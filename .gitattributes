@@ -1,0 +1,120 @@
+##### Global default #####
+
+## Any file not listed below will not have EOL characters normalized.
+##   (Diffing and merging will depend on whether Git thinks the file is really
+##   text or binary.)
+*                       -text
+
+## Alternatively, we could let Git auto-detect text files and normalize EOL,
+##   by setting:
+## *                       text=auto
+
+
+##### Source code #####
+
+## C++ and C source files
+*.h                     text diff=cpp
+*.cc                    text diff=cpp
+*.c                     text diff=cpp
+## (Discouraged C++ extensions)
+*.cpp                   text diff=cpp
+*.cxx                   text diff=cpp
+*.hh                    text diff=cpp
+
+## Python scripts
+*.py                    text eol=lf diff=python
+## Perl scripts/libraries/modules
+*.perl                  text eol=lf diff=perl
+*.pl                    text eol=lf diff=perl
+*.pm                    text eol=lf diff=perl
+## Shell scripts
+*.sh                    text eol=lf
+*.bash                  text eol=lf
+## Windows batch scripts
+*.bat                   text eol=crlf
+
+## Shader program source
+*.frag                  text diff=cpp
+*.vert                  text diff=cpp
+
+
+##### Other file types #####
+
+## Text files and documentation
+*.txt                   text
+README*                 text
+INSTALL*                text
+LICENSE*                text
+## Non-text documentation
+*.html                  text diff=html
+*.pdf                   binary
+*.rtf                   binary
+
+## Doxygen documentation configuration files
+Doxyfile                text
+*.dox                   text
+
+## Image files
+*.png                   binary
+*.PNG                   binary
+*.jpg                   binary
+*.JPG                   binary
+*.gif                   binary
+*.GIF                   binary
+*.bmp                   binary
+*.BMP                   binary
+*.ico                   binary
+*.ICO                   binary
+*.ppm                   binary
+*.pgm                   binary
+*.pbm                   binary
+*.xpm                   -text diff -merge
+## Vector graphics
+*.svg                   -text diff -merge
+
+## Model files
+*.obj                   text diff -merge
+*.mtl                   text diff -merge
+*.osg                   text diff -merge
+*.osgt                  text diff -merge
+*.ply                   text diff -merge
+*.stl                   text diff -merge
+*.osgb                  binary
+*.oct                   binary
+*.phi                   binary
+*.rgd                   binary
+*.tet                   binary
+*.tri                   binary
+
+## CMake files
+CMakeLists.txt          text
+
+## Makefiles
+Makefile                text
+makefile                text
+GNUmakefile             text
+*.mk                    text
+
+## Various IDE project files, etc
+*.sln                   -text diff merge
+*.vcxproj               -text diff -merge
+*.vcxproj.filters       -text diff -merge
+*.props                 -text diff -merge
+*.pbxproj               -text diff -merge
+
+## Resource files and UI design descriptions
+*.qrc                   text
+*.ui                    text
+*.rc                    text
+
+## Diff/patch files
+*.diff                  text diff -merge
+*.patch                 text diff -merge
+
+## XML and configuration
+*.xml                   text
+*.cfg                   text
+
+## Self-reference =)
+.gitignore              text
+.gitattributes          text

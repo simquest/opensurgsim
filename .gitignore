@@ -1,0 +1,70 @@
+# This file specifies intentionally untracked files that git should ignore.
+# For details, see documentation, e.g. by running "git help ignore".
+#
+# To list the files in your tree that are being ignored (i.e. files which
+# are not already under version control and match an ignore pattern), run
+#   git ls-files --others -i
+
+##### generic file types #####
+
+## object files and other build output
+*.o
+*.obj
+*.pdb
+*.so
+*.a
+*.dll
+*.lib
+*.exe
+*.pyc
+
+## editor etc. back-up files
+*~
+.*~
+*.bak
+.#*
+
+## archive file formats
+*.tar
+*.gz
+*.bz2
+*.zip
+*.7z
+
+## CMake-style build directories
+
+## Windows-style build directories
+Debug
+Release
+ReleaseUnoptimized
+Debug-vs20[01][0-9]
+Release-vs20[01][0-9]
+ReleaseUnoptimized-vs20[01][0-9]
+
+## files left by Visual Studio
+*.sdf
+*.opensdf
+*.suo
+*.ncb
+*.bsc
+*.pch
+*.ilk
+*.idb
+*.exp
+*.vcproj.*.user
+*.vcxproj.user
+
+## files left by other development tools
+ipch
+VTune
+My Amplifier XE Results*
+*.ampl.cfg
+
+## files left around after manually running 'patch'
+*.rej
+*.orig
+
+## other files we don't generally care about
+*.log
+
+##### specific files/paths to ignore #####
