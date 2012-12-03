@@ -45,6 +45,7 @@
 README*                 text
 INSTALL*                text
 LICENSE*                text
+NOTICE*                 text
 ## Non-text documentation
 *.html                  text diff=html
 *.pdf                   binary
