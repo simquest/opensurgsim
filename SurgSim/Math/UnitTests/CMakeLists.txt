@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	MatrixTests.cpp
 	VectorTests.cpp
 )
 

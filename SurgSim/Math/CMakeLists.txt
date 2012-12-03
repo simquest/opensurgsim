@@ -22,6 +22,7 @@ set(SURGSIM_MATH_SOURCES
 )
 
 set(SURGSIM_MATH_HEADERS
+	Matrix.h
 	Vector.h
 )
 
