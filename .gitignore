@@ -31,9 +31,15 @@
 *.zip
 *.7z
 
-## CMake-style build directories
+## CMake build directories
+CMakeFiles
 
-## Windows-style build directories
+## files left by CMake
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+## Visual Studio build directories
 Debug
 Release
 ReleaseUnoptimized
@@ -54,6 +60,13 @@ ReleaseUnoptimized-vs20[01][0-9]
 *.vcproj.*.user
 *.vcxproj.user
 
+## Visual Studio solution and project files
+# (Currently always generated from CMake, so we just ignore them all.
+#  If that changes in the future, this will have to change as well.)
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
 ## files left by other development tools
 ipch
 VTune
@@ -68,3 +81,13 @@ My Amplifier XE Results*
 *.log
 
 ##### specific files/paths to ignore #####
+
+## build directories
+/build
+/build-*
+/build_*
+
+## binaries
+# (only if building directly inside the tree)
+/tests/unit_tests
+/tests/unit_tests.exe
