@@ -1,0 +1,8 @@
+This directory contains third-party software that is not a part of
+OpenSurgSim, but is packaged with it for convenience.
+
+The "gtest" directory contains a copy of the Google Test framework,
+version 1.6.0, which is also available for download at
+    http://code.google.com/p/googletest/
+Google Test is used to build and run the OpenSurgSim unit tests, and
+is governed by the license in gtest/COPYING.
