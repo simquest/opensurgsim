@@ -15,7 +15,6 @@
 
 
 include_directories(
-	${SURGSIM_INCLUDE_DIR}
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
 )
