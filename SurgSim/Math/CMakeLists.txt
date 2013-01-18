@@ -15,7 +15,6 @@
 
 
 include_directories(
-	${SURGSIM_INCLUDE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 )
 
@@ -23,11 +22,13 @@ set(SURGSIM_MATH_SOURCES
 )
 
 set(SURGSIM_MATH_HEADERS
+	Matrix.h
+	Quaternion.h
 	Vector.h
 )
 
 #add_library(SurgSimMath ${SURGSIM_MATH_SOURCES} ${SURGSIM_MATH_HEADERS})
 
-if (SURGSIM_TESTS_BUILD)
+if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()

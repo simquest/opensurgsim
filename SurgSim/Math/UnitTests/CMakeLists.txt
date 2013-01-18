@@ -15,12 +15,13 @@
 
 
 include_directories(
-	${SURGSIM_INCLUDE_DIR}
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
+	MatrixTests.cpp
+	QuaternionTests.cpp
 	VectorTests.cpp
 )
 

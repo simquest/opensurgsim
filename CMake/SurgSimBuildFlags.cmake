@@ -27,34 +27,34 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 add_definitions( -D_USE_MATH_DEFINES )
 
 # G++ (C++ compilation) specific settings
-if (CMAKE_COMPILER_IS_GNUCXX)
+if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 	# Enable support for C++0x/C++11 for G++ if available
 	include(CheckCXXCompilerFlag)
 	check_cxx_compiler_flag(-std=gnu++11 HAVE_FLAG_STD_GNUXX11)
-	if (HAVE_FLAG_STD_GNUXX11)
+	if(HAVE_FLAG_STD_GNUXX11)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-	else (HAVE_FLAG_STD_GNUXX11)
+	else(HAVE_FLAG_STD_GNUXX11)
 		check_cxx_compiler_flag(-std=gnu++0x HAVE_FLAG_STD_GNUXX0X)
-		if (HAVE_FLAG_STD_GNUXX0X)
+		if(HAVE_FLAG_STD_GNUXX0X)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
-		else (HAVE_FLAG_STD_GNUXX0X)
+		else(HAVE_FLAG_STD_GNUXX0X)
 			message(WARNING "G++ is missing C++0x/C++11 support; trying anyway.")
-		endif (HAVE_FLAG_STD_GNUXX0X)
-	endif (HAVE_FLAG_STD_GNUXX11)
+		endif(HAVE_FLAG_STD_GNUXX0X)
+	endif(HAVE_FLAG_STD_GNUXX11)
 
-endif (CMAKE_COMPILER_IS_GNUCXX)
+endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # GCC (C compilation) specific settings
-if (CMAKE_COMPILER_IS_GNUCC)  # "CC"?  really?  sigh.
+if(CMAKE_COMPILER_IS_GNUCC)  # "CC"?  really?  sigh.
 	# default GCC compilation flags
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-endif (CMAKE_COMPILER_IS_GNUCC)
+endif(CMAKE_COMPILER_IS_GNUCC)
 
 # Visual Studio C/C++ specific settings
-if (MSVC)
+if(MSVC)
 	# default VC++ compilation flags
 	add_definitions( -D_CRT_SECURE_NO_WARNINGS )
 	# Set the iterator debug level consistently for Debug builds.
@@ -65,9 +65,9 @@ if (MSVC)
 	# Enable parallel builds:
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /MP")  # is this needed?
-endif (MSVC)
+endif(MSVC)
 
 # Windows-specific settings
-if (WIN32)
+if(WIN32)
 	add_definitions( -D_WIN32_WINNT=0x0501 )  # request compatibility with WinXP
-endif (WIN32)
+endif(WIN32)
