@@ -14,17 +14,24 @@
 # limitations under the License.
 
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
 include_directories(
-	"${Boost_INCLUDE_DIR}"
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-# add_subdirectory(Collision)
-# add_subdirectory(Devices)
-add_subdirectory(Framework)
-# add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-# add_subdirectory(Physics)
+set(UNIT_TEST_SOURCES
+	DataGroupTests.cpp
+	IndexDirectoryTests.cpp
+	NamedDataTests.cpp
+)
+
+set(UNIT_TEST_HEADERS
+)
+
+include_directories(
+)
+
+#set(LIBS SurgSimFramework SurgSimInput gtest)
+set(LIBS SurgSimFramework gtest)
+
+surgsim_add_unit_tests(SurgSimInputTest)

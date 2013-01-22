@@ -14,17 +14,23 @@
 # limitations under the License.
 
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
 include_directories(
-	"${Boost_INCLUDE_DIR}"
+	${EIGEN3_INCLUDE_DIR}
 )
 
-# add_subdirectory(Collision)
-# add_subdirectory(Devices)
-add_subdirectory(Framework)
-# add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-# add_subdirectory(Physics)
+set(SURGSIM_INPUT_SOURCES
+)
+
+set(SURGSIM_INPUT_HEADERS
+	DataGroup.h
+	DataGroupBuilder.h
+	IndexDirectory.h
+	NamedData.h
+	NamedDataBuilder.h
+)
+
+#add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
+
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()
