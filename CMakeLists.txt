@@ -32,6 +32,11 @@ include(SurgSimUtilities)
 #find_package(OpenThreads)
 find_package(Eigen3 REQUIRED)
 
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost COMPONENTS thread REQUIRED)
+
 
 option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 if(SURGSIM_TESTS_BUILD)

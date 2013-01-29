@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -21,9 +22,41 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 )
 
-# add_subdirectory(Collision)
-# add_subdirectory(Devices)
-add_subdirectory(Framework)
-# add_subdirectory(Graphics)
-add_subdirectory(Math)
-# add_subdirectory(Physics)
+set(SURGSIM_FRAMEWORK_SOURCES
+#	BasicThread.cpp
+#	BehaviorManager.cpp
+#	Component.cpp
+	Logger.cpp
+	LogMessageBase.cpp
+	LogOutput.cpp
+#	Representation.cpp
+#	Runtime.cpp
+#	Scene.cpp
+#	SceneElement.cpp
+)
+
+set(SURGSIM_FRAMEWORK_HEADERS
+	Assert.h
+	AssertMessage.h
+#	BasicThread.h
+#	Behavior.h
+#	BehaviorManager.h
+#	Component.h
+#	Framework.h
+	Log.h
+	Logger.h
+	LogMacros.h
+	LogMessage.h
+	LogMessageBase.h
+	LogOutput.h
+#	Representation.h
+#	Runtime.h
+#	Scene.h
+#	SceneElement.h
+)
+
+add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HEADERS})
+
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()
