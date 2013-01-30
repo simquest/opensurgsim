@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+find_package(Boost COMPONENTS filesystem REQUIRED)
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
@@ -36,6 +37,9 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimFramework gtest)
+set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
+if(UNIX)
+    set(LIBS ${LIBS} rt)
+endif(UNIX)
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
