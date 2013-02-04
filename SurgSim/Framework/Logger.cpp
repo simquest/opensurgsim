@@ -16,6 +16,9 @@
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Framework/LogOutput.h"
 
+#include <iostream>
+
+
 namespace SurgSim
 {
 namespace Framework
