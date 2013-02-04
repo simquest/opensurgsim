@@ -146,13 +146,16 @@ TEST(ThreadSafeContainerTest, ReadWriteInterlock)
 
 	ThreadSafeContainer<Copyable> data(content);
 	EXPECT_EQ(1, data->getValue());
+	bool wasUpdated = data.update();
+	EXPECT_FALSE(wasUpdated);
 
 	// "writer":
 	content.setValue(2);
 	// note: NOT writing to the container!
 
 	// "reader":
-	data.update();
+	wasUpdated = data.update();
+	EXPECT_FALSE(wasUpdated);
 	EXPECT_EQ(1, data->getValue());
 
 	// "writer":
@@ -166,7 +169,8 @@ TEST(ThreadSafeContainerTest, ReadWriteInterlock)
 	// "writer": reusing previously written value
 
 	// "reader":
-	data.update();
+	wasUpdated = data.update();
+	EXPECT_TRUE(wasUpdated);
 	EXPECT_EQ(3, data->getValue());
 }
 
@@ -177,13 +181,16 @@ TEST(ThreadSafeContainerTest, MoveInterfaces)
 
 	ThreadSafeContainer<Movable> data(std::move(content));
 	EXPECT_EQ(1, data->getValue());
+	bool wasUpdated = data.update();
+	EXPECT_FALSE(wasUpdated);
 
 	// "writer":
 	content.setValue(2);
 	// note: NOT writing to the container!
 
 	// "reader":
-	data.update();
+	wasUpdated = data.update();
+	EXPECT_FALSE(wasUpdated);
 	EXPECT_EQ(1, data->getValue());
 
 	// "writer":
@@ -197,7 +204,8 @@ TEST(ThreadSafeContainerTest, MoveInterfaces)
 	// "writer": reusing previously written value
 
 	// "reader":
-	data.update();
+	wasUpdated = data.update();
+	EXPECT_TRUE(wasUpdated);
 	EXPECT_EQ(3, data->getValue());
 }
 
@@ -208,8 +216,9 @@ typedef ThreadSafeContainer<BigData> SharedData;
 class DataWriter
 {
 public:
-	explicit DataWriter(SharedData& data, int step = 1, int loops = 100000) :
+	explicit DataWriter(SharedData& data, int start = 0, int step = 1, int loops = 100000) :
 		m_data(data),
+		m_start(start),
 		m_step(step),
 		m_loops(loops),
 		m_isDone(false)
@@ -234,7 +243,7 @@ public:
 	{
 		BigData current;
 
-		int value = 0;
+		int value = m_start;
 		while (m_loops > 0)
 		{
 			--m_loops;
@@ -253,6 +262,7 @@ private:
 	void operator=(const DataWriter&);
 
 	SharedData& m_data;
+	int m_start;
 	int m_step;
 	int m_loops;
 	bool m_isDone;
@@ -274,7 +284,8 @@ void testReaderAndWriters(int numWriters)
 	std::vector<DataWriter*> writers(numWriters);
 	for (size_t i = 0;  i < writers.size();  ++i)
 	{
-		writers[i] = new DataWriter(data, i, NUM_TOTAL_WRITES/numWriters);
+		// The step has been chosen so two writers can't ever produce the same value
+		writers[i] = new DataWriter(data, i, numWriters, NUM_TOTAL_WRITES/numWriters);
 	}
 	data.update();
 	EXPECT_EQ(-1, data->getValue1());
@@ -287,10 +298,20 @@ void testReaderAndWriters(int numWriters)
 
 	while (1)
 	{
-		data.update();
+		int z1 = data->getValue1();
+
+		bool wasUpdated = data.update();
 		int a1 = data->getValue1();
 		int a2 = data->getValue2();
 		EXPECT_EQ(a1, a2);
+		if (wasUpdated)
+		{
+			EXPECT_NE(z1, a1);
+		}
+		else
+		{
+			EXPECT_EQ(z1, a1);
+		}
 
 		int b1 = data->getValue1();
 		int b2 = data->getValue2();
