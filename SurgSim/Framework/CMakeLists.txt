@@ -52,6 +52,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 #	Runtime.h
 #	Scene.h
 #	SceneElement.h
+	ThreadSafeContainer.h
 )
 
 add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HEADERS})
