@@ -40,8 +40,8 @@ find_package(Boost COMPONENTS thread REQUIRED)
 
 option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(ThirdParty/gtest)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
+	add_subdirectory(ThirdParty/gtest)
 endif()
 
 add_subdirectory(SurgSim)
