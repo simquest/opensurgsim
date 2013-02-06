@@ -2,7 +2,7 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/SceneElement.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Framework
 {

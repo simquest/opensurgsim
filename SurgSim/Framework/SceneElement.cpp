@@ -82,7 +82,7 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 {
 	std::vector<std::shared_ptr<Component>> result(m_components.size());
 	auto componentIt = m_components.begin();
-	for (int i=0;componentIt != m_components.end(); ++componentIt, ++i)
+	for (int i=0; componentIt != m_components.end(); ++componentIt, ++i)
 	{
 		result[i] = componentIt->second;
 	}

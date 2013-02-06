@@ -38,7 +38,7 @@ Runtime::Runtime() :
 
 Runtime::~Runtime()
 {
-	
+
 }
 
 void Runtime::addWorkerThread(std::shared_ptr<BasicThread> thread)
@@ -60,17 +60,17 @@ void SurgSim::Framework::Runtime::setScene(std::shared_ptr<Scene> scene)
 
 bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 {
-	// If we add a single scene element before the simulation is running 
+	// If we add a single scene element before the simulation is running
 	// it will be handled by the scene initialization
 	if (! m_isRunning)
 	{
 		return false;
 	}
-	
+
 	bool result = false;
-	
+
 	result = sceneElement->doInit();
-	
+
 	if (result)
 	{
 		result = addComponents(sceneElement->getComponents());
@@ -110,7 +110,7 @@ bool Runtime::execute()
 			boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 			for (it = m_workerThreads.cbegin(); it != m_workerThreads.cend(); ++it)
 			{
-				if ( ! (*it)->isRunning())
+				if (!(*it)->isRunning())
 				{
 					doExit = true;
 					break;
@@ -168,7 +168,7 @@ void Runtime::preprocessSceneElements()
 	// Collect all the Components
 	std::vector<std::shared_ptr<Component>> newComponents;
 	auto sceneElements = m_scene->getSceneElements();
-	for (auto it = sceneElements.begin(); it != sceneElements.end();++it)
+	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
 		it->second->doInit();
 		std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
@@ -176,8 +176,8 @@ void Runtime::preprocessSceneElements()
 	}
 
 	addComponents(newComponents);
-	
-	for (auto it = sceneElements.cbegin(); it != sceneElements.cend();++it)
+
+	for (auto it = sceneElements.cbegin(); it != sceneElements.cend(); ++it)
 	{
 		it->second->doWakeUp();
 	}
@@ -203,7 +203,7 @@ std::shared_ptr<Logger> Runtime::getLogger(const std::string& loggerName)
 std::shared_ptr<Runtime> Runtime::getSharedPtr()
 {
 	std::shared_ptr<Runtime> result;
-	try 
+	try
 	{
 		result = shared_from_this();
 	}

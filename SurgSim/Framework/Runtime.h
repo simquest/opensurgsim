@@ -36,7 +36,7 @@ class Logger;
 
 /// This class contains all the information about the runtime environment of
 /// the simulation, all the running threads, the state, ... while it is de facto a
-/// singleton it should be passed around if needed. Needs to be created as a 
+/// singleton it should be passed around if needed. Needs to be created as a
 /// shared object
 class Runtime : public std::enable_shared_from_this<Runtime>
 {
@@ -60,7 +60,7 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	bool addSceneElement(std::shared_ptr<SceneElement> sceneElement);
 
-	/// Start all the threads and block until one of them quits 
+	/// Start all the threads and block until one of them quits
 	bool Runtime::execute();
 
 	/// Start all the threads non returns after the startup as succeeded
@@ -93,9 +93,9 @@ public:
 	std::shared_ptr<Runtime> getSharedPtr();
 
 	/// Gets a logger. If the logger does not exist yet it will be created with
-	/// the given name and a default output. Cleaning up the logger will be the 
+	/// the given name and a default output. Cleaning up the logger will be the
 	/// responsibility of this class, keep the logger reference
-	/// \todo This should be moved into a future LogFactory class HS-2012-feb-05 
+	/// \todo This should be moved into a future LogFactory class HS-2012-feb-05
 	/// \param	loggerName	Name of the logger.
 	/// \return	The logger with the name loggerName.
 	std::shared_ptr<Logger> getLogger(const std::string& loggerName);
@@ -110,14 +110,14 @@ private:
 	/// \param	components	The components.
 	/// \return	true if it succeeds, false if it fails.
 	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
-	
-	
+
+
 	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;
 	std::shared_ptr<Scene> m_scene;
 	bool m_isRunning;
 
 	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
-	
+
 	boost::mutex m_mutex;
 };
 

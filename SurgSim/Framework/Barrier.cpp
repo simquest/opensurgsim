@@ -23,8 +23,8 @@
 
 #include "SurgSim/Framework/Barrier.h"
 
-SurgSim::Framework::Barrier::Barrier(unsigned int count) : 
-m_threshold(count), 
+SurgSim::Framework::Barrier::Barrier(unsigned int count) :
+	m_threshold(count),
 	m_count(count),
 	m_generation(0),
 	m_success(true)

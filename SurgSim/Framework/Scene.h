@@ -14,7 +14,7 @@ namespace Framework
 
 class Runtime;
 
-/// Scene. Basic Container for SceneElements 
+/// Scene. Basic Container for SceneElements
 class Scene
 {
 public:

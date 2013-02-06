@@ -18,7 +18,7 @@
 // David Moore, William E. Kempf
 // Copyright (C) 2007-8 Anthony Williams
 //
-// Which was distributed under the Boost Software License, Version 1.0. 
+// Which was distributed under the Boost Software License, Version 1.0.
 // (See accomanying NOTICES or a copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef SURGSIM_FRAMEWORK_BARRIER_H
@@ -40,7 +40,7 @@ namespace Framework
 /// threads will wait at Barrier::wait(val) until the number of threads calling
 /// wait is equal to the number given in the constructor.
 /// Additionally wait will return a boolean AND over all the values passed into
-/// the wait function, this can be used to signal a failure condition accross 
+/// the wait function, this can be used to signal a failure condition accross
 /// threads.
 class Barrier
 {

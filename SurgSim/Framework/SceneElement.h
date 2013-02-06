@@ -14,8 +14,8 @@ namespace Framework
 class Component;
 class Runtime;
 
-/// SceneElement is the basic part of a scene, it is a container of components. SceneElements 
-/// doInit() will be called on all SceneElements before they are integrated into the system, 
+/// SceneElement is the basic part of a scene, it is a container of components. SceneElements
+/// doInit() will be called on all SceneElements before they are integrated into the system,
 /// doWakeup() will be called after all doInit() have been completed and all the static information
 /// has been initialised
 class SceneElement
@@ -58,7 +58,7 @@ public:
 	bool doWakeUp();
 
 	/// \return	The name.
-	std::string getName() const 
+	std::string getName() const
 	{
 		return m_name;
 	}

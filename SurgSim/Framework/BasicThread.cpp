@@ -128,7 +128,7 @@ void SurgSim::Framework::BasicThread::operator()()
 		if (m_rate > frameTime)
 		{
 			boost::this_thread::sleep_for(m_rate-frameTime);
-		} 
+		}
 		start = boost::chrono::system_clock::now();
 		m_isRunning = update(m_rate.count());
 		frameTime = boost::chrono::system_clock::now() - start;

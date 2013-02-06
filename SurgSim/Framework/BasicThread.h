@@ -46,12 +46,12 @@ public:
 
 	/// Live cycle functions, public implementation.
 	/// All of these have virtual partners as private functions
-	
-	/// Start the thread from the outside, this will call the private 
-	/// run() function that can be overridden for each implementor of this 
+
+	/// Start the thread from the outside, this will call the private
+	/// run() function that can be overridden for each implementor of this
 	/// interface
 	/// \param startupBarrier is a barrier it synchronizes a group of thread that should go through their startup
-	/// sequence in step. 
+	/// sequence in step.
 	void doRun(std::shared_ptr<Barrier> startupBarrier);
 
 	/// Stopping the execution
@@ -87,10 +87,14 @@ public:
 
 	/// @{
 	/// Runtime accessors
-	std::shared_ptr<Runtime> getRuntime() const 
-	{ return m_runtime.lock(); }
-	void setRuntime(std::shared_ptr<Runtime> val) 
-	{ m_runtime = val; }
+	std::shared_ptr<Runtime> getRuntime() const
+	{
+		return m_runtime.lock();
+	}
+	void setRuntime(std::shared_ptr<Runtime> val)
+	{
+		m_runtime = val;
+	}
 	/// @}
 
 protected:
@@ -101,7 +105,7 @@ protected:
 	bool doInit();
 
 	/// Trigger the startup of this object, this will be called after all other threads doInit() was called
-	/// the thread will only enter the run loop triggering upated() if all threads doInit() and doStartup() 
+	/// the thread will only enter the run loop triggering upated() if all threads doInit() and doStartup()
 	/// returned true
 	/// \return true on success
 	bool doStartup();
