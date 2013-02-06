@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include "MockObjects.h"
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 
@@ -22,4 +23,25 @@ using namespace SurgSim::Framework;
 TEST(SceneTest, ConstructorTest)
 {
 	ASSERT_NO_THROW( {Scene scene;});
+}
+
+TEST(SceneTest, ElementManagement)
+{
+	std::shared_ptr<Scene> scene(new Scene());
+	std::shared_ptr<MockSceneElement> element1(new MockSceneElement("one"));
+	std::shared_ptr<MockSceneElement> element2(new MockSceneElement("two"));
+
+	EXPECT_EQ(0, scene->getSceneElements().size());
+
+	EXPECT_TRUE(scene->addSceneElement(element1));
+	EXPECT_EQ(1, scene->getSceneElements().size());
+	EXPECT_TRUE(scene->addSceneElement(element2));
+	EXPECT_EQ(2, scene->getSceneElements().size());
+
+	EXPECT_FALSE(scene->addSceneElement(element1));
+	EXPECT_EQ(2, scene->getSceneElements().size());
+
+	EXPECT_EQ(element1, scene->getSceneElement("one"));
+	EXPECT_EQ(element2, scene->getSceneElement("two"));
+	EXPECT_EQ(nullptr, scene->getSceneElement("nonexistentelement"));
 }
