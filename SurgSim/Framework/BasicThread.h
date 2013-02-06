@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BASICTHREAD_H
-#define SURGSIM_BASICTHREAD_H
+#ifndef SURGSIM_FRAMEWORK_BASICTHREAD_H
+#define SURGSIM_FRAMEWORK_BASICTHREAD_H
 
 #include <memory>
 #include <string>
