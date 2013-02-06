@@ -61,7 +61,7 @@ public:
 	bool addSceneElement(std::shared_ptr<SceneElement> sceneElement);
 
 	/// Start all the threads and block until one of them quits
-	bool Runtime::execute();
+	bool execute();
 
 	/// Start all the threads non returns after the startup as succeeded
 	/// \return	true if it succeeds, false if it fails.
