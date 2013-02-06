@@ -36,20 +36,20 @@ namespace SurgSim
 namespace Framework
 {
 
-/// Barrier class, synchronize a set of thread to wait at a common point, all
+/// Barrier class, synchronize a set of threads to wait at a common point, all
 /// threads will wait at Barrier::wait(val) until the number of threads calling
 /// wait is equal to the number given in the constructor.
 /// Additionally wait will return a boolean AND over all the values passed into
-/// the wait function, this can be used to signal a failure condition accross
+/// the wait function, this can be used to signal a failure condition across
 /// threads.
 class Barrier
 {
 public:
-	/// Construct the barrier
-	/// \param number of threads to synchronize, can't be 0
+	/// Construct the barrier.
+	/// \param number of threads to synchronize, can't be 0.
 	Barrier(unsigned int count);
 
-	/// Wait until all threads have called wait
+	/// Waits until all \a count threads have called wait.
 	/// \param value to be used in result calculation
 	/// \return true if all wait calls passed true, false otherwise
 	bool wait(bool success);

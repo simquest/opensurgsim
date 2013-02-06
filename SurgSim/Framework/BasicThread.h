@@ -57,9 +57,9 @@ public:
 	/// Stopping the execution
 	void doStop(bool waitForExit);
 
-	/// Query if this object is initialised.
-	/// \return	true if initialised, false if not.
-	bool isInitialised();
+	/// Query if this object is initialized.
+	/// \return	true if initialized, false if not.
+	bool isInitialized();
 
 	/// Query if this object is running.
 	/// \return	true if the threads update() function is being called.
@@ -118,7 +118,7 @@ private:
 	std::shared_ptr<Barrier> m_startupBarrier;
 	std::weak_ptr<Runtime> m_runtime;
 
-	bool m_isInitialised;
+	bool m_isInitialized;
 	bool m_isRunning;
 	bool m_stopExecution;
 

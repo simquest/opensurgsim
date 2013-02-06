@@ -131,7 +131,7 @@ bool Runtime::start()
 		(*it)->doRun(barrier);
 	}
 
-	// Wait for all the threads to initialise
+	// Wait for all the threads to initialize
 	barrier->wait(true);
 	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doInit() suceeded";
 
@@ -144,7 +144,7 @@ bool Runtime::start()
 	m_isRunning = true;
 	// Now add all the scenelements
 	preprocessSceneElements();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Scene is initialised";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Scene is initialized";
 
 	// All threads are waiting for this
 	barrier->wait(true);

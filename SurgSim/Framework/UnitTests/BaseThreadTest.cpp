@@ -31,7 +31,7 @@
 TEST(ThreadTest, Instantiation)
 {
 	MockThread m;
-	EXPECT_FALSE(m.isInitialised());
+	EXPECT_FALSE(m.isInitialized());
 	EXPECT_FALSE(m.isRunning());
 }
 

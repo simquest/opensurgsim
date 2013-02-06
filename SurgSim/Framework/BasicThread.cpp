@@ -23,7 +23,7 @@
 #include <SurgSim/Framework/Log.h>
 
 SurgSim::Framework::BasicThread::BasicThread(std::string name) :
-	m_isInitialised(false),
+	m_isInitialized(false),
 	m_isRunning(false),
 	m_rate(1.0/30),
 	m_stopExecution(false),
@@ -37,9 +37,9 @@ SurgSim::Framework::BasicThread::~BasicThread()
 
 }
 
-bool SurgSim::Framework::BasicThread::isInitialised()
+bool SurgSim::Framework::BasicThread::isInitialized()
 {
-	return m_isInitialised;
+	return m_isInitialized;
 }
 
 bool SurgSim::Framework::BasicThread::isRunning() const
@@ -49,8 +49,8 @@ bool SurgSim::Framework::BasicThread::isRunning() const
 
 bool SurgSim::Framework::BasicThread::doInit()
 {
-	m_isInitialised = init();
-	return m_isInitialised;
+	m_isInitialized = init();
+	return m_isInitialized;
 }
 
 
