@@ -23,25 +23,25 @@ include_directories(
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
-#	BasicThread.cpp
+	BasicThread.cpp
+	Barrier.cpp
 #	BehaviorManager.cpp
-#	Component.cpp
 	Logger.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
 #	Representation.cpp
-#	Runtime.cpp
-#	Scene.cpp
-#	SceneElement.cpp
+	Runtime.cpp
+	Scene.cpp
+	SceneElement.cpp
 )
 
 set(SURGSIM_FRAMEWORK_HEADERS
 	Assert.h
 	AssertMessage.h
-#	BasicThread.h
+	BasicThread.h
 #	Behavior.h
 #	BehaviorManager.h
-#	Component.h
+	Component.h
 #	Framework.h
 	Log.h
 	Logger.h
@@ -50,9 +50,9 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessageBase.h
 	LogOutput.h
 #	Representation.h
-#	Runtime.h
-#	Scene.h
-#	SceneElement.h
+	Runtime.h
+	Scene.h
+	SceneElement.h
 )
 
 add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HEADERS})

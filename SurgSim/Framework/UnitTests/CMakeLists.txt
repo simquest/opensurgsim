@@ -22,15 +22,15 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	AssertTest.cpp
 #	BehaviorManagerTest.cpp
-#	BaseThreadTest.cpp
+	BaseThreadTest.cpp
 	LoggerTest.cpp
-#	RuntimeTest.cpp
-#	SceneElementTest.cpp
-#	SceneTest.cpp
+	RuntimeTest.cpp
+	SceneElementTest.cpp
+	SceneTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
-#	MockObjects.h
+	MockObjects.h
 )
 
 include_directories(
