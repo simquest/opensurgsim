@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+find_package(Boost COMPONENTS filesystem system REQUIRED)
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
@@ -27,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
+	ThreadSafeContainerTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -36,6 +38,9 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimFramework gtest)
+set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	set(LIBS ${LIBS} rt)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)

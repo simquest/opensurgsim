@@ -48,14 +48,14 @@ enum LogLevel
 class Logger
 {
 public:
-	Logger::Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
+	Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
 		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
 		m_name(name),
 		m_output(output)
 	{
 	}
 
-	Logger::~Logger()
+	~Logger()
 	{
 	}
 
@@ -65,40 +65,40 @@ public:
 	/// Uses the contained instance of LogOutput to write the log message
 	/// \return true on success
 	/// \param message the message to be printed
-	bool Logger::writeMessage(const std::string& message)
+	bool writeMessage(const std::string& message)
 	{
 		return m_output->writeMessage(message);
 	}
 
 	/// The threshold used for logging, anything message with less than this level
 	/// will be ignored
-	int Logger::getThreshold() const
+	int getThreshold() const
 	{
 		return m_threshold;
 	}
 
 	/// Sets the logging threshold
 	/// \param the value for the threshold
-	void Logger::setThreshold(int val)
+	void setThreshold(int val)
 	{
 		m_threshold = val;
 	}
 
 	/// \return the current output class used this logger
-	std::shared_ptr<LogOutput> Logger::getOutput() const
+	std::shared_ptr<LogOutput> getOutput() const
 	{
 		return m_output;
 	}
 
 	/// Set the output class used by this logger
 	/// \param the output class to be used
-	void Logger::setOutput(std::shared_ptr<LogOutput> val)
+	void setOutput(std::shared_ptr<LogOutput> val)
 	{
 		m_output = val;
 	}
 
 	/// This loggers name
-	std::string Logger::getName() const
+	std::string getName() const
 	{
 		return m_name;
 	}
