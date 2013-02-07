@@ -112,9 +112,9 @@ private:
 	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
 
 
+	bool m_isRunning;
 	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;
 	std::shared_ptr<Scene> m_scene;
-	bool m_isRunning;
 
 	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
 

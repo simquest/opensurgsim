@@ -23,18 +23,16 @@
 #include <SurgSim/Framework/Log.h>
 
 SurgSim::Framework::BasicThread::BasicThread(std::string name) :
+	m_name(name),
+	m_rate(1.0/30),
 	m_isInitialized(false),
 	m_isRunning(false),
-	m_rate(1.0/30),
-	m_stopExecution(false),
-	m_name(name)
+	m_stopExecution(false)
 {
-
 }
 
 SurgSim::Framework::BasicThread::~BasicThread()
 {
-
 }
 
 bool SurgSim::Framework::BasicThread::isInitialized()
@@ -74,7 +72,6 @@ boost::thread& SurgSim::Framework::BasicThread::getThread()
 
 void SurgSim::Framework::BasicThread::operator()()
 {
-	double dt = 0.0;
 	bool success = true;
 	m_stopExecution = false;
 
