@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Original barrier.hpp
+// Based on barrier.hpp from Boost 1.51
 // Copyright (C) 2002-2003
 // David Moore, William E. Kempf
 // Copyright (C) 2007-8 Anthony Williams
 //
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// Which was distributed under the Boost Software License, Version 1.0.
+// (See accomanying NOTICES or a copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include "SurgSim/Framework/Barrier.h"
 
