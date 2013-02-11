@@ -16,12 +16,12 @@ class MockSceneElement : public SurgSim::Framework::SceneElement
 {
 public:
 	MockSceneElement(std::string name = "MockSceneElement") : 
+		SceneElement(name),
 		didInit(false), 
 		didWakeUp(false), 
 		didUpdate(false),
 		didLateUpdate(false),
-		didFixedUpdate(false),
-		SceneElement(name)
+		didFixedUpdate(false)
 	{
 		m_localRuntime = std::make_shared<SurgSim::Framework::Runtime>();
 		setRuntime(m_localRuntime);
@@ -67,15 +67,19 @@ public:
 		succeedInit(succeedInit),
 		succeedStartup(succeedStartup),
 		count(10),
-		totalTime(0.0) {};
-	virtual ~MockThread() {};
+		totalTime(0.0)
+	{
+	}
 
-	int count;
-	double totalTime;
+	virtual ~MockThread()
+	{
+	}
 
 	bool succeedInit;
 	bool succeedStartup;
-	bool assertInLoop;
+
+	int count;
+	double totalTime;
 
 private:
 	virtual bool doInitialize()
@@ -130,8 +134,8 @@ public:
 
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
-	bool didInit;
 	bool didWakeUp;
+	bool didInit;
 };
 
 // class MockBehavior : public SurgSim::Framework::Behavior

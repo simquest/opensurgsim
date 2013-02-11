@@ -61,7 +61,7 @@ public:
 	bool addSceneElement(std::shared_ptr<SceneElement> sceneElement);
 
 	/// Start all the threads and block until one of them quits
-	bool Runtime::execute();
+	bool execute();
 
 	/// Start all the threads non returns after the startup as succeeded
 	/// \return	true if it succeeds, false if it fails.
@@ -104,9 +104,9 @@ private:
 	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
 
 
+	bool m_isRunning;
 	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;
 	std::shared_ptr<Scene> m_scene;
-	bool m_isRunning;
 
 	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
 
