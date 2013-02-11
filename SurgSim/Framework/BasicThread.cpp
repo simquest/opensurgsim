@@ -47,19 +47,19 @@ bool SurgSim::Framework::BasicThread::isRunning() const
 	return m_isRunning;
 }
 
-bool SurgSim::Framework::BasicThread::doInit()
+bool SurgSim::Framework::BasicThread::initialize()
 {
-	m_isInitialized = init();
+	m_isInitialized = doInitialize();
 	return m_isInitialized;
 }
 
 
-bool SurgSim::Framework::BasicThread::doStartup()
+bool SurgSim::Framework::BasicThread::startUp()
 {
-	return startup();
+	return doStartUp();
 }
 
-void SurgSim::Framework::BasicThread::doRun(std::shared_ptr<Barrier> startupBarrier)
+void SurgSim::Framework::BasicThread::start(std::shared_ptr<Barrier> startupBarrier)
 {
 	m_startupBarrier = startupBarrier;
 	// Start the thread with a reference to this
@@ -78,7 +78,7 @@ void SurgSim::Framework::BasicThread::operator()()
 	bool success = true;
 	m_stopExecution = false;
 
-	success = doInit();
+	success = initialize();
 	SURGSIM_ASSERT(success) << "Initialisation has failed for thread " << getName();
 	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Initialisation has succeeded for thread " << getName();
 	// Waits for all the threads to init and then proceeds
@@ -93,7 +93,7 @@ void SurgSim::Framework::BasicThread::operator()()
 		}
 	}
 
-	success = doStartup();
+	success = startUp();
 
 	SURGSIM_ASSERT(success) << "Startup has failed for thread " << getName();
 	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Startup has succeeded for thread " << getName();
@@ -130,17 +130,17 @@ void SurgSim::Framework::BasicThread::operator()()
 			boost::this_thread::sleep_for(m_rate-frameTime);
 		}
 		start = boost::chrono::system_clock::now();
-		m_isRunning = update(m_rate.count());
+		m_isRunning = doUpdate(m_rate.count());
 		frameTime = boost::chrono::system_clock::now() - start;
 	}
 	m_isRunning = false;
 	m_stopExecution = false;
 }
 
-void SurgSim::Framework::BasicThread::doStop(bool waitForExit)
+void SurgSim::Framework::BasicThread::stop()
 {
 	m_stopExecution = true;
-	if (waitForExit)
+	if (m_thisThread.joinable())
 	{
 		m_thisThread.join();
 	}

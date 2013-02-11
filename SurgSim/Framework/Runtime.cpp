@@ -69,7 +69,7 @@ bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 
 	bool result = false;
 
-	result = sceneElement->doInit();
+	result = sceneElement->initialize();
 
 	if (result)
 	{
@@ -78,7 +78,7 @@ bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 
 	if (result)
 	{
-		result = sceneElement->doWakeUp();
+		result = sceneElement->wakeUp();
 	}
 
 	return result;
@@ -117,7 +117,7 @@ bool Runtime::execute()
 				}
 			}
 		}
-		stop(true);
+		stop();
 	}
 	return true;
 }
@@ -128,7 +128,7 @@ bool Runtime::start()
 	std::shared_ptr<Barrier> barrier(new Barrier(m_workerThreads.size()+1));
 	for (it = m_workerThreads.begin(); it != m_workerThreads.end(); ++it)
 	{
-		(*it)->doRun(barrier);
+		(*it)->start(barrier);
 	}
 
 	// Wait for all the threads to initialize
@@ -153,12 +153,12 @@ bool Runtime::start()
 	return true;
 }
 
-bool Runtime::stop(bool waitForFinish)
+bool Runtime::stop()
 {
 	std::vector<std::shared_ptr<BasicThread>>::iterator it;
 	for (it = m_workerThreads.begin(); it != m_workerThreads.end(); ++it)
 	{
-		(*it)->doStop(waitForFinish);
+		(*it)->stop();
 	}
 	return true;
 }
@@ -170,7 +170,7 @@ void Runtime::preprocessSceneElements()
 	auto sceneElements = m_scene->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
-		it->second->doInit();
+		it->second->initialize();
 		std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
 		newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());
 	}
@@ -179,7 +179,7 @@ void Runtime::preprocessSceneElements()
 
 	for (auto it = sceneElements.cbegin(); it != sceneElements.cend(); ++it)
 	{
-		it->second->doWakeUp();
+		it->second->wakeUp();
 	}
 }
 

@@ -48,7 +48,7 @@ TEST(RuntimeTest, AddWorker)
 	EXPECT_TRUE(thread->isInitialized());
 
 
-	EXPECT_TRUE(runtime->stop(true));
+	EXPECT_TRUE(runtime->stop());
 
 	EXPECT_FALSE(thread->isRunning());
 }

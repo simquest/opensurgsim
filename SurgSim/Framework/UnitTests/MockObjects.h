@@ -5,9 +5,9 @@
 
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-// #include "SurgSim/Framework/Representation.h"
+//#include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/Component.h"
-// #include "SurgSim/Framework/Behavior.h"
+//#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Runtime.h"
 
@@ -40,12 +40,12 @@ public:
 		didFixedUpdate = true;
 	}
 
-	virtual bool init()
+	virtual bool doInitialize()
 	{
 		didInit = true;
 		return didInit;
 	};
-	virtual bool wakeUp()
+	virtual bool doWakeUp()
 	{
 		didWakeUp = true;
 		return didWakeUp;
@@ -78,15 +78,15 @@ public:
 	bool assertInLoop;
 
 private:
-	virtual bool init()
+	virtual bool doInitialize()
 	{
 		return succeedInit;
 	};
-	virtual bool startup()
+	virtual bool doStartUp()
 	{
 		return succeedStartup;
 	};
-	virtual bool update(double dt)
+	virtual bool doUpdate(double dt)
 	{
 		--count;
 		totalTime += dt;
@@ -116,13 +116,13 @@ public:
 	{};
 	virtual ~MockComponent() {};
 
-	virtual bool init()
+	virtual bool doInitialize()
 	{
 		didInit = true;
 		return succeedWithInit;
 	}
 
-	virtual bool wakeUp()
+	virtual bool doWakeUp()
 	{
 		didWakeUp = true;
 		return succeedWithWakeUp;
@@ -142,18 +142,18 @@ public:
 // 		succeedWithInit(succeedInit),
 // 		succeedWithWakeUp(succeedWakeUp),
 // 		isAwoken(false),
-// 		isInitialised(false),
+// 		isInitialized(false),
 // 		updateCount(0)
 // 	{};
 // 	virtual ~MockBehavior() {};
 // 
-// 	virtual bool init()
+// 	virtual bool doInitialize()
 // 	{
-// 		isInitialised = true;
+// 		isInitialized = true;
 // 		return succeedWithInit;
 // 	}
 // 
-// 	virtual bool wakeUp()
+// 	virtual bool doWakeUp()
 // 	{
 //  		isAwoken = true;
 // 		return succeedWithWakeUp;
@@ -166,7 +166,7 @@ public:
 // 
 // 	bool succeedWithInit;
 // 	bool succeedWithWakeUp;
-// 	bool isInitialised;
+// 	bool isInitialized;
 // 	bool isAwoken;
 // 	int updateCount;
 // };

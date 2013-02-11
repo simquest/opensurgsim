@@ -54,27 +54,27 @@ std::shared_ptr<Component> SceneElement::getComponent(std::string name) const
 	return result;
 }
 
-bool SceneElement::doInit()
+bool SceneElement::initialize()
 {
 	bool result = true;
 	for (auto it = m_components.begin(); it != m_components.end(); ++it)
 	{
-		bool componentInit = it->second->doInit();
+		bool componentInit = it->second->initialize();
 		result = result && componentInit;
 	}
-	result = init() && result;
+	result = doInitialize() && result;
 	return result;
 }
 
-bool SceneElement::doWakeUp()
+bool SceneElement::wakeUp()
 {
 	bool result = true;
 	for (auto it = m_components.begin(); it != m_components.end(); ++it)
 	{
-		bool componentInit = it->second->doWakeUp();
+		bool componentInit = it->second->wakeUp();
 		result = result && componentInit;
 	}
-	result = wakeUp() && result;
+	result = doWakeUp() && result;
 	return result;
 }
 

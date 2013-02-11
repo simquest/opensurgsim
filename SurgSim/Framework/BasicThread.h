@@ -52,10 +52,10 @@ public:
 	/// interface
 	/// \param startupBarrier is a barrier it synchronizes a group of thread that should go through their startup
 	/// sequence in step.
-	void doRun(std::shared_ptr<Barrier> startupBarrier);
+	void start(std::shared_ptr<Barrier> startupBarrier);
 
-	/// Stopping the execution
-	void doStop(bool waitForExit);
+	/// Stopping the execution, blocks until the running thread has actually stopped
+	void stop();
 
 	/// Query if this object is initialized.
 	/// \return	true if initialized, false if not.
@@ -102,13 +102,13 @@ protected:
 	/// Trigger the initialisation of this object, this will be called before all other threads doStartup()
 	/// are called
 	/// \return true on success
-	bool doInit();
+	bool initialize();
 
 	/// Trigger the startup of this object, this will be called after all other threads doInit() was called
 	/// the thread will only enter the run loop triggering upated() if all threads doInit() and doStartup()
 	/// returned true
 	/// \return true on success
-	bool doStartup();
+	bool startUp();
 
 private:
 	std::string m_name;
@@ -122,11 +122,11 @@ private:
 	bool m_isRunning;
 	bool m_stopExecution;
 
-	virtual bool init() = 0;
-	virtual bool startup() = 0;
+	virtual bool doInitialize() = 0;
+	virtual bool doStartUp() = 0;
 
 	//! \return false when the thread is done, this will stop execution
-	virtual bool update(double dt) = 0;
+	virtual bool doUpdate(double dt) = 0;
 };
 
 };

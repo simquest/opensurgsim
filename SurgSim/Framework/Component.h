@@ -45,24 +45,24 @@ public:
 		return m_name;
 	};
 
-	bool doInit()
+	bool initialize()
 	{
 		SURGSIM_ASSERT(! m_didInit) << "Double initialisation called on component " << getName();
 		m_didInit = true;
-		return init();
+		return doInitialize();
 	};
-	bool doWakeUp()
+	bool wakeUp()
 	{
 		SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
 		m_didWakeUp = true;
-		return wakeUp();
+		return doWakeUp();
 	};
 
 private:
 	std::string m_name;
 
-	virtual bool init() = 0;
-	virtual bool wakeUp() = 0;
+	virtual bool doInitialize() = 0;
+	virtual bool doWakeUp() = 0;
 
 	bool m_didInit;
 	bool m_didWakeUp;

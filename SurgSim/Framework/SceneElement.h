@@ -66,11 +66,11 @@ public:
 
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
-	bool doInit();
+	bool initialize();
 
 	/// Executes the wake up operation.
 	/// \return	true if it succeeds, false if it fails.
-	bool doWakeUp();
+	bool wakeUp();
 
 	/// \return	The name.
 	std::string getName() const
@@ -87,8 +87,8 @@ private:
 	std::string m_name;
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;
 	std::weak_ptr<Runtime> m_runtime;
-	virtual bool init() = 0;
-	virtual bool wakeUp() = 0;
+	virtual bool doInitialize() = 0;
+	virtual bool doWakeUp() = 0;
 
 };
 

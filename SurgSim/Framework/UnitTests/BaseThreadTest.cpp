@@ -38,7 +38,7 @@ TEST(ThreadTest, Instantiation)
 TEST(ThreadTest, Running)
 {
 	MockThread m;
-	m.doRun(nullptr);
+	m.start(nullptr);
 
 	m.getThread().join();
 

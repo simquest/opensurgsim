@@ -70,28 +70,20 @@ public:
 	/// Stops the simulation.
 	/// \param	waitForFinish	true to wait for all the threads to finish.
 	/// \return	true if it succeeds, false if it fails.
-	bool stop(bool waitForFinish);
+	bool stop();
 
 	/// Query if this object is running.
 	/// \return	true if running, false if not.
 	bool isRunning();
 
-	/// Pause the threads that are marked for pausing, if forceAll is set
-	/// all the threads will be suspended no matter what
-	bool setPause(bool val, bool forceAll = false);
-
 	/// Query if this object is paused.
 	/// \return	true if paused, false if not.
 	bool isPaused();
 
-	/// Gets the worker threads.
-	/// \return	.
-	std::vector< std::shared_ptr<BasicThread> > workerThreads();
-
 	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
-
+	 
 	/// Gets a logger. If the logger does not exist yet it will be created with
 	/// the given name and a default output. Cleaning up the logger will be the
 	/// responsibility of this class, keep the logger reference

@@ -110,7 +110,7 @@ TEST (SceneElementTest, InitComponentTest)
 	element.addComponent(component1);
 	element.addComponent(component2);
 
-	element.doInit();
+	element.initialize();
 
 	EXPECT_TRUE(element.didInit);
 	EXPECT_FALSE(element.didWakeUp);
@@ -119,7 +119,7 @@ TEST (SceneElementTest, InitComponentTest)
 	EXPECT_TRUE(component2->didInit);
 	EXPECT_FALSE(component2->didWakeUp);
 
-	element.doWakeUp();
+	element.wakeUp();
 
 	EXPECT_TRUE(element.didWakeUp);
 	EXPECT_TRUE(component1->didWakeUp);
