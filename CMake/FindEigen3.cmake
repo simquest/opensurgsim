@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest LLC.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 
 
 # - Try to find Eigen 3.x
