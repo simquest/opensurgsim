@@ -35,14 +35,14 @@ find_package(Eigen3 REQUIRED)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost COMPONENTS thread system chrono REQUIRED)
+find_package(Boost 1.51 COMPONENTS thread system chrono REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 
 option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(ThirdParty/gtest)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
+	add_subdirectory(ThirdParty/gtest)
 endif()
 
 add_subdirectory(SurgSim)
