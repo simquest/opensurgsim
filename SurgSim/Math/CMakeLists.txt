@@ -24,6 +24,7 @@ set(SURGSIM_MATH_SOURCES
 set(SURGSIM_MATH_HEADERS
 	Matrix.h
 	Quaternion.h
+	RigidTransform.h
 	Vector.h
 )
 
