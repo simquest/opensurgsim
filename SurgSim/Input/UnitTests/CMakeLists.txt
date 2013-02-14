@@ -31,7 +31,7 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-#set(LIBS SurgSimFramework SurgSimInput gtest)
-set(LIBS SurgSimFramework gtest)
+#set(LIBS SurgSimFramework SurgSimInput gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimInputTest)
