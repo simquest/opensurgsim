@@ -37,7 +37,7 @@ if(SURGSIM_DOCUMENTATION)
 		# Set DOT_PATH to DOXYGEN_DOT_EXECUTABLE, or empty if not found.
 		# Eliminates whining from Doxygen.
 		if(DOXYGEN_DOT_FOUND)
-			set(DOT_PATH "${DOXYGEN_DOT_EXECUTABLE)")
+			set(DOT_PATH "${DOXYGEN_DOT_EXECUTABLE}")
 		else(DOXYGEN_DOT_FOUND)
 			set(DOT_PATH "")
 		endif(DOXYGEN_DOT_FOUND)
@@ -49,6 +49,13 @@ if(SURGSIM_DOCUMENTATION)
 		else(SURGSIM_DOCUMENTATION_AUTOBUILD)
 			set(DOCUMENTATION_TARGET_FLAGS )
 		endif(SURGSIM_DOCUMENTATION_AUTOBUILD)
+
+		# Control the output format so warnings pop up in the Visual Studio list
+		if(MSVC)
+			set(WARN_FORMAT "\"$file($line): warning DOC1: $text\"")
+		else(MSVC)
+			set(WARN_FORMAT "\"$file:$line: $text\"")
+		endif(MSVC)
 
 		# Generate Doxyfile from Doxyfile.in, with @VARIABLE@ substitution.
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
