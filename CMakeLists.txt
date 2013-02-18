@@ -50,4 +50,7 @@ endif()
 add_subdirectory(SurgSim)
 add_subdirectory(Documentation)
 
-#option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)
+option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)
+if(SURGSIM_EXAMPLES_BUILD)
+	add_subdirectory(Examples)
+endif()
