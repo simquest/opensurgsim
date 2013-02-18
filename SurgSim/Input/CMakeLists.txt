@@ -24,7 +24,10 @@ set(SURGSIM_INPUT_SOURCES
 set(SURGSIM_INPUT_HEADERS
 	DataGroup.h
 	DataGroupBuilder.h
+	DeviceClassManagerInterface.h
 	IndexDirectory.h
+	InputDeviceInterface.h
+	InputDeviceListenerInterface.h
 	NamedData.h
 	NamedDataBuilder.h
 )
