@@ -14,28 +14,6 @@
 # limitations under the License.
 
 
-include_directories(
-	${EIGEN3_INCLUDE_DIR}
-)
-
-set(SURGSIM_INPUT_SOURCES
-	CommonInputDevice.cpp
-)
-
-set(SURGSIM_INPUT_HEADERS
-	CommonInputDevice.h
-	DataGroup.h
-	DataGroupBuilder.h
-	DeviceClassManagerInterface.h
-	IndexDirectory.h
-	InputDeviceInterface.h
-	InputDeviceListenerInterface.h
-	NamedData.h
-	NamedDataBuilder.h
-)
-
-add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
-
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
+if(OPENHAPTICS_FOUND)
+	add_subdirectory(Phantom)
+endif(OPENHAPTICS_FOUND)

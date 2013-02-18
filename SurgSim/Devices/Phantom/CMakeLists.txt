@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,28 +14,30 @@
 # limitations under the License.
 
 
+
+link_directories(${Boost_LIBRARY_DIRS})
+set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+	"${Boost_INCLUDE_DIR}"
+	"${OPENHAPTICS_INCLUDE_DIR}"
 )
 
-set(SURGSIM_INPUT_SOURCES
-	CommonInputDevice.cpp
+set(PHANTOM_DEVICE_SOURCES
+	PhantomDevice.cpp
+	PhantomManager.cpp
 )
 
-set(SURGSIM_INPUT_HEADERS
-	CommonInputDevice.h
-	DataGroup.h
-	DataGroupBuilder.h
-	DeviceClassManagerInterface.h
-	IndexDirectory.h
-	InputDeviceInterface.h
-	InputDeviceListenerInterface.h
-	NamedData.h
-	NamedDataBuilder.h
+set(PHANTOM_DEVICE_HEADERS
+	PhantomDevice.h
+	PhantomManager.h
 )
 
-add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
+add_library(PhantomDevice ${PHANTOM_DEVICE_SOURCES} ${PHANTOM_DEVICE_HEADERS})
 
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
+#if(SURGSIM_TESTS_BUILD)
+#	add_subdirectory(UnitTests)
+#endif()
