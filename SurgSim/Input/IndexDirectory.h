@@ -34,6 +34,15 @@ public:
 	/// Create an empty directory object.
 	IndexDirectory() {};
 
+	/// Create a directory object initialized to a list of names.
+	IndexDirectory(const std::vector<std::string>& names)
+	{
+		for (auto it = names.cbegin();  it != names.cend();  ++it)
+		{
+			addEntry(*it);
+		}
+	}
+
 	/// Given a name, return the index (or -1).
 	int getIndex(const std::string& name) const
 	{

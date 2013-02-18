@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Input/IndexDirectory.h>
@@ -40,6 +41,15 @@ public:
 	/// You should probably use \ref NamedDataBuilder or copy construction/assignment instead.
 	NamedData(std::shared_ptr<const IndexDirectory> directory)
 		: m_directory(directory)
+	{
+		m_data.resize(m_directory->getNumEntries());
+		m_isCurrent.resize(m_directory->getNumEntries(), false);
+		SURGSIM_ASSERT(isValid());
+	}
+
+	/// Create an object containing items from a vector of strings.
+	NamedData(const std::vector<std::string>& names)
+		: m_directory(std::make_shared<const IndexDirectory>(names))
 	{
 		m_data.resize(m_directory->getNumEntries());
 		m_isCurrent.resize(m_directory->getNumEntries(), false);
