@@ -19,16 +19,18 @@ include_directories(
 )
 
 set(SURGSIM_INPUT_SOURCES
+	CommonInputDevice.cpp
 )
 
 set(SURGSIM_INPUT_HEADERS
+	CommonInputDevice.h
 	DeviceClassManagerInterface.h
 	InputDeviceInterface.h
 	InputDeviceListenerInterface.h
 )
 
-#add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
+add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
 
-#if(SURGSIM_TESTS_BUILD)
-#	add_subdirectory(UnitTests)
-#endif()
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()
