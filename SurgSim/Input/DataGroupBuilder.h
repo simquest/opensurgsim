@@ -174,6 +174,26 @@ public:
 		strings().addEntry(name);
 	}
 
+	void addEntriesFrom(const DataGroupBuilder& builder)
+	{
+		poses().addEntries(builder.poses());
+		vectors().addEntries(builder.vectors());
+		scalars().addEntries(builder.scalars());
+		integers().addEntries(builder.integers());
+		booleans().addEntries(builder.booleans());
+		strings().addEntries(builder.strings());
+	}
+
+	void addEntriesFrom(const DataGroup& data)
+	{
+		poses().addEntries(data.poses());
+		vectors().addEntries(data.vectors());
+		scalars().addEntries(data.scalars());
+		integers().addEntries(data.integers());
+		booleans().addEntries(data.booleans());
+		strings().addEntries(data.strings());
+	}
+
 private:
 	// Prevent copy construction and copy assignment.
 	DataGroupBuilder(const DataGroupBuilder&);

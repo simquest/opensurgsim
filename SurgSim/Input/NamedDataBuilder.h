@@ -60,9 +60,9 @@ public:
 	/// Create new entries from a vector of strings.
 	void addEntries(const std::vector<std::string>& names)
 	{
-		for (auto iter = names.cbegin();  iter != names.cend();  ++iter)
+		for (auto it = names.cbegin();  it != names.cend();  ++it)
 		{
-			addEntry(*iter);
+			addEntry(*it);
 		}
 	}
 
@@ -71,6 +71,13 @@ public:
 	void addEntries(const NamedDataBuilder<U>& builder)
 	{
 		addEntries(builder.getAllNames());
+	}
+
+	/// Create new entries from an already initialized NamedData.
+	template <typename U>
+	void addEntries(const NamedData<U>& data)
+	{
+		addEntries(data.getDirectory()->getAllNames());
 	}
 
 	/// Create new entries from an IndexDirectory.
