@@ -53,6 +53,7 @@ NOTICE*                 text
 
 ## Doxygen documentation configuration files
 Doxyfile                text
+Doxyfile.in             text
 *.dox                   text
 
 ## Image files

@@ -46,5 +46,6 @@ if(SURGSIM_TESTS_BUILD)
 endif()
 
 add_subdirectory(SurgSim)
+add_subdirectory(Documentation)
 
 #option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)
