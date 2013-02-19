@@ -37,21 +37,21 @@ public:
 	/// Notifies the listener that the application input coming from the device has been updated.
 	///
 	/// Typical input data contents (but note that individual devices may do things differently):
-	///   type       | name        |
-	///   ----       | ----        | ---
-	///   pose       | "pose"      | Device pose (units are meters).
-	///   bool       | "button0"   | Device button 0 state.
-	///   bool       | "button1"   | Device button 1 state.
+	///   | type       | name        |                                                                |
+	///   | ----       | ----        | ---                                                            |
+	///   | pose       | "pose"      | %Device pose (units are meters).                                |
+	///   | bool       | "button0"   | %Device button 0 state.                                         |
+	///   | bool       | "button1"   | %Device button 1 state.                                         |
 	///
 	/// Other possible contents includes:
-	///   type       | name        |
-	///   ----       | ----        |
-	///   bool       | "isHomed"   | Device homing status.
-	///   bool       | "isHomed0"  | Individual axis homing status, etc.
-	///   bool       | "isHeld"    | Safety sensor etc. status.
-	///   string     | "model"     | Device model description.
-	///   string     | "serial"    | Serial number string.
-	///   (any)      | "debug:*"   | Various debugging information
+	///   | type       | name        |                                                                |
+	///   | ----       | ----        |                                                                |
+	///   | bool       | "isHomed"   | %Device homing status.                                          |
+	///   | bool       | "isHomed0"  | Individual axis homing status, etc.                            |
+	///   | bool       | "isHeld"    | Safety sensor etc. status.                                     |
+	///   | string     | "model"     | %Device model description.                                      |
+	///   | string     | "serial"    | Serial number string.                                          |
+	///   | (any)      | "debug:*"   | Various debugging information                                  |
 	///
 	/// \param device The name of the device that is producing the input.  This should only be used to identify
 	/// 	the device (e.g. if the listener is listening to several devices at once).
@@ -66,18 +66,18 @@ public:
 	/// because another listener is already providing output information.
 	///
 	///  Typical output data contents (but note that individual devices may do things differently):
-	///   type       | name        |
-	///   ----       | ----        | ---
-	///   vector     | "force"     | Commanded force for the device (units are newtons).
-	///   vector     | "torque"    | Commanded torque for the device (units are newton-meters).
-	///   bool       | "isEnabled" | Safety switch input.
+	///   | type       | name        |                                                                |
+	///   | ----       | ----        | ---                                                            |
+	///   | vector     | "force"     | Commanded force for the device (units are newtons).            |
+	///   | vector     | "torque"    | Commanded torque for the device (units are newton-meters).     |
+	///   | bool       | "isEnabled" | Safety switch input.                                           |
 	///
 	/// Other possible contents includes:
-	///   type       | name        |
-	///   ----       | ----        | ---
-	///   bool       | "led0"      | Desired state for LED 0.
-	///   bool       | "led1"      | Desired state for LED 1.
-	///   string     | "toolId"    | Calibration ID to use, e.g. for camera devices.
+	///   | type       | name        |                                                                |
+	///   | ----       | ----        | ---                                                            |
+	///   | bool       | "led0"      | Desired state for LED 0.                                       |
+	///   | bool       | "led1"      | Desired state for LED 1.                                       |
+	///   | string     | "toolId"    | Calibration ID to use, e.g. for camera devices.                |
 	///
 	/// \param device The name of the device that is requesting the output.  This should only be used to identify
 	/// 	the device (e.g. if the listener is listening to several devices at once).
