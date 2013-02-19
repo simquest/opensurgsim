@@ -54,6 +54,7 @@ public:
 protected:
 	/// Constructor.
 	///
+	/// \param manager The PhantomManager object creating the device.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param initializationName The name passed to HDAPI when initializing the device.  This should match a
 	/// 	configured PHANTOM device; alternately, an empty string indicates the default device.
