@@ -37,7 +37,6 @@ public:
 	~Scene() {};
 
 	/// Adds a scene element to 'element'.
-	/// \param	name   	The name of the element.
 	/// \param	element	The element.
 	/// \return	true if it succeeds, false if it fails.
 	bool addSceneElement(std::shared_ptr<SceneElement> element);

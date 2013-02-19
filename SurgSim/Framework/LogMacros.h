@@ -106,7 +106,6 @@ namespace Framework
 
 /// Logs a message to the specified \c logger with the short \c level name, but only the first time this statement
 /// is reached.
-/// \param condition Condition to test
 /// \param logger Logger used to log the message
 /// \param level Level of this log message (DEBUG, INFO, WARNING, SEVERE, or CRITICAL)
 /// \return Stream to output the log message

@@ -38,15 +38,15 @@ class LogMessageBase
 public:
 
 	/// Construct a LogMessage
-	/// \param logger the logger to be used
-	/// \param level the level for this message
+	/// \param logger The logger to be used
+	/// \param level The logging level for this message
 	LogMessageBase(Logger* logger, int level);
 
 	/// Destructor.
 	~LogMessageBase() {};
 
 	/// Add the given input to the current log message.
-	/// \param the input to be added to the current stream
+	/// \param input The input to be added to the current stream
 	template <typename T>
 	LogMessageBase& operator <<(T&& input)
 	{

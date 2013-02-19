@@ -77,27 +77,28 @@ public:
 		return m_threshold;
 	}
 
-	/// Sets the logging threshold
-	/// \param the value for the threshold
+	/// Sets the logging threshold.
+	/// \param val The value for the threshold.
 	void setThreshold(int val)
 	{
 		m_threshold = val;
 	}
 
-	/// \return the current output class used this logger
+	/// Get the output object used by this logger.
+	/// \return the current output object used this logger.
 	std::shared_ptr<LogOutput> getOutput() const
 	{
 		return m_output;
 	}
 
-	/// Set the output class used by this logger
-	/// \param the output class to be used
+	/// Set the output object used by this logger.
+	/// \param val The output object to be used.
 	void setOutput(std::shared_ptr<LogOutput> val)
 	{
 		m_output = val;
 	}
 
-	/// This loggers name
+	/// This logger's name.
 	std::string getName() const
 	{
 		return m_name;
