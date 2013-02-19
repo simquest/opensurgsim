@@ -75,12 +75,12 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 bool SceneElement::initialize()
 {
 	bool result = true;
+	result = doInitialize() && result;
 	for (auto it = m_components.begin(); it != m_components.end(); ++it)
 	{
 		bool componentInit = it->second->initialize();
 		result = result && componentInit;
 	}
-	result = doInitialize() && result;
 	return result;
 }
 
