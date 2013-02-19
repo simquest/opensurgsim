@@ -49,6 +49,7 @@ void SimpleSquareForce::handleInput(const std::string& device, const DataGroup& 
 	{
 		m_outputData.vectors().put("force", Vector3d(0, 0, 0));
 		m_outputData.vectors().put("torque", Vector3d(0, 0, 0));
+		return;
 	}
 
 	Vector3d tipPosition = devicePose * m_tipPoint;
