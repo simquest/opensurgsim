@@ -168,10 +168,12 @@ bool PhantomDevice::update()
 
 	hdBeginFrame(m_state->hHD);
 
+	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
 	hdGetDoublev(HD_CURRENT_POSITION, m_state->positionBuffer);
 	hdGetDoublev(HD_CURRENT_TRANSFORM, m_state->transformBuffer);
 	hdGetIntegerv(HD_CURRENT_BUTTONS, &(m_state->buttonsBuffer));
 
+	// Set the force command (in newtons).
 	hdSetDoublev(HD_CURRENT_FORCE, m_state->forceBuffer);
 	//hdSetDoublev(HD_CURRENT_TORQUE, m_state->torqueBuffer);
 
@@ -186,7 +188,7 @@ bool PhantomDevice::update()
 
 		RigidTransform3d pose;
 		pose.linear() = transform.block<3,3>(0,0);
-		pose.translation() = position;
+		pose.translation() = position * 0.001;  // convert from millimeters to meters!
 
 		getInputData().poses().put("pose", pose);
 		getInputData().booleans().put("button0", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
