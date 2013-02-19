@@ -15,6 +15,9 @@
 
 #include "CommonInputDevice.h"
 
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/locks.hpp>
+
 
 namespace SurgSim
 {
