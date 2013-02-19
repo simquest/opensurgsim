@@ -87,6 +87,10 @@ public:
 	/// \param runtime Pointer to the runtime.
 	void setRuntime(std::shared_ptr<Runtime> runtime);
 
+	/// Gets the runtime.
+	/// \return	The runtime.
+	std::shared_ptr<Runtime> getRuntime();;
+
 private:
 
 	std::string m_name;

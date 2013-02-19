@@ -26,6 +26,9 @@ namespace Framework
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
 {
 	bool result= false;
+
+	SURGSIM_ASSERT(component != nullptr) << "Cannot add a nullptr as a component";
+
 	if (m_components.find(component->getName()) == m_components.end())
 	{
 		m_components[component->getName()] = component;
@@ -107,6 +110,11 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 void SceneElement::setRuntime(std::shared_ptr<Runtime> runtime)
 {
 	m_runtime = runtime;
+}
+
+std::shared_ptr<Runtime> SceneElement::getRuntime()
+{
+	return m_runtime.lock();
 }
 
 }; // namespace Framework

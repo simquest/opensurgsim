@@ -180,6 +180,7 @@ void Runtime::preprocessSceneElements()
 	auto sceneElements = m_scene->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
+		it->second->setRuntime(getSharedPtr());
 		it->second->initialize();
 		std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
 		newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());
