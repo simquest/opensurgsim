@@ -20,9 +20,12 @@
 #include <SurgSim/Input/DataGroup.h>
 
 
+/// A simple listener to calculate collision force against a square area for the example application.
+/// \sa SurgSim::Input::InputDeviceListenerInterface
 class SimpleSquareForce : public SurgSim::Input::InputDeviceListenerInterface
 {
 public:
+	/// Constructor.
 	SimpleSquareForce();
 
 	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
@@ -30,22 +33,35 @@ public:
 	virtual bool requestOutput(const std::string& device, SurgSim::Input::DataGroup* outputData);
 
 protected:
+	/// Calculates the force as a function of device tip position.
+	/// The calculation is very simple, for a simple demo of the device input/output functionality.
+	///
+	/// \param position The device tip position.
+	/// \return The computed force.
 	SurgSim::Math::Vector3d computeForce(const SurgSim::Math::Vector3d& position);
 
 private:
+	/// Internally stored output data (force and torque).
 	SurgSim::Input::DataGroup m_outputData;
 
+	/// One half of the edge length of the square we're colliding against, in meters.
 	double m_squareHalfSize;
+	/// The surface stiffness, in newtons per meter.
 	double m_surfaceStiffness;
+	/// The maximum force before the application allows the tool to pop through.
 	double m_forceLimit;
 
+	/// The unit normal vector of the square.
 	SurgSim::Math::Vector3d m_squareNormal;
+	/// The location of the center of the square in world coordinates.
 	SurgSim::Math::Vector3d m_squareCenter;
+	/// The unit direction along one of the pairs edges of the square.
 	SurgSim::Math::Vector3d m_planeDirectionX;
+	/// The unit direction along the other pair of edges of the square.
 	SurgSim::Math::Vector3d m_planeDirectionY;
 
+	/// The location of the "tip" (i.e. interacting point) of the tool, in the local frame relative to the tool pose.
 	SurgSim::Math::Vector3d m_tipPoint;
-
 };
 
 #endif // SIMPLE_SQUARE_FORCE_H

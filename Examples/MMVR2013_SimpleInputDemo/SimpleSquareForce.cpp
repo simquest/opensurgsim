@@ -25,8 +25,8 @@ using SurgSim::Math::RigidTransform3d;
 
 
 SimpleSquareForce::SimpleSquareForce() :
-	m_squareHalfSize(50.0),
-	m_surfaceStiffness(0.25),
+	m_squareHalfSize(0.050),
+	m_surfaceStiffness(250.0),
 	m_forceLimit(5.0),
 	m_squareNormal(0, -1, 0),
 	m_squareCenter(0, 0, 0),
