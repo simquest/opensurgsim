@@ -184,7 +184,7 @@ bool PhantomDevice::update()
 	{
 		// Use Eigen::Map to make the raw HDAPI output values look like Eigen data types
 		Eigen::Map<Vector3d> position(m_state->positionBuffer);
-		Eigen::Map<Matrix44d> transform(m_state->transformBuffer);
+		Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::ColMajor>> transform(m_state->transformBuffer);
 
 		RigidTransform3d pose;
 		pose.linear() = transform.block<3,3>(0,0);
