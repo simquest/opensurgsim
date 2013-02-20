@@ -46,7 +46,7 @@ public:
 	void SetUp()
 	{
 		logOutput = std::make_shared<MockOutput>();
-		testLogger = std::unique_ptr<SurgSim::Framework::Logger>(new SurgSim::Framework::Logger("assertTest", logOutput));
+		testLogger = std::unique_ptr<SurgSim::Framework::Logger>(new SurgSim::Framework::Logger("test", logOutput));
 		// testLogger will be used for assertions in most tests, due to the definition of SURGSIM_ASSERT_LOGGER below.
 	}
 
@@ -79,19 +79,46 @@ TEST_F(AssertTest, Assertion)
 {
 	logOutput->reset();
 	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "extra information would go here", SurgSim::Framework::AssertionFailure);
-	EXPECT_TRUE(stringContains(logOutput->logMessage, "1 == 2")) << "message: '" << logOutput->logMessage << "'";
-	EXPECT_TRUE(stringContains(logOutput->logMessage, "AssertTest.cpp")) << "message: '" << logOutput->logMessage << "'";
-	EXPECT_TRUE(stringContains(logOutput->logMessage, "extra information")) << "message: '" << logOutput->logMessage << "'";
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "1 == 2")) <<
+		"message: '" << logOutput->logMessage << "'";
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "AssertTest.cpp")) <<
+		"message: '" << logOutput->logMessage << "'";
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "extra information")) <<
+		"message: '" << logOutput->logMessage << "'";
 
 	logOutput->reset();
 	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
-	EXPECT_EQ("", logOutput->logMessage) << "message: '" << logOutput->logMessage << "'";
+	EXPECT_EQ("", logOutput->logMessage) <<
+		"message: '" << logOutput->logMessage << "'";
 }
 
 TEST_F(AssertTest, Failure)
 {
 	logOutput->reset();
 	EXPECT_THROW(SURGSIM_FAILURE() << "extra information would go here", SurgSim::Framework::AssertionFailure);
-	EXPECT_TRUE(stringContains(logOutput->logMessage, "AssertTest.cpp")) << "message: '" << logOutput->logMessage << "'";
-	EXPECT_TRUE(stringContains(logOutput->logMessage, "extra information")) << "message: '" << logOutput->logMessage << "'";
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "AssertTest.cpp")) <<
+		"message: '" << logOutput->logMessage << "'";
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "extra information")) <<
+		"message: '" << logOutput->logMessage << "'";
+}
+
+TEST_F(AssertTest, Manipulators)
+{
+	logOutput->reset();
+	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "aAa" << std::endl << "bBb", SurgSim::Framework::AssertionFailure);
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "aAa\nbBb") ||
+				stringContains(logOutput->logMessage, "aAa\r\n\bBb")) <<
+		"message: '" << logOutput->logMessage << "'";
+
+	logOutput->reset();
+	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "[" << std::hex << std::setw(5) << std::setfill('0') << 0x1234 << "]",
+				 SurgSim::Framework::AssertionFailure);
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "[01234]")) <<
+		"message: '" << logOutput->logMessage << "'";
+
+	logOutput->reset();
+	// The next message should not show any evidence of previous manipulators.
+	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "[" << 987 << "]", SurgSim::Framework::AssertionFailure);
+	EXPECT_TRUE(stringContains(logOutput->logMessage, "[987]")) <<
+		"message: '" << logOutput->logMessage << "'";
 }
