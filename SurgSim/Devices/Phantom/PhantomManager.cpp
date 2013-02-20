@@ -119,7 +119,7 @@ bool PhantomManager::releaseDevice(std::shared_ptr<PhantomDevice> device)
 	bool found = false;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->activeDeviceMutex);
-		for (auto it = m_state->activeDevices.cbegin();  it != m_state->activeDevices.cend();  ++it)
+		for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
 		{
 			if (*it == device)
 			{
