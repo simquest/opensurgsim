@@ -38,7 +38,6 @@ public:
 
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
 		glShadeModel(GL_FLAT);
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 
@@ -99,6 +98,10 @@ private:
 	static Vector3d m_tipPointColor;
 	static double m_axisLength;
 
+	static GLUquadric* quadratic;
+
+	static Vector3d m_lightPosition;
+
 	static void reshape(GLint width, GLint height)
 	{
 		m_width = width;
@@ -117,6 +120,8 @@ private:
 		glLoadIdentity();
 		gluLookAt(-0.15, 0.15, 0.3,  0.0, 0.0, 0.0,  0.0, 1.0, 0.0);
 
+		glEnable(GL_LIGHT0);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawObjects();
 		glutSwapBuffers();
@@ -133,6 +138,8 @@ private:
 
 	static void drawSquare()
 	{
+		glEnable(GL_LIGHTING);
+
 		Vector3d m_squarePoints[4];
 		m_squarePoints[0] = m_squareCenter - (m_squareHalfSize * m_planeDirectionX) + (m_squareHalfSize * m_planeDirectionY);
 		m_squarePoints[1] = m_squareCenter + (m_squareHalfSize * m_planeDirectionX) + (m_squareHalfSize * m_planeDirectionY);
@@ -141,6 +148,7 @@ private:
 
 		glColor3d(m_squareColor.x(), m_squareColor.y(), m_squareColor.z());
 		glBegin(GL_QUADS);
+		glNormal3d(m_squareNormal.x(), m_squareNormal.y(), m_squareNormal.z());
 		for (int i = 0; i < 4; ++i)
 		{
 			glVertex3d(m_squarePoints[i].x(), m_squarePoints[i].y(), m_squarePoints[i].z());
@@ -150,13 +158,15 @@ private:
 
 	static void drawAxes()
 	{
+		glDisable(GL_LIGHTING);
+
 		Vector3d axesPoints[4];
 		axesPoints[0] = m_pose * Vector3d(0.0, 0.0, 0.0);
 		axesPoints[1] = m_pose * (m_axisLength * Vector3d(1.0, 0.0, 0.0));
 		axesPoints[2] = m_pose * (m_axisLength * Vector3d(0.0, 1.0, 0.0));
 		axesPoints[3] = m_pose * (m_axisLength * Vector3d(0.0, 0.0, 1.0));
 
-		glLineWidth(3.0);
+		glLineWidth(5.0);
 		glBegin(GL_LINES);
 		glColor3d(1.0, 0.0, 0.0);
 		glVertex3d(axesPoints[0].x(), axesPoints[0].y(), axesPoints[0].z());
@@ -172,14 +182,17 @@ private:
 
 	static void drawTipPoint()
 	{
+		glEnable(GL_LIGHTING);
+
 		Vector3d tipPoint = m_pose * m_localTipPoint;
 
 		glColor3d(m_tipPointColor.x(), m_tipPointColor.y(), m_tipPointColor.z());
-		glPointSize(5.0);
 
-		glBegin(GL_POINT);
-		glVertex3d(tipPoint.x(), tipPoint.y(), tipPoint.z());
-		glEnd();
+		glPushMatrix();
+		glTranslated(tipPoint.x(), tipPoint.y(), tipPoint.z());
+		gluQuadricOrientation(quadratic, GLU_OUTSIDE);
+		gluSphere(quadratic, 0.01, 32, 32);
+		glPopMatrix();
 	}
 };
 
@@ -196,17 +209,19 @@ double Renderer::m_axisLength = 0.01;
 int Renderer::m_width = 1024;
 int Renderer::m_height = 768;
 
-Vector3d Renderer::m_planeDirectionX(1, 0, 0);
-Vector3d Renderer::m_planeDirectionY(0, 0, 1);
+Vector3d Renderer::m_planeDirectionX(1.0, 0.0, 0.0);
+Vector3d Renderer::m_planeDirectionY(0.0, 0.0, 1.0);
+
+GLUquadric* Renderer::quadratic = gluNewQuadric();
 
 
 SimpleSquareGlutWindow::SimpleSquareGlutWindow()
 {
-	Renderer::setSquare(Vector3d(0, 0, 0), 0.050, Vector3d(0, -1, 0));
+	Renderer::setSquare(Vector3d(0.0, 0.0, 0.0), 0.050, Vector3d(0.0, 1.0, 0.0));
 	Renderer::setTipPointColor(Vector3d(1.0, 1.0, 1.0));
 	Renderer::setLocalTipPoint(Vector3d(0.0, 0.0, 0.0));
 	Renderer::setPose(RigidTransform3d::Identity());
-	Renderer::setAxisLength(0.01);
+	Renderer::setAxisLength(0.025);
 
 	m_renderThread = boost::thread(boost::ref(Renderer::run));
 }
