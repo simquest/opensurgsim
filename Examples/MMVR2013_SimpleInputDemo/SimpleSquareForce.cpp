@@ -29,15 +29,18 @@ SimpleSquareForce::SimpleSquareForce() :
 	m_surfaceStiffness(250.0),
 	m_forceLimit(5.0),
 	m_squareNormal(0, -1, 0),
+	m_squareEdgeDirectionX(1, 0, 0),
+	m_squareEdgeDirectionY(0, 0, 1),
 	m_squareCenter(0, 0, 0),
-	m_planeDirectionX(1, 0, 0),
-	m_planeDirectionY(0, 0, 1),
 	m_tipPoint(0, 0, 0)
 {
 	DataGroupBuilder builder;
 	builder.addVector("force");
 	builder.addVector("torque");
 	m_outputData = std::move(builder.createData());
+
+	m_outputData.vectors().put("force", Vector3d(0, 0, 0));
+	m_outputData.vectors().put("torque", Vector3d(0, 0, 0));
 }
 
 void SimpleSquareForce::handleInput(const std::string& device, const DataGroup& inputData)
@@ -71,8 +74,8 @@ Vector3d SimpleSquareForce::computeForce(const Vector3d& position)
 	double penetration = offset.dot(m_squareNormal);
 	if (penetration > 0)
 	{
-		double planeDistanceX = offset.dot(m_planeDirectionX);
-		double planeDistanceY = offset.dot(m_planeDirectionY);
+		double planeDistanceX = offset.dot(m_squareEdgeDirectionX);
+		double planeDistanceY = offset.dot(m_squareEdgeDirectionY);
 		bool insideSquare = (fabs(planeDistanceX) < m_squareHalfSize) && (fabs(planeDistanceY) < m_squareHalfSize);
 
 		force = -m_surfaceStiffness * penetration * m_squareNormal;

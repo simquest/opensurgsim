@@ -28,17 +28,17 @@ include_directories(
 
 set(EXAMPLE_SOURCES
 	main.cpp
-	SimpleSquareForce.cpp
+	MovingSquareForce.cpp
 	SimpleSquareGlutWindow.cpp
 )
 
 set(EXAMPLE_HEADERS
-	SimpleSquareForce.h
+	MovingSquareForce.h
 	SimpleSquareGlutWindow.h
 )
 
 add_executable(MMVR2013_BiggerInputDemo
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 target_link_libraries(MMVR2013_BiggerInputDemo
-	${LIBS} PhantomDevice SurgSimInput SurgSimFramework
+	${LIBS} PhantomDevice NullDevice SurgSimInput SurgSimFramework
 	${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} ${GLUT_LIBRARIES})
