@@ -23,15 +23,18 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
+	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
 	main.cpp
 	SimpleSquareForce.cpp
+	SimpleSquareGlutWindow.cpp
 )
 
 set(EXAMPLE_HEADERS
 	SimpleSquareForce.h
+	SimpleSquareGlutWindow.h
 )
 
 add_executable(MMVR2013_BiggerInputDemo

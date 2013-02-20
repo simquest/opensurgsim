@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <memory>
+#include <GL/glut.h>
 
 #include <SurgSim/Devices/Phantom/PhantomManager.h>
 #include <SurgSim/Devices/Phantom/PhantomDevice.h>
@@ -22,10 +23,12 @@ using SurgSim::Device::PhantomManager;
 using SurgSim::Device::PhantomDevice;
 
 #include "SimpleSquareForce.h"
+#include "SimpleSquareGlutWindow.h"
 
 
 int main(int argc, char** argv)
 {
+	
 	std::shared_ptr<PhantomManager> phantomDeviceManager = std::make_shared<PhantomManager>();
 	std::shared_ptr<PhantomDevice> device = phantomDeviceManager->createDevice("Phantom1", "Default PHANToM");
 	if (! device)
@@ -35,8 +38,11 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	std::shared_ptr<SimpleSquareForce> squareForce = std::make_shared<SimpleSquareForce>();
-	device->addListener(squareForce);
+ 	std::shared_ptr<SimpleSquareForce> squareForce = std::make_shared<SimpleSquareForce>();
+ 	device->addListener(squareForce);
+
+	std::shared_ptr<SimpleSquareGlutWindow> squareGlutWindow = std::make_shared<SimpleSquareGlutWindow>();
+	device->addListener(squareGlutWindow);
 
 	printf("\n"
 	       "**********************************************************************\n"
