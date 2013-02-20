@@ -18,11 +18,13 @@
 
 #include <SurgSim/Devices/Phantom/PhantomManager.h>
 #include <SurgSim/Devices/Phantom/PhantomDevice.h>
+#include <SurgSim/Devices/NullDevice/NullDevice.h>
 
 using SurgSim::Device::PhantomManager;
 using SurgSim::Device::PhantomDevice;
+using SurgSim::Device::NullDevice;
 
-#include "SimpleSquareForce.h"
+#include "MovingSquareForce.h"
 #include "SimpleSquareGlutWindow.h"
 
 
@@ -30,19 +32,24 @@ int main(int argc, char** argv)
 {
 	
 	std::shared_ptr<PhantomManager> phantomDeviceManager = std::make_shared<PhantomManager>();
-	std::shared_ptr<PhantomDevice> device = phantomDeviceManager->createDevice("Phantom1", "Default PHANToM");
-	if (! device)
+	std::shared_ptr<PhantomDevice> toolDevice = phantomDeviceManager->createDevice("ToolDevice", "Default PHANToM");
+	if (! toolDevice)
 	{
 		printf("--- Press Enter to quit the application! ---\n");
 		getc(stdin);
 		return -1;
 	}
 
- 	std::shared_ptr<SimpleSquareForce> squareForce = std::make_shared<SimpleSquareForce>();
- 	device->addListener(squareForce);
+	// The square is controlled by a second device. Unfortunately, we don't have a second device, so we're using a
+	// "NullDevice"-- a pretend device that doesn't actually move.
+	std::shared_ptr<NullDevice> squareDevice = std::make_shared<NullDevice>("SquareDevice");
+
+	std::shared_ptr<MovingSquareForce> squareForce = std::make_shared<MovingSquareForce>("ToolDevice", "SquareDevice");
+	toolDevice->addListener(squareForce);
+	squareDevice->addListener(squareForce);
 
 	std::shared_ptr<SimpleSquareGlutWindow> squareGlutWindow = std::make_shared<SimpleSquareGlutWindow>();
-	device->addListener(squareGlutWindow);
+	toolDevice->addListener(squareGlutWindow);
 
 	printf("\n"
 	       "**********************************************************************\n"

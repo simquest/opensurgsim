@@ -53,12 +53,12 @@ private:
 
 	/// The unit normal vector of the square.
 	SurgSim::Math::Vector3d m_squareNormal;
+	/// The unit direction along one of the pairs edges of the square.
+	SurgSim::Math::Vector3d m_squareEdgeDirectionX;
+	/// The unit direction along the other pair of edges of the square.
+	SurgSim::Math::Vector3d m_squareEdgeDirectionY;
 	/// The location of the center of the square in world coordinates.
 	SurgSim::Math::Vector3d m_squareCenter;
-	/// The unit direction along one of the pairs edges of the square.
-	SurgSim::Math::Vector3d m_planeDirectionX;
-	/// The unit direction along the other pair of edges of the square.
-	SurgSim::Math::Vector3d m_planeDirectionY;
 
 	/// The location of the "tip" (i.e. interacting point) of the tool, in the local frame relative to the tool pose.
 	SurgSim::Math::Vector3d m_tipPoint;

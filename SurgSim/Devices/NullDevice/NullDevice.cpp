@@ -49,11 +49,13 @@ NullDevice::NullDevice(const std::string& uniqueName) :
 
 bool NullDevice::initialize()
 {
+	// required by the InputDeviceInterface API
 	return true;
 }
 
 bool NullDevice::finalize()
 {
+	// required by the InputDeviceInterface API
 	return true;
 }
 

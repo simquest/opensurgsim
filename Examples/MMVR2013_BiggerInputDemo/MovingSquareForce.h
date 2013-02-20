@@ -13,26 +13,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_SQUARE_FORCE_H
-#define SIMPLE_SQUARE_FORCE_H
+#ifndef MOVING_SQUARE_FORCE_H
+#define MOVING_SQUARE_FORCE_H
+
+#include <string>
 
 #include <SurgSim/Input/InputDeviceListenerInterface.h>
 #include <SurgSim/Input/DataGroup.h>
 
+#include <SurgSim/Framework/ThreadSafeContainer.h>
+
 
 /// A simple listener to calculate collision force against a square area for the example application.
+/// Includes support for the square being moved by a second tool.
 /// \sa SurgSim::Input::InputDeviceListenerInterface
-class SimpleSquareForce : public SurgSim::Input::InputDeviceListenerInterface
+class MovingSquareForce : public SurgSim::Input::InputDeviceListenerInterface
 {
 public:
 	/// Constructor.
-	SimpleSquareForce();
+	MovingSquareForce(const std::string& toolDeviceName, const std::string& squareDeviceName);
 
 	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
 
 	virtual bool requestOutput(const std::string& device, SurgSim::Input::DataGroup* outputData);
 
 protected:
+	/// Updates the state of the tool as described by toolInputData.
+	/// \param toolInputData The state of the device controlling the tool.
+	void updateTool(const SurgSim::Input::DataGroup& toolInputData);
+
+	/// Updates the state of the square as described by squareInputData.
+	/// \param squareInputData The state of the device controlling the colliding square.
+	void updateSquare(const SurgSim::Input::DataGroup& squareInputData);
+
 	/// Calculates the force as a function of device tip position.
 	/// The calculation is very simple, for a simple demo of the device input/output functionality.
 	///
@@ -41,6 +54,28 @@ protected:
 	SurgSim::Math::Vector3d computeForce(const SurgSim::Math::Vector3d& position);
 
 private:
+	/// State defined by the pose of the square.
+	struct SquarePoseVectors
+	{
+		/// Constructor.
+		SquarePoseVectors();
+
+		/// The unit normal vector of the square.
+		SurgSim::Math::Vector3d normal;
+		/// The unit direction along one of the pairs edges of the square.
+		SurgSim::Math::Vector3d edgeDirectionX;
+		/// The unit direction along the other pair of edges of the square.
+		SurgSim::Math::Vector3d edgeDirectionY;
+		/// The location of the center of the square in world coordinates.
+		SurgSim::Math::Vector3d center;
+	};
+
+
+	/// Name of the device used as the tool.
+	const std::string m_toolDeviceName;
+	/// Name of the device used to move the square.
+	const std::string m_squareDeviceName;
+
 	/// Internally stored output data (force and torque).
 	SurgSim::Input::DataGroup m_outputData;
 
@@ -51,17 +86,13 @@ private:
 	/// The maximum force before the application allows the tool to pop through.
 	double m_forceLimit;
 
-	/// The unit normal vector of the square.
-	SurgSim::Math::Vector3d m_squareNormal;
-	/// The location of the center of the square in world coordinates.
-	SurgSim::Math::Vector3d m_squareCenter;
-	/// The unit direction along one of the pairs edges of the square.
-	SurgSim::Math::Vector3d m_planeDirectionX;
-	/// The unit direction along the other pair of edges of the square.
-	SurgSim::Math::Vector3d m_planeDirectionY;
+	/// Points and directions defined by the pose of the square.
+	SurgSim::Framework::ThreadSafeContainer<SquarePoseVectors> m_square;
+	/// The current sign of the direction of the normal vector of the square.
+	double m_squareNormalDirection;
 
 	/// The location of the "tip" (i.e. interacting point) of the tool, in the local frame relative to the tool pose.
 	SurgSim::Math::Vector3d m_tipPoint;
 };
 
-#endif // SIMPLE_SQUARE_FORCE_H
+#endif // MOVING_SQUARE_FORCE_H
