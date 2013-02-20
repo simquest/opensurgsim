@@ -78,7 +78,7 @@ bool SceneElement::initialize()
 	result = doInitialize() && result;
 	for (auto it = m_components.begin(); it != m_components.end(); ++it)
 	{
-		bool componentInit = it->second->initialize();
+		bool componentInit = it->second->initialize(getRuntime());
 		result = result && componentInit;
 	}
 	return result;
