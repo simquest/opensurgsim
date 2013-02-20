@@ -199,6 +199,7 @@ int Renderer::m_height = 768;
 Vector3d Renderer::m_planeDirectionX(1, 0, 0);
 Vector3d Renderer::m_planeDirectionY(0, 0, 1);
 
+
 SimpleSquareGlutWindow::SimpleSquareGlutWindow()
 {
 	Renderer::setSquare(Vector3d(0, 0, 0), 0.050, Vector3d(0, -1, 0));
@@ -231,6 +232,8 @@ void SimpleSquareGlutWindow::handleInput(const std::string& device, const DataGr
 		return;
 	}
 	
+	Renderer::setPose(devicePose);
+
 	Vector3d tipPointColor(1.0, 1.0, 1.0);
 	if (button0)
 	{
