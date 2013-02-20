@@ -46,7 +46,7 @@ class Barrier
 {
 public:
 	/// Construct the barrier.
-	/// \param number of threads to synchronize, can't be 0.
+	/// \param count Number of threads to synchronize, can't be 0.
 	Barrier(unsigned int count);
 
 	/// Waits until all \a count threads have called wait.

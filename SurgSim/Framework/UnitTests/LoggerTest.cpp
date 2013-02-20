@@ -24,6 +24,7 @@
 
 #include <fstream>
 #include <string>
+#include <iomanip>
 
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::FileOutput;
@@ -103,11 +104,43 @@ TEST(LoggerTest, UniquePtrTest)
 
 	output->reset();
 	SURGSIM_LOG(logger, DEBUG) << "Missing Text";
-	EXPECT_TRUE(isContained("", output->logMessage));
+	EXPECT_EQ("", output->logMessage);
 
 	output->reset();
 	SURGSIM_LOG(logger, WARNING) << "Exactly At Threshold";
 	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
+}
+
+TEST(LoggerTest, SharedPtrTest)
+{
+	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
+	std::shared_ptr<Logger> logger = std::make_shared<Logger>("TestLogger", output);
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+
+	output->reset();
+	SURGSIM_LOG(logger, CRITICAL) << "Test Text";
+	EXPECT_TRUE(isContained("Test Text", output->logMessage));
+
+	output->reset();
+	SURGSIM_LOG(logger, DEBUG) << "Missing Text";
+	EXPECT_EQ("", output->logMessage);
+
+	output->reset();
+	SURGSIM_LOG(logger, WARNING) << "Exactly At Threshold";
+	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
+}
+
+TEST(LoggerTest, ConsoleLoggerTest)
+{
+	std::shared_ptr<Logger> logger = Logger::createConsoleLogger("testConsoleLogger");
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+
+	// Of course, we can't test what was written to the console...
+	std::cerr << "--- This should include exactly 2 messages (CRIT and WARN):" << std::endl;
+	SURGSIM_LOG(logger, CRITICAL) << "Test Text";
+	SURGSIM_LOG(logger, DEBUG) << "Missing Text";
+	SURGSIM_LOG(logger, WARNING) << "Exactly At Threshold";
+	std::cerr << "--- done!" << std::endl;
 }
 
 TEST(LoggerTest, LevelSpecificMacroTest)
@@ -264,6 +297,28 @@ TEST(LoggerTest, LogLevelTest)
 	output->reset();
 	SURGSIM_LOG_CRITICAL(&logger) << "a message";
 	EXPECT_TRUE(isContained("CRITICAL", output->logMessage));
+}
+
+TEST(LoggerTest, ManipulatorTest)
+{
+	std::shared_ptr<MockOutput> output	 = std::make_shared<MockOutput>();
+	Logger logger(Logger("TestLogger", output));
+
+	output->reset();
+	SURGSIM_LOG_WARNING(&logger) << "aAa" << std::endl << "bBb";
+	EXPECT_TRUE(isContained("aAa\nbBb", output->logMessage) || isContained("aAa\r\n\bBb", output->logMessage)) <<
+		"message: '" << output->logMessage << "'";
+
+	output->reset();
+	SURGSIM_LOG_WARNING(&logger) << "[" << std::hex << std::setw(5) << std::setfill('0') << 0x1234 << "]";
+	EXPECT_TRUE(isContained("[01234]", output->logMessage)) <<
+		"message: '" << output->logMessage << "'";
+
+	output->reset();
+	// The next message should not show any evidence of previous manipulators.
+	SURGSIM_LOG_WARNING(&logger) << "[" << 987 << "]";
+	EXPECT_TRUE(isContained("[987]", output->logMessage)) <<
+		"message: '" << output->logMessage << "'";
 }
 
 class FileOutputTest : public ::testing::Test

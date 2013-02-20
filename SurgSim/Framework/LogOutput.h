@@ -43,7 +43,7 @@ class FileOutput : public LogOutput
 public:
 
 	/// Constructor
-	/// \param the filename to be used for writing
+	/// \param filename The filename to be used for writing
 	explicit FileOutput(std::string filename);
 
 	virtual ~FileOutput();
