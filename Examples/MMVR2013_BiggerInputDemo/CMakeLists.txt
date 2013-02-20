@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,28 @@
 # limitations under the License.
 
 
-find_package(GLUT)
+link_directories(
+	${Boost_LIBRARY_DIRS}
+)
 
-if(OPENHAPTICS_FOUND)
-	add_subdirectory(MMVR2013_SimpleInputDemo)
-endif(OPENHAPTICS_FOUND)
-if(OPENHAPTICS_FOUND AND GLUT_FOUND)
-	add_subdirectory(MMVR2013_BiggerInputDemo)
-endif(OPENHAPTICS_FOUND AND GLUT_FOUND)
+include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+	"${Boost_INCLUDE_DIR}"
+)
+
+set(EXAMPLE_SOURCES
+	main.cpp
+	SimpleSquareForce.cpp
+)
+
+set(EXAMPLE_HEADERS
+	SimpleSquareForce.h
+)
+
+add_executable(MMVR2013_BiggerInputDemo
+	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+target_link_libraries(MMVR2013_BiggerInputDemo
+	${LIBS} PhantomDevice SurgSimInput SurgSimFramework
+	${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} ${GLUT_LIBRARIES})
