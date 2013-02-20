@@ -88,7 +88,7 @@ bool CommonInputDevice::addInputListener(std::shared_ptr<InputDeviceListenerInte
 bool CommonInputDevice::removeListener(std::shared_ptr<InputDeviceListenerInterface> listener)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
-	for (auto it = m_state->listenerList.cbegin();  it != m_state->listenerList.cend();  ++it)
+	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
 	{
 		if (it->listener == listener)
 		{
