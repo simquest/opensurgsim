@@ -26,6 +26,12 @@ include_directories(
 	"${GLUT_INCLUDE_DIR}"
 )
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	# The standard FindGLUT code in CMake 2.8 includes some annoying old junk
+	# (-lXmu -lXi) in GLUT_LIBRARIES for Unix/Linux.  We only need GLUT itself.
+	set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+
 set(EXAMPLE_SOURCES
 	GlutRenderer.cpp
 	main.cpp
