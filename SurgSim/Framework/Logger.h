@@ -59,8 +59,21 @@ public:
 	{
 	}
 
-	/// \return a default logger to be used by all components
+	/// Get the shared default logger that will be used for assertions, and can be used whenever else necessary.
+	///
+	/// Note that this method currently returns a pointer, mostly for the convenience and efficiency of the
+	/// assert macros.  <b>DO NOT</b> attempt to wrap this into a smart pointer like std::shared_ptr; this will
+	/// likely cause it to be freed prematurely!
+	///
+	/// \return The default logger.
 	static Logger* getDefaultLogger();
+
+	/// Creates a logger that logs to the standard error output.
+	///
+	/// \param name The name to use for the logger.
+	///
+	/// \return The new logger.
+	static std::shared_ptr<Logger> createConsoleLogger(const std::string& name);
 
 	/// Uses the contained instance of LogOutput to write the log message
 	/// \return true on success
