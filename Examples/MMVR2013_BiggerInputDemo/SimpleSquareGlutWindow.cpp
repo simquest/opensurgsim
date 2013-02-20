@@ -38,7 +38,7 @@ public:
 
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-		glShadeModel(GL_FLAT);
+		glShadeModel(GL_SMOOTH);
 		glClearColor(0.1, 0.1, 0.1, 1.0);
 
 		glutDisplayFunc(display);
@@ -51,32 +51,40 @@ public:
 		glutMainLoop(); 
 	}
 
-	static void setSquare(const Vector3d& center, double halfSize, const Vector3d& normal)
+	static void setSquare(const Vector3d& center, double halfSize, const Vector3d& normal, Vector3d& color)
 	{
-		m_squareCenter = center;
-		m_squareHalfSize = halfSize;
-		m_squareNormal = normal;
-	}
-	static void setSquareColor(const Vector3d& color)
-	{
-		m_squareColor = color;
+		m_square.set(center, halfSize, normal, color);
 	}
 
 	static void setLocalTipPoint(const Vector3d& point)
 	{
 		m_localTipPoint = point;
 	}
-	static void setTipPointColor(const Vector3d& color)
+	static void setTipSphereColor(const Vector3d& color)
 	{
-		m_tipPointColor = color;
+		m_tipSphereColor = color;
+	}
+	static void setTipSphereRadius(double radius)
+	{
+		m_tipSphereRadius = radius;
 	}
 	static void setAxisLength(double length)
 	{
 		m_axisLength = length;
 	}
+	static void setAxisWidth(double width)
+	{
+		m_axisWidth = width;
+	}
 	static void setPose(const RigidTransform3d& pose)
 	{
 		m_pose = pose;
+	}
+
+	static void setCamera(const Vector3d& eye, const Vector3d& center, const Vector3d& up, double fovY,
+		double near, double far)
+	{
+		m_camera.set(eye, center, up, fovY, near, far);
 	}
 
 private:
@@ -88,19 +96,66 @@ private:
 	static int m_width;
 	static int m_height;
 
-	static Vector3d m_squareColor;
-	static Vector3d m_squareCenter;
-	static double m_squareHalfSize;
-	static Vector3d m_squareNormal;
+	struct Square
+	{
+		Vector3d center;
+		double halfSize;
+		Vector3d normal;
+		Vector3d color;
+
+		Square(const Vector3d& center, double halfSize, const Vector3d& normal, const Vector3d& color)
+		{
+			set(center, halfSize, normal, color);
+		}
+
+		void set(const Vector3d& center, double halfSize, const Vector3d& normal, const Vector3d& color)
+		{
+			this->center = center;
+			this->halfSize = halfSize;
+			this->normal = normal;
+			this->color = color;
+		}
+	};
+	static Square m_square;
 
 	static RigidTransform3d m_pose;
 	static Vector3d m_localTipPoint;
-	static Vector3d m_tipPointColor;
+	static Vector3d m_tipSphereColor;
+	static double m_tipSphereRadius;
 	static double m_axisLength;
+	static double m_axisWidth;
 
 	static GLUquadric* quadratic;
 
 	static Vector3d m_lightPosition;
+
+	struct Camera 
+	{
+		Vector3d eye;
+		Vector3d center;
+		Vector3d up;
+		double fovY;
+		double near;
+		double far;
+
+		Camera(const Vector3d& eye, const Vector3d& center, const Vector3d& up, const double fovY,
+			double near, double far)
+		{
+			set(eye, center, up, fovY, near, far);
+		}
+
+		void set(const Vector3d& eye, const Vector3d& center, const Vector3d& up, const double fovY,
+			double near, double far)
+		{
+			this->eye = eye,
+			this->center = center;
+			this->up = up;
+			this->fovY = fovY;
+			this->near = near;
+			this->far = far;
+		}
+	};
+	static Camera m_camera;
 
 	static void reshape(GLint width, GLint height)
 	{
@@ -114,11 +169,13 @@ private:
 		glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(45.0, (float)m_width / m_height, 0.001, 1.0);
+		gluPerspective(m_camera.fovY, (float)m_width / m_height, m_camera.near, m_camera.far);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(-0.15, 0.15, 0.3,  0.0, 0.0, 0.0,  0.0, 1.0, 0.0);
+		gluLookAt(m_camera.eye.x(), m_camera.eye.y(), m_camera.eye.z(),
+			m_camera.center.x(), m_camera.center.y(), m_camera.center.z(),
+			m_camera.up.x(), m_camera.up.y(), m_camera.up.z());
 
 		glEnable(GL_LIGHT0);
 
@@ -140,18 +197,18 @@ private:
 	{
 		glEnable(GL_LIGHTING);
 
-		Vector3d m_squarePoints[4];
-		m_squarePoints[0] = m_squareCenter - (m_squareHalfSize * m_planeDirectionX) + (m_squareHalfSize * m_planeDirectionY);
-		m_squarePoints[1] = m_squareCenter + (m_squareHalfSize * m_planeDirectionX) + (m_squareHalfSize * m_planeDirectionY);
-		m_squarePoints[2] = m_squareCenter + (m_squareHalfSize * m_planeDirectionX) - (m_squareHalfSize * m_planeDirectionY);
-		m_squarePoints[3] = m_squareCenter - (m_squareHalfSize * m_planeDirectionX) - (m_squareHalfSize * m_planeDirectionY);
+		Vector3d squarePoints[4];
+		squarePoints[0] = m_square.center - (m_square.halfSize * m_planeDirectionX) + (m_square.halfSize * m_planeDirectionY);
+		squarePoints[1] = m_square.center + (m_square.halfSize * m_planeDirectionX) + (m_square.halfSize * m_planeDirectionY);
+		squarePoints[2] = m_square.center + (m_square.halfSize * m_planeDirectionX) - (m_square.halfSize * m_planeDirectionY);
+		squarePoints[3] = m_square.center - (m_square.halfSize * m_planeDirectionX) - (m_square.halfSize * m_planeDirectionY);
 
-		glColor3d(m_squareColor.x(), m_squareColor.y(), m_squareColor.z());
+		glColor3d(m_square.color.x(), m_square.color.y(), m_square.color.z());
 		glBegin(GL_QUADS);
-		glNormal3d(m_squareNormal.x(), m_squareNormal.y(), m_squareNormal.z());
+		glNormal3d(m_square.normal.x(), m_square.normal.y(), m_square.normal.z());
 		for (int i = 0; i < 4; ++i)
 		{
-			glVertex3d(m_squarePoints[i].x(), m_squarePoints[i].y(), m_squarePoints[i].z());
+			glVertex3d(squarePoints[i].x(), squarePoints[i].y(), squarePoints[i].z());
 		}
 		glEnd();
 	}
@@ -166,7 +223,7 @@ private:
 		axesPoints[2] = m_pose * (m_axisLength * Vector3d(0.0, 1.0, 0.0));
 		axesPoints[3] = m_pose * (m_axisLength * Vector3d(0.0, 0.0, 1.0));
 
-		glLineWidth(5.0);
+		glLineWidth(m_axisWidth);
 		glBegin(GL_LINES);
 		glColor3d(1.0, 0.0, 0.0);
 		glVertex3d(axesPoints[0].x(), axesPoints[0].y(), axesPoints[0].z());
@@ -186,25 +243,24 @@ private:
 
 		Vector3d tipPoint = m_pose * m_localTipPoint;
 
-		glColor3d(m_tipPointColor.x(), m_tipPointColor.y(), m_tipPointColor.z());
+		glColor3d(m_tipSphereColor.x(), m_tipSphereColor.y(), m_tipSphereColor.z());
 
 		glPushMatrix();
 		glTranslated(tipPoint.x(), tipPoint.y(), tipPoint.z());
 		gluQuadricOrientation(quadratic, GLU_OUTSIDE);
-		gluSphere(quadratic, 0.01, 32, 32);
+		gluSphere(quadratic, m_tipSphereRadius, 32, 32);
 		glPopMatrix();
 	}
 };
 
-Vector3d Renderer::m_squareCenter(0.0, 0.0, 0.0);
-Vector3d Renderer::m_squareNormal(0.0, 0.0, 1.0);
-double Renderer::m_squareHalfSize = 0.01;
-Vector3d Renderer::m_squareColor = Vector3d(1.0, 1.0, 1.0);
+Renderer::Square Renderer::m_square(Vector3d(0.0, 0.0, 0.0), 0.01, Vector3d(0.0, 0.0, 1.0), Vector3d(1.0, 1.0, 1.0));
 
 Vector3d Renderer::m_localTipPoint(0.0, 0.0, 0.0);
 RigidTransform3d Renderer::m_pose(RigidTransform3d::Identity());
-Vector3d Renderer::m_tipPointColor(1.0, 1.0, 1.0);
+Vector3d Renderer::m_tipSphereColor(1.0, 1.0, 1.0);
+double Renderer::m_tipSphereRadius = 0.01;
 double Renderer::m_axisLength = 0.01;
+double Renderer::m_axisWidth = 1.0;
 
 int Renderer::m_width = 1024;
 int Renderer::m_height = 768;
@@ -214,14 +270,20 @@ Vector3d Renderer::m_planeDirectionY(0.0, 0.0, 1.0);
 
 GLUquadric* Renderer::quadratic = gluNewQuadric();
 
+Renderer::Camera Renderer::m_camera(Vector3d(0.0, 0.0, 1.0), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 45.0, 
+	0.1, 1.0);
+
 
 SimpleSquareGlutWindow::SimpleSquareGlutWindow()
 {
-	Renderer::setSquare(Vector3d(0.0, 0.0, 0.0), 0.050, Vector3d(0.0, 1.0, 0.0));
-	Renderer::setTipPointColor(Vector3d(1.0, 1.0, 1.0));
+	Renderer::setSquare(Vector3d(0.0, 0.0, 0.0), 0.050, Vector3d(0.0, 1.0, 0.0), Vector3d(1.0, 1.0, 1.0));
+	Renderer::setTipSphereColor(Vector3d(1.0, 1.0, 1.0));
+	Renderer::setTipSphereRadius(0.010);
 	Renderer::setLocalTipPoint(Vector3d(0.0, 0.0, 0.0));
 	Renderer::setPose(RigidTransform3d::Identity());
 	Renderer::setAxisLength(0.025);
+	Renderer::setAxisWidth(5.0);
+	Renderer::setCamera(Vector3d(-0.15, 0.15, 0.3), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 45.0, 0.001, 1.0);
 
 	m_renderThread = boost::thread(boost::ref(Renderer::run));
 }
@@ -266,7 +328,7 @@ void SimpleSquareGlutWindow::handleInput(const std::string& device, const DataGr
 	{
 		tipPointColor *= 0.5;
 	}
-	Renderer::setTipPointColor(tipPointColor);
+	Renderer::setTipSphereColor(tipPointColor);
 }
 
 bool SimpleSquareGlutWindow::requestOutput(const std::string& device, DataGroup* outputData)
