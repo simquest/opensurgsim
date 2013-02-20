@@ -27,9 +27,24 @@ or don't like, or could be more useful to you if it were done
 differently speak up. This goes for the code as well as the rest of
 the project. We are open to ideas of all sorts.
  
-\section mainDiscuss Discussion of things related to OpenSurgSim
+\section mainResources Resources
 
-\li <a href="http://eepurl.com/vzzdv">Subscribe to the OpenSurgSim
-    mailing list!</a>
+<ul>
+<li><a href="https://www.assembla.com/spaces/OpenSurgSim/wiki">OpenSurgSim
+    project wiki</a><br>&nbsp;</li>
+<li>the <i>openSurgSim</i> mailing list/forum:<ul><li>subscribe by sending a
+        <a href="mailto:opensurgsim+subscribe@simquest.com">blank
+        e-mail to opensurgsim+subscribe@simquest.com</a></li>
+    <li>unsubscribe by sending a
+        <a href="mailto:opensurgsim+unsubscribe@simquest.com">blank
+        e-mail to opensurgsim+unsubscribe@simquest.com</a></li>
+    <li>view the archives, subscribe, unsubscribe, manage settings and
+        send messages using
+        <a href="http://groups.google.com/a/simquest.com/group/opensurgsim/?hl=en">the
+        Google Groups web interface</a> (requires Google account)</li>
+    </ul></li><br>
+<li>subscribe to the <a href="http://eepurl.com/vzzdv">OpenSurgSim
+    newsletter</a> for low-volume periodic updates</li>
+</ul>
 
 */
