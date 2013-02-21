@@ -25,7 +25,7 @@ using SurgSim::Device::PhantomDevice;
 using SurgSim::Device::NullDevice;
 
 #include "MovingSquareForce.h"
-#include "SimpleSquareGlutWindow.h"
+#include "MovingSquareGlutWindow.h"
 
 
 int main(int argc, char** argv)
@@ -48,8 +48,10 @@ int main(int argc, char** argv)
 	toolDevice->addListener(squareForce);
 	squareDevice->addListener(squareForce);
 
-	std::shared_ptr<SimpleSquareGlutWindow> squareGlutWindow = std::make_shared<SimpleSquareGlutWindow>();
+	std::shared_ptr<MovingSquareGlutWindow> squareGlutWindow = std::make_shared<MovingSquareGlutWindow>("ToolDevice", 
+		"SquareDevice");
 	toolDevice->addListener(squareGlutWindow);
+	squareDevice->addListener(squareGlutWindow);
 
 	printf("\n"
 	       "**********************************************************************\n"

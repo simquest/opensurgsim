@@ -13,24 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_SQUARE_GLUT_WINDOW_H
-#define SIMPLE_SQUARE_GLUT_WINDOW_H
+#ifndef MOVING_SQUARE_GLUT_WINDOW_H
+#define MOVING_SQUARE_GLUT_WINDOW_H
 
 #include <boost/thread.hpp>
 
 #include <SurgSim/Input/InputDeviceListenerInterface.h>
 #include <SurgSim/Input/DataGroup.h>
 
+#include "GlutRenderer.h"
 
-/// A simple listener to calculate collision force against a square area for the example application.
-/// \sa SurgSim::Input::InputDeviceListenerInterface
-class SimpleSquareGlutWindow : public SurgSim::Input::InputDeviceListenerInterface
+class MovingSquareGlutWindow : public SurgSim::Input::InputDeviceListenerInterface
 {
 public:
 	/// Constructor.
-	SimpleSquareGlutWindow();
+	MovingSquareGlutWindow(const std::string& toolDeviceName, const std::string& squareDeviceName);
 	/// Destructor.
-	~SimpleSquareGlutWindow();
+	~MovingSquareGlutWindow();
 
 	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
 
@@ -41,8 +40,17 @@ protected:
 private:
 	boost::thread m_renderThread;
 
+	std::string m_toolDeviceName;
+	std::string m_squareDeviceName;
+
+	std::shared_ptr<GlutCamera> m_camera;
+
+	std::shared_ptr<GlutSquare> m_square;
+	std::shared_ptr<GlutTool> m_tool;
+
+	void updateTool(const SurgSim::Input::DataGroup& inputData);
+	void updateSquare(const SurgSim::Input::DataGroup& inputData);
+
 };
 
-
-
-#endif // SIMPLE_SQUARE_GLUT_WINDOW_H
+#endif // MOVING_SQUARE_GLUT_WINDOW_H

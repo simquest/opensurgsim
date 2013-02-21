@@ -27,14 +27,16 @@ include_directories(
 )
 
 set(EXAMPLE_SOURCES
+	GlutRenderer.cpp
 	main.cpp
 	MovingSquareForce.cpp
-	SimpleSquareGlutWindow.cpp
+	MovingSquareGlutWindow.cpp
 )
 
 set(EXAMPLE_HEADERS
+	GlutRenderer.h
 	MovingSquareForce.h
-	SimpleSquareGlutWindow.h
+	MovingSquareGlutWindow.h
 )
 
 add_executable(MMVR2013_BiggerInputDemo
