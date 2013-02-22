@@ -116,7 +116,7 @@ void GlutSphere::draw() const
 	glPopMatrix();
 }
 
-void GlutTool::draw() const
+void GlutGroup::draw() const
 {
 	glPushMatrix();
 
@@ -124,8 +124,10 @@ void GlutTool::draw() const
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(pose.rotation());
 	glRotated(angleAxis.angle() * 180.0 / M_PI, angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
 
-	axes->draw();
-	sphere->draw();
+	for (auto it = children.cbegin(); it != children.cend(); ++it)
+	{
+		(*it)->draw();
+	}
 
 	glPopMatrix();
 }

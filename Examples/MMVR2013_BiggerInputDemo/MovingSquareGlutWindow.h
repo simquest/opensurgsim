@@ -23,6 +23,9 @@
 
 #include "GlutRenderer.h"
 
+/// A simple listener to display the simple scene composed of a square and tool for the example application.
+/// Includes support for the square being moved by a second tool.
+/// \sa SurgSim::Input::InputDeviceListenerInterface
 class MovingSquareGlutWindow : public SurgSim::Input::InputDeviceListenerInterface
 {
 public:
@@ -31,24 +34,44 @@ public:
 	/// Destructor.
 	~MovingSquareGlutWindow();
 
+	/// Handles input from a device.
+	/// \param device Name of the device.
+	/// \param inputData Input data from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
 
+	/// Gets output for a device. This listener provides no output, as it only handles display of the scene.
+	/// \param device Name of the device.
+	/// \param outputData Output for data to provide to the device.
 	virtual bool requestOutput(const std::string& device, SurgSim::Input::DataGroup* outputData);
 
 protected:
 
 private:
+	/// Render thread which runs the Glut main loop.
 	boost::thread m_renderThread;
 
-	std::string m_toolDeviceName;
-	std::string m_squareDeviceName;
+	/// Name of the tool device.
+	const std::string m_toolDeviceName;
+	/// Name of the square device.
+	const std::string m_squareDeviceName;
 
+	/// Camera which controls the view of the scene.
 	std::shared_ptr<GlutCamera> m_camera;
 
+	/// Tool composed of a sphere and axes that are moved with device input.
+	std::shared_ptr<GlutGroup> m_tool;
+	/// Sphere of the tool. Pointer is kept here so that the color can easily be changed based on the device's button 
+	/// state.
+	std::shared_ptr<GlutSphere> m_toolSphere;
+	
+	/// Square that is moved with device input.
 	std::shared_ptr<GlutSquare> m_square;
-	std::shared_ptr<GlutTool> m_tool;
 
+	/// Updates the tool based on the device input.
+	/// \param inputData Input data from the device.
 	void updateTool(const SurgSim::Input::DataGroup& inputData);
+	/// Updates the square based on the device input.
+	/// \param inputData Input data from the device.
 	void updateSquare(const SurgSim::Input::DataGroup& inputData);
 
 };

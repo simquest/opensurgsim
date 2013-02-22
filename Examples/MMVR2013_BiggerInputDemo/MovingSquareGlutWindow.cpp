@@ -24,15 +24,19 @@ MovingSquareGlutWindow::MovingSquareGlutWindow(const std::string& toolDeviceName
 	m_toolDeviceName(toolDeviceName),
 	m_squareDeviceName(squareDeviceName)
 {
-	m_camera = std::make_shared<GlutCamera>(Vector3d(-0.15, 0.15, 0.3), Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 1.0, 0.0), 45.0, 0.001, 1.0);
+	m_camera = std::make_shared<GlutCamera>(Vector3d(-0.15, 0.15, 0.3), Vector3d(0.0, 0.0, 0.0), 
+		Vector3d(0.0, 1.0, 0.0), 45.0, 0.001, 1.0);
 	GlutRenderer::setCamera(m_camera);
 
-	m_square = std::make_shared<GlutSquare>(0.050, Vector3d(1.0, 1.0, 1.0), RigidTransform3d::Identity());
+	m_square = std::make_shared<GlutSquare>(0.050, Vector3d(1.0, 1.0, 1.0), Vector3d(1.0, 0.0, 0.0), 
+		Vector3d(0.0, 0.0, 1.0));
 	GlutRenderer::addObject(m_square);
 
-	std::shared_ptr<GlutSphere> toolSphere = std::make_shared<GlutSphere>(0.010, Vector3d(1.0, 1.0, 1.0), RigidTransform3d::Identity());
-	std::shared_ptr<GlutAxes> toolAxes = std::make_shared<GlutAxes>(0.025, 5.0, RigidTransform3d::Identity());
-	m_tool = std::make_shared<GlutTool>(toolSphere, toolAxes, RigidTransform3d::Identity());
+	m_toolSphere = std::make_shared<GlutSphere>(0.010, Vector3d(1.0, 1.0, 1.0));
+	std::shared_ptr<GlutAxes> toolAxes = std::make_shared<GlutAxes>(0.025, 5.0);
+	m_tool = std::make_shared<GlutGroup>();
+	m_tool->children.push_back(m_toolSphere);
+	m_tool->children.push_back(toolAxes);
 	GlutRenderer::addObject(m_tool);
 
 	m_renderThread = boost::thread(boost::ref(GlutRenderer::run));
@@ -93,7 +97,7 @@ void MovingSquareGlutWindow::updateTool(const DataGroup& inputData)
 	{
 		color *= 0.5;
 	}
-	m_tool->sphere->color = color;
+	m_toolSphere->color = color;
 }
 
 void MovingSquareGlutWindow::updateSquare(const DataGroup& inputData)
