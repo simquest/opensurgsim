@@ -62,7 +62,7 @@ public:
 	/// \return	The absolute path to the file in system format i.e c:\xxx\yyy\file.txt for 
 	/// 		windows and /xxx/yyy/file.txt for all other systems. An empty string will be
 	/// 		returned if the file cannot be found.
-	std::string ApplicationData::findFile(const std::string& fileName) const;
+	std::string findFile(const std::string& fileName) const;
 private:
 
 	/// Adds a single path to the list of search paths.

@@ -80,7 +80,7 @@ using boost::filesystem::path;
 		return ::testing::AssertionFailure() << "Expected " << searchFileName << 
 			" Result " << filePath.filename();
 	}
-	if ( fileName.find(expectedDirectoryName) == -1)
+	if ( fileName.find(expectedDirectoryName) == std::string::npos)
 	{
 		return ::testing::AssertionFailure() << "Expected the file to be in subdirectory " << 
 			expectedDirectoryName << " but is not " << fileName;
@@ -102,26 +102,28 @@ TEST(ApplicationDataTest, OnlyValidPaths)
 	paths.push_back("xxx");
 	ApplicationData data(paths);
 
-	EXPECT_EQ(1, data.getPaths().size());
+	EXPECT_EQ(1U, data.getPaths().size());
 }
 
 TEST(ApplicationDataTest, GetPathsTest)
 {
 	std::vector<std::string> paths;
-	paths.push_back("Data/ApplicationDataTest/Directory1");
-	paths.push_back("Data\\ApplicationDataTest\\Directory2");
+	std::string path1 = "Data/ApplicationDataTest/Directory1";
+	std::string path2 = "Data\\ApplicationDataTest\\Directory2";
+	paths.push_back(path1);
+	paths.push_back(path2);
 	ApplicationData data (paths);
 
-	EXPECT_EQ(2, data.getPaths().size());
+	EXPECT_EQ(2U, data.getPaths().size());
 	
 	paths = data.getPaths();
 
 	EXPECT_TRUE(boost::filesystem::equivalent(
-		path("Data/ApplicationDataTest/Directory1"),
-		path(paths[0])));
+		path(path1),
+		path(paths[0]))) << path1 << " not considered equivalent to " << paths[0];
 	EXPECT_TRUE(boost::filesystem::equivalent(
-		path("Data/ApplicationDataTest/Directory2"),
-		path(paths[1])));
+		path(path2),
+		path(paths[1]))) << path2 << " not considered equivalent to " << paths[1];
 }
 
 TEST (ApplicationDataTest, FindFileTest)
@@ -134,7 +136,7 @@ TEST (ApplicationDataTest, FindFileTest)
 	std::string fileName;
 	boost::filesystem::path filePath;
 
-	EXPECT_EQ(2, data.getPaths().size());
+	EXPECT_EQ(2U, data.getPaths().size());
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));
@@ -149,7 +151,7 @@ TEST (ApplicationDataTest, MessedUpSlashesTest)
 	paths.push_back("Data/ApplicationDataTest\\Directory2");
 	ApplicationData data(paths);
 
-	EXPECT_EQ(2, data.getPaths().size());
+	EXPECT_EQ(2U, data.getPaths().size());
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));
@@ -173,7 +175,7 @@ TEST (ApplicationDataTest, InitFromFile)
 
 	ApplicationData data("Data/ApplicationDataTest/testFile1.txt");
 
-	EXPECT_EQ(2, data.getPaths().size());
+	EXPECT_EQ(2U, data.getPaths().size());
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));
