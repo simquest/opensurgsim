@@ -68,7 +68,7 @@ public:
 	bool start();
 
 	/// Stops the simulation.
-	/// \param	waitForFinish	true to wait for all the threads to finish.
+	/// The call will wait for all the threads to finish, except for any threads that have been detached.
 	/// \return	true if it succeeds, false if it fails.
 	bool stop();
 
