@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,6 +45,10 @@ public:
 	/// Constructor
 	/// \param logger Logger used to log this message
 	explicit AssertMessage(const std::unique_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
+	/// Constructor.
+	/// \param logger Logger used to log this message
+	explicit AssertMessage(const std::shared_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
+
 
 	/// Destructor
 	~AssertMessage()

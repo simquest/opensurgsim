@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,8 +59,21 @@ public:
 	{
 	}
 
-	/// \return a default logger to be used by all components
+	/// Get the shared default logger that will be used for assertions, and can be used whenever else necessary.
+	///
+	/// Note that this method currently returns a pointer, mostly for the convenience and efficiency of the
+	/// assert macros.  <b>DO NOT</b> attempt to wrap this into a smart pointer like std::shared_ptr; this will
+	/// likely cause it to be freed prematurely!
+	///
+	/// \return The default logger.
 	static Logger* getDefaultLogger();
+
+	/// Creates a logger that logs to the standard error output.
+	///
+	/// \param name The name to use for the logger.
+	///
+	/// \return The new logger.
+	static std::shared_ptr<Logger> createConsoleLogger(const std::string& name);
 
 	/// Uses the contained instance of LogOutput to write the log message
 	/// \return true on success
@@ -77,27 +90,28 @@ public:
 		return m_threshold;
 	}
 
-	/// Sets the logging threshold
-	/// \param the value for the threshold
+	/// Sets the logging threshold.
+	/// \param val The value for the threshold.
 	void setThreshold(int val)
 	{
 		m_threshold = val;
 	}
 
-	/// \return the current output class used this logger
+	/// Get the output object used by this logger.
+	/// \return the current output object used this logger.
 	std::shared_ptr<LogOutput> getOutput() const
 	{
 		return m_output;
 	}
 
-	/// Set the output class used by this logger
-	/// \param the output class to be used
+	/// Set the output object used by this logger.
+	/// \param val The output object to be used.
 	void setOutput(std::shared_ptr<LogOutput> val)
 	{
 		m_output = val;
 	}
 
-	/// This loggers name
+	/// This logger's name.
 	std::string getName() const
 	{
 		return m_name;

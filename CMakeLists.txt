@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest LLC.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ find_package(Eigen3 REQUIRED)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.51 COMPONENTS thread system chrono REQUIRED)
+find_package(Boost 1.50 COMPONENTS thread system chrono REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 
@@ -46,5 +46,6 @@ if(SURGSIM_TESTS_BUILD)
 endif()
 
 add_subdirectory(SurgSim)
+add_subdirectory(Documentation)
 
 #option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)

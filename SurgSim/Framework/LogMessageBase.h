@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,15 +38,15 @@ class LogMessageBase
 public:
 
 	/// Construct a LogMessage
-	/// \param logger the logger to be used
-	/// \param level the level for this message
+	/// \param logger The logger to be used
+	/// \param level The logging level for this message
 	LogMessageBase(Logger* logger, int level);
 
 	/// Destructor.
 	~LogMessageBase() {};
 
 	/// Add the given input to the current log message.
-	/// \param the input to be added to the current stream
+	/// \param input The input to be added to the current stream
 	template <typename T>
 	LogMessageBase& operator <<(T&& input)
 	{
@@ -55,7 +55,15 @@ public:
 	}
 
 	// A specialization for output manipulators (functions that apply to the stream).
-	// Otherwise overloaded manipulators like std::endl don't work, since the compiler can't know what overloaded variant to apply.
+	// Otherwise overloaded manipulators like std::endl and std::endl don't work, since the compiler can't know what overloaded variant to apply.
+	LogMessageBase& operator <<(std::ios_base& (*manipulator)(std::ios_base&))
+	{
+		m_stream << *manipulator;
+		return *this;
+	}
+
+	// A specialization for output manipulators (functions that apply to the stream).
+	// Otherwise overloaded manipulators like std::hex and std::endl don't work, since the compiler can't know what overloaded variant to apply.
 	LogMessageBase& operator <<(std::ostream& (*manipulator)(std::ostream&))
 	{
 		m_stream << *manipulator;

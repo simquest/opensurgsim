@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class FileOutput : public LogOutput
 public:
 
 	/// Constructor
-	/// \param the filename to be used for writing
+	/// \param filename The filename to be used for writing
 	explicit FileOutput(std::string filename);
 
 	virtual ~FileOutput();

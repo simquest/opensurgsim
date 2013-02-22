@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest LLC.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-find_package(Boost COMPONENTS filesystem system REQUIRED)
+find_package(Boost 1.50 COMPONENTS filesystem system REQUIRED)
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}

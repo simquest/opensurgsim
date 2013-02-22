@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest LLC.
+// Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ namespace Framework
 ///
 /// The type of the contained data is determined by the template argument, and should satisfy the following:
 ///  - It must be either copy-assignable or move-assignable.  In other words, assignment must be possible using
-///    either \code{operator=(const T&)} or \code{operator=(T&&)}, or compiler-generated equivalents.
+///    either <code>operator=(const T&)</code> or <code>operator=(T&&)</code>, or compiler-generated equivalents.
 ///  - It must be either default-constructable or copy-constructable.  In other words, construction must be
-///    possible using either \code{T()} or \code{T(const T&)}, or compiler-generated equivalents.
+///    possible using either <code>T()</code> or <code>T(const T&)</code>, or compiler-generated equivalents.
 /// Note that STL container types, plain-old-data structs, and most other things you might want to use satisfy
 /// those requirements.
 ///
@@ -39,8 +39,8 @@ namespace Framework
 ///
 /// Writers set the data by calling the \ref set method, which copies or moves the data into internal storage.
 ///
-/// Readers request their view of the data to be updated by calling the \ref update method, and can access the data
-/// between updates by "dereferencing" the container using \c * or \c -> operators.
+/// The reader requests its view of the data to be updated by calling the \ref update method, and can access the data
+/// between updates by "dereferencing" the container using the <code>*</code> or <code>-&gt;</code> operators.
 template <typename T>
 class ThreadSafeContainer
 {
