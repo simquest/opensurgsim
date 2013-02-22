@@ -33,7 +33,7 @@ void GlutSquare::draw() const
 
 	glTranslated(pose.translation().x(), pose.translation().y(), pose.translation().z());
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(pose.rotation());
-	glRotated(angleAxis.angle(), angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
+	glRotated(angleAxis.angle() * 180.0 / M_PI, angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
 
 	Vector3d squarePoints[4];
 	squarePoints[0] = - (halfSize * planeDirectionX) + (halfSize * planeDirectionY);
@@ -73,7 +73,7 @@ void GlutAxes::draw() const
 
 	glTranslated(pose.translation().x(), pose.translation().y(), pose.translation().z());
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(pose.rotation());
-	glRotated(angleAxis.angle(), angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
+	glRotated(angleAxis.angle() * 180.0 / M_PI, angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
 
 	Vector3d axesPoints[4];
 	axesPoints[0] = Vector3d(0.0, 0.0, 0.0);
@@ -106,7 +106,7 @@ void GlutSphere::draw() const
 
 	glTranslated(pose.translation().x(), pose.translation().y(), pose.translation().z());
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(pose.rotation());
-	glRotated(angleAxis.angle(), angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
+	glRotated(angleAxis.angle() * 180.0 / M_PI, angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
 
 	glColor3d(color.x(), color.y(), color.z());
 
@@ -122,7 +122,7 @@ void GlutTool::draw() const
 
 	glTranslated(pose.translation().x(), pose.translation().y(), pose.translation().z());
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(pose.rotation());
-	glRotated(angleAxis.angle(), angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
+	glRotated(angleAxis.angle() * 180.0 / M_PI, angleAxis.axis().x(), angleAxis.axis().y(), angleAxis.axis().z());
 
 	axes->draw();
 	sphere->draw();
@@ -141,6 +141,7 @@ void GlutRenderer::initialize()
 	glutInitWindowSize(m_width, m_height); 
 	glutCreateWindow("MMVR2013 Bigger Input Demo"); 
 
+	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
