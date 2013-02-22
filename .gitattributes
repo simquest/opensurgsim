@@ -90,6 +90,7 @@ Doxyfile.in             text
 
 ## CMake files
 CMakeLists.txt          text
+*.cmake                 text
 
 ## Makefiles
 Makefile                text
