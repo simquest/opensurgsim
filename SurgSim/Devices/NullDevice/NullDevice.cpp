@@ -64,9 +64,6 @@ DataGroup NullDevice::buildInputData()
 	DataGroupBuilder builder;
 	builder.addPose("pose");
 	builder.addBoolean("button0");
-	builder.addBoolean("button1");
-	builder.addBoolean("button2");
-	builder.addBoolean("button3");
 	return builder.createData();
 }
 
