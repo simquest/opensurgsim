@@ -28,6 +28,11 @@ set(SURGSIM_MATH_HEADERS
 )
 
 #add_library(SurgSimMath ${SURGSIM_MATH_SOURCES} ${SURGSIM_MATH_HEADERS})
+#install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION include}
+#install(TARGETS SurgSimMath
+#    RUNTIME DESTINATION bin
+#    LIBRARY DESTINATION lib
+#    ARCHIVE DESTINATION lib)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
