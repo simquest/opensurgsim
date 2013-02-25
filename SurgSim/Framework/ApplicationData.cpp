@@ -15,7 +15,10 @@
 
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Log.h>
+
 #include <algorithm>
+#include <iostream>
+#include <regex>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -60,16 +63,37 @@ ApplicationData::~ApplicationData()
 std::string ApplicationData::findFile(const std::string& fileName) const
 {
 	std::string result;
+
+	if (!isValidFilename(fileName))
+	{
+		return "";
+	}
+
 	path file(fileName);
 	for (auto it = m_paths.cbegin(); it != m_paths.cend(); ++it)
 	{
 		path filePath(*it);
 		filePath /= fileName;
-		if (boost::filesystem::exists(filePath))
+
+		std::cout << __FUNCTION__;
+		std::cout << std::endl;
+		std::cout << fileName << std::endl;
+		std::cout << filePath.string() << std::endl;
+
+		boost::system::error_code ec;
+
+		if (boost::filesystem::exists(filePath,ec))
 		{
-			filePath = boost::filesystem::canonical(filePath);
 			result = filePath.make_preferred().string();
 			break;
+		}
+		else 
+		{
+			if (ec.value() != 0)
+			{
+				SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << 
+					"Could not find file because " << ec.message();
+			}
 		}
 	}
 	return result;
@@ -89,12 +113,18 @@ bool ApplicationData::setPaths(const std::vector<std::string>& paths)
 bool ApplicationData::addPath(std::string pathName)
 {
 	bool result = false;
-	if (std::find(m_paths.cbegin(), m_paths.cend(), pathName) == m_paths.cend())
+	
+	if (! isValidFilename(pathName))
 	{
-		path newPath(pathName);
-		if (boost::filesystem::exists(newPath) && boost::filesystem::is_directory(newPath))
+		return false;
+	}
+
+	path newPath(pathName);
+	if (boost::filesystem::exists(newPath) && boost::filesystem::is_directory(newPath))
+	{
+		newPath = boost::filesystem::canonical(newPath).make_preferred();
+		if (std::find(m_paths.cbegin(), m_paths.cend(), newPath) == m_paths.cend())
 		{
-			newPath.make_preferred();
 			m_paths.push_back(newPath);
 			result = true;
 		}
@@ -118,6 +148,32 @@ std::vector<std::string> ApplicationData::getPaths() const
 	for (auto it = m_paths.cbegin(); it != m_paths.cend(); ++it)
 	{
 		result.push_back(it->string());
+	}
+	return result;
+}
+
+bool ApplicationData::isValidFilename(const std::string& fileName) const
+{
+	bool result = true;
+	size_t index = fileName.find("\\");
+	if (index != std::string::npos)
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ <<
+			" Backslashes encountered in the path, this path cannot be used " << fileName <<
+			" to be useful it needs to be rewritten using '/'.";
+		result = false;
+	}
+	return result;
+}
+
+std::string ApplicationData::makeValid(const std::string& fileName) const
+{
+	std::string result = fileName;
+	size_t index = result.find("\\");
+	while (index != std::string::npos)
+	{
+		result.replace(index,1, "/");
+		index = result.find("\\");
 	}
 	return result;
 }

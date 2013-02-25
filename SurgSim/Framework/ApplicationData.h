@@ -63,6 +63,17 @@ public:
 	/// 		windows and /xxx/yyy/file.txt for all other systems. An empty string will be
 	/// 		returned if the file cannot be found.
 	std::string findFile(const std::string& fileName) const;
+
+	/// Checks if the filename is acceptable
+	/// \param fileName		Filename to be checked.
+	/// \return true if the name is valid, false otherwise.
+	bool isValidFilename(const std::string& fileName) const;
+
+	/// Remove all occurances of '\' and replace them with '/'
+	/// \param fileName	The file name to be changed.
+	/// \return A useable file name
+	std::string makeValid(const std::string& fileName) const;
+
 private:
 
 	/// Adds a single path to the list of search paths.
