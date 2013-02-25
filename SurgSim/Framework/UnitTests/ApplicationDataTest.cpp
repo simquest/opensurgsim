@@ -56,13 +56,8 @@ using boost::filesystem::path;
 	const std::string& searchFileName,
 	const std::string& expectedDirectoryName) 
 {
-
-	std::cout << data.getPaths() << std::endl;
-
 	// First file should be there and in directory1
 	std::string fileName = data.findFile(searchFileName);
-	std::cout << fileName << std::endl;
-	std::cout << "-----------------" << std::endl;
 	boost::filesystem::path filePath(fileName);
 
 	if (! filePath.is_absolute())

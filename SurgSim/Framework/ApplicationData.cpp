@@ -74,26 +74,10 @@ std::string ApplicationData::findFile(const std::string& fileName) const
 	{
 		path filePath(*it);
 		filePath /= fileName;
-
-		std::cout << __FUNCTION__;
-		std::cout << std::endl;
-		std::cout << fileName << std::endl;
-		std::cout << filePath.string() << std::endl;
-
-		boost::system::error_code ec;
-
-		if (boost::filesystem::exists(filePath,ec))
+		if (boost::filesystem::exists(filePath))
 		{
 			result = filePath.make_preferred().string();
 			break;
-		}
-		else 
-		{
-			if (ec.value() != 0)
-			{
-				SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << __FUNCTION__ << 
-					"Could not find file because " << ec.message();
-			}
 		}
 	}
 	return result;
