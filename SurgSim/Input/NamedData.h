@@ -28,17 +28,39 @@ namespace SurgSim
 namespace Input
 {
 
-/// An array of value entries that can be accessed by name or index.
-/// Each entry can also be marked as currently valid or missing.
+/// A collection of value entries that can be accessed by name or index.
+///
+/// A NamedData object contains a collection of values of type \a T.  Each entry in the collection can be
+/// accessed by using either its unique name (a std::string) or its unique index (a non-negative integer).
+/// Access by name is more convenient, but also less efficient.
+///
+/// A NamedData object constructed by the default constructor starts out empty, meaning it has not yet been
+/// associated with a set of names and indices.  A <i>non</i>-empty object contains a fixed set of value entries;
+/// entries <b>cannot be added or removed</b>, and names and indices of existing entries
+/// <b>cannot be changed</b>.  A non-empty object also cannot ever become empty again.  These properties ensure
+/// that a stable data layout is available to the code using this class so that it can, for example, record
+/// entry indices and use them to retrieve the same entries later on.
+///
+/// However, each entry can be marked as not currently valid, i.e. missing.  Its entry still remains in the
+/// collection, but for the moment has no value associated with it.
+///
+/// The set of names and indices within a NamedData object object cannot be modified, but it can be initialized
+/// by passing in a vector of names to the constructor.  Alternately, you can initialize the data layout using
+/// the \ref NamedDataBuilder class.  After doing that, you can create other objects with the same layout by
+/// copy construction, or by assigning the initialized value to an empty (default-constructed) NamedData object.
+///
+/// \tparam T the data type used for values contained in this collection.
 template <typename T>
 class NamedData
 {
 public:
-	/// Create an empty object, with no associated directory yet.
+	/// Create an empty object, with no associated names and indices yet.
 	NamedData() {};
 
 	/// Create an object containing items from an index directory.
 	/// You should probably use \ref NamedDataBuilder or copy construction/assignment instead.
+	///
+	/// \param directory The IndexDirectory object describing the names and indices to be used.
 	NamedData(std::shared_ptr<const IndexDirectory> directory)
 		: m_directory(directory)
 	{
@@ -47,7 +69,10 @@ public:
 		SURGSIM_ASSERT(isValid());
 	}
 
-	/// Create an object containing items from a vector of strings.
+	/// Construct an object, using the names from a vector of strings.
+	/// The indices corresponding to each name's entry will be the same as that name's index in the vector.
+	///
+	/// \param names The names, which should be unique.
 	NamedData(const std::vector<std::string>& names)
 		: m_directory(std::make_shared<const IndexDirectory>(names))
 	{
@@ -56,7 +81,8 @@ public:
 		SURGSIM_ASSERT(isValid());
 	}
 
-	/// Create an object and copy the data from another object.
+	/// Construct an object as a copy of the data from another object.
+	/// \param namedData The object to copy from.
 	NamedData(const NamedData& namedData)
 		: m_directory(namedData.m_directory),
 		  m_data(namedData.m_data),
@@ -66,6 +92,31 @@ public:
 	}
 
 	/// Copy the data from another object.
+	///
+	/// The object being assigned into must either be empty (not yet associated with a set of names and indices), or
+	/// the two objects must share the same data layout, resulting from earlier copy construction or assignment.
+	/// ~~~~~
+	/// DataGroup initial;
+	/// // ...initialize "initial" to some non-empty value...
+	/// NamedData copyConstructed(initial);  // Layout is shared with initial
+	/// copyConstructed = initial            // OK, using the same layout
+	/// NamedData another;                   // Object is empty (no layout)
+	/// another = initial;                   // OK, layout is now shared with initial
+	/// another = initial                    // OK, using the same layout
+	/// ~~~~~
+	///
+	/// Note that the data layout must be the same, i.e. related to one another by object assignment or copy
+	/// construction.  Objects that merely contain entries with the same names and indices are not acceptable!
+	/// (Otherwise, we'd need to inefficiently compare layout contents each time we assign.)
+	/// ~~~~~
+	/// std::vector<std::string> names // = ...initialized to some value...;
+	/// NamedData first(names);   // Layout of entries created from names
+	/// NamedData second(names);  // Another layout of entries created from names; names and indices match
+	/// second = first;           // ERROR at run-time, layouts were created separately!
+	/// ~~~~~
+	///
+	/// \param namedData The object to copy from.
+	/// \return The object that was assigned into.
 	NamedData& operator=(const NamedData& namedData)
 	{
 		SURGSIM_ASSERT(namedData.isValid()) <<
@@ -85,12 +136,14 @@ public:
 
 		SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
 		SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isCurrent.size() == m_directory->size()) <<
-			"NamedData isn't correctly sized after assignment!";
+		        "NamedData isn't correctly sized after assignment!";
 
 		return *this;
 	}
 
 	/// Create an object and move the data from another object.
+	///
+	/// \param [in,out] namedData The object to copy from, which will be left in an ununsable state.
 	NamedData(NamedData&& namedData)
 		: m_directory(std::move(namedData.m_directory)),
 		  m_data(std::move(namedData.m_data)),
@@ -99,6 +152,11 @@ public:
 	}
 
 	/// Move the data from another object.
+	///
+	/// The same restrictions on object compatibility apply as in the case of the copy assignment operator=(const NamedData&).
+	///
+	/// \param [in,out] namedData The object to copy from, which will be left in an ununsable state.
+	/// \return The object that was assigned into.
 	NamedData& operator=(NamedData&& namedData)
 	{
 		SURGSIM_ASSERT(namedData.isValid()) <<
@@ -112,49 +170,65 @@ public:
 		{
 			SURGSIM_ASSERT(m_directory == namedData.m_directory) << "Incompatible NamedData contents in assignment!";
 		}
-		
+
 		m_data = std::move(namedData.m_data);
 		m_isCurrent = std::move(namedData.m_isCurrent);
 
 		SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
 		SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isCurrent.size() == m_directory->size()) <<
-			"NamedData isn't correctly sized after assignment!";
-		
+		        "NamedData isn't correctly sized after assignment!";
+
 		return *this;
 	}
 
-	/// Check if the object is valid, meaning it has a valid directory.
-	/// If the object isn't valid, it can become valid on assignment from a valid object.
+	/// Check if the object is valid (non-empty), meaning it is associated with a set of names and indices.
+	/// If the object is empty, it can become valid on assignment from a valid object.
+	///
+	/// \return true if valid, false if empty.
 	bool isValid() const
 	{
 		return static_cast<bool>(m_directory);
 	}
 
-	/// Return the object's directory.
+	/// Return the object's layout directory, which is its collection of names and indices.
+	/// In most cases, you should use direct assignment instead of doing things via the directory.
+	/// \return The IndexDirectory object containing the names and indices of entries.
 	std::shared_ptr<const IndexDirectory> getDirectory() const
 	{
 		return m_directory;
 	}
 
-	/// The object contains an entry with the specified index.
+	/// Check whether the object contains an entry with the specified index.
+	///
+	/// \param index The index corresponding to the entry.
+	/// \return true if that entry exists, false if not.
 	bool hasEntry(int index) const
 	{
 		return ((index >= 0) && (index < static_cast<int>(m_data.size())));
 	}
 
-	/// The object contains an entry with the specified name.
+	/// Check whether the object contains an entry with the specified name.
+	///
+	/// \param name The name corresponding to the entry.
+	/// \return true if that entry exists, false if not.
 	bool hasEntry(const std::string& name) const
 	{
 		return m_directory->hasEntry(name);
 	}
 
-	/// The object contains current data for the entry with the specified index.
+	/// Check whether the object contains current data for the entry with the specified index.
+	///
+	/// \param index The index of the entry.
+	/// \return true if that entry exists and contains current data.
 	bool hasCurrentData(int index) const
 	{
 		return hasEntry(index) && m_isCurrent[index];
 	}
 
-	/// The object contains current data for the entry with the specified name.
+	/// Check whether the object contains current data for the entry with the specified name.
+	///
+	/// \param name The name of the entry.
+	/// \return true if that entry exists and contains current data.
 	bool hasCurrentData(const std::string& name) const
 	{
 		int index =  m_directory->getIndex(name);
@@ -169,7 +243,11 @@ public:
 		}
 	}
 
-	/// Given an index, return the corresponding value.
+	/// Given an index, get the corresponding value.
+	///
+	/// \param index The index of the entry.
+	/// \param [out] value The retrieved value.
+	/// \return true if a current value is available and was written to \a value.
 	bool get(int index, T& value) const
 	{
 		if (! hasCurrentData(index))
@@ -183,7 +261,11 @@ public:
 		}
 	}
 
-	/// Given a name, return the corresponding value.
+	/// Given a name, get the corresponding value.
+	///
+	/// \param name The name of the entry.
+	/// \param [out] value The retrieved value.
+	/// \return true if a current value is available and was written to \a value.
 	bool get(const std::string& name, T& value) const
 	{
 		int index =  m_directory->getIndex(name);
@@ -200,6 +282,11 @@ public:
 	}
 
 	/// Record the data for an entry specified by an index.
+	/// The entry will also be marked as containing current data.
+	///
+	/// \param index The index of the entry.
+	/// \param value The value to be set.
+	/// \return true if successful.
 	bool put(int index, const T& value)
 	{
 		if (! hasEntry(index))
@@ -215,6 +302,11 @@ public:
 	}
 
 	/// Record the data for an entry specified by a name.
+	/// The entry will also be marked as containing current data.
+	///
+	/// \param name The name of the entry.
+	/// \param value The value to be set.
+	/// \return true if successful.
 	bool put(const std::string& name, const T& value)
 	{
 		int index =  m_directory->getIndex(name);
@@ -231,7 +323,7 @@ public:
 		}
 	}
 
-	/// Mark all data as not current.
+	/// Mark all of the data as not current.
 	void reset()
 	{
 		m_isCurrent.assign(m_data.size(), false);
