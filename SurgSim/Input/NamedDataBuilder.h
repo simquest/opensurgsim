@@ -25,16 +25,22 @@ namespace SurgSim
 namespace Input
 {
 
-/// A class that allows you to build an IndexDirectory structure.
-/// Read-only access to this class is thread-safe if all of the threads are only performing read (const) operations.
+/// A class that allows you to build a \ref NamedData structure.
+///
+/// Since the data layout of a \ref NamedData object cannot be modified, this class can be helpful in initially
+/// setting up the names and their corresponding indices.  You can add entries to the builder using \ref addEntry
+/// and \ref addEntriesFrom calls, then create the NamedData instance with createData() or createSharedData().
+///
+/// \sa NamedData
 template <typename T>
 class NamedDataBuilder : protected IndexDirectory
 {
 public:
-	/// Create an empty directory object.
+	/// Constructs an empty builder object.
 	NamedDataBuilder() {};
 
-	/// Produce an empty \ref NamedData object with an immutable directory.
+	/// Produces a \ref NamedData object with an immutable set of names and indices.
+	/// None of the values will contain any current data.
 	/// \return the NamedData object *by value*.
 	NamedData<T> createData() const
 	{
@@ -44,20 +50,25 @@ public:
 		return NamedData<T>(dir);
 	}
 
-	/// Produce a shared pointer to an empty \ref NamedData object with an immutable directory.
+	/// Produces a shared pointer to an empty \ref NamedData object with an immutable set of names and indices.
+	/// None of the values will contain any current data.
 	/// \return a shared pointer to the NamedData object.
 	std::shared_ptr<NamedData<T>> createSharedData() const
 	{
 		return std::make_shared<NamedData<T>>(createData());
 	}
 
-	/// Create a new entry for the specified name.
+	/// Creates a new entry for the specified name.
+	///
+	/// \param name The name, which should be non-empty and should not already exist in the data.
+	/// \return the index of the created entry, or -1 if the entry could not be added.
 	int addEntry(const std::string& name)
 	{
 		return IndexDirectory::addEntry(name);
 	}
 
-	/// Create new entries from a vector of strings.
+	/// Create new entries from a vector of names.
+	/// \param names The names.
 	void addEntries(const std::vector<std::string>& names)
 	{
 		for (auto it = names.cbegin();  it != names.cend();  ++it)
@@ -66,7 +77,9 @@ public:
 		}
 	}
 
-	/// Create new entries from an NamedDataBuilder.
+	/// Create new entries from another NamedDataBuilder.
+	/// \tparam typename U The data type of the other NamedDataBuilder.
+	/// \param builder The other builder.
 	template <typename U>
 	void addEntries(const NamedDataBuilder<U>& builder)
 	{
@@ -74,6 +87,8 @@ public:
 	}
 
 	/// Create new entries from an already initialized NamedData.
+	/// \tparam typename U The data type of the NamedData.
+	/// \param data The data object.
 	template <typename U>
 	void addEntries(const NamedData<U>& data)
 	{
@@ -81,34 +96,46 @@ public:
 	}
 
 	/// Create new entries from an IndexDirectory.
+	/// \param directory The index directory object.
 	void addEntries(const IndexDirectory& directory)
 	{
 		addEntries(directory.getAllNames());
 	}
 
-	// The forwarding proxies below are needed because we don't inherit from IndexBuilder publicly.
-	// We can just inherit their Doxygen documentation from the base class.
-
+	/// Given a name, return the corresponding index (or -1).
+	/// \param name The name.
+	/// \return the index for that name if one exists; -1 otherwise.
 	int getIndex(const std::string& name) const
 	{
 		return IndexDirectory::getIndex(name);
 	}
 
+	/// Given an index, return the corresponding name (or "").
+	/// \param index The index.
+	/// \return the name for that index if one exists; an empty string otherwise.
 	std::string getName(int index) const
 	{
 		return IndexDirectory::getName(index);
 	}
 
+	/// Get a list of all the names available in the builder.
+	/// \return all the names.
 	const std::vector<std::string>& getAllNames() const
 	{
 		return IndexDirectory::getAllNames();
 	}
 
+	/// Check whether the specified name exists in the builder.
+	///
+	/// \param name The name.
+	/// \return true if the entry exists.
 	bool hasEntry(const std::string& name) const
 	{
 		return IndexDirectory::hasEntry(name);
 	}
 
+	/// Check the number of existing entries in the builder.
+	/// \return the number of entries.
 	int getNumEntries() const
 	{
 		return IndexDirectory::getNumEntries();

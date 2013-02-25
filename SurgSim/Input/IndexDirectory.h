@@ -35,6 +35,7 @@ public:
 	IndexDirectory() {};
 
 	/// Create a directory object initialized to a list of names.
+	/// \param names The names.
 	IndexDirectory(const std::vector<std::string>& names)
 	{
 		for (auto it = names.cbegin();  it != names.cend();  ++it)
@@ -43,7 +44,9 @@ public:
 		}
 	}
 
-	/// Given a name, return the index (or -1).
+	/// Given a name, return the corresponding index (or -1).
+	/// \param name The name.
+	/// \return the index for that name if one exists; -1 otherwise.
 	int getIndex(const std::string& name) const
 	{
 		if (name.length() == 0)
@@ -61,7 +64,9 @@ public:
 		}
 	}
 
-	/// Given an index, return the name (or "").
+	/// Given an index, return the corresponding name (or "").
+	/// \param index The index.
+	/// \return the name for that index if one exists; an empty string otherwise.
 	std::string getName(int index) const
 	{
 		if ((index < 0) || (index >= static_cast<int>(m_names.size())))
@@ -75,24 +80,32 @@ public:
 	}
 
 	/// Get a list of all the names available from the index directory.
+	/// \return all the names.
 	const std::vector<std::string>& getAllNames() const
 	{
 		return m_names;
 	}
 
 	/// Check whether the specified name exists in the directory.
+	///
+	/// \param name The name.
+	/// \return true if the entry exists.
 	bool hasEntry(const std::string& name) const
 	{
 		return ((name.length() > 0) && (m_indices.count(name) > 0));
 	}
 
 	/// Check the number of existing entries in the directory.
+	/// \return the size of the directory.
+	/// \sa getNumEntries()
 	size_t size() const
 	{
 		return m_names.size();
 	}
 
 	/// Check the number of existing entries in the directory.
+	/// \return the size of the directory.
+	/// \sa size()
 	int getNumEntries() const
 	{
 		return static_cast<int>(m_names.size());
@@ -120,6 +133,9 @@ protected:
 	}
 
 	/// Create a new entry for the specified name.
+	///
+	/// \param name The name, which should be non-empty and should not already exist in the directory.
+	/// \return the index of the created entry, or -1 if the entry could not be added.
 	int addEntry(const std::string& name)
 	{
 		if ((name.length() == 0) || (m_indices.count(name) > 0))

@@ -24,7 +24,12 @@ namespace SurgSim
 namespace Input
 {
 
-/// A builder for a \c DataGroup.
+/// A class that allows you to build a \ref DataGroup structure.
+///
+/// Since the data layout of a \ref DataGroup object cannot be modified, this class is helpful in initially
+/// setting up the names and their corresponding indices.  You can add entries to the builder using \ref addEntry
+/// and \ref addEntries calls, then create the DataGroup instance with createData() or createSharedData().
+///
 /// \sa DataGroup
 class DataGroupBuilder
 {
@@ -42,9 +47,11 @@ public:
 	/// The type used for strings.
 	typedef DataGroup::StringType StringType;
 
+	/// Constructs an empty builder object.
 	DataGroupBuilder() {};
 
-	/// Produce an empty \ref DataGroup object with an immutable directory.
+	/// Produces a \ref DataGroup object with an immutable set of names and indices.
+	/// None of the values will contain any current data.
 	/// \return the DataGroup object *by value*.
 	DataGroup createData() const
 	{
@@ -58,122 +65,142 @@ public:
 		return data;
 	}
 
-	/// Produce a shared pointer to an empty \ref DataGroup object with an immutable directory.
+	/// Produce a shared pointer to an empty \ref DataGroup object with an immutable set of names and indices.
+	/// None of the values will contain any current data.
 	/// \return a shared pointer to the DataGroup object.
 	std::shared_ptr<DataGroup> createSharedData() const
 	{
 		return std::make_shared<DataGroup>(createData());
 	}
 
-
-	/// Return the directory used for pose values.
+	/// Provides access to the pose value entries.
+	/// \return a writable reference to the sub-object that contains pose value entries.
 	NamedDataBuilder<PoseType>& poses()
 	{
 		return m_poses;
 	}
 
-	/// Return the directory used for pose values.
+	/// Provides access to the pose value entries.
+	/// \return a read-only reference to the sub-object that contains pose value entries.
 	const NamedDataBuilder<PoseType>& poses() const
 	{
 		return m_poses;
 	}
 
-	/// Return the directory used for vector values.
+	/// Provides access to the vector value entries.
+	/// \return a writable reference to the sub-object that contains vector value entries.
 	NamedDataBuilder<VectorType>& vectors()
 	{
 		return m_vectors;
 	}
 
-	/// Return the directory used for vector values.
+	/// Provides access to the vector value entries.
+	/// \return a read-only reference to the sub-object that contains vector value entries.
 	const NamedDataBuilder<VectorType>& vectors() const
 	{
 		return m_vectors;
 	}
 
-	/// Return the directory used for scalar values.
+	/// Provides access to the scalar value entries.
+	/// \return a writable reference to the sub-object that contains scalar value entries.
 	NamedDataBuilder<ScalarType>& scalars()
 	{
 		return m_scalars;
 	}
 
-	/// Return the directory used for scalar values.
+	/// Provides access to the scalar value entries.
+	/// \return a read-only reference to the sub-object that contains scalar value entries.
 	const NamedDataBuilder<ScalarType>& scalars() const
 	{
 		return m_scalars;
 	}
 
-	/// Return the directory used for integer values.
+	/// Provides access to the integer value entries.
+	/// \return a writable reference to the sub-object that contains integer value entries.
 	NamedDataBuilder<IntegerType>& integers()
 	{
 		return m_integers;
 	}
 
-	/// Return the directory used for integer values.
+	/// Provides access to the integer value entries.
+	/// \return a read-only reference to the sub-object that contains integer value entries.
 	const NamedDataBuilder<IntegerType>& integers() const
 	{
 		return m_integers;
 	}
 
-	/// Return the directory used for boolean values.
+	/// Provides access to the Boolean value entries.
+	/// \return a writable reference to the sub-object that contains Boolean value entries.
 	NamedDataBuilder<BooleanType>& booleans()
 	{
 		return m_booleans;
 	}
 
-	/// Return the directory used for boolean values.
+	/// Provides access to the Boolean value entries.
+	/// \return a read-only reference to the sub-object that contains Boolean value entries.
 	const NamedDataBuilder<BooleanType>& booleans() const
 	{
 		return m_booleans;
 	}
 
-	/// Return the directory used for string values.
+	/// Provides access to the string value entries.
+	/// \return a writable reference to the sub-object that contains string value entries.
 	NamedDataBuilder<StringType>& strings()
 	{
 		return m_strings;
 	}
 
-	/// Return the directory used for string values.
+	/// Provides access to the string value entries.
+	/// \return a read-only reference to the sub-object that contains string value entries.
 	const NamedDataBuilder<StringType>& strings() const
 	{
 		return m_strings;
 	}
 
 	/// A shortcut for adding a named pose entry.
+	/// Identical to <code>%poses().addEntry(name)</code>.
 	void addPose(const std::string& name)
 	{
 		poses().addEntry(name);
 	}
 
 	/// A shortcut for adding a named vector entry.
+	/// Identical to <code>%vectors().addEntry(name)</code>.
 	void addVector(const std::string& name)
 	{
 		vectors().addEntry(name);
 	}
 
 	/// A shortcut for adding a named scalar entry.
+	/// Identical to <code>%scalars().addEntry(name)</code>.
 	void addScalar(const std::string& name)
 	{
 		scalars().addEntry(name);
 	}
 
 	/// A shortcut for adding a named integer entry.
+	/// Identical to <code>%integers().addEntry(name)</code>.
 	void addInteger(const std::string& name)
 	{
 		integers().addEntry(name);
 	}
 
 	/// A shortcut for adding a named boolean entry.
+	/// Identical to <code>%booleans().addEntry(name)</code>.
 	void addBoolean(const std::string& name)
 	{
 		booleans().addEntry(name);
 	}
 
 	/// A shortcut for adding a named string entry.
+	/// Identical to <code>%strings().addEntry(name)</code>.
 	void addString(const std::string& name)
 	{
 		strings().addEntry(name);
 	}
 
+	/// Create new entries from another DataGroupBuilder.
+	/// \param builder The other builder.
 	void addEntriesFrom(const DataGroupBuilder& builder)
 	{
 		poses().addEntries(builder.poses());
@@ -184,6 +211,8 @@ public:
 		strings().addEntries(builder.strings());
 	}
 
+	/// Create new entries from an already initialized DataGroup.
+	/// \param data The data object.
 	void addEntriesFrom(const DataGroup& data)
 	{
 		poses().addEntries(data.poses());
