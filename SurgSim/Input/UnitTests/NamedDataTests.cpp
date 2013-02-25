@@ -32,16 +32,23 @@ TEST(NamedDataTests, CanConstruct)
 	builder.addEntry("test");
 	NamedData<float> data = builder.createData();
 
+	EXPECT_EQ(1, data.getNumEntries());
+	EXPECT_EQ(1U, data.size());
+
 	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
 	EXPECT_FALSE(data.hasCurrentData(0));
 	EXPECT_FALSE(data.hasCurrentData("test"));
+	EXPECT_EQ(0, data.getIndex("test"));
+	EXPECT_EQ("test", data.getName(0));
 
 	EXPECT_FALSE(data.hasEntry(1));
 	EXPECT_FALSE(data.hasEntry("missing"));
 	EXPECT_FALSE(data.hasCurrentData(1));
 	EXPECT_FALSE(data.hasCurrentData("missing"));
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_EQ("", data.getName(1));
 }
 
 
@@ -52,16 +59,70 @@ TEST(NamedDataTests, CanCreateShared)
 	builder.addEntry("test");
 	std::shared_ptr<NamedData<float>> data = builder.createSharedData();
 
+	EXPECT_EQ(1, data->getNumEntries());
+	EXPECT_EQ(1U, data->size());
+
 	EXPECT_TRUE(data->isValid());
 	EXPECT_TRUE(data->hasEntry(0));
 	EXPECT_TRUE(data->hasEntry("test"));
 	EXPECT_FALSE(data->hasCurrentData(0));
 	EXPECT_FALSE(data->hasCurrentData("test"));
+	EXPECT_EQ(0, data->getIndex("test"));
+	EXPECT_EQ("test", data->getName(0));
 
 	EXPECT_FALSE(data->hasEntry(1));
 	EXPECT_FALSE(data->hasEntry("missing"));
 	EXPECT_FALSE(data->hasCurrentData(1));
 	EXPECT_FALSE(data->hasCurrentData("missing"));
+	EXPECT_EQ(-1, data->getIndex("missing"));
+	EXPECT_EQ("", data->getName(1));
+}
+
+
+/// Creating a named data object using a vector of names, without a builder.
+TEST(NamedDataTests, CanConstructFromNames)
+{
+	std::vector<std::string> names;
+	names.push_back("test");
+	NamedData<float> data(names);
+
+	EXPECT_EQ(1, data.getNumEntries());
+	EXPECT_EQ(1U, data.size());
+
+	EXPECT_TRUE(data.isValid());
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("test"));
+	EXPECT_FALSE(data.hasCurrentData(0));
+	EXPECT_FALSE(data.hasCurrentData("test"));
+	EXPECT_EQ(0, data.getIndex("test"));
+	EXPECT_EQ("test", data.getName(0));
+
+	EXPECT_FALSE(data.hasEntry(1));
+	EXPECT_FALSE(data.hasEntry("missing"));
+	EXPECT_FALSE(data.hasCurrentData(1));
+	EXPECT_FALSE(data.hasCurrentData("missing"));
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_EQ("", data.getName(1));
+}
+
+/// Run a few tests against an empty NamedData structure.
+TEST(NamedDataTests, Empty)
+{
+	NamedDataBuilder<float> builder;
+
+	EXPECT_EQ(0, builder.getNumEntries());
+	EXPECT_EQ("", builder.getName(0));
+
+	EXPECT_EQ(-1, builder.getIndex("missing"));
+	EXPECT_FALSE(builder.hasEntry("missing"));
+
+	NamedData<float> data = builder.createData();
+
+	EXPECT_EQ(0, data.getNumEntries());
+	EXPECT_EQ("", data.getName(0));
+
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_FALSE(data.hasEntry("missing"));
 }
 
 /// Creating an unitialized data object.
@@ -87,16 +148,22 @@ TEST(NamedDataTests, Put)
 	EXPECT_TRUE(data.hasEntry("first"));
 	EXPECT_TRUE(data.hasCurrentData(0));
 	EXPECT_TRUE(data.hasCurrentData("first"));
+	EXPECT_EQ(0, data.getIndex("first"));
+	EXPECT_EQ("first", data.getName(0));
 
 	EXPECT_TRUE(data.hasEntry(1));
 	EXPECT_TRUE(data.hasEntry("second"));
 	EXPECT_TRUE(data.hasCurrentData(1));
 	EXPECT_TRUE(data.hasCurrentData("second"));
+	EXPECT_EQ(1, data.getIndex("second"));
+	EXPECT_EQ("second", data.getName(1));
 
 	EXPECT_TRUE(data.hasEntry(2));
 	EXPECT_TRUE(data.hasEntry("third"));
 	EXPECT_FALSE(data.hasCurrentData(2));
 	EXPECT_FALSE(data.hasCurrentData("third"));
+	EXPECT_EQ(2, data.getIndex("third"));
+	EXPECT_EQ("third", data.getName(2));
 }
 
 /// Getting data into the container.
@@ -144,7 +211,7 @@ TEST(NamedDataTests, Get)
 }
 
 /// Resetting the data in the container.
-TEST(NamedDataTests, Reset)
+TEST(NamedDataTests, ResetAll)
 {
 	NamedDataBuilder<float> builder;
 	builder.addEntry("first");
@@ -155,7 +222,7 @@ TEST(NamedDataTests, Reset)
 	data.put("first", 1.23f);
 	data.put(1, 4.56f);
 
-	data.reset();
+	data.resetAll();
 
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("first"));
@@ -171,4 +238,41 @@ TEST(NamedDataTests, Reset)
 	EXPECT_TRUE(data.hasEntry("third"));
 	EXPECT_FALSE(data.hasCurrentData(2));
 	EXPECT_FALSE(data.hasCurrentData("third"));
+}
+
+/// Resetting one data entry at a time.
+TEST(NamedDataTests, ResetOne)
+{
+	NamedDataBuilder<float> builder;
+	builder.addEntry("first");
+	builder.addEntry("second");
+	builder.addEntry("third");
+	NamedData<float> data = builder.createData();
+
+	data.put("first", 1.23f);
+	data.put(1, 4.56f);
+
+	data.reset(0);
+
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("first"));
+	EXPECT_FALSE(data.hasCurrentData(0));
+	EXPECT_FALSE(data.hasCurrentData("first"));
+
+	EXPECT_TRUE(data.hasEntry(1));
+	EXPECT_TRUE(data.hasEntry("second"));
+	EXPECT_TRUE(data.hasCurrentData(1));
+	EXPECT_TRUE(data.hasCurrentData("second"));
+
+	EXPECT_TRUE(data.hasEntry(2));
+	EXPECT_TRUE(data.hasEntry("third"));
+	EXPECT_FALSE(data.hasCurrentData(2));
+	EXPECT_FALSE(data.hasCurrentData("third"));
+
+	data.reset("second");
+
+	EXPECT_TRUE(data.hasEntry(1));
+	EXPECT_TRUE(data.hasEntry("second"));
+	EXPECT_FALSE(data.hasCurrentData(1));
+	EXPECT_FALSE(data.hasCurrentData("second"));
 }

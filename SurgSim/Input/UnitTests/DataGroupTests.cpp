@@ -174,7 +174,7 @@ TEST(DataGroupTests, GetName)
 }
 
 /// Resetting the data in the container.
-TEST(DataGroupTests, Reset)
+TEST(DataGroupTests, ResetAll)
 {
 	DataGroupBuilder builder;
 	builder.addPose("first");
@@ -185,7 +185,7 @@ TEST(DataGroupTests, Reset)
 	data.scalars().put("second", 1.23);
 	data.strings().put("third", "hello");
 
-	data.reset();
+	data.resetAll();
 
 	EXPECT_TRUE(data.poses().hasEntry("first"));
 	EXPECT_FALSE(data.poses().hasCurrentData("first"));
@@ -195,4 +195,33 @@ TEST(DataGroupTests, Reset)
 
 	EXPECT_TRUE(data.strings().hasEntry("third"));
 	EXPECT_FALSE(data.strings().hasCurrentData("third"));
+}
+
+/// Resetting one data entry at a time.
+TEST(DataGroupTests, ResetOne)
+{
+	DataGroupBuilder builder;
+	builder.addPose("first");
+	builder.addScalar("second");
+	builder.addString("third");
+	DataGroup data = builder.createData();
+
+	data.scalars().put("second", 1.23);
+	data.strings().put("third", "hello");
+
+	data.strings().reset("third");
+
+	EXPECT_TRUE(data.poses().hasEntry("first"));
+	EXPECT_FALSE(data.poses().hasCurrentData("first"));
+
+	EXPECT_TRUE(data.scalars().hasEntry("second"));
+	EXPECT_TRUE(data.scalars().hasCurrentData("second"));
+
+	EXPECT_TRUE(data.strings().hasEntry("third"));
+	EXPECT_FALSE(data.strings().hasCurrentData("third"));
+
+	data.scalars().reset("second");
+
+	EXPECT_TRUE(data.scalars().hasEntry("second"));
+	EXPECT_FALSE(data.scalars().hasCurrentData("second"));
 }

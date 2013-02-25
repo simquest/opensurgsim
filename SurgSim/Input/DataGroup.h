@@ -258,14 +258,14 @@ public:
 	}
 
 	/// Mark all data as not current.
-	void reset()
+	void resetAll()
 	{
-		m_poses.reset();
-		m_vectors.reset();
-		m_scalars.reset();
-		m_integers.reset();
-		m_booleans.reset();
-		m_strings.reset();
+		m_poses.resetAll();
+		m_vectors.resetAll();
+		m_scalars.resetAll();
+		m_integers.resetAll();
+		m_booleans.resetAll();
+		m_strings.resetAll();
 	}
 
 private:

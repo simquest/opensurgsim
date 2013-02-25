@@ -198,6 +198,22 @@ public:
 		return m_directory;
 	}
 
+	/// Given a name, return the corresponding index (or -1).
+	/// \param name The name.
+	/// \return the index for that name if one exists; -1 otherwise.
+	int getIndex(const std::string& name) const
+	{
+		return m_directory->getIndex(name);
+	}
+
+	/// Given an index, return the corresponding name (or "").
+	/// \param index The index.
+	/// \return the name for that index if one exists; an empty string otherwise.
+	std::string getName(int index) const
+	{
+		return m_directory->getName(index);
+	}
+
 	/// Check whether the object contains an entry with the specified index.
 	///
 	/// \param index The index corresponding to the entry.
@@ -275,7 +291,7 @@ public:
 		}
 		else
 		{
-			// XXX assert(hasEntry(index));
+			SURGSIM_ASSERT(hasEntry(index));
 			value = m_data[index];
 			return true;
 		}
@@ -316,17 +332,69 @@ public:
 		}
 		else
 		{
-			// XXX assert(hasEntry(index));
+			SURGSIM_ASSERT(hasEntry(index));
 			m_data[index] = value;
 			m_isCurrent[index] = true;
 			return true;
 		}
 	}
 
+	/// Mark an entry as not containing any current data.
+	///
+	/// \param index The index of the entry.
+	/// \return true if successful.
+	bool reset(int index)
+	{
+		if (! hasEntry(index))
+		{
+			return false;
+		}
+		else
+		{
+			m_isCurrent[index] = false;
+			return true;
+		}
+	}
+
+	/// Mark an entry as not containing any current data.
+	///
+	/// \param name The name of the entry.
+	/// \return true if successful.
+	bool reset(const std::string& name)
+	{
+		int index =  m_directory->getIndex(name);
+		if (index < 0)
+		{
+			return false;
+		}
+		else
+		{
+			SURGSIM_ASSERT(hasEntry(index));
+			m_isCurrent[index] = false;
+			return true;
+		}
+	}
+
 	/// Mark all of the data as not current.
-	void reset()
+	void resetAll()
 	{
 		m_isCurrent.assign(m_data.size(), false);
+	}
+
+	/// Check the number of existing entries.
+	/// \return the size of the data collection.
+	/// \sa getNumEntries()
+	size_t size() const
+	{
+		return m_data.size();
+	}
+
+	/// Check the number of existing entries.
+	/// \return the size of the data collection.
+	/// \sa size()
+	int getNumEntries() const
+	{
+		return static_cast<int>(m_data.size());
 	}
 
 private:

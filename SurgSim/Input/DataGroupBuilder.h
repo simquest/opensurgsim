@@ -203,24 +203,24 @@ public:
 	/// \param builder The other builder.
 	void addEntriesFrom(const DataGroupBuilder& builder)
 	{
-		poses().addEntries(builder.poses());
-		vectors().addEntries(builder.vectors());
-		scalars().addEntries(builder.scalars());
-		integers().addEntries(builder.integers());
-		booleans().addEntries(builder.booleans());
-		strings().addEntries(builder.strings());
+		poses().addEntriesFrom(builder.poses());
+		vectors().addEntriesFrom(builder.vectors());
+		scalars().addEntriesFrom(builder.scalars());
+		integers().addEntriesFrom(builder.integers());
+		booleans().addEntriesFrom(builder.booleans());
+		strings().addEntriesFrom(builder.strings());
 	}
 
 	/// Create new entries from an already initialized DataGroup.
 	/// \param data The data object.
 	void addEntriesFrom(const DataGroup& data)
 	{
-		poses().addEntries(data.poses());
-		vectors().addEntries(data.vectors());
-		scalars().addEntries(data.scalars());
-		integers().addEntries(data.integers());
-		booleans().addEntries(data.booleans());
-		strings().addEntries(data.strings());
+		poses().addEntriesFrom(data.poses());
+		vectors().addEntriesFrom(data.vectors());
+		scalars().addEntriesFrom(data.scalars());
+		integers().addEntriesFrom(data.integers());
+		booleans().addEntriesFrom(data.booleans());
+		strings().addEntriesFrom(data.strings());
 	}
 
 private:

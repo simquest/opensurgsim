@@ -69,7 +69,7 @@ public:
 
 	/// Create new entries from a vector of names.
 	/// \param names The names.
-	void addEntries(const std::vector<std::string>& names)
+	void addEntriesFrom(const std::vector<std::string>& names)
 	{
 		for (auto it = names.cbegin();  it != names.cend();  ++it)
 		{
@@ -81,25 +81,25 @@ public:
 	/// \tparam typename U The data type of the other NamedDataBuilder.
 	/// \param builder The other builder.
 	template <typename U>
-	void addEntries(const NamedDataBuilder<U>& builder)
+	void addEntriesFrom(const NamedDataBuilder<U>& builder)
 	{
-		addEntries(builder.getAllNames());
+		addEntriesFrom(builder.getAllNames());
 	}
 
 	/// Create new entries from an already initialized NamedData.
 	/// \tparam typename U The data type of the NamedData.
 	/// \param data The data object.
 	template <typename U>
-	void addEntries(const NamedData<U>& data)
+	void addEntriesFrom(const NamedData<U>& data)
 	{
-		addEntries(data.getDirectory()->getAllNames());
+		addEntriesFrom(data.getDirectory()->getAllNames());
 	}
 
 	/// Create new entries from an IndexDirectory.
 	/// \param directory The index directory object.
-	void addEntries(const IndexDirectory& directory)
+	void addEntriesFrom(const IndexDirectory& directory)
 	{
-		addEntries(directory.getAllNames());
+		addEntriesFrom(directory.getAllNames());
 	}
 
 	/// Given a name, return the corresponding index (or -1).
@@ -136,6 +136,15 @@ public:
 
 	/// Check the number of existing entries in the builder.
 	/// \return the number of entries.
+	/// \sa getNumEntries()
+	size_t size() const
+	{
+		return IndexDirectory::size();
+	}
+
+	/// Check the number of existing entries in the builder.
+	/// \return the number of entries.
+	/// \sa size()
 	int getNumEntries() const
 	{
 		return IndexDirectory::getNumEntries();
