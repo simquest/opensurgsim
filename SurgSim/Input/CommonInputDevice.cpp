@@ -129,7 +129,7 @@ bool CommonInputDevice::pullOutput()
 	}
 
 	// If we haven't received an update, the old data is meaningless.
-	m_outputData.reset();
+	m_outputData.resetAll();
 
 	return false;
 }
