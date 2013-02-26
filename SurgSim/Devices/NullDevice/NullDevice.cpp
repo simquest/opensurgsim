@@ -15,11 +15,6 @@
 
 #include "SurgSim/Devices/NullDevice/NullDevice.h"
 
-#include <iostream>
-#include <iomanip>
-
-#include <HD/hd.h>
-
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
