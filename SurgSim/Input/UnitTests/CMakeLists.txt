@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,27 +14,21 @@
 # limitations under the License.
 
 
+include_directories(
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
+)
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+set(UNIT_TEST_SOURCES
+	CommonInputDeviceTests.cpp
+)
+
+set(UNIT_TEST_HEADERS
+)
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 )
 
-set(NULL_DEVICE_SOURCES
-	NullDevice.cpp
-)
+set(LIBS SurgSimFramework SurgSimInput gtest ${Boost_LIBRARIES})
 
-set(NULL_DEVICE_HEADERS
-	NullDevice.h
-)
-
-add_library(NullDevice ${NULL_DEVICE_SOURCES} ${NULL_DEVICE_HEADERS})
-
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
+surgsim_add_unit_tests(SurgSimInputTest)

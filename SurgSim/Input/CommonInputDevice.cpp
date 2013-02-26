@@ -74,6 +74,13 @@ std::string CommonInputDevice::getName() const
 bool CommonInputDevice::addListener(std::shared_ptr<InputDeviceListenerInterface> listener)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
+	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	{
+		if (it->listener == listener)
+		{
+			return false;
+		}
+	}
 	m_state->listenerList.emplace_back(State::ListenerEntry(std::move(listener), true));
 	return true;
 }
@@ -81,6 +88,13 @@ bool CommonInputDevice::addListener(std::shared_ptr<InputDeviceListenerInterface
 bool CommonInputDevice::addInputListener(std::shared_ptr<InputDeviceListenerInterface> listener)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
+	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	{
+		if (it->listener == listener)
+		{
+			return false;
+		}
+	}
 	m_state->listenerList.emplace_back(State::ListenerEntry(std::move(listener), false));
 	return true;
 }

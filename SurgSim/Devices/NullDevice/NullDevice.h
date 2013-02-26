@@ -26,9 +26,7 @@ namespace SurgSim
 namespace Device
 {
 
-class PhantomManager;
-
-/// A class implementing the "null" device, i.e. a device that doesn't move.
+/// A class implementing the "null" device, which is a pretend device that doesn't move.
 ///
 /// \sa SurgSim::Input::InputDeviceInterface
 class NullDevice : public SurgSim::Input::CommonInputDevice
