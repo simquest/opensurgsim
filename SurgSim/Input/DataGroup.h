@@ -116,7 +116,7 @@ public:
 	/// second = first;                           // ERROR at run-time, layouts were created separately!
 	/// ~~~~~
 	///
-	/// \param namedData The object to copy from.
+	/// \param dataGroup The object to copy from.
 	/// \return The object that was assigned into.
 	DataGroup& operator=(const DataGroup& dataGroup)
 	{

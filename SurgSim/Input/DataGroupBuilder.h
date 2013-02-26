@@ -26,9 +26,11 @@ namespace Input
 
 /// A class that allows you to build a \ref DataGroup structure.
 ///
-/// Since the data layout of a \ref DataGroup object cannot be modified, this class is helpful in initially
-/// setting up the names and their corresponding indices.  You can add entries to the builder using \ref addEntry
-/// and \ref addEntries calls, then create the DataGroup instance with createData() or createSharedData().
+/// Since the data layout of a \ref DataGroup object cannot be modified, this class is helpful in initially setting
+/// up the names and their corresponding indices.  You can add entries to the builder using the \ref addPose,
+/// \ref addVector, \ref addScalar, \ref addInteger, \ref addBoolean, \ref addString, and \ref addEntriesFrom
+/// calls, or using similar calls on one of the type-specific element groups; and then create the DataGroup
+/// instance with createData() or createSharedData().
 ///
 /// \sa DataGroup
 class DataGroupBuilder
