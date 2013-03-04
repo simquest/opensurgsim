@@ -117,14 +117,16 @@ protected:
 	friend class DataGroupBuilder;
 
 	/// Copy constructor.
-	/// Not directly accessible by external code, but but could be used by subclasses.
+	/// Not generally accessible by external code, but is used by friend classes.
+	/// \sa NamedDataBuilder, DataGroupBuilder
 	IndexDirectory(const IndexDirectory& directory)
 		: m_names(directory.m_names), m_indices(directory.m_indices)
 	{
 	}
 
 	/// Assignment operator.
-	/// Not directly accessible by external code, but could be used by subclasses.
+	/// Not generally accessible by external code, but is used by friend classes.
+	/// \sa NamedDataBuilder, DataGroupBuilder
 	IndexDirectory& operator =(const IndexDirectory& directory)
 	{
 		m_names = directory.m_names;
@@ -133,6 +135,8 @@ protected:
 	}
 
 	/// Create a new entry for the specified name.
+	/// Not generally accessible by external code, but is used by friend classes.
+	/// \sa NamedDataBuilder, DataGroupBuilder
 	///
 	/// \param name The name, which should be non-empty and should not already exist in the directory.
 	/// \return the index of the created entry, or -1 if the entry could not be added.
