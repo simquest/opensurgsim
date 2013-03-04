@@ -19,17 +19,21 @@ include_directories(
 )
 
 set(SURGSIM_INPUT_SOURCES
+	DataGroupBuilder.cpp
+	IndexDirectory.cpp
 )
 
 set(SURGSIM_INPUT_HEADERS
 	DataGroup.h
+	DataGroup-inl.h
 	DataGroupBuilder.h
 	IndexDirectory.h
 	NamedData.h
+	NamedData-inl.h
 	NamedDataBuilder.h
 )
 
-#add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
+add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

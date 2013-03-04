@@ -50,180 +50,97 @@ public:
 	typedef DataGroup::StringType StringType;
 
 	/// Constructs an empty builder object.
-	DataGroupBuilder() {};
+	DataGroupBuilder();
 
 	/// Produces a \ref DataGroup object with an immutable set of names and indices.
 	/// None of the values will contain any current data.
 	/// \return the DataGroup object *by value*.
-	DataGroup createData() const
-	{
-		DataGroup data;
-		data.poses() = poses().createData();
-		data.vectors() = vectors().createData();
-		data.scalars() = scalars().createData();
-		data.integers() = integers().createData();
-		data.booleans() = booleans().createData();
-		data.strings() = strings().createData();
-		return data;
-	}
+	DataGroup createData() const;
 
 	/// Produce a shared pointer to an empty \ref DataGroup object with an immutable set of names and indices.
 	/// None of the values will contain any current data.
 	/// \return a shared pointer to the DataGroup object.
-	std::shared_ptr<DataGroup> createSharedData() const
-	{
-		return std::make_shared<DataGroup>(createData());
-	}
+	std::shared_ptr<DataGroup> createSharedData() const;
 
 	/// Provides access to the pose value entries.
 	/// \return a writable reference to the sub-object that contains pose value entries.
-	NamedDataBuilder<PoseType>& poses()
-	{
-		return m_poses;
-	}
+	NamedDataBuilder<PoseType>& poses();
 
 	/// Provides access to the pose value entries.
 	/// \return a read-only reference to the sub-object that contains pose value entries.
-	const NamedDataBuilder<PoseType>& poses() const
-	{
-		return m_poses;
-	}
+	const NamedDataBuilder<PoseType>& poses() const;
 
 	/// Provides access to the vector value entries.
 	/// \return a writable reference to the sub-object that contains vector value entries.
-	NamedDataBuilder<VectorType>& vectors()
-	{
-		return m_vectors;
-	}
+	NamedDataBuilder<VectorType>& vectors();
 
 	/// Provides access to the vector value entries.
 	/// \return a read-only reference to the sub-object that contains vector value entries.
-	const NamedDataBuilder<VectorType>& vectors() const
-	{
-		return m_vectors;
-	}
+	const NamedDataBuilder<VectorType>& vectors() const;
 
 	/// Provides access to the scalar value entries.
 	/// \return a writable reference to the sub-object that contains scalar value entries.
-	NamedDataBuilder<ScalarType>& scalars()
-	{
-		return m_scalars;
-	}
+	NamedDataBuilder<ScalarType>& scalars();
 
 	/// Provides access to the scalar value entries.
 	/// \return a read-only reference to the sub-object that contains scalar value entries.
-	const NamedDataBuilder<ScalarType>& scalars() const
-	{
-		return m_scalars;
-	}
+	const NamedDataBuilder<ScalarType>& scalars() const;
 
 	/// Provides access to the integer value entries.
 	/// \return a writable reference to the sub-object that contains integer value entries.
-	NamedDataBuilder<IntegerType>& integers()
-	{
-		return m_integers;
-	}
+	NamedDataBuilder<IntegerType>& integers();
 
 	/// Provides access to the integer value entries.
 	/// \return a read-only reference to the sub-object that contains integer value entries.
-	const NamedDataBuilder<IntegerType>& integers() const
-	{
-		return m_integers;
-	}
+	const NamedDataBuilder<IntegerType>& integers() const;
 
 	/// Provides access to the Boolean value entries.
 	/// \return a writable reference to the sub-object that contains Boolean value entries.
-	NamedDataBuilder<BooleanType>& booleans()
-	{
-		return m_booleans;
-	}
+	NamedDataBuilder<BooleanType>& booleans();
 
 	/// Provides access to the Boolean value entries.
 	/// \return a read-only reference to the sub-object that contains Boolean value entries.
-	const NamedDataBuilder<BooleanType>& booleans() const
-	{
-		return m_booleans;
-	}
+	const NamedDataBuilder<BooleanType>& booleans() const;
 
 	/// Provides access to the string value entries.
 	/// \return a writable reference to the sub-object that contains string value entries.
-	NamedDataBuilder<StringType>& strings()
-	{
-		return m_strings;
-	}
+	NamedDataBuilder<StringType>& strings();
 
 	/// Provides access to the string value entries.
 	/// \return a read-only reference to the sub-object that contains string value entries.
-	const NamedDataBuilder<StringType>& strings() const
-	{
-		return m_strings;
-	}
+	const NamedDataBuilder<StringType>& strings() const;
 
 	/// A shortcut for adding a named pose entry.
 	/// Identical to <code>%poses().addEntry(name)</code>.
-	void addPose(const std::string& name)
-	{
-		poses().addEntry(name);
-	}
+	void addPose(const std::string& name);
 
 	/// A shortcut for adding a named vector entry.
 	/// Identical to <code>%vectors().addEntry(name)</code>.
-	void addVector(const std::string& name)
-	{
-		vectors().addEntry(name);
-	}
+	void addVector(const std::string& name);
 
 	/// A shortcut for adding a named scalar entry.
 	/// Identical to <code>%scalars().addEntry(name)</code>.
-	void addScalar(const std::string& name)
-	{
-		scalars().addEntry(name);
-	}
+	void addScalar(const std::string& name);
 
 	/// A shortcut for adding a named integer entry.
 	/// Identical to <code>%integers().addEntry(name)</code>.
-	void addInteger(const std::string& name)
-	{
-		integers().addEntry(name);
-	}
+	void addInteger(const std::string& name);
 
 	/// A shortcut for adding a named boolean entry.
 	/// Identical to <code>%booleans().addEntry(name)</code>.
-	void addBoolean(const std::string& name)
-	{
-		booleans().addEntry(name);
-	}
+	void addBoolean(const std::string& name);
 
 	/// A shortcut for adding a named string entry.
 	/// Identical to <code>%strings().addEntry(name)</code>.
-	void addString(const std::string& name)
-	{
-		strings().addEntry(name);
-	}
+	void addString(const std::string& name);
 
 	/// Create new entries from another DataGroupBuilder.
 	/// \param builder The other builder.
-	void addEntriesFrom(const DataGroupBuilder& builder)
-	{
-		poses().addEntriesFrom(builder.poses());
-		vectors().addEntriesFrom(builder.vectors());
-		scalars().addEntriesFrom(builder.scalars());
-		integers().addEntriesFrom(builder.integers());
-		booleans().addEntriesFrom(builder.booleans());
-		strings().addEntriesFrom(builder.strings());
-	}
+	void addEntriesFrom(const DataGroupBuilder& builder);
 
 	/// Create new entries from an already initialized DataGroup.
 	/// \param data The data object.
-	void addEntriesFrom(const DataGroup& data)
-	{
-		poses().addEntriesFrom(data.poses());
-		vectors().addEntriesFrom(data.vectors());
-		scalars().addEntriesFrom(data.scalars());
-		integers().addEntriesFrom(data.integers());
-		booleans().addEntriesFrom(data.booleans());
-		strings().addEntriesFrom(data.strings());
-	}
+	void addEntriesFrom(const DataGroup& data);
 
 private:
 	// Prevent copy construction and copy assignment.

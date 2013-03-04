@@ -32,17 +32,11 @@ class IndexDirectory
 {
 public:
 	/// Create an empty directory object.
-	IndexDirectory() {};
+	IndexDirectory();
 
 	/// Create a directory object initialized to a list of names.
 	/// \param names The names.
-	IndexDirectory(const std::vector<std::string>& names)
-	{
-		for (auto it = names.cbegin();  it != names.cend();  ++it)
-		{
-			addEntry(*it);
-		}
-	}
+	IndexDirectory(const std::vector<std::string>& names);
 
 	/// Given a name, return the corresponding index (or -1).
 	/// \param name The name.
@@ -80,11 +74,8 @@ public:
 	}
 
 	/// Get a list of all the names available from the index directory.
-	/// \return all the names.
-	const std::vector<std::string>& getAllNames() const
-	{
-		return m_names;
-	}
+	/// \return all the names, in index order.
+	const std::vector<std::string>& getAllNames() const;
 
 	/// Check whether the specified name exists in the directory.
 	///
@@ -119,20 +110,12 @@ protected:
 	/// Copy constructor.
 	/// Not generally accessible by external code, but is used by friend classes.
 	/// \sa NamedDataBuilder, DataGroupBuilder
-	IndexDirectory(const IndexDirectory& directory)
-		: m_names(directory.m_names), m_indices(directory.m_indices)
-	{
-	}
+	IndexDirectory(const IndexDirectory& directory);
 
 	/// Assignment operator.
 	/// Not generally accessible by external code, but is used by friend classes.
 	/// \sa NamedDataBuilder, DataGroupBuilder
-	IndexDirectory& operator =(const IndexDirectory& directory)
-	{
-		m_names = directory.m_names;
-		m_indices = directory.m_indices;
-		return *this;
-	}
+	IndexDirectory& operator =(const IndexDirectory& directory);
 
 	/// Create a new entry for the specified name.
 	/// Not generally accessible by external code, but is used by friend classes.
@@ -140,17 +123,7 @@ protected:
 	///
 	/// \param name The name, which should be non-empty and should not already exist in the directory.
 	/// \return the index of the created entry, or -1 if the entry could not be added.
-	int addEntry(const std::string& name)
-	{
-		if ((name.length() == 0) || (m_indices.count(name) > 0))
-		{
-			return -1;
-		}
-		int index = static_cast<int>(m_names.size());
-		m_names.push_back(name);
-		m_indices[name] = index;
-		return index;
-	}
+	int addEntry(const std::string& name);
 
 private:
 	/// The array of entry names, in index order.
