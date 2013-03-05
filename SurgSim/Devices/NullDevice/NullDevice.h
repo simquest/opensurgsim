@@ -26,7 +26,9 @@ namespace SurgSim
 namespace Device
 {
 
+
 /// A class implementing the "null" device, which is a pretend device that doesn't move.
+/// The null device produces a pose that's always the identity transform.
 ///
 /// \sa SurgSim::Input::DeviceInterface
 class NullDevice : public SurgSim::Input::CommonDevice
@@ -35,11 +37,9 @@ public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	NullDevice(const std::string& uniqueName);
+
+	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer);
 	
-	virtual bool addListener(std::shared_ptr<SurgSim::Input::DeviceListenerInterface> listener);
-
-	virtual bool addInputListener(std::shared_ptr<SurgSim::Input::DeviceListenerInterface> listener);
-
 protected:
 	virtual bool initialize();
 
@@ -48,6 +48,7 @@ protected:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();
 };
+
 
 };  // namespace Device
 };  // namespace SurgSim

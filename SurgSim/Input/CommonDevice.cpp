@@ -24,6 +24,7 @@ namespace SurgSim
 namespace Input
 {
 
+
 struct CommonDevice::State
 {
 	/// Constructor.
@@ -31,35 +32,22 @@ struct CommonDevice::State
 	{
 	}
 
-	/// A structure describing an entry in the listener list.
-	struct ListenerEntry
-	{
-		/// Constructor.
-		/// \param listenerArg The listener.
-		/// \param forOutput true if this listener can provide output data, false if it can only listen to input.
-		ListenerEntry(std::shared_ptr<DeviceListenerInterface>&& listenerArg, bool forOutput) :
-			listener(std::move(listenerArg)),
-			canProvideOutput(forOutput)
-		{
-		}
+	/// The list of input consumers.
+	std::vector<std::shared_ptr<InputConsumerInterface>> inputConsumerList;
 
-		std::shared_ptr<DeviceListenerInterface> listener;
-		bool canProvideOutput;
-	};
+	/// The output producer, if any.
+	std::shared_ptr<OutputProducerInterface> outputProducer;
 
-	/// The list of listeners and associated metadata.
-	std::vector<ListenerEntry> listenerList;
-
-	/// The mutex that protects the listener list.
-	boost::mutex listenerListMutex;
+	/// The mutex that protects the consumers and the producer.
+	boost::mutex consumerProducerMutex;
 };
+
 
 
 CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
 	m_name(name), m_inputData(inputData), m_state(new State)
 {
 }
-
 
 CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
 	m_name(name), m_inputData(std::move(inputData)), m_state(new State)
@@ -71,42 +59,38 @@ std::string CommonDevice::getName() const
 	return m_name;
 }
 
-bool CommonDevice::addListener(std::shared_ptr<DeviceListenerInterface> listener)
+bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
-	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
-	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	if (! inputConsumer)
 	{
-		if (it->listener == listener)
+		return false;
+	}
+
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
+	{
+		if (*it == inputConsumer)
 		{
 			return false;
 		}
 	}
-	m_state->listenerList.emplace_back(State::ListenerEntry(std::move(listener), true));
+	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
 }
 
-bool CommonDevice::addInputListener(std::shared_ptr<DeviceListenerInterface> listener)
+bool CommonDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
-	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
-	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	if (! inputConsumer)
 	{
-		if (it->listener == listener)
-		{
-			return false;
-		}
+		return false;
 	}
-	m_state->listenerList.emplace_back(State::ListenerEntry(std::move(listener), false));
-	return true;
-}
 
-bool CommonDevice::removeListener(std::shared_ptr<DeviceListenerInterface> listener)
-{
-	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
-	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
 	{
-		if (it->listener == listener)
+		if (*it == inputConsumer)
 		{
-			m_state->listenerList.erase(it);
+			m_state->inputConsumerList.erase(it);
 			// The iterator is now invalid.
 			return true;
 		}
@@ -114,32 +98,59 @@ bool CommonDevice::removeListener(std::shared_ptr<DeviceListenerInterface> liste
 	return false;
 }
 
+bool CommonDevice::setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
+{
+	if (! outputProducer)
+	{
+		return false;
+	}
+
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	if (m_state->outputProducer == outputProducer)
+	{
+		return false;
+	}
+	m_state->outputProducer = std::move(outputProducer);
+	return true;
+}
+
+bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer)
+{
+	if (! outputProducer)
+	{
+		return false;
+	}
+
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	if (m_state->outputProducer == outputProducer)
+	{
+		m_state->outputProducer.reset();
+		return true;
+	}
+	return false;
+}
+
 void CommonDevice::pushInput()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
-	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
 	{
-		it->listener->handleInput(m_name, m_inputData);
+		(*it)->handleInput(m_name, m_inputData);
 	}
 }
 
 bool CommonDevice::pullOutput()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
-	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
+	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
+	if (m_state->outputProducer)
 	{
-		if (it->canProvideOutput)
+		bool gotOutput = m_state->outputProducer->requestOutput(m_name, &m_outputData);
+		if (gotOutput)
 		{
-			bool gotOutput = it->listener->requestOutput(m_name, &m_outputData);
-			if (gotOutput)
-			{
-				return true;
-			}
-
-			// If we're here, then the listener has refused to provide output, even though it was registered via
-			// \ref addListener and not \ref addInputListener. Keep going down the listener list in the hope
-			// someone else can handle it.
+			return true;
 		}
+
+		// If we're here, then the producer has refused to provide output.
 	}
 
 	// If we haven't received an update, the old data is meaningless.
@@ -147,6 +158,7 @@ bool CommonDevice::pullOutput()
 
 	return false;
 }
+
 
 };  // namespace Input
 };  // namespace SurgSim

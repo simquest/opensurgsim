@@ -20,7 +20,7 @@
 #include <string>
 
 #include <SurgSim/Input/DeviceInterface.h>
-#include <SurgSim/Input/DeviceListenerInterface.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 
 namespace SurgSim
@@ -30,20 +30,14 @@ namespace Input
 
 
 /// A class that implements some common management code on top of the DeviceInterface.
-///
-/// Note that despite the class name, many devices that inherit from it will not be input-only.  Haptic devices
-/// are the most obvious example, but many other devices can, for example, display visual indicators such as
-/// LEDs, etc.
-///
-/// Derived classes will likely want to hide their constructor and only allow creation through a manager object
-/// for that type of device.
+/// Practically every class that implements DeviceInterface will likely want to inherit from CommonDevice.
 class CommonDevice : public DeviceInterface
 {
 public:
 	/// Constructor.
 	///
 	/// \param name The name associated with the input device.
-	/// \param inputData An initial value for the application's input from the device (i.e. the device's output).
+	/// \param inputData An initial value for the application's input from the device (e.g. pose etc).
 	/// 	The concrete device implementation should pass in a DataGroup whose contents has been set up, e.g. by
 	/// 	using a DataGroupBuilder, to that device's supported values.
 	CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData);
@@ -51,7 +45,7 @@ public:
 	/// Constructor.
 	///
 	/// \param name The name associated with the input device.
-	/// \param inputData An initial value for the application's input from the device (i.e. the device's output).
+	/// \param inputData An initial value for the application's input from the device (e.g. pose etc).
 	/// 	The concrete device implementation should pass in a DataGroup whose contents has been set up, e.g. by
 	/// 	using a DataGroupBuilder, to that device's supported values.
 	CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
@@ -59,18 +53,20 @@ public:
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const;
 
-	virtual bool addListener(std::shared_ptr<DeviceListenerInterface> listener);
+	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer);
 
-	virtual bool addInputListener(std::shared_ptr<DeviceListenerInterface> listener);
+	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer);
 
-	virtual bool removeListener(std::shared_ptr<DeviceListenerInterface> listener);
+	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
+
+	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
 
 protected:
 
-	/// Push application input (i.e. device output) to listeners.
+	/// Push application input to consumers.
 	virtual void pushInput();
 
-	/// Pull application output (i.e. device input) from a listener.
+	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
 	/// Provides access to the input data \ref DataGroup.
@@ -101,6 +97,7 @@ private:
 	SurgSim::DataStructures::DataGroup m_outputData;
 	State* m_state;
 };
+
 
 };  // namespace Input
 };  // namespace SurgSim

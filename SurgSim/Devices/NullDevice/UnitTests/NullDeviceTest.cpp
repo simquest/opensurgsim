@@ -22,18 +22,20 @@
 #include <gtest/gtest.h>
 #include <SurgSim/Devices/NullDevice/NullDevice.h>
 #include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Input/DeviceListenerInterface.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
 using SurgSim::Device::NullDevice;
 using SurgSim::DataStructures::DataGroup;
-using SurgSim::Input::DeviceListenerInterface;
+using SurgSim::Input::InputConsumerInterface;
+using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 
 
-struct TestListener : public DeviceListenerInterface
+struct TestListener : public InputConsumerInterface, public OutputProducerInterface
 {
 public:
 	TestListener() :
@@ -74,44 +76,86 @@ TEST(NullDeviceTest, Name)
 	EXPECT_EQ("MyNullDevice", device.getName());
 }
 
-TEST(NullDeviceTest, AddListener)
+TEST(NullDeviceTest, AddInputConsumer)
 {
 	NullDevice device("MyNullDevice");
-	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
-	EXPECT_TRUE(device.addInputListener(listener));
+	EXPECT_TRUE(device.addInputConsumer(consumer));
 
-	// NullDevice is supposed to shove "null" data at every listener when it's added.
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
-	EXPECT_TRUE(listener->m_lastReceivedInput.poses().hasCurrentData("pose"));
-	EXPECT_TRUE(listener->m_lastReceivedInput.booleans().hasCurrentData("button0"));
+	// NullDevice is supposed to shove "null" data at every consumer when it's added.
+	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasCurrentData("pose"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button0"));
 
+	// Check the data.
 	RigidTransform3d pose;
-	EXPECT_TRUE(listener->m_lastReceivedInput.poses().get("pose", pose));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().get("pose", pose));
 	EXPECT_NEAR(0, (pose.matrix() - Matrix44d::Identity()).norm(), 1e-6);
-
 	bool button0;
-	EXPECT_TRUE(listener->m_lastReceivedInput.booleans().get("button0", button0));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().get("button0", button0));
 	EXPECT_FALSE(button0);
+
+	// Adding the same input consumer again should fail.
+	EXPECT_FALSE(device.addInputConsumer(consumer));
+	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
+
+	// Adding a different device should push to it.
+	std::shared_ptr<TestListener> consumer2 = std::make_shared<TestListener>();
+	EXPECT_EQ(0, consumer2->m_numTimesReceivedInput);
+	EXPECT_TRUE(device.addInputConsumer(consumer2));
+	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
+	// We don't care if the first consumer was updated again or not.
+	EXPECT_TRUE((consumer->m_numTimesReceivedInput >= 1) && (consumer->m_numTimesReceivedInput <= 2)) <<
+		"consumer->m_numTimesReceivedInput = " << consumer->m_numTimesReceivedInput << std::endl;
 }
 
-TEST(NullDeviceTest, RemoveListener)
+TEST(NullDeviceTest, RemoveInputConsumer)
 {
 	NullDevice device("MyNullDevice");
-	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
-	EXPECT_FALSE(device.removeListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	EXPECT_FALSE(device.removeInputConsumer(consumer));
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
-	EXPECT_TRUE(device.addInputListener(listener));
-	// NullDevice is supposed to shove "null" data at every listener when it's added.
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
+	EXPECT_TRUE(device.addInputConsumer(consumer));
+	// NullDevice is supposed to shove "null" data at every consumer when it's added.
+	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 
-	EXPECT_TRUE(device.removeListener(listener));
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
+	EXPECT_TRUE(device.removeInputConsumer(consumer));
+	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 
-	EXPECT_FALSE(device.removeListener(listener));
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
+	EXPECT_FALSE(device.removeInputConsumer(consumer));
+	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
+}
+
+TEST(NullDeviceTest, SetOutputProducer)
+{
+	NullDevice device("MyNullDevice");
+	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
+
+	EXPECT_TRUE(device.setOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
+}
+
+TEST(NullDeviceTest, RemoveOutputProducer)
+{
+	NullDevice device("MyNullDevice");
+	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
+
+	EXPECT_FALSE(device.removeOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesReceivedInput);
+
+	EXPECT_TRUE(device.setOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesReceivedInput);
+
+	EXPECT_TRUE(device.removeOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesReceivedInput);
+
+	EXPECT_FALSE(device.removeOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesReceivedInput);
 }

@@ -26,7 +26,8 @@ set(SURGSIM_INPUT_HEADERS
 	CommonDevice.h
 	DeviceClassManagerInterface.h
 	DeviceInterface.h
-	DeviceListenerInterface.h
+	InputConsumerInterface.h
+	OutputProducerInterface.h
 )
 
 add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})

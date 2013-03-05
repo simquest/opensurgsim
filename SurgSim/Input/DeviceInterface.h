@@ -19,19 +19,20 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/DeviceListenerInterface.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
 
 namespace SurgSim
 {
 namespace Input
 {
 
+
 /// Interface used to communicate with user-interface hardware devices.
 ///
-/// Note that despite the interface name, many devices that implement it will
-/// not be input-only.  Haptic devices are the most obvious example, but
-/// many other devices can, for example, display visual indicators such as
-/// LEDs, etc.
+/// Classes that implement communication with a hardware device implement this interface.  This includes
+/// input/output devices (haptic devices are the most obvious example, but many other devices can, for example,
+/// display visual indicators such as LEDs, etc.), as well as input-only and output-only devices.
 ///
 /// Derived classes will likely want to hide their constructor and only
 /// allow creation through a manager object for that type of device.
@@ -44,23 +45,26 @@ public:
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
 
-	/// Adds a listener that will be notified when input state is updated, and asked for output state when
-	/// needed.
+	/// Adds an input consumer that will be notified when input state is updated.
 	///
-	/// \param listener The listener to be added.
-	///
+	/// \param inputConsumer The input consumer to be added.
 	/// \return true on success, false on failure.
-	virtual bool addListener(std::shared_ptr<DeviceListenerInterface> listener) = 0;
+	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) = 0;
 
-	/// Adds a listener that will be notified when input state is updated.
-	/// The listener will not be used to provide output.
+	/// Removes an input consumer previously added via \ref addInputConsumer.
+	/// \param inputConsumer The input consumer to be removed.
+	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) = 0;
+	
+	/// Sets an output producer that will be asked for output state when the device needs it.
+	/// Any previously set output producer will be removed.
 	///
-	/// \param listener The listener to be added.
+	/// \param outputProducer The output producer to be added.
 	/// \return true on success, false on failure.
-	virtual bool addInputListener(std::shared_ptr<DeviceListenerInterface> listener) = 0;
+	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) = 0;
 
-	/// Removes a listener previously added via \ref addListener or \ref addInputListener.
-	virtual bool removeListener(std::shared_ptr<DeviceListenerInterface> listener) = 0;
+	/// Removes an output producer previously added via \ref setOutputProducer.
+	/// \param outputProducer The output producer to be removed.
+	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) = 0;
 
 protected:
 
@@ -73,6 +77,7 @@ protected:
 	/// Finalize (de-initialize) the device.
 	virtual bool finalize() = 0;
 };
+
 
 };  // namespace Input
 };  // namespace SurgSim

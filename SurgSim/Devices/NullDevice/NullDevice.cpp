@@ -62,31 +62,23 @@ DataGroup NullDevice::buildInputData()
 	return builder.createData();
 }
 
-bool NullDevice::addListener(std::shared_ptr<SurgSim::Input::DeviceListenerInterface> listener)
+bool NullDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
 {
-	bool status = CommonDevice::addListener(std::move(listener));
+	if (! CommonDevice::addInputConsumer(std::move(inputConsumer)))
+	{
+		return false;
+	}
 
 	// The NullDevice doesn't have any input events; it just sits there.
-	// So we push the output to all the listeners, including the new one, right away after we add it.
+	// So we push the output to all the consumers, including the new one, right away after we add a consumer.
+	// This ensures that all consumers always see the identity pose.
 	getInputData().poses().put("pose", RigidTransform3d::Identity());
 	getInputData().booleans().put("button0", false);
 	pushInput();
 
-	return status;
+	return true;
 }
 
-bool NullDevice::addInputListener(std::shared_ptr<SurgSim::Input::DeviceListenerInterface> listener)
-{
-	bool status = CommonDevice::addInputListener(std::move(listener));
-
-	// The NullDevice doesn't have any input events; it just sits there.
-	// So we push the output to all the listeners, including the new one, right away after we add it.
-	getInputData().poses().put("pose", RigidTransform3d::Identity());
-	getInputData().booleans().put("button0", false);
-	pushInput();
-
-	return status;
-}
 
 };  // namespace Device
 };  // namespace SurgSim

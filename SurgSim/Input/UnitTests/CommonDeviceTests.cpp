@@ -21,14 +21,16 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <SurgSim/Input/CommonDevice.h>
-#include <SurgSim/Input/DeviceListenerInterface.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/DataStructures/DataGroupBuilder.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::DeviceListenerInterface;
+using SurgSim::Input::InputConsumerInterface;
+using SurgSim::Input::OutputProducerInterface;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Math::RigidTransform3d;
@@ -51,10 +53,7 @@ public:
 
 	virtual bool pullOutput();
 
-	const DataGroup& getOutputData() const
-	{
-		return CommonDevice::getOutputData();
-	}
+	const DataGroup& getOutputData() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static DataGroup buildInputData();
@@ -84,6 +83,12 @@ bool TestDevice::pullOutput()
 	return CommonDevice::pullOutput();
 }
 
+// expose the getOutputData method to the world
+const DataGroup& TestDevice::getOutputData() const
+{
+	return CommonDevice::getOutputData();
+}
+
 DataGroup TestDevice::buildInputData()
 {
 	DataGroupBuilder builder;
@@ -94,40 +99,33 @@ DataGroup TestDevice::buildInputData()
 }
 
 
-struct TestListener : public DeviceListenerInterface
+struct TestInputConsumer : public InputConsumerInterface
 {
 public:
-	TestListener() :
-		m_numTimesReceivedInput(0),
-		m_numTimesRequestedOutput(0)
+	TestInputConsumer() :
+		m_numTimesReceivedInput(0)
 	{
 	}
 
 	virtual void handleInput(const std::string& device, const DataGroup& inputData);
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
 
 	int m_numTimesReceivedInput;
-	int m_numTimesRequestedOutput;
 	DataGroup m_lastReceivedInput;
 };
 
-void TestListener::handleInput(const std::string& device, const DataGroup& inputData)
+void TestInputConsumer::handleInput(const std::string& device, const DataGroup& inputData)
 {
 	++m_numTimesReceivedInput;
 	m_lastReceivedInput = inputData;
 }
 
-bool TestListener::requestOutput(const std::string& device, DataGroup* outputData)
-{
-	++m_numTimesRequestedOutput;
-	return false;
-}
 
-
-struct TestOutputListener : public TestListener
+struct TestOutputProducer : public OutputProducerInterface
 {
 public:
-	TestOutputListener()
+	TestOutputProducer() :
+		m_numTimesRequestedOutput(0),
+		m_refuseToProduce(false)
 	{
 		DataGroupBuilder builder;
 		builder.addInteger("value");
@@ -137,14 +135,24 @@ public:
 
 	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
 
+	int m_numTimesRequestedOutput;
+	bool m_refuseToProduce;
 	DataGroup m_nextSentOutput;
 };
 
-bool TestOutputListener::requestOutput(const std::string& device, DataGroup* outputData)
+bool TestOutputProducer::requestOutput(const std::string& device, DataGroup* outputData)
 {
 	++m_numTimesRequestedOutput;
-	*outputData = m_nextSentOutput;
-	return true;
+
+	if (m_refuseToProduce)
+	{
+		return false;
+	}
+	else
+	{
+		*outputData = m_nextSentOutput;
+		return true;
+	}
 }
 
 
@@ -161,127 +169,199 @@ TEST(CommonDeviceTests, Name)
 	EXPECT_EQ("MyTestDevice", device.getName());
 }
 
-TEST(CommonDeviceTests, AddInputListener)
+TEST(CommonDeviceTests, AddInputConsumer)
 {
 	TestDevice device("MyTestDevice");
-	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	std::shared_ptr<TestInputConsumer> consumer = std::make_shared<TestInputConsumer>();
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
-	EXPECT_TRUE(device.addInputListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	EXPECT_TRUE(device.addInputConsumer(consumer));
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
-	EXPECT_FALSE(device.addInputListener(listener));
-	EXPECT_FALSE(device.addListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	EXPECT_FALSE(device.addInputConsumer(consumer));
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
+
+	std::shared_ptr<TestInputConsumer> consumer2 = std::make_shared<TestInputConsumer>();
+	EXPECT_EQ(0, consumer2->m_numTimesReceivedInput);
+
+	EXPECT_TRUE(device.addInputConsumer(consumer2));
+	EXPECT_EQ(0, consumer2->m_numTimesReceivedInput);
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 }
 
-TEST(CommonDeviceTests, AddListener)
+TEST(CommonDeviceTests, SetOutputProducer)
 {
 	TestDevice device("MyTestDevice");
-	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	std::shared_ptr<TestOutputProducer> producer = std::make_shared<TestOutputProducer>();
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
-	EXPECT_TRUE(device.addListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	EXPECT_TRUE(device.setOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
-	EXPECT_FALSE(device.addListener(listener));
-	EXPECT_FALSE(device.addInputListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	EXPECT_FALSE(device.setOutputProducer(producer));
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
+
+	std::shared_ptr<TestOutputProducer> producer2 = std::make_shared<TestOutputProducer>();
+	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
+
+	EXPECT_TRUE(device.setOutputProducer(producer2));
+	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }
 
 TEST(CommonDeviceTests, PushInput)
 {
-	for (int pass = 0;  pass < 2;  ++pass)
-	{
-		TestDevice device("MyTestDevice");
-		std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
-		EXPECT_EQ(0, listener->m_numTimesReceivedInput);
+	TestDevice device("MyTestDevice");
+	std::shared_ptr<TestInputConsumer> consumer1 = std::make_shared<TestInputConsumer>();
+	std::shared_ptr<TestInputConsumer> consumer2 = std::make_shared<TestInputConsumer>();
+	std::shared_ptr<TestOutputProducer> producer = std::make_shared<TestOutputProducer>();
+	EXPECT_TRUE(device.addInputConsumer(consumer1));
+	EXPECT_TRUE(device.addInputConsumer(consumer2));
+	EXPECT_TRUE(device.setOutputProducer(producer));
+	EXPECT_EQ(0, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(0, consumer2->m_numTimesReceivedInput);
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
-		if (pass == 0)
-		{
-			EXPECT_TRUE(device.addInputListener(listener));
-		}
-		else
-		{
-			EXPECT_TRUE(device.addListener(listener));
-		}
+	device.pushInput();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
+	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
-		for (int i = 1;  i <= 3;  ++i)
-		{
-			EXPECT_EQ(i-1, listener->m_numTimesReceivedInput);
+	// invalidate the state
+	consumer1->m_lastReceivedInput.resetAll();
+	consumer2->m_lastReceivedInput.resetAll();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_FALSE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
 
-			device.pushInput();
-			EXPECT_EQ(i, listener->m_numTimesReceivedInput);
-			EXPECT_TRUE(listener->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-
-			listener->m_lastReceivedInput.resetAll();  // invalidate the state for next loop
-			EXPECT_EQ(i, listener->m_numTimesReceivedInput);
-			EXPECT_FALSE(listener->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-		}
-	}
+	device.pushInput();
+	EXPECT_EQ(2, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(2, consumer2->m_numTimesReceivedInput);
+	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }
 
 TEST(CommonDeviceTests, PullOutput)
 {
 	TestDevice device("MyTestDevice");
-	std::shared_ptr<TestOutputListener> listener = std::make_shared<TestOutputListener>();
-	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
-
-	EXPECT_TRUE(device.addListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
+	std::shared_ptr<TestOutputProducer> producer1 = std::make_shared<TestOutputProducer>();
+	std::shared_ptr<TestOutputProducer> producer2 = std::make_shared<TestOutputProducer>();
+	std::shared_ptr<TestInputConsumer> consumer = std::make_shared<TestInputConsumer>();
+	EXPECT_TRUE(device.setOutputProducer(producer1));
+	EXPECT_TRUE(device.setOutputProducer(producer2));
+	EXPECT_TRUE(device.addInputConsumer(consumer));
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.pullOutput());
-	EXPECT_EQ(1, listener->m_numTimesRequestedOutput);
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(1, producer2->m_numTimesRequestedOutput);
+	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
+
+	EXPECT_TRUE(device.pullOutput());
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
+	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
+
+	// Test what happens when the producer returns false.
+	producer2->m_refuseToProduce = true;
+	EXPECT_FALSE(device.pullOutput());
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(3, producer2->m_numTimesRequestedOutput);
+	EXPECT_FALSE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
+}
+
+TEST(CommonDeviceTests, RemoveInputConsumer)
+{
+	TestDevice device("MyTestDevice");
+	EXPECT_FALSE(device.removeInputConsumer(std::shared_ptr<TestInputConsumer>()));
+	EXPECT_FALSE(device.removeInputConsumer(std::shared_ptr<TestInputConsumer>(nullptr)));
+
+	std::shared_ptr<TestInputConsumer> consumer1 = std::make_shared<TestInputConsumer>();
+	std::shared_ptr<TestInputConsumer> consumer2 = std::make_shared<TestInputConsumer>();
+	EXPECT_FALSE(device.removeInputConsumer(consumer1));
+	EXPECT_TRUE(device.addInputConsumer(consumer1));
+	EXPECT_TRUE(device.addInputConsumer(consumer2));
+	EXPECT_EQ(0, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(0, consumer2->m_numTimesReceivedInput);
+
+	EXPECT_FALSE(device.removeInputConsumer(std::shared_ptr<TestInputConsumer>()));
+	EXPECT_FALSE(device.removeInputConsumer(std::shared_ptr<TestInputConsumer>(nullptr)));
+
+	device.pushInput();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
+	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+
+	// invalidate the state
+	consumer1->m_lastReceivedInput.resetAll();
+	consumer2->m_lastReceivedInput.resetAll();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_FALSE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+
+	EXPECT_TRUE(device.removeInputConsumer(consumer1));
+	device.pushInput();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(2, consumer2->m_numTimesReceivedInput);
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+
+	EXPECT_FALSE(device.removeInputConsumer(consumer1));
+	device.pushInput();
+	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
+	EXPECT_EQ(3, consumer2->m_numTimesReceivedInput);
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+}
+
+TEST(CommonDeviceTests, RemoveOutputProducer)
+{
+	TestDevice device("MyTestDevice");
+	EXPECT_FALSE(device.removeOutputProducer(std::shared_ptr<TestOutputProducer>()));
+	EXPECT_FALSE(device.removeOutputProducer(std::shared_ptr<TestOutputProducer>(nullptr)));
+
+	std::shared_ptr<TestOutputProducer> producer1 = std::make_shared<TestOutputProducer>();
+	std::shared_ptr<TestOutputProducer> producer2 = std::make_shared<TestOutputProducer>();
+	EXPECT_FALSE(device.removeOutputProducer(producer1));
+	EXPECT_TRUE(device.setOutputProducer(producer1));
+	EXPECT_TRUE(device.setOutputProducer(producer2));
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
+
+	EXPECT_FALSE(device.removeOutputProducer(std::shared_ptr<TestOutputProducer>()));
+	EXPECT_FALSE(device.removeOutputProducer(std::shared_ptr<TestOutputProducer>(nullptr)));
+
+	EXPECT_TRUE(device.pullOutput());
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(1, producer2->m_numTimesRequestedOutput);
 	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
 
+	EXPECT_FALSE(device.removeOutputProducer(producer1));
 	EXPECT_TRUE(device.pullOutput());
-	EXPECT_EQ(2, listener->m_numTimesRequestedOutput);
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
+	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
 
-	EXPECT_TRUE(device.removeListener(listener));
+	EXPECT_TRUE(device.removeOutputProducer(producer2));
 	EXPECT_FALSE(device.pullOutput());
-	EXPECT_EQ(2, listener->m_numTimesRequestedOutput);
-}
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
+	EXPECT_FALSE(device.getOutputData().integers().hasCurrentData("value"));
 
-TEST(CommonDeviceTests, DontPullOutput)
-{
-	TestDevice device("MyTestDevice");
-	std::shared_ptr<TestOutputListener> listener = std::make_shared<TestOutputListener>();
-	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
-
-	EXPECT_TRUE(device.addInputListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
-
+	EXPECT_FALSE(device.removeOutputProducer(producer2));
 	EXPECT_FALSE(device.pullOutput());
-	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
-
-	EXPECT_FALSE(device.pullOutput());
-	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
-}
-
-TEST(CommonDeviceTests, RemoveListener)
-{
-	TestDevice device("MyTestDevice");
-	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
-
-	EXPECT_TRUE(device.addInputListener(listener));
-	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
-
-	device.pushInput();
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
-	EXPECT_TRUE(listener->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-
-	listener->m_lastReceivedInput.resetAll();  // invalidate the state for next loop
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
-	EXPECT_FALSE(listener->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-
-	EXPECT_TRUE(device.removeListener(listener));
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
-
-	device.pushInput();
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
-	EXPECT_FALSE(listener->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-
-	EXPECT_FALSE(device.removeListener(listener));
-	EXPECT_EQ(1, listener->m_numTimesReceivedInput);
+	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
+	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
+	EXPECT_FALSE(device.getOutputData().integers().hasCurrentData("value"));
 }
