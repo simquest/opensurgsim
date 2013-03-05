@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_INPUT_DEVICE_LISTENER_INTERFACE_H
-#define SURGSIM_INPUT_INPUT_DEVICE_LISTENER_INTERFACE_H
+#ifndef SURGSIM_INPUT_DEVICE_LISTENER_INTERFACE_H
+#define SURGSIM_INPUT_DEVICE_LISTENER_INTERFACE_H
 
 #include <string>
 
@@ -28,15 +28,15 @@ class DataGroup;
 namespace Input
 {
 
-class InputDeviceInterface;
+class DeviceInterface;
 
 
 /// Interface for a listener that monitors device and signal state updates.
-class InputDeviceListenerInterface
+class DeviceListenerInterface
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~InputDeviceListenerInterface() {};
+	virtual ~DeviceListenerInterface() {};
 
 	/// Notifies the listener that the application input coming from the device has been updated.
 	///
@@ -66,7 +66,7 @@ public:
 	/// Asks the listener to provide output state to the device.
 	///
 	/// Note that devices may never call this method, e.g. because the listener was registered via \ref
-	/// InputDeviceInterface::addInputListener, or because the device doesn't have any output capability, or
+	/// DeviceInterface::addInputListener, or because the device doesn't have any output capability, or
 	/// because another listener is already providing output information.
 	///
 	///  Typical output data contents (but note that individual devices may do things differently):
@@ -90,7 +90,7 @@ public:
 	///
 	/// \return true if the listener has provided some output, false if it refuses to do so.  In general, it is
 	/// 		a good idea to register a listener than never provides output using \ref
-	/// 		InputDeviceInterface::addInputListener, so that this method will never be called.  Any listener
+	/// 		DeviceInterface::addInputListener, so that this method will never be called.  Any listener
 	/// 		that returns false should leave outputData unmodified.  This allows the application to register
 	/// 		several listeners with the same device, but ensure that only one of them will be providing the
 	/// 		output information.
@@ -100,4 +100,4 @@ public:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif // SURGSIM_INPUT_INPUT_DEVICE_LISTENER_INTERFACE_H
+#endif // SURGSIM_INPUT_DEVICE_LISTENER_INTERFACE_H

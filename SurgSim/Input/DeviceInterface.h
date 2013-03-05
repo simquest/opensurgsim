@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_INPUT_DEVICE_INTERFACE_H
-#define SURGSIM_INPUT_INPUT_DEVICE_INTERFACE_H
+#ifndef SURGSIM_INPUT_DEVICE_INTERFACE_H
+#define SURGSIM_INPUT_DEVICE_INTERFACE_H
 
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/InputDeviceListenerInterface.h>
+#include <SurgSim/Input/DeviceListenerInterface.h>
 
 namespace SurgSim
 {
@@ -35,11 +35,11 @@ namespace Input
 ///
 /// Derived classes will likely want to hide their constructor and only
 /// allow creation through a manager object for that type of device.
-class InputDeviceInterface
+class DeviceInterface
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~InputDeviceInterface() {};
+	virtual ~DeviceInterface() {};
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
@@ -50,17 +50,17 @@ public:
 	/// \param listener The listener to be added.
 	///
 	/// \return true on success, false on failure.
-	virtual bool addListener(std::shared_ptr<InputDeviceListenerInterface> listener) = 0;
+	virtual bool addListener(std::shared_ptr<DeviceListenerInterface> listener) = 0;
 
 	/// Adds a listener that will be notified when input state is updated.
 	/// The listener will not be used to provide output.
 	///
 	/// \param listener The listener to be added.
 	/// \return true on success, false on failure.
-	virtual bool addInputListener(std::shared_ptr<InputDeviceListenerInterface> listener) = 0;
+	virtual bool addInputListener(std::shared_ptr<DeviceListenerInterface> listener) = 0;
 
 	/// Removes a listener previously added via \ref addListener or \ref addInputListener.
-	virtual bool removeListener(std::shared_ptr<InputDeviceListenerInterface> listener) = 0;
+	virtual bool removeListener(std::shared_ptr<DeviceListenerInterface> listener) = 0;
 
 protected:
 
@@ -77,4 +77,4 @@ protected:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif // SURGSIM_INPUT_INPUT_DEVICE_INTERFACE_H
+#endif // SURGSIM_INPUT_DEVICE_INTERFACE_H

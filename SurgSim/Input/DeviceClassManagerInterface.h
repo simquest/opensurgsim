@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/InputDeviceInterface.h>
+#include <SurgSim/Input/DeviceInterface.h>
 
 namespace SurgSim
 {

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "CommonInputDevice.h"
+#include "CommonDevice.h"
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -24,7 +24,7 @@ namespace SurgSim
 namespace Input
 {
 
-struct CommonInputDevice::State
+struct CommonDevice::State
 {
 	/// Constructor.
 	State()
@@ -37,13 +37,13 @@ struct CommonInputDevice::State
 		/// Constructor.
 		/// \param listenerArg The listener.
 		/// \param forOutput true if this listener can provide output data, false if it can only listen to input.
-		ListenerEntry(std::shared_ptr<InputDeviceListenerInterface>&& listenerArg, bool forOutput) :
+		ListenerEntry(std::shared_ptr<DeviceListenerInterface>&& listenerArg, bool forOutput) :
 			listener(std::move(listenerArg)),
 			canProvideOutput(forOutput)
 		{
 		}
 
-		std::shared_ptr<InputDeviceListenerInterface> listener;
+		std::shared_ptr<DeviceListenerInterface> listener;
 		bool canProvideOutput;
 	};
 
@@ -55,23 +55,23 @@ struct CommonInputDevice::State
 };
 
 
-CommonInputDevice::CommonInputDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
+CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
 	m_name(name), m_inputData(inputData), m_state(new State)
 {
 }
 
 
-CommonInputDevice::CommonInputDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
+CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
 	m_name(name), m_inputData(std::move(inputData)), m_state(new State)
 {
 }
 
-std::string CommonInputDevice::getName() const
+std::string CommonDevice::getName() const
 {
 	return m_name;
 }
 
-bool CommonInputDevice::addListener(std::shared_ptr<InputDeviceListenerInterface> listener)
+bool CommonDevice::addListener(std::shared_ptr<DeviceListenerInterface> listener)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
 	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
@@ -85,7 +85,7 @@ bool CommonInputDevice::addListener(std::shared_ptr<InputDeviceListenerInterface
 	return true;
 }
 
-bool CommonInputDevice::addInputListener(std::shared_ptr<InputDeviceListenerInterface> listener)
+bool CommonDevice::addInputListener(std::shared_ptr<DeviceListenerInterface> listener)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
 	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
@@ -99,7 +99,7 @@ bool CommonInputDevice::addInputListener(std::shared_ptr<InputDeviceListenerInte
 	return true;
 }
 
-bool CommonInputDevice::removeListener(std::shared_ptr<InputDeviceListenerInterface> listener)
+bool CommonDevice::removeListener(std::shared_ptr<DeviceListenerInterface> listener)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
 	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
@@ -114,7 +114,7 @@ bool CommonInputDevice::removeListener(std::shared_ptr<InputDeviceListenerInterf
 	return false;
 }
 
-void CommonInputDevice::pushInput()
+void CommonDevice::pushInput()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
 	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)
@@ -123,7 +123,7 @@ void CommonInputDevice::pushInput()
 	}
 }
 
-bool CommonInputDevice::pullOutput()
+bool CommonDevice::pullOutput()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->listenerListMutex);
 	for (auto it = m_state->listenerList.begin();  it != m_state->listenerList.end();  ++it)

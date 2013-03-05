@@ -20,7 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	CommonInputDeviceTests.cpp
+	CommonDeviceTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

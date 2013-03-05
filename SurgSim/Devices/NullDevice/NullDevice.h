@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/CommonInputDevice.h>
+#include <SurgSim/Input/CommonDevice.h>
 
 namespace SurgSim
 {
@@ -28,17 +28,17 @@ namespace Device
 
 /// A class implementing the "null" device, which is a pretend device that doesn't move.
 ///
-/// \sa SurgSim::Input::InputDeviceInterface
-class NullDevice : public SurgSim::Input::CommonInputDevice
+/// \sa SurgSim::Input::DeviceInterface
+class NullDevice : public SurgSim::Input::CommonDevice
 {
 public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	NullDevice(const std::string& uniqueName);
 	
-	virtual bool addListener(std::shared_ptr<SurgSim::Input::InputDeviceListenerInterface> listener);
+	virtual bool addListener(std::shared_ptr<SurgSim::Input::DeviceListenerInterface> listener);
 
-	virtual bool addInputListener(std::shared_ptr<SurgSim::Input::InputDeviceListenerInterface> listener);
+	virtual bool addInputListener(std::shared_ptr<SurgSim::Input::DeviceListenerInterface> listener);
 
 protected:
 	virtual bool initialize();

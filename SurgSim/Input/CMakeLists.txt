@@ -19,14 +19,14 @@ include_directories(
 )
 
 set(SURGSIM_INPUT_SOURCES
-	CommonInputDevice.cpp
+	CommonDevice.cpp
 )
 
 set(SURGSIM_INPUT_HEADERS
-	CommonInputDevice.h
+	CommonDevice.h
 	DeviceClassManagerInterface.h
-	InputDeviceInterface.h
-	InputDeviceListenerInterface.h
+	DeviceInterface.h
+	DeviceListenerInterface.h
 )
 
 add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})

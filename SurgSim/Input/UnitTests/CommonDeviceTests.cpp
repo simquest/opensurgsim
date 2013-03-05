@@ -14,32 +14,32 @@
 // limitations under the License.
 
 /** @file
- * Tests for the CommonInputDevice class.
+ * Tests for the CommonDevice class.
  */
 
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
-#include <SurgSim/Input/CommonInputDevice.h>
-#include <SurgSim/Input/InputDeviceListenerInterface.h>
+#include <SurgSim/Input/CommonDevice.h>
+#include <SurgSim/Input/DeviceListenerInterface.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/DataStructures/DataGroupBuilder.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
-using SurgSim::Input::CommonInputDevice;
-using SurgSim::Input::InputDeviceListenerInterface;
+using SurgSim::Input::CommonDevice;
+using SurgSim::Input::DeviceListenerInterface;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 
 
-class TestDevice : public CommonInputDevice
+class TestDevice : public CommonDevice
 {
 public:
 	TestDevice(const std::string& uniqueName) :
-		CommonInputDevice(uniqueName, buildInputData())
+		CommonDevice(uniqueName, buildInputData())
 	{
 	}
 
@@ -53,20 +53,20 @@ public:
 
 	const DataGroup& getOutputData() const
 	{
-		return CommonInputDevice::getOutputData();
+		return CommonDevice::getOutputData();
 	}
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static DataGroup buildInputData();
 };
 
-// required by the InputDeviceInterface API
+// required by the DeviceInterface API
 bool TestDevice::initialize()
 {
 	return true;
 }
 
-// required by the InputDeviceInterface API
+// required by the DeviceInterface API
 bool TestDevice::finalize()
 {
 	return true;
@@ -75,13 +75,13 @@ bool TestDevice::finalize()
 // expose the pushInput method to the world
 void TestDevice::pushInput()
 {
-	CommonInputDevice::pushInput();
+	CommonDevice::pushInput();
 }
 
 // expose the pullOutput method to the world
 bool TestDevice::pullOutput()
 {
-	return CommonInputDevice::pullOutput();
+	return CommonDevice::pullOutput();
 }
 
 DataGroup TestDevice::buildInputData()
@@ -94,7 +94,7 @@ DataGroup TestDevice::buildInputData()
 }
 
 
-struct TestListener : public InputDeviceListenerInterface
+struct TestListener : public DeviceListenerInterface
 {
 public:
 	TestListener() :
@@ -150,18 +150,18 @@ bool TestOutputListener::requestOutput(const std::string& device, DataGroup* out
 
 // OK, let's start testing...
 
-TEST(CommonInputDeviceTests, CanConstruct)
+TEST(CommonDeviceTests, CanConstruct)
 {
 	EXPECT_NO_THROW({TestDevice device("MyTestDevice");});
 }
 
-TEST(CommonInputDeviceTests, Name)
+TEST(CommonDeviceTests, Name)
 {
 	TestDevice device("MyTestDevice");
 	EXPECT_EQ("MyTestDevice", device.getName());
 }
 
-TEST(CommonInputDeviceTests, AddInputListener)
+TEST(CommonDeviceTests, AddInputListener)
 {
 	TestDevice device("MyTestDevice");
 	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
@@ -175,7 +175,7 @@ TEST(CommonInputDeviceTests, AddInputListener)
 	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
 }
 
-TEST(CommonInputDeviceTests, AddListener)
+TEST(CommonDeviceTests, AddListener)
 {
 	TestDevice device("MyTestDevice");
 	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
@@ -189,7 +189,7 @@ TEST(CommonInputDeviceTests, AddListener)
 	EXPECT_EQ(0, listener->m_numTimesReceivedInput);
 }
 
-TEST(CommonInputDeviceTests, PushInput)
+TEST(CommonDeviceTests, PushInput)
 {
 	for (int pass = 0;  pass < 2;  ++pass)
 	{
@@ -221,7 +221,7 @@ TEST(CommonInputDeviceTests, PushInput)
 	}
 }
 
-TEST(CommonInputDeviceTests, PullOutput)
+TEST(CommonDeviceTests, PullOutput)
 {
 	TestDevice device("MyTestDevice");
 	std::shared_ptr<TestOutputListener> listener = std::make_shared<TestOutputListener>();
@@ -242,7 +242,7 @@ TEST(CommonInputDeviceTests, PullOutput)
 	EXPECT_EQ(2, listener->m_numTimesRequestedOutput);
 }
 
-TEST(CommonInputDeviceTests, DontPullOutput)
+TEST(CommonDeviceTests, DontPullOutput)
 {
 	TestDevice device("MyTestDevice");
 	std::shared_ptr<TestOutputListener> listener = std::make_shared<TestOutputListener>();
@@ -258,7 +258,7 @@ TEST(CommonInputDeviceTests, DontPullOutput)
 	EXPECT_EQ(0, listener->m_numTimesRequestedOutput);
 }
 
-TEST(CommonInputDeviceTests, RemoveListener)
+TEST(CommonDeviceTests, RemoveListener)
 {
 	TestDevice device("MyTestDevice");
 	std::shared_ptr<TestListener> listener = std::make_shared<TestListener>();
