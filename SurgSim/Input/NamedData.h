@@ -108,7 +108,8 @@ public:
 
 	/// Move the data from another object.
 	///
-	/// The same restrictions on object compatibility apply as in the case of the copy assignment operator=(const NamedData&).
+	/// The same restrictions on object compatibility apply as in the case of the copy assignment
+	/// operator=(const NamedData&).
 	///
 	/// \param [in,out] namedData The object to copy from, which will be left in an ununsable state.
 	/// \return The object that was assigned into.

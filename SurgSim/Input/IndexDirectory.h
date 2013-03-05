@@ -27,7 +27,8 @@ namespace Input
 
 /// A simple bidirectional mapping between names (strings) and distinct consecutive non-negative indices.
 ///
-/// Access to this class is thread-safe if all of the threads are only performing const operations, i.e. reading the names and indices.
+/// Access to this class is thread-safe if all of the threads are only performing const operations, i.e. reading
+/// the names and indices.
 class IndexDirectory
 {
 public:

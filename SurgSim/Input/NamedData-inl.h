@@ -60,7 +60,7 @@ template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 {
 	SURGSIM_ASSERT(namedData.isValid()) <<
-	                                    "Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
+		"Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
 
 	if (! isValid())
 	{
@@ -76,7 +76,7 @@ inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 
 	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
 	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isCurrent.size() == m_directory->size()) <<
-	        "NamedData isn't correctly sized after assignment!";
+		"NamedData isn't correctly sized after assignment!";
 
 	return *this;
 }
@@ -94,7 +94,7 @@ template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 {
 	SURGSIM_ASSERT(namedData.isValid()) <<
-	                                    "Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
+		"Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
 
 	if (! isValid())
 	{
@@ -110,7 +110,7 @@ inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 
 	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
 	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isCurrent.size() == m_directory->size()) <<
-	        "NamedData isn't correctly sized after assignment!";
+		"NamedData isn't correctly sized after assignment!";
 
 	return *this;
 }
