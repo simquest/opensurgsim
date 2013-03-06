@@ -16,12 +16,12 @@
 #ifndef SURGSIM_INPUT_DATA_GROUP_INL_H
 #define SURGSIM_INPUT_DATA_GROUP_INL_H
 
-#include <SurgSim/Input/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/Assert.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 inline DataGroup::DataGroup()

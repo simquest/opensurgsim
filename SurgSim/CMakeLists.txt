@@ -22,9 +22,10 @@ include_directories(
 )
 
 # add_subdirectory(Collision)
+add_subdirectory(DataStructures)
 # add_subdirectory(Devices)
 add_subdirectory(Framework)
 # add_subdirectory(Graphics)
-add_subdirectory(Input)
+#add_subdirectory(Input)
 add_subdirectory(Math)
 # add_subdirectory(Physics)

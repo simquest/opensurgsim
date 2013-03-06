@@ -17,15 +17,15 @@
  * Tests for the DataGroup class.
  */
 
-#include "SurgSim/Input/DataGroup.h"
-#include "SurgSim/Input/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 #include "gtest/gtest.h"
 
-using SurgSim::Input::DataGroup;
-using SurgSim::Input::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
 
 
 /// Creating a named data object.

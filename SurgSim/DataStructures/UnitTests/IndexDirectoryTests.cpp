@@ -17,12 +17,12 @@
  * Tests for the IndexDirectory class.
  */
 
-#include "SurgSim/Input/NamedDataBuilder.h"
-#include "SurgSim/Input/IndexDirectory.h"
+#include "SurgSim/DataStructures/NamedDataBuilder.h"
+#include "SurgSim/DataStructures/IndexDirectory.h"
 #include "gtest/gtest.h"
 
-using SurgSim::Input::NamedDataBuilder;
-using SurgSim::Input::IndexDirectory;
+using SurgSim::DataStructures::NamedDataBuilder;
+using SurgSim::DataStructures::IndexDirectory;
 
 
 /// Run a few tests against an empty index directory.

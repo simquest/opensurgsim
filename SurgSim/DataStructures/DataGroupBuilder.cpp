@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Input/DataGroupBuilder.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 

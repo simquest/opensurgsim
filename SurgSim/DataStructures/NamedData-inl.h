@@ -16,12 +16,12 @@
 #ifndef SURGSIM_INPUT_NAMED_DATA_INL_H
 #define SURGSIM_INPUT_NAMED_DATA_INL_H
 
-#include <SurgSim/Input/NamedData.h>
+#include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Framework/Assert.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 template <typename T>

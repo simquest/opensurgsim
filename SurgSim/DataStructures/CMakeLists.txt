@@ -15,22 +15,27 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
 )
 
-set(UNIT_TEST_SOURCES
-	DataGroupTests.cpp
-	IndexDirectoryTests.cpp
-	NamedDataTests.cpp
+set(SURGSIM_DATA_STRUCTURES_SOURCES
+	DataGroupBuilder.cpp
+	IndexDirectory.cpp
 )
 
-set(UNIT_TEST_HEADERS
+set(SURGSIM_DATA_STRUCTURES_HEADERS
+	DataGroup.h
+	DataGroup-inl.h
+	DataGroupBuilder.h
+	IndexDirectory.h
+	NamedData.h
+	NamedData-inl.h
+	NamedDataBuilder.h
 )
 
-include_directories(
-)
+add_library(SurgSimDataStructures
+	${SURGSIM_DATA_STRUCTURES_SOURCES} ${SURGSIM_DATA_STRUCTURES_HEADERS})
 
-set(LIBS SurgSimFramework SurgSimInput gtest ${Boost_LIBRARIES})
-
-surgsim_add_unit_tests(SurgSimInputTest)
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()

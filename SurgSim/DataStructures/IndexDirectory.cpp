@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Input/IndexDirectory.h"
+#include "SurgSim/DataStructures/IndexDirectory.h"
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 

@@ -17,12 +17,12 @@
  * Tests for the NamedData<T> class.
  */
 
-#include "SurgSim/Input/NamedData.h"
-#include "SurgSim/Input/NamedDataBuilder.h"
+#include "SurgSim/DataStructures/NamedData.h"
+#include "SurgSim/DataStructures/NamedDataBuilder.h"
 #include "gtest/gtest.h"
 
-using SurgSim::Input::NamedData;
-using SurgSim::Input::NamedDataBuilder;
+using SurgSim::DataStructures::NamedData;
+using SurgSim::DataStructures::NamedDataBuilder;
 
 
 /// Creating a named data object.

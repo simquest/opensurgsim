@@ -16,13 +16,13 @@
 #ifndef SURGSIM_INPUT_DATA_GROUP_H
 #define SURGSIM_INPUT_DATA_GROUP_H
 
-#include <SurgSim/Input/NamedData.h>
+#include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A collection of value entries of different types that can be accessed by name or index.
@@ -201,7 +201,7 @@ private:
 };  // namespace SurgSim
 
 
-#include "SurgSim/Input/DataGroup-inl.h"
+#include "SurgSim/DataStructures/DataGroup-inl.h"
 
 
 #endif  // SURGSIM_INPUT_DATA_GROUP_H

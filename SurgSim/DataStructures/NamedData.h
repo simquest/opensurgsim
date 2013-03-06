@@ -21,11 +21,11 @@
 #include <vector>
 
 #include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Input/IndexDirectory.h>
+#include <SurgSim/DataStructures/IndexDirectory.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A collection of value entries that can be accessed by name or index.
@@ -231,7 +231,7 @@ private:
 };  // namespace SurgSim
 
 
-#include <SurgSim/Input/NamedData-inl.h>
+#include <SurgSim/DataStructures/NamedData-inl.h>
 
 
 #endif  // SURGSIM_INPUT_NAMED_DATA_H

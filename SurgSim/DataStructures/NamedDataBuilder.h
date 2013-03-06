@@ -18,11 +18,11 @@
 
 #include <memory>
 
-#include "SurgSim/Input/NamedData.h"
+#include "SurgSim/DataStructures/NamedData.h"
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A class that allows you to build a \ref NamedData structure.

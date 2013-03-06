@@ -22,7 +22,7 @@
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A simple bidirectional mapping between names (strings) and distinct consecutive non-negative indices.

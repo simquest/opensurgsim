@@ -16,12 +16,12 @@
 #ifndef SURGSIM_INPUT_DATA_GROUP_BUILDER_H
 #define SURGSIM_INPUT_DATA_GROUP_BUILDER_H
 
-#include <SurgSim/Input/NamedDataBuilder.h>
-#include <SurgSim/Input/DataGroup.h>
+#include <SurgSim/DataStructures/NamedDataBuilder.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A class that allows you to build a \ref DataGroup structure.
