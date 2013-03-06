@@ -13,17 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_DATA_GROUP_H
-#define SURGSIM_INPUT_DATA_GROUP_H
+#ifndef SURGSIM_DATA_STRUCTURES_DATA_GROUP_H
+#define SURGSIM_DATA_STRUCTURES_DATA_GROUP_H
 
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Input/NamedData.h>
+#include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A collection of value entries of different types that can be accessed by name or index.
@@ -77,19 +76,11 @@ public:
 
 
 	/// Construct an empty object, with no associated names and indices yet.
-	DataGroup() {};
+	inline DataGroup();
 
 	/// Construct an object as a copy of the data from another object.
 	/// \param dataGroup The object to copy from.
-	DataGroup(const DataGroup& dataGroup)
-		: m_poses(dataGroup.m_poses),
-		  m_vectors(dataGroup.m_vectors),
-		  m_scalars(dataGroup.m_scalars),
-		  m_integers(dataGroup.m_integers),
-		  m_booleans(dataGroup.m_booleans),
-		  m_strings(dataGroup.m_strings)
-	{
-	}
+	inline DataGroup(const DataGroup& dataGroup);
 
 	/// Copy the data from another object.
 	///
@@ -116,23 +107,9 @@ public:
 	/// second = first;                           // ERROR at run-time, layouts were created separately!
 	/// ~~~~~
 	///
-	/// \param namedData The object to copy from.
+	/// \param dataGroup The object to copy from.
 	/// \return The object that was assigned into.
-	DataGroup& operator=(const DataGroup& dataGroup)
-	{
-		SURGSIM_ASSERT(dataGroup.isValid()) <<
-			"Can't use an invalid (empty) DataGroup on the right-hand side of an assignment!";
-
-		m_poses = dataGroup.m_poses;
-		m_vectors = dataGroup.m_vectors;
-		m_scalars = dataGroup.m_scalars;
-		m_integers = dataGroup.m_integers;
-		m_booleans = dataGroup.m_booleans;
-		m_strings = dataGroup.m_strings;
-
-		SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
-		return *this;
-	}
+	inline DataGroup& operator=(const DataGroup& dataGroup);
 
 	/// Move the data from another object.
 	///
@@ -141,132 +118,64 @@ public:
 	///
 	/// \param [in,out] dataGroup The object to copy from, which will be left in an ununsable state.
 	/// \return The object that was assigned into.
-	DataGroup& operator=(DataGroup&& dataGroup)
-	{
-		SURGSIM_ASSERT(dataGroup.isValid()) <<
-			"Can't use an invalid (empty) DataGroup on the right-hand side of an assignment!";
-
-		m_poses = std::move(dataGroup.m_poses);
-		m_vectors = std::move(dataGroup.m_vectors);
-		m_scalars = std::move(dataGroup.m_scalars);
-		m_integers = std::move(dataGroup.m_integers);
-		m_booleans = std::move(dataGroup.m_booleans);
-		m_strings = std::move(dataGroup.m_strings);
-
-		SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
-		return *this;
-	}
+	inline DataGroup& operator=(DataGroup&& dataGroup);
 
 	/// Check if the object is valid (non-empty), meaning it is associated with a set of names and indices.
 	/// If the object is empty, it can become valid on assignment from a valid object.
 	///
 	/// \return true if valid, false if empty.
-	bool isValid() const
-	{
-		bool valid = poses().isValid();
-		SURGSIM_ASSERT(poses().isValid() == valid &&
-		               vectors().isValid() == valid &&
-		               scalars().isValid() == valid &&
-		               integers().isValid() == valid &&
-		               booleans().isValid() == valid &&
-		               strings().isValid() == valid) << "The object is only partially initialized!";
-		return valid;
-	}
+	inline bool isValid() const;
 
 	/// Return the pose data structure.
 	/// \return the mutable pose data.
-	NamedData<PoseType>& poses()
-	{
-		return m_poses;
-	}
+	inline NamedData<PoseType>& poses();
 
 	/// Return the pose data structure.
 	/// \return the read-only pose data.
-	const NamedData<PoseType>& poses() const
-	{
-		return m_poses;
-	}
+	inline const NamedData<PoseType>& poses() const;
 
 	/// Return the vector data structure.
 	/// \return the mutable vector data.
-	NamedData<VectorType>& vectors()
-	{
-		return m_vectors;
-	}
+	inline NamedData<VectorType>& vectors();
 
 	/// Return the vector data structure.
 	/// \return the read-only vector data.
-	const NamedData<VectorType>& vectors() const
-	{
-		return m_vectors;
-	}
+	inline const NamedData<VectorType>& vectors() const;
 
 	/// Return the scalar data structure.
 	/// \return the mutable scalar data.
-	NamedData<ScalarType>& scalars()
-	{
-		return m_scalars;
-	}
+	inline NamedData<ScalarType>& scalars();
 
 	/// Return the scalar data structure.
 	/// \return the read-only scalar data.
-	const NamedData<ScalarType>& scalars() const
-	{
-		return m_scalars;
-	}
+	inline const NamedData<ScalarType>& scalars() const;
 
 	/// Return the integer data structure.
 	/// \return the mutable integer data.
-	NamedData<IntegerType>& integers()
-	{
-		return m_integers;
-	}
+	inline NamedData<IntegerType>& integers();
 
 	/// Return the integer data structure.
 	/// \return the read-only integer data.
-	const NamedData<IntegerType>& integers() const
-	{
-		return m_integers;
-	}
+	inline const NamedData<IntegerType>& integers() const;
 
 	/// Return the boolean data structure.
 	/// \return the mutable Boolean data.
-	NamedData<BooleanType>& booleans()
-	{
-		return m_booleans;
-	}
+	inline NamedData<BooleanType>& booleans();
 
 	/// Return the boolean data structure.
 	/// \return the read-only Boolean data.
-	const NamedData<BooleanType>& booleans() const
-	{
-		return m_booleans;
-	}
+	inline const NamedData<BooleanType>& booleans() const;
 
 	/// Return the string data structure.
 	/// \return the mutable string data.
-	NamedData<StringType>& strings()
-	{
-		return m_strings;
-	}
+	inline NamedData<StringType>& strings();
 
 	/// Return the string data structure.
 	/// \return the read-only string data.
-	const NamedData<StringType>& strings() const
-	{
-		return m_strings;
-	}
+	inline const NamedData<StringType>& strings() const;
 
 	/// Mark all data as not current.
-	void resetAll()
-	{
-		m_poses.resetAll();
-		m_vectors.resetAll();
-		m_scalars.resetAll();
-		m_integers.resetAll();
-		m_booleans.resetAll();
-		m_strings.resetAll();
-	}
+	inline void resetAll();
 
 private:
 	/// The pose values.
@@ -291,4 +200,8 @@ private:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_INPUT_DATA_GROUP_H
+
+#include "SurgSim/DataStructures/DataGroup-inl.h"
+
+
+#endif  // SURGSIM_DATA_STRUCTURES_DATA_GROUP_H

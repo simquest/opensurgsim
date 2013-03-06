@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_NAMED_DATA_BUILDER_H
-#define SURGSIM_INPUT_NAMED_DATA_BUILDER_H
+#ifndef SURGSIM_DATA_STRUCTURES_NAMED_DATA_BUILDER_H
+#define SURGSIM_DATA_STRUCTURES_NAMED_DATA_BUILDER_H
 
 #include <memory>
 
-#include "SurgSim/Input/NamedData.h"
+#include "SurgSim/DataStructures/NamedData.h"
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A class that allows you to build a \ref NamedData structure.
@@ -33,7 +33,7 @@ namespace Input
 ///
 /// \sa NamedData
 template <typename T>
-class NamedDataBuilder : protected IndexDirectory
+class NamedDataBuilder
 {
 public:
 	/// Constructs an empty builder object.
@@ -46,7 +46,7 @@ public:
 	{
 		// NB: can't use copy construction in the std::make_shared call, because access is protected.
 		std::shared_ptr<IndexDirectory> dir = std::make_shared<IndexDirectory>();
-		*dir = *this;
+		*dir = m_directory;
 		return NamedData<T>(dir);
 	}
 
@@ -64,7 +64,7 @@ public:
 	/// \return the index of the created entry, or -1 if the entry could not be added.
 	int addEntry(const std::string& name)
 	{
-		return IndexDirectory::addEntry(name);
+		return m_directory.addEntry(name);
 	}
 
 	/// Create new entries from a vector of names.
@@ -107,7 +107,7 @@ public:
 	/// \return the index for that name if one exists; -1 otherwise.
 	int getIndex(const std::string& name) const
 	{
-		return IndexDirectory::getIndex(name);
+		return m_directory.getIndex(name);
 	}
 
 	/// Given an index, return the corresponding name (or "").
@@ -115,14 +115,14 @@ public:
 	/// \return the name for that index if one exists; an empty string otherwise.
 	std::string getName(int index) const
 	{
-		return IndexDirectory::getName(index);
+		return m_directory.getName(index);
 	}
 
 	/// Get a list of all the names available in the builder.
 	/// \return all the names.
 	const std::vector<std::string>& getAllNames() const
 	{
-		return IndexDirectory::getAllNames();
+		return m_directory.getAllNames();
 	}
 
 	/// Check whether the specified name exists in the builder.
@@ -131,7 +131,7 @@ public:
 	/// \return true if the entry exists.
 	bool hasEntry(const std::string& name) const
 	{
-		return IndexDirectory::hasEntry(name);
+		return m_directory.hasEntry(name);
 	}
 
 	/// Check the number of existing entries in the builder.
@@ -139,7 +139,7 @@ public:
 	/// \sa getNumEntries()
 	size_t size() const
 	{
-		return IndexDirectory::size();
+		return m_directory.size();
 	}
 
 	/// Check the number of existing entries in the builder.
@@ -147,11 +147,15 @@ public:
 	/// \sa size()
 	int getNumEntries() const
 	{
-		return IndexDirectory::getNumEntries();
+		return m_directory.getNumEntries();
 	}
+
+private:
+	/// The mapping between names and indices that will be used to create the NamedData instance.
+	IndexDirectory m_directory;
 };
 
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_INPUT_NAMED_DATA_BUILDER_H
+#endif  // SURGSIM_DATA_STRUCTURES_NAMED_DATA_BUILDER_H

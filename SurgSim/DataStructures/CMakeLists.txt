@@ -15,29 +15,27 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
 )
 
-# Fix a problem with 64-bit builds running out of sections.
-if(MSVC AND CMAKE_CL_64)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-endif(MSVC AND CMAKE_CL_64)
-
-
-set(UNIT_TEST_SOURCES
-	MatrixTests.cpp
-	QuaternionTests.cpp
-	VectorTests.cpp
+set(SURGSIM_DATA_STRUCTURES_SOURCES
+	DataGroupBuilder.cpp
+	IndexDirectory.cpp
 )
 
-set(UNIT_TEST_HEADERS
+set(SURGSIM_DATA_STRUCTURES_HEADERS
+	DataGroup.h
+	DataGroup-inl.h
+	DataGroupBuilder.h
+	IndexDirectory.h
+	NamedData.h
+	NamedData-inl.h
+	NamedDataBuilder.h
 )
 
-include_directories(
-)
+add_library(SurgSimDataStructures
+	${SURGSIM_DATA_STRUCTURES_SOURCES} ${SURGSIM_DATA_STRUCTURES_HEADERS})
 
-#set(LIBS SurgSimMath gtest)
-set(LIBS gtest)
-
-surgsim_add_unit_tests(SurgSimMathTest)
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_INDEX_DIRECTORY_H
-#define SURGSIM_INPUT_INDEX_DIRECTORY_H
+#ifndef SURGSIM_DATA_STRUCTURES_INDEX_DIRECTORY_H
+#define SURGSIM_DATA_STRUCTURES_INDEX_DIRECTORY_H
 
 #include <string>
 #include <vector>
@@ -22,27 +22,22 @@
 
 namespace SurgSim
 {
-namespace Input
+namespace DataStructures
 {
 
 /// A simple bidirectional mapping between names (strings) and distinct consecutive non-negative indices.
 ///
-/// Access to this class is thread-safe if all of the threads are only performing const operations, i.e. reading the names and indices.
+/// Access to this class is thread-safe if all of the threads are only performing const operations, i.e. reading
+/// the names and indices.
 class IndexDirectory
 {
 public:
 	/// Create an empty directory object.
-	IndexDirectory() {};
+	IndexDirectory();
 
 	/// Create a directory object initialized to a list of names.
 	/// \param names The names.
-	IndexDirectory(const std::vector<std::string>& names)
-	{
-		for (auto it = names.cbegin();  it != names.cend();  ++it)
-		{
-			addEntry(*it);
-		}
-	}
+	IndexDirectory(const std::vector<std::string>& names);
 
 	/// Given a name, return the corresponding index (or -1).
 	/// \param name The name.
@@ -80,11 +75,8 @@ public:
 	}
 
 	/// Get a list of all the names available from the index directory.
-	/// \return all the names.
-	const std::vector<std::string>& getAllNames() const
-	{
-		return m_names;
-	}
+	/// \return all the names, in index order.
+	const std::vector<std::string>& getAllNames() const;
 
 	/// Check whether the specified name exists in the directory.
 	///
@@ -117,36 +109,22 @@ protected:
 	friend class DataGroupBuilder;
 
 	/// Copy constructor.
-	/// Not directly accessible by external code, but but could be used by subclasses.
-	IndexDirectory(const IndexDirectory& directory)
-		: m_names(directory.m_names), m_indices(directory.m_indices)
-	{
-	}
+	/// Not generally accessible by external code, but is used by friend classes.
+	/// \sa NamedDataBuilder, DataGroupBuilder
+	IndexDirectory(const IndexDirectory& directory);
 
 	/// Assignment operator.
-	/// Not directly accessible by external code, but could be used by subclasses.
-	IndexDirectory& operator =(const IndexDirectory& directory)
-	{
-		m_names = directory.m_names;
-		m_indices = directory.m_indices;
-		return *this;
-	}
+	/// Not generally accessible by external code, but is used by friend classes.
+	/// \sa NamedDataBuilder, DataGroupBuilder
+	IndexDirectory& operator =(const IndexDirectory& directory);
 
 	/// Create a new entry for the specified name.
+	/// Not generally accessible by external code, but is used by friend classes.
+	/// \sa NamedDataBuilder, DataGroupBuilder
 	///
 	/// \param name The name, which should be non-empty and should not already exist in the directory.
 	/// \return the index of the created entry, or -1 if the entry could not be added.
-	int addEntry(const std::string& name)
-	{
-		if ((name.length() == 0) || (m_indices.count(name) > 0))
-		{
-			return -1;
-		}
-		int index = static_cast<int>(m_names.size());
-		m_names.push_back(name);
-		m_indices[name] = index;
-		return index;
-	}
+	int addEntry(const std::string& name);
 
 private:
 	/// The array of entry names, in index order.
@@ -159,4 +137,4 @@ private:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_INPUT_INDEX_DIRECTORY_H
+#endif  // SURGSIM_DATA_STRUCTURES_INDEX_DIRECTORY_H
