@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_NAMED_DATA_BUILDER_H
-#define SURGSIM_INPUT_NAMED_DATA_BUILDER_H
+#ifndef SURGSIM_DATA_STRUCTURES_NAMED_DATA_BUILDER_H
+#define SURGSIM_DATA_STRUCTURES_NAMED_DATA_BUILDER_H
 
 #include <memory>
 
@@ -158,4 +158,4 @@ private:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_INPUT_NAMED_DATA_BUILDER_H
+#endif  // SURGSIM_DATA_STRUCTURES_NAMED_DATA_BUILDER_H

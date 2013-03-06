@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_DATA_GROUP_INL_H
-#define SURGSIM_INPUT_DATA_GROUP_INL_H
+#ifndef SURGSIM_DATA_STRUCTURES_DATA_GROUP_INL_H
+#define SURGSIM_DATA_STRUCTURES_DATA_GROUP_INL_H
 
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/Assert.h>
@@ -156,4 +156,4 @@ inline void DataGroup::resetAll()
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_INPUT_DATA_GROUP_INL_H
+#endif  // SURGSIM_DATA_STRUCTURES_DATA_GROUP_INL_H

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_NAMED_DATA_INL_H
-#define SURGSIM_INPUT_NAMED_DATA_INL_H
+#ifndef SURGSIM_DATA_STRUCTURES_NAMED_DATA_INL_H
+#define SURGSIM_DATA_STRUCTURES_NAMED_DATA_INL_H
 
 #include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Framework/Assert.h>
@@ -286,4 +286,4 @@ inline int NamedData<T>::getNumEntries() const
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_INPUT_NAMED_DATA_INL_H
+#endif  // SURGSIM_DATA_STRUCTURES_NAMED_DATA_INL_H
