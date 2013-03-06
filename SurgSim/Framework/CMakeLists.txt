@@ -61,14 +61,25 @@ if(SURGSIM_TESTS_BUILD)
 endif()
 
 if(SURGSIM_WRAPPERS_BUILD)
+	find_package(PythonLibs REQUIRED)
+	set(${LIBRARY_OUTPUT_PATH} ${CMAKE_BINARY_DIR}/Python)
+	set_source_files_properties(Framework.i PROPERTIES CPLUSPLUS ON)
+	swig_add_module(Framework python Framework.i)
 
-find_package(PythonLibs REQUIRED)
-set_source_files_properties(Framework.i PROPERTIES CPLUSPLUS ON)
-swig_add_module(Framework python Framework.i)
+	swig_link_libraries( Framework 
+		${PYTHON_LIBRARIES}
+		${Boost_LIBRARIES}
+		SurgSimFramework
+	)
 
-swig_link_libraries( Framework 
-	${PYTHON_LIBRARIES}
-	${Boost_LIBRARIES}
-	SurgSimFramework
-)
+	message(STATUS ${LIBRARY_OUTPUT_PATH})
+
+	add_custom_command(
+		TARGET _Framework
+		POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/Framework.py
+										 ${CMAKE_BINARY_DIR}/Python/Framework.py
+		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/_Framework.pyd
+										 ${CMAKE_BINARY_DIR}/Python/_Framework.pyd
+	)
 endif()
