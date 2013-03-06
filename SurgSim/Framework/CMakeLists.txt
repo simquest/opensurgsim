@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -60,4 +58,17 @@ add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HE
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+endif()
+
+if(SURGSIM_WRAPPERS_BUILD)
+
+find_package(PythonLibs REQUIRED)
+set_source_files_properties(Framework.i PROPERTIES CPLUSPLUS ON)
+swig_add_module(Framework python Framework.i)
+
+swig_link_libraries( Framework 
+	${PYTHON_LIBRARIES}
+	${Boost_LIBRARIES}
+	SurgSimFramework
+)
 endif()

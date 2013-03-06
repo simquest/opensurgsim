@@ -35,7 +35,7 @@ find_package(Eigen3 REQUIRED)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.50 COMPONENTS thread system chrono REQUIRED)
+find_package(Boost 1.50 COMPONENTS thread system chrono date_time REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 
@@ -43,6 +43,17 @@ option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 if(SURGSIM_TESTS_BUILD)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
 	add_subdirectory(ThirdParty/gtest)
+endif()
+
+option(SURGSIM_WRAPPERS_BUILD "Build Pyton/Swig Wrappers" ON)
+if(SURGSIM_WRAPPERS_BUILD)
+	find_package(SWIG REQUIRED)
+	include(${SWIG_USE_FILE})
+
+	find_package(PythonLibs REQUIRED)
+
+	include_directories(${PYTHON_INCLUDE_PATH})
+	set(CMAKE_SWIG_FLAGS "")
 endif()
 
 add_subdirectory(SurgSim)

@@ -62,7 +62,7 @@ public:
 
 	/// Gets all the components of this SceneElement.
 	/// \return	The components.
-	std::vector<std::shared_ptr<Component>> getComponents() const;
+	std::vector< std::shared_ptr<Component> > getComponents() const;
 
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
@@ -85,10 +85,10 @@ public:
 private:
 
 	std::string m_name;
-	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;
+	std::unordered_map< std::string, std::shared_ptr<Component> > m_components;
 	std::weak_ptr<Runtime> m_runtime;
-	virtual bool doInitialize() = 0;
-	virtual bool doWakeUp() = 0;
+	virtual bool doInitialize() {return true;};
+	virtual bool doWakeUp() {return true;};
 
 };
 
