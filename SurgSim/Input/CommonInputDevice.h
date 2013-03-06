@@ -21,13 +21,13 @@
 
 #include <SurgSim/Input/InputDeviceInterface.h>
 #include <SurgSim/Input/InputDeviceListenerInterface.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 
 namespace SurgSim
 {
 namespace Input
 {
 
-class DataGroup;
 
 /// A class that implements some common management code on top of the InputDeviceInterface.
 ///
@@ -45,14 +45,14 @@ public:
 	/// \param name The name associated with the input device.
 	/// \param inputData An initial value for the application's input from the device (i.e. the device's output).
 	/// 	It should be initialized with data layout that will be used for the input coming from this device; the actual values in the .
-	CommonInputDevice(const std::string& name, const DataGroup& inputData);
+	CommonInputDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData);
 
 	/// Constructor.
 	///
 	/// \param name The name associated with the input device.
 	/// \param inputData An initial value for the application's input from the device (i.e. the device's output).
 	/// 	It should be initialized with data layout that will be used for the input coming from this device; the actual values in the .
-	CommonInputDevice(const std::string& name, DataGroup&& inputData);
+	CommonInputDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const;
@@ -73,33 +73,30 @@ protected:
 
 	/// Provides access to the input data \ref DataGroup.
 	/// \return A const reference to the input data.
-	const SurgSim::Input::DataGroup& getInputData() const
+	const SurgSim::DataStructures::DataGroup& getInputData() const
 	{
 		return m_inputData;
 	}
 	/// Provides access to the input data \ref DataGroup.
 	/// \return A writable reference to the input data.
-	SurgSim::Input::DataGroup& getInputData()
+	SurgSim::DataStructures::DataGroup& getInputData()
 	{
 		return m_inputData;
 	}
 
 	/// Provides access to the output data \ref DataGroup.
 	/// \return A const reference to the output data.
-	const SurgSim::Input::DataGroup& getOutputData() const
+	const SurgSim::DataStructures::DataGroup& getOutputData() const
 	{
 		return m_outputData;
 	}
-// 	/// Provides access to the output data \ref DataGroup.
-// 	/// \return A writable reference to the output data.
-// 	SurgSim::Input::DataGroup& getOutputData() { return m_outputData; }
 
 private:
 	struct State;
 
 	std::string m_name;
-	DataGroup m_inputData;
-	DataGroup m_outputData;
+	SurgSim::DataStructures::DataGroup m_inputData;
+	SurgSim::DataStructures::DataGroup m_outputData;
 	State* m_state;
 };
 

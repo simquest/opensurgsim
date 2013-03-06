@@ -19,16 +19,16 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Framework/Log.h>
-#include <SurgSim/Input/DataGroup.h>
-#include <SurgSim/Input/DataGroupBuilder.h>
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Input::DataGroup;
-using SurgSim::Input::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
 
 
 namespace SurgSim

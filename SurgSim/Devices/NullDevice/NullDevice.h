@@ -46,7 +46,7 @@ protected:
 	virtual bool finalize();
 
 	/// Builds the data layout for the application input (i.e. device output).
-	static SurgSim::Input::DataGroup buildInputData();
+	static SurgSim::DataStructures::DataGroup buildInputData();
 };
 
 };  // namespace Device

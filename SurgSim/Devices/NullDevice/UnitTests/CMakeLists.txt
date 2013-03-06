@@ -26,5 +26,5 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS NullDevice SurgSimInput SurgSimFramework gtest ${Boost_LIBRARIES})
+set(LIBS NullDevice SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
 surgsim_add_unit_tests(NullDeviceTest)

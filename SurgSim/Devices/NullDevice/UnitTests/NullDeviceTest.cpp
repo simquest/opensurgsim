@@ -21,13 +21,13 @@
 #include <string>
 #include <gtest/gtest.h>
 #include <SurgSim/Devices/NullDevice/NullDevice.h>
-#include <SurgSim/Input/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Input/InputDeviceListenerInterface.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
 using SurgSim::Device::NullDevice;
-using SurgSim::Input::DataGroup;
+using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputDeviceListenerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;

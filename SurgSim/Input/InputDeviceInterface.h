@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/DataGroup.h>
 #include <SurgSim/Input/InputDeviceListenerInterface.h>
 
 namespace SurgSim

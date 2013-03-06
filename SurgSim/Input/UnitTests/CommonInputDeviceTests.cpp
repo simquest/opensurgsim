@@ -22,15 +22,15 @@
 #include <gtest/gtest.h>
 #include <SurgSim/Input/CommonInputDevice.h>
 #include <SurgSim/Input/InputDeviceListenerInterface.h>
-#include <SurgSim/Input/DataGroup.h>
-#include <SurgSim/Input/DataGroupBuilder.h>
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
 using SurgSim::Input::CommonInputDevice;
 using SurgSim::Input::InputDeviceListenerInterface;
-using SurgSim::Input::DataGroup;
-using SurgSim::Input::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 

@@ -55,13 +55,13 @@ struct CommonInputDevice::State
 };
 
 
-CommonInputDevice::CommonInputDevice(const std::string& name, const DataGroup& inputData) :
+CommonInputDevice::CommonInputDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
 	m_name(name), m_inputData(inputData), m_state(new State)
 {
 }
 
 
-CommonInputDevice::CommonInputDevice(const std::string& name, DataGroup&& inputData) :
+CommonInputDevice::CommonInputDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
 	m_name(name), m_inputData(std::move(inputData)), m_state(new State)
 {
 }

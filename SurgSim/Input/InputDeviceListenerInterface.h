@@ -20,10 +20,14 @@
 
 namespace SurgSim
 {
+namespace DataStructures
+{
+class DataGroup;
+}; // namespace DataStructures
+
 namespace Input
 {
 
-class DataGroup;
 class InputDeviceInterface;
 
 
@@ -57,7 +61,7 @@ public:
 	/// 	the device (e.g. if the listener is listening to several devices at once).
 	/// \param inputData The input state coming from the device (i.e. the application's input but the device's
 	/// 	<em>output</em>).
-	virtual void handleInput(const std::string& device, const DataGroup& inputData) = 0;
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
 
 	/// Asks the listener to provide output state to the device.
 	///
@@ -90,7 +94,7 @@ public:
 	/// 		that returns false should leave outputData unmodified.  This allows the application to register
 	/// 		several listeners with the same device, but ensure that only one of them will be providing the
 	/// 		output information.
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData) = 0;
+	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) = 0;
 };
 
 };  // namespace Input
