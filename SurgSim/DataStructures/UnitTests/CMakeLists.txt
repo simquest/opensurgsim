@@ -15,21 +15,22 @@
 
 
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-set(SURGSIM_MATH_SOURCES
+set(UNIT_TEST_SOURCES
+	DataGroupTests.cpp
+	IndexDirectoryTests.cpp
+	NamedDataTests.cpp
 )
 
-set(SURGSIM_MATH_HEADERS
-	Matrix.h
-	Quaternion.h
-	RigidTransform.h
-	Vector.h
+set(UNIT_TEST_HEADERS
 )
 
-#add_library(SurgSimMath ${SURGSIM_MATH_SOURCES} ${SURGSIM_MATH_HEADERS})
+include_directories(
+)
 
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
+set(LIBS SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
+
+surgsim_add_unit_tests(SurgSimDataStructuresTest)
