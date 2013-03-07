@@ -15,10 +15,10 @@
 
 #include "SimpleSquareForce.h"
 
-#include <SurgSim/Input/DataGroupBuilder.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 
-using SurgSim::Input::DataGroup;
-using SurgSim::Input::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::RigidTransform3d;
@@ -45,7 +45,7 @@ SimpleSquareForce::SimpleSquareForce() :
 
 void SimpleSquareForce::handleInput(const std::string& device, const DataGroup& inputData)
 {
-	m_outputData.reset();
+	m_outputData.resetAll();
 
 	RigidTransform3d devicePose;
 	if (! inputData.poses().get("pose", devicePose))

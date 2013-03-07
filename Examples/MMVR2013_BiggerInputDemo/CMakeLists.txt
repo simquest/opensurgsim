@@ -48,5 +48,5 @@ set(EXAMPLE_HEADERS
 add_executable(MMVR2013_BiggerInputDemo
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 target_link_libraries(MMVR2013_BiggerInputDemo
-	${LIBS} PhantomDevice NullDevice SurgSimInput SurgSimFramework
+	${LIBS} PhantomDevice NullDevice SurgSimInput SurgSimFramework SurgSimDataStructures
 	${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} ${GLUT_LIBRARIES})

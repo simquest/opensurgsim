@@ -18,33 +18,34 @@
 
 #include <string>
 
-#include <SurgSim/Input/InputDeviceListenerInterface.h>
-#include <SurgSim/Input/DataGroup.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 
 #include <SurgSim/Framework/ThreadSafeContainer.h>
 
 
 /// A simple listener to calculate collision force against a square area for the example application.
 /// Includes support for the square being moved by a second tool.
-/// \sa SurgSim::Input::InputDeviceListenerInterface
-class MovingSquareForce : public SurgSim::Input::InputDeviceListenerInterface
+/// \sa SurgSim::Input::InputConsumerInterface, SurgSim::Input::OutputProducerInterface
+class MovingSquareForce : public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
 {
 public:
 	/// Constructor.
 	MovingSquareForce(const std::string& toolDeviceName, const std::string& squareDeviceName);
 
-	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData);
 
-	virtual bool requestOutput(const std::string& device, SurgSim::Input::DataGroup* outputData);
+	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData);
 
 protected:
 	/// Updates the state of the tool as described by toolInputData.
 	/// \param toolInputData The state of the device controlling the tool.
-	void updateTool(const SurgSim::Input::DataGroup& toolInputData);
+	void updateTool(const SurgSim::DataStructures::DataGroup& toolInputData);
 
 	/// Updates the state of the square as described by squareInputData.
 	/// \param squareInputData The state of the device controlling the colliding square.
-	void updateSquare(const SurgSim::Input::DataGroup& squareInputData);
+	void updateSquare(const SurgSim::DataStructures::DataGroup& squareInputData);
 
 	/// Calculates the force as a function of device tip position.
 	/// The calculation is very simple, for a simple demo of the device input/output functionality.
@@ -77,7 +78,7 @@ private:
 	const std::string m_squareDeviceName;
 
 	/// Internally stored output data (force and torque).
-	SurgSim::Input::DataGroup m_outputData;
+	SurgSim::DataStructures::DataGroup m_outputData;
 
 	/// One half of the edge length of the square we're colliding against, in meters.
 	double m_squareHalfSize;

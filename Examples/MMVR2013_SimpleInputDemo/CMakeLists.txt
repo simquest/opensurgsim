@@ -37,5 +37,5 @@ set(EXAMPLE_HEADERS
 add_executable(MMVR2013_SimpleInputDemo
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 target_link_libraries(MMVR2013_SimpleInputDemo
-	${LIBS} PhantomDevice SurgSimInput SurgSimFramework
+	${LIBS} PhantomDevice SurgSimInput SurgSimFramework SurgSimDataStructures
 	${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})

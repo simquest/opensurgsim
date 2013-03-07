@@ -16,21 +16,22 @@
 #ifndef SIMPLE_SQUARE_FORCE_H
 #define SIMPLE_SQUARE_FORCE_H
 
-#include <SurgSim/Input/InputDeviceListenerInterface.h>
-#include <SurgSim/Input/DataGroup.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 
 
 /// A simple listener to calculate collision force against a square area for the example application.
-/// \sa SurgSim::Input::InputDeviceListenerInterface
-class SimpleSquareForce : public SurgSim::Input::InputDeviceListenerInterface
+/// \sa SurgSim::Input::InputConsumerInterface, SurgSim::Input::OutputProducerInterface
+class SimpleSquareForce : public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
 {
 public:
 	/// Constructor.
 	SimpleSquareForce();
 
-	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData);
 
-	virtual bool requestOutput(const std::string& device, SurgSim::Input::DataGroup* outputData);
+	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData);
 
 protected:
 	/// Calculates the force as a function of device tip position.
@@ -42,7 +43,7 @@ protected:
 
 private:
 	/// Internally stored output data (force and torque).
-	SurgSim::Input::DataGroup m_outputData;
+	SurgSim::DataStructures::DataGroup m_outputData;
 
 	/// One half of the edge length of the square we're colliding against, in meters.
 	double m_squareHalfSize;

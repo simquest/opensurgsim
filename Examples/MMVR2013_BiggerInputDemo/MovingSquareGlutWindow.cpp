@@ -15,7 +15,7 @@
 
 #include "MovingSquareGlutWindow.h"
 
-using SurgSim::Input::DataGroup;
+using SurgSim::DataStructures::DataGroup;
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::RigidTransform3d;
@@ -109,9 +109,4 @@ void MovingSquareGlutWindow::updateSquare(const DataGroup& inputData)
 	}
 
 	m_square->pose = devicePose;
-}
-
-bool MovingSquareGlutWindow::requestOutput(const std::string& device, DataGroup* outputData)
-{
-	return true;
 }

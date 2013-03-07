@@ -45,13 +45,15 @@ int main(int argc, char** argv)
 	std::shared_ptr<NullDevice> squareDevice = std::make_shared<NullDevice>("SquareDevice");
 
 	std::shared_ptr<MovingSquareForce> squareForce = std::make_shared<MovingSquareForce>("ToolDevice", "SquareDevice");
-	toolDevice->addListener(squareForce);
-	squareDevice->addListener(squareForce);
+	toolDevice->addInputConsumer(squareForce);
+	toolDevice->setOutputProducer(squareForce);
+	squareDevice->addInputConsumer(squareForce);
+	// NB: the code does not currently support exerting the reaction force on the square.
 
 	std::shared_ptr<MovingSquareGlutWindow> squareGlutWindow = std::make_shared<MovingSquareGlutWindow>("ToolDevice", 
 		"SquareDevice");
-	toolDevice->addListener(squareGlutWindow);
-	squareDevice->addListener(squareGlutWindow);
+	toolDevice->addInputConsumer(squareGlutWindow);
+	squareDevice->addInputConsumer(squareGlutWindow);
 
 	printf("\n"
 	       "**********************************************************************\n"

@@ -18,15 +18,16 @@
 
 #include <boost/thread.hpp>
 
-#include <SurgSim/Input/InputDeviceListenerInterface.h>
-#include <SurgSim/Input/DataGroup.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 
 #include "GlutRenderer.h"
 
 /// A simple listener to display the simple scene composed of a square and tool for the example application.
 /// Includes support for the square being moved by a second tool.
-/// \sa SurgSim::Input::InputDeviceListenerInterface
-class MovingSquareGlutWindow : public SurgSim::Input::InputDeviceListenerInterface
+/// \sa SurgSim::Input::InputConsumerInterface
+class MovingSquareGlutWindow : public SurgSim::Input::InputConsumerInterface
 {
 public:
 	/// Constructor.
@@ -37,12 +38,7 @@ public:
 	/// Handles input from a device.
 	/// \param device Name of the device.
 	/// \param inputData Input data from the device.
-	virtual void handleInput(const std::string& device, const SurgSim::Input::DataGroup& inputData);
-
-	/// Gets output for a device. This listener provides no output, as it only handles display of the scene.
-	/// \param device Name of the device.
-	/// \param outputData Output for data to provide to the device.
-	virtual bool requestOutput(const std::string& device, SurgSim::Input::DataGroup* outputData);
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData);
 
 protected:
 
@@ -69,10 +65,10 @@ private:
 
 	/// Updates the tool based on the device input.
 	/// \param inputData Input data from the device.
-	void updateTool(const SurgSim::Input::DataGroup& inputData);
+	void updateTool(const SurgSim::DataStructures::DataGroup& inputData);
 	/// Updates the square based on the device input.
 	/// \param inputData Input data from the device.
-	void updateSquare(const SurgSim::Input::DataGroup& inputData);
+	void updateSquare(const SurgSim::DataStructures::DataGroup& inputData);
 
 };
 

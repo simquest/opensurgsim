@@ -36,7 +36,8 @@ int main(int argc, char** argv)
 	}
 
 	std::shared_ptr<SimpleSquareForce> squareForce = std::make_shared<SimpleSquareForce>();
-	device->addListener(squareForce);
+	device->addInputConsumer(squareForce);
+	device->setOutputProducer(squareForce);
 
 	printf("\n"
 	       "**********************************************************************\n"

@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/CommonInputDevice.h>
+#include <SurgSim/Input/CommonDevice.h>
 
 namespace SurgSim
 {
@@ -35,7 +35,7 @@ class PhantomManager;
 /// 3DoF haptic output (forces only, no torques).
 ///
 /// \sa SurgSim::Input::InputDeviceInterface
-class PhantomDevice : public SurgSim::Input::CommonInputDevice
+class PhantomDevice : public SurgSim::Input::CommonDevice
 {
 public:
 	virtual ~PhantomDevice();
@@ -67,7 +67,7 @@ protected:
 	virtual bool finalize();
 
 	/// Builds the data layout for the application input (i.e. device output).
-	static SurgSim::Input::DataGroup buildInputData();
+	static SurgSim::DataStructures::DataGroup buildInputData();
 
 	/// Check for OpenHaptics HDAPI errors, display them, and signal fatal errors.
 	///
