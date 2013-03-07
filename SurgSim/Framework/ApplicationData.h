@@ -59,7 +59,7 @@ public:
 	/// search is shallow, only direct content of the directories in the path list 
 	/// will be used as search candidates. 
 	/// \param	fileName	Filename of the file.
-	/// \return	The absolute path to the file in system format i.e c:\xxx\yyy\file.txt for 
+	/// \return	The absolute path to the file in system format i.e c:\\xxx\\yyy\\file.txt for 
 	/// 		windows and /xxx/yyy/file.txt for all other systems. An empty string will be
 	/// 		returned if the file cannot be found.
 	std::string findFile(const std::string& fileName) const;
