@@ -19,16 +19,16 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Framework/Log.h>
-#include <SurgSim/Input/DataGroup.h>
-#include <SurgSim/Input/DataGroupBuilder.h>
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Input::DataGroup;
-using SurgSim::Input::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
 
 
 namespace SurgSim
@@ -38,19 +38,19 @@ namespace Device
 
 
 NullDevice::NullDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonInputDevice(uniqueName, buildInputData())
+	SurgSim::Input::CommonDevice(uniqueName, buildInputData())
 {
 }
 
 bool NullDevice::initialize()
 {
-	// required by the InputDeviceInterface API
+	// required by the DeviceInterface API
 	return true;
 }
 
 bool NullDevice::finalize()
 {
-	// required by the InputDeviceInterface API
+	// required by the DeviceInterface API
 	return true;
 }
 
@@ -62,31 +62,23 @@ DataGroup NullDevice::buildInputData()
 	return builder.createData();
 }
 
-bool NullDevice::addListener(std::shared_ptr<SurgSim::Input::InputDeviceListenerInterface> listener)
+bool NullDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
 {
-	bool status = CommonInputDevice::addListener(std::move(listener));
+	if (! CommonDevice::addInputConsumer(std::move(inputConsumer)))
+	{
+		return false;
+	}
 
 	// The NullDevice doesn't have any input events; it just sits there.
-	// So we push the output to all the listeners, including the new one, right away after we add it.
+	// So we push the output to all the consumers, including the new one, right away after we add a consumer.
+	// This ensures that all consumers always see the identity pose.
 	getInputData().poses().put("pose", RigidTransform3d::Identity());
 	getInputData().booleans().put("button0", false);
 	pushInput();
 
-	return status;
+	return true;
 }
 
-bool NullDevice::addInputListener(std::shared_ptr<SurgSim::Input::InputDeviceListenerInterface> listener)
-{
-	bool status = CommonInputDevice::addInputListener(std::move(listener));
-
-	// The NullDevice doesn't have any input events; it just sits there.
-	// So we push the output to all the listeners, including the new one, right away after we add it.
-	getInputData().poses().put("pose", RigidTransform3d::Identity());
-	getInputData().booleans().put("button0", false);
-	pushInput();
-
-	return status;
-}
 
 };  // namespace Device
 };  // namespace SurgSim

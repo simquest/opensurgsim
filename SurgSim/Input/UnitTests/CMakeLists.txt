@@ -20,9 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	DataGroupTests.cpp
-	IndexDirectoryTests.cpp
-	NamedDataTests.cpp
+	CommonDeviceTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -31,7 +29,6 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-#set(LIBS SurgSimFramework SurgSimInput gtest ${Boost_LIBRARIES})
-set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimInputTest)
