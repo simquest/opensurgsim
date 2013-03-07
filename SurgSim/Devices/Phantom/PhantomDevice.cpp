@@ -25,16 +25,16 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Devices/Phantom/PhantomManager.h>
-#include <SurgSim/Input/DataGroup.h>
-#include <SurgSim/Input/DataGroupBuilder.h>
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Input::DataGroup;
-using SurgSim::Input::DataGroupBuilder;
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
 
 
 namespace SurgSim
@@ -80,7 +80,7 @@ struct PhantomDevice::State
 
 PhantomDevice::PhantomDevice(const PhantomManager& manager, const std::string& uniqueName,
                              const std::string& initializationName) :
-	SurgSim::Input::CommonInputDevice(uniqueName, buildInputData()),
+	SurgSim::Input::CommonDevice(uniqueName, buildInputData()),
 	m_logger(manager.getLogger()),
 	m_initializationName(initializationName),
 	m_messageLabel("Device " + uniqueName + ": "),
