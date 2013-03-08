@@ -45,7 +45,7 @@ public:
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
 
-	/// Adds an input consumer that will be notified when input state is updated.
+	/// Adds an input consumer that will be notified when the application input state is updated.
 	///
 	/// \param inputConsumer The input consumer to be added.
 	/// \return true on success, false on failure.
@@ -55,7 +55,7 @@ public:
 	/// \param inputConsumer The input consumer to be removed.
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) = 0;
 	
-	/// Sets an output producer that will be asked for output state when the device needs it.
+	/// Sets an output producer that will be asked for application output state when the device needs it.
 	/// Any previously set output producer will be removed.
 	///
 	/// \param outputProducer The output producer to be added.

@@ -39,7 +39,7 @@ public:
 	/// \param name The name associated with the input device.
 	/// \param inputData An initial value for the application's input from the device (e.g. pose etc).
 	/// 	The concrete device implementation should pass in a DataGroup whose contents has been set up, e.g. by
-	/// 	using a DataGroupBuilder, to that device's supported values.
+	/// 	using a DataGroupBuilder, to that device's supported values that it will push to the application.
 	CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData);
 
 	/// Constructor.
@@ -47,7 +47,7 @@ public:
 	/// \param name The name associated with the input device.
 	/// \param inputData An initial value for the application's input from the device (e.g. pose etc).
 	/// 	The concrete device implementation should pass in a DataGroup whose contents has been set up, e.g. by
-	/// 	using a DataGroupBuilder, to that device's supported values.
+	/// 	using a DataGroupBuilder, to that device's supported values that it will push to the application.
 	CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
 
 	/// Return a (hopefully unique) device name.
@@ -69,20 +69,22 @@ protected:
 	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
-	/// Provides access to the input data \ref DataGroup.
+	/// Provides access to the input data \ref DataGroup for derived classes.
 	/// \return A const reference to the input data.
 	const SurgSim::DataStructures::DataGroup& getInputData() const
 	{
 		return m_inputData;
 	}
-	/// Provides access to the input data \ref DataGroup.
+	/// Provides access to the input data \ref DataGroup for derived classes.
 	/// \return A writable reference to the input data.
 	SurgSim::DataStructures::DataGroup& getInputData()
 	{
 		return m_inputData;
 	}
 
-	/// Provides access to the output data \ref DataGroup.
+	/// Provides access to the output data \ref DataGroup for derived classes.
+	/// Note that a writable variant is not provided, since derived classes will not need to write to the application
+	/// output data (an output producer registered via \ref setOutputProducer will be called to do that).
 	/// \return A const reference to the output data.
 	const SurgSim::DataStructures::DataGroup& getOutputData() const
 	{
