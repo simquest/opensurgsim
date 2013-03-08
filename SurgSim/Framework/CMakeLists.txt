@@ -23,6 +23,7 @@ include_directories(
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
+	ApplicationData.cpp
 	BasicThread.cpp
 	Barrier.cpp
 #	BehaviorManager.cpp
@@ -36,6 +37,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 )
 
 set(SURGSIM_FRAMEWORK_HEADERS
+	ApplicationData.h
 	Assert.h
 	AssertMessage.h
 	BasicThread.h
