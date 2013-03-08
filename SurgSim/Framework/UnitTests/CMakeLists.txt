@@ -21,6 +21,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	ApplicationDataTest.cpp
 	AssertTest.cpp
 #	BehaviorManagerTest.cpp
 	BaseThreadTest.cpp
@@ -37,6 +38,8 @@ set(UNIT_TEST_HEADERS
 
 include_directories(
 )
+
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
