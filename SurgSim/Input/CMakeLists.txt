@@ -24,7 +24,6 @@ set(SURGSIM_INPUT_SOURCES
 
 set(SURGSIM_INPUT_HEADERS
 	CommonDevice.h
-	DeviceClassManagerInterface.h
 	DeviceInterface.h
 	InputConsumerInterface.h
 	OutputProducerInterface.h
