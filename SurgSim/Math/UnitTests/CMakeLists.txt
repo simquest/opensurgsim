@@ -19,6 +19,12 @@ include_directories(
 	${gtest_SOURCE_DIR}
 )
 
+# Fix a problem with 64-bit builds running out of sections.
+if(MSVC AND CMAKE_CL_64)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+endif(MSVC AND CMAKE_CL_64)
+
+
 set(UNIT_TEST_SOURCES
 	MatrixTests.cpp
 	QuaternionTests.cpp

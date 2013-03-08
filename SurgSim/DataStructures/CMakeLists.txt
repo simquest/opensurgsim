@@ -18,22 +18,23 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 )
 
-set(SURGSIM_MATH_SOURCES
+set(SURGSIM_DATA_STRUCTURES_SOURCES
+	DataGroupBuilder.cpp
+	IndexDirectory.cpp
 )
 
-set(SURGSIM_MATH_HEADERS
-	Matrix.h
-	Quaternion.h
-	RigidTransform.h
-	Vector.h
+set(SURGSIM_DATA_STRUCTURES_HEADERS
+	DataGroup.h
+	DataGroup-inl.h
+	DataGroupBuilder.h
+	IndexDirectory.h
+	NamedData.h
+	NamedData-inl.h
+	NamedDataBuilder.h
 )
 
-#add_library(SurgSimMath ${SURGSIM_MATH_SOURCES} ${SURGSIM_MATH_HEADERS})
-#install(TARGETS SurgSimMath
-#    RUNTIME DESTINATION bin
-#    LIBRARY DESTINATION lib
-#    ARCHIVE DESTINATION lib)
-install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION include/SurgSim/Math)
+add_library(SurgSimDataStructures
+	${SURGSIM_DATA_STRUCTURES_SOURCES} ${SURGSIM_DATA_STRUCTURES_HEADERS})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
