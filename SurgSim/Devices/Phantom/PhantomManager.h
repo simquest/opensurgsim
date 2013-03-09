@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include <SurgSim/Input/DeviceClassManagerInterface.h>
 #include <SurgSim/Framework/Logger.h>
 
 namespace SurgSim
@@ -32,9 +31,7 @@ class PhantomDevice;
 ///
 /// This should support any PHANTOM device that can communicate using OpenHaptics 3.0 toolkit, such as PHANTOM
 /// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.
-///
-/// \sa SurgSim::Input::DeviceClassManagerInterface
-class PhantomManager : public SurgSim::Input::DeviceClassManagerInterface
+class PhantomManager
 {
 public:
 	/// Constructor.
