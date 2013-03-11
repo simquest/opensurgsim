@@ -90,7 +90,8 @@ PhantomManager::~PhantomManager()
 }
 
 
-std::shared_ptr<PhantomDevice> PhantomManager::createDevice(const std::string& uniqueName, const std::string& initializationName)
+std::shared_ptr<PhantomDevice> PhantomManager::createDevice(const std::string& uniqueName,
+                                                            const std::string& initializationName)
 {
 	std::shared_ptr<PhantomDevice> device(new PhantomDevice(*this, uniqueName, initializationName));
 	if (! device->initialize())

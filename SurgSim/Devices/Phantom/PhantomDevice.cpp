@@ -110,7 +110,8 @@ bool PhantomDevice::initialize()
 	if (checkForFatalError("Failed to initialize"))
 	{
 		// HDAPI error message already logged
-		SURGSIM_LOG_INFO(m_logger) << std::endl << "  OpenHaptics device name: '" << m_initializationName << "'" << std::endl;
+		SURGSIM_LOG_INFO(m_logger) << std::endl <<
+		                           "  OpenHaptics device name: '" << m_initializationName << "'" << std::endl;
 		return false;
 	}
 	else if (hHD == HD_INVALID_HANDLE)

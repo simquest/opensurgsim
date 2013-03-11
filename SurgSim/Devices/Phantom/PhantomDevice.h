@@ -34,7 +34,7 @@ class PhantomManager;
 /// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.  The implementation is currently limited to
 /// 3DoF haptic output (forces only, no torques).
 ///
-/// \sa SurgSim::Input::InputDeviceInterface
+/// \sa SurgSim::Device::PhantomManager, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class PhantomDevice : public SurgSim::Input::CommonDevice
 {
 public:

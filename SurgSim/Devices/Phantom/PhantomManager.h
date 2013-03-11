@@ -30,12 +30,18 @@ class PhantomDevice;
 /// A class that manages Sensable PHANTOM devices.
 ///
 /// This should support any PHANTOM device that can communicate using OpenHaptics 3.0 toolkit, such as PHANTOM
-/// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.
+/// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.  The implementation is currently limited to
+/// 3DoF haptic output (forces only, no torques).
+///
+/// \sa SurgSim::Device::PhantomDevice
 class PhantomManager
 {
 public:
 	/// Constructor.
-	explicit PhantomManager(std::shared_ptr<SurgSim::Framework::Logger> logger = std::shared_ptr<SurgSim::Framework::Logger>());
+	/// \param logger (optional) The logger to be used for the manager object and the devices it manages.
+	/// 			  If unspecified or empty, a console logger will be created and used.
+	explicit PhantomManager(std::shared_ptr<SurgSim::Framework::Logger> logger =
+	                            std::shared_ptr<SurgSim::Framework::Logger>());
 
 	/// Destructor.
 	~PhantomManager();
@@ -49,12 +55,15 @@ public:
 
 	/// Creates a device.
 	///
+	/// \param uniqueName A unique name for the device that will be used by the application.
+	/// \param initializationName The name passed to HDAPI when initializing the device.  This should match a
+	/// 	configured PHANTOM device; alternately, an empty string indicates the default device.
 	/// \return The newly created device, or an empty shared_ptr if the initialization fails.
 	std::shared_ptr<PhantomDevice> createDevice(const std::string& uniqueName, const std::string& initializationName);
 
-	/// Shuts down and releases (i.e. possibly destroys) the specified device.
+	/// Shuts down and releases (and possibly destroys) the specified device.
 	///
-	/// After being shut down, the device object will be destroyed, but only if there are no other shared_ptr
+	/// After being released, the device object will be destroyed, but only if there are no other shared_ptr
 	/// references to it being held elsewhere.
 	///
 	/// \param device The device.
@@ -62,6 +71,7 @@ public:
 	bool releaseDevice(std::shared_ptr<PhantomDevice> device);
 
 	/// Executes the operations for a single haptic frame.
+	/// Should only be called from the context of an OpenHaptics callback.
 	/// \return true on success.
 	bool runHapticFrame();
 
