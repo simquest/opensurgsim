@@ -86,12 +86,15 @@ public:
 
 
 	/// Destroy the container and the data it contains.
-	~ThreadSafeContainer() { m_readBuffer = m_writeBuffer = 0; };
+	~ThreadSafeContainer()
+	{
+		m_readBuffer = m_writeBuffer = 0;
+	};
 
 	/// Write (copy) new data into the container.
 	///
 	/// The data will be copied into internal storage, but will not be seen by the reader until it calls
-    /// \ref update.  If \ref set is called again before \ref update, the first data will be overwritten.
+	/// \ref update.  If \ref set is called again before \ref update, the first data will be overwritten.
 	/// \arg value The value to be written.
 	void set(const T& value)
 	{
@@ -103,7 +106,7 @@ public:
 	/// Write (move) new data into the container.
 	///
 	/// The data will be moved into internal storage, but will not be seen by the reader until it calls
-    /// \ref update.  If \ref set is called again before \ref update, the first data will be overwritten.
+	/// \ref update.  If \ref set is called again before \ref update, the first data will be overwritten.
 	/// \arg value The value to be written.
 	void set(T&& value)
 	{
@@ -168,15 +171,21 @@ private:
 
 	/// First internal buffer
 	T m_buffer0;
+
 	/// Second internal buffer
 	T m_buffer1;
+
 	/// Pointer to the buffer currently active for reading.
-	/// Access to the data is always read-only, but we don't declare it \c const so we can swap it with the write buffer.
+	/// Access to the data is always read-only, but we don't declare it \c const
+	/// so we can swap it with the write buffer.
 	T* m_readBuffer;
+
 	/// Pointer to the buffer currently active for writing.
 	T* m_writeBuffer;
+
 	/// Is there data that has been written, but not yet pulled in by \ref update ?
 	bool m_haveNewData;
+
 	/// Mutex for synchronization of set() and update() calls
 	boost::mutex m_mutex;
 };

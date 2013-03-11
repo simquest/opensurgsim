@@ -55,7 +55,8 @@ public:
 	}
 
 	// A specialization for output manipulators (functions that apply to the stream).
-	// Otherwise overloaded manipulators like std::endl and std::endl don't work, since the compiler can't know what overloaded variant to apply.
+	// Otherwise overloaded manipulators like std::endl and std::endl don't work, since the compiler can't know
+	// what overloaded variant to apply.
 	LogMessageBase& operator <<(std::ios_base& (*manipulator)(std::ios_base&))
 	{
 		m_stream << *manipulator;
@@ -63,7 +64,8 @@ public:
 	}
 
 	// A specialization for output manipulators (functions that apply to the stream).
-	// Otherwise overloaded manipulators like std::hex and std::endl don't work, since the compiler can't know what overloaded variant to apply.
+	// Otherwise overloaded manipulators like std::hex and std::endl don't work, since the compiler can't know
+	// what overloaded variant to apply.
 	LogMessageBase& operator <<(std::ostream& (*manipulator)(std::ostream&))
 	{
 		m_stream << *manipulator;

@@ -59,7 +59,8 @@ inline Eigen::Quaternion<T> makeRotationQuaternion(const T& angle, const Eigen::
 
 /// Get the angle (in radians) and axis corresponding to a quaternion's rotation.
 template <typename T, int QOpt, int MOpt>
-inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion, T& angle, Eigen::Matrix<T, 3, 1, MOpt>& axis)
+inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
+                                T& angle, Eigen::Matrix<T, 3, 1, MOpt>& axis)
 {
 	Eigen::AngleAxis<T> angleAxis(quaternion);
 	angle = angleAxis.angle();
