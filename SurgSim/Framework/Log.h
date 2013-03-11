@@ -13,13 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file
+/// The convenience header that provides the entirety of the logging API.
+/// \ingroup loggingAPI
+/// \sa loggingAPI
+
 #ifndef SURGSIM_FRAMEWORK_LOG_H
 #define SURGSIM_FRAMEWORK_LOG_H
+
+/// \defgroup loggingAPI Logging API
+/// The logging API used by OpenSurgSim code.
+/// \sa assertAPI
+/// @{
+
+/// \defgroup logInternals Internal logging helpers
+/// Not meant for public consumption.
 
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Framework/LogMessage.h"
 #include "SurgSim/Framework/LogOutput.h"
 #include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Framework/Assert.h"
+
+/// @}
 
 #endif  // SURGSIM_FRAMEWORK_LOG_H
