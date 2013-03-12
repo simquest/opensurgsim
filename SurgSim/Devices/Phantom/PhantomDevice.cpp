@@ -91,8 +91,6 @@ PhantomDevice::PhantomDevice(const PhantomManager& manager, const std::string& u
 PhantomDevice::~PhantomDevice()
 {
 	finalize();  // it's OK if we finalized already
-	delete m_state;
-	m_state = 0;
 }
 
 bool PhantomDevice::initialize()

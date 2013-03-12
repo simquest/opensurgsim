@@ -54,6 +54,10 @@ CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::Dat
 {
 }
 
+CommonDevice::~CommonDevice()
+{
+}
+
 std::string CommonDevice::getName() const
 {
 	return m_name;

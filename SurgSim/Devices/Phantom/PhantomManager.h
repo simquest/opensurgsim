@@ -95,7 +95,7 @@ private:
 	struct State;
 
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	State* m_state;
+	std::unique_ptr<State> m_state;
 };
 
 };  // namespace Device

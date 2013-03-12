@@ -50,6 +50,9 @@ public:
 	/// 	using a DataGroupBuilder, to that device's supported values that it will push to the application.
 	CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
 
+	/// Destructor.
+	virtual ~CommonDevice();
+
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const;
 
@@ -97,7 +100,7 @@ private:
 	std::string m_name;
 	SurgSim::DataStructures::DataGroup m_inputData;
 	SurgSim::DataStructures::DataGroup m_outputData;
-	State* m_state;
+	std::unique_ptr<State> m_state;
 };
 
 

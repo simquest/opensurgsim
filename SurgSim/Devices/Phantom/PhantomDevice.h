@@ -92,7 +92,7 @@ private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 	std::string m_initializationName;
 	std::string m_messageLabel;
-	State* m_state;
+	std::unique_ptr<State> m_state;
 };
 
 };  // namespace Device

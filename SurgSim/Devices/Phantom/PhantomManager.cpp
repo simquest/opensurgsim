@@ -54,7 +54,7 @@ struct PhantomManager::State
 
 
 PhantomManager::PhantomManager(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_state(new State), m_logger(logger)
+	m_logger(logger), m_state(new State)
 {
 	if (m_logger == nullptr)
 	{
