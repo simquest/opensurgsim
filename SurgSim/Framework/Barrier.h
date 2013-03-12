@@ -55,8 +55,9 @@ public:
 	/// the same value.  This return value will be true if the \c success
 	/// argument was true in \em all of the threads; if any thread passes false,
 	/// the return value will be false.
-	/// \param success a value indicating if this thread has been successful, used to determine the return value across all threads.
-	/// \return true if all threads claimed success, false otherwise
+	/// \param success a value indicating if this thread has been successful, used to determine the return
+	/// 	value across all threads.
+	/// \return true if all threads claimed success, false otherwise.
 	bool wait(bool success);
 
 private:

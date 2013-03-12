@@ -90,7 +90,8 @@ inline Eigen::Matrix<T, 3, 3> makeRotationMatrix(const T& angle, const Eigen::Ma
 
 /// Get the angle (in radians) and axis corresponding to a rotation matrix.
 template <typename T, int MOpt, int VOpt>
-inline void computeAngleAndAxis(const Eigen::Matrix<T, 3, 3, MOpt>& matrix, T& angle, Eigen::Matrix<T, 3, 1, VOpt>& axis)
+inline void computeAngleAndAxis(const Eigen::Matrix<T, 3, 3, MOpt>& matrix,
+                                T& angle, Eigen::Matrix<T, 3, 1, VOpt>& axis)
 {
 	Eigen::AngleAxis<T> angleAxis(matrix);
 	angle = angleAxis.angle();

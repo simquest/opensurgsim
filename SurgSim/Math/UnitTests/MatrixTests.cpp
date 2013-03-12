@@ -221,8 +221,8 @@ TYPED_TEST(Matrix22Tests, ShiftCommaInitialization)
 	{
 		for (int col = 0;  col < 2;  ++col)
 		{
-			EXPECT_NEAR(1.1 + 0.2*row + 0.1*col, matrix(row, col), 1e-6)
-				<< row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(1.1 + 0.2*row + 0.1*col, matrix(row, col), 1e-6) <<
+			        row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -243,8 +243,8 @@ TYPED_TEST(Matrix33Tests, ShiftCommaInitialization)
 	{
 		for (int col = 0;  col < 3;  ++col)
 		{
-			EXPECT_NEAR(1.1 + 0.3*row + 0.1*col, matrix(row, col), 1e-6)
-				<< row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(1.1 + 0.3*row + 0.1*col, matrix(row, col), 1e-6) <<
+			        row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -266,8 +266,8 @@ TYPED_TEST(Matrix44Tests, ShiftCommaInitialization)
 	{
 		for (int col = 0;  col < 4;  ++col)
 		{
-			EXPECT_NEAR(1.1 + 0.4*row + 0.1*col, matrix(row, col), 1e-6)
-				<< row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(1.1 + 0.4*row + 0.1*col, matrix(row, col), 1e-6) <<
+			        row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -353,7 +353,8 @@ TYPED_TEST(AllMatrixTests, InitializeRowMajorFromArray)
 
 	// This array has more elements than we will need.
 	// The element type must match the matrix!
-	const T inputArray[18]  = {
+	const T inputArray[18]  =
+	{
 		0.01f,  1.02f,  2.03f,  3.04f,  4.05f,  5.06f,  6.07f,  7.08f,  8.09f,
 		9.10f, 10.11f, 11.12f, 12.13f, 13.14f, 14.15f, 15.16f, 16.17f, 17.18f
 	};
@@ -363,7 +364,8 @@ TYPED_TEST(AllMatrixTests, InitializeRowMajorFromArray)
 	{
 		for (int col = 0;  col < SIZE;  ++col)
 		{
-			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) << row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
+			        row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -379,7 +381,8 @@ TYPED_TEST(AllMatrixTests, InitializeColumnMajorFromArray)
 
 	// This array has more elements than we will need.
 	// The element type must match the matrix!
-	const T inputArray[18]  = {
+	const T inputArray[18]  =
+	{
 		0.01f,  1.02f,  2.03f,  3.04f,  4.05f,  5.06f,  6.07f,  7.08f,  8.09f,
 		9.10f, 10.11f, 11.12f, 12.13f, 13.14f, 14.15f, 15.16f, 16.17f, 17.18f
 	};
@@ -389,7 +392,8 @@ TYPED_TEST(AllMatrixTests, InitializeColumnMajorFromArray)
 	{
 		for (int col = 0;  col < SIZE;  ++col)
 		{
-			EXPECT_NEAR(0.01 + (col*SIZE + row) * 1.01, matrix(row, col), 1e-6) << row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(0.01 + (col*SIZE + row) * 1.01, matrix(row, col), 1e-6) <<
+			        row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -404,7 +408,8 @@ TYPED_TEST(AllMatrixTests, InitializeFromArray)
 
 	// This array has more elements than we will need.
 	// The element type must match the matrix!
-	const T inputArray[18]  = {
+	const T inputArray[18]  =
+	{
 		0.01f,  1.02f,  2.03f,  3.04f,  4.05f,  5.06f,  6.07f,  7.08f,  8.09f,
 		9.10f, 10.11f, 11.12f, 12.13f, 13.14f, 14.15f, 15.16f, 16.17f, 17.18f
 	};
@@ -414,7 +419,8 @@ TYPED_TEST(AllMatrixTests, InitializeFromArray)
 	{
 		for (int col = 0;  col < SIZE;  ++col)
 		{
-			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) << row << "," << col << " wasn't properly initialized.";
+			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
+			        row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -799,7 +805,8 @@ TYPED_TEST(AllMatrixTests, L1NormAndLInfNorm)
 			sumAbsolute += std::abs(value);
 		}
 	}
-	T maxAbsolute = (SIZE + 0.6f);  // the function is set up so that the (0,0) corner will always have the biggest absolute value
+	// the function is set up so that the (0,0) corner will always have the biggest absolute value
+	T maxAbsolute = (SIZE + 0.6f);
 
 	Matrix n = -m;
 	// Ugh, "template" is required to get this to parse properly.  This is
@@ -818,7 +825,8 @@ TYPED_TEST(AllMatrixTests, MinAndMax)
 	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
-	const T inputArray[18]  = {
+	const T inputArray[18]  =
+	{
 		0.01f,  1.02f,  2.03f,  3.04f,  4.05f,  5.06f,  6.07f,  7.08f,  8.09f,
 		9.10f, 10.11f, 11.12f, 12.13f, 13.14f, 14.15f, 15.16f, 16.17f, 17.18f
 	};
@@ -1110,7 +1118,8 @@ TYPED_TEST(AllMatrixTests, ArrayReadWrite)
 	const int NUM_ELEMENTS = Matrix::SizeAtCompileTime;
 
 
-	const T inputArray[18]  = {
+	const T inputArray[18]  =
+	{
 		0.01f,  1.02f,  2.03f,  3.04f,  4.05f,  5.06f,  6.07f,  7.08f,  8.09f,
 		9.10f, 10.11f, 11.12f, 12.13f, 13.14f, 14.15f, 15.16f, 16.17f, 17.18f
 	};
