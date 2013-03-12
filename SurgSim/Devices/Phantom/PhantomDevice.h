@@ -34,6 +34,25 @@ class PhantomManager;
 /// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.  The implementation is currently limited to
 /// 3DoF haptic output (forces only, no torques).
 ///
+/// \par Application input provided by the device:
+///   | type       | name        |                                                                |
+///   | ----       | ----        | ---                                                            |
+///   | pose       | "pose"      | %Device pose (units are meters).                               |
+///   | bool       | "button0"   | %State of the first device button.                             |
+///   | bool       | "button1"   | %State of the second device button if present.                 |
+///   | bool       | "button2"   | %State of the third device button (probaly doesn't exist).     |
+///   | bool       | "button3"   | %State of the third device button (probaly doesn't exist).     |
+/// Note that \c button0 through \c 3 correspond to the \c HD_DEVICE_BUTTON_1 through \c 4 provided by the
+/// OpenHaptics API, but your PHANTOM device likely has fewer than 4 buttons.  On one-button PHANTOM devices,
+/// the button state can be accessed through \c button0.  On a PHANTOM Omni, \c button0
+/// corresponds to the front (blue) stylus button, and \c button1 to the rear (white/gray) stylus button.
+///
+/// \par Application output used by the device:
+///   | type       | name        |                                                                |
+///   | ----       | ----        | ---                                                            |
+///   | vector     | "force"     | %Device output force (units are newtons).                      |
+///   | vector     | "torque"    | %Device output torque (units are Nm).  NOT YET SUPPORTED.      |
+///
 /// \sa SurgSim::Device::PhantomManager, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class PhantomDevice : public SurgSim::Input::CommonDevice
 {
