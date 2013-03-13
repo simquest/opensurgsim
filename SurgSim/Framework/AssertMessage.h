@@ -26,7 +26,9 @@ namespace SurgSim
 namespace Framework
 {
 
-/// An exception class thrown by SURGSIM_ASSERT(...) failures and SURGSIM_FAILURE().
+
+/// An exception class thrown by SURGSIM_ASSERT() failures and SURGSIM_FAILURE().
+/// \ingroup assertAPI
 class AssertionFailure : public std::runtime_error
 {
 public:
@@ -35,18 +37,22 @@ public:
 	explicit AssertionFailure(const std::string& message) : std::runtime_error(message) {};
 };
 
+
 /// An internal message class used for assertion failures.  Dies after logging.
+/// \ingroup assertInternals
 class AssertMessage : public LogMessageBase
 {
 public:
-	/// Constructor
-	/// \param logger Logger used to log this message
-	explicit AssertMessage(Logger* logger) : LogMessageBase(logger, LOG_LEVEL_CRITICAL) {};
-	/// Constructor
-	/// \param logger Logger used to log this message
-	explicit AssertMessage(const std::unique_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
 	/// Constructor.
-	/// \param logger Logger used to log this message
+	/// \param logger %Logger used to log this message.
+	explicit AssertMessage(Logger* logger) : LogMessageBase(logger, LOG_LEVEL_CRITICAL) {};
+
+	/// Constructor.
+	/// \param logger %Logger used to log this message.
+	explicit AssertMessage(const std::unique_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
+
+	/// Constructor.
+	/// \param logger %Logger used to log this message.
 	explicit AssertMessage(const std::shared_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
 
 

@@ -25,6 +25,10 @@ namespace Framework
 
 class Logger;
 
+/// \addtogroup logInternals
+/// @{
+
+
 /// Specialization, handles flush on destruction
 class LogMessage : public LogMessageBase
 {
@@ -38,6 +42,8 @@ public:
 	}
 };
 
+
+/// @}
 
 }; // namespace Framework
 }; // namespace SurgSim
