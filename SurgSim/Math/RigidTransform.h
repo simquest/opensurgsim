@@ -50,7 +50,7 @@ template <typename T, int N, int MOpt, int VOpt>
 inline Eigen::Transform<T, N, Eigen::Isometry> makeRigidTransform(const Eigen::Matrix<T, N, N, MOpt>& rotation,
 	const Eigen::Matrix<T, N, 1, VOpt>& translation)
 {
-	Eigen::Transform<T, N, Eigen::Isometry> rigid;
+	Eigen::Transform<T, N, Eigen::Isometry> rigid(Eigen::Transform<T, N, Eigen::Isometry>::Identity());
 	rigid.linear() = rotation;
 	rigid.translation() = translation;
 	return rigid;
@@ -61,7 +61,7 @@ template <typename T, int QOpt, int VOpt>
 inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(const Eigen::Quaternion<T, QOpt>& rotation,
 	const Eigen::Matrix<T, 3, 1, VOpt>& translation)
 {
-	Eigen::Transform<T, 3, Eigen::Isometry> rigid;
+	Eigen::Transform<T, 3, Eigen::Isometry> rigid(Eigen::Transform<T, 3, Eigen::Isometry>::Identity());
 	rigid.linear() = rotation.matrix();
 	rigid.translation() = translation;
 	return rigid;
