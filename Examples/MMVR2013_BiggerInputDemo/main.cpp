@@ -18,11 +18,11 @@
 
 #include <SurgSim/Devices/Phantom/PhantomManager.h>
 #include <SurgSim/Devices/Phantom/PhantomDevice.h>
-#include <SurgSim/Devices/NullDevice/NullDevice.h>
+#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
 
 using SurgSim::Device::PhantomManager;
 using SurgSim::Device::PhantomDevice;
-using SurgSim::Device::NullDevice;
+using SurgSim::Device::IdentityPoseDevice;
 
 #include "MovingSquareForce.h"
 #include "MovingSquareGlutWindow.h"
@@ -40,9 +40,9 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	// The square is controlled by a second device. Unfortunately, we don't have a second device, so we're using a
-	// "NullDevice"-- a pretend device that doesn't actually move.
-	std::shared_ptr<NullDevice> squareDevice = std::make_shared<NullDevice>("SquareDevice");
+	// The square is controlled by a second device. Unfortunately, we don't have a second hardware device yet, so
+	// we're using an IdentityPoseDevice-- a pretend device that doesn't actually move.
+	std::shared_ptr<IdentityPoseDevice> squareDevice = std::make_shared<IdentityPoseDevice>("SquareDevice");
 
 	std::shared_ptr<MovingSquareForce> squareForce = std::make_shared<MovingSquareForce>("ToolDevice", "SquareDevice");
 	toolDevice->addInputConsumer(squareForce);
