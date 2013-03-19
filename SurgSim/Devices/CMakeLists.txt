@@ -14,4 +14,4 @@
 # limitations under the License.
 
 
-add_subdirectory(NullDevice)
+add_subdirectory(IdentityPoseDevice)

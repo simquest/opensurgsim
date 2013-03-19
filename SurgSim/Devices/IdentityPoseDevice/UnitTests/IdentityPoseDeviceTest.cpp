@@ -14,20 +14,20 @@
 // limitations under the License.
 
 /** @file
- * Tests for the NullDevice class.
+ * Tests for the IdentityPoseDevice class.
  */
 
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
-#include <SurgSim/Devices/NullDevice/NullDevice.h>
+#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
-using SurgSim::Device::NullDevice;
+using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
@@ -65,26 +65,26 @@ bool TestListener::requestOutput(const std::string& device, DataGroup* outputDat
 }
 
 
-TEST(NullDeviceTest, CanConstruct)
+TEST(IdentityPoseDeviceTest, CanConstruct)
 {
-	EXPECT_NO_THROW({NullDevice device("MyNullDevice");});
+	EXPECT_NO_THROW({IdentityPoseDevice device("MyIdentityPoseDevice");});
 }
 
-TEST(NullDeviceTest, Name)
+TEST(IdentityPoseDeviceTest, Name)
 {
-	NullDevice device("MyNullDevice");
-	EXPECT_EQ("MyNullDevice", device.getName());
+	IdentityPoseDevice device("MyIdentityPoseDevice");
+	EXPECT_EQ("MyIdentityPoseDevice", device.getName());
 }
 
-TEST(NullDeviceTest, AddInputConsumer)
+TEST(IdentityPoseDeviceTest, AddInputConsumer)
 {
-	NullDevice device("MyNullDevice");
+	IdentityPoseDevice device("MyIdentityPoseDevice");
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.addInputConsumer(consumer));
 
-	// NullDevice is supposed to shove "null" data at every consumer when it's added.
+	// IdentityPoseDevice is supposed to shove an identity pose (and a button) at every consumer when it's added.
 	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasCurrentData("pose"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button0"));
@@ -111,9 +111,9 @@ TEST(NullDeviceTest, AddInputConsumer)
 		"consumer->m_numTimesReceivedInput = " << consumer->m_numTimesReceivedInput << std::endl;
 }
 
-TEST(NullDeviceTest, RemoveInputConsumer)
+TEST(IdentityPoseDeviceTest, RemoveInputConsumer)
 {
-	NullDevice device("MyNullDevice");
+	IdentityPoseDevice device("MyIdentityPoseDevice");
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
@@ -121,7 +121,7 @@ TEST(NullDeviceTest, RemoveInputConsumer)
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.addInputConsumer(consumer));
-	// NullDevice is supposed to shove "null" data at every consumer when it's added.
+	// IdentityPoseDevice is supposed to shove an identity pose (and a button) at every consumer when it's added.
 	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.removeInputConsumer(consumer));
@@ -131,9 +131,9 @@ TEST(NullDeviceTest, RemoveInputConsumer)
 	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
 }
 
-TEST(NullDeviceTest, SetOutputProducer)
+TEST(IdentityPoseDeviceTest, SetOutputProducer)
 {
-	NullDevice device("MyNullDevice");
+	IdentityPoseDevice device("MyIdentityPoseDevice");
 	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
@@ -141,9 +141,9 @@ TEST(NullDeviceTest, SetOutputProducer)
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }
 
-TEST(NullDeviceTest, RemoveOutputProducer)
+TEST(IdentityPoseDeviceTest, RemoveOutputProducer)
 {
-	NullDevice device("MyNullDevice");
+	IdentityPoseDevice device("MyIdentityPoseDevice");
 	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 

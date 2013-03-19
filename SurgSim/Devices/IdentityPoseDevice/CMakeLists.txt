@@ -25,15 +25,16 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 )
 
-set(NULL_DEVICE_SOURCES
-	NullDevice.cpp
+set(IDENTITY_POSE_DEVICE_SOURCES
+	IdentityPoseDevice.cpp
 )
 
-set(NULL_DEVICE_HEADERS
-	NullDevice.h
+set(IDENTITY_POSE_DEVICE_HEADERS
+	IdentityPoseDevice.h
 )
 
-add_library(NullDevice ${NULL_DEVICE_SOURCES} ${NULL_DEVICE_HEADERS})
+add_library(IdentityPoseDevice
+	${IDENTITY_POSE_DEVICE_SOURCES} ${IDENTITY_POSE_DEVICE_HEADERS})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
