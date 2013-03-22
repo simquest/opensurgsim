@@ -28,6 +28,10 @@ namespace SurgSim
 namespace Framework
 {
 
+/// \addtogroup logInternals
+/// @{
+
+
 /// LogMessageBase is a base class to be used to customize messages for logging
 /// textual information can be put into a log message by using the << operator
 /// in general the message class will output all of its information when the
@@ -90,6 +94,8 @@ private:
 	Logger* m_logger;
 };
 
+
+/// @}
 
 }; // namespace Framework
 }; // namespace SurgSim
