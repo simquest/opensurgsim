@@ -30,7 +30,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Logger.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
-#	Representation.cpp
+	Representation.cpp
 	Runtime.cpp
 	Scene.cpp
 	SceneElement.cpp
@@ -51,7 +51,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessage.h
 	LogMessageBase.h
 	LogOutput.h
-#	Representation.h
+	Representation.h
 	Runtime.h
 	Scene.h
 	SceneElement.h
