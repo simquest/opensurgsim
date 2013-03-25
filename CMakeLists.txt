@@ -49,5 +49,6 @@ endif()
 
 add_subdirectory(SurgSim)
 add_subdirectory(Documentation)
+add_subdirectory(Applications)
 
 #option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)
