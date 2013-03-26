@@ -133,13 +133,13 @@ bool Runtime::start()
 
 	// Wait for all the threads to initialize
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doInit() suceeded";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doInit() succeeded";
 
 
 	// Wait for all the threads to startup
 	barrier->wait(true);
 
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doStartup() suceeded";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doStartup() succeeded";
 
 	m_isRunning = true;
 	// Now add all the scenelements
