@@ -66,10 +66,6 @@ public:
 		return m_logger;
 	}
 
-	/// Communicates with the device, reading its state and writing the command parameters.
-	/// \return true on success.
-	bool update();
-
 protected:
 	/// Constructor.
 	///
@@ -84,6 +80,10 @@ protected:
 	virtual bool initialize();
 
 	virtual bool finalize();
+
+	/// Communicates with the device, reading its state and writing the command parameters.
+	/// \return true on success.
+	bool update();
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();

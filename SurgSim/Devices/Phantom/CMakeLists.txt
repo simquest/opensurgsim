@@ -37,7 +37,7 @@ set(PHANTOM_DEVICE_HEADERS
 )
 
 add_library(PhantomDevice ${PHANTOM_DEVICE_SOURCES} ${PHANTOM_DEVICE_HEADERS})
-
-#if(SURGSIM_TESTS_BUILD)
-#	add_subdirectory(UnitTests)
-#endif()
+if(SURGSIM_TESTS_BUILD)
+	# The unit tests will be built whenever the library is built.
+	add_subdirectory(UnitTests)
+endif()

@@ -127,7 +127,7 @@ bool PhantomDevice::initialize()
 
 	m_state->hHD = hHD;
 
-	SURGSIM_LOG_INFO(m_logger) << m_messageLabel << "Device initialized." << std::endl <<
+	SURGSIM_LOG_INFO(m_logger) << m_messageLabel << "Initialized." << std::endl <<
 	                           "  OpenHaptics device name: '" << m_initializationName << "'" << std::endl;
 
 	return true;
@@ -141,6 +141,7 @@ bool PhantomDevice::finalize()
 		return false;
 	}
 
+	SURGSIM_LOG_DEBUG(m_logger) << m_messageLabel << "Finalizing.";
 	hdDisableDevice(hHD);
 	m_state->hHD = HD_INVALID_HANDLE;
 	return true;

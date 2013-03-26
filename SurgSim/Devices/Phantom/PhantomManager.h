@@ -81,6 +81,7 @@ protected:
 	bool createHapticLoop();
 
 	/// Destroys the haptic loop callback.
+	/// Should be called while NOT holding the internal device list mutex, to prevent deadlock.
 	/// \return true on success.
 	bool destroyHapticLoop();
 

@@ -87,6 +87,15 @@ static HDCallbackCode HDCALLBACK runHapticLoopCallback(void* data)
 
 PhantomManager::~PhantomManager()
 {
+	if (m_state->haveCallback)
+	{
+		destroyHapticLoop();
+	}
+	boost::lock_guard<boost::mutex> lock(m_state->activeDeviceMutex);
+	for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
+	{
+		(*it)->finalize();
+	}
 }
 
 
@@ -104,7 +113,8 @@ std::shared_ptr<PhantomDevice> PhantomManager::createDevice(const std::string& u
 		boost::lock_guard<boost::mutex> lock(m_state->activeDeviceMutex);
 		if (m_state->activeDevices.size() == 0)
 		{
-			// If this is the first device, create the haptic loop as well
+			// If this is the first device, create the haptic loop as well.
+			// The haptic loop should be created AFTER initializing the device, or OpenHaptics will complain.
 			createHapticLoop();
 		}
 
@@ -118,6 +128,7 @@ std::shared_ptr<PhantomDevice> PhantomManager::createDevice(const std::string& u
 bool PhantomManager::releaseDevice(std::shared_ptr<PhantomDevice> device)
 {
 	bool found = false;
+	bool haveOtherDevices = false;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->activeDeviceMutex);
 		for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
@@ -129,11 +140,23 @@ bool PhantomManager::releaseDevice(std::shared_ptr<PhantomDevice> device)
 				break;
 			}
 		}
+		haveOtherDevices = (m_state->activeDevices.size() > 0);
 	}
 
 	if (found)
 	{
+		// If you attempt to destroy the device while the haptic callback is active, you see lots of nasty errors
+		// under OpenHaptics 3.0.  The solution seems to be to disable the haptic callback when destroying the device.
+		destroyHapticLoop();
+
 		device->finalize();
+
+		if (haveOtherDevices)
+		{
+			// If there are other devices left, we need to recreate the haptic callback.
+			// If there aren't, we don't need the callback... and moreover, trying to create it will fail.
+			createHapticLoop();
+		}
 	}
 	return found;
 }
@@ -186,6 +209,7 @@ bool PhantomManager::destroyHapticLoop()
 	SURGSIM_ASSERT(m_state->haveCallback);
 
 	bool sawError = false;
+	checkForFatalError("Error prior to stopping haptic callback");  // NOT considered an error for return code!
 	hdUnschedule(m_state->callbackHandle);
 	sawError = checkForFatalError("Couldn't stop haptic callback") || sawError;
 	hdStopScheduler();
