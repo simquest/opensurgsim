@@ -42,10 +42,9 @@ public:
 	typedef T Matrix22;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix22d,
-						 SurgSim::Math::Matrix22dv,
-						 SurgSim::Math::Matrix22f,
-						 SurgSim::Math::Matrix22fv> Matrix22Variants;
+						 SurgSim::Math::Matrix22f> Matrix22Variants;
 TYPED_TEST_CASE(Matrix22Tests, Matrix22Variants);
 
 
@@ -56,10 +55,9 @@ public:
 	typedef T Matrix33;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix33d,
-						 SurgSim::Math::Matrix33dv,
-						 SurgSim::Math::Matrix33f,
-						 SurgSim::Math::Matrix33fv> Matrix33Variants;
+						 SurgSim::Math::Matrix33f> Matrix33Variants;
 TYPED_TEST_CASE(Matrix33Tests, Matrix33Variants);
 
 
@@ -70,10 +68,9 @@ public:
 	typedef T Matrix44;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix44d,
-						 SurgSim::Math::Matrix44dv,
-						 SurgSim::Math::Matrix44f,
-						 SurgSim::Math::Matrix44fv> Matrix44Variants;
+						 SurgSim::Math::Matrix44f> Matrix44Variants;
 TYPED_TEST_CASE(Matrix44Tests, Matrix44Variants);
 
 
@@ -85,18 +82,13 @@ public:
 	typedef T Matrix;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix22d,
-						 SurgSim::Math::Matrix22dv,
 						 SurgSim::Math::Matrix22f,
-						 SurgSim::Math::Matrix22fv,
 						 SurgSim::Math::Matrix33d,
-						 SurgSim::Math::Matrix33dv,
 						 SurgSim::Math::Matrix33f,
-						 SurgSim::Math::Matrix33fv,
 						 SurgSim::Math::Matrix44d,
-						 SurgSim::Math::Matrix44dv,
-						 SurgSim::Math::Matrix44f,
-						 SurgSim::Math::Matrix44fv> AllMatrixVariants;
+						 SurgSim::Math::Matrix44f> AllMatrixVariants;
 TYPED_TEST_CASE(AllMatrixTests, AllMatrixVariants);
 
 template <class T>

@@ -30,54 +30,28 @@ namespace Math
 {
 
 /// A 2x2 matrix of floats.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  2, 2, Eigen::DontAlign | Eigen::RowMajor>  Matrix22f;
 
 /// A 3x3 matrix of floats.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  3, 3, Eigen::DontAlign | Eigen::RowMajor>  Matrix33f;
 
 /// A 4x4 matrix of floats.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  4, 4, Eigen::DontAlign | Eigen::RowMajor>  Matrix44f;
 
 /// A 2x2 matrix of doubles.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 2, 2, Eigen::DontAlign | Eigen::RowMajor>  Matrix22d;
 
 /// A 3x3 matrix of doubles.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign | Eigen::RowMajor>  Matrix33d;
 
 /// A 4x4 matrix of doubles.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 4, Eigen::DontAlign | Eigen::RowMajor>  Matrix44d;
-
-
-
-/// A 2x2 matrix of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<float,  2, 2, Eigen::AutoAlign | Eigen::RowMajor>  Matrix22fv;
-
-/// A 3x3 matrix of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<float,  3, 3, Eigen::AutoAlign | Eigen::RowMajor>  Matrix33fv;
-
-/// A 4x4 matrix of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<float,  4, 4, Eigen::AutoAlign | Eigen::RowMajor>  Matrix44fv;
-
-/// A 2x2 matrix of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<double, 2, 2, Eigen::AutoAlign | Eigen::RowMajor>  Matrix22dv;
-
-/// A 3x3 matrix of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<double, 3, 3, Eigen::AutoAlign | Eigen::RowMajor>  Matrix33dv;
-
-/// A 4x4 matrix of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<double, 4, 4, Eigen::AutoAlign | Eigen::RowMajor>  Matrix44dv;
 
 
 

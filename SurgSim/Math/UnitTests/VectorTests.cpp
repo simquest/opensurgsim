@@ -41,10 +41,9 @@ public:
 	typedef T Vector2;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector2d,
-						 SurgSim::Math::Vector2dv,
-						 SurgSim::Math::Vector2f,
-						 SurgSim::Math::Vector2fv> Vector2Variants;
+						 SurgSim::Math::Vector2f> Vector2Variants;
 TYPED_TEST_CASE(Vector2Tests, Vector2Variants);
 
 
@@ -55,10 +54,9 @@ public:
 	typedef T Vector3;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector3dv,
-						 SurgSim::Math::Vector3f,
-						 SurgSim::Math::Vector3fv> Vector3Variants;
+						 SurgSim::Math::Vector3f> Vector3Variants;
 TYPED_TEST_CASE(Vector3Tests, Vector3Variants);
 
 
@@ -69,10 +67,9 @@ public:
 	typedef T Vector4;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector4d,
-						 SurgSim::Math::Vector4dv,
-						 SurgSim::Math::Vector4f,
-						 SurgSim::Math::Vector4fv> Vector4Variants;
+						 SurgSim::Math::Vector4f> Vector4Variants;
 TYPED_TEST_CASE(Vector4Tests, Vector4Variants);
 
 
@@ -84,18 +81,13 @@ public:
 	typedef T Vector;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector2d,
-						 SurgSim::Math::Vector2dv,
 						 SurgSim::Math::Vector2f,
-						 SurgSim::Math::Vector2fv,
 						 SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector3dv,
 						 SurgSim::Math::Vector3f,
-						 SurgSim::Math::Vector3fv,
 						 SurgSim::Math::Vector4d,
-						 SurgSim::Math::Vector4dv,
-						 SurgSim::Math::Vector4f,
-						 SurgSim::Math::Vector4fv> AllVectorVariants;
+						 SurgSim::Math::Vector4f> AllVectorVariants;
 TYPED_TEST_CASE(AllVectorTests, AllVectorVariants);
 
 template <class T>
@@ -128,7 +120,7 @@ TYPED_TEST(Vector2Tests, CanConstruct)
 
 	// Warning: Eigen *does not* provide a 1-argument constructor that
 	// initializes all elements to the same value!  If you do something like
-	//    SurgSim::Math::Vector2fu oneArg2fu(1.23f);
+	//    SurgSim::Math::Vector2f oneArg2f(1.23f);
 	// the argument is converted to an integral type, interpreted as a size,
 	// and promptly ignored because the size is fixed.  Oops.
 	// To generate a constant vector, use Vector2f::Constant(val).
