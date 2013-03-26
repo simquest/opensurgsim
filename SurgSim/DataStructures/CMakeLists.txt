@@ -21,6 +21,9 @@ include_directories(
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
+	Tree.cpp
+	TreeData.cpp
+	TreeNode.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
@@ -31,6 +34,9 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
+	Tree.h
+	TreeData.h
+	TreeNode.h
 )
 
 add_library(SurgSimDataStructures
