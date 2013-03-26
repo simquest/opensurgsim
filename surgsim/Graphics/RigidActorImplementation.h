@@ -1,13 +1,15 @@
 #ifndef SURGSIM_GRAPHICS_RIGID_ACTOR_IMPLEMENTATION_H
 #define SURGSIM_GRAPHICS_RIGID_ACTOR_IMPLEMENTATION_H
 
+#include "ActorImplementation.h"
+
 #include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim 
 {
 	namespace Graphics
 	{
-		class RigidActorImplementation
+		class RigidActorImplementation : public ActorImplementation
 		{
 		public:
 			RigidActorImplementation();

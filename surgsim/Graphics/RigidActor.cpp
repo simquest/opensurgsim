@@ -22,5 +22,5 @@ void RigidActor::setPose(const SurgSim::Math::RigidTransform3d& pose)
 
 const SurgSim::Math::RigidTransform3d& RigidActor::getPose() const
 {
-	getRigidImplementation()->getPose();
+	return getRigidImplementation()->getPose();
 }
