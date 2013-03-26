@@ -20,11 +20,11 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	NullDeviceTest.cpp
+	IdentityPoseDeviceTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS NullDevice SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
-surgsim_add_unit_tests(NullDeviceTest)
+set(LIBS IdentityPoseDevice SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
+surgsim_add_unit_tests(IdentityPoseDeviceTest)
