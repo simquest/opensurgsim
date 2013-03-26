@@ -29,54 +29,28 @@ namespace Math
 {
 
 /// A 2D vector of floats.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  2, 1, Eigen::DontAlign>  Vector2f;
 
 /// A 3D vector of floats.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  3, 1, Eigen::DontAlign>  Vector3f;
 
 /// A 4D vector of floats.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<float,  4, 1, Eigen::DontAlign>  Vector4f;
 
 /// A 2D vector of doubles.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 2, 1, Eigen::DontAlign>  Vector2d;
 
 /// A 3D vector of doubles.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 3, 1, Eigen::DontAlign>  Vector3d;
 
 /// A 4D vector of doubles.
-/// This type (and any struct that contain it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign>  Vector4d;
-
-
-
-/// A 2D vector of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<float,  2, 1, Eigen::AutoAlign>  Vector2fv;
-
-/// A 3D vector of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<float,  3, 1, Eigen::AutoAlign>  Vector3fv;
-
-/// A 4D vector of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<float,  4, 1, Eigen::AutoAlign>  Vector4fv;
-
-/// A 2D vector of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<double, 2, 1, Eigen::AutoAlign>  Vector2dv;
-
-/// A 3D vector of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<double, 3, 1, Eigen::AutoAlign>  Vector3dv;
-
-/// A 4D vector of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Matrix<double, 4, 1, Eigen::AutoAlign>  Vector4dv;
 
 };  // namespace Math
 };  // namespace SurgSim

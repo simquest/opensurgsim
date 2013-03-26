@@ -33,10 +33,9 @@ public:
 	typedef typename T::Scalar Scalar;
 };
 
+// This used to contain aligned (via Eigen::AutoAlign) quaternion type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Quaterniond,
-						 SurgSim::Math::Quaterniondv,
-						 SurgSim::Math::Quaternionf,
-						 SurgSim::Math::Quaternionfv> QuaternionVariants;
+						 SurgSim::Math::Quaternionf> QuaternionVariants;
 TYPED_TEST_CASE(QuaternionTests, QuaternionVariants);
 
 
