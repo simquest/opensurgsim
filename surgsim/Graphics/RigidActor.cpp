@@ -1,19 +1,26 @@
-#include "Actor.h"
+#include "RigidActor.h"
 
-#include "ActorImplementation.h"
+#include <SurgSim/Graphics/RigidActorImplementation.h>
 
 using SurgSim::Graphics::Actor;
-using SurgSim::Graphics::ActorImplementation;
+using SurgSim::Graphics::RigidActor;
+using SurgSim::Graphics::RigidActorImplementation;
 
-Actor::Actor(const std::string& name, std::shared_ptr<ActorImplementation> implementation) : m_name(name), m_implementation(implementation)
+RigidActor::RigidActor(const std::string& name, std::shared_ptr<RigidActorImplementation> implementation) : 
+Actor(name, implementation)
 {
 }
 
-Actor::~Actor()
+RigidActor::~RigidActor()
 {
 }
 
-void Actor::doUpdate(double dt)
+void RigidActor::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
-	m_implementation->update(dt);
+	getRigidImplementation()->setPose(pose);
+}
+
+const SurgSim::Math::RigidTransform3d& RigidActor::getPose() const
+{
+	getRigidImplementation()->getPose();
 }

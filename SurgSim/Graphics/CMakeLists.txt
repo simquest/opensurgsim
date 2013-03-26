@@ -25,6 +25,8 @@ set(SURGSIM_GRAPHICS_SOURCES
 	CameraImplementation.cpp
 	Manager.cpp
 	Representation.cpp
+	RigidActor.cpp
+	RigidActorImplementation.cpp
 	Scene.cpp
 	SceneImplementation.cpp
 	ViewComponent.cpp
@@ -40,6 +42,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	CameraImplementation.h
 	Manager.h
 	Representation.h
+	RigidActor.h
+	RigidActorImplementation.h
 	Scene.h
 	SceneImplementation.h
 	ViewComponent.h

@@ -1,5 +1,9 @@
-#ifndef SURGSIM_GRAPHICS_ACTOR_H
-#define SURGSIM_GRAPHICS_ACTOR_H
+#ifndef SURGSIM_GRAPHICS_RIGID_ACTOR_H
+#define SURGSIM_GRAPHICS_RIGID_ACTOR_H
+
+#include "Actor.h"
+
+#include <SurgSim/Math/RigidTransform.h>
 
 #include <memory>
 #include <string>
@@ -8,37 +12,24 @@ namespace SurgSim
 {
 	namespace Graphics
 	{
-		class ActorImplementation;
+		class RigidActorImplementation;
 
-		class Actor
+		class RigidActor : public Actor
 		{
 		public:
-			Actor(const std::string& name, std::shared_ptr<ActorImplementation> implementation);
-			virtual ~Actor();
+			RigidActor(const std::string& name, std::shared_ptr<RigidActorImplementation> implementation);
+			virtual ~RigidActor();
 
-			const std::string& getName() const
+			void setPose(const SurgSim::Math::RigidTransform3d& pose);
+			const SurgSim::Math::RigidTransform3d& getPose() const;
+
+			std::shared_ptr<RigidActorImplementation> getRigidImplementation() const
 			{
-				return m_name;
+				return std::static_pointer_cast<RigidActorImplementation>(getImplementation());
 			}
 
-			/// \param	dt	The time in seconds of the preceding timestep.
-			void update(double dt)
-			{ 
-				doUpdate(dt);
-			}
-
-			std::shared_ptr<ActorImplementation> getImplementation() const
-			{
-				return m_implementation;
-			}
-
-		private:
-			std::string m_name;
-			std::shared_ptr<ActorImplementation> m_implementation;
-
-			virtual void doUpdate(double dt);
 		};
 	}
 }
 
-#endif
+#endif  // SURGSIM_GRAPHICS_RIGID_ACTOR_H
