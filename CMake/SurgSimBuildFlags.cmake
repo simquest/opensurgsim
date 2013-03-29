@@ -55,8 +55,16 @@ endif(CMAKE_COMPILER_IS_GNUCC)
 
 # Visual Studio C/C++ specific settings
 if(MSVC)
+	# Sanity check the version.  (You can see this problem if you delete
+	# the cache file on disk while cmake-gui has the data in memory.)
+	if("${MSVC_VERSION}" STREQUAL "")
+		message(FATAL_ERROR
+			"MSVC_VERSION isn't correctly set; delete the cache and try again!")
+	endif("${MSVC_VERSION}" STREQUAL "")
+
 	# default VC++ compilation flags
 	add_definitions( -D_CRT_SECURE_NO_WARNINGS )
+
 	# Set the iterator debug level consistently for Debug builds.
 	# [Note that you can't add_definitions() conditionally for debug only,
 	#  because for VS add_definitions() affects ALL build types in the project.
