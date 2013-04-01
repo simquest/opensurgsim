@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file
+/// The header that provides the assertion API.
+/// \ingroup assertAPI
+/// \sa assertAPI
+
 #ifndef SURGSIM_FRAMEWORK_ASSERT_H
 #define SURGSIM_FRAMEWORK_ASSERT_H
 
@@ -24,14 +29,26 @@ namespace SurgSim
 namespace Framework
 {
 
+/// \defgroup assertAPI Assertions
+/// The assertion API used by OpenSurgSim code.
+/// \sa loggingAPI
+/// @{
+	
+/// \defgroup assertInternals Internal assertion helpers
+/// Not meant for public consumption.
+
+
 #if !defined(SURGSIM_ASSERT_LOGGER)
 /// Logger used to log asserts.
 /// The default logger is used if no other logger is defined.
+/// \ingroup assertInternals
 #define SURGSIM_ASSERT_LOGGER  ::SurgSim::Framework::Logger::getDefaultLogger()
 #endif
 
-// Helper macro to determine the function name currently being compiled.
-// (I wish we didn't need this garbage, but...)
+/// Helper macro to determine the function name currently being compiled.
+/// Tries to provide some readable but information-rich version of the name, as provided by different compilers.
+/// \ingroup assertInternals
+/// \hideinitializer
 #if defined(__func__)
 #define SURGSIM_CURRENT_FUNCTION __func__
 #elif defined(__FUNCSIG__)
@@ -45,6 +62,7 @@ namespace Framework
 #endif
 
 /// Helper macros to turn its argument into a quoted string constant.
+/// \ingroup assertInternals
 /// \param x Argument to convert into a string
 /// \return Quoted string constant.  Note that macros such as __LINE__ may be quoted literally rather than expanded.
 #define SURGSIM_MAKE_STRING(x)  #x
@@ -78,6 +96,9 @@ namespace Framework
 	::SurgSim::Framework::AssertMessage(SURGSIM_ASSERT_LOGGER) << "*** Failure ***" << std::endl << \
 	"    in " << SURGSIM_CURRENT_FUNCTION << std::endl << \
 	"    at " << __FILE__ << ":" << __LINE__ << std::endl
+
+
+/// @}
 
 };  // namespace Framework
 };  // namespace SurgSim

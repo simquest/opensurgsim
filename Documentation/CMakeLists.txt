@@ -14,6 +14,18 @@
 # limitations under the License.
 
 
+# Make it easier to tell CMake where to find dot for doxygen.  You can
+# set the environment variable DOXYGEN_DOT_PATH to a directory path to
+# where the dot binary lives.  (You don't need this on Linux if you
+# install Graphviz in a standard location.)
+#
+# Note that the Windows installer for Graphviz 2.30 doesn't seem to
+# write the install directory into the registry.
+find_program(DOXYGEN_DOT_EXECUTABLE
+	NAMES dot
+	PATHS "$ENV{DOXYGEN_DOT_PATH}" "${DOXYGEN_DOT_PATH}"
+  DOC "Graphviz Dot tool for using Doxygen")
+
 find_package(Doxygen)
 
 option(SURGSIM_DOCUMENTATION
@@ -63,8 +75,11 @@ if(SURGSIM_DOCUMENTATION)
 
 		add_custom_target(documentation ${DOCUMENTATION_TARGET_FLAGS}
 			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+			SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			COMMENT "Generating HTML documentation" VERBATIM)
+		# Put the Doxyfile.in at the top of the VS project, not "Header Files":
+		source_group("" FILES "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in")
 
 		if(UNIX)
 			install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 

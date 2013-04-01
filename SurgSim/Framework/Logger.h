@@ -26,28 +26,35 @@ namespace SurgSim
 {
 namespace Framework
 {
+	
+/// \addtogroup loggingAPI
+/// @{
 
-/// Logging levels, use these
-/// DEBUG Use at your discretion
-/// INFO informational, notify of state changes
-/// WARNING something failed, but the impact of the failure is not know or minimal (e.g. purely visual)
-/// SEVERE something and it will impact functionality, some parts of the program will not function correctly
-/// CRITICAL Used by assertion, after using this level the program will not be functional at all
+
+/// Logging levels.
+/// Please note that most logging macros take an abbreviated version of these enumerations, without the leading
+/// \c LOG_LEVEL_, i.e. one of \c DEBUG, \c INFO, \c WARNING, \c SEVERE or \c CRITICAL .
 enum LogLevel
 {
-    LOG_LEVEL_DEBUG,
+	/// Use at your discretion.
+	LOG_LEVEL_DEBUG,
+	/// Informational, notify of state changes.
     LOG_LEVEL_INFO,
+	/// Something failed, but the impact of the failure is not know or minimal (e.g. purely visual).
     LOG_LEVEL_WARNING,
+	/// Something failed and will impact functionality, some parts of the program will not function correctly.
     LOG_LEVEL_SEVERE,
+	/// Used by assertion, after using this level the program will not be functional at all.
     LOG_LEVEL_CRITICAL
 };
 
-/// Logger class, takes a name and an LogOutput class, which determines in what
-/// way the logger presents its output. Construct at the beginning and pass to
-/// the the macro to use it.
+/// An object that can be used to control logging parameters, such as verbosity and log output destination.
 class Logger
 {
 public:
+	/// Constructor.
+	/// \param name The name used for this logger.
+	/// \param output The LogOutput instance used to display or log the data.
 	Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
 		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
 		m_name(name),
@@ -55,6 +62,7 @@ public:
 	{
 	}
 
+	/// Destructor.
 	~Logger()
 	{
 	}
@@ -83,36 +91,39 @@ public:
 		return m_output->writeMessage(message);
 	}
 
-	/// The threshold used for logging, anything message with less than this level
-	/// will be ignored
+	/// Gets the logging threshold.
+	/// Anything message with less than this level will be ignored.
+	/// \return The threshold value.
 	int getThreshold() const
 	{
 		return m_threshold;
 	}
 
 	/// Sets the logging threshold.
-	/// \param val The value for the threshold.
+	/// Anything message with less than this level will be ignored.
+	/// \param val The value to be used as the threshold.
 	void setThreshold(int val)
 	{
 		m_threshold = val;
 	}
 
-	/// Get the output object used by this logger.
-	/// \return the current output object used this logger.
+	/// Gets the output object used by this logger.
+	/// \return The current output object used this logger.
 	std::shared_ptr<LogOutput> getOutput() const
 	{
 		return m_output;
 	}
 
-	/// Set the output object used by this logger.
+	/// Sets the output object used by this logger.
 	/// \param val The output object to be used.
 	void setOutput(std::shared_ptr<LogOutput> val)
 	{
 		m_output = val;
 	}
 
-	/// This logger's name.
-	std::string getName() const
+	/// Gets this logger's name.
+	/// \return The name.
+	std::string getName( ) const
 	{
 		return m_name;
 	}
@@ -122,6 +133,9 @@ private:
 	std::string m_name;
 	std::shared_ptr<LogOutput> m_output;
 };
+
+
+/// @}
 
 }; // namespace Framework
 }; // namespace SurgSim

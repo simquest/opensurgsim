@@ -31,22 +31,12 @@ namespace Math
 {
 
 /// A quaternion of floats.
-/// This type (and any struct that contains it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Quaternion<float,  Eigen::DontAlign>  Quaternionf;
 
 /// A quaternion of doubles.
-/// This type (and any struct that contains it) can be safely allocated via new.
+/// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Quaternion<double, Eigen::DontAlign>  Quaterniond;
-
-
-
-/// A quaternion of floats, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Quaternion<float,  Eigen::AutoAlign>  Quaternionfv;
-
-/// A quaternion of doubles, with vectorized (SIMD) operations enabled if possible.
-/// Note that special alignment restrictions may apply to this type; see Eigen documentation for details.
-typedef Eigen::Quaternion<double, Eigen::AutoAlign>  Quaterniondv;
 
 
 

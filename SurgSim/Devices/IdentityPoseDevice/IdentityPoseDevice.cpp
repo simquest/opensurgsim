@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/NullDevice/NullDevice.h"
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
@@ -37,24 +37,24 @@ namespace Device
 {
 
 
-NullDevice::NullDevice(const std::string& uniqueName) :
+IdentityPoseDevice::IdentityPoseDevice(const std::string& uniqueName) :
 	SurgSim::Input::CommonDevice(uniqueName, buildInputData())
 {
 }
 
-bool NullDevice::initialize()
+bool IdentityPoseDevice::initialize()
 {
 	// required by the DeviceInterface API
 	return true;
 }
 
-bool NullDevice::finalize()
+bool IdentityPoseDevice::finalize()
 {
 	// required by the DeviceInterface API
 	return true;
 }
 
-DataGroup NullDevice::buildInputData()
+DataGroup IdentityPoseDevice::buildInputData()
 {
 	DataGroupBuilder builder;
 	builder.addPose("pose");
@@ -62,14 +62,14 @@ DataGroup NullDevice::buildInputData()
 	return builder.createData();
 }
 
-bool NullDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
+bool IdentityPoseDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer)
 {
 	if (! CommonDevice::addInputConsumer(std::move(inputConsumer)))
 	{
 		return false;
 	}
 
-	// The NullDevice doesn't have any input events; it just sits there.
+	// The IdentityPoseDevice doesn't have any input events; it just sits there.
 	// So we push the output to all the consumers, including the new one, right away after we add a consumer.
 	// This ensures that all consumers always see the identity pose.
 	getInputData().poses().put("pose", RigidTransform3d::Identity());
