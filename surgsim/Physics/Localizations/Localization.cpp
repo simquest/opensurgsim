@@ -13,36 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_REPRESENTATION_H
-#define SURGSIM_PHYSICS_REPRESENTATION_H
+#include "Localization.h"
 
-#include <SurgSim/Framework/Representation.h>
+#include <utility>
 
-namespace SurgSim 
+using SurgSim::Physics::Actor;
+using SurgSim::Physics::Localization;
+
+Localization::Localization()
 {
-
-namespace Physics
+}
+Localization::Localization(std::shared_ptr<Actor> actor) : m_actor(actor)
 {
+}
 
-class Actor;
-
-class Representation : public Framework::Representation
+Localization::~Localization()
 {
-public:
-	Representation(std::shared_ptr<Actor> actor);
-	virtual ~Representation();
+}
 
-	std::shared_ptr<Actor> getActor()
-	{
-		return m_actor;
-	}
+bool Localization::operator==(const Localization& localization) const
+{
+	return (typeid(*this) == typeid(localization)) && isEqual(localization);
+}
 
-private:
-	std::shared_ptr<Actor> m_actor;
-};
-
-};  // namespace Physics
-
-};  // namespace SurgSim
-
-#endif  // SURGSIM_PHYSICS_REPRESENTATION_H
+bool Localization::operator!=(const Localization& localization) const
+{
+	return (typeid(*this) != typeid(localization)) || ! isEqual(localization);
+}

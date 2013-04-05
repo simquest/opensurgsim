@@ -18,8 +18,6 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
-	Actor.cpp
-	ActorImplementation.cpp
 	Manager.cpp
 	Representation.cpp
 	Scene.cpp
@@ -27,15 +25,30 @@ set(SURGSIM_PHYSICS_SOURCES
 )
 
 set(SURGSIM_PHYSICS_HEADERS
-	Actor.h
-	ActorImplementation.h
 	Manager.h
 	Representation.h
 	Scene.h
 	SceneImplementation.h
 )
 
-add_library(SurgSimPhysics ${SURGSIM_PHYSICS_SOURCES} ${SURGSIM_PHYSICS_HEADERS})
+add_subdirectory(Actors)
+add_subdirectory(Constraints)
+add_subdirectory(Localizations)
+
+add_library(SurgSimPhysics 
+	${SURGSIM_PHYSICS_ACTORS_SOURCES} ${SURGSIM_PHYSICS_ACTORS_HEADERS}
+	${SURGSIM_PHYSICS_CONSTRAINTS_SOURCES} ${SURGSIM_PHYSICS_CONSTRAINTS_HEADERS}
+	${SURGSIM_PHYSICS_LOCALIZATIONS_SOURCES} ${SURGSIM_PHYSICS_LOCALIZATIONS_HEADERS}
+	${SURGSIM_PHYSICS_SOURCES} ${SURGSIM_PHYSICS_HEADERS}
+)
+
+source_group("Source Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_SOURCES})
+source_group("Header Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_HEADERS})
+source_group("Source Files\\Constraints" FILES ${SURGSIM_PHYSICS_CONSTRAINTS_SOURCES})
+source_group("Header Files\\Constraints" FILES ${SURGSIM_PHYSICS_CONSTRAINTS_HEADERS})
+source_group("Source Files\\Localizations" FILES ${SURGSIM_PHYSICS_LOCALIZATIONS_SOURCES})
+source_group("Header Files\\Localizations" FILES ${SURGSIM_PHYSICS_LOCALIZATIONS_HEADERS})
+
 
 if(SURGSIM_TESTS_BUILD)
 #	add_subdirectory(UnitTests)
@@ -43,3 +56,4 @@ endif()
 
 add_subdirectory(Fem)
 add_subdirectory(MasterSolver)
+

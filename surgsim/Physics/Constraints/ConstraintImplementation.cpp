@@ -13,36 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_REPRESENTATION_H
-#define SURGSIM_PHYSICS_REPRESENTATION_H
+#include "ConstraintImplementation.h"
 
-#include <SurgSim/Framework/Representation.h>
+using SurgSim::Physics::Localization;
+using SurgSim::Physics::ConstraintImplementation;
 
-namespace SurgSim 
+ConstraintImplementation::ConstraintImplementation()
 {
 
-namespace Physics
+}
+ConstraintImplementation::ConstraintImplementation(std::shared_ptr<Localization> location) : m_location(location)
 {
+}
 
-class Actor;
-
-class Representation : public Framework::Representation
+ConstraintImplementation::~ConstraintImplementation()
 {
-public:
-	Representation(std::shared_ptr<Actor> actor);
-	virtual ~Representation();
-
-	std::shared_ptr<Actor> getActor()
-	{
-		return m_actor;
-	}
-
-private:
-	std::shared_ptr<Actor> m_actor;
-};
-
-};  // namespace Physics
-
-};  // namespace SurgSim
-
-#endif  // SURGSIM_PHYSICS_REPRESENTATION_H
+}

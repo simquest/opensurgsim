@@ -13,36 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_REPRESENTATION_H
-#define SURGSIM_PHYSICS_REPRESENTATION_H
+#include "ConstraintData.h"
 
-#include <SurgSim/Framework/Representation.h>
+using SurgSim::Physics::ConstraintData;
 
-namespace SurgSim 
+ConstraintData::ConstraintData()
 {
 
-namespace Physics
+}
+ConstraintData::~ConstraintData()
 {
 
-class Actor;
-
-class Representation : public Framework::Representation
-{
-public:
-	Representation(std::shared_ptr<Actor> actor);
-	virtual ~Representation();
-
-	std::shared_ptr<Actor> getActor()
-	{
-		return m_actor;
-	}
-
-private:
-	std::shared_ptr<Actor> m_actor;
-};
-
-};  // namespace Physics
-
-};  // namespace SurgSim
-
-#endif  // SURGSIM_PHYSICS_REPRESENTATION_H
+}

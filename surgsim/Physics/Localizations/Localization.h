@@ -13,31 +13,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_REPRESENTATION_H
-#define SURGSIM_PHYSICS_REPRESENTATION_H
+#ifndef LOCALIZATION_H
+#define LOCALIZATION_H
 
-#include <SurgSim/Framework/Representation.h>
+#include <SurgSim/Math/Vector.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
 {
 
 class Actor;
+class ActorState;
 
-class Representation : public Framework::Representation
+class Localization
 {
 public:
-	Representation(std::shared_ptr<Actor> actor);
-	virtual ~Representation();
+	Localization();
+	Localization(std::shared_ptr<Actor> actor);
+	virtual ~Localization();
 
-	std::shared_ptr<Actor> getActor()
+	void setActor(std::shared_ptr<Actor> actor)
+	{
+		m_actor = actor;
+	}
+	std::shared_ptr<Actor> getActor() const
 	{
 		return m_actor;
 	}
 
+	SurgSim::Math::Vector3d calculatePosition(const ActorState& state)
+	{
+		doCalculatePosition(state);
+	}
+
+	bool operator==(const Localization& localization) const;
+
+	bool operator!=(const Localization& localization) const;
+
 private:
+	virtual bool isEqual(const Localization& localization) const = 0;
+
+	virtual SurgSim::Math::Vector3d doCalculatePosition(const ActorState& state) = 0;
+
 	std::shared_ptr<Actor> m_actor;
 };
 
@@ -45,4 +64,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_REPRESENTATION_H
+#endif  // LOCALIZATION_H

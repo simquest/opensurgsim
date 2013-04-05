@@ -13,19 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
-include_directories(
-	"${Boost_INCLUDE_DIR}"
+set(SURGSIM_PHYSICS_CONSTRAINTS_SOURCES
+	${CMAKE_CURRENT_SOURCE_DIR}/Constraint.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ConstraintData.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/ConstraintImplementation.cpp
+	PARENT_SCOPE
 )
 
-# add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Physics)
+set(SURGSIM_PHYSICS_CONSTRAINTS_HEADERS
+	${CMAKE_CURRENT_SOURCE_DIR}/Constraint.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ConstraintData.h
+	${CMAKE_CURRENT_SOURCE_DIR}/ConstraintImplementation.h
+	PARENT_SCOPE
+)
+
+if(SURGSIM_TESTS_BUILD)
+#	add_subdirectory(UnitTests)
+endif()
+
+
+
+

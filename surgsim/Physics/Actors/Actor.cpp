@@ -13,36 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_REPRESENTATION_H
-#define SURGSIM_PHYSICS_REPRESENTATION_H
+#include "Actor.h"
 
-#include <SurgSim/Framework/Representation.h>
+#include "ActorImplementation.h"
 
-namespace SurgSim 
+using SurgSim::Framework::Representation;
+using SurgSim::Physics::Actor;
+using SurgSim::Physics::ActorImplementation;
+
+Actor::Actor(const std::string& name, std::shared_ptr<ActorImplementation> implementation) : Representation(name), m_implementation(implementation)
 {
+}
 
-namespace Physics
+Actor::~Actor()
 {
-
-class Actor;
-
-class Representation : public Framework::Representation
-{
-public:
-	Representation(std::shared_ptr<Actor> actor);
-	virtual ~Representation();
-
-	std::shared_ptr<Actor> getActor()
-	{
-		return m_actor;
-	}
-
-private:
-	std::shared_ptr<Actor> m_actor;
-};
-
-};  // namespace Physics
-
-};  // namespace SurgSim
-
-#endif  // SURGSIM_PHYSICS_REPRESENTATION_H
+}
