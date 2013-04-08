@@ -180,7 +180,7 @@ public:
 	/// \param index The index of the entry.
 	/// \param value The value to be set.
 	/// \return true if successful.
-	inline bool put(int index, const T& value);
+	inline bool set(int index, const T& value);
 
 	/// Record the data for an entry specified by a name.
 	/// The entry will also be marked as containing current data.
@@ -188,7 +188,7 @@ public:
 	/// \param name The name of the entry.
 	/// \param value The value to be set.
 	/// \return true if successful.
-	inline bool put(const std::string& name, const T& value);
+	inline bool set(const std::string& name, const T& value);
 
 	/// Mark an entry as not containing any current data.
 	///

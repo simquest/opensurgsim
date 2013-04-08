@@ -141,8 +141,8 @@ TEST(NamedDataTests, Put)
 	builder.addEntry("third");
 	NamedData<float> data = builder.createData();
 
-	data.put("first", 1.23f);
-	data.put(1, 4.56f);
+	data.set("first", 1.23f);
+	data.set(1, 4.56f);
 
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("first"));
@@ -175,8 +175,8 @@ TEST(NamedDataTests, Get)
 	builder.addEntry("third");
 	NamedData<float> data = builder.createData();
 
-	data.put("first", 1.23f);
-	data.put(1, 4.56f);
+	data.set("first", 1.23f);
+	data.set(1, 4.56f);
 
 	{
 		float value = 9.87f;
@@ -219,8 +219,8 @@ TEST(NamedDataTests, ResetAll)
 	builder.addEntry("third");
 	NamedData<float> data = builder.createData();
 
-	data.put("first", 1.23f);
-	data.put(1, 4.56f);
+	data.set("first", 1.23f);
+	data.set(1, 4.56f);
 
 	data.resetAll();
 
@@ -249,8 +249,8 @@ TEST(NamedDataTests, ResetOne)
 	builder.addEntry("third");
 	NamedData<float> data = builder.createData();
 
-	data.put("first", 1.23f);
-	data.put(1, 4.56f);
+	data.set("first", 1.23f);
+	data.set(1, 4.56f);
 
 	data.reset(0);
 
