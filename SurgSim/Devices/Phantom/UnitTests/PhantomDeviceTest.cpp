@@ -78,7 +78,6 @@ TEST(PhantomDeviceTest, CreateAndReleaseDevice)
 	PhantomManager manager;
 	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
 	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-	//boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
 	manager.releaseDevice(device);
 }
 
@@ -87,7 +86,6 @@ TEST(PhantomDeviceTest, DestroyManagerWithRunningDevice)
 	PhantomManager manager;
 	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
 	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-	//boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
 
 	// NB: device NOT released here!
 }
@@ -106,13 +104,11 @@ TEST(PhantomDeviceTest, CreateDeviceTwice)
 	{
 		std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
 		ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-		//boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
 		manager.releaseDevice(device);
 	}
 	{
 		std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
 		ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-		//boost::this_thread::sleep_for(boost::chrono::milliseconds(200));
 		manager.releaseDevice(device);
 	}
 }
