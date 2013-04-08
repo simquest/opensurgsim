@@ -18,12 +18,12 @@
  */
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/ThreadSafeContainer.h>
+#include <SurgSim/Framework/LockedContainer.h>
 
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 
-using SurgSim::Framework::ThreadSafeContainer;
+using SurgSim::Framework::LockedContainer;
 
 
 // Define some helper data types for testing.
@@ -33,10 +33,19 @@ class Copyable
 public:
 	Copyable() : m_data(-1) {};
 	Copyable(const Copyable& o) : m_data(o.m_data) {}
-	void operator=(const Copyable& o) { m_data = o.m_data; }
+	void operator=(const Copyable& o)
+	{
+		m_data = o.m_data;
+	}
 
-	int getValue() const { return m_data; }
-	void setValue(int d) { m_data = d; }
+	int getValue() const
+	{
+		return m_data;
+	}
+	void setValue(int d)
+	{
+		m_data = d;
+	}
 
 private:
 	int m_data;
@@ -47,8 +56,14 @@ class NonCopyable
 public:
 	NonCopyable() : m_data(-1) {};
 
-	int getValue() const { return m_data; }
-	void setValue(int d) { m_data = d; }
+	int getValue() const
+	{
+		return m_data;
+	}
+	void setValue(int d)
+	{
+		m_data = d;
+	}
 
 private:
 	NonCopyable(const NonCopyable&);
@@ -61,11 +76,24 @@ class Movable
 {
 public:
 	Movable() : m_data(-1) {};
-	Movable(Movable&& o) : m_data(o.m_data) { o.m_data = -1; }
-	void operator=(Movable&& o) { m_data = o.m_data;  o.m_data = -1; }
+	Movable(Movable&& o) : m_data(o.m_data)
+	{
+		o.m_data = -1;
+	}
+	void operator=(Movable&& o)
+	{
+		m_data = o.m_data;
+		o.m_data = -1;
+	}
 
-	int getValue() const { return m_data; }
-	void setValue(int d) { m_data = d; }
+	int getValue() const
+	{
+		return m_data;
+	}
+	void setValue(int d)
+	{
+		m_data = d;
+	}
 
 private:
 	Movable(const Movable&);
@@ -80,15 +108,39 @@ public:
 	BigData() : m_data1(-1), m_data2(-1) {};
 
 	BigData(const BigData& o) : m_data1(o.m_data1), m_data2(o.m_data2) {}
-	void operator=(const BigData& o) { m_data1 = o.m_data1;  m_data2 = o.m_data2; }
+	void operator=(const BigData& o)
+	{
+		m_data1 = o.m_data1;
+		m_data2 = o.m_data2;
+	}
 
-	BigData(BigData&& o) : m_data1(o.m_data1), m_data2(o.m_data2) { o.m_data1 = o.m_data2 = -1; }
-	void operator=(BigData&& o) { m_data1 = o.m_data1;  m_data2 = o.m_data2;  o.m_data1 = o.m_data2 = -1; }
+	BigData(BigData&& o) : m_data1(o.m_data1), m_data2(o.m_data2)
+	{
+		o.m_data1 = o.m_data2 = -1;
+	}
+	void operator=(BigData&& o)
+	{
+		m_data1 = o.m_data1;
+		m_data2 = o.m_data2;
+		o.m_data1 = o.m_data2 = -1;
+	}
 
-	int getValue1() const { return m_data1; }
-	void setValue1(int d) { m_data1 = d; }
-	int getValue2() const { return m_data2; }
-	void setValue2(int d) { m_data2 = d; }
+	int getValue1() const
+	{
+		return m_data1;
+	}
+	void setValue1(int d)
+	{
+		m_data1 = d;
+	}
+	int getValue2() const
+	{
+		return m_data2;
+	}
+	void setValue2(int d)
+	{
+		m_data2 = d;
+	}
 
 private:
 	int m_data1;
@@ -103,12 +155,12 @@ private:
 TEST(ThreadSafeContainerTest, Construct)
 {
 	// This should work:
-	EXPECT_NO_THROW({ThreadSafeContainer<int> data;});
-	EXPECT_NO_THROW({ThreadSafeContainer<Copyable> data;});
-	EXPECT_NO_THROW({ThreadSafeContainer<Movable> data;});
+	EXPECT_NO_THROW( {LockedContainer<int> data;});
+	EXPECT_NO_THROW( {LockedContainer<Copyable> data;});
+	EXPECT_NO_THROW( {LockedContainer<Movable> data;});
 
 	// This should also work but it's useless (can't modify the data):
-	EXPECT_NO_THROW({ThreadSafeContainer<NonCopyable> data;});
+	EXPECT_NO_THROW( {LockedContainer<NonCopyable> data;});
 }
 
 TEST(ThreadSafeContainerTest, InitializeAtConstruction)
@@ -121,8 +173,8 @@ TEST(ThreadSafeContainerTest, InitializeAtConstruction)
 	initial.setValue(123);
 	EXPECT_EQ(123, initial.getValue());
 
-	ThreadSafeContainer<DataType> data(initial);
-	EXPECT_EQ(123, data->getValue());
+	LockedContainer<DataType> data(initial);
+	EXPECT_EQ(123, data.get().getValue());
 	EXPECT_EQ(123, initial.getValue());
 }
 
@@ -134,8 +186,8 @@ TEST(ThreadSafeContainerTest, MoveInitializeAtConstruction)
 	initial.setValue(123);
 	EXPECT_EQ(123, initial.getValue());
 
-	ThreadSafeContainer<DataType> data(std::move(initial));
-	EXPECT_EQ(123, data->getValue());
+	LockedContainer<DataType> data(std::move(initial));
+	EXPECT_EQ(123, data.getMove().getValue());
 	EXPECT_EQ(-1, initial.getValue());
 }
 
@@ -144,34 +196,22 @@ TEST(ThreadSafeContainerTest, ReadWriteInterlock)
 	Copyable content;
 	content.setValue(1);
 
-	ThreadSafeContainer<Copyable> data(content);
-	EXPECT_EQ(1, data->getValue());
-	bool wasUpdated = data.update();
-	EXPECT_FALSE(wasUpdated);
+	LockedContainer<Copyable> data(content);
+	EXPECT_EQ(1, data.get().getValue());
 
 	// "writer":
 	content.setValue(2);
 	// note: NOT writing to the container!
 
 	// "reader":
-	wasUpdated = data.update();
-	EXPECT_FALSE(wasUpdated);
-	EXPECT_EQ(1, data->getValue());
+	EXPECT_EQ(1, data.get().getValue());
 
 	// "writer":
 	content.setValue(3);
 	data.set(content);
 
 	// "reader":
-	// note: NOT calling data.update()!
-	EXPECT_EQ(1, data->getValue());
-
-	// "writer": reusing previously written value
-
-	// "reader":
-	wasUpdated = data.update();
-	EXPECT_TRUE(wasUpdated);
-	EXPECT_EQ(3, data->getValue());
+	EXPECT_EQ(3, data.get().getValue());
 }
 
 TEST(ThreadSafeContainerTest, MoveInterfaces)
@@ -179,39 +219,30 @@ TEST(ThreadSafeContainerTest, MoveInterfaces)
 	Movable content;
 	content.setValue(1);
 
-	ThreadSafeContainer<Movable> data(std::move(content));
-	EXPECT_EQ(1, data->getValue());
-	bool wasUpdated = data.update();
-	EXPECT_FALSE(wasUpdated);
+	LockedContainer<Movable> data(std::move(content));
+	EXPECT_EQ(1, data.getMove().getValue());
+	EXPECT_EQ(-1, data.getMove().getValue());
 
 	// "writer":
 	content.setValue(2);
 	// note: NOT writing to the container!
 
 	// "reader":
-	wasUpdated = data.update();
-	EXPECT_FALSE(wasUpdated);
-	EXPECT_EQ(1, data->getValue());
+	EXPECT_EQ(-1, data.getMove().getValue());
 
 	// "writer":
 	content.setValue(3);
 	data.set(std::move(content));
 
 	// "reader":
-	// note: NOT calling data.update()!
-	EXPECT_EQ(1, data->getValue());
-
-	// "writer": reusing previously written value
-
-	// "reader":
-	wasUpdated = data.update();
-	EXPECT_TRUE(wasUpdated);
-	EXPECT_EQ(3, data->getValue());
+	EXPECT_EQ(3, data.getMove().getValue());
+	EXPECT_EQ(-1, data.getMove().getValue());
+	EXPECT_EQ(-1, content.getValue());
 }
 
 // ==================== MULTI-THREADED TESTS ====================
 
-typedef ThreadSafeContainer<BigData> SharedData;
+typedef LockedContainer<BigData> SharedData;
 
 class DataWriter
 {
@@ -279,7 +310,7 @@ void testReaderAndWriters(int numWriters)
 	// the threads finish too quickly and thus don't run concurrently.
 	const int NUM_TOTAL_WRITES = 1000000;
 
-	ThreadSafeContainer<BigData> data;
+	LockedContainer<BigData> data;
 
 	std::vector<DataWriter*> writers(numWriters);
 	for (size_t i = 0;  i < writers.size();  ++i)
@@ -287,22 +318,22 @@ void testReaderAndWriters(int numWriters)
 		// The step has been chosen so two writers can't ever produce the same value
 		writers[i] = new DataWriter(data, i, numWriters, NUM_TOTAL_WRITES/numWriters);
 	}
-	data.update();
-	EXPECT_EQ(-1, data->getValue1());
-	EXPECT_EQ(-1, data->getValue2());
+	EXPECT_EQ(-1, data.get().getValue1());
+	EXPECT_EQ(-1, data.get().getValue2());
 
 	for (size_t i = 0;  i < writers.size();  ++i)
 	{
 		writers[i]->start();
 	}
 
+	BigData value;
 	while (1)
 	{
-		int z1 = data->getValue1();
+		int z1 = value.getValue1();
 
-		bool wasUpdated = data.update();
-		int a1 = data->getValue1();
-		int a2 = data->getValue2();
+		bool wasUpdated = data.getIfChanged(&value);
+		int a1 = value.getValue1();
+		int a2 = value.getValue2();
 		EXPECT_EQ(a1, a2);
 		if (wasUpdated)
 		{
@@ -312,11 +343,6 @@ void testReaderAndWriters(int numWriters)
 		{
 			EXPECT_EQ(z1, a1);
 		}
-
-		int b1 = data->getValue1();
-		int b2 = data->getValue2();
-		EXPECT_EQ(a1, b1);
-		EXPECT_EQ(b1, b2);
 
 		bool allDone = true;
 		for (size_t i = 0;  i < writers.size();  ++i)
