@@ -29,7 +29,6 @@ set(UNIT_TEST_SOURCES
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
-	ThreadSafeContainerTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
