@@ -28,12 +28,14 @@ namespace Framework
 /// A simple thread-safe data container that can support multiple writers and readers.
 ///
 /// The type of the contained data is determined by the template argument, and should satisfy the following:
-///  - It must be either default-constructable or copy-constructable.  In other words, construction must be
-///    possible using either <code>T()</code> or <code>T(const T&amp;)</code>, or compiler-generated equivalents.
+///  - It must be either default-constructable or copy-constructable or move-constructable.  In other words,
+///    construction must be possible using either <code>T()</code> or <code>T(const T&amp;)</code> or
+///    <code>T(T&amp;&amp;)</code>, or compiler-generated equivalents.
 ///  - It must be either copy-assignable or move-assignable.  In other words, assignment must be possible using
 ///    either <code>operator=(const T&amp;)</code> or <code>operator=(T&amp;&amp;)</code>, or compiler-generated
 ///    equivalents.  (If it is only move-assignable, then you can't get the value in the container without
 ///    erasing it.)
+///
 /// Note that STL container types, plain-old-data structs, and most other things you might want to use satisfy
 /// those requirements.
 ///
