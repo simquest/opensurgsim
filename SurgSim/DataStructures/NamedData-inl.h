@@ -130,6 +130,10 @@ inline std::shared_ptr<const IndexDirectory> NamedData<T>::getDirectory() const
 template <typename T>
 inline int NamedData<T>::getIndex(const std::string& name) const
 {
+	if (! isValid())
+	{
+		return -1;
+	}
 	return m_directory->getIndex(name);
 }
 
@@ -138,7 +142,7 @@ inline std::string NamedData<T>::getName(int index) const
 {
 	if (! isValid())
 	{
-		return -1;
+		return "";
 	}
 	return m_directory->getName(index);
 }
