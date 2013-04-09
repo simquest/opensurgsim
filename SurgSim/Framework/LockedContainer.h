@@ -49,7 +49,7 @@ namespace Framework
 /// Writers write the data by calling the \ref set method, which copies or moves the data into internal storage.
 /// Readers read the data by calling the \ref get method, which copies the data from internal storage.
 ///
-/// \tparam T Generic type parameter.
+/// \tparam T Type of the data held by the LockedContainer.
 template <typename T>
 class LockedContainer
 {
@@ -66,7 +66,7 @@ public:
 	/// Create the container and the data it contains.
 	///
 	/// The data will be initialized using the copy constructor.
-	/// \arg initialValue The initial value to be used.
+	/// \param initialValue The initial value to be used.
 	LockedContainer(const T& initialValue) :
 		m_buffer(initialValue),
 		m_haveNewData(false)
@@ -77,7 +77,7 @@ public:
 	///
 	/// The data in the active buffer will be initialized using the move constructor.
 	/// The data in the second, inactive buffer will be initialized using the default constructor.
-	/// \arg initialValue The initial value to be moved into the active buffer.
+	/// \param initialValue The initial value to be moved into the active buffer.
 	LockedContainer(T&& initialValue) :
 		m_buffer(std::move(initialValue)),
 		m_haveNewData(false)
@@ -94,7 +94,7 @@ public:
 	///
 	/// The data will be copied into internal storage.  If \ref set is called again before the next \ref get,
 	/// the first data will be overwritten and lost.
-	/// \arg value The value to be written.
+	/// \param value The value to be written.
 	void set(const T& value)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
@@ -106,21 +106,12 @@ public:
 	///
 	/// The data will be moved into internal storage.  If \ref set is called again before the next \ref get, the
 	/// first data will be overwritten and lost.
-	/// \arg value The value to be written.
+	/// \param value The value to be written.
 	void set(T&& value)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
 		m_buffer = std::move(value);
 		m_haveNewData = true;
-	}
-
-	/// Read (copy) the data from the container.
-	/// \return the data in the container, by value.
-	T get() const
-	{
-		boost::lock_guard<boost::mutex> lock(m_mutex);
-		m_haveNewData = false;
-		return m_buffer;
 	}
 
 	/// Read (copy) the data from the container.
@@ -132,33 +123,25 @@ public:
 		*value = m_buffer;
 	}
 
-	/// Read (move) the data from the container.
-	/// \todo What should the LockedContainer::getMove method be called?
-	/// \return the data in the container, by moving into the return value.
-	T getMove()
-	{
-		boost::lock_guard<boost::mutex> lock(m_mutex);
-		m_haveNewData = false;
-		return std::move(m_buffer);
-	}
-
-	/// Read (move) the data from the container.
-	/// \todo What should the LockedContainer::getMove method be called?
+	/// Move the data out of the container.
+	/// For types that support move assignment, the internal state of the container will be invalidated.
 	/// \param [out] value The location to write the data from the container.  The pointer must be non-null.
-	void getMove(T* value)
+	void take(T* value)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
 		m_haveNewData = false;
 		*value = std::move(m_buffer);
 	}
 
-	/// Get the data from the container.
+	/// Read (copy) the data from the container if it has been modified since the last access.
+	/// If \ref set has not been called since the last \ref get, \ref take, \ref tryGetChanged or
+	/// \ref tryTakeChanged, the method returns \c false and doesn't modify the data.
 	///
 	/// \param [out] value The location to write the data from the container if it has changed.  The pointer
 	/// 	must be non-null.
 	/// \return true if there was new data (which may or may not be equal to the old).  Note that the initial
 	/// 	value created when the object was constructed (if any) is not considered "new" data by this method.
-	bool getIfChanged(T* value) const
+	bool tryGetChanged(T* value) const
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
 		if (! m_haveNewData)
@@ -173,6 +156,29 @@ public:
 		}
 	}
 
+	/// Move the data out of the container if it has been modified since the last access.
+	/// If \ref set has not been called since the last \ref get, \ref take, \ref tryGetChanged or
+	/// \ref tryTakeChanged, the method returns \c false and doesn't modify the data.
+	///
+	/// \param [out] value The location to write the data from the container if it has changed.  The pointer
+	/// 	must be non-null.
+	/// \return true if there was new data (which may or may not be equal to the old).  Note that the initial
+	/// 	value created when the object was constructed (if any) is not considered "new" data by this method.
+	bool tryTakeChanged(T* value)
+	{
+		boost::lock_guard<boost::mutex> lock(m_mutex);
+		if (! m_haveNewData)
+		{
+			return false;
+		}
+		else
+		{
+			m_haveNewData = false;
+			*value = std::move(m_buffer);
+			return true;
+		}
+	}
+
 private:
 	/// Prevent copying
 	LockedContainer(const LockedContainer&);
@@ -183,7 +189,7 @@ private:
 	/// Internal buffer.
 	T m_buffer;
 
-	/// True if there data that has been written, but not yet pulled in by \ref get or \ref getMove.
+	/// True if there data that has been written, but not yet pulled in by get, take, etc.
 	mutable bool m_haveNewData;
 
 	/// Mutex for synchronization of set() and get() calls.

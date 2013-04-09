@@ -157,6 +157,7 @@ private:
 	int m_data2;
 };
 
+
 // Now we're ready to start testing...
 
 // ==================== SINGLE-THREADED TESTS ====================
@@ -183,7 +184,10 @@ TEST(LockedContainerTest, InitializeAtConstruction)
 	EXPECT_EQ(123, initial.getValue());
 
 	LockedContainer<DataType> data(initial);
-	EXPECT_EQ(123, data.get().getValue());
+
+	DataType contents;
+	data.get(&contents);
+	EXPECT_EQ(123, contents.getValue());
 	EXPECT_EQ(123, initial.getValue());
 }
 
@@ -196,62 +200,14 @@ TEST(LockedContainerTest, MoveInitializeAtConstruction)
 	EXPECT_EQ(123, initial.getValue());
 
 	LockedContainer<DataType> data(std::move(initial));
-	EXPECT_EQ(123, data.getMove().getValue());
+
+	DataType contents;
+	data.take(&contents);
+	EXPECT_EQ(123, contents.getValue());
 	EXPECT_EQ(-1, initial.getValue());  // the old data has been moved out!
 }
 
-TEST(LockedContainerTest, ReadWriteInterlock)
-{
-	Copyable content;
-	content.setValue(1);
-
-	LockedContainer<Copyable> data(content);
-	EXPECT_EQ(1, data.get().getValue());
-
-	// "writer":
-	content.setValue(2);
-	// note: NOT writing to the container!
-
-	// "reader":
-	EXPECT_EQ(1, data.get().getValue());
-
-	// "writer":
-	content.setValue(3);
-	data.set(content);
-
-	// "reader":
-	EXPECT_EQ(3, data.get().getValue());
-}
-
-TEST(LockedContainerTest, MoveInterfaces)
-{
-	Movable content;
-	content.setValue(1);
-	EXPECT_EQ(1, content.getValue());
-
-	LockedContainer<Movable> data(std::move(content));
-	EXPECT_EQ(1, data.getMove().getValue());
-	EXPECT_EQ(-1, data.getMove().getValue());
-	EXPECT_EQ(-1, content.getValue());
-
-	// "writer":
-	content.setValue(2);
-	// note: NOT writing to the container!
-
-	// "reader":
-	EXPECT_EQ(-1, data.getMove().getValue());
-
-	// "writer":
-	content.setValue(3);
-	data.set(std::move(content));
-
-	// "reader":
-	EXPECT_EQ(3, data.getMove().getValue());
-	EXPECT_EQ(-1, data.getMove().getValue());
-	EXPECT_EQ(-1, content.getValue());
-}
-
-TEST(LockedContainerTest, GetIntoVariable)
+TEST(LockedContainerTest, Get)
 {
 	Copyable content;
 	content.setValue(987);
@@ -262,11 +218,12 @@ TEST(LockedContainerTest, GetIntoVariable)
 	Copyable destination;
 	data.get(&destination);
 	EXPECT_EQ(987, destination.getValue());
-	EXPECT_EQ(987, data.get().getValue());
+	data.get(&destination);
+	EXPECT_EQ(987, destination.getValue());
 	EXPECT_EQ(987, content.getValue());
 }
 
-TEST(LockedContainerTest, GetMoveIntoVariable)
+TEST(LockedContainerTest, Take)
 {
 	Movable content;
 	content.setValue(987);
@@ -275,13 +232,77 @@ TEST(LockedContainerTest, GetMoveIntoVariable)
 	EXPECT_EQ(-1, content.getValue());
 
 	Movable destination;
-	data.getMove(&destination);
+	data.take(&destination);
 	EXPECT_EQ(987, destination.getValue());
-	EXPECT_EQ(-1, data.getMove().getValue());
+	data.take(&destination);
+	EXPECT_EQ(-1, destination.getValue());
 	EXPECT_EQ(-1, content.getValue());
 }
 
-TEST(LockedContainerTest, GetIfChanged)
+TEST(LockedContainerTest, SetAndGet)
+{
+	Copyable initial;
+	initial.setValue(1);
+
+	LockedContainer<Copyable> data(initial);
+
+	Copyable contents;
+	data.get(&contents);
+	EXPECT_EQ(1, contents.getValue());
+
+	// "writer":
+	initial.setValue(2);
+	// note: NOT writing to the container!
+
+	// "reader":
+	data.get(&contents);
+	EXPECT_EQ(1, contents.getValue());
+
+	// "writer":
+	initial.setValue(3);
+	data.set(initial);
+
+	// "reader":
+	data.get(&contents);
+	EXPECT_EQ(3, contents.getValue());
+}
+
+TEST(LockedContainerTest, SetAndTake)
+{
+	Movable initial;
+	initial.setValue(1);
+	EXPECT_EQ(1, initial.getValue());
+
+	LockedContainer<Movable> data(std::move(initial));
+
+	Movable contents;
+	data.take(&contents);
+	EXPECT_EQ(1, contents.getValue());
+	data.take(&contents);
+	EXPECT_EQ(-1, contents.getValue());
+	EXPECT_EQ(-1, initial.getValue());
+
+	// "writer":
+	initial.setValue(2);
+	// note: NOT writing to the container!
+
+	// "reader":
+	data.take(&contents);
+	EXPECT_EQ(-1, contents.getValue());
+
+	// "writer":
+	initial.setValue(3);
+	data.set(std::move(initial));
+
+	// "reader":
+	data.take(&contents);
+	EXPECT_EQ(3, contents.getValue());
+	data.take(&contents);
+	EXPECT_EQ(-1, contents.getValue());
+	EXPECT_EQ(-1, initial.getValue());
+}
+
+TEST(LockedContainerTest, TryGetChanged)
 {
 	{
 		LockedContainer<Copyable> data;  // use default constructor for Copyable
@@ -289,11 +310,12 @@ TEST(LockedContainerTest, GetIfChanged)
 		Copyable destination;
 		destination.setValue(999);
 		{
-			bool changed = data.getIfChanged(&destination);
-			EXPECT_FALSE(changed) << "no set(); getIfChanged should return false!";
+			bool changed = data.tryGetChanged(&destination);
+			EXPECT_FALSE(changed) << "no set(); tryGetChanged() should return false!";
 			if (! changed)
 			{
-				EXPECT_EQ(999, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+				EXPECT_EQ(999, destination.getValue()) <<
+					"tryGetChanged() returned false; value shouldn't have changed!";
 			}
 		}
 
@@ -302,21 +324,23 @@ TEST(LockedContainerTest, GetIfChanged)
 		data.set(content);
 
 		{
-			bool changed = data.getIfChanged(&destination);
-			EXPECT_TRUE(changed) << "set() called; getIfChanged should return true!";
+			bool changed = data.tryGetChanged(&destination);
+			EXPECT_TRUE(changed) << "set() called; tryGetChanged() should return true!";
 			if (changed)
 			{
-				EXPECT_EQ(101, destination.getValue()) << "getIfChanged() returned true; value should have changed!";
+				EXPECT_EQ(101, destination.getValue()) <<
+					"tryGetChanged() returned true; value should have changed!";
 			}
 		}
 
 		destination.setValue(888);
 		{
-			bool changed = data.getIfChanged(&destination);
-			EXPECT_FALSE(changed) << "no set() since get(); getIfChanged should return false!";
+			bool changed = data.tryGetChanged(&destination);
+			EXPECT_FALSE(changed) << "no set() since get(); tryGetChanged() should return false!";
 			if (! changed)
 			{
-				EXPECT_EQ(888, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+				EXPECT_EQ(888, destination.getValue()) <<
+					"tryGetChanged() returned false; value shouldn't have changed!";
 			}
 		}
 	}
@@ -329,11 +353,12 @@ TEST(LockedContainerTest, GetIfChanged)
 		Copyable destination;
 		destination.setValue(999);
 		{
-			bool changed = data.getIfChanged(&destination);
-			EXPECT_FALSE(changed) << "no set(); getIfChanged should return false!";
+			bool changed = data.tryGetChanged(&destination);
+			EXPECT_FALSE(changed) << "no set(); tryGetChanged() should return false!";
 			if (! changed)
 			{
-				EXPECT_EQ(999, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+				EXPECT_EQ(999, destination.getValue()) <<
+					"tryGetChanged() returned false; value shouldn't have changed!";
 			}
 		}
 
@@ -341,22 +366,124 @@ TEST(LockedContainerTest, GetIfChanged)
 		data.set(content);
 
 		{
-			bool changed = data.getIfChanged(&destination);
-			EXPECT_TRUE(changed) << "set() called; getIfChanged should return true!";
+			bool changed = data.tryGetChanged(&destination);
+			EXPECT_TRUE(changed) << "set() called; tryGetChanged() should return true!";
 			if (changed)
 			{
-				EXPECT_EQ(121, destination.getValue()) << "getIfChanged() returned true; value should have changed!";
+				EXPECT_EQ(121, destination.getValue()) <<
+					"tryGetChanged() returned true; value should have changed!";
 			}
 		}
 
 		destination.setValue(888);
 		{
-			bool changed = data.getIfChanged(&destination);
-			EXPECT_FALSE(changed) << "no set() since get(); getIfChanged should return false!";
+			bool changed = data.tryGetChanged(&destination);
+			EXPECT_FALSE(changed) << "no set() since get(); tryGetChanged() should return false!";
 			if (! changed)
 			{
-				EXPECT_EQ(888, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+				EXPECT_EQ(888, destination.getValue()) <<
+					"tryGetChanged() returned false; value shouldn't have changed!";
 			}
+		}
+	}
+}
+
+TEST(LockedContainerTest, TryTakeChanged)
+{
+	{
+		LockedContainer<Movable> data;  // use default constructor for Movable
+
+		Movable destination;
+		destination.setValue(999);
+		{
+			bool changed = data.tryTakeChanged(&destination);
+			EXPECT_FALSE(changed) << "no set(); tryTakeChanged() should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(999, destination.getValue()) <<
+					"tryTakeChanged() returned false; value shouldn't have changed!";
+			}
+		}
+
+		Movable content;
+		content.setValue(101);
+		data.set(std::move(content));
+
+		{
+			bool changed = data.tryTakeChanged(&destination);
+			EXPECT_TRUE(changed) << "set() called; tryTakeChanged() should return true!";
+			if (changed)
+			{
+				EXPECT_EQ(101, destination.getValue()) <<
+					"tryTakeChanged() returned true; value should have changed!";
+			}
+		}
+
+		destination.setValue(888);
+		{
+			bool changed = data.tryTakeChanged(&destination);
+			EXPECT_FALSE(changed) << "no set() since get(); tryTakeChanged() should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(888, destination.getValue()) <<
+					"tryTakeChanged() returned false; value shouldn't have changed!";
+			}
+		}
+
+		destination.setValue(777);
+		{
+			data.take(&destination);
+			EXPECT_EQ(-1, destination.getValue()) <<
+				"an earlier tryTakeChanged() should have emptied the container!";
+		}
+	}
+
+	{
+		Movable content;
+		content.setValue(654);
+		LockedContainer<Movable> data(std::move(content));  // use initializing constructor for Movable
+
+		Movable destination;
+		destination.setValue(999);
+		{
+			bool changed = data.tryTakeChanged(&destination);
+			EXPECT_FALSE(changed) << "no set(); tryTakeChanged() should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(999, destination.getValue()) <<
+					"tryTakeChanged() returned false; value shouldn't have changed!";
+			}
+		}
+
+		content.setValue(121);
+		data.set(std::move(content));
+
+		{
+			bool changed = data.tryTakeChanged(&destination);
+			EXPECT_TRUE(changed) << "set() called; tryTakeChanged() should return true!";
+			if (changed)
+			{
+				EXPECT_EQ(121, destination.getValue()) <<
+					"tryTakeChanged() returned true; value should have changed!";
+			}
+		}
+
+		destination.setValue(888);
+		{
+			bool changed = data.tryTakeChanged(&destination);
+			EXPECT_FALSE(changed) << "no set() since get(); tryTakeChanged() should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(888, destination.getValue()) <<
+					"tryTakeChanged() returned false; value shouldn't have changed!";
+			}
+		}
+
+		destination.setValue(777);
+		{
+			data.take(&destination);
+			EXPECT_EQ(-1, destination.getValue()) <<
+				"an earlier tryTakeChanged() should have emptied the container!";
 		}
 	}
 }
@@ -444,8 +571,12 @@ void testReaderAndWriters(int numWriters)
 		// The step has been chosen so two writers can't ever produce the same value
 		writers[i] = new DataWriter(data, i, numWriters, NUM_TOTAL_WRITES/numWriters);
 	}
-	EXPECT_EQ(-1, data.get().getValue1());
-	EXPECT_EQ(-1, data.get().getValue2());
+	{
+		BigData value;
+		data.get(&value);
+		EXPECT_EQ(-1, value.getValue1());
+		EXPECT_EQ(-1, value.getValue2());
+	}
 
 	for (size_t i = 0;  i < writers.size();  ++i)
 	{
@@ -457,7 +588,7 @@ void testReaderAndWriters(int numWriters)
 	{
 		int z1 = value.getValue1();
 
-		bool wasUpdated = data.getIfChanged(&value);
+		bool wasUpdated = data.tryGetChanged(&value);
 		int a1 = value.getValue1();
 		int a2 = value.getValue2();
 		EXPECT_EQ(a1, a2);
