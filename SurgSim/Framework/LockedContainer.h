@@ -27,13 +27,13 @@ namespace Framework
 
 /// A simple thread-safe data container that can support multiple writers and readers.
 ///
-/// \todo FIX THIS DOC PARAGRAPH XXX!!!XXX
 /// The type of the contained data is determined by the template argument, and should satisfy the following:
-///  - It must be either copy-assignable or move-assignable.  In other words, assignment must be possible using
-///    either <code>operator=(const T&amp;)</code> or <code>operator=(T&amp;&amp;)</code>, or compiler-generated
-///    equivalents.
 ///  - It must be either default-constructable or copy-constructable.  In other words, construction must be
 ///    possible using either <code>T()</code> or <code>T(const T&amp;)</code>, or compiler-generated equivalents.
+///  - It must be either copy-assignable or move-assignable.  In other words, assignment must be possible using
+///    either <code>operator=(const T&amp;)</code> or <code>operator=(T&amp;&amp;)</code>, or compiler-generated
+///    equivalents.  (If it is only move-assignable, then you can't get the value in the container without
+///    erasing it.)
 /// Note that STL container types, plain-old-data structs, and most other things you might want to use satisfy
 /// those requirements.
 ///
@@ -151,9 +151,11 @@ public:
 	}
 
 	/// Get the data from the container.
+	///
 	/// \param [out] value The location to write the data from the container if it has changed.  The pointer
 	/// 	must be non-null.
-	/// \return true if there was new data (which may or may not be equal to the old).
+	/// \return true if there was new data (which may or may not be equal to the old).  Note that the initial
+	/// 	value created when the object was constructed (if any) is not considered "new" data by this method.
 	bool getIfChanged(T* value) const
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
@@ -176,13 +178,13 @@ private:
 	LockedContainer& operator=(const LockedContainer&);
 
 
-	/// Internal buffer
+	/// Internal buffer.
 	T m_buffer;
 
-	/// Is there data that has been written, but not yet pulled in by \ref update ?
+	/// True if there data that has been written, but not yet pulled in by \ref get or \ref getMove.
 	mutable bool m_haveNewData;
 
-	/// Mutex for synchronization of set() and update() calls
+	/// Mutex for synchronization of set() and get() calls.
 	mutable boost::mutex m_mutex;
 };
 

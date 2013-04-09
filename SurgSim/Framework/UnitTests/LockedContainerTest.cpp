@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /** @file
- * Tests for the ThreadSafeContainer class.
+ * Tests for the LockedContainer class.
  */
 
 #include <gtest/gtest.h>
@@ -28,6 +28,7 @@ using SurgSim::Framework::LockedContainer;
 
 // Define some helper data types for testing.
 
+/// A class that supports copy construction and copy assignment but not moving.
 class Copyable
 {
 public:
@@ -48,9 +49,12 @@ public:
 	}
 
 private:
+	// No need to disable move construction and move assignment-- the compiler does not provide those by default.
+
 	int m_data;
 };
 
+/// A class that supports neither copying nor moving.
 class NonCopyable
 {
 public:
@@ -66,12 +70,15 @@ public:
 	}
 
 private:
+	// Disable copy construction and copy assignment.
+	// No need to disable move construction and move assignment-- the compiler does not provide those by default.
 	NonCopyable(const NonCopyable&);
 	void operator=(const NonCopyable&);
 
 	int m_data;
 };
 
+/// A class that supports move construction and move assignment but not copying.
 class Movable
 {
 public:
@@ -96,12 +103,14 @@ public:
 	}
 
 private:
+	// Disable copy construction and copy assignment.
 	Movable(const Movable&);
 	void operator=(const Movable&);
 
 	int m_data;
 };
 
+/// A class with several pieces of data for checking consistency.
 class BigData
 {
 public:
@@ -152,7 +161,7 @@ private:
 
 // ==================== SINGLE-THREADED TESTS ====================
 
-TEST(ThreadSafeContainerTest, Construct)
+TEST(LockedContainerTest, Construct)
 {
 	// This should work:
 	EXPECT_NO_THROW( {LockedContainer<int> data;});
@@ -163,10 +172,10 @@ TEST(ThreadSafeContainerTest, Construct)
 	EXPECT_NO_THROW( {LockedContainer<NonCopyable> data;});
 }
 
-TEST(ThreadSafeContainerTest, InitializeAtConstruction)
+TEST(LockedContainerTest, InitializeAtConstruction)
 {
 	typedef Copyable DataType;
-	// With the following definition, the TSC construction should not compile:
+	// With the following definition, the container construction should not compile:
 	//typedef NonCopyable DataType;
 
 	DataType initial;
@@ -178,7 +187,7 @@ TEST(ThreadSafeContainerTest, InitializeAtConstruction)
 	EXPECT_EQ(123, initial.getValue());
 }
 
-TEST(ThreadSafeContainerTest, MoveInitializeAtConstruction)
+TEST(LockedContainerTest, MoveInitializeAtConstruction)
 {
 	typedef Movable DataType;
 
@@ -188,10 +197,10 @@ TEST(ThreadSafeContainerTest, MoveInitializeAtConstruction)
 
 	LockedContainer<DataType> data(std::move(initial));
 	EXPECT_EQ(123, data.getMove().getValue());
-	EXPECT_EQ(-1, initial.getValue());
+	EXPECT_EQ(-1, initial.getValue());  // the old data has been moved out!
 }
 
-TEST(ThreadSafeContainerTest, ReadWriteInterlock)
+TEST(LockedContainerTest, ReadWriteInterlock)
 {
 	Copyable content;
 	content.setValue(1);
@@ -214,14 +223,16 @@ TEST(ThreadSafeContainerTest, ReadWriteInterlock)
 	EXPECT_EQ(3, data.get().getValue());
 }
 
-TEST(ThreadSafeContainerTest, MoveInterfaces)
+TEST(LockedContainerTest, MoveInterfaces)
 {
 	Movable content;
 	content.setValue(1);
+	EXPECT_EQ(1, content.getValue());
 
 	LockedContainer<Movable> data(std::move(content));
 	EXPECT_EQ(1, data.getMove().getValue());
 	EXPECT_EQ(-1, data.getMove().getValue());
+	EXPECT_EQ(-1, content.getValue());
 
 	// "writer":
 	content.setValue(2);
@@ -238,6 +249,116 @@ TEST(ThreadSafeContainerTest, MoveInterfaces)
 	EXPECT_EQ(3, data.getMove().getValue());
 	EXPECT_EQ(-1, data.getMove().getValue());
 	EXPECT_EQ(-1, content.getValue());
+}
+
+TEST(LockedContainerTest, GetIntoVariable)
+{
+	Copyable content;
+	content.setValue(987);
+
+	LockedContainer<Copyable> data(content);
+	EXPECT_EQ(987, content.getValue());
+
+	Copyable destination;
+	data.get(&destination);
+	EXPECT_EQ(987, destination.getValue());
+	EXPECT_EQ(987, data.get().getValue());
+	EXPECT_EQ(987, content.getValue());
+}
+
+TEST(LockedContainerTest, GetMoveIntoVariable)
+{
+	Movable content;
+	content.setValue(987);
+
+	LockedContainer<Movable> data(std::move(content));
+	EXPECT_EQ(-1, content.getValue());
+
+	Movable destination;
+	data.getMove(&destination);
+	EXPECT_EQ(987, destination.getValue());
+	EXPECT_EQ(-1, data.getMove().getValue());
+	EXPECT_EQ(-1, content.getValue());
+}
+
+TEST(LockedContainerTest, GetIfChanged)
+{
+	{
+		LockedContainer<Copyable> data;  // use default constructor for Copyable
+
+		Copyable destination;
+		destination.setValue(999);
+		{
+			bool changed = data.getIfChanged(&destination);
+			EXPECT_FALSE(changed) << "no set(); getIfChanged should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(999, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+			}
+		}
+
+		Copyable content;
+		content.setValue(101);
+		data.set(content);
+
+		{
+			bool changed = data.getIfChanged(&destination);
+			EXPECT_TRUE(changed) << "set() called; getIfChanged should return true!";
+			if (changed)
+			{
+				EXPECT_EQ(101, destination.getValue()) << "getIfChanged() returned true; value should have changed!";
+			}
+		}
+
+		destination.setValue(888);
+		{
+			bool changed = data.getIfChanged(&destination);
+			EXPECT_FALSE(changed) << "no set() since get(); getIfChanged should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(888, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+			}
+		}
+	}
+
+	{
+		Copyable content;
+		content.setValue(654);
+		LockedContainer<Copyable> data(content);  // use initializing constructor for Copyable
+
+		Copyable destination;
+		destination.setValue(999);
+		{
+			bool changed = data.getIfChanged(&destination);
+			EXPECT_FALSE(changed) << "no set(); getIfChanged should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(999, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+			}
+		}
+
+		content.setValue(121);
+		data.set(content);
+
+		{
+			bool changed = data.getIfChanged(&destination);
+			EXPECT_TRUE(changed) << "set() called; getIfChanged should return true!";
+			if (changed)
+			{
+				EXPECT_EQ(121, destination.getValue()) << "getIfChanged() returned true; value should have changed!";
+			}
+		}
+
+		destination.setValue(888);
+		{
+			bool changed = data.getIfChanged(&destination);
+			EXPECT_FALSE(changed) << "no set() since get(); getIfChanged should return false!";
+			if (! changed)
+			{
+				EXPECT_EQ(888, destination.getValue()) << "getIfChanged() returned false; value shouldn't have changed!";
+			}
+		}
+	}
 }
 
 // ==================== MULTI-THREADED TESTS ====================
@@ -258,6 +379,11 @@ public:
 
 	bool isDone() const
 	{
+		// Direct access to the data member is a hack, since this is called from a different thread.
+		// If this were production code, we would really want to use a LockedContainer<bool> instead.
+		//
+		// But in this case, we really want to avoid locking around the flag in order to maximize the likelihood
+		// that adverse race conditions in *actual data* access may pop up, so we do this anyway.
 		return m_isDone;
 	}
 
@@ -365,15 +491,15 @@ void testReaderAndWriters(int numWriters)
 	}
 }
 
-TEST(ThreadSafeContainerTest, DISABLED_OneWriterThread)
+TEST(LockedContainerTest, DISABLED_OneWriterThread)
 {
 	testReaderAndWriters(1);
 }
-TEST(ThreadSafeContainerTest, TwoWriterThreads)
+TEST(LockedContainerTest, TwoWriterThreads)
 {
 	testReaderAndWriters(2);
 }
-TEST(ThreadSafeContainerTest, DISABLED_FourWriterThreads)
+TEST(LockedContainerTest, DISABLED_FourWriterThreads)
 {
 	testReaderAndWriters(4);
 }
