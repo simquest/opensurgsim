@@ -37,7 +37,7 @@ class SceneElement
 {
 
 public:
-	SceneElement(std::string name) : m_name(name) {};
+	SceneElement(const std::string& name) : m_name(name) {};
 	virtual ~SceneElement() {};
 
 	/// Adds a component
@@ -53,12 +53,12 @@ public:
 	/// Removes the component described by name.
 	/// \param	name	The name.
 	/// \return	true if it succeeds, false if it fails or the component cannot be found.
-	bool removeComponent(std::string name);
+	bool removeComponent(const std::string& name);
 
 	/// Gets the component identified by name.
 	/// \param	name	The name.
 	/// \return	The component or nullptr if the component cannot be found.
-	std::shared_ptr<Component> getComponent(std::string name) const;
+	std::shared_ptr<Component> getComponent(const std::string& name) const;
 
 	/// Gets all the components of this SceneElement.
 	/// \return	The components.

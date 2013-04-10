@@ -44,7 +44,7 @@ public:
 
 	/// Constructor
 	/// \param filename The filename to be used for writing
-	explicit FileOutput(std::string filename);
+	explicit FileOutput(const std::string& filename);
 
 	virtual ~FileOutput();
 
