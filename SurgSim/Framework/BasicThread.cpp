@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "BasicThread.h"
+#include "SurgSim/Framework/BasicThread.h"
 
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>

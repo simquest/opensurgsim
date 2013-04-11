@@ -18,7 +18,7 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 
-using namespace SurgSim::Framework;
+using SurgSim::Framework::Scene;
 
 TEST(SceneTest, ConstructorTest)
 {

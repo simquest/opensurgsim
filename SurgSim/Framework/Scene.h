@@ -19,8 +19,8 @@
 #include <memory>
 #include <string>
 
-#include "BasicThread.h"
-#include "SceneElement.h"
+#include "SurgSim/Framework/BasicThread.h"
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {

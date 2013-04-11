@@ -19,7 +19,9 @@
 #include <SurgSim/Framework/SceneElement.h>
 #include "MockObjects.h"
 
-using namespace SurgSim::Framework;
+using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Scene;
+using SurgSim::Framework::Logger;
 
 TEST(RuntimeTest, Constructor)
 {

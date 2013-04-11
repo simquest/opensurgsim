@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "CommonDevice.h"
+#include "SurgSim/Input/CommonDevice.h"
 #include <SurgSim/Framework/Log.h>
 
 #include <boost/thread/mutex.hpp>
