@@ -40,7 +40,7 @@ class IdentityPoseDevice : public SurgSim::Input::CommonDevice
 public:
 	/// Constructor.
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	IdentityPoseDevice(const std::string& uniqueName);
+	explicit IdentityPoseDevice(const std::string& uniqueName);
 
 	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer);
 

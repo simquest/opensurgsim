@@ -37,7 +37,7 @@ public:
 
 	/// Create a directory object initialized to a list of names.
 	/// \param names The names.
-	IndexDirectory(const std::vector<std::string>& names);
+	explicit IndexDirectory(const std::vector<std::string>& names);
 
 	/// Given a name, return the corresponding index (or -1).
 	/// \param name The name.

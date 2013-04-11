@@ -34,7 +34,9 @@ class AssertionFailure : public std::runtime_error
 public:
 	/// Constructor
 	/// \param message Exception message
-	explicit AssertionFailure(const std::string& message) : std::runtime_error(message) {};
+	explicit AssertionFailure(const std::string& message) : std::runtime_error(message)
+	{
+	}
 };
 
 
