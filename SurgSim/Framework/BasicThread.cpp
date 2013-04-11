@@ -22,7 +22,7 @@
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Framework/Log.h>
 
-SurgSim::Framework::BasicThread::BasicThread(std::string name) :
+SurgSim::Framework::BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
 	m_rate(1.0/30),
 	m_isInitialized(false),
