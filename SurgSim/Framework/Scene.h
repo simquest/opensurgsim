@@ -33,8 +33,13 @@ class Runtime;
 class Scene
 {
 public:
-	Scene() {};
-	~Scene() {};
+	Scene()
+	{
+	}
+
+	~Scene()
+	{
+	}
 
 	/// Adds a scene element to 'element'.
 	/// \param	element	The element.

@@ -22,7 +22,7 @@ using namespace SurgSim::Framework;
 
 TEST(SceneTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {Scene scene;});
+	ASSERT_NO_THROW({Scene scene;});
 }
 
 TEST(SceneTest, ElementManagement)

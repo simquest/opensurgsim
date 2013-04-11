@@ -44,8 +44,13 @@ using SurgSim::Framework::FileOutput;
 class MockOutput : public SurgSim::Framework::LogOutput
 {
 public:
-	MockOutput() {};
-	~MockOutput() {};
+	MockOutput()
+	{
+	}
+
+	~MockOutput()
+	{
+	}
 
 	bool writeMessage(const std::string& message)
 	{
@@ -331,13 +336,11 @@ public:
 
 	void TearDown()
 	{
-
 		output = nullptr;
 		boost::filesystem::remove("test.log");
 	}
 
 	static std::shared_ptr<FileOutput> output;
-
 };
 
 std::shared_ptr<FileOutput> FileOutputTest::output;

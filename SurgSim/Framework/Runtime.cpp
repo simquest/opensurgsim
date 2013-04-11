@@ -48,7 +48,6 @@ Runtime::Runtime(const std::string& configFilePath) :
 
 Runtime::~Runtime()
 {
-
 }
 
 void Runtime::addWorkerThread(std::shared_ptr<BasicThread> thread)
