@@ -114,3 +114,69 @@ macro(surgsim_add_unit_tests TESTNAME)
 		endif()
 	endif()
 endmacro()
+
+## CMake support for running Google's cpplint over the C++ source.
+
+# Should we bother with cpplint at all?
+option(SURGSIM_CPPLINT "Include the unit tests in the build" ON)
+
+# Running cpplint requires Python
+if(SURGSIM_CPPLINT)
+	find_package(PythonInterp)
+	if(NOT PYTHON_EXECUTABLE)
+		set(SURGSIM_CPPLINT OFF)
+	endif(NOT PYTHON_EXECUTABLE)
+endif(SURGSIM_CPPLINT)
+
+# Extra flags to pass to cpplint
+set(CPPLINT_DEFAULT_EXTRA_FLAGS)
+if(MSVC)
+	set(CPPLINT_DEFAULT_EXTRA_FLAGS --output=vs7)
+endif(MSVC)
+
+set(SURGSIM_CPPLINT_EXTRA_FLAGS
+	${CPPLINT_DEFAULT_EXTRA_FLAGS}
+  CACHE STRING "Extra flags to pass to cpplint."
+)
+mark_as_advanced(SURGSIM_CPPLINT_EXTRA_FLAGS)
+
+# Filter settings for cpplint
+set(CPPLINT_DEFAULT_FILTER_LIST
+	-whitespace
+	-build/header_guard
+	-build/include_what_you_use
+)
+string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
+	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")
+
+set(SURGSIM_CPPLINT_FILTERS
+	"${CPPLINT_DEFAULT_FILTERS}"
+  CACHE STRING "Filter settings to pass to cpplint."
+)
+mark_as_advanced(SURGSIM_CPPLINT_FILTERS)
+
+
+# Run cpplint (from Google's coding standards project) on specified files.
+#
+# Note the use of optional arguments:
+#   surgsim_run_cpplint(<testname> [<file>...])
+#
+macro(surgsim_run_cpplint TARGET)
+	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
+		add_custom_target("${TARGET}"
+			${PYTHON_EXECUTABLE}
+			  ${SURGSIM_THIRD_PARTY_DIR}/google-style-lint/cpplint.py
+				${SURGSIM_CPPLINT_EXTRA_FLAGS} ${SURGSIM_CPPLINT_FILTERS} ${ARGN}
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			COMMENT "Checking C++ sources with cpplint" VERBATIM)
+	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
+endmacro()
+
+# Run cpplint (from Google's coding standards project) on the source
+# files in the current directory and all of its subdirectories.
+macro(surgsim_cpplint_this_tree TARGET)
+	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
+		file(GLOB_RECURSE ALL_CXX_SOURCE_FILES *.h *.cpp)
+		surgsim_run_cpplint("${TARGET}" ${ALL_CXX_SOURCE_FILES})
+	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
+endmacro()
