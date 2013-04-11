@@ -11,24 +11,12 @@ public:
 	~MockObject() {};
 };
 
-class ReuseFactoryTest : public ::testing::Test
-{
-public:
-	void SetUp()
-	{
-	}
-
-	void TearDown()
-	{
-	}
-};
-
-TEST_F(ReuseFactoryTest, InitTest)
+TEST(ReuseFactoryTest, InitTest)
 {
 	ASSERT_NO_THROW({ReuseFactory<MockObject>();});
 }
 
-TEST_F(ReuseFactoryTest, GetNewTest)
+TEST(ReuseFactoryTest, GetNewTest)
 {
 	ReuseFactory<MockObject> objectFactory;
 
@@ -36,7 +24,7 @@ TEST_F(ReuseFactoryTest, GetNewTest)
 	ASSERT_TRUE(object != nullptr) << "Object = " << object;
 }
 
-TEST_F(ReuseFactoryTest, DeleteTest)
+TEST(ReuseFactoryTest, DeleteTest)
 {
 	ReuseFactory<MockObject> objectFactory;
 
@@ -63,7 +51,7 @@ TEST_F(ReuseFactoryTest, DeleteTest)
 	EXPECT_TRUE(weakPointer.lock() == nullptr) << "Weak pointer to object = " << weakPointer.lock();
 }
 
-TEST_F(ReuseFactoryTest, ReuseTest)
+TEST(ReuseFactoryTest, ReuseTest)
 {
 	ReuseFactory<MockObject> objectFactory;
 

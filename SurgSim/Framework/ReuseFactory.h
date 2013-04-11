@@ -109,7 +109,7 @@ private:
 	}
 
 	/// Stack of objects that are available for reuse.
-	std::stack< std::unique_ptr<T> > m_unusedObjects;
+	std::stack<std::unique_ptr<T>> m_unusedObjects;
 };
 
 };  // namespace Framework
