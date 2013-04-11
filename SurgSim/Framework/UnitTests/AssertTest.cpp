@@ -63,6 +63,9 @@ public:
 	SurgSim::Framework::AssertMessage::DeathCallback savedCallback;
 };
 
+typedef AssertTest AssertDeathTest;
+
+
 TEST_F(AssertTest, DefaultAssertLogger)
 {
 	std::cout << "=== You should see an assertion message to cout/cerr:" << std::endl;
@@ -171,14 +174,7 @@ TEST_F(AssertTest, Callback)
 	EXPECT_EQ(2, numIgnoredAssertions);
 }
 
-TEST_F(AssertTest, DebuggerBehaviorSuccess)
-{
-	logOutput->reset();
-	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
-	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
-}
-
-TEST_F(AssertTest, DebuggerBehaviorAssertFailedDeathTest)
+TEST_F(AssertDeathTest, DebuggerBehaviorAssertFailed)
 {
 	logOutput->reset();
 	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
@@ -186,7 +182,14 @@ TEST_F(AssertTest, DebuggerBehaviorAssertFailedDeathTest)
 	ASSERT_DEATH_IF_SUPPORTED({SURGSIM_ASSERT(1 == 2) << "extra information would go here";}, "^$");
 }
 
-TEST_F(AssertTest, DebuggerBehaviorFailureDeathTest)
+TEST_F(AssertDeathTest, DebuggerBehaviorAssertSucceded)
+{
+	logOutput->reset();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
+}
+
+TEST_F(AssertDeathTest, DebuggerBehaviorFailure)
 {
 	logOutput->reset();
 	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
