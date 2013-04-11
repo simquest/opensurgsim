@@ -36,7 +36,7 @@ class Component
 {
 public:
 	Component(const std::string& name) : m_name(name), m_didInit(false), m_didWakeUp(false) {};
-	virtual ~Component(void) {};
+	virtual ~Component() {};
 
 	/// Gets the name.
 	/// \return	The name.

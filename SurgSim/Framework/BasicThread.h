@@ -42,7 +42,7 @@ class BasicThread
 {
 public:
 	BasicThread(std::string name = "Unknown Thread");
-	virtual ~BasicThread(void);
+	virtual ~BasicThread();
 
 	/// Live cycle functions, public implementation.
 	/// All of these have virtual partners as private functions
