@@ -21,7 +21,7 @@ TEST(ReuseFactoryTest, GetNewTest)
 	ReuseFactory<MockObject> objectFactory;
 
 	std::shared_ptr<MockObject> object = objectFactory.getInstance();
-	ASSERT_TRUE(object != nullptr) << "Object = " << object;
+	ASSERT_NE(nullptr, object);
 }
 
 TEST(ReuseFactoryTest, DeleteTest)
@@ -34,21 +34,21 @@ TEST(ReuseFactoryTest, DeleteTest)
 		{
 			// Get a new object.
 			std::shared_ptr<MockObject> object = objectFactory.getInstance();
-			ASSERT_TRUE(object != nullptr) << "Object = " << object;
+			ASSERT_NE(nullptr, object);
 
 			weakPointer = object;
-			ASSERT_TRUE(weakPointer.lock() != nullptr) << "Weak pointer to object = " << weakPointer.lock();
+			ASSERT_NE(nullptr, weakPointer.lock());
 
 			// Make another shared pointer to the object.
 			sharedPointer = object;
 		}
 
 		// The object should not have been deleted yet, as there is still a shared pointer to it.
-		EXPECT_TRUE(weakPointer.lock() != nullptr) << "Weak pointer to object = " << weakPointer.lock();
+		ASSERT_NE(nullptr, weakPointer.lock());
 	}
 
 	// It should be deleted now.
-	EXPECT_TRUE(weakPointer.lock() == nullptr) << "Weak pointer to object = " << weakPointer.lock();
+	EXPECT_EQ(nullptr, weakPointer.lock()) << "The object should no longer exist.";
 }
 
 TEST(ReuseFactoryTest, ReuseTest)
@@ -61,30 +61,30 @@ TEST(ReuseFactoryTest, ReuseTest)
 	// Get a new object
 	{
 		std::shared_ptr<MockObject> object = objectFactory.getInstance();
-		ASSERT_TRUE(object != nullptr) << "Object = " << object;
+		ASSERT_NE(nullptr, object);
 
 		weakPointer = object;
-		ASSERT_TRUE(weakPointer.lock() != nullptr) << "Weak pointer to object = " << weakPointer.lock();
+		ASSERT_NE(nullptr, weakPointer.lock());
 
 		pointer = object.get();
 	}
 
 	// It should be deleted now.
-	EXPECT_TRUE(weakPointer.lock() == nullptr) << "Weak pointer to object = " << weakPointer.lock();
+	EXPECT_EQ(nullptr, weakPointer.lock()) << "Weak pointer to object = " << weakPointer.lock();
 	
 	// Reuse the object that has been deleted.
 	{
 		std::shared_ptr<MockObject> object = objectFactory.getInstance();
-		ASSERT_TRUE(object != nullptr) << "Object = " << object;
+		ASSERT_NE(nullptr, object);
 
-		EXPECT_TRUE(object.get() == pointer) << "Original object = " << pointer << ", New object = " << object.get();
+		EXPECT_EQ(pointer, object.get()) << "The retrieved object should be the object that was previously deleted.";
 
 		// Get another object, which should be new.
 		{
 			std::shared_ptr<MockObject> object = objectFactory.getInstance();
-			ASSERT_TRUE(object != nullptr) << "Object = " << object;
+			ASSERT_NE(nullptr, object);
 
-			EXPECT_TRUE(object.get() != pointer ) << "Original object = " << pointer << ", New object = " << object.get();
+			EXPECT_NE(pointer, object.get()) << "We should have a completely new object, not the same previous object.";
 		}
 	}
 }
