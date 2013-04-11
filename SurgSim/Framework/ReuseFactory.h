@@ -16,6 +16,7 @@
 #ifndef SURGSIM_FRAMEWORK_REUSE_FACTORY_H
 #define SURGSIM_FRAMEWORK_REUSE_FACTORY_H
 
+#include <memory>
 #include <stack>
 
 namespace SurgSim
