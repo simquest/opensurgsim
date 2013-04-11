@@ -140,11 +140,23 @@ set(SURGSIM_CPPLINT_EXTRA_FLAGS
 )
 mark_as_advanced(SURGSIM_CPPLINT_EXTRA_FLAGS)
 
-# Filter settings for cpplint
+# Default filter settings for cpplint
 set(CPPLINT_DEFAULT_FILTER_LIST
-	-whitespace
+	# our coding standards differ from Google's when it comes to whitespace:
+	-whitespace/tab -whitespace/braces -whitespace/line_length
+	-whitespace/ending_newline
+	# these flag some useful stuff, but also currently produce a lot of noise:
+	-whitespace/operators -whitespace/newline -whitespace/blank_line
+	-whitespace/comma -whitespace/parens -whitespace/comments
+	# this is just broken if a comment is preceded by a tab and ends in ":":
+	-whitespace/labels
+	# our preferred include guard format differs from Google's:
 	-build/header_guard
+	# potentially useful, but generates a lot of noise:
 	-build/include_what_you_use
+	# potentially useful, but generates some crazy false positives
+	# (it claims <unordered_map> is a C header!?):
+	-build/include_order
 )
 string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")
