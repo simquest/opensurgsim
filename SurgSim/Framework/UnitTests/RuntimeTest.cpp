@@ -17,7 +17,7 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;

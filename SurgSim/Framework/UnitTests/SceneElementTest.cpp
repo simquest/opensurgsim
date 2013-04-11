@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
 using SurgSim::Framework::Component;
 using SurgSim::Framework::SceneElement;
