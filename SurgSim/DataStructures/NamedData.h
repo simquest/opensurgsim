@@ -163,16 +163,16 @@ public:
 	/// Given an index, get the corresponding value.
 	///
 	/// \param index The index of the entry.
-	/// \param [out] value The retrieved value.
+	/// \param [out] value The location for the retrieved value.  Must not be null.
 	/// \return true if a current value is available and was written to \a value.
-	inline bool get(int index, T& value) const;
+	inline bool get(int index, T* value) const;
 
 	/// Given a name, get the corresponding value.
 	///
 	/// \param name The name of the entry.
-	/// \param [out] value The retrieved value.
+	/// \param [out] value The location for the retrieved value.  Must not be null.
 	/// \return true if a current value is available and was written to \a value.
-	inline bool get(const std::string& name, T& value) const;
+	inline bool get(const std::string& name, T* value) const;
 
 	/// Record the data for an entry specified by an index.
 	/// The entry will also be marked as containing current data.
