@@ -52,6 +52,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessageBase.h
 	LogOutput.h
 #	Representation.h
+	ReuseFactory.h
 	Runtime.h
 	Scene.h
 	SceneElement.h
