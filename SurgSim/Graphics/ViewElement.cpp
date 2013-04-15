@@ -15,7 +15,7 @@
 
 #include "ViewElement.h"
 
-#include <SurgSim/Graphics/CameraElement.h>
+#include <SurgSim/Graphics/CameraRepresentation.h>
 #include <SurgSim/Graphics/ViewComponent.h>
 
 using SurgSim::Graphics::CameraRepresentation;
