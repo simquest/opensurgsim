@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <boost/thread.hpp>
+#include <boost/chrono.hpp>
 #include <gtest/gtest.h>
 #include <SurgSim/Devices/Phantom/PhantomDevice.h>
 #include <SurgSim/Devices/Phantom/PhantomManager.h>
@@ -146,7 +147,7 @@ TEST(PhantomDeviceTest, InputConsumer)
 
 	// Sleep for a second, to see how many times the consumer is invoked.
 	// (A Phantom device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
@@ -177,7 +178,7 @@ TEST(PhantomDeviceTest, OutputProducer)
 
 	// Sleep for a second, to see how many times the producer is invoked.
 	// (A Phantom device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
 
