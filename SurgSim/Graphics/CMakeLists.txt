@@ -21,8 +21,8 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Actor.cpp
 	ActorImplementation.cpp
 	CameraActor.cpp
-	CameraElement.cpp
 	CameraImplementation.cpp
+	CameraRepresentation.cpp
 	Manager.cpp
 	Representation.cpp
 	Scene.cpp
@@ -36,8 +36,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Actor.h
 	ActorImplementation.h
 	CameraActor.h
-	CameraElement.h
 	CameraImplementation.h
+	CameraRepresentation.h
 	Manager.h
 	Representation.h
 	Scene.h
