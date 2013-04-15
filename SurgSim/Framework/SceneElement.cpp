@@ -46,7 +46,7 @@ bool SceneElement::removeComponent(std::shared_ptr<Component> component)
 	return removeComponent(component->getName());
 }
 
-bool SceneElement::removeComponent(std::string name)
+bool SceneElement::removeComponent(const std::string& name)
 {
 	bool result = false;
 	if (m_components.find(name) != m_components.end())
@@ -57,7 +57,7 @@ bool SceneElement::removeComponent(std::string name)
 	return result;
 }
 
-std::shared_ptr<Component> SceneElement::getComponent(std::string name) const
+std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) const
 {
 	std::shared_ptr<Component> result;
 

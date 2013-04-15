@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 #	BehaviorManagerTest.cpp
 	BaseThreadTest.cpp
 	LoggerTest.cpp
+	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
