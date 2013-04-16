@@ -30,30 +30,46 @@ class Actor;
 class Representation;
 class SceneImplementation;
 
+/// Graphics scene, which is a collection of graphics actors to provide a visualization of the virtual scene.
 class Scene
 {
 public:
+	/// Constructor
+	/// \param	implementation	Implementation of the scene, which providing the low-level functionality.
 	Scene(std::shared_ptr<SceneImplementation> implementation);
+	/// Destructor
 	virtual ~Scene();
 
+	/// Adds an actor to this scene.
 	bool addActor(std::shared_ptr<Actor> actor);
+	/// Removes an actor from this scene.
 	bool removeActor(std::shared_ptr<Actor> actor);
+	/// Removes an actor from this scene by name.
 	bool removeActor(const std::string& name);
 
+	/// Updates the scene for a single timestep.
+	/// The doUpdate(double) method provides the functionality to update the scene.
+	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt)
 	{
 		doUpdate(dt);
 	}
 
+	/// Returns the implementation of this scene, which provides the low-level functionality.
 	std::shared_ptr<SceneImplementation> getImplementation() const
 	{
 		return m_implementation;
 	}
 
 private:
+	/// Map name to actor.
 	std::unordered_map<std::string, std::shared_ptr<Actor>> m_actors;
+	/// Implementation of this scene, providing low-level functionality.
 	std::shared_ptr<SceneImplementation> m_implementation;
 
+	/// Updates the scene for a single timestep.
+	/// Override this method for custom functionality.
+	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void doUpdate(double dt);
 };
 
