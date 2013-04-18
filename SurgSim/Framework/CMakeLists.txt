@@ -27,7 +27,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	AssertMessage.cpp
 	BasicThread.cpp
 	Barrier.cpp
-#	BehaviorManager.cpp
+	BehaviorManager.cpp
 	Logger.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
@@ -42,10 +42,9 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Assert.h
 	AssertMessage.h
 	BasicThread.h
-#	Behavior.h
-#	BehaviorManager.h
+	Behavior.h
+	BehaviorManager.h
 	Component.h
-#	Framework.h
 	Log.h
 	Logger.h
 	LogMacros.h
