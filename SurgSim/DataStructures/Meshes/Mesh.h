@@ -27,6 +27,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
+/// Base class for mesh structures, handling basic vertex functionality.
 class Mesh
 {
 public:
@@ -41,35 +42,54 @@ public:
 		doReset();
 	}
 
+	/// Performs any updates that are required when the vertices are modified.
+	/// Calls doUpdate() to perform the updates.
 	void update()
 	{
 		doUpdate();
 	}
 
-	// Return the new vertex ID
+	/// Creates a new vertex.
+	/// \param	position	Position of the vertex
+	/// \return	Unique ID of the new vertex.
 	unsigned int createNewVertex(const SurgSim::Math::Vector3d& position);
 
+	/// Returns the number of vertices in this mesh.
 	unsigned int numVertices() const
 	{ 
 		m_vertexPositions.size();
 	}
-			
+	
+	/// Returns the position of a vertex.
+	/// \param	id	Unique ID of the vertex
+	/// \return	Position of the vertex
 	const SurgSim::Math::Vector3d& getVertexPosition(unsigned int id) const
 	{
 		return m_vertexPositions[id];
 	}
 
+	/// Sets the position of each vertex.
+	/// \param	positions	Vector containing new position for each vertex
+	/// \param	doUpdate	Whether or not to perform an update after setting the vertices
 	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = false);
-	void setVertexPositions(const Mesh &mesh, bool doUpdate = false);
+	/// Sets the position of each vertex to those of another mesh.
+	/// \param	mesh	Mesh to copy vertex positions from
+	/// \param	doUpdate	Whether or not to perform an update after setting the vertices
+	void setVertexPositions(const Mesh& mesh, bool doUpdate = false);
+	/// Sets the position of each vertex to the combination of two other meshes.
+	/// \param	mesh1	First mesh to copy vertex positions from
+	/// \param	percent1	Percent contribution of first mesh [0.0-1.0]
+	/// \param	mesh2	Second mesh to copy vertex positions from
+	/// \param	percent2	Percent contribution of second mesh [0.0-1.0]
+	/// \param	doUpdate	Whether or not to perform an update after setting the vertices
 	void setVertexPositions(const Mesh& mesh1, double percent1, const Mesh& mesh2, double percent2,
 		bool doUpdate = false);
 
+	/// Returns a vector containing the position of each vertex.
 	const std::vector<SurgSim::Math::Vector3d>& getVertexPositions() const
 	{
 		return m_vertexPositions;
 	}
-
-	void loadFromParticles(std::string name, int nbPts, const double *pts);
 
 protected:
 	/// Reset to no vertices.
@@ -85,13 +105,11 @@ private:
 		doResetVertices();
 	}
 
+	/// Performs any updates that are required when the vertices are modified.
+	/// Override this method to implement update functionality.
 	virtual void doUpdate()
 	{
 	}
-
-	// Return -1 if the vertex does not already exist in m_vertices
-	// Return the vertex ID if it already exist in m_vertices
-	int doesThisVertexAlreadyExist(const double *v) const;
 
 	/// Position of each vertex in the mesh.
 	std::vector<SurgSim::Math::Vector3d> m_vertexPositions;

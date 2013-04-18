@@ -21,6 +21,7 @@ unsigned int Mesh::createNewVertex(const Vector3d& position)
 void Mesh::setVertexPositions(const std::vector<Vector3d>& positions, bool doUpdate)
 {
 	// TODO: assert that the number of positions matches vertices
+
 	m_vertexPositions = positions;
 
 	update();
