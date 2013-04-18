@@ -77,7 +77,7 @@ public:
 private:
 
 	/// Adds a single path to the list of search paths.
-	/// \param	path	Full pathname.
+	/// \param	pathName Full pathname.
 	/// \return	true if it succeeds, false if the given path does not exist or if it is
 	/// 		already in the list of paths.
 	bool addPath(std::string pathName);
