@@ -15,3 +15,6 @@
 
 
 add_subdirectory(IdentityPoseDevice)
+if(OPENHAPTICS_FOUND)
+	add_subdirectory(Phantom)
+endif(OPENHAPTICS_FOUND)
