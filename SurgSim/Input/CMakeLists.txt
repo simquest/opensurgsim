@@ -31,6 +31,16 @@ set(SURGSIM_INPUT_HEADERS
 
 add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
 
+set_target_properties(SurgSimInput PROPERTIES
+	PUBLIC_HEADER "${SURGSIM_INPUT_HEADERS}")
+
+install(TARGETS SurgSimInput
+   EXPORT ${PROJECT_NAME}Targets
+   RUNTIME DESTINATION bin
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib
+   PUBLIC_HEADER DESTINATION include/SurgSim/Input)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
