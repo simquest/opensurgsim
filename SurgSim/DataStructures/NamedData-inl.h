@@ -130,12 +130,20 @@ inline std::shared_ptr<const IndexDirectory> NamedData<T>::getDirectory() const
 template <typename T>
 inline int NamedData<T>::getIndex(const std::string& name) const
 {
+	if (! isValid())
+	{
+		return -1;
+	}
 	return m_directory->getIndex(name);
 }
 
 template <typename T>
 inline std::string NamedData<T>::getName(int index) const
 {
+	if (! isValid())
+	{
+		return "";
+	}
 	return m_directory->getName(index);
 }
 
@@ -148,6 +156,10 @@ inline bool NamedData<T>::hasEntry(int index) const
 template <typename T>
 inline bool NamedData<T>::hasEntry(const std::string& name) const
 {
+	if (! isValid())
+	{
+		return false;
+	}
 	return m_directory->hasEntry(name);
 }
 
@@ -160,6 +172,10 @@ inline bool NamedData<T>::hasCurrentData(int index) const
 template <typename T>
 inline bool NamedData<T>::hasCurrentData(const std::string& name) const
 {
+	if (! isValid())
+	{
+		return false;
+	}
 	int index =  m_directory->getIndex(name);
 	if (index < 0)
 	{
@@ -189,6 +205,10 @@ inline bool NamedData<T>::get(int index, T& value) const
 template <typename T>
 inline bool NamedData<T>::get(const std::string& name, T& value) const
 {
+	if (! isValid())
+	{
+		return false;
+	}
 	int index =  m_directory->getIndex(name);
 	if ((index < 0) || ! m_isCurrent[index])
 	{
@@ -220,6 +240,10 @@ inline bool NamedData<T>::put(int index, const T& value)
 template <typename T>
 inline bool NamedData<T>::put(const std::string& name, const T& value)
 {
+	if (! isValid())
+	{
+		return false;
+	}
 	int index =  m_directory->getIndex(name);
 	if (index < 0)
 	{
@@ -251,6 +275,10 @@ inline bool NamedData<T>::reset(int index)
 template <typename T>
 inline bool NamedData<T>::reset(const std::string& name)
 {
+	if (! isValid())
+	{
+		return false;
+	}
 	int index =  m_directory->getIndex(name);
 	if (index < 0)
 	{

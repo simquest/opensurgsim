@@ -130,6 +130,21 @@ TEST(NamedDataTests, Uninitialized)
 {
 	NamedData<float> data;
 	EXPECT_FALSE(data.isValid());
+
+	EXPECT_EQ(0, data.getNumEntries());
+	EXPECT_EQ("", data.getName(0));
+
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_FALSE(data.hasEntry("missing"));
+	EXPECT_FALSE(data.hasCurrentData("missing"));
+
+	float value = 9.87f;
+	EXPECT_FALSE(data.get("missing", value));
+	EXPECT_NEAR(9.87f, value, 1e-9);  // i.e. unchanged
+
+	EXPECT_FALSE(data.reset("missing"));
+
+	EXPECT_FALSE(data.put("missing", value));
 }
 
 /// Putting data into the container.
