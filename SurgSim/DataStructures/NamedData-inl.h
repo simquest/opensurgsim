@@ -223,7 +223,7 @@ inline bool NamedData<T>::get(const std::string& name, T& value) const
 }
 
 template <typename T>
-inline bool NamedData<T>::put(int index, const T& value)
+inline bool NamedData<T>::set(int index, const T& value)
 {
 	if (! hasEntry(index))
 	{
@@ -238,7 +238,7 @@ inline bool NamedData<T>::put(int index, const T& value)
 }
 
 template <typename T>
-inline bool NamedData<T>::put(const std::string& name, const T& value)
+inline bool NamedData<T>::set(const std::string& name, const T& value)
 {
 	if (! isValid())
 	{
