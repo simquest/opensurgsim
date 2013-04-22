@@ -195,32 +195,32 @@ TEST(NamedDataTests, Get)
 
 	{
 		float value = 9.87f;
-		EXPECT_TRUE(data.get(0, value));
+		EXPECT_TRUE(data.get(0, &value));
 		EXPECT_NEAR(1.23f, value, 1e-9);
 	}
 	{
 		float value = 9.87f;
-		EXPECT_TRUE(data.get("first", value));
+		EXPECT_TRUE(data.get("first", &value));
 		EXPECT_NEAR(1.23f, value, 1e-9);
 	}
 	{
 		float value = 9.87f;
-		EXPECT_TRUE(data.get(1, value));
+		EXPECT_TRUE(data.get(1, &value));
 		EXPECT_NEAR(4.56f, value, 1e-9);
 	}
 	{
 		float value = 9.87f;
-		EXPECT_TRUE(data.get("second", value));
+		EXPECT_TRUE(data.get("second", &value));
 		EXPECT_NEAR(4.56f, value, 1e-9);
 	}
 	{
 		float value = 9.87f;
-		EXPECT_FALSE(data.get(2, value));
+		EXPECT_FALSE(data.get(2, &value));
 		EXPECT_NEAR(9.87f, value, 1e-9);  // i.e. unchanged
 	}
 	{
 		float value = 9.87f;
-		EXPECT_FALSE(data.get("third", value));
+		EXPECT_FALSE(data.get("third", &value));
 		EXPECT_NEAR(9.87f, value, 1e-9);  // i.e. unchanged
 	}
 }

@@ -142,33 +142,33 @@ TEST(DataGroupTests, GetName)
 
 	{
 		SurgSim::Math::RigidTransform3d value = SurgSim::Math::RigidTransform3d::Identity();
-		EXPECT_TRUE(data.poses().get("pose", value));
+		EXPECT_TRUE(data.poses().get("pose", &value));
 		EXPECT_NEAR(0, (value.linear() - quat.matrix()).norm(), 1e-9);
 		EXPECT_NEAR(0, (value.translation() - vector).norm(), 1e-9);
 	}
 	{
 		SurgSim::Math::Vector3d value(0, 0, 0);
-		EXPECT_TRUE(data.vectors().get("vector", value));
+		EXPECT_TRUE(data.vectors().get("vector", &value));
 		EXPECT_NEAR(0, (value - vector).norm(), 1e-9);
 	}
 	{
 		double value = 0;
-		EXPECT_TRUE(data.scalars().get("scalar", value));
+		EXPECT_TRUE(data.scalars().get("scalar", &value));
 		EXPECT_NEAR(1.23, value, 1e-9);
 	}
 	{
 		int value = 0;
-		EXPECT_TRUE(data.integers().get("integer", value));
+		EXPECT_TRUE(data.integers().get("integer", &value));
 		EXPECT_EQ(123, value);
 	}
 	{
 		bool value = 0;
-		EXPECT_TRUE(data.booleans().get("boolean", value));
+		EXPECT_TRUE(data.booleans().get("boolean", &value));
 		EXPECT_EQ(true, value);
 	}
 	{
 		std::string value = "";
-		EXPECT_TRUE(data.strings().get("string", value));
+		EXPECT_TRUE(data.strings().get("string", &value));
 		EXPECT_EQ("string", value);
 	}
 }

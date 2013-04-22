@@ -189,7 +189,7 @@ inline bool NamedData<T>::hasCurrentData(const std::string& name) const
 }
 
 template <typename T>
-inline bool NamedData<T>::get(int index, T& value) const
+inline bool NamedData<T>::get(int index, T* value) const
 {
 	if (! hasCurrentData(index))
 	{
@@ -197,13 +197,13 @@ inline bool NamedData<T>::get(int index, T& value) const
 	}
 	else
 	{
-		value = m_data[index];
+		*value = m_data[index];
 		return true;
 	}
 }
 
 template <typename T>
-inline bool NamedData<T>::get(const std::string& name, T& value) const
+inline bool NamedData<T>::get(const std::string& name, T* value) const
 {
 	if (! isValid())
 	{
@@ -217,7 +217,7 @@ inline bool NamedData<T>::get(const std::string& name, T& value) const
 	else
 	{
 		SURGSIM_ASSERT(hasEntry(index));
-		value = m_data[index];
+		*value = m_data[index];
 		return true;
 	}
 }
