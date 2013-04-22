@@ -185,8 +185,8 @@ public:
 
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
-	bool isInitialized;
 	bool isAwoken;
+	bool isInitialized;
 	int updateCount;
 };
 
