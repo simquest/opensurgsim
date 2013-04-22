@@ -30,13 +30,11 @@ bool ViewImplementation::setCamera(std::shared_ptr<SurgSim::Graphics::CameraImpl
 bool ViewImplementation::setUpFullScreen(unsigned int screen)
 {
 	m_viewer->setUpViewOnSingleScreen(screen);
-	m_viewer->realize();
 	return true;
 }
 bool ViewImplementation::setUpWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height, unsigned int screen)
 {
 	m_viewer->setUpViewInWindow(x, y, width, height, screen);
-	m_viewer->realize();
 	return true;
 }
 

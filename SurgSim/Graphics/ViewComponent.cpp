@@ -15,7 +15,8 @@ Component(name),
 	m_windowX(100),
 	m_windowY(100),
 	m_windowWidth(800),
-	m_windowHeight(600)
+	m_windowHeight(600),
+	m_isFirstUpdate(true)
 {
 	m_camera = std::make_shared<CameraActor>(name + " Camera", m_implementation->getCamera());
 }
@@ -54,6 +55,11 @@ bool ViewComponent::doInitialize()
 }
 bool ViewComponent::doWakeUp()
 {
+	return true;
+}
+
+void ViewComponent::doBeforeFirstUpdate(double dt)
+{
 	if (m_isFullscreen)
 	{
 		m_implementation->setUpFullScreen(m_screen);
@@ -62,7 +68,6 @@ bool ViewComponent::doWakeUp()
 	{
 		m_implementation->setUpWindow(m_windowX, m_windowY, m_windowWidth, m_windowHeight, m_screen);
 	}
-	return true;
 }
 void ViewComponent::doUpdate(double dt)
 {
