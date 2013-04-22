@@ -18,11 +18,13 @@
 #include <boost/thread/locks.hpp>
 
 #include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/BasicThread.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/Component.h>
+
+#include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Barrier.h>
+#include <SurgSim/Framework/BasicThread.h>
+#include <SurgSim/Framework/Component.h>
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/Scene.h>
 
 namespace SurgSim
 {
@@ -34,6 +36,14 @@ Runtime::Runtime() :
 	m_isRunning(false),
 	m_scene(new Scene())
 {
+	initSearchPaths("");
+}
+
+Runtime::Runtime(const std::string& configFileFilePath) :
+	m_isRunning(false),
+	m_scene(new Scene())
+{
+	initSearchPaths(configFileFilePath);
 }
 
 Runtime::~Runtime()
@@ -212,6 +222,26 @@ std::shared_ptr<Runtime> Runtime::getSharedPtr()
 		SURGSIM_FAILURE() << "Runtime was not created as a shared_ptr";
 	}
 	return result;
+}
+
+void Runtime::initSearchPaths(const std::string& configFilePath)
+{
+	if (configFilePath == "")
+	{
+		std::vector<std::string> paths;
+		paths.push_back(".");
+		paths.push_back("./Data");
+		m_applicationData = std::make_shared<ApplicationData>(paths);
+	}
+	else
+	{
+		m_applicationData = std::make_shared<ApplicationData>(configFilePath);
+	}
+}
+
+std::shared_ptr<const ApplicationData> Runtime::getApplicationData() const
+{
+	return m_applicationData;
 }
 
 }; // namespace Framework
