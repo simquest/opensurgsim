@@ -61,7 +61,7 @@ public:
 	///
 	/// The data will be initialized using the copy constructor.
 	/// \arg initialValue The initial value to be used.
-	ThreadSafeContainer(const T& initialValue) :
+	explicit ThreadSafeContainer(const T& initialValue) :
 		m_buffer0(initialValue),
 		m_buffer1(initialValue),
 		m_readBuffer(&m_buffer0),
@@ -75,7 +75,7 @@ public:
 	/// The data in the active buffer will be initialized using the move constructor.
 	/// The data in the second, inactive buffer will be initialized using the default constructor.
 	/// \arg initialValue The initial value to be moved into the active buffer.
-	ThreadSafeContainer(T&& initialValue) :
+	explicit ThreadSafeContainer(T&& initialValue) :
 		m_buffer0(std::move(initialValue)),
 		m_buffer1(),
 		m_readBuffer(&m_buffer0),

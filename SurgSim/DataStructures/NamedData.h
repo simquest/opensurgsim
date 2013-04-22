@@ -61,13 +61,13 @@ public:
 	/// You should probably use \ref NamedDataBuilder or copy construction/assignment instead.
 	///
 	/// \param directory The IndexDirectory object describing the names and indices to be used.
-	inline NamedData(std::shared_ptr<const IndexDirectory> directory);
+	inline explicit NamedData(std::shared_ptr<const IndexDirectory> directory);
 
 	/// Construct an object, using the names from a vector of strings.
 	/// The indices corresponding to each name's entry will be the same as that name's index in the vector.
 	///
 	/// \param names The names, which should be unique.
-	inline NamedData(const std::vector<std::string>& names);
+	inline explicit NamedData(const std::vector<std::string>& names);
 
 	/// Construct an object as a copy of the data from another object.
 	/// \param namedData The object to copy from.

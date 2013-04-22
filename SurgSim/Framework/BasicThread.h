@@ -41,7 +41,7 @@ class Runtime;
 class BasicThread
 {
 public:
-	BasicThread(const std::string& name = "Unknown Thread");
+	explicit BasicThread(const std::string& name = "Unknown Thread");
 	virtual ~BasicThread();
 
 	/// Live cycle functions, public implementation.

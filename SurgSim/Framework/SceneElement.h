@@ -37,8 +37,13 @@ class SceneElement
 {
 
 public:
-	SceneElement(const std::string& name) : m_name(name) {};
-	virtual ~SceneElement() {};
+	explicit SceneElement(const std::string& name) : m_name(name)
+	{
+	}
+
+	virtual ~SceneElement()
+	{
+	}
 
 	/// Adds a component
 	/// \param	component	The component.

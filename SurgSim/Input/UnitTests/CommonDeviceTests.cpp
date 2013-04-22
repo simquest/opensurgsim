@@ -40,7 +40,7 @@ using SurgSim::Math::Matrix44d;
 class TestDevice : public CommonDevice
 {
 public:
-	TestDevice(const std::string& uniqueName) :
+	explicit TestDevice(const std::string& uniqueName) :
 		CommonDevice(uniqueName, buildInputData())
 	{
 	}
