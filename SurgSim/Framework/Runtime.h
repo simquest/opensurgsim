@@ -118,7 +118,7 @@ private:
 	/// Initializes the search paths. 
 	/// \param	configFilePath	Full pathname of the configuration file, if path is empty 
 	/// 						"." and "./Data" will be used as default paths.
-	void Runtime::initSearchPaths(const std::string& configFilePath);
+	void initSearchPaths(const std::string& configFilePath);
 	bool m_isRunning;
 	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;
 	std::shared_ptr<Scene> m_scene;
