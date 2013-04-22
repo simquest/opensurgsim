@@ -48,8 +48,14 @@ public:
 
 	/// \param	dt	The time in seconds of the preceding timestep.
 	void update(double dt)
-	{ 
+	{
+		if (m_isFirstUpdate)
+		{
+			doBeforeFirstUpdate(dt);
+		}
+				
 		doUpdate(dt);
+		m_isFirstUpdate = false;
 	}
 
 	std::shared_ptr<ViewImplementation> getImplementation()
@@ -60,6 +66,8 @@ public:
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();
+
+	virtual void doBeforeFirstUpdate(double dt);
 	virtual void doUpdate(double dt);
 
 	virtual void updateWindow();
@@ -72,6 +80,8 @@ private:
 	unsigned int m_windowY;
 	unsigned int m_windowWidth;
 	unsigned int m_windowHeight;
+
+	bool m_isFirstUpdate;
 };
 
 };  // namespace Graphics
