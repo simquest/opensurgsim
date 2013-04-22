@@ -39,11 +39,11 @@ Runtime::Runtime() :
 	initSearchPaths("");
 }
 
-Runtime::Runtime(const std::string& configFileFilePath) :
+Runtime::Runtime(const std::string& configFilePath) :
 	m_isRunning(false),
 	m_scene(new Scene())
 {
-	initSearchPaths(configFileFilePath);
+	initSearchPaths(configFilePath);
 }
 
 Runtime::~Runtime()

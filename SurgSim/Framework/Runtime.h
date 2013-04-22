@@ -46,9 +46,11 @@ public:
 	/// Default constructor.
 	Runtime();
 
-	/// Constructor, initializes the search path with paths from the give file.
-	/// \param	configFileName	Filename of the configuration file.
-	explicit Runtime(const std::string& configFileName);
+	/// Constructor, initializes the search path with paths from the given file.
+	/// \param	configFilePath 	Full pathname of the configuration file that contains paths,
+	///							one per line, to search for application data. If no config file
+	/// 						is given "." and "./Data" will be used as default paths.
+	explicit Runtime(const std::string& configFilePath);
 	
 	/// Destructor.
 	~Runtime();
