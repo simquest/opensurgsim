@@ -28,6 +28,10 @@ namespace Framework
 
 class Behavior;
 
+/// Manager to handle Behaviors. The manager will collect all the behaviors
+/// in the scene through addComponent (and removeComponent) calls. All the
+/// behaviors will be update once per period (default 30Hz) once the 
+/// BehaviorManager is started.
 class BehaviorManager : public BasicThread
 {
 public:

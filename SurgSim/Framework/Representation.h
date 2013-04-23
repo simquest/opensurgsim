@@ -27,6 +27,9 @@ namespace Framework
 
 class SceneElement;
 
+/// Representations are manifestations of a SceneElement. For example, a 
+/// SceneElement can be represented in graphics, physics, etc. Each of these
+/// representation will be derived from this class.
 class Representation : public Component
 {
 public:

@@ -23,12 +23,17 @@ namespace SurgSim
 namespace Framework
 {
 
+/// Behaviors perform actions. They can update components, facilitate
+/// communication between components, and create new components. They are
+/// updated periodicly by the BehaviorManager through update() call.
 class Behavior: public Component
 {
 public:
 	Behavior(std::string name) : Component(name) {};
 	virtual ~Behavior() {};
 
+	/// Update the behavior
+	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt) = 0;
 };
 
