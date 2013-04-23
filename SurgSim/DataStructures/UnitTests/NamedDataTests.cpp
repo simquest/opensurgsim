@@ -139,12 +139,12 @@ TEST(NamedDataTests, Uninitialized)
 	EXPECT_FALSE(data.hasCurrentData("missing"));
 
 	float value = 9.87f;
-	EXPECT_FALSE(data.get("missing", value));
+	EXPECT_FALSE(data.get("missing", &value));
 	EXPECT_NEAR(9.87f, value, 1e-9);  // i.e. unchanged
 
 	EXPECT_FALSE(data.reset("missing"));
 
-	EXPECT_FALSE(data.put("missing", value));
+	EXPECT_FALSE(data.set("missing", value));
 }
 
 /// Putting data into the container.
