@@ -49,7 +49,7 @@ public:
 	/// Constructor, initializes the search path with paths from the given file.
 	/// \param	configFilePath 	Full pathname of the configuration file that contains paths,
 	///							one per line, to search for application data. If no config file
-	/// 						is given "." and "./Data" will be used as default paths.
+	/// 						is given "." will be used as default path.
 	explicit Runtime(const std::string& configFilePath);
 	
 	/// Destructor.
@@ -117,7 +117,7 @@ private:
 
 	/// Initializes the search paths. 
 	/// \param	configFilePath	Full pathname of the configuration file, if path is empty 
-	/// 						"." and "./Data" will be used as default paths.
+	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
 	bool m_isRunning;
 	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;

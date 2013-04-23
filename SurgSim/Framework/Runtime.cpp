@@ -231,7 +231,6 @@ void Runtime::initSearchPaths(const std::string& configFilePath)
 	{
 		std::vector<std::string> paths;
 		paths.push_back(".");
-		paths.push_back("./Data");
 		m_applicationData = std::make_shared<ApplicationData>(paths);
 	}
 	else
