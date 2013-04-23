@@ -26,6 +26,7 @@ namespace SurgSim
 namespace Framework
 {
 
+class Logger;
 class Behavior;
 
 /// Manager to handle Behaviors. The manager will collect all the behaviors
@@ -41,13 +42,13 @@ public:
 	virtual bool removeComponent(std::shared_ptr<Component> component);
 
 private:
-	//! \return false when the thread is done
 	virtual bool doUpdate(double dt);
-
-	virtual bool doInitialize() {return true;};
-	virtual bool doStartUp() {return true;};
+	virtual bool doInitialize();
+	virtual bool doStartUp();
 
 	std::vector<std::shared_ptr<Behavior>> m_behaviors;
+
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 

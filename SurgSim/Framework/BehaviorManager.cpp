@@ -20,11 +20,13 @@
 
 #include "Component.h"
 #include "Behavior.h"
+#include "Logger.h"
+#include "Runtime.h"
 
 
 SurgSim::Framework::BehaviorManager::BehaviorManager() : BasicThread ("Behavior Manager")
 {
-
+	m_logger = SurgSim::Framework::Logger::createConsoleLogger(getName());
 }
 
 SurgSim::Framework::BehaviorManager::~BehaviorManager()
@@ -32,14 +34,33 @@ SurgSim::Framework::BehaviorManager::~BehaviorManager()
 
 }
 
+bool SurgSim::Framework::BehaviorManager::doInitialize()
+{
+	m_logger = getRuntime()->getLogger(getName());
+	return true;
+}
+
+bool SurgSim::Framework::BehaviorManager::doStartUp()
+{
+	return true;
+}
+
 bool SurgSim::Framework::BehaviorManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	bool result = false;
 	std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(component);
-	if (behavior != nullptr && find(m_behaviors.begin(), m_behaviors.end(),behavior) == m_behaviors.end())
+	if (behavior != nullptr)
 	{
-		m_behaviors.push_back(behavior);
-		result = true;
+		if (find(m_behaviors.begin(), m_behaviors.end(),behavior) == m_behaviors.end())
+		{
+			m_behaviors.push_back(behavior);
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added behavior " << behavior->getName();
+			result = true;
+		}
+		else
+		{
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate behavior " << behavior->getName();
+		}
 	}
 	return result;
 }
@@ -54,7 +75,13 @@ bool SurgSim::Framework::BehaviorManager::removeComponent(std::shared_ptr<SurgSi
 		if (found != m_behaviors.end())
 		{
 			m_behaviors.erase(found);
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed behavior " << behavior->getName();
 			result = true;
+		}
+		else
+		{
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Unable to remove behavior " << behavior->getName()
+									   << ". Not found.";
 		}
 	}
 	return result;
@@ -70,3 +97,5 @@ bool SurgSim::Framework::BehaviorManager::doUpdate(double dt)
 	}
 	return true;
 }
+
+
