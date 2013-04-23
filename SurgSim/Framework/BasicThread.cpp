@@ -21,6 +21,7 @@
 #include <boost/ref.hpp>
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/Runtime.h>
 
 SurgSim::Framework::BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
@@ -148,5 +149,14 @@ std::string SurgSim::Framework::BasicThread::getName() const
 	return m_name;
 }
 
+std::shared_ptr<SurgSim::Framework::Runtime> SurgSim::Framework::BasicThread::getRuntime() const
+{
+	return m_runtime.lock();
+}
+
+void SurgSim::Framework::BasicThread::setRuntime(std::shared_ptr<SurgSim::Framework::Runtime> val)
+{
+	m_runtime = val;
+}
 
 
