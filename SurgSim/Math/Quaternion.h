@@ -41,26 +41,41 @@ typedef Eigen::Quaternion<double, Eigen::DontAlign>  Quaterniond;
 
 
 /// Create a quaternion rotation corresponding to the specified angle (in radians) and axis.
-template <typename T, int MOpt>
-inline Eigen::Quaternion<T> makeRotationQuaternion(const T& angle, const Eigen::Matrix<T, 3, 1, MOpt>& axis)
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
+/// \param angle the angle of the rotation, in radians.
+/// \param axis the axis of the rotation.
+/// \returns the rotation quaternion.
+template <typename T, int VOpt>
+inline Eigen::Quaternion<T> makeRotationQuaternion(const T& angle, const Eigen::Matrix<T, 3, 1, VOpt>& axis)
 {
 	return Eigen::Quaternion<T>(Eigen::AngleAxis<T>(angle, axis));
 }
 
 /// Get the angle (in radians) and axis corresponding to a quaternion's rotation.
-template <typename T, int QOpt, int MOpt>
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
+/// \param quaternion the rotation quaternion to inspect.
+/// \param [out] angle the angle of the rotation, in radians.
+/// \param [out] axis the axis of the rotation.
+template <typename T, int QOpt, int VOpt>
 inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
-                                T& angle, Eigen::Matrix<T, 3, 1, MOpt>& axis)
+                                T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
 {
 	Eigen::AngleAxis<T> angleAxis(quaternion);
-	angle = angleAxis.angle();
-	axis = angleAxis.axis();
+	*angle = angleAxis.angle();
+	*axis = angleAxis.axis();
 }
 
 /// Get the angle corresponding to a quaternion's rotation, in radians.
 /// If you don't care about the rotation axis, this is more efficient than computeAngleAndAxis().
-template <typename T, int Opt>
-inline T computeAngle(const Eigen::Quaternion<T, Opt>& quaternion)
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
+/// \param quaternion the rotation quaternion to inspect.
+/// \returns the angle of the rotation, in radians.
+template <typename T, int QOpt>
+inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 {
 	T w = std::abs(quaternion.w());
 	if (w >= 1.0)
