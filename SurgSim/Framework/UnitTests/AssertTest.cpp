@@ -48,17 +48,23 @@ public:
 		logOutput = std::make_shared<MockOutput>();
 		testLogger = std::unique_ptr<SurgSim::Framework::Logger>(new SurgSim::Framework::Logger("test", logOutput));
 		// testLogger will be used for assertions in most tests, due to the definition of SURGSIM_ASSERT_LOGGER below.
+		savedCallback = SurgSim::Framework::AssertMessage::getFailureCallback();
 	}
 
 	void TearDown()
 	{
+		SurgSim::Framework::AssertMessage::setFailureCallback(savedCallback);
 		testLogger.reset();
 		logOutput.reset();
 	}
 
 	std::shared_ptr<MockOutput> logOutput;
 	std::unique_ptr<SurgSim::Framework::Logger> testLogger;
+	SurgSim::Framework::AssertMessage::DeathCallback savedCallback;
 };
+
+typedef AssertTest AssertDeathTest;
+
 
 TEST_F(AssertTest, DefaultAssertLogger)
 {
@@ -73,6 +79,13 @@ TEST_F(AssertTest, DefaultAssertLogger)
 inline bool stringContains(const std::string& string, const std::string& fragment)
 {
 	return string.find(fragment) != std::string::npos;
+}
+
+static int numIgnoredAssertions = 0;
+
+static void ignoreAssertionKeepGoing(const std::string& message)
+{
+	++numIgnoredAssertions;
 }
 
 TEST_F(AssertTest, Assertion)
@@ -121,4 +134,65 @@ TEST_F(AssertTest, Manipulators)
 	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "[" << 987 << "]", SurgSim::Framework::AssertionFailure);
 	EXPECT_TRUE(stringContains(logOutput->logMessage, "[987]")) <<
 		"message: '" << logOutput->logMessage << "'";
+}
+
+TEST_F(AssertTest, ExceptionBehavior)
+{
+	logOutput->reset();
+
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToThrow();
+	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "extra information would go here", SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
+
+	EXPECT_THROW(SURGSIM_FAILURE() << "extra information would go here", SurgSim::Framework::AssertionFailure);
+}
+
+TEST_F(AssertTest, Callback)
+{
+	logOutput->reset();
+
+	typedef SurgSim::Framework::AssertMessage::DeathCallback CallbackType;
+	const CallbackType defaultCallback = SurgSim::Framework::AssertMessage::getFailureCallback();
+
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToThrow();
+	const CallbackType throwCallback = SurgSim::Framework::AssertMessage::getFailureCallback();
+	EXPECT_EQ(throwCallback, defaultCallback);
+
+	SurgSim::Framework::AssertMessage::setFailureCallback(ignoreAssertionKeepGoing);
+	EXPECT_EQ(static_cast<CallbackType>(ignoreAssertionKeepGoing), SurgSim::Framework::AssertMessage::getFailureCallback());
+	numIgnoredAssertions = 0;
+	EXPECT_NO_THROW(SURGSIM_ASSERT(1 == 2) << "extra information would go here");
+	EXPECT_EQ(1, numIgnoredAssertions);
+	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
+	EXPECT_EQ(1, numIgnoredAssertions);
+	EXPECT_NO_THROW(SURGSIM_FAILURE() << "extra information would go here");
+	EXPECT_EQ(2, numIgnoredAssertions);
+
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToThrow();
+	EXPECT_EQ(throwCallback, SurgSim::Framework::AssertMessage::getFailureCallback());
+	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "extra information would go here", SurgSim::Framework::AssertionFailure);
+	EXPECT_EQ(2, numIgnoredAssertions);
+}
+
+TEST_F(AssertDeathTest, DebuggerBehaviorAssertFailed)
+{
+	logOutput->reset();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	// The assertion should die with no output to stdout.
+	ASSERT_DEATH_IF_SUPPORTED({SURGSIM_ASSERT(1 == 2) << "extra information would go here";}, "^$");
+}
+
+TEST_F(AssertDeathTest, DebuggerBehaviorAssertSucceded)
+{
+	logOutput->reset();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
+}
+
+TEST_F(AssertDeathTest, DebuggerBehaviorFailure)
+{
+	logOutput->reset();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	// The assertion should die with no output to stdout.
+	ASSERT_DEATH_IF_SUPPORTED({SURGSIM_FAILURE() << "extra information would go here";}, "^$");
 }

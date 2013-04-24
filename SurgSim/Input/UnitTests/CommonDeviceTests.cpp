@@ -40,7 +40,7 @@ using SurgSim::Math::Matrix44d;
 class TestDevice : public CommonDevice
 {
 public:
-	TestDevice(const std::string& uniqueName) :
+	explicit TestDevice(const std::string& uniqueName) :
 		CommonDevice(uniqueName, buildInputData())
 	{
 	}
@@ -94,7 +94,7 @@ DataGroup TestDevice::buildInputData()
 	DataGroupBuilder builder;
 	builder.addString("helloWorld");
 	DataGroup data = builder.createData();
-	data.strings().put("helloWorld", "data");
+	data.strings().set("helloWorld", "data");
 	return data;
 }
 
@@ -130,7 +130,7 @@ public:
 		DataGroupBuilder builder;
 		builder.addInteger("value");
 		m_nextSentOutput = builder.createData();
-		m_nextSentOutput.integers().put("value", 123);
+		m_nextSentOutput.integers().set("value", 123);
 	}
 
 	virtual bool requestOutput(const std::string& device, DataGroup* outputData);

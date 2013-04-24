@@ -24,7 +24,7 @@ namespace SurgSim
 namespace Framework
 {
 
-FileOutput::FileOutput(std::string filename) :
+FileOutput::FileOutput(const std::string& filename) :
 	m_filename(filename)
 {
 	if (! m_stream.is_open())

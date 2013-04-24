@@ -38,8 +38,9 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.50 COMPONENTS thread system chrono REQUIRED)
 mark_as_advanced(Boost_DIR)
 
+find_package(OpenHaptics)
 
-option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
+
 if(SURGSIM_TESTS_BUILD)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
 	add_subdirectory(ThirdParty/gtest)

@@ -44,7 +44,7 @@ public:
 
 	/// Constructor
 	/// \param filename The filename to be used for writing
-	explicit FileOutput(std::string filename);
+	explicit FileOutput(const std::string& filename);
 
 	virtual ~FileOutput();
 
@@ -66,7 +66,7 @@ public:
 
 	/// Constructor
 	/// \param ostream stream to be used for writing
-	StreamOutput(std::ostream& ostream);
+	explicit StreamOutput(std::ostream& ostream);
 	virtual ~StreamOutput();
 
 	/// \param message to be written to the stream

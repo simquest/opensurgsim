@@ -24,6 +24,7 @@ include_directories(
 
 set(SURGSIM_FRAMEWORK_SOURCES
 	ApplicationData.cpp
+	AssertMessage.cpp
 	BasicThread.cpp
 	Barrier.cpp
 #	BehaviorManager.cpp
@@ -53,6 +54,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessageBase.h
 	LogOutput.h
 #	Representation.h
+	ReuseFactory.h
 	Runtime.h
 	Scene.h
 	SceneElement.h
