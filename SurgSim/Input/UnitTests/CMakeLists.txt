@@ -21,14 +21,20 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	CommonDeviceTests.cpp
+	InputManagerTest.cpp
+	TestDevice.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	TestDevice.h
 )
 
 include_directories(
 )
 
 set(LIBS SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	set(LIBS ${LIBS} rt)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 surgsim_add_unit_tests(SurgSimInputTest)

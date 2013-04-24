@@ -20,12 +20,18 @@ include_directories(
 
 set(SURGSIM_INPUT_SOURCES
 	CommonDevice.cpp
+	InputManager.cpp
+	InputComponent.cpp
+	OutputComponent.cpp
 )
 
 set(SURGSIM_INPUT_HEADERS
 	CommonDevice.h
 	DeviceInterface.h
+	InputComponent.h
 	InputConsumerInterface.h
+	InputManager.h
+	OutputComponent.h
 	OutputProducerInterface.h
 )
 

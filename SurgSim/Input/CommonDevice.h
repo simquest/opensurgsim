@@ -64,6 +64,8 @@ public:
 
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
 
+	virtual bool hasOutputProducer();
+
 protected:
 
 	/// Push application input to consumers.

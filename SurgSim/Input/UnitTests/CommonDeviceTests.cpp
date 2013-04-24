@@ -28,6 +28,8 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
+#include "TestDevice.h"
+
 using SurgSim::Input::CommonDevice;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
@@ -35,128 +37,6 @@ using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
-
-
-class TestDevice : public CommonDevice
-{
-public:
-	explicit TestDevice(const std::string& uniqueName) :
-		CommonDevice(uniqueName, buildInputData())
-	{
-	}
-
-	virtual bool initialize();
-
-	virtual bool finalize();
-
-	virtual void pushInput();
-
-	virtual bool pullOutput();
-
-	const DataGroup& getOutputData() const;
-
-	/// Builds the data layout for the application input (i.e. device output).
-	static DataGroup buildInputData();
-};
-
-// required by the DeviceInterface API
-bool TestDevice::initialize()
-{
-	return true;
-}
-
-// required by the DeviceInterface API
-bool TestDevice::finalize()
-{
-	return true;
-}
-
-// expose the pushInput method to the world
-void TestDevice::pushInput()
-{
-	CommonDevice::pushInput();
-}
-
-// expose the pullOutput method to the world
-bool TestDevice::pullOutput()
-{
-	return CommonDevice::pullOutput();
-}
-
-// expose the getOutputData method to the world
-const DataGroup& TestDevice::getOutputData() const
-{
-	return CommonDevice::getOutputData();
-}
-
-DataGroup TestDevice::buildInputData()
-{
-	DataGroupBuilder builder;
-	builder.addString("helloWorld");
-	DataGroup data = builder.createData();
-	data.strings().set("helloWorld", "data");
-	return data;
-}
-
-
-struct TestInputConsumer : public InputConsumerInterface
-{
-public:
-	TestInputConsumer() :
-		m_numTimesReceivedInput(0)
-	{
-	}
-
-	virtual void handleInput(const std::string& device, const DataGroup& inputData);
-
-	int m_numTimesReceivedInput;
-	DataGroup m_lastReceivedInput;
-};
-
-void TestInputConsumer::handleInput(const std::string& device, const DataGroup& inputData)
-{
-	++m_numTimesReceivedInput;
-	m_lastReceivedInput = inputData;
-}
-
-
-struct TestOutputProducer : public OutputProducerInterface
-{
-public:
-	TestOutputProducer() :
-		m_numTimesRequestedOutput(0),
-		m_refuseToProduce(false)
-	{
-		DataGroupBuilder builder;
-		builder.addInteger("value");
-		m_nextSentOutput = builder.createData();
-		m_nextSentOutput.integers().set("value", 123);
-	}
-
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
-
-	int m_numTimesRequestedOutput;
-	bool m_refuseToProduce;
-	DataGroup m_nextSentOutput;
-};
-
-bool TestOutputProducer::requestOutput(const std::string& device, DataGroup* outputData)
-{
-	++m_numTimesRequestedOutput;
-
-	if (m_refuseToProduce)
-	{
-		return false;
-	}
-	else
-	{
-		*outputData = m_nextSentOutput;
-		return true;
-	}
-}
-
-
-// OK, let's start testing...
 
 TEST(CommonDeviceTests, CanConstruct)
 {
@@ -196,6 +76,7 @@ TEST(CommonDeviceTests, SetOutputProducer)
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_TRUE(device.setOutputProducer(producer));
+	EXPECT_TRUE(device.hasOutputProducer());
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device.setOutputProducer(producer));
@@ -205,6 +86,7 @@ TEST(CommonDeviceTests, SetOutputProducer)
 	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
 
 	EXPECT_TRUE(device.setOutputProducer(producer2));
+	EXPECT_TRUE(device.hasOutputProducer());
 	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }

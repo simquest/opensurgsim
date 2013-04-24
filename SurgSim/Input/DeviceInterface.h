@@ -54,7 +54,7 @@ public:
 	/// Removes an input consumer previously added via \ref addInputConsumer.
 	/// \param inputConsumer The input consumer to be removed.
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) = 0;
-	
+
 	/// Sets an output producer that will be asked for application output state when the device needs it.
 	/// Any previously set output producer will be removed.
 	///
@@ -65,6 +65,10 @@ public:
 	/// Removes an output producer previously added via \ref setOutputProducer.
 	/// \param outputProducer The output producer to be removed.
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) = 0;
+
+	/// Query if this object has output producer.
+	/// \return	true if there is an output producer, false if not.
+	virtual bool hasOutputProducer() = 0;
 
 protected:
 
