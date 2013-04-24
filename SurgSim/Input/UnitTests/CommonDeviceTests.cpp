@@ -76,6 +76,7 @@ TEST(CommonDeviceTests, SetOutputProducer)
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_TRUE(device.setOutputProducer(producer));
+	EXPECT_TRUE(device.hasOutputProducer());
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device.setOutputProducer(producer));
@@ -85,6 +86,7 @@ TEST(CommonDeviceTests, SetOutputProducer)
 	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
 
 	EXPECT_TRUE(device.setOutputProducer(producer2));
+	EXPECT_TRUE(device.hasOutputProducer());
 	EXPECT_EQ(0, producer2->m_numTimesRequestedOutput);
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }

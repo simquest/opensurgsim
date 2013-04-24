@@ -109,16 +109,24 @@ bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output)
 	{
 		if (m_devices.find(output->getDeviceName()) != m_devices.end())
 		{
-			// Should check if device already has producer and warn about overwrite
-			m_devices[output->getDeviceName()]->setOutputProducer(output);
-			m_outputs.push_back(output);
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-			                           " Added component " << output->getName();
-			result = true;
+			if (! m_devices[output->getDeviceName()]->hasOutputProducer())
+			{
+				m_devices[output->getDeviceName()]->setOutputProducer(output);
+				m_outputs.push_back(output);
+				SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
+					" Added component " << output->getName();
+				result = true;
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
+					" Trying to add OutputProducer " << output->getName() << " to device " << output->getDeviceName() <<
+					" but the device already has and OutputProducer assigned, this add will be ignored!";
+			}
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << "Could not find Device with name " <<
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
 			                           output->getDeviceName() << " when adding component " << output->getName();
 		}
 	}

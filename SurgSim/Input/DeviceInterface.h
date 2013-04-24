@@ -66,6 +66,10 @@ public:
 	/// \param outputProducer The output producer to be removed.
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) = 0;
 
+	/// Query if this object has output producer.
+	/// \return	true if there is an output producer, false if not.
+	virtual bool hasOutputProducer() = 0;
+
 protected:
 
 	/// Fully initialize the device.

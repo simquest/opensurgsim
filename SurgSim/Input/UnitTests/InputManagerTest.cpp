@@ -65,14 +65,10 @@ protected:
 		inputManager->addDevice(testDevice2);
 	}
 
-
-
 	virtual void TearDown()
 	{
 		runtime->stop();
 	}
-
-
 
 	std::shared_ptr<TestDevice> testDevice1;
 	std::shared_ptr<TestDevice> testDevice2;
@@ -149,7 +145,7 @@ TEST_F(InputManagerTest, OutputAddRemove)
 	std::shared_ptr<OutputComponent> invalid = createOutputComponent("Component3", "InvalidDevice");
 
 	EXPECT_TRUE(inputManager->addComponent(output1));
-	EXPECT_TRUE(inputManager->addComponent(output2));
+	EXPECT_FALSE(inputManager->addComponent(output2));
 	EXPECT_FALSE(inputManager->addComponent(output2));
 	EXPECT_TRUE(inputManager->addComponent(output3));
 	EXPECT_FALSE(inputManager->addComponent(invalid));
