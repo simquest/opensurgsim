@@ -27,7 +27,7 @@ void TestDevice::pushInput()
 
 void TestDevice::pushInput(std::string data)
 {
-	getInputData().strings().put("helloWorld", data);
+	getInputData().strings().set("helloWorld", data);
 	pushInput();
 }
 
@@ -35,7 +35,7 @@ void TestDevice::pushInput(std::string data)
 bool TestDevice::pullOutput()
 {
 	bool result = CommonDevice::pullOutput();
-	getOutputData().strings().get("data",lastPulledData);
+	getOutputData().strings().get("data",&lastPulledData);
 	return result;
 }
 
@@ -50,7 +50,7 @@ DataGroup TestDevice::buildInputData()
 	DataGroupBuilder builder;
 	builder.addString("helloWorld");
 	DataGroup data = builder.createData();
-	data.strings().put("helloWorld", "data");
+	data.strings().set("helloWorld", "data");
 	return data;
 }
 

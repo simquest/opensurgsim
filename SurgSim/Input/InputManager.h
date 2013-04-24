@@ -17,7 +17,8 @@
 #define HEMSIM_INPUTMANAGER_H
 
 #include <vector>
-#include <map>
+#include <unordered_map>
+#include <memory>
 #include <SurgSim/Framework/BasicThread.h>
 #include <SurgSim/Input/InputComponent.h>
 #include <SurgSim/Input/OutputComponent.h>
@@ -31,7 +32,6 @@ namespace SurgSim
 namespace Input
 {
 
-
 /// Manager to handle InputComponent and OutputComponent, SceneElement can add these to
 /// get input from devices, or even write output to devices. The devices have to be added
 /// to this class before components can be added to it.
@@ -42,7 +42,10 @@ public:
 	virtual ~InputManager(void);
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
-	/// function in the device .
+	/// function in the device. For an InputComonent this will suceed if the device name 
+	/// inside the component is known to the InputManager and if the component has not 
+	/// been added as an input yet. For an OutputComponent the call will fail if the device
+	/// does not exist or 
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.
@@ -68,19 +71,27 @@ private:
 	virtual bool doStartUp();
 	virtual bool doUpdate(double dt);
 
-	/// Specific call for input components
+	/// Specific call for input components.
 	bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input);
 
-	/// Specific call for output components
+	/// Specific call for output components.
 	bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output);
 
+	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
+
+	/// Collection of all output components.
 	std::vector<std::shared_ptr<OutputComponent>> m_outputs;
 
-	std::map<std::string, std::shared_ptr<SurgSim::Input::DeviceInterface>> m_devices;
+	/// Collection of all devices that have been added to the input manager
+	/// key is the name, no two devices with the same name can be added to the
+	/// input manager
+	std::unordered_map<std::string, std::shared_ptr<SurgSim::Input::DeviceInterface>> m_devices;
 
+	/// The logger for this manager
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
+	/// Protect critical sections
 	boost::mutex m_mutex;
 };
 

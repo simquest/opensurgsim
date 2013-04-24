@@ -86,7 +86,7 @@ std::shared_ptr<OutputComponent> createOutputComponent(std::string name, std::st
 	DataGroupBuilder builder;
 	builder.addString("data");
 	DataGroup data = builder.createData();
-	data.strings().put("data", "data");
+	data.strings().set("data", "data");
 
 	return std::make_shared<OutputComponent>(name,deviceName,data);
 }
@@ -133,11 +133,11 @@ TEST_F(InputManagerTest, InputfromDevice)
 	testDevice1->pushInput("avalue");
 
 	std::string data;
-	listener1->getInputData().strings().get("helloWorld",data);
+	listener1->getInputData().strings().get("helloWorld",&data);
 	EXPECT_EQ("avalue",data);
 
 	testDevice1->pushInput("bvalue");
-	listener1->getInputData().strings().get("helloWorld",data);
+	listener1->getInputData().strings().get("helloWorld",&data);
 	EXPECT_EQ("bvalue",data);
 }
 
@@ -161,7 +161,7 @@ TEST_F(InputManagerTest, OutputPush)
 {
 	std::shared_ptr<OutputComponent> output = createOutputComponent("Component1", "TestDevice1");
 	EXPECT_TRUE(inputManager->addComponent(output));
-	output->getOutputData().strings().put("data","outputdata");
+	output->getOutputData().strings().set("data","outputdata");
 	EXPECT_TRUE(testDevice1->pullOutput());
 	EXPECT_EQ("outputdata",testDevice1->lastPulledData);
 }

@@ -64,6 +64,10 @@ public:
 
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
 
+	/// Query if this object has output producer.
+	/// \return	true if there is an output producer, false if not.
+	virtual bool hasOutputProducer();
+
 protected:
 
 	/// Push application input to consumers.

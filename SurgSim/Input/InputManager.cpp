@@ -38,6 +38,7 @@ InputManager::~InputManager(void)
 
 bool InputManager::doInitialize()
 {
+	// When the runtime has been set pull the runtimes logger for this manager
 	m_logger = getRuntime()->getLogger(getName());
 	return true;
 }
@@ -54,11 +55,11 @@ bool InputManager::doUpdate(double dt)
 
 bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = false;
 	std::shared_ptr<InputComponent> input = std::dynamic_pointer_cast<InputComponent>(component);
 	if (input != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
+		// Early exit
 		return addInputComponent(input);
 	}
 
@@ -66,10 +67,12 @@ bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> c
 	if (output != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
+		// Early exit
 		return addOutputComponent(output);
 	}
 
-	return result;
+	// If we got he the component was neither an Input nor and OutputComponent
+	return false;
 }
 
 bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
