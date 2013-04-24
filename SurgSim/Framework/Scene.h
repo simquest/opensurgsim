@@ -48,7 +48,7 @@ public:
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
-	const std::map< std::string,std::shared_ptr<SceneElement> >& getSceneElements() const;
+	const std::map<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
 
 	/// Sets the runtime.
 	/// \param	runtime	The runtime for this scene.
@@ -57,7 +57,7 @@ public:
 private:
 	std::weak_ptr<Runtime> m_runtime;
 
-	std::map< std::string,std::shared_ptr<SceneElement> > m_elements;
+	std::map<std::string,std::shared_ptr<SceneElement>> m_elements;
 };
 
 }

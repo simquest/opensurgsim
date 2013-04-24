@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
@@ -68,37 +70,4 @@ install(TARGETS SurgSimFramework
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
-endif()
-
-if(SURGSIM_WRAPPERS_BUILD)
-	find_package(PythonLibs REQUIRED)
-	set(${LIBRARY_OUTPUT_PATH} ${CMAKE_BINARY_DIR}/Python)
-
-	set(SWIG_I_FILES 
-		Scene.i
-		SceneElement.i
-		Framework.i
-	)
-
-	set_source_files_properties(Framework.i PROPERTIES CPLUSPLUS ON)
-	
-	if(SURGSIM_TESTS_BUILD)
-		add_subdirectory(PythonTests)
-	endif()
-	
-	swig_add_module(Framework python Framework.i)
-	swig_link_libraries( Framework 
-		${PYTHON_LIBRARIES}
-		${Boost_LIBRARIES}
-		SurgSimFramework
-	)
-
-	add_custom_command(
-		TARGET _Framework
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/Framework.py
-										 ${CMAKE_BINARY_DIR}/Python/Framework.py
-		COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/_Framework.pyd
-										 ${CMAKE_BINARY_DIR}/Python/_Framework.pyd
-	)
 endif()
