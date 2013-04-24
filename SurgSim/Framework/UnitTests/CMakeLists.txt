@@ -25,12 +25,12 @@ set(UNIT_TEST_SOURCES
 	AssertTest.cpp
 #	BehaviorManagerTest.cpp
 	BaseThreadTest.cpp
+	LockedContainerTest.cpp
 	LoggerTest.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
-	ThreadSafeContainerTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
