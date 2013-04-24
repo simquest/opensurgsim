@@ -1,11 +1,11 @@
 #ifndef SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
 #define SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
 
-#include "SurgSim\Input\CommonDevice.h"
-#include "SurgSim\Input\InputConsumerInterface.h"
-#include "SurgSim\Input\OutputProducerInterface.h"
-#include "SurgSim\DataStructures\DataGroup.h"
-#include "SurgSim\DataStructures\DataGroupBuilder.h"
+#include <SurgSim/Input/CommonDevice.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/OutputProducerInterface.h>
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
 
 using SurgSim::Input::CommonDevice;
 using SurgSim::DataStructures::DataGroup;

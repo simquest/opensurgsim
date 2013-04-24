@@ -72,10 +72,10 @@ private:
 	virtual bool doUpdate(double dt);
 
 	/// Specific call for input components.
-	bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input);
+	bool addInputComponent(std::shared_ptr<InputComponent> input);
 
 	/// Specific call for output components.
-	bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output);
+	bool addOutputComponent(std::shared_ptr<OutputComponent> output);
 
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
