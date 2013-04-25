@@ -29,7 +29,7 @@ namespace Framework
 class Behavior: public Component
 {
 public:
-	Behavior(std::string name) : Component(name) {};
+	Behavior(const std::string& name) : Component(name) {};
 	virtual ~Behavior() {};
 
 	/// Update the behavior
