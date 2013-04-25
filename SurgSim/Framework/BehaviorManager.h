@@ -33,6 +33,9 @@ class Behavior;
 /// in the scene through addComponent (and removeComponent) calls. All the
 /// behaviors will be update once per period (default 30Hz) once the 
 /// BehaviorManager is started.
+/// NOTE: Currently, BehaviorManager is not thread safe. Behaviors should only
+///       be added before runtime starts.
+/// TODO: Thread safety. Add ability to add/remove components during runtime.
 class BehaviorManager : public BasicThread
 {
 public:
