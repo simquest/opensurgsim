@@ -116,7 +116,7 @@ void SurgSim::Framework::BasicThread::operator()()
 	}
 
 	boost::chrono::duration<double> frameTime(0.0);
-	boost::chrono::system_clock::time_point start;
+	boost::chrono::steady_clock::time_point start;
 
 	m_isRunning = true;
 	while (m_isRunning && ! m_stopExecution)
@@ -124,11 +124,11 @@ void SurgSim::Framework::BasicThread::operator()()
 		// Check for frameTime being > desired update period report error, adjust ...
 		if (m_period > frameTime)
 		{
-			boost::this_thread::sleep_for(m_period-frameTime);
+			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + (m_period - frameTime));
 		}
-		start = boost::chrono::system_clock::now();
+		start = boost::chrono::steady_clock::now();
 		m_isRunning = doUpdate(m_period.count());
-		frameTime = boost::chrono::system_clock::now() - start;
+		frameTime = boost::chrono::steady_clock::now() - start;
 	}
 	m_isRunning = false;
 	m_stopExecution = false;
