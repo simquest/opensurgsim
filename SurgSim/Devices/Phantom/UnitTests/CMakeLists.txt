@@ -15,28 +15,25 @@
 
 
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-set(SURGSIM_INPUT_SOURCES
-	CommonDevice.cpp
-	InputManager.cpp
-	InputComponent.cpp
-	OutputComponent.cpp
+set(UNIT_TEST_SOURCES
+	PhantomDeviceTest.cpp
 )
 
-set(SURGSIM_INPUT_HEADERS
-	CommonDevice.h
-	DeviceInterface.h
-	InputComponent.h
-	InputConsumerInterface.h
-	InputManager.h
-	OutputComponent.h
-	OutputProducerInterface.h
+set(UNIT_TEST_HEADERS
 )
 
-add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
+set(LIBS PhantomDevice SurgSimInput SurgSimFramework SurgSimDataStructures
+	gtest ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
 
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
+# The unit tests will be built whenever the library is built, but
+# running them at build time requires hardware and is disabled by
+# default.
+option(SURGSIM_TESTS_RUN_DEVICE_PHANTOM
+	"Run the Phantom tests as part of unit tests.  (Requires hardware, OpenHaptics 3.0 and device license!"
+	OFF)
+surgsim_add_unit_tests(PhantomDeviceTest
+	RUN ${SURGSIM_TESTS_RUN_DEVICE_PHANTOM})

@@ -90,12 +90,12 @@ TEST(DataGroupTests, PutName)
 		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(1, 0, 0));
 	const SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform(quat, vector);
 
-	data.poses().put("pose", pose);
-	data.vectors().put("vector", vector);
-	data.scalars().put("scalar", 1.23f);
-	data.integers().put("integer", 123);
-	data.booleans().put("boolean", true);
-	data.strings().put("string", "string");
+	data.poses().set("pose", pose);
+	data.vectors().set("vector", vector);
+	data.scalars().set("scalar", 1.23f);
+	data.integers().set("integer", 123);
+	data.booleans().set("boolean", true);
+	data.strings().set("string", "string");
 
 	EXPECT_TRUE(data.poses().hasEntry("pose"));
 	EXPECT_TRUE(data.poses().hasCurrentData("pose"));
@@ -133,42 +133,42 @@ TEST(DataGroupTests, GetName)
 		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(1, 0, 0));
 	const SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform(quat, vector);
 
-	data.poses().put("pose", pose);
-	data.vectors().put("vector", vector);
-	data.scalars().put("scalar", 1.23);
-	data.integers().put("integer", 123);
-	data.booleans().put("boolean", true);
-	data.strings().put("string", "string");
+	data.poses().set("pose", pose);
+	data.vectors().set("vector", vector);
+	data.scalars().set("scalar", 1.23);
+	data.integers().set("integer", 123);
+	data.booleans().set("boolean", true);
+	data.strings().set("string", "string");
 
 	{
 		SurgSim::Math::RigidTransform3d value = SurgSim::Math::RigidTransform3d::Identity();
-		EXPECT_TRUE(data.poses().get("pose", value));
+		EXPECT_TRUE(data.poses().get("pose", &value));
 		EXPECT_NEAR(0, (value.linear() - quat.matrix()).norm(), 1e-9);
 		EXPECT_NEAR(0, (value.translation() - vector).norm(), 1e-9);
 	}
 	{
 		SurgSim::Math::Vector3d value(0, 0, 0);
-		EXPECT_TRUE(data.vectors().get("vector", value));
+		EXPECT_TRUE(data.vectors().get("vector", &value));
 		EXPECT_NEAR(0, (value - vector).norm(), 1e-9);
 	}
 	{
 		double value = 0;
-		EXPECT_TRUE(data.scalars().get("scalar", value));
+		EXPECT_TRUE(data.scalars().get("scalar", &value));
 		EXPECT_NEAR(1.23, value, 1e-9);
 	}
 	{
 		int value = 0;
-		EXPECT_TRUE(data.integers().get("integer", value));
+		EXPECT_TRUE(data.integers().get("integer", &value));
 		EXPECT_EQ(123, value);
 	}
 	{
 		bool value = 0;
-		EXPECT_TRUE(data.booleans().get("boolean", value));
+		EXPECT_TRUE(data.booleans().get("boolean", &value));
 		EXPECT_EQ(true, value);
 	}
 	{
 		std::string value = "";
-		EXPECT_TRUE(data.strings().get("string", value));
+		EXPECT_TRUE(data.strings().get("string", &value));
 		EXPECT_EQ("string", value);
 	}
 }
@@ -182,8 +182,8 @@ TEST(DataGroupTests, ResetAll)
 	builder.addString("third");
 	DataGroup data = builder.createData();
 
-	data.scalars().put("second", 1.23);
-	data.strings().put("third", "hello");
+	data.scalars().set("second", 1.23);
+	data.strings().set("third", "hello");
 
 	data.resetAll();
 
@@ -206,8 +206,8 @@ TEST(DataGroupTests, ResetOne)
 	builder.addString("third");
 	DataGroup data = builder.createData();
 
-	data.scalars().put("second", 1.23);
-	data.strings().put("third", "hello");
+	data.scalars().set("second", 1.23);
+	data.strings().set("third", "hello");
 
 	data.strings().reset("third");
 

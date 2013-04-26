@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_COMPONENT_H
 
 #include <string>
+#include <memory>
 
 #include <SurgSim/Framework/Log.h>
 
@@ -26,7 +27,7 @@ namespace Framework
 {
 
 // Forward References
-class SceneElement;
+class Runtime;
 
 /// Component is the main interface class to pass information to the system managers each will decide
 /// whether to handle a component of a given type or not. Components will get initialized by having
@@ -35,8 +36,13 @@ class SceneElement;
 class Component
 {
 public:
-	Component(const std::string& name) : m_name(name), m_didInit(false), m_didWakeUp(false) {};
-	virtual ~Component() {};
+	explicit Component(const std::string& name) : m_name(name), m_didInit(false), m_didWakeUp(false)
+	{
+	}
+
+	virtual ~Component()
+	{
+	}
 
 	/// Gets the name.
 	/// \return	The name.
@@ -45,12 +51,16 @@ public:
 		return m_name;
 	};
 
-	bool initialize()
+	bool initialize(std::shared_ptr<Runtime> runtime)
 	{
-		SURGSIM_ASSERT(! m_didInit) << "Double initialisation called on component " << getName();
+		SURGSIM_ASSERT(! m_didInit) << "Double initialization called on component " << getName();
+		SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be nullptr";
+		m_runtime = runtime;
+
 		m_didInit = true;
 		return doInitialize();
 	};
+
 	bool wakeUp()
 	{
 		SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
@@ -58,8 +68,24 @@ public:
 		return doWakeUp();
 	};
 
+	std::shared_ptr<Runtime> getRuntime()
+	{
+		return m_runtime.lock();
+	}
+
+protected:
+
+	/// Sets the name.
+	/// \param	name	The name.
+	void setName(const std::string& name)
+	{
+		m_name = name;
+	}
+
 private:
 	std::string m_name;
+
+	std::weak_ptr<Runtime> m_runtime;
 
 	virtual bool doInitialize() = 0;
 	virtual bool doWakeUp() = 0;

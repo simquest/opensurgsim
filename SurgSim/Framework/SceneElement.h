@@ -37,8 +37,13 @@ class SceneElement
 {
 
 public:
-	SceneElement(const std::string& name) : m_name(name) {};
-	virtual ~SceneElement() {};
+	explicit SceneElement(const std::string& name) : m_name(name)
+	{
+	}
+
+	virtual ~SceneElement()
+	{
+	}
 
 	/// Adds a component
 	/// \param	component	The component.
@@ -81,6 +86,10 @@ public:
 	/// Sets the Runtime.
 	/// \param runtime Pointer to the runtime.
 	void setRuntime(std::shared_ptr<Runtime> runtime);
+
+	/// Gets the runtime.
+	/// \return	The runtime.
+	std::shared_ptr<Runtime> getRuntime();;
 
 private:
 

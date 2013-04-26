@@ -34,7 +34,9 @@ class AssertionFailure : public std::runtime_error
 public:
 	/// Constructor
 	/// \param message Exception message
-	explicit AssertionFailure(const std::string& message) : std::runtime_error(message) {};
+	explicit AssertionFailure(const std::string& message) : std::runtime_error(message)
+	{
+	}
 };
 
 
@@ -43,25 +45,72 @@ public:
 class AssertMessage : public LogMessageBase
 {
 public:
-	/// Constructor.
-	/// \param logger %Logger used to log this message.
-	explicit AssertMessage(Logger* logger) : LogMessageBase(logger, LOG_LEVEL_CRITICAL) {};
+	/// The type used for the callback function that is triggered after an assertion has failed.
+	typedef void (*DeathCallback)(const std::string& message);
 
 	/// Constructor.
 	/// \param logger %Logger used to log this message.
-	explicit AssertMessage(const std::unique_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
+	explicit AssertMessage(Logger* logger) : LogMessageBase(logger, LOG_LEVEL_CRITICAL)
+	{
+	}
 
 	/// Constructor.
 	/// \param logger %Logger used to log this message.
-	explicit AssertMessage(const std::shared_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL) {};
+	explicit AssertMessage(const std::unique_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL)
+	{
+	}
 
+	/// Constructor.
+	/// \param logger %Logger used to log this message.
+	explicit AssertMessage(const std::shared_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL)
+	{
+	}
 
 	/// Destructor
 	~AssertMessage()
 	{
 		flush();
-		throw AssertionFailure(getMessage());
+		m_killMeNow(getMessage());
 	}
+
+	/// After an assertion has failed, call some arbitrary function.
+	/// The callback function should cause the application (or at least the current thread) to terminate.
+	///
+	/// Thread-unsafe if called concurrently from multiple threads, or concurrently with a failing assertion.
+	static void setFailureCallback(DeathCallback callback);
+
+	/// Get the callback that will currently be called after an assertion has failed.
+	/// Thread-unsafe if called concurrently from multiple threads, or concurrently with a failing assertion.
+	/// \return The callback.
+	static DeathCallback getFailureCallback();
+
+	/// After an assertion has failed, throw a C++ exception.
+	/// Thread-unsafe if called concurrently from multiple threads, or concurrently with a failing assertion.
+	static void setFailureBehaviorToThrow()
+	{
+		setFailureCallback(throwException);
+	}
+
+	/// After an assertion has failed, enter the debugger or kill the application in a system-dependent way.
+	/// Thread-unsafe if called concurrently from multiple threads, or concurrently with a failing assertion.
+	static void setFailureBehaviorToDebugger()
+	{
+		setFailureCallback(crashToDebugger);
+	}
+
+private:
+	/// Kill the application by throwing an exception.
+	/// \param errorMessage Message describing the error.
+	static void throwException(const std::string& errorMessage);
+
+	/// Enter the debugger or kill the application in a system-dependent way.
+	/// \param errorMessage Message describing the error (which will be ignored).
+	static void crashToDebugger(const std::string& errorMessage);
+
+
+	/// The callback function that is triggered after an assertion has failed.
+	/// Thread-unsafe if called concurrently from multiple threads.
+	static DeathCallback m_killMeNow;
 };
 
 

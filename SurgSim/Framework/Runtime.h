@@ -28,16 +28,17 @@ namespace SurgSim
 namespace Framework
 {
 
+class ApplicationData;
 class BasicThread;
-class Scene;
-class SceneElement;
 class Component;
 class Logger;
+class Scene;
+class SceneElement;
 
 /// This class contains all the information about the runtime environment of
-/// the simulation, all the running threads, the state, ... while it is de facto a
+/// the simulation, all the running threads, the state, while it is de facto a
 /// singleton it should be passed around if needed. Needs to be created as a
-/// shared object
+/// shared object.
 class Runtime : public std::enable_shared_from_this<Runtime>
 {
 public:
@@ -45,6 +46,12 @@ public:
 	/// Default constructor.
 	Runtime();
 
+	/// Constructor, initializes the search path with paths from the given file.
+	/// \param	configFilePath 	Full pathname of the configuration file that contains paths,
+	///							one per line, to search for application data. If no config file
+	/// 						is given "." will be used as default path.
+	explicit Runtime(const std::string& configFilePath);
+	
 	/// Destructor.
 	~Runtime();
 
@@ -92,6 +99,11 @@ public:
 	/// \return	The logger with the name loggerName.
 	std::shared_ptr<Logger> getLogger(const std::string& loggerName);
 
+	/// Gets application data for the runtime.
+	/// \return	The application data.
+	std::shared_ptr<const ApplicationData> getApplicationData() const;
+
+
 private:
 
 	/// Preprocess scene elements. This is called during the startup sequence
@@ -103,10 +115,14 @@ private:
 	/// \return	true if it succeeds, false if it fails.
 	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
 
-
+	/// Initializes the search paths. 
+	/// \param	configFilePath	Full pathname of the configuration file, if path is empty 
+	/// 						"." will be used as default path.
+	void initSearchPaths(const std::string& configFilePath);
 	bool m_isRunning;
 	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;
 	std::shared_ptr<Scene> m_scene;
+	std::shared_ptr<ApplicationData> m_applicationData;
 
 	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
 

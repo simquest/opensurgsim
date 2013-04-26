@@ -61,13 +61,13 @@ public:
 	/// You should probably use \ref NamedDataBuilder or copy construction/assignment instead.
 	///
 	/// \param directory The IndexDirectory object describing the names and indices to be used.
-	inline NamedData(std::shared_ptr<const IndexDirectory> directory);
+	inline explicit NamedData(std::shared_ptr<const IndexDirectory> directory);
 
 	/// Construct an object, using the names from a vector of strings.
 	/// The indices corresponding to each name's entry will be the same as that name's index in the vector.
 	///
 	/// \param names The names, which should be unique.
-	inline NamedData(const std::vector<std::string>& names);
+	inline explicit NamedData(const std::vector<std::string>& names);
 
 	/// Construct an object as a copy of the data from another object.
 	/// \param namedData The object to copy from.
@@ -163,16 +163,16 @@ public:
 	/// Given an index, get the corresponding value.
 	///
 	/// \param index The index of the entry.
-	/// \param [out] value The retrieved value.
+	/// \param [out] value The location for the retrieved value.  Must not be null.
 	/// \return true if a current value is available and was written to \a value.
-	inline bool get(int index, T& value) const;
+	inline bool get(int index, T* value) const;
 
 	/// Given a name, get the corresponding value.
 	///
 	/// \param name The name of the entry.
-	/// \param [out] value The retrieved value.
+	/// \param [out] value The location for the retrieved value.  Must not be null.
 	/// \return true if a current value is available and was written to \a value.
-	inline bool get(const std::string& name, T& value) const;
+	inline bool get(const std::string& name, T* value) const;
 
 	/// Record the data for an entry specified by an index.
 	/// The entry will also be marked as containing current data.
@@ -180,7 +180,7 @@ public:
 	/// \param index The index of the entry.
 	/// \param value The value to be set.
 	/// \return true if successful.
-	inline bool put(int index, const T& value);
+	inline bool set(int index, const T& value);
 
 	/// Record the data for an entry specified by a name.
 	/// The entry will also be marked as containing current data.
@@ -188,7 +188,7 @@ public:
 	/// \param name The name of the entry.
 	/// \param value The value to be set.
 	/// \return true if successful.
-	inline bool put(const std::string& name, const T& value);
+	inline bool set(const std::string& name, const T& value);
 
 	/// Mark an entry as not containing any current data.
 	///

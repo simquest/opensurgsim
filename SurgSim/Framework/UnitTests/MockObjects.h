@@ -30,7 +30,7 @@
 class MockSceneElement : public SurgSim::Framework::SceneElement
 {
 public:
-	MockSceneElement(const std::string& name = "MockSceneElement") : 
+	explicit MockSceneElement(const std::string& name = "MockSceneElement") : 
 		SceneElement(name),
 		didInit(false), 
 		didWakeUp(false), 
@@ -126,7 +126,7 @@ private:
 class MockComponent : public SurgSim::Framework::Component
 {
 public:
-	MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
+	explicit MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
 		Component(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
