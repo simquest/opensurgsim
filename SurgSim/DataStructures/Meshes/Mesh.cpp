@@ -1,5 +1,7 @@
 #include "Mesh.h"
 
+#include <SurgSim/Framework/Assert.h>
+
 using SurgSim::DataStructures::Mesh;
 using SurgSim::Math::Vector3d;
 
@@ -11,39 +13,27 @@ Mesh::~Mesh()
 {
 }
 
-unsigned int Mesh::createNewVertex(const Vector3d& position)
-{
-	m_vertexPositions.push_back(position);
-
-	return m_vertexPositions.size() - 1;
-}
-
 void Mesh::setVertexPositions(const std::vector<Vector3d>& positions, bool doUpdate)
 {
-	// TODO: assert that the number of positions matches vertices
+	SURGSIM_ASSERT(m_vertices.size() == positions.size()) << "Number of positions must match number of vertices.";
 
-	m_vertexPositions = positions;
-
-	update();
-}
-
-void Mesh::setVertexPositions(const Mesh &mesh, bool doUpdate)
-{
-	// TODO: check that meshes have same number of vertices
-
-	m_vertexPositions = mesh.getVertexPositions();
-
-	update();
-}
-
-void Mesh::setVertexPositions(const Mesh& mesh1, double percent1, const Mesh& mesh2, double percent2, bool doUpdate)
-{
-	// TODO: check that meshes have same number of vertices
-
-	for (unsigned int i = 0; i < m_vertexPositions.size(); ++i)
+	for (unsigned int i = 0; i < m_vertices.size(); ++i)
 	{
-		m_vertexPositions[i] = mesh1.getVertexPosition(i) * percent1 + mesh2.getVertexPosition(i) * percent2;
+		m_vertices[i].position = positions[i];
 	}
 
-	update();
+	if (doUpdate)
+	{
+		update();
+	}
+}
+
+bool Mesh::operator==(const Mesh& mesh) const
+{
+	return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
+}
+
+bool Mesh::operator!=(const Mesh& mesh) const
+{
+	return (typeid(*this) != typeid(mesh)) || ! isEqual(mesh);
 }

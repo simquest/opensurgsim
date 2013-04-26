@@ -15,37 +15,23 @@
 
 
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-set(SURGSIM_DATA_STRUCTURES_SOURCES
-	DataGroupBuilder.cpp
-	IndexDirectory.cpp
+set(UNIT_TEST_SOURCES
+	MeshTest.cpp
+	MeshElementTest.cpp
+	MeshVertexTest.cpp
 )
 
-set(SURGSIM_DATA_STRUCTURES_HEADERS
-	DataGroup.h
-	DataGroup-inl.h
-	DataGroupBuilder.h
-	IndexDirectory.h
-	NamedData.h
-	NamedData-inl.h
-	NamedDataBuilder.h
+set(UNIT_TEST_HEADERS
+	MockObjects.h
 )
 
-add_library(SurgSimDataStructures
-	${SURGSIM_DATA_STRUCTURES_SOURCES} ${SURGSIM_DATA_STRUCTURES_HEADERS}
+include_directories(
 )
 
-install(FILES ${SURGSIM_DATA_STRUCTURES_HEADERS} DESTINATION include/SurgSim/DataStructures)
+set(LIBS SurgSimFramework SurgSimDataStructures SurgSimDataStructuresMeshes gtest)
 
-install(TARGETS SurgSimDataStructures
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib)
-
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
-
-add_subdirectory(Meshes)
+surgsim_add_unit_tests(SurgSimDataStructuresMeshesTest)

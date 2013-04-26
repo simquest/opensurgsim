@@ -14,21 +14,33 @@
 # limitations under the License.
 
 set(SURGSIM_DATA_STRUCTURES_MESHES_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/Mesh.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/TriangleMesh.cpp
-	PARENT_SCOPE
+	Mesh.cpp
+	
+	MeshVertex.cpp
+	MeshVertexData.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_MESHES_HEADERS
-	${CMAKE_CURRENT_SOURCE_DIR}/Mesh.h
-	${CMAKE_CURRENT_SOURCE_DIR}/TriangleMesh.h
-	PARENT_SCOPE
+	Mesh.h
+	MeshElement.h
+	MeshElement-inl.h
+	MeshElementData.h
+	MeshElementData-inl.h
+	MeshVertex.h
+	MeshVertexData.h
 )
 
+add_library(SurgSimDataStructuresMeshes
+	${SURGSIM_DATA_STRUCTURES_MESHES_SOURCES} ${SURGSIM_DATA_STRUCTURES_MESHES_HEADERS}
+)
+
+install(FILES ${SURGSIM_DATA_STRUCTURES_MESHES_HEADERS} DESTINATION include/SurgSim/DataStructures/Meshes)
+
+install(TARGETS SurgSimDataStructuresMeshes
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib
+	ARCHIVE DESTINATION lib)
+
 if(SURGSIM_TESTS_BUILD)
-#	add_subdirectory(UnitTests)
+	add_subdirectory(UnitTests)
 endif()
-
-
-
-

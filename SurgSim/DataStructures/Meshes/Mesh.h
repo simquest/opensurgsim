@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATA_STRUCTURES_MESH_H
 #define SURGSIM_DATA_STRUCTURES_MESH_H
 
-#include <SurgSim/Math/Vector.h>
+#include <SurgSim/DataStructures/Meshes/MeshVertex.h>
 
 #include <array>
 #include <vector>
@@ -31,15 +31,18 @@ namespace DataStructures
 class Mesh
 {
 public:
-	/// Constructor initializes an empty mesh.
+	/// Vertex type
+	typedef MeshVertex Vertex;
+
+	/// Constructor. The mesh is initially empty (no vertices).
 	Mesh();
 	/// Destructor
-	~Mesh();
+	virtual ~Mesh();
 
-	/// Reset to empty mesh.
-	void reset()
+	/// Clear mesh to return to an empty state (no vertices).
+	void clear()
 	{
-		doReset();
+		doClear();
 	}
 
 	/// Performs any updates that are required when the vertices are modified.
@@ -49,60 +52,79 @@ public:
 		doUpdate();
 	}
 
-	/// Creates a new vertex.
-	/// \param	position	Position of the vertex
+	/// Adds a vertex to the mesh.
+	/// \param	vertex	Vertex to add to the mesh
 	/// \return	Unique ID of the new vertex.
-	unsigned int createNewVertex(const SurgSim::Math::Vector3d& position);
+	unsigned int addVertex(const Vertex& vertex)
+	{
+		m_vertices.push_back(vertex);
+		return m_vertices.size() - 1;
+	}
 
 	/// Returns the number of vertices in this mesh.
-	unsigned int numVertices() const
+	unsigned int getNumVertices() const
 	{ 
-		m_vertexPositions.size();
+		return m_vertices.size();
 	}
-	
+
+	/// Returns the specified vertex.
+	const Vertex& getVertex(unsigned int id) const
+	{
+		return m_vertices[id];
+	}
+
+	/// Returns a vector containing the position of each vertex.
+	const std::vector<Vertex>& getVertices() const
+	{
+		return m_vertices;
+	}
+
+	/// Sets the position of a vertex.
+	/// \param	id	Unique ID of the vertex
+	/// \param	position	Position of the vertex
+	void setVertexPosition(unsigned int id, const SurgSim::Math::Vector3d& position)
+	{
+		m_vertices[id].position = position;
+	}
 	/// Returns the position of a vertex.
 	/// \param	id	Unique ID of the vertex
 	/// \return	Position of the vertex
 	const SurgSim::Math::Vector3d& getVertexPosition(unsigned int id) const
 	{
-		return m_vertexPositions[id];
+		return m_vertices[id].position;
 	}
 
 	/// Sets the position of each vertex.
 	/// \param	positions	Vector containing new position for each vertex
-	/// \param	doUpdate	Whether or not to perform an update after setting the vertices
-	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = false);
-	/// Sets the position of each vertex to those of another mesh.
-	/// \param	mesh	Mesh to copy vertex positions from
-	/// \param	doUpdate	Whether or not to perform an update after setting the vertices
-	void setVertexPositions(const Mesh& mesh, bool doUpdate = false);
-	/// Sets the position of each vertex to the combination of two other meshes.
-	/// \param	mesh1	First mesh to copy vertex positions from
-	/// \param	percent1	Percent contribution of first mesh [0.0-1.0]
-	/// \param	mesh2	Second mesh to copy vertex positions from
-	/// \param	percent2	Percent contribution of second mesh [0.0-1.0]
-	/// \param	doUpdate	Whether or not to perform an update after setting the vertices
-	void setVertexPositions(const Mesh& mesh1, double percent1, const Mesh& mesh2, double percent2,
-		bool doUpdate = false);
+	/// \param	doUpdate	True to perform an update after setting the vertices, false to skip update; default is true.
+	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = true);
 
-	/// Returns a vector containing the position of each vertex.
-	const std::vector<SurgSim::Math::Vector3d>& getVertexPositions() const
-	{
-		return m_vertexPositions;
-	}
+	/// Compares the meshes and returns true if equal, false if not equal.
+	bool operator==(const Mesh& mesh) const;
+
+	/// Compares the meshes and returns false if equal, true if not equal.
+	bool operator!=(const Mesh& mesh) const;
 
 protected:
 	/// Reset to no vertices.
-	virtual void doResetVertices()
+	virtual void doClearVertices()
 	{
-		m_vertexPositions.clear();
+		m_vertices.clear();
+	}
+
+	/// Internal comparison of meshes of the same type: returns true if equal, false if not equal.
+	/// Override this method to provide custom comparison. Base implementation compares vertices.
+	/// \param	mesh	Mesh must be of the same type as that which it is compared against
+	virtual bool isEqual(const Mesh& mesh) const
+	{
+		return m_vertices == mesh.m_vertices;
 	}
 
 private:
-	/// Reset to empty mesh.
-	virtual void doReset()
+	/// Clear mesh to return to an empty state (no vertices).
+	virtual void doClear()
 	{
-		doResetVertices();
+		doClearVertices();
 	}
 
 	/// Performs any updates that are required when the vertices are modified.
@@ -111,8 +133,8 @@ private:
 	{
 	}
 
-	/// Position of each vertex in the mesh.
-	std::vector<SurgSim::Math::Vector3d> m_vertexPositions;
+	/// Vertices
+	std::vector<Vertex> m_vertices;
 };
 
 };  // namespace DataStructures
