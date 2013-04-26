@@ -33,12 +33,8 @@ struct MeshVertex
 {
 	/// Constructor. Data is set to nullptr.
 	/// \param	position	Position of the vertex
-	MeshVertex(const SurgSim::Math::Vector3d& position);
-
-	/// Constructor.
-	/// \param	position	Position of the vertex
-	/// \param	data	Extra vertex data
-	MeshVertex(const SurgSim::Math::Vector3d& position, std::shared_ptr<MeshVertexData> data);
+	/// \param	data	Extra vertex data (default is null)
+	MeshVertex(const SurgSim::Math::Vector3d& position, std::shared_ptr<MeshVertexData> data = nullptr);
 
 	/// Position of the vertex.
 	SurgSim::Math::Vector3d position;

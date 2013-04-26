@@ -37,12 +37,8 @@ struct MeshElement
 {
 	/// Constructor. Data is set to nullptr.
 	/// \param	vertices	IDs of the N element vertices
-	MeshElement(const std::array<unsigned int, N> vertices);
-
-	/// Constructor.
-	/// \param	vertices	IDs of the N element vertices
-	/// \param	data	Extra element data
-	MeshElement(const std::array<unsigned int, N> vertices, std::shared_ptr<MeshElementData<N>> data);
+	/// \param	data	Extra element data (default is null)
+	MeshElement(const std::array<unsigned int, N> vertices, std::shared_ptr<MeshElementData<N>> data = nullptr);
 
 	/// Element vertices.
 	std::array<unsigned int, N> vertices;

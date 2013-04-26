@@ -16,11 +16,6 @@
 using SurgSim::DataStructures::MeshElement;
 using SurgSim::DataStructures::MeshElementData;
 
-template <unsigned int N>
-MeshElement<N>::MeshElement(const std::array<unsigned int, N> vertices) :
-vertices(vertices)
-{
-}
 
 template <unsigned int N>
 MeshElement<N>::MeshElement(const std::array<unsigned int, N> vertices, std::shared_ptr<MeshElementData<N>> data) :

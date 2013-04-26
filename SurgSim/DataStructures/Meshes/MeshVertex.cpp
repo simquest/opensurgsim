@@ -20,11 +20,6 @@ using SurgSim::DataStructures::MeshVertexData;
 using SurgSim::Math::Vector3d;
 
 
-MeshVertex::MeshVertex(const SurgSim::Math::Vector3d& position) : 
-position(position)
-{
-}
-
 MeshVertex::MeshVertex(const SurgSim::Math::Vector3d& position, std::shared_ptr<MeshVertexData> data) : 
 position(position), 
 data(data)
