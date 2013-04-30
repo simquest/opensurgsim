@@ -25,9 +25,23 @@ option(SURGSIM_TESTS_ALL_IN_ONE
 option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 
+# Copy zero or more files to the location of a built target, after the
+# target is built successfully.
+#
+# Note the use of optional arguments:
+#   copy_to_target_directory(<target> [<file>...])
+#
+macro(copy_to_target_directory TARGET)
+	foreach(FILE ${ARGN})
+		add_custom_command(TARGET ${TARGET} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FILE}"
+			$<TARGET_FILE_DIR:${TARGET}>)
+	endforeach(FILE ${ARGN})
+endmacro()
+
 # Builds the unit test executable or library (unless disabled).
 # Does not try to run the test.
-# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS and LIBS.
+# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS and UNIT_TEST_SHARED_LIBS.
 #
 # You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
 #
@@ -40,6 +54,8 @@ macro(surgsim_unit_test_build_only TESTNAME)
 	else()
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 		target_link_libraries(${TESTNAME} gtest_main ${LIBS})
+		# copy all ${UNIT_TEST_SHARED_LIBS} to the test executable directory:
+		copy_to_target_directory(${TESTNAME} ${UNIT_TEST_SHARED_LIBS})
 	endif()
 endmacro()
 

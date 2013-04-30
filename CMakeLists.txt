@@ -56,6 +56,7 @@ find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 find_package(OpenHaptics)
+find_package(SixenseSdk)
 
 
 if(SURGSIM_TESTS_BUILD)
