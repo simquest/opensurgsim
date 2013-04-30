@@ -22,7 +22,8 @@ namespace Input
 
 InputComponent::InputComponent(std::string name, std::string deviceName) :
 	Component(name),
-	m_deviceName(deviceName)
+	m_deviceName(deviceName),
+	m_hasData(false)
 {
 
 }
@@ -34,12 +35,18 @@ InputComponent::~InputComponent()
 
 void InputComponent::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	m_lastInput = inputData;
+	m_lastInput.set(inputData);
+	m_hasData = true;
 }
 
-const SurgSim::DataStructures::DataGroup& InputComponent::getInputData()
+void InputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
 {
-	return m_lastInput;
+	m_lastInput.get(dataGroup);
+}
+
+bool InputComponent::hasData()
+{
+	return m_hasData;
 }
 
 bool InputComponent::doInitialize()

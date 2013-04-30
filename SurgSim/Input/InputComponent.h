@@ -19,6 +19,7 @@
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/Framework/LockedContainer.h>
 
 namespace SurgSim
 {
@@ -41,7 +42,9 @@ public:
 
 	/// Fetches a reference to the input data.
 	/// \return	The input data.
-	const SurgSim::DataStructures::DataGroup& getInputData();
+	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
+
+	bool hasData();
 
 	/// Overriden from Component, do nothing
 	virtual bool doInitialize();
@@ -55,7 +58,8 @@ public:
 
 private:
 	std::string m_deviceName;
-	SurgSim::DataStructures::DataGroup m_lastInput;
+	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
+	bool m_hasData;
 };
 
 }; // namespace Input
