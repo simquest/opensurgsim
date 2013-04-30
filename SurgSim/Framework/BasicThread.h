@@ -87,14 +87,8 @@ public:
 
 	/// @{
 	/// Runtime accessors
-	std::shared_ptr<Runtime> getRuntime() const
-	{
-		return m_runtime.lock();
-	}
-	void setRuntime(std::shared_ptr<Runtime> val)
-	{
-		m_runtime = val;
-	}
+	std::shared_ptr<Runtime> getRuntime() const;
+	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
 
 protected:
