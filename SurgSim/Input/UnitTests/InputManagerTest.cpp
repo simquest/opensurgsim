@@ -126,14 +126,19 @@ TEST_F(InputManagerTest, InputfromDevice)
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
 	inputManager->addComponent(listener1);
 
+	EXPECT_FALSE(listener1->hasData());
 	testDevice1->pushInput("avalue");
+	EXPECT_TRUE(listener1->hasData());
 
 	std::string data;
-	listener1->getInputData().strings().get("helloWorld",&data);
+	SurgSim::DataStructures::DataGroup dataGroup;
+	listener1->getData(&dataGroup);
+	dataGroup.strings().get("helloWorld",&data);
 	EXPECT_EQ("avalue",data);
 
 	testDevice1->pushInput("bvalue");
-	listener1->getInputData().strings().get("helloWorld",&data);
+	listener1->getData(&dataGroup);
+	dataGroup.strings().get("helloWorld",&data);
 	EXPECT_EQ("bvalue",data);
 }
 
