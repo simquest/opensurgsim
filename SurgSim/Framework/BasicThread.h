@@ -91,6 +91,10 @@ public:
 	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
 
+	/// Set the update rate of the thread
+	/// \param val	rate in hertz (updates per second) of the thread
+	void setRate(double val) {m_period = boost::chrono::duration<double>(1.0/val);}
+
 protected:
 
 	/// Trigger the initialisation of this object, this will be called before all other threads doStartup()
@@ -108,7 +112,7 @@ private:
 	std::string m_name;
 
 	boost::thread m_thisThread;
-	boost::chrono::duration<double> m_rate;
+	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
 	std::weak_ptr<Runtime> m_runtime;
 

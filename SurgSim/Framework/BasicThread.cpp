@@ -25,7 +25,7 @@
 
 SurgSim::Framework::BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
-	m_rate(1.0/30),
+	m_period(1.0/30),
 	m_isInitialized(false),
 	m_isRunning(false),
 	m_stopExecution(false)
@@ -117,19 +117,19 @@ void SurgSim::Framework::BasicThread::operator()()
 	}
 
 	boost::chrono::duration<double> frameTime(0.0);
-	boost::chrono::system_clock::time_point start;
+	boost::chrono::steady_clock::time_point start;
 
 	m_isRunning = true;
 	while (m_isRunning && ! m_stopExecution)
 	{
-		// Check for frameTime being > rate report error, adjust ...
-		if (m_rate > frameTime)
+		// Check for frameTime being > desired update period report error, adjust ...
+		if (m_period > frameTime)
 		{
-			boost::this_thread::sleep_for(m_rate-frameTime);
+			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + (m_period - frameTime));
 		}
-		start = boost::chrono::system_clock::now();
-		m_isRunning = doUpdate(m_rate.count());
-		frameTime = boost::chrono::system_clock::now() - start;
+		start = boost::chrono::steady_clock::now();
+		m_isRunning = doUpdate(m_period.count());
+		frameTime = boost::chrono::steady_clock::now() - start;
 	}
 	m_isRunning = false;
 	m_stopExecution = false;
