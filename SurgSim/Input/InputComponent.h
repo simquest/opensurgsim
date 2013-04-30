@@ -40,10 +40,12 @@ public:
 	/// \param	inputData	The actual input data.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData);
 
-	/// Fetches a reference to the input data.
-	/// \return	The input data.
+	/// Gets the input data.
+	/// \param [out] dataGroup The location to write the data.  The pointer must be non-null.
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
+	/// Check if data has been retreived from device.
+	/// \return true if data has ever been provided by the device.
 	bool hasData();
 
 	/// Overriden from Component, do nothing
