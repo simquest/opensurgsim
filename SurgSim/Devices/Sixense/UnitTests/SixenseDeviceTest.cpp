@@ -78,7 +78,7 @@ TEST(SixenseDeviceTest, CreateAndReleaseDevice)
 {
 	SixenseManager manager;
 	std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 	manager.releaseDevice(device);
 }
 
@@ -86,7 +86,7 @@ TEST(SixenseDeviceTest, DestroyManagerWithRunningDevice)
 {
 	SixenseManager manager;
 	std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	// NB: device NOT released here!
 }
@@ -95,7 +95,7 @@ TEST(SixenseDeviceTest, Name)
 {
 	SixenseManager manager;
 	std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 	EXPECT_EQ("TestSixense", device->getName());
 }
 
@@ -104,12 +104,12 @@ TEST(SixenseDeviceTest, CreateDeviceTwice)
 	SixenseManager manager;
 	{
 		std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-		ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		manager.releaseDevice(device);
 	}
 	{
 		std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-		ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		manager.releaseDevice(device);
 	}
 }
@@ -119,10 +119,11 @@ TEST(SixenseDeviceTest, CreateTwoDevices)
 	SixenseManager manager;
 
 	std::shared_ptr<SixenseDevice> device1 = manager.createDevice("Sixense1");
-	ASSERT_TRUE(device1) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	ASSERT_TRUE(device1 != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	std::shared_ptr<SixenseDevice> device2 = manager.createDevice("Sixense2");
-	ASSERT_TRUE(device2) << "Initialization failed for second controller.  Is only one controller plugged in?";
+	ASSERT_TRUE(device2 != nullptr) << "Initialization failed for second controller." <<
+		"  Is only one controller plugged in?";
 
 	std::shared_ptr<SixenseDevice> device3 = manager.createDevice("Sixense3");
 	if (! device3)
@@ -135,7 +136,7 @@ TEST(SixenseDeviceTest, InputConsumer)
 {
 	SixenseManager manager;
 	std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
@@ -179,7 +180,7 @@ TEST(SixenseDeviceTest, OutputProducer)
 {
 	SixenseManager manager;
 	std::shared_ptr<SixenseDevice> device = manager.createDevice("TestSixense");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
