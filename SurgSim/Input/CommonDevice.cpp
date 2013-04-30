@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "CommonDevice.h"
+#include <SurgSim/Framework/Log.h>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -125,6 +126,7 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return false;
 	}
 
+	
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	if (m_state->outputProducer == outputProducer)
 	{
@@ -132,6 +134,12 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return true;
 	}
 	return false;
+}
+
+
+bool CommonDevice::hasOutputProducer()
+{
+	return (m_state->outputProducer != nullptr);
 }
 
 void CommonDevice::pushInput()
@@ -162,6 +170,7 @@ bool CommonDevice::pullOutput()
 
 	return false;
 }
+
 
 
 };  // namespace Input

@@ -51,6 +51,9 @@ TEST(SceneElementTest, AddAndAccessComponents)
 	// Should not be able to add two with the same name
 	EXPECT_FALSE(element.addComponent(component1));
 
+	// Should not be able to add nullptr component
+	EXPECT_ANY_THROW(element.addComponent(nullptr));
+
 	std::shared_ptr<Component> fetched(element.getComponent("TestComponent1"));
 	ASSERT_NE(nullptr, fetched);
 	EXPECT_EQ("TestComponent1", fetched->getName());

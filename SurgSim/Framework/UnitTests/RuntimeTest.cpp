@@ -117,6 +117,7 @@ TEST(RuntimeTest, SceneInitialisation)
 
 	for (int i=0;i<2;i++)
 	{
+		EXPECT_NE(nullptr, elements[i]->getRuntime());
 		EXPECT_TRUE(elements[i]->didInit);
 		EXPECT_TRUE(elements[i]->didWakeUp);
 	}

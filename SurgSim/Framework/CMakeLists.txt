@@ -45,6 +45,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Behavior.h
 	BehaviorManager.h
 	Component.h
+	LockedContainer.h
 	Log.h
 	Logger.h
 	LogMacros.h
@@ -56,7 +57,6 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Runtime.h
 	Scene.h
 	SceneElement.h
-	ThreadSafeContainer.h
 )
 
 add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HEADERS})

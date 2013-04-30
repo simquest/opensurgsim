@@ -156,7 +156,7 @@ bool PhantomDevice::update()
 		Eigen::Map<Vector3d> force(m_state->forceBuffer);
 
 		Vector3d forceValue;
-		if (getOutputData().isValid() && getOutputData().vectors().get("force", forceValue))
+		if (getOutputData().isValid() && getOutputData().vectors().get("force", &forceValue))
 		{
 			force = forceValue;
 		}
@@ -190,11 +190,11 @@ bool PhantomDevice::update()
 		pose.linear() = transform.block<3,3>(0,0);
 		pose.translation() = position * 0.001;  // convert from millimeters to meters!
 
-		getInputData().poses().put("pose", pose);
-		getInputData().booleans().put("button0", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
-		getInputData().booleans().put("button1", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
-		getInputData().booleans().put("button2", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
-		getInputData().booleans().put("button3", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
+		getInputData().poses().set("pose", pose);
+		getInputData().booleans().set("button0", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
+		getInputData().booleans().set("button1", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
+		getInputData().booleans().set("button2", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
+		getInputData().booleans().set("button3", (m_state->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
 	}
 
 	return !fatalError;
