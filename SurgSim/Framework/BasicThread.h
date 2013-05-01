@@ -87,15 +87,13 @@ public:
 
 	/// @{
 	/// Runtime accessors
-	std::shared_ptr<Runtime> getRuntime() const
-	{
-		return m_runtime.lock();
-	}
-	void setRuntime(std::shared_ptr<Runtime> val)
-	{
-		m_runtime = val;
-	}
+	std::shared_ptr<Runtime> getRuntime() const;
+	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
+
+	/// Set the update rate of the thread
+	/// \param val	rate in hertz (updates per second) of the thread
+	void setRate(double val) {m_period = boost::chrono::duration<double>(1.0/val);}
 
 protected:
 
@@ -114,7 +112,7 @@ private:
 	std::string m_name;
 
 	boost::thread m_thisThread;
-	boost::chrono::duration<double> m_rate;
+	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
 	std::weak_ptr<Runtime> m_runtime;
 

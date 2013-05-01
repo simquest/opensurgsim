@@ -17,9 +17,16 @@
 cmake_minimum_required(VERSION 2.6)
 project(OpenSurgSim)
 
+set(OPENSURGSIM_MAJOR_VERSION 0)
+set(OPENSURGSIM_MINOR_VERSION 0)
+set(OPENSURGSIM_PATCH_VERSION 0)
+set(OPENSURGSIM_VERSION
+  ${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
+
 set(SURGSIM_TOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${SURGSIM_TOP_INCLUDE_DIR})
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SURGSIM_TOP_INCLUDE_DIR}/CMake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+set(SURGSIM_THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty")
 
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
@@ -35,7 +42,7 @@ find_package(Eigen3 REQUIRED)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.50 COMPONENTS thread system chrono REQUIRED)
+find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 find_package(OpenHaptics)
@@ -48,5 +55,27 @@ endif()
 
 add_subdirectory(SurgSim)
 add_subdirectory(Documentation)
+
+set(CONFIG_EXPORT_TARGETS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	IdentityPoseDevice)
+
+export(TARGETS ${CONFIG_EXPORT_TARGETS} 
+	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
+
+#Register where to find this build-tree. On windows this in the registry, on
+#unix this goes in ~/.cmake/packages/OpenSurgSim
+export(PACKAGE OpenSurgSim)
+
+set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
+configure_file(OpenSurgSimConfig.cmake.in
+	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
+configure_file(OpenSurgSimConfigVersion.cmake.in
+	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake" @ONLY)
+
+
+#install(EXPORT ${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
 
 #option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)

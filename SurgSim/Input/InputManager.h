@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef HEMSIM_INPUTMANAGER_H
-#define HEMSIM_INPUTMANAGER_H
+#ifndef SURGSIM_INPUT_INPUTMANAGER_H
+#define SURGSIM_INPUT_INPUTMANAGER_H
 
 #include <vector>
 #include <unordered_map>

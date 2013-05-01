@@ -13,34 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Original barrier.hpp
-// Copyright (C) 2002-2003
-// David Moore, William E. Kempf
-// Copyright (C) 2007-8 Anthony Williams
-//
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#include "Representation.h"
 
-#include <gtest/gtest.h>
-#include <boost/thread.hpp>
-
-
-#include <SurgSim/Framework/BasicThread.h>
-#include "MockObjects.h"  //NOLINT
-
-TEST(ThreadTest, Instantiation)
+SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
 {
-	MockThread m;
-	EXPECT_FALSE(m.isInitialized());
-	EXPECT_FALSE(m.isRunning());
+
 }
 
-TEST(ThreadTest, Running)
+SurgSim::Framework::Representation::~Representation()
 {
-	MockThread m;
-	m.start(nullptr);
 
-	m.getThread().join();
-
-	EXPECT_EQ(0,m.count);
 }
+
+bool SurgSim::Framework::Representation::doInitialize()
+{
+	return true;
+}
+
+bool SurgSim::Framework::Representation::doWakeUp()
+{
+	return true;
+}
+
+

@@ -13,34 +13,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Original barrier.hpp
-// Copyright (C) 2002-2003
-// David Moore, William E. Kempf
-// Copyright (C) 2007-8 Anthony Williams
-//
-//  Distributed under the Boost Software License, Version 1.0. (See accompanying
-//  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+#ifndef SURGSIM_REPRESENTATION_H
+#define SURGSIM_REPRESENTATION_H
 
-#include <gtest/gtest.h>
-#include <boost/thread.hpp>
+#include <memory>
 
+#include "Component.h"
 
-#include <SurgSim/Framework/BasicThread.h>
-#include "MockObjects.h"  //NOLINT
-
-TEST(ThreadTest, Instantiation)
+namespace SurgSim
 {
-	MockThread m;
-	EXPECT_FALSE(m.isInitialized());
-	EXPECT_FALSE(m.isRunning());
+namespace Framework
+{
+
+class SceneElement;
+
+/// Representations are manifestations of a SceneElement. For example, a 
+/// SceneElement can be represented in graphics, physics, etc. Each of these
+/// representation will be derived from this class.
+class Representation : public Component
+{
+public:
+	Representation(const std::string& m_name);;
+	virtual ~Representation();
+private:
+	virtual bool doInitialize();
+	virtual bool doWakeUp();
+};
+
+}
 }
 
-TEST(ThreadTest, Running)
-{
-	MockThread m;
-	m.start(nullptr);
+#endif
 
-	m.getThread().join();
-
-	EXPECT_EQ(0,m.count);
-}

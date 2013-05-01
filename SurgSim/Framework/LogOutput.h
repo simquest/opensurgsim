@@ -28,8 +28,13 @@ namespace Framework
 class LogOutput
 {
 public:
-	LogOutput() {};
-	virtual ~LogOutput() {};
+	LogOutput()
+	{
+	}
+
+	virtual ~LogOutput()
+	{
+	}
 
 	/// \param message to be written out
 	/// \return true on success

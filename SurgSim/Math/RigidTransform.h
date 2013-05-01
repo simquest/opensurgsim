@@ -51,6 +51,7 @@ inline Eigen::Transform<T, N, Eigen::Isometry> makeRigidTransform(const Eigen::M
 	const Eigen::Matrix<T, N, 1, VOpt>& translation)
 {
 	Eigen::Transform<T, N, Eigen::Isometry> rigid;
+	rigid.makeAffine();
 	rigid.linear() = rotation;
 	rigid.translation() = translation;
 	return rigid;
@@ -62,6 +63,7 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(const Eigen::Q
 	const Eigen::Matrix<T, 3, 1, VOpt>& translation)
 {
 	Eigen::Transform<T, 3, Eigen::Isometry> rigid;
+	rigid.makeAffine();
 	rigid.linear() = rotation.matrix();
 	rigid.translation() = translation;
 	return rigid;

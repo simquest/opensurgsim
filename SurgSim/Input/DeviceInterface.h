@@ -40,7 +40,9 @@ class DeviceInterface
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~DeviceInterface() {};
+	virtual ~DeviceInterface()
+	{
+	}
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
@@ -71,7 +73,6 @@ public:
 	virtual bool hasOutputProducer() = 0;
 
 protected:
-
 	/// Fully initialize the device.
 	///
 	/// When the manager object creates the device, the internal state of the device usually isn't fully

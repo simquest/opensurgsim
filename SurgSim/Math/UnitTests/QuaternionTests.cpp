@@ -218,7 +218,7 @@ TYPED_TEST(QuaternionTests, ToAngleAxis)
 
 	T angle2;
 	Vector3 axis2;
-	computeAngleAndAxis(quaternion, angle2, axis2);
+	computeAngleAndAxis(quaternion, &angle2, &axis2);
 	EXPECT_NEAR(-angle,    angle2,    1e-6) << "angle wasn't properly computed.";
 	EXPECT_NEAR(-axis.x(), axis2.x(), 1e-6) << "X wasn't properly computed.";
 	EXPECT_NEAR(-axis.y(), axis2.y(), 1e-6) << "Y wasn't properly computed.";
