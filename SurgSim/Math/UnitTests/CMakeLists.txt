@@ -20,6 +20,8 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	GeometryTests.cpp
+	IntersectionTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -47,8 +49,7 @@ if(SURGSIM_TESTS_BUILD_EIGEN)
 	endif(MSVC AND CMAKE_CL_64)
 endif(SURGSIM_TESTS_BUILD_EIGEN)
 
-#set(LIBS SurgSimMath gtest)
-set(LIBS gtest)
+set(LIBS SurgSimMath SurgSimFramework gtest)
 
 if(UNIT_TEST_SOURCES)
 	surgsim_add_unit_tests(SurgSimMathTest)

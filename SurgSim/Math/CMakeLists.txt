@@ -19,16 +19,26 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
+	Geometry.cpp
+	Intersections.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
+	Geometry.h
+	Intersections.h
 	Matrix.h
 	Quaternion.h
 	RigidTransform.h
 	Vector.h
 )
 
+add_library(SurgSimMath ${SURGSIM_MATH_SOURCES} ${SURGSIM_MATH_HEADERS})
+
 install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION include/SurgSim/Math)
+install(TARGETS SurgSimMath
+		RUNTIME DESTINATION bin
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
