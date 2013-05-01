@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "BasicThread.h"
+#include "SurgSim/Framework/BasicThread.h"
 
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
@@ -21,10 +21,11 @@
 #include <boost/ref.hpp>
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/Runtime.h>
 
 SurgSim::Framework::BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
-	m_rate(1.0/30),
+	m_period(1.0/30),
 	m_isInitialized(false),
 	m_isRunning(false),
 	m_stopExecution(false)
@@ -116,19 +117,19 @@ void SurgSim::Framework::BasicThread::operator()()
 	}
 
 	boost::chrono::duration<double> frameTime(0.0);
-	boost::chrono::system_clock::time_point start;
+	boost::chrono::steady_clock::time_point start;
 
 	m_isRunning = true;
 	while (m_isRunning && ! m_stopExecution)
 	{
-		// Check for frameTime being > rate report error, adjust ...
-		if (m_rate > frameTime)
+		// Check for frameTime being > desired update period report error, adjust ...
+		if (m_period > frameTime)
 		{
-			boost::this_thread::sleep_for(m_rate-frameTime);
+			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + (m_period - frameTime));
 		}
-		start = boost::chrono::system_clock::now();
-		m_isRunning = doUpdate(m_rate.count());
-		frameTime = boost::chrono::system_clock::now() - start;
+		start = boost::chrono::steady_clock::now();
+		m_isRunning = doUpdate(m_period.count());
+		frameTime = boost::chrono::steady_clock::now() - start;
 	}
 	m_isRunning = false;
 	m_stopExecution = false;
@@ -148,5 +149,14 @@ std::string SurgSim::Framework::BasicThread::getName() const
 	return m_name;
 }
 
+std::shared_ptr<SurgSim::Framework::Runtime> SurgSim::Framework::BasicThread::getRuntime() const
+{
+	return m_runtime.lock();
+}
+
+void SurgSim::Framework::BasicThread::setRuntime(std::shared_ptr<SurgSim::Framework::Runtime> val)
+{
+	m_runtime = val;
+}
 
 

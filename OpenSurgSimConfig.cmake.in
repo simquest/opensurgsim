@@ -1,0 +1,14 @@
+# - Config file for the OpenSurgSim package
+# It defines the following variables
+#  OPENSURGSIM_INCLUDE_DIRS - include directories
+#  OPENSURGSIM_LIBRARIES    - libraries to link against
+ 
+# Compute paths
+get_filename_component(OPENSURGSIM_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(OPENSURGSIM_INCLUDE_DIRS "@CONFIG_INCLUDE_DIRS@")
+ 
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${OPENSURGSIM_CMAKE_DIR}/OpenSurgSimTargets.cmake")
+ 
+# These are IMPORTED targets created by OpenSurgSimTargets.cmake
+set(OPENSURGSIM_LIBRARIES "@CONFIG_EXPORT_TARGETS@")

@@ -23,7 +23,7 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Framework/Barrier.h"
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
 #include <boost/thread.hpp>
 

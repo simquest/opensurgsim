@@ -30,6 +30,7 @@ set(UNIT_TEST_HEADERS
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
 	MatrixTests.cpp
 	QuaternionTests.cpp
+	RigidTransformTests.cpp
 	VectorTests.cpp
 )
 

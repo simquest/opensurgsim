@@ -14,7 +14,6 @@
 # limitations under the License.
 
 
-find_package(Boost 1.50 COMPONENTS filesystem system REQUIRED)
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
@@ -23,7 +22,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	ApplicationDataTest.cpp
 	AssertTest.cpp
-#	BehaviorManagerTest.cpp
+	BehaviorManagerTest.cpp
 	BaseThreadTest.cpp
 	LockedContainerTest.cpp
 	LoggerTest.cpp

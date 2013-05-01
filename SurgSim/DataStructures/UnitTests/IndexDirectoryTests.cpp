@@ -100,7 +100,7 @@ TEST(IndexDirectoryTests, BadKeyOrIndex)
 	EXPECT_EQ(1, builder.addEntry("second"));
 	EXPECT_EQ(-1, builder.addEntry(""));
 
-	std::shared_ptr<const IndexDirectory> dir = builder.createData().getDirectory();	
+	std::shared_ptr<const IndexDirectory> dir = builder.createData().getDirectory();
 	EXPECT_EQ("", dir->getName(-1));
 	EXPECT_EQ("", dir->getName(-12345));
 	EXPECT_EQ("", dir->getName(+56789));
