@@ -16,7 +16,7 @@
 #ifndef SURGSIM_FRAMEWORK_LOGGER_H
 #define SURGSIM_FRAMEWORK_LOGGER_H
 
-#include "LogOutput.h"
+#include "SurgSim/Framework/LogOutput.h"
 
 #include <string>
 #include <sstream>

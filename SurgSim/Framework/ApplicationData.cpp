@@ -57,7 +57,6 @@ ApplicationData::ApplicationData(const std::string& configurationFileName)
 
 ApplicationData::~ApplicationData()
 {
-
 }
 
 std::string ApplicationData::findFile(const std::string& fileName) const

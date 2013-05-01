@@ -26,7 +26,7 @@
 
 
 #include <SurgSim/Framework/BasicThread.h>
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
 TEST(ThreadTest, Instantiation)
 {

@@ -17,13 +17,15 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
-using namespace SurgSim::Framework;
+using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Scene;
+using SurgSim::Framework::Logger;
 
 TEST(RuntimeTest, Constructor)
 {
-	EXPECT_NO_THROW( {std::shared_ptr<Runtime> runtime(new Runtime());});
+	EXPECT_NO_THROW({std::shared_ptr<Runtime> runtime(new Runtime());});
 
 	Runtime runtime;
 	ASSERT_ANY_THROW(runtime.getSharedPtr());
@@ -87,7 +89,6 @@ TEST(RuntimeTest, LoggerManagement)
 
 	std::shared_ptr<Logger> oldLogger = runtime->getLogger("TestLogger");
 	EXPECT_EQ(oldLogger, newLogger);
-
 }
 
 TEST(RuntimeTest, SceneInitialisation)
@@ -122,7 +123,7 @@ TEST(RuntimeTest, SceneInitialisation)
 		EXPECT_TRUE(elements[i]->didWakeUp);
 	}
 
-	for (int i=0; i<4;i++)
+	for (int i=0; i<4; i++)
 	{
 		EXPECT_TRUE(components[i]->didInit);
 		EXPECT_TRUE(components[i]->didWakeUp);

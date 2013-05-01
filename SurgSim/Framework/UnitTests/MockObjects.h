@@ -132,8 +132,12 @@ public:
 		succeedWithWakeUp(succeedWakeUp),
 		didWakeUp(false),
 		didInit(false)
-	{};
-	virtual ~MockComponent() {};
+	{
+	}
+
+	virtual ~MockComponent()
+	{
+	}
 
 	virtual bool doInitialize()
 	{

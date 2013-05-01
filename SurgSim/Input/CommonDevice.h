@@ -67,7 +67,6 @@ public:
 	virtual bool hasOutputProducer();
 
 protected:
-
 	/// Push application input to consumers.
 	virtual void pushInput();
 
