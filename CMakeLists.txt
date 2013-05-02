@@ -70,9 +70,9 @@ export(TARGETS ${CONFIG_EXPORT_TARGETS}
 export(PACKAGE OpenSurgSim)
 
 set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
-configure_file(OpenSurgSimConfig.cmake.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
-configure_file(OpenSurgSimConfigVersion.cmake.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfigVersion.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake" @ONLY)
 
 
