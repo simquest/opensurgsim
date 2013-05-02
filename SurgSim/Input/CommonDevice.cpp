@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "CommonDevice.h"
+#include "SurgSim/Input/CommonDevice.h"
+#include <SurgSim/Framework/Log.h>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -51,6 +52,10 @@ CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructure
 
 CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
 	m_name(name), m_inputData(std::move(inputData)), m_state(new State)
+{
+}
+
+CommonDevice::~CommonDevice()
 {
 }
 
@@ -121,6 +126,7 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return false;
 	}
 
+	
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	if (m_state->outputProducer == outputProducer)
 	{
@@ -128,6 +134,12 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return true;
 	}
 	return false;
+}
+
+
+bool CommonDevice::hasOutputProducer()
+{
+	return (m_state->outputProducer != nullptr);
 }
 
 void CommonDevice::pushInput()
@@ -158,6 +170,7 @@ bool CommonDevice::pullOutput()
 
 	return false;
 }
+
 
 
 };  // namespace Input

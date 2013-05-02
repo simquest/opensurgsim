@@ -50,6 +50,9 @@ public:
 	/// 	using a DataGroupBuilder, to that device's supported values that it will push to the application.
 	CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
 
+	/// Destructor.
+	virtual ~CommonDevice();
+
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const;
 
@@ -61,28 +64,29 @@ public:
 
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
 
-protected:
+	virtual bool hasOutputProducer();
 
+protected:
 	/// Push application input to consumers.
 	virtual void pushInput();
 
 	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
-	/// Provides access to the input data \ref DataGroup for derived classes.
+	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
 	/// \return A const reference to the input data.
 	const SurgSim::DataStructures::DataGroup& getInputData() const
 	{
 		return m_inputData;
 	}
-	/// Provides access to the input data \ref DataGroup for derived classes.
+	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
 	/// \return A writable reference to the input data.
 	SurgSim::DataStructures::DataGroup& getInputData()
 	{
 		return m_inputData;
 	}
 
-	/// Provides access to the output data \ref DataGroup for derived classes.
+	/// Provides access to the output data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
 	/// Note that a writable variant is not provided, since derived classes will not need to write to the application
 	/// output data (an output producer registered via \ref setOutputProducer will be called to do that).
 	/// \return A const reference to the output data.
@@ -97,7 +101,7 @@ private:
 	std::string m_name;
 	SurgSim::DataStructures::DataGroup m_inputData;
 	SurgSim::DataStructures::DataGroup m_outputData;
-	State* m_state;
+	std::unique_ptr<State> m_state;
 };
 
 

@@ -28,8 +28,13 @@ namespace Framework
 class LogOutput
 {
 public:
-	LogOutput() {};
-	virtual ~LogOutput() {};
+	LogOutput()
+	{
+	}
+
+	virtual ~LogOutput()
+	{
+	}
 
 	/// \param message to be written out
 	/// \return true on success
@@ -66,7 +71,7 @@ public:
 
 	/// Constructor
 	/// \param ostream stream to be used for writing
-	StreamOutput(std::ostream& ostream);
+	explicit StreamOutput(std::ostream& ostream);
 	virtual ~StreamOutput();
 
 	/// \param message to be written to the stream

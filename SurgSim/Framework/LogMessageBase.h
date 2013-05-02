@@ -47,7 +47,9 @@ public:
 	LogMessageBase(Logger* logger, int level);
 
 	/// Destructor.
-	~LogMessageBase() {};
+	~LogMessageBase()
+	{
+	}
 
 	/// Add the given input to the current log message.
 	/// \param input The input to be added to the current stream

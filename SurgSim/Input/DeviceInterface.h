@@ -40,7 +40,9 @@ class DeviceInterface
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~DeviceInterface() {};
+	virtual ~DeviceInterface()
+	{
+	}
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
@@ -54,7 +56,7 @@ public:
 	/// Removes an input consumer previously added via \ref addInputConsumer.
 	/// \param inputConsumer The input consumer to be removed.
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) = 0;
-	
+
 	/// Sets an output producer that will be asked for application output state when the device needs it.
 	/// Any previously set output producer will be removed.
 	///
@@ -66,8 +68,11 @@ public:
 	/// \param outputProducer The output producer to be removed.
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) = 0;
 
-protected:
+	/// Query if this object has output producer.
+	/// \return	true if there is an output producer, false if not.
+	virtual bool hasOutputProducer() = 0;
 
+protected:
 	/// Fully initialize the device.
 	///
 	/// When the manager object creates the device, the internal state of the device usually isn't fully

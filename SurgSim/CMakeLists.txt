@@ -29,3 +29,5 @@ add_subdirectory(Graphics)
 add_subdirectory(Input)
 add_subdirectory(Math)
 # add_subdirectory(Physics)
+
+surgsim_cpplint_this_tree(cpplintSurgSim)

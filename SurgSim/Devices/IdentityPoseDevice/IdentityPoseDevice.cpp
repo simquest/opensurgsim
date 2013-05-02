@@ -72,8 +72,8 @@ bool IdentityPoseDevice::addInputConsumer(std::shared_ptr<SurgSim::Input::InputC
 	// The IdentityPoseDevice doesn't have any input events; it just sits there.
 	// So we push the output to all the consumers, including the new one, right away after we add a consumer.
 	// This ensures that all consumers always see the identity pose.
-	getInputData().poses().put("pose", RigidTransform3d::Identity());
-	getInputData().booleans().put("button0", false);
+	getInputData().poses().set("pose", RigidTransform3d::Identity());
+	getInputData().booleans().set("button0", false);
 	pushInput();
 
 	return true;

@@ -24,13 +24,14 @@ include_directories(
 
 set(SURGSIM_FRAMEWORK_SOURCES
 	ApplicationData.cpp
+	AssertMessage.cpp
 	BasicThread.cpp
 	Barrier.cpp
-#	BehaviorManager.cpp
+	BehaviorManager.cpp
 	Logger.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
-#	Representation.cpp
+	Representation.cpp
 	Runtime.cpp
 	Scene.cpp
 	SceneElement.cpp
@@ -41,31 +42,34 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Assert.h
 	AssertMessage.h
 	BasicThread.h
-#	Behavior.h
-#	BehaviorManager.h
+	Behavior.h
+	BehaviorManager.h
 	Component.h
-#	Framework.h
+	LockedContainer.h
 	Log.h
 	Logger.h
 	LogMacros.h
 	LogMessage.h
 	LogMessageBase.h
 	LogOutput.h
-#	Representation.h
+	Representation.h
 	ReuseFactory.h
 	Runtime.h
 	Scene.h
 	SceneElement.h
-	ThreadSafeContainer.h
 )
 
 add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HEADERS})
 
-install(FILES ${SURGSIM_FRAMEWORK_HEADERS} DESTINATION include/SurgSim/Framework)
+set_target_properties(SurgSimFramework PROPERTIES
+	PUBLIC_HEADER "${SURGSIM_FRAMEWORK_HEADERS}")
+
 install(TARGETS SurgSimFramework 
+	EXPORT ${PROJECT_NAME}Targets
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib)
+	ARCHIVE DESTINATION lib
+	PUBLIC_HEADER DESTINATION include/SurgSim/Framework)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

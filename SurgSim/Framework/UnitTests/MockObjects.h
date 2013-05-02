@@ -20,9 +20,9 @@
 
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-//#include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/Component.h"
-//#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Runtime.h"
 
@@ -30,7 +30,7 @@
 class MockSceneElement : public SurgSim::Framework::SceneElement
 {
 public:
-	MockSceneElement(const std::string& name = "MockSceneElement") : 
+	explicit MockSceneElement(const std::string& name = "MockSceneElement") : 
 		SceneElement(name),
 		didInit(false), 
 		didWakeUp(false), 
@@ -126,14 +126,18 @@ private:
 class MockComponent : public SurgSim::Framework::Component
 {
 public:
-	MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
+	explicit MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
 		Component(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
 		didWakeUp(false),
 		didInit(false)
-	{};
-	virtual ~MockComponent() {};
+	{
+	}
+
+	virtual ~MockComponent()
+	{
+	}
 
 	virtual bool doInitialize()
 	{
@@ -153,41 +157,41 @@ public:
 	bool didInit;
 };
 
-// class MockBehavior : public SurgSim::Framework::Behavior
-// {
-// public:
-// 	MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
-// 	Behavior(name),
-// 		succeedWithInit(succeedInit),
-// 		succeedWithWakeUp(succeedWakeUp),
-// 		isAwoken(false),
-// 		isInitialized(false),
-// 		updateCount(0)
-// 	{};
-// 	virtual ~MockBehavior() {};
-// 
-// 	virtual bool doInitialize()
-// 	{
-// 		isInitialized = true;
-// 		return succeedWithInit;
-// 	}
-// 
-// 	virtual bool doWakeUp()
-// 	{
-//  		isAwoken = true;
-// 		return succeedWithWakeUp;
-// 	}
-// 
-// 	virtual void update(double dt)
-// 	{
-// 		updateCount++;
-// 	}
-// 
-// 	bool succeedWithInit;
-// 	bool succeedWithWakeUp;
-// 	bool isInitialized;
-// 	bool isAwoken;
-// 	int updateCount;
-// };
+class MockBehavior : public SurgSim::Framework::Behavior
+{
+public:
+	MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
+	Behavior(name),
+		succeedWithInit(succeedInit),
+		succeedWithWakeUp(succeedWakeUp),
+		isAwoken(false),
+		isInitialized(false),
+		updateCount(0)
+	{};
+	virtual ~MockBehavior() {};
+
+	virtual bool doInitialize()
+	{
+		isInitialized = true;
+		return succeedWithInit;
+	}
+
+	virtual bool doWakeUp()
+	{
+		isAwoken = true;
+		return succeedWithWakeUp;
+	}
+
+	virtual void update(double dt)
+	{
+		updateCount++;
+	}
+
+	bool succeedWithInit;
+	bool succeedWithWakeUp;
+	bool isAwoken;
+	bool isInitialized;
+	int updateCount;
+};
 
 #endif // MOCK_OBJECTS_H

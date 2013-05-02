@@ -15,14 +15,14 @@
 
 #include <gtest/gtest.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
 using SurgSim::Framework::Component;
 using SurgSim::Framework::SceneElement;
 
 TEST(SceneElementTest, Constructor)
 {
-	ASSERT_NO_THROW( {MockSceneElement element;});
+	ASSERT_NO_THROW({MockSceneElement element;});
 }
 
 TEST(SceneElementTest, UpdateFunctions)
@@ -50,6 +50,9 @@ TEST(SceneElementTest, AddAndAccessComponents)
 
 	// Should not be able to add two with the same name
 	EXPECT_FALSE(element.addComponent(component1));
+
+	// Should not be able to add nullptr component
+	EXPECT_ANY_THROW(element.addComponent(nullptr));
 
 	std::shared_ptr<Component> fetched(element.getComponent("TestComponent1"));
 	ASSERT_NE(nullptr, fetched);
@@ -93,15 +96,15 @@ TEST(SceneElementTest, GetComponentsTest)
 
 	std::vector<std::shared_ptr<Component>> components = element.getComponents();
 
-	EXPECT_NE(components.end(),std::find(components.cbegin(), components.cend(),component1));
-	EXPECT_NE(components.end(),std::find(components.cbegin(), components.cend(),component2));
+	EXPECT_NE(components.end(), std::find(components.cbegin(), components.cend(), component1));
+	EXPECT_NE(components.end(), std::find(components.cbegin(), components.cend(), component2));
 
 	element.removeComponent(component1);
 	components = element.getComponents();
 	EXPECT_EQ(1U, components.size());
 }
 
-TEST (SceneElementTest, InitComponentTest)
+TEST(SceneElementTest, InitComponentTest)
 {
 	MockSceneElement element;
 	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));

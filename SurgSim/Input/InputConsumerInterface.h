@@ -34,7 +34,9 @@ class InputConsumerInterface
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~InputConsumerInterface() {};
+	virtual ~InputConsumerInterface()
+	{
+	}
 
 	/// Notifies the consumer that the application input coming from the device has been updated.
 	///
