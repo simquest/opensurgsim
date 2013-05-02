@@ -43,7 +43,9 @@ TYPED_TEST_CASE(ValidTests, FloatingPointVariants);
 
 TYPED_TEST(ValidTests, ValidScalars)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isValid;
+
 	EXPECT_TRUE(isValid(static_cast<Scalar>(0)));
 	EXPECT_TRUE(isValid(static_cast<Scalar>(1)));
 	EXPECT_TRUE(isValid(std::numeric_limits<Scalar>::denorm_min()));
@@ -54,7 +56,9 @@ TYPED_TEST(ValidTests, ValidScalars)
 
 TYPED_TEST(ValidTests, SubnormalScalars)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isSubnormal;
+
 	EXPECT_FALSE(isSubnormal(static_cast<Scalar>(0)));
 	EXPECT_FALSE(isSubnormal(static_cast<Scalar>(1)));
 	EXPECT_TRUE(isSubnormal(std::numeric_limits<Scalar>::denorm_min()));
@@ -65,6 +69,7 @@ TYPED_TEST(ValidTests, SubnormalScalars)
 
 TYPED_TEST(ValidTests, SubnormalArithmetic)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isSubnormal;
 
 	Scalar x = 1;
@@ -99,7 +104,7 @@ static void matrixCheckHelper(const T& validMatrix)
 	// Assumes T is a matrix, 2x2 or larger
 
 	typedef T Matrix;
-	typedef Matrix::Scalar Scalar;
+	typedef typename Matrix::Scalar Scalar;
 
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
@@ -135,6 +140,8 @@ static void matrixCheckHelper(const T& validMatrix)
 
 TYPED_TEST(ValidTests, MatrixChecks)
 {
+	typedef typename TestFixture::Scalar Scalar;
+
 	{
 		Eigen::Matrix<Scalar, 2, 2, Eigen::DontAlign | Eigen::RowMajor> matrix;
 		matrix.setIdentity();
@@ -171,7 +178,7 @@ static void vectorCheckHelper(const T& validVector)
 	// Assumes T is a vector, size 2 or larger
 
 	typedef T Vector;
-	typedef Vector::Scalar Scalar;
+	typedef typename Vector::Scalar Scalar;
 
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
@@ -215,6 +222,8 @@ static void vectorCheckHelper(const T& validVector)
 
 TYPED_TEST(ValidTests, VectorChecks)
 {
+	typedef typename TestFixture::Scalar Scalar;
+
 	{
 		Eigen::Matrix<Scalar, 2, 1, Eigen::DontAlign> vector;
 		vector.setZero();
@@ -247,6 +256,7 @@ TYPED_TEST(ValidTests, VectorChecks)
 
 TYPED_TEST(ValidTests, QuaternionChecks)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
 
@@ -269,6 +279,7 @@ TYPED_TEST(ValidTests, QuaternionChecks)
 
 TYPED_TEST(ValidTests, AngleAxisChecks)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
 
@@ -304,6 +315,7 @@ TYPED_TEST(ValidTests, AngleAxisChecks)
 
 TYPED_TEST(ValidTests, Rotation2DChecks)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
 
@@ -330,7 +342,7 @@ static void transformCheckHelper()
 	// Assumes T is an Eigen::Transform type of some sort
 
 	typedef T Transform;
-	typedef Transform::Scalar Scalar;
+	typedef typename Transform::Scalar Scalar;
 
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
@@ -355,6 +367,7 @@ static void transformCheckHelper()
 
 TYPED_TEST(ValidTests, TransformChecks)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
 
@@ -368,6 +381,7 @@ TYPED_TEST(ValidTests, TransformChecks)
 
 TYPED_TEST(ValidTests, ClearSubnormalScalars)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::setSubnormalToZero;
 	using SurgSim::Math::isValid;
 	Scalar x;
@@ -401,8 +415,8 @@ template <typename T>
 static void compareMatrices(const T& a, const T& b)
 {
 	typedef T Matrix;
-	typedef Matrix::Scalar Scalar;
-	typedef Matrix::Index Index;
+	typedef typename Matrix::Scalar Scalar;
+	typedef typename Matrix::Index Index;
 
 	EXPECT_EQ(a.rows(), b.rows());
 	EXPECT_EQ(a.cols(), b.cols());
@@ -433,8 +447,8 @@ static void matrixSetSubnormalHelper(const T& validMatrix)
 	// Assumes T is a matrix, 2x2 or larger
 
 	typedef T Matrix;
-	typedef Matrix::Scalar Scalar;
-	typedef Matrix::Index Index;
+	typedef typename Matrix::Scalar Scalar;
+	typedef typename Matrix::Index Index;
 
 	EXPECT_TRUE(SurgSim::Math::isValid(validMatrix));
 	EXPECT_FALSE(SurgSim::Math::isSubnormal(validMatrix));
@@ -479,6 +493,8 @@ static void matrixSetSubnormalHelper(const T& validMatrix)
 
 TYPED_TEST(ValidTests, ClearSubnormalMatrix)
 {
+	typedef typename TestFixture::Scalar Scalar;
+
 	{
 		Eigen::Matrix<Scalar, 2, 2, Eigen::DontAlign | Eigen::RowMajor> matrix;
 		matrix.setConstant(123);
@@ -515,7 +531,7 @@ static void vectorSetSubnormalHelper(const T& validVector)
 	// Assumes T is a vector, size 2 or larger
 
 	typedef T Vector;
-	typedef Vector::Scalar Scalar;
+	typedef typename Vector::Scalar Scalar;
 
 	using SurgSim::Math::setSubnormalToZero;
 
@@ -557,6 +573,8 @@ static void vectorSetSubnormalHelper(const T& validVector)
 
 TYPED_TEST(ValidTests, ClearSubnormalVector)
 {
+	typedef typename TestFixture::Scalar Scalar;
+
 	{
 		Eigen::Matrix<Scalar, 2, 1, Eigen::DontAlign> vector;
 		vector.setConstant(543);
@@ -589,6 +607,7 @@ TYPED_TEST(ValidTests, ClearSubnormalVector)
 
 TYPED_TEST(ValidTests, ClearSubnormalQuaternion)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::setSubnormalToZero;
 
 	Eigen::Quaternion<Scalar> quaternion(1, 0, 0, 0);
@@ -617,7 +636,7 @@ template <typename T>
 static void compareAngleAxis(const T& a, const T& b)
 {
 	typedef T AngleAxis;
-	typedef AngleAxis::Scalar Scalar;
+	typedef typename AngleAxis::Scalar Scalar;
 
 	bool isValidAngleA = SurgSim::Math::isValid(a.angle());
 	bool isValidAngleB = SurgSim::Math::isValid(b.angle());
@@ -634,6 +653,7 @@ static void compareAngleAxis(const T& a, const T& b)
 
 TYPED_TEST(ValidTests, ClearSubnormalAngleAxis)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::setSubnormalToZero;
 
 	typedef Eigen::AngleAxis<Scalar> AngleAxis;
@@ -665,6 +685,7 @@ TYPED_TEST(ValidTests, ClearSubnormalAngleAxis)
 
 TYPED_TEST(ValidTests, ClearSubnormalRotation2D)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::setSubnormalToZero;
 
 	Eigen::Rotation2D<Scalar> rotation(0);
@@ -690,7 +711,7 @@ static void transformSetSubnormalHelper()
 	// Assumes T is an Eigen::Transform type of some sort
 
 	typedef T Transform;
-	typedef Transform::Scalar Scalar;
+	typedef typename Transform::Scalar Scalar;
 
 	using SurgSim::Math::setSubnormalToZero;
 
@@ -724,6 +745,8 @@ static void transformSetSubnormalHelper()
 
 TYPED_TEST(ValidTests, ClearSubnormalTransform)
 {
+	typedef typename TestFixture::Scalar Scalar;
+
 	transformSetSubnormalHelper<Eigen::Transform<Scalar, 2, Eigen::Isometry, Eigen::DontAlign>>();
 	transformSetSubnormalHelper<Eigen::Transform<Scalar, 3, Eigen::Isometry, Eigen::DontAlign>>();
 	transformSetSubnormalHelper<Eigen::Transform<Scalar, 4, Eigen::Isometry, Eigen::DontAlign>>();
@@ -734,6 +757,7 @@ TYPED_TEST(ValidTests, ClearSubnormalTransform)
 
 TYPED_TEST(ValidTests, Blocks)
 {
+	typedef typename TestFixture::Scalar Scalar;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::isSubnormal;
 	using SurgSim::Math::setSubnormalToZero;
@@ -741,20 +765,20 @@ TYPED_TEST(ValidTests, Blocks)
 	{
 		Eigen::Matrix<Scalar, 4, 4, Eigen::DontAlign | Eigen::RowMajor> matrix;
 		matrix.setConstant(123);
-		EXPECT_TRUE(isValid(matrix.block<2, 2>(1, 1)));
-		EXPECT_FALSE(isSubnormal(matrix.block<2, 2>(1, 1)));
+		EXPECT_TRUE(isValid(matrix.template block<2, 2>(1, 1)));
+		EXPECT_FALSE(isSubnormal(matrix.template block<2, 2>(1, 1)));
 		{
-			auto submatrix = matrix.block<2, 2>(1, 1);
+			auto submatrix = matrix.template block<2, 2>(1, 1);
 			EXPECT_FALSE(setSubnormalToZero(&submatrix));
 		}
 	}
 	{
 		Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> matrix;
 		matrix.setConstant(11, 13, static_cast<Scalar>(123));
-		EXPECT_TRUE(isValid(matrix.block<6, 6>(3, 5)));
-		EXPECT_FALSE(isSubnormal(matrix.block<6, 6>(3, 5)));
+		EXPECT_TRUE(isValid(matrix.template block<6, 6>(3, 5)));
+		EXPECT_FALSE(isSubnormal(matrix.template block<6, 6>(3, 5)));
 		{
-			auto submatrix = matrix.block<6, 6>(3, 5);
+			auto submatrix = matrix.template block<6, 6>(3, 5);
 			EXPECT_FALSE(setSubnormalToZero(&submatrix));
 		}
 	}

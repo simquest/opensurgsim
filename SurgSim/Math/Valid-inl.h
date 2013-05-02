@@ -71,6 +71,8 @@ template <typename T>
 class ValidVisitor : public PredicateAlwaysTrueVisitor<T, ValidVisitor<T>>
 {
 public:
+	typedef typename PredicateAlwaysTrueVisitor<T, ValidVisitor<T>>::Scalar Scalar;
+
 	static bool evaluate(const Scalar& value)
 	{
 		// The extra parentheses protect from pain if isfinite() is also defined as a macro.
@@ -82,6 +84,8 @@ template <typename T>
 class NonSubnormalVisitor : public PredicateAlwaysTrueVisitor<T, NonSubnormalVisitor<T>>
 {
 public:
+	typedef typename PredicateAlwaysTrueVisitor<T, ValidVisitor<T>>::Scalar Scalar;
+
 	static bool evaluate(const Scalar& value)
 	{
 		// The extra parentheses protect from pain if fpclassify() is also defined as a macro.
@@ -222,7 +226,7 @@ inline bool setSubnormalToZero(Eigen::DenseBase<T>* value)
 	// the lines of the implementation of Eigen::DenseBase<T>::visit().  Unfortunately, we can't just *use* Eigen's
 	// visitors here, because the visitor API doesn't allow modifying the values.
 
-	typedef Eigen::DenseBase<T>::Index Index;
+	typedef typename Eigen::DenseBase<T>::Index Index;
 	const Index numColumns = value->cols();
 	const Index numRows = value->rows();
 
