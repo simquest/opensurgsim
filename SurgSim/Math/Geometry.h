@@ -492,7 +492,7 @@ T SegSegDistance(
 /// Calculate the distance of a point from a Triangle
 /// \param pv0 Vertex of the point.
 /// \param tv0, tv1, tv2 The vertices of the triangle
-/// \param [OUT] Closest Point on the Trianle
+/// \param [OUT] Closest Point on the Triangle
 /// \param epsilon Precision required
 /// \return the distance between the point and the triangle
 template <class T> inline
@@ -678,7 +678,6 @@ T PointTriDistance(const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& pv0,
 /// \param tn Normal of the triangle (yes must be of norm 1 and a,b,c CCW).
 /// \param epsilon Required precision.
 /// \return true if pt lies inside the triangle tv0, tv1, tv2, false otherwise.
-
 template <class T> inline
 bool PointInsideTriangle(const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& pt, 
 						 const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv0, 
@@ -723,11 +722,9 @@ bool PointInsideTriangle(
 /// \param tv0,tv1,tv2 The triangle vertices.
 /// \param [OUT] intersection The point where the triangle and the line segment intersect.
 /// \param epsilon The required precision.
-/// \return 1 for no collision, o.w. either -1 or the penetration depth of the segment (i.e (intersection-v0).norm())
-/// \note HS-2013-apr-29 I think this should be rewritten as returning false or true and passing the
-/// 	  distance as a second parameter ...
+/// \return true if the segment intersects with the triangle, false if it does not
 template <class T> inline
-T SegTriCollide(
+bool SegTriCollide(
 	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v0,
 	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v1,
 	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv0, 
@@ -736,6 +733,9 @@ T SegTriCollide(
 	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tn,
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* intersection)
 {
+	(*intersection) << (std::numeric_limits<double>::quiet_NaN()),
+		(std::numeric_limits<double>::quiet_NaN()),
+		(std::numeric_limits<double>::quiet_NaN());
 	// From http://geomalgorithms.com/a06-_intersect-2.html#intersect_RayTriangle
 	// Triangle edges vectors
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> u = tv1-tv0;
@@ -757,28 +757,31 @@ T SegTriCollide(
 				BaryCentricCoordinates((i==0?v0:v1), tv0, tv1, tv2, tn, &baryCoords);
 				if ( baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0 ) 
 				{
-					return 0;
+					*intersection = (i==0)?v0:v1;
+					return true;
 				}
 			}
+			// All segment endpoints outside of triangle 
+			return false;
 		}
 		else 
 		{
-			// Ray disjoint from plane
-			return 1;
+			// Segment parallel to triangle but not in same plane
+			return false;
 		}
 	}
+
 	// Get intersect point of ray with triangle plane
 	T r = a / b;
 	// Ray goes away from triangle
-	if ( r < 0 || r > 1 )
-		return 1;
+	if ( r < 0 || r > 1 ) return false;
 	// Intersect point of ray and plane
-	*intersection = v0 + r * dir;
+	VectorType presumedIntersection = v0 + r * dir;
 	// Collision point inside T?
 	T uu = u.dot(u);
 	T uv = u.dot(v);
 	T vv = v.dot(v);
-	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> w = (*intersection) - tv0;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> w = presumedIntersection - tv0;
 	T wu = w.dot(u);
 	T wv = w.dot(v);
 	T D = uv * uv - uu * vv;
@@ -787,14 +790,36 @@ T SegTriCollide(
 	// I is outside T
 	if ( s < 0 || s > 1 )
 	{
-		return 1;
+		return false;
 	}
 	T t = ( uv * wu - uu * wv ) / D;
 	// I is outside T
 	if ( t < 0 || (s + t) > 1 )
-		return 1;
+	{
+		return false;
+	}
 	// I is in T
-	return -( (*intersection)-v1).norm();
+	*intersection = v0 + r * dir;
+	return true;
+}
+
+
+/// Get the distance of a point to a plane
+/// \param p The point to check.
+/// \param n The normal of the plane n (normalized)
+/// \param d Constant d in n.x=d
+/// \param pt [OUT] Projection of point p into the plane
+/// \return the distance to the plane (negative if inside)
+template <class T> inline
+T PointPlaneDistance(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& p, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& n, 
+	T d,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt)
+{
+	T dist = n.dot(p) + d;
+	*pt = p - n*dist;
+	return dist;
 }
 
 }; // namespace Math

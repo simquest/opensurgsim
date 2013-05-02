@@ -46,9 +46,8 @@ bool near(double val1, double val2, double abs_error)
 
 ::testing::AssertionResult eigenEqual(const VectorType& expected, const VectorType& actual)
 {
-	double error = 1e-4;
-	if (near(expected[0], actual[0],error) && near(expected[1], actual[1], error) &&
-		near(expected[2], actual[2],error))
+	double precision= 1e-4;
+	if (expected.isApprox(actual,precision))
 	{
 		return ::testing::AssertionSuccess();
 	}
@@ -662,22 +661,134 @@ TEST_F(GeometryTest, PointInsideTriangleWithoutNormal)
 	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
 }
 
+typedef std::tuple<Segment, Triangle, VectorType, bool> SegTriData;
+::testing::AssertionResult checkSegTriIntersection(const SegTriData& data)
+{
+	std::stringstream errorMessage;
+	Segment segment = std::get<0>(data);
+	Triangle tri = std::get<1>(data);
+	VectorType expectedClosestPoint = std::get<2>(data);
+	bool expectedResult = std::get<3>(data);
+	VectorType closestPoint;
+
+	bool result = SegTriCollide(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&closestPoint);
+	if (result != expectedResult) 
+	{
+		errorMessage << "Intersection result does not match should be: " << expectedResult << " but got " << result << std::endl;
+	};
+	if (expectedResult)
+	{
+		if (! expectedClosestPoint.isApprox(closestPoint))
+		{
+			errorMessage << "Closest Point was expected to be " << expectedClosestPoint << " but is " << closestPoint << std::endl;
+		}
+	}
+	else
+	{
+		errorMessage << eigenAllNan(closestPoint).message();
+	}
+
+	if (errorMessage.str() == "")
+	{
+		return ::testing::AssertionSuccess();
+	}
+	else
+	{
+		return ::testing::AssertionFailure() << errorMessage.str();
+	}
+}
+
 TEST_F(GeometryTest, SegmentTriangleIntersection)
 {
 	VectorType closestPoint;
 	VectorType intersectionPoint = tri.pointInTriangle(0.2,0.7);
 	Segment intersecting(intersectionPoint - tri.n*2, intersectionPoint + tri.n*2);
 
-	double distance;
+	SegTriData data;
 
-	distance = SegTriCollide(intersecting.a, intersecting.b, tri.v0, tri.v1, tri.v2, tri.n,&closestPoint);
-	EXPECT_NEAR(-2.0,distance,epsilon);
-	EXPECT_TRUE(eigenEqual(intersectionPoint, closestPoint));
+	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting.a = intersectionPoint + tri.n*4;
-	distance = SegTriCollide(intersecting.a, intersecting.b, tri.v0, tri.v1, tri.v2, tri.n,&closestPoint);
-	EXPECT_NEAR(1,distance,epsilon);
-	EXPECT_TRUE(eigenEqual(intersectionPoint, closestPoint));
+	data = SegTriData(intersecting, tri, intersectionPoint, false);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	// in the plane of the triangle
+	intersecting = Segment(intersectionPoint, intersectionPoint + tri.v0v1 + tri.v1v2);
+	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	intersecting = Segment(intersectionPoint + tri.v0v1 + tri.v1v2, intersectionPoint);
+	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	intersecting = Segment(intersectionPoint + tri.v0v1 + tri.v1v2, intersectionPoint + 2*tri.v0v1 + tri.v1v2);
+	data = SegTriData(intersecting, tri, intersectionPoint, false);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	// Slanting but intersecting
+	// Point On triangle
+	intersecting = Segment(intersectionPoint, intersectionPoint + tri.n*2 + tri.v0v1*2);
+	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	// Intersection in Triangle
+	intersecting = Segment(intersectionPoint - tri.n*2 - tri.v1v2*2, intersectionPoint + 2*tri.n + tri.v1v2*2);
+	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	// Intersection not on Segment
+	intersecting = Segment(intersectionPoint + tri.n*4 + tri.v1v2*4, intersectionPoint + 2*tri.n + tri.v1v2*2);
+	data = SegTriData(intersecting, tri, intersectionPoint, false);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	// Normal segment through one edge
+	VectorType pointOnEdge = tri.v0 + tri.v0v1*0.5;
+	intersecting = Segment(pointOnEdge + tri.n, pointOnEdge - tri.n);
+	data = SegTriData(intersecting, tri, pointOnEdge, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	intersecting = Segment(pointOnEdge + tri.n, pointOnEdge);
+	data = SegTriData(intersecting, tri, pointOnEdge, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	intersecting = Segment(pointOnEdge + tri.n*3, pointOnEdge + tri.n*4);
+	data = SegTriData(intersecting, tri, pointOnEdge, false);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	intersecting = Segment(pointOnEdge + tri.n +tri.v0v1*0.5, pointOnEdge);
+	data = SegTriData(intersecting, tri, pointOnEdge, true);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+
+	// Segment away from the triangle
+	intersecting = Segment(tri.v0 - tri.v0v1 - tri.v1v2, tri.v0 - tri.n*3.0 - tri.v0v1 - tri.v1v2);
+	data = SegTriData(intersecting, tri, pointOnEdge, false);
+	EXPECT_TRUE(checkSegTriIntersection(data));
+}
+
+TEST_F(GeometryTest, PointPlaneDistance)
+{
+
+	VectorType pointInTriangle = tri.v0 + tri.v0v1*.5;
+	double d = tri.n.dot(tri.v0);
+	VectorType point = pointInTriangle;
+	VectorType projectionPoint;
+	double distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
+	EXPECT_NEAR(0.0, distance, epsilon);
+	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
+
+	point = pointInTriangle + tri.n*2;
+	distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
+	EXPECT_NEAR(2.0, distance, epsilon);
+	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
+
+	point = pointInTriangle - tri.n*2;
+	distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
+	EXPECT_NEAR(-2.0, distance, epsilon);
+	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 
 }
+
+
+
 
