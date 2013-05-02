@@ -29,6 +29,10 @@ namespace Framework
 class Component;
 class Runtime;
 
+/// Base Component Manager class. Component Managers manage a collection of
+/// components. The runtime will present each new component to the manager, and
+/// it is up to the manger to decide whether to handle a component of a given
+/// type or not.
 class ComponentManager : public BasicThread
 {
 public:
