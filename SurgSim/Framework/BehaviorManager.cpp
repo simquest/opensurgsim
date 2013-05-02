@@ -24,7 +24,7 @@
 #include "Runtime.h"
 
 
-SurgSim::Framework::BehaviorManager::BehaviorManager() : BasicThread ("Behavior Manager")
+SurgSim::Framework::BehaviorManager::BehaviorManager() : ComponentManager("Behavior Manager")
 {
 	m_logger = SurgSim::Framework::Logger::createConsoleLogger(getName());
 }

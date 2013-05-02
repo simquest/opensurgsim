@@ -58,7 +58,7 @@ protected:
 		runtime = std::make_shared<Runtime>();
 		inputManager = std::make_shared<InputManager>();
 	 
-		runtime->addWorkerThread(inputManager);
+		runtime->addManager(inputManager);
 		runtime->start();
 
 		inputManager->addDevice(testDevice1);
