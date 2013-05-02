@@ -19,7 +19,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-#include <SurgSim/Framework/BasicThread.h>
+#include <SurgSim/Framework/ComponentManager.h>
 #include <SurgSim/Input/InputComponent.h>
 #include <SurgSim/Input/OutputComponent.h>
 #include <SurgSim/Input/DeviceInterface.h>
@@ -35,7 +35,7 @@ namespace Input
 /// Manager to handle InputComponent and OutputComponent, SceneElement can add these to
 /// get input from devices, or even write output to devices. The devices have to be added
 /// to this class before components can be added to it.
-class InputManager : public SurgSim::Framework::BasicThread
+class InputManager : public SurgSim::Framework::ComponentManager
 {
 public:
 	InputManager() ;

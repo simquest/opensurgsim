@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 
-#include "BasicThread.h"
+#include "ComponentManager.h"
 
 namespace SurgSim 
 {
@@ -36,7 +36,7 @@ class Behavior;
 /// NOTE: Currently, BehaviorManager is not thread safe. Behaviors should only
 ///       be added before runtime starts.
 /// TODO: Thread safety. Add ability to add/remove components during runtime.
-class BehaviorManager : public BasicThread
+class BehaviorManager : public ComponentManager 
 {
 public:
 	BehaviorManager();

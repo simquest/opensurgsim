@@ -45,6 +45,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Behavior.h
 	BehaviorManager.h
 	Component.h
+	ComponentManager.h
 	LockedContainer.h
 	Log.h
 	Logger.h
