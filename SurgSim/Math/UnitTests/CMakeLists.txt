@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
