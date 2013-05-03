@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_OUTPUT_PRODUCER_INTERFACE_H
-#define SURGSIM_INPUT_OUTPUT_PRODUCER_INTERFACE_H
+#ifndef SURGSIM_INPUT_OUTPUTPRODUCERINTERFACE_H
+#define SURGSIM_INPUT_OUTPUTPRODUCERINTERFACE_H
 
 #include <string>
 
@@ -70,4 +70,4 @@ public:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif // SURGSIM_INPUT_OUTPUT_PRODUCER_INTERFACE_H
+#endif // SURGSIM_INPUT_OUTPUTPRODUCERINTERFACE_H

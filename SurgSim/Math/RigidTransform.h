@@ -17,8 +17,8 @@
  *  Definitions of 2x2 and 3x3 rigid-body (isometric) transforms.
  */
 
-#ifndef SURGSIM_MATH_RIGID_TRANSFORM_H
-#define SURGSIM_MATH_RIGID_TRANSFORM_H
+#ifndef SURGSIM_MATH_RIGIDTRANSFORM_H
+#define SURGSIM_MATH_RIGIDTRANSFORM_H
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -72,4 +72,4 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(const Eigen::Q
 };  // namespace Math
 };  // namespace SurgSim
 
-#endif  // SURGSIM_MATH_RIGID_TRANSFORM_H
+#endif  // SURGSIM_MATH_RIGIDTRANSFORM_H

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MOCK_OBJECTS_H
-#define MOCK_OBJECTS_H
+#ifndef MOCKOBJECTS_H
+#define MOCKOBJECTS_H
 
 #include <memory>
 
@@ -194,4 +194,4 @@ public:
 	int updateCount;
 };
 
-#endif // MOCK_OBJECTS_H
+#endif // MOCKOBJECTS_H
