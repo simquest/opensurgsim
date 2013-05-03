@@ -29,7 +29,7 @@ namespace Framework
 {
 
 class ApplicationData;
-class BasicThread;
+class ComponentManager;
 class Component;
 class Logger;
 class Scene;
@@ -56,7 +56,7 @@ public:
 	~Runtime();
 
 	/// Add a worker thread, this should probably only be possible if the system is not running
-	void addWorkerThread(std::shared_ptr<BasicThread> thread);
+	void addManager(std::shared_ptr<ComponentManager> thread);
 
 	/// Sets the scene currently only works before the runtime has started the threads
 	/// \param	scene	The scene.
@@ -120,7 +120,7 @@ private:
 	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
 	bool m_isRunning;
-	std::vector< std::shared_ptr<BasicThread> > m_workerThreads;
+	std::vector< std::shared_ptr<ComponentManager> > m_managers;
 	std::shared_ptr<Scene> m_scene;
 	std::shared_ptr<ApplicationData> m_applicationData;
 

@@ -16,10 +16,10 @@
 #ifndef SURGSIM_FRAMEWORK_SCENE_H
 #define SURGSIM_FRAMEWORK_SCENE_H
 
+#include <map>
 #include <memory>
 #include <string>
 
-#include "SurgSim/Framework/BasicThread.h"
 #include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim

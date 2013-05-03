@@ -38,31 +38,31 @@ TEST(RuntimeTest, SetScene)
 	EXPECT_NO_THROW(runtime->setScene(scene));
 }
 
-TEST(RuntimeTest, AddWorker)
+TEST(RuntimeTest, AddManager)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<MockThread> thread(new MockThread());
+	std::shared_ptr<MockManager> manager(new MockManager());
 
-	runtime->addWorkerThread(thread);
+	runtime->addManager(manager);
 
 	EXPECT_TRUE(runtime->start());
 
-	EXPECT_TRUE(thread->isInitialized());
+	EXPECT_TRUE(manager->isInitialized());
 
 
 	EXPECT_TRUE(runtime->stop());
 
-	EXPECT_FALSE(thread->isRunning());
+	EXPECT_FALSE(manager->isRunning());
 }
 
 TEST(RuntimeTest, InitFailureDeathTest)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<MockThread> threadSucceeds(new MockThread());
-	std::shared_ptr<MockThread> threadFails(new MockThread(false,true));
+	std::shared_ptr<MockManager> managerSucceeds(new MockManager());
+	std::shared_ptr<MockManager> managerFails(new MockManager(false,true));
 
-	runtime->addWorkerThread(threadSucceeds);
-	runtime->addWorkerThread(threadFails);
+	runtime->addManager(managerSucceeds);
+	runtime->addManager(managerFails);
 
 	ASSERT_DEATH(runtime->start(), "");
 }
@@ -70,11 +70,11 @@ TEST(RuntimeTest, InitFailureDeathTest)
 TEST(RuntimeTest, StartupFailureDeathTest)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<MockThread> threadSucceeds(new MockThread());
-	std::shared_ptr<MockThread> threadFails(new MockThread(true,false));
+	std::shared_ptr<MockManager> managerSucceeds(new MockManager());
+	std::shared_ptr<MockManager> managerFails(new MockManager(true,false));
 
-	runtime->addWorkerThread(threadSucceeds);
-	runtime->addWorkerThread(threadFails);
+	runtime->addManager(managerSucceeds);
+	runtime->addManager(managerFails);
 
 	ASSERT_DEATH(runtime->start(), "");
 }

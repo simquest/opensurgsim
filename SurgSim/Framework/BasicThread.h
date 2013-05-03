@@ -52,7 +52,7 @@ public:
 	/// interface
 	/// \param startupBarrier is a barrier it synchronizes a group of thread that should go through their startup
 	/// sequence in step.
-	void start(std::shared_ptr<Barrier> startupBarrier);
+	void start(std::shared_ptr<Barrier> startupBarrier=nullptr);
 
 	/// Stopping the execution, blocks until the running thread has actually stopped
 	void stop();
@@ -65,17 +65,6 @@ public:
 	/// \return	true if the threads update() function is being called.
 	bool isRunning() const;
 
-
-	/// Handle representations, override for each thread
-	/// \param component	The component to be removed.
-	/// \return true on success
-	virtual bool removeComponent(std::shared_ptr<Component> component) = 0;
-
-	/// Adds a component.
-	/// \param component The component to be added.
-	/// \return true if it succeeds or the thread is not concerned with the component, false if it fails.
-	virtual bool addComponent(std::shared_ptr<Component> component) = 0;
-
 	/// This is what boost::thread executes on thread creation.
 	void operator()();
 
@@ -84,12 +73,6 @@ public:
 
 	/// \return the name of the thread
 	std::string getName() const;
-
-	/// @{
-	/// Runtime accessors
-	std::shared_ptr<Runtime> getRuntime() const;
-	void setRuntime(std::shared_ptr<Runtime> val);
-	/// @}
 
 	/// Set the update rate of the thread
 	/// \param val	rate in hertz (updates per second) of the thread
@@ -114,7 +97,6 @@ private:
 	boost::thread m_thisThread;
 	boost::chrono::duration<double> m_period;
 	std::shared_ptr<Barrier> m_startupBarrier;
-	std::weak_ptr<Runtime> m_runtime;
 
 	bool m_isInitialized;
 	bool m_isRunning;

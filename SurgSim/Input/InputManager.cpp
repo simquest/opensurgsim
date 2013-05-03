@@ -26,7 +26,7 @@ namespace Input
 {
 
 InputManager::InputManager() :
-	BasicThread("Input Manager")
+	ComponentManager("Input Manager")
 {
 	// Use a default logger, if there are errors before runtime is set here
 	m_logger = SurgSim::Framework::Logger::createConsoleLogger(getName());
