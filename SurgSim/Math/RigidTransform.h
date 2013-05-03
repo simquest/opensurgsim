@@ -46,11 +46,16 @@ typedef Eigen::Transform<double, 3, Eigen::Isometry, Eigen::DontAlign>  RigidTra
 
 
 /// Create a rigid-body transform using the specified rotation matrix and translation.
-template <typename T, int N, int MOpt, int VOpt>
-inline Eigen::Transform<T, N, Eigen::Isometry> makeRigidTransform(const Eigen::Matrix<T, N, N, MOpt>& rotation,
-	const Eigen::Matrix<T, N, 1, VOpt>& translation)
+/// \tparam M the type used to describe the rotation matrix.  Can usually be deduced.
+/// \tparam V the type used to describe the translation vector.  Can usually be deduced.
+/// \param rotation the rotation matrix.
+/// \param translation the translation vector.
+/// \returns the transform with the specified rotation and translation.
+template <typename M, typename V>
+inline Eigen::Transform<typename M::Scalar, M::RowsAtCompileTime, Eigen::Isometry> makeRigidTransform(
+	const Eigen::MatrixBase<M>& rotation, const Eigen::MatrixBase<V>& translation)
 {
-	Eigen::Transform<T, N, Eigen::Isometry> rigid;
+	Eigen::Transform<typename M::Scalar, M::RowsAtCompileTime, Eigen::Isometry> rigid;
 	rigid.makeAffine();
 	rigid.linear() = rotation;
 	rigid.translation() = translation;
@@ -58,11 +63,16 @@ inline Eigen::Transform<T, N, Eigen::Isometry> makeRigidTransform(const Eigen::M
 }
 
 /// Create a rigid-body transform using the specified rotation quaternion and translation.
-template <typename T, int QOpt, int VOpt>
-inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(const Eigen::Quaternion<T, QOpt>& rotation,
-	const Eigen::Matrix<T, 3, 1, VOpt>& translation)
+/// \tparam Q the type used to describe the rotation quaternion.  Can usually be deduced.
+/// \tparam V the type used to describe the translation vector.  Can usually be deduced.
+/// \param rotation the rotation quaternion.
+/// \param translation the translation vector.
+/// \returns the transform with the specified rotation and translation.
+template <typename Q, typename V>
+inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransform(
+	const Eigen::QuaternionBase<Q>& rotation, const Eigen::MatrixBase<V>& translation)
 {
-	Eigen::Transform<T, 3, Eigen::Isometry> rigid;
+	Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> rigid;
 	rigid.makeAffine();
 	rigid.linear() = rotation.matrix();
 	rigid.translation() = translation;
