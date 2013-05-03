@@ -786,9 +786,89 @@ TEST_F(GeometryTest, PointPlaneDistance)
 	distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
 	EXPECT_NEAR(-2.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
-
 }
 
+TEST_F(GeometryTest, SegmentPlaneDistance)
+{
+	double d = tri.n.dot(tri.v0);
+	VectorType intersectionPoint = tri.pointInTriangle(0.2,0.7);
+	Segment seg(intersectionPoint - tri.n*2, intersectionPoint + tri.n*2);
 
+	VectorType segResultPoint, planeResultPoint;
 
+	double distance;
 
+	// Segment intersects plane
+	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	EXPECT_NEAR(0.0, distance, epsilon);
+	EXPECT_TRUE(intersectionPoint.isApprox(segResultPoint));
+	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
+
+	// Segment above plane, segment intersection should be point a
+	seg = Segment(intersectionPoint + tri.n * 2, intersectionPoint + tri.n * 3);
+	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	EXPECT_NEAR(2.0, distance, epsilon);
+	EXPECT_TRUE(seg.a.isApprox(segResultPoint));
+	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
+
+	seg = Segment(intersectionPoint - tri.n * 3, intersectionPoint - tri.n * 2);
+	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	EXPECT_NEAR(2.0, distance, epsilon);
+	EXPECT_TRUE(seg.b.isApprox(segResultPoint));
+	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
+
+	// Segment parallel to the plane
+	// coplanar with plane
+	seg = Segment(intersectionPoint - tri.v0v1, intersectionPoint + tri.v0v1);
+	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	EXPECT_NEAR(0.0, distance, epsilon);
+	EXPECT_TRUE(segResultPoint.isApprox(seg.pointOnLine(0.5)));
+	EXPECT_TRUE(planeResultPoint.isApprox(seg.pointOnLine(0.5)));
+
+	// moved away from plane, but still parallel
+	seg = Segment(intersectionPoint - tri.v0v1 + tri.n*2.0, intersectionPoint + tri.v0v1 + tri.n*2.0);
+	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	EXPECT_NEAR(2.0, distance, epsilon);
+	EXPECT_TRUE(segResultPoint.isApprox(seg.pointOnLine(0.5)));
+	EXPECT_TRUE(planeResultPoint.isApprox(intersectionPoint));
+}
+
+TEST_F(GeometryTest, TrianglePlaneTest)
+{
+	// Start with the coplanar case 
+	double d = tri.n.dot(tri.v0);
+	double distance;
+	VectorType intersectionPoint0;
+	VectorType intersectionPoint1;
+
+	VectorType third = (tri.v0 + tri.v1 + tri.v2) / 3.0;
+	distance = TriPlaneDistance(tri.v0, tri.v1, tri.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	EXPECT_NEAR(0.0,distance, epsilon);
+	EXPECT_TRUE(third.isApprox(intersectionPoint0));
+	EXPECT_TRUE(third.isApprox(intersectionPoint1));
+
+	// Not intersecting
+	Triangle triangle (tri.v0 + tri.n*2, tri.v1 + tri.n*3, tri.v2+tri.n*3);
+	distance = TriPlaneDistance(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	EXPECT_NEAR(2.0,distance, epsilon);
+	EXPECT_TRUE(triangle.v0.isApprox(intersectionPoint0));
+	EXPECT_TRUE(tri.v0.isApprox(intersectionPoint1));
+
+	// Intersecting
+	// On the triangle
+	// Need to change the order of points for this to work ... strange ...
+	triangle = Triangle(tri.v0 + tri.n*3, tri.v2 + tri.n*3, tri.v1 );
+	distance = TriPlaneDistance(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	EXPECT_NEAR(0.0,distance, epsilon);
+	EXPECT_TRUE(triangle.v2.isApprox(intersectionPoint0));
+	EXPECT_TRUE(triangle.v2.isApprox(intersectionPoint1));
+
+	// inside ...
+	triangle = Triangle(tri.v0 - tri.n*2, tri.v1*3 + tri.n, tri.v2*3 + tri.n);
+	distance = TriPlaneDistance(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	EXPECT_NEAR(0.0,distance, epsilon);
+	EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
+	EXPECT_TRUE(PointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2,triangle.n));
+	EXPECT_NEAR(0.0,PointPlaneDistance(intersectionPoint0,tri.n,d,&intersectionPoint1),epsilon);
+
+}

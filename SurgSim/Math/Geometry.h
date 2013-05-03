@@ -822,6 +822,146 @@ T PointPlaneDistance(
 	return dist;
 }
 
+
+/// Get the distance between a segment and a plane
+/// \param v0,v1 Endpoints of the segments.
+/// \param n Normal of the plane n (normalized).
+/// \param d Constant d in n.x=d
+/// \param [OUT] closestPointSegment Point closest to the plane, the midpoint of the segment (v0+v1)/2 
+/// 			 is being used if the segment is parallel to the plane. If the segment actually
+/// 			 intersects the plane segmentIntersectionPoint will be equal to planeIntersectionPoint
+/// \param [OUT] planeIntersectionPoint the point on the plane where the line defined by the segment
+/// 			 intersects the plane
+/// \return the distance of closest point of the segment to the plane, 0 if the segment intersects the plane, 
+/// 		negative if the closest point is on the other side of the plane
+template <class T> inline
+T SegPlaneDistance(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v0,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v1,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& n,
+	T d,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* closestPointSegment,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* planeIntersectionPoint)
+{
+	T dist0 = n.dot(v0) - d;
+	T dist1 = n.dot(v1) - d;
+	// Parallel case
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> v01 = v1 - v0;
+	if ( abs(n.dot(v01)) <= IntersectionEpsilon )
+	{
+		*closestPointSegment = (v0 + v1)*T(0.5);
+		dist0 = n.dot(*closestPointSegment) - d;
+		*planeIntersectionPoint = *closestPointSegment - dist0*n;
+		return (abs(dist0) < IntersectionEpsilon ? 0 : dist0);
+	}
+	// Both on the same side 
+	if ( dist0>=0 && dist1>=0 || dist0<0 && dist1<0 )
+	{
+		if ( abs(dist0) < abs(dist1) )
+		{
+			*closestPointSegment = v0;
+			*planeIntersectionPoint = v0 - dist0*n;
+			return abs(dist0);
+		}
+		else
+		{
+			*closestPointSegment = v1;
+			*planeIntersectionPoint = v1 - dist1*n;
+			return abs(dist1);
+		}
+	}
+	// Segment cutting through
+	else
+	{
+		Eigen::Matrix<T, 3, 1, Eigen::DontAlign> v01 = v1-v0;
+		T lambda= (d-v0.dot(n)) / v01.dot(n);
+		*planeIntersectionPoint = v0 + lambda * v01;
+		*closestPointSegment = *planeIntersectionPoint;
+		return 0;
+	}
+}
+
+
+/// Get the distance of a point to a plane
+/// \param t0,t1,t2 Points of the triangle.
+/// \param n Normal of the plane n (normalized).
+/// \param d Constant d in n.x=d
+/// \param p0 Closest point on the triangle, when the triangle is coplanar to the plane (tv0+tv1+tv2)/3 is used,
+/// 		when the triangle intersects the plane the midpoint of the intersection segment is returned
+/// \param p1 Projection of the closest point onto the plane, when the triangle intersects the plane the midpoint of
+/// 		  the intersection segment is returned
+/// \return The distance of the triangle to the plane, 0 when the triangle is closer than 
+template <class T> inline
+T TriPlaneDistance(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv0,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv1,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv2,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& n, 
+	T d,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt0,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt1)
+{	
+	*pt0 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
+	*pt1 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
+
+	T dist0 = n.dot(tv0)-d;
+	T dist1 = n.dot(tv1)-d;
+	T dist2 = n.dot(tv2)-d;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t01 = tv1-tv0;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t02 = tv2-tv0;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t12 = tv2-tv1;
+
+	// Coplanar case
+	if ( abs(n.dot(t01)) <= DegenerateEpsilon && abs(n.dot(t02)) <= DegenerateEpsilon)
+	{
+		*pt0 = *pt1 = (tv0 + tv1 + tv2) / T(3);
+		return dist0;
+	}
+	// Is there an intersection
+	if ( dist0 <= IntersectionEpsilon || dist1 <= IntersectionEpsilon || dist2 <= IntersectionEpsilon)
+	{
+		if ( dist0 * dist1 < 0 )
+		{
+			*pt0 = tv0 + (d-n.dot(tv0))/n.dot(t01) * t01;
+			if ( dist0 * dist2 < 0 )
+			{
+				*pt1 = tv0 + (d-n.dot(tv0))/n.dot(t02) * t02;
+			}
+			else
+			{
+				Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t12 = tv2-tv1;
+				*pt1 = tv1 + (d-n.dot(tv1))/n.dot(t12) * t12;
+			}
+		}
+		else
+		{
+			*pt0 = tv0 + (d-n.dot(tv0))/n.dot(t02) * t02;
+			*pt1 = tv1 + (d-n.dot(tv1))/n.dot(t12) * t12;
+		}
+
+		// Find the midpoint, take this out to return the segment endpoints
+		*pt0 = *pt1 = (*pt0 + *pt1) * T(0.5);
+		return 0;
+	}
+
+	// No collision, get separation
+	if ( dist0 < dist1 && dist0 < dist2 )
+	{
+		*pt0 = tv0;
+		*pt1 = tv0 - n*dist0;
+		return dist0;
+	}
+	if ( dist1 < dist0 && dist1 < dist2 )
+	{
+		*pt0 = tv1;
+		*pt1 = tv1 - n*dist1;
+		return dist1;
+	}
+	*pt0 = tv2;
+	*pt1 = tv2 - n*dist2;
+	return dist2;
+}
+
 }; // namespace Math
 }; // namespace SurgSim
 
