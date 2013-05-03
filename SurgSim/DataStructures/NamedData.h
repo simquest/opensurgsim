@@ -41,7 +41,7 @@ namespace DataStructures
 /// that a stable data layout is available to the code using this class so that it can, for example, record
 /// entry indices and use them to retrieve the same entries later on.
 ///
-/// However, each entry can be marked as not currently valid, i.e. missing.  Its entry still remains in the
+/// However, each entry can be marked as not valid right now, i.e. missing.  Its entry still remains in the
 /// collection, but for the moment has no value associated with it.
 ///
 /// The set of names and indices within a NamedData object object cannot be modified, but it can be initialized
@@ -103,7 +103,7 @@ public:
 
 	/// Create an object and move the data from another object.
 	///
-	/// \param [in,out] namedData The object to copy from, which will be left in an ununsable state.
+	/// \param [in,out] namedData The object to copy from, which will be left in an unusable state.
 	inline NamedData(NamedData&& namedData);
 
 	/// Move the data from another object.
@@ -111,7 +111,7 @@ public:
 	/// The same restrictions on object compatibility apply as in the case of the copy assignment
 	/// operator=(const NamedData&).
 	///
-	/// \param [in,out] namedData The object to copy from, which will be left in an ununsable state.
+	/// \param [in,out] namedData The object to copy from, which will be left in an unusable state.
 	/// \return The object that was assigned into.
 	inline NamedData& operator=(NamedData&& namedData);
 
@@ -137,45 +137,59 @@ public:
 	inline std::string getName(int index) const;
 
 	/// Check whether the object contains an entry with the specified index.
+	/// Logically equivalent to <code>getName(index) != ""</code>.
 	///
 	/// \param index The index corresponding to the entry.
 	/// \return true if that entry exists, false if not.
 	inline bool hasEntry(int index) const;
 
 	/// Check whether the object contains an entry with the specified name.
+	/// Logically equivalent to <code>getIndex(name) != -1</code>.
 	///
 	/// \param name The name corresponding to the entry.
 	/// \return true if that entry exists, false if not.
 	inline bool hasEntry(const std::string& name) const;
 
-	/// Check whether the object contains current data for the entry with the specified index.
+	/// Check whether the entry with the specified index contains valid data.
+	/// The check verifies that the entry's data was %set using set(int, const T&) or
+	/// set(const std::string&, const T&), without being subsequently invalidated by reset(int)
+	/// or reset(const std::string&).
 	///
 	/// \param index The index of the entry.
-	/// \return true if that entry exists and contains current data.
-	inline bool hasCurrentData(int index) const;
+	/// \return true if that entry exists and contains valid data.
+	inline bool hasData(int index) const;
 
-	/// Check whether the object contains current data for the entry with the specified name.
+	/// Check whether the entry with the specified name contains valid data.
+	/// The check verifies that the entry's data was %set using set(int, const T&) or
+	/// set(const std::string&, const T&), without being subsequently invalidated by reset(int)
+	/// or reset(const std::string&).
 	///
 	/// \param name The name of the entry.
-	/// \return true if that entry exists and contains current data.
-	inline bool hasCurrentData(const std::string& name) const;
+	/// \return true if that entry exists and contains valid data.
+	inline bool hasData(const std::string& name) const;
 
 	/// Given an index, get the corresponding value.
+	/// It's only possible to get the value if the data was %set using set(int, const T&) or
+	/// set(const std::string&, const T&), without being subsequently invalidated by reset(int)
+	/// or reset(const std::string&).  In other words, get returns the same value as hasData would return.
 	///
 	/// \param index The index of the entry.
 	/// \param [out] value The location for the retrieved value.  Must not be null.
-	/// \return true if a current value is available and was written to \a value.
+	/// \return true if a valid value is available and was written to \a value.
 	inline bool get(int index, T* value) const;
 
 	/// Given a name, get the corresponding value.
+	/// It's only possible to get the value if the data was %set using set(int, const T&) or
+	/// set(const std::string&, const T&), without being subsequently invalidated by reset(int)
+	/// or reset(const std::string&).  In other words, get returns the same value as hasData would return.
 	///
 	/// \param name The name of the entry.
 	/// \param [out] value The location for the retrieved value.  Must not be null.
-	/// \return true if a current value is available and was written to \a value.
+	/// \return true if a valid value is available and was written to \a value.
 	inline bool get(const std::string& name, T* value) const;
 
 	/// Record the data for an entry specified by an index.
-	/// The entry will also be marked as containing current data.
+	/// The entry will also be marked as containing valid data.
 	///
 	/// \param index The index of the entry.
 	/// \param value The value to be set.
@@ -183,26 +197,26 @@ public:
 	inline bool set(int index, const T& value);
 
 	/// Record the data for an entry specified by a name.
-	/// The entry will also be marked as containing current data.
+	/// The entry will also be marked as containing valid data.
 	///
 	/// \param name The name of the entry.
 	/// \param value The value to be set.
 	/// \return true if successful.
 	inline bool set(const std::string& name, const T& value);
 
-	/// Mark an entry as not containing any current data.
+	/// Invalidate an entry&mdash; mark it as not containing any valid data.
 	///
 	/// \param index The index of the entry.
 	/// \return true if successful.
 	inline bool reset(int index);
 
-	/// Mark an entry as not containing any current data.
+	/// Invalidate an entry&mdash; mark it as not containing any valid data.
 	///
 	/// \param name The name of the entry.
 	/// \return true if successful.
 	inline bool reset(const std::string& name);
 
-	/// Mark all of the data as not current.
+	/// Invalidate all entries&mdash; mark everything as not containing any valid data.
 	inline void resetAll();
 
 	/// Check the number of existing entries.
@@ -222,8 +236,8 @@ private:
 	/// The array of values.
 	std::vector<T> m_data;
 
-	/// The array storing whether the data is current.
-	std::vector<bool> m_isCurrent;
+	/// The array storing whether the data is currently valid.
+	std::vector<bool> m_isDataValid;
 };
 
 

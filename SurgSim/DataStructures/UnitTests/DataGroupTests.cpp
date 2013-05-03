@@ -42,9 +42,9 @@ TEST(DataGroupTests, CanConstruct)
 
 	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.poses().hasEntry("test"));
-	EXPECT_FALSE(data.poses().hasCurrentData("test"));
+	EXPECT_FALSE(data.poses().hasData("test"));
 	EXPECT_FALSE(data.strings().hasEntry("missing"));
-	EXPECT_FALSE(data.strings().hasCurrentData("missing"));
+	EXPECT_FALSE(data.strings().hasData("missing"));
 }
 
 /// Creating a shared_ref to a named data object.
@@ -61,9 +61,9 @@ TEST(DataGroupTests, CanCreateShared)
 
 	EXPECT_TRUE(data->isValid());
 	EXPECT_TRUE(data->poses().hasEntry("test"));
-	EXPECT_FALSE(data->poses().hasCurrentData("test"));
+	EXPECT_FALSE(data->poses().hasData("test"));
 	EXPECT_FALSE(data->strings().hasEntry("missing"));
-	EXPECT_FALSE(data->strings().hasCurrentData("missing"));
+	EXPECT_FALSE(data->strings().hasData("missing"));
 }
 
 /// Creating an unitialized data object.
@@ -98,22 +98,22 @@ TEST(DataGroupTests, PutName)
 	data.strings().set("string", "string");
 
 	EXPECT_TRUE(data.poses().hasEntry("pose"));
-	EXPECT_TRUE(data.poses().hasCurrentData("pose"));
+	EXPECT_TRUE(data.poses().hasData("pose"));
 
 	EXPECT_TRUE(data.vectors().hasEntry("vector"));
-	EXPECT_TRUE(data.vectors().hasCurrentData("vector"));
+	EXPECT_TRUE(data.vectors().hasData("vector"));
 
 	EXPECT_TRUE(data.scalars().hasEntry("scalar"));
-	EXPECT_TRUE(data.scalars().hasCurrentData("scalar"));
+	EXPECT_TRUE(data.scalars().hasData("scalar"));
 
 	EXPECT_TRUE(data.integers().hasEntry("integer"));
-	EXPECT_TRUE(data.integers().hasCurrentData("integer"));
+	EXPECT_TRUE(data.integers().hasData("integer"));
 
 	EXPECT_TRUE(data.booleans().hasEntry("boolean"));
-	EXPECT_TRUE(data.booleans().hasCurrentData("boolean"));
+	EXPECT_TRUE(data.booleans().hasData("boolean"));
 
 	EXPECT_TRUE(data.strings().hasEntry("string"));
-	EXPECT_TRUE(data.strings().hasCurrentData("string"));
+	EXPECT_TRUE(data.strings().hasData("string"));
 }
 
 /// Getting data from the container.
@@ -188,13 +188,13 @@ TEST(DataGroupTests, ResetAll)
 	data.resetAll();
 
 	EXPECT_TRUE(data.poses().hasEntry("first"));
-	EXPECT_FALSE(data.poses().hasCurrentData("first"));
+	EXPECT_FALSE(data.poses().hasData("first"));
 
 	EXPECT_TRUE(data.scalars().hasEntry("second"));
-	EXPECT_FALSE(data.scalars().hasCurrentData("second"));
+	EXPECT_FALSE(data.scalars().hasData("second"));
 
 	EXPECT_TRUE(data.strings().hasEntry("third"));
-	EXPECT_FALSE(data.strings().hasCurrentData("third"));
+	EXPECT_FALSE(data.strings().hasData("third"));
 }
 
 /// Resetting one data entry at a time.
@@ -212,16 +212,16 @@ TEST(DataGroupTests, ResetOne)
 	data.strings().reset("third");
 
 	EXPECT_TRUE(data.poses().hasEntry("first"));
-	EXPECT_FALSE(data.poses().hasCurrentData("first"));
+	EXPECT_FALSE(data.poses().hasData("first"));
 
 	EXPECT_TRUE(data.scalars().hasEntry("second"));
-	EXPECT_TRUE(data.scalars().hasCurrentData("second"));
+	EXPECT_TRUE(data.scalars().hasData("second"));
 
 	EXPECT_TRUE(data.strings().hasEntry("third"));
-	EXPECT_FALSE(data.strings().hasCurrentData("third"));
+	EXPECT_FALSE(data.strings().hasData("third"));
 
 	data.scalars().reset("second");
 
 	EXPECT_TRUE(data.scalars().hasEntry("second"));
-	EXPECT_FALSE(data.scalars().hasCurrentData("second"));
+	EXPECT_FALSE(data.scalars().hasData("second"));
 }

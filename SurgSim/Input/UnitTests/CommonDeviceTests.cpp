@@ -107,8 +107,8 @@ TEST(CommonDeviceTests, PushInput)
 	device.pushInput();
 	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
-	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	// invalidate the state
@@ -116,14 +116,14 @@ TEST(CommonDeviceTests, PushInput)
 	consumer2->m_lastReceivedInput.resetAll();
 	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
-	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_FALSE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_FALSE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 
 	device.pushInput();
 	EXPECT_EQ(2, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(2, consumer2->m_numTimesReceivedInput);
-	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 }
 
@@ -143,13 +143,13 @@ TEST(CommonDeviceTests, PullOutput)
 	EXPECT_TRUE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(1, producer2->m_numTimesRequestedOutput);
-	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_TRUE(device.getOutputData().integers().hasData("value"));
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
-	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_TRUE(device.getOutputData().integers().hasData("value"));
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	// Test what happens when the producer returns false.
@@ -157,7 +157,7 @@ TEST(CommonDeviceTests, PullOutput)
 	EXPECT_FALSE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(3, producer2->m_numTimesRequestedOutput);
-	EXPECT_FALSE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_FALSE(device.getOutputData().integers().hasData("value"));
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 }
 
@@ -181,30 +181,30 @@ TEST(CommonDeviceTests, RemoveInputConsumer)
 	device.pushInput();
 	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
-	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_TRUE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 
 	// invalidate the state
 	consumer1->m_lastReceivedInput.resetAll();
 	consumer2->m_lastReceivedInput.resetAll();
 	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(1, consumer2->m_numTimesReceivedInput);
-	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_FALSE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_FALSE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 
 	EXPECT_TRUE(device.removeInputConsumer(consumer1));
 	device.pushInput();
 	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(2, consumer2->m_numTimesReceivedInput);
-	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 
 	EXPECT_FALSE(device.removeInputConsumer(consumer1));
 	device.pushInput();
 	EXPECT_EQ(1, consumer1->m_numTimesReceivedInput);
 	EXPECT_EQ(3, consumer2->m_numTimesReceivedInput);
-	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
-	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasCurrentData("helloWorld"));
+	EXPECT_FALSE(consumer1->m_lastReceivedInput.strings().hasData("helloWorld"));
+	EXPECT_TRUE(consumer2->m_lastReceivedInput.strings().hasData("helloWorld"));
 }
 
 TEST(CommonDeviceTests, RemoveOutputProducer)
@@ -227,23 +227,23 @@ TEST(CommonDeviceTests, RemoveOutputProducer)
 	EXPECT_TRUE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(1, producer2->m_numTimesRequestedOutput);
-	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_TRUE(device.getOutputData().integers().hasData("value"));
 
 	EXPECT_FALSE(device.removeOutputProducer(producer1));
 	EXPECT_TRUE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
-	EXPECT_TRUE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_TRUE(device.getOutputData().integers().hasData("value"));
 
 	EXPECT_TRUE(device.removeOutputProducer(producer2));
 	EXPECT_FALSE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
-	EXPECT_FALSE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_FALSE(device.getOutputData().integers().hasData("value"));
 
 	EXPECT_FALSE(device.removeOutputProducer(producer2));
 	EXPECT_FALSE(device.pullOutput());
 	EXPECT_EQ(0, producer1->m_numTimesRequestedOutput);
 	EXPECT_EQ(2, producer2->m_numTimesRequestedOutput);
-	EXPECT_FALSE(device.getOutputData().integers().hasCurrentData("value"));
+	EXPECT_FALSE(device.getOutputData().integers().hasData("value"));
 }
