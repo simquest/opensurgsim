@@ -28,7 +28,7 @@ set(SURGSIM_MATH_HEADERS
 	Vector.h
 )
 
-install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION include/SurgSim/Math)
+install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION "${INSTALL_INCLUDE_DIR}/SurgSim/Math")
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
