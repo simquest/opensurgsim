@@ -41,7 +41,7 @@ bool OutputComponent::requestOutput(const std::string& device, SurgSim::DataStru
 		*outputData = m_outputData;
 		result = true;
 	}
-	return true;
+	return result;
 }
 
 SurgSim::DataStructures::DataGroup& OutputComponent::getOutputData()
