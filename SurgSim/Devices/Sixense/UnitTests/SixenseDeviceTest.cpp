@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the SixenseDevice and SixenseManager classes.
- */
+/// \file
+/// Tests for the SixenseDevice and SixenseManager classes.
 
 #include <memory>
 #include <string>
