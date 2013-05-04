@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests that exercise the functionality of our rigid transform typedefs, which
- * come straight from Eigen.
- */
+/// \file
+/// Tests that exercise the functionality of our rigid transform typedefs, which
+/// come straight from Eigen.
 
 #include <Eigen/Geometry>
 #include "SurgSim/Math/RigidTransform.h"

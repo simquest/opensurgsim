@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- *  Definitions of 2x2 and 3x3 rigid-body (isometric) transforms.
- */
+/// \file
+/// Definitions of 2x2 and 3x3 rigid-body (isometric) transforms.
 
 #ifndef SURGSIM_MATH_RIGIDTRANSFORM_H
 #define SURGSIM_MATH_RIGIDTRANSFORM_H
