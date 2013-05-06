@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_INDEX_DIRECTORY_H
-#define SURGSIM_DATA_STRUCTURES_INDEX_DIRECTORY_H
+#ifndef SURGSIM_DATASTRUCTURES_INDEXDIRECTORY_H
+#define SURGSIM_DATASTRUCTURES_INDEXDIRECTORY_H
 
 #include <string>
 #include <vector>
@@ -137,4 +137,4 @@ private:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATA_STRUCTURES_INDEX_DIRECTORY_H
+#endif  // SURGSIM_DATASTRUCTURES_INDEXDIRECTORY_H

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_DATA_GROUP_BUILDER_H
-#define SURGSIM_DATA_STRUCTURES_DATA_GROUP_BUILDER_H
+#ifndef SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
+#define SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
 
 #include <SurgSim/DataStructures/NamedDataBuilder.h>
 #include <SurgSim/DataStructures/DataGroup.h>
@@ -169,4 +169,4 @@ private:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATA_STRUCTURES_DATA_GROUP_BUILDER_H
+#endif  // SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
