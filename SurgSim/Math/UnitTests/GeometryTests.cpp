@@ -17,6 +17,12 @@
  * Tests for the Intersections.cpp functions.
  */
 
+/// \todo rename all the functions to a consistant naming scheme
+/// \todo pass the alignment as a separate template parameter
+/// \todo check parameter naming for consistency
+/// \todo run through lint and formatting
+
+
 #include <gtest/gtest.h>
 #include <numeric>
 #include <cmath>
@@ -114,6 +120,9 @@ public:
 		return v0 + a*v0v1 + b*v0v2;
 	}
 };
+namespace {
+	SizeType epsilon = 1e-10;
+}
 
 class GeometryTest : public ::testing::Test
 {
@@ -128,7 +137,6 @@ protected:
 		degenerateSegment.a = plainSegment.a;
 		degenerateSegment.b = degenerateSegment.a + (plainSegment.ab)*1e-9;
 		degenerateSegment.ab = degenerateSegment.b - degenerateSegment.a;
-		epsilon = 1e-10;
 
 		plainLine = Segment(VectorType(-10.0,10,10), VectorType(10.0,10.0,10.0));
 		parallelLine = Segment(VectorType(-100.0,5.0,5.0), VectorType(-90.0,5.0,5.0));
@@ -145,7 +153,6 @@ protected:
 	Vector3d plainNormal;
 	Segment plainSegment;
 	Segment degenerateSegment;
-	SizeType epsilon;
 
 	Segment plainLine;
 	Segment parallelLine;
@@ -377,12 +384,12 @@ void testSegmentDistance(const SegmentData& segmentData, std::string info, int i
 	// reported as being the closes ones
 	SizeType expectedDistance = (segmentData.p1 - segmentData.p0).norm();
 
-	distance = SegSegDistance(segmentData.segment0.a, segmentData.segment0.b, segmentData.segment1.a, segmentData.segment1.b, &p0, &p1, 1e-8);
+	distance = SegSegDistance(segmentData.segment0.a, segmentData.segment0.b, segmentData.segment1.a, segmentData.segment1.b, &p0, &p1);
 	EXPECT_NEAR(expectedDistance, distance, 1e-8) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p0, p0)) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p1, p1)) << "for " << info << " at index " << i;
 
-	distance = SegSegDistance(segmentData.segment1.a, segmentData.segment1.b, segmentData.segment0.a, segmentData.segment0.b, &p0, &p1, 1e-8);
+	distance = SegSegDistance(segmentData.segment1.a, segmentData.segment1.b, segmentData.segment0.a, segmentData.segment0.b, &p0, &p1);
 	EXPECT_NEAR(expectedDistance, distance,1e-8) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p1, p0)) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p0, p1)) << "for " << info << " at index " << i;
@@ -400,7 +407,7 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	VectorType closestPoint = plainSegment.pointOnLine(0.5); 
 	Segment otherSegment(closestPoint + plainNormal, closestPoint - plainNormal);
 
-	distance = SegSegDistance(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1, epsilon);
+	distance = SegSegDistance(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	EXPECT_NEAR(0.0, distance,epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,p0));
 	EXPECT_TRUE(eigenEqual(closestPoint,p1));
@@ -487,7 +494,7 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	// Parallel Segments
 	closestPoint = plainSegment.a;
 	otherSegment = Segment(plainSegment.a + plainNormal *4, plainSegment.b + plainNormal*4);
-	distance = SegSegDistance(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1, epsilon);
+	distance = SegSegDistance(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	EXPECT_NEAR(4.0, distance, epsilon);
 	// What should the points be here ? 
 	
@@ -661,8 +668,8 @@ TEST_F(GeometryTest, PointInsideTriangleWithoutNormal)
 	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
 }
 
-typedef std::tuple<Segment, Triangle, VectorType, bool> SegTriData;
-::testing::AssertionResult checkSegTriIntersection(const SegTriData& data)
+typedef std::tuple<Segment, Triangle, VectorType, bool> SegTriIntersectionData;
+::testing::AssertionResult checkSegTriIntersection(const SegTriIntersectionData& data)
 {
 	std::stringstream errorMessage;
 	Segment segment = std::get<0>(data);
@@ -704,65 +711,65 @@ TEST_F(GeometryTest, SegmentTriangleIntersection)
 	VectorType intersectionPoint = tri.pointInTriangle(0.2,0.7);
 	Segment intersecting(intersectionPoint - tri.n*2, intersectionPoint + tri.n*2);
 
-	SegTriData data;
+	SegTriIntersectionData data;
 
-	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting.a = intersectionPoint + tri.n*4;
-	data = SegTriData(intersecting, tri, intersectionPoint, false);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, false);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	// in the plane of the triangle
 	intersecting = Segment(intersectionPoint, intersectionPoint + tri.v0v1 + tri.v1v2);
-	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting = Segment(intersectionPoint + tri.v0v1 + tri.v1v2, intersectionPoint);
-	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting = Segment(intersectionPoint + tri.v0v1 + tri.v1v2, intersectionPoint + 2*tri.v0v1 + tri.v1v2);
-	data = SegTriData(intersecting, tri, intersectionPoint, false);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, false);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	// Slanting but intersecting
 	// Point On triangle
 	intersecting = Segment(intersectionPoint, intersectionPoint + tri.n*2 + tri.v0v1*2);
-	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	// Intersection in Triangle
 	intersecting = Segment(intersectionPoint - tri.n*2 - tri.v1v2*2, intersectionPoint + 2*tri.n + tri.v1v2*2);
-	data = SegTriData(intersecting, tri, intersectionPoint, true);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	// Intersection not on Segment
 	intersecting = Segment(intersectionPoint + tri.n*4 + tri.v1v2*4, intersectionPoint + 2*tri.n + tri.v1v2*2);
-	data = SegTriData(intersecting, tri, intersectionPoint, false);
+	data = SegTriIntersectionData(intersecting, tri, intersectionPoint, false);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	// Normal segment through one edge
 	VectorType pointOnEdge = tri.v0 + tri.v0v1*0.5;
 	intersecting = Segment(pointOnEdge + tri.n, pointOnEdge - tri.n);
-	data = SegTriData(intersecting, tri, pointOnEdge, true);
+	data = SegTriIntersectionData(intersecting, tri, pointOnEdge, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting = Segment(pointOnEdge + tri.n, pointOnEdge);
-	data = SegTriData(intersecting, tri, pointOnEdge, true);
+	data = SegTriIntersectionData(intersecting, tri, pointOnEdge, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting = Segment(pointOnEdge + tri.n*3, pointOnEdge + tri.n*4);
-	data = SegTriData(intersecting, tri, pointOnEdge, false);
+	data = SegTriIntersectionData(intersecting, tri, pointOnEdge, false);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	intersecting = Segment(pointOnEdge + tri.n +tri.v0v1*0.5, pointOnEdge);
-	data = SegTriData(intersecting, tri, pointOnEdge, true);
+	data = SegTriIntersectionData(intersecting, tri, pointOnEdge, true);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 
 	// Segment away from the triangle
 	intersecting = Segment(tri.v0 - tri.v0v1 - tri.v1v2, tri.v0 - tri.n*3.0 - tri.v0v1 - tri.v1v2);
-	data = SegTriData(intersecting, tri, pointOnEdge, false);
+	data = SegTriIntersectionData(intersecting, tri, pointOnEdge, false);
 	EXPECT_TRUE(checkSegTriIntersection(data));
 }
 
@@ -871,9 +878,7 @@ TEST_F(GeometryTest, TrianglePlaneTest)
 	EXPECT_TRUE(PointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2,triangle.n));
 	EXPECT_NEAR(0.0,PointPlaneDistance(intersectionPoint0,tri.n,d,&intersectionPoint1),epsilon);
 }
-// segmentSegmentDistance()
-// intersectPlanePlane()
-// Use another template 
+
 TEST_F(GeometryTest, PlanePlaneDistance)
 {
 	// Simple test against same
@@ -896,16 +901,168 @@ TEST_F(GeometryTest, PlanePlaneDistance)
 	VectorType output;
 	EXPECT_TRUE(result);
 	EXPECT_FALSE(eigenAllNan(point0));
-// 	EXPECT_NEAR(0.0,point0.dot(tri.n)-d1,epsilon);
-// 	EXPECT_NEAR(0.0,point0.dot(n2)-d2,epsilon);
-// 	EXPECT_NEAR(0.0,point1.dot(tri.n)-d1,epsilon);
-// 	EXPECT_NEAR(0.0,point1.dot(n2)-d2,epsilon);
-
-
 	EXPECT_NEAR(0, PointPlaneDistance(point0,tri.n, d1,&output), epsilon);
 	EXPECT_NEAR(0, PointPlaneDistance(point1,tri.n, d1,&output), epsilon);
 	EXPECT_FALSE(eigenAllNan(point1));
 	EXPECT_NEAR(0, PointPlaneDistance(point0,n2, d2,&output), epsilon);
 	EXPECT_NEAR(0, PointPlaneDistance(point1,n2, d2,&output), epsilon);
+}
+
+typedef std::tuple<Segment, Triangle, VectorType, VectorType, bool> SegTriDistanceData;
+void checkSegTriDistance(const SegTriDistanceData& data)
+{
+	std::stringstream errorMessage;
+	Segment segment = std::get<0>(data);
+	Triangle tri = std::get<1>(data);
+	VectorType expectedSegmentPoint = std::get<2>(data);
+	VectorType expectedTrianglePoint = std::get<3>(data);
+	bool hasResult = std::get<4>(data);
+	double expectedDistance = (expectedSegmentPoint - expectedTrianglePoint).norm();
+	double distance;
+	VectorType segmentPoint, trianglePoint;
+
+	distance = SegTriDistance(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
+	if (hasResult)
+	{
+		EXPECT_NEAR(expectedDistance, distance,epsilon);
+		EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
+		EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
+	}
+	else
+	{
+
+	}
+
+	// Repeat above with segment reversed
+	distance = SegTriDistance(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
+	if (hasResult)
+	{
+		EXPECT_NEAR(expectedDistance, distance,epsilon);
+		EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
+		EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
+	}
+	else
+	{
+
+	}
+}
+TEST_F(GeometryTest, SegmentTriangleDistance)
+{
+	Segment segment;
+	VectorType intersection;
+	{
+		SCOPED_TRACE("Segment endpoint equivalent to triangle point");
+		segment = Segment(tri.v0, tri.v1+tri.n*3);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v0, true));
+	}
+	{
+		SCOPED_TRACE("Segment endpoint inside triangle on triangle plane");
+		segment = Segment(tri.pointInTriangle(0.5,0.2), tri.pointInTriangle(2,2) + tri.n * 4);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, segment.a, true));
+	}
+	{
+		SCOPED_TRACE("Intersection inside triangle");
+		intersection = tri.pointInTriangle(0.5,0.2);
+		segment = Segment(intersection-tri.n * 4 - tri.v0v1, intersection + tri.n * 4 + tri.v0v1);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection, intersection, true));
+	}
+	{
+		SCOPED_TRACE("Segment endpoint on triangle edge");
+		segment = Segment(tri.pointInTriangle(0.0,0.2), tri.pointInTriangle(2,2) + tri.n * 4);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, segment.a, true));
+	}
+	{
+		SCOPED_TRACE("intersection on triangle edge");
+		intersection = tri.pointInTriangle(0,0.2);
+		segment = Segment(intersection - tri.n*3 - tri.v1v2 * .5, intersection + tri.n*3 + tri.v1v2 * .5);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection, intersection, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to point inside of triangle");
+		intersection = tri.pointInTriangle(0.5,0.2);
+		Segment seg(intersection, intersection + tri.n*2 + tri.v0v1*3);
+		segment = Segment(seg.a + tri.n*0.1, seg.b + tri.n*0.1);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to triangle point v0");
+		Segment seg(tri.v0, tri.v0 - tri.n * 2 - tri.v0v1 * 2);
+		segment = Segment(seg.a - tri.n*0.1, seg.b - tri.n*0.1);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v0, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to triangle point v1");
+		Segment seg(tri.v1, tri.v1 - tri.n * 2 - tri.v0v1 * 2);
+		segment = Segment(seg.a - tri.n*0.1, seg.b - tri.n*0.1);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v1, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to triangle point v2");
+		Segment seg(tri.v2, tri.v2 - tri.n * 2 - tri.v1v2 * 2);
+		segment = Segment(seg.a - tri.n*0.1, seg.b - tri.n*0.1);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v2, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to edge v0v1");
+		intersection = tri.v0 + tri.v0v1 * 0.2;
+		Segment seg(intersection, intersection + tri.n * 2 );
+		segment = Segment(seg.a + seg.ab*0.01, seg.b + seg.ab*0.01);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to edge v0v2");
+		intersection = tri.v0 + tri.v0v2 * 0.4;
+		Segment seg(intersection, intersection + tri.n * 2 );
+		segment = Segment(seg.a + seg.ab*0.01, seg.b + seg.ab*0.01);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a , intersection, true));
+	}
+	{
+		SCOPED_TRACE("segment endpoint is close to edge v1v2");
+		intersection = tri.v1 + tri.v1v2 * 0.2;
+		Segment seg(intersection, intersection + tri.n * 2 );
+		segment = Segment(seg.a + seg.ab*0.01, seg.b + seg.ab*0.01);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection, true));
+	}
+	{
+		SCOPED_TRACE("point on segment is close to triangle vertex v0");
+		segment = Segment(tri.v0 - tri.n*3, tri.v0 + tri.n*3);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v0, tri.v0, true));
+	}
+	{
+		SCOPED_TRACE("point on segment is close to triangle vertex v1");
+		segment = Segment(tri.v1 - tri.n*3, tri.v1 + tri.n*3);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v1, tri.v1, true));
+	}
+	{
+		SCOPED_TRACE("point on segment is close to triangle vertex v2");
+		segment = Segment(tri.v2 - tri.n*3, tri.v2 + tri.n*3);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v2, tri.v2, true));
+	}
+	{
+		SCOPED_TRACE("point on segment is close to edge v0v1");
+		intersection = tri.v0 + tri.v0v1 * 0.2;
+		Segment seg(intersection - tri.n*3, intersection + tri.n * 2 );
+		VectorType cross = tri.n.cross(tri.v0v1);
+		segment = Segment(seg.a - cross*0.01, seg.b-cross*0.01);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection-cross*0.01, intersection, true));
+	}
+	{
+		SCOPED_TRACE("point on segment is close to edge v0v2");
+		intersection = tri.v0 + tri.v0v2 * 0.2;
+		Segment seg(intersection - tri.n*3, intersection + tri.n * 2 );
+		VectorType cross = tri.n.cross(tri.v0v2);
+		segment = Segment(seg.a + cross*0.01, seg.b+cross*0.01);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection+cross*0.01, intersection, true));
+	}
+	{
+		SCOPED_TRACE("point on segment is close to edge v1v2");
+		intersection = tri.v1 + tri.v1v2 * 0.2;
+		Segment seg(intersection - tri.n*3, intersection + tri.n * 2 );
+		VectorType cross = tri.n.cross(tri.v1v2);
+		segment = Segment(seg.a - cross*0.01, seg.b-cross*0.01);
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection-cross*0.01, intersection, true));
+	}
+
+
 
 }

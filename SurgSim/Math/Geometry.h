@@ -34,6 +34,23 @@ namespace Math
 	const static double IntersectionEpsilon = 1e-10;
 	const static double ComparisonEpsilon = 1e-10;
 
+/// Sets all the elements in the vector to NAN, this indicates an invalid result.
+/// \param vector The vector to be invalidated.
+template <class T> inline
+void invalidateVector(Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* vector)
+{
+	(*vector) << (std::numeric_limits<double>::quiet_NaN()),
+				 (std::numeric_limits<double>::quiet_NaN()),
+				 (std::numeric_limits<double>::quiet_NaN());
+}
+
+template <class T> inline
+size_t minIndex(T x, T y, T z, T w, T v)
+{
+	return x <= y ?(x <= z ?(x <= w ? ((x <= v) ? 0 : 4) : (w <= v ? 3 : 4 )) :(z <= w ? (z <= v ? 2 : 4 ) : (w <= v ? 3 : 4 ))) : 
+		(y <= z ?(y <= w ? (y <= v ? 1 : 4 ) : (w <= v ? 3 : 4 )) :(z <= w ? (z <= v ? 2 : 4 ) : (w <= v ? 3 : 4 )));
+}
+
 /// Get the barycentric coordinates of a point with respect to a triangle
 /// \param pt Vertex of the point.
 /// \param tv0, tv1, tv2 Vertices of the triangle in counter clockwise order in respect to the normal.
@@ -53,9 +70,7 @@ bool BaryCentricCoordinates(const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& pt,
 	if (signedTriAreaX2 < DegenerateEpsilon)
 	{
 		// SQ_ASSERT_WARNING(false, "Cannot compute barycentric coords (degenetrate triangle), assigning center");
-		(*baryCoords) << (std::numeric_limits<double>::quiet_NaN()),
-						 (std::numeric_limits<double>::quiet_NaN()),
-						 (std::numeric_limits<double>::quiet_NaN());
+		invalidateVector(baryCoords);
 		return false;
 	}
 	(*baryCoords)[0] = ((tv1-pt).cross(tv2-pt)).dot(tn) / signedTriAreaX2;
@@ -223,8 +238,7 @@ T SegSegDistance(
 		const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& l1v0, 
 		const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& l1v1, 
 		Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt0,
-		Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt1, 
-		T epsilon)
+		Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt1)
 {
 	// Based on the outline of http://www.geometrictools.com/Distance.html, also refer to 
 	// http://geomalgorithms.com/a07-_distance.html for a geometric interpretation
@@ -234,7 +248,7 @@ T SegSegDistance(
 	// We are minimizing Q(s, t) = as*as + 2bst + ct*ct + 2ds + 2et + f,
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> l0v01 = l0v1-l0v0;
 	T a = l0v01.dot(l0v01);
-	if ( a <= epsilon )
+	if ( a <= DegenerateEpsilon )
 	{ 
 		// Degenerate segment 0
 		*pt0 = l0v0;
@@ -243,7 +257,7 @@ T SegSegDistance(
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> l1v01 = l1v1-l1v0;
 	T b = -l0v01.dot(l1v01);
 	T c = l1v01.dot(l1v01);
-	if ( c <= epsilon )
+	if ( c <= DegenerateEpsilon )
 	{ 
 		// Degenerate segment 1
 		*pt1 = l1v1;
@@ -257,7 +271,7 @@ T SegSegDistance(
 	int region = -1;
 	T tmp;
 	// Non-parallel case
-	if ( abs(ratio) >= epsilon )
+	if ( abs(ratio) >= DegenerateEpsilon )
 	{
 		// Get the region of the global minimum in the s-t space based on the line-line solution
 		//		s=0		s=1
@@ -717,7 +731,8 @@ bool PointInsideTriangle(
 
 
 /// Get the intersection of a line segment with a triangle, if the segment intersects this will return the 
-/// penetration depth on the intersection. 
+/// penetration depth on the intersection. See http://geomalgorithms.com/a06-_intersect-2.html#intersect_RayTriangle
+/// for the algorithm
 /// \param v0,v1 Extremities of the segment.
 /// \param tv0,tv1,tv2 The triangle vertices.
 /// \param [OUT] intersection The point where the triangle and the line segment intersect.
@@ -733,18 +748,18 @@ bool SegTriCollide(
 	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tn,
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* intersection)
 {
-	(*intersection) << (std::numeric_limits<double>::quiet_NaN()),
-		(std::numeric_limits<double>::quiet_NaN()),
-		(std::numeric_limits<double>::quiet_NaN());
-	// From http://geomalgorithms.com/a06-_intersect-2.html#intersect_RayTriangle
 	// Triangle edges vectors
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> u = tv1-tv0;
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> v = tv2-tv0;
+
 	// Ray direction vector
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> dir = v1-v0;
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> w0 = v0-tv0;
 	T a = -tn.dot(w0);
 	T b = tn.dot(dir);
+
+	invalidateVector(intersection);
+
 	// Ray is parallel to triangle plane
 	if ( fabs(b) <= IntersectionEpsilon )
 	{
@@ -901,15 +916,15 @@ T TriPlaneDistance(
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt0,
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt1)
 {	
-	*pt0 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
-	*pt1 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
-
 	T dist0 = n.dot(tv0)-d;
 	T dist1 = n.dot(tv1)-d;
 	T dist2 = n.dot(tv2)-d;
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t01 = tv1-tv0;
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t02 = tv2-tv0;
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> t12 = tv2-tv1;
+
+	invalidateVector(pt0);
+	invalidateVector(pt1);
 
 	// Coplanar case
 	if ( abs(n.dot(t01)) <= DegenerateEpsilon && abs(n.dot(t02)) <= DegenerateEpsilon)
@@ -974,12 +989,13 @@ template <class T> inline
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt0, 
 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt1)
 {
-	*pt0 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
-	*pt1 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
-
 	/// \note Real time collision detection - optimized version page 210 (with extra checks)
 	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign> lineDir = n0.cross(n1);
 	const T lineDirNorm2 = lineDir.squaredNorm();
+
+	invalidateVector(pt0);
+	invalidateVector(pt1);
+
 	// Test if the two planes are parallel
 	if ( lineDirNorm2 <= DegenerateEpsilon )
 	{
@@ -990,6 +1006,139 @@ template <class T> inline
 	*pt1 = *pt0 + lineDir;
 	return true;
 }
+
+
+/// Calculate the distance of a line segment to a triangle.
+/// Note that this version will calculate the normal of the triangle, 
+/// if the normal is know use the other version of this function.
+/// \param v0,v1 Extremities of the line segment.
+/// \param tv0, tv1, tv2 Triangle points.
+/// \param [OUT] segmentPoint Closest point on the segment.
+/// \param [OUT] trianglePoint Closest point on the triangle.
+/// \return the the distance between the two closest points
+template <class T> inline
+T SegTriDistance(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v0,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v1, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv0, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv1, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv2, 
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* segmentPoint, 
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* trianglePoint)
+{
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> n = (tv1 - tv0).cross(tv2 - tv1) ;
+	n.normalize();
+	return SegTriDistance(v0, v1, tv0, tv1, tv2, n, segmentPoint, trianglePoint, epsilon) ;
+}
+
+/// Calculate the distance of a line segment to a triangle.
+/// \param v0,v1 Extremities of the line segment.
+/// \param tv0, tv1, tv2 Points of the triangle.
+/// \param n Normal of the triangle (Expected to be normalized)
+/// \param [OUT] segmentPoint Closest point on the segment.
+/// \param [OUT] trianglePoint Closest point on the triangle.
+/// \return the distance between the two closest points
+template <class T> inline
+T SegTriDistance(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v0,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& v1, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv0,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv1,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& tv2, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& normal,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* segmentPoint,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* trianglePoint)
+{
+	invalidateVector(segmentPoint);
+	invalidateVector(trianglePoint);
+	// This a plane containing the triangle
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& n = normal ;
+	T d = -n.dot(tv0);
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> baryCoords;
+	// Degenerate case: Line and triangle plane parallel
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign> v01 = v1-v0;
+	const T v01DotTn = n.dot(v01);
+	if ( abs(v01DotTn) <= DegenerateEpsilon )
+	{
+		// Check if any of the points project onto the tri - otherwise normal (non-parallel) processing will get the right result
+		T dst = abs(PointPlaneDistance(v0, n, d, trianglePoint));
+		Eigen::Matrix<T, 3, 1, Eigen::DontAlign> baryCoords;
+		BaryCentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
+		if ( baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0 )
+		{
+			*segmentPoint = v0;
+			return dst;
+		}
+		dst = abs(PointPlaneDistance(v1, n, d, trianglePoint));
+		BaryCentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
+		if ( baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0 )
+		{
+			*segmentPoint = v1;
+			return dst;
+		}
+	}
+	// Line and triangle plane *not* parallel: check cut through case only, the rest will be check later
+	else
+	{
+		T lambda = -n.dot(v0-tv0) / v01DotTn;
+		if ( lambda >= 0 && lambda <= 1 )
+		{
+			*segmentPoint = *trianglePoint = v0 + lambda * v01;
+			BaryCentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
+			if ( baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0 )
+			{
+				// Segment goes through the triangle
+				return 0;
+			}
+		}
+	}
+	// At this point the segment is nearest point to one of the triangle edges or one of the end points
+ 	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> segColPt01, segColPt02, segColPt12, triColPt01, triColPt02, triColPt12;
+	T dst01 = SegSegDistance(v0, v1, tv0, tv1, &segColPt01, &triColPt01);
+	T dst02 = SegSegDistance(v0, v1, tv0, tv2, &segColPt02, &triColPt02);
+	T dst12 = SegSegDistance(v0, v1, tv1, tv2, &segColPt12, &triColPt12);
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> ptTriCol0, ptTriCol1; 
+	T dstPtTri0 = abs(PointPlaneDistance(v0, n, d, &ptTriCol0));
+	BaryCentricCoordinates(ptTriCol0, tv0, tv1, tv2, normal, &baryCoords);
+	if ( baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0 )
+	{
+		dstPtTri0 = std::numeric_limits<T>::max();
+	}
+	T dstPtTri1 = abs(PointPlaneDistance(v1, n, d, &ptTriCol1));
+	BaryCentricCoordinates(ptTriCol1, tv0, tv1, tv2, normal, &baryCoords);
+	if ( baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0 )
+	{
+		dstPtTri1 = std::numeric_limits<T>::max();
+	}
+	switch ( minIndex(dst01, dst02, dst12, dstPtTri0, dstPtTri1) )
+	{
+	case 0:
+		*segmentPoint = segColPt01;
+		*trianglePoint = triColPt01;
+		return dst01;
+	case 1:
+		*segmentPoint = segColPt02;
+		*trianglePoint = triColPt02;
+		return dst02;
+	case 2:
+		*segmentPoint = segColPt12;
+		*trianglePoint = triColPt12;
+		return dst12;
+	case 3:
+		*segmentPoint = v0;
+		*trianglePoint = ptTriCol0;
+		return dstPtTri0;
+	case 4:
+		*segmentPoint = v1;
+		*trianglePoint = ptTriCol1;
+		return dstPtTri1;
+	}
+
+	// Invalid ...
+	return std::numeric_limits<T>::quiet_NaN();
+
+}
+
 
 }; // namespace Math
 }; // namespace SurgSim
