@@ -21,6 +21,9 @@ include_directories(
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
+	Mesh.cpp
+	MeshVertex.cpp
+	MeshVertexData.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
@@ -28,6 +31,13 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup-inl.h
 	DataGroupBuilder.h
 	IndexDirectory.h
+	Mesh.h
+	MeshElement.h
+	MeshElementData.h
+	MeshElementData-inl.h
+	MeshElement-inl.h
+	MeshVertex.h
+	MeshVertexData.h
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
@@ -47,5 +57,3 @@ install(TARGETS SurgSimDataStructures
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
-
-add_subdirectory(Meshes)
