@@ -17,6 +17,8 @@
 
 #include <SurgSim/Framework/Assert.h>
 
+#include <typeinfo>
+
 using SurgSim::DataStructures::Mesh;
 using SurgSim::Math::Vector3d;
 
