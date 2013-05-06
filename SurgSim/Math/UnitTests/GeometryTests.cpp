@@ -870,5 +870,42 @@ TEST_F(GeometryTest, TrianglePlaneTest)
 	EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
 	EXPECT_TRUE(PointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2,triangle.n));
 	EXPECT_NEAR(0.0,PointPlaneDistance(intersectionPoint0,tri.n,d,&intersectionPoint1),epsilon);
+}
+// segmentSegmentDistance()
+// intersectPlanePlane()
+// Use another template 
+TEST_F(GeometryTest, PlanePlaneDistance)
+{
+	// Simple test against same
+	double d1 = -tri.n.dot(tri.v0);
+	VectorType point0, point1;
+
+	bool result = IntersectPlanePlane(tri.n, d1, tri.n, d1, &point0, &point1);
+	EXPECT_FALSE(result);
+	EXPECT_TRUE(eigenAllNan(point0));
+	EXPECT_TRUE(eigenAllNan(point1));
+	result = IntersectPlanePlane(tri.n, -2.0, tri.n, 8.8, &point0, &point1);
+	EXPECT_FALSE(result);
+	EXPECT_TRUE(eigenAllNan(point0));
+	EXPECT_TRUE(eigenAllNan(point1));
+
+	VectorType n2 = VectorType(5,6,7);
+	n2.normalize();
+	double d2 = -2;
+	result = IntersectPlanePlane(tri.n, d1, n2, d2, &point0, &point1);
+	VectorType output;
+	EXPECT_TRUE(result);
+	EXPECT_FALSE(eigenAllNan(point0));
+// 	EXPECT_NEAR(0.0,point0.dot(tri.n)-d1,epsilon);
+// 	EXPECT_NEAR(0.0,point0.dot(n2)-d2,epsilon);
+// 	EXPECT_NEAR(0.0,point1.dot(tri.n)-d1,epsilon);
+// 	EXPECT_NEAR(0.0,point1.dot(n2)-d2,epsilon);
+
+
+	EXPECT_NEAR(0, PointPlaneDistance(point0,tri.n, d1,&output), epsilon);
+	EXPECT_NEAR(0, PointPlaneDistance(point1,tri.n, d1,&output), epsilon);
+	EXPECT_FALSE(eigenAllNan(point1));
+	EXPECT_NEAR(0, PointPlaneDistance(point0,n2, d2,&output), epsilon);
+	EXPECT_NEAR(0, PointPlaneDistance(point1,n2, d2,&output), epsilon);
 
 }

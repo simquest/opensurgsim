@@ -962,6 +962,35 @@ T TriPlaneDistance(
 	return dist2;
 }
 
+/// Intersection of two planes
+/// \param n1,d1 Normal and constant of the first plane.
+/// \param n2,d2 Normal and constant of the second plane
+/// \param [out] p0,p1 Two points on the intersection line, not valid if there is no intersection
+/// \return true when a unique line exists, false for disjoint or coinciding
+template <class T> inline
+	bool IntersectPlanePlane(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& n0, T d0, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& n1, T d1,
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt0, 
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* pt1)
+{
+	*pt0 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
+	*pt1 << std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN(),std::numeric_limits<double>::quiet_NaN();
+
+	/// \note Real time collision detection - optimized version page 210 (with extra checks)
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign> lineDir = n0.cross(n1);
+	const T lineDirNorm2 = lineDir.squaredNorm();
+	// Test if the two planes are parallel
+	if ( lineDirNorm2 <= DegenerateEpsilon )
+	{
+		return false; // planes disjoint
+	}
+	// Compute common point
+	*pt0 = (d1*n0-d0*n1).cross(lineDir) / lineDirNorm2;	
+	*pt1 = *pt0 + lineDir;
+	return true;
+}
+
 }; // namespace Math
 }; // namespace SurgSim
 
