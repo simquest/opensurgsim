@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -28,6 +29,7 @@ set(UNIT_TEST_HEADERS
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
 	MatrixTests.cpp
 	QuaternionTests.cpp
+	RigidTransformTests.cpp
 	VectorTests.cpp
 )
 

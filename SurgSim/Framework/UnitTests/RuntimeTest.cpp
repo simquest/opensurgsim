@@ -17,13 +17,15 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include "MockObjects.h"
+#include "MockObjects.h"  //NOLINT
 
-using namespace SurgSim::Framework;
+using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Scene;
+using SurgSim::Framework::Logger;
 
 TEST(RuntimeTest, Constructor)
 {
-	EXPECT_NO_THROW( {std::shared_ptr<Runtime> runtime(new Runtime());});
+	EXPECT_NO_THROW({std::shared_ptr<Runtime> runtime(new Runtime());});
 
 	Runtime runtime;
 	ASSERT_ANY_THROW(runtime.getSharedPtr());
@@ -36,31 +38,31 @@ TEST(RuntimeTest, SetScene)
 	EXPECT_NO_THROW(runtime->setScene(scene));
 }
 
-TEST(RuntimeTest, AddWorker)
+TEST(RuntimeTest, AddManager)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<MockThread> thread(new MockThread());
+	std::shared_ptr<MockManager> manager(new MockManager());
 
-	runtime->addWorkerThread(thread);
+	runtime->addManager(manager);
 
 	EXPECT_TRUE(runtime->start());
 
-	EXPECT_TRUE(thread->isInitialized());
+	EXPECT_TRUE(manager->isInitialized());
 
 
 	EXPECT_TRUE(runtime->stop());
 
-	EXPECT_FALSE(thread->isRunning());
+	EXPECT_FALSE(manager->isRunning());
 }
 
 TEST(RuntimeTest, InitFailureDeathTest)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<MockThread> threadSucceeds(new MockThread());
-	std::shared_ptr<MockThread> threadFails(new MockThread(false,true));
+	std::shared_ptr<MockManager> managerSucceeds(new MockManager());
+	std::shared_ptr<MockManager> managerFails(new MockManager(false,true));
 
-	runtime->addWorkerThread(threadSucceeds);
-	runtime->addWorkerThread(threadFails);
+	runtime->addManager(managerSucceeds);
+	runtime->addManager(managerFails);
 
 	ASSERT_DEATH(runtime->start(), "");
 }
@@ -68,11 +70,11 @@ TEST(RuntimeTest, InitFailureDeathTest)
 TEST(RuntimeTest, StartupFailureDeathTest)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<MockThread> threadSucceeds(new MockThread());
-	std::shared_ptr<MockThread> threadFails(new MockThread(true,false));
+	std::shared_ptr<MockManager> managerSucceeds(new MockManager());
+	std::shared_ptr<MockManager> managerFails(new MockManager(true,false));
 
-	runtime->addWorkerThread(threadSucceeds);
-	runtime->addWorkerThread(threadFails);
+	runtime->addManager(managerSucceeds);
+	runtime->addManager(managerFails);
 
 	ASSERT_DEATH(runtime->start(), "");
 }
@@ -87,7 +89,6 @@ TEST(RuntimeTest, LoggerManagement)
 
 	std::shared_ptr<Logger> oldLogger = runtime->getLogger("TestLogger");
 	EXPECT_EQ(oldLogger, newLogger);
-
 }
 
 TEST(RuntimeTest, SceneInitialisation)
@@ -122,7 +123,7 @@ TEST(RuntimeTest, SceneInitialisation)
 		EXPECT_TRUE(elements[i]->didWakeUp);
 	}
 
-	for (int i=0; i<4;i++)
+	for (int i=0; i<4; i++)
 	{
 		EXPECT_TRUE(components[i]->didInit);
 		EXPECT_TRUE(components[i]->didWakeUp);

@@ -37,7 +37,9 @@ class NamedDataBuilder
 {
 public:
 	/// Constructs an empty builder object.
-	NamedDataBuilder() {};
+	NamedDataBuilder()
+	{
+	}
 
 	/// Produces a \ref NamedData object with an immutable set of names and indices.
 	/// None of the values will contain any current data.

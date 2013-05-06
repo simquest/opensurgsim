@@ -34,7 +34,9 @@ class OutputProducerInterface
 {
 public:
 	/// Virtual destructor (empty).
-	virtual ~OutputProducerInterface() {};
+	virtual ~OutputProducerInterface()
+	{
+	}
 
 	/// Asks the producer to provide output state to the device.
 	///

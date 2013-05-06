@@ -16,11 +16,11 @@
 #ifndef SURGSIM_FRAMEWORK_SCENE_H
 #define SURGSIM_FRAMEWORK_SCENE_H
 
+#include <map>
 #include <memory>
 #include <string>
 
-#include "BasicThread.h"
-#include "SceneElement.h"
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {
@@ -33,8 +33,13 @@ class Runtime;
 class Scene
 {
 public:
-	Scene() {};
-	~Scene() {};
+	Scene()
+	{
+	}
+
+	~Scene()
+	{
+	}
 
 	/// Adds a scene element to 'element'.
 	/// \param	element	The element.

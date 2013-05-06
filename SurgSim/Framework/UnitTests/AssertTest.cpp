@@ -24,8 +24,13 @@
 class MockOutput : public SurgSim::Framework::LogOutput
 {
 public:
-	MockOutput() {};
-	~MockOutput() {};
+	MockOutput()
+	{
+	}
+
+	~MockOutput()
+	{
+	}
 
 	bool writeMessage(const std::string& message)
 	{

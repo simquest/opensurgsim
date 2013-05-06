@@ -139,7 +139,6 @@ TEST(ApplicationDataTest, GetPathsTest)
 
 TEST (ApplicationDataTest, FindFileTest)
 {
-
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
 	std::vector<std::string> paths;
