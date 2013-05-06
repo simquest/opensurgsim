@@ -46,11 +46,11 @@ public:
 		{
 			printf("Test Positions:\n");
 		}
-		
+
 		/// Generate random positions for each vertex
 		for (unsigned int i = 0; i < numVertices; ++i)
 		{
-			Vector3d position(positionDistribution(generator), positionDistribution(generator), 
+			Vector3d position(positionDistribution(generator), positionDistribution(generator),
 				positionDistribution(generator));
 			testPositions.push_back(position);
 
@@ -73,7 +73,6 @@ public:
 				printf("\t%d: (%g, %g, %g)\n", i, normal.x(), normal.y(), normal.z());
 			}
 		}
-		
 
 	}
 
@@ -136,7 +135,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 
 	EXPECT_EQ(1, mesh.getNumUpdates());
 	EXPECT_EQ(testPositions.size(), mesh.getNumVertices());
-	
+
 	const std::vector<MeshVertex>& vertices = mesh.getVertices();
 	EXPECT_EQ(testPositions.size(), vertices.size());
 

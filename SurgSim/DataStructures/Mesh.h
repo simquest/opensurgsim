@@ -63,7 +63,7 @@ public:
 
 	/// Returns the number of vertices in this mesh.
 	unsigned int getNumVertices() const
-	{ 
+	{
 		return m_vertices.size();
 	}
 

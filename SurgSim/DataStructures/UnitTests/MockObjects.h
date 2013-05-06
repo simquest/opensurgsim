@@ -31,8 +31,8 @@ public:
 	/// Constructor
 	/// \param	id	Unique ID of the vertex in its mesh
 	/// \param	normal	Surface normal of the vertex
-	MockVertexData(unsigned int id, const SurgSim::Math::Vector3d& normal) : MeshVertexData(), 
-		m_id(id), 
+	MockVertexData(unsigned int id, const SurgSim::Math::Vector3d& normal) : MeshVertexData(),
+		m_id(id),
 		m_normal(normal)
 	{
 	}
@@ -75,7 +75,7 @@ class MockEdgeData : public SurgSim::DataStructures::MeshElementData<2>
 public:
 	/// Constructor
 	/// \param	id	Unique ID of the edge in its mesh
-	MockEdgeData(unsigned int id) : MeshElementData<2>(),
+	explicit MockEdgeData(unsigned int id) : MeshElementData<2>(),
 		m_id(id)
 	{
 	}
@@ -186,7 +186,7 @@ public:
 	}
 
 private:
-	/// Provides update funcionality, which just increments the number of updates
+	/// Provides update functionality, which just increments the number of updates
 	virtual void doUpdate()
 	{
 		++m_numUpdates;
@@ -196,4 +196,4 @@ private:
 	int m_numUpdates;
 };
 
-#endif SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
+#endif  // SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H

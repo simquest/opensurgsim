@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "MeshVertex.h"
+#include "SurgSim/DataStructures/MeshVertex.h"
 
 using SurgSim::DataStructures::MeshVertex;
 using SurgSim::DataStructures::MeshVertexData;
 using SurgSim::Math::Vector3d;
 
 
-MeshVertex::MeshVertex(const SurgSim::Math::Vector3d& position, std::shared_ptr<MeshVertexData> data) : 
-position(position), 
+MeshVertex::MeshVertex(const SurgSim::Math::Vector3d& position, std::shared_ptr<MeshVertexData> data) :
+position(position),
 data(data)
 {
 }

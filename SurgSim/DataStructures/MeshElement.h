@@ -67,6 +67,6 @@ struct MeshElement
 
 };  // namespace SurgSim
 
-#include "MeshElement-inl.h"
+#include "SurgSim/DataStructures/MeshElement-inl.h"
 
 #endif  // SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_DATA_H

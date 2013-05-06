@@ -55,6 +55,6 @@ private:
 
 };  // namespace SurgSim
 
-#include "MeshElementData-inl.h"
+#include "SurgSim/DataStructures/MeshElementData-inl.h"
 
 #endif  // SURGSIM_DATA_STRUCTURES_MESH_VERTEX_DATA_H
