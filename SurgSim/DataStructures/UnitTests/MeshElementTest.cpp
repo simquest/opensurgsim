@@ -19,9 +19,9 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/Meshes/MeshElement.h"
-#include "SurgSim/DataStructures/Meshes/MeshElementData.h"
-#include "SurgSim/DataStructures/Meshes/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/MeshElement.h"
+#include "SurgSim/DataStructures/MeshElementData.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_H
 #define SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_H
 
-#include <SurgSim/DataStructures/Meshes/MeshElementData.h>
+#include <SurgSim/DataStructures/MeshElementData.h>
 
 #include <array>
 #include <memory>

@@ -16,9 +16,9 @@
 #ifndef SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
 #define SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
 
-#include "SurgSim/DataStructures/Meshes/Mesh.h"
-#include "SurgSim/DataStructures/Meshes/MeshElementData.h"
-#include "SurgSim/DataStructures/Meshes/MeshVertexData.h"
+#include "SurgSim/DataStructures/Mesh.h"
+#include "SurgSim/DataStructures/MeshElementData.h"
+#include "SurgSim/DataStructures/MeshVertexData.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <array>

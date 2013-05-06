@@ -19,7 +19,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/Meshes/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
 #include <random>
 
