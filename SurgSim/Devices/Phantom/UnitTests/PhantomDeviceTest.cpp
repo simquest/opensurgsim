@@ -158,8 +158,8 @@ TEST(PhantomDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 700);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 1300);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasCurrentData("pose"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button0"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button0"));
 }
 
 TEST(PhantomDeviceTest, OutputProducer)
