@@ -20,12 +20,10 @@ include_directories(
 
 set(SURGSIM_MATH_SOURCES
 	Geometry.cpp
-	Intersections.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
-	Intersections.h
 	Matrix.h
 	Quaternion.h
 	RigidTransform.h
