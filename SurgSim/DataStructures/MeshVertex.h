@@ -26,7 +26,16 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// Vertex structure for meshes. Vertices have a position and some extra data.
+/// Vertex structure for meshes. Vertices are the lowest level of structure in a Mesh, providing a position and can
+/// store extra per-vertex data. MeshElements combine MeshVertices to form the structure of the mesh.
+///
+/// MeshVertex is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics FEM's nodes are not subclasses of MeshVertex if they provide code that is part of the FEM
+/// algorithm, but they may used with a Mesh to store the structure of the FEM.
+///
+/// The extra Data is left up to the particular use of Mesh to specify. For example, for use collision detection,
+/// a vertex may need a normal and adjacent triangle information, which could be stored in a struct.
+///
 /// \tparam	Data	Type of extra data stored in the vertex
 /// \sa	Mesh
 template <class Data>

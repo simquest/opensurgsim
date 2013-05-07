@@ -25,7 +25,16 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// Element structure for meshes. Elements link vertices in the mesh and store some extra data.
+/// Element structure for meshes. MeshElements combine MeshVertices to form the structure of a Mesh and can store extra
+/// per-element data.
+///
+/// MeshElement is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics FEM's elements are not subclasses of MeshElement if they provide code that is part of the FEM
+/// algorithm, but they may used with a Mesh to store the structure of the FEM.
+///
+/// The extra Data is left up to the particular use of Mesh to specify. For example, for use collision detection,
+/// a vertex may need a normal and adjacent triangle information, which could be stored in a struct.
+///
 /// \tparam	N	Number of vertices in the element
 /// \tparam	Data	Type of extra data stored in the element
 /// \sa	Mesh
