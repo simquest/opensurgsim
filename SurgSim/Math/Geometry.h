@@ -1140,6 +1140,79 @@ T SegTriDistance(
 }
 
 
+/// Distance between two triangles
+/// \param t0v0,t0v1,t0v2 Points of the first triangle.
+/// \param t1v0,t1v1,t1v2 Points of the second triangle.
+/// \param [out] closestPoint0 Closest point on the first triangle, unless penetrating, 
+/// 			 in which case it is the point along the edge that allows min separation
+/// \param [out] closestPoint1 Closest point on the second triangle, unless penetrating, 
+/// 			 in which case it is the point along the edge that allows min separation
+/// \return the distance between the two triangles
+template <class T> inline
+T TriangleTriangleDistance(
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& t0v0, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& t0v1, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& t0v2, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& t1v0, 
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& t1v1,
+	const Eigen::Matrix<T, 3, 1, Eigen::DontAlign>& t1v2, 
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* closestPoint0, 
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign>* closestPoint1)
+{
+	// Check the segments of t0 against t1
+	T minDst = std::numeric_limits<T>::max();
+	T currDst = 0;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> segPt, triPt;
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> n0 = (t0v1-t0v0).cross(t0v2-t0v1);
+	n0.normalize();
+	Eigen::Matrix<T, 3, 1, Eigen::DontAlign> n1 = (t1v1-t1v0).cross(t1v2-t1v1);
+	n1.normalize();
+	currDst = SegTriDistance(t0v0, t0v1, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
+	if ( currDst < minDst )
+	{
+		minDst = currDst;
+		*closestPoint0 = segPt;
+		*closestPoint1 = triPt;
+	}
+	currDst = SegTriDistance(t0v1, t0v2, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
+	if ( currDst < minDst )
+	{
+		minDst = currDst;
+		*closestPoint0 = segPt;
+		*closestPoint1 = triPt;
+	}
+	currDst = SegTriDistance(t0v2, t0v0, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
+	if ( currDst < minDst )
+	{
+		minDst = currDst;
+		*closestPoint0 = segPt;
+		*closestPoint1 = triPt;
+	}
+	// Check the segments of t1 against t0
+	currDst = SegTriDistance(t1v0, t1v1, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
+	if ( currDst < minDst )
+	{
+		minDst = currDst;
+		*closestPoint1 = segPt;
+		*closestPoint0 = triPt;
+	}
+	currDst = SegTriDistance(t1v1, t1v2, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
+	if ( currDst < minDst )
+	{
+		minDst = currDst;
+		*closestPoint1 = segPt;
+		*closestPoint0 = triPt;
+	}
+	currDst = SegTriDistance(t1v2, t1v0, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
+	if ( currDst < minDst )
+	{
+		minDst = currDst;
+		*closestPoint1 = segPt;
+		*closestPoint0 = triPt;
+	}
+	return (minDst);
+}
+
 }; // namespace Math
 }; // namespace SurgSim
 

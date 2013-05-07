@@ -908,7 +908,7 @@ TEST_F(GeometryTest, PlanePlaneDistance)
 	EXPECT_NEAR(0, PointPlaneDistance(point1,n2, d2,&output), epsilon);
 }
 
-typedef std::tuple<Segment, Triangle, VectorType, VectorType, bool> SegTriDistanceData;
+typedef std::tuple<Segment, Triangle, VectorType, VectorType> SegTriDistanceData;
 void checkSegTriDistance(const SegTriDistanceData& data)
 {
 	std::stringstream errorMessage;
@@ -916,35 +916,21 @@ void checkSegTriDistance(const SegTriDistanceData& data)
 	Triangle tri = std::get<1>(data);
 	VectorType expectedSegmentPoint = std::get<2>(data);
 	VectorType expectedTrianglePoint = std::get<3>(data);
-	bool hasResult = std::get<4>(data);
 	double expectedDistance = (expectedSegmentPoint - expectedTrianglePoint).norm();
 	double distance;
 	VectorType segmentPoint, trianglePoint;
 
 	distance = SegTriDistance(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
-	if (hasResult)
-	{
-		EXPECT_NEAR(expectedDistance, distance,epsilon);
-		EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
-		EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
-	}
-	else
-	{
+	EXPECT_NEAR(expectedDistance, distance,epsilon);
+	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
+	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
 
-	}
 
 	// Repeat above with segment reversed
 	distance = SegTriDistance(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
-	if (hasResult)
-	{
-		EXPECT_NEAR(expectedDistance, distance,epsilon);
-		EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
-		EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
-	}
-	else
-	{
-
-	}
+	EXPECT_NEAR(expectedDistance, distance,epsilon);
+	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
+	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
 }
 TEST_F(GeometryTest, SegmentTriangleDistance)
 {
@@ -953,90 +939,90 @@ TEST_F(GeometryTest, SegmentTriangleDistance)
 	{
 		SCOPED_TRACE("Segment endpoint equivalent to triangle point");
 		segment = Segment(tri.v0, tri.v1+tri.n*3);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v0, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v0));
 	}
 	{
 		SCOPED_TRACE("Segment endpoint inside triangle on triangle plane");
 		segment = Segment(tri.pointInTriangle(0.5,0.2), tri.pointInTriangle(2,2) + tri.n * 4);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, segment.a, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, segment.a));
 	}
 	{
 		SCOPED_TRACE("Intersection inside triangle");
 		intersection = tri.pointInTriangle(0.5,0.2);
 		segment = Segment(intersection-tri.n * 4 - tri.v0v1, intersection + tri.n * 4 + tri.v0v1);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection, intersection));
 	}
 	{
 		SCOPED_TRACE("Segment endpoint on triangle edge");
 		segment = Segment(tri.pointInTriangle(0.0,0.2), tri.pointInTriangle(2,2) + tri.n * 4);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, segment.a, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, segment.a));
 	}
 	{
 		SCOPED_TRACE("intersection on triangle edge");
 		intersection = tri.pointInTriangle(0,0.2);
 		segment = Segment(intersection - tri.n*3 - tri.v1v2 * .5, intersection + tri.n*3 + tri.v1v2 * .5);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection, intersection));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to point inside of triangle");
 		intersection = tri.pointInTriangle(0.5,0.2);
 		Segment seg(intersection, intersection + tri.n*2 + tri.v0v1*3);
 		segment = Segment(seg.a + tri.n*0.1, seg.b + tri.n*0.1);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to triangle point v0");
 		Segment seg(tri.v0, tri.v0 - tri.n * 2 - tri.v0v1 * 2);
 		segment = Segment(seg.a - tri.n*0.1, seg.b - tri.n*0.1);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v0, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v0));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to triangle point v1");
 		Segment seg(tri.v1, tri.v1 - tri.n * 2 - tri.v0v1 * 2);
 		segment = Segment(seg.a - tri.n*0.1, seg.b - tri.n*0.1);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v1, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v1));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to triangle point v2");
 		Segment seg(tri.v2, tri.v2 - tri.n * 2 - tri.v1v2 * 2);
 		segment = Segment(seg.a - tri.n*0.1, seg.b - tri.n*0.1);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v2, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, tri.v2));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to edge v0v1");
 		intersection = tri.v0 + tri.v0v1 * 0.2;
 		Segment seg(intersection, intersection + tri.n * 2 );
 		segment = Segment(seg.a + seg.ab*0.01, seg.b + seg.ab*0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to edge v0v2");
 		intersection = tri.v0 + tri.v0v2 * 0.4;
 		Segment seg(intersection, intersection + tri.n * 2 );
 		segment = Segment(seg.a + seg.ab*0.01, seg.b + seg.ab*0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a , intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a , intersection));
 	}
 	{
 		SCOPED_TRACE("segment endpoint is close to edge v1v2");
 		intersection = tri.v1 + tri.v1v2 * 0.2;
 		Segment seg(intersection, intersection + tri.n * 2 );
 		segment = Segment(seg.a + seg.ab*0.01, seg.b + seg.ab*0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, segment.a, intersection));
 	}
 	{
 		SCOPED_TRACE("point on segment is close to triangle vertex v0");
 		segment = Segment(tri.v0 - tri.n*3, tri.v0 + tri.n*3);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v0, tri.v0, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v0, tri.v0));
 	}
 	{
 		SCOPED_TRACE("point on segment is close to triangle vertex v1");
 		segment = Segment(tri.v1 - tri.n*3, tri.v1 + tri.n*3);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v1, tri.v1, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v1, tri.v1));
 	}
 	{
 		SCOPED_TRACE("point on segment is close to triangle vertex v2");
 		segment = Segment(tri.v2 - tri.n*3, tri.v2 + tri.n*3);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v2, tri.v2, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, tri.v2, tri.v2));
 	}
 	{
 		SCOPED_TRACE("point on segment is close to edge v0v1");
@@ -1044,7 +1030,7 @@ TEST_F(GeometryTest, SegmentTriangleDistance)
 		Segment seg(intersection - tri.n*3, intersection + tri.n * 2 );
 		VectorType cross = tri.n.cross(tri.v0v1);
 		segment = Segment(seg.a - cross*0.01, seg.b-cross*0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection-cross*0.01, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection-cross*0.01, intersection));
 	}
 	{
 		SCOPED_TRACE("point on segment is close to edge v0v2");
@@ -1052,7 +1038,7 @@ TEST_F(GeometryTest, SegmentTriangleDistance)
 		Segment seg(intersection - tri.n*3, intersection + tri.n * 2 );
 		VectorType cross = tri.n.cross(tri.v0v2);
 		segment = Segment(seg.a + cross*0.01, seg.b+cross*0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection+cross*0.01, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection+cross*0.01, intersection));
 	}
 	{
 		SCOPED_TRACE("point on segment is close to edge v1v2");
@@ -1060,9 +1046,101 @@ TEST_F(GeometryTest, SegmentTriangleDistance)
 		Segment seg(intersection - tri.n*3, intersection + tri.n * 2 );
 		VectorType cross = tri.n.cross(tri.v1v2);
 		segment = Segment(seg.a - cross*0.01, seg.b-cross*0.01);
-		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection-cross*0.01, intersection, true));
+		checkSegTriDistance(SegTriDistanceData(segment, tri, intersection-cross*0.01, intersection));
+	}
+}
+
+typedef std::tuple<Triangle, Triangle, VectorType, VectorType> TriTriDistanceData;
+void checkTriTriDistance(const TriTriDistanceData& data)
+{
+	Triangle t0 = std::get<0>(data);
+	Triangle t1 = std::get<1>(data);
+	VectorType expectedT0Point = std::get<2>(data);
+	VectorType expectedT1Point = std::get<3>(data);
+	double expectedDistance = (expectedT1Point - expectedT0Point).norm();
+	double distance;
+	VectorType t0Point, t1Point;
+
+	{
+		SCOPED_TRACE("Normal Test");
+		distance = TriangleTriangleDistance(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
+		EXPECT_NEAR(expectedDistance, distance,epsilon);
+		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
+		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
+	}
+
+// 	{
+// 		SCOPED_TRACE("Reversed Triangles");
+// 		distance = TriangleTriangleDistance(t1.v0, t1.v1, t1.v2, t0.v0, t0.v1, t0.v2, &t1Point, &t0Point);
+// 		EXPECT_NEAR(expectedDistance, distance,epsilon);
+// 		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
+// 		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
+// 	}
+
+	{
+		SCOPED_TRACE("Shift t0 edges once");
+		distance = TriangleTriangleDistance(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
+		EXPECT_NEAR(expectedDistance, distance,epsilon);
+		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
+		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
 	}
 
 
+	{
+		SCOPED_TRACE("Shift t0 edges twice"); 
+		distance = TriangleTriangleDistance(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
+		EXPECT_NEAR(expectedDistance, distance,epsilon);
+		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
+		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
+	}
+}
 
+TEST_F(GeometryTest, TriangleTriangleDistance)
+{
+	Triangle t0(VectorType(5,0,0), VectorType(0,2,2), VectorType(0,-2,-2));
+	Triangle t1;
+	{
+		SCOPED_TRACE("vertex t1v0 equal to t0v0");
+		t1 = Triangle(t0.v0, t0.v1 + t0.n*2, t0.v2 + t0.n*2);
+		checkTriTriDistance(TriTriDistanceData(t1, t0, t0.v0, t0.v0));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 inside of triangle t0");
+		VectorType intersection = t0.pointInTriangle(0.2,0.2);
+		t1 = Triangle(intersection, t0.v1 + t0.n*2, t0.v2 + t0.n*2);
+		checkTriTriDistance(TriTriDistanceData(t1, t0, t1.v0, intersection));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 close to t0v0");
+		t1 = Triangle(t0.v0 + t0.n, t0.v1 + t0.n*2, t0.v2 + t0.n*2);
+		checkTriTriDistance(TriTriDistanceData(t1, t0, t1.v0, t0.v0));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 close to the inside of triangle t0");
+		VectorType intersection = t0.pointInTriangle(0.2,0.2);
+		t1 = Triangle(intersection + t0.n , t0.v1 + t0.n*2, t0.v2 + t0.n*2);
+		checkTriTriDistance(TriTriDistanceData(t1, t0, t1.v0, intersection));
+	}
+	{
+		SCOPED_TRACE("edge t1v0v1 through triangle t0");
+		VectorType intersection = t0.pointInTriangle(0.2,0.2);
+		t1 = Triangle(intersection + t0.n* 3, t0.v0 - t0.v0v2*4 + t0.n, intersection - t0.n*4);
+		checkTriTriDistance(TriTriDistanceData(t1, t0, intersection, intersection));
+	}
+	{
+		SCOPED_TRACE("Triangles parallel");
+		t1 = Triangle(t0.v0 + tri.n * 3, t0.v1 + tri.n * 3, t0.v2 + tri.n * 3);
+		VectorType closest0, closest1;
+		double distance = TriangleTriangleDistance(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2, &closest0, &closest1);
+		EXPECT_NEAR(3.0, distance, epsilon);
+	}
+	{
+		SCOPED_TRACE("edge t0v0v1 close to t1v0v1");
+		VectorType closest0 = t0.v0 + t0.v0v1 * 0.2;
+		VectorType shift = t0.n.cross(t0.v0v1.normalized());
+		shift.normalize();
+		VectorType closest1 = closest0 - shift * 2;
+		t1 = Triangle(closest1 - tri.n * 2, closest1 + tri.n * 2, closest1 + tri.n - shift* 10);
+		checkTriTriDistance(TriTriDistanceData(t1, t0, closest1, closest0));
+	}
 }
