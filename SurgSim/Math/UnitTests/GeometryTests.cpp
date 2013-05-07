@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the Intersections.cpp functions.
- */
+/// \file
+/// Tests for the Geometry.cpp functions.
+///
 
 /// \todo rename all the functions to a consistant naming scheme
 /// \todo pass the alignment as a separate template parameter
@@ -168,43 +168,43 @@ TEST_F(GeometryTest, BaryCentricWithNormal)
 	// Order of Points is v0,v1,v2
 	//Check Edges first
 	VectorType outputPoint;
-	EXPECT_TRUE(BaryCentricCoordinates(tri.v0, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(tri.v0, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(1,0,0),outputPoint));
 
-	EXPECT_TRUE(BaryCentricCoordinates(tri.v1, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(tri.v1, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0,1,0),outputPoint));
 
-	EXPECT_TRUE(BaryCentricCoordinates(tri.v2, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(tri.v2, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0,0,1),outputPoint));
 
 	// Halfway points
-	EXPECT_TRUE(BaryCentricCoordinates<double>(tri.pointInTriangle(0.5,0), 
+	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0.5,0), 
 		tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.5,0),outputPoint));
 
-	EXPECT_TRUE(BaryCentricCoordinates<double>(tri.pointInTriangle(0,0.5), 
+	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0,0.5), 
 		tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.0,0.5),outputPoint));
 
 	// Center Point
 	VectorType inputPoint;
 	inputPoint = (tri.v0 + tri.v1 + tri.v2) / 3;
-	EXPECT_TRUE(BaryCentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(1.0/3.0,1.0/3.0,1.0/3.0),outputPoint));
 
 	// random Point
 	inputPoint = tri.v0*0.2 + tri.v1*0.25 + tri.v2*0.55;
-	EXPECT_TRUE(BaryCentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.2,0.25,0.55),outputPoint));
 
 	// Degenerate
-	EXPECT_FALSE(BaryCentricCoordinates(inputPoint, tri.v1,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v1,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 
-	EXPECT_FALSE(BaryCentricCoordinates(inputPoint, tri.v0,tri.v0,tri.v2,tri.n,&outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v0,tri.v0,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 
-	EXPECT_FALSE(BaryCentricCoordinates(inputPoint, tri.v2,tri.v1,tri.v2,tri.n,&outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v2,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 }
 
@@ -213,43 +213,43 @@ TEST_F(GeometryTest, BaryCentricWithoutNormal)
 	// Order of Points is v0,v1,v2
 	//Check Edges first
 	VectorType outputPoint;
-	EXPECT_TRUE(BaryCentricCoordinates(tri.v0, tri.v0,tri.v1,tri.v2, &outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(tri.v0, tri.v0,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(1,0,0),outputPoint));
 
-	EXPECT_TRUE(BaryCentricCoordinates(tri.v1, tri.v0,tri.v1,tri.v2, &outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(tri.v1, tri.v0,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0,1,0),outputPoint));
 
-	EXPECT_TRUE(BaryCentricCoordinates(tri.v2, tri.v0,tri.v1,tri.v2, &outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(tri.v2, tri.v0,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0,0,1),outputPoint));
 
 	// Halfway points
-	EXPECT_TRUE(BaryCentricCoordinates<double>(tri.pointInTriangle(0.5,0), 
+	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0.5,0),
 		tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.5,0),outputPoint));
 
-	EXPECT_TRUE(BaryCentricCoordinates<double>(tri.pointInTriangle(0,0.5), 
+	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0,0.5),
 		tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.0,0.5),outputPoint));
 
 	// Center Point
 	VectorType inputPoint;
 	inputPoint = (tri.v0 + tri.v1 + tri.v2) / 3;
-	EXPECT_TRUE(BaryCentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2, &outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(1.0/3.0,1.0/3.0,1.0/3.0),outputPoint));
 
 	// random Point
 	inputPoint = tri.v0*0.2 + tri.v1*0.25 + tri.v2*0.55;
-	EXPECT_TRUE(BaryCentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2, &outputPoint));
+	EXPECT_TRUE(barycentricCoordinates(inputPoint, tri.v0,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.2,0.25,0.55),outputPoint));
 
 	// Degenerate
-	EXPECT_FALSE(BaryCentricCoordinates(inputPoint, tri.v1,tri.v1,tri.v2, &outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v1,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 
-	EXPECT_FALSE(BaryCentricCoordinates(inputPoint, tri.v0,tri.v0,tri.v2, &outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v0,tri.v0,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 
-	EXPECT_FALSE(BaryCentricCoordinates(inputPoint, tri.v2,tri.v1,tri.v2, &outputPoint));
+	EXPECT_FALSE(barycentricCoordinates(inputPoint, tri.v2,tri.v1,tri.v2, &outputPoint));
 	EXPECT_TRUE(eigenAllNan(outputPoint));
 }
 
@@ -259,19 +259,19 @@ TEST_F(GeometryTest, DistancePointLine)
 	Vector3d result;
 
 	// Trivial point lies on the line
-	distance = PointLineDistance<SizeType>(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &result);
+	distance = distancePointLine<SizeType>(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ(0.0,distance);
 	EXPECT_EQ(plainSegment.pointOnLine(0.5),result);
 
 	// Point is away from the line
 	Vector3d offLinePoint = plainSegment.a + (plainNormal * 1.5);
-	distance = PointLineDistance(offLinePoint, plainSegment.a, plainSegment.b, &result);
+	distance = distancePointLine(offLinePoint, plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ(1.5, distance);
 	EXPECT_EQ(plainSegment.a, result);
 
 	// Degenerate line, just do plain distance
 	offLinePoint = plainSegment.a + plainNormal * 1.5;
-	distance = PointLineDistance(offLinePoint, plainSegment.a, plainSegment.a, &result);
+	distance = distancePointLine(offLinePoint, plainSegment.a, plainSegment.a, &result);
 	EXPECT_DOUBLE_EQ(1.5, distance);
 	EXPECT_EQ(plainSegment.a, result);
 }
@@ -282,32 +282,32 @@ TEST_F(GeometryTest, DistancePointSegment)
 	Vector3d result;
 
 	// Trivial point lies on the line
-	distance = PointSegDistance(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &result);
+	distance = distancePointSegment(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ(0.0,distance);
 	EXPECT_EQ(plainSegment.pointOnLine(0.5),result);
 
 	// Point On the line but outside the segment
 	VectorType point = plainSegment.pointOnLine(1.5);
-	distance = PointSegDistance(point, plainSegment.a, plainSegment.b, &result);
+	distance = distancePointSegment(point, plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ((plainSegment.ab.norm()*0.5),distance);
 	EXPECT_TRUE(eigenEqual(plainSegment.b,result));
 
 	// Point projection is on the segment
 	VectorType resultPoint = plainSegment.a + plainSegment.ab * 0.25;
 	VectorType offLinePoint = resultPoint + (plainNormal * 1.5);
-	distance = PointSegDistance(offLinePoint, plainSegment.a, plainSegment.b, &result);
+	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ(1.5, distance);
 	EXPECT_TRUE(eigenEqual(resultPoint, result));
 
-	// Point projection is away from the segment, distance is to the closest segment point 
+	// Point projection is away from the segment, distance is to the closest segment point
 	resultPoint = plainSegment.a;
 	offLinePoint = plainSegment.a - plainSegment.ab + (plainNormal * 1.5);
-	distance = PointSegDistance(offLinePoint, plainSegment.a, plainSegment.b, &result);
+	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ((offLinePoint - resultPoint).norm(), distance);
 	EXPECT_TRUE(eigenEqual(resultPoint, result));
 
 	// Degenerated Segment
-	distance = PointSegDistance(offLinePoint, plainSegment.a, plainSegment.a, &result);
+	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.a, &result);
 	EXPECT_DOUBLE_EQ((offLinePoint - plainSegment.a).norm(), distance);
 	EXPECT_TRUE(eigenEqual(plainSegment.a, result));
 }
@@ -318,16 +318,16 @@ TEST_F(GeometryTest, DistanceLineLine)
 	VectorType p0, p1;
 
 	// Trivial the same line compared against itself
-	distance = LineLineDistance(plainSegment.a, plainSegment.b, plainSegment.a, plainSegment.b, &p0, &p1);
+	distance = distanceLineLine(plainSegment.a, plainSegment.b, plainSegment.a, plainSegment.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(0.0, distance);
 
 	// Parallel Line
 	Segment parallel = Segment(plainSegment.a + plainNormal*2, plainSegment.b + plainNormal*2);
-	distance = LineLineDistance(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
+	distance = distanceLineLine(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(2.0, distance);
 
 	// Intersecting Line
-	distance = LineLineDistance(plainLine.a, plainLine.b, intersectingLine.a, intersectingLine.b, &p0, &p1);
+	distance = distanceLineLine(plainLine.a, plainLine.b, intersectingLine.a, intersectingLine.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(0.0, distance);
 	EXPECT_TRUE(eigenEqual(plainLine.b, p0));
 	EXPECT_TRUE(eigenEqual(plainLine.b, p1));
@@ -336,30 +336,30 @@ TEST_F(GeometryTest, DistanceLineLine)
 	Segment line0(VectorType(0,-5,0), VectorType(0,5,0));
 	Segment line1(VectorType(-5,5,5), VectorType(5,5,5));
 
-	distance = LineLineDistance(line0.a, line0.b, line1.a, line1.b, &p0, &p1);
+	distance = distanceLineLine(line0.a, line0.b, line1.a, line1.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(5, distance);
 	EXPECT_TRUE(eigenEqual(VectorType(0,5,0), p0));
 	EXPECT_TRUE(eigenEqual(VectorType(0,5,5), p1));
 
 	// Degenerate Cases
 	// Both Lines Degenerate
-	distance = LineLineDistance(plainSegment.a, plainSegment.a, plainSegment.b, plainSegment.b, &p0, &p1);
+	distance = distanceLineLine(plainSegment.a, plainSegment.a, plainSegment.b, plainSegment.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(plainSegment.ab.norm(),distance);
 	EXPECT_TRUE(eigenEqual(plainSegment.a,p0));
 	EXPECT_TRUE(eigenEqual(plainSegment.b,p1));
 
 	// First Line Denegenerate
 	VectorType offLinePoint = plainSegment.a + plainSegment.ab*0.5 + plainNormal * 1.5;
-	distance = LineLineDistance(offLinePoint, offLinePoint, plainSegment.a, plainSegment.b, &p0, &p1);
+	distance = distanceLineLine(offLinePoint, offLinePoint, plainSegment.a, plainSegment.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(1.5,distance);
 	EXPECT_TRUE(eigenEqual(offLinePoint,p0));
 	EXPECT_TRUE(eigenEqual(plainSegment.a + plainSegment.ab*0.5, p1));
 
 	// Second Line Degenerate
-	distance = LineLineDistance(plainSegment.a, plainSegment.b, offLinePoint, offLinePoint, &p0, &p1);
+	distance = distanceLineLine(plainSegment.a, plainSegment.b, offLinePoint, offLinePoint, &p0, &p1);
 	EXPECT_DOUBLE_EQ(1.5,distance);
 	EXPECT_TRUE(eigenEqual(offLinePoint,p1));
-	EXPECT_TRUE(eigenEqual(plainSegment.a + plainSegment.ab*0.5, p0));	
+	EXPECT_TRUE(eigenEqual(plainSegment.a + plainSegment.ab*0.5, p0));
 }
 
 
@@ -369,9 +369,9 @@ struct SegmentData {
 	Segment segment1;
 	VectorType p0;
 	VectorType p1;
-	SegmentData () {};
+	SegmentData () {}
 	SegmentData (Segment seg0, Segment seg1, VectorType vec0, VectorType vec1) :
-		segment0(seg0), segment1(seg1), p0(vec0), p1(vec1) {};
+		segment0(seg0), segment1(seg1), p0(vec0), p1(vec1) {}
 };
 
 
@@ -384,12 +384,12 @@ void testSegmentDistance(const SegmentData& segmentData, std::string info, int i
 	// reported as being the closes ones
 	SizeType expectedDistance = (segmentData.p1 - segmentData.p0).norm();
 
-	distance = SegSegDistance(segmentData.segment0.a, segmentData.segment0.b, segmentData.segment1.a, segmentData.segment1.b, &p0, &p1);
+	distance = distanceSegmentSegment(segmentData.segment0.a, segmentData.segment0.b, segmentData.segment1.a, segmentData.segment1.b, &p0, &p1);
 	EXPECT_NEAR(expectedDistance, distance, 1e-8) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p0, p0)) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p1, p1)) << "for " << info << " at index " << i;
 
-	distance = SegSegDistance(segmentData.segment1.a, segmentData.segment1.b, segmentData.segment0.a, segmentData.segment0.b, &p0, &p1);
+	distance = distanceSegmentSegment(segmentData.segment1.a, segmentData.segment1.b, segmentData.segment0.a, segmentData.segment0.b, &p0, &p1);
 	EXPECT_NEAR(expectedDistance, distance,1e-8) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p1, p0)) << "for " << info << " at index " << i;
 	EXPECT_TRUE(eigenEqual(segmentData.p0, p1)) << "for " << info << " at index " << i;
@@ -407,7 +407,7 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	VectorType closestPoint = plainSegment.pointOnLine(0.5); 
 	Segment otherSegment(closestPoint + plainNormal, closestPoint - plainNormal);
 
-	distance = SegSegDistance(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
+	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	EXPECT_NEAR(0.0, distance,epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,p0));
 	EXPECT_TRUE(eigenEqual(closestPoint,p1));
@@ -494,7 +494,7 @@ TEST_F(GeometryTest, DistanceSegmentSegment)
 	// Parallel Segments
 	closestPoint = plainSegment.a;
 	otherSegment = Segment(plainSegment.a + plainNormal *4, plainSegment.b + plainNormal*4);
-	distance = SegSegDistance(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
+	distance = distanceSegmentSegment(plainSegment.a, plainSegment.b, otherSegment.a, otherSegment.b, &p0, &p1);
 	EXPECT_NEAR(4.0, distance, epsilon);
 	// What should the points be here ? 
 	
@@ -544,24 +544,24 @@ TEST_F(GeometryTest, DistancePointTriangle)
 
 	// Trivial, point on triangle
 	inputPoint = VectorType(0,0,0);
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
 	EXPECT_NEAR(0.0, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(inputPoint,result));
 
-	distance = PointTriDistance(tri.v1,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(tri.v1,tri.v0,tri.v1,tri.v2,&result);
 	EXPECT_NEAR(0.0, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(tri.v1,result));
 
 	// Closest Point is inside Triangle
 	closestPoint = tri.v0 + tri.v0v1*0.3 + tri.v0v2*0.7;
 	inputPoint = closestPoint + tri.n * 2.5;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
 	EXPECT_NEAR(2.5, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 
 	// other side
 	inputPoint = closestPoint - tri.n * 3.5;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
 	EXPECT_NEAR(3.5, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 
@@ -569,103 +569,103 @@ TEST_F(GeometryTest, DistancePointTriangle)
 	// Point closest to edge v0v1
 	double expectedDistance;
 	inputPoint = tri.v0 +  tri.v0v1*0.5 - tri.v0v2 + tri.n;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
-	expectedDistance = PointSegDistance(inputPoint, tri.v0,tri.v1, &closestPoint);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	expectedDistance = distancePointSegment(inputPoint, tri.v0,tri.v1, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 
 	// Point closest to edge v0v2
 	inputPoint = tri.v0 + tri.v0v2*0.3 - tri.v0v1 +tri.n*2;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
-	expectedDistance = PointSegDistance(inputPoint, tri.v0,tri.v2, &closestPoint);	
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	expectedDistance = distancePointSegment(inputPoint, tri.v0,tri.v2, &closestPoint);	
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 
 	// Point closest to edge v1v2
 	inputPoint = tri.v1 + (tri.v2-tri.v1)*.75 + tri.v0v1*0.2 + tri.n;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
-	expectedDistance = PointSegDistance(inputPoint, tri.v1,tri.v2, &closestPoint);	
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	expectedDistance = distancePointSegment(inputPoint, tri.v1,tri.v2, &closestPoint);	
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 
 	// Point closest to point v0
 	inputPoint = tri.v0 - tri.v0v1 - tri.v0v2*0.5 - tri.n;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
 	expectedDistance = (tri.v0 - inputPoint).norm();	
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(tri.v0,result));
 
 	// Point closest to point v1
 	inputPoint = tri.v1 + tri.v0v1 + (tri.v1 - tri.v2) * 2.0 - tri.n*2.0;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
 	expectedDistance = (tri.v1 - inputPoint).norm();	
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(tri.v1,result));
 
 	// Point closest to point v2
 	inputPoint = tri.v2 + tri.v0v2 + (tri.v2 - tri.v1) * 3.0 - tri.n*1.5;
-	distance = PointTriDistance(inputPoint,tri.v0,tri.v1,tri.v2,&result);
+	distance = distancePointTriangle(inputPoint,tri.v0,tri.v1,tri.v2,&result);
 	expectedDistance = (tri.v2 - inputPoint).norm();	
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(tri.v2,result));
 
 	// Degenerate Edges
 	// Edge v0v1
-	distance = PointTriDistance<double>(inputPoint, tri.v0, tri.v0 + tri.v0v1*epsilon*0.01,tri.v2, &result);
-	expectedDistance = PointSegDistance(inputPoint,tri.v0,tri.v2, &closestPoint);
+	distance = distancePointTriangle<double, Eigen::DontAlign>(inputPoint, tri.v0, tri.v0 + tri.v0v1*epsilon*0.01,tri.v2, &result);
+	expectedDistance = distancePointSegment(inputPoint,tri.v0,tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 
 	// Edge v0v2
-	distance = PointTriDistance<double>(inputPoint, tri.v2 - tri.v0v2*epsilon*0.01 , tri.v1 ,tri.v2, &result);
-	expectedDistance = PointSegDistance(inputPoint,tri.v1,tri.v2, &closestPoint);
+	distance = distancePointTriangle<double, Eigen::DontAlign>(inputPoint, tri.v2 - tri.v0v2*epsilon*0.01 , tri.v1 ,tri.v2, &result);
+	expectedDistance = distancePointSegment(inputPoint,tri.v1,tri.v2, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
-	
+
 	// Edge v1v2
-	distance = PointTriDistance(inputPoint, tri.v0, tri.v1 ,tri.v1, &result);
-	expectedDistance = PointSegDistance(inputPoint,tri.v1,tri.v0, &closestPoint);
+	distance = distancePointTriangle(inputPoint, tri.v0, tri.v1 ,tri.v1, &result);
+	expectedDistance = distancePointSegment(inputPoint,tri.v1,tri.v0, &closestPoint);
 	EXPECT_NEAR(expectedDistance, distance, epsilon);
 	EXPECT_TRUE(eigenEqual(closestPoint,result));
 }
 
 TEST_F(GeometryTest, PointInsideTriangleWithNormal)
 {
-	EXPECT_TRUE(PointInsideTriangle(tri.v0, tri.v0,tri.v1,tri.v2,tri.n));
-	EXPECT_TRUE(PointInsideTriangle(tri.v1, tri.v0,tri.v1,tri.v2,tri.n));
-	EXPECT_TRUE(PointInsideTriangle(tri.v2, tri.v0,tri.v1,tri.v2,tri.n));
+	EXPECT_TRUE(isPointInsideTriangle(tri.v0, tri.v0,tri.v1,tri.v2,tri.n));
+	EXPECT_TRUE(isPointInsideTriangle(tri.v1, tri.v0,tri.v1,tri.v2,tri.n));
+	EXPECT_TRUE(isPointInsideTriangle(tri.v2, tri.v0,tri.v1,tri.v2,tri.n));
 
-	VectorType inputPoint = tri.v0 + tri.v0v1*0.2 ;
-	EXPECT_TRUE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
+	VectorType inputPoint = tri.v0 + tri.v0v1*0.2;
+	EXPECT_TRUE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
 	inputPoint += tri.v0v2*0.5;
-	EXPECT_TRUE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
-	
+	EXPECT_TRUE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
+
 	inputPoint = tri.v0 + tri.v0v1*1.5;
-	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
-	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v1,tri.v1,tri.v2,tri.n));
+	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
+	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v1,tri.v1,tri.v2,tri.n));
 
 	inputPoint = tri.v0 + tri.v0v2*2 + tri.v0v1 * 2;
-	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
+	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2,tri.n));
 
 }
 
 TEST_F(GeometryTest, PointInsideTriangleWithoutNormal)
 {
-	EXPECT_TRUE(PointInsideTriangle(tri.v0, tri.v0,tri.v1,tri.v2));
-	EXPECT_TRUE(PointInsideTriangle(tri.v1, tri.v0,tri.v1,tri.v2));
-	EXPECT_TRUE(PointInsideTriangle(tri.v2, tri.v0,tri.v1,tri.v2));
+	EXPECT_TRUE(isPointInsideTriangle(tri.v0, tri.v0,tri.v1,tri.v2));
+	EXPECT_TRUE(isPointInsideTriangle(tri.v1, tri.v0,tri.v1,tri.v2));
+	EXPECT_TRUE(isPointInsideTriangle(tri.v2, tri.v0,tri.v1,tri.v2));
 
-	VectorType inputPoint = tri.v0 + tri.v0v1*0.2 ;
-	EXPECT_TRUE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
+	VectorType inputPoint = tri.v0 + tri.v0v1*0.2;
+	EXPECT_TRUE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
 	inputPoint += tri.v0v2*0.5;
-	EXPECT_TRUE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
+	EXPECT_TRUE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
 
 	inputPoint = tri.v0 + tri.v0v1*1.5;
-	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
-	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v1,tri.v1,tri.v2));
+	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
+	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v1,tri.v1,tri.v2));
 
 	inputPoint = tri.v0 + tri.v0v2*2 + tri.v0v1 * 2;
-	EXPECT_FALSE(PointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
+	EXPECT_FALSE(isPointInsideTriangle(inputPoint, tri.v0,tri.v1,tri.v2));
 }
 
 typedef std::tuple<Segment, Triangle, VectorType, bool> SegTriIntersectionData;
@@ -678,8 +678,8 @@ typedef std::tuple<Segment, Triangle, VectorType, bool> SegTriIntersectionData;
 	bool expectedResult = std::get<3>(data);
 	VectorType closestPoint;
 
-	bool result = SegTriCollide(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&closestPoint);
-	if (result != expectedResult) 
+	bool result = doesCollideSegmentTriangle(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&closestPoint);
+	if (result != expectedResult)
 	{
 		errorMessage << "Intersection result does not match should be: " << expectedResult << " but got " << result << std::endl;
 	};
@@ -773,24 +773,24 @@ TEST_F(GeometryTest, SegmentTriangleIntersection)
 	EXPECT_TRUE(checkSegTriIntersection(data));
 }
 
-TEST_F(GeometryTest, PointPlaneDistance)
+TEST_F(GeometryTest, distancePointPlane)
 {
 
 	VectorType pointInTriangle = tri.v0 + tri.v0v1*.5;
 	double d = tri.n.dot(tri.v0);
 	VectorType point = pointInTriangle;
 	VectorType projectionPoint;
-	double distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
+	double distance = distancePointPlane(point, tri.n, d, &projectionPoint);
 	EXPECT_NEAR(0.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 
 	point = pointInTriangle + tri.n*2;
-	distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
+	distance = distancePointPlane(point, tri.n, d, &projectionPoint);
 	EXPECT_NEAR(2.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 
 	point = pointInTriangle - tri.n*2;
-	distance = PointPlaneDistance(point, tri.n, d, &projectionPoint);
+	distance = distancePointPlane(point, tri.n, d, &projectionPoint);
 	EXPECT_NEAR(-2.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 }
@@ -806,20 +806,20 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 	double distance;
 
 	// Segment intersects plane
-	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
 	EXPECT_NEAR(0.0, distance, epsilon);
 	EXPECT_TRUE(intersectionPoint.isApprox(segResultPoint));
 	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
 
 	// Segment above plane, segment intersection should be point a
 	seg = Segment(intersectionPoint + tri.n * 2, intersectionPoint + tri.n * 3);
-	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
 	EXPECT_NEAR(2.0, distance, epsilon);
 	EXPECT_TRUE(seg.a.isApprox(segResultPoint));
 	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
 
 	seg = Segment(intersectionPoint - tri.n * 3, intersectionPoint - tri.n * 2);
-	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
 	EXPECT_NEAR(2.0, distance, epsilon);
 	EXPECT_TRUE(seg.b.isApprox(segResultPoint));
 	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
@@ -827,14 +827,14 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 	// Segment parallel to the plane
 	// coplanar with plane
 	seg = Segment(intersectionPoint - tri.v0v1, intersectionPoint + tri.v0v1);
-	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
 	EXPECT_NEAR(0.0, distance, epsilon);
 	EXPECT_TRUE(segResultPoint.isApprox(seg.pointOnLine(0.5)));
 	EXPECT_TRUE(planeResultPoint.isApprox(seg.pointOnLine(0.5)));
 
 	// moved away from plane, but still parallel
 	seg = Segment(intersectionPoint - tri.v0v1 + tri.n*2.0, intersectionPoint + tri.v0v1 + tri.n*2.0);
-	distance = SegPlaneDistance(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
 	EXPECT_NEAR(2.0, distance, epsilon);
 	EXPECT_TRUE(segResultPoint.isApprox(seg.pointOnLine(0.5)));
 	EXPECT_TRUE(planeResultPoint.isApprox(intersectionPoint));
@@ -842,21 +842,21 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 
 TEST_F(GeometryTest, TrianglePlaneTest)
 {
-	// Start with the coplanar case 
+	// Start with the coplanar case
 	double d = tri.n.dot(tri.v0);
 	double distance;
 	VectorType intersectionPoint0;
 	VectorType intersectionPoint1;
 
 	VectorType third = (tri.v0 + tri.v1 + tri.v2) / 3.0;
-	distance = TriPlaneDistance(tri.v0, tri.v1, tri.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	distance = distanceTrianglePlane(tri.v0, tri.v1, tri.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(0.0,distance, epsilon);
 	EXPECT_TRUE(third.isApprox(intersectionPoint0));
 	EXPECT_TRUE(third.isApprox(intersectionPoint1));
 
 	// Not intersecting
 	Triangle triangle (tri.v0 + tri.n*2, tri.v1 + tri.n*3, tri.v2+tri.n*3);
-	distance = TriPlaneDistance(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(2.0,distance, epsilon);
 	EXPECT_TRUE(triangle.v0.isApprox(intersectionPoint0));
 	EXPECT_TRUE(tri.v0.isApprox(intersectionPoint1));
@@ -865,18 +865,18 @@ TEST_F(GeometryTest, TrianglePlaneTest)
 	// On the triangle
 	// Need to change the order of points for this to work ... strange ...
 	triangle = Triangle(tri.v0 + tri.n*3, tri.v2 + tri.n*3, tri.v1 );
-	distance = TriPlaneDistance(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(0.0,distance, epsilon);
 	EXPECT_TRUE(triangle.v2.isApprox(intersectionPoint0));
 	EXPECT_TRUE(triangle.v2.isApprox(intersectionPoint1));
 
 	// inside ...
 	triangle = Triangle(tri.v0 - tri.n*2, tri.v1*3 + tri.n, tri.v2*3 + tri.n);
-	distance = TriPlaneDistance(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(0.0,distance, epsilon);
 	EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
-	EXPECT_TRUE(PointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2,triangle.n));
-	EXPECT_NEAR(0.0,PointPlaneDistance(intersectionPoint0,tri.n,d,&intersectionPoint1),epsilon);
+	EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2,triangle.n));
+	EXPECT_NEAR(0.0,distancePointPlane(intersectionPoint0,tri.n,d,&intersectionPoint1),epsilon);
 }
 
 TEST_F(GeometryTest, PlanePlaneDistance)
@@ -885,11 +885,11 @@ TEST_F(GeometryTest, PlanePlaneDistance)
 	double d1 = -tri.n.dot(tri.v0);
 	VectorType point0, point1;
 
-	bool result = IntersectPlanePlane(tri.n, d1, tri.n, d1, &point0, &point1);
+	bool result = doesIntersectPlanePlane(tri.n, d1, tri.n, d1, &point0, &point1);
 	EXPECT_FALSE(result);
 	EXPECT_TRUE(eigenAllNan(point0));
 	EXPECT_TRUE(eigenAllNan(point1));
-	result = IntersectPlanePlane(tri.n, -2.0, tri.n, 8.8, &point0, &point1);
+	result = doesIntersectPlanePlane(tri.n, -2.0, tri.n, 8.8, &point0, &point1);
 	EXPECT_FALSE(result);
 	EXPECT_TRUE(eigenAllNan(point0));
 	EXPECT_TRUE(eigenAllNan(point1));
@@ -897,15 +897,15 @@ TEST_F(GeometryTest, PlanePlaneDistance)
 	VectorType n2 = VectorType(5,6,7);
 	n2.normalize();
 	double d2 = -2;
-	result = IntersectPlanePlane(tri.n, d1, n2, d2, &point0, &point1);
+	result = doesIntersectPlanePlane(tri.n, d1, n2, d2, &point0, &point1);
 	VectorType output;
 	EXPECT_TRUE(result);
 	EXPECT_FALSE(eigenAllNan(point0));
-	EXPECT_NEAR(0, PointPlaneDistance(point0,tri.n, d1,&output), epsilon);
-	EXPECT_NEAR(0, PointPlaneDistance(point1,tri.n, d1,&output), epsilon);
+	EXPECT_NEAR(0, distancePointPlane(point0,tri.n, d1,&output), epsilon);
+	EXPECT_NEAR(0, distancePointPlane(point1,tri.n, d1,&output), epsilon);
 	EXPECT_FALSE(eigenAllNan(point1));
-	EXPECT_NEAR(0, PointPlaneDistance(point0,n2, d2,&output), epsilon);
-	EXPECT_NEAR(0, PointPlaneDistance(point1,n2, d2,&output), epsilon);
+	EXPECT_NEAR(0, distancePointPlane(point0,n2, d2,&output), epsilon);
+	EXPECT_NEAR(0, distancePointPlane(point1,n2, d2,&output), epsilon);
 }
 
 typedef std::tuple<Segment, Triangle, VectorType, VectorType> SegTriDistanceData;
@@ -920,14 +920,14 @@ void checkSegTriDistance(const SegTriDistanceData& data)
 	double distance;
 	VectorType segmentPoint, trianglePoint;
 
-	distance = SegTriDistance(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
+	distance = distanceTriangleSegment(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
 	EXPECT_NEAR(expectedDistance, distance,epsilon);
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
 
 
 	// Repeat above with segment reversed
-	distance = SegTriDistance(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
+	distance = distanceTriangleSegment(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
 	EXPECT_NEAR(expectedDistance, distance,epsilon);
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
@@ -1063,7 +1063,7 @@ void checkTriTriDistance(const TriTriDistanceData& data)
 
 	{
 		SCOPED_TRACE("Normal Test");
-		distance = TriangleTriangleDistance(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
+		distance = distanceTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
 		EXPECT_NEAR(expectedDistance, distance,epsilon);
 		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
 		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
@@ -1079,7 +1079,7 @@ void checkTriTriDistance(const TriTriDistanceData& data)
 
 	{
 		SCOPED_TRACE("Shift t0 edges once");
-		distance = TriangleTriangleDistance(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
+		distance = distanceTriangleTriangle(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
 		EXPECT_NEAR(expectedDistance, distance,epsilon);
 		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
 		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
@@ -1087,15 +1087,15 @@ void checkTriTriDistance(const TriTriDistanceData& data)
 
 
 	{
-		SCOPED_TRACE("Shift t0 edges twice"); 
-		distance = TriangleTriangleDistance(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
+		SCOPED_TRACE("Shift t0 edges twice");
+		distance = distanceTriangleTriangle(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2, &t0Point, &t1Point);
 		EXPECT_NEAR(expectedDistance, distance,epsilon);
 		EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
 		EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
 	}
 }
 
-TEST_F(GeometryTest, TriangleTriangleDistance)
+TEST_F(GeometryTest, distanceTriangleTriangle)
 {
 	Triangle t0(VectorType(5,0,0), VectorType(0,2,2), VectorType(0,-2,-2));
 	Triangle t1;
@@ -1131,7 +1131,7 @@ TEST_F(GeometryTest, TriangleTriangleDistance)
 		SCOPED_TRACE("Triangles parallel");
 		t1 = Triangle(t0.v0 + tri.n * 3, t0.v1 + tri.n * 3, t0.v2 + tri.n * 3);
 		VectorType closest0, closest1;
-		double distance = TriangleTriangleDistance(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2, &closest0, &closest1);
+		double distance = distanceTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2, &closest0, &closest1);
 		EXPECT_NEAR(3.0, distance, epsilon);
 	}
 	{
