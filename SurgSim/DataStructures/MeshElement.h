@@ -16,8 +16,6 @@
 #ifndef SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_H
 #define SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_H
 
-#include <SurgSim/DataStructures/MeshElementData.h>
-
 #include <array>
 #include <memory>
 
@@ -27,37 +25,34 @@ namespace SurgSim
 namespace DataStructures
 {
 
-template <unsigned int N>
-class MeshElementData;
-
-/// Edge structure for meshes.
+/// Element structure for meshes. Elements link vertices in the mesh and store some extra data.
+/// \tparam	N	Number of vertices in the element
+/// \tparam	Data	Type of extra data stored in the element
 /// \sa	Mesh
-template <unsigned int N>
+template <unsigned int N, class Data>
 struct MeshElement
 {
 	/// Constructor. Data is set to nullptr.
 	/// \param	vertices	IDs of the N element vertices
-	/// \param	data	Extra element data (default is null)
-	MeshElement(const std::array<unsigned int, N> vertices, std::shared_ptr<MeshElementData<N>> data = nullptr);
+	MeshElement(const std::array<unsigned int, N> vertices, Data data) :
+		vertices(vertices),
+		data(data)
+	{
+	}
 
 	/// Element vertices.
 	std::array<unsigned int, N> vertices;
 	/// Extra element data.
-	std::shared_ptr<MeshElementData<N>> data;
+	Data data;
 
 	/// Compare the elements and return true if equal, false if not equal.
-	friend bool operator==(const MeshElement<N>& element1, const MeshElement<N>& element2)
+	friend bool operator==(const MeshElement<N, Data>& element1, const MeshElement<N, Data>& element2)
 	{
-		bool isDataEqual = (element1.data == nullptr && element2.data == nullptr);
-		if (element1.data != nullptr && element2.data != nullptr)
-		{
-			isDataEqual = *element1.data == *element2.data;
-		}
-		return element1.vertices == element2.vertices && isDataEqual;
+		return element1.vertices == element2.vertices && element1.data == element2.data;
 	}
 
 	/// Compare the elements and return false if equal, true if not equal.
-	friend bool operator!=(const MeshElement<N>& element1, const MeshElement<N>& element2)
+	friend bool operator!=(const MeshElement<N, Data>& element1, const MeshElement<N, Data>& element2)
 	{
 		return ! (element1 == element2);
 	}
@@ -67,6 +62,4 @@ struct MeshElement
 
 };  // namespace SurgSim
 
-#include "SurgSim/DataStructures/MeshElement-inl.h"
-
-#endif  // SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_DATA_H
+#endif  // SURGSIM_DATASTRUCTURES_MESHELEMENT_H

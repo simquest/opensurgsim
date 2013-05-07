@@ -13,15 +13,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the Mesh class.
- */
+/// \file
+/// Tests for the Mesh class.
 
 #include "gtest/gtest.h"
 
+#include "SurgSim/DataStructures/MeshVertex.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
-
-#include <random>
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;
 
+/// Vertex
+typedef SurgSim::DataStructures::MeshVertex<MockVertexData> MockVertex;
+
+TEST(MeshVertexTest, InitTest)
+{
+	Vector3d position(0.0, 0.0, 0.0);
+	MockVertexData data(0, Vector3d(1.0, 0.0, 0.0));
+	ASSERT_NO_THROW({MockVertex vertex(position, data);});
+}
+
+TEST(MeshVertexTest, VertexTest)
+{
+	Vector3d position(1.0, 2.0, 3.0);
+	MockVertexData data(2, Vector3d(1.0, 0.0, 0.0));
+	MockVertex vertex(position, data);
+
+	EXPECT_EQ(position, vertex.position);
+	EXPECT_EQ(data, vertex.data);
+
+	{
+		const MockVertexData& data = vertex.data;
+		EXPECT_EQ(2, data.getId());
+		EXPECT_EQ(Vector3d(1.0, 0.0, 0.0), data.getNormal());
+	}
+}

@@ -17,8 +17,10 @@
 #define SURGSIM_DATA_STRUCTURES_MESH_H
 
 #include <SurgSim/DataStructures/MeshVertex.h>
+#include <SurgSim/Framework/Assert.h>
 
 #include <array>
+#include <typeinfo>
 #include <vector>
 
 namespace SurgSim
@@ -28,16 +30,22 @@ namespace DataStructures
 {
 
 /// Base class for mesh structures, handling basic vertex functionality.
+/// \tparam	VertexData	Type of extra data stored in each vertex
+template <class VertexData>
 class Mesh
 {
 public:
-	/// Vertex type
-	typedef MeshVertex Vertex;
+	/// Vertex type for convenience
+	typedef MeshVertex<VertexData> Vertex;
 
 	/// Constructor. The mesh is initially empty (no vertices).
-	Mesh();
+	Mesh()
+	{
+	}
 	/// Destructor
-	virtual ~Mesh();
+	virtual ~Mesh()
+	{
+	}
 
 	/// Clear mesh to return to an empty state (no vertices).
 	void clear()
@@ -97,13 +105,32 @@ public:
 	/// Sets the position of each vertex.
 	/// \param	positions	Vector containing new position for each vertex
 	/// \param	doUpdate	True to perform an update after setting the vertices, false to skip update; default is true.
-	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = true);
+	void setVertexPositions(const std::vector<SurgSim::Math::Vector3d>& positions, bool doUpdate = true)
+	{
+		SURGSIM_ASSERT(m_vertices.size() == positions.size()) << "Number of positions must match number of vertices.";
+
+		for (unsigned int i = 0; i < m_vertices.size(); ++i)
+		{
+			m_vertices[i].position = positions[i];
+		}
+
+		if (doUpdate)
+		{
+			update();
+		}
+	}
 
 	/// Compares the meshes and returns true if equal, false if not equal.
-	bool operator==(const Mesh& mesh) const;
+	bool operator==(const Mesh& mesh) const
+	{
+		return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
+	}
 
 	/// Compares the meshes and returns false if equal, true if not equal.
-	bool operator!=(const Mesh& mesh) const;
+	bool operator!=(const Mesh& mesh) const
+	{
+		return (typeid(*this) != typeid(mesh)) || ! isEqual(mesh);
+	}
 
 protected:
 	/// Reset to no vertices.

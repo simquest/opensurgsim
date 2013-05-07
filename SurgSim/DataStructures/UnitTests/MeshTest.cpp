@@ -13,12 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the Mesh class.
- */
+/// \file
+/// Tests for the Mesh class.
 
 #include "gtest/gtest.h"
 
+#include "SurgSim/DataStructures/MeshVertex.h"
+#include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
 #include <random>
@@ -106,7 +107,7 @@ TEST_F(MeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 
-		const std::vector<MeshVertex>& vertices = mesh.getVertices();
+		const std::vector<MockMesh::Vertex>& vertices = mesh.getVertices();
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
@@ -114,8 +115,8 @@ TEST_F(MeshTest, CreateVerticesTest)
 		{
 			EXPECT_EQ(testPositions[j], vertices[j].position);
 
-			const std::shared_ptr<MockVertexData>& data = std::dynamic_pointer_cast<MockVertexData>(vertices[j].data);
-			EXPECT_EQ(testNormals[j], data->getNormal());
+			const MockVertexData& data = vertices[j].data;
+			EXPECT_EQ(testNormals[j], data.getNormal());
 		}
 	}
 }
@@ -136,7 +137,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(1, mesh.getNumUpdates());
 	EXPECT_EQ(testPositions.size(), mesh.getNumVertices());
 
-	const std::vector<MeshVertex>& vertices = mesh.getVertices();
+	const std::vector<MockMesh::Vertex>& vertices = mesh.getVertices();
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly
@@ -144,8 +145,8 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	{
 		EXPECT_EQ(testPositions[i], vertices[i].position);
 
-		const std::shared_ptr<MockVertexData>& data = std::dynamic_pointer_cast<MockVertexData>(vertices[i].data);
-		EXPECT_EQ(testNormals[i], data->getNormal());
+		const MockVertexData& data = vertices[i].data;
+		EXPECT_EQ(testNormals[i], data.getNormal());
 	}
 
 	mesh.setVertexPositions(testPositions, false);

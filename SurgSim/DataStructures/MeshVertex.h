@@ -16,7 +16,6 @@
 #ifndef SURGSIM_DATA_STRUCTURES_MESH_VERTEX_H
 #define SURGSIM_DATA_STRUCTURES_MESH_VERTEX_H
 
-#include <SurgSim/DataStructures/MeshVertexData.h>
 #include <SurgSim/Math/Vector.h>
 
 #include <memory>
@@ -27,33 +26,34 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// Vertex structure for meshes.
+/// Vertex structure for meshes. Vertices have a position and some extra data.
+/// \tparam	Data	Type of extra data stored in the vertex
 /// \sa	Mesh
+template <class Data>
 struct MeshVertex
 {
 	/// Constructor. Data is set to nullptr.
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra vertex data (default is null)
-	MeshVertex(const SurgSim::Math::Vector3d& position, std::shared_ptr<MeshVertexData> data = nullptr);
+	MeshVertex(const SurgSim::Math::Vector3d& position, Data data) :
+		position(position),
+		data(data)
+	{
+	}
 
 	/// Position of the vertex.
 	SurgSim::Math::Vector3d position;
 	/// Extra vertex data.
-	std::shared_ptr<MeshVertexData> data;
+	Data data;
 
 	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const MeshVertex& vertex1, const MeshVertex& vertex2)
+	friend bool operator==(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
 	{
-		bool isDataEqual = (vertex1.data == nullptr && vertex2.data == nullptr);
-		if (vertex1.data != nullptr && vertex2.data != nullptr)
-		{
-			 isDataEqual = *vertex1.data == *vertex2.data;
-		}
-		return vertex1.position == vertex2.position && isDataEqual;
+		return vertex1.data == vertex2.data && vertex1.position == vertex2.position;
 	}
 
 	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const MeshVertex& vertex1, const MeshVertex& vertex2)
+	friend bool operator!=(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
 	{
 		return ! (vertex1 == vertex2);
 	}
