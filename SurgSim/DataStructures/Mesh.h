@@ -30,7 +30,12 @@ namespace DataStructures
 {
 
 /// Base class for mesh structures, handling basic vertex functionality.
+/// Subclasses of this class should handle the elements required for a specific type of mesh (as simple as just a 
+/// generic triangle mesh or as specific as a triangle mesh for collision detection, which might also specify the data
+/// types for the vertex and elements).
 /// \tparam	VertexData	Type of extra data stored in each vertex
+/// \sa MeshVertex
+/// \sa MeshElement
 template <class VertexData>
 class Mesh
 {
