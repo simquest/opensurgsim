@@ -23,7 +23,7 @@ namespace Input
 InputComponent::InputComponent(std::string name, std::string deviceName) :
 	Component(name),
 	m_deviceName(deviceName),
-	m_hasData(false)
+	m_deviceConnected(false)
 {
 
 }
@@ -33,20 +33,28 @@ InputComponent::~InputComponent()
 
 }
 
+void InputComponent::deviceConnected(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData)
+{
+	SURGSIM_ASSERT(initialData.isValid()) 
+		<< "Cannot initialize input component (" << getName() << ") with invalid data from device (" << device << ")";
+	m_lastInput.set(initialData);
+	m_deviceConnected = true;
+}
+
+void InputComponent::deviceDisconnected(const std::string& device)
+{
+	m_deviceConnected = false;
+}
+
 void InputComponent::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
 	m_lastInput.set(inputData);
-	m_hasData = true;
 }
 
 void InputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
 {
+	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to " << getName() << ". Unable to getData.";
 	m_lastInput.get(dataGroup);
-}
-
-bool InputComponent::hasData()
-{
-	return m_hasData;
 }
 
 bool InputComponent::doInitialize()

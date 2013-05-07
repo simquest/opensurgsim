@@ -123,22 +123,23 @@ TEST_F(InputManagerTest, InputAddRemove)
 
 TEST_F(InputManagerTest, InputfromDevice)
 {
-	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
-	inputManager->addComponent(listener1);
-
-	EXPECT_FALSE(listener1->hasData());
-	testDevice1->pushInput("avalue");
-	EXPECT_TRUE(listener1->hasData());
-
 	std::string data;
 	SurgSim::DataStructures::DataGroup dataGroup;
-	listener1->getData(&dataGroup);
-	dataGroup.strings().get("helloWorld",&data);
+
+	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
+	EXPECT_THROW(listener1->getData(&dataGroup), SurgSim::Framework::AssertionFailure);
+
+	inputManager->addComponent(listener1);
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+
+	testDevice1->pushInput("avalue");
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
 	EXPECT_EQ("avalue",data);
 
 	testDevice1->pushInput("bvalue");
-	listener1->getData(&dataGroup);
-	dataGroup.strings().get("helloWorld",&data);
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
 	EXPECT_EQ("bvalue",data);
 }
 

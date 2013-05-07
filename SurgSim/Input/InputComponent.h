@@ -18,6 +18,7 @@
 
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Input/CommonDevice.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/LockedContainer.h>
 
@@ -33,20 +34,19 @@ class InputComponent : public SurgSim::Framework::Component, public SurgSim::Inp
 {
 public:
 	InputComponent(std::string name, std::string deviceName);;
-	virtual ~InputComponent();;
+	virtual ~InputComponent();
 
 	/// Overridden from InputComsumerInterface, callback from the device to set the input data in here.
 	/// \param	device   	The name of the device from which we want to pull input.
 	/// \param	inputData	The actual input data.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData);
 
+	virtual void deviceConnected(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData);
+	virtual void deviceDisconnected(const std::string& device);
+
 	/// Gets the input data.
 	/// \param [out] dataGroup The location to write the data.  The pointer must be non-null.
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
-
-	/// Check if data has been retreived from device.
-	/// \return true if data has ever been provided by the device.
-	bool hasData();
 
 	/// Overriden from Component, do nothing
 	virtual bool doInitialize();
@@ -61,7 +61,7 @@ public:
 private:
 	std::string m_deviceName;
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
-	bool m_hasData;
+	bool m_deviceConnected;
 };
 
 }; // namespace Input
