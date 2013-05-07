@@ -29,7 +29,7 @@ public:
 	/// Constructor
 	/// \param	id	Unique ID of the vertex in its mesh
 	/// \param	normal	Surface normal of the vertex
-	MockVertexData(unsigned int id, const SurgSim::Math::Vector3d& normal) : 
+	MockVertexData(unsigned int id, const SurgSim::Math::Vector3d& normal) :
 		m_id(id),
 		m_normal(normal)
 	{
