@@ -34,7 +34,7 @@ namespace DataStructures
 /// Mesh is to be used purely as a data structure and not provide implementation of algorithms.
 /// For example, a physics FEM is not a subclass of Mesh, but may use a Mesh for storing the structure of the FEM.
 ///
-/// Subclasses of this class should handle the elements required for a specific type of mesh (as simple as just a 
+/// Subclasses of this class should handle the elements required for a specific type of mesh (as simple as just a
 /// generic triangle mesh or as specific as a triangle mesh for collision detection, which might also specify the data
 /// types for the vertex and elements).
 ///
