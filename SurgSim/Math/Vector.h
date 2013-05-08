@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- *  Definitions of small fixed-size vector types.
- */
+/// \file
+/// Definitions of small fixed-size vector types.
 
 #ifndef SURGSIM_MATH_VECTOR_H
 #define SURGSIM_MATH_VECTOR_H
