@@ -36,12 +36,14 @@ namespace DataStructures
 /// The extra Data is left up to the particular use of Mesh to specify. For example, for use collision detection,
 /// a vertex may need a normal and adjacent triangle information, which could be stored in a struct.
 ///
-/// \tparam	Data	Type of extra data stored in the vertex
+/// If no extra Data is needed, a specialization exists for void, in which case the constructor takes no data.
+///
+/// \tparam	Data	Type of extra data stored in the vertex (void for no data)
 /// \sa	Mesh
 template <class Data>
 struct MeshVertex
 {
-	/// Constructor. Data is set to nullptr.
+	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
 	MeshVertex(const SurgSim::Math::Vector3d& position, const Data& data) :
@@ -63,6 +65,34 @@ struct MeshVertex
 
 	/// Compare the vertices and return false if equal, true if not equal.
 	friend bool operator!=(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
+	{
+		return ! (vertex1 == vertex2);
+	}
+};
+
+/// Specialization of MeshVertex with no data.
+/// \sa MeshVertex
+template <>
+struct MeshVertex<void>
+{
+	/// Constructor
+	/// \param	position	Position of the vertex
+	/// \param	data	Extra data to be stored in the vertex
+	MeshVertex(const SurgSim::Math::Vector3d& position) : position(position)
+	{
+	}
+
+	/// Position of the vertex.
+	SurgSim::Math::Vector3d position;
+
+	/// Compare the vertices and return true if equal, false if not equal.
+	friend bool operator==(const MeshVertex<void>& vertex1, const MeshVertex<void>& vertex2)
+	{
+		return vertex1.position == vertex2.position;
+	}
+
+	/// Compare the vertices and return false if equal, true if not equal.
+	friend bool operator!=(const MeshVertex<void>& vertex1, const MeshVertex<void>& vertex2)
 	{
 		return ! (vertex1 == vertex2);
 	}
