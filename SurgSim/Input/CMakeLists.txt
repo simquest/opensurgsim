@@ -35,18 +35,12 @@ set(SURGSIM_INPUT_HEADERS
 	OutputProducerInterface.h
 )
 
-add_library(SurgSimInput ${SURGSIM_INPUT_SOURCES} ${SURGSIM_INPUT_HEADERS})
-
-set_target_properties(SurgSimInput PROPERTIES
-	PUBLIC_HEADER "${SURGSIM_INPUT_HEADERS}")
-
-install(TARGETS SurgSimInput
-	EXPORT ${PROJECT_NAME}Targets
-	RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-	LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-	ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-	PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/SurgSim/Input")
-set(EXPORT_TARGETS SurgSimInput ${EXPORT_TARGETS} CACHE INTERNAL "export targets")
+surgsim_add_library(
+	SurgSimInput
+	"${SURGSIM_INPUT_SOURCES}"
+	"${SURGSIM_INPUT_HEADERS}"
+	"/SurgSim/Input"
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
