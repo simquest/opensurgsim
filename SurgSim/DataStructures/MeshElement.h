@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_H
-#define SURGSIM_DATA_STRUCTURES_MESH_ELEMENT_H
+#ifndef SURGSIM_DATASTRUCTURES_MESHELEMENT_H
+#define SURGSIM_DATASTRUCTURES_MESHELEMENT_H
 
 #include <array>
 #include <memory>
@@ -43,6 +43,7 @@ struct MeshElement
 {
 	/// Constructor. Data is set to nullptr.
 	/// \param	vertices	IDs of the N element vertices
+	/// \param	data	Extra data to be stored with the element
 	MeshElement(const std::array<unsigned int, N> vertices, Data data) :
 		vertices(vertices),
 		data(data)
