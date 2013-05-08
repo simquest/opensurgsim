@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
-#define SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
+#ifndef SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
+#define SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 
 #include "SurgSim/DataStructures/Mesh.h"
 #include "SurgSim/Math/Vector.h"
@@ -187,4 +187,4 @@ private:
 	int m_numUpdates;
 };
 
-#endif  // SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
+#endif  // SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
