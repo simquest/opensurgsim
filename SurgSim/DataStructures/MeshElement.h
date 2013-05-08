@@ -46,7 +46,7 @@ struct MeshElement
 	/// Constructor
 	/// \param	vertices	IDs of the N element vertices
 	/// \param	data	Extra data to be stored with the element
-	MeshElement(const std::array<unsigned int, N> vertices, const Data& data) :
+	MeshElement(const std::array<unsigned int, N>& vertices, const Data& data) :
 		vertices(vertices),
 		data(data)
 	{
@@ -69,14 +69,14 @@ struct MeshElement
 		return ! (element1 == element2);
 	}
 };
- 
+
 template <unsigned int N>
 struct MeshElement<N, void>
 {
 	/// Constructor
 	/// \param	vertices	IDs of the N element vertices
 	/// \param	data	Extra data to be stored with the element
-	MeshElement(const std::array<unsigned int, N> vertices) :
+	explicit MeshElement(const std::array<unsigned int, N>& vertices) :
 		vertices(vertices)
 	{
 	}
