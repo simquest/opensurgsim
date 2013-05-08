@@ -17,6 +17,7 @@
 #define SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
 
 #include "SurgSim/DataStructures/Mesh.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <array>
@@ -130,9 +131,9 @@ public:
 	}
 private:
 	/// Edge's unique ID in its mesh
-	const unsigned int m_id;
+	unsigned int m_id;
 	/// The IDs of the triangle's edges in its mesh, in order: {vertex0->vertex1, vertex1->vertex2, vertex2->vertex3}
-	const std::array<unsigned int, 3> m_edges;
+	std::array<unsigned int, 3> m_edges;
 };
 
 /// Mesh for testing using MockVertexData
@@ -153,9 +154,9 @@ public:
 	}
 
 	/// Create a new vertex in the mesh
-	/// \param position Position of the vertex
-	/// \param normal Normal of the vertex
-	/// \return Unique ID of vertex in the mesh
+	/// \param	position	Position of the vertex
+	/// \param	normal	Normal of the vertex
+	/// \return	Unique ID of vertex in the mesh
 	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
 		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
@@ -187,4 +188,82 @@ private:
 	int m_numUpdates;
 };
 
-#endif  // SURGSIM_DATA_STRUCTURES_UNITTESTS_MOCK_OBJECTS_H
+/// Triangle Mesh for testing using MockVertexData, MockEdgeData, and MockTriangleData
+class MockTriangleMesh : public SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>
+{
+public:
+	/// Vertex type for convenience
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Vertex Vertex;
+	/// Edge type for convenience
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Edge Edge;
+	/// Triangle type for convenience
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Triangle Triangle;
+
+	/// Constructor. Start out with no vertices and 0 updates
+	MockTriangleMesh() :SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>(),
+		m_numUpdates(0)
+	{
+	}
+	/// Destructor
+	virtual ~MockTriangleMesh()
+	{
+	}
+
+	/// Create a new vertex in the mesh
+	/// \param	position	Position of the vertex
+	/// \param	normal	Normal of the vertex
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
+	{
+		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
+
+		return addVertex(vertex);
+	}
+
+	/// Create a new edge in the mesh
+	/// \param	vertices	Edge vertices
+	/// \param normal Normal of the vertex
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
+	{
+		Edge edge(vertices, MockEdgeData(getNumEdges()));
+
+		return addEdge(edge);
+	}
+
+	/// Create a new triangle in the mesh
+	/// \param	vertices
+	/// \param normal Normal of the vertex
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
+	{
+		Triangle triangle(vertices, MockTriangleData(getNumTriangles(), edges));
+
+		return addTriangle(triangle);
+	}
+
+	/// Returns the normal of a vertex
+	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
+	{
+		MockVertexData data = getVertex(id).data;
+		return data.getNormal();
+	}
+
+	/// Returns the number of updates performed on the mesh
+	int getNumUpdates() const
+	{
+		return m_numUpdates;
+	}
+
+private:
+	/// Provides update functionality, which just increments the number of updates
+	virtual void doUpdate()
+	{
+		++m_numUpdates;
+	}
+
+	/// Number of updates performed on the mesh
+	int m_numUpdates;
+};
+
+#endif  // SURGSIM_DATASTRUCTURES_UNITTESTS_MOCK_OBJECTS_H
