@@ -61,6 +61,11 @@ public:
 			}
 		}
 
+		if (printNormals)
+		{
+			printf("Test Normals:\n");
+		}
+
 		/// Generate random normals for each vertex
 		for (unsigned int i = 0; i < numVertices; ++i)
 		{
@@ -116,6 +121,7 @@ TEST_F(MeshTest, CreateVerticesTest)
 			EXPECT_EQ(testPositions[j], vertices[j].position);
 
 			const MockVertexData& data = vertices[j].data;
+			EXPECT_EQ(j, data.getId());
 			EXPECT_EQ(testNormals[j], data.getNormal());
 		}
 	}

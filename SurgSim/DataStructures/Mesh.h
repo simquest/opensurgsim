@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_MESH_H
-#define SURGSIM_DATA_STRUCTURES_MESH_H
+#ifndef SURGSIM_DATASTRUCTURES_MESH_H
+#define SURGSIM_DATASTRUCTURES_MESH_H
 
 #include <SurgSim/DataStructures/MeshVertex.h>
 #include <SurgSim/Framework/Assert.h>
@@ -143,14 +143,15 @@ public:
 	}
 
 protected:
-	/// Reset to no vertices.
+	/// Remove all vertices from the mesh.
 	virtual void doClearVertices()
 	{
 		m_vertices.clear();
 	}
 
 	/// Internal comparison of meshes of the same type: returns true if equal, false if not equal.
-	/// Override this method to provide custom comparison. Base implementation compares vertices.
+	/// Override this method to provide custom comparison. Base Mesh implementation compares vertices:
+	/// the order of vertices must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
 	virtual bool isEqual(const Mesh& mesh) const
 	{
@@ -166,6 +167,7 @@ private:
 
 	/// Performs any updates that are required when the vertices are modified.
 	/// Override this method to implement update functionality.
+	/// For example, this could be overridden to calculate normals for each MeshVertex.
 	virtual void doUpdate()
 	{
 	}
@@ -178,4 +180,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif
+#endif  // SURGSIM_DATASTRUCTURES_MESH_H

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_MESH_VERTEX_H
-#define SURGSIM_DATA_STRUCTURES_MESH_VERTEX_H
+#ifndef SURGSIM_DATASTRUCTURES_MESHVERTEX_H
+#define SURGSIM_DATASTRUCTURES_MESHVERTEX_H
 
 #include <SurgSim/Math/Vector.h>
 
@@ -43,7 +43,7 @@ struct MeshVertex
 {
 	/// Constructor. Data is set to nullptr.
 	/// \param	position	Position of the vertex
-	/// \param	data	Extra vertex data (default is null)
+	/// \param	data	Extra data to be stored in the vertex
 	MeshVertex(const SurgSim::Math::Vector3d& position, const Data& data) :
 		position(position),
 		data(data)
@@ -72,4 +72,4 @@ struct MeshVertex
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATA_STRUCTURES_MESH_VERTEX_H
+#endif  // SURGSIM_DATASTRUCTURES_MESHVERTEX_H
