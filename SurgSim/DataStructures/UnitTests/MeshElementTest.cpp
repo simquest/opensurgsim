@@ -15,6 +15,7 @@
 
 /// \file
 /// Tests for the MeshElement class.
+/// Edges and Triangles are used as example elements for testing.
 
 #include "gtest/gtest.h"
 
@@ -54,6 +55,27 @@ TEST(MeshElementTest, EdgeTest)
 		const MockEdgeData& data = edge.data;
 		EXPECT_EQ(5, data.getId());
 	}
+
+	/// Check comparisons
+
+	MockEdge sameEdge(edgeVertices, edgeData);
+	EXPECT_TRUE(edge == sameEdge);
+	EXPECT_FALSE(edge != sameEdge);
+
+	std::array<unsigned int, 2> differentEdgeVertices = {{10, 5}};
+	MockEdgeData differentEdgeData(7);
+
+	MockEdge edgeWithDifferentVertices(differentEdgeVertices, edgeData);
+	EXPECT_FALSE(edge == edgeWithDifferentVertices);
+	EXPECT_TRUE(edge != edgeWithDifferentVertices);
+
+	MockEdge edgeWithDifferentData(edgeVertices, differentEdgeData);
+	EXPECT_FALSE(edge == edgeWithDifferentData);
+	EXPECT_TRUE(edge != edgeWithDifferentData);
+
+	MockEdge edgeWithDifferentVerticesAndData(differentEdgeVertices, differentEdgeData);
+	EXPECT_FALSE(edge == edgeWithDifferentVerticesAndData);
+	EXPECT_TRUE(edge != edgeWithDifferentVerticesAndData);
 }
 
 TEST(MeshElementTest, TriangleTest)
