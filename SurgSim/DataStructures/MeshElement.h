@@ -44,7 +44,7 @@ struct MeshElement
 	/// Constructor. Data is set to nullptr.
 	/// \param	vertices	IDs of the N element vertices
 	/// \param	data	Extra data to be stored with the element
-	MeshElement(const std::array<unsigned int, N> vertices, Data data) :
+	MeshElement(const std::array<unsigned int, N> vertices, const Data& data) :
 		vertices(vertices),
 		data(data)
 	{
