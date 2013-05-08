@@ -44,7 +44,7 @@ struct MeshVertex
 	/// Constructor. Data is set to nullptr.
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra vertex data (default is null)
-	MeshVertex(const SurgSim::Math::Vector3d& position, Data data) :
+	MeshVertex(const SurgSim::Math::Vector3d& position, const Data& data) :
 		position(position),
 		data(data)
 	{
