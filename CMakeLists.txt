@@ -63,17 +63,12 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(ThirdParty/gtest)
 endif()
 
+SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
+
 add_subdirectory(SurgSim)
 add_subdirectory(Documentation)
 
-set(CONFIG_EXPORT_TARGETS
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimInput
-	IdentityPoseDevice
-)
-
-export(TARGETS ${CONFIG_EXPORT_TARGETS} 
+export(TARGETS ${EXPORT_TARGETS} 
 	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
 
 #Register where to find this build-tree. On windows this in the registry, on

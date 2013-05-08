@@ -45,6 +45,7 @@ install(TARGETS IdentityPoseDevice
 	LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
 	ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
 	PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/SurgSim/Devices/IdentityPoseDevice")
+set(EXPORT_TARGETS IdentityPoseDevice ${EXPORT_TARGETS} CACHE INTERNAL "export targets")
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
