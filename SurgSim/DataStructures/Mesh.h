@@ -38,7 +38,7 @@ namespace DataStructures
 /// generic triangle mesh or as specific as a triangle mesh for collision detection, which might also specify the data
 /// types for the vertex and elements).
 ///
-/// \tparam	VertexData	Type of extra data stored in each vertex
+/// \tparam	VertexData	Type of extra data stored in each vertex (void for no data)
 /// \sa MeshVertex
 /// \sa MeshElement
 template <class VertexData>

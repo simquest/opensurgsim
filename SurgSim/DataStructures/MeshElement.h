@@ -35,16 +35,18 @@ namespace DataStructures
 /// The extra Data is left up to the particular use of Mesh to specify. For example, for use collision detection,
 /// a vertex may need a normal and adjacent triangle information, which could be stored in a struct.
 ///
+/// If no extra Data is needed, a specialization exists for void, in which case the constructor takes no data.
+///
 /// \tparam	N	Number of vertices in the element
-/// \tparam	Data	Type of extra data stored in the element
+/// \tparam	Data	Type of extra data stored in the element (void for no data)
 /// \sa	Mesh
 template <unsigned int N, class Data>
 struct MeshElement
 {
-	/// Constructor. Data is set to nullptr.
+	/// Constructor
 	/// \param	vertices	IDs of the N element vertices
 	/// \param	data	Extra data to be stored with the element
-	MeshElement(const std::array<unsigned int, N> vertices, const Data& data) :
+	MeshElement(const std::array<unsigned int, N>& vertices, const Data& data) :
 		vertices(vertices),
 		data(data)
 	{
@@ -63,6 +65,32 @@ struct MeshElement
 
 	/// Compare the elements and return false if equal, true if not equal.
 	friend bool operator!=(const MeshElement<N, Data>& element1, const MeshElement<N, Data>& element2)
+	{
+		return ! (element1 == element2);
+	}
+};
+
+template <unsigned int N>
+struct MeshElement<N, void>
+{
+	/// Constructor
+	/// \param	vertices	IDs of the N element vertices
+	explicit MeshElement(const std::array<unsigned int, N>& vertices) :
+		vertices(vertices)
+	{
+	}
+
+	/// Element vertices.
+	std::array<unsigned int, N> vertices;
+
+	/// Compare the elements and return true if equal, false if not equal.
+	friend bool operator==(const MeshElement<N, void>& element1, const MeshElement<N, void>& element2)
+	{
+		return element1.vertices == element2.vertices;
+	}
+
+	/// Compare the elements and return false if equal, true if not equal.
+	friend bool operator!=(const MeshElement<N, void>& element1, const MeshElement<N, void>& element2)
 	{
 		return ! (element1 == element2);
 	}

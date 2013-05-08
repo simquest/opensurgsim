@@ -22,16 +22,22 @@
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::MeshVertex;
 using SurgSim::Math::Vector3d;
 
-/// Vertex
+/// Vertex with ID and normal data
 typedef SurgSim::DataStructures::MeshVertex<MockVertexData> MockVertex;
+/// Vertex with no data
+typedef SurgSim::DataStructures::MeshVertex<void> MockVertexNoData;
 
 TEST(MeshVertexTest, InitTest)
 {
 	Vector3d position(0.0, 0.0, 0.0);
 	MockVertexData data(0, Vector3d(1.0, 0.0, 0.0));
 	ASSERT_NO_THROW({MockVertex vertex(position, data);});
+
+	/// Check that we can also create a vertex with no data
+	ASSERT_NO_THROW({MockVertexNoData vertex(position);});
 }
 
 TEST(MeshVertexTest, VertexTest)
@@ -48,4 +54,12 @@ TEST(MeshVertexTest, VertexTest)
 		EXPECT_EQ(2, data.getId());
 		EXPECT_EQ(Vector3d(1.0, 0.0, 0.0), data.getNormal());
 	}
+}
+
+TEST(MeshVertexTest, VertexNoDataTest)
+{
+	Vector3d position(1.0, 2.0, 3.0);
+	MockVertexNoData vertex(position);
+
+	EXPECT_EQ(position, vertex.position);
 }

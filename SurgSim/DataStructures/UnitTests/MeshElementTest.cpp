@@ -25,10 +25,12 @@
 
 using SurgSim::Math::Vector3d;
 
-/// Edge element
+/// Edge element with ID data.
 typedef SurgSim::DataStructures::MeshElement<2, MockEdgeData> MockEdge;
-/// Triangle element
+/// Triangle element with ID and edge ID data.
 typedef SurgSim::DataStructures::MeshElement<3, MockTriangleData> MockTriangle;
+/// Tetrahedron element with no data
+typedef SurgSim::DataStructures::MeshElement<4, void> MockTetrahedron;
 
 TEST(MeshElementTest, InitTest)
 {
@@ -40,6 +42,9 @@ TEST(MeshElementTest, InitTest)
 	std::array<unsigned int, 3> triangleEdges = {{0, 1, 2}};
 	MockTriangleData triangleData(0, triangleEdges);
 	ASSERT_NO_THROW({MockTriangle triangle(triangleVertices, triangleData);});
+
+	std::array<unsigned int, 4> tetrahedronVertices = {{0, 1, 2, 3}};
+	ASSERT_NO_THROW({MockTetrahedron triangle(tetrahedronVertices);});
 }
 
 TEST(MeshElementTest, EdgeTest)
@@ -115,4 +120,24 @@ TEST(MeshElementTest, TriangleTest)
 	MockTriangle triangleWithDifferentVerticesAndData(differentTriangleVertices, differentTriangleData);
 	EXPECT_FALSE(triangle == triangleWithDifferentVerticesAndData);
 	EXPECT_TRUE(triangle != triangleWithDifferentVerticesAndData);
+}
+
+TEST(MeshElementTest, TetrahedronTest)
+{
+	std::array<unsigned int, 4> tetrahedronVertices = {{5, 2, 10, 6}};
+	MockTetrahedron tetrahedron(tetrahedronVertices);
+
+	EXPECT_EQ(tetrahedronVertices, tetrahedron.vertices);
+
+	/// Check comparisons
+
+	MockTetrahedron sameTetrahedron(tetrahedronVertices);
+	EXPECT_TRUE(tetrahedron == sameTetrahedron);
+	EXPECT_FALSE(tetrahedron != sameTetrahedron);
+
+	std::array<unsigned int, 4> differentTetrahedronVertices = {{10, 5, 7, 3}};
+
+	MockTetrahedron tetrahedronWithDifferentVertices(differentTetrahedronVertices);
+	EXPECT_FALSE(tetrahedron == tetrahedronWithDifferentVertices);
+	EXPECT_TRUE(tetrahedron != tetrahedronWithDifferentVertices);
 }
