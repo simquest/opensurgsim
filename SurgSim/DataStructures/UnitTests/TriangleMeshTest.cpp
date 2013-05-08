@@ -24,6 +24,7 @@
 
 #include <random>
 
+using SurgSim::DataStructures::TriangleMesh;
 using SurgSim::Math::Vector3d;
 
 class TriangleMeshTest : public ::testing::Test
@@ -152,6 +153,27 @@ public:
 TEST_F(TriangleMeshTest, InitTest)
 {
 	ASSERT_NO_THROW({MockTriangleMesh mesh;});
+
+	/// Make sure we can create triangle meshes with each possible combination of void data.
+	typedef TriangleMesh<void, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
+	typedef TriangleMesh<MockVertexData, void, MockTriangleData> TriangleMeshNoEdgeData;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, void> TriangleMeshNoTriangleData;
+
+	typedef TriangleMesh<MockVertexData, void, void> TriangleMeshNoEdgeOrTriangleData;
+	typedef TriangleMesh<void, MockEdgeData, void> TriangleMeshNoVertexOrTriangleData;
+	typedef TriangleMesh<void, void, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
+
+	typedef TriangleMesh<void, void, void> TriangleMeshNoData;
+
+	ASSERT_NO_THROW({TriangleMeshNoVertexData mesh;});
+	ASSERT_NO_THROW({TriangleMeshNoEdgeData mesh;});
+	ASSERT_NO_THROW({TriangleMeshNoTriangleData mesh;});
+
+	ASSERT_NO_THROW({TriangleMeshNoEdgeOrTriangleData mesh;});
+	ASSERT_NO_THROW({TriangleMeshNoVertexOrTriangleData mesh;});
+	ASSERT_NO_THROW({TriangleMeshNoVertexOrEdgeData mesh;});
+
+	ASSERT_NO_THROW({TriangleMeshNoData mesh;});
 }
 
 TEST_F(TriangleMeshTest, CreateVerticesTest)
