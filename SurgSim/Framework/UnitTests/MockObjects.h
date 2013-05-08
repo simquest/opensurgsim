@@ -13,18 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MOCK_OBJECTS_H
-#define MOCK_OBJECTS_H
+#ifndef MOCKOBJECTS_H
+#define MOCKOBJECTS_H
 
 #include <memory>
 
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/BasicThread.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/ComponentManager.h"
+#include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Framework/Representation.h"
-#include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Behavior.h"
-#include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Runtime.h"
 
 /// Class to catch the calls made to the scene element, does nothing
 class MockSceneElement : public SurgSim::Framework::SceneElement
@@ -78,9 +80,7 @@ private:
 class MockThread : public SurgSim::Framework::BasicThread
 {
 public:
-	MockThread(bool succeedInit = true, bool succeedStartup = true) :
-		succeedInit(succeedInit),
-		succeedStartup(succeedStartup),
+	MockThread() :
 		count(10),
 		totalTime(0.0)
 	{
@@ -90,11 +90,42 @@ public:
 	{
 	}
 
-	bool succeedInit;
-	bool succeedStartup;
-
 	int count;
 	double totalTime;
+
+private:
+	virtual bool doInitialize()
+	{
+		return true;
+	};
+	virtual bool doStartUp()
+	{
+		return true;
+	};
+	virtual bool doUpdate(double dt)
+	{
+		--count;
+		totalTime += dt;
+
+		return count != 0;
+	};
+};
+
+class MockManager : public SurgSim::Framework::ComponentManager
+{
+public:
+	MockManager(bool succeedInit = true, bool succeedStartup = true) :
+		succeedInit(succeedInit),
+		succeedStartup(succeedStartup)
+	{
+	}
+
+	virtual ~MockManager()
+	{
+	}
+
+	bool succeedInit;
+	bool succeedStartup;
 
 private:
 	virtual bool doInitialize()
@@ -107,10 +138,7 @@ private:
 	};
 	virtual bool doUpdate(double dt)
 	{
-		--count;
-		totalTime += dt;
-
-		return count != 0;
+		return true;
 	};
 
 	virtual bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
@@ -194,4 +222,4 @@ public:
 	int updateCount;
 };
 
-#endif // MOCK_OBJECTS_H
+#endif // MOCKOBJECTS_H

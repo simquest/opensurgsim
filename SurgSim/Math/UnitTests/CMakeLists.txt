@@ -21,6 +21,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
+	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

@@ -21,7 +21,7 @@
 
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Barrier.h>
-#include <SurgSim/Framework/BasicThread.h>
+#include <SurgSim/Framework/ComponentManager.h>
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Scene.h>
@@ -50,12 +50,12 @@ Runtime::~Runtime()
 {
 }
 
-void Runtime::addWorkerThread(std::shared_ptr<BasicThread> thread)
+void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 {
-	if (thread != nullptr)
+	if (manager != nullptr)
 	{
-		thread->setRuntime(getSharedPtr());
-		m_workerThreads.push_back(thread);
+		manager->setRuntime(getSharedPtr());
+		m_managers.push_back(manager);
 	}
 }
 
@@ -99,9 +99,9 @@ bool Runtime::addComponents(const std::vector<std::shared_ptr<Component>>& compo
 	bool result = true;
 	for (auto it = components.cbegin(); it != componentsEnd; ++it)
 	{
-		for (auto thread = m_workerThreads.begin(); thread != m_workerThreads.end(); ++thread)
+		for (auto manager = m_managers.begin(); manager != m_managers.end(); ++manager)
 		{
-			result = (*thread)->addComponent(*it) && result;
+			result = (*manager)->addComponent(*it) && result;
 		}
 	}
 	return result;
@@ -112,12 +112,12 @@ bool Runtime::execute()
 	bool doExit = false;
 	if (start())
 	{
-		auto it = m_workerThreads.cbegin();
+		auto it = m_managers.cbegin();
 		while (!doExit)
 		{
-			// Watchdog, shut down all threads if one thread is done
+			// Watchdog, shut down all managers if one manager is done
 			boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
-			for (it = m_workerThreads.cbegin(); it != m_workerThreads.cend(); ++it)
+			for (it = m_managers.cbegin(); it != m_managers.cend(); ++it)
 			{
 				if (!(*it)->isRunning())
 				{
@@ -133,39 +133,39 @@ bool Runtime::execute()
 
 bool Runtime::start()
 {
-	std::vector<std::shared_ptr<BasicThread>>::iterator it;
-	std::shared_ptr<Barrier> barrier(new Barrier(m_workerThreads.size()+1));
-	for (it = m_workerThreads.begin(); it != m_workerThreads.end(); ++it)
+	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
+	std::shared_ptr<Barrier> barrier(new Barrier(m_managers.size()+1));
+	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
 		(*it)->start(barrier);
 	}
 
-	// Wait for all the threads to initialize
+	// Wait for all the managers to initialize
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doInit() succeeded";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers doInit() succeeded";
 
 
-	// Wait for all the threads to startup
+	// Wait for all the managers to startup
 	barrier->wait(true);
 
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads doStartup() succeeded";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers doStartup() succeeded";
 
 	m_isRunning = true;
 	// Now add all the scenelements
 	preprocessSceneElements();
 	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Scene is initialized";
 
-	// All threads are waiting for this
+	// All managers are waiting for this
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All threads updating";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers updating";
 
 	return true;
 }
 
 bool Runtime::stop()
 {
-	std::vector<std::shared_ptr<BasicThread>>::iterator it;
-	for (it = m_workerThreads.begin(); it != m_workerThreads.end(); ++it)
+	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
+	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
 		(*it)->stop();
 	}

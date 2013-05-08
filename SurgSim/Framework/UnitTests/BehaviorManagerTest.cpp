@@ -29,7 +29,7 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	std::shared_ptr<BehaviorManager> behaviorManager(new BehaviorManager());
 
-	runtime->addWorkerThread(behaviorManager);
+	runtime->addManager(behaviorManager);
 	std::shared_ptr<Scene> scene(new Scene());
 	std::shared_ptr<SceneElement> element(new MockSceneElement());
 	std::shared_ptr<MockBehavior> behavior(new MockBehavior("MockBehavior"));
