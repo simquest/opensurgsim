@@ -77,7 +77,6 @@ struct MeshVertex<void>
 {
 	/// Constructor
 	/// \param	position	Position of the vertex
-	/// \param	data	Extra data to be stored in the vertex
 	explicit MeshVertex(const SurgSim::Math::Vector3d& position) : position(position)
 	{
 	}

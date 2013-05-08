@@ -75,7 +75,6 @@ struct MeshElement<N, void>
 {
 	/// Constructor
 	/// \param	vertices	IDs of the N element vertices
-	/// \param	data	Extra data to be stored with the element
 	explicit MeshElement(const std::array<unsigned int, N>& vertices) :
 		vertices(vertices)
 	{
