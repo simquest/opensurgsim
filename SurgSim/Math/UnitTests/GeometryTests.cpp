@@ -312,11 +312,65 @@ TEST_F(GeometryTest, DistancePointSegment)
 	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
 	EXPECT_DOUBLE_EQ((offLinePoint - resultPoint).norm(), distance);
 	EXPECT_TRUE(eigenEqual(resultPoint, result));
+	
+	// Other Side of the above case
+	resultPoint = plainSegment.b;
+	offLinePoint = plainSegment.b + plainSegment.ab*0.01 + plainNormal * 0.1;
+	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
+	EXPECT_DOUBLE_EQ((offLinePoint - resultPoint).norm(), distance);
+	EXPECT_TRUE(eigenEqual(resultPoint, result));
+
 
 	// Degenerated Segment
 	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.a, &result);
 	EXPECT_DOUBLE_EQ((offLinePoint - plainSegment.a).norm(), distance);
 	EXPECT_TRUE(eigenEqual(plainSegment.a, result));
+}
+
+typedef std::tuple<Segment, Segment, VectorType, VectorType> LineLineCheckData;
+void checkLineLineDistance(const LineLineCheckData& data)
+{
+	Segment line0 = std::get<0>(data);
+	Segment line1 = std::get<1>(data);
+	VectorType expectedResult0 = std::get<2>(data);
+	VectorType expectedResult1 = std::get<3>(data);
+	VectorType result0, result1;
+	double distance;
+
+	{
+		SCOPED_TRACE("Forward Case");
+		distance = distanceLineLine(line0.a, line0.b, line1.a, line1.b, &result0, &result1);
+		EXPECT_NEAR((expectedResult1 - expectedResult0).norm(), distance, epsilon);
+		EXPECT_TRUE(expectedResult0.isApprox(result0));
+		EXPECT_TRUE(expectedResult1.isApprox(result1));
+	}
+
+	{
+		SCOPED_TRACE("Backward Case");
+		distance = distanceLineLine(line1.a, line1.b, line0.a, line0.b, &result1, &result0);
+		EXPECT_NEAR((expectedResult1 - expectedResult0).norm(), distance, epsilon);
+		EXPECT_TRUE(expectedResult0.isApprox(result0));
+		EXPECT_TRUE(expectedResult1.isApprox(result1));
+	}
+
+	{
+		SCOPED_TRACE("Turn around the first line");
+		distance = distanceLineLine(line0.b, line0.a, line1.a, line1.b, &result0, &result1);
+		EXPECT_NEAR((expectedResult1 - expectedResult0).norm(), distance, epsilon);
+		EXPECT_TRUE(expectedResult0.isApprox(result0));
+		EXPECT_TRUE(expectedResult1.isApprox(result1));
+	}
+
+	{
+		SCOPED_TRACE("And switch lines again");
+		distance = distanceLineLine(line0.b, line0.a, line1.a, line1.b, &result0, &result1);
+		EXPECT_NEAR((expectedResult1 - expectedResult0).norm(), distance, epsilon);
+		EXPECT_TRUE(expectedResult0.isApprox(result0));
+		EXPECT_TRUE(expectedResult1.isApprox(result1));
+	}
+
+
+
 }
 
 TEST_F(GeometryTest, DistanceLineLine)
@@ -333,40 +387,76 @@ TEST_F(GeometryTest, DistanceLineLine)
 	distance = distanceLineLine(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
 	EXPECT_DOUBLE_EQ(2.0, distance);
 
-	// Intersecting Line
-	distance = distanceLineLine(plainLine.a, plainLine.b, intersectingLine.a, intersectingLine.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(0.0, distance);
-	EXPECT_TRUE(eigenEqual(plainLine.b, p0));
-	EXPECT_TRUE(eigenEqual(plainLine.b, p1));
+	// Not quite parallel, trying to get below epsilon
+	parallel = Segment(plainSegment.a + plainNormal*2 , plainSegment.b + plainNormal*2 - plainNormal*1.0e-10);
+	distance = distanceLineLine(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
+	EXPECT_DOUBLE_EQ(2.0, distance);
 
-	// Non Intersecting Line, don't know a better way to design this case besides reimplementing line/line distance
-	Segment line0(VectorType(0,-5,0), VectorType(0,5,0));
-	Segment line1(VectorType(-5,5,5), VectorType(5,5,5));
+	{
+		SCOPED_TRACE("Intersecting Lines");
+		LineLineCheckData data(plainLine, intersectingLine, plainLine.b, plainLine.b);
+		checkLineLineDistance(data);
+	}
 
-	distance = distanceLineLine(line0.a, line0.b, line1.a, line1.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(5, distance);
-	EXPECT_TRUE(eigenEqual(VectorType(0,5,0), p0));
-	EXPECT_TRUE(eigenEqual(VectorType(0,5,5), p1));
+	{
+		SCOPED_TRACE("Non-intersecting Lines");
+		// Non Intersecting Line, don't know a better way to design this case besides reimplementing line/line distance
+		Segment line0(VectorType(0,-5,0), VectorType(0,5,0));
+		Segment line1(VectorType(-5,5,5), VectorType(5,5,5));
+		checkLineLineDistance(LineLineCheckData(line0,line1,VectorType(0,5,0),VectorType(0,5,5)));
+	}
+
 
 	// Degenerate Cases
-	// Both Lines Degenerate
-	distance = distanceLineLine(plainSegment.a, plainSegment.a, plainSegment.b, plainSegment.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(plainSegment.ab.norm(),distance);
-	EXPECT_TRUE(eigenEqual(plainSegment.a,p0));
-	EXPECT_TRUE(eigenEqual(plainSegment.b,p1));
+	{
+		SCOPED_TRACE("Both lines degenerate");
+		Segment line0(VectorType(0,-5,0), VectorType(0,-5,0));
+		Segment line1(VectorType(5,5,5), VectorType(5,5,5));
+		checkLineLineDistance(LineLineCheckData(line0,line1,line0.a,line1.a));
+	}
 
-	// First Line Denegenerate
-	VectorType offLinePoint = plainSegment.a + plainSegment.ab*0.5 + plainNormal * 1.5;
-	distance = distanceLineLine(offLinePoint, offLinePoint, plainSegment.a, plainSegment.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(1.5,distance);
-	EXPECT_TRUE(eigenEqual(offLinePoint,p0));
-	EXPECT_TRUE(eigenEqual(plainSegment.a + plainSegment.ab*0.5, p1));
+	{
+		SCOPED_TRACE("Only one line degenerate");
+		VectorType offLinePoint = plainSegment.a + plainSegment.ab*0.5 + plainNormal * 1.5;
+		LineLineCheckData data(plainSegment, Segment(offLinePoint,offLinePoint),
+								plainSegment.pointOnLine(0.5), offLinePoint);
+		checkLineLineDistance(data);
+	}
 
-	// Second Line Degenerate
-	distance = distanceLineLine(plainSegment.a, plainSegment.b, offLinePoint, offLinePoint, &p0, &p1);
-	EXPECT_DOUBLE_EQ(1.5,distance);
-	EXPECT_TRUE(eigenEqual(offLinePoint,p1));
-	EXPECT_TRUE(eigenEqual(plainSegment.a + plainSegment.ab*0.5, p0));
+	{
+		SCOPED_TRACE("Orthogonal Lines intersecting");
+		Segment line0(VectorType(0,-5,0), VectorType(0,5,0));
+		VectorType v(3,4,5);
+		VectorType n = line0.ab.cross(v);
+		n.normalize();
+		Segment line1(line0.a + n, line0.a-n);
+		checkLineLineDistance(LineLineCheckData(line0,line1,line0.a,line0.a));
+	}
+
+	{
+		SCOPED_TRACE("Orthogonal Lines non intersecting");
+		Segment line0(VectorType(0,-5,0), VectorType(0,5,0));
+		VectorType v(3,4,5);
+		VectorType n = line0.ab.cross(v);
+		n.normalize();
+		VectorType n2 = line0.ab.cross(n);
+		n2.normalize();
+		Segment line1(line0.a + n + n2, line0.a-n + n2);
+		checkLineLineDistance(LineLineCheckData(line0,line1,line0.a,line0.a + n2));
+	}
+
+	{
+		SCOPED_TRACE("not quite orthogonal Lines non intersecting ");
+		Segment line0(VectorType(0,-5,0), VectorType(0,5,0));
+		VectorType v(3,4,5);
+		VectorType n = line0.ab.cross(v);
+		n.normalize();
+		VectorType n2 = line0.ab.cross(n);
+		n2.normalize();
+		Segment line1(line0.a + n + n2 + line0.ab*0.01, line0.a-n + n2 - line0.ab*0.01);
+		checkLineLineDistance(LineLineCheckData(line0,line1,line0.a,line0.a + n2));
+	}
+	
 }
 
 
@@ -803,6 +893,25 @@ TEST_F(GeometryTest, distancePointPlane)
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 }
 
+typedef std::tuple<Segment, VectorType, double, VectorType, VectorType, int> SegmentPlaneData;
+void checkSegmentPlanDistance(const SegmentPlaneData& data)
+{
+	Segment seg = std::get<0>(data);
+	VectorType n = std::get<1>(data);
+	double d = std::get<2>(data);
+	VectorType expectedSegmentPoint = std::get<3>(data);
+	VectorType expectedPlanePoint = std::get<4>(data);
+	// The sign of the expected distance [1|-1|0], you must use 0 for expected 0
+	int sign = std::get<5>(data);
+	double distance;
+	VectorType segResultPoint, planeResultPoint;
+	distance = distanceSegmentPlane(seg. a, seg.b,n,d, &segResultPoint, &planeResultPoint);
+	EXPECT_NEAR((planeResultPoint - segResultPoint).norm(), fabs(distance), epsilon);
+	EXPECT_TRUE(distance * sign > 0 || distance == double(sign));
+	EXPECT_TRUE(expectedSegmentPoint.isApprox(segResultPoint));
+	EXPECT_TRUE(expectedPlanePoint.isApprox(planeResultPoint));
+}
+
 TEST_F(GeometryTest, SegmentPlaneDistance)
 {
 	double d = tri.n.dot(tri.v0);
@@ -813,41 +922,69 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 
 	double distance;
 
-	// Segment intersects plane
-	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-	EXPECT_NEAR(0.0, distance, epsilon);
-	EXPECT_TRUE(intersectionPoint.isApprox(segResultPoint));
-	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
+	{
+		SCOPED_TRACE("Segment intersects Plane");
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, intersectionPoint, intersectionPoint, 0));
+	}
 
-	// Segment above plane, segment intersection should be point a
-	seg = Segment(intersectionPoint + tri.n * 2, intersectionPoint + tri.n * 3);
-	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-	EXPECT_NEAR(2.0, distance, epsilon);
-	EXPECT_TRUE(seg.a.isApprox(segResultPoint));
-	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
+	{
+		SCOPED_TRACE("Segment above plane, segment intersection should be point a");
+		seg = Segment(intersectionPoint + tri.n * 2, intersectionPoint + tri.n * 3);
+		distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.a, intersectionPoint, 1));
+	}
 
-	seg = Segment(intersectionPoint - tri.n * 3, intersectionPoint - tri.n * 2);
-	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-	EXPECT_NEAR(2.0, distance, epsilon);
-	EXPECT_TRUE(seg.b.isApprox(segResultPoint));
-	EXPECT_TRUE(intersectionPoint.isApprox(planeResultPoint));
+	{
+		SCOPED_TRACE("Segment below plane, segment intersection should be point a");
+		seg = Segment(intersectionPoint - tri.n * 3, intersectionPoint - tri.n * 2);
+		distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.b, intersectionPoint, -1));
+	}
 
-	// Segment parallel to the plane
-	// coplanar with plane
-	seg = Segment(intersectionPoint - tri.v0v1, intersectionPoint + tri.v0v1);
-	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-	EXPECT_NEAR(0.0, distance, epsilon);
-	EXPECT_TRUE(segResultPoint.isApprox(seg.pointOnLine(0.5)));
-	EXPECT_TRUE(planeResultPoint.isApprox(seg.pointOnLine(0.5)));
+	{
+		SCOPED_TRACE("Segment below plane, segment intersection should be point a, reverse case from above");
+		seg = Segment(intersectionPoint - tri.n * 2, intersectionPoint - tri.n * 3);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.a, intersectionPoint, -1));
+	}
 
-	// moved away from plane, but still parallel
-	seg = Segment(intersectionPoint - tri.v0v1 + tri.n*2.0, intersectionPoint + tri.v0v1 + tri.n*2.0);
-	distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-	EXPECT_NEAR(2.0, distance, epsilon);
-	EXPECT_TRUE(segResultPoint.isApprox(seg.pointOnLine(0.5)));
-	EXPECT_TRUE(planeResultPoint.isApprox(intersectionPoint));
+	{
+		SCOPED_TRACE("Segment coplanar with plane");
+		seg = Segment(intersectionPoint - tri.v0v1, intersectionPoint + tri.v0v1);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, intersectionPoint, intersectionPoint, 0));
+	}
+
+	{
+		SCOPED_TRACE("Segment parallel with plane");
+		seg = Segment(intersectionPoint - tri.v0v1 + tri.n*2.0, intersectionPoint + tri.v0v1 + tri.n*2.0);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.pointOnLine(0.5), intersectionPoint, 1));
+	}
+
+	{
+		SCOPED_TRACE("Segment parallel with plane but on the other side");
+		seg = Segment(intersectionPoint - tri.v0v1 - tri.n*2.0, intersectionPoint + tri.v0v1 - tri.n*2.0);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.pointOnLine(0.5), intersectionPoint, -1));
+	}
 }
 
+typedef std::tuple<Triangle, VectorType, double, VectorType, VectorType, int> TriPlaneData;
+void checkTriPlaneDistance(const TriPlaneData& data)
+{
+	Triangle tri = std::get<0>(data);
+	VectorType n = std::get<1>(data);
+	double d = std::get<2>(data);
+	VectorType expectedTrianglePoint = std::get<3>(data);
+	VectorType expectedPlanePoint = std::get<4>(data);
+	int sign = std::get<5>(data);
+	VectorType triangleResultPoint, planeResultPoint;
+	double distance;
+
+	distance = distanceTrianglePlane(tri.v0, tri.v1, tri.v2, n, d, &triangleResultPoint, &planeResultPoint);
+	EXPECT_NEAR((planeResultPoint - triangleResultPoint).norm(), fabs(distance), epsilon);
+	EXPECT_TRUE(distance * sign > 0 || distance == double(sign));
+	EXPECT_TRUE(expectedTrianglePoint.isApprox(triangleResultPoint));
+	EXPECT_TRUE(expectedPlanePoint.isApprox(planeResultPoint));
+
+}
 TEST_F(GeometryTest, TrianglePlaneTest)
 {
 	// Start with the coplanar case
@@ -856,30 +993,78 @@ TEST_F(GeometryTest, TrianglePlaneTest)
 	VectorType intersectionPoint0;
 	VectorType intersectionPoint1;
 
+	// Coplanar
 	VectorType third = (tri.v0 + tri.v1 + tri.v2) / 3.0;
 	distance = distanceTrianglePlane(tri.v0, tri.v1, tri.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(0.0,distance, epsilon);
 	EXPECT_TRUE(third.isApprox(intersectionPoint0));
 	EXPECT_TRUE(third.isApprox(intersectionPoint1));
 
-	// Not intersecting
-	Triangle triangle(tri.v0 + tri.n*2, tri.v1 + tri.n*3, tri.v2+tri.n*3);
-	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
-	EXPECT_NEAR(2.0,distance, epsilon);
-	EXPECT_TRUE(triangle.v0.isApprox(intersectionPoint0));
-	EXPECT_TRUE(tri.v0.isApprox(intersectionPoint1));
+	VectorType pointOnPlane = (tri.v0 + tri.v1 + tri.v2) / 3.0;
+	
+	{
+		SCOPED_TRACE("Coplanar Case");
+		//Triangle triangle(tri.v0 + tri.n, tri.v1 + tri.n, tri.v2 + tri.n);
+		Triangle triangle(tri.v0 , tri.v1 , tri.v2 );
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, pointOnPlane, pointOnPlane,0));
+	}
+	
+	{
+		SCOPED_TRACE("Parallel, below the plane");
+		Triangle triangle(tri.v0 - tri.n * 3, tri.v1 - tri.n * 3, tri.v2 - tri.n * 3);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, pointOnPlane - tri.n*3, pointOnPlane,-1));
+	}
 
-	// Intersecting
-	// On the triangle
-	// Need to change the order of points for this to work ... strange ...
-	triangle = Triangle(tri.v0 + tri.n*3, tri.v2 + tri.n*3, tri.v1);
-	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
-	EXPECT_NEAR(0.0,distance, epsilon);
-	EXPECT_TRUE(triangle.v2.isApprox(intersectionPoint0));
-	EXPECT_TRUE(triangle.v2.isApprox(intersectionPoint1));
+	{
+		SCOPED_TRACE("Parallel, above the plane");
+		Triangle triangle(tri.v0 + tri.n, tri.v1 + tri.n, tri.v2 + tri.n);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, pointOnPlane + tri.n, pointOnPlane,1));
+	}
 
-	// inside ...
-	triangle = Triangle(tri.v0 - tri.n*2, tri.v1*3 + tri.n, tri.v2*3 + tri.n);
+	{
+		SCOPED_TRACE("Not Intersecting, tri.v0 is closest above the plane");
+		Triangle triangle(tri.v0 + tri.n*2, tri.v1 + tri.n*3, tri.v2+tri.n*3);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v0, tri.v0,1));
+	}
+
+	{
+		SCOPED_TRACE("Not Intersecting, tri.v1 is closest above the plane");
+		Triangle triangle(tri.v0 + tri.n*3, tri.v1 + tri.n*2, tri.v2+tri.n*3);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v1, tri.v1,1));
+	}
+
+	{
+		SCOPED_TRACE("Not Intersecting, tri.v2 is closest above the plane");
+		Triangle triangle(tri.v0 + tri.n*4, tri.v1 + tri.n*3, tri.v2+tri.n*2);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v2, tri.v2,1));
+	}
+	
+	{
+		SCOPED_TRACE("Not Intersecting, tri.v0 is closest below the plane");
+		Triangle triangle(tri.v0 - tri.n*2, tri.v1 - tri.n*3, tri.v2 - tri.n*3);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v0, tri.v0,-1));
+	}
+
+	{
+		SCOPED_TRACE("Not Intersecting, tri.v1 is closest below the plane");
+		Triangle triangle(tri.v0 - tri.n*4, tri.v1 - tri.n*2, tri.v2 - tri.n*3);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v1, tri.v1,-1));
+	}
+
+	{
+		SCOPED_TRACE("Not Intersecting, tri.v2 is closest below the plane");
+		Triangle triangle(tri.v0 - tri.n*4, tri.v1 - tri.n*3, tri.v2 - tri.n*2);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v2, tri.v2,-1));
+	}
+
+	{
+		SCOPED_TRACE("Triangle point on the plane");
+		// Need to change the order of points for this to work ... strange ...
+		Triangle triangle(tri.v0 + tri.n*3, tri.v2 + tri.n*3, tri.v1);
+		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v2, triangle.v2,0));
+	}
+
+	Triangle triangle(tri.v0 - tri.n*2, tri.v1*3 + tri.n, tri.v2*3 + tri.n);
 	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(0.0,distance, epsilon);
 	EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
