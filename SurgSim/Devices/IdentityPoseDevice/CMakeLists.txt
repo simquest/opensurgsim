@@ -33,19 +33,12 @@ set(IDENTITY_POSE_DEVICE_HEADERS
 	IdentityPoseDevice.h
 )
 
-add_library(IdentityPoseDevice
-	${IDENTITY_POSE_DEVICE_SOURCES} ${IDENTITY_POSE_DEVICE_HEADERS})
-
-set_target_properties(IdentityPoseDevice PROPERTIES
-	PUBLIC_HEADER "${IDENTITY_POSE_DEVICE_HEADERS}")
-
-install(TARGETS IdentityPoseDevice
-	EXPORT ${PROJECT_NAME}Targets
-	RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-	LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
-	ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
-	PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/SurgSim/Devices/IdentityPoseDevice")
-set(EXPORT_TARGETS IdentityPoseDevice ${EXPORT_TARGETS} CACHE INTERNAL "export targets")
+surgsim_add_library(
+	IdentityPoseDevice
+	"${IDENTITY_POSE_DEVICE_SOURCES}" 
+	"${IDENTITY_POSE_DEVICE_HEADERS}"
+	"/SurgSim/Devices/IdentityPoseDevice"
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
