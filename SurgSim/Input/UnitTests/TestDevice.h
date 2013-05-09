@@ -1,5 +1,5 @@
-#ifndef SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
-#define SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
+#ifndef TESTDEVICE_H
+#define TESTDEVICE_H
 
 #include <SurgSim/Input/CommonDevice.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
@@ -74,5 +74,4 @@ public:
 	  DataGroup m_nextSentOutput;
 };
 
-#endif
-
+#endif // TESTDEVICE_H

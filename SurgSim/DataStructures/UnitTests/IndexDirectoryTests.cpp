@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the IndexDirectory class.
- */
+/// \file
+/// Tests for the IndexDirectory class.
 
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
 #include "SurgSim/DataStructures/IndexDirectory.h"

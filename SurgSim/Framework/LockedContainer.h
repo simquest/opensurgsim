@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_LOCKED_CONTAINER_H
-#define SURGSIM_FRAMEWORK_LOCKED_CONTAINER_H
+#ifndef SURGSIM_FRAMEWORK_LOCKEDCONTAINER_H
+#define SURGSIM_FRAMEWORK_LOCKEDCONTAINER_H
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
@@ -199,4 +199,4 @@ private:
 };  // namespace Framework
 };  // namespace SurgSim
 
-#endif  // SURGSIM_FRAMEWORK_LOCKED_CONTAINER_H
+#endif  // SURGSIM_FRAMEWORK_LOCKEDCONTAINER_H

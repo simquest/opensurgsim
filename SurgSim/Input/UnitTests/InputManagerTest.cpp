@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the CommonDevice class.
- */
+/// \file
+/// Tests for the CommonDevice class.
 
 #include <memory>
 #include <string>

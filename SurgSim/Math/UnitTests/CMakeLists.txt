@@ -20,6 +20,8 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	MakeRigidTransformTests.cpp
+	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

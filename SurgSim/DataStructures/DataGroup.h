@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_DATA_GROUP_H
-#define SURGSIM_DATA_STRUCTURES_DATA_GROUP_H
+#ifndef SURGSIM_DATASTRUCTURES_DATAGROUP_H
+#define SURGSIM_DATASTRUCTURES_DATAGROUP_H
 
 #include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -204,4 +204,4 @@ private:
 #include "SurgSim/DataStructures/DataGroup-inl.h"
 
 
-#endif  // SURGSIM_DATA_STRUCTURES_DATA_GROUP_H
+#endif  // SURGSIM_DATASTRUCTURES_DATAGROUP_H

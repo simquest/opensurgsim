@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests that exercise the functionality of our vector typedefs, which come
- * straight from Eigen.
- */
+/// \file
+/// Tests that exercise the functionality of our vector typedefs, which come
+/// straight from Eigen.
 
 #include <math.h>
 #include "SurgSim/Math/Vector.h"

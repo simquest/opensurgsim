@@ -18,8 +18,8 @@
 /// \ingroup logInternals
 /// \sa loggingAPI
 
-#ifndef SURGSIM_FRAMEWORK_LOG_MACROS_H
-#define SURGSIM_FRAMEWORK_LOG_MACROS_H
+#ifndef SURGSIM_FRAMEWORK_LOGMACROS_H
+#define SURGSIM_FRAMEWORK_LOGMACROS_H
 
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Framework/LogMessage.h"
@@ -214,4 +214,4 @@ namespace Framework
 }; // namespace Framework
 }; // namespace SurgSim
 
-#endif  // SURGSIM_FRAMEWORK_LOG_MACROS_H
+#endif  // SURGSIM_FRAMEWORK_LOGMACROS_H

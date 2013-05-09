@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATA_STRUCTURES_NAMED_DATA_H
-#define SURGSIM_DATA_STRUCTURES_NAMED_DATA_H
+#ifndef SURGSIM_DATASTRUCTURES_NAMEDDATA_H
+#define SURGSIM_DATASTRUCTURES_NAMEDDATA_H
 
 #include <memory>
 #include <string>
@@ -234,4 +234,4 @@ private:
 #include <SurgSim/DataStructures/NamedData-inl.h>
 
 
-#endif  // SURGSIM_DATA_STRUCTURES_NAMED_DATA_H
+#endif  // SURGSIM_DATASTRUCTURES_NAMEDDATA_H

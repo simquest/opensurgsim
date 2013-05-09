@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_ASSERT_MESSAGE_H
-#define SURGSIM_FRAMEWORK_ASSERT_MESSAGE_H
+#ifndef SURGSIM_FRAMEWORK_ASSERTMESSAGE_H
+#define SURGSIM_FRAMEWORK_ASSERTMESSAGE_H
 
 #include <memory>
 
@@ -117,4 +117,4 @@ private:
 };  // namespace Framework
 };  // namespace SurgSim
 
-#endif // SURGSIM_FRAMEWORK_ASSERT_MESSAGE_H
+#endif // SURGSIM_FRAMEWORK_ASSERTMESSAGE_H
