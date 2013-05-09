@@ -79,7 +79,7 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 			return false;
 		}
 	}
-	inputConsumer->deviceConnected(m_name, m_inputData);
+	inputConsumer->initializeInput(m_name, m_inputData);
 	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
 }
@@ -96,7 +96,6 @@ bool CommonDevice::removeInputConsumer(std::shared_ptr<InputConsumerInterface> i
 	{
 		if (*it == inputConsumer)
 		{
-			inputConsumer->deviceDisconnected(m_name);
 			m_state->inputConsumerList.erase(it);
 			// The iterator is now invalid.
 			return true;

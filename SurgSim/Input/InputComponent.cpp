@@ -20,10 +20,44 @@ namespace SurgSim
 namespace Input
 {
 
+class InputConsumer: public InputConsumerInterface
+{
+public:
+	InputConsumer()
+	{
+	}
+
+	virtual ~InputConsumer()
+	{
+	}
+
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
+	{
+		m_lastInput.set(inputData);
+	}
+
+	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData)
+	{
+		SURGSIM_ASSERT(initialData.isValid()) 
+			<< "Cannot initialize input with invalid data from device (" << device << ")";
+		m_lastInput.set(initialData);
+	}
+
+	void getData(SurgSim::DataStructures::DataGroup* dataGroup)
+	{
+		m_lastInput.get(dataGroup);
+	}
+
+private:
+	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
+};
+
+
 InputComponent::InputComponent(std::string name, std::string deviceName) :
 	Component(name),
 	m_deviceName(deviceName),
-	m_deviceConnected(false)
+	m_deviceConnected(false),
+	m_input(std::make_shared<InputConsumer>())
 {
 
 }
@@ -33,28 +67,15 @@ InputComponent::~InputComponent()
 
 }
 
-void InputComponent::deviceConnected(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData)
+bool InputComponent::isDeviceConnected()
 {
-	SURGSIM_ASSERT(initialData.isValid()) 
-		<< "Cannot initialize input component (" << getName() << ") with invalid data from device (" << device << ")";
-	m_lastInput.set(initialData);
-	m_deviceConnected = true;
-}
-
-void InputComponent::deviceDisconnected(const std::string& device)
-{
-	m_deviceConnected = false;
-}
-
-void InputComponent::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
-{
-	m_lastInput.set(inputData);
+	return m_deviceConnected;
 }
 
 void InputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
 {
 	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to " << getName() << ". Unable to getData.";
-	m_lastInput.get(dataGroup);
+	m_input->getData(dataGroup);
 }
 
 bool InputComponent::doInitialize()
@@ -72,6 +93,17 @@ std::string InputComponent::getDeviceName() const
 	return m_deviceName;
 }
 
+void InputComponent::connectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
+{
+	device->addInputConsumer(m_input);
+	m_deviceConnected = true;
+}
+
+void InputComponent::disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
+{
+	device->removeInputConsumer(m_input);
+	m_deviceConnected = true;
+}
 
 }; // namespace Input
 }; // namespace SurgSim

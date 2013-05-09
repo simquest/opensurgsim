@@ -82,7 +82,7 @@ bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
 	{
 		if (m_devices.find(input->getDeviceName()) != m_devices.end())
 		{
-			m_devices[input->getDeviceName()]->addInputConsumer(input);
+			input->connectDevice(m_devices[input->getDeviceName()]);
 			m_inputs.push_back(input);
 			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
 			                           " Added component " << input->getName();
@@ -148,7 +148,7 @@ bool InputManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component
 		auto found = std::find(m_inputs.begin(), m_inputs.end(), input);
 		if (found != m_inputs.end())
 		{
-			m_devices[input->getDeviceName()]->removeInputConsumer(input);
+			input->disconnectDevice(m_devices[input->getDeviceName()]);
 			m_inputs.erase(found);
 			result = true;
 		}
