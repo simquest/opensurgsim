@@ -32,7 +32,7 @@ surgsim_add_library(
 	SurgSimMath 
 	"${SURGSIM_MATH_SOURCES}"
 	"${SURGSIM_MATH_HEADERS}"
-	"/SurgSim/Math"
+	"SurgSim/Math"
 )
 	
 if(SURGSIM_TESTS_BUILD)

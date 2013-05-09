@@ -37,7 +37,7 @@ surgsim_add_library(
 	SurgSimDataStructures
 	"${SURGSIM_DATA_STRUCTURES_SOURCES}" 
 	"${SURGSIM_DATA_STRUCTURES_HEADERS}" 
-	"/SurgSim/DataStructures"
+	"SurgSim/DataStructures"
 )
 
 if(SURGSIM_TESTS_BUILD)

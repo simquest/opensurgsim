@@ -63,7 +63,7 @@ surgsim_add_library(
 	SurgSimFramework 
 	"${SURGSIM_FRAMEWORK_SOURCES}" 
 	"${SURGSIM_FRAMEWORK_HEADERS}" 
-	"/SurgSim/Framework"
+	"SurgSim/Framework"
 )
 
 if(SURGSIM_TESTS_BUILD)

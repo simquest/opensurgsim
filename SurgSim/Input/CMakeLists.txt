@@ -39,7 +39,7 @@ surgsim_add_library(
 	SurgSimInput
 	"${SURGSIM_INPUT_SOURCES}"
 	"${SURGSIM_INPUT_HEADERS}"
-	"/SurgSim/Input"
+	"SurgSim/Input"
 )
 
 if(SURGSIM_TESTS_BUILD)
