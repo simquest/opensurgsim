@@ -47,8 +47,6 @@ template <class VertexData, class EdgeData, class TriangleData>
 class TriangleMesh : public Mesh<VertexData>
 {
 public:
-	/// Vertex type for convenience
-	typedef typename MeshVertex<VertexData> Vertex;
 	/// Edge type for convenience
 	typedef typename MeshElement<2, EdgeData> Edge;
 	/// Triangle type for convenience
@@ -72,7 +70,7 @@ public:
 		return m_edges.size() - 1;
 	}
 
-	/// Adds an triangle to the mesh.
+	/// Adds a triangle to the mesh.
 	/// \param	triangle	Triangle to add to the mesh
 	/// \return	Unique ID of the new triangle.
 	unsigned int addTriangle(const Triangle& triangle)
