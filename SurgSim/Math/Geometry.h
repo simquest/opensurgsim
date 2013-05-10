@@ -1063,10 +1063,11 @@ T distanceSegmentPlane(
 /// \param tv0,tv1,tv2 Points of the triangle.
 /// \param n		Normal of the plane n (normalized).
 /// \param d		Constant d in n.x=d.
-/// \param closestPointTriangle Closest point on the triangle, when the triangle is coplanar to the plane (tv0+tv1+tv2)/3 is used,
-/// 				when the triangle intersects the plane the midpoint of the intersection segment is returned.
-/// \param planeProjectionPoint Projection of the closest point onto the plane, when the triangle intersects the plane the midpoint of
-///					the intersection segment is returned.
+/// \param closestPointTriangle Closest point on the triangle, when the triangle is coplanar to 
+/// 				the plane (tv0+tv1+tv2)/3 is used, when the triangle intersects the plane the midpoint of 
+/// 				the intersection segment is returned.
+/// \param planeProjectionPoint Projection of the closest point onto the plane, when the triangle intersects 
+/// 				the plane the midpoint of the intersection segment is returned.
 /// \return The distance of the triangle to the plane.
 template <class T, int MOpt> inline
 T distanceTrianglePlane(
@@ -1190,7 +1191,7 @@ bool doesIntersectPlanePlane(
 /// \param [out] trianglePoint Closest point on the triangle.
 /// \return the the distance between the two closest points, i.e. (trianglePoint - segmentPoint).norm().
 template <class T, int MOpt> inline
-T distanceTriangleSegment(
+T distanceSegmentTriangle(
     const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
     const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
     const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
@@ -1201,7 +1202,7 @@ T distanceTriangleSegment(
 {
 	Eigen::Matrix<T, 3, 1, MOpt> n = (tv1 - tv0).cross(tv2 - tv1);
 	n.normalize();
-	return distanceTriangleSegment(sv0, sv1, tv0, tv1, tv2, n, segmentPoint, trianglePoint);
+	return distanceSegmentTriangle(sv0, sv1, tv0, tv1, tv2, n, segmentPoint, trianglePoint);
 }
 
 /// Calculate the distance of a line segment to a triangle.
@@ -1215,7 +1216,7 @@ T distanceTriangleSegment(
 /// \param [OUT] trianglePoint Closest point on the triangle.
 /// \return the distance between the two closest points.
 template <class T, int MOpt> inline
-T distanceTriangleSegment(
+T distanceSegmentTriangle(
     const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
     const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
     const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
@@ -1237,7 +1238,8 @@ T distanceTriangleSegment(
 	const T v01DotTn = n.dot(v01);
 	if (abs(v01DotTn) <= Geometry::AngularEpsilon)
 	{
-		// Check if any of the points project onto the tri - otherwise normal (non-parallel) processing will get the right result
+		// Check if any of the points project onto the tri 
+		// otherwise normal (non-parallel) processing will get the right result
 		T dst = abs(distancePointPlane(sv0, n, d, trianglePoint));
 		Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 		barycentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
@@ -1346,21 +1348,21 @@ T distanceTriangleTriangle(
 	n0.normalize();
 	Eigen::Matrix<T, 3, 1, MOpt> n1 = (t1v1-t1v0).cross(t1v2-t1v1);
 	n1.normalize();
-	currDst = distanceTriangleSegment(t0v0, t0v1, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
+	currDst = distanceSegmentTriangle(t0v0, t0v1, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
 	if (currDst < minDst)
 	{
 		minDst = currDst;
 		*closestPoint0 = segPt;
 		*closestPoint1 = triPt;
 	}
-	currDst = distanceTriangleSegment(t0v1, t0v2, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
+	currDst = distanceSegmentTriangle(t0v1, t0v2, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
 	if (currDst < minDst)
 	{
 		minDst = currDst;
 		*closestPoint0 = segPt;
 		*closestPoint1 = triPt;
 	}
-	currDst = distanceTriangleSegment(t0v2, t0v0, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
+	currDst = distanceSegmentTriangle(t0v2, t0v0, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
 	if (currDst < minDst)
 	{
 		minDst = currDst;
@@ -1368,21 +1370,21 @@ T distanceTriangleTriangle(
 		*closestPoint1 = triPt;
 	}
 	// Check the segments of t1 against t0
-	currDst = distanceTriangleSegment(t1v0, t1v1, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
+	currDst = distanceSegmentTriangle(t1v0, t1v1, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
 	if (currDst < minDst)
 	{
 		minDst = currDst;
 		*closestPoint1 = segPt;
 		*closestPoint0 = triPt;
 	}
-	currDst = distanceTriangleSegment(t1v1, t1v2, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
+	currDst = distanceSegmentTriangle(t1v1, t1v2, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
 	if (currDst < minDst)
 	{
 		minDst = currDst;
 		*closestPoint1 = segPt;
 		*closestPoint0 = triPt;
 	}
-	currDst = distanceTriangleSegment(t1v2, t1v0, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
+	currDst = distanceSegmentTriangle(t1v2, t1v0, t0v0, t0v1, t0v2, n0, &segPt, &triPt);
 	if (currDst < minDst)
 	{
 		minDst = currDst;

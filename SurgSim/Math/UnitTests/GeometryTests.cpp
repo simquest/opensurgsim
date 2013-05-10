@@ -17,11 +17,6 @@
 /// Tests for the Geometry.cpp functions.
 ///
 
-/// \todo rename all the functions to a consistant naming scheme
-/// \todo pass the alignment as a separate template parameter
-/// \todo check parameter naming for consistency
-/// \todo run through lint and formatting
-
 
 #include <gtest/gtest.h>
 #include <numeric>
@@ -1113,14 +1108,14 @@ void checkSegTriDistance(const SegTriDistanceData& data)
 	double distance;
 	VectorType segmentPoint, trianglePoint;
 
-	distance = distanceTriangleSegment(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
+	distance = distanceSegmentTriangle(segment.a, segment.b, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
 	EXPECT_NEAR(expectedDistance, distance,epsilon);
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
 
 
 	// Repeat above with segment reversed
-	distance = distanceTriangleSegment(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
+	distance = distanceSegmentTriangle(segment.b, segment.a, tri.v0, tri.v1, tri.v2, tri.n,&segmentPoint, &trianglePoint);
 	EXPECT_NEAR(expectedDistance, distance,epsilon);
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segmentPoint));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(trianglePoint));
