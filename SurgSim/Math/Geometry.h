@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// \TODO use Eigen comparison functions for tests
-
 #ifndef SURGSIM_GEOMETRY_H
 #define SURGSIM_GEOMETRY_H
 
@@ -37,14 +35,21 @@ namespace SurgSim
 {
 namespace Math
 {
-/// Used as epsilon when we need to decide whether a line segment is actually a point
-static const double DegenerateEpsilon = 1e-10;
 
-/// Used as epsilon for intersection calculations
-static const double IntersectionEpsilon = 1e-10;
+namespace Geometry
+{
+	/// Used as epsilon for general distance calculations
+	static const double DistanceEpsilon = 1e-10;
 
-/// Used as epsilon for numerical equality comparison
-static const double ComparisonEpsilon = 1e-10;
+	/// Used as epsilon for general distance calculations with squared distances
+	static const double SquaredDistanceEpsilon = 1e-10;
+
+	/// Epsilon used in angular comparisons
+	static const double AngularEpsilon = 1e-10;
+
+	/// Used as epsilon for scalar comparisons
+	static const double ScalarEpsilon = 1e-10;
+}
 
 /// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
 /// appear in the list of parameters.
@@ -61,7 +66,8 @@ template <class T> inline
 }
 
 /// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
-/// appear in the list of parameters.
+/// appear in the list of parameters. If you need tests with more parameters, think about using 
+/// boost::minmax for example.
 /// \tparam T Floating point type of the calculation, can usually be inferred.
 /// \param a,b,c,d,e Values that are searched for the minimum.
 /// \return [0-4] with then number being equivalent to the place of the parameter with the smallest value
@@ -76,9 +82,7 @@ size_t indexOfMinimum(T a, T b, T c, T d, T e)
 	return index;
 }
 
-
-
-/// Calculate the barycentric coordinates of a point with respect to a triangle
+/// Calculate the barycentric coordinates of a point with respect to a triangle.
 /// \pre The normal must be unit length
 /// \pre The triangle vertices must be in counter clockwise order in respect to the normal
 /// \tparam T Floating point type of the calculation, can usually be inferred.
@@ -97,7 +101,7 @@ bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
                             Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
 {
 	const T signedTriAreaX2 = ((tv1-tv0).cross(tv2-tv0)).dot(tn);
-	if (signedTriAreaX2 < DegenerateEpsilon)
+	if (signedTriAreaX2 < Geometry::SquaredDistanceEpsilon)
 	{
 		// SQ_ASSERT_WARNING(false, "Cannot compute barycentric coords (degenetrate triangle), assigning center");
 		coordinates->setConstant((std::numeric_limits<double>::quiet_NaN()));
@@ -152,9 +156,9 @@ bool isPointInsideTriangle(
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, tn, &baryCoords);
 	return (result &&
-	        baryCoords[0] >= -ComparisonEpsilon &&
-	        baryCoords[1] >= -ComparisonEpsilon &&
-	        baryCoords[2] >= -ComparisonEpsilon);
+	        baryCoords[0] >= -Geometry::ScalarEpsilon &&
+	        baryCoords[1] >= -Geometry::ScalarEpsilon &&
+	        baryCoords[2] >= -Geometry::ScalarEpsilon);
 }
 
 /// Check if a point is inside a triangle.
@@ -175,9 +179,9 @@ bool isPointInsideTriangle(
 {
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, &baryCoords);
-	return (result && baryCoords[0] >= -ComparisonEpsilon &&
-	        baryCoords[1] >= -ComparisonEpsilon &&
-	        baryCoords[2] >= -ComparisonEpsilon);
+	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
+	        baryCoords[1] >= -Geometry::ScalarEpsilon &&
+	        baryCoords[2] >= -Geometry::ScalarEpsilon);
 }
 
 
@@ -198,7 +202,7 @@ T distancePointLine(
 	// and we solve for pq.v01 = 0;
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = v1-v0;
 	T v01_norm2 = v01.squaredNorm();
-	if (v01_norm2 <= DegenerateEpsilon)
+	if (v01_norm2 <= Geometry::SquaredDistanceEpsilon)
 	{
 		*result = v0; // closest point is either
 		T pv_norm2 = (pt-v0).squaredNorm();
@@ -226,7 +230,7 @@ T distancePointSegment(
 {
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
 	T v01Norm2 = v01.squaredNorm();
-	if (v01Norm2 <= DegenerateEpsilon)
+	if (v01Norm2 <= Geometry::SquaredDistanceEpsilon)
 	{
 		*result = sv0; // closest point is either
 		return (pt-sv0).norm();
@@ -274,8 +278,8 @@ T distanceLineLine(
 	// and we solve for p0p1 perpendicular to both lines
 	T lambda0, lambda1;
 	Eigen::Matrix<T, 3, 1, MOpt> l0v01 = l0v1-l0v0;
-	T a = l0v01.dot(l0v01);
-	if (a <= DegenerateEpsilon)
+	T a = l0v01.squaredNorm();
+	if (a <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate line 0
 		*pt0 = l0v0;
@@ -284,7 +288,7 @@ T distanceLineLine(
 	Eigen::Matrix<T, 3, 1, MOpt> l1v01 = l1v1-l1v0;
 	T b = -l0v01.dot(l1v01);
 	T c = l1v01.squaredNorm();
-	if (c <= DegenerateEpsilon)
+	if (c <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate line 1
 		*pt1 = l1v0;
@@ -294,7 +298,7 @@ T distanceLineLine(
 	T d = l0v01.dot(l0v0_l1v0);
 	T e = -l1v01.dot(l0v0_l1v0);
 	T ratio = a*c-b*b;
-	if (fabs(ratio) <= IntersectionEpsilon)
+	if (fabs(ratio) <= Geometry::ScalarEpsilon)
 	{
 		// parallel case
 		lambda0 = 0;
@@ -338,8 +342,8 @@ T distanceSegmentSegment(
 	//		p1 = l1v0 + t * (l1v1-l1v0), with t between 0 and 1
 	// We are minimizing Q(s, t) = as*as + 2bst + ct*ct + 2ds + 2et + f,
 	Eigen::Matrix<T, 3, 1, MOpt> s0v01 = s0v1-s0v0;
-	T a = s0v01.dot(s0v01);
-	if (a <= DegenerateEpsilon)
+	T a = s0v01.squaredNorm();
+	if (a <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate segment 0
 		*pt0 = s0v0;
@@ -347,8 +351,8 @@ T distanceSegmentSegment(
 	}
 	Eigen::Matrix<T, 3, 1, MOpt> s1v01 = s1v1-s1v0;
 	T b = -s0v01.dot(s1v01);
-	T c = s1v01.dot(s1v01);
-	if (c <= DegenerateEpsilon)
+	T c = s1v01.squaredNorm();
+	if (c <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate segment 1
 		*pt1 = s1v1;
@@ -362,7 +366,7 @@ T distanceSegmentSegment(
 	int region = -1;
 	T tmp;
 	// Non-parallel case
-	if (abs(ratio) >= DegenerateEpsilon)
+	if (abs(ratio) >= Geometry::ScalarEpsilon)
 	{
 		// Get the region of the global minimum in the s-t space based on the line-line solution
 		//		s=0		s=1
@@ -678,21 +682,21 @@ T distancePointTriangle(
 	// We are minimizing Q(s, t) = as*as + 2bst + ct*ct + 2ds + 2et + f,
 	Eigen::Matrix<T, 3, 1, MOpt> tv01 = tv1-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> tv02 = tv2-tv0;
-	T a = tv01.dot(tv01);
-	if (a <= DegenerateEpsilon)
+	T a = tv01.squaredNorm();
+	if (a <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate edge 1
 		return distancePointSegment<T>(pt, tv0, tv2, result);
 	}
 	T b = tv01.dot(tv02);
 	T tCross = tv01.cross(tv02).squaredNorm();
-	if (tCross <= DegenerateEpsilon)
+	if (tCross <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate edge 2
 		return distancePointSegment<T>(pt, tv0, tv1, result);
 	}
-	T c = tv02.dot(tv02);
-	if (c <= DegenerateEpsilon)
+	T c = tv02.squaredNorm();
+	if (c <= Geometry::SquaredDistanceEpsilon)
 	{
 		// Degenerate edge 3
 		return distancePointSegment<T>(pt, tv0, tv1, result);
@@ -867,7 +871,7 @@ T distancePointTriangle(
 		break;
 	}
 	*result = tv0 + s * tv01 + t * tv02;
-	return ((*result)-pt).norm();
+	return ((*result)-pt).norm(); // * (n.dot(tv0pv0) >= 0) ? 1 : -1;
 }
 
 /// Calculate the intersection of a line segment with a triangle
@@ -907,7 +911,7 @@ bool doesCollideSegmentTriangle(
 	result->setConstant((std::numeric_limits<double>::quiet_NaN()));
 
 	// Ray is parallel to triangle plane
-	if (fabs(b) <= IntersectionEpsilon)
+	if (fabs(b) <= Geometry::AngularEpsilon)
 	{
 		if (a == 0)
 		{
@@ -1017,12 +1021,12 @@ T distanceSegmentPlane(
 	T dist1 = n.dot(sv1) - d;
 	// Parallel case
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
-	if (abs(n.dot(v01)) <= IntersectionEpsilon)
+	if (abs(n.dot(v01)) <= Geometry::AngularEpsilon)
 	{
 		*closestPointSegment = (sv0 + sv1)*T(0.5);
 		dist0 = n.dot(*closestPointSegment) - d;
 		*planeIntersectionPoint = *closestPointSegment - dist0*n;
-		return (abs(dist0) < IntersectionEpsilon ? 0 : dist0);
+		return (abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
 	}
 	// Both on the same side
 	if (dist0 > 0 && dist1 > 0 || dist0 < 0 && dist1 < 0)
@@ -1084,10 +1088,10 @@ T distanceTrianglePlane(
 	closestPointTriangle->setConstant((std::numeric_limits<double>::quiet_NaN()));
 	planeProjectionPoint->setConstant((std::numeric_limits<double>::quiet_NaN()));
 
-	// HS-2013-may-09 Could there be a case where we fall into the wrong tree because of the checks agains
+	// HS-2013-may-09 Could there be a case where we fall into the wrong tree because of the checks against
 	// the various epsilon values all going against us ???
 	// Parallel case (including Coplanar)
-	if (abs(n.dot(t01)) <= DegenerateEpsilon && abs(n.dot(t02)) <= DegenerateEpsilon)
+	if (abs(n.dot(t01)) <= Geometry::AngularEpsilon && abs(n.dot(t02)) <= Geometry::AngularEpsilon)
 	{
 		*closestPointTriangle = (tv0 + tv1 + tv2) / T(3);
 		*planeProjectionPoint = *closestPointTriangle - n*dist0;
@@ -1095,8 +1099,8 @@ T distanceTrianglePlane(
 	}
 
 	// Is there an intersection
-	if ((dist0 <= IntersectionEpsilon || dist1 <= IntersectionEpsilon || dist2 <= IntersectionEpsilon) &&
-		(dist0 > IntersectionEpsilon || dist1 > IntersectionEpsilon || dist2 > IntersectionEpsilon))
+	if ((dist0 <= Geometry::DistanceEpsilon || dist1 <= Geometry::DistanceEpsilon || dist2 <= Geometry::DistanceEpsilon) &&
+		(dist0 > Geometry::DistanceEpsilon || dist1 > Geometry::DistanceEpsilon || dist2 > Geometry::DistanceEpsilon))
 	{
 		if (dist0 * dist1 < 0)
 		{
@@ -1164,7 +1168,7 @@ bool doesIntersectPlanePlane(
 	pt1->setConstant((std::numeric_limits<double>::quiet_NaN()));
 
 	// Test if the two planes are parallel
-	if (lineDirNorm2 <= DegenerateEpsilon)
+	if (lineDirNorm2 <= Geometry::SquaredDistanceEpsilon)
 	{
 		return false; // planes disjoint
 	}
@@ -1231,7 +1235,7 @@ T distanceTriangleSegment(
 	// Degenerate case: Line and triangle plane parallel
 	const Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
 	const T v01DotTn = n.dot(v01);
-	if (abs(v01DotTn) <= DegenerateEpsilon)
+	if (abs(v01DotTn) <= Geometry::AngularEpsilon)
 	{
 		// Check if any of the points project onto the tri - otherwise normal (non-parallel) processing will get the right result
 		T dst = abs(distancePointPlane(sv0, n, d, trianglePoint));
