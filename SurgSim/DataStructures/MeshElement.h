@@ -70,6 +70,8 @@ struct MeshElement
 	}
 };
 
+/// Specialization of MeshElement with no data.
+/// \sa MeshElement
 template <unsigned int N>
 struct MeshElement<N, void>
 {

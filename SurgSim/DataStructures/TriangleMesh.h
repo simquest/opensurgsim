@@ -31,12 +31,21 @@ namespace DataStructures
 /// For example, a physics 2D FEM is not a subclass of TriangleMesh, but may use a TriangleMesh for storing the
 /// structure of the FEM.
 ///
-/// Subclasses of this class can provide convenience methods for creation of vertices, edges, and triangles and the
-/// data each contains. Overriding isEqual(const Mesh&) is necessary to do more than just basic list comparison of the
-/// vertices, edges, and triangles, which is dependent on order in the list. Override doUpdate() to provide update
-/// functionality when vertices are changes, such as recalculating surface normals. A subclass that is designed for a
-/// specific use, such as collision detection, may also want to specify the VertexData, EdgeData, and TriangleData to
-/// what is required.
+/// It is recommended that subclasses with a specific purpose (such as for use in collision detection) provide
+/// convenience methods for creation of vertices, edges, and triangles and the data each contains. Methods such as
+/// createVertex(position, other data...), createEdge(vertices, other data...),
+/// and createTriangle(vertices, other data...) simplify the creation of vertices and elements and the data required.
+/// These methods would use the addVertex(), addEdge(), and addTriangle() methods to add the created vertices and
+/// elements to the TriangleMesh.
+///
+/// Overriding isEqual(const Mesh&) is necessary to do more than just basic list comparison of the
+/// vertices, edges, and triangles, which is dependent on order in the list.
+///
+/// Override doUpdate() to provide update functionality when vertices are changes, such as recalculating surface
+/// normals.
+///
+/// A subclass that is designed for a specific use (such as collision detection) may also specify the VertexData,
+/// EdgeData, and TriangleData to what is required.
 ///
 /// \tparam	VertexData	Type of extra data stored in each vertex
 /// \tparam	EdgeData	Type of extra data stored in each edge
@@ -62,6 +71,10 @@ public:
 	}
 
 	/// Adds an edge to the mesh.
+	/// No checking on the edge's vertices is performed.
+	/// Recommend that subclasses with a specific purpose (such as for use in collision detection) have a
+	/// createEdge(vertices, other data...) method which performs any checking desired and sets up the edge data based
+	/// on the vertices and other parameters.
 	/// \param	edge	Edge to add to the mesh
 	/// \return	Unique ID of the new edge.
 	unsigned int addEdge(const Edge& edge)
@@ -72,6 +85,9 @@ public:
 
 	/// Adds a triangle to the mesh.
 	/// \param	triangle	Triangle to add to the mesh
+	/// Recommend that subclasses with a specific purpose (such as for use in collision detection) have a
+	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
+	/// based on the vertices and other parameters.
 	/// \return	Unique ID of the new triangle.
 	unsigned int addTriangle(const Triangle& triangle)
 	{

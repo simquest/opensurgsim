@@ -38,6 +38,11 @@ namespace DataStructures
 /// generic triangle mesh or as specific as a triangle mesh for collision detection, which might also specify the data
 /// types for the vertex and elements).
 ///
+/// It is recommended that subclasses of this class also provide convenience methods for creation of vertices and
+/// elements, and the data each contains. A method such as createVertex(position, other data...) simplifies the creation
+/// of vertices and the data required. This method would use the addVertex() method to add the created vertices to the
+/// Mesh.
+///
 /// \tparam	VertexData	Type of extra data stored in each vertex (void for no data)
 /// \sa MeshVertex
 /// \sa MeshElement
@@ -71,6 +76,9 @@ public:
 	}
 
 	/// Adds a vertex to the mesh.
+	/// Recommend that subclasses with a specific purpose (such as for use in collision detection), have a
+	/// createVertex(position, other data...) method which performs any checking desired and sets up the vertex data
+	/// based on the other parameters.
 	/// \param	vertex	Vertex to add to the mesh
 	/// \return	Unique ID of the new vertex.
 	unsigned int addVertex(const Vertex& vertex)
