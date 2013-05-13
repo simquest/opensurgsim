@@ -868,23 +868,23 @@ TEST_F(GeometryTest, SegmentTriangleIntersection)
 
 TEST_F(GeometryTest, distancePointPlane)
 {
-
-	VectorType pointInTriangle = tri.v0 + tri.v0v1*.5;
-	double d = tri.n.dot(tri.v0);
+	Triangle triangle(VectorType(3,4,5), VectorType(5,5,5), VectorType(10,5,2));
+	VectorType pointInTriangle = triangle.v0 + triangle.v0v1*0.4;
+	double d = -triangle.n.dot(triangle.v0);
 	VectorType point = pointInTriangle;
 	VectorType projectionPoint;
-	double distance = distancePointPlane(point, tri.n, d, &projectionPoint);
+	double distance = distancePointPlane(point, triangle.n, d, &projectionPoint);
 	EXPECT_NEAR(0.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 
-	point = pointInTriangle + tri.n*2;
-	distance = distancePointPlane(point, tri.n, d, &projectionPoint);
+	point = pointInTriangle + triangle.n*2;
+	distance = distancePointPlane(point, triangle.n, d, &projectionPoint);
 	EXPECT_NEAR(2.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 
-	point = pointInTriangle - tri.n*2;
-	distance = distancePointPlane(point, tri.n, d, &projectionPoint);
-	EXPECT_NEAR(-2.0, distance, epsilon);
+	point = pointInTriangle - triangle.n*3;
+	distance = distancePointPlane(point, triangle.n, d, &projectionPoint);
+	EXPECT_NEAR(-3.0, distance, epsilon);
 	EXPECT_TRUE(pointInTriangle.isApprox(projectionPoint));
 }
 
@@ -909,9 +909,10 @@ void checkSegmentPlanDistance(const SegmentPlaneData& data)
 
 TEST_F(GeometryTest, SegmentPlaneDistance)
 {
-	double d = tri.n.dot(tri.v0);
-	VectorType intersectionPoint = tri.pointInTriangle(0.2,0.7);
-	Segment seg(intersectionPoint - tri.n*2, intersectionPoint + tri.n*2);
+	Triangle triangle(VectorType(3,4,5), VectorType(5,5,5), VectorType(10,5,2));
+	double d = -triangle.n.dot(triangle.v0);
+	VectorType intersectionPoint = triangle.pointInTriangle(0.2,0.7);
+	Segment seg(intersectionPoint - triangle.n*2, intersectionPoint + triangle.n*2);
 
 	VectorType segResultPoint, planeResultPoint;
 
@@ -919,45 +920,45 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 
 	{
 		SCOPED_TRACE("Segment intersects Plane");
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, intersectionPoint, intersectionPoint, 0));
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, intersectionPoint, intersectionPoint, 0));
 	}
 
 	{
 		SCOPED_TRACE("Segment above plane, segment intersection should be point a");
-		seg = Segment(intersectionPoint + tri.n * 2, intersectionPoint + tri.n * 3);
-		distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.a, intersectionPoint, 1));
+		seg = Segment(intersectionPoint + triangle.n * 2, intersectionPoint + triangle.n * 3);
+		distance = distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.a, intersectionPoint, 1));
 	}
 
 	{
 		SCOPED_TRACE("Segment below plane, segment intersection should be point a");
-		seg = Segment(intersectionPoint - tri.n * 3, intersectionPoint - tri.n * 2);
-		distance = distanceSegmentPlane(seg.a, seg.b,tri.n,d, &segResultPoint, &planeResultPoint);
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.b, intersectionPoint, -1));
+		seg = Segment(intersectionPoint - triangle.n * 3, intersectionPoint - triangle.n * 2);
+		distance = distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.b, intersectionPoint, -1));
 	}
 
 	{
 		SCOPED_TRACE("Segment below plane, segment intersection should be point a, reverse case from above");
-		seg = Segment(intersectionPoint - tri.n * 2, intersectionPoint - tri.n * 3);
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.a, intersectionPoint, -1));
+		seg = Segment(intersectionPoint - triangle.n * 2, intersectionPoint - triangle.n * 3);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.a, intersectionPoint, -1));
 	}
 
 	{
 		SCOPED_TRACE("Segment coplanar with plane");
-		seg = Segment(intersectionPoint - tri.v0v1, intersectionPoint + tri.v0v1);
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, intersectionPoint, intersectionPoint, 0));
+		seg = Segment(intersectionPoint - triangle.v0v1, intersectionPoint + triangle.v0v1);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, intersectionPoint, intersectionPoint, 0));
 	}
 
 	{
 		SCOPED_TRACE("Segment parallel with plane");
-		seg = Segment(intersectionPoint - tri.v0v1 + tri.n*2.0, intersectionPoint + tri.v0v1 + tri.n*2.0);
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.pointOnLine(0.5), intersectionPoint, 1));
+		seg = Segment(intersectionPoint - triangle.v0v1 + triangle.n*2.0, intersectionPoint + triangle.v0v1 + triangle.n*2.0);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.pointOnLine(0.5), intersectionPoint, 1));
 	}
 
 	{
 		SCOPED_TRACE("Segment parallel with plane but on the other side");
-		seg = Segment(intersectionPoint - tri.v0v1 - tri.n*2.0, intersectionPoint + tri.v0v1 - tri.n*2.0);
-		checkSegmentPlanDistance(SegmentPlaneData(seg, tri.n, d, seg.pointOnLine(0.5), intersectionPoint, -1));
+		seg = Segment(intersectionPoint - triangle.v0v1 - triangle.n*2.0, intersectionPoint + triangle.v0v1 - triangle.n*2.0);
+		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.pointOnLine(0.5), intersectionPoint, -1));
 	}
 }
 
@@ -978,93 +979,116 @@ void checkTriPlaneDistance(const TriPlaneData& data)
 	EXPECT_TRUE(distance * sign > 0 || distance == double(sign));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(triangleResultPoint));
 	EXPECT_TRUE(expectedPlanePoint.isApprox(planeResultPoint));
-
 }
+
 TEST_F(GeometryTest, TrianglePlaneTest)
 {
+	Triangle triangle(VectorType(3,4,5), VectorType(5,5,5), VectorType(10,5,2));
 	// Start with the coplanar case
-	double d = tri.n.dot(tri.v0);
+	double d = -triangle.n.dot(triangle.v0);
 	double distance;
 	VectorType intersectionPoint0;
 	VectorType intersectionPoint1;
 
 	// Coplanar
-	VectorType third = (tri.v0 + tri.v1 + tri.v2) / 3.0;
-	distance = distanceTrianglePlane(tri.v0, tri.v1, tri.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
+	VectorType third = (triangle.v0 + triangle.v1 + triangle.v2) / 3.0;
+	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, triangle.n, d, &intersectionPoint0, &intersectionPoint1);
 	EXPECT_NEAR(0.0,distance, epsilon);
 	EXPECT_TRUE(third.isApprox(intersectionPoint0));
 	EXPECT_TRUE(third.isApprox(intersectionPoint1));
 
-	VectorType pointOnPlane = (tri.v0 + tri.v1 + tri.v2) / 3.0;
+	VectorType pointOnPlane = (triangle.v0 + triangle.v1 + triangle.v2) / 3.0;
 	
 	{
 		SCOPED_TRACE("Coplanar Case");
-		//Triangle triangle(tri.v0 + tri.n, tri.v1 + tri.n, tri.v2 + tri.n);
-		Triangle triangle(tri.v0 , tri.v1 , tri.v2 );
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, pointOnPlane, pointOnPlane,0));
+		Triangle target(triangle.v0 , triangle.v1 , triangle.v2 );
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, pointOnPlane, pointOnPlane,0));
 	}
 	
 	{
 		SCOPED_TRACE("Parallel, below the plane");
-		Triangle triangle(tri.v0 - tri.n * 3, tri.v1 - tri.n * 3, tri.v2 - tri.n * 3);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, pointOnPlane - tri.n*3, pointOnPlane,-1));
+		Triangle target(triangle.v0 - triangle.n * 3, triangle.v1 - triangle.n * 3, triangle.v2 - triangle.n * 3);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, pointOnPlane - triangle.n*3, pointOnPlane,-1));
 	}
 
 	{
 		SCOPED_TRACE("Parallel, above the plane");
-		Triangle triangle(tri.v0 + tri.n, tri.v1 + tri.n, tri.v2 + tri.n);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, pointOnPlane + tri.n, pointOnPlane,1));
+		Triangle target(triangle.v0 + triangle.n, triangle.v1 + triangle.n, triangle.v2 + triangle.n);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, pointOnPlane + triangle.n, pointOnPlane,1));
 	}
 
 	{
-		SCOPED_TRACE("Not Intersecting, tri.v0 is closest above the plane");
-		Triangle triangle(tri.v0 + tri.n*2, tri.v1 + tri.n*3, tri.v2+tri.n*3);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v0, tri.v0,1));
+		SCOPED_TRACE("Not Intersecting, triangle.v0 is closest above the plane");
+		Triangle target(triangle.v0 + triangle.n*2, triangle.v1 + triangle.n*3, triangle.v2+triangle.n*3);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v0, triangle.v0,1));
 	}
 
 	{
-		SCOPED_TRACE("Not Intersecting, tri.v1 is closest above the plane");
-		Triangle triangle(tri.v0 + tri.n*3, tri.v1 + tri.n*2, tri.v2+tri.n*3);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v1, tri.v1,1));
+		SCOPED_TRACE("Not Intersecting, triangle.v1 is closest above the plane");
+		Triangle target(triangle.v0 + triangle.n*3, triangle.v1 + triangle.n*2, triangle.v2+triangle.n*3);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v1, triangle.v1,1));
 	}
 
 	{
-		SCOPED_TRACE("Not Intersecting, tri.v2 is closest above the plane");
-		Triangle triangle(tri.v0 + tri.n*4, tri.v1 + tri.n*3, tri.v2+tri.n*2);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v2, tri.v2,1));
+		SCOPED_TRACE("Not Intersecting, triangle.v2 is closest above the plane");
+		Triangle target(triangle.v0 + triangle.n*4, triangle.v1 + triangle.n*3, triangle.v2+triangle.n*2);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v2, triangle.v2,1));
 	}
 	
 	{
-		SCOPED_TRACE("Not Intersecting, tri.v0 is closest below the plane");
-		Triangle triangle(tri.v0 - tri.n*2, tri.v1 - tri.n*3, tri.v2 - tri.n*3);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v0, tri.v0,-1));
+		SCOPED_TRACE("Not Intersecting, triangle.v0 is closest below the plane");
+		Triangle target(triangle.v0 - triangle.n*2, triangle.v1 - triangle.n*3, triangle.v2 - triangle.n*3);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v0, triangle.v0,-1));
 	}
 
 	{
-		SCOPED_TRACE("Not Intersecting, tri.v1 is closest below the plane");
-		Triangle triangle(tri.v0 - tri.n*4, tri.v1 - tri.n*2, tri.v2 - tri.n*3);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v1, tri.v1,-1));
+		SCOPED_TRACE("Not Intersecting, triangle.v1 is closest below the plane");
+		Triangle target(triangle.v0 - triangle.n*4, triangle.v1 - triangle.n*2, triangle.v2 - triangle.n*3);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v1, triangle.v1,-1));
 	}
 
 	{
-		SCOPED_TRACE("Not Intersecting, tri.v2 is closest below the plane");
-		Triangle triangle(tri.v0 - tri.n*4, tri.v1 - tri.n*3, tri.v2 - tri.n*2);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v2, tri.v2,-1));
+		SCOPED_TRACE("Not Intersecting, triangle.v2 is closest below the plane");
+		Triangle target(triangle.v0 - triangle.n*4, triangle.v1 - triangle.n*3, triangle.v2 - triangle.n*2);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v2, triangle.v2,-1));
 	}
 
 	{
 		SCOPED_TRACE("Triangle point on the plane");
 		// Need to change the order of points for this to work ... strange ...
-		Triangle triangle(tri.v0 + tri.n*3, tri.v2 + tri.n*3, tri.v1);
-		checkTriPlaneDistance(TriPlaneData(triangle, tri.n, d, triangle.v2, triangle.v2,0));
+		Triangle target(triangle.v0 + triangle.n*3, triangle.v2 + triangle.n*3, triangle.v1);
+		checkTriPlaneDistance(TriPlaneData(target, triangle.n, d, target.v2, target.v2,0));
 	}
 
-	Triangle triangle(tri.v0 - tri.n*2, tri.v1*3 + tri.n, tri.v2*3 + tri.n);
-	distance = distanceTrianglePlane(triangle.v0, triangle.v1, triangle.v2, tri.n, d, &intersectionPoint0, &intersectionPoint1);
-	EXPECT_NEAR(0.0,distance, epsilon);
-	EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
-	EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2,triangle.n));
-	EXPECT_NEAR(0.0,distancePointPlane(intersectionPoint0,tri.n,d,&intersectionPoint1),epsilon);
+	{
+		SCOPED_TRACE("Triangle plane intersection with v0 being under the plane");
+		Triangle target(triangle.v0 - triangle.n*2, triangle.v1 + triangle.n*2, triangle.v2 + triangle.n*2);
+		distance = distanceTrianglePlane(target.v0, target.v1, target.v2, triangle.n, d, &intersectionPoint0, &intersectionPoint1);
+		EXPECT_NEAR(0.0,distance, epsilon);
+		EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
+		EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, target.v0, target.v1, target.v2,target.n));
+		EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2, triangle.n));
+	}
+
+	{
+		SCOPED_TRACE("Triangle plane intersection with v0 and v1 being under the plane");
+		Triangle target(triangle.v0 - triangle.n*2, triangle.v1 - triangle.n*2, triangle.v2 + triangle.n*2);
+		distance = distanceTrianglePlane(target.v0, target.v1, target.v2, triangle.n, d, &intersectionPoint0, &intersectionPoint1);
+		EXPECT_NEAR(0.0,distance, epsilon);
+		EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
+		EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, target.v0, target.v1, target.v2,target.n));
+		EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2, triangle.n));
+	}
+
+	{
+		SCOPED_TRACE("Triangle plane intersection with v2 being under the plane");
+		Triangle target(triangle.v0 + triangle.n*2, triangle.v1 + triangle.n*2, triangle.v2 - triangle.n*2);
+		distance = distanceTrianglePlane(target.v0, target.v1, target.v2, triangle.n, d, &intersectionPoint0, &intersectionPoint1);
+		EXPECT_NEAR(0.0,distance, epsilon);
+		EXPECT_TRUE(intersectionPoint0.isApprox(intersectionPoint1));
+		EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, target.v0, target.v1, target.v2,target.n));
+		EXPECT_TRUE(isPointInsideTriangle(intersectionPoint0, triangle.v0, triangle.v1, triangle.v2, triangle.n));
+	}
 }
 
 TEST_F(GeometryTest, PlanePlaneDistance)

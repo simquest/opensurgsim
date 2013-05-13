@@ -27,6 +27,7 @@
 /// 	  parameters. When those outputs cannot be calculated their values will be set to NAN.
 /// 	  This functions are meant as a basic layer that will be wrapped with calls from structures mainting more
 /// 	  state information about the primitives they are handling.
+/// 	  As a convention we are using a plane equation in the form nx + d = 0
 /// \note HS-2013-may-07 Even though some of the names in this file do not agree with the coding standards in
 /// 	  regard to the use of verbs for functions it was determined that other phrasing would not necessarily
 /// 	  improve the readability or expressiveness of the function names.
@@ -871,7 +872,7 @@ T distancePointTriangle(
 		break;
 	}
 	*result = tv0 + s * tv01 + t * tv02;
-	return ((*result)-pt).norm(); // * (n.dot(tv0pv0) >= 0) ? 1 : -1;
+	return ((*result)-pt).norm();
 }
 
 /// Calculate the intersection of a line segment with a triangle
@@ -978,7 +979,7 @@ bool doesCollideSegmentTriangle(
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param pt		The point to check.
 /// \param n		The normal of the plane n (normalized).
-/// \param d		Constant d for the plane equation as in n.x=d.
+/// \param d		Constant d for the plane equation as in n.x + d = 0.
 /// \param [out] result Projection of point p into the plane.
 /// \return			The distance to the plane (negative if on the backside of the plane).
 template <class T, int MOpt> inline
@@ -1000,7 +1001,7 @@ T distancePointPlane(
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param sv0,sv1	Endpoints of the segments.
 /// \param n		Normal of the plane n (normalized).
-/// \param d		Constant d in n.x=d.
+/// \param d		Constant d in n.x + d = 0.
 /// \param [out] closestPointSegment Point closest to the plane, the midpoint of the segment (v0+v1)/2
 /// 				is being used if the segment is parallel to the plane. If the segment actually
 /// 				intersects the plane segmentIntersectionPoint will be equal to planeIntersectionPoint.
@@ -1017,14 +1018,14 @@ T distanceSegmentPlane(
     Eigen::Matrix<T, 3, 1, MOpt>* closestPointSegment,
     Eigen::Matrix<T, 3, 1, MOpt>* planeIntersectionPoint)
 {
-	T dist0 = n.dot(sv0) - d;
-	T dist1 = n.dot(sv1) - d;
+	T dist0 = n.dot(sv0) + d;
+	T dist1 = n.dot(sv1) + d;
 	// Parallel case
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	if (abs(n.dot(v01)) <= Geometry::AngularEpsilon)
 	{
 		*closestPointSegment = (sv0 + sv1)*T(0.5);
-		dist0 = n.dot(*closestPointSegment) - d;
+		dist0 = n.dot(*closestPointSegment) + d;
 		*planeIntersectionPoint = *closestPointSegment - dist0*n;
 		return (abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
 	}
@@ -1048,7 +1049,7 @@ T distanceSegmentPlane(
 	else
 	{
 		Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
-		T lambda= (d-sv0.dot(n)) / v01.dot(n);
+		T lambda= (-d-sv0.dot(n)) / v01.dot(n);
 		*planeIntersectionPoint = sv0 + lambda * v01;
 		*closestPointSegment = *planeIntersectionPoint;
 		return 0;
@@ -1062,7 +1063,7 @@ T distanceSegmentPlane(
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param tv0,tv1,tv2 Points of the triangle.
 /// \param n		Normal of the plane n (normalized).
-/// \param d		Constant d in n.x=d.
+/// \param d		Constant d in n.x + d = 0.
 /// \param closestPointTriangle Closest point on the triangle, when the triangle is coplanar to 
 /// 				the plane (tv0+tv1+tv2)/3 is used, when the triangle intersects the plane the midpoint of 
 /// 				the intersection segment is returned.
@@ -1079,9 +1080,9 @@ T distanceTrianglePlane(
     Eigen::Matrix<T, 3, 1, MOpt>* closestPointTriangle,
     Eigen::Matrix<T, 3, 1, MOpt>* planeProjectionPoint)
 {
-	T dist0 = n.dot(tv0)-d;
-	T dist1 = n.dot(tv1)-d;
-	T dist2 = n.dot(tv2)-d;
+	T dist0 = n.dot(tv0) + d;
+	T dist1 = n.dot(tv1) + d;
+	T dist2 = n.dot(tv2) + d;
 	Eigen::Matrix<T, 3, 1, MOpt> t01 = tv1-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> t02 = tv2-tv0;
 	Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
@@ -1105,21 +1106,21 @@ T distanceTrianglePlane(
 	{
 		if (dist0 * dist1 < 0)
 		{
-			*closestPointTriangle = tv0 + (d-n.dot(tv0))/n.dot(t01) * t01;
+			*closestPointTriangle = tv0 + (-d-n.dot(tv0))/n.dot(t01) * t01;
 			if (dist0 * dist2 < 0)
 			{
-				*planeProjectionPoint = tv0 + (d-n.dot(tv0))/n.dot(t02) * t02;
+				*planeProjectionPoint = tv0 + (-d-n.dot(tv0))/n.dot(t02) * t02;
 			}
 			else
 			{
 				Eigen::Matrix<T, 3, 1, MOpt> t12 = tv2-tv1;
-				*planeProjectionPoint = tv1 + (d-n.dot(tv1))/n.dot(t12) * t12;
+				*planeProjectionPoint = tv1 + (-d-n.dot(tv1))/n.dot(t12) * t12;
 			}
 		}
 		else
 		{
-			*closestPointTriangle = tv0 + (d-n.dot(tv0))/n.dot(t02) * t02;
-			*planeProjectionPoint = tv1 + (d-n.dot(tv1))/n.dot(t12) * t12;
+			*closestPointTriangle = tv0 + (-d-n.dot(tv0))/n.dot(t02) * t02;
+			*planeProjectionPoint = tv1 + (-d-n.dot(tv1))/n.dot(t12) * t12;
 		}
 
 		// Find the midpoint, take this out to return the segment endpoints
@@ -1150,8 +1151,8 @@ T distanceTrianglePlane(
 /// Test if two planes are intersecting, if yes also calculate the intersection line.
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
-/// \param pn0,pd0	Normal and constant of the first plane.
-/// \param pn1,pd2	Normal and constant of the second plane.
+/// \param pn0,pd0	Normal and constant of the first plane, nx + d = 0.
+/// \param pn1,pd2	Normal and constant of the second plane, nx + d = 0.
 /// \param [out] pt0,pt1 Two points on the intersection line, not valid if there is no intersection.
 /// \return true when a unique line exists, false for disjoint or coinciding.
 template <class T, int MOpt> inline
