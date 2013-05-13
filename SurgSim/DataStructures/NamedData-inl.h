@@ -34,7 +34,7 @@ inline NamedData<T>::NamedData(std::shared_ptr<const IndexDirectory> directory) 
 	m_directory(directory)
 {
 	m_data.resize(m_directory->getNumEntries());
-	m_isCurrent.resize(m_directory->getNumEntries(), false);
+	m_isDataValid.resize(m_directory->getNumEntries(), false);
 	SURGSIM_ASSERT(isValid());
 }
 
@@ -43,7 +43,7 @@ inline NamedData<T>::NamedData(const std::vector<std::string>& names) :
 	m_directory(std::make_shared<const IndexDirectory>(names))
 {
 	m_data.resize(m_directory->getNumEntries());
-	m_isCurrent.resize(m_directory->getNumEntries(), false);
+	m_isDataValid.resize(m_directory->getNumEntries(), false);
 	SURGSIM_ASSERT(isValid());
 }
 
@@ -51,7 +51,7 @@ template <typename T>
 inline NamedData<T>::NamedData(const NamedData& namedData) :
 	m_directory(namedData.m_directory),
 	m_data(namedData.m_data),
-	m_isCurrent(namedData.m_isCurrent)
+	m_isDataValid(namedData.m_isDataValid)
 {
 	SURGSIM_ASSERT(isValid());
 }
@@ -72,10 +72,10 @@ inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 	}
 
 	m_data = namedData.m_data;
-	m_isCurrent = namedData.m_isCurrent;
+	m_isDataValid = namedData.m_isDataValid;
 
 	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
-	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isCurrent.size() == m_directory->size()) <<
+	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isDataValid.size() == m_directory->size()) <<
 		"NamedData isn't correctly sized after assignment!";
 
 	return *this;
@@ -85,7 +85,7 @@ template <typename T>
 inline NamedData<T>::NamedData(NamedData&& namedData) :
 	m_directory(std::move(namedData.m_directory)),
 	m_data(std::move(namedData.m_data)),
-	m_isCurrent(std::move(namedData.m_isCurrent))
+	m_isDataValid(std::move(namedData.m_isDataValid))
 {
 	SURGSIM_ASSERT(isValid());
 }
@@ -106,10 +106,10 @@ inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 	}
 
 	m_data = std::move(namedData.m_data);
-	m_isCurrent = std::move(namedData.m_isCurrent);
+	m_isDataValid = std::move(namedData.m_isDataValid);
 
 	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
-	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isCurrent.size() == m_directory->size()) <<
+	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isDataValid.size() == m_directory->size()) <<
 		"NamedData isn't correctly sized after assignment!";
 
 	return *this;
@@ -164,13 +164,13 @@ inline bool NamedData<T>::hasEntry(const std::string& name) const
 }
 
 template <typename T>
-inline bool NamedData<T>::hasCurrentData(int index) const
+inline bool NamedData<T>::hasData(int index) const
 {
-	return hasEntry(index) && m_isCurrent[index];
+	return hasEntry(index) && m_isDataValid[index];
 }
 
 template <typename T>
-inline bool NamedData<T>::hasCurrentData(const std::string& name) const
+inline bool NamedData<T>::hasData(const std::string& name) const
 {
 	if (! isValid())
 	{
@@ -184,14 +184,14 @@ inline bool NamedData<T>::hasCurrentData(const std::string& name) const
 	else
 	{
 		SURGSIM_ASSERT(hasEntry(index));
-		return m_isCurrent[index];
+		return m_isDataValid[index];
 	}
 }
 
 template <typename T>
 inline bool NamedData<T>::get(int index, T* value) const
 {
-	if (! hasCurrentData(index))
+	if (! hasData(index))
 	{
 		return false;
 	}
@@ -210,7 +210,7 @@ inline bool NamedData<T>::get(const std::string& name, T* value) const
 		return false;
 	}
 	int index =  m_directory->getIndex(name);
-	if ((index < 0) || ! m_isCurrent[index])
+	if ((index < 0) || ! m_isDataValid[index])
 	{
 		return false;
 	}
@@ -232,7 +232,7 @@ inline bool NamedData<T>::set(int index, const T& value)
 	else
 	{
 		m_data[index] = value;
-		m_isCurrent[index] = true;
+		m_isDataValid[index] = true;
 		return true;
 	}
 }
@@ -253,7 +253,7 @@ inline bool NamedData<T>::set(const std::string& name, const T& value)
 	{
 		SURGSIM_ASSERT(hasEntry(index));
 		m_data[index] = value;
-		m_isCurrent[index] = true;
+		m_isDataValid[index] = true;
 		return true;
 	}
 }
@@ -267,7 +267,7 @@ inline bool NamedData<T>::reset(int index)
 	}
 	else
 	{
-		m_isCurrent[index] = false;
+		m_isDataValid[index] = false;
 		return true;
 	}
 }
@@ -287,7 +287,7 @@ inline bool NamedData<T>::reset(const std::string& name)
 	else
 	{
 		SURGSIM_ASSERT(hasEntry(index));
-		m_isCurrent[index] = false;
+		m_isDataValid[index] = false;
 		return true;
 	}
 }
@@ -295,7 +295,7 @@ inline bool NamedData<T>::reset(const std::string& name)
 template <typename T>
 inline void NamedData<T>::resetAll()
 {
-	m_isCurrent.assign(m_data.size(), false);
+	m_isDataValid.assign(m_data.size(), false);
 }
 
 template <typename T>
