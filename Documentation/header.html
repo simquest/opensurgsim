@@ -23,10 +23,17 @@ $extrastylesheet
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
- <tr style="height: 56px;">
+ <tr style="height: 90px;">
   <!--BEGIN PROJECT_LOGO-->
-  <td id="projectlogo"><img alt="Logo" src="$relpath^$projectlogo"/></td>
+  <td id="projectlogo">
+    <!--BEGIN PROJECT_NAME-->
+     <!--BEGIN PROJECT_BRIEF--><img alt="$projectname: $projectbrief" src="$relpath^$projectlogo"/><!--END PROJECT_BRIEF-->
+     <!--BEGIN !PROJECT_BRIEF--><img alt="$projectname" src="$relpath^$projectlogo"/><!--END !PROJECT_BRIEF-->
+    <!--END PROJECT_NAME-->
+    <!--BEGIN !PROJECT_NAME--><img alt="Logo" src="$relpath^$projectlogo"/><!--END !PROJECT_NAME-->
+  </td>
   <!--END PROJECT_LOGO-->
+  <!--BEGIN !PROJECT_LOGO-->
   <!--BEGIN PROJECT_NAME-->
   <td style="padding-left: 0.5em;">
    <div id="projectname">$projectname
@@ -42,6 +49,7 @@ $extrastylesheet
     </td>
    <!--END PROJECT_BRIEF-->
   <!--END !PROJECT_NAME-->
+  <!--END !PROJECT_LOGO-->
   <!--BEGIN DISABLE_INDEX-->
    <!--BEGIN SEARCHENGINE-->
    <td>$searchbox</td>

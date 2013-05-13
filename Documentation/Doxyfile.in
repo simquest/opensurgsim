@@ -42,10 +42,10 @@ PROJECT_BRIEF          = "A free platform for open surgery simulation"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is
 # included in the documentation. The maximum height of the logo should not
-# exceed 55 pixels and the maximum width should not exceed 200 pixels.
+# exceed *89* pixels (when using the OpenSurgSim custom HTML_HEADER).
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           =
+PROJECT_LOGO           = @PROJECT_LOGO@
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
