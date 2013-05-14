@@ -42,8 +42,18 @@ public:
 	InputComponent(std::string name, std::string deviceName);
 	virtual ~InputComponent();
 
+	/// Is a device connected
+	/// \param [out] true if a device has been connected.
 	bool isDeviceConnected();
+
+	/// Connect to a device
+	/// This call will be made by the InputManager, and should generally not be called directly.
+	/// \param device The device to connect to.
 	void connectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
+
+	/// Disconnect from a device
+	/// This call will be made by the InputManager, and should generally not be called directly.
+	/// \param device The device to disconnect from.
 	void disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
 	/// Gets the input data.
