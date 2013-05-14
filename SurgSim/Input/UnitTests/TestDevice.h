@@ -1,5 +1,5 @@
-#ifndef SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
-#define SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
+#ifndef TESTDEVICE_H
+#define TESTDEVICE_H
 
 #include <SurgSim/Input/CommonDevice.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
@@ -48,6 +48,9 @@ public:
 	  {
 	  }
 
+	  virtual void initializeInput(const std::string& device, const DataGroup& initialInput)
+	  {
+	  }
 	  virtual void handleInput(const std::string& device, const DataGroup& inputData);
 
 	  int m_numTimesReceivedInput;
@@ -74,5 +77,4 @@ public:
 	  DataGroup m_nextSentOutput;
 };
 
-#endif
-
+#endif // TESTDEVICE_H

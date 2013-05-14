@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_INPUT_CONSUMER_INTERFACE_H
-#define SURGSIM_INPUT_INPUT_CONSUMER_INTERFACE_H
+#ifndef SURGSIM_INPUT_INPUTCONSUMERINTERFACE_H
+#define SURGSIM_INPUT_INPUTCONSUMERINTERFACE_H
 
 #include <string>
 
@@ -61,10 +61,12 @@ public:
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
+
+	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
 };
 
 
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif // SURGSIM_INPUT_INPUT_CONSUMER_INTERFACE_H
+#endif // SURGSIM_INPUT_INPUTCONSUMERINTERFACE_H

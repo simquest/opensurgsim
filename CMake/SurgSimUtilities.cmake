@@ -115,6 +115,30 @@ macro(surgsim_add_unit_tests TESTNAME)
 	endif()
 endmacro()
 
+# Do all the work to add a library to the system
+# Works with the install system and detects wether the library is 
+# header only or has source files, for header only the headers are copied into
+# the appropriate directory. 
+# Note that when calling this the parameters  should be quoted to separate lists
+function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIRECTORY)
+	if (SOURCE_FILES)
+		add_library(${LIBRARY_NAME} ${SOURCE_FILES} ${HEADER_FILES})
+
+		set_target_properties(${LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
+		install(TARGETS ${LIBRARY_NAME}
+			EXPORT ${PROJECT_NAME}Targets
+			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
+			LIBRARY DESTINATION "${INSTALL_LIB_DIR}"
+			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
+			PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
+			
+		set(EXPORT_TARGETS ${LIBRARY_NAME} ${EXPORT_TARGETS} CACHE INTERNAL "export targets")
+	else()
+		install(FILES ${HEADER_FILES} DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
+	endif()
+endfunction()
+
+
 ## CMake support for running Google's cpplint over the C++ source.
 
 # Should we bother with cpplint at all?

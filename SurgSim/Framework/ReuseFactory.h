@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_REUSE_FACTORY_H
-#define SURGSIM_FRAMEWORK_REUSE_FACTORY_H
+#ifndef SURGSIM_FRAMEWORK_REUSEFACTORY_H
+#define SURGSIM_FRAMEWORK_REUSEFACTORY_H
 
 #include <memory>
 #include <stack>
@@ -116,4 +116,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_FRAMEWORK_REUSE_FACTORY_H
+#endif  // SURGSIM_FRAMEWORK_REUSEFACTORY_H

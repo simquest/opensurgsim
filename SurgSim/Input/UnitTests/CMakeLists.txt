@@ -22,6 +22,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	CommonDeviceTests.cpp
 	InputManagerTest.cpp
+	InputComponentTest.cpp
 	TestDevice.cpp
 )
 

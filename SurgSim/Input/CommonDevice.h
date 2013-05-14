@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_INPUT_COMMON_DEVICE_H
-#define SURGSIM_INPUT_COMMON_DEVICE_H
+#ifndef SURGSIM_INPUT_COMMONDEVICE_H
+#define SURGSIM_INPUT_COMMONDEVICE_H
 
 #include <memory>
 #include <string>
@@ -99,6 +99,7 @@ private:
 	struct State;
 
 	std::string m_name;
+	const SurgSim::DataStructures::DataGroup m_initialInputData;
 	SurgSim::DataStructures::DataGroup m_inputData;
 	SurgSim::DataStructures::DataGroup m_outputData;
 	std::unique_ptr<State> m_state;
@@ -108,4 +109,4 @@ private:
 };  // namespace Input
 };  // namespace SurgSim
 
-#endif // SURGSIM_INPUT_COMMON_DEVICE_H
+#endif // SURGSIM_INPUT_COMMONDEVICE_H

@@ -23,6 +23,16 @@ set(OPENSURGSIM_PATCH_VERSION 0)
 set(OPENSURGSIM_VERSION
   ${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
 
+# Install Directories
+set(INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(INSTALL_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
+set(INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
+if(WIN32 AND NOT CYGWIN)
+  set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/CMake)
+else()
+  set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/${PROJECT_NAME})
+endif()
+
 set(SURGSIM_TOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${SURGSIM_TOP_INCLUDE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
@@ -53,28 +63,37 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(ThirdParty/gtest)
 endif()
 
+SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
+
 add_subdirectory(SurgSim)
 add_subdirectory(Documentation)
 
-set(CONFIG_EXPORT_TARGETS
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimInput
-	IdentityPoseDevice)
-
-export(TARGETS ${CONFIG_EXPORT_TARGETS} 
+export(TARGETS ${EXPORT_TARGETS} 
 	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
 
 #Register where to find this build-tree. On windows this in the registry, on
 #unix this goes in ~/.cmake/packages/OpenSurgSim
 export(PACKAGE OpenSurgSim)
 
+#OpenSurgSimConfig For the Build Tree
 set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
-configure_file(OpenSurgSimConfig.cmake.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfig.cmake" @ONLY)
-configure_file(OpenSurgSimConfigVersion.cmake.in
+
+#OpenSurgSimConfig For the Install Tree
+file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}" "${CMAKE_INSTALL_PREFIX}/include")
+set(CONFIG_INCLUDE_DIRS "\${OPENSURGSIM_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfig.cmake.in
+	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake" @ONLY)
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/CMake/OpenSurgSimConfigVersion.cmake.in
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake" @ONLY)
 
+install(FILES
+	"${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/OpenSurgSimConfig.cmake"
+	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake"
+	DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+install(EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT dev)
 
 #install(EXPORT ${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
 

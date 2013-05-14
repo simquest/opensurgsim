@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_LOG_MESSAGE_H
-#define SURGSIM_FRAMEWORK_LOG_MESSAGE_H
+#ifndef SURGSIM_FRAMEWORK_LOGMESSAGE_H
+#define SURGSIM_FRAMEWORK_LOGMESSAGE_H
 
 #include "SurgSim/Framework/LogMessageBase.h"
 
@@ -57,4 +57,4 @@ public:
 }; // namespace Framework
 }; // namespace SurgSim
 
-#endif  // SURGSIM_FRAMEWORK_LOG_MESSAGE_H
+#endif  // SURGSIM_FRAMEWORK_LOGMESSAGE_H
