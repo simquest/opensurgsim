@@ -747,21 +747,21 @@ T distancePointTriangle(
 			region = 1;
 		}
 	}
-	//	Regions:
-	//	    ^ t=0
-	//	 \ 2|
-	//	  \ |
-	//	   \|
-	//		\
-	//		|\
-	//		| \	  1
-	//	3	|  \
-	//		| 0 \
-	//	----|----\------->	s=0
-	//		| 	  \
-	//	4	|	5  \   6
-	//		|	    \
-	//
+	//	Regions:                    /
+	//	    ^ t=0                   /
+	//	 \ 2|                       /
+	//	  \ |                       /
+	//	   \|                       /
+	//		\                       /
+	//		|\                      /
+	//		| \	  1                 /
+	//	3	|  \                    /
+	//		| 0 \                   /
+	//	----|----\------->	s=0     /
+	//		| 	  \                 /
+	//	4	|	5  \   6            /
+	//		|	    \               /
+	//                              /
 	T numer, denom, tmp0, tmp1;
 	enum edge_type { s0, t0, s1t1, edge_skip, edge_invalid };
 	edge_type edge = edge_invalid;
@@ -945,7 +945,7 @@ bool doesCollideSegmentTriangle(
 		return false;
 	}
 	// Intersect point of ray and plane
-	VectorType presumedIntersection = sv0 + r * dir;
+	Eigen::Matrix<T, 3, 1, MOpt> presumedIntersection = sv0 + r * dir;
 	// Collision point inside T?
 	T uu = u.dot(u);
 	T uv = u.dot(v);
@@ -1030,7 +1030,7 @@ T distanceSegmentPlane(
 		return (abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
 	}
 	// Both on the same side
-	if (dist0 > 0 && dist1 > 0 || dist0 < 0 && dist1 < 0)
+	if ((dist0 > 0 && dist1 > 0) || (dist0 < 0 && dist1 < 0))
 	{
 		if (abs(dist0) < abs(dist1))
 		{
