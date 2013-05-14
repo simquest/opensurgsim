@@ -747,21 +747,21 @@ T distancePointTriangle(
 			region = 1;
 		}
 	}
-	//	Regions:
-	//	    ^ t=0
-	//	 \ 2|
-	//	  \ |
-	//	   \|
-	//		\
-	//		|\
-	//		| \	  1
-	//	3	|  \
-	//		| 0 \
-	//	----|----\------->	s=0
-	//		| 	  \
-	//	4	|	5  \   6
-	//		|	    \
-	//
+	//	Regions:                    /
+	//	    ^ t=0                   /
+	//	 \ 2|                       /
+	//	  \ |                       /
+	//	   \|                       /
+	//		\                       /
+	//		|\                      /
+	//		| \	  1                 /
+	//	3	|  \                    /
+	//		| 0 \                   /
+	//	----|----\------->	s=0     /
+	//		| 	  \                 /
+	//	4	|	5  \   6            /
+	//		|	    \               /
+	//                              /
 	T numer, denom, tmp0, tmp1;
 	enum edge_type { s0, t0, s1t1, edge_skip, edge_invalid };
 	edge_type edge = edge_invalid;
