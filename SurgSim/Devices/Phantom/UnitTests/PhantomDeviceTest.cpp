@@ -47,6 +47,9 @@ public:
 	{
 	}
 
+	virtual void initializeInput(const std::string& device, const DataGroup& initialInput)
+	{
+	}
 	virtual void handleInput(const std::string& device, const DataGroup& inputData);
 	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
 

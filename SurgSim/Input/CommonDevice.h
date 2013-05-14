@@ -99,6 +99,7 @@ private:
 	struct State;
 
 	std::string m_name;
+	const SurgSim::DataStructures::DataGroup m_initialInputData;
 	SurgSim::DataStructures::DataGroup m_inputData;
 	SurgSim::DataStructures::DataGroup m_outputData;
 	std::unique_ptr<State> m_state;

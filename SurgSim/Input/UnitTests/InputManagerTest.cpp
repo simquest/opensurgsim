@@ -22,7 +22,6 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Input/CommonDevice.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Input/InputComponent.h>
@@ -37,7 +36,6 @@
 using SurgSim::Framework::Runtime;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Input::InputManager;
 using SurgSim::Input::InputComponent;
@@ -122,17 +120,23 @@ TEST_F(InputManagerTest, InputAddRemove)
 
 TEST_F(InputManagerTest, InputfromDevice)
 {
+	std::string data;
+	SurgSim::DataStructures::DataGroup dataGroup;
+
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
+
 	inputManager->addComponent(listener1);
+	EXPECT_TRUE(listener1->isDeviceConnected());
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
 
 	testDevice1->pushInput("avalue");
-
-	std::string data;
-	listener1->getInputData().strings().get("helloWorld",&data);
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
 	EXPECT_EQ("avalue",data);
 
 	testDevice1->pushInput("bvalue");
-	listener1->getInputData().strings().get("helloWorld",&data);
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
 	EXPECT_EQ("bvalue",data);
 }
 
