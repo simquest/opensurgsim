@@ -145,10 +145,10 @@ protected:
 	/// Override this method to provide custom comparison. Basic TriangleMesh implementation compares vertices,
 	/// edges and triangles: the order of vertices, edges, and triangles must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Mesh& mesh) const
+	virtual bool isEqual(const Mesh<VertexData>& mesh) const
 	{
 		const TriangleMesh& triangleMesh = static_cast<const TriangleMesh&>(mesh);
-		return Mesh::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
+		return Mesh<VertexData>::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
 			m_triangles == triangleMesh.getTriangles();
 	}
 private:
@@ -158,7 +158,7 @@ private:
 	{
 		doClearTriangles();
 		doClearEdges();
-		doClearVertices();
+		this->doClearVertices();
 	}
 
 	/// Edges
