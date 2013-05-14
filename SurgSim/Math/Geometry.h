@@ -945,7 +945,7 @@ bool doesCollideSegmentTriangle(
 		return false;
 	}
 	// Intersect point of ray and plane
-	VectorType presumedIntersection = sv0 + r * dir;
+	Eigen::Matrix<T, 3, 1, MOpt> presumedIntersection = sv0 + r * dir;
 	// Collision point inside T?
 	T uu = u.dot(u);
 	T uv = u.dot(v);
