@@ -19,13 +19,16 @@
 #include <string>
 #include <vector>
 
+#if !defined(SURGSIM_PARSED_BY_DOXYGEN)  // do not generate documentation for Boost stuff!
 namespace boost
 {
 namespace filesystem
 {
-	class path;
-}
-}
+class path;
+} // namespace filesystem
+} // namespace boost
+#endif // defined(SURGSIM_PARSED_BY_DOXYGEN)
+
 namespace SurgSim
 {
 namespace Framework
