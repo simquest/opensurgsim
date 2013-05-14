@@ -57,9 +57,9 @@ class TriangleMesh : public Mesh<VertexData>
 {
 public:
 	/// Edge type for convenience
-	typedef typename MeshElement<2, EdgeData> Edge;
+	typedef MeshElement<2, EdgeData> Edge;
 	/// Triangle type for convenience
-	typedef typename MeshElement<3, TriangleData> Triangle;
+	typedef MeshElement<3, TriangleData> Triangle;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
 	TriangleMesh()
