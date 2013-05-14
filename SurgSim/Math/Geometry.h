@@ -1345,9 +1345,9 @@ T distanceTriangleTriangle(
 	T minDst = std::numeric_limits<T>::max();
 	T currDst = 0;
 	Eigen::Matrix<T, 3, 1, MOpt> segPt, triPt;
-	Eigen::Matrix<T, 3, 1, MOpt> n0 = (t0v1-t0v0).cross(t0v2-t0v1);
+	Eigen::Matrix<T, 3, 1, MOpt> n0 = (t0v1-t0v0).cross(t0v2-t0v0);
 	n0.normalize();
-	Eigen::Matrix<T, 3, 1, MOpt> n1 = (t1v1-t1v0).cross(t1v2-t1v1);
+	Eigen::Matrix<T, 3, 1, MOpt> n1 = (t1v1-t1v0).cross(t1v2-t1v0);
 	n1.normalize();
 	currDst = distanceSegmentTriangle(t0v0, t0v1, t1v0, t1v1, t1v2, n1, &segPt, &triPt);
 	if (currDst < minDst)
