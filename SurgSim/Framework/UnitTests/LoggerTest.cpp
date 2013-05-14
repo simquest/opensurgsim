@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the SURGSIM_LOG_*() macros and the related classes.
- */
+/// \file
+/// Tests for the SURGSIM_LOG_*() macros and the related classes.
 
 #include <gtest/gtest.h>
 #include <SurgSim/Framework/Log.h>

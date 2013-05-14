@@ -19,7 +19,7 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
-	Geometry.cpp
+
 )
 
 set(SURGSIM_MATH_HEADERS
@@ -30,13 +30,12 @@ set(SURGSIM_MATH_HEADERS
 	Vector.h
 )
 
-add_library(SurgSimMath ${SURGSIM_MATH_SOURCES} ${SURGSIM_MATH_HEADERS})
-
-install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION include/SurgSim/Math)
-install(TARGETS SurgSimMath
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION lib
-		ARCHIVE DESTINATION lib)
+surgsim_add_library(
+	SurgSimMath 
+	"${SURGSIM_MATH_SOURCES}"
+	"${SURGSIM_MATH_HEADERS}"
+	"SurgSim/Math"
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

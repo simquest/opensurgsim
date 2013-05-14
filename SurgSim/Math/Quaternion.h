@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- *  Definitions of quaternion types.
- */
+/// \file
+/// Definitions of quaternion types.
 
 #ifndef SURGSIM_MATH_QUATERNION_H
 #define SURGSIM_MATH_QUATERNION_H

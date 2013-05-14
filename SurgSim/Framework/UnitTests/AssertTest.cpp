@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for SURGSIM_ASSERT() and SURGSIM_FAILURE().
- */
+/// \file
+/// Tests for SURGSIM_ASSERT() and SURGSIM_FAILURE().
 
 #include <gtest/gtest.h>
 #include <SurgSim/Framework/Assert.h>
