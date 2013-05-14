@@ -107,8 +107,8 @@ TEST_F(MeshTest, CreateVerticesTest)
 {
 	MockMesh mesh;
 
-	EXPECT_EQ(0, mesh.getNumVertices());
-	EXPECT_EQ(0, mesh.getVertices().size());
+	EXPECT_EQ(0u, mesh.getNumVertices());
+	EXPECT_EQ(0u, mesh.getVertices().size());
 
 	/// Create the test vertices
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
@@ -200,8 +200,8 @@ TEST_F(MeshTest, ClearTest)
 	MockMesh mesh;
 
 	EXPECT_EQ(0, mesh.getNumUpdates());
-	EXPECT_EQ(0, mesh.getNumVertices());
-	EXPECT_EQ(0, mesh.getVertices().size());
+	EXPECT_EQ(0u, mesh.getNumVertices());
+	EXPECT_EQ(0u, mesh.getVertices().size());
 
 	/// Create vertices
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
@@ -216,8 +216,8 @@ TEST_F(MeshTest, ClearTest)
 	/// Clear mesh
 	mesh.clear();
 
-	EXPECT_EQ(0, mesh.getNumVertices());
-	EXPECT_EQ(0, mesh.getVertices().size());
+	EXPECT_EQ(0u, mesh.getNumVertices());
+	EXPECT_EQ(0u, mesh.getVertices().size());
 }
 
 TEST_F(MeshTest, UpdateTest)

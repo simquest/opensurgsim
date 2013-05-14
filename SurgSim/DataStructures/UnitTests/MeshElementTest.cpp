@@ -58,7 +58,7 @@ TEST(MeshElementTest, EdgeTest)
 
 	{
 		const MockEdgeData& data = edge.data;
-		EXPECT_EQ(5, data.getId());
+		EXPECT_EQ(5u, data.getId());
 	}
 
 	/// Check comparisons
@@ -95,7 +95,7 @@ TEST(MeshElementTest, TriangleTest)
 
 	{
 		const MockTriangleData& data = triangle.data;
-		EXPECT_EQ(4, data.getId());
+		EXPECT_EQ(4u, data.getId());
 		EXPECT_EQ(triangleEdges, data.getEdges());
 	}
 

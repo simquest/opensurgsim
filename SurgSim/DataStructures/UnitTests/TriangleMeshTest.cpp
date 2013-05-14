@@ -180,8 +180,8 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 {
 	MockTriangleMesh mesh;
 
-	EXPECT_EQ(0, mesh.getNumVertices());
-	EXPECT_EQ(0, mesh.getVertices().size());
+	EXPECT_EQ(0u, mesh.getNumVertices());
+	EXPECT_EQ(0u, mesh.getVertices().size());
 
 	/// Create the test vertices
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
@@ -313,14 +313,14 @@ TEST_F(TriangleMeshTest, ClearTest)
 
 	EXPECT_EQ(0, mesh.getNumUpdates());
 
-	EXPECT_EQ(0, mesh.getNumVertices());
-	EXPECT_EQ(0, mesh.getVertices().size());
+	EXPECT_EQ(0u, mesh.getNumVertices());
+	EXPECT_EQ(0u, mesh.getVertices().size());
 
-	EXPECT_EQ(0, mesh.getNumEdges());
-	EXPECT_EQ(0, mesh.getEdges().size());
+	EXPECT_EQ(0u, mesh.getNumEdges());
+	EXPECT_EQ(0u, mesh.getEdges().size());
 
-	EXPECT_EQ(0, mesh.getNumTriangles());
-	EXPECT_EQ(0, mesh.getTriangles().size());
+	EXPECT_EQ(0u, mesh.getNumTriangles());
+	EXPECT_EQ(0u, mesh.getTriangles().size());
 
 	/// Create mesh using test data
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
@@ -351,14 +351,14 @@ TEST_F(TriangleMeshTest, ClearTest)
 	/// Clear mesh
 	mesh.clear();
 
-	EXPECT_EQ(0, mesh.getNumVertices());
-	EXPECT_EQ(0, mesh.getVertices().size());
+	EXPECT_EQ(0u, mesh.getNumVertices());
+	EXPECT_EQ(0u, mesh.getVertices().size());
 
-	EXPECT_EQ(0, mesh.getNumEdges());
-	EXPECT_EQ(0, mesh.getEdges().size());
+	EXPECT_EQ(0u, mesh.getNumEdges());
+	EXPECT_EQ(0u, mesh.getEdges().size());
 
-	EXPECT_EQ(0, mesh.getNumTriangles());
-	EXPECT_EQ(0, mesh.getTriangles().size());
+	EXPECT_EQ(0u, mesh.getNumTriangles());
+	EXPECT_EQ(0u, mesh.getTriangles().size());
 }
 
 TEST_F(TriangleMeshTest, UpdateTest)

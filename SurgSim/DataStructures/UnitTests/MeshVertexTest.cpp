@@ -51,7 +51,7 @@ TEST(MeshVertexTest, VertexTest)
 
 	{
 		const MockVertexData& data = vertex.data;
-		EXPECT_EQ(2, data.getId());
+		EXPECT_EQ(2u, data.getId());
 		EXPECT_EQ(Vector3d(1.0, 0.0, 0.0), data.getNormal());
 	}
 }
