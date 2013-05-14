@@ -1030,7 +1030,7 @@ T distanceSegmentPlane(
 		return (abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
 	}
 	// Both on the same side
-	if (dist0 > 0 && dist1 > 0 || dist0 < 0 && dist1 < 0)
+	if ((dist0 > 0 && dist1 > 0) || (dist0 < 0 && dist1 < 0))
 	{
 		if (abs(dist0) < abs(dist1))
 		{
