@@ -167,8 +167,7 @@ public:
 	/// Returns the normal of a vertex
 	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
 	{
-		MockVertexData data = getVertex(id).data;
-		return data.getNormal();
+		return getVertex(id).data.getNormal();
 	}
 
 	/// Returns the number of updates performed on the mesh
@@ -245,8 +244,7 @@ public:
 	/// Returns the normal of a vertex
 	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
 	{
-		MockVertexData data = getVertex(id).data;
-		return data.getNormal();
+		return getVertex(id).data.getNormal();
 	}
 
 	/// Returns the number of updates performed on the mesh
