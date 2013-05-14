@@ -28,8 +28,13 @@ set(SURGSIM_MATH_HEADERS
 	Vector.h
 )
 
-install(FILES ${SURGSIM_MATH_HEADERS} DESTINATION include/SurgSim/Math)
-
+surgsim_add_library(
+	SurgSimMath 
+	"${SURGSIM_MATH_SOURCES}"
+	"${SURGSIM_MATH_HEADERS}"
+	"SurgSim/Math"
+)
+	
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
