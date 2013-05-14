@@ -35,8 +35,6 @@ surgsim_add_library(
 	"${SURGSIM_MATH_SOURCES}"
 	"${SURGSIM_MATH_HEADERS}"
 	"SurgSim/Math"
-)
-
-if(SURGSIM_TESTS_BUILD)
+	if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
