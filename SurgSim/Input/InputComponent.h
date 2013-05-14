@@ -16,16 +16,21 @@
 #ifndef SURGSIM_INPUT_INPUTCOMPONENT_H
 #define SURGSIM_INPUT_INPUTCOMPONENT_H
 
+#include <string>
+#include <memory>
 #include <SurgSim/Framework/Component.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/DeviceInterface.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Framework/LockedContainer.h>
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class DataGroup;
+}
+
 namespace Input
 {
+class DeviceInterface;
 class InputConsumer;
 
 /// InputComponent combines the Component interface and the InputConsumerInterface so that input devices can

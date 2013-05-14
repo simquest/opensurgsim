@@ -23,7 +23,6 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Input/CommonDevice.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Input/InputComponent.h>
@@ -38,7 +37,6 @@
 using SurgSim::Framework::Runtime;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Input::InputManager;
 using SurgSim::Input::InputComponent;

@@ -14,6 +14,10 @@
 // limitations under the License.
 
 #include "InputComponent.h"
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/Input/DeviceInterface.h>
+#include <SurgSim/Input/InputConsumerInterface.h>
+#include <SurgSim/Framework/LockedContainer.h>
 
 namespace SurgSim
 {
