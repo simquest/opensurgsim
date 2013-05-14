@@ -125,9 +125,9 @@ TEST_F(InputManagerTest, InputfromDevice)
 	SurgSim::DataStructures::DataGroup dataGroup;
 
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
-	EXPECT_THROW(listener1->getData(&dataGroup), SurgSim::Framework::AssertionFailure);
 
 	inputManager->addComponent(listener1);
+	EXPECT_TRUE(listener1->isDeviceConnected());
 	EXPECT_NO_THROW(listener1->getData(&dataGroup));
 
 	testDevice1->pushInput("avalue");
