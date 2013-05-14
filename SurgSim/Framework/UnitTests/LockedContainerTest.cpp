@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the LockedContainer class.
- */
+/// \file
+/// Tests for the LockedContainer class.
 
 #include <gtest/gtest.h>
 #include <SurgSim/Framework/LockedContainer.h>

@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- * Tests for the NamedData<T> class.
- */
+/// \file
+/// Tests for the NamedData<T> class.
 
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
@@ -38,15 +37,15 @@ TEST(NamedDataTests, CanConstruct)
 	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
-	EXPECT_FALSE(data.hasCurrentData(0));
-	EXPECT_FALSE(data.hasCurrentData("test"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("test"));
 	EXPECT_EQ(0, data.getIndex("test"));
 	EXPECT_EQ("test", data.getName(0));
 
 	EXPECT_FALSE(data.hasEntry(1));
 	EXPECT_FALSE(data.hasEntry("missing"));
-	EXPECT_FALSE(data.hasCurrentData(1));
-	EXPECT_FALSE(data.hasCurrentData("missing"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("missing"));
 	EXPECT_EQ(-1, data.getIndex("missing"));
 	EXPECT_EQ("", data.getName(1));
 }
@@ -65,15 +64,15 @@ TEST(NamedDataTests, CanCreateShared)
 	EXPECT_TRUE(data->isValid());
 	EXPECT_TRUE(data->hasEntry(0));
 	EXPECT_TRUE(data->hasEntry("test"));
-	EXPECT_FALSE(data->hasCurrentData(0));
-	EXPECT_FALSE(data->hasCurrentData("test"));
+	EXPECT_FALSE(data->hasData(0));
+	EXPECT_FALSE(data->hasData("test"));
 	EXPECT_EQ(0, data->getIndex("test"));
 	EXPECT_EQ("test", data->getName(0));
 
 	EXPECT_FALSE(data->hasEntry(1));
 	EXPECT_FALSE(data->hasEntry("missing"));
-	EXPECT_FALSE(data->hasCurrentData(1));
-	EXPECT_FALSE(data->hasCurrentData("missing"));
+	EXPECT_FALSE(data->hasData(1));
+	EXPECT_FALSE(data->hasData("missing"));
 	EXPECT_EQ(-1, data->getIndex("missing"));
 	EXPECT_EQ("", data->getName(1));
 }
@@ -92,15 +91,15 @@ TEST(NamedDataTests, CanConstructFromNames)
 	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
-	EXPECT_FALSE(data.hasCurrentData(0));
-	EXPECT_FALSE(data.hasCurrentData("test"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("test"));
 	EXPECT_EQ(0, data.getIndex("test"));
 	EXPECT_EQ("test", data.getName(0));
 
 	EXPECT_FALSE(data.hasEntry(1));
 	EXPECT_FALSE(data.hasEntry("missing"));
-	EXPECT_FALSE(data.hasCurrentData(1));
-	EXPECT_FALSE(data.hasCurrentData("missing"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("missing"));
 	EXPECT_EQ(-1, data.getIndex("missing"));
 	EXPECT_EQ("", data.getName(1));
 }
@@ -136,7 +135,7 @@ TEST(NamedDataTests, Uninitialized)
 
 	EXPECT_EQ(-1, data.getIndex("missing"));
 	EXPECT_FALSE(data.hasEntry("missing"));
-	EXPECT_FALSE(data.hasCurrentData("missing"));
+	EXPECT_FALSE(data.hasData("missing"));
 
 	float value = 9.87f;
 	EXPECT_FALSE(data.get("missing", &value));
@@ -161,22 +160,22 @@ TEST(NamedDataTests, Put)
 
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("first"));
-	EXPECT_TRUE(data.hasCurrentData(0));
-	EXPECT_TRUE(data.hasCurrentData("first"));
+	EXPECT_TRUE(data.hasData(0));
+	EXPECT_TRUE(data.hasData("first"));
 	EXPECT_EQ(0, data.getIndex("first"));
 	EXPECT_EQ("first", data.getName(0));
 
 	EXPECT_TRUE(data.hasEntry(1));
 	EXPECT_TRUE(data.hasEntry("second"));
-	EXPECT_TRUE(data.hasCurrentData(1));
-	EXPECT_TRUE(data.hasCurrentData("second"));
+	EXPECT_TRUE(data.hasData(1));
+	EXPECT_TRUE(data.hasData("second"));
 	EXPECT_EQ(1, data.getIndex("second"));
 	EXPECT_EQ("second", data.getName(1));
 
 	EXPECT_TRUE(data.hasEntry(2));
 	EXPECT_TRUE(data.hasEntry("third"));
-	EXPECT_FALSE(data.hasCurrentData(2));
-	EXPECT_FALSE(data.hasCurrentData("third"));
+	EXPECT_FALSE(data.hasData(2));
+	EXPECT_FALSE(data.hasData("third"));
 	EXPECT_EQ(2, data.getIndex("third"));
 	EXPECT_EQ("third", data.getName(2));
 }
@@ -241,18 +240,18 @@ TEST(NamedDataTests, ResetAll)
 
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("first"));
-	EXPECT_FALSE(data.hasCurrentData(0));
-	EXPECT_FALSE(data.hasCurrentData("first"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("first"));
 
 	EXPECT_TRUE(data.hasEntry(1));
 	EXPECT_TRUE(data.hasEntry("second"));
-	EXPECT_FALSE(data.hasCurrentData(1));
-	EXPECT_FALSE(data.hasCurrentData("second"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("second"));
 
 	EXPECT_TRUE(data.hasEntry(2));
 	EXPECT_TRUE(data.hasEntry("third"));
-	EXPECT_FALSE(data.hasCurrentData(2));
-	EXPECT_FALSE(data.hasCurrentData("third"));
+	EXPECT_FALSE(data.hasData(2));
+	EXPECT_FALSE(data.hasData("third"));
 }
 
 /// Resetting one data entry at a time.
@@ -271,23 +270,23 @@ TEST(NamedDataTests, ResetOne)
 
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("first"));
-	EXPECT_FALSE(data.hasCurrentData(0));
-	EXPECT_FALSE(data.hasCurrentData("first"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("first"));
 
 	EXPECT_TRUE(data.hasEntry(1));
 	EXPECT_TRUE(data.hasEntry("second"));
-	EXPECT_TRUE(data.hasCurrentData(1));
-	EXPECT_TRUE(data.hasCurrentData("second"));
+	EXPECT_TRUE(data.hasData(1));
+	EXPECT_TRUE(data.hasData("second"));
 
 	EXPECT_TRUE(data.hasEntry(2));
 	EXPECT_TRUE(data.hasEntry("third"));
-	EXPECT_FALSE(data.hasCurrentData(2));
-	EXPECT_FALSE(data.hasCurrentData("third"));
+	EXPECT_FALSE(data.hasData(2));
+	EXPECT_FALSE(data.hasData("third"));
 
 	data.reset("second");
 
 	EXPECT_TRUE(data.hasEntry(1));
 	EXPECT_TRUE(data.hasEntry("second"));
-	EXPECT_FALSE(data.hasCurrentData(1));
-	EXPECT_FALSE(data.hasCurrentData("second"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("second"));
 }

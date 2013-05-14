@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	MakeRigidTransformTests.cpp
 	GeometryTests.cpp
 	ValidTests.cpp
 )

@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- *  Implementation of isValid(), isSubnormal() and setSubnormalToZero().
- */
+/// \file
+/// Implementation of isValid(), isSubnormal() and setSubnormalToZero().
 
 #ifndef SURGSIM_MATH_VALID_INL_H
 #define SURGSIM_MATH_VALID_INL_H

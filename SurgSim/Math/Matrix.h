@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
- *  Definitions of small fixed-size square matrix types.
- */
+/// \file
+/// Definitions of small fixed-size square matrix types.
 
 #ifndef SURGSIM_MATH_MATRIX_H
 #define SURGSIM_MATH_MATRIX_H
