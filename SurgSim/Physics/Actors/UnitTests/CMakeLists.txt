@@ -21,6 +21,8 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	ActorTest.cpp
+	FixedActorTest.cpp
+	RigidActorBaseStateTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
