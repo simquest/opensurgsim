@@ -44,6 +44,17 @@ using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 
 
+class MockComponent : public SurgSim::Framework::Component
+{
+public:
+	MockComponent() : Component("MockComponent") {}
+	virtual ~MockComponent() {}
+
+protected:
+	virtual bool doInitialize() {return true;}
+	virtual bool doWakeUp() {return true;}
+};
+
 class InputManagerTest : public ::testing::Test
 {
 protected:
@@ -116,6 +127,9 @@ TEST_F(InputManagerTest, InputAddRemove)
 	EXPECT_FALSE(inputManager->addComponent(listener1));
 	EXPECT_TRUE(inputManager->removeComponent(listener1));
 	EXPECT_FALSE(inputManager->removeComponent(listener1));
+
+	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>();
+	EXPECT_TRUE(inputManager->addComponent(component));
 }
 
 TEST_F(InputManagerTest, InputfromDevice)

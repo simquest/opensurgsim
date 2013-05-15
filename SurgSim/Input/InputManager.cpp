@@ -72,7 +72,7 @@ bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> c
 	}
 
 	// If we got he the component was neither an Input nor and OutputComponent
-	return false;
+	return true;
 }
 
 bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
