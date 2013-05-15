@@ -16,19 +16,16 @@
 #ifndef SURGSIM_PHYSICS_ACTOR_H
 #define SURGSIM_PHYSICS_ACTOR_H
 
-#include <SurgSim\Math\Vector.h>
-
-#include <SurgSim\Framework\Representation.h>
-
 #include <string>
+
+#include <SurgSim\Math\Vector.h>
+#include <SurgSim\Framework\Representation.h>
 
 namespace SurgSim
 {
 
 namespace Physics
 {
-
-class ActorState;
 
 /// The Actor class defines the base class for all physics objects
 class Actor : public SurgSim::Framework::Representation
@@ -113,19 +110,19 @@ public:
 
 	/// Called before the scene does its physics update, lets the actor
 	/// do some preprocessing
-	/// \param dt The time in seconds that the update call will advance the scene
+	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt)
 	{
 	};
 
 	/// Update the actor state to the current time step
-	/// \param dt The time in seconds that the update call will advance the scene
+	/// \param dt The time step (in seconds)
 	virtual void update(double dt)
 	{
 	};
 
 	/// Called after the scene update has concluded.
-	/// \param dt The time in seconds of the preceding timestep
+	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt)
 	{
 	};
@@ -133,7 +130,8 @@ public:
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom
-	/// protected so that nobody can change the number of DOF, except daughter classes
+	/// \note protected so that nobody can change the number of DOF
+	/// \note except daughter classes
 	void setNumDof(unsigned int numDof)
 	{
 		m_numDof = numDof;
