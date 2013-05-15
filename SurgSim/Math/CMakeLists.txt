@@ -19,9 +19,11 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
+
 )
 
 set(SURGSIM_MATH_HEADERS
+	Geometry.h
 	Matrix.h
 	Quaternion.h
 	RigidTransform.h
@@ -34,7 +36,7 @@ surgsim_add_library(
 	"${SURGSIM_MATH_HEADERS}"
 	"SurgSim/Math"
 )
-	
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
