@@ -28,7 +28,7 @@
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::FileOutput;
 
-::testing::AssertionResult isContained(std::string expected, std::string argument)
+::testing::AssertionResult isContained(const std::string& expected, const std::string& argument)
 {
 	if (std::string::npos != argument.find(expected))
 	{

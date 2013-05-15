@@ -93,10 +93,10 @@ bool ApplicationData::setPaths(const std::vector<std::string>& paths)
 	return result;
 }
 
-bool ApplicationData::addPath(std::string pathName)
+bool ApplicationData::addPath(const std::string& pathName)
 {
 	bool result = false;
-	
+
 	if (! isValidFilename(pathName))
 	{
 		return false;
