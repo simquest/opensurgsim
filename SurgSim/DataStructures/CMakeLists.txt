@@ -28,9 +28,13 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup-inl.h
 	DataGroupBuilder.h
 	IndexDirectory.h
+	Mesh.h
+	MeshElement.h
+	MeshVertex.h
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
+	TriangleMesh.h
 )
 
 surgsim_add_library(
