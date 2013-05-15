@@ -20,6 +20,7 @@
 #include <memory>
 #include <algorithm>
 #include <unordered_map>
+#include <vector>
 
 namespace SurgSim
 {
