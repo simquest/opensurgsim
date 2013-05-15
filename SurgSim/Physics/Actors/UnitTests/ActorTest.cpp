@@ -28,8 +28,8 @@ class ActorTest : public ::testing::Test
 public:
 	void SetUp()
 	{
-		gGravity << 0.0, -9.81, 0.0;
-		gNoGravity.setZero();
+		m_Gravity << 0.0, -9.81, 0.0;
+		m_zeroGravity.setZero();
 	}
 
 	void TearDown()
@@ -37,26 +37,27 @@ public:
 	}
 
 	// Gravity vector (normal version)
-	Vector3d gGravity;
+	Vector3d m_Gravity;
+
 	// Gravity vector (version without gravity)
-	Vector3d gNoGravity;
+	Vector3d m_zeroGravity;
 };
 
 
 TEST_F(ActorTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({Actor actor(std::string("Actor"));});
+	ASSERT_NO_THROW({Actor actor("Actor");});
 }
 
 TEST_F(ActorTest, ResetStateTest)
 {
 	// Create the rigid body
-	std::shared_ptr<Actor> actor = std::make_shared<Actor>(std::string("Actor"));
+	std::shared_ptr<Actor> actor = std::make_shared<Actor>("Actor");
 
 	// Set the actor state to non default values
 	actor->setIsActive(false);
 	actor->setIsGravityEnabled(false);
-	actor->setGravity(gNoGravity);
+	actor->setGravity(m_zeroGravity);
 
 	// Reset the actor state to the default values
 	actor->resetState();
@@ -66,13 +67,13 @@ TEST_F(ActorTest, ResetStateTest)
 	// isGravityEnable flag [default = true]
 	EXPECT_TRUE(actor->isGravityEnabled());
 	// gravity vector [default = (0 -9.81 0)]
-	EXPECT_EQ(gGravity, actor->getGravity());
+	EXPECT_EQ(m_Gravity, actor->getGravity());
 }
 
 TEST_F(ActorTest, SetGetAndDefaultValueTest)
 {
 	/// Create the actor
-	std::shared_ptr<Actor> actor = std::make_shared<Actor>(std::string("Actor"));
+	std::shared_ptr<Actor> actor = std::make_shared<Actor>("Actor");
 
 	/// Get/Set active flag [default = true]
 	EXPECT_TRUE(actor->isActive());
@@ -92,9 +93,9 @@ TEST_F(ActorTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(actor->isGravityEnabled());
 
 	/// Set/Get gravity [default = (0 -9.81 0)]
-	EXPECT_EQ(gGravity, actor->getGravity());
-	actor->setGravity(gNoGravity);
-	ASSERT_EQ(gNoGravity, actor->getGravity());
-	actor->setGravity(gGravity);
-	ASSERT_EQ(gGravity, actor->getGravity());
+	EXPECT_EQ(m_Gravity, actor->getGravity());
+	actor->setGravity(m_zeroGravity);
+	ASSERT_EQ(m_zeroGravity, actor->getGravity());
+	actor->setGravity(m_Gravity);
+	ASSERT_EQ(m_Gravity, actor->getGravity());
 }
