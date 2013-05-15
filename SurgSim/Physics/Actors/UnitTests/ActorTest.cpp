@@ -28,7 +28,7 @@ class ActorTest : public ::testing::Test
 public:
 	void SetUp()
 	{
-		m_Gravity << 0.0, -9.81, 0.0;
+		m_gravity << 0.0, -9.81, 0.0;
 		m_zeroGravity.setZero();
 	}
 
@@ -37,7 +37,7 @@ public:
 	}
 
 	// Gravity vector (normal version)
-	Vector3d m_Gravity;
+	Vector3d m_gravity;
 
 	// Gravity vector (version without gravity)
 	Vector3d m_zeroGravity;
@@ -67,7 +67,7 @@ TEST_F(ActorTest, ResetStateTest)
 	// isGravityEnable flag [default = true]
 	EXPECT_TRUE(actor->isGravityEnabled());
 	// gravity vector [default = (0 -9.81 0)]
-	EXPECT_EQ(m_Gravity, actor->getGravity());
+	EXPECT_EQ(m_gravity, actor->getGravity());
 }
 
 TEST_F(ActorTest, SetGetAndDefaultValueTest)
@@ -93,9 +93,9 @@ TEST_F(ActorTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(actor->isGravityEnabled());
 
 	/// Set/Get gravity [default = (0 -9.81 0)]
-	EXPECT_EQ(m_Gravity, actor->getGravity());
+	EXPECT_EQ(m_gravity, actor->getGravity());
 	actor->setGravity(m_zeroGravity);
 	ASSERT_EQ(m_zeroGravity, actor->getGravity());
-	actor->setGravity(m_Gravity);
-	ASSERT_EQ(m_Gravity, actor->getGravity());
+	actor->setGravity(m_gravity);
+	ASSERT_EQ(m_gravity, actor->getGravity());
 }
