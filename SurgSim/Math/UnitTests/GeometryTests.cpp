@@ -40,7 +40,7 @@ typedef Eigen::Matrix<SizeType, 3, 1, Eigen::DontAlign> VectorType;
 
 bool near(double val1, double val2, double abs_error)
 {
-	const double diff = fabs(val1 - val2);
+	const double diff = std::abs(val1 - val2);
 	if (diff <= abs_error)
 	{
 		return true;
@@ -901,7 +901,7 @@ void checkSegmentPlanDistance(const SegmentPlaneData& data)
 	double distance;
 	VectorType segResultPoint, planeResultPoint;
 	distance = distanceSegmentPlane(seg. a, seg.b,n,d, &segResultPoint, &planeResultPoint);
-	EXPECT_NEAR((planeResultPoint - segResultPoint).norm(), fabs(distance), epsilon);
+	EXPECT_NEAR((planeResultPoint - segResultPoint).norm(), std::abs(distance), epsilon);
 	EXPECT_TRUE(distance * sign > 0 || distance == static_cast<double>(sign));
 	EXPECT_TRUE(expectedSegmentPoint.isApprox(segResultPoint));
 	EXPECT_TRUE(expectedPlanePoint.isApprox(planeResultPoint));
@@ -924,14 +924,14 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 	{
 		SCOPED_TRACE("Segment above plane, segment intersection should be point a");
 		seg = Segment(intersectionPoint + triangle.n * 2, intersectionPoint + triangle.n * 3);
-		distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
+		distance = distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
 		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.a, intersectionPoint, 1));
 	}
 
 	{
 		SCOPED_TRACE("Segment below plane, segment intersection should be point a");
 		seg = Segment(intersectionPoint - triangle.n * 3, intersectionPoint - triangle.n * 2);
-		distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
+		distance = distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
 		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.b, intersectionPoint, -1));
 	}
 
@@ -973,7 +973,7 @@ void checkTriPlaneDistance(const TriPlaneData& data)
 	double distance;
 
 	distance = distanceTrianglePlane(tri.v0, tri.v1, tri.v2, n, d, &triangleResultPoint, &planeResultPoint);
-	EXPECT_NEAR((planeResultPoint - triangleResultPoint).norm(), fabs(distance), epsilon);
+	EXPECT_NEAR((planeResultPoint - triangleResultPoint).norm(), std::abs(distance), epsilon);
 	EXPECT_TRUE(distance * sign > 0 || distance == static_cast<double>(sign));
 	EXPECT_TRUE(expectedTrianglePoint.isApprox(triangleResultPoint));
 	EXPECT_TRUE(expectedPlanePoint.isApprox(planeResultPoint));

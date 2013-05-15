@@ -299,7 +299,7 @@ T distanceLineLine(
 	T d = l0v01.dot(l0v0_l1v0);
 	T e = -l1v01.dot(l0v0_l1v0);
 	T ratio = a*c-b*b;
-	if (fabs(ratio) <= Geometry::ScalarEpsilon)
+	if (std::abs(ratio) <= Geometry::ScalarEpsilon)
 	{
 		// parallel case
 		lambda0 = 0;
@@ -367,7 +367,7 @@ T distanceSegmentSegment(
 	int region = -1;
 	T tmp;
 	// Non-parallel case
-	if (abs(ratio) >= Geometry::ScalarEpsilon)
+	if (std::abs(ratio) >= Geometry::ScalarEpsilon)
 	{
 		// Get the region of the global minimum in the s-t space based on the line-line solution
 		//		s=0		s=1
@@ -912,7 +912,7 @@ bool doesCollideSegmentTriangle(
 	result->setConstant((std::numeric_limits<double>::quiet_NaN()));
 
 	// Ray is parallel to triangle plane
-	if (fabs(b) <= Geometry::AngularEpsilon)
+	if (std::abs(b) <= Geometry::AngularEpsilon)
 	{
 		if (a == 0)
 		{
@@ -1022,17 +1022,17 @@ T distanceSegmentPlane(
 	T dist1 = n.dot(sv1) + d;
 	// Parallel case
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1 - sv0;
-	if (abs(n.dot(v01)) <= Geometry::AngularEpsilon)
+	if (std::abs(n.dot(v01)) <= Geometry::AngularEpsilon)
 	{
 		*closestPointSegment = (sv0 + sv1)*T(0.5);
 		dist0 = n.dot(*closestPointSegment) + d;
 		*planeIntersectionPoint = *closestPointSegment - dist0*n;
-		return (abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
+		return (std::abs(dist0) < Geometry::DistanceEpsilon ? 0 : dist0);
 	}
 	// Both on the same side
 	if ((dist0 > 0 && dist1 > 0) || (dist0 < 0 && dist1 < 0))
 	{
-		if (abs(dist0) < abs(dist1))
+		if (std::abs(dist0) < std::abs(dist1))
 		{
 			*closestPointSegment = sv0;
 			*planeIntersectionPoint = sv0 - dist0*n;
@@ -1093,7 +1093,7 @@ T distanceTrianglePlane(
 	// HS-2013-may-09 Could there be a case where we fall into the wrong tree because of the checks against
 	// the various epsilon values all going against us ???
 	// Parallel case (including Coplanar)
-	if (abs(n.dot(t01)) <= Geometry::AngularEpsilon && abs(n.dot(t02)) <= Geometry::AngularEpsilon)
+	if (std::abs(n.dot(t01)) <= Geometry::AngularEpsilon && std::abs(n.dot(t02)) <= Geometry::AngularEpsilon)
 	{
 		*closestPointTriangle = (tv0 + tv1 + tv2) / T(3);
 		*planeProjectionPoint = *closestPointTriangle - n*dist0;
@@ -1128,7 +1128,7 @@ T distanceTrianglePlane(
 		return 0;
 	}
 
-	int index = indexOfMinimum(fabs(dist0), fabs(dist1), fabs(dist2));
+	int index = indexOfMinimum(std::abs(dist0), std::abs(dist1), std::abs(dist2));
 	switch (index)
 	{
 	case 0: //dist0 is closest
@@ -1237,11 +1237,11 @@ T distanceSegmentTriangle(
 	// Degenerate case: Line and triangle plane parallel
 	const Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
 	const T v01DotTn = n.dot(v01);
-	if (abs(v01DotTn) <= Geometry::AngularEpsilon)
+	if (std::abs(v01DotTn) <= Geometry::AngularEpsilon)
 	{
 		// Check if any of the points project onto the tri 
 		// otherwise normal (non-parallel) processing will get the right result
-		T dst = abs(distancePointPlane(sv0, n, d, trianglePoint));
+		T dst = std::abs(distancePointPlane(sv0, n, d, trianglePoint));
 		Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 		barycentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
 		if (baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0)
@@ -1249,7 +1249,7 @@ T distanceSegmentTriangle(
 			*segmentPoint = sv0;
 			return dst;
 		}
-		dst = abs(distancePointPlane(sv1, n, d, trianglePoint));
+		dst = std::abs(distancePointPlane(sv1, n, d, trianglePoint));
 		barycentricCoordinates(*trianglePoint, tv0, tv1, tv2, normal, &baryCoords);
 		if (baryCoords[0] >= 0 && baryCoords[1] >= 0 && baryCoords[2] >= 0)
 		{
@@ -1278,13 +1278,13 @@ T distanceSegmentTriangle(
 	T dst02 = distanceSegmentSegment(sv0, sv1, tv0, tv2, &segColPt02, &triColPt02);
 	T dst12 = distanceSegmentSegment(sv0, sv1, tv1, tv2, &segColPt12, &triColPt12);
 	Eigen::Matrix<T, 3, 1, MOpt> ptTriCol0, ptTriCol1;
-	T dstPtTri0 = abs(distancePointPlane(sv0, n, d, &ptTriCol0));
+	T dstPtTri0 = std::abs(distancePointPlane(sv0, n, d, &ptTriCol0));
 	barycentricCoordinates(ptTriCol0, tv0, tv1, tv2, normal, &baryCoords);
 	if (baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0)
 	{
 		dstPtTri0 = std::numeric_limits<T>::max();
 	}
-	T dstPtTri1 = abs(distancePointPlane(sv1, n, d, &ptTriCol1));
+	T dstPtTri1 = std::abs(distancePointPlane(sv1, n, d, &ptTriCol1));
 	barycentricCoordinates(ptTriCol1, tv0, tv1, tv2, normal, &baryCoords);
 	if (baryCoords[0] < 0 || baryCoords[1] < 0 || baryCoords[2] < 0)
 	{
