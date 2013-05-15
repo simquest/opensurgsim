@@ -924,14 +924,14 @@ TEST_F(GeometryTest, SegmentPlaneDistance)
 	{
 		SCOPED_TRACE("Segment above plane, segment intersection should be point a");
 		seg = Segment(intersectionPoint + triangle.n * 2, intersectionPoint + triangle.n * 3);
-		distance = distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
+		distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
 		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.a, intersectionPoint, 1));
 	}
 
 	{
 		SCOPED_TRACE("Segment below plane, segment intersection should be point a");
 		seg = Segment(intersectionPoint - triangle.n * 3, intersectionPoint - triangle.n * 2);
-		distance = distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
+		distanceSegmentPlane(seg.a, seg.b,triangle.n,d, &segResultPoint, &planeResultPoint);
 		checkSegmentPlanDistance(SegmentPlaneData(seg, triangle.n, d, seg.b, intersectionPoint, -1));
 	}
 
