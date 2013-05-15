@@ -20,8 +20,8 @@ include_directories(
 
 set(SURGSIM_INPUT_SOURCES
 	CommonDevice.cpp
-	InputManager.cpp
 	InputComponent.cpp
+	InputManager.cpp
 	OutputComponent.cpp
 )
 
