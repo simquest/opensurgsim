@@ -43,7 +43,7 @@ public:
 	};
 
 	/// Set the initial pose of the rigid actor
-	/// \param pose The initial transformation (translation + rotation)
+	/// \param pose The initial pose (translation + rotation)
 	void setInitialPose(const RigidTransform3d& pose)
 	{
 		m_initialState.setPose(pose);
@@ -52,28 +52,28 @@ public:
 	};
 
 	/// Get the initial pose of the rigid actor
-	/// \return The initial transformation (translation + rotation)
+	/// \return The initial pose (translation + rotation)
 	const RigidTransform3d& getInitialPose() const
 	{
 		return m_initialState.getPose();
 	};
 
 	/// Set the current pose of the rigid actor
-	/// \param pose The current transformation (translation + rotation)
+	/// \param pose The current pose (translation + rotation)
 	void setPose(const RigidTransform3d& pose)
 	{
 		m_currentState.setPose(pose);
 	};
 
 	/// Get the current pose of the rigid actor
-	/// \return The current transformation (translation + rotation)
+	/// \return The current pose (translation + rotation)
 	const RigidTransform3d& getPose() const
 	{
 		return m_currentState.getPose();
 	};
 
 	/// Get the previous pose of the rigid actor
-	/// \return The previous transformation (translation + rotation)
+	/// \return The previous pose (translation + rotation)
 	const RigidTransform3d& getPreviousPose() const
 	{
 		return m_previousState.getPose();
@@ -81,7 +81,7 @@ public:
 
 	/// Called after beforeUpdate and prior to afterUpdate
 	/// It compute the current free motion of the object using the time step dt
-	/// \param dt The time step in seconds.
+	/// \param dt The time step (in seconds)
 	void update(double dt)
 	{
 		m_previousState = m_currentState;

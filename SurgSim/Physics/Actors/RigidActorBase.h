@@ -27,7 +27,8 @@ namespace SurgSim
 namespace Physics
 {
 
-/// The RigidActorBase class defines the base class for all rigid object (non-deformable)
+/// The RigidActorBase class defines the base class for
+/// all rigid motion based actors (fixed, rigid body, rigid body + vtc,...)
 class RigidActorBase : public Actor
 {
 public:
@@ -44,24 +45,24 @@ public:
 	}
 
 	/// Set the initial pose of the rigid actor
-	/// \param transformation The initial transformation (translation + rotation)
-	virtual void setInitialPose(const RigidTransform3d& transformation) = 0;
+	/// \param pose The initial pose
+	virtual void setInitialPose(const RigidTransform3d& pose) = 0;
 
 	/// Get the initial pose of the rigid actor
-	/// \return The initial transformation (translation + rotation)
+	/// \return The initial pose
 	virtual const RigidTransform3d& getInitialPose() const = 0;
 
 	/// Set the current pose of the rigid actor
-	/// \param transformation The current transformation (translation + rotation)
-	virtual void setPose(const RigidTransform3d& transformation) = 0;
+	/// \param pose The current pose
+	virtual void setPose(const RigidTransform3d& pose) = 0;
 
 	/// Get the current pose of the rigid actor
-	/// \return The current transformation (translation + rotation)
+	/// \return The current pose
 	virtual const RigidTransform3d& getPose() const = 0;
 
 	/// Called before the scene does its physics update, lets the actor
 	/// do some preprocessing
-	/// \param dt The time in seconds that the update call will advance the scene
+	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt)
 	{
 		Actor::beforeUpdate(dt);
@@ -69,14 +70,14 @@ public:
 
 	/// Called after beforeUpdate and prior to afterUpdate
 	/// It compute the current free motion of the object using the time step dt
-	/// \param dt The time step in seconds
+	/// \param dt The time step (in seconds)
 	virtual void update(double dt)
 	{
 		Actor::update(dt);
 	};
 
 	/// Called after the scene update has concluded
-	/// \param dt The time in seconds of the preceding timestep
+	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt)
 	{
 		Actor::afterUpdate(dt);
@@ -88,7 +89,7 @@ public:
 		Actor::resetState();
 	};
 
-	/// Called to reset the rigid actor parameters to their initial/default values
+	/// Called to reset the rigid actor parameters
 	virtual void resetParameters()
 	{
 		Actor::resetParameters();
