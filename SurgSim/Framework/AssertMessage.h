@@ -67,7 +67,7 @@ public:
 	}
 
 	/// Destructor
-	~AssertMessage()
+	~AssertMessage() noexcept(false)
 	{
 		flush();
 		m_killMeNow(getMessage());
