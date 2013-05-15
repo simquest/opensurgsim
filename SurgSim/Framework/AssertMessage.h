@@ -67,7 +67,11 @@ public:
 	}
 
 	/// Destructor
+#ifdef _MSC_VER
+	~AssertMessage() throw(...)
+#else
 	~AssertMessage() noexcept(false)
+#endif
 	{
 		flush();
 		m_killMeNow(getMessage());
