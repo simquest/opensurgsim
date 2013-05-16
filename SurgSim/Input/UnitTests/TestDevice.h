@@ -26,7 +26,7 @@ public:
 	virtual void pushInput();
 
 	// Send some data down the stream
-	void pushInput(std::string data);
+	void pushInput(const std::string& data);
 
 	virtual bool pullOutput();
 

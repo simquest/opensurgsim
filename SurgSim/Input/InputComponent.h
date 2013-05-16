@@ -39,7 +39,7 @@ class InputConsumer;
 class InputComponent : public SurgSim::Framework::Component
 {
 public:
-	InputComponent(std::string name, std::string deviceName);
+	InputComponent(const std::string& name, const std::string& deviceName);
 	virtual ~InputComponent();
 
 	/// Is a device connected

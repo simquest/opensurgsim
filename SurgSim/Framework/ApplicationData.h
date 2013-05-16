@@ -80,7 +80,7 @@ private:
 	/// \param	pathName Full pathname.
 	/// \return	true if it succeeds, false if the given path does not exist or if it is
 	/// 		already in the list of paths.
-	bool addPath(std::string pathName);
+	bool addPath(const std::string& pathName);
 
 	/// Sets the list of search paths to be used for finding the location of files.
 	/// Eliminates duplicate paths and paths that do not exist

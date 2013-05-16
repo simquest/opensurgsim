@@ -217,7 +217,7 @@ std::shared_ptr<Runtime> Runtime::getSharedPtr()
 	{
 		result = shared_from_this();
 	}
-	catch (std::exception e)
+	catch (const std::exception& e)
 	{
 		SURGSIM_FAILURE() << "Runtime was not created as a shared_ptr";
 	}
