@@ -2,7 +2,7 @@
 #include "TestDevice.h"
 
 TestDevice::TestDevice(const std::string& uniqueName) :
-CommonDevice(uniqueName, buildInputData())
+	CommonDevice(uniqueName, buildInputData())
 {
 
 }
@@ -25,7 +25,7 @@ void TestDevice::pushInput()
 	CommonDevice::pushInput();
 }
 
-void TestDevice::pushInput(std::string data)
+void TestDevice::pushInput(const std::string& data)
 {
 	getInputData().strings().set("helloWorld", data);
 	pushInput();

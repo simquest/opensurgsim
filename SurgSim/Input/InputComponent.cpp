@@ -57,7 +57,7 @@ private:
 };
 
 
-InputComponent::InputComponent(std::string name, std::string deviceName) :
+InputComponent::InputComponent(const std::string& name, const std::string& deviceName) :
 	Component(name),
 	m_deviceName(deviceName),
 	m_deviceConnected(false),

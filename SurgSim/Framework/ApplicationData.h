@@ -19,13 +19,16 @@
 #include <string>
 #include <vector>
 
+#if !defined(SURGSIM_PARSED_BY_DOXYGEN)  // do not generate documentation for Boost stuff!
 namespace boost
 {
 namespace filesystem
 {
-	class path;
-}
-}
+class path;
+} // namespace filesystem
+} // namespace boost
+#endif // defined(SURGSIM_PARSED_BY_DOXYGEN)
+
 namespace SurgSim
 {
 namespace Framework
@@ -80,7 +83,7 @@ private:
 	/// \param	pathName Full pathname.
 	/// \return	true if it succeeds, false if the given path does not exist or if it is
 	/// 		already in the list of paths.
-	bool addPath(std::string pathName);
+	bool addPath(const std::string& pathName);
 
 	/// Sets the list of search paths to be used for finding the location of files.
 	/// Eliminates duplicate paths and paths that do not exist
