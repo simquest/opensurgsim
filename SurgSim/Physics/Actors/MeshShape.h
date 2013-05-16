@@ -19,7 +19,7 @@
 #include <SurgSim/Physics/Actors/RigidShape.h>
 #include <SurgSim/DataStructures/TriangleMesh.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -78,3 +78,4 @@ private:
 }; /// SurgSim
 
 #endif /// SURGSIM_PHYSICS_MESHSHAPE_H
+
