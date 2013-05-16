@@ -13,14 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_SHAPES_H
-#define SURGSIM_PHYSICS_SHAPES_H
+#include <SurgSim/Physics/Actors/CylinderShape.h>
 
-/// This file includes all the shapes
-#include <SurgSim/Physics/Actors/Shapes/BoxShape.h>
-#include <SurgSim/Physics/Actors/Shapes/CapsuleShape.h>
-#include <SurgSim/Physics/Actors/Shapes/CylinderShape.h>
-#include <SurgSim/Physics/Actors/Shapes/MeshShape.h>
-#include <SurgSim/Physics/Actors/Shapes/SphereShape.h>
-
-#endif /// SURGSIM_PHYSICS_SHAPES_H
+// Explicit instantiation for compile test and code generation
+template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;
+template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Y>;
+template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Z>;

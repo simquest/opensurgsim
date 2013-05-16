@@ -14,20 +14,20 @@
 # limitations under the License.
 
 set(SURGSIM_PHYSICS_ACTORS_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/CapsuleShape.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/CylinderShape.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CapsuleShape.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/CylinderShape.cpp
 	PARENT_SCOPE
 )
 
 set(SURGSIM_PHYSICS_ACTORS_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/Actor.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/BoxShape.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/CapsuleShape.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/CylinderShape.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/MeshShape.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/RigidShape.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/Shapes.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Shapes/SphereShape.h
+	${CMAKE_CURRENT_SOURCE_DIR}/BoxShape.h
+	${CMAKE_CURRENT_SOURCE_DIR}/CapsuleShape.h
+	${CMAKE_CURRENT_SOURCE_DIR}/CylinderShape.h
+	${CMAKE_CURRENT_SOURCE_DIR}/MeshShape.h
+	${CMAKE_CURRENT_SOURCE_DIR}/RigidShape.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Shapes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/SphereShape.h
 	PARENT_SCOPE
 )
 

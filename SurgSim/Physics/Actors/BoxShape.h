@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_BOXSHAPE_H
 #define SURGSIM_PHYSICS_BOXSHAPE_H
 
-#include <SurgSim/Physics/Actors/Shapes/RigidShape.h>
+#include <SurgSim/Physics/Actors/RigidShape.h>
 
 namespace SurgSim 
 {

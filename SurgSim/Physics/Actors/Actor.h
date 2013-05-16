@@ -18,8 +18,8 @@
 
 #include <string>
 
-#include <SurgSim\Math\Vector.h>
-#include <SurgSim\Framework\Representation.h>
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Framework/Representation.h>
 
 namespace SurgSim
 {

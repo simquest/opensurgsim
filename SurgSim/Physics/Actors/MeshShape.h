@@ -16,7 +16,8 @@
 #ifndef SURGSIM_PHYSICS_MESHSHAPE_H
 #define SURGSIM_PHYSICS_MESHSHAPE_H
 
-#include <SurgSim/Physics/Actors/Shapes/RigidShape.h>
+#include <SurgSim/Physics/Actors/RigidShape.h>
+#include <SurgSim/DataStructures/TriangleMesh.h>
 
 namespace SurgSim 
 {
@@ -24,10 +25,12 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Mesh shape
 class Mesh;
+
+/// Mesh shape
 class MeshShape: public RigidShape
 {
+
 public:
 	/// Constructor
 	/// \param mesh The mesh to build the shape from
@@ -47,7 +50,7 @@ public:
 	/// \return The volume of the mesh (in m-3)
 	virtual double calculateVolume() const
 	{
-		return 0.0;
+		return 0;
 	}
 
 	/// Calculate the mass center of the mesh

@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Actors/Shapes/CylinderShape.h>
+#include <SurgSim/Physics/Actors/CapsuleShape.h>
 
 // Explicit instantiation for compile test and code generation
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Y>;
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Z>;
+template class SurgSim::Physics::CapsuleShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;
+template class SurgSim::Physics::CapsuleShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Y>;
+template class SurgSim::Physics::CapsuleShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Z>;

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_SPHERESHAPE_H
 #define SURGSIM_PHYSICS_SPHERESHAPE_H
 
-#include <SurgSim/Physics/Actors/Shapes/RigidShape.h>
+#include <SurgSim/Physics/Actors/RigidShape.h>
 
 namespace SurgSim 
 {
@@ -24,17 +24,15 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Sphere shape: sphere centered on (0 0 0), with radius, solid or hollow
+/// Sphere shape: sphere centered on (0 0 0), defined with radius
 class SphereShape: public RigidShape
 {
 public:
 	/// Constructor
 	/// \param radius The sphere radius (in m)
-	/// \param isSolid True if the sphere is solid, False if it is hollow
-	SphereShape(double radius, bool isSolid = true)
+	explicit SphereShape(double radius)
 	{
 		m_radius = radius;
-		m_isSolid  = isSolid;
 	}
 
 	/// Get the sphere radius
@@ -44,27 +42,11 @@ public:
 		return m_radius;
 	}
 
-	/// Query if the sphere is solid or not
-	/// \return True if the sphere is solid, False if it is hollow
-	bool isSolid() const
-	{
-		return m_isSolid;
-	}
-
 	/// Calculate the volumeof the sphere
 	/// \return The volume of the sphere (in m-3)
 	double calculateVolume() const
 	{
-		double r2 = m_radius * m_radius;
-
-		if (m_isSolid)
-		{
-			return 4.0 / 3.0 * M_PI * m_radius * r2;
-		}
-		else
-		{
-			return 4.0 * M_PI * r2;
-		}
+		return 4.0 / 3.0 * M_PI * m_radius * m_radius * m_radius;
 	}
 
 	/// Calculate the mass center of the sphere
@@ -81,8 +63,7 @@ public:
 	{
 		const double mass = calculateMass(rho);
 
-		double diagonalCoefficient = (m_isSolid ? 2.0 / 5.0 : 2.0 / 3.0);
-		diagonalCoefficient *= mass * m_radius * m_radius;
+		double diagonalCoefficient = 2.0 / 5.0 * mass * m_radius * m_radius;
 
 		Matrix33d inertia;
 		inertia.setZero();
@@ -94,9 +75,6 @@ public:
 private:
 	/// Sphere radius
 	double m_radius;
-
-	/// Is the sphere solid or hollow ?
-	bool m_isSolid;
 };
 
 }; /// Physics
