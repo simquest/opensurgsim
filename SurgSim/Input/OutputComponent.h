@@ -28,7 +28,8 @@ namespace Input
 class OutputComponent : public SurgSim::Framework::Component, public SurgSim::Input::OutputProducerInterface
 {
 public:
-	OutputComponent(std::string name, std::string deviceName, SurgSim::DataStructures::DataGroup outputData);
+	OutputComponent(const std::string& name, const std::string& deviceName,
+	                const SurgSim::DataStructures::DataGroup& outputData);
 	virtual ~OutputComponent();
 
 	/// Overridden callback from OutputProducerInterface, the device will call this to fetch the

@@ -74,7 +74,7 @@ protected:
 	std::shared_ptr<InputManager> inputManager;
 };
 
-std::shared_ptr<OutputComponent> createOutputComponent(std::string name, std::string deviceName)
+std::shared_ptr<OutputComponent> createOutputComponent(const std::string& name, const std::string& deviceName)
 {
 	DataGroupBuilder builder;
 	builder.addString("data");

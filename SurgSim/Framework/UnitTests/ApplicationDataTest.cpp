@@ -26,20 +26,23 @@ using boost::filesystem::path;
 
 namespace std
 {
-	::std::ostream& operator<<(::std::ostream& os, const vector<std::string>& content) {
-		os << "(";
-		
-		for (size_t i = 0; i < content.size(); ++i)
+
+::std::ostream& operator<<(::std::ostream& os, const vector<std::string>& content) 
+{
+	os << "(";
+
+	for (size_t i = 0; i < content.size(); ++i)
+	{
+		if (i > 0)
 		{
-			if (i > 0)
-			{
-				os << ", ";
-			}
-			os << "\"" << content[i] << "\"";
+			os << ", ";
 		}
-		os << ")";
-		return os;
+		os << "\"" << content[i] << "\"";
 	}
+	os << ")";
+	return os;
+}
+
 }
 
 ::testing::AssertionResult isContained(const std::string& expected, 
