@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	ActorTest.cpp
 	FixedActorTest.cpp
 	RigidActorBaseStateTest.cpp
+	RigidShapeTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -31,12 +32,6 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-# Do not include SurgSimPhysics library for now as it only contains 1 hearder
-# Therefore no library can be build...
-# Still kept this line, because the next merge request will require it
-# Which should happen in few minutes...
-#set(LIBS SurgSimPhysics SurgSimFramework gtest ${Boost_LIBRARIES})
-
-set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimPhysics SurgSimFramework gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimPhysicsActorsTest)
