@@ -47,7 +47,7 @@ bool SurgSim::Framework::BehaviorManager::doStartUp()
 
 bool SurgSim::Framework::BehaviorManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = false;
+	bool result = true;
 	std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(component);
 	if (behavior != nullptr)
 	{
@@ -55,10 +55,10 @@ bool SurgSim::Framework::BehaviorManager::addComponent(std::shared_ptr<SurgSim::
 		{
 			m_behaviors.push_back(behavior);
 			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added behavior " << behavior->getName();
-			result = true;
 		}
 		else
 		{
+			result = false;
 			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate behavior " << behavior->getName();
 		}
 	}
