@@ -23,54 +23,12 @@
 using SurgSim::Physics::Actor;
 using SurgSim::Math::Vector3d;
 
-class ActorTest : public ::testing::Test
-{
-public:
-	void SetUp()
-	{
-		m_gravity << 0.0, -9.81, 0.0;
-		m_zeroGravity.setZero();
-	}
-
-	void TearDown()
-	{
-	}
-
-	// Gravity vector (normal version)
-	Vector3d m_gravity;
-
-	// Gravity vector (version without gravity)
-	Vector3d m_zeroGravity;
-};
-
-
-TEST_F(ActorTest, ConstructorTest)
+TEST(ActorTest, ConstructorTest)
 {
 	ASSERT_NO_THROW({Actor actor("Actor");});
 }
 
-TEST_F(ActorTest, ResetStateTest)
-{
-	// Create the rigid body
-	std::shared_ptr<Actor> actor = std::make_shared<Actor>("Actor");
-
-	// Set the actor state to non default values
-	actor->setIsActive(false);
-	actor->setIsGravityEnabled(false);
-	actor->setGravity(m_zeroGravity);
-
-	// Reset the actor state to the default values
-	actor->resetState();
-
-	// isActive flag [default = true]
-	EXPECT_TRUE(actor->isActive());
-	// isGravityEnable flag [default = true]
-	EXPECT_TRUE(actor->isGravityEnabled());
-	// gravity vector [default = (0 -9.81 0)]
-	EXPECT_EQ(m_gravity, actor->getGravity());
-}
-
-TEST_F(ActorTest, SetGetAndDefaultValueTest)
+TEST(ActorTest, SetGetAndDefaultValueTest)
 {
 	/// Create the actor
 	std::shared_ptr<Actor> actor = std::make_shared<Actor>("Actor");
@@ -91,11 +49,4 @@ TEST_F(ActorTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(actor->isGravityEnabled());
 	actor->setIsGravityEnabled(true);
 	ASSERT_TRUE(actor->isGravityEnabled());
-
-	/// Set/Get gravity [default = (0 -9.81 0)]
-	EXPECT_EQ(m_gravity, actor->getGravity());
-	actor->setGravity(m_zeroGravity);
-	ASSERT_EQ(m_zeroGravity, actor->getGravity());
-	actor->setGravity(m_gravity);
-	ASSERT_EQ(m_gravity, actor->getGravity());
 }

@@ -18,8 +18,8 @@
 
 #include <string>
 
-#include <SurgSim\Math\Vector.h>
-#include <SurgSim\Framework\Representation.h>
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Framework/Representation.h>
 
 namespace SurgSim
 {
@@ -34,9 +34,9 @@ public:
 	/// Constructor
 	/// \param name The actor's name
 	explicit Actor(const std::string& name)
-		: Representation(name), m_numDof(0)
+		: Representation(name), m_numDof(0), m_gravity(0.0, -9.81, 0.0),
+		m_isGravityEnabled(true), m_isActive(true)
 	{
-		Actor::resetState();
 	}
 
 	/// Destructor
@@ -45,12 +45,8 @@ public:
 	}
 
 	/// Reset the actor to its initial/default state
-	/// The actor is being active with gravity enabled, set to (0 -9.81 0)
 	virtual void resetState()
 	{
-		setIsActive(true);
-		setIsGravityEnabled(true);
-		setGravity(SurgSim::Math::Vector3d(0, -9.81, 0));
 	}
 
 	/// Reset the actor parameters to their initial/default values
@@ -93,21 +89,6 @@ public:
 		return m_isGravityEnabled;
 	}
 
-	/// Set gravity vector
-	/// \param gravity The gravity vector (direction and magnitude)
-	virtual void setGravity(const SurgSim::Math::Vector3d& gravity)
-	{
-		m_gravity = gravity;
-	}
-
-	/// Get gravity vector
-	/// \return The gravity vector (direction and magnitude)
-	///         No matter what the gravity enabled flag is
-	const SurgSim::Math::Vector3d& getGravity() const
-	{
-		return m_gravity;
-	}
-
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt)
@@ -147,7 +128,7 @@ private:
 	unsigned int m_numDof;
 
 	/// Gravity vector
-	SurgSim::Math::Vector3d m_gravity;
+	const SurgSim::Math::Vector3d m_gravity;
 
 	/// Gravity enabled flag
 	bool m_isGravityEnabled;
