@@ -39,6 +39,10 @@ set(SURGSIM_DOCUMENTATION_EXCLUDE_LIST
 	CACHE STRING "Directories and files to ignore when generating documentation")
 mark_as_advanced(SURGSIM_DOCUMENTATION_EXCLUDE_LIST)
 
+set(PROJECT_LOGO "${CMAKE_CURRENT_SOURCE_DIR}/OpenSurgSim-dox.png")
+set(HTML_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/header.html")
+set(HTML_FOOTER "${CMAKE_CURRENT_SOURCE_DIR}/footer.html")
+
 
 if(SURGSIM_DOCUMENTATION)
   if (NOT DOXYGEN_FOUND)
