@@ -18,9 +18,7 @@
 
 #include <SurgSim/Math/RigidTransform.h>
 
-using SurgSim::Math::RigidTransform3d;
-
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -34,46 +32,46 @@ public:
 	/// Default constructor
 	RigidActorBaseState()
 	{
-		RigidActorBaseState::reset();
-	};
+		m_pose.setIdentity();
+	}
 
 	/// Destructor
 	virtual ~RigidActorBaseState()
 	{
-	};
+	}
 
 	/// Comparison operator
 	/// \param s A RigidActorBaseState to compare it to
 	/// \return True if the 2 states are equals, False otherwise
-	bool operator ==(const RigidActorBaseState &s) const
+	bool operator ==(const RigidActorBaseState &state) const
 	{
-		return m_pose.isApprox(s.m_pose);
-	};
+		return m_pose.isApprox(state.m_pose);
+	}
 
 	/// Reset the state to default values
 	/// Pose is being set to identity (no translation, no rotation)
 	virtual void reset()
 	{
 		m_pose.setIdentity();
-	};
+	}
 
 	/// Set the rigid actor pose
 	/// \param pose The pose to set the rigid actor to
-	void setPose(const RigidTransform3d& pose)
+	void setPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 		m_pose = pose;
-	};
+	}
 
 	/// Get the rigid actor pose
 	/// \return A constant reference to the pose (read only)
-	const RigidTransform3d& getPose() const
+	const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_pose;
-	};
+	}
 
 private:
 	/// Rigid actor pose (translation + rotation)
-	RigidTransform3d m_pose;
+	SurgSim::Math::RigidTransform3d m_pose;
 };
 
 }; /// Physics

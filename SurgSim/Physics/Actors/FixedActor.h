@@ -35,12 +35,12 @@ public:
 	explicit FixedActor(const std::string& name)
 		: RigidActorBase(name)
 	{
-	};
+	}
 
 	/// Destructor
 	virtual ~FixedActor()
 	{
-	};
+	}
 
 	/// Set the initial pose of the rigid actor
 	/// \param pose The initial pose (translation + rotation)
@@ -49,28 +49,28 @@ public:
 		m_initialState.setPose(pose);
 		m_currentState = m_initialState;
 		m_previousState = m_initialState;
-	};
+	}
 
 	/// Get the initial pose of the rigid actor
 	/// \return The initial pose (translation + rotation)
 	const RigidTransform3d& getInitialPose() const
 	{
 		return m_initialState.getPose();
-	};
+	}
 
 	/// Set the current pose of the rigid actor
 	/// \param pose The current pose (translation + rotation)
 	void setPose(const RigidTransform3d& pose)
 	{
 		m_currentState.setPose(pose);
-	};
+	}
 
 	/// Get the current pose of the rigid actor
 	/// \return The current pose (translation + rotation)
 	const RigidTransform3d& getPose() const
 	{
 		return m_currentState.getPose();
-	};
+	}
 
 	/// Get the previous pose of the rigid actor
 	/// \return The previous pose (translation + rotation)
@@ -85,7 +85,7 @@ public:
 	void update(double dt)
 	{
 		m_previousState = m_currentState;
-	};
+	}
 
 	/// Called to reset the fixed object to its initial/default state
 	/// \post all states are set to the initial state
@@ -95,7 +95,7 @@ public:
 
 		m_previousState = m_initialState;
 		m_currentState  = m_initialState;
-	};
+	}
 
 private:
 	/// Initial fixed actor state

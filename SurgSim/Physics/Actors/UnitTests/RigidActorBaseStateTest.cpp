@@ -18,13 +18,16 @@
 #include <string>
 
 #include <SurgSim/Physics/Actors/RigidActorBaseState.h>
+
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
 using namespace SurgSim::Physics;
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
 
 class RigidActorBaseStateTest : public ::testing::Test
 {
@@ -37,9 +40,9 @@ public:
 		q.coeffs().setRandom();
 		q.normalize();
 		t.setRandom();
-		currentTransformation = SurgSim::Math::makeRigidTransform(q, t);
+		m_currentTransformation = SurgSim::Math::makeRigidTransform(q, t);
 
-		identityTransformation.setIdentity();
+		m_identityTransformation.setIdentity();
 	}
 
 	void TearDown()
@@ -47,10 +50,10 @@ public:
 	}
 
 	// Rigid actor current pose
-	RigidTransform3d currentTransformation;
+	RigidTransform3d m_currentTransformation;
 
 	// Identity pose (no translation/rotation)
-	RigidTransform3d identityTransformation;
+	RigidTransform3d m_identityTransformation;
 };
 
 TEST_F(RigidActorBaseStateTest, ConstructorTest)
@@ -64,7 +67,7 @@ TEST_F(RigidActorBaseStateTest, DefaultValueTest)
 	std::shared_ptr<RigidActorBaseState> rigidActorBaseState = std::make_shared<RigidActorBaseState>();
 
 	/// Pose [default = identity]
-	EXPECT_TRUE(rigidActorBaseState->getPose().isApprox(identityTransformation));
+	EXPECT_TRUE(rigidActorBaseState->getPose().isApprox(m_identityTransformation));
 }
 
 TEST_F(RigidActorBaseStateTest, ResetTest)
@@ -72,9 +75,9 @@ TEST_F(RigidActorBaseStateTest, ResetTest)
 	/// Create the base rigid actor state
 	std::shared_ptr<RigidActorBaseState> rigidActorBaseState = std::make_shared<RigidActorBaseState>();
 
-	rigidActorBaseState->setPose(currentTransformation);
-	EXPECT_FALSE(rigidActorBaseState->getPose().isApprox(identityTransformation));
+	rigidActorBaseState->setPose(m_currentTransformation);
+	EXPECT_FALSE(rigidActorBaseState->getPose().isApprox(m_identityTransformation));
 	// Reset should reset the pose to identity
 	rigidActorBaseState->reset();
-	EXPECT_TRUE(rigidActorBaseState->getPose().isApprox(identityTransformation));
+	EXPECT_TRUE(rigidActorBaseState->getPose().isApprox(m_identityTransformation));
 }

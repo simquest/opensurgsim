@@ -20,94 +20,86 @@
 #include <SurgSim/Physics/Actors/FixedActor.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/RigidTransform.h>
 
 using namespace SurgSim::Physics;
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
 
 class FixedActorTest : public ::testing::Test
 {
 public:
 	void SetUp()
 	{
-		gGravity << 0.0, -9.81, 0.0;
-		gNoGravity.setZero();
-
 		Quaterniond q;
 		Vector3d t;
 
 		q.coeffs().setRandom();
 		q.normalize();
 		t.setRandom();
-		initialTransformation = SurgSim::Math::makeRigidTransform(q, t);
+		m_initialTransformation = SurgSim::Math::makeRigidTransform(q, t);
 
 		do
 		{
 			q.coeffs().setRandom();
 			q.normalize();
 			t.setRandom();
-			currentTransformation = SurgSim::Math::makeRigidTransform(q, t);
-		} while (initialTransformation.isApprox(currentTransformation));
+			m_currentTransformation = SurgSim::Math::makeRigidTransform(q, t);
+		} while (m_initialTransformation.isApprox(m_currentTransformation));
 
-		identityTransformation.setIdentity();
+		m_identityTransformation.setIdentity();
 	}
 
 	void TearDown()
 	{
 	}
 
-	// Gravity vector (normal version)
-	Vector3d gGravity;
-	// Gravity vector (version without gravity)
-	Vector3d gNoGravity;
-
 	// Fixed actor initialization pose
-	RigidTransform3d initialTransformation;
+	RigidTransform3d m_initialTransformation;
 
 	// Fixed actor current pose
-	RigidTransform3d currentTransformation;
+	RigidTransform3d m_currentTransformation;
 
 	// Identity pose (no translation/rotation)
-	RigidTransform3d identityTransformation;
+	RigidTransform3d m_identityTransformation;
 };
 
 TEST_F(FixedActorTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {FixedActor fixedActor(std::string("FixedActor"));});
+	ASSERT_NO_THROW( {FixedActor fixedActor("FixedActor");});
 }
 
 TEST_F(FixedActorTest, ResetStateTest)
 {
 	// Create the rigid body
-	std::shared_ptr<FixedActor> fixedActor = std::make_shared<FixedActor>(std::string("FixedActor"));
+	std::shared_ptr<FixedActor> fixedActor = std::make_shared<FixedActor>("FixedActor");
 
 	fixedActor->setIsActive(false);
 	fixedActor->setIsGravityEnabled(false);
-	fixedActor->setGravity(gNoGravity);
-	fixedActor->setInitialPose(initialTransformation);
+	fixedActor->setInitialPose(m_initialTransformation);
 	EXPECT_TRUE(fixedActor->getPose().isApprox(fixedActor->getInitialPose()));
 	EXPECT_TRUE(fixedActor->getPreviousPose().isApprox(fixedActor->getInitialPose()));
-	fixedActor->setPose(currentTransformation);
+	fixedActor->setPose(m_currentTransformation);
 	EXPECT_FALSE(fixedActor->getPose().isApprox(fixedActor->getInitialPose()));
 	EXPECT_TRUE(fixedActor->getPreviousPose().isApprox(fixedActor->getInitialPose()));
 
+	std::shared_ptr<Actor> actor = fixedActor;
 	// reset the actor (NOT THE FIXED ACTOR, test polymorphism)
-	std::static_pointer_cast<Actor>(fixedActor)->resetState();
+	actor->resetState();
 
 	// isActive flag [default = true]
 	EXPECT_TRUE(fixedActor->isActive());
 	// isGravityEnable flag [default = true]
 	EXPECT_TRUE(fixedActor->isGravityEnabled());
-	// gravity vector [default = (0 -9.81 0)]
-	EXPECT_EQ(gGravity, fixedActor->getGravity());
 	// The current rigid state should be exactly the initial rigid state
 	EXPECT_TRUE(fixedActor->getPose().isApprox(fixedActor->getInitialPose()));
-	EXPECT_TRUE(fixedActor->getPose().isApprox(initialTransformation));
-	EXPECT_TRUE(fixedActor->getInitialPose().isApprox(initialTransformation));
+	EXPECT_TRUE(fixedActor->getPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(fixedActor->getInitialPose().isApprox(m_initialTransformation));
 	// The previous rigid state should be exactly the initial rigid state
 	EXPECT_TRUE(fixedActor->getPreviousPose().isApprox(fixedActor->getInitialPose()));
-	EXPECT_TRUE(fixedActor->getPreviousPose().isApprox(initialTransformation));
+	EXPECT_TRUE(fixedActor->getPreviousPose().isApprox(m_initialTransformation));
 }
 
 TEST_F(FixedActorTest, SetGetAndDefaultValueTest)
@@ -132,26 +124,19 @@ TEST_F(FixedActorTest, SetGetAndDefaultValueTest)
 	fixedActor->setIsGravityEnabled(true);
 	ASSERT_TRUE(fixedActor->isGravityEnabled());
 
-	// Set/Get gravity [default = (0 -9.81 0)]
-	EXPECT_EQ(gGravity, fixedActor->getGravity());
-	fixedActor->setGravity(gNoGravity);
-	ASSERT_EQ(gNoGravity, fixedActor->getGravity());
-	fixedActor->setGravity(gGravity);
-	ASSERT_EQ(gGravity, fixedActor->getGravity());
-
 	// Set/Get current pose [default = no translation, no rotation]
-	EXPECT_TRUE(identityTransformation.isApprox(fixedActor->getPose()));
-	fixedActor->setPose(currentTransformation);
-	ASSERT_TRUE(currentTransformation.isApprox(fixedActor->getPose()));
-	fixedActor->setPose(identityTransformation);
-	ASSERT_TRUE(identityTransformation.isApprox(fixedActor->getPose()));
+	EXPECT_TRUE(m_identityTransformation.isApprox(fixedActor->getPose()));
+	fixedActor->setPose(m_currentTransformation);
+	ASSERT_TRUE(m_currentTransformation.isApprox(fixedActor->getPose()));
+	fixedActor->setPose(m_identityTransformation);
+	ASSERT_TRUE(m_identityTransformation.isApprox(fixedActor->getPose()));
 
 	// Set/Get initial pose [default = no translation, no rotation]
-	EXPECT_TRUE(identityTransformation.isApprox(fixedActor->getInitialPose()));
-	fixedActor->setInitialPose(initialTransformation);
-	ASSERT_TRUE(initialTransformation.isApprox(fixedActor->getInitialPose()));
-	fixedActor->setInitialPose(identityTransformation);
-	ASSERT_TRUE(identityTransformation.isApprox(fixedActor->getInitialPose()));
+	EXPECT_TRUE(m_identityTransformation.isApprox(fixedActor->getInitialPose()));
+	fixedActor->setInitialPose(m_initialTransformation);
+	ASSERT_TRUE(m_initialTransformation.isApprox(fixedActor->getInitialPose()));
+	fixedActor->setInitialPose(m_identityTransformation);
+	ASSERT_TRUE(m_identityTransformation.isApprox(fixedActor->getInitialPose()));
 }
 
 TEST_F(FixedActorTest, UpdateTest)
@@ -161,13 +146,13 @@ TEST_F(FixedActorTest, UpdateTest)
 
 	double dt = 1.0;
 
-	fixedActor->setInitialPose(initialTransformation);
-	fixedActor->setPose(currentTransformation);
+	fixedActor->setInitialPose(m_initialTransformation);
+	fixedActor->setPose(m_currentTransformation);
 	// This should simply backup the current transformation into the previous
 	fixedActor->update(dt);
 	EXPECT_TRUE(fixedActor->getPose().isApprox(fixedActor->getPreviousPose()));
 	EXPECT_FALSE(fixedActor->getPose().isApprox(fixedActor->getInitialPose()));
 	EXPECT_FALSE(fixedActor->getPreviousPose().isApprox(fixedActor->getInitialPose()));
-	fixedActor->setPose(identityTransformation);
+	fixedActor->setPose(m_identityTransformation);
 	EXPECT_FALSE(fixedActor->getPose().isApprox(fixedActor->getPreviousPose()));
 }

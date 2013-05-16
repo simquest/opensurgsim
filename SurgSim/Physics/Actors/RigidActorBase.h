@@ -20,10 +20,9 @@
 
 #include <SurgSim/Math/RigidTransform.h>
 
-using SurgSim::Math::RigidTransform3d;
-
 namespace SurgSim 
 {
+
 namespace Physics
 {
 
@@ -32,6 +31,8 @@ namespace Physics
 class RigidActorBase : public Actor
 {
 public:
+	typedef SurgSim::Math::RigidTransform3d RigidTransform3d;
+
 	/// Constructor
 	/// \param name The rigid actor's name
 	explicit RigidActorBase(const std::string& name)
@@ -59,41 +60,6 @@ public:
 	/// Get the current pose of the rigid actor
 	/// \return The current pose
 	virtual const RigidTransform3d& getPose() const = 0;
-
-	/// Called before the scene does its physics update, lets the actor
-	/// do some preprocessing
-	/// \param dt The time step (in seconds)
-	virtual void beforeUpdate(double dt)
-	{
-		Actor::beforeUpdate(dt);
-	};
-
-	/// Called after beforeUpdate and prior to afterUpdate
-	/// It compute the current free motion of the object using the time step dt
-	/// \param dt The time step (in seconds)
-	virtual void update(double dt)
-	{
-		Actor::update(dt);
-	};
-
-	/// Called after the scene update has concluded
-	/// \param dt The time step (in seconds)
-	virtual void afterUpdate(double dt)
-	{
-		Actor::afterUpdate(dt);
-	};
-
-	/// Called to reset the rigid actor to its initial/default state
-	virtual void resetState()
-	{
-		Actor::resetState();
-	};
-
-	/// Called to reset the rigid actor parameters
-	virtual void resetParameters()
-	{
-		Actor::resetParameters();
-	};
 };
 
 }; /// Physics
