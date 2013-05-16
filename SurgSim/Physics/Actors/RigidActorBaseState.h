@@ -43,7 +43,7 @@ public:
 	/// Comparison operator
 	/// \param s A RigidActorBaseState to compare it to
 	/// \return True if the 2 states are equals, False otherwise
-	bool operator ==(const RigidActorBaseState &state) const
+	bool operator ==(const RigidActorBaseState& state) const
 	{
 		return m_pose.isApprox(state.m_pose);
 	}
