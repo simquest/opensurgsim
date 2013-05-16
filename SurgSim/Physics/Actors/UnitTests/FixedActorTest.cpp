@@ -89,10 +89,10 @@ TEST_F(FixedActorTest, ResetStateTest)
 	// reset the actor (NOT THE FIXED ACTOR, test polymorphism)
 	actor->resetState();
 
-	// isActive flag [default = true]
-	EXPECT_TRUE(fixedActor->isActive());
-	// isGravityEnable flag [default = true]
-	EXPECT_TRUE(fixedActor->isGravityEnabled());
+	// isActive flag unchanged
+	EXPECT_FALSE(fixedActor->isActive());
+	// isGravityEnable flag unchanged
+	EXPECT_FALSE(fixedActor->isGravityEnabled());
 	// The current rigid state should be exactly the initial rigid state
 	EXPECT_TRUE(fixedActor->getPose().isApprox(fixedActor->getInitialPose()));
 	EXPECT_TRUE(fixedActor->getPose().isApprox(m_initialTransformation));
@@ -105,7 +105,7 @@ TEST_F(FixedActorTest, ResetStateTest)
 TEST_F(FixedActorTest, SetGetAndDefaultValueTest)
 {
 	// Create the fixed actor
-	std::shared_ptr<FixedActor> fixedActor = std::make_shared<FixedActor>(std::string("FixedActor"));
+	std::shared_ptr<FixedActor> fixedActor = std::make_shared<FixedActor>("FixedActor");
 
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(fixedActor->isActive());
@@ -142,14 +142,16 @@ TEST_F(FixedActorTest, SetGetAndDefaultValueTest)
 TEST_F(FixedActorTest, UpdateTest)
 {
 	// Create the fixed actor
-	std::shared_ptr<FixedActor> fixedActor = std::make_shared<FixedActor>(std::string("FixedActor"));
+	std::shared_ptr<FixedActor> fixedActor = std::make_shared<FixedActor>("FixedActor");
 
 	double dt = 1.0;
 
 	fixedActor->setInitialPose(m_initialTransformation);
 	fixedActor->setPose(m_currentTransformation);
+	
 	// This should simply backup the current transformation into the previous
 	fixedActor->update(dt);
+
 	EXPECT_TRUE(fixedActor->getPose().isApprox(fixedActor->getPreviousPose()));
 	EXPECT_FALSE(fixedActor->getPose().isApprox(fixedActor->getInitialPose()));
 	EXPECT_FALSE(fixedActor->getPreviousPose().isApprox(fixedActor->getInitialPose()));
