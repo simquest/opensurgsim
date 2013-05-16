@@ -27,7 +27,7 @@ namespace Physics
 {
 
 /// Cylinder shape: centered on (0 0 0) defined with length and radius
-/// /tparam direction The direction of the cylinder {X, Y, Z}
+/// \tparam direction The direction of the cylinder {X, Y, Z}
 template <ShapeDirection direction>
 class CylinderShape: public RigidShape
 {

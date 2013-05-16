@@ -84,7 +84,7 @@ public:
 		const double sphereMass   = rho * 4.0 / 3.0 * M_PI * r2 * r;
 
 		// The Inertia matrix is a combination of the cylinder inertia and
-		// the 2 semi-spheres inertia:
+		// the 2 hemispheres inertia:
 		//
 		// Inertia of cylinder along the X axis (direction = 0)
 		// mc = PI.radius.radius.length (mass of the cylinder)
@@ -94,13 +94,13 @@ public:
 		// I(cylinder) = (0 b 0)
 		//               (0 0 b)
 		//
-		// Inertia of the 2 semi-spheres along the X axis (direction = 0)
+		// Inertia of the 2 hemispheres along the X axis (direction = 0)
 		// ms = 4/3 pi.radius.radius.radius (mass of the entire sphere)
 		// c = 2/5.ms.r^2
 		// d = 2/5.ms.r^2 + ms.h^2/4 + 3/8.ms.r.h
-		//                     (c 0 0)
-		// I(2 semi-spheres) = (0 d 0)
-		//                     (0 0 d)
+		//                    (c 0 0)
+		// I(2 hemispheres) = (0 d 0)
+		//                    (0 0 d)
 		double a = 1.0 / 2.0  * cylinderMass * r2;
 		double b = 1.0 / 12.0 * cylinderMass * (3.0 * r2 + l2);
 		double c = 2.0 / 5.0  * sphereMass   * r2;
