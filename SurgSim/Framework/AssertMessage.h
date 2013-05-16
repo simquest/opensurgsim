@@ -66,8 +66,12 @@ public:
 	{
 	}
 
-	/// Destructor
-	~AssertMessage()
+	/// Destructor, which may throw an exception if the failure behavior does
+#ifdef _MSC_VER
+	~AssertMessage() throw(...)  // Visual Studio does not support noexcept. The throw(...) is optional.
+#else
+	~AssertMessage() noexcept(false)  /// C++11 introduced noexcept
+#endif
 	{
 		flush();
 		m_killMeNow(getMessage());

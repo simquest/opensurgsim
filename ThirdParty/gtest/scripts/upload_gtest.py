@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright 2008, Google Inc.
+# Copyright 2009, Google Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,42 +29,50 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Verifies that Google Test warns the user when not initialized properly."""
+"""upload_gtest.py v0.1.0 -- uploads a Google Test patch for review.
+
+This simple wrapper passes all command line flags and
+--cc=googletestframework@googlegroups.com to upload.py.
+
+USAGE: upload_gtest.py [options for upload.py]
+"""
 
 __author__ = 'wan@google.com (Zhanyong Wan)'
 
-import gtest_test_utils
+import os
+import sys
+
+CC_FLAG = '--cc='
+GTEST_GROUP = 'googletestframework@googlegroups.com'
 
 
-COMMAND = gtest_test_utils.GetTestExecutablePath('gtest_uninitialized_test_')
+def main():
+  # Finds the path to upload.py, assuming it is in the same directory
+  # as this file.
+  my_dir = os.path.dirname(os.path.abspath(__file__))
+  upload_py_path = os.path.join(my_dir, 'upload.py')
 
+  # Adds Google Test discussion group to the cc line if it's not there
+  # already.
+  upload_py_argv = [upload_py_path]
+  found_cc_flag = False
+  for arg in sys.argv[1:]:
+    if arg.startswith(CC_FLAG):
+      found_cc_flag = True
+      cc_line = arg[len(CC_FLAG):]
+      cc_list = [addr for addr in cc_line.split(',') if addr]
+      if GTEST_GROUP not in cc_list:
+        cc_list.append(GTEST_GROUP)
+      upload_py_argv.append(CC_FLAG + ','.join(cc_list))
+    else:
+      upload_py_argv.append(arg)
 
-def Assert(condition):
-  if not condition:
-    raise AssertionError
+  if not found_cc_flag:
+    upload_py_argv.append(CC_FLAG + GTEST_GROUP)
 
-
-def AssertEq(expected, actual):
-  if expected != actual:
-    print 'Expected: %s' % (expected,)
-    print '  Actual: %s' % (actual,)
-    raise AssertionError
-
-
-def TestExitCodeAndOutput(command):
-  """Runs the given command and verifies its exit code and output."""
-
-  # Verifies that 'command' exits with code 1.
-  p = gtest_test_utils.Subprocess(command)
-  Assert(p.exited)
-  AssertEq(1, p.exit_code)
-  Assert('InitGoogleTest' in p.output)
-
-
-class GTestUninitializedTest(gtest_test_utils.TestCase):
-  def testExitCodeAndOutput(self):
-    TestExitCodeAndOutput(COMMAND)
+  # Invokes upload.py with the modified command line flags.
+  os.execv(upload_py_path, upload_py_argv)
 
 
 if __name__ == '__main__':
-  gtest_test_utils.Main()
+  main()

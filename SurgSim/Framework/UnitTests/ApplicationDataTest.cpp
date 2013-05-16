@@ -24,19 +24,10 @@
 using SurgSim::Framework::ApplicationData;
 using boost::filesystem::path;
 
-::testing::AssertionResult isContained(const std::string& expected, const std::vector<std::string>& argument)
+namespace std
 {
-	if (std::find(argument.cbegin(), argument.cend(), expected) != argument.cend())
-	{
-		return ::testing::AssertionSuccess();
-	}
-	else
-	{
-		return ::testing::AssertionFailure() << "\"" << expected << "\"" << " not contained in " << argument;
-	}
-}
 
-::std::ostream& operator<<(::std::ostream& os, const std::vector<std::string>& content)
+::std::ostream& operator<<(::std::ostream& os, const vector<std::string>& content) 
 {
 	os << "(";
 
@@ -50,6 +41,21 @@ using boost::filesystem::path;
 	}
 	os << ")";
 	return os;
+}
+
+}
+
+::testing::AssertionResult isContained(const std::string& expected, 
+									   const std::vector<std::string>& argument)
+{
+	if (std::find(argument.cbegin(), argument.cend(), expected) != argument.cend())
+	{
+		return ::testing::AssertionSuccess();
+	}
+	else
+	{
+		return ::testing::AssertionFailure() << "\"" << expected << "\"" << " not contained in " << argument;
+	}
 }
 
 ::testing::AssertionResult fileIsFoundCorrectly(
