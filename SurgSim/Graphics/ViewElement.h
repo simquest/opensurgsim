@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_VIEW_ELEMENT_H
-#define SURGSIM_GRAPHICS_VIEW_ELEMENT_H
+#ifndef SURGSIM_GRAPHICS_VIEWELEMENT_H
+#define SURGSIM_GRAPHICS_VIEWELEMENT_H
 
 #include <SurgSim/Framework/SceneElement.h>
 
@@ -24,36 +24,49 @@ namespace SurgSim
 namespace Graphics
 {
 
-class CameraRepresentation;
-class ViewComponent;
+class Camera;
+class View;
 
+/// Basic SceneElement that wraps a View so that it can be added to the Scene.
+///
+/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Actor objects to be shown.
 class ViewElement : public Framework::SceneElement
 {
 public:
-	ViewElement(const std::string& name, std::shared_ptr<SurgSim::Graphics::ViewComponent> component);
+	/// Constructor
+	/// \param	name	Name of the scene element
+	/// \param	view	View component that provides the visualization of the graphics actors
+	ViewElement(const std::string& name, std::shared_ptr<SurgSim::Graphics::View> view);
+
+	/// Destructor
 	virtual ~ViewElement();
 
-	bool setCamera(std::shared_ptr<CameraRepresentation> camera);
+	/// Sets the view component that provides the visualization of the graphics actors
+	/// \return	True if it succeeds, false if it fails
+	virtual bool setView(std::shared_ptr<View> view);
 
-	std::shared_ptr<CameraRepresentation> getCamera() const
+	/// Returns the view component that provides the visualization of the graphics actors
+	std::shared_ptr<View> getView() const
 	{
-		return m_camera;
+		return m_view;
 	}
 
-	void setScreen(unsigned int screen);
-	void setFullScreen(bool fullscreen);
-	void setWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
-			
-private:
+protected:
+	/// Initializes the scene element
+	/// \return True if it succeeds, false if it fails
 	virtual bool doInitialize();
+
+private:
+	/// Wakes up the scene element
+	/// \return True if it succeeds, false if it fails
 	virtual bool doWakeUp();
 
-	std::shared_ptr<CameraRepresentation> m_camera;
-	std::shared_ptr<ViewComponent> m_view;
+	/// View component that provides the visualization of the graphics actors
+	std::shared_ptr<View> m_view;
 };
 
 };  // namespace Graphics
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_VIEW_ELEMENT_H
+#endif  // SURGSIM_GRAPHICS_VIEWELEMENT_H

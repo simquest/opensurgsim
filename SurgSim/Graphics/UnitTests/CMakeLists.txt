@@ -14,10 +14,8 @@
 # limitations under the License.
 
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
 
 find_package(OpenThreads)
-set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
@@ -28,19 +26,22 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	ActorTests.cpp
+	CameraTests.cpp
+	GroupTests.cpp
+	ManagerTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRigidTransformConversionsTests.cpp
 	OsgVectorConversionsTests.cpp
+	ViewElementTests.cpp
+	ViewTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
-)
-
-include_directories(
+	MockObjects.h
 )
 
 set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
-
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)

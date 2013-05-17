@@ -26,13 +26,22 @@ include_directories(
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
+	Manager.cpp
+	Group.cpp
+	ViewElement.cpp
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
+	Actor.h
+	Camera.h
+	Group.h
+	Manager.h
 	OsgMatrixConversions.h
 	OsgQuaternionConversions.h
 	OsgRigidTransformConversions.h
 	OsgVectorConversions.h
+	View.h
+	ViewElement.h
 )
 
 #add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})

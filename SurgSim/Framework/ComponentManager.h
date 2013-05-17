@@ -21,6 +21,8 @@
 
 #include "BasicThread.h"
 
+#include "Component.h"
+
 namespace SurgSim
 {
 namespace Framework
@@ -33,7 +35,7 @@ class Runtime;
 /// components. The runtime will present each new component to the manager, and
 /// it is up to the manger to decide whether to handle a component of a given
 /// type or not.
-class ComponentManager : public BasicThread
+class ComponentManager : public BasicThread, public std::enable_shared_from_this<ComponentManager>
 {
 public:
 	explicit ComponentManager(const std::string& name = "Unknown Component Manager") :

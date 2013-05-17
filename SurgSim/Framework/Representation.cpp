@@ -13,26 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Representation.h"
+#include "SurgSim/Framework/Representation.h"
 
-SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
+#include <SurgSim/Framework/ComponentManager.h>
+
+using SurgSim::Framework::Component;
+using SurgSim::Framework::ComponentManager;
+using SurgSim::Framework::Representation;
+
+Representation::Representation(const std::string& m_name) : Component(m_name)
 {
 
 }
 
-SurgSim::Framework::Representation::~Representation()
+Representation::~Representation()
 {
 
 }
 
-bool SurgSim::Framework::Representation::doInitialize()
+bool Representation::doInitialize()
 {
 	return true;
 }
 
-bool SurgSim::Framework::Representation::doWakeUp()
+bool Representation::doWakeUp()
 {
 	return true;
 }
-
-
