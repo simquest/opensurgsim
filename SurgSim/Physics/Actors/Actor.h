@@ -117,6 +117,10 @@ protected:
 		m_numDof = numDof;
 	}
 
+	/// Gravity vector
+	/// Needs to be in protected to be accessible from derived classes
+	const SurgSim::Math::Vector3d m_gravity;
+
 private:
 	/// NO copy constructor
 	Actor(const Actor& a);
@@ -126,9 +130,6 @@ private:
 
 	/// Number of degrees of freedom for this actor
 	unsigned int m_numDof;
-
-	/// Gravity vector
-	const SurgSim::Math::Vector3d m_gravity;
 
 	/// Gravity enabled flag
 	bool m_isGravityEnabled;
