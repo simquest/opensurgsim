@@ -13,33 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-set(SURGSIM_PHYSICS_SOURCES
-	PhysicsManager.cpp
-	FreeMotionStep.cpp
+set(UNIT_TEST_SOURCES
+	FreeMotionStepTests.cpp
+	PhysicsManagerTests.cpp
 )
 
-set(SURGSIM_PHYSICS_HEADERS
-	PhysicsManager.h
-	FreeMotionStep.h
-	TimeStep.h
+set(UNIT_TEST_HEADERS
 )
 
-add_subdirectory(Actors)
-
-set(SURGSIM_PHYSICS_ALL_SOURCES ${SURGSIM_PHYSICS_SOURCES} ${SURGSIM_PHYSICS_ACTORS_SOURCES})
-set(SURGSIM_PHYSICS_ALL_HEADERS ${SURGSIM_PHYSICS_HEADERS} ${SURGSIM_PHYSICS_ACTORS_HEADERS})
-
-surgsim_add_library(
-    SurgSimPhysics
-    "${SURGSIM_PHYSICS_ALL_SOURCES}"
-    "${SURGSIM_PHYSICS_ALL_HEADERS}"
-    "SurgSim/Physics"
+include_directories(
 )
 
-source_group("Source Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_SOURCES})
-source_group("Header Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_HEADERS})
+set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics gtest ${Boost_LIBRARIES})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	set(LIBS ${LIBS} rt)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
+surgsim_add_unit_tests(SurgSimPhysicsTest)
