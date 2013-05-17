@@ -27,7 +27,9 @@ set(UNIT_TEST_SOURCES
 	RigidActorParametersTest.cpp
 	RigidActorStateTest.cpp
 	RigidActorTest.cpp
+	RigidActorVtcTest.cpp
 	RigidShapeTest.cpp
+	RigidVtcParametersTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
