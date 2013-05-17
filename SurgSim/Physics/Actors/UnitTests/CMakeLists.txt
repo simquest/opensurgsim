@@ -24,6 +24,7 @@ set(UNIT_TEST_SOURCES
 	FixedActorTest.cpp
 	RigidActorBaseStateTest.cpp
 	RigidShapeTest.cpp
+	RigidActorParametersTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
