@@ -61,6 +61,8 @@ public:
 	/// 	the device (e.g. if the consumer is listening to several devices at once).
 	/// \param inputData The application input state coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
+
+	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
 };
 
 

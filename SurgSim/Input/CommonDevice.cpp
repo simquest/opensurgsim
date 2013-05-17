@@ -46,12 +46,12 @@ struct CommonDevice::State
 
 
 CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
-	m_name(name), m_inputData(inputData), m_state(new State)
+	m_name(name), m_initialInputData(inputData), m_inputData(inputData), m_state(new State)
 {
 }
 
 CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
-	m_name(name), m_inputData(std::move(inputData)), m_state(new State)
+	m_name(name), m_initialInputData(inputData), m_inputData(std::move(inputData)), m_state(new State)
 {
 }
 
@@ -79,6 +79,7 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 			return false;
 		}
 	}
+	inputConsumer->initializeInput(m_name, m_initialInputData);
 	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
 }

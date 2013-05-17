@@ -22,7 +22,6 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Input/CommonDevice.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Input/InputComponent.h>
@@ -37,7 +36,6 @@
 using SurgSim::Framework::Runtime;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::CommonDevice;
-using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Input::InputManager;
 using SurgSim::Input::InputComponent;
@@ -45,6 +43,17 @@ using SurgSim::Input::OutputComponent;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 
+
+class MockComponent : public SurgSim::Framework::Component
+{
+public:
+	MockComponent() : Component("MockComponent") {}
+	virtual ~MockComponent() {}
+
+protected:
+	virtual bool doInitialize() {return true;}
+	virtual bool doWakeUp() {return true;}
+};
 
 class InputManagerTest : public ::testing::Test
 {
@@ -76,7 +85,7 @@ protected:
 	std::shared_ptr<InputManager> inputManager;
 };
 
-std::shared_ptr<OutputComponent> createOutputComponent(std::string name, std::string deviceName)
+std::shared_ptr<OutputComponent> createOutputComponent(const std::string& name, const std::string& deviceName)
 {
 	DataGroupBuilder builder;
 	builder.addString("data");
@@ -118,21 +127,30 @@ TEST_F(InputManagerTest, InputAddRemove)
 	EXPECT_FALSE(inputManager->addComponent(listener1));
 	EXPECT_TRUE(inputManager->removeComponent(listener1));
 	EXPECT_FALSE(inputManager->removeComponent(listener1));
+
+	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>();
+	EXPECT_TRUE(inputManager->addComponent(component));
 }
 
 TEST_F(InputManagerTest, InputfromDevice)
 {
+	std::string data;
+	SurgSim::DataStructures::DataGroup dataGroup;
+
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
+
 	inputManager->addComponent(listener1);
+	EXPECT_TRUE(listener1->isDeviceConnected());
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
 
 	testDevice1->pushInput("avalue");
-
-	std::string data;
-	listener1->getInputData().strings().get("helloWorld",&data);
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
 	EXPECT_EQ("avalue",data);
 
 	testDevice1->pushInput("bvalue");
-	listener1->getInputData().strings().get("helloWorld",&data);
+	EXPECT_NO_THROW(listener1->getData(&dataGroup));
+	EXPECT_TRUE(dataGroup.strings().get("helloWorld",&data));
 	EXPECT_EQ("bvalue",data);
 }
 

@@ -26,7 +26,7 @@ public:
 	virtual void pushInput();
 
 	// Send some data down the stream
-	void pushInput(std::string data);
+	void pushInput(const std::string& data);
 
 	virtual bool pullOutput();
 
@@ -48,6 +48,9 @@ public:
 	  {
 	  }
 
+	  virtual void initializeInput(const std::string& device, const DataGroup& initialInput)
+	  {
+	  }
 	  virtual void handleInput(const std::string& device, const DataGroup& inputData);
 
 	  int m_numTimesReceivedInput;

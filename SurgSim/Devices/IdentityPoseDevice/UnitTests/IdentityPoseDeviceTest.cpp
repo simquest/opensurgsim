@@ -43,6 +43,9 @@ public:
 	{
 	}
 
+	virtual void initializeInput(const std::string& device, const DataGroup& initialInput)
+	{
+	}
 	virtual void handleInput(const std::string& device, const DataGroup& inputData);
 	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
 
@@ -85,8 +88,8 @@ TEST(IdentityPoseDeviceTest, AddInputConsumer)
 
 	// IdentityPoseDevice is supposed to shove an identity pose (and a button) at every consumer when it's added.
 	EXPECT_EQ(1, consumer->m_numTimesReceivedInput);
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasCurrentData("pose"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button0"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button0"));
 
 	// Check the data.
 	RigidTransform3d pose;

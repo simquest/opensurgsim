@@ -16,32 +16,49 @@
 #ifndef SURGSIM_INPUT_INPUTCOMPONENT_H
 #define SURGSIM_INPUT_INPUTCOMPONENT_H
 
+#include <string>
+#include <memory>
 #include <SurgSim/Framework/Component.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/DataStructures/DataGroup.h>
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class DataGroup;
+}
+
 namespace Input
 {
+class DeviceInterface;
+class InputConsumer;
 
 /// InputComponent combines the Component interface and the InputConsumerInterface so that input devices can
 /// provide input through the normal component interface. Multiple InputComponents can be added to
 /// the same device.
-class InputComponent : public SurgSim::Framework::Component, public SurgSim::Input::InputConsumerInterface
+class InputComponent : public SurgSim::Framework::Component
 {
 public:
-	InputComponent(std::string name, std::string deviceName);;
-	virtual ~InputComponent();;
+	InputComponent(const std::string& name, const std::string& deviceName);
+	virtual ~InputComponent();
 
-	/// Overridden from InputComsumerInterface, callback from the device to set the input data in here.
-	/// \param	device   	The name of the device from which we want to pull input.
-	/// \param	inputData	The actual input data.
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData);
+	/// Is a device connected
+	/// \param [out] true if a device has been connected.
+	bool isDeviceConnected();
 
-	/// Fetches a reference to the input data.
-	/// \return	The input data.
-	const SurgSim::DataStructures::DataGroup& getInputData();
+	/// Connect to a device
+	/// This call will be made by the InputManager, and should generally not be called directly.
+	/// \param device The device to connect to.
+	void connectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
+
+	/// Disconnect from a device
+	/// This call will be made by the InputManager, and should generally not be called directly.
+	/// \param device The device to disconnect from.
+	void disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
+
+	/// Gets the input data.
+	/// \param [out] dataGroup The location to write the data.  The pointer must be non-null.
+	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
 	/// Overriden from Component, do nothing
 	virtual bool doInitialize();
@@ -55,7 +72,8 @@ public:
 
 private:
 	std::string m_deviceName;
-	SurgSim::DataStructures::DataGroup m_lastInput;
+	bool m_deviceConnected;
+	std::shared_ptr<InputConsumer> m_input;
 };
 
 }; // namespace Input

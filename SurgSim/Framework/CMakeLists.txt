@@ -59,19 +59,15 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Runtime.h
 	Scene.h
 	SceneElement.h
+	SharedInstance.h
 )
 
-add_library(SurgSimFramework ${SURGSIM_FRAMEWORK_SOURCES} ${SURGSIM_FRAMEWORK_HEADERS})
-
-set_target_properties(SurgSimFramework PROPERTIES
-	PUBLIC_HEADER "${SURGSIM_FRAMEWORK_HEADERS}")
-
-install(TARGETS SurgSimFramework 
-	EXPORT ${PROJECT_NAME}Targets
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-	PUBLIC_HEADER DESTINATION include/SurgSim/Framework)
+surgsim_add_library(
+	SurgSimFramework 
+	"${SURGSIM_FRAMEWORK_SOURCES}" 
+	"${SURGSIM_FRAMEWORK_HEADERS}" 
+	"SurgSim/Framework"
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

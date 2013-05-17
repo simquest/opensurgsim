@@ -28,23 +28,21 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup-inl.h
 	DataGroupBuilder.h
 	IndexDirectory.h
+	Mesh.h
+	MeshElement.h
+	MeshVertex.h
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
+	TriangleMesh.h
 )
 
-add_library(SurgSimDataStructures
-	${SURGSIM_DATA_STRUCTURES_SOURCES} ${SURGSIM_DATA_STRUCTURES_HEADERS})
-
-set_target_properties(SurgSimDataStructures PROPERTIES 
-	PUBLIC_HEADER "${SURGSIM_DATA_STRUCTURES_HEADERS}")
-
-install(TARGETS SurgSimDataStructures
-	EXPORT ${PROJECT_NAME}Targets
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib
-	PUBLIC_HEADER DESTINATION include/SurgSim/DataStructures)
+surgsim_add_library(
+	SurgSimDataStructures
+	"${SURGSIM_DATA_STRUCTURES_SOURCES}" 
+	"${SURGSIM_DATA_STRUCTURES_HEADERS}" 
+	"SurgSim/DataStructures"
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
