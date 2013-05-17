@@ -15,34 +15,24 @@
 
 #include "ViewElement.h"
 
-#include <SurgSim/Graphics/CameraRepresentation.h>
-#include <SurgSim/Graphics/ViewComponent.h>
+#include <SurgSim/Graphics/View.h>
 
-using SurgSim::Graphics::CameraRepresentation;
+using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Graphics::ViewComponent;
 
-ViewElement::ViewElement(const std::string& name, std::shared_ptr<SurgSim::Graphics::ViewComponent> component) : 
-SceneElement(name), m_view(component)
+ViewElement::ViewElement(const std::string& name, std::shared_ptr<View> view) : 
+SceneElement(name), m_view(view)
 {
-	m_camera = std::make_shared<CameraRepresentation>(m_view->getCamera());
 }
 ViewElement::~ViewElement()
 {
 
 }
 
-void ViewElement::setScreen(unsigned int screen)
+bool ViewElement::setView(std::shared_ptr<View> view)
 {
-	m_view->setScreen(screen);
-}
-void ViewElement::setFullScreen(bool fullscreen)
-{
-	m_view->setFullScreen(fullscreen);
-}
-void ViewElement::setWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
-{
-	m_view->setWindow(x, y, width, height);
+	m_view = view;
+	return true;
 }
 
 bool ViewElement::doInitialize()

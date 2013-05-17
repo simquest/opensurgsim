@@ -13,29 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-set(SURGSIM_GRAPHICS_SOURCES
-	Manager.cpp
-	Group.cpp
-	ViewElement.cpp
+set(UNIT_TEST_SOURCES
+	ActorTests.cpp
+	CameraTests.cpp
+	GroupTests.cpp
+	ManagerTests.cpp
+	ViewElementTests.cpp
+	ViewTests.cpp
 )
 
-set(SURGSIM_GRAPHICS_HEADERS
-	Actor.h
-	Camera.h
-	Manager.h
-	Group.h
-	View.h
-	ViewElement.h
+set(UNIT_TEST_HEADERS
+	MockObjects.h
 )
 
-add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})
+include_directories(
+)
 
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
+set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES})
 
-#add_subdirectory(Osg)
+surgsim_add_unit_tests(SurgSimGraphicsTest)

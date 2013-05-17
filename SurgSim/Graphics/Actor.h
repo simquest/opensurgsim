@@ -16,8 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_ACTOR_H
 #define SURGSIM_GRAPHICS_ACTOR_H
 
-#include <memory>
-#include <string>
+#include <SurgSim/Framework/Representation.h>
+
+#include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim 
 {
@@ -25,35 +26,40 @@ namespace SurgSim
 namespace Graphics
 {
 
-class ActorImplementation;
+class Manager;
+class Material;
 
-class Actor
+/// Base graphics actor class, which defines the interface that all graphics actors must implement.
+///
+/// A Graphics::Actor is the visual Framework::Representation of a Framework::SceneElement in the Framework::Scene.
+class Actor : public SurgSim::Framework::Representation
 {
 public:
-	Actor(const std::string& name, std::shared_ptr<ActorImplementation> implementation);
-	virtual ~Actor();
-
-	const std::string& getName() const
+	/// Constructor
+	/// \param	name	Name of the actor
+	explicit Actor(const std::string& name) : SurgSim::Framework::Representation(name)
 	{
-		return m_name;
 	}
 
+	/// Sets whether the actor is currently visible
+	/// \param	visible	True for visible, false for invisible
+	virtual void setVisible(bool visible) = 0;
+
+	/// Gets whether the actor is currently visible
+	/// \return	visible	True for visible, false for invisible
+	virtual bool isVisible() const = 0;
+
+	/// Sets the pose of the actor
+	/// \param	transform	Rigid transformation that describes the pose of the actor
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform) = 0;
+
+	/// Gets the pose of the actor
+	/// \return	Rigid transformation that describes the pose of the actor
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
+
+	/// Updates the actor
 	/// \param	dt	The time in seconds of the preceding timestep.
-	void update(double dt)
-	{ 
-		doUpdate(dt);
-	}
-
-	std::shared_ptr<ActorImplementation> getImplementation() const
-	{
-		return m_implementation;
-	}
-
-private:
-	std::string m_name;
-	std::shared_ptr<ActorImplementation> m_implementation;
-
-	virtual void doUpdate(double dt);
+	virtual void update(double dt) = 0;
 };
 
 };  // namespace Graphics
