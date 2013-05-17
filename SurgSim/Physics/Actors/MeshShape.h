@@ -219,8 +219,7 @@ private:
 
 		for (i = 0; i < m_mesh->getNumTriangles(); i++)
 		{
-
-			const TriMesh::Triangle *f = &m_mesh->getTriangle(i);
+			const typename TriMesh::Triangle* f = &m_mesh->getTriangle(i);
 
 			const Vector3d& ptA = m_mesh->getVertexPosition(f->vertices[0]);
 			const Vector3d& ptB = m_mesh->getVertexPosition(f->vertices[1]);
