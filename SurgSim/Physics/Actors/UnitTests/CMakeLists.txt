@@ -21,6 +21,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	ActorTest.cpp
+	MeshShapeTest.cpp
 	RigidShapeTest.cpp
 )
 
