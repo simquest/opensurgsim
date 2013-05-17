@@ -22,6 +22,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	ActorTest.cpp
 	RigidShapeTest.cpp
+	RigidActorParametersTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
