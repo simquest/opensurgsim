@@ -61,15 +61,31 @@ public:
 	/// \return True if the 2 parameters set are equals, False otherwise
 	bool operator ==(const RigidActorParameters &c) const
 	{
+		using SurgSim::Math::isValid;
+
+		bool isMassEqual = m_mass == c.m_mass;
+		isMassEqual |= ! isValid(m_mass) && ! isValid(c.m_mass);
+
+		bool isInertiaEqual = m_localInertia == c.m_localInertia;
+		isInertiaEqual |= ! isValid(m_localInertia) && ! isValid(c.m_localInertia);
+
 		return (m_isValid == c.m_isValid &&
 			m_rho == c.m_rho &&
-			m_mass == c.m_mass &&
+			isMassEqual &&
 			m_linearDamping == c.m_linearDamping &&
 			m_angularDamping == c.m_angularDamping &&
 			m_massCenter == c.m_massCenter &&
-			m_localInertia == c.m_localInertia &&
+			isInertiaEqual &&
 			m_shapeForMassInertia == c.m_shapeForMassInertia &&
 			m_shapes == c.m_shapes);
+	}
+
+	/// Comparison operator (for difference)
+	/// \param c A RigidActorParameters to compare it to
+	/// \return False if the 2 parameters set are equals, True otherwise
+	bool operator !=(const RigidActorParameters &c) const
+	{
+		return ! (operator ==(c));
 	}
 
 	/// Set the mass density of the rigid actor
