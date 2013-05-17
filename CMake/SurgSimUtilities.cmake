@@ -142,7 +142,7 @@ endfunction()
 ## CMake support for running Google's cpplint over the C++ source.
 
 # Should we bother with cpplint at all?
-option(SURGSIM_CPPLINT "Include the unit tests in the build" ON)
+option(SURGSIM_CPPLINT "Include cpplint in the build" ON)
 
 # Running cpplint requires Python
 if(SURGSIM_CPPLINT)
