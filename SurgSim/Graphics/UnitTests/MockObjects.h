@@ -183,7 +183,7 @@ class MockGroup : public SurgSim::Graphics::Group
 public:
 	/// Constructor. The group is initially empty.
 	/// \param	name	Name of the group
-	MockGroup(const std::string& name) : SurgSim::Graphics::Group(name)
+	explicit MockGroup(const std::string& name) : SurgSim::Graphics::Group(name)
 	{
 	}
 
@@ -445,7 +445,7 @@ private:
 class MockViewElement : public SurgSim::Graphics::ViewElement
 {
 public:
-	MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
+	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
 		m_isInitialized(false),
 		m_isAwoken(false)
 	{

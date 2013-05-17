@@ -54,26 +54,22 @@ TEST(GroupTests, AddRemoveTest)
 	/// Add an actor
 	EXPECT_TRUE(group->addActor(actor1));
 	EXPECT_EQ(1, group->getActors().size());
-	EXPECT_NE(group->getActors().end(), std::find(group->getActors().begin(), 
-		group->getActors().end(), actor1));
+	EXPECT_NE(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor1));
 
 	/// Add a group
 	EXPECT_TRUE(group->addGroup(group1));
 	EXPECT_EQ(1, group->getGroups().size());
-	EXPECT_NE(group->getGroups().end(), std::find(group->getGroups().begin(), 
-		group->getGroups().end(), group1));
+	EXPECT_NE(group->getGroups().end(), std::find(group->getGroups().begin(), group->getGroups().end(), group1));
 
 	/// Add another group
 	EXPECT_TRUE(group->addGroup(group2));
 	EXPECT_EQ(2, group->getGroups().size());
-	EXPECT_NE(group->getGroups().end(), std::find(group->getGroups().begin(), 
-		group->getGroups().end(), group2));
+	EXPECT_NE(group->getGroups().end(), std::find(group->getGroups().begin(), group->getGroups().end(), group2));
 
 	/// Add another actor
 	EXPECT_TRUE(group->addActor(actor2));
 	EXPECT_EQ(2, group->getActors().size());
-	EXPECT_NE(group->getActors().end(), std::find(group->getActors().begin(), 
-		group->getActors().end(), actor2));
+	EXPECT_NE(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor2));
 
 
 	/// Try to add a duplicate actor
@@ -87,22 +83,17 @@ TEST(GroupTests, AddRemoveTest)
 
 	/// Remove a group
 	EXPECT_TRUE(group->removeGroup(group2));
-	EXPECT_EQ(group->getGroups().end(), std::find(group->getGroups().begin(), 
-		group->getGroups().end(), group2));
+	EXPECT_EQ(group->getGroups().end(), std::find(group->getGroups().begin(), group->getGroups().end(), group2));
 
 	/// Remove an actor
 	EXPECT_TRUE(group->removeActor(actor1));
-	EXPECT_EQ(group->getActors().end(), std::find(group->getActors().begin(), 
-		group->getActors().end(), actor1));
+	EXPECT_EQ(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor1));
 
 	/// Try to remove a group that is not in the group
 	EXPECT_FALSE(group->removeGroup(group2));
-	EXPECT_EQ(group->getGroups().end(), std::find(group->getGroups().begin(), 
-		group->getGroups().end(), group2));
+	EXPECT_EQ(group->getGroups().end(), std::find(group->getGroups().begin(), group->getGroups().end(), group2));
 
 	/// Try to remove an actor that is not in the group
 	EXPECT_FALSE(group->removeActor(actor1));
-	EXPECT_EQ(group->getActors().end(), std::find(group->getActors().begin(), 
-		group->getActors().end(), actor1));
+	EXPECT_EQ(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor1));
 }
-

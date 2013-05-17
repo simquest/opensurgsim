@@ -64,12 +64,12 @@ TEST(ManagerTests, StartUpTest)
 	runtime->stop();
 
 	/// Check that the manager did update when the thread was running
-	EXPECT_TRUE(manager->getNumUpdates() > 0);
-	EXPECT_TRUE(manager->getSumDt() > 0.0);
+	EXPECT_GT(0, manager->getNumUpdates());
+	EXPECT_GT(0.0, manager->getSumDt());
 
- 	EXPECT_TRUE(view->isInitialized());
- 	EXPECT_TRUE(view->isAwoken());
- 	EXPECT_TRUE(view->getNumUpdates() > 0);
+	EXPECT_TRUE(view->isInitialized());
+	EXPECT_TRUE(view->isAwoken());
+	EXPECT_GT(0, view->getNumUpdates());
 	EXPECT_EQ(manager->getNumUpdates(), view->getNumUpdates());
 }
 
@@ -94,38 +94,38 @@ TEST(ManagerTests, AddRemoveTest)
 	/// Add an actor
 	EXPECT_TRUE(graphicsManager->addComponent(actor1));
 	EXPECT_EQ(1, graphicsManager->getActors().size());
-	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(), 
+	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
 		graphicsManager->getActors().end(), actor1));
 
 	/// Add a group
 	EXPECT_TRUE(graphicsManager->addComponent(group1));
 	EXPECT_EQ(1, graphicsManager->getGroups().size());
-	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(), 
+	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group1));
 
 	/// Add a view
 	EXPECT_TRUE(graphicsManager->addComponent(view1));
 	EXPECT_EQ(1, graphicsManager->getViews().size());
-	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(), 
+	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view1));
 
 
 	/// Add another view
 	EXPECT_TRUE(graphicsManager->addComponent(view2));
 	EXPECT_EQ(2, graphicsManager->getViews().size());
-	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(), 
+	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
 	/// Add another group
 	EXPECT_TRUE(graphicsManager->addComponent(group2));
 	EXPECT_EQ(2, graphicsManager->getGroups().size());
-	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(), 
+	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Add another actor
 	EXPECT_TRUE(graphicsManager->addComponent(actor2));
 	EXPECT_EQ(2, graphicsManager->getActors().size());
-	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(), 
+	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
 		graphicsManager->getActors().end(), actor2));
 
 
@@ -142,42 +142,42 @@ TEST(ManagerTests, AddRemoveTest)
 	EXPECT_EQ(2, graphicsManager->getViews().size());
 
 	/// Try to add a component that is not graphics-related
-	EXPECT_TRUE(componentManager->addComponent(nonGraphicsComponent)) << 
+	EXPECT_TRUE(componentManager->addComponent(nonGraphicsComponent)) <<
 		"Adding a component that this manager is not concerned with should return true";
 
 
 	/// Remove a group
 	EXPECT_TRUE(componentManager->removeComponent(group2));
-	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(), 
+	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Remove a view
 	EXPECT_TRUE(componentManager->removeComponent(view2));
-	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(), 
+	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
 	/// Remove an actor
 	EXPECT_TRUE(componentManager->removeComponent(actor1));
-	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(), 
+	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
 		graphicsManager->getActors().end(), actor1));
 
 	/// Try to remove a group that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(group2));
-	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(), 
+	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Try to remove an actor that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(actor1));
-	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(), 
+	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
 		graphicsManager->getActors().end(), actor1));
-	
+
 	/// Try to remove a view that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(view2));
-	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(), 
+	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
 
 	/// Try to remove a component that is not graphics-related
-	EXPECT_TRUE(componentManager->removeComponent(nonGraphicsComponent)) << 
+	EXPECT_TRUE(componentManager->removeComponent(nonGraphicsComponent)) <<
 		"Removing a component that this manager is not concerned with should return true";
 }

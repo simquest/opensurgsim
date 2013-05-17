@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics
@@ -51,7 +51,7 @@ public:
 	/// \param	component	The component to be removed.
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
 	virtual bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
-	
+
 	/// Adds an actor to the manager
 	/// \param	actor	The actor to be added.
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.

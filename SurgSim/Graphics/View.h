@@ -22,7 +22,7 @@
 
 #include <memory>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics
