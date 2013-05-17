@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	ActorTest.cpp
 	FixedActorTest.cpp
 	RigidActorBaseStateTest.cpp
+	MeshShapeTest.cpp
 	RigidShapeTest.cpp
 	RigidActorParametersTest.cpp
 )
