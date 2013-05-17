@@ -30,7 +30,6 @@
     |          |/
    4*----------*5
 */
-//static const double lx = 1.1, ly = 2.12, lz = 4.123;
 static const int cubeNumPoints = 8;
 static const SurgSim::Math::Vector3d cubePoints[8]=
 {
