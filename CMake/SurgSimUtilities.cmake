@@ -22,6 +22,7 @@ option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 option(SURGSIM_TESTS_RUN "Run the unit tests at the end of the build" ON)
 option(SURGSIM_TESTS_ALL_IN_ONE
 	"Build a single binary with all unit tests.  [Does not work yet!]" OFF)
+option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 
 # Builds the unit test executable or library (unless disabled).
