@@ -125,10 +125,6 @@ private:
 
 		for (i = 0; i < 3; i++)
 		{
-			//a0 = f->poly->verts[f->verts[i]][A];
-			//b0 = f->poly->verts[f->verts[i]][B];
-			//a1 = f->poly->verts[f->verts[(i+1) % f->numVerts]][A];
-			//b1 = f->poly->verts[f->verts[(i+1) % f->numVerts]][B];
 			a0 = m_mesh->getVertexPosition(face.vertices[i])[A];
 			b0 = m_mesh->getVertexPosition(face.vertices[i])[B];
 			a1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[A];
