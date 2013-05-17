@@ -21,7 +21,7 @@
 #include <memory>
 #include <vector>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics
@@ -31,15 +31,15 @@ class Actor;
 
 /// Base graphics group class, which defines the interface that all graphics groups must implement.
 ///
-/// Graphics::Group allows the organization of Graphics::Actor objects so that different algorithms can operate on 
+/// Graphics::Group allows the organization of Graphics::Actor objects so that different algorithms can operate on
 /// specific sub-sets rather than the entire scene.
 class Group : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor. The group is initially empty.
 	/// \param	name	Name of the group
-	Group(const std::string& name);
-	
+	explicit Group(const std::string& name);
+
 	/// Destructor
 	virtual ~Group();
 

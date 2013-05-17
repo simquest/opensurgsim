@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Manager.h"
+#include "SurgSim/Graphics/Manager.h"
 
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
@@ -41,7 +41,6 @@ Manager::Manager() : ComponentManager("Graphics Manager")
 
 Manager::~Manager()
 {
-	
 }
 
 bool Manager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)

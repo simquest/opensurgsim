@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ViewElement.h"
+#include "SurgSim/Graphics/ViewElement.h"
 
 #include <SurgSim/Graphics/View.h>
 
 using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;
 
-ViewElement::ViewElement(const std::string& name, std::shared_ptr<View> view) : 
+ViewElement::ViewElement(const std::string& name, std::shared_ptr<View> view) :
 SceneElement(name), m_view(view)
 {
 }

@@ -125,7 +125,7 @@ TEST(ViewElementTests, StartUpTest)
 TEST(ViewElementTests, ViewTest)
 {
 	std::shared_ptr<ViewElement> element = std::make_shared<MockViewElement>("test name");
-	
+
 	/// Setting a MockView should succeed
 	std::shared_ptr<View> mockView = std::make_shared<MockView>("test mock view");
 	EXPECT_TRUE(element->setView(mockView));

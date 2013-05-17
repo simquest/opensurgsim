@@ -18,7 +18,7 @@
 
 #include <SurgSim/Framework/SceneElement.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics

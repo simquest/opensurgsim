@@ -20,7 +20,7 @@
 
 #include <SurgSim/Math/Matrix.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics
@@ -32,7 +32,7 @@ class Group;
 ///
 /// A Graphics::Camera provides the viewpoint to visualize the Graphics::Group assigned to it.
 ///
-/// To disable a camera: setVisible(false). To re-enable, setVisible(true). 
+/// To disable a camera: setVisible(false). To re-enable, setVisible(true).
 /// A disabled (invisible) camera does not produce an image.
 ///
 /// Graphics::Camera is used with Graphics::View to provide the visualization of the virtual scene to the user.
