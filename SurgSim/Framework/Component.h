@@ -27,14 +27,13 @@ namespace Framework
 {
 
 // Forward References
-class ComponentManager;
 class Runtime;
 
 /// Component is the main interface class to pass information to the system managers each will decide
 /// whether to handle a component of a given type or not. Components will get initialized by having
 /// doInit(), and doWakeUp() called in succession, all components together will have doInit() called before
 /// any component will recieve doWakeUp()
-class Component : public std::enable_shared_from_this<Component>
+class Component
 {
 public:
 	explicit Component(const std::string& name) : m_name(name), m_didInit(false), m_didWakeUp(false)

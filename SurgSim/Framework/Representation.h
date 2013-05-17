@@ -33,9 +33,8 @@ class SceneElement;
 class Representation : public Component
 {
 public:
-	Representation(const std::string& m_name);
+	Representation(const std::string& m_name);;
 	virtual ~Representation();
-
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();
