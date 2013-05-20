@@ -28,10 +28,13 @@ class TimeStep
 public:
 
 	/// Constructor
-	TimeStep();
-	~TimeStep();
+	TimeStep() {};
+	~TimeStep() {};
 
-	void step(double dt);
+	inline void step(double dt)
+	{ 
+		doStep(dt);
+	};
 
 protected:
 	
