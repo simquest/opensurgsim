@@ -89,10 +89,10 @@ TEST(SceneElementTest, GetComponentsTest)
 	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 
 	element.addComponent(component1);
-	EXPECT_EQ(1U, element.getComponents().size());
+	EXPECT_EQ(1u, element.getComponents().size());
 
 	element.addComponent(component2);
-	EXPECT_EQ(2U, element.getComponents().size());
+	EXPECT_EQ(2u, element.getComponents().size());
 
 	std::vector<std::shared_ptr<Component>> components = element.getComponents();
 
@@ -101,7 +101,7 @@ TEST(SceneElementTest, GetComponentsTest)
 
 	element.removeComponent(component1);
 	components = element.getComponents();
-	EXPECT_EQ(1U, components.size());
+	EXPECT_EQ(1u, components.size());
 }
 
 TEST(SceneElementTest, InitComponentTest)
