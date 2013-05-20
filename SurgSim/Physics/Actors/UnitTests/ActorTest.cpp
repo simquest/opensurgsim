@@ -41,7 +41,7 @@ TEST(ActorTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(actor->isActive());
 
 	/// Get numDof = 0
-	ASSERT_EQ(0, actor->getNumDof());
+	ASSERT_EQ(0u, actor->getNumDof());
 
 	/// Set/Get isGravityEnabled [default = true]
 	EXPECT_TRUE(actor->isGravityEnabled());

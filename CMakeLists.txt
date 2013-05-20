@@ -63,10 +63,16 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(ThirdParty/gtest)
 endif()
 
+
+
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
 
 add_subdirectory(SurgSim)
 add_subdirectory(Documentation)
+
+if(SURGSIM_EXAMPLES_BUILD)
+	add_subdirectory(Examples)
+endif()
 
 export(TARGETS ${EXPORT_TARGETS} 
 	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
