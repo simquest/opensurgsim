@@ -43,17 +43,18 @@ static std::shared_ptr<MlcpTestData> loadTestProblem(const std::string& fileName
 }
 
 
-
 TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 {
 	//ASSERT_NO_THROW({
 	MLCP_GaussSeidel_Christian<Eigen::MatrixXd, Eigen::VectorXd> mlcpSolver(1.0, 1.0, 100);
 }
 
-TEST(MlcpGaussSeidelSolverTests, CompareResult1)
+
+static void compareResult(const std::string& fileName,
+                          double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8, int gsMaxIterations = 20)
 {
-	const std::shared_ptr<MlcpTestData> problem = loadTestProblem("mlcpOriginalTest.txt");
-	ASSERT_TRUE(problem) << "Failed to load " << "mlcpOriginalTest.txt";
+	const std::shared_ptr<MlcpTestData> problem = loadTestProblem(fileName);
+	ASSERT_TRUE(problem) << "Failed to load " << fileName;
 
 	// NB: need to make the solver calls const-correct.
 	Eigen::MatrixXd HCHt = problem->HCHt;
@@ -66,9 +67,8 @@ TEST(MlcpGaussSeidelSolverTests, CompareResult1)
 
 	//################################
 	// Gauss-Seidel solver
-	const double solverPrecision = 1e-4;
-	const double _contactTolerance = 2e-5;
-	MLCP_GaussSeidel_Christian<Eigen::MatrixXd, Eigen::VectorXd> mlcpSolver(solverPrecision, _contactTolerance, 30);
+	MLCP_GaussSeidel_Christian<Eigen::MatrixXd, Eigen::VectorXd> mlcpSolver(gsSolverPrecision, gsContactTolerance,
+	        gsMaxIterations);
 
 	printf("  ### Gauss Seidel solver:\n");
 	int nbIteration;
@@ -83,24 +83,47 @@ TEST(MlcpGaussSeidelSolverTests, CompareResult1)
 
 	ASSERT_EQ(size, lambda.rows());
 	ASSERT_EQ(size, problem->expectedLambda.rows());
-	EXPECT_TRUE(isValid(lambda));
-	for (int i = 0;  i < size;  ++i)
-	{
-		EXPECT_NEAR(problem->expectedLambda[i], lambda[i], 1e-9);
-	}
+	EXPECT_TRUE(isValid(lambda)) << lambda;
+	EXPECT_TRUE(lambda.isApprox(problem->expectedLambda)) << "lambda:" << std::endl << lambda << std::endl <<
+		"expected:" << std::endl << problem->expectedLambda;
 
-	double convergenceCriteria=0.0;
-	bool validSignorini=false;
-	int nbContactToSkip=0;
+//	double convergenceCriteria=0.0;
+//	bool validSignorini=false;
+//	int nbContactToSkip=0;
 //	int currentAtomicIndex = calculateConvergenceCriteria(lambda, nbContactToSkip, convergenceCriteria,
 //		validSignorini, 1.0);
 //	printf("\tStatus method final [convergence criteria=%g, Signorini=%d]\n",convergenceCriteria,validSignorini?1:0);
 	printf("############\n");
 }
 
+TEST(MlcpGaussSeidelSolverTests, CompareResultOriginal)
+{
+	const double gsSolverPrecision = 1e-4;
+	const double gsContactTolerance = 2e-5;
+	int gsMaxIterations = 30;
+	compareResult("mlcpOriginalTest.txt", gsSolverPrecision, gsContactTolerance, gsMaxIterations);
+}
+
+TEST(MlcpGaussSeidelSolverTests, CompareResultsSequence)
+{
+	for (int i = 0;  i <= 9;  ++i)
+	{
+		std::string index = std::to_string(i);
+		while (index.length() < 3)
+		{
+			index = "0" + index;
+		}
+
+		SCOPED_TRACE("while running test " + index);
+		printf("-- TEST %s --\n", index.c_str());
+		compareResult("mlcpTest" + index + ".txt");
+	}
+}
+
+
 static void solveRepeatedly(const MlcpTestData& problem,
-							/*XXX const */ MLCP_GaussSeidel_Christian<Eigen::MatrixXd,Eigen::VectorXd>* mlcpSolver,
-							const int repetitions)
+                            /*XXX const */ MLCP_GaussSeidel_Christian<Eigen::MatrixXd,Eigen::VectorXd>* mlcpSolver,
+                            const int repetitions)
 {
 	// NB: need to make the solver calls const-correct.
 	Eigen::MatrixXd HCHt;
@@ -127,19 +150,20 @@ static void solveRepeatedly(const MlcpTestData& problem,
 			bool Signorini;
 
 			bool res = mlcpSolver->solve(size, HCHt, size, E, lambda, mu, constraintTypes, 1.0,
-				&nbIteration, &converged, &Signorini);
+			                             &nbIteration, &converged, &Signorini);
 		}
 	}
 }
 
-TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTime1)
+static double measureExecutionTimeUsec(const std::string& fileName,
+                                       double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8,
+                                       int gsMaxIterations = 20)
 {
-	const std::shared_ptr<MlcpTestData> problem = loadTestProblem("mlcpOriginalTest.txt");
-	ASSERT_TRUE(problem);
+	const std::shared_ptr<MlcpTestData> problem = loadTestProblem(fileName);
+	EXPECT_TRUE(problem) << "Failed to load " << fileName;
 
-	const double solverPrecision = 1e-4;
-	const double _contactTolerance = 2e-5;
-	MLCP_GaussSeidel_Christian<Eigen::MatrixXd,Eigen::VectorXd> mlcpSolver(solverPrecision, _contactTolerance, 30);
+	MLCP_GaussSeidel_Christian<Eigen::MatrixXd,Eigen::VectorXd> mlcpSolver(gsSolverPrecision, gsContactTolerance,
+	        gsMaxIterations);
 
 	typedef boost::chrono::high_resolution_clock clock;
 	clock::time_point calibrationStart = clock::now();
@@ -150,7 +174,7 @@ TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTime1)
 	boost::chrono::duration<double> calibrationTime = clock::now() - calibrationStart;
 	double desiredTestTimeSec = 1.0;
 	const int repetitions = std::max(10, std::min(1000000,
-		static_cast<int>(desiredTestTimeSec * calibrationRepetitions / calibrationTime.count())));
+	                                              static_cast<int>(desiredTestTimeSec * calibrationRepetitions / calibrationTime.count())));
 
 	clock::time_point time0 = clock::now();
 
@@ -172,6 +196,16 @@ TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTime1)
 	double copyTimeUsec = elapsedBaseline.count() * 1e6 / repetitions;
 	std::cout << "Average solution time: " << solveTimeUsec << " microseconds (over " <<
 		repetitions << " loops)" << std::endl;
+	return solveTimeUsec;
+}
+
+TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTimeOriginal)
+{
+	const double gsSolverPrecision = 1e-4;
+	const double gsContactTolerance = 2e-5;
+	int gsMaxIterations = 30;
+	double solveTimeUsec = measureExecutionTimeUsec("mlcpOriginalTest.txt", gsSolverPrecision, gsContactTolerance,
+	                                                gsMaxIterations);
 
 	// When refactoring the MLCP code, it can be very useful to compare the execution time before and after making
 	// changes.  But you can't usefully compare execution times on different machines, or with different build

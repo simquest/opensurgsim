@@ -254,7 +254,8 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 	}
 }
 
-static bool extractWordList(const std::string& fileName, const std::string& line, const char* label, std::vector<std::string>* words)
+static bool extractWordList(const std::string& fileName, const std::string& line, const char* label,
+                            std::vector<std::string>* words)
 {
 	std::string labelString(label);
 	if (line.substr(0, labelString.length()) != labelString)
