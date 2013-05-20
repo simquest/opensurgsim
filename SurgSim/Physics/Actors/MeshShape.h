@@ -40,7 +40,7 @@ public:
 	explicit MeshShape(const std::shared_ptr<TriMesh> mesh)
 	{
 		m_mesh = mesh;
-		compVolumeIntegrals();
+		computeVolumeIntegrals();
 	}
 
 	/// Get mesh
@@ -86,7 +86,7 @@ public:
 		inertia(2, 2) -= mass * (r[0]*r[0] + r[1]*r[1]);
 		inertia(0, 1) = inertia(1, 0) += mass * r[0] * r[1];
 		inertia(1, 2) = inertia(2, 1) += mass * r[1] * r[2];
-		inertia(2, 0) = inertia(0, 2) += mass * r[2] * r[0]; 
+		inertia(2, 0) = inertia(0, 2) += mass * r[2] * r[0];
 
 		return inertia;
 	}
@@ -111,7 +111,7 @@ private:
 
 	/// Compute various integrations over projection of face
 	/// \param face A triangle
-	void compProjectionIntegrals(const typename TriMesh::Triangle& face)
+	void computeProjectionIntegrals(const typename TriMesh::Triangle& face)
 	{
 		double a0, a1, da;
 		double b0, b1, db;
@@ -125,10 +125,6 @@ private:
 
 		for (i = 0; i < 3; i++)
 		{
-			//a0 = f->poly->verts[f->verts[i]][A];
-			//b0 = f->poly->verts[f->verts[i]][B];
-			//a1 = f->poly->verts[f->verts[(i+1) % f->numVerts]][A];
-			//b1 = f->poly->verts[f->verts[(i+1) % f->numVerts]][B];
 			a0 = m_mesh->getVertexPosition(face.vertices[i])[A];
 			b0 = m_mesh->getVertexPosition(face.vertices[i])[B];
 			a1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[A];
@@ -137,7 +133,7 @@ private:
 			db = b1 - b0;
 			a0_2 = a0 * a0; a0_3 = a0_2 * a0; a0_4 = a0_3 * a0;
 			b0_2 = b0 * b0; b0_3 = b0_2 * b0; b0_4 = b0_3 * b0;
-			a1_2 = a1 * a1; a1_3 = a1_2 * a1; 
+			a1_2 = a1 * a1; a1_3 = a1_2 * a1;
 			b1_2 = b1 * b1; b1_3 = b1_2 * b1;
 
 			C1 = a1 + a0;
@@ -174,11 +170,11 @@ private:
 
 	/// Compute various integrations on a face
 	/// \param face A triangle
-	void compFaceIntegrals(const typename TriMesh::Triangle& face)
+	void computeFaceIntegrals(const typename TriMesh::Triangle& face)
 	{
 		double k1, k2, k3, k4;
 
-		compProjectionIntegrals(face);
+		computeProjectionIntegrals(face);
 
 		const Vector3d& ptA = m_mesh->getVertexPosition(face.vertices[0]);
 		const Vector3d& ptB = m_mesh->getVertexPosition(face.vertices[1]);
@@ -200,7 +196,7 @@ private:
 
 		Faaa = k1 * Paaa;
 		Fbbb = k1 * Pbbb;
-		Fccc = -k4 * (cube(n[A])*Paaa + 3*sqr(n[A])*n[B]*Paab 
+		Fccc = -k4 * (cube(n[A])*Paaa + 3*sqr(n[A])*n[B]*Paab
 			+ 3*n[A]*sqr(n[B])*Pabb + cube(n[B])*Pbbb
 			+ 3*w*(sqr(n[A])*Paa + 2*n[A]*n[B]*Pab + sqr(n[B])*Pbb)
 			+ w*w*(3*(n[A]*Pa + n[B]*Pb) + w*P1));
@@ -212,19 +208,18 @@ private:
 	}
 
 	/// Compute various volume integrals over the triangle mesh
-	void compVolumeIntegrals()
+	void computeVolumeIntegrals()
 	{
 		double nx, ny, nz;
 		unsigned int i;
 
-		T0 = T1[0] = T1[1] = T1[2] 
-			= T2[0] = T2[1] = T2[2] 
+		T0 = T1[0] = T1[1] = T1[2]
+			= T2[0] = T2[1] = T2[2]
 			= TP[0] = TP[1] = TP[2] = 0.0;
 
 		for (i = 0; i < m_mesh->getNumTriangles(); i++)
 		{
-
-			const TriMesh::Triangle *f = &m_mesh->getTriangle(i);
+			const typename TriMesh::Triangle* f = &m_mesh->getTriangle(i);
 
 			const Vector3d& ptA = m_mesh->getVertexPosition(f->vertices[0]);
 			const Vector3d& ptB = m_mesh->getVertexPosition(f->vertices[1]);
@@ -245,7 +240,7 @@ private:
 			A = (C + 1) % 3;
 			B = (A + 1) % 3;
 
-			compFaceIntegrals(*f);
+			computeFaceIntegrals(*f);
 
 			T0 += n[0] * ((A == 0) ? Fa : ((B == 0) ? Fb : Fc));
 
