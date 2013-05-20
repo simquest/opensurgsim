@@ -96,7 +96,7 @@ private:
 	/// Calculate squared value
 	/// \param x A real
 	/// \return x^2
-	double sqr(double x) const
+	static double square(double x)
 	{
 		return ((x)*(x));
 	}
@@ -104,7 +104,7 @@ private:
 	/// Calculate cubic value
 	/// \param x A real
 	/// \return x^3
-	double cube(double x) const
+	static double cube(double x)
 	{
 		return ((x)*(x)*(x));
 	}
@@ -191,19 +191,19 @@ private:
 
 		Faa = k1 * Paa;
 		Fbb = k1 * Pbb;
-		Fcc = k3 * (sqr(n[A])*Paa + 2*n[A]*n[B]*Pab + sqr(n[B])*Pbb
+		Fcc = k3 * (MeshShape::square(n[A])*Paa + 2*n[A]*n[B]*Pab + MeshShape::square(n[B])*Pbb
 			+ w*(2*(n[A]*Pa + n[B]*Pb) + w*P1));
 
 		Faaa = k1 * Paaa;
 		Fbbb = k1 * Pbbb;
-		Fccc = -k4 * (cube(n[A])*Paaa + 3*sqr(n[A])*n[B]*Paab
-			+ 3*n[A]*sqr(n[B])*Pabb + cube(n[B])*Pbbb
-			+ 3*w*(sqr(n[A])*Paa + 2*n[A]*n[B]*Pab + sqr(n[B])*Pbb)
+		Fccc = -k4 * (MeshShape::cube(n[A])*Paaa + 3*MeshShape::square(n[A])*n[B]*Paab
+			+ 3*n[A]*MeshShape::square(n[B])*Pabb + MeshShape::cube(n[B])*Pbbb
+			+ 3*w*(MeshShape::square(n[A])*Paa + 2*n[A]*n[B]*Pab + MeshShape::square(n[B])*Pbb)
 			+ w*w*(3*(n[A]*Pa + n[B]*Pb) + w*P1));
 
 		Faab = k1 * Paab;
 		Fbbc = -k2 * (n[A]*Pabb + n[B]*Pbbb + w*Pbb);
-		Fcca = k3 * (sqr(n[A])*Paaa + 2*n[A]*n[B]*Paab + sqr(n[B])*Pabb
+		Fcca = k3 * (MeshShape::square(n[A])*Paaa + 2*n[A]*n[B]*Paab + MeshShape::square(n[B])*Pabb
 			+ w*(2*(n[A]*Paa + n[B]*Pab) + w*Pa));
 	}
 
