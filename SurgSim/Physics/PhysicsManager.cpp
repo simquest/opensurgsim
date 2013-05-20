@@ -16,7 +16,7 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FreeMotionStep.h>
+#include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/Actors/RigidActorBase.h>
 #include <SurgSim/Framework/Log.h>
 
@@ -39,7 +39,7 @@ bool PhysicsManager::doInitialize()
 {
 	m_logger = getRuntime()->getLogger("PhysicsManager");
 	m_rigidActors = std::make_shared<std::vector<std::shared_ptr<RigidActorBase>>>();
-	m_freeMotionStep.reset(new FreeMotionStep(m_rigidActors));
+	m_freeMotionStep.reset(new FreeMotion(m_rigidActors));
 	return m_logger != nullptr && m_rigidActors != nullptr && m_freeMotionStep != nullptr;
 }
 
@@ -52,7 +52,7 @@ bool PhysicsManager::doStartUp()
 
 bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	return doAddComponent(component,m_rigidActors.get());
+	return doAddComponent(component,m_rigidActors.get()) != nullptr;
 }
 
 bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
@@ -62,7 +62,7 @@ bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Compone
 
 bool PhysicsManager::doUpdate(double dt)
 {
-	m_freeMotionStep->step(dt);
+	m_freeMotionStep->update(dt);
 	return true;
 }
 

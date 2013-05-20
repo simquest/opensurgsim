@@ -13,34 +13,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_PHYSICS_TIMESTEP_H
+#define SURGSIM_PHYSICS_TIMESTEP_H
 
-#include <memory>
 #include <vector>
-
-#include <SurgSim/Physics/FreeMotionStep.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
-FreeMotionStep::FreeMotionStep(std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> actors) :
-	m_actors(actors)
+/// Encapsulates a calculation over a selection of objects, needs to be subclassed to be used
+class Computation
 {
+public:
 
-}
+	/// Constructor
+	Computation() {};
+	~Computation() {};
 
-FreeMotionStep::~FreeMotionStep()
-{
+	/// Public Interface execute this objects computations, dt is the time from
+	/// the last update call in seconds
+	inline void update(double dt)
+	{ 
+		doUpdate(dt);
+	};
 
-}
+protected:
 
-void FreeMotionStep::doStep(double dt)
-{
-	
-}
+	/// Override this function to implement the computations specific behavior
+	virtual void doUpdate(double dt) = 0;
+
+};
+
 
 
 }; // Physics
 }; // SurgSim
+
+#endif

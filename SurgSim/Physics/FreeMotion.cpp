@@ -13,37 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTIONSTEP_H
-#define SURGSIM_PHYSICS_FREEMOTIONSTEP_H
 
 #include <memory>
 #include <vector>
 
-
-#include <SurgSim/Physics/TimeStep.h>
+#include <SurgSim/Physics/FreeMotion.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-class RigidActorBase;
 
-class FreeMotionStep  : public TimeStep
+FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> actors) :
+	m_actors(actors)
 {
-public:
 
-	/// Constructor
-	FreeMotionStep(std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> m_actors);
-	~FreeMotionStep();
+}
 
-protected:
+FreeMotion::~FreeMotion()
+{
 
-	virtual void doStep(double dt);
-	std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> m_actors;
-};
+}
+
+void FreeMotion::doUpdate(double dt)
+{
+	// Call freemotion on the rigidactor base but it is not in there yet ...
+}
+
 
 }; // Physics
 }; // SurgSim
-
-#endif
