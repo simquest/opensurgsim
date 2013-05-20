@@ -22,32 +22,28 @@ namespace SurgSim
 namespace Physics
 {
 
-/// The RigidVtcParameters class defines all the physical
-/// parameters for a rigid vtc
+/// The RigidVtcParameters class defines all the physical parameters for a rigid vtc
 class RigidVtcParameters
 {
 public:
 	/// Default constructor
 	RigidVtcParameters()
-		: m_vtcLinearStiffness(0.0), m_vtcLinearDamping(0.0),
-		m_vtcAngularStiffness(0.0), m_vtcAngularDamping(0.0)
+		: m_vtcLinearStiffness(0.0), m_vtcLinearDamping(0.0), m_vtcAngularStiffness(0.0), m_vtcAngularDamping(0.0)
 	{
-	};
+	}
 
 	/// Destructor
 	virtual ~RigidVtcParameters()
 	{
-	};
+	}
 
 	/// Comparison operator (equality test)
 	/// \param p A RigidVtcParameters to compare it to
 	/// \return True if the 2 parameters set are equals, False otherwise
 	bool operator ==(const RigidVtcParameters &p) const
 	{
-		return (m_vtcLinearStiffness == p.m_vtcLinearStiffness &&
-			m_vtcLinearDamping == p.m_vtcLinearDamping &&
-			m_vtcAngularStiffness == p.m_vtcAngularStiffness &&
-			m_vtcAngularDamping == p.m_vtcAngularDamping);
+		return (m_vtcLinearStiffness == p.m_vtcLinearStiffness && m_vtcLinearDamping == p.m_vtcLinearDamping &&
+			m_vtcAngularStiffness == p.m_vtcAngularStiffness && m_vtcAngularDamping == p.m_vtcAngularDamping);
 	}
 
 	/// Comparison operator (difference test)
@@ -63,56 +59,56 @@ public:
 	void setVtcLinearStiffness(double linearStiffness)
 	{
 		m_vtcLinearStiffness = linearStiffness;
-	};
+	}
 
 	/// Get vtc linear stiffness
 	/// \return The vtc linear stiffness (in N.m-1)
 	double getVtcLinearStiffness() const
 	{
 		return m_vtcLinearStiffness;
-	};
+	}
 
 	/// Set vtc linear damping
 	/// \param linearDamping The damping of the vtc in linear mode (in N.s.m-1 or Kg.s-1)
 	void setVtcLinearDamping(double linearDamping)
 	{
 		m_vtcLinearDamping = linearDamping;
-	};
+	}
 
 	/// Get vtc linear damping
 	/// \return The vtc linear damping (in N.s.m-1 or Kg.s-1)
 	double getVtcLinearDamping() const
 	{
 		return m_vtcLinearDamping;
-	};
+	}
 
 	/// Set vtc angular stiffness
 	/// \param angularStiffness The stiffness of the vtc in angular mode (in N·m rad-1)
 	void setVtcAngularStiffness(double angularStiffness)
 	{
 		m_vtcAngularStiffness = angularStiffness;
-	};
+	}
 
 	/// Get vtc angular stiffness
 	/// \return The vtc angular stiffness (in N·m rad-1)
 	double getVtcAngularStiffness() const
 	{
 		return m_vtcAngularStiffness;
-	};
+	}
 
 	/// Set vtc angular damping
 	/// \param angularDamping The damping of the vtc in angular mode (in N.m.s.rad-1)
 	void setVtcAngularDamping(double angularDamping)
 	{
 		m_vtcAngularDamping = angularDamping;
-	};
+	}
 
 	/// Get the vtc angular damping
 	/// \return the vtc angular damping (in N.m.s.rad-1)
 	double getVtcAngularDamping() const
 	{
 		return m_vtcAngularDamping;
-	};
+	}
 
 private:
 	/// Vtc stiffness parameter in linear mode (in N.m-1)

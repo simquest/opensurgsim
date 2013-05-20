@@ -39,12 +39,14 @@ public:
 		m_param.setShapeUsedForMassInertia(std::make_shared<SphereShape>(radius));
 
 		{
-			SurgSim::Math::Quaterniond q(0.5, 0.4, 0.3, 0.2);
+			SurgSim::Math::Quaterniond   q(0.5, 0.4, 0.3, 0.2);
+			SurgSim::Math::Vector3d linVel(3.0, 2.0, 1.0);
+			SurgSim::Math::Vector3d angVel(1.0, 2.0, 3.0);
+			SurgSim::Math::Vector3d      t(1.2, 2.1, 12.21);
+			m_state.setAngularVelocity(angVel);
+			m_state.setLinearVelocity(linVel);
 			q.normalize();
-			SurgSim::Math::Vector3d t(1.2, 2.1, 12.21);
-			m_state.setAngularVelocity(Vector3d(1.0, 2.0, 3.0));
-			m_state.setLinearVelocity(Vector3d(3.0, 2.0, 1.0));
-			m_state.setPose(SurgSim::Math::makeRigidTransform(q,t ));
+			m_state.setPose(SurgSim::Math::makeRigidTransform(q, t));
 		}
 
 		// State to be used to test divergence
@@ -57,15 +59,17 @@ public:
 		m_vtcParam.setVtcLinearStiffness(1000.0);
 
 		{
-			SurgSim::Math::Quaterniond q(0.5, 0.4, 0.3, 0.2);
+			SurgSim::Math::Quaterniond   q(0.5, 0.4, 0.3, 0.2);
+			SurgSim::Math::Vector3d angVel(1.0, 2.0, 3.0);
+			SurgSim::Math::Vector3d linVel(1.0, 2.0, 3.0);
+			SurgSim::Math::Vector3d      t(1.0, 2.0, 3.0);
+			m_vtcState.setAngularVelocity(angVel);
+			m_vtcState.setLinearVelocity(linVel);
 			q.normalize();
-			SurgSim::Math::Vector3d t(1,2,3);
-			m_vtcState.setAngularVelocity(Vector3d(1,2,3));
-			m_vtcState.setLinearVelocity(Vector3d(4,5,6));
 			m_vtcState.setPose(SurgSim::Math::makeRigidTransform(q, t));
 		}
 
-		m_maxNumSimulationStepTest = 100;
+		m_maxNumSimulationStepTest = 1;
 	}
 
 	void TearDown()
@@ -77,20 +81,28 @@ public:
 
 	// Rigid actor parameters
 	RigidActorParameters m_param;
+	
 	// Rigid actor default parameters
 	RigidActorParameters m_defaultParameters;
 
-	// Vtc parameters
+	// Vtc default parameters
 	RigidVtcParameters m_vtcParamDefault;
+
+	// Vtc current parameters
 	RigidVtcParameters m_vtcParam;
-	// Vtc states
+
+	// Vtc default states
 	RigidActorState m_vtcStateDefault;
+
+	// Vtc current states
 	RigidActorState m_vtcState;
 
 	// Rigid actor state
 	RigidActorState m_state;
+
 	// Rigid actor state for divergence test
 	RigidActorState m_stateDivergence;
+	
 	// Rigid actor default state
 	RigidActorState m_defaultState;
 
@@ -278,7 +290,7 @@ TEST_F(RigidActorVtcTest, GravityTest)
 	rigidBody->setInitialVtcParameters(m_vtcParam);
 
 	// Run few time steps
-	for (int timeStep = 0; timeStep < 1000; timeStep++)
+	for (int timeStep = 0; timeStep < m_maxNumSimulationStepTest; timeStep++)
 	{
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);

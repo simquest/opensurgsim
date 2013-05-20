@@ -49,7 +49,7 @@ void RigidActorVtc::beforeUpdate(double dt)
 	// We need to update the vtc velocities at each time step
 	{
 		Vector3d p = m_currentVtcState.getPose().translation() - m_previousVtcState.getPose().translation();
-		m_currentVtcState.setLinearVelocity(p/dt);
+		m_currentVtcState.setLinearVelocity(p / dt);
 
 		const SurgSim::Math::Quaterniond q(m_currentVtcState.getPose().rotation());
 		const SurgSim::Math::Quaterniond qprev(m_previousVtcState.getPose().rotation());
