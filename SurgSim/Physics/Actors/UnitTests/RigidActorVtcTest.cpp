@@ -211,7 +211,7 @@ TEST_F(RigidActorVtcTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(rigidBody->isActive());
 
 	// Get numDof = 6
-	ASSERT_EQ(6, rigidBody->getNumDof());
+	ASSERT_EQ(6u, rigidBody->getNumDof());
 
 	// Set/Get isGravityEnabled [default = true]
 	EXPECT_TRUE(rigidBody->isGravityEnabled());
@@ -290,7 +290,6 @@ TEST_F(RigidActorVtcTest, GravityTest)
 		const Vector3d    G = state.getPose().translation();
 		const Matrix33d&  R = state.getPose().rotation();
 		const Quaterniond q = Quaterniond(R);
-		const Vector3d    v = state.getLinearVelocity();
 		const Vector3d    w = state.getAngularVelocity();
 
 		// 1mm margin with a stiff Vtc to keep the virtual object close by

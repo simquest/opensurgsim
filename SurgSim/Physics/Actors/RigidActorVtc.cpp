@@ -99,7 +99,7 @@ void RigidActorVtc::update(double dt)
 	m_torque.setZero();
 	if (isGravityEnabled())
 	{
-		m_force += m_gravity * param.getMass();
+		m_force += getGravity() * param.getMass();
 	}
 	m_torque -= w.cross(m_globalInertia * w);
 
