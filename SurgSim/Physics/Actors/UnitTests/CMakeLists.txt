@@ -24,8 +24,10 @@ set(UNIT_TEST_SOURCES
 	FixedActorTest.cpp
 	MeshShapeTest.cpp
 	RigidActorBaseStateTest.cpp
-	RigidShapeTest.cpp
 	RigidActorParametersTest.cpp
+	RigidActorStateTest.cpp
+	RigidActorTest.cpp
+	RigidShapeTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
