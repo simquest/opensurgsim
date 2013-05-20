@@ -18,15 +18,15 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
+	FreeMotion.cpp
 	PhysicsManager.cpp
-	FreeMotionStep.cpp
 )
 
 set(SURGSIM_PHYSICS_HEADERS
+	Computation.h
+	FreeMotion.h
 	PhysicsManager.h
 	PhysicsManager-inl.h
-	FreeMotionStep.h
-	TimeStep.h
 )
 
 add_subdirectory(Actors)
