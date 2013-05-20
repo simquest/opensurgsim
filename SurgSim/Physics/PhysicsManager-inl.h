@@ -16,14 +16,8 @@
 #ifndef SURGSIM_PHYSICS_PHYSICSMANAGER_INL_H
 #define SURGSIM_PHYSICS_PHYSICSMANAGER_INL_H
 
-#include <memory>
-#include <vector>
-#include <Surgsim/Framework/Component.h>
-#include <SurgSim/Framework/Log.h>
-
-
 template<class T>
-std::shared_ptr<T> doAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
+std::shared_ptr<T> PhysicsManager::doAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
 {
 	std::shared_ptr<T> typedComponent = std::dynamic_pointer_cast<T>(component);
 	if (typedComponent != nullptr)
@@ -35,15 +29,16 @@ std::shared_ptr<T> doAddComponent(std::shared_ptr<SurgSim::Framework::Component>
 		}
 		else
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " component " << component->getName() << 
-				"already added to " << getName();	
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " component " << component->getName() << 
+				"already added to " << getName();
+			typedComponent = nullptr;
 		}
 	}
 	return typedComponent;
 };
 
 template<class T>
-bool doRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
+bool PhysicsManager::doRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
 {
 	bool result = false;
 	std::shared_ptr<T> typedComponent = std::dynamic_pointer_cast<T>(component);
@@ -53,12 +48,12 @@ bool doRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component,
 		if (found != container->end())
 		{
 			container->erase(found);
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed behavior " << typedComponent->getName();
+			SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Removed component " << typedComponent->getName();
 			result = true;
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Unable to remove behavior " << typedComponent->getName()
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Unable to remove component " << typedComponent->getName()
 				<< ". Not found.";
 		}
 	}

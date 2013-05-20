@@ -21,10 +21,11 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/Actors/Actor.h>
+#include <SurgSim/Physics/Actors/FixedActor.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Framework::Runtime;
-using SurgSim::Physics::Actor;
+using SurgSim::Physics::FixedActor;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
@@ -59,4 +60,18 @@ TEST_F(PhysicsManagerTest, InitTest)
 	runtime->addManager(physicsManager);
 	EXPECT_NO_THROW(runtime->start());
 	EXPECT_NO_THROW(runtime->stop());
+}
+
+TEST_F(PhysicsManagerTest, AddRemoveComponent)
+{
+	std::shared_ptr<FixedActor> actor1= std::make_shared<FixedActor>("Actor1");
+	std::shared_ptr<FixedActor> actor2 = std::make_shared<FixedActor>("Actor2");
+
+	EXPECT_TRUE(physicsManager->addComponent(actor1));
+	EXPECT_TRUE(physicsManager->addComponent(actor2));
+	EXPECT_FALSE(physicsManager->addComponent(actor1));
+
+	EXPECT_TRUE(physicsManager->removeComponent(actor1));
+	EXPECT_FALSE(physicsManager->removeComponent(actor1));
+	EXPECT_TRUE(physicsManager->removeComponent(actor2));
 }
