@@ -89,7 +89,7 @@ public:
 
 private:
 	/// Group of actors that this camera sees
-	/// /// Only the actors in this group will be rendered when this camera's view is rendered.
+	/// Only the actors in this group will be rendered when this camera's view is rendered.
 	std::shared_ptr<Group> m_group;
 };
 
