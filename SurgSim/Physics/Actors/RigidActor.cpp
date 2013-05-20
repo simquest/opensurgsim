@@ -78,7 +78,7 @@ void RigidActor::update(double dt)
 	m_torque.setZero();
 	if (isGravityEnabled())
 	{
-		m_force += m_gravity * p.getMass();
+		m_force += getGravity() * p.getMass();
 	}
 	m_torque -= w.cross(m_globalInertia * w);
 
