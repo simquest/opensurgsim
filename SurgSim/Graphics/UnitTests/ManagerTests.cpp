@@ -64,12 +64,12 @@ TEST(ManagerTests, StartUpTest)
 	runtime->stop();
 
 	/// Check that the manager did update when the thread was running
-	EXPECT_GT(0, manager->getNumUpdates());
-	EXPECT_GT(0.0, manager->getSumDt());
+	EXPECT_GT(manager->getNumUpdates(), 0);
+	EXPECT_GT(manager->getSumDt(), 0.0);
 
 	EXPECT_TRUE(view->isInitialized());
 	EXPECT_TRUE(view->isAwoken());
-	EXPECT_GT(0, view->getNumUpdates());
+	EXPECT_GT(view->getNumUpdates(), 0);
 	EXPECT_EQ(manager->getNumUpdates(), view->getNumUpdates());
 }
 
