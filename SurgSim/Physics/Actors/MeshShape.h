@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Parts of the code in this file are based on research and
+// public-domain code by Brian Mirtich.
+// (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
+
+
 #ifndef SURGSIM_PHYSICS_MESHSHAPE_H
 #define SURGSIM_PHYSICS_MESHSHAPE_H
 
@@ -27,6 +32,7 @@ namespace Physics
 
 /// Mesh shape: shape made of a triangle mesh
 /// Various physical properties are computed from the triangle mesh using
+/// work by Brian Mirtich.
 /// http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html
 template <class VertexData, class EdgeData, class TriangleData>
 class MeshShape: public RigidShape
