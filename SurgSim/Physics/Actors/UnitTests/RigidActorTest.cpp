@@ -149,7 +149,7 @@ TEST_F(RigidActorTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(rigidBody->isActive());
 
 	// Get numDof = 6
-	ASSERT_EQ(6, rigidBody->getNumDof());
+	ASSERT_EQ(6u, rigidBody->getNumDof());
 
 	// Set/Get isGravityEnabled [default = true]
 	EXPECT_TRUE(rigidBody->isGravityEnabled());
@@ -213,10 +213,7 @@ TEST_F(RigidActorTest, GravityTest)
 		const Vector3d    w = rigidBody->getCurrentState().getAngularVelocity();
 
 		const Vector3d    Gprev = rigidBody->getPreviousState().getPose().translation();
-		const Matrix33d&  Rprev = rigidBody->getPreviousState().getPose().rotation();
-		const Quaterniond qprev = Quaterniond(Rprev);
 		const Vector3d    vprev = rigidBody->getPreviousState().getLinearVelocity();
-		const Vector3d    wprev = rigidBody->getPreviousState().getAngularVelocity();
 
 		// Implicit numerical integration gives v(t+dt) = v(t) + dt.a(t+dt) = v(t) + dt.g
 		//                                      p(t+dt) = p(t) + dt.v(t+dt) = p(t) + dt.v(t) + dt^2.g

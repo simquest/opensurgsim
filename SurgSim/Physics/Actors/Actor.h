@@ -34,7 +34,7 @@ public:
 	/// Constructor
 	/// \param name The actor's name
 	explicit Actor(const std::string& name)
-		: Representation(name), m_numDof(0), m_gravity(0.0, -9.81, 0.0),
+		: Representation(name), m_gravity(0.0, -9.81, 0.0), m_numDof(0),
 		m_isGravityEnabled(true), m_isActive(true)
 	{
 	}
