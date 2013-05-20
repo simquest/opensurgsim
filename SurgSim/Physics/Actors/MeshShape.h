@@ -54,14 +54,14 @@ public:
 	/// \return The volume of the mesh (in m-3)
 	virtual double calculateVolume() const
 	{
-		return T0;
+		return m_T0;
 	}
 
 	/// Calculate the mass center of the mesh
 	/// \return The mass center of the mesh
 	Vector3d calculateMassCenter() const
 	{
-		return Vector3d(T1[0] / T0, T1[1] / T0, T1[2] / T0);
+		return Vector3d(m_T1[0] / m_T0, m_T1[1] / m_T0, m_T1[2] / m_T0);
 	}
 
 	/// Calculate the inertia of the mesh
@@ -73,12 +73,12 @@ public:
 		const Vector3d& r = calculateMassCenter();
 		const double mass = calculateMass(rho);
 
-		inertia(0, 0) = rho * (T2[1] + T2[2]);
-		inertia(1, 1) = rho * (T2[2] + T2[0]);
-		inertia(2, 2) = rho * (T2[0] + T2[1]);
-		inertia(0, 1) = inertia(1, 0) = - rho * TP[0];
-		inertia(1, 2) = inertia(2, 1) = - rho * TP[1];
-		inertia(2, 0) = inertia(0, 2) = - rho * TP[2];
+		inertia(0, 0) = rho * (m_T2[1] + m_T2[2]);
+		inertia(1, 1) = rho * (m_T2[2] + m_T2[0]);
+		inertia(2, 2) = rho * (m_T2[0] + m_T2[1]);
+		inertia(0, 1) = inertia(1, 0) = - rho * m_TP[0];
+		inertia(1, 2) = inertia(2, 1) = - rho * m_TP[1];
+		inertia(2, 0) = inertia(0, 2) = - rho * m_TP[2];
 
 		// translate inertia tensor to center of mass
 		inertia(0, 0) -= mass * (r[1]*r[1] + r[0]*r[0]);
@@ -121,14 +121,14 @@ private:
 		double Cab, Kab, Caab, Kaab, Cabb, Kabb;
 		int i;
 
-		P1 = Pa = Pb = Paa = Pab = Pbb = Paaa = Paab = Pabb = Pbbb = 0.0;
+		m_P1 = m_Pa = m_Pb = m_Paa = m_Pab = m_Pbb = m_Paaa = m_Paab = m_Pabb = m_Pbbb = 0.0;
 
 		for (i = 0; i < 3; i++)
 		{
-			a0 = m_mesh->getVertexPosition(face.vertices[i])[A];
-			b0 = m_mesh->getVertexPosition(face.vertices[i])[B];
-			a1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[A];
-			b1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[B];
+			a0 = m_mesh->getVertexPosition(face.vertices[i])[m_alpha];
+			b0 = m_mesh->getVertexPosition(face.vertices[i])[m_beta];
+			a1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[m_alpha];
+			b1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[m_beta];
 			da = a1 - a0;
 			db = b1 - b0;
 			a0_2 = a0 * a0; a0_3 = a0_2 * a0; a0_4 = a0_3 * a0;
@@ -144,28 +144,28 @@ private:
 			Cabb = 4*b1_3 + 3*b1_2*b0 + 2*b1*b0_2 + b0_3;
 			Kabb = b1_3 + 2*b1_2*b0 + 3*b1*b0_2 + 4*b0_3;
 
-			P1 += db*C1;
-			Pa += db*Ca;
-			Paa += db*Caa;
-			Paaa += db*Caaa;
-			Pb += da*Cb;
-			Pbb += da*Cbb;
-			Pbbb += da*Cbbb;
-			Pab += db*(b1*Cab + b0*Kab);
-			Paab += db*(b1*Caab + b0*Kaab);
-			Pabb += da*(a1*Cabb + a0*Kabb);
+			m_P1 += db*C1;
+			m_Pa += db*Ca;
+			m_Paa += db*Caa;
+			m_Paaa += db*Caaa;
+			m_Pb += da*Cb;
+			m_Pbb += da*Cbb;
+			m_Pbbb += da*Cbbb;
+			m_Pab += db*(b1*Cab + b0*Kab);
+			m_Paab += db*(b1*Caab + b0*Kaab);
+			m_Pabb += da*(a1*Cabb + a0*Kabb);
 		}
 
-		P1 /= 2.0;
-		Pa /= 6.0;
-		Paa /= 12.0;
-		Paaa /= 20.0;
-		Pb /= -6.0;
-		Pbb /= -12.0;
-		Pbbb /= -20.0;
-		Pab /= 24.0;
-		Paab /= 60.0;
-		Pabb /= -60.0;
+		m_P1 /= 2.0;
+		m_Pa /= 6.0;
+		m_Paa /= 12.0;
+		m_Paaa /= 20.0;
+		m_Pb /= -6.0;
+		m_Pbb /= -12.0;
+		m_Pbbb /= -20.0;
+		m_Pab /= 24.0;
+		m_Paab /= 60.0;
+		m_Pabb /= -60.0;
 	}
 
 	/// Compute various integrations on a face
@@ -183,28 +183,28 @@ private:
 		n.normalize();
 		double w = -ptA.dot(n);
 
-		k1 = 1 / n[C]; k2 = k1 * k1; k3 = k2 * k1; k4 = k3 * k1;
+		k1 = 1 / n[m_gamma]; k2 = k1 * k1; k3 = k2 * k1; k4 = k3 * k1;
 
-		Fa = k1 * Pa;
-		Fb = k1 * Pb;
-		Fc = -k2 * (n[A]*Pa + n[B]*Pb + w*P1);
+		m_Fa = k1 * m_Pa;
+		m_Fb = k1 * m_Pb;
+		m_Fc = -k2 * (n[m_alpha]*m_Pa + n[m_beta]*m_Pb + w*m_P1);
 
-		Faa = k1 * Paa;
-		Fbb = k1 * Pbb;
-		Fcc = k3 * (MeshShape::square(n[A])*Paa + 2*n[A]*n[B]*Pab + MeshShape::square(n[B])*Pbb
-			+ w*(2*(n[A]*Pa + n[B]*Pb) + w*P1));
+		m_Faa = k1 * m_Paa;
+		m_Fbb = k1 * m_Pbb;
+		m_Fcc = k3 * (MeshShape::square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab + MeshShape::square(n[m_beta])*m_Pbb
+			+ w*(2*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
 
-		Faaa = k1 * Paaa;
-		Fbbb = k1 * Pbbb;
-		Fccc = -k4 * (MeshShape::cube(n[A])*Paaa + 3*MeshShape::square(n[A])*n[B]*Paab
-			+ 3*n[A]*MeshShape::square(n[B])*Pabb + MeshShape::cube(n[B])*Pbbb
-			+ 3*w*(MeshShape::square(n[A])*Paa + 2*n[A]*n[B]*Pab + MeshShape::square(n[B])*Pbb)
-			+ w*w*(3*(n[A]*Pa + n[B]*Pb) + w*P1));
+		m_Faaa = k1 * m_Paaa;
+		m_Fbbb = k1 * m_Pbbb;
+		m_Fccc = -k4 * (MeshShape::cube(n[m_alpha])*m_Paaa + 3*MeshShape::square(n[m_alpha])*n[m_beta]*m_Paab
+			+ 3*n[m_alpha]*MeshShape::square(n[m_beta])*m_Pabb + MeshShape::cube(n[m_beta])*m_Pbbb
+			+ 3*w*(MeshShape::square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab + MeshShape::square(n[m_beta])*m_Pbb)
+			+ w*w*(3*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
 
-		Faab = k1 * Paab;
-		Fbbc = -k2 * (n[A]*Pabb + n[B]*Pbbb + w*Pbb);
-		Fcca = k3 * (MeshShape::square(n[A])*Paaa + 2*n[A]*n[B]*Paab + MeshShape::square(n[B])*Pabb
-			+ w*(2*(n[A]*Paa + n[B]*Pab) + w*Pa));
+		m_Faab = k1 * m_Paab;
+		m_Fbbc = -k2 * (n[m_alpha]*m_Pabb + n[m_beta]*m_Pbbb + w*m_Pbb);
+		m_Fcca = k3 * (MeshShape::square(n[m_alpha])*m_Paaa + 2*n[m_alpha]*n[m_beta]*m_Paab + MeshShape::square(n[m_beta])*m_Pabb
+			+ w*(2*(n[m_alpha]*m_Paa + n[m_beta]*m_Pab) + w*m_Pa));
 	}
 
 	/// Compute various volume integrals over the triangle mesh
@@ -213,9 +213,9 @@ private:
 		double nx, ny, nz;
 		unsigned int i;
 
-		T0 = T1[0] = T1[1] = T1[2]
-			= T2[0] = T2[1] = T2[2]
-			= TP[0] = TP[1] = TP[2] = 0.0;
+		m_T0 = m_T1[0] = m_T1[1] = m_T1[2]
+			= m_T2[0] = m_T2[1] = m_T2[2]
+			= m_TP[0] = m_TP[1] = m_TP[2] = 0.0;
 
 		for (i = 0; i < m_mesh->getNumTriangles(); i++)
 		{
@@ -231,51 +231,48 @@ private:
 			nz = fabs(n[2]);
 			if (nx > ny && nx > nz)
 			{
-				C = 0;
+				m_gamma = 0;
 			}
 			else
 			{
-				C = (ny > nz) ? 1 : 2;
+				m_gamma = (ny > nz) ? 1 : 2;
 			}
-			A = (C + 1) % 3;
-			B = (A + 1) % 3;
+			m_alpha = (m_gamma + 1) % 3;
+			m_beta = (m_alpha + 1) % 3;
 
 			computeFaceIntegrals(*f);
 
-			T0 += n[0] * ((A == 0) ? Fa : ((B == 0) ? Fb : Fc));
+			m_T0 += n[0] * ((m_alpha == 0) ? m_Fa : ((m_beta == 0) ? m_Fb : m_Fc));
 
-			T1[A] += n[A] * Faa;
-			T1[B] += n[B] * Fbb;
-			T1[C] += n[C] * Fcc;
-			T2[A] += n[A] * Faaa;
-			T2[B] += n[B] * Fbbb;
-			T2[C] += n[C] * Fccc;
-			TP[A] += n[A] * Faab;
-			TP[B] += n[B] * Fbbc;
-			TP[C] += n[C] * Fcca;
+			m_T1[m_alpha] += n[m_alpha] * m_Faa;
+			m_T1[m_beta] += n[m_beta] * m_Fbb;
+			m_T1[m_gamma] += n[m_gamma] * m_Fcc;
+			m_T2[m_alpha] += n[m_alpha] * m_Faaa;
+			m_T2[m_beta] += n[m_beta] * m_Fbbb;
+			m_T2[m_gamma] += n[m_gamma] * m_Fccc;
+			m_TP[m_alpha] += n[m_alpha] * m_Faab;
+			m_TP[m_beta] += n[m_beta] * m_Fbbc;
+			m_TP[m_gamma] += n[m_gamma] * m_Fcca;
 		}
 
-		T1[0] /= 2; T1[1] /= 2; T1[2] /= 2;
-		T2[0] /= 3; T2[1] /= 3; T2[2] /= 3;
-		TP[0] /= 2; TP[1] /= 2; TP[2] /= 2;
+		m_T1[0] /= 2; m_T1[1] /= 2; m_T1[2] /= 2;
+		m_T2[0] /= 3; m_T2[1] /= 3; m_T2[2] /= 3;
+		m_TP[0] /= 2; m_TP[1] /= 2; m_TP[2] /= 2;
 	}
 
 	/// Data structure from Brian Mirtich
-	/// alpha
-	int A;
-	/// beta
-	int B;
-	/// gamma
-	int C;
+	int m_alpha;
+	int m_beta;
+	int m_gamma;
 
 	//// projection integrals (Data structure from Brian Mirtich)
-	double P1, Pa, Pb, Paa, Pab, Pbb, Paaa, Paab, Pabb, Pbbb;
+	double m_P1, m_Pa, m_Pb, m_Paa, m_Pab, m_Pbb, m_Paaa, m_Paab, m_Pabb, m_Pbbb;
 
 	/// face integrals (Data structure from Brian Mirtich)
-	double Fa, Fb, Fc, Faa, Fbb, Fcc, Faaa, Fbbb, Fccc, Faab, Fbbc, Fcca;
+	double m_Fa, m_Fb, m_Fc, m_Faa, m_Fbb, m_Fcc, m_Faaa, m_Fbbb, m_Fccc, m_Faab, m_Fbbc, m_Fcca;
 
 	/// volume integrals (Data structure from Brian Mirtich)
-	double T0, T1[3], T2[3], TP[3];
+	double m_T0, m_T1[3], m_T2[3], m_TP[3];
 
 	/// Triangle mesh associated to this MeshShape
 	std::shared_ptr<TriMesh> m_mesh;
