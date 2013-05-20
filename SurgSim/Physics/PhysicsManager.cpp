@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Framework/Runtime.h>
+#include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FreeMotionStep.h>
 #include <SurgSim/Physics/Actors/RigidActorBase.h>
@@ -42,30 +43,21 @@ bool PhysicsManager::doInitialize()
 	return m_logger != nullptr && m_rigidActors != nullptr && m_freeMotionStep != nullptr;
 }
 
+
+bool PhysicsManager::doStartUp()
+{
+	return true;
+}
+
+
 bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = true;
-	std::shared_ptr<RigidActorBase> actor = std::dynamic_pointer_cast<RigidActorBase>(component);
-	if (actor != nullptr)
-	{
-		if (std::find(m_rigidActors->cbegin(), m_rigidActors->cend(), actor) != m_rigidActors->cend())
-		{
-			m_rigidActors->push_back(actor);
-		}
-		else
-		{
-			SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Object " << actor->getName() << " alread added to PhysicsManager";
-			result = false;
-		}
-	}
-	return result;
+	return doAddComponent(component,m_rigidActors.get());
 }
 
 bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = false;
-
-	return result;
+	return doRemoveComponent(component, m_rigidActors.get());
 }
 
 bool PhysicsManager::doUpdate(double dt)

@@ -24,6 +24,7 @@ set(SURGSIM_PHYSICS_SOURCES
 
 set(SURGSIM_PHYSICS_HEADERS
 	PhysicsManager.h
+	PhysicsManager-inl.h
 	FreeMotionStep.h
 	TimeStep.h
 )
@@ -39,6 +40,10 @@ surgsim_add_library(
     "${SURGSIM_PHYSICS_ALL_HEADERS}"
     "SurgSim/Physics"
 )
+
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()
 
 source_group("Source Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_SOURCES})
 source_group("Header Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_HEADERS})
