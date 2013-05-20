@@ -118,7 +118,7 @@ TEST(ApplicationDataTest, OnlyValidPaths)
 	paths.push_back("Data\\ApplicationDataTest\\Directory2");
 
 	ApplicationData data(paths);
-	ASSERT_EQ(2U, data.getPaths().size());
+	ASSERT_EQ(2u, data.getPaths().size());
 }
 
 TEST(ApplicationDataTest, GetPathsTest)
@@ -132,7 +132,7 @@ TEST(ApplicationDataTest, GetPathsTest)
 	paths.push_back(path2);
 	ApplicationData data (paths);
 
-	ASSERT_EQ(2U, data.getPaths().size());
+	ASSERT_EQ(2u, data.getPaths().size());
 	
 	paths = data.getPaths();
 
@@ -156,7 +156,7 @@ TEST (ApplicationDataTest, FindFileTest)
 	std::string fileName;
 	boost::filesystem::path filePath;
 
-	ASSERT_EQ(2U, data.getPaths().size());
+	ASSERT_EQ(2u, data.getPaths().size());
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));
@@ -174,7 +174,7 @@ TEST (ApplicationDataTest, MessedUpSlashesTest)
 	paths.push_back("Data/ApplicationDataTest\\Directory2");
 	ApplicationData data(paths);
 
-	ASSERT_EQ(0U, data.getPaths().size());
+	ASSERT_EQ(0u, data.getPaths().size());
 }
 
 TEST (ApplicationDataTest, DeepPathTest)
@@ -198,7 +198,7 @@ TEST (ApplicationDataTest, InitFromFile)
 
 	ApplicationData data("Data/ApplicationDataTest/testFile1.txt");
 
-	ASSERT_EQ(2U, data.getPaths().size());
+	ASSERT_EQ(2u, data.getPaths().size());
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile1.txt","Directory1"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile2.txt","Directory2"));
 	EXPECT_TRUE(fileIsFoundCorrectly(data,"duplicatedFile.txt","Directory1"));

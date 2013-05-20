@@ -64,7 +64,7 @@ TEST(IndexDirectoryTests, SmallDirectoryTests)
 	std::shared_ptr<const IndexDirectory> dir = builder.createData().getDirectory();
 
 	EXPECT_EQ(2, dir->getNumEntries());
-	EXPECT_EQ(2U, dir->size());
+	EXPECT_EQ(2u, dir->size());
 
 	EXPECT_EQ("first", dir->getName(0));
 	EXPECT_EQ(0, dir->getIndex("first"));
