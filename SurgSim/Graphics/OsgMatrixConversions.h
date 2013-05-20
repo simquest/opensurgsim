@@ -54,14 +54,14 @@ namespace Graphics
 /// Convert 2x2 matrix of floats to OSG
 inline osg::Matrix2 toOsg(const SurgSim::Math::Matrix22f& matrix)
 {
-	return osg::Matrix2(matrix(0, 0), matrix(1, 0), 
+	return osg::Matrix2(matrix(0, 0), matrix(1, 0),
 						 matrix(0, 1), matrix(1, 1));
 }
 /// Convert 2x2 matrix of doubles to OSG
 /// Note that the OSG matrix stores the values as floats, so precision will be lost.
 inline osg::Matrix2 toOsg(const SurgSim::Math::Matrix22d& matrix)
 {
-	return osg::Matrix2(matrix(0, 0), matrix(1, 0), 
+	return osg::Matrix2(matrix(0, 0), matrix(1, 0),
 						matrix(0, 1), matrix(1, 1));
 }
 /// Convert from OSG to either 2x2 matrix of floats or doubles
