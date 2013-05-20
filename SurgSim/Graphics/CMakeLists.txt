@@ -13,21 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+find_package(OpenThreads)
+set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
 
 include_directories(
-	"${Boost_INCLUDE_DIR}"
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
-# add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Physics)
+set(SURGSIM_GRAPHICS_SOURCES
+)
 
-surgsim_cpplint_this_tree(cpplintSurgSim)
+set(SURGSIM_GRAPHICS_HEADERS
+	OsgMatrixConversions.h
+	OsgQuaternionConversions.h
+	OsgRigidTransformConversions.h
+	OsgVectorConversions.h
+)
+
+#add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})
+
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()
