@@ -76,8 +76,6 @@ TEST_F(RigidActorParametersTest, ConstructorTest)
 
 TEST_F(RigidActorParametersTest, DefaultValueTest)
 {
-	double qNaN = std::numeric_limits<double>::quiet_NaN();
-
 	// Create the base rigid actor state
 	std::shared_ptr<RigidActorParameters> rigidActorParam = std::make_shared<RigidActorParameters>();
 
@@ -92,7 +90,7 @@ TEST_F(RigidActorParametersTest, DefaultValueTest)
 	// Angular damping [default = 0]
 	EXPECT_EQ(0.0, rigidActorParam->getAngularDamping());
 	// Mesh [default = nullptr]
-	EXPECT_EQ(0, rigidActorParam->getShapes().size());
+	EXPECT_EQ(0u, rigidActorParam->getShapes().size());
 	// RigidShape [default = nullptr]
 	EXPECT_EQ(nullptr, rigidActorParam->getShapeUsedForMassInertia());
 	// isValid [default = false]
@@ -152,7 +150,7 @@ TEST_F(RigidActorParametersTest, SetGetTest)
 	EXPECT_EQ(m_sphere, rigidActorParam->getShapes()[0]);
 	rigidActorParam->setShapeUsedForMassInertia(nullptr);
 	EXPECT_EQ(nullptr, rigidActorParam->getShapeUsedForMassInertia());
-	EXPECT_EQ(1, rigidActorParam->getShapes().size());
+	EXPECT_EQ(1u, rigidActorParam->getShapes().size());
 
 	// isValid
 	rigidActorParam->setMass(m_mass);
@@ -167,20 +165,20 @@ TEST_F(RigidActorParametersTest, ShapesTest)
 
 	// RigidShape
 	rigidActorParam->setShapeUsedForMassInertia(m_sphere);
-	EXPECT_EQ(1, rigidActorParam->getShapes().size());
+	EXPECT_EQ(1u, rigidActorParam->getShapes().size());
 	rigidActorParam->addShape(m_sphere);
-	EXPECT_EQ(2, rigidActorParam->getShapes().size());
+	EXPECT_EQ(2u, rigidActorParam->getShapes().size());
 	rigidActorParam->setShapeUsedForMassInertia(nullptr);
-	EXPECT_EQ(2, rigidActorParam->getShapes().size());
+	EXPECT_EQ(2u, rigidActorParam->getShapes().size());
 	rigidActorParam->removeShape(m_sphere);
-	EXPECT_EQ(1, rigidActorParam->getShapes().size());
+	EXPECT_EQ(1u, rigidActorParam->getShapes().size());
 	rigidActorParam->removeShape(m_sphere);
-	EXPECT_EQ(0, rigidActorParam->getShapes().size());
+	EXPECT_EQ(0u, rigidActorParam->getShapes().size());
 }
 
 TEST_F(RigidActorParametersTest, ValidityCheckTest)
 {
-	double qNaN = std::numeric_limits<double>::quiet_NaN();
+	double qNaN = std::numeric_limits<double>::quiet_NaN(); 
 
 	// Create the base rigid actor state
 	std::shared_ptr<RigidActorParameters> rigidActorParam = std::make_shared<RigidActorParameters>();
