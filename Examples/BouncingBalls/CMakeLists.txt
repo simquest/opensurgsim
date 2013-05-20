@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,27 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-)
-
-set(UNIT_TEST_SOURCES
-	ActorTest.cpp
-	FixedActorTest.cpp
-	MeshShapeTest.cpp
-	RigidActorBaseStateTest.cpp
-	RigidShapeTest.cpp
-	RigidActorParametersTest.cpp
-)
-
-set(UNIT_TEST_HEADERS
+link_directories(
+	${Boost_LIBRARY_DIRS}
 )
 
 include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+	"${Boost_INCLUDE_DIR}"
 )
 
-set(LIBS SurgSimPhysics SurgSimFramework gtest ${Boost_LIBRARIES})
+set(EXAMPLE_SOURCES
+	ExampleBouncingBalls.cpp
+	Sphere.cpp
+)
 
-surgsim_add_unit_tests(SurgSimPhysicsActorsTest)
+set(EXAMPLE_HEADERS
+	Sphere.h
+)
+
+add_executable(ExampleBouncingBalls
+	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+target_link_libraries(ExampleBouncingBalls
+	${LIBS} SurgSimFramework SurgSimDataStructures
+	${Boost_LIBRARIES})
