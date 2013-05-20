@@ -162,6 +162,8 @@ public:
 
 		m_currentState  = m_initialState;
 		m_previousState = m_initialState;
+
+		updateGlobalInertiaMatrices(m_currentState);
 	}
 
 	/// Reset the rigid actor parameters to the initial parameters
@@ -170,6 +172,8 @@ public:
 		Actor::resetParameters();
 
 		m_currentParameters = m_initialParameters;
+
+		updateGlobalInertiaMatrices(m_currentState);
 	}
 
 protected:

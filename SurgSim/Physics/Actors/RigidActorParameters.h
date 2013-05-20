@@ -40,8 +40,7 @@ class RigidActorParameters
 public:
 	/// Default constructor
 	RigidActorParameters()
-		: m_isValid(false), m_rho(0.0),
-		m_linearDamping(0.0), m_angularDamping(0.0)
+		: m_rho(0.0), m_linearDamping(0.0), m_angularDamping(0.0), m_isValid(false)
 	{
 		m_massCenter.setZero();
 
@@ -98,15 +97,12 @@ public:
 	/// \note if any.
 	void setDensity(double rho)
 	{
-		double volume;
-
 		m_rho = rho;
 
 		/// Lets update the mass, mass-center and inertia if possible
 		if (m_rho && m_shapeForMassInertia)
 		{
 			// If a shape overwrite a mesh, the shape should be used !
-			volume         = m_shapeForMassInertia->calculateVolume();
 			m_mass         = m_shapeForMassInertia->calculateMass(m_rho);
 			m_massCenter   = m_shapeForMassInertia->calculateMassCenter();
 			m_localInertia = m_shapeForMassInertia->calculateInertia(m_rho);
@@ -247,8 +243,6 @@ public:
 
 		if (m_rho && m_shapeForMassInertia)
 		{
-			double volume;
-			volume         = m_shapeForMassInertia->calculateVolume();
 			m_mass         = m_shapeForMassInertia->calculateMass(m_rho);
 			m_massCenter   = m_shapeForMassInertia->calculateMassCenter();
 			m_localInertia = m_shapeForMassInertia->calculateInertia(m_rho);

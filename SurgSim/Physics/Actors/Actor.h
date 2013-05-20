@@ -34,7 +34,7 @@ public:
 	/// Constructor
 	/// \param name The actor's name
 	explicit Actor(const std::string& name)
-		: Representation(name), m_numDof(0), m_gravity(0.0, -9.81, 0.0),
+		: Representation(name), m_gravity(0.0, -9.81, 0.0), m_numDof(0),
 		m_isGravityEnabled(true), m_isActive(true)
 	{
 	}
@@ -117,9 +117,12 @@ protected:
 		m_numDof = numDof;
 	}
 
-	/// Gravity vector
-	/// Needs to be in protected to be accessible from derived classes
-	const SurgSim::Math::Vector3d m_gravity;
+	/// Get the gravity used by this Actor
+	/// \return The gravity vector
+	const SurgSim::Math::Vector3d& getGravity() const
+	{
+		return m_gravity;
+	}
 
 private:
 	/// NO copy constructor
@@ -127,6 +130,9 @@ private:
 	
 	/// NO assignement operator
 	Actor& operator =(const Actor &a);
+
+	/// Gravity vector
+	const SurgSim::Math::Vector3d m_gravity;
 
 	/// Number of degrees of freedom for this actor
 	unsigned int m_numDof;
