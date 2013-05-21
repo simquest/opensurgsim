@@ -112,6 +112,6 @@ TEST(CameraTests, UpdateTest)
 
 		camera.update(dt);
 		EXPECT_EQ(i, camera.getNumUpdates());
-		EXPECT_EQ(sumDt, camera.getSumDt());
+		EXPECT_LT(fabs(sumDt - camera.getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }

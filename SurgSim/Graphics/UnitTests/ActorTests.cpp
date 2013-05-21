@@ -90,6 +90,6 @@ TEST(ActorTests, UpdateTest)
 
 		actor->update(dt);
 		EXPECT_EQ(i, mockActor->getNumUpdates());
-		EXPECT_EQ(sumDt, mockActor->getSumDt());
+		EXPECT_LT(fabs(sumDt - mockActor->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
