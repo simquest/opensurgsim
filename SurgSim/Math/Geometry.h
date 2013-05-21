@@ -940,10 +940,16 @@ bool doesCollideSegmentTriangle(
 	// Get intersect point of ray with triangle plane
 	T r = a / b;
 	// Ray goes away from triangle
-	if (r < 0 || r > 1)
+	if (r < -Geometry::DistanceEpsilon)
 	{
 		return false;
 	}
+	//Ray comes toward triangle but isn't long enough to reach it
+	if(r > 1+Geometry::DistanceEpsilon)
+	{
+		return false;
+	}
+
 	// Intersect point of ray and plane
 	Eigen::Matrix<T, 3, 1, MOpt> presumedIntersection = sv0 + r * dir;
 	// Collision point inside T?
