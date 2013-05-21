@@ -48,37 +48,37 @@ TEST(GroupTests, AddRemoveTest)
 	std::shared_ptr<MockGroup> group1 = std::make_shared<MockGroup>("test group 1");
 	std::shared_ptr<MockGroup> group2 = std::make_shared<MockGroup>("test group 2");
 
-	EXPECT_EQ(0, group->getActors().size());
-	EXPECT_EQ(0, group->getGroups().size());
+	EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(0u, group->getGroups().size());
 
 	/// Add an actor
 	EXPECT_TRUE(group->addActor(actor1));
-	EXPECT_EQ(1, group->getActors().size());
+	EXPECT_EQ(1u, group->getActors().size());
 	EXPECT_NE(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor1));
 
 	/// Add a group
 	EXPECT_TRUE(group->addGroup(group1));
-	EXPECT_EQ(1, group->getGroups().size());
+	EXPECT_EQ(1u, group->getGroups().size());
 	EXPECT_NE(group->getGroups().end(), std::find(group->getGroups().begin(), group->getGroups().end(), group1));
 
 	/// Add another group
 	EXPECT_TRUE(group->addGroup(group2));
-	EXPECT_EQ(2, group->getGroups().size());
+	EXPECT_EQ(2u, group->getGroups().size());
 	EXPECT_NE(group->getGroups().end(), std::find(group->getGroups().begin(), group->getGroups().end(), group2));
 
 	/// Add another actor
 	EXPECT_TRUE(group->addActor(actor2));
-	EXPECT_EQ(2, group->getActors().size());
+	EXPECT_EQ(2u, group->getActors().size());
 	EXPECT_NE(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor2));
 
 
 	/// Try to add a duplicate actor
 	EXPECT_FALSE(group->addActor(actor1));
-	EXPECT_EQ(2, group->getActors().size());
+	EXPECT_EQ(2u, group->getActors().size());
 
 	/// Try to add a duplicate group
 	EXPECT_FALSE(group->addGroup(group2));
-	EXPECT_EQ(2, group->getGroups().size());
+	EXPECT_EQ(2u, group->getGroups().size());
 
 
 	/// Remove a group

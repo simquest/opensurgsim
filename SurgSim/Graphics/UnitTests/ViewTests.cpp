@@ -100,6 +100,6 @@ TEST(ViewTests, UpdateTest)
 
 		view->update(dt);
 		EXPECT_EQ(i, mockView->getNumUpdates());
-		EXPECT_EQ(sumDt, mockView->getSumDt());
+		EXPECT_LT(fabs(sumDt - mockView->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
