@@ -32,9 +32,8 @@ using SurgSim::Math::Vector3d;
 class PhysicsManagerTest : public ::testing::Test
 {
 protected:
-	virtual void SetUp() 
+	virtual void SetUp()
 	{
-
 		runtime = std::make_shared<Runtime>();
 		physicsManager = std::make_shared<PhysicsManager>();
 

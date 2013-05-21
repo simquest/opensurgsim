@@ -40,12 +40,12 @@ FreeMotion::~FreeMotion()
 void FreeMotion::doUpdate(double dt)
 {
 	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
-	
+
 	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
 
 	auto it = actors->begin();
 	auto itEnd = actors->end();
-	for (;it != itEnd;++it)
+	for (; it != itEnd; ++it)
 	{
 		(*it)->update(dt);
 	}

@@ -24,7 +24,7 @@
 #include <SurgSim/Framework/Log.h>
 
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Framework
 {
@@ -39,7 +39,7 @@ class Actor;
 class FreeMotion;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
-/// separate the algorithmic steps into smaller pieces. 
+/// separate the algorithmic steps into smaller pieces.
 class PhysicsManager : public SurgSim::Framework::ComponentManager
 {
 public:

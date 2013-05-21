@@ -29,13 +29,18 @@ class Computation
 public:
 
 	/// Constructor
-	Computation() {};
-	virtual ~Computation() {};
+	Computation()
+	{
+	}
+	/// Destructor
+	virtual ~Computation()
+	{
+	}
 
 	/// Public Interface execute this objects computations, dt is the time from
 	/// the last update call in seconds
 	inline void update(double dt)
-	{ 
+	{
 		doUpdate(dt);
 	};
 
