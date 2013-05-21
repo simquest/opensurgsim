@@ -25,11 +25,11 @@ namespace SurgSim
 namespace Framework
 {
 
-/// Factory for acquiring new or unused existing instances of class T to reduce repeated deallocation and reallocation 
+/// Factory for acquiring new or unused existing instances of class T to reduce repeated deallocation and reallocation
 /// of objects with short lifespans.
 ///
 /// Example Usage:
-/// \code{.cpp} 
+/// \code{.cpp}
 /// {
 ///		// Create an instance of the factory to provide instances of MyObject.
 ///		ReuseFactory<MyObject> factory;
@@ -38,7 +38,7 @@ namespace Framework
 ///		// Setup the provided object, as the state is not guaranteed to be initialized.
 ///		myObject.set(...);
 /// }
-/// // When myObject goes out of scope, it will automatically be added back to the factory for reuse later. 
+/// // When myObject goes out of scope, it will automatically be added back to the factory for reuse later.
 /// // This will return the previous, now unused, instance rather than allocating anew.
 /// std::shared_ptr<MyObject> myObject2 = factory.getInstance();
 /// // Setup the provided object, as the state is not guaranteed to be initialized.
@@ -88,7 +88,9 @@ private:
 	public:
 		/// Constructor
 		/// \param factory ReuseFactory with the collection of unused object for reuse.
-		Deleter(ReuseFactory* factory) : m_factory(factory) {}
+		explicit Deleter(ReuseFactory* factory) : m_factory(factory)
+		{
+		}
 		/// Deletion method, adds the object to the ReuseFactory's collection.
 		/// \param unusedObject Object that is no longer referenced by any shared pointers
 		void operator()(T* unusedObject) const

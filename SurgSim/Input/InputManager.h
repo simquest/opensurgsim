@@ -38,14 +38,14 @@ namespace Input
 class InputManager : public SurgSim::Framework::ComponentManager
 {
 public:
-	InputManager() ;
-	virtual ~InputManager(void);
+	InputManager();
+	virtual ~InputManager();
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
-	/// function in the device. For an InputComonent this will suceed if the device name 
-	/// inside the component is known to the InputManager and if the component has not 
+	/// function in the device. For an InputComonent this will succeed if the device name
+	/// inside the component is known to the InputManager and if the component has not
 	/// been added as an input yet. For an OutputComponent the call will fail if the device
-	/// does not exist or 
+	/// does not exist or the device has already been assigned an output.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_FRAMEWORK_BEHAVIOR_H
 #define SURGSIM_FRAMEWORK_BEHAVIOR_H
 
-#include "Component.h"
+#include "SurgSim/Framework/Component.h"
 
 namespace SurgSim
 {
@@ -29,8 +29,12 @@ namespace Framework
 class Behavior: public Component
 {
 public:
-	Behavior(const std::string& name) : Component(name) {};
-	virtual ~Behavior() {};
+	explicit Behavior(const std::string& name) : Component(name)
+	{
+	}
+	virtual ~Behavior()
+	{
+	}
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.

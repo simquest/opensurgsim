@@ -121,7 +121,7 @@ bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output)
 			{
 				SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
 					" Trying to add OutputProducer " << output->getName() << " to device " << output->getDeviceName() <<
-					" but the device already has and OutputProducer assigned, this add will be ignored!";
+					" but the device already has an OutputProducer assigned, this add will be ignored!";
 			}
 		}
 		else

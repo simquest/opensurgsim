@@ -51,7 +51,7 @@ public:
 	///							one per line, to search for application data. If no config file
 	/// 						is given "." will be used as default path.
 	explicit Runtime(const std::string& configFilePath);
-	
+
 	/// Destructor.
 	~Runtime();
 
@@ -90,7 +90,7 @@ public:
 	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
 	std::shared_ptr<Runtime> getSharedPtr();
-	 
+
 	/// Gets a logger. If the logger does not exist yet it will be created with
 	/// the given name and a default output. Cleaning up the logger will be the
 	/// responsibility of this class, keep the logger reference
@@ -115,8 +115,8 @@ private:
 	/// \return	true if it succeeds, false if it fails.
 	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
 
-	/// Initializes the search paths. 
-	/// \param	configFilePath	Full pathname of the configuration file, if path is empty 
+	/// Initializes the search paths.
+	/// \param	configFilePath	Full pathname of the configuration file, if path is empty
 	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
 	bool m_isRunning;
