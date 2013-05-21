@@ -32,7 +32,7 @@ TEST(NamedDataTests, CanConstruct)
 	NamedData<float> data = builder.createData();
 
 	EXPECT_EQ(1, data.getNumEntries());
-	EXPECT_EQ(1U, data.size());
+	EXPECT_EQ(1u, data.size());
 
 	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
@@ -59,7 +59,7 @@ TEST(NamedDataTests, CanCreateShared)
 	std::shared_ptr<NamedData<float>> data = builder.createSharedData();
 
 	EXPECT_EQ(1, data->getNumEntries());
-	EXPECT_EQ(1U, data->size());
+	EXPECT_EQ(1u, data->size());
 
 	EXPECT_TRUE(data->isValid());
 	EXPECT_TRUE(data->hasEntry(0));
@@ -86,7 +86,7 @@ TEST(NamedDataTests, CanConstructFromNames)
 	NamedData<float> data(names);
 
 	EXPECT_EQ(1, data.getNumEntries());
-	EXPECT_EQ(1U, data.size());
+	EXPECT_EQ(1u, data.size());
 
 	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));

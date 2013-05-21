@@ -31,15 +31,15 @@ TEST(SceneTest, ElementManagement)
 	std::shared_ptr<MockSceneElement> element1(new MockSceneElement("one"));
 	std::shared_ptr<MockSceneElement> element2(new MockSceneElement("two"));
 
-	EXPECT_EQ(0U, scene->getSceneElements().size());
+	EXPECT_EQ(0u, scene->getSceneElements().size());
 
 	EXPECT_TRUE(scene->addSceneElement(element1));
-	EXPECT_EQ(1U, scene->getSceneElements().size());
+	EXPECT_EQ(1u, scene->getSceneElements().size());
 	EXPECT_TRUE(scene->addSceneElement(element2));
-	EXPECT_EQ(2U, scene->getSceneElements().size());
+	EXPECT_EQ(2u, scene->getSceneElements().size());
 
 	EXPECT_FALSE(scene->addSceneElement(element1));
-	EXPECT_EQ(2U, scene->getSceneElements().size());
+	EXPECT_EQ(2u, scene->getSceneElements().size());
 
 	EXPECT_EQ(element1, scene->getSceneElement("one"));
 	EXPECT_EQ(element2, scene->getSceneElement("two"));
