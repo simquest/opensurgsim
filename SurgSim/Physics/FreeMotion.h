@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTIONSTEP_H
-#define SURGSIM_PHYSICS_FREEMOTIONSTEP_H
+#ifndef SURGSIM_PHYSICS_FREEMOTION_H
+#define SURGSIM_PHYSICS_FREEMOTION_H
 
 #include <memory>
 #include <vector>
