@@ -18,6 +18,7 @@
 #include <vector>
 
 #include <SurgSim/Physics/FreeMotion.h>
+#include <SurgSim/Physics/Actors/Actor.h>
 
 namespace SurgSim
 {
@@ -25,7 +26,7 @@ namespace Physics
 {
 
 
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> actors) :
+FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
 	m_actors(actors)
 {
 
@@ -38,7 +39,16 @@ FreeMotion::~FreeMotion()
 
 void FreeMotion::doUpdate(double dt)
 {
-	// Call freemotion on the rigidactor base but it is not in there yet ...
+	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
+	
+	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
+
+	auto it = actors->begin();
+	auto itEnd = actors->end();
+	for (;it != itEnd;++it)
+	{
+		(*it)->update(dt);
+	}
 }
 
 

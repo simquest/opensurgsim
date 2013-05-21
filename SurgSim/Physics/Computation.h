@@ -30,7 +30,7 @@ public:
 
 	/// Constructor
 	Computation() {};
-	~Computation() {};
+	virtual ~Computation() {};
 
 	/// Public Interface execute this objects computations, dt is the time from
 	/// the last update call in seconds

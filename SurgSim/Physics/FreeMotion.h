@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-class RigidActorBase;
+class Actor;
 
 /// Apply the Freemotion calcluation to all physics representations
 class FreeMotion  : public Computation
@@ -35,13 +35,13 @@ class FreeMotion  : public Computation
 public:
 
 	/// Constructor
-	FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> m_actors);
+	FreeMotion( std::shared_ptr<std::vector<std::shared_ptr<Actor>>> m_actors);
 	~FreeMotion();
 
 protected:
 
 	virtual void doUpdate(double dt);
-	std::shared_ptr<std::vector<std::shared_ptr<RigidActorBase>>> m_actors;
+	std::weak_ptr<std::vector<std::shared_ptr<Actor>>> m_actors;
 };
 
 }; // Physics

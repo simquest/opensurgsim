@@ -35,7 +35,7 @@ namespace Framework
 namespace Physics
 {
 
-class RigidActorBase;
+class Actor;
 class FreeMotion;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
@@ -80,7 +80,7 @@ protected:
 
 private:
 
-	std::shared_ptr< std::vector<std::shared_ptr<RigidActorBase>> > m_rigidActors;
+	std::shared_ptr< std::vector<std::shared_ptr<Actor>> > m_actors;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	///@{
