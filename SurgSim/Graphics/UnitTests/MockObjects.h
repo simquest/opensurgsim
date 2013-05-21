@@ -77,11 +77,11 @@ public:
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
 	explicit MockActor(const std::string& name) : SurgSim::Graphics::Actor(name),
+		m_isVisible(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
-		m_isAwoken(false),
-		m_isVisible(true)
+		m_isAwoken(false)
 	{
 		m_transform.setIdentity();
 	}
