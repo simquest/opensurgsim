@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_TIMESTEP_H
-#define SURGSIM_PHYSICS_TIMESTEP_H
+#ifndef SURGSIM_PHYSICS_COMPUTATION_H
+#define SURGSIM_PHYSICS_COMPUTATION_H
 
 #include <vector>
 
@@ -52,8 +52,7 @@ protected:
 };
 
 
-
 }; // Physics
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_PHYSICS_COMPUTATION_H
