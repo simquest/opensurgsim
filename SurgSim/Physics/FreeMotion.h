@@ -35,7 +35,7 @@ class FreeMotion  : public Computation
 public:
 
 	/// Constructor
-	FreeMotion( std::shared_ptr<std::vector<std::shared_ptr<Actor>>> m_actors);
+	explicit FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> m_actors);
 	~FreeMotion();
 
 protected:

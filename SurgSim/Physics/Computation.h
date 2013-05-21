@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_TIMESTEP_H
-#define SURGSIM_PHYSICS_TIMESTEP_H
+#ifndef SURGSIM_PHYSICS_COMPUTATION_H
+#define SURGSIM_PHYSICS_COMPUTATION_H
 
 #include <vector>
 
@@ -29,13 +29,18 @@ class Computation
 public:
 
 	/// Constructor
-	Computation() {};
-	virtual ~Computation() {};
+	Computation()
+	{
+	}
+	/// Destructor
+	virtual ~Computation()
+	{
+	}
 
 	/// Public Interface execute this objects computations, dt is the time from
 	/// the last update call in seconds
 	inline void update(double dt)
-	{ 
+	{
 		doUpdate(dt);
 	};
 
@@ -47,8 +52,7 @@ protected:
 };
 
 
-
 }; // Physics
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_PHYSICS_COMPUTATION_H

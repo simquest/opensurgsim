@@ -29,8 +29,8 @@ std::shared_ptr<T> PhysicsManager::doAddComponent(std::shared_ptr<SurgSim::Frame
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " component " << component->getName() << 
-				"already added to " << getName();
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " component " << component->getName() <<
+				" already added to " << getName();
 			typedComponent = nullptr;
 		}
 	}
