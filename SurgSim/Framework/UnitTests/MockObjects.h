@@ -32,10 +32,10 @@
 class MockSceneElement : public SurgSim::Framework::SceneElement
 {
 public:
-	explicit MockSceneElement(const std::string& name = "MockSceneElement") : 
+	explicit MockSceneElement(const std::string& name = "MockSceneElement") :
 		SceneElement(name),
-		didInit(false), 
-		didWakeUp(false), 
+		didInit(false),
+		didWakeUp(false),
 		didUpdate(false),
 		didLateUpdate(false),
 		didFixedUpdate(false)
@@ -195,8 +195,11 @@ public:
 		isAwoken(false),
 		isInitialized(false),
 		updateCount(0)
-	{};
-	virtual ~MockBehavior() {};
+	{
+	}
+	virtual ~MockBehavior()
+	{
+	}
 
 	virtual bool doInitialize()
 	{
