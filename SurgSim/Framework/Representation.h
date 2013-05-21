@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "Component.h"
+#include "SurgSim/Framework/Component.h"
 
 namespace SurgSim
 {
@@ -27,13 +27,13 @@ namespace Framework
 
 class SceneElement;
 
-/// Representations are manifestations of a SceneElement. For example, a 
+/// Representations are manifestations of a SceneElement. For example, a
 /// SceneElement can be represented in graphics, physics, etc. Each of these
 /// representation will be derived from this class.
 class Representation : public Component
 {
 public:
-	Representation(const std::string& m_name);;
+	explicit Representation(const std::string& m_name);
 	virtual ~Representation();
 private:
 	virtual bool doInitialize();

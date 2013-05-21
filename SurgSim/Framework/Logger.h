@@ -26,7 +26,7 @@ namespace SurgSim
 {
 namespace Framework
 {
-	
+
 /// \addtogroup loggingAPI
 /// @{
 

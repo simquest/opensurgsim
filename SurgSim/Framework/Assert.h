@@ -33,7 +33,7 @@ namespace Framework
 /// The assertion API used by OpenSurgSim code.
 /// \sa loggingAPI
 /// @{
-	
+
 /// \defgroup assertInternals Internal assertion helpers
 /// Not meant for public consumption.
 

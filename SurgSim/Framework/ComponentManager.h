@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include "BasicThread.h"
+#include "SurgSim/Framework/BasicThread.h"
 
 namespace SurgSim
 {
@@ -37,13 +37,13 @@ class ComponentManager : public BasicThread
 {
 public:
 	explicit ComponentManager(const std::string& name = "Unknown Component Manager") :
-        BasicThread(name)
-    {
-    }
+		BasicThread(name)
+	{
+	}
 
 	virtual ~ComponentManager()
-    {
-    }
+	{
+	}
 
 	/// Handle representations, override for each thread
 	/// \param component	The component to be removed.
@@ -58,14 +58,14 @@ public:
 	/// @{
 	/// Runtime accessors
 	std::shared_ptr<Runtime> getRuntime() const
-    {
-	    return m_runtime.lock();
-    }
+	{
+		return m_runtime.lock();
+	}
 
 	void setRuntime(std::shared_ptr<Runtime> val)
-    {
-	    m_runtime = val;
-    }
+	{
+		m_runtime = val;
+	}
 	/// @}
 
 private:

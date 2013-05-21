@@ -36,7 +36,7 @@ namespace Framework
 
 /// Enable searching for files in a given list of paths, give access to the current directory and
 /// wrap boost::filesystem functionality
-class ApplicationData 
+class ApplicationData
 {
 public:
 
@@ -59,10 +59,10 @@ public:
 	std::vector<std::string> getPaths() const;
 
 	/// Searches for the first occurrence of fileName amongst the given paths, the
-	/// search is shallow, only direct content of the directories in the path list 
-	/// will be used as search candidates. 
+	/// search is shallow, only direct content of the directories in the path list
+	/// will be used as search candidates.
 	/// \param	fileName	Filename of the file.
-	/// \return	The absolute path to the file in system format i.e c:\\xxx\\yyy\\file.txt for 
+	/// \return	The absolute path to the file in system format i.e c:\\xxx\\yyy\\file.txt for
 	/// 		windows and /xxx/yyy/file.txt for all other systems. An empty string will be
 	/// 		returned if the file cannot be found.
 	std::string findFile(const std::string& fileName) const;
@@ -88,7 +88,7 @@ private:
 	/// Sets the list of search paths to be used for finding the location of files.
 	/// Eliminates duplicate paths and paths that do not exist
 	/// \param	paths	The paths to be used for finding files.
-	/// \return	true if it succeeds, false if one or more of the paths 
+	/// \return	true if it succeeds, false if one or more of the paths
 	/// 		do not exist in the system or are duplicated.
 	bool setPaths(const std::vector<std::string>& paths);
 
