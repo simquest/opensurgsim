@@ -20,22 +20,21 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	ActorTest.cpp
-	FixedActorTest.cpp
-	MeshShapeTest.cpp
-	RigidActorBaseStateTest.cpp
-	RigidActorParametersTest.cpp
-	RigidActorStateTest.cpp
-	RigidActorTest.cpp
-	RigidShapeTest.cpp
+	ActorTests.cpp
+	CameraTests.cpp
+	GroupTests.cpp
+	ManagerTests.cpp
+	ViewElementTests.cpp
+	ViewTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	MockObjects.h
 )
 
 include_directories(
 )
 
-set(LIBS SurgSimPhysics SurgSimFramework gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES})
 
-surgsim_add_unit_tests(SurgSimPhysicsActorsTest)
+surgsim_add_unit_tests(SurgSimGraphicsTest)
