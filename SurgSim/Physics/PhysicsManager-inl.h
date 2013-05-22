@@ -36,7 +36,7 @@ std::shared_ptr<T> PhysicsManager::tryAddComponent(std::shared_ptr<SurgSim::Fram
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << SURGSIM_CURRENT_FUNCTION << " component " << component->getName() <<
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " component " << component->getName() <<
 				" already added to " << getName();
 			typedComponent = nullptr;
 		}
@@ -56,7 +56,7 @@ bool PhysicsManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Comp
 		if (found != container->end())
 		{
 			container->erase(found);
-			SURGSIM_LOG_DEBUG(m_logger) << SURGSIM_CURRENT_FUNCTION << " Removed component " << typedComponent->getName();
+			SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Removed component " << typedComponent->getName();
 			result = true;
 		}
 		else

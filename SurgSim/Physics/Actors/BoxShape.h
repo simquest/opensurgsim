@@ -18,7 +18,7 @@
 
 #include <SurgSim/Physics/Actors/RigidShape.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -36,6 +36,13 @@ public:
 		m_size[0] = sizeX;
 		m_size[1] = sizeY;
 		m_size[2] = sizeZ;
+	}
+
+
+	/// \return the type of the shape
+	int getType()
+	{
+		return RIGID_SHAPE_TYPE_BOX;
 	}
 
 	/// Get size in X direction

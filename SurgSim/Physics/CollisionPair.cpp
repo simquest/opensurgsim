@@ -13,16 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_SHAPES_H
-#define SURGSIM_PHYSICS_SHAPES_H
+#include <numeric>
+#include <SurgSim/Framework/Assert.h>
+#include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Physics/CollisionRepresentation.h>
 
-/// This file includes all the shapes
-#include <SurgSim/Physics/Actors/BoxShape.h>
-#include <SurgSim/Physics/Actors/CapsuleShape.h>
-#include <SurgSim/Physics/Actors/CylinderShape.h>
-#include <SurgSim/Physics/Actors/MeshShape.h>
-#include <SurgSim/Physics/Actors/SphereShape.h>
+namespace SurgSim
+{
+namespace Physics
+{
 
+CollisionPair::CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second) :
+		m_representations(first, second)
+{
+	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Colliders cannot be null";
+}
 
+CollisionPair::~CollisionPair()
+{
 
-#endif /// SURGSIM_PHYSICS_SHAPES_H
+}
+
+void CollisionPair::clearContacts()
+{
+	m_contacts.clear();
+}
+
+}; // namespace Physics
+}; // namespace SurgSim
+

@@ -20,7 +20,7 @@
 
 #include <SurgSim/Math/RigidTransform.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics

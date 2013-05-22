@@ -19,7 +19,7 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -29,6 +29,17 @@ namespace Physics
 /// (i.e. CylinderShape and CapsuleShape)
 typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTION_AXIS_Z=2} ShapeDirection;
 
+/// Fixed List of enums for the available RigidShape types, do not explicitely assign values, RigidShapeCount is
+/// used to determine the number of actual shape types
+typedef enum {
+	RIGID_SHAPE_TYPE_SPHERE = 0,
+	RIGID_SHAPE_TYPE_BOX,
+	RIGID_SHAPE_TYPE_CYLINDER,
+	RIGID_SHAPE_TYPE_CAPSULE,
+	RIGID_SHAPE_TYPE_MESH,
+	RIGID_SHAPE_TYPE_COUNT
+} RigidShapeType;
+
 /// Generic rigid shape class defining a shape for a rigid actor
 /// \note This class gives the ability to analyse the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
@@ -37,6 +48,11 @@ class RigidShape
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
+	
+	virtual ~RigidShape() {}
+
+	/// \return the type of shape
+	virtual int getType() = 0;
 
 	/// Calculate the volume of the shape
 	/// \return The volume of the shape (in m-3)

@@ -50,7 +50,7 @@ struct FreeMotionTest: public ::testing::Test
 
 TEST(FreeMotionTest, RunTest)
 {
-	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors = 
+	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors =
 		std::make_shared<std::vector<std::shared_ptr<Actor>>>();
 	std::shared_ptr<RigidActor> actor = std::make_shared<RigidActor>("TestSphere");
 

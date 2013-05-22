@@ -45,8 +45,7 @@ void RigidActor::update(double dt)
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
-	using namespace SurgSim::Framework;
-	
+
 	if (! isActive() || ! m_currentParameters.isValid())
 	{
 		return;
@@ -120,7 +119,7 @@ void RigidActor::update(double dt)
 	condition &= qNorm != 0.0;
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(! condition, Logger::getDefaultLogger(), DEBUG) << getName() <<
+	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
 		" deactivated and reset because:" << std::endl << "m_G=(" <<
 		G[0] << "," << G[1] << "," << G[2] << ") " <<
 		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
