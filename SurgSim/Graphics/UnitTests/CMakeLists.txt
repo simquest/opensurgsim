@@ -14,10 +14,7 @@
 # limitations under the License.
 
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
-
 find_package(OpenThreads)
-set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
