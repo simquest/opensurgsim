@@ -64,9 +64,11 @@ public:
 
 	/// Sets the camera which provides the viewpoint in the scene
 	/// \param	camera	Camera whose image will be shown in this view
-	virtual void setCamera(std::shared_ptr<Camera> camera)
+	/// \return	True if it succeeded, false if it failed
+	virtual bool setCamera(std::shared_ptr<Camera> camera)
 	{
 		m_camera = camera;
+		return true;
 	}
 	/// Gets the camera which provides the viewpoint in the scene
 	/// \return	camera	Camera whose image will be shown in this view
