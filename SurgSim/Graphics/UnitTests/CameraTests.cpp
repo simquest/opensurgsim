@@ -33,7 +33,7 @@ using SurgSim::Math::Vector3d;
 
 TEST(CameraTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<MockCamera> camera = std::make_shared<MockCamera>("test name");});
+	ASSERT_NO_THROW({std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test name");});
 }
 
 TEST(CameraTests, NameTest)
@@ -67,16 +67,15 @@ TEST(CameraTests, GroupTest)
 
 TEST(CameraTests, PoseAndMatricesTest)
 {
-	std::shared_ptr<MockCamera> camera = std::make_shared<MockCamera>("test name");
+	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test name");
 
 	EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
 
 	/// Create a random rigid body transform
 	Vector3d translation = Vector3d::Random();
-    
 	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
 	quaternion.normalize();
-    RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
 
 	/// Set the transform and make sure it was set correctly
 	camera->setPose(transform);
