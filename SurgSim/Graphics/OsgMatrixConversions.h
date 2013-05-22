@@ -58,7 +58,8 @@ template <typename T, int MOpt> inline
 const osg::Matrix2 toOsg(const Eigen::Matrix<T, 2, 2, MOpt>& matrix)
 {
 	osg::Matrix2 osgMatrix;
-	Eigen::Map<Eigen::Matrix<float, 2, 2, Eigen::ColMajor>>(osgMatrix.ptr()) = matrix.cast<float>();
+	Eigen::Map<Eigen::Matrix<float, 2, 2, Eigen::ColMajor>> osgMatrixMap(osgMatrix.ptr());
+	osgMatrixMap = matrix.template cast<float>();
 	return osgMatrix;
 }
 
@@ -78,7 +79,8 @@ template <typename T, int MOpt> inline
 const osg::Matrix3 toOsg(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 {
 	osg::Matrix3 osgMatrix;
-	Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>>(osgMatrix.ptr()) = matrix.cast<float>();
+	Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>> osgMatrixMap(osgMatrix.ptr());
+	osgMatrixMap = matrix.template cast<float>();
 	return osgMatrix;
 }
 
