@@ -13,10 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
+
+find_package(OpenThreads)
+set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -24,18 +32,19 @@ set(UNIT_TEST_SOURCES
 	CameraTests.cpp
 	GroupTests.cpp
 	ManagerTests.cpp
+	OsgActorTests.cpp
+	OsgGroupTests.cpp
 	ViewElementTests.cpp
 	ViewTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
+	MockOsgObjects.h
 )
 
-include_directories(
-)
+set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
-set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES})
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	set(LIBS ${LIBS} rt)
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
