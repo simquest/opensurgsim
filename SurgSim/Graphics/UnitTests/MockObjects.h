@@ -1,0 +1,513 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2012-2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Graphics/Actor.h"
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/Group.h"
+#include "SurgSim/Graphics/Manager.h"
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/ViewElement.h"
+
+/// Manager class for testing
+class MockManager : public SurgSim::Graphics::Manager
+{
+public:
+	/// Constructor
+	/// \post m_numUpdates and m_sumDt are initialized to 0
+	MockManager() : SurgSim::Graphics::Manager(),
+		m_numUpdates(0),
+		m_sumDt(0.0)
+	{
+	}
+
+	/// Returns the number of times the manager has been updated
+	int getNumUpdates() const
+	{
+		return m_numUpdates;
+	}
+	/// Returns the sum of the dt that the manager has been updated with
+	double getSumDt() const
+	{
+		return m_sumDt;
+	}
+
+private:
+	/// Updates the manager.
+	/// \param	dt	The time in seconds of the preceding timestep.
+	/// \post	m_numUpdates is incremented and dt is added to m_sumDt
+	virtual bool doUpdate(double dt)
+	{
+		if (Manager::doUpdate(dt))
+		{
+			++m_numUpdates;
+			m_sumDt += dt;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/// Number of times the manager has been updated
+	int m_numUpdates;
+	/// Sum of the dt that the manager has been updated with
+	double m_sumDt;
+};
+
+/// Actor class for testing
+class MockActor : public SurgSim::Graphics::Actor
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the actor
+	/// \post m_numUpdates and m_sumDt are initialized to 0
+	/// \post m_transform is set to identity
+	explicit MockActor(const std::string& name) : SurgSim::Graphics::Actor(name),
+		m_isVisible(true),
+		m_numUpdates(0),
+		m_sumDt(0.0),
+		m_isInitialized(false),
+		m_isAwoken(false)
+	{
+		m_transform.setIdentity();
+	}
+
+	/// Sets whether the actor is currently visible
+	/// \param	visible	True for visible, false for invisible
+	virtual void setVisible(bool visible)
+	{
+		m_isVisible = visible;
+	}
+
+	/// Gets whether the actor is currently visible
+	/// \return	visible	True for visible, false for invisible
+	virtual bool isVisible() const
+	{
+		return m_isVisible;
+	}
+
+	/// Returns the number of times the actor has been updated
+	int getNumUpdates() const
+	{
+		return m_numUpdates;
+	}
+	/// Returns the sum of the dt that the actor has been updated with
+	double getSumDt() const
+	{
+		return m_sumDt;
+	}
+
+	/// Sets the pose of the actor
+	/// \param	transform	Rigid transformation that describes the pose of the actor
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+		m_transform = transform;
+	}
+
+	/// Gets the pose of the actor
+	/// \return	Rigid transformation that describes the pose of the actor
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	{
+		return m_transform;
+	}
+
+	/// Updates the actor.
+	/// \param	dt	The time in seconds of the preceding timestep.
+	/// \post m_numUpdates is incremented and dt is added to m_sumDt
+	virtual void update(double dt)
+	{
+		++m_numUpdates;
+		m_sumDt += dt;
+	}
+
+	/// Gets whether the actor has been initialized
+	bool isInitialized() const
+	{
+		return m_isInitialized;
+	}
+	/// Gets whether the actor has been awoken
+	bool isAwoken() const
+	{
+		return m_isAwoken;
+	}
+
+private:
+	/// Initializes the actor
+	/// \post m_isInitialized is set to true
+	virtual bool doInitialize()
+	{
+		m_isInitialized = true;
+		return true;
+	}
+	/// Wakes up the actor
+	/// \post m_isAwoken is set to true
+	virtual bool doWakeUp()
+	{
+		m_isAwoken = true;
+		return true;
+	}
+
+	/// Whether this actor is currently visible or not
+	bool m_isVisible;
+
+	/// Number of times the actor has been updated
+	int m_numUpdates;
+	/// Sum of the dt that the actor has been updated with
+	double m_sumDt;
+
+	/// Whether the actor has been initialized
+	bool m_isInitialized;
+	/// Whether the actor has been awoken
+	bool m_isAwoken;
+
+	/// Rigid transform describing pose of the actor
+	SurgSim::Math::RigidTransform3d m_transform;
+};
+
+class MockGroup : public SurgSim::Graphics::Group
+{
+public:
+	/// Constructor. The group is initially empty.
+	/// \param	name	Name of the group
+	explicit MockGroup(const std::string& name) : SurgSim::Graphics::Group(name)
+	{
+	}
+
+	/// Sets whether the group is currently visible
+	/// \param	visible	True for visible, false for invisible
+	virtual void setVisible(bool visible)
+	{
+		m_isVisible = visible;
+	}
+
+	/// Gets whether the group is currently visible
+	/// \return	visible	True for visible, false for invisible
+	virtual bool isVisible() const
+	{
+		return m_isVisible;
+	}
+
+private:
+	/// Whether this group is currently visible or not
+	bool m_isVisible;
+};
+
+/// Camera class for testing
+class MockCamera : public SurgSim::Graphics::Camera
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the camera
+	/// \post m_numUpdates and m_sumDt are initialized to 0
+	/// \post m_transform is set to identity, m_eye to (0,0,0), m_center to (0, 0, -1), and m_up to (0, 1, 0)
+	explicit MockCamera(const std::string& name) : SurgSim::Graphics::Camera(name),
+		m_numUpdates(0),
+		m_sumDt(0.0),
+		m_isVisible(true)
+	{
+		m_pose.setIdentity();
+		m_viewMatrix.setIdentity();
+		m_projectionMatrix.setIdentity();
+	}
+
+	/// Sets whether the camera is currently visible
+	/// When the camera is invisible, it does not produce an image.
+	/// \param	visible	True for visible, false for invisible
+	virtual void setVisible(bool visible)
+	{
+		m_isVisible = visible;
+	}
+
+	/// Gets whether the camera is currently visible
+	/// When the camera is invisible, it does not produce an image.
+	/// \return	visible	True for visible, false for invisible
+	virtual bool isVisible() const
+	{
+		return m_isVisible;
+	}
+
+	/// Returns the number of times the actor has been updated
+	int getNumUpdates() const
+	{
+		return m_numUpdates;
+	}
+	/// Returns the sum of the dt that the actor has been updated with
+	double getSumDt() const
+	{
+		return m_sumDt;
+	}
+
+	/// Sets the pose of the camera
+	/// \param	transform	Rigid transformation that describes the pose of the camera
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+		m_pose = transform;
+	}
+
+	/// Gets the pose of the camera
+	/// \return	Rigid transformation that describes the pose of the actor
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	{
+		return m_pose;
+	}
+
+	/// Sets the view matrix of the camera
+	/// \param	matrix	View matrix
+	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
+	{
+		m_viewMatrix = matrix;
+	}
+
+	/// Gets the view matrix of the camera
+	/// \return	View matrix
+	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const
+	{
+		return m_viewMatrix;
+	}
+
+	/// Sets the projection matrix of the camera
+	/// \param	matrix	Projection matrix
+	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix)
+	{
+		m_projectionMatrix = matrix;
+	}
+
+	/// Gets the projection matrix of the camera
+	/// \return	Projection matrix
+	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const
+	{
+		return m_projectionMatrix;
+	}
+
+	/// Updates the camera.
+	/// \param	dt	The time in seconds of the preceding timestep.
+	/// \post	m_numUpdates is incremented and dt is added to m_sumDt
+	virtual void update(double dt)
+	{
+		++m_numUpdates;
+		m_sumDt += dt;
+	}
+
+private:
+	/// Number of times the camera has been updated
+	int m_numUpdates;
+	/// Sum of the dt that the camera has been updated with
+	double m_sumDt;
+
+	/// Rigid transform describing pose of the camera
+	SurgSim::Math::RigidTransform3d m_pose;
+
+	/// View matrix of the camera
+	SurgSim::Math::Matrix44d m_viewMatrix;
+
+	/// Projection matrix of the camera
+	SurgSim::Math::Matrix44d m_projectionMatrix;
+
+	/// Whether this camera is currently visible or not
+	/// When the camera is invisible, it does not produce an image.
+	bool m_isVisible;
+};
+
+/// View class for testing
+class MockView : public SurgSim::Graphics::View
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the view
+	/// \post m_x and m_y are initialized to 0
+	/// \post m_width is initialized to 800, m_height to 600
+	/// \post m_numUpdates and m_sumDt are initialized to 0
+	/// \post m_transform is set to identity
+	explicit MockView(const std::string& name) : SurgSim::Graphics::View(name),
+		m_x(0),
+		m_y(0),
+		m_width(800),
+		m_height(600),
+		m_numUpdates(0),
+		m_sumDt(0.0),
+		m_isInitialized(false),
+		m_isAwoken(false)
+	{
+	}
+
+	/// Set the position of this view
+	/// \param	x,y	Position on the screen (in pixels)
+	virtual bool setPosition(int x, int y)
+	{
+		m_x = x;
+		m_y = y;
+		return true;
+	}
+
+	/// Get the position of this view
+	/// \param[out]	x,y	Position on the screen (in pixels)
+	virtual void getPosition(int* x, int* y)
+	{
+		*x = m_x;
+		*y = m_y;
+	}
+
+	/// Set the dimensions of this view
+	/// \param	width,height	Dimensions on the screen (in pixels)
+	virtual bool setDimensions(int width, int height)
+	{
+		m_width = width;
+		m_height = height;
+		return true;
+	}
+
+	/// Set the dimensions of this view
+	/// \param[out]	width,height	Dimensions on the screen (in pixels)
+	virtual void getDimensions(int* width, int* height)
+	{
+		*width = m_width;
+		*height = m_height;
+	}
+
+	/// Returns the number of times the view has been updated
+	int getNumUpdates() const
+	{
+		return m_numUpdates;
+	}
+	/// Returns the sum of the dt that the view has been updated with
+	double getSumDt() const
+	{
+		return m_sumDt;
+	}
+
+	/// Updates the view.
+	/// \param	dt	The time in seconds of the preceding timestep.
+	/// \post	m_numUpdates is incremented and dt is added to m_sumDt
+	virtual void update(double dt)
+	{
+		++m_numUpdates;
+		m_sumDt += dt;
+	}
+
+	/// Gets whether the view has been initialized
+	bool isInitialized() const
+	{
+		return m_isInitialized;
+	}
+	/// Gets whether the view has been awoken
+	bool isAwoken() const
+	{
+		return m_isAwoken;
+	}
+
+private:
+	/// Initialize the view
+	/// \post m_isInitialized is set to true
+	virtual bool doInitialize()
+	{
+		m_isInitialized = true;
+		return true;
+	}
+	/// Wake up the view
+	/// \post m_isAwoken is set to true
+	virtual bool doWakeUp()
+	{
+		m_isAwoken = true;
+		return true;
+	}
+
+	/// Position of the view on the screen (in pixels)
+	int m_x, m_y;
+	/// Dimensions of the view on the screen (in pixels)
+	int m_width, m_height;
+
+	/// Number of times the view has been updated
+	int m_numUpdates;
+	/// Sum of the dt that the view has been updated with
+	double m_sumDt;
+
+	/// Whether the view has been initialized
+	bool m_isInitialized;
+	/// Whether the view has been awoken
+	bool m_isAwoken;
+};
+
+/// View element for testing
+class MockViewElement : public SurgSim::Graphics::ViewElement
+{
+public:
+	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
+		m_isInitialized(false),
+		m_isAwoken(false)
+	{
+	}
+
+	/// Sets the view component that provides the visualization of the graphics actors
+	/// Only allow MockView components, any other will not be set and return false.
+	/// \return	True if it succeeds, false if it fails
+	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
+	{
+		std::shared_ptr<MockView> mockView = std::dynamic_pointer_cast<MockView>(view);
+		if (mockView)
+		{
+			return ViewElement::setView(mockView);
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/// Returns the View component as a MockView (only MockView is allowed by the overridden setView()).
+	std::shared_ptr<MockView> getMockView() const
+	{
+		return std::static_pointer_cast<MockView>(getView());
+	}
+
+	/// Gets whether the view element has been initialized
+	bool isInitialized() const
+	{
+		return m_isInitialized;
+	}
+	/// Gets whether the view element has been awoken
+	bool isAwoken() const
+	{
+		return m_isAwoken;
+	}
+private:
+	/// Initialize the view element
+	/// \post m_isInitialized is set to true
+	virtual bool doInitialize()
+	{
+		if (SurgSim::Graphics::ViewElement::doInitialize())
+		{
+			m_isInitialized = true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	/// Wake up the view element
+	/// \post m_isAwoken is set to true
+	virtual bool doWakeUp()
+	{
+		m_isAwoken = true;
+		return true;
+	}
+
+	/// Whether the view has been initialized
+	bool m_isInitialized;
+	/// Whether the view has been awoken
+	bool m_isAwoken;
+};

@@ -70,7 +70,8 @@ TEST_F(RigidShapeTest, Sphere)
 
 	const double& r = m_radius;
 	const double r2 = r * r;
-	double expectedMass = m_rho * 4.0 / 3.0 * M_PI * (r2 * r);
+	double expectedVolume = 4.0 / 3.0 * M_PI * (r2 * r);
+	double expectedMass = m_rho * expectedVolume;
 	double coef = 2.0 / 5.0 * expectedMass * r2;
 	Matrix33d expectedInertia;
 	expectedInertia << coef, 0.0, 0.0,
@@ -87,6 +88,7 @@ TEST_F(RigidShapeTest, Sphere)
 
 		
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -100,7 +102,8 @@ TEST_F(RigidShapeTest, Box)
 	EXPECT_EQ(m_size[1], b.getSizeY());
 	EXPECT_EQ(m_size[2], b.getSizeZ());
 
-	double expectedMass = m_rho * (m_size[0] * m_size[1] * m_size[2]);
+	double expectedVolume = m_size[0] * m_size[1] * m_size[2];
+	double expectedMass = m_rho * expectedVolume;
 	double coef = 1.0 / 12.0 * expectedMass;
 	double x2 = m_size[0] * m_size[0];
 	double y2 = m_size[1] * m_size[1];
@@ -119,6 +122,7 @@ TEST_F(RigidShapeTest, Box)
 	inertia    = b.calculateInertia(m_rho);
 		
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -131,7 +135,8 @@ TEST_F(RigidShapeTest, CylinderX)
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
 
-	double expectedMass = m_rho * (M_PI * m_radius * m_radius * m_length);
+	double expectedVolume = M_PI * m_radius * m_radius * m_length;
+	double expectedMass = m_rho * expectedVolume;
 
 	double r1sq = m_radius * m_radius;
 	double l2 = m_length * m_length;
@@ -151,6 +156,7 @@ TEST_F(RigidShapeTest, CylinderX)
 	inertia    = c.calculateInertia(m_rho);
 
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -163,7 +169,8 @@ TEST_F(RigidShapeTest, CylinderY)
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
 
-	double expectedMass = m_rho * (M_PI * m_radius * m_radius * m_length);
+	double expectedVolume = M_PI * m_radius * m_radius * m_length;
+	double expectedMass = m_rho * expectedVolume;
 
 	double r1sq = m_radius * m_radius;
 	double l2 = m_length * m_length;
@@ -183,6 +190,7 @@ TEST_F(RigidShapeTest, CylinderY)
 	inertia    = c.calculateInertia(m_rho);
 
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -195,7 +203,8 @@ TEST_F(RigidShapeTest, CylinderZ)
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
 
-	double expectedMass = m_rho * (M_PI * m_radius * m_radius * m_length);
+	double expectedVolume = M_PI * m_radius * m_radius * m_length;
+	double expectedMass = m_rho * expectedVolume;
 
 	double r1sq = m_radius * m_radius;
 	double l2 = m_length * m_length;
@@ -215,6 +224,7 @@ TEST_F(RigidShapeTest, CylinderZ)
 	inertia    = c.calculateInertia(m_rho);
 
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -231,9 +241,13 @@ TEST_F(RigidShapeTest, CapsuleX)
 	double r3 = r2 * m_radius;
 	double l2 = m_length * m_length;
 
-	double massCylinder = m_rho * (M_PI * r2 * m_length);
-	double massSphere = m_rho * (4.0 / 3.0 * M_PI * r3);
-	double expectedMass = massCylinder + massSphere;
+	double volumeCylinder = M_PI * r2 * m_length;
+	double massCylinder = m_rho * volumeCylinder;
+	double volumeSphere = 4.0 / 3.0 * M_PI * r3;
+	double massSphere = m_rho * volumeSphere;
+	double expectedVolume = volumeCylinder + volumeSphere;
+	double expectedMass = m_rho * expectedVolume;
+
 	double coefDir = 2.0 /  5.0 * massSphere * r2;
 	double coef    = coefDir;
 	coefDir += 1.0 / 2.0 * massCylinder * r2;
@@ -253,6 +267,7 @@ TEST_F(RigidShapeTest, CapsuleX)
 	inertia    = c.calculateInertia(m_rho);
 
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -269,8 +284,11 @@ TEST_F(RigidShapeTest, CapsuleY)
 	double r3 = r2 * m_radius;
 	double l2 = m_length * m_length;
 
-	double massCylinder = m_rho * (M_PI * r2 * m_length);
-	double massSphere = m_rho * (4.0 / 3.0 * M_PI * r3);
+	double volumeCylinder = M_PI * r2 * m_length;
+	double massCylinder = m_rho * volumeCylinder;
+	double volumeSphere = 4.0 / 3.0 * M_PI * r3;
+	double massSphere = m_rho * volumeSphere;
+	double expectedVolume = volumeCylinder + volumeSphere;
 	double expectedMass = massCylinder + massSphere;
 	double coefDir = 2.0 /  5.0 * massSphere * r2;
 	double coef    = coefDir;
@@ -291,6 +309,7 @@ TEST_F(RigidShapeTest, CapsuleY)
 	inertia    = c.calculateInertia(m_rho);
 
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
@@ -307,8 +326,11 @@ TEST_F(RigidShapeTest, CapsuleZ)
 	double r3 = r2 * m_radius;
 	double l2 = m_length * m_length;
 
-	double massCylinder = m_rho * (M_PI * r2 * m_length);
-	double massSphere = m_rho * (4.0 / 3.0 * M_PI * r3);
+	double volumeCylinder = M_PI * r2 * m_length;
+	double massCylinder = m_rho * volumeCylinder;
+	double volumeSphere = 4.0 / 3.0 * M_PI * r3;
+	double massSphere = m_rho * volumeSphere;
+	double expectedVolume = volumeCylinder + volumeSphere;
 	double expectedMass = massCylinder + massSphere;
 	double coefDir = 2.0 /  5.0 * massSphere * r2;
 	double coef    = coefDir;
@@ -329,6 +351,7 @@ TEST_F(RigidShapeTest, CapsuleZ)
 	inertia    = c.calculateInertia(m_rho);
 
 	double epsilon = 1e-10;
+	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }

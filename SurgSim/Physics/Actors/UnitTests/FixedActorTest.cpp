@@ -115,7 +115,7 @@ TEST_F(FixedActorTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(fixedActor->isActive());
 
 	// Get numDof = 0
-	ASSERT_EQ(0, fixedActor->getNumDof());
+	ASSERT_EQ(0u, fixedActor->getNumDof());
 
 	// Set/Get isGravityEnabled [default = true]
 	EXPECT_TRUE(fixedActor->isGravityEnabled());

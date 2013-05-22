@@ -4,6 +4,12 @@ Copyright 2012-2013, SimQuest Solutions Inc.
 This product includes software developed by SimQuest Solutions
 Inc. (http://www.simquest.com/).
 
+The calculations of various physical properties from an arbitrary surface
+mesh, implemented in the MeshShape class, are based on research and a
+public-domain implementation by Brian Mirtich.
+  (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
+
+------------------------------------------------------------
 
 Contains code based on Boost Threads
 Copyright (C) 2002-2003 David Moore, William E. Kempf
@@ -32,3 +38,5 @@ SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
 FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
+
+------------------------------------------------------------
