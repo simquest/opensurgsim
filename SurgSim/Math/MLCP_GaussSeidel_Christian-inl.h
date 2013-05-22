@@ -1,7 +1,10 @@
 #include <math.h>
-#include <mkl.h>
 #include <TOOLS/Vector/vector.h>
 #include <TOOLS/Matrix/matrix.h>
+
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <Eigen/Dense>
 
 #include <SurgSim/Math/Valid.h>
 
@@ -628,21 +631,16 @@ computeEnforcementSystem(
 // Solve the system A x = b for x, with the assumption that the size is "size"
 static inline bool solveSystem(const Dynamic_Matrix<double>& A, const Dynamic_Vector<double>& b, int size, Dynamic_Vector<double>* x)
 {
-	MKL_INT info;
-	MKL_INT nrhs = 1;
-	MKL_INT N = size;
+	Eigen::Map<const Eigen::MatrixXd> AA(A.getPointer(), size, size);
+	Eigen::Map<const Eigen::VectorXd> bb(b.getPointer(), size);
 
-	Dynamic_Matrix<double> AA = A;
-	Dynamic_Vector<int> pivot(size);
-
-	*x = b;
-	dgesv(&N, &nrhs, AA.getPointer(), &N, pivot.getPointer(), x->getPointer(), &N, &info);
-	if (info < 0)
-	{
-		cerr << "MLCP_GaussSeidel_Christian::solveSystem  MKL dgesv: Illegal value for parameter " << -info << endl;
-		return false;
-	}
-	return info == 0;
+	x->resizeUpIfNecessary(size);
+	Eigen::Map<Eigen::VectorXd> xx(x->getPointer(), size);
+	Eigen::VectorXd solution = AA.partialPivLu().solve(bb);
+	//Eigen::VectorXd solution = AA.colPivHouseholderQr().solve(bb);
+	//Eigen::VectorXd solution = AA.householderQr().solve(bb);
+	xx = solution;
+	return true;
 }
 
 template <class Matrix, class Vector> void MLCP_GaussSeidel_Christian<Matrix,Vector>::
