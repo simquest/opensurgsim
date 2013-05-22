@@ -16,8 +16,7 @@
 /// \file
 /// Conversions to and from OSG quaternion types
 ///
-/// Note that the Eigen quaternion stores the W component first, while OSG stores it last.
-/// These conversions handle this difference in ordering.
+/// Note that the Eigen quaternion constructor takes the W component first, while OSG stores it last.
 ///
 /// Also note that OSG only has one Quat type, which uses double for the value type. Conversions are provided to and
 /// from this type for both SurgSim::Math::Quaternionf and SurgSim::Math::Quaterniond.

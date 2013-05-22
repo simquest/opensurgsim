@@ -49,9 +49,12 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3fTest)
 	Vector3f translation = Vector3f::Random();
 	RigidTransform3f transform = makeRigidTransform(rotation, translation);
 
+	/// Convert to OSG
 	std::pair<osg::Quat, osg::Vec3f> osgTransform = toOsg(transform);
 
-	EXPECT_TRUE(rotation.isApprox(fromOsg<float>(osgTransform.first)));
+	/// Convert back to Eigen and compare with original
+	Quaternionf resultRotation = fromOsg<float>(osgTransform.first);
+	EXPECT_TRUE(rotation.angularDistance(resultRotation) < Eigen::NumTraits<float>::dummy_precision());
 	EXPECT_TRUE(translation.isApprox(fromOsg(osgTransform.second)));
 }
 
@@ -65,12 +68,15 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3fMultiplyTest)
 	Vector3f vector = Vector3f::Random();
 	osg::Vec3f osgVector = toOsg(vector);
 
+	/// Transform the vector using Eigen
 	Vector3f result = transform * vector;
 
 	std::pair<osg::Quat, osg::Vec3f> osgTransform = toOsg(transform);
 
+	/// Transform the vector using OSG
 	osg::Vec3f osgResult = osgTransform.first * osgVector + osgTransform.second;
 
+	/// Compare the transformations
 	EXPECT_TRUE(result.isApprox(fromOsg(osgResult)));
 }
 
@@ -79,11 +85,15 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3dTest)
 	Quaterniond rotation = Quaterniond(Vector4d::Random());
 	rotation.normalize();
 	Vector3d translation = Vector3d::Random();
+
 	RigidTransform3d transform = makeRigidTransform(rotation, translation);
 
+	/// Convert to OSG
 	std::pair<osg::Quat, osg::Vec3d> osgTransform = toOsg(transform);
 
-	EXPECT_TRUE(rotation.isApprox(fromOsg<double>(osgTransform.first)));
+	/// Convert back to Eigen and compare with original
+	Quaterniond resultRotation = fromOsg<double>(osgTransform.first);
+	EXPECT_TRUE(rotation.angularDistance(resultRotation) < Eigen::NumTraits<double>::dummy_precision());
 	EXPECT_TRUE(translation.isApprox(fromOsg(osgTransform.second)));
 }
 
@@ -97,11 +107,14 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3dMultiplyTest)
 	Vector3d vector = Vector3d::Random();
 	osg::Vec3d osgVector = toOsg(vector);
 
+	/// Transform the vector using Eigen
 	Vector3d result = transform * vector;
 
 	std::pair<osg::Quat, osg::Vec3d> osgTransform = toOsg(transform);
 
+	/// Transform the vector using OSG
 	osg::Vec3d osgResult = osgTransform.first * osgVector + osgTransform.second;
 
+	/// Compare the transformations
 	EXPECT_TRUE(result.isApprox(fromOsg(osgResult)));
 }

@@ -82,9 +82,12 @@ TEST(OsgMatrixConversionsTests, Matrix44fMultiplicationTest)
 	osg::Matrixf osgMatrix = toOsg(matrix);
 	osg::Vec4f osgVector = toOsg(vector);
 
+	/// Multiply with Eigen
 	Vector4f result = matrix * vector;
+	/// Multiply with OSG
 	osg::Vec4f osgResult = osgVector * osgMatrix;
 
+	/// Compare the two results
 	EXPECT_TRUE(result.isApprox(fromOsg(osgResult)));
 }
 
@@ -103,8 +106,11 @@ TEST(OsgMatrixConversionsTests, Matrix44dMultiplicationTest)
 	osg::Matrixd osgMatrix = toOsg(matrix);
 	osg::Vec4d osgVector = toOsg(vector);
 
+	/// Multiply with Eigen
 	Vector4d result = matrix * vector;
+	/// Multiply with OSG
 	osg::Vec4d osgResult = osgVector * osgMatrix;
 
+	/// Compare the two results
 	EXPECT_TRUE(result.isApprox(fromOsg(osgResult)));
 }

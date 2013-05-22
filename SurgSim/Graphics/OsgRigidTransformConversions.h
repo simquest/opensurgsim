@@ -44,14 +44,14 @@ namespace Graphics
 /// Convert 3D rigid body (isometric) transform, represented as floats, to OSG
 inline std::pair<osg::Quat, osg::Vec3f> toOsg(const SurgSim::Math::RigidTransform3f& transform)
 {
-	return std::make_pair(toOsg(SurgSim::Math::Quaternionf(transform.rotation())),
-		toOsg(SurgSim::Math::Vector3f(transform.translation())));
+	SurgSim::Math::Quaternionf normalizedQuaternion = SurgSim::Math::Quaternionf(transform.rotation()).normalized();
+	return std::make_pair(toOsg(normalizedQuaternion), toOsg(SurgSim::Math::Vector3f(transform.translation())));
 }
 /// Convert 3D rigid body (isometric) transform, represented as doubles, to OSG
 inline std::pair<osg::Quat, osg::Vec3d> toOsg(const SurgSim::Math::RigidTransform3d& transform)
 {
-	return std::make_pair(toOsg(SurgSim::Math::Quaterniond(transform.rotation())),
-		toOsg(SurgSim::Math::Vector3d(transform.translation())));
+	SurgSim::Math::Quaterniond normalizedQuaternion = SurgSim::Math::Quaterniond(transform.rotation()).normalized();
+	return std::make_pair(toOsg(normalizedQuaternion), toOsg(SurgSim::Math::Vector3d(transform.translation())));
 }
 
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as floats
