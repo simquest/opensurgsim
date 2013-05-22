@@ -30,12 +30,12 @@ public:
 	/// \post m_transform is set to identity
 	/// \post m_isInitialized and m_isAwoken are set to false
 	/// \post m_isVisible is set to true
-	explicit MockOsgActor(const std::string& name) : SurgSim::Graphics::OsgActor(name, new osg::Group()),
-		SurgSim::Graphics::Actor(name),
-		m_numUpdates(0),
+	explicit MockOsgActor(const std::string& name) : SurgSim::Graphics::Actor(name),
+        SurgSim::Graphics::OsgActor(name, new osg::Group()),
+		m_isAwoken(false),
+        m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
-		m_isAwoken(false),
 		m_isVisible(true)
 	{
 		m_transform.setIdentity();
