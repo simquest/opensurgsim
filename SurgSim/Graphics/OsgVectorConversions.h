@@ -37,68 +37,80 @@ namespace Graphics
 /// Convert 2D vector of floats to OSG
 inline osg::Vec2f toOsg(const SurgSim::Math::Vector2f& vector)
 {
-	return osg::Vec2f(vector[0], vector[1]);
+	osg::Vec2f osgVector;
+	Eigen::Map<SurgSim::Math::Vector2f>(osgVector.ptr()) = vector;
+	return osgVector;
 }
 /// Convert from OSG to 2D vector of floats
 inline SurgSim::Math::Vector2f fromOsg(const osg::Vec2f& vector)
 {
-	return SurgSim::Math::Vector2f(vector.x(), vector.y());
+	return SurgSim::Math::Vector2f(vector.ptr());
 }
 
 /// Convert 2D vector of doubles to OSG
 inline osg::Vec2d toOsg(const SurgSim::Math::Vector2d& vector)
 {
-	return osg::Vec2d(vector[0], vector[1]);
+	osg::Vec2d osgVector;
+	Eigen::Map<SurgSim::Math::Vector2d>(osgVector.ptr()) = vector;
+	return osgVector;
 }
 /// Convert from OSG to 2D vector of doubles
 inline SurgSim::Math::Vector2d fromOsg(const osg::Vec2d& vector)
 {
-	return SurgSim::Math::Vector2d(vector.x(), vector.y());
+	return SurgSim::Math::Vector2d(vector.ptr());
 }
 
 /// Convert 3D vector of floats to OSG
 inline osg::Vec3f toOsg(const SurgSim::Math::Vector3f& vector)
 {
-	return osg::Vec3f(vector[0], vector[1], vector[2]);
+	osg::Vec3f osgVector;
+	Eigen::Map<SurgSim::Math::Vector3f>(osgVector.ptr()) = vector;
+	return osgVector;
 }
 /// Convert from OSG to 3D vector of floats
 inline SurgSim::Math::Vector3f fromOsg(const osg::Vec3f& vector)
 {
-	return SurgSim::Math::Vector3f(vector.x(), vector.y(), vector.z());
+	return SurgSim::Math::Vector3f(vector.ptr());
 }
 
 /// Convert 3D vector of doubles to OSG
 inline osg::Vec3d toOsg(SurgSim::Math::Vector3d vector)
 {
-	return osg::Vec3d(vector[0], vector[1], vector[2]);
+	osg::Vec3d osgVector;
+	Eigen::Map<SurgSim::Math::Vector3d>(osgVector.ptr()) = vector;
+	return osgVector;
 }
 /// Convert from OSG to 3D vector of doubles
 inline SurgSim::Math::Vector3d fromOsg(const osg::Vec3d& vector)
 {
-	return SurgSim::Math::Vector3d(vector.x(), vector.y(), vector.z());
+	return SurgSim::Math::Vector3d(vector.ptr());
 }
 
 
 /// Convert 4D vector of floats to OSG
 inline osg::Vec4f toOsg(const SurgSim::Math::Vector4f& vector)
 {
-	return osg::Vec4f(vector[0], vector[1], vector[2], vector[3]);
+	osg::Vec4f osgVector;
+	Eigen::Map<SurgSim::Math::Vector4f>(osgVector.ptr()) = vector;
+	return osgVector;
 }
 /// Convert from OSG to 4D vector of floats
 inline SurgSim::Math::Vector4f fromOsg(const osg::Vec4f& vector)
 {
-	return SurgSim::Math::Vector4f(vector.x(), vector.y(), vector.z(), vector.w());
+	return SurgSim::Math::Vector4f(vector.ptr());
 }
 
 /// Convert 4D vector of doubles to OSG
 inline osg::Vec4d toOsg(const SurgSim::Math::Vector4d& vector)
 {
-	return osg::Vec4d(vector[0], vector[1], vector[2], vector[3]);
+	osg::Vec4d osgVector;
+	Eigen::Map<SurgSim::Math::Vector4d>(osgVector.ptr()) = vector;
+	return osgVector;
 }
 /// Convert from OSG to 4D vector of doubles
 inline SurgSim::Math::Vector4d fromOsg(const osg::Vec4d& vector)
 {
-	return SurgSim::Math::Vector4d(vector.x(), vector.y(), vector.z(), vector.w());
+	return SurgSim::Math::Vector4d(vector.ptr());
 }
 
 };  // namespace Graphics
