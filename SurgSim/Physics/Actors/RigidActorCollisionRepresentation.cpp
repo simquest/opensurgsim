@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim\Physics\Actors\RigidActorCollisionRepresentation.h>
+#include <SurgSim/Physics/Actors/RigidActorCollisionRepresentation.h>
 
 namespace SurgSim
 {

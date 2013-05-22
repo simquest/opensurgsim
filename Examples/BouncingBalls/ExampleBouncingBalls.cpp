@@ -47,7 +47,7 @@ using SurgSim::Physics::PhysicsManager;
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	PrintoutBehavior(std::shared_ptr<RigidActor> actor) : m_actor(actor), Behavior("PrintoutBehavior") {}
+	PrintoutBehavior(std::shared_ptr<RigidActor> actor) : Behavior("PrintoutBehavior"), m_actor(actor) {}
 	~PrintoutBehavior() {}
 
 protected:
