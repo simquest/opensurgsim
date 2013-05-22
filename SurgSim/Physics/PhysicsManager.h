@@ -46,7 +46,7 @@ public:
 
 	/// Condstructor
 	PhysicsManager();
-	~PhysicsManager();
+	virtual ~PhysicsManager();
 
 	///@{
 	/// Overridden from ComponentManager
@@ -68,7 +68,7 @@ protected:
 	/// \param [in,out]	container	If non-null, the container, that should receive the component if of the correct type.
 	/// \return	the correctly cast component pointer if successful and the component did not alread exist in the container
 	template<class T>
-	std::shared_ptr<T> doAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+	std::shared_ptr<T> tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
 
 	/// Template version of the removeComponent method.
 	/// \tparam	T	Specific type of the component that is being removed.
@@ -76,7 +76,7 @@ protected:
 	/// \param [in,out]	container	If non-null, the container, from which the component should be removed.
 	/// \return	true if the component exists in the container or the component did not cast to T, otherwise.
 	template<class T>
-	bool doRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
 
 private:
 

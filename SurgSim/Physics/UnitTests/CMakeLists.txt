@@ -20,7 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	FreeMotionStepTests.cpp
+	FreeMotionTests.cpp
 	PhysicsManagerTests.cpp
 )
 

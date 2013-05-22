@@ -13,15 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/SceneElement.h>
+#include <string>
 
-class Sphere : public SurgSim::Framework::SceneElement
+#include <Examples/BouncingBalls/ConcreteSceneElement.h>
+
+ConcreteSceneElement::ConcreteSceneElement(const std::string& name) :
+	SurgSim::Framework::SceneElement(name)
 {
-public:
-	Sphere(const std::string& name);
-	virtual ~Sphere();
 
-protected:
-	virtual bool doInitialize();
-	virtual bool doWakeUp();
-};
+}
+
+ConcreteSceneElement::~ConcreteSceneElement()
+{
+
+}
+
+bool ConcreteSceneElement::doInitialize()
+{
+	return true;
+}
+
+bool ConcreteSceneElement::doWakeUp()
+{
+	return true;
+}

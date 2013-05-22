@@ -13,41 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Sphere.h"
+#ifndef EXAMPLES_BOUNCINGBALLS_CONCRETESCENELEMENT_H
+#define EXAMPLES_BOUNCINGBALLS_CONCRETESCENELEMENT_H
 
-#include "SurgSim/Framework/Behavior.h"
+#include <SurgSim/Framework/SceneElement.h>
 
-class PoseUpdateBehavior : public SurgSim::Framework::Behavior
+/// Simple concrete implementation of a sphere element that does not have any higher logic
+class ConcreteSceneElement : public SurgSim::Framework::SceneElement
 {
-	PoseUpdateBehavior();
-	~PoseUpdateBehavior();
+public:
+	ConcreteSceneElement(const std::string& name);
+	virtual ~ConcreteSceneElement();
+
+protected:
+	virtual bool doInitialize();
+	virtual bool doWakeUp();
 };
 
-
-
-Sphere::Sphere(const std::string& name) : SceneElement(name)
-{
-
-}
-
-Sphere::~Sphere()
-{
-
-}
-
-bool Sphere::doInitialize()
-{
-	// Create Rigid Actor
-	// Create Sphere Shape for Rigid Actor
-	// Create Graphics Sphere
-	// Create Update Behavior
-	// Add all of them ...
-	// Connect RigidActor and Graphics Sphere in Update Behavior
-	
-	return false;
-}
-
-bool Sphere::doWakeUp()
-{
-	return true;
-}
+#endif

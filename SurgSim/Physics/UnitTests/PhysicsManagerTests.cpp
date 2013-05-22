@@ -29,9 +29,8 @@ using SurgSim::Physics::FixedActor;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
-class PhysicsManagerTest : public ::testing::Test
+struct PhysicsManagerTest : public ::testing::Test
 {
-protected:
 	virtual void SetUp()
 	{
 		runtime = std::make_shared<Runtime>();

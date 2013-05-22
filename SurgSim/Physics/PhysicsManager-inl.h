@@ -16,9 +16,16 @@
 #ifndef SURGSIM_PHYSICS_PHYSICSMANAGER_INL_H
 #define SURGSIM_PHYSICS_PHYSICSMANAGER_INL_H
 
+/// Executes the add component operation.
+/// \tparam	T	Type of the component to be added.
+/// \param	component		 	The component that is being added.
+/// \param [in,out]	container	The container that the component is being added to.
+/// \return	The correctly cast component if it is of type T and does not exist in the container yet, nullptr otherwise.
 template<class T>
-std::shared_ptr<T> PhysicsManager::doAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
+std::shared_ptr<T> PhysicsManager::tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
 {
+	SURGSIM_ASSERT(component != nullptr) << "Trying to add a component that is null";
+	SURGSIM_ASSERT(container != nullptr) << "Trying to use a component container that is null";
 	std::shared_ptr<T> typedComponent = std::dynamic_pointer_cast<T>(component);
 	if (typedComponent != nullptr)
 	{
@@ -29,7 +36,7 @@ std::shared_ptr<T> PhysicsManager::doAddComponent(std::shared_ptr<SurgSim::Frame
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " component " << component->getName() <<
+			SURGSIM_LOG_INFO(m_logger) << SURGSIM_CURRENT_FUNCTION << " component " << component->getName() <<
 				" already added to " << getName();
 			typedComponent = nullptr;
 		}
@@ -38,8 +45,9 @@ std::shared_ptr<T> PhysicsManager::doAddComponent(std::shared_ptr<SurgSim::Frame
 };
 
 template<class T>
-bool PhysicsManager::doRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
+bool PhysicsManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
 {
+	SURGSIM_ASSERT(container != nullptr) << "Trying to use a component container that is null";
 	bool result = false;
 	std::shared_ptr<T> typedComponent = std::dynamic_pointer_cast<T>(component);
 	if (typedComponent != nullptr && container->size() != 0)
@@ -48,12 +56,12 @@ bool PhysicsManager::doRemoveComponent(std::shared_ptr<SurgSim::Framework::Compo
 		if (found != container->end())
 		{
 			container->erase(found);
-			SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Removed component " << typedComponent->getName();
+			SURGSIM_LOG_DEBUG(m_logger) << SURGSIM_CURRENT_FUNCTION << " Removed component " << typedComponent->getName();
 			result = true;
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Unable to remove component " << typedComponent->getName()
+			SURGSIM_LOG_INFO(m_logger) << SURGSIM_CURRENT_FUNCTION << " Unable to remove component " << typedComponent->getName()
 				<< ". Not found.";
 		}
 	}
