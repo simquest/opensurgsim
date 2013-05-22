@@ -26,8 +26,8 @@ include_directories(
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
-	Manager.cpp
 	Group.cpp
+	Manager.cpp
 	OsgGroup.cpp
 	ViewElement.cpp
 )
