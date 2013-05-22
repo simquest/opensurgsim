@@ -168,59 +168,59 @@ TEST(OsgGroupTests, AddRemoveTest)
 
 TEST(OsgGroupTests, ClearTests)
 {
-    std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test name");
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test name");
 	std::shared_ptr<Group> group = osgGroup;
 
 	std::shared_ptr<Actor> actor1 = std::make_shared<MockOsgActor>("test actor 1");
 	std::shared_ptr<Actor> actor2 = std::make_shared<MockOsgActor>("test actor 2");
 	std::shared_ptr<Group> group1 = std::make_shared<OsgGroup>("test group 1");
 	std::shared_ptr<Group> group2 = std::make_shared<OsgGroup>("test group 2");
-    
-    osg::ref_ptr<osg::Switch> osgSwitch = dynamic_cast<osg::Switch*>(osgGroup->getOsgGroup().get());
+
+	osg::ref_ptr<osg::Switch> osgSwitch = dynamic_cast<osg::Switch*>(osgGroup->getOsgGroup().get());
 	ASSERT_TRUE(osgSwitch.valid()) << "Group's OSG node should be a switch!";
-    
+
 	EXPECT_EQ(0u, group->getActors().size());
 	EXPECT_EQ(0u, group->getGroups().size());
-    EXPECT_EQ(0u, osgSwitch->getNumChildren());
-    
-    // Add actors and groups
-    group->addActor(actor1);
-    group->addActor(actor2);
-    group->addGroup(group1);
-    group->addGroup(group2);
-    EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(0u, osgSwitch->getNumChildren());
+
+	// Add actors and groups
+	group->addActor(actor1);
+	group->addActor(actor2);
+	group->addGroup(group1);
+	group->addGroup(group2);
+	EXPECT_EQ(2u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-    EXPECT_EQ(4u, osgSwitch->getNumChildren());
-    
-    // Remove all actors
-    group->clearActors();
-    EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(4u, osgSwitch->getNumChildren());
+
+	// Remove all actors
+	group->clearActors();
+	EXPECT_EQ(0u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-    EXPECT_EQ(2u, osgSwitch->getNumChildren());
-    
-    // Add actors again
-    group->addActor(actor1);
-    group->addActor(actor2);
-    EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(2u, osgSwitch->getNumChildren());
+
+	// Add actors again
+	group->addActor(actor1);
+	group->addActor(actor2);
+	EXPECT_EQ(2u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-    EXPECT_EQ(4u, osgSwitch->getNumChildren());
-    
-    // Remove all groups
-    group->clearGroups();
-    EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(4u, osgSwitch->getNumChildren());
+
+	// Remove all groups
+	group->clearGroups();
+	EXPECT_EQ(2u, group->getActors().size());
 	EXPECT_EQ(0u, group->getGroups().size());
-    EXPECT_EQ(2u, osgSwitch->getNumChildren());
-    
-    // Add groups again
-    group->addGroup(group1);
-    group->addGroup(group2);
-    EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(2u, osgSwitch->getNumChildren());
+
+	// Add groups again
+	group->addGroup(group1);
+	group->addGroup(group2);
+	EXPECT_EQ(2u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-    EXPECT_EQ(4u, osgSwitch->getNumChildren());
-    
-    // Remove everything
-    group->clear();
-    EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(4u, osgSwitch->getNumChildren());
+
+	// Remove everything
+	group->clear();
+	EXPECT_EQ(0u, group->getActors().size());
 	EXPECT_EQ(0u, group->getGroups().size());
-    EXPECT_EQ(0u, osgSwitch->getNumChildren());
+	EXPECT_EQ(0u, osgSwitch->getNumChildren());
 }
