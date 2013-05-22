@@ -20,7 +20,7 @@
 #include <vector>
 
 #include <SurgSim/Framework/ComponentManager.h>
-#include <Surgsim/Framework/Component.h>
+#include <SurgSim/Framework/Component.h>
 #include <SurgSim/Framework/Log.h>
 
 
