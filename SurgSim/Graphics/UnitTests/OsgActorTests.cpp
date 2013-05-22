@@ -16,12 +16,12 @@
 /// \file
 /// Tests for the OsgActor class.
 
-#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <random>
 
