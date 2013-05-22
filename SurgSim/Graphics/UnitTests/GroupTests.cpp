@@ -97,3 +97,51 @@ TEST(GroupTests, AddRemoveTest)
 	EXPECT_FALSE(group->removeActor(actor1));
 	EXPECT_EQ(group->getActors().end(), std::find(group->getActors().begin(), group->getActors().end(), actor1));
 }
+
+TEST(GroupTests, ClearTests)
+{
+	std::shared_ptr<Group> group = std::make_shared<MockGroup>("test name");
+
+	std::shared_ptr<Actor> actor1 = std::make_shared<MockActor>("test actor 1");
+	std::shared_ptr<Actor> actor2 = std::make_shared<MockActor>("test actor 2");
+	std::shared_ptr<Group> group1 = std::make_shared<MockGroup>("test group 1");
+	std::shared_ptr<Group> group2 = std::make_shared<MockGroup>("test group 2");
+
+	EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(0u, group->getGroups().size());
+
+	/// Add 2 actors and 2 groups
+	group->addActor(actor1);
+	group->addActor(actor2);
+	group->addGroup(group1);
+	group->addGroup(group2);
+	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(2u, group->getGroups().size());
+
+	/// Remove all actors and make sure that they are removed correctly
+	group->clearActors();
+	EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(2u, group->getGroups().size());
+
+	/// Add the 2 actors again
+	group->addActor(actor1);
+	group->addActor(actor2);
+	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(2u, group->getGroups().size());
+
+	/// Remove all groups and make sure that they are removed correctly
+	group->clearGroups();
+	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(0u, group->getGroups().size());
+
+	/// Add the 2 groups again
+	group->addGroup(group1);
+	group->addGroup(group2);
+	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(2u, group->getGroups().size());
+
+	/// Remove everything from the group and make sure that there are no actors nor groups remaining
+	group->clear();
+	EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(0u, group->getGroups().size());
+}
