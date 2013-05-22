@@ -22,7 +22,6 @@
 #include "TOOLS/Vector/vector.h"  //XXX temporary
 #include "TOOLS/Matrix/hardcoded_inverse.h" //XXX temporary
 #include <SurgSim/Math/MLCP_GaussSeidel_Christian.h>
-#include "SqMathUtils.h"
 #include "MlcpTestProblems.h"
 #include "gtest/gtest.h"
 #include <boost/chrono.hpp>

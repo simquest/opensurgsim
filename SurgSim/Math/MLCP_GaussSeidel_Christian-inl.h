@@ -3,6 +3,8 @@
 #include <TOOLS/Vector/vector.h>
 #include <TOOLS/Matrix/matrix.h>
 
+#include <SurgSim/Math/Valid.h>
+
 // cf. Christian Duriez TVCG05 paper
 // Realistic Haptic Rendering of Interacting
 // Deformable Objects in Virtual Environments
@@ -115,7 +117,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 			// If we have an incredibly high convergence criteria value, the displacements are going to be very large, causing
 			// problems in the next iteration, so we should break out here. The convergence_criteria should really only be a couple
 			// order of magnitudes higher than epsilon.
-			if (!SqMath::IsValid(convergence_criteria) || convergence_criteria > 1.0)
+			if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
 			{
 				printf("Convergence (%e) is NaN, infinite, or greater than 1.0! MLCP is exploding after %d Gauss Seidel iterations!!\n", convergence_criteria, nbLoop);
 				break;
@@ -125,7 +127,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 		//printf("  Solver [loop %2d] convergence_criteria=%g<?%g\n",nbLoop,convergence_criteria,epsilonConvergence);
 
 	}
-	while ((!signorini_verified || (SqMath::IsValid(convergence_criteria) && convergence_criteria>epsilonConvergence)) && nbLoop<maxIterations);
+	while ((!signorini_verified || (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>epsilonConvergence)) && nbLoop<maxIterations);
 
 	if (MLCP_nbIterations)
 	{
@@ -136,7 +138,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 	{
 		*validConvergence = true;
 
-		if (!SqMath::IsValid(convergence_criteria) || convergence_criteria > 1.0)
+		if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
 		{
 			*validConvergence = false;
 		}
@@ -183,7 +185,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 		*initialConvergenceCriteria = initial_convergence_criteria;
 	}
 
-	if (convergence_criteria > epsilonConvergence || !SqMath::IsValid(convergence_criteria) || !signorini_valid)
+	if (convergence_criteria > epsilonConvergence || !SurgSim::Math::isValid(convergence_criteria) || !signorini_valid)
 	{
 //#ifdef PRINTOUT_TEST_APP
 		//cout << "\tLCP_3DContactFriction_GaussSeidel_Christian::solve did <<<NOT>>> converge after " << nbLoop << " iterations" << endl;
@@ -291,11 +293,11 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			{
 				violation += A[currentAtomicIndex][j] * initialGuess_and_solution[j];
 			}
-			if (violation<-contactTolerance || !SqMath::IsValid(violation))
+			if (violation<-contactTolerance || !SurgSim::Math::isValid(violation))
 			{
 				signoriniVerified=false;
 			}
-			if (!SqMath::IsValid(violation))
+			if (!SurgSim::Math::isValid(violation))
 			{
 				signoriniValid = false;
 			}
@@ -310,11 +312,11 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			{
 				violation += A[currentAtomicIndex][j] * initialGuess_and_solution[j];
 			}
-			if (violation<-contactTolerance || !SqMath::IsValid(violation))
+			if (violation<-contactTolerance || !SurgSim::Math::isValid(violation))
 			{
 				signoriniVerified=false;
 			}
-			if (!SqMath::IsValid(violation))
+			if (!SurgSim::Math::isValid(violation))
 			{
 				signoriniValid = false;
 			}
