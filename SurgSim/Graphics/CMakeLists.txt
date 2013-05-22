@@ -47,7 +47,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	ViewElement.h
 )
 
-#add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})
+add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
