@@ -54,7 +54,7 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3fTest)
 
 	/// Convert back to Eigen and compare with original
 	Quaternionf resultRotation = fromOsg<float>(osgTransform.first);
-	EXPECT_TRUE(rotation.angularDistance(resultRotation) < Eigen::NumTraits<float>::dummy_precision());
+	EXPECT_LT(rotation.angularDistance(resultRotation), Eigen::NumTraits<float>::dummy_precision());
 	EXPECT_TRUE(translation.isApprox(fromOsg(osgTransform.second)));
 }
 
@@ -93,7 +93,7 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3dTest)
 
 	/// Convert back to Eigen and compare with original
 	Quaterniond resultRotation = fromOsg<double>(osgTransform.first);
-	EXPECT_TRUE(rotation.angularDistance(resultRotation) < Eigen::NumTraits<double>::dummy_precision());
+	EXPECT_LT(rotation.angularDistance(resultRotation), Eigen::NumTraits<double>::dummy_precision());
 	EXPECT_TRUE(translation.isApprox(fromOsg(osgTransform.second)));
 }
 
