@@ -1,7 +1,8 @@
 #ifndef __MLCP_GaussSeidel_Christian__
 #define __MLCP_GaussSeidel_Christian__
 
-#include "LCP.h"
+#include <SurgSim/Math/MLCP.h>              //XXX temporary??
+#include <SurgSim/Math/MLCP_Constraint.h>   //XXX temporary??
 #include <Eigen/Core>
 
 //! Resolution of a mixed LCP problem (Gauss Seidel iterative solver)

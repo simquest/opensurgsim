@@ -24,6 +24,7 @@ set(SURGSIM_MATH_SOURCES
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
+	MLCP.h
 	MLCP_Constraint.h
 	MLCP_GaussSeidel_Christian.h
 	MLCP_GaussSeidel_Christian-inl.h
