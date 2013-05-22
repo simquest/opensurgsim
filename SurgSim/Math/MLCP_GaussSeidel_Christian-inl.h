@@ -625,6 +625,26 @@ computeEnforcementSystem(
 
 }
 
+// Solve the system A x = b for x, with the assumption that the size is "size"
+static inline bool solveSystem(const Dynamic_Matrix<double>& A, const Dynamic_Vector<double>& b, int size, Dynamic_Vector<double>* x)
+{
+	MKL_INT info;
+	MKL_INT nrhs = 1;
+	MKL_INT N = size;
+
+	Dynamic_Matrix<double> AA = A;
+	Dynamic_Vector<int> pivot(size);
+
+	*x = b;
+	dgesv(&N, &nrhs, AA.getPointer(), &N, pivot.getPointer(), x->getPointer(), &N, &info);
+	if (info < 0)
+	{
+		cerr << "MLCP_GaussSeidel_Christian::solveSystem  MKL dgesv: Illegal value for parameter " << -info << endl;
+		return false;
+	}
+	return info == 0;
+}
+
 template <class Matrix, class Vector> void MLCP_GaussSeidel_Christian<Matrix,Vector>::
 doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& initialGuess_and_solution, IN Vector& frictionCoefs,
                IN vector<MLCP_Constraint>& constraintsType, IN double subStep,
@@ -730,11 +750,8 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			MKL_INT info, nrhs = 1 ,N = nbEnforcedAtomicConstraint;
-			dgesv(&N, &nrhs, LHS_enforcedLocalSystem.getPointer(), &N, LHSpivot_enforcedLocalSystem.getPointer(), RHS_enforcedLocalSystem.getPointer(), &N, &info);
-			if (info < 0)
+			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
 			{
-				cerr << "MLCP_GaussSeidel_Christian::doOneIteration  MKL dgesv: Illegal value for parameter " << -info << endl;
 				return;
 			}
 
@@ -767,11 +784,8 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			MKL_INT info, nrhs = 1 ,N = nbEnforcedAtomicConstraint;
-			dgesv(&N, &nrhs, LHS_enforcedLocalSystem.getPointer(), &N, LHSpivot_enforcedLocalSystem.getPointer(), RHS_enforcedLocalSystem.getPointer(), &N, &info);
-			if (info < 0)
+			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
 			{
-				cerr << "MLCP_GaussSeidel_Christian::doOneIteration  MKL dgesv: Illegal value for parameter " << -info << endl;
 				return;
 			}
 
@@ -827,11 +841,8 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			MKL_INT info, nrhs = 1 ,N = nbEnforcedAtomicConstraint;
-			dgesv(&N, &nrhs, LHS_enforcedLocalSystem.getPointer(), &N, LHSpivot_enforcedLocalSystem.getPointer(), RHS_enforcedLocalSystem.getPointer(), &N, &info);
-			if (info < 0)
+			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
 			{
-				cerr << "MLCP_GaussSeidel_Christian::doOneIteration  MKL dgesv: Illegal value for parameter " << -info << endl;
 				return;
 			}
 
@@ -1049,11 +1060,8 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			MKL_INT info, nrhs = 1 ,N = nbEnforcedAtomicConstraint;
-			dgesv(&N, &nrhs, LHS_enforcedLocalSystem.getPointer(), &N, LHSpivot_enforcedLocalSystem.getPointer(), RHS_enforcedLocalSystem.getPointer(), &N, &info);
-			if (info < 0)
+			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
 			{
-				cerr << "MLCP_GaussSeidel_Christian::doOneIteration  MKL dgesv: Illegal value for parameter " << -info << endl;
 				return;
 			}
 
