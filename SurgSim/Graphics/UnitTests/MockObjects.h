@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
+#define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
+
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Graphics/Actor.h"
 #include "SurgSim/Graphics/Camera.h"
@@ -511,3 +514,5 @@ private:
 	/// Whether the view has been awoken
 	bool m_isAwoken;
 };
+
+#endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
