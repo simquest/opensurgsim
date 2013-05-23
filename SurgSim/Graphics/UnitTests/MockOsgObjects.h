@@ -143,7 +143,8 @@ public:
 	/// \param	name	Name of the camera
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity, m_eye to (0,0,0), m_center to (0, 0, -1), and m_up to (0, 1, 0)
-	explicit MockOsgCamera(const std::string& name) : SurgSim::Graphics::OsgCamera(name), SurgSim::Graphics::Actor(name),
+	explicit MockOsgCamera(const std::string& name) : SurgSim::Graphics::Actor(name),
+        SurgSim::Graphics::OsgCamera(name),
 		m_numUpdates(0),
 		m_sumDt(0.0)
 	{

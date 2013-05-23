@@ -22,11 +22,11 @@ using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
 
 OsgView::OsgView(const std::string& name) : View(name),
-	m_view(new osgViewer::View()),
 	m_x(0), m_y(0),
 	m_width(800), m_height(600),
 	m_isPositionDirty(false),
-	m_areDimensionsDirty(false)
+	m_areDimensionsDirty(false),
+    m_view(new osgViewer::View())
 {
 	/// Don't allow the default camera here, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
