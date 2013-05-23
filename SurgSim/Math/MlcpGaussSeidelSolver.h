@@ -32,6 +32,7 @@ namespace Math
 */
 class MlcpGaussSeidelSolver : public MlcpSolver
 {
+public:
 	MlcpGaussSeidelSolver() :
 		m_epsilonConvergence(defaultEpsilonConvergence()),
 		m_contactTolerance(defaultContactTolerance()),
@@ -46,7 +47,7 @@ class MlcpGaussSeidelSolver : public MlcpSolver
 	MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance, unsigned int maxIterations) :
 		m_epsilonConvergence(epsilonConvergence),
 		m_contactTolerance(contactTolerance),
-		m_subStep(1.0),
+		m_substepRatio(1.0),
 		m_maxIterations(maxIterations),
 		m_catchExplodingConvergenceCriteria(true),
 		m_verbose(false),
@@ -58,7 +59,59 @@ class MlcpGaussSeidelSolver : public MlcpSolver
 	{
 	}
 
+
 	virtual bool solve(const MlcpProblem& problem, MlcpSolution* solution);
+
+
+	double getEpsilonConvergence() const
+	{
+		return m_epsilonConvergence;
+	}
+	void setEpsilonConvergence(double val)
+	{
+		m_epsilonConvergence = val;
+	}
+	double getContactTolerance() const
+	{
+		return m_contactTolerance;
+	}
+	void setContactTolerance(double val)
+	{
+		m_contactTolerance = val;
+	}
+	double getSubstepRatio() const
+	{
+		return m_substepRatio;
+	}
+	void setSubstepRatio(double val)
+	{
+		m_substepRatio = val;
+	}
+	unsigned int getMaxIterations() const
+	{
+		return m_maxIterations;
+	}
+	void setMaxIterations(unsigned int val)
+	{
+		m_maxIterations = val;
+	}
+	bool isCatchingExplodingConvergenceCriteria() const
+	{
+		return m_catchExplodingConvergenceCriteria;
+	}
+	void setCatchingExplodingConvergenceCriteria(bool val)
+	{
+		m_catchExplodingConvergenceCriteria = val;
+	}
+	bool isVerbose() const
+	{
+		return m_verbose;
+	}
+	void setVerbose(bool val)
+	{
+		m_verbose = val;
+	}
+
 
 	static double defaultEpsilonConvergence()
 	{
@@ -78,7 +131,7 @@ private:
 
 	double       m_epsilonConvergence;
 	double       m_contactTolerance;
-	double       m_subStep;
+	double       m_substepRatio;
 	unsigned int m_maxIterations;
 	bool         m_catchExplodingConvergenceCriteria;
 	bool         m_verbose;

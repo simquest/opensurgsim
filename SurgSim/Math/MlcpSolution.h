@@ -35,6 +35,10 @@ struct MlcpSolution
 	double constraintConvergenceCriteria;
 	double initialConstraintConvergenceCriteria;
 
+	MlcpSolution()
+	{
+	}
+
 private:
 	// Prevent copying and assignment
 	MlcpSolution(const MlcpSolution& other);
