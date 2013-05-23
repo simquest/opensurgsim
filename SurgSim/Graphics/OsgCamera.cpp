@@ -27,14 +27,14 @@ using SurgSim::Graphics::fromOsg;
 using SurgSim::Graphics::toOsg;
 using SurgSim::Math::makeRigidTransform;
 
-OsgCamera::OsgCamera(const std::string& name) : SurgSim::Graphics::Actor(name), SurgSim::Graphics::Camera(name), 
+OsgCamera::OsgCamera(const std::string& name) : SurgSim::Graphics::Actor(name), SurgSim::Graphics::Camera(name),
 	OsgActor(name, new osg::Switch()),
 	m_camera(new osg::Camera())
 {
 	m_switch = static_cast<osg::Switch*>(getOsgNode().get());
 	m_switch->setName(name + " Switch");
 	m_camera->setName(name + " Camera");
-	
+
 	m_switch->addChild(m_camera);
 
 	/// Update pose to inverse of view matrix
@@ -87,7 +87,7 @@ void OsgCamera::setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
 	/// Set the pose to the inverse of the view matrix
 	osg::Matrixd osgViewMatrix = toOsg(matrix);
 	osg::Matrixd osgInverseViewMatrix = osg::Matrixd::inverse(osgViewMatrix);
-	m_pose = makeRigidTransform(fromOsg<double>(osgInverseViewMatrix.getRotate()), 
+	m_pose = makeRigidTransform(fromOsg<double>(osgInverseViewMatrix.getRotate()),
 		fromOsg(osgInverseViewMatrix.getTrans()));
 
 	m_camera->setViewMatrix(osgViewMatrix);

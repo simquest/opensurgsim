@@ -20,7 +20,7 @@
 
 #include <osgViewer/Viewer>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics

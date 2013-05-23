@@ -22,7 +22,7 @@
 #include <osg/Camera>
 #include <osg/Switch>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Graphics
