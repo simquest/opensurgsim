@@ -79,6 +79,6 @@ public:
 	           IN bool catchExplodingConvergenceCriteria = false, IN bool verbose = false);
 };
 
-#include "MLCP_GaussSeidel_Christian.hpp"
+#include "MLCP_GaussSeidel_Christian-inl.h"
 
 #endif

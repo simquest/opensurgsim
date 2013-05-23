@@ -18,7 +18,7 @@
 
 #include <vector>
 #include <Eigen/Core>
-#include "MLCP_Constraint.h"
+#include <SurgSim/Math/MLCP_Constraint.h>
 
 
 struct MlcpTestData

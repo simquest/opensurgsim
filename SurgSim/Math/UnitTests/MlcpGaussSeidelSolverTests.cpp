@@ -21,8 +21,7 @@
 #include "TOOLS/Matrix/matrix.h"  //XXX temporary
 #include "TOOLS/Vector/vector.h"  //XXX temporary
 #include "TOOLS/Matrix/hardcoded_inverse.h" //XXX temporary
-#include "MLCP_Constraint.h"      //XXX temporary??
-#include "MLCP_GaussSeidel_Christian.h"
+#include <SurgSim/Math/MLCP_GaussSeidel_Christian.h>
 #include "SqMathUtils.h"
 #include "MlcpTestProblems.h"
 #include "gtest/gtest.h"
