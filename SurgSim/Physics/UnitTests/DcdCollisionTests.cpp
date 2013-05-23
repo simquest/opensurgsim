@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file Tests for the DCDCollision Class
+/// \file Tests for the DcdCollision Class
 
 #include <gtest/gtest.h>
 
@@ -22,15 +22,11 @@
 
 
 #include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Physics/DCDCollision.h>
-#include <SurgSim/Physics/Actors/RigidActor.h>
-#include <SurgSim/Physics/Actors/RigidActorParameters.h>
+#include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/Actors/RigidActorCollisionRepresentation.h>
 #include <SurgSim/Physics/Actors/SphereShape.h>
 
-#include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
 
 using SurgSim::Physics::CollisionRepresentation;
 using SurgSim::Physics::CollisionPair;
@@ -60,7 +56,7 @@ std::shared_ptr<RigidActorCollisionRepresentation>
 }
 
 
-TEST(DCDCollisionTest, SingleCollisionTest)
+TEST(DcdCollisionTest, SingleCollisionTest)
 {
 	std::shared_ptr<CollisionRepresentation> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
 	std::shared_ptr<CollisionRepresentation> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
@@ -70,7 +66,7 @@ TEST(DCDCollisionTest, SingleCollisionTest)
 
 	pairs->push_back(std::make_shared<CollisionPair>(sphere1, sphere2));
 
-	SurgSim::Physics::DCDCollision computation(pairs);
+	SurgSim::Physics::DcdCollision computation(pairs);
 	computation.update(1.0);
 
 	EXPECT_TRUE((*pairs)[0]->hasContacts());

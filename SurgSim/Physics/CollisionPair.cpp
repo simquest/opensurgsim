@@ -26,7 +26,7 @@ namespace Physics
 CollisionPair::CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second) :
 		m_representations(first, second)
 {
-	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Colliders cannot be null";
+	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
 }
 
 CollisionPair::~CollisionPair()

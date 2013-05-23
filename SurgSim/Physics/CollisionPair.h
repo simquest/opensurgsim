@@ -27,15 +27,15 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Contact data structure used when two colliders touch each other
+/// Contact data structure used when two representations touch each other
 /// The convention is that if body 1 is moved along the normal vector by
 /// a distance depth (or equivalently if body 2 is moved the same distance
 /// in the opposite direction) then the penetration depth will be reduced to
 /// zero. This means that the normal vector points "in" to body 1
 struct Contact {
-	double depth;						///< What is the penetration depth for the collider
+	double depth;						///< What is the penetration depth for the representation
 	SurgSim::Math::Vector3d contact;	///< The actual contact point
-	SurgSim::Math::Vector3d normal;		///< The normal on the contact point (normalized)
+	SurgSim::Math::Vector3d normal;		///< The normal on the contact point (norapmalized)
 };
 
 /// Collision Pair class, it signifies a pair of items that should be checked with the
@@ -45,17 +45,17 @@ class CollisionPair
 {
 public:
 
-	CollisionPair(std::shared_ptr<CollisionRepresentation> colliderOne, std::shared_ptr<CollisionRepresentation> colliderTwo);
+	CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second);
 	~CollisionPair();
 
-	/// \return The collider considered to be the left collider
-	inline std::shared_ptr<CollisionRepresentation> getFirstCollider() const
+	/// \return The representation considered to be the first
+	inline std::shared_ptr<CollisionRepresentation> getFirst() const
 	{
 		return m_representations.first;
 	}
 
-	/// \return The collider considered to be the right collider
-	inline std::shared_ptr<CollisionRepresentation> getSecondCollider() const
+	/// \return The represenation considered to be the first
+	inline std::shared_ptr<CollisionRepresentation> getSecond() const
 	{
 		return m_representations.second;
 	}
@@ -69,7 +69,7 @@ public:
 	/// Adds a contact to the collision pair.
 	/// \param	depth			The depth of the intersection.
 	/// \param	contactPoint	The contact point, between the two bodies.
-	/// \param	normal			The normal of the contact pointing into the leftCollider.
+	/// \param	normal			The normal of the contact pointing into the first representation.
 	inline void addContact(const double& depth, SurgSim::Math::Vector3d contactPoint, SurgSim::Math::Vector3d normal)
 	{
 		Contact contact = {depth,contactPoint,normal};

@@ -29,13 +29,13 @@ namespace Physics
 
 /// Computation to determine the contacts between a list of CollisionPairs
 /// will update the collision pairs accordingly
-class DCDCollision : public Computation
+class DcdCollision : public Computation
 {
 public:
 
 	/// Constructor
-	explicit DCDCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs );
-	~DCDCollision();
+	explicit DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs );
+	virtual ~DcdCollision();
 
 protected:
 	void doUpdate(double dt);

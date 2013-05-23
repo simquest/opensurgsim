@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/DCDCollision.h>
+#include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -32,11 +32,11 @@ namespace {
 	bool intersectSphereSphere(std::shared_ptr<CollisionPair> pair)
 	{
 		bool result = false;
-		std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirstCollider()->getShape());
-		std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecondCollider()->getShape());
+		std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
+		std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
 
-		Vector3d leftCenter = pair->getFirstCollider()->getLocalToWorldTransform().translation();
-		Vector3d rightCenter = pair->getSecondCollider()->getLocalToWorldTransform().translation();
+		Vector3d leftCenter = pair->getFirst()->getLocalToWorldTransform().translation();
+		Vector3d rightCenter = pair->getSecond()->getLocalToWorldTransform().translation();
 
 		Vector3d normal = rightCenter - leftCenter;
 		double dist = normal.norm();
@@ -55,18 +55,18 @@ namespace SurgSim
 namespace Physics
 {
 
-DCDCollision::DCDCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs) :
+DcdCollision::DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs) :
 	m_pairs(pairs)
 {
 
 }
 
-DCDCollision::~DCDCollision()
+DcdCollision::~DcdCollision()
 {
 
 }
 
-void DCDCollision::doUpdate(double dt)
+void DcdCollision::doUpdate(double dt)
 {
 	std::list<CollisionPair> result;
 	auto it = m_pairs->cbegin();
@@ -78,7 +78,7 @@ void DCDCollision::doUpdate(double dt)
 	}
 }
 
-void DCDCollision::calculateContacts(std::shared_ptr<CollisionPair> it)
+void DcdCollision::calculateContacts(std::shared_ptr<CollisionPair> it)
 {
 	intersectSphereSphere(it);
 }
