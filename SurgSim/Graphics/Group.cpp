@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Group.h"
+#include <SurgSim/Graphics/Group.h>
 
 #include <SurgSim/Graphics/Actor.h>
 

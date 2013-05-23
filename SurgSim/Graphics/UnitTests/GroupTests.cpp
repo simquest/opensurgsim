@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the Group class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using SurgSim::Graphics::Actor;
 using SurgSim::Graphics::Group;

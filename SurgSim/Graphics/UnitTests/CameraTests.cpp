@@ -16,11 +16,11 @@
 /// \file
 /// Tests for the Camera class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
 #include <SurgSim/Math/Quaternion.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <random>
 

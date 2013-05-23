@@ -25,7 +25,7 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using SurgSim::Graphics::fromOsg;
 using SurgSim::Graphics::toOsg;

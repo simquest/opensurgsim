@@ -18,7 +18,7 @@
 
 #include <SurgSim/Graphics/OsgVectorConversions.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using SurgSim::Graphics::fromOsg;
 using SurgSim::Graphics::toOsg;
