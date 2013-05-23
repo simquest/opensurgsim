@@ -75,7 +75,7 @@ TEST(ViewTests, CameraTest)
 	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test camera");
 
 	/// Set the camera and check that it set correctly
-	view->setCamera(camera);
+	EXPECT_TRUE(view->setCamera(camera));
 
 	EXPECT_EQ(camera, view->getCamera());
 }
