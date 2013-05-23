@@ -118,81 +118,14 @@ TEST(OsgViewTests, UpdateTest)
 	std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
 	/// Do 10 updates with random dt and check each time that the number of updates and sum of dt are correct.
-	/// Also change the position and then dimensions and check that they are updated correctly at the OSG level.
 	for (int i = 1; i <= 10; ++i)
 	{
 		double dt = distribution(generator);
 		sumDt += dt;
 
-		/// Try changing the position
-		if (i == 3)
-		{
-			view->setPosition(50, 60);
-		}
-		/// Try changing the dimensions
-		if (i == 6)
-		{
-			view->setDimensions(100, 200);
-		}
-
 		view->update(dt);
 
 		EXPECT_EQ(i, mockOsgView->getNumUpdates());
 		EXPECT_EQ(sumDt, mockOsgView->getSumDt());
-
-		/// The position should initially be (0, 0) and dimensions 800 x 600
-		if (i < 3)
-		{
-			std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(mockOsgView->getCamera());
-			EXPECT_NE(nullptr, osgCamera);
-
-			osgViewer::GraphicsWindow* window = dynamic_cast<osgViewer::GraphicsWindow*>(
-				osgCamera->getOsgCamera()->getGraphicsContext());
-
-			EXPECT_NE(nullptr, window);
-			int testX, testY, testWidth, testHeight;
-			window->getWindowRectangle(testX, testY, testWidth, testHeight);
-
-			EXPECT_EQ(0, testX);
-			EXPECT_EQ(0, testY);
-			EXPECT_EQ(0, testWidth);
-			EXPECT_EQ(0, testHeight);
-		}
-		/// The position should now be (50, 60) and dimensions 800 x 600
-		else if (i >= 3 && i < 6)
-		{
-			std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(mockOsgView->getCamera());
-			EXPECT_NE(nullptr, osgCamera);
-
-			osgViewer::GraphicsWindow* window = dynamic_cast<osgViewer::GraphicsWindow*>(
-				osgCamera->getOsgCamera()->getGraphicsContext());
-
-			EXPECT_NE(nullptr, window);
-			int testX, testY, testWidth, testHeight;
-			window->getWindowRectangle(testX, testY, testWidth, testHeight);
-
-			EXPECT_EQ(50, testX);
-			EXPECT_EQ(60, testY);
-			EXPECT_EQ(800, testWidth);
-			EXPECT_EQ(600, testHeight);
-		}
-		/// The position should now be (50, 60) and dimensions 100 x 200
-		else if (i >= 6)
-		{
-			std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(mockOsgView->getCamera());
-			EXPECT_NE(nullptr, osgCamera);
-
-			osgViewer::GraphicsWindow* window = dynamic_cast<osgViewer::GraphicsWindow*>(
-				osgCamera->getOsgCamera()->getGraphicsContext());
-
-			EXPECT_NE(nullptr, window);
-			int testX, testY, testWidth, testHeight;
-			window->getWindowRectangle(testX, testY, testWidth, testHeight);
-
-			EXPECT_EQ(50, testX);
-			EXPECT_EQ(60, testY);
-			EXPECT_EQ(100, testWidth);
-			EXPECT_EQ(200, testHeight);
-		}
 	}
 }
