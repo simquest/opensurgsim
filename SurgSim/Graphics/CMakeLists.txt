@@ -13,21 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
+
+find_package(OpenThreads)
+set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
+
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
-	Manager.cpp
 	Group.cpp
+	Manager.cpp
 	ViewElement.cpp
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
 	Actor.h
 	Camera.h
-	Manager.h
 	Group.h
+	Manager.h
+	OsgMatrixConversions.h
+	OsgQuaternionConversions.h
+	OsgRigidTransformConversions.h
+	OsgVectorConversions.h
 	View.h
 	ViewElement.h
 )
@@ -37,5 +49,3 @@ add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADE
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
-
-#add_subdirectory(Osg)
