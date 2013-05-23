@@ -110,7 +110,7 @@ TEST(OsgViewTests, UpdateTest)
 	/// Make sure that we can successfully initialize, which setups up the window
 	EXPECT_TRUE(mockOsgView->initialize());
 
-	EXPECT_EQ(0, mockOsgView->getNumUpdates());
+	EXPECT_EQ(0u, mockOsgView->getNumUpdates());
 	EXPECT_EQ(0.0, mockOsgView->getSumDt());
 
 	double sumDt = 0.0;
@@ -153,10 +153,10 @@ TEST(OsgViewTests, UpdateTest)
 			int testX, testY, testWidth, testHeight;
 			window->getWindowRectangle(testX, testY, testWidth, testHeight);
 
-			EXPECT_EQ(testX, 0);
-			EXPECT_EQ(testY, 0);
-			EXPECT_EQ(testWidth, 800);
-			EXPECT_EQ(testHeight, 600);
+			EXPECT_EQ(0, testX);
+			EXPECT_EQ(0, testY);
+			EXPECT_EQ(0, testWidth);
+			EXPECT_EQ(0, testHeight);
 		}
 		/// The position should now be (50, 60) and dimensions 800 x 600
 		else if (i >= 3 && i < 6)
@@ -171,10 +171,10 @@ TEST(OsgViewTests, UpdateTest)
 			int testX, testY, testWidth, testHeight;
 			window->getWindowRectangle(testX, testY, testWidth, testHeight);
 
-			EXPECT_EQ(testX, 50);
-			EXPECT_EQ(testY, 60);
-			EXPECT_EQ(testWidth, 800);
-			EXPECT_EQ(testHeight, 600);
+			EXPECT_EQ(50, testX);
+			EXPECT_EQ(60, testY);
+			EXPECT_EQ(800, testWidth);
+			EXPECT_EQ(600, testHeight);
 		}
 		/// The position should now be (50, 60) and dimensions 100 x 200
 		else if (i >= 6)
@@ -189,10 +189,10 @@ TEST(OsgViewTests, UpdateTest)
 			int testX, testY, testWidth, testHeight;
 			window->getWindowRectangle(testX, testY, testWidth, testHeight);
 
-			EXPECT_EQ(testX, 50);
-			EXPECT_EQ(testY, 60);
-			EXPECT_EQ(testWidth, 100);
-			EXPECT_EQ(testHeight, 200);
+			EXPECT_EQ(50, testX);
+			EXPECT_EQ(60, testY);
+			EXPECT_EQ(100, testWidth);
+			EXPECT_EQ(200, testHeight);
 		}
 	}
 }

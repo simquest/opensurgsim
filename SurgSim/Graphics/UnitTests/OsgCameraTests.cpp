@@ -146,7 +146,7 @@ TEST(OsgCameraTests, UpdateTest)
 	std::shared_ptr<MockOsgCamera> mockCamera = std::make_shared<MockOsgCamera>("test name");
 	std::shared_ptr<Camera> camera = mockCamera;
 
-	EXPECT_EQ(0, mockCamera->getNumUpdates());
+	EXPECT_EQ(0u, mockCamera->getNumUpdates());
 	EXPECT_EQ(0.0, mockCamera->getSumDt());
 
 	double sumDt = 0.0;
