@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
+#define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
+
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Graphics/Actor.h"
 #include "SurgSim/Graphics/Camera.h"
@@ -76,6 +79,8 @@ public:
 	/// \param	name	Name of the actor
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
+	/// \post m_isInitialized and m_isAwoken are set to false
+	/// \post m_isVisible is set to true
 	explicit MockActor(const std::string& name) : SurgSim::Graphics::Actor(name),
 		m_isVisible(true),
 		m_numUpdates(0),
@@ -214,7 +219,8 @@ public:
 	/// \param	name	Name of the camera
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity, m_eye to (0,0,0), m_center to (0, 0, -1), and m_up to (0, 1, 0)
-	explicit MockCamera(const std::string& name) : SurgSim::Graphics::Camera(name),
+	/// \post m_isVisible is set to true
+	explicit MockCamera(const std::string& name) : SurgSim::Graphics::Actor(name), SurgSim::Graphics::Camera(name),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isVisible(true)
@@ -452,12 +458,12 @@ public:
 	}
 
 	/// Sets the view component that provides the visualization of the graphics actors
-	/// Only allow MockView components, any other will not be set and return false.
+	/// Only allows MockView components, any other will not be set and it will return false.
 	/// \return	True if it succeeds, false if it fails
 	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
 	{
 		std::shared_ptr<MockView> mockView = std::dynamic_pointer_cast<MockView>(view);
-		if (mockView)
+		if (mockView != nullptr)
 		{
 			return ViewElement::setView(mockView);
 		}
@@ -511,3 +517,5 @@ private:
 	/// Whether the view has been awoken
 	bool m_isAwoken;
 };
+
+#endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H

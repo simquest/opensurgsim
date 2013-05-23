@@ -14,36 +14,47 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the Actor class.
+/// Tests for the OsgActor class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
+#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/Vector.h>
 
 #include <gtest/gtest.h>
 
 #include <random>
 
 using SurgSim::Graphics::Actor;
+using SurgSim::Graphics::OsgActor;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-TEST(ActorTests, InitTest)
+TEST(OsgActorTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<Actor> actor = std::make_shared<MockActor>("test name");});
-}
+	ASSERT_NO_THROW({std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");});
 
-TEST(ActorTests, NameTest)
-{
-	std::shared_ptr<Actor> actor = std::make_shared<MockActor>("test name");
+	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
 
 	EXPECT_EQ("test name", actor->getName());
+	EXPECT_TRUE(actor->isVisible());
 }
 
-TEST(ActorTests, VisibilityTest)
+TEST(OsgActorTests, OsgNodeTest)
 {
-	std::shared_ptr<Actor> actor = std::make_shared<MockActor>("test name");
+	std::shared_ptr<OsgActor> actor = std::make_shared<MockOsgActor>("test name");
+
+	EXPECT_NE(nullptr, actor->getOsgNode());
+
+	/// Check that the OSG node is a group (MockOsgActor passes a new group as the node into the OsgActor constructor)
+	osg::ref_ptr<osg::Group> osgGroup = dynamic_cast<osg::Group*>(actor->getOsgNode().get());
+	EXPECT_TRUE(osgGroup.valid()) << "Actor's OSG node should be a group!";
+}
+
+TEST(OsgActorTests, VisibilityTest)
+{
+	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
 
 	actor->setVisible(true);
 	EXPECT_TRUE(actor->isVisible());
@@ -52,9 +63,9 @@ TEST(ActorTests, VisibilityTest)
 	EXPECT_FALSE(actor->isVisible());
 }
 
-TEST(ActorTests, PoseTest)
+TEST(OsgActorTests, PoseTest)
 {
-	std::shared_ptr<Actor> actor = std::make_shared<MockActor>("test name");
+	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
 
 	EXPECT_TRUE(actor->getPose().isApprox(RigidTransform3d::Identity()));
 
@@ -70,9 +81,9 @@ TEST(ActorTests, PoseTest)
 	EXPECT_TRUE(actor->getPose().isApprox(transform));
 }
 
-TEST(ActorTests, UpdateTest)
+TEST(OsgActorTests, UpdateTest)
 {
-	std::shared_ptr<MockActor> mockActor = std::make_shared<MockActor>("test name");
+	std::shared_ptr<MockOsgActor> mockActor = std::make_shared<MockOsgActor>("test name");
 	std::shared_ptr<Actor> actor = mockActor;
 
 	EXPECT_EQ(0, mockActor->getNumUpdates());

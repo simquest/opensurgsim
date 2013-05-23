@@ -16,7 +16,6 @@
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
@@ -30,6 +29,8 @@ set(UNIT_TEST_SOURCES
 	CameraTests.cpp
 	GroupTests.cpp
 	ManagerTests.cpp
+	OsgActorTests.cpp
+	OsgGroupTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRigidTransformConversionsTests.cpp
@@ -40,6 +41,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
+	MockOsgObjects.h
 )
 
 set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})

@@ -28,6 +28,7 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
+	OsgGroup.cpp
 	ViewElement.cpp
 )
 
@@ -36,6 +37,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Camera.h
 	Group.h
 	Manager.h
+	OsgActor.h
+	OsgGroup.h
 	OsgMatrixConversions.h
 	OsgQuaternionConversions.h
 	OsgRigidTransformConversions.h
