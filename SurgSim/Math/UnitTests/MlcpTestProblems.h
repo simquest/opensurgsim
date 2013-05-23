@@ -18,12 +18,9 @@
 
 #include <vector>
 #include <Eigen/Core>
-#include "TOOLS/Matrix/matrix.h"
-#include "TOOLS/Vector/vector.h"
 #include <SurgSim/Math/MLCP_Constraint.h>
 
 #include "MlcpTestData.h"
-
 
 const MlcpTestData* getTestProblem1();
 

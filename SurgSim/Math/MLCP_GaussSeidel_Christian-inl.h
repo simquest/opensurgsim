@@ -1,6 +1,4 @@
 #include <math.h>
-#include <TOOLS/Vector/vector.h>
-#include <TOOLS/Matrix/matrix.h>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -239,9 +237,10 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 		case MLCP_BILATERAL_1D_CONSTRAINT:
 		{
 			double violation = b[currentAtomicIndex]*subStep;
+			//XXX REWRITE
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation * violation);
 			convergence_criteria += criteria;
@@ -254,11 +253,12 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
+			// XXX REWRITE
 			double violation[2] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1]);
 			convergence_criteria += criteria;
@@ -272,11 +272,12 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
 			double violation[3] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
+			// XXX REWRITE
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-				violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1] + violation[2]*violation[2]);
 			convergence_criteria += criteria;
@@ -294,7 +295,7 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			double violation = b[currentAtomicIndex]*subStep;
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A[currentAtomicIndex][j] * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
 			if (violation<-contactTolerance || !SurgSim::Math::isValid(violation))
 			{
@@ -313,7 +314,7 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			double violation = b[currentAtomicIndex]*subStep;
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A[currentAtomicIndex][j] * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
 			if (violation<-contactTolerance || !SurgSim::Math::isValid(violation))
 			{
@@ -332,8 +333,8 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			double violation[2] = { b[currentAtomicIndex] , b[currentAtomicIndex+1] };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1]);
 			convergence_criteria += criteria;
@@ -350,8 +351,8 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			double violation[2] = { b[currentAtomicIndex] , b[currentAtomicIndex+1] };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			double criteria = sqrt(violation[0]*violation[0] + violation[1]*violation[1]);
 			convergence_criteria += criteria;
@@ -446,9 +447,8 @@ computeEnforcementSystem(
 		}
 	}
 	nbEnforcedAtomicConstraint = systemSize;
-	RHS_enforcedLocalSystem.resizeUpIfNecessary(systemSize);
-	LHS_enforcedLocalSystem.resizeUpIfNecessary(systemSize,systemSize);
-	LHSpivot_enforcedLocalSystem.resizeUpIfNecessary(systemSize);
+	RHS_enforcedLocalSystem.resize(systemSize);
+	LHS_enforcedLocalSystem.resize(systemSize, systemSize);
 
 	// 2nd) Fill up the system
 	// We suppose that the constraint to enforce are only 1D, 2D or 3D bilateral constraints
@@ -459,13 +459,13 @@ computeEnforcementSystem(
 			RHS_enforcedLocalSystem[line] = b[line] * subStep;  // At the same time, we compute the violation for the constraints
 			for (int column=0 ; column<systemSizeWithoutConstraintID ; column++)
 			{
-				LHS_enforcedLocalSystem[line][column] = A[line][column];
-				RHS_enforcedLocalSystem[line] += A[line][column]*initialGuess_and_solution[column];
+				LHS_enforcedLocalSystem(line, column) = A(line, column);
+				RHS_enforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
 			}
 			// Now we complete the violation[line] computation by taking into account the effect of all remaining contacts/slidings/constraints
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[line] += A[line][column]*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
 			}
 		}
 
@@ -478,16 +478,16 @@ computeEnforcementSystem(
 			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] = b[matrixEntryForConstraintID] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID] = A[line][matrixEntryForConstraintID];
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID][line] = A[matrixEntryForConstraintID][line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A[matrixEntryForConstraintID][line] * initialGuess_and_solution[line];
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID][systemSizeWithoutConstraintID] = A[matrixEntryForConstraintID][matrixEntryForConstraintID];
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A[matrixEntryForConstraintID][column]*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -499,25 +499,25 @@ computeEnforcementSystem(
 			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID  ] = A[line][matrixEntryForConstraintID  ];
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID+1] = A[line][matrixEntryForConstraintID+1];
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
 
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID    ][line] = A[matrixEntryForConstraintID  ][line];
-				LHS_enforcedLocalSystem[(systemSizeWithoutConstraintID+1)][line] = A[matrixEntryForConstraintID+1][line];
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,     line) = A(matrixEntryForConstraintID,   line);
+				LHS_enforcedLocalSystem((systemSizeWithoutConstraintID+1), line) = A(matrixEntryForConstraintID+1, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A[matrixEntryForConstraintID  ][line] * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A[matrixEntryForConstraintID+1][line] * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID+1];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID+1];
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A[matrixEntryForConstraintID  ][column]*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A[matrixEntryForConstraintID+1][column]*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -530,34 +530,34 @@ computeEnforcementSystem(
 			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] = b[matrixEntryForConstraintID+2] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID  ] = A[line][matrixEntryForConstraintID  ];
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID+1] = A[line][matrixEntryForConstraintID+1];
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID+2] = A[line][matrixEntryForConstraintID+2];
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+2) = A(line, matrixEntryForConstraintID+2);
 
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][line] = A[matrixEntryForConstraintID  ][line];
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][line] = A[matrixEntryForConstraintID+1][line];
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2][line] = A[matrixEntryForConstraintID+2][line];
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, line) = A(matrixEntryForConstraintID+2, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A[matrixEntryForConstraintID  ][line] * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A[matrixEntryForConstraintID+1][line] * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] += A[matrixEntryForConstraintID+2][line] * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID+1];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID+2] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID+2];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID+1];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID+2] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID+2];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID+2][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID+2][matrixEntryForConstraintID+1];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2][systemSizeWithoutConstraintID+2] = A[matrixEntryForConstraintID+2][matrixEntryForConstraintID+2];
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+2);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+2);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+1);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+2);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A[matrixEntryForConstraintID  ][column]*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A[matrixEntryForConstraintID+1][column]*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] += A[matrixEntryForConstraintID+2][column]*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -570,18 +570,18 @@ computeEnforcementSystem(
 			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] = b[matrixEntryForConstraintID] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID] = A[line][matrixEntryForConstraintID];
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID][line] = A[matrixEntryForConstraintID][line];
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A[matrixEntryForConstraintID][line] * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
 			}
 
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID][systemSizeWithoutConstraintID] = A[matrixEntryForConstraintID][matrixEntryForConstraintID];
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
 			//...and complete the violation for the normal contact constraint
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A[matrixEntryForConstraintID][column]*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
 			}
 		}
 		break;
@@ -595,26 +595,26 @@ computeEnforcementSystem(
 			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID  ] = A[line][matrixEntryForConstraintID  ];
-				LHS_enforcedLocalSystem[line][systemSizeWithoutConstraintID+1] = A[line][matrixEntryForConstraintID+1];
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
 
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][line] = A[matrixEntryForConstraintID  ][line];
-				LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][line] = A[matrixEntryForConstraintID+1][line];
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
+				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A[matrixEntryForConstraintID  ][line] * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A[matrixEntryForConstraintID+1][line] * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
 
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID  ][matrixEntryForConstraintID+1];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID  ] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID  ];
-			LHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1][systemSizeWithoutConstraintID+1] = A[matrixEntryForConstraintID+1][matrixEntryForConstraintID+1];
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
 			//...and complete the violation for the normal contact constraints
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A[matrixEntryForConstraintID  ][column]*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A[matrixEntryForConstraintID+1][column]*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
 			}
 
 		}
@@ -629,17 +629,15 @@ computeEnforcementSystem(
 }
 
 // Solve the system A x = b for x, with the assumption that the size is "size"
-static inline bool solveSystem(const Dynamic_Matrix<double>& A, const Dynamic_Vector<double>& b, int size, Dynamic_Vector<double>* x)
+static inline bool solveSystem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, int size, Eigen::VectorXd* x)
 {
-	Eigen::Map<const Eigen::MatrixXd> AA(A.getPointer(), size, size);
-	Eigen::Map<const Eigen::VectorXd> bb(b.getPointer(), size);
+	Eigen::MatrixXd AA = A.block(0, 0, size, size);
+	Eigen::VectorXd bb = b.head(size);
 
-	x->resizeUpIfNecessary(size);
-	Eigen::Map<Eigen::VectorXd> xx(x->getPointer(), size);
 	Eigen::VectorXd solution = AA.partialPivLu().solve(bb);
 	//Eigen::VectorXd solution = AA.colPivHouseholderQr().solve(bb);
 	//Eigen::VectorXd solution = AA.householderQr().solve(bb);
-	xx = solution;
+	*x = solution;
 	return true;
 }
 
@@ -672,9 +670,9 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			double violation = b[currentAtomicIndex]*subStep;
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A[currentAtomicIndex][j] * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
-			F -= violation/A[currentAtomicIndex][currentAtomicIndex];
+			F -= violation / A(currentAtomicIndex, currentAtomicIndex);
 		}
 		currentAtomicIndex++;
 		break;
@@ -689,18 +687,18 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			double violation[2] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			// det = ad-bc
 			// [ a b ]   [  d -b ]       [ 1 0 ]
 			// [ c d ] . [ -c  a ]/det = [ 0 1 ]
-			double A_determinant = A[currentAtomicIndex][currentAtomicIndex]*A[currentAtomicIndex+1][currentAtomicIndex+1]-
-			                       A[currentAtomicIndex][currentAtomicIndex+1]*A[currentAtomicIndex+1][currentAtomicIndex];
+			double A_determinant = A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
+			                       A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
 			double Ainv[2][2]=
 			{
-				{ A[currentAtomicIndex+1][currentAtomicIndex+1]/A_determinant  , -A[currentAtomicIndex  ][currentAtomicIndex+1]/A_determinant },
-				{-A[currentAtomicIndex+1][currentAtomicIndex  ]/A_determinant  ,  A[currentAtomicIndex  ][currentAtomicIndex  ]/A_determinant }
+				{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  , -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
+				{-A(currentAtomicIndex+1, currentAtomicIndex)/A_determinant  ,  A(currentAtomicIndex,   currentAtomicIndex)/A_determinant }
 			} ;
 			F1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
 			F2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
@@ -719,20 +717,14 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			double violation[3] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-				violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
-			double Ainv[3][3];
-			if (!inverseSubmatrix3x3(&A[currentAtomicIndex][currentAtomicIndex] , nbColumnInA , &Ainv[0][0]))
-			{
-				cerr << "MLCP_GaussSeidel_Christian::solve could not inversed 3x3 matrix in BILATERAL_3D_CONSTRAINT" << endl;
-				currentAtomicIndex+=3;
-				continue;
-			}
-			F1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1] + Ainv[0][2]*violation[2]);
-			F2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1] + Ainv[1][2]*violation[2]);
-			F3 -= (Ainv[2][0]*violation[0] + Ainv[2][1]*violation[1] + Ainv[2][2]*violation[2]);
+			Eigen::Matrix3d Ainv = A.block<3,3>(currentAtomicIndex, currentAtomicIndex).inverse();
+			F1 -= (Ainv(0, 0)*violation[0] + Ainv(0, 1)*violation[1] + Ainv(0, 2)*violation[2]);
+			F2 -= (Ainv(1, 0)*violation[0] + Ainv(1, 1)*violation[1] + Ainv(1, 2)*violation[2]);
+			F3 -= (Ainv(2, 0)*violation[0] + Ainv(2, 1)*violation[1] + Ainv(2, 2)*violation[2]);
 		}
 		currentAtomicIndex+=3;
 		break;
@@ -800,12 +792,12 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 				double violation[2]= { b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
 				for (int i=0 ; i<n ; i++)
 				{
-					violation[0] += A[currentAtomicIndex+1][i]*initialGuess_and_solution[i];
-					violation[1] += A[currentAtomicIndex+2][i]*initialGuess_and_solution[i];
+					violation[0] += A(currentAtomicIndex+1, i)*initialGuess_and_solution[i];
+					violation[1] += A(currentAtomicIndex+2, i)*initialGuess_and_solution[i];
 				}
 
-				Ft1 -= 2*violation[0]/(A[currentAtomicIndex+1][currentAtomicIndex+1] + A[currentAtomicIndex+2][currentAtomicIndex+2]);
-				Ft2 -= 2*violation[1]/(A[currentAtomicIndex+1][currentAtomicIndex+1] + A[currentAtomicIndex+2][currentAtomicIndex+2]);
+				Ft1 -= 2*violation[0]/(A(currentAtomicIndex+1, currentAtomicIndex+1) + A(currentAtomicIndex+2, currentAtomicIndex+2));
+				Ft2 -= 2*violation[1]/(A(currentAtomicIndex+1, currentAtomicIndex+1) + A(currentAtomicIndex+2, currentAtomicIndex+2));
 
 				double normFt = sqrt(Ft1 * Ft1 + Ft2 * Ft2);
 				if (normFt>local_mu*Fn)
@@ -879,24 +871,24 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//				b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A[0][j] * initialGuess_and_solution[j];
-			//				violation[1] += A[1][j] * initialGuess_and_solution[j];
-			//				violation[2] += A[2][j] * initialGuess_and_solution[j];
-			//				violation[3] += A[3][j] * initialGuess_and_solution[j];
-			//				violation[4] += A[4][j] * initialGuess_and_solution[j];
-			//				violation[5] += A[5][j] * initialGuess_and_solution[j];
-			//				violation[6] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//				violation[7] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
+			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
+			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
+			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
+			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
+			//				violation[5] += A(5, j) * initialGuess_and_solution[j];
+			//				violation[6] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//				violation[7] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//			}
 			//			double localA[64]={
-			//				A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][currentAtomicIndex], A[0][currentAtomicIndex+1],
-			//				A[1][0], A[1][1], A[1][2], A[1][3], A[1][4], A[1][5], A[1][currentAtomicIndex], A[1][currentAtomicIndex+1],
-			//				A[2][0], A[2][1], A[2][2], A[2][3], A[2][4], A[2][5], A[2][currentAtomicIndex], A[2][currentAtomicIndex+1],
-			//				A[3][0], A[3][1], A[3][2], A[3][3], A[3][4], A[3][5], A[3][currentAtomicIndex], A[3][currentAtomicIndex+1],
-			//				A[4][0], A[4][1], A[4][2], A[4][3], A[4][4], A[4][5], A[4][currentAtomicIndex], A[4][currentAtomicIndex+1],
-			//				A[5][0], A[5][1], A[5][2], A[5][3], A[5][4], A[5][5], A[5][currentAtomicIndex], A[5][currentAtomicIndex+1],
-			//				A[currentAtomicIndex  ][0], A[currentAtomicIndex  ][1], A[currentAtomicIndex  ][2], A[currentAtomicIndex  ][3], A[currentAtomicIndex  ][4], A[currentAtomicIndex  ][5], A[currentAtomicIndex  ][currentAtomicIndex], A[currentAtomicIndex  ][currentAtomicIndex+1],
-			//				A[currentAtomicIndex+1][0], A[currentAtomicIndex+1][1], A[currentAtomicIndex+1][2], A[currentAtomicIndex+1][3], A[currentAtomicIndex+1][4], A[currentAtomicIndex+1][5], A[currentAtomicIndex+1][currentAtomicIndex], A[currentAtomicIndex+1][currentAtomicIndex+1]
+			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, 5), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, 5), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, 5), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, 5), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+			//				A(5, 0), A(5, 1), A(5, 2), A(5, 3), A(5, 4), A(5, 5), A(5, currentAtomicIndex), A(5, currentAtomicIndex+1),
+			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   5), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, 5), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
 			//			};
 			//			double Ainv[64];
 			//			if( !inverseMatrix_using_BlockDecomposition<double,8,5,3>(localA,Ainv) ) // Try a block decomposition 7=5+3
@@ -936,22 +928,22 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			double violation[7] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A[0][j] * initialGuess_and_solution[j];
-			//				violation[1] += A[1][j] * initialGuess_and_solution[j];
-			//				violation[2] += A[2][j] * initialGuess_and_solution[j];
-			//				violation[3] += A[3][j] * initialGuess_and_solution[j];
-			//				violation[4] += A[4][j] * initialGuess_and_solution[j];
-			//				violation[5] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//				violation[6] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
+			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
+			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
+			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
+			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
+			//				violation[5] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//				violation[6] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//			}
 			//			double localA[49]={
-			//				A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][currentAtomicIndex], A[0][currentAtomicIndex+1],
-			//				A[1][0], A[1][1], A[1][2], A[1][3], A[1][4], A[1][currentAtomicIndex], A[1][currentAtomicIndex+1],
-			//				A[2][0], A[2][1], A[2][2], A[2][3], A[2][4], A[2][currentAtomicIndex], A[2][currentAtomicIndex+1],
-			//				A[3][0], A[3][1], A[3][2], A[3][3], A[3][4], A[3][currentAtomicIndex], A[3][currentAtomicIndex+1],
-			//				A[4][0], A[4][1], A[4][2], A[4][3], A[4][4], A[4][currentAtomicIndex], A[4][currentAtomicIndex+1],
-			//				A[currentAtomicIndex  ][0], A[currentAtomicIndex  ][1], A[currentAtomicIndex  ][2], A[currentAtomicIndex  ][3], A[currentAtomicIndex  ][4], A[currentAtomicIndex  ][currentAtomicIndex], A[currentAtomicIndex  ][currentAtomicIndex+1],
-			//				A[currentAtomicIndex+1][0], A[currentAtomicIndex+1][1], A[currentAtomicIndex+1][2], A[currentAtomicIndex+1][3], A[currentAtomicIndex+1][4], A[currentAtomicIndex+1][currentAtomicIndex], A[currentAtomicIndex+1][currentAtomicIndex+1]
+			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
 			//			};
 			//			double Ainv[49];
 			//			if( !inverseMatrix_using_BlockDecomposition<double,7,4,3>(localA,Ainv) )
@@ -986,18 +978,18 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//		double violation[5] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//		for( int j=0 ; j<n ; j++ )
 			//		{
-			//			violation[0] += A[0][j] * initialGuess_and_solution[j];
-			//			violation[1] += A[1][j] * initialGuess_and_solution[j];
-			//			violation[2] += A[2][j] * initialGuess_and_solution[j];
-			//			violation[3] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//			violation[4] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//			violation[0] += A(0, j) * initialGuess_and_solution[j];
+			//			violation[1] += A(1, j) * initialGuess_and_solution[j];
+			//			violation[2] += A(2, j) * initialGuess_and_solution[j];
+			//			violation[3] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//			violation[4] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//		}
 			//		double localA[25]={
-			//			A[0][0], A[0][1], A[0][2], A[0][currentAtomicIndex], A[0][currentAtomicIndex+1],
-			//			A[1][0], A[1][1], A[1][2], A[1][currentAtomicIndex], A[1][currentAtomicIndex+1],
-			//			A[2][0], A[2][1], A[2][2], A[2][currentAtomicIndex], A[2][currentAtomicIndex+1],
-			//			A[currentAtomicIndex  ][0], A[currentAtomicIndex  ][1], A[currentAtomicIndex  ][2], A[currentAtomicIndex  ][currentAtomicIndex], A[currentAtomicIndex  ][currentAtomicIndex+1],
-			//			A[currentAtomicIndex+1][0], A[currentAtomicIndex+1][1], A[currentAtomicIndex+1][2], A[currentAtomicIndex+1][currentAtomicIndex], A[currentAtomicIndex+1][currentAtomicIndex+1]
+			//			A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+			//			A(1, 0), A(1, 1), A(1, 2), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+			//			A(2, 0), A(2, 1), A(2, 2), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+			//			A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+			//			A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
 			//		};
 			//		double Ainv[25];
 			//		if( !inverseMatrix_using_BlockDecomposition<double,5,2,3>(localA,Ainv) )
@@ -1024,18 +1016,18 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//	double violation[2] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//	for( int j=0 ; j<n ; j++ )
 			//	{
-			//		violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//		violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//		violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//		violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//	}
 
 			//	// det = ad-bc
 			//	// [ a b ]   [  d -b ]       [ 1 0 ]
 			//	// [ c d ] . [ -c  a ]/det = [ 0 1 ]
-			//	double A_determinant = A[currentAtomicIndex][currentAtomicIndex]*A[currentAtomicIndex+1][currentAtomicIndex+1]-
-			//		A[currentAtomicIndex][currentAtomicIndex+1]*A[currentAtomicIndex+1][currentAtomicIndex];
+			//	double A_determinant = A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
+			//		A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
 			//	double Ainv[2][2]={
-			//		{ A[currentAtomicIndex+1][currentAtomicIndex+1]/A_determinant  , -A[currentAtomicIndex  ][currentAtomicIndex+1]/A_determinant },
-			//		{-A[currentAtomicIndex+1][currentAtomicIndex  ]/A_determinant  ,  A[currentAtomicIndex  ][currentAtomicIndex  ]/A_determinant }
+			//		{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  , -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
+			//		{-A(currentAtomicIndex+1, currentAtomicIndex  )/A_determinant  ,  A(currentAtomicIndex,   currentAtomicIndex  )/A_determinant }
 			//	} ;
 			//	Fn1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
 			//	Fn2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
@@ -1078,10 +1070,10 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 				double violation = b[currentAtomicIndex+2]*subStep;
 				for (int i=0 ; i<n ; i++)
 				{
-					violation += A[currentAtomicIndex+2][i]*initialGuess_and_solution[i];
+					violation += A(currentAtomicIndex+2, i)*initialGuess_and_solution[i];
 				}
 
-				Ft -= violation/A[currentAtomicIndex+2][currentAtomicIndex+2];
+				Ft -= violation/A(currentAtomicIndex+2, currentAtomicIndex+2);
 
 				double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
 				double normFt = fabs(Ft);
@@ -1120,28 +1112,28 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//				b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A[0][j] * initialGuess_and_solution[j];
-			//				violation[1] += A[1][j] * initialGuess_and_solution[j];
-			//				violation[2] += A[2][j] * initialGuess_and_solution[j];
-			//				violation[3] += A[3][j] * initialGuess_and_solution[j];
-			//				violation[4] += A[4][j] * initialGuess_and_solution[j];
-			//				violation[5] += A[5][j] * initialGuess_and_solution[j];
-			//				violation[6] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//				violation[7] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
+			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
+			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
+			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
+			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
+			//				violation[5] += A(5, j) * initialGuess_and_solution[j];
+			//				violation[6] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//				violation[7] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//				if(j>=7 && j!=currentAtomicIndex)
 			//				{
-			//					violation[8] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+			//					violation[8] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			//				}
 			//			}
 			//			double localA[64]={
-			//				A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][5], A[0][currentAtomicIndex], A[0][currentAtomicIndex+1],
-			//				A[1][0], A[1][1], A[1][2], A[1][3], A[1][4], A[1][5], A[1][currentAtomicIndex], A[1][currentAtomicIndex+1],
-			//				A[2][0], A[2][1], A[2][2], A[2][3], A[2][4], A[2][5], A[2][currentAtomicIndex], A[2][currentAtomicIndex+1],
-			//				A[3][0], A[3][1], A[3][2], A[3][3], A[3][4], A[3][5], A[3][currentAtomicIndex], A[3][currentAtomicIndex+1],
-			//				A[4][0], A[4][1], A[4][2], A[4][3], A[4][4], A[4][5], A[4][currentAtomicIndex], A[4][currentAtomicIndex+1],
-			//				A[5][0], A[5][1], A[5][2], A[5][3], A[5][4], A[5][5], A[5][currentAtomicIndex], A[5][currentAtomicIndex+1],
-			//				A[currentAtomicIndex  ][0], A[currentAtomicIndex  ][1], A[currentAtomicIndex  ][2], A[currentAtomicIndex  ][3], A[currentAtomicIndex  ][4], A[currentAtomicIndex  ][5], A[currentAtomicIndex  ][currentAtomicIndex], A[currentAtomicIndex  ][currentAtomicIndex+1],
-			//				A[currentAtomicIndex+1][0], A[currentAtomicIndex+1][1], A[currentAtomicIndex+1][2], A[currentAtomicIndex+1][3], A[currentAtomicIndex+1][4], A[currentAtomicIndex+1][5], A[currentAtomicIndex+1][currentAtomicIndex], A[currentAtomicIndex+1][currentAtomicIndex+1]
+			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, 5), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, 5), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, 5), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, 5), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+			//				A(5, 0), A(5, 1), A(5, 2), A(5, 3), A(5, 4), A(5, 5), A(5, currentAtomicIndex), A(5, currentAtomicIndex+1),
+			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   5), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, 5), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
 			//			};
 			//			double Ainv[64];
 			//			if( !inverseMatrix_using_BlockDecomposition<double,8,5,3>(localA,Ainv) ) // Try a block decomposition 7=5+3
@@ -1167,16 +1159,16 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			//if(Fn>0.0)
 			//			{
 			//				// Complete the violation of the friction along t, with the missing terms...
-			//				violation[8] += A[currentAtomicIndex+2][     0]*FX +
-			//					A[currentAtomicIndex+2][                   1]*FY +
-			//					A[currentAtomicIndex+2][                   2]*FZ +
-			//					A[currentAtomicIndex+2][                   3]*FdirX +
-			//					A[currentAtomicIndex+2][                   4]*FdirY +
-			//					A[currentAtomicIndex+2][                   5]*Faxial+
-			//					A[currentAtomicIndex+2][currentAtomicIndex  ]*Fn1 +
-			//					A[currentAtomicIndex+2][currentAtomicIndex+1]*Fn2;
+			//				violation[8] += A(currentAtomicIndex+2,      0)*FX +
+			//					A(currentAtomicIndex+2,                    1)*FY +
+			//					A(currentAtomicIndex+2,                    2)*FZ +
+			//					A(currentAtomicIndex+2,                    3)*FdirX +
+			//					A(currentAtomicIndex+2,                    4)*FdirY +
+			//					A(currentAtomicIndex+2,                    5)*Faxial+
+			//					A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1 +
+			//					A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
 
-			//				Ft -= violation[8]/A[currentAtomicIndex+2][currentAtomicIndex+2];
+			//				Ft -= violation[8]/A(currentAtomicIndex+2, currentAtomicIndex+2);
 
 			//				double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
 			//				double normFt = fabs(Ft);
@@ -1206,26 +1198,26 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A[0][j] * initialGuess_and_solution[j];
-			//				violation[1] += A[1][j] * initialGuess_and_solution[j];
-			//				violation[2] += A[2][j] * initialGuess_and_solution[j];
-			//				violation[3] += A[3][j] * initialGuess_and_solution[j];
-			//				violation[4] += A[4][j] * initialGuess_and_solution[j];
-			//				violation[5] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//				violation[6] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
+			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
+			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
+			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
+			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
+			//				violation[5] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//				violation[6] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//				if(j>=6 && j!=currentAtomicIndex)
 			//				{
-			//					violation[7] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+			//					violation[7] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			//				}
 			//			}
 			//			double localA[49]={
-			//				A[0][0], A[0][1], A[0][2], A[0][3], A[0][4], A[0][currentAtomicIndex], A[0][currentAtomicIndex+1],
-			//				A[1][0], A[1][1], A[1][2], A[1][3], A[1][4], A[1][currentAtomicIndex], A[1][currentAtomicIndex+1],
-			//				A[2][0], A[2][1], A[2][2], A[2][3], A[2][4], A[2][currentAtomicIndex], A[2][currentAtomicIndex+1],
-			//				A[3][0], A[3][1], A[3][2], A[3][3], A[3][4], A[3][currentAtomicIndex], A[3][currentAtomicIndex+1],
-			//				A[4][0], A[4][1], A[4][2], A[4][3], A[4][4], A[4][currentAtomicIndex], A[4][currentAtomicIndex+1],
-			//				A[currentAtomicIndex  ][0], A[currentAtomicIndex  ][1], A[currentAtomicIndex  ][2], A[currentAtomicIndex  ][3], A[currentAtomicIndex  ][4], A[currentAtomicIndex  ][currentAtomicIndex], A[currentAtomicIndex  ][currentAtomicIndex+1],
-			//				A[currentAtomicIndex+1][0], A[currentAtomicIndex+1][1], A[currentAtomicIndex+1][2], A[currentAtomicIndex+1][3], A[currentAtomicIndex+1][4], A[currentAtomicIndex+1][currentAtomicIndex], A[currentAtomicIndex+1][currentAtomicIndex+1]
+			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
 			//			};
 			//			double Ainv[49];
 			//			if( !inverseMatrix_using_BlockDecomposition<double,7,4,3>(localA,Ainv) )
@@ -1250,15 +1242,15 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			//if(Fn>0.0)
 			//			{
 			//				// Complete the violation of the friction along t, with the missing terms...
-			//				violation[7] += A[currentAtomicIndex+2][     0]*FX +
-			//					A[currentAtomicIndex+2][                   1]*FY +
-			//					A[currentAtomicIndex+2][                   2]*FZ +
-			//					A[currentAtomicIndex+2][                   3]*FdirX +
-			//					A[currentAtomicIndex+2][                   4]*FdirY +
-			//					A[currentAtomicIndex+2][currentAtomicIndex  ]*Fn1+
-			//					A[currentAtomicIndex+2][currentAtomicIndex+1]*Fn2;
+			//				violation[7] += A(currentAtomicIndex+2,      0)*FX +
+			//					A(currentAtomicIndex+2,                    1)*FY +
+			//					A(currentAtomicIndex+2,                    2)*FZ +
+			//					A(currentAtomicIndex+2,                    3)*FdirX +
+			//					A(currentAtomicIndex+2,                    4)*FdirY +
+			//					A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1+
+			//					A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
 
-			//				Ft -= violation[7]/A[currentAtomicIndex+2][currentAtomicIndex+2];
+			//				Ft -= violation[7]/A(currentAtomicIndex+2, currentAtomicIndex+2);
 
 			//				double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
 			//				double normFt = fabs(Ft);
@@ -1284,22 +1276,22 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//		double violation[6] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//		for( int j=0 ; j<n ; j++ )
 			//		{
-			//			violation[0] += A[0][j] * initialGuess_and_solution[j];
-			//			violation[1] += A[1][j] * initialGuess_and_solution[j];
-			//			violation[2] += A[2][j] * initialGuess_and_solution[j];
-			//			violation[3] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//			violation[4] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+			//			violation[0] += A(0, j) * initialGuess_and_solution[j];
+			//			violation[1] += A(1, j) * initialGuess_and_solution[j];
+			//			violation[2] += A(2, j) * initialGuess_and_solution[j];
+			//			violation[3] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//			violation[4] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			//			if(j>=4 && j!=currentAtomicIndex)
 			//			{
-			//				violation[5] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+			//				violation[5] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			//			}
 			//		}
 			//		double localA[25]={
-			//			A[0][0], A[0][1], A[0][2], A[0][currentAtomicIndex], A[0][currentAtomicIndex+1],
-			//			A[1][0], A[1][1], A[1][2], A[1][currentAtomicIndex], A[1][currentAtomicIndex+1],
-			//			A[2][0], A[2][1], A[2][2], A[2][currentAtomicIndex], A[2][currentAtomicIndex+1],
-			//			A[currentAtomicIndex  ][0], A[currentAtomicIndex  ][1], A[currentAtomicIndex  ][2], A[currentAtomicIndex  ][currentAtomicIndex], A[currentAtomicIndex  ][currentAtomicIndex+1],
-			//			A[currentAtomicIndex+1][0], A[currentAtomicIndex+1][1], A[currentAtomicIndex+1][2], A[currentAtomicIndex+1][currentAtomicIndex], A[currentAtomicIndex+1][currentAtomicIndex+1]
+			//			A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+			//			A(1, 0), A(1, 1), A(1, 2), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+			//			A(2, 0), A(2, 1), A(2, 2), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+			//			A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+			//			A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
 			//		};
 			//		double Ainv[25];
 			//		if( !inverseMatrix_using_BlockDecomposition<double,5,2,3>(localA,Ainv) )
@@ -1322,13 +1314,13 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//		//if(Fn>0.0)
 			//		{
 			//			// Complete the violation of the friction along t, with the missing terms...
-			//			violation[5] += A[currentAtomicIndex+2][     0]*FX +
-			//				A[currentAtomicIndex+2][                   1]*FY +
-			//				A[currentAtomicIndex+2][                   2]*FZ +
-			//				A[currentAtomicIndex+2][currentAtomicIndex  ]*Fn1+
-			//				A[currentAtomicIndex+2][currentAtomicIndex+1]*Fn2;
+			//			violation[5] += A(currentAtomicIndex+2,      0)*FX +
+			//				A(currentAtomicIndex+2,                    1)*FY +
+			//				A(currentAtomicIndex+2,                    2)*FZ +
+			//				A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1+
+			//				A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
 
-			//			Ft -= violation[5]/A[currentAtomicIndex+2][currentAtomicIndex+2];
+			//			Ft -= violation[5]/A(currentAtomicIndex+2, currentAtomicIndex+2);
 
 			//			double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
 			//			double normFt = fabs(Ft);
@@ -1348,31 +1340,31 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//	double violation[3] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//	for( int j=0 ; j<currentAtomicIndex ; j++ )
 			//	{
-			//		violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//		violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-			//		violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+			//		violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//		violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//		violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			//	}
 			//	for( int j=currentAtomicIndex+3 ; j<n ; j++ )
 			//	{
-			//		violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-			//		violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-			//		violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+			//		violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+			//		violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//		violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			//	}
-			//	violation[0] += A[currentAtomicIndex][currentAtomicIndex]*Fn1 +
-			//		A[currentAtomicIndex][currentAtomicIndex+1]*Fn2 +
-			//		A[currentAtomicIndex][currentAtomicIndex+2]*Ft;
-			//	violation[1] += A[currentAtomicIndex+1][currentAtomicIndex]*Fn1 +
-			//		A[currentAtomicIndex+1][currentAtomicIndex+1]*Fn2 +
-			//		A[currentAtomicIndex+1][currentAtomicIndex+2]*Ft;
+			//	violation[0] += A(currentAtomicIndex, currentAtomicIndex)*Fn1 +
+			//		A(currentAtomicIndex, currentAtomicIndex+1)*Fn2 +
+			//		A(currentAtomicIndex, currentAtomicIndex+2)*Ft;
+			//	violation[1] += A(currentAtomicIndex+1, currentAtomicIndex)*Fn1 +
+			//		A(currentAtomicIndex+1, currentAtomicIndex+1)*Fn2 +
+			//		A(currentAtomicIndex+1, currentAtomicIndex+2)*Ft;
 
 			//	// det = ad-bc
 			//	// [ a b ]   [  d -b ]       [ 1 0 ]
 			//	// [ c d ] . [ -c  a ]/det = [ 0 1 ]
-			//	double A_determinant = A[currentAtomicIndex][currentAtomicIndex]*A[currentAtomicIndex+1][currentAtomicIndex+1]-
-			//		A[currentAtomicIndex][currentAtomicIndex+1]*A[currentAtomicIndex+1][currentAtomicIndex];
+			//	double A_determinant = A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
+			//		A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
 			//	double Ainv[2][2]={
-			//		{ A[currentAtomicIndex+1][currentAtomicIndex+1]/A_determinant  , -A[currentAtomicIndex  ][currentAtomicIndex+1]/A_determinant },
-			//		{-A[currentAtomicIndex+1][currentAtomicIndex  ]/A_determinant  ,  A[currentAtomicIndex  ][currentAtomicIndex  ]/A_determinant }
+			//		{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  , -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
+			//		{-A(currentAtomicIndex+1, currentAtomicIndex  )/A_determinant  ,  A(currentAtomicIndex,   currentAtomicIndex  )/A_determinant }
 			//	} ;
 			//	Fn1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
 			//	Fn2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
@@ -1380,11 +1372,11 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//	// No Signorini to verify here, we have bilaterals constraints, not unilateral ones !
 			//	//if(Fn>0.0)
 			//	{
-			//		violation[2] += A[currentAtomicIndex+2][currentAtomicIndex]*Fn1
-			//			+ A[currentAtomicIndex+2][currentAtomicIndex+1]*Fn2
-			//			+ A[currentAtomicIndex+2][currentAtomicIndex+2]*Ft;
+			//		violation[2] += A(currentAtomicIndex+2, currentAtomicIndex)*Fn1
+			//			+ A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2
+			//			+ A(currentAtomicIndex+2, currentAtomicIndex+2)*Ft;
 
-			//		Ft -= violation[2]/A[currentAtomicIndex+2][currentAtomicIndex+2];
+			//		Ft -= violation[2]/A(currentAtomicIndex+2, currentAtomicIndex+2);
 
 			//		double normFt = fabs(Ft);
 			//		double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
@@ -1429,7 +1421,7 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation = b[currentAtomicIndex];
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g) ",violation);
 			printf("\n\t force=(%g) ",initialGuess_and_solution[currentAtomicIndex]);
@@ -1443,8 +1435,8 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation[2] = {b[currentAtomicIndex],b[currentAtomicIndex+1]};
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g) ",violation[0],violation[1]);
 			printf("\n\t force=(%g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1]);
@@ -1458,9 +1450,9 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation[3] = {b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]};
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-				violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
 			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);
@@ -1474,7 +1466,7 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation = b[currentAtomicIndex];
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g) ",violation);
 			if (violation<-contactTolerance)
@@ -1492,9 +1484,9 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation[3] = {b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]};
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-				violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
 			if (violation[0]<-contactTolerance)
@@ -1512,8 +1504,8 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation[2] = {b[currentAtomicIndex],b[currentAtomicIndex+1]};
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g) ",violation[0],violation[1]);
 			printf("\n\t force=(%g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1]);
@@ -1527,9 +1519,9 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 			double violation[3] = {b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]};
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A[currentAtomicIndex  ][j] * initialGuess_and_solution[j];
-				violation[1] += A[currentAtomicIndex+1][j] * initialGuess_and_solution[j];
-				violation[2] += A[currentAtomicIndex+2][j] * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
+				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
 			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);

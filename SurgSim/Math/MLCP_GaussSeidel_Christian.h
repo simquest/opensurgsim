@@ -2,6 +2,7 @@
 #define __MLCP_GaussSeidel_Christian__
 
 #include "LCP.h"
+#include <Eigen/Core>
 
 //! Resolution of a mixed LCP problem (Gauss Seidel iterative solver)
 /*!
@@ -32,9 +33,8 @@ private:
 	unsigned int maxIterations;
 
 	int nbEnforcedAtomicConstraint;  // from id 0..nbEnforcedAtomicConstraint-1
-	Dynamic_Matrix<double> LHS_enforcedLocalSystem;
-	Dynamic_Vector<double> RHS_enforcedLocalSystem;
-	Dynamic_Vector<int> LHSpivot_enforcedLocalSystem;
+	Eigen::MatrixXd LHS_enforcedLocalSystem;
+	Eigen::VectorXd RHS_enforcedLocalSystem;
 
 	void computeEnforcementSystem(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& initialGuess_and_solution, IN Vector& frictionCoefs,
 	                              IN vector<MLCP_Constraint>& constraintsType, IN double subStep,
