@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the Group class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using SurgSim::Graphics::Actor;
 using SurgSim::Graphics::Group;
@@ -104,18 +104,20 @@ TEST(GroupTests, ClearTests)
 
 	std::shared_ptr<Actor> actor1 = std::make_shared<MockActor>("test actor 1");
 	std::shared_ptr<Actor> actor2 = std::make_shared<MockActor>("test actor 2");
+	std::shared_ptr<Actor> actor3 = std::make_shared<MockActor>("test actor 3");
 	std::shared_ptr<Group> group1 = std::make_shared<MockGroup>("test group 1");
 	std::shared_ptr<Group> group2 = std::make_shared<MockGroup>("test group 2");
 
 	EXPECT_EQ(0u, group->getActors().size());
 	EXPECT_EQ(0u, group->getGroups().size());
 
-	/// Add 2 actors and 2 groups
+	/// Add 3 actors and 2 groups
 	group->addActor(actor1);
 	group->addActor(actor2);
+	group->addActor(actor3);
 	group->addGroup(group1);
 	group->addGroup(group2);
-	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
 
 	/// Remove all actors and make sure that they are removed correctly
@@ -123,21 +125,22 @@ TEST(GroupTests, ClearTests)
 	EXPECT_EQ(0u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
 
-	/// Add the 2 actors again
+	/// Add the 3 actors again
 	group->addActor(actor1);
 	group->addActor(actor2);
-	EXPECT_EQ(2u, group->getActors().size());
+	group->addActor(actor3);
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
 
 	/// Remove all groups and make sure that they are removed correctly
 	group->clearGroups();
-	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(0u, group->getGroups().size());
 
 	/// Add the 2 groups again
 	group->addGroup(group1);
 	group->addGroup(group2);
-	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
 
 	/// Remove everything from the group and make sure that there are no actors nor groups remaining

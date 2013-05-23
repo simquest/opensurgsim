@@ -16,12 +16,12 @@
 /// \file
 /// Tests for the OsgActor class.
 
-#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <random>
 
@@ -34,6 +34,11 @@ using SurgSim::Math::Vector3d;
 TEST(OsgActorTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");});
+
+	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
+
+	EXPECT_EQ("test name", actor->getName());
+	EXPECT_TRUE(actor->isVisible());
 }
 
 TEST(OsgActorTests, OsgNodeTest)
@@ -45,13 +50,6 @@ TEST(OsgActorTests, OsgNodeTest)
 	/// Check that the OSG node is a group (MockOsgActor passes a new group as the node into the OsgActor constructor)
 	osg::ref_ptr<osg::Group> osgGroup = dynamic_cast<osg::Group*>(actor->getOsgNode().get());
 	EXPECT_TRUE(osgGroup.valid()) << "Actor's OSG node should be a group!";
-}
-
-TEST(OsgActorTests, NameTest)
-{
-	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
-
-	EXPECT_EQ("test name", actor->getName());
 }
 
 TEST(OsgActorTests, VisibilityTest)
@@ -103,6 +101,6 @@ TEST(OsgActorTests, UpdateTest)
 
 		actor->update(dt);
 		EXPECT_EQ(i, mockActor->getNumUpdates());
-		EXPECT_EQ(sumDt, mockActor->getSumDt());
+		EXPECT_LT(fabs(sumDt - mockActor->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }

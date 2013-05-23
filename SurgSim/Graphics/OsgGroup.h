@@ -30,7 +30,7 @@ namespace Graphics
 /// OSG implementation of a graphics group.
 ///
 /// A Graphics::OsgGroup wraps a osg::Switch to provide group functionality.
-class OsgGroup : public SurgSim::Graphics::Group
+class OsgGroup : public Group
 {
 public:
 	/// Constructor
