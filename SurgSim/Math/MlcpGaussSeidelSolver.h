@@ -1,0 +1,94 @@
+#ifndef SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
+#define SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
+
+#include <SurgSim/Math/MlcpSolver.h>
+#include <Eigen/Core>
+
+namespace SurgSim
+{
+namespace Math
+{
+
+//! Resolution of a mixed LCP problem (Gauss Seidel iterative solver)
+/*!
+  Iterative solver based on Gauss-Seidel.
+
+  Problem can contains:
+    - CONSTRAINT  = Bilateral constraint (all atomic, a fixed 3D point=3 atomics independents constraints)
+    - CONTACT     = Unilateral constraint
+      * frictionless => 1 atomic constraint per contact
+      * frictional with Coulomb friction (1 mu parameter per contact) => 3 atomic dependent constraints per contact (1 directional + 2 tangentials)
+    - SUTURING    = Sliding constraint for suturing
+      * Frictionless suturing constraint => 2 atomic constraints per sliding point
+      * Frictional suturing constraint   => 3 atomic constraints per sliding point (2 directional + 1 tangential with friction on it) => 1 mu parameter per frictional suturing
+
+  cf. Christian Duriez TVCG05 paper
+  Realistic Haptic Rendering of Interacting
+  Deformable Objects in Virtual Environments
+  Christian Duriez, Student Member, IEEE, Fre´de´ ric Dubois,
+  Abderrahmane Kheddar, Member, IEEE, and Claude Andriot
+  +
+  + recent Christian's work
+*/
+class MlcpGaussSeidelSolver : public MlcpSolver
+{
+	MlcpGaussSeidelSolver() :
+		m_epsilonConvergence(defaultEpsilonConvergence()),
+		m_contactTolerance(defaultContactTolerance()),
+		m_subStep(1.0),
+		m_maxIterations(defaultMaxIterations()),
+		m_catchExplodingConvergenceCriteria(true),
+		m_verbose(false),
+		m_numEnforcedAtomicConstraints(-1)
+	{
+	}
+
+	MlcpGaussSeidelSolver(double epsilonConvergence, double contactTolerance, unsigned int maxIterations) :
+		m_epsilonConvergence(epsilonConvergence),
+		m_contactTolerance(contactTolerance),
+		m_subStep(1.0),
+		m_maxIterations(maxIterations),
+		m_catchExplodingConvergenceCriteria(true),
+		m_verbose(false),
+		m_numEnforcedAtomicConstraints(-1)
+	{
+	}
+
+	~MlcpGaussSeidelSolver()
+	{
+	}
+
+	virtual bool solve(const MlcpProblem& problem, MlcpSolution* solution);
+
+	static double defaultEpsilonConvergence()
+	{
+		return 1e-4;
+	}
+	static double defaultContactTolerance()
+	{
+		return 2e-5;
+	}
+	static int defaultMaxIterations()
+	{
+		return 30;
+	}
+
+private:
+	// ...lots of private methods elided...
+
+	double       m_epsilonConvergence;
+	double       m_contactTolerance;
+	double       m_subStep;
+	unsigned int m_maxIterations;
+	bool         m_catchExplodingConvergenceCriteria;
+	bool         m_verbose;
+
+	int m_numEnforcedAtomicConstraints;
+	Eigen::MatrixXd m_lhsEnforcedLocalSystem;
+	Eigen::VectorXd m_rhsEnforcedLocalSystem;
+};
+
+};  // namespace Math
+};  // namespace SurgSim
+
+#endif // SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
