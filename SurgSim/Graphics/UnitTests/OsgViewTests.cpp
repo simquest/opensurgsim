@@ -52,8 +52,8 @@ TEST(OsgViewTests, InitTest)
 
 TEST(OsgViewTests, PositionAndDimensionsTest)
 {
-	std::shared_ptr<OsgView> osgView = std::make_shared<MockOsgView>("test name");
-	std::shared_ptr<View> view = std::make_shared<MockOsgView>("test name");
+	std::shared_ptr<OsgView> osgView = std::make_shared<OsgView>("test name");
+	std::shared_ptr<View> view = osgView;
 
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(0, 1000);
@@ -97,35 +97,4 @@ TEST(OsgViewTests, CameraTest)
 	/// Try to set a camera that does not derive from OsgCamera
 	EXPECT_FALSE(view->setCamera(mockCamera));
 	EXPECT_EQ(camera, view->getCamera());
-}
-
-TEST(OsgViewTests, UpdateTest)
-{
-	std::shared_ptr<MockOsgView> mockOsgView = std::make_shared<MockOsgView>("test view");
-	std::shared_ptr<View> view = mockOsgView;
-
-	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test camera");
-	view->setCamera(camera);
-
-	/// Make sure that we can successfully initialize, which setups up the window
-	EXPECT_TRUE(mockOsgView->initialize());
-
-	EXPECT_EQ(0u, mockOsgView->getNumUpdates());
-	EXPECT_EQ(0.0, mockOsgView->getSumDt());
-
-	double sumDt = 0.0;
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-	/// Do 10 updates with random dt and check each time that the number of updates and sum of dt are correct.
-	for (int i = 1; i <= 10; ++i)
-	{
-		double dt = distribution(generator);
-		sumDt += dt;
-
-		view->update(dt);
-
-		EXPECT_EQ(i, mockOsgView->getNumUpdates());
-		EXPECT_EQ(sumDt, mockOsgView->getSumDt());
-	}
 }

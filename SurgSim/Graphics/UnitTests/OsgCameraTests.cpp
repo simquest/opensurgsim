@@ -40,7 +40,7 @@ using SurgSim::Math::Vector3d;
 
 TEST(OsgCameraTests, InitTest)
 {
-	ASSERT_NO_THROW({ std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test name"); });
+	ASSERT_NO_THROW({std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test name");});
 
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
@@ -63,14 +63,12 @@ TEST(OsgCameraTests, InitTest)
 
 TEST(OsgCameraTests, OsgNodesTest)
 {
-	std::shared_ptr<MockOsgCamera> mockCamera = std::make_shared<MockOsgCamera>("test name");
-	std::shared_ptr<OsgCamera> osgCamera = mockCamera;
-	std::shared_ptr<OsgActor> osgActor = mockCamera;
+	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
+	std::shared_ptr<OsgActor> osgActor = osgCamera;
 
 	/// Check that the OSG nodes of the camera are built correctly
 	osg::ref_ptr<osg::Node> node = osgActor->getOsgNode();
 	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(node.get());
-	EXPECT_EQ(switchNode, mockCamera->getOsgSwitch());
 	EXPECT_TRUE(switchNode.valid());
 	EXPECT_EQ(1u, switchNode->getNumChildren());
 
@@ -80,21 +78,29 @@ TEST(OsgCameraTests, OsgNodesTest)
 
 TEST(OsgCameraTests, VisibilityTest)
 {
-	std::shared_ptr<MockOsgCamera> mockCamera = std::make_shared<MockOsgCamera>("test name");
-	std::shared_ptr<Camera> camera = mockCamera;
+	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
+	std::shared_ptr<OsgActor> osgActor = osgCamera;
+	std::shared_ptr<Camera> camera = osgCamera;
+
+	// Get the osg::Switch from the OsgActor so that we can make sure that the osg::Camera has the correct visibility.
+	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgActor->getOsgNode().get());
+	EXPECT_TRUE(switchNode.valid());
 
 	EXPECT_TRUE(camera->isVisible());
 
 	camera->setVisible(false);
 	EXPECT_FALSE(camera->isVisible());
+	EXPECT_FALSE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
 	camera->setVisible(true);
 	EXPECT_TRUE(camera->isVisible());
+	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
+
 }
 
 TEST(OsgCameraTests, GroupTest)
 {
-	std::shared_ptr<Camera> camera = std::make_shared<MockOsgCamera>("test name");
+	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test name");
 
 	EXPECT_EQ(nullptr, camera->getGroup());
 
@@ -111,7 +117,7 @@ TEST(OsgCameraTests, GroupTest)
 
 TEST(OsgCameraTests, PoseAndMatricesTest)
 {
-	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<MockOsgCamera>("test name");
+	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 
 	EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
@@ -139,28 +145,4 @@ TEST(OsgCameraTests, PoseAndMatricesTest)
 	camera->setProjectionMatrix(projectionMatrix);
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
 	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()).isApprox(projectionMatrix));
-}
-
-TEST(OsgCameraTests, UpdateTest)
-{
-	std::shared_ptr<MockOsgCamera> mockCamera = std::make_shared<MockOsgCamera>("test name");
-	std::shared_ptr<Camera> camera = mockCamera;
-
-	EXPECT_EQ(0u, mockCamera->getNumUpdates());
-	EXPECT_EQ(0.0, mockCamera->getSumDt());
-
-	double sumDt = 0.0;
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-	/// Do 10 updates with random dt and check each time that the number of updates and sum of dt are correct.
-	for (int i = 1; i <= 10; ++i)
-	{
-		double dt = distribution(generator);
-		sumDt += dt;
-
-		camera->update(dt);
-		EXPECT_EQ(i, mockCamera->getNumUpdates());
-		EXPECT_LT(fabs(sumDt - mockCamera->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
-	}
 }
