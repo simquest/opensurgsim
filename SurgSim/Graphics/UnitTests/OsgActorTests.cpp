@@ -34,6 +34,11 @@ using SurgSim::Math::Vector3d;
 TEST(OsgActorTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");});
+
+	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
+
+	EXPECT_EQ("test name", actor->getName());
+	EXPECT_TRUE(actor->isVisible());
 }
 
 TEST(OsgActorTests, OsgNodeTest)
@@ -45,13 +50,6 @@ TEST(OsgActorTests, OsgNodeTest)
 	/// Check that the OSG node is a group (MockOsgActor passes a new group as the node into the OsgActor constructor)
 	osg::ref_ptr<osg::Group> osgGroup = dynamic_cast<osg::Group*>(actor->getOsgNode().get());
 	EXPECT_TRUE(osgGroup.valid()) << "Actor's OSG node should be a group!";
-}
-
-TEST(OsgActorTests, NameTest)
-{
-	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
-
-	EXPECT_EQ("test name", actor->getName());
 }
 
 TEST(OsgActorTests, VisibilityTest)

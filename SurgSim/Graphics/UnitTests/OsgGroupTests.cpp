@@ -31,6 +31,15 @@ using SurgSim::Graphics::OsgGroup;
 TEST(OsgGroupTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Group> group = std::make_shared<OsgGroup>("test name");});
+
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
+	std::shared_ptr<Group> group = osgGroup;
+
+	EXPECT_EQ("test group", group->getName());
+	EXPECT_TRUE(group->isVisible());
+	EXPECT_EQ(0u, group->getActors().size());
+	EXPECT_EQ(0u, group->getGroups().size());
+	EXPECT_EQ(0u, osgGroup->getOsgGroup()->getNumChildren());
 }
 
 TEST(OsgGroupTests, OsgNodesTest)
@@ -46,7 +55,8 @@ TEST(OsgGroupTests, VisibilityTest)
 	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
 	std::shared_ptr<Group> group = osgGroup;
 
-	EXPECT_TRUE(group->isVisible());
+	group->setVisible(false);
+	EXPECT_FALSE(group->isVisible());
 
 	group->setVisible(true);
 	EXPECT_TRUE(group->isVisible());
@@ -173,6 +183,7 @@ TEST(OsgGroupTests, ClearTests)
 
 	std::shared_ptr<Actor> actor1 = std::make_shared<MockOsgActor>("test actor 1");
 	std::shared_ptr<Actor> actor2 = std::make_shared<MockOsgActor>("test actor 2");
+	std::shared_ptr<Actor> actor3 = std::make_shared<MockOsgActor>("test actor 3");
 	std::shared_ptr<Group> group1 = std::make_shared<OsgGroup>("test group 1");
 	std::shared_ptr<Group> group2 = std::make_shared<OsgGroup>("test group 2");
 
@@ -183,14 +194,15 @@ TEST(OsgGroupTests, ClearTests)
 	EXPECT_EQ(0u, group->getGroups().size());
 	EXPECT_EQ(0u, osgSwitch->getNumChildren());
 
-	// Add actors and groups
+	// Add 3 actors and 2 groups
 	group->addActor(actor1);
 	group->addActor(actor2);
+	group->addActor(actor3);
 	group->addGroup(group1);
 	group->addGroup(group2);
-	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-	EXPECT_EQ(4u, osgSwitch->getNumChildren());
+	EXPECT_EQ(5u, osgSwitch->getNumChildren());
 
 	// Remove all actors
 	group->clearActors();
@@ -198,25 +210,26 @@ TEST(OsgGroupTests, ClearTests)
 	EXPECT_EQ(2u, group->getGroups().size());
 	EXPECT_EQ(2u, osgSwitch->getNumChildren());
 
-	// Add actors again
+	// Add 3 actors again
 	group->addActor(actor1);
 	group->addActor(actor2);
-	EXPECT_EQ(2u, group->getActors().size());
+	group->addActor(actor3);
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-	EXPECT_EQ(4u, osgSwitch->getNumChildren());
+	EXPECT_EQ(5u, osgSwitch->getNumChildren());
 
 	// Remove all groups
 	group->clearGroups();
-	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(0u, group->getGroups().size());
-	EXPECT_EQ(2u, osgSwitch->getNumChildren());
+	EXPECT_EQ(3u, osgSwitch->getNumChildren());
 
-	// Add groups again
+	// Add 2 groups again
 	group->addGroup(group1);
 	group->addGroup(group2);
-	EXPECT_EQ(2u, group->getActors().size());
+	EXPECT_EQ(3u, group->getActors().size());
 	EXPECT_EQ(2u, group->getGroups().size());
-	EXPECT_EQ(4u, osgSwitch->getNumChildren());
+	EXPECT_EQ(5u, osgSwitch->getNumChildren());
 
 	// Remove everything
 	group->clear();
