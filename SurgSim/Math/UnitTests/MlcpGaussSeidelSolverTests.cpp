@@ -36,16 +36,21 @@ TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 
 TEST(MlcpGaussSeidelSolverTests, CompareResult1)
 {
-	const MlcpTestProblem* problem = getTestProblem1();
+	const MlcpTestData* problem = getTestProblem1();
 
 	// NB: need to make the solver calls const-correct.
-	Dynamic_Matrix<double> HCHt = problem->HCHt;
-	Dynamic_Vector<double> E = problem->E;
-	Dynamic_Vector<double> mu = problem->mu;
+	const int size = problem->getSize();
+	Dynamic_Matrix<double> HCHt(size, size);
+	Eigen::Map<Eigen::MatrixXd>(HCHt.getPointer(), size, size) = problem->HCHt;
+	Dynamic_Vector<double> E(size);
+	Eigen::Map<Eigen::VectorXd>(E.getPointer(), size) = problem->E;
+	Dynamic_Vector<double> mu(size);
+	Eigen::Map<Eigen::VectorXd>(mu.getPointer(), size) = problem->mu;
 	std::vector<MLCP_Constraint> constraintTypes = problem->constraintTypes;
 
-	const int size = problem->getSize();
 	Dynamic_Vector<double> lambda(size);
+	Dynamic_Vector<double> expectedLambda(size);
+	Eigen::Map<Eigen::VectorXd>(expectedLambda.getPointer(), size) = problem->expectedLambda;
 
 	//################################
 	// Gauss-Seidel solver
@@ -65,10 +70,10 @@ TEST(MlcpGaussSeidelSolverTests, CompareResult1)
 	printf("\tsolver did %d iterations convergence=%d Signorini=%d\n",nbIteration,converged,Signorini);
 
 	ASSERT_EQ(size, lambda.getSize());
-	ASSERT_EQ(size, problem->expectedLambda.getSize());
+	ASSERT_EQ(size, expectedLambda.getSize());
 	for (int i = 0;  i < size;  ++i)
 	{
-		EXPECT_NEAR(problem->expectedLambda[i], lambda[i], 1e-9);
+		EXPECT_NEAR(expectedLambda[i], lambda[i], 1e-9);
 	}
 
 	double convergenceCriteria=0.0;
@@ -81,16 +86,21 @@ TEST(MlcpGaussSeidelSolverTests, CompareResult1)
 
 TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTime1)
 {
-	const MlcpTestProblem* problem = getTestProblem1();
+	const MlcpTestData* problem = getTestProblem1();
 
 	// NB: need to make the solver calls const-correct.
-	Dynamic_Matrix<double> HCHt = problem->HCHt;
-	Dynamic_Vector<double> E = problem->E;
-	Dynamic_Vector<double> mu = problem->mu;
+	const int size = problem->getSize();
+	Dynamic_Matrix<double> HCHt(size, size);
+	Eigen::Map<Eigen::MatrixXd>(HCHt.getPointer(), size, size) = problem->HCHt;
+	Dynamic_Vector<double> E(size);
+	Eigen::Map<Eigen::VectorXd>(E.getPointer(), size) = problem->E;
+	Dynamic_Vector<double> mu(size);
+	Eigen::Map<Eigen::VectorXd>(mu.getPointer(), size) = problem->mu;
 	std::vector<MLCP_Constraint> constraintTypes = problem->constraintTypes;
 
-	const int size = problem->getSize();
 	Dynamic_Vector<double> lambda(size);
+	Dynamic_Vector<double> expectedLambda(size);
+	Eigen::Map<Eigen::VectorXd>(expectedLambda.getPointer(), size) = problem->expectedLambda;
 
 	const int repetitions = 100000;
 
@@ -99,9 +109,9 @@ TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTime1)
 
 	for (int i = repetitions;  i > 0;  --i)
 	{
-		HCHt = problem->HCHt;
-		E = problem->E;
-		mu = problem->mu;
+		Eigen::Map<Eigen::MatrixXd>(HCHt.getPointer(), size, size) = problem->HCHt;
+		Eigen::Map<Eigen::VectorXd>(E.getPointer(), size) = problem->E;
+		Eigen::Map<Eigen::VectorXd>(mu.getPointer(), size) = problem->mu;
 		constraintTypes = problem->constraintTypes;
 	}
 
@@ -113,9 +123,9 @@ TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTime1)
 
 	for (int i = repetitions;  i > 0;  --i)
 	{
-		HCHt = problem->HCHt;
-		E = problem->E;
-		mu = problem->mu;
+		Eigen::Map<Eigen::MatrixXd>(HCHt.getPointer(), size, size) = problem->HCHt;
+		Eigen::Map<Eigen::VectorXd>(E.getPointer(), size) = problem->E;
+		Eigen::Map<Eigen::VectorXd>(mu.getPointer(), size) = problem->mu;
 		constraintTypes = problem->constraintTypes;
 
 		vec_generic_null<double>(lambda.getPointer(), size);

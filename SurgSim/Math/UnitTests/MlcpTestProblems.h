@@ -16,53 +16,16 @@
 #ifndef MLCP_TEST_PROBLEMS_H
 #define MLCP_TEST_PROBLEMS_H
 
+#include <vector>
+#include <Eigen/Core>
 #include "TOOLS/Matrix/matrix.h"
 #include "TOOLS/Vector/vector.h"
 #include "MLCP_Constraint.h"
 
-#include <vector>
+#include "MlcpTestData.h"
 
 
-struct MlcpTestProblem
-{
-public:
-	//  Description of an MLCP problem.
-	Dynamic_Matrix<double> HCHt;
-	Dynamic_Vector<double> E;
-	Dynamic_Vector<double> mu;
-	std::vector<MLCP_Constraint> constraintTypes;
-
-	// Expected output for the solver (as recorded from old Gauss-Seidel code).
-	Dynamic_Vector<double> expectedLambda;
-
-
-	MlcpTestProblem()
-	{
-	}
-
-	MlcpTestProblem(const MlcpTestProblem& other) :
-		HCHt(other.HCHt), E(other.E), mu(other.mu), constraintTypes(other.constraintTypes),
-		expectedLambda(other.expectedLambda)
-	{
-	}
-
-	MlcpTestProblem& operator= (const MlcpTestProblem& other)
-	{
-		HCHt = other.HCHt;
-		E = other.E;
-		mu = other.mu;
-		constraintTypes = other.constraintTypes;
-		expectedLambda = other.expectedLambda;
-	}
-
-	int getSize() const
-	{
-		return E.getSize();
-	}
-};
-
-
-const MlcpTestProblem* getTestProblem1();
+const MlcpTestData* getTestProblem1();
 
 
 #endif // MLCP_TEST_PROBLEMS_H

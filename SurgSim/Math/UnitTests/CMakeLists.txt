@@ -69,6 +69,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	MlcpTestData.h
 	MlcpTestProblems.h
 )
 
