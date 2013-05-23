@@ -19,6 +19,7 @@
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
+#include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgMatrixConversions.h>
 #include <SurgSim/Math/Quaternion.h>
