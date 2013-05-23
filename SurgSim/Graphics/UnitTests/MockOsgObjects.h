@@ -17,8 +17,6 @@
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H
 
 #include <SurgSim/Graphics/OsgActor.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgView.h>
 
 #include <osg/Group>
 
