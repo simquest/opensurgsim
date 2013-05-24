@@ -18,8 +18,9 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
-	FreeMotion.cpp
 	CollisionPair.cpp
+	ContactCalculation.cpp
+	FreeMotion.cpp
 	DcdCollision.cpp
 	PhysicsManager.cpp
 )
@@ -27,6 +28,7 @@ set(SURGSIM_PHYSICS_SOURCES
 set(SURGSIM_PHYSICS_HEADERS
 	CollisionPair.h
 	CollisionRepresentation.h
+	ContactCalculation.h
 	Computation.h
 	DcdCollision.h
 	FreeMotion.h

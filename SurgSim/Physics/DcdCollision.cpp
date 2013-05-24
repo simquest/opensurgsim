@@ -16,39 +16,9 @@
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
-
-namespace {
-	using SurgSim::Physics::RigidShape;
-	using SurgSim::Physics::SphereShape;
-	using SurgSim::Physics::CollisionPair;
-	using SurgSim::Physics::CollisionRepresentation;
-	using SurgSim::Physics::Contact;
-
-	using SurgSim::Math::RigidTransform3d;
-	using SurgSim::Math::Vector3d;
-
-	bool intersectSphereSphere(std::shared_ptr<CollisionPair> pair)
-	{
-		bool result = false;
-		std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
-		std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
-
-		Vector3d leftCenter = pair->getFirst()->getLocalToWorldTransform().translation();
-		Vector3d rightCenter = pair->getSecond()->getLocalToWorldTransform().translation();
-
-		Vector3d normal = rightCenter - leftCenter;
-		double dist = normal.norm();
-		double maxDist = leftSphere->getRadius() + rightSphere->getRadius();
-		if (dist < maxDist)
-		{
-			result = true;
-			pair->addContact(maxDist - dist, leftCenter + normal*0.5, normal.normalized());
-		}
-		return result;
-	}
-}
 
 namespace SurgSim
 {
@@ -58,7 +28,7 @@ namespace Physics
 DcdCollision::DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs) :
 	m_pairs(pairs)
 {
-
+	populateCollisionTable();
 }
 
 DcdCollision::~DcdCollision()
@@ -68,19 +38,28 @@ DcdCollision::~DcdCollision()
 
 void DcdCollision::doUpdate(double dt)
 {
-	std::list<CollisionPair> result;
 	auto it = m_pairs->cbegin();
 	auto itEnd = m_pairs->cend();
 	while (it != itEnd)
 	{
-		calculateContacts(*it);
+		int i = (*it)->getFirstCollider()->getShapeType();
+		int j = (*it)->getSecondCollider()->getShapeType();
+		m_contactCalculations[i][j]->calculateContact(*it);
 		++it;
 	}
 }
 
 void DcdCollision::calculateContacts(std::shared_ptr<CollisionPair> it)
 {
-	intersectSphereSphere(it);
+	std::shared_ptr<ContactFactory> contactFactory = std::make_shared<ContactFactory>();
+	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
+	{
+		for (int j = 0; j < RIGID_SHAPE_TYPE_COUNT; ++j)
+		{
+			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
+		}
+	}
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact(contactFactory));
 }
 
 }; // Physics

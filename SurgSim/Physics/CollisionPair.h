@@ -73,8 +73,15 @@ public:
 	inline void addContact(const double& depth, SurgSim::Math::Vector3d contactPoint, SurgSim::Math::Vector3d normal)
 	{
 		Contact contact = {depth,contactPoint,normal};
-		m_contacts.push_back(std::move(contact));
+		m_contacts.push_back(std::make_shared<Contact>(contact));
 	}
+
+	inline void addContact(std::shared_ptr<Contact> contact)
+	{
+		m_contacts.push_back(contact);
+	}
+
+
 
 	/// Reset clear the list of contacts, invalidating all the contacts
 	void clearContacts();
@@ -85,7 +92,7 @@ private:
 	std::pair <std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>> m_representations;
 
 	/// List of current contacts
-	std::list <Contact> m_contacts;
+	std::list <std::shared_ptr<Contact>> m_contacts;
 };
 
 

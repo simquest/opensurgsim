@@ -20,7 +20,6 @@
 #include <memory>
 #include <vector>
 
-
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/Actors/RigidActorCollisionRepresentation.h>

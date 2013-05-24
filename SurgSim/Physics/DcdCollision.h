@@ -27,6 +27,8 @@ namespace SurgSim
 namespace Physics
 {
 
+class ContactCalculation;
+
 /// Computation to determine the contacts between a list of CollisionPairs
 /// will update the collision pairs accordingly
 class DcdCollision : public Computation
@@ -39,11 +41,10 @@ public:
 
 protected:
 	void doUpdate(double dt);
-	void calculateContacts(std::shared_ptr<CollisionPair> it);
-
+	void populateCollisionTable();
 private:
 	std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> m_pairs;
-
+	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
 };
 
 }; // Physics

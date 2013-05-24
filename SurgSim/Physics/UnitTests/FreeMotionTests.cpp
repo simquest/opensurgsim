@@ -35,19 +35,6 @@ using SurgSim::Physics::RigidActorParameters;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::FreeMotion;
 
-
-
-struct FreeMotionTest: public ::testing::Test
-{
-	virtual void SetUp()
-	{
-	}
-
-	virtual void TearDown()
-	{
-	}
-};
-
 TEST(FreeMotionTest, RunTest)
 {
 	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors =

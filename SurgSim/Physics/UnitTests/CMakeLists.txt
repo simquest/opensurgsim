@@ -20,8 +20,8 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	DcdCollisionTests.cpp
-	FreeMotionTests.cpp
+	ContactCalculationTests.cpp
+	DcdCollisionTests.cpp	FreeMotionTests.cpp
 	PhysicsManagerTests.cpp
 )
 
