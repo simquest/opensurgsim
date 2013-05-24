@@ -14,32 +14,49 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the View class.
+/// Tests for the OsgView class.
 
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
+#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+
+#include <SurgSim/Graphics/OsgCamera.h>
+#include <SurgSim/Graphics/OsgView.h>
 
 #include <gtest/gtest.h>
 
 #include <random>
 
 using SurgSim::Graphics::Camera;
+using SurgSim::Graphics::Manager;
 using SurgSim::Graphics::View;
+using SurgSim::Graphics::OsgCamera;
+using SurgSim::Graphics::OsgView;
 
-TEST(ViewTests, InitTest)
+TEST(OsgViewTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<View> view = std::make_shared<MockView>("test name");});
-}
+	ASSERT_NO_THROW({std::shared_ptr<View> view = std::make_shared<OsgView>("test name");});
 
-TEST(ViewTests, NameTest)
-{
-	std::shared_ptr<View> view = std::make_shared<MockView>("test name");
+	std::shared_ptr<View> view = std::make_shared<OsgView>("test name");
 
 	EXPECT_EQ("test name", view->getName());
+
+	EXPECT_EQ(nullptr, view->getCamera());
+
+	int x, y;
+	view->getPosition(&x, &y);
+	EXPECT_EQ(0, x);
+	EXPECT_EQ(0, y);
+
+	int width, height;
+	view->getDimensions(&width, &height);
+	EXPECT_EQ(800, width);
+	EXPECT_EQ(600, height);
 }
 
-TEST(ViewTests, PositionAndDimensionsTest)
+TEST(OsgViewTests, PositionAndDimensionsTest)
 {
-	std::shared_ptr<View> view = std::make_shared<MockView>("test name");
+	std::shared_ptr<OsgView> osgView = std::make_shared<OsgView>("test name");
+	std::shared_ptr<View> view = osgView;
 
 	std::default_random_engine generator;
 	std::uniform_int_distribution<int> distribution(0, 1000);
@@ -68,38 +85,19 @@ TEST(ViewTests, PositionAndDimensionsTest)
 	EXPECT_EQ(height, testHeight);
 }
 
-TEST(ViewTests, CameraTest)
+TEST(OsgViewTests, CameraTest)
 {
-	std::shared_ptr<View> view = std::make_shared<MockView>("test name");
+	std::shared_ptr<View> view = std::make_shared<OsgView>("test name");
 
-	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test camera");
+	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test camera");
 
 	/// Set the camera and check that it set correctly
 	EXPECT_TRUE(view->setCamera(camera));
-
 	EXPECT_EQ(camera, view->getCamera());
-}
 
-TEST(ViewTests, UpdateTest)
-{
-	std::shared_ptr<MockView> mockView = std::make_shared<MockView>("test name");
-	std::shared_ptr<View> view = mockView;
+	std::shared_ptr<Camera> mockCamera = std::make_shared<MockCamera>("non-osg camera");
 
-	EXPECT_EQ(0, mockView->getNumUpdates());
-	EXPECT_EQ(0.0, mockView->getSumDt());
-
-	double sumDt = 0.0;
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(0.0, 1.0);
-
-	/// Do 10 updates with random dt and check each time that the number of updates and sum of dt are correct.
-	for (int i = 1; i <= 10; ++i)
-	{
-		double dt = distribution(generator);
-		sumDt += dt;
-
-		view->update(dt);
-		EXPECT_EQ(i, mockView->getNumUpdates());
-		EXPECT_LT(fabs(sumDt - mockView->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
-	}
+	/// Try to set a camera that does not derive from OsgCamera
+	EXPECT_FALSE(view->setCamera(mockCamera));
+	EXPECT_EQ(camera, view->getCamera());
 }
