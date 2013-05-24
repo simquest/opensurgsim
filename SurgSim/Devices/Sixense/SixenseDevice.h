@@ -54,7 +54,20 @@ class SixenseDevice : public SurgSim::Input::CommonDevice
 public:
 	virtual ~SixenseDevice();
 
-	/// Gets the logger used by this object and the devices it manages.
+	/// Creates a device.
+	///
+	/// \param uniqueName A unique name for the device that will be used by the application.
+	/// \return The newly created device, or an empty shared_ptr if the initialization fails.
+	static std::shared_ptr<SixenseDevice> create(const std::string& uniqueName);
+
+	/// Gets the manager object that coordinates all Sixense devices.
+	/// \return The manager.
+	std::shared_ptr<SixenseManager> getManager() const
+	{
+		return m_manager;
+	}
+
+	/// Gets the logger used by this device (and other devices managed by the same manager).
 	/// \return The logger.
 	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
 	{
@@ -66,11 +79,20 @@ protected:
 
 	/// Constructor.
 	///
-	/// \param manager The SixenseManager object creating the device.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param baseIndex Index of the base unit this controller is connected to.
 	/// \param controllerIndex Index of this controller within its base unit.
-	SixenseDevice(const SixenseManager& manager, const std::string& uniqueName, int baseIndex, int controllerIndex);
+	/// \param logger The logger used for diagnostic messages.
+	SixenseDevice(const std::string& uniqueName, int baseIndex, int controllerIndex,
+		std::shared_ptr<SurgSim::Framework::Logger> logger);
+
+	/// Sets the manager object held by this device.
+	/// This should be called as a part of device initialization.
+	/// \param manager The manager.
+	void setManager(std::shared_ptr<SixenseManager> manager)
+	{
+		m_manager = std::move(manager);
+	}
 
 	/// Gets the index of the base unit this controller is connected to.
 	/// \return The base unit index.
@@ -97,10 +119,16 @@ protected:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();
 
+	/// Gets or creates the manager shared by all SixenseDevice instances.
+	/// The manager is managed using a SingleInstance object, so it will be destroyed when all devices are released.
+	/// \return the manager object.
+	static std::shared_ptr<SixenseManager> acquireSharedManager();
+
 private:
+	std::shared_ptr<SixenseManager> m_manager;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	int m_baseIndex;
-	int m_controllerIndex;
+	const int m_baseIndex;
+	const int m_controllerIndex;
 	std::string m_messageLabel;
 };
 

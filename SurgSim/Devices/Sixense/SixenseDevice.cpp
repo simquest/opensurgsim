@@ -25,6 +25,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 
@@ -44,10 +45,10 @@ namespace Device
 {
 
 
-SixenseDevice::SixenseDevice(const SixenseManager& manager, const std::string& uniqueName,
-                             int baseIndex, int controllerIndex) :
+SixenseDevice::SixenseDevice(const std::string& uniqueName, int baseIndex, int controllerIndex,
+							 std::shared_ptr<SurgSim::Framework::Logger> logger) :
 	SurgSim::Input::CommonDevice(uniqueName, buildInputData()),
-	m_logger(manager.getLogger()),
+	m_logger(logger),
 	m_baseIndex(baseIndex),
 	m_controllerIndex(controllerIndex),
 	m_messageLabel("Device " + uniqueName + ": ")
@@ -57,6 +58,18 @@ SixenseDevice::SixenseDevice(const SixenseManager& manager, const std::string& u
 SixenseDevice::~SixenseDevice()
 {
 	finalize();  // it's OK if we finalized already
+}
+
+std::shared_ptr<SixenseDevice> SixenseDevice::create(const std::string& uniqueName)
+{
+	std::shared_ptr<SixenseManager> manager = acquireSharedManager();
+	std::shared_ptr<SixenseDevice> device = manager->createDevice(uniqueName);
+	if (! device)
+	{
+		return std::shared_ptr<SixenseDevice>();
+	}
+	device->setManager(manager);
+	return device;
 }
 
 bool SixenseDevice::initialize()
@@ -88,7 +101,15 @@ bool SixenseDevice::initialize()
 
 bool SixenseDevice::finalize()
 {
-	SURGSIM_LOG_DEBUG(m_logger) << m_messageLabel << "Finalizing.";
+	if (! m_manager)
+	{
+		SURGSIM_LOG_SEVERE(m_logger) << m_messageLabel << "Finalizing, but no manager is present!";
+	}
+	else
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << m_messageLabel << "Finalizing.";
+		m_manager->releaseDevice(this);
+	}
 	return true;
 }
 
@@ -155,6 +176,12 @@ DataGroup SixenseDevice::buildInputData()
 	builder.addBoolean("buttonStart");
 	builder.addBoolean("buttonJoystick");
 	return builder.createData();
+}
+
+std::shared_ptr<SixenseManager> SixenseDevice::acquireSharedManager()
+{
+	static SurgSim::Framework::SharedInstance<SixenseManager> sharedInstance;
+	return sharedInstance.get();
 }
 
 

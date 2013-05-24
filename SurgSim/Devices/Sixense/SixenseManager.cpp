@@ -47,8 +47,8 @@ struct SixenseManager::State
 	/// Processing thread.
 	std::unique_ptr<SixenseThread> thread;
 
-	/// The list of known devices and their indices.
-	std::vector<std::shared_ptr<SixenseDevice>> activeDevices;
+	/// The list of known devices.
+	std::vector<SixenseDevice*> activeDevices;
 
 	/// The mutex that protects the list of known devices.
 	boost::mutex mutex;
@@ -61,8 +61,9 @@ SixenseManager::SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logge
 	if (! m_logger)
 	{
 		m_logger = SurgSim::Framework::Logger::createConsoleLogger("Sixense/Hydra device");
-		m_logger->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
+		m_logger->setThreshold(m_defaultLogLevel);
 	}
+	SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: Created.";
 }
 
 
@@ -79,7 +80,7 @@ SixenseManager::~SixenseManager()
 		for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
 		{
 			(*it)->finalize();
-			(*it).reset();
+			*it = nullptr;
 		}
 
 		if (m_state->isApiInitialized)
@@ -87,6 +88,7 @@ SixenseManager::~SixenseManager()
 			finalizeSdk();
 		}
 	}
+	SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: Destroyed.";
 }
 
 
@@ -152,7 +154,7 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 }
 
 
-bool SixenseManager::releaseDevice(std::shared_ptr<SixenseDevice> device)
+bool SixenseManager::releaseDevice(const SixenseDevice* device)
 {
 	bool found = false;
 	bool haveOtherDevices = false;
@@ -172,7 +174,7 @@ bool SixenseManager::releaseDevice(std::shared_ptr<SixenseDevice> device)
 
 	if (found)
 	{
-		device->finalize();
+		// the device is already finalized!
 		if (! haveOtherDevices)
 		{
 			destroyThread();
@@ -309,14 +311,15 @@ bool SixenseManager::createDeviceIfUnused(int baseIndex, int controllerIndex, co
 	}
 
 	std::shared_ptr<SixenseDevice> device =
-	    std::shared_ptr<SixenseDevice>(new SixenseDevice(*this, uniqueName, baseIndex, controllerIndex));
+	    std::shared_ptr<SixenseDevice>(new SixenseDevice(uniqueName, baseIndex, controllerIndex, getLogger()));
+	// We initialize the device now, because if initialization fails, we don't want to add it to the active list.
 	if (! device->initialize())
 	{
 		(*newDevice).reset();  // clear the pointer
 		return false;
 	}
 
-	m_state->activeDevices.emplace_back(device);
+	m_state->activeDevices.push_back(device.get());
 	*newDevice = std::move(device);
 	return true;
 }
@@ -342,6 +345,13 @@ bool SixenseManager::destroyThread()
 
 	return true;
 }
+
+void SixenseManager::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
+{
+	m_defaultLogLevel = logLevel;
+}
+
+SurgSim::Framework::LogLevel SixenseManager::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 
 };  // namespace Device

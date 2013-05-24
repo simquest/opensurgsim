@@ -50,6 +50,15 @@ public:
 		return m_logger;
 	}
 
+	/// Sets the default log level.
+	/// Must be called before a manager is created (i.e. before the first device) in order to have any effect.
+	/// \param logLevel The log level.
+	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
+
+protected:
+	friend class SixenseDevice;
+	friend class SixenseThread;
+
 	/// Creates a device.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
@@ -63,10 +72,7 @@ public:
 	///
 	/// \param device The device.
 	/// \return true on success, false on failure.
-	bool releaseDevice(std::shared_ptr<SixenseDevice> device);
-
-protected:
-	friend class SixenseThread;
+	bool releaseDevice(const SixenseDevice* device);
 
 	/// Executes the operations for a single input frame.
 	/// Should only be called from the context of the input loop thread.
@@ -120,6 +126,8 @@ private:
 
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 	std::unique_ptr<State> m_state;
+
+	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
 };  // namespace Device
