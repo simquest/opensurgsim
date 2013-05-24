@@ -24,17 +24,26 @@ namespace SurgSim
 {
 namespace Physics
 {
+void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
+{
+
+	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<
+		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
+	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Contact calculation not implemented for pairs with types ("<<
+		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
+}
+
 
 void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	bool result = false;
 
-	std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirstCollider()->getShape());
-	std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecondCollider()->getShape());
+	std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
+	std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
 
 
-	Vector3d leftCenter = pair->getFirstCollider()->getLocalToWorldTransform().translation();
-	Vector3d rightCenter = pair->getSecondCollider()->getLocalToWorldTransform().translation();
+	Vector3d leftCenter = pair->getFirst()->getLocalToWorldTransform().translation();
+	Vector3d rightCenter = pair->getSecond()->getLocalToWorldTransform().translation();
 
 	Vector3d normal = rightCenter - leftCenter;
 	double dist = normal.norm();
@@ -50,20 +59,7 @@ void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pai
 }
 
 
-void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
-{
 
-	if (m_doAssert)
-	{
-		SURGSIM_ASSERT(SurgSim::Framework::Logger::getDefaultLogger()) << "Contact calculation not implemented for pairs with types ("<<
-			pair->getFirstCollider()->getShapeType() << ", " << pair->getSecondCollider()->getShapeType() << ").";
-	}
-	else
-	{
-		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Contact calculation not implemented for pairs with types ("<<
-			pair->getFirstCollider()->getShapeType() << ", " << pair->getSecondCollider()->getShapeType() << ").";
-	}
-}
 
 }; // Physics
 }; // SurgSim

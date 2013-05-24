@@ -44,7 +44,7 @@ protected:
 class DefaultContactCalculation : public ContactCalculation
 {
 public:
-	DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert), ContactCalculation(nullptr) {}
+	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert), ContactCalculation(nullptr) {}
 	virtual ~DefaultContactCalculation() {}
 
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
@@ -56,7 +56,7 @@ private:
 class SphereSphereDcdContact : public ContactCalculation
 {
 public:
-	explicit SphereSphereDcdContact(std::shared_ptr<ContactFactory> factory);
+	explicit SphereSphereDcdContact(std::shared_ptr<ContactFactory> factory) : ContactCalculation(factory) {};
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
 };
 

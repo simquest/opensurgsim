@@ -41,8 +41,10 @@ public:
 
 protected:
 	void doUpdate(double dt);
-	void populateCollisionTable();
+
 private:
+	void populateCollisionTable();
+
 	std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> m_pairs;
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
 };

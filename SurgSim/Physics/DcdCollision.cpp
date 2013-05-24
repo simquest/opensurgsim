@@ -42,14 +42,14 @@ void DcdCollision::doUpdate(double dt)
 	auto itEnd = m_pairs->cend();
 	while (it != itEnd)
 	{
-		int i = (*it)->getFirstCollider()->getShapeType();
-		int j = (*it)->getSecondCollider()->getShapeType();
+		int i = (*it)->getFirst()->getShapeType();
+		int j = (*it)->getSecond()->getShapeType();
 		m_contactCalculations[i][j]->calculateContact(*it);
 		++it;
 	}
 }
 
-void DcdCollision::calculateContacts(std::shared_ptr<CollisionPair> it)
+void DcdCollision::populateCollisionTable()
 {
 	std::shared_ptr<ContactFactory> contactFactory = std::make_shared<ContactFactory>();
 	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
