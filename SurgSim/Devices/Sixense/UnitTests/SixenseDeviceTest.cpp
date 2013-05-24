@@ -42,18 +42,26 @@ struct TestListener : public InputConsumerInterface, public OutputProducerInterf
 {
 public:
 	TestListener() :
+		m_numTimesInitializedInput(0),
 		m_numTimesReceivedInput(0),
 		m_numTimesRequestedOutput(0)
 	{
 	}
 
+	virtual void initializeInput(const std::string& device, const DataGroup& inputData);
 	virtual void handleInput(const std::string& device, const DataGroup& inputData);
 	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
 
+	int m_numTimesInitializedInput;
 	int m_numTimesReceivedInput;
 	int m_numTimesRequestedOutput;
 	DataGroup m_lastReceivedInput;
 };
+
+void TestListener::initializeInput(const std::string& device, const DataGroup& inputData)
+{
+	++m_numTimesInitializedInput;
+}
 
 void TestListener::handleInput(const std::string& device, const DataGroup& inputData)
 {
@@ -138,9 +146,11 @@ TEST(SixenseDeviceTest, InputConsumer)
 	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_FALSE(device->removeInputConsumer(consumer));
+	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
 	EXPECT_TRUE(device->addInputConsumer(consumer));
@@ -158,21 +168,22 @@ TEST(SixenseDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->removeInputConsumer(consumer));
 
 	// Check the number of invocations.
+	EXPECT_EQ(1, consumer->m_numTimesInitializedInput);
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 100);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 140);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasCurrentData("pose"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasCurrentData("trigger"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasCurrentData("joystickX"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasCurrentData("joystickY"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("buttonTrigger"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("buttonBumper"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button1"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button2"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button3"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("button4"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("buttonStart"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasCurrentData("buttonJoystick"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasData("trigger"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasData("joystickX"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.scalars().hasData("joystickY"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("buttonTrigger"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("buttonBumper"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button1"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button2"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button3"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button4"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("buttonStart"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("buttonJoystick"));
 }
 
 TEST(SixenseDeviceTest, OutputProducer)
