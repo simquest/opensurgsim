@@ -49,6 +49,12 @@ public:
 		computeVolumeIntegrals();
 	}
 
+	/// \return the type of the shape
+	int getType()
+	{
+		return RIGID_SHAPE_TYPE_MESH;
+	}
+
 	/// Get mesh
 	/// \return The triangle mesh associated to this MeshShape
 	const std::shared_ptr<TriMesh> getMesh() const

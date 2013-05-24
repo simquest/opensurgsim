@@ -18,7 +18,7 @@
 
 #include <SurgSim/Physics/Actors/RigidShape.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -33,6 +33,12 @@ public:
 	explicit SphereShape(double radius)
 	{
 		m_radius = radius;
+	}
+
+	/// \return the type of the shape
+	int getType()
+	{
+		return RIGID_SHAPE_TYPE_BOX;
 	}
 
 	/// Get the sphere radius

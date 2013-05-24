@@ -13,16 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_SHAPES_H
-#define SURGSIM_PHYSICS_SHAPES_H
+#ifndef EXAMPLES_BOUNCINGBALLS_CONCRETESCENELEMENT_H
+#define EXAMPLES_BOUNCINGBALLS_CONCRETESCENELEMENT_H
 
-/// This file includes all the shapes
-#include <SurgSim/Physics/Actors/BoxShape.h>
-#include <SurgSim/Physics/Actors/CapsuleShape.h>
-#include <SurgSim/Physics/Actors/CylinderShape.h>
-#include <SurgSim/Physics/Actors/MeshShape.h>
-#include <SurgSim/Physics/Actors/SphereShape.h>
+#include <SurgSim/Framework/SceneElement.h>
 
+/// Simple concrete implementation of a sphere element that does not have any higher logic
+class ConcreteSceneElement : public SurgSim::Framework::SceneElement
+{
+public:
+	ConcreteSceneElement(const std::string& name);
+	virtual ~ConcreteSceneElement();
 
+protected:
+	virtual bool doInitialize();
+	virtual bool doWakeUp();
+};
 
-#endif /// SURGSIM_PHYSICS_SHAPES_H
+#endif

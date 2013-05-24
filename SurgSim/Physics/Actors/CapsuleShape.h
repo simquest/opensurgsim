@@ -18,7 +18,7 @@
 
 #include <SurgSim/Physics/Actors/RigidShape.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -37,6 +37,12 @@ public:
 	{
 		m_length = length;
 		m_radius = radius;
+	}
+
+	/// \return the type of the shape
+	int getType()
+	{
+		return RIGID_SHAPE_TYPE_CAPSULE;
 	}
 
 	/// Get the capsule length (i.e. cylinder length)

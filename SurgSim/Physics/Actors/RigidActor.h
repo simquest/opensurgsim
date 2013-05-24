@@ -24,7 +24,7 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -71,7 +71,6 @@ public:
 	void setCurrentParameters(const RigidActorParameters& parameters)
 	{
 		m_currentParameters = parameters;
-		
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 

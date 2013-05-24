@@ -103,7 +103,7 @@ private:
 
 	/// Previous fixed actor state
 	RigidActorBaseState m_previousState;
-	
+
 	/// Current fixed actor state
 	RigidActorBaseState m_currentState;
 };

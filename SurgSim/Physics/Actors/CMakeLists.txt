@@ -17,6 +17,7 @@ set(SURGSIM_PHYSICS_ACTORS_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/CapsuleShape.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/CylinderShape.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/RigidActor.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/RigidActorCollisionRepresentation.cpp
 	PARENT_SCOPE
 )
 
@@ -30,6 +31,7 @@ set(SURGSIM_PHYSICS_ACTORS_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/CylinderShape.h
 	${CMAKE_CURRENT_SOURCE_DIR}/MeshShape.h
 	${CMAKE_CURRENT_SOURCE_DIR}/RigidActor.h
+	${CMAKE_CURRENT_SOURCE_DIR}/RigidActorCollisionRepresentation.h
 	${CMAKE_CURRENT_SOURCE_DIR}/RigidActorParameters.h
 	${CMAKE_CURRENT_SOURCE_DIR}/RigidActorState.h
 	${CMAKE_CURRENT_SOURCE_DIR}/RigidShape.h
