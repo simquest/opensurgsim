@@ -54,12 +54,6 @@ protected:
 	virtual bool doStartUp();
 	virtual bool doUpdate(double dt);
 
-	// stupid empty placeholder, needed for now because it's pure virtual in BasicThread
-	virtual bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component);
-
-	// stupid empty placeholder, needed for now because it's pure virtual in BasicThread
-	virtual bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
-
 private:
 	SixenseManager* m_manager;
 };

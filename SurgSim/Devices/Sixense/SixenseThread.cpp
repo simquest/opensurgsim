@@ -42,15 +42,5 @@ bool SixenseThread::doStartUp()
 	return true;
 }
 
-bool SixenseThread::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
-{
-	return false;  // stupid empty placeholder, needed for now because it's pure virtual in BasicThread
-}
-
-bool SixenseThread::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
-{
-	return false;  // stupid empty placeholder, needed for now because it's pure virtual in BasicThread
-}
-
 };  // namespace Device
 };  // namespace SurgSim
