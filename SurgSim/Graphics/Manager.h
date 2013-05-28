@@ -54,32 +54,32 @@ public:
 
 	/// Adds an actor to the manager
 	/// \param	actor	The actor to be added.
-	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
+	/// \return	True if the actor was not already in and has been successfully added to this manager, false if it fails.
 	virtual bool addActor(std::shared_ptr<Actor> actor);
 
 	/// Adds a group to the manager
 	/// \param	group	The group to be added.
-	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
+	/// \return	True if the group was not already in and has been successfully added to this manager, false if it fails.
 	virtual bool addGroup(std::shared_ptr<Group> group);
 
 	/// Adds a view to the manager
 	/// \param	view	The view to be added.
-	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
+	/// \return	True if the view was not already in and has been successfully added to this manager, false if it fails.
 	virtual bool addView(std::shared_ptr<View> view);
 
 	/// Removes an actor from the manager
 	/// \param	actor	The actor to be removed.
-	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
+	/// \return	True if the actor was in and has been successfully removed from this manager, false if it fails.
 	virtual bool removeActor(std::shared_ptr<Actor> actor);
 
 	/// Removes a group from the manager
 	/// \param	group	The group to be removed.
-	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
+	/// \return	True if the group was in and has been successfully removed from this manager, false if it fails.
 	virtual bool removeGroup(std::shared_ptr<Group> group);
 
 	/// Removes a view from the manager
 	/// \param	view	The view to be removed.
-	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
+	/// \return	True if the view was in and has been successfully removed from this manager, false if it fails.
 	virtual bool removeView(std::shared_ptr<View> view);
 
 	/// Returns the actors assigned to the manager
@@ -104,6 +104,12 @@ protected:
 	/// Performs an update for a single timestep
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual bool doUpdate(double dt);
+
+	/// Returns this manager's logger
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
+	{
+		return m_logger;
+	}
 
 private:
 	/// Initializes the manager
