@@ -32,11 +32,13 @@ set(UNIT_TEST_SOURCES
 	OsgActorTests.cpp
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
+	OsgManagerTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRigidTransformConversionsTests.cpp
 	OsgVectorConversionsTests.cpp
 	OsgViewTests.cpp
+	OsgViewElementTests.cpp
 	ViewElementTests.cpp
 	ViewTests.cpp
 )

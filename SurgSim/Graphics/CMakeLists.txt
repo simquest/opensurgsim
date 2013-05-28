@@ -30,7 +30,9 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Manager.cpp
 	OsgCamera.cpp
 	OsgGroup.cpp
+	OsgManager.cpp
 	OsgView.cpp
+	OsgViewElement.cpp
 	ViewElement.cpp
 )
 
@@ -42,11 +44,13 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgActor.h
 	OsgCamera.h
 	OsgGroup.h
+	OsgManager.h
 	OsgMatrixConversions.h
 	OsgQuaternionConversions.h
 	OsgRigidTransformConversions.h
 	OsgVectorConversions.h
 	OsgView.h
+	OsgViewElement.h
 	View.h
 	ViewElement.h
 )
