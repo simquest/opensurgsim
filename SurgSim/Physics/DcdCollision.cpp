@@ -15,6 +15,8 @@
 
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Physics/Actors/RigidActorCollisionRepresentation.h>
+#include <SurgSim/Physics/Actors/RigidActor.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -25,10 +27,14 @@ namespace SurgSim
 namespace Physics
 {
 
-DcdCollision::DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs) :
-	m_pairs(pairs)
+DcdCollision::DcdCollision(std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors) :
+	m_actors(actors), m_pairCount(0)
 {
 	populateCollisionTable();
+	if (m_actors->size()*m_actors->size() != m_pairCount)
+	{
+		updatePairs();
+	}
 }
 
 DcdCollision::~DcdCollision()
@@ -38,8 +44,8 @@ DcdCollision::~DcdCollision()
 
 void DcdCollision::doUpdate(double dt)
 {
-	auto it = m_pairs->cbegin();
-	auto itEnd = m_pairs->cend();
+	auto it = m_pairs.cbegin();
+	auto itEnd = m_pairs.cend();
 	while (it != itEnd)
 	{
 		int i = (*it)->getFirst()->getShapeType();
@@ -60,6 +66,33 @@ void DcdCollision::populateCollisionTable()
 		}
 	}
 	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact(contactFactory));
+}
+
+void DcdCollision::updatePairs()
+{
+	m_pairs.clear();
+
+	std::list<std::shared_ptr<RigidActor>> rigidActors;
+	for (auto it = m_actors->cbegin(); it != m_actors->cend(); ++it)
+	{
+		std::shared_ptr<RigidActor> rigid = std::dynamic_pointer_cast<RigidActor>(*it);
+		if (rigid != nullptr)
+		{
+			rigidActors.push_back(rigid);
+		}
+	}
+	
+	auto rigidEnd = rigidActors.cend();
+	for (auto first = rigidActors.cbegin(); first != rigidEnd; ++first)
+	{
+		for (auto second = rigidActors.cbegin(); second != rigidEnd; ++second)
+		{
+			std::shared_ptr<CollisionPair> pair = m_pairFactory.getInstance();		
+			pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
+									 std::make_shared<RigidActorCollisionRepresentation>(*second));
+			m_pairs.push_back(pair);
+		}
+	}
 }
 
 }; // Physics

@@ -18,9 +18,14 @@
 
 #include <memory>
 #include <vector>
+#include <list>
+
+
+#include <SurgSim/Framework/ReuseFactory.h>
 
 #include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Physics/Actors/Actor.h>
 
 namespace SurgSim
 {
@@ -31,22 +36,34 @@ class ContactCalculation;
 
 /// Computation to determine the contacts between a list of CollisionPairs
 /// will update the collision pairs accordingly
+/// \note HS-2013-may-24 Currently handles only RigidActor, all others  will be ignored 
 class DcdCollision : public Computation
 {
 public:
 
 	/// Constructor
-	explicit DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs );
+	explicit DcdCollision(std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors);
 	virtual ~DcdCollision();
+
+	const std::list<std::shared_ptr<CollisionPair>>& collisionPairs()
+	{
+		return m_pairs;
+	}
 
 protected:
 	void doUpdate(double dt);
 
 private:
 	void populateCollisionTable();
+	void updatePairs();
+	size_t m_pairCount;
 
-	std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> m_pairs;
+	SurgSim::Framework::ReuseFactory<CollisionPair> m_pairFactory;
+
+	std::list<std::shared_ptr<CollisionPair>> m_pairs;
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
+
+	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> m_actors;
 };
 
 }; // Physics

@@ -37,6 +37,7 @@ namespace Physics
 
 class Actor;
 class FreeMotion;
+class DcdCollision;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -86,6 +87,7 @@ private:
 	///@{
 	/// Steps to perform the physics update
 	std::unique_ptr<FreeMotion> m_freeMotionStep;
+	std::unique_ptr<DcdCollision> m_dcdCollision;
 	///@}
 
 };

@@ -51,7 +51,7 @@ void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pai
 	if (dist < maxDist)
 	{
 		std::shared_ptr<Contact> contact = m_contactFactory->getInstance();
-		contact->depth = maxDist - dist;
+		contact->depth = (maxDist - dist) / 2;
 		contact->contact = leftCenter + normal*0.5;
 		contact->normal = normal.normalized();
 		pair->addContact(contact);
