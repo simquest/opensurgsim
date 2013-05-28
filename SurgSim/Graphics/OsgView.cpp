@@ -24,6 +24,7 @@ using SurgSim::Graphics::OsgView;
 OsgView::OsgView(const std::string& name) : View(name),
 	m_x(0), m_y(0),
 	m_width(800), m_height(600),
+	m_isFirstUpdate(true),
 	m_isPositionDirty(false),
 	m_areDimensionsDirty(false),
     m_view(new osgViewer::View())
@@ -82,6 +83,11 @@ bool OsgView::setCamera(std::shared_ptr<Camera> camera)
 
 void OsgView::update(double dt)
 {
+	if (m_isFirstUpdate)
+	{
+		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+		m_isFirstUpdate = false;
+	}
 	if (m_isPositionDirty || m_areDimensionsDirty)
 	{
 		osg::Camera* viewCamera = m_view->getCamera();
@@ -98,7 +104,6 @@ void OsgView::update(double dt)
 
 bool OsgView::doInitialize()
 {
-	m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
 	return true;
 }
 

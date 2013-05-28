@@ -68,6 +68,7 @@ public:
 	virtual bool setCamera(std::shared_ptr<Camera> camera);
 
 	/// Updates the view
+	/// On the first update, the view window is setup.
 	/// If the position or dimensions have changed, the window rectangle is updated.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt);
@@ -92,6 +93,9 @@ private:
 	/// Dimensions of the view on the screen (in pixels)
 	int m_width, m_height;
 
+	/// Whether the next update will be the first time the view has been updated
+	/// On the first update, the view window is setup.
+	bool m_isFirstUpdate;
 	/// Whether the position has changed and the window rectangle needs to be updated
 	bool m_isPositionDirty;
 	/// Whether the dimensions have changed and the window rectangle needs to be updated
