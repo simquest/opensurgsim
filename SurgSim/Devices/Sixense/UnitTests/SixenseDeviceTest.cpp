@@ -121,6 +121,16 @@ TEST(SixenseDeviceTest, CreateSeveralDevices)
 	}
 }
 
+// Create a string representation from an int.
+// C++11 adds std::to_string() to do this for various types, but VS2010 only half-supports that.
+template <typename T>
+inline std::string makeString(T value)
+{
+	std::ostringstream out;
+	out << value;
+	return out.str();
+}
+
 TEST(SixenseDeviceTest, CreateAllDevices)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
@@ -128,7 +138,7 @@ TEST(SixenseDeviceTest, CreateAllDevices)
 
 	for (int i = 1;  ;  ++i)
 	{
-		std::string name = "Sixense" + std::to_string(i);
+		std::string name = "Sixense" + makeString(i);
 		std::shared_ptr<SixenseDevice> device = SixenseDevice::create(name);
 		if (device == nullptr)
 		{
