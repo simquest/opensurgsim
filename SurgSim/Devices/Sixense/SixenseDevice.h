@@ -108,9 +108,9 @@ protected:
 		return m_controllerIndex;
 	}
 
-	virtual bool initialize();
+	virtual bool initialize() override;
 
-	virtual bool finalize();
+	virtual bool finalize() override;
 
 	/// Communicates with the device, reading its state and writing the command parameters.
 	/// \return true on success.

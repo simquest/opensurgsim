@@ -50,9 +50,9 @@ public:
 	}
 
 protected:
-	virtual bool doInitialize();
-	virtual bool doStartUp();
-	virtual bool doUpdate(double dt);
+	virtual bool doInitialize() override;
+	virtual bool doStartUp() override;
+	virtual bool doUpdate(double dt) override;
 
 private:
 	SixenseManager* m_manager;
