@@ -121,13 +121,18 @@ protected:
 	bool destroyThread();
 
 private:
-	/// Internal manager state.
+	/// Internal manager state data type.
 	struct State;
 
+	/// Logger used by the manager and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	/// Internal manager state.
 	std::unique_ptr<State> m_state;
 
+	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
+	/// How long we're willing to wait for devices to be detected, in milliseconds.
+	static int m_startupDelayMilliseconds;
 };
 
 };  // namespace Device

@@ -112,7 +112,7 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 	boost::chrono::steady_clock::time_point tick = boost::chrono::steady_clock::now();
 
 	bool deviceFound = scanForUnusedDevice(uniqueName, &device, &numUsedDevicesSeen);
-	if (! deviceFound && (numUsedDevicesSeen == 0))
+	if (! deviceFound && (numUsedDevicesSeen == 0) && (m_startupDelayMilliseconds > 0))
 	{
 		// Unfortunately, right after sixenseInit() the library has not yet completed its device discovery!
 		// That means that calls to sixenseIsBaseConnected(), sixenseIsControllerEnabled(), etc. will return
@@ -123,13 +123,16 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 		//
 		// Another is to simply sleep and retry a few times here.  Ugh.
 		// --advornik 2012-08-03
-		for (int i = 0;  i < 20;  ++i)
+		boost::chrono::steady_clock::time_point retryEnd = tick +
+			boost::chrono::milliseconds(m_startupDelayMilliseconds);
+		while (true)
 		{
 			tick += boost::chrono::milliseconds(100);
 			boost::this_thread::sleep_until(tick);
+			tick = boost::chrono::steady_clock::now();  // if scanForUnusedDevice() takes > 100ms, fix up the time.
 
 			deviceFound = scanForUnusedDevice(uniqueName, &device, &numUsedDevicesSeen);
-			if (deviceFound || (numUsedDevicesSeen > 0))
+			if (deviceFound || (numUsedDevicesSeen > 0) || (tick >= retryEnd))
 			{
 				break;
 			}
@@ -352,6 +355,8 @@ void SixenseManager::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 }
 
 SurgSim::Framework::LogLevel SixenseManager::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
+
+int SixenseManager::m_startupDelayMilliseconds = 5000;
 
 
 };  // namespace Device
