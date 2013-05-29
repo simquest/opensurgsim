@@ -43,8 +43,5 @@ include_directories(
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(LIBS ${LIBS} rt)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)

@@ -33,11 +33,11 @@ set(EXAMPLE_HEADERS
 	ConcreteSceneElement.h
 )
 
-set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics ${Boost_LIBRARIES})
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(LIBS ${LIBS} rt)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-
 add_executable(ExampleBouncingBalls
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-target_link_libraries(ExampleBouncingBalls ${LIBS})
+
+target_link_libraries(ExampleBouncingBalls 
+	SurgSimFramework
+	SurgSimDataStructures
+	SurgSimPhysics
+	${Boost_LIBRARIES})
