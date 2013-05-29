@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Actors/CapsuleShape.h>
+#include <SurgSim/Physics/CapsuleShape.h>
 
 // Explicit instantiation for compile test and code generation
 template class SurgSim::Physics::CapsuleShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;

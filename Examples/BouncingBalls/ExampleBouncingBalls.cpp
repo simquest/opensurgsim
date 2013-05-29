@@ -23,9 +23,9 @@
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Actors/RigidActor.h>
-#include <SurgSim/Physics/Actors/RigidActorParameters.h>
-#include <SurgSim/Physics/Actors/SphereShape.h>
+#include <SurgSim/Physics/RigidActor.h>
+#include <SurgSim/Physics/RigidActorParameters.h>
+#include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>

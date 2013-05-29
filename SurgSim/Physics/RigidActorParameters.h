@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H
 #define SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H
 
-#include <SurgSim/Physics/Actors/Shapes.h>
+#include <SurgSim/Physics/Shapes.h>
 #include <SurgSim/Math/Valid.h>
 
 namespace SurgSim 

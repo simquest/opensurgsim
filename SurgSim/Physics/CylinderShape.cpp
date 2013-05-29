@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Actors/CylinderShape.h>
+#include <SurgSim/Physics/CylinderShape.h>
 
 // Explicit instantiation for compile test and code generation
 template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;

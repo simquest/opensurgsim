@@ -20,8 +20,8 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Actors/Actor.h>
-#include <SurgSim/Physics/Actors/FixedActor.h>
+#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/FixedActor.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Framework::Runtime;

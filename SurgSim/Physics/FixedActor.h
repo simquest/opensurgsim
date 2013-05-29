@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_FIXEDACTOR_H
 #define SURGSIM_PHYSICS_FIXEDACTOR_H
 
-#include <SurgSim/Physics/Actors/RigidActorBase.h>
-#include <SurgSim/Physics/Actors/RigidActorBaseState.h>
+#include <SurgSim/Physics/RigidActorBase.h>
+#include <SurgSim/Physics/RigidActorBaseState.h>
 
 namespace SurgSim
 {

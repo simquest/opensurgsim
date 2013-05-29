@@ -18,7 +18,7 @@
 #include <vector>
 
 #include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actors/Actor.h>
+#include <SurgSim/Physics/Actor.h>
 
 namespace SurgSim
 {

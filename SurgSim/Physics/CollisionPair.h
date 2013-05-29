@@ -19,7 +19,7 @@
 #include <memory>
 #include <list>
 #include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/Actors/RigidActor.h>
+#include <SurgSim/Physics/RigidActor.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
 
 namespace SurgSim
