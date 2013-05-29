@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_SHAPES_H
 
 /// This file includes all the shapes
+#include <Surgsim/Physics/Actors/PlaneShape.h>
 #include <SurgSim/Physics/Actors/BoxShape.h>
 #include <SurgSim/Physics/Actors/CapsuleShape.h>
 #include <SurgSim/Physics/Actors/CylinderShape.h>

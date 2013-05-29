@@ -27,6 +27,10 @@ using SurgSim::Math::RigidTransform3d;
 #include <SurgSim/Physics/Actors/Shapes.h>
 using namespace SurgSim::Physics;
 
+namespace {
+	const double epsilon = 1e-10;
+}
+
 class RigidShapeTest : public ::testing::Test
 {
 public:
@@ -86,8 +90,6 @@ TEST_F(RigidShapeTest, Sphere)
 	massCenter = s.calculateMassCenter();
 	inertia    = s.calculateInertia(m_rho);
 
-		
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -121,7 +123,6 @@ TEST_F(RigidShapeTest, Box)
 	massCenter = b.calculateMassCenter();
 	inertia    = b.calculateInertia(m_rho);
 		
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -155,7 +156,6 @@ TEST_F(RigidShapeTest, CylinderX)
 	massCenter = c.calculateMassCenter();
 	inertia    = c.calculateInertia(m_rho);
 
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -189,7 +189,6 @@ TEST_F(RigidShapeTest, CylinderY)
 	massCenter = c.calculateMassCenter();
 	inertia    = c.calculateInertia(m_rho);
 
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -223,7 +222,6 @@ TEST_F(RigidShapeTest, CylinderZ)
 	massCenter = c.calculateMassCenter();
 	inertia    = c.calculateInertia(m_rho);
 
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -266,7 +264,6 @@ TEST_F(RigidShapeTest, CapsuleX)
 	massCenter = c.calculateMassCenter();
 	inertia    = c.calculateInertia(m_rho);
 
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -308,7 +305,6 @@ TEST_F(RigidShapeTest, CapsuleY)
 	massCenter = c.calculateMassCenter();
 	inertia    = c.calculateInertia(m_rho);
 
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
@@ -350,8 +346,42 @@ TEST_F(RigidShapeTest, CapsuleZ)
 	massCenter = c.calculateMassCenter();
 	inertia    = c.calculateInertia(m_rho);
 
-	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
+}
+
+TEST_F (RigidShapeTest, PlaneTest)
+{
+	Vector3d n(1.0,2.0,3.0);
+	Vector3d p0(2.0,4.0,5.0);
+	double d = 1.0;
+	EXPECT_NO_THROW({PlaneShape shape(n,d);});
+
+	PlaneShape normalForm(n,d);
+	EXPECT_EQ(d, normalForm.getD());
+	EXPECT_TRUE(n.normalized().isApprox(normalForm.getNormal()));
+
+	PlaneShape pointAndNormal(p0,n);
+	EXPECT_TRUE(n.normalized().isApprox(pointAndNormal.getNormal()));
+
+	double expectedD = - n.normalized().dot(p0);
+	EXPECT_NEAR(expectedD, pointAndNormal.getD(), epsilon);
+
+	Vector3d p1(4.0,5.0,6.0);
+	Vector3d p2(0.0,2.0,1.0);
+
+	PlaneShape threePoints(p0, p1, p2);
+
+	Vector3d expectedN = (p1 - p0).cross(p2 - p0);
+	expectedN.normalize();
+	expectedD = - expectedN.dot(p0);
+
+	EXPECT_TRUE(expectedN.normalized().isApprox(threePoints.getNormal()));
+	EXPECT_NEAR(expectedD, threePoints.getD(), epsilon);
+
+	EXPECT_EQ(0.0, normalForm.calculateVolume());
+	EXPECT_EQ(0.0, normalForm.calculateMass(1.0));
+	EXPECT_EQ(Vector3d(0,0,0), normalForm.calculateMassCenter());
+	EXPECT_EQ(Matrix33d::Identity(), normalForm.calculateInertia(1.0));
 }
