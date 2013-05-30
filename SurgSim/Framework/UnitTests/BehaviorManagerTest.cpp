@@ -66,6 +66,6 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 
 	EXPECT_TRUE(behavior->isInitialized);
 	EXPECT_TRUE(behavior->isAwoken);
-	EXPECT_TRUE(behavior->updateCount != 0);
+	EXPECT_GT(behavior->updateCount, 0);
 
 }

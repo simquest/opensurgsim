@@ -66,7 +66,10 @@ static const int cubeTrianglesCCW[12][3] =
 class EmptyData
 {
 public:
-	bool operator ==(const EmptyData& e) const { return true; };
+	bool operator ==(const EmptyData& e) const
+	{
+		return true;
+	}
 };
 
 class CubeMeshTest : public ::testing::Test

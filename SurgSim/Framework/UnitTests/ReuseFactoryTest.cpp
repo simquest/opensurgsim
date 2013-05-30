@@ -22,8 +22,13 @@ using SurgSim::Framework::ReuseFactory;
 class MockObject
 {
 public:
-	MockObject() {};
-	~MockObject() {};
+	MockObject()
+	{
+	}
+
+	~MockObject()
+	{
+	}
 };
 
 TEST(ReuseFactoryTest, InitTest)
