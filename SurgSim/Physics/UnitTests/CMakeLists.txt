@@ -32,8 +32,5 @@ include_directories(
 )
 
 set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics gtest ${Boost_LIBRARIES})
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(LIBS ${LIBS} rt)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)

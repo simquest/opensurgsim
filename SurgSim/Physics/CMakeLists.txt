@@ -39,12 +39,14 @@ add_subdirectory(Actors)
 set(SURGSIM_PHYSICS_ALL_SOURCES ${SURGSIM_PHYSICS_SOURCES} ${SURGSIM_PHYSICS_ACTORS_SOURCES})
 set(SURGSIM_PHYSICS_ALL_HEADERS ${SURGSIM_PHYSICS_HEADERS} ${SURGSIM_PHYSICS_ACTORS_HEADERS})
 
+
 surgsim_add_library(
     SurgSimPhysics
     "${SURGSIM_PHYSICS_ALL_SOURCES}"
     "${SURGSIM_PHYSICS_ALL_HEADERS}"
     "SurgSim/Physics"
 )
+target_link_libraries(SurgSimPhysics SurgSimFramework)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
