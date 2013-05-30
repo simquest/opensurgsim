@@ -53,9 +53,8 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3fTest)
 	std::pair<osg::Quat, osg::Vec3f> osgTransform = toOsg(transform);
 
 	/// Convert back to Eigen and compare with original
-	Quaternionf resultRotation = fromOsg<float>(osgTransform.first);
-	EXPECT_LT(rotation.angularDistance(resultRotation), Eigen::NumTraits<float>::dummy_precision());
-	EXPECT_TRUE(translation.isApprox(fromOsg(osgTransform.second)));
+	RigidTransform3f resultTransform = fromOsg(osgTransform);
+	EXPECT_TRUE(transform.isApprox(resultTransform));
 }
 
 TEST(OsgRigidTransformConversionsTests, RigidTransform3fMultiplyTest)
@@ -92,9 +91,8 @@ TEST(OsgRigidTransformConversionsTests, RigidTransform3dTest)
 	std::pair<osg::Quat, osg::Vec3d> osgTransform = toOsg(transform);
 
 	/// Convert back to Eigen and compare with original
-	Quaterniond resultRotation = fromOsg<double>(osgTransform.first);
-	EXPECT_LT(rotation.angularDistance(resultRotation), Eigen::NumTraits<double>::dummy_precision());
-	EXPECT_TRUE(translation.isApprox(fromOsg(osgTransform.second)));
+	RigidTransform3d resultTransform = fromOsg(osgTransform);
+	EXPECT_TRUE(transform.isApprox(resultTransform));
 }
 
 TEST(OsgRigidTransformConversionsTests, RigidTransform3dMultiplyTest)
