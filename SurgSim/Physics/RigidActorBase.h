@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDACTORBASE_H
 #define SURGSIM_PHYSICS_RIGIDACTORBASE_H
 
-#include <SurgSim/Physics/Actors/Actor.h>
+#include <SurgSim/Physics/Actor.h>
 
 #include <SurgSim/Math/RigidTransform.h>
 

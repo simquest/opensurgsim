@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include <SurgSim/Physics/Actors/RigidActorParameters.h>
+#include <SurgSim/Physics/RigidActorParameters.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Valid.h>

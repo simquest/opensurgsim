@@ -18,7 +18,7 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Physics/Actors/RigidActorBaseState.h>
+#include <SurgSim/Physics/RigidActorBaseState.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>

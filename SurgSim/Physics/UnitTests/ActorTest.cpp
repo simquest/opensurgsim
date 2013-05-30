@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include <SurgSim/Physics/Actors/Actor.h>
+#include <SurgSim/Physics/Actor.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Physics::Actor;

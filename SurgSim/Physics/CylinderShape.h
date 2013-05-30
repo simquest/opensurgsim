@@ -18,7 +18,7 @@
 
 #include <SurgSim/Framework/Assert.h>
 
-#include <SurgSim/Physics/Actors/RigidShape.h>
+#include <SurgSim/Physics/RigidShape.h>
 
 namespace SurgSim
 {

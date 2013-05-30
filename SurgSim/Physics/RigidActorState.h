@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDACTORSTATE_H
 #define SURGSIM_PHYSICS_RIGIDACTORSTATE_H
 
-#include <SurgSim/Physics/Actors/RigidActorBaseState.h>
+#include <SurgSim/Physics/RigidActorBaseState.h>
 
 #include <SurgSim/Math/Vector.h>
 

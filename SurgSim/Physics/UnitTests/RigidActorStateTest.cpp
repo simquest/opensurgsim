@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/Physics/Actors/RigidActorState.h>
+#include <SurgSim/Physics/RigidActorState.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
