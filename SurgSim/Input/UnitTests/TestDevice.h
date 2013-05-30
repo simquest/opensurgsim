@@ -32,7 +32,7 @@ using SurgSim::Input::OutputProducerInterface;
 class TestDevice : public CommonDevice
 {
 public:
-	TestDevice(const std::string& uniqueName);
+	explicit TestDevice(const std::string& uniqueName);
 
 	virtual bool initialize();
 
