@@ -35,7 +35,7 @@ TEST(BehaviorManagerTest, AddRemoveTest)
 	EXPECT_TRUE(manager->addComponent(behavior2));
 	EXPECT_FALSE(manager->addComponent(behavior));
 
-	// This should return true because the manager is not concerned 
+	// This should return true because the manager is not concerned
 	// with base components
 	EXPECT_TRUE(manager->addComponent(component));
 

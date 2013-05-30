@@ -86,7 +86,7 @@ TEST_F(RigidShapeTest, Sphere)
 	massCenter = s.calculateMassCenter();
 	inertia    = s.calculateInertia(m_rho);
 
-		
+
 	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
@@ -120,7 +120,7 @@ TEST_F(RigidShapeTest, Box)
 	mass       = b.calculateMass(m_rho);
 	massCenter = b.calculateMassCenter();
 	inertia    = b.calculateInertia(m_rho);
-		
+
 	double epsilon = 1e-10;
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);

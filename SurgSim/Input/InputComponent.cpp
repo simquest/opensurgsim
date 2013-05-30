@@ -43,7 +43,7 @@ public:
 
 	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData)
 	{
-		SURGSIM_ASSERT(initialData.isValid()) 
+		SURGSIM_ASSERT(initialData.isValid())
 			<< "Cannot initialize input with invalid data from device (" << device << ")";
 		m_lastInput.set(initialData);
 	}

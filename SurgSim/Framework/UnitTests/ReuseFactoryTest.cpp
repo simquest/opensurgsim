@@ -91,7 +91,7 @@ TEST(ReuseFactoryTest, ReuseTest)
 
 	// It should be deleted now.
 	EXPECT_EQ(nullptr, weakPointer.lock()) << "Weak pointer to object = " << weakPointer.lock();
-	
+
 	// Reuse the object that has been deleted.
 	{
 		std::shared_ptr<MockObject> object = objectFactory.getInstance();

@@ -178,7 +178,7 @@ TEST_F(RigidActorParametersTest, ShapesTest)
 
 TEST_F(RigidActorParametersTest, ValidityCheckTest)
 {
-	double qNaN = std::numeric_limits<double>::quiet_NaN(); 
+	double qNaN = std::numeric_limits<double>::quiet_NaN();
 
 	// Create the base rigid actor state
 	std::shared_ptr<RigidActorParameters> rigidActorParam = std::make_shared<RigidActorParameters>();

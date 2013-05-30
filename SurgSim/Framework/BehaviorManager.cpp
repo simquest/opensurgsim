@@ -91,7 +91,7 @@ bool SurgSim::Framework::BehaviorManager::doUpdate(double dt)
 {
 	auto endIt = m_behaviors.end();
 	auto it = m_behaviors.begin();
-	for (;it != endIt; ++it)
+	for ( ;  it != endIt;  ++it)
 	{
 		(*it)->update(dt);
 	}

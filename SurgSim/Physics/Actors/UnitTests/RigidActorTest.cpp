@@ -70,10 +70,10 @@ public:
 
 	// Rigid actor state
 	RigidActorState m_state;
-	
+
 	// Rigid actor state for divergence test
 	RigidActorState m_stateDivergence;
-	
+
 	// Rigid actor default state
 	RigidActorState m_defaultState;
 
@@ -267,7 +267,7 @@ TEST_F(RigidActorTest, DisableWhenDivergeTest)
 	// The rotation explode under the angular velocity too strong !
 	{
 		ASSERT_TRUE(rigidBody->isActive());
-		
+
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);
 		rigidBody->afterUpdate(m_dt);

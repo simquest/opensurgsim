@@ -139,18 +139,18 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 			TriangleMesh::Triangle t(triangleElement);
 			mesh->addTriangle(t);
 		}
-		
+
 		SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData> boxMesh(mesh);
 
 		SurgSim::Physics::BoxShape boxShape(lx, ly, lz);
-		
+
 		SurgSim::Math::Matrix33d expectedInertia;
 		SurgSim::Math::Vector3d expectedMassCenter;
 		double expectedMass;
 		expectedMass       = boxShape.calculateMass(density);
 		expectedInertia    = boxShape.calculateInertia(density);
 		expectedMassCenter = boxShape.calculateMassCenter();
-		
+
 		EXPECT_NEAR(boxShape.calculateVolume(), boxMesh.calculateVolume(), 1e-8);
 		EXPECT_EQ(expectedMassCenter, boxMesh.calculateMassCenter());
 		EXPECT_NEAR(expectedMass, boxMesh.calculateMass(density), 1e-8);
