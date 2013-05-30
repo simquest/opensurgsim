@@ -58,12 +58,12 @@ private:
 	void updatePairs();
 	size_t m_pairCount;
 
+	std::shared_ptr<SurgSim::Framework::ReuseFactory<Contact>> m_contactFactory;
 	SurgSim::Framework::ReuseFactory<CollisionPair> m_pairFactory;
-
-	std::list<std::shared_ptr<CollisionPair>> m_pairs;
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
-
 	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> m_actors;
+	std::list<std::shared_ptr<CollisionPair>> m_pairs;
+
 };
 
 }; // Physics

@@ -60,13 +60,11 @@ TEST(DcdCollisionTest, SingleCollisionTest)
 	std::shared_ptr<Actor> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
 	std::shared_ptr<Actor> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
 
-	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors;
+	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors = std::make_shared<std::vector<std::shared_ptr<Actor>>>();
 
 	actors->push_back(sphere1);
 	actors->push_back(sphere2);
 
 	SurgSim::Physics::DcdCollision computation(actors);
 	computation.update(1.0);
-
-
 }

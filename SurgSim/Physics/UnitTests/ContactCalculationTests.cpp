@@ -21,12 +21,12 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include "../CollisionRepresentation.h"
-#include "../Actors/RigidActorState.h"
-#include "../Actors/RigidShape.h"
-#include "../ContactCalculation.h"
-#include "../Actors/SphereShape.h"
-#include "../CollisionPair.h"
+#include <SurgSim/Physics/Actors/RigidActorState.h>
+#include <SurgSim/Physics/Actors/RigidShape.h>
+#include <SurgSim/Physics/Actors/SphereShape.h>
+#include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Physics/ContactCalculation.h>
+#include <SurgSim/Physics/CollisionPair.h>
 
 
 
@@ -55,8 +55,8 @@ namespace Physics
 class RigidShapeCollisionRepresentation : public CollisionRepresentation
 {
 public:
-	RigidShapeCollisionRepresentation(std::shared_ptr<RigidShape> shape, Vector3d translation) :
-		m_shape(shape), m_transform(SurgSim::Math::makeRigidTransform(Quaterniond(), translation))
+	RigidShapeCollisionRepresentation(std::shared_ptr<RigidShape> shape, Quaterniond quat, Vector3d translation) :
+		m_shape(shape), m_transform(SurgSim::Math::makeRigidTransform(quat, translation))
 	{
 
 	}
@@ -90,17 +90,29 @@ namespace {
 	std::shared_ptr<RigidShape> shape0 = std::make_shared<SphereShape>(1.0);
 	std::shared_ptr<RigidShape> shape1 = std::make_shared<SphereShape>(1.0);
 
-	std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<RigidShapeCollisionRepresentation>(shape0, Vector3d(1.0,0.0,0.0));
-	std::shared_ptr<CollisionRepresentation> rep1 = std::make_shared<RigidShapeCollisionRepresentation>(shape1, Vector3d(0.5,0.0,0.0));
+	std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<RigidShapeCollisionRepresentation>
+						(shape0, Quaterniond(), Vector3d(1.0,0.0,0.0));
+	std::shared_ptr<CollisionRepresentation> rep1 = std::make_shared<RigidShapeCollisionRepresentation>
+						(shape1, Quaterniond(), Vector3d(0.5,0.0,0.0));
 
 	std::shared_ptr<CollisionPair> pair01 = std::make_shared<CollisionPair>(rep0, rep1);
 }
 
-std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius, const Vector3d& position)
+std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius, 
+													  const Quaterniond& rotation = Quaterniond(), 
+													  const Vector3d& position = Vector3d())
 {
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
-	std::shared_ptr<CollisionRepresentation> rep = std::make_shared<RigidShapeCollisionRepresentation>
-		(sphere, position);
+	std::shared_ptr<CollisionRepresentation> rep = std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);
+	return rep;
+}
+
+std::shared_ptr<CollisionRepresentation> makePlaneRep(const Vector3d& n, const double& d, 
+													  const Quaterniond& rotation = Quaterniond(), 
+													  const Vector3d& position = Vector3d())
+{
+	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>(n,d);
+	std::shared_ptr<CollisionRepresentation> rep = std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
 	return rep;
 }
 
@@ -110,8 +122,8 @@ TEST(CollisionPairTest, InitTest)
 	// Default Constructor, needs to work for ReuseFactory
 	EXPECT_NO_THROW({CollisionPair pair;});
 
-	std::shared_ptr<CollisionRepresentation> rep0 = makeSpereRep(1.0, Vector3d(0.0,0.0,0.0));
-	std::shared_ptr<CollisionRepresentation> rep1 = makeSpereRep(1.0, Vector3d(0.0,1.0,0.0));
+	std::shared_ptr<CollisionRepresentation> rep0 = makeSpereRep(1.0, Quaterniond(), Vector3d(0.0,0.0,0.0));
+	std::shared_ptr<CollisionRepresentation> rep1 = makeSpereRep(1.0, Quaterniond(), Vector3d(0.0,1.0,0.0));
 
 	EXPECT_ANY_THROW({CollisionPair pair(rep0, rep0);});
 	EXPECT_ANY_THROW({CollisionPair pair(nullptr, rep0);});
@@ -126,8 +138,6 @@ TEST(CollisionPairTest, InitTest)
 	EXPECT_FALSE(pair.hasContacts());
 	
 }
-
-
 
 
 TEST (ContactCalculationTests, DefaultCalculation)
@@ -146,8 +156,8 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 {
 	std::shared_ptr<ContactFactory> factory = std::make_shared<ContactFactory>();
 	SphereSphereDcdContact calc(factory);
-	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(makeSpereRep(r0,p0),
-										makeSpereRep(r1,p1));
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(makeSpereRep(r0,Quaterniond(),p0),
+																		  makeSpereRep(r1,Quaterniond(),p1));
 
 	calc.calculateContact(pair);
 	EXPECT_EQ(hasContacts, pair->hasContacts());
@@ -156,11 +166,7 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
 		Vector3d dist = (p1 - p0).normalized();
 		EXPECT_TRUE(eigenEqual(dist, contact->normal));
-		// Verify the contact point ... 
-		
-		Vector3d expected = p1 + contact->normal * (r0 + r1);
-		Vector3d moved = p0 + contact->normal * contact->depth;
-		EXPECT_TRUE(eigenEqual(expected, moved));
+		EXPECT_NEAR(d, contact->depth, 1e-10);
 	}
 }
 
@@ -174,8 +180,63 @@ TEST (ContactCalculationTests, SphereSphereCalculation)
 
 	{
 		SCOPED_TRACE("Intersection");
-		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0,0), true, 0.25);
+		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0,0), true, 0.5);
 	}
+}
+
+void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& sphereQuat, const Vector3d& sphereTrans,
+					   std::shared_ptr<PlaneShape> plane, const Quaterniond& planeQuat, const Vector3d& planeTrans,
+					   bool expectedIntersect, const double& expectedDepth = 0 , const Vector3d& expectedNorm = Vector3d())
+{
+		std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<RigidShapeCollisionRepresentation>(plane,planeQuat,planeTrans);
+		std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
+		std::shared_ptr<ContactFactory> factory = std::make_shared<ContactFactory>();
+		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
+
+		SpherePlaneDcdContact calc(factory);
+		calc.calculateContact(pair);
+		if (expectedIntersect)
+		{
+			ASSERT_TRUE(pair->hasContacts());
+			std::shared_ptr<Contact> contact = pair->getContacts().front();
+			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
+			EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal));
+		}
+		else
+		{
+			EXPECT_FALSE(pair->hasContacts());
+		}
+
+}
+
+TEST(ContactCalculationTests, SperePlaneCalculation)
+{
+	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>(Vector3d(0.0,1.0,0.0),-0.5);
+	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
+
+	{
+		SCOPED_TRACE("No Intersection, no transformation");
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,2.0,0.0),
+						  plane,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+						  false);
+
+	}	
+
+	{
+ 		SCOPED_TRACE("Intersection front, no transformation");
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,1.0,0.0),
+						  plane,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+						 true, 0.5, Vector3d(0.0,1.0,0.0));
+	}
+
+	{
+		SCOPED_TRACE("Intersection back, no transformation");
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0,0.0),
+			plane,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+			true, 0.5, Vector3d(0.0,-1.0,0.0));
+	}
+
+	
 }
 
 

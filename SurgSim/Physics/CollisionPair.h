@@ -34,7 +34,7 @@ namespace Physics
 /// zero. This means that the normal vector points "in" to body 1
 struct Contact {
 	double depth;						///< What is the penetration depth for the representation
-	SurgSim::Math::Vector3d contact;	///< The actual contact point
+	SurgSim::Math::Vector3d contact;	///< The actual contact point, only used for CCD
 	SurgSim::Math::Vector3d normal;		///< The normal on the contact point (normalized)
 };
 
@@ -117,7 +117,7 @@ private:
 	std::shared_ptr<CollisionRepresentation> m_second;
 
 	/// List of current contacts
-	std::list <std::shared_ptr<Contact>> m_contacts;
+	std::list<std::shared_ptr<Contact>> m_contacts;
 };
 
 

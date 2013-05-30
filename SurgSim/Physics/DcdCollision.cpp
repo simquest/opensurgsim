@@ -39,11 +39,12 @@ DcdCollision::DcdCollision(std::shared_ptr< std::vector<std::shared_ptr<Actor>>>
 
 DcdCollision::~DcdCollision()
 {
-
+	m_pairs.clear();
 }
 
 void DcdCollision::doUpdate(double dt)
 {
+	updatePairs();
 	auto it = m_pairs.cbegin();
 	auto itEnd = m_pairs.cend();
 	while (it != itEnd)
@@ -57,7 +58,7 @@ void DcdCollision::doUpdate(double dt)
 
 void DcdCollision::populateCollisionTable()
 {
-	std::shared_ptr<ContactFactory> contactFactory = std::make_shared<ContactFactory>();
+	m_contactFactory = std::make_shared<ContactFactory>();
 	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
 	{
 		for (int j = 0; j < RIGID_SHAPE_TYPE_COUNT; ++j)
@@ -65,7 +66,8 @@ void DcdCollision::populateCollisionTable()
 			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
 		}
 	}
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact(contactFactory));
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact(m_contactFactory));
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(m_contactFactory));
 }
 
 void DcdCollision::updatePairs()
