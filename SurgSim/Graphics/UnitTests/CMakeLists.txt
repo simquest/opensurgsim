@@ -48,8 +48,4 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(LIBS ${LIBS} rt)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-
 surgsim_add_unit_tests(SurgSimGraphicsTest)

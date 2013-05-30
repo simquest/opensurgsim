@@ -35,6 +35,9 @@ set(EXAMPLE_HEADERS
 
 add_executable(ExampleBouncingBalls
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-target_link_libraries(ExampleBouncingBalls
-	${LIBS} SurgSimFramework SurgSimDataStructures SurgSimPhysics
+
+target_link_libraries(ExampleBouncingBalls 
+	SurgSimFramework
+	SurgSimDataStructures
+	SurgSimPhysics
 	${Boost_LIBRARIES})

@@ -58,6 +58,7 @@ surgsim_add_library(
     "${SURGSIM_PHYSICS_HEADERS}"
     "SurgSim/Physics"
 )
+target_link_libraries(SurgSimPhysics SurgSimFramework)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
