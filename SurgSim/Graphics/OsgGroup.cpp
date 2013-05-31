@@ -47,11 +47,11 @@ bool OsgGroup::isVisible() const
 	return m_isVisible;
 }
 
-bool OsgGroup::addActor(std::shared_ptr<SurgSim::Graphics::Actor> actor)
+bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Actor> actor)
 {
 	std::shared_ptr<OsgActor> osgActor = std::dynamic_pointer_cast<OsgActor>(actor);
 
-	if (osgActor && Group::addActor(osgActor))
+	if (osgActor && Group::add(osgActor))
 	{
 		m_switch->addChild(osgActor->getOsgNode());
 		m_switch->setChildValue(osgActor->getOsgNode(), m_isVisible);
@@ -63,11 +63,25 @@ bool OsgGroup::addActor(std::shared_ptr<SurgSim::Graphics::Actor> actor)
 	}
 }
 
-bool OsgGroup::removeActor(std::shared_ptr<SurgSim::Graphics::Actor> actor)
+bool OsgGroup::append(std::shared_ptr<SurgSim::Graphics::Group> group)
+{
+	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
+
+	if (osgGroup && Group::append(osgGroup))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool OsgGroup::remove(std::shared_ptr<SurgSim::Graphics::Actor> actor)
 {
 	std::shared_ptr<OsgActor> osgActor = std::dynamic_pointer_cast<OsgActor>(actor);
 
-	if (osgActor && Group::removeActor(osgActor))
+	if (osgActor && Group::remove(osgActor))
 	{
 		m_switch->removeChild(osgActor->getOsgNode());
 		return true;
@@ -78,53 +92,12 @@ bool OsgGroup::removeActor(std::shared_ptr<SurgSim::Graphics::Actor> actor)
 	}
 }
 
-void OsgGroup::clearActors()
+void OsgGroup::clear()
 {
-	while (!getActors().empty())
+	while (!getMembers().empty())
 	{
-		std::shared_ptr<Actor> actor = getActors().front();
-		SURGSIM_ASSERT(removeActor(actor)) << "Removal of actor " << actor->getName() <<
-			" failed while attempting to clear group " << getName() << "!";
-	}
-}
-
-bool OsgGroup::addGroup(std::shared_ptr<Group> group)
-{
-	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
-
-	if (osgGroup && Group::addGroup(osgGroup))
-	{
-		m_switch->addChild(osgGroup->getOsgGroup());
-		m_switch->setChildValue(osgGroup->getOsgGroup(), m_isVisible);
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-bool OsgGroup::removeGroup(std::shared_ptr<Group> group)
-{
-	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
-
-	if (osgGroup && Group::removeGroup(osgGroup))
-	{
-		m_switch->removeChild(osgGroup->getOsgGroup());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
-void OsgGroup::clearGroups()
-{
-	while (!getGroups().empty())
-	{
-		std::shared_ptr<Group> group = getGroups().front();
-		SURGSIM_ASSERT(removeGroup(group)) << "Removal of group " << group->getName() <<
-			" failed while attempting to clear group " << getName() << "!";
+		std::shared_ptr<Actor> actor = getMembers().front();
+ 		SURGSIM_ASSERT(remove(actor)) << "Removal of actor " << actor->getName() <<
+ 			" failed while attempting to clear group " << getName() << "!";
 	}
 }
