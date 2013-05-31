@@ -59,10 +59,20 @@ inline SurgSim::Math::RigidTransform3f fromOsg(const osg::Quat& rotation, const 
 {
 	return makeRigidTransform(fromOsg<float>(rotation), fromOsg(translation));
 }
+/// Convert from OSG to 3D rigid body (isometric) transform, represented as floats
+inline SurgSim::Math::RigidTransform3f fromOsg(const std::pair<osg::Quat, osg::Vec3f>& transform)
+{
+	return fromOsg(transform.first, transform.second);
+}
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as doubles
 inline SurgSim::Math::RigidTransform3d fromOsg(const osg::Quat& rotation, const osg::Vec3d& translation)
 {
 	return makeRigidTransform(fromOsg<double>(rotation), fromOsg(translation));
+}
+/// Convert from OSG to 3D rigid body (isometric) transform, represented as doubles
+inline SurgSim::Math::RigidTransform3d fromOsg(const std::pair<osg::Quat, osg::Vec3d>& transform)
+{
+	return fromOsg(transform.first, transform.second);
 }
 
 };  // namespace Graphics

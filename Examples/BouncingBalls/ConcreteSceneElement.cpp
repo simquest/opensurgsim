@@ -13,44 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <string>
 
-#include <memory>
-#include <vector>
+#include <Examples/BouncingBalls/ConcreteSceneElement.h>
 
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
-
-namespace SurgSim
-{
-namespace Physics
-{
-
-
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
+ConcreteSceneElement::ConcreteSceneElement(const std::string& name) :
+	SurgSim::Framework::SceneElement(name)
 {
 
 }
 
-FreeMotion::~FreeMotion()
+ConcreteSceneElement::~ConcreteSceneElement()
 {
 
 }
 
-void FreeMotion::doUpdate(double dt)
+bool ConcreteSceneElement::doInitialize()
 {
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
-
-	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
-
-	auto it = actors->begin();
-	auto itEnd = actors->end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
+	return true;
 }
 
-
-}; // Physics
-}; // SurgSim
+bool ConcreteSceneElement::doWakeUp()
+{
+	return true;
+}

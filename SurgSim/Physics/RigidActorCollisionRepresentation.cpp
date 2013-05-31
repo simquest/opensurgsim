@@ -13,44 +13,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
+RigidActorCollisionRepresentation::RigidActorCollisionRepresentation(std::shared_ptr<RigidActor> actor) : m_actor(actor)
 {
 
 }
 
-FreeMotion::~FreeMotion()
+RigidActorCollisionRepresentation::~RigidActorCollisionRepresentation()
 {
 
 }
 
-void FreeMotion::doUpdate(double dt)
+int RigidActorCollisionRepresentation::getShapeType() const
 {
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
-
-	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
-
-	auto it = actors->begin();
-	auto itEnd = actors->end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
+	return m_actor->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
+const std::shared_ptr<RigidShape> RigidActorCollisionRepresentation::getShape() const
+{
+	return m_actor->getCurrentParameters().getShapeUsedForMassInertia();
+}
+
+const SurgSim::Math::RigidTransform3d& RigidActorCollisionRepresentation::getLocalToWorldTransform() const
+{
+	return m_actor->getPose();
+}
 
 }; // Physics
 }; // SurgSim
+
+
+
+

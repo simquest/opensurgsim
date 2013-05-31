@@ -13,44 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_PHYSICS_SHAPES_H
+#define SURGSIM_PHYSICS_SHAPES_H
 
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
-
-namespace SurgSim
-{
-namespace Physics
-{
+/// This file includes all the shapes
+#include <SurgSim/Physics/BoxShape.h>
+#include <SurgSim/Physics/CapsuleShape.h>
+#include <SurgSim/Physics/CylinderShape.h>
+#include <SurgSim/Physics/MeshShape.h>
+#include <SurgSim/Physics/SphereShape.h>
 
 
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
-{
 
-}
-
-FreeMotion::~FreeMotion()
-{
-
-}
-
-void FreeMotion::doUpdate(double dt)
-{
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
-
-	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
-
-	auto it = actors->begin();
-	auto itEnd = actors->end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
-}
-
-
-}; // Physics
-}; // SurgSim
+#endif /// SURGSIM_PHYSICS_SHAPES_H

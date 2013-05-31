@@ -17,7 +17,7 @@
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actors/Actor.h>
+#include <SurgSim/Physics/Actor.h>
 #include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
@@ -52,12 +52,12 @@ bool PhysicsManager::doStartUp()
 
 bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	return doAddComponent(component,m_actors.get()) != nullptr;
+	return tryAddComponent(component,m_actors.get()) != nullptr;
 }
 
 bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	return doRemoveComponent(component, m_actors.get());
+	return tryRemoveComponent(component, m_actors.get());
 }
 
 bool PhysicsManager::doUpdate(double dt)

@@ -13,44 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
+#include <numeric>
+#include <SurgSim/Framework/Assert.h>
+#include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Physics/CollisionRepresentation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
+CollisionPair::CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second) :
+		m_representations(first, second)
+{
+	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
+}
 
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
+CollisionPair::~CollisionPair()
 {
 
 }
 
-FreeMotion::~FreeMotion()
+void CollisionPair::clearContacts()
 {
-
+	m_contacts.clear();
 }
 
-void FreeMotion::doUpdate(double dt)
-{
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
+}; // namespace Physics
+}; // namespace SurgSim
 
-	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
-
-	auto it = actors->begin();
-	auto itEnd = actors->end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
-}
-
-
-}; // Physics
-}; // SurgSim

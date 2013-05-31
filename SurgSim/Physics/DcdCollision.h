@@ -13,44 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_PHYSICS_DCDCOLLISION_H
+#define SURGSIM_PHYSICS_DCDCOLLISION_H
 
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/Computation.h>
+#include <SurgSim/Physics/CollisionPair.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
+/// Computation to determine the contacts between a list of CollisionPairs
+/// will update the collision pairs accordingly
+class DcdCollision : public Computation
 {
+public:
 
-}
+	/// Constructor
+	explicit DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs );
+	virtual ~DcdCollision();
 
-FreeMotion::~FreeMotion()
-{
+protected:
+	void doUpdate(double dt);
+	void calculateContacts(std::shared_ptr<CollisionPair> it);
 
-}
+private:
+	std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> m_pairs;
 
-void FreeMotion::doUpdate(double dt)
-{
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
-
-	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
-
-	auto it = actors->begin();
-	auto itEnd = actors->end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
-}
-
+};
 
 }; // Physics
 }; // SurgSim
+
+#endif
