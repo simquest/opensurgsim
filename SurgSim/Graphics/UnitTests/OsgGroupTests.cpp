@@ -123,7 +123,7 @@ TEST(OsgGroupTests, AddRemoveTest)
 	std::shared_ptr<MockActor> nonOsgActor = std::make_shared<MockActor>("non-osg actor");
 	EXPECT_FALSE(group->add(nonOsgActor)) << "OsgGroup should only succeed on actors that derive from OsgActor!";
 	EXPECT_EQ(1u, group->getMembers().size());
-	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), 
+	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(),
 		nonOsgActor)) << "Only subclasses of OsgActor should be in an OsgGroup!";
 	EXPECT_EQ(1u, osgSwitch->getNumChildren());
 }
@@ -172,12 +172,12 @@ TEST(GroupTests, AppendTest)
 	/// Add an OSG and non-OSG actor to this group.
 	EXPECT_TRUE(nonOsgGroup->add(actor3));
 	EXPECT_TRUE(nonOsgGroup->add(nonOsgActor));
-	
+
 	EXPECT_FALSE(group1->append(nonOsgGroup));
-	EXPECT_EQ(2u, group1->getMembers().size()) << 
+	EXPECT_EQ(2u, group1->getMembers().size()) <<
 		"Nothing from the non-OSG group should have been added to the OsgGroup!";
 	EXPECT_EQ(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), actor3));
-	EXPECT_EQ(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), 
+	EXPECT_EQ(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(),
 		nonOsgActor));
 }
 

@@ -97,7 +97,7 @@ void OsgGroup::clear()
 	while (!getMembers().empty())
 	{
 		std::shared_ptr<Actor> actor = getMembers().front();
- 		SURGSIM_ASSERT(remove(actor)) << "Removal of actor " << actor->getName() <<
- 			" failed while attempting to clear group " << getName() << "!";
+		SURGSIM_ASSERT(remove(actor)) << "Removal of actor " << actor->getName() <<
+			" failed while attempting to clear group " << getName() << "!";
 	}
 }
