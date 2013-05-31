@@ -63,7 +63,7 @@ TEST(OsgManagerTests, StartUpTest)
 	/// Run the thread for a moment
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
 }
 

@@ -63,7 +63,7 @@ TEST(OsgViewElementTests, StartUpTest)
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	/// Get the GraphicsWindow to check that it is updated correctly
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(viewElement->getView());
@@ -82,7 +82,7 @@ TEST(OsgViewElementTests, StartUpTest)
 
 	/// Move the window to (100, 200)
 	viewElement->getView()->setPosition(100, 200);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	/// Check that the window position was updated
 	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
@@ -93,7 +93,7 @@ TEST(OsgViewElementTests, StartUpTest)
 
 	/// Resize the window to 400 x 800
 	viewElement->getView()->setDimensions(400, 500);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	/// Check that the window dimensions were updated
 	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
