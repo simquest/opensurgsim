@@ -19,9 +19,9 @@
 
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
-using SurgSim::Graphics::ViewElement;
 
-OsgViewElement::OsgViewElement(const std::string& name) : ViewElement(name, std::make_shared<OsgView>(name + " View"))
+OsgViewElement::OsgViewElement(const std::string& name) :
+	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View"))
 {
 }
 OsgViewElement::~OsgViewElement()

@@ -26,11 +26,10 @@
 
 #include <random>
 
-using SurgSim::Graphics::Camera;
-using SurgSim::Graphics::Manager;
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::OsgCamera;
-using SurgSim::Graphics::OsgView;
+namespace SurgSim
+{
+namespace Graphics
+{
 
 TEST(OsgViewTests, InitTest)
 {
@@ -101,3 +100,6 @@ TEST(OsgViewTests, CameraTest)
 	EXPECT_FALSE(view->setCamera(mockCamera));
 	EXPECT_EQ(camera, view->getCamera());
 }
+
+}  // namespace Graphics
+}  // namespace SurgSim

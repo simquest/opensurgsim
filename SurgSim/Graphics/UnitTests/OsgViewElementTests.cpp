@@ -30,11 +30,11 @@
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
-using SurgSim::Graphics::OsgManager;
-using SurgSim::Graphics::OsgView;
-using SurgSim::Graphics::OsgViewElement;
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::ViewElement;
+
+namespace SurgSim
+{
+namespace Graphics
+{
 
 TEST(OsgViewElementTests, InitTest)
 {
@@ -121,3 +121,6 @@ TEST(OsgViewElementTests, ViewTest)
 	EXPECT_NE(mockView, element->getView());
 	EXPECT_EQ(osgView, element->getView());
 }
+
+}  // namespace Graphics
+}  // namespace SurgSim

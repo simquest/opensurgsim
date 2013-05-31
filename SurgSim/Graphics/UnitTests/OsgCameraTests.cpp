@@ -28,16 +28,15 @@
 
 #include <random>
 
-using SurgSim::Graphics::Camera;
-using SurgSim::Graphics::Group;
-using SurgSim::Graphics::OsgActor;
-using SurgSim::Graphics::OsgCamera;
-using SurgSim::Graphics::OsgGroup;
-using SurgSim::Graphics::fromOsg;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+
+namespace SurgSim
+{
+namespace Graphics
+{
 
 TEST(OsgCameraTests, InitTest)
 {
@@ -147,3 +146,6 @@ TEST(OsgCameraTests, PoseAndMatricesTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
 	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()).isApprox(projectionMatrix));
 }
+
+}  // namespace Graphics
+}  // namespace SurgSim

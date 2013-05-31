@@ -17,7 +17,6 @@
 
 #include <SurgSim/Graphics/OsgCamera.h>
 
-using SurgSim::Graphics::Camera;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
 
@@ -67,7 +66,7 @@ void OsgView::getDimensions(int* width, int* height)
 	*height = m_height;
 }
 
-bool OsgView::setCamera(std::shared_ptr<Camera> camera)
+bool OsgView::setCamera(std::shared_ptr<SurgSim::Graphics::Camera> camera)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::dynamic_pointer_cast<OsgCamera>(camera);
 	if (osgCamera != nullptr && View::setCamera(camera))

@@ -21,17 +21,12 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
 
-using SurgSim::Graphics::Actor;
-using SurgSim::Graphics::Group;
-using SurgSim::Graphics::Manager;
-using SurgSim::Graphics::View;
-
 using SurgSim::Graphics::OsgActor;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
 using SurgSim::Graphics::OsgManager;
 
-OsgManager::OsgManager() : Manager(),
+OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 	m_viewer(new osgViewer::CompositeViewer()),
 	m_defaultGroup(std::make_shared<OsgGroup>("Default Group"))
 {
@@ -61,12 +56,12 @@ std::shared_ptr<OsgGroup> OsgManager::getDefaultGroup() const
 	return m_defaultGroup;
 }
 
-bool OsgManager::addActor(std::shared_ptr<Actor> actor)
+bool OsgManager::addActor(std::shared_ptr<SurgSim::Graphics::Actor> actor)
 {
 	std::shared_ptr<OsgActor> osgActor = std::dynamic_pointer_cast<OsgActor>(actor);
 	if (osgActor && Manager::addActor(osgActor))
 	{
-		SURGSIM_ASSERT(m_defaultGroup->addActor(osgActor)) << "Failed to add actor to default group!";
+		SURGSIM_ASSERT(m_defaultGroup->add(osgActor)) << "Failed to add actor to default group!";
 		return true;
 	}
 	else
@@ -75,12 +70,11 @@ bool OsgManager::addActor(std::shared_ptr<Actor> actor)
 		return false;
 	}
 }
-bool OsgManager::addGroup(std::shared_ptr<Group> group)
+bool OsgManager::addGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 {
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && Manager::addGroup(osgGroup))
 	{
-		SURGSIM_ASSERT(m_defaultGroup->addGroup(osgGroup)) << "Failed to add group to default group!";
 		return true;
 	}
 	else
@@ -89,7 +83,7 @@ bool OsgManager::addGroup(std::shared_ptr<Group> group)
 		return false;
 	}
 }
-bool OsgManager::addView(std::shared_ptr<View> view)
+bool OsgManager::addView(std::shared_ptr<SurgSim::Graphics::View> view)
 {
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
 	if (osgView && Manager::addView(osgView))
@@ -112,7 +106,7 @@ bool OsgManager::addView(std::shared_ptr<View> view)
 	}
 }
 
-bool OsgManager::removeView(std::shared_ptr<View> view)
+bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 {
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
 	if (osgView)
@@ -125,9 +119,7 @@ bool OsgManager::removeView(std::shared_ptr<View> view)
 
 bool OsgManager::doInitialize()
 {
-	addActor(m_defaultCamera);
-	addGroup(m_defaultGroup);
-	return true;
+	return addActor(m_defaultCamera) && addGroup(m_defaultGroup);
 }
 
 bool OsgManager::doStartUp()

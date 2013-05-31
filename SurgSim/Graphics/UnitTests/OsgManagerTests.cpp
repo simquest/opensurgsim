@@ -35,14 +35,11 @@
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
-using SurgSim::Graphics::Actor;
-using SurgSim::Graphics::Group;
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::OsgActor;
-using SurgSim::Graphics::OsgGroup;
-using SurgSim::Graphics::OsgView;
-using SurgSim::Graphics::OsgManager;
-using SurgSim::Graphics::OsgViewElement;
+
+namespace SurgSim
+{
+namespace Graphics
+{
 
 TEST(OsgManagerTests, InitTest)
 {
@@ -211,3 +208,6 @@ TEST(OsgManagerTests, AddRemoveTest)
 	EXPECT_TRUE(componentManager->removeComponent(nonGraphicsComponent)) <<
 		"Removing a component that this manager is not concerned with should return true";
 }
+
+}  // namespace Graphics
+}  // namespace SurgSim
