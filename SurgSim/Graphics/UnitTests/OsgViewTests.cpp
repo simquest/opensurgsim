@@ -50,6 +50,8 @@ TEST(OsgViewTests, InitTest)
 	view->getDimensions(&width, &height);
 	EXPECT_EQ(800, width);
 	EXPECT_EQ(600, height);
+
+	EXPECT_TRUE(view->isWindowBorderEnabled());
 }
 
 TEST(OsgViewTests, PositionAndDimensionsTest)
@@ -82,6 +84,12 @@ TEST(OsgViewTests, PositionAndDimensionsTest)
 
 	EXPECT_EQ(width, testWidth);
 	EXPECT_EQ(height, testHeight);
+
+	/// The window border should be enabled initially
+	EXPECT_TRUE(view->isWindowBorderEnabled());
+	/// Disable the window border
+	view->setWindowBorderEnabled(false);
+	EXPECT_FALSE(view->isWindowBorderEnabled());
 }
 
 TEST(OsgViewTests, CameraTest)

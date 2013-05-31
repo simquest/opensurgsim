@@ -51,7 +51,7 @@ public:
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y) = 0;
+	virtual void getPosition(int* x, int* y) const = 0;
 
 	/// Set the dimensions of this view
 	/// \param	width,height	Dimensions on the screen (in pixels)
@@ -60,7 +60,14 @@ public:
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height) = 0;
+	virtual void getDimensions(int* width, int* height) const = 0;
+
+	/// Sets whether the view window has a border
+	/// \param	enabled	True to enable the border around the window; false for no border
+	virtual void setWindowBorderEnabled(bool enabled) = 0;
+	/// Returns whether the view window has a border
+	/// \return	True to enable the border around the window; false for no border
+	virtual bool isWindowBorderEnabled() const = 0;
 
 	/// Sets the camera which provides the viewpoint in the scene
 	/// \param	camera	Camera whose image will be shown in this view

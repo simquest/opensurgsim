@@ -40,6 +40,7 @@ public:
 	/// \post	The view has no camera.
 	/// \post	The position of the view is (0, 0).
 	/// \post	The dimensions of the view are 800 x 600.
+	/// \post	The window border is enabled.
 	/// \param	name	Name of the view
 	explicit OsgView(const std::string& name);
 
@@ -50,7 +51,7 @@ public:
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y);
+	virtual void getPosition(int* x, int* y) const;
 
 	/// Set the dimensions of this view
 	/// \param	width,height	Dimensions on the screen (in pixels)
@@ -59,7 +60,14 @@ public:
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height);
+	virtual void getDimensions(int* width, int* height) const;
+
+	/// Sets whether the view window has a border
+	/// \param	enabled	True to enable the border around the window; false for no border
+	virtual void setWindowBorderEnabled(bool enabled);
+	/// Returns whether the view window has a border
+	/// \return	True to enable the border around the window; false for no border
+	virtual bool isWindowBorderEnabled() const;
 
 	/// Sets the camera which provides the viewpoint in the scene
 	/// Only allows OsgCamera components, any other will not be set and it will return false.
@@ -92,14 +100,14 @@ private:
 	int m_x, m_y;
 	/// Dimensions of the view on the screen (in pixels)
 	int m_width, m_height;
+	/// Whether the view window has a border
+	bool m_isWindowBorderEnabled;
 
 	/// Whether the next update will be the first time the view has been updated
 	/// On the first update, the view window is setup.
 	bool m_isFirstUpdate;
-	/// Whether the position has changed and the window rectangle needs to be updated
-	bool m_isPositionDirty;
-	/// Whether the dimensions have changed and the window rectangle needs to be updated
-	bool m_areDimensionsDirty;
+	/// Whether the settings have been changed and the window needs to be updated
+	bool m_areWindowSettingsDirty;
 
 	/// OSG view which performs the actual work involved in setting up and rendering to a window
 	osg::ref_ptr<osgViewer::View> m_view;

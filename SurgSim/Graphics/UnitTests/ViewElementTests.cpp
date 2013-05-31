@@ -119,7 +119,7 @@ public:
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y)
+	virtual void getPosition(int* x, int* y) const
 	{
 		*x = 0;
 		*y = 0;
@@ -134,10 +134,22 @@ public:
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height)
+	virtual void getDimensions(int* width, int* height) const
 	{
 		*width = 0;
 		*height = 0;
+	}
+
+	/// Sets whether the view window has a border
+	/// \param	enabled	True to enable the border around the window; false for no border
+	virtual void setWindowBorderEnabled(bool enabled)
+	{
+	}
+	/// Returns whether the view window has a border
+	/// \return	True to enable the border around the window; false for no border
+	virtual bool isWindowBorderEnabled() const
+	{
+		return true;
 	}
 
 	/// Updates the view.
@@ -184,7 +196,7 @@ TEST(ViewElementTests, StartUpTest)
 	/// Run the thread for a moment
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
 
 	/// Check that the view element was initialized and awoken

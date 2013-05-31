@@ -60,6 +60,11 @@ TEST(OsgViewElementTests, StartUpTest)
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("test element");
 	scene->addSceneElement(viewElement);
 
+	/// Set initial position to (50, 60), dimensions to 200 x 100 and disable the window border
+	viewElement->getView()->setPosition(50, 60);
+	viewElement->getView()->setDimensions(200, 100);
+	viewElement->getView()->setWindowBorderEnabled(false);
+
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
@@ -73,12 +78,12 @@ TEST(OsgViewElementTests, StartUpTest)
 	ASSERT_NE(nullptr, osgWindow);
 	int testX, testY, testWidth, testHeight;
 
-	/// Window should initially be at (0, 0) and 800 x 600
+	/// Window should initially be at (50, 60) and 200 x 100
 	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(0, testX);
-	EXPECT_EQ(0, testY);
-	EXPECT_EQ(800, testWidth);
-	EXPECT_EQ(600, testHeight);
+	EXPECT_EQ(50, testX);
+	EXPECT_EQ(60, testY);
+	EXPECT_EQ(200, testWidth);
+	EXPECT_EQ(100, testHeight);
 
 	/// Move the window to (100, 200)
 	viewElement->getView()->setPosition(100, 200);
@@ -88,10 +93,10 @@ TEST(OsgViewElementTests, StartUpTest)
 	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
 	EXPECT_EQ(100, testX);
 	EXPECT_EQ(200, testY);
-	EXPECT_EQ(800, testWidth);
-	EXPECT_EQ(600, testHeight);
+	EXPECT_EQ(200, testWidth);
+	EXPECT_EQ(100, testHeight);
 
-	/// Resize the window to 400 x 800
+	/// Resize the window to 400 x 500
 	viewElement->getView()->setDimensions(400, 500);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
