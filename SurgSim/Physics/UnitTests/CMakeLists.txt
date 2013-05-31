@@ -20,9 +20,18 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	ActorTest.cpp
 	ContactCalculationTests.cpp
-	DcdCollisionTests.cpp	FreeMotionTests.cpp
+	DcdCollisionTests.cpp
+	FixedActorTest.cpp
+	FreeMotionTests.cpp
+	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
+	RigidActorBaseStateTest.cpp
+	RigidActorParametersTest.cpp
+	RigidActorStateTest.cpp
+	RigidActorTest.cpp
+	RigidShapeTest.cpp
 )
 
 set(UNIT_TEST_HEADERS

@@ -15,8 +15,8 @@
 
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/Actors/RigidActorCollisionRepresentation.h>
-#include <SurgSim/Physics/Actors/RigidActor.h>
+#include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidActor.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Math/RigidTransform.h>

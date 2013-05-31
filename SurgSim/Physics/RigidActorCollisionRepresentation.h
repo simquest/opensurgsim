@@ -19,8 +19,8 @@
 #include <memory>
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/Actors/RigidActor.h>
-#include <SurgSim/Physics/Actors/RigidShape.h>
+#include <SurgSim/Physics/RigidActor.h>
+#include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim

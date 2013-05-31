@@ -24,7 +24,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-#include <SurgSim/Physics/Actors/Shapes.h>
+#include <SurgSim/Physics/Shapes.h>
 using namespace SurgSim::Physics;
 
 namespace {

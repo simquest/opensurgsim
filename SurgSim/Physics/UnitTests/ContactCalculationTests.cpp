@@ -21,15 +21,12 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include <SurgSim/Physics/Actors/RigidActorState.h>
-#include <SurgSim/Physics/Actors/RigidShape.h>
-#include <SurgSim/Physics/Actors/SphereShape.h>
+#include <SurgSim/Physics/RigidActorState.h>
+#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Physics/CollisionPair.h>
-
-
-
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;

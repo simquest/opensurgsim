@@ -16,10 +16,9 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Physics/Actors/Actor.h>
-#include <SurgSim/Framework/Log.h>
+#include <SurgSim/Physics/FreeMotion.h>`
+#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/DcdCollision.h>#include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
 {

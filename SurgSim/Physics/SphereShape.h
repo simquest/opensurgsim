@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_SPHERESHAPE_H
 #define SURGSIM_PHYSICS_SPHERESHAPE_H
 
-#include <SurgSim/Physics/Actors/RigidShape.h>
+#include <SurgSim/Physics/RigidShape.h>
 
 namespace SurgSim
 {

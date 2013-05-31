@@ -19,7 +19,7 @@
 
 #include <SurgSim/Math/Vector.h>
 
-#include <SurgSim/Physics/Actors/Shapes.h>
+#include <SurgSim/Physics/Shapes.h>
 
 /* CUBE
      3*----------*2

@@ -22,8 +22,8 @@
 
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Physics/Actors/RigidActorCollisionRepresentation.h>
-#include <SurgSim/Physics/Actors/SphereShape.h>
+#include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
+#include <SurgSim/Physics/SphereShape.h>
 
 #include <SurgSim/Math/Quaternion.h>
 

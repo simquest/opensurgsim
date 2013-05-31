@@ -21,7 +21,7 @@
 #ifndef SURGSIM_PHYSICS_MESHSHAPE_H
 #define SURGSIM_PHYSICS_MESHSHAPE_H
 
-#include <SurgSim/Physics/Actors/RigidShape.h>
+#include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/DataStructures/TriangleMesh.h>
 
 namespace SurgSim

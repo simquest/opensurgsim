@@ -25,7 +25,7 @@
 
 #include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Physics/Actors/Actor.h>
+#include <SurgSim/Physics/Actor.h>
 
 namespace SurgSim
 {
