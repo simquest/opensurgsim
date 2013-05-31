@@ -26,11 +26,10 @@
 
 #include <random>
 
-using SurgSim::Graphics::Camera;
-using SurgSim::Graphics::Manager;
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::OsgCamera;
-using SurgSim::Graphics::OsgView;
+namespace SurgSim
+{
+namespace Graphics
+{
 
 TEST(OsgViewTests, InitTest)
 {
@@ -51,6 +50,8 @@ TEST(OsgViewTests, InitTest)
 	view->getDimensions(&width, &height);
 	EXPECT_EQ(800, width);
 	EXPECT_EQ(600, height);
+
+	EXPECT_TRUE(view->isWindowBorderEnabled());
 }
 
 TEST(OsgViewTests, PositionAndDimensionsTest)
@@ -83,6 +84,12 @@ TEST(OsgViewTests, PositionAndDimensionsTest)
 
 	EXPECT_EQ(width, testWidth);
 	EXPECT_EQ(height, testHeight);
+
+	/// The window border should be enabled initially
+	EXPECT_TRUE(view->isWindowBorderEnabled());
+	/// Disable the window border
+	view->setWindowBorderEnabled(false);
+	EXPECT_FALSE(view->isWindowBorderEnabled());
 }
 
 TEST(OsgViewTests, CameraTest)
@@ -101,3 +108,6 @@ TEST(OsgViewTests, CameraTest)
 	EXPECT_FALSE(view->setCamera(mockCamera));
 	EXPECT_EQ(camera, view->getCamera());
 }
+
+}  // namespace Graphics
+}  // namespace SurgSim
