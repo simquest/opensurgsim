@@ -32,29 +32,34 @@ import subprocess
 import re
 
 STANDARD_WARNING_FORMAT = \
-    "%(file)s:%(line)s: %%(text)s [%(category)s] [%(level)s]"
+    "{file}:{line}: {text} [{category}] [{level}]"
 VISUAL_STUDIO_WARNING_FORMAT = \
-    "%(file)s(%(line)s): %(warning)s %(vscategory)s[%(level)s]: %%(text)s"
+    "{file}({line}): {warning} {vscategory}[{level}]: {text}"
 WARNING_FORMAT = STANDARD_WARNING_FORMAT
 
 def emit_warning(fields):
   fields = dict(fields)
-  if 'level' not in fields:
-    fields['level'] = ''
-  if 'category' not in fields:
-    fields['category'] = ''
-    fields['vscategory'] = 'RL'
-  else:
+  fmt = WARNING_FORMAT
+  # add a "vscategory" field which is like "category" but never empty
+  if 'category' in fields and fields['category'] is not None:
     fields['vscategory'] = fields['category']
+  else:
+    fmt = re.sub(r'\s*\[\{category[^\}]*\}\w\]', '', fmt)
+    fmt = re.sub(r'\s*\{category[^\}]*\}', '', fmt)
+    fields['category'] = '???'  # panic button
+    fields['vscategory'] = 'RL'
+  if 'level' not in fields:
+    fmt = re.sub(r'\s*\[\{level[^\}]*\}\]', '', fmt)
+    fmt = re.sub(r'\s*\{level[^\}]*\}', '', fmt)
+    fields['level'] = '???'  # panic button
   if 'line' not in fields:
-    fields['line'] = 'NO_LINE'
+    fmt = re.sub(r'\s*\{line[^\}]*\}:', '', fmt)
+    fmt = re.sub(r'\s*\(\{line[^\}]*\}\)', '', fmt)
+    fmt = re.sub(r'\s*\{line[^\}]*\}', '', fmt)
+    fields['line'] = '???'  # panic button
   if 'warning' not in fields:
     fields['warning'] = 'warning'
-  text = WARNING_FORMAT % fields
-  text = re.sub(r'\s*\[\]', '', text)  # strip empty '[]' tags
-  text = re.sub(r'\(NO_LINE\):', ':',
-                re.sub(r':NO_LINE:', ':', text))  # strip missing line numbers
-  print text % fields
+  print fmt.format(**fields)
 
 def emit_error(fields):
   fields = dict(fields)
