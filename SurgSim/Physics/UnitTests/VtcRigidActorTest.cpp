@@ -17,7 +17,7 @@
 
 #include <string>
 
-#include <SurgSim/Physics/RigidActorVtc.h>
+#include <SurgSim/Physics/VtcRigidActor.h>
 using namespace SurgSim::Physics;
 
 #include <SurgSim/Math/Vector.h>

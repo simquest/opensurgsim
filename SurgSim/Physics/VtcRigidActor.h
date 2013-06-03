@@ -19,7 +19,7 @@
 #include <SurgSim/Physics/RigidActorBase.h>
 #include <SurgSim/Physics/RigidActorState.h>
 #include <SurgSim/Physics/RigidActorParameters.h>
-#include <SurgSim/Physics/RigidVtcParameters.h>
+#include <SurgSim/Physics/VtcRigidParameters.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
