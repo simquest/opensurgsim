@@ -22,7 +22,7 @@
 
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -107,7 +107,7 @@ public:
 private:
 	/// Linear velocity
 	Vector3d m_v;
-	
+
 	/// Angular velocity
 	Vector3d m_w;
 };

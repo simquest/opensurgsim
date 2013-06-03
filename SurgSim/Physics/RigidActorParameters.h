@@ -19,7 +19,7 @@
 #include <SurgSim/Physics/Shapes.h>
 #include <SurgSim/Math/Valid.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -127,7 +127,7 @@ public:
 	void setMass(double mass)
 	{
 		m_mass = mass;
-		
+
 		m_rho = 0.0; // Invalidate the density information
 		             // Density is not automcatically computed, only set
 
@@ -154,7 +154,7 @@ public:
 	void setLocalInertia(const SurgSim::Math::Matrix33d& localInertia)
 	{
 		m_localInertia = localInertia;
-		
+
 		m_isValid = checkValidity();
 	}
 

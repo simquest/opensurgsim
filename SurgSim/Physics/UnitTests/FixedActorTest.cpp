@@ -148,7 +148,7 @@ TEST_F(FixedActorTest, UpdateTest)
 
 	fixedActor->setInitialPose(m_initialTransformation);
 	fixedActor->setPose(m_currentTransformation);
-	
+
 	// This should simply backup the current transformation into the previous
 	fixedActor->update(dt);
 

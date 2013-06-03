@@ -28,7 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// CollisionRepresentation class that wraps a RigidActor 
+/// CollisionRepresentation class that wraps a RigidActor
 class RigidActorCollisionRepresentation : public CollisionRepresentation
 {
 public:

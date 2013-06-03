@@ -182,6 +182,8 @@ set(CPPLINT_DEFAULT_FILTER_LIST
 	# potentially useful, but generates some crazy false positives
 	# (it claims <unordered_map> is a C header!?):
 	-build/include_order
+	# things disallowed by Google's coding standards, but not ours:
+	-runtime/rtti
 )
 string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")
