@@ -16,10 +16,10 @@
 #ifndef SURGSIM_PHYSICS_RIGIDACTORVTC_H
 #define SURGSIM_PHYSICS_RIGIDACTORVTC_H
 
-#include <SurgSim/Physics/Actors/RigidActorBase.h>
-#include <SurgSim/Physics/Actors/RigidActorState.h>
-#include <SurgSim/Physics/Actors/RigidActorParameters.h>
-#include <SurgSim/Physics/Actors/RigidVtcParameters.h>
+#include <SurgSim/Physics/RigidActorBase.h>
+#include <SurgSim/Physics/RigidActorState.h>
+#include <SurgSim/Physics/RigidActorParameters.h>
+#include <SurgSim/Physics/RigidVtcParameters.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>

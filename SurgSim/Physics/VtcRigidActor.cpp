@@ -15,7 +15,7 @@
 
 #include <SurgSim/Framework/Logger.h>
 
-#include <SurgSim/Physics/Actors/RigidActorVtc.h>
+#include <SurgSim/Physics/RigidActorVtc.h>
 
 #include <SurgSim/Math/Valid.h>
 #include <SurgSim/Math/Vector.h>

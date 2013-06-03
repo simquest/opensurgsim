@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Physics/Actors/RigidVtcParameters.h>
+#include <SurgSim/Physics/VtcRigidParameters.h>
 
 TEST(RigidVtcParametersTest, ConstructorTest)
 {

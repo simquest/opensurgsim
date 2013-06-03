@@ -26,7 +26,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	PhysicsManager.cpp
 	RigidActor.cpp
 	RigidActorCollisionRepresentation.cpp
-	RigidActorVtc.cpp)
+	VtcRigidActor.cpp)
 
 set(SURGSIM_PHYSICS_HEADERS
 	Actor.h
@@ -48,11 +48,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidActorCollisionRepresentation.h
 	RigidActorParameters.h
 	RigidActorState.h
-	RigidActorVtc.h
 	RigidShape.h
-	RigidVtcParameters.h
 	Shapes.h
 	SphereShape.h
+	VtcRigidActor.h
+	VtcRigidParameters.h
 )
 
 surgsim_add_library(
