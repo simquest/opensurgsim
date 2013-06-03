@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file Simple Test for FreeMotion calculation
+
 #include <gtest/gtest.h>
 
 #include <string>
@@ -54,9 +56,14 @@ TEST(FreeMotionTest, RunTest)
 
 	FreeMotion computation(actors);
 
+	actor->setIsGravityEnabled(false);
+	EXPECT_TRUE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
+	computation.update(1.0);
+	
+	actor->setIsGravityEnabled(true);
+
 	EXPECT_TRUE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
 	computation.update(1.0);
 	EXPECT_FALSE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
-
 }
 

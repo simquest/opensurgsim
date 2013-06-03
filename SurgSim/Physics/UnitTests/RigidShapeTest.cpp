@@ -70,6 +70,7 @@ TEST_F(RigidShapeTest, Sphere)
 	ASSERT_NO_THROW({SphereShape s(m_radius);});
 
 	SphereShape s(m_radius);
+	EXPECT_EQ(RIGID_SHAPE_TYPE_SPHERE, s.getType());
 	EXPECT_EQ(m_radius, s.getRadius());
 
 	const double& r = m_radius;
@@ -103,6 +104,7 @@ TEST_F(RigidShapeTest, Box)
 	EXPECT_EQ(m_size[0], b.getSizeX());
 	EXPECT_EQ(m_size[1], b.getSizeY());
 	EXPECT_EQ(m_size[2], b.getSizeZ());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_BOX, b.getType());
 
 	double expectedVolume = m_size[0] * m_size[1] * m_size[2];
 	double expectedMass = m_rho * expectedVolume;
@@ -135,6 +137,7 @@ TEST_F(RigidShapeTest, CylinderX)
 	CylinderShape<SHAPE_DIRECTION_AXIS_X> c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_CYLINDER, c.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
 	double expectedMass = m_rho * expectedVolume;
@@ -168,6 +171,7 @@ TEST_F(RigidShapeTest, CylinderY)
 	CylinderShape<SHAPE_DIRECTION_AXIS_Y> c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_CYLINDER, c.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
 	double expectedMass = m_rho * expectedVolume;
@@ -201,6 +205,7 @@ TEST_F(RigidShapeTest, CylinderZ)
 	CylinderShape<SHAPE_DIRECTION_AXIS_Z> c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_CYLINDER, c.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
 	double expectedMass = m_rho * expectedVolume;
@@ -234,6 +239,7 @@ TEST_F(RigidShapeTest, CapsuleX)
 	CapsuleShape<SHAPE_DIRECTION_AXIS_X> c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_CAPSULE, c.getType());
 
 	double r2 = m_radius * m_radius;
 	double r3 = r2 * m_radius;
@@ -276,6 +282,7 @@ TEST_F(RigidShapeTest, CapsuleY)
 	CapsuleShape<SHAPE_DIRECTION_AXIS_Y> c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_CAPSULE, c.getType());
 
 	double r2 = m_radius * m_radius;
 	double r3 = r2 * m_radius;
@@ -317,6 +324,7 @@ TEST_F(RigidShapeTest, CapsuleZ)
 	CapsuleShape<SHAPE_DIRECTION_AXIS_Z> c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
+	EXPECT_EQ(RIGID_SHAPE_TYPE_CAPSULE, c.getType());
 
 	double r2 = m_radius * m_radius;
 	double r3 = r2 * m_radius;
@@ -361,6 +369,7 @@ TEST_F (RigidShapeTest, PlaneTest)
 	PlaneShape normalForm(n,d);
 	EXPECT_EQ(d, normalForm.getD());
 	EXPECT_TRUE(n.normalized().isApprox(normalForm.getNormal()));
+	EXPECT_EQ(RIGID_SHAPE_TYPE_PLANE, normalForm.getType());
 
 	PlaneShape pointAndNormal(p0,n);
 	EXPECT_TRUE(n.normalized().isApprox(pointAndNormal.getNormal()));

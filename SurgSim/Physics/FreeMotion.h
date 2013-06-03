@@ -40,7 +40,10 @@ public:
 
 protected:
 
-	virtual void doUpdate(double dt);
+	/// Override doUpdate from superclass
+	virtual void doUpdate(double dt) override;
+
+	/// Shared list of all the actors 
 	std::weak_ptr<std::vector<std::shared_ptr<Actor>>> m_actors;
 };
 

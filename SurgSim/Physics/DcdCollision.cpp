@@ -28,13 +28,10 @@ namespace Physics
 {
 
 DcdCollision::DcdCollision(std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors), m_pairCount(0)
+	m_actors(actors)
 {
-	populateCollisionTable();
-	if (m_actors->size()*m_actors->size() != m_pairCount)
-	{
-		updatePairs();
-	}
+	populateCalculationTable();
+	updatePairs();
 }
 
 DcdCollision::~DcdCollision()
@@ -56,7 +53,7 @@ void DcdCollision::doUpdate(double dt)
 	}
 }
 
-void DcdCollision::populateCollisionTable()
+void DcdCollision::populateCalculationTable()
 {
 	m_contactFactory = std::make_shared<ContactFactory>();
 	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
@@ -78,7 +75,7 @@ void DcdCollision::updatePairs()
 	for (auto it = m_actors->cbegin(); it != m_actors->cend(); ++it)
 	{
 		std::shared_ptr<RigidActor> rigid = std::dynamic_pointer_cast<RigidActor>(*it);
-		if (rigid != nullptr)
+		if (rigid != nullptr && rigid->isActive())
 		{
 			rigidActors.push_back(rigid);
 		}
@@ -87,6 +84,7 @@ void DcdCollision::updatePairs()
 	auto rigidEnd = rigidActors.cend();
 	for (auto first = rigidActors.cbegin(); first != rigidEnd; ++first)
 	{
+		// \todo Fix for the correct pair 
 		for (auto second = rigidActors.cbegin(); second != rigidEnd; ++second)
 		{
 			std::shared_ptr<CollisionPair> pair = m_pairFactory.getInstance();		

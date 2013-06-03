@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Contact data structure used when two representations touch each other
+/// Contact data structure used when two representations touch each other 
 /// The convention is that if body 1 is moved along the normal vector by
 /// a distance depth (or equivalently if body 2 is moved the same distance
 /// in the opposite direction) then the penetration depth will be reduced to
@@ -40,7 +40,9 @@ struct Contact {
 
 /// Collision Pair class, it signifies a pair of items that should be checked with the
 /// collision algorithm, this structure will be used for input as well as output, as contacts
-/// get appended to the contacts list when found
+/// get appended to the contacts list when found.
+/// \note When used in a ReuseFactory, please note that contained contacts won't get deallocated
+/// 	  until the next use, which might not be until the end of the program
 class CollisionPair
 {
 public:
@@ -61,7 +63,9 @@ public:
 	{
 		SURGSIM_ASSERT(first != second) << "Should try to collide with self";
 		SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
-
+		
+		// Invalidate the current contacts
+		clearContacts();
 		m_first = first;
 		m_second = second;
 	}
