@@ -36,7 +36,7 @@ public:
 	MlcpGaussSeidelSolver() :
 		m_epsilonConvergence(defaultEpsilonConvergence()),
 		m_contactTolerance(defaultContactTolerance()),
-		m_subStep(1.0),
+		m_substepRatio(1.0),
 		m_maxIterations(defaultMaxIterations()),
 		m_catchExplodingConvergenceCriteria(true),
 		m_verbose(false),
