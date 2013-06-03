@@ -202,7 +202,7 @@ macro(surgsim_run_cpplint TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 		add_custom_target("${TARGET}"
 			${PYTHON_EXECUTABLE}
-			  ${SURGSIM_HELPERS_DIR}/run-lint.py
+			  ${SURGSIM_TOOLS_DIR}/run-lint.py
 					--cpplint-script
 						${SURGSIM_THIRD_PARTY_DIR}/google-style-lint/cpplint.py
 					${SURGSIM_CPPLINT_FILTERS} ${SURGSIM_RUNLINT_EXTRA_FLAGS} ${ARGN}

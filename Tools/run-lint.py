@@ -26,6 +26,8 @@ flagged code will turn out to be correct.  But it does make it easier
 to notice certain common errors.
 """
 
+# TODO(bert): add some more checks.
+
 import argparse
 import sys
 import subprocess
