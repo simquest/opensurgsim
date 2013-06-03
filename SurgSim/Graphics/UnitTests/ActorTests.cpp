@@ -16,11 +16,11 @@
 /// \file
 /// Tests for the Actor class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
 #include <SurgSim/Math/Quaternion.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <random>
 
@@ -90,6 +90,6 @@ TEST(ActorTests, UpdateTest)
 
 		actor->update(dt);
 		EXPECT_EQ(i, mockActor->getNumUpdates());
-		EXPECT_EQ(sumDt, mockActor->getSumDt());
+		EXPECT_LT(fabs(sumDt - mockActor->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }

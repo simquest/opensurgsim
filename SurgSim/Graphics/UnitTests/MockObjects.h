@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
+#define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
+
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Graphics/Actor.h"
 #include "SurgSim/Graphics/Camera.h"
@@ -76,12 +79,14 @@ public:
 	/// \param	name	Name of the actor
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
+	/// \post m_isInitialized and m_isAwoken are set to false
+	/// \post m_isVisible is set to true
 	explicit MockActor(const std::string& name) : SurgSim::Graphics::Actor(name),
+		m_isVisible(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
-		m_isAwoken(false),
-		m_isVisible(true)
+		m_isAwoken(false)
 	{
 		m_transform.setIdentity();
 	}
@@ -214,7 +219,8 @@ public:
 	/// \param	name	Name of the camera
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity, m_eye to (0,0,0), m_center to (0, 0, -1), and m_up to (0, 1, 0)
-	explicit MockCamera(const std::string& name) : SurgSim::Graphics::Camera(name),
+	/// \post m_isVisible is set to true
+	explicit MockCamera(const std::string& name) : SurgSim::Graphics::Actor(name), SurgSim::Graphics::Camera(name),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isVisible(true)
@@ -330,6 +336,7 @@ public:
 	/// \param	name	Name of the view
 	/// \post m_x and m_y are initialized to 0
 	/// \post m_width is initialized to 800, m_height to 600
+	/// \post m_isWindowBorderEnabled is initialized to true
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
 	explicit MockView(const std::string& name) : SurgSim::Graphics::View(name),
@@ -337,6 +344,7 @@ public:
 		m_y(0),
 		m_width(800),
 		m_height(600),
+		m_isWindowBorderEnabled(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
@@ -355,7 +363,7 @@ public:
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y)
+	virtual void getPosition(int* x, int* y) const
 	{
 		*x = m_x;
 		*y = m_y;
@@ -372,10 +380,23 @@ public:
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height)
+	virtual void getDimensions(int* width, int* height) const
 	{
 		*width = m_width;
 		*height = m_height;
+	}
+
+	/// Sets whether the view window has a border
+	/// \param	enabled	True to enable the border around the window; false for no border
+	virtual void setWindowBorderEnabled(bool enabled)
+	{
+		m_isWindowBorderEnabled = enabled;
+	}
+	/// Returns whether the view window has a border
+	/// \return	True to enable the border around the window; false for no border
+	virtual bool isWindowBorderEnabled() const
+	{
+		return m_isWindowBorderEnabled;
 	}
 
 	/// Returns the number of times the view has been updated
@@ -429,6 +450,8 @@ private:
 	int m_x, m_y;
 	/// Dimensions of the view on the screen (in pixels)
 	int m_width, m_height;
+	/// Whether the view window has a border
+	bool m_isWindowBorderEnabled;
 
 	/// Number of times the view has been updated
 	int m_numUpdates;
@@ -441,73 +464,4 @@ private:
 	bool m_isAwoken;
 };
 
-/// View element for testing
-class MockViewElement : public SurgSim::Graphics::ViewElement
-{
-public:
-	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
-		m_isInitialized(false),
-		m_isAwoken(false)
-	{
-	}
-
-	/// Sets the view component that provides the visualization of the graphics actors
-	/// Only allow MockView components, any other will not be set and return false.
-	/// \return	True if it succeeds, false if it fails
-	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
-	{
-		std::shared_ptr<MockView> mockView = std::dynamic_pointer_cast<MockView>(view);
-		if (mockView)
-		{
-			return ViewElement::setView(mockView);
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/// Returns the View component as a MockView (only MockView is allowed by the overridden setView()).
-	std::shared_ptr<MockView> getMockView() const
-	{
-		return std::static_pointer_cast<MockView>(getView());
-	}
-
-	/// Gets whether the view element has been initialized
-	bool isInitialized() const
-	{
-		return m_isInitialized;
-	}
-	/// Gets whether the view element has been awoken
-	bool isAwoken() const
-	{
-		return m_isAwoken;
-	}
-private:
-	/// Initialize the view element
-	/// \post m_isInitialized is set to true
-	virtual bool doInitialize()
-	{
-		if (SurgSim::Graphics::ViewElement::doInitialize())
-		{
-			m_isInitialized = true;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	/// Wake up the view element
-	/// \post m_isAwoken is set to true
-	virtual bool doWakeUp()
-	{
-		m_isAwoken = true;
-		return true;
-	}
-
-	/// Whether the view has been initialized
-	bool m_isInitialized;
-	/// Whether the view has been awoken
-	bool m_isAwoken;
-};
+#endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H

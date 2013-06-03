@@ -74,8 +74,9 @@ public:
 	explicit StreamOutput(std::ostream& ostream);
 	virtual ~StreamOutput();
 
-	/// \param message to be written to the stream
-	/// \return true on succes
+	/// Writes a message to the stream.
+	/// \param	message	Message to be written to the stream
+	/// \return	True on success
 	virtual bool writeMessage(const std::string& message);
 
 private:

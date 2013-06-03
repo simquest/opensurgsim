@@ -67,7 +67,7 @@ public:
 	///
 	/// The data will be initialized using the copy constructor.
 	/// \param initialValue The initial value to be used.
-	LockedContainer(const T& initialValue) :
+	explicit LockedContainer(const T& initialValue) :
 		m_buffer(initialValue),
 		m_haveNewData(false)
 	{
@@ -78,7 +78,7 @@ public:
 	/// The data in the active buffer will be initialized using the move constructor.
 	/// The data in the second, inactive buffer will be initialized using the default constructor.
 	/// \param initialValue The initial value to be moved into the active buffer.
-	LockedContainer(T&& initialValue) :
+	explicit LockedContainer(T&& initialValue) :
 		m_buffer(std::move(initialValue)),
 		m_haveNewData(false)
 	{

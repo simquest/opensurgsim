@@ -16,12 +16,12 @@
 /// \file
 /// Tests for the Graphics Manager class.
 
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/ViewElement.h"
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Framework/Runtime.h>
+#include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Graphics/ViewElement.h>
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <algorithm>
 #include <random>
@@ -64,12 +64,12 @@ TEST(ManagerTests, StartUpTest)
 	runtime->stop();
 
 	/// Check that the manager did update when the thread was running
-	EXPECT_GT(0, manager->getNumUpdates());
-	EXPECT_GT(0.0, manager->getSumDt());
+	EXPECT_GT(manager->getNumUpdates(), 0);
+	EXPECT_GT(manager->getSumDt(), 0.0);
 
 	EXPECT_TRUE(view->isInitialized());
 	EXPECT_TRUE(view->isAwoken());
-	EXPECT_GT(0, view->getNumUpdates());
+	EXPECT_GT(view->getNumUpdates(), 0);
 	EXPECT_EQ(manager->getNumUpdates(), view->getNumUpdates());
 }
 
@@ -87,59 +87,59 @@ TEST(ManagerTests, AddRemoveTest)
 	std::shared_ptr<MockView> view2 = std::make_shared<MockView>("test view 2");
 	std::shared_ptr<Representation> nonGraphicsComponent = std::make_shared<Representation>("non-graphics component");
 
-	EXPECT_EQ(0, graphicsManager->getActors().size());
-	EXPECT_EQ(0, graphicsManager->getGroups().size());
-	EXPECT_EQ(0, graphicsManager->getViews().size());
+	EXPECT_EQ(0u, graphicsManager->getActors().size());
+	EXPECT_EQ(0u, graphicsManager->getGroups().size());
+	EXPECT_EQ(0u, graphicsManager->getViews().size());
 
 	/// Add an actor
 	EXPECT_TRUE(graphicsManager->addComponent(actor1));
-	EXPECT_EQ(1, graphicsManager->getActors().size());
+	EXPECT_EQ(1u, graphicsManager->getActors().size());
 	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
 		graphicsManager->getActors().end(), actor1));
 
 	/// Add a group
 	EXPECT_TRUE(graphicsManager->addComponent(group1));
-	EXPECT_EQ(1, graphicsManager->getGroups().size());
+	EXPECT_EQ(1u, graphicsManager->getGroups().size());
 	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group1));
 
 	/// Add a view
 	EXPECT_TRUE(graphicsManager->addComponent(view1));
-	EXPECT_EQ(1, graphicsManager->getViews().size());
+	EXPECT_EQ(1u, graphicsManager->getViews().size());
 	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view1));
 
 
 	/// Add another view
 	EXPECT_TRUE(graphicsManager->addComponent(view2));
-	EXPECT_EQ(2, graphicsManager->getViews().size());
+	EXPECT_EQ(2u, graphicsManager->getViews().size());
 	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
 	/// Add another group
 	EXPECT_TRUE(graphicsManager->addComponent(group2));
-	EXPECT_EQ(2, graphicsManager->getGroups().size());
+	EXPECT_EQ(2u, graphicsManager->getGroups().size());
 	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Add another actor
 	EXPECT_TRUE(graphicsManager->addComponent(actor2));
-	EXPECT_EQ(2, graphicsManager->getActors().size());
+	EXPECT_EQ(2u, graphicsManager->getActors().size());
 	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
 		graphicsManager->getActors().end(), actor2));
 
 
 	/// Try to add a duplicate actor
 	EXPECT_FALSE(componentManager->addComponent(actor1));
-	EXPECT_EQ(2, graphicsManager->getActors().size());
+	EXPECT_EQ(2u, graphicsManager->getActors().size());
 
 	/// Try to add a duplicate group
 	EXPECT_FALSE(componentManager->addComponent(group2));
-	EXPECT_EQ(2, graphicsManager->getGroups().size());
+	EXPECT_EQ(2u, graphicsManager->getGroups().size());
 
 	/// Try to add a duplicate view
 	EXPECT_FALSE(componentManager->addComponent(view1));
-	EXPECT_EQ(2, graphicsManager->getViews().size());
+	EXPECT_EQ(2u, graphicsManager->getViews().size());
 
 	/// Try to add a component that is not graphics-related
 	EXPECT_TRUE(componentManager->addComponent(nonGraphicsComponent)) <<
