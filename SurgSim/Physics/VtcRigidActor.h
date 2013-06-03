@@ -31,22 +31,22 @@ namespace SurgSim
 namespace Physics
 {
 
-/// The RigidActorVtc class defines a rigid body actor associated with a
+/// The VtcRigidActor class defines a rigid body actor associated with a
 /// Virtual tool coupler (i.e. god-object or proxy)
 /// Note that the rigid actor is velocity-based, therefore its degrees of
 /// freedom are the linear and angular velocities: 6 Dof
 /// \note The physical rigid body is driven by the Vtc through setPose(...)
 /// \note setPose sets the proxy (Vtc) pose.
 /// \note getPose gets the virtual rigid body pose.
-class RigidActorVtc : public RigidActorBase
+class VtcRigidActor : public RigidActorBase
 {
 public:
 	/// Constructor
 	/// \param name The rigid actor's name
-	explicit RigidActorVtc(const std::string& name);
+	explicit VtcRigidActor(const std::string& name);
 
 	/// Destructor
-	virtual ~RigidActorVtc();
+	virtual ~VtcRigidActor();
 
 	/// Set the initial state of the rigid actor
 	/// \param state The initial state (pose + lin/ang velocities)
@@ -124,7 +124,7 @@ public:
 
 	/// Set the initial Vtc parameters
 	/// \param parameters The initial Vtc parameters
-	void setInitialVtcParameters(const RigidVtcParameters& parameters)
+	void setInitialVtcParameters(const VtcRigidParameters& parameters)
 	{
 		m_initialVtcParameters = parameters;
 		m_currentVtcParameters = parameters;
@@ -132,7 +132,7 @@ public:
 
 	/// Set the current Vtc parameters
 	/// \param parameters The current Vtc parameters
-	void setCurrentVtcParameters(const RigidVtcParameters& parameters)
+	void setCurrentVtcParameters(const VtcRigidParameters& parameters)
 	{
 		m_currentVtcParameters = parameters;
 	}
@@ -146,7 +146,7 @@ public:
 
 	/// Get the initial Vtc parameters
 	/// \return The initial Vtc parameters
-	const RigidVtcParameters& getInitialVtcParameters() const
+	const VtcRigidParameters& getInitialVtcParameters() const
 	{
 		return m_initialVtcParameters;
 	}
@@ -167,7 +167,7 @@ public:
 
 	/// Get the current Vtc parameters
 	/// \return The current Vtc parameters
-	const RigidVtcParameters& getCurrentVtcParameters() const
+	const VtcRigidParameters& getCurrentVtcParameters() const
 	{
 		return m_currentVtcParameters;
 	}
@@ -300,10 +300,10 @@ private:
 	RigidActorState m_currentVtcState;
 
 	/// Initial Vtc parameters
-	RigidVtcParameters m_initialVtcParameters;
+	VtcRigidParameters m_initialVtcParameters;
 
 	/// Current Vtc parameters
-	RigidVtcParameters m_currentVtcParameters;
+	VtcRigidParameters m_currentVtcParameters;
 };
 
 }; /// Physics

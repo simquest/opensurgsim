@@ -26,7 +26,7 @@ namespace SurgSim{
 
 namespace Physics{
 
-RigidActorVtc::RigidActorVtc(const std::string& name)
+VtcRigidActor::VtcRigidActor(const std::string& name)
 	: RigidActorBase(name)
 {
 	// Initialize the number of degrees of freedom
@@ -34,11 +34,11 @@ RigidActorVtc::RigidActorVtc(const std::string& name)
 	setNumDof(6);
 }
 
-RigidActorVtc::~RigidActorVtc()
+VtcRigidActor::~VtcRigidActor()
 {
 }
 
-void RigidActorVtc::beforeUpdate(double dt)
+void VtcRigidActor::beforeUpdate(double dt)
 {
 	if (! isActive() || ! m_currentParameters.isValid())
 	{
@@ -62,7 +62,7 @@ void RigidActorVtc::beforeUpdate(double dt)
 	}
 }
 
-void RigidActorVtc::update(double dt)
+void VtcRigidActor::update(double dt)
 {
 	using namespace SurgSim::Framework;
 	using SurgSim::Math::isValid;
@@ -77,7 +77,7 @@ void RigidActorVtc::update(double dt)
 
 	// For convenience
 	RigidActorParameters&  param = m_currentParameters;
-	RigidVtcParameters& vtcParam = m_currentVtcParameters;
+	VtcRigidParameters& vtcParam = m_currentVtcParameters;
 	Vector3d         G = m_currentState.getPose().translation();
 	Vector3d        dG = m_currentState.getLinearVelocity();
 	const Matrix33d& R = m_currentState.getPose().rotation();
@@ -197,11 +197,11 @@ void RigidActorVtc::update(double dt)
 	computeComplianceMatrix(dt);
 }
 
-void RigidActorVtc::afterUpdate(double dt)
+void VtcRigidActor::afterUpdate(double dt)
 {
 }
 
-void RigidActorVtc::computeComplianceMatrix(double dt)
+void VtcRigidActor::computeComplianceMatrix(double dt)
 {
 	if (! isActive() || ! m_currentParameters.isValid())
 	{
@@ -234,7 +234,7 @@ void RigidActorVtc::computeComplianceMatrix(double dt)
 	m_C.block<3,3>(3,3) = mat33.inverse();
 }
 
-void RigidActorVtc::updateGlobalInertiaMatrices(const RigidActorState& state)
+void VtcRigidActor::updateGlobalInertiaMatrices(const RigidActorState& state)
 {
 	const SurgSim::Math::Matrix33d& R = state.getPose().rotation();
 	m_globalInertia = R * m_currentParameters.getLocalInertia() * R.transpose();

@@ -22,34 +22,34 @@ namespace SurgSim
 namespace Physics
 {
 
-/// The RigidVtcParameters class defines all the physical parameters for a rigid vtc
-class RigidVtcParameters
+/// The VtcRigidParameters class defines all the physical parameters for a rigid vtc
+class VtcRigidParameters
 {
 public:
 	/// Default constructor
-	RigidVtcParameters()
+	VtcRigidParameters()
 		: m_vtcLinearStiffness(0.0), m_vtcLinearDamping(0.0), m_vtcAngularStiffness(0.0), m_vtcAngularDamping(0.0)
 	{
 	}
 
 	/// Destructor
-	virtual ~RigidVtcParameters()
+	virtual ~VtcRigidParameters()
 	{
 	}
 
 	/// Comparison operator (equality test)
-	/// \param p A RigidVtcParameters to compare it to
+	/// \param p A VtcRigidParameters to compare it to
 	/// \return True if the 2 parameters set are equals, False otherwise
-	bool operator ==(const RigidVtcParameters &p) const
+	bool operator ==(const VtcRigidParameters &p) const
 	{
 		return (m_vtcLinearStiffness == p.m_vtcLinearStiffness && m_vtcLinearDamping == p.m_vtcLinearDamping &&
 			m_vtcAngularStiffness == p.m_vtcAngularStiffness && m_vtcAngularDamping == p.m_vtcAngularDamping);
 	}
 
 	/// Comparison operator (difference test)
-	/// \param p A RigidVtcParameters to compare it to
+	/// \param p A VtcRigidParameters to compare it to
 	/// \return False if the 2 parameters set are equals, True otherwise
-	bool operator !=(const RigidVtcParameters &p) const
+	bool operator !=(const VtcRigidParameters &p) const
 	{
 		return ! (operator ==(p));
 	}

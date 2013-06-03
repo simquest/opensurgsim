@@ -17,52 +17,52 @@
 
 #include <SurgSim/Physics/VtcRigidParameters.h>
 
-TEST(RigidVtcParametersTest, ConstructorTest)
+TEST(VtcRigidParametersTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({SurgSim::Physics::RigidVtcParameters rigidVtcParam;});
+	ASSERT_NO_THROW({SurgSim::Physics::VtcRigidParameters vtcRigidParam;});
 }
 
-TEST(RigidVtcParametersTest, DefaultValueTest)
+TEST(VtcRigidParametersTest, DefaultValueTest)
 {
 	// Create the base rigid actor state
-	SurgSim::Physics::RigidVtcParameters rigidVtcParam;
+	SurgSim::Physics::VtcRigidParameters vtcRigidParam;
 
 	// Linear damping [default = 0]
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcLinearDamping());
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearDamping());
 	// Angular damping [default = 0]
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcAngularDamping());
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularDamping());
 	// Linear stiffness [default = 0]
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcLinearStiffness());
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearStiffness());
 	// Angular stiffness [default = 0]
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcAngularStiffness());
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularStiffness());
 }
 
-TEST(RigidVtcParametersTest, SetGetTest)
+TEST(VtcRigidParametersTest, SetGetTest)
 {
 	// Create the base rigid actor state
-	SurgSim::Physics::RigidVtcParameters rigidVtcParam;
+	SurgSim::Physics::VtcRigidParameters vtcRigidParam;
 
 	// Linear damping
-	rigidVtcParam.setVtcLinearDamping(12.2);
-	EXPECT_EQ(12.2, rigidVtcParam.getVtcLinearDamping());
-	rigidVtcParam.setVtcLinearDamping(0.0);
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcLinearDamping());
+	vtcRigidParam.setVtcLinearDamping(12.2);
+	EXPECT_EQ(12.2, vtcRigidParam.getVtcLinearDamping());
+	vtcRigidParam.setVtcLinearDamping(0.0);
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearDamping());
 
 	// Angular damping
-	rigidVtcParam.setVtcAngularDamping(12.1);
-	EXPECT_EQ(12.1, rigidVtcParam.getVtcAngularDamping());
-	rigidVtcParam.setVtcAngularDamping(0.0);
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcAngularDamping());
+	vtcRigidParam.setVtcAngularDamping(12.1);
+	EXPECT_EQ(12.1, vtcRigidParam.getVtcAngularDamping());
+	vtcRigidParam.setVtcAngularDamping(0.0);
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularDamping());
 
 	// Linear stiffness
-	rigidVtcParam.setVtcLinearStiffness(12.0);
-	EXPECT_EQ(12.0, rigidVtcParam.getVtcLinearStiffness());
-	rigidVtcParam.setVtcLinearStiffness(0.0);
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcLinearStiffness());
+	vtcRigidParam.setVtcLinearStiffness(12.0);
+	EXPECT_EQ(12.0, vtcRigidParam.getVtcLinearStiffness());
+	vtcRigidParam.setVtcLinearStiffness(0.0);
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearStiffness());
 	
 	// Angular stiffness
-	rigidVtcParam.setVtcAngularStiffness(11.9);
-	EXPECT_EQ(11.9, rigidVtcParam.getVtcAngularStiffness());
-	rigidVtcParam.setVtcAngularStiffness(0.0);
-	EXPECT_EQ(0.0, rigidVtcParam.getVtcAngularStiffness());
+	vtcRigidParam.setVtcAngularStiffness(11.9);
+	EXPECT_EQ(11.9, vtcRigidParam.getVtcAngularStiffness());
+	vtcRigidParam.setVtcAngularStiffness(0.0);
+	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularStiffness());
 }

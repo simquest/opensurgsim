@@ -25,7 +25,7 @@ using namespace SurgSim::Physics;
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-class RigidActorVtcTest : public ::testing::Test
+class VtcRigidActorTest : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -86,10 +86,10 @@ public:
 	RigidActorParameters m_defaultParameters;
 
 	// Vtc default parameters
-	RigidVtcParameters m_vtcParamDefault;
+	VtcRigidParameters m_vtcParamDefault;
 
 	// Vtc current parameters
-	RigidVtcParameters m_vtcParam;
+	VtcRigidParameters m_vtcParam;
 
 	// Vtc default states
 	RigidActorState m_vtcStateDefault;
@@ -111,17 +111,17 @@ public:
 };
 
 
-TEST_F(RigidActorVtcTest, ConstructorTest)
+TEST_F(VtcRigidActorTest, ConstructorTest)
 {
-	ASSERT_NO_THROW( {RigidActorVtc rigidBody("Rigid Vtc");});
+	ASSERT_NO_THROW( {VtcRigidActor rigidBody("Rigid Vtc");});
 }
 
-TEST_F(RigidActorVtcTest, ResetTest)
+TEST_F(VtcRigidActorTest, ResetTest)
 {
 	SurgSim::Math::RigidTransform3d id4x4 = SurgSim::Math::RigidTransform3d::Identity();
 
 	// Create the rigid body
-	std::shared_ptr<RigidActorVtc> rigidBody = std::make_shared<RigidActorVtc>("Rigid Vtc");
+	std::shared_ptr<VtcRigidActor> rigidBody = std::make_shared<VtcRigidActor>("Rigid Vtc");
 
 	rigidBody->setInitialState(m_state);
 	rigidBody->setCurrentParameters(m_param);
@@ -180,10 +180,10 @@ TEST_F(RigidActorVtcTest, ResetTest)
 	EXPECT_EQ(m_vtcParamDefault, rigidBody->getCurrentVtcParameters());
 }
 
-TEST_F(RigidActorVtcTest, SetGetAndDefaultValueTest)
+TEST_F(VtcRigidActorTest, SetGetAndDefaultValueTest)
 {
 	// Create the rigid body
-	std::shared_ptr<RigidActorVtc> rigidBody = std::make_shared<RigidActorVtc>("Rigid Vtc");
+	std::shared_ptr<VtcRigidActor> rigidBody = std::make_shared<VtcRigidActor>("Rigid Vtc");
 
 	// Get state (current, initial)
 	EXPECT_EQ(m_vtcStateDefault, rigidBody->getCurrentVtcState());
@@ -233,14 +233,14 @@ TEST_F(RigidActorVtcTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(rigidBody->isGravityEnabled());
 }
 
-TEST_F(RigidActorVtcTest, NoForceTorqueTest)
+TEST_F(VtcRigidActorTest, NoForceTorqueTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
 	// Create the rigid body
-	std::shared_ptr<RigidActorVtc> rigidBody = std::make_shared<RigidActorVtc>("Rigid Vtc");
+	std::shared_ptr<VtcRigidActor> rigidBody = std::make_shared<VtcRigidActor>("Rigid Vtc");
 
 	// Setup phase
 	rigidBody->setIsActive(true);
@@ -274,14 +274,14 @@ TEST_F(RigidActorVtcTest, NoForceTorqueTest)
 // velocity linear (0 0 0)/angular(0 0 0)
 // The Vtc does not move, holding the rigid actor in place,
 // fighting the gravity force.
-TEST_F(RigidActorVtcTest, GravityTest)
+TEST_F(VtcRigidActorTest, GravityTest)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
 	// Create the rigid body
-	std::shared_ptr<RigidActorVtc> rigidBody = std::make_shared<RigidActorVtc>("Rigid Vtc");
+	std::shared_ptr<VtcRigidActor> rigidBody = std::make_shared<VtcRigidActor>("Rigid Vtc");
 
 	// Setup phase
 	rigidBody->setIsActive(true);
@@ -316,10 +316,10 @@ TEST_F(RigidActorVtcTest, GravityTest)
 	}
 }
 
-TEST_F(RigidActorVtcTest, DisableWhenDivergeTest)
+TEST_F(VtcRigidActorTest, DisableWhenDivergeTest)
 {
 	// Create the rigid body
-	std::shared_ptr<RigidActorVtc> rigidBody = std::make_shared<RigidActorVtc>("Rigid Vtc");
+	std::shared_ptr<VtcRigidActor> rigidBody = std::make_shared<VtcRigidActor>("Rigid Vtc");
 
 	// Setup phase
 	rigidBody->setIsActive(true);
