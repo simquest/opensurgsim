@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDACTORVTC_H
-#define SURGSIM_PHYSICS_RIGIDACTORVTC_H
+#ifndef SURGSIM_PHYSICS_VTCRIGIDACTOR_H
+#define SURGSIM_PHYSICS_VTCRIGIDACTOR_H
 
 #include <SurgSim/Physics/RigidActorBase.h>
 #include <SurgSim/Physics/RigidActorState.h>
@@ -310,4 +310,4 @@ private:
 
 }; /// SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTORVTC_H
+#endif /// SURGSIM_PHYSICS_VTCRIGIDACTOR_H
