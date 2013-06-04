@@ -39,7 +39,7 @@ class OsgSphereActor : public SphereActor, public OsgActor
 public:
 	/// Constructor
 	/// \param	name	Name of the actor
-	OsgSphereActor(const std::string& name);
+	explicit OsgSphereActor(const std::string& name);
 
 	/// Sets whether the actor is currently visible
 	/// \param	visible	True for visible, false for invisible

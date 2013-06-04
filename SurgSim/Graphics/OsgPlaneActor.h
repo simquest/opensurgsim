@@ -39,7 +39,7 @@ class OsgPlaneActor : public PlaneActor, public OsgActor
 public:
 	/// Constructor
 	/// \param	name	Name of the actor
-	OsgPlaneActor(const std::string& name);
+	explicit OsgPlaneActor(const std::string& name);
 
 	/// Sets whether the actor is currently visible
 	/// \param	visible	True for visible, false for invisible

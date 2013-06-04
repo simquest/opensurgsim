@@ -138,7 +138,7 @@ TEST(OsgSphereActorTests, RenderTest)
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	
+
 	for (int i = 0; i < numSteps; ++i)
 	{
 		/// Calculate t in [0.0, 1.0]
@@ -150,7 +150,7 @@ TEST(OsgSphereActorTests, RenderTest)
 		sphereActor2->setRadius((1 - t) * startRadius2 + t * endRadius2);
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}	
+	}
 
 	runtime->stop();
 }
