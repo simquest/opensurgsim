@@ -29,16 +29,22 @@ set(UNIT_TEST_SOURCES
 	CameraTests.cpp
 	GroupTests.cpp
 	ManagerTests.cpp
+	PlaneActorTests.cpp
 	OsgActorTests.cpp
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
 	OsgMatrixConversionsTests.cpp
+	OsgPlaneActorTests.cpp
+	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRigidTransformConversionsTests.cpp
+	OsgSphereActorTests.cpp
+	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
 	OsgViewTests.cpp
 	OsgViewElementTests.cpp
+	SphereActorTests.cpp
 	ViewElementTests.cpp
 	ViewTests.cpp
 )
