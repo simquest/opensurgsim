@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the View class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <random>
 
@@ -37,7 +37,7 @@ TEST(ViewTests, NameTest)
 	EXPECT_EQ("test name", view->getName());
 }
 
-TEST(ViewTests, PositionAndDimensionsTest)
+TEST(ViewTests, WindowSettingsTests)
 {
 	std::shared_ptr<View> view = std::make_shared<MockView>("test name");
 
@@ -66,6 +66,12 @@ TEST(ViewTests, PositionAndDimensionsTest)
 
 	EXPECT_EQ(width, testWidth);
 	EXPECT_EQ(height, testHeight);
+
+	/// The window border should be enabled initially
+	EXPECT_TRUE(view->isWindowBorderEnabled());
+	/// Disable the window border
+	view->setWindowBorderEnabled(false);
+	EXPECT_FALSE(view->isWindowBorderEnabled());
 }
 
 TEST(ViewTests, CameraTest)
@@ -75,7 +81,7 @@ TEST(ViewTests, CameraTest)
 	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test camera");
 
 	/// Set the camera and check that it set correctly
-	view->setCamera(camera);
+	EXPECT_TRUE(view->setCamera(camera));
 
 	EXPECT_EQ(camera, view->getCamera());
 }

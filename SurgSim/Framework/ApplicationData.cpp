@@ -38,7 +38,7 @@ ApplicationData::ApplicationData(const std::vector<std::string>& paths)
 ApplicationData::ApplicationData(const std::string& configurationFileName)
 {
 	path filePath(configurationFileName);
-	SURGSIM_ASSERT(boost::filesystem::exists(filePath)) << 
+	SURGSIM_ASSERT(boost::filesystem::exists(filePath)) <<
 		"ApplicationdData could not find configuration file " << configurationFileName << " " <<
 		"the application is probably not going to be able to find it's data files";
 
@@ -113,13 +113,13 @@ bool ApplicationData::addPath(const std::string& pathName)
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << 
+			SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) <<
 				"ApplicationData, trying to add nonexistent or non directory path to search list " << newPath;
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << 
+		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) <<
 			"ApplicationsData::addPath: Trying to add duplicate path " << pathName;
 	}
 	return result;

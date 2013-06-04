@@ -16,12 +16,12 @@
 /// \file
 /// Tests for the Graphics Manager class.
 
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/ViewElement.h"
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Framework/Runtime.h>
+#include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Graphics/ViewElement.h>
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <algorithm>
 #include <random>

@@ -67,7 +67,7 @@ template <class T> inline
 }
 
 /// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
-/// appear in the list of parameters. If you need tests with more parameters, think about using 
+/// appear in the list of parameters. If you need tests with more parameters, think about using
 /// boost::minmax for example.
 /// \tparam T Floating point type of the calculation, can usually be inferred.
 /// \param a,b,c,d,e Values that are searched for the minimum.
@@ -940,10 +940,16 @@ bool doesCollideSegmentTriangle(
 	// Get intersect point of ray with triangle plane
 	T r = a / b;
 	// Ray goes away from triangle
-	if (r < 0 || r > 1)
+	if (r < -Geometry::DistanceEpsilon)
 	{
 		return false;
 	}
+	//Ray comes toward triangle but isn't long enough to reach it
+	if(r > 1+Geometry::DistanceEpsilon)
+	{
+		return false;
+	}
+
 	// Intersect point of ray and plane
 	Eigen::Matrix<T, 3, 1, MOpt> presumedIntersection = sv0 + r * dir;
 	// Collision point inside T?
@@ -1064,10 +1070,10 @@ T distanceSegmentPlane(
 /// \param tv0,tv1,tv2 Points of the triangle.
 /// \param n		Normal of the plane n (normalized).
 /// \param d		Constant d in n.x + d = 0.
-/// \param closestPointTriangle Closest point on the triangle, when the triangle is coplanar to 
-/// 				the plane (tv0+tv1+tv2)/3 is used, when the triangle intersects the plane the midpoint of 
+/// \param closestPointTriangle Closest point on the triangle, when the triangle is coplanar to
+/// 				the plane (tv0+tv1+tv2)/3 is used, when the triangle intersects the plane the midpoint of
 /// 				the intersection segment is returned.
-/// \param planeProjectionPoint Projection of the closest point onto the plane, when the triangle intersects 
+/// \param planeProjectionPoint Projection of the closest point onto the plane, when the triangle intersects
 /// 				the plane the midpoint of the intersection segment is returned.
 /// \return The distance of the triangle to the plane.
 template <class T, int MOpt> inline
@@ -1239,7 +1245,7 @@ T distanceSegmentTriangle(
 	const T v01DotTn = n.dot(v01);
 	if (std::abs(v01DotTn) <= Geometry::AngularEpsilon)
 	{
-		// Check if any of the points project onto the tri 
+		// Check if any of the points project onto the tri
 		// otherwise normal (non-parallel) processing will get the right result
 		T dst = std::abs(distancePointPlane(sv0, n, d, trianglePoint));
 		Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
