@@ -24,6 +24,7 @@
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
 #include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 
 #include <SurgSim/Math/Quaternion.h>
 
@@ -34,6 +35,7 @@ using SurgSim::Physics::RigidActor;
 using SurgSim::Physics::RigidActorParameters;
 using SurgSim::Physics::RigidActorCollisionRepresentation;
 using SurgSim::Physics::SphereShape;
+using SurgSim::Physics::PhysicsManagerState;
 
 using SurgSim::Math::Vector3d;
 
@@ -57,14 +59,18 @@ std::shared_ptr<Actor> createSphere(const std::string& name, const SurgSim::Math
 
 TEST(DcdCollisionTest, SingleCollisionTest)
 {
+	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 	std::shared_ptr<Actor> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
 	std::shared_ptr<Actor> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
 
-	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors = std::make_shared<std::vector<std::shared_ptr<Actor>>>();
+	std::vector<std::shared_ptr<Actor>> actors;
 
-	actors->push_back(sphere1);
-	actors->push_back(sphere2);
+	actors.push_back(sphere1);
+	actors.push_back(sphere2);
+	state->setActors(actors);
 
-	SurgSim::Physics::DcdCollision computation(actors);
-	computation.update(1.0);
+	SurgSim::Physics::DcdCollision computation;
+	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
+
+	EXPECT_EQ(1, newState->getCollisionPairs().size());
 }

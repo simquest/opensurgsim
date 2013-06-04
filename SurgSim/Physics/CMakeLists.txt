@@ -44,6 +44,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MeshShape.h
 	PhysicsManager-inl.h
 	PhysicsManager.h
+	PhysicsManagerState.h
 	PlaneShape.h
 	RigidActor.h
 	RigidActorBase.h

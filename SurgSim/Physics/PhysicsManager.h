@@ -81,7 +81,7 @@ protected:
 
 private:
 
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>> > m_actors;
+	std::vector<std::shared_ptr<Actor>> m_actors;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	///@{

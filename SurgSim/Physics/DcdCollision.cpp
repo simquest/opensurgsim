@@ -27,11 +27,9 @@ namespace SurgSim
 namespace Physics
 {
 
-DcdCollision::DcdCollision(std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
+DcdCollision::DcdCollision()
 {
 	populateCalculationTable();
-	updatePairs();
 }
 
 DcdCollision::~DcdCollision()
@@ -39,9 +37,13 @@ DcdCollision::~DcdCollision()
 	m_pairs.clear();
 }
 
-void DcdCollision::doUpdate(double dt)
+std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
-	updatePairs();
+	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);	
+
+	updatePairs(result);
+
+	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();
 	auto it = m_pairs.cbegin();
 	auto itEnd = m_pairs.cend();
 	while (it != itEnd)
@@ -51,6 +53,7 @@ void DcdCollision::doUpdate(double dt)
 		m_contactCalculations[i][j]->calculateContact(*it);
 		++it;
 	}
+	return result;
 }
 
 void DcdCollision::populateCalculationTable()
@@ -67,31 +70,41 @@ void DcdCollision::populateCalculationTable()
 	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(m_contactFactory));
 }
 
-void DcdCollision::updatePairs()
+void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	m_pairs.clear();
-
+	std::vector<std::shared_ptr<Actor>> actors = state->getActors();	
 	std::list<std::shared_ptr<RigidActor>> rigidActors;
-	for (auto it = m_actors->cbegin(); it != m_actors->cend(); ++it)
+	
+	if (actors.size() > 1)
 	{
-		std::shared_ptr<RigidActor> rigid = std::dynamic_pointer_cast<RigidActor>(*it);
-		if (rigid != nullptr && rigid->isActive())
+		for (auto it = actors.cbegin(); it != actors.cend(); ++it)
 		{
-			rigidActors.push_back(rigid);
+			std::shared_ptr<RigidActor> rigid = std::dynamic_pointer_cast<RigidActor>(*it);
+			if (rigid != nullptr && rigid->isActive())
+			{
+				rigidActors.push_back(rigid);
+			}
 		}
 	}
 	
-	auto rigidEnd = rigidActors.cend();
-	for (auto first = rigidActors.cbegin(); first != rigidEnd; ++first)
+	if (rigidActors.size() > 1)
 	{
-		// \todo Fix for the correct pair 
-		for (auto second = rigidActors.cbegin(); second != rigidEnd; ++second)
+		std::vector<std::shared_ptr<CollisionPair>> pairs;
+		auto firstEnd = rigidActors.end();
+		--firstEnd;
+		for (auto first = rigidActors.begin(); first != firstEnd; ++first)
 		{
-			std::shared_ptr<CollisionPair> pair = m_pairFactory.getInstance();		
-			pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
-									 std::make_shared<RigidActorCollisionRepresentation>(*second));
-			m_pairs.push_back(pair);
+			std::list<std::shared_ptr<RigidActor>>::iterator second = first;
+			++second;
+			for (;second != rigidActors.end(); ++second)
+			{
+				std::shared_ptr<CollisionPair> pair = m_pairFactory.getInstance();		
+				pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
+					std::make_shared<RigidActorCollisionRepresentation>(*second));
+				pairs.push_back(pair);
+			}
 		}
+		state->setCollisionPairs(pairs);
 	}
 }
 

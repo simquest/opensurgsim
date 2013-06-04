@@ -26,8 +26,7 @@ namespace Physics
 {
 
 
-FreeMotion::FreeMotion(std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors) :
-	m_actors(actors)
+FreeMotion::FreeMotion()
 {
 
 }
@@ -37,18 +36,19 @@ FreeMotion::~FreeMotion()
 
 }
 
-void FreeMotion::doUpdate(double dt)
+std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors = m_actors.lock();
+	// Copy state to new state
+	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);	
+	std::vector<std::shared_ptr<Actor>> actors = result->getActors();
 
-	SURGSIM_ASSERT(actors != nullptr) << "Actors data structure was deallocated";
-
-	auto it = actors->begin();
-	auto itEnd = actors->end();
+	auto it = actors.begin();
+	auto itEnd = actors.end();
 	for (; it != itEnd; ++it)
 	{
 		(*it)->update(dt);
 	}
+	return result;
 }
 
 

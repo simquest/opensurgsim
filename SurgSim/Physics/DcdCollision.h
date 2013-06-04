@@ -46,22 +46,14 @@ class DcdCollision : public Computation
 public:
 
 	/// Constructor
-	explicit DcdCollision(std::shared_ptr< std::vector<std::shared_ptr<Actor>>> actors);
+	explicit DcdCollision();
 	virtual ~DcdCollision();
-
-	/// Gets list of all collision pairs that were considered, a pair will have
-	/// either contacts or not.
-	/// \return	A list of CollisionPair objects.
-	const std::list<std::shared_ptr<CollisionPair>>& collisionPairs()
-	{
-		return m_pairs;
-	}
 
 protected:
 
 	/// Executes the update operation, overridden from Computation.
 	/// \param	dt	The time passed.
-	virtual void doUpdate(double dt) override;
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
 
 private:
 
@@ -69,7 +61,7 @@ private:
 	void populateCalculationTable();
 
 	/// Updates the collision pairs
-	void updatePairs();
+	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
 	///@{
 	/// Instances of factories to be used
@@ -84,9 +76,6 @@ private:
 	/// the first pair object and the second pair object in order
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
 	
-	/// Global list of actors, used for creating the collision pairs
-	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> m_actors;
-
 	/// List of collision pairs, recalculate every update call
 	std::list<std::shared_ptr<CollisionPair>> m_pairs;
 };
