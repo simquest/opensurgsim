@@ -28,16 +28,19 @@ namespace Math
 
 /// A description of an MLCP (mixed linear complementarity problem, or mixed LCP) system to be solved.
 ///
-/// A traditional (not mixed!) LCP problem is expressed \f$A x + b = c\f$, where \f$x\f$ and \f$c\f$ are subject
+/// A traditional (not mixed!) LCP problem is expressed as \f$\mathbf{A}x + b = c\f$, where \f$x\f$ and \f$c\f$
+/// are subject
 /// to inequality conditions \f$x_i \ge 0\f$, \f$c_i \ge 0\f$, and \f$x \perp c\f$ (i.e. \f$x \cdot c = 0\f$).
 /// Thus for each row \f$i\f$, either
-/// * \f$(A x+b)_i = A_{i,*}\cdot x+b_i \ge 0\f$ <b>and</b> \f$x_i = 0\f$
+/// * \f$(\mathbf{A}x+b)_i = \mathbf{A}_{i,*}\cdot x+b_i \ge 0\f$ <b>and</b> \f$x_i = 0\f$
 ///   (the constraint is non-binding, and therefore there is no force); or
-/// * \f$(A x+b)_i = A_{i,*}\cdot x+b_i = 0\f$ <b>and</b> \f$x_i \ge 0\f$
+/// * \f$(\mathbf{A}x+b)_i = \mathbf{A}_{i,*}\cdot x+b_i = 0\f$ <b>and</b> \f$x_i \ge 0\f$
 ///   (the constraint is binding, and therefore there is a positive force to enforce the constraint)
+/// Solving the problem produces the vector \f$x\f$, from which \f$c\f$ can also be computed if needed.
 ///
 /// A mixed LCP problem is defined in the same way, except that for a certain subset of indices, the conditions are
-/// restricted further to require \f$c_i\f$ to be zero, \f$A_{i,*}\cdot x+b_i = 0\f$, resulting non-zero force,
+/// restricted further to require \f$c_i\f$ to be zero, \f$\mathbf{A}_{i,*}\cdot x+b_i = 0\f$,
+/// which results in a non-zero force,
 /// \f$x_i \ge 0\f$.  These are referred to as <i>bilateral</i> constraints, as opposed to the <i>unilateral</i>
 /// constraints that behave as they do in the LCP problem.
 ///
@@ -45,9 +48,15 @@ namespace Math
 // TODO(advornik): Get rid of the constraint types and encode necessary info in other ways.
 struct MlcpProblem
 {
+	/// Matrix \f$\mathbf{A}\f$ used to describe the mixed LCP problem.
 	Eigen::MatrixXd A;
+	/// Vector \f$b\f$ used to describe the mixed LCP problem.
 	Eigen::VectorXd b;
+	/// A vector of friction coefficients used to describe the mixed LCP problem.
+	/// \todo This API will change in the future to something more independent of physics.
 	Eigen::VectorXd mu;
+	/// A vector of constraint types used to describe the mixed LCP problem.
+	/// \todo This API will change in the future to something more independent of physics.
 	std::vector<MlcpConstraintType> constraintTypes;
 
 	MlcpProblem()

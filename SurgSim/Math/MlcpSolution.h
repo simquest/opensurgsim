@@ -25,6 +25,9 @@ namespace Math
 
 /// The description of a solution to an MLCP problem.
 ///
+/// The solution consists of the vector \f$x\f$ and various diagnostic parameers.
+/// If \f$c\f$ is also needed, it can be computed by the caller.
+///
 /// \sa MlcpProblem, MlcpSolver
 
 struct MlcpSolution
