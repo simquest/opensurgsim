@@ -25,6 +25,7 @@
 #include "SurgSim/Devices/Sixense/SixenseThread.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
 
 #include <sixense.h>
 
@@ -347,6 +348,12 @@ bool SixenseManager::destroyThread()
 	thread.release();
 
 	return true;
+}
+
+std::shared_ptr<SixenseManager> SixenseManager::getOrCreateSharedInstance()
+{
+	static SurgSim::Framework::SharedInstance<SixenseManager> sharedInstance;
+	return sharedInstance.get();
 }
 
 void SixenseManager::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)

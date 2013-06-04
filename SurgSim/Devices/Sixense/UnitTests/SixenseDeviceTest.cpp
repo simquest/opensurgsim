@@ -112,7 +112,7 @@ TEST(SixenseDeviceTest, CreateSeveralDevices)
 	ASSERT_TRUE(device2 != nullptr) << "Initialization failed for second controller." <<
 		"  Is only one controller plugged in?";
 
-	EXPECT_EQ(device1->getManager(), device2->getManager());
+	// We can't check what happens with the managers, since those are no longer a part of the device's API...
 
 	std::shared_ptr<SixenseDevice> device3 = SixenseDevice::create("Sixense3");
 	if (! device3)

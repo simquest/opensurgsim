@@ -26,7 +26,15 @@ namespace SurgSim
 namespace Device
 {
 
+class SixenseDevice;
 class SixenseManager;
+
+namespace Test
+{
+// Pre-declare a helper function for testing.
+std::shared_ptr<SixenseManager> extractManager(const SixenseDevice& device);
+};  // namespace Test
+
 
 /// A class implementing the communication with one Sixense controller, for example one of the two on the Razer Hydra.
 ///
@@ -60,13 +68,6 @@ public:
 	/// \return The newly created device, or an empty shared_ptr if the initialization fails.
 	static std::shared_ptr<SixenseDevice> create(const std::string& uniqueName);
 
-	/// Gets the manager object that coordinates all Sixense devices.
-	/// \return The manager.
-	std::shared_ptr<SixenseManager> getManager() const
-	{
-		return m_manager;
-	}
-
 	/// Gets the logger used by this device (and other devices managed by the same manager).
 	/// \return The logger.
 	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
@@ -76,6 +77,7 @@ public:
 
 protected:
 	friend class SixenseManager;
+	friend std::shared_ptr<SixenseManager> Test::extractManager(const SixenseDevice& device);
 
 	/// Constructor.
 	///
@@ -85,6 +87,13 @@ protected:
 	/// \param logger The logger used for diagnostic messages.
 	SixenseDevice(const std::string& uniqueName, int baseIndex, int controllerIndex,
 		std::shared_ptr<SurgSim::Framework::Logger> logger);
+
+	/// Gets the manager object that coordinates all Sixense devices.
+	/// \return The manager.
+	std::shared_ptr<SixenseManager> getManager() const
+	{
+		return m_manager;
+	}
 
 	/// Sets the manager object held by this device.
 	/// This should be called as a part of device initialization.
@@ -118,11 +127,6 @@ protected:
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildInputData();
-
-	/// Gets or creates the manager shared by all SixenseDevice instances.
-	/// The manager is managed using a SingleInstance object, so it will be destroyed when all devices are released.
-	/// \return the manager object.
-	static std::shared_ptr<SixenseManager> acquireSharedManager();
 
 private:
 	std::shared_ptr<SixenseManager> m_manager;

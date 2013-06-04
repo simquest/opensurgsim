@@ -25,7 +25,6 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 
@@ -62,7 +61,7 @@ SixenseDevice::~SixenseDevice()
 
 std::shared_ptr<SixenseDevice> SixenseDevice::create(const std::string& uniqueName)
 {
-	std::shared_ptr<SixenseManager> manager = acquireSharedManager();
+	std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
 	std::shared_ptr<SixenseDevice> device = manager->createDevice(uniqueName);
 	if (! device)
 	{
@@ -176,12 +175,6 @@ DataGroup SixenseDevice::buildInputData()
 	builder.addBoolean("buttonStart");
 	builder.addBoolean("buttonJoystick");
 	return builder.createData();
-}
-
-std::shared_ptr<SixenseManager> SixenseDevice::acquireSharedManager()
-{
-	static SurgSim::Framework::SharedInstance<SixenseManager> sharedInstance;
-	return sharedInstance.get();
 }
 
 

@@ -50,6 +50,11 @@ public:
 		return m_logger;
 	}
 
+	/// Gets or creates the manager shared by all SixenseDevice instances.
+	/// The manager is managed using a SingleInstance object, so it will be destroyed when all devices are released.
+	/// \return the manager object.
+	static std::shared_ptr<SixenseManager> getOrCreateSharedInstance();
+
 	/// Sets the default log level.
 	/// Must be called before a manager is created (i.e. before the first device) in order to have any effect.
 	/// \param logLevel The log level.
