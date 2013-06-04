@@ -98,6 +98,16 @@ public:
 		m_contacts.push_back(std::make_shared<Contact>(contact));
 	}
 
+	/// Adds a contact to the collision pair.
+	/// \param	depth			The depth of the intersection.
+	/// \param	contactPoint	The contact point, between the two bodies.
+	/// \param	normal			The normal of the contact pointing into the first representation.
+	inline void addContact(const double& depth, SurgSim::Math::Vector3d normal)
+	{
+		Contact contact = {depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal};
+		m_contacts.push_back(std::make_shared<Contact>(contact));
+	}
+
 	/// Adds a contact.
 	/// \param	contact	The contact between the first and the second representation.
 	inline void addContact(std::shared_ptr<Contact> contact)

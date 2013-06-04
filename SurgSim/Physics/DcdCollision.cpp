@@ -58,7 +58,6 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(double dt, std::shar
 
 void DcdCollision::populateCalculationTable()
 {
-	m_contactFactory = std::make_shared<ContactFactory>();
 	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
 	{
 		for (int j = 0; j < RIGID_SHAPE_TYPE_COUNT; ++j)
@@ -66,8 +65,9 @@ void DcdCollision::populateCalculationTable()
 			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
 		}
 	}
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact(m_contactFactory));
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(m_contactFactory));
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact());
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(false));
+	m_contactCalculations[RIGID_SHAPE_TYPE_PLANE][RIGID_SHAPE_TYPE_SPHERE].reset(new SpherePlaneDcdContact(true));
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
@@ -98,7 +98,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			++second;
 			for (;second != rigidActors.end(); ++second)
 			{
-				std::shared_ptr<CollisionPair> pair = m_pairFactory.getInstance();		
+				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();		
 				pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
 					std::make_shared<RigidActorCollisionRepresentation>(*second));
 				pairs.push_back(pair);

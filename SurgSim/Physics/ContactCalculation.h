@@ -31,37 +31,21 @@ typedef SurgSim::Framework::ReuseFactory<Contact> ContactFactory;
 class ContactCalculation
 {
 public:
-	explicit ContactCalculation(std::shared_ptr<ContactFactory> factory) : m_contactFactory(factory) {}
-	virtual ~ContactCalculation() {}
-	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) = 0;
-
-protected:
-
-	/// Helper function to add a contact to a given CollisionPair.
-	/// \param	pair  	The pair.
-	/// \param	depth 	The depth.
-	/// \param	normal	The normal.
-	/// \param	contact The contact point, not used  for DCD.
-	inline void addContact(std::shared_ptr<CollisionPair> pair, 
-							const double& depth, 
-							const Vector3d& normal, 
-							const Vector3d& contactPoint = Vector3d(0,0,0)) 
+	explicit ContactCalculation() 
 	{
-		std::shared_ptr<Contact> contact = m_contactFactory->getInstance();
-		contact->depth = depth;
-		contact->normal = normal;
-		contact->contact = contactPoint;
-		pair->addContact(contact);
 	}
-
-	std::shared_ptr<SurgSim::Framework::ReuseFactory<Contact>> m_contactFactory;
-	
+	virtual ~ContactCalculation()
+	{
+	}
+	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) = 0;
 };
 
 class DefaultContactCalculation : public ContactCalculation
 {
 public:
-	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert), ContactCalculation(nullptr) {}
+	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert) 
+	{
+	}
 	virtual ~DefaultContactCalculation() {}
 
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) override;
@@ -73,15 +57,24 @@ private:
 class SphereSphereDcdContact : public ContactCalculation
 {
 public:
-	explicit SphereSphereDcdContact(std::shared_ptr<ContactFactory> factory) : ContactCalculation(factory) {};
+	explicit SphereSphereDcdContact() 
+	{
+	}
+
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
 };
 
 class SpherePlaneDcdContact : public ContactCalculation
 {
 public:
-	explicit SpherePlaneDcdContact(std::shared_ptr<ContactFactory> factory) : ContactCalculation(factory) {};
+	explicit SpherePlaneDcdContact(bool switchPair) : 
+		m_switchPair(switchPair)
+	{
+	}
+	
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
+private:
+	bool m_switchPair;
 };
 
 }; // Physics

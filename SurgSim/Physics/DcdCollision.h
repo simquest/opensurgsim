@@ -63,15 +63,6 @@ private:
 	/// Updates the collision pairs
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
-	///@{
-	/// Instances of factories to be used
-	/// \note The ordering of the declaration here is important, CollisionPair holds
-	/// 	  Contact so, when all the collision pairs get released the ContactFactory
-	/// 	  needs to be available
-	std::shared_ptr<SurgSim::Framework::ReuseFactory<Contact>> m_contactFactory;
-	SurgSim::Framework::ReuseFactory<CollisionPair> m_pairFactory;
-	///@}
-
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];

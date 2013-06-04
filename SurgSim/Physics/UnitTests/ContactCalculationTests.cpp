@@ -151,8 +151,7 @@ TEST (ContactCalculationTests, DefaultCalculation)
 
 void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts, double d)
 {
-	std::shared_ptr<ContactFactory> factory = std::make_shared<ContactFactory>();
-	SphereSphereDcdContact calc(factory);
+	SphereSphereDcdContact calc;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(makeSpereRep(r0,Quaterniond(),p0),
 																		  makeSpereRep(r1,Quaterniond(),p1));
 
@@ -187,11 +186,10 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 {
 		std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<RigidShapeCollisionRepresentation>(plane,planeQuat,planeTrans);
 		std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
-		std::shared_ptr<ContactFactory> factory = std::make_shared<ContactFactory>();
-		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
 
-		SpherePlaneDcdContact calc(factory);
-		calc.calculateContact(pair);
+		SpherePlaneDcdContact calcNormal(false);
+		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
+		calcNormal.calculateContact(pair);
 		if (expectedIntersect)
 		{
 			ASSERT_TRUE(pair->hasContacts());
@@ -204,6 +202,21 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 			EXPECT_FALSE(pair->hasContacts());
 		}
 
+		// Switched Case
+		SpherePlaneDcdContact calcReverse(true);
+		pair = std::make_shared<CollisionPair>(planeRep, sphereRep);
+		calcReverse.calculateContact(pair);
+		if (expectedIntersect)
+		{
+			ASSERT_TRUE(pair->hasContacts());
+			std::shared_ptr<Contact> contact = pair->getContacts().front();
+			EXPECT_NEAR(expectedDepth, -contact->depth, 1e-10);
+			EXPECT_TRUE(eigenEqual(expectedNorm, -contact->normal));
+		}
+		else
+		{
+			EXPECT_FALSE(pair->hasContacts());
+		}
 }
 
 TEST(ContactCalculationTests, SperePlaneCalculation)

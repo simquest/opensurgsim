@@ -26,6 +26,7 @@ namespace SurgSim
 {
 namespace Physics
 {
+
 void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
 
@@ -34,7 +35,6 @@ void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> 
 	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Contact calculation not implemented for pairs with types ("<<
 		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
-
 
 void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
@@ -55,38 +55,46 @@ void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pai
 	double maxDist = leftSphere->getRadius() + rightSphere->getRadius();
 	if (dist < maxDist)
 	{
-		addContact(pair,maxDist - dist, normal.normalized());
+		pair->addContact(maxDist - dist, normal.normalized());
 	}
 }
 
 void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" << 
+	std::shared_ptr<CollisionRepresentation> representationPlane;
+	std::shared_ptr<CollisionRepresentation> representationSphere;
+
+	if (! m_switchPair)
+	{
+		representationSphere = pair->getFirst();
+		representationPlane = pair->getSecond();
+	}
+	else
+	{
+		representationSphere = pair->getSecond();
+		representationPlane = pair->getFirst();
+	}
+
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" << 
 																					pair->getFirst()->getShapeType();
-	SURGSIM_ASSERT(pair->getSecond()->getShapeType() == RIGID_SHAPE_TYPE_PLANE) << "Second Object, wrong type of object" << 
+	SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) << "Second Object, wrong type of object" << 
 																					pair->getSecond()->getShapeType();
 
-	std::shared_ptr<SphereShape> sphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
-	std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(pair->getSecond()->getShape());
+	std::shared_ptr<SphereShape> sphere = std::static_pointer_cast<SphereShape>(representationSphere->getShape());
+	std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
 
-	Vector3d leftCenter = pair->getFirst()->getLocalToWorldTransform().translation();
+	Vector3d sphereCenter = representationSphere->getLocalToWorldTransform().translation();
 
 	// Move into Plane coordinate system
-	leftCenter =  pair->getSecond()->getLocalToWorldTransform().inverse() * leftCenter;
+	sphereCenter =  representationPlane->getLocalToWorldTransform().inverse() * sphereCenter;
 
 	Vector3d result;
-	double dist = SurgSim::Math::distancePointPlane(leftCenter, plane->getNormal(), plane->getD(), &result);
+	double dist = SurgSim::Math::distancePointPlane(sphereCenter, plane->getNormal(), plane->getD(), &result);
 	
 	if (std::abs(dist) < sphere->getRadius())
 	{
-		if (dist > 0)
-		{
-			addContact(pair,dist, pair->getSecond()->getLocalToWorldTransform()*plane->getNormal());
-		}
-		else
-		{
-			addContact(pair,-dist, pair->getSecond()->getLocalToWorldTransform()*(-plane->getNormal()));
-		}
+		double factor = ((dist < 0) ? -1.0 : 1.0) * ((m_switchPair) ? -1.0 : 1.0);
+		pair->addContact(dist * factor, representationPlane->getLocalToWorldTransform() * plane->getNormal() * factor);
 	}
 }
 
