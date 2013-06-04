@@ -23,9 +23,13 @@ namespace SurgSim
 namespace Math
 {
 
+/// The description of a solution to an MLCP problem.
+///
+/// \sa MlcpProblem, MlcpSolver
+
 struct MlcpSolution
 {
-	Eigen::VectorXd lambda;
+	Eigen::VectorXd x;
 
 	int numIterations;
 	bool validConvergence;

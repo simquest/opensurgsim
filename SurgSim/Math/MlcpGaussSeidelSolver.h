@@ -9,27 +9,22 @@ namespace SurgSim
 namespace Math
 {
 
-//! Resolution of a mixed LCP problem (Gauss Seidel iterative solver)
-/*!
-  Iterative solver based on Gauss-Seidel.
-
-  Problem can contains:
-    - CONSTRAINT  = Bilateral constraint (all atomic, a fixed 3D point=3 atomics independents constraints)
-    - CONTACT     = Unilateral constraint
-      * frictionless => 1 atomic constraint per contact
-      * frictional with Coulomb friction (1 mu parameter per contact) => 3 atomic dependent constraints per contact (1 directional + 2 tangentials)
-    - SUTURING    = Sliding constraint for suturing
-      * Frictionless suturing constraint => 2 atomic constraints per sliding point
-      * Frictional suturing constraint   => 3 atomic constraints per sliding point (2 directional + 1 tangential with friction on it) => 1 mu parameter per frictional suturing
-
-  cf. Christian Duriez TVCG05 paper
-  Realistic Haptic Rendering of Interacting
-  Deformable Objects in Virtual Environments
-  Christian Duriez, Student Member, IEEE, Fre´de´ ric Dubois,
-  Abderrahmane Kheddar, Member, IEEE, and Claude Andriot
-  +
-  + recent Christian's work
-*/
+/// A solver for mixed LCP problems using the Gauss-Seidel iterative method.
+///
+/// \todo Clean this up more...
+///
+/// The problem can contain:
+///  - CONSTRAINT  = Bilateral constraint (all atomic, a fixed 3D point=3 atomics independents constraints)
+///  - CONTACT     = Unilateral constraint
+///    * frictionless => 1 atomic constraint per contact
+///    * frictional with Coulomb friction (1 mu parameter per contact) => 3 atomic dependent constraints per contact (1 directional + 2 tangentials)
+///  - SUTURING    = Sliding constraint for suturing
+///    * Frictionless suturing constraint => 2 atomic constraints per sliding point
+///    * Frictional suturing constraint   => 3 atomic constraints per sliding point (2 directional + 1 tangential with friction on it) => 1 mu parameter per frictional suturing
+///
+/// See e.g.: Duriez, Christian; Dubois, F.; Kheddar, A.; Andriot, C., "Realistic haptic rendering of interacting
+/// deformable objects in virtual environments," <i>IEEE Transactions on Visualization and Computer Graphics,</i>
+/// vol.12, no.1, pp.36,47, Jan.-Feb. 2006.
 class MlcpGaussSeidelSolver : public MlcpSolver
 {
 public:
