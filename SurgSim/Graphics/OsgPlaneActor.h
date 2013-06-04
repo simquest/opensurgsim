@@ -33,9 +33,7 @@ namespace Graphics
 
 class OsgPlane;
 
-/// Base OSG implementation of a graphics plane actor.
-///
-/// 
+/// OSG implementation of a graphics plane actor.
 class OsgPlaneActor : public PlaneActor, public OsgActor
 {
 public:
@@ -83,4 +81,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OSGSPHEREACTOR_H
+#endif  // SURGSIM_GRAPHICS_OSGPLANEACTOR_H

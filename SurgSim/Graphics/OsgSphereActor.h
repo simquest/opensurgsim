@@ -33,9 +33,7 @@ namespace Graphics
 
 class OsgUnitSphere;
 
-/// Base OSG implementation of a graphics sphere actor.
-///
-/// 
+/// OSG implementation of a graphics sphere actor.
 class OsgSphereActor : public SphereActor, public OsgActor
 {
 public:
@@ -52,7 +50,7 @@ public:
 	virtual bool isVisible() const;
 
 	/// Sets the radius of the sphere
-	/// \param	Radius of the sphere
+	/// \param	radius	Radius of the sphere
 	virtual void setRadius(double radius);
 	/// Returns the radius of the sphere
 	/// \return	Radius of the sphere

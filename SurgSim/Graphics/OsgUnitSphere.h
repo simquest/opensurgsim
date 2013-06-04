@@ -27,7 +27,7 @@ namespace Graphics
 {
 
 /// OSG unit sphere geode to be used as a primitive shape
-/// The sphere has a radius of 1.
+/// The sphere is located at (0, 0, 0) and has a radius of 1.
 /// Add the sphere geode to a transform node to position and scale it.
 class OsgUnitSphere
 {
