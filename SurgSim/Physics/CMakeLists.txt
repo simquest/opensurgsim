@@ -36,6 +36,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Computation.h
 	CylinderShape.h
 	DcdCollision.h
+	FemActorParameters.h
 	FixedActor.h
 	FreeMotion.h
 	MeshShape.h

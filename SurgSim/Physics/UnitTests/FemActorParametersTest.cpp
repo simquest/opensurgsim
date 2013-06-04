@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/Actors/FemActorParameters.h>
+#include <SurgSim/Physics/FemActorParameters.h>
 
 namespace SurgSim
 {
