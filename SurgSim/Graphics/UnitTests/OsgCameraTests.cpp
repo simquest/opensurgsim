@@ -100,19 +100,25 @@ TEST(OsgCameraTests, VisibilityTest)
 
 TEST(OsgCameraTests, GroupTest)
 {
-	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test name");
+	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
+	std::shared_ptr<Camera> camera = osgCamera;
 
 	EXPECT_EQ(nullptr, camera->getGroup());
 
 	/// Adding an OsgGroup should succeed
-	std::shared_ptr<Group> osgGroup = std::make_shared<OsgGroup>("test group");
-	EXPECT_TRUE(camera->setGroup(osgGroup));
-	EXPECT_EQ(osgGroup, camera->getGroup());
+	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
+	std::shared_ptr<Group> group = osgGroup;
+	EXPECT_TRUE(camera->setGroup(group));
+	EXPECT_EQ(group, camera->getGroup());
+
+	/// Check that the OSG node of the group is added to the OSG camera correctly
+	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0));
 
 	/// Adding a group that does not derive from OsgGroup should fail
 	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>("non-osg group");
 	EXPECT_FALSE(camera->setGroup(mockGroup));
-	EXPECT_EQ(osgGroup, camera->getGroup());
+	EXPECT_EQ(group, camera->getGroup());
+	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0));
 }
 
 TEST(OsgCameraTests, PoseAndMatricesTest)
