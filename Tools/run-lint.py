@@ -123,39 +123,50 @@ def run_cpplint(script, filter, files):
 def check_header_guard(flags, file):
   lines = slurp_lines(file)
   if not lines:
-    emit_warning({'file': file, 'text': "file is missing or empty."})
+    emit_warning({'file': file, 'category': "opensurgsim/no_lines",
+                  'text': "file is missing or empty."})
     return False
 
-  ifndef = filter(lambda x: re.search(r'^\s*#\s*ifndef\b', x), lines)
+  lines = list(enumerate(lines))
+
+  ifndef = filter(lambda x: re.search(r'^\s*#\s*ifndef\b', x[1]), lines)
   if not ifndef:
-    emit_warning({'file': file, 'text': "no #ifndef lines!"})
+    emit_warning({'file': file, 'category': "opensurgsim/no_ifndef",
+                  'text': "no #ifndef lines!"})
     return False
 #  elif len(ifndef) > 1:
-#    emit_warning({'file': file,
+#    emit_warning({'file': file, 'line': ifndef[1][0],
+#                  'category': "opensurgsim/several_ifndef",
 #                  'text': "multiple #ifndef lines; using first."})
 
-  guard = ifndef[0]
+  guard = ifndef[0][1]
   guard = re.sub(r'//.*', '', guard)
   guard = re.sub(r'/\*.*?\*/', '', guard)
   guard_match = re.search(r'^\s*#\s*ifndef\s+(\w+)\s*$', guard)
   if not guard_match:
-    emit_error({'file': file,
+    emit_error({'file': file, 'line': ifndef[0][0],
+                'category': "opensurgsim/internal",
                 'text': "script error: failed to parse #ifndef line!"})
     return False
   guard = guard_match.group(1)
 
-  namespace = filter(lambda x: re.search(r'^\s*namespace\b', x), lines)
+  namespace = filter(lambda x: re.search(r'^\s*namespace\b', x[1]), lines)
   if not namespace:
-    emit_warning({'file': file, 'text': "no 'namespace' lines!"})
-  if filter(lambda x: re.search(r'^\s', x), namespace):
-    emit_warning({'file': file,
+    emit_warning({'file': file, 'category': "opensurgsim/no_namespace",
+                  'text': "no 'namespace' lines!"})
+  indented_namespace = filter(lambda x: re.search(r'^\s', x[1]), namespace)
+  if indented_namespace:
+    emit_warning({'file': file, 'line': indented_namespace[0][0],
+                  'category': "opensurgsim/namespace_indented",
                   'text': "one or more namespace declarations are indented!"})
-  namespace = map(lambda x: re.sub(r'^\s*namespace\b', '', x).strip(),
-                  namespace)
-  if filter(lambda x: re.search(r'{$', x), namespace):
-    emit_warning({'file': file,
+  curly_namespace = filter(lambda x: re.search(r'{$', x[1]), namespace)
+  if curly_namespace:
+    emit_warning({'file': file, 'line': curly_namespace[0][0],
+                  'category': "opensurgsim/namespace_brace",
                   'text': "'{' on the same line as a namespace declaration!"})
-    namespace = map(lambda x: re.sub(r'\s*{$', '', x), namespace)
+    namespace = map(lambda x: (x[0], re.sub(r'\s*{$', '', x[1])), namespace)
+  namespace = map(lambda x: re.sub(r'^\s*namespace\b', '', x[1]).strip(),
+                  namespace)
 
   namespace_re = "".join(
     map(lambda x: "(?:" + re.sub(r'[^\w\d]+', '', x.upper()) + "_)?",
@@ -168,38 +179,50 @@ def check_header_guard(flags, file):
   guard_re = r'^' + namespace_re + file_guard_re + r'$'
 
   if not re.search(guard_re, guard):
-    emit_warning({'file': file,
+    emit_warning({'file': file, 'line': ifndef[0][0],
+                  'category': "opensurgsim/header_guard",
                   'text': ("unexpected guard '{}'!  expected /{}/."
                            .format(guard, guard_re)) })
-  define = filter(lambda x: re.search(r'^\s*#\s*define\b', x), lines)
+
+  define = filter(lambda x: re.search(r'^\s*#\s*define\b', x[1]), lines)
   if not define:
-    emit_warning({'file': file, 'text': "no #define lines!"})
+    emit_warning({'file': file, 'category': "opensurgsim/no_define",
+                  'text': "no #define lines!"})
   else:
     def_match = re.match(r'^\s*#\s*define\s+(\w+)\s*$',
                          re.sub(r'/\*.*?\*/', '',
                                 re.sub(r'//.*', '', define[0])))
     if not def_match:
-      emit_error({'file': file,
+      emit_error({'file': file, 'line': define[0][0],
+                  'category': "opensurgsim/internal",
                   'text': "script error: failed to parse #define line!"})
     elif def_match.group(1) != guard:
-      emit_warning({'file': file, 'text': "#define doesn't match #ifndef!"})
+      emit_warning({'file': file, 'line': define[0][0],
+                    'category': "opensurgsim/guard_mismatch",
+                    'text': "#define doesn't match #ifndef!"})
 
-  endif = filter(lambda x: re.search(r'^\s*#\s*endif\b', x), lines)
+  endif = filter(lambda x: re.search(r'^\s*#\s*endif\b', x[1]), lines)
   if not endif:
-    emit_warning({'file': file, 'text': "no #endif lines!"})
-  elif re.search(r'^\s*#\s*endif\s*$', endif[-1]):
+    emit_warning({'file': file, 'category': "opensurgsim/no_endif",
+                  'text': "no #endif lines!"})
+  elif re.search(r'^\s*#\s*endif\s*$', endif[-1][1]):
     if flags.missing_endif_comments:
-      emit_warning({'file': file, 'text': "#endif with no comment."})
+      emit_warning({'file': file, 'line': endif[-1][0],
+                    'category': "opensurgsim/endif_no_comment",
+                    'text': "#endif with no comment."})
   else:
-    if re.search(r'^\s*#\s*endif\s*///', endif[-1]):
-      emit_warning({'file': file,
+    if re.search(r'^\s*#\s*endif\s*///', endif[-1][1]):
+      emit_warning({'file': file, 'line': endif[-1][0],
+                    'category': "opensurgsim/endif_doxygen",
                     'text': "#endif with a Doxygen style /// comment."})
-    endif_match = re.search(r'^\s*#\s*endif\s*//+\s*(.*?)\s*$', endif[-1])
+    endif_match = re.search(r'^\s*#\s*endif\s*//+\s*(.*?)\s*$', endif[-1][1])
     if not endif_match:
-      emit_error({'file': file,
+      emit_error({'file': file, 'line': endif[-1][0],
+                  'category': "opensurgsim/internal",
                   'text': "script error: failed to parse #endif comment."})
     elif endif_match.group(1) != guard:
-      emit_warning({'file': file,
+      emit_warning({'file': file, 'line': endif[-1][0],
+                    'category': "opensurgsim/endif_mismatch",
                     'text': ("#endif comment doesn't match #ifndef! (" + \
                                endif_match.group(1) + ")")})
 
