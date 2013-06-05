@@ -18,10 +18,12 @@
 
 #include <memory>
 
-#include "SurgSim/Framework/Component.h"
+#include <SurgSim/Framework/Component.h>
+#include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim
 {
+
 namespace Framework
 {
 
@@ -35,6 +37,14 @@ class Representation : public Component
 public:
 	explicit Representation(const std::string& m_name);
 	virtual ~Representation();
+
+	/// Set the current pose of the representation
+	/// \param pose The current pose
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+
+	/// Get the current pose of the representation
+	/// \return The current pose
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();

@@ -18,20 +18,48 @@
 #include <string>
 
 #include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Physics::Actor;
+using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+
+/// Concrete actor class for testing
+class MockActor : public Actor
+{
+public:
+	/// Constructor
+	/// \name	Name of the actor
+	MockActor(const std::string& name) : Actor(name)
+	{
+	}
+
+	/// Sets the pose of the actor
+	virtual void setPose(const RigidTransform3d& transform)
+	{
+		m_pose = transform;
+	}
+	/// Returns the pose of the actor
+	virtual const RigidTransform3d& getPose() const
+	{
+		return m_pose;
+	}
+private:
+	/// Pose of the actor
+	RigidTransform3d m_pose;
+};
 
 TEST(ActorTest, ConstructorTest)
 {
-	ASSERT_NO_THROW({Actor actor("Actor");});
+	ASSERT_NO_THROW({MockActor actor("Actor");});
 }
 
 TEST(ActorTest, SetGetAndDefaultValueTest)
 {
 	/// Create the actor
-	std::shared_ptr<Actor> actor = std::make_shared<Actor>("Actor");
+	std::shared_ptr<Actor> actor = std::make_shared<MockActor>("Actor");
 
 	/// Get/Set active flag [default = true]
 	EXPECT_TRUE(actor->isActive());
@@ -49,4 +77,13 @@ TEST(ActorTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(actor->isGravityEnabled());
 	actor->setIsGravityEnabled(true);
 	ASSERT_TRUE(actor->isGravityEnabled());
+
+	/// Create a rigid body transform
+	Vector3d translation = Vector3d::Random();
+	Quaterniond rotation = Quaterniond(SurgSim::Math::Vector4d::Random());
+	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(rotation, translation);
+
+	/// Set the pose and make sure it was set correctly
+	actor->setPose(transform);
+	EXPECT_TRUE(actor->getPose().isApprox(transform));
 }

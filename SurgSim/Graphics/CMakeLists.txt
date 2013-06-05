@@ -14,10 +14,7 @@
 # limitations under the License.
 
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
-
 find_package(OpenThreads)
-set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
@@ -55,7 +52,15 @@ set(SURGSIM_GRAPHICS_HEADERS
 	ViewElement.h
 )
 
-add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})
+surgsim_add_library(
+	SurgSimGraphics
+	"${SURGSIM_GRAPHICS_SOURCES}"
+	"${SURGSIM_GRAPHICS_HEADERS}"
+	"SurgSim/Graphics"
+)
+target_link_libraries(SurgSimGraphics SurgSimFramework 
+	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
