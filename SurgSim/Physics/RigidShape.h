@@ -32,7 +32,8 @@ typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTI
 /// Fixed List of enums for the available RigidShape types, do not explicitely assign values, RigidShapeCount is
 /// used to determine the number of actual shape types
 typedef enum {
-	RIGID_SHAPE_TYPE_SPHERE = 0,
+	RIGID_SHAPE_TYPE_PLANE = 0,
+	RIGID_SHAPE_TYPE_SPHERE,
 	RIGID_SHAPE_TYPE_BOX,
 	RIGID_SHAPE_TYPE_CYLINDER,
 	RIGID_SHAPE_TYPE_CAPSULE,

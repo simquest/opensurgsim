@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_COMPUTATION_H
 
 #include <vector>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 
 namespace SurgSim
 {
@@ -39,15 +40,15 @@ public:
 
 	/// Public Interface execute this objects computations, dt is the time from
 	/// the last update call in seconds
-	inline void update(double dt)
+	std::shared_ptr<PhysicsManagerState> update(double dt, std::shared_ptr<PhysicsManagerState> state)
 	{
-		doUpdate(dt);
+		return std::move(doUpdate(dt,state));
 	};
 
 protected:
 
 	/// Override this function to implement the computations specific behavior
-	virtual void doUpdate(double dt) = 0;
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state) = 0;
 
 };
 

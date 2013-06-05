@@ -102,6 +102,7 @@ private:
 
 };
 
-}
-}
-#endif
+}; // namespace Framework
+}; // namespace SurgSim
+
+#endif // SURGSIM_FRAMEWORK_SCENEELEMENT_H

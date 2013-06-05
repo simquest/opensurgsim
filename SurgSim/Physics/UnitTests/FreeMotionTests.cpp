@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file Simple Test for FreeMotion calculation
+
 #include <gtest/gtest.h>
 
 #include <string>
@@ -25,6 +27,7 @@
 #include <SurgSim/Physics/RigidActorParameters.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/FreeMotion.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -34,24 +37,11 @@ using SurgSim::Physics::RigidActor;
 using SurgSim::Physics::RigidActorParameters;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::FreeMotion;
-
-
-
-struct FreeMotionTest: public ::testing::Test
-{
-	virtual void SetUp()
-	{
-	}
-
-	virtual void TearDown()
-	{
-	}
-};
+using SurgSim::Physics::PhysicsManagerState;
 
 TEST(FreeMotionTest, RunTest)
 {
-	std::shared_ptr<std::vector<std::shared_ptr<Actor>>> actors =
-		std::make_shared<std::vector<std::shared_ptr<Actor>>>();
+	std::vector<std::shared_ptr<Actor>> actors = std::vector<std::shared_ptr<Actor>>();
 	std::shared_ptr<RigidActor> actor = std::make_shared<RigidActor>("TestSphere");
 
 	RigidActorParameters params;
@@ -63,13 +53,18 @@ TEST(FreeMotionTest, RunTest)
 	actor->setInitialParameters(params);
 	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), Vector3d(0.0,0.0,0.0)));
 
-	actors->push_back(actor);
+	actors.push_back(actor);
 
-	FreeMotion computation(actors);
+	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
+	state->setActors(actors);
 
 	EXPECT_TRUE(actor->getPose().translation().isZero());
-	computation.update(1.0);
-	EXPECT_FALSE(actor->getPose().translation().isZero());
+	state = computation.update(1.0,state);
+	
+	actor->setIsGravityEnabled(true);
 
+	EXPECT_TRUE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
+	state = computation.update(1.0,state);
+	EXPECT_FALSE(actor->getPose().translation().isZero());
 }
 

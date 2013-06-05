@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_REPRESENTATION_H
-#define SURGSIM_REPRESENTATION_H
+#ifndef SURGSIM_FRAMEWORK_REPRESENTATION_H
+#define SURGSIM_FRAMEWORK_REPRESENTATION_H
 
 #include <memory>
 
@@ -50,8 +50,8 @@ private:
 	virtual bool doWakeUp();
 };
 
-}
-}
+}; // namespace Framework
 
-#endif
+}; // namespace SurgSim
 
+#endif // SURGSIM_FRAMEWORK_REPRESENTATION_H
