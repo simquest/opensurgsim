@@ -41,7 +41,7 @@ public:
 	}
 
 	/// Comparison operator
-	/// \param s A RigidActorBaseState to compare it to
+	/// \param state A RigidActorBaseState to compare it to
 	/// \return True if the 2 states are equals, False otherwise
 	bool operator ==(const RigidActorBaseState& state) const
 	{

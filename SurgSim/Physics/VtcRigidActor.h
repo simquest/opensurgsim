@@ -13,39 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDACTOR_H
-#define SURGSIM_PHYSICS_RIGIDACTOR_H
+#ifndef SURGSIM_PHYSICS_VTCRIGIDACTOR_H
+#define SURGSIM_PHYSICS_VTCRIGIDACTOR_H
 
 #include <SurgSim/Physics/RigidActorBase.h>
 #include <SurgSim/Physics/RigidActorState.h>
 #include <SurgSim/Physics/RigidActorParameters.h>
+#include <SurgSim/Physics/VtcRigidParameters.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-namespace SurgSim
+namespace SurgSim 
 {
 
 namespace Physics
 {
 
-/// The RigidActor class defines the dynamic rigid body actor
+/// The VtcRigidActor class defines a rigid body actor associated with a
+/// Virtual tool coupler (i.e. god-object or proxy)
 /// Note that the rigid actor is velocity-based, therefore its degrees of
 /// freedom are the linear and angular velocities: 6 Dof
-class RigidActor : public RigidActorBase
+/// \note The physical rigid body is driven by the Vtc through setPose(...)
+/// \note setPose sets the proxy (Vtc) pose.
+/// \note getPose gets the virtual rigid body pose.
+class VtcRigidActor : public RigidActorBase
 {
 public:
 	/// Constructor
 	/// \param name The rigid actor's name
-	explicit RigidActor(const std::string& name);
+	explicit VtcRigidActor(const std::string& name);
 
 	/// Destructor
-	virtual ~RigidActor();
+	virtual ~VtcRigidActor();
 
 	/// Set the initial state of the rigid actor
 	/// \param state The initial state (pose + lin/ang velocities)
-	/// This will also set the current/previous states to the initial state
 	void setInitialState(const RigidActorState& state)
 	{
 		m_initialState = state;
@@ -57,7 +61,6 @@ public:
 
 	/// Set the initial parameters of the rigid actor
 	/// \param parameters The initial parameters
-	/// This will also set the current parameters to the initial parameters
 	void setInitialParameters(const RigidActorParameters& parameters)
 	{
 		m_initialParameters = parameters;
@@ -71,6 +74,7 @@ public:
 	void setCurrentParameters(const RigidActorParameters& parameters)
 	{
 		m_currentParameters = parameters;
+
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
@@ -109,8 +113,68 @@ public:
 		return m_currentParameters;
 	}
 
+	/// Set the initial Vtc proxy state
+	/// \param state The initial Vtc state (pose + lin/ang velocities)
+	void setInitialVtcState(const RigidActorState& state)
+	{
+		m_initialVtcState = state;
+		m_currentVtcState = state;
+		m_previousVtcState = state;
+	}
+
+	/// Set the initial Vtc parameters
+	/// \param parameters The initial Vtc parameters
+	void setInitialVtcParameters(const VtcRigidParameters& parameters)
+	{
+		m_initialVtcParameters = parameters;
+		m_currentVtcParameters = parameters;
+	}
+
+	/// Set the current Vtc parameters
+	/// \param parameters The current Vtc parameters
+	void setCurrentVtcParameters(const VtcRigidParameters& parameters)
+	{
+		m_currentVtcParameters = parameters;
+	}
+
+	/// Get the initial Vtc state
+	/// \return The initial Vtc state (pose + lin/ang velocities)
+	const RigidActorState& getInitialVtcState() const
+	{
+		return m_initialVtcState;
+	}
+
+	/// Get the initial Vtc parameters
+	/// \return The initial Vtc parameters
+	const VtcRigidParameters& getInitialVtcParameters() const
+	{
+		return m_initialVtcParameters;
+	}
+
+	/// Get the current Vtc state
+	/// \return The current Vtc state (pose + lin/ang velocities)
+	const RigidActorState& getCurrentVtcState() const
+	{
+		return m_currentVtcState;
+	}
+
+	/// Get the previous Vtc state
+	/// \return The previous Vtc state (pose + lin/ang velocities)
+	const RigidActorState& getPreviousVtcState() const
+	{
+		return m_previousVtcState;
+	}
+
+	/// Get the current Vtc parameters
+	/// \return The current Vtc parameters
+	const VtcRigidParameters& getCurrentVtcParameters() const
+	{
+		return m_currentVtcParameters;
+	}
+
 	/// Set the initial pose of the rigid actor
 	/// \param pose The initial pose (translation + rotation)
+	/// \note Sets the current/previous poses as well
 	void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 		m_initialState.setPose(pose);
@@ -129,14 +193,16 @@ public:
 
 	/// Set the current pose of the rigid actor
 	/// \param pose The current pose (translation + rotation)
-	/// \note Does Not Apply to this actor (the pose is fully controlled by the
-	/// physics simulation).
+	/// \note This is done through the Vtc proxy !
+	/// \note We let the end-user drive the Vtc, not the virtual rigid actor directly
 	void setPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
+		m_currentVtcState.setPose(pose);
 	}
 
 	/// Get the current pose of the rigid actor
 	/// \return The current pose (translation + rotation)
+	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid actor
 	const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_currentState.getPose();
@@ -146,7 +212,7 @@ public:
 	/// \param dt The time step (in seconds)
 	void beforeUpdate(double dt);
 
-	/// Update the actor state to the current time step (compute free motion)
+	/// Update the actor state to the current time step
 	/// \param dt The time step (in seconds)
 	void update(double dt);
 
@@ -155,9 +221,11 @@ public:
 	void afterUpdate(double dt);
 
 	/// Reset the rigid actor state to its initial state
+	/// \note This reset the rigid actor state but not the Vtc state
+	/// \note The Vtc is controlled externally via setPose()
 	void resetState()
 	{
-		Actor::resetState();
+		RigidActorBase::resetState();
 
 		m_currentState  = m_initialState;
 		m_previousState = m_initialState;
@@ -165,14 +233,21 @@ public:
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
-	/// Reset the rigid actor parameters to the initial parameters
+	/// Reset the rigid actor parameters to their initial values
+	/// \note Does not reset the Vtc parameters
 	void resetParameters()
 	{
-		Actor::resetParameters();
+		RigidActorBase::resetParameters();
 
 		m_currentParameters = m_initialParameters;
 
 		updateGlobalInertiaMatrices(m_currentState);
+	}
+
+	/// Reset the Vtc parameters to their initial values
+	void resetVtcParameters()
+	{
+		m_currentVtcParameters = m_initialVtcParameters;
 	}
 
 protected:
@@ -184,6 +259,7 @@ protected:
 
 	/// Current force applied on the rigid actor (in N)
 	SurgSim::Math::Vector3d m_force;
+
 	/// Current torque applied on the rigid actor (in N.m)
 	SurgSim::Math::Vector3d m_torque;
 
@@ -213,10 +289,25 @@ private:
 
 	/// Current physical parameters
 	RigidActorParameters m_currentParameters;
+
+	/// Initial Vtc state (useful for reset)
+	RigidActorState m_initialVtcState;
+
+	/// Previous Vtc state
+	RigidActorState m_previousVtcState;
+
+	/// Current Vtc state
+	RigidActorState m_currentVtcState;
+
+	/// Initial Vtc parameters
+	VtcRigidParameters m_initialVtcParameters;
+
+	/// Current Vtc parameters
+	VtcRigidParameters m_currentVtcParameters;
 };
 
 }; /// Physics
 
 }; /// SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTOR_H
+#endif /// SURGSIM_PHYSICS_VTCRIGIDACTOR_H

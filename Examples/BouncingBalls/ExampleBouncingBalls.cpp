@@ -62,7 +62,7 @@ public:
 	PrintoutBehavior(std::shared_ptr<RigidActor> actor) : Behavior("PrintoutBehavior"), m_actor(actor) {}
 	~PrintoutBehavior() {}
 
-	virtual void update(double dt) 
+	virtual void update(double dt)
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_actor->getName() << ": " << m_actor->getPose().translation().transpose();
@@ -79,7 +79,6 @@ protected:
 
 private:
 	std::shared_ptr<RigidActor> m_actor;
-	
 };
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)

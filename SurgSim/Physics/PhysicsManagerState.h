@@ -35,14 +35,14 @@ public:
 	PhysicsManagerState() {}
 	~PhysicsManagerState() {}
 
-	const std::vector<std::shared_ptr<Actor>>& getActors() const 
+	const std::vector<std::shared_ptr<Actor>>& getActors() const
 	{ return m_actors; }
-	void setActors(const std::vector<std::shared_ptr<Actor>>& val) 
+	void setActors(const std::vector<std::shared_ptr<Actor>>& val)
 	{ m_actors = val; }
 
-	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const 
+	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const
 	{ return m_collisionPairs; }
-	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val) 
+	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val)
 	{ m_collisionPairs = val; }
 
 private:
