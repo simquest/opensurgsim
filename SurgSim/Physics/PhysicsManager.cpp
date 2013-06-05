@@ -18,7 +18,11 @@
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Framework/Log.h>
+
+
+#include <list>
 
 namespace SurgSim
 {
@@ -38,9 +42,9 @@ PhysicsManager::~PhysicsManager()
 bool PhysicsManager::doInitialize()
 {
 	m_logger = getRuntime()->getLogger("PhysicsManager");
-	m_actors = std::make_shared<std::vector<std::shared_ptr<Actor>>>();
-	m_freeMotionStep.reset(new FreeMotion(m_actors));
-	return m_logger != nullptr && m_actors != nullptr && m_freeMotionStep != nullptr;
+	m_freeMotionStep.reset(new FreeMotion());
+	m_dcdCollision.reset(new DcdCollision());
+	return m_logger != nullptr && m_freeMotionStep != nullptr;
 }
 
 
@@ -52,17 +56,22 @@ bool PhysicsManager::doStartUp()
 
 bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	return tryAddComponent(component,m_actors.get()) != nullptr;
+	return tryAddComponent(component,&m_actors) != nullptr;
 }
 
 bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	return tryRemoveComponent(component, m_actors.get());
+	return tryRemoveComponent(component, &m_actors);
 }
 
 bool PhysicsManager::doUpdate(double dt)
 {
-	m_freeMotionStep->update(dt);
+	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
+	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
+	stateList.push_back(state);
+	state->setActors(m_actors);
+	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
+	stateList.push_back(m_dcdCollision->update(dt, stateList.back()));
 	return true;
 }
 
