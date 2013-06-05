@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_RUNTIME_H
-#define SURGSIM_RUNTIME_H
+#ifndef SURGSIM_FRAMEWORK_RUNTIME_H
+#define SURGSIM_FRAMEWORK_RUNTIME_H
 
 #include <vector>
 #include <memory>
@@ -129,7 +129,7 @@ private:
 	boost::mutex m_mutex;
 };
 
-};
-};
+}; // namespace Framework
+}; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_FRAMEWORK_RUNTIME_H
