@@ -49,7 +49,7 @@ class RigidShape
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
-	
+
 	virtual ~RigidShape() {}
 
 	/// \return the type of shape

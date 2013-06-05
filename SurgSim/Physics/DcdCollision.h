@@ -34,13 +34,14 @@ namespace Physics
 
 class ContactCalculation;
 
-/// Computation to determine the contacts between a list of CollisionPairs. 
+/// Computation to determine the contacts between a list of CollisionPairs.
 /// This Computation class takes a list of actors, it will generate a list of collision pairs
 /// from this list on every frame, for each CollisionPair, it uses a two dimensional table of
 /// function objects (ContactCalculation) to determine how to calculate a contact between the two
-/// members of each pair, if no specific function exists a default function will be used. 
+/// members of each pair, if no specific function exists a default function will be used.
 /// will update the collision pairs accordingly.
-/// \note HS-2013-may-24 Currently handles only RigidActor, all others  will be ignored 
+/// \note HS-2013-may-24 Currently handles only RigidActor, all others  will be ignored
+
 class DcdCollision : public Computation
 {
 public:
@@ -66,7 +67,7 @@ private:
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
-	
+
 	/// List of collision pairs, recalculate every update call
 	std::list<std::shared_ptr<CollisionPair>> m_pairs;
 };

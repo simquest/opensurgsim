@@ -72,5 +72,5 @@ TEST(DcdCollisionTest, SingleCollisionTest)
 	SurgSim::Physics::DcdCollision computation;
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
 
-	EXPECT_EQ(1, newState->getCollisionPairs().size());
+	EXPECT_EQ(1u, newState->getCollisionPairs().size());
 }

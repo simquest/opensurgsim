@@ -45,7 +45,7 @@ namespace {
 	}
 	else
 	{
-		return ::testing::AssertionFailure() << std::endl << "Vectors not close, expected: " << left.transpose() << 
+		return ::testing::AssertionFailure() << std::endl << "Vectors not close, expected: " << left.transpose() <<
 			std::endl << " result: " << right.transpose() << std::endl;
 	}
 }
@@ -101,8 +101,8 @@ namespace {
 	std::shared_ptr<CollisionPair> pair01 = std::make_shared<CollisionPair>(rep0, rep1);
 }
 
-std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius, 
-													  const Quaterniond& rotation = Quaterniond(), 
+std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius,
+													  const Quaterniond& rotation = Quaterniond(),
 													  const Vector3d& position = Vector3d())
 {
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
@@ -110,8 +110,8 @@ std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius,
 	return rep;
 }
 
-std::shared_ptr<CollisionRepresentation> makePlaneRep(const Vector3d& n, const double& d, 
-													  const Quaterniond& rotation = Quaterniond(), 
+std::shared_ptr<CollisionRepresentation> makePlaneRep(const Vector3d& n, const double& d,
+													  const Quaterniond& rotation = Quaterniond(),
 													  const Vector3d& position = Vector3d())
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>(n,d);
@@ -141,9 +141,7 @@ TEST(CollisionPairTest, InitTest)
 	EXPECT_FALSE(pair.hasContacts());
 
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0));
-	EXPECT_TRUE(pair.hasContacts());
-
-		
+	EXPECT_TRUE(pair.hasContacts());		
 }
 
 
@@ -239,11 +237,10 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,2.0,0.0),
 						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
 						  false);
-
 	}	
 
 	{
- 		SCOPED_TRACE("Intersection front, no transformation");
+		SCOPED_TRACE("Intersection front, no transformation");
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,1.0,0.0),
 						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
 						 true, 0.5, Vector3d(0.0,1.0,0.0));
@@ -268,9 +265,7 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.5),
 			plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
 			true, 0.5, Vector3d(-1.0,0.0,0.0));
-	}
-
-	
+	}	
 }
 
 

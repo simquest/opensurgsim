@@ -38,9 +38,9 @@ void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> 
 
 void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" << 
+	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" <<
 																					pair->getFirst()->getShapeType();
-	SURGSIM_ASSERT(pair->getSecond()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "Second Object, wrong type of object" << 
+	SURGSIM_ASSERT(pair->getSecond()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "Second Object, wrong type of object" <<
 																					pair->getSecond()->getShapeType();
 
 	std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
@@ -75,7 +75,7 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 		representationPlane = pair->getFirst();
 	}
 
-	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" << 
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" <<
 																					pair->getFirst()->getShapeType();
 	SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) << "Second Object, wrong type of object" << 
 																					pair->getSecond()->getShapeType();

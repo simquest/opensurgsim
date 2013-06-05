@@ -39,7 +39,7 @@ DcdCollision::~DcdCollision()
 
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
-	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);	
+	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);
 
 	updatePairs(result);
 
@@ -72,9 +72,9 @@ void DcdCollision::populateCalculationTable()
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<Actor>> actors = state->getActors();	
+	std::vector<std::shared_ptr<Actor>> actors = state->getActors();
 	std::list<std::shared_ptr<RigidActor>> rigidActors;
-	
+
 	if (actors.size() > 1)
 	{
 		for (auto it = actors.cbegin(); it != actors.cend(); ++it)
@@ -86,7 +86,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			}
 		}
 	}
-	
+
 	if (rigidActors.size() > 1)
 	{
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
@@ -96,9 +96,9 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 		{
 			std::list<std::shared_ptr<RigidActor>>::iterator second = first;
 			++second;
-			for (;second != rigidActors.end(); ++second)
+			for (; second != rigidActors.end(); ++second)
 			{
-				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();		
+				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();	
 				pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
 					std::make_shared<RigidActorCollisionRepresentation>(*second));
 				pairs.push_back(pair);
