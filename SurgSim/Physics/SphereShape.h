@@ -38,7 +38,7 @@ public:
 	/// \return the type of the shape
 	int getType()
 	{
-		return RIGID_SHAPE_TYPE_BOX;
+		return RIGID_SHAPE_TYPE_SPHERE;
 	}
 
 	/// Get the sphere radius
@@ -48,7 +48,7 @@ public:
 		return m_radius;
 	}
 
-	/// Calculate the volumeof the sphere
+	/// Calculate the volume of the sphere
 	/// \return The volume of the sphere (in m-3)
 	double calculateVolume() const
 	{

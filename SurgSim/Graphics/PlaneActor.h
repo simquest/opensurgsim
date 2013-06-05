@@ -13,39 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTION_H
-#define SURGSIM_PHYSICS_FREEMOTION_H
+#ifndef SURGSIM_GRAPHICS_PLANEACTOR_H
+#define SURGSIM_GRAPHICS_PLANEACTOR_H
 
-#include <memory>
-#include <vector>
-
-
-#include <SurgSim/Physics/Computation.h>
+#include <SurgSim/Graphics/Actor.h>
 
 namespace SurgSim
 {
-namespace Physics
+
+namespace Graphics
 {
 
-class Actor;
-
-/// Apply the Freemotion calcluation to all physics representations
-class FreeMotion  : public Computation
+/// Base graphics plane actor class, which defines the basic interface for a plane that can be visualized.
+/// The plane is the XZ plane, with normal +Y.
+class PlaneActor : public virtual Actor
 {
 public:
-
 	/// Constructor
-	explicit FreeMotion();
-	~FreeMotion();
-
-protected:
-
-	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
-
+	/// \param	name	Name of the actor
+	explicit PlaneActor(const std::string& name) : Actor(name)
+	{
+	}
 };
 
-}; // Physics
-}; // SurgSim
+};  // namespace Graphics
 
-#endif
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_PLANEACTOR_H
