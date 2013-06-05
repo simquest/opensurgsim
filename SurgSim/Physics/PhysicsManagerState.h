@@ -13,14 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTION_H
-#define SURGSIM_PHYSICS_FREEMOTION_H
+#ifndef SURGSIM_PHYSICS_PHYSICSMANAGERSTATE_H
+#define SURGSIM_PHYSICS_PHYSICSMANAGERSTATE_H
 
 #include <memory>
 #include <vector>
-
-
-#include <SurgSim/Physics/Computation.h>
 
 namespace SurgSim
 {
@@ -28,20 +25,30 @@ namespace Physics
 {
 
 class Actor;
+class CollisionPair;
 
-/// Apply the Freemotion calcluation to all physics representations
-class FreeMotion  : public Computation
+class PhysicsManagerState
 {
 public:
 
 	/// Constructor
-	explicit FreeMotion();
-	~FreeMotion();
+	PhysicsManagerState() {}
+	~PhysicsManagerState() {}
 
-protected:
+	const std::vector<std::shared_ptr<Actor>>& getActors() const 
+	{ return m_actors; }
+	void setActors(const std::vector<std::shared_ptr<Actor>>& val) 
+	{ m_actors = val; }
 
-	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
+	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const 
+	{ return m_collisionPairs; }
+	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val) 
+	{ m_collisionPairs = val; }
+
+private:
+
+	std::vector<std::shared_ptr<Actor>> m_actors;
+	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
 
 };
 

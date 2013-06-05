@@ -51,7 +51,7 @@ public:
 	/// \return False if the 2 parameters set are equals, True otherwise
 	bool operator !=(const VtcRigidParameters &p) const
 	{
-		return ! (operator ==(p));
+		return ! ((*this) == p);
 	}
 
 	/// Set vtc linear stiffness

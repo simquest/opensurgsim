@@ -17,6 +17,11 @@
 
 #include <SurgSim/Physics/VtcRigidParameters.h>
 
+namespace
+{
+double epsilon = 1e-10;
+}
+
 TEST(VtcRigidParametersTest, ConstructorTest)
 {
 	ASSERT_NO_THROW({SurgSim::Physics::VtcRigidParameters vtcRigidParam;});
@@ -28,13 +33,13 @@ TEST(VtcRigidParametersTest, DefaultValueTest)
 	SurgSim::Physics::VtcRigidParameters vtcRigidParam;
 
 	// Linear damping [default = 0]
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearDamping());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcLinearDamping(), epsilon);
 	// Angular damping [default = 0]
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularDamping());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcAngularDamping(), epsilon);
 	// Linear stiffness [default = 0]
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearStiffness());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcLinearStiffness(), epsilon);
 	// Angular stiffness [default = 0]
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularStiffness());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcAngularStiffness(), epsilon);
 }
 
 TEST(VtcRigidParametersTest, SetGetTest)
@@ -44,25 +49,25 @@ TEST(VtcRigidParametersTest, SetGetTest)
 
 	// Linear damping
 	vtcRigidParam.setVtcLinearDamping(12.2);
-	EXPECT_EQ(12.2, vtcRigidParam.getVtcLinearDamping());
+	EXPECT_NEAR(12.2, vtcRigidParam.getVtcLinearDamping(), epsilon);
 	vtcRigidParam.setVtcLinearDamping(0.0);
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearDamping());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcLinearDamping(), epsilon);
 
 	// Angular damping
 	vtcRigidParam.setVtcAngularDamping(12.1);
-	EXPECT_EQ(12.1, vtcRigidParam.getVtcAngularDamping());
+	EXPECT_NEAR(12.1, vtcRigidParam.getVtcAngularDamping(), epsilon);
 	vtcRigidParam.setVtcAngularDamping(0.0);
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularDamping());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcAngularDamping(), epsilon);
 
 	// Linear stiffness
 	vtcRigidParam.setVtcLinearStiffness(12.0);
-	EXPECT_EQ(12.0, vtcRigidParam.getVtcLinearStiffness());
+	EXPECT_NEAR(12.0, vtcRigidParam.getVtcLinearStiffness(), epsilon);
 	vtcRigidParam.setVtcLinearStiffness(0.0);
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcLinearStiffness());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcLinearStiffness(), epsilon);
 	
 	// Angular stiffness
 	vtcRigidParam.setVtcAngularStiffness(11.9);
-	EXPECT_EQ(11.9, vtcRigidParam.getVtcAngularStiffness());
+	EXPECT_NEAR(11.9, vtcRigidParam.getVtcAngularStiffness(), epsilon);
 	vtcRigidParam.setVtcAngularStiffness(0.0);
-	EXPECT_EQ(0.0, vtcRigidParam.getVtcAngularStiffness());
+	EXPECT_NEAR(0.0, vtcRigidParam.getVtcAngularStiffness(), epsilon);
 }
