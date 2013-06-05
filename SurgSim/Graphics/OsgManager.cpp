@@ -31,6 +31,7 @@ OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 	m_defaultGroup(std::make_shared<OsgGroup>("Default Group"))
 {
 	m_defaultCamera = std::make_shared<OsgCamera>("Default Camera");
+	m_defaultCamera->setGroup(m_defaultGroup);
 }
 
 OsgManager::~OsgManager()
@@ -119,7 +120,7 @@ bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 
 bool OsgManager::doInitialize()
 {
-	return addActor(m_defaultCamera) && addGroup(m_defaultGroup);
+	return true;
 }
 
 bool OsgManager::doStartUp()
@@ -129,6 +130,8 @@ bool OsgManager::doStartUp()
 
 bool OsgManager::doUpdate(double dt)
 {
+	m_defaultCamera->update(dt);
+
 	if (Manager::doUpdate(dt))
 	{
 		m_viewer->frame();
