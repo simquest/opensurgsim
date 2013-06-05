@@ -33,14 +33,14 @@ public:
 	/// \param	normal	The normal.
 	/// \param	d	  	The d.
 	PlaneShape(Vector3d normal, double d) :
-		m_normal(normal.normalized()), m_d(d) 
+		m_normal(normal.normalized()), m_d(d)
 	{
-		
+
 	}
 
 	/// Constructor.
 	/// \param	point0	The point on the plane.
-	/// \param	normal	The normal.	
+	/// \param	normal	The normal.
 	PlaneShape(Vector3d point0, Vector3d normal) : m_normal(normal.normalized())
 	{
 		m_d = - m_normal.dot(point0);
@@ -102,7 +102,7 @@ private:
 	/// The normal of the plane
 	Vector3d m_normal;
 
-	/// The d of the plane 
+	/// The d of the plane
 	double m_d;
 };
 

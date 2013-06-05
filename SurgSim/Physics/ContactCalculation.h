@@ -31,7 +31,7 @@ typedef SurgSim::Framework::ReuseFactory<Contact> ContactFactory;
 class ContactCalculation
 {
 public:
-	explicit ContactCalculation() 
+	explicit ContactCalculation()
 	{
 	}
 	virtual ~ContactCalculation()
@@ -43,7 +43,7 @@ public:
 class DefaultContactCalculation : public ContactCalculation
 {
 public:
-	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert) 
+	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert)
 	{
 	}
 	virtual ~DefaultContactCalculation() {}
@@ -57,7 +57,7 @@ private:
 class SphereSphereDcdContact : public ContactCalculation
 {
 public:
-	explicit SphereSphereDcdContact() 
+	explicit SphereSphereDcdContact()
 	{
 	}
 
@@ -67,11 +67,11 @@ public:
 class SpherePlaneDcdContact : public ContactCalculation
 {
 public:
-	explicit SpherePlaneDcdContact(bool switchPair) : 
+	explicit SpherePlaneDcdContact(bool switchPair) :
 		m_switchPair(switchPair)
 	{
 	}
-	
+
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
 private:
 	bool m_switchPair;
