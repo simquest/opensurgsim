@@ -127,7 +127,7 @@ protected:
 private:
 	/// NO copy constructor
 	Actor(const Actor& a);
-	
+
 	/// NO assignement operator
 	Actor& operator =(const Actor &a);
 

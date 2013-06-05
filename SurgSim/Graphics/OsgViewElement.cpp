@@ -13,26 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Representation.h"
+#include <SurgSim/Graphics/OsgViewElement.h>
 
-SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
+#include <SurgSim/Graphics/OsgView.h>
+
+using SurgSim::Graphics::OsgView;
+using SurgSim::Graphics::OsgViewElement;
+
+OsgViewElement::OsgViewElement(const std::string& name) :
+	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View"))
 {
-
+}
+OsgViewElement::~OsgViewElement()
+{
 }
 
-SurgSim::Framework::Representation::~Representation()
+bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 {
-
+	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
+	if (osgView && ViewElement::setView(view))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
-
-bool SurgSim::Framework::Representation::doInitialize()
-{
-	return true;
-}
-
-bool SurgSim::Framework::Representation::doWakeUp()
-{
-	return true;
-}
-
-

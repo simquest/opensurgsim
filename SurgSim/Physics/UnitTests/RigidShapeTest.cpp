@@ -124,7 +124,7 @@ TEST_F(RigidShapeTest, Box)
 	mass       = b.calculateMass(m_rho);
 	massCenter = b.calculateMassCenter();
 	inertia    = b.calculateInertia(m_rho);
-		
+
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));

@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "BehaviorManager.h"
+#include "SurgSim/Framework/BehaviorManager.h"
 
 #include <memory>
 #include <vector>
 
-#include "Component.h"
-#include "Behavior.h"
-#include "Logger.h"
-#include "Runtime.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/Runtime.h"
 
 
 SurgSim::Framework::BehaviorManager::BehaviorManager() : ComponentManager("Behavior Manager")
@@ -91,7 +91,7 @@ bool SurgSim::Framework::BehaviorManager::doUpdate(double dt)
 {
 	auto endIt = m_behaviors.end();
 	auto it = m_behaviors.begin();
-	for (;it != endIt; ++it)
+	for ( ;  it != endIt;  ++it)
 	{
 		(*it)->update(dt);
 	}

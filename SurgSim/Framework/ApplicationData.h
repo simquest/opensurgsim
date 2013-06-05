@@ -98,4 +98,4 @@ private:
 }; // Framework
 }; // SurgSim
 
-#endif
+#endif // SURGSIM_FRAMEWORK_APPLICATIONDATA_H

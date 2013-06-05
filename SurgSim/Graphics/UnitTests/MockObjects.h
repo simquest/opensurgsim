@@ -336,6 +336,7 @@ public:
 	/// \param	name	Name of the view
 	/// \post m_x and m_y are initialized to 0
 	/// \post m_width is initialized to 800, m_height to 600
+	/// \post m_isWindowBorderEnabled is initialized to true
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
 	explicit MockView(const std::string& name) : SurgSim::Graphics::View(name),
@@ -343,6 +344,7 @@ public:
 		m_y(0),
 		m_width(800),
 		m_height(600),
+		m_isWindowBorderEnabled(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isInitialized(false),
@@ -361,7 +363,7 @@ public:
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y)
+	virtual void getPosition(int* x, int* y) const
 	{
 		*x = m_x;
 		*y = m_y;
@@ -378,10 +380,23 @@ public:
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height)
+	virtual void getDimensions(int* width, int* height) const
 	{
 		*width = m_width;
 		*height = m_height;
+	}
+
+	/// Sets whether the view window has a border
+	/// \param	enabled	True to enable the border around the window; false for no border
+	virtual void setWindowBorderEnabled(bool enabled)
+	{
+		m_isWindowBorderEnabled = enabled;
+	}
+	/// Returns whether the view window has a border
+	/// \return	True to enable the border around the window; false for no border
+	virtual bool isWindowBorderEnabled() const
+	{
+		return m_isWindowBorderEnabled;
 	}
 
 	/// Returns the number of times the view has been updated
@@ -435,6 +450,8 @@ private:
 	int m_x, m_y;
 	/// Dimensions of the view on the screen (in pixels)
 	int m_width, m_height;
+	/// Whether the view window has a border
+	bool m_isWindowBorderEnabled;
 
 	/// Number of times the view has been updated
 	int m_numUpdates;

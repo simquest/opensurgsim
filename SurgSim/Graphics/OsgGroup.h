@@ -48,28 +48,22 @@ public:
 	/// Adds an actor
 	/// \param	actor	Actor to add to this group
 	/// \return	True if the actor is added successfully, false if failure
-	virtual bool addActor(std::shared_ptr<Actor> actor);
+	/// Only subclasses of OsgActor will be added successfully.
+	virtual bool add(std::shared_ptr<Actor> actor);
+
+	/// Adds all actors in another group to this group
+	/// \param	group	Group of actors to add
+	/// \return	True if all actors are added successfully, false if failure
+	/// Only subclasses of OsgGroup will be appended successfully.
+	virtual bool append(std::shared_ptr<Group> group);
 
 	/// Removes an actor
 	/// \param	actor	Actor to remove from this group
 	/// \return	True if the actor is removed successfully, false if actor is not in this group or other failure
-	virtual bool removeActor(std::shared_ptr<Actor> actor);
+	virtual bool remove(std::shared_ptr<Actor> actor);
 
 	/// Removes all actors
-	virtual void clearActors();
-
-	/// Adds a-group
-	/// \param	group	Group to add as a sub-group of this group
-	/// \return	True if the group is added successfully, false if failure
-	virtual bool addGroup(std::shared_ptr<Group> group);
-
-	/// Removes a-group
-	/// \param	group	Sub-group to remove from this group
-	/// \return	True if the group is removed successfully, false if not a sub-group of this group or other failure
-	virtual bool removeGroup(std::shared_ptr<Group> group);
-
-	/// Removes all groups
-	virtual void clearGroups();
+	virtual void clear();
 
 	/// Returns the root OSG group node
 	osg::ref_ptr<osg::Group> getOsgGroup() const

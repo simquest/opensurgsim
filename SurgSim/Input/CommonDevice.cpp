@@ -127,7 +127,6 @@ bool CommonDevice::removeOutputProducer(std::shared_ptr<OutputProducerInterface>
 		return false;
 	}
 
-	
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	if (m_state->outputProducer == outputProducer)
 	{

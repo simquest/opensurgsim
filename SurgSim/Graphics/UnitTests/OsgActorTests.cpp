@@ -25,11 +25,14 @@
 
 #include <random>
 
-using SurgSim::Graphics::Actor;
-using SurgSim::Graphics::OsgActor;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+
+namespace SurgSim
+{
+namespace Graphics
+{
 
 TEST(OsgActorTests, InitTest)
 {
@@ -104,3 +107,6 @@ TEST(OsgActorTests, UpdateTest)
 		EXPECT_LT(fabs(sumDt - mockActor->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
+
+}  // namespace Graphics
+}  // namespace SurgSim

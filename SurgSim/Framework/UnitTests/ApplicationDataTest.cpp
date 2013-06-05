@@ -45,7 +45,7 @@ namespace std
 
 }
 
-::testing::AssertionResult isContained(const std::string& expected, 
+::testing::AssertionResult isContained(const std::string& expected,
 									   const std::vector<std::string>& argument)
 {
 	if (std::find(argument.cbegin(), argument.cend(), expected) != argument.cend())
@@ -61,7 +61,7 @@ namespace std
 ::testing::AssertionResult fileIsFoundCorrectly(
 	const ApplicationData& data,
 	const std::string& searchFileName,
-	const std::string& expectedDirectoryName) 
+	const std::string& expectedDirectoryName)
 {
 	// First file should be there and in directory1
 	std::string fileName = data.findFile(searchFileName);
@@ -78,17 +78,17 @@ namespace std
 	}
 	if (fileName != filePath.make_preferred().string())
 	{
-		return ::testing::AssertionFailure() << "Result not system format path " << fileName << 
+		return ::testing::AssertionFailure() << "Result not system format path " << fileName <<
 			" expected " << filePath.make_preferred().string();
 	}
 	if (boost::filesystem::path(searchFileName).filename() != filePath.filename() )
 	{
-		return ::testing::AssertionFailure() << "Expected " << searchFileName << 
+		return ::testing::AssertionFailure() << "Expected " << searchFileName <<
 			" Result " << filePath.filename();
 	}
 	if ( fileName.find(expectedDirectoryName) == std::string::npos)
 	{
-		return ::testing::AssertionFailure() << "Expected the file to be in subdirectory " << 
+		return ::testing::AssertionFailure() << "Expected the file to be in subdirectory " <<
 			expectedDirectoryName << " but is not " << fileName;
 	}
 	return ::testing::AssertionSuccess();
@@ -133,7 +133,7 @@ TEST(ApplicationDataTest, GetPathsTest)
 	ApplicationData data (paths);
 
 	ASSERT_EQ(2u, data.getPaths().size());
-	
+
 	paths = data.getPaths();
 
 	EXPECT_TRUE(boost::filesystem::equivalent(
@@ -152,7 +152,7 @@ TEST (ApplicationDataTest, FindFileTest)
 	paths.push_back("Data/ApplicationDataTest/Directory1");
 	paths.push_back("Data/ApplicationDataTest/Directory2");
 	ApplicationData data (paths);
-	
+
 	std::string fileName;
 	boost::filesystem::path filePath;
 
