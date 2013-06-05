@@ -166,7 +166,7 @@ public:
 	}
 
 	/// Set the linear damping parameter
-	/// \param The linear damping parameter (in N.s.m-1)
+	/// \param linearDamping The linear damping parameter (in N.s.m-1)
 	void setLinearDamping(double linearDamping)
 	{
 		m_linearDamping = linearDamping;
@@ -180,7 +180,7 @@ public:
 	}
 
 	/// Set the angular damping parameter
-	/// \param The angular damping parameter (in N.m.s.rad-1)
+	/// \param angularDamping The angular damping parameter (in N.m.s.rad-1)
 	void setAngularDamping(double angularDamping)
 	{
 		m_angularDamping = angularDamping;

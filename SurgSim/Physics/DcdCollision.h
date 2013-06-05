@@ -53,7 +53,8 @@ public:
 protected:
 
 	/// Executes the update operation, overridden from Computation.
-	/// \param	dt	The time passed.
+	/// \param dt	The time passed.
+	/// \param state The PhysicsManagerState from previous computation. 
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
 
 private:
