@@ -84,7 +84,7 @@ public:
 	/// \return False if the 2 parameters set are equals, True otherwise
 	bool operator !=(const RigidActorParameters &c) const
 	{
-		return ! (operator ==(c));
+		return ! ((*this) == c);
 	}
 
 	/// Set the mass density of the rigid actor
