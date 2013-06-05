@@ -63,7 +63,7 @@ TEST(FreeMotionTest, RunTest)
 	actor->setIsGravityEnabled(false);
 	EXPECT_TRUE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
 	state = computation.update(1.0,state);
-	
+
 	actor->setIsGravityEnabled(true);
 
 	EXPECT_TRUE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));

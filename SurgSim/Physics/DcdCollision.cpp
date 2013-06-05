@@ -98,7 +98,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			++second;
 			for (; second != rigidActors.end(); ++second)
 			{
-				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();	
+				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
 				pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
 					std::make_shared<RigidActorCollisionRepresentation>(*second));
 				pairs.push_back(pair);
