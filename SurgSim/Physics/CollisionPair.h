@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Contact data structure used when two representations touch each other 
+/// Contact data structure used when two representations touch each other
 /// The convention is that if body 1 is moved along the normal vector by
 /// a distance depth (or equivalently if body 2 is moved the same distance
 /// in the opposite direction) then the penetration depth will be reduced to
@@ -52,7 +52,7 @@ public:
 
 	/// Normal constructor
 	CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second);
-	
+
 	/// Destructor
 	~CollisionPair();
 
@@ -63,7 +63,7 @@ public:
 	{
 		SURGSIM_ASSERT(first != second) << "Should try to collide with self";
 		SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
-		
+
 		// Invalidate the current contacts
 		clearContacts();
 		m_first = first;
@@ -100,7 +100,6 @@ public:
 
 	/// Adds a contact to the collision pair.
 	/// \param	depth			The depth of the intersection.
-	/// \param	contactPoint	The contact point, between the two bodies.
 	/// \param	normal			The normal of the contact pointing into the first representation.
 	inline void addContact(const double& depth, SurgSim::Math::Vector3d normal)
 	{

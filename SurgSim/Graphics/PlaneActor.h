@@ -13,44 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_GRAPHICS_PLANEACTOR_H
+#define SURGSIM_GRAPHICS_PLANEACTOR_H
 
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Graphics/Actor.h>
 
 namespace SurgSim
 {
-namespace Physics
+
+namespace Graphics
 {
 
-
-FreeMotion::FreeMotion()
+/// Base graphics plane actor class, which defines the basic interface for a plane that can be visualized.
+/// The plane is the XZ plane, with normal +Y.
+class PlaneActor : public virtual Actor
 {
-
-}
-
-FreeMotion::~FreeMotion()
-{
-
-}
-
-std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
-{
-	// Copy state to new state
-	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);
-	std::vector<std::shared_ptr<Actor>> actors = result->getActors();
-
-	auto it = actors.begin();
-	auto itEnd = actors.end();
-	for (; it != itEnd; ++it)
+public:
+	/// Constructor
+	/// \param	name	Name of the actor
+	explicit PlaneActor(const std::string& name) : Actor(name)
 	{
-		(*it)->update(dt);
 	}
-	return result;
-}
+};
 
+};  // namespace Graphics
 
-}; // Physics
-}; // SurgSim
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_PLANEACTOR_H
