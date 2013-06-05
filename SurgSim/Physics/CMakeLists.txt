@@ -18,10 +18,8 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
-	CapsuleShape.cpp
 	CollisionPair.cpp
 	ContactCalculation.cpp
-	CylinderShape.cpp
 	DcdCollision.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
