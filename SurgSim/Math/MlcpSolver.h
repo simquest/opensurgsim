@@ -30,6 +30,11 @@ public:
 	/// \param [out] solution the solution to the problem, if available.
 	/// \return true if solved (in which case solution will be set to the solution); false if failed.
 	virtual bool solve(const MlcpProblem& problem, MlcpSolution* solution) = 0;
+
+private:
+	// Prevent copy construction and assignment.
+	MlcpSolver(const MlcpSolver&);
+	MlcpSolver& operator==(const MlcpSolver&);
 };
 
 };  // namespace Math

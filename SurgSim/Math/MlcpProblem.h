@@ -64,31 +64,49 @@ struct MlcpProblem
 	}
 
 	MlcpProblem(const MlcpProblem& other) :
-		HCHt(other.HCHt),
-		E(other.E),
+		A(other.A),
+		b(other.b),
 		mu(other.mu),
 		constraintTypes(other.constraintTypes)
 	{
 	}
 
+	MlcpProblem(MlcpProblem&& other) :
+		A(std::move(other.A)),
+		b(std::move(other.b)),
+		mu(std::move(other.mu)),
+		constraintTypes(std::move(other.constraintTypes))
+	{
+	}
+
 	MlcpProblem& operator= (const MlcpProblem& other)
 	{
-		HCHt = other.HCHt;
-		E = other.E;
+		A = other.A;
+		b = other.b;
 		mu = other.mu;
 		constraintTypes = other.constraintTypes;
+		return *this;
+	}
+
+	MlcpProblem& operator= (MlcpProblem&& other)
+	{
+		A = std::move(other.A);
+		b = std::move(other.b);
+		mu = std::move(other.mu);
+		constraintTypes = std::move(other.constraintTypes);
+		return *this;
 	}
 
 	int getSize() const
 	{
-		return E.rows();
+		return b.rows();
 	}
 
 	bool isConsistent() const
 	{
 		int numConstraintTypes = constraintTypes.size();
-		return ((E.rows() >= 0) && (E.cols() == 1) && (HCHt.rows() == E.rows()) && (HCHt.cols() == HCHt.rows()) &&
-		        (numConstraintTypes <= E.rows()) && (mu.size() == numConstraintTypes));
+		return ((b.rows() >= 0) && (b.cols() == 1) && (A.rows() == b.rows()) && (A.cols() == A.rows()) &&
+		        (numConstraintTypes <= b.rows()) && (mu.size() == numConstraintTypes));
 	}
 };
 
