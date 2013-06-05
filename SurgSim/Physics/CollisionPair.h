@@ -100,7 +100,6 @@ public:
 
 	/// Adds a contact to the collision pair.
 	/// \param	depth			The depth of the intersection.
-	/// \param	contactPoint	The contact point, between the two bodies.
 	/// \param	normal			The normal of the contact pointing into the first representation.
 	inline void addContact(const double& depth, SurgSim::Math::Vector3d normal)
 	{
