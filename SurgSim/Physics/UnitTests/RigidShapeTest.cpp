@@ -361,36 +361,17 @@ TEST_F(RigidShapeTest, CapsuleZ)
 
 TEST_F (RigidShapeTest, PlaneTest)
 {
-	Vector3d n(1.0,2.0,3.0);
-	Vector3d p0(2.0,4.0,5.0);
-	double d = 1.0;
-	EXPECT_NO_THROW({PlaneShape shape(n,d);});
+	Vector3d n(0.0,1.0,0.0);
+	double d = 0.0;
+	EXPECT_NO_THROW({PlaneShape shape;});
 
-	PlaneShape normalForm(n,d);
-	EXPECT_EQ(d, normalForm.getD());
-	EXPECT_TRUE(n.normalized().isApprox(normalForm.getNormal()));
-	EXPECT_EQ(RIGID_SHAPE_TYPE_PLANE, normalForm.getType());
+	PlaneShape plane;
+	EXPECT_EQ(d, plane.getD());
+	EXPECT_TRUE(n.isApprox(plane.getNormal()));
+	EXPECT_EQ(RIGID_SHAPE_TYPE_PLANE, plane.getType());
 
-	PlaneShape pointAndNormal(p0,n);
-	EXPECT_TRUE(n.normalized().isApprox(pointAndNormal.getNormal()));
-
-	double expectedD = - n.normalized().dot(p0);
-	EXPECT_NEAR(expectedD, pointAndNormal.getD(), epsilon);
-
-	Vector3d p1(4.0,5.0,6.0);
-	Vector3d p2(0.0,2.0,1.0);
-
-	PlaneShape threePoints(p0, p1, p2);
-
-	Vector3d expectedN = (p1 - p0).cross(p2 - p0);
-	expectedN.normalize();
-	expectedD = - expectedN.dot(p0);
-
-	EXPECT_TRUE(expectedN.normalized().isApprox(threePoints.getNormal()));
-	EXPECT_NEAR(expectedD, threePoints.getD(), epsilon);
-
-	EXPECT_EQ(0.0, normalForm.calculateVolume());
-	EXPECT_EQ(0.0, normalForm.calculateMass(1.0));
-	EXPECT_EQ(Vector3d(0,0,0), normalForm.calculateMassCenter());
-	EXPECT_EQ(Matrix33d::Identity(), normalForm.calculateInertia(1.0));
+	EXPECT_EQ(0.0, plane.calculateVolume());
+	EXPECT_EQ(0.0, plane.calculateMass(1.0));
+	EXPECT_EQ(Vector3d(0.0,0.0,0.0), plane.calculateMassCenter());
+	EXPECT_EQ(Matrix33d::Identity(), plane.calculateInertia(1.0));
 }
