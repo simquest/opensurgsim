@@ -67,9 +67,9 @@ TEST(FreeMotionTest, RunTest)
 
 	FreeMotion computation(actors);
 
-	EXPECT_TRUE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
+	EXPECT_TRUE(actor->getPose().translation().isZero());
 	computation.update(1.0);
-	EXPECT_FALSE(Vector3d(0.0,0.0,0.0).isApprox(actor->getPose().translation()));
+	EXPECT_FALSE(actor->getPose().translation().isZero());
 
 }
 
