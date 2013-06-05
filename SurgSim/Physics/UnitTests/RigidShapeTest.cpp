@@ -127,45 +127,11 @@ TEST_F(RigidShapeTest, Box)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(RigidShapeTest, CylinderX)
+TEST_F(RigidShapeTest, Cylinder)
 {
-	ASSERT_NO_THROW({CylinderShape<SHAPE_DIRECTION_AXIS_X> c(m_length, m_radius);});
+	ASSERT_NO_THROW({CylinderShape c(m_length, m_radius);});
 
-	CylinderShape<SHAPE_DIRECTION_AXIS_X> c(m_length, m_radius);
-	EXPECT_EQ(m_length, c.getLength());
-	EXPECT_EQ(m_radius, c.getRadius());
-
-	double expectedVolume = M_PI * m_radius * m_radius * m_length;
-	double expectedMass = m_rho * expectedVolume;
-
-	double r1sq = m_radius * m_radius;
-	double l2 = m_length * m_length;
-	double coefDir = 1.0 /  2.0 * expectedMass * (r1sq);
-	double coef    = 1.0 / 12.0 * expectedMass * (3.0 * (r1sq) + l2);
-	Matrix33d expectedInertia;
-	expectedInertia << coefDir, 0.0, 0.0,
-		0.0, coef, 0.0,
-		0.0, 0.0, coef;
-
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = c.calculateVolume();
-	mass       = c.calculateMass(m_rho);
-	massCenter = c.calculateMassCenter();
-	inertia    = c.calculateInertia(m_rho);
-
-	double epsilon = 1e-10;
-	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
-	EXPECT_TRUE(expectedInertia.isApprox(inertia));
-}
-
-TEST_F(RigidShapeTest, CylinderY)
-{
-	ASSERT_NO_THROW({CylinderShape<SHAPE_DIRECTION_AXIS_Y> c(m_length, m_radius);});
-
-	CylinderShape<SHAPE_DIRECTION_AXIS_Y> c(m_length, m_radius);
+	CylinderShape c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
 
@@ -195,88 +161,11 @@ TEST_F(RigidShapeTest, CylinderY)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(RigidShapeTest, CylinderZ)
+TEST_F(RigidShapeTest, Capsule)
 {
-	ASSERT_NO_THROW({CylinderShape<SHAPE_DIRECTION_AXIS_Z> c(m_length, m_radius);});
+	ASSERT_NO_THROW({CapsuleShape c(m_length, m_radius);});
 
-	CylinderShape<SHAPE_DIRECTION_AXIS_Z> c(m_length, m_radius);
-	EXPECT_EQ(m_length, c.getLength());
-	EXPECT_EQ(m_radius, c.getRadius());
-
-	double expectedVolume = M_PI * m_radius * m_radius * m_length;
-	double expectedMass = m_rho * expectedVolume;
-
-	double r1sq = m_radius * m_radius;
-	double l2 = m_length * m_length;
-	double coefDir = 1.0 /  2.0 * expectedMass * (r1sq);
-	double coef    = 1.0 / 12.0 * expectedMass * (3.0 * (r1sq) + l2);
-	Matrix33d expectedInertia;
-	expectedInertia << coef, 0.0, 0.0,
-		0.0, coef, 0.0,
-		0.0, 0.0, coefDir;
-
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = c.calculateVolume();
-	mass       = c.calculateMass(m_rho);
-	massCenter = c.calculateMassCenter();
-	inertia    = c.calculateInertia(m_rho);
-
-	double epsilon = 1e-10;
-	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
-	EXPECT_TRUE(expectedInertia.isApprox(inertia));
-}
-
-TEST_F(RigidShapeTest, CapsuleX)
-{
-	ASSERT_NO_THROW({CapsuleShape<SHAPE_DIRECTION_AXIS_X> c(m_length, m_radius);});
-
-	CapsuleShape<SHAPE_DIRECTION_AXIS_X> c(m_length, m_radius);
-	EXPECT_EQ(m_length, c.getLength());
-	EXPECT_EQ(m_radius, c.getRadius());
-
-	double r2 = m_radius * m_radius;
-	double r3 = r2 * m_radius;
-	double l2 = m_length * m_length;
-
-	double volumeCylinder = M_PI * r2 * m_length;
-	double massCylinder = m_rho * volumeCylinder;
-	double volumeSphere = 4.0 / 3.0 * M_PI * r3;
-	double massSphere = m_rho * volumeSphere;
-	double expectedVolume = volumeCylinder + volumeSphere;
-	double expectedMass = m_rho * expectedVolume;
-
-	double coefDir = 2.0 /  5.0 * massSphere * r2;
-	double coef    = coefDir;
-	coefDir += 1.0 / 2.0 * massCylinder * r2;
-	coef += massSphere  * (1.0 / 4.0 * l2 + 3.0 / 8.0 * m_radius * m_length);
-	coef += 1.0 / 12.0 * massCylinder * (3*r2 + l2);
-	Matrix33d expectedInertia;
-	expectedInertia << coefDir, 0.0, 0.0,
-		0.0, coef, 0.0,
-		0.0, 0.0, coef;
-
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = c.calculateVolume();
-	mass       = c.calculateMass(m_rho);
-	massCenter = c.calculateMassCenter();
-	inertia    = c.calculateInertia(m_rho);
-
-	double epsilon = 1e-10;
-	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
-	EXPECT_TRUE(expectedInertia.isApprox(inertia));
-}
-
-TEST_F(RigidShapeTest, CapsuleY)
-{
-	ASSERT_NO_THROW({CapsuleShape<SHAPE_DIRECTION_AXIS_Y> c(m_length, m_radius);});
-
-	CapsuleShape<SHAPE_DIRECTION_AXIS_Y> c(m_length, m_radius);
+	CapsuleShape c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
 
@@ -299,48 +188,6 @@ TEST_F(RigidShapeTest, CapsuleY)
 	expectedInertia << coef, 0.0, 0.0,
 		0.0, coefDir, 0.0,
 		0.0, 0.0, coef;
-
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = c.calculateVolume();
-	mass       = c.calculateMass(m_rho);
-	massCenter = c.calculateMassCenter();
-	inertia    = c.calculateInertia(m_rho);
-
-	double epsilon = 1e-10;
-	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
-	EXPECT_TRUE(expectedInertia.isApprox(inertia));
-}
-
-TEST_F(RigidShapeTest, CapsuleZ)
-{
-	ASSERT_NO_THROW({CapsuleShape<SHAPE_DIRECTION_AXIS_Z> c(m_length, m_radius);});
-
-	CapsuleShape<SHAPE_DIRECTION_AXIS_Z> c(m_length, m_radius);
-	EXPECT_EQ(m_length, c.getLength());
-	EXPECT_EQ(m_radius, c.getRadius());
-
-	double r2 = m_radius * m_radius;
-	double r3 = r2 * m_radius;
-	double l2 = m_length * m_length;
-
-	double volumeCylinder = M_PI * r2 * m_length;
-	double massCylinder = m_rho * volumeCylinder;
-	double volumeSphere = 4.0 / 3.0 * M_PI * r3;
-	double massSphere = m_rho * volumeSphere;
-	double expectedVolume = volumeCylinder + volumeSphere;
-	double expectedMass = massCylinder + massSphere;
-	double coefDir = 2.0 /  5.0 * massSphere * r2;
-	double coef    = coefDir;
-	coefDir += 1.0 / 2.0 * massCylinder * r2;
-	coef += massSphere  * (1.0 / 4.0 * l2 + 3.0 / 8.0 * m_radius * m_length);
-	coef += 1.0 / 12.0 * massCylinder * (3*r2 + l2);
-	Matrix33d expectedInertia;
-	expectedInertia << coef, 0.0, 0.0,
-		0.0, coef, 0.0,
-		0.0, 0.0, coefDir;
 
 	double volume, mass;
 	Vector3d massCenter;
