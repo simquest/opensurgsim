@@ -58,4 +58,4 @@ private:
 }; // namespace Framework
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_FRAMEWORK_BEHAVIORMANAGER_H

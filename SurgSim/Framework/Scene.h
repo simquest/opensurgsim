@@ -65,6 +65,7 @@ private:
 	std::map<std::string,std::shared_ptr<SceneElement>> m_elements;
 };
 
-}
-}
-#endif
+}; // namespace Framework
+}; // namespace SurgSim
+
+#endif // SURGSIM_FRAMEWORK_SCENE_H
