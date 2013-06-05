@@ -34,7 +34,6 @@ public:
 	{
 		m_rho = 9000.0;
 		m_radius = 0.01;
-		m_innerRadius = 0.005;
 		m_length = 0.1;
 		m_size[0] = 0.1;
 		m_size[1] = 0.2;
@@ -50,9 +49,6 @@ public:
 
 	// Radius (sphere/cylinder/capsule)
 	double m_radius;
-
-	// Inner radius (cylinder)
-	double m_innerRadius;
 
 	// Length (cylinder/capsule)
 	double m_length;
