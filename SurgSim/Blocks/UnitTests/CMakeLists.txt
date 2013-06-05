@@ -13,22 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+find_package(OpenThreads)
 
 include_directories(
-	"${Boost_INCLUDE_DIR}"
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
-add_subdirectory(Blocks)
-# add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Physics)
+set(UNIT_TEST_SOURCES
+	RepresentationPoseBehaviorTests.cpp
+)
 
-surgsim_cpplint_this_tree(cpplintSurgSim)
+set(UNIT_TEST_HEADERS
+)
+
+set(LIBS SurgSimFramework SurgSimPhysics SurgSimGraphics gtest 
+	${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
+surgsim_add_unit_tests(SurgSimBlocksTest)
