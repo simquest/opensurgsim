@@ -32,15 +32,21 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right)
+namespace {
+	double epsilon = 1e-10;
+}
+
+::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right, double epsilon)
 {
-	if (left.isApprox(right))
+	double dist = left.norm() - right.norm();
+	if (std::abs(dist) < epsilon)
 	{
 		return ::testing::AssertionSuccess();
 	}
 	else
 	{
-		return ::testing::AssertionFailure() << "Eigen values not near, expected: " << left << std::endl << " result: " << right;
+		return ::testing::AssertionFailure() << std::endl << "Vectors not close, expected: " << left.transpose() << 
+			std::endl << " result: " << right.transpose() << std::endl;
 	}
 }
 
@@ -133,7 +139,11 @@ TEST(CollisionPairTest, InitTest)
 	EXPECT_EQ(rep0, pair.getFirst());
 	EXPECT_EQ(rep1, pair.getSecond());
 	EXPECT_FALSE(pair.hasContacts());
-	
+
+	pair.addContact(1.0, Vector3d(1.0,0.0,0.0));
+	EXPECT_TRUE(pair.hasContacts());
+
+		
 }
 
 
@@ -161,7 +171,7 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 	{
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
 		Vector3d dist = (p1 - p0).normalized();
-		EXPECT_TRUE(eigenEqual(dist, contact->normal));
+		EXPECT_TRUE(eigenEqual(dist, contact->normal, epsilon));
 		EXPECT_NEAR(d, contact->depth, 1e-10);
 	}
 }
@@ -195,7 +205,7 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 			ASSERT_TRUE(pair->hasContacts());
 			std::shared_ptr<Contact> contact = pair->getContacts().front();
 			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
-			EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal));
+			EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
 		}
 		else
 		{
@@ -210,8 +220,8 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 		{
 			ASSERT_TRUE(pair->hasContacts());
 			std::shared_ptr<Contact> contact = pair->getContacts().front();
-			EXPECT_NEAR(expectedDepth, -contact->depth, 1e-10);
-			EXPECT_TRUE(eigenEqual(expectedNorm, -contact->normal));
+			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
+			EXPECT_TRUE(eigenEqual(expectedNorm, -contact->normal, epsilon));
 		}
 		else
 		{
@@ -221,13 +231,13 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 
 TEST(ContactCalculationTests, SperePlaneCalculation)
 {
-	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>(Vector3d(0.0,1.0,0.0),-0.5);
+	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>(Vector3d(0.0,1.0,0.0),0.0);
 	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
 
 	{
 		SCOPED_TRACE("No Intersection, no transformation");
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,2.0,0.0),
-						  plane,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
 						  false);
 
 	}	
@@ -235,15 +245,29 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 	{
  		SCOPED_TRACE("Intersection front, no transformation");
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,1.0,0.0),
-						  plane,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
 						 true, 0.5, Vector3d(0.0,1.0,0.0));
 	}
 
 	{
 		SCOPED_TRACE("Intersection back, no transformation");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0,0.0),
-			plane,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
+			plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
 			true, 0.5, Vector3d(0.0,-1.0,0.0));
+	}
+
+	{
+		SCOPED_TRACE("Intersection front, sphere center on the plane, rotated plane");
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0,0.0),
+						  plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
+			              true, 1.0, Vector3d(-1.0,0.0,0.0));
+	}
+
+	{
+		SCOPED_TRACE("Intersection front, transformed Plane");
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.5),
+			plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
+			true, 0.5, Vector3d(-1.0,0.0,0.0));
 	}
 
 	

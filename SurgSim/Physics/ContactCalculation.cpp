@@ -90,11 +90,12 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 
 	Vector3d result;
 	double dist = SurgSim::Math::distancePointPlane(sphereCenter, plane->getNormal(), plane->getD(), &result);
-	
-	if (std::abs(dist) < sphere->getRadius())
+	double distAbsolute = std::abs(dist);
+	if (distAbsolute < sphere->getRadius())
 	{
+		double depth = sphere->getRadius() - distAbsolute;
 		double factor = ((dist < 0) ? -1.0 : 1.0) * ((m_switchPair) ? -1.0 : 1.0);
-		pair->addContact(dist * factor, representationPlane->getLocalToWorldTransform() * plane->getNormal() * factor);
+		pair->addContact(depth, (representationPlane->getLocalToWorldTransform() * plane->getNormal() * factor).normalized());
 	}
 }
 
