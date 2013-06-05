@@ -191,7 +191,7 @@ def check_header_guard(flags, file):
   else:
     def_match = re.match(r'^\s*#\s*define\s+(\w+)\s*$',
                          re.sub(r'/\*.*?\*/', '',
-                                re.sub(r'//.*', '', define[0])))
+                                re.sub(r'//.*', '', define[0][1])))
     if not def_match:
       emit_error({'file': file, 'line': define[0][0],
                   'category': "opensurgsim/internal",
