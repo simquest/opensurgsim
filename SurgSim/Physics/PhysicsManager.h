@@ -37,6 +37,7 @@ namespace Physics
 
 class Actor;
 class FreeMotion;
+class DcdCollision;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -80,12 +81,13 @@ protected:
 
 private:
 
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>> > m_actors;
+	std::vector<std::shared_ptr<Actor>> m_actors;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	///@{
 	/// Steps to perform the physics update
 	std::unique_ptr<FreeMotion> m_freeMotionStep;
+	std::unique_ptr<DcdCollision> m_dcdCollision;
 	///@}
 
 };

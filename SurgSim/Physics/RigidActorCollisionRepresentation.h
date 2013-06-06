@@ -48,6 +48,7 @@ public:
 
 private:
 
+	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
 	std::shared_ptr<RigidActor> m_actor;
 };
 

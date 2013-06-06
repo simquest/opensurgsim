@@ -15,72 +15,97 @@
 
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidActor.h>
 #include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
-
-namespace {
-	using SurgSim::Physics::RigidShape;
-	using SurgSim::Physics::SphereShape;
-	using SurgSim::Physics::CollisionPair;
-	using SurgSim::Physics::CollisionRepresentation;
-	using SurgSim::Physics::Contact;
-
-	using SurgSim::Math::RigidTransform3d;
-	using SurgSim::Math::Vector3d;
-
-	bool intersectSphereSphere(std::shared_ptr<CollisionPair> pair)
-	{
-		bool result = false;
-		std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
-		std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
-
-		Vector3d leftCenter = pair->getFirst()->getLocalToWorldTransform().translation();
-		Vector3d rightCenter = pair->getSecond()->getLocalToWorldTransform().translation();
-
-		Vector3d normal = rightCenter - leftCenter;
-		double dist = normal.norm();
-		double maxDist = leftSphere->getRadius() + rightSphere->getRadius();
-		if (dist < maxDist)
-		{
-			result = true;
-			pair->addContact(maxDist - dist, leftCenter + normal*0.5, normal.normalized());
-		}
-		return result;
-	}
-}
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-DcdCollision::DcdCollision(std::shared_ptr<std::vector<std::shared_ptr<CollisionPair>>> pairs) :
-	m_pairs(pairs)
+DcdCollision::DcdCollision()
 {
-
+	populateCalculationTable();
 }
 
 DcdCollision::~DcdCollision()
 {
-
+	m_pairs.clear();
 }
 
-void DcdCollision::doUpdate(double dt)
+std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
-	std::list<CollisionPair> result;
-	auto it = m_pairs->cbegin();
-	auto itEnd = m_pairs->cend();
+	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);
+
+	updatePairs(result);
+
+	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();
+	auto it = m_pairs.cbegin();
+	auto itEnd = m_pairs.cend();
 	while (it != itEnd)
 	{
-		calculateContacts(*it);
+		int i = (*it)->getFirst()->getShapeType();
+		int j = (*it)->getSecond()->getShapeType();
+		m_contactCalculations[i][j]->calculateContact(*it);
 		++it;
 	}
+	return result;
 }
 
-void DcdCollision::calculateContacts(std::shared_ptr<CollisionPair> it)
+void DcdCollision::populateCalculationTable()
 {
-	intersectSphereSphere(it);
+	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
+	{
+		for (int j = 0; j < RIGID_SHAPE_TYPE_COUNT; ++j)
+		{
+			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
+		}
+	}
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact());
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(false));
+	m_contactCalculations[RIGID_SHAPE_TYPE_PLANE][RIGID_SHAPE_TYPE_SPHERE].reset(new SpherePlaneDcdContact(true));
+}
+
+void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
+{
+	std::vector<std::shared_ptr<Actor>> actors = state->getActors();
+	std::list<std::shared_ptr<RigidActor>> rigidActors;
+
+	if (actors.size() > 1)
+	{
+		for (auto it = actors.cbegin(); it != actors.cend(); ++it)
+		{
+			std::shared_ptr<RigidActor> rigid = std::dynamic_pointer_cast<RigidActor>(*it);
+			if (rigid != nullptr && rigid->isActive())
+			{
+				rigidActors.push_back(rigid);
+			}
+		}
+	}
+
+	if (rigidActors.size() > 1)
+	{
+		std::vector<std::shared_ptr<CollisionPair>> pairs;
+		auto firstEnd = rigidActors.end();
+		--firstEnd;
+		for (auto first = rigidActors.begin(); first != firstEnd; ++first)
+		{
+			std::list<std::shared_ptr<RigidActor>>::iterator second = first;
+			++second;
+			for (; second != rigidActors.end(); ++second)
+			{
+				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
+				pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
+					std::make_shared<RigidActorCollisionRepresentation>(*second));
+				pairs.push_back(pair);
+			}
+		}
+		state->setCollisionPairs(pairs);
+	}
 }
 
 }; // Physics

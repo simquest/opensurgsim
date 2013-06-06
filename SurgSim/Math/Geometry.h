@@ -20,7 +20,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-/// \file Collection of functions that calculation geometric properties of various basic geometric shapes.
+/// \file Geometry.h a collection of functions that calculation geometric properties of various basic geometric shapes.
 /// 	  Point, LineSegment, Plane, Triangle. All functions are templated for the accuracy of the calculation
 /// 	  (float/double). There are also three kinds of epsilon defined that are used on a case by case basis.
 /// 	  In general all function here will return a floating point or boolean value and take a series of output
@@ -55,7 +55,7 @@ namespace Geometry
 /// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
 /// appear in the list of parameters.
 /// \tparam T Floating point type of the calculation, can usually be inferred.
-/// \param a,b,c,d,e Values that are searched for the minimum.
+/// \param a,b,c Values that are searched for the minimum.
 /// \return [0-2] with then number being equivalent to the place of the parameter with the smallest value
 template <class T> inline
 	size_t indexOfMinimum(T a, T b, T c)
@@ -1158,7 +1158,7 @@ T distanceTrianglePlane(
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param pn0,pd0	Normal and constant of the first plane, nx + d = 0.
-/// \param pn1,pd2	Normal and constant of the second plane, nx + d = 0.
+/// \param pn1,pd1	Normal and constant of the second plane, nx + d = 0.
 /// \param [out] pt0,pt1 Two points on the intersection line, not valid if there is no intersection.
 /// \return true when a unique line exists, false for disjoint or coinciding.
 template <class T, int MOpt> inline
@@ -1218,9 +1218,9 @@ T distanceSegmentTriangle(
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param sv0,sv1	Extremities of the line segment.
 /// \param tv0, tv1, tv2 Points of the triangle.
-/// \param n		Normal of the triangle (Expected to be normalized)
-/// \param [OUT] segmentPoint Closest point on the segment.
-/// \param [OUT] trianglePoint Closest point on the triangle.
+/// \param normal		Normal of the triangle (Expected to be normalized)
+/// \param [out] segmentPoint Closest point on the segment.
+/// \param [out] trianglePoint Closest point on the triangle.
 /// \return the distance between the two closest points.
 template <class T, int MOpt> inline
 T distanceSegmentTriangle(

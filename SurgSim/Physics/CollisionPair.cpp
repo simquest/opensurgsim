@@ -24,8 +24,9 @@ namespace Physics
 {
 
 CollisionPair::CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second) :
-		m_representations(first, second)
+		m_first(first), m_second(second)
 {
+	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
 	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
 }
 
