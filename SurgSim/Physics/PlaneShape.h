@@ -24,12 +24,13 @@ namespace SurgSim
 namespace Physics
 {
 
-/// PlaneShape a plane with the form nx + d = 0
+/// PlaneShape: The XZ plane (d = 0) with normal pointing along
+/// positive Y axis.
 class PlaneShape: public RigidShape
 {
 public:
 
-	/// Constructor from the plane equation nx + d = 0.
+	/// Constructor: No members to initialize.
 	PlaneShape()
 	{
 
@@ -64,14 +65,14 @@ public:
 	}
 
 	/// Gets the d of the plane equation.
-	/// \return	The value of d.
+	/// \return	The value of d (always 0).
 	inline double getD()
 	{
 		return 0.0;
 	}
 
 	/// Gets the normal of the plane equation.
-	/// \return	The value of the normal.
+	/// \return	The value of the normal (always Y axis).
 	inline Vector3d getNormal()
 	{
 		return Vector3d(0.0, 1.0, 0.0);
