@@ -16,13 +16,13 @@
 #ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Graphics/Actor.h"
-#include "SurgSim/Graphics/Camera.h"
-#include "SurgSim/Graphics/Group.h"
-#include "SurgSim/Graphics/Manager.h"
-#include "SurgSim/Graphics/View.h"
-#include "SurgSim/Graphics/ViewElement.h"
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Graphics/Actor.h>
+#include <SurgSim/Graphics/Camera.h>
+#include <SurgSim/Graphics/Group.h>
+#include <SurgSim/Graphics/Manager.h>
+#include <SurgSim/Graphics/View.h>
+#include <SurgSim/Graphics/ViewElement.h>
 
 /// Manager class for testing
 class MockManager : public SurgSim::Graphics::Manager
@@ -462,6 +462,31 @@ private:
 	bool m_isInitialized;
 	/// Whether the view has been awoken
 	bool m_isAwoken;
+};
+
+/// Representation that does not subclass any graphics components
+class NonGraphicsRepresentation : public SurgSim::Framework::Representation
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the representation
+	NonGraphicsRepresentation(const std::string& name) : SurgSim::Framework::Representation(name)
+	{
+	}
+
+	/// Sets the current pose of the representation
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+		m_pose = transform;
+	}
+	/// Returns the current pose of the representation
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	{
+		return m_pose;
+	}
+private:
+	/// Current pose of the representation
+	SurgSim::Math::RigidTransform3d m_pose;
 };
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
