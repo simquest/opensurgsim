@@ -27,7 +27,7 @@ using boost::filesystem::path;
 namespace std
 {
 
-::std::ostream& operator<<(::std::ostream& os, const vector<std::string>& content) 
+::std::ostream& operator<<(::std::ostream& os, const vector<std::string>& content)
 {
 	os << "(";
 

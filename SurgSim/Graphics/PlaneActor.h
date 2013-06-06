@@ -13,9 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/CylinderShape.h>
+#ifndef SURGSIM_GRAPHICS_PLANEACTOR_H
+#define SURGSIM_GRAPHICS_PLANEACTOR_H
 
-// Explicit instantiation for compile test and code generation
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Y>;
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Z>;
+#include <SurgSim/Graphics/Actor.h>
+
+namespace SurgSim
+{
+
+namespace Graphics
+{
+
+/// Base graphics plane actor class, which defines the basic interface for a plane that can be visualized.
+/// The plane is the XZ plane, with normal +Y.
+class PlaneActor : public virtual Actor
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the actor
+	explicit PlaneActor(const std::string& name) : Actor(name)
+	{
+	}
+};
+
+};  // namespace Graphics
+
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_PLANEACTOR_H

@@ -39,7 +39,7 @@ FreeMotion::~FreeMotion()
 std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
 	// Copy state to new state
-	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);	
+	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);
 	std::vector<std::shared_ptr<Actor>> actors = result->getActors();
 
 	auto it = actors.begin();

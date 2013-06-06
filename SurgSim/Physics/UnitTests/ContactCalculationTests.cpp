@@ -140,7 +140,7 @@ TEST(CollisionPairTest, InitTest)
 	EXPECT_FALSE(pair.hasContacts());
 
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0));
-	EXPECT_TRUE(pair.hasContacts());		
+	EXPECT_TRUE(pair.hasContacts());
 }
 
 
@@ -236,7 +236,7 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,2.0,0.0),
 						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
 						  false);
-	}	
+	}
 
 	{
 		SCOPED_TRACE("Intersection front, no transformation");
@@ -264,7 +264,7 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.5),
 			plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
 			true, 0.5, Vector3d(-1.0,0.0,0.0));
-	}	
+	}
 }
 
 

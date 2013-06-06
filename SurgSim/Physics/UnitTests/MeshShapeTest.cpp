@@ -152,7 +152,7 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 		expectedMassCenter = boxShape.calculateMassCenter();
 
 		EXPECT_NEAR(boxShape.calculateVolume(), boxMesh.calculateVolume(), 1e-8);
-		EXPECT_EQ(expectedMassCenter, boxMesh.calculateMassCenter());
+		EXPECT_TRUE((expectedMassCenter - boxMesh.calculateMassCenter()).isZero());
 		EXPECT_NEAR(expectedMass, boxMesh.calculateMass(density), 1e-8);
 		EXPECT_TRUE(boxMesh.calculateInertia(density).isApprox(expectedInertia));
 	}
