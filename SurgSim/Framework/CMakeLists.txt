@@ -69,7 +69,7 @@ surgsim_add_library(
 	"SurgSim/Framework"
 )
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	target_link_libraries(SurgSimFramework SurgSimMath rt)
+	target_link_libraries(SurgSimFramework rt)
 endif()
 
 
