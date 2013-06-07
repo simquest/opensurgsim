@@ -33,8 +33,8 @@ class RepresentationPoseBehavior : public SurgSim::Framework::Behavior
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	/// \param	physicsActor	Physics actor to get the pose
-	/// \param	graphicsActor	Graphics actor to set the pose
+	/// \param	from	Representation to get the pose
+	/// \param	to	Representation to set the pose
 	RepresentationPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Framework::Representation> from,
 		std::shared_ptr<SurgSim::Framework::Representation> to) : SurgSim::Framework::Behavior(name),
 		m_from(from),
