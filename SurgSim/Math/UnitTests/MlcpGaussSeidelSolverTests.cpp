@@ -83,7 +83,34 @@ static void compareResult(const std::string& fileName,
 
 	ASSERT_EQ(size, lambda.rows());
 	ASSERT_EQ(size, problem->expectedLambda.rows());
-	EXPECT_TRUE(isValid(lambda)) << lambda;
+	ASSERT_TRUE(isValid(lambda)) << lambda;
+
+	// TODO(advornik): Because this is a mixed LCP problem *with friction*, we can't just easily check that
+	//   all x are positive (the frictional entries may not be), or that all Ax+b are positive(ditto).
+	//   We need to either (a) make the test aware of the meaning of the constraint types, or (b) get rid
+	//   of the constraint types and flag the frictional DOFs more directly.
+	//
+	//   For now, we check if the MLCP is really a pure LCP (only unilaterals without friction), and we
+	//   perform some simple checks that apply to that case and that case only.
+	bool isSimpleLcp = true;
+	for (auto it = constraintTypes.cbegin();  it != constraintTypes.cend();  ++it)
+	{
+		if ((*it) != MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+		{
+			isSimpleLcp = false;
+		}
+	}
+
+	if (isSimpleLcp && (size > 0))
+	{
+		EXPECT_GE(lambda.minCoeff(), 0.0) << "x contains negative coefficients:" << std::endl << lambda;
+
+		Eigen::VectorXd c = problem->HCHt * lambda + problem->E;
+		EXPECT_GE(c.minCoeff(), -gsSolverPrecision) << "Ax+b contains negative coefficients:" << std::endl << c;
+		EXPECT_NEAR(0.0, c.dot(lambda), 1e-9) << "Ax+b is not orthogonal to x!" << std::endl <<
+			"x:" << std::endl << lambda << std::endl << "Ax+b:" << std::endl << c;
+	}
+
 	EXPECT_TRUE(lambda.isApprox(problem->expectedLambda)) << "lambda:" << std::endl << lambda << std::endl <<
 		"expected:" << std::endl << problem->expectedLambda;
 
