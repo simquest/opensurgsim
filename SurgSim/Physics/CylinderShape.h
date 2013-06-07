@@ -101,8 +101,8 @@ private:
 	double   m_length;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_CYLINDERSHAPE_H
+#endif // SURGSIM_PHYSICS_CYLINDERSHAPE_H

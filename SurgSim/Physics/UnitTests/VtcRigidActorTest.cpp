@@ -18,7 +18,11 @@
 #include <string>
 
 #include <SurgSim/Physics/VtcRigidActor.h>
-using namespace SurgSim::Physics;
+using SurgSim::Physics::VtcRigidActor;
+using SurgSim::Physics::VtcRigidParameters;
+using SurgSim::Physics::RigidActorParameters;
+using SurgSim::Physics::RigidActorState;
+using SurgSim::Physics::SphereShape;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
@@ -81,7 +85,7 @@ public:
 
 	// Rigid actor parameters
 	RigidActorParameters m_param;
-	
+
 	// Rigid actor default parameters
 	RigidActorParameters m_defaultParameters;
 
@@ -102,7 +106,7 @@ public:
 
 	// Rigid actor state for divergence test
 	RigidActorState m_stateDivergence;
-	
+
 	// Rigid actor default state
 	RigidActorState m_defaultState;
 
@@ -256,7 +260,7 @@ TEST_F(VtcRigidActorTest, NoForceTorqueTest)
 	}
 
 	const RigidActorState& state = rigidBody->getCurrentState();
-	
+
 	const Vector3d    G = state.getPose().translation();
 	const Matrix33d&  R = state.getPose().rotation();
 	const Quaterniond q = Quaterniond(R);
@@ -331,7 +335,7 @@ TEST_F(VtcRigidActorTest, DisableWhenDivergeTest)
 	// The rotation explode under the angular velocity too strong !
 	{
 		ASSERT_TRUE(rigidBody->isActive());
-		
+
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);
 		rigidBody->afterUpdate(m_dt);

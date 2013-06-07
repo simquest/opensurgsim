@@ -64,7 +64,7 @@ TEST(FreeMotionTest, RunTest)
 	EXPECT_TRUE(actor->getPose().translation().isZero());
 	state = computation.update(1.0,state);
 	EXPECT_TRUE(actor->getPose().translation().isZero());
-	
+
 	actor->setIsGravityEnabled(true);
 	EXPECT_TRUE(actor->getPose().translation().isZero());
 	state = computation.update(1.0,state);
