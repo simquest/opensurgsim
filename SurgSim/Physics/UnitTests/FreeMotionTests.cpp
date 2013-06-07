@@ -51,7 +51,7 @@ TEST(FreeMotionTest, RunTest)
 	params.setShapeUsedForMassInertia(shape);
 
 	actor->setInitialParameters(params);
-	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), Vector3d(0.0,0.0,0.0)));
+	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
 
 	actors.push_back(actor);
 

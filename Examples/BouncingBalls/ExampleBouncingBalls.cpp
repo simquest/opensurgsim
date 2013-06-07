@@ -74,7 +74,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 	params.setShapeUsedForMassInertia(shape);
 
 	actor->setInitialParameters(params);
-	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), position));
+	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), position));
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<ConcreteSceneElement>(name);
 	sphereElement->addComponent(actor);
