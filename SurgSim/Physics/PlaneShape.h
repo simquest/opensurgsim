@@ -80,8 +80,8 @@ public:
 
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_PLANESHAPE_H
+#endif // SURGSIM_PHYSICS_PLANESHAPE_H

@@ -135,4 +135,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_MANAGER_H
+#endif  // SURGSIM_GRAPHICS_OSGMANAGER_H

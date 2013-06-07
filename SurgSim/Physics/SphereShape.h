@@ -83,8 +83,8 @@ private:
 	double m_radius;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_SPHERESHAPE_H
+#endif // SURGSIM_PHYSICS_SPHERESHAPE_H
