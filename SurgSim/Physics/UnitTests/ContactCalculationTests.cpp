@@ -110,11 +110,10 @@ std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius,
 	return rep;
 }
 
-std::shared_ptr<CollisionRepresentation> makePlaneRep(const Vector3d& n, const double& d,
-													  const Quaterniond& rotation = Quaterniond(),
+std::shared_ptr<CollisionRepresentation> makePlaneRep(const Quaterniond& rotation = Quaterniond(),
 													  const Vector3d& position = Vector3d())
 {
-	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>(n,d);
+	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<CollisionRepresentation> rep = std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
 	return rep;
 }
@@ -229,7 +228,7 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 
 TEST(ContactCalculationTests, SperePlaneCalculation)
 {
-	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>(Vector3d(0.0,1.0,0.0),0.0);
+	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
 
 	{
