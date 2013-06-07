@@ -70,42 +70,14 @@ TEST(OsgViewElementTests, StartUpTest)
 	EXPECT_TRUE(manager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	/// Get the GraphicsWindow to check that it is updated correctly
-	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(viewElement->getView());
-	ASSERT_NE(nullptr, osgView);
-	osgViewer::GraphicsWindow* osgWindow = dynamic_cast<osgViewer::GraphicsWindow*>(
-		osgView->getOsgView()->getCamera()->getGraphicsContext());
-	ASSERT_NE(nullptr, osgWindow);
-	int testX, testY, testWidth, testHeight;
-
-	/// Window should initially be at (50, 60) and 200 x 100
-	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(50, testX);
-	EXPECT_EQ(60, testY);
-	EXPECT_EQ(200, testWidth);
-	EXPECT_EQ(100, testHeight);
-
 	/// Move the window to (100, 200)
 	viewElement->getView()->setPosition(100, 200);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	/// Check that the window position was updated
-	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(100, testX);
-	EXPECT_EQ(200, testY);
-	EXPECT_EQ(200, testWidth);
-	EXPECT_EQ(100, testHeight);
-
-	/// Resize the window to 400 x 500
+	/// Enable the window border and resize the window to 400 x 500
+	viewElement->getView()->setWindowBorderEnabled(true);
 	viewElement->getView()->setDimensions(400, 500);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	/// Check that the window dimensions were updated
-	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(100, testX);
-	EXPECT_EQ(200, testY);
-	EXPECT_EQ(400, testWidth);
-	EXPECT_EQ(500, testHeight);
 
 	runtime->stop();
 }

@@ -306,8 +306,8 @@ private:
 	VtcRigidParameters m_currentVtcParameters;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_VTCRIGIDACTOR_H
+#endif // SURGSIM_PHYSICS_VTCRIGIDACTOR_H

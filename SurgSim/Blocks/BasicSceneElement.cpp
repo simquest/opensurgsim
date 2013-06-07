@@ -15,25 +15,25 @@
 
 #include <string>
 
-#include <Examples/BouncingBalls/ConcreteSceneElement.h>
+#include <SurgSim/Blocks/BasicSceneElement.h>
 
-ConcreteSceneElement::ConcreteSceneElement(const std::string& name) :
+BasicSceneElement::BasicSceneElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name)
 {
 
 }
 
-ConcreteSceneElement::~ConcreteSceneElement()
+BasicSceneElement::~BasicSceneElement()
 {
 
 }
 
-bool ConcreteSceneElement::doInitialize()
+bool BasicSceneElement::doInitialize()
 {
 	return true;
 }
 
-bool ConcreteSceneElement::doWakeUp()
+bool BasicSceneElement::doWakeUp()
 {
 	return true;
 }

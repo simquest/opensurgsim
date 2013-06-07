@@ -108,6 +108,7 @@ void OsgView::update(double dt)
 			{
 				window->setWindowDecoration(m_isWindowBorderEnabled);
 				window->setWindowRectangle(m_x, m_y, m_width, m_height);
+				m_areWindowSettingsDirty = false;
 			}
 		}
 	}
