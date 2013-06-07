@@ -90,21 +90,20 @@ TEST(FemActorParametersTest, SetGetValidTest)
 	EXPECT_FALSE(femActorParam->isValid());
 	femActorParam->setYoungModulus(1.0);
 	EXPECT_TRUE(femActorParam->isValid());
+	femActorParam->setPoissonRatio(-2.0);
+	EXPECT_FALSE(femActorParam->isValid());
+	femActorParam->setPoissonRatio(-1.0);
+	EXPECT_FALSE(femActorParam->isValid());
+	femActorParam->setPoissonRatio(-0.99);
+	EXPECT_TRUE(femActorParam->isValid());
 	femActorParam->setPoissonRatio(0.0);
 	EXPECT_TRUE(femActorParam->isValid());
-	femActorParam->setPoissonRatio(0.4);
+	femActorParam->setPoissonRatio(0.499);
 	EXPECT_TRUE(femActorParam->isValid());
-
-	// Test ASSERT
-	EXPECT_THROW(femActorParam->setPoissonRatio(-1.5), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(femActorParam->setPoissonRatio(-1.0), SurgSim::Framework::AssertionFailure);
-	EXPECT_NO_THROW(femActorParam->setPoissonRatio(-0.99999));
-	EXPECT_NO_THROW(femActorParam->setPoissonRatio(-0.5));
-	EXPECT_NO_THROW(femActorParam->setPoissonRatio(0.0));
-	EXPECT_NO_THROW(femActorParam->setPoissonRatio(0.3));
-	EXPECT_NO_THROW(femActorParam->setPoissonRatio(0.49999));
-	EXPECT_THROW(femActorParam->setPoissonRatio(0.5), SurgSim::Framework::AssertionFailure);
-	EXPECT_THROW(femActorParam->setPoissonRatio(1.0), SurgSim::Framework::AssertionFailure);
+	femActorParam->setPoissonRatio(0.5);
+	EXPECT_FALSE(femActorParam->isValid());
+	femActorParam->setPoissonRatio(1.0);
+	EXPECT_FALSE(femActorParam->isValid());
 }
 
 
@@ -114,25 +113,25 @@ TEST(FemActorParametersTest, BoundaryConditionsTest)
 	std::shared_ptr<FemActorParameters> femActorParam = std::make_shared<FemActorParameters>();
 
 	// Add 1 by 1
-	EXPECT_EQ(0, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(0u, femActorParam->getBoundaryConditions().size());
 	EXPECT_TRUE(femActorParam->addBoundaryCondition(0));
-	EXPECT_EQ(1, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(1u, femActorParam->getBoundaryConditions().size());
 	EXPECT_TRUE(femActorParam->addBoundaryCondition(1));
-	EXPECT_EQ(2, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(2u, femActorParam->getBoundaryConditions().size());
 	EXPECT_FALSE(femActorParam->addBoundaryCondition(0));
-	EXPECT_EQ(2, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(2u, femActorParam->getBoundaryConditions().size());
 	EXPECT_TRUE(femActorParam->addBoundaryCondition(10));
-	EXPECT_EQ(3, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(3u, femActorParam->getBoundaryConditions().size());
 
 	// Remove 1 by 1
 	EXPECT_TRUE(femActorParam->removeBoundaryCondition(10));
-	EXPECT_EQ(2, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(2u, femActorParam->getBoundaryConditions().size());
 	EXPECT_FALSE(femActorParam->removeBoundaryCondition(5));
-	EXPECT_EQ(2, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(2u, femActorParam->getBoundaryConditions().size());
 	EXPECT_TRUE(femActorParam->removeBoundaryCondition(0));
-	EXPECT_EQ(1, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(1u, femActorParam->getBoundaryConditions().size());
 	EXPECT_TRUE(femActorParam->removeBoundaryCondition(1));
-	EXPECT_EQ(0, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(0u, femActorParam->getBoundaryConditions().size());
 
 	// Add all
 	std::vector<unsigned int> data;
@@ -142,11 +141,11 @@ TEST(FemActorParametersTest, BoundaryConditionsTest)
 	data.push_back(3);
 	data.push_back(2); // duplicate !
 	EXPECT_EQ(4u, femActorParam->addBoundaryConditions(data));
-	EXPECT_EQ(4, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(4u, femActorParam->getBoundaryConditions().size());
 
 	// Clear all
 	femActorParam->clearBoundaryConditions();
-	EXPECT_EQ(0, femActorParam->getBoundaryConditions().size());
+	EXPECT_EQ(0u, femActorParam->getBoundaryConditions().size());
 
 	/// Boundary condition mass property
 	femActorParam->setBoundaryConditionMass(0.0);
