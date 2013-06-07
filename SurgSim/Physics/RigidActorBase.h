@@ -52,14 +52,6 @@ public:
 	/// Get the initial pose of the rigid actor
 	/// \return The initial pose
 	virtual const RigidTransform3d& getInitialPose() const = 0;
-
-	/// Set the current pose of the rigid actor
-	/// \param pose The current pose
-	virtual void setPose(const RigidTransform3d& pose) = 0;
-
-	/// Get the current pose of the rigid actor
-	/// \return The current pose
-	virtual const RigidTransform3d& getPose() const = 0;
 };
 
 }; // Physics
