@@ -109,7 +109,7 @@ private:
 	virtual bool doUpdate(double dt) = 0;
 };
 
-};
-};
+}; // namespace Framework
+}; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_FRAMEWORK_BASICTHREAD_H

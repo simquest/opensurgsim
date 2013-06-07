@@ -33,6 +33,7 @@
 #include <random>
 
 using SurgSim::Framework::ComponentManager;
+using SurgSim::Framework::Representation;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 
@@ -97,7 +98,8 @@ TEST(OsgManagerTests, AddRemoveTest)
 	std::shared_ptr<MockGroup> nonOsgGroup = std::make_shared<MockGroup>("non-osg group");
 	std::shared_ptr<MockView> nonOsgView = std::make_shared<MockView>("non-osg view");
 	using SurgSim::Framework::Representation;
-	std::shared_ptr<Representation> nonGraphicsComponent = std::make_shared<Representation>("non-graphics component");
+	std::shared_ptr<Representation> nonGraphicsComponent = std::make_shared<NonGraphicsRepresentation>(
+		"non-graphics component");
 
 	EXPECT_EQ(0u, graphicsManager->getActors().size());
 	EXPECT_EQ(0u, graphicsManager->getGroups().size());

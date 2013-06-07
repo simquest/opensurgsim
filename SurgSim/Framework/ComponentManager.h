@@ -72,7 +72,7 @@ private:
 	std::weak_ptr<Runtime> m_runtime;
 };
 
-};
-};
+}; // namespace Framework
+}; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_FRAMEWORK_COMPONENTMANAGER_H

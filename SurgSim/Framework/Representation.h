@@ -13,15 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_REPRESENTATION_H
-#define SURGSIM_REPRESENTATION_H
+#ifndef SURGSIM_FRAMEWORK_REPRESENTATION_H
+#define SURGSIM_FRAMEWORK_REPRESENTATION_H
 
 #include <memory>
 
-#include "SurgSim/Framework/Component.h"
+#include <SurgSim/Framework/Component.h>
+#include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim
 {
+
 namespace Framework
 {
 
@@ -35,13 +37,21 @@ class Representation : public Component
 public:
 	explicit Representation(const std::string& m_name);
 	virtual ~Representation();
+
+	/// Set the current pose of the representation
+	/// \param pose The current pose
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+
+	/// Get the current pose of the representation
+	/// \return The current pose
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();
 };
 
-}
-}
+}; // namespace Framework
 
-#endif
+}; // namespace SurgSim
 
+#endif // SURGSIM_FRAMEWORK_REPRESENTATION_H

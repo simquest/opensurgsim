@@ -53,7 +53,7 @@ public:
 protected:
 	virtual bool doInitialize() { return true;}
 	virtual bool doWakeUp() {return true;}
-	virtual void update(double dt) 
+	virtual void update(double dt)
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_actor->getName() << ": " << m_actor->getPose().translation();
@@ -61,7 +61,6 @@ protected:
 
 private:
 	std::shared_ptr<RigidActor> m_actor;
-	
 };
 
 std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSim::Math::Vector3d& position)

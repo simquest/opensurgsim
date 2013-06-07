@@ -44,4 +44,4 @@ public:
 }; //namespace Framework
 }; //namespace SurgSim
 
-#endif
+#endif // SURGSIM_FRAMEWORK_BEHAVIOR_H

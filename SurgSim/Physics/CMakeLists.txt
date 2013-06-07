@@ -18,14 +18,14 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
-	CapsuleShape.cpp
 	CollisionPair.cpp
-	CylinderShape.cpp
+	ContactCalculation.cpp
 	DcdCollision.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
 	RigidActor.cpp
-	RigidActorCollisionRepresentation.cpp)
+	RigidActorCollisionRepresentation.cpp
+	VtcRigidActor.cpp)
 
 set(SURGSIM_PHYSICS_HEADERS
 	Actor.h
@@ -33,6 +33,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	CapsuleShape.h
 	CollisionPair.h
 	CollisionRepresentation.h
+	ContactCalculation.h
 	Computation.h
 	CylinderShape.h
 	DcdCollision.h
@@ -42,6 +43,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	MeshShape.h
 	PhysicsManager-inl.h
 	PhysicsManager.h
+	PhysicsManagerState.h
+	PlaneShape.h
 	RigidActor.h
 	RigidActorBase.h
 	RigidActorBaseState.h
@@ -51,6 +54,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidShape.h
 	Shapes.h
 	SphereShape.h
+	VtcRigidActor.h
+	VtcRigidParameters.h
 )
 
 surgsim_add_library(

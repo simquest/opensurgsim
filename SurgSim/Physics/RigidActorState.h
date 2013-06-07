@@ -60,7 +60,7 @@ public:
 	/// \return False if the 2 states are equals, True otherwise
 	bool operator !=(const RigidActorState &s) const
 	{
-		return ! (operator ==(s));
+		return ! ((*this) == s);
 	}
 
 	/// Reset the state to default values

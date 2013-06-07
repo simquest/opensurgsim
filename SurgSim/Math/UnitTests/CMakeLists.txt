@@ -51,7 +51,7 @@ if(SURGSIM_TESTS_BUILD_EIGEN)
 	endif(MSVC AND CMAKE_CL_64)
 endif(SURGSIM_TESTS_BUILD_EIGEN)
 
-set(LIBS SurgSimFramework gtest)
+set(LIBS gtest)
 
 if(UNIT_TEST_SOURCES)
 	surgsim_add_unit_tests(SurgSimMathTest)
