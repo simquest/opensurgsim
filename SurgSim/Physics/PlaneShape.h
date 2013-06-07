@@ -24,35 +24,16 @@ namespace SurgSim
 namespace Physics
 {
 
-/// PlaneShape a plane with the form nx + d = 0
+/// PlaneShape: The XZ plane (d = 0) with normal pointing along
+/// positive Y axis.
 class PlaneShape: public RigidShape
 {
 public:
 
-	/// Constructor from the plane equation nx + d = 0.
-	/// \param	normal	The normal.
-	/// \param	d	  	The d.
-	PlaneShape(Vector3d normal, double d) :
-		m_normal(normal.normalized()), m_d(d)
+	/// Constructor: No members to initialize.
+	PlaneShape()
 	{
 
-	}
-
-	/// Constructor.
-	/// \param	point0	The point on the plane.
-	/// \param	normal	The normal.
-	PlaneShape(Vector3d point0, Vector3d normal) : m_normal(normal.normalized())
-	{
-		m_d = - m_normal.dot(point0);
-	}
-
-	/// Constructor.
-	/// \param	point0, point1, point2	The points that form the plane.
-	PlaneShape(Vector3d point0, Vector3d point1, Vector3d point2)
-	{
-		m_normal = (point1 - point0).cross(point2 - point0);
-		m_normal.normalize();
-		m_d = - m_normal.dot(point0);
 	}
 
 	/// \return the type of the shape
@@ -84,26 +65,19 @@ public:
 	}
 
 	/// Gets the d of the plane equation.
-	/// \return	The value of d.
+	/// \return	The value of d (always 0).
 	inline double getD()
 	{
-		return m_d;
+		return 0.0;
 	}
 
 	/// Gets the normal of the plane equation.
-	/// \return	The value of the normal.
-	const Vector3d& getNormal()
+	/// \return	The value of the normal (always Y axis).
+	inline Vector3d getNormal()
 	{
-		return m_normal;
+		return Vector3d(0.0, 1.0, 0.0);
 	}
 
-private:
-
-	/// The normal of the plane
-	Vector3d m_normal;
-
-	/// The d of the plane
-	double m_d;
 };
 
 }; /// Physics
