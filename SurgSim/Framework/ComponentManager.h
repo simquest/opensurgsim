@@ -28,6 +28,7 @@ namespace Framework
 
 class Component;
 class Runtime;
+class Logger;
 
 /// Base Component Manager class. Component Managers manage a collection of
 /// components. The runtime will present each new component to the manager, and
@@ -36,14 +37,9 @@ class Runtime;
 class ComponentManager : public BasicThread
 {
 public:
-	explicit ComponentManager(const std::string& name = "Unknown Component Manager") :
-		BasicThread(name)
-	{
-	}
 
-	virtual ~ComponentManager()
-	{
-	}
+	explicit ComponentManager(const std::string& name = "Unknown Component Manager");
+	virtual ~ComponentManager();
 
 	/// Handle representations, override for each thread
 	/// \param component	The component to be removed.
@@ -57,20 +53,39 @@ public:
 
 	/// @{
 	/// Runtime accessors
-	std::shared_ptr<Runtime> getRuntime() const
+	inline std::shared_ptr<Runtime> getRuntime() const
 	{
 		return m_runtime.lock();
 	}
 
-	void setRuntime(std::shared_ptr<Runtime> val)
-	{
-		m_runtime = val;
-	}
+	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
+	
+
+	/// Template version of the addComponent method.
+	/// \tparam	T	Specific type of the component that is being added.
+	/// \param	component		 	The component that needs to be added.
+	/// \param [in,out]	container	If non-null, the container, that should receive the component if of the correct type.
+	/// \return	the correctly cast component pointer if successful and the component did not alread exist in the container
+	template<class T>
+	std::shared_ptr<T> tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+
+	/// Template version of the removeComponent method.
+	/// \tparam	T	Specific type of the component that is being removed.
+	/// \param	component		 	The component that needs to be removed.
+	/// \param [in,out]	container	If non-null, the container, from which the component should be removed.
+	/// \return	true if the component exists in the container or the component did not cast to T, otherwise.
+	template<class T>
+	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+
+protected:
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 private:
 	std::weak_ptr<Runtime> m_runtime;
 };
+
+#include <SurgSim/Framework/ComponentManager-inl.h>
 
 }; // namespace Framework
 }; // namespace SurgSim

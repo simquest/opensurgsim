@@ -40,7 +40,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedActor.h
 	FreeMotion.h
 	MeshShape.h
-	PhysicsManager-inl.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PlaneShape.h

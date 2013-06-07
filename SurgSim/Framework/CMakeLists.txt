@@ -29,6 +29,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	BasicThread.cpp
 	Barrier.cpp
 	BehaviorManager.cpp
+	ComponentManager.cpp
 	Logger.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
@@ -47,6 +48,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	BehaviorManager.h
 	Component.h
 	ComponentManager.h
+	ComponentManager-inl.h
 	LockedContainer.h
 	Log.h
 	Logger.h

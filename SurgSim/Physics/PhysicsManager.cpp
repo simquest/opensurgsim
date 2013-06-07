@@ -41,10 +41,9 @@ PhysicsManager::~PhysicsManager()
 
 bool PhysicsManager::doInitialize()
 {
-	m_logger = getRuntime()->getLogger("PhysicsManager");
 	m_freeMotionStep.reset(new FreeMotion());
 	m_dcdCollision.reset(new DcdCollision());
-	return m_logger != nullptr && m_freeMotionStep != nullptr;
+	return m_logger != nullptr;
 }
 
 
