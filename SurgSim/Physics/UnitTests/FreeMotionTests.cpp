@@ -70,4 +70,3 @@ TEST(FreeMotionTest, RunTest)
 	state = computation.update(1.0,state);
 	EXPECT_FALSE(actor->getPose().translation().isZero());
 }
-
