@@ -27,13 +27,13 @@ namespace SurgSim
 namespace Graphics
 {
 
-class Actor;
+class Representation;
 class Group;
 class View;
 
 /// Basic graphics manager class which manages graphics components to provide a visualization of the scene to the user.
 ///
-/// Graphics::Manager manages Graphics::Actor, Graphics::Group, and Graphics::View components.
+/// Graphics::Manager manages Graphics::Representation, Graphics::Group, and Graphics::View components.
 class Manager : public SurgSim::Framework::ComponentManager
 {
 public:
@@ -52,10 +52,10 @@ public:
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
 	virtual bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
 
-	/// Adds an actor to the manager
-	/// \param	actor	The actor to be added.
-	/// \return	True if the actor was not in this manager and has been successfully added, false if it fails.
-	virtual bool addActor(std::shared_ptr<Actor> actor);
+	/// Adds an representation to the manager
+	/// \param	representation	The representation to be added.
+	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
+	virtual bool addRepresentation(std::shared_ptr<Representation> representation);
 
 	/// Adds a group to the manager
 	/// \param	group	The group to be added.
@@ -67,10 +67,10 @@ public:
 	/// \return	True if the view was not in this manager and has been successfully added, false if it fails.
 	virtual bool addView(std::shared_ptr<View> view);
 
-	/// Removes an actor from the manager
-	/// \param	actor	The actor to be removed.
-	/// \return	True if the actor was in this manager and has been successfully removed, false if it fails.
-	virtual bool removeActor(std::shared_ptr<Actor> actor);
+	/// Removes an representation from the manager
+	/// \param	representation	The representation to be removed.
+	/// \return	True if the representation was in this manager and has been successfully removed, false if it fails.
+	virtual bool removeRepresentation(std::shared_ptr<Representation> representation);
 
 	/// Removes a group from the manager
 	/// \param	group	The group to be removed.
@@ -82,10 +82,10 @@ public:
 	/// \return	True if the view was in this manager and has been successfully removed, false if it fails.
 	virtual bool removeView(std::shared_ptr<View> view);
 
-	/// Returns the actors assigned to the manager
-	const std::vector<std::shared_ptr<Actor>>& getActors() const
+	/// Returns the representations assigned to the manager
+	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
 	{
-		return m_actors;
+		return m_representations;
 	}
 
 	/// Returns the groups assigned to the manager
@@ -120,8 +120,8 @@ private:
 	/// \return True if it succeeds, false if it fails
 	virtual bool doStartUp();
 
-	/// Actors assigned to the manager
-	std::vector<std::shared_ptr<Actor>> m_actors;
+	/// Representations assigned to the manager
+	std::vector<std::shared_ptr<Representation>> m_representations;
 	/// Groups assigned to the manager
 	std::vector<std::shared_ptr<Group>> m_groups;
 	/// Views assigned to the manager

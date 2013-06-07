@@ -35,7 +35,7 @@ namespace Framework
 namespace Physics
 {
 
-class Actor;
+class Representation;
 class FreeMotion;
 class DcdCollision;
 
@@ -81,7 +81,7 @@ protected:
 
 private:
 
-	std::vector<std::shared_ptr<Actor>> m_actors;
+	std::vector<std::shared_ptr<Representation>> m_representations;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	///@{

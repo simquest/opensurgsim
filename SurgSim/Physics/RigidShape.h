@@ -41,7 +41,7 @@ typedef enum {
 	RIGID_SHAPE_TYPE_COUNT
 } RigidShapeType;
 
-/// Generic rigid shape class defining a shape for a rigid actor
+/// Generic rigid shape class defining a shape for a rigid representation
 /// \note This class gives the ability to analyse the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
 class RigidShape

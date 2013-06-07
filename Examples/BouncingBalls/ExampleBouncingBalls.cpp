@@ -23,8 +23,8 @@
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/RigidActor.h>
-#include <SurgSim/Physics/RigidActorParameters.h>
+#include <SurgSim/Physics/RigidRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -33,10 +33,10 @@
 #include <Examples/BouncingBalls/ConcreteSceneElement.h>
 
 using SurgSim::Framework::SceneElement;
-using SurgSim::Physics::Actor;
-using SurgSim::Physics::RigidActor;
+using SurgSim::Physics::Representation;
+using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::SphereShape;
-using SurgSim::Physics::RigidActorParameters;
+using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::PhysicsManager;
 
 ///\file Example of how to put together a very simple demo of  balls colliding with each other
@@ -47,7 +47,8 @@ using SurgSim::Physics::PhysicsManager;
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	PrintoutBehavior(std::shared_ptr<RigidActor> actor) : Behavior("PrintoutBehavior"), m_actor(actor) {}
+	PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation)
+		: Behavior("PrintoutBehavior"), m_representation(representation) {}
 	~PrintoutBehavior() {}
 
 protected:
@@ -56,29 +57,29 @@ protected:
 	virtual void update(double dt)
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
-		SURGSIM_LOG_DEBUG(logger) << m_actor->getName() << ": " << m_actor->getPose().translation();
+		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " << m_representation->getPose().translation();
 	}
 
 private:
-	std::shared_ptr<RigidActor> m_actor;
+	std::shared_ptr<RigidRepresentation> m_representation;
 };
 
 std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSim::Math::Vector3d& position)
 {
-	std::shared_ptr<RigidActor> actor = std::make_shared<RigidActor>(name);
+	std::shared_ptr<RigidRepresentation> representation = std::make_shared<RigidRepresentation>(name);
 
-	RigidActorParameters params;
+	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.01); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
-	actor->setInitialParameters(params);
-	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), position));
+	representation->setInitialParameters(params);
+	representation->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), position));
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<ConcreteSceneElement>(name);
-	sphereElement->addComponent(actor);
-	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(actor));
+	sphereElement->addComponent(representation);
+	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(representation));
 	return sphereElement;
 }
 

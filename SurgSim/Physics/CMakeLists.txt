@@ -23,12 +23,12 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
-	RigidActor.cpp
-	RigidActorCollisionRepresentation.cpp
-	VtcRigidActor.cpp)
+	RigidRepresentation.cpp
+	RigidRepresentationCollisionRepresentation.cpp
+	VtcRigidRepresentation.cpp)
 
 set(SURGSIM_PHYSICS_HEADERS
-	Actor.h
+	Representation.h
 	BoxShape.h
 	CapsuleShape.h
 	CollisionPair.h
@@ -37,23 +37,23 @@ set(SURGSIM_PHYSICS_HEADERS
 	Computation.h
 	CylinderShape.h
 	DcdCollision.h
-	FixedActor.h
+	FixedRepresentation.h
 	FreeMotion.h
 	MeshShape.h
 	PhysicsManager-inl.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PlaneShape.h
-	RigidActor.h
-	RigidActorBase.h
-	RigidActorBaseState.h
-	RigidActorCollisionRepresentation.h
-	RigidActorParameters.h
-	RigidActorState.h
+	RigidRepresentation.h
+	RigidRepresentationBase.h
+	RigidRepresentationBaseState.h
+	RigidRepresentationCollisionRepresentation.h
+	RigidRepresentationParameters.h
+	RigidRepresentationState.h
 	RigidShape.h
 	Shapes.h
 	SphereShape.h
-	VtcRigidActor.h
+	VtcRigidRepresentation.h
 	VtcRigidParameters.h
 )
 

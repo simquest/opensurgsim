@@ -20,12 +20,12 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Actor.h>
-#include <SurgSim/Physics/FixedActor.h>
+#include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Framework::Runtime;
-using SurgSim::Physics::FixedActor;
+using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
@@ -62,14 +62,14 @@ TEST_F(PhysicsManagerTest, InitTest)
 
 TEST_F(PhysicsManagerTest, AddRemoveComponent)
 {
-	std::shared_ptr<FixedActor> actor1= std::make_shared<FixedActor>("Actor1");
-	std::shared_ptr<FixedActor> actor2 = std::make_shared<FixedActor>("Actor2");
+	std::shared_ptr<FixedRepresentation> representation1= std::make_shared<FixedRepresentation>("Representation1");
+	std::shared_ptr<FixedRepresentation> representation2 = std::make_shared<FixedRepresentation>("Representation2");
 
-	EXPECT_TRUE(physicsManager->addComponent(actor1));
-	EXPECT_TRUE(physicsManager->addComponent(actor2));
-	EXPECT_FALSE(physicsManager->addComponent(actor1));
+	EXPECT_TRUE(physicsManager->addComponent(representation1));
+	EXPECT_TRUE(physicsManager->addComponent(representation2));
+	EXPECT_FALSE(physicsManager->addComponent(representation1));
 
-	EXPECT_TRUE(physicsManager->removeComponent(actor1));
-	EXPECT_FALSE(physicsManager->removeComponent(actor1));
-	EXPECT_TRUE(physicsManager->removeComponent(actor2));
+	EXPECT_TRUE(physicsManager->removeComponent(representation1));
+	EXPECT_FALSE(physicsManager->removeComponent(representation1));
+	EXPECT_TRUE(physicsManager->removeComponent(representation2));
 }

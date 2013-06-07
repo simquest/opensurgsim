@@ -29,7 +29,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-class Actor;
+class Representation;
 class Group;
 class View;
 class OsgCamera;
@@ -43,16 +43,16 @@ class OsgGroup;
 /// For convenience, a default Camera and default Group are setup.
 /// The default Camera is assigned to any added View that does not already have a Camera assigned. This allows a View of
 /// the scene to be setup simply by creating a Graphics::OsgViewElement and adding it to the Framework::Scene.
-/// The default Camera is initially assigned the default Group. Any Graphics::Actor or Graphics::Group added to the
-/// Manager will be added to this group, so the default Camera will see everything.
+/// The default Camera is initially assigned the default Group. Any Graphics::Representation or Graphics::Group added
+/// to the Manager will be added to this group, so the default Camera will see everything.
 class OsgManager : public Manager
 {
 public:
 	/// Constructor
 	///
 	/// Sets up a default Camera which will be used if for any View that does not have a Camera assigned
-	/// Sets up a default Group which is assigned to the default Camera. All added actors and groups will be added to
-	/// this group.
+	/// Sets up a default Group which is assigned to the default Camera. All added representations and groups will be
+	/// added to this group.
 	OsgManager();
 	/// Destructor
 	virtual ~OsgManager();
@@ -65,18 +65,18 @@ public:
 	std::shared_ptr<OsgCamera> getDefaultCamera() const;
 
 	/// Sets the default group
-	/// Any Actor or Group added will be added to the default Group.
+	/// Any Representation or Group added will be added to the default Group.
 	virtual bool setDefaultGroup(std::shared_ptr<OsgGroup> group);
 	/// Returns the default group
-	/// Any Actor or Group added will be added to the default Group.
+	/// Any Representation or Group added will be added to the default Group.
 	std::shared_ptr<OsgGroup> getDefaultGroup() const;
 
-	/// Adds an actor to the manager
-	/// \param	actor	The actor to be added.
-	/// Only allows OsgActor components, any other will not be set and it will return false.
-	/// \return	True if the actor was not in this manager and has been successfully added, false if it fails.
-	/// \post	The actor is added to the default group.
-	virtual bool addActor(std::shared_ptr<Actor> actor);
+	/// Adds an representation to the manager
+	/// \param	representation	The representation to be added.
+	/// Only allows OsgRepresentation components, any other will not be set and it will return false.
+	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
+	/// \post	The representation is added to the default group.
+	virtual bool addRepresentation(std::shared_ptr<Representation> representation);
 
 	/// Adds a group to the manager
 	/// \param	group	The group to be added.
@@ -111,7 +111,7 @@ protected:
 
 	/// Initializes the manager
 	/// \return True if it succeeds, false if it fails
-	/// \post	The default camera component is in the list of managed actors.
+	/// \post	The default camera component is in the list of managed representations.
 	/// \post	The default group component is in the list of managed groups.
 	virtual bool doInitialize();
 
@@ -126,7 +126,7 @@ private:
 	/// Default camera which is used if no other camera is specified
 	/// This camera is initially assigned the default group.
 	std::shared_ptr<OsgCamera> m_defaultCamera;
-	/// Default group to which all actors and groups are added
+	/// Default group to which all representations and groups are added
 	/// This group is initially assigned to the default camera.
 	std::shared_ptr<OsgGroup> m_defaultGroup;
 };

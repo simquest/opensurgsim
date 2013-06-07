@@ -21,7 +21,7 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include <SurgSim/Physics/RigidActorState.h>
+#include <SurgSim/Physics/RigidRepresentationState.h>
 #include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
@@ -121,7 +121,7 @@ std::shared_ptr<CollisionRepresentation> makePlaneRep(const Quaterniond& rotatio
 
 TEST(CollisionPairTest, InitTest)
 {
-	// Default Constructor, needs to work for ReuseFactory
+	// Default Constructor, needs to work for ReuseFrepresentationy
 	EXPECT_NO_THROW({CollisionPair pair;});
 
 	std::shared_ptr<CollisionRepresentation> rep0 = makeSpereRep(1.0, Quaterniond(), Vector3d(0.0,0.0,0.0));

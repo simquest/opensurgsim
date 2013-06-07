@@ -29,7 +29,7 @@ TEST(VtcRigidParametersTest, ConstructorTest)
 
 TEST(VtcRigidParametersTest, DefaultValueTest)
 {
-	// Create the base rigid actor state
+	// Create the base rigid representation state
 	SurgSim::Physics::VtcRigidParameters vtcRigidParam;
 
 	// Linear damping [default = 0]
@@ -44,7 +44,7 @@ TEST(VtcRigidParametersTest, DefaultValueTest)
 
 TEST(VtcRigidParametersTest, SetGetTest)
 {
-	// Create the base rigid actor state
+	// Create the base rigid representation state
 	SurgSim::Physics::VtcRigidParameters vtcRigidParam;
 
 	// Linear damping

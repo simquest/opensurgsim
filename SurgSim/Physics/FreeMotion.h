@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-class Actor;
+class Representation;
 
 /// Apply the Freemotion calcluation to all physics representations
 class FreeMotion  : public Computation

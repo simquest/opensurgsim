@@ -22,7 +22,7 @@
 
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentationCollisionRepresentation.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/PhysicsManagerState.h>
 
@@ -30,44 +30,44 @@
 
 using SurgSim::Physics::CollisionRepresentation;
 using SurgSim::Physics::CollisionPair;
-using SurgSim::Physics::Actor;
-using SurgSim::Physics::RigidActor;
-using SurgSim::Physics::RigidActorParameters;
-using SurgSim::Physics::RigidActorCollisionRepresentation;
+using SurgSim::Physics::Representation;
+using SurgSim::Physics::RigidRepresentation;
+using SurgSim::Physics::RigidRepresentationParameters;
+using SurgSim::Physics::RigidRepresentationCollisionRepresentation;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::PhysicsManagerState;
 
 using SurgSim::Math::Vector3d;
 
 
-std::shared_ptr<Actor> createSphere(const std::string& name, const SurgSim::Math::Vector3d& position)
+std::shared_ptr<Representation> createSphere(const std::string& name, const SurgSim::Math::Vector3d& position)
 {
-	std::shared_ptr<RigidActor> actor = std::make_shared<RigidActor>(name);
+	std::shared_ptr<RigidRepresentation> representation = std::make_shared<RigidRepresentation>(name);
 
-	RigidActorParameters params;
+	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.01); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
-	actor->setInitialParameters(params);
-	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), position));
+	representation->setInitialParameters(params);
+	representation->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), position));
 
-	return actor;
+	return representation;
 }
 
 
 TEST(DcdCollisionTest, SingleCollisionTest)
 {
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
-	std::shared_ptr<Actor> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
-	std::shared_ptr<Actor> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
+	std::shared_ptr<Representation> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
+	std::shared_ptr<Representation> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
 
-	std::vector<std::shared_ptr<Actor>> actors;
+	std::vector<std::shared_ptr<Representation>> representations;
 
-	actors.push_back(sphere1);
-	actors.push_back(sphere2);
-	state->setActors(actors);
+	representations.push_back(sphere1);
+	representations.push_back(sphere2);
+	state->setRepresentations(representations);
 
 	SurgSim::Physics::DcdCollision computation;
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);

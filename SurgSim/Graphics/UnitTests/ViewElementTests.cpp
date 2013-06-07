@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	/// Sets the view component that provides the visualization of the graphics actors
+	/// Sets the view component that provides the visualization of the graphics representations
 	/// Only allows MockView components, any other will not be set and it will return false.
 	/// \return	True if it succeeds, false if it fails
 	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
