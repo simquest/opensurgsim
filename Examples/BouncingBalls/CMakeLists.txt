@@ -46,6 +46,6 @@ target_link_libraries(ExampleBouncingBalls
 	SurgSimPhysics
 	SurgSimGraphics
 	${Boost_LIBRARIES}
-	$(OPENSCENEGRAPH_LIBRARIES)
-	$(OPENTHREADS_LIBRARY)
+	${OPENSCENEGRAPH_LIBRARIES}
+	${OPENTHREADS_LIBRARY}
 )
