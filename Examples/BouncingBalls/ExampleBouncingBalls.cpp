@@ -98,7 +98,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim
 	RigidActorParameters params;
 	params.setDensity(700.0); // Wood
 
-	std::shared_ptr<PlaneShape> shape = std::make_shared<PlaneShape>(Vector3d(0.0, 1.0, 0.0), 0.0);
+	std::shared_ptr<PlaneShape> shape = std::make_shared<PlaneShape>();
 	params.setShapeUsedForMassInertia(shape);
 
 	physicsActor->setInitialParameters(params);
