@@ -23,20 +23,22 @@ include_directories(
 )
 
 set(SURGSIM_BLOCKS_SOURCES
+	BasicSceneElement.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
+	BasicSceneElement.h
 	RepresentationPoseBehavior.h
 )
 
-#surgsim_add_library(
-#    SurgSimBlocks
-#    "${SURGSIM_BLOCKS_SOURCES}"
-#    "${SURGSIM_BLOCKS_HEADERS}"
-#    "SurgSim/Behaviors"
-#)
-#target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
-#	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+surgsim_add_library(
+    SurgSimBlocks
+    "${SURGSIM_BLOCKS_SOURCES}"
+    "${SURGSIM_BLOCKS_HEADERS}"
+    "SurgSim/Blocks"
+)
+target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
+	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

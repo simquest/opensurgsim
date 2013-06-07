@@ -16,6 +16,7 @@
 #include <memory>
 #include <boost/thread.hpp>
 
+#include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
@@ -37,8 +38,6 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-
-#include <Examples/BouncingBalls/ConcreteSceneElement.h>
 
 using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Framework::SceneElement;
@@ -108,7 +107,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim
 	std::shared_ptr<OsgPlaneActor> graphicsActor = std::make_shared<OsgPlaneActor>(name + " Graphics");
 	graphicsActor->setPose(pose);
 
-	std::shared_ptr<SceneElement> planeElement = std::make_shared<ConcreteSceneElement>(name);
+	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsActor);
 	planeElement->addComponent(graphicsActor);
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose", physicsActor,
@@ -133,7 +132,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 	graphicsActor->setRadius(0.1);
 	graphicsActor->setPose(pose);
 
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<ConcreteSceneElement>(name);
+	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsActor);
 	sphereElement->addComponent(graphicsActor);
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsActor));

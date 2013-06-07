@@ -31,11 +31,9 @@ include_directories(
 
 set(EXAMPLE_SOURCES
 	ExampleBouncingBalls.cpp
-	ConcreteSceneElement.cpp
 )
 
 set(EXAMPLE_HEADERS
-	ConcreteSceneElement.h
 )
 
 add_executable(ExampleBouncingBalls
@@ -43,6 +41,7 @@ add_executable(ExampleBouncingBalls
 
 target_link_libraries(ExampleBouncingBalls 
 	SurgSimFramework
+	SurgSimBlocks
 	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
