@@ -16,22 +16,94 @@
 /// \file
 /// Tests for the RepresentationPoseBehavior class.
 
+#include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/UnitTests/MockObjects.h>
+#include <SurgSim/Framework/BehaviorManager.h>
+#include <SurgSim/Framework/Runtime.h>
+#include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Vector.h>
 
 #include <gtest/gtest.h>
 
 #include <random>
 
-using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Framework::Behavior;
+using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeRigidTransform;
 
-// TEST(RepresentationPoseBehaviorTests, InitTest)
-// {
-// 	ASSERT_NO_THROW({std::shared_ptr<Actor> actor = std::make_shared<MockActor>("test name");});
-// }
-// 
-// TEST(RepresentationPoseBehaviorTests, NameTest)
-// {
-// 	std::shared_ptr<Actor> actor = std::make_shared<MockActor>("test name");
-// 
-// 	EXPECT_EQ("test name", actor->getName());
-// }
+namespace SurgSim
+{
+
+namespace Blocks
+{
+
+TEST(RepresentationPoseBehaviorTests, InitTest)
+{
+	std::shared_ptr<MockRepresentation> from = std::make_shared<MockRepresentation>("from");
+	std::shared_ptr<MockRepresentation> to = std::make_shared<MockRepresentation>("to");
+
+	std::shared_ptr<Behavior> behavior = std::make_shared<RepresentationPoseBehavior>("test name", from, to);
+
+	EXPECT_EQ("test name", behavior->getName());
+}
+
+TEST(RepresentationPoseBehaviorTests, UpdateTest)
+{
+	std::shared_ptr<MockRepresentation> from = std::make_shared<MockRepresentation>("from");
+	std::shared_ptr<MockRepresentation> to = std::make_shared<MockRepresentation>("to");
+
+	std::shared_ptr<Behavior> behavior = std::make_shared<RepresentationPoseBehavior>("behavior", from, to);
+
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+
+	/// Add the representations and behavior to a scene element
+	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
+	sceneElement->addComponent(from);
+	sceneElement->addComponent(to);
+	sceneElement->addComponent(behavior);
+
+	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
+		std::make_shared<SurgSim::Framework::BehaviorManager>();
+
+	runtime->addManager(behaviorManager);
+
+	/// Create a scene and add the scene element to it
+	std::shared_ptr<SurgSim::Framework::Scene> scene = std::make_shared<SurgSim::Framework::Scene>();
+	scene->addSceneElement(sceneElement);
+	runtime->setScene(scene);
+
+	/// Set the initial pose of the "from" representation
+	Quaterniond rotation = Quaterniond(SurgSim::Math::Vector4d::Random()).normalized();
+	Vector3d position = Vector3d::Random();
+	RigidTransform3d pose = makeRigidTransform(rotation, position);
+	from->setPose(pose);
+
+	runtime->start();
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+	/// Check that initial pose propagates correctly
+	EXPECT_TRUE(pose.matrix().isApprox(to->getPose().matrix())) <<
+		"The behavior should copy the initial pose on update!";
+
+	/// Change the pose and check that it propagates correctly
+	rotation = Quaterniond(SurgSim::Math::Vector4d::Random()).normalized();
+	position = Vector3d::Random();
+	pose = makeRigidTransform(rotation, position);
+	from->setPose(pose);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+	EXPECT_TRUE(pose.matrix().isApprox(to->getPose().matrix())) <<
+		"The behavior should copy the new pose on update!";
+
+	runtime->stop();
+}
+
+};  // namespace Blocks
+};  // namespace SurgSim
