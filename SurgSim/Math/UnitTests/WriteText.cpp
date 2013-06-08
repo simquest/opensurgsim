@@ -1,4 +1,4 @@
-#include "writeText.h"
+#include "WriteText.h"
 
 #include <string>
 #include <vector>
@@ -10,7 +10,7 @@
 #include <SurgSim/Math/MlcpConstraintTypeName.h>
 
 #include "MlcpTestData.h"
-#include "textLabels.h"
+#include "TextLabels.h"
 
 
 // output helpers

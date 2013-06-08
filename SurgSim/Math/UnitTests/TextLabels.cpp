@@ -1,4 +1,4 @@
-#include "textLabels.h"
+#include "TextLabels.h"
 
 const char* const TEXT_LABEL_FLAGS_LIST = "flags =";
 const char* const TEXT_LABEL_NUM_DEGREES_OF_FREEDOM = "total degrees of freedom =";
