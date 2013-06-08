@@ -68,13 +68,18 @@ def emit_error(fields):
   fields['warning'] = 'error'
   emit_warning(fields)
 
-def slurp_lines(file):
+def slurp_numbered_lines(file):
   try:
     with open(file, 'r') as f:
-      return f.read().splitlines()
+      lines = list(enumerate(f.read().splitlines(), start=1))
+      if not lines:
+        emit_warning({'file': file, 'category': "opensurgsim/no_lines",
+                      'text': "file is empty."})
+      return lines
   except IOError as e:
     print >> sys.stderr, e
-    #emit_error({'file': file, 'text': str(e)})
+    emit_warning({'file': file, 'category': "opensurgsim/no_file",
+                  'text': "file is missing or could not be opened."})
     return None
 
 def run_cpplint(script, filter, files):
@@ -120,15 +125,7 @@ def run_cpplint(script, filter, files):
     return False
   return cmd.returncode == 0
 
-def check_header_guard(flags, file):
-  lines = slurp_lines(file)
-  if not lines:
-    emit_warning({'file': file, 'category': "opensurgsim/no_lines",
-                  'text': "file is missing or empty."})
-    return False
-
-  lines = list(enumerate(lines))
-
+def check_header_guard(flags, file, lines):
   ifndef = filter(lambda x: re.search(r'^\s*#\s*ifndef\b', x[1]), lines)
   if not ifndef:
     emit_warning({'file': file, 'category': "opensurgsim/no_ifndef",
@@ -226,8 +223,15 @@ def check_header_guard(flags, file):
                     'text': ("#endif comment doesn't match #ifndef! (" + \
                                endif_match.group(1) + ")")})
 
-def check_guards(flags, files):
-  return all(map(lambda f: check_header_guard(flags, f), files))
+def check_length(flags, file, lines):
+  xlines = map(lambda x: (x[0], re.sub(r'\r?\n$', '', x[1].expandtabs(4))),
+               lines)
+  for bad in filter(lambda x: len(x[1]) > flags.max_line_length, xlines):
+    emit_warning({'file': file, 'line': bad[0],
+                  'category': "opensurgsim/too_long",
+                  'text': ("the line is {} characters long, which is longer"
+                           " than {}!"
+                           .format(len(bad[1]), flags.max_line_length)) })
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
@@ -244,6 +248,11 @@ if __name__ == '__main__':
   parser.add_argument('--ignore-guards',
                       action='store_false', dest='do_check_guards',
                       help='Do not check the header file include guards.')
+  parser.add_argument('--max-line-length', type=int, default=120,
+                      help='Maximum allowed line length for C++ code.')
+  parser.add_argument('--ignore-length',
+                      action='store_false', dest='do_check_length',
+                      help='Do not check the line length.')
   parser.add_argument('--ignore-ext',
                       action='store_false', dest='do_check_extension',
                       help='Do not check the file extensions.')
@@ -277,10 +286,24 @@ if __name__ == '__main__':
                               args.files)):
       ok = False
 
-  if args.do_check_guards:
-    if not check_guards(args,
-                        filter(lambda x: re.search(r'\.h$', x), args.files)):
-      ok = False
+  for file in args.files:
+    lines = None
+
+    if args.do_check_guards and re.search(r'\.h$', file):
+      if lines is None:
+        lines = slurp_numbered_lines(file)
+        if not lines:
+          continue
+      if not check_header_guard(args, file, lines):
+        ok = False
+
+    if args.do_check_length and re.search(r'\.(h|cpp)$', file):
+      if lines is None:
+        lines = slurp_numbered_lines(file)
+        if not lines:
+          continue
+      if not check_length(args, file, lines):
+        ok = False
 
   if not ok:
     sys.exit(1)
