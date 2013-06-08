@@ -20,7 +20,7 @@
 using SurgSim::Graphics::Actor;
 using SurgSim::Graphics::Group;
 
-Group::Group(const std::string& name) : SurgSim::Framework::Representation(name)
+Group::Group(const std::string& name) : SurgSim::Framework::Component(name)
 {
 }
 Group::~Group()
@@ -67,4 +67,14 @@ bool Group::remove(std::shared_ptr<Actor> actor)
 void Group::clear()
 {
 	m_actors.clear();
+}
+
+bool Group::doInitialize()
+{
+	return true;
+}
+
+bool Group::doWakeUp()
+{
+	return true;
 }

@@ -41,6 +41,9 @@ OsgCamera::OsgCamera(const std::string& name) : SurgSim::Graphics::Actor(name), 
 	osg::Matrixd inverseViewMatrix = osg::Matrixd::inverse(m_camera->getViewMatrix());
 	m_pose = makeRigidTransform(fromOsg<double>(inverseViewMatrix.getRotate()), fromOsg(inverseViewMatrix.getTrans()));
 
+	m_camera->setViewMatrixAsLookAt(osg::Vec3d(0.0, 0.0, 0.0), osg::Vec3d(0.0, 0.0, -1.0), osg::Vec3d(0.0, 1.0, 0.0));
+	m_camera->setProjectionMatrixAsPerspective(45.0, 1.0, 0.01, 10.0);
+
 	/// Update storage of view and projection matrices
 	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
@@ -51,7 +54,9 @@ bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && SurgSim::Graphics::Camera::setGroup(group))
 	{
-		m_camera->setChild(0, osgGroup->getOsgGroup());
+
+		m_camera->removeChildren(0, m_camera->getNumChildren());  /// Remove any previous group
+		m_camera->addChild(osgGroup->getOsgGroup());
 		return true;
 	}
 	else

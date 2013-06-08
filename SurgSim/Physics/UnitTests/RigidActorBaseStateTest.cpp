@@ -19,13 +19,11 @@
 #include <memory>
 
 #include <SurgSim/Physics/RigidActorBaseState.h>
+using SurgSim::Physics::RigidActorBaseState;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-
-using namespace SurgSim::Physics;
-
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;

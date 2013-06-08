@@ -37,6 +37,9 @@ class OsgCamera : public Camera, public OsgActor
 public:
 	/// Constructor
 	/// \param	name	Name of the camera
+	/// The view matrix is initialized with eye at (0, 0, 0), center at (0, 0, -1), and up (0, 1, 0).
+	/// The projection matrix is initialized to a perspective matrix with FOV Y of 45 deg, Aspect Ratio of 1.0,
+	/// Z Near of 0.01, and Z Far of 10.0.
 	explicit OsgCamera(const std::string& name);
 
 	/// Sets the group of actors that will be seen by this camera.

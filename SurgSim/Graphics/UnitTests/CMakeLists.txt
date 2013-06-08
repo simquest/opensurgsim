@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
@@ -29,16 +26,22 @@ set(UNIT_TEST_SOURCES
 	CameraTests.cpp
 	GroupTests.cpp
 	ManagerTests.cpp
+	PlaneActorTests.cpp
 	OsgActorTests.cpp
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
 	OsgMatrixConversionsTests.cpp
+	OsgPlaneActorTests.cpp
+	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRigidTransformConversionsTests.cpp
+	OsgSphereActorTests.cpp
+	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
 	OsgViewTests.cpp
 	OsgViewElementTests.cpp
+	SphereActorTests.cpp
 	ViewElementTests.cpp
 	ViewTests.cpp
 )

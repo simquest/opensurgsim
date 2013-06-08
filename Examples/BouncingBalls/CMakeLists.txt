@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+find_package(OpenThreads)
+
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
@@ -22,15 +25,15 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
+	"${OSG_INCLUDE_DIR}"
+	"${OPENTHREADS_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
 	ExampleBouncingBalls.cpp
-	ConcreteSceneElement.cpp
 )
 
 set(EXAMPLE_HEADERS
-	ConcreteSceneElement.h
 )
 
 add_executable(ExampleBouncingBalls
@@ -38,6 +41,11 @@ add_executable(ExampleBouncingBalls
 
 target_link_libraries(ExampleBouncingBalls 
 	SurgSimFramework
+	SurgSimBlocks
 	SurgSimDataStructures
 	SurgSimPhysics
-	${Boost_LIBRARIES})
+	SurgSimGraphics
+	${Boost_LIBRARIES}
+	${OPENSCENEGRAPH_LIBRARIES}
+	${OPENTHREADS_LIBRARY}
+)

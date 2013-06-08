@@ -13,27 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
+#ifndef SURGSIM_GRAPHICS_PLANEACTOR_H
+#define SURGSIM_GRAPHICS_PLANEACTOR_H
 
-#include <Examples/BouncingBalls/ConcreteSceneElement.h>
+#include <SurgSim/Graphics/Actor.h>
 
-ConcreteSceneElement::ConcreteSceneElement(const std::string& name) :
-	SurgSim::Framework::SceneElement(name)
+namespace SurgSim
 {
 
-}
-
-ConcreteSceneElement::~ConcreteSceneElement()
+namespace Graphics
 {
 
-}
-
-bool ConcreteSceneElement::doInitialize()
+/// Base graphics plane actor class, which defines the basic interface for a plane that can be visualized.
+/// The plane is the XZ plane, with normal +Y.
+class PlaneActor : public virtual Actor
 {
-	return true;
-}
+public:
+	/// Constructor
+	/// \param	name	Name of the actor
+	explicit PlaneActor(const std::string& name) : Actor(name)
+	{
+	}
+};
 
-bool ConcreteSceneElement::doWakeUp()
-{
-	return true;
-}
+};  // namespace Graphics
+
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_PLANEACTOR_H

@@ -19,7 +19,7 @@
 #include <SurgSim/Physics/Shapes.h>
 #include <SurgSim/Math/Valid.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -84,7 +84,7 @@ public:
 	/// \return False if the 2 parameters set are equals, True otherwise
 	bool operator !=(const RigidActorParameters &c) const
 	{
-		return ! (operator ==(c));
+		return ! ((*this) == c);
 	}
 
 	/// Set the mass density of the rigid actor
@@ -127,7 +127,7 @@ public:
 	void setMass(double mass)
 	{
 		m_mass = mass;
-		
+
 		m_rho = 0.0; // Invalidate the density information
 		             // Density is not automcatically computed, only set
 
@@ -154,7 +154,7 @@ public:
 	void setLocalInertia(const SurgSim::Math::Matrix33d& localInertia)
 	{
 		m_localInertia = localInertia;
-		
+
 		m_isValid = checkValidity();
 	}
 
@@ -166,7 +166,7 @@ public:
 	}
 
 	/// Set the linear damping parameter
-	/// \param The linear damping parameter (in N.s.m-1)
+	/// \param linearDamping The linear damping parameter (in N.s.m-1)
 	void setLinearDamping(double linearDamping)
 	{
 		m_linearDamping = linearDamping;
@@ -180,7 +180,7 @@ public:
 	}
 
 	/// Set the angular damping parameter
-	/// \param The angular damping parameter (in N.m.s.rad-1)
+	/// \param angularDamping The angular damping parameter (in N.m.s.rad-1)
 	void setAngularDamping(double angularDamping)
 	{
 		m_angularDamping = angularDamping;
@@ -308,8 +308,8 @@ private:
 	bool m_isValid;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H
+#endif // SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H

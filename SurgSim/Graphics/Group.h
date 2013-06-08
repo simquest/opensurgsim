@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_GROUP_H
 #define SURGSIM_GRAPHICS_GROUP_H
 
-#include <SurgSim/Framework/Representation.h>
+#include <SurgSim/Framework/Component.h>
 
 #include <memory>
 #include <vector>
@@ -33,7 +33,7 @@ class Actor;
 ///
 /// Graphics::Group allows the organization of Graphics::Actor objects so that different algorithms can operate on
 /// specific sub-sets rather than the entire scene.
-class Group : public SurgSim::Framework::Representation
+class Group : public SurgSim::Framework::Component
 {
 public:
 	/// Constructor. The group is initially empty.
@@ -76,6 +76,13 @@ public:
 	virtual void clear();
 
 private:
+	/// Initialize the component
+	/// \return	True if succeeded, false if failed
+	virtual bool doInitialize();
+	/// Wake up the component
+	/// \return	True if succeeded, false if failed
+	virtual bool doWakeUp();
+
 	/// Actors in this group
 	std::vector<std::shared_ptr<Actor>> m_actors;
 };

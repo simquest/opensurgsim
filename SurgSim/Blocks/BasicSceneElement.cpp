@@ -13,9 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/CylinderShape.h>
+#include <string>
 
-// Explicit instantiation for compile test and code generation
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_X>;
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Y>;
-template class SurgSim::Physics::CylinderShape<SurgSim::Physics::SHAPE_DIRECTION_AXIS_Z>;
+#include <SurgSim/Blocks/BasicSceneElement.h>
+
+BasicSceneElement::BasicSceneElement(const std::string& name) :
+	SurgSim::Framework::SceneElement(name)
+{
+
+}
+
+BasicSceneElement::~BasicSceneElement()
+{
+
+}
+
+bool BasicSceneElement::doInitialize()
+{
+	return true;
+}
+
+bool BasicSceneElement::doWakeUp()
+{
+	return true;
+}

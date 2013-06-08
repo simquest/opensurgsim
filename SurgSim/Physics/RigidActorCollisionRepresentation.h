@@ -28,7 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// CollisionRepresentation class that wraps a RigidActor 
+/// CollisionRepresentation class that wraps a RigidActor
 class RigidActorCollisionRepresentation : public CollisionRepresentation
 {
 public:
@@ -48,6 +48,7 @@ public:
 
 private:
 
+	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
 	std::shared_ptr<RigidActor> m_actor;
 };
 

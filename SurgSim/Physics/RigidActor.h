@@ -110,7 +110,7 @@ public:
 	}
 
 	/// Set the initial pose of the rigid actor
-	/// \param transformation The initial pose (translation + rotation)
+	/// \param pose The initial pose (translation + rotation)
 	void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 		m_initialState.setPose(pose);
@@ -215,8 +215,8 @@ private:
 	RigidActorParameters m_currentParameters;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTOR_H
+#endif // SURGSIM_PHYSICS_RIGIDACTOR_H

@@ -106,8 +106,8 @@ private:
 	double   m_size[3];
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_BOXSHAPE_H
+#endif // SURGSIM_PHYSICS_BOXSHAPE_H

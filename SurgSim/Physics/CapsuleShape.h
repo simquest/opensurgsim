@@ -24,9 +24,8 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Capsule shape: centered on (0 0 0), with length and radius
-/// \tparam direction The shape direction in {X, Y, Z}
-template <ShapeDirection direction>
+/// Capsule shape: centered on (0 0 0), aligned along Y,
+/// with length and radius
 class CapsuleShape: public RigidShape
 {
 public:
@@ -92,20 +91,20 @@ public:
 		// The Inertia matrix is a combination of the cylinder inertia and
 		// the 2 hemispheres inertia:
 		//
-		// Inertia of cylinder along the X axis (direction = 0)
+		// Inertia of cylinder along the Y axis
 		// mc = PI.radius.radius.length (mass of the cylinder)
 		// a = 1/2.mc.r^2
 		// b = 1/12.mc.(3.r^2 + h^2)
-		//               (a 0 0)
-		// I(cylinder) = (0 b 0)
+		//               (b 0 0)
+		// I(cylinder) = (0 a 0)
 		//               (0 0 b)
 		//
 		// Inertia of the 2 hemispheres along the X axis (direction = 0)
 		// ms = 4/3 pi.radius.radius.radius (mass of the entire sphere)
 		// c = 2/5.ms.r^2
 		// d = 2/5.ms.r^2 + ms.h^2/4 + 3/8.ms.r.h
-		//                    (c 0 0)
-		// I(2 hemispheres) = (0 d 0)
+		//                    (d 0 0)
+		// I(2 hemispheres) = (0 c 0)
 		//                    (0 0 d)
 		double a = 1.0 / 2.0  * cylinderMass * r2;
 		double b = 1.0 / 12.0 * cylinderMass * (3.0 * r2 + l2);
@@ -115,7 +114,7 @@ public:
 		Matrix33d inertia;
 		inertia.setZero();
 		inertia.diagonal().setConstant(b + d);
-		inertia(direction, direction) = a + c;
+		inertia(1, 1) = a + c;
 
 		return inertia;
 	}
@@ -128,8 +127,8 @@ private:
 	double   m_length;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_CAPSULESHAPE_H
+#endif // SURGSIM_PHYSICS_CAPSULESHAPE_H

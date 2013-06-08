@@ -22,7 +22,7 @@
 
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -60,7 +60,7 @@ public:
 	/// \return False if the 2 states are equals, True otherwise
 	bool operator !=(const RigidActorState &s) const
 	{
-		return ! (operator ==(s));
+		return ! ((*this) == s);
 	}
 
 	/// Reset the state to default values
@@ -107,13 +107,13 @@ public:
 private:
 	/// Linear velocity
 	Vector3d m_v;
-	
+
 	/// Angular velocity
 	Vector3d m_w;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTORSTATE_H
+#endif // SURGSIM_PHYSICS_RIGIDACTORSTATE_H

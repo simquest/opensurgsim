@@ -66,7 +66,10 @@ static const int cubeTrianglesCCW[12][3] =
 class EmptyData
 {
 public:
-	bool operator ==(const EmptyData& e) const { return true; };
+	bool operator ==(const EmptyData& e) const
+	{
+		return true;
+	}
 };
 
 class CubeMeshTest : public ::testing::Test
@@ -136,20 +139,20 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 			TriangleMesh::Triangle t(triangleElement);
 			mesh->addTriangle(t);
 		}
-		
+
 		SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData> boxMesh(mesh);
 
 		SurgSim::Physics::BoxShape boxShape(lx, ly, lz);
-		
+
 		SurgSim::Math::Matrix33d expectedInertia;
 		SurgSim::Math::Vector3d expectedMassCenter;
 		double expectedMass;
 		expectedMass       = boxShape.calculateMass(density);
 		expectedInertia    = boxShape.calculateInertia(density);
 		expectedMassCenter = boxShape.calculateMassCenter();
-		
+
 		EXPECT_NEAR(boxShape.calculateVolume(), boxMesh.calculateVolume(), 1e-8);
-		EXPECT_EQ(expectedMassCenter, boxMesh.calculateMassCenter());
+		EXPECT_TRUE((expectedMassCenter - boxMesh.calculateMassCenter()).isZero());
 		EXPECT_NEAR(expectedMass, boxMesh.calculateMass(density), 1e-8);
 		EXPECT_TRUE(boxMesh.calculateInertia(density).isApprox(expectedInertia));
 	}
