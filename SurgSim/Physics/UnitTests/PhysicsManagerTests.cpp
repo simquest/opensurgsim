@@ -20,8 +20,8 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Actors/Actor.h>
-#include <SurgSim/Physics/Actors/FixedActor.h>
+#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/FixedActor.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Framework::Runtime;
@@ -29,9 +29,8 @@ using SurgSim::Physics::FixedActor;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
-class PhysicsManagerTest : public ::testing::Test
+struct PhysicsManagerTest : public ::testing::Test
 {
-protected:
 	virtual void SetUp()
 	{
 		runtime = std::make_shared<Runtime>();

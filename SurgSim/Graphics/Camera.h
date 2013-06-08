@@ -36,7 +36,7 @@ class Group;
 /// A disabled (invisible) camera does not produce an image.
 ///
 /// Graphics::Camera is used with Graphics::View to provide the visualization of the virtual scene to the user.
-class Camera : public Actor
+class Camera : public virtual Actor
 {
 public:
 	/// Constructor

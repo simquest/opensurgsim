@@ -16,17 +16,89 @@
 /// \file
 /// Tests for the ViewElement class.
 
-#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
-#include "SurgSim/Framework/Runtime.h"
-#include "SurgSim/Framework/Scene.h"
+#include <SurgSim/Framework/Runtime.h>
+#include <SurgSim/Framework/Scene.h>
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;
+
+
+/// View element for testing
+class MockViewElement : public SurgSim::Graphics::ViewElement
+{
+public:
+	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
+		m_isInitialized(false),
+		m_isAwoken(false)
+	{
+	}
+
+	/// Sets the view component that provides the visualization of the graphics actors
+	/// Only allows MockView components, any other will not be set and it will return false.
+	/// \return	True if it succeeds, false if it fails
+	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
+	{
+		std::shared_ptr<MockView> mockView = std::dynamic_pointer_cast<MockView>(view);
+		if (mockView != nullptr)
+		{
+			return ViewElement::setView(mockView);
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/// Returns the View component as a MockView (only MockView is allowed by the overridden setView()).
+	std::shared_ptr<MockView> getMockView() const
+	{
+		return std::static_pointer_cast<MockView>(getView());
+	}
+
+	/// Gets whether the view element has been initialized
+	bool isInitialized() const
+	{
+		return m_isInitialized;
+	}
+	/// Gets whether the view element has been awoken
+	bool isAwoken() const
+	{
+		return m_isAwoken;
+	}
+private:
+	/// Initialize the view element
+	/// \post m_isInitialized is set to true
+	virtual bool doInitialize()
+	{
+		if (SurgSim::Graphics::ViewElement::doInitialize())
+		{
+			m_isInitialized = true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	/// Wake up the view element
+	/// \post m_isAwoken is set to true
+	virtual bool doWakeUp()
+	{
+		m_isAwoken = true;
+		return true;
+	}
+
+	/// Whether the view has been initialized
+	bool m_isInitialized;
+	/// Whether the view has been awoken
+	bool m_isAwoken;
+};
 
 /// View class for testing adding a non-MockView
 class NotMockView : public SurgSim::Graphics::View
@@ -47,7 +119,7 @@ public:
 
 	/// Get the position of this view
 	/// \param[out]	x,y	Position on the screen (in pixels)
-	virtual void getPosition(int* x, int* y)
+	virtual void getPosition(int* x, int* y) const
 	{
 		*x = 0;
 		*y = 0;
@@ -62,10 +134,22 @@ public:
 
 	/// Set the dimensions of this view
 	/// \param[out]	width,height	Dimensions on the screen (in pixels)
-	virtual void getDimensions(int* width, int* height)
+	virtual void getDimensions(int* width, int* height) const
 	{
 		*width = 0;
 		*height = 0;
+	}
+
+	/// Sets whether the view window has a border
+	/// \param	enabled	True to enable the border around the window; false for no border
+	virtual void setWindowBorderEnabled(bool enabled)
+	{
+	}
+	/// Returns whether the view window has a border
+	/// \return	True to enable the border around the window; false for no border
+	virtual bool isWindowBorderEnabled() const
+	{
+		return true;
 	}
 
 	/// Updates the view.
@@ -112,7 +196,7 @@ TEST(ViewElementTests, StartUpTest)
 	/// Run the thread for a moment
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	runtime->stop();
 
 	/// Check that the view element was initialized and awoken

@@ -31,8 +31,14 @@ using SurgSim::Framework::LockedContainer;
 class Copyable
 {
 public:
-	Copyable() : m_data(-1) {};
-	Copyable(const Copyable& o) : m_data(o.m_data) {}
+	Copyable() : m_data(-1)
+	{
+	}
+
+	Copyable(const Copyable& o) : m_data(o.m_data)
+	{
+	}
+
 	void operator=(const Copyable& o)
 	{
 		m_data = o.m_data;
@@ -57,7 +63,9 @@ private:
 class NonCopyable
 {
 public:
-	NonCopyable() : m_data(-1) {};
+	NonCopyable() : m_data(-1)
+	{
+	}
 
 	int getValue() const
 	{
@@ -81,7 +89,10 @@ private:
 class Movable
 {
 public:
-	Movable() : m_data(-1) {};
+	Movable() : m_data(-1)
+	{
+	}
+
 	Movable(Movable&& o) : m_data(o.m_data)
 	{
 		o.m_data = -1;
@@ -113,7 +124,9 @@ private:
 class BigData
 {
 public:
-	BigData() : m_data1(-1), m_data2(-1) {};
+	BigData() : m_data1(-1), m_data2(-1)
+	{
+	}
 
 	BigData(const BigData& o) : m_data1(o.m_data1), m_data2(o.m_data2) {}
 	void operator=(const BigData& o)

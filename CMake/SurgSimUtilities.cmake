@@ -153,17 +153,17 @@ if(SURGSIM_CPPLINT)
 	endif(NOT PYTHON_EXECUTABLE)
 endif(SURGSIM_CPPLINT)
 
-# Extra flags to pass to cpplint
-set(CPPLINT_DEFAULT_EXTRA_FLAGS)
+# Extra flags to pass to run-lint
+set(RUNLINT_DEFAULT_EXTRA_FLAGS)
 if(MSVC)
-	set(CPPLINT_DEFAULT_EXTRA_FLAGS --output=vs7)
-endif(MSVC)
+	set(RUNLINT_DEFAULT_EXTRA_FLAGS --vs)
+endif()
 
-set(SURGSIM_CPPLINT_EXTRA_FLAGS
-	${CPPLINT_DEFAULT_EXTRA_FLAGS}
-  CACHE STRING "Extra flags to pass to cpplint."
+set(SURGSIM_RUNLINT_EXTRA_FLAGS
+	${RUNLINT_DEFAULT_EXTRA_FLAGS}
+  CACHE STRING "Extra flags to pass to run-lint."
 )
-mark_as_advanced(SURGSIM_CPPLINT_EXTRA_FLAGS)
+mark_as_advanced(SURGSIM_RUNLINT_EXTRA_FLAGS)
 
 # Default filter settings for cpplint
 set(CPPLINT_DEFAULT_FILTER_LIST
@@ -182,13 +182,15 @@ set(CPPLINT_DEFAULT_FILTER_LIST
 	# potentially useful, but generates some crazy false positives
 	# (it claims <unordered_map> is a C header!?):
 	-build/include_order
+	# things disallowed by Google's coding standards, but not ours:
+	-runtime/rtti
 )
 string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")
 
 set(SURGSIM_CPPLINT_FILTERS
 	"${CPPLINT_DEFAULT_FILTERS}"
-  CACHE STRING "Filter settings to pass to cpplint."
+  CACHE STRING "Filter settings to pass to cpplint via run-cpplint."
 )
 mark_as_advanced(SURGSIM_CPPLINT_FILTERS)
 
@@ -202,8 +204,10 @@ macro(surgsim_run_cpplint TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 		add_custom_target("${TARGET}"
 			${PYTHON_EXECUTABLE}
-			  ${SURGSIM_THIRD_PARTY_DIR}/google-style-lint/cpplint.py
-				${SURGSIM_CPPLINT_EXTRA_FLAGS} ${SURGSIM_CPPLINT_FILTERS} ${ARGN}
+			  ${SURGSIM_TOOLS_DIR}/run-lint.py
+					--cpplint-script
+						${SURGSIM_THIRD_PARTY_DIR}/google-style-lint/cpplint.py
+					${SURGSIM_CPPLINT_FILTERS} ${SURGSIM_RUNLINT_EXTRA_FLAGS} ${ARGN}
 			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			COMMENT "Checking C++ sources with cpplint" VERBATIM)
 	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)

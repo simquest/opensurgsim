@@ -18,33 +18,53 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
+	CollisionPair.cpp
+	ContactCalculation.cpp
+	DcdCollision.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
-)
+	RigidActor.cpp
+	RigidActorCollisionRepresentation.cpp
+	VtcRigidActor.cpp)
 
 set(SURGSIM_PHYSICS_HEADERS
+	Actor.h
+	BoxShape.h
+	CapsuleShape.h
+	CollisionPair.h
+	CollisionRepresentation.h
+	ContactCalculation.h
 	Computation.h
+	CylinderShape.h
+	DcdCollision.h
+	FixedActor.h
 	FreeMotion.h
-	PhysicsManager.h
+	MeshShape.h
 	PhysicsManager-inl.h
+	PhysicsManager.h
+	PhysicsManagerState.h
+	PlaneShape.h
+	RigidActor.h
+	RigidActorBase.h
+	RigidActorBaseState.h
+	RigidActorCollisionRepresentation.h
+	RigidActorParameters.h
+	RigidActorState.h
+	RigidShape.h
+	Shapes.h
+	SphereShape.h
+	VtcRigidActor.h
+	VtcRigidParameters.h
 )
-
-add_subdirectory(Actors)
-
-set(SURGSIM_PHYSICS_ALL_SOURCES ${SURGSIM_PHYSICS_SOURCES} ${SURGSIM_PHYSICS_ACTORS_SOURCES})
-set(SURGSIM_PHYSICS_ALL_HEADERS ${SURGSIM_PHYSICS_HEADERS} ${SURGSIM_PHYSICS_ACTORS_HEADERS})
 
 surgsim_add_library(
     SurgSimPhysics
-    "${SURGSIM_PHYSICS_ALL_SOURCES}"
-    "${SURGSIM_PHYSICS_ALL_HEADERS}"
+    "${SURGSIM_PHYSICS_SOURCES}"
+    "${SURGSIM_PHYSICS_HEADERS}"
     "SurgSim/Physics"
 )
+target_link_libraries(SurgSimPhysics SurgSimFramework)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
-
-source_group("Source Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_SOURCES})
-source_group("Header Files\\Actors" FILES ${SURGSIM_PHYSICS_ACTORS_HEADERS})
-

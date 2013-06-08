@@ -43,7 +43,7 @@ public:
 	virtual ~InputComponent();
 
 	/// Is a device connected
-	/// \param [out] true if a device has been connected.
+	/// \return true if a device has been connected.
 	bool isDeviceConnected();
 
 	/// Connect to a device

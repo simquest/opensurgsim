@@ -20,8 +20,20 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	FreeMotionStepTests.cpp
+	ActorTest.cpp
+	ContactCalculationTests.cpp
+	DcdCollisionTests.cpp
+	FixedActorTest.cpp
+	FreeMotionTests.cpp
+	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
+	RigidActorBaseStateTest.cpp
+	RigidActorParametersTest.cpp
+	RigidActorStateTest.cpp
+	RigidActorTest.cpp
+	RigidShapeTest.cpp
+	VtcRigidActorTest.cpp
+	VtcRigidParametersTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -31,8 +43,5 @@ include_directories(
 )
 
 set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics gtest ${Boost_LIBRARIES})
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	set(LIBS ${LIBS} rt)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)

@@ -20,6 +20,7 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 include_directories(
 	"${Boost_INCLUDE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
@@ -67,6 +68,11 @@ surgsim_add_library(
 	"${SURGSIM_FRAMEWORK_HEADERS}" 
 	"SurgSim/Framework"
 )
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	target_link_libraries(SurgSimFramework rt)
+endif()
+
+
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

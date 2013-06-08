@@ -13,21 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Group.h"
+#include <SurgSim/Graphics/Group.h>
 
 #include <SurgSim/Graphics/Actor.h>
 
 using SurgSim::Graphics::Actor;
 using SurgSim::Graphics::Group;
 
-Group::Group(const std::string& name) : Representation(name)
+Group::Group(const std::string& name) : SurgSim::Framework::Component(name)
 {
 }
 Group::~Group()
 {
 }
 
-bool Group::addActor(std::shared_ptr<Actor> actor)
+bool Group::add(std::shared_ptr<Actor> actor)
 {
 	bool result = false;
 	if (std::find(m_actors.begin(), m_actors.end(), actor) == m_actors.end())
@@ -38,7 +38,21 @@ bool Group::addActor(std::shared_ptr<Actor> actor)
 	return result;
 }
 
-bool Group::removeActor(std::shared_ptr<Actor> actor)
+bool Group::append(std::shared_ptr<Group> group)
+{
+	bool result = true;
+	const std::vector<std::shared_ptr<Actor>>& members = group->getMembers();
+	for (auto it = members.begin(); it != members.end(); ++it)
+	{
+		if (! add(*it))
+		{
+			result = false;
+		}
+	}
+	return result;
+}
+
+bool Group::remove(std::shared_ptr<Actor> actor)
 {
 	bool result = false;
 	auto it = std::find(m_actors.begin(), m_actors.end(), actor);
@@ -50,41 +64,17 @@ bool Group::removeActor(std::shared_ptr<Actor> actor)
 	return result;
 }
 
-void Group::clearActors()
+void Group::clear()
 {
 	m_actors.clear();
 }
 
-bool Group::addGroup(std::shared_ptr<Group> group)
+bool Group::doInitialize()
 {
-	bool result = false;
-	if (std::find(m_groups.begin(), m_groups.end(), group) == m_groups.end())
-	{
-		m_groups.push_back(group);
-		result = true;
-	}
-	return result;
+	return true;
 }
 
-bool Group::removeGroup(std::shared_ptr<Group> group)
+bool Group::doWakeUp()
 {
-	bool result = false;
-	auto it = std::find(m_groups.begin(), m_groups.end(), group);
-	if (it != m_groups.end())
-	{
-		m_groups.erase(it);
-		result = true;
-	}
-	return result;
-}
-
-void Group::clearGroups()
-{
-	m_groups.clear();
-}
-
-void Group::clear()
-{
-	clearActors();
-	clearGroups();
+	return true;
 }

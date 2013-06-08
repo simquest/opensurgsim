@@ -13,21 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Graphics/Manager.h"
+#include <SurgSim/Graphics/Manager.h>
 
 #include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Representation.h>
 #include <SurgSim/Graphics/Actor.h>
 #include <SurgSim/Graphics/Camera.h>
 #include <SurgSim/Graphics/Group.h>
 #include <SurgSim/Graphics/View.h>
-
-#include <boost/any.hpp>
-#include <unordered_map>
-#include <functional>
-#include <iostream>
-#include <vector>
 
 using SurgSim::Graphics::Actor;
 using SurgSim::Graphics::Group;
@@ -175,7 +167,7 @@ bool Manager::removeView(std::shared_ptr<View> view)
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Group not found " << view->getName();
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " View not found " << view->getName();
 	}
 	return result;
 }
