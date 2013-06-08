@@ -29,6 +29,11 @@ set(SURGSIM_MATH_HEADERS
 	MLCP_ConstraintName.h
 	MLCP_GaussSeidel_Christian.h
 	MLCP_GaussSeidel_Christian-inl.h
+	MlcpConstraintType.h
+	MlcpGaussSeidelSolver.h
+	MlcpProblem.h
+	MlcpSolution.h
+	MlcpSolver.h
 	Matrix.h
 	Quaternion.h
 	RigidTransform.h
