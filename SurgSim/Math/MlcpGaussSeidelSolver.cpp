@@ -1,3 +1,5 @@
+#include "SurgSim/Math/MlcpGaussSeidelSolver.h"
+
 #include <math.h>
 
 #include <Eigen/Core>
@@ -5,6 +7,12 @@
 #include <Eigen/Dense>
 
 #include <SurgSim/Math/Valid.h>
+
+
+namespace SurgSim
+{
+namespace Math
+{
 
 // cf. Christian Duriez TVCG05 paper
 // Realistic Haptic Rendering of Interacting
@@ -28,17 +36,30 @@ IN Vector b defining the RHS LCP
 INOUT Vector of initial guess and solution
 @param frictionCoefs
 IN vector containing the friction coefficient for each constraint
-@param vector<MLCP_Constraint>
+@param vector<MlcpConstraintType>
 IN list of constraint type useful to define the number of atomic constraint per entry and how to handle each constraint.
 */
-template <class Matrix, class Vector> bool MLCP_GaussSeidel_Christian<Matrix,Vector>::
-solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& initialGuess_and_solution, IN Vector& frictionCoefs,
-      IN vector<MLCP_Constraint>& constraintsType, IN double subStep, OUT int* MLCP_nbIterations, OUT bool* validConvergence, OUT bool* validSignorini,
-      OUT double* convergenceCriteria, OUT double* initialConvergenceCriteria,
-      OUT double* constraintConvergenceCriteria, OUT double* initialConstraintConvergenceCriteria,
-      IN bool catchExplodingConvergenceCriteria, IN bool verbose)
+bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
-	int nbConstraints = (int)constraintsType.size();
+	int n = problem.getSize();
+	const Eigen::MatrixXd& A = problem.A;
+	const int nbColumnInA = A.cols();
+	const Eigen::VectorXd& b = problem.b;
+	Eigen::VectorXd& initialGuess_and_solution = solution->x;
+	const Eigen::VectorXd& frictionCoefs = problem.mu;
+	const std::vector<MlcpConstraintType>& constraintsType = problem.constraintTypes;
+	double subStep = 1.0;//XXX
+	int* MLCP_nbIterations = &solution->numIterations;
+	bool* validConvergence = &solution->validConvergence;
+	bool* validSignorini = &solution->validSignorini;
+	double* convergenceCriteria = &solution->convergenceCriteria;
+	double* initialConvergenceCriteria = &solution->initialConvergenceCriteria;
+	double* constraintConvergenceCriteria = solution->constraintConvergenceCriteria;
+	double* initialConstraintConvergenceCriteria = solution->initialConstraintConvergenceCriteria;
+	bool catchExplodingConvergenceCriteria = true;
+	bool verbose = true;
+
+	int nbConstraints = static_cast<int>(constraintsType.size());
 
 	//cout << "======== MLCP ========" << endl;
 	//cout << "\tMLCP: nbAtomicEntry (nb Line In Matrix)="<<n<<" - nbConstraints=" << nbConstraints << endl;
@@ -61,7 +82,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 	                             initial_constraint_convergence_criteria, initial_convergence_criteria, initialSignoriniVerified, initialSignoriniValid);
 
 	// If it is already converged, fill the output and return true.
-	if (initial_convergence_criteria <= epsilonConvergence && initialSignoriniVerified)
+	if (initial_convergence_criteria <= m_epsilonConvergence && initialSignoriniVerified)
 	{
 		if (validSignorini)
 		{
@@ -101,7 +122,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 
 	do
 	{
-		doOneIteration(n, A, nbColumnInA, b, initialGuess_and_solution, frictionCoefs,
+		doOneIteration(n, A, nbColumnInA, b, &initialGuess_and_solution, frictionCoefs,
 		               constraintsType, subStep, constraint_convergence_criteria, convergence_criteria, signorini_verified);
 
 		calculateConvergenceCriteria(n, A, nbColumnInA, b,
@@ -125,10 +146,10 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 			}
 		}
 
-		//printf("  Solver [loop %2d] convergence_criteria=%g<?%g\n",nbLoop,convergence_criteria,epsilonConvergence);
+		//printf("  Solver [loop %2d] convergence_criteria=%g<?%g\n",nbLoop,convergence_criteria,m_epsilonConvergence);
 
 	}
-	while ((!signorini_verified || (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>epsilonConvergence)) && nbLoop<maxIterations);
+	while ((!signorini_verified || (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>m_epsilonConvergence)) && nbLoop<m_maxIterations);
 
 	if (MLCP_nbIterations)
 	{
@@ -144,11 +165,11 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 			*validConvergence = false;
 		}
 
-		if (!(convergence_criteria < sqrt(epsilonConvergence)))
+		if (!(convergence_criteria < sqrt(m_epsilonConvergence)))
 		{
 			if (verbose)
 			{
-				printf("Convergence criteria (%e) is greater than %e at end of %d Gauss Seidel iterations.\n", convergence_criteria, sqrt(epsilonConvergence), nbLoop);
+				printf("Convergence criteria (%e) is greater than %e at end of %d Gauss Seidel iterations.\n", convergence_criteria, sqrt(m_epsilonConvergence), nbLoop);
 			}
 			//*validConvergence = false;
 		}
@@ -186,7 +207,7 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 		*initialConvergenceCriteria = initial_convergence_criteria;
 	}
 
-	if (convergence_criteria > epsilonConvergence || !SurgSim::Math::isValid(convergence_criteria) || !signorini_valid)
+	if (convergence_criteria > m_epsilonConvergence || !SurgSim::Math::isValid(convergence_criteria) || !signorini_valid)
 	{
 //#ifdef PRINTOUT_TEST_APP
 		//cout << "\tLCP_3DContactFriction_GaussSeidel_Christian::solve did <<<NOT>>> converge after " << nbLoop << " iterations" << endl;
@@ -209,9 +230,8 @@ solve(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& in
 }
 
 
-template <class Matrix, class Vector> void MLCP_GaussSeidel_Christian<Matrix,Vector>::
-calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b,
-                             IN Vector& initialGuess_and_solution, IN vector<MLCP_Constraint>& constraintsType, IN double subStep,
+void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+                             const Eigen::VectorXd& initialGuess_and_solution, const std::vector<MlcpConstraintType>& constraintsType, double subStep,
                              double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
                              bool& signoriniVerified, bool& signoriniValid)
 {
@@ -297,7 +317,7 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			{
 				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
-			if (violation<-contactTolerance || !SurgSim::Math::isValid(violation))
+			if (violation < -m_contactTolerance || !SurgSim::Math::isValid(violation))
 			{
 				signoriniVerified=false;
 			}
@@ -316,7 +336,7 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 			{
 				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
-			if (violation<-contactTolerance || !SurgSim::Math::isValid(violation))
+			if (violation < -m_contactTolerance || !SurgSim::Math::isValid(violation))
 			{
 				signoriniVerified=false;
 			}
@@ -364,7 +384,8 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 		break;
 
 		default:
-			cerr << "MLCP_GaussSeidel_Christian::solve unknown constraint type ["<<constraintsType[i]<<"]" << endl;
+			//XXX
+			std::cerr << "MlcpGaussSeidelSolver::solve unknown constraint type ["<<constraintsType[i]<<"]" << std::endl;
 			break;
 		}
 
@@ -376,11 +397,11 @@ calculateConvergenceCriteria(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vect
 	}
 }
 
-template <class Matrix, class Vector> void MLCP_GaussSeidel_Christian<Matrix,Vector>::
-computeEnforcementSystem(
-    IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& initialGuess_and_solution, IN Vector& frictionCoefs,
-    IN vector<MLCP_Constraint>& constraintsType, IN double subStep,
-    IN int constraintID,IN int matrixEntryForConstraintID)
+void MlcpGaussSeidelSolver::computeEnforcementSystem(
+    int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b, const Eigen::VectorXd& initialGuess_and_solution,
+	const Eigen::VectorXd& frictionCoefs,
+	const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+	int constraintID, int matrixEntryForConstraintID)
 {
 	int nbConstraints = (int)constraintsType.size();
 	int systemSize=0;                    // Total size of the system (number of line and column in the final matrix)
@@ -442,13 +463,13 @@ computeEnforcementSystem(
 			systemSize+=2;
 			break; // The system will solve the sliding case, not the frictional part !
 		default:
-			printf("MLCP_GaussSeidel_Christian::computeEnforcementSystem  Unkown constraint !?\n");
+			printf("MlcpGaussSeidelSolver::computeEnforcementSystem  Unkown constraint !?\n");
 			break;
 		}
 	}
-	nbEnforcedAtomicConstraint = systemSize;
-	RHS_enforcedLocalSystem.resize(systemSize);
-	LHS_enforcedLocalSystem.resize(systemSize, systemSize);
+	m_numEnforcedAtomicConstraints = systemSize;
+	m_rhsEnforcedLocalSystem.resize(systemSize);
+	m_lhsEnforcedLocalSystem.resize(systemSize, systemSize);
 
 	// 2nd) Fill up the system
 	// We suppose that the constraint to enforce are only 1D, 2D or 3D bilateral constraints
@@ -456,16 +477,16 @@ computeEnforcementSystem(
 		// Here we fill up the core part, compliance between all the constraints themselves !
 		for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 		{
-			RHS_enforcedLocalSystem[line] = b[line] * subStep;  // At the same time, we compute the violation for the constraints
+			m_rhsEnforcedLocalSystem[line] = b[line] * subStep;  // At the same time, we compute the violation for the constraints
 			for (int column=0 ; column<systemSizeWithoutConstraintID ; column++)
 			{
-				LHS_enforcedLocalSystem(line, column) = A(line, column);
-				RHS_enforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
+				m_lhsEnforcedLocalSystem(line, column) = A(line, column);
+				m_rhsEnforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
 			}
 			// Now we complete the violation[line] computation by taking into account the effect of all remaining contacts/slidings/constraints
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
 			}
 		}
 
@@ -475,19 +496,19 @@ computeEnforcementSystem(
 		case MLCP_BILATERAL_1D_CONSTRAINT:
 		{
 			// Coupling part (fill up LHS and RHS)
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] = b[matrixEntryForConstraintID] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] = b[matrixEntryForConstraintID] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -495,29 +516,29 @@ computeEnforcementSystem(
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
 			// Coupling part (fill up LHS and RHS)
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] = b[matrixEntryForConstraintID  ] * subStep;
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] = b[matrixEntryForConstraintID  ] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
 
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,     line) = A(matrixEntryForConstraintID,   line);
-				LHS_enforcedLocalSystem((systemSizeWithoutConstraintID+1), line) = A(matrixEntryForConstraintID+1, line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,     line) = A(matrixEntryForConstraintID,   line);
+				m_lhsEnforcedLocalSystem((systemSizeWithoutConstraintID+1), line) = A(matrixEntryForConstraintID+1, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -525,39 +546,39 @@ computeEnforcementSystem(
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
 			// Coupling part (fill up LHS and RHS)
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] = b[matrixEntryForConstraintID  ] * subStep;
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] = b[matrixEntryForConstraintID+2] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] = b[matrixEntryForConstraintID  ] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] = b[matrixEntryForConstraintID+2] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+2) = A(line, matrixEntryForConstraintID+2);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID+2) = A(line, matrixEntryForConstraintID+2);
 
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, line) = A(matrixEntryForConstraintID+2, line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, line) = A(matrixEntryForConstraintID+2, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+2);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+2);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+1);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+2);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+2);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+2);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+2);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -567,21 +588,21 @@ computeEnforcementSystem(
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
 			// Coupling part (fill up LHS and RHS)
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] = b[matrixEntryForConstraintID] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] = b[matrixEntryForConstraintID] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
 			}
 
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
 			//...and complete the violation for the normal contact constraint
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
 			}
 		}
 		break;
@@ -591,37 +612,37 @@ computeEnforcementSystem(
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
 			// Coupling part  (fill up LHS and RHS)
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] = b[matrixEntryForConstraintID  ] * subStep;
-			RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] = b[matrixEntryForConstraintID  ] * subStep;
+			m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] = b[matrixEntryForConstraintID+1] * subStep;
 			for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 			{
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
-				LHS_enforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
+				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
 
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
-				LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
 
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
 
 			// Compliance part for the {contact|sliding}
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
-			LHS_enforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
 			//...and complete the violation for the normal contact constraints
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
-				RHS_enforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
 			}
 
 		}
 		break;
 
 		default:
-			printf("MLCP_GaussSeidel_Christian::computeEnforcementSystem  Unkown constraint !?\n");
+			printf("MlcpGaussSeidelSolver::computeEnforcementSystem  Unkown constraint !?\n");
 			break;
 		}
 	}
@@ -641,10 +662,11 @@ static inline bool solveSystem(const Eigen::MatrixXd& A, const Eigen::VectorXd& 
 	return true;
 }
 
-template <class Matrix, class Vector> void MLCP_GaussSeidel_Christian<Matrix,Vector>::
-doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT Vector& initialGuess_and_solution, IN Vector& frictionCoefs,
-               IN vector<MLCP_Constraint>& constraintsType, IN double subStep,
-               OUT double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], OUT double& convergence_criteria, OUT bool& signoriniVerified)
+void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+												Eigen::VectorXd* initialGuess_and_solution, const Eigen::VectorXd& frictionCoefs,
+												const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+												double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
+												double& convergence_criteria, bool& signoriniVerified)
 {
 	for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 	{
@@ -666,11 +688,11 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//####################################
 		case MLCP_BILATERAL_1D_CONSTRAINT:
 		{
-			double& F  = initialGuess_and_solution[currentAtomicIndex];
+			double& F  = (*initialGuess_and_solution)[currentAtomicIndex];
 			double violation = b[currentAtomicIndex]*subStep;
 			for (int j=0 ; j<n ; j++)
 			{
-				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
+				violation += A(currentAtomicIndex, j) * (*initialGuess_and_solution)[j];
 			}
 			F -= violation / A(currentAtomicIndex, currentAtomicIndex);
 		}
@@ -682,13 +704,13 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		//####################################
 		case MLCP_BILATERAL_2D_CONSTRAINT:
 		{
-			double& F1  = initialGuess_and_solution[currentAtomicIndex  ];
-			double& F2  = initialGuess_and_solution[currentAtomicIndex+1];
+			double& F1  = (*initialGuess_and_solution)[currentAtomicIndex  ];
+			double& F2  = (*initialGuess_and_solution)[currentAtomicIndex+1];
 			double violation[2] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+				violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			}
 			// det = ad-bc
 			// [ a b ]   [  d -b ]       [ 1 0 ]
@@ -711,15 +733,15 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		//####################################
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
-			double& F1  = initialGuess_and_solution[currentAtomicIndex  ];
-			double& F2  = initialGuess_and_solution[currentAtomicIndex+1];
-			double& F3  = initialGuess_and_solution[currentAtomicIndex+2];
+			double& F1  = (*initialGuess_and_solution)[currentAtomicIndex  ];
+			double& F2  = (*initialGuess_and_solution)[currentAtomicIndex+1];
+			double& F3  = (*initialGuess_and_solution)[currentAtomicIndex+2];
 			double violation[3] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
 			for (int j=0 ; j<n ; j++)
 			{
-				violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
-				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
+				violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+				violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+				violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
 			}
 			Eigen::Matrix3d Ainv = A.block<3,3>(currentAtomicIndex, currentAtomicIndex).inverse();
 			F1 -= (Ainv(0, 0)*violation[0] + Ainv(0, 1)*violation[1] + Ainv(0, 2)*violation[2]);
@@ -734,23 +756,23 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		//####################################
 		case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 		{
-			double& Fn  = initialGuess_and_solution[currentAtomicIndex];
+			double& Fn  = (*initialGuess_and_solution)[currentAtomicIndex];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
 
 			// Correct the forces accordingly
-			for (int i=0 ; i<nbEnforcedAtomicConstraint-1 ; i++)
+			for (int i=0 ; i<m_numEnforcedAtomicConstraints-1 ; i++)
 			{
-				initialGuess_and_solution[i] -= RHS_enforcedLocalSystem[i];
+				(*initialGuess_and_solution)[i] -= m_rhsEnforcedLocalSystem[i];
 			}
-			Fn -= RHS_enforcedLocalSystem[nbEnforcedAtomicConstraint-1];
+			Fn -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-1];
 
 			if (Fn<0.0)
 			{
@@ -766,25 +788,25 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
 			double local_mu = frictionCoefs[i];
-			double& Fn  = initialGuess_and_solution[currentAtomicIndex  ];
-			double& Ft1 = initialGuess_and_solution[currentAtomicIndex+1];
-			double& Ft2 = initialGuess_and_solution[currentAtomicIndex+2];
+			double& Fn  = (*initialGuess_and_solution)[currentAtomicIndex  ];
+			double& Ft1 = (*initialGuess_and_solution)[currentAtomicIndex+1];
+			double& Ft2 = (*initialGuess_and_solution)[currentAtomicIndex+2];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
 
 			// Correct the forces accordingly
-			for (int i=0 ; i<nbEnforcedAtomicConstraint-1 ; i++)
+			for (int i=0 ; i<m_numEnforcedAtomicConstraints-1 ; i++)
 			{
-				initialGuess_and_solution[i] -= RHS_enforcedLocalSystem[i];
+				(*initialGuess_and_solution)[i] -= m_rhsEnforcedLocalSystem[i];
 			}
-			Fn -= RHS_enforcedLocalSystem[nbEnforcedAtomicConstraint-1];
+			Fn -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-1];
 
 			if (Fn>0.0)
 			{
@@ -792,8 +814,8 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 				double violation[2]= { b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
 				for (int i=0 ; i<n ; i++)
 				{
-					violation[0] += A(currentAtomicIndex+1, i)*initialGuess_and_solution[i];
-					violation[1] += A(currentAtomicIndex+2, i)*initialGuess_and_solution[i];
+					violation[0] += A(currentAtomicIndex+1, i)*(*initialGuess_and_solution)[i];
+					violation[1] += A(currentAtomicIndex+2, i)*(*initialGuess_and_solution)[i];
 				}
 
 				Ft1 -= 2*violation[0]/(A(currentAtomicIndex+1, currentAtomicIndex+1) + A(currentAtomicIndex+2, currentAtomicIndex+2));
@@ -824,25 +846,25 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		{
 			double local_mu = frictionCoefs[i];
-			double& Fn1 = initialGuess_and_solution[currentAtomicIndex  ];
-			double& Fn2 = initialGuess_and_solution[currentAtomicIndex+1];
+			double& Fn1 = (*initialGuess_and_solution)[currentAtomicIndex  ];
+			double& Fn2 = (*initialGuess_and_solution)[currentAtomicIndex+1];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
 
 			// Correct the forces accordingly
-			for (int i=0 ; i<nbEnforcedAtomicConstraint-2 ; i++)
+			for (int i=0 ; i<m_numEnforcedAtomicConstraints-2 ; i++)
 			{
-				initialGuess_and_solution[i] -= RHS_enforcedLocalSystem[i];
+				(*initialGuess_and_solution)[i] -= m_rhsEnforcedLocalSystem[i];
 			}
-			Fn1 -= RHS_enforcedLocalSystem[nbEnforcedAtomicConstraint-2];
-			Fn2 -= RHS_enforcedLocalSystem[nbEnforcedAtomicConstraint-1];
+			Fn1 -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-2];
+			Fn2 -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-1];
 
 			//// 1st we analyze the constraints in the system to see if we should enforce any of them while solving the contact !
 			//if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT) // Bilateral 3D ?
@@ -858,27 +880,27 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			// We want to enforce these constraints while solving the contact
 			//			// => solve 7x7 system, including the bilateral 3D constraint + directional 2D constraint + axial 1D rotation + contact normal force (1D)
 			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = initialGuess_and_solution[0];
-			//			double &FY  = initialGuess_and_solution[1];
-			//			double &FZ  = initialGuess_and_solution[2];
+			//			double &FX  = (*initialGuess_and_solution)[0];
+			//			double &FY  = (*initialGuess_and_solution)[1];
+			//			double &FZ  = (*initialGuess_and_solution)[2];
 
-			//			double &FdirX  = initialGuess_and_solution[3];
-			//			double &FdirY  = initialGuess_and_solution[4];
+			//			double &FdirX  = (*initialGuess_and_solution)[3];
+			//			double &FdirY  = (*initialGuess_and_solution)[4];
 
-			//			double &Faxial  = initialGuess_and_solution[5];
+			//			double &Faxial  = (*initialGuess_and_solution)[5];
 
 			//			double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[5]*subStep,
 			//				b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
-			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
-			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
-			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
-			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
-			//				violation[5] += A(5, j) * initialGuess_and_solution[j];
-			//				violation[6] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//				violation[7] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+			//				violation[5] += A(5, j) * (*initialGuess_and_solution)[j];
+			//				violation[6] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//				violation[7] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//			}
 			//			double localA[64]={
 			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
@@ -918,23 +940,23 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			// We want to enforce these constraints while solving the contact
 			//			// => solve 6x6 system, including the bilateral 3D constraint + directional 2D constraint + contact normal force (1D)
 			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = initialGuess_and_solution[0];
-			//			double &FY  = initialGuess_and_solution[1];
-			//			double &FZ  = initialGuess_and_solution[2];
+			//			double &FX  = (*initialGuess_and_solution)[0];
+			//			double &FY  = (*initialGuess_and_solution)[1];
+			//			double &FZ  = (*initialGuess_and_solution)[2];
 
-			//			double &FdirX  = initialGuess_and_solution[3];
-			//			double &FdirY  = initialGuess_and_solution[4];
+			//			double &FdirX  = (*initialGuess_and_solution)[3];
+			//			double &FdirY  = (*initialGuess_and_solution)[4];
 
 			//			double violation[7] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
-			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
-			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
-			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
-			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
-			//				violation[5] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//				violation[6] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+			//				violation[5] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//				violation[6] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//			}
 			//			double localA[49]={
 			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
@@ -972,17 +994,17 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//		// We want to enforce this constraint while solving the contact
 			//		// => solve 4x4 system, including the bilateral 3D constraint + contact normal force (1D)
 			//		// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//		double &FX  = initialGuess_and_solution[0];
-			//		double &FY  = initialGuess_and_solution[1];
-			//		double &FZ  = initialGuess_and_solution[2];
+			//		double &FX  = (*initialGuess_and_solution)[0];
+			//		double &FY  = (*initialGuess_and_solution)[1];
+			//		double &FZ  = (*initialGuess_and_solution)[2];
 			//		double violation[5] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//		for( int j=0 ; j<n ; j++ )
 			//		{
-			//			violation[0] += A(0, j) * initialGuess_and_solution[j];
-			//			violation[1] += A(1, j) * initialGuess_and_solution[j];
-			//			violation[2] += A(2, j) * initialGuess_and_solution[j];
-			//			violation[3] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//			violation[4] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//			violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+			//			violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+			//			violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+			//			violation[3] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//			violation[4] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//		}
 			//		double localA[25]={
 			//			A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
@@ -1016,8 +1038,8 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//	double violation[2] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
 			//	for( int j=0 ; j<n ; j++ )
 			//	{
-			//		violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//		violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//		violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//		violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//	}
 
 			//	// det = ad-bc
@@ -1042,26 +1064,26 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
 			double local_mu = frictionCoefs[i];
-			double& Fn1 = initialGuess_and_solution[currentAtomicIndex  ];
-			double& Fn2 = initialGuess_and_solution[currentAtomicIndex+1];
-			double& Ft  = initialGuess_and_solution[currentAtomicIndex+2];
+			double& Fn1 = (*initialGuess_and_solution)[currentAtomicIndex  ];
+			double& Fn2 = (*initialGuess_and_solution)[currentAtomicIndex+1];
+			double& Ft  = (*initialGuess_and_solution)[currentAtomicIndex+2];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,initialGuess_and_solution,frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(LHS_enforcedLocalSystem, RHS_enforcedLocalSystem, nbEnforcedAtomicConstraint, &RHS_enforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
 
 			// Correct the forces accordingly
-			for (int i=0 ; i<nbEnforcedAtomicConstraint-2 ; i++)
+			for (int i=0 ; i<m_numEnforcedAtomicConstraints-2 ; i++)
 			{
-				initialGuess_and_solution[i] -= RHS_enforcedLocalSystem[i];
+				(*initialGuess_and_solution)[i] -= m_rhsEnforcedLocalSystem[i];
 			}
-			Fn1 -= RHS_enforcedLocalSystem[nbEnforcedAtomicConstraint-2];
-			Fn2 -= RHS_enforcedLocalSystem[nbEnforcedAtomicConstraint-1];
+			Fn1 -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-2];
+			Fn2 -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-1];
 
 			// No Signorini to verify here, it is NOT a unilateral constraint, but bilateral
 			//if(Fn>0.0)
@@ -1070,7 +1092,7 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 				double violation = b[currentAtomicIndex+2]*subStep;
 				for (int i=0 ; i<n ; i++)
 				{
-					violation += A(currentAtomicIndex+2, i)*initialGuess_and_solution[i];
+					violation += A(currentAtomicIndex+2, i)*(*initialGuess_and_solution)[i];
 				}
 
 				Ft -= violation/A(currentAtomicIndex+2, currentAtomicIndex+2);
@@ -1099,30 +1121,30 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			// We want to enforce these constraints while solving the contact
 			//			// => solve 7x7 system, including the bilateral 3D constraint + directional 2D constraint + axial 1D rotation + contact normal force (1D)
 			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = initialGuess_and_solution[0];
-			//			double &FY  = initialGuess_and_solution[1];
-			//			double &FZ  = initialGuess_and_solution[2];
+			//			double &FX  = (*initialGuess_and_solution)[0];
+			//			double &FY  = (*initialGuess_and_solution)[1];
+			//			double &FZ  = (*initialGuess_and_solution)[2];
 
-			//			double &FdirX  = initialGuess_and_solution[3];
-			//			double &FdirY  = initialGuess_and_solution[4];
+			//			double &FdirX  = (*initialGuess_and_solution)[3];
+			//			double &FdirY  = (*initialGuess_and_solution)[4];
 
-			//			double &Faxial  = initialGuess_and_solution[5];
+			//			double &Faxial  = (*initialGuess_and_solution)[5];
 
 			//			double violation[9] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[5]*subStep,
 			//				b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
-			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
-			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
-			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
-			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
-			//				violation[5] += A(5, j) * initialGuess_and_solution[j];
-			//				violation[6] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//				violation[7] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+			//				violation[5] += A(5, j) * (*initialGuess_and_solution)[j];
+			//				violation[6] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//				violation[7] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//				if(j>=7 && j!=currentAtomicIndex)
 			//				{
-			//					violation[8] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
+			//					violation[8] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
 			//				}
 			//			}
 			//			double localA[64]={
@@ -1188,26 +1210,26 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//			// We want to enforce these constraints while solving the contact
 			//			// => solve 6x6 system, including the bilateral 3D constraint + directional 2D constraint + contact normal force (1D)
 			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = initialGuess_and_solution[0];
-			//			double &FY  = initialGuess_and_solution[1];
-			//			double &FZ  = initialGuess_and_solution[2];
+			//			double &FX  = (*initialGuess_and_solution)[0];
+			//			double &FY  = (*initialGuess_and_solution)[1];
+			//			double &FZ  = (*initialGuess_and_solution)[2];
 
-			//			double &FdirX  = initialGuess_and_solution[3];
-			//			double &FdirY  = initialGuess_and_solution[4];
+			//			double &FdirX  = (*initialGuess_and_solution)[3];
+			//			double &FdirY  = (*initialGuess_and_solution)[4];
 
 			//			double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//			for( int j=0 ; j<n ; j++ )
 			//			{
-			//				violation[0] += A(0, j) * initialGuess_and_solution[j];
-			//				violation[1] += A(1, j) * initialGuess_and_solution[j];
-			//				violation[2] += A(2, j) * initialGuess_and_solution[j];
-			//				violation[3] += A(3, j) * initialGuess_and_solution[j];
-			//				violation[4] += A(4, j) * initialGuess_and_solution[j];
-			//				violation[5] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//				violation[6] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+			//				violation[5] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//				violation[6] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//				if(j>=6 && j!=currentAtomicIndex)
 			//				{
-			//					violation[7] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
+			//					violation[7] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
 			//				}
 			//			}
 			//			double localA[49]={
@@ -1270,20 +1292,20 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//		// We want to enforce this constraint while solving the contact
 			//		// => solve 4x4 system, including the bilateral 3D constraint + contact normal force (1D)
 			//		// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//		double &FX  = initialGuess_and_solution[0];
-			//		double &FY  = initialGuess_and_solution[1];
-			//		double &FZ  = initialGuess_and_solution[2];
+			//		double &FX  = (*initialGuess_and_solution)[0];
+			//		double &FY  = (*initialGuess_and_solution)[1];
+			//		double &FZ  = (*initialGuess_and_solution)[2];
 			//		double violation[6] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//		for( int j=0 ; j<n ; j++ )
 			//		{
-			//			violation[0] += A(0, j) * initialGuess_and_solution[j];
-			//			violation[1] += A(1, j) * initialGuess_and_solution[j];
-			//			violation[2] += A(2, j) * initialGuess_and_solution[j];
-			//			violation[3] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//			violation[4] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
+			//			violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+			//			violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+			//			violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+			//			violation[3] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//			violation[4] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
 			//			if(j>=4 && j!=currentAtomicIndex)
 			//			{
-			//				violation[5] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
+			//				violation[5] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
 			//			}
 			//		}
 			//		double localA[25]={
@@ -1340,15 +1362,15 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 			//	double violation[3] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
 			//	for( int j=0 ; j<currentAtomicIndex ; j++ )
 			//	{
-			//		violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//		violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
-			//		violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
+			//		violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//		violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+			//		violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
 			//	}
 			//	for( int j=currentAtomicIndex+3 ; j<n ; j++ )
 			//	{
-			//		violation[0] += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
-			//		violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
-			//		violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
+			//		violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+			//		violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+			//		violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
 			//	}
 			//	violation[0] += A(currentAtomicIndex, currentAtomicIndex)*Fn1 +
 			//		A(currentAtomicIndex, currentAtomicIndex+1)*Fn2 +
@@ -1395,14 +1417,17 @@ doOneIteration(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, INOUT V
 		//####################################
 		//####################################
 		default:
-			cerr << "MLCP_GaussSeidel_Christian::solve constraint type unknown ["<<constraintsType[i]<<"]" << endl;
+			//XXX
+			std::cerr << "MlcpGaussSeidelSolver::solve constraint type unknown ["<<constraintsType[i]<<"]" << std::endl;
+			break;
 		}
 	}
 }
 
-template <class Matrix, class Vector> void MLCP_GaussSeidel_Christian<Matrix,Vector>::
-printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vector& b, IN Vector& initialGuess_and_solution,
-                              IN vector<MLCP_Constraint>& constraintsType, IN double subStep, IN double convergence_criteria, IN bool signorini_verified, IN int nbLoop)
+void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+															   const Eigen::VectorXd& initialGuess_and_solution,
+															   const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+															   double convergence_criteria, bool signorini_verified, int nbLoop)
 {
 	printf("MLCP at iteration %d =\n",nbLoop);
 
@@ -1469,9 +1494,9 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 				violation += A(currentAtomicIndex,   j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g) ",violation);
-			if (violation<-contactTolerance)
+			if (violation < -m_contactTolerance)
 			{
-				printf("\n\t  => normal violation = %g < -contactTolerance => Signorini not verified yet !",violation);
+				printf("\n\t  => normal violation = %g < -m_contactTolerance => Signorini not verified yet !",violation);
 			}
 			printf("\n\t force=(%g) ",initialGuess_and_solution[currentAtomicIndex]);
 			currentAtomicIndex+=1;
@@ -1489,7 +1514,7 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
-			if (violation[0]<-contactTolerance)
+			if (violation[0] < -m_contactTolerance)
 			{
 				printf("\n\t  => normal violation = %g < -contactTolerance => Signorini not verified yet !",violation[0]);
 			}
@@ -1535,3 +1560,6 @@ printViolationsAndConvergence(IN int n, IN Matrix& A, IN int nbColumnInA, IN Vec
 	}
 	printf("convergence_criteria=%g  Signorini verified=%b\n", convergence_criteria, signorini_verified);
 }
+
+};  // namespace Math
+};  // namespace SurgSim

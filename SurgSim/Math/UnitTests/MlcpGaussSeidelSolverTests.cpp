@@ -25,65 +25,69 @@
 #include <boost/chrono.hpp>
 
 #include <SurgSim/Math/Valid.h>
-#include <SurgSim/Math/MLCP_GaussSeidel_Christian.h>
+#include <SurgSim/Math/MlcpGaussSeidelSolver.h>
+#include <SurgSim/Math/MlcpSolution.h>
 #include "MlcpTestData.h"
 #include "ReadText.h"
 
 using SurgSim::Math::isValid;
+using SurgSim::Math::MlcpGaussSeidelSolver;
 
 
-static std::shared_ptr<MlcpTestData> loadTestProblem(const std::string& fileName)
+static std::shared_ptr<MlcpTestData> loadTestData(const std::string& fileName)
 {
-	std::shared_ptr<MlcpTestData> problem = std::make_shared<MlcpTestData>();
-	if (! readMlcpTestDataAsText("MlcpTestData/" + fileName, problem.get()))
+	std::shared_ptr<MlcpTestData> data = std::make_shared<MlcpTestData>();
+	if (! readMlcpTestDataAsText("MlcpTestData/" + fileName, data.get()))
 	{
-		problem.reset();
+		data.reset();
 	}
-	return problem;
+	return data;
 }
 
 
 TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 {
 	//ASSERT_NO_THROW({
-	MLCP_GaussSeidel_Christian<Eigen::MatrixXd, Eigen::VectorXd> mlcpSolver(1.0, 1.0, 100);
+	MlcpGaussSeidelSolver mlcpSolver(1.0, 1.0, 100);
 }
 
 
 static void compareResult(const std::string& fileName,
                           double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8, int gsMaxIterations = 20)
 {
-	const std::shared_ptr<MlcpTestData> problem = loadTestProblem(fileName);
-	ASSERT_TRUE(problem) << "Failed to load " << fileName;
+	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
+	ASSERT_TRUE(data) << "Failed to load " << fileName;
 
 	// NB: need to make the solver calls const-correct.
-	Eigen::MatrixXd HCHt = problem->HCHt;
-	Eigen::VectorXd E = problem->E;
-	Eigen::VectorXd mu = problem->mu;
-	std::vector<MLCP_Constraint> constraintTypes = problem->constraintTypes;
+	Eigen::MatrixXd A = data->problem.A;
+	Eigen::VectorXd b = data->problem.b;
+	Eigen::VectorXd mu = data->problem.mu;
+	std::vector<MlcpConstraintType> constraintTypes = data->problem.constraintTypes;
 
-	const int size = problem->getSize();
-	Eigen::VectorXd lambda(size);
+	const int size = data->getSize();
+	SurgSim::Math::MlcpSolution solution;
+	solution.x.resize(size);
 
 	//################################
 	// Gauss-Seidel solver
-	MLCP_GaussSeidel_Christian<Eigen::MatrixXd, Eigen::VectorXd> mlcpSolver(gsSolverPrecision, gsContactTolerance,
+	MlcpGaussSeidelSolver mlcpSolver(gsSolverPrecision, gsContactTolerance,
 	        gsMaxIterations);
 
 	printf("  ### Gauss Seidel solver:\n");
-	int nbIteration;
-	bool converged;
-	bool Signorini;
-	lambda.setZero();
+	solution.x.setZero();
 
-	bool res = mlcpSolver.solve(size, HCHt, size, E, lambda, mu, constraintTypes, 1.0,
-	                            &nbIteration, &converged, &Signorini);
+	// XXX set ratio to 1
+	bool res = mlcpSolver.solve(data->problem, &solution);
 
-	printf("\tsolver did %d iterations convergence=%d Signorini=%d\n",nbIteration,converged,Signorini);
+	printf("\tsolver did %d iterations convergence=%d Signorini=%d\n",
+		solution.numIterations, solution.validConvergence ? 1 : 0, solution.validSignorini ? 1 : 0);
 
-	ASSERT_EQ(size, lambda.rows());
-	ASSERT_EQ(size, problem->expectedLambda.rows());
-	ASSERT_TRUE(isValid(lambda)) << lambda;
+	ASSERT_EQ(size, solution.x.rows());
+	ASSERT_EQ(size, data->expectedLambda.rows());
+	if (size > 0)
+	{
+		ASSERT_TRUE(isValid(solution.x)) << solution.x;
+	}
 
 	// TODO(advornik): Because this is a mixed LCP problem *with friction*, we can't just easily check that
 	//   all x are positive (the frictional entries may not be), or that all Ax+b are positive(ditto).
@@ -103,16 +107,16 @@ static void compareResult(const std::string& fileName,
 
 	if (isSimpleLcp && (size > 0))
 	{
-		EXPECT_GE(lambda.minCoeff(), 0.0) << "x contains negative coefficients:" << std::endl << lambda;
+		EXPECT_GE(solution.x.minCoeff(), 0.0) << "x contains negative coefficients:" << std::endl << solution.x;
 
-		Eigen::VectorXd c = problem->HCHt * lambda + problem->E;
+		Eigen::VectorXd c = A * solution.x + b;
 		EXPECT_GE(c.minCoeff(), -gsSolverPrecision) << "Ax+b contains negative coefficients:" << std::endl << c;
-		EXPECT_NEAR(0.0, c.dot(lambda), 1e-9) << "Ax+b is not orthogonal to x!" << std::endl <<
-			"x:" << std::endl << lambda << std::endl << "Ax+b:" << std::endl << c;
+		EXPECT_NEAR(0.0, c.dot(solution.x), 1e-9) << "Ax+b is not orthogonal to x!" << std::endl <<
+			"x:" << std::endl << solution.x << std::endl << "Ax+b:" << std::endl << c;
 	}
 
-	EXPECT_TRUE(lambda.isApprox(problem->expectedLambda)) << "lambda:" << std::endl << lambda << std::endl <<
-		"expected:" << std::endl << problem->expectedLambda;
+	EXPECT_TRUE(solution.x.isApprox(data->expectedLambda)) << "lambda:" << std::endl << solution.x << std::endl <<
+		"expected:" << std::endl << data->expectedLambda;
 
 //	double convergenceCriteria=0.0;
 //	bool validSignorini=false;
@@ -148,36 +152,26 @@ TEST(MlcpGaussSeidelSolverTests, CompareResultsSequence)
 }
 
 
-static void solveRepeatedly(const MlcpTestData& problem,
-                            /*XXX const */ MLCP_GaussSeidel_Christian<Eigen::MatrixXd,Eigen::VectorXd>* mlcpSolver,
+static void solveRepeatedly(const MlcpTestData& data,
+                            /*XXX const */ MlcpGaussSeidelSolver* mlcpSolver,
                             const int repetitions)
 {
 	// NB: need to make the solver calls const-correct.
-	Eigen::MatrixXd HCHt;
-	Eigen::VectorXd E;
-	Eigen::VectorXd mu;
-	std::vector<MLCP_Constraint> constraintTypes;
+	SurgSim::Math::MlcpProblem problem;
+	SurgSim::Math::MlcpSolution solution;
+	std::vector<MlcpConstraintType> constraintTypes;
 
-	const int size = problem.getSize();
-	Eigen::VectorXd lambda(size);
+	const int size = data.getSize();
+	solution.x.resize(size);
 
 	for (int i = repetitions;  i > 0;  --i)
 	{
-		HCHt = problem.HCHt;
-		E = problem.E;
-		mu = problem.mu;
-		constraintTypes = problem.constraintTypes;
+		problem = data.problem;
 
 		if (mlcpSolver)
 		{
-			lambda.setZero();
-
-			int nbIteration;
-			bool converged;
-			bool Signorini;
-
-			bool res = mlcpSolver->solve(size, HCHt, size, E, lambda, mu, constraintTypes, 1.0,
-			                             &nbIteration, &converged, &Signorini);
+			solution.x.setZero();
+			bool res = mlcpSolver->solve(problem, &solution);
 		}
 	}
 }
@@ -186,17 +180,16 @@ static double measureExecutionTimeUsec(const std::string& fileName,
                                        double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8,
                                        int gsMaxIterations = 20)
 {
-	const std::shared_ptr<MlcpTestData> problem = loadTestProblem(fileName);
-	EXPECT_TRUE(problem) << "Failed to load " << fileName;
+	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
+	EXPECT_TRUE(data) << "Failed to load " << fileName;
 
-	MLCP_GaussSeidel_Christian<Eigen::MatrixXd,Eigen::VectorXd> mlcpSolver(gsSolverPrecision, gsContactTolerance,
-	        gsMaxIterations);
+	MlcpGaussSeidelSolver mlcpSolver(gsSolverPrecision, gsContactTolerance, gsMaxIterations);
 
 	typedef boost::chrono::high_resolution_clock clock;
 	clock::time_point calibrationStart = clock::now();
 
 	const int calibrationRepetitions = 1000;
-	solveRepeatedly(*problem, &mlcpSolver, calibrationRepetitions);
+	solveRepeatedly(*data, &mlcpSolver, calibrationRepetitions);
 
 	boost::chrono::duration<double> calibrationTime = clock::now() - calibrationStart;
 	double desiredTestTimeSec = 1.0;
@@ -206,12 +199,12 @@ static double measureExecutionTimeUsec(const std::string& fileName,
 	clock::time_point time0 = clock::now();
 
 	// Do not actually solve the problem; just copy the input data.
-	solveRepeatedly(*problem, nullptr, repetitions);
+	solveRepeatedly(*data, nullptr, repetitions);
 
 	clock::time_point time1 = clock::now();
 
 	// Actually solve the problem.
-	solveRepeatedly(*problem, &mlcpSolver, repetitions);
+	solveRepeatedly(*data, &mlcpSolver, repetitions);
 
 	clock::time_point time2 = clock::now();
 

@@ -3,6 +3,8 @@
 
 #include <SurgSim/Math/MlcpSolver.h>
 #include <Eigen/Core>
+#include <SurgSim/Math/MlcpProblem.h>
+#include <SurgSim/Math/MlcpSolution.h>
 
 namespace SurgSim
 {
@@ -50,12 +52,12 @@ public:
 	{
 	}
 
-	~MlcpGaussSeidelSolver()
+	virtual ~MlcpGaussSeidelSolver()
 	{
 	}
 
 
-	virtual bool solve(const MlcpProblem& problem, MlcpSolution* solution);
+	bool solve(const MlcpProblem& problem, MlcpSolution* solution);
 
 
 	double getEpsilonConvergence() const
@@ -122,7 +124,26 @@ public:
 	}
 
 private:
-	// ...lots of private methods elided...
+	void computeEnforcementSystem(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+								  const Eigen::VectorXd& initialGuess_and_solution, const Eigen::VectorXd& frictionCoefs,
+	                              const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+	                              int constraintID, int matrixEntryForConstraintID);
+
+	void calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+	                                  const Eigen::VectorXd& initialGuess_and_solution, const std::vector<MlcpConstraintType>& constraintsType,
+									  double subStep,
+	                                  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
+									  bool& signoriniVerified, bool& signoriniValid);
+
+	void doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b, Eigen::VectorXd* initialGuess_and_solution,
+		const Eigen::VectorXd& frictionCoefs,
+		const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+		double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria, bool& signoriniVerified);
+
+	void printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+		const Eigen::VectorXd& initialGuess_and_solution,
+		const std::vector<MlcpConstraintType>& constraintsType, double subStep, double convergence_criteria, bool signorini_verified, int nbLoop);
+
 
 	double       m_epsilonConvergence;
 	double       m_contactTolerance;

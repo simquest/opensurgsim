@@ -13,22 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MLCP_TEST_PROBLEM_H
-#define MLCP_TEST_PROBLEM_H
+#ifndef MLCP_TEST_DATA_H
+#define MLCP_TEST_DATA_H
 
 #include <vector>
 #include <Eigen/Core>
-#include <SurgSim/Math/MLCP_Constraint.h>
+#include <SurgSim/Math/MlcpProblem.h>
+#include <SurgSim/Math/MlcpConstraintType.h>
 
 
 struct MlcpTestData
 {
 public:
 	// Description of an MLCP problem.
-	Eigen::MatrixXd HCHt;
-	Eigen::VectorXd E;
-	std::vector<MLCP_Constraint> constraintTypes;
-	Eigen::VectorXd mu;
+	SurgSim::Math::MlcpProblem problem;
 
 	// Expected output for the solver (as recorded from old Gauss-Seidel code).
 	Eigen::VectorXd expectedLambda;
@@ -44,19 +42,17 @@ public:
 	}
 
 	MlcpTestData(const MlcpTestData& other) :
-		HCHt(other.HCHt), E(other.E), mu(other.mu), constraintTypes(other.constraintTypes),
+		problem(other.problem),
 		expectedLambda(other.expectedLambda),
-		description(other.description), flags(other.flags), numDegreesOfFreedom(other.numDegreesOfFreedom)
+		description(other.description),
+		flags(other.flags),
+		numDegreesOfFreedom(other.numDegreesOfFreedom)
 	{
 	}
 
 	MlcpTestData& operator= (const MlcpTestData& other)
 	{
-		HCHt = other.HCHt;
-		E = other.E;
-		mu = other.mu;
-		constraintTypes = other.constraintTypes;
-
+		problem = other.problem;
 		expectedLambda = other.expectedLambda;
 
 		description = other.description;
@@ -66,7 +62,7 @@ public:
 
 	int getSize() const
 	{
-		return E.rows();
+		return problem.b.rows();
 	}
 };
 
@@ -74,4 +70,4 @@ public:
 const MlcpTestData* getTestProblem1();
 
 
-#endif // MLCP_TEST_PROBLEM_H
+#endif // MLCP_TEST_DATA_H

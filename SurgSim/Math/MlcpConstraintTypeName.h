@@ -1,13 +1,12 @@
-#ifndef MLCPCONSTRAINTNAME_H
-#define MLCPCONSTRAINTNAME_H
-
-#include "MLCP_Constraint.h"
+#ifndef SURGSIM_MATH_MLCPCONSTRAINTTYPENAME_H
+#define SURGSIM_MATH_MLCPCONSTRAINTTYPENAME_H
 
 #include <string>
+#include <SurgSim/Math/MlcpConstraintType.h>
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Framework/Log.h>
 
-inline std::string getMlcpConstraintName(MLCP_Constraint constraintType)
+inline std::string getMlcpConstraintTypeName(MlcpConstraintType constraintType)
 {
 	switch (constraintType)
 	{
@@ -33,7 +32,7 @@ inline std::string getMlcpConstraintName(MLCP_Constraint constraintType)
 	}
 }
 
-inline MLCP_Constraint getMlcpConstraintValue(const std::string& typeName)
+inline MlcpConstraintType getMlcpConstraintTypeValue(const std::string& typeName)
 {
 
 	if (typeName == "MLCP_BILATERAL_1D_CONSTRAINT")
@@ -75,4 +74,4 @@ inline MLCP_Constraint getMlcpConstraintValue(const std::string& typeName)
 	}
 }
 
-#endif // MLCPCONSTRAINTNAME_H
+#endif // SURGSIM_MATH_MLCPCONSTRAINTTYPENAME_H

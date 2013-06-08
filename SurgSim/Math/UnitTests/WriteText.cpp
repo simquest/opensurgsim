@@ -6,8 +6,8 @@
 
 #include <Eigen/Core>
 
-#include <SurgSim/Math/MLCP_Constraint.h>
-#include <SurgSim/Math/MLCP_ConstraintName.h>
+#include <SurgSim/Math/MlcpConstraintType.h>
+#include <SurgSim/Math/MlcpConstraintTypeName.h>
 
 #include "MlcpTestData.h"
 #include "textLabels.h"
@@ -78,10 +78,10 @@ bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& te
 		return false;
 	}
 
-	int numConstraints = testData.constraintTypes.size();
-	int numAtomicConstraints = testData.E.rows();
-	if (testData.E.rows() != numAtomicConstraints ||
-	    testData.HCHt.rows() != numAtomicConstraints || testData.HCHt.cols() != numAtomicConstraints ||
+	int numConstraints = testData.problem.constraintTypes.size();
+	int numAtomicConstraints = testData.problem.b.rows();
+	if (testData.problem.b.rows() != numAtomicConstraints ||
+	    testData.problem.A.rows() != numAtomicConstraints || testData.problem.A.cols() != numAtomicConstraints ||
 	    testData.expectedLambda.rows() != numAtomicConstraints)
 	{
 		fprintf(stderr, "Inconsistent dimensions in file '%s'!\n", fileName.c_str());
@@ -104,15 +104,15 @@ bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& te
 	fprintf(out, "%s %d\n", TEXT_LABEL_NUM_ATOMIC_CONSTRAINTS, numAtomicConstraints);
 
 	fprintf(out, "%s", TEXT_LABEL_CONSTRAINT_TYPES_LIST);
-	for (auto it = testData.constraintTypes.begin();  it != testData.constraintTypes.end();  ++it)
+	for (auto it = testData.problem.constraintTypes.begin();  it != testData.problem.constraintTypes.end();  ++it)
 	{
-		fprintf(out, " %s", getMlcpConstraintName(*it).c_str());
+		fprintf(out, " %s", getMlcpConstraintTypeName(*it).c_str());
 	}
 	fprintf(out, "\n");
 
-	writeEigenVector(out, TEXT_LABEL_E_VIOLATIONS_VECTOR, testData.E);
-	writeEigenMatrix(out, TEXT_LABEL_HCHt_MLCP_MATRIX, testData.HCHt);
-	writeEigenVector(out, TEXT_LABEL_MU_FRICTION_VECTOR, testData.mu);
+	writeEigenVector(out, TEXT_LABEL_E_VIOLATIONS_VECTOR, testData.problem.b);
+	writeEigenMatrix(out, TEXT_LABEL_HCHt_MLCP_MATRIX, testData.problem.A);
+	writeEigenVector(out, TEXT_LABEL_MU_FRICTION_VECTOR, testData.problem.mu);
 	writeEigenVector(out, TEXT_LABEL_LAMBDA_VECTOR, testData.expectedLambda);
 
 

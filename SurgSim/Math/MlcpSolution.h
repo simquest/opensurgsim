@@ -39,8 +39,8 @@ struct MlcpSolution
 	bool validSignorini;
 	double convergenceCriteria;
 	double initialConvergenceCriteria;
-	double constraintConvergenceCriteria;
-	double initialConstraintConvergenceCriteria;
+	double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
+	double initialConstraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
 
 	MlcpSolution()
 	{

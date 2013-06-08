@@ -6,8 +6,8 @@
 
 #include <Eigen/Core>
 
-#include <SurgSim/Math/MLCP_Constraint.h>
-#include <SurgSim/Math/MLCP_ConstraintName.h>
+#include <SurgSim/Math/MlcpConstraintType.h>
+#include <SurgSim/Math/MlcpConstraintTypeName.h>
 
 #include "MlcpTestData.h"
 #include "textLabels.h"
@@ -385,44 +385,44 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 		        numConstraints, constraintTypeNames.size(), fileName.c_str());
 		return false;
 	}
-	testData->constraintTypes.resize(numConstraints);
-	for (size_t i = 0;  i < testData->constraintTypes.size();  ++i)
+	testData->problem.constraintTypes.resize(numConstraints);
+	for (size_t i = 0;  i < testData->problem.constraintTypes.size();  ++i)
 	{
-		MLCP_Constraint currentType = getMlcpConstraintValue(constraintTypeNames[i]);
+		MlcpConstraintType currentType = getMlcpConstraintTypeValue(constraintTypeNames[i]);
 		if (currentType == MLCP_INVALID_CONSTRAINT)
 		{
 			fprintf(stderr, "Unexpected constraint type string: '%s'\n  in file '%s'\n",
 			        constraintTypeNames[i].c_str(), fileName.c_str());
 			return false;
 		}
-		testData->constraintTypes[i] = currentType;
+		testData->problem.constraintTypes[i] = currentType;
 	}
 
-	if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &(testData->E)) ||
-	    ! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &(testData->HCHt)) ||
-	    ! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &(testData->mu)) ||
+	if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &(testData->problem.b)) ||
+	    ! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &(testData->problem.A)) ||
+	    ! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &(testData->problem.mu)) ||
 	    ! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &(testData->expectedLambda)))
 	{
 		return false;
 	}
 
-	if ((testData->E.rows() != numAtomicConstraints) || (testData->E.cols() != 1))
+	if ((testData->problem.b.rows() != numAtomicConstraints) || (testData->problem.b.cols() != 1))
 	{
 		fprintf(stderr, "Expected %dx%d vector E, saw %dx%d\n  in file '%s'\n",
-		        numAtomicConstraints, 1, testData->E.rows(), testData->E.cols(), fileName.c_str());
+		        numAtomicConstraints, 1, testData->problem.b.rows(), testData->problem.b.cols(), fileName.c_str());
 		return false;
 	}
-	if ((testData->HCHt.rows() != numAtomicConstraints) || (testData->HCHt.cols() != numAtomicConstraints))
+	if ((testData->problem.A.rows() != numAtomicConstraints) || (testData->problem.A.cols() != numAtomicConstraints))
 	{
-		fprintf(stderr, "Expected %dx%d matrix HCHt, saw %dx%d\n  in file '%s'\n",
-		        numAtomicConstraints, numAtomicConstraints, testData->HCHt.rows(), testData->HCHt.cols(),
+		fprintf(stderr, "Expected %dx%d matrix A, saw %dx%d\n  in file '%s'\n",
+		        numAtomicConstraints, numAtomicConstraints, testData->problem.A.rows(), testData->problem.A.cols(),
 		        fileName.c_str());
 		return false;
 	}
-	if ((testData->mu.rows() != numConstraints) || (testData->mu.cols() != 1))
+	if ((testData->problem.mu.rows() != numConstraints) || (testData->problem.mu.cols() != 1))
 	{
 		fprintf(stderr, "Expected %dx%d vector mu, saw %dx%d\n  in file '%s'\n",
-		        numConstraints, 1, testData->mu.rows(), testData->mu.cols(),
+		        numConstraints, 1, testData->problem.mu.rows(), testData->problem.mu.cols(),
 		        fileName.c_str());
 		return false;
 	}
