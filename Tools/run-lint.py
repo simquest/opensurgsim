@@ -34,9 +34,9 @@ import subprocess
 import re
 
 STANDARD_WARNING_FORMAT = \
-    "{file}:{line}: {text} [{category}] [{level}]"
+    "{file}:{line}:{col}: {text} [{category}] [{level}]"
 VISUAL_STUDIO_WARNING_FORMAT = \
-    "{file}({line}): {warning} {vscategory}[{level}]: {text}"
+    "{file}({line},{col}): {warning} {vscategory}[{level}]: {text}"
 WARNING_FORMAT = STANDARD_WARNING_FORMAT
 
 def emit_warning(fields):
@@ -54,6 +54,11 @@ def emit_warning(fields):
     fmt = re.sub(r'\s*\[\{level[^\}]*\}\]', '', fmt)
     fmt = re.sub(r'\s*\{level[^\}]*\}', '', fmt)
     fields['level'] = '???'  # panic button
+  if 'col' not in fields:
+    fmt = re.sub(r'\s*\{col[^\}]*\}:', '', fmt)
+    fmt = re.sub(r'\s*,\{col[^\}]*\}\)', ')', fmt)
+    fmt = re.sub(r'\s*\{col[^\}]*\}', '', fmt)
+    fields['col'] = '???'  # panic button
   if 'line' not in fields:
     fmt = re.sub(r'\s*\{line[^\}]*\}:', '', fmt)
     fmt = re.sub(r'\s*\(\{line[^\}]*\}\)', '', fmt)
@@ -78,8 +83,8 @@ def slurp_numbered_lines(file):
       return lines
   except IOError as e:
     print >> sys.stderr, e
-    emit_warning({'file': file, 'category': "opensurgsim/no_file",
-                  'text': "file is missing or could not be opened."})
+    emit_error({'file': file, 'category': "opensurgsim/no_file",
+                'text': "file is missing or could not be opened."})
     return None
 
 def run_cpplint(script, filter, files):
@@ -223,11 +228,24 @@ def check_header_guard(flags, file, lines):
                     'text': ("#endif comment doesn't match #ifndef! (" + \
                                endif_match.group(1) + ")")})
 
+def find_column_char(text, column, tab_width=4):
+  """Find the character that corresponds to the specified column.
+
+  In the absence of tabs in the text, the return value will be equal
+  to the column.  When tabs are present, it will be smaller.
+
+  """
+  text = text[:column]
+  while len(text.expandtabs(tab_width)) > column:
+    text = text[:(len(text)-1)]
+  return len(text)
+
 def check_length(flags, file, lines):
   xlines = map(lambda x: (x[0], re.sub(r'\r?\n$', '', x[1].expandtabs(4))),
                lines)
   for bad in filter(lambda x: len(x[1]) > flags.max_line_length, xlines):
-    emit_warning({'file': file, 'line': bad[0],
+    col = find_column_char(lines[bad[0]-1][1], flags.max_line_length)
+    emit_warning({'file': file, 'line': bad[0], 'col': col,
                   'category': "opensurgsim/too_long",
                   'text': ("the line is {} characters long, which is longer"
                            " than {}!"
