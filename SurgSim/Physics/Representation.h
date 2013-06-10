@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_ACTOR_H
-#define SURGSIM_PHYSICS_ACTOR_H
+#ifndef SURGSIM_PHYSICS_REPRESENTATION_H
+#define SURGSIM_PHYSICS_REPRESENTATION_H
 
 #include <string>
 
@@ -148,4 +148,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_ACTOR_H
+#endif  // SURGSIM_PHYSICS_REPRESENTATION_H

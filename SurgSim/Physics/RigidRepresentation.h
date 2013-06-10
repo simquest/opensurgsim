@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDACTOR_H
-#define SURGSIM_PHYSICS_RIGIDACTOR_H
+#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
+#define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
 #include <SurgSim/Physics/RigidRepresentationBase.h>
 #include <SurgSim/Physics/RigidRepresentationState.h>
@@ -219,4 +219,4 @@ private:
 
 }; /// SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTOR_H
+#endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATION_H

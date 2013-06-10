@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDACTORCOLLISIONREPRESENTATION_H
-#define SURGSIM_PHYSICS_RIGIDACTORCOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H
+#define SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H
 
 #include <memory>
 
@@ -29,15 +29,15 @@ namespace Physics
 {
 
 /// CollisionRepresentation class that wraps a RigidRepresentation
-class RigidRepresentationCollisionRepresentation : public CollisionRepresentation
+class RigidCollisionRepresentation : public CollisionRepresentation
 {
 public:
 
 	/// Constructor
-	explicit RigidRepresentationCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation);
+	explicit RigidCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation);
 
 	/// Destructor
-	virtual ~RigidRepresentationCollisionRepresentation();
+	virtual ~RigidCollisionRepresentation();
 
 	///@{
 	/// Implementations of pure virtual functions

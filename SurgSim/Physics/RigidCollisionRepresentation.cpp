@@ -13,34 +13,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/RigidRepresentationCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidCollisionRepresentation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-RigidRepresentationCollisionRepresentation::RigidRepresentationCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation) : m_representation(representation)
+RigidCollisionRepresentation::RigidCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation) : m_representation(representation)
 {
 
 }
 
-RigidRepresentationCollisionRepresentation::~RigidRepresentationCollisionRepresentation()
+RigidCollisionRepresentation::~RigidCollisionRepresentation()
 {
 
 }
 
-int RigidRepresentationCollisionRepresentation::getShapeType() const
+int RigidCollisionRepresentation::getShapeType() const
 {
 	return m_representation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
-const std::shared_ptr<RigidShape> RigidRepresentationCollisionRepresentation::getShape() const
+const std::shared_ptr<RigidShape> RigidCollisionRepresentation::getShape() const
 {
 	return m_representation->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
-const SurgSim::Math::RigidTransform3d& RigidRepresentationCollisionRepresentation::getLocalToWorldTransform() const
+const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getLocalToWorldTransform() const
 {
 	return m_representation->getPose();
 }

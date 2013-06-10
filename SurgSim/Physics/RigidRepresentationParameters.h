@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H
-#define SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H
+#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
+#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 
 #include <SurgSim/Physics/Shapes.h>
 #include <SurgSim/Math/Valid.h>
@@ -312,4 +312,4 @@ private:
 
 }; /// SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTORPARAMETERS_H
+#endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H

@@ -15,7 +15,7 @@
 
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/ContactCalculation.h>
@@ -99,8 +99,8 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			for (; second != rigidRepresentations.end(); ++second)
 			{
 				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-				pair->setRepresentations(std::make_shared<RigidRepresentationCollisionRepresentation>(*first),
-					std::make_shared<RigidRepresentationCollisionRepresentation>(*second));
+				pair->setRepresentations(std::make_shared<RigidCollisionRepresentation>(*first),
+					std::make_shared<RigidCollisionRepresentation>(*second));
 				pairs.push_back(pair);
 			}
 		}

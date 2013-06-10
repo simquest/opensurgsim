@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_ACTOR_H
-#define SURGSIM_GRAPHICS_ACTOR_H
+#ifndef SURGSIM_GRAPHICS_REPRESENTATION_H
+#define SURGSIM_GRAPHICS_REPRESENTATION_H
 
 #include <SurgSim/Framework/Representation.h>
 
@@ -66,4 +66,4 @@ public:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_ACTOR_H
+#endif  // SURGSIM_GRAPHICS_REPRESENTATION_H

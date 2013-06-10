@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_SPHEREACTOR_H
-#define SURGSIM_GRAPHICS_SPHEREACTOR_H
+#ifndef SURGSIM_GRAPHICS_SPHEREREPRESENTATION_H
+#define SURGSIM_GRAPHICS_SPHEREREPRESENTATION_H
 
 #include <SurgSim/Graphics/Representation.h>
 
@@ -46,4 +46,4 @@ public:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_SPHEREACTOR_H
+#endif  // SURGSIM_GRAPHICS_SPHEREREPRESENTATION_H

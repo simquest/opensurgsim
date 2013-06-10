@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGPLANEACTOR_H
-#define SURGSIM_GRAPHICS_OSGPLANEACTOR_H
+#ifndef SURGSIM_GRAPHICS_OSGPLANEREPRESENTATION_H
+#define SURGSIM_GRAPHICS_OSGPLANEREPRESENTATION_H
 
 #include <SurgSim/Graphics/PlaneRepresentation.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
@@ -81,4 +81,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OSGPLANEACTOR_H
+#endif  // SURGSIM_GRAPHICS_OSGPLANEREPRESENTATION_H

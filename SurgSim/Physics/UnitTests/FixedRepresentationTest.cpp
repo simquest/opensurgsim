@@ -86,7 +86,7 @@ TEST_F(FixedRepresentationTest, ResetStateTest)
 	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
 
 	std::shared_ptr<Representation> representation = fixedRepresentation;
-	// reset the representation (NOT THE FIXED ACTOR, test polymorphism)
+	// reset the representation (NOT THE FIXED REPRESENTATION, test polymorphism)
 	representation->resetState();
 
 	// isActive flag unchanged
