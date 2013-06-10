@@ -106,7 +106,7 @@ struct MlcpProblem
 	{
 		int numConstraintTypes = constraintTypes.size();
 		return ((b.rows() >= 0) && (b.cols() == 1) && (A.rows() == b.rows()) && (A.cols() == A.rows()) &&
-		        (numConstraintTypes <= b.rows()) && (mu.size() == numConstraintTypes));
+				(numConstraintTypes <= b.rows()) && (mu.size() == numConstraintTypes));
 	}
 };
 

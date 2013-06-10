@@ -93,8 +93,8 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	bool initialSignoriniValid = true;
 
 	calculateConvergenceCriteria(n, A, nbColumnInA, b,
-	                             initialGuess_and_solution, constraintsType, subStep,
-	                             initial_constraint_convergence_criteria, initial_convergence_criteria,
+								 initialGuess_and_solution, constraintsType, subStep,
+								 initial_constraint_convergence_criteria, initial_convergence_criteria,
 								 initialSignoriniVerified, initialSignoriniValid);
 
 	// If it is already converged, fill the output and return true.
@@ -139,12 +139,12 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	do
 	{
 		doOneIteration(n, A, nbColumnInA, b, &initialGuess_and_solution, frictionCoefs,
-		               constraintsType, subStep, constraint_convergence_criteria, convergence_criteria,
+					   constraintsType, subStep, constraint_convergence_criteria, convergence_criteria,
 					   signorini_verified);
 
 		calculateConvergenceCriteria(n, A, nbColumnInA, b,
-		                             initialGuess_and_solution, constraintsType, subStep,
-		                             constraint_convergence_criteria, convergence_criteria,
+									 initialGuess_and_solution, constraintsType, subStep,
+									 constraint_convergence_criteria, convergence_criteria,
 									 signorini_verified, signorini_valid);
 
 // 	  printViolationsAndConvergence(n, A, nbColumnInA, b, initialGuess_and_solution, constraintsType, subStep,
@@ -160,7 +160,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 			if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
 			{
 				printf("Convergence (%e) is NaN, infinite, or greater than 1.0! MLCP is exploding"
-					" after %d Gauss Seidel iterations!!\n", convergence_criteria, nbLoop);
+					   " after %d Gauss Seidel iterations!!\n", convergence_criteria, nbLoop);
 				break;
 			}
 		}
@@ -169,7 +169,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 
 	}
 	while ((!signorini_verified ||
-		    (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>m_epsilonConvergence)) &&
+			(SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>m_epsilonConvergence)) &&
 		   nbLoop<m_maxIterations);
 
 	if (MLCP_nbIterations)
@@ -191,7 +191,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 			if (verbose)
 			{
 				printf("Convergence criteria (%e) is greater than %e at end of %d Gauss Seidel iterations.\n",
-					convergence_criteria, sqrt(m_epsilonConvergence), nbLoop);
+					   convergence_criteria, sqrt(m_epsilonConvergence), nbLoop);
 			}
 			//*validConvergence = false;
 		}
@@ -201,7 +201,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 			if (verbose)
 			{
 				printf("Convergence criteria (%e) is greater than before %d Gauss Seidel iterations (%e).\n",
-					convergence_criteria, nbLoop, initial_convergence_criteria);
+					   convergence_criteria, nbLoop, initial_convergence_criteria);
 			}
 			//		  *validConvergence = false;   // This is a bit strict but it is useful to know when diverging.
 		}
@@ -258,12 +258,12 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 
 
 void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA,
-							 const Eigen::VectorXd& b,
-                             const Eigen::VectorXd& initialGuess_and_solution,
-							 const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-                             double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-							 double& convergence_criteria,
-                             bool& signoriniVerified, bool& signoriniValid)
+														 const Eigen::VectorXd& b,
+														 const Eigen::VectorXd& initialGuess_and_solution,
+														 const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+														 double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
+														 double& convergence_criteria,
+														 bool& signoriniVerified, bool& signoriniValid)
 {
 	// Calculate initial convergence criteria.
 
@@ -321,7 +321,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
-			double violation[3] = {
+			double violation[3] =
+			{
 				b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep
 			};
 			// XXX REWRITE
@@ -432,7 +433,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 }
 
 void MlcpGaussSeidelSolver::computeEnforcementSystem(
-    int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+	int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
 	const Eigen::VectorXd& initialGuess_and_solution,
 	const Eigen::VectorXd& frictionCoefs,
 	const std::vector<MlcpConstraintType>& constraintsType, double subStep,
@@ -715,11 +716,11 @@ static inline bool solveSystem(const Eigen::MatrixXd& A, const Eigen::VectorXd& 
 }
 
 void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-												Eigen::VectorXd* initialGuess_and_solution,
-												const Eigen::VectorXd& frictionCoefs,
-												const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-												double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
-												double& convergence_criteria, bool& signoriniVerified)
+										   Eigen::VectorXd* initialGuess_and_solution,
+										   const Eigen::VectorXd& frictionCoefs,
+										   const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+										   double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
+										   double& convergence_criteria, bool& signoriniVerified)
 {
 	for (int i = 0; i < MLCP_NUM_CONSTRAINT_TYPES; i++)
 	{
@@ -771,11 +772,16 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int 
 			double A_determinant =
 				A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1) -
 				A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
-			double Ainv[2][2] = {
-				{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant,
-						-A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
-				{-A(currentAtomicIndex+1, currentAtomicIndex)/A_determinant,
-						A(currentAtomicIndex,   currentAtomicIndex)/A_determinant }
+			double Ainv[2][2] =
+			{
+				{
+					A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant,
+					-A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant
+				},
+				{
+					-A(currentAtomicIndex+1, currentAtomicIndex)/A_determinant,
+					A(currentAtomicIndex,   currentAtomicIndex)/A_determinant
+				}
 			};
 			F1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
 			F2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
@@ -1555,7 +1561,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::Ma
 			if (violation < -m_contactTolerance)
 			{
 				printf("\n\t  => normal violation = %g < -m_contactTolerance => Signorini not verified yet !",
-					violation);
+					   violation);
 			}
 			printf("\n\t force=(%g) ",initialGuess_and_solution[currentAtomicIndex]);
 			currentAtomicIndex+=1;
@@ -1576,7 +1582,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::Ma
 			if (violation[0] < -m_contactTolerance)
 			{
 				printf("\n\t  => normal violation = %g < -contactTolerance => Signorini not verified yet !",
-					violation[0]);
+					   violation[0]);
 			}
 			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);
 			currentAtomicIndex+=3;

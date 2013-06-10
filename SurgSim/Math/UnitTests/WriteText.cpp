@@ -96,8 +96,8 @@ bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& te
 	int numConstraints = testData.problem.constraintTypes.size();
 	int numAtomicConstraints = testData.problem.b.rows();
 	if (testData.problem.b.rows() != numAtomicConstraints ||
-	    testData.problem.A.rows() != numAtomicConstraints || testData.problem.A.cols() != numAtomicConstraints ||
-	    testData.expectedLambda.rows() != numAtomicConstraints)
+		testData.problem.A.rows() != numAtomicConstraints || testData.problem.A.cols() != numAtomicConstraints ||
+		testData.expectedLambda.rows() != numAtomicConstraints)
 	{
 		fprintf(stderr, "Inconsistent dimensions in file '%s'!\n", fileName.c_str());
 		fclose(out);

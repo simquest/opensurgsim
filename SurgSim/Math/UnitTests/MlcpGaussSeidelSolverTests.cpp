@@ -53,7 +53,7 @@ TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 
 
 static void compareResult(const std::string& fileName,
-                          double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8, int gsMaxIterations = 20)
+						  double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8, int gsMaxIterations = 20)
 {
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
 	ASSERT_TRUE(data) << "Failed to load " << fileName;
@@ -71,7 +71,7 @@ static void compareResult(const std::string& fileName,
 	//################################
 	// Gauss-Seidel solver
 	MlcpGaussSeidelSolver mlcpSolver(gsSolverPrecision, gsContactTolerance,
-	        gsMaxIterations);
+									 gsMaxIterations);
 
 	printf("  ### Gauss Seidel solver:\n");
 	solution.x.setZero();
@@ -80,7 +80,7 @@ static void compareResult(const std::string& fileName,
 	bool res = mlcpSolver.solve(data->problem, &solution);
 
 	printf("\tsolver did %d iterations convergence=%d Signorini=%d\n",
-		solution.numIterations, solution.validConvergence ? 1 : 0, solution.validSignorini ? 1 : 0);
+		   solution.numIterations, solution.validConvergence ? 1 : 0, solution.validSignorini ? 1 : 0);
 
 	ASSERT_EQ(size, solution.x.rows());
 	ASSERT_EQ(size, data->expectedLambda.rows());
@@ -153,8 +153,8 @@ TEST(MlcpGaussSeidelSolverTests, CompareResultsSequence)
 
 
 static void solveRepeatedly(const MlcpTestData& data,
-                            /*XXX const */ MlcpGaussSeidelSolver* mlcpSolver,
-                            const int repetitions)
+							/*XXX const */ MlcpGaussSeidelSolver* mlcpSolver,
+							const int repetitions)
 {
 	// NB: need to make the solver calls const-correct.
 	SurgSim::Math::MlcpProblem problem;
@@ -177,8 +177,8 @@ static void solveRepeatedly(const MlcpTestData& data,
 }
 
 static double measureExecutionTimeUsec(const std::string& fileName,
-                                       double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8,
-                                       int gsMaxIterations = 20)
+									   double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8,
+									   int gsMaxIterations = 20)
 {
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
 	EXPECT_TRUE(data) << "Failed to load " << fileName;
@@ -225,7 +225,7 @@ TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTimeOriginal)
 	const double gsContactTolerance = 2e-5;
 	int gsMaxIterations = 30;
 	double solveTimeUsec = measureExecutionTimeUsec("mlcpOriginalTest.txt", gsSolverPrecision, gsContactTolerance,
-	                                                gsMaxIterations);
+													gsMaxIterations);
 
 	// When refactoring the MLCP code, it can be very useful to compare the execution time before and after making
 	// changes.  But you can't usefully compare execution times on different machines, or with different build

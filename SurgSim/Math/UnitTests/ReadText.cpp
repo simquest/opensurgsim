@@ -105,7 +105,7 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 		if (fscanf(in, format.c_str()) != 0)
 		{
 			fprintf(stderr, "Bad label for Eigen input in '%s'\n  near text '%s'\n",
-			        fileName.c_str(), getRawLine(in).c_str());
+					fileName.c_str(), getRawLine(in).c_str());
 			return false;
 		}
 	}
@@ -158,7 +158,7 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 		if (fscanf(in, " %lg", &nextValue) != 1)
 		{
 			fprintf(stderr, "Bad data for Eigen input in '%s'\n  near text '%s'\n",
-			        fileName.c_str(), getRawLine(in).c_str());
+					fileName.c_str(), getRawLine(in).c_str());
 			return false;
 		}
 
@@ -193,7 +193,7 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 		if (fscanf(in, format.c_str()) != 0)
 		{
 			fprintf(stderr, "Bad label for Eigen input in '%s'\n  near text '%s'\n",
-			        fileName.c_str(), getRawLine(in).c_str());
+					fileName.c_str(), getRawLine(in).c_str());
 			return false;
 		}
 	}
@@ -260,7 +260,7 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 			if (rowVector.cols() != numCols)
 			{
 				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%d vs %d)\n  in file '%s'\n",
-				        numCols, rowVector.cols(), fileName.c_str());
+						numCols, rowVector.cols(), fileName.c_str());
 				return false;
 			}
 			matrix->conservativeResize(newNumRows, numCols);
@@ -270,16 +270,16 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 }
 
 static bool extractWordList(const std::string& fileName, const std::string& line, const char* label,
-                            std::vector<std::string>* words)
+							std::vector<std::string>* words)
 {
 	std::string labelString(label);
 	if (line.substr(0, labelString.length()) != labelString)
 	{
 		fprintf(stderr,
-		        "Unexpected input line: '%s'\n"
-		        "  expected:            '%s'...\n"
-		        "  in file '%s'\n",
-		        line.c_str(), label, fileName.c_str());
+				"Unexpected input line: '%s'\n"
+				"  expected:            '%s'...\n"
+				"  in file '%s'\n",
+				line.c_str(), label, fileName.c_str());
 		return false;
 	}
 
@@ -315,10 +315,10 @@ static bool checkInputLine(const std::string& fileName, const std::string& expec
 	if (line != expected)
 	{
 		fprintf(stderr,
-		        "Unexpected input line: '%s'\n"
-		        "  expected:            '%s'\n"
-		        "  in file '%s'\n",
-		        line.c_str(), expected.c_str(), fileName.c_str());
+				"Unexpected input line: '%s'\n"
+				"  expected:            '%s'\n"
+				"  in file '%s'\n",
+				line.c_str(), expected.c_str(), fileName.c_str());
 		return false;
 	}
 	return true;
@@ -397,7 +397,7 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 	if (constraintTypeNames.size() != numConstraints)
 	{
 		fprintf(stderr, "Expected %d constraint types, saw %d\n  in file '%s'\n",
-		        numConstraints, constraintTypeNames.size(), fileName.c_str());
+				numConstraints, constraintTypeNames.size(), fileName.c_str());
 		return false;
 	}
 	testData->problem.constraintTypes.resize(numConstraints);
@@ -408,16 +408,16 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 		if (currentType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)
 		{
 			fprintf(stderr, "Unexpected constraint type string: '%s'\n  in file '%s'\n",
-			        constraintTypeNames[i].c_str(), fileName.c_str());
+					constraintTypeNames[i].c_str(), fileName.c_str());
 			return false;
 		}
 		testData->problem.constraintTypes[i] = currentType;
 	}
 
 	if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &(testData->problem.b)) ||
-	    ! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &(testData->problem.A)) ||
-	    ! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &(testData->problem.mu)) ||
-	    ! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &(testData->expectedLambda)))
+		! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &(testData->problem.A)) ||
+		! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &(testData->problem.mu)) ||
+		! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &(testData->expectedLambda)))
 	{
 		return false;
 	}
@@ -425,28 +425,28 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 	if ((testData->problem.b.rows() != numAtomicConstraints) || (testData->problem.b.cols() != 1))
 	{
 		fprintf(stderr, "Expected %dx%d vector E, saw %dx%d\n  in file '%s'\n",
-		        numAtomicConstraints, 1, testData->problem.b.rows(), testData->problem.b.cols(), fileName.c_str());
+				numAtomicConstraints, 1, testData->problem.b.rows(), testData->problem.b.cols(), fileName.c_str());
 		return false;
 	}
 	if ((testData->problem.A.rows() != numAtomicConstraints) || (testData->problem.A.cols() != numAtomicConstraints))
 	{
 		fprintf(stderr, "Expected %dx%d matrix A, saw %dx%d\n  in file '%s'\n",
-		        numAtomicConstraints, numAtomicConstraints, testData->problem.A.rows(), testData->problem.A.cols(),
-		        fileName.c_str());
+				numAtomicConstraints, numAtomicConstraints, testData->problem.A.rows(), testData->problem.A.cols(),
+				fileName.c_str());
 		return false;
 	}
 	if ((testData->problem.mu.rows() != numConstraints) || (testData->problem.mu.cols() != 1))
 	{
 		fprintf(stderr, "Expected %dx%d vector mu, saw %dx%d\n  in file '%s'\n",
-		        numConstraints, 1, testData->problem.mu.rows(), testData->problem.mu.cols(),
-		        fileName.c_str());
+				numConstraints, 1, testData->problem.mu.rows(), testData->problem.mu.cols(),
+				fileName.c_str());
 		return false;
 	}
 	if ((testData->expectedLambda.rows() != numAtomicConstraints) || (testData->expectedLambda.cols() != 1))
 	{
 		fprintf(stderr, "Expected %dx%d vector lambda, saw %dx%d\n  in file '%s'\n",
-		        numAtomicConstraints, 1, testData->expectedLambda.rows(), testData->expectedLambda.cols(),
-		        fileName.c_str());
+				numAtomicConstraints, 1, testData->expectedLambda.rows(), testData->expectedLambda.cols(),
+				fileName.c_str());
 		return false;
 	}
 
