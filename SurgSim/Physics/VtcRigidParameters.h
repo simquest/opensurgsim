@@ -124,8 +124,8 @@ private:
 	double m_vtcAngularDamping;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_VTCRIGIDPARAMETERS_H
+#endif // SURGSIM_PHYSICS_VTCRIGIDPARAMETERS_H

@@ -54,8 +54,8 @@ public:
 	virtual const RigidTransform3d& getInitialPose() const = 0;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTORBASE_H
+#endif // SURGSIM_PHYSICS_RIGIDACTORBASE_H
