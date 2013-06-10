@@ -19,9 +19,6 @@
 #include <algorithm>
 #include <vector>
 
-//#include <SurgSim/Framework/Assert.h>
-//#include <SurgSim/Framework/Log.h>
-
 namespace SurgSim
 {
 
@@ -33,211 +30,109 @@ class FemActorParameters
 {
 public:
 	/// Default constructor
-	FemActorParameters() : m_boundaryConditionsMass(0.0), m_boundaryConditionsInverseMass(0.0),
-		m_rho(0.0), m_rayleighDampingMass(0.0), m_rayleighDampingStiffness(0.0),
-		m_youngModulus(0.0), m_poissonRatio(0.0), m_isValid(false)
-	{
-	}
+	FemActorParameters();
 
 	/// Destructor
-	virtual ~FemActorParameters()
-	{
-	}
+	virtual ~FemActorParameters();
 
 	/// Comparison operator (equality test)
 	/// \param p A FemActorParameters to compare it to
 	/// \return True if the 2 parameters set are equals, False otherwise
-	bool operator ==(const FemActorParameters &p) const
-	{
-		return ( m_boundaryConditions == p.m_boundaryConditions &&
-			m_boundaryConditionsMass == p.m_boundaryConditionsMass &&
-			m_boundaryConditionsInverseMass == p.m_boundaryConditionsInverseMass &&
-			m_rho == p.m_rho &&
-			m_rayleighDampingMass == p.m_rayleighDampingMass &&
-			m_rayleighDampingStiffness == p.m_rayleighDampingStiffness &&
-			m_youngModulus == p.m_youngModulus &&
-			m_poissonRatio == p.m_poissonRatio &&
-			m_isValid == p.m_isValid);
-	}
+	bool operator ==(const FemActorParameters &p) const;
 
 	/// Comparison operator (difference test)
 	/// \param p A FemActorParameters to compare it to
 	/// \return False if the 2 parameters set are equals, True otherwise
-	bool operator !=(const FemActorParameters &p) const
-	{
-		return ! ((*this) == p);
-	}
+	bool operator !=(const FemActorParameters &p) const;
 
 	/// Add a boundary condition
-	/// \param nodeId The node of the Fem to be fixed
+	/// \param nodeId The nodeId of the Fem to be fixed
 	/// \return True if the boundary condition has been added, False otherwise
-	bool addBoundaryCondition(unsigned int nodeId)
-	{
-		auto found = std::find(m_boundaryConditions.begin(), m_boundaryConditions.end(), nodeId);
-		if (found == m_boundaryConditions.end())
-		{
-			m_boundaryConditions.push_back(nodeId);
-			return true;
-		}
-		return false;
-	}
+	bool addBoundaryCondition(unsigned int nodeId);
 
 	/// Remove a boundary condition
-	/// \param nodeId The node of the Fem to be removed from the boundary conditions list
+	/// \param nodeId The nodeId of the Fem to be removed from the boundary conditions list
 	/// \return True if the boundary condition has been removed, False otherwise
-	bool removeBoundaryCondition(unsigned int nodeId)
-	{
-		auto found = std::find(m_boundaryConditions.begin(), m_boundaryConditions.end(), nodeId);
-		if (found != m_boundaryConditions.end())
-		{
-			m_boundaryConditions.erase(found);
-			return true;
-		}
-		return false;
-	}
+	bool removeBoundaryCondition(unsigned int nodeId);
 
 	/// Add boundary conditions
 	/// \param boundaryConditions The vector of all boundary conditions to be added (nodeIdx)
 	/// \return The number of boundary conditions actually added
-	unsigned int addBoundaryConditions(const std::vector<unsigned int>& boundaryConditions)
-	{
-		unsigned int count = 0;
-
-		for(auto it = boundaryConditions.begin(); it != boundaryConditions.end(); it++)
-		{
-			auto found = std::find(m_boundaryConditions.begin(), m_boundaryConditions.end(), *it);
-			if (found == m_boundaryConditions.end())
-			{
-				m_boundaryConditions.push_back(*it);
-				count++;
-			}
-		}
-		return count;
-	}
+	unsigned int addBoundaryConditions(const std::vector<unsigned int>& boundaryConditions);
 
 	/// Remove all boundary conditions
-	void clearBoundaryConditions()
-	{
-		m_boundaryConditions.clear();
-	}
+	void clearBoundaryConditions();
 
 	/// Get all boundary conditions
-	/// \return The vector of all boundary conditions (nodeId)
-	const std::vector<unsigned int>& getBoundaryConditions() const
-	{
-		return m_boundaryConditions;
-	}
+	/// \return The vector of all boundary conditions (nodeIds)
+	const std::vector<unsigned int>& getBoundaryConditions() const;
 
 	/// Set the boundary condition mass property
 	/// \param mass The mass to be assigned to boundary condition nodes
-	void setBoundaryConditionMass(double mass)
-	{
-		m_boundaryConditionsMass = mass;
-	}
+	void setBoundaryConditionMass(double mass);
 
 	/// Get the boundary condition mass property
 	/// \return The mass assigned to boundary condition nodes
-	double getBoundaryConditionMass() const
-	{
-		return m_boundaryConditionsMass;
-	}
+	double getBoundaryConditionMass() const;
 
 	/// Set the boundary condition inverse mass property
 	/// \param invMass The inverse mass to be assigned to boundary condition nodes
-	void setBoundaryConditionInverseMass(double invMass)
-	{
-		m_boundaryConditionsInverseMass = invMass;
-	}
+	void setBoundaryConditionInverseMass(double invMass);
 
 	/// Get the boundary condition inverse mass property
 	/// \return The inverse mass assigned to boundary condition nodes
-	double getBoundaryConditionInverseMass() const
-	{
-		return m_boundaryConditionsInverseMass;
-	}
+	double getBoundaryConditionInverseMass() const;
 
 	/// Set the mass density of the fem
 	/// \param rho The mass density (in Kg.m-3)
-	void setDensity(double rho)
-	{
-		m_rho = rho;
-		checkValidity();
-	}
+	void setDensity(double rho);
 
 	/// Get the mass density of the fem
 	/// \return The density if it has been provided, 0 otherwise (in Kg.m-3)
-	double getDensity() const
-	{
-		return m_rho;
-	}
+	double getDensity() const;
 
 	/// Set the Rayleigh damping mass parameter
 	/// \param massCoef The Rayleigh damping mass parameter (in s-1)
-	void setRayleighDampingMass(double massCoef)
-	{
-		m_rayleighDampingMass = massCoef;
-	}
+	void setRayleighDampingMass(double massCoef);
 
 	/// Get the Rayleigh damping mass parameter
 	/// \return The Rayleigh damping mass parameter (in s-1)
-	double getRayleighDampingMass() const
-	{
-		return m_rayleighDampingMass;
-	}
+	double getRayleighDampingMass() const;
 
 	/// Set the Rayleigh damping stiffness parameter
 	/// \param stiffnessCoef The Rayleigh damping stiffness parameter (in s)
-	void setRayleighDampingStiffness(double stiffnessCoef)
-	{
-		m_rayleighDampingStiffness = stiffnessCoef;
-	}
+	void setRayleighDampingStiffness(double stiffnessCoef);
 
 	/// Get the Rayleigh damping stiffness parameter
 	/// \return The Rayleigh damping stiffness parameter (in s)
-	double getRayleighDampingStiffness() const
-	{
-		return m_rayleighDampingStiffness;
-	}
+	double getRayleighDampingStiffness() const;
 
 	/// Set the Young modulus of the material
 	/// \param E The Young modulus of the material (in N.m-2)
-	void setYoungModulus(double E)
-	{
-		m_youngModulus = E;
-		checkValidity();
-	}
+	void setYoungModulus(double E);
 
 	/// Get the material Young modulus
 	/// \return The Young modulus of the material (in N.m-2)
-	double getYoungModulus() const
-	{
-		return m_youngModulus;
-	}
+	double getYoungModulus() const;
 
 	/// Set the Poisson ratio of the material
 	/// \param nu The Poisson ratio of the material (unitless)
-	void setPoissonRatio(double nu)
-	{
-		m_poissonRatio = nu;
-		checkValidity();
-	}
+	void setPoissonRatio(double nu);
 
 	/// Get the material Poisson ratio
 	/// \return The Poisson ratio of the material (unitless)
-	double getPoissonRatio() const
-	{
-		return m_poissonRatio;
-	}
+	double getPoissonRatio() const;
 
 	/// Test if the the parameters are fully set and ready
-	/// \return True if the set of parameters are valid
-	/// \note i.e. Mass density and Young modulus strictly positive and Poisson ratio in ]-1, 0.5[
-	bool isValid() const
-	{
-		return m_isValid;
-	}
+	/// \return True if the set of parameters is valid
+	/// \note Valid if mass density and Young modulus strictly positive
+	/// \note and Poisson ratio in ]-1, 0.5[ and both Rayleigh parameters positive or null
+	bool isValid() const;
 
 private:
+	/// Check the validity of the parameters and set the flag m_isValid accordingly
+	void checkValidity();
+
 	/// Boundary conditions (vector of node indices to fix)
 	std::vector<unsigned int> m_boundaryConditions;
 
@@ -267,20 +162,6 @@ private:
 
 	/// Validity of the set of parameters
 	bool m_isValid;
-
-	/// Check the validity of the parameters and set the flag m_isValid accordingly
-	void checkValidity()
-	{
-		// Valid if mass density and Young modulus are strictly positive and Poisson ratio in valid range
-		if (m_rho > 0.0 && m_youngModulus > 0.0 && m_poissonRatio > -1.0 && m_poissonRatio < 0.5)
-		{
-			m_isValid = true;
-		}
-		else
-		{
-			m_isValid = false;
-		}
-	}
 };
 
 }; // Physics

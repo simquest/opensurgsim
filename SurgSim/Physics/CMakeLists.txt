@@ -21,6 +21,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
 	DcdCollision.cpp
+	FemActorParameters.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
 	RigidActor.cpp

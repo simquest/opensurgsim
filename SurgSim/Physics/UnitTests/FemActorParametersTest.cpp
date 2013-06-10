@@ -19,6 +19,11 @@
 
 #include <SurgSim/Physics/FemActorParameters.h>
 
+namespace
+{
+	const double epsilon = 1e-10;
+}
+
 namespace SurgSim
 {
 
@@ -36,15 +41,15 @@ TEST(FemActorParametersTest, DefaultValueTest)
 	std::shared_ptr<FemActorParameters> femActorParam = std::make_shared<FemActorParameters>();
 
 	// Mass density [default = 0]
-	EXPECT_EQ(0.0, femActorParam->getDensity());
+	EXPECT_NEAR(0.0, femActorParam->getDensity(), epsilon);
 	// Rayleigh damping mass parameter [default = 0]
-	EXPECT_EQ(0.0, femActorParam->getRayleighDampingMass());
+	EXPECT_NEAR(0.0, femActorParam->getRayleighDampingMass(), epsilon);
 	// Rayleigh damping stiffness parameter [default = 0]
-	EXPECT_EQ(0.0, femActorParam->getRayleighDampingStiffness());
+	EXPECT_NEAR(0.0, femActorParam->getRayleighDampingStiffness(), epsilon);
 	// Young modulus [default = 0]
-	EXPECT_EQ(0.0, femActorParam->getYoungModulus());
+	EXPECT_NEAR(0.0, femActorParam->getYoungModulus(), epsilon);
 	// Poisson ratio [default = 0]
-	EXPECT_EQ(0.0, femActorParam->getPoissonRatio());
+	EXPECT_NEAR(0.0, femActorParam->getPoissonRatio(), epsilon);
 	// isValid [default = false]
 	EXPECT_FALSE(femActorParam->isValid());
 }
@@ -56,29 +61,35 @@ TEST(FemActorParametersTest, SetGetValidTest)
 
 	// Set proper density, young modulus and poisson ratio to test validy flag
 	femActorParam->setDensity(12.52);
-	EXPECT_EQ(12.52, femActorParam->getDensity());
+	EXPECT_NEAR(12.52, femActorParam->getDensity(), epsilon);
 	EXPECT_FALSE(femActorParam->isValid());
 	femActorParam->setYoungModulus(10e7);
-	EXPECT_EQ(10e7, femActorParam->getYoungModulus());
+	EXPECT_NEAR(10e7, femActorParam->getYoungModulus(), epsilon);
 	EXPECT_TRUE(femActorParam->isValid());
 	femActorParam->setPoissonRatio(0.4);
-	EXPECT_EQ(0.4, femActorParam->getPoissonRatio());
+	EXPECT_NEAR(0.4, femActorParam->getPoissonRatio(), epsilon);
 	EXPECT_TRUE(femActorParam->isValid());
 
 	// Test Rayleigh damping mass
 	femActorParam->setRayleighDampingMass(13.21);
-	EXPECT_EQ(13.21, femActorParam->getRayleighDampingMass());
+	EXPECT_NEAR(13.21, femActorParam->getRayleighDampingMass(), epsilon);
 	EXPECT_TRUE(femActorParam->isValid());
+	femActorParam->setRayleighDampingMass(-13.21);
+	EXPECT_NEAR(-13.21, femActorParam->getRayleighDampingMass(), epsilon);
+	EXPECT_FALSE(femActorParam->isValid());
 	femActorParam->setRayleighDampingMass(0.0);
-	EXPECT_EQ(0.0, femActorParam->getRayleighDampingMass());
+	EXPECT_NEAR(0.0, femActorParam->getRayleighDampingMass(), epsilon);
 	EXPECT_TRUE(femActorParam->isValid());
 
 	// Test Rayleigh damping stiffness
 	femActorParam->setRayleighDampingStiffness(3.87);
-	EXPECT_EQ(3.87, femActorParam->getRayleighDampingStiffness());
+	EXPECT_NEAR(3.87, femActorParam->getRayleighDampingStiffness(), epsilon);
 	EXPECT_TRUE(femActorParam->isValid());
+	femActorParam->setRayleighDampingStiffness(-3.87);
+	EXPECT_NEAR(-3.87, femActorParam->getRayleighDampingStiffness(), epsilon);
+	EXPECT_FALSE(femActorParam->isValid());
 	femActorParam->setRayleighDampingStiffness(0.0);
-	EXPECT_EQ(0.0, femActorParam->getRayleighDampingStiffness());
+	EXPECT_NEAR(0.0, femActorParam->getRayleighDampingStiffness(), epsilon);
 	EXPECT_TRUE(femActorParam->isValid());
 
 	// Test validity flag some more
@@ -149,19 +160,19 @@ TEST(FemActorParametersTest, BoundaryConditionsTest)
 
 	/// Boundary condition mass property
 	femActorParam->setBoundaryConditionMass(0.0);
-	EXPECT_EQ(0.0, femActorParam->getBoundaryConditionMass());
+	EXPECT_NEAR(0.0, femActorParam->getBoundaryConditionMass(), epsilon);
 	femActorParam->setBoundaryConditionMass(1.2);
-	EXPECT_EQ(1.2, femActorParam->getBoundaryConditionMass());
+	EXPECT_NEAR(1.2, femActorParam->getBoundaryConditionMass(), epsilon);
 	femActorParam->setBoundaryConditionMass(0.0);
-	EXPECT_EQ(0.0, femActorParam->getBoundaryConditionMass());
+	EXPECT_NEAR(0.0, femActorParam->getBoundaryConditionMass(), epsilon);
 
 	/// Boundary condition stiffness property
 	femActorParam->setBoundaryConditionInverseMass(0.0);
-	EXPECT_EQ(0.0, femActorParam->getBoundaryConditionInverseMass());
+	EXPECT_NEAR(0.0, femActorParam->getBoundaryConditionInverseMass(), epsilon);
 	femActorParam->setBoundaryConditionInverseMass(1.2);
-	EXPECT_EQ(1.2, femActorParam->getBoundaryConditionInverseMass());
+	EXPECT_NEAR(1.2, femActorParam->getBoundaryConditionInverseMass(), epsilon);
 	femActorParam->setBoundaryConditionInverseMass(0.0);
-	EXPECT_EQ(0.0, femActorParam->getBoundaryConditionInverseMass());
+	EXPECT_NEAR(0.0, femActorParam->getBoundaryConditionInverseMass(), epsilon);
 }
 
 }; // Physics
