@@ -68,10 +68,3 @@ if __name__ == '__main__':
     print "{}: Nothing to reformat!".format(sys.argv[0])
   else:
     run_astyle(args.files)
-
-"""
-if [ "$#" -eq 0 ]; then
-    echo "`basename "$0"`: Nothing to reformat!" >&2
-else
-fi
-"""
