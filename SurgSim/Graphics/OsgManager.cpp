@@ -142,3 +142,9 @@ bool OsgManager::doUpdate(double dt)
 		return false;
 	}
 }
+
+void OsgManager::doBeforeStop()
+{
+	// Delete the viewer so that 
+	m_viewer = nullptr;
+}
