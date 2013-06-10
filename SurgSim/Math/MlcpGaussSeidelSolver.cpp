@@ -1,3 +1,18 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 
 #include <math.h>
@@ -17,7 +32,7 @@ namespace Math
 // cf. Christian Duriez TVCG05 paper
 // Realistic Haptic Rendering of Interacting
 // Deformable Objects in Virtual Environments
-// Christian Duriez, Student Member, IEEE, Fre´de´ ric Dubois,
+// Christian Duriez, Student Member, IEEE, Frederic Dubois,
 // Abderrahmane Kheddar, Member, IEEE, and Claude Andriot
 // +
 // recent work from Christian
@@ -79,7 +94,8 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 
 	calculateConvergenceCriteria(n, A, nbColumnInA, b,
 	                             initialGuess_and_solution, constraintsType, subStep,
-	                             initial_constraint_convergence_criteria, initial_convergence_criteria, initialSignoriniVerified, initialSignoriniValid);
+	                             initial_constraint_convergence_criteria, initial_convergence_criteria,
+								 initialSignoriniVerified, initialSignoriniValid);
 
 	// If it is already converged, fill the output and return true.
 	if (initial_convergence_criteria <= m_epsilonConvergence && initialSignoriniVerified)
@@ -123,11 +139,13 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	do
 	{
 		doOneIteration(n, A, nbColumnInA, b, &initialGuess_and_solution, frictionCoefs,
-		               constraintsType, subStep, constraint_convergence_criteria, convergence_criteria, signorini_verified);
+		               constraintsType, subStep, constraint_convergence_criteria, convergence_criteria,
+					   signorini_verified);
 
 		calculateConvergenceCriteria(n, A, nbColumnInA, b,
 		                             initialGuess_and_solution, constraintsType, subStep,
-		                             constraint_convergence_criteria, convergence_criteria, signorini_verified, signorini_valid);
+		                             constraint_convergence_criteria, convergence_criteria,
+									 signorini_verified, signorini_valid);
 
 // 	  printViolationsAndConvergence(n, A, nbColumnInA, b, initialGuess_and_solution, constraintsType, subStep,
 // 		  convergence_criteria, signorini_verified, nbLoop);
@@ -136,12 +154,13 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 
 		if (catchExplodingConvergenceCriteria)
 		{
-			// If we have an incredibly high convergence criteria value, the displacements are going to be very large, causing
-			// problems in the next iteration, so we should break out here. The convergence_criteria should really only be a couple
-			// order of magnitudes higher than epsilon.
+			// If we have an incredibly high convergence criteria value, the displacements are going to be very large,
+			// causing problems in the next iteration, so we should break out here. The convergence_criteria should
+			// really only be a couple order of magnitudes higher than epsilon.
 			if (!SurgSim::Math::isValid(convergence_criteria) || convergence_criteria > 1.0)
 			{
-				printf("Convergence (%e) is NaN, infinite, or greater than 1.0! MLCP is exploding after %d Gauss Seidel iterations!!\n", convergence_criteria, nbLoop);
+				printf("Convergence (%e) is NaN, infinite, or greater than 1.0! MLCP is exploding"
+					" after %d Gauss Seidel iterations!!\n", convergence_criteria, nbLoop);
 				break;
 			}
 		}
@@ -149,7 +168,9 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		//printf("  Solver [loop %2d] convergence_criteria=%g<?%g\n",nbLoop,convergence_criteria,m_epsilonConvergence);
 
 	}
-	while ((!signorini_verified || (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>m_epsilonConvergence)) && nbLoop<m_maxIterations);
+	while ((!signorini_verified ||
+		    (SurgSim::Math::isValid(convergence_criteria) && convergence_criteria>m_epsilonConvergence)) &&
+		   nbLoop<m_maxIterations);
 
 	if (MLCP_nbIterations)
 	{
@@ -169,7 +190,8 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		{
 			if (verbose)
 			{
-				printf("Convergence criteria (%e) is greater than %e at end of %d Gauss Seidel iterations.\n", convergence_criteria, sqrt(m_epsilonConvergence), nbLoop);
+				printf("Convergence criteria (%e) is greater than %e at end of %d Gauss Seidel iterations.\n",
+					convergence_criteria, sqrt(m_epsilonConvergence), nbLoop);
 			}
 			//*validConvergence = false;
 		}
@@ -178,9 +200,10 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		{
 			if (verbose)
 			{
-				printf("Convergence criteria (%e) is greater than before %d Gauss Seidel iterations (%e).\n", convergence_criteria, nbLoop, initial_convergence_criteria);
+				printf("Convergence criteria (%e) is greater than before %d Gauss Seidel iterations (%e).\n",
+					convergence_criteria, nbLoop, initial_convergence_criteria);
 			}
-			//		  *validConvergence = false;   // This is a bit strict but it is useful to know when we are diverging.
+			//		  *validConvergence = false;   // This is a bit strict but it is useful to know when diverging.
 		}
 	}
 
@@ -207,22 +230,26 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 		*initialConvergenceCriteria = initial_convergence_criteria;
 	}
 
-	if (convergence_criteria > m_epsilonConvergence || !SurgSim::Math::isValid(convergence_criteria) || !signorini_valid)
+	if (convergence_criteria > m_epsilonConvergence || !SurgSim::Math::isValid(convergence_criteria) ||
+		!signorini_valid)
 	{
 //#ifdef PRINTOUT_TEST_APP
-		//cout << "\tLCP_3DContactFriction_GaussSeidel_Christian::solve did <<<NOT>>> converge after " << nbLoop << " iterations" << endl;
-		//cout << "\t  SignoriniVerified = "<< SignoriniVerified <<"   convergence_criteria = " << convergence_criteria << endl;
-
-		//printViolationsAndConvergence(n, A, nbColumnInA, b, initialGuess_and_solution, constraintsType, subStep, convergence_criteria, signorini_verified);
-
-//#endif // _DEBUG
+//		cout << "\tLCP_3DContactFriction_GaussSeidel_Christian::solve did <<<NOT>>> converge after " <<
+//			nbLoop << " iterations" << endl;
+//		cout << "\t  SignoriniVerified = "<< SignoriniVerified <<"   convergence_criteria = " <<
+//			convergence_criteria << endl;
+//
+//		printViolationsAndConvergence(n, A, nbColumnInA, b, initialGuess_and_solution, constraintsType, subStep,
+//			convergence_criteria, signorini_verified);
+//#endif // PRINTOUT_TEST_APP
 
 		return false;
 	}
 #ifdef PRINTOUT_TEST_APP
 	else
 	{
-		cout << "LCP_3DContactFriction_GaussSeidel_Christian::solve converged after " << nbLoop << " iterations" << endl;
+		std::cout << "LCP_3DContactFriction_GaussSeidel_Christian::solve converged after " <<
+			nbLoop << " iterations" << std::endl;
 	}
 #endif // PRINTOUT_TEST_APP
 
@@ -230,9 +257,12 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 }
 
 
-void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-                             const Eigen::VectorXd& initialGuess_and_solution, const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-                             double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
+void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA,
+							 const Eigen::VectorXd& b,
+                             const Eigen::VectorXd& initialGuess_and_solution,
+							 const std::vector<MlcpConstraintType>& constraintsType, double subStep,
+                             double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
+							 double& convergence_criteria,
                              bool& signoriniVerified, bool& signoriniValid)
 {
 	// Calculate initial convergence criteria.
@@ -246,7 +276,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 	signoriniValid = true;
 
 	int currentAtomicIndex=0;
-	int nbConstraints = (int)constraintsType.size();
+	int nbConstraints = static_cast<int>(constraintsType.size());
 
 	int nbNonContactConstraints = 0;
 
@@ -291,7 +321,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
-			double violation[3] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
+			double violation[3] = {
+				b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep
+			};
 			// XXX REWRITE
 			for (int j=0 ; j<n ; j++)
 			{
@@ -308,7 +340,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 		currentAtomicIndex+=3;
 		break;
 
-		//case MLCP_BILATERAL_4D_CONSTRAINT:             // Fixing 4 DOF (could be a fixed point with twist included for the MechanicalSpline for example)
+		//case MLCP_BILATERAL_4D_CONSTRAINT:
+		//...
 
 		case MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT:
 		{
@@ -367,7 +400,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
-			// We verify that the sliding point is on the line...no matter what the friction violation is (3rd component)
+			// We verify that the sliding point is on the line...no matter what the friction violation is
+			// (3rd component)
 			double violation[2] = { b[currentAtomicIndex] , b[currentAtomicIndex+1] };
 			for (int j=0 ; j<n ; j++)
 			{
@@ -398,14 +432,15 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 }
 
 void MlcpGaussSeidelSolver::computeEnforcementSystem(
-    int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b, const Eigen::VectorXd& initialGuess_and_solution,
+    int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+	const Eigen::VectorXd& initialGuess_and_solution,
 	const Eigen::VectorXd& frictionCoefs,
 	const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 	int constraintID, int matrixEntryForConstraintID)
 {
-	int nbConstraints = (int)constraintsType.size();
+	int nbConstraints = static_cast<int>(constraintsType.size());
 	int systemSize=0;                    // Total size of the system (number of line and column in the final matrix)
-	int systemSizeWithoutConstraintID=0; // Total size of the system counting only the {1D, 2D, 3D} bilateral constraints
+	int systemSizeWithoutConstraintID=0; // Total size of the system counting only the {1D,2D,3D} bilateral constraints
 
 	// 1st) compute the size of the final system
 	// We suppose that the constraint to enforce are only 1D, 2D or 3D bilateral constraints
@@ -438,7 +473,8 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 			}
 		}
 
-		// We added all the constraints, now we need to add the constraintID (contact, sliding,...) to have the total system size !
+		// We added all the constraints, now we need to add the constraintID (contact, sliding,...) to have the total
+		// system size!
 		switch (constraintsType[constraintID])
 		{
 		case MLCP_BILATERAL_1D_CONSTRAINT                  :
@@ -477,20 +513,23 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 		// Here we fill up the core part, compliance between all the constraints themselves !
 		for (int line=0 ; line<systemSizeWithoutConstraintID ; line++)
 		{
-			m_rhsEnforcedLocalSystem[line] = b[line] * subStep;  // At the same time, we compute the violation for the constraints
+			// At the same time, we compute the violation for the constraints
+			m_rhsEnforcedLocalSystem[line] = b[line] * subStep;
 			for (int column=0 ; column<systemSizeWithoutConstraintID ; column++)
 			{
 				m_lhsEnforcedLocalSystem(line, column) = A(line, column);
 				m_rhsEnforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
 			}
-			// Now we complete the violation[line] computation by taking into account the effect of all remaining contacts/slidings/constraints
+			// Now we complete the violation[line] computation by taking into account the effect of all remaining
+			// contacts/slidings/constraints
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
 				m_rhsEnforcedLocalSystem[line] += A(line, column)*initialGuess_and_solution[column];
 			}
 		}
 
-		// Now we complete the contact matrix by adding the coupling constraint/{contact|sliding} and the compliance for {contact|sliding}
+		// Now we complete the contact matrix by adding the coupling constraint/{contact|sliding} and the compliance
+		// for {contact|sliding}
 		switch (constraintsType[constraintID])
 		{
 		case MLCP_BILATERAL_1D_CONSTRAINT:
@@ -501,14 +540,17 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 			{
 				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
 				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] +=
+					A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID, matrixEntryForConstraintID);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] +=
+					A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -523,22 +565,32 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
 				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID+1) = A(line, matrixEntryForConstraintID+1);
 
-				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,     line) = A(matrixEntryForConstraintID,   line);
-				m_lhsEnforcedLocalSystem((systemSizeWithoutConstraintID+1), line) = A(matrixEntryForConstraintID+1, line);
+				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,     line) =
+					A(matrixEntryForConstraintID,   line);
+				m_lhsEnforcedLocalSystem((systemSizeWithoutConstraintID+1), line) =
+					A(matrixEntryForConstraintID+1, line);
 
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
+					(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
+					A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
+					A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
+					A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -663,7 +715,8 @@ static inline bool solveSystem(const Eigen::MatrixXd& A, const Eigen::VectorXd& 
 }
 
 void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-												Eigen::VectorXd* initialGuess_and_solution, const Eigen::VectorXd& frictionCoefs,
+												Eigen::VectorXd* initialGuess_and_solution,
+												const Eigen::VectorXd& frictionCoefs,
 												const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 												double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
 												double& convergence_criteria, bool& signoriniVerified)
@@ -676,7 +729,7 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int 
 	signoriniVerified=true;
 
 	int currentAtomicIndex=0;
-	int nbConstraints = (int)constraintsType.size();
+	int nbConstraints = static_cast<int>(constraintsType.size());
 
 	// For each constraint, we look if the constraint is violated or not !
 	for (int i=0 ; i<nbConstraints ; i++)
@@ -715,13 +768,15 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int 
 			// det = ad-bc
 			// [ a b ]   [  d -b ]       [ 1 0 ]
 			// [ c d ] . [ -c  a ]/det = [ 0 1 ]
-			double A_determinant = A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
-			                       A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
-			double Ainv[2][2]=
-			{
-				{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  , -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
-				{-A(currentAtomicIndex+1, currentAtomicIndex)/A_determinant  ,  A(currentAtomicIndex,   currentAtomicIndex)/A_determinant }
-			} ;
+			double A_determinant =
+				A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1) -
+				A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
+			double Ainv[2][2] = {
+				{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant,
+						-A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
+				{-A(currentAtomicIndex+1, currentAtomicIndex)/A_determinant,
+						A(currentAtomicIndex,   currentAtomicIndex)/A_determinant }
+			};
 			F1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
 			F2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
 		}
@@ -1424,15 +1479,18 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int 
 	}
 }
 
-void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-															   const Eigen::VectorXd& initialGuess_and_solution,
-															   const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-															   double convergence_criteria, bool signorini_verified, int nbLoop)
+void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA,
+														  const Eigen::VectorXd& b,
+														  const Eigen::VectorXd& initialGuess_and_solution,
+														  const std::vector<MlcpConstraintType>& constraintsType,
+														  double subStep,
+														  double convergence_criteria, bool signorini_verified,
+														  int nbLoop)
 {
 	printf("MLCP at iteration %d =\n",nbLoop);
 
 	int currentAtomicIndex=0;
-	int nbConstraints = (int)constraintsType.size();
+	int nbConstraints = static_cast<int>(constraintsType.size());
 
 	for (int i=0 ; i<nbConstraints ; i++)
 	{
@@ -1496,7 +1554,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::Ma
 			printf("\n\t with final   violation b-Ax=(%g) ",violation);
 			if (violation < -m_contactTolerance)
 			{
-				printf("\n\t  => normal violation = %g < -m_contactTolerance => Signorini not verified yet !",violation);
+				printf("\n\t  => normal violation = %g < -m_contactTolerance => Signorini not verified yet !",
+					violation);
 			}
 			printf("\n\t force=(%g) ",initialGuess_and_solution[currentAtomicIndex]);
 			currentAtomicIndex+=1;
@@ -1516,7 +1575,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::Ma
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
 			if (violation[0] < -m_contactTolerance)
 			{
-				printf("\n\t  => normal violation = %g < -contactTolerance => Signorini not verified yet !",violation[0]);
+				printf("\n\t  => normal violation = %g < -contactTolerance => Signorini not verified yet !",
+					violation[0]);
 			}
 			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);
 			currentAtomicIndex+=3;

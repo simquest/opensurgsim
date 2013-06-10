@@ -1,3 +1,18 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #ifndef SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
 #define SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
 
@@ -19,10 +34,12 @@ namespace Math
 ///  - CONSTRAINT  = Bilateral constraint (all atomic, a fixed 3D point=3 atomics independents constraints)
 ///  - CONTACT     = Unilateral constraint
 ///    * frictionless => 1 atomic constraint per contact
-///    * frictional with Coulomb friction (1 mu parameter per contact) => 3 atomic dependent constraints per contact (1 directional + 2 tangentials)
+///    * frictional with Coulomb friction (1 mu parameter per contact) => 3 atomic dependent constraints per contact
+///      (1 directional + 2 tangentials)
 ///  - SUTURING    = Sliding constraint for suturing
 ///    * Frictionless suturing constraint => 2 atomic constraints per sliding point
-///    * Frictional suturing constraint   => 3 atomic constraints per sliding point (2 directional + 1 tangential with friction on it) => 1 mu parameter per frictional suturing
+///    * Frictional suturing constraint   => 3 atomic constraints per sliding point (2 directional + 1 tangential with
+///      friction on it) => 1 mu parameter per frictional suturing
 ///
 /// See e.g.: Duriez, Christian; Dubois, F.; Kheddar, A.; Andriot, C., "Realistic haptic rendering of interacting
 /// deformable objects in virtual environments," <i>IEEE Transactions on Visualization and Computer Graphics,</i>
@@ -125,24 +142,30 @@ public:
 
 private:
 	void computeEnforcementSystem(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-								  const Eigen::VectorXd& initialGuess_and_solution, const Eigen::VectorXd& frictionCoefs,
+								  const Eigen::VectorXd& initialGuess_and_solution,
+								  const Eigen::VectorXd& frictionCoefs,
 	                              const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 	                              int constraintID, int matrixEntryForConstraintID);
 
 	void calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-	                                  const Eigen::VectorXd& initialGuess_and_solution, const std::vector<MlcpConstraintType>& constraintsType,
+	                                  const Eigen::VectorXd& initialGuess_and_solution,
+									  const std::vector<MlcpConstraintType>& constraintsType,
 									  double subStep,
-	                                  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
+	                                  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
+									  double& convergence_criteria,
 									  bool& signoriniVerified, bool& signoriniValid);
 
-	void doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b, Eigen::VectorXd* initialGuess_and_solution,
+	void doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
+		Eigen::VectorXd* initialGuess_and_solution,
 		const Eigen::VectorXd& frictionCoefs,
 		const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-		double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria, bool& signoriniVerified);
+		double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
+		bool& signoriniVerified);
 
 	void printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
 		const Eigen::VectorXd& initialGuess_and_solution,
-		const std::vector<MlcpConstraintType>& constraintsType, double subStep, double convergence_criteria, bool signorini_verified, int nbLoop);
+		const std::vector<MlcpConstraintType>& constraintsType, double subStep, double convergence_criteria,
+		bool signorini_verified, int nbLoop);
 
 
 	double       m_epsilonConvergence;

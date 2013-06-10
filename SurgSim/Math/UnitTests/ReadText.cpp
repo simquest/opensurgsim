@@ -1,3 +1,18 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include "ReadText.h"
 
 #include <string>
@@ -388,8 +403,9 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 	testData->problem.constraintTypes.resize(numConstraints);
 	for (size_t i = 0;  i < testData->problem.constraintTypes.size();  ++i)
 	{
-		MlcpConstraintType currentType = getMlcpConstraintTypeValue(constraintTypeNames[i]);
-		if (currentType == MLCP_INVALID_CONSTRAINT)
+		SurgSim::Math::MlcpConstraintType currentType =
+			SurgSim::Math::getMlcpConstraintTypeValue(constraintTypeNames[i]);
+		if (currentType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)
 		{
 			fprintf(stderr, "Unexpected constraint type string: '%s'\n  in file '%s'\n",
 			        constraintTypeNames[i].c_str(), fileName.c_str());

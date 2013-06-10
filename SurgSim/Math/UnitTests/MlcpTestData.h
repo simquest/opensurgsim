@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MLCP_TEST_DATA_H
-#define MLCP_TEST_DATA_H
+#ifndef MLCPTESTDATA_H
+#define MLCPTESTDATA_H
 
 #include <vector>
 #include <Eigen/Core>
@@ -70,4 +70,4 @@ public:
 const MlcpTestData* getTestProblem1();
 
 
-#endif // MLCP_TEST_DATA_H
+#endif // MLCPTESTDATA_H

@@ -62,7 +62,7 @@ static void compareResult(const std::string& fileName,
 	Eigen::MatrixXd A = data->problem.A;
 	Eigen::VectorXd b = data->problem.b;
 	Eigen::VectorXd mu = data->problem.mu;
-	std::vector<MlcpConstraintType> constraintTypes = data->problem.constraintTypes;
+	std::vector<SurgSim::Math::MlcpConstraintType> constraintTypes = data->problem.constraintTypes;
 
 	const int size = data->getSize();
 	SurgSim::Math::MlcpSolution solution;
@@ -99,7 +99,7 @@ static void compareResult(const std::string& fileName,
 	bool isSimpleLcp = true;
 	for (auto it = constraintTypes.cbegin();  it != constraintTypes.cend();  ++it)
 	{
-		if ((*it) != MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
+		if ((*it) != SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT)
 		{
 			isSimpleLcp = false;
 		}
@@ -159,7 +159,7 @@ static void solveRepeatedly(const MlcpTestData& data,
 	// NB: need to make the solver calls const-correct.
 	SurgSim::Math::MlcpProblem problem;
 	SurgSim::Math::MlcpSolution solution;
-	std::vector<MlcpConstraintType> constraintTypes;
+	std::vector<SurgSim::Math::MlcpConstraintType> constraintTypes;
 
 	const int size = data.getSize();
 	solution.x.resize(size);
@@ -193,8 +193,8 @@ static double measureExecutionTimeUsec(const std::string& fileName,
 
 	boost::chrono::duration<double> calibrationTime = clock::now() - calibrationStart;
 	double desiredTestTimeSec = 1.0;
-	const int repetitions = std::max(10, std::min(1000000,
-	                                              static_cast<int>(desiredTestTimeSec * calibrationRepetitions / calibrationTime.count())));
+	double desiredRepetitions = desiredTestTimeSec * calibrationRepetitions / calibrationTime.count();
+	const int repetitions = std::max(10, std::min(1000000, static_cast<int>(desiredRepetitions)));
 
 	clock::time_point time0 = clock::now();
 
