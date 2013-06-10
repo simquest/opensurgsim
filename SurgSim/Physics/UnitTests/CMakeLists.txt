@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	ActorTest.cpp
 	ContactCalculationTests.cpp
 	DcdCollisionTests.cpp
+	FemActorParametersTest.cpp
 	FixedActorTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
