@@ -18,6 +18,12 @@
 
 #include <SurgSim/Framework/SceneElement.h>
 
+namespace SurgSim
+{
+
+namespace Blocks
+{
+
 /// Simple concrete implementation of a scene element that does not have any higher logic
 class BasicSceneElement : public SurgSim::Framework::SceneElement
 {
@@ -37,5 +43,9 @@ protected:
 	/// \return	True if succeeds, false if fails
 	virtual bool doWakeUp();
 };
+
+};  // namespace Blocks
+
+};  // namespace SurgSim
 
 #endif  // SURGSIM_BLOCKS_BASICSCENEELEMENT_H

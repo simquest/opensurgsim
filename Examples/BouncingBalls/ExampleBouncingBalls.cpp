@@ -39,6 +39,7 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
+using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPlaneActor;

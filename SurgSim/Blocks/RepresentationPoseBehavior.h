@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BEHAVIORS_REPRESENTATIONPOSEBEHAVIOR_H
-#define SURGSIM_BEHAVIORS_REPRESENTATIONPOSEBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
+#define SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Graphics/Actor.h>
@@ -73,4 +73,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_BEHAVIORS_REPRESENTATIONPOSEBEHAVIOR_H
+#endif  // SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
