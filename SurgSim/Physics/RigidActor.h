@@ -131,15 +131,29 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	/// \note Does Not Apply to this actor (the pose is fully controlled by the
 	/// physics simulation).
-	void setPose(const SurgSim::Math::RigidTransform3d& pose)
+	void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
+	}
+
+	/// Get the previous pose of the rigid actor
+	/// \return The previous pose (translation + rotation)
+	const SurgSim::Math::RigidTransform3d& getPreviousPose() const
+	{
+		return m_previousState.getPose();
 	}
 
 	/// Get the current pose of the rigid actor
 	/// \return The current pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPose() const
+	const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
 		return m_currentState.getPose();
+	}
+
+	/// Get the final pose of the rigid actor
+	/// \return The final pose (translation + rotation)
+	const SurgSim::Math::RigidTransform3d& getFinalPose() const
+	{
+		return m_finalState.getPose();
 	}
 
 	/// Preprocessing done before the update call
@@ -161,6 +175,7 @@ public:
 
 		m_currentState  = m_initialState;
 		m_previousState = m_initialState;
+		m_finalState    = m_initialState;
 
 		updateGlobalInertiaMatrices(m_currentState);
 	}
@@ -207,6 +222,9 @@ private:
 
 	/// Current rigid actor state
 	RigidActorState m_currentState;
+
+	/// Last valid/final rigid actor state
+	RigidActorState m_finalState;
 
 	/// Initial physical parameters
 	RigidActorParameters m_initialParameters;

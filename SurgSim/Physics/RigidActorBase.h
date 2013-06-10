@@ -44,14 +44,6 @@ public:
 	virtual ~RigidActorBase()
 	{
 	}
-
-	/// Set the initial pose of the rigid actor
-	/// \param pose The initial pose
-	virtual void setInitialPose(const RigidTransform3d& pose) = 0;
-
-	/// Get the initial pose of the rigid actor
-	/// \return The initial pose
-	virtual const RigidTransform3d& getInitialPose() const = 0;
 };
 
 }; // Physics

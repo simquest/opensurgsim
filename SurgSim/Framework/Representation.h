@@ -38,13 +38,25 @@ public:
 	explicit Representation(const std::string& m_name);
 	virtual ~Representation();
 
+	/// Set the initial pose of the representation
+	/// \param pose The initial pose
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+
+	/// Get the initial pose of the representation
+	/// \return The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
+
 	/// Set the current pose of the representation
 	/// \param pose The current pose
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
 
-	/// Get the current pose of the representation
-	/// \return The current pose
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
+	/// Get the previous pose of the representation
+	/// \return The previous pose
+	virtual const SurgSim::Math::RigidTransform3d& getPreviousPose() const = 0;
+
+	/// Get the final pose of the representation (i.e. last valid pose)
+	/// \return The final pose
+	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const = 0;
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();

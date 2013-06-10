@@ -43,7 +43,7 @@ public:
 	/// Implementations of pure virtual functions
 	virtual int getShapeType() const;
 	virtual const std::shared_ptr<RigidShape> getShape() const;
-	virtual const SurgSim::Math::RigidTransform3d& getLocalToWorldTransform() const;
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
 	///@}
 
 private:

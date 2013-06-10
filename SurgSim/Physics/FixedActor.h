@@ -47,8 +47,9 @@ public:
 	void setInitialPose(const RigidTransform3d& pose)
 	{
 		m_initialState.setPose(pose);
-		m_currentState = m_initialState;
-		m_previousState = m_initialState;
+		m_currentState   = m_initialState;
+		m_previousState  = m_initialState;
+		m_lastValidState = m_initialState;
 	}
 
 	/// Get the initial pose of the rigid actor
@@ -60,16 +61,9 @@ public:
 
 	/// Set the current pose of the rigid actor
 	/// \param pose The current pose (translation + rotation)
-	void setPose(const RigidTransform3d& pose)
+	void setCurrentPose(const RigidTransform3d& pose)
 	{
 		m_currentState.setPose(pose);
-	}
-
-	/// Get the current pose of the rigid actor
-	/// \return The current pose (translation + rotation)
-	const RigidTransform3d& getPose() const
-	{
-		return m_currentState.getPose();
 	}
 
 	/// Get the previous pose of the rigid actor
@@ -77,14 +71,25 @@ public:
 	const RigidTransform3d& getPreviousPose() const
 	{
 		return m_previousState.getPose();
-	};
+	}
 
-	/// Called after beforeUpdate and prior to afterUpdate
-	/// It compute the current free motion of the object using the time step dt
+	/// Get the final pose of the rigid actor
+	/// \return The final pose (translation + rotation)
+	const RigidTransform3d& getFinalPose() const
+	{
+		return m_finalState.getPose();
+	}
+
+	/// Called prior to update
 	/// \param dt The time step (in seconds)
-	void update(double dt)
+	void beforeUpdate(double dt)
 	{
 		m_previousState = m_currentState;
+	}
+
+	void afterUpdate(double dt)
+	{
+		m_finalState = m_currentState;
 	}
 
 	/// Called to reset the fixed object to its initial/default state
@@ -93,8 +98,9 @@ public:
 	{
 		Actor::resetState();
 
-		m_previousState = m_initialState;
-		m_currentState  = m_initialState;
+		m_previousState  = m_initialState;
+		m_currentState   = m_initialState;
+		m_finalState     = m_initialState;
 	}
 
 private:
@@ -106,6 +112,9 @@ private:
 
 	/// Current fixed actor state
 	RigidActorBaseState m_currentState;
+
+	/// Last valid/final actor state
+	RigidActorBaseState m_finalState;
 };
 
 }; // Physics

@@ -180,6 +180,7 @@ public:
 		m_initialState.setPose(pose);
 		m_currentState.setPose(pose);
 		m_previousState.setPose(pose);
+		m_finalState.setPose(pose);
 
 		updateGlobalInertiaMatrices(m_currentState);
 	}
@@ -195,17 +196,24 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	/// \note This is done through the Vtc proxy !
 	/// \note We let the end-user drive the Vtc, not the virtual rigid actor directly
-	void setPose(const SurgSim::Math::RigidTransform3d& pose)
+	void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 		m_currentVtcState.setPose(pose);
 	}
 
-	/// Get the current pose of the rigid actor
-	/// \return The current pose (translation + rotation)
-	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid actor
-	const SurgSim::Math::RigidTransform3d& getPose() const
+	/// Get the previous pose of the rigid actor
+	/// \return The previous pose (translation + rotation)
+	const SurgSim::Math::RigidTransform3d& getPreviousPose() const
 	{
-		return m_currentState.getPose();
+		return m_previousState.getPose();
+	}
+
+	/// Get the final pose of the rigid actor
+	/// \return The final pose (translation + rotation)
+	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid actor
+	const SurgSim::Math::RigidTransform3d& getFinalPose() const
+	{
+		return m_finalState.getPose();
 	}
 
 	/// Preprocessing done before the update call
@@ -229,6 +237,7 @@ public:
 
 		m_currentState  = m_initialState;
 		m_previousState = m_initialState;
+		m_finalState    = m_initialState;
 
 		updateGlobalInertiaMatrices(m_currentState);
 	}
@@ -283,6 +292,9 @@ private:
 
 	/// Current rigid actor state
 	RigidActorState m_currentState;
+
+	/// Last valid/final rigid actor state
+	RigidActorState m_finalState;
 
 	/// Initial physical parameters
 	RigidActorParameters m_initialParameters;
