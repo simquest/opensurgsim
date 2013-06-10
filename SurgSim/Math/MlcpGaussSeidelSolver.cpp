@@ -16,6 +16,7 @@
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 
 #include <math.h>
+#include <iostream>
 
 #include <Eigen/Core>
 #include <Eigen/LU>

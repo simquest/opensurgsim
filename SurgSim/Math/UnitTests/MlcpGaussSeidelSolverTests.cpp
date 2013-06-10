@@ -44,6 +44,13 @@ static std::shared_ptr<MlcpTestData> loadTestData(const std::string& fileName)
 	return data;
 }
 
+static inline std::string getTestFileName(const std::string& prefix, int index, const std::string& suffix)
+{
+	std::ostringstream stream;
+	stream << prefix << std::setfill('0') << std::setw(3) << index << suffix;
+	return stream.str();
+}
+
 
 TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 {
@@ -55,6 +62,9 @@ TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 static void compareResult(const std::string& fileName,
 						  double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8, int gsMaxIterations = 20)
 {
+	SCOPED_TRACE("while running test " + fileName);
+	printf("-- TEST %s --\n", fileName.c_str());
+
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
 	ASSERT_TRUE(data) << "Failed to load " << fileName;
 
@@ -139,15 +149,7 @@ TEST(MlcpGaussSeidelSolverTests, CompareResultsSequence)
 {
 	for (int i = 0;  i <= 9;  ++i)
 	{
-		std::string index = std::to_string(i);
-		while (index.length() < 3)
-		{
-			index = "0" + index;
-		}
-
-		SCOPED_TRACE("while running test " + index);
-		printf("-- TEST %s --\n", index.c_str());
-		compareResult("mlcpTest" + index + ".txt");
+		compareResult(getTestFileName("mlcpTest", i, ".txt"));
 	}
 }
 
@@ -180,6 +182,9 @@ static double measureExecutionTimeUsec(const std::string& fileName,
 									   double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8,
 									   int gsMaxIterations = 20)
 {
+	SCOPED_TRACE("while running test " + fileName);
+	printf("-- TEST %s --\n", fileName.c_str());
+
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
 	EXPECT_TRUE(data) << "Failed to load " << fileName;
 
