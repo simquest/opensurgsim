@@ -47,44 +47,12 @@ bool SurgSim::Framework::BehaviorManager::doStartUp()
 
 bool SurgSim::Framework::BehaviorManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = true;
-	std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(component);
-	if (behavior != nullptr)
-	{
-		if (find(m_behaviors.begin(), m_behaviors.end(),behavior) == m_behaviors.end())
-		{
-			m_behaviors.push_back(behavior);
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added behavior " << behavior->getName();
-		}
-		else
-		{
-			result = false;
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate behavior " << behavior->getName();
-		}
-	}
-	return result;
+	return tryAddComponent(component, &m_behaviors) != nullptr;
 }
 
 bool SurgSim::Framework::BehaviorManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = false;
-	std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(component);
-	if (behavior != nullptr && m_behaviors.size() != 0)
-	{
-		auto found = std::find(m_behaviors.begin(), m_behaviors.end(), behavior);
-		if (found != m_behaviors.end())
-		{
-			m_behaviors.erase(found);
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed behavior " << behavior->getName();
-			result = true;
-		}
-		else
-		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Unable to remove behavior " << behavior->getName()
-									   << ". Not found.";
-		}
-	}
-	return result;
+	return tryRemoveComponent(component, &m_behaviors);
 }
 
 bool SurgSim::Framework::BehaviorManager::doUpdate(double dt)

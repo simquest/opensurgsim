@@ -55,7 +55,9 @@ bool PhysicsManager::doStartUp()
 
 bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	return tryAddComponent(component,&m_actors) != nullptr;
+	tryAddComponent(component,&m_actors);
+	// no failure condition, return true
+	return true;
 }
 
 bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)

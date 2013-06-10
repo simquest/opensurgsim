@@ -88,9 +88,6 @@ private:
 	/// input manager
 	std::unordered_map<std::string, std::shared_ptr<SurgSim::Input::DeviceInterface>> m_devices;
 
-	/// The logger for this manager
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
 	/// Protect critical sections
 	boost::mutex m_mutex;
 };

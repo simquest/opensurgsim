@@ -23,10 +23,8 @@ namespace Framework
 {
 
 ComponentManager::ComponentManager(const std::string& name /*= "Unknown Component Manager"*/) :
-	BasicThread(name)
+	m_logger (Logger::createConsoleLogger(name)), BasicThread(name)
 {
-	// use a local logger until the runtime comes in
-	m_logger = Logger::createConsoleLogger(getName());
 }
 
 ComponentManager::~ComponentManager()

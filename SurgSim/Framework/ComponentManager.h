@@ -19,7 +19,8 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Framework/BasicThread.h"
+#include <SurgSim/Framework/BasicThread.h>
+#include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
 {

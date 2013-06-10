@@ -28,8 +28,6 @@ namespace Input
 InputManager::InputManager() :
 	ComponentManager("Input Manager")
 {
-	// Use a default logger, if there are errors before runtime is set here
-	m_logger = SurgSim::Framework::Logger::createConsoleLogger(getName());
 }
 
 InputManager::~InputManager(void)
@@ -38,8 +36,6 @@ InputManager::~InputManager(void)
 
 bool InputManager::doInitialize()
 {
-	// When the runtime has been set pull the runtimes logger for this manager
-	m_logger = getRuntime()->getLogger(getName());
 	return true;
 }
 
@@ -55,7 +51,8 @@ bool InputManager::doUpdate(double dt)
 
 bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	std::shared_ptr<InputComponent> input = std::dynamic_pointer_cast<InputComponent>(component);
+
+	auto input = tryAddComponent(component, &m_inputs);
 	if (input != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
@@ -63,7 +60,7 @@ bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> c
 		return addInputComponent(input);
 	}
 
-	std::shared_ptr<OutputComponent> output = std::dynamic_pointer_cast<OutputComponent>(component);
+	auto output = tryAddComponent(component, &m_outputs);
 	if (output != nullptr)
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
@@ -78,26 +75,17 @@ bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> c
 bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
 {
 	bool result = false;
-	if (find(m_inputs.begin(), m_inputs.end(), input) == m_inputs.end())
+	if (m_devices.find(input->getDeviceName()) != m_devices.end())
 	{
-		if (m_devices.find(input->getDeviceName()) != m_devices.end())
-		{
-			input->connectDevice(m_devices[input->getDeviceName()]);
-			m_inputs.push_back(input);
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-			                           " Added component " << input->getName();
-			result = true;
-		}
-		else
-		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
-			                           input->getDeviceName() << " when adding component " << input->getName();
-		}
+		input->connectDevice(m_devices[input->getDeviceName()]);
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
+			                        " Added component " << input->getName();
+		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-		                           " Duplicate Component" << input->getName();
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
+			                        input->getDeviceName() << " when adding component " << input->getName();
 	}
 	return result;
 }
@@ -105,70 +93,47 @@ bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
 bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output)
 {
 	bool result = false;
-	if (find(m_outputs.begin(), m_outputs.end(), output) == m_outputs.end())
+	if (m_devices.find(output->getDeviceName()) != m_devices.end())
 	{
-		if (m_devices.find(output->getDeviceName()) != m_devices.end())
+		if (! m_devices[output->getDeviceName()]->hasOutputProducer())
 		{
-			if (! m_devices[output->getDeviceName()]->hasOutputProducer())
-			{
-				m_devices[output->getDeviceName()]->setOutputProducer(output);
-				m_outputs.push_back(output);
-				SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-					" Added component " << output->getName();
-				result = true;
-			}
-			else
-			{
-				SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
-					" Trying to add OutputProducer " << output->getName() << " to device " << output->getDeviceName() <<
-					" but the device already has an OutputProducer assigned, this add will be ignored!";
-			}
+			m_devices[output->getDeviceName()]->setOutputProducer(output);
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
+				" Added component " << output->getName();
+			result = true;
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
-			                           output->getDeviceName() << " when adding component " << output->getName();
+			SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
+				" Trying to add OutputProducer " << output->getName() << " to device " << output->getDeviceName() <<
+				" but the device already has an OutputProducer assigned, this add will be ignored!";
 		}
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-		                           " Duplicate Component" << output->getName();
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
+			                        output->getDeviceName() << " when adding component " << output->getName();
 	}
 	return result;
 }
 
 bool InputManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	bool result = false;
-	std::shared_ptr<InputComponent> input = std::dynamic_pointer_cast<InputComponent>(component);
-	if (input != nullptr)
-	{
-		boost::lock_guard<boost::mutex> lock(m_mutex);
-		auto found = std::find(m_inputs.begin(), m_inputs.end(), input);
-		if (found != m_inputs.end())
-		{
-			input->disconnectDevice(m_devices[input->getDeviceName()]);
-			m_inputs.erase(found);
-			result = true;
-		}
-	}
-	else
-	{
-		std::shared_ptr<OutputComponent> output = std::dynamic_pointer_cast<OutputComponent>(component);
-		if (output != nullptr)
-		{
-			boost::lock_guard<boost::mutex> lock(m_mutex);
-			auto found = std::find(m_outputs.begin(), m_outputs.end(), output);
-			if (found != m_outputs.end())
-			{
-				m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
-				m_outputs.erase(found);
-				result = true;
-			}
-		}
-	}
 
+	bool result = false;
+	boost::lock_guard<boost::mutex> lock(m_mutex);
+	if (tryRemoveComponent(component, &m_inputs))
+	{
+		auto input = std::static_pointer_cast<InputComponent>(component);
+		input->disconnectDevice(m_devices[input->getDeviceName()]);
+		result = true;
+	}
+	else if(tryRemoveComponent(component, &m_outputs))
+	{
+		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
+		m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
+		result = true;
+	}
 	return result;
 }
 

@@ -124,7 +124,9 @@ TEST_F(InputManagerTest, InputAddRemove)
 	EXPECT_FALSE(inputManager->addComponent(notvalid));
 
 	// Excercise adds and removes
-	EXPECT_FALSE(inputManager->addComponent(listener1));
+	
+	// Duplicate false on duplicate will become deprecated
+	EXPECT_TRUE(inputManager->addComponent(listener1));
 	EXPECT_TRUE(inputManager->removeComponent(listener1));
 	EXPECT_FALSE(inputManager->removeComponent(listener1));
 
@@ -163,7 +165,9 @@ TEST_F(InputManagerTest, OutputAddRemove)
 
 	EXPECT_TRUE(inputManager->addComponent(output1));
 	EXPECT_FALSE(inputManager->addComponent(output2));
-	EXPECT_FALSE(inputManager->addComponent(output2));
+
+	// This will become deprecated in the next refactoring step
+	EXPECT_TRUE(inputManager->addComponent(output2));
 	EXPECT_TRUE(inputManager->addComponent(output3));
 	EXPECT_FALSE(inputManager->addComponent(invalid));
 	EXPECT_TRUE(inputManager->removeComponent(output1));

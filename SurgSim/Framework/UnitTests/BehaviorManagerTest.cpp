@@ -33,11 +33,13 @@ TEST(BehaviorManagerTest, AddRemoveTest)
 	EXPECT_EQ(0,behavior->updateCount);
 	EXPECT_TRUE(manager->addComponent(behavior));
 	EXPECT_TRUE(manager->addComponent(behavior2));
+
+	// Intermediate refactoring change, this will be deprecated after moving to threadsafe add
 	EXPECT_FALSE(manager->addComponent(behavior));
 
 	// This should return true because the manager is not concerned
 	// with base components
-	EXPECT_TRUE(manager->addComponent(component));
+	EXPECT_FALSE(manager->addComponent(component));
 
 	EXPECT_TRUE(manager->removeComponent(behavior));
 	EXPECT_FALSE(manager->removeComponent(behavior));

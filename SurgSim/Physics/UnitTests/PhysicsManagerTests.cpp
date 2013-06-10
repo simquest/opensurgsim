@@ -67,7 +67,7 @@ TEST_F(PhysicsManagerTest, AddRemoveComponent)
 
 	EXPECT_TRUE(physicsManager->addComponent(actor1));
 	EXPECT_TRUE(physicsManager->addComponent(actor2));
-	EXPECT_FALSE(physicsManager->addComponent(actor1));
+	EXPECT_TRUE(physicsManager->addComponent(actor1));
 
 	EXPECT_TRUE(physicsManager->removeComponent(actor1));
 	EXPECT_FALSE(physicsManager->removeComponent(actor1));
