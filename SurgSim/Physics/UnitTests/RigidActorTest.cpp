@@ -99,7 +99,7 @@ TEST_F(RigidActorTest, ResetTest)
 	rigidBody->setInitialState(m_state);
 	rigidBody->setIsActive(false);
 	rigidBody->setIsGravityEnabled(false);
-	rigidBody->setPose(RigidTransform3d::Identity());
+	rigidBody->setCurrentPose(RigidTransform3d::Identity());
 
 	// reset the actor state
 	rigidBody->resetState();

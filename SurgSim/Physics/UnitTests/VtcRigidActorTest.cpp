@@ -133,7 +133,7 @@ TEST_F(VtcRigidActorTest, ResetTest)
 	rigidBody->setInitialVtcState(m_vtcState);
 	rigidBody->setIsActive(false);
 	rigidBody->setIsGravityEnabled(false);
-	rigidBody->setPose(id4x4);
+	rigidBody->setCurrentPose(id4x4);
 
 	// reset the actor state
 	rigidBody->resetState();

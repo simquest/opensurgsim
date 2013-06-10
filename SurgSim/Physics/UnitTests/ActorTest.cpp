@@ -36,19 +36,76 @@ public:
 	{
 	}
 
-	/// Sets the pose of the actor
-	virtual void setPose(const RigidTransform3d& transform)
+	/// Sets the initial pose
+	/// \param pose The initial pose to set the MockActor to
+	void setInitialPose(const RigidTransform3d& pose)
 	{
-		m_pose = transform;
+		m_initialPose = pose;
 	}
-	/// Returns the pose of the actor
-	virtual const RigidTransform3d& getPose() const
+
+	/// Gets the initial pose of the actor
+	/// \return The initial pose of this MockActor
+	const RigidTransform3d& getInitialPose() const
 	{
-		return m_pose;
+		return m_initialPose;
 	}
+
+	/// Sets the current pose of the actor
+	/// \param pose The current pose of this MockActor
+	void setCurrentPose(const RigidTransform3d& pose)
+	{
+		m_currentPose = pose;
+	}
+
+	/// Returns the previous pose of the actor
+	/// \return The previous pose of this MockActor
+	const RigidTransform3d& getPreviousPose() const
+	{
+		return m_previousPose;
+	}
+
+	/// Returns the final pose of the actor
+	/// \return The final pose of this MockActor
+	const RigidTransform3d& getFinalPose() const
+	{
+		return m_finalPose;
+	}
+
+	void beforeUpdate(double dt)
+	{
+		m_previousPose = m_currentPose;
+	}
+
+	void update(double dt)
+	{
+		m_currentPose.translation() += SurgSim::Math::Vector3d(1.0, 2.0, 3.0);
+	}
+
+	void afterUpdate(double dt)
+	{
+		m_finalPose = m_currentPose;
+	}
+
+	void resetState(void)
+	{
+		m_currentPose  = m_initialPose;
+		m_previousPose = m_initialPose;
+		m_finalPose    = m_initialPose;
+	}
+
 private:
+
 	/// Pose of the actor
-	RigidTransform3d m_pose;
+	RigidTransform3d m_initialPose;
+
+	/// Pose of the actor
+	RigidTransform3d m_previousPose;
+
+	/// Pose of the actor
+	RigidTransform3d m_currentPose;
+
+	/// Pose of the actor
+	RigidTransform3d m_finalPose;
 };
 
 TEST(ActorTest, ConstructorTest)
@@ -77,13 +134,4 @@ TEST(ActorTest, SetGetAndDefaultValueTest)
 	ASSERT_FALSE(actor->isGravityEnabled());
 	actor->setIsGravityEnabled(true);
 	ASSERT_TRUE(actor->isGravityEnabled());
-
-	/// Create a rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond rotation = Quaterniond(SurgSim::Math::Vector4d::Random());
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(rotation, translation);
-
-	/// Set the pose and make sure it was set correctly
-	actor->setPose(transform);
-	EXPECT_TRUE(actor->getPose().isApprox(transform));
 }

@@ -49,7 +49,7 @@ public:
 		m_initialState.setPose(pose);
 		m_currentState   = m_initialState;
 		m_previousState  = m_initialState;
-		m_lastValidState = m_initialState;
+		m_finalState = m_initialState;
 	}
 
 	/// Get the initial pose of the rigid actor
@@ -63,6 +63,7 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	void setCurrentPose(const RigidTransform3d& pose)
 	{
+		m_previousState = m_currentState;
 		m_currentState.setPose(pose);
 	}
 
@@ -80,13 +81,8 @@ public:
 		return m_finalState.getPose();
 	}
 
-	/// Called prior to update
+	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
-	void beforeUpdate(double dt)
-	{
-		m_previousState = m_currentState;
-	}
-
 	void afterUpdate(double dt)
 	{
 		m_finalState = m_currentState;

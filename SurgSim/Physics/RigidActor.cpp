@@ -38,6 +38,12 @@ RigidActor::~RigidActor()
 
 void RigidActor::beforeUpdate(double dt)
 {
+	if (! isActive() || ! m_currentParameters.isValid())
+	{
+		return;
+	}
+
+	m_previousState = m_currentState;
 }
 
 void RigidActor::update(double dt)
@@ -137,6 +143,12 @@ void RigidActor::update(double dt)
 
 void RigidActor::afterUpdate(double dt)
 {
+	if (! isActive() || ! m_currentParameters.isValid())
+	{
+		return;
+	}
+
+	m_finalState = m_currentState;
 }
 
 void RigidActor::computeComplianceMatrix(double dt)
