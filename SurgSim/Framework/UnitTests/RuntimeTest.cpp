@@ -114,7 +114,19 @@ TEST(RuntimeTest, SceneInitialisation)
 	elements[1]->addComponent(components[3]);
 
 	runtime->setScene(scene);
+
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
+	runtime->addManager(manager);
+
+	EXPECT_FALSE(manager->didInitialize);
+	EXPECT_FALSE(manager->didStartUp);
+	EXPECT_FALSE(manager->didBeforeStop);
+
 	runtime->start();
+
+	EXPECT_TRUE(manager->didInitialize);
+	EXPECT_TRUE(manager->didStartUp);
+	EXPECT_FALSE(manager->didBeforeStop);
 
 	for (int i = 0;  i < 2;  ++i)
 	{
@@ -128,7 +140,9 @@ TEST(RuntimeTest, SceneInitialisation)
 		EXPECT_TRUE(components[i]->didInit);
 		EXPECT_TRUE(components[i]->didWakeUp);
 	}
+
+	runtime->stop();
+
+	EXPECT_TRUE(manager->didBeforeStop);
 }
-
-
 
