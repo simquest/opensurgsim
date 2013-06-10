@@ -180,7 +180,8 @@ bool FemActorParameters::isValid() const
 
 void FemActorParameters::checkValidity()
 {
-	// Valid if mass density and Young modulus are strictly positive and Poisson ratio in valid range
+	// Valid if mass density and Young modulus are strictly positive and
+	// Poisson ratio in valid range and Rayleigh parameters positives or nulls
 	if (m_rho > 0.0 && m_youngModulus > 0.0 && m_poissonRatio > -1.0 && m_poissonRatio < 0.5 &&
 		m_rayleighDampingMass >= 0.0 && m_rayleighDampingStiffness >= 0.0)
 	{

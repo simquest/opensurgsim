@@ -156,8 +156,8 @@ private:
 	double m_youngModulus;
 
 	/// Poisson ratio (unitless)
-	/// Theoritically within ]-1, 0.5[  with 0.5 for uncompressible material
-	/// In general    within [ 0, 0.5[
+	/// Theoritically within (-1, 0.5)  with 0.5 for incompressible material
+	/// In general    within [ 0, 0.5)
 	double m_poissonRatio;
 
 	/// Validity of the set of parameters
