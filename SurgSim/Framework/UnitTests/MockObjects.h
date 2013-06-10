@@ -82,7 +82,8 @@ class MockThread : public SurgSim::Framework::BasicThread
 public:
 	MockThread() :
 		count(10),
-		totalTime(0.0)
+		totalTime(0.0),
+		didBeforeStop(false)
 	{
 	}
 
@@ -92,6 +93,8 @@ public:
 
 	int count;
 	double totalTime;
+
+	bool didBeforeStop;
 
 private:
 	virtual bool doInitialize()
@@ -109,6 +112,10 @@ private:
 
 		return count != 0;
 	};
+	virtual void doBeforeStop()
+	{
+		didBeforeStop = true;
+	};
 };
 
 class MockManager : public SurgSim::Framework::ComponentManager
@@ -116,7 +123,10 @@ class MockManager : public SurgSim::Framework::ComponentManager
 public:
 	MockManager(bool succeedInit = true, bool succeedStartup = true) :
 		succeedInit(succeedInit),
-		succeedStartup(succeedStartup)
+		succeedStartup(succeedStartup),
+		didInitialize(false),
+		didStartUp(false),
+		didBeforeStop(false)
 	{
 	}
 
@@ -127,18 +137,28 @@ public:
 	bool succeedInit;
 	bool succeedStartup;
 
+	bool didInitialize;
+	bool didStartUp;
+	bool didBeforeStop;
+
 private:
 	virtual bool doInitialize()
 	{
+		didInitialize = succeedInit;
 		return succeedInit;
 	};
 	virtual bool doStartUp()
 	{
+		didStartUp = succeedStartup;
 		return succeedStartup;
 	};
 	virtual bool doUpdate(double dt)
 	{
 		return true;
+	};
+	virtual void doBeforeStop()
+	{
+		didBeforeStop = true;
 	};
 
 	virtual bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component)

@@ -120,6 +120,10 @@ protected:
 	virtual bool doStartUp();
 
 private:
+	/// Prepares the manager for its execution to be stopped
+	/// \note	Called from this thread before joined
+	void doBeforeStop();
+
 	/// OSG CompositeViewer to manage and render the individual views
 	osg::ref_ptr<osgViewer::CompositeViewer> m_viewer;
 

@@ -131,6 +131,12 @@ void SurgSim::Framework::BasicThread::operator()()
 		m_isRunning = doUpdate(m_period.count());
 		frameTime = boost::chrono::steady_clock::now() - start;
 	}
+
+	if (m_stopExecution)
+	{
+		doBeforeStop();
+	}
+
 	m_isRunning = false;
 	m_stopExecution = false;
 }
@@ -149,4 +155,7 @@ std::string SurgSim::Framework::BasicThread::getName() const
 	return m_name;
 }
 
+void SurgSim::Framework::BasicThread::doBeforeStop()
+{
+}
 
