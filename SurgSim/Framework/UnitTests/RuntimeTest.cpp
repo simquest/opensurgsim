@@ -91,7 +91,7 @@ TEST(RuntimeTest, LoggerManagement)
 	EXPECT_EQ(oldLogger, newLogger);
 }
 
-TEST(RuntimeTest, SceneInitialisation)
+TEST(RuntimeTest, SceneInitialization)
 {
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	std::shared_ptr<Scene> scene(new Scene());
