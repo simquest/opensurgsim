@@ -21,6 +21,7 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 )
 
+add_subdirectory(Blocks)
 # add_subdirectory(Collision)
 add_subdirectory(DataStructures)
 add_subdirectory(Devices)

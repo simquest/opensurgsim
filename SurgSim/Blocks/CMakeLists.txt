@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,36 +16,30 @@
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${OSG_INCLUDE_DIR}"
-	"${OPENTHREADS_INCLUDE_DIR}"
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(EXAMPLE_SOURCES
-	ExampleBouncingBalls.cpp
+set(SURGSIM_BLOCKS_SOURCES
+	BasicSceneElement.cpp
 )
 
-set(EXAMPLE_HEADERS
+set(SURGSIM_BLOCKS_HEADERS
+	BasicSceneElement.h
+	RepresentationPoseBehavior.h
 )
 
-add_executable(ExampleBouncingBalls
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-
-target_link_libraries(ExampleBouncingBalls 
-	SurgSimFramework
-	SurgSimBlocks
-	SurgSimDataStructures
-	SurgSimPhysics
-	SurgSimGraphics
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
+surgsim_add_library(
+    SurgSimBlocks
+    "${SURGSIM_BLOCKS_SOURCES}"
+    "${SURGSIM_BLOCKS_HEADERS}"
+    "SurgSim/Blocks"
 )
+target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
+	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()

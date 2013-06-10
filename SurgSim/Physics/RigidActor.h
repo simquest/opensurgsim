@@ -215,8 +215,8 @@ private:
 	RigidActorParameters m_currentParameters;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDACTOR_H
+#endif // SURGSIM_PHYSICS_RIGIDACTOR_H

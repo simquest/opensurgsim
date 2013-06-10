@@ -25,7 +25,11 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
 #include <SurgSim/Physics/Shapes.h>
-using namespace SurgSim::Physics;
+using SurgSim::Physics::BoxShape;
+using SurgSim::Physics::SphereShape;
+using SurgSim::Physics::CylinderShape;
+using SurgSim::Physics::CapsuleShape;
+using SurgSim::Physics::MeshShape;
 
 namespace {
 	const double epsilon = 1e-10;
@@ -66,7 +70,7 @@ TEST_F(RigidShapeTest, Sphere)
 	ASSERT_NO_THROW({SphereShape s(m_radius);});
 
 	SphereShape s(m_radius);
-	EXPECT_EQ(RIGID_SHAPE_TYPE_SPHERE, s.getType());
+	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE, s.getType());
 	EXPECT_EQ(m_radius, s.getRadius());
 
 	const double& r = m_radius;
@@ -100,7 +104,7 @@ TEST_F(RigidShapeTest, Box)
 	EXPECT_EQ(m_size[0], b.getSizeX());
 	EXPECT_EQ(m_size[1], b.getSizeY());
 	EXPECT_EQ(m_size[2], b.getSizeZ());
-	EXPECT_EQ(RIGID_SHAPE_TYPE_BOX, b.getType());
+	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_BOX, b.getType());
 
 	double expectedVolume = m_size[0] * m_size[1] * m_size[2];
 	double expectedMass = m_rho * expectedVolume;
@@ -133,7 +137,7 @@ TEST_F(RigidShapeTest, Cylinder)
 	CylinderShape c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
-	EXPECT_EQ(RIGID_SHAPE_TYPE_CYLINDER, c.getType());
+	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_CYLINDER, c.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
 	double expectedMass = m_rho * expectedVolume;
@@ -167,7 +171,7 @@ TEST_F(RigidShapeTest, Capsule)
 	CapsuleShape c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
-	EXPECT_EQ(RIGID_SHAPE_TYPE_CAPSULE, c.getType());
+	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_CAPSULE, c.getType());
 
 	double r2 = m_radius * m_radius;
 	double r3 = r2 * m_radius;

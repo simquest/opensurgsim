@@ -290,8 +290,8 @@ private:
 	std::shared_ptr<TriMesh> m_mesh;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_MESHSHAPE_H
+#endif // SURGSIM_PHYSICS_MESHSHAPE_H

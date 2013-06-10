@@ -51,7 +51,7 @@ TEST(FreeMotionTest, RunTest)
 	params.setShapeUsedForMassInertia(shape);
 
 	actor->setInitialParameters(params);
-	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond(), Vector3d(0.0,0.0,0.0)));
+	actor->setInitialPose(SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
 
 	actors.push_back(actor);
 
@@ -64,10 +64,9 @@ TEST(FreeMotionTest, RunTest)
 	EXPECT_TRUE(actor->getPose().translation().isZero());
 	state = computation.update(1.0,state);
 	EXPECT_TRUE(actor->getPose().translation().isZero());
-	
+
 	actor->setIsGravityEnabled(true);
 	EXPECT_TRUE(actor->getPose().translation().isZero());
 	state = computation.update(1.0,state);
 	EXPECT_FALSE(actor->getPose().translation().isZero());
 }
-

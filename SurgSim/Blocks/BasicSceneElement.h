@@ -13,21 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_BOUNCINGBALLS_CONCRETESCENELEMENT_H
-#define EXAMPLES_BOUNCINGBALLS_CONCRETESCENELEMENT_H
+#ifndef SURGSIM_BLOCKS_BASICSCENEELEMENT_H
+#define SURGSIM_BLOCKS_BASICSCENEELEMENT_H
 
 #include <SurgSim/Framework/SceneElement.h>
 
-/// Simple concrete implementation of a sphere element that does not have any higher logic
-class ConcreteSceneElement : public SurgSim::Framework::SceneElement
+/// Simple concrete implementation of a scene element that does not have any higher logic
+class BasicSceneElement : public SurgSim::Framework::SceneElement
 {
 public:
-	ConcreteSceneElement(const std::string& name);
-	virtual ~ConcreteSceneElement();
+	/// Constructor
+	/// \name	Name of the scene element
+	explicit BasicSceneElement(const std::string& name);
+	/// Destructor
+	virtual ~BasicSceneElement();
 
 protected:
+	/// Initializes the scene element
+	/// \return	True if succeeds, false if fails
 	virtual bool doInitialize();
+	/// Wakes up the scene element
+	/// \pre	All scene elements are initialized
+	/// \return	True if succeeds, false if fails
 	virtual bool doWakeUp();
 };
 
-#endif
+#endif  // SURGSIM_BLOCKS_BASICSCENEELEMENT_H

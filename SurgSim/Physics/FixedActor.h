@@ -108,8 +108,8 @@ private:
 	RigidActorBaseState m_currentState;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_FIXEDACTOR_H
+#endif // SURGSIM_PHYSICS_FIXEDACTOR_H
