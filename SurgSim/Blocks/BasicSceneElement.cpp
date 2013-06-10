@@ -17,6 +17,8 @@
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
 
+using SurgSim::Blocks::BasicSceneElement;
+
 BasicSceneElement::BasicSceneElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name)
 {
