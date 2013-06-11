@@ -64,7 +64,7 @@ public:
 	virtual void update(double dt)
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
-		SURGSIM_LOG_DEBUG(logger) << m_actor->getName() << ": " << m_actor->getPose().translation().transpose();
+		SURGSIM_LOG_DEBUG(logger) << m_actor->getName() << ": " << m_actor->getFinalPose().translation().transpose();
 	}
 protected:
 	virtual bool doInitialize()
@@ -105,7 +105,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim
 	physicsActor->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneActor> graphicsActor = std::make_shared<OsgPlaneActor>(name + " Graphics");
-	graphicsActor->setPose(pose);
+	graphicsActor->setInitialPose(pose);
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsActor);
@@ -130,7 +130,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 
 	std::shared_ptr<OsgSphereActor> graphicsActor = std::make_shared<OsgSphereActor>(name + " Graphics");
 	graphicsActor->setRadius(0.1);
-	graphicsActor->setPose(pose);
+	graphicsActor->setInitialPose(pose);
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsActor);
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
-	graphicsManager->getDefaultCamera()->setPose(SurgSim::Math::makeRigidTransform(
+	graphicsManager->getDefaultCamera()->setInitialPose(SurgSim::Math::makeRigidTransform(
 		SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->setScene(scene);

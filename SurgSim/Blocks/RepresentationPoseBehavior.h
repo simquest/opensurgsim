@@ -46,7 +46,7 @@ public:
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt)
 	{
-		m_to->setPose(m_from->getPose());
+		m_to->setCurrentPose(m_from->getFinalPose());
 	}
 
 protected:
@@ -58,7 +58,7 @@ protected:
 	/// Wakeup the behavior, which copies the initial pose
 	virtual bool doWakeUp()
 	{
-		m_to->setPose(m_from->getPose());
+		m_to->setInitialPose(m_from->getInitialPose());
 		return true;
 	}
 
