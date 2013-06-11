@@ -37,7 +37,8 @@ class Actor : public SurgSim::Framework::Representation
 public:
 	/// Constructor
 	/// \param	name	Name of the actor
-	explicit Actor(const std::string& name) : SurgSim::Framework::Representation(name)
+	explicit Actor(const std::string& name) : SurgSim::Framework::Representation(name),
+		m_initialPose(SurgSim::Math::RigidTransform3d::Identity())
 	{
 	}
 
@@ -49,17 +50,43 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const = 0;
 
-	/// Sets the pose of the actor
-	/// \param	transform	Rigid transformation that describes the pose of the actor
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform) = 0;
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+	{
+		m_initialPose = pose;
+		setCurrentPose(m_initialPose);
+	}
 
-	/// Gets the pose of the actor
-	/// \return	Rigid transformation that describes the pose of the actor
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		return m_initialPose;
+	}
+
+	/// Get the current pose of the representation
+	/// \param	pose Rigid transformation that describes the current pose of the representation
+	/// \note	This is an intermediate pose, while getFinalPose() returns the last valid (end of timestep) pose
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const = 0;
+
+	/// Get the final pose of the representation (i.e. last valid pose)
+	/// \return	The final pose
+	/// \note	For graphics, the final pose is just the current pose.
+	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const
+	{
+		return getCurrentPose();
+	}
 
 	/// Updates the actor
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt) = 0;
+
+private:
+
+	/// Initial pose of the representation
+	SurgSim::Math::RigidTransform3d m_initialPose;
 };
 
 };  // namespace Graphics

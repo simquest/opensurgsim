@@ -116,16 +116,16 @@ public:
 		return m_sumDt;
 	}
 
-	/// Sets the pose of the actor
-	/// \param	transform	Rigid transformation that describes the pose of the actor
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	/// Sets the current pose of the actor
+	/// \param	transform	Rigid transformation that describes the current pose of the actor
+	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_transform = transform;
 	}
 
-	/// Gets the pose of the actor
-	/// \return	Rigid transformation that describes the pose of the actor
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	/// Gets the current pose of the actor
+	/// \return	Rigid transformation that describes the current pose of the actor
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
 		return m_transform;
 	}
@@ -257,16 +257,16 @@ public:
 		return m_sumDt;
 	}
 
-	/// Sets the pose of the camera
-	/// \param	transform	Rigid transformation that describes the pose of the camera
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	/// Sets the current pose of the camera
+	/// \param	transform	Rigid transformation that describes the current pose of the camera
+	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_pose = transform;
 	}
 
 	/// Gets the pose of the camera
 	/// \return	Rigid transformation that describes the pose of the actor
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
 		return m_pose;
 	}
@@ -470,23 +470,45 @@ class NonGraphicsRepresentation : public SurgSim::Framework::Representation
 public:
 	/// Constructor
 	/// \param	name	Name of the representation
-	NonGraphicsRepresentation(const std::string& name) : SurgSim::Framework::Representation(name)
+	explicit NonGraphicsRepresentation(const std::string& name) : SurgSim::Framework::Representation(name),
+		m_initialPose(SurgSim::Math::RigidTransform3d::Identity()),
+		m_currentPose(SurgSim::Math::RigidTransform3d::Identity())
 	{
 	}
 
-	/// Sets the current pose of the representation
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	/// Sets the initial pose of the representation
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
-		m_pose = transform;
+		m_initialPose = transform;
+		setCurrentPose(transform);
+	}
+	/// Returns the initial pose of the representation
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		return m_initialPose;
+	}
+
+	/// Sets the current pose of the representation
+	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+		m_currentPose = transform;
 	}
 	/// Returns the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
-		return m_pose;
+		return m_currentPose;
+	}
+
+	/// Returns the final pose of the representation
+	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const
+	{
+		return getCurrentPose();
 	}
 private:
+	/// Initial pose of the representation
+	SurgSim::Math::RigidTransform3d m_initialPose;
 	/// Current pose of the representation
-	SurgSim::Math::RigidTransform3d m_pose;
+	SurgSim::Math::RigidTransform3d m_currentPose;
 };
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H

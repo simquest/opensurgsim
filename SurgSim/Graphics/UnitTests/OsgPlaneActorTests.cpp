@@ -70,17 +70,43 @@ TEST(OsgPlaneActorTests, PoseTest)
 {
 	std::shared_ptr<Actor> actor = std::make_shared<OsgPlaneActor>("test name");
 
-	EXPECT_TRUE(actor->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(actor->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a random rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
-	quaternion.normalize();
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	actor->setPose(transform);
-	EXPECT_TRUE(actor->getPose().isApprox(transform));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setCurrentPose(currentPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(currentPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(currentPose));
+	}
+
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 }
 
 TEST(OsgPlaneActorTests, RenderTest)
@@ -135,9 +161,9 @@ TEST(OsgPlaneActorTests, RenderTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate pose
-		planeActor1->setPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngle1 + t * endAngle1,
+		planeActor1->setCurrentPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngle1 + t * endAngle1,
 			Vector3d(1.0, 0.0, 0.0)), (1.0 - t) * startPosition1 + t * endPosition1));
-		planeActor2->setPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngle2 + t * endAngle2,
+		planeActor2->setCurrentPose(makeRigidTransform(makeRotationQuaternion((1.0 - t) * startAngle2 + t * endAngle2,
 			Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition2 + t * endPosition2));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}

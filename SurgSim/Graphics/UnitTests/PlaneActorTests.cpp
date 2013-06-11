@@ -80,16 +80,16 @@ public:
 		return m_sumDt;
 	}
 
-	/// Sets the pose of the actor
+	/// Sets the current pose of the actor
 	/// \param	transform	Rigid transformation that describes the pose of the actor
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
+	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_transform = transform;
 	}
 
-	/// Gets the pose of the actor
+	/// Gets the current pose of the actor
 	/// \return	Rigid transformation that describes the pose of the actor
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
 		return m_transform;
 	}
@@ -170,17 +170,43 @@ TEST(PlaneActorTests, PoseTest)
 {
 	std::shared_ptr<Actor> actor = std::make_shared<MockPlaneActor>("test name");
 
-	EXPECT_TRUE(actor->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(actor->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a random rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
-	quaternion.normalize();
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	actor->setPose(transform);
-	EXPECT_TRUE(actor->getPose().isApprox(transform));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setCurrentPose(currentPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(currentPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(currentPose));
+	}
+
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 }
 
 TEST(PlaneActorTests, UpdateTest)

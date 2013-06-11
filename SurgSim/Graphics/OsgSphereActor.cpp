@@ -63,7 +63,7 @@ double OsgSphereActor::getRadius() const
 	return m_transform->getScale().x();
 }
 
-void OsgSphereActor::setPose(const SurgSim::Math::RigidTransform3d& transform)
+void OsgSphereActor::setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	m_pose = transform;
 	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
@@ -71,7 +71,7 @@ void OsgSphereActor::setPose(const SurgSim::Math::RigidTransform3d& transform)
 	m_transform->setPosition(pose.second);
 }
 
-const SurgSim::Math::RigidTransform3d& OsgSphereActor::getPose() const
+const SurgSim::Math::RigidTransform3d& OsgSphereActor::getCurrentPose() const
 {
 	return m_pose;
 }

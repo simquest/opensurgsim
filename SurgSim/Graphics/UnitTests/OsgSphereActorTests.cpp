@@ -79,17 +79,43 @@ TEST(OsgSphereActorTests, PoseTest)
 {
 	std::shared_ptr<Actor> actor = std::make_shared<OsgSphereActor>("test name");
 
-	EXPECT_TRUE(actor->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(actor->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a random rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
-	quaternion.normalize();
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	actor->setPose(transform);
-	EXPECT_TRUE(actor->getPose().isApprox(transform));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setCurrentPose(currentPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(currentPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(currentPose));
+	}
+
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 }
 
 TEST(OsgSphereActorTests, RenderTest)
@@ -144,9 +170,11 @@ TEST(OsgSphereActorTests, RenderTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
-		sphereActor1->setPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition1 + t * endPosition1));
+		sphereActor1->setCurrentPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition1 +
+			t * endPosition1));
 		sphereActor1->setRadius((1 - t) * startRadius1 + t * endRadius1);
-		sphereActor2->setPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition2 + t * endPosition2));
+		sphereActor2->setCurrentPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition2 +
+			t * endPosition2));
 		sphereActor2->setRadius((1 - t) * startRadius2 + t * endRadius2);
 		/// The total number of steps should complete in 1 second
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));

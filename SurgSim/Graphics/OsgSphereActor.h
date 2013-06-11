@@ -56,13 +56,13 @@ public:
 	/// \return	Radius of the sphere
 	virtual double getRadius() const;
 
-	/// Sets the pose of the actor
-	/// \param	transform	Rigid transformation that describes the pose of the actor
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
+	/// Sets the current pose of the actor
+	/// \param	transform	Rigid transformation that describes the current pose of the actor
+	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform);
 
-	/// Gets the pose of the actor
-	/// \return	Rigid transformation that describes the pose of the actor
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
+	/// Gets the current pose of the actor
+	/// \return	Rigid transformation that describes the current pose of the actor
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
 
 	/// Updates the actor.
 	/// \param	dt	The time in seconds of the preceding timestep.

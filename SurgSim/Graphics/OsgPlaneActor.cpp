@@ -52,7 +52,7 @@ bool OsgPlaneActor::isVisible() const
 	return m_switch->getChildValue(m_transform);
 }
 
-void OsgPlaneActor::setPose(const SurgSim::Math::RigidTransform3d& transform)
+void OsgPlaneActor::setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	m_pose = transform;
 	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
@@ -60,7 +60,7 @@ void OsgPlaneActor::setPose(const SurgSim::Math::RigidTransform3d& transform)
 	m_transform->setPosition(pose.second);
 }
 
-const SurgSim::Math::RigidTransform3d& OsgPlaneActor::getPose() const
+const SurgSim::Math::RigidTransform3d& OsgPlaneActor::getCurrentPose() const
 {
 	return m_pose;
 }

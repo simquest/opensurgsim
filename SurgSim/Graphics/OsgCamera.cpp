@@ -75,12 +75,12 @@ bool OsgCamera::isVisible() const
 	return m_switch->getChildValue(m_camera);
 }
 
-void OsgCamera::setPose(const SurgSim::Math::RigidTransform3d& transform)
+void OsgCamera::setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	setViewMatrix(transform.matrix().inverse());
 }
 
-const SurgSim::Math::RigidTransform3d& OsgCamera::getPose() const
+const SurgSim::Math::RigidTransform3d& OsgCamera::getCurrentPose() const
 {
 	return m_pose;
 }

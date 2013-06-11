@@ -70,18 +70,43 @@ TEST(OsgActorTests, PoseTest)
 {
 	std::shared_ptr<Actor> actor = std::make_shared<MockOsgActor>("test name");
 
-	EXPECT_TRUE(actor->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(actor->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a rigid body transform
-	Vector3d translation = Vector3d::Random();
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(0.0, 3.14);
-	Quaterniond quaternion = SurgSim::Math::makeRotationQuaternion(distribution(generator), Vector3d(1.0, 0.0, 0.0));
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	actor->setPose(transform);
-	EXPECT_TRUE(actor->getPose().isApprox(transform));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setCurrentPose(currentPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(currentPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(currentPose));
+	}
+
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		actor->setInitialPose(initialPose);
+		EXPECT_TRUE(actor->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(actor->getFinalPose().isApprox(initialPose));
+	}
 }
 
 TEST(OsgActorTests, UpdateTest)
