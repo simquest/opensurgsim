@@ -50,10 +50,6 @@ public:
 	/// \param pose The current pose
 	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
 
-	/// Get the previous pose of the representation
-	/// \return The previous pose
-	virtual const SurgSim::Math::RigidTransform3d& getPreviousPose() const = 0;
-
 	/// Get the final pose of the representation (i.e. last valid pose)
 	/// \return The final pose
 	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const = 0;
