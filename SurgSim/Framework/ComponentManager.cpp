@@ -59,57 +59,102 @@ bool ComponentManager::removeComponent(const std::shared_ptr<Component>& compone
 
 void ComponentManager::processComponents()
 {
-	std::vector<std::shared_ptr<Component>> inflightAdditions;
-	std::vector<std::shared_ptr<Component>> inflightRemovals;
+	copyScheduledComponents();
 
+	auto inflightBegin = std::begin(m_inflightAdditions);
+	auto inflightEnd = std::end(m_inflightAdditions);
+
+	initializeComponents(inflightBegin, inflightEnd);
+	wakeUpComponents(inflightBegin, inflightEnd);
+	m_inflightAdditions.clear();
+
+	removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
+	m_inflightRemovals.clear();
+}
+
+bool ComponentManager::executeInitialization()
+{
+	// Call BasicThread initialize to do the initialize and startup call
+	bool success = BasicThread::executeInitialization();
+	if (! success )
 	{
-		// Lock for any more additions or removals and then copy to local storage
-		// this will insulate us from the actual add or remove call taking longer than it should
-		boost::lock_guard<boost::mutex> lock(m_componentMutex);
-		inflightAdditions.resize(m_componentAdditions.size());
-		std::copy(m_componentAdditions.begin(), m_componentAdditions.end(), inflightAdditions.begin());		
-		m_componentAdditions.clear();
-
-		inflightRemovals.resize(m_componentRemovals.size());
-		std::copy(m_componentRemovals.begin(), m_componentRemovals.end(), inflightRemovals.begin());		
-		m_componentRemovals.clear();
+		return success;
 	}
-	
-	auto inflightBegin = std::begin(inflightAdditions);
-	auto inflightEnd = std::end(inflightAdditions);
 
+	// Now Initialize and and wakeup all the components
+	copyScheduledComponents();
+	auto inflightBegin = std::begin(m_inflightAdditions);
+	auto inflightEnd = std::end(m_inflightAdditions);
+
+	initializeComponents(inflightBegin, inflightEnd);
+	wakeUpComponents(inflightBegin, inflightEnd);
+	m_inflightAdditions.clear();
+	success = waitForBarrier(success);
+	if (! success)
+	{
+		return success;
+	}
+
+	removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
+	m_inflightRemovals.clear();
+	success = waitForBarrier(success);
+
+	// Wait for SceneElement WakeUp, the last in the sequence
+	success = waitForBarrier(success);
+	return success;
+}
+
+void ComponentManager::copyScheduledComponents()
+{
+	m_inflightAdditions.clear();
+	m_inflightRemovals.clear();
+
+	// Lock for any more additions or removals and then copy to local storage
+	// this will insulate us from the actual add or remove call taking longer than it should
+	boost::lock_guard<boost::mutex> lock(m_componentMutex);
+	m_inflightAdditions.resize(m_componentAdditions.size());
+	std::copy(m_componentAdditions.begin(), m_componentAdditions.end(), m_inflightAdditions.begin());		
+	m_componentAdditions.clear();
+
+	m_inflightRemovals.resize(m_componentRemovals.size());
+	std::copy(m_componentRemovals.begin(), m_componentRemovals.end(), m_inflightRemovals.begin());		
+	m_componentRemovals.clear();
+}
+
+void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+										const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
+{
+	for(auto it = beginIt; it != endIt; ++it)
+	{
+		doRemoveComponent(*it);
+	}
+}
+
+void ComponentManager::initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt, 
+	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
+{
 	// Add All Components to the internal storage
-	for(auto it = inflightBegin; it != inflightEnd; ++it)
+	for(auto it = beginIt; it != endIt; ++it)
 	{
 		if (doAddComponent(*it))
 		{
 			(*it)->initialize(std::move(getRuntime()));
 		}
 	}
+}
 
-	// And again to wake all the components up, only the components that were successfully initialized
-	// get the wakeup call, check for isAwake because there to catch multiple versions of the same component
-	// from being awoken more than once
-	for(auto it = inflightBegin; it != inflightEnd; ++it)
+void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt, 
+	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
+{
+	for(auto it = beginIt; it != endIt; ++it)
 	{
 		if ( (*it)->isInitialized() && !(*it)->isAwake())
 		{
-			(*it)->wakeUp();
+			if ( !(*it)->wakeUp())
+			{
+				doRemoveComponent(*it);
+			}
 		}
-	}
-
-	// This is optional but clean up if anything did not wake up correctly ... 
-	for(auto it = inflightBegin; it != inflightEnd; ++it)
-	{
-		if ((*it)->isInitialized() && !(*it)->isAwake())
-		{
-			doRemoveComponent(*it);
-		}
-	}
-
-	for(auto it = std::begin(inflightRemovals); it != std::end(inflightRemovals); ++it)
-	{
-		doRemoveComponent(*it);
 	}
 }
 

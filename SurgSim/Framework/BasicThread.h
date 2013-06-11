@@ -91,6 +91,11 @@ protected:
 	/// \return true on success
 	bool startUp();
 
+	bool waitForBarrier(bool success);
+
+	virtual bool executeInitialization();
+
+
 private:
 	std::string m_name;
 

@@ -87,6 +87,11 @@ protected:
 
 	void processComponents();
 
+
+	void addComponents();
+
+	void copyScheduledComponents();
+
 	boost::mutex m_componentMutex;
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
@@ -106,8 +111,35 @@ private:
 	/// 		the component will actually be removed from this manager 
 	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component) = 0;
 
+	/// Overridden from BasicThread, extends the initialization to contain component initialization
+	/// including waiting for the other threads to conclude their component initialization and wakeup
+	virtual bool executeInitialization() override;
+
+	// Delegates to doRemoveComponent to remove all the components in the indicated array.
+	/// \param	beginIt	The begin iterator.
+	/// \param	endIt  	The end iterator.	
+	void removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
+
+	// Delegates to doAddComponent and calls initialize on all the components
+	/// \param	beginIt	The begin iterator.
+	/// \param	endIt  	The end iterator.	
+	void initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+							  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
+
+	/// Wake all the components up, only the components that were successfully initialized get
+	/// the wakeup call, check for isAwake because there to catch multiple versions of the same
+	/// component from being awoken more than once. Will also remove components if they did not
+	/// wake up as expected
+	/// \param	beginIt	The begin iterator.
+	/// \param	endIt  	The end iterator.	
+	void wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	std::weak_ptr<Runtime> m_runtime;
+
+	std::vector<std::shared_ptr<Component>> m_inflightAdditions;
+	std::vector<std::shared_ptr<Component>> m_inflightRemovals;
 
 };
 

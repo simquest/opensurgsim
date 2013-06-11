@@ -1,4 +1,4 @@
-// This file is a part of the OpenSurgSim project.
+  // This file is a part of the OpenSurgSim project.
 // Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,16 +33,15 @@ class Behavior;
 /// in the scene through addComponent (and removeComponent) calls. All the
 /// behaviors will be update once per period (default 30Hz) once the
 /// BehaviorManager is started.
-/// NOTE: Currently, BehaviorManager is not thread safe. Behaviors should only
-///       be added before runtime starts.
-/// TODO: Thread safety. Add ability to add/remove components during runtime.
 class BehaviorManager : public ComponentManager
 {
 public:
 	BehaviorManager();
 	~BehaviorManager();
-	virtual bool addComponent(std::shared_ptr<Component> component);
-	virtual bool removeComponent(std::shared_ptr<Component> component);
+
+protected:
+	virtual bool doAddComponent(const std::shared_ptr<Component>& component);
+	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component);
 
 private:
 	virtual bool doUpdate(double dt);

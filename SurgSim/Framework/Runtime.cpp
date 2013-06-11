@@ -48,10 +48,14 @@ Runtime::Runtime(const std::string& configFilePath) :
 
 Runtime::~Runtime()
 {
+	// Kill all threads
+	stop();
 }
 
 void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 {
+	SURGSIM_ASSERT(! m_isRunning) << "Cannot add a manager to the runtime once it is running";
+
 	if (manager != nullptr)
 	{
 		manager->setRuntime(getSharedPtr());
@@ -62,7 +66,7 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 void SurgSim::Framework::Runtime::setScene(std::shared_ptr<Scene> scene)
 {
 	// Workers need to be initialized to do this
-	SURGSIM_ASSERT(! m_isRunning) << "Cannot set the Scene in the Runtime once it is running";
+	SURGSIM_ASSERT(! m_isRunning) << "Cannot set the scene in the runtime once it is running";
 	m_scene = scene;
 	scene->setRuntime(getSharedPtr());
 }
@@ -82,7 +86,7 @@ bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 
 	if (result)
 	{
-		result = addComponents(sceneElement->getComponents());
+		addComponents(sceneElement->getComponents());
 	}
 
 	if (result)
@@ -93,18 +97,17 @@ bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 	return result;
 }
 
-bool Runtime::addComponents(const std::vector<std::shared_ptr<Component>>& components)
+void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components)
 {
-	auto componentsEnd = components.cend();
-	bool result = true;
-	for (auto it = components.cbegin(); it != componentsEnd; ++it)
+	auto componentsIt = std::begin(components);
+	auto componentsEnd = std::end(components);
+	for (; componentsIt != componentsEnd; ++componentsIt)
 	{
-		for (auto manager = m_managers.begin(); manager != m_managers.end(); ++manager)
+		for (auto manager = std::begin(m_managers); manager != std::end(m_managers); ++manager)
 		{
-			result = (*manager)->addComponent(*it) && result;
+			(*manager)->addComponent(*componentsIt);
 		}
 	}
-	return result;
 }
 
 bool Runtime::execute()
@@ -133,6 +136,10 @@ bool Runtime::execute()
 
 bool Runtime::start()
 {
+
+	// Add all the scene Elements so they can be initialized during the startup process
+	preprocessSceneElements();
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	std::shared_ptr<Barrier> barrier(new Barrier(m_managers.size()+1));
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
@@ -140,24 +147,33 @@ bool Runtime::start()
 		(*it)->start(barrier);
 	}
 
+
 	// Wait for all the managers to initialize
 	barrier->wait(true);
 	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers doInit() succeeded";
 
-
 	// Wait for all the managers to startup
 	barrier->wait(true);
-
 	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers doStartup() succeeded";
 
-	m_isRunning = true;
-	// Now add all the scenelements
-	preprocessSceneElements();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Scene is initialized";
-
-	// All managers are waiting for this
+	// Wait for all the components to initialize()
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers updating";
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All component initialize() succeeded";
+
+	// Wait for all the components to wakeUp()
+	barrier->wait(true);
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All component wakeUp() succeeded";
+
+	// Now wake up all the sceneelements
+	auto sceneElements = m_scene->getSceneElements();
+	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
+	{
+		it->second->wakeUp();
+	}
+	barrier->wait(true);
+
+	m_isRunning = true;
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Scene is initialized. All managers updating";
 
 	return true;
 }
@@ -179,18 +195,14 @@ void Runtime::preprocessSceneElements()
 	auto sceneElements = m_scene->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
-		it->second->setRuntime(getSharedPtr());
-		it->second->initialize();
-		std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
-		newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());
+		if (it->second->initialize())
+		{
+			std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
+			newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());
+		}
 	}
 
 	addComponents(newComponents);
-
-	for (auto it = sceneElements.cbegin(); it != sceneElements.cend(); ++it)
-	{
-		it->second->wakeUp();
-	}
 }
 
 std::shared_ptr<Logger> Runtime::getLogger(const std::string& loggerName)

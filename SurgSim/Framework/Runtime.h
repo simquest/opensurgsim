@@ -118,7 +118,7 @@ private:
 	/// Adds the components.
 	/// \param	components	The components.
 	/// \return	true if it succeeds, false if it fails.
-	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
+	void addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
 
 	/// Initializes the search paths.
 	/// \param	configFilePath	Full pathname of the configuration file, if path is empty
