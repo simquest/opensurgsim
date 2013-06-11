@@ -20,20 +20,20 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	ActorTest.cpp
+	RepresentationTest.cpp
 	ContactCalculationTests.cpp
 	DcdCollisionTests.cpp
-	FemActorParametersTest.cpp
-	FixedActorTest.cpp
+	FemRepresentationParametersTest.cpp
+	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
-	RigidActorBaseStateTest.cpp
-	RigidActorParametersTest.cpp
-	RigidActorStateTest.cpp
-	RigidActorTest.cpp
+	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationParametersTest.cpp
+	RigidRepresentationStateTest.cpp
+	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
-	VtcRigidActorTest.cpp
+	VtcRigidRepresentationTest.cpp
 	VtcRigidParametersTest.cpp
 )
 

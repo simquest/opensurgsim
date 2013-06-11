@@ -80,7 +80,7 @@ public:
 
 protected:
 
-	/// Trigger the initialisation of this object, this will be called before all other threads doStartup()
+	/// Trigger the initialization of this object, this will be called before all other threads doStartup()
 	/// are called
 	/// \return true on success
 	bool initialize();

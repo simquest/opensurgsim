@@ -64,10 +64,10 @@ TEST(OsgCameraTests, InitTest)
 TEST(OsgCameraTests, OsgNodesTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
-	std::shared_ptr<OsgActor> osgActor = osgCamera;
+	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
 
 	/// Check that the OSG nodes of the camera are built correctly
-	osg::ref_ptr<osg::Node> node = osgActor->getOsgNode();
+	osg::ref_ptr<osg::Node> node = osgRepresentation->getOsgNode();
 	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(node.get());
 	EXPECT_TRUE(switchNode.valid());
 	EXPECT_EQ(1u, switchNode->getNumChildren());
@@ -79,11 +79,11 @@ TEST(OsgCameraTests, OsgNodesTest)
 TEST(OsgCameraTests, VisibilityTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
-	std::shared_ptr<OsgActor> osgActor = osgCamera;
+	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	// Get the osg::Switch from the OsgActor so that we can make sure that the osg::Camera has the correct visibility.
-	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgActor->getOsgNode().get());
+	// Get the osg::Switch from the OsgRepresentation so that we can make sure that the osg::Camera has the correct visibility.
+	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
 	EXPECT_TRUE(switchNode.valid());
 
 	EXPECT_TRUE(camera->isVisible());

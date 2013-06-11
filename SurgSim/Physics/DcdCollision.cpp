@@ -15,8 +15,8 @@
 
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/RigidActorCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidActor.h>
+#include <SurgSim/Physics/RigidCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -72,35 +72,35 @@ void DcdCollision::populateCalculationTable()
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<Actor>> actors = state->getActors();
-	std::list<std::shared_ptr<RigidActor>> rigidActors;
+	std::vector<std::shared_ptr<Representation>> representations = state->getRepresentations();
+	std::list<std::shared_ptr<RigidRepresentation>> rigidRepresentations;
 
-	if (actors.size() > 1)
+	if (representations.size() > 1)
 	{
-		for (auto it = actors.cbegin(); it != actors.cend(); ++it)
+		for (auto it = representations.cbegin(); it != representations.cend(); ++it)
 		{
-			std::shared_ptr<RigidActor> rigid = std::dynamic_pointer_cast<RigidActor>(*it);
+			std::shared_ptr<RigidRepresentation> rigid = std::dynamic_pointer_cast<RigidRepresentation>(*it);
 			if (rigid != nullptr && rigid->isActive())
 			{
-				rigidActors.push_back(rigid);
+				rigidRepresentations.push_back(rigid);
 			}
 		}
 	}
 
-	if (rigidActors.size() > 1)
+	if (rigidRepresentations.size() > 1)
 	{
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
-		auto firstEnd = rigidActors.end();
+		auto firstEnd = rigidRepresentations.end();
 		--firstEnd;
-		for (auto first = rigidActors.begin(); first != firstEnd; ++first)
+		for (auto first = rigidRepresentations.begin(); first != firstEnd; ++first)
 		{
-			std::list<std::shared_ptr<RigidActor>>::iterator second = first;
+			std::list<std::shared_ptr<RigidRepresentation>>::iterator second = first;
 			++second;
-			for (; second != rigidActors.end(); ++second)
+			for (; second != rigidRepresentations.end(); ++second)
 			{
 				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-				pair->setRepresentations(std::make_shared<RigidActorCollisionRepresentation>(*first),
-					std::make_shared<RigidActorCollisionRepresentation>(*second));
+				pair->setRepresentations(std::make_shared<RigidCollisionRepresentation>(*first),
+					std::make_shared<RigidCollisionRepresentation>(*second));
 				pairs.push_back(pair);
 			}
 		}

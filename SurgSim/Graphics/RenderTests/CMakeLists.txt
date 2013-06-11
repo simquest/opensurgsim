@@ -23,8 +23,8 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	OsgManagerRenderTests.cpp
-	OsgPlaneActorRenderTests.cpp
-	OsgSphereActorRenderTests.cpp
+	OsgPlaneRepresentationRenderTests.cpp
+	OsgSphereRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
 )
 

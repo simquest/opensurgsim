@@ -24,7 +24,7 @@ namespace SurgSim
 namespace Physics
 {
 
-class Actor;
+class Representation;
 class CollisionPair;
 
 class PhysicsManagerState
@@ -35,10 +35,10 @@ public:
 	PhysicsManagerState() {}
 	~PhysicsManagerState() {}
 
-	const std::vector<std::shared_ptr<Actor>>& getActors() const
-	{ return m_actors; }
-	void setActors(const std::vector<std::shared_ptr<Actor>>& val)
-	{ m_actors = val; }
+	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
+	{ return m_representations; }
+	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val)
+	{ m_representations = val; }
 
 	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const
 	{ return m_collisionPairs; }
@@ -47,7 +47,7 @@ public:
 
 private:
 
-	std::vector<std::shared_ptr<Actor>> m_actors;
+	std::vector<std::shared_ptr<Representation>> m_representations;
 	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
 
 };
