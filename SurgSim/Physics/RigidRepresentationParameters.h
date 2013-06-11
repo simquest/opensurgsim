@@ -308,8 +308,8 @@ private:
 	bool m_isValid;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
 #endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H

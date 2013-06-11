@@ -112,8 +112,8 @@ private:
 	Vector3d m_w;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
 #endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H

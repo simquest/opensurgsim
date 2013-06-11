@@ -142,3 +142,9 @@ bool OsgManager::doUpdate(double dt)
 		return false;
 	}
 }
+
+void OsgManager::doBeforeStop()
+{
+	// Delete the viewer so that the graphics context will be released in the manager's thread
+	m_viewer = nullptr;
+}

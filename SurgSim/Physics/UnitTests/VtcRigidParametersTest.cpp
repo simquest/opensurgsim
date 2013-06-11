@@ -64,7 +64,7 @@ TEST(VtcRigidParametersTest, SetGetTest)
 	EXPECT_NEAR(12.0, vtcRigidParam.getVtcLinearStiffness(), epsilon);
 	vtcRigidParam.setVtcLinearStiffness(0.0);
 	EXPECT_NEAR(0.0, vtcRigidParam.getVtcLinearStiffness(), epsilon);
-	
+
 	// Angular stiffness
 	vtcRigidParam.setVtcAngularStiffness(11.9);
 	EXPECT_NEAR(11.9, vtcRigidParam.getVtcAngularStiffness(), epsilon);

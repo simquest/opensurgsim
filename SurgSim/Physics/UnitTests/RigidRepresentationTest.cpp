@@ -18,7 +18,10 @@
 #include <string>
 
 #include <SurgSim/Physics/RigidRepresentation.h>
-using namespace SurgSim::Physics;
+using SurgSim::Physics::RigidRepresentation;
+using SurgSim::Physics::RigidRepresentationState;
+using SurgSim::Physics::RigidRepresentationParameters;
+using SurgSim::Physics::SphereShape;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>

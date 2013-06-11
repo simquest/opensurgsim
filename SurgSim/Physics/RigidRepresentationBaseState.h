@@ -74,8 +74,8 @@ private:
 	SurgSim::Math::RigidTransform3d m_pose;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
 #endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASESTATE_H

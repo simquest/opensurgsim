@@ -13,36 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+find_package(OpenThreads)
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
-set(UNIT_TEST_SOURCES
-	RepresentationTest.cpp
-	ContactCalculationTests.cpp
-	DcdCollisionTests.cpp
-	FemRepresentationParametersTest.cpp
-	FixedRepresentationTest.cpp
-	FreeMotionTests.cpp
-	MeshShapeTest.cpp
-	PhysicsManagerTests.cpp
-	RigidRepresentationBaseStateTest.cpp
-	RigidRepresentationParametersTest.cpp
-	RigidRepresentationStateTest.cpp
-	RigidRepresentationTest.cpp
-	RigidShapeTest.cpp
-	VtcRigidRepresentationTest.cpp
-	VtcRigidParametersTest.cpp
+set(SURGSIM_BLOCKS_SOURCES
+	BasicSceneElement.cpp
 )
 
-set(UNIT_TEST_HEADERS
+set(SURGSIM_BLOCKS_HEADERS
+	BasicSceneElement.h
+	RepresentationPoseBehavior.h
 )
 
-include_directories(
+surgsim_add_library(
+    SurgSimBlocks
+    "${SURGSIM_BLOCKS_SOURCES}"
+    "${SURGSIM_BLOCKS_HEADERS}"
+    "SurgSim/Blocks"
 )
+target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
+	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
-set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics gtest ${Boost_LIBRARIES})
-
-surgsim_add_unit_tests(SurgSimPhysicsTest)
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()

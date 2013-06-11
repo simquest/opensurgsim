@@ -108,8 +108,8 @@ private:
 	RigidRepresentationBaseState m_currentState;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
 #endif /// SURGSIM_PHYSICS_FIXEDREPRESENTATION_H

@@ -45,7 +45,7 @@ class PhysicsManager : public SurgSim::Framework::ComponentManager
 {
 public:
 
-	/// Condstructor
+	/// Constructor
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
@@ -58,7 +58,7 @@ public:
 protected:
 
 	///@{
-	/// Overriden from ComponentManager
+	/// Overridden from ComponentManager
 	virtual bool doInitialize();
 	virtual bool doStartUp();
 	virtual bool doUpdate(double dt);

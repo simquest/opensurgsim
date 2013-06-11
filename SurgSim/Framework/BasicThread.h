@@ -80,7 +80,7 @@ public:
 
 protected:
 
-	/// Trigger the initialisation of this object, this will be called before all other threads doStartup()
+	/// Trigger the initialization of this object, this will be called before all other threads doStartup()
 	/// are called
 	/// \return true on success
 	bool initialize();
@@ -107,6 +107,10 @@ private:
 
 	//! \return false when the thread is done, this will stop execution
 	virtual bool doUpdate(double dt) = 0;
+
+	/// Prepares the thread for its execution to be stopped
+	/// \note	Called from this thread before joined
+	virtual void doBeforeStop();
 };
 
 }; // namespace Framework

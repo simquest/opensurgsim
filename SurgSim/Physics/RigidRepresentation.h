@@ -215,8 +215,8 @@ private:
 	RigidRepresentationParameters m_currentParameters;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
 #endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATION_H

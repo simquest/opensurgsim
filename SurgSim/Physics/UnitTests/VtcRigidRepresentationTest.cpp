@@ -18,7 +18,11 @@
 #include <string>
 
 #include <SurgSim/Physics/VtcRigidRepresentation.h>
-using namespace SurgSim::Physics;
+using SurgSim::Physics::VtcRigidRepresentation;
+using SurgSim::Physics::VtcRigidParameters;
+using SurgSim::Physics::RigidRepresentationParameters;
+using SurgSim::Physics::RigidRepresentationState;
+using SurgSim::Physics::SphereShape;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
@@ -81,7 +85,7 @@ public:
 
 	// Rigid representation parameters
 	RigidRepresentationParameters m_param;
-	
+
 	// Rigid representation default parameters
 	RigidRepresentationParameters m_defaultParameters;
 
@@ -102,7 +106,7 @@ public:
 
 	// Rigid representation state for divergence test
 	RigidRepresentationState m_stateDivergence;
-	
+
 	// Rigid representation default state
 	RigidRepresentationState m_defaultState;
 
@@ -256,7 +260,7 @@ TEST_F(VtcRigidRepresentationTest, NoForceTorqueTest)
 	}
 
 	const RigidRepresentationState& state = rigidBody->getCurrentState();
-	
+
 	const Vector3d    G = state.getPose().translation();
 	const Matrix33d&  R = state.getPose().rotation();
 	const Quaterniond q = Quaterniond(R);
@@ -331,7 +335,7 @@ TEST_F(VtcRigidRepresentationTest, DisableWhenDivergeTest)
 	// The rotation explode under the angular velocity too strong !
 	{
 		ASSERT_TRUE(rigidBody->isActive());
-		
+
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);
 		rigidBody->afterUpdate(m_dt);

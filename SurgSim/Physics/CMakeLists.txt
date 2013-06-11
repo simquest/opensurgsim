@@ -21,6 +21,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
 	DcdCollision.cpp
+	FemRepresentationParameters.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
 	RigidRepresentation.cpp
@@ -37,6 +38,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Computation.h
 	CylinderShape.h
 	DcdCollision.h
+	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FreeMotion.h
 	MeshShape.h
