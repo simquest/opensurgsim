@@ -19,8 +19,6 @@
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
@@ -34,8 +32,6 @@
 
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Representation;
-using SurgSim::Framework::Runtime;
-using SurgSim::Framework::Scene;
 
 namespace SurgSim
 {
@@ -45,27 +41,6 @@ namespace Graphics
 TEST(OsgManagerTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();});
-}
-
-TEST(OsgManagerTests, StartUpTest)
-{
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
-
-	/// Add a graphics component to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("test view element");
-	scene->addSceneElement(viewElement);
-
-	/// Run the thread for a moment
-	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-	runtime->stop();
 }
 
 bool hasView(osgViewer::CompositeViewer* compositeViewer, osg::View* view)
@@ -88,13 +63,16 @@ TEST(OsgManagerTests, AddRemoveTest)
 	/// Perform add and remove from a pointer to a ComponentManager to check that the intended polymorphism is working.
 	std::shared_ptr<ComponentManager> componentManager = graphicsManager;
 
-	std::shared_ptr<OsgRepresentation> representation1 = std::make_shared<MockOsgRepresentation>("test representation 1");
-	std::shared_ptr<OsgRepresentation> representation2 = std::make_shared<MockOsgRepresentation>("test representation 2");
+	std::shared_ptr<OsgRepresentation> representation1 =
+		std::make_shared<MockOsgRepresentation>("test representation 1");
+	std::shared_ptr<OsgRepresentation> representation2 =
+		std::make_shared<MockOsgRepresentation>("test representation 2");
 	std::shared_ptr<OsgGroup> group1 = std::make_shared<OsgGroup>("test group 1");
 	std::shared_ptr<OsgGroup> group2 = std::make_shared<OsgGroup>("test group 2");
 	std::shared_ptr<OsgView> view1 = std::make_shared<OsgView>("test view 1");
 	std::shared_ptr<OsgView> view2 = std::make_shared<OsgView>("test view 2");
-	std::shared_ptr<MockRepresentation> nonOsgRepresentation = std::make_shared<MockRepresentation>("non-osg representation");
+	std::shared_ptr<MockRepresentation> nonOsgRepresentation
+		= std::make_shared<MockRepresentation>("non-osg representation");
 	std::shared_ptr<MockGroup> nonOsgGroup = std::make_shared<MockGroup>("non-osg group");
 	std::shared_ptr<MockView> nonOsgView = std::make_shared<MockView>("non-osg view");
 	using SurgSim::Framework::Representation;
