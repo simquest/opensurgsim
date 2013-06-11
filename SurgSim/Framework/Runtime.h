@@ -22,6 +22,7 @@
 #include <map>
 
 #include <boost/thread/mutex.hpp>
+#include <boost/lockfree/queue.hpp>
 
 namespace SurgSim
 {
@@ -103,6 +104,10 @@ public:
 	/// \return	The application data.
 	std::shared_ptr<const ApplicationData> getApplicationData() const;
 
+	void addComponent(const std::shared_ptr<Component>& component);
+
+	void removeComponent(const std::shared_ptr<Component>& component);
+
 
 private:
 
@@ -125,6 +130,7 @@ private:
 	std::shared_ptr<ApplicationData> m_applicationData;
 
 	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
+
 
 	boost::mutex m_mutex;
 };

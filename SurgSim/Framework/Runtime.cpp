@@ -243,5 +243,21 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData() const
 	return m_applicationData;
 }
 
+void Runtime::addComponent(const std::shared_ptr<Component>& component)
+{
+	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	{
+		(*it)->addComponent(component);
+	}
+}
+
+void Runtime::removeComponent(const std::shared_ptr<Component>& component)
+{
+	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	{
+		(*it)->removeComponent(component);
+	}
+}
+
 }; // namespace Framework
 }; // namespace SurgSim

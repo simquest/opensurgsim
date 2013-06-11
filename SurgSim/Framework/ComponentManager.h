@@ -18,6 +18,9 @@
 
 #include <memory>
 #include <string>
+#include <queue>
+
+#include <boost/thread/mutex.hpp>
 
 #include <SurgSim/Framework/BasicThread.h>
 #include <SurgSim/Framework/Log.h>
@@ -42,15 +45,17 @@ public:
 	explicit ComponentManager(const std::string& name = "Unknown Component Manager");
 	virtual ~ComponentManager();
 
-	/// Handle representations, override for each thread
-	/// \param component	The component to be removed.
-	/// \return true on success
-	virtual bool removeComponent(std::shared_ptr<Component> component) = 0;
-
 	/// Adds a component.
 	/// \param component The component to be added.
-	/// \return true if it succeeds or the thread is not concerned with the component, false if it fails.
-	virtual bool addComponent(std::shared_ptr<Component> component) = 0;
+	/// \return true if the component was scheduled for addition, this does not indicate that
+	/// 		the component will actually be added to this manager
+	bool addComponent(const std::shared_ptr<Component>& component);
+
+	/// Handle representations, override for each thread
+	/// \param component	The component to be removed.
+	/// \return true if the component was scheduled for removal, this does not indicate that
+	/// 		the component will actually be removed from this manager 
+	bool removeComponent(const std::shared_ptr<Component>& component);
 
 	/// @{
 	/// Runtime accessors
@@ -63,6 +68,7 @@ public:
 	/// @}
 	
 
+protected:
 	/// Template version of the addComponent method.
 	/// \tparam	T	Specific type of the component that is being added.
 	/// \param	component		 	The component that needs to be added.
@@ -79,11 +85,30 @@ public:
 	template<class T>
 	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
 
-protected:
+	void processComponents();
+
+	boost::mutex m_componentMutex;
+	std::vector<std::shared_ptr<Component>> m_componentAdditions;
+	std::vector<std::shared_ptr<Component>> m_componentRemovals;
+
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 private:
+	/// Adds a component.
+	/// \param component The component to be added.
+	/// \return true if the component was scheduled for addition, this does not indicate that
+	/// 		the component will actually be added to this manager
+	virtual bool doAddComponent(const std::shared_ptr<Component>& component) = 0;
+
+	/// Handle representations, override for each thread
+	/// \param component	The component to be removed.
+	/// \return true if the component was scheduled for removal, this does not indicate that
+	/// 		the component will actually be removed from this manager 
+	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component) = 0;
+
+
 	std::weak_ptr<Runtime> m_runtime;
+
 };
 
 #include <SurgSim/Framework/ComponentManager-inl.h>

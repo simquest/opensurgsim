@@ -24,6 +24,7 @@ set(UNIT_TEST_SOURCES
 	AssertTest.cpp
 	BehaviorManagerTest.cpp
 	BaseThreadTest.cpp
+	ComponentManagerTests.cpp
 	LockedContainerTest.cpp
 	LoggerTest.cpp
 	ReuseFactoryTest.cpp
