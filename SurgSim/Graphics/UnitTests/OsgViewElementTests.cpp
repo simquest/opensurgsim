@@ -19,17 +19,10 @@
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
-#include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-
 #include <gtest/gtest.h>
-
-using SurgSim::Framework::Runtime;
-using SurgSim::Framework::Scene;
 
 namespace SurgSim
 {
@@ -44,42 +37,6 @@ TEST(OsgViewElementTests, InitTest)
 
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(viewElement->getView());
 	EXPECT_NE(nullptr, osgView);
-}
-
-TEST(OsgViewElementTests, StartUpTest)
-{
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
-
-	/// Add a graphics component to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("test element");
-	scene->addSceneElement(viewElement);
-
-	/// Set initial position to (50, 60), dimensions to 200 x 100 and disable the window border
-	viewElement->getView()->setPosition(50, 60);
-	viewElement->getView()->setDimensions(200, 100);
-	viewElement->getView()->setWindowBorderEnabled(false);
-
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	/// Move the window to (100, 200)
-	viewElement->getView()->setPosition(100, 200);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	/// Enable the window border and resize the window to 400 x 500
-	viewElement->getView()->setWindowBorderEnabled(true);
-	viewElement->getView()->setDimensions(400, 500);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	runtime->stop();
 }
 
 TEST(OsgViewElementTests, ViewTest)

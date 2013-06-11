@@ -72,4 +72,5 @@ target_link_libraries(SurgSimGraphics SurgSimFramework
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+	add_subdirectory(RenderTests)
 endif()
