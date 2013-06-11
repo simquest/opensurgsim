@@ -24,39 +24,40 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemRepresentationParameters.cpp
 	FreeMotion.cpp
 	PhysicsManager.cpp
-	RigidRepresentation.cpp
 	RigidCollisionRepresentation.cpp
-	VtcRigidRepresentation.cpp)
+	RigidRepresentation.cpp
+	VtcRigidRepresentation.cpp
+)
 
 set(SURGSIM_PHYSICS_HEADERS
-	Representation.h
 	BoxShape.h
 	CapsuleShape.h
 	CollisionPair.h
 	CollisionRepresentation.h
-	ContactCalculation.h
 	Computation.h
+	ContactCalculation.h
 	CylinderShape.h
 	DcdCollision.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FreeMotion.h
 	MeshShape.h
-	PhysicsManager-inl.h
 	PhysicsManager.h
+	PhysicsManager-inl.h
 	PhysicsManagerState.h
 	PlaneShape.h
+	Representation.h
+	RigidCollisionRepresentation.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBaseState.h
-	RigidCollisionRepresentation.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	RigidShape.h
 	Shapes.h
 	SphereShape.h
-	VtcRigidRepresentation.h
 	VtcRigidParameters.h
+	VtcRigidRepresentation.h
 )
 
 surgsim_add_library(

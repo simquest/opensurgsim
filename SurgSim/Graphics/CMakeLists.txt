@@ -36,11 +36,9 @@ set(SURGSIM_GRAPHICS_SOURCES
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
-	Representation.h
 	Camera.h
 	Group.h
 	Manager.h
-	OsgRepresentation.h
 	OsgCamera.h
 	OsgGroup.h
 	OsgManager.h
@@ -48,6 +46,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgQuaternionConversions.h
+	OsgRepresentation.h
 	OsgRigidTransformConversions.h
 	OsgSphereRepresentation.h
 	OsgUnitSphere.h
@@ -55,6 +54,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
+	Representation.h
 	SphereRepresentation.h
 	View.h
 	ViewElement.h

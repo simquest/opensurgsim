@@ -22,28 +22,28 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	RepresentationTests.cpp
 	CameraTests.cpp
 	GroupTests.cpp
 	ManagerTests.cpp
-	PlaneRepresentationTests.cpp
-	OsgRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
 	OsgMatrixConversionsTests.cpp
-	OsgPlaneRepresentationTests.cpp
 	OsgPlaneTests.cpp
+	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
+	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
 	OsgViewTests.cpp
 	OsgViewElementTests.cpp
+	PlaneRepresentationTests.cpp
+	RepresentationTests.cpp
 	SphereRepresentationTests.cpp
-	ViewElementTests.cpp
 	ViewTests.cpp
+	ViewElementTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

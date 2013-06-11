@@ -20,7 +20,6 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	RepresentationTest.cpp
 	ContactCalculationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
@@ -28,13 +27,14 @@ set(UNIT_TEST_SOURCES
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
+	RepresentationTest.cpp
+	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
-	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
-	VtcRigidRepresentationTest.cpp
 	VtcRigidParametersTest.cpp
+	VtcRigidRepresentationTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
