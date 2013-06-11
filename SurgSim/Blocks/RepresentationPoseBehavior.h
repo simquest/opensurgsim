@@ -17,8 +17,8 @@
 #define SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Graphics/Actor.h>
-#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {

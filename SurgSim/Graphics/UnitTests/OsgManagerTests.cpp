@@ -21,7 +21,7 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Graphics/OsgActor.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgManager.h>
@@ -88,28 +88,28 @@ TEST(OsgManagerTests, AddRemoveTest)
 	/// Perform add and remove from a pointer to a ComponentManager to check that the intended polymorphism is working.
 	std::shared_ptr<ComponentManager> componentManager = graphicsManager;
 
-	std::shared_ptr<OsgActor> actor1 = std::make_shared<MockOsgActor>("test actor 1");
-	std::shared_ptr<OsgActor> actor2 = std::make_shared<MockOsgActor>("test actor 2");
+	std::shared_ptr<OsgRepresentation> representation1 = std::make_shared<MockOsgRepresentation>("test representation 1");
+	std::shared_ptr<OsgRepresentation> representation2 = std::make_shared<MockOsgRepresentation>("test representation 2");
 	std::shared_ptr<OsgGroup> group1 = std::make_shared<OsgGroup>("test group 1");
 	std::shared_ptr<OsgGroup> group2 = std::make_shared<OsgGroup>("test group 2");
 	std::shared_ptr<OsgView> view1 = std::make_shared<OsgView>("test view 1");
 	std::shared_ptr<OsgView> view2 = std::make_shared<OsgView>("test view 2");
-	std::shared_ptr<MockActor> nonOsgActor = std::make_shared<MockActor>("non-osg actor");
+	std::shared_ptr<MockRepresentation> nonOsgRepresentation = std::make_shared<MockRepresentation>("non-osg representation");
 	std::shared_ptr<MockGroup> nonOsgGroup = std::make_shared<MockGroup>("non-osg group");
 	std::shared_ptr<MockView> nonOsgView = std::make_shared<MockView>("non-osg view");
 	using SurgSim::Framework::Representation;
 	std::shared_ptr<Representation> nonGraphicsComponent = std::make_shared<NonGraphicsRepresentation>(
 		"non-graphics component");
 
-	EXPECT_EQ(0u, graphicsManager->getActors().size());
+	EXPECT_EQ(0u, graphicsManager->getRepresentations().size());
 	EXPECT_EQ(0u, graphicsManager->getGroups().size());
 	EXPECT_EQ(0u, graphicsManager->getViews().size());
 
-	/// Add an actor
-	EXPECT_TRUE(componentManager->addComponent(actor1));
-	EXPECT_EQ(1u, graphicsManager->getActors().size());
-	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor1));
+	/// Add an representation
+	EXPECT_TRUE(componentManager->addComponent(representation1));
+	EXPECT_EQ(1u, graphicsManager->getRepresentations().size());
+	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Add a group
 	EXPECT_TRUE(componentManager->addComponent(group1));
@@ -136,16 +136,16 @@ TEST(OsgManagerTests, AddRemoveTest)
 	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
-	/// Add another actor
-	EXPECT_TRUE(componentManager->addComponent(actor2));
-	EXPECT_EQ(2u, graphicsManager->getActors().size());
-	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor2));
+	/// Add another representation
+	EXPECT_TRUE(componentManager->addComponent(representation2));
+	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
+	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation2));
 
 
-	/// Try to add a duplicate actor
-	EXPECT_FALSE(componentManager->addComponent(actor1));
-	EXPECT_EQ(2u, graphicsManager->getActors().size());
+	/// Try to add a duplicate representation
+	EXPECT_FALSE(componentManager->addComponent(representation1));
+	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 
 	/// Try to add a duplicate group
 	EXPECT_FALSE(componentManager->addComponent(group2));
@@ -155,10 +155,10 @@ TEST(OsgManagerTests, AddRemoveTest)
 	EXPECT_FALSE(componentManager->addComponent(view1));
 	EXPECT_EQ(2u, graphicsManager->getViews().size());
 
-	/// Try to add an actor that is not a subclass of OsgActor
-	EXPECT_FALSE(componentManager->addComponent(nonOsgActor)) <<
-		"Adding an Actor that is not a subclass of OsgActor should fail and return false";
-	EXPECT_EQ(2u, graphicsManager->getActors().size());
+	/// Try to add an representation that is not a subclass of OsgRepresentation
+	EXPECT_FALSE(componentManager->addComponent(nonOsgRepresentation)) <<
+		"Adding an Representation that is not a subclass of OsgRepresentation should fail and return false";
+	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 
 	/// Try to add a group that is not a subclass of OsgGroup
 	EXPECT_FALSE(componentManager->addComponent(nonOsgGroup)) <<
@@ -185,20 +185,20 @@ TEST(OsgManagerTests, AddRemoveTest)
 	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
-	/// Remove an actor
-	EXPECT_TRUE(componentManager->removeComponent(actor1));
-	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor1));
+	/// Remove an representation
+	EXPECT_TRUE(componentManager->removeComponent(representation1));
+	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a group that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(group2));
 	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
-	/// Try to remove an actor that is not in the manager
-	EXPECT_FALSE(componentManager->removeComponent(actor1));
-	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor1));
+	/// Try to remove an representation that is not in the manager
+	EXPECT_FALSE(componentManager->removeComponent(representation1));
+	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a view that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(view2));
