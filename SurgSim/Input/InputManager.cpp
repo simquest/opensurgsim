@@ -49,7 +49,7 @@ bool InputManager::doUpdate(double dt)
 	return true;
 }
 
-bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool InputManager::doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 
 	auto input = tryAddComponent(component, &m_inputs);
@@ -68,11 +68,12 @@ bool InputManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> c
 		return addOutputComponent(output);
 	}
 
-	// If we got he the component was neither an Input nor and OutputComponent
-	return true;
+	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
+	// return false
+	return false;
 }
 
-bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
+bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& input)
 {
 	bool result = false;
 	if (m_devices.find(input->getDeviceName()) != m_devices.end())
@@ -90,7 +91,7 @@ bool InputManager::addInputComponent(std::shared_ptr<InputComponent> input)
 	return result;
 }
 
-bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output)
+bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& output)
 {
 	bool result = false;
 	if (m_devices.find(output->getDeviceName()) != m_devices.end())
@@ -117,7 +118,7 @@ bool InputManager::addOutputComponent(std::shared_ptr<OutputComponent> output)
 	return result;
 }
 
-bool InputManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool InputManager::doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 
 	bool result = false;
