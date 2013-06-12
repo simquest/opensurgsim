@@ -59,7 +59,7 @@ TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 }
 
 
-static void solveAndCompareResult(const std::string& fileName, bool compare = false,
+static void solveAndCompareResult(const std::string& fileName,
 						  double gsSolverPrecision = 1e-9, double gsContactTolerance = 1e-9, int gsMaxIterations = 100)
 {
 	SCOPED_TRACE("while running test " + fileName);
@@ -133,11 +133,8 @@ static void solveAndCompareResult(const std::string& fileName, bool compare = fa
 			"x:" << std::endl << solution.x << std::endl << "Ax+b:" << std::endl << c;
 	}
 
-	if (compare)
-	{
-		EXPECT_TRUE(solution.x.isApprox(data->expectedLambda)) << "lambda:" << std::endl << solution.x << std::endl <<
-			"expected:" << std::endl << data->expectedLambda;
-	}
+	EXPECT_TRUE(solution.x.isApprox(data->expectedLambda)) << "lambda:" << std::endl << solution.x << std::endl <<
+		"expected:" << std::endl << data->expectedLambda;
 
 //	double convergenceCriteria=0.0;
 //	bool validSignorini=false;
@@ -153,33 +150,16 @@ TEST(MlcpGaussSeidelSolverTests, SolveOriginal)
 	const double gsSolverPrecision = 1e-4;
 	const double gsContactTolerance = 2e-4;
 	int gsMaxIterations = 30;
-	solveAndCompareResult("mlcpOriginalTest.txt", false, gsSolverPrecision, gsContactTolerance, gsMaxIterations);
+	solveAndCompareResult("mlcpOriginalTest.txt", gsSolverPrecision, gsContactTolerance, gsMaxIterations);
 }
 
-TEST(MlcpGaussSeidelSolverTests, CompareResultOriginal)
-{
-	const double gsSolverPrecision = 1e-4;
-	const double gsContactTolerance = 2e-4;
-	int gsMaxIterations = 30;
-	solveAndCompareResult("mlcpOriginalTest.txt", true, gsSolverPrecision, gsContactTolerance, gsMaxIterations);
-}
-
-TEST(MlcpGaussSeidelSolverTests, solveSequence)
+TEST(MlcpGaussSeidelSolverTests, SolveSequence)
 {
 	for (int i = 0;  i <= 9;  ++i)
 	{
-		solveAndCompareResult(getTestFileName("mlcpTest", i, ".txt"), false);
+		solveAndCompareResult(getTestFileName("mlcpTest", i, ".txt"));
 	}
 }
-
-TEST(MlcpGaussSeidelSolverTests, CompareResultsSequence)
-{
-	for (int i = 0;  i <= 9;  ++i)
-	{
-		solveAndCompareResult(getTestFileName("mlcpTest", i, ".txt"), true);
-	}
-}
-
 
 static void solveRepeatedly(const MlcpTestData& data,
 							/*XXX const */ MlcpGaussSeidelSolver* mlcpSolver,
