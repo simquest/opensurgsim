@@ -130,6 +130,7 @@ bool OsgManager::doStartUp()
 
 bool OsgManager::doUpdate(double dt)
 {
+
 	m_defaultCamera->update(dt);
 
 	if (Manager::doUpdate(dt))

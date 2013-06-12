@@ -38,6 +38,14 @@ class Logger;
 /// components. The runtime will present each new component to the manager, and
 /// it is up to the manger to decide whether to handle a component of a given
 /// type or not.
+/// Adding and removing components is threadsafe, when the [add|remove]Component
+/// call is made the component is added to an intermediary datastructure, each 
+/// ComponentManager implementation must call processComponents() to trigger the
+/// actual addition and removal. Each ComponentManager subclass needs to implement
+/// doAddComponent() and doRemoveComponent() to the actual addition and removal of 
+/// components.
+/// ComponentManager implements a custom executeInitialization() method that lets the
+/// runtime schedule initialization of components that exist at the start of the simulation
 class ComponentManager : public BasicThread
 {
 public:
@@ -45,13 +53,13 @@ public:
 	explicit ComponentManager(const std::string& name = "Unknown Component Manager");
 	virtual ~ComponentManager();
 
-	/// Adds a component.
+	/// Queues a component to be added later.
 	/// \param component The component to be added.
 	/// \return true if the component was scheduled for addition, this does not indicate that
 	/// 		the component will actually be added to this manager
 	bool addComponent(const std::shared_ptr<Component>& component);
 
-	/// Handle representations, override for each thread
+	/// Queues a component to be removed
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
 	/// 		the component will actually be removed from this manager 
@@ -85,18 +93,34 @@ protected:
 	template<class T>
 	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
 
+
+	/// Processes all the components that are scheduled for addition or removal, this needs to be called 
+	/// inside the doUpdate() function.
 	void processComponents();
 
-
-	void addComponents();
-
+	/// Helper, blocks access to the additions and removal queue and copies the components
+	/// from there to the intermediate inflight queues, after this call, the incoming 
+	/// queues will be empty.
 	void copyScheduledComponents();
 
+	/// Blocks protects addition and removal queues
 	boost::mutex m_componentMutex;
+
+	///@{
+	/// Datastructures, to contain components scheduled for addition and
+	/// removal
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
-
+	///@}
+	
+	/// Logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// Returns this manager's logger
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
+	{
+		return m_logger;
+	}
 
 private:
 	/// Adds a component.
@@ -138,8 +162,12 @@ private:
 
 	std::weak_ptr<Runtime> m_runtime;
 
+	///@{
+	/// Temporary containers for the components that are to be added and removed
+	/// receives all the elements from m_componentAdditions and Removals
 	std::vector<std::shared_ptr<Component>> m_inflightAdditions;
 	std::vector<std::shared_ptr<Component>> m_inflightRemovals;
+	///@}
 
 };
 

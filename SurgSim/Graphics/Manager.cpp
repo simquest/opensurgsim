@@ -35,7 +35,7 @@ Manager::~Manager()
 {
 }
 
-bool Manager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool Manager::doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	bool result = true;
 	std::shared_ptr<Representation> representation = std::dynamic_pointer_cast<Representation>(component);
@@ -56,7 +56,7 @@ bool Manager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> com
 	return result;
 }
 
-bool Manager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool Manager::doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	bool result = true;
 	std::shared_ptr<Representation> representation = std::dynamic_pointer_cast<Representation>(component);
@@ -184,6 +184,8 @@ bool Manager::doStartUp()
 
 bool Manager::doUpdate(double dt)
 {
+	processComponents();
+
 	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
 		(*it)->update(dt);

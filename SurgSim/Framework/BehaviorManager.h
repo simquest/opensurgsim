@@ -26,7 +26,6 @@ namespace SurgSim
 namespace Framework
 {
 
-class Logger;
 class Behavior;
 
 /// Manager to handle Behaviors. The manager will collect all the behaviors
@@ -50,7 +49,6 @@ private:
 
 	std::vector<std::shared_ptr<Behavior>> m_behaviors;
 
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 

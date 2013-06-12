@@ -78,7 +78,7 @@ private:
 	bool addInputComponent(const std::shared_ptr<InputComponent>& input);
 
 	/// Specific call for output components.
-	bool  addOutputComponent(const std::shared_ptr<OutputComponent>& output);
+	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
 
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
