@@ -352,13 +352,11 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 			{
 				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
-			if (violation < -m_contactTolerance || !SurgSim::Math::isValid(violation))
+			// Enforce orthogonality condition
+			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&  violation >  m_contactTolerance) )
 			{
 				signoriniVerified=false;
-			}
-			if (!SurgSim::Math::isValid(violation))
-			{
-				signoriniValid = false;
 			}
 		}
 		currentAtomicIndex++;
@@ -371,13 +369,11 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 			{
 				violation += A(currentAtomicIndex, j) * initialGuess_and_solution[j];
 			}
-			if (violation < -m_contactTolerance || !SurgSim::Math::isValid(violation))
+			// Enforce orthogonality condition
+			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
+				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&  violation >  m_contactTolerance) )
 			{
 				signoriniVerified=false;
-			}
-			if (!SurgSim::Math::isValid(violation))
-			{
-				signoriniValid = false;
 			}
 		}
 		currentAtomicIndex+=3;

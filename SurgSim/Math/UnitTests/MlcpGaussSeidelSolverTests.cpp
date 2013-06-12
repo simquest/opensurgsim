@@ -59,8 +59,8 @@ TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 }
 
 
-static void compareResult(const std::string& fileName,
-						  double gsSolverPrecision = 1e-8, double gsContactTolerance = 1e-8, int gsMaxIterations = 20)
+static void solveAndCompareResult(const std::string& fileName, bool compare = false,
+						  double gsSolverPrecision = 1e-9, double gsContactTolerance = 1e-9, int gsMaxIterations = 100)
 {
 	SCOPED_TRACE("while running test " + fileName);
 	printf("-- TEST %s --\n", fileName.c_str());
@@ -121,12 +121,23 @@ static void compareResult(const std::string& fileName,
 
 		Eigen::VectorXd c = A * solution.x + b;
 		EXPECT_GE(c.minCoeff(), -gsSolverPrecision) << "Ax+b contains negative coefficients:" << std::endl << c;
-		EXPECT_NEAR(0.0, c.dot(solution.x), 1e-9) << "Ax+b is not orthogonal to x!" << std::endl <<
+
+		// Orthogonality test should be taking into account the scaling factor
+		double maxAbsForce = abs(solution.x.maxCoeff());
+		if (abs(solution.x.minCoeff()) > maxAbsForce)
+		{
+			maxAbsForce = abs(solution.x.minCoeff());
+		}
+		const double epsilon = 1e-9 * maxAbsForce;
+		EXPECT_NEAR(0.0, c.dot(solution.x), epsilon) << "Ax+b is not orthogonal to x!" << std::endl <<
 			"x:" << std::endl << solution.x << std::endl << "Ax+b:" << std::endl << c;
 	}
 
-	EXPECT_TRUE(solution.x.isApprox(data->expectedLambda)) << "lambda:" << std::endl << solution.x << std::endl <<
-		"expected:" << std::endl << data->expectedLambda;
+	if (compare)
+	{
+		EXPECT_TRUE(solution.x.isApprox(data->expectedLambda)) << "lambda:" << std::endl << solution.x << std::endl <<
+			"expected:" << std::endl << data->expectedLambda;
+	}
 
 //	double convergenceCriteria=0.0;
 //	bool validSignorini=false;
@@ -137,19 +148,35 @@ static void compareResult(const std::string& fileName,
 	printf("############\n");
 }
 
+TEST(MlcpGaussSeidelSolverTests, SolveOriginal)
+{
+	const double gsSolverPrecision = 1e-4;
+	const double gsContactTolerance = 2e-4;
+	int gsMaxIterations = 30;
+	solveAndCompareResult("mlcpOriginalTest.txt", false, gsSolverPrecision, gsContactTolerance, gsMaxIterations);
+}
+
 TEST(MlcpGaussSeidelSolverTests, CompareResultOriginal)
 {
 	const double gsSolverPrecision = 1e-4;
-	const double gsContactTolerance = 2e-5;
+	const double gsContactTolerance = 2e-4;
 	int gsMaxIterations = 30;
-	compareResult("mlcpOriginalTest.txt", gsSolverPrecision, gsContactTolerance, gsMaxIterations);
+	solveAndCompareResult("mlcpOriginalTest.txt", true, gsSolverPrecision, gsContactTolerance, gsMaxIterations);
+}
+
+TEST(MlcpGaussSeidelSolverTests, solveSequence)
+{
+	for (int i = 0;  i <= 9;  ++i)
+	{
+		solveAndCompareResult(getTestFileName("mlcpTest", i, ".txt"), false);
+	}
 }
 
 TEST(MlcpGaussSeidelSolverTests, CompareResultsSequence)
 {
 	for (int i = 0;  i <= 9;  ++i)
 	{
-		compareResult(getTestFileName("mlcpTest", i, ".txt"));
+		solveAndCompareResult(getTestFileName("mlcpTest", i, ".txt"), true);
 	}
 }
 
