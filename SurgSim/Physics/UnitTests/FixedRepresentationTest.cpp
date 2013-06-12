@@ -79,11 +79,38 @@ TEST_F(FixedRepresentationTest, ResetStateTest)
 	fixedRepresentation->setIsActive(false);
 	fixedRepresentation->setIsGravityEnabled(false);
 	fixedRepresentation->setInitialPose(m_initialTransformation);
+	// Initial = Current = Previous = Final = m_initialTransformation
 	EXPECT_TRUE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getInitialPose()));
 	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_TRUE(fixedRepresentation->getFinalPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(m_initialTransformation));
+	EXPECT_TRUE(fixedRepresentation->getInitialPose().isApprox(m_initialTransformation));
+
 	fixedRepresentation->setCurrentPose(m_currentTransformation);
-	EXPECT_FALSE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getInitialPose()));
+	// setCurrent is supposed to backup current in previous and set current
+	// Therefore it should not affect initial nor final
+	// Initial = Final = Previous = m_initialTransformation
+	// Current = m_initialTransformation
+	EXPECT_TRUE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getInitialPose()));
 	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getFinalPose()));
+	EXPECT_FALSE(fixedRepresentation->getFinalPose().isApprox(m_currentTransformation));
+
+	fixedRepresentation->setCurrentPose(m_currentTransformation);
+	// setCurrent is supposed to backup current in previous and set current
+	// Therefore it should not affect initial nor final
+	// Initial = Final = m_initialTransformation
+	// Previous = Current = m_initialTransformation
+	EXPECT_TRUE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_FALSE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_FALSE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getFinalPose()));
+	EXPECT_FALSE(fixedRepresentation->getFinalPose().isApprox(m_currentTransformation));
+
+	fixedRepresentation->afterUpdate(1.0);
+	// afterUpdate simply backs up the current into the final
+	// Initial = m_initialTransformation
+	// Previous = Current = Final = m_initialTransformation
+	EXPECT_TRUE(fixedRepresentation->getFinalPose().isApprox(m_currentTransformation));
 
 	std::shared_ptr<Representation> representation = fixedRepresentation;
 	// reset the representation (NOT THE FIXED ACTOR, test polymorphism)
@@ -127,8 +154,10 @@ TEST_F(FixedRepresentationTest, SetGetAndDefaultValueTest)
 	// Set/Get current pose [default = no translation, no rotation]
 	EXPECT_TRUE(m_identityTransformation.isApprox(fixedRepresentation->getFinalPose()));
 	fixedRepresentation->setCurrentPose(m_currentTransformation);
+	fixedRepresentation->afterUpdate(1.0); // afterUpdate backs up current into final
 	ASSERT_TRUE(m_currentTransformation.isApprox(fixedRepresentation->getFinalPose()));
 	fixedRepresentation->setCurrentPose(m_identityTransformation);
+	fixedRepresentation->afterUpdate(1.0); // afterUpdate backs up current into final
 	ASSERT_TRUE(m_identityTransformation.isApprox(fixedRepresentation->getFinalPose()));
 
 	// Set/Get initial pose [default = no translation, no rotation]
@@ -146,15 +175,19 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 
 	double dt = 1.0;
 
+	// Sets Initial state and reset all other state with initial state
 	fixedRepresentation->setInitialPose(m_initialTransformation);
+	// Backs up current state into previous state and set the current
 	fixedRepresentation->setCurrentPose(m_currentTransformation);
 
-	// This should simply backup the current transformation into the previous
+	// Does not do anything
+	fixedRepresentation->beforeUpdate(dt);
+	// Does not do anything
 	fixedRepresentation->update(dt);
+	// Backs up current state into final state
+	fixedRepresentation->afterUpdate(dt);
 
-	EXPECT_TRUE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getPreviousPose()));
-	EXPECT_FALSE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getInitialPose()));
-	EXPECT_FALSE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
-	fixedRepresentation->setCurrentPose(m_identityTransformation);
 	EXPECT_FALSE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getPreviousPose()));
+	EXPECT_FALSE(fixedRepresentation->getFinalPose().isApprox(fixedRepresentation->getInitialPose()));
+	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
 }
