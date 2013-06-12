@@ -14,7 +14,10 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the CommonDevice class.
+/// Tests for the InputManaget class. Note that InputManagerTest, the test fixture
+/// is declared as a friend class in InputManager to make it easier to test the
+/// add and removal of components, for this to work correctly PhysicsManagerTest is required
+/// to be in the SurgSim::Physics namespace.
 
 #include <memory>
 #include <string>

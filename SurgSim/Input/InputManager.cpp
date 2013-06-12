@@ -46,6 +46,9 @@ bool InputManager::doStartUp()
 
 bool InputManager::doUpdate(double dt)
 {
+	// Add all components that came in before the last update
+	processComponents();
+
 	return true;
 }
 

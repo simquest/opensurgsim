@@ -49,13 +49,16 @@ public:
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
-	///@{
-	/// Overridden from ComponentManager
-	bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component);
-	bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
-	///@}
+	friend class PhysicsManagerTest;
+
 
 protected:
+
+	///@{
+	/// Overridden from ComponentManager
+	bool doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	bool doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	///@}
 
 	///@{
 	/// Overriden from ComponentManager

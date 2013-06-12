@@ -53,20 +53,21 @@ bool PhysicsManager::doStartUp()
 }
 
 
-bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool PhysicsManager::doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	tryAddComponent(component,&m_actors);
-	// no failure condition, return true
-	return true;
+	return 	tryAddComponent(component,&m_actors) != nullptr;
 }
 
-bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool PhysicsManager::doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_actors);
 }
 
 bool PhysicsManager::doUpdate(double dt)
 {
+	// Add all components that came in before the last update
+	processComponents();
+
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 	stateList.push_back(state);
