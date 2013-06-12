@@ -65,8 +65,13 @@ TEST(FreeMotionTest, RunTest)
 	state = computation.update(1.0,state);
 	EXPECT_TRUE(representation->getFinalPose().translation().isZero());
 
+	// Computation.update calls update on all representations, but DOES NOT CALL beforeUpdate/afterUpdate
+	// Therefore the finalState is never set...only previous/current are handled in update
+
 	representation->setIsGravityEnabled(true);
 	EXPECT_TRUE(representation->getFinalPose().translation().isZero());
-	state = computation.update(1.0,state);
-	EXPECT_FALSE(representation->getFinalPose().translation().isZero());
+	state = computation.update(1.0,state); // previous==(0 0 0) current !=(0 0 0)
+	EXPECT_TRUE(representation->getPreviousPose().translation().isZero());
+	state = computation.update(1.0,state); // previous!=(0 0 0) current !=(0 0 0)
+	EXPECT_FALSE(representation->getPreviousPose().translation().isZero());
 }
