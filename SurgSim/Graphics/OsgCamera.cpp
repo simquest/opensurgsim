@@ -20,15 +20,15 @@
 #include <SurgSim/Graphics/OsgQuaternionConversions.h>
 #include <SurgSim/Graphics/OsgVectorConversions.h>
 
-using SurgSim::Graphics::OsgActor;
+using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
 using SurgSim::Graphics::fromOsg;
 using SurgSim::Graphics::toOsg;
 using SurgSim::Math::makeRigidTransform;
 
-OsgCamera::OsgCamera(const std::string& name) : SurgSim::Graphics::Actor(name), SurgSim::Graphics::Camera(name),
-	OsgActor(name, new osg::Switch()),
+OsgCamera::OsgCamera(const std::string& name) : SurgSim::Graphics::Representation(name), SurgSim::Graphics::Camera(name),
+	OsgRepresentation(name, new osg::Switch()),
 	m_camera(new osg::Camera())
 {
 	m_switch = static_cast<osg::Switch*>(getOsgNode().get());

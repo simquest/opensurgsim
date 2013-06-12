@@ -28,7 +28,7 @@ namespace Graphics
 ///
 /// A Graphics::OsgViewElement creates and wraps a Graphics::OsgView so that it can be added to the Scene.
 ///
-/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Actor objects to be shown.
+/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Representation objects to be shown.
 class OsgViewElement : public Graphics::ViewElement
 {
 public:
@@ -39,7 +39,7 @@ public:
 	/// Destructor
 	virtual ~OsgViewElement();
 
-	/// Sets the view component that provides the visualization of the graphics actors
+	/// Sets the view component that provides the visualization of the graphics representations
 	/// Only allows OsgView components, any other will not be set and it will return false.
 	/// \return	True if it succeeds, false if it fails
 	virtual bool setView(std::shared_ptr<View> view);

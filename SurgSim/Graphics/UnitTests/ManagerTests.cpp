@@ -27,11 +27,10 @@
 #include <random>
 
 using SurgSim::Framework::ComponentManager;
-using SurgSim::Framework::Representation;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::Actor;
+using SurgSim::Graphics::Representation;
 using SurgSim::Graphics::Camera;
 using SurgSim::Graphics::ViewElement;
 
@@ -79,24 +78,24 @@ TEST(ManagerTests, AddRemoveTest)
 	/// Perform add and remove from a pointer to a ComponentManager to check that the intended polymorphism is working.
 	std::shared_ptr<ComponentManager> componentManager = graphicsManager;
 
-	std::shared_ptr<Actor> actor1 = std::make_shared<MockActor>("test actor 1");
-	std::shared_ptr<Actor> actor2 = std::make_shared<MockActor>("test actor 2");
+	std::shared_ptr<Representation> representation1 = std::make_shared<MockRepresentation>("test representation 1");
+	std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("test representation 2");
 	std::shared_ptr<MockGroup> group1 = std::make_shared<MockGroup>("test group 1");
 	std::shared_ptr<MockGroup> group2 = std::make_shared<MockGroup>("test group 2");
 	std::shared_ptr<MockView> view1 = std::make_shared<MockView>("test view 1");
 	std::shared_ptr<MockView> view2 = std::make_shared<MockView>("test view 2");
-	std::shared_ptr<Representation> nonGraphicsComponent = std::make_shared<NonGraphicsRepresentation>(
-		"non-graphics component");
+	std::shared_ptr<SurgSim::Framework::Representation> nonGraphicsComponent = 
+		std::make_shared<NonGraphicsRepresentation>("non-graphics component");
 
-	EXPECT_EQ(0u, graphicsManager->getActors().size());
+	EXPECT_EQ(0u, graphicsManager->getRepresentations().size());
 	EXPECT_EQ(0u, graphicsManager->getGroups().size());
 	EXPECT_EQ(0u, graphicsManager->getViews().size());
 
-	/// Add an actor
-	EXPECT_TRUE(graphicsManager->addComponent(actor1));
-	EXPECT_EQ(1u, graphicsManager->getActors().size());
-	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor1));
+	/// Add an representation
+	EXPECT_TRUE(graphicsManager->addComponent(representation1));
+	EXPECT_EQ(1u, graphicsManager->getRepresentations().size());
+	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Add a group
 	EXPECT_TRUE(graphicsManager->addComponent(group1));
@@ -123,16 +122,16 @@ TEST(ManagerTests, AddRemoveTest)
 	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
-	/// Add another actor
-	EXPECT_TRUE(graphicsManager->addComponent(actor2));
-	EXPECT_EQ(2u, graphicsManager->getActors().size());
-	EXPECT_NE(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor2));
+	/// Add another representation
+	EXPECT_TRUE(graphicsManager->addComponent(representation2));
+	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
+	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation2));
 
 
-	/// Try to add a duplicate actor
-	EXPECT_FALSE(componentManager->addComponent(actor1));
-	EXPECT_EQ(2u, graphicsManager->getActors().size());
+	/// Try to add a duplicate representation
+	EXPECT_FALSE(componentManager->addComponent(representation1));
+	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 
 	/// Try to add a duplicate group
 	EXPECT_FALSE(componentManager->addComponent(group2));
@@ -157,20 +156,20 @@ TEST(ManagerTests, AddRemoveTest)
 	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
-	/// Remove an actor
-	EXPECT_TRUE(componentManager->removeComponent(actor1));
-	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor1));
+	/// Remove an representation
+	EXPECT_TRUE(componentManager->removeComponent(representation1));
+	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a group that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(group2));
 	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
-	/// Try to remove an actor that is not in the manager
-	EXPECT_FALSE(componentManager->removeComponent(actor1));
-	EXPECT_EQ(graphicsManager->getActors().end(), std::find(graphicsManager->getActors().begin(),
-		graphicsManager->getActors().end(), actor1));
+	/// Try to remove an representation that is not in the manager
+	EXPECT_FALSE(componentManager->removeComponent(representation1));
+	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
+		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a view that is not in the manager
 	EXPECT_FALSE(componentManager->removeComponent(view2));

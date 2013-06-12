@@ -45,24 +45,24 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
-	/// Adds an actor
-	/// \param	actor	Actor to add to this group
-	/// \return	True if the actor is added successfully, false if failure
-	/// Only subclasses of OsgActor will be added successfully.
-	virtual bool add(std::shared_ptr<Actor> actor);
+	/// Adds an representation
+	/// \param	representation	Representation to add to this group
+	/// \return	True if the representation is added successfully, false if failure
+	/// Only subclasses of OsgRepresentation will be added successfully.
+	virtual bool add(std::shared_ptr<Representation> representation);
 
-	/// Adds all actors in another group to this group
-	/// \param	group	Group of actors to add
-	/// \return	True if all actors are added successfully, false if failure
+	/// Adds all representations in another group to this group
+	/// \param	group	Group of representations to add
+	/// \return	True if all representations are added successfully, false if failure
 	/// Only subclasses of OsgGroup will be appended successfully.
 	virtual bool append(std::shared_ptr<Group> group);
 
-	/// Removes an actor
-	/// \param	actor	Actor to remove from this group
-	/// \return	True if the actor is removed successfully, false if actor is not in this group or other failure
-	virtual bool remove(std::shared_ptr<Actor> actor);
+	/// Removes an representation
+	/// \param	representation	Representation to remove from this group
+	/// \return	True if the representation is removed successfully, false if representation is not in this group or other failure
+	virtual bool remove(std::shared_ptr<Representation> representation);
 
-	/// Removes all actors
+	/// Removes all representations
 	virtual void clear();
 
 	/// Returns the root OSG group node
@@ -73,7 +73,7 @@ public:
 
 private:
 	/// Whether the group is currently visible or not
-	/// Newly added actors or groups will have this visibility.
+	/// Newly added representations or groups will have this visibility.
 	bool m_isVisible;
 
 	/// OSG group node

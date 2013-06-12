@@ -16,9 +16,9 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 
 #include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Graphics/OsgActor.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 
-using SurgSim::Graphics::OsgActor;
+using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgGroup;
 
 OsgGroup::OsgGroup(const std::string& name) : SurgSim::Graphics::Group(name),
@@ -47,14 +47,14 @@ bool OsgGroup::isVisible() const
 	return m_isVisible;
 }
 
-bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Actor> actor)
+bool OsgGroup::add(std::shared_ptr<SurgSim::Graphics::Representation> representation)
 {
-	std::shared_ptr<OsgActor> osgActor = std::dynamic_pointer_cast<OsgActor>(actor);
+	std::shared_ptr<OsgRepresentation> osgRepresentation = std::dynamic_pointer_cast<OsgRepresentation>(representation);
 
-	if (osgActor && Group::add(osgActor))
+	if (osgRepresentation && Group::add(osgRepresentation))
 	{
-		m_switch->addChild(osgActor->getOsgNode());
-		m_switch->setChildValue(osgActor->getOsgNode(), m_isVisible);
+		m_switch->addChild(osgRepresentation->getOsgNode());
+		m_switch->setChildValue(osgRepresentation->getOsgNode(), m_isVisible);
 		return true;
 	}
 	else
@@ -77,13 +77,13 @@ bool OsgGroup::append(std::shared_ptr<SurgSim::Graphics::Group> group)
 	}
 }
 
-bool OsgGroup::remove(std::shared_ptr<SurgSim::Graphics::Actor> actor)
+bool OsgGroup::remove(std::shared_ptr<SurgSim::Graphics::Representation> representation)
 {
-	std::shared_ptr<OsgActor> osgActor = std::dynamic_pointer_cast<OsgActor>(actor);
+	std::shared_ptr<OsgRepresentation> osgRepresentation = std::dynamic_pointer_cast<OsgRepresentation>(representation);
 
-	if (osgActor && Group::remove(osgActor))
+	if (osgRepresentation && Group::remove(osgRepresentation))
 	{
-		m_switch->removeChild(osgActor->getOsgNode());
+		m_switch->removeChild(osgRepresentation->getOsgNode());
 		return true;
 	}
 	else
@@ -96,8 +96,8 @@ void OsgGroup::clear()
 {
 	while (!getMembers().empty())
 	{
-		std::shared_ptr<Actor> actor = getMembers().front();
-		SURGSIM_ASSERT(remove(actor)) << "Removal of actor " << actor->getName() <<
+		std::shared_ptr<Representation> representation = getMembers().front();
+		SURGSIM_ASSERT(remove(representation)) << "Removal of representation " << representation->getName() <<
 			" failed while attempting to clear group " << getName() << "!";
 	}
 }

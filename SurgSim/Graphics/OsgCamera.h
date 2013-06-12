@@ -17,7 +17,7 @@
 #define SURGSIM_GRAPHICS_OSGCAMERA_H
 
 #include <SurgSim/Graphics/Camera.h>
-#include <SurgSim/Graphics/OsgActor.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <osg/Camera>
 #include <osg/Switch>
@@ -32,7 +32,7 @@ namespace Graphics
 ///
 /// A Graphics::OsgCamera wraps a osg::Camera to provide camera functionality and a osg::Switch to allow enabling and
 /// disabling of the camera.
-class OsgCamera : public Camera, public OsgActor
+class OsgCamera : public Camera, public OsgRepresentation
 {
 public:
 	/// Constructor
@@ -42,9 +42,9 @@ public:
 	/// Z Near of 0.01, and Z Far of 10.0.
 	explicit OsgCamera(const std::string& name);
 
-	/// Sets the group of actors that will be seen by this camera.
-	/// Only the actors in this group will be rendered when this camera's view is rendered.
-	/// \param	group	Group of actors
+	/// Sets the group of representations that will be seen by this camera.
+	/// Only the representations in this group will be rendered when this camera's view is rendered.
+	/// \param	group	Group of representations
 	/// \return	True if it succeeded, false if it failed
 	virtual bool setGroup(std::shared_ptr<Group> group);
 
