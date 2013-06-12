@@ -41,7 +41,7 @@ typedef enum {
 	RIGID_SHAPE_TYPE_COUNT
 } RigidShapeType;
 
-/// Generic rigid shape class defining a shape for a rigid actor
+/// Generic rigid shape class defining a shape for a rigid representation
 /// \note This class gives the ability to analyse the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
 class RigidShape
@@ -77,8 +77,8 @@ public:
 	virtual Matrix33d calculateInertia(double rho) const = 0;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDSHAPE_H
+#endif // SURGSIM_PHYSICS_RIGIDSHAPE_H

@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-using SurgSim::Graphics::Actor;
+using SurgSim::Graphics::Representation;
 using SurgSim::Graphics::Group;
 
 TEST(GroupTests, InitTest)
@@ -43,37 +43,37 @@ TEST(GroupTests, AddRemoveTest)
 {
 	std::shared_ptr<Group> group = std::make_shared<MockGroup>("test name");
 
-	std::shared_ptr<Actor> actor1 = std::make_shared<MockActor>("test actor 1");
-	std::shared_ptr<Actor> actor2 = std::make_shared<MockActor>("test actor 2");
+	std::shared_ptr<Representation> representation1 = std::make_shared<MockRepresentation>("test representation 1");
+	std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("test representation 2");
 	std::shared_ptr<MockGroup> group1 = std::make_shared<MockGroup>("test group 1");
 	std::shared_ptr<MockGroup> group2 = std::make_shared<MockGroup>("test group 2");
 
 	EXPECT_EQ(0u, group->getMembers().size());
 
-	/// Add an actor
-	EXPECT_TRUE(group->add(actor1));
+	/// Add an representation
+	EXPECT_TRUE(group->add(representation1));
 	EXPECT_EQ(1u, group->getMembers().size());
-	EXPECT_NE(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), actor1));
+	EXPECT_NE(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
 
-	/// Add another actor
-	EXPECT_TRUE(group->add(actor2));
+	/// Add another representation
+	EXPECT_TRUE(group->add(representation2));
 	EXPECT_EQ(2u, group->getMembers().size());
-	EXPECT_NE(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), actor2));
+	EXPECT_NE(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation2));
 
 
-	/// Try to add a duplicate actor
-	EXPECT_FALSE(group->add(actor1));
+	/// Try to add a duplicate representation
+	EXPECT_FALSE(group->add(representation1));
 	EXPECT_EQ(2u, group->getMembers().size());
 
 
-	/// Remove an actor
-	EXPECT_TRUE(group->remove(actor1));
-	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), actor1));
+	/// Remove an representation
+	EXPECT_TRUE(group->remove(representation1));
+	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
 
 
-	/// Try to remove an actor that is not in the group
-	EXPECT_FALSE(group->remove(actor1));
-	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), actor1));
+	/// Try to remove an representation that is not in the group
+	EXPECT_FALSE(group->remove(representation1));
+	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
 }
 
 TEST(GroupTests, AppendTest)
@@ -81,57 +81,57 @@ TEST(GroupTests, AppendTest)
 	std::shared_ptr<Group> group1 = std::make_shared<MockGroup>("test group 1");
 	EXPECT_EQ(0u, group1->getMembers().size());
 
-	std::shared_ptr<Actor> actor1 = std::make_shared<MockActor>("test actor 1");
-	std::shared_ptr<Actor> actor2 = std::make_shared<MockActor>("test actor 2");
+	std::shared_ptr<Representation> representation1 = std::make_shared<MockRepresentation>("test representation 1");
+	std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("test representation 2");
 
-	/// Add 2 actors to group 1
-	EXPECT_TRUE(group1->add(actor1));
-	EXPECT_TRUE(group1->add(actor2));
+	/// Add 2 representations to group 1
+	EXPECT_TRUE(group1->add(representation1));
+	EXPECT_TRUE(group1->add(representation2));
 	EXPECT_EQ(2u, group1->getMembers().size());
 
-	std::shared_ptr<Actor> actor3 = std::make_shared<MockActor>("test actor 3");
+	std::shared_ptr<Representation> representation3 = std::make_shared<MockRepresentation>("test representation 3");
 
 	std::shared_ptr<Group> group2 = std::make_shared<MockGroup>("test group 2");
 	EXPECT_EQ(0u, group2->getMembers().size());
 
-	/// Add an actor to group 2 and append group 1 to group 2.
-	EXPECT_TRUE(group2->add(actor3));
+	/// Add an representation to group 2 and append group 1 to group 2.
+	EXPECT_TRUE(group2->add(representation3));
 	EXPECT_TRUE(group2->append(group1));
 	EXPECT_EQ(3u, group2->getMembers().size());
 
-	/// Check that the actors from group 1 were added to group 2, and that it still has the actor that was added
+	/// Check that the representations from group 1 were added to group 2, and that it still has the representation that was added
 	/// directly to it.
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), actor1));
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), actor2));
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), actor3));
+	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
+	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
+	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
 
-	/// Try to append a group that has already been appended - this will try to add duplicate actors.
-	EXPECT_FALSE(group2->append(group1)) << "Append should return false if any actor is a duplicate!";
+	/// Try to append a group that has already been appended - this will try to add duplicate representations.
+	EXPECT_FALSE(group2->append(group1)) << "Append should return false if any representation is a duplicate!";
 	EXPECT_EQ(3u, group2->getMembers().size());
 
 	/// Check that group 1 was not modified by appending it to group 2.
 	EXPECT_EQ(2u, group1->getMembers().size());
-	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), actor1));
-	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), actor2));
+	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
+	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
 }
 
 TEST(GroupTests, ClearTest)
 {
 	std::shared_ptr<Group> group = std::make_shared<MockGroup>("test name");
 
-	std::shared_ptr<Actor> actor1 = std::make_shared<MockActor>("test actor 1");
-	std::shared_ptr<Actor> actor2 = std::make_shared<MockActor>("test actor 2");
-	std::shared_ptr<Actor> actor3 = std::make_shared<MockActor>("test actor 3");
+	std::shared_ptr<Representation> representation1 = std::make_shared<MockRepresentation>("test representation 1");
+	std::shared_ptr<Representation> representation2 = std::make_shared<MockRepresentation>("test representation 2");
+	std::shared_ptr<Representation> representation3 = std::make_shared<MockRepresentation>("test representation 3");
 
 	EXPECT_EQ(0u, group->getMembers().size());
 
-	/// Add 3 actors
-	EXPECT_TRUE(group->add(actor1));
-	EXPECT_TRUE(group->add(actor2));
-	EXPECT_TRUE(group->add(actor3));
+	/// Add 3 representations
+	EXPECT_TRUE(group->add(representation1));
+	EXPECT_TRUE(group->add(representation2));
+	EXPECT_TRUE(group->add(representation3));
 	EXPECT_EQ(3u, group->getMembers().size());
 
-	/// Remove all actors and make sure that they are removed correctly
+	/// Remove all representations and make sure that they are removed correctly
 	group->clear();
 	EXPECT_EQ(0u, group->getMembers().size());
 }

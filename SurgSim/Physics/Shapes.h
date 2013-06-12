@@ -24,6 +24,4 @@
 #include <SurgSim/Physics/PlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
 
-
-
-#endif /// SURGSIM_PHYSICS_SHAPES_H
+#endif // SURGSIM_PHYSICS_SHAPES_H

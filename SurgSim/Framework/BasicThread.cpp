@@ -98,6 +98,12 @@ void BasicThread::operator()()
 		m_isRunning = doUpdate(m_period.count());
 		frameTime = boost::chrono::steady_clock::now() - start;
 	}
+	
+	if (m_stopExecution)
+	{
+		doBeforeStop();
+	}
+	
 	m_isRunning = false;
 	m_stopExecution = false;
 }
@@ -151,6 +157,10 @@ bool BasicThread::waitForBarrier(bool success)
 		success = m_startupBarrier->wait(success);
 	}	
 	return success;
+}
+
+void SurgSim::Framework::BasicThread::doBeforeStop()
+{
 }
 
 }; // namespace Framework

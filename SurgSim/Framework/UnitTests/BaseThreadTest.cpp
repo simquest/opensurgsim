@@ -42,5 +42,17 @@ TEST(BasicThreadTest, Running)
 
 	m.getThread().join();
 
-	EXPECT_EQ(0,m.count);
+	EXPECT_EQ(0, m.count);
+}
+
+TEST(ThreadTest, Stop)
+{
+	MockThread m;
+	m.start(nullptr);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+	m.stop();
+
+	EXPECT_TRUE(m.didBeforeStop);
 }
