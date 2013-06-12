@@ -18,8 +18,12 @@
 
 #include <memory>
 #include <string>
+#include <queue>
 
-#include "SurgSim/Framework/BasicThread.h"
+#include <boost/thread/mutex.hpp>
+
+#include <SurgSim/Framework/BasicThread.h>
+#include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
 {
@@ -28,49 +32,146 @@ namespace Framework
 
 class Component;
 class Runtime;
+class Logger;
 
 /// Base Component Manager class. Component Managers manage a collection of
 /// components. The runtime will present each new component to the manager, and
 /// it is up to the manger to decide whether to handle a component of a given
 /// type or not.
+/// Adding and removing components is threadsafe, when the [add|remove]Component
+/// call is made the component is added to an intermediary datastructure, each 
+/// ComponentManager implementation must call processComponents() to trigger the
+/// actual addition and removal. Each ComponentManager subclass needs to implement
+/// doAddComponent() and doRemoveComponent() to the actual addition and removal of 
+/// components.
+/// ComponentManager implements a custom executeInitialization() method that lets the
+/// runtime schedule initialization of components that exist at the start of the simulation
 class ComponentManager : public BasicThread
 {
 public:
-	explicit ComponentManager(const std::string& name = "Unknown Component Manager") :
-		BasicThread(name)
-	{
-	}
 
-	virtual ~ComponentManager()
-	{
-	}
+	explicit ComponentManager(const std::string& name = "Unknown Component Manager");
+	virtual ~ComponentManager();
 
-	/// Handle representations, override for each thread
-	/// \param component	The component to be removed.
-	/// \return true on success
-	virtual bool removeComponent(std::shared_ptr<Component> component) = 0;
-
-	/// Adds a component.
+	/// Queues a component to be added later.
 	/// \param component The component to be added.
-	/// \return true if it succeeds or the thread is not concerned with the component, false if it fails.
-	virtual bool addComponent(std::shared_ptr<Component> component) = 0;
+	/// \return true if the component was scheduled for addition, this does not indicate that
+	/// 		the component will actually be added to this manager
+	bool addComponent(const std::shared_ptr<Component>& component);
+
+	/// Queues a component to be removed
+	/// \param component	The component to be removed.
+	/// \return true if the component was scheduled for removal, this does not indicate that
+	/// 		the component will actually be removed from this manager 
+	bool removeComponent(const std::shared_ptr<Component>& component);
 
 	/// @{
 	/// Runtime accessors
-	std::shared_ptr<Runtime> getRuntime() const
+	inline std::shared_ptr<Runtime> getRuntime() const
 	{
 		return m_runtime.lock();
 	}
 
-	void setRuntime(std::shared_ptr<Runtime> val)
-	{
-		m_runtime = val;
-	}
+	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
+	
+
+protected:
+	/// Template version of the addComponent method.
+	/// \tparam	T	Specific type of the component that is being added.
+	/// \param	component		 	The component that needs to be added.
+	/// \param [in,out]	container	If non-null, the container, that should receive the component if of the correct type.
+	/// \return	the correctly cast component pointer if successful and the component did not alread exist in the container
+	template<class T>
+	std::shared_ptr<T> tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+
+	/// Template version of the removeComponent method.
+	/// \tparam	T	Specific type of the component that is being removed.
+	/// \param	component		 	The component that needs to be removed.
+	/// \param [in,out]	container	If non-null, the container, from which the component should be removed.
+	/// \return	true if the component exists in the container or the component did not cast to T, otherwise.
+	template<class T>
+	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+
+
+	/// Processes all the components that are scheduled for addition or removal, this needs to be called 
+	/// inside the doUpdate() function.
+	void processComponents();
+
+	/// Helper, blocks access to the additions and removal queue and copies the components
+	/// from there to the intermediate inflight queues, after this call, the incoming 
+	/// queues will be empty.
+	void copyScheduledComponents();
+
+	/// Blocks protects addition and removal queues
+	boost::mutex m_componentMutex;
+
+	///@{
+	/// Datastructures, to contain components scheduled for addition and
+	/// removal
+	std::vector<std::shared_ptr<Component>> m_componentAdditions;
+	std::vector<std::shared_ptr<Component>> m_componentRemovals;
+	///@}
+	
+	/// Logger for this class
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	/// Returns this manager's logger
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
+	{
+		return m_logger;
+	}
 
 private:
+	/// Adds a component.
+	/// \param component The component to be added.
+	/// \return true if the component was scheduled for addition, this does not indicate that
+	/// 		the component will actually be added to this manager
+	virtual bool doAddComponent(const std::shared_ptr<Component>& component) = 0;
+
+	/// Handle representations, override for each thread
+	/// \param component	The component to be removed.
+	/// \return true if the component was scheduled for removal, this does not indicate that
+	/// 		the component will actually be removed from this manager 
+	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component) = 0;
+
+	/// Overridden from BasicThread, extends the initialization to contain component initialization
+	/// including waiting for the other threads to conclude their component initialization and wakeup
+	virtual bool executeInitialization() override;
+
+	// Delegates to doRemoveComponent to remove all the components in the indicated array.
+	/// \param	beginIt	The begin iterator.
+	/// \param	endIt  	The end iterator.	
+	void removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
+
+	// Delegates to doAddComponent and calls initialize on all the components
+	/// \param	beginIt	The begin iterator.
+	/// \param	endIt  	The end iterator.	
+	void initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+							  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
+
+	/// Wake all the components up, only the components that were successfully initialized get
+	/// the wakeup call, check for isAwake because there to catch multiple versions of the same
+	/// component from being awoken more than once. Will also remove components if they did not
+	/// wake up as expected
+	/// \param	beginIt	The begin iterator.
+	/// \param	endIt  	The end iterator.	
+	void wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
+
 	std::weak_ptr<Runtime> m_runtime;
+
+	///@{
+	/// Temporary containers for the components that are to be added and removed
+	/// receives all the elements from m_componentAdditions and Removals
+	std::vector<std::shared_ptr<Component>> m_inflightAdditions;
+	std::vector<std::shared_ptr<Component>> m_inflightRemovals;
+	///@}
+
 };
+
+#include <SurgSim/Framework/ComponentManager-inl.h>
 
 }; // namespace Framework
 }; // namespace SurgSim

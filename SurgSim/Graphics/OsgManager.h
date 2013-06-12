@@ -57,19 +57,33 @@ public:
 	/// Destructor
 	virtual ~OsgManager();
 
-	/// Sets the default camera
-	/// The default Camera will be assigned to any added View which does not already have a camera.
-	virtual bool setDefaultCamera(std::shared_ptr<OsgCamera> camera);
 	/// Returns the default camera
 	/// The default Camera will be assigned to any added View which does not already have a camera.
 	std::shared_ptr<OsgCamera> getDefaultCamera() const;
 
+
+protected:
+	/// Performs an update for a single timestep
+	/// \param	dt	The time in seconds of the preceding timestep.
+	virtual bool doUpdate(double dt);
+
+	/// Initializes the manager
+	/// \return True if it succeeds, false if it fails
+	/// \post	The default camera component is in the list of managed representations.
+	/// \post	The default group component is in the list of managed groups.
+	virtual bool doInitialize();
+
+	/// Starts up the manager after all threads have initialized
+	/// \return True if it succeeds, false if it fails
+	virtual bool doStartUp();
+
+	/// Sets the default camera
+	/// The default Camera will be assigned to any added View which does not already have a camera.
+	virtual bool setDefaultCamera(std::shared_ptr<OsgCamera> camera);
+
 	/// Sets the default group
 	/// Any Representation or Group added will be added to the default Group.
 	virtual bool setDefaultGroup(std::shared_ptr<OsgGroup> group);
-	/// Returns the default group
-	/// Any Representation or Group added will be added to the default Group.
-	std::shared_ptr<OsgGroup> getDefaultGroup() const;
 
 	/// Adds an representation to the manager
 	/// \param	representation	The representation to be added.
@@ -98,28 +112,19 @@ public:
 	/// \post	The view is removed from the manager and the osgViewer::CompositeViewer.
 	virtual bool removeView(std::shared_ptr<View> view);
 
+private:
+
+	/// Returns the default group
+	/// Any Representation or Group added will be added to the default Group.
+	std::shared_ptr<OsgGroup> getDefaultGroup() const;
+
+
 	/// Returns the OSG CompositeViewer used to manage and render the views
 	osg::ref_ptr<osgViewer::CompositeViewer> getOsgCompositeViewer() const
 	{
 		return m_viewer;
 	}
 
-protected:
-	/// Performs an update for a single timestep
-	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual bool doUpdate(double dt);
-
-	/// Initializes the manager
-	/// \return True if it succeeds, false if it fails
-	/// \post	The default camera component is in the list of managed representations.
-	/// \post	The default group component is in the list of managed groups.
-	virtual bool doInitialize();
-
-	/// Starts up the manager after all threads have initialized
-	/// \return True if it succeeds, false if it fails
-	virtual bool doStartUp();
-
-private:
 	/// Prepares the manager for its execution to be stopped
 	/// \note	Called from this thread before joined
 	void doBeforeStop();

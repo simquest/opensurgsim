@@ -13,6 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file
+/// Tests for the PhysicsManager class. Note that PhysicsManagerTest, the test fixture
+/// is declared as a friend class in PhysicsManager to make it easier to test the
+/// add and removal of components, for this to work correctly PhysicsManagerTest is required
+/// to be in the SurgSim::Physics namespace.
+
 #include <gtest/gtest.h>
 
 #include <string>
@@ -25,12 +31,19 @@
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Component;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
-struct PhysicsManagerTest : public ::testing::Test
+namespace SurgSim 
 {
+namespace Physics
+{
+
+class PhysicsManagerTest : public ::testing::Test
+{
+public:
 	virtual void SetUp()
 	{
 		runtime = std::make_shared<Runtime>();
@@ -45,6 +58,16 @@ struct PhysicsManagerTest : public ::testing::Test
 		runtime->stop();
 	}
 
+
+	bool testDoAddComponent(const std::shared_ptr<Component>& component)
+	{
+		return physicsManager->doAddComponent(component);
+	}
+
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	{
+		return physicsManager->doRemoveComponent(component);
+	}
 
 	std::shared_ptr<Runtime> runtime;
 	std::shared_ptr<PhysicsManager> physicsManager;
@@ -62,14 +85,18 @@ TEST_F(PhysicsManagerTest, InitTest)
 
 TEST_F(PhysicsManagerTest, AddRemoveComponent)
 {
-	std::shared_ptr<FixedRepresentation> representation1= std::make_shared<FixedRepresentation>("Representation1");
-	std::shared_ptr<FixedRepresentation> representation2 = std::make_shared<FixedRepresentation>("Representation2");
+	std::shared_ptr<FixedRepresentation> representation1 = std::make_shared<FixedRepresentation>("Rep1");
+	std::shared_ptr<FixedRepresentation> representation2 = std::make_shared<FixedRepresentation>("Rep2");
 
-	EXPECT_TRUE(physicsManager->addComponent(representation1));
-	EXPECT_TRUE(physicsManager->addComponent(representation2));
-	EXPECT_FALSE(physicsManager->addComponent(representation1));
+	EXPECT_TRUE(testDoAddComponent(representation1));
+	EXPECT_TRUE(testDoAddComponent(representation2));
+	EXPECT_FALSE(testDoAddComponent(representation1));
 
-	EXPECT_TRUE(physicsManager->removeComponent(representation1));
-	EXPECT_FALSE(physicsManager->removeComponent(representation1));
-	EXPECT_TRUE(physicsManager->removeComponent(representation2));
+	EXPECT_TRUE(testDoRemoveComponent(representation1));
+	EXPECT_FALSE(testDoRemoveComponent(representation1));
+	EXPECT_TRUE(testDoRemoveComponent(representation2));
 }
+
+}; // namespace Physics
+}; // namespace SurgSim
+

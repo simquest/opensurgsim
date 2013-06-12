@@ -41,20 +41,7 @@ public:
 	InputManager();
 	virtual ~InputManager();
 
-	/// Adds a component, this can be either input or output, it will call the appropriate
-	/// function in the device. For an InputComonent this will succeed if the device name
-	/// inside the component is known to the InputManager and if the component has not
-	/// been added as an input yet. For an OutputComponent the call will fail if the device
-	/// does not exist or the device has already been assigned an output.
-	/// \param	component	The component.
-	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
-	/// 		has already been added to the manager, and return false.
-	virtual bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component);
-
-	/// Removes the component described by component.
-	/// \param	component	The component.
-	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
-	virtual bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
+	friend class InputManagerTest;
 
 	/// Adds a device to the manager.
 	/// \param	device	The device.
@@ -71,11 +58,27 @@ private:
 	virtual bool doStartUp();
 	virtual bool doUpdate(double dt);
 
+	/// Adds a component, this can be either input or output, it will call the appropriate
+	/// function in the device. For an InputComonent this will succeed if the device name
+	/// inside the component is known to the InputManager and if the component has not
+	/// been added as an input yet. For an OutputComponent the call will fail if the device
+	/// does not exist or the device has already been assigned an output.
+	/// \param	component	The component.
+	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
+	/// 		has already been added to the manager, and return false.
+	virtual bool doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+
+	/// Removes the component described by component.
+	/// \param	component	The component.
+	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
+	virtual bool doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+
+
 	/// Specific call for input components.
-	bool addInputComponent(std::shared_ptr<InputComponent> input);
+	bool addInputComponent(const std::shared_ptr<InputComponent>& input);
 
 	/// Specific call for output components.
-	bool  addOutputComponent(std::shared_ptr<OutputComponent> output);
+	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
 
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
@@ -87,9 +90,6 @@ private:
 	/// key is the name, no two devices with the same name can be added to the
 	/// input manager
 	std::unordered_map<std::string, std::shared_ptr<SurgSim::Input::DeviceInterface>> m_devices;
-
-	/// The logger for this manager
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	/// Protect critical sections
 	boost::mutex m_mutex;

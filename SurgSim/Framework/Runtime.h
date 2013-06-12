@@ -22,6 +22,7 @@
 #include <map>
 
 #include <boost/thread/mutex.hpp>
+#include <boost/lockfree/queue.hpp>
 
 namespace SurgSim
 {
@@ -103,6 +104,10 @@ public:
 	/// \return	The application data.
 	std::shared_ptr<const ApplicationData> getApplicationData() const;
 
+	void addComponent(const std::shared_ptr<Component>& component);
+
+	void removeComponent(const std::shared_ptr<Component>& component);
+
 
 private:
 
@@ -113,7 +118,7 @@ private:
 	/// Adds the components.
 	/// \param	components	The components.
 	/// \return	true if it succeeds, false if it fails.
-	bool addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
+	void addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components);
 
 	/// Initializes the search paths.
 	/// \param	configFilePath	Full pathname of the configuration file, if path is empty
@@ -125,6 +130,7 @@ private:
 	std::shared_ptr<ApplicationData> m_applicationData;
 
 	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
+
 
 	boost::mutex m_mutex;
 };
