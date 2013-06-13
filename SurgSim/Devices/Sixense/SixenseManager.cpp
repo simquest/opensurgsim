@@ -16,18 +16,34 @@
 #include "SurgSim/Devices/Sixense/SixenseManager.h"
 
 #include <vector>
+#include <list>
 #include <memory>
+#include <algorithm>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+
+#include <sixense.h>
 
 #include "SurgSim/Devices/Sixense/SixenseDevice.h"
 #include "SurgSim/Devices/Sixense/SixenseThread.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 
-#include <sixense.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Framework/Log.h"
+
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector3f;
+using SurgSim::Math::Matrix44d;
+using SurgSim::Math::Matrix33d;
+using SurgSim::Math::RigidTransform3d;
+
 
 namespace SurgSim
 {
@@ -35,10 +51,35 @@ namespace Device
 {
 
 
-struct SixenseManager::State
+struct SixenseManager::DeviceData
 {
+public:
+	/// Initialize the data.
+	DeviceData(int baseIndex, int controllerIndex, SixenseDevice* device) :
+		deviceBaseIndex(baseIndex),
+		deviceControllerIndex(controllerIndex),
+		deviceObject(device)
+	{
+	}
+
+	/// The index of the Sixense base unit for this device.
+	const int deviceBaseIndex;
+	/// The index of the Sixense controller for this device.
+	const int deviceControllerIndex;
+	/// The corresponding device object.
+	SixenseDevice* const deviceObject;
+
+private:
+	// prohibit copy construction and asignment
+	DeviceData(const DeviceData&);
+	DeviceData& operator=(const DeviceData&);
+};
+
+struct SixenseManager::StateData
+{
+public:
 	/// Initialize the state.
-	State() : isApiInitialized(false)
+	StateData() : isApiInitialized(false)
 	{
 	}
 
@@ -49,15 +90,20 @@ struct SixenseManager::State
 	std::unique_ptr<SixenseThread> thread;
 
 	/// The list of known devices.
-	std::vector<SixenseDevice*> activeDevices;
+	std::list<DeviceData> activeDeviceList;
 
 	/// The mutex that protects the list of known devices.
 	boost::mutex mutex;
+
+private:
+	// prohibit copy construction and asignment
+	StateData(const StateData&);
+	StateData& operator=(const StateData&);
 };
 
 
 SixenseManager::SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new State)
+	m_logger(logger), m_state(new StateData)
 {
 	if (! m_logger)
 	{
@@ -70,18 +116,19 @@ SixenseManager::SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logge
 
 SixenseManager::~SixenseManager()
 {
-	if (m_state->thread)
-	{
-		destroyThread();
-	}
-
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-		for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
+		
+		if (m_state->thread)
 		{
-			(*it)->finalize();
-			*it = nullptr;
+			destroyThread();
+		}
+
+		if (! m_state->activeDeviceList.empty())
+		{
+			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Destroying manager while devices are active!?!";
+			// do anything special with each device?
+			m_state->activeDeviceList.clear();
 		}
 
 		if (m_state->isApiInitialized)
@@ -93,7 +140,7 @@ SixenseManager::~SixenseManager()
 }
 
 
-std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& uniqueName)
+bool SixenseManager::registerDevice(SixenseDevice* device)
 {
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
@@ -102,18 +149,17 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 		{
 			if (! initializeSdk())
 			{
-				// Return an empty shared_ptr.
-				return std::shared_ptr<SixenseDevice>();
+				return false;
 			}
 		}
 	}
 
-	std::shared_ptr<SixenseDevice> device;
-	int numUsedDevicesSeen = 0;
 	boost::chrono::steady_clock::time_point tick = boost::chrono::steady_clock::now();
+	int numUsedDevicesSeen = 0;
+	bool fatalError = false;
 
-	bool deviceFound = scanForUnusedDevice(uniqueName, &device, &numUsedDevicesSeen);
-	if (! deviceFound && (numUsedDevicesSeen == 0) && (m_startupDelayMilliseconds > 0))
+	bool deviceFound = findUnusedDeviceAndRegister(device, &numUsedDevicesSeen, &fatalError);
+	if (! deviceFound && ! fatalError && (numUsedDevicesSeen == 0) && (m_startupDelayMilliseconds > 0))
 	{
 		// Unfortunately, right after sixenseInit() the library has not yet completed its device discovery!
 		// That means that calls to sixenseIsBaseConnected(), sixenseIsControllerEnabled(), etc. will return
@@ -128,12 +174,12 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 			boost::chrono::milliseconds(m_startupDelayMilliseconds);
 		while (true)
 		{
-			tick += boost::chrono::milliseconds(100);
+			tick += boost::chrono::milliseconds(m_startupRetryIntervalMilliseconds);
 			boost::this_thread::sleep_until(tick);
-			tick = boost::chrono::steady_clock::now();  // if scanForUnusedDevice() takes > 100ms, fix up the time.
+			tick = boost::chrono::steady_clock::now();  // if findUnusedDeviceAndRegister() takes > 100ms, fix up the time.
 
-			deviceFound = scanForUnusedDevice(uniqueName, &device, &numUsedDevicesSeen);
-			if (deviceFound || (numUsedDevicesSeen > 0) || (tick >= retryEnd))
+			deviceFound = findUnusedDeviceAndRegister(device, &numUsedDevicesSeen, &fatalError);
+			if (deviceFound || fatalError || (numUsedDevicesSeen > 0) || (tick >= retryEnd))
 			{
 				break;
 			}
@@ -142,7 +188,12 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 
 	if (! deviceFound)
 	{
-		if (numUsedDevicesSeen > 0)
+		if (fatalError)
+		{
+			// error information was hopefully already logged
+			SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: Registering device failed due to earlier fatal error.";
+		}
+		else if (numUsedDevicesSeen > 0)
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Failed to find any unused controllers!";
 		}
@@ -151,38 +202,31 @@ std::shared_ptr<SixenseDevice> SixenseManager::createDevice(const std::string& u
 			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Failed to find any devices." <<
 				"  Are the base and controllers plugged in?";
 		}
-		device.reset();
+		return false;
 	}
 
-	return device;
+	return true;
 }
 
 
-bool SixenseManager::releaseDevice(const SixenseDevice* device)
+bool SixenseManager::unregisterDevice(const SixenseDevice* const device)
 {
 	bool found = false;
-	bool haveOtherDevices = false;
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
+		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+			[device](const DeviceData& info) { return info.deviceObject == device; });
+		if (matching != m_state->activeDeviceList.end())
 		{
-			if (*it == device)
-			{
-				m_state->activeDevices.erase(it);
-				// the iterator is now invalid but that's OK
-				break;
-			}
+			m_state->activeDeviceList.erase(matching);
+			// the iterator is now invalid but that's OK
+			found = true;
 		}
-		haveOtherDevices = (m_state->activeDevices.size() > 0);
 	}
 
-	if (found)
+	if (! found)
 	{
-		// the device is already finalized!
-		if (! haveOtherDevices)
-		{
-			destroyThread();
-		}
+		SURGSIM_LOG_WARNING(m_logger) << "SixenseManager: Attempted to release non-registered device.";
 	}
 	return found;
 }
@@ -191,16 +235,66 @@ bool SixenseManager::runInputFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
+	for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
 	{
-		if (*it)
+		// We don't call it->deviceObject->pullOutput() because we don't use any output at all.
+		if (updateDevice(*it))
 		{
-			// We don't call (*it)->pullOutput() because we don't use any output at all.
-			(*it)->update();
-			(*it)->pushInput();
+			it->deviceObject->pushInput();
 		}
 	}
 
+	return true;
+}
+
+bool SixenseManager::updateDevice(const SixenseManager::DeviceData& info)
+{
+	//const SurgSim::DataStructures::DataGroup& outputData = info.deviceObject->getOutputData();
+	SurgSim::DataStructures::DataGroup& inputData = info.deviceObject->getInputData();
+
+	int status = sixenseSetActiveBase(info.deviceBaseIndex);
+	if (status != SIXENSE_SUCCESS)
+
+	{
+		SURGSIM_LOG_CRITICAL(m_logger) << "Device " << info.deviceObject->getName() << ": Could not activate" <<
+			" base unit #" << info.deviceBaseIndex << " for existing device! (status = " << status << ")";
+		return false;
+	}
+
+	sixenseControllerData data;
+	status = sixenseGetNewestData(info.deviceControllerIndex, &data);
+	if (status != SIXENSE_SUCCESS)
+	{
+		SURGSIM_LOG_CRITICAL(m_logger) << "Device " << info.deviceObject->getName() << ": Could not get data from" <<
+			" controller #" << info.deviceBaseIndex << "," << info.deviceControllerIndex <<
+			" for existing device! (status = " << status << ")";
+		return false;
+	}
+
+	{
+		// Use Eigen::Map to make the raw API output values look like Eigen data types
+		Eigen::Map<Vector3f> position(data.pos);
+		Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>> orientation(&(data.rot_mat[0][0]));
+
+		RigidTransform3d pose;
+		pose.makeAffine();
+		pose.linear() = orientation.cast<double>();
+		pose.translation() = position.cast<double>() * 0.001;  // convert from millimeters to meters!
+
+		// TODO(bert): this code should cache the access indices.
+		inputData.poses().set("pose", pose);
+		inputData.scalars().set("trigger", data.trigger);
+		inputData.scalars().set("joystickX", data.joystick_x);
+		inputData.scalars().set("joystickY", data.joystick_y);
+		inputData.booleans().set("buttonTrigger", (data.trigger > 0));
+		inputData.booleans().set("buttonBumper", (data.buttons & SIXENSE_BUTTON_BUMPER) != 0);
+		inputData.booleans().set("button1", (data.buttons & SIXENSE_BUTTON_1) != 0);
+		inputData.booleans().set("button2", (data.buttons & SIXENSE_BUTTON_2) != 0);
+		inputData.booleans().set("button3", (data.buttons & SIXENSE_BUTTON_3) != 0);
+		inputData.booleans().set("button4", (data.buttons & SIXENSE_BUTTON_4) != 0);
+		inputData.booleans().set("buttonStart", (data.buttons & SIXENSE_BUTTON_START) != 0);
+		inputData.booleans().set("buttonJoystick", (data.buttons & SIXENSE_BUTTON_JOYSTICK) != 0);
+	}
 	return true;
 }
 
@@ -236,12 +330,30 @@ bool SixenseManager::finalizeSdk()
 	return true;
 }
 
-bool SixenseManager::scanForUnusedDevice(const std::string& uniqueName, std::shared_ptr<SixenseDevice>* device,
-                                         int* numUsedDevicesSeen)
+bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* numUsedDevicesSeen, bool* fatalError)
 {
-	(*device).reset();
 	*numUsedDevicesSeen = 0;
+	*fatalError = false;
 
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+
+	// Make sure the object is unique.
+	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+		[device](const DeviceData& info) { return info.deviceObject == device; });
+	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "Sixense/Hydra: Tried to register a device" <<
+		" which is already present!";
+
+	// Make sure the name is unique.
+	const std::string deviceName = device->getName();
+	auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+		[&deviceName](const DeviceData& info) { return info.deviceObject->getName() == deviceName; });
+	if (sameName != m_state->activeDeviceList.end())
+	{
+		SURGSIM_LOG_CRITICAL(m_logger) << "SixenseManager: Two devices would share the same name!";
+		*fatalError = true;
+		return false;
+	}
+	
 	const int maxNumBases = sixenseGetMaxBases();
 
 	for (int b = 0;  b < maxNumBases;  ++b)
@@ -280,8 +392,7 @@ bool SixenseManager::scanForUnusedDevice(const std::string& uniqueName, std::sha
 			SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: found controller #" << b << "," << c <<
 				" (of total " << maxNumControllers << ")";
 
-
-			if (createDeviceIfUnused(b, c, uniqueName, device, numUsedDevicesSeen))
+			if (registerIfUnused(b, c, device, numUsedDevicesSeen))
 			{
 				return true;
 			}
@@ -291,20 +402,18 @@ bool SixenseManager::scanForUnusedDevice(const std::string& uniqueName, std::sha
 	return false;
 }
 
-bool SixenseManager::createDeviceIfUnused(int baseIndex, int controllerIndex, const std::string& uniqueName,
-                                          std::shared_ptr<SixenseDevice>* newDevice, int* numUsedDevicesSeen)
+bool SixenseManager::registerIfUnused(int baseIndex, int controllerIndex, SixenseDevice* device,
+									  int* numUsedDevicesSeen)
 {
-	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
 	// Check existing devices.
-	for (auto it = m_state->activeDevices.begin();  it != m_state->activeDevices.end();  ++it)
+	auto sameIndices = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
+		[baseIndex, controllerIndex](const DeviceData& info)
+			{ return ((info.deviceBaseIndex == baseIndex) && (info.deviceControllerIndex == controllerIndex)); });
+	if (sameIndices != m_state->activeDeviceList.end())
 	{
-		if ((baseIndex == (*it)->getBaseIndex()) && (controllerIndex == (*it)->getControllerIndex()))
-		{
-			// We found an existing device for this controller.
-			++(*numUsedDevicesSeen);
-			return false;
-		}
+		// We found an existing device for this controller.
+		++(*numUsedDevicesSeen);
+		return false;
 	}
 
 	// The controller is not yet in use.
@@ -314,17 +423,7 @@ bool SixenseManager::createDeviceIfUnused(int baseIndex, int controllerIndex, co
 		createThread();
 	}
 
-	std::shared_ptr<SixenseDevice> device =
-	    std::shared_ptr<SixenseDevice>(new SixenseDevice(uniqueName, baseIndex, controllerIndex, getLogger()));
-	// We initialize the device now, because if initialization fails, we don't want to add it to the active list.
-	if (! device->initialize())
-	{
-		(*newDevice).reset();  // clear the pointer
-		return false;
-	}
-
-	m_state->activeDevices.push_back(device.get());
-	*newDevice = std::move(device);
+	m_state->activeDeviceList.emplace_back(baseIndex, controllerIndex, device);
 	return true;
 }
 
@@ -350,9 +449,29 @@ bool SixenseManager::destroyThread()
 	return true;
 }
 
+SurgSim::DataStructures::DataGroup SixenseManager::buildDeviceInputData()
+{
+	SurgSim::DataStructures::DataGroupBuilder builder;
+	builder.addPose("pose");
+	builder.addScalar("trigger");
+	builder.addScalar("joystickX");
+	builder.addScalar("joystickY");
+	builder.addBoolean("buttonTrigger");
+	builder.addBoolean("buttonBumper");
+	builder.addBoolean("button1");
+	builder.addBoolean("button2");
+	builder.addBoolean("button3");
+	builder.addBoolean("button4");
+	builder.addBoolean("buttonStart");
+	builder.addBoolean("buttonJoystick");
+	return builder.createData();
+}
+
 std::shared_ptr<SixenseManager> SixenseManager::getOrCreateSharedInstance()
 {
-	static SurgSim::Framework::SharedInstance<SixenseManager> sharedInstance;
+	// Using an explicit creation function gets around problems with accessing the private constructor.
+	static auto creator = []() { return std::shared_ptr<SixenseManager>(new SixenseManager); };
+	static SurgSim::Framework::SharedInstance<SixenseManager> sharedInstance(creator);
 	return sharedInstance.get();
 }
 
@@ -364,6 +483,8 @@ void SixenseManager::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 SurgSim::Framework::LogLevel SixenseManager::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 int SixenseManager::m_startupDelayMilliseconds = 5000;
+int SixenseManager::m_startupRetryIntervalMilliseconds = 100;
+
 
 
 };  // namespace Device

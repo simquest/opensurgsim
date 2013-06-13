@@ -25,8 +25,6 @@ namespace SurgSim
 {
 namespace Device
 {
-
-class SixenseDevice;
 class SixenseManager;
 
 
@@ -36,7 +34,7 @@ class SixenseManager;
 ///   | type       | name              |                                                                           |
 ///   | ----       | ----              | ---                                                                       |
 ///   | pose       | "pose"            | %Device pose (units are meters).                                          |
-///   | scalar     | "trigger"         | %State of the analog trigger button (0 = not pressed, 1 = fully pressed). |
+///   | scalar     | "trigger"         | State of the analog trigger button (0 = not pressed, 1 = fully pressed). |
 ///   | scalar     | "joystickX"       | Joystick X position (0 = center, -1 = fully left, +1 = fully right).      |
 ///   | scalar     | "joystickY"       | Joystick Y position (0 = center, -1 = fully down/near, +1 = up/far).      |
 ///   | bool       | "buttonTrigger"   | True if the analog trigger button is pressed, i.e. its value is non-zero. |
@@ -54,79 +52,28 @@ class SixenseManager;
 class SixenseDevice : public SurgSim::Input::CommonDevice
 {
 public:
-	virtual ~SixenseDevice();
-
-	/// Creates a device.
-	///
-	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \return The newly created device, or an empty shared_ptr if the initialization fails.
-	static std::shared_ptr<SixenseDevice> create(const std::string& uniqueName);
-
-	/// Gets the logger used by this device (and other devices managed by the same manager).
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
-
-protected:
-	friend class SixenseManager;
-
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param baseIndex Index of the base unit this controller is connected to.
 	/// \param controllerIndex Index of this controller within its base unit.
 	/// \param logger The logger used for diagnostic messages.
-	SixenseDevice(const std::string& uniqueName, int baseIndex, int controllerIndex,
-		std::shared_ptr<SurgSim::Framework::Logger> logger);
-
-	/// Gets the manager object that coordinates all Sixense devices.
-	/// \return The manager.
-	std::shared_ptr<SixenseManager> getManager() const
-	{
-		return m_manager;
-	}
-
-	/// Sets the manager object held by this device.
-	/// This should be called as a part of device initialization.
-	/// \param manager The manager.
-	void setManager(std::shared_ptr<SixenseManager> manager)
-	{
-		m_manager = std::move(manager);
-	}
-
-	/// Gets the index of the base unit this controller is connected to.
-	/// \return The base unit index.
-	int getBaseIndex() const
-	{
-		return m_baseIndex;
-	}
-
-	/// Gets the index of this controller within its base unit.
-	/// \return The controller index.
-	int getControllerIndex() const
-	{
-		return m_controllerIndex;
-	}
+	SixenseDevice(const std::string& uniqueName);
+	
+	/// Destructor.
+	virtual ~SixenseDevice();
 
 	virtual bool initialize() override;
 
 	virtual bool finalize() override;
 
-	/// Communicates with the device, reading its state and writing the command parameters.
-	/// \return true on success.
-	bool update();
-
-	/// Builds the data layout for the application input (i.e. device output).
-	static SurgSim::DataStructures::DataGroup buildInputData();
+	/// Check wheter this device is initialized.
+	bool isInitialized() const;
 
 private:
+	friend class SixenseManager;
+
 	std::shared_ptr<SixenseManager> m_manager;
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	const int m_baseIndex;
-	const int m_controllerIndex;
-	std::string m_messageLabel;
 };
 
 };  // namespace Device

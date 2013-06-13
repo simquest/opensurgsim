@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <SurgSim/Framework/Logger.h>
+#include <SurgSim/DataStructures/DataGroup.h>
 
 namespace SurgSim
 {
@@ -34,12 +35,6 @@ class SixenseThread;
 class SixenseManager
 {
 public:
-	/// Constructor.
-	/// \param logger (optional) The logger to be used for the manager object and the devices it manages.
-	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logger =
-	                            std::shared_ptr<SurgSim::Framework::Logger>());
-
 	/// Destructor.
 	~SixenseManager();
 
@@ -60,29 +55,43 @@ public:
 	/// \param logLevel The log level.
 	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
-protected:
+private:
+	/// Internal shared state data type.
+	struct StateData;
+	/// Interal per-device information.
+	struct DeviceData;
+
 	friend class SixenseDevice;
 	friend class SixenseThread;
+	
+	/// Constructor.
+	/// \param logger (optional) The logger to be used for the manager object and the devices it manages.
+	/// 			  If unspecified or empty, a console logger will be created and used.
+	explicit SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logger =
+	                            std::shared_ptr<SurgSim::Framework::Logger>());
 
-	/// Creates a device.
+	/// Registers the specified device object.
+	/// If successful, the device object will become connected to an unused controller.
 	///
-	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \return The newly created device, or an empty shared_ptr if the initialization fails.
-	std::shared_ptr<SixenseDevice> createDevice(const std::string& uniqueName);
+	/// \param device The device object to be used, which should have a unique name.
+	/// \return True if the initialization succeeds, false if it fails.
+	bool registerDevice(SixenseDevice* device);
 
-	/// Shuts down and releases (and possibly destroys) the specified device.
+	/// Unregisters the specified device object.
+	/// The corresponding controller will become unused, and can be re-registered later.
 	///
-	/// After being released, the device object will be destroyed, but only if there are no other shared_ptr
-	/// references to it being held elsewhere.
-	///
-	/// \param device The device.
+	/// \param device The device object.
 	/// \return true on success, false on failure.
-	bool releaseDevice(const SixenseDevice* device);
+	bool unregisterDevice(const SixenseDevice* device);
 
 	/// Executes the operations for a single input frame.
 	/// Should only be called from the context of the input loop thread.
 	/// \return true on success.
 	bool runInputFrame();
+
+	/// Updates the device information for a single device.
+	/// \return true on success.
+	bool updateDevice(const DeviceData& info);
 
 	/// Initializes the Sixense SDK.
 	/// \return true on success.
@@ -92,29 +101,26 @@ protected:
 	/// \return true on success.
 	bool finalizeSdk();
 
-	/// Scans controllers that are present in the system, and if an unused one is found, create a device for it.
+	/// Scans controllers that are present in the system, and if an unused one is found, register a device for it.
 	///
-	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \param [out] device The created device handle, if any.
+	/// \param device The device object to register if an unused device is found.
 	/// \param [out] numUsedDevicesSeen The number of devices that were found during the scan but were already
 	/// 	in use.  Can be used if the scan fails to determine the error message that should be displayed.
-	///
+	/// \param [out] fatalError Set to true if an error (such as a duplicate device name) prevented device
+	/// 	registration such that retrying will not help; false otherwise.
 	/// \return true on success.
-	bool scanForUnusedDevice(const std::string& uniqueName, std::shared_ptr<SixenseDevice>* device,
-	                         int* numUsedDevicesSeen);
+	bool findUnusedDeviceAndRegister(SixenseDevice* device, int* numUsedDevicesSeen, bool* fatalError);
 
-	/// Creates a device object given a (baseIndex, controllerIndex) pair, if the same pair is not already in use.
+	/// Register a device object given a (baseIndex, controllerIndex) pair, if the same pair is not already in use.
 	///
 	/// \param baseIndex Index of the base unit.
 	/// \param controllerIndex Index of the controller within the base unit.
 	/// \param uniqueName A unique name for the created device that will be used by the application.
-	/// \param [out] device The created device handle, if any.
+	/// \param device The device object to register if the index pair is in fact unused.
 	/// \param [in,out] numUsedDevicesSeen The number of devices that were found during the scan but were
 	/// 	already in use; incremented when an unused device is seen.
-	///
 	/// \return true on success.
-	bool createDeviceIfUnused(int baseIndex, int controllerIndex, const std::string& uniqueName,
-	                          std::shared_ptr<SixenseDevice>* device, int* numUsedDevicesSeen);
+	bool registerIfUnused(int baseIndex, int controllerIndex, SixenseDevice* device, int* numUsedDevicesSeen);
 
 	/// Creates the input loop thread.
 	/// \return true on success.
@@ -125,19 +131,22 @@ protected:
 	/// \return true on success.
 	bool destroyThread();
 
-private:
-	/// Internal manager state data type.
-	struct State;
+	/// Builds the data layout for the application input (i.e. device output).
+	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
+
+
 
 	/// Logger used by the manager and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 	/// Internal manager state.
-	std::unique_ptr<State> m_state;
+	std::unique_ptr<StateData> m_state;
 
 	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 	/// How long we're willing to wait for devices to be detected, in milliseconds.
 	static int m_startupDelayMilliseconds;
+	/// How long to wait between trying to detect devices, in milliseconds.
+	static int m_startupRetryIntervalMilliseconds;
 };
 
 };  // namespace Device

@@ -76,18 +76,21 @@ bool TestListener::requestOutput(const std::string& device, DataGroup* outputDat
 }
 
 
-TEST(SixenseDeviceTest, CreateDevice)
+TEST(SixenseDeviceTest, InitializeAndInitializeDevice)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 }
 
 TEST(SixenseDeviceTest, Name)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_EQ("TestSixense", device->getName());
+	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 	EXPECT_EQ("TestSixense", device->getName());
 }
 
@@ -96,8 +99,9 @@ TEST(SixenseDeviceTest, CreateDeviceSeveralTimes)
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	for (int i = 0;  i < 6;  ++i)
 	{
-		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-		ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		// the device will be destroyed here
 	}
 }
@@ -105,19 +109,22 @@ TEST(SixenseDeviceTest, CreateDeviceSeveralTimes)
 TEST(SixenseDeviceTest, CreateSeveralDevices)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseDevice> device1 = SixenseDevice::create("Sixense1");
-	ASSERT_TRUE(device1 != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	std::shared_ptr<SixenseDevice> device1 = std::make_shared<SixenseDevice>("Sixense1");
+	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
-	std::shared_ptr<SixenseDevice> device2 = SixenseDevice::create("Sixense2");
-	ASSERT_TRUE(device2 != nullptr) << "Initialization failed for second controller." <<
+	std::shared_ptr<SixenseDevice> device2 = std::make_shared<SixenseDevice>("Sixense1");
+	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device2->initialize()) << "Initialization failed for second controller." <<
 		"  Is only one controller plugged in?";
 
 	// We can't check what happens with the managers, since those are no longer a part of the device's API...
 
-	std::shared_ptr<SixenseDevice> device3 = SixenseDevice::create("Sixense3");
-	if (! device3)
+	std::shared_ptr<SixenseDevice> device3 = std::make_shared<SixenseDevice>("Sixense3");
+	ASSERT_TRUE(device3 != nullptr) << "Device creation failed.";
+	if (! device3->initialize())
 	{
-		std::cerr << "[Warning: third Sixense/Hydra controller not actually created; is it plugged in?]" << std::endl;
+		std::cerr << "[Warning: third Sixense/Hydra controller did not come up; is it plugged in?]" << std::endl;
 	}
 }
 
@@ -139,7 +146,7 @@ TEST(SixenseDeviceTest, CreateAllDevices)
 	for (int i = 1;  ;  ++i)
 	{
 		std::string name = "Sixense" + makeString(i);
-		std::shared_ptr<SixenseDevice> device = SixenseDevice::create(name);
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>(name);
 		if (device == nullptr)
 		{
 			break;
@@ -155,8 +162,9 @@ TEST(SixenseDeviceTest, CreateAllDevices)
 TEST(SixenseDeviceTest, InputConsumer)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
@@ -202,8 +210,9 @@ TEST(SixenseDeviceTest, InputConsumer)
 TEST(SixenseDeviceTest, OutputProducer)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-	ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
 	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);

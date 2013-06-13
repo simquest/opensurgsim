@@ -81,7 +81,7 @@ TEST(SixenseManagerTest, ManagerLifeCycle)
 	}
 
 	{
-		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
 		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		{
 			std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
@@ -110,7 +110,7 @@ TEST(SixenseManagerTest, ManagerLifeCycle)
 	}
 
 	{
-		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
 		ASSERT_NE(nullptr, device) << "Initialization failed.  Didn't this work a moment ago?";
 		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
 		EXPECT_NE(nullptr, manager) << "The manager was not retrieved!";
@@ -130,7 +130,7 @@ TEST(SixenseManagerTest, CreateDeviceSeveralTimes)
 	{
 		SCOPED_TRACE(i);
 		EXPECT_EQ(nullptr, lastManager.lock());
-		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
 		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
 		ASSERT_NE(nullptr, manager) << "The manager was not retrieved!";
@@ -148,7 +148,7 @@ TEST(SixenseManagerTest, CreateDeviceSeveralTimesWithManagerRef)
 	for (int i = 0;  i < 6;  ++i)
 	{
 		SCOPED_TRACE(i);
-		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
 		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
 		ASSERT_NE(nullptr, manager) << "The manager was not retrieved!";
