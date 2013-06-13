@@ -66,7 +66,7 @@ public:
 	virtual void update(double dt)
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
-		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " << m_representation->getFinalPose().translation().transpose();
+		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " << m_representation->getPose().translation().transpose();
 	}
 protected:
 	virtual bool doInitialize()

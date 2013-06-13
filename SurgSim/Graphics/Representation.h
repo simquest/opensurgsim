@@ -56,7 +56,7 @@ public:
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 		m_initialPose = pose;
-		setCurrentPose(m_initialPose);
+		setPose(m_initialPose);
 	}
 
 	/// Get the initial pose of the representation
@@ -64,19 +64,6 @@ public:
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
 	{
 		return m_initialPose;
-	}
-
-	/// Get the current pose of the representation
-	/// \param	pose Rigid transformation that describes the current pose of the representation
-	/// \note	This is an intermediate pose, while getFinalPose() returns the last valid (end of timestep) pose
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const = 0;
-
-	/// Get the final pose of the representation (i.e. last valid pose)
-	/// \return	The final pose
-	/// \note	For graphics, the final pose is just the current pose.
-	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const
-	{
-		return getCurrentPose();
 	}
 
 	/// Updates the representation

@@ -39,7 +39,7 @@ public:
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_initialPose = transform;
-		setCurrentPose(transform);
+		setPose(transform);
 	}
 	/// Returns the current pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
@@ -48,20 +48,14 @@ public:
 	}
 
 	/// Sets the current pose of the representation
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_currentPose = transform;
 	}
 	/// Returns the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_currentPose;
-	}
-
-	/// Gets the final pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const
-	{
-		return getCurrentPose();
 	}
 
 	/// Returns true if the representation has been initialized, otherwise false

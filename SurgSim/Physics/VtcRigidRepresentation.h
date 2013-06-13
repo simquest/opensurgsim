@@ -196,7 +196,7 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	/// \note This is done through the Vtc proxy !
 	/// \note We let the end-user drive the Vtc, not the virtual rigid representation directly
-	void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose)
+	void setPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 		m_currentVtcState.setPose(pose);
 	}
@@ -211,7 +211,7 @@ public:
 	/// Get the final pose of the rigid representation
 	/// \return The final pose (translation + rotation)
 	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid representation
-	const SurgSim::Math::RigidTransform3d& getFinalPose() const
+	const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_finalState.getPose();
 	}

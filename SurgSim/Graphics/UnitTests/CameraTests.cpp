@@ -72,8 +72,7 @@ TEST(CameraTests, PoseTest)
 	{
 		SCOPED_TRACE("Check Initial Pose");
 		EXPECT_TRUE(camera->getInitialPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
 	}
 
 	RigidTransform3d initialPose;
@@ -83,18 +82,16 @@ TEST(CameraTests, PoseTest)
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
 	}
 
 	{
 		SCOPED_TRACE("Set Current Pose");
 		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		camera->setCurrentPose(currentPose);
+		camera->setPose(currentPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(currentPose));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(currentPose));
+		EXPECT_TRUE(camera->getPose().isApprox(currentPose));
 	}
 
 	{
@@ -103,8 +100,7 @@ TEST(CameraTests, PoseTest)
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
 	}
 }
 

@@ -99,7 +99,7 @@ TEST_F(RigidRepresentationTest, ResetTest)
 	rigidBody->setInitialState(m_state);
 	rigidBody->setIsActive(false);
 	rigidBody->setIsGravityEnabled(false);
-	rigidBody->setCurrentPose(RigidTransform3d::Identity());
+	rigidBody->setPose(RigidTransform3d::Identity());
 
 	// reset the representation state
 	rigidBody->resetState();

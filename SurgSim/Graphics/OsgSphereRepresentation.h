@@ -58,11 +58,11 @@ public:
 
 	/// Sets the current pose of the representation
 	/// \param	transform	Rigid transformation that describes the current pose of the representation
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform);
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
 
 	/// Gets the current pose of the representation
 	/// \return	Rigid transformation that describes the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
 
 	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.

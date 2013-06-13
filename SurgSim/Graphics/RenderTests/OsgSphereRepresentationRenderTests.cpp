@@ -98,10 +98,10 @@ TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
-		sphereRepresentation1->setCurrentPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition1 +
+		sphereRepresentation1->setPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition1 +
 			t * endPosition1));
 		sphereRepresentation1->setRadius((1 - t) * startRadius1 + t * endRadius1);
-		sphereRepresentation2->setCurrentPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition2 +
+		sphereRepresentation2->setPose(makeRigidTransform(Quaterniond::Identity(), (1 - t) * startPosition2 +
 			t * endPosition2));
 		sphereRepresentation2->setRadius((1 - t) * startRadius2 + t * endRadius2);
 		/// The total number of steps should complete in 1 second

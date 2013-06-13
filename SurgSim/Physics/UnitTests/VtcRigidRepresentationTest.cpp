@@ -133,7 +133,7 @@ TEST_F(VtcRigidRepresentationTest, ResetTest)
 	rigidBody->setInitialVtcState(m_vtcState);
 	rigidBody->setIsActive(false);
 	rigidBody->setIsGravityEnabled(false);
-	rigidBody->setCurrentPose(id4x4);
+	rigidBody->setPose(id4x4);
 
 	// reset the representation state
 	rigidBody->resetState();

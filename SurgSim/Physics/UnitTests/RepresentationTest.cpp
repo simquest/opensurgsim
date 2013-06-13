@@ -52,7 +52,7 @@ public:
 
 	/// Sets the current pose of the representation
 	/// \param pose The current pose of this MockRepresentation
-	void setCurrentPose(const RigidTransform3d& pose)
+	void setPose(const RigidTransform3d& pose)
 	{
 		m_currentPose = pose;
 	}
@@ -66,7 +66,7 @@ public:
 
 	/// Returns the final pose of the representation
 	/// \return The final pose of this MockRepresentation
-	const RigidTransform3d& getFinalPose() const
+	const RigidTransform3d& getPose() const
 	{
 		return m_finalPose;
 	}

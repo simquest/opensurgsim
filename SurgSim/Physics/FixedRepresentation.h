@@ -49,7 +49,6 @@ public:
 		m_initialState.setPose(pose);
 		m_currentState   = m_initialState;
 		m_previousState  = m_initialState;
-		m_finalState = m_initialState;
 	}
 
 	/// Get the initial pose of the rigid representation
@@ -61,7 +60,7 @@ public:
 
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
-	void setCurrentPose(const RigidTransform3d& pose)
+	void setPose(const RigidTransform3d& pose)
 	{
 		m_previousState = m_currentState;
 		m_currentState.setPose(pose);
@@ -76,16 +75,9 @@ public:
 
 	/// Get the final pose of the rigid representation
 	/// \return The final pose (translation + rotation)
-	const RigidTransform3d& getFinalPose() const
+	const RigidTransform3d& getPose() const
 	{
-		return m_finalState.getPose();
-	}
-
-	/// Postprocessing done after the update call
-	/// \param dt The time step (in seconds)
-	void afterUpdate(double dt)
-	{
-		m_finalState = m_currentState;
+		return m_currentState.getPose();
 	}
 
 	/// Called to reset the fixed object to its initial/default state
@@ -96,7 +88,6 @@ public:
 
 		m_previousState  = m_initialState;
 		m_currentState   = m_initialState;
-		m_finalState     = m_initialState;
 	}
 
 private:
@@ -108,9 +99,6 @@ private:
 
 	/// Current fixed representation state
 	RigidRepresentationBaseState m_currentState;
-
-	/// Last valid/final representation state
-	RigidRepresentationBaseState m_finalState;
 };
 
 }; // Physics

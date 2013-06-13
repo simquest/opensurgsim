@@ -46,7 +46,7 @@ public:
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt)
 	{
-		m_to->setCurrentPose(m_from->getFinalPose());
+		m_to->setPose(m_from->getPose());
 	}
 
 protected:

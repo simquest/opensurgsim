@@ -49,7 +49,7 @@ TEST(OsgCameraTests, InitTest)
 
 	EXPECT_TRUE(camera->isVisible());
 
-	EXPECT_TRUE(camera->getCurrentPose().matrix().isApprox(
+	EXPECT_TRUE(camera->getPose().matrix().isApprox(
 		fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
 		"Camera's pose should be initialized to the inverse of the osg::Camera's view matrix!";
 
@@ -131,8 +131,7 @@ TEST(CameraTests, PoseTest)
 	{
 		SCOPED_TRACE("Check Initial Pose");
 		EXPECT_TRUE(camera->getInitialPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
 	}
 
 	RigidTransform3d initialPose;
@@ -142,22 +141,20 @@ TEST(CameraTests, PoseTest)
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getViewMatrix().isApprox(initialPose.matrix().inverse()));
 		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(initialPose.matrix().inverse()));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(initialPose));
 	}
 
 	{
 		SCOPED_TRACE("Set Current Pose");
 		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		camera->setCurrentPose(currentPose);
+		camera->setPose(currentPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(currentPose));
+		EXPECT_TRUE(camera->getPose().isApprox(currentPose));
 		EXPECT_TRUE(camera->getViewMatrix().isApprox(currentPose.matrix().inverse()));
 		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(currentPose.matrix().inverse()));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(currentPose));
 	}
 
 	{
@@ -166,10 +163,9 @@ TEST(CameraTests, PoseTest)
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(camera->getCurrentPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getViewMatrix().isApprox(initialPose.matrix().inverse()));
 		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(initialPose.matrix().inverse()));
-		EXPECT_TRUE(camera->getFinalPose().isApprox(initialPose));
 	}
 }
 
@@ -188,7 +184,7 @@ TEST(CameraTests, MatricesTest)
 	/// Set the matrices and make sure they were set correctly
 	camera->setViewMatrix(viewMatrix);
 	EXPECT_TRUE(camera->getViewMatrix().isApprox(viewMatrix));
-	EXPECT_TRUE(camera->getCurrentPose().matrix().isApprox(viewMatrix.inverse()));
+	EXPECT_TRUE(camera->getPose().matrix().isApprox(viewMatrix.inverse()));
 	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(viewMatrix));
 
 	camera->setProjectionMatrix(projectionMatrix);

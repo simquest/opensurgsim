@@ -61,12 +61,12 @@ public:
 	/// Sets the current pose of the camera
 	/// The view matrix is set to the inverse of the transform.
 	/// \param	transform	Rigid transformation that describes the current pose of the camera
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform);
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
 
 	/// Gets the current pose of the camera
 	/// The transform returned is the inverse of the view matrix.
 	/// \return	Rigid transformation that describes the current pose of the camera
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
 
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix

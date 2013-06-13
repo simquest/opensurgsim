@@ -131,7 +131,7 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	/// \note Does Not Apply to this representation (the pose is fully controlled by the
 	/// physics simulation).
-	void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose)
+	void setPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
 	}
 
@@ -151,7 +151,7 @@ public:
 
 	/// Get the final pose of the rigid representation
 	/// \return The final pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getFinalPose() const
+	const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_finalState.getPose();
 	}

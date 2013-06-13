@@ -46,13 +46,17 @@ public:
 	/// \return The initial pose
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
 
-	/// Set the current pose of the representation
-	/// \param pose The current pose
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+	/// Set the pose of the representation
+	/// \param pose The pose to set the representation to
+	/// \note This requests the representation to set its pose to the given pose
+	/// \note In physics, the actual pose of the representation might not be exactly the requested one
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
 
-	/// Get the final pose of the representation (i.e. last valid pose)
-	/// \return The final pose
-	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const = 0;
+	/// Get the pose of the representation
+	/// \return The pose of this representation
+	/// \note getPose may or may not return the pose last sets by setPose
+	/// \note In physics, the simulation will drive the pose internally
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();

@@ -118,14 +118,14 @@ public:
 
 	/// Sets the current pose of the representation
 	/// \param	transform	Rigid transformation that describes the current pose of the representation
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_transform = transform;
 	}
 
 	/// Gets the current pose of the representation
 	/// \return	Rigid transformation that describes the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_transform;
 	}
@@ -259,14 +259,14 @@ public:
 
 	/// Sets the current pose of the camera
 	/// \param	transform	Rigid transformation that describes the current pose of the camera
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_pose = transform;
 	}
 
 	/// Gets the pose of the camera
 	/// \return	Rigid transformation that describes the pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_pose;
 	}
@@ -480,7 +480,7 @@ public:
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_initialPose = transform;
-		setCurrentPose(transform);
+		setPose(transform);
 	}
 	/// Returns the initial pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
@@ -489,12 +489,12 @@ public:
 	}
 
 	/// Sets the current pose of the representation
-	virtual void setCurrentPose(const SurgSim::Math::RigidTransform3d& transform)
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_currentPose = transform;
 	}
 	/// Returns the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_currentPose;
 	}
@@ -502,7 +502,7 @@ public:
 	/// Returns the final pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getFinalPose() const
 	{
-		return getCurrentPose();
+		return getPose();
 	}
 private:
 	/// Initial pose of the representation

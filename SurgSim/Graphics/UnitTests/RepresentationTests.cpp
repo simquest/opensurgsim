@@ -59,8 +59,7 @@ TEST(RepresentationTests, PoseTest)
 	{
 		SCOPED_TRACE("Check Initial Pose");
 		EXPECT_TRUE(representation->getInitialPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(representation->getCurrentPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(representation->getFinalPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(representation->getPose().isApprox(RigidTransform3d::Identity()));
 	}
 
 	RigidTransform3d initialPose;
@@ -70,18 +69,16 @@ TEST(RepresentationTests, PoseTest)
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setInitialPose(initialPose);
 		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getCurrentPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getFinalPose().isApprox(initialPose));
+		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
 	}
 
 	{
 		SCOPED_TRACE("Set Current Pose");
 		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setCurrentPose(currentPose);
+		representation->setPose(currentPose);
 		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getCurrentPose().isApprox(currentPose));
-		EXPECT_TRUE(representation->getFinalPose().isApprox(currentPose));
+		EXPECT_TRUE(representation->getPose().isApprox(currentPose));
 	}
 
 	{
@@ -90,8 +87,7 @@ TEST(RepresentationTests, PoseTest)
 			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		representation->setInitialPose(initialPose);
 		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getCurrentPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getFinalPose().isApprox(initialPose));
+		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
 	}
 }
 

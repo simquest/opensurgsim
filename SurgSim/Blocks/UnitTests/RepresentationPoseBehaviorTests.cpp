@@ -88,18 +88,18 @@ TEST(RepresentationPoseBehaviorTests, UpdateTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
 	/// Check that initial pose propagates correctly
-	EXPECT_TRUE(pose.matrix().isApprox(to->getFinalPose().matrix())) <<
+	EXPECT_TRUE(pose.matrix().isApprox(to->getPose().matrix())) <<
 		"The behavior should copy the initial pose on update!";
 
 	/// Change the pose and check that it propagates correctly
 	rotation = Quaterniond(SurgSim::Math::Vector4d::Random()).normalized();
 	position = Vector3d::Random();
 	pose = makeRigidTransform(rotation, position);
-	from->setCurrentPose(pose);
+	from->setPose(pose);
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
-	EXPECT_TRUE(pose.matrix().isApprox(to->getFinalPose().matrix())) <<
+	EXPECT_TRUE(pose.matrix().isApprox(to->getPose().matrix())) <<
 		"The behavior should copy the new pose on update!";
 
 	runtime->stop();
