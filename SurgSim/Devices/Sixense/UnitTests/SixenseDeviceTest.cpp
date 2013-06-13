@@ -122,7 +122,7 @@ TEST(SixenseDeviceTest, CreateSeveralDevices)
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 
-	std::shared_ptr<SixenseDevice> device2 = std::make_shared<SixenseDevice>("Sixense1");
+	std::shared_ptr<SixenseDevice> device2 = std::make_shared<SixenseDevice>("Sixense2");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device2->initialize()) << "Initialization failed for second controller." <<
 		"  Is only one controller plugged in?";
@@ -135,6 +135,18 @@ TEST(SixenseDeviceTest, CreateSeveralDevices)
 	{
 		std::cerr << "[Warning: third Sixense/Hydra controller did not come up; is it plugged in?]" << std::endl;
 	}
+}
+
+TEST(SixenseDeviceTest, CreateDevicesWithSameName)
+{
+	//SixenseScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<SixenseDevice> device1 = std::make_shared<SixenseDevice>("Sixense");
+	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+
+	std::shared_ptr<SixenseDevice> device2 = std::make_shared<SixenseDevice>("Sixense");
+	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
 }
 
 // Create a string representation from an int.
