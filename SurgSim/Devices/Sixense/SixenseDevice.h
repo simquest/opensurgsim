@@ -29,12 +29,6 @@ namespace Device
 class SixenseDevice;
 class SixenseManager;
 
-namespace Test
-{
-// Pre-declare a helper function for testing.
-std::shared_ptr<SixenseManager> extractManager(const SixenseDevice& device);
-};  // namespace Test
-
 
 /// A class implementing the communication with one Sixense controller, for example one of the two on the Razer Hydra.
 ///
@@ -77,7 +71,6 @@ public:
 
 protected:
 	friend class SixenseManager;
-	friend std::shared_ptr<SixenseManager> Test::extractManager(const SixenseDevice& device);
 
 	/// Constructor.
 	///

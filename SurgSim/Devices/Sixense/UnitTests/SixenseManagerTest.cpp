@@ -32,25 +32,6 @@
 using SurgSim::Device::SixenseDevice;
 using SurgSim::Device::SixenseManager;
 
-namespace SurgSim
-{
-namespace Device
-{
-namespace Test
-{
-
-std::shared_ptr<SixenseManager> extractManager(const SixenseDevice& device)
-{
-	return device.getManager();
-}
-
-};
-};
-};
-
-using SurgSim::Device::Test::extractManager;
-
-
 TEST(SixenseManagerTest, CreateAndDestroyManager)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
@@ -88,70 +69,94 @@ TEST(SixenseManagerTest, ManagerLifeCycle)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::weak_ptr<SixenseManager> lastManager;
+	{
+		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
+		ASSERT_NE(nullptr, manager) << "The manager was not created!";
+		lastManager = manager;
+	}
+	{
+		std::shared_ptr<SixenseManager> dontHaveManager = lastManager.lock();
+		EXPECT_EQ(nullptr, dontHaveManager) << "Able to get manager from weak ref (with no strong ref)";
+		lastManager.reset();
+	}
 
 	{
 		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-		ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
-		std::shared_ptr<SixenseManager> manager = extractManager(*device);
-		ASSERT_TRUE(manager != nullptr) << "The device doesn't know its manager!";
+		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		{
+			std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
+			EXPECT_NE(nullptr, manager) << "The manager was not retrieved!";
+			lastManager = manager;  // save the manager for later
 
-		lastManager = manager;  // save the manager for later
-		std::shared_ptr<SixenseManager> sameManager = lastManager.lock();
-		EXPECT_TRUE(sameManager != nullptr);
-		EXPECT_EQ(manager, sameManager);
+			std::shared_ptr<SixenseManager> sameManager = lastManager.lock();
+			EXPECT_NE(nullptr, sameManager);
+			EXPECT_EQ(manager, sameManager);
+		}
+		// The same manager is supposed to still be around because of the device
+		{
+			std::shared_ptr<SixenseManager> sameManager = lastManager.lock();
+			EXPECT_NE(nullptr, sameManager);
+
+			std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
+			EXPECT_NE(nullptr, manager) << "The manager was not retrieved!";
+			EXPECT_EQ(sameManager, manager);
+		}
 		// the device and the manager are about to get destroyed
 	}
 
 	{
 		std::shared_ptr<SixenseManager> deadManager = lastManager.lock();
-		EXPECT_TRUE(deadManager == nullptr);
+		EXPECT_EQ(nullptr, deadManager);
 	}
 
 	{
 		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-		ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
-		std::shared_ptr<SixenseManager> manager = extractManager(*device);
-		ASSERT_TRUE(manager != nullptr) << "The device doesn't know its manager!";
+		ASSERT_NE(nullptr, device) << "Initialization failed.  Didn't this work a moment ago?";
+		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
+		EXPECT_NE(nullptr, manager) << "The manager was not retrieved!";
 
 		std::shared_ptr<SixenseManager> deadManager = lastManager.lock();
-		EXPECT_TRUE(deadManager == nullptr);
+		EXPECT_EQ(nullptr, deadManager);
 	}
 }
 
 
-TEST(SixenseManagerTest, CreateDeviceSeveralTimesWithManager)
+TEST(SixenseManagerTest, CreateDeviceSeveralTimes)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseManager> manager;
+	std::weak_ptr<SixenseManager> lastManager;
 
 	for (int i = 0;  i < 6;  ++i)
 	{
+		SCOPED_TRACE(i);
+		EXPECT_EQ(nullptr, lastManager.lock());
 		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
-		ASSERT_TRUE(device != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
-		if (! manager)
-		{
-			manager = extractManager(*device);
-		}
-		EXPECT_EQ(manager, extractManager(*device));
-		// the device will be destroyed here, but the manager stays around because we have a shared_ptr to it.
+		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
+		ASSERT_NE(nullptr, manager) << "The manager was not retrieved!";
+		lastManager = manager;
+		// the device and the manager will be destroyed here
 	}
 }
 
-TEST(SixenseManagerTest, CreateSeveralDevices)
+
+TEST(SixenseManagerTest, CreateDeviceSeveralTimesWithManagerRef)
 {
 	//SixenseManager::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<SixenseDevice> device1 = SixenseDevice::create("Sixense1");
-	ASSERT_TRUE(device1 != nullptr) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	std::shared_ptr<SixenseManager> lastManager;
 
-	std::shared_ptr<SixenseDevice> device2 = SixenseDevice::create("Sixense2");
-	ASSERT_TRUE(device2 != nullptr) << "Initialization failed for second controller." <<
-		"  Is only one controller plugged in?";
-
-	EXPECT_EQ(extractManager(*device1), extractManager(*device2));
-
-	std::shared_ptr<SixenseDevice> device3 = SixenseDevice::create("Sixense3");
-	if (! device3)
+	for (int i = 0;  i < 6;  ++i)
 	{
-		std::cerr << "[Warning: third Sixense/Hydra controller not actually created; is it plugged in?]" << std::endl;
+		SCOPED_TRACE(i);
+		std::shared_ptr<SixenseDevice> device = SixenseDevice::create("TestSixense");
+		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
+		ASSERT_NE(nullptr, manager) << "The manager was not retrieved!";
+		if (! lastManager)
+		{
+			lastManager = manager;
+		}
+		EXPECT_EQ(lastManager, manager);
+		// the device will be destroyed here, but the manager stays around because we have a shared_ptr to it.
 	}
 }
