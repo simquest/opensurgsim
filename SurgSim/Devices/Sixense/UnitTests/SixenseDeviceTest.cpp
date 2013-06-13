@@ -76,12 +76,21 @@ bool TestListener::requestOutput(const std::string& device, DataGroup* outputDat
 }
 
 
-TEST(SixenseDeviceTest, InitializeAndInitializeDevice)
+TEST(SixenseDeviceTest, CreateUninitializedDevice)
 {
 	//SixenseScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+}
+
+TEST(SixenseDeviceTest, CreateAndInitializeDevice)
+{
+	//SixenseScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_FALSE(device->isInitialized());
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
 }
 
 TEST(SixenseDeviceTest, Name)
@@ -147,7 +156,8 @@ TEST(SixenseDeviceTest, CreateAllDevices)
 	{
 		std::string name = "Sixense" + makeString(i);
 		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>(name);
-		if (device == nullptr)
+		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+		if (! device->initialize())
 		{
 			break;
 		}

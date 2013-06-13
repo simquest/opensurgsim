@@ -82,7 +82,29 @@ TEST(SixenseScaffoldTest, ScaffoldLifeCycle)
 
 	{
 		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
-		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		ASSERT_NE(nullptr, device) << "Creation failed.  Is a Sixense/Hydra device plugged in?";
+		// note: the device is NOT initialized!
+		{
+			std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
+			EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
+			lastScaffold = scaffold;  // save the scaffold for later
+
+			std::shared_ptr<SixenseScaffold> sameScaffold = lastScaffold.lock();
+			EXPECT_NE(nullptr, sameScaffold);
+			EXPECT_EQ(scaffold, sameScaffold);
+		}
+		// The device has not been initialized, so it should NOT be hanging on to the device!
+		{
+			std::shared_ptr<SixenseScaffold> deadScaffold = lastScaffold.lock();
+			EXPECT_EQ(nullptr, deadScaffold);
+		}
+		// the ("empty") device is about to get destroyed
+	}
+
+	{
+		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
+		ASSERT_NE(nullptr, device) << "Device creation failed.";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		{
 			std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
 			EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
@@ -111,7 +133,8 @@ TEST(SixenseScaffoldTest, ScaffoldLifeCycle)
 
 	{
 		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
-		ASSERT_NE(nullptr, device) << "Initialization failed.  Didn't this work a moment ago?";
+		ASSERT_NE(nullptr, device) << "Device creation failed.";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Didn't this work a moment ago?";
 		std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
 		EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
 
@@ -131,7 +154,8 @@ TEST(SixenseScaffoldTest, CreateDeviceSeveralTimes)
 		SCOPED_TRACE(i);
 		EXPECT_EQ(nullptr, lastScaffold.lock());
 		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
-		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		ASSERT_NE(nullptr, device) << "Device creation failed.";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
 		ASSERT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
 		lastScaffold = scaffold;
@@ -149,7 +173,8 @@ TEST(SixenseScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
 	{
 		SCOPED_TRACE(i);
 		std::shared_ptr<SixenseDevice> device = std::make_shared<SixenseDevice>("TestSixense");
-		ASSERT_NE(nullptr, device) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
+		ASSERT_NE(nullptr, device) << "Device creation failed.";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Sixense/Hydra device plugged in?";
 		std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
 		ASSERT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
 		if (! lastScaffold)
