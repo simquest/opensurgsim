@@ -23,7 +23,7 @@
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Framework
 {
@@ -98,12 +98,12 @@ void BasicThread::operator()()
 		m_isRunning = doUpdate(m_period.count());
 		frameTime = boost::chrono::steady_clock::now() - start;
 	}
-	
+
 	if (m_stopExecution)
 	{
 		doBeforeStop();
 	}
-	
+
 	m_isRunning = false;
 	m_stopExecution = false;
 }
@@ -133,7 +133,7 @@ bool BasicThread::executeInitialization()
 	// If one of the other thread asserts and ends this does not matter
 	// as the process will be taken down
 	success = waitForBarrier(success);
-	
+
 	if (!success)
 	{
 		return success;
@@ -155,7 +155,7 @@ bool BasicThread::waitForBarrier(bool success)
 	if (m_startupBarrier != nullptr)
 	{
 		success = m_startupBarrier->wait(success);
-	}	
+	}
 	return success;
 }
 

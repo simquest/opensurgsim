@@ -36,7 +36,7 @@ using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Physics
 {
@@ -64,7 +64,7 @@ public:
 		return physicsManager->doAddComponent(component);
 	}
 
-	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
 	{
 		return physicsManager->doRemoveComponent(component);
 	}

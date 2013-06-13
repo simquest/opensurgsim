@@ -51,11 +51,11 @@ public:
 		return m_name;
 	};
 
-	bool isInitialized() 
+	bool isInitialized()
 	{
 		return m_didInit;
 	}
-	
+
 	bool isAwake() {
 		return m_didWakeUp;
 	}

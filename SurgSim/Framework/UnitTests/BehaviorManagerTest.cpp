@@ -17,7 +17,7 @@
 
 #include <SurgSim/Framework/BehaviorManager.h>
 
-#include "MockObjects.h"
+#include <SurgSim/Framework/UnitTests/MockObjects.h>
 #include "boost/thread/thread.hpp"
 
 using namespace SurgSim::Framework;

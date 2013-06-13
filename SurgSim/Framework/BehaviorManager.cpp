@@ -24,7 +24,7 @@
 #include "SurgSim/Framework/Runtime.h"
 
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Framework
 {

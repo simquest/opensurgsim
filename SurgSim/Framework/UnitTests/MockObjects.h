@@ -259,7 +259,7 @@ private:
 		return tryAddComponent(component, &m_components) != nullptr;
 	}
 
-	virtual bool doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component) 
+	virtual bool doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 	{
 		return tryRemoveComponent(component, &m_components);
 	}

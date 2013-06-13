@@ -22,7 +22,8 @@
 /// \param [in,out]	container	The container that the component is being added to.
 /// \return	The correctly cast component if it is of type T and does not exist in the container yet, nullptr otherwise.
 template<class T>
-std::shared_ptr<T> ComponentManager::tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
+std::shared_ptr<T> ComponentManager::tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component,
+													 std::vector<std::shared_ptr<T>>* container)
 {
 	SURGSIM_ASSERT(component != nullptr) << "Trying to add a component that is null";
 	SURGSIM_ASSERT(container != nullptr) << "Trying to use a component container that is null";
@@ -45,7 +46,8 @@ std::shared_ptr<T> ComponentManager::tryAddComponent(std::shared_ptr<SurgSim::Fr
 };
 
 template<class T>
-bool ComponentManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container)
+bool ComponentManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component,
+										  std::vector<std::shared_ptr<T>>* container)
 {
 	SURGSIM_ASSERT(container != nullptr) << "Trying to use a component container that is null";
 	bool result = false;
@@ -61,8 +63,8 @@ bool ComponentManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Co
 		}
 		else
 		{
-			SURGSIM_LOG_INFO(m_logger) << SURGSIM_CURRENT_FUNCTION << " Unable to remove component " << typedComponent->getName()
-				<< ". Not found.";
+			SURGSIM_LOG_INFO(m_logger) << SURGSIM_CURRENT_FUNCTION << " Unable to remove component " <<
+				typedComponent->getName() << ". Not found.";
 		}
 	}
 	return result;

@@ -39,10 +39,10 @@ class Logger;
 /// it is up to the manger to decide whether to handle a component of a given
 /// type or not.
 /// Adding and removing components is threadsafe, when the [add|remove]Component
-/// call is made the component is added to an intermediary datastructure, each 
+/// call is made the component is added to an intermediary datastructure, each
 /// ComponentManager implementation must call processComponents() to trigger the
 /// actual addition and removal. Each ComponentManager subclass needs to implement
-/// doAddComponent() and doRemoveComponent() to the actual addition and removal of 
+/// doAddComponent() and doRemoveComponent() to the actual addition and removal of
 /// components.
 /// ComponentManager implements a custom executeInitialization() method that lets the
 /// runtime schedule initialization of components that exist at the start of the simulation
@@ -62,7 +62,7 @@ public:
 	/// Queues a component to be removed
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
-	/// 		the component will actually be removed from this manager 
+	/// 		the component will actually be removed from this manager
 	bool removeComponent(const std::shared_ptr<Component>& component);
 
 	/// @{
@@ -74,16 +74,18 @@ public:
 
 	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
-	
+
 
 protected:
 	/// Template version of the addComponent method.
 	/// \tparam	T	Specific type of the component that is being added.
 	/// \param	component		 	The component that needs to be added.
-	/// \param [in,out]	container	If non-null, the container, that should receive the component if of the correct type.
-	/// \return	the correctly cast component pointer if successful and the component did not alread exist in the container
+	/// \param [in,out]	container	If non-null, the container that should receive the component if of the correct type.
+	/// \return	the correctly cast component pointer if successful and the 
+	/// 		component did not already exist in the container
 	template<class T>
-	std::shared_ptr<T> tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+	std::shared_ptr<T> tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component,
+									   std::vector<std::shared_ptr<T>>* container);
 
 	/// Template version of the removeComponent method.
 	/// \tparam	T	Specific type of the component that is being removed.
@@ -91,15 +93,16 @@ protected:
 	/// \param [in,out]	container	If non-null, the container, from which the component should be removed.
 	/// \return	true if the component exists in the container or the component did not cast to T, otherwise.
 	template<class T>
-	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component, std::vector<std::shared_ptr<T>>* container);
+	bool tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Component> component,
+							std::vector<std::shared_ptr<T>>* container);
 
 
-	/// Processes all the components that are scheduled for addition or removal, this needs to be called 
+	/// Processes all the components that are scheduled for addition or removal, this needs to be called
 	/// inside the doUpdate() function.
 	void processComponents();
 
 	/// Helper, blocks access to the additions and removal queue and copies the components
-	/// from there to the intermediate inflight queues, after this call, the incoming 
+	/// from there to the intermediate inflight queues, after this call, the incoming
 	/// queues will be empty.
 	void copyScheduledComponents();
 
@@ -112,7 +115,7 @@ protected:
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
 	///@}
-	
+
 	/// Logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
@@ -126,13 +129,13 @@ private:
 	/// Adds a component.
 	/// \param component The component to be added.
 	/// \return true if the component was scheduled for addition, this does not indicate that
-	/// 		the component will actually be added to this manager
+	/// 		the component will actually be added to this manager.
 	virtual bool doAddComponent(const std::shared_ptr<Component>& component) = 0;
 
 	/// Handle representations, override for each thread
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
-	/// 		the component will actually be removed from this manager 
+	/// 		the component will actually be removed from this manager.
 	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component) = 0;
 
 	/// Overridden from BasicThread, extends the initialization to contain component initialization
@@ -141,13 +144,13 @@ private:
 
 	// Delegates to doRemoveComponent to remove all the components in the indicated array.
 	/// \param	beginIt	The begin iterator.
-	/// \param	endIt  	The end iterator.	
+	/// \param	endIt  	The end iterator.
 	void removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	// Delegates to doAddComponent and calls initialize on all the components
 	/// \param	beginIt	The begin iterator.
-	/// \param	endIt  	The end iterator.	
+	/// \param	endIt  	The end iterator.
 	void initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 							  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
@@ -156,7 +159,7 @@ private:
 	/// component from being awoken more than once. Will also remove components if they did not
 	/// wake up as expected
 	/// \param	beginIt	The begin iterator.
-	/// \param	endIt  	The end iterator.	
+	/// \param	endIt  	The end iterator.
 	void wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 

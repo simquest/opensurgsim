@@ -100,7 +100,7 @@ bool ComponentManager::executeInitialization()
 	}
 
 	success = waitForBarrier(success);
-	
+
 	if (! success)
 	{
 		return success;
@@ -127,11 +127,11 @@ void ComponentManager::copyScheduledComponents()
 	// this will insulate us from the actual add or remove call taking longer than it should
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
 	m_inflightAdditions.resize(m_componentAdditions.size());
-	std::copy(m_componentAdditions.begin(), m_componentAdditions.end(), m_inflightAdditions.begin());		
+	std::copy(m_componentAdditions.begin(), m_componentAdditions.end(), m_inflightAdditions.begin());
 	m_componentAdditions.clear();
 
 	m_inflightRemovals.resize(m_componentRemovals.size());
-	std::copy(m_componentRemovals.begin(), m_componentRemovals.end(), m_inflightRemovals.begin());		
+	std::copy(m_componentRemovals.begin(), m_componentRemovals.end(), m_inflightRemovals.begin());
 	m_componentRemovals.clear();
 }
 
@@ -144,7 +144,7 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 	}
 }
 
-void ComponentManager::initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt, 
+void ComponentManager::initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
 {
 	// Add All Components to the internal storage
@@ -157,7 +157,7 @@ void ComponentManager::initializeComponents(const std::vector<std::shared_ptr<Co
 	}
 }
 
-void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt, 
+void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
 {
 	for(auto it = beginIt; it != endIt; ++it)

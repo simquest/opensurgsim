@@ -15,7 +15,7 @@
 
 
 ///\file ComponentManagerTests.cpp test the basic functionality of the component manager
-///		 mostly through a mock manager that exposes the private interface and implements 
+///		 mostly through a mock manager that exposes the private interface and implements
 ///		 the simplest version of the abstract interface.
 
 #include <gtest/gtest.h>
@@ -31,9 +31,9 @@ using SurgSim::Framework::Component;
 
 TEST(ComponentManagerTests, TestInternalAddRemove)
 {
-	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");  
+	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");
 	std::shared_ptr<Component> mock2 = std::make_shared<MockComponent>("Component2");
-	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");  
+	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");
 
 	MockManager manager;
 	EXPECT_EQ(0u, manager.getComponents().size());
@@ -45,7 +45,7 @@ TEST(ComponentManagerTests, TestInternalAddRemove)
 	EXPECT_TRUE(manager.testTryAddComponent(mock2));
 	EXPECT_EQ(2u, manager.getComponents().size());
 
-	// Should not be able to add behavior 
+	// Should not be able to add behavior
 	EXPECT_FALSE(manager.testTryAddComponent(invalid));
 	EXPECT_EQ(2u, manager.getComponents().size());
 
@@ -70,11 +70,11 @@ TEST(ComponentManagerTests, TestInternalAddRemove)
 
 TEST(ComponentManagerTests, SimpleAddRemoveComponentTest)
 {
-	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");  
+	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");
 	std::shared_ptr<Component> mock2 = std::make_shared<MockComponent>("Component2");
-	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");  
+	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");
 
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>(); 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	MockManager manager;
 	manager.setRuntime(runtime);
 	manager.addComponent(mock1);
@@ -83,7 +83,7 @@ TEST(ComponentManagerTests, SimpleAddRemoveComponentTest)
 	manager.testProcessComponents();
 
 	EXPECT_EQ(1u, manager.getComponents().size());
-	
+
 	manager.removeComponent(mock1);
 	manager.testProcessComponents();
 	EXPECT_EQ(0u, manager.getComponents().size());
@@ -92,11 +92,11 @@ TEST(ComponentManagerTests, SimpleAddRemoveComponentTest)
 
 TEST(ComponentManagerTests, CompundAddRemoveComponentTest)
 {
-	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");  
+	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");
 	std::shared_ptr<Component> mock2 = std::make_shared<MockComponent>("Component2");
-	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");  
+	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");
 
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>(); 
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	MockManager manager;
 	manager.setRuntime(runtime);
 	manager.addComponent(mock1);
