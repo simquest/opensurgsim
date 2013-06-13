@@ -115,12 +115,14 @@ SixenseScaffold::SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 SixenseScaffold::~SixenseScaffold()
 {
 	{
-		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
+		// The thread needs to be torn down while NOT holding the mutex, to avoid deadlock.
 		if (m_state->thread)
 		{
 			destroyThread();
 		}
+	}
+	{
+		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
 		if (! m_state->activeDeviceList.empty())
 		{
