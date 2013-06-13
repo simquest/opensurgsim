@@ -24,13 +24,13 @@
 
 #include <SurgSim/Framework/BasicThread.h>
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/Component.h>
 
 namespace SurgSim
 {
 namespace Framework
 {
 
-class Component;
 class Runtime;
 class Logger;
 

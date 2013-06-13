@@ -42,8 +42,6 @@ public:
 	/// Destructor
 	virtual ~Manager();
 
-
-
 	/// Returns the representations assigned to the manager
 	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
 	{

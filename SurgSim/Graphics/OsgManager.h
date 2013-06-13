@@ -57,10 +57,22 @@ public:
 	/// Destructor
 	virtual ~OsgManager();
 
+	friend class OsgManagerTest;
+
 	/// Returns the default camera
 	/// The default Camera will be assigned to any added View which does not already have a camera.
 	std::shared_ptr<OsgCamera> getDefaultCamera() const;
 
+	/// Returns the default group
+	/// Any Representation or Group added will be added to the default Group.
+	std::shared_ptr<OsgGroup> getDefaultGroup() const;
+
+
+	/// Returns the OSG CompositeViewer used to manage and render the views
+	osg::ref_ptr<osgViewer::CompositeViewer> getOsgCompositeViewer() const
+	{
+		return m_viewer;
+	}
 
 protected:
 	/// Performs an update for a single timestep
@@ -113,17 +125,6 @@ protected:
 	virtual bool removeView(std::shared_ptr<View> view);
 
 private:
-
-	/// Returns the default group
-	/// Any Representation or Group added will be added to the default Group.
-	std::shared_ptr<OsgGroup> getDefaultGroup() const;
-
-
-	/// Returns the OSG CompositeViewer used to manage and render the views
-	osg::ref_ptr<osgViewer::CompositeViewer> getOsgCompositeViewer() const
-	{
-		return m_viewer;
-	}
 
 	/// Prepares the manager for its execution to be stopped
 	/// \note	Called from this thread before joined

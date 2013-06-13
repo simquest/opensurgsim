@@ -61,15 +61,21 @@ void ComponentManager::processComponents()
 {
 	copyScheduledComponents();
 
-	auto inflightBegin = std::begin(m_inflightAdditions);
-	auto inflightEnd = std::end(m_inflightAdditions);
+	if (!m_inflightAdditions.empty())
+	{
+		auto inflightBegin = std::begin(m_inflightAdditions);
+		auto inflightEnd = std::end(m_inflightAdditions);
 
-	initializeComponents(inflightBegin, inflightEnd);
-	wakeUpComponents(inflightBegin, inflightEnd);
-	m_inflightAdditions.clear();
+		initializeComponents(inflightBegin, inflightEnd);
+		wakeUpComponents(inflightBegin, inflightEnd);
+		m_inflightAdditions.clear();
+	}
 
-	removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
-	m_inflightRemovals.clear();
+	if (!m_inflightRemovals.empty())
+	{
+		removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
+		m_inflightRemovals.clear();
+	}
 }
 
 bool ComponentManager::executeInitialization()
@@ -86,17 +92,25 @@ bool ComponentManager::executeInitialization()
 	auto inflightBegin = std::begin(m_inflightAdditions);
 	auto inflightEnd = std::end(m_inflightAdditions);
 
-	initializeComponents(inflightBegin, inflightEnd);
-	wakeUpComponents(inflightBegin, inflightEnd);
-	m_inflightAdditions.clear();
+	if (!m_inflightAdditions.empty())
+	{
+		initializeComponents(inflightBegin, inflightEnd);
+		wakeUpComponents(inflightBegin, inflightEnd);
+		m_inflightAdditions.clear();
+	}
+
 	success = waitForBarrier(success);
+	
 	if (! success)
 	{
 		return success;
 	}
 
-	removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
-	m_inflightRemovals.clear();
+	if (!m_inflightAdditions.empty())
+	{
+		removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
+		m_inflightRemovals.clear();
+	}
 	success = waitForBarrier(success);
 
 	// Wait for SceneElement WakeUp, the last in the sequence

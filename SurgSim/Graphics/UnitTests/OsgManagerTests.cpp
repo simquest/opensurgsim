@@ -19,6 +19,8 @@
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
+#include <SurgSim/Framework/Runtime.h>
+
 #include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
@@ -27,18 +29,59 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <algorithm>
 #include <random>
 
+using SurgSim::Framework::Runtime;
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Representation;
+using SurgSim::Framework::Component;
 
-namespace SurgSim
+
+namespace SurgSim 
 {
 namespace Graphics
 {
 
-TEST(OsgManagerTests, InitTest)
+
+class OsgManagerTest : public ::testing::Test
+{
+public:
+	virtual void SetUp()
+	{
+		runtime = std::make_shared<Runtime>();
+		graphicsManager = std::make_shared<OsgManager>();
+
+		runtime->addManager(graphicsManager);
+	}
+
+	virtual void TearDown()
+	{
+		runtime->stop();
+	}
+
+
+	bool testDoAddComponent(const std::shared_ptr<Component>& component)
+	{
+		return graphicsManager->doAddComponent(component);
+	}
+
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	{
+		return graphicsManager->doRemoveComponent(component);
+	}
+
+	void doProcessComponents()
+	{
+		graphicsManager->processComponents();
+	}
+
+	std::shared_ptr<Runtime> runtime;
+	std::shared_ptr<OsgManager> graphicsManager;
+}; 
+
+TEST_F(OsgManagerTest, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();});
 }
@@ -56,9 +99,8 @@ bool hasView(osgViewer::CompositeViewer* compositeViewer, osg::View* view)
 	return foundView;
 }
 
-TEST(OsgManagerTests, AddRemoveTest)
+TEST_F(OsgManagerTest, AddRemoveTest)
 {
-	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
 	osgViewer::CompositeViewer* compositeViewer = graphicsManager->getOsgCompositeViewer();
 	/// Perform add and remove from a pointer to a ComponentManager to check that the intended polymorphism is working.
 	std::shared_ptr<ComponentManager> componentManager = graphicsManager;
@@ -85,18 +127,21 @@ TEST(OsgManagerTests, AddRemoveTest)
 
 	/// Add an representation
 	EXPECT_TRUE(componentManager->addComponent(representation1));
+	doProcessComponents();
 	EXPECT_EQ(1u, graphicsManager->getRepresentations().size());
 	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
 		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Add a group
 	EXPECT_TRUE(componentManager->addComponent(group1));
+	doProcessComponents();
 	EXPECT_EQ(1u, graphicsManager->getGroups().size());
 	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group1));
 
 	/// Add a view
 	EXPECT_TRUE(componentManager->addComponent(view1));
+	doProcessComponents();
 	EXPECT_EQ(1u, graphicsManager->getViews().size());
 	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view1));
@@ -104,48 +149,57 @@ TEST(OsgManagerTests, AddRemoveTest)
 
 	/// Add another view
 	EXPECT_TRUE(componentManager->addComponent(view2));
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getViews().size());
 	EXPECT_NE(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
 	/// Add another group
 	EXPECT_TRUE(componentManager->addComponent(group2));
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getGroups().size());
 	EXPECT_NE(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Add another representation
 	EXPECT_TRUE(componentManager->addComponent(representation2));
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 	EXPECT_NE(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
 		graphicsManager->getRepresentations().end(), representation2));
 
 
 	/// Try to add a duplicate representation
-	EXPECT_FALSE(componentManager->addComponent(representation1));
+	EXPECT_TRUE(componentManager->addComponent(representation1));
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 
 	/// Try to add a duplicate group
-	EXPECT_FALSE(componentManager->addComponent(group2));
+	EXPECT_TRUE(componentManager->addComponent(group2));
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getGroups().size());
 
 	/// Try to add a duplicate view
-	EXPECT_FALSE(componentManager->addComponent(view1));
+	EXPECT_TRUE(componentManager->addComponent(view1));
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getViews().size());
 
 	/// Try to add an representation that is not a subclass of OsgRepresentation
-	EXPECT_FALSE(componentManager->addComponent(nonOsgRepresentation)) <<
+	EXPECT_TRUE(componentManager->addComponent(nonOsgRepresentation)) <<
 		"Adding an Representation that is not a subclass of OsgRepresentation should fail and return false";
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getRepresentations().size());
 
 	/// Try to add a group that is not a subclass of OsgGroup
-	EXPECT_FALSE(componentManager->addComponent(nonOsgGroup)) <<
+	EXPECT_TRUE(componentManager->addComponent(nonOsgGroup)) <<
 		"Adding a Group that is not a subclass of OsgGroup should fail and return false";
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getGroups().size());
 
 	/// Try to add a group that is not a subclass of OsgView
-	EXPECT_FALSE(componentManager->addComponent(nonOsgView)) <<
+	EXPECT_TRUE(componentManager->addComponent(nonOsgView)) <<
 		"Adding a View that is not a subclass of OsgView should fail and return false";
+	doProcessComponents();
 	EXPECT_EQ(2u, graphicsManager->getViews().size());
 
 	/// Try to add a component that is not graphics-related
@@ -155,31 +209,37 @@ TEST(OsgManagerTests, AddRemoveTest)
 
 	/// Remove a group
 	EXPECT_TRUE(componentManager->removeComponent(group2));
+	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Remove a view
 	EXPECT_TRUE(componentManager->removeComponent(view2));
+	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
 	/// Remove an representation
 	EXPECT_TRUE(componentManager->removeComponent(representation1));
+	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
 		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a group that is not in the manager
-	EXPECT_FALSE(componentManager->removeComponent(group2));
+	EXPECT_TRUE(componentManager->removeComponent(group2));
+	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getGroups().end(), std::find(graphicsManager->getGroups().begin(),
 		graphicsManager->getGroups().end(), group2));
 
 	/// Try to remove an representation that is not in the manager
-	EXPECT_FALSE(componentManager->removeComponent(representation1));
+	EXPECT_TRUE(componentManager->removeComponent(representation1));
+	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getRepresentations().end(), std::find(graphicsManager->getRepresentations().begin(),
 		graphicsManager->getRepresentations().end(), representation1));
 
 	/// Try to remove a view that is not in the manager
-	EXPECT_FALSE(componentManager->removeComponent(view2));
+	EXPECT_TRUE(componentManager->removeComponent(view2));
+	doProcessComponents();
 	EXPECT_EQ(graphicsManager->getViews().end(), std::find(graphicsManager->getViews().begin(),
 		graphicsManager->getViews().end(), view2));
 
@@ -189,5 +249,7 @@ TEST(OsgManagerTests, AddRemoveTest)
 		"Removing a component that this manager is not concerned with should return true";
 }
 
-}  // namespace Graphics
-}  // namespace SurgSim
+}; // namespace Graphics
+}; // namespace SurgSim
+
+

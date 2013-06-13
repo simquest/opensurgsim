@@ -31,6 +31,7 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
+
 TEST(CameraTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test name");});
@@ -117,3 +118,5 @@ TEST(CameraTests, UpdateTest)
 		EXPECT_LT(fabs(sumDt - mockCamera->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
+
+

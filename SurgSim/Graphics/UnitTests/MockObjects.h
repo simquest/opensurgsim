@@ -24,10 +24,14 @@
 #include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/ViewElement.h>
 
+
 /// Manager class for testing
 class MockManager : public SurgSim::Graphics::Manager
 {
 public:
+
+	friend class GraphicsManagerTest;
+
 	/// Constructor
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	MockManager() : SurgSim::Graphics::Manager(),
