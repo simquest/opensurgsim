@@ -32,7 +32,8 @@ typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTI
 /// Fixed List of enums for the available RigidShape types, do not explicitely assign values, RigidShapeCount is
 /// used to determine the number of actual shape types
 typedef enum {
-	RIGID_SHAPE_TYPE_SPHERE = 0,
+	RIGID_SHAPE_TYPE_PLANE = 0,
+	RIGID_SHAPE_TYPE_SPHERE,
 	RIGID_SHAPE_TYPE_BOX,
 	RIGID_SHAPE_TYPE_CYLINDER,
 	RIGID_SHAPE_TYPE_CAPSULE,
@@ -40,7 +41,7 @@ typedef enum {
 	RIGID_SHAPE_TYPE_COUNT
 } RigidShapeType;
 
-/// Generic rigid shape class defining a shape for a rigid actor
+/// Generic rigid shape class defining a shape for a rigid representation
 /// \note This class gives the ability to analyse the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
 class RigidShape
@@ -48,7 +49,7 @@ class RigidShape
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
-	
+
 	virtual ~RigidShape() {}
 
 	/// \return the type of shape
@@ -76,8 +77,8 @@ public:
 	virtual Matrix33d calculateInertia(double rho) const = 0;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_RIGIDSHAPE_H
+#endif // SURGSIM_PHYSICS_RIGIDSHAPE_H

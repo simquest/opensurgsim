@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_GROUP_H
 #define SURGSIM_GRAPHICS_GROUP_H
 
-#include <SurgSim/Framework/Representation.h>
+#include <SurgSim/Framework/Component.h>
 
 #include <memory>
 #include <vector>
@@ -27,13 +27,13 @@ namespace SurgSim
 namespace Graphics
 {
 
-class Actor;
+class Representation;
 
 /// Base graphics group class, which defines the interface that all graphics groups must implement.
 ///
-/// Graphics::Group allows the organization of Graphics::Actor objects so that different algorithms can operate on
-/// specific sub-sets rather than the entire scene.
-class Group : public SurgSim::Framework::Representation
+/// Graphics::Group allows the organization of Graphics::Representation objects so that different algorithms can
+/// operate on specific sub-sets rather than the entire scene.
+class Group : public SurgSim::Framework::Component
 {
 public:
 	/// Constructor. The group is initially empty.
@@ -51,33 +51,41 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const = 0;
 
-	/// Adds an actor
-	/// \param	actor	Actor to add to this group
-	/// \return	True if the actor is added successfully, false if failure
-	virtual bool add(std::shared_ptr<Actor> actor);
+	/// Adds an representation
+	/// \param	representation	Representation to add to this group
+	/// \return	True if the representation is added successfully, false if failure
+	virtual bool add(std::shared_ptr<Representation> representation);
 
-	/// Adds all actors in another group to this group
-	/// \param	group	Group of actors to add
-	/// \return	True if all actors are added successfully, false if failure
+	/// Adds all representations in another group to this group
+	/// \param	group	Group of representations to add
+	/// \return	True if all representations are added successfully, false if failure
 	virtual bool append(std::shared_ptr<Group> group);
 
-	/// Removes an actor
-	/// \param	actor	Actor to remove from this group
-	/// \return	True if the actor is removed successfully, false if actor is not in this group or other failure
-	virtual bool remove(std::shared_ptr<Actor> actor);
+	/// Removes an representation
+	/// \param	representation	Representation to remove from this group
+	/// \return	True if the representation is removed successfully, false if representation is not in this group or
+	/// other failure
+	virtual bool remove(std::shared_ptr<Representation> representation);
 
-	/// Returns the actors in this group
-	const std::vector<std::shared_ptr<Actor>>& getMembers() const
+	/// Returns the representations in this group
+	const std::vector<std::shared_ptr<Representation>>& getMembers() const
 	{
-		return m_actors;
+		return m_representations;
 	}
 
-	/// Removes all actors
+	/// Removes all representations
 	virtual void clear();
 
 private:
-	/// Actors in this group
-	std::vector<std::shared_ptr<Actor>> m_actors;
+	/// Initialize the component
+	/// \return	True if succeeded, false if failed
+	virtual bool doInitialize();
+	/// Wake up the component
+	/// \return	True if succeeded, false if failed
+	virtual bool doWakeUp();
+
+	/// Representations in this group
+	std::vector<std::shared_ptr<Representation>> m_representations;
 };
 
 };  // namespace Graphics

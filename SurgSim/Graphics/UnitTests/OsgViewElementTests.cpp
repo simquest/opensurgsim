@@ -19,17 +19,10 @@
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
-#include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-
 #include <gtest/gtest.h>
-
-using SurgSim::Framework::Runtime;
-using SurgSim::Framework::Scene;
 
 namespace SurgSim
 {
@@ -44,70 +37,6 @@ TEST(OsgViewElementTests, InitTest)
 
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(viewElement->getView());
 	EXPECT_NE(nullptr, osgView);
-}
-
-TEST(OsgViewElementTests, StartUpTest)
-{
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
-
-	/// Add a graphics component to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("test element");
-	scene->addSceneElement(viewElement);
-
-	/// Set initial position to (50, 60), dimensions to 200 x 100 and disable the window border
-	viewElement->getView()->setPosition(50, 60);
-	viewElement->getView()->setDimensions(200, 100);
-	viewElement->getView()->setWindowBorderEnabled(false);
-
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	/// Get the GraphicsWindow to check that it is updated correctly
-	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(viewElement->getView());
-	ASSERT_NE(nullptr, osgView);
-	osgViewer::GraphicsWindow* osgWindow = dynamic_cast<osgViewer::GraphicsWindow*>(
-		osgView->getOsgView()->getCamera()->getGraphicsContext());
-	ASSERT_NE(nullptr, osgWindow);
-	int testX, testY, testWidth, testHeight;
-
-	/// Window should initially be at (50, 60) and 200 x 100
-	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(50, testX);
-	EXPECT_EQ(60, testY);
-	EXPECT_EQ(200, testWidth);
-	EXPECT_EQ(100, testHeight);
-
-	/// Move the window to (100, 200)
-	viewElement->getView()->setPosition(100, 200);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	/// Check that the window position was updated
-	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(100, testX);
-	EXPECT_EQ(200, testY);
-	EXPECT_EQ(200, testWidth);
-	EXPECT_EQ(100, testHeight);
-
-	/// Resize the window to 400 x 500
-	viewElement->getView()->setDimensions(400, 500);
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	/// Check that the window dimensions were updated
-	osgWindow->getWindowRectangle(testX, testY, testWidth, testHeight);
-	EXPECT_EQ(100, testX);
-	EXPECT_EQ(200, testY);
-	EXPECT_EQ(400, testWidth);
-	EXPECT_EQ(500, testHeight);
-
-	runtime->stop();
 }
 
 TEST(OsgViewElementTests, ViewTest)

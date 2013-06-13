@@ -16,12 +16,12 @@
 #include <SurgSim/Graphics/OsgManager.h>
 
 #include <SurgSim/Framework/Log.h>
-#include <SurgSim/Graphics/OsgActor.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
 
-using SurgSim::Graphics::OsgActor;
+using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
 using SurgSim::Graphics::OsgManager;
@@ -31,6 +31,7 @@ OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 	m_defaultGroup(std::make_shared<OsgGroup>("Default Group"))
 {
 	m_defaultCamera = std::make_shared<OsgCamera>("Default Camera");
+	m_defaultCamera->setGroup(m_defaultGroup);
 }
 
 OsgManager::~OsgManager()
@@ -56,17 +57,17 @@ std::shared_ptr<OsgGroup> OsgManager::getDefaultGroup() const
 	return m_defaultGroup;
 }
 
-bool OsgManager::addActor(std::shared_ptr<SurgSim::Graphics::Actor> actor)
+bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representation> representation)
 {
-	std::shared_ptr<OsgActor> osgActor = std::dynamic_pointer_cast<OsgActor>(actor);
-	if (osgActor && Manager::addActor(osgActor))
+	std::shared_ptr<OsgRepresentation> osgRepresentation = std::dynamic_pointer_cast<OsgRepresentation>(representation);
+	if (osgRepresentation && Manager::addRepresentation(osgRepresentation))
 	{
-		SURGSIM_ASSERT(m_defaultGroup->add(osgActor)) << "Failed to add actor to default group!";
+		SURGSIM_ASSERT(m_defaultGroup->add(osgRepresentation)) << "Failed to add representation to default group!";
 		return true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Actor is not a subclass of OsgActor " << actor->getName();
+		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Representation is not a subclass of OsgRepresentation " << representation->getName();
 		return false;
 	}
 }
@@ -119,7 +120,7 @@ bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 
 bool OsgManager::doInitialize()
 {
-	return addActor(m_defaultCamera) && addGroup(m_defaultGroup);
+	return true;
 }
 
 bool OsgManager::doStartUp()
@@ -129,6 +130,8 @@ bool OsgManager::doStartUp()
 
 bool OsgManager::doUpdate(double dt)
 {
+	m_defaultCamera->update(dt);
+
 	if (Manager::doUpdate(dt))
 	{
 		m_viewer->frame();
@@ -138,4 +141,10 @@ bool OsgManager::doUpdate(double dt)
 	{
 		return false;
 	}
+}
+
+void OsgManager::doBeforeStop()
+{
+	// Delete the viewer so that the graphics context will be released in the manager's thread
+	m_viewer = nullptr;
 }

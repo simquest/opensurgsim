@@ -14,10 +14,7 @@
 # limitations under the License.
 
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-set(LIBS ${LIBS} ${OPENSCENEGRAPH_LIBRARIES})
-
 find_package(OpenThreads)
-set(LIBS ${LIBS} ${OPENTHREADS_LIBRARY})
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
@@ -31,32 +28,49 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgCamera.cpp
 	OsgGroup.cpp
 	OsgManager.cpp
+	OsgPlaneRepresentation.cpp
+	OsgSphereRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	ViewElement.cpp
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
-	Actor.h
+	Representation.h
 	Camera.h
 	Group.h
 	Manager.h
-	OsgActor.h
+	OsgRepresentation.h
 	OsgCamera.h
 	OsgGroup.h
 	OsgManager.h
 	OsgMatrixConversions.h
+	OsgPlane.h
+	OsgPlaneRepresentation.h
 	OsgQuaternionConversions.h
 	OsgRigidTransformConversions.h
+	OsgSphereRepresentation.h
+	OsgUnitSphere.h
 	OsgVectorConversions.h
 	OsgView.h
 	OsgViewElement.h
+	PlaneRepresentation.h
+	SphereRepresentation.h
 	View.h
 	ViewElement.h
 )
 
-add_library(SurgSimGraphics ${SURGSIM_GRAPHICS_SOURCES} ${SURGSIM_GRAPHICS_HEADERS})
+surgsim_add_library(
+	SurgSimGraphics
+	"${SURGSIM_GRAPHICS_SOURCES}"
+	"${SURGSIM_GRAPHICS_HEADERS}"
+	"SurgSim/Graphics"
+)
+target_link_libraries(SurgSimGraphics SurgSimFramework 
+	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+	add_subdirectory(RenderTests)
 endif()

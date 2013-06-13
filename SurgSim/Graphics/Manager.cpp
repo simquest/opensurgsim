@@ -16,12 +16,12 @@
 #include <SurgSim/Graphics/Manager.h>
 
 #include <SurgSim/Framework/Log.h>
-#include <SurgSim/Graphics/Actor.h>
+#include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Graphics/Camera.h>
 #include <SurgSim/Graphics/Group.h>
 #include <SurgSim/Graphics/View.h>
 
-using SurgSim::Graphics::Actor;
+using SurgSim::Graphics::Representation;
 using SurgSim::Graphics::Group;
 using SurgSim::Graphics::Manager;
 using SurgSim::Graphics::View;
@@ -38,10 +38,10 @@ Manager::~Manager()
 bool Manager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	bool result = true;
-	std::shared_ptr<Actor> actor = std::dynamic_pointer_cast<Actor>(component);
-	if (actor != nullptr)
+	std::shared_ptr<Representation> representation = std::dynamic_pointer_cast<Representation>(component);
+	if (representation != nullptr)
 	{
-		result = removeActor(actor);
+		result = removeRepresentation(representation);
 	}
 	std::shared_ptr<Group> group = std::dynamic_pointer_cast<Group>(component);
 	if (group != nullptr)
@@ -59,10 +59,10 @@ bool Manager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> com
 bool Manager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
 {
 	bool result = true;
-	std::shared_ptr<Actor> actor = std::dynamic_pointer_cast<Actor>(component);
-	if (actor != nullptr)
+	std::shared_ptr<Representation> representation = std::dynamic_pointer_cast<Representation>(component);
+	if (representation != nullptr)
 	{
-		result = addActor(actor);
+		result = addRepresentation(representation);
 	}
 	std::shared_ptr<Group> group = std::dynamic_pointer_cast<Group>(component);
 	if (group != nullptr)
@@ -77,18 +77,18 @@ bool Manager::addComponent(std::shared_ptr<SurgSim::Framework::Component> compon
 	return result;
 }
 
-bool Manager::addActor(std::shared_ptr<Actor> actor)
+bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 {
 	bool result = false;
-	if (std::find(m_actors.begin(), m_actors.end(), actor) == m_actors.end())
+	if (std::find(m_representations.begin(), m_representations.end(), representation) == m_representations.end())
 	{
-		m_actors.push_back(actor);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added actor " << actor->getName();
+		m_representations.push_back(representation);
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added representation " << representation->getName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate actor " << actor->getName();
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Duplicate representation " << representation->getName();
 	}
 	return result;
 }
@@ -123,19 +123,19 @@ bool Manager::addView(std::shared_ptr<View> view)
 	return result;
 }
 
-bool Manager::removeActor(std::shared_ptr<Actor> actor)
+bool Manager::removeRepresentation(std::shared_ptr<Representation> representation)
 {
 	bool result = false;
-	auto it = std::find(m_actors.begin(), m_actors.end(), actor);
-	if (it != m_actors.end())
+	auto it = std::find(m_representations.begin(), m_representations.end(), representation);
+	if (it != m_representations.end())
 	{
-		m_actors.erase(it);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed actor " << actor->getName();
+		m_representations.erase(it);
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Removed representation " << representation->getName();
 		result = true;
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Actor not found " << actor->getName();
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Representation not found " << representation->getName();
 	}
 	return result;
 }
@@ -184,7 +184,7 @@ bool Manager::doStartUp()
 
 bool Manager::doUpdate(double dt)
 {
-	for (auto it = m_actors.begin(); it != m_actors.end(); ++it)
+	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
 		(*it)->update(dt);
 	}

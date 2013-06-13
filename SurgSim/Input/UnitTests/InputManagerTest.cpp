@@ -58,14 +58,14 @@ protected:
 class InputManagerTest : public ::testing::Test
 {
 protected:
-	virtual void SetUp() 
+	virtual void SetUp()
 	{
 		testDevice1 = std::make_shared<TestDevice>("TestDevice1");
 		testDevice2 = std::make_shared<TestDevice>("TestDevice2");
-	 
+
 		runtime = std::make_shared<Runtime>();
 		inputManager = std::make_shared<InputManager>();
-	 
+
 		runtime->addManager(inputManager);
 		runtime->start();
 

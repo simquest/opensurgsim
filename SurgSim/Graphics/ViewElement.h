@@ -29,23 +29,23 @@ class View;
 
 /// Basic SceneElement that wraps a View so that it can be added to the Scene.
 ///
-/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Actor objects to be shown.
+/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Representation objects to be shown.
 class ViewElement : public Framework::SceneElement
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the scene element
-	/// \param	view	View component that provides the visualization of the graphics actors
+	/// \param	view	View component that provides the visualization of the graphics representations
 	ViewElement(const std::string& name, std::shared_ptr<SurgSim::Graphics::View> view);
 
 	/// Destructor
 	virtual ~ViewElement();
 
-	/// Sets the view component that provides the visualization of the graphics actors
+	/// Sets the view component that provides the visualization of the graphics representations
 	/// \return	True if it succeeds, false if it fails
 	virtual bool setView(std::shared_ptr<View> view);
 
-	/// Returns the view component that provides the visualization of the graphics actors
+	/// Returns the view component that provides the visualization of the graphics representations
 	std::shared_ptr<View> getView() const
 	{
 		return m_view;
@@ -61,7 +61,7 @@ private:
 	/// \return True if it succeeds, false if it fails
 	virtual bool doWakeUp();
 
-	/// View component that provides the visualization of the graphics actors
+	/// View component that provides the visualization of the graphics representations
 	std::shared_ptr<View> m_view;
 };
 

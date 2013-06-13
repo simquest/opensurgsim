@@ -19,7 +19,7 @@
 #include <memory>
 #include <list>
 #include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/RigidActor.h>
+#include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
 
 namespace SurgSim
@@ -34,30 +34,52 @@ namespace Physics
 /// zero. This means that the normal vector points "in" to body 1
 struct Contact {
 	double depth;						///< What is the penetration depth for the representation
-	SurgSim::Math::Vector3d contact;	///< The actual contact point
-	SurgSim::Math::Vector3d normal;		///< The normal on the contact point (norapmalized)
+	SurgSim::Math::Vector3d contact;	///< The actual contact point, only used for CCD
+	SurgSim::Math::Vector3d normal;		///< The normal on the contact point (normalized)
 };
 
 /// Collision Pair class, it signifies a pair of items that should be checked with the
 /// collision algorithm, this structure will be used for input as well as output, as contacts
-/// get appended to the contacts list when found
+/// get appended to the contacts list when found.
+/// \note When used in a ReuseFactory, please note that contained contacts won't get deallocated
+/// 	  until the next use, which might not be until the end of the program
 class CollisionPair
 {
 public:
 
+	/// Default constructor needed for ReuseFactory
+	CollisionPair() {}
+
+	/// Normal constructor
 	CollisionPair(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second);
+
+	/// Destructor
 	~CollisionPair();
+
+	/// Sets the representations in this pair, representations cannot be the same instance and neither can be nullptr.
+	/// \param	first 	The first CollisionRepresenation.
+	/// \param	second	The second CollisionRepresentation.
+	inline void setRepresentations(std::shared_ptr<CollisionRepresentation> first, std::shared_ptr<CollisionRepresentation> second)
+	{
+		SURGSIM_ASSERT(first != second) << "Should try to collide with self";
+		SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
+
+		// Invalidate the current contacts
+		clearContacts();
+		m_first = first;
+		m_second = second;
+	}
 
 	/// \return The representation considered to be the first
 	inline std::shared_ptr<CollisionRepresentation> getFirst() const
 	{
-		return m_representations.first;
+		return m_first;
 	}
 
-	/// \return The represenation considered to be the first
+	/// \return The representation considered to be the second
 	inline std::shared_ptr<CollisionRepresentation> getSecond() const
 	{
-		return m_representations.second;
+		return m_second;
 	}
 
 	/// \return true if there are any contacts assigned to the pair, false otherwise
@@ -73,7 +95,29 @@ public:
 	inline void addContact(const double& depth, SurgSim::Math::Vector3d contactPoint, SurgSim::Math::Vector3d normal)
 	{
 		Contact contact = {depth,contactPoint,normal};
-		m_contacts.push_back(std::move(contact));
+		m_contacts.push_back(std::make_shared<Contact>(contact));
+	}
+
+	/// Adds a contact to the collision pair.
+	/// \param	depth			The depth of the intersection.
+	/// \param	normal			The normal of the contact pointing into the first representation.
+	inline void addContact(const double& depth, SurgSim::Math::Vector3d normal)
+	{
+		Contact contact = {depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal};
+		m_contacts.push_back(std::make_shared<Contact>(contact));
+	}
+
+	/// Adds a contact.
+	/// \param	contact	The contact between the first and the second representation.
+	inline void addContact(std::shared_ptr<Contact> contact)
+	{
+		m_contacts.push_back(contact);
+	}
+
+	/// \return	All the contacts.
+	const std::list<std::shared_ptr<Contact>>& getContacts()
+	{
+		return m_contacts;
 	}
 
 	/// Reset clear the list of contacts, invalidating all the contacts
@@ -82,10 +126,11 @@ public:
 private:
 
 	/// Pair of objects that are colliding
-	std::pair <std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>> m_representations;
+	std::shared_ptr<CollisionRepresentation> m_first;
+	std::shared_ptr<CollisionRepresentation> m_second;
 
 	/// List of current contacts
-	std::list <Contact> m_contacts;
+	std::list<std::shared_ptr<Contact>> m_contacts;
 };
 
 

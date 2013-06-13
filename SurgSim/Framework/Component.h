@@ -94,6 +94,7 @@ private:
 	bool m_didWakeUp;
 };
 
-}
-}
-#endif
+}; // namespace Framework
+}; // namespace SurgSim
+
+#endif // SURGSIM_FRAMEWORK_COMPONENT_H

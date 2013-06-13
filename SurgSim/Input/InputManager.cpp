@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "InputManager.h"
+#include "SurgSim/Input/InputManager.h"
 
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Framework/Runtime.h>
 
-#include "InputComponent.h"
+#include "SurgSim/Input/InputComponent.h"
 
 namespace SurgSim
 {

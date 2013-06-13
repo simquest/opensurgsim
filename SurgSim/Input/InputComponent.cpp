@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "InputComponent.h"
+#include "SurgSim/Input/InputComponent.h"
+
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Input/DeviceInterface.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
@@ -42,7 +43,7 @@ public:
 
 	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData)
 	{
-		SURGSIM_ASSERT(initialData.isValid()) 
+		SURGSIM_ASSERT(initialData.isValid())
 			<< "Cannot initialize input with invalid data from device (" << device << ")";
 		m_lastInput.set(initialData);
 	}

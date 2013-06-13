@@ -35,8 +35,9 @@ namespace Framework
 namespace Physics
 {
 
-class Actor;
+class Representation;
 class FreeMotion;
+class DcdCollision;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -44,7 +45,7 @@ class PhysicsManager : public SurgSim::Framework::ComponentManager
 {
 public:
 
-	/// Condstructor
+	/// Constructor
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
@@ -57,7 +58,7 @@ public:
 protected:
 
 	///@{
-	/// Overriden from ComponentManager
+	/// Overridden from ComponentManager
 	virtual bool doInitialize();
 	virtual bool doStartUp();
 	virtual bool doUpdate(double dt);
@@ -80,12 +81,13 @@ protected:
 
 private:
 
-	std::shared_ptr< std::vector<std::shared_ptr<Actor>> > m_actors;
+	std::vector<std::shared_ptr<Representation>> m_representations;
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	///@{
 	/// Steps to perform the physics update
 	std::unique_ptr<FreeMotion> m_freeMotionStep;
+	std::unique_ptr<DcdCollision> m_dcdCollision;
 	///@}
 
 };

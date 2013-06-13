@@ -26,9 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Cylinder shape: centered on (0 0 0) defined with length and radius
-/// \tparam direction The direction of the cylinder {X, Y, Z}
-template <ShapeDirection direction>
+/// Cylinder shape: centered on (0 0 0), aligned along Y,
+/// defined with length and radius.
 class CylinderShape: public RigidShape
 {
 public:
@@ -89,7 +88,7 @@ public:
 		Matrix33d inertia;
 		inertia.setZero();
 		inertia.diagonal().setConstant(coef * (3.0 * squareRadius + squareL));
-		inertia(direction, direction) = coefDir * (squareRadius);
+		inertia(1, 1) = coefDir * (squareRadius);
 
 		return inertia;
 	}
@@ -102,8 +101,8 @@ private:
 	double   m_length;
 };
 
-}; /// Physics
+}; // Physics
 
-}; /// SurgSim
+}; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_CYLINDERSHAPE_H
+#endif // SURGSIM_PHYSICS_CYLINDERSHAPE_H

@@ -15,24 +15,24 @@
 
 #include <SurgSim/Graphics/Group.h>
 
-#include <SurgSim/Graphics/Actor.h>
+#include <SurgSim/Graphics/Representation.h>
 
-using SurgSim::Graphics::Actor;
+using SurgSim::Graphics::Representation;
 using SurgSim::Graphics::Group;
 
-Group::Group(const std::string& name) : SurgSim::Framework::Representation(name)
+Group::Group(const std::string& name) : SurgSim::Framework::Component(name)
 {
 }
 Group::~Group()
 {
 }
 
-bool Group::add(std::shared_ptr<Actor> actor)
+bool Group::add(std::shared_ptr<Representation> representation)
 {
 	bool result = false;
-	if (std::find(m_actors.begin(), m_actors.end(), actor) == m_actors.end())
+	if (std::find(m_representations.begin(), m_representations.end(), representation) == m_representations.end())
 	{
-		m_actors.push_back(actor);
+		m_representations.push_back(representation);
 		result = true;
 	}
 	return result;
@@ -41,7 +41,7 @@ bool Group::add(std::shared_ptr<Actor> actor)
 bool Group::append(std::shared_ptr<Group> group)
 {
 	bool result = true;
-	const std::vector<std::shared_ptr<Actor>>& members = group->getMembers();
+	const std::vector<std::shared_ptr<Representation>>& members = group->getMembers();
 	for (auto it = members.begin(); it != members.end(); ++it)
 	{
 		if (! add(*it))
@@ -52,13 +52,13 @@ bool Group::append(std::shared_ptr<Group> group)
 	return result;
 }
 
-bool Group::remove(std::shared_ptr<Actor> actor)
+bool Group::remove(std::shared_ptr<Representation> representation)
 {
 	bool result = false;
-	auto it = std::find(m_actors.begin(), m_actors.end(), actor);
-	if (it != m_actors.end())
+	auto it = std::find(m_representations.begin(), m_representations.end(), representation);
+	if (it != m_representations.end())
 	{
-		m_actors.erase(it);
+		m_representations.erase(it);
 		result = true;
 	}
 	return result;
@@ -66,5 +66,15 @@ bool Group::remove(std::shared_ptr<Actor> actor)
 
 void Group::clear()
 {
-	m_actors.clear();
+	m_representations.clear();
+}
+
+bool Group::doInitialize()
+{
+	return true;
+}
+
+bool Group::doWakeUp()
+{
+	return true;
 }

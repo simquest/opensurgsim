@@ -77,8 +77,8 @@ void SurgSim::Framework::BasicThread::operator()()
 	m_stopExecution = false;
 
 	success = initialize();
-	SURGSIM_ASSERT(success) << "Initialisation has failed for thread " << getName();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Initialisation has succeeded for thread " << getName();
+	SURGSIM_ASSERT(success) << "Initialization has failed for thread " << getName();
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Initialization has succeeded for thread " << getName();
 	// Waits for all the threads to init and then proceeds
 	// If one of the other thread asserts and ends this does not matter
 	// as the process will be taken down
@@ -131,6 +131,12 @@ void SurgSim::Framework::BasicThread::operator()()
 		m_isRunning = doUpdate(m_period.count());
 		frameTime = boost::chrono::steady_clock::now() - start;
 	}
+
+	if (m_stopExecution)
+	{
+		doBeforeStop();
+	}
+
 	m_isRunning = false;
 	m_stopExecution = false;
 }
@@ -149,4 +155,7 @@ std::string SurgSim::Framework::BasicThread::getName() const
 	return m_name;
 }
 
+void SurgSim::Framework::BasicThread::doBeforeStop()
+{
+}
 
