@@ -32,11 +32,9 @@
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Framework/Log.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector3f;
@@ -118,7 +116,7 @@ SixenseScaffold::~SixenseScaffold()
 {
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		
+
 		if (m_state->thread)
 		{
 			destroyThread();
@@ -170,13 +168,13 @@ bool SixenseScaffold::registerDevice(SixenseDevice* device)
 		//
 		// Another is to simply sleep and retry a few times here.  Ugh.
 		// --advornik 2012-08-03
-		boost::chrono::steady_clock::time_point retryEnd = tick +
-			boost::chrono::milliseconds(m_startupDelayMilliseconds);
+		boost::chrono::steady_clock::time_point retryEnd =
+			tick + boost::chrono::milliseconds(m_startupDelayMilliseconds);
 		while (true)
 		{
 			tick += boost::chrono::milliseconds(m_startupRetryIntervalMilliseconds);
 			boost::this_thread::sleep_until(tick);
-			tick = boost::chrono::steady_clock::now();  // if findUnusedDeviceAndRegister() takes > 100ms, fix up the time.
+			tick = boost::chrono::steady_clock::now();  // finding a device may take > 100ms, so fix up the time.
 
 			deviceFound = findUnusedDeviceAndRegister(device, &numUsedDevicesSeen, &fatalError);
 			if (deviceFound || fatalError || (numUsedDevicesSeen > 0) || (tick >= retryEnd))
@@ -354,7 +352,7 @@ bool SixenseScaffold::findUnusedDeviceAndRegister(SixenseDevice* device, int* nu
 		*fatalError = true;
 		return false;
 	}
-	
+
 	const int maxNumBases = sixenseGetMaxBases();
 
 	for (int b = 0;  b < maxNumBases;  ++b)
@@ -471,7 +469,8 @@ SurgSim::DataStructures::DataGroup SixenseScaffold::buildDeviceInputData()
 std::shared_ptr<SixenseScaffold> SixenseScaffold::getOrCreateSharedInstance()
 {
 	// Using an explicit creation function gets around problems with accessing the private constructor.
-	static auto creator = []() { return std::shared_ptr<SixenseScaffold>(new SixenseScaffold); };
+	static auto creator =
+		[]() { return std::shared_ptr<SixenseScaffold>(new SixenseScaffold); };  // NOLINT(readability/braces)
 	static SurgSim::Framework::SharedInstance<SixenseScaffold> sharedInstance(creator);
 	return sharedInstance.get();
 }

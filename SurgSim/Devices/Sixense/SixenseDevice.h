@@ -58,8 +58,8 @@ public:
 	/// \param baseIndex Index of the base unit this controller is connected to.
 	/// \param controllerIndex Index of this controller within its base unit.
 	/// \param logger The logger used for diagnostic messages.
-	SixenseDevice(const std::string& uniqueName);
-	
+	explicit SixenseDevice(const std::string& uniqueName);
+
 	/// Destructor.
 	virtual ~SixenseDevice();
 

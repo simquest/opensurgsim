@@ -106,7 +106,7 @@ public:
 		m_instanceCreator([]() { return std::make_shared<T>(); })
 	{
 	}
-	
+
 	/// Create the SharedInstance object used to manage the shared instance.
 	/// Note that this <em>does not</em> immediately create the instance itself.
 	/// If and when the shared instance is created, it will be initialized using the creator call.

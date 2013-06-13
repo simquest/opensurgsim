@@ -15,9 +15,6 @@
 
 #include "SurgSim/Devices/Sixense/SixenseDevice.h"
 
-#include <iostream>
-#include <iomanip>
-
 #include <sixense.h>
 
 #include "SurgSim/Devices/Sixense/SixenseScaffold.h"

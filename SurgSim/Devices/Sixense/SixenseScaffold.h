@@ -63,12 +63,11 @@ private:
 
 	friend class SixenseDevice;
 	friend class SixenseThread;
-	
+
 	/// Constructor.
 	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
 	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger =
-	                            std::shared_ptr<SurgSim::Framework::Logger>());
+	explicit SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
 
 	/// Registers the specified device object.
 	/// If successful, the device object will become connected to an unused controller.
