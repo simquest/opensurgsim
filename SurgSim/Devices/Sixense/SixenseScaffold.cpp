@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Sixense/SixenseManager.h"
+#include "SurgSim/Devices/Sixense/SixenseScaffold.h"
 
 #include <vector>
 #include <list>
@@ -51,7 +51,7 @@ namespace Device
 {
 
 
-struct SixenseManager::DeviceData
+struct SixenseScaffold::DeviceData
 {
 public:
 	/// Initialize the data.
@@ -75,7 +75,7 @@ private:
 	DeviceData& operator=(const DeviceData&);
 };
 
-struct SixenseManager::StateData
+struct SixenseScaffold::StateData
 {
 public:
 	/// Initialize the state.
@@ -102,7 +102,7 @@ private:
 };
 
 
-SixenseManager::SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logger) :
+SixenseScaffold::SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
 	m_logger(logger), m_state(new StateData)
 {
 	if (! m_logger)
@@ -110,11 +110,11 @@ SixenseManager::SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logge
 		m_logger = SurgSim::Framework::Logger::createConsoleLogger("Sixense/Hydra device");
 		m_logger->setThreshold(m_defaultLogLevel);
 	}
-	SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: Created.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: Shared scaffold created.";
 }
 
 
-SixenseManager::~SixenseManager()
+SixenseScaffold::~SixenseScaffold()
 {
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
@@ -126,7 +126,7 @@ SixenseManager::~SixenseManager()
 
 		if (! m_state->activeDeviceList.empty())
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Destroying manager while devices are active!?!";
+			SURGSIM_LOG_SEVERE(m_logger) << "Sixense/Hydra: Destroying scaffold while devices are active!?!";
 			// do anything special with each device?
 			m_state->activeDeviceList.clear();
 		}
@@ -136,11 +136,11 @@ SixenseManager::~SixenseManager()
 			finalizeSdk();
 		}
 	}
-	SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: Destroyed.";
+	SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: Shared scaffold destroyed.";
 }
 
 
-bool SixenseManager::registerDevice(SixenseDevice* device)
+bool SixenseScaffold::registerDevice(SixenseDevice* device)
 {
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
@@ -191,15 +191,15 @@ bool SixenseManager::registerDevice(SixenseDevice* device)
 		if (fatalError)
 		{
 			// error information was hopefully already logged
-			SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: Registering device failed due to earlier fatal error.";
+			SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: Registering device failed due to earlier fatal error.";
 		}
 		else if (numUsedDevicesSeen > 0)
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Failed to find any unused controllers!";
+			SURGSIM_LOG_SEVERE(m_logger) << "Sixense/Hydra: Failed to find any unused controllers!";
 		}
 		else
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Failed to find any devices." <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Sixense/Hydra: Failed to find any devices." <<
 				"  Are the base and controllers plugged in?";
 		}
 		return false;
@@ -209,7 +209,7 @@ bool SixenseManager::registerDevice(SixenseDevice* device)
 }
 
 
-bool SixenseManager::unregisterDevice(const SixenseDevice* const device)
+bool SixenseScaffold::unregisterDevice(const SixenseDevice* const device)
 {
 	bool found = false;
 	{
@@ -226,12 +226,12 @@ bool SixenseManager::unregisterDevice(const SixenseDevice* const device)
 
 	if (! found)
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "SixenseManager: Attempted to release non-registered device.";
+		SURGSIM_LOG_WARNING(m_logger) << "Sixense/Hydra: Attempted to release a non-registered device.";
 	}
 	return found;
 }
 
-bool SixenseManager::runInputFrame()
+bool SixenseScaffold::runInputFrame()
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -247,7 +247,7 @@ bool SixenseManager::runInputFrame()
 	return true;
 }
 
-bool SixenseManager::updateDevice(const SixenseManager::DeviceData& info)
+bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 {
 	//const SurgSim::DataStructures::DataGroup& outputData = info.deviceObject->getOutputData();
 	SurgSim::DataStructures::DataGroup& inputData = info.deviceObject->getInputData();
@@ -256,8 +256,8 @@ bool SixenseManager::updateDevice(const SixenseManager::DeviceData& info)
 	if (status != SIXENSE_SUCCESS)
 
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Device " << info.deviceObject->getName() << ": Could not activate" <<
-			" base unit #" << info.deviceBaseIndex << " for existing device! (status = " << status << ")";
+		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Could not activate base unit #" << info.deviceBaseIndex <<
+			" to read device '" << info.deviceObject->getName() << "'! (status = " << status << ")";
 		return false;
 	}
 
@@ -265,9 +265,9 @@ bool SixenseManager::updateDevice(const SixenseManager::DeviceData& info)
 	status = sixenseGetNewestData(info.deviceControllerIndex, &data);
 	if (status != SIXENSE_SUCCESS)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Device " << info.deviceObject->getName() << ": Could not get data from" <<
-			" controller #" << info.deviceBaseIndex << "," << info.deviceControllerIndex <<
-			" for existing device! (status = " << status << ")";
+		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Could not get data from controller #" <<
+			info.deviceBaseIndex << "," << info.deviceControllerIndex << " for device '" <<
+			info.deviceObject->getName() << "'! (status = " << status << ")";
 		return false;
 	}
 
@@ -298,14 +298,14 @@ bool SixenseManager::updateDevice(const SixenseManager::DeviceData& info)
 	return true;
 }
 
-bool SixenseManager::initializeSdk()
+bool SixenseScaffold::initializeSdk()
 {
 	SURGSIM_ASSERT(! m_state->isApiInitialized);
 
 	int status = sixenseInit();
 	if (status != SIXENSE_SUCCESS)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "SixenseManager: Could not initialize the Sixense library (status = " <<
+		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Could not initialize the Sixense library (status = " <<
 			status << ")";
 		return false;
 	}
@@ -314,14 +314,14 @@ bool SixenseManager::initializeSdk()
 	return true;
 }
 
-bool SixenseManager::finalizeSdk()
+bool SixenseScaffold::finalizeSdk()
 {
 	SURGSIM_ASSERT(m_state->isApiInitialized);
 
 	int status = sixenseExit();
 	if (status != SIXENSE_SUCCESS)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "SixenseManager: Could not shut down the Sixense library (status = " <<
+		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Could not shut down the Sixense library (status = " <<
 			status << ")";
 		return false;
 	}
@@ -330,7 +330,7 @@ bool SixenseManager::finalizeSdk()
 	return true;
 }
 
-bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* numUsedDevicesSeen, bool* fatalError)
+bool SixenseScaffold::findUnusedDeviceAndRegister(SixenseDevice* device, int* numUsedDevicesSeen, bool* fatalError)
 {
 	*numUsedDevicesSeen = 0;
 	*fatalError = false;
@@ -349,7 +349,8 @@ bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* num
 		[&deviceName](const DeviceData& info) { return info.deviceObject->getName() == deviceName; });
 	if (sameName != m_state->activeDeviceList.end())
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "SixenseManager: Two devices would share the same name!";
+		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Tried to register a device when the same name is" <<
+			" already present!";
 		*fatalError = true;
 		return false;
 	}
@@ -358,7 +359,7 @@ bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* num
 
 	for (int b = 0;  b < maxNumBases;  ++b)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: scanning base #" << b << " (of total " << maxNumBases << ")";
+		SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: scanning base #" << b << " (of total " << maxNumBases << ")";
 		if (! sixenseIsBaseConnected(b))
 		{
 			continue;
@@ -367,7 +368,7 @@ bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* num
 		int status = sixenseSetActiveBase(b);
 		if (status != SIXENSE_SUCCESS)
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Could not activate connected base #" << b <<
+			SURGSIM_LOG_SEVERE(m_logger) << "Sixense/Hydra: Could not activate connected base #" << b <<
 				" (status = " << status << ")";
 			continue;
 		}
@@ -384,12 +385,12 @@ bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* num
 			status = sixenseGetNewestData(c, &data);
 			if (status != SIXENSE_SUCCESS)
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << "SixenseManager: Could not get data from enabled controller #" <<
+				SURGSIM_LOG_SEVERE(m_logger) << "Sixense/Hydra: Could not get data from enabled controller #" <<
 					b << "," << c << " (status = " << status << ")";
 				continue;
 			}
 
-			SURGSIM_LOG_DEBUG(m_logger) << "SixenseManager: found controller #" << b << "," << c <<
+			SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: scanning controller #" << b << "," << c <<
 				" (of total " << maxNumControllers << ")";
 
 			if (registerIfUnused(b, c, device, numUsedDevicesSeen))
@@ -402,7 +403,7 @@ bool SixenseManager::findUnusedDeviceAndRegister(SixenseDevice* device, int* num
 	return false;
 }
 
-bool SixenseManager::registerIfUnused(int baseIndex, int controllerIndex, SixenseDevice* device,
+bool SixenseScaffold::registerIfUnused(int baseIndex, int controllerIndex, SixenseDevice* device,
 									  int* numUsedDevicesSeen)
 {
 	// Check existing devices.
@@ -427,7 +428,7 @@ bool SixenseManager::registerIfUnused(int baseIndex, int controllerIndex, Sixens
 	return true;
 }
 
-bool SixenseManager::createThread()
+bool SixenseScaffold::createThread()
 {
 	SURGSIM_ASSERT(! m_state->thread);
 
@@ -438,7 +439,7 @@ bool SixenseManager::createThread()
 	return true;
 }
 
-bool SixenseManager::destroyThread()
+bool SixenseScaffold::destroyThread()
 {
 	SURGSIM_ASSERT(m_state->thread);
 
@@ -449,7 +450,7 @@ bool SixenseManager::destroyThread()
 	return true;
 }
 
-SurgSim::DataStructures::DataGroup SixenseManager::buildDeviceInputData()
+SurgSim::DataStructures::DataGroup SixenseScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addPose("pose");
@@ -467,23 +468,23 @@ SurgSim::DataStructures::DataGroup SixenseManager::buildDeviceInputData()
 	return builder.createData();
 }
 
-std::shared_ptr<SixenseManager> SixenseManager::getOrCreateSharedInstance()
+std::shared_ptr<SixenseScaffold> SixenseScaffold::getOrCreateSharedInstance()
 {
 	// Using an explicit creation function gets around problems with accessing the private constructor.
-	static auto creator = []() { return std::shared_ptr<SixenseManager>(new SixenseManager); };
-	static SurgSim::Framework::SharedInstance<SixenseManager> sharedInstance(creator);
+	static auto creator = []() { return std::shared_ptr<SixenseScaffold>(new SixenseScaffold); };
+	static SurgSim::Framework::SharedInstance<SixenseScaffold> sharedInstance(creator);
 	return sharedInstance.get();
 }
 
-void SixenseManager::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
+void SixenseScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 {
 	m_defaultLogLevel = logLevel;
 }
 
-SurgSim::Framework::LogLevel SixenseManager::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
+SurgSim::Framework::LogLevel SixenseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
-int SixenseManager::m_startupDelayMilliseconds = 5000;
-int SixenseManager::m_startupRetryIntervalMilliseconds = 100;
+int SixenseScaffold::m_startupDelayMilliseconds = 5000;
+int SixenseScaffold::m_startupRetryIntervalMilliseconds = 100;
 
 
 

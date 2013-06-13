@@ -21,7 +21,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	SixenseDeviceTest.cpp
-	SixenseManagerTest.cpp
+	SixenseScaffoldTest.cpp
 )
 
 set(UNIT_TEST_HEADERS

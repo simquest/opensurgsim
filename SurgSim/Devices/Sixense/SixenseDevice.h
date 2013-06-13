@@ -25,7 +25,7 @@ namespace SurgSim
 {
 namespace Device
 {
-class SixenseManager;
+class SixenseScaffold;
 
 
 /// A class implementing the communication with one Sixense controller, for example one of the two on the Razer Hydra.
@@ -48,7 +48,7 @@ class SixenseManager;
 ///
 /// \par Application output used by the device: none.
 ///
-/// \sa SurgSim::Device::SixenseManager, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
+/// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class SixenseDevice : public SurgSim::Input::CommonDevice
 {
 public:
@@ -71,9 +71,9 @@ public:
 	bool isInitialized() const;
 
 private:
-	friend class SixenseManager;
+	friend class SixenseScaffold;
 
-	std::shared_ptr<SixenseManager> m_manager;
+	std::shared_ptr<SixenseScaffold> m_scaffold;
 };
 
 };  // namespace Device

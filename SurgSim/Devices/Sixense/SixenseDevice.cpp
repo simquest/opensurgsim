@@ -20,7 +20,7 @@
 
 #include <sixense.h>
 
-#include "SurgSim/Devices/Sixense/SixenseManager.h"
+#include "SurgSim/Devices/Sixense/SixenseScaffold.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Assert.h"
 
@@ -32,7 +32,7 @@ namespace Device
 
 
 SixenseDevice::SixenseDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, SixenseManager::buildDeviceInputData())
+	SurgSim::Input::CommonDevice(uniqueName, SixenseScaffold::buildDeviceInputData())
 {
 }
 
@@ -49,32 +49,32 @@ SixenseDevice::~SixenseDevice()
 bool SixenseDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<SixenseManager> manager = SixenseManager::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(manager);
+	std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold);
 
-	if (! manager->registerDevice(this))
+	if (! scaffold->registerDevice(this))
 	{
 		return false;
 	}
 
-	m_manager = std::move(manager);
-	SURGSIM_LOG_INFO(m_manager->getLogger()) << "Device " << getName() << ": " << "Initialized.";
+	m_scaffold = std::move(scaffold);
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
 	return true;
 }
 
 bool SixenseDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_DEBUG(m_manager->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
-	bool ok = m_manager->unregisterDevice(this);
-	m_manager.reset();
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	bool ok = m_scaffold->unregisterDevice(this);
+	m_scaffold.reset();
 	return ok;
 }
 
 
 bool SixenseDevice::isInitialized() const
 {
-	return (m_manager != nullptr);
+	return (m_scaffold != nullptr);
 }
 
 

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_SIXENSEMANAGER_H
-#define SURGSIM_DEVICE_SIXENSEMANAGER_H
+#ifndef SURGSIM_DEVICE_SIXENSESCAFFOLD_H
+#define SURGSIM_DEVICE_SIXENSESCAFFOLD_H
 
 #include <memory>
 
@@ -32,11 +32,11 @@ class SixenseThread;
 /// A class that manages Sixense devices, such as the Razer Hydra.
 ///
 /// \sa SurgSim::Device::SixenseDevice
-class SixenseManager
+class SixenseScaffold
 {
 public:
 	/// Destructor.
-	~SixenseManager();
+	~SixenseScaffold();
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
@@ -45,13 +45,13 @@ public:
 		return m_logger;
 	}
 
-	/// Gets or creates the manager shared by all SixenseDevice instances.
-	/// The manager is managed using a SingleInstance object, so it will be destroyed when all devices are released.
-	/// \return the manager object.
-	static std::shared_ptr<SixenseManager> getOrCreateSharedInstance();
+	/// Gets or creates the scaffold shared by all SixenseDevice instances.
+	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
+	/// \return the scaffold object.
+	static std::shared_ptr<SixenseScaffold> getOrCreateSharedInstance();
 
 	/// Sets the default log level.
-	/// Must be called before a manager is created (i.e. before the first device) in order to have any effect.
+	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
 	/// \param logLevel The log level.
 	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
@@ -65,9 +65,9 @@ private:
 	friend class SixenseThread;
 	
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the manager object and the devices it manages.
+	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
 	/// 			  If unspecified or empty, a console logger will be created and used.
-	explicit SixenseManager(std::shared_ptr<SurgSim::Framework::Logger> logger =
+	explicit SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger =
 	                            std::shared_ptr<SurgSim::Framework::Logger>());
 
 	/// Registers the specified device object.
@@ -136,9 +136,9 @@ private:
 
 
 
-	/// Logger used by the manager and all devices.
+	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	/// Internal manager state.
+	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
 
 	/// The default logging level.
@@ -152,4 +152,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif // SURGSIM_DEVICE_SIXENSEMANAGER_H
+#endif // SURGSIM_DEVICE_SIXENSESCAFFOLD_H

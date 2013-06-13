@@ -15,7 +15,7 @@
 
 #include "SurgSim/Devices/Sixense/SixenseThread.h"
 
-#include <SurgSim/Devices/Sixense/SixenseManager.h>
+#include <SurgSim/Devices/Sixense/SixenseScaffold.h>
 
 namespace SurgSim
 {
@@ -28,7 +28,7 @@ SixenseThread::~SixenseThread()
 
 bool SixenseThread::doUpdate(double dt)
 {
-	m_manager->runInputFrame();
+	m_scaffold->runInputFrame();
 	return true;
 }
 

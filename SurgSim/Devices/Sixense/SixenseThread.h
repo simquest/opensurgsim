@@ -26,16 +26,16 @@ namespace SurgSim
 namespace Device
 {
 
-class SixenseManager;
+class SixenseScaffold;
 
 /// A class implementing the thread context for sampling Sixense devices.
-/// \sa SurgSim::Device::SixenseManager
+/// \sa SurgSim::Device::SixenseScaffold
 class SixenseThread : public SurgSim::Framework::BasicThread
 {
 public:
-	explicit SixenseThread(SixenseManager* manager) :
+	explicit SixenseThread(SixenseScaffold* scaffold) :
 		BasicThread("Sixense thread"),
-		m_manager(manager)
+		m_scaffold(scaffold)
 	{
 		setRate(120.0);  // The Hydra runs at 60Hz, but running at 60Hz here could introduce up to 16.6ms extra latency
 	}
@@ -55,7 +55,7 @@ protected:
 	virtual bool doUpdate(double dt) override;
 
 private:
-	SixenseManager* m_manager;
+	SixenseScaffold* m_scaffold;
 };
 
 };  // namespace Device

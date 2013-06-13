@@ -28,13 +28,13 @@ include_directories(
 
 set(SIXENSE_DEVICE_SOURCES
 	SixenseDevice.cpp
-	SixenseManager.cpp
+	SixenseScaffold.cpp
 	SixenseThread.cpp
 )
 
 set(SIXENSE_DEVICE_HEADERS
 	SixenseDevice.h
-	SixenseManager.h
+	SixenseScaffold.h
 	SixenseThread.h
 )
 
