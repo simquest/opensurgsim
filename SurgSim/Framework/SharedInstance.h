@@ -95,10 +95,23 @@ template <typename T>
 class SharedInstance
 {
 public:
+	/// A type that can hold a function object or lambda that takes no arguments and returns std::shared_ptr<T>.
+	typedef std::function<std::shared_ptr<T>()> InstanceCreator;
+
 	/// Create the SharedInstance object used to manage the shared instance.
 	/// Note that this <em>does not</em> immediately create the instance itself.
-	/// If and when the shared instance is created, it will be initialized using the default constructor.
-	SharedInstance()
+	/// If and when the shared instance is created, it will be initialized using the default constructor via
+	/// std::make_shared.
+	SharedInstance() :
+		m_instanceCreator([]() { return std::make_shared<T>(); })
+	{
+	}
+	
+	/// Create the SharedInstance object used to manage the shared instance.
+	/// Note that this <em>does not</em> immediately create the instance itself.
+	/// If and when the shared instance is created, it will be initialized using the creator call.
+	explicit SharedInstance(const InstanceCreator& instanceCreator) :
+		m_instanceCreator(instanceCreator)
 	{
 	}
 
@@ -127,9 +140,6 @@ public:
 	}
 
 private:
-	// /// A type that can hold a function or lambda that takes no arguments and returns std::shared_ptr<T>.
-	// typedef std::function<std::shared_ptr<T>()> TypeCreator;
-
 	/// Prevent copying
 	SharedInstance(const SharedInstance&);
 	/// Prevent assignment
@@ -137,11 +147,13 @@ private:
 
 	std::shared_ptr<T> createInstance()
 	{
-		std::shared_ptr<T> instance = std::make_shared<T>();
+		std::shared_ptr<T> instance = m_instanceCreator();
 		SURGSIM_ASSERT(instance);
 		return std::move(instance);
 	}
 
+	/// A creator function used to construct the shared instance.
+	InstanceCreator m_instanceCreator;
 
 	/// A weak reference to the shared instance, if any.
 	std::weak_ptr<T> m_weakInstance;
