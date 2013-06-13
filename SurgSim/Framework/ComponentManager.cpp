@@ -166,6 +166,8 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 		{
 			if ( !(*it)->wakeUp())
 			{
+				SURGSIM_LOG_WARNING(m_logger) << "Failed to wake up component " << (*it)->getName() << " in manager " <<
+					getName() << ". Component was not added to the manager!";
 				doRemoveComponent(*it);
 			}
 		}
