@@ -23,6 +23,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	FemRepresentationParameters.cpp
 	FreeMotion.cpp
+	Localization.cpp
 	PhysicsManager.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
@@ -40,7 +41,9 @@ set(SURGSIM_PHYSICS_HEADERS
 	DcdCollision.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
+	FixedRepresentationLocalization.h
 	FreeMotion.h
+	Localization.h
 	MeshShape.h
 	PhysicsManager.h
 	PhysicsManager-inl.h
@@ -51,6 +54,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBaseState.h
+	RigidRepresentationFixedLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	RigidShape.h
