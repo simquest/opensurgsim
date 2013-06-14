@@ -196,7 +196,7 @@ TEST(ViewElementTests, StartUpTest)
 	/// Run the thread for a moment
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	runtime->stop();
 
 	/// Check that the view element was initialized and awoken
