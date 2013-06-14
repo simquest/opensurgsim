@@ -33,7 +33,9 @@ set(UNIT_TEST_SHARED_LIBS
 	${SIXENSE_SDK_sixense_SHARED_RELEASE}
 	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
 	${SIXENSE_SDK_sixense_SHARED_DEBUG}
-	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG})
+	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
+	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}
+)
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by

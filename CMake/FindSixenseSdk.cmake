@@ -164,3 +164,25 @@ if(SIXENSE_SDK_FOUND)
 		${SIXENSE_SDK_sixense_LIBRARY} ${SIXENSE_SDK_sixense_utils_LIBRARY})
 endif(SIXENSE_SDK_FOUND)
 mark_as_advanced(SIXENSE_SDK_LIBRARIES)
+
+if(SIXENSE_SDK_FOUND)
+	# HACK: for debug, we may also need the mysterious DeviceDLL.dll on Windows.
+	if(WIN32)
+		find_file(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
+			NAMES DeviceDLL.dll
+			HINTS "${SIXENSE_SDK_ROOT_DIR}"
+			PATH_SUFFIXES "samples/${LIB_ARCH}/sixense_simple3d"
+			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
+		)
+    if(NOT SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+			# if not found, clear it and hope for the best...
+			message("Warning: DeviceDLL.dll (from Sixense) not found; continuing.")
+			set(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
+				CACHE PATH "Path to DeviceDLL, if any." FORCE)
+		endif(NOT SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+	else()
+		set(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
+			CACHE PATH "Path to DeviceDLL, if any.")
+		mark_as_advanced(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+	endif()
+endif(SIXENSE_SDK_FOUND)
