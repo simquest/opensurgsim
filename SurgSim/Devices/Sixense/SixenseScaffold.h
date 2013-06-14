@@ -63,6 +63,7 @@ private:
 
 	friend class SixenseDevice;
 	friend class SixenseThread;
+	friend struct StateData;
 
 	/// Constructor.
 	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.

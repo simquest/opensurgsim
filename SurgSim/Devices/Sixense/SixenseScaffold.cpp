@@ -60,6 +60,15 @@ public:
 	{
 	}
 
+	// Initialize by moving the data from another object.
+	// Needed because Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers.
+	DeviceData(DeviceData&& other) :
+		deviceBaseIndex(std::move(other.deviceBaseIndex)),
+		deviceControllerIndex(std::move(other.deviceControllerIndex)),
+		deviceObject(std::move(other.deviceObject))
+	{
+	}
+
 	/// The index of the Sixense base unit for this device.
 	const int deviceBaseIndex;
 	/// The index of the Sixense controller for this device.
@@ -88,7 +97,7 @@ public:
 	std::unique_ptr<SixenseThread> thread;
 
 	/// The list of known devices.
-	std::list<DeviceData> activeDeviceList;
+	std::list<SixenseScaffold::DeviceData> activeDeviceList;
 
 	/// The mutex that protects the list of known devices.
 	boost::mutex mutex;
@@ -424,7 +433,10 @@ bool SixenseScaffold::registerIfUnused(int baseIndex, int controllerIndex, Sixen
 		createThread();
 	}
 
-	m_state->activeDeviceList.emplace_back(baseIndex, controllerIndex, device);
+	// This constructs the object first, then moves it to the list.  That's only needed because Visual Studio 2010
+	// doesn't support multi-argument emplace_back() for STL containers; modern compilers don't need the DeviceData().
+	m_state->activeDeviceList.emplace_back(DeviceData(baseIndex, controllerIndex, device));
+
 	return true;
 }
 
