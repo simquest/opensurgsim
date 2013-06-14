@@ -38,6 +38,12 @@ RigidRepresentation::~RigidRepresentation()
 
 void RigidRepresentation::beforeUpdate(double dt)
 {
+	if (! isActive() || ! m_currentParameters.isValid())
+	{
+		return;
+	}
+
+	m_previousState = m_currentState;
 }
 
 void RigidRepresentation::update(double dt)
@@ -137,6 +143,12 @@ void RigidRepresentation::update(double dt)
 
 void RigidRepresentation::afterUpdate(double dt)
 {
+	if (! isActive() || ! m_currentParameters.isValid())
+	{
+		return;
+	}
+
+	m_finalState = m_currentState;
 }
 
 void RigidRepresentation::computeComplianceMatrix(double dt)

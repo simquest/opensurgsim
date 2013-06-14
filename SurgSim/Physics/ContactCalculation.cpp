@@ -47,8 +47,8 @@ void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pai
 	std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
 
 
-	Vector3d leftCenter = pair->getFirst()->getLocalToWorldTransform().translation();
-	Vector3d rightCenter = pair->getSecond()->getLocalToWorldTransform().translation();
+	Vector3d leftCenter = pair->getFirst()->getCurrentPose().translation();
+	Vector3d rightCenter = pair->getSecond()->getCurrentPose().translation();
 
 	Vector3d normal = rightCenter - leftCenter;
 	double dist = normal.norm();
@@ -83,10 +83,10 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 	std::shared_ptr<SphereShape> sphere = std::static_pointer_cast<SphereShape>(representationSphere->getShape());
 	std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
 
-	Vector3d sphereCenter = representationSphere->getLocalToWorldTransform().translation();
+	Vector3d sphereCenter = representationSphere->getCurrentPose().translation();
 
 	// Move into Plane coordinate system
-	sphereCenter =  representationPlane->getLocalToWorldTransform().inverse() * sphereCenter;
+	sphereCenter =  representationPlane->getCurrentPose().inverse() * sphereCenter;
 
 	Vector3d result;
 	double dist = SurgSim::Math::distancePointPlane(sphereCenter, plane->getNormal(), plane->getD(), &result);
@@ -95,7 +95,7 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 	{
 		double depth = sphere->getRadius() - distAbsolute;
 		double factor = ((dist < 0) ? -1.0 : 1.0) * ((m_switchPair) ? -1.0 : 1.0);
-		pair->addContact(depth, (representationPlane->getLocalToWorldTransform() * plane->getNormal() * factor).normalized());
+		pair->addContact(depth, (representationPlane->getCurrentPose() * plane->getNormal() * factor).normalized());
 	}
 }
 

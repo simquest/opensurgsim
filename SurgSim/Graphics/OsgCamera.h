@@ -58,14 +58,14 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
-	/// Sets the pose of the camera
+	/// Sets the current pose of the camera
 	/// The view matrix is set to the inverse of the transform.
-	/// \param	transform	Rigid transformation that describes the pose of the camera
+	/// \param	transform	Rigid transformation that describes the current pose of the camera
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
 
-	/// Gets the pose of the camera
+	/// Gets the current pose of the camera
 	/// The transform returned is the inverse of the view matrix.
-	/// \return	Rigid transformation that describes the pose of the representation
+	/// \return	Rigid transformation that describes the current pose of the camera
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
 
 	/// Sets the view matrix of the camera

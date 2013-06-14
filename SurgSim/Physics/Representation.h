@@ -89,6 +89,11 @@ public:
 		return m_isGravityEnabled;
 	}
 
+	/// Set the pose of the physics representation
+	/// \param pose The pose to request the representation to be at
+	/// \note setPose should be called only once per time step!
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt)

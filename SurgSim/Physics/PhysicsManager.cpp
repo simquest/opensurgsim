@@ -66,12 +66,23 @@ bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Compone
 
 bool PhysicsManager::doUpdate(double dt)
 {
+	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
+	{
+		(*it)->beforeUpdate(dt);
+	}
+
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 	stateList.push_back(state);
 	state->setRepresentations(m_representations);
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
 	stateList.push_back(m_dcdCollision->update(dt, stateList.back()));
+
+	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
+	{
+		(*it)->afterUpdate(dt);
+	}
+
 	return true;
 }
 

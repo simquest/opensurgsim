@@ -49,12 +49,12 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
-	/// Sets the pose of the representation
-	/// \param	transform	Rigid transformation that describes the pose of the representation
+	/// Sets the current pose of the representation
+	/// \param	transform	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
 
-	/// Gets the pose of the representation
-	/// \return	Rigid transformation that describes the pose of the representation
+	/// Gets the current pose of the representation
+	/// \return	Rigid transformation that describes the current pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
 
 	/// Updates the representation.

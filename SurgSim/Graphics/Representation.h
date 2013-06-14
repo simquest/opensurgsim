@@ -37,7 +37,8 @@ class Representation : public SurgSim::Framework::Representation
 public:
 	/// Constructor
 	/// \param	name	Name of the representation
-	explicit Representation(const std::string& name) : SurgSim::Framework::Representation(name)
+	explicit Representation(const std::string& name) : SurgSim::Framework::Representation(name),
+		m_initialPose(SurgSim::Math::RigidTransform3d::Identity())
 	{
 	}
 
@@ -49,17 +50,30 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const = 0;
 
-	/// Sets the pose of the representation
-	/// \param	transform	Rigid transformation that describes the pose of the representation
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform) = 0;
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+	{
+		m_initialPose = pose;
+		setPose(m_initialPose);
+	}
 
-	/// Gets the pose of the representation
-	/// \return	Rigid transformation that describes the pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		return m_initialPose;
+	}
 
 	/// Updates the representation
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt) = 0;
+
+private:
+
+	/// Initial pose of the representation
+	SurgSim::Math::RigidTransform3d m_initialPose;
 };
 
 };  // namespace Graphics
