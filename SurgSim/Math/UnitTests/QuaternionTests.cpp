@@ -433,6 +433,44 @@ TYPED_TEST(QuaternionTests, ArrayReadWrite)
 	}
 }
 
+
+// ==================== SLERP ====================
+
+/// Test quaternion interpolation.
+TYPED_TEST(QuaternionTests, SlerpInterpolation)
+{
+	typedef typename TestFixture::Quaternion Quaternion;
+	typedef typename TestFixture::Scalar T;
+
+	// Eigen does something fancy in the slerp. If your 2 quaternions have an angle bigger than PI
+	// it will interpolate between q0 and -q1. Which means that interpolating at time 1 will not give you q1.
+	const T angle = static_cast<T>(M_PI * 0.99);
+	const Eigen::Matrix<T, 3, 1> axis (0.0, 1.0, 0.0);
+	Eigen::Quaternion<T> rotation = SurgSim::Math::makeRotationQuaternion(angle, axis);
+
+	Eigen::Quaternion<T> q0(Eigen::Matrix<T,4,1>::Random());
+	q0.normalize();
+	Eigen::Quaternion<T> q1 = rotation * q0;
+	q1.normalize();
+
+	EXPECT_TRUE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.0)).isApprox(q0));
+	EXPECT_TRUE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(1.0)).isApprox(q1));
+
+	EXPECT_FALSE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.234)).isApprox(q0));
+	EXPECT_FALSE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.234)).isApprox(q1));
+
+	EXPECT_FALSE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.5)).isApprox(q0));
+	EXPECT_FALSE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.5)).isApprox(q1));
+	// At t=0.5, the inteprolation should return (q0 + q1)/2 normalized
+	// c.f. http://en.wikipedia.org/wiki/Slerp
+	Eigen::Quaternion<T> qHalf( (q0.coeffs() + q1.coeffs()) * 0.5);
+	qHalf.normalize();
+	EXPECT_TRUE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.5)).isApprox(qHalf));
+
+	EXPECT_FALSE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.874)).isApprox(q0));
+	EXPECT_FALSE(SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.874)).isApprox(q1));
+}
+
 // TO DO:
 // testing numerical validity
 // testing for denormalized numbers
