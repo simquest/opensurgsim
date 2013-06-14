@@ -28,21 +28,34 @@ public:
 	/// \post	m_didInit is initialized to false
 	/// \post	m_didWakeUp is initialized to false
 	explicit MockRepresentation(const std::string& name) : SurgSim::Framework::Representation(name),
-		m_pose(SurgSim::Math::RigidTransform3d::Identity()),
+		m_initialPose(SurgSim::Math::RigidTransform3d::Identity()),
+		m_currentPose(SurgSim::Math::RigidTransform3d::Identity()),
 		m_didInit(false),
 		m_didWakeUp(false)
 	{
 	}
 
 	/// Sets the current pose of the representation
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+		m_initialPose = transform;
+		setPose(transform);
+	}
+	/// Returns the current pose of the representation
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		return m_initialPose;
+	}
+
+	/// Sets the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
-		m_pose = transform;
+		m_currentPose = transform;
 	}
 	/// Returns the current pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
-		return m_pose;
+		return m_currentPose;
 	}
 
 	/// Returns true if the representation has been initialized, otherwise false
@@ -58,8 +71,10 @@ public:
 	}
 
 private:
+	/// Initial pose of the representation
+	SurgSim::Math::RigidTransform3d m_initialPose;
 	/// Current pose of the representation
-	SurgSim::Math::RigidTransform3d m_pose;
+	SurgSim::Math::RigidTransform3d m_currentPose;
 
 	/// Whether the representation has been initialized
 	bool m_didInit;

@@ -81,7 +81,7 @@ TEST(RepresentationPoseBehaviorTests, UpdateTest)
 	Quaterniond rotation = Quaterniond(SurgSim::Math::Vector4d::Random()).normalized();
 	Vector3d position = Vector3d::Random();
 	RigidTransform3d pose = makeRigidTransform(rotation, position);
-	from->setPose(pose);
+	from->setInitialPose(pose);
 
 	runtime->start();
 

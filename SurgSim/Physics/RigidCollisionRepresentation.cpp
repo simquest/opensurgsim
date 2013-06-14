@@ -40,9 +40,9 @@ const std::shared_ptr<RigidShape> RigidCollisionRepresentation::getShape() const
 	return m_representation->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
-const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getLocalToWorldTransform() const
+const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getCurrentPose() const
 {
-	return m_representation->getPose();
+	return m_representation->getCurrentPose();
 }
 
 }; // Physics

@@ -38,12 +38,24 @@ public:
 	explicit Representation(const std::string& m_name);
 	virtual ~Representation();
 
-	/// Set the current pose of the representation
-	/// \param pose The current pose
+	/// Set the initial pose of the representation
+	/// \param pose The initial pose
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
+
+	/// Get the initial pose of the representation
+	/// \return The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
+
+	/// Set the pose of the representation
+	/// \param pose The pose to set the representation to
+	/// \note This requests the representation to set its pose to the given pose
+	/// \note In physics, the actual pose of the representation might not be exactly the requested one
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
 
-	/// Get the current pose of the representation
-	/// \return The current pose
+	/// Get the pose of the representation
+	/// \return The pose of this representation
+	/// \note getPose may or may not return the pose last sets by setPose
+	/// \note In physics, the simulation will drive the pose internally
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
 private:
 	virtual bool doInitialize();

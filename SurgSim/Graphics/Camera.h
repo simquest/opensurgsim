@@ -63,14 +63,6 @@ public:
 		return m_group;
 	}
 
-	/// Sets the pose of the camera
-	/// \param	transform	Rigid transformation that describes the pose of the camera
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform) = 0;
-
-	/// Gets the pose of the camera
-	/// \return	Rigid transformation that describes the pose of the camera
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
-
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix
 	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix) = 0;

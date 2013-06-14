@@ -47,8 +47,8 @@ public:
 	void setInitialPose(const RigidTransform3d& pose)
 	{
 		m_initialState.setPose(pose);
-		m_currentState = m_initialState;
-		m_previousState = m_initialState;
+		m_currentState   = m_initialState;
+		m_previousState  = m_initialState;
 	}
 
 	/// Get the initial pose of the rigid representation
@@ -62,14 +62,8 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	void setPose(const RigidTransform3d& pose)
 	{
+		m_previousState = m_currentState;
 		m_currentState.setPose(pose);
-	}
-
-	/// Get the current pose of the rigid representation
-	/// \return The current pose (translation + rotation)
-	const RigidTransform3d& getPose() const
-	{
-		return m_currentState.getPose();
 	}
 
 	/// Get the previous pose of the rigid representation
@@ -77,14 +71,13 @@ public:
 	const RigidTransform3d& getPreviousPose() const
 	{
 		return m_previousState.getPose();
-	};
+	}
 
-	/// Called after beforeUpdate and prior to afterUpdate
-	/// It compute the current free motion of the object using the time step dt
-	/// \param dt The time step (in seconds)
-	void update(double dt)
+	/// Get the final pose of the rigid representation
+	/// \return The final pose (translation + rotation)
+	const RigidTransform3d& getPose() const
 	{
-		m_previousState = m_currentState;
+		return m_currentState.getPose();
 	}
 
 	/// Called to reset the fixed object to its initial/default state
@@ -93,8 +86,8 @@ public:
 	{
 		Representation::resetState();
 
-		m_previousState = m_initialState;
-		m_currentState  = m_initialState;
+		m_previousState  = m_initialState;
+		m_currentState   = m_initialState;
 	}
 
 private:

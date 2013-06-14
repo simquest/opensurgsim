@@ -76,7 +76,7 @@ public:
 		return m_shape;
 	}
 
-	virtual const SurgSim::Math::RigidTransform3d& getLocalToWorldTransform() const
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
 		return m_transform;
 	}

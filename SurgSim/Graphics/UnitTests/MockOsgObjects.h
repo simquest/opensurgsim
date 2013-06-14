@@ -66,15 +66,15 @@ public:
 		return m_sumDt;
 	}
 
-	/// Sets the pose of the representation
-	/// \param	transform	Rigid transformation that describes the pose of the representation
+	/// Sets the current pose of the representation
+	/// \param	transform	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_transform = transform;
 	}
 
-	/// Gets the pose of the representation
-	/// \return	Rigid transformation that describes the pose of the representation
+	/// Gets the current pose of the representation
+	/// \return	Rigid transformation that describes the current pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_transform;

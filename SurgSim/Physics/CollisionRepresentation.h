@@ -42,7 +42,7 @@ public:
 	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const = 0;
 
 	/// \return Transformation to transform the shape into world coordinates
-	virtual const SurgSim::Math::RigidTransform3d& getLocalToWorldTransform() const = 0;
+	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const = 0;
 
 };
 
