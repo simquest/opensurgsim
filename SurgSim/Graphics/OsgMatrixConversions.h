@@ -51,46 +51,63 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// Convert a fixed-size 2x2 matrix to OSG.
-/// Note that the OSG matrix stores the values as floats, so depending on the type of the input matrix,
-/// precision may be lost.
-template <typename T, int MOpt> inline
-const osg::Matrix2 toOsg(const Eigen::Matrix<T, 2, 2, MOpt>& matrix)
+/// Convert a fixed-size 2x2 matrix of floats to OSG.
+template <int MOpt> inline
+const osg::Matrix2 toOsg(const Eigen::Matrix<float, 2, 2, MOpt>& matrix)
 {
 	osg::Matrix2 osgMatrix;
-	Eigen::Map<Eigen::Matrix<float, 2, 2, Eigen::ColMajor>> osgMatrixMap(osgMatrix.ptr());
-	osgMatrixMap = matrix.template cast<float>();
+	Eigen::Map<Eigen::Matrix<float, 2, 2, Eigen::ColMajor>>(osgMatrix.ptr()) = matrix;
 	return osgMatrix;
 }
 
-/// Convert from OSG to a 2x2 matrix of either floats or doubles.
-/// Note that the OSG matrix stores the values as floats.
-/// \tparam	T	Value type (float or double)
-template <typename T> inline
-const Eigen::Matrix<T, 2, 2, Eigen::RowMajor> fromOsg(const osg::Matrix2& matrix)
+/// Convert a fixed-size 2x2 matrix of doubles to OSG.
+template <int MOpt> inline
+const osg::Matrix2d toOsg(const Eigen::Matrix<double, 2, 2, MOpt>& matrix)
 {
-	return Eigen::Map<const Eigen::Matrix<float, 2, 2, Eigen::ColMajor>>(matrix.ptr()).cast<T>();
+	osg::Matrix2d osgMatrix;
+	Eigen::Map<Eigen::Matrix<double, 2, 2, Eigen::ColMajor>>(osgMatrix.ptr()) = matrix;
+	return osgMatrix;
 }
 
-/// Convert a fixed-size 3x3 matrix to OSG.
-/// Note that the OSG matrix stores the values as floats, so depending on the type of the input matrix,
-/// precision may be lost.
-template <typename T, int MOpt> inline
-const osg::Matrix3 toOsg(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
+/// Convert from OSG to a 2x2 matrix of floats.
+inline const Eigen::Matrix<float, 2, 2, Eigen::RowMajor> fromOsg(const osg::Matrix2& matrix)
+{
+	return Eigen::Map<const Eigen::Matrix<float, 2, 2, Eigen::ColMajor>>(matrix.ptr());
+}
+/// Convert from OSG to a 2x2 matrix of doubles.
+inline const Eigen::Matrix<double, 2, 2, Eigen::RowMajor> fromOsg(const osg::Matrix2d& matrix)
+{
+	return Eigen::Map<const Eigen::Matrix<double, 2, 2, Eigen::ColMajor>>(matrix.ptr());
+}
+
+/// Convert a fixed-size 3x3 matrix of floats to OSG.
+template <int MOpt> inline
+const osg::Matrix3 toOsg(const Eigen::Matrix<float, 3, 3, MOpt>& matrix)
 {
 	osg::Matrix3 osgMatrix;
-	Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>> osgMatrixMap(osgMatrix.ptr());
-	osgMatrixMap = matrix.template cast<float>();
+	Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>>(osgMatrix.ptr()) = matrix;
 	return osgMatrix;
 }
 
-/// Convert from OSG to a 3x3 matrix of either floats or doubles.
-/// Note that the OSG matrix stores the values as floats.
-/// \tparam	T	Value type (float or double)
-template <typename T> inline
-const Eigen::Matrix<T, 3, 3, Eigen::RowMajor> fromOsg(const osg::Matrix3& matrix)
+/// Convert a fixed-size 3x3 matrix of doubles to OSG.
+template <int MOpt> inline
+	const osg::Matrix3d toOsg(const Eigen::Matrix<double, 3, 3, MOpt>& matrix)
 {
-	return Eigen::Map<const Eigen::Matrix<float, 3, 3, Eigen::ColMajor>>(matrix.ptr()).cast<T>();
+	osg::Matrix3d osgMatrix;
+	Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::ColMajor>>(osgMatrix.ptr()) = matrix;
+	return osgMatrix;
+}
+
+/// Convert from OSG to a 3x3 matrix of floats.
+inline const Eigen::Matrix<float, 3, 3, Eigen::RowMajor> fromOsg(const osg::Matrix3& matrix)
+{
+	return Eigen::Map<const Eigen::Matrix<float, 3, 3, Eigen::ColMajor>>(matrix.ptr());
+}
+
+/// Convert from OSG to a 3x3 matrix of doubles.
+inline const Eigen::Matrix<double, 3, 3, Eigen::RowMajor> fromOsg(const osg::Matrix3d& matrix)
+{
+	return Eigen::Map<const Eigen::Matrix<double, 3, 3, Eigen::ColMajor>>(matrix.ptr());
 }
 
 /// Convert a fixed-size 4x4 matrix of floats to OSG.
