@@ -19,8 +19,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Quaternion.h"
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Quaternion.h>
 #include "gtest/gtest.h"
 
 template <class T>
@@ -81,7 +81,6 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 
 	Eigen::Transform<T, 3, Eigen::Isometry> transform0 = SurgSim::Math::makeRigidTransform(q0, t0);
 	Eigen::Transform<T, 3, Eigen::Isometry> transform1 = SurgSim::Math::makeRigidTransform(q1, t1);
-	Eigen::Transform<T, 3, Eigen::Isometry> t = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.0));
 	EXPECT_TRUE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.0)).isApprox(transform0));
 	EXPECT_TRUE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(1.0)).isApprox(transform1));
 
