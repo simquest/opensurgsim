@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	MeshVertexTest.cpp
 	NamedDataTests.cpp
 	TriangleMeshTest.cpp
+	TestableValueTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
