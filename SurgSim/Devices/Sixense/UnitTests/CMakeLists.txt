@@ -29,12 +29,14 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS SixenseDevice SurgSimInput SurgSimFramework SurgSimDataStructures
 	gtest ${Boost_LIBRARIES} ${SIXENSE_SDK_LIBRARIES})
-set(UNIT_TEST_SHARED_LIBS
+set(UNIT_TEST_SHARED_RELEASE_LIBS
 	${SIXENSE_SDK_sixense_SHARED_RELEASE}
 	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
+)
+set(UNIT_TEST_SHARED_DEBUG_LIBS
 	${SIXENSE_SDK_sixense_SHARED_DEBUG}
 	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
-	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}
+	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
 
 # The unit tests will be built whenever the library is built, but

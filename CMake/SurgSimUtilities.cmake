@@ -26,22 +26,72 @@ option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 
 # Copy zero or more files to the location of a built target, after the
+# target is built successfully, but only if the condition (which
+# should be a add_custom_command "generator expression") evaluates to 1.
+#
+# Note the use of optional arguments:
+#   copy_to_target_directory_if(<condition> <target> [<file>...])
+#
+function(copy_to_target_directory_if CONDITION TARGET)
+	foreach(FILE ${ARGN})
+		if(NOT "${FILE}" STREQUAL "")
+			# After much experimentation (and cmake-gui crashes), I learned
+			# that as of CMake 2.8.10, you can't have line breaks or
+			# multiple tokens within the body of a $<{0,1}:...> generator
+			# expression.  So to conditionalize the command "foo bar", you
+			# can't do "$<COND:foo bar>"; you need "$<COND:foo> $<COND:bar>"...
+			get_filename_component(FNAME "${FILE}" NAME)
+			set(CMD_COPY copy_if_different "${FILE}" $<TARGET_FILE_DIR:${TARGET}>)
+			set(CMD_SKIP echo "${TARGET}: Not copying ${FNAME} for $<CONFIGURATION>")
+			# Build a list of properly conditionalized list elements.
+			set(CONDITIONAL_COMMAND  ${CMAKE_COMMAND} -E)
+			foreach(TOKEN ${CMD_COPY})
+				list(APPEND CONDITIONAL_COMMAND $<${CONDITION}:${TOKEN}>)
+			endforeach(TOKEN ${CMD_COPY})
+			foreach(TOKEN ${CMD_SKIP})
+				list(APPEND CONDITIONAL_COMMAND $<$<NOT:${CONDITION}>:${TOKEN}>)
+			endforeach(TOKEN ${CMD_SKIP})
+			# Now use the conditional command we built.
+			add_custom_command(TARGET ${TARGET} POST_BUILD
+				COMMAND ${CONDITIONAL_COMMAND} VERBATIM)
+		endif(NOT "${FILE}" STREQUAL "")
+	endforeach(FILE ${ARGN})
+endfunction()
+
+# Copy zero or more files to the location of a built target, after the
 # target is built successfully.
 #
 # Note the use of optional arguments:
 #   copy_to_target_directory(<target> [<file>...])
 #
 macro(copy_to_target_directory TARGET)
-	foreach(FILE ${ARGN})
-		add_custom_command(TARGET ${TARGET} POST_BUILD
-			COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FILE}"
-			$<TARGET_FILE_DIR:${TARGET}>)
-	endforeach(FILE ${ARGN})
+	copy_to_target_directory_if(1 "${TARGET}" ${ARGN})
+endmacro()
+
+# Copy zero or more files to the location of a built *Debug* target,
+# after the target is built successfully.
+#
+# Note the use of optional arguments:
+#   copy_to_target_directory_for_debug(<target> [<file>...])
+#
+macro(copy_to_target_directory_for_debug TARGET)
+	copy_to_target_directory_if($<CONFIG:Debug> "${TARGET}" ${ARGN})
+endmacro()
+
+# Copy zero or more files to the location of a built *non-Debug*
+# target, after the target is built successfully.
+#
+# Note the use of optional arguments:
+#   copy_to_target_directory_for_release(<target> [<file>...])
+#
+macro(copy_to_target_directory_for_release TARGET)
+	copy_to_target_directory_if($<NOT:$<CONFIG:Debug>> "${TARGET}" ${ARGN})
 endmacro()
 
 # Builds the unit test executable or library (unless disabled).
 # Does not try to run the test.
-# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS and UNIT_TEST_SHARED_LIBS.
+# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS, UNIT_TEST_SHARED_LIBS,
+# UNIT_TEST_SHARED_RELEASE_LIBS and UNIT_TEST_SHARED_DEBUG_LIBS.
 #
 # You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
 #
@@ -54,8 +104,12 @@ macro(surgsim_unit_test_build_only TESTNAME)
 	else()
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 		target_link_libraries(${TESTNAME} gtest_main ${LIBS})
-		# copy all ${UNIT_TEST_SHARED_LIBS} to the test executable directory:
-		copy_to_target_directory(${TESTNAME} ${UNIT_TEST_SHARED_LIBS})
+		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
+		copy_to_target_directory_for_debug(${TESTNAME} ${UNIT_TEST_SHARED_LIBS})
+		copy_to_target_directory_for_release(${TESTNAME}
+			${UNIT_TEST_SHARED_RELEASE_LIBS})
+		copy_to_target_directory_for_debug(${TESTNAME}
+			${UNIT_TEST_SHARED_DEBUG_LIBS})
 	endif()
 endmacro()
 
@@ -68,7 +122,8 @@ endmacro()
 #
 macro(surgsim_unit_test_run_only TESTNAME)
 	if(NOT SURGSIM_TESTS_ALL_IN_ONE)
-		add_custom_command(TARGET ${TESTNAME} POST_BUILD COMMAND ${TESTNAME})
+		add_custom_command(TARGET ${TESTNAME} POST_BUILD COMMAND ${TESTNAME}
+			VERBATIM)
 	endif()
 endmacro()
 
