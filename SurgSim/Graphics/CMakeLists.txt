@@ -40,6 +40,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Group.h
 	Manager.h
 	OsgCamera.h
+	OsgConversions.h
 	OsgGroup.h
 	OsgManager.h
 	OsgMatrixConversions.h
