@@ -82,22 +82,22 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 	Eigen::Transform<T, 3, Eigen::Isometry> transform0 = SurgSim::Math::makeRigidTransform(q0, t0);
 	Eigen::Transform<T, 3, Eigen::Isometry> transform1 = SurgSim::Math::makeRigidTransform(q1, t1);
 	{
-		auto transform = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.0));
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.0));
 		EXPECT_TRUE(transform.isApprox(transform0));
 	}
 	{
-		auto transform = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(1.0));
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(1.0));
 		EXPECT_TRUE(transform.isApprox(transform1));
 	}
 
 	{
-		auto transform = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.234));
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.234));
 		EXPECT_FALSE(transform.isApprox(transform0));
 		EXPECT_FALSE(transform.isApprox(transform1));
 	}
 
 	{
-		auto transform = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.5));
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.5));
 		EXPECT_FALSE(transform.isApprox(transform0));
 		EXPECT_FALSE(transform.isApprox(transform1));
 
@@ -111,7 +111,7 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 	}
 
 	{
-		auto transform = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.839));
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.839));
 		EXPECT_FALSE(transform.isApprox(transform0));
 		EXPECT_FALSE(transform.isApprox(transform1));
 	}

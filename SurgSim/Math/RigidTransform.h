@@ -90,7 +90,7 @@ inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransfo
 /// \note t=0 => returns t0
 /// \note t=1 => returns t1
 template <typename T, int TOpt>
-inline Eigen::Transform<T, 3, Eigen::Isometry> interpolateRigidTransform(
+inline Eigen::Transform<T, 3, Eigen::Isometry> interpolate(
 	const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& t0,
 	const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& t1,
 	T t)
