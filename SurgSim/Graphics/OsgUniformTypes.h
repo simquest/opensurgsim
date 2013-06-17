@@ -22,6 +22,8 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Vector.h>
 
+#include <osg/Uniform>
+
 namespace SurgSim
 {
 
