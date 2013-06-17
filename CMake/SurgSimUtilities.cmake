@@ -40,6 +40,9 @@ function(copy_to_target_directory_if CONDITION TARGET)
 			# multiple tokens within the body of a $<{0,1}:...> generator
 			# expression.  So to conditionalize the command "foo bar", you
 			# can't do "$<COND:foo bar>"; you need "$<COND:foo> $<COND:bar>"...
+			# And on top of that, we can't use VERBATIM or each of the
+			# conditional tokens will become "" rather than being skipped
+			# altogether.
 			get_filename_component(FNAME "${FILE}" NAME)
 			set(CMD_COPY copy_if_different "${FILE}" $<TARGET_FILE_DIR:${TARGET}>)
 			set(CMD_SKIP echo "${TARGET}: Not copying ${FNAME} for $<CONFIGURATION>")
@@ -51,9 +54,9 @@ function(copy_to_target_directory_if CONDITION TARGET)
 			foreach(TOKEN ${CMD_SKIP})
 				list(APPEND CONDITIONAL_COMMAND $<$<NOT:${CONDITION}>:${TOKEN}>)
 			endforeach(TOKEN ${CMD_SKIP})
-			# Now use the conditional command we built.
+			# Now use the conditional command we built.  (Can't use VERBATIM!)
 			add_custom_command(TARGET ${TARGET} POST_BUILD
-				COMMAND ${CONDITIONAL_COMMAND} VERBATIM)
+				COMMAND ${CONDITIONAL_COMMAND})
 		endif(NOT "${FILE}" STREQUAL "")
 	endforeach(FILE ${ARGN})
 endfunction()
