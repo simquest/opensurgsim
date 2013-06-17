@@ -147,7 +147,7 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 {
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		threadRemoveComponent(*it);
+		executeRemovals(*it);
 	}
 }
 
@@ -157,7 +157,7 @@ void ComponentManager::addAndIntializeComponents(const std::vector<std::shared_p
 	// Add All Components to the internal storage
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		if (threadAddComponent(*it))
+		if (executeAdditions(*it))
 		{
 			(*it)->initialize(std::move(getRuntime()));
 		}
@@ -175,7 +175,7 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 			{
 				SURGSIM_LOG_WARNING(m_logger) << "Failed to wake up component " << (*it)->getName() << " in manager " <<
 					getName() << ". Component was not added to the manager!";
-				threadRemoveComponent(*it);
+				executeRemovals(*it);
 			}
 		}
 	}

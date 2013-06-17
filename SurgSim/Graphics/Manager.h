@@ -65,12 +65,12 @@ protected:
 	/// Adds a component
 	/// \param	component	The component to be added.
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
-	virtual bool threadAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
 	/// Removes a component
 	/// \param	component	The component to be removed.
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
-	virtual bool threadRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
 	/// Adds an representation to the manager
 	/// \param	representation	The representation to be added.
