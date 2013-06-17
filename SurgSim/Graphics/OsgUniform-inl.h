@@ -54,7 +54,7 @@ inline osg::ref_ptr<osg::Uniform> OsgUniformBase::getOsgUniform() const
 }
 
 template <class T>
-OsgUniform<T>::OsgUniform(const std::string& name, const std::string& shaderName) : UniformBase(name), Uniform(name),
+OsgUniform<T>::OsgUniform(const std::string& name, const std::string& shaderName) : UniformBase(name), Uniform<T>(name),
 	OsgUniformBase(name, shaderName)
 {
 	osg::Uniform::Type osgUniformType = getOsgUniformType<T>();
@@ -79,7 +79,7 @@ const T& OsgUniform<T>::get() const
 
 template <class T>
 OsgUniform<std::vector<T>>::OsgUniform(const std::string& name, const std::string& shaderName, unsigned int numElements) : 
-		UniformBase(name), Uniform(name), OsgUniformBase(name, shaderName)
+		UniformBase(name), Uniform<std::vector<T>>(name), OsgUniformBase(name, shaderName)
 {
 	osg::Uniform::Type osgUniformType = getOsgUniformType<T>();
 	SURGSIM_ASSERT(osgUniformType != osg::Uniform::UNDEFINED) << "Failed to get OSG uniform type!";

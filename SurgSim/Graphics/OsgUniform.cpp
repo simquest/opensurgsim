@@ -19,7 +19,7 @@ using SurgSim::Graphics::OsgUniform;
 using SurgSim::Graphics::toOsg;
 
 OsgUniform<std::vector<bool>>::OsgUniform(const std::string& name, const std::string& shaderName, unsigned int numElements) : 
-	UniformBase(name), Uniform(name), OsgUniformBase(name, shaderName)
+	UniformBase(name), Uniform<std::vector<bool>>(name), OsgUniformBase(name, shaderName)
 {
 	osg::Uniform::Type osgUniformType = SurgSim::Graphics::getOsgUniformType<bool>();
 	SURGSIM_ASSERT(osgUniformType != osg::Uniform::UNDEFINED) << "Failed to get OSG uniform type!";
