@@ -19,7 +19,6 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
-
 )
 
 set(SURGSIM_MATH_HEADERS

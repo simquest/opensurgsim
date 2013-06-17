@@ -107,7 +107,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation = std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
-	graphicsRepresentation->setPose(pose);
+	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
@@ -132,7 +132,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation = std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(0.1);
-	graphicsRepresentation->setPose(pose);
+	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
-	graphicsManager->getDefaultCamera()->setPose(SurgSim::Math::makeRigidTransform(
+	graphicsManager->getDefaultCamera()->setInitialPose(SurgSim::Math::makeRigidTransform(
 		SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->setScene(scene);

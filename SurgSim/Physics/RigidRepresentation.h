@@ -135,11 +135,25 @@ public:
 	{
 	}
 
+	/// Get the previous pose of the rigid representation
+	/// \return The previous pose (translation + rotation)
+	const SurgSim::Math::RigidTransform3d& getPreviousPose() const
+	{
+		return m_previousState.getPose();
+	}
+
 	/// Get the current pose of the rigid representation
 	/// \return The current pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPose() const
+	const SurgSim::Math::RigidTransform3d& getCurrentPose() const
 	{
 		return m_currentState.getPose();
+	}
+
+	/// Get the final pose of the rigid representation
+	/// \return The final pose (translation + rotation)
+	const SurgSim::Math::RigidTransform3d& getPose() const
+	{
+		return m_finalState.getPose();
 	}
 
 	/// Preprocessing done before the update call
@@ -161,6 +175,7 @@ public:
 
 		m_currentState  = m_initialState;
 		m_previousState = m_initialState;
+		m_finalState    = m_initialState;
 
 		updateGlobalInertiaMatrices(m_currentState);
 	}
@@ -207,6 +222,9 @@ private:
 
 	/// Current rigid representation state
 	RigidRepresentationState m_currentState;
+
+	/// Last valid/final rigid representation state
+	RigidRepresentationState m_finalState;
 
 	/// Initial physical parameters
 	RigidRepresentationParameters m_initialParameters;

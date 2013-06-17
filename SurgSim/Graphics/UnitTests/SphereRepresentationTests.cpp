@@ -93,15 +93,15 @@ public:
 		return m_sumDt;
 	}
 
-	/// Sets the pose of the representation
-	/// \param	transform	Rigid transformation that describes the pose of the representation
+	/// Sets the current pose of the representation
+	/// \param	transform	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_transform = transform;
 	}
 
 	/// Gets the pose of the representation
-	/// \return	Rigid transformation that describes the pose of the representation
+	/// \return	Rigid transformation that describes the current pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_transform;
@@ -199,17 +199,39 @@ TEST(SphereRepresentationTests, PoseTest)
 {
 	std::shared_ptr<Representation> representation = std::make_shared<MockSphereRepresentation>("test name");
 
-	EXPECT_TRUE(representation->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(representation->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(representation->getPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a random rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
-	quaternion.normalize();
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		representation->setInitialPose(initialPose);
+		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	representation->setPose(transform);
-	EXPECT_TRUE(representation->getPose().isApprox(transform));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		representation->setPose(currentPose);
+		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(representation->getPose().isApprox(currentPose));
+	}
+
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		representation->setInitialPose(initialPose);
+		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
+	}
 }
 
 TEST(SphereRepresentationTests, UpdateTest)

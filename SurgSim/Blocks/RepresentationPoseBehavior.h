@@ -58,7 +58,7 @@ protected:
 	/// Wakeup the behavior, which copies the initial pose
 	virtual bool doWakeUp()
 	{
-		m_to->setPose(m_from->getPose());
+		m_to->setInitialPose(m_from->getInitialPose());
 		return true;
 	}
 
