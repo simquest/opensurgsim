@@ -19,8 +19,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Quaternion.h"
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Quaternion.h>
 #include "gtest/gtest.h"
 
 template <class T>
@@ -81,23 +81,38 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 
 	Eigen::Transform<T, 3, Eigen::Isometry> transform0 = SurgSim::Math::makeRigidTransform(q0, t0);
 	Eigen::Transform<T, 3, Eigen::Isometry> transform1 = SurgSim::Math::makeRigidTransform(q1, t1);
-	Eigen::Transform<T, 3, Eigen::Isometry> t = SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.0));
-	EXPECT_TRUE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.0)).isApprox(transform0));
-	EXPECT_TRUE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(1.0)).isApprox(transform1));
+	{
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.0));
+		EXPECT_TRUE(transform.isApprox(transform0));
+	}
+	{
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(1.0));
+		EXPECT_TRUE(transform.isApprox(transform1));
+	}
 
-	EXPECT_FALSE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.234)).isApprox(transform0));
-	EXPECT_FALSE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.234)).isApprox(transform1));
+	{
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.234));
+		EXPECT_FALSE(transform.isApprox(transform0));
+		EXPECT_FALSE(transform.isApprox(transform1));
+	}
 
-	EXPECT_FALSE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.5)).isApprox(transform0));
-	EXPECT_FALSE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.5)).isApprox(transform1));
-	// At t=0.5, the inteprolation should return (q0 + q1)/2 normalized
-	// c.f. http://en.wikipedia.org/wiki/Slerp
-	Eigen::Quaternion<T> qHalf( (q0.coeffs() + q1.coeffs()) * 0.5);
-	qHalf.normalize();
-	Eigen::Matrix<T, 3, 1> tHalf = (t0 + t1) * 0.5;
-	Eigen::Transform<T, 3, Eigen::Isometry> transformHalf = SurgSim::Math::makeRigidTransform(qHalf, tHalf);
-	EXPECT_TRUE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.5)).isApprox(transformHalf));
+	{
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.5));
+		EXPECT_FALSE(transform.isApprox(transform0));
+		EXPECT_FALSE(transform.isApprox(transform1));
 
-	EXPECT_FALSE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.839)).isApprox(transform0));
-	EXPECT_FALSE(SurgSim::Math::interpolateRigidTransform(transform0, transform1, static_cast<T>(0.839)).isApprox(transform1));
+		// At t=0.5, the inteprolation should return (q0 + q1)/2 normalized
+		// c.f. http://en.wikipedia.org/wiki/Slerp
+		Eigen::Quaternion<T> qHalf( (q0.coeffs() + q1.coeffs()) * 0.5);
+		qHalf.normalize();
+		Eigen::Matrix<T, 3, 1> tHalf = (t0 + t1) * 0.5;
+		auto transformHalf = SurgSim::Math::makeRigidTransform(qHalf, tHalf);
+		EXPECT_TRUE(transform.isApprox(transformHalf));
+	}
+
+	{
+		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.839));
+		EXPECT_FALSE(transform.isApprox(transform0));
+		EXPECT_FALSE(transform.isApprox(transform1));
+	}
 }
