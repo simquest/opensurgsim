@@ -496,7 +496,7 @@ void SixenseScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 
 SurgSim::Framework::LogLevel SixenseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
-int SixenseScaffold::m_startupDelayMilliseconds = 5000;
+int SixenseScaffold::m_startupDelayMilliseconds = 6000;
 int SixenseScaffold::m_startupRetryIntervalMilliseconds = 100;
 
 
