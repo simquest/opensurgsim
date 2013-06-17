@@ -57,13 +57,13 @@ public:
 	/// \param component The component to be added.
 	/// \return true if the component was scheduled for addition, this does not indicate that
 	/// 		the component will actually be added to this manager
-	bool addComponent(const std::shared_ptr<Component>& component);
+	bool enqueueAddComponent(const std::shared_ptr<Component>& component);
 
 	/// Queues a component to be removed
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
 	/// 		the component will actually be removed from this manager
-	bool removeComponent(const std::shared_ptr<Component>& component);
+	bool enqueueRemoveComponent(const std::shared_ptr<Component>& component);
 
 	/// @{
 	/// Runtime accessors

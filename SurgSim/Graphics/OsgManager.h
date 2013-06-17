@@ -41,7 +41,8 @@ class OsgGroup;
 /// the Manager.
 ///
 /// For convenience, a default Camera and default Group are setup.
-/// The default Camera is assigned to any added View that does not already have a Camera assigned. This allows a View of
+/// The default Camera is assigned to any added View that do
+/// es not already have a Camera assigned. This allows a View of
 /// the scene to be setup simply by creating a Graphics::OsgViewElement and adding it to the Framework::Scene.
 /// The default Camera is initially assigned the default Group. Any Graphics::Representation or Graphics::Group added
 /// to the Manager will be added to this group, so the default Camera will see everything.

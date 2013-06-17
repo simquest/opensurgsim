@@ -43,14 +43,14 @@ void ComponentManager::setRuntime(std::shared_ptr<Runtime> val)
 	m_logger = val->getLogger(getName());
 }
 
-bool ComponentManager::addComponent(const std::shared_ptr<Component>& component)
+bool ComponentManager::enqueueAddComponent(const std::shared_ptr<Component>& component)
 {
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
 	m_componentAdditions.push_back(component);
 	return true;
 }
 
-bool ComponentManager::removeComponent(const std::shared_ptr<Component>& component)
+bool ComponentManager::enqueueRemoveComponent(const std::shared_ptr<Component>& component)
 {
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
 	m_componentRemovals.push_back(component);

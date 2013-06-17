@@ -81,14 +81,14 @@ TEST(ComponentManagerTests, SimpleAddRemoveComponentTest)
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	MockManager manager;
 	manager.setRuntime(runtime);
-	manager.addComponent(mock1);
-	manager.addComponent(mock1);
+	manager.enqueueAddComponent(mock1);
+	manager.enqueueAddComponent(mock1);
 
 	manager.testProcessComponents();
 
 	EXPECT_EQ(1u, manager.getComponents().size());
 
-	manager.removeComponent(mock1);
+	manager.enqueueRemoveComponent(mock1);
 	manager.testProcessComponents();
 	EXPECT_EQ(0u, manager.getComponents().size());
 
@@ -103,15 +103,15 @@ TEST(ComponentManagerTests, CompundAddRemoveComponentTest)
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	MockManager manager;
 	manager.setRuntime(runtime);
-	manager.addComponent(mock1);
-	manager.addComponent(mock2);
-	manager.addComponent(invalid);
+	manager.enqueueAddComponent(mock1);
+	manager.enqueueAddComponent(mock2);
+	manager.enqueueAddComponent(invalid);
 	manager.testProcessComponents();
 
 	EXPECT_EQ(2u, manager.getComponents().size());
-	manager.removeComponent(mock1);
-	manager.addComponent(mock2);
-	manager.removeComponent(invalid);
+	manager.enqueueRemoveComponent(mock1);
+	manager.enqueueAddComponent(mock2);
+	manager.enqueueRemoveComponent(invalid);
 	manager.testProcessComponents();
 
 	EXPECT_EQ(1u, manager.getComponents().size());

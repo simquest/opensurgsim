@@ -53,12 +53,12 @@ bool PhysicsManager::doStartUp()
 }
 
 
-bool PhysicsManager::doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+bool PhysicsManager::threadAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryAddComponent(component,&m_representations) != nullptr;
 }
 
-bool PhysicsManager::doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+bool PhysicsManager::threadRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_representations);
 }

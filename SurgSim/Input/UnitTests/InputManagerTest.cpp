@@ -88,12 +88,12 @@ public:
 
 	bool testDoAddComponent(const std::shared_ptr<Component>& component)
 	{
-		return inputManager->doAddComponent(component);
+		return inputManager->threadAddComponent(component);
 	}
 
 	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
 	{
-		return inputManager->doRemoveComponent(component);
+		return inputManager->threadRemoveComponent(component);
 	}
 
 	std::shared_ptr<TestDevice> testDevice1;

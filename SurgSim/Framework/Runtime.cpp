@@ -105,7 +105,7 @@ void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework
 	{
 		for (auto manager = std::begin(m_managers); manager != std::end(m_managers); ++manager)
 		{
-			(*manager)->addComponent(*componentsIt);
+			(*manager)->enqueueAddComponent(*componentsIt);
 		}
 	}
 }
@@ -259,7 +259,7 @@ void Runtime::addComponent(const std::shared_ptr<Component>& component)
 {
 	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
 	{
-		(*it)->addComponent(component);
+		(*it)->enqueueAddComponent(component);
 	}
 }
 
@@ -267,7 +267,7 @@ void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 {
 	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
 	{
-		(*it)->removeComponent(component);
+		(*it)->enqueueRemoveComponent(component);
 	}
 }
 

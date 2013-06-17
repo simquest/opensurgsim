@@ -39,8 +39,8 @@ public:
 	~BehaviorManager();
 
 protected:
-	virtual bool doAddComponent(const std::shared_ptr<Component>& component);
-	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component);
+	virtual bool threadAddComponent(const std::shared_ptr<Component>& component);
+	virtual bool threadRemoveComponent(const std::shared_ptr<Component>& component);
 
 private:
 	virtual bool doUpdate(double dt);

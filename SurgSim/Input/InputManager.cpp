@@ -52,7 +52,7 @@ bool InputManager::doUpdate(double dt)
 	return true;
 }
 
-bool InputManager::doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+bool InputManager::threadAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 
 	auto input = tryAddComponent(component, &m_inputs);
@@ -121,7 +121,7 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	return result;
 }
 
-bool InputManager::doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+bool InputManager::threadRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 
 	bool result = false;

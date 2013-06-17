@@ -61,12 +61,12 @@ public:
 
 	bool testDoAddComponent(const std::shared_ptr<Component>& component)
 	{
-		return physicsManager->doAddComponent(component);
+		return physicsManager->threadAddComponent(component);
 	}
 
 	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
 	{
-		return physicsManager->doRemoveComponent(component);
+		return physicsManager->threadRemoveComponent(component);
 	}
 
 	std::shared_ptr<Runtime> runtime;

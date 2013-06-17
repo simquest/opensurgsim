@@ -66,12 +66,12 @@ private:
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.
-	virtual bool doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	virtual bool threadAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
 	/// Removes the component described by component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
-	virtual bool doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	virtual bool threadRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
 
 	/// Specific call for input components.

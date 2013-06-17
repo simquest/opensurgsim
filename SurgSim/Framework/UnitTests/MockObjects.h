@@ -214,12 +214,12 @@ public:
 
 	bool testTryAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 	{
-		return doAddComponent(component);
+		return threadAddComponent(component);
 	}
 
 	bool testTryRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 	{
-		return doRemoveComponent(component);
+		return threadRemoveComponent(component);
 	}
 
 	void testProcessComponents()
@@ -254,12 +254,12 @@ private:
 		didBeforeStop = true;
 	}
 
-	virtual bool doAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component) 
+	virtual bool threadAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component) 
 	{
 		return tryAddComponent(component, &m_components) != nullptr;
 	}
 
-	virtual bool doRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+	virtual bool threadRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
 	{
 		return tryRemoveComponent(component, &m_components);
 	}
