@@ -66,6 +66,10 @@ TEST(ComponentManagerTests, TestInternalAddRemove)
 	EXPECT_TRUE(manager.testTryRemoveComponent(mock2));
 	EXPECT_EQ(0u, manager.getComponents().size());
 
+	// Add after remove
+	EXPECT_TRUE(manager.testTryAddComponent(mock1));
+	EXPECT_EQ(1u, manager.getComponents().size());
+
 }
 
 TEST(ComponentManagerTests, SimpleAddRemoveComponentTest)

@@ -59,22 +59,23 @@ bool ComponentManager::removeComponent(const std::shared_ptr<Component>& compone
 
 void ComponentManager::processComponents()
 {
-	copyScheduledComponents();
+	std::vector<std::shared_ptr<Component>> inflightAdditions;
+	std::vector<std::shared_ptr<Component>> inflightRemovals;
 
-	if (!m_inflightAdditions.empty())
+	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
+
+	if (!inflightAdditions.empty())
 	{
-		auto inflightBegin = std::begin(m_inflightAdditions);
-		auto inflightEnd = std::end(m_inflightAdditions);
+		auto inflightBegin = std::begin(inflightAdditions);
+		auto inflightEnd = std::end(inflightAdditions);
 
-		initializeComponents(inflightBegin, inflightEnd);
+		addAndIntializeComponents(inflightBegin, inflightEnd);
 		wakeUpComponents(inflightBegin, inflightEnd);
-		m_inflightAdditions.clear();
 	}
 
-	if (!m_inflightRemovals.empty())
+	if (!inflightRemovals.empty())
 	{
-		removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
-		m_inflightRemovals.clear();
+		removeComponents(std::begin(inflightRemovals), std::end(inflightRemovals));
 	}
 }
 
@@ -88,50 +89,56 @@ bool ComponentManager::executeInitialization()
 	}
 
 	// Now Initialize and and wakeup all the components
-	copyScheduledComponents();
-	auto inflightBegin = std::begin(m_inflightAdditions);
-	auto inflightEnd = std::end(m_inflightAdditions);
+	std::vector<std::shared_ptr<Component>> inflightAdditions;
+	std::vector<std::shared_ptr<Component>> inflightRemovals;
+	
+	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
 
-	if (!m_inflightAdditions.empty())
+	auto inflightBegin = std::begin(inflightAdditions);
+	auto inflightEnd = std::end(inflightAdditions);
+	
+	if (! inflightAdditions.empty())
 	{
-		initializeComponents(inflightBegin, inflightEnd);
-		wakeUpComponents(inflightBegin, inflightEnd);
-		m_inflightAdditions.clear();
+		addAndIntializeComponents(inflightBegin, inflightEnd);
 	}
 
 	success = waitForBarrier(success);
-
 	if (! success)
 	{
 		return success;
 	}
 
-	if (!m_inflightAdditions.empty())
+	if (! inflightAdditions.empty())
 	{
-		removeComponents(std::begin(m_inflightRemovals), std::end(m_inflightRemovals));
-		m_inflightRemovals.clear();
+		wakeUpComponents(inflightBegin, inflightEnd);
 	}
-	success = waitForBarrier(success);
+
+	if (! inflightRemovals.empty())
+	{
+		removeComponents(std::begin(inflightRemovals), std::end(inflightRemovals));
+	}
 
 	// Wait for SceneElement WakeUp, the last in the sequence
 	success = waitForBarrier(success);
+
+	success = waitForBarrier(success);
+
 	return success;
 }
 
-void ComponentManager::copyScheduledComponents()
+void ComponentManager::copyScheduledComponents(
+	std::vector<std::shared_ptr<Component>>* inflightAdditions,
+	std::vector<std::shared_ptr<Component>>* inflightRemovals
+)
 {
-	m_inflightAdditions.clear();
-	m_inflightRemovals.clear();
 
 	// Lock for any more additions or removals and then copy to local storage
 	// this will insulate us from the actual add or remove call taking longer than it should
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
-	m_inflightAdditions.resize(m_componentAdditions.size());
-	std::copy(m_componentAdditions.begin(), m_componentAdditions.end(), m_inflightAdditions.begin());
+	*inflightAdditions = std::move(m_componentAdditions);
 	m_componentAdditions.clear();
 
-	m_inflightRemovals.resize(m_componentRemovals.size());
-	std::copy(m_componentRemovals.begin(), m_componentRemovals.end(), m_inflightRemovals.begin());
+	*inflightRemovals = std::move(m_componentRemovals);
 	m_componentRemovals.clear();
 }
 
@@ -140,17 +147,17 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 {
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		doRemoveComponent(*it);
+		threadRemoveComponent(*it);
 	}
 }
 
-void ComponentManager::initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+void ComponentManager::addAndIntializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
 {
 	// Add All Components to the internal storage
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		if (doAddComponent(*it))
+		if (threadAddComponent(*it))
 		{
 			(*it)->initialize(std::move(getRuntime()));
 		}
@@ -168,7 +175,7 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 			{
 				SURGSIM_LOG_WARNING(m_logger) << "Failed to wake up component " << (*it)->getName() << " in manager " <<
 					getName() << ". Component was not added to the manager!";
-				doRemoveComponent(*it);
+				threadRemoveComponent(*it);
 			}
 		}
 	}

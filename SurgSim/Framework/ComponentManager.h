@@ -104,7 +104,8 @@ protected:
 	/// Helper, blocks access to the additions and removal queue and copies the components
 	/// from there to the intermediate inflight queues, after this call, the incoming
 	/// queues will be empty.
-	void copyScheduledComponents();
+	void copyScheduledComponents(std::vector<std::shared_ptr<Component>>* inflightAdditions,
+								 std::vector<std::shared_ptr<Component>>* inflightRemovals);
 
 	/// Blocks protects addition and removal queues
 	boost::mutex m_componentMutex;
@@ -130,13 +131,13 @@ private:
 	/// \param component The component to be added.
 	/// \return true if the component was scheduled for addition, this does not indicate that
 	/// 		the component will actually be added to this manager.
-	virtual bool doAddComponent(const std::shared_ptr<Component>& component) = 0;
+	virtual bool threadAddComponent(const std::shared_ptr<Component>& component) = 0;
 
 	/// Handle representations, override for each thread
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
 	/// 		the component will actually be removed from this manager.
-	virtual bool doRemoveComponent(const std::shared_ptr<Component>& component) = 0;
+	virtual bool threadRemoveComponent(const std::shared_ptr<Component>& component) = 0;
 
 	/// Overridden from BasicThread, extends the initialization to contain component initialization
 	/// including waiting for the other threads to conclude their component initialization and wakeup
@@ -151,7 +152,7 @@ private:
 	// Delegates to doAddComponent and calls initialize on all the components
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
-	void initializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+	void addAndIntializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 							  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	/// Wake all the components up, only the components that were successfully initialized get
@@ -164,13 +165,6 @@ private:
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	std::weak_ptr<Runtime> m_runtime;
-
-	///@{
-	/// Temporary containers for the components that are to be added and removed
-	/// receives all the elements from m_componentAdditions and Removals
-	std::vector<std::shared_ptr<Component>> m_inflightAdditions;
-	std::vector<std::shared_ptr<Component>> m_inflightRemovals;
-	///@}
 
 };
 
