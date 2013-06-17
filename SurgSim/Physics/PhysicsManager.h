@@ -56,8 +56,8 @@ protected:
 
 	///@{
 	/// Overridden from ComponentManager
-	bool threadAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
-	bool threadRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
 	///@}
 
 	///@{

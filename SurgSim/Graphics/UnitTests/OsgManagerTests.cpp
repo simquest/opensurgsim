@@ -64,12 +64,12 @@ public:
 
 	bool testDoAddComponent(const std::shared_ptr<Component>& component)
 	{
-		return graphicsManager->threadAddComponent(component);
+		return graphicsManager->executeAdditions(component);
 	}
 
 	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
 	{
-		return graphicsManager->threadRemoveComponent(component);
+		return graphicsManager->executeRemovals(component);
 	}
 
 	void doProcessComponents()

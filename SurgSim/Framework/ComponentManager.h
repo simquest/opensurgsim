@@ -131,13 +131,13 @@ private:
 	/// \param component The component to be added.
 	/// \return true if the component was scheduled for addition, this does not indicate that
 	/// 		the component will actually be added to this manager.
-	virtual bool threadAddComponent(const std::shared_ptr<Component>& component) = 0;
+	virtual bool executeAdditions(const std::shared_ptr<Component>& component) = 0;
 
 	/// Handle representations, override for each thread
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
 	/// 		the component will actually be removed from this manager.
-	virtual bool threadRemoveComponent(const std::shared_ptr<Component>& component) = 0;
+	virtual bool executeRemovals(const std::shared_ptr<Component>& component) = 0;
 
 	/// Overridden from BasicThread, extends the initialization to contain component initialization
 	/// including waiting for the other threads to conclude their component initialization and wakeup
