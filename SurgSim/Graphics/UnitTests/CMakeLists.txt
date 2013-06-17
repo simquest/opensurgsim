@@ -36,6 +36,7 @@ set(UNIT_TEST_SOURCES
 	OsgRigidTransformConversionsTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgUniformTests.cpp
+	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
 	OsgViewTests.cpp
