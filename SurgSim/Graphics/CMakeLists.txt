@@ -56,6 +56,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	PlaneRepresentation.h
 	Representation.h
 	SphereRepresentation.h
+	Uniform.h
 	View.h
 	ViewElement.h
 )
