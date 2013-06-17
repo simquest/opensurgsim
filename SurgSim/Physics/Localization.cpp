@@ -33,7 +33,8 @@ Localization::~Localization()
 
 bool Localization::operator==(const Localization& localization) const
 {
-	return (typeid(*this) == typeid(localization)) && isEqual(localization);
+	return (typeid(*this) == typeid(localization)) &&
+		m_representation == localization.m_representation && isEqual(localization);
 }
 
 bool Localization::operator!=(const Localization& localization) const

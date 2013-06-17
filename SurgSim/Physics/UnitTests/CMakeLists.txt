@@ -23,15 +23,17 @@ set(UNIT_TEST_SOURCES
 	ContactCalculationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
+	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
 	RepresentationTest.cpp
-	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationFixedLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
+	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	VtcRigidParametersTest.cpp
 	VtcRigidRepresentationTest.cpp

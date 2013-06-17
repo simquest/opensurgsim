@@ -18,7 +18,9 @@
 
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
+
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim
 {
@@ -30,12 +32,18 @@ namespace Physics
 class FixedRepresentationLocalization: public Localization
 {
 public:
+	/// Default constructor
+	FixedRepresentationLocalization() :
+	Localization()
+	{
+	}
+
 	/// Constructor
 	/// \param representation The representation to assign to this localization
-	explicit FixedRepresentationLocalization(std::shared_ptr<Representation> representation) :
+	explicit FixedRepresentationLocalization(std::shared_ptr<Representation> representation) : 
 	Localization(representation)
 	{
-		std::shared_ptr<FixedRepresentation> fixed = std::dynamic_pointer_cast<std::shared_ptr<FixedRepresentation>>;
+		std::shared_ptr<FixedRepresentation> fixed = std::dynamic_pointer_cast<FixedRepresentation>(representation);
 		SURGSIM_ASSERT(fixed != nullptr) << "Unexpected representation type" << std::endl;
 	}
 
@@ -74,7 +82,7 @@ private:
 	/// \note time can useful when dealing with CCD
 	SurgSim::Math::Vector3d doCalculatePosition(double time)
 	{
-		std::shared_ptr<FixedRepresentation> fixed = std::static_pointer_cast<std::shared_ptr<FixedRepresentation>>(getRepresentation());
+		std::shared_ptr<FixedRepresentation> fixed = std::static_pointer_cast<FixedRepresentation>(getRepresentation());
 
 		if (time == 0.0)
 		{
@@ -91,7 +99,7 @@ private:
 
 		const SurgSim::Math::RigidTransform3d& currentPose  = fixed->getPose();
 		const SurgSim::Math::RigidTransform3d& previousPose = fixed->getPreviousPose();
-		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolateRigidTransform(previousPose, currentPose, time);
+		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolate(previousPose, currentPose, time);
 
 		return pose * m_position;
 	}

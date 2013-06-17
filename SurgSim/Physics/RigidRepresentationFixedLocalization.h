@@ -33,6 +33,12 @@ namespace Physics
 class RigidRepresentationFixedLocalization: public Localization
 {
 public:
+	/// Default constructor
+	RigidRepresentationFixedLocalization() :
+	Localization()
+	{
+	}
+
 	/// Constructor
 	/// \param representation The representation to assign to this localization
 	explicit RigidRepresentationFixedLocalization(std::shared_ptr<Representation> representation) :
@@ -94,7 +100,7 @@ private:
 
 		const SurgSim::Math::RigidTransform3d& currentPose  = rigidRepresentation->getCurrentState().getPose();
 		const SurgSim::Math::RigidTransform3d& previousPose = rigidRepresentation->getPreviousState().getPose();
-		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolateRigidTransform(previousPose, currentPose, time);
+		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolate(previousPose, currentPose, time);
 
 		return pose * m_position;
 	}
