@@ -22,7 +22,6 @@
 #include <map>
 
 #include <boost/thread/mutex.hpp>
-#include <boost/lockfree/queue.hpp>
 
 namespace SurgSim
 {
