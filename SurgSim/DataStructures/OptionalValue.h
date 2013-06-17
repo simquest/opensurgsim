@@ -26,22 +26,15 @@ namespace DataStructures
 template <class T> 
 /// Container class that can indicate wether the object has been assigned a value.
 /// \tparam Class of the value that this object contains
-class TestableValue
+class OptionalValue
 {
 public:
-	TestableValue()  : m_hasValue(false)
+	OptionalValue()  : m_hasValue(false)
 	{
 	}
 
-	explicit TestableValue(const T& value) : m_hasValue(true), m_value(value)
+	explicit OptionalValue(const T& value) : m_hasValue(true), m_value(value)
 	{
-	}
-
-	TestableValue operator=(T rhs)
-	{
-		m_hasValue = true;
-		std::swap(m_value, rhs);
-		return *this;
 	}
 
 	/// Query if this object has been assigned a value.

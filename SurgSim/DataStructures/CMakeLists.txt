@@ -34,7 +34,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
-	TestableValue.h
+	OptionalValue.h
 	TriangleMesh.h
 )
 

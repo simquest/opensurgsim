@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include <SurgSim/DataStructures/TestableValue.h>
+#include <SurgSim/DataStructures/OptionalValue.h>
 
 namespace SurgSim 
 {
@@ -26,13 +26,16 @@ namespace DataStructures
 
 TEST(TestableValueTests, InitTest)
 {
-	EXPECT_NO_THROW({TestableValue<int> a;});
-	EXPECT_NO_THROW({TestableValue<double> b(10.0);});
+	EXPECT_NO_THROW({OptionalValue<int> a;});
+	EXPECT_NO_THROW({OptionalValue<double> b(10.0);});
+
+	OptionalValue<int> a;
+	EXPECT_FALSE(a.hasValue());
 }
 
 TEST(TestableValueTests, AssertTest)
 {
-	TestableValue<std::shared_ptr<int>> a;
+	OptionalValue<std::shared_ptr<int>> a;
 
 	EXPECT_ANY_THROW({ auto i = a.getValue();});
 }
@@ -40,7 +43,7 @@ TEST(TestableValueTests, AssertTest)
 
 TEST(TestableValueTests, SetValueTest)
 {
-	TestableValue<double> a;
+	OptionalValue<double> a;
 	EXPECT_FALSE(a.hasValue());
 	a.setValue(10.0);
 
@@ -52,14 +55,6 @@ TEST(TestableValueTests, SetValueTest)
 	EXPECT_FALSE(a.hasValue());
 }
 
-TEST(TestableValueTests, AssignmentTest)
-{
-	TestableValue<double> a;
-	EXPECT_FALSE(a.hasValue());
-	a = 10.0;
-	EXPECT_TRUE(a.hasValue());
-	EXPECT_EQ(10.0, a.getValue());
-}
 
 }; // namespace DataStructures
 }; // namespace SurgSim
