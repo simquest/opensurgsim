@@ -123,13 +123,13 @@ SixenseScaffold::SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 
 SixenseScaffold::~SixenseScaffold()
 {
+	// The thread needs to be torn down while NOT holding the mutex, to avoid deadlock.
+	if (m_state->thread)
 	{
-		// The thread needs to be torn down while NOT holding the mutex, to avoid deadlock.
-		if (m_state->thread)
-		{
-			destroyThread();
-		}
+		destroyThread();
 	}
+
+	// The following block controls the duration of the mutex being locked.
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -263,7 +263,6 @@ bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 
 	int status = sixenseSetActiveBase(info.deviceBaseIndex);
 	if (status != SIXENSE_SUCCESS)
-
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Could not activate base unit #" << info.deviceBaseIndex <<
 			" to read device '" << info.deviceObject->getName() << "'! (status = " << status << ")";
@@ -280,30 +279,29 @@ bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 		return false;
 	}
 
-	{
-		// Use Eigen::Map to make the raw API output values look like Eigen data types
-		Eigen::Map<Vector3f> position(data.pos);
-		Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>> orientation(&(data.rot_mat[0][0]));
+	// Use Eigen::Map to make the raw API output values look like Eigen data types
+	Eigen::Map<Vector3f> position(data.pos);
+	Eigen::Map<Eigen::Matrix<float, 3, 3, Eigen::ColMajor>> orientation(&(data.rot_mat[0][0]));
 
-		RigidTransform3d pose;
-		pose.makeAffine();
-		pose.linear() = orientation.cast<double>();
-		pose.translation() = position.cast<double>() * 0.001;  // convert from millimeters to meters!
+	RigidTransform3d pose;
+	pose.makeAffine();
+	pose.linear() = orientation.cast<double>();
+	pose.translation() = position.cast<double>() * 0.001;  // convert from millimeters to meters!
 
-		// TODO(bert): this code should cache the access indices.
-		inputData.poses().set("pose", pose);
-		inputData.scalars().set("trigger", data.trigger);
-		inputData.scalars().set("joystickX", data.joystick_x);
-		inputData.scalars().set("joystickY", data.joystick_y);
-		inputData.booleans().set("buttonTrigger", (data.trigger > 0));
-		inputData.booleans().set("buttonBumper", (data.buttons & SIXENSE_BUTTON_BUMPER) != 0);
-		inputData.booleans().set("button1", (data.buttons & SIXENSE_BUTTON_1) != 0);
-		inputData.booleans().set("button2", (data.buttons & SIXENSE_BUTTON_2) != 0);
-		inputData.booleans().set("button3", (data.buttons & SIXENSE_BUTTON_3) != 0);
-		inputData.booleans().set("button4", (data.buttons & SIXENSE_BUTTON_4) != 0);
-		inputData.booleans().set("buttonStart", (data.buttons & SIXENSE_BUTTON_START) != 0);
-		inputData.booleans().set("buttonJoystick", (data.buttons & SIXENSE_BUTTON_JOYSTICK) != 0);
-	}
+	// TODO(bert): this code should cache the access indices.
+	inputData.poses().set("pose", pose);
+	inputData.scalars().set("trigger", data.trigger);
+	inputData.scalars().set("joystickX", data.joystick_x);
+	inputData.scalars().set("joystickY", data.joystick_y);
+	inputData.booleans().set("buttonTrigger", (data.trigger > 0));
+	inputData.booleans().set("buttonBumper", (data.buttons & SIXENSE_BUTTON_BUMPER) != 0);
+	inputData.booleans().set("button1", (data.buttons & SIXENSE_BUTTON_1) != 0);
+	inputData.booleans().set("button2", (data.buttons & SIXENSE_BUTTON_2) != 0);
+	inputData.booleans().set("button3", (data.buttons & SIXENSE_BUTTON_3) != 0);
+	inputData.booleans().set("button4", (data.buttons & SIXENSE_BUTTON_4) != 0);
+	inputData.booleans().set("buttonStart", (data.buttons & SIXENSE_BUTTON_START) != 0);
+	inputData.booleans().set("buttonJoystick", (data.buttons & SIXENSE_BUTTON_JOYSTICK) != 0);
+
 	return true;
 }
 

@@ -42,13 +42,6 @@ public:
 
 	virtual ~SixenseThread();
 
-	/// Starts the thread execution.
-	void start()
-	{
-		// Start without waiting on a barrier, by calling the base class method with the default argument.
-		BasicThread::start();
-	}
-
 protected:
 	virtual bool doInitialize() override;
 	virtual bool doStartUp() override;
