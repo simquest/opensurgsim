@@ -433,6 +433,83 @@ TYPED_TEST(QuaternionTests, ArrayReadWrite)
 	}
 }
 
+/// Test quaternion negation.
+TYPED_TEST(QuaternionTests, Negate)
+{
+	using SurgSim::Math::negate;
+
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Quaternion<T> Quaternion;
+
+	// Test that 2 quaternions are opposite if they are not equal but give the same rotation
+	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
+	{
+		Quaternion q(Eigen::Matrix<T,4,1>::Random());
+		q.normalize();
+		Quaternion qNeg = negate(q);
+		EXPECT_FALSE(q.isApprox(qNeg));
+
+		typename Quaternion::Matrix3 m = q.toRotationMatrix();
+		typename Quaternion::Matrix3 mNeg = qNeg.toRotationMatrix();
+		EXPECT_TRUE(m.isApprox(mNeg));
+	}
+}
+
+// ==================== SLERP ====================
+
+/// Test quaternion interpolation.
+TYPED_TEST(QuaternionTests, SlerpInterpolation)
+{
+	using SurgSim::Math::negate;
+
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Quaternion<T> Quaternion;
+
+	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
+	{
+		Quaternion q;
+		Quaternion q0(Eigen::Matrix<T,4,1>::Random());
+		Quaternion q1(Eigen::Matrix<T,4,1>::Random());
+		q0.normalize();
+		q1.normalize();
+
+		q = SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.0));
+		EXPECT_TRUE(q.isApprox(q0) || q.isApprox(negate(q0)));
+		q = SurgSim::Math::interpolate(q0, q1, static_cast<T>(1.0));
+		EXPECT_TRUE(q.isApprox(q1) || q.isApprox(negate(q1)));
+
+		q = SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.234));
+		EXPECT_FALSE(q.isApprox(q0) || q.isApprox(negate(q0)));
+		EXPECT_FALSE(q.isApprox(q1) || q.isApprox(negate(q1)));
+
+		q = SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.5));
+		EXPECT_FALSE(q.isApprox(q0) || q.isApprox(negate(q0)));
+		EXPECT_FALSE(q.isApprox(q1) || q.isApprox(negate(q1)));
+		// At t=0.5, the interpolation should return (q0 + q1)/2 normalized
+		// c.f. http://en.wikipedia.org/wiki/Slerp
+		// If the quaternions are over PI angle, the slerp will interpolate between q0 and -q1
+		// in this case, the interpolation is (q0 - q1)/2 normalized
+		// From our specification, both quaternions could be considered negative, so we extend
+		// the tests to these possibilities as well:
+		// (-q0 + q1) / 2 normalized
+		// (-q0 - q1) / 2 normalized
+		Quaternion qHalf0(( q0.coeffs() + q1.coeffs()) * 0.5);
+		Quaternion qHalf1(( q0.coeffs() - q1.coeffs()) * 0.5);
+		Quaternion qHalf2((-q0.coeffs() + q1.coeffs()) * 0.5);
+		Quaternion qHalf3((-q0.coeffs() - q1.coeffs()) * 0.5);
+		qHalf0.normalize();
+		qHalf1.normalize();
+		qHalf2.normalize();
+		qHalf3.normalize();
+		EXPECT_TRUE(q.isApprox(qHalf0) || q.isApprox(qHalf1) ||
+			q.isApprox(qHalf2) || q.isApprox(qHalf3));
+
+		q = SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.874));
+		EXPECT_FALSE(q.isApprox(q0) || q.isApprox(negate(q0)));
+		EXPECT_FALSE(q.isApprox(q1) || q.isApprox(negate(q1)));
+	}
+}
+
 // TO DO:
 // testing numerical validity
 // testing for denormalized numbers

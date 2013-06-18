@@ -22,6 +22,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include <SurgSim/Math/Quaternion.h>
+
 namespace SurgSim
 {
 namespace Math
@@ -76,6 +78,34 @@ inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransfo
 	rigid.linear() = rotation.matrix();
 	rigid.translation() = translation;
 	return rigid;
+}
+
+/// Interpolate (slerp) between 2 rigid transformations
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam TOpt the option flags (alignment etc.) used for the Transform arguments.  Can be deduced.
+/// \param t0 The start transform (at time 0.0).
+/// \param t1 The end   transform (at time 1.0).
+/// \param t  The interpolation time requested. Within [0..1].
+/// \returns the transform resulting in the slerp interpolation at time t, between t0 and t1.
+/// \note t=0 => returns t0
+/// \note t=1 => returns t1
+template <typename T, int TOpt>
+inline Eigen::Transform<T, 3, Eigen::Isometry> interpolate(
+	const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& t0,
+	const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& t1,
+	T t)
+{
+	Eigen::Transform<T, 3, Eigen::Isometry> transform;
+	transform.makeAffine();
+	transform.translation() = t0.translation() * (static_cast<T>(1.0) - t) + t1.translation() * t;
+	{
+		Eigen::Quaternion<T> q0(t0.linear());
+		Eigen::Quaternion<T> q1(t1.linear());
+		q0.normalize();
+		q1.normalize();
+		transform.linear() = interpolate(q0, q1, t).matrix();
+	}
+	return transform;
 }
 
 };  // namespace Math
