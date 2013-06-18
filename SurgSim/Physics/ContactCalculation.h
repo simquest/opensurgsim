@@ -26,34 +26,56 @@ namespace SurgSim
 namespace Physics
 {
 
-typedef SurgSim::Framework::ReuseFactory<Contact> ContactFactory;
-
+/// Base class responsible for calculating contact data between to given shapes, calculateContact needs to  
+/// determine whether the two shapes intersect, and if yes calculate the correct data for this contact, which
+/// consists of, the normal to displace the first shape so that the two shapes just barely touch. And the 
+/// penetration point for each shape, the point the is furthest inside the other object.
+/// If a subclass is works on asymmetric pairs it should implement a flag that enables the calculation to
+/// switch the direction of the pair.
 class ContactCalculation
 {
 public:
+	
+	/// Constructor
 	explicit ContactCalculation()
 	{
 	}
+
+	/// Destructor
 	virtual ~ContactCalculation()
 	{
 	}
+
+	/// Calculate the actual contact between two shapes of the give CollisionPair.
+	/// \param	pair	The pair that is under consideration.
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) = 0;
 };
 
+/// A default calculation, it does nothing and can be used as a placeholder
 class DefaultContactCalculation : public ContactCalculation
 {
 public:
+
+	/// Constructor
+	/// \param doAssert If set the calculation will throw an exception if it is executed, this
+	/// 				can be used to detect cases where a  contact calculation is being called
+	/// 				on a pair that should be implemented
 	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert)
 	{
 	}
+
+	/// Destructor
 	virtual ~DefaultContactCalculation() {}
 
+
+	/// \param	pair	The pair that is under consideration.
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 private:
 	bool m_doAssert;
 };
 
+/// Class to calculate intersections between spheres
 class SphereSphereDcdContact : public ContactCalculation
 {
 public:
@@ -61,18 +83,28 @@ public:
 	{
 	}
 
+	/// Calculate the actual contact between two shapes of the give CollisionPair.
+	/// \param	pair	The pair that is under consideration.
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
 };
 
+
+/// Class to calculate intersections between Spheres and Planes
 class SpherePlaneDcdContact : public ContactCalculation
 {
 public:
+
+	/// Constructor.
+	/// \param	switchPair	Set to true if the calculation needs to switch the members of the pair.
 	explicit SpherePlaneDcdContact(bool switchPair) :
 		m_switchPair(switchPair)
 	{
 	}
 
+	/// Calculate the actual contact between two shapes of the give CollisionPair.
+	/// \param	pair	The pair that is under consideration.
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
+
 private:
 	bool m_switchPair;
 };

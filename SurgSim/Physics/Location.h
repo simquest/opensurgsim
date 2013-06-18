@@ -13,34 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <numeric>
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
+#ifndef SURGSIM_PHYSICS_LOCATION_H
+#define SURGSIM_PHYSICS_LOCATION_H
+
+#include <SurgSim/DataStructures/OptionalValue.h>
+#include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first, 
-							 const std::shared_ptr<CollisionRepresentation>& second) :
-		m_representations(first, second)
+struct Location
 {
-	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
-	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
-}
+public:
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
+};
 
-CollisionPair::~CollisionPair()
-{
+}; // Physics
+}; // SurgSim
 
-}
-
-void CollisionPair::clearContacts()
-{
-	m_contacts.clear();
-}
-
-}; // namespace Physics
-}; // namespace SurgSim
-
+#endif

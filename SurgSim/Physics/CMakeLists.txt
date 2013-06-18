@@ -41,6 +41,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FreeMotion.h
+	Location.h
 	MeshShape.h
 	PhysicsManager.h
 	PhysicsManager-inl.h

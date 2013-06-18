@@ -36,6 +36,8 @@ void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> 
 		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
 
+// Specific calculation for pairs of Spheres
+
 void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" <<
@@ -43,19 +45,25 @@ void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pai
 	SURGSIM_ASSERT(pair->getSecond()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "Second Object, wrong type of object" <<
 																					pair->getSecond()->getShapeType();
 
-	std::shared_ptr<SphereShape> leftSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
-	std::shared_ptr<SphereShape> rightSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
+	std::shared_ptr<SphereShape> firstSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
+	std::shared_ptr<SphereShape> secondSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
 
 
-	Vector3d leftCenter = pair->getFirst()->getCurrentPose().translation();
-	Vector3d rightCenter = pair->getSecond()->getCurrentPose().translation();
+	Vector3d firstCenter = pair->getFirst()->getCurrentPose().translation();
+	Vector3d secondCenter = pair->getSecond()->getCurrentPose().translation();
 
-	Vector3d normal = rightCenter - leftCenter;
+
+	Vector3d normal = secondCenter - firstCenter;
 	double dist = normal.norm();
-	double maxDist = leftSphere->getRadius() + rightSphere->getRadius();
+	double maxDist = firstSphere->getRadius() + secondSphere->getRadius();
 	if (dist < maxDist)
 	{
-		pair->addContact(maxDist - dist, normal.normalized());
+		std::pair<Location,Location> penetrationPoints;
+		normal.normalize();
+		penetrationPoints.first.globalPosition.setValue(firstCenter - normal * firstSphere->getRadius());
+		penetrationPoints.second.globalPosition.setValue(secondCenter + normal * secondSphere->getRadius());
+
+		pair->addContact(maxDist - dist, normal, penetrationPoints);
 	}
 }
 
@@ -86,16 +94,30 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 	Vector3d sphereCenter = representationSphere->getCurrentPose().translation();
 
 	// Move into Plane coordinate system
-	sphereCenter =  representationPlane->getCurrentPose().inverse() * sphereCenter;
+	Vector3d planeLocalSphereCenter =  representationPlane->getCurrentPose().inverse() * sphereCenter;
 
 	Vector3d result;
-	double dist = SurgSim::Math::distancePointPlane(sphereCenter, plane->getNormal(), plane->getD(), &result);
+	double dist = SurgSim::Math::distancePointPlane(planeLocalSphereCenter, plane->getNormal(), plane->getD(), &result);
 	double distAbsolute = std::abs(dist);
 	if (distAbsolute < sphere->getRadius())
 	{
 		double depth = sphere->getRadius() - distAbsolute;
-		double factor = ((dist < 0) ? -1.0 : 1.0) * ((m_switchPair) ? -1.0 : 1.0);
-		pair->addContact(depth, (representationPlane->getCurrentPose() * plane->getNormal() * factor).normalized());
+
+		// Calculate the normal going from the plane to the sphere, it is the plane normal transformed by the
+		// plane pose, flipped if the sphere is behind the plane and normalize it 
+		Vector3d normal = ((representationPlane->getCurrentPose() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0)).normalized();
+
+		std::pair<Location,Location> penetrationPoints;
+		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
+		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * distAbsolute);
+
+		if (m_switchPair)
+		{
+			std::swap(penetrationPoints.first, penetrationPoints.second);
+			normal = -normal; 
+		}
+
+		pair->addContact(depth, normal, penetrationPoints);
 	}
 }
 

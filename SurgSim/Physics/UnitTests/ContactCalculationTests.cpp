@@ -38,7 +38,7 @@ namespace {
 
 ::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right, double epsilon)
 {
-	double dist = left.norm() - right.norm();
+	double dist = (left - right).norm();
 	if (std::abs(dist) < epsilon)
 	{
 		return ::testing::AssertionSuccess();
@@ -106,7 +106,8 @@ std::shared_ptr<CollisionRepresentation> makeSpereRep(const double& radius,
 													  const Vector3d& position = Vector3d::Zero())
 {
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
-	std::shared_ptr<CollisionRepresentation> rep = std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);
+	std::shared_ptr<CollisionRepresentation> rep = 
+		std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);
 	return rep;
 }
 
@@ -114,7 +115,8 @@ std::shared_ptr<CollisionRepresentation> makePlaneRep(const Quaterniond& rotatio
 													  const Vector3d& position = Vector3d::Zero())
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>();
-	std::shared_ptr<CollisionRepresentation> rep = std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
+	std::shared_ptr<CollisionRepresentation> rep = 
+		std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
 	return rep;
 }
 
@@ -138,8 +140,9 @@ TEST(CollisionPairTest, InitTest)
 	EXPECT_EQ(rep0, pair.getFirst());
 	EXPECT_EQ(rep1, pair.getSecond());
 	EXPECT_FALSE(pair.hasContacts());
-
-	pair.addContact(1.0, Vector3d(1.0,0.0,0.0));
+	
+	std::pair<Location,Location> penetrationPoints;
+	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 }
 
@@ -169,7 +172,16 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
 		Vector3d dist = (p1 - p0).normalized();
 		EXPECT_TRUE(eigenEqual(dist, contact->normal, epsilon));
-		EXPECT_NEAR(d, contact->depth, 1e-10);
+		EXPECT_NEAR(d, contact->depth, epsilon);
+		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
+		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
+
+		// This technically repeats the calculation from the sphere sphere collision but there is
+		// only so many ways to calculate this
+		Vector3d penetrationPoint0 = p0 - dist * r0;
+		Vector3d penetrationPoint1 = p1 + dist * r1;
+		EXPECT_TRUE(eigenEqual(penetrationPoint0 ,contact->penetrationPoints.first.globalPosition.getValue(),epsilon));
+		EXPECT_TRUE(eigenEqual(penetrationPoint1 ,contact->penetrationPoints.second.globalPosition.getValue(),epsilon));
 	}
 }
 
@@ -187,15 +199,29 @@ TEST (ContactCalculationTests, SphereSphereCalculation)
 	}
 }
 
-void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& sphereQuat, const Vector3d& sphereTrans,
-					   std::shared_ptr<PlaneShape> plane, const Quaterniond& planeQuat, const Vector3d& planeTrans,
-					   bool expectedIntersect, const double& expectedDepth = 0 , const Vector3d& expectedNorm = Vector3d::Zero())
+void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, 
+					   const Quaterniond& sphereQuat, 
+					   const Vector3d& sphereTrans,
+					   std::shared_ptr<PlaneShape> plane, 
+					   const Quaterniond& planeQuat, 
+					   const Vector3d& planeTrans,
+					   bool expectedIntersect, 
+					   const double& expectedDepth = 0 , 
+					   const Vector3d& expectedNorm = Vector3d::Zero())
 {
-		std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<RigidShapeCollisionRepresentation>(plane,planeQuat,planeTrans);
-		std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
+		std::shared_ptr<CollisionRepresentation> planeRep = 
+			std::make_shared<RigidShapeCollisionRepresentation>(plane,planeQuat,planeTrans);
+		std::shared_ptr<CollisionRepresentation> sphereRep = 
+			std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
 
 		SpherePlaneDcdContact calcNormal(false);
 		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
+
+		// Again this replicates the way this is calculated in the contact calculation just with different 
+		// starting values
+		Vector3d spherePenetration = sphereTrans - expectedNorm * sphere->getRadius();
+		Vector3d planePenetration = sphereTrans - expectedNorm * (sphere->getRadius() - expectedDepth);
+
 		calcNormal.calculateContact(pair);
 		if (expectedIntersect)
 		{
@@ -203,6 +229,14 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 			std::shared_ptr<Contact> contact = pair->getContacts().front();
 			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
 			EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
+			EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
+			EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
+			EXPECT_TRUE(eigenEqual(spherePenetration, 
+								   contact->penetrationPoints.first.globalPosition.getValue(),
+								   epsilon));
+			EXPECT_TRUE(eigenEqual(planePenetration, 
+								   contact->penetrationPoints.second.globalPosition.getValue(),
+								   epsilon));
 		}
 		else
 		{
@@ -219,6 +253,14 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, const Quaterniond& s
 			std::shared_ptr<Contact> contact = pair->getContacts().front();
 			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
 			EXPECT_TRUE(eigenEqual(expectedNorm, -contact->normal, epsilon));
+			EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
+			EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
+			EXPECT_TRUE(eigenEqual(spherePenetration, 
+								   contact->penetrationPoints.second.globalPosition.getValue(),
+								   epsilon));
+			EXPECT_TRUE(eigenEqual(planePenetration, 
+								   contact->penetrationPoints.first.globalPosition.getValue(),
+								   epsilon));
 		}
 		else
 		{
@@ -254,16 +296,20 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 
 	{
 		SCOPED_TRACE("Intersection front, sphere center on the plane, rotated plane");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0,0.0),
-						  plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
-			              true, 1.0, Vector3d(-1.0,0.0,0.0));
+		doSpherePlaneTest(sphere,Quaterniond::Identity(), 
+						  Vector3d(0.0,0,0.0),
+						  plane,
+						  SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)),
+						  Vector3d(0.0,0.0,0.0),
+			              true,
+						  1.0, Vector3d(0.0,0.0,1.0));
 	}
 
 	{
-		SCOPED_TRACE("Intersection front, transformed Plane");
+		SCOPED_TRACE("Intersection front, rotated Plane");
 		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.5),
 			plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
-			true, 0.5, Vector3d(-1.0,0.0,0.0));
+			true, 0.5, Vector3d(0.0,0.0,1.0));
 	}
 }
 
