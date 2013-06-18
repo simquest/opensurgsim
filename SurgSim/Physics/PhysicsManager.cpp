@@ -29,7 +29,8 @@ namespace SurgSim
 namespace Physics
 {
 
-PhysicsManager::PhysicsManager()
+PhysicsManager::PhysicsManager() :
+  ComponentManager("Physics Manager")
 {
 
 }

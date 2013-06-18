@@ -62,6 +62,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Scene.h
 	SceneElement.h
 	SharedInstance.h
+	SharedInstance-inl.h
 )
 
 surgsim_add_library(

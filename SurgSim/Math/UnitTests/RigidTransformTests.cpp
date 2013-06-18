@@ -19,8 +19,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Quaternion.h"
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Quaternion.h>
 #include "gtest/gtest.h"
 
 template <class T>
@@ -28,6 +28,7 @@ class RigidTransformTestBase : public testing::Test
 {
 public:
 	typedef T RigidTransform;
+	typedef typename T::Scalar Scalar;
 };
 
 
@@ -57,4 +58,80 @@ TYPED_TEST_CASE(AllRigidTransformTests, AllRigidTransformVariants);
 TYPED_TEST(AllRigidTransformTests, CanConstruct)
 {
 	typename TestFixture::RigidTransform transform;
+}
+
+/// Test rigid transforms interpolation
+TYPED_TEST(AllRigidTransformTests, Interpolation)
+{
+	using SurgSim::Math::makeRigidTransform;
+
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Quaternion<T> Quaternion;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> Transform;
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
+
+	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
+	{
+		Quaternion q0(Eigen::Matrix<T,4,1>::Random());
+		Quaternion q1(Eigen::Matrix<T,4,1>::Random());
+		q0.normalize();
+		q1.normalize();
+
+		Vector3 t0(Vector3::Random());
+		Vector3 t1(Vector3::Random());
+
+		Transform transform0 = makeRigidTransform(q0, t0);
+		Transform transform1 = makeRigidTransform(q1, t1);
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.0));
+			EXPECT_TRUE(transform.isApprox(transform0));
+		}
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(1.0));
+			EXPECT_TRUE(transform.isApprox(transform1));
+		}
+
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.234));
+			EXPECT_FALSE(transform.isApprox(transform0));
+			EXPECT_FALSE(transform.isApprox(transform1));
+		}
+
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.5));
+			EXPECT_FALSE(transform.isApprox(transform0));
+			EXPECT_FALSE(transform.isApprox(transform1));
+
+			// At t=0.5, the rotation interpolation should return (q0 + q1)/2 normalized
+			// c.f. http://en.wikipedia.org/wiki/Slerp
+			// If the quaternions are over PI angle, the slerp will interpolate between q0 and -q1
+			// in this case, the interpolation is (q0 - q1)/2 normalized
+			// From our specification, both quaternions could be considered negative, so we extend
+			// the tests to these possibilities as well:
+			// (-q0 + q1) / 2 normalized
+			// (-q0 - q1) / 2 normalized
+			Quaternion qHalf0(( q0.coeffs() + q1.coeffs()) * 0.5);
+			Quaternion qHalf1(( q0.coeffs() - q1.coeffs()) * 0.5);
+			Quaternion qHalf2((-q0.coeffs() + q1.coeffs()) * 0.5);
+			Quaternion qHalf3((-q0.coeffs() - q1.coeffs()) * 0.5);
+			qHalf0.normalize();
+			qHalf1.normalize();
+			qHalf2.normalize();
+			qHalf3.normalize();
+
+			Vector3 tHalf = (t0 + t1) * 0.5;
+			Transform transformHalf0 = makeRigidTransform(qHalf0, tHalf);
+			Transform transformHalf1 = makeRigidTransform(qHalf1, tHalf);
+			Transform transformHalf2 = makeRigidTransform(qHalf2, tHalf);
+			Transform transformHalf3 = makeRigidTransform(qHalf3, tHalf);
+			EXPECT_TRUE(transform.isApprox(transformHalf0) || transform.isApprox(transformHalf1) ||
+				transform.isApprox(transformHalf2) || transform.isApprox(transformHalf3));
+		}
+
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.839));
+			EXPECT_FALSE(transform.isApprox(transform0));
+			EXPECT_FALSE(transform.isApprox(transform1));
+		}
+	}
 }

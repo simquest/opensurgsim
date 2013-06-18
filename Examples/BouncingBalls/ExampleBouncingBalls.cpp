@@ -31,6 +31,7 @@
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Physics/PhysicsManager.h>
+#include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/PlaneShape.h>
@@ -44,6 +45,7 @@ using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgSphereRepresentation;
+using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::PlaneShape;
@@ -95,15 +97,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim::Math::RigidTransform3d& pose)
 {
-	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>(name + " Physics");
+	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>(name + " Physics");
 
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
-
-	std::shared_ptr<PlaneShape> shape = std::make_shared<PlaneShape>();
-	params.setShapeUsedForMassInertia(shape);
-
-	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation = std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
@@ -123,6 +118,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
+	params.setLinearDamping(10.0);
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
