@@ -72,6 +72,7 @@ public:
 		clearContacts();
 		m_representations.first = first;
 		m_representations.second = second;
+		m_isSwapped = false;
 	}
 
 	inline const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
@@ -138,6 +139,13 @@ public:
 	/// Reset clear the list of contacts, invalidating all the contacts
 	void clearContacts();
 
+	/// Swap the representation pair so that first becomes second and second becomes first
+	void swapRepresentations();
+
+	/// Query if this the pair has been swapped from when it was constructed.
+	/// \return	true if swapped, false if not.
+	bool isSwapped() const;
+
 private:
 
 	/// Pair of objects that are colliding
@@ -146,6 +154,8 @@ private:
 
 	/// List of current contacts
 	std::list<std::shared_ptr<Contact>> m_contacts;
+
+	bool m_isSwapped;
 };
 
 

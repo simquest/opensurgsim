@@ -25,7 +25,7 @@ namespace Physics
 
 CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first, 
 							 const std::shared_ptr<CollisionRepresentation>& second) :
-		m_representations(first, second)
+		m_representations(first, second), m_isSwapped(false)
 {
 	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
 	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
@@ -39,6 +39,18 @@ CollisionPair::~CollisionPair()
 void CollisionPair::clearContacts()
 {
 	m_contacts.clear();
+}
+
+void CollisionPair::swapRepresentations()
+{
+	SURGSIM_ASSERT(! hasContacts()) << "Can't swap representations after contacts have already been calculated";
+	m_isSwapped = !m_isSwapped;
+	std::swap(m_representations.first, m_representations.second);
+}
+
+bool CollisionPair::isSwapped() const
+{
+	return m_isSwapped;
 }
 
 }; // namespace Physics
