@@ -80,7 +80,7 @@ private:
 class MockThread : public SurgSim::Framework::BasicThread
 {
 public:
-	MockThread(int runCount = -1) :
+	explicit MockThread(int runCount = -1) :
 		count(runCount),
 		totalTime(0.0),
 		didBeforeStop(false),

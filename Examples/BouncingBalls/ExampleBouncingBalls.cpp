@@ -61,8 +61,8 @@ using SurgSim::Physics::PhysicsManager;
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation)
-		: Behavior("PrintoutBehavior"), m_representation(representation) {}
+	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
+		Behavior("PrintoutBehavior"), m_representation(representation) {}
 	~PrintoutBehavior() {}
 
 	virtual void update(double dt)
