@@ -30,7 +30,6 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgManager.cpp
 	OsgPlaneRepresentation.cpp
 	OsgSphereRepresentation.cpp
-	OsgUniform.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	ViewElement.cpp

@@ -32,30 +32,14 @@ namespace Graphics
 /// The input value is just returned. This allows this conversion method to be used with scalar types such as int and
 /// float, which are the same in Eigen and OSG.
 template <typename T>
-T& toOsg(T& value)
+const T& toOsg(const T& value)
 {
 	return value;
 }
 
-inline OsgUniformBase::OsgUniformBase(const std::string& name, const std::string& shaderName) : UniformBase(name),
-	m_uniform(new osg::Uniform())
-{
-	m_uniform->setName(shaderName);
-}
-
-inline const std::string& OsgUniformBase::getShaderName() const
-{
-	return m_uniform->getName();
-}
-
-inline osg::ref_ptr<osg::Uniform> OsgUniformBase::getOsgUniform() const
-{
-	return m_uniform;
-}
-
 template <class T>
-OsgUniform<T>::OsgUniform(const std::string& name, const std::string& shaderName) : UniformBase(name), Uniform<T>(name),
-	OsgUniformBase(name, shaderName)
+OsgUniform<T>::OsgUniform(const std::string& name) :
+	UniformBase(), Uniform<T>(), OsgUniformBase(name)
 {
 	osg::Uniform::Type osgUniformType = getOsgUniformType<T>();
 	SURGSIM_ASSERT(osgUniformType != osg::Uniform::UNDEFINED) << "Failed to get OSG uniform type!";
@@ -78,8 +62,8 @@ const T& OsgUniform<T>::get() const
 }
 
 template <class T>
-OsgUniform<std::vector<T>>::OsgUniform(const std::string& name, const std::string& shaderName, unsigned int numElements) : 
-		UniformBase(name), Uniform<std::vector<T>>(name), OsgUniformBase(name, shaderName)
+OsgUniform<std::vector<T>>::OsgUniform(const std::string& name, unsigned int numElements) :
+	UniformBase(), Uniform<std::vector<T>>(), OsgUniformBase(name)
 {
 	osg::Uniform::Type osgUniformType = getOsgUniformType<T>();
 	SURGSIM_ASSERT(osgUniformType != osg::Uniform::UNDEFINED) << "Failed to get OSG uniform type!";
@@ -105,7 +89,7 @@ void OsgUniform<std::vector<T>>::setElement(unsigned int index, const T& value)
 template <class T>
 void OsgUniform<std::vector<T>>::set(const std::vector<T>& value)
 {
-	SURGSIM_ASSERT(value.size() == m_uniform->getNumElements()) << 
+	SURGSIM_ASSERT(value.size() == m_uniform->getNumElements()) <<
 		"Number of elements (" << value.size() << ") must match uniform's number of elements (" <<
 		m_uniform->getNumElements() << ")! Uniform: " << getName();
 	for (unsigned int i = 0; i < value.size(); ++i)
@@ -115,7 +99,7 @@ void OsgUniform<std::vector<T>>::set(const std::vector<T>& value)
 }
 
 template <class T>
-const T& OsgUniform<std::vector<T>>::getElement(unsigned int index) const
+typename std::vector<T>::const_reference OsgUniform<std::vector<T>>::getElement(unsigned int index) const
 {
 	return m_value[index];
 }

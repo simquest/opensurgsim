@@ -16,42 +16,16 @@
 #ifndef SURGSIM_GRAPHICS_OSGUNIFORM_H
 #define SURGSIM_GRAPHICS_OSGUNIFORM_H
 
+#include <SurgSim/Graphics/OsgUniformBase.h>
 #include <SurgSim/Graphics/Uniform.h>
 
 #include <osg/Uniform>
-
-#include <array>
 
 namespace SurgSim
 {
 
 namespace Graphics
 {
-
-/// Base OSG implementation of graphics uniforms.
-///
-/// Wraps an osg::Uniform.
-/// \note
-/// SurgSim::Graphics::OsgUniform is templated on the type of value, so this base class allows a pointer to any type of
-/// OSG Uniform.
-class OsgUniformBase : public virtual UniformBase
-{
-public:
-	/// Constructor
-	/// \param	name	Name of the uniform
-	/// \param	shaderName	Name used in shaders to reference this uniform
-	OsgUniformBase(const std::string& name, const std::string& shaderName);
-
-	/// Returns the name used in shaders to use the uniform
-	const std::string& getShaderName() const;
-
-	/// Returns the OSG uniform node
-	osg::ref_ptr<osg::Uniform> getOsgUniform() const;
-
-protected:
-	/// OSG uniform node
-	osg::ref_ptr<osg::Uniform> m_uniform;
-};
 
 /// OSG implementation of graphics uniform with a value of type T.
 /// \tparam	Value type
@@ -60,9 +34,8 @@ class OsgUniform : public Uniform<T>, public OsgUniformBase
 {
 public:
 	/// Constructor
-	/// \param	name	Name of the uniform
-	/// \param	shaderName	Name used in shaders to reference this uniform
-	OsgUniform(const std::string& name, const std::string& shaderName);
+	/// \param	name	Name used in shader code to access this uniform
+	explicit OsgUniform(const std::string& name);
 
 	/// Sets the value of the uniform
 	virtual void set(const T& value);
@@ -82,10 +55,9 @@ class OsgUniform<std::vector<T>> : public Uniform<std::vector<T>>, public OsgUni
 {
 public:
 	/// Constructor
-	/// \param	name	Name of the uniform
-	/// \param	shaderName	Name used in shaders to reference this uniform
+	/// \param	name	Name used in shader code to access this uniform
 	/// \param	numElements	Number of elements
-	OsgUniform(const std::string& name, const std::string& shaderName, unsigned int numElements);
+	OsgUniform(const std::string& name, unsigned int numElements);
 
 	/// Returns the number of elements
 	virtual unsigned int getNumElements() const;
@@ -102,7 +74,7 @@ public:
 	/// Gets the value of one of the uniform's elements
 	/// \param	index	Index of the element
 	/// \return	Value of the element
-	virtual const T& getElement(unsigned int index) const;
+	virtual typename std::vector<T>::const_reference getElement(unsigned int index) const;
 
 	/// Gets the value of all of the uniform's elements
 	/// \return	Vector of values
@@ -111,47 +83,6 @@ public:
 private:
 	/// Vector containing the values of the uniform's elements
 	std::vector<T> m_value;
-};
-
-/// Specialization of OsgUniform for vector of bool values.
-///
-/// \note
-/// This is necessary because std::vector<bool> has been specialized to optimize storage, and in result
-/// std::vector::operator[] does not return a reference.
-template <>
-class OsgUniform<std::vector<bool>> : public Uniform<std::vector<bool>>, public OsgUniformBase
-{
-public:
-	/// Constructor
-	/// \param	name	Name of the uniform
-	/// \param	shaderName	Name used in shaders to reference this uniform
-	/// \param	numElements	Number of elements
-	OsgUniform(const std::string& name, const std::string& shaderName, unsigned int numElements);
-
-	/// Returns the number of elements
-	virtual unsigned int getNumElements() const;
-
-	/// Sets the value of one of the uniform's elements
-	/// \param	index	Index of the element
-	/// \param	value	Value to set
-	virtual void setElement(unsigned int index, bool value);
-
-	/// Sets the value of all of the uniform's elements
-	/// \param	value	Array of values
-	virtual void set(const std::vector<bool>& value);
-
-	/// Gets the value of one of the uniform's elements
-	/// \param	index	Index of the element
-	/// \return	Value of the element
-	virtual bool getElement(unsigned int index) const;
-
-	/// Gets the value of all of the uniform's elements
-	/// \return	Vector of values
-	virtual const std::vector<bool>& get() const;
-
-private:
-	/// Vector containing the values of the uniform's elements
-	std::vector<bool> m_value;
 };
 
 };  // namespace Graphics

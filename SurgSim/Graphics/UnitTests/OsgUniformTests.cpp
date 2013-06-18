@@ -56,13 +56,12 @@ template <class Type, class OsgType>
 std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 {
 	std::shared_ptr<OsgUniform<Type>> osgUniform =
-		std::make_shared<OsgUniform<Type>>("referenceName", "shaderName");
+		std::make_shared<OsgUniform<Type>>("test name");
 	std::shared_ptr<OsgUniformBase> osgUniformBase = osgUniform;
 	std::shared_ptr<Uniform<Type>> uniform = osgUniform;
 	std::shared_ptr<UniformBase> uniformBase = osgUniform;
 
-	EXPECT_EQ("referenceName", uniformBase->getName());
-	EXPECT_EQ("shaderName", osgUniformBase->getShaderName());
+	EXPECT_EQ("test name", osgUniformBase->getName());
 
 	uniform->set(value);
 
@@ -82,13 +81,12 @@ std::pair<std::vector<Type>, std::vector<OsgType>> testUniformElementsConstructi
 	const std::vector<Type>& value, unsigned int numElements)
 {
 	std::shared_ptr<OsgUniform<std::vector<Type>>> osgUniform =
-		std::make_shared<OsgUniform<std::vector<Type>>>("referenceName", "shaderName", numElements);
+		std::make_shared<OsgUniform<std::vector<Type>>>("test name", numElements);
 	std::shared_ptr<OsgUniformBase> osgUniformBase = osgUniform;
 	std::shared_ptr<Uniform<std::vector<Type>>> uniform = osgUniform;
 	std::shared_ptr<UniformBase> uniformBase = osgUniform;
 
-	EXPECT_EQ("referenceName", uniformBase->getName());
-	EXPECT_EQ("shaderName", osgUniformBase->getShaderName());
+	EXPECT_EQ("test name", osgUniformBase->getName());
 
 	uniform->set(value);
 
@@ -97,7 +95,7 @@ std::pair<std::vector<Type>, std::vector<OsgType>> testUniformElementsConstructi
 	for (unsigned int i = 0; i < osgUniformBase->getOsgUniform()->getNumElements(); ++i)
 	{
 		OsgType element;
-		EXPECT_TRUE(osgUniformBase->getOsgUniform()->getElement(i, element)) << 
+		EXPECT_TRUE(osgUniformBase->getOsgUniform()->getElement(i, element)) <<
 			"Failed to get osg::Uniform element value. The Uniform type may be wrong!";
 		osgValue.push_back(element);
 	}

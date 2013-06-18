@@ -13,15 +13,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file
-/// Conversions to and from OSG types
+#ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
+#define SURGSIM_GRAPHICS_UNIFORMBASE_H
 
-#ifndef SURGSIM_GRAPHICS_OSGCONVERSIONS_H
-#define SURGSIM_GRAPHICS_OSGCONVERSIONS_H
+#include <string>
 
-#include <SurgSim/Graphics/OsgMatrixConversions.h>
-#include <SurgSim/Graphics/OsgQuaternionConversions.h>
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/OsgVectorConversions.h>
+namespace SurgSim
+{
 
-#endif  // SURGSIM_GRAPHICS_OSGCONVERSIONS_H
+namespace Graphics
+{
+
+/// Common base class for all graphics uniforms.
+///
+/// Graphics uniforms act as parameters to shader programs.
+/// \note
+/// SurgSim::Graphics::Uniform is templated on the type of value, so this base class allows a pointer to any type
+/// of Uniform.
+class UniformBase
+{
+public:
+	/// Destructor
+	virtual ~UniformBase() = 0;
+};
+
+UniformBase::~UniformBase()
+{
+}
+
+};  // namespace Graphics
+
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_UNIFORMBASE_H
