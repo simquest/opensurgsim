@@ -103,7 +103,8 @@ void OsgView::update(double dt)
 		osg::Camera* viewCamera = m_view->getCamera();
 		if (viewCamera)
 		{
-			osgViewer::GraphicsWindow* window = dynamic_cast<osgViewer::GraphicsWindow*>(viewCamera->getGraphicsContext());
+			osgViewer::GraphicsWindow* window =
+				dynamic_cast<osgViewer::GraphicsWindow*>(viewCamera->getGraphicsContext());
 			if (window)
 			{
 				window->setWindowDecoration(m_isWindowBorderEnabled);

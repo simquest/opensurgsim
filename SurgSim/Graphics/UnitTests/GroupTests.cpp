@@ -55,12 +55,14 @@ TEST(GroupTests, AddRemoveTest)
 	/// Add an representation
 	EXPECT_TRUE(group->add(representation1));
 	EXPECT_EQ(1u, group->getMembers().size());
-	EXPECT_NE(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
+	EXPECT_NE(group->getMembers().end(),
+			  std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
 
 	/// Add another representation
 	EXPECT_TRUE(group->add(representation2));
 	EXPECT_EQ(2u, group->getMembers().size());
-	EXPECT_NE(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation2));
+	EXPECT_NE(group->getMembers().end(),
+			  std::find(group->getMembers().begin(), group->getMembers().end(), representation2));
 
 
 	/// Try to add a duplicate representation
@@ -70,12 +72,14 @@ TEST(GroupTests, AddRemoveTest)
 
 	/// Remove an representation
 	EXPECT_TRUE(group->remove(representation1));
-	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
+	EXPECT_EQ(group->getMembers().end(),
+			  std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
 
 
 	/// Try to remove an representation that is not in the group
 	EXPECT_FALSE(group->remove(representation1));
-	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
+	EXPECT_EQ(group->getMembers().end(),
+			  std::find(group->getMembers().begin(), group->getMembers().end(), representation1));
 }
 
 TEST(GroupTests, AppendTest)
@@ -101,11 +105,14 @@ TEST(GroupTests, AppendTest)
 	EXPECT_TRUE(group2->append(group1));
 	EXPECT_EQ(3u, group2->getMembers().size());
 
-	/// Check that the representations from group 1 were added to group 2, and that it still has the representation that was added
-	/// directly to it.
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
+	// Check that the representations from group 1 were added to group 2, and that it still has the representation
+	// that was added directly to it.
+	EXPECT_NE(group2->getMembers().end(),
+			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
+	EXPECT_NE(group2->getMembers().end(),
+			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
+	EXPECT_NE(group2->getMembers().end(),
+			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
 
 	/// Try to append a group that has already been appended - this will try to add duplicate representations.
 	EXPECT_FALSE(group2->append(group1)) << "Append should return false if any representation is a duplicate!";
@@ -113,8 +120,10 @@ TEST(GroupTests, AppendTest)
 
 	/// Check that group 1 was not modified by appending it to group 2.
 	EXPECT_EQ(2u, group1->getMembers().size());
-	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
-	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
+	EXPECT_NE(group1->getMembers().end(),
+			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
+	EXPECT_NE(group1->getMembers().end(),
+			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
 }
 
 TEST(GroupTests, ClearTest)

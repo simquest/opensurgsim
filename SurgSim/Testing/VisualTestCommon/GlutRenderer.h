@@ -152,8 +152,13 @@ struct GlutCamera
 	/// \param near Near clipping plane distance from camera, in meters.
 	/// \param far Far clipping plane distance from camera, in meters.
 	GlutCamera(const SurgSim::Math::Vector3d& eye, const SurgSim::Math::Vector3d& center,
-			   const SurgSim::Math::Vector3d& up, const double fovY, double zNear, double zFar) : eye(eye), center(center),
-		up(up), fovY(fovY), zNear(zNear), zFar(zFar)
+			   const SurgSim::Math::Vector3d& up, const double fovY, double zNear, double zFar) :
+		eye(eye),
+		center(center),
+		up(up),
+		fovY(fovY),
+		zNear(zNear),
+		zFar(zFar)
 	{
 	}
 };

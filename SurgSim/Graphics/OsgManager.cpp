@@ -67,7 +67,8 @@ bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representa
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Representation is not a subclass of OsgRepresentation " << representation->getName();
+		SURGSIM_LOG_INFO(getLogger()) << __FUNCTION__ << " Representation is not a subclass of OsgRepresentation " <<
+			representation->getName();
 		return false;
 	}
 }

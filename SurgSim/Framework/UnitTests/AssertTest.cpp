@@ -163,7 +163,8 @@ TEST_F(AssertTest, Callback)
 	EXPECT_EQ(throwCallback, defaultCallback);
 
 	SurgSim::Framework::AssertMessage::setFailureCallback(ignoreAssertionKeepGoing);
-	EXPECT_EQ(static_cast<CallbackType>(ignoreAssertionKeepGoing), SurgSim::Framework::AssertMessage::getFailureCallback());
+	EXPECT_EQ(static_cast<CallbackType>(ignoreAssertionKeepGoing),
+			  SurgSim::Framework::AssertMessage::getFailureCallback());
 	numIgnoredAssertions = 0;
 	EXPECT_NO_THROW(SURGSIM_ASSERT(1 == 2) << "extra information would go here");
 	EXPECT_EQ(1, numIgnoredAssertions);

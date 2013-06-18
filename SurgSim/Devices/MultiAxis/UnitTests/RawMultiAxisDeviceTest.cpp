@@ -22,7 +22,7 @@
 #include <boost/chrono.hpp>
 #include <gtest/gtest.h>
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
-//#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"  // only needed if calling RawMultiAxisScaffold::setDefaultLogLevel()
+//#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"  // only needed if calling setDefaultLogLevel()
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"

@@ -21,17 +21,17 @@ namespace SurgSim
 namespace Physics
 {
 
+
 CollisionRepresentation::~CollisionRepresentation()
 {
-
 }
 
-void CollisionRepresentation::setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation)
+void CollisionRepresentation::setPhysicsRepresentation(const std::shared_ptr<Representation>& physicsRepresentation)
 {
 	m_physicsRepresentation = physicsRepresentation;
 }
 
-std::shared_ptr<SurgSim::Physics::Representation> CollisionRepresentation::getPhysicsRepresentation()
+std::shared_ptr<Representation> CollisionRepresentation::getPhysicsRepresentation()
 {
 	return m_physicsRepresentation.lock();
 }
