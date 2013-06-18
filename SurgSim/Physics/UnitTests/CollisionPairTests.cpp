@@ -34,7 +34,7 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Physics
 {

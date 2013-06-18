@@ -53,7 +53,7 @@ public:
 	CollisionPair() {}
 
 	/// Normal constructor
-	CollisionPair(const std::shared_ptr<CollisionRepresentation>& first, 
+	CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
 				  const std::shared_ptr<CollisionRepresentation>& second);
 
 	/// Destructor
@@ -62,7 +62,7 @@ public:
 	/// Sets the representations in this pair, representations cannot be the same instance and neither can be nullptr.
 	/// \param	first 	The first CollisionRepresenation.
 	/// \param	second	The second CollisionRepresentation.
-	inline void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first, 
+	inline void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
 								   const std::shared_ptr<CollisionRepresentation>& second)
 	{
 		SURGSIM_ASSERT(first != second) << "Should try to collide with self";
@@ -103,8 +103,8 @@ public:
 	/// \param	depth			The depth of the intersection.
 	/// \param	contactPoint	The contact point, between the two bodies.
 	/// \param	normal			The normal of the contact pointing into the first representation.
-	inline void addContact(const double& depth, 
-						   const SurgSim::Math::Vector3d& contactPoint, 
+	inline void addContact(const double& depth,
+						   const SurgSim::Math::Vector3d& contactPoint,
 						   const SurgSim::Math::Vector3d& normal,
 						   const std::pair<Location, Location>& penetrationPoints)
 	{
@@ -149,7 +149,7 @@ public:
 private:
 
 	/// Pair of objects that are colliding
-	std::pair<std::shared_ptr<CollisionRepresentation>, 
+	std::pair<std::shared_ptr<CollisionRepresentation>,
 			  std::shared_ptr<CollisionRepresentation>> m_representations;
 
 	/// List of current contacts

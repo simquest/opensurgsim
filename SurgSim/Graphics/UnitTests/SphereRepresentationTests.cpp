@@ -165,7 +165,8 @@ private:
 
 TEST(SphereRepresentationTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<Representation> representation = std::make_shared<MockSphereRepresentation>("test name");});
+	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
+		std::make_shared<MockSphereRepresentation>("test name");});
 
 	std::shared_ptr<Representation> representation = std::make_shared<MockSphereRepresentation>("test name");
 	EXPECT_EQ("test name", representation->getName());
@@ -184,7 +185,8 @@ TEST(SphereRepresentationTests, VisibilityTest)
 
 TEST(SphereRepresentationTests, RadiusTest)
 {
-	std::shared_ptr<SphereRepresentation> sphereRepresentation = std::make_shared<MockSphereRepresentation>("test name");
+	std::shared_ptr<SphereRepresentation> sphereRepresentation =
+		std::make_shared<MockSphereRepresentation>("test name");
 
 	std::default_random_engine generator;
 	std::uniform_real_distribution<double> distribution(1.0, 10.0);
@@ -236,7 +238,8 @@ TEST(SphereRepresentationTests, PoseTest)
 
 TEST(SphereRepresentationTests, UpdateTest)
 {
-	std::shared_ptr<MockSphereRepresentation> mockSphereRepresentation = std::make_shared<MockSphereRepresentation>("test name");
+	std::shared_ptr<MockSphereRepresentation> mockSphereRepresentation =
+		std::make_shared<MockSphereRepresentation>("test name");
 	std::shared_ptr<Representation> representation = mockSphereRepresentation;
 
 	EXPECT_EQ(0, mockSphereRepresentation->getNumUpdates());

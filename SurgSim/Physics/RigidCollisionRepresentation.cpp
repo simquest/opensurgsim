@@ -20,7 +20,8 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidCollisionRepresentation::RigidCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation) : m_representation(representation)
+RigidCollisionRepresentation::RigidCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation) : 
+	m_representation(representation)
 {
 
 }

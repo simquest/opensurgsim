@@ -32,7 +32,7 @@ class MockRepresentation : public Representation
 public:
 	/// Constructor
 	/// \name	Name of the representation
-	MockRepresentation(const std::string& name) : Representation(name)
+	explicit MockRepresentation(const std::string& name) : Representation(name)
 	{
 	}
 

@@ -22,8 +22,8 @@ namespace Physics
 
 
 RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
-	const std::shared_ptr<RigidShape>& shape, 
-	const SurgSim::Math::Quaterniond& quat, 
+	const std::shared_ptr<RigidShape>& shape,
+	const SurgSim::Math::Quaterniond& quat,
 	const SurgSim::Math::Vector3d& translation) :
 	m_shape(shape), m_transform(SurgSim::Math::makeRigidTransform(quat, translation))
 {
@@ -31,7 +31,7 @@ RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
 }
 
 RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
-	const std::shared_ptr<RigidShape>& shape, 
+	const std::shared_ptr<RigidShape>& shape,
 	const SurgSim::Math::RigidTransform3d& pose) :
 	m_shape(shape), m_transform(pose)
 {

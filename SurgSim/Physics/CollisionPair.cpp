@@ -23,7 +23,7 @@ namespace SurgSim
 namespace Physics
 {
 
-CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first, 
+CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
 							 const std::shared_ptr<CollisionRepresentation>& second) :
 		m_representations(first, second), m_isSwapped(false)
 {

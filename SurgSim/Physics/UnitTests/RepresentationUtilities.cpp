@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& radius, 
+std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& radius,
 													  const Quaterniond& rotation,
 													  const Vector3d& position)
 {
@@ -41,7 +41,7 @@ std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(const Quaternio
 													  const Vector3d& position)
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>();
-	std::shared_ptr<CollisionRepresentation> rep = 
+	std::shared_ptr<CollisionRepresentation> rep =
 		std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
 	return rep;
 }

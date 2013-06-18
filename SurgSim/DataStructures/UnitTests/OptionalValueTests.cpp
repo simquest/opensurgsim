@@ -19,7 +19,7 @@
 
 #include <SurgSim/DataStructures/OptionalValue.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace DataStructures
 {

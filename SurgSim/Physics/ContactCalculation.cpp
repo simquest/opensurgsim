@@ -32,7 +32,8 @@ void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> 
 
 	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<
 		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
-	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) << "Contact calculation not implemented for pairs with types ("<<
+	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) <<
+		"Contact calculation not implemented for pairs with types (" <<
 		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
 
@@ -40,10 +41,10 @@ void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> 
 
 void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" <<
-																					pair->getFirst()->getShapeType();
-	SURGSIM_ASSERT(pair->getSecond()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "Second Object, wrong type of object" <<
-																					pair->getSecond()->getShapeType();
+	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+		"First Object, wrong type of object" << pair->getFirst()->getShapeType();
+	SURGSIM_ASSERT(pair->getSecond()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+		"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
 
 	std::shared_ptr<SphereShape> firstSphere = std::static_pointer_cast<SphereShape>(pair->getFirst()->getShape());
 	std::shared_ptr<SphereShape> secondSphere = std::static_pointer_cast<SphereShape>(pair->getSecond()->getShape());
@@ -83,10 +84,10 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 		representationPlane = pair->getFirst();
 	}
 
-	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) << "First Object, wrong type of object" <<
-																					pair->getFirst()->getShapeType();
-	SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) << "Second Object, wrong type of object" <<
-																					pair->getSecond()->getShapeType();
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+		"First Object, wrong type of object" << pair->getFirst()->getShapeType();
+	SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) <<
+		"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
 
 	std::shared_ptr<SphereShape> sphere = std::static_pointer_cast<SphereShape>(representationSphere->getShape());
 	std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
@@ -104,8 +105,9 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 		double depth = sphere->getRadius() - distAbsolute;
 
 		// Calculate the normal going from the plane to the sphere, it is the plane normal transformed by the
-		// plane pose, flipped if the sphere is behind the plane and normalize it 
-		Vector3d normal = ((representationPlane->getCurrentPose() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0)).normalized();
+		// plane pose, flipped if the sphere is behind the plane and normalize it
+		Vector3d normal = 
+			((representationPlane->getCurrentPose() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0)).normalized();
 
 		std::pair<Location,Location> penetrationPoints;
 		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
@@ -114,7 +116,7 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 		if (m_switchPair)
 		{
 			std::swap(penetrationPoints.first, penetrationPoints.second);
-			normal = -normal; 
+			normal = -normal;
 		}
 
 		pair->addContact(depth, normal, penetrationPoints);

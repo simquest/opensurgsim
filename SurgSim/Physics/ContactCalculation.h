@@ -26,16 +26,16 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Base class responsible for calculating contact data between to given shapes, calculateContact needs to  
+/// Base class responsible for calculating contact data between to given shapes, calculateContact needs to
 /// determine whether the two shapes intersect, and if yes calculate the correct data for this contact, which
-/// consists of, the normal to displace the first shape so that the two shapes just barely touch. And the 
+/// consists of, the normal to displace the first shape so that the two shapes just barely touch. And the
 /// penetration point for each shape, the point the is furthest inside the other object.
 /// If a subclass is works on asymmetric pairs it should implement a flag that enables the calculation to
 /// switch the direction of the pair.
 class ContactCalculation
 {
 public:
-	
+
 	/// Constructor
 	explicit ContactCalculation()
 	{

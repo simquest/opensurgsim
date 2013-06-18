@@ -34,12 +34,12 @@ class RigidShapeCollisionRepresentation : public CollisionRepresentation
 {
 public:
 	RigidShapeCollisionRepresentation(
-		const std::shared_ptr<RigidShape>& shape, 
-		const SurgSim::Math::Quaterniond& quat, 
+		const std::shared_ptr<RigidShape>& shape,
+		const SurgSim::Math::Quaterniond& quat,
 		const SurgSim::Math::Vector3d& translation);
 
 	RigidShapeCollisionRepresentation(
-		const std::shared_ptr<RigidShape>& shape, 
+		const std::shared_ptr<RigidShape>& shape,
 		const SurgSim::Math::RigidTransform3d& pose);
 
 	virtual ~RigidShapeCollisionRepresentation();
