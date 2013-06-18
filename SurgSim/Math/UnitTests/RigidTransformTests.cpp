@@ -63,56 +63,75 @@ TYPED_TEST(AllRigidTransformTests, CanConstruct)
 /// Test rigid transforms interpolation
 TYPED_TEST(AllRigidTransformTests, Interpolation)
 {
-	typedef typename TestFixture::RigidTransform Transform;
+	using SurgSim::Math::makeRigidTransform;
+
 	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Quaternion<T> Quaternion;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> Transform;
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
 
-	// Eigen does something fancy in the slerp. If your 2 quaternions have an angle bigger than PI
-	// it will interpolate between q0 and -q1. Which means that interpolating at time 1 will not give you q1.
-	const T angle = static_cast<T>(M_PI * 0.99);
-	const Eigen::Matrix<T, 3, 1> axis (0.0, 1.0, 0.0);
-	Eigen::Quaternion<T> rotation = SurgSim::Math::makeRotationQuaternion(angle, axis);
-
-	Eigen::Quaternion<T> q0(Eigen::Matrix<T,4,1>::Random());
-	q0.normalize();
-	Eigen::Quaternion<T> q1 = rotation * q0;
-	q1.normalize();
-	Eigen::Matrix<T, 3, 1> t0(Eigen::Matrix<T,3,1>::Random());
-	Eigen::Matrix<T, 3, 1> t1(Eigen::Matrix<T,3,1>::Random());
-
-	Eigen::Transform<T, 3, Eigen::Isometry> transform0 = SurgSim::Math::makeRigidTransform(q0, t0);
-	Eigen::Transform<T, 3, Eigen::Isometry> transform1 = SurgSim::Math::makeRigidTransform(q1, t1);
+	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
 	{
-		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.0));
-		EXPECT_TRUE(transform.isApprox(transform0));
-	}
-	{
-		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(1.0));
-		EXPECT_TRUE(transform.isApprox(transform1));
-	}
+		Quaternion q0(Eigen::Matrix<T,4,1>::Random());
+		Quaternion q1(Eigen::Matrix<T,4,1>::Random());
+		q0.normalize();
+		q1.normalize();
 
-	{
-		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.234));
-		EXPECT_FALSE(transform.isApprox(transform0));
-		EXPECT_FALSE(transform.isApprox(transform1));
-	}
+		Vector3 t0(Vector3::Random());
+		Vector3 t1(Vector3::Random());
 
-	{
-		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.5));
-		EXPECT_FALSE(transform.isApprox(transform0));
-		EXPECT_FALSE(transform.isApprox(transform1));
+		Transform transform0 = makeRigidTransform(q0, t0);
+		Transform transform1 = makeRigidTransform(q1, t1);
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.0));
+			EXPECT_TRUE(transform.isApprox(transform0));
+		}
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(1.0));
+			EXPECT_TRUE(transform.isApprox(transform1));
+		}
 
-		// At t=0.5, the inteprolation should return (q0 + q1)/2 normalized
-		// c.f. http://en.wikipedia.org/wiki/Slerp
-		Eigen::Quaternion<T> qHalf( (q0.coeffs() + q1.coeffs()) * 0.5);
-		qHalf.normalize();
-		Eigen::Matrix<T, 3, 1> tHalf = (t0 + t1) * 0.5;
-		auto transformHalf = SurgSim::Math::makeRigidTransform(qHalf, tHalf);
-		EXPECT_TRUE(transform.isApprox(transformHalf));
-	}
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.234));
+			EXPECT_FALSE(transform.isApprox(transform0));
+			EXPECT_FALSE(transform.isApprox(transform1));
+		}
 
-	{
-		auto transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.839));
-		EXPECT_FALSE(transform.isApprox(transform0));
-		EXPECT_FALSE(transform.isApprox(transform1));
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.5));
+			EXPECT_FALSE(transform.isApprox(transform0));
+			EXPECT_FALSE(transform.isApprox(transform1));
+
+			// At t=0.5, the rotation interpolation should return (q0 + q1)/2 normalized
+			// c.f. http://en.wikipedia.org/wiki/Slerp
+			// If the quaternions are over PI angle, the slerp will interpolate between q0 and -q1
+			// in this case, the interpolation is (q0 - q1)/2 normalized
+			// From our specification, both quaternions could be considered negative, so we extend
+			// the tests to these possibilities as well:
+			// (-q0 + q1) / 2 normalized
+			// (-q0 - q1) / 2 normalized
+			Quaternion qHalf0(( q0.coeffs() + q1.coeffs()) * 0.5);
+			Quaternion qHalf1(( q0.coeffs() - q1.coeffs()) * 0.5);
+			Quaternion qHalf2((-q0.coeffs() + q1.coeffs()) * 0.5);
+			Quaternion qHalf3((-q0.coeffs() - q1.coeffs()) * 0.5);
+			qHalf0.normalize();
+			qHalf1.normalize();
+			qHalf2.normalize();
+			qHalf3.normalize();
+
+			Vector3 tHalf = (t0 + t1) * 0.5;
+			Transform transformHalf0 = makeRigidTransform(qHalf0, tHalf);
+			Transform transformHalf1 = makeRigidTransform(qHalf1, tHalf);
+			Transform transformHalf2 = makeRigidTransform(qHalf2, tHalf);
+			Transform transformHalf3 = makeRigidTransform(qHalf3, tHalf);
+			EXPECT_TRUE(transform.isApprox(transformHalf0) || transform.isApprox(transformHalf1) ||
+				transform.isApprox(transformHalf2) || transform.isApprox(transformHalf3));
+		}
+
+		{
+			Transform transform = SurgSim::Math::interpolate(transform0, transform1, static_cast<T>(0.839));
+			EXPECT_FALSE(transform.isApprox(transform0));
+			EXPECT_FALSE(transform.isApprox(transform1));
+		}
 	}
 }

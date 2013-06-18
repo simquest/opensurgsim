@@ -84,6 +84,17 @@ inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 	return static_cast<T>(2 * std::acos(w));
 }
 
+/// Quaternion negation (i.e. unary operator -)
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam QOpt the option flags (alignment etc.) used for the quaternion arguments.  Can be deduced.
+/// \param q The quaternion to negate
+/// \returns the negation of q (i.e. -q)
+template <typename T, int QOpt>
+inline Eigen::Quaternion<T, QOpt> negate(const Eigen::Quaternion<T, QOpt>& q)
+{
+	return Eigen::Quaternion<T, QOpt>(q.coeffs() * -1.0);
+}
+
 /// Interpolate (slerp) between 2 quaternions
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam QOpt the option flags (alignment etc.) used for the quaternion arguments.  Can be deduced.
@@ -91,8 +102,8 @@ inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 /// \param q1 The end   quaternion (at time 1.0).
 /// \param t  The interpolation time requested. Within [0..1].
 /// \returns the quaternion resulting in the slerp interpolation at time t, between q0 and q1.
-/// \note t=0 => returns q0
-/// \note t=1 => returns q1
+/// \note t=0 => returns either q0 or -q0
+/// \note t=1 => returns either q1 or -q1
 /// \note 'Interpolate' has been created because slerp might not be enough in certain cases.
 /// This gives room for correction and special future treatment
 template <typename T, int QOpt>
