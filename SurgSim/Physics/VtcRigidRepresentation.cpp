@@ -64,7 +64,7 @@ void VtcRigidRepresentation::beforeUpdate(double dt)
 
 void VtcRigidRepresentation::update(double dt)
 {
-	using namespace SurgSim::Framework;
+	using SurgSim::Framework::Logger;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;

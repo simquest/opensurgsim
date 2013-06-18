@@ -26,8 +26,22 @@
 #include <boost/math/special_functions/fpclassify.hpp>
 
 
-using namespace SurgSim::Math;
+using SurgSim::Math::Vector3d;
 
+using SurgSim::Math::barycentricCoordinates;
+using SurgSim::Math::distancePointLine;
+using SurgSim::Math::distancePointSegment;
+using SurgSim::Math::distanceLineLine;
+using SurgSim::Math::distanceSegmentSegment;
+using SurgSim::Math::distancePointPlane;
+using SurgSim::Math::distancePointTriangle;
+using SurgSim::Math::isPointInsideTriangle;
+using SurgSim::Math::distanceSegmentPlane;
+using SurgSim::Math::distanceSegmentTriangle;
+using SurgSim::Math::doesCollideSegmentTriangle;
+using SurgSim::Math::doesIntersectPlanePlane;
+using SurgSim::Math::distanceTrianglePlane;
+using SurgSim::Math::distanceTriangleTriangle;
 
 typedef double SizeType;
 typedef Eigen::Matrix<SizeType, 3, 1, Eigen::DontAlign> VectorType;
