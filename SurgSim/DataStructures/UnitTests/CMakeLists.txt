@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	MeshElementTest.cpp
 	MeshVertexTest.cpp
 	NamedDataTests.cpp
+	OptionalValueTests.cpp
 	TriangleMeshTest.cpp
 )
 
