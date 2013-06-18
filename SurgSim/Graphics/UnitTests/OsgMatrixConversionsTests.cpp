@@ -41,30 +41,28 @@ TEST(OsgMatrixConversionsTests, Matrix22fTest)
 {
 	Matrix22f matrix = Matrix22f::Random();
 	osg::Matrix2 osgMatrix = toOsg(matrix);
-	EXPECT_TRUE(matrix.isApprox(fromOsg<float>(osgMatrix)));
+	EXPECT_TRUE(matrix.isApprox(fromOsg(osgMatrix)));
 }
 
 TEST(OsgMatrixConversionsTests, Matrix22dTest)
 {
 	Matrix22d matrix = Matrix22d::Random();
-	osg::Matrix2 osgMatrix = toOsg(matrix);
-	/// OSG only stores the values as floats, so precision is lost: use float precision for comparison
-	EXPECT_TRUE(matrix.isApprox(fromOsg<double>(osgMatrix), Eigen::NumTraits<float>::dummy_precision()));
+	osg::Matrix2d osgMatrix = toOsg(matrix);
+	EXPECT_TRUE(matrix.isApprox(fromOsg(osgMatrix)));
 }
 
 TEST(OsgMatrixConversionsTests, Matrix33fTest)
 {
 	Matrix33f matrix = Matrix33f::Random();
 	osg::Matrix3 osgMatrix = toOsg(matrix);
-	EXPECT_TRUE(matrix.isApprox(fromOsg<float>(osgMatrix)));
+	EXPECT_TRUE(matrix.isApprox(fromOsg(osgMatrix)));
 }
 
 TEST(OsgMatrixConversionsTests, Matrix33dTest)
 {
 	Matrix33d matrix = Matrix33d::Random();
-	osg::Matrix3 osgMatrix = toOsg(matrix);
-	/// OSG only stores the values as floats, so precision is lost: use float precision for comparison
-	EXPECT_TRUE(matrix.isApprox(fromOsg<double>(osgMatrix), Eigen::NumTraits<float>::dummy_precision()));
+	osg::Matrix3d osgMatrix = toOsg(matrix);
+	EXPECT_TRUE(matrix.isApprox(fromOsg(osgMatrix)));
 }
 
 TEST(OsgMatrixConversionsTests, Matrix44fConversionTest)
