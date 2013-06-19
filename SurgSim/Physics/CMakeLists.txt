@@ -20,6 +20,8 @@ include_directories(
 set(SURGSIM_PHYSICS_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
+	ContactConstraintGeneration.cpp
+	Computation.cpp
 	DcdCollision.cpp
 	FemRepresentationParameters.cpp
 	FreeMotion.cpp
@@ -38,6 +40,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	CollisionRepresentation.h
 	Computation.h
 	ContactCalculation.h
+	ContactConstraintGeneration.cpp
 	CylinderShape.h
 	DcdCollision.h
 	FemRepresentationParameters.h

@@ -13,46 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/ContactConstraintGeneration.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
-FreeMotion::FreeMotion(bool doCopyState) : Computation(doCopyState)
+ContactConstraintGeneration::ContactConstraintGeneration()
 {
 
 }
 
-FreeMotion::~FreeMotion()
+ContactConstraintGeneration::~ContactConstraintGeneration()
 {
 
 }
 
-std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
-	const double& dt, 
-	const std::shared_ptr<PhysicsManagerState>& state)
+std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
-	// Copy state to new state
-	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
-
-	auto it = representations.begin();
-	auto itEnd = representations.end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
-	return result;
+	throw std::exception("The method or operation is not implemented.");
 }
-
 
 }; // Physics
 }; // SurgSim
