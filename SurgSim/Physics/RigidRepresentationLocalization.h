@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONFIXEDLOCALIZATION_H
-#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONFIXEDLOCALIZATION_H
+#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H
+#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H
 
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
@@ -30,18 +30,18 @@ namespace Physics
 {
 
 /// This class implement the localization on a RigidRepresentation, as a local position
-class RigidRepresentationFixedLocalization: public Localization
+class RigidRepresentationLocalization: public Localization
 {
 public:
 	/// Default constructor
-	RigidRepresentationFixedLocalization() :
+	RigidRepresentationLocalization() :
 	Localization()
 	{
 	}
 
 	/// Constructor
 	/// \param representation The representation to assign to this localization
-	explicit RigidRepresentationFixedLocalization(std::shared_ptr<Representation> representation) :
+	explicit RigidRepresentationLocalization(std::shared_ptr<Representation> representation) :
 	Localization(representation)
 	{
 		std::shared_ptr<RigidRepresentation> rigidRepresentation = std::dynamic_pointer_cast<RigidRepresentation>(representation);
@@ -49,7 +49,7 @@ public:
 	}
 
 	/// Destructor
-	virtual ~RigidRepresentationFixedLocalization()
+	virtual ~RigidRepresentationLocalization()
 	{
 	}
 
@@ -68,15 +68,6 @@ public:
 	}
 
 private:
-	/// Comparison function of equality
-	/// \param localization The localization to compare it to
-	/// \return True if the localization matches, False otherwise
-	bool isEqual(const Localization& localization) const
-	{
-		const RigidRepresentationFixedLocalization& fixedLoc = static_cast<const RigidRepresentationFixedLocalization&>(localization);
-		return m_position == fixedLoc.m_position;
-	}
-
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
@@ -113,4 +104,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_RIGIDREPRESENTATIONFIXEDLOCALIZATION_H
+#endif  // SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H

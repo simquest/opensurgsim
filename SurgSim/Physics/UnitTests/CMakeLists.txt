@@ -30,7 +30,7 @@ set(UNIT_TEST_SOURCES
 	PhysicsManagerTests.cpp
 	RepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
-	RigidRepresentationFixedLocalizationTest.cpp
+	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp

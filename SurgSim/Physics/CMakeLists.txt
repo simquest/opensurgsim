@@ -54,7 +54,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBaseState.h
-	RigidRepresentationFixedLocalization.h
+	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	RigidShape.h

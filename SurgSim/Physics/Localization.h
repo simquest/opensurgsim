@@ -65,22 +65,7 @@ public:
 		return doCalculatePosition(time);
 	}
 
-	/// Comparison operator (equality test)
-	/// \param localization The localization to compare it to
-	/// \return True if the localization matches, False otherwise
-	bool operator==(const Localization& localization) const;
-
-	/// Comparison operator (difference test)
-	/// \param localization The localization to compare it to
-	/// \return False if the localization matches, True otherwise
-	bool operator!=(const Localization& localization) const;
-
 private:
-	/// Comparison function of equality
-	/// \param localization The localization to compare it to
-	/// \return True if the localization matches, False otherwise
-	virtual bool isEqual(const Localization& localization) const = 0;
-
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
