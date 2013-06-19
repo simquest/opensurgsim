@@ -95,17 +95,22 @@ template <typename T>
 class SharedInstance
 {
 public:
+	/// A type that can hold a function object or lambda that takes no arguments and returns std::shared_ptr<T>.
+	typedef std::function<std::shared_ptr<T>()> InstanceCreator;
+
 	/// Create the SharedInstance object used to manage the shared instance.
 	/// Note that this <em>does not</em> immediately create the instance itself.
-	/// If and when the shared instance is created, it will be initialized using the default constructor.
-	SharedInstance()
-	{
-	}
+	/// If and when the shared instance is created, it will be initialized using the default constructor via
+	/// std::make_shared.
+	SharedInstance();
+
+	/// Create the SharedInstance object used to manage the shared instance.
+	/// Note that this <em>does not</em> immediately create the instance itself.
+	/// If and when the shared instance is created, it will be initialized using the creator call.
+	explicit SharedInstance(const InstanceCreator& instanceCreator);
 
 	/// Destroy the container and the data it contains.
-	~SharedInstance()
-	{
-	}
+	~SharedInstance();
 
 	/// Gets the shared object instance.
 	/// If the instance has not been created previously, it will be created during the call.
@@ -114,34 +119,27 @@ public:
 	/// As soon as all of the shared pointers are released, the shared object instance will be destroyed.
 	///
 	/// \return a shared_ptr holding the instance.
-	std::shared_ptr<T> get()
-	{
-		boost::lock_guard<boost::mutex> lock(m_mutex);
-		std::shared_ptr<T> instance = m_weakInstance.lock();
-		if (! instance)
-		{
-			instance = createInstance();
-			m_weakInstance = instance;
-		}
-		return std::move(instance);
-	}
+	std::shared_ptr<T> get();
 
 private:
-	// /// A type that can hold a function or lambda that takes no arguments and returns std::shared_ptr<T>.
-	// typedef std::function<std::shared_ptr<T>()> TypeCreator;
-
 	/// Prevent copying
 	SharedInstance(const SharedInstance&);
 	/// Prevent assignment
 	SharedInstance& operator=(const SharedInstance&);
 
-	std::shared_ptr<T> createInstance()
-	{
-		std::shared_ptr<T> instance = std::make_shared<T>();
-		SURGSIM_ASSERT(instance);
-		return std::move(instance);
-	}
+	/// Creates an object instance.
+	/// \return a shared_ptr containing a newly created object instance.
+	std::shared_ptr<T> createInstance();
 
+	/// Creates a function that can create an instance using std::make_shared<T>().
+	/// The function must be default-constuctible.
+	/// It was necessary to split this into a separate function because with VS2010, we can't just put a lambda in the
+	/// initializer for m_instanceCreator.
+	/// \return a function that creates a new object of type T using std::make_shared.
+	static InstanceCreator defaultInstanceCreator();
+
+	/// A creator function used to construct the shared instance.
+	InstanceCreator m_instanceCreator;
 
 	/// A weak reference to the shared instance, if any.
 	std::weak_ptr<T> m_weakInstance;
@@ -152,5 +150,7 @@ private:
 
 };  // namespace Framework
 };  // namespace SurgSim
+
+#include "SurgSim/Framework/SharedInstance-inl.h"
 
 #endif  // SURGSIM_FRAMEWORK_SHAREDINSTANCE_H
