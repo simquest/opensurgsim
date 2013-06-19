@@ -13,48 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
-#include <memory>
+#ifndef SURGSIM_PHYSICS_LOCATION_H
+#define SURGSIM_PHYSICS_LOCATION_H
 
 #include <SurgSim/DataStructures/OptionalValue.h>
+#include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
-namespace DataStructures
+namespace Physics
 {
 
-TEST(TestableValueTests, InitTest)
+struct Location
 {
-	EXPECT_NO_THROW({OptionalValue<int> a;});
-	EXPECT_NO_THROW({OptionalValue<double> b(10.0);});
+public:
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
+};
 
-	OptionalValue<int> a;
-	EXPECT_FALSE(a.hasValue());
-}
+}; // Physics
+}; // SurgSim
 
-TEST(TestableValueTests, AssertTest)
-{
-	OptionalValue<std::shared_ptr<int>> a;
-
-	EXPECT_ANY_THROW({ auto i = a.getValue();});
-}
-
-
-TEST(TestableValueTests, SetValueTest)
-{
-	OptionalValue<double> a;
-	EXPECT_FALSE(a.hasValue());
-	a.setValue(10.0);
-
-	EXPECT_TRUE(a.hasValue());
-	EXPECT_EQ(10.0, a.getValue());
-
-	a.invalidate();
-
-	EXPECT_FALSE(a.hasValue());
-}
-
-
-}; // namespace DataStructures
-}; // namespace SurgSim
+#endif
