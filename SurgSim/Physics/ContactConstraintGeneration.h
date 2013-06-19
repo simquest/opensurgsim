@@ -13,46 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_PHYSICS_CONTACTCONSTRAINTGENERATION_H
+#define SURGSIM_PHYSICS_CONTACTCONSTRAINTGENERATION_H
 
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/Computation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
-FreeMotion::FreeMotion(bool doCopyState) : Computation(doCopyState)
+class ContactConstraintGeneration : public Computation
 {
+public:
 
-}
+	/// Constructor
+	ContactConstraintGeneration();
+	~ContactConstraintGeneration();
 
-FreeMotion::~FreeMotion()
-{
 
-}
+private:
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
 
-std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
-	const double& dt, 
-	const std::shared_ptr<PhysicsManagerState>& state)
-{
-	// Copy state to new state
-	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
-
-	auto it = representations.begin();
-	auto itEnd = representations.end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
-	return result;
-}
-
+};
 
 }; // Physics
 }; // SurgSim
+
+#endif
