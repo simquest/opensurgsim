@@ -24,7 +24,7 @@ namespace DataStructures
 {
 
 template <class T>
-/// Container class that can indicate wheter the object has been assigned a value.
+/// Container class that can indicate whether the object has been assigned a value.
 /// \tparam Class of the value that this object contains
 class OptionalValue
 {

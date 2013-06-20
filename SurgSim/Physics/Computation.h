@@ -41,7 +41,7 @@ public:
 	/// the last update call in seconds
 	std::shared_ptr<PhysicsManagerState> update(double dt, const std::shared_ptr<PhysicsManagerState>& state);;
 
-	/// Sets up wheter the computation will copy the state of PhysicsManagerState before executing.
+	/// Sets up whether the computation will copy the state of PhysicsManagerState before executing.
 	/// \param	val	Whether to create a copy of the PhysicsState before running the update fuction.
 	void setDoCopyState(bool val);
 
