@@ -13,13 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTION_H
-#define SURGSIM_PHYSICS_FREEMOTION_H
-
-#include <memory>
-#include <vector>
-
-
 #include <SurgSim/Physics/Computation.h>
 
 namespace SurgSim
@@ -27,28 +20,50 @@ namespace SurgSim
 namespace Physics
 {
 
-class Representation;
-
-/// Apply the Freemotion calcluation to all physics representations
-class FreeMotion  : public Computation
+Computation::Computation() : m_copyState(false)
 {
-public:
 
-	/// Constructor
-	explicit FreeMotion(bool doCopyState = false);
-	
-	~FreeMotion();
+}
 
-protected:
 
-	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
-		const std::shared_ptr<PhysicsManagerState>& state) override;
+Computation::Computation(bool doCopyState) : m_copyState(doCopyState)
+{
 
-};
+}
+
+
+
+Computation::~Computation()
+{
+
+}
+
+std::shared_ptr<PhysicsManagerState> Computation::update(double dt, const std::shared_ptr<PhysicsManagerState>& state)
+{
+	return std::move(doUpdate(dt,std::move(preparePhysicsState(state))));
+}
+
+void Computation::setDoCopyState(bool val)
+{
+	m_copyState = val;
+}
+
+bool Computation::isCopyingState()
+{
+	return m_copyState;
+}
+
+std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state)
+{
+	if (m_copyState)
+	{ 
+		return std::move(std::make_shared<PhysicsManagerState>(*state));
+	}
+	else
+	{
+		return std::move(state);
+	}
+}
 
 }; // Physics
 }; // SurgSim
-
-#endif

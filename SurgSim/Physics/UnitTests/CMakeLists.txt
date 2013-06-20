@@ -21,6 +21,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	ContactCalculationTests.cpp
+	ComputationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
 	FixedRepresentationLocalizationTest.cpp
