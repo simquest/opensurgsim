@@ -54,7 +54,7 @@ protected:
 
 	/// Executes the update operation, overridden from Computation.
 	/// \param dt	The time passed.
-	/// \param state The PhysicsManagerState from previous computation. 
+	/// \param state The PhysicsManagerState from previous computation.
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
 		const double& dt, 
 		const std::shared_ptr<PhysicsManagerState>& state) override;

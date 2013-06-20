@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_TESTABLEVALUE_H
-#define SURGSIM_DATASTRUCTURES_TESTABLEVALUE_H
+#ifndef SURGSIM_DATASTRUCTURES_OPTIONALVALUE_H
+#define SURGSIM_DATASTRUCTURES_OPTIONALVALUE_H
 
 #include <SurgSim/Framework/Assert.h>
 
@@ -23,7 +23,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-template <class T> 
+template <class T>
 /// Container class that can indicate wether the object has been assigned a value.
 /// \tparam Class of the value that this object contains
 class OptionalValue
@@ -39,7 +39,7 @@ public:
 
 	/// Query if this object has been assigned a value.
 	/// \return	true if yes, false if not.
-	bool hasValue() const 
+	bool hasValue() const
 	{
 		return m_hasValue;
 	}

@@ -149,7 +149,8 @@ private:
 
 TEST(PlaneRepresentationTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<Representation> representation = std::make_shared<MockPlaneRepresentation>("test name");});
+	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
+		std::make_shared<MockPlaneRepresentation>("test name");});
 
 	std::shared_ptr<Representation> representation = std::make_shared<MockPlaneRepresentation>("test name");
 	EXPECT_EQ("test name", representation->getName());
@@ -207,7 +208,8 @@ TEST(PlaneRepresentationTests, PoseTest)
 
 TEST(PlaneRepresentationTests, UpdateTest)
 {
-	std::shared_ptr<MockPlaneRepresentation> mockPlaneRepresentation = std::make_shared<MockPlaneRepresentation>("test name");
+	std::shared_ptr<MockPlaneRepresentation> mockPlaneRepresentation = 
+		std::make_shared<MockPlaneRepresentation>("test name");
 	std::shared_ptr<Representation> representation = mockPlaneRepresentation;
 
 	EXPECT_EQ(0, mockPlaneRepresentation->getNumUpdates());

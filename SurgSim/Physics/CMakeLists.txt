@@ -29,6 +29,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	PhysicsManager.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
+	RigidShapeCollisionRepresentation.cpp
 	VtcRigidRepresentation.cpp
 )
 
@@ -47,6 +48,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedRepresentationLocalization.h
 	FreeMotion.h
 	Localization.h
+	Location.h
 	MeshShape.h
 	PhysicsManager.h
 	PhysicsManagerState.h
@@ -60,6 +62,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	RigidShape.h
+	RigidShapeCollisionRepresentation.h
 	Shapes.h
 	SphereShape.h
 	VtcRigidParameters.h

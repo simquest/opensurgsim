@@ -31,7 +31,8 @@ using SurgSim::Math::Vector3d;
 
 TEST(RepresentationTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("test name");});
+	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
+		std::make_shared<MockRepresentation>("test name");});
 }
 
 TEST(RepresentationTests, NameTest)
