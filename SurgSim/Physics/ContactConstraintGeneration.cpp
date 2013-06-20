@@ -32,7 +32,7 @@ ContactConstraintGeneration::~ContactConstraintGeneration()
 
 std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
 {
-	throw std::exception("The method or operation is not implemented.");
+	return state;
 }
 
 }; // Physics
