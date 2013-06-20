@@ -68,17 +68,6 @@ TEST(BasicSceneElementTest, InitComponentTest)
 	EXPECT_FALSE(representation2->didInit());
 	EXPECT_FALSE(representation2->didWakeUp());
 
-	sceneElement->initialize();
-
-	EXPECT_TRUE(representation1->didInit());
-	EXPECT_FALSE(representation1->didWakeUp());
-	EXPECT_TRUE(representation2->didInit());
-	EXPECT_FALSE(representation2->didWakeUp());
-
-	sceneElement->wakeUp();
-
-	EXPECT_TRUE(representation1->didWakeUp());
-	EXPECT_TRUE(representation2->didWakeUp());
 }
 
 };  // namespace Blocks

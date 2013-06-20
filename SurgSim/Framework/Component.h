@@ -51,7 +51,16 @@ public:
 		return m_name;
 	};
 
-	bool initialize(std::shared_ptr<Runtime> runtime)
+	bool isInitialized()
+	{
+		return m_didInit;
+	}
+
+	bool isAwake() {
+		return m_didWakeUp;
+	}
+
+	bool initialize(const std::shared_ptr<Runtime>& runtime)
 	{
 		SURGSIM_ASSERT(! m_didInit) << "Double initialization called on component " << getName();
 		SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be nullptr";
@@ -64,8 +73,7 @@ public:
 	bool wakeUp()
 	{
 		SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
-		m_didWakeUp = true;
-		return doWakeUp();
+		return m_didWakeUp = doWakeUp();
 	};
 
 	std::shared_ptr<Runtime> getRuntime()

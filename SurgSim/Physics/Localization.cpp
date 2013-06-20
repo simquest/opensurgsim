@@ -13,46 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#include <memory>
-#include <vector>
-
-#include <SurgSim/Physics/FreeMotion.h>
+#include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/Representation.h>
 
-namespace SurgSim
-{
-namespace Physics
-{
+using SurgSim::Physics::Localization;
+using SurgSim::Physics::Representation;
 
-
-FreeMotion::FreeMotion(bool doCopyState) : Computation(doCopyState)
+Localization::Localization()
 {
-
+}
+Localization::Localization(std::shared_ptr<Representation> representation) :
+m_representation(representation)
+{
 }
 
-FreeMotion::~FreeMotion()
+Localization::~Localization()
 {
-
 }
-
-std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
-	const double& dt, 
-	const std::shared_ptr<PhysicsManagerState>& state)
-{
-	// Copy state to new state
-	std::shared_ptr<PhysicsManagerState> result = state;
-	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
-
-	auto it = representations.begin();
-	auto itEnd = representations.end();
-	for (; it != itEnd; ++it)
-	{
-		(*it)->update(dt);
-	}
-	return result;
-}
-
-
-}; // Physics
-}; // SurgSim

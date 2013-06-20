@@ -22,8 +22,10 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	CollisionPairTests.cpp
 	ContactCalculationTests.cpp
+	ComputationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
+	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
@@ -32,8 +34,10 @@ set(UNIT_TEST_SOURCES
 	RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
+	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	VtcRigidParametersTest.cpp
 	VtcRigidRepresentationTest.cpp

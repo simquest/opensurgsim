@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-DcdCollision::DcdCollision()
+DcdCollision::DcdCollision(bool doCopyState) : Computation(doCopyState)
 {
 	populateCalculationTable();
 }
@@ -37,10 +37,11 @@ DcdCollision::~DcdCollision()
 	m_pairs.clear();
 }
 
-std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state)
+std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
+	const double& dt, 
+	const std::shared_ptr<PhysicsManagerState>& state)
 {
-	std::shared_ptr<PhysicsManagerState> result = std::make_shared<PhysicsManagerState>(*state);
-
+	std::shared_ptr<PhysicsManagerState> result = state;
 	updatePairs(result);
 
 	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();

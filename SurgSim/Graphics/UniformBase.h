@@ -13,42 +13,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTION_H
-#define SURGSIM_PHYSICS_FREEMOTION_H
+#ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
+#define SURGSIM_GRAPHICS_UNIFORMBASE_H
 
-#include <memory>
-#include <vector>
-
-
-#include <SurgSim/Physics/Computation.h>
+#include <string>
 
 namespace SurgSim
 {
-namespace Physics
+
+namespace Graphics
 {
 
-class Representation;
-
-/// Apply the Freemotion calcluation to all physics representations
-class FreeMotion  : public Computation
+/// Common base class for all graphics uniforms.
+///
+/// Graphics uniforms act as parameters to shader programs.
+/// \note
+/// SurgSim::Graphics::Uniform is templated on the type of value, so this base class allows a pointer to any type
+/// of Uniform.
+class UniformBase
 {
 public:
-
-	/// Constructor
-	explicit FreeMotion(bool doCopyState = false);
-	
-	~FreeMotion();
-
-protected:
-
-	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
-		const std::shared_ptr<PhysicsManagerState>& state) override;
-
+	/// Destructor
+	virtual ~UniformBase() = 0;
 };
 
-}; // Physics
-}; // SurgSim
+UniformBase::~UniformBase()
+{
+}
 
-#endif
+};  // namespace Graphics
+
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_UNIFORMBASE_H

@@ -47,7 +47,7 @@ class DcdCollision : public Computation
 public:
 
 	/// Constructor
-	explicit DcdCollision();
+	explicit DcdCollision(bool doCopyState = false);
 	virtual ~DcdCollision();
 
 protected:
@@ -55,7 +55,9 @@ protected:
 	/// Executes the update operation, overridden from Computation.
 	/// \param dt	The time passed.
 	/// \param state The PhysicsManagerState from previous computation.
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
+		const double& dt, 
+		const std::shared_ptr<PhysicsManagerState>& state) override;
 
 private:
 

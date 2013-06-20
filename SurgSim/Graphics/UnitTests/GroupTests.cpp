@@ -20,8 +20,10 @@
 
 #include <gtest/gtest.h>
 
-using SurgSim::Graphics::Representation;
+
 using SurgSim::Graphics::Group;
+using SurgSim::Graphics::Representation;
+
 
 TEST(GroupTests, InitTest)
 {
@@ -135,3 +137,4 @@ TEST(GroupTests, ClearTest)
 	group->clear();
 	EXPECT_EQ(0u, group->getMembers().size());
 }
+

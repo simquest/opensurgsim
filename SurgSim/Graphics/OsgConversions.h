@@ -13,42 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FREEMOTION_H
-#define SURGSIM_PHYSICS_FREEMOTION_H
+/// \file
+/// Conversions to and from OSG types
 
-#include <memory>
-#include <vector>
+#ifndef SURGSIM_GRAPHICS_OSGCONVERSIONS_H
+#define SURGSIM_GRAPHICS_OSGCONVERSIONS_H
 
+#include <SurgSim/Graphics/OsgMatrixConversions.h>
+#include <SurgSim/Graphics/OsgQuaternionConversions.h>
+#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
+#include <SurgSim/Graphics/OsgVectorConversions.h>
 
-#include <SurgSim/Physics/Computation.h>
-
-namespace SurgSim
-{
-namespace Physics
-{
-
-class Representation;
-
-/// Apply the Freemotion calcluation to all physics representations
-class FreeMotion  : public Computation
-{
-public:
-
-	/// Constructor
-	explicit FreeMotion(bool doCopyState = false);
-	
-	~FreeMotion();
-
-protected:
-
-	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
-		const std::shared_ptr<PhysicsManagerState>& state) override;
-
-};
-
-}; // Physics
-}; // SurgSim
-
-#endif
+#endif  // SURGSIM_GRAPHICS_OSGCONVERSIONS_H
