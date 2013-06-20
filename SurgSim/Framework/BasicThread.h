@@ -37,7 +37,7 @@ class Runtime;
 /// after calling doRun() a thread be be set off and doInit() and doStartup() will
 /// be called in succession. If given a startup barrier the sequence will pause at
 /// both steps until all other threads are done with these steps.
-//! TODO HS Add functionality to stop the thread from the outside
+/// Initialization can be further customized by implementing a executeInitialization() function
 class BasicThread
 {
 public:
@@ -90,6 +90,11 @@ protected:
 	/// returned true
 	/// \return true on success
 	bool startUp();
+
+	bool waitForBarrier(bool success);
+
+	virtual bool executeInitialization();
+
 
 private:
 	std::string m_name;

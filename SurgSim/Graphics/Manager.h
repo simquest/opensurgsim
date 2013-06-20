@@ -42,15 +42,35 @@ public:
 	/// Destructor
 	virtual ~Manager();
 
+	/// Returns the representations assigned to the manager
+	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
+	{
+		return m_representations;
+	}
+
+	/// Returns the groups assigned to the manager
+	const std::vector<std::shared_ptr<Group>>& getGroups() const
+	{
+		return m_groups;
+	}
+
+	/// Returns the views assigned to the manager
+	const std::vector<std::shared_ptr<View>>& getViews() const
+	{
+		return m_views;
+	}
+
+protected:
+
 	/// Adds a component
 	/// \param	component	The component to be added.
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
-	virtual bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component);
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
 	/// Removes a component
 	/// \param	component	The component to be removed.
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
-	virtual bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component);
+	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
 	/// Adds an representation to the manager
 	/// \param	representation	The representation to be added.
@@ -82,34 +102,10 @@ public:
 	/// \return	True if the view was in this manager and has been successfully removed, false if it fails.
 	virtual bool removeView(std::shared_ptr<View> view);
 
-	/// Returns the representations assigned to the manager
-	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
-	{
-		return m_representations;
-	}
 
-	/// Returns the groups assigned to the manager
-	const std::vector<std::shared_ptr<Group>>& getGroups() const
-	{
-		return m_groups;
-	}
-
-	/// Returns the views assigned to the manager
-	const std::vector<std::shared_ptr<View>>& getViews() const
-	{
-		return m_views;
-	}
-
-protected:
 	/// Performs an update for a single timestep
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual bool doUpdate(double dt);
-
-	/// Returns this manager's logger
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
 
 private:
 	/// Initializes the manager
@@ -120,15 +116,15 @@ private:
 	/// \return True if it succeeds, false if it fails
 	virtual bool doStartUp();
 
+
+
+
 	/// Representations assigned to the manager
 	std::vector<std::shared_ptr<Representation>> m_representations;
 	/// Groups assigned to the manager
 	std::vector<std::shared_ptr<Group>> m_groups;
 	/// Views assigned to the manager
 	std::vector<std::shared_ptr<View>> m_views;
-
-	/// This manager's logger
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Graphics

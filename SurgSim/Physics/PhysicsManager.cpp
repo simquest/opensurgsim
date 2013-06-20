@@ -42,10 +42,9 @@ PhysicsManager::~PhysicsManager()
 
 bool PhysicsManager::doInitialize()
 {
-	m_logger = getRuntime()->getLogger("PhysicsManager");
 	m_freeMotionStep.reset(new FreeMotion());
 	m_dcdCollision.reset(new DcdCollision());
-	return m_logger != nullptr && m_freeMotionStep != nullptr;
+	return m_logger != nullptr;
 }
 
 
@@ -55,18 +54,21 @@ bool PhysicsManager::doStartUp()
 }
 
 
-bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryAddComponent(component,&m_representations) != nullptr;
 }
 
-bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryRemoveComponent(component, &m_representations);
 }
 
 bool PhysicsManager::doUpdate(double dt)
 {
+	// Add all components that came in before the last update
+	processComponents();
+
 	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
 		(*it)->beforeUpdate(dt);

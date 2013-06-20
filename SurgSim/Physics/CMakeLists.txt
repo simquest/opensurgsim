@@ -46,7 +46,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	MeshShape.h
 	PhysicsManager.h
-	PhysicsManager-inl.h
 	PhysicsManagerState.h
 	PlaneShape.h
 	Representation.h
