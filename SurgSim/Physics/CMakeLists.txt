@@ -40,7 +40,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	CollisionRepresentation.h
 	Computation.h
 	ContactCalculation.h
-	ContactConstraintGeneration.cpp
+	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
 	FemRepresentationParameters.h
