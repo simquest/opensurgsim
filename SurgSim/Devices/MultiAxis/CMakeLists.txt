@@ -23,22 +23,22 @@ include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
-	"${SIXENSE_SDK_INCLUDE_DIR}"
 )
 
-set(SIXENSE_DEVICE_SOURCES
-	SixenseDevice.cpp
-	SixenseScaffold.cpp
-	SixenseThread.cpp
+set(MULTIAXIS_DEVICE_SOURCES
+	RawMultiAxisDevice.cpp
+	RawMultiAxisScaffold.cpp
+	RawMultiAxisThread.cpp
 )
 
-set(SIXENSE_DEVICE_HEADERS
-	SixenseDevice.h
-	SixenseScaffold.h
-	SixenseThread.h
+set(MULTIAXIS_DEVICE_HEADERS
+	RawMultiAxisDevice.h
+	RawMultiAxisScaffold.h
+	RawMultiAxisThread.h
 )
 
-add_library(SixenseDevice ${SIXENSE_DEVICE_SOURCES} ${SIXENSE_DEVICE_HEADERS})
+add_library(MultiAxisDevice
+	${MULTIAXIS_DEVICE_SOURCES} ${MULTIAXIS_DEVICE_HEADERS})
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()

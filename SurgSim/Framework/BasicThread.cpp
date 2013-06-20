@@ -111,7 +111,12 @@ void BasicThread::operator()()
 void BasicThread::stop()
 {
 	m_stopExecution = true;
-	if (m_thisThread.joinable())
+	if (! m_thisThread.joinable())
+	{
+		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
+			" is detached, cannot wait for it to stop.";
+	}
+	else
 	{
 		m_thisThread.join();
 	}

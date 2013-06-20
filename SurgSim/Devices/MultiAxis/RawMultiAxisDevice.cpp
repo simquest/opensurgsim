@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Sixense/SixenseDevice.h"
+#include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 
-#include "SurgSim/Devices/Sixense/SixenseScaffold.h"
+#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Assert.h"
 
@@ -26,13 +26,13 @@ namespace Device
 {
 
 
-SixenseDevice::SixenseDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, SixenseScaffold::buildDeviceInputData())
+RawMultiAxisDevice::RawMultiAxisDevice(const std::string& uniqueName) :
+	SurgSim::Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData())
 {
 }
 
 
-SixenseDevice::~SixenseDevice()
+RawMultiAxisDevice::~RawMultiAxisDevice()
 {
 	if (isInitialized())
 	{
@@ -41,10 +41,10 @@ SixenseDevice::~SixenseDevice()
 }
 
 
-bool SixenseDevice::initialize()
+bool RawMultiAxisDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<SixenseScaffold> scaffold = SixenseScaffold::getOrCreateSharedInstance();
+	std::shared_ptr<RawMultiAxisScaffold> scaffold = RawMultiAxisScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
 	if (! scaffold->registerDevice(this))
@@ -57,7 +57,8 @@ bool SixenseDevice::initialize()
 	return true;
 }
 
-bool SixenseDevice::finalize()
+
+bool RawMultiAxisDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
@@ -67,7 +68,7 @@ bool SixenseDevice::finalize()
 }
 
 
-bool SixenseDevice::isInitialized() const
+bool RawMultiAxisDevice::isInitialized() const
 {
 	return (m_scaffold != nullptr);
 }
