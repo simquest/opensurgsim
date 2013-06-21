@@ -13,20 +13,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Representation.h>
+#ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
+#define SURGSIM_GRAPHICS_UNIFORMBASE_H
 
-using SurgSim::Physics::Localization;
-using SurgSim::Physics::Representation;
+#include <string>
 
-Localization::Localization()
+namespace SurgSim
+{
+
+namespace Graphics
+{
+
+/// Common base class for all graphics uniforms.
+///
+/// Graphics uniforms act as parameters to shader programs.
+/// \note
+/// SurgSim::Graphics::Uniform is templated on the type of value, so this base class allows a pointer to any type
+/// of Uniform.
+class UniformBase
+{
+public:
+	/// Destructor
+	virtual ~UniformBase() = 0;
+};
+
+UniformBase::~UniformBase()
 {
 }
-Localization::Localization(std::shared_ptr<Representation> representation) :
-m_representation(representation)
-{
-}
 
-Localization::~Localization()
-{
-}
+};  // namespace Graphics
+
+};  // namespace SurgSim
+
+#endif  // SURGSIM_GRAPHICS_UNIFORMBASE_H

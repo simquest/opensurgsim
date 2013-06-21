@@ -40,6 +40,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Group.h
 	Manager.h
 	OsgCamera.h
+	OsgConversions.h
 	OsgGroup.h
 	OsgManager.h
 	OsgMatrixConversions.h
@@ -49,6 +50,9 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
 	OsgSphereRepresentation.h
+	OsgUniform.h
+	OsgUniform-inl.h
+	OsgUniformTypes.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
 	OsgView.h
@@ -56,6 +60,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	PlaneRepresentation.h
 	Representation.h
 	SphereRepresentation.h
+	Uniform.h
 	View.h
 	ViewElement.h
 )

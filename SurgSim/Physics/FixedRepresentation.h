@@ -75,8 +75,9 @@ public:
 		return m_previousState.getPose();
 	}
 
-	/// Get the final pose of the rigid representation
-	/// \return The final pose (translation + rotation)
+	/// Get the current/final pose of the rigid representation
+	/// \return The current pose (translation + rotation)
+	/// \note In the case of a fixed representation, the final pose is the current pose
 	const RigidTransform3d& getPose() const
 	{
 		return m_currentState.getPose();

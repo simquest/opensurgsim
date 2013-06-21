@@ -118,58 +118,6 @@ private:
 	};
 };
 
-class MockManager : public SurgSim::Framework::ComponentManager
-{
-public:
-	MockManager(bool succeedInit = true, bool succeedStartup = true) :
-		succeedInit(succeedInit),
-		succeedStartup(succeedStartup),
-		didInitialize(false),
-		didStartUp(false),
-		didBeforeStop(false)
-	{
-	}
-
-	virtual ~MockManager()
-	{
-	}
-
-	bool succeedInit;
-	bool succeedStartup;
-
-	bool didInitialize;
-	bool didStartUp;
-	bool didBeforeStop;
-
-private:
-	virtual bool doInitialize()
-	{
-		didInitialize = succeedInit;
-		return succeedInit;
-	};
-	virtual bool doStartUp()
-	{
-		didStartUp = succeedStartup;
-		return succeedStartup;
-	};
-	virtual bool doUpdate(double dt)
-	{
-		return true;
-	};
-	virtual void doBeforeStop()
-	{
-		didBeforeStop = true;
-	};
-
-	virtual bool addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
-	{
-		return false;
-	};
-	virtual bool removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
-	{
-		return false;
-	};
-};
 
 class MockComponent : public SurgSim::Framework::Component
 {
@@ -212,7 +160,6 @@ public:
 	Behavior(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
-		isAwoken(false),
 		isInitialized(false),
 		updateCount(0)
 	{
@@ -229,7 +176,6 @@ public:
 
 	virtual bool doWakeUp()
 	{
-		isAwoken = true;
 		return succeedWithWakeUp;
 	}
 
@@ -240,9 +186,88 @@ public:
 
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
-	bool isAwoken;
 	bool isInitialized;
 	int updateCount;
+};
+
+
+class MockManager : public SurgSim::Framework::ComponentManager
+{
+public:
+	MockManager(bool succeedInit = true, bool succeedStartup = true) :
+		succeedInit(succeedInit),
+		succeedStartup(succeedStartup),
+		didInitialize(false),
+		didStartUp(false),
+		didBeforeStop(false)
+	{
+	}
+
+	virtual ~MockManager()
+	{
+	}
+
+	const std::vector<std::shared_ptr<MockComponent>>& getComponents()
+	{
+		return m_components;
+	}
+
+	bool testTryAddComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+	{
+		return executeAdditions(component);
+	}
+
+	bool testTryRemoveComponent(const std::shared_ptr<SurgSim::Framework::Component>& component)
+	{
+		return executeRemovals(component);
+	}
+
+	void testProcessComponents()
+	{
+		processComponents();
+	}
+
+	bool succeedInit;
+	bool succeedStartup;
+	bool didInitialize;
+	bool didStartUp;
+	bool didBeforeStop;
+
+private:
+	virtual bool doInitialize()
+	{
+		didInitialize = true;
+		return succeedInit;
+	};
+	virtual bool doStartUp()
+	{
+		didStartUp = true;
+		return succeedStartup;
+	};
+	virtual bool doUpdate(double dt)
+	{
+		return true;
+	};
+
+	virtual void doBeforeStop()
+	{
+		didBeforeStop = true;
+	}
+
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) 
+	{
+		return tryAddComponent(component, &m_components) != nullptr;
+	}
+
+	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
+	{
+		return tryRemoveComponent(component, &m_components);
+	}
+
+
+	std::vector<std::shared_ptr<MockComponent>> m_components;
+
+
 };
 
 #endif // MOCKOBJECTS_H

@@ -31,7 +31,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
-	RigidRepresentationFixedLocalization.cpp
+	RigidRepresentationLocalization.cpp
 	RigidShapeCollisionRepresentation.cpp
 	VtcRigidRepresentation.cpp
 )
@@ -43,7 +43,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	CollisionRepresentation.h
 	Computation.h
 	ContactCalculation.h
-	ContactConstraintGeneration.cpp
+	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
 	FemRepresentationParameters.h
@@ -53,7 +53,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	Location.h
 	MeshShape.h
 	PhysicsManager.h
-	PhysicsManager-inl.h
 	PhysicsManagerState.h
 	PlaneShape.h
 	Representation.h
@@ -61,7 +60,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBaseState.h
-	RigidRepresentationFixedLocalization.h
+	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	RigidShape.h

@@ -28,14 +28,14 @@
 #include <SurgSim/Framework/BasicThread.h>
 #include "MockObjects.h"  //NOLINT
 
-TEST(ThreadTest, Instantiation)
+TEST(BasicThreadTest, Instantiation)
 {
 	MockThread m;
 	EXPECT_FALSE(m.isInitialized());
 	EXPECT_FALSE(m.isRunning());
 }
 
-TEST(ThreadTest, Running)
+TEST(BasicThreadTest, Running)
 {
 	MockThread m;
 	m.start(nullptr);

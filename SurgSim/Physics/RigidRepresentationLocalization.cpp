@@ -13,19 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/RigidRepresentationFixedLocalization.h>
+#include <SurgSim/Physics/RigidRepresentationLocalization.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
-RigidRepresentationFixedLocalization::RigidRepresentationFixedLocalization() :
-	Localization()
+RigidRepresentationLocalization::RigidRepresentationLocalization()
 {
 
 }
 
-RigidRepresentationFixedLocalization::RigidRepresentationFixedLocalization(std::shared_ptr<Representation> representation) :
+RigidRepresentationLocalization::RigidRepresentationLocalization(std::shared_ptr<Representation> representation) :
 	Localization(representation)
 {
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
@@ -33,29 +32,22 @@ RigidRepresentationFixedLocalization::RigidRepresentationFixedLocalization(std::
 	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "Unexpected representation type" << std::endl;
 }
 
-RigidRepresentationFixedLocalization::~RigidRepresentationFixedLocalization()
+RigidRepresentationLocalization::~RigidRepresentationLocalization()
 {
 
 }
 
-void RigidRepresentationFixedLocalization::setLocalPosition(const SurgSim::Math::Vector3d& p)
+void RigidRepresentationLocalization::setLocalPosition(const SurgSim::Math::Vector3d& p)
 {
 	m_position = p;
 }
 
-const SurgSim::Math::Vector3d& RigidRepresentationFixedLocalization::getLocalPosition() const
+const SurgSim::Math::Vector3d& RigidRepresentationLocalization::getLocalPosition() const
 {
 	return m_position;
 }
 
-bool RigidRepresentationFixedLocalization::isEqual(const Localization& localization) const
-{
-	const RigidRepresentationFixedLocalization& fixedLoc = 
-		static_cast<const RigidRepresentationFixedLocalization&>(localization);
-	return m_position == fixedLoc.m_position;
-}
-
-SurgSim::Math::Vector3d RigidRepresentationFixedLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(double time)
 {
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());

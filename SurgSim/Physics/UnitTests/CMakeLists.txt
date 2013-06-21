@@ -34,7 +34,7 @@ set(UNIT_TEST_SOURCES
 	RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
-	RigidRepresentationFixedLocalizationTest.cpp
+	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp

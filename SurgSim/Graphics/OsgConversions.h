@@ -13,20 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Representation.h>
+/// \file
+/// Conversions to and from OSG types
 
-using SurgSim::Physics::Localization;
-using SurgSim::Physics::Representation;
+#ifndef SURGSIM_GRAPHICS_OSGCONVERSIONS_H
+#define SURGSIM_GRAPHICS_OSGCONVERSIONS_H
 
-Localization::Localization()
-{
-}
-Localization::Localization(std::shared_ptr<Representation> representation) :
-m_representation(representation)
-{
-}
+#include <SurgSim/Graphics/OsgMatrixConversions.h>
+#include <SurgSim/Graphics/OsgQuaternionConversions.h>
+#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
+#include <SurgSim/Graphics/OsgVectorConversions.h>
 
-Localization::~Localization()
-{
-}
+#endif  // SURGSIM_GRAPHICS_OSGCONVERSIONS_H

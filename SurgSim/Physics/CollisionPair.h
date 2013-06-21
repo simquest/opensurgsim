@@ -34,6 +34,13 @@ namespace Physics
 /// in the opposite direction) then the penetration depth will be reduced to
 /// zero. This means that the normal vector points "in" to body 1
 struct Contact {
+	Contact(const double& newDepth, 
+			const SurgSim::Math::Vector3d& newContact,
+			const SurgSim::Math::Vector3d& newNormal,
+			const std::pair<Location, Location>& newPenetrationPoints) :
+		depth(newDepth), contact(newContact), normal(newNormal), penetrationPoints(newPenetrationPoints)
+		{
+		};
 	double depth;										///< What is the penetration depth for the representation
 	SurgSim::Math::Vector3d contact;					///< The actual contact point, only used for CCD
 	SurgSim::Math::Vector3d normal;						///< The normal on the contact point (normalized)
@@ -60,7 +67,7 @@ public:
 	~CollisionPair();
 
 	/// Sets the representations in this pair, representations cannot be the same instance and neither can be nullptr.
-	/// \param	first 	The first CollisionRepresenation.
+	/// \param	first 	The first CollisionRepresentation.
 	/// \param	second	The second CollisionRepresentation.
 	inline void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
 								   const std::shared_ptr<CollisionRepresentation>& second)
@@ -108,8 +115,7 @@ public:
 						   const SurgSim::Math::Vector3d& normal,
 						   const std::pair<Location, Location>& penetrationPoints)
 	{
-		Contact contact = {depth,contactPoint,normal,penetrationPoints};
-		m_contacts.push_back(std::make_shared<Contact>(contact));
+		m_contacts.push_back(std::make_shared<Contact>(depth,contactPoint,normal,penetrationPoints));
 	}
 
 	/// Adds a contact to the collision pair.
@@ -119,8 +125,8 @@ public:
 						   const SurgSim::Math::Vector3d& normal,
 						   const std::pair<Location, Location>& penetrationPoints)
 	{
-		Contact contact = {depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal, penetrationPoints};
-		m_contacts.push_back(std::make_shared<Contact>(contact));
+		m_contacts.push_back(
+			std::make_shared<Contact>(depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal, penetrationPoints));
 	}
 
 	/// Adds a contact.

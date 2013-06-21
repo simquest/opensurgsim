@@ -38,6 +38,7 @@ public:
 	void SetUp()
 	{
 		m_dt = 1e-3;
+		m_dtDivergenceTest = 1e+3;
 
 		double radius = 0.1;
 		m_param.setDensity(9000.0);
@@ -64,6 +65,7 @@ public:
 
 	// Time step
 	double m_dt;
+	double m_dtDivergenceTest;
 
 	// Rigid representation parameters
 	RigidRepresentationParameters m_param;
@@ -271,9 +273,9 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 	{
 		ASSERT_TRUE(rigidBody->isActive());
 
-		rigidBody->beforeUpdate(m_dt);
-		rigidBody->update(m_dt);
-		rigidBody->afterUpdate(m_dt);
+		rigidBody->beforeUpdate(m_dtDivergenceTest);
+		rigidBody->update(m_dtDivergenceTest);
+		rigidBody->afterUpdate(m_dtDivergenceTest);
 
 		ASSERT_FALSE(rigidBody->isActive());
 	}

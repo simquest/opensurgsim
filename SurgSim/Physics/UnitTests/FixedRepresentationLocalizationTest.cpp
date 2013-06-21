@@ -94,5 +94,3 @@ TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 	EXPECT_TRUE(localization.getLocalPosition().isApprox(position, epsilon));
 	EXPECT_FALSE(localization.calculatePosition().isApprox(origin, epsilon));
 }
-
-

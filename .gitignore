@@ -91,3 +91,4 @@ My Amplifier XE Results*
 # (only if building directly inside the tree)
 /tests/unit_tests
 /tests/unit_tests.exe
+*.smproj

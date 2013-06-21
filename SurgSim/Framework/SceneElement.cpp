@@ -76,22 +76,13 @@ bool SceneElement::initialize()
 {
 	bool result = true;
 	result = doInitialize() && result;
-	for (auto it = m_components.begin(); it != m_components.end(); ++it)
-	{
-		bool componentInit = it->second->initialize(getRuntime());
-		result = result && componentInit;
-	}
+
 	return result;
 }
 
 bool SceneElement::wakeUp()
 {
 	bool result = true;
-	for (auto it = m_components.begin(); it != m_components.end(); ++it)
-	{
-		bool componentInit = it->second->wakeUp();
-		result = result && componentInit;
-	}
 	result = doWakeUp() && result;
 	return result;
 }

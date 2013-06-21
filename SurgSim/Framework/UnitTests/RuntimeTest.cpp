@@ -93,7 +93,9 @@ TEST(RuntimeTest, LoggerManagement)
 
 TEST(RuntimeTest, SceneInitialization)
 {
-	std::shared_ptr<Runtime> runtime(new Runtime());
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
+	runtime->addManager(manager);
 	std::shared_ptr<Scene> scene(new Scene());
 
 	std::vector<std::shared_ptr<MockSceneElement>> elements;
@@ -114,9 +116,6 @@ TEST(RuntimeTest, SceneInitialization)
 	elements[1]->addComponent(components[3]);
 
 	runtime->setScene(scene);
-
-	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
-	runtime->addManager(manager);
 
 	EXPECT_FALSE(manager->didInitialize);
 	EXPECT_FALSE(manager->didStartUp);
@@ -142,7 +141,6 @@ TEST(RuntimeTest, SceneInitialization)
 	}
 
 	runtime->stop();
-
 	EXPECT_TRUE(manager->didBeforeStop);
 }
 
