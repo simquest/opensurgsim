@@ -45,17 +45,7 @@ public:
 	/// Destructor
 	virtual ~RigidRepresentation();
 
-	/// Set the initial state of the rigid representation
-	/// \param state The initial state (pose + lin/ang velocities)
-	/// This will also set the current/previous states to the initial state
-	void setInitialState(const RigidRepresentationState& state)
-	{
-		m_initialState = state;
-		m_currentState = state;
-		m_previousState = state;
 
-		updateGlobalInertiaMatrices(m_currentState);
-	}
 
 	/// Set the initial parameters of the rigid representation
 	/// \param parameters The initial parameters
@@ -76,32 +66,11 @@ public:
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
-	/// Get the initial state of the rigid representation
-	/// \return The initial state (pose + lin/ang velocities)
-	const RigidRepresentationState& getInitialState() const
-	{
-		return m_initialState;
-	}
-
 	/// Get the initial parameters of the rigid representation
 	/// \return The initial parameters of the rigid representation
 	const RigidRepresentationParameters& getInitialParameters() const
 	{
 		return m_initialParameters;
-	}
-
-	/// Get the current state of the rigid representation
-	/// \return The current state (pose + lin/ang velocities)
-	const RigidRepresentationState& getCurrentState() const
-	{
-		return m_currentState;
-	}
-
-	/// Get the previous state of the rigid representation
-	/// \return The previous state (pose + lin/ang velocities)
-	const RigidRepresentationState& getPreviousState() const
-	{
-		return m_previousState;
 	}
 
 	/// Get the current parameters of the rigid representation
@@ -111,51 +80,12 @@ public:
 		return m_currentParameters;
 	}
 
-	/// Set the initial pose of the rigid representation
-	/// \param pose The initial pose (translation + rotation)
-	void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_initialState.setPose(pose);
-		m_currentState.setPose(pose);
-		m_previousState.setPose(pose);
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
-
-	/// Get the initial pose of the rigid representation
-	/// \return The initial pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{
-		return m_initialState.getPose();
-	}
-
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
 	/// \note Does Not Apply to this representation (the pose is fully controlled by the
 	/// physics simulation).
 	void setPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
-	}
-
-	/// Get the previous pose of the rigid representation
-	/// \return The previous pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPreviousPose() const
-	{
-		return m_previousState.getPose();
-	}
-
-	/// Get the current pose of the rigid representation
-	/// \return The current pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getCurrentPose() const
-	{
-		return m_currentState.getPose();
-	}
-
-	/// Get the final pose of the rigid representation
-	/// \return The final pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPose() const
-	{
-		return m_finalState.getPose();
 	}
 
 	/// Preprocessing done before the update call
@@ -170,17 +100,7 @@ public:
 	/// \param dt The time step (in seconds)
 	void afterUpdate(double dt);
 
-	/// Reset the rigid representation state to its initial state
-	void resetState()
-	{
-		Representation::resetState();
 
-		m_currentState  = m_initialState;
-		m_previousState = m_initialState;
-		m_finalState    = m_initialState;
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
 
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters()
@@ -217,19 +137,6 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	void updateGlobalInertiaMatrices(const RigidRepresentationState& state);
-
-
-	/// Initial rigid representation state (useful for reset)
-	RigidRepresentationState m_initialState;
-
-	/// Previous rigid representation state
-	RigidRepresentationState m_previousState;
-
-	/// Current rigid representation state
-	RigidRepresentationState m_currentState;
-
-	/// Last valid/final rigid representation state
-	RigidRepresentationState m_finalState;
 
 	/// Initial physical parameters
 	RigidRepresentationParameters m_initialParameters;

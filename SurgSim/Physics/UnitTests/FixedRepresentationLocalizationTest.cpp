@@ -19,9 +19,9 @@
 #include <string>
 
 #include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationFixedLocalization.h>
+#include <SurgSim/Physics/RigidRepresentationLocalization.h>
 using SurgSim::Physics::FixedRepresentation;
-using SurgSim::Physics::RigidRepresentationFixedLocalization;
+using SurgSim::Physics::RigidRepresentationLocalization;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -80,7 +80,7 @@ TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 	fixedRepresentation->setIsActive(true);
 	fixedRepresentation->setInitialPose(m_initialTransformation);
 
-	RigidRepresentationFixedLocalization localization = RigidRepresentationFixedLocalization(fixedRepresentation);
+	RigidRepresentationLocalization localization = RigidRepresentationLocalization(fixedRepresentation);
 	ASSERT_EQ(fixedRepresentation, localization.getRepresentation());
 
 	SurgSim::Math::Vector3d origin = m_initialTransformation.translation();

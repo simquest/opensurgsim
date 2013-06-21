@@ -31,6 +31,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
+	RigidRepresentationBase.cpp
 	RigidRepresentationLocalization.cpp
 	RigidShapeCollisionRepresentation.cpp
 	VtcRigidRepresentation.cpp

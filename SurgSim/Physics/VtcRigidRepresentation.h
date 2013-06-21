@@ -48,16 +48,15 @@ public:
 	/// Destructor
 	virtual ~VtcRigidRepresentation();
 
-	/// Set the initial state of the rigid representation
-	/// \param state The initial state (pose + lin/ang velocities)
-	void setInitialState(const RigidRepresentationState& state)
+	/// Set the current pose of the rigid representation
+	/// \param pose The current pose (translation + rotation)
+	/// \note This is done through the Vtc proxy !
+	/// \note We let the end-user drive the Vtc, not the virtual rigid representation directly
+	void setPose(const SurgSim::Math::RigidTransform3d& pose)
 	{
-		m_initialState = state;
-		m_currentState = state;
-		m_previousState = state;
-
-		updateGlobalInertiaMatrices(m_currentState);
+		m_currentVtcState.setPose(pose);
 	}
+
 
 	/// Set the initial parameters of the rigid representation
 	/// \param parameters The initial parameters
@@ -78,13 +77,6 @@ public:
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
-	/// Get the initial state of the rigid representation
-	/// \return The initial state (pose + lin/ang velocities)
-	const RigidRepresentationState& getInitialState() const
-	{
-		return m_initialState;
-	}
-
 	/// Get the initial parameters of the rigid representation
 	/// \return The initial parameters of the rigid representation
 	const RigidRepresentationParameters& getInitialParameters() const
@@ -92,19 +84,6 @@ public:
 		return m_initialParameters;
 	}
 
-	/// Get the current state of the rigid representation
-	/// \return The current state (pose + lin/ang velocities)
-	const RigidRepresentationState& getCurrentState() const
-	{
-		return m_currentState;
-	}
-
-	/// Get the previous state of the rigid representation
-	/// \return The previous state (pose + lin/ang velocities)
-	const RigidRepresentationState& getPreviousState() const
-	{
-		return m_previousState;
-	}
 
 	/// Get the current parameters of the rigid representation
 	/// \return The current parameters of the rigid representation
@@ -172,42 +151,6 @@ public:
 		return m_currentVtcParameters;
 	}
 
-	/// Set the initial pose of the rigid representation
-	/// \param pose The initial pose (translation + rotation)
-	/// \note Sets the current/previous poses as well
-	void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_initialState.setPose(pose);
-		m_currentState.setPose(pose);
-		m_previousState.setPose(pose);
-		m_finalState.setPose(pose);
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
-
-	/// Get the initial pose of the rigid representation
-	/// \return The initial pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{
-		return m_initialState.getPose();
-	}
-
-	/// Set the current pose of the rigid representation
-	/// \param pose The current pose (translation + rotation)
-	/// \note This is done through the Vtc proxy !
-	/// \note We let the end-user drive the Vtc, not the virtual rigid representation directly
-	void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_currentVtcState.setPose(pose);
-	}
-
-	/// Get the previous pose of the rigid representation
-	/// \return The previous pose (translation + rotation)
-	const SurgSim::Math::RigidTransform3d& getPreviousPose() const
-	{
-		return m_previousState.getPose();
-	}
-
 	/// Get the final pose of the rigid representation
 	/// \return The final pose (translation + rotation)
 	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid representation
@@ -227,20 +170,6 @@ public:
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
 	void afterUpdate(double dt);
-
-	/// Reset the rigid representation state to its initial state
-	/// \note This reset the rigid representation state but not the Vtc state
-	/// \note The Vtc is controlled externally via setPose()
-	void resetState()
-	{
-		RigidRepresentationBase::resetState();
-
-		m_currentState  = m_initialState;
-		m_previousState = m_initialState;
-		m_finalState    = m_initialState;
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
 
 	/// Reset the rigid representation parameters to their initial values
 	/// \note Does not reset the Vtc parameters
@@ -283,18 +212,6 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	void updateGlobalInertiaMatrices(const RigidRepresentationState& state);
-
-	/// Initial rigid representation state (useful for reset)
-	RigidRepresentationState m_initialState;
-
-	/// Previous rigid representation state
-	RigidRepresentationState m_previousState;
-
-	/// Current rigid representation state
-	RigidRepresentationState m_currentState;
-
-	/// Last valid/final rigid representation state
-	RigidRepresentationState m_finalState;
 
 	/// Initial physical parameters
 	RigidRepresentationParameters m_initialParameters;
