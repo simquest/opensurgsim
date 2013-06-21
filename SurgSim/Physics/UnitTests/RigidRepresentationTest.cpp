@@ -288,10 +288,25 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 TEST_F(RigidRepresentationTest, LocalizationCreation)
 {
 	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-	Location l;
-	l.globalPosition.setValue(Vector3d(1.0,2.0,3.0));
+	Location loc0;
+	loc0.globalPosition.setValue(Vector3d(1.0,2.0,3.0));
 
-	std::shared_ptr<Localization> loc = rigidBody->createLocalization(l);
+	std::shared_ptr<Localization> localization = rigidBody->createLocalization(loc0);
+	localization->setRepresentation(rigidBody);
+
+	EXPECT_TRUE(loc0.globalPosition.getValue().isApprox(localization->calculatePosition(0.0)));
+	EXPECT_TRUE(loc0.globalPosition.getValue().isApprox(localization->calculatePosition(1.0)));
+
+	Location loc1;
+	loc1.rigidLocalPosition.setValue(Vector3d(3.0,2.0,1.0));
+
+	localization = rigidBody->createLocalization(loc1);
+	localization->setRepresentation(rigidBody);
+	
+	Vector3d globalPos = rigidBody->getCurrentPose() * loc1.rigidLocalPosition.getValue();
+
+	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(0.0)));
+	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(1.0)));
 
 }
 

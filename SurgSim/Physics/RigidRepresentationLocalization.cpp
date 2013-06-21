@@ -25,11 +25,9 @@ RigidRepresentationLocalization::RigidRepresentationLocalization()
 }
 
 RigidRepresentationLocalization::RigidRepresentationLocalization(std::shared_ptr<Representation> representation) :
-	Localization(representation)
+	Localization()
 {
-	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
-		std::dynamic_pointer_cast<RigidRepresentationBase>(representation);
-	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "Unexpected representation type" << std::endl;
+	setRepresentation(representation);
 }
 
 RigidRepresentationLocalization::~RigidRepresentationLocalization()
@@ -52,6 +50,9 @@ SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(dou
 	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
 
+	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "RigidRepresentation is null, it was probably not" <<
+		" initialized";
+
 	if (time == 0.0)
 	{
 		return rigidRepresentation->getPreviousState().getPose() * m_position;
@@ -72,6 +73,15 @@ SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(dou
 	return pose * m_position;
 }
 
+bool RigidRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
+{
+
+	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
+		std::dynamic_pointer_cast<RigidRepresentationBase>(representation);
+
+	// Allows to reset the representation to nullptr ... 
+	return (rigidRepresentation != nullptr || representation == nullptr);
+}
 
 }; // Physics
 }; // SurgSim
