@@ -34,23 +34,17 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 set(EXAMPLE_SOURCES
-	GlutRenderer.cpp
 	main.cpp
-	MovingSquareForce.cpp
-	MovingSquareGlutWindow.cpp
 )
 
 set(EXAMPLE_HEADERS
-	GlutRenderer.h
-	MovingSquareForce.h
-	MovingSquareGlutWindow.h
 )
 
 add_executable(SixenseVisualTest
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 target_link_libraries(SixenseVisualTest
-	${LIBS} SixenseDevice IdentityPoseDevice SurgSimInput SurgSimFramework
-	SurgSimDataStructures
+	${LIBS} SixenseDevice IdentityPoseDevice VisualTestCommon
+	SurgSimInput SurgSimFramework SurgSimDataStructures
 	${Boost_LIBRARIES} ${SIXENSE_SDK_LIBRARIES} ${GLUT_LIBRARIES})
 
 # Copy the device DLLs into the build directory

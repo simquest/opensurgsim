@@ -141,7 +141,7 @@ void GlutRenderer::initialize()
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
 	glutInitWindowSize(m_width, m_height);
-	glutCreateWindow("MMVR2013 Bigger Input Demo");
+	glutCreateWindow("Simple GLUT display");
 
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_CULL_FACE);
