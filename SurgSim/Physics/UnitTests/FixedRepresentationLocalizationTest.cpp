@@ -19,9 +19,9 @@
 #include <string>
 
 #include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/FixedRepresentationLocalization.h>
+#include <SurgSim/Physics/RigidRepresentationFixedLocalization.h>
 using SurgSim::Physics::FixedRepresentation;
-using SurgSim::Physics::FixedRepresentationLocalization;
+using SurgSim::Physics::RigidRepresentationFixedLocalization;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -70,41 +70,17 @@ public:
 	SurgSim::Math::RigidTransform3d m_identityTransformation;
 };
 
-TEST_F(FixedRepresentationLocalizationTest, ConstructorTest)
-{
-	ASSERT_NO_THROW( {FixedRepresentationLocalization fixedRepresentationLoc;});
-
-	ASSERT_NO_THROW(
-	{
-		std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("FixedRepresentation");
-		FixedRepresentationLocalization fixedRepresentationLoc(fixed);
-	});
-}
-
-TEST_F(FixedRepresentationLocalizationTest, SetGetRepresentation)
-{
-	FixedRepresentationLocalization fixedRepresentationLoc;
-	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("FixedRepresentation");
-	
-	EXPECT_EQ(nullptr, fixedRepresentationLoc.getRepresentation());
-
-	fixedRepresentationLoc.setRepresentation(fixed);
-	EXPECT_EQ(fixed, fixedRepresentationLoc.getRepresentation());
-
-	fixedRepresentationLoc.setRepresentation(nullptr);
-	EXPECT_EQ(nullptr, fixedRepresentationLoc.getRepresentation());
-}
-
 TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 {
 	// Create the rigid body
-	std::shared_ptr<FixedRepresentation> fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
+	std::shared_ptr<FixedRepresentation> fixedRepresentation = 
+		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	// Activate the rigid body and setup its initial pose
 	fixedRepresentation->setIsActive(true);
 	fixedRepresentation->setInitialPose(m_initialTransformation);
 
-	FixedRepresentationLocalization localization = FixedRepresentationLocalization(fixedRepresentation);
+	RigidRepresentationFixedLocalization localization = RigidRepresentationFixedLocalization(fixedRepresentation);
 	ASSERT_EQ(fixedRepresentation, localization.getRepresentation());
 
 	SurgSim::Math::Vector3d origin = m_initialTransformation.translation();
@@ -119,42 +95,4 @@ TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 	EXPECT_FALSE(localization.calculatePosition().isApprox(origin, epsilon));
 }
 
-TEST_F(FixedRepresentationLocalizationTest, EqualityTest)
-{
-	std::shared_ptr<FixedRepresentation> fixedRepresentation1 = std::make_shared<FixedRepresentation>("FixedRepresentation1");
-	std::shared_ptr<FixedRepresentation> fixedRepresentation2 = std::make_shared<FixedRepresentation>("FixedRepresentation2");
-	FixedRepresentationLocalization localization1 = FixedRepresentationLocalization(fixedRepresentation1);
-	FixedRepresentationLocalization localization2 = FixedRepresentationLocalization(fixedRepresentation1);
-	SurgSim::Math::Vector3d zeroVector = SurgSim::Math::Vector3d::Zero();
-	SurgSim::Math::Vector3d randomVector = SurgSim::Math::Vector3d::Random();
-	localization1.setLocalPosition(zeroVector);
-	localization2.setLocalPosition(zeroVector);
-	EXPECT_EQ(localization1.getRepresentation(), fixedRepresentation1);
-	EXPECT_EQ(localization2.getRepresentation(), fixedRepresentation1);
-	EXPECT_TRUE(localization1 == localization2);
-	EXPECT_FALSE(localization1 != localization2);
 
-	localization2.setLocalPosition(randomVector);
-	EXPECT_EQ(localization1.getRepresentation(), fixedRepresentation1);
-	EXPECT_EQ(localization2.getRepresentation(), fixedRepresentation1);
-	EXPECT_FALSE(localization1 == localization2);
-	EXPECT_TRUE(localization1 != localization2);
-
-	localization1.setLocalPosition(randomVector);
-	EXPECT_EQ(localization1.getRepresentation(), fixedRepresentation1);
-	EXPECT_EQ(localization2.getRepresentation(), fixedRepresentation1);
-	EXPECT_TRUE(localization1 == localization2);
-	EXPECT_FALSE(localization1 != localization2);
-
-	localization2.setRepresentation(fixedRepresentation2);
-	EXPECT_EQ(localization1.getRepresentation(), fixedRepresentation1);
-	EXPECT_EQ(localization2.getRepresentation(), fixedRepresentation2);
-	EXPECT_FALSE(localization1 == localization2);
-	EXPECT_TRUE(localization1 != localization2);
-
-	localization1.setRepresentation(fixedRepresentation2);
-	EXPECT_EQ(localization1.getRepresentation(), fixedRepresentation2);
-	EXPECT_EQ(localization2.getRepresentation(), fixedRepresentation2);
-	EXPECT_TRUE(localization1 == localization2);
-	EXPECT_FALSE(localization1 != localization2);
-}

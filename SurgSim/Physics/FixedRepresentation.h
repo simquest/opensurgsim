@@ -16,8 +16,10 @@
 #ifndef SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 
+#include <SurgSim/Physics/Utilities.h>
 #include <SurgSim/Physics/RigidRepresentationBase.h>
 #include <SurgSim/Physics/RigidRepresentationBaseState.h>
+#include <SurgSim/Physics/RigidRepresentationFixedLocalization.h>
 
 namespace SurgSim
 {
@@ -88,6 +90,11 @@ public:
 
 		m_previousState  = m_initialState;
 		m_currentState   = m_initialState;
+	}
+
+	std::shared_ptr<Localization> FixedRepresentation::createLocalization(const Location& location)
+	{
+		return std::move(createTypedLocalization<RigidRepresentationFixedLocalization>(*this,location));
 	}
 
 private:

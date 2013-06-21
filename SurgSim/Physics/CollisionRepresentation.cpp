@@ -13,44 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
-#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
-
+#include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/Representation.h>
-
-#include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim
 {
-
 namespace Physics
 {
 
-/// The RigidRepresentationBase class defines the base class for
-/// all rigid motion based representations (fixed, rigid body, rigid body + vtc,...)
-class RigidRepresentationBase : public Representation
+CollisionRepresentation::~CollisionRepresentation()
 {
-public:
-	typedef SurgSim::Math::RigidTransform3d RigidTransform3d;
 
-	/// Constructor
-	/// \param name The rigid representation's name
-	explicit RigidRepresentationBase(const std::string& name)
-		: Representation(name)
-	{
-	}
+}
 
-	/// Destructor
-	virtual ~RigidRepresentationBase()
-	{
-	}
+void CollisionRepresentation::setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation)
+{
+	m_physicsRepresentation = physicsRepresentation;
+}
 
-protected:
-
-};
+std::shared_ptr<SurgSim::Physics::Representation> CollisionRepresentation::getPhysicsRepresentation()
+{
+	return m_physicsRepresentation.lock();
+}
 
 }; // Physics
-
 }; // SurgSim
-
-#endif /// SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H

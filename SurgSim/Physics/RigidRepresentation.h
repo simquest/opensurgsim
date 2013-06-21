@@ -30,6 +30,8 @@ namespace SurgSim
 namespace Physics
 {
 
+class Localization;
+
 /// The RigidRepresentation class defines the dynamic rigid body representation
 /// Note that the rigid representation is velocity-based, therefore its degrees of
 /// freedom are the linear and angular velocities: 6 Dof
@@ -190,6 +192,8 @@ public:
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
+	virtual std::shared_ptr<Localization> createLocalization(const Location& location);
+
 protected:
 	/// Inertia matrices in global coordinates
 	SurgSim::Math::Matrix33d m_globalInertia;
@@ -213,6 +217,7 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	void updateGlobalInertiaMatrices(const RigidRepresentationState& state);
+
 
 	/// Initial rigid representation state (useful for reset)
 	RigidRepresentationState m_initialState;

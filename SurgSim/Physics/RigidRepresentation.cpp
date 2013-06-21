@@ -17,8 +17,13 @@
 
 #include <SurgSim/Physics/RigidRepresentation.h>
 
+#include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Valid.h>
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Physics/Localization.h>
+#include <SurgSim/Physics/Location.h>
+#include <SurgSim/Physics/RigidRepresentationFixedLocalization.h>
+#include <SurgSim/Physics/Utilities.h>
 
 namespace SurgSim{
 
@@ -183,6 +188,11 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	const SurgSim::Math::Matrix33d& R = state.getPose().rotation();
 	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
+}
+
+std::shared_ptr<Localization> RigidRepresentation::createLocalization(const Location& location)
+{
+	return std::move(createTypedLocalization<RigidRepresentationFixedLocalization>(*this,location));
 }
 
 }; /// Physics

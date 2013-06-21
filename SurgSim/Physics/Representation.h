@@ -27,67 +27,51 @@ namespace SurgSim
 namespace Physics
 {
 
+class Localization;
+struct Location;
+
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
 	/// \param name The representation's name
-	explicit Representation(const std::string& name)
-		: SurgSim::Framework::Representation(name), m_gravity(0.0, -9.81, 0.0), m_numDof(0),
-		m_isGravityEnabled(true), m_isActive(true)
-	{
-	}
+	explicit Representation(const std::string& name);
 
 	/// Destructor
-	virtual ~Representation()
-	{
-	}
+	virtual ~Representation();
 
 	/// Reset the representation to its initial/default state
-	virtual void resetState()
-	{
-	}
+	virtual void resetState();
 
 	/// Reset the representation parameters to their initial/default values
-	virtual void resetParameters()
-	{
-	}
+	virtual void resetParameters();
 
 	/// Query the object number of degrees of freedom
 	/// \return The number of degrees of freedom
-	unsigned int getNumDof() const
+	inline unsigned int getNumDof() const
 	{
 		return m_numDof;
 	}
 
 	/// Set active flag for this Representation
 	/// \param isActive True if the Representation is being activated, False otherwise
-	virtual void setIsActive(bool isActive)
-	{
-		m_isActive = isActive;
-	}
+	virtual void setIsActive(bool isActive);
 
 	/// Query if this object is active in the scene.
 	/// \return true if active, false if not.
-	bool isActive() const
+	inline bool isActive() const
 	{
 		return m_isActive;
 	}
 
 	/// Set the gravity enable flag
 	/// \param isGravityEnabled True if gravity enabled, false if not.
-	virtual void setIsGravityEnabled(bool isGravityEnabled)
-	{
-		m_isGravityEnabled = isGravityEnabled;
-	}
+	virtual void setIsGravityEnabled(bool isGravityEnabled);
 
 	/// Get the gravity enable flag
 	/// \return true if gravity enabled, false if not.
-	bool isGravityEnabled() const
-	{
-		return m_isGravityEnabled;
-	}
+	bool isGravityEnabled() const;
 
 	/// Set the pose of the physics representation
 	/// \param pose The pose to request the representation to be at
@@ -96,38 +80,28 @@ public:
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
-	virtual void beforeUpdate(double dt)
-	{
-	}
+	virtual void beforeUpdate(double dt);
 
 	/// Update the representation state to the current time step
 	/// \param dt The time step (in seconds)
-	virtual void update(double dt)
-	{
-	}
+	virtual void update(double dt);
 
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
-	virtual void afterUpdate(double dt)
-	{
-	}
+	virtual void afterUpdate(double dt);
+
+	virtual std::shared_ptr<Localization> createLocalization(const Location& location);
 
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom
 	/// \note protected so that nobody can change the number of DOF
 	/// \note except daughter classes
-	void setNumDof(unsigned int numDof)
-	{
-		m_numDof = numDof;
-	}
+	void setNumDof(unsigned int numDof);
 
 	/// Get the gravity used by this Representation
 	/// \return The gravity vector
-	const SurgSim::Math::Vector3d& getGravity() const
-	{
-		return m_gravity;
-	}
+	const SurgSim::Math::Vector3d& getGravity() const;
 
 private:
 	/// NO copy constructor

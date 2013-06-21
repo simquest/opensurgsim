@@ -27,6 +27,7 @@ namespace Physics
 {
 
 class RigidShape;
+class Representation;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform
@@ -34,7 +35,7 @@ class CollisionRepresentation
 {
 public:
 
-	virtual ~CollisionRepresentation() {}
+	virtual ~CollisionRepresentation();
 	/// \return The unique type of the shape, used to determine which calculation to use.
 	virtual int getShapeType() const = 0;
 
@@ -43,6 +44,13 @@ public:
 
 	/// \return Transformation to transform the shape into world coordinates
 	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const = 0;
+
+	void setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation);
+
+	std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation();
+
+private:
+	std::weak_ptr<SurgSim::Physics::Representation> m_physicsRepresentation;
 
 };
 

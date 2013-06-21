@@ -34,76 +34,34 @@ class RigidRepresentationFixedLocalization: public Localization
 {
 public:
 	/// Default constructor
-	RigidRepresentationFixedLocalization() :
-	Localization()
-	{
-	}
+	RigidRepresentationFixedLocalization();
 
 	/// Constructor
 	/// \param representation The representation to assign to this localization
-	explicit RigidRepresentationFixedLocalization(std::shared_ptr<Representation> representation) :
-	Localization(representation)
-	{
-		std::shared_ptr<RigidRepresentation> rigidRepresentation = std::dynamic_pointer_cast<RigidRepresentation>(representation);
-		SURGSIM_ASSERT(rigidRepresentation != nullptr) << "Unexpected representation type" << std::endl;
-	}
+	explicit RigidRepresentationFixedLocalization(std::shared_ptr<Representation> representation);
 
 	/// Destructor
-	virtual ~RigidRepresentationFixedLocalization()
-	{
-	}
+	virtual ~RigidRepresentationFixedLocalization();
 
 	/// Sets the local position
 	/// \param p The local position to set the localization at
-	void setLocalPosition(const SurgSim::Math::Vector3d& p)
-	{
-		m_position = p;
-	}
+	void setLocalPosition(const SurgSim::Math::Vector3d& p);
 
 	/// Gets the local position
 	/// \return The local position set for this localization
-	const SurgSim::Math::Vector3d& getLocalPosition() const
-	{
-		return m_position;
-	}
+	const SurgSim::Math::Vector3d& getLocalPosition() const;
 
 private:
 	/// Comparison function of equality
 	/// \param localization The localization to compare it to
 	/// \return True if the localization matches, False otherwise
-	bool isEqual(const Localization& localization) const
-	{
-		const RigidRepresentationFixedLocalization& fixedLoc = static_cast<const RigidRepresentationFixedLocalization&>(localization);
-		return m_position == fixedLoc.m_position;
-	}
+	bool isEqual(const Localization& localization) const;
 
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
-	SurgSim::Math::Vector3d doCalculatePosition(double time)
-	{
-		std::shared_ptr<RigidRepresentation> rigidRepresentation = std::static_pointer_cast<RigidRepresentation>(getRepresentation());
-
-		if (time == 0.0)
-		{
-			return rigidRepresentation->getPreviousState().getPose() * m_position;
-		}
-		else if (time == 1.0)
-		{
-			return rigidRepresentation->getCurrentState().getPose() * m_position;
-		}
-		else if (rigidRepresentation->getCurrentState().getPose().isApprox(rigidRepresentation->getPreviousState().getPose()))
-		{
-			return rigidRepresentation->getCurrentState().getPose() * m_position;
-		}
-
-		const SurgSim::Math::RigidTransform3d& currentPose  = rigidRepresentation->getCurrentState().getPose();
-		const SurgSim::Math::RigidTransform3d& previousPose = rigidRepresentation->getPreviousState().getPose();
-		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolate(previousPose, currentPose, time);
-
-		return pose * m_position;
-	}
+	SurgSim::Math::Vector3d doCalculatePosition(double time);
 
 	/// 3D position in local coordinates
 	SurgSim::Math::Vector3d m_position;
