@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GLUT_RENDERER_H
-#define GLUT_RENDERER_H
+#ifndef SURGSIM_TESTING_VISUALTESTCOMMON_GLUTRENDERER_H
+#define SURGSIM_TESTING_VISUALTESTCOMMON_GLUTRENDERER_H
 
 #include <vector>
 #include <memory>
@@ -33,6 +33,8 @@ struct GlutRenderObject
 	GlutRenderObject() : pose(SurgSim::Math::RigidTransform3d::Identity())
 	{
 	}
+
+	virtual ~GlutRenderObject();
 
 	/// Pure virtual draw method for subclasses to define how to draw themselves with Glut.
 	virtual void draw() const = 0;
@@ -56,9 +58,9 @@ struct GlutSquare : public GlutRenderObject
 	/// \param planeDirectionX The unit direction along one of the pairs edges of the square, default is X-axis.
 	/// \param planeDirectionY The unit direction along the other pair of edges of the square, default is Y-axis.
 	GlutSquare(double halfSize, const SurgSim::Math::Vector3d& color,
-		const SurgSim::Math::Vector3d& planeDirectionX = SurgSim::Math::Vector3d(1.0, 0.0, 0.0),
-		const SurgSim::Math::Vector3d& planeDirectionY = SurgSim::Math::Vector3d(0.0, 1.0, 0.0)) :
-	GlutRenderObject(), halfSize(halfSize), color(color), planeDirectionX(planeDirectionX),
+			   const SurgSim::Math::Vector3d& planeDirectionX = SurgSim::Math::Vector3d(1.0, 0.0, 0.0),
+			   const SurgSim::Math::Vector3d& planeDirectionY = SurgSim::Math::Vector3d(0.0, 1.0, 0.0)) :
+		GlutRenderObject(), halfSize(halfSize), color(color), planeDirectionX(planeDirectionX),
 		planeDirectionY(planeDirectionY)
 	{
 	}
@@ -99,7 +101,7 @@ struct GlutSphere : GlutRenderObject
 	/// \param radius Radius of the sphere, in meters.
 	/// \param color Color of the sphere.
 	GlutSphere(double radius, const SurgSim::Math::Vector3d& color) :
-	radius(radius), color(color), quadratic(gluNewQuadric())
+		radius(radius), color(color), quadratic(gluNewQuadric())
 	{
 	}
 
@@ -150,7 +152,7 @@ struct GlutCamera
 	/// \param near Near clipping plane distance from camera, in meters.
 	/// \param far Far clipping plane distance from camera, in meters.
 	GlutCamera(const SurgSim::Math::Vector3d& eye, const SurgSim::Math::Vector3d& center,
-		const SurgSim::Math::Vector3d& up, const double fovY, double near, double far) : eye(eye), center(center),
+			   const SurgSim::Math::Vector3d& up, const double fovY, double near, double far) : eye(eye), center(center),
 		up(up), fovY(fovY), near(near), far(far)
 	{
 	}
@@ -217,4 +219,4 @@ private:
 };
 
 
-#endif // GLUT_RENDERER_H
+#endif // SURGSIM_TESTING_VISUALTESTCOMMON_GLUTRENDERER_H

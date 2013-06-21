@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "MovingSquareForce.h"
+#include "SurgSim/Testing/VisualTestCommon/MovingSquareForce.h"
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "MovingSquareGlutWindow.h"
+#include "SurgSim/Testing/VisualTestCommon/MovingSquareGlutWindow.h"
 
 using SurgSim::DataStructures::DataGroup;
 
@@ -25,11 +25,11 @@ MovingSquareGlutWindow::MovingSquareGlutWindow(const std::string& toolDeviceName
 	m_squareDeviceName(squareDeviceName)
 {
 	m_camera = std::make_shared<GlutCamera>(Vector3d(-0.15, 0.15, 0.3), Vector3d(0.0, 0.0, 0.0),
-		Vector3d(0.0, 1.0, 0.0), 45.0, 0.001, 1.0);
+											Vector3d(0.0, 1.0, 0.0), 45.0, 0.001, 1.0);
 	GlutRenderer::setCamera(m_camera);
 
 	m_square = std::make_shared<GlutSquare>(0.050, Vector3d(1.0, 1.0, 1.0), Vector3d(1.0, 0.0, 0.0),
-		Vector3d(0.0, 0.0, 1.0));
+											Vector3d(0.0, 0.0, 1.0));
 	GlutRenderer::addObject(m_square);
 
 	m_toolSphere = std::make_shared<GlutSphere>(0.010, Vector3d(1.0, 1.0, 1.0));

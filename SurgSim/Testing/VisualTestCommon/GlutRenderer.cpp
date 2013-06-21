@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "GlutRenderer.h"
+#include "SurgSim/Testing/VisualTestCommon/GlutRenderer.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::RigidTransform3d;
@@ -23,7 +23,13 @@ int GlutRenderer::m_width = 1024;
 int GlutRenderer::m_height = 768;
 
 std::shared_ptr<GlutCamera> GlutRenderer::m_camera = nullptr;
-std::vector< std::shared_ptr<GlutRenderObject> > GlutRenderer::m_objects = std::vector< std::shared_ptr<GlutRenderObject> >();
+std::vector< std::shared_ptr<GlutRenderObject> > GlutRenderer::m_objects =
+	std::vector< std::shared_ptr<GlutRenderObject> >();
+
+
+GlutRenderObject::~GlutRenderObject()
+{
+}
 
 void GlutSquare::draw() const
 {
@@ -62,7 +68,7 @@ void GlutSquare::draw() const
 
 	glEnd();
 
- 	glPopMatrix();
+	glPopMatrix();
 }
 
 void GlutAxes::draw() const
@@ -158,13 +164,13 @@ void GlutRenderer::display()
 	glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(m_camera->fovY, (float)m_width / m_height, m_camera->near, m_camera->far);
+	gluPerspective(m_camera->fovY, static_cast<float>(m_width / m_height), m_camera->near, m_camera->far);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(m_camera->eye.x(), m_camera->eye.y(), m_camera->eye.z(),
-		m_camera->center.x(), m_camera->center.y(), m_camera->center.z(),
-		m_camera->up.x(), m_camera->up.y(), m_camera->up.z());
+			  m_camera->center.x(), m_camera->center.y(), m_camera->center.z(),
+			  m_camera->up.x(), m_camera->up.y(), m_camera->up.z());
 
 	glEnable(GL_LIGHT0);
 

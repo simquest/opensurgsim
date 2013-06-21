@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MOVING_SQUARE_GLUT_WINDOW_H
-#define MOVING_SQUARE_GLUT_WINDOW_H
+#ifndef SURGSIM_TESTING_VISUALTESTCOMMON_MOVINGSQUAREGLUTWINDOW_H
+#define SURGSIM_TESTING_VISUALTESTCOMMON_MOVINGSQUAREGLUTWINDOW_H
 
 #include <boost/thread.hpp>
 
@@ -22,7 +22,7 @@
 #include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 
-#include "GlutRenderer.h"
+#include "SurgSim/Testing/VisualTestCommon/GlutRenderer.h"
 
 /// A simple listener to display the simple scene composed of a square and tool for the example application.
 /// Includes support for the square being moved by a second tool.
@@ -35,7 +35,8 @@ public:
 	/// Destructor.
 	~MovingSquareGlutWindow();
 
-	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+	virtual void initializeInput(const std::string& device,
+								 const SurgSim::DataStructures::DataGroup& inputData) override;
 
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
@@ -71,4 +72,4 @@ private:
 
 };
 
-#endif // MOVING_SQUARE_GLUT_WINDOW_H
+#endif // SURGSIM_TESTING_VISUALTESTCOMMON_MOVINGSQUAREGLUTWINDOW_H
