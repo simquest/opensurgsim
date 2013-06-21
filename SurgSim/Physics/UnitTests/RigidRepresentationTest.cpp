@@ -18,10 +18,9 @@
 #include <string>
 
 #include <SurgSim/Physics/RigidRepresentation.h>
-using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationState;
-using SurgSim::Physics::RigidRepresentationParameters;
-using SurgSim::Physics::SphereShape;
+#include <SurgSim/Physics/Localization.h>
+#include <SurgSim/Physics/Location.h>
+
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
@@ -31,6 +30,11 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+
+namespace SurgSim 
+{
+namespace Physics
+{
 
 class RigidRepresentationTest : public ::testing::Test
 {
@@ -280,3 +284,17 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		ASSERT_FALSE(rigidBody->isActive());
 	}
 }
+
+TEST_F(RigidRepresentationTest, LocalizationCreation)
+{
+	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+	Location l;
+	l.globalPosition.setValue(Vector3d(1.0,2.0,3.0));
+
+	std::shared_ptr<Localization> loc = rigidBody->createLocalization(l);
+
+}
+
+}; // namespace Physics
+}; // namespace SurgSim
+

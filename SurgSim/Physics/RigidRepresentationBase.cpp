@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Physics/RigidRepresentationBase.h>
+#include <SurgSim/Physics/RigidRepresentationLocalization.h>
 
 namespace SurgSim
 {
@@ -92,6 +93,11 @@ const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getCurrentPose()
 const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getPose() const
 {
 	return m_finalState.getPose();
+}
+
+std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const Location& location)
+{
+	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
 }
 
 }; // Physics

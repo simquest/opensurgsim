@@ -68,7 +68,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidShapeCollisionRepresentation.h
 	Shapes.h
 	SphereShape.h
-	Utilities.h
 	VtcRigidParameters.h
 	VtcRigidRepresentation.h
 )

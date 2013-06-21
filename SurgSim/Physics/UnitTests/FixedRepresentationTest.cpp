@@ -185,3 +185,4 @@ TEST_F(FixedRepresentationTest, UpdateTest)
 	EXPECT_FALSE(fixedRepresentation->getPose().isApprox(fixedRepresentation->getInitialPose()));
 	EXPECT_TRUE(fixedRepresentation->getPreviousPose().isApprox(fixedRepresentation->getInitialPose()));
 }
+

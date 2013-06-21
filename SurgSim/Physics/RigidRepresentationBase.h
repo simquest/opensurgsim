@@ -17,7 +17,11 @@
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 
 #include <SurgSim/Physics/Representation.h>
+
+#include <SurgSim/Physics/Localization.h>
+#include <SurgSim/Physics/Location.h>
 #include <SurgSim/Physics/RigidRepresentationState.h>
+#include <SurgSim/Physics/RigidRepresentationLocalization.h>
 
 #include <SurgSim/Math/RigidTransform.h>
 
@@ -83,6 +87,8 @@ public:
 	/// \return The final pose (translation + rotation)
 	const SurgSim::Math::RigidTransform3d& getPose() const;
 
+	std::shared_ptr<Localization> createLocalization(const Location& location);
+
 
 protected:
 	/// Initial rigid representation state (useful for reset)
@@ -96,6 +102,34 @@ protected:
 
 	/// Last valid/final rigid representation state
 	RigidRepresentationState m_finalState;
+
+	/// Creates typed localization.
+	/// \tparam	T	Type of localization to create.
+	/// \param	location	The location for the localization.
+	/// \return	The new Localization;
+	template <class T>
+	std::shared_ptr<T> createTypedLocalization(const Location& location)
+	{
+		// Change when we deal with the meshes as shapes
+		std::shared_ptr<T> result = std::make_shared<T>();
+
+		SURGSIM_ASSERT(location.globalPosition.hasValue() || location.rigidLocalPosition.hasValue()) <<
+			"Tried to create a rigid localization without valid position information";
+
+		SurgSim::Math::Vector3d localPosition;
+		if (!location.rigidLocalPosition.hasValue())
+		{
+			localPosition = this->getCurrentPose().inverse() * location.globalPosition.getValue();
+		}
+		else
+		{
+			localPosition = location.rigidLocalPosition.getValue();
+		}
+
+		result->setLocalPosition(localPosition);
+
+		return std::move(result);
+	}
 
 private:
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) = 0;
