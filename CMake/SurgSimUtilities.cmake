@@ -25,6 +25,8 @@ option(SURGSIM_TESTS_ALL_IN_ONE
 option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 
+set(SURGSIM_COPY_WARNING_ONCE TRUE)
+
 # Copy zero or more files to the location of a built target, after the
 # target is built successfully, but only if the condition (which
 # should be a add_custom_command "generator expression") evaluates to 1.
@@ -48,12 +50,21 @@ function(surgsim_copy_to_target_directory_if CONDITION TARGET)
 			set(CMD_SKIP echo "${TARGET}: Not copying ${FNAME} for $<CONFIGURATION>")
 			# Build a list of properly conditionalized list elements.
 			set(CONDITIONAL_COMMAND  ${CMAKE_COMMAND} -E)
-			foreach(TOKEN ${CMD_COPY})
-				list(APPEND CONDITIONAL_COMMAND $<${CONDITION}:${TOKEN}>)
-			endforeach(TOKEN ${CMD_COPY})
-			foreach(TOKEN ${CMD_SKIP})
-				list(APPEND CONDITIONAL_COMMAND $<$<NOT:${CONDITION}>:${TOKEN}>)
-			endforeach(TOKEN ${CMD_SKIP})
+			if(CMAKE_VERSION VERSION_LESS 2.8.10)
+				if(SURGSIM_COPY_WARNING_ONCE)
+					# Only show the message once *per directory*.
+					set(SURGSIM_COPY_WARNING_ONCE FALSE)
+					message("Will copy target libraries unconditionally.  Please consider upgrading to CMake 2.8.10 or later.")
+				endif(SURGSIM_COPY_WARNING_ONCE)
+				list(APPEND CONDITIONAL_COMMAND ${CMD_COPY})
+			else()
+				foreach(TOKEN ${CMD_COPY})
+					list(APPEND CONDITIONAL_COMMAND $<${CONDITION}:${TOKEN}>)
+				endforeach(TOKEN ${CMD_COPY})
+				foreach(TOKEN ${CMD_SKIP})
+					list(APPEND CONDITIONAL_COMMAND $<$<NOT:${CONDITION}>:${TOKEN}>)
+				endforeach(TOKEN ${CMD_SKIP})
+			endif()
 			# Now use the conditional command we built.  (Can't use VERBATIM!)
 			add_custom_command(TARGET ${TARGET} POST_BUILD
 				COMMAND ${CONDITIONAL_COMMAND})
