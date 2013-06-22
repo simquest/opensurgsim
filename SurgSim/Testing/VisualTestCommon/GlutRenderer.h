@@ -80,7 +80,7 @@ struct GlutAxes : GlutRenderObject
 
 	/// Constructor
 	/// \param length Length of each axis, in meters.
-	/// \param Width of each axis, in pixels.
+	/// \param width Width of each axis, in pixels.
 	GlutAxes(double length, double width) : GlutRenderObject(), length(length), width(width)
 	{
 	}
