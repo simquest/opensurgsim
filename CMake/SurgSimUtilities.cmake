@@ -30,9 +30,9 @@ mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 # should be a add_custom_command "generator expression") evaluates to 1.
 #
 # Note the use of optional arguments:
-#   copy_to_target_directory_if(<condition> <target> [<file>...])
+#   surgsim_copy_to_target_directory_if(<condition> <target> [<file>...])
 #
-function(copy_to_target_directory_if CONDITION TARGET)
+function(surgsim_copy_to_target_directory_if CONDITION TARGET)
 	foreach(FILE ${ARGN})
 		if(NOT "${FILE}" STREQUAL "")
 			# After much experimentation (and cmake-gui crashes), I learned
@@ -65,30 +65,31 @@ endfunction()
 # target is built successfully.
 #
 # Note the use of optional arguments:
-#   copy_to_target_directory(<target> [<file>...])
+#   surgsim_copy_to_target_directory(<target> [<file>...])
 #
-macro(copy_to_target_directory TARGET)
-	copy_to_target_directory_if(1 "${TARGET}" ${ARGN})
+macro(surgsim_copy_to_target_directory TARGET)
+	surgsim_copy_to_target_directory_if(1 "${TARGET}" ${ARGN})
 endmacro()
 
 # Copy zero or more files to the location of a built *Debug* target,
 # after the target is built successfully.
 #
 # Note the use of optional arguments:
-#   copy_to_target_directory_for_debug(<target> [<file>...])
+#   surgsim_copy_to_target_directory_for_debug(<target> [<file>...])
 #
-macro(copy_to_target_directory_for_debug TARGET)
-	copy_to_target_directory_if($<CONFIG:Debug> "${TARGET}" ${ARGN})
+macro(surgsim_copy_to_target_directory_for_debug TARGET)
+	surgsim_copy_to_target_directory_if($<CONFIG:Debug> "${TARGET}" ${ARGN})
 endmacro()
 
 # Copy zero or more files to the location of a built *non-Debug*
 # target, after the target is built successfully.
 #
 # Note the use of optional arguments:
-#   copy_to_target_directory_for_release(<target> [<file>...])
+#   surgsim_copy_to_target_directory_for_release(<target> [<file>...])
 #
-macro(copy_to_target_directory_for_release TARGET)
-	copy_to_target_directory_if($<NOT:$<CONFIG:Debug>> "${TARGET}" ${ARGN})
+macro(surgsim_copy_to_target_directory_for_release TARGET)
+	surgsim_copy_to_target_directory_if($<NOT:$<CONFIG:Debug>>
+		"${TARGET}" ${ARGN})
 endmacro()
 
 # Builds the unit test executable or library (unless disabled).
@@ -108,10 +109,11 @@ macro(surgsim_unit_test_build_only TESTNAME)
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 		target_link_libraries(${TESTNAME} gtest_main ${LIBS})
 		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
-		copy_to_target_directory_for_debug(${TESTNAME} ${UNIT_TEST_SHARED_LIBS})
-		copy_to_target_directory_for_release(${TESTNAME}
+		surgsim_copy_to_target_directory(${TESTNAME}
+			${UNIT_TEST_SHARED_LIBS})
+		surgsim_copy_to_target_directory_for_release(${TESTNAME}
 			${UNIT_TEST_SHARED_RELEASE_LIBS})
-		copy_to_target_directory_for_debug(${TESTNAME}
+		surgsim_copy_to_target_directory_for_debug(${TESTNAME}
 			${UNIT_TEST_SHARED_DEBUG_LIBS})
 	endif()
 endmacro()
