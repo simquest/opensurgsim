@@ -169,7 +169,7 @@ void GlutRenderer::display()
 	glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(m_camera->fovY, static_cast<float>(m_width / m_height), m_camera->zNear, m_camera->zFar);
+	gluPerspective(m_camera->fovY, static_cast<float>(m_width) / m_height, m_camera->zNear, m_camera->zFar);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
