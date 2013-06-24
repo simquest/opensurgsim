@@ -13,6 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// \file
+/// Tests for the PhysicsManager class. Note that PhysicsManagerTest, the test fixture
+/// is declared as a friend class in PhysicsManager to make it easier to test the
+/// add and removal of components, for this to work correctly PhysicsManagerTest is required
+/// to be in the SurgSim::Physics namespace.
+
 #include <gtest/gtest.h>
 
 #include <string>
@@ -20,17 +26,24 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Actor.h>
-#include <SurgSim/Physics/FixedActor.h>
+#include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Framework::Runtime;
-using SurgSim::Physics::FixedActor;
+using SurgSim::Framework::Component;
+using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 
-struct PhysicsManagerTest : public ::testing::Test
+namespace SurgSim
 {
+namespace Physics
+{
+
+class PhysicsManagerTest : public ::testing::Test
+{
+public:
 	virtual void SetUp()
 	{
 		runtime = std::make_shared<Runtime>();
@@ -45,6 +58,16 @@ struct PhysicsManagerTest : public ::testing::Test
 		runtime->stop();
 	}
 
+
+	bool testDoAddComponent(const std::shared_ptr<Component>& component)
+	{
+		return physicsManager->executeAdditions(component);
+	}
+
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
+	{
+		return physicsManager->executeRemovals(component);
+	}
 
 	std::shared_ptr<Runtime> runtime;
 	std::shared_ptr<PhysicsManager> physicsManager;
@@ -62,14 +85,18 @@ TEST_F(PhysicsManagerTest, InitTest)
 
 TEST_F(PhysicsManagerTest, AddRemoveComponent)
 {
-	std::shared_ptr<FixedActor> actor1= std::make_shared<FixedActor>("Actor1");
-	std::shared_ptr<FixedActor> actor2 = std::make_shared<FixedActor>("Actor2");
+	std::shared_ptr<FixedRepresentation> representation1 = std::make_shared<FixedRepresentation>("Rep1");
+	std::shared_ptr<FixedRepresentation> representation2 = std::make_shared<FixedRepresentation>("Rep2");
 
-	EXPECT_TRUE(physicsManager->addComponent(actor1));
-	EXPECT_TRUE(physicsManager->addComponent(actor2));
-	EXPECT_FALSE(physicsManager->addComponent(actor1));
+	EXPECT_TRUE(testDoAddComponent(representation1));
+	EXPECT_TRUE(testDoAddComponent(representation2));
+	EXPECT_FALSE(testDoAddComponent(representation1));
 
-	EXPECT_TRUE(physicsManager->removeComponent(actor1));
-	EXPECT_FALSE(physicsManager->removeComponent(actor1));
-	EXPECT_TRUE(physicsManager->removeComponent(actor2));
+	EXPECT_TRUE(testDoRemoveComponent(representation1));
+	EXPECT_FALSE(testDoRemoveComponent(representation1));
+	EXPECT_TRUE(testDoRemoveComponent(representation2));
 }
+
+}; // namespace Physics
+}; // namespace SurgSim
+

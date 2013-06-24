@@ -20,23 +20,31 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	ActorTest.cpp
+	CollisionPairTests.cpp
 	ContactCalculationTests.cpp
+	ComputationTests.cpp
 	DcdCollisionTests.cpp
-	FixedActorTest.cpp
+	FemRepresentationParametersTest.cpp
+	FixedRepresentationLocalizationTest.cpp
+	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
-	RigidActorBaseStateTest.cpp
-	RigidActorParametersTest.cpp
-	RigidActorStateTest.cpp
-	RigidActorTest.cpp
+	RepresentationTest.cpp
+	RepresentationUtilities.cpp
+	RigidRepresentationTest.cpp
+	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationLocalizationTest.cpp
+	RigidRepresentationParametersTest.cpp
+	RigidRepresentationStateTest.cpp
+	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
-	VtcRigidActorTest.cpp
 	VtcRigidParametersTest.cpp
+	VtcRigidRepresentationTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	RepresentationUtilities.h
 )
 
 include_directories(

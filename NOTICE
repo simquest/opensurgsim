@@ -9,6 +9,12 @@ mesh, implemented in the MeshShape class, are based on research and a
 public-domain implementation by Brian Mirtich.
   (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
 
+This product uses software developed by The MathJax Consortium and
+licensed under the Apache License, Version 2.0.  The OpenSurgSim
+documentation displays equations using MathJax (http://www.mathjax.org/),
+which is an open-source JavaScript display engine for LaTeX, MathML,
+and AsciiMath notation.
+
 ------------------------------------------------------------
 
 Contains code based on Boost Threads

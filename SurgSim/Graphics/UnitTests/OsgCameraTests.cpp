@@ -49,7 +49,8 @@ TEST(OsgCameraTests, InitTest)
 
 	EXPECT_TRUE(camera->isVisible());
 
-	EXPECT_TRUE(camera->getPose().matrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
+	EXPECT_TRUE(camera->getPose().matrix().isApprox(
+		fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
 		"Camera's pose should be initialized to the inverse of the osg::Camera's view matrix!";
 
 	EXPECT_TRUE(camera->getViewMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()))) <<
@@ -64,10 +65,10 @@ TEST(OsgCameraTests, InitTest)
 TEST(OsgCameraTests, OsgNodesTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
-	std::shared_ptr<OsgActor> osgActor = osgCamera;
+	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
 
 	/// Check that the OSG nodes of the camera are built correctly
-	osg::ref_ptr<osg::Node> node = osgActor->getOsgNode();
+	osg::ref_ptr<osg::Node> node = osgRepresentation->getOsgNode();
 	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(node.get());
 	EXPECT_TRUE(switchNode.valid());
 	EXPECT_EQ(1u, switchNode->getNumChildren());
@@ -79,11 +80,11 @@ TEST(OsgCameraTests, OsgNodesTest)
 TEST(OsgCameraTests, VisibilityTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
-	std::shared_ptr<OsgActor> osgActor = osgCamera;
+	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	// Get the osg::Switch from the OsgActor so that we can make sure that the osg::Camera has the correct visibility.
-	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgActor->getOsgNode().get());
+	// Get the osg::Switch from the OsgRepresentation so that we can make sure that the osg::Camera has the correct visibility.
+	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
 	EXPECT_TRUE(switchNode.valid());
 
 	EXPECT_TRUE(camera->isVisible());
@@ -121,36 +122,73 @@ TEST(OsgCameraTests, GroupTest)
 	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0));
 }
 
-TEST(OsgCameraTests, PoseAndMatricesTest)
+
+TEST(CameraTests, PoseTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(camera->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a random rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
-	quaternion.normalize();
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		camera->setInitialPose(initialPose);
+		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getViewMatrix().isApprox(initialPose.matrix().inverse()));
+		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(initialPose.matrix().inverse()));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	camera->setPose(transform);
-	EXPECT_TRUE(camera->getPose().isApprox(transform));
-	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(transform.matrix().inverse()));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		camera->setPose(currentPose);
+		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(currentPose));
+		EXPECT_TRUE(camera->getViewMatrix().isApprox(currentPose.matrix().inverse()));
+		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(currentPose.matrix().inverse()));
+	}
+
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		camera->setInitialPose(initialPose);
+		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getViewMatrix().isApprox(initialPose.matrix().inverse()));
+		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(initialPose.matrix().inverse()));
+	}
+}
+
+TEST(CameraTests, MatricesTest)
+{
+	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
+	std::shared_ptr<Camera> camera = osgCamera;
 
 	/// Create a random view and projection matrix
-	Matrix44d viewMatrix = Matrix44d::Random();
+	RigidTransform3d viewTransform = SurgSim::Math::makeRigidTransform(
+		Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+	Matrix44d viewMatrix = viewTransform.matrix();
+
 	Matrix44d projectionMatrix = Matrix44d::Random();
 
 	/// Set the matrices and make sure they were set correctly
 	camera->setViewMatrix(viewMatrix);
 	EXPECT_TRUE(camera->getViewMatrix().isApprox(viewMatrix));
+	EXPECT_TRUE(camera->getPose().matrix().isApprox(viewMatrix.inverse()));
 	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(viewMatrix));
 
 	camera->setProjectionMatrix(projectionMatrix);
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
-	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()).isApprox(projectionMatrix));
 }
 
 }  // namespace Graphics

@@ -28,34 +28,39 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgCamera.cpp
 	OsgGroup.cpp
 	OsgManager.cpp
-	OsgPlaneActor.cpp
-	OsgSphereActor.cpp
+	OsgPlaneRepresentation.cpp
+	OsgSphereRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	ViewElement.cpp
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
-	Actor.h
 	Camera.h
 	Group.h
 	Manager.h
-	OsgActor.h
 	OsgCamera.h
+	OsgConversions.h
 	OsgGroup.h
 	OsgManager.h
 	OsgMatrixConversions.h
 	OsgPlane.h
-	OsgPlaneActor.h
+	OsgPlaneRepresentation.h
 	OsgQuaternionConversions.h
+	OsgRepresentation.h
 	OsgRigidTransformConversions.h
-	OsgSphereActor.h
+	OsgSphereRepresentation.h
+	OsgUniform.h
+	OsgUniform-inl.h
+	OsgUniformTypes.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
 	OsgView.h
 	OsgViewElement.h
-	PlaneActor.h
-	SphereActor.h
+	PlaneRepresentation.h
+	Representation.h
+	SphereRepresentation.h
+	Uniform.h
 	View.h
 	ViewElement.h
 )
@@ -72,4 +77,5 @@ target_link_libraries(SurgSimGraphics SurgSimFramework
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+	add_subdirectory(RenderTests)
 endif()

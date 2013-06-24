@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-class Actor;
+class Representation;
 
 /// Apply the Freemotion calcluation to all physics representations
 class FreeMotion  : public Computation
@@ -35,13 +35,16 @@ class FreeMotion  : public Computation
 public:
 
 	/// Constructor
-	explicit FreeMotion();
+	explicit FreeMotion(bool doCopyState = false);
+	
 	~FreeMotion();
 
 protected:
 
 	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
+		const double& dt, 
+		const std::shared_ptr<PhysicsManagerState>& state) override;
 
 };
 

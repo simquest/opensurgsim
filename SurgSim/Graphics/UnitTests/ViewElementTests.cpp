@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	/// Sets the view component that provides the visualization of the graphics actors
+	/// Sets the view component that provides the visualization of the graphics representations
 	/// Only allows MockView components, any other will not be set and it will return false.
 	/// \return	True if it succeeds, false if it fails
 	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
@@ -196,7 +196,7 @@ TEST(ViewElementTests, StartUpTest)
 	/// Run the thread for a moment
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	runtime->stop();
 
 	/// Check that the view element was initialized and awoken

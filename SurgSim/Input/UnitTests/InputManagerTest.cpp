@@ -14,7 +14,10 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the CommonDevice class.
+/// Tests for the InputManaget class. Note that InputManagerTest, the test fixture
+/// is declared as a friend class in InputManager to make it easier to test the
+/// add and removal of components, for this to work correctly PhysicsManagerTest is required
+/// to be in the SurgSim::Physics namespace.
 
 #include <memory>
 #include <string>
@@ -34,6 +37,7 @@
 #include "TestDevice.h"
 
 using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Component;
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Input::CommonDevice;
 using SurgSim::Input::OutputProducerInterface;
@@ -54,10 +58,14 @@ protected:
 	virtual bool doInitialize() {return true;}
 	virtual bool doWakeUp() {return true;}
 };
+namespace SurgSim 
+{
+namespace Input
+{
 
 class InputManagerTest : public ::testing::Test
 {
-protected:
+public:
 	virtual void SetUp()
 	{
 		testDevice1 = std::make_shared<TestDevice>("TestDevice1");
@@ -76,6 +84,16 @@ protected:
 	virtual void TearDown()
 	{
 		runtime->stop();
+	}
+
+	bool testDoAddComponent(const std::shared_ptr<Component>& component)
+	{
+		return inputManager->executeAdditions(component);
+	}
+
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	{
+		return inputManager->executeRemovals(component);
 	}
 
 	std::shared_ptr<TestDevice> testDevice1;
@@ -115,21 +133,24 @@ TEST_F(InputManagerTest, InputAddRemove)
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
 	std::shared_ptr<InputComponent> listener2 = std::make_shared<InputComponent>("Component2","TestDevice1");
 	std::shared_ptr<InputComponent> listener3 = std::make_shared<InputComponent>("Component3","TestDevice2");
-	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component3","NonExistantDevice");
+	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component4","NonExistantDevice");
 
 	// Add various listeners to the input manager
-	EXPECT_TRUE(inputManager->addComponent(listener1));
-	EXPECT_TRUE(inputManager->addComponent(listener2));
-	EXPECT_TRUE(inputManager->addComponent(listener3));
-	EXPECT_FALSE(inputManager->addComponent(notvalid));
+	EXPECT_TRUE(testDoAddComponent(listener1));
+	EXPECT_TRUE(testDoAddComponent(listener2));
+	EXPECT_TRUE(testDoAddComponent(listener3));
+	EXPECT_FALSE(testDoAddComponent(notvalid));
 
 	// Excercise adds and removes
-	EXPECT_FALSE(inputManager->addComponent(listener1));
-	EXPECT_TRUE(inputManager->removeComponent(listener1));
-	EXPECT_FALSE(inputManager->removeComponent(listener1));
+	
+	// Duplicate false on duplicate will become deprecated
+	EXPECT_FALSE(testDoAddComponent(listener1));
+	EXPECT_TRUE(testDoRemoveComponent(listener1));
+	EXPECT_FALSE(testDoRemoveComponent(listener1));
 
+	// Should not be able to add random components 
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>();
-	EXPECT_TRUE(inputManager->addComponent(component));
+	EXPECT_FALSE(testDoAddComponent(component));
 }
 
 TEST_F(InputManagerTest, InputfromDevice)
@@ -139,7 +160,8 @@ TEST_F(InputManagerTest, InputfromDevice)
 
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
 
-	inputManager->addComponent(listener1);
+	testDoAddComponent(listener1);
+
 	EXPECT_TRUE(listener1->isDeviceConnected());
 	EXPECT_NO_THROW(listener1->getData(&dataGroup));
 
@@ -158,23 +180,28 @@ TEST_F(InputManagerTest, OutputAddRemove)
 {
 	std::shared_ptr<OutputComponent> output1 = createOutputComponent("Component1", "TestDevice1");
 	std::shared_ptr<OutputComponent> output2 = createOutputComponent("Component2", "TestDevice1");
-	std::shared_ptr<OutputComponent> output3 = createOutputComponent("Component2", "TestDevice2");
-	std::shared_ptr<OutputComponent> invalid = createOutputComponent("Component3", "InvalidDevice");
+	std::shared_ptr<OutputComponent> output3 = createOutputComponent("Component3", "TestDevice2");
+	std::shared_ptr<OutputComponent> invalid = createOutputComponent("Component4", "InvalidDevice");
 
-	EXPECT_TRUE(inputManager->addComponent(output1));
-	EXPECT_FALSE(inputManager->addComponent(output2));
-	EXPECT_FALSE(inputManager->addComponent(output2));
-	EXPECT_TRUE(inputManager->addComponent(output3));
-	EXPECT_FALSE(inputManager->addComponent(invalid));
-	EXPECT_TRUE(inputManager->removeComponent(output1));
-	EXPECT_FALSE(inputManager->removeComponent(output1));
+	EXPECT_TRUE(testDoAddComponent(output1));
+	EXPECT_FALSE(testDoAddComponent(output2));
+
+	EXPECT_FALSE(testDoAddComponent(output2));
+	EXPECT_TRUE(testDoAddComponent(output3));
+	EXPECT_FALSE(testDoAddComponent(invalid));
+	EXPECT_TRUE(testDoRemoveComponent(output1));
+	EXPECT_FALSE(testDoRemoveComponent(output1));
 }
 
 TEST_F(InputManagerTest, OutputPush)
 {
 	std::shared_ptr<OutputComponent> output = createOutputComponent("Component1", "TestDevice1");
-	EXPECT_TRUE(inputManager->addComponent(output));
+	EXPECT_TRUE(testDoAddComponent(output));
 	output->getOutputData().strings().set("data","outputdata");
 	EXPECT_TRUE(testDevice1->pullOutput());
 	EXPECT_EQ("outputdata",testDevice1->lastPulledData);
 }
+
+}; // namespace Input
+}; // namespace SurgSim
+

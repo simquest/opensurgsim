@@ -30,26 +30,37 @@ class Computation
 public:
 
 	/// Constructor
-	Computation()
-	{
-	}
+	Computation();
+	Computation(bool doCopyState);
+	
+
 	/// Destructor
-	virtual ~Computation()
-	{
-	}
+	virtual ~Computation();
 
 	/// Public Interface execute this objects computations, dt is the time from
 	/// the last update call in seconds
-	std::shared_ptr<PhysicsManagerState> update(double dt, std::shared_ptr<PhysicsManagerState> state)
-	{
-		return std::move(doUpdate(dt,state));
-	};
+	std::shared_ptr<PhysicsManagerState> update(double dt, const std::shared_ptr<PhysicsManagerState>& state);;
+
+	/// Sets up whether the computation will copy the state of PhysicsManagerState before executing.
+	/// \param	val	Whether to create a copy of the PhysicsState before running the update fuction.
+	void setDoCopyState(bool val);
+
+	/// Query if this object is copying the PhysicsManagerState.
+	/// \return	true if copying the state, false if not.
+	bool isCopyingState();
 
 protected:
 
 	/// Override this function to implement the computations specific behavior
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state) = 0;
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
+		const double& dt, 
+		const std::shared_ptr<PhysicsManagerState>& state) = 0;
 
+private:
+	bool m_copyState;
+
+	/// Copy the PhysicsManagerState object when isCopyingState() is true
+	std::shared_ptr<PhysicsManagerState> preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state);
 };
 
 

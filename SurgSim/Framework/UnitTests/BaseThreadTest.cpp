@@ -28,19 +28,31 @@
 #include <SurgSim/Framework/BasicThread.h>
 #include "MockObjects.h"  //NOLINT
 
-TEST(ThreadTest, Instantiation)
+TEST(BasicThreadTest, Instantiation)
 {
 	MockThread m;
 	EXPECT_FALSE(m.isInitialized());
 	EXPECT_FALSE(m.isRunning());
 }
 
-TEST(ThreadTest, Running)
+TEST(BasicThreadTest, Running)
 {
 	MockThread m;
 	m.start(nullptr);
 
 	m.getThread().join();
 
-	EXPECT_EQ(0,m.count);
+	EXPECT_EQ(0, m.count);
+}
+
+TEST(ThreadTest, Stop)
+{
+	MockThread m;
+	m.start(nullptr);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+
+	m.stop();
+
+	EXPECT_TRUE(m.didBeforeStop);
 }

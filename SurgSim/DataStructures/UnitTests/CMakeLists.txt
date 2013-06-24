@@ -22,10 +22,11 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	DataGroupTests.cpp
 	IndexDirectoryTests.cpp
-	MeshElementTest.cpp
 	MeshTest.cpp
+	MeshElementTest.cpp
 	MeshVertexTest.cpp
 	NamedDataTests.cpp
+	OptionalValueTests.cpp
 	TriangleMeshTest.cpp
 )
 

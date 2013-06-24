@@ -54,17 +54,17 @@ public:
 	virtual ~CommonDevice();
 
 	/// Return a (hopefully unique) device name.
-	virtual std::string getName() const;
+	virtual std::string getName() const override;
 
-	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer);
+	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
-	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer);
+	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
-	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
+	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
-	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer);
+	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
-	virtual bool hasOutputProducer();
+	virtual bool hasOutputProducer() override;
 
 protected:
 	/// Push application input to consumers.

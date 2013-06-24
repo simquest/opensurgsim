@@ -16,22 +16,22 @@
 #ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H
 
-#include <SurgSim/Graphics/OsgActor.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <osg/Group>
 
-/// Actor class for testing
-class MockOsgActor : public SurgSim::Graphics::OsgActor
+/// Representation class for testing
+class MockOsgRepresentation : public SurgSim::Graphics::OsgRepresentation
 {
 public:
 	/// Constructor
-	/// \param	name	Name of the actor
+	/// \param	name	Name of the representation
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity
 	/// \post m_isInitialized and m_isAwoken are set to false
 	/// \post m_isVisible is set to true
-	explicit MockOsgActor(const std::string& name) : SurgSim::Graphics::Actor(name),
-        SurgSim::Graphics::OsgActor(name, new osg::Group()),
+	explicit MockOsgRepresentation(const std::string& name) : SurgSim::Graphics::Representation(name),
+        SurgSim::Graphics::OsgRepresentation(name, new osg::Group()),
         m_isVisible(true),
         m_numUpdates(0),
 		m_sumDt(0.0),
@@ -41,46 +41,46 @@ public:
 		m_transform.setIdentity();
 	}
 
-	/// Sets whether the actor is currently visible
+	/// Sets whether the representation is currently visible
 	/// \param	visible	True for visible, false for invisible
 	virtual void setVisible(bool visible)
 	{
 		m_isVisible = visible;
 	}
 
-	/// Gets whether the actor is currently visible
+	/// Gets whether the representation is currently visible
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const
 	{
 		return m_isVisible;
 	}
 
-	/// Returns the number of times the actor has been updated
+	/// Returns the number of times the representation has been updated
 	int getNumUpdates() const
 	{
 		return m_numUpdates;
 	}
-	/// Returns the sum of the dt that the actor has been updated with
+	/// Returns the sum of the dt that the representation has been updated with
 	double getSumDt() const
 	{
 		return m_sumDt;
 	}
 
-	/// Sets the pose of the actor
-	/// \param	transform	Rigid transformation that describes the pose of the actor
+	/// Sets the current pose of the representation
+	/// \param	transform	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 		m_transform = transform;
 	}
 
-	/// Gets the pose of the actor
-	/// \return	Rigid transformation that describes the pose of the actor
+	/// Gets the current pose of the representation
+	/// \return	Rigid transformation that describes the current pose of the representation
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const
 	{
 		return m_transform;
 	}
 
-	/// Updates the actor.
+	/// Updates the representation.
 	/// \param	dt	The time in seconds of the preceding timestep.
 	/// \post m_numUpdates is incremented and dt is added to m_sumDt
 	virtual void update(double dt)
@@ -89,26 +89,26 @@ public:
 		m_sumDt += dt;
 	}
 
-	/// Gets whether the actor has been initialized
+	/// Gets whether the representation has been initialized
 	bool isInitialized() const
 	{
 		return m_isInitialized;
 	}
-	/// Gets whether the actor has been awoken
+	/// Gets whether the representation has been awoken
 	bool isAwoken() const
 	{
 		return m_isAwoken;
 	}
 
 private:
-	/// Initializes the actor
+	/// Initializes the representation
 	/// \post m_isInitialized is set to true
 	virtual bool doInitialize()
 	{
 		m_isInitialized = true;
 		return true;
 	}
-	/// Wakes up the actor
+	/// Wakes up the representation
 	/// \post m_isAwoken is set to true
 	virtual bool doWakeUp()
 	{
@@ -116,20 +116,20 @@ private:
 		return true;
 	}
 
-	/// Whether this actor is currently visible or not
+	/// Whether this representation is currently visible or not
 	bool m_isVisible;
 
-	/// Number of times the actor has been updated
+	/// Number of times the representation has been updated
 	int m_numUpdates;
-	/// Sum of the dt that the actor has been updated with
+	/// Sum of the dt that the representation has been updated with
 	double m_sumDt;
 
-	/// Whether the actor has been initialized
+	/// Whether the representation has been initialized
 	bool m_isInitialized;
-	/// Whether the actor has been awoken
+	/// Whether the representation has been awoken
 	bool m_isAwoken;
 
-	/// Rigid transform describing pose of the actor
+	/// Rigid transform describing pose of the representation
 	SurgSim::Math::RigidTransform3d m_transform;
 };
 

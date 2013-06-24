@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BEHAVIORS_REPRESENTATIONPOSEBEHAVIOR_H
-#define SURGSIM_BEHAVIORS_REPRESENTATIONPOSEBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
+#define SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Graphics/Actor.h>
-#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {
@@ -58,7 +58,7 @@ protected:
 	/// Wakeup the behavior, which copies the initial pose
 	virtual bool doWakeUp()
 	{
-		m_to->setPose(m_from->getPose());
+		m_to->setInitialPose(m_from->getInitialPose());
 		return true;
 	}
 
@@ -73,4 +73,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_BEHAVIORS_REPRESENTATIONPOSEBEHAVIOR_H
+#endif  // SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H

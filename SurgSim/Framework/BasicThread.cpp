@@ -23,7 +23,12 @@
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 
-SurgSim::Framework::BasicThread::BasicThread(const std::string& name) :
+namespace SurgSim
+{
+namespace Framework
+{
+
+BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
 	m_period(1.0/30),
 	m_isInitialized(false),
@@ -32,33 +37,33 @@ SurgSim::Framework::BasicThread::BasicThread(const std::string& name) :
 {
 }
 
-SurgSim::Framework::BasicThread::~BasicThread()
+BasicThread::~BasicThread()
 {
 }
 
-bool SurgSim::Framework::BasicThread::isInitialized()
+bool BasicThread::isInitialized()
 {
 	return m_isInitialized;
 }
 
-bool SurgSim::Framework::BasicThread::isRunning() const
+bool BasicThread::isRunning() const
 {
 	return m_isRunning;
 }
 
-bool SurgSim::Framework::BasicThread::initialize()
+bool BasicThread::initialize()
 {
 	m_isInitialized = doInitialize();
 	return m_isInitialized;
 }
 
 
-bool SurgSim::Framework::BasicThread::startUp()
+bool BasicThread::startUp()
 {
 	return doStartUp();
 }
 
-void SurgSim::Framework::BasicThread::start(std::shared_ptr<Barrier> startupBarrier)
+void BasicThread::start(std::shared_ptr<Barrier> startupBarrier)
 {
 	m_startupBarrier = startupBarrier;
 	// Start the thread with a reference to this
@@ -66,55 +71,17 @@ void SurgSim::Framework::BasicThread::start(std::shared_ptr<Barrier> startupBarr
 	m_thisThread = boost::thread(boost::ref(*this));
 }
 
-boost::thread& SurgSim::Framework::BasicThread::getThread()
+boost::thread& BasicThread::getThread()
 {
 	return m_thisThread;
 }
 
-void SurgSim::Framework::BasicThread::operator()()
+void BasicThread::operator()()
 {
-	bool success = true;
+
 	m_stopExecution = false;
-
-	success = initialize();
-	SURGSIM_ASSERT(success) << "Initialisation has failed for thread " << getName();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Initialisation has succeeded for thread " << getName();
-	// Waits for all the threads to init and then proceeds
-	// If one of the other thread asserts and ends this does not matter
-	// as the process will be taken down
-	if (m_startupBarrier != nullptr)
-	{
-		success = m_startupBarrier->wait(success);
-		if (!success)
-		{
-			return;
-		}
-	}
-
-	success = startUp();
-
-	SURGSIM_ASSERT(success) << "Startup has failed for thread " << getName();
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Startup has succeeded for thread " << getName();
-
-	// Waits for all the threads to startup and then proceeds
-	if (m_startupBarrier != nullptr)
-	{
-		success = m_startupBarrier->wait(success);
-		if (! success)
-		{
-			return;
-		}
-	}
-
-	// Wait again, this gives the runtime a chance to add the scene elements
-	if (m_startupBarrier != nullptr)
-	{
-		success = m_startupBarrier->wait(success);
-		if (! success)
-		{
-			return;
-		}
-	}
+	bool success = executeInitialization();
+	if (! success) return;
 
 	boost::chrono::duration<double> frameTime(0.0);
 	boost::chrono::steady_clock::time_point start;
@@ -131,11 +98,17 @@ void SurgSim::Framework::BasicThread::operator()()
 		m_isRunning = doUpdate(m_period.count());
 		frameTime = boost::chrono::steady_clock::now() - start;
 	}
+
+	if (m_stopExecution)
+	{
+		doBeforeStop();
+	}
+
 	m_isRunning = false;
 	m_stopExecution = false;
 }
 
-void SurgSim::Framework::BasicThread::stop()
+void BasicThread::stop()
 {
 	m_stopExecution = true;
 	if (m_thisThread.joinable())
@@ -144,9 +117,54 @@ void SurgSim::Framework::BasicThread::stop()
 	}
 }
 
-std::string SurgSim::Framework::BasicThread::getName() const
+std::string BasicThread::getName() const
 {
 	return m_name;
 }
+
+bool BasicThread::executeInitialization()
+{
+	bool success = true;
+
+	success = initialize();
+	SURGSIM_ASSERT(success) << "Initialization has failed for thread " << getName();
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Initialization has succeeded for thread " << getName();
+	// Waits for all the threads to init and then proceeds
+	// If one of the other thread asserts and ends this does not matter
+	// as the process will be taken down
+	success = waitForBarrier(success);
+
+	if (!success)
+	{
+		return success;
+	}
+
+	success = startUp();
+
+	SURGSIM_ASSERT(success) << "Startup has failed for thread " << getName();
+	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Startup has succeeded for thread " << getName();
+
+	// Waits for all the threads to startup and then proceeds
+	success = waitForBarrier(success);
+
+	return success;
+}
+
+bool BasicThread::waitForBarrier(bool success)
+{
+	if (m_startupBarrier != nullptr)
+	{
+		success = m_startupBarrier->wait(success);
+	}
+	return success;
+}
+
+void SurgSim::Framework::BasicThread::doBeforeStop()
+{
+}
+
+}; // namespace Framework
+}; // namespace SurgSim
+
 
 

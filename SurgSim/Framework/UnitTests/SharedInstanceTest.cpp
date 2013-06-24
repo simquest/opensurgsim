@@ -74,15 +74,15 @@ int ObjectCounts::m_constructionIndex = 0;
 int ObjectCounts::m_destructionIndex = 0;
 
 
-/// A class that does only supports construction with an argument, and doesn't support copying or moving.
-class ArgumentOnlyConstructable : public ObjectCounts
+/// A class that only supports construction with an argument, and doesn't support copying or moving.
+class ArgumentOnlyConstructible : public ObjectCounts
 {
 public:
-	explicit ArgumentOnlyConstructable(int data) : m_data(data), m_instanceIndex(getNextInstanceIndex())
+	explicit ArgumentOnlyConstructible(int data) : m_data(data), m_instanceIndex(getNextInstanceIndex())
 	{
 	}
 
-	~ArgumentOnlyConstructable()
+	~ArgumentOnlyConstructible()
 	{
 		markDestruction();
 	}
@@ -104,8 +104,8 @@ public:
 private:
 	// Disable copy construction and copy assignment.
 	// No need to disable move construction and move assignment-- the compiler does not provide those by default.
-	ArgumentOnlyConstructable(const ArgumentOnlyConstructable&);
-	void operator=(const ArgumentOnlyConstructable&);
+	ArgumentOnlyConstructible(const ArgumentOnlyConstructible&);
+	void operator=(const ArgumentOnlyConstructible&);
 
 	int m_data;
 	int m_instanceIndex;
@@ -113,10 +113,10 @@ private:
 
 
 /// A class that supports default construction, but neither copying nor moving.
-class DefaultConstructable : public ArgumentOnlyConstructable
+class DefaultConstructible : public ArgumentOnlyConstructible
 {
 public:
-	DefaultConstructable() : ArgumentOnlyConstructable(-1)
+	DefaultConstructible() : ArgumentOnlyConstructible(-1)
 	{
 	}
 };
@@ -132,22 +132,127 @@ TEST(SharedInstanceTest, Construct)
 
 	// This should work:
 	EXPECT_NO_THROW({SharedInstance<int> shared;});
-	EXPECT_NO_THROW({SharedInstance<DefaultConstructable> shared;});
-	//EXPECT_NO_THROW({SharedInstance<ArgumentOnlyConstructable> shared;});
+	EXPECT_NO_THROW({SharedInstance<DefaultConstructible> shared;});
+
+	// This should NOT work:
+//	EXPECT_NO_THROW({SharedInstance<ArgumentOnlyConstructible> shared;});
+	// ...but this should:
+	SharedInstance<ArgumentOnlyConstructible>::InstanceCreator createArgumentOnlyConstructible =
+		[]() { return std::make_shared<ArgumentOnlyConstructible>(1); };
+	EXPECT_NO_THROW({SharedInstance<ArgumentOnlyConstructible> shared(createArgumentOnlyConstructible);});
 
 	// No objects should have been constructed:
 	EXPECT_EQ(0, ObjectCounts::getNumInstancesCreated());
 }
 
-TEST(SharedInstanceTest, CreateDefaultConstructable)
+TEST(SharedInstanceTest, CreateInstance)
 {
-	typedef DefaultConstructable DataType;
-	// With the following definition, this test should not compile:
-	//typedef ArgumentOnlyConstructable DataType;
+	typedef DefaultConstructible DataType;
 
 	ObjectCounts::resetInstanceIndices();
 
 	SharedInstance<DataType> shared;
+	EXPECT_EQ(0, ObjectCounts::getNumInstancesCreated());
+
+	{
+		std::shared_ptr<DataType> ref1 = shared.get();
+		ASSERT_NE(nullptr, ref1);
+		EXPECT_EQ(1, ref1->getInstanceIndex());
+		std::shared_ptr<DataType> ref2 = shared.get();
+		ASSERT_NE(nullptr, ref2);
+		EXPECT_EQ(1, ref2->getInstanceIndex());
+		EXPECT_EQ(ref1, ref2);
+		EXPECT_EQ(1, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(0, ObjectCounts::getNumInstancesDestroyed());
+	}
+	EXPECT_EQ(1, ObjectCounts::getNumInstancesCreated());
+	EXPECT_EQ(1, ObjectCounts::getNumInstancesDestroyed());
+
+	{
+		std::shared_ptr<DataType> ref1 = shared.get();
+		std::shared_ptr<DataType> ref2 = shared.get();
+		EXPECT_EQ(ref1, ref2);
+		EXPECT_EQ(2, ref1->getInstanceIndex());
+		EXPECT_EQ(2, ref2->getInstanceIndex());
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(1, ObjectCounts::getNumInstancesDestroyed());
+
+		ref1.reset();
+		ASSERT_EQ(nullptr, ref1);  // it's dead now!
+		ASSERT_NE(nullptr, ref2);
+		EXPECT_EQ(2, ref2->getInstanceIndex());
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(1, ObjectCounts::getNumInstancesDestroyed());
+		ref2.reset();
+		ASSERT_EQ(nullptr, ref2);  // it too is dead now!
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesDestroyed());
+	}
+	EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+	EXPECT_EQ(2, ObjectCounts::getNumInstancesDestroyed());
+}
+
+TEST(SharedInstanceTest, CreateInstanceUsingCreator)
+{
+	typedef DefaultConstructible DataType;
+
+	ObjectCounts::resetInstanceIndices();
+
+	SharedInstance<DataType>::InstanceCreator createDataType = []() { return std::make_shared<DataType>(); };
+	SharedInstance<DataType> shared(createDataType);
+
+	EXPECT_EQ(0, ObjectCounts::getNumInstancesCreated());
+
+	{
+		std::shared_ptr<DataType> ref1 = shared.get();
+		ASSERT_NE(nullptr, ref1);
+		EXPECT_EQ(1, ref1->getInstanceIndex());
+		std::shared_ptr<DataType> ref2 = shared.get();
+		ASSERT_NE(nullptr, ref2);
+		EXPECT_EQ(1, ref2->getInstanceIndex());
+		EXPECT_EQ(ref1, ref2);
+		EXPECT_EQ(1, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(0, ObjectCounts::getNumInstancesDestroyed());
+	}
+	EXPECT_EQ(1, ObjectCounts::getNumInstancesCreated());
+	EXPECT_EQ(1, ObjectCounts::getNumInstancesDestroyed());
+
+	{
+		std::shared_ptr<DataType> ref1 = shared.get();
+		std::shared_ptr<DataType> ref2 = shared.get();
+		EXPECT_EQ(ref1, ref2);
+		EXPECT_EQ(2, ref1->getInstanceIndex());
+		EXPECT_EQ(2, ref2->getInstanceIndex());
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(1, ObjectCounts::getNumInstancesDestroyed());
+
+		ref1.reset();
+		ASSERT_EQ(nullptr, ref1);  // it's dead now!
+		ASSERT_NE(nullptr, ref2);
+		EXPECT_EQ(2, ref2->getInstanceIndex());
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(1, ObjectCounts::getNumInstancesDestroyed());
+		ref2.reset();
+		ASSERT_EQ(nullptr, ref2);  // it too is dead now!
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+		EXPECT_EQ(2, ObjectCounts::getNumInstancesDestroyed());
+	}
+	EXPECT_EQ(2, ObjectCounts::getNumInstancesCreated());
+	EXPECT_EQ(2, ObjectCounts::getNumInstancesDestroyed());
+}
+
+TEST(SharedInstanceTest, CreateNonDefaultConstructibleInstance)
+{
+	typedef ArgumentOnlyConstructible DataType;
+
+	ObjectCounts::resetInstanceIndices();
+
+	// This should NOT work for a type that's not default-constructible:
+//	SharedInstance<DataType> shared;
+	// ...but this should:
+	SharedInstance<DataType>::InstanceCreator createDataType = []() { return std::make_shared<DataType>(2); };
+	SharedInstance<DataType> shared(createDataType);
+
 	EXPECT_EQ(0, ObjectCounts::getNumInstancesCreated());
 
 	{

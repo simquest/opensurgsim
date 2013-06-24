@@ -31,6 +31,7 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
+
 TEST(CameraTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test name");});
@@ -65,22 +66,48 @@ TEST(CameraTests, GroupTest)
 	EXPECT_EQ(group, camera->getGroup());
 }
 
-TEST(CameraTests, PoseAndMatricesTest)
+TEST(CameraTests, PoseTest)
 {
 	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test name");
 
-	EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
+	{
+		SCOPED_TRACE("Check Initial Pose");
+		EXPECT_TRUE(camera->getInitialPose().isApprox(RigidTransform3d::Identity()));
+		EXPECT_TRUE(camera->getPose().isApprox(RigidTransform3d::Identity()));
+	}
 
-	/// Create a random rigid body transform
-	Vector3d translation = Vector3d::Random();
-	Quaterniond quaternion = Quaterniond(SurgSim::Math::Vector4d::Random());
-	quaternion.normalize();
-	RigidTransform3d transform = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	RigidTransform3d initialPose;
+	{
+		SCOPED_TRACE("Set Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		camera->setInitialPose(initialPose);
+		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
+	}
 
-	/// Set the transform and make sure it was set correctly
-	camera->setPose(transform);
-	EXPECT_TRUE(camera->getPose().isApprox(transform));
+	{
+		SCOPED_TRACE("Set Current Pose");
+		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		camera->setPose(currentPose);
+		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(currentPose));
+	}
 
+	{
+		SCOPED_TRACE("Change Initial Pose");
+		initialPose = SurgSim::Math::makeRigidTransform(
+			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+		camera->setInitialPose(initialPose);
+		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
+		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
+	}
+}
+
+TEST(CameraTests, MatricesTest)
+{
+	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test name");
 
 	/// Create a random view and projection matrix
 	Matrix44d viewMatrix = Matrix44d::Random();
@@ -117,3 +144,5 @@ TEST(CameraTests, UpdateTest)
 		EXPECT_LT(fabs(sumDt - mockCamera->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
+
+

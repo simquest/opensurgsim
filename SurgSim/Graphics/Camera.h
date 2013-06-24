@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_CAMERA_H
 #define SURGSIM_GRAPHICS_CAMERA_H
 
-#include <SurgSim/Graphics/Actor.h>
+#include <SurgSim/Graphics/Representation.h>
 
 #include <SurgSim/Math/Matrix.h>
 
@@ -36,18 +36,18 @@ class Group;
 /// A disabled (invisible) camera does not produce an image.
 ///
 /// Graphics::Camera is used with Graphics::View to provide the visualization of the virtual scene to the user.
-class Camera : public virtual Actor
+class Camera : public virtual Representation
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the camera
-	explicit Camera(const std::string& name) : Actor(name)
+	explicit Camera(const std::string& name) : Representation(name)
 	{
 	}
 
-	/// Sets the group of actors that will be seen by this camera.
-	/// Only the actors in this group will be rendered when this camera's view is rendered.
-	/// \param	group	Group of actors
+	/// Sets the group of representations that will be seen by this camera.
+	/// Only the representations in this group will be rendered when this camera's view is rendered.
+	/// \param	group	Group of representations
 	/// \return	True if it succeeded, false if it failed
 	virtual bool setGroup(std::shared_ptr<Group> group)
 	{
@@ -55,21 +55,13 @@ public:
 		return true;
 	}
 
-	/// Gets the group of actors that will be seen by this camera.
-	/// Only the actors in this group will be rendered when this camera's view is rendered.
-	/// \return	Group of actors
+	/// Gets the group of representations that will be seen by this camera.
+	/// Only the representations in this group will be rendered when this camera's view is rendered.
+	/// \return	Group of representations
 	std::shared_ptr<Group> getGroup() const
 	{
 		return m_group;
 	}
-
-	/// Sets the pose of the camera
-	/// \param	transform	Rigid transformation that describes the pose of the camera
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform) = 0;
-
-	/// Gets the pose of the camera
-	/// \return	Rigid transformation that describes the pose of the camera
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
 
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix
@@ -88,8 +80,8 @@ public:
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
 
 private:
-	/// Group of actors that this camera sees
-	/// Only the actors in this group will be rendered when this camera's view is rendered.
+	/// Group of representations that this camera sees
+	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	std::shared_ptr<Group> m_group;
 };
 

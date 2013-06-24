@@ -17,7 +17,7 @@
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/Actor.h>
+#include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Framework/Log.h>
 
@@ -29,7 +29,8 @@ namespace SurgSim
 namespace Physics
 {
 
-PhysicsManager::PhysicsManager()
+PhysicsManager::PhysicsManager() :
+  ComponentManager("Physics Manager")
 {
 
 }
@@ -41,10 +42,9 @@ PhysicsManager::~PhysicsManager()
 
 bool PhysicsManager::doInitialize()
 {
-	m_logger = getRuntime()->getLogger("PhysicsManager");
 	m_freeMotionStep.reset(new FreeMotion());
 	m_dcdCollision.reset(new DcdCollision());
-	return m_logger != nullptr && m_freeMotionStep != nullptr;
+	return m_logger != nullptr;
 }
 
 
@@ -54,24 +54,38 @@ bool PhysicsManager::doStartUp()
 }
 
 
-bool PhysicsManager::addComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	return tryAddComponent(component,&m_actors) != nullptr;
+	return tryAddComponent(component,&m_representations) != nullptr;
 }
 
-bool PhysicsManager::removeComponent(std::shared_ptr<SurgSim::Framework::Component> component)
+bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	return tryRemoveComponent(component, &m_actors);
+	return tryRemoveComponent(component, &m_representations);
 }
 
 bool PhysicsManager::doUpdate(double dt)
 {
+	// Add all components that came in before the last update
+	processComponents();
+
+	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
+	{
+		(*it)->beforeUpdate(dt);
+	}
+
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 	stateList.push_back(state);
-	state->setActors(m_actors);
+	state->setRepresentations(m_representations);
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
 	stateList.push_back(m_dcdCollision->update(dt, stateList.back()));
+
+	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
+	{
+		(*it)->afterUpdate(dt);
+	}
+
 	return true;
 }
 

@@ -20,41 +20,53 @@ include_directories(
 set(SURGSIM_PHYSICS_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
+	ContactConstraintGeneration.cpp
+	Computation.cpp
 	DcdCollision.cpp
+	FemRepresentationParameters.cpp
 	FreeMotion.cpp
+	Localization.cpp
 	PhysicsManager.cpp
-	RigidActor.cpp
-	RigidActorCollisionRepresentation.cpp
-	VtcRigidActor.cpp)
+	RigidCollisionRepresentation.cpp
+	RigidRepresentation.cpp
+	RigidShapeCollisionRepresentation.cpp
+	VtcRigidRepresentation.cpp
+)
 
 set(SURGSIM_PHYSICS_HEADERS
-	Actor.h
 	BoxShape.h
 	CapsuleShape.h
 	CollisionPair.h
 	CollisionRepresentation.h
-	ContactCalculation.h
 	Computation.h
+	ContactCalculation.h
+	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
-	FixedActor.h
+	FemRepresentationParameters.h
+	FixedRepresentation.h
+	FixedRepresentationLocalization.h
 	FreeMotion.h
+	Localization.h
+	Location.h
 	MeshShape.h
-	PhysicsManager-inl.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PlaneShape.h
-	RigidActor.h
-	RigidActorBase.h
-	RigidActorBaseState.h
-	RigidActorCollisionRepresentation.h
-	RigidActorParameters.h
-	RigidActorState.h
+	Representation.h
+	RigidCollisionRepresentation.h
+	RigidRepresentation.h
+	RigidRepresentationBase.h
+	RigidRepresentationBaseState.h
+	RigidRepresentationLocalization.h
+	RigidRepresentationParameters.h
+	RigidRepresentationState.h
 	RigidShape.h
+	RigidShapeCollisionRepresentation.h
 	Shapes.h
 	SphereShape.h
-	VtcRigidActor.h
 	VtcRigidParameters.h
+	VtcRigidRepresentation.h
 )
 
 surgsim_add_library(
