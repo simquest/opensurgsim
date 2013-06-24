@@ -60,8 +60,8 @@ struct GlutSquare : public GlutRenderObject
 	GlutSquare(double halfSize, const SurgSim::Math::Vector3d& color,
 			   const SurgSim::Math::Vector3d& planeDirectionX = SurgSim::Math::Vector3d(1.0, 0.0, 0.0),
 			   const SurgSim::Math::Vector3d& planeDirectionY = SurgSim::Math::Vector3d(0.0, 1.0, 0.0)) :
-		GlutRenderObject(), halfSize(halfSize), color(color), planeDirectionX(planeDirectionX),
-		planeDirectionY(planeDirectionY)
+		GlutRenderObject(), planeDirectionX(planeDirectionX), planeDirectionY(planeDirectionY),
+		halfSize(halfSize), color(color)
 	{
 	}
 
