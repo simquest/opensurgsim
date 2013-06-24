@@ -41,15 +41,6 @@ struct MlcpSolution
 	double initialConvergenceCriteria;
 	double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
 	double initialConstraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
-
-	MlcpSolution()
-	{
-	}
-
-private:
-	// Prevent copying and assignment
-	MlcpSolution(const MlcpSolution& other);
-	MlcpSolution& operator= (const MlcpSolution& other);
 };
 
 };  // namespace Math

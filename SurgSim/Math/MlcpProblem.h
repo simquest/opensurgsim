@@ -59,44 +59,6 @@ struct MlcpProblem
 	/// \todo This API will change in the future to something more independent of physics.
 	std::vector<MlcpConstraintType> constraintTypes;
 
-	MlcpProblem()
-	{
-	}
-
-	MlcpProblem(const MlcpProblem& other) :
-		A(other.A),
-		b(other.b),
-		mu(other.mu),
-		constraintTypes(other.constraintTypes)
-	{
-	}
-
-	MlcpProblem(MlcpProblem&& other) :
-		A(std::move(other.A)),
-		b(std::move(other.b)),
-		mu(std::move(other.mu)),
-		constraintTypes(std::move(other.constraintTypes))
-	{
-	}
-
-	MlcpProblem& operator= (const MlcpProblem& other)
-	{
-		A = other.A;
-		b = other.b;
-		mu = other.mu;
-		constraintTypes = other.constraintTypes;
-		return *this;
-	}
-
-	MlcpProblem& operator= (MlcpProblem&& other)
-	{
-		A = std::move(other.A);
-		b = std::move(other.b);
-		mu = std::move(other.mu);
-		constraintTypes = std::move(other.constraintTypes);
-		return *this;
-	}
-
 	int getSize() const
 	{
 		return b.rows();
