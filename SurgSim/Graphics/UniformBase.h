@@ -16,8 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
 #define SURGSIM_GRAPHICS_UNIFORMBASE_H
 
-#include <string>
-
 namespace SurgSim
 {
 
@@ -37,7 +35,7 @@ public:
 	virtual ~UniformBase() = 0;
 };
 
-UniformBase::~UniformBase()
+inline UniformBase::~UniformBase()
 {
 }
 
