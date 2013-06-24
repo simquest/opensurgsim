@@ -41,6 +41,15 @@ struct MlcpSolution
 	double initialConvergenceCriteria;
 	double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
 	double initialConstraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
+
+	// NB: We let the compiler generate the default code for the constructor, copy constructor and copy assignment,
+	// because we currently sometimes need to copy the solution (although we ought to minimize this).
+	// The C++11-ish way to indicate that explicitly would be to write code like this:
+	//     MlcpProblem() = default;
+	//     MlcpProblem(const MlcpProblem& other) = default;
+	//     MlcpProblem& operator= (const MlcpProblem& other) = default;
+	// but I haven't yet tested that this works correctly on VS 2010, so I'm just putting in the comment.
+	// We may also want to add move construction and move assignment.  --advornik 2013-06-24
 };
 
 };  // namespace Math

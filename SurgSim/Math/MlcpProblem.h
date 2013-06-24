@@ -59,6 +59,15 @@ struct MlcpProblem
 	/// \todo This API will change in the future to something more independent of physics.
 	std::vector<MlcpConstraintType> constraintTypes;
 
+	// NB: We let the compiler generate the default code for the constructor, copy constructor and copy assignment,
+	// because we currently sometimes need to copy the problem (although we ought to minimize this).
+	// The C++11-ish way to indicate that explicitly would be to write code like this:
+	//     MlcpProblem() = default;
+	//     MlcpProblem(const MlcpProblem& other) = default;
+	//     MlcpProblem& operator= (const MlcpProblem& other) = default;
+	// but I haven't yet tested that this works correctly on VS 2010, so I'm just putting in the comment.
+	// We may also want to add move construction and move assignment.  --advornik 2013-06-24
+
 	int getSize() const
 	{
 		return b.rows();
