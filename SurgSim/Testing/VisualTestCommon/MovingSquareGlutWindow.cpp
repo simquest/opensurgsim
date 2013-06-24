@@ -33,7 +33,7 @@ MovingSquareGlutWindow::MovingSquareGlutWindow(const std::string& toolDeviceName
 	GlutRenderer::addObject(m_square);
 
 	m_toolSphere = std::make_shared<GlutSphere>(0.010, Vector3d(1.0, 1.0, 1.0));
-	std::shared_ptr<GlutAxes> toolAxes = std::make_shared<GlutAxes>(0.025, 5.0);
+	std::shared_ptr<GlutAxes> toolAxes = std::make_shared<GlutAxes>(0.025, 5.0f);
 	m_tool = std::make_shared<GlutGroup>();
 	m_tool->children.push_back(m_toolSphere);
 	m_tool->children.push_back(toolAxes);

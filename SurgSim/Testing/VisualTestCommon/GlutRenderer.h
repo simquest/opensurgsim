@@ -76,12 +76,12 @@ struct GlutAxes : GlutRenderObject
 	/// Length of each axis, in meters.
 	double length;
 	/// Width of each axis, in pixels.
-	double width;
+	float width;
 
 	/// Constructor
 	/// \param length Length of each axis, in meters.
 	/// \param width Width of each axis, in pixels.
-	GlutAxes(double length, double width) : GlutRenderObject(), length(length), width(width)
+	GlutAxes(double length, float width) : GlutRenderObject(), length(length), width(width)
 	{
 	}
 
@@ -140,9 +140,9 @@ struct GlutCamera
 	/// Field of view angle (in degrees) in the vertical direction.
 	double fovY;
 	/// Near clipping plane distance from camera, in meters.
-	double near;
+	double zNear;
 	/// Far clipping plane distance from camera, in meters.
-	double far;
+	double zFar;
 
 	/// Constructor
 	/// \param eye Eye position.
@@ -152,8 +152,8 @@ struct GlutCamera
 	/// \param near Near clipping plane distance from camera, in meters.
 	/// \param far Far clipping plane distance from camera, in meters.
 	GlutCamera(const SurgSim::Math::Vector3d& eye, const SurgSim::Math::Vector3d& center,
-			   const SurgSim::Math::Vector3d& up, const double fovY, double near, double far) : eye(eye), center(center),
-		up(up), fovY(fovY), near(near), far(far)
+			   const SurgSim::Math::Vector3d& up, const double fovY, double zNear, double zFar) : eye(eye), center(center),
+		up(up), fovY(fovY), zNear(zNear), zFar(zFar)
 	{
 	}
 };

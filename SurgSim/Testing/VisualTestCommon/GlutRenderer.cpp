@@ -15,6 +15,8 @@
 
 #include "SurgSim/Testing/VisualTestCommon/GlutRenderer.h"
 
+#include <string>
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::RigidTransform3d;
 
@@ -142,7 +144,10 @@ void GlutRenderer::initialize()
 {
 	char* argv[1];
 	int argc = 1;
-	argv[0] = _strdup("GlutWindow");
+	std::string title = "GlutWindow";
+	std::vector<char> charString(title.size() + 1);
+	std::copy(title.begin(), title.end(), charString.begin());
+	argv[0] = &charString[0];
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
@@ -154,7 +159,7 @@ void GlutRenderer::initialize()
 	glCullFace(GL_BACK);
 	glEnable(GL_DEPTH_TEST);
 	glShadeModel(GL_SMOOTH);
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
@@ -164,7 +169,7 @@ void GlutRenderer::display()
 	glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(m_camera->fovY, static_cast<float>(m_width / m_height), m_camera->near, m_camera->far);
+	gluPerspective(m_camera->fovY, static_cast<float>(m_width / m_height), m_camera->zNear, m_camera->zFar);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
