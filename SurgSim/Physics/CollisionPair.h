@@ -67,7 +67,7 @@ public:
 	~CollisionPair();
 
 	/// Sets the representations in this pair, representations cannot be the same instance and neither can be nullptr.
-	/// \param	first 	The first CollisionRepresenation.
+	/// \param	first 	The first CollisionRepresentation.
 	/// \param	second	The second CollisionRepresentation.
 	inline void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
 								   const std::shared_ptr<CollisionRepresentation>& second)
