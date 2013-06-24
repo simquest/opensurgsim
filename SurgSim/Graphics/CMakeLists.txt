@@ -28,8 +28,11 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgCamera.cpp
 	OsgGroup.cpp
 	OsgManager.cpp
+	OsgMaterial.cpp
 	OsgPlaneRepresentation.cpp
+	OsgShader.cpp
 	OsgSphereRepresentation.cpp
+	OsgUniformBase.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	ViewElement.cpp
@@ -39,19 +42,23 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Camera.h
 	Group.h
 	Manager.h
+	Material.h
 	OsgCamera.h
 	OsgConversions.h
 	OsgGroup.h
 	OsgManager.h
+	OsgMaterial.h
 	OsgMatrixConversions.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgQuaternionConversions.h
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
+	OsgShader.h
 	OsgSphereRepresentation.h
 	OsgUniform.h
 	OsgUniform-inl.h
+	OsgUniformBase.h
 	OsgUniformTypes.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
@@ -59,8 +66,10 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgViewElement.h
 	PlaneRepresentation.h
 	Representation.h
+	Shader.h
 	SphereRepresentation.h
 	Uniform.h
+	UniformBase.h
 	View.h
 	ViewElement.h
 )
