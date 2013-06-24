@@ -165,30 +165,6 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 		{
 			EXPECT_FALSE(pair->hasContacts());
 		}
-
-		// Switched Case
-		SpherePlaneDcdContact calcReverse(true);
-		pair = std::make_shared<CollisionPair>(planeRep, sphereRep);
-		calcReverse.calculateContact(pair);
-		if (expectedIntersect)
-		{
-			ASSERT_TRUE(pair->hasContacts());
-			std::shared_ptr<Contact> contact = pair->getContacts().front();
-			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
-			EXPECT_TRUE(eigenEqual(expectedNorm, -contact->normal, epsilon));
-			EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
-			EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
-			EXPECT_TRUE(eigenEqual(spherePenetration, 
-								   contact->penetrationPoints.second.globalPosition.getValue(),
-								   epsilon));
-			EXPECT_TRUE(eigenEqual(planePenetration, 
-								   contact->penetrationPoints.first.globalPosition.getValue(),
-								   epsilon));
-		}
-		else
-		{
-			EXPECT_FALSE(pair->hasContacts());
-		}
 }
 
 TEST(ContactCalculationTests, SperePlaneCalculation)
