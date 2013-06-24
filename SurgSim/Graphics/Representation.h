@@ -67,7 +67,7 @@ public:
 	}
 
 	/// Sets the material that defines the visual appearance of the representation
-	/// \param	Graphics material
+	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
 	virtual bool setMaterial(std::shared_ptr<Material> material)
 	{

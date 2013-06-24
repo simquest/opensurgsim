@@ -57,7 +57,7 @@ public:
 	virtual double getRadius() const;
 
 	/// Sets the material that defines the visual appearance of the representation
-	/// \param	Graphics material
+	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
 	/// \note	OsgSphereRepresentation only accepts subclasses of OsgMaterial.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
