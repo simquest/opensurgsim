@@ -31,8 +31,7 @@ public:
 
 	/// Constructor
 	Computation();
-	Computation(bool doCopyState);
-	
+	explicit Computation(bool doCopyState);
 
 	/// Destructor
 	virtual ~Computation();
@@ -53,7 +52,7 @@ protected:
 
 	/// Override this function to implement the computations specific behavior
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
+		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state) = 0;
 
 private:

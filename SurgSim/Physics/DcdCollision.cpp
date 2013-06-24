@@ -38,7 +38,7 @@ DcdCollision::~DcdCollision()
 }
 
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
-	const double& dt, 
+	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;

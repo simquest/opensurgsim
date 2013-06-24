@@ -91,12 +91,12 @@ bool ComponentManager::executeInitialization()
 	// Now Initialize and and wakeup all the components
 	std::vector<std::shared_ptr<Component>> inflightAdditions;
 	std::vector<std::shared_ptr<Component>> inflightRemovals;
-	
+
 	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
 
 	auto inflightBegin = std::begin(inflightAdditions);
 	auto inflightEnd = std::end(inflightAdditions);
-	
+
 	if (! inflightAdditions.empty())
 	{
 		addAndIntializeComponents(inflightBegin, inflightEnd);

@@ -106,7 +106,7 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 
 		// Calculate the normal going from the plane to the sphere, it is the plane normal transformed by the
 		// plane pose, flipped if the sphere is behind the plane and normalize it
-		Vector3d normal = 
+		Vector3d normal =
 			((representationPlane->getCurrentPose() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0)).normalized();
 
 		std::pair<Location,Location> penetrationPoints;

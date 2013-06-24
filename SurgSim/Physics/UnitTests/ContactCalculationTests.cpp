@@ -85,8 +85,9 @@ TEST (ContactCalculationTests, DefaultCalculation)
 void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts, double d)
 {
 	SphereSphereDcdContact calc;
-	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(makeSphereRepresentation(r0,Quaterniond::Identity(),p0),
-																		  makeSphereRepresentation(r1,Quaterniond::Identity(),p1));
+	std::shared_ptr<CollisionPair> pair = 
+		std::make_shared<CollisionPair>(makeSphereRepresentation(r0,Quaterniond::Identity(),p0),
+										makeSphereRepresentation(r1,Quaterniond::Identity(),p1));
 
 	calc.calculateContact(pair);
 	EXPECT_EQ(hasContacts, pair->hasContacts());
@@ -122,25 +123,25 @@ TEST (ContactCalculationTests, SphereSphereCalculation)
 	}
 }
 
-void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, 
-					   const Quaterniond& sphereQuat, 
+void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
+					   const Quaterniond& sphereQuat,
 					   const Vector3d& sphereTrans,
-					   std::shared_ptr<PlaneShape> plane, 
-					   const Quaterniond& planeQuat, 
+					   std::shared_ptr<PlaneShape> plane,
+					   const Quaterniond& planeQuat,
 					   const Vector3d& planeTrans,
-					   bool expectedIntersect, 
-					   const double& expectedDepth = 0 , 
+					   bool expectedIntersect,
+					   const double& expectedDepth = 0 ,
 					   const Vector3d& expectedNorm = Vector3d::Zero())
 {
-		std::shared_ptr<CollisionRepresentation> planeRep = 
+		std::shared_ptr<CollisionRepresentation> planeRep =
 			std::make_shared<RigidShapeCollisionRepresentation>(plane,planeQuat,planeTrans);
-		std::shared_ptr<CollisionRepresentation> sphereRep = 
+		std::shared_ptr<CollisionRepresentation> sphereRep =
 			std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
 
 		SpherePlaneDcdContact calcNormal(false);
 		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
 
-		// Again this replicates the way this is calculated in the contact calculation just with different 
+		// Again this replicates the way this is calculated in the contact calculation just with different
 		// starting values
 		Vector3d spherePenetration = sphereTrans - expectedNorm * sphere->getRadius();
 		Vector3d planePenetration = sphereTrans - expectedNorm * (sphere->getRadius() - expectedDepth);
@@ -154,10 +155,10 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 			EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
 			EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 			EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
-			EXPECT_TRUE(eigenEqual(spherePenetration, 
+			EXPECT_TRUE(eigenEqual(spherePenetration,
 								   contact->penetrationPoints.first.globalPosition.getValue(),
 								   epsilon));
-			EXPECT_TRUE(eigenEqual(planePenetration, 
+			EXPECT_TRUE(eigenEqual(planePenetration,
 								   contact->penetrationPoints.second.globalPosition.getValue(),
 								   epsilon));
 		}
@@ -178,10 +179,10 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 			EXPECT_TRUE(eigenEqual(expectedNorm, -contact->normal, epsilon));
 			EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 			EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
-			EXPECT_TRUE(eigenEqual(spherePenetration, 
+			EXPECT_TRUE(eigenEqual(spherePenetration,
 								   contact->penetrationPoints.second.globalPosition.getValue(),
 								   epsilon));
-			EXPECT_TRUE(eigenEqual(planePenetration, 
+			EXPECT_TRUE(eigenEqual(planePenetration,
 								   contact->penetrationPoints.first.globalPosition.getValue(),
 								   epsilon));
 		}
@@ -219,7 +220,7 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 
 	{
 		SCOPED_TRACE("Intersection front, sphere center on the plane, rotated plane");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), 
+		doSpherePlaneTest(sphere,Quaterniond::Identity(),
 						  Vector3d(0.0,0,0.0),
 						  plane,
 						  SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)),

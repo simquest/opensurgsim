@@ -32,7 +32,7 @@ std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& 
 													  const Vector3d& position)
 {
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
-	std::shared_ptr<CollisionRepresentation> rep = 
+	std::shared_ptr<CollisionRepresentation> rep =
 		std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);
 	return rep;
 }

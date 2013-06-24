@@ -81,7 +81,7 @@ protected:
 	/// \tparam	T	Specific type of the component that is being added.
 	/// \param	component		 	The component that needs to be added.
 	/// \param [in,out]	container	If non-null, the container that should receive the component if of the correct type.
-	/// \return	the correctly cast component pointer if successful and the 
+	/// \return	the correctly cast component pointer if successful and the
 	/// 		component did not already exist in the container
 	template<class T>
 	std::shared_ptr<T> tryAddComponent(std::shared_ptr<SurgSim::Framework::Component> component,
