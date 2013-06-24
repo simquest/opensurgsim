@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
+	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
@@ -36,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	OsgRigidTransformConversionsTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgUniformTests.cpp
+	OsgUniformBaseTests.cpp
 	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
