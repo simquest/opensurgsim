@@ -394,7 +394,7 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 	{
 		return false;
 	}
-	if (constraintTypeNames.size() != numConstraints)
+	if (static_cast<int>(constraintTypeNames.size()) != numConstraints)
 	{
 		fprintf(stderr, "Expected %d constraint types, saw %d\n  in file '%s'\n",
 				numConstraints, constraintTypeNames.size(), fileName.c_str());

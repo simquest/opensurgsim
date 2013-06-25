@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @file
-* Tests for the Gauss-Seidel implementation of the MLCP solver.
-*/
+/// \file
+/// Tests for the Gauss-Seidel implementation of the MLCP solver.
 
 #include <math.h>
 #include <memory>
@@ -66,7 +65,7 @@ static void solveAndCompareResult(const std::string& fileName,
 	printf("-- TEST %s --\n", fileName.c_str());
 
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
-	ASSERT_TRUE(data) << "Failed to load " << fileName;
+	ASSERT_TRUE(data != nullptr) << "Failed to load " << fileName;
 
 	// NB: need to make the solver calls const-correct.
 	Eigen::MatrixXd A = data->problem.A;
@@ -89,7 +88,7 @@ static void solveAndCompareResult(const std::string& fileName,
 	// XXX set ratio to 1
 	bool res = mlcpSolver.solve(data->problem, &solution);
 
-	printf("\tsolver did %d iterations convergence=%d Signorini=%d\n",
+	printf("\tsolver %s after %d iterations convergence=%d Signorini=%d\n", (res ? "succeeded" : "FAILED"),
 		   solution.numIterations, solution.validConvergence ? 1 : 0, solution.validSignorini ? 1 : 0);
 
 	ASSERT_EQ(size, solution.x.rows());
@@ -180,7 +179,7 @@ static void solveRepeatedly(const MlcpTestData& data,
 		if (mlcpSolver)
 		{
 			solution.x.setZero();
-			bool res = mlcpSolver->solve(problem, &solution);
+			mlcpSolver->solve(problem, &solution);
 		}
 	}
 }
@@ -193,7 +192,7 @@ static double measureExecutionTimeUsec(const std::string& fileName,
 	printf("-- TEST %s --\n", fileName.c_str());
 
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
-	EXPECT_TRUE(data) << "Failed to load " << fileName;
+	EXPECT_TRUE(data != nullptr) << "Failed to load " << fileName;
 
 	MlcpGaussSeidelSolver mlcpSolver(gsSolverPrecision, gsContactTolerance, gsMaxIterations);
 
@@ -226,8 +225,8 @@ static double measureExecutionTimeUsec(const std::string& fileName,
 	//std::cout << "Baseline:              " << (elapsedBaseline.count() * 1000.) << " ms" << std::endl;
 	double solveTimeUsec = (elapsedSolveTime - elapsedBaseline).count() * 1e6 / repetitions;
 	double copyTimeUsec = elapsedBaseline.count() * 1e6 / repetitions;
-	std::cout << "Average solution time: " << solveTimeUsec << " microseconds (over " <<
-		repetitions << " loops)" << std::endl;
+	std::cout << "Average solution time: " << solveTimeUsec << " microseconds (~" << (solveTimeUsec+copyTimeUsec) <<
+		"-" << copyTimeUsec << ") over " << repetitions << " loops" << std::endl;
 	return solveTimeUsec;
 }
 
@@ -243,4 +242,5 @@ TEST(MlcpGaussSeidelSolverTests, MeasureExecutionTimeOriginal)
 	// changes.  But you can't usefully compare execution times on different machines, or with different build
 	// settings, so you'll need to manually uncomment the following line and adjust the time accordingly.
 //	EXPECT_LE(solveTimeUsec, 14.0);
+	EXPECT_LE(solveTimeUsec, 1e6);
 }

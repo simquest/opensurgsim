@@ -58,6 +58,8 @@ public:
 		description = other.description;
 		flags = other.flags;
 		numDegreesOfFreedom = other.numDegreesOfFreedom;
+
+		return *this;
 	}
 
 	int getSize() const
