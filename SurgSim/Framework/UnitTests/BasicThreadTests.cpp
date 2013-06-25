@@ -28,7 +28,7 @@
 #include <SurgSim/Framework/BasicThread.h>
 #include "MockObjects.h"  //NOLINT
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Framework
 {
@@ -119,12 +119,15 @@ public:
 	std::shared_ptr<MockThread> m;
 };
 
-TEST_F(BasicThreadDeathTest, DISABLED_DestructLiveThread)
+TEST_F(BasicThreadDeathTest, DestructLiveThread)
 {
 	::testing::FLAGS_gtest_death_test_style = "threadsafe";
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
-	ASSERT_DEATH_IF_SUPPORTED(m.reset(), "Failure");
+	ASSERT_DEATH_IF_SUPPORTED({
+		SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+		m.reset();
+	}, "Failure");
 }
 
 }; // namespace Framework
