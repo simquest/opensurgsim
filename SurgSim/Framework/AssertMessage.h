@@ -17,7 +17,6 @@
 #define SURGSIM_FRAMEWORK_ASSERTMESSAGE_H
 
 #include <memory>
-#include <functional>
 
 #include "SurgSim/Framework/LogMessageBase.h"
 
@@ -47,7 +46,7 @@ class AssertMessage : public LogMessageBase
 {
 public:
 	/// The type used for the callback function that is triggered after an assertion has failed.
-	typedef std::function<void(const std::string& message)> DeathCallback;
+	typedef void (*DeathCallback)(const std::string& message);
 
 	/// Constructor.
 	/// \param logger %Logger used to log this message.
