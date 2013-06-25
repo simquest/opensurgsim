@@ -125,7 +125,7 @@ TEST_F(BasicThreadDeathTest, DestructLiveThread)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
 	ASSERT_DEATH_IF_SUPPORTED({
-		SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+		SurgSim::Framework::AssertMessage::setFailureBehaviorToDeath();
 		m.reset();
 	}, "Failure");
 }
