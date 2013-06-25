@@ -34,6 +34,7 @@ DataGroup DataGroupBuilder::createData() const
 	data.integers() = integers().createData();
 	data.booleans() = booleans().createData();
 	data.strings() = strings().createData();
+	data.matrixes() = matrixes().createData();
 	return data;
 }
 
@@ -61,6 +62,17 @@ const NamedDataBuilder<DataGroupBuilder::VectorType>& DataGroupBuilder::vectors(
 {
 	return m_vectors;
 }
+
+NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::matrixes()
+{
+	return m_matrixes;
+}
+
+const NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::matrixes() const
+{
+	return m_matrixes;
+}
+
 
 NamedDataBuilder<DataGroupBuilder::ScalarType>& DataGroupBuilder::scalars()
 {
@@ -112,6 +124,12 @@ void DataGroupBuilder::addVector(const std::string& name)
 	vectors().addEntry(name);
 }
 
+void DataGroupBuilder::addMatrix(const std::string& name)
+{
+	matrixes().addEntry(name);
+}
+
+
 void DataGroupBuilder::addScalar(const std::string& name)
 {
 	scalars().addEntry(name);
@@ -136,6 +154,7 @@ void DataGroupBuilder::addEntriesFrom(const DataGroupBuilder& builder)
 {
 	poses().addEntriesFrom(builder.poses());
 	vectors().addEntriesFrom(builder.vectors());
+	matrixes().addEntriesFrom(builder.matrixes());
 	scalars().addEntriesFrom(builder.scalars());
 	integers().addEntriesFrom(builder.integers());
 	booleans().addEntriesFrom(builder.booleans());
@@ -146,6 +165,7 @@ void DataGroupBuilder::addEntriesFrom(const DataGroup& data)
 {
 	poses().addEntriesFrom(data.poses());
 	vectors().addEntriesFrom(data.vectors());
+	matrixes().addEntriesFrom(data.matrixes());
 	scalars().addEntriesFrom(data.scalars());
 	integers().addEntriesFrom(data.integers());
 	booleans().addEntriesFrom(data.booleans());

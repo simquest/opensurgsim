@@ -18,6 +18,7 @@
 
 #include <SurgSim/DataStructures/NamedDataBuilder.h>
 #include <SurgSim/DataStructures/DataGroup.h>
+#include <Eigen/Core>
 
 namespace SurgSim
 {
@@ -49,6 +50,8 @@ public:
 	/// The type used for strings.
 	typedef DataGroup::StringType StringType;
 
+	typedef Eigen::MatrixXd DynamicMatrixType;
+
 	/// Constructs an empty builder object.
 	DataGroupBuilder();
 
@@ -77,6 +80,9 @@ public:
 	/// Provides access to the vector value entries.
 	/// \return a read-only reference to the sub-object that contains vector value entries.
 	const NamedDataBuilder<VectorType>& vectors() const;
+
+	NamedDataBuilder<DynamicMatrixType>& matrixes();
+	const NamedDataBuilder<DynamicMatrixType>& matrixes() const;
 
 	/// Provides access to the scalar value entries.
 	/// \return a writable reference to the sub-object that contains scalar value entries.
@@ -118,6 +124,8 @@ public:
 	/// Identical to <code>%vectors().addEntry(name)</code>.
 	void addVector(const std::string& name);
 
+	void addMatrix(const std::string& name);
+
 	/// A shortcut for adding a named scalar entry.
 	/// Identical to <code>%scalars().addEntry(name)</code>.
 	void addScalar(const std::string& name);
@@ -152,6 +160,8 @@ private:
 
 	/// The subsidiary builder used for vector values.
 	NamedDataBuilder<VectorType> m_vectors;
+
+	NamedDataBuilder<DynamicMatrixType> m_matrixes;
 
 	/// The subsidiary builder used for scalar values.
 	NamedDataBuilder<ScalarType> m_scalars;

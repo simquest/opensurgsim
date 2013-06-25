@@ -31,6 +31,7 @@ inline DataGroup::DataGroup()
 inline DataGroup::DataGroup(const DataGroup& dataGroup) :
 	m_poses(dataGroup.m_poses),
 	m_vectors(dataGroup.m_vectors),
+	m_matrixes(dataGroup.m_matrixes),
 	m_scalars(dataGroup.m_scalars),
 	m_integers(dataGroup.m_integers),
 	m_booleans(dataGroup.m_booleans),
@@ -45,6 +46,7 @@ inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 
 	m_poses = dataGroup.m_poses;
 	m_vectors = dataGroup.m_vectors;
+	m_matrixes = dataGroup.m_matrixes;
 	m_scalars = dataGroup.m_scalars;
 	m_integers = dataGroup.m_integers;
 	m_booleans = dataGroup.m_booleans;
@@ -61,6 +63,7 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 
 	m_poses = std::move(dataGroup.m_poses);
 	m_vectors = std::move(dataGroup.m_vectors);
+	m_matrixes = std::move(dataGroup.m_matrixes);
 	m_scalars = std::move(dataGroup.m_scalars);
 	m_integers = std::move(dataGroup.m_integers);
 	m_booleans = std::move(dataGroup.m_booleans);
@@ -75,6 +78,7 @@ inline bool DataGroup::isValid() const
 	bool valid = poses().isValid();
 	SURGSIM_ASSERT(poses().isValid() == valid &&
 	               vectors().isValid() == valid &&
+	               matrixes().isValid() == valid &&
 	               scalars().isValid() == valid &&
 	               integers().isValid() == valid &&
 	               booleans().isValid() == valid &&
@@ -101,6 +105,17 @@ inline const NamedData<DataGroup::VectorType>& DataGroup::vectors() const
 {
 	return m_vectors;
 }
+
+inline NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrixes()
+{
+	return m_matrixes;
+}
+
+inline const NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrixes() const
+{
+	return m_matrixes;
+}
+
 
 inline NamedData<DataGroup::ScalarType>& DataGroup::scalars()
 {

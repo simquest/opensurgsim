@@ -19,6 +19,7 @@
 #include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
+#include <Eigen/Core>
 
 namespace SurgSim
 {
@@ -73,6 +74,8 @@ public:
 	typedef bool BooleanType;
 	/// The type used for strings.
 	typedef std::string StringType;
+
+	typedef Eigen::MatrixXd DynamicMatrixType;
 
 
 	/// Construct an empty object, with no associated names and indices yet.
@@ -142,6 +145,9 @@ public:
 	/// \return the read-only vector data.
 	inline const NamedData<VectorType>& vectors() const;
 
+	inline NamedData<DynamicMatrixType>& matrixes();
+	inline const NamedData<DynamicMatrixType>& matrixes() const;
+
 	/// Return the scalar data structure.
 	/// \return the mutable scalar data.
 	inline NamedData<ScalarType>& scalars();
@@ -195,6 +201,8 @@ private:
 
 	/// The string values.
 	NamedData<StringType> m_strings;
+
+	NamedData<DynamicMatrixType> m_matrixes;
 };
 
 };  // namespace Input
