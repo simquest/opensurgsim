@@ -163,8 +163,11 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 		}
 
 		int newSize = vector->cols() + 1;
-		vector->conservativeResize(newSize);
-		(*vector)[newSize-1] = nextValue;
+		Eigen::RowVectorXd newVector;
+		newVector.resize(newSize);
+		newVector.head(newSize-1) = *vector;
+		newVector[newSize-1] = nextValue;
+		*vector = newVector;
 	}
 }
 
