@@ -328,11 +328,11 @@ bool RawMultiAxisScaffold::unregisterDevice(const RawMultiAxisDevice* const devi
 bool RawMultiAxisScaffold::runInputFrame(RawMultiAxisScaffold::DeviceData* info)
 {
 	info->deviceObject->pullOutput();
-	if (updateDevice(info))
+	if (! updateDevice(info))
 	{
-		info->deviceObject->pushInput();
+		return false;
 	}
-
+	info->deviceObject->pushInput();
 	return true;
 }
 
@@ -387,10 +387,11 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 		int numRead = read(info->fileDescriptor, &event, sizeof(event));
 		if (numRead < 0)
 		{
+
 			if (errno == ENODEV)
 			{
-				SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: read failed; device has been disconnected!";
-				// XXX deal with error!!!
+				SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: read failed; device has been disconnected!  (ignoring)";
+				return false;  // stop updating this device!
 			}
 			else if (errno != EAGAIN)
 			{

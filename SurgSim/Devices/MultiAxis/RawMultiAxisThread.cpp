@@ -28,8 +28,7 @@ RawMultiAxisThread::~RawMultiAxisThread()
 
 bool RawMultiAxisThread::doUpdate(double dt)
 {
-	m_scaffold->runInputFrame(m_deviceData);
-	return true;
+	return m_scaffold->runInputFrame(m_deviceData);
 }
 
 bool RawMultiAxisThread::doInitialize()
