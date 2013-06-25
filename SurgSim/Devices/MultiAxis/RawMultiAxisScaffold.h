@@ -28,6 +28,7 @@ namespace Device
 
 class RawMultiAxisDevice;
 class RawMultiAxisThread;
+class FileDescriptor;
 
 /// A class that implements the behavior of RawMultiAxisDevice objects.
 ///
@@ -128,8 +129,8 @@ private:
 	bool destroyPerDeviceThread(DeviceData* data);
 
 	/// Opens the specified device.
-	/// \return The file descriptor for the device.
-	int openDevice(const std::string& path);
+	/// \return The FileDescriptor wrapper for the device.
+	FileDescriptor openDevice(const std::string& path);
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();

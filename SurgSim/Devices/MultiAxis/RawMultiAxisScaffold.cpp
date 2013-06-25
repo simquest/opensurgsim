@@ -33,6 +33,7 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
+#include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
@@ -91,11 +92,11 @@ struct RawMultiAxisScaffold::DeviceData
 {
 public:
 	/// Initialize the data.
-	DeviceData(const std::string& path, RawMultiAxisDevice* device, int fd) :
+	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileDescriptor&& descriptor) :
 		devicePath(path),
 		deviceObject(device),
 		thread(),
-		fileDescriptor(fd),
+		fileDescriptor(std::move(descriptor)),
 		axisStates(initialAxisStates()),
 		buttonStates(initialButtonStates()),
 		coordinateSystemRotation(defaultCoordinateSystemRotation()),
@@ -128,11 +129,6 @@ public:
 
 	~DeviceData()
 	{
-		if (fileDescriptor != -1)
-		{
-			close(fileDescriptor);
-			fileDescriptor = -1;
-		}
 	}
 
 	static const int NUM_BUTTONS = 4;
@@ -184,7 +180,7 @@ public:
 	/// Processing thread.
 	std::unique_ptr<RawMultiAxisThread> thread;
 	/// File descriptor to read from.
-	int fileDescriptor;
+	FileDescriptor fileDescriptor;
 	/// Persistent axis states.
 	std::array<int, 6> axisStates;
 	/// Persistent button states.
@@ -375,7 +371,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	}
 
 	struct pollfd pollData[1];
-	pollData[0].fd = info->fileDescriptor;
+	pollData[0].fd = info->fileDescriptor.get();
 	pollData[0].events = POLLIN;
 
 	//const int timeoutMsec = 10;
@@ -384,7 +380,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	while (poll(pollData, 1, nonBlockingOnly) > 0)
 	{
 		struct input_event event;
-		int numRead = read(info->fileDescriptor, &event, sizeof(event));
+		int numRead = read(info->fileDescriptor.get(), &event, sizeof(event));
 		if (numRead < 0)
 		{
 
@@ -533,14 +529,11 @@ bool RawMultiAxisScaffold::finalizeSdk()
 	return true;
 }
 
-int RawMultiAxisScaffold::openDevice(const std::string& path)
+FileDescriptor RawMultiAxisScaffold::openDevice(const std::string& path)
 {
-	int fd = open(path.c_str(), O_RDWR);
-	if (fd == -1)
-	{
-		fd = open(path.c_str(), O_RDONLY);
-	}
-	if (fd == -1)
+	FileDescriptor fd;
+	fd.openForReadingAndMaybeWriting(path);
+	if (! fd.isValid())
 	{
 		int error = errno;
 		if (error != ENOENT)
@@ -549,7 +542,7 @@ int RawMultiAxisScaffold::openDevice(const std::string& path)
 				getSystemErrorText(error);
 		}
 	}
-	return fd;
+	return std::move(fd);
 }
 
 bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* device, int* numUsedDevicesSeen)
@@ -575,19 +568,19 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		return false;
 	}
 
-    for (int i = 0;  i < 32;  ++i)
-    {
+	for (int i = 0;  i < 32;  ++i)
+	{
 		char devicePath[128];
-        sprintf(devicePath, "/dev/input/event%d", i);
+		sprintf(devicePath, "/dev/input/event%d", i);
 
-		int fd = openDevice(devicePath);
-        if (fd == -1)
+		FileDescriptor fd = openDevice(devicePath);
+		if (! fd.isValid())
 		{
 			continue;
 		}
 
 		char reportedName[1024];
-		if (ioctl(fd, EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
+		if (ioctl(fd.get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
 		{
 			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): " << errno << ", " <<
 				getSystemErrorText(errno);
@@ -600,21 +593,19 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
 
 		struct input_id reportedId;
-		if (ioctl(fd, EVIOCGID, &reportedId) < 0)
+		if (ioctl(fd.get(), EVIOCGID, &reportedId) < 0)
 		{
 			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGID): " << errno << ", " <<
 				getSystemErrorText(errno);
-			close(fd);
 			continue;
 		}
 
 		if (reportedId.vendor != 0x046d)
 		{
-			close(fd);
 			continue;
 		}
 
-		close(fd);
+		fd.reset();
 
 		if (registerIfUnused(devicePath, device, numUsedDevicesSeen))
 		{
@@ -626,7 +617,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 }
 
 bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxisDevice* device,
-									  int* numUsedDevicesSeen)
+											int* numUsedDevicesSeen)
 {
 	// Check existing devices.
 	auto sameIndices = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
@@ -640,8 +631,8 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 
 	// The controller is not yet in use.
 
-	int fd = openDevice(path);
-	if (fd == -1)
+	FileDescriptor fd = openDevice(path);
+	if (! fd.isValid())
 	{
 		return false;
 	}
@@ -649,7 +640,7 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 	// Construct the object, start its thread, then move it to the list.
 	// The thread needs a device entry pointer, but the unique_ptr indirection means we have one to provide even
 	// before we've put an entry in the active device array.
-	std::unique_ptr<DeviceData> info(new DeviceData(path, device, fd));
+	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fd)));
 	createPerDeviceThread(info.get());
 	SURGSIM_ASSERT(info->thread);
 	m_state->activeDeviceList.emplace_back(std::move(info));
