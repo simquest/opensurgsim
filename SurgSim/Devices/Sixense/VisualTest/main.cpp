@@ -28,13 +28,14 @@ using SurgSim::Device::IdentityPoseDevice;
 
 int main(int argc, char** argv)
 {
-	std::shared_ptr<DeviceInterface> toolDevice = std::make_shared<SixenseDevice>("SixenseDevice");
+	std::shared_ptr<DeviceInterface> toolDevice = std::make_shared<SixenseDevice>("SixenseDevice1");
+	std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<SixenseDevice>("SixenseDevice2");
 
-	// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
-	// a pretend device that doesn't actually move.
-	std::shared_ptr<DeviceInterface> squareDevice = std::make_shared<IdentityPoseDevice>("IdentityPoseDevice");
-
-	runToolSquareTest(toolDevice, squareDevice);
+	runToolSquareTest(toolDevice, squareDevice,
+					  //2345678901234567890123456789012345678901234567890123456789012345678901234567890
+					  "Move the Razer Hydra controllers, but keep them above the base unit!\n"
+					  "\n"
+					  "One controller will control the sphere tool, the other the square.");
 
 	printf("\nExiting.\n");
 	// Cleanup and shutdown will happen automatically as objects go out of scope.

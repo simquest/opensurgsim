@@ -25,7 +25,8 @@ using SurgSim::Input::DeviceInterface;
 #include "SurgSim/Testing/VisualTestCommon/MovingSquareGlutWindow.h"
 
 
-void runToolSquareTest(std::shared_ptr<DeviceInterface> toolDevice, std::shared_ptr<DeviceInterface> squareDevice)
+void runToolSquareTest(std::shared_ptr<DeviceInterface> toolDevice, std::shared_ptr<DeviceInterface> squareDevice,
+					   const char* testDescriptionMessage)
 {
 	SURGSIM_ASSERT(toolDevice && squareDevice);
 	if (! toolDevice->initialize())
@@ -56,11 +57,11 @@ void runToolSquareTest(std::shared_ptr<DeviceInterface> toolDevice, std::shared_
 
 	printf("\n"
 		   "**********************************************************************\n"
-		   "Move the device up / down.  If haptic feedback is available,\n"
-		   "you will feel a square in the horizontal plane.\n"
+		   "%s\n"
 		   "\n"
 		   "When done, press Enter to quit the application.\n"
-		   "**********************************************************************\n");
+		   "**********************************************************************\n",
+		   testDescriptionMessage);
 
 	// Wait for a key; the display, force generation, etc. all happen in separate threads.
 	getc(stdin);

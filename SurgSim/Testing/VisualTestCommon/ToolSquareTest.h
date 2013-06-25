@@ -20,6 +20,7 @@
 #include <SurgSim/Input/DeviceInterface.h>
 
 void runToolSquareTest(std::shared_ptr<SurgSim::Input::DeviceInterface> toolDevice,
-					   std::shared_ptr<SurgSim::Input::DeviceInterface> squareDevice);
+					   std::shared_ptr<SurgSim::Input::DeviceInterface> squareDevice,
+					   const char* testDescriptionMessage);
 
 #endif // TOOLSQUARETEST_H
