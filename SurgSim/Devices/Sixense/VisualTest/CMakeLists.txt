@@ -45,7 +45,8 @@ add_executable(SixenseVisualTest
 target_link_libraries(SixenseVisualTest
 	${LIBS} SixenseDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
-	${Boost_LIBRARIES} ${SIXENSE_SDK_LIBRARIES} ${GLUT_LIBRARIES})
+	${Boost_LIBRARIES} ${SIXENSE_SDK_LIBRARIES}
+	${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
 # Copy the device DLLs into the build directory
 surgsim_copy_to_target_directory_for_release(SixenseVisualTest
