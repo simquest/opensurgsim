@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGUNITSPHERE_H
-#define SURGSIM_GRAPHICS_OSGUNITSPHERE_H
+#ifndef SURGSIM_GRAPHICS_OSGUNITBOX_H
+#define SURGSIM_GRAPHICS_OSGUNITBOX_H
 
 #include <osg/Geode>
 #include <osg/Shape>
@@ -26,18 +26,18 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// OSG unit sphere geode to be used as a primitive shape
-/// The sphere is located at (0, 0, 0) and has a radius of 1.
-/// Add the sphere geode to a transform node to position and scale it.
-class OsgUnitSphere
+/// OSG unit box geode to be used as a primitive shape
+/// The box is located at (0, 0, 0) and has a size of 1 on all three axes.
+/// Add the box geode to a transform node to position and scale it.
+class OsgUnitBox
 {
 public:
 	/// Constructor
-	OsgUnitSphere() :
+	OsgUnitBox() :
 		m_geode(new osg::Geode())
 	{
-		osg::ref_ptr<osg::Sphere> unitSphere = new osg::Sphere(osg::Vec3(0.0, 0.0, 0.0), 1.0);
-		osg::ref_ptr<osg::ShapeDrawable> drawable = new osg::ShapeDrawable(unitSphere);
+		osg::ref_ptr<osg::Box> unitBox = new osg::Box(osg::Vec3(0.0, 0.0, 0.0), 1.0);
+		osg::ref_ptr<osg::ShapeDrawable> drawable = new osg::ShapeDrawable(unitBox);
 		m_geode->addDrawable(drawable);
 		m_geode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
 	}
@@ -49,7 +49,7 @@ public:
 	}
 
 private:
-	/// Root OSG node of the sphere
+	/// Root OSG node of the box
 	osg::ref_ptr<osg::Geode> m_geode;
 };
 
@@ -57,4 +57,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OSGUNITSPHERE_H
+#endif  // SURGSIM_GRAPHICS_OSGUNITBOX_H
