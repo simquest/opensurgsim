@@ -44,9 +44,9 @@ class BasicThread
 public:
 	explicit BasicThread(const std::string& name = "Unknown Thread");
 #ifdef _MSC_VER
-	~BasicThread() throw(...);  // Visual Studio does not support noexcept. The throw(...) is optional.
+	virtual ~BasicThread() throw(...);  // Visual Studio does not support noexcept. The throw(...) is optional.
 #else
-	~BasicThread() noexcept(false);  /// C++11 introduced noexcept
+	virtual ~BasicThread() noexcept(false);  /// C++11 introduced noexcept
 #endif
 
 	/// Live cycle functions, public implementation.
