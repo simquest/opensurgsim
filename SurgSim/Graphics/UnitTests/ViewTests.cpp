@@ -22,8 +22,11 @@
 
 #include <random>
 
-using SurgSim::Graphics::Camera;
-using SurgSim::Graphics::View;
+namespace SurgSim
+{
+
+namespace Graphics
+{
 
 TEST(ViewTests, InitTest)
 {
@@ -109,3 +112,7 @@ TEST(ViewTests, UpdateTest)
 		EXPECT_LT(fabs(sumDt - mockView->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
+
+};  // namespace Graphics
+
+};  // namespace SurgSim
