@@ -36,6 +36,7 @@ namespace Math
 ///   (the constraint is non-binding, and therefore there is no force); or
 /// * \f$(\mathbf{A}x+b)_i = \mathbf{A}_{i,*}\cdot x+b_i = 0\f$ <b>and</b> \f$x_i \ge 0\f$
 ///   (the constraint is binding, and therefore there is a positive force to enforce the constraint)
+///
 /// Solving the problem produces the vector \f$x\f$, from which \f$c\f$ can also be computed if needed.
 ///
 /// A mixed LCP problem is defined in the same way, except that for a certain subset of indices, the conditions are
@@ -49,7 +50,7 @@ namespace Math
 /// deformable objects in virtual environments," <i>IEEE Transactions on Visualization and Computer %Graphics,</i>
 /// vol.12, no.1, pp.36,47, Jan.-Feb. 2006.
 ///
-/// \sa SurgSim::Physics::MlcpPhysicsProblem
+/// \sa SurgSim::Physics::MlcpPhysicsProblem, MlcpSolution, MlcpSolver
 //
 // TODO(advornik): Describe the approach to friction in more detail.
 // TODO(advornik): Get rid of the constraint types and encode necessary info in other ways.

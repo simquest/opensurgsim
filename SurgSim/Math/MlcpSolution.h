@@ -23,12 +23,12 @@ namespace SurgSim
 namespace Math
 {
 
-/// The description of a solution to an \ref MlcpProblem "mixed linear complementarity problem".
+/// The description of a solution to a \ref MlcpProblem "mixed linear complementarity problem".
 ///
 /// The solution consists of the vector \f$x\f$ and various diagnostic parameers.
 /// If \f$c = \mathbf{A}x + b\f$ is also needed, it can be computed by the caller.
 ///
-/// \sa MlcpProblem, MlcpSolver
+/// \sa SurgSim::Physics::MlcpPhysicsSolution, MlcpProblem, MlcpSolver
 struct MlcpSolution
 {
 	/// Vector \f$x\f$ specifying a solution to the specified mixed LCP problem.
