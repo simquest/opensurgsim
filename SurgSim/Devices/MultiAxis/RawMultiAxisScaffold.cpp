@@ -93,7 +93,8 @@ struct RawMultiAxisScaffold::DeviceData
 {
 public:
 	/// Initialize the data.
-	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileDescriptor&& descriptor) :
+	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileDescriptor&& descriptor,
+			   const std::vector<int>& buttonCodeList) :
 		devicePath(path),
 		deviceObject(device),
 		thread(),
@@ -105,9 +106,13 @@ public:
 		orientationScale(device->getOrientationScale()),
 		useAxisDominance(device->isUsingAxisDominance())
 	{
-		for (int i = 0;  i < NUM_BUTTONS;  ++i)
+		for (size_t i = 0;  (i < buttonCodeList.size()) && (i < NUM_BUTTONS);  ++i)
 		{
-			buttonCodes[i] = BTN_0 + i;
+			buttonCodes[i] = buttonCodeList[i];
+		}
+		for (size_t i = buttonCodeList.size();  i < NUM_BUTTONS;  ++i)
+		{
+			buttonCodes[i] = -1;
 		}
 	}
 
@@ -132,7 +137,7 @@ public:
 	{
 	}
 
-	static const int NUM_BUTTONS = 4;
+	static const size_t NUM_BUTTONS = 4;
 
 	// Returns the default coordinate system rotation matrix.
 	static SurgSim::Math::Matrix33d defaultCoordinateSystemRotation()
@@ -457,7 +462,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 			}
 			else if (event.type == EV_KEY)
 			{
-				for (int i = 0;  i < DeviceData::NUM_BUTTONS;  ++i)
+				for (size_t i = 0;  i < DeviceData::NUM_BUTTONS;  ++i)
 				{
 					if (event.code == info->buttonCodes[i])
 					{
@@ -664,10 +669,12 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 		return false;
 	}
 
+	std::vector<int> buttons = getDeviceButtonsAndKeys(fd);
+
 	// Construct the object, start its thread, then move it to the list.
 	// The thread needs a device entry pointer, but the unique_ptr indirection means we have one to provide even
 	// before we've put an entry in the active device array.
-	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fd)));
+	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fd), buttons));
 	createPerDeviceThread(info.get());
 	SURGSIM_ASSERT(info->thread);
 	m_state->activeDeviceList.emplace_back(std::move(info));
@@ -767,6 +774,36 @@ bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDe
 	}
 
 	return true;
+}
+
+std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(const FileDescriptor& fileDescriptor)
+{
+	std::vector<int> result;
+	BitSetBuffer<KEY_CNT> buffer;
+	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): " << errno << ", " <<
+			getSystemErrorText(errno);
+		return result;
+	}
+
+	// Start listing buttons/keys from BTN_0; then go back and cover the earlier ones.
+	for (int i = BTN_0;  i < KEY_CNT;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			result.push_back(i);
+		}
+	}
+	for (int i = 0;  i < BTN_0;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			result.push_back(i);
+		}
+	}
+
+	return result;
 }
 
 

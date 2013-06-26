@@ -17,6 +17,7 @@
 #define SURGSIM_DEVICE_RAWMULTIAXISSCAFFOLD_H
 
 #include <memory>
+#include <vector>
 
 #include <SurgSim/Framework/Logger.h>
 #include <SurgSim/DataStructures/DataGroup.h>
@@ -148,6 +149,10 @@ private:
 	/// Checks if the specified device has all six relative translation/rotation coordinate axes.
 	/// \param fileDescriptor The FileDescriptor wrapper for the device.
 	bool deviceHasSixRelativeAxes(const FileDescriptor& fileDescriptor);
+
+	/// Gets the indices of the available device buttons.
+	/// \return a vector of indices.
+	std::vector<int> getDeviceButtonsAndKeys(const FileDescriptor& fileDescriptor);
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
