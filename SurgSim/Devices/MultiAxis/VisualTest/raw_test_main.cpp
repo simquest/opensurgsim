@@ -28,7 +28,10 @@ using SurgSim::Device::IdentityPoseDevice;
 
 int main(int argc, char** argv)
 {
-	std::shared_ptr<DeviceInterface> toolDevice = std::make_shared<RawMultiAxisDevice>("RawMultiAxisDevice");
+	std::shared_ptr<RawMultiAxisDevice> toolDevice = std::make_shared<RawMultiAxisDevice>("RawMultiAxisDevice");
+	toolDevice->setPositionScale(0.0002);
+	toolDevice->setOrientationScale(0.005);
+	toolDevice->setAxisDominance(false);
 
 	// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
 	// a pretend device that doesn't actually move.

@@ -100,9 +100,9 @@ public:
 		axisStates(initialAxisStates()),
 		buttonStates(initialButtonStates()),
 		coordinateSystemRotation(defaultCoordinateSystemRotation()),
-		positionScale(defaultPositionScale()),
-		orientationScale(defaultOrientationScale()),
-		useAxisDominance(false)
+		positionScale(device->getPositionScale()),
+		orientationScale(device->getOrientationScale()),
+		useAxisDominance(device->isUsingAxisDominance())
 	{
 		for (int i = 0;  i < NUM_BUTTONS;  ++i)
 		{
@@ -132,20 +132,6 @@ public:
 	}
 
 	static const int NUM_BUTTONS = 4;
-
-	// Returns the default position scale, in meters per tick.
-	static double defaultPositionScale()
-	{
-		// the position scale from Paul N's measurements of the SpaceNavigator; 1/16"/350 ticks
-		return 0.0000045;
-	}
-
-	// Returns the default rotation scale, in radians per tick.
-	static double defaultOrientationScale()
-	{
-		// the rotation scale from Paul N's measurements of the SpaceNavigator
-		return 0.0003;
-	}
 
 	// Returns the default coordinate system rotation matrix.
 	static SurgSim::Math::Matrix33d defaultCoordinateSystemRotation()
@@ -195,6 +181,8 @@ public:
 	double orientationScale;
 	/// Controls whether dominance will be enabled.
 	bool useAxisDominance;
+	/// The mutex that protects the externally modifiable parameters.
+	boost::mutex parametersMutex;
 
 private:
 	// prohibit copy construction and asignment
@@ -321,6 +309,42 @@ bool RawMultiAxisScaffold::unregisterDevice(const RawMultiAxisDevice* const devi
 	return found;
 }
 
+void RawMultiAxisScaffold::setPositionScale(const RawMultiAxisDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->positionScale = scale;
+	}
+}
+
+void RawMultiAxisScaffold::setOrientationScale(const RawMultiAxisDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->orientationScale = scale;
+	}
+}
+
+void RawMultiAxisScaffold::setAxisDominance(const RawMultiAxisDevice* device, bool onOff)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->useAxisDominance = onOff;
+	}
+}
+
 bool RawMultiAxisScaffold::runInputFrame(RawMultiAxisScaffold::DeviceData* info)
 {
 	info->deviceObject->pullOutput();
@@ -356,6 +380,8 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	bool ledState = false;
 	if (outputData.booleans().get("led1", &ledState))

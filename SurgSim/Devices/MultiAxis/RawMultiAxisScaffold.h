@@ -85,6 +85,15 @@ private:
 	/// \return true on success, false on failure.
 	bool unregisterDevice(const RawMultiAxisDevice* device);
 
+	/// Sets the position scale for this device.
+	void setPositionScale(const RawMultiAxisDevice* device, double scale);
+
+	/// Sets the orientation scale for this device.
+	void setOrientationScale(const RawMultiAxisDevice* device, double scale);
+
+	/// Turns on or off the axis dominance setting for this device.
+	void setAxisDominance(const RawMultiAxisDevice* device, bool onOff);
+
 	/// Executes the operations for a single input frame for a single device.
 	/// Should only be called from the context of the input loop thread.
 	/// \param info The internal device data.

@@ -27,7 +27,10 @@ namespace Device
 
 
 RawMultiAxisDevice::RawMultiAxisDevice(const std::string& uniqueName) :
-	SurgSim::Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData())
+	SurgSim::Input::CommonDevice(uniqueName, RawMultiAxisScaffold::buildDeviceInputData()),
+	m_positionScale(defaultPositionScale()),
+	m_orientationScale(defaultOrientationScale()),
+	m_useAxisDominance(false)
 {
 }
 
@@ -53,6 +56,9 @@ bool RawMultiAxisDevice::initialize()
 	}
 
 	m_scaffold = std::move(scaffold);
+	m_scaffold->setPositionScale(this, m_positionScale);
+	m_scaffold->setOrientationScale(this, m_orientationScale);
+	m_scaffold->setAxisDominance(this, m_useAxisDominance);
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
 	return true;
 }
@@ -71,6 +77,54 @@ bool RawMultiAxisDevice::finalize()
 bool RawMultiAxisDevice::isInitialized() const
 {
 	return (m_scaffold != nullptr);
+}
+
+
+void RawMultiAxisDevice::setPositionScale(double scale)
+{
+	m_positionScale = scale;
+	if (m_scaffold)
+	{
+		m_scaffold->setPositionScale(this, m_positionScale);
+	}
+}
+
+
+double RawMultiAxisDevice::getPositionScale() const
+{
+	return m_positionScale;
+}
+
+
+void RawMultiAxisDevice::setOrientationScale(double scale)
+{
+	m_orientationScale = scale;
+	if (m_scaffold)
+	{
+		m_scaffold->setOrientationScale(this, m_orientationScale);
+	}
+}
+
+
+double RawMultiAxisDevice::getOrientationScale() const
+{
+	return m_orientationScale;
+}
+
+
+void RawMultiAxisDevice::setAxisDominance(bool onOff)
+{
+	m_useAxisDominance = onOff;
+	if (m_scaffold)
+	{
+		m_scaffold->setAxisDominance(this, m_useAxisDominance);
+	}
+}
+
+
+bool RawMultiAxisDevice::isUsingAxisDominance() const
+{
+	return m_useAxisDominance;
 }
 
 

@@ -69,10 +69,54 @@ public:
 	/// Check wheter this device is initialized.
 	bool isInitialized() const;
 
+	/// Sets the position scale for this device.
+	/// The position scale controls how much the pose changes for a given device translation.
+	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	void setPositionScale(double scale);
+	/// Gets the position scale for this device.
+	double getPositionScale() const;
+
+	/// Sets the orientation scale for this device.
+	/// The orientation scale controls how much the pose changes for a given device rotation.
+	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	void setOrientationScale(double scale);
+	/// Gets the orientation scale for this device.
+	double getOrientationScale() const;
+
+	/// Turns on or off the axis dominance setting for this device.
+	/// When axis dominance is on, only one (the largest) of the 6 pure axis directions is allowed to be active.
+	/// In other words, the device will be translating in X, or in Y, or in Z, or rotating around X, or around Y,
+	/// or around Z; but only one of those at a time.
+	void setAxisDominance(bool onOff);
+	/// Gets the axis dominance setting for this device.
+	bool isUsingAxisDominance() const;
+
 private:
+	// Returns the default position scale, in meters per tick.
+	static double defaultPositionScale()
+	{
+		// the position scale from Paul N's measurements of the SpaceNavigator; 1/16"/350 ticks
+		return 0.0000045;
+	}
+
+	// Returns the default rotation scale, in radians per tick.
+	static double defaultOrientationScale()
+	{
+		// the rotation scale from Paul N's measurements of the SpaceNavigator
+		return 0.0003;
+	}
+
+
 	friend class RawMultiAxisScaffold;
 
 	std::shared_ptr<RawMultiAxisScaffold> m_scaffold;
+
+	/// Scale factor for the position axes; stored locally before the device is initialized.
+	double m_positionScale;
+	/// Scale factor for the orientation axes; stored locally before the device is initialized.
+	double m_orientationScale;
+	/// Controls whether dominance will be enabled; stored locally before the device is initialized.
+	bool m_useAxisDominance;
 };
 
 };  // namespace Device
