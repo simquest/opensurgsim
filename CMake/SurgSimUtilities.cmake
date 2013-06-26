@@ -20,12 +20,23 @@
 #
 option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 option(SURGSIM_TESTS_RUN "Run the unit tests at the end of the build" ON)
+if(NOT WIN32)
+	option(SURGSIM_TESTS_RUN_WITH_VALGRIND "Run the unit tests under Valgrind" OFF)
+endif(NOT WIN32)
 option(SURGSIM_TESTS_ALL_IN_ONE
 	"Build a single binary with all unit tests.  [Does not work yet!]" OFF)
 option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 
 set(SURGSIM_COPY_WARNING_ONCE TRUE)
+set(SURGSIM_TEST_RUN_PREFIX)
+if(NOT WIN32)
+	if(SURGSIM_TESTS_RUN_WITH_VALGRIND)
+		set(SURGSIM_TEST_RUN_PREFIX valgrind -v --error-exitcode=1
+			--fullpath-after= --leak-check=full --redzone-size=64)
+	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
+endif(NOT WIN32)
+
 
 # Copy zero or more files to the location of a built target, after the
 # target is built successfully, but only if the condition (which
@@ -138,7 +149,8 @@ endmacro()
 #
 macro(surgsim_unit_test_run_only TESTNAME)
 	if(NOT SURGSIM_TESTS_ALL_IN_ONE)
-		add_custom_command(TARGET ${TESTNAME} POST_BUILD COMMAND ${TESTNAME}
+		add_custom_command(TARGET ${TESTNAME} POST_BUILD
+			COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TESTNAME}>
 			VERBATIM)
 	endif()
 endmacro()
