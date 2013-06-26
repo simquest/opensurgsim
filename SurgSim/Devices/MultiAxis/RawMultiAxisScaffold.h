@@ -141,6 +141,14 @@ private:
 	/// \return The FileDescriptor wrapper for the device.
 	FileDescriptor openDevice(const std::string& path);
 
+	/// Checks if the specified device has all six absolute translation/rotation coordinate axes.
+	/// \param fileDescriptor The FileDescriptor wrapper for the device.
+	bool deviceHasSixAbsoluteAxes(const FileDescriptor& fileDescriptor);
+
+	/// Checks if the specified device has all six relative translation/rotation coordinate axes.
+	/// \param fileDescriptor The FileDescriptor wrapper for the device.
+	bool deviceHasSixRelativeAxes(const FileDescriptor& fileDescriptor);
+
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 

@@ -34,6 +34,7 @@
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
 #include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
+#include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
@@ -626,7 +627,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 			continue;
 		}
 
-		if (reportedId.vendor != 0x046d)
+		if (! deviceHasSixAbsoluteAxes(fd) && ! deviceHasSixRelativeAxes(fd))
 		{
 			continue;
 		}
@@ -695,6 +696,79 @@ bool RawMultiAxisScaffold::destroyPerDeviceThread(DeviceData* data)
 
 	return true;
 }
+
+bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDescriptor)
+{
+	BitSetBuffer<ABS_CNT> buffer;
+	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_ABS)): " << errno << ", " <<
+			getSystemErrorText(errno);
+		return false;
+	}
+
+	if (! buffer.test(ABS_X) || ! buffer.test(ABS_Y) || ! buffer.test(ABS_Z) ||
+		! buffer.test(ABS_RX) || ! buffer.test(ABS_RY) || ! buffer.test(ABS_RZ))
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: does not have the 6 absolute axes.";
+		return false;
+	}
+
+	int numIgnoredAxes = 0;
+	for (size_t i = 0;  i < ABS_CNT;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			if ((i != ABS_X) && (i != ABS_Y) && (i != ABS_Z) && (i != ABS_RX) && (i != ABS_RY) && (i != ABS_RZ))
+			{
+				++numIgnoredAxes;
+			}
+		}
+	}
+	if (numIgnoredAxes)
+	{
+		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional absolute axes.";
+	}
+
+	return true;
+}
+
+bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDescriptor)
+{
+	BitSetBuffer<REL_CNT> buffer;
+	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_REL)): " << errno << ", " <<
+			getSystemErrorText(errno);
+		return false;
+	}
+
+	if (! buffer.test(REL_X) || ! buffer.test(REL_Y) || ! buffer.test(REL_Z) ||
+		! buffer.test(REL_RX) || ! buffer.test(REL_RY) || ! buffer.test(REL_RZ))
+	{
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: does not have the 6 relative axes.";
+		return false;
+	}
+
+	int numIgnoredAxes = 0;
+	for (size_t i = 0;  i < REL_CNT;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			if ((i != REL_X) && (i != REL_Y) && (i != REL_Z) && (i != REL_RX) && (i != REL_RY) && (i != REL_RZ))
+			{
+				++numIgnoredAxes;
+			}
+		}
+	}
+	if (numIgnoredAxes)
+	{
+		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional relative axes.";
+	}
+
+	return true;
+}
+
 
 SurgSim::DataStructures::DataGroup RawMultiAxisScaffold::buildDeviceInputData()
 {
