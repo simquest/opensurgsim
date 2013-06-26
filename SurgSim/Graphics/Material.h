@@ -63,6 +63,9 @@ public:
 	/// Gets the shader used by this material
 	/// \return	Shader program
 	virtual std::shared_ptr<Shader> getShader() const = 0;
+
+	/// Removes the shader from the material, falling back to fixed-function pipeline
+	virtual void clearShader() = 0;
 };
 
 };  // namespace Graphics
