@@ -26,8 +26,11 @@
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgPlaneRepresentation.h>
+#include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
+#include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Physics/PhysicsManager.h>
@@ -43,8 +46,12 @@
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Framework::SceneElement;
+using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
+using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
+using SurgSim::Graphics::OsgUniform;
+using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
@@ -104,6 +111,22 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation = std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 	graphicsRepresentation->setInitialPose(pose);
 
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+
+	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
+	uniform->set(Vector4f(1.0f, 0.5f, 0.0f, 1.0f));
+	material->addUniform(uniform);
+
+	shader->setFragmentShaderSource(
+		"uniform vec4 color;\n"
+		"void main(void)\n"
+		"{\n"
+		"	gl_FragColor = color;\n"
+		"}");
+	material->setShader(shader);
+	graphicsRepresentation->setMaterial(material);
+
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
@@ -129,6 +152,26 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation = std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(0.1);
 	graphicsRepresentation->setInitialPose(pose);
+
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+
+	shader->setVertexShaderSource(
+		"varying vec4 color;\n"
+		"void main(void)\n"
+		"{\n"
+		"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+		"	color.rgb = gl_Normal;\n"
+		"	color.a = 1.0;\n"
+		"}");
+	shader->setFragmentShaderSource(
+		"varying vec4 color;\n"
+		"void main(void)\n"
+		"{\n"
+		"	gl_FragColor = color;\n"
+		"}");
+	material->setShader(shader);
+	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
