@@ -66,6 +66,12 @@ bool OsgPlaneRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Mate
 	return didSucceed;
 }
 
+void OsgPlaneRepresentation::clearMaterial()
+{
+	m_transform->setStateSet(new osg::StateSet()); // Reset to empty state set
+	Representation::setMaterial(nullptr);
+}
+
 void OsgPlaneRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	m_pose = transform;
