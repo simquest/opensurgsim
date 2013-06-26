@@ -1,6 +1,6 @@
 varying vec4 vertColor;
 
-/// Outputs the normal direction as the vertex color
+/// Outputs the local normal direction as the vertex color
 void main(void)
 {
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;

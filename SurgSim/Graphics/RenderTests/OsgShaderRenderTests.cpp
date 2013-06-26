@@ -72,6 +72,8 @@ std::shared_ptr<Shader> loadExampleShader()
 	return shader;
 }
 
+/// Pops up a window with a sphere colored by its normals and its mirror along the x-axis is also drawn using the
+/// geometry shader
 TEST(OsgShaderRenderTests, SphereShaderTest)
 {
 	ASSERT_TRUE(boost::filesystem::exists("Data"));

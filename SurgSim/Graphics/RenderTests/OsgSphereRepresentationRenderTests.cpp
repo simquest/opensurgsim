@@ -43,7 +43,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-
+/// Pops up a window with two spheres that are translating and changing radius
 TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 {
 	/// Initial sphere 1 position

@@ -44,6 +44,7 @@ namespace SurgSim
 namespace Graphics
 {
 
+/// Pops up a window with two planes that are translating and rotating
 TEST(OsgPlaneRepresentationRenderTests, MovingPlanesTest)
 {
 	/// Initial plane 1 position
