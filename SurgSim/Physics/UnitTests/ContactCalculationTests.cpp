@@ -59,13 +59,13 @@ namespace Physics
 
 
 	namespace {
-		std::shared_ptr<RigidShape> shape0 = std::make_shared<SphereShape>(1.0);
-		std::shared_ptr<RigidShape> shape1 = std::make_shared<SphereShape>(1.0);
+		std::shared_ptr<RigidShape> sphereShape = std::make_shared<SphereShape>(1.0);
+		std::shared_ptr<RigidShape> planeShape = std::make_shared<PlaneShape>();
 
 		std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<RigidShapeCollisionRepresentation>
-			(shape0, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
+			(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
 		std::shared_ptr<CollisionRepresentation> rep1 = std::make_shared<RigidShapeCollisionRepresentation>
-			(shape1, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
+			(sphereShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
 
 		std::shared_ptr<CollisionPair> pair01 = std::make_shared<CollisionPair>(rep0, rep1);
 	}
@@ -212,6 +212,27 @@ TEST(ContactCalculationTests, SperePlaneCalculation)
 	}
 }
 
+TEST(ContactCalculationTests, PlaneSphereShouldFail)
+{
+	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<RigidShapeCollisionRepresentation>
+		(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
+	std::shared_ptr<CollisionRepresentation> repp0 = std::make_shared<RigidShapeCollisionRepresentation>
+		(planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
+	std::shared_ptr<CollisionRepresentation> reps1 = std::make_shared<RigidShapeCollisionRepresentation>
+		(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
+	std::shared_ptr<CollisionRepresentation> repp1 = std::make_shared<RigidShapeCollisionRepresentation>
+		(planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
+
+	std::shared_ptr<CollisionPair> pairps = std::make_shared<CollisionPair>(repp0, reps0);
+	std::shared_ptr<CollisionPair> pairpp = std::make_shared<CollisionPair>(repp0, repp1);
+	std::shared_ptr<CollisionPair> pairss = std::make_shared<CollisionPair>(reps0, reps1);
+
+	SpherePlaneDcdContact contact(false);
+
+	EXPECT_ANY_THROW(contact.calculateContact(pairps));
+	EXPECT_ANY_THROW(contact.calculateContact(pairpp));
+	EXPECT_ANY_THROW(contact.calculateContact(pairss));
+}
 
 
 }; // Physics
