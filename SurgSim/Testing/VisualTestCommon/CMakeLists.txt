@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,22 +14,33 @@
 # limitations under the License.
 
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
-include_directories(
-	"${Boost_INCLUDE_DIR}"
+link_directories(
+	${Boost_LIBRARY_DIRS}
 )
 
-add_subdirectory(Blocks)
-# add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Physics)
-add_subdirectory(Testing)
+include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+	"${Boost_INCLUDE_DIR}"
+	"${GLUT_INCLUDE_DIR}"
+)
 
-surgsim_cpplint_this_tree(cpplintSurgSim)
+set(VISUAL_TEST_COMMON_SOURCES
+	GlutRenderer.cpp
+	MovingSquareForce.cpp
+	MovingSquareGlutWindow.cpp
+	ToolSquareTest.cpp
+)
+
+set(VISUAL_TEST_COMMON_HEADERS
+	GlutRenderer.h
+	MovingSquareForce.h
+	MovingSquareGlutWindow.h
+	ToolSquareTest.h
+)
+
+# The headers etc. for this do not need to be shipped, so do NOT use
+# surgsim_add_library here.
+add_library(VisualTestCommon
+	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})

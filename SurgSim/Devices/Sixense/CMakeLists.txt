@@ -41,4 +41,8 @@ set(SIXENSE_DEVICE_HEADERS
 add_library(SixenseDevice ${SIXENSE_DEVICE_SOURCES} ${SIXENSE_DEVICE_HEADERS})
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+
+	if(GLUT_FOUND)
+		add_subdirectory(VisualTest)
+	endif(GLUT_FOUND)
 endif()
