@@ -36,6 +36,7 @@ namespace Math
 ///   (the constraint is non-binding, and therefore there is no force); or
 /// * \f$(\mathbf{A}x+b)_i = \mathbf{A}_{i,*}\cdot x+b_i = 0\f$ <b>and</b> \f$x_i \ge 0\f$
 ///   (the constraint is binding, and therefore there is a positive force to enforce the constraint)
+///
 /// Solving the problem produces the vector \f$x\f$, from which \f$c\f$ can also be computed if needed.
 ///
 /// A mixed LCP problem is defined in the same way, except that for a certain subset of indices, the conditions are
@@ -44,7 +45,14 @@ namespace Math
 /// \f$x_i \ge 0\f$.  These are referred to as <i>bilateral</i> constraints, as opposed to the <i>unilateral</i>
 /// constraints that behave as they do in the LCP problem.
 ///
-// TODO(advornik): Describe why friction is special!!!
+/// Friction is integrated directly into the problem, using the general approach described e.g. in:<br/>
+/// Duriez, Christian; Dubois, F.; Kheddar, A.; Andriot, C., "Realistic haptic rendering of interacting
+/// deformable objects in virtual environments," <i>IEEE Transactions on Visualization and Computer %Graphics,</i>
+/// vol.12, no.1, pp.36,47, Jan.-Feb. 2006.
+///
+/// \sa SurgSim::Physics::MlcpPhysicsProblem, MlcpSolution, MlcpSolver
+//
+// TODO(advornik): Describe the approach to friction in more detail.
 // TODO(advornik): Get rid of the constraint types and encode necessary info in other ways.
 struct MlcpProblem
 {
@@ -68,11 +76,15 @@ struct MlcpProblem
 	// but I haven't yet tested that this works correctly on VS 2010, so I'm just putting in the comment.
 	// We may also want to add move construction and move assignment.  --advornik 2013-06-24
 
+	/// Gets the size of the system.
+	/// \return the number of degrees of freedom of the system.
 	int getSize() const
 	{
 		return b.rows();
 	}
 
+	/// Checks if the sizes of various elements of the system are consistent with each other.
+	/// \return true if consistent, false otherwise.
 	bool isConsistent() const
 	{
 		int numConstraintTypes = constraintTypes.size();
