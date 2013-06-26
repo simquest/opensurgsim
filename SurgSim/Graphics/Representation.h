@@ -37,10 +37,7 @@ class Representation : public SurgSim::Framework::Representation
 public:
 	/// Constructor
 	/// \param	name	Name of the representation
-	explicit Representation(const std::string& name) : SurgSim::Framework::Representation(name),
-		m_initialPose(SurgSim::Math::RigidTransform3d::Identity())
-	{
-	}
+	explicit Representation(const std::string& name);
 
 	/// Sets whether the representation is currently visible
 	/// \param	visible	True for visible, false for invisible
@@ -53,11 +50,7 @@ public:
 	/// Set the initial pose of the representation
 	/// \param	pose	The initial pose
 	/// \note	This will reset initial, current, and final poses all to the new initial pose.
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_initialPose = pose;
-		setPose(m_initialPose);
-	}
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Get the initial pose of the representation
 	/// \return	The initial pose
@@ -69,17 +62,17 @@ public:
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
-	virtual bool setMaterial(std::shared_ptr<Material> material)
-	{
-		m_material = material;
-		return true;
-	}
+	virtual bool setMaterial(std::shared_ptr<Material> material);
+
 	/// Gets the material that defines the visual appearance of the representation
 	/// \return	Graphics material
 	std::shared_ptr<Material> getMaterial() const
 	{
 		return m_material;
 	}
+
+	/// Removes the material from the representation
+	virtual void clearMaterial();
 
 	/// Updates the representation
 	/// \param	dt	The time in seconds of the preceding timestep.

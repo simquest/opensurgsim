@@ -35,6 +35,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgUniformBase.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	Representation.cpp
 	ViewElement.cpp
 )
 
