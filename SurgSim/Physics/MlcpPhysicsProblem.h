@@ -23,17 +23,25 @@ namespace SurgSim
 namespace Physics
 {
 
-/// A description of a physics MLCP (mixed linear complementarity problem, or mixed LCP) system to be solved.
+/// A description of a physical mixed LCP system to be solved.
 ///
-/// It extends the typical mathematrical MLCP problem by storing intermediate matrices:
-/// H(c x n) The constraints matrix containing c rows of constraints and n columns of global dof
-/// CHt (n x c) The mapping matrix from forces (in constraint space) to displacement (in global dof space)
-/// Note that with these notation, A in MlcpProblem is H.CHt
+
+/// This extends \ref SurgSim::Math::MlcpProblem "the pure mathematical MLCP problem" by storing the intermediate
+/// matrices \ref H and \ref CHt that are necessary to physically interpret the solution.
+///
+/// Note that the matrix \f$\mathbf{A}\f$ used in the MlcpProblem is computed in the physical problem as
+/// \f$\mathbf{H\;C\;H^T}\f$.
+///
+/// \sa SurgSim::Math::MlcpProblem
 struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 {
-	/// Matrix \f$\mathbf{H}\f$ used to describe the constraint wrt dof
+	/// The matrix \f$\mathbf{H}\f$, which is a constraints matrix of size\f$c\times n\f$ that is used to describe
+	/// the correspondence between the \f$c\f$ constraints being applied to the system, and the \f$n\f$ total
+	/// system degrees of freedom.
 	Eigen::MatrixXd H;
-	/// Matrix \f$\mathbf{C.H^t}\f$ used to map forces (constraint space) to displacement (dof space)
+
+	/// The matrix \f$\mathbf{C\;H^T}\f$, which is a matrix of size \f$n\times c\f$ that is used to convert the
+	/// vector of \f$c\f$ constraint forces to the \f$n\f$ displacements of each degree of freedom of the system.
 	Eigen::MatrixXd CHt;
 };
 

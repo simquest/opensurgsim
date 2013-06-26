@@ -23,15 +23,17 @@ namespace SurgSim
 namespace Physics
 {
 
-/// The description of a solution to a physics MLCP problem.
+/// The description of a solution to a \ref MlcpPhysicsProblem "physical MLCP problem".
 ///
-/// The solution consists of a general MLCP math solution and
-/// the vector \f$dofCorrection\f$ containing correction displacement for all dof.
+/// The solution consists of a \ref SurgSim::Math::MlcpSolution "mathematical solution for the MLCP" and
+/// the vector \ref dofCorrection containing the displacements (corrections) for each degree of freedom
+/// present in the system.
 ///
-/// \sa MlcpSolution, MlcpPhysicsProblem, MlcpSolver
+/// \sa SurgSim::Math::MlcpSolution, MlcpPhysicsProblem, SurgSim::Math::MlcpSolver
 
 struct MlcpPhysicsSolution: public SurgSim::Math::MlcpSolution
 {
+	/// Corrections to all of the degrees of freedom needed to satisfy the system equations.
 	Eigen::VectorXd dofCorrection;
 };
 

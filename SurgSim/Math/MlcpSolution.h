@@ -23,23 +23,30 @@ namespace SurgSim
 namespace Math
 {
 
-/// The description of a solution to an MLCP problem.
+/// The description of a solution to an \ref MlcpProblem "mixed linear complementarity problem".
 ///
 /// The solution consists of the vector \f$x\f$ and various diagnostic parameers.
-/// If \f$c\f$ is also needed, it can be computed by the caller.
+/// If \f$c = \mathbf{A}x + b\f$ is also needed, it can be computed by the caller.
 ///
 /// \sa MlcpProblem, MlcpSolver
-
 struct MlcpSolution
 {
+	/// Vector \f$x\f$ specifying a solution to the specified mixed LCP problem.
 	Eigen::VectorXd x;
 
+	/// The number of informations performed.
 	int numIterations;
+	/// True if the final value of the convergence criteria is valid.
 	bool validConvergence;
+	/// True if the final solution satisfies the Signorini conditions.
 	bool validSignorini;
+	/// The final value of the convergence criteria.
 	double convergenceCriteria;
+	/// The initial value of the convergence criteria, before the solver has done anything.
 	double initialConvergenceCriteria;
+	/// The final value of the convergence criteria for each of the constraint types.
 	double constraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
+	/// The initial value of the convergence criteria for each of the constraint types.
 	double initialConstraintConvergenceCriteria[MLCP_NUM_CONSTRAINT_TYPES];
 
 	// NB: We let the compiler generate the default code for the constructor, copy constructor and copy assignment,
