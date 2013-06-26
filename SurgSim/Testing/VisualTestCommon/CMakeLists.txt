@@ -14,35 +14,33 @@
 # limitations under the License.
 
 
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+link_directories(
+	${Boost_LIBRARY_DIRS}
+)
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
-	"${SIXENSE_SDK_INCLUDE_DIR}"
+	"${GLUT_INCLUDE_DIR}"
 )
 
-set(SIXENSE_DEVICE_SOURCES
-	SixenseDevice.cpp
-	SixenseScaffold.cpp
-	SixenseThread.cpp
+set(VISUAL_TEST_COMMON_SOURCES
+	GlutRenderer.cpp
+	MovingSquareForce.cpp
+	MovingSquareGlutWindow.cpp
+	ToolSquareTest.cpp
 )
 
-set(SIXENSE_DEVICE_HEADERS
-	SixenseDevice.h
-	SixenseScaffold.h
-	SixenseThread.h
+set(VISUAL_TEST_COMMON_HEADERS
+	GlutRenderer.h
+	MovingSquareForce.h
+	MovingSquareGlutWindow.h
+	ToolSquareTest.h
 )
 
-add_library(SixenseDevice ${SIXENSE_DEVICE_SOURCES} ${SIXENSE_DEVICE_HEADERS})
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-
-	if(GLUT_FOUND)
-		add_subdirectory(VisualTest)
-	endif(GLUT_FOUND)
-endif()
+# The headers etc. for this do not need to be shipped, so do NOT use
+# surgsim_add_library here.
+add_library(VisualTestCommon
+	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})

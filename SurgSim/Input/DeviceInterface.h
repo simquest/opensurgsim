@@ -47,6 +47,12 @@ public:
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const = 0;
 
+	/// Fully initialize the device.
+	///
+	/// When the manager object creates the device, the internal state of the device usually isn't fully
+	/// initialized yet.  This method performs any needed initialization.
+	virtual bool initialize() = 0;
+
 	/// Adds an input consumer that will be notified when the application input state is updated.
 	///
 	/// \param inputConsumer The input consumer to be added.
@@ -73,12 +79,6 @@ public:
 	virtual bool hasOutputProducer() = 0;
 
 protected:
-	/// Fully initialize the device.
-	///
-	/// When the manager object creates the device, the internal state of the device usually isn't fully
-	/// initialized yet.  This method performs any needed initialization.
-	virtual bool initialize() = 0;
-
 	/// Finalize (de-initialize) the device.
 	virtual bool finalize() = 0;
 };
