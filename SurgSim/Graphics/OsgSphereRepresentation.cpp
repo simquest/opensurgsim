@@ -15,6 +15,7 @@
 
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
+#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 #include <SurgSim/Graphics/OsgUnitSphere.h>
 
@@ -61,6 +62,19 @@ double OsgSphereRepresentation::getRadius() const
 	SURGSIM_ASSERT(m_transform->getScale().x() == m_transform->getScale().y() &&
 		m_transform->getScale().x() == m_transform->getScale().z()) << "Sphere should be scaled equally in all directions!";
 	return m_transform->getScale().x();
+}
+
+bool OsgSphereRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+{
+	bool didSucceed = false;
+
+	std::shared_ptr<OsgMaterial> osgMaterial = std::dynamic_pointer_cast<OsgMaterial>(material);
+	if (osgMaterial && Representation::setMaterial(material))
+	{
+		m_transform->setStateSet(osgMaterial->getOsgStateSet());
+		didSucceed = true;
+	}
+	return didSucceed;
 }
 
 void OsgSphereRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)

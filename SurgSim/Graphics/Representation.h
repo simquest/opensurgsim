@@ -61,9 +61,24 @@ public:
 
 	/// Get the initial pose of the representation
 	/// \return	The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	const SurgSim::Math::RigidTransform3d& getInitialPose() const
 	{
 		return m_initialPose;
+	}
+
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<Material> material)
+	{
+		m_material = material;
+		return true;
+	}
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	std::shared_ptr<Material> getMaterial() const
+	{
+		return m_material;
 	}
 
 	/// Updates the representation
@@ -74,6 +89,9 @@ private:
 
 	/// Initial pose of the representation
 	SurgSim::Math::RigidTransform3d m_initialPose;
+
+	/// Material that defines the visual appearance of the representation
+	std::shared_ptr<Material> m_material;
 };
 
 };  // namespace Graphics

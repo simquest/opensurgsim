@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
-#define SURGSIM_GRAPHICS_UNIFORMBASE_H
+#ifndef SURGSIM_GRAPHICS_SHADERBASE_H
+#define SURGSIM_GRAPHICS_SHADERBASE_H
 
 namespace SurgSim
 {
@@ -22,20 +22,18 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// Common base class for all graphics uniforms.
+/// Base class that defines the interface for graphics shaders.
 ///
-/// Graphics uniforms act as parameters to shader programs.
-/// \note
-/// SurgSim::Graphics::Uniform is templated on the type of value, so this base class allows a pointer to any type
-/// of Uniform.
-class UniformBase
+/// Shaders are the programs executed on the GPU to render the scene geometry.
+/// \todo	Define interface for loading the geometry/vertex/fragment shaders from files/strings.
+class Shader
 {
 public:
 	/// Destructor
-	virtual ~UniformBase() = 0;
+	virtual ~Shader() = 0;
 };
 
-inline UniformBase::~UniformBase()
+inline Shader::~Shader()
 {
 }
 
@@ -43,4 +41,4 @@ inline UniformBase::~UniformBase()
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_UNIFORMBASE_H
+#endif  // SURGSIM_GRAPHICS_SHADERBASE_H

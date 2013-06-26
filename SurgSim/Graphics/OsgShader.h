@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGUNIFORMBASE_H
-#define SURGSIM_GRAPHICS_OSGUNIFORMBASE_H
+#ifndef SURGSIM_GRAPHICS_OSGSHADER_H
+#define SURGSIM_GRAPHICS_OSGSHADER_H
 
-#include <SurgSim/Graphics/Uniform.h>
+#include <SurgSim/Graphics/Shader.h>
 
+#include <osg/Program>
 #include <osg/StateSet>
-#include <osg/Uniform>
 
 namespace SurgSim
 {
@@ -27,22 +27,19 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// Base OSG implementation of graphics uniforms.
+/// OSG-based implementation of a graphics shader.
 ///
-/// Wraps an osg::Uniform.
-/// \note
-/// SurgSim::Graphics::OsgUniform is templated on the type of value, so this base class allows a pointer to any type of
-/// OSG Uniform.
-class OsgUniformBase : public virtual UniformBase
+/// Wraps an osg::Program which manages the geometry, vertex, and fragment shaders.
+/// The osg::Program is added to the osg::StateSet of an osg::Node to use the shaders for the rendering of that
+/// node's geometry.
+/// \todo	Implement loading of the geometry/vertex/fragment shaders from files/strings.
+class OsgShader : public Shader
 {
 public:
-	/// Returns the name used in shader code to access this uniform
-	const std::string& getName() const
-	{
-		return m_uniform->getName();
-	}
+	/// Constructor
+	OsgShader();
 
-	/// Adds this uniform to the OSG state set
+	/// Adds this shader to the OSG state set
 	/// \param	stateSet	OSG state set
 	virtual void addToStateSet(osg::StateSet* stateSet);
 
@@ -50,23 +47,19 @@ public:
 	/// \param	stateSet	OSG state set
 	virtual void removeFromStateSet(osg::StateSet* stateSet);
 
-	/// Returns the OSG uniform node
-	osg::ref_ptr<osg::Uniform> getOsgUniform() const
+	/// Returns the OSG program attribute
+	osg::ref_ptr<osg::Program> getOsgProgram() const
 	{
-		return m_uniform;
+		return m_program;
 	}
 
-protected:
-	/// Constructor
-	/// \param	name	Name used in shader code to access this uniform
-	explicit OsgUniformBase(const std::string& name);
-
-	/// OSG uniform node
-	osg::ref_ptr<osg::Uniform> m_uniform;
+private:
+	/// OSG program attribute
+	osg::ref_ptr<osg::Program> m_program;
 };
 
 };  // namespace Graphics
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OSGUNIFORMBASE_H
+#endif  // SURGSIM_GRAPHICS_OSGSHADER_H
