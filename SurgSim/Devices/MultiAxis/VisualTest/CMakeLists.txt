@@ -14,35 +14,35 @@
 # limitations under the License.
 
 
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+link_directories(
+	${Boost_LIBRARY_DIRS}
+)
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
-	"${SIXENSE_SDK_INCLUDE_DIR}"
+	"${GLUT_INCLUDE_DIR}"
 )
 
-set(SIXENSE_DEVICE_SOURCES
-	SixenseDevice.cpp
-	SixenseScaffold.cpp
-	SixenseThread.cpp
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	# The standard FindGLUT code in CMake 2.8 includes some annoying old
+	# junk (-lXmu -lXi) in GLUT_LIBRARIES for Unix/Linux, which is
+	# neither needed nor usually available.  We only need GLUT itself.
+	set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+
+set(RAW_EXAMPLE_SOURCES
+	raw_test_main.cpp
 )
 
-set(SIXENSE_DEVICE_HEADERS
-	SixenseDevice.h
-	SixenseScaffold.h
-	SixenseThread.h
+set(RAW_EXAMPLE_HEADERS
 )
 
-add_library(SixenseDevice ${SIXENSE_DEVICE_SOURCES} ${SIXENSE_DEVICE_HEADERS})
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-
-	if(GLUT_FOUND)
-		add_subdirectory(VisualTest)
-	endif(GLUT_FOUND)
-endif()
+add_executable(RawMultiAxisVisualTest
+	${RAW_EXAMPLE_SOURCES} ${RAW_EXAMPLE_HEADERS})
+target_link_libraries(RawMultiAxisVisualTest
+	${LIBS} MultiAxisDevice IdentityPoseDevice VisualTestCommon
+	SurgSimInput SurgSimFramework SurgSimDataStructures
+	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
