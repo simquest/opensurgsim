@@ -78,4 +78,4 @@ typename SharedInstance<T>::InstanceCreator SharedInstance<T>::defaultInstanceCr
 };  // namespace Framework
 };  // namespace SurgSim
 
-#endif  // SURGSIM_FRAMEWORK_SHAREDINSTANCE_H
+#endif  // SURGSIM_FRAMEWORK_SHAREDINSTANCE_INL_H

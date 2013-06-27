@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_SHADERBASE_H
-#define SURGSIM_GRAPHICS_SHADERBASE_H
+#ifndef SURGSIM_GRAPHICS_SHADER_H
+#define SURGSIM_GRAPHICS_SHADER_H
 
 namespace SurgSim
 {
@@ -41,4 +41,4 @@ inline Shader::~Shader()
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_SHADERBASE_H
+#endif  // SURGSIM_GRAPHICS_SHADER_H

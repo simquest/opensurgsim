@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TOOLSQUARETEST_H
-#define TOOLSQUARETEST_H
+#ifndef SURGSIM_TESTING_VISUALTESTCOMMON_TOOLSQUARETEST_H
+#define SURGSIM_TESTING_VISUALTESTCOMMON_TOOLSQUARETEST_H
 
 #include <memory>
 #include <SurgSim/Input/DeviceInterface.h>
@@ -23,4 +23,4 @@ void runToolSquareTest(std::shared_ptr<SurgSim::Input::DeviceInterface> toolDevi
 					   std::shared_ptr<SurgSim::Input::DeviceInterface> squareDevice,
 					   const char* testDescriptionMessage);
 
-#endif // TOOLSQUARETEST_H
+#endif  // SURGSIM_TESTING_VISUALTESTCOMMON_TOOLSQUARETEST_H

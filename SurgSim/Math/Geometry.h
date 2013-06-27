@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GEOMETRY_H
-#define SURGSIM_GEOMETRY_H
+#ifndef SURGSIM_MATH_GEOMETRY_H
+#define SURGSIM_MATH_GEOMETRY_H
 
 #include <SurgSim/Math/Vector.h>
 #include <Eigen/Core>

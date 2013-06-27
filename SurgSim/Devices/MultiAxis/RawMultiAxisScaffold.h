@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_RAWMULTIAXISSCAFFOLD_H
-#define SURGSIM_DEVICE_RAWMULTIAXISSCAFFOLD_H
+#ifndef SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISSCAFFOLD_H
+#define SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISSCAFFOLD_H
 
 #include <memory>
 #include <vector>
@@ -171,4 +171,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif // SURGSIM_DEVICE_RAWMULTIAXISSCAFFOLD_H
+#endif  // SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISSCAFFOLD_H

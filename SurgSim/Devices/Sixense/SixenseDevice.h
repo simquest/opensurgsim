@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_SIXENSEDEVICE_H
-#define SURGSIM_DEVICE_SIXENSEDEVICE_H
+#ifndef SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H
+#define SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H
 
 #include <memory>
 #include <string>
@@ -76,4 +76,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif // SURGSIM_DEVICE_SIXENSEDEVICE_H
+#endif  // SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H

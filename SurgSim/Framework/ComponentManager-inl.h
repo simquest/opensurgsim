@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_COMPONENTMANAGER_INL_H
-#define SURGSIM_PHYSICS_COMPONENTMANAGER_INL_H
+#ifndef SURGSIM_FRAMEWORK_COMPONENTMANAGER_INL_H
+#define SURGSIM_FRAMEWORK_COMPONENTMANAGER_INL_H
 
 /// Executes the add component operation.
 /// \tparam	T	Type of the component to be added.
