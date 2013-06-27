@@ -27,8 +27,8 @@ using SurgSim::Graphics::OsgUnitBox;
 
 OsgBoxRepresentation::OsgBoxRepresentation(const std::string& name) : Representation(name), BoxRepresentation(name),
 	OsgRepresentation(name, new osg::Switch()),
-	m_sharedUnitBox(getSharedUnitBox()),
-	m_scale(1.0, 1.0, 1.0)
+	m_scale(1.0, 1.0, 1.0),
+	m_sharedUnitBox(getSharedUnitBox())
 {
 	m_switch = static_cast<osg::Switch*>(getOsgNode().get());
 	m_switch->setName(name + " Switch");
@@ -53,52 +53,36 @@ bool OsgBoxRepresentation::isVisible() const
 	return m_switch->getChildValue(m_transform);
 }
 
-/// Sets the size along X-axis of the box
-/// \param sizeX Size along X-axis of the box
 void OsgBoxRepresentation::setSizeX(double sizeX)
 {
 	m_scale.x() = sizeX;
 	m_transform->setScale(m_scale);
 }
-/// Returns the size along X-axis of the box
-/// \return Size along X-axis of the box
 double OsgBoxRepresentation::getSizeX() const
 {
 	return m_scale.x();
 }
 
-/// Sets the size along Y-axis of the box
-/// \param sizeY Size along Y-axis of the box
 void OsgBoxRepresentation::setSizeY(double sizeY)
 {
 	m_scale.y() = sizeY;
 	m_transform->setScale(m_scale);
 }
-/// Returns the size along Y-axis of the box
-/// \return Size along Y-axis of the box
 double OsgBoxRepresentation::getSizeY() const
 {
 	return m_scale.y();
 }
 
-/// Sets the size along Z-axis of the box
-/// \param sizeZ Size along Z-axis of the box
 void OsgBoxRepresentation::setSizeZ(double sizeZ)
 {
 	m_scale.z() = sizeZ;
 	m_transform->setScale(m_scale);
 }
-/// Returns the size along Z-axis of the box
-/// \return Size along Z-axis of the box
 double OsgBoxRepresentation::getSizeZ() const
 {
 	return m_scale.z();
 }
 
-/// Sets the size of the box
-/// \param sizeX Size along X-axis of the box
-/// \param sizeY Size along Y-axis of the box
-/// \param sizeZ Size along Z-axis of the box
 void OsgBoxRepresentation::setSize(double sizeX, double sizeY, double sizeZ)
 {
 	m_scale.x() = sizeX;
@@ -106,10 +90,6 @@ void OsgBoxRepresentation::setSize(double sizeX, double sizeY, double sizeZ)
 	m_scale.z() = sizeZ;
 	m_transform->setScale(m_scale);
 }
-/// Gets the size of the box
-/// \param sizeX Reference to store the size along X-axis of the box
-/// \param sizeY Reference to store the size along Y-axis of the box
-/// \param sizeZ Reference to store the size along Z-axis of the box
 void OsgBoxRepresentation::getSize(double& sizeX, double& sizeY, double& sizeZ)
 {
 	sizeX =	m_scale.x();
@@ -117,15 +97,11 @@ void OsgBoxRepresentation::getSize(double& sizeX, double& sizeY, double& sizeZ)
 	sizeZ = m_scale.z();
 }
 
-/// Sets the size of the box
-/// \param size Size of the box
 void OsgBoxRepresentation::setSize(SurgSim::Math::Vector3d size)
 {
 	m_scale.set(size.x(), size.y(), size.z());
 	m_transform->setScale(m_scale);
 }
-/// Returns the radius of the sphere
-/// \return Size of the box
 SurgSim::Math::Vector3d OsgBoxRepresentation::getSize() const
 {
 	return SurgSim::Math::Vector3d(m_scale._v);
