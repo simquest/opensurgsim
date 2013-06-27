@@ -50,6 +50,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Location.h
 	MeshShape.h
+	MlcpPhysicsProblem.h
+	MlcpPhysicsSolution.h
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PlaneShape.h

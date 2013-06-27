@@ -181,7 +181,7 @@ TEST_F(AssertTest, Callback)
 TEST_F(AssertDeathTest, DebuggerBehaviorAssertFailed)
 {
 	logOutput->reset();
-	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDeath();
 	// The assertion should die with no output to stdout.
 	ASSERT_DEATH_IF_SUPPORTED({SURGSIM_ASSERT(1 == 2) << "extra information would go here";}, "^$");
 }
@@ -189,14 +189,14 @@ TEST_F(AssertDeathTest, DebuggerBehaviorAssertFailed)
 TEST_F(AssertDeathTest, DebuggerBehaviorAssertSucceded)
 {
 	logOutput->reset();
-	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDeath();
 	EXPECT_NO_THROW({SURGSIM_ASSERT(3 == 3) << "extra information would go here";});
 }
 
 TEST_F(AssertDeathTest, DebuggerBehaviorFailure)
 {
 	logOutput->reset();
-	SurgSim::Framework::AssertMessage::setFailureBehaviorToDebugger();
+	SurgSim::Framework::AssertMessage::setFailureBehaviorToDeath();
 	// The assertion should die with no output to stdout.
 	ASSERT_DEATH_IF_SUPPORTED({SURGSIM_FAILURE() << "extra information would go here";}, "^$");
 }

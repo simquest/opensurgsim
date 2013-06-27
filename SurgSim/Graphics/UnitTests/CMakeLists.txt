@@ -28,14 +28,17 @@ set(UNIT_TEST_SOURCES
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
+	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
+	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgUniformTests.cpp
+	OsgUniformBaseTests.cpp
 	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp

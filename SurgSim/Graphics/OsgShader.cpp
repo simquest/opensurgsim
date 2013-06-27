@@ -13,34 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
-#define SURGSIM_GRAPHICS_UNIFORMBASE_H
+#include <SurgSim/Graphics/OsgShader.h>
 
-namespace SurgSim
+using SurgSim::Graphics::OsgShader;
+
+OsgShader::OsgShader() : SurgSim::Graphics::Shader(),
+	m_program(new osg::Program())
 {
 
-namespace Graphics
-{
-
-/// Common base class for all graphics uniforms.
-///
-/// Graphics uniforms act as parameters to shader programs.
-/// \note
-/// SurgSim::Graphics::Uniform is templated on the type of value, so this base class allows a pointer to any type
-/// of Uniform.
-class UniformBase
-{
-public:
-	/// Destructor
-	virtual ~UniformBase() = 0;
-};
-
-inline UniformBase::~UniformBase()
-{
 }
 
-};  // namespace Graphics
+void OsgShader::addToStateSet(osg::StateSet* stateSet)
+{
+	stateSet->setAttributeAndModes(m_program, osg::StateAttribute::ON);
+}
 
-};  // namespace SurgSim
-
-#endif  // SURGSIM_GRAPHICS_UNIFORMBASE_H
+void OsgShader::removeFromStateSet(osg::StateSet* stateSet)
+{
+	stateSet->removeAttribute(m_program);
+}

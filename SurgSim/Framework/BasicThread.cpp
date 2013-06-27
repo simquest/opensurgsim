@@ -37,8 +37,21 @@ BasicThread::BasicThread(const std::string& name) :
 {
 }
 
-BasicThread::~BasicThread()
+#ifdef _MSC_VER
+BasicThread::~BasicThread() throw(...) // Visual Studio does not support noexcept. The throw(...) is optional.
+#else
+BasicThread::~BasicThread() noexcept(false)  /// C++11 introduced noexcept
+#endif
 {
+	// Still need to stop thread to get a clean exit
+	if (m_isRunning || m_thisThread.joinable())
+	{
+		SURGSIM_FAILURE() <<
+			"A BasicThread instance destructor was called while the thread was still running or " <<
+			"in the process of being stopped, this is currently not supported. If this was intentional " <<
+			"call stop() before destruction of the thread. If this is unintentional, make sure to prevent " <<
+			"the destructor from being called.";
+	}
 }
 
 bool BasicThread::isInitialized()
@@ -66,6 +79,9 @@ bool BasicThread::startUp()
 void BasicThread::start(std::shared_ptr<Barrier> startupBarrier)
 {
 	m_startupBarrier = startupBarrier;
+	m_stopExecution = false;
+	m_isRunning = false;
+
 	// Start the thread with a reference to this
 	// prevents making a copy
 	m_thisThread = boost::thread(boost::ref(*this));
@@ -78,8 +94,6 @@ boost::thread& BasicThread::getThread()
 
 void BasicThread::operator()()
 {
-
-	m_stopExecution = false;
 	bool success = executeInitialization();
 	if (! success) return;
 
@@ -87,7 +101,7 @@ void BasicThread::operator()()
 	boost::chrono::steady_clock::time_point start;
 
 	m_isRunning = true;
-	while (m_isRunning && ! m_stopExecution)
+	while (m_isRunning && !m_stopExecution )
 	{
 		// Check for frameTime being > desired update period report error, adjust ...
 		if (m_period > frameTime)
@@ -99,10 +113,7 @@ void BasicThread::operator()()
 		frameTime = boost::chrono::steady_clock::now() - start;
 	}
 
-	if (m_stopExecution)
-	{
-		doBeforeStop();
-	}
+	doBeforeStop();
 
 	m_isRunning = false;
 	m_stopExecution = false;
@@ -162,6 +173,11 @@ bool BasicThread::waitForBarrier(bool success)
 		success = m_startupBarrier->wait(success);
 	}
 	return success;
+}
+
+bool BasicThread::doUpdate(double dt)
+{
+	return true;
 }
 
 void SurgSim::Framework::BasicThread::doBeforeStop()
