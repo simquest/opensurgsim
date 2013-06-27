@@ -17,7 +17,7 @@
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONLOCALIZATION_H
 
 #include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentationBase.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -30,73 +30,44 @@ namespace Physics
 {
 
 /// This class implement the localization on a RigidRepresentation, as a local position
+/// \todo HS-2013-jun-21 There is a slight mismatch in the way the class was written and 
+/// 	  the current use, the constructor needs the correct shared_ptr and that might not
+/// 	  be available, setRepresentation is currently used, but this does not check on the
+/// 	  type of the representation, this needs to be fixed
 class RigidRepresentationLocalization: public Localization
 {
 public:
 	/// Default constructor
-	RigidRepresentationLocalization() :
-	Localization()
-	{
-	}
+	RigidRepresentationLocalization();
 
 	/// Constructor
-	/// \param representation The representation to assign to this localization
-	explicit RigidRepresentationLocalization(std::shared_ptr<Representation> representation) :
-	Localization(representation)
-	{
-		std::shared_ptr<RigidRepresentation> rigidRepresentation = std::dynamic_pointer_cast<RigidRepresentation>(representation);
-		SURGSIM_ASSERT(rigidRepresentation != nullptr) << "Unexpected representation type" << std::endl;
-	}
+	/// \param representation The representation to assign to this localization.
+	explicit RigidRepresentationLocalization(std::shared_ptr<Representation> representation);
 
 	/// Destructor
-	virtual ~RigidRepresentationLocalization()
-	{
-	}
+	virtual ~RigidRepresentationLocalization();
 
-	/// Sets the local position
-	/// \param p The local position to set the localization at
-	void setLocalPosition(const SurgSim::Math::Vector3d& p)
-	{
-		m_position = p;
-	}
+	/// Sets the local position.
+	/// \param p The local position to set the localization at.
+	void setLocalPosition(const SurgSim::Math::Vector3d& p);
 
-	/// Gets the local position
-	/// \return The local position set for this localization
-	const SurgSim::Math::Vector3d& getLocalPosition() const
-	{
-		return m_position;
-	}
+	/// Gets the local position.
+	/// \return The local position set for this localization.
+	const SurgSim::Math::Vector3d& getLocalPosition() const;
+
+	/// Query if 'representation' is valid representation.
+	/// \param	representation	The representation.
+	/// \return	true if valid representation, false if not.
+	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
 private:
-	/// Calculates the global position of this localization
-	/// \param time The time in [0..1] at which the position should be calculated
-	/// \return The global position of the localization at the requested time
-	/// \note time can useful when dealing with CCD
-	SurgSim::Math::Vector3d doCalculatePosition(double time)
-	{
-		std::shared_ptr<RigidRepresentation> rigidRepresentation = std::static_pointer_cast<RigidRepresentation>(getRepresentation());
+	/// Calculates the global position of this localization.
+	/// \param time The time in [0..1] at which the position should be calculated.
+	/// \return The global position of the localization at the requested time.
+	/// \note time can useful when dealing with CCD.
+	SurgSim::Math::Vector3d doCalculatePosition(double time);
 
-		if (time == 0.0)
-		{
-			return rigidRepresentation->getPreviousState().getPose() * m_position;
-		}
-		else if (time == 1.0)
-		{
-			return rigidRepresentation->getCurrentState().getPose() * m_position;
-		}
-		else if (rigidRepresentation->getCurrentState().getPose().isApprox(rigidRepresentation->getPreviousState().getPose()))
-		{
-			return rigidRepresentation->getCurrentState().getPose() * m_position;
-		}
-
-		const SurgSim::Math::RigidTransform3d& currentPose  = rigidRepresentation->getCurrentState().getPose();
-		const SurgSim::Math::RigidTransform3d& previousPose = rigidRepresentation->getPreviousState().getPose();
-		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::interpolate(previousPose, currentPose, time);
-
-		return pose * m_position;
-	}
-
-	/// 3D position in local coordinates
+	/// 3D position in local coordinates.
 	SurgSim::Math::Vector3d m_position;
 };
 

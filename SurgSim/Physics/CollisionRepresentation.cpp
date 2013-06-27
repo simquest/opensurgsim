@@ -13,26 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Localization.h>
+#include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/Representation.h>
 
-using SurgSim::Physics::Localization;
-using SurgSim::Physics::Representation;
+namespace SurgSim
+{
+namespace Physics
+{
 
-Localization::Localization()
+CollisionRepresentation::~CollisionRepresentation()
 {
-}
-Localization::Localization(std::shared_ptr<Representation> representation) :
-m_representation(representation)
-{
-}
 
-Localization::~Localization()
-{
 }
 
-bool SurgSim::Physics::Localization::isValidRepresentation(std::shared_ptr<Representation> representation)
+void CollisionRepresentation::setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation)
 {
-	// Localization base class does not care about the type
-	return true;
+	m_physicsRepresentation = physicsRepresentation;
 }
+
+std::shared_ptr<SurgSim::Physics::Representation> CollisionRepresentation::getPhysicsRepresentation()
+{
+	return m_physicsRepresentation.lock();
+}
+
+}; // Physics
+}; // SurgSim
