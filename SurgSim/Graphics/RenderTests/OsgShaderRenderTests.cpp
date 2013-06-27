@@ -79,6 +79,7 @@ TEST(OsgShaderRenderTests, SphereShaderTest)
 	ASSERT_TRUE(boost::filesystem::exists("Data"));
 
 	/// Enable OSG info notifications to see the shader compilation results
+	osg::NotifySeverity previousNotifyLevel = osg::getNotifyLevel();
 	osg::setNotifyLevel(osg::INFO);
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
@@ -115,6 +116,9 @@ TEST(OsgShaderRenderTests, SphereShaderTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	runtime->stop();
+
+	/// Reset notify level
+	osg::setNotifyLevel(previousNotifyLevel);
 }
 
 };  // namespace Graphics
