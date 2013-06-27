@@ -16,7 +16,12 @@
 #ifndef SURGSIM_DEVICE_FILEDESCRIPTOR_H
 #define SURGSIM_DEVICE_FILEDESCRIPTOR_H
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <string>
+
 #include <SurgSim/Framework/Assert.h>
 
 
