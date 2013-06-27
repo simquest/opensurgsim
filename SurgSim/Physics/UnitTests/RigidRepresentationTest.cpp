@@ -31,7 +31,7 @@ using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Physics
 {
@@ -302,7 +302,7 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 
 	localization = rigidBody->createLocalization(loc1);
 	localization->setRepresentation(rigidBody);
-	
+
 	Vector3d globalPos = rigidBody->getCurrentPose() * loc1.rigidLocalPosition.getValue();
 
 	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(0.0)));

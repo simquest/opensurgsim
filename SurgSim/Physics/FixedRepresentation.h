@@ -51,7 +51,7 @@ public:
 		m_currentState.setPose(pose);
 	}
 
-	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) 
+	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 	{
 		// Do Nothing it is a fixed object
 	}

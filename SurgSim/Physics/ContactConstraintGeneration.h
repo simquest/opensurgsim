@@ -41,7 +41,7 @@ public:
 
 private:
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
+		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state);
 
 	bool makeLocalization(

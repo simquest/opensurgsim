@@ -25,7 +25,7 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -239,4 +239,4 @@ private:
 
 }; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_VTCRIGIDREPRESENTATION_H
+#endif // SURGSIM_PHYSICS_VTCRIGIDREPRESENTATION_H

@@ -73,7 +73,7 @@ public:
 TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 {
 	// Create the rigid body
-	std::shared_ptr<FixedRepresentation> fixedRepresentation = 
+	std::shared_ptr<FixedRepresentation> fixedRepresentation =
 		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	// Activate the rigid body and setup its initial pose

@@ -55,12 +55,11 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 			auto firstContact  = (*pairsIt)->getContacts().front();
 			std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> localizations;
 			auto representations = (*pairsIt)->getRepresentations();
-			bool createConstraint = true;
 			makeLocalization(
 				representations.first,
 				firstContact->penetrationPoints.first,
 				localizations.first);
-			
+
 			if (localizations.first != nullptr)
 			{
 				makeLocalization(
@@ -71,7 +70,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 
 			if (localizations.first != nullptr && localizations.second != nullptr)
 			{
-				// Make Constraint 
+				// Make Constraint
 			}
 		}
 	}
@@ -80,8 +79,8 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 }
 
 bool ContactConstraintGeneration::makeLocalization(
-	const std::shared_ptr<CollisionRepresentation>& representation, 
-	const Location& location, 
+	const std::shared_ptr<CollisionRepresentation>& representation,
+	const Location& location,
 	std::shared_ptr<Localization> localization)
 {
 	bool result = false;
@@ -89,7 +88,7 @@ bool ContactConstraintGeneration::makeLocalization(
 	if (physicsRepresenation != nullptr)
 	{
 		std::shared_ptr<Localization> localization = physicsRepresenation->createLocalization(location);
-		
+
 		// HS 2013-jun-20 this is not quite right, we are passing in the pointer to the representation
 		// that we just asked about, but I don't know if we can use shared_from_this from the inside and
 		// still get the same reference count as with this  shared_ptr

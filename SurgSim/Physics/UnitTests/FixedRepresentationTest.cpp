@@ -74,7 +74,8 @@ TEST_F(FixedRepresentationTest, ConstructorTest)
 TEST_F(FixedRepresentationTest, ResetStateTest)
 {
 	// Create the rigid body
-	std::shared_ptr<FixedRepresentation> fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
+	std::shared_ptr<FixedRepresentation> fixedRepresentation =
+		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	fixedRepresentation->setIsActive(false);
 	fixedRepresentation->setIsGravityEnabled(false);
@@ -126,7 +127,8 @@ TEST_F(FixedRepresentationTest, ResetStateTest)
 TEST_F(FixedRepresentationTest, SetGetAndDefaultValueTest)
 {
 	// Create the fixed representation
-	std::shared_ptr<FixedRepresentation> fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
+	std::shared_ptr<FixedRepresentation> fixedRepresentation =
+		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	// Get/Set active flag [default = true]
 	EXPECT_TRUE(fixedRepresentation->isActive());
@@ -165,7 +167,8 @@ TEST_F(FixedRepresentationTest, SetGetAndDefaultValueTest)
 TEST_F(FixedRepresentationTest, UpdateTest)
 {
 	// Create the fixed representation
-	std::shared_ptr<FixedRepresentation> fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
+	std::shared_ptr<FixedRepresentation> fixedRepresentation =
+		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	double dt = 1.0;
 

@@ -23,11 +23,11 @@ namespace SurgSim
 namespace Physics
 {
 
-Representation::Representation(const std::string& name) : 
-	SurgSim::Framework::Representation(name), 
-	m_gravity(0.0, -9.81, 0.0), 
+Representation::Representation(const std::string& name) :
+	SurgSim::Framework::Representation(name),
+	m_gravity(0.0, -9.81, 0.0),
 	m_numDof(0),
-	m_isGravityEnabled(true), 
+	m_isGravityEnabled(true),
 	m_isActive(true)
 {
 

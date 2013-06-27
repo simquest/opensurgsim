@@ -47,7 +47,7 @@ const SurgSim::Math::Vector3d& RigidRepresentationLocalization::getLocalPosition
 
 SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(double time)
 {
-	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
+	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
 		std::static_pointer_cast<RigidRepresentationBase>(getRepresentation());
 
 	SURGSIM_ASSERT(rigidRepresentation != nullptr) << "RigidRepresentation is null, it was probably not" <<
@@ -61,7 +61,8 @@ SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(dou
 	{
 		return rigidRepresentation->getCurrentState().getPose() * m_position;
 	}
-	else if (rigidRepresentation->getCurrentState().getPose().isApprox(rigidRepresentation->getPreviousState().getPose()))
+	else if (rigidRepresentation->getCurrentState().getPose().
+		isApprox(rigidRepresentation->getPreviousState().getPose()))
 	{
 		return rigidRepresentation->getCurrentState().getPose() * m_position;
 	}
@@ -76,10 +77,10 @@ SurgSim::Math::Vector3d RigidRepresentationLocalization::doCalculatePosition(dou
 bool RigidRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
 
-	std::shared_ptr<RigidRepresentationBase> rigidRepresentation = 
+	std::shared_ptr<RigidRepresentationBase> rigidRepresentation =
 		std::dynamic_pointer_cast<RigidRepresentationBase>(representation);
 
-	// Allows to reset the representation to nullptr ... 
+	// Allows to reset the representation to nullptr ...
 	return (rigidRepresentation != nullptr || representation == nullptr);
 }
 
