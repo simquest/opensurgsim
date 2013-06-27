@@ -33,6 +33,7 @@ import sys
 import subprocess
 import re
 import os
+from fix_header_guards import get_expected_header_guard
 
 STANDARD_WARNING_FORMAT = \
     "{file}:{line}:{col}: {text} [{category}] [{level}]"
@@ -130,35 +131,6 @@ def run_cpplint(script, filter, files):
     emit_error({'file': "run-lint", 'text': "cpplint produced no output!"})
     return False
   return cmd.returncode == 0
-
-HEADER_GUARD_DIRECTORY_PREFIX_CACHE = {}
-
-def get_header_guard_directory_prefix(dir_path):
-  if dir_path not in HEADER_GUARD_DIRECTORY_PREFIX_CACHE:
-    prefix = ""
-    path = dir_path
-    while not (os.path.exists(os.path.join(path, 'LICENSE')) or
-               os.path.exists(os.path.join(path, '.git'))):
-      (parent, dirname) = os.path.split(path)
-      assert parent != path
-      prefix = re.sub(r'\W+', '', dirname).upper() + '_' + prefix
-      path = parent
-    HEADER_GUARD_DIRECTORY_PREFIX_CACHE[dir_path] = prefix
-
-  return HEADER_GUARD_DIRECTORY_PREFIX_CACHE[dir_path]
-
-def get_expected_header_guard(file):
-  (dir_path, filename) = os.path.split(os.path.abspath(file))
-  guard = re.sub(r'\W+', '_', filename).upper()
-
-  while not (os.path.exists(os.path.join(dir_path, 'LICENSE')) or
-             os.path.exists(os.path.join(dir_path, '.git'))):
-    (parent, dirname) = os.path.split(dir_path)
-    assert parent != dir_path
-    guard = re.sub(r'\W+', '', dirname).upper() + '_' + guard
-    dir_path = parent
-
-  return guard
 
 def check_header_guard(flags, file, lines):
   ifndef = filter(lambda x: re.search(r'^\s*#\s*ifndef\b', x[1]), lines)
