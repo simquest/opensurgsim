@@ -56,7 +56,7 @@ bool Computation::isCopyingState()
 std::shared_ptr<PhysicsManagerState> Computation::preparePhysicsState(const std::shared_ptr<PhysicsManagerState>& state)
 {
 	if (m_copyState)
-	{ 
+	{
 		return std::move(std::make_shared<PhysicsManagerState>(*state));
 	}
 	else

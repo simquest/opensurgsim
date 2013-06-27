@@ -63,7 +63,8 @@ TEST_F(RigidRepresentationBaseStateTest, ConstructorTest)
 TEST_F(RigidRepresentationBaseStateTest, DefaultValueTest)
 {
 	/// Create the base rigid representation state
-	std::shared_ptr<RigidRepresentationBaseState> rigidRepresentationBaseState = std::make_shared<RigidRepresentationBaseState>();
+	std::shared_ptr<RigidRepresentationBaseState> rigidRepresentationBaseState =
+		std::make_shared<RigidRepresentationBaseState>();
 
 	/// Pose [default = identity]
 	EXPECT_TRUE(rigidRepresentationBaseState->getPose().isApprox(m_identityTransformation));

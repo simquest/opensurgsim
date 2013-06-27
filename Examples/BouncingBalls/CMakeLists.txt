@@ -39,7 +39,7 @@ set(EXAMPLE_HEADERS
 add_executable(ExampleBouncingBalls
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 
-target_link_libraries(ExampleBouncingBalls 
+target_link_libraries(ExampleBouncingBalls
 	SurgSimFramework
 	SurgSimBlocks
 	SurgSimDataStructures

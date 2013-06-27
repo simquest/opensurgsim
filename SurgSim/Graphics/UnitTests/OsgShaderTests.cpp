@@ -52,7 +52,7 @@ TEST(OsgShaderTests, StateSetTest)
 	/// Remove the shader from the state set
 	shader.removeFromStateSet(stateSet.get());
 
-	EXPECT_EQ(0u, attributes.size()) << 
+	EXPECT_EQ(0u, attributes.size()) <<
 		"State set should no longer have any attributes, the shader program should have been removed!";
 }
 

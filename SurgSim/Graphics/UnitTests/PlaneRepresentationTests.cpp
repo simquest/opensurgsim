@@ -208,7 +208,7 @@ TEST(PlaneRepresentationTests, PoseTest)
 
 TEST(PlaneRepresentationTests, UpdateTest)
 {
-	std::shared_ptr<MockPlaneRepresentation> mockPlaneRepresentation = 
+	std::shared_ptr<MockPlaneRepresentation> mockPlaneRepresentation =
 		std::make_shared<MockPlaneRepresentation>("test name");
 	std::shared_ptr<Representation> representation = mockPlaneRepresentation;
 

@@ -34,7 +34,7 @@ namespace Physics
 /// in the opposite direction) then the penetration depth will be reduced to
 /// zero. This means that the normal vector points "in" to body 1
 struct Contact {
-	Contact(const double& newDepth, 
+	Contact(const double& newDepth,
 			const SurgSim::Math::Vector3d& newContact,
 			const SurgSim::Math::Vector3d& newNormal,
 			const std::pair<Location, Location>& newPenetrationPoints) :

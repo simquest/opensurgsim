@@ -264,7 +264,7 @@ private:
 		didBeforeStop = true;
 	}
 
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) 
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 	{
 		return tryAddComponent(component, &m_components) != nullptr;
 	}

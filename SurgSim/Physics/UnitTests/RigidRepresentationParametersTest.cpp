@@ -77,7 +77,8 @@ TEST_F(RigidRepresentationParametersTest, ConstructorTest)
 TEST_F(RigidRepresentationParametersTest, DefaultValueTest)
 {
 	// Create the base rigid representation state
-	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam = std::make_shared<RigidRepresentationParameters>();
+	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam =
+		std::make_shared<RigidRepresentationParameters>();
 
 	// Mass density [default = 0]
 	EXPECT_EQ(0.0, rigidRepresentationParam->getDensity());
@@ -100,7 +101,8 @@ TEST_F(RigidRepresentationParametersTest, DefaultValueTest)
 TEST_F(RigidRepresentationParametersTest, SetGetTest)
 {
 	// Create the base rigid representation state
-	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam = std::make_shared<RigidRepresentationParameters>();
+	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam =
+		std::make_shared<RigidRepresentationParameters>();
 
 	// isValid
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
@@ -161,7 +163,8 @@ TEST_F(RigidRepresentationParametersTest, SetGetTest)
 TEST_F(RigidRepresentationParametersTest, ShapesTest)
 {
 	// Create the base rigid representation state
-	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam = std::make_shared<RigidRepresentationParameters>();
+	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam =
+		std::make_shared<RigidRepresentationParameters>();
 
 	// RigidShape
 	rigidRepresentationParam->setShapeUsedForMassInertia(m_sphere);
@@ -181,7 +184,8 @@ TEST_F(RigidRepresentationParametersTest, ValidityCheckTest)
 	double qNaN = std::numeric_limits<double>::quiet_NaN();
 
 	// Create the base rigid representation state
-	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam = std::make_shared<RigidRepresentationParameters>();
+	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam =
+		std::make_shared<RigidRepresentationParameters>();
 
 	// Mass invalid (qNaN), inertia invalid (qNaN)
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
@@ -214,7 +218,8 @@ TEST_F(RigidRepresentationParametersTest, ValidityCheckTest)
 TEST_F(RigidRepresentationParametersTest, DensityWithSphereShapeTest)
 {
 	// Create the base rigid representation state
-	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam = std::make_shared<RigidRepresentationParameters>();
+	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam =
+		std::make_shared<RigidRepresentationParameters>();
 
 	// Mass density
 	rigidRepresentationParam->setDensity(m_density);
