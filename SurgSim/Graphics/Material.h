@@ -37,6 +37,8 @@ class Shader;
 class Material
 {
 public:
+	virtual ~Material() = default;
+
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
 	/// \return	True if uniform was added successfully, otherwise false
