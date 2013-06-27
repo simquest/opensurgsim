@@ -18,7 +18,7 @@
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 
-#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/locks.hpp>
 
 namespace SurgSim
 {

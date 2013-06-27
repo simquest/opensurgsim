@@ -73,16 +73,8 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 	std::shared_ptr<CollisionRepresentation> representationPlane;
 	std::shared_ptr<CollisionRepresentation> representationSphere;
 
-	if (! m_switchPair)
-	{
-		representationSphere = pair->getFirst();
-		representationPlane = pair->getSecond();
-	}
-	else
-	{
-		representationSphere = pair->getSecond();
-		representationPlane = pair->getFirst();
-	}
+	representationSphere = pair->getFirst();
+	representationPlane = pair->getSecond();
 
 	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
 		"First Object, wrong type of object" << pair->getFirst()->getShapeType();
@@ -112,12 +104,6 @@ void SpherePlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair
 		std::pair<Location,Location> penetrationPoints;
 		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
 		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * distAbsolute);
-
-		if (m_switchPair)
-		{
-			std::swap(penetrationPoints.first, penetrationPoints.second);
-			normal = -normal;
-		}
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}

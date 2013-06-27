@@ -41,7 +41,7 @@ void AssertMessage::throwException(const std::string& errorMessage)
 	throw AssertionFailure(errorMessage);
 }
 
-void AssertMessage::crashToDebugger(const std::string& errorMessage)
+void AssertMessage::killApplication(const std::string& errorMessage)
 {
 #if defined(_WIN32)
 	DebugBreak();

@@ -646,11 +646,11 @@ TEST(LockedContainerTest, DISABLED_FourWriterThreads)
 {
 	testReaderAndWriters(4);
 }
-TEST(ThreadSafeContainerTest, DISABLED_EightWriterThreads)
+TEST(LockedContainerTest, DISABLED_EightWriterThreads)
 {
 	testReaderAndWriters(8);
 }
-TEST(ThreadSafeContainerTest, SixteenWriterThreads)
+TEST(LockedContainerTest, SixteenWriterThreads)
 {
 	testReaderAndWriters(16);
 }

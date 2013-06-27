@@ -97,9 +97,9 @@ public:
 
 	/// After an assertion has failed, enter the debugger or kill the application in a system-dependent way.
 	/// Thread-unsafe if called concurrently from multiple threads, or concurrently with a failing assertion.
-	static void setFailureBehaviorToDebugger()
+	static void setFailureBehaviorToDeath()
 	{
-		setFailureCallback(crashToDebugger);
+		setFailureCallback(killApplication);
 	}
 
 private:
@@ -109,7 +109,7 @@ private:
 
 	/// Enter the debugger or kill the application in a system-dependent way.
 	/// \param errorMessage Message describing the error (which will be ignored).
-	static void crashToDebugger(const std::string& errorMessage);
+	static void killApplication(const std::string& errorMessage);
 
 
 	/// The callback function that is triggered after an assertion has failed.
