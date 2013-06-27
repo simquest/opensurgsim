@@ -13,227 +13,201 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-#include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
-
 #include <memory>
+
+#include <gtest/gtest.h>
+#include <SurgSim/Physics/Constraint.h>
+#include <SurgSim/Physics/ConstraintData.h>
+#include <SurgSim/Physics/ContactConstraintData.h>
+#include <SurgSim/Physics/FixedRepresentation.h>
+#include <SurgSim/Physics/FixedRepresentationContact.h>
+#include <SurgSim/Physics/FixedRepresentationLocalization.h>
+#include <SurgSim/Physics/MlcpPhysicsProblem.h>
+#include <SurgSim/Physics/RigidRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentationContact.h>
+#include <SurgSim/Physics/RigidRepresentationLocalization.h>
+#include <SurgSim/Physics/RigidRepresentationParameters.h>
+#include <SurgSim/Physics/SphereShape.h>
+using SurgSim::Physics::Constraint;
+using SurgSim::Physics::ConstraintData;
+using SurgSim::Physics::ContactConstraintData;
+using SurgSim::Physics::ConstraintImplementation;
+using SurgSim::Physics::Localization;
+using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::FixedRepresentationContact;
+using SurgSim::Physics::FixedRepresentationLocalization;
+using SurgSim::Physics::MlcpPhysicsProblem;
+using SurgSim::Physics::RigidRepresentation;
+using SurgSim::Physics::RigidRepresentationContact;
+using SurgSim::Physics::RigidRepresentationLocalization;
+using SurgSim::Physics::RigidRepresentationParameters;
+using SurgSim::Physics::SphereShape;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidShape.h>
-#include <SurgSim/Physics/SphereShape.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/ContactCalculation.h>
-#include <SurgSim/Physics/CollisionPair.h>
-
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-namespace {
-	double epsilon = 1e-10;
+
+TEST (ConstraintTests, TestDefaultEmptyConstraint)
+{
+	Constraint constraint;
+
+	EXPECT_EQ(nullptr, constraint.getData());
+	EXPECT_EQ(nullptr, constraint.getImplementations().first);
+	EXPECT_EQ(nullptr, constraint.getImplementations().second);
 }
 
-::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right, double epsilon)
+TEST (ConstraintTests, TestGetNumDof)
 {
-	double dist = (left - right).norm();
-	if (std::abs(dist) < epsilon)
+	Constraint constraint;
+
+	// 0 by default
+	EXPECT_EQ(0u, constraint.getNumDof());
+
+	// 1 for a frictionless contact between 2 fixed representations
 	{
-		return ::testing::AssertionSuccess();
-	}
-	else
-	{
-		return ::testing::AssertionFailure() << std::endl << "Vectors not close, expected: " << left.transpose() <<
-			std::endl << " result: " << right.transpose() << std::endl;
-	}
-}
-
-namespace SurgSim
-{
-namespace Physics
-{
-
-
-	namespace {
-		std::shared_ptr<RigidShape> sphereShape = std::make_shared<SphereShape>(1.0);
-		std::shared_ptr<RigidShape> planeShape = std::make_shared<PlaneShape>();
-
-		std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<RigidShapeCollisionRepresentation>
-			(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
-		std::shared_ptr<CollisionRepresentation> rep1 = std::make_shared<RigidShapeCollisionRepresentation>
-			(sphereShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
-
-		std::shared_ptr<CollisionPair> pair01 = std::make_shared<CollisionPair>(rep0, rep1);
+		std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
+		std::shared_ptr<Localization> loc2 = std::make_shared<FixedRepresentationLocalization>();
+		std::shared_ptr<FixedRepresentationContact> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
+		std::shared_ptr<FixedRepresentationContact> implementation2 = std::make_shared<FixedRepresentationContact>(loc2);
+		constraint.setImplementations(implementation1, implementation2);
+		EXPECT_EQ(1u, constraint.getNumDof());
 	}
 
-TEST (ContactCalculationTests, DefaultCalculation)
-{
-	DefaultContactCalculation calcShouldLog(false);
-	EXPECT_NO_THROW(calcShouldLog.calculateContact(pair01));
-	EXPECT_FALSE(pair01->hasContacts());
-
-	DefaultContactCalculation calcShouldThrow(true);
-	EXPECT_ANY_THROW(calcShouldThrow.calculateContact(pair01));
-	EXPECT_FALSE(pair01->hasContacts());
-}
-
-
-void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts, double d)
-{
-	SphereSphereDcdContact calc;
-	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(makeSphereRepresentation(r0,Quaterniond::Identity(),p0),
-																		  makeSphereRepresentation(r1,Quaterniond::Identity(),p1));
-
-	calc.calculateContact(pair);
-	EXPECT_EQ(hasContacts, pair->hasContacts());
-	if(pair->hasContacts())
+	// 1 for a frictionless contact between 1 fixed representation and 1 rigid representation
 	{
-		std::shared_ptr<Contact> contact = pair->getContacts().front();
-		Vector3d dist = (p1 - p0).normalized();
-		EXPECT_TRUE(eigenEqual(dist, contact->normal, epsilon));
-		EXPECT_NEAR(d, contact->depth, epsilon);
-		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
-		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
-
-		// This technically repeats the calculation from the sphere sphere collision but there is
-		// only so many ways to calculate this
-		Vector3d penetrationPoint0 = p0 - dist * r0;
-		Vector3d penetrationPoint1 = p1 + dist * r1;
-		EXPECT_TRUE(eigenEqual(penetrationPoint0 ,contact->penetrationPoints.first.globalPosition.getValue(),epsilon));
-		EXPECT_TRUE(eigenEqual(penetrationPoint1 ,contact->penetrationPoints.second.globalPosition.getValue(),epsilon));
+		std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
+		std::shared_ptr<Localization> loc2 = std::make_shared<RigidRepresentationLocalization>();
+		std::shared_ptr<ConstraintImplementation> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
+		std::shared_ptr<ConstraintImplementation> implementation2 = std::make_shared<RigidRepresentationContact>(loc2);
+		constraint.setImplementations(implementation1, implementation2);
+		EXPECT_EQ(1u, constraint.getNumDof());
 	}
 }
 
-
-TEST (ContactCalculationTests, SphereSphereCalculation)
+TEST (ConstraintTests, TestSetGetData)
 {
-	{
-		SCOPED_TRACE("No Intersection");
-		doSphereSphereTest(0.1, Vector3d(0.0,0.0,0.0), 0.1, Vector3d(1.0,1.0,1.0), false, 0.0);
-	}
+	Constraint constraint;
+	std::shared_ptr<ConstraintData> constraintData = std::make_shared<ConstraintData>();
 
-	{
-		SCOPED_TRACE("Intersection");
-		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0,0), true, 0.5);
-	}
+	constraint.setData(constraintData);
+	EXPECT_NE(nullptr, constraint.getData());
+	EXPECT_EQ(constraintData, constraint.getData());
+	EXPECT_EQ(nullptr, constraint.getImplementations().first);
+	EXPECT_EQ(nullptr, constraint.getImplementations().second);
 }
 
-void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere, 
-					   const Quaterniond& sphereQuat, 
-					   const Vector3d& sphereTrans,
-					   std::shared_ptr<PlaneShape> plane, 
-					   const Quaterniond& planeQuat, 
-					   const Vector3d& planeTrans,
-					   bool expectedIntersect, 
-					   const double& expectedDepth = 0 , 
-					   const Vector3d& expectedNorm = Vector3d::Zero())
+TEST (ConstraintTests, TestSetGetImplementations)
 {
-		std::shared_ptr<CollisionRepresentation> planeRep = 
-			std::make_shared<RigidShapeCollisionRepresentation>(plane,planeQuat,planeTrans);
-		std::shared_ptr<CollisionRepresentation> sphereRep = 
-			std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
+	Constraint constraint;
+	std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<Localization> loc2 = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<FixedRepresentationContact> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
+	std::shared_ptr<FixedRepresentationContact> implementation2 = std::make_shared<FixedRepresentationContact>(loc2);
 
-		SpherePlaneDcdContact calcNormal(false);
-		std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
-
-		// Again this replicates the way this is calculated in the contact calculation just with different 
-		// starting values
-		Vector3d spherePenetration = sphereTrans - expectedNorm * sphere->getRadius();
-		Vector3d planePenetration = sphereTrans - expectedNorm * (sphere->getRadius() - expectedDepth);
-
-		calcNormal.calculateContact(pair);
-		if (expectedIntersect)
-		{
-			ASSERT_TRUE(pair->hasContacts());
-			std::shared_ptr<Contact> contact = pair->getContacts().front();
-			EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
-			EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
-			EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
-			EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
-			EXPECT_TRUE(eigenEqual(spherePenetration, 
-								   contact->penetrationPoints.first.globalPosition.getValue(),
-								   epsilon));
-			EXPECT_TRUE(eigenEqual(planePenetration, 
-								   contact->penetrationPoints.second.globalPosition.getValue(),
-								   epsilon));
-		}
-		else
-		{
-			EXPECT_FALSE(pair->hasContacts());
-		}
+	constraint.setImplementations(implementation1, implementation2);
+	EXPECT_EQ(nullptr, constraint.getData());
+	EXPECT_NE(nullptr, constraint.getImplementations().first);
+	EXPECT_NE(nullptr, constraint.getImplementations().second);
+	EXPECT_EQ(implementation1, constraint.getImplementations().first);
+	EXPECT_EQ(implementation2, constraint.getImplementations().second);
 }
 
-TEST(ContactCalculationTests, SperePlaneCalculation)
+TEST (ConstraintTests, TestClear)
 {
-	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
-	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
+	Constraint constraint;
+	std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<Localization> loc2 = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<FixedRepresentationContact> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
+	std::shared_ptr<FixedRepresentationContact> implementation2 = std::make_shared<FixedRepresentationContact>(loc2);
+	std::shared_ptr<ConstraintData> constraintData = std::make_shared<ConstraintData>();
 
-	{
-		SCOPED_TRACE("No Intersection, no transformation");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,2.0,0.0),
-						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
-						  false);
-	}
-
-	{
-		SCOPED_TRACE("Intersection front, no transformation");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,1.0,0.0),
-						  plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
-						 true, 0.5, Vector3d(0.0,1.0,0.0));
-	}
-
-	{
-		SCOPED_TRACE("Intersection back, no transformation");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.0),
-			plane,Quaterniond::Identity(), Vector3d(0.0,0.5,0.0),
-			true, 0.5, Vector3d(0.0,-1.0,0.0));
-	}
-
-	{
-		SCOPED_TRACE("Intersection front, sphere center on the plane, rotated plane");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), 
-						  Vector3d(0.0,0,0.0),
-						  plane,
-						  SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)),
-						  Vector3d(0.0,0.0,0.0),
-			              true,
-						  1.0, Vector3d(0.0,0.0,1.0));
-	}
-
-	{
-		SCOPED_TRACE("Intersection front, rotated Plane");
-		doSpherePlaneTest(sphere,Quaterniond::Identity(), Vector3d(0.0,0.0,0.5),
-			plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)), Vector3d(0.0,0.0,0.0),
-			true, 0.5, Vector3d(0.0,0.0,1.0));
-	}
+	constraint.setData(constraintData);
+	constraint.setImplementations(implementation1, implementation2);
+	EXPECT_NE(nullptr, constraint.getData());
+	EXPECT_NE(nullptr, constraint.getImplementations().first);
+	EXPECT_NE(nullptr, constraint.getImplementations().second);
+	constraint.clear();
+	EXPECT_EQ(nullptr, constraint.getData());
+	EXPECT_EQ(nullptr, constraint.getImplementations().first);
+	EXPECT_EQ(nullptr, constraint.getImplementations().second);
 }
 
-TEST(ContactCalculationTests, PlaneSphereShouldFail)
+// Contact plane equation is (n=(0 1 0) d=0)
+// 2 representations involved are: 1 fixed and 1 rigid (sphere of radius 0.01)
+// Localization on the fixed is (0 0 0)
+// Localization on the rigid is (0 -0.01 0)
+// => violation of -0.1m
+TEST (ConstraintTests, TestBuildMlcp)
 {
-	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<RigidShapeCollisionRepresentation>
-		(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
-	std::shared_ptr<CollisionRepresentation> repp0 = std::make_shared<RigidShapeCollisionRepresentation>
-		(planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
-	std::shared_ptr<CollisionRepresentation> reps1 = std::make_shared<RigidShapeCollisionRepresentation>
-		(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
-	std::shared_ptr<CollisionRepresentation> repp1 = std::make_shared<RigidShapeCollisionRepresentation>
-		(planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
+	RigidTransform3d poseFixed, poseRigid;
+	Vector3d n(0.0, 1.0, 0.0);
+	double d = 0.0;
+	double radius = 0.01;
+	double dt = 1e-3;
+	unsigned int indexRepresentation0 = 0;
+	unsigned int indexRepresentation1;
 
-	std::shared_ptr<CollisionPair> pairps = std::make_shared<CollisionPair>(repp0, reps0);
-	std::shared_ptr<CollisionPair> pairpp = std::make_shared<CollisionPair>(repp0, repp1);
-	std::shared_ptr<CollisionPair> pairss = std::make_shared<CollisionPair>(reps0, reps1);
+	poseFixed.setIdentity();
+	poseRigid.setIdentity();
 
-	SpherePlaneDcdContact contact(false);
+	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
+	fixed->setIsActive(true);
+	fixed->setIsGravityEnabled(false);
+	fixed->setInitialPose(poseFixed);
 
-	EXPECT_ANY_THROW(contact.calculateContact(pairps));
-	EXPECT_ANY_THROW(contact.calculateContact(pairpp));
-	EXPECT_ANY_THROW(contact.calculateContact(pairss));
+	indexRepresentation1 = indexRepresentation0 + fixed->getNumDof();
+	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("Rigid");
+	rigid->setIsActive(true);
+	rigid->setIsGravityEnabled(false);
+	rigid->setInitialPose(poseRigid);
+	{
+		RigidRepresentationParameters param;
+		param.setDensity(1000.0);
+		std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(radius);
+		param.setShapeUsedForMassInertia(shape);
+		rigid->setInitialParameters(param);
+	}
+
+	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
+	{
+		fixed->beforeUpdate(dt);
+		rigid->beforeUpdate(dt);
+
+		fixed->update(dt);
+		rigid->update(dt);
+
+		fixed->afterUpdate(dt);
+		rigid->afterUpdate(dt);
+	}
+
+	Constraint constraint;
+	std::shared_ptr<FixedRepresentationLocalization> loc1 = std::make_shared<FixedRepresentationLocalization>(fixed);
+	std::shared_ptr<RigidRepresentationLocalization> loc2 = std::make_shared<RigidRepresentationLocalization>(rigid);
+	loc1->setLocalPosition(Vector3d(0.0, 0.0, 0.0));
+	loc2->setLocalPosition(Vector3d(0.0, -radius, 0.0));
+	std::shared_ptr<ConstraintImplementation> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
+	std::shared_ptr<ConstraintImplementation> implementation2 = std::make_shared<RigidRepresentationContact>(loc2);
+	constraint.setImplementations(implementation1, implementation2);
+
+	std::shared_ptr<ContactConstraintData> constraintData = std::make_shared<ContactConstraintData>();
+	constraintData->setPlaneEquation(n, d);
+	constraint.setData(constraintData);
+
+	MlcpPhysicsProblem mlcpPhysicsProblem;
+	mlcpPhysicsProblem.A.resize(constraint.getNumDof(), constraint.getNumDof());
+	mlcpPhysicsProblem.A.setZero();
+	mlcpPhysicsProblem.b.resize(constraint.getNumDof());
+	mlcpPhysicsProblem.b.setZero();
+	mlcpPhysicsProblem.constraintTypes.resize(constraint.getNumDof());
+	mlcpPhysicsProblem.mu.resize(constraint.getNumDof());
+	mlcpPhysicsProblem.mu.setZero();
+	mlcpPhysicsProblem.CHt.resize(fixed->getNumDof()+rigid->getNumDof(), constraint.getNumDof());
+	mlcpPhysicsProblem.CHt.setZero();
+	mlcpPhysicsProblem.H.resize(constraint.getNumDof(), fixed->getNumDof()+rigid->getNumDof());
+	mlcpPhysicsProblem.H.setZero();
+	constraint.build(dt, mlcpPhysicsProblem, indexRepresentation0, indexRepresentation1, 0);
 }
-
-
-}; // Physics
-}; // SurgSim

@@ -31,10 +31,15 @@ class ContactConstraintData : public ConstraintData
 {
 public:
 	/// Default constructor
-	ContactConstraintData();
+	ContactConstraintData() :
+	ConstraintData()
+	{
+	}
 
 	/// Destructor
-	virtual ~ContactConstraintData();
+	virtual ~ContactConstraintData()
+	{
+	}
 
 	/// Sets the plane equation of the frictionless contact
 	/// \param n The plane normal (normalized vector)

@@ -96,6 +96,11 @@ public:
 	{
 		using namespace SurgSim::Framework;
 
+		if (m_implementations.first == nullptr || m_implementations.second == nullptr)
+		{
+			return 0u;
+		}
+
 		// TODO: Assert that both sides have same DOF
 		SURGSIM_ASSERT(m_implementations.first->getNumDof() == m_implementations.second->getNumDof()) << 
 			"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
