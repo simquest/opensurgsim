@@ -216,11 +216,17 @@ def find_column_char(text, column, tab_width=4):
     text = text[:(len(text)-1)]
   return len(text)
 
+def get_column(flags, text, column):
+  if flags.visual_studio:
+    return find_column_char(text, column)
+  else:
+    return column
+
 def check_length(flags, file, lines):
   xlines = map(lambda x: (x[0], re.sub(r'\r?\n$', '', x[1].expandtabs(4))),
                lines)
   for bad in filter(lambda x: len(x[1]) > flags.max_line_length, xlines):
-    col = find_column_char(lines[bad[0]-1][1], flags.max_line_length)
+    col = get_column(flags, lines[bad[0]-1][1], flags.max_line_length)
     emit_warning({'file': file, 'line': bad[0], 'col': col,
                   'category': "opensurgsim/too_long",
                   'text': ("the line is {} characters long, which is longer"
