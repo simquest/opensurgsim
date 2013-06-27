@@ -39,7 +39,7 @@ using SurgSim::Framework::Representation;
 using SurgSim::Framework::Component;
 
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Graphics
 {
@@ -67,7 +67,7 @@ public:
 		return graphicsManager->executeAdditions(component);
 	}
 
-	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
 	{
 		return graphicsManager->executeRemovals(component);
 	}
@@ -79,7 +79,7 @@ public:
 
 	std::shared_ptr<Runtime> runtime;
 	std::shared_ptr<OsgManager> graphicsManager;
-}; 
+};
 
 TEST_F(OsgManagerTest, InitTest)
 {

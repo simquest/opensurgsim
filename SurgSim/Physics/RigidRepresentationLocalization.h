@@ -30,7 +30,7 @@ namespace Physics
 {
 
 /// This class implement the localization on a RigidRepresentation, as a local position
-/// \todo HS-2013-jun-21 There is a slight mismatch in the way the class was written and 
+/// \todo HS-2013-jun-21 There is a slight mismatch in the way the class was written and
 /// 	  the current use, the constructor needs the correct shared_ptr and that might not
 /// 	  be available, setRepresentation is currently used, but this does not check on the
 /// 	  type of the representation, this needs to be fixed

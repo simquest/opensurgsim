@@ -85,7 +85,7 @@ TEST_F(RigidRepresentationLocalizationTest, SetGetRepresentation)
 {
 	RigidRepresentationLocalization rigidRepresentationLoc;
 	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("RigidRepresentation");
-	
+
 	EXPECT_EQ(nullptr, rigidRepresentationLoc.getRepresentation());
 
 	rigidRepresentationLoc.setRepresentation(rigid);
