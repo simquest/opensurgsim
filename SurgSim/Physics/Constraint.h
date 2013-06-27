@@ -16,15 +16,11 @@
 #ifndef SURGSIM_PHYSICS_CONSTRAINT_H
 #define SURGSIM_PHYSICS_CONSTRAINT_H
 
-#include <SurgSim/Framework/Log.h>
-
 #include <SurgSim/Physics/ConstraintData.h>
 #include <SurgSim/Physics/ConstraintImplementation.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
 
-#include <Eigen/Core>
-
-#include <utility>
+//#include <utility>
 #include <memory>
 
 namespace SurgSim
@@ -49,73 +45,38 @@ public:
 
 	/// Sets both sides implementation
 	/// \param side0, side1 Both sides implementation of the constraint
-	void setImplementations(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1)
-	{
-		m_implementations = std::make_pair(side0, side1);
-	}
-	
-	/// Gets both sides ConstraintImplementation as a pair
-	/// \return the pair of ConstraintImplementation forming this constraint
-	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>& getImplementations() const
-	{
-		return m_implementations;
-	}
+	void setImplementations(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1);
+
+	/// Gets both sides implementation as a pair
+	/// \return the pair of implementations forming this constraint
+	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>& getImplementations() const;
 
 	/// Sets the data associated to this constraint
 	/// \param data The data for this constraint
-	void setData(std::shared_ptr<ConstraintData> data)
-	{
-		m_data = data;
-	}
+	void setData(std::shared_ptr<ConstraintData> data);
 
 	/// Gets the data associated to this constraint
 	/// \return The data associated to this constraint
-	std::shared_ptr<ConstraintData> getData()
-	{
-		return m_data;
-	}
+	std::shared_ptr<ConstraintData> getData() const;
+
+	/// Gets the number of degree of freedom for this constraint
+	/// \return The number of degree of freedom for this constraint
+	unsigned int getNumDof() const;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint
 	/// \param dt The time step
 	/// \param [in, out] mclpPhysicsProblem The Mlcp physics problem to be filled up
-	/// \param indexActor0 The index of the 1st representation in the Mlcp
-	/// \param indexActor1 The index of the 2nd representation in the Mlcp
-	/// \param indexConstraing The index of this constraint in the Mlcp
+	/// \param indexRepresentation0 The index of the 1st representation in the Mlcp
+	/// \param indexRepresentation1 The index of the 2nd representation in the Mlcp
+	/// \param indexConstraint The index of this constraint in the Mlcp
 	void build(double dt,
 		MlcpPhysicsProblem& mlcpPhysicsProblem,
 		unsigned int indexRepresentation0,
 		unsigned int indexRepresentation1,
-		unsigned int indexConstraint)
-	{
-		doBuild(dt, *m_data, mlcpPhysicsProblem, indexRepresentation0, indexRepresentation1, indexConstraint);
-	}
-
-	/// Gets the number of degree of freedom for this constraint
-	/// \return The number of degree of freedom for this constraint
-	unsigned int getNumDof()
-	{
-		using namespace SurgSim::Framework;
-
-		if (m_implementations.first == nullptr || m_implementations.second == nullptr)
-		{
-			return 0u;
-		}
-
-		// TODO: Assert that both sides have same DOF
-		SURGSIM_ASSERT(m_implementations.first->getNumDof() == m_implementations.second->getNumDof()) << 
-			"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
-			" != " << m_implementations.second->getNumDof() <<")" << std::endl;
-		return m_implementations.first->getNumDof();
-	}
+		unsigned int indexConstraint);
 
 	/// Clears/resets this constraint
-	void clear()
-	{
-		doClear();
-		m_implementations.first = nullptr;
-		m_implementations.second = nullptr;
-		m_data = nullptr;
-	}
+	void clear();
 
 private:
 	/// Specific data associated to this constraint
@@ -123,19 +84,19 @@ private:
 	/// Pair of implementations defining the 2 sides of the constraint
 	std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>> m_implementations;
 
-	/// Builds subset of an Mlcp physics problem associated to this constraint
+	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step
 	/// \param data The data specific to this constraint
 	/// \param [in, out] mclpPhysicsProblem The Mlcp physics problem to be filled up
-	/// \param indexActor0 The index of the 1st representation in the Mlcp
-	/// \param indexActor1 The index of the 2nd representation in the Mlcp
-	/// \param indexConstraing The index of this constraint in the Mlcp
+	/// \param indexRepresentation0 The index of the 1st representation in the Mlcp
+	/// \param indexRepresentation1 The index of the 2nd representation in the Mlcp
+	/// \param indexConstraint The index of this constraint in the Mlcp
 	virtual void doBuild(double dt,
 		const ConstraintData& data,
 		MlcpPhysicsProblem& mlcpPhysicsProblem,
-		unsigned int offsetActor0,
-		unsigned int offsetActor1,
-		unsigned int offsetConstraint);
+		unsigned int indexRepresentation0,
+		unsigned int indexRepresentation1,
+		unsigned int indexConstraint);
 
 	/// Clears/resets user-defined call for extra treatment
 	virtual void doClear();

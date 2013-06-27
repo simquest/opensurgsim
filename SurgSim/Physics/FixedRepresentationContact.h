@@ -62,6 +62,13 @@ private:
 		ConstraintSideSign sign) override
 	{
 	}
+
+	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
+	/// \return The MLCP constraint type corresponding to this constraint implementation
+	SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const override
+	{
+		return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+	}
 };
 
 };  // namespace Physics

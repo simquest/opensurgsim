@@ -39,6 +39,8 @@ void RigidRepresentationContact::doBuild(double dt,
 	Eigen::MatrixXd& CHt  = mlcp.CHt;
 	Eigen::MatrixXd& HCHt = mlcp.A;
 	Eigen::VectorXd& b    = mlcp.b;
+	Eigen::VectorXd& mu   = mlcp.mu;
+	std::vector<SurgSim::Math::MlcpConstraintType>& constraintListTypes = mlcp.constraintTypes;
 
 	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);

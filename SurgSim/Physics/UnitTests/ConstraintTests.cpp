@@ -50,6 +50,10 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
+namespace
+{
+	const double epsilon = 1e-10;
+};
 
 TEST (ConstraintTests, TestDefaultEmptyConstraint)
 {
@@ -150,6 +154,7 @@ TEST (ConstraintTests, TestBuildMlcp)
 	double dt = 1e-3;
 	unsigned int indexRepresentation0 = 0;
 	unsigned int indexRepresentation1;
+	unsigned int indexConstraint = 0;
 
 	poseFixed.setIdentity();
 	poseRigid.setIdentity();
@@ -198,16 +203,40 @@ TEST (ConstraintTests, TestBuildMlcp)
 	constraint.setData(constraintData);
 
 	MlcpPhysicsProblem mlcpPhysicsProblem;
+
+	// Resize and zero all Eigen types
 	mlcpPhysicsProblem.A.resize(constraint.getNumDof(), constraint.getNumDof());
 	mlcpPhysicsProblem.A.setZero();
 	mlcpPhysicsProblem.b.resize(constraint.getNumDof());
 	mlcpPhysicsProblem.b.setZero();
-	mlcpPhysicsProblem.constraintTypes.resize(constraint.getNumDof());
 	mlcpPhysicsProblem.mu.resize(constraint.getNumDof());
 	mlcpPhysicsProblem.mu.setZero();
 	mlcpPhysicsProblem.CHt.resize(fixed->getNumDof()+rigid->getNumDof(), constraint.getNumDof());
 	mlcpPhysicsProblem.CHt.setZero();
 	mlcpPhysicsProblem.H.resize(constraint.getNumDof(), fixed->getNumDof()+rigid->getNumDof());
 	mlcpPhysicsProblem.H.setZero();
-	constraint.build(dt, mlcpPhysicsProblem, indexRepresentation0, indexRepresentation1, 0);
+
+	// Empty all std::vector types
+	mlcpPhysicsProblem.constraintTypes.clear();
+
+	// Fill up the Mlcp
+	constraint.build(dt, mlcpPhysicsProblem, indexRepresentation0, indexRepresentation1, indexConstraint);
+
+	// Violation b should be exactly -radius (the sphere center is on the plane)
+	EXPECT_NEAR(-0.01, mlcpPhysicsProblem.b[0], epsilon);
+	
+	// Constraint H should be
+	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
+	// The rigid being the 2nd representation in the pair, it has the negative sign in the constraint !
+	Vector3d n_GP = n.cross(Vector3d(0.0, -radius, 0.0));
+	EXPECT_NEAR(-dt * n[0]   , mlcpPhysicsProblem.H(0, 0), epsilon);
+	EXPECT_NEAR(-dt * n[1]   , mlcpPhysicsProblem.H(0, 1), epsilon);
+	EXPECT_NEAR(-dt * n[2]   , mlcpPhysicsProblem.H(0, 2), epsilon);
+	EXPECT_NEAR(-dt * n_GP[0], mlcpPhysicsProblem.H(0, 3), epsilon);
+	EXPECT_NEAR(-dt * n_GP[1], mlcpPhysicsProblem.H(0, 4), epsilon);
+	EXPECT_NEAR(-dt * n_GP[2], mlcpPhysicsProblem.H(0, 5), epsilon);
+
+	// ConstraintTypes should contain 1 entry SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
+	ASSERT_EQ(1u, mlcpPhysicsProblem.constraintTypes.size());
+	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, mlcpPhysicsProblem.constraintTypes[0]);
 }

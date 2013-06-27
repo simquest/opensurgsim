@@ -23,9 +23,11 @@ set(UNIT_TEST_SOURCES
 	CollisionPairTests.cpp
 	ConstraintTests.cpp
 	ContactCalculationTests.cpp
+	ContactConstraintDataTests.cpp
 	ComputationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
+	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
@@ -35,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp

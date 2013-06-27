@@ -32,8 +32,10 @@ class ContactConstraintData : public ConstraintData
 public:
 	/// Default constructor
 	ContactConstraintData() :
-	ConstraintData()
+	ConstraintData(),
+	m_distance(0.0)
 	{
+		m_normal.setZero();
 	}
 
 	/// Destructor

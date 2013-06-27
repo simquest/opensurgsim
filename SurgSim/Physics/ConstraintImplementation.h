@@ -72,6 +72,13 @@ public:
 		return doGetNumDof();
 	}
 
+	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
+	/// \return The MLCP constraint type corresponding to this constraint implementation
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const
+	{
+		return doGetMlcpConstraintType();
+	}
+
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
@@ -110,6 +117,13 @@ private:
 				unsigned int indexRepresentation,
 				unsigned int indexConstraint,
 				ConstraintSideSign sign) = 0;
+
+	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
+	/// \return The MLCP constraint type corresponding to this constraint implementation
+	virtual SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const
+	{
+		return SurgSim::Math::MLCP_INVALID_CONSTRAINT;
+	}
 };
 
 };  // namespace Physics
