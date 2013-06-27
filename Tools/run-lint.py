@@ -32,6 +32,7 @@ import argparse
 import sys
 import subprocess
 import re
+import os
 
 STANDARD_WARNING_FORMAT = \
     "{file}:{line}:{col}: {text} [{category}] [{level}]"
@@ -130,6 +131,35 @@ def run_cpplint(script, filter, files):
     return False
   return cmd.returncode == 0
 
+HEADER_GUARD_DIRECTORY_PREFIX_CACHE = {}
+
+def get_header_guard_directory_prefix(dir_path):
+  if dir_path not in HEADER_GUARD_DIRECTORY_PREFIX_CACHE:
+    prefix = ""
+    path = dir_path
+    while not (os.path.exists(os.path.join(path, 'LICENSE')) or
+               os.path.exists(os.path.join(path, '.git'))):
+      (parent, dirname) = os.path.split(path)
+      assert parent != path
+      prefix = re.sub(r'\W+', '', dirname).upper() + '_' + prefix
+      path = parent
+    HEADER_GUARD_DIRECTORY_PREFIX_CACHE[dir_path] = prefix
+
+  return HEADER_GUARD_DIRECTORY_PREFIX_CACHE[dir_path]
+
+def get_expected_header_guard(file):
+  (dir_path, filename) = os.path.split(os.path.abspath(file))
+  guard = re.sub(r'\W+', '_', filename).upper()
+
+  while not (os.path.exists(os.path.join(dir_path, 'LICENSE')) or
+             os.path.exists(os.path.join(dir_path, '.git'))):
+    (parent, dirname) = os.path.split(dir_path)
+    assert parent != dir_path
+    guard = re.sub(r'\W+', '', dirname).upper() + '_' + guard
+    dir_path = parent
+
+  return guard
+
 def check_header_guard(flags, file, lines):
   ifndef = filter(lambda x: re.search(r'^\s*#\s*ifndef\b', x[1]), lines)
   if not ifndef:
@@ -152,39 +182,13 @@ def check_header_guard(flags, file, lines):
     return False
   guard = guard_match.group(1)
 
-  namespace = filter(lambda x: re.search(r'^\s*namespace\b', x[1]), lines)
-  if not namespace:
-    emit_warning({'file': file, 'category': "opensurgsim/no_namespace",
-                  'text': "no 'namespace' lines!"})
-  indented_namespace = filter(lambda x: re.search(r'^\s', x[1]), namespace)
-  if indented_namespace:
-    emit_warning({'file': file, 'line': indented_namespace[0][0],
-                  'category': "opensurgsim/namespace_indented",
-                  'text': "one or more namespace declarations are indented!"})
-  curly_namespace = filter(lambda x: re.search(r'{$', x[1]), namespace)
-  if curly_namespace:
-    emit_warning({'file': file, 'line': curly_namespace[0][0],
-                  'category': "opensurgsim/namespace_brace",
-                  'text': "'{' on the same line as a namespace declaration!"})
-    namespace = map(lambda x: (x[0], re.sub(r'\s*{$', '', x[1])), namespace)
-  namespace = map(lambda x: re.sub(r'^\s*namespace\b', '', x[1]).strip(),
-                  namespace)
+  guard_expected = get_expected_header_guard(file)
 
-  namespace_re = "".join(
-    map(lambda x: "(?:" + re.sub(r'[^\w\d]+', '', x.upper()) + "_)?",
-        namespace))
-  if len(namespace_re):
-    namespace_re += r'(?<=.)'
-
-  file_guard_re = re.sub(r'\W+', '_',
-                         re.sub(r'.*/', '', file)).upper()
-  guard_re = r'^' + namespace_re + file_guard_re + r'$'
-
-  if not re.search(guard_re, guard):
+  if guard != guard_expected:
     emit_warning({'file': file, 'line': ifndef[0][0],
                   'category': "opensurgsim/header_guard",
-                  'text': ("unexpected guard '{}'!  expected /{}/."
-                           .format(guard, guard_re)) })
+                  'text': ("unexpected guard '{}'!  expected '{}'."
+                           .format(guard, guard_expected)) })
 
   define = filter(lambda x: re.search(r'^\s*#\s*define\b', x[1]), lines)
   if not define:
