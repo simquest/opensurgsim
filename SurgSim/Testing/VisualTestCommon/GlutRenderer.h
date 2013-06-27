@@ -151,14 +151,14 @@ struct GlutCamera
 	/// \param fovY Field of view angle (in degrees) in the vertical direction.
 	/// \param near Near clipping plane distance from camera, in meters.
 	/// \param far Far clipping plane distance from camera, in meters.
-	GlutCamera(const SurgSim::Math::Vector3d& eye, const SurgSim::Math::Vector3d& center,
-			   const SurgSim::Math::Vector3d& up, const double fovY, double zNear, double zFar) :
-		eye(eye),
-		center(center),
-		up(up),
-		fovY(fovY),
-		zNear(zNear),
-		zFar(zFar)
+	GlutCamera(const SurgSim::Math::Vector3d& eye_, const SurgSim::Math::Vector3d& center_,
+			   const SurgSim::Math::Vector3d& up_, const double fovY_, double zNear_, double zFar_) :
+		eye(eye_),
+		center(center_),
+		up(up_),
+		fovY(fovY_),
+		zNear(zNear_),
+		zFar(zFar_)
 	{
 	}
 };
