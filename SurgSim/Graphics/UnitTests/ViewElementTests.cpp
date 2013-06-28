@@ -25,12 +25,15 @@
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::ViewElement;
 
+namespace SurgSim
+{
+
+namespace Graphics
+{
 
 /// View element for testing
-class MockViewElement : public SurgSim::Graphics::ViewElement
+class MockViewElement : public ViewElement
 {
 public:
 	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
@@ -42,7 +45,7 @@ public:
 	/// Sets the view component that provides the visualization of the graphics representations
 	/// Only allows MockView components, any other will not be set and it will return false.
 	/// \return	True if it succeeds, false if it fails
-	virtual bool setView(std::shared_ptr<SurgSim::Graphics::View> view)
+	virtual bool setView(std::shared_ptr<View> view)
 	{
 		std::shared_ptr<MockView> mockView = std::dynamic_pointer_cast<MockView>(view);
 		if (mockView != nullptr)
@@ -76,7 +79,7 @@ private:
 	/// \post m_isInitialized is set to true
 	virtual bool doInitialize()
 	{
-		if (SurgSim::Graphics::ViewElement::doInitialize())
+		if (ViewElement::doInitialize())
 		{
 			m_isInitialized = true;
 			return true;
@@ -101,12 +104,12 @@ private:
 };
 
 /// View class for testing adding a non-MockView
-class NotMockView : public SurgSim::Graphics::View
+class NotMockView : public View
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the view
-	explicit NotMockView(const std::string& name) : SurgSim::Graphics::View(name)
+	explicit NotMockView(const std::string& name) : View(name)
 	{
 	}
 
@@ -222,3 +225,7 @@ TEST(ViewElementTests, ViewTest)
 	EXPECT_NE(notMockView, element->getView());
 	EXPECT_EQ(mockView, element->getView());
 }
+
+};  // namespace Graphics
+
+};  // namespace SurgSim

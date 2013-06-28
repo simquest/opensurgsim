@@ -45,6 +45,7 @@ class OsgMaterial : public Material
 {
 public:
 	/// Constructor
+	/// \post	The material has no uniforms and no shader.
 	OsgMaterial();
 
 	/// Adds a uniform to this material
@@ -76,6 +77,9 @@ public:
 	/// Gets the shader used by this material
 	/// \return	Shader program
 	virtual std::shared_ptr<Shader> getShader() const;
+
+	/// Removes the shader from the material, falling back to fixed-function pipeline
+	virtual void clearShader();
 
 	/// Returns the OSG state set with the material properties
 	osg::ref_ptr<osg::StateSet> getOsgStateSet() const

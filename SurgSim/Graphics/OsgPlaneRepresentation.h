@@ -55,6 +55,9 @@ public:
 	/// \note	OsgPlaneRepresentation only accepts subclasses of OsgMaterial.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
 
+	/// Removes the material from the representation
+	virtual void clearMaterial();
+
 	/// Sets the current pose of the representation
 	/// \param	transform	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);

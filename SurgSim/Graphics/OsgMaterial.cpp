@@ -96,3 +96,12 @@ std::shared_ptr<SurgSim::Graphics::Shader> OsgMaterial::getShader() const
 {
 	return m_shader;
 }
+
+void OsgMaterial::clearShader()
+{
+	if (m_shader)
+	{
+		m_shader->removeFromStateSet(m_stateSet.get());
+	}
+	m_shader = nullptr;
+}
