@@ -49,6 +49,15 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	/// \note	OsgBoxRepresentation only accepts subclasses of OsgMaterial.
+	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	/// Removes the material from the representation
+	virtual void clearMaterial();
+
 	/// Sets the size along X-axis of the box
 	/// \param sizeX Size along X-axis of the box
 	virtual void setSizeX(double sizeX);

@@ -15,6 +15,7 @@
 
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 
+#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 #include <SurgSim/Graphics/OsgUnitBox.h>
 
@@ -51,6 +52,25 @@ void OsgBoxRepresentation::setVisible(bool visible)
 bool OsgBoxRepresentation::isVisible() const
 {
 	return m_switch->getChildValue(m_transform);
+}
+
+bool OsgBoxRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+{
+	bool didSucceed = false;
+
+	std::shared_ptr<OsgMaterial> osgMaterial = std::dynamic_pointer_cast<OsgMaterial>(material);
+	if (osgMaterial && Representation::setMaterial(material))
+	{
+		m_transform->setStateSet(osgMaterial->getOsgStateSet());
+		didSucceed = true;
+	}
+	return didSucceed;
+}
+
+void OsgBoxRepresentation::clearMaterial()
+{
+	m_transform->setStateSet(new osg::StateSet()); // Reset to empty state set
+	Representation::setMaterial(nullptr);
 }
 
 void OsgBoxRepresentation::setSizeX(double sizeX)
