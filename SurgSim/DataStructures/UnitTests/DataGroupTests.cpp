@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the DataGroup class.
 
+#include <Eigen/Core>
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -33,6 +34,7 @@ TEST(DataGroupTests, CanConstruct)
 	DataGroupBuilder builder;
 	builder.addPose("test");
 	builder.addVector("test");
+	builder.addMatrix("test");
 	builder.addScalar("test");
 	builder.addInteger("test");
 	builder.addBoolean("test");
@@ -52,6 +54,7 @@ TEST(DataGroupTests, CanCreateShared)
 	DataGroupBuilder builder;
 	builder.addPose("test");
 	builder.addVector("test");
+	builder.addMatrix("test");
 	builder.addScalar("test");
 	builder.addInteger("test");
 	builder.addBoolean("test");
@@ -78,6 +81,7 @@ TEST(DataGroupTests, PutName)
 	DataGroupBuilder builder;
 	builder.addPose("pose");
 	builder.addVector("vector");
+	builder.addMatrix("matrix");
 	builder.addScalar("scalar");
 	builder.addInteger("integer");
 	builder.addBoolean("boolean");
@@ -88,9 +92,12 @@ TEST(DataGroupTests, PutName)
 	const SurgSim::Math::Quaterniond quat =
 		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(1, 0, 0));
 	const SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform(quat, vector);
+	Eigen::MatrixXd matrix(2,3);
+	matrix.fill(3.0);
 
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
+	data.matrixes().set("matrix", matrix);
 	data.scalars().set("scalar", 1.23f);
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
@@ -101,6 +108,9 @@ TEST(DataGroupTests, PutName)
 
 	EXPECT_TRUE(data.vectors().hasEntry("vector"));
 	EXPECT_TRUE(data.vectors().hasData("vector"));
+
+	EXPECT_TRUE(data.matrixes().hasEntry("matrix"));
+	EXPECT_TRUE(data.matrixes().hasData("matrix"));
 
 	EXPECT_TRUE(data.scalars().hasEntry("scalar"));
 	EXPECT_TRUE(data.scalars().hasData("scalar"));
@@ -121,6 +131,7 @@ TEST(DataGroupTests, GetName)
 	DataGroupBuilder builder;
 	builder.addPose("pose");
 	builder.addVector("vector");
+	builder.addMatrix("matrix");
 	builder.addScalar("scalar");
 	builder.addInteger("integer");
 	builder.addBoolean("boolean");
@@ -131,9 +142,12 @@ TEST(DataGroupTests, GetName)
 	const SurgSim::Math::Quaterniond quat =
 		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(1, 0, 0));
 	const SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform(quat, vector);
+	Eigen::MatrixXd matrix(2,3);
+	matrix.fill(3.0);
 
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
+	data.matrixes().set("matrix", matrix);
 	data.scalars().set("scalar", 1.23);
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
@@ -149,6 +163,11 @@ TEST(DataGroupTests, GetName)
 		SurgSim::Math::Vector3d value(0, 0, 0);
 		EXPECT_TRUE(data.vectors().get("vector", &value));
 		EXPECT_NEAR(0, (value - vector).norm(), 1e-9);
+	}
+	{
+		Eigen::MatrixXd value;
+		EXPECT_TRUE(data.matrixes().get("matrix", &value));
+		EXPECT_NEAR(0, (value - matrix).norm(), 1e-9);
 	}
 	{
 		double value = 0;

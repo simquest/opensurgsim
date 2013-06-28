@@ -52,8 +52,6 @@ public:
 	/// The type used for strings.
 	typedef DataGroup::StringType StringType;
 
-	typedef Eigen::MatrixXd DynamicMatrixType;
-
 	/// Constructs an empty builder object.
 	DataGroupBuilder();
 
