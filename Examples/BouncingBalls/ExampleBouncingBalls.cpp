@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager = 
+	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 
 	runtime->addManager(physicsManager);
@@ -198,9 +198,9 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
-	scene->addSceneElement(createSphere("sphere1", 
+	scene->addSceneElement(createSphere("sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
-	scene->addSceneElement(createPlane("plane1", 
+	scene->addSceneElement(createPlane("plane1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 

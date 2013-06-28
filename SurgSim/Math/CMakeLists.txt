@@ -23,6 +23,10 @@ set(SURGSIM_MATH_SOURCES
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
+	MlcpConstraintType.h
+	MlcpProblem.h
+	MlcpSolution.h
+	MlcpSolver.h
 	Matrix.h
 	Quaternion.h
 	RigidTransform.h
@@ -32,7 +36,7 @@ set(SURGSIM_MATH_HEADERS
 )
 
 surgsim_add_library(
-	SurgSimMath 
+	SurgSimMath
 	"${SURGSIM_MATH_SOURCES}"
 	"${SURGSIM_MATH_HEADERS}"
 	"SurgSim/Math"

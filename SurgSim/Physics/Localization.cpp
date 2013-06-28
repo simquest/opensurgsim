@@ -30,3 +30,9 @@ m_representation(representation)
 Localization::~Localization()
 {
 }
+
+bool SurgSim::Physics::Localization::isValidRepresentation(std::shared_ptr<Representation> representation)
+{
+	// Localization base class does not care about the type
+	return true;
+}

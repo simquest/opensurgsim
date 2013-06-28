@@ -16,7 +16,7 @@
 
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"

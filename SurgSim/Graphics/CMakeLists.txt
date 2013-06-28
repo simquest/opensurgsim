@@ -81,7 +81,7 @@ surgsim_add_library(
 	"${SURGSIM_GRAPHICS_HEADERS}"
 	"SurgSim/Graphics"
 )
-target_link_libraries(SurgSimGraphics SurgSimFramework 
+target_link_libraries(SurgSimGraphics SurgSimFramework
 	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 

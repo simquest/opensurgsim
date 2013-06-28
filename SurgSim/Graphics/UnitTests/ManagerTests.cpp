@@ -56,7 +56,7 @@ public:
 		return graphicsManager->executeAdditions(component);
 	}
 
-	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
 	{
 		return graphicsManager->executeRemovals(component);
 	}
@@ -125,7 +125,7 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 	std::shared_ptr<MockGroup> group2 = std::make_shared<MockGroup>("test group 2");
 	std::shared_ptr<MockView> view1 = std::make_shared<MockView>("test view 1");
 	std::shared_ptr<MockView> view2 = std::make_shared<MockView>("test view 2");
-	std::shared_ptr<SurgSim::Framework::Representation> nonGraphicsComponent = 
+	std::shared_ptr<SurgSim::Framework::Representation> nonGraphicsComponent =
 		std::make_shared<NonGraphicsRepresentation>("non-graphics component");
 
 	EXPECT_EQ(0u, graphicsManager->getRepresentations().size());
