@@ -39,8 +39,6 @@ void RigidRepresentationContact::doBuild(double dt,
 	Eigen::MatrixXd& CHt  = mlcp.CHt;
 	Eigen::MatrixXd& HCHt = mlcp.A;
 	Eigen::VectorXd& b    = mlcp.b;
-	Eigen::VectorXd& mu   = mlcp.mu;
-	std::vector<SurgSim::Math::MlcpConstraintType>& constraintListTypes = mlcp.constraintTypes;
 
 	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);
@@ -52,7 +50,6 @@ void RigidRepresentationContact::doBuild(double dt,
 
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
 	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& C = rigid->getComplianceMatrix();
-	const unsigned int numDof = rigid->getNumDof();
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();

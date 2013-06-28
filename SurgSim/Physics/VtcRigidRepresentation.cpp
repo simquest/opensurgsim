@@ -22,6 +22,8 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Quaternion.h>
 
+using SurgSim::Framework::Logger;
+
 namespace SurgSim{
 
 namespace Physics{
@@ -64,7 +66,6 @@ void VtcRigidRepresentation::beforeUpdate(double dt)
 
 void VtcRigidRepresentation::update(double dt)
 {
-	using namespace SurgSim::Framework;
 	using SurgSim::Math::isValid;
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;

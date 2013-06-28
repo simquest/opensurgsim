@@ -60,15 +60,12 @@ std::shared_ptr<ConstraintData> Constraint::getData() const
 
 unsigned int Constraint::getNumDof() const
 {
-	using namespace SurgSim::Framework;
-
 	if (m_implementations.first == nullptr || m_implementations.second == nullptr)
 	{
 		return 0u;
 	}
 
-	// TODO: Assert that both sides have same DOF
-	SURGSIM_ASSERT(m_implementations.first->getNumDof() == m_implementations.second->getNumDof()) << 
+	SURGSIM_ASSERT(m_implementations.first->getNumDof() == m_implementations.second->getNumDof()) <<
 		"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
 		" != " << m_implementations.second->getNumDof() <<")" << std::endl;
 
@@ -81,7 +78,6 @@ void Constraint::build(double dt,
 	unsigned int indexRepresentation1,
 	unsigned int indexConstraint)
 {
-	using namespace SurgSim::Framework;
 	SURGSIM_ASSERT(m_data.get() != nullptr) << "Constraint data has not been set for this constraint." << std::endl;
 
 	SurgSim::Math::MlcpConstraintType mlcpConstraintType = SurgSim::Math::MLCP_INVALID_CONSTRAINT;
@@ -90,21 +86,23 @@ void Constraint::build(double dt,
 
 	if (m_implementations.first)
 	{
-		m_implementations.first->build(dt, *m_data.get(), mlcp, indexRepresentation0, indexConstraint, CONSTRAINT_POSITIVE_SIDE);
+		m_implementations.first->build(dt, *m_data.get(), mlcp, indexRepresentation0, indexConstraint,
+			CONSTRAINT_POSITIVE_SIDE);
 		mlcpConstraintType = m_implementations.first->getMlcpConstraintType();
 	}
 
 	if (m_implementations.second)
 	{
-		m_implementations.second->build(dt, *m_data.get(), mlcp, indexRepresentation1, indexConstraint, CONSTRAINT_NEGATIVE_SIDE);
-		SurgSim::Math::MlcpConstraintType mlcpConstraintType_second = m_implementations.second->getMlcpConstraintType();
+		m_implementations.second->build(dt, *m_data.get(), mlcp, indexRepresentation1, indexConstraint,
+			CONSTRAINT_NEGATIVE_SIDE);
+		SurgSim::Math::MlcpConstraintType mlcpConstraintType_2nd = m_implementations.second->getMlcpConstraintType();
 		if (mlcpConstraintType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)
 		{
-			mlcpConstraintType = mlcpConstraintType_second;
+			mlcpConstraintType = mlcpConstraintType_2nd;
 		}
-		SURGSIM_ASSERT(mlcpConstraintType == mlcpConstraintType_second) <<
+		SURGSIM_ASSERT(mlcpConstraintType == mlcpConstraintType_2nd) <<
 			"A constraint has 2 incompatible implementations:( " << mlcpConstraintType << " , " <<
-			mlcpConstraintType_second << " )" << std::endl;
+			mlcpConstraintType_2nd << " )" << std::endl;
 	}
 
 	mlcp.constraintTypes.push_back(mlcpConstraintType);

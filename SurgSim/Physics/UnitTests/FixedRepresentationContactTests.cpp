@@ -102,7 +102,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// b should be exactly the violation
 	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);
-	
+
 	// Constraint H should be [] (a fixed representation has no dof !)
 
 	// ConstraintTypes should contain 0 entry as it is setup by the constraint and not the ConstraintImplementation

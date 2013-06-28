@@ -29,7 +29,7 @@ class ConstraintData
 public:
 	/// Default Constructor
 	ConstraintData();
-	
+
 	/// Destructor
 	virtual ~ConstraintData();
 };

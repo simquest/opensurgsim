@@ -46,8 +46,8 @@ private:
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
-	/// \param indexRepresentation The index, of the representation associated to this implementation. in the mlcp problem
-	/// \param indexConstraint The index of the constraint in the mlcp problem
+	/// \param indexRepresentation The index of the representation (associated to this implementation) in the mlcp
+	/// \param indexConstraint The index of the constraint in the mlcp
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,

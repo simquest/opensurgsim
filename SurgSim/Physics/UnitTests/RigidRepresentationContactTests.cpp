@@ -104,7 +104,7 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Violation b should be exactly violation = -radius (the sphere center is on the plane)
 	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);
-	
+
 	// Constraint H should be
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));

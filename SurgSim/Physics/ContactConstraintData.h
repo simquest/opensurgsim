@@ -70,7 +70,7 @@ public:
 private:
 	/// Plane equation normal vector (normalized vector)
 	SurgSim::Math::Vector3d m_normal;
-	
+
 	/// Plane equation distance to origin
 	double m_distance;
 };

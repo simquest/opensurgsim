@@ -64,7 +64,7 @@ protected:
 	RigidTransform3d m_poseRigid;
 	/// Contact normal direction
 	Vector3d m_n;
-	/// Distance to origin of the contact plane equation 
+	/// Distance to origin of the contact plane equation
 	double m_d;
 	/// Sphere radius
 	double m_radius;
@@ -114,7 +114,6 @@ protected:
 		m_dt = 1e-3;
 		m_numDof = 0;
 		m_indexSphereRepresentation = 0;
-		m_indexPlaneRepresentation;
 		m_indexConstraint = 0;
 		m_numConstraint = 1;
 		m_contactPositionPlane.setZero();
@@ -198,8 +197,10 @@ TEST_F (ConstraintTests, TestGetNumDof)
 	{
 		std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
 		std::shared_ptr<Localization> loc2 = std::make_shared<FixedRepresentationLocalization>();
-		std::shared_ptr<FixedRepresentationContact> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
-		std::shared_ptr<FixedRepresentationContact> implementation2 = std::make_shared<FixedRepresentationContact>(loc2);
+		std::shared_ptr<FixedRepresentationContact> implementation1;
+		std::shared_ptr<FixedRepresentationContact> implementation2;
+		implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
+		implementation2 = std::make_shared<FixedRepresentationContact>(loc2);
 		constraint.setImplementations(implementation1, implementation2);
 		EXPECT_EQ(1u, constraint.getNumDof());
 	}
@@ -288,18 +289,19 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	m_constraint.setImplementations(m_implementationRigidSphere, m_implementationFixedPlane);
 
 	// Fill up the Mlcp
-	m_constraint.build(m_dt, m_mlcpPhysicsProblem, m_indexSphereRepresentation, m_indexPlaneRepresentation, m_indexConstraint);
+	m_constraint.build(m_dt, m_mlcpPhysicsProblem, m_indexSphereRepresentation, m_indexPlaneRepresentation,
+		m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
 	// This should not depend on the ordering of the object...the violation remains the same no matter what
 	EXPECT_NEAR(-m_radius, m_mlcpPhysicsProblem.b[0], epsilon);
-	
+
 	// Constraint H should be
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// The rigid sphere being the 1st representation in the pair, it has the positive sign in the constraint !
 	double sign = 1.0;
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
-	
+
 	EXPECT_NEAR(sign * m_dt * m_n[0] , m_mlcpPhysicsProblem.H(0, 0), epsilon);
 	EXPECT_NEAR(sign * m_dt * m_n[1] , m_mlcpPhysicsProblem.H(0, 1), epsilon);
 	EXPECT_NEAR(sign * m_dt * m_n[2] , m_mlcpPhysicsProblem.H(0, 2), epsilon);
@@ -337,18 +339,19 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 	m_constraint.setImplementations(m_implementationFixedPlane, m_implementationRigidSphere);
 
 	// Fill up the Mlcp
-	m_constraint.build(m_dt, m_mlcpPhysicsProblem, m_indexPlaneRepresentation, m_indexSphereRepresentation, m_indexConstraint);
+	m_constraint.build(m_dt, m_mlcpPhysicsProblem, m_indexPlaneRepresentation, m_indexSphereRepresentation,
+		m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
 	// This should not depend on the ordering of the object...the violation remains the same no matter what
 	EXPECT_NEAR(-m_radius, m_mlcpPhysicsProblem.b[0], epsilon);
-	
+
 	// Constraint H should be
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// The rigid sphere being the 2nd representation in the pair, it has the negative sign in the constraint !
 	double sign = -1.0;
 	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
-	
+
 	EXPECT_NEAR(sign * m_dt * m_n[0] , m_mlcpPhysicsProblem.H(0, 0), epsilon);
 	EXPECT_NEAR(sign * m_dt * m_n[1] , m_mlcpPhysicsProblem.H(0, 1), epsilon);
 	EXPECT_NEAR(sign * m_dt * m_n[2] , m_mlcpPhysicsProblem.H(0, 2), epsilon);

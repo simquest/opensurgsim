@@ -35,11 +35,11 @@ class Constraint
 public:
 	/// Default constructor
 	Constraint();
-	
+
 	/// Constructor
 	/// \param side0, side1 Both sides implementation of the constraint
 	Constraint(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1);
-	
+
 	/// Destructor
 	virtual ~Constraint();
 
