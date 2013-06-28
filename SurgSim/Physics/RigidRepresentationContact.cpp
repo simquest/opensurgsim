@@ -59,7 +59,7 @@ void RigidRepresentationContact::doBuild(double dt,
 
 	// FRICTIONLESS CONTACT in a LCP
 	//   (n, d) defines the plane of contact
-	//   P(t) the point of contact
+	//   P(t) the point of contact (usually after free motion)
 	// The constraint equation is: n.P(t+dt) + d >= 0
 	// n.[ P(t) + dt.V(t+dt) ] + d >= 0   (using the numerical integration scheme Backward Euler)
 	// n.dt.[dG(t+dt) + w(t+dt)^GP] + n.P(t) + d >= 0
@@ -68,13 +68,13 @@ void RigidRepresentationContact::doBuild(double dt,
 	//      [dGz(t+dt) + (wx(t+dt).GPy-wy(t+dt).GPx)]
 	// H.v(t+dt) + b >= 0
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
-	// b = - n.P(t) - d             -> P(t) evaluated after free motion
+	// b = n.P(t) + d             -> P(t) evaluated after free motion
 
 	SurgSim::Math::Vector3d globalPosition = getLocalization()->calculatePosition();
 	SurgSim::Math::Vector3d GP = globalPosition - rigid->getCurrentState().getPose().translation();
 
 	// Fill up b with the constraint equation...
-	double violation = - n.dot(globalPosition) - d;
+	double violation = n.dot(globalPosition) + d;
 	b[indexConstraint] += violation * scale;
 
 	// Fill up H with just the non null values

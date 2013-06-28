@@ -57,6 +57,11 @@ namespace
 
 TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 {
+	Vector3d n(0.0, 1.0, 0.0);
+	double d = 0.0;
+	double violation = -0.01;
+
+	Vector3d contactPosition = -n * (d - violation);
 	RigidTransform3d poseFixed;
 	poseFixed.setIdentity();
 
@@ -66,7 +71,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	fixed->setInitialPose(poseFixed);
 
 	std::shared_ptr<FixedRepresentationLocalization> loc = std::make_shared<FixedRepresentationLocalization>(fixed);
-	loc->setLocalPosition(Vector3d(0.0, 0.0, 0.0));
+	loc->setLocalPosition(contactPosition);
 	std::shared_ptr<FixedRepresentationContact> implementation = std::make_shared<FixedRepresentationContact>(loc);
 
 	EXPECT_EQ(loc, implementation->getLocalization());
@@ -74,8 +79,6 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	EXPECT_EQ(1u, implementation->getNumDof());
 
 	ContactConstraintData constraintData;
-	Vector3d n(0.0, 1.0, 0.0);
-	double d = 0.0;
 	constraintData.setPlaneEquation(n, d);
 
 	MlcpPhysicsProblem mlcpPhysicsProblem;
@@ -97,8 +100,8 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	double dt = 1e-3;
 	implementation->build(dt, constraintData, mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
-	// Violation b should be exactly -radius (the sphere center is on the plane)
-	EXPECT_NEAR(0.0, mlcpPhysicsProblem.b[0], epsilon);
+	// b should be exactly the violation
+	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);
 	
 	// Constraint H should be [] (a fixed representation has no dof !)
 

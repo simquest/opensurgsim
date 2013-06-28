@@ -27,6 +27,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Computation.cpp
 	DcdCollision.cpp
 	FemRepresentationParameters.cpp
+	FixedRepresentationContact.cpp
 	FreeMotion.cpp
 	Localization.cpp
 	PhysicsManager.cpp

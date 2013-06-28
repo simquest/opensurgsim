@@ -96,7 +96,7 @@ void Constraint::build(double dt,
 
 	if (m_implementations.second)
 	{
-		m_implementations.second->build(dt, *m_data.get(), mlcp, indexRepresentation0, indexConstraint, CONSTRAINT_NEGATIVE_SIDE);
+		m_implementations.second->build(dt, *m_data.get(), mlcp, indexRepresentation1, indexConstraint, CONSTRAINT_NEGATIVE_SIDE);
 		SurgSim::Math::MlcpConstraintType mlcpConstraintType_second = m_implementations.second->getMlcpConstraintType();
 		if (mlcpConstraintType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)
 		{

@@ -18,6 +18,8 @@
 
 #include <SurgSim/Physics/ConstraintImplementation.h>
 
+#include <SurgSim/Math/Vector.h>
+
 namespace SurgSim
 {
 
@@ -30,21 +32,15 @@ class FixedRepresentationContact : public ConstraintImplementation
 public:
 	/// Constructor
 	/// \param localization The localization of the contact on the FixedRepresentation
-	explicit FixedRepresentationContact(std::shared_ptr<Localization> localization) :
-	ConstraintImplementation(localization)
-	{}
+	explicit FixedRepresentationContact(std::shared_ptr<Localization> localization);
 
 	/// Destructor
-	virtual ~FixedRepresentationContact()
-	{}
+	virtual ~FixedRepresentationContact();
 
 private:
 	/// Gets the number of degree of freedom
 	/// \return 1 as a frictionless contact is formed of 1 equation of constraint (along the normal direction)
-	unsigned int doGetNumDof() const override
-	{
-		return 1;
-	}
+	unsigned int doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
@@ -59,16 +55,11 @@ private:
 		MlcpPhysicsProblem& mlcp,
 		unsigned int indexRepresentation,
 		unsigned int indexConstraint,
-		ConstraintSideSign sign) override
-	{
-	}
+		ConstraintSideSign sign) override;
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
-	SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const override
-	{
-		return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
-	}
+	SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const override;
 };
 
 };  // namespace Physics
