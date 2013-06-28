@@ -133,7 +133,7 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(1u, osgSwitch->getNumChildren());
 }
 
-TEST(GroupTests, AppendTest)
+TEST(OsgGroupTests, AppendTest)
 {
 	std::shared_ptr<Group> group1 = std::make_shared<OsgGroup>("test group 1");
 	EXPECT_EQ(0u, group1->getMembers().size());

@@ -89,6 +89,7 @@ TEST(OsgCameraTests, VisibilityTest)
 	EXPECT_TRUE(switchNode.valid());
 
 	EXPECT_TRUE(camera->isVisible());
+	EXPECT_TRUE(switchNode->getChildValue(osgCamera->getOsgCamera()));
 
 	camera->setVisible(false);
 	EXPECT_FALSE(camera->isVisible());
@@ -124,7 +125,7 @@ TEST(OsgCameraTests, GroupTest)
 }
 
 
-TEST(CameraTests, PoseTest)
+TEST(OsgCameraTests, PoseTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
@@ -170,7 +171,7 @@ TEST(CameraTests, PoseTest)
 	}
 }
 
-TEST(CameraTests, MatricesTest)
+TEST(OsgCameraTests, MatricesTest)
 {
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;

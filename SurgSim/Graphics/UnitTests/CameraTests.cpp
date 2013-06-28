@@ -24,12 +24,16 @@
 
 #include <random>
 
-using SurgSim::Graphics::Camera;
-using SurgSim::Graphics::Group;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+
+namespace SurgSim
+{
+
+namespace Graphics
+{
 
 
 TEST(CameraTests, InitTest)
@@ -145,4 +149,6 @@ TEST(CameraTests, UpdateTest)
 	}
 }
 
+};  // namespace Graphics
 
+};  // namespace SurgSim

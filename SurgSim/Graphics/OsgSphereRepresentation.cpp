@@ -80,6 +80,12 @@ bool OsgSphereRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Mat
 	return didSucceed;
 }
 
+void OsgSphereRepresentation::clearMaterial()
+{
+	m_transform->setStateSet(new osg::StateSet()); // Reset to empty state set
+	Representation::setMaterial(nullptr);
+}
+
 void OsgSphereRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	m_pose = transform;

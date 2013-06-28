@@ -20,10 +20,11 @@
 
 #include <gtest/gtest.h>
 
+namespace SurgSim
+{
 
-using SurgSim::Graphics::Group;
-using SurgSim::Graphics::Representation;
-
+namespace Graphics
+{
 
 TEST(GroupTests, InitTest)
 {
@@ -147,3 +148,6 @@ TEST(GroupTests, ClearTest)
 	EXPECT_EQ(0u, group->getMembers().size());
 }
 
+};  // namespace Graphics
+
+};  // namespace SurgSim

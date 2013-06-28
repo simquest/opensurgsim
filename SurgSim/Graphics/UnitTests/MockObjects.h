@@ -17,13 +17,15 @@
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 
 #include <SurgSim/Math/Vector.h>
-#include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Graphics/Camera.h>
 #include <SurgSim/Graphics/Group.h>
 #include <SurgSim/Graphics/Manager.h>
+#include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Graphics/Shader.h>
+#include <SurgSim/Graphics/UniformBase.h>
 #include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/ViewElement.h>
-
 
 /// Manager class for testing
 class MockManager : public SurgSim::Graphics::Manager
@@ -515,6 +517,77 @@ private:
 	SurgSim::Math::RigidTransform3d m_initialPose;
 	/// Current pose of the representation
 	SurgSim::Math::RigidTransform3d m_currentPose;
+};
+
+/// Material class for testing
+class MockMaterial : public SurgSim::Graphics::Material
+{
+	/// Adds a uniform to this material
+	/// \param	uniform	Uniform to add
+	/// \return	True if uniform was added successfully, otherwise false
+	virtual bool addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
+	{
+		m_uniforms.push_back(uniform);
+		return true;
+	}
+
+	/// Removes a uniform from this material
+	/// \param	uniform	Uniform to remove
+	/// \return True if uniform was removed successfully, otherwise false
+	virtual bool removeUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
+	{
+		auto it = std::find(m_uniforms.begin(), m_uniforms.end(), uniform);
+		if (it != m_uniforms.end())
+		{
+			m_uniforms.erase(it);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/// Returns the number of uniforms in this material
+	virtual unsigned int getNumUniforms() const
+	{
+		return m_uniforms.size();
+	}
+
+	/// Gets a uniform in this material
+	/// \param	index	Index of the uniform in the material's list of uniforms
+	/// \return	Uniform at the index
+	virtual std::shared_ptr<SurgSim::Graphics::UniformBase> getUniform(unsigned int index) const
+	{
+		return m_uniforms[index];
+	}
+
+	/// Sets the shader used by this material
+	/// \param	shader	Shader program
+	/// \return	True if shader was set successfully, otherwise false
+	virtual bool setShader(std::shared_ptr<SurgSim::Graphics::Shader> shader)
+	{
+		m_shader = shader;
+		return true;
+	}
+
+	/// Gets the shader used by this material
+	/// \return	Shader program
+	virtual std::shared_ptr<SurgSim::Graphics::Shader> getShader() const
+	{
+		return m_shader;
+	}
+
+	/// Removes the shader from the material, falling back to fixed-function pipeline
+	virtual void clearShader()
+	{
+		m_shader = nullptr;
+	}
+private:
+	/// Uniforms
+	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> m_uniforms;
+	/// Shader
+	std::shared_ptr<SurgSim::Graphics::Shader> m_shader;
 };
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
