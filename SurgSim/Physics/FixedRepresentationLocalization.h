@@ -40,7 +40,7 @@ public:
 
 	/// Constructor
 	/// \param representation The representation to assign to this localization
-	explicit FixedRepresentationLocalization(std::shared_ptr<Representation> representation) : 
+	explicit FixedRepresentationLocalization(std::shared_ptr<Representation> representation) :
 	Localization(representation)
 	{
 		std::shared_ptr<FixedRepresentation> fixed = std::dynamic_pointer_cast<FixedRepresentation>(representation);

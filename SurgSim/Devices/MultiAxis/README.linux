@@ -1,0 +1,14 @@
+By default, regular users on most Linux systems DO NOT have the
+permissions necessary to access the multi-axis controller devices on
+their system.  Fortunately, the permissions that are set on those
+devices are usually relatively easy to configure using udev rules.
+
+To allow all users direct access to various 3DConnexion devices, you
+can simply copy the rules file from the udev-rules directory into the
+system directory /etc/udev/rules.d.  (You will need administrative
+privileges to do so.)  For example, on many systems you can run:
+
+  sudo cp udev-rules/90-3dconnexion.rules /etc/udev/rules.d
+
+For other devices, or to set up the privileges differently, you will
+need to set up your own rules file.

@@ -36,7 +36,7 @@ set(SURGSIM_MATH_HEADERS
 )
 
 surgsim_add_library(
-	SurgSimMath 
+	SurgSimMath
 	"${SURGSIM_MATH_SOURCES}"
 	"${SURGSIM_MATH_HEADERS}"
 	"SurgSim/Math"

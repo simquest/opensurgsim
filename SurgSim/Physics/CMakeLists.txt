@@ -19,6 +19,7 @@ include_directories(
 
 set(SURGSIM_PHYSICS_SOURCES
 	CollisionPair.cpp
+	CollisionRepresentation.cpp
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
@@ -31,9 +32,12 @@ set(SURGSIM_PHYSICS_SOURCES
 	FreeMotion.cpp
 	Localization.cpp
 	PhysicsManager.cpp
+	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
+	RigidRepresentationBase.cpp
 	RigidRepresentationContact.cpp
+	RigidRepresentationLocalization.cpp
 	RigidShapeCollisionRepresentation.cpp
 	VtcRigidRepresentation.cpp
 )

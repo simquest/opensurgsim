@@ -18,7 +18,7 @@
 #include <SurgSim/Physics/Computation.h>
 
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Physics
 {
@@ -26,14 +26,14 @@ namespace Physics
 class MockComputation : public Computation
 {
 public:
-	explicit MockComputation(bool doCopyState = false) : Computation(doCopyState) 
+	explicit MockComputation(bool doCopyState = false) : Computation(doCopyState)
 	{
 
 	}
 
 protected:
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
+		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state) override
 	{
 		return state;

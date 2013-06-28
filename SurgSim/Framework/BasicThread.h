@@ -114,7 +114,7 @@ private:
 	virtual bool doInitialize() = 0;
 	virtual bool doStartUp() = 0;
 
-	/// Implementation of actual work function for this thread, this has a default implementation to handle 
+	/// Implementation of actual work function for this thread, this has a default implementation to handle
 	/// destruction better, as it could be called while the thread is under destruction, if left unimplemented
 	/// this would trigger a call to a pure virtual function.
 	/// \return false when the thread is done, this will stop execution

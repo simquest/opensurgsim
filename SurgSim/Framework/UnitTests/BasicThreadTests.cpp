@@ -65,6 +65,22 @@ TEST(BasicThreadTest, Stop)
 	EXPECT_FALSE(m.isRunning());
 }
 
+TEST(BasicThreadTest, StopWithoutSleep)
+{
+	for (int i = 0;  i < 10;  ++i)
+	{
+		MockThread m;
+		m.count = 1000000;
+		m.start(nullptr);
+
+		// Stopping right away should not create a race condition.
+		m.stop();
+
+		EXPECT_TRUE(m.didBeforeStop);
+		EXPECT_FALSE(m.isRunning());
+	}
+}
+
 TEST(BasicThreadTest, RunTimeManagement)
 {
 	MockThread m;

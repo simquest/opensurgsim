@@ -13,4 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_subdirectory(VisualTestCommon)
+if(GLUT_FOUND)
+	add_subdirectory(VisualTestCommon)
+endif(GLUT_FOUND)
