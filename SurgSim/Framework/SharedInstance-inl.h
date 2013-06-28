@@ -71,7 +71,7 @@ std::shared_ptr<T> SharedInstance<T>::createInstance()
 template <typename T>
 typename SharedInstance<T>::InstanceCreator SharedInstance<T>::defaultInstanceCreator()
 {
-	return []() { return std::make_shared<T>(); };
+	return []() { return std::make_shared<T>(); };  // NOLINT(readability/braces)
 }
 
 
