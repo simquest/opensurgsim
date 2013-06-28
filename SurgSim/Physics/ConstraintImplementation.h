@@ -20,6 +20,8 @@
 
 #include <Eigen/Core>
 
+#include <SurgSim/Physics/ConstraintData.h>
+#include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
 
 namespace SurgSim
@@ -33,16 +35,13 @@ namespace Physics
 /// \note Therefore 1 side will have a positive sign (+1), and 1 side a negative sign (-1)
 enum ConstraintSideSign {CONSTRAINT_POSITIVE_SIDE, CONSTRAINT_NEGATIVE_SIDE};
 
-class Localization;
-class ConstraintData;
+//class Localization;
+//class ConstraintData;
 
 /// Base class for all constraint implementations. A ConstraintImplementation defines 1 side of a constraint.
 class ConstraintImplementation
 {
 public:
-	/// Default constructor
-	ConstraintImplementation();
-
 	/// Constructor
 	/// \param localization The localization for this implementation
 	/// \note Localization embbed the representation, so it is fully defined
@@ -83,17 +82,17 @@ public:
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
-	/// \param indexRepresentation The index of the representation (associated to this implementation) in the mlcp
-	/// \param indexConstraint The index of the constraint in the mlcp
+	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
+	/// \param indexOfConstraint The index of the constraint in the mlcp
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void build(double dt,
 		const ConstraintData& data,
 		MlcpPhysicsProblem& mlcp,
-		unsigned int indexRepresentation,
-		unsigned int indexConstraint,
+		unsigned int indexOfRepresentation,
+		unsigned int indexOfConstraint,
 		ConstraintSideSign sign)
 	{
-		doBuild(dt, data, mlcp, indexRepresentation, indexConstraint, sign);
+		doBuild(dt, data, mlcp, indexOfRepresentation, indexOfConstraint, sign);
 	}
 
 private:
@@ -108,14 +107,14 @@ private:
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
-	/// \param indexRepresentation The index of the representation (associated to this implementation) in the mlcp
-	/// \param indexConstraint The index of the constraint in the mlcp
+	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
+	/// \param indexOfConstraint The index of the constraint in the mlcp
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	virtual void doBuild(double dt,
 				const ConstraintData& data,
 				MlcpPhysicsProblem& mlcp,
-				unsigned int indexRepresentation,
-				unsigned int indexConstraint,
+				unsigned int indexOfRepresentation,
+				unsigned int indexOfConstraint,
 				ConstraintSideSign sign) = 0;
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation

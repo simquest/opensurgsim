@@ -28,33 +28,20 @@
 #include <SurgSim/Physics/RigidRepresentationLocalization.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/SphereShape.h>
-using SurgSim::Physics::Constraint;
-using SurgSim::Physics::ConstraintData;
-using SurgSim::Physics::ContactConstraintData;
-using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::Localization;
-using SurgSim::Physics::FixedRepresentation;
-using SurgSim::Physics::FixedRepresentationContact;
-using SurgSim::Physics::FixedRepresentationLocalization;
-using SurgSim::Physics::MlcpPhysicsProblem;
-using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationContact;
-using SurgSim::Physics::RigidRepresentationLocalization;
-using SurgSim::Physics::RigidRepresentationParameters;
-using SurgSim::Physics::SphereShape;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 
 namespace
 {
 	const double epsilon = 1e-10;
 };
 
+namespace SurgSim
+{
+namespace Physics
+{
 TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 {
 	Vector3d n(0.0, 1.0, 0.0);
@@ -62,7 +49,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	double violation = -0.01;
 
 	Vector3d contactPosition = -n * (d - violation);
-	RigidTransform3d poseFixed;
+	SurgSim::Math::RigidTransform3d poseFixed;
 	poseFixed.setIdentity();
 
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
@@ -109,3 +96,6 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	// This way, the constraint can verify that both ConstraintImplementation are the same type
 	ASSERT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
+
+};  //  namespace Physics
+};  //  namespace SurgSim

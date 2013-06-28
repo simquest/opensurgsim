@@ -31,8 +31,8 @@ namespace Physics
 void RigidRepresentationContact::doBuild(double dt,
 			const ConstraintData& data,
 			MlcpPhysicsProblem& mlcp,
-			unsigned int indexRepresentation,
-			unsigned int indexConstraint,
+			unsigned int indexOfRepresentation,
+			unsigned int indexOfConstraint,
 			ConstraintSideSign sign)
 {
 	Eigen::MatrixXd& H    = mlcp.H;
@@ -72,29 +72,30 @@ void RigidRepresentationContact::doBuild(double dt,
 
 	// Fill up b with the constraint equation...
 	double violation = n.dot(globalPosition) + d;
-	b[indexConstraint] += violation * scale;
+	b[indexOfConstraint] += violation * scale;
 
 	// Fill up H with just the non null values
-	H.block<1,3>(indexConstraint, indexRepresentation + 0) += dt * scale * n;
-	H.block<1,3>(indexConstraint, indexRepresentation + 3) += dt * scale * GP.cross(n);
+	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 0) += dt * scale * n;
+	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 3) += dt * scale * GP.cross(n);
 
 	// Fill up CH^t with just the non null values
 	for (unsigned int CHt_line = 0; CHt_line < rigid->getNumDof(); CHt_line++)
 	{
-		CHt(indexRepresentation + CHt_line, indexConstraint) +=
-			C.block<1,6>(CHt_line, 0) * H.block<1,6>(indexConstraint, indexRepresentation).transpose();
+		CHt(indexOfRepresentation + CHt_line, indexOfConstraint) +=
+			C.block<1,6>(CHt_line, 0) * H.block<1,6>(indexOfConstraint, indexOfRepresentation).transpose();
 	}
 
 	// Fill up HCHt (add 1 line and 1 column to it)
 	// NOTE: HCHt is symmetric => we compute the last line and reflect it on the last column
-	for (unsigned int col = 0; col < indexConstraint; col++)
+	for (unsigned int col = 0; col < indexOfConstraint; col++)
 	{
-		HCHt(indexConstraint, col) +=
-			H.block<1, 6>(indexConstraint, indexRepresentation) * CHt.block<6, 1>(indexRepresentation, col);
-		HCHt(col, indexConstraint) = HCHt(indexConstraint, col);
+		HCHt(indexOfConstraint, col) +=
+			H.block<1, 6>(indexOfConstraint, indexOfRepresentation) * CHt.block<6, 1>(indexOfRepresentation, col);
+		HCHt(col, indexOfConstraint) = HCHt(indexOfConstraint, col);
 	}
-	HCHt(indexConstraint, indexConstraint) +=
-		H.block<1, 6>(indexConstraint, indexRepresentation) * CHt.block<6, 1>(indexRepresentation, indexConstraint);
+	HCHt(indexOfConstraint, indexOfConstraint) +=
+		H.block<1, 6>(indexOfConstraint, indexOfRepresentation) *
+		CHt.block<6, 1>(indexOfRepresentation, indexOfConstraint);
 }
 
 }; // namespace Physics

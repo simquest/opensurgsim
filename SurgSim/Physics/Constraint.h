@@ -20,7 +20,6 @@
 #include <SurgSim/Physics/ConstraintImplementation.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
 
-//#include <utility>
 #include <memory>
 
 namespace SurgSim
@@ -33,9 +32,6 @@ namespace Physics
 class Constraint
 {
 public:
-	/// Default constructor
-	Constraint();
-
 	/// Constructor
 	/// \param side0, side1 Both sides implementation of the constraint
 	Constraint(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1);
@@ -45,11 +41,13 @@ public:
 
 	/// Sets both sides implementation
 	/// \param side0, side1 Both sides implementation of the constraint
-	void setImplementations(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1);
+	void setImplementations(std::shared_ptr<ConstraintImplementation> side0,
+		std::shared_ptr<ConstraintImplementation> side1);
 
 	/// Gets both sides implementation as a pair
 	/// \return the pair of implementations forming this constraint
-	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>& getImplementations() const;
+	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
+		getImplementations() const;
 
 	/// Sets the data associated to this constraint
 	/// \param data The data for this constraint
@@ -66,17 +64,14 @@ public:
 	/// Builds subset of an Mlcp physics problem associated to this constraint
 	/// \param dt The time step
 	/// \param [in, out] mclpPhysicsProblem The Mlcp physics problem to be filled up
-	/// \param indexRepresentation0 The index of the 1st representation in the Mlcp
-	/// \param indexRepresentation1 The index of the 2nd representation in the Mlcp
-	/// \param indexConstraint The index of this constraint in the Mlcp
+	/// \param indexOfRepresentation0 The index of the 1st representation in the Mlcp
+	/// \param indexOfRepresentation1 The index of the 2nd representation in the Mlcp
+	/// \param indexOfConstraint The index of this constraint in the Mlcp
 	void build(double dt,
 		MlcpPhysicsProblem& mlcpPhysicsProblem,
-		unsigned int indexRepresentation0,
-		unsigned int indexRepresentation1,
-		unsigned int indexConstraint);
-
-	/// Clears/resets this constraint
-	void clear();
+		unsigned int indexOfRepresentation0,
+		unsigned int indexOfRepresentation1,
+		unsigned int indexOfConstraint);
 
 private:
 	/// Specific data associated to this constraint
@@ -88,18 +83,15 @@ private:
 	/// \param dt The time step
 	/// \param data The data specific to this constraint
 	/// \param [in, out] mclpPhysicsProblem The Mlcp physics problem to be filled up
-	/// \param indexRepresentation0 The index of the 1st representation in the Mlcp
-	/// \param indexRepresentation1 The index of the 2nd representation in the Mlcp
-	/// \param indexConstraint The index of this constraint in the Mlcp
+	/// \param indexOfRepresentation0 The index of the 1st representation in the Mlcp
+	/// \param indexOfRepresentation1 The index of the 2nd representation in the Mlcp
+	/// \param indexOfConstraint The index of this constraint in the Mlcp
 	virtual void doBuild(double dt,
 		const ConstraintData& data,
 		MlcpPhysicsProblem& mlcpPhysicsProblem,
-		unsigned int indexRepresentation0,
-		unsigned int indexRepresentation1,
-		unsigned int indexConstraint);
-
-	/// Clears/resets user-defined call for extra treatment
-	virtual void doClear();
+		unsigned int indexOfRepresentation0,
+		unsigned int indexOfRepresentation1,
+		unsigned int indexOfConstraint);
 };
 
 };  // namespace Physics

@@ -25,39 +25,30 @@
 #include <SurgSim/Physics/RigidRepresentationLocalization.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/SphereShape.h>
-using SurgSim::Physics::Constraint;
-using SurgSim::Physics::ConstraintData;
-using SurgSim::Physics::ContactConstraintData;
-using SurgSim::Physics::ConstraintImplementation;
-using SurgSim::Physics::Localization;
-using SurgSim::Physics::MlcpPhysicsProblem;
-using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationContact;
-using SurgSim::Physics::RigidRepresentationLocalization;
-using SurgSim::Physics::RigidRepresentationParameters;
-using SurgSim::Physics::SphereShape;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 
 namespace
 {
 	const double epsilon = 1e-10;
 };
 
+namespace SurgSim
+{
+namespace Physics
+{
+
 TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 {
-	Vector3d n(0.0, 1.0, 0.0);
+	SurgSim::Math::Vector3d n(0.0, 1.0, 0.0);
 	double d = 0.0;
 	double radius = 0.01;
 	double violation = -radius;
 
-	Vector3d contactPosition = -n * (d - violation);
-	RigidTransform3d poseRigid;
+	SurgSim::Math::Vector3d contactPosition = -n * (d - violation);
+	SurgSim::Math::RigidTransform3d poseRigid;
 	poseRigid.setIdentity();
 
 	std::shared_ptr<RigidRepresentation> rigid = std::make_shared<RigidRepresentation>("Rigid");
@@ -107,7 +98,7 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Constraint H should be
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
-	Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));
+	SurgSim::Math::Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));
 	EXPECT_NEAR(dt * n[0]   , mlcpPhysicsProblem.H(0, 0), epsilon);
 	EXPECT_NEAR(dt * n[1]   , mlcpPhysicsProblem.H(0, 1), epsilon);
 	EXPECT_NEAR(dt * n[2]   , mlcpPhysicsProblem.H(0, 2), epsilon);
@@ -119,3 +110,6 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 	// This way, the constraint can verify that both ConstraintImplementation are the same type
 	ASSERT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
+
+};  //  namespace Physics
+};  //  namespace SurgSim

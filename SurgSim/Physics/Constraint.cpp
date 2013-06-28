@@ -24,13 +24,11 @@ namespace SurgSim
 namespace Physics
 {
 
-Constraint::Constraint()
-{
-}
-
 Constraint::Constraint(std::shared_ptr<ConstraintImplementation> side0,
                        std::shared_ptr<ConstraintImplementation> side1)
 {
+	SURGSIM_ASSERT(side0 != nullptr && side1 != nullptr) << "A constraint needs 2 valid constraint implementations!";
+
 	m_implementations = std::make_pair(side0, side1);
 }
 
@@ -38,12 +36,16 @@ Constraint::~Constraint()
 {
 }
 
-void Constraint::setImplementations(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1)
+void Constraint::setImplementations(std::shared_ptr<ConstraintImplementation> side0,
+	std::shared_ptr<ConstraintImplementation> side1)
 {
+	SURGSIM_ASSERT(side0 != nullptr && side1 != nullptr) << "A constraint needs 2 valid constraint implementations!";
+
 	m_implementations = std::make_pair(side0, side1);
 }
 
-const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>& Constraint::getImplementations() const
+const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
+	Constraint::getImplementations() const
 {
 	return m_implementations;
 }
@@ -60,11 +62,6 @@ std::shared_ptr<ConstraintData> Constraint::getData() const
 
 unsigned int Constraint::getNumDof() const
 {
-	if (m_implementations.first == nullptr || m_implementations.second == nullptr)
-	{
-		return 0u;
-	}
-
 	SURGSIM_ASSERT(m_implementations.first->getNumDof() == m_implementations.second->getNumDof()) <<
 		"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
 		" != " << m_implementations.second->getNumDof() <<")" << std::endl;
@@ -74,26 +71,26 @@ unsigned int Constraint::getNumDof() const
 
 void Constraint::build(double dt,
 	MlcpPhysicsProblem &mlcp,
-	unsigned int indexRepresentation0,
-	unsigned int indexRepresentation1,
-	unsigned int indexConstraint)
+	unsigned int indexOfRepresentation0,
+	unsigned int indexOfRepresentation1,
+	unsigned int indexOfConstraint)
 {
 	SURGSIM_ASSERT(m_data.get() != nullptr) << "Constraint data has not been set for this constraint." << std::endl;
 
 	SurgSim::Math::MlcpConstraintType mlcpConstraintType = SurgSim::Math::MLCP_INVALID_CONSTRAINT;
 
-	doBuild(dt, *m_data.get(), mlcp, indexRepresentation0, indexRepresentation1, indexConstraint);
+	doBuild(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfRepresentation1, indexOfConstraint);
 
 	if (m_implementations.first)
 	{
-		m_implementations.first->build(dt, *m_data.get(), mlcp, indexRepresentation0, indexConstraint,
+		m_implementations.first->build(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfConstraint,
 			CONSTRAINT_POSITIVE_SIDE);
 		mlcpConstraintType = m_implementations.first->getMlcpConstraintType();
 	}
 
 	if (m_implementations.second)
 	{
-		m_implementations.second->build(dt, *m_data.get(), mlcp, indexRepresentation1, indexConstraint,
+		m_implementations.second->build(dt, *m_data.get(), mlcp, indexOfRepresentation1, indexOfConstraint,
 			CONSTRAINT_NEGATIVE_SIDE);
 		SurgSim::Math::MlcpConstraintType mlcpConstraintType_2nd = m_implementations.second->getMlcpConstraintType();
 		if (mlcpConstraintType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)
@@ -111,21 +108,9 @@ void Constraint::build(double dt,
 void Constraint::doBuild(double dt,
 	const ConstraintData& data,
 	MlcpPhysicsProblem &mlcp,
-	unsigned int indexRepresentation0,
-	unsigned int indexRepresentation1,
-	unsigned int indexConstraint)
-{
-}
-
-void Constraint::clear()
-{
-	doClear();
-	m_implementations.first = nullptr;
-	m_implementations.second = nullptr;
-	m_data = nullptr;
-}
-
-void Constraint::doClear()
+	unsigned int indexOfRepresentation0,
+	unsigned int indexOfRepresentation1,
+	unsigned int indexOfConstraint)
 {
 }
 

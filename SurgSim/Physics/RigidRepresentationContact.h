@@ -34,8 +34,8 @@ class RigidRepresentationContact : public ConstraintImplementation
 public:
 	/// Constructor
 	/// \param localization The localization of the contact on the rigid representation
-	explicit RigidRepresentationContact(std::shared_ptr<Localization> localization)
-		: ConstraintImplementation(localization)
+	explicit RigidRepresentationContact(std::shared_ptr<Localization> localization) :
+	ConstraintImplementation(localization)
 	{}
 
 	/// Destructor
@@ -54,14 +54,14 @@ private:
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
-	/// \param indexRepresentation The index of the representation (associated to this implementation) in the mlcp
-	/// \param indexConstraint The index of the constraint in the mlcp
+	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
+	/// \param indexOfConstraint The index of the constraint in the mlcp
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void doBuild(double dt,
 		const ConstraintData& data,
 		MlcpPhysicsProblem& mlcp,
-		unsigned int indexRepresentation,
-		unsigned int indexConstraint,
+		unsigned int indexOfRepresentation,
+		unsigned int indexOfConstraint,
 		ConstraintSideSign sign) override;
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation

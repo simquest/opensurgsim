@@ -43,8 +43,8 @@ unsigned int FixedRepresentationContact::doGetNumDof() const
 void FixedRepresentationContact::doBuild(double dt,
 	const ConstraintData& data,
 	MlcpPhysicsProblem& mlcp,
-	unsigned int indexRepresentation,
-	unsigned int indexConstraint,
+	unsigned int indexOfRepresentation,
+	unsigned int indexOfConstraint,
 	ConstraintSideSign sign)
 {
 	Eigen::VectorXd& b = mlcp.b;
@@ -66,7 +66,7 @@ void FixedRepresentationContact::doBuild(double dt,
 
 	// Fill up b with the constraint equation...
 	double violation = n.dot(globalPosition) + d;
-	b[indexConstraint] += violation * scale;
+	b[indexOfConstraint] += violation * scale;
 }
 
 /// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
