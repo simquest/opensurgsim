@@ -41,6 +41,8 @@ public:
 	typedef DataGroup::PoseType PoseType;
 	/// The type used for vectors.
 	typedef DataGroup::VectorType VectorType;
+	/// The type used for matrixes.
+	typedef Eigen::MatrixXd DynamicMatrixType;
 	/// The type used for scalars.
 	typedef DataGroup::ScalarType ScalarType;
 	/// The type used for integers.
@@ -81,7 +83,12 @@ public:
 	/// \return a read-only reference to the sub-object that contains vector value entries.
 	const NamedDataBuilder<VectorType>& vectors() const;
 
+	/// Provides access to the matrix value entries.
+	/// \return a writable reference to the sub-object that contains matrix value entries.
 	NamedDataBuilder<DynamicMatrixType>& matrixes();
+
+	/// Provides access to the matrix value entries.
+	/// \return a read-only reference to the sub-object that contains matrix value entries.
 	const NamedDataBuilder<DynamicMatrixType>& matrixes() const;
 
 	/// Provides access to the scalar value entries.
@@ -124,6 +131,8 @@ public:
 	/// Identical to <code>%vectors().addEntry(name)</code>.
 	void addVector(const std::string& name);
 
+	/// A shortcut for adding a named matrix entry.
+	/// Identical to <code>%matrixes().addEntry(name)</code>.
 	void addMatrix(const std::string& name);
 
 	/// A shortcut for adding a named scalar entry.
@@ -161,6 +170,7 @@ private:
 	/// The subsidiary builder used for vector values.
 	NamedDataBuilder<VectorType> m_vectors;
 
+	/// The subsidiary builder used for matrix values.
 	NamedDataBuilder<DynamicMatrixType> m_matrixes;
 
 	/// The subsidiary builder used for scalar values.

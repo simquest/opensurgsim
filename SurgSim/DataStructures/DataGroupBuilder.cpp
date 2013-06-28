@@ -30,11 +30,11 @@ DataGroup DataGroupBuilder::createData() const
 	DataGroup data;
 	data.poses() = poses().createData();
 	data.vectors() = vectors().createData();
+	data.matrixes() = matrixes().createData();
 	data.scalars() = scalars().createData();
 	data.integers() = integers().createData();
 	data.booleans() = booleans().createData();
 	data.strings() = strings().createData();
-	data.matrixes() = matrixes().createData();
 	return data;
 }
 
@@ -72,7 +72,6 @@ const NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::m
 {
 	return m_matrixes;
 }
-
 
 NamedDataBuilder<DataGroupBuilder::ScalarType>& DataGroupBuilder::scalars()
 {
@@ -128,7 +127,6 @@ void DataGroupBuilder::addMatrix(const std::string& name)
 {
 	matrixes().addEntry(name);
 }
-
 
 void DataGroupBuilder::addScalar(const std::string& name)
 {

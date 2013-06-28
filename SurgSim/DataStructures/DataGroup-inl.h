@@ -161,6 +161,7 @@ inline void DataGroup::resetAll()
 {
 	m_poses.resetAll();
 	m_vectors.resetAll();
+	m_matrixes.resetAll();
 	m_scalars.resetAll();
 	m_integers.resetAll();
 	m_booleans.resetAll();

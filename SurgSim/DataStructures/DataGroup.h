@@ -66,6 +66,8 @@ public:
 	typedef SurgSim::Math::RigidTransform3d PoseType;
 	/// The type used for vectors.
 	typedef SurgSim::Math::Vector3d VectorType;
+	/// The type used for matrixes.
+	typedef Eigen::MatrixXd DynamicMatrixType;
 	/// The type used for scalars.
 	typedef double ScalarType;
 	/// The type used for integers.
@@ -74,9 +76,6 @@ public:
 	typedef bool BooleanType;
 	/// The type used for strings.
 	typedef std::string StringType;
-
-	typedef Eigen::MatrixXd DynamicMatrixType;
-
 
 	/// Construct an empty object, with no associated names and indices yet.
 	inline DataGroup();
@@ -145,7 +144,12 @@ public:
 	/// \return the read-only vector data.
 	inline const NamedData<VectorType>& vectors() const;
 
+	/// Return the matrix data structure.
+	/// \return the mutable matrix data.
 	inline NamedData<DynamicMatrixType>& matrixes();
+
+	/// Return the matrix data structure.
+	/// \return the read-only matrix data.
 	inline const NamedData<DynamicMatrixType>& matrixes() const;
 
 	/// Return the scalar data structure.
@@ -190,6 +194,9 @@ private:
 	/// The vector values.
 	NamedData<VectorType> m_vectors;
 
+	/// The matrix values.
+	NamedData<DynamicMatrixType> m_matrixes;
+
 	/// The scalar values.
 	NamedData<ScalarType> m_scalars;
 
@@ -201,8 +208,6 @@ private:
 
 	/// The string values.
 	NamedData<StringType> m_strings;
-
-	NamedData<DynamicMatrixType> m_matrixes;
 };
 
 };  // namespace Input
