@@ -50,7 +50,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->isVisible());
 
 	EXPECT_TRUE(camera->getPose().matrix().isApprox(
-		fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
+					fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
 		"Camera's pose should be initialized to the inverse of the osg::Camera's view matrix!";
 
 	EXPECT_TRUE(camera->getViewMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()))) <<
@@ -83,7 +83,8 @@ TEST(OsgCameraTests, VisibilityTest)
 	std::shared_ptr<OsgRepresentation> osgRepresentation = osgCamera;
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	// Get the osg::Switch from the OsgRepresentation so that we can make sure that the osg::Camera has the correct visibility.
+	// Get the osg::Switch from the OsgRepresentation so that we can make sure that the osg::Camera has the
+	// correct visibility.
 	osg::ref_ptr<osg::Switch> switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
 	EXPECT_TRUE(switchNode.valid());
 

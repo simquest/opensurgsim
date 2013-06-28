@@ -37,6 +37,12 @@ class Shader;
 class Material
 {
 public:
+	/// Destructor.
+	//  (Note that Visual Studio does not support "= default" yet.)
+	virtual ~Material()
+	{
+	}
+
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
 	/// \return	True if uniform was added successfully, otherwise false

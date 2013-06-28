@@ -31,7 +31,7 @@ class MockOsgUniformBase : public OsgUniformBase
 public:
 	/// Constructor
 	/// \param	name	Name used in shader code to access this uniform
-	MockOsgUniformBase(const std::string& name) : OsgUniformBase(name)
+	explicit MockOsgUniformBase(const std::string& name) : OsgUniformBase(name)
 	{
 	}
 };

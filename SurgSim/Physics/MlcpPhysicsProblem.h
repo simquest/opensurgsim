@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_MLCPPHYSICSPROBLEM_H
-#define SURGSIM_MATH_MLCPPHYSICSPROBLEM_H
+#ifndef SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
+#define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 
 #include <SurgSim/Math/MlcpProblem.h>
 
@@ -48,4 +48,4 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 };  // namespace Physics
 };  // namespace SurgSim
 
-#endif // SURGSIM_MATH_MLCPPHYSICSPROBLEM_H
+#endif  // SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H

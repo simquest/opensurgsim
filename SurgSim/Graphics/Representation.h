@@ -31,7 +31,8 @@ class Material;
 
 /// Base graphics representation class, which defines the interface that all graphics representations must implement.
 ///
-/// A Graphics::Representation is the visual Framework::Representation of a Framework::SceneElement in the Framework::Scene.
+/// A Graphics::Representation is the visual Framework::Representation of a Framework::SceneElement in the
+/// Framework::Scene.
 class Representation : public SurgSim::Framework::Representation
 {
 public:

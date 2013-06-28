@@ -28,7 +28,8 @@ namespace Graphics
 
 /// Base OSG implementation of a graphics representation.
 ///
-/// A Graphics::OsgRepresentation wraps a osg::Node that serves as the root node for this representation in the OSG scenegraph.
+/// A Graphics::OsgRepresentation wraps a osg::Node that serves as the root node for this representation in the OSG
+/// scenegraph.
 class OsgRepresentation : public virtual Representation
 {
 public:

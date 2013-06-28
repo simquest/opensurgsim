@@ -26,7 +26,9 @@
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgPlane;
 
-OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) : Representation(name), PlaneRepresentation(name),
+OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) :
+	Representation(name),
+	PlaneRepresentation(name),
 	OsgRepresentation(name, new osg::Switch()),
 	m_sharedPlane(getSharedPlane())
 {

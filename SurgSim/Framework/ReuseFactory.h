@@ -47,8 +47,10 @@ namespace Framework
 ///
 /// Limitations:
 /// - The class T must have a default constructor.
-/// - The state of returned objects are in no way reset, so the state will need to be setup after retrieving the instance from the factory.
-/// - Custom deleters for an instance of T cannot be specified, as a custom deleter is used to manage the unused objects.
+/// - The state of returned objects are in no way reset, so the state will need to be setup after retrieving the
+///   instance from the factory.
+/// - Custom deleters for an instance of T cannot be specified, as a custom deleter is used to manage the unused
+///   objects.
 ///
 /// \tparam T	Instances of this class are provided by this factory
 template <class T>

@@ -107,7 +107,8 @@ inline Eigen::Quaternion<T, QOpt> negate(const Eigen::Quaternion<T, QOpt>& q)
 /// \note 'Interpolate' has been created because slerp might not be enough in certain cases.
 /// This gives room for correction and special future treatment
 template <typename T, int QOpt>
-inline Eigen::Quaternion<T, QOpt> interpolate(const Eigen::Quaternion<T, QOpt>& q0, const Eigen::Quaternion<T, QOpt>& q1, T t)
+inline Eigen::Quaternion<T, QOpt> interpolate(const Eigen::Quaternion<T, QOpt>& q0,
+											  const Eigen::Quaternion<T, QOpt>& q1, T t)
 {
 	Eigen::Quaternion<T, QOpt> result;
 

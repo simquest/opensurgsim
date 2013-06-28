@@ -27,7 +27,9 @@ using SurgSim::Graphics::fromOsg;
 using SurgSim::Graphics::toOsg;
 using SurgSim::Math::makeRigidTransform;
 
-OsgCamera::OsgCamera(const std::string& name) : SurgSim::Graphics::Representation(name), SurgSim::Graphics::Camera(name),
+OsgCamera::OsgCamera(const std::string& name) :
+	SurgSim::Graphics::Representation(name),
+	SurgSim::Graphics::Camera(name),
 	OsgRepresentation(name, new osg::Switch()),
 	m_camera(new osg::Camera())
 {
@@ -93,7 +95,7 @@ void OsgCamera::setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
 	osg::Matrixd osgViewMatrix = toOsg(matrix);
 	osg::Matrixd osgInverseViewMatrix = osg::Matrixd::inverse(osgViewMatrix);
 	m_pose = makeRigidTransform(fromOsg<double>(osgInverseViewMatrix.getRotate()),
-		fromOsg(osgInverseViewMatrix.getTrans()));
+								fromOsg(osgInverseViewMatrix.getTrans()));
 
 	m_camera->setViewMatrix(osgViewMatrix);
 }

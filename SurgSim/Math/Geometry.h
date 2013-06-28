@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GEOMETRY_H
-#define SURGSIM_GEOMETRY_H
+#ifndef SURGSIM_MATH_GEOMETRY_H
+#define SURGSIM_MATH_GEOMETRY_H
 
 #include <SurgSim/Math/Vector.h>
 #include <Eigen/Core>
@@ -39,17 +39,19 @@ namespace Math
 
 namespace Geometry
 {
-	/// Used as epsilon for general distance calculations
-	static const double DistanceEpsilon = 1e-10;
 
-	/// Used as epsilon for general distance calculations with squared distances
-	static const double SquaredDistanceEpsilon = 1e-10;
+/// Used as epsilon for general distance calculations
+static const double DistanceEpsilon = 1e-10;
 
-	/// Epsilon used in angular comparisons
-	static const double AngularEpsilon = 1e-10;
+/// Used as epsilon for general distance calculations with squared distances
+static const double SquaredDistanceEpsilon = 1e-10;
 
-	/// Used as epsilon for scalar comparisons
-	static const double ScalarEpsilon = 1e-10;
+/// Epsilon used in angular comparisons
+static const double AngularEpsilon = 1e-10;
+
+/// Used as epsilon for scalar comparisons
+static const double ScalarEpsilon = 1e-10;
+
 }
 
 /// Determine the parameter that is the smallest of the five and returns its numerical index in the order as they
@@ -58,11 +60,21 @@ namespace Geometry
 /// \param a,b,c Values that are searched for the minimum.
 /// \return [0-2] with then number being equivalent to the place of the parameter with the smallest value
 template <class T> inline
-	size_t indexOfMinimum(T a, T b, T c)
+size_t indexOfMinimum(T a, T b, T c)
 {
 	int index = 0;
-	if (b < a) { index = 1; } else { b = a; }
-	if (c < b) { index = 2; }
+	if (b < a)
+	{
+		index = 1;
+	}
+	else
+	{
+		b = a;
+	}
+	if (c < b)
+	{
+		index = 2;
+	}
 	return index;
 }
 
@@ -76,10 +88,34 @@ template <class T> inline
 size_t indexOfMinimum(T a, T b, T c, T d, T e)
 {
 	int index = 0;
-	if (b < a) { index = 1; } else { b = a; }
-	if (c < b) { index = 2; } else { c = b; }
-	if (d < c) { index = 3; } else { d = c; }
-	if (e < d) { index = 4; }
+	if (b < a)
+	{
+		index = 1;
+	}
+	else
+	{
+		b = a;
+	}
+	if (c < b)
+	{
+		index = 2;
+	}
+	else
+	{
+		c = b;
+	}
+	if (d < c)
+	{
+		index = 3;
+	}
+	else
+	{
+		d = c;
+	}
+	if (e < d)
+	{
+		index = 4;
+	}
 	return index;
 }
 
@@ -95,11 +131,11 @@ size_t indexOfMinimum(T a, T b, T c, T d, T e)
 /// \return bool true on success, false if two or more if the triangle is considered degenerate
 template <class T,int MOpt> inline
 bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-                            const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-                            const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-                            const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-                            const Eigen::Matrix<T, 3, 1, MOpt>& tn,
-                            Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
+							const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+							const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+							const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+							const Eigen::Matrix<T, 3, 1, MOpt>& tn,
+							Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
 {
 	const T signedTriAreaX2 = ((tv1-tv0).cross(tv2-tv0)).dot(tn);
 	if (signedTriAreaX2 < Geometry::SquaredDistanceEpsilon)
@@ -126,11 +162,11 @@ bool barycentricCoordinates(const Eigen::Matrix<T, 3, 1, MOpt>& pt,
 /// \return bool true on success, false if two or more if the triangle is considered degenerate
 template <class T, int MOpt> inline
 bool barycentricCoordinates(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	Eigen::Matrix<T, 3, 1, MOpt>* coordinates)
 {
 	const Eigen::Matrix<T, 3, 1, MOpt> tn = (tv1-tv0).cross(tv2-tv0);
 	return barycentricCoordinates(pt, tv0, tv1, tv2, tn, coordinates);
@@ -148,18 +184,18 @@ bool barycentricCoordinates(
 /// \return	true		if pt lies inside the triangle tv0, tv1, tv2, false otherwise.
 template <class T, int MOpt> inline
 bool isPointInsideTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tn)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tn)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, tn, &baryCoords);
 	return (result &&
-	        baryCoords[0] >= -Geometry::ScalarEpsilon &&
-	        baryCoords[1] >= -Geometry::ScalarEpsilon &&
-	        baryCoords[2] >= -Geometry::ScalarEpsilon);
+			baryCoords[0] >= -Geometry::ScalarEpsilon &&
+			baryCoords[1] >= -Geometry::ScalarEpsilon &&
+			baryCoords[2] >= -Geometry::ScalarEpsilon);
 }
 
 /// Check if a point is inside a triangle.
@@ -173,16 +209,16 @@ bool isPointInsideTriangle(
 /// \return true if pt lies inside the triangle tv0, tv1, tv2, false otherwise.
 template <class T, int MOpt> inline
 bool isPointInsideTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> baryCoords;
 	bool result = barycentricCoordinates(pt, tv0, tv1, tv2, &baryCoords);
 	return (result && baryCoords[0] >= -Geometry::ScalarEpsilon &&
-	        baryCoords[1] >= -Geometry::ScalarEpsilon &&
-	        baryCoords[2] >= -Geometry::ScalarEpsilon);
+			baryCoords[1] >= -Geometry::ScalarEpsilon &&
+			baryCoords[2] >= -Geometry::ScalarEpsilon);
 }
 
 
@@ -193,10 +229,10 @@ bool isPointInsideTriangle(
 /// \return			The normal distance between the point and the line
 template <class T, int MOpt> inline
 T distancePointLine(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& v1,
-    Eigen::Matrix<T, 3, 1, MOpt>* result)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& v1,
+	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	// The lines is parametrized by:
 	//		q = v0 + lambda0 * (v1-v0)
@@ -224,10 +260,10 @@ T distancePointLine(
 /// \return				The distance of the point from the segment.
 template <class T, int MOpt> inline
 T distancePointSegment(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-    Eigen::Matrix<T, 3, 1, MOpt>* result)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> v01 = sv1-sv0;
 	T v01Norm2 = v01.squaredNorm();
@@ -264,12 +300,12 @@ T distancePointSegment(
 /// 	  distancePointLine, why is that ??? (HS-2013-apr-26)
 template <class T, int MOpt> inline
 T distanceLineLine(
-    const Eigen::Matrix<T, 3, 1, MOpt>& l0v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& l0v1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& l1v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& l1v1,
-    Eigen::Matrix<T, 3, 1, MOpt>* pt0,
-    Eigen::Matrix<T, 3, 1, MOpt>* pt1)
+	const Eigen::Matrix<T, 3, 1, MOpt>& l0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& l0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& l1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& l1v1,
+	Eigen::Matrix<T, 3, 1, MOpt>* pt0,
+	Eigen::Matrix<T, 3, 1, MOpt>* pt1)
 {
 	// Based on the outline of http://www.geometrictools.com/Distance.html, also refer to
 	// http://geomalgorithms.com/a07-_distance.html for a geometric interpretation
@@ -329,12 +365,12 @@ T distanceLineLine(
 /// \return Distance between the segments, i.e. (pt0 - pt1).norm()
 template <class T, int MOpt>
 T distanceSegmentSegment(
-    const Eigen::Matrix<T, 3, 1, MOpt>& s0v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& s0v1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& s1v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& s1v1,
-    Eigen::Matrix<T, 3, 1, MOpt>* pt0,
-    Eigen::Matrix<T, 3, 1, MOpt>* pt1)
+	const Eigen::Matrix<T, 3, 1, MOpt>& s0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& s0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& s1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& s1v1,
+	Eigen::Matrix<T, 3, 1, MOpt>* pt0,
+	Eigen::Matrix<T, 3, 1, MOpt>* pt1)
 {
 	// Based on the outline of http://www.geometrictools.com/Distance.html, also refer to
 	// http://geomalgorithms.com/a07-_distance.html for a geometric interpretation
@@ -670,11 +706,11 @@ T distanceSegmentSegment(
 /// \return				The distance between the point and the triangle, i.e (result - pt).norm()
 template <class T, int MOpt> inline
 T distancePointTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    Eigen::Matrix<T, 3, 1, MOpt>* result)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	// Based on the outline of http://www.geometrictools.com/Distance.html, also refer to
 	//	http://softsurfer.com/Archive/algorithm_0106 for a geometric interpretation
@@ -891,13 +927,13 @@ T distancePointTriangle(
 /// 	  against all the triangle edges in the non intersection cases.
 template <class T, int MOpt> inline
 bool doesCollideSegmentTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tn,
-    Eigen::Matrix<T, 3, 1, MOpt>* result)
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tn,
+	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	// Triangle edges vectors
 	Eigen::Matrix<T, 3, 1, MOpt> u = tv1-tv0;
@@ -945,7 +981,7 @@ bool doesCollideSegmentTriangle(
 		return false;
 	}
 	//Ray comes toward triangle but isn't long enough to reach it
-	if(r > 1+Geometry::DistanceEpsilon)
+	if (r > 1+Geometry::DistanceEpsilon)
 	{
 		return false;
 	}
@@ -990,10 +1026,10 @@ bool doesCollideSegmentTriangle(
 /// \return			The distance to the plane (negative if on the backside of the plane).
 template <class T, int MOpt> inline
 T distancePointPlane(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pt,
-    const Eigen::Matrix<T, 3, 1, MOpt>& n,
-    T d,
-    Eigen::Matrix<T, 3, 1, MOpt>* result)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pt,
+	const Eigen::Matrix<T, 3, 1, MOpt>& n,
+	T d,
+	Eigen::Matrix<T, 3, 1, MOpt>* result)
 {
 	T dist = n.dot(pt) + d;
 	*result = pt - n*dist;
@@ -1017,12 +1053,12 @@ T distancePointPlane(
 /// 				negative if the closest point is on the other side of the plane.
 template <class T, int MOpt> inline
 T distanceSegmentPlane(
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& n,
-    T d,
-    Eigen::Matrix<T, 3, 1, MOpt>* closestPointSegment,
-    Eigen::Matrix<T, 3, 1, MOpt>* planeIntersectionPoint)
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& n,
+	T d,
+	Eigen::Matrix<T, 3, 1, MOpt>* closestPointSegment,
+	Eigen::Matrix<T, 3, 1, MOpt>* planeIntersectionPoint)
 {
 	T dist0 = n.dot(sv0) + d;
 	T dist1 = n.dot(sv1) + d;
@@ -1078,13 +1114,13 @@ T distanceSegmentPlane(
 /// \return The distance of the triangle to the plane.
 template <class T, int MOpt> inline
 T distanceTrianglePlane(
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    const Eigen::Matrix<T, 3, 1, MOpt>& n,
-    T d,
-    Eigen::Matrix<T, 3, 1, MOpt>* closestPointTriangle,
-    Eigen::Matrix<T, 3, 1, MOpt>* planeProjectionPoint)
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& n,
+	T d,
+	Eigen::Matrix<T, 3, 1, MOpt>* closestPointTriangle,
+	Eigen::Matrix<T, 3, 1, MOpt>* planeProjectionPoint)
 {
 	T dist0 = n.dot(tv0) + d;
 	T dist1 = n.dot(tv1) + d;
@@ -1107,8 +1143,10 @@ T distanceTrianglePlane(
 	}
 
 	// Is there an intersection
-	if ((dist0 <= Geometry::DistanceEpsilon || dist1 <= Geometry::DistanceEpsilon || dist2 <= Geometry::DistanceEpsilon) &&
-		(dist0 > Geometry::DistanceEpsilon || dist1 > Geometry::DistanceEpsilon || dist2 > Geometry::DistanceEpsilon))
+	if ((dist0 <= Geometry::DistanceEpsilon || dist1 <= Geometry::DistanceEpsilon ||
+		 dist2 <= Geometry::DistanceEpsilon) &&
+		(dist0 > Geometry::DistanceEpsilon || dist1 > Geometry::DistanceEpsilon ||
+		 dist2 > Geometry::DistanceEpsilon))
 	{
 		if (dist0 * dist1 < 0)
 		{
@@ -1163,10 +1201,10 @@ T distanceTrianglePlane(
 /// \return true when a unique line exists, false for disjoint or coinciding.
 template <class T, int MOpt> inline
 bool doesIntersectPlanePlane(
-    const Eigen::Matrix<T, 3, 1, MOpt>& pn0, T pd0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& pn1, T pd1,
-    Eigen::Matrix<T, 3, 1, MOpt>* pt0,
-    Eigen::Matrix<T, 3, 1, MOpt>* pt1)
+	const Eigen::Matrix<T, 3, 1, MOpt>& pn0, T pd0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& pn1, T pd1,
+	Eigen::Matrix<T, 3, 1, MOpt>* pt0,
+	Eigen::Matrix<T, 3, 1, MOpt>* pt1)
 {
 	// Algorithm from real time collision detection - optimized version page 210 (with extra checks)
 	const Eigen::Matrix<T, 3, 1, MOpt> lineDir = pn0.cross(pn1);
@@ -1199,13 +1237,13 @@ bool doesIntersectPlanePlane(
 /// \return the the distance between the two closest points, i.e. (trianglePoint - segmentPoint).norm().
 template <class T, int MOpt> inline
 T distanceSegmentTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
-    Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
+	Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
 {
 	Eigen::Matrix<T, 3, 1, MOpt> n = (tv1 - tv0).cross(tv2 - tv1);
 	n.normalize();
@@ -1224,14 +1262,14 @@ T distanceSegmentTriangle(
 /// \return the distance between the two closest points.
 template <class T, int MOpt> inline
 T distanceSegmentTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
-    const Eigen::Matrix<T, 3, 1, MOpt>& normal,
-    Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
-    Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& tv2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& normal,
+	Eigen::Matrix<T, 3, 1, MOpt>* segmentPoint,
+	Eigen::Matrix<T, 3, 1, MOpt>* trianglePoint)
 {
 	segmentPoint->setConstant((std::numeric_limits<double>::quiet_NaN()));
 	trianglePoint->setConstant((std::numeric_limits<double>::quiet_NaN()));
@@ -1338,14 +1376,14 @@ T distanceSegmentTriangle(
 /// \return the distance between the two triangles.
 template <class T, int MOpt> inline
 T distanceTriangleTriangle(
-    const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
-    const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
-    const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
-    const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
-    Eigen::Matrix<T, 3, 1, MOpt>* closestPoint0,
-    Eigen::Matrix<T, 3, 1, MOpt>* closestPoint1)
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	Eigen::Matrix<T, 3, 1, MOpt>* closestPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* closestPoint1)
 {
 	// Check the segments of t0 against t1
 	T minDst = std::numeric_limits<T>::max();
