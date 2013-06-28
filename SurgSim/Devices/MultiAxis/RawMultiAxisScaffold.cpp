@@ -602,7 +602,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 	for (int i = 0;  i < 32;  ++i)
 	{
 		char devicePath[128];
-		sprintf(devicePath, "/dev/input/event%d", i);
+		snprintf(devicePath, sizeof(devicePath), "/dev/input/event%d", i);
 
 		FileDescriptor fd = openDevice(devicePath);
 		if (! fd.isValid())
@@ -615,7 +615,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		{
 			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): " << errno << ", " <<
 				getSystemErrorText(errno);
-			strcpy(reportedName, "???");
+			snprintf(reportedName, sizeof(reportedName), "???");
 		}
 		else
 		{
