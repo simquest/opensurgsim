@@ -18,6 +18,7 @@
 
 #include <SurgSim/Graphics/Uniform.h>
 
+#include <osg/StateSet>
 #include <osg/Uniform>
 
 namespace SurgSim
@@ -35,19 +36,19 @@ namespace Graphics
 class OsgUniformBase : public virtual UniformBase
 {
 public:
-	/// Constructor
-	/// \param	name	Name used in shader code to access this uniform
-	explicit OsgUniformBase(const std::string& name) : UniformBase(),
-		m_uniform(new osg::Uniform())
-	{
-		m_uniform->setName(name);
-	}
-
 	/// Returns the name used in shader code to access this uniform
 	const std::string& getName() const
 	{
 		return m_uniform->getName();
 	}
+
+	/// Adds this uniform to the OSG state set
+	/// \param	stateSet	OSG state set
+	virtual void addToStateSet(osg::StateSet* stateSet);
+
+	/// Removes this uniform from the OSG state set
+	/// \param	stateSet	OSG state set
+	virtual void removeFromStateSet(osg::StateSet* stateSet);
 
 	/// Returns the OSG uniform node
 	osg::ref_ptr<osg::Uniform> getOsgUniform() const
@@ -56,6 +57,10 @@ public:
 	}
 
 protected:
+	/// Constructor
+	/// \param	name	Name used in shader code to access this uniform
+	explicit OsgUniformBase(const std::string& name);
+
 	/// OSG uniform node
 	osg::ref_ptr<osg::Uniform> m_uniform;
 };

@@ -80,10 +80,12 @@ private:
 class MockThread : public SurgSim::Framework::BasicThread
 {
 public:
-	MockThread() :
-		count(10),
+	MockThread(int runCount = -1) :
+		count(runCount),
 		totalTime(0.0),
-		didBeforeStop(false)
+		didBeforeStop(false),
+		didInitialize(false),
+		didStartUp(false)
 	{
 	}
 
@@ -95,16 +97,23 @@ public:
 	double totalTime;
 
 	bool didBeforeStop;
+	bool runIndefinetly;
+	bool didInitialize;
+	bool didStartUp;
 
 private:
 	virtual bool doInitialize()
 	{
+		didInitialize = true;
 		return true;
 	};
+
 	virtual bool doStartUp()
 	{
+		didStartUp = true;
 		return true;
 	};
+
 	virtual bool doUpdate(double dt)
 	{
 		--count;
@@ -112,6 +121,7 @@ private:
 
 		return count != 0;
 	};
+
 	virtual void doBeforeStop()
 	{
 		didBeforeStop = true;
@@ -254,7 +264,7 @@ private:
 		didBeforeStop = true;
 	}
 
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) 
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 	{
 		return tryAddComponent(component, &m_components) != nullptr;
 	}

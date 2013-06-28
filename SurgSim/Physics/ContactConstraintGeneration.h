@@ -16,12 +16,19 @@
 #ifndef SURGSIM_PHYSICS_CONTACTCONSTRAINTGENERATION_H
 #define SURGSIM_PHYSICS_CONTACTCONSTRAINTGENERATION_H
 
+#include  <memory>
 #include <SurgSim/Physics/Computation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
+
+class PhysicsManagerState;
+class Representation;
+struct Location;
+class Localization;
+class CollisionRepresentation;
 
 class ContactConstraintGeneration : public Computation
 {
@@ -33,8 +40,14 @@ public:
 
 
 private:
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(double dt, std::shared_ptr<PhysicsManagerState> state);
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
+		const double& dt,
+		const std::shared_ptr<PhysicsManagerState>& state);
 
+	bool makeLocalization(
+		const std::shared_ptr<CollisionRepresentation>& representation,
+		const Location& location,
+		std::shared_ptr<Localization> localization);
 };
 
 }; // Physics

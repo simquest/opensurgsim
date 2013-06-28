@@ -49,6 +49,15 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const;
 
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	/// \note	OsgPlaneRepresentation only accepts subclasses of OsgMaterial.
+	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	/// Removes the material from the representation
+	virtual void clearMaterial();
+
 	/// Sets the current pose of the representation
 	/// \param	transform	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);

@@ -25,12 +25,15 @@ set(UNIT_TEST_SOURCES
 	OsgBoxRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
+	OsgShaderRenderTests.cpp
 	OsgSphereRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
+
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 

@@ -37,7 +37,7 @@ FreeMotion::~FreeMotion()
 }
 
 std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
-	const double& dt, 
+	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	// Copy state to new state

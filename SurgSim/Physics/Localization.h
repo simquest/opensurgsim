@@ -19,6 +19,7 @@
 #include <memory>
 
 #include <SurgSim/Math/Vector.h>
+#include <SurgSim/Framework/Assert.h>
 
 namespace SurgSim
 {
@@ -46,7 +47,14 @@ public:
 	/// \param representation The representation on which the localization is defined
 	void setRepresentation(std::shared_ptr<Representation> representation)
 	{
-		m_representation = representation;
+		if (isValidRepresentation(representation))
+		{
+			m_representation = representation;
+		}
+		else
+		{
+			SURGSIM_ASSERT(false) << "Unexpected representation type" << std::endl;
+		}
 	}
 
 	/// Gets the representation
@@ -65,13 +73,14 @@ public:
 		return doCalculatePosition(time);
 	}
 
+	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation);
+
 private:
 	/// Calculates the global position of this localization
 	/// \param time The time in [0..1] at which the position should be calculated
 	/// \return The global position of the localization at the requested time
 	/// \note time can useful when dealing with CCD
 	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) = 0;
-
 	/// The representation on which the localization is defined
 	std::shared_ptr<Representation> m_representation;
 };

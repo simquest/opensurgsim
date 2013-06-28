@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_VTCRIGIDPARAMETERS_H
 #define SURGSIM_PHYSICS_VTCRIGIDPARAMETERS_H
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics

@@ -18,7 +18,6 @@
 
 #include <SurgSim/Graphics/UniformBase.h>
 
-#include <string>
 #include <vector>
 
 namespace SurgSim

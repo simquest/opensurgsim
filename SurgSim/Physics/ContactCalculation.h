@@ -37,9 +37,10 @@ class ContactCalculation
 public:
 
 	/// Constructor
-	explicit ContactCalculation()
+	explicit ContactCalculation(bool doSwapPairs = false) : m_doSwapPairs(doSwapPairs)
 	{
 	}
+
 
 	/// Destructor
 	virtual ~ContactCalculation()
@@ -49,6 +50,16 @@ public:
 	/// Calculate the actual contact between two shapes of the give CollisionPair.
 	/// \param	pair	The pair that is under consideration.
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) = 0;
+
+	bool needsSwap()
+	{
+		return m_doSwapPairs;
+	}
+
+private:
+
+	bool m_doSwapPairs;
+
 };
 
 /// A default calculation, it does nothing and can be used as a placeholder
@@ -96,17 +107,15 @@ public:
 
 	/// Constructor.
 	/// \param	switchPair	Set to true if the calculation needs to switch the members of the pair.
-	explicit SpherePlaneDcdContact(bool switchPair) :
-		m_switchPair(switchPair)
+	explicit SpherePlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
 	{
+
 	}
 
 	/// Calculate the actual contact between two shapes of the give CollisionPair.
 	/// \param	pair	The pair that is under consideration.
 	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
 
-private:
-	bool m_switchPair;
 };
 
 }; // Physics
