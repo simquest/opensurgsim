@@ -117,4 +117,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  //SURGSIM_GRAPHICS_OSGVIEW_H
+#endif  // SURGSIM_GRAPHICS_OSGVIEW_H

@@ -27,7 +27,7 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
-#include "TestDevice.h"
+#include "SurgSim/Input/UnitTests/TestDevice.h"
 
 using SurgSim::Input::CommonDevice;
 using SurgSim::Input::InputConsumerInterface;

@@ -32,6 +32,8 @@ import argparse
 import sys
 import subprocess
 import re
+import os
+from fix_header_guards import get_expected_header_guard
 
 STANDARD_WARNING_FORMAT = \
     "{file}:{line}:{col}: {text} [{category}] [{level}]"
@@ -152,39 +154,13 @@ def check_header_guard(flags, file, lines):
     return False
   guard = guard_match.group(1)
 
-  namespace = filter(lambda x: re.search(r'^\s*namespace\b', x[1]), lines)
-  if not namespace:
-    emit_warning({'file': file, 'category': "opensurgsim/no_namespace",
-                  'text': "no 'namespace' lines!"})
-  indented_namespace = filter(lambda x: re.search(r'^\s', x[1]), namespace)
-  if indented_namespace:
-    emit_warning({'file': file, 'line': indented_namespace[0][0],
-                  'category': "opensurgsim/namespace_indented",
-                  'text': "one or more namespace declarations are indented!"})
-  curly_namespace = filter(lambda x: re.search(r'{$', x[1]), namespace)
-  if curly_namespace:
-    emit_warning({'file': file, 'line': curly_namespace[0][0],
-                  'category': "opensurgsim/namespace_brace",
-                  'text': "'{' on the same line as a namespace declaration!"})
-    namespace = map(lambda x: (x[0], re.sub(r'\s*{$', '', x[1])), namespace)
-  namespace = map(lambda x: re.sub(r'^\s*namespace\b', '', x[1]).strip(),
-                  namespace)
+  guard_expected = get_expected_header_guard(file)
 
-  namespace_re = "".join(
-    map(lambda x: "(?:" + re.sub(r'[^\w\d]+', '', x.upper()) + "_)?",
-        namespace))
-  if len(namespace_re):
-    namespace_re += r'(?<=.)'
-
-  file_guard_re = re.sub(r'\W+', '_',
-                         re.sub(r'.*/', '', file)).upper()
-  guard_re = r'^' + namespace_re + file_guard_re + r'$'
-
-  if not re.search(guard_re, guard):
+  if guard != guard_expected:
     emit_warning({'file': file, 'line': ifndef[0][0],
                   'category': "opensurgsim/header_guard",
-                  'text': ("unexpected guard '{}'!  expected /{}/."
-                           .format(guard, guard_re)) })
+                  'text': ("unexpected guard '{}'!  expected '{}'."
+                           .format(guard, guard_expected)) })
 
   define = filter(lambda x: re.search(r'^\s*#\s*define\b', x[1]), lines)
   if not define:
@@ -240,11 +216,17 @@ def find_column_char(text, column, tab_width=4):
     text = text[:(len(text)-1)]
   return len(text)
 
+def get_column(flags, text, column):
+  if flags.visual_studio:
+    return find_column_char(text, column)
+  else:
+    return column
+
 def check_length(flags, file, lines):
   xlines = map(lambda x: (x[0], re.sub(r'\r?\n$', '', x[1].expandtabs(4))),
                lines)
   for bad in filter(lambda x: len(x[1]) > flags.max_line_length, xlines):
-    col = find_column_char(lines[bad[0]-1][1], flags.max_line_length)
+    col = get_column(flags, lines[bad[0]-1][1], flags.max_line_length)
     emit_warning({'file': file, 'line': bad[0], 'col': col,
                   'category': "opensurgsim/too_long",
                   'text': ("the line is {} characters long, which is longer"

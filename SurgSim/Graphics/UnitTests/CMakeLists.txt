@@ -56,6 +56,8 @@ set(UNIT_TEST_HEADERS
 	MockOsgObjects.h
 )
 
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)

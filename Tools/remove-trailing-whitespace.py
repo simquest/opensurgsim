@@ -53,6 +53,10 @@ def update(file, lines):
   if len(lines) and re.search(r'\r\n$', lines[0]):
     eol = "\r\n"
   result = map(lambda x: x.rstrip() + eol, lines)
+  # If the trailing newline was missing, but there's no other trailing
+  # whitespace, leave well enough alone.
+  if len(lines) and lines[-1] == lines[-1].rstrip():
+    result[-1] = lines[-1]
   if result == lines:
     return None
   return result

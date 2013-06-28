@@ -60,7 +60,7 @@ StreamOutput::~StreamOutput()
 {
 	if (m_stream.fail())
 	{
-		//TODO HS-2013-28-01 Still need to figure out default logging
+		//TODO(hscheirich) 2013-01-28: Still need to figure out default logging
 		throw("Default logging not implemented yet");
 	}
 }
@@ -76,7 +76,7 @@ bool StreamOutput::writeMessage(const std::string& message)
 	}
 	else
 	{
-		//TODO HS-2013-28-01 Still need to figure out default logging
+		//TODO(hscheirich) 2013-01-28: Still need to figure out default logging
 		throw("Default logging not implemented yet");
 	}
 	return result;

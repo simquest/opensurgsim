@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MOCKOBJECTS_H
-#define MOCKOBJECTS_H
+#ifndef SURGSIM_FRAMEWORK_UNITTESTS_MOCKOBJECTS_H
+#define SURGSIM_FRAMEWORK_UNITTESTS_MOCKOBJECTS_H
 
 #include <memory>
 
@@ -80,7 +80,7 @@ private:
 class MockThread : public SurgSim::Framework::BasicThread
 {
 public:
-	MockThread(int runCount = -1) :
+	explicit MockThread(int runCount = -1) :
 		count(runCount),
 		totalTime(0.0),
 		didBeforeStop(false),
@@ -280,4 +280,4 @@ private:
 
 };
 
-#endif // MOCKOBJECTS_H
+#endif  // SURGSIM_FRAMEWORK_UNITTESTS_MOCKOBJECTS_H

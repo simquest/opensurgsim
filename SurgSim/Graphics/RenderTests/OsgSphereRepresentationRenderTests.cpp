@@ -43,7 +43,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-
+/// Pops up a window with two spheres that are translating and changing radius
 TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 {
 	/// Initial sphere 1 position
@@ -79,8 +79,7 @@ TEST(OsgSphereRepresentationRenderTests, MovingSpheresTest)
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");
 	scene->addSceneElement(viewElement);
 
-	/// Add the two sphere representation to the view element so we don't need to make another concrete scene element
-	/// \todo	DK-2013-june-03	Use the BasicSceneElement when it gets moved into Framework.
+	/// Add the sphere representation to the view element, no need to make another scene element
 	std::shared_ptr<SphereRepresentation> sphereRepresentation1 =
 		std::make_shared<OsgSphereRepresentation>("sphere representation 1");
 	viewElement->addComponent(sphereRepresentation1);

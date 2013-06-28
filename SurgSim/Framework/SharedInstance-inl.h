@@ -71,11 +71,11 @@ std::shared_ptr<T> SharedInstance<T>::createInstance()
 template <typename T>
 typename SharedInstance<T>::InstanceCreator SharedInstance<T>::defaultInstanceCreator()
 {
-	return []() { return std::make_shared<T>(); };
+	return []() { return std::make_shared<T>(); };  // NOLINT(readability/braces)
 }
 
 
 };  // namespace Framework
 };  // namespace SurgSim
 
-#endif  // SURGSIM_FRAMEWORK_SHAREDINSTANCE_H
+#endif  // SURGSIM_FRAMEWORK_SHAREDINSTANCE_INL_H

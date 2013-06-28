@@ -37,6 +37,12 @@ class Shader;
 class Material
 {
 public:
+	/// Destructor.
+	//  (Note that Visual Studio does not support "= default" yet.)
+	virtual ~Material()
+	{
+	}
+
 	/// Adds a uniform to this material
 	/// \param	uniform	Uniform to add
 	/// \return	True if uniform was added successfully, otherwise false
@@ -63,6 +69,9 @@ public:
 	/// Gets the shader used by this material
 	/// \return	Shader program
 	virtual std::shared_ptr<Shader> getShader() const = 0;
+
+	/// Removes the shader from the material, falling back to fixed-function pipeline
+	virtual void clearShader() = 0;
 };
 
 };  // namespace Graphics

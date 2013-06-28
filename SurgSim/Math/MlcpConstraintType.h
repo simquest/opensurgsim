@@ -39,7 +39,7 @@ enum MlcpConstraintType
 	MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT,
 	// Frictionless suturing in 3D => 2 directional constraint = 2 bilateral constraints !
 	MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT,
-	// Frictional suturing in 3D => 2 directional constraint + 1 frictional tangent constraint linked by the Coulomb's law
+	// Frictional suturing in 3D => 2 directional constraint + 1 frictional tangent constraint linked by Coulomb's law
 	MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT,
 	MLCP_NUM_CONSTRAINT_TYPES
 };

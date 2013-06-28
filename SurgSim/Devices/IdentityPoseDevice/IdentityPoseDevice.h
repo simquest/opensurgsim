@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_IDENTITYPOSEDEVICE_H
-#define SURGSIM_DEVICE_IDENTITYPOSEDEVICE_H
+#ifndef SURGSIM_DEVICES_IDENTITYPOSEDEVICE_IDENTITYPOSEDEVICE_H
+#define SURGSIM_DEVICES_IDENTITYPOSEDEVICE_IDENTITYPOSEDEVICE_H
 
 #include <memory>
 #include <string>
@@ -57,4 +57,4 @@ protected:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif // SURGSIM_DEVICE_IDENTITYPOSEDEVICE_H
+#endif  // SURGSIM_DEVICES_IDENTITYPOSEDEVICE_IDENTITYPOSEDEVICE_H

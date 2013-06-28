@@ -40,4 +40,4 @@ struct MlcpPhysicsSolution: public SurgSim::Math::MlcpSolution
 };  // namespace Physics
 };  // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_MLCPPHYSICSSOLUTION_H
+#endif  // SURGSIM_PHYSICS_MLCPPHYSICSSOLUTION_H

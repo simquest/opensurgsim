@@ -110,8 +110,10 @@ void VtcRigidRepresentation::update(double dt)
 	// k_t = Vtc linear  stiffness
 	// k_r = Vtc angular stiffness
 	{
-		//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
-		//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
+		//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] =
+		//                           = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
+		//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] =
+		//                           = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
 		//
 		// System matrix on the rotational DOF:
 		//  Id33.m.(1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m)
@@ -144,10 +146,13 @@ void VtcRigidRepresentation::update(double dt)
 
 	// Solve the 6D system on the velocity level
 	{
-		//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
-		//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
+		//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] =
+		//                           = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
+		//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] =
+		//                           = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
 		double invMass = 1.0 / param.getMass();
-		dG = invMass * m_force  / (1.0 / dt + param.getLinearDamping() + (vtcParam.getVtcLinearDamping() + dt * vtcParam.getVtcLinearStiffness()) * invMass);
+		dG = invMass * m_force  / (1.0 / dt + param.getLinearDamping() +
+								   (vtcParam.getVtcLinearDamping() + dt * vtcParam.getVtcLinearStiffness()) * invMass);
 		Matrix33d mat33_tmp(m_globalInertia);
 		mat33_tmp *= (1.0 / dt + param.getAngularDamping());
 		mat33_tmp += Matrix33d::Identity() * vtcParam.getVtcAngularDamping();
@@ -211,8 +216,10 @@ void VtcRigidRepresentation::computeComplianceMatrix(double dt)
 
 	m_C.setZero();
 
-	//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
-	//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
+	//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] =
+	//                               = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
+	//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] =
+	//                               = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
 
 	// Compliance matrix for interactions:
 	// C = ( Mlinear^-1       0     )

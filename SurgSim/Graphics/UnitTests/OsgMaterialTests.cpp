@@ -47,6 +47,106 @@ public:
 	MockShader() : Shader()
 	{
 	}
+
+	/// Returns true if the vertex shader has been set, otherwise false.
+	virtual bool hasVertexShader()
+	{
+		return false;
+	}
+
+	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
+	virtual void clearVertexShader()
+	{
+	}
+
+	/// Loads the vertex shader source code from a file
+	/// \param	filePath	Path to file containing shader source code
+	/// \return	True if the source is successfully loaded, otherwise false.
+	virtual bool loadVertexShaderSource(const std::string& filePath)
+	{
+		return false;
+	}
+
+	/// Set the vertex shader source code
+	/// \param	source	Shader source code
+	virtual void setVertexShaderSource(const std::string& source)
+	{
+	}
+
+	/// Gets the vertex shader source code
+	/// \return	Shader source code
+	virtual bool getVertexShaderSource(std::string* source) const
+	{
+		*source = "";
+		return false;
+	}
+
+	/// Returns true if the geometry shader has been set, otherwise false.
+	virtual bool hasGeometryShader() const
+	{
+		return false;
+	}
+
+	/// Removes the geometry shader, returning that portion of the shader program to fixed-function.
+	virtual void clearGeometryShader()
+	{
+	}
+
+	/// Loads the geometry shader source code from a file
+	/// \param	filePath	Path to file containing shader source code
+	/// \return	True if the source is successfully loaded, otherwise false.
+	virtual bool loadGeometryShaderSource(const std::string& filePath)
+	{
+		return false;
+	}
+
+	/// Set the geometry shader source code
+	/// \param	source	Shader source code
+	virtual void setGeometryShaderSource(const std::string& source)
+	{
+	}
+
+	/// Gets the geometry shader source code
+	/// \return	Shader source code
+	virtual bool getGeometryShaderSource(std::string* source) const
+	{
+		*source = "";
+		return false;
+	}
+
+
+	/// Returns true if the fragment shader has been set, otherwise false.
+	virtual bool hasFragmentShader() const
+	{
+		return false;
+	}
+
+	/// Removes the fragment shader, returning that portion of the shader program to fixed-function.
+	virtual void clearFragmentShader()
+	{
+	}
+
+	/// Loads the fragment shader source code from a file
+	/// \param	filePath	Path to file containing shader source code
+	/// \return	True if the source is successfully loaded, otherwise false.
+	virtual bool loadFragmentShaderSource(const std::string& filePath)
+	{
+		return false;
+	}
+
+	/// Set the fragment shader source code
+	/// \param	source	Shader source code
+	virtual void setFragmentShaderSource(const std::string& source)
+	{
+	}
+
+	/// Gets the fragment shader source code
+	/// \return	Shader source code
+	virtual bool getFragmentShaderSource(std::string* source) const
+	{
+		*source = "";
+		return false;
+	}
 };
 
 
@@ -115,7 +215,7 @@ TEST(OsgMaterialTests, AddAndRemoveUniformsTest)
 	EXPECT_EQ(1u, material->getNumUniforms());
 }
 
-TEST(OsgMaterialTests, SetShaderTest)
+TEST(OsgMaterialTests, SetAndClearShaderTest)
 {
 	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
 	std::shared_ptr<Material> material = osgMaterial;
@@ -133,13 +233,19 @@ TEST(OsgMaterialTests, SetShaderTest)
 
 	EXPECT_EQ(1u, attributes.size());
 	EXPECT_EQ(osgShader->getOsgProgram(), attributes.at(osg::StateAttribute::TypeMemberPair(
-		osg::StateAttribute::PROGRAM, 0)).first);
+		osg::StateAttribute::PROGRAM, 0)).first) <<
+		"Shader should have been added to the material's state attributes!";
 
 	/// Try setting a non-OSG Shader
 	std::shared_ptr<MockShader> nonOsgShader = std::make_shared<MockShader>();
 	EXPECT_FALSE(material->setShader(nonOsgShader)) <<
 		"Should not be able to set a shader that is not a subclass of OsgShader!";
 	EXPECT_NE(nonOsgShader, material->getShader());
+
+	/// Clear the shader
+	material->clearShader();
+	EXPECT_EQ(nullptr, material->getShader());
+	EXPECT_EQ(0u, attributes.size()) << "Shader should have been removed from the material's state attributes!";
 }
 
 }  // namespace Graphics

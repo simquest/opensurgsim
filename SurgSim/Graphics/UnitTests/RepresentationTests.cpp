@@ -24,10 +24,15 @@
 
 #include <random>
 
-using SurgSim::Graphics::Representation;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+
+namespace SurgSim
+{
+
+namespace Graphics
+{
 
 TEST(RepresentationTests, InitTest)
 {
@@ -92,6 +97,24 @@ TEST(RepresentationTests, PoseTest)
 	}
 }
 
+TEST(RepresentationTests, MaterialTest)
+{
+	std::shared_ptr<Representation> representation = std::make_shared<MockRepresentation>("test name");
+
+	{
+		SCOPED_TRACE("Set material");
+		std::shared_ptr<MockMaterial> material = std::make_shared<MockMaterial>();
+		EXPECT_TRUE(representation->setMaterial(material));
+		EXPECT_EQ(material, representation->getMaterial());
+	}
+
+	{
+		SCOPED_TRACE("Clear material");
+		representation->clearMaterial();
+		EXPECT_EQ(nullptr, representation->getMaterial());
+	}
+}
+
 TEST(RepresentationTests, UpdateTest)
 {
 	std::shared_ptr<MockRepresentation> mockRepresentation = std::make_shared<MockRepresentation>("test name");
@@ -115,3 +138,7 @@ TEST(RepresentationTests, UpdateTest)
 		EXPECT_LT(fabs(sumDt - mockRepresentation->getSumDt()), Eigen::NumTraits<double>::dummy_precision());
 	}
 }
+
+};  // namespace Graphics
+
+};  // namespace SurgSim

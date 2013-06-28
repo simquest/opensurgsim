@@ -14,3 +14,4 @@
 # limitations under the License.
 
 add_subdirectory(BouncingBalls)
+surgsim_cpplint_this_tree(cpplintExamples)

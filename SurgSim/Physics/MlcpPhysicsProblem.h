@@ -48,4 +48,4 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 };  // namespace Physics
 };  // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
+#endif  // SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H

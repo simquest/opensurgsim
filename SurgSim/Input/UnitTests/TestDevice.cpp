@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "TestDevice.h"
+#include "SurgSim/Input/UnitTests/TestDevice.h"
 
 TestDevice::TestDevice(const std::string& uniqueName) :
 	CommonDevice(uniqueName, buildInputData())

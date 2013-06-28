@@ -32,10 +32,6 @@ using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::Representation;
-using SurgSim::Graphics::Camera;
-using SurgSim::Graphics::ViewElement;
-
 
 class GraphicsManagerTest : public ::testing::Test
 {
@@ -73,6 +69,12 @@ public:
 	std::shared_ptr<Runtime> runtime;
 	std::shared_ptr<MockManager> graphicsManager;
 };
+
+namespace SurgSim
+{
+
+namespace Graphics
+{
 
 TEST_F(GraphicsManagerTest, InitTest)
 {
@@ -234,5 +236,6 @@ TEST_F(GraphicsManagerTest, AddRemoveTest)
 		"Removing a component that this manager is not concerned with should return true";
 }
 
+};  // namespace Graphics
 
-
+};  // namespace SurgSim

@@ -26,7 +26,9 @@
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgUnitSphere;
 
-OsgSphereRepresentation::OsgSphereRepresentation(const std::string& name) : Representation(name), SphereRepresentation(name),
+OsgSphereRepresentation::OsgSphereRepresentation(const std::string& name) :
+	Representation(name),
+	SphereRepresentation(name),
 	OsgRepresentation(name, new osg::Switch()),
 	m_sharedUnitSphere(getSharedUnitSphere())
 {
@@ -60,7 +62,8 @@ void OsgSphereRepresentation::setRadius(double radius)
 double OsgSphereRepresentation::getRadius() const
 {
 	SURGSIM_ASSERT(m_transform->getScale().x() == m_transform->getScale().y() &&
-		m_transform->getScale().x() == m_transform->getScale().z()) << "Sphere should be scaled equally in all directions!";
+				   m_transform->getScale().x() == m_transform->getScale().z()) <<
+		"Sphere should be scaled equally in all directions!";
 	return m_transform->getScale().x();
 }
 
@@ -75,6 +78,12 @@ bool OsgSphereRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Mat
 		didSucceed = true;
 	}
 	return didSucceed;
+}
+
+void OsgSphereRepresentation::clearMaterial()
+{
+	m_transform->setStateSet(new osg::StateSet()); // Reset to empty state set
+	Representation::setMaterial(nullptr);
 }
 
 void OsgSphereRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
