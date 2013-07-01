@@ -110,6 +110,13 @@ public:
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
+	/// Retrieve the rigid body 6x6 compliance matrix
+	/// \return the 6x6 compliance matrix
+	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const
+	{
+		return m_C;
+	}
+
 protected:
 	/// Inertia matrices in global coordinates
 	SurgSim::Math::Matrix33d m_globalInertia;
