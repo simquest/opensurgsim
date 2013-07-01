@@ -30,15 +30,15 @@ namespace Physics
 
 void RigidRepresentationContact::doBuild(double dt,
 			const ConstraintData& data,
-			MlcpPhysicsProblem& mlcp,
+			MlcpPhysicsProblem* mlcp,
 			unsigned int indexOfRepresentation,
 			unsigned int indexOfConstraint,
 			ConstraintSideSign sign)
 {
-	Eigen::MatrixXd& H    = mlcp.H;
-	Eigen::MatrixXd& CHt  = mlcp.CHt;
-	Eigen::MatrixXd& HCHt = mlcp.A;
-	Eigen::VectorXd& b    = mlcp.b;
+	Eigen::MatrixXd& H    = mlcp->H;
+	Eigen::MatrixXd& CHt  = mlcp->CHt;
+	Eigen::MatrixXd& HCHt = mlcp->A;
+	Eigen::VectorXd& b    = mlcp->b;
 
 	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);

@@ -63,12 +63,12 @@ public:
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint
 	/// \param dt The time step
-	/// \param [in, out] mclpPhysicsProblem The Mlcp physics problem to be filled up
+	/// \param [in,out] mlcpPhysicsProblem The Mlcp physics problem to be filled up
 	/// \param indexOfRepresentation0 The index of the 1st representation in the Mlcp
 	/// \param indexOfRepresentation1 The index of the 2nd representation in the Mlcp
 	/// \param indexOfConstraint The index of this constraint in the Mlcp
 	void build(double dt,
-		MlcpPhysicsProblem& mlcpPhysicsProblem,
+		MlcpPhysicsProblem* mlcpPhysicsProblem,
 		unsigned int indexOfRepresentation0,
 		unsigned int indexOfRepresentation1,
 		unsigned int indexOfConstraint);
@@ -82,13 +82,13 @@ private:
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step
 	/// \param data The data specific to this constraint
-	/// \param [in, out] mclpPhysicsProblem The Mlcp physics problem to be filled up
+	/// \param [in,out] mlcpPhysicsProblem The Mlcp physics problem to be filled up
 	/// \param indexOfRepresentation0 The index of the 1st representation in the Mlcp
 	/// \param indexOfRepresentation1 The index of the 2nd representation in the Mlcp
 	/// \param indexOfConstraint The index of this constraint in the Mlcp
 	virtual void doBuild(double dt,
 		const ConstraintData& data,
-		MlcpPhysicsProblem& mlcpPhysicsProblem,
+		MlcpPhysicsProblem* mlcpPhysicsProblem,
 		unsigned int indexOfRepresentation0,
 		unsigned int indexOfRepresentation1,
 		unsigned int indexOfConstraint);

@@ -35,9 +35,6 @@ namespace Physics
 /// \note Therefore 1 side will have a positive sign (+1), and 1 side a negative sign (-1)
 enum ConstraintSideSign {CONSTRAINT_POSITIVE_SIDE, CONSTRAINT_NEGATIVE_SIDE};
 
-//class Localization;
-//class ConstraintData;
-
 /// Base class for all constraint implementations. A ConstraintImplementation defines 1 side of a constraint.
 class ConstraintImplementation
 {
@@ -87,7 +84,7 @@ public:
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void build(double dt,
 		const ConstraintData& data,
-		MlcpPhysicsProblem& mlcp,
+		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign)
@@ -112,7 +109,7 @@ private:
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	virtual void doBuild(double dt,
 				const ConstraintData& data,
-				MlcpPhysicsProblem& mlcp,
+				MlcpPhysicsProblem* mlcp,
 				unsigned int indexOfRepresentation,
 				unsigned int indexOfConstraint,
 				ConstraintSideSign sign) = 0;

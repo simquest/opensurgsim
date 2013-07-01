@@ -42,12 +42,12 @@ unsigned int FixedRepresentationContact::doGetNumDof() const
 
 void FixedRepresentationContact::doBuild(double dt,
 	const ConstraintData& data,
-	MlcpPhysicsProblem& mlcp,
+	MlcpPhysicsProblem* mlcp,
 	unsigned int indexOfRepresentation,
 	unsigned int indexOfConstraint,
 	ConstraintSideSign sign)
 {
-	Eigen::VectorXd& b = mlcp.b;
+	Eigen::VectorXd& b = mlcp->b;
 
 	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
 	std::shared_ptr<FixedRepresentation> fixed = std::static_pointer_cast<FixedRepresentation>(representation);
@@ -69,8 +69,6 @@ void FixedRepresentationContact::doBuild(double dt,
 	b[indexOfConstraint] += violation * scale;
 }
 
-/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-/// \return The MLCP constraint type corresponding to this constraint implementation
 SurgSim::Math::MlcpConstraintType FixedRepresentationContact::doGetMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;

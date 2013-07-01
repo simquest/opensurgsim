@@ -59,7 +59,7 @@ private:
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void doBuild(double dt,
 		const ConstraintData& data,
-		MlcpPhysicsProblem& mlcp,
+		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign) override;

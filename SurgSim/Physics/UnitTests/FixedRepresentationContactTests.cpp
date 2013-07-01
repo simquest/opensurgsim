@@ -85,7 +85,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Fill up the Mlcp
 	double dt = 1e-3;
-	implementation->build(dt, constraintData, mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+	implementation->build(dt, constraintData, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// b should be exactly the violation
 	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);

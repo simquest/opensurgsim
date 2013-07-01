@@ -256,7 +256,7 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	}
 
 	// Fill up the Mlcp
-	m_constraint->build(m_dt, m_mlcpPhysicsProblem, m_indexSphereRepresentation, m_indexPlaneRepresentation,
+	m_constraint->build(m_dt, &m_mlcpPhysicsProblem, m_indexSphereRepresentation, m_indexPlaneRepresentation,
 		m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)
@@ -306,7 +306,7 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 	}
 
 	// Fill up the Mlcp
-	m_constraint->build(m_dt, m_mlcpPhysicsProblem, m_indexPlaneRepresentation, m_indexSphereRepresentation,
+	m_constraint->build(m_dt, &m_mlcpPhysicsProblem, m_indexPlaneRepresentation, m_indexSphereRepresentation,
 		m_indexConstraint);
 
 	// Violation b should be exactly -radius (the sphere center is on the plane)

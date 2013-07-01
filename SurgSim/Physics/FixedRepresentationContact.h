@@ -52,7 +52,7 @@ private:
 	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,
 		const ConstraintData& data,
-		MlcpPhysicsProblem& mlcp,
+		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign) override;

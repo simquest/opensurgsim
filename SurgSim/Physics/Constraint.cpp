@@ -70,7 +70,7 @@ unsigned int Constraint::getNumDof() const
 }
 
 void Constraint::build(double dt,
-	MlcpPhysicsProblem &mlcp,
+	MlcpPhysicsProblem* mlcp,
 	unsigned int indexOfRepresentation0,
 	unsigned int indexOfRepresentation1,
 	unsigned int indexOfConstraint)
@@ -102,12 +102,12 @@ void Constraint::build(double dt,
 			mlcpConstraintType_2nd << " )" << std::endl;
 	}
 
-	mlcp.constraintTypes.push_back(mlcpConstraintType);
+	mlcp->constraintTypes.push_back(mlcpConstraintType);
 }
 
 void Constraint::doBuild(double dt,
 	const ConstraintData& data,
-	MlcpPhysicsProblem &mlcp,
+	MlcpPhysicsProblem* mlcp,
 	unsigned int indexOfRepresentation0,
 	unsigned int indexOfRepresentation1,
 	unsigned int indexOfConstraint)
