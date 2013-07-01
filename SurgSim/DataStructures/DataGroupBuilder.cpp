@@ -30,7 +30,7 @@ DataGroup DataGroupBuilder::createData() const
 	DataGroup data;
 	data.poses() = poses().createData();
 	data.vectors() = vectors().createData();
-	data.matrixes() = matrixes().createData();
+	data.matrices() = matrices().createData();
 	data.scalars() = scalars().createData();
 	data.integers() = integers().createData();
 	data.booleans() = booleans().createData();
@@ -63,14 +63,14 @@ const NamedDataBuilder<DataGroupBuilder::VectorType>& DataGroupBuilder::vectors(
 	return m_vectors;
 }
 
-NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::matrixes()
+NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::matrices()
 {
-	return m_matrixes;
+	return m_matrices;
 }
 
-const NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::matrixes() const
+const NamedDataBuilder<DataGroupBuilder::DynamicMatrixType>& DataGroupBuilder::matrices() const
 {
-	return m_matrixes;
+	return m_matrices;
 }
 
 NamedDataBuilder<DataGroupBuilder::ScalarType>& DataGroupBuilder::scalars()
@@ -125,7 +125,7 @@ void DataGroupBuilder::addVector(const std::string& name)
 
 void DataGroupBuilder::addMatrix(const std::string& name)
 {
-	matrixes().addEntry(name);
+	matrices().addEntry(name);
 }
 
 void DataGroupBuilder::addScalar(const std::string& name)
@@ -152,7 +152,7 @@ void DataGroupBuilder::addEntriesFrom(const DataGroupBuilder& builder)
 {
 	poses().addEntriesFrom(builder.poses());
 	vectors().addEntriesFrom(builder.vectors());
-	matrixes().addEntriesFrom(builder.matrixes());
+	matrices().addEntriesFrom(builder.matrices());
 	scalars().addEntriesFrom(builder.scalars());
 	integers().addEntriesFrom(builder.integers());
 	booleans().addEntriesFrom(builder.booleans());
@@ -163,7 +163,7 @@ void DataGroupBuilder::addEntriesFrom(const DataGroup& data)
 {
 	poses().addEntriesFrom(data.poses());
 	vectors().addEntriesFrom(data.vectors());
-	matrixes().addEntriesFrom(data.matrixes());
+	matrices().addEntriesFrom(data.matrices());
 	scalars().addEntriesFrom(data.scalars());
 	integers().addEntriesFrom(data.integers());
 	booleans().addEntriesFrom(data.booleans());

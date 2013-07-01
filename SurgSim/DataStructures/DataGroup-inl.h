@@ -31,7 +31,7 @@ inline DataGroup::DataGroup()
 inline DataGroup::DataGroup(const DataGroup& dataGroup) :
 	m_poses(dataGroup.m_poses),
 	m_vectors(dataGroup.m_vectors),
-	m_matrixes(dataGroup.m_matrixes),
+	m_matrices(dataGroup.m_matrices),
 	m_scalars(dataGroup.m_scalars),
 	m_integers(dataGroup.m_integers),
 	m_booleans(dataGroup.m_booleans),
@@ -46,7 +46,7 @@ inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 
 	m_poses = dataGroup.m_poses;
 	m_vectors = dataGroup.m_vectors;
-	m_matrixes = dataGroup.m_matrixes;
+	m_matrices = dataGroup.m_matrices;
 	m_scalars = dataGroup.m_scalars;
 	m_integers = dataGroup.m_integers;
 	m_booleans = dataGroup.m_booleans;
@@ -63,7 +63,7 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 
 	m_poses = std::move(dataGroup.m_poses);
 	m_vectors = std::move(dataGroup.m_vectors);
-	m_matrixes = std::move(dataGroup.m_matrixes);
+	m_matrices = std::move(dataGroup.m_matrices);
 	m_scalars = std::move(dataGroup.m_scalars);
 	m_integers = std::move(dataGroup.m_integers);
 	m_booleans = std::move(dataGroup.m_booleans);
@@ -78,7 +78,7 @@ inline bool DataGroup::isValid() const
 	bool valid = poses().isValid();
 	SURGSIM_ASSERT(poses().isValid() == valid &&
 	               vectors().isValid() == valid &&
-	               matrixes().isValid() == valid &&
+	               matrices().isValid() == valid &&
 	               scalars().isValid() == valid &&
 	               integers().isValid() == valid &&
 	               booleans().isValid() == valid &&
@@ -106,14 +106,14 @@ inline const NamedData<DataGroup::VectorType>& DataGroup::vectors() const
 	return m_vectors;
 }
 
-inline NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrixes()
+inline NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrices()
 {
-	return m_matrixes;
+	return m_matrices;
 }
 
-inline const NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrixes() const
+inline const NamedData<DataGroup::DynamicMatrixType>& DataGroup::matrices() const
 {
-	return m_matrixes;
+	return m_matrices;
 }
 
 
@@ -161,7 +161,7 @@ inline void DataGroup::resetAll()
 {
 	m_poses.resetAll();
 	m_vectors.resetAll();
-	m_matrixes.resetAll();
+	m_matrices.resetAll();
 	m_scalars.resetAll();
 	m_integers.resetAll();
 	m_booleans.resetAll();

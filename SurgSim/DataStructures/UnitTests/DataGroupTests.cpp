@@ -97,7 +97,7 @@ TEST(DataGroupTests, PutName)
 
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
-	data.matrixes().set("matrix", matrix);
+	data.matrices().set("matrix", matrix);
 	data.scalars().set("scalar", 1.23f);
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
@@ -109,8 +109,8 @@ TEST(DataGroupTests, PutName)
 	EXPECT_TRUE(data.vectors().hasEntry("vector"));
 	EXPECT_TRUE(data.vectors().hasData("vector"));
 
-	EXPECT_TRUE(data.matrixes().hasEntry("matrix"));
-	EXPECT_TRUE(data.matrixes().hasData("matrix"));
+	EXPECT_TRUE(data.matrices().hasEntry("matrix"));
+	EXPECT_TRUE(data.matrices().hasData("matrix"));
 
 	EXPECT_TRUE(data.scalars().hasEntry("scalar"));
 	EXPECT_TRUE(data.scalars().hasData("scalar"));
@@ -147,7 +147,7 @@ TEST(DataGroupTests, GetName)
 
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
-	data.matrixes().set("matrix", matrix);
+	data.matrices().set("matrix", matrix);
 	data.scalars().set("scalar", 1.23);
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
@@ -166,7 +166,9 @@ TEST(DataGroupTests, GetName)
 	}
 	{
 		Eigen::MatrixXd value;
-		EXPECT_TRUE(data.matrixes().get("matrix", &value));
+		EXPECT_TRUE(data.matrices().get("matrix", &value));
+		EXPECT_EQ(matrix.cols(), value.cols());
+		EXPECT_EQ(matrix.rows(), value.rows());
 		EXPECT_NEAR(0, (value - matrix).norm(), 1e-9);
 	}
 	{

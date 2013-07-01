@@ -66,7 +66,7 @@ public:
 	typedef SurgSim::Math::RigidTransform3d PoseType;
 	/// The type used for vectors.
 	typedef SurgSim::Math::Vector3d VectorType;
-	/// The type used for matrixes.
+	/// The type used for matrices.
 	typedef Eigen::MatrixXd DynamicMatrixType;
 	/// The type used for scalars.
 	typedef double ScalarType;
@@ -146,11 +146,11 @@ public:
 
 	/// Return the matrix data structure.
 	/// \return the mutable matrix data.
-	inline NamedData<DynamicMatrixType>& matrixes();
+	inline NamedData<DynamicMatrixType>& matrices();
 
 	/// Return the matrix data structure.
 	/// \return the read-only matrix data.
-	inline const NamedData<DynamicMatrixType>& matrixes() const;
+	inline const NamedData<DynamicMatrixType>& matrices() const;
 
 	/// Return the scalar data structure.
 	/// \return the mutable scalar data.
@@ -195,7 +195,7 @@ private:
 	NamedData<VectorType> m_vectors;
 
 	/// The matrix values.
-	NamedData<DynamicMatrixType> m_matrixes;
+	NamedData<DynamicMatrixType> m_matrices;
 
 	/// The scalar values.
 	NamedData<ScalarType> m_scalars;
