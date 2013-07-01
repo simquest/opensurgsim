@@ -52,6 +52,12 @@ find_package(Eigen3 REQUIRED)
 
 find_package(GLUT)  # only needed for visual device tests
 find_package(GlutFromOsg)  # look for GLUT in the OSG tree if not found above
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+    # The standard FindGLUT code in CMake 2.8 includes some annoying old
+    # junk (-lXmu -lXi) in GLUT_LIBRARIES for Unix/Linux, which is
+    # neither needed nor usually available.  We only need GLUT itself.
+    set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)

@@ -26,13 +26,6 @@ include_directories(
 	"${GLUT_INCLUDE_DIR}"
 )
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	# The standard FindGLUT code in CMake 2.8 includes some annoying old
-	# junk (-lXmu -lXi) in GLUT_LIBRARIES for Unix/Linux, which is
-	# neither needed nor usually available.  We only need GLUT itself.
-	set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-
 set(RAW_EXAMPLE_SOURCES
 	raw_test_main.cpp
 )
