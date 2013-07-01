@@ -30,26 +30,14 @@ namespace Graphics
 ///
 /// A Graphics::OsgRepresentation wraps a osg::Node that serves as the root node for this representation in the OSG
 /// scenegraph.
-class OsgRepresentation : public virtual Representation
+class OsgRepresentation
 {
 public:
-	/// Constructor
-	/// \param	name	Name of the representation
-	/// \param	node	Root OSG node of the representation
-	explicit OsgRepresentation(const std::string& name, osg::Node* node) : Representation(name),
-		m_node(node)
-	{
-	}
 
 	/// Returns the root OSG node of the representation
-	osg::ref_ptr<osg::Node> getOsgNode() const
-	{
-		return m_node;
-	}
+	virtual osg::ref_ptr<osg::Node> getOsgNode() const = 0;
 
 private:
-	/// Root OSG node of the representation
-	osg::ref_ptr<osg::Node> m_node;
 };
 
 };  // namespace Graphics

@@ -20,24 +20,7 @@
 using SurgSim::Graphics::Material;
 using SurgSim::Graphics::Representation;
 
-Representation::Representation(const std::string& name) : SurgSim::Framework::Representation(name),
-	m_initialPose(SurgSim::Math::RigidTransform3d::Identity())
+Representation::Representation(const std::string& name) : SurgSim::Framework::Representation(name)
 {
 }
 
-void Representation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	m_initialPose = pose;
-	setPose(m_initialPose);
-}
-
-bool Representation::setMaterial(std::shared_ptr<Material> material)
-{
-	m_material = material;
-	return true;
-}
-
-void Representation::clearMaterial()
-{
-	m_material = nullptr;
-}
