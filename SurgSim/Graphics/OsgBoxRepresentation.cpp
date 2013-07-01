@@ -13,8 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Visual Studio generates a warning on 
-#pragma warning(disable:4250)
+
 
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 
@@ -32,7 +31,7 @@ using SurgSim::Graphics::OsgUnitBox;
 OsgBoxRepresentation::OsgBoxRepresentation(const std::string& name) : 
 	Representation(name),
 	BoxRepresentation(name), 
-	OsgRepresentationBase(name),
+	OsgRepresentation(name),
 	m_scale(1.0, 1.0, 1.0),
 	m_sharedUnitBox(getSharedUnitBox())
 {

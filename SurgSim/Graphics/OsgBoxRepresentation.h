@@ -16,14 +16,21 @@
 #ifndef SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 
+// Visual Studio generates a warning on 
+
 #include <SurgSim/Graphics/BoxRepresentation.h>
-#include <SurgSim/Graphics/OsgRepresentationBase.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <SurgSim/Framework/SharedInstance.h>
 #include <SurgSim/Math/RigidTransform.h>
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/Switch>
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4250)
+#endif
 
 namespace SurgSim
 {
@@ -34,7 +41,7 @@ namespace Graphics
 class OsgUnitBox;
 
 /// OSG implementation of a graphics box representation.
-class OsgBoxRepresentation : public OsgRepresentationBase, public BoxRepresentation
+class OsgBoxRepresentation : public virtual OsgRepresentation, public virtual BoxRepresentation
 {
 public:
 	/// Constructor
@@ -96,5 +103,9 @@ private:
 };  // namespace Graphics
 
 };  // namespace SurgSim
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif 
 
 #endif  // SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H

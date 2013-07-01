@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgRepresentationBase.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <boost/thread/locks.hpp>
 
@@ -31,7 +31,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-OsgRepresentationBase::OsgRepresentationBase(const std::string& name)
+OsgRepresentation::OsgRepresentation(const std::string& name) :
+	Representation(name)
 {
 	m_switch = new osg::Switch;
 	m_switch->setName(name + " Switch");
@@ -44,42 +45,42 @@ OsgRepresentationBase::OsgRepresentationBase(const std::string& name)
 	setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 }
 
-OsgRepresentationBase::~OsgRepresentationBase()
+OsgRepresentation::~OsgRepresentation()
 {
 
 }
 
-void OsgRepresentationBase::setVisible(bool visible)
+void OsgRepresentation::setVisible(bool visible)
 {
 	m_switch->setChildValue(m_transform, visible);
 }
 
-bool OsgRepresentationBase::isVisible() const
+bool OsgRepresentation::isVisible() const
 {
 	return m_switch->getChildValue(m_transform);
 }
 
-void OsgRepresentationBase::update(double dt)
+void OsgRepresentation::update(double dt)
 {
 	doUpdate(dt);
 }
 
-void OsgRepresentationBase::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+void OsgRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	m_initialPose = pose;
 	setPose(m_initialPose);
 }
 
 
-const SurgSim::Math::RigidTransform3d& OsgRepresentationBase::getInitialPose() const
+const SurgSim::Math::RigidTransform3d& OsgRepresentation::getInitialPose() const
 {
 	return m_initialPose;
 }
 
-void OsgRepresentationBase::setPose(const SurgSim::Math::RigidTransform3d& transform)
+void OsgRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
 {
 	// HS-2013-jun-28 This function should probably be protected by a mutes, but I can see
-	// the assumption could be that this is only called from on thread ... right ?
+	// the assumption could be that this is only called from on thread.
 	// #threadsafety
 	m_pose = transform;
 	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
@@ -87,12 +88,12 @@ void OsgRepresentationBase::setPose(const SurgSim::Math::RigidTransform3d& trans
 	m_transform->setPosition(pose.second);
 }
 
-const SurgSim::Math::RigidTransform3d& OsgRepresentationBase::getPose() const
+const SurgSim::Math::RigidTransform3d& OsgRepresentation::getPose() const
 {
 	return m_pose;
 }
 
-bool OsgRepresentationBase::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+bool OsgRepresentation::setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
 {
 	bool didSucceed = false;
 
@@ -106,12 +107,12 @@ bool OsgRepresentationBase::setMaterial(std::shared_ptr<SurgSim::Graphics::Mater
 	return didSucceed;
 }
 
-std::shared_ptr<Material> OsgRepresentationBase::getMaterial() const
+std::shared_ptr<Material> OsgRepresentation::getMaterial() const
 {
 	return m_material;
 }
 
-void OsgRepresentationBase::clearMaterial()
+void OsgRepresentation::clearMaterial()
 {
 	m_transform->setStateSet(new osg::StateSet()); // Reset to empty state set
 	m_material = nullptr;

@@ -56,7 +56,7 @@ public:
 
 	/// Get the initial pose of the representation
 	/// \return	The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() = 0;
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
 
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
