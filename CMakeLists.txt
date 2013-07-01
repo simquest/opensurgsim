@@ -48,8 +48,10 @@ include(SurgSimUtilities)
 #find_package(Qt4 COMPONENTS QtCore)
 #find_package(OpenThreads)
 find_package(OpenGL)
-find_package(GLUT)  # only needed for visual device tests
 find_package(Eigen3 REQUIRED)
+
+find_package(GLUT)  # only needed for visual device tests
+find_package(GlutFromOsg)  # look for GLUT in the OSG tree if not found above
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
