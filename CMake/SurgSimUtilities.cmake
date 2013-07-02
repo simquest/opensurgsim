@@ -21,7 +21,8 @@
 option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 option(SURGSIM_TESTS_RUN "Run the unit tests at the end of the build" ON)
 if(NOT WIN32)
-	option(SURGSIM_TESTS_RUN_WITH_VALGRIND "Run the unit tests under Valgrind" OFF)
+	option(SURGSIM_TESTS_RUN_WITH_VALGRIND
+		"Run the unit tests using Valgrind's memcheck tool." OFF)
 endif(NOT WIN32)
 option(SURGSIM_TESTS_ALL_IN_ONE
 	"Build a single binary with all unit tests.  [Does not work yet!]" OFF)
@@ -32,8 +33,8 @@ set(SURGSIM_COPY_WARNING_ONCE TRUE)
 set(SURGSIM_TEST_RUN_PREFIX)
 if(NOT WIN32)
 	if(SURGSIM_TESTS_RUN_WITH_VALGRIND)
-		set(SURGSIM_TEST_RUN_PREFIX valgrind -v --error-exitcode=1
-			--fullpath-after= --leak-check=full --redzone-size=64)
+		set(SURGSIM_TEST_RUN_PREFIX valgrind -v --tool=memcheck --error-exitcode=1
+			--fullpath-after= --leak-check=full)
 	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
 endif(NOT WIN32)
 
