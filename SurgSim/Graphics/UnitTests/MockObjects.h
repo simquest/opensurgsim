@@ -156,6 +156,41 @@ public:
 		return m_isAwoken;
 	}
 
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		return false;
+	}
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	/// Removes the material from the representation
+	virtual void clearMaterial()
+	{
+	}
+
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+	}
+
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -170,31 +205,6 @@ private:
 	{
 		m_isAwoken = true;
 		return true;
-	}
-
-	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
-	{
-		return false;
-	}
-
-	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
-	{
-		return nullptr;
-	}
-
-	virtual void clearMaterial()
-	{
-	}
-
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
-	{
-
-	}
-
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{
-		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
-		return identity;
 	}
 
 	/// Whether this representation is currently visible or not
@@ -341,26 +351,36 @@ public:
 		m_sumDt += dt;
 	}
 
-
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
 	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
 	{
 		return false;
 	}
 
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
 	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
 	{
 		return nullptr;
 	}
 
+	/// Removes the material from the representation
 	virtual void clearMaterial()
 	{
 	}
 
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
 	{
 
 	}
 
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
 	{
 		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
