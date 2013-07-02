@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/Representation.h>
 
 #include <osg/ref_ptr>
