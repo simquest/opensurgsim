@@ -39,7 +39,7 @@ namespace Graphics
 class OsgUnitSphere;
 
 /// OSG implementation of a graphics sphere representation.
-class OsgSphereRepresentation : public OsgRepresentation, public SphereRepresentation 
+class OsgSphereRepresentation : public OsgRepresentation, public SphereRepresentation
 {
 public:
 	/// Constructor

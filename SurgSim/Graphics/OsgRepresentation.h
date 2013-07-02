@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGREPRESENTATIONBASE_H
-#define SURGSIM_GRAPHICS_OSGREPRESENTATIONBASE_H
+#ifndef SURGSIM_GRAPHICS_OSGREPRESENTATION_H
+#define SURGSIM_GRAPHICS_OSGREPRESENTATION_H
 
 #include <memory>
 
@@ -42,7 +42,7 @@ class OsgRepresentation : public virtual Representation
 public:
 
 	/// Constructor
-	OsgRepresentation(const std::string& name);
+	explicit OsgRepresentation(const std::string& name);
 	virtual ~OsgRepresentation();
 
 	osg::ref_ptr<osg::Node> getOsgNode() const;

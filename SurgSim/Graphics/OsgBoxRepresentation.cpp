@@ -28,9 +28,9 @@
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgUnitBox;
 
-OsgBoxRepresentation::OsgBoxRepresentation(const std::string& name) : 
+OsgBoxRepresentation::OsgBoxRepresentation(const std::string& name) :
 	Representation(name),
-	BoxRepresentation(name), 
+	BoxRepresentation(name),
 	OsgRepresentation(name),
 	m_scale(1.0, 1.0, 1.0),
 	m_sharedUnitBox(getSharedUnitBox())
@@ -76,11 +76,11 @@ void OsgBoxRepresentation::setSize(double sizeX, double sizeY, double sizeZ)
 	m_scale.z() = sizeZ;
 	m_transform->setScale(m_scale);
 }
-void OsgBoxRepresentation::getSize(double& sizeX, double& sizeY, double& sizeZ)
+void OsgBoxRepresentation::getSize(double* sizeX, double* sizeY, double* sizeZ)
 {
-	sizeX =	m_scale.x();
-	sizeY = m_scale.y();
-	sizeZ = m_scale.z();
+	*sizeX = m_scale.x();
+	*sizeY = m_scale.y();
+	*sizeZ = m_scale.z();
 }
 
 void OsgBoxRepresentation::setSize(SurgSim::Math::Vector3d size)

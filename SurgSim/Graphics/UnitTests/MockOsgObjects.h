@@ -30,7 +30,7 @@ public:
 	/// \post m_transform is set to identity
 	/// \post m_isInitialized and m_isAwoken are set to false
 	/// \post m_isVisible is set to true
-	explicit MockOsgRepresentation(const std::string& name) : 
+	explicit MockOsgRepresentation(const std::string& name) :
         SurgSim::Graphics::OsgRepresentation(name),
 		SurgSim::Graphics::Representation(name),
         m_isVisible(true),

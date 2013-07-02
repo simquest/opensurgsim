@@ -25,7 +25,7 @@
 
 using SurgSim::Math::makeRigidTransform;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Graphics
 {

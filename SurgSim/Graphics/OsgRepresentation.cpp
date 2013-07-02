@@ -20,7 +20,6 @@
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 #include <SurgSim/Graphics/OsgUnitBox.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
 
 #include <osg/Geode>
 #include <osg/Switch>

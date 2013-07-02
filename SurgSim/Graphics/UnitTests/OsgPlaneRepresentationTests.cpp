@@ -61,7 +61,8 @@ TEST(OsgPlaneRepresentationTests, OsgNodeTest)
 
 	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 
-	osg::PositionAttitudeTransform* transformNode = dynamic_cast<osg::PositionAttitudeTransform*>(switchNode->getChild(0));
+	osg::PositionAttitudeTransform* transformNode = 
+		dynamic_cast<osg::PositionAttitudeTransform*>(switchNode->getChild(0));
 	ASSERT_NE(nullptr, transformNode) << "Could not get OSG transform node!";
 
 	ASSERT_EQ(1u, transformNode->getNumChildren()) << "OSG transform node should have 1 child, the geode!";
@@ -134,7 +135,7 @@ TEST(OsgPlaneRepresentationTests, MaterialTest)
 {
 	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<OsgPlaneRepresentation>("test name");
 	std::shared_ptr<Representation> representation = osgRepresentation;
-	
+
 	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
 	std::shared_ptr<Material> material = osgMaterial;
 	{
