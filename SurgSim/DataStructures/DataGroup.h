@@ -19,6 +19,7 @@
 #include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
+#include <Eigen/Core>
 
 namespace SurgSim
 {
@@ -65,6 +66,8 @@ public:
 	typedef SurgSim::Math::RigidTransform3d PoseType;
 	/// The type used for vectors.
 	typedef SurgSim::Math::Vector3d VectorType;
+	/// The type used for matrices.
+	typedef Eigen::MatrixXd DynamicMatrixType;
 	/// The type used for scalars.
 	typedef double ScalarType;
 	/// The type used for integers.
@@ -73,7 +76,6 @@ public:
 	typedef bool BooleanType;
 	/// The type used for strings.
 	typedef std::string StringType;
-
 
 	/// Construct an empty object, with no associated names and indices yet.
 	inline DataGroup();
@@ -142,6 +144,14 @@ public:
 	/// \return the read-only vector data.
 	inline const NamedData<VectorType>& vectors() const;
 
+	/// Return the matrix data structure.
+	/// \return the mutable matrix data.
+	inline NamedData<DynamicMatrixType>& matrices();
+
+	/// Return the matrix data structure.
+	/// \return the read-only matrix data.
+	inline const NamedData<DynamicMatrixType>& matrices() const;
+
 	/// Return the scalar data structure.
 	/// \return the mutable scalar data.
 	inline NamedData<ScalarType>& scalars();
@@ -183,6 +193,9 @@ private:
 
 	/// The vector values.
 	NamedData<VectorType> m_vectors;
+
+	/// The matrix values.
+	NamedData<DynamicMatrixType> m_matrices;
 
 	/// The scalar values.
 	NamedData<ScalarType> m_scalars;
