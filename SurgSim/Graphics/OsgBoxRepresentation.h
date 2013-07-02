@@ -16,8 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 
-// Visual Studio generates a warning on
-
 #include <SurgSim/Graphics/BoxRepresentation.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
 
