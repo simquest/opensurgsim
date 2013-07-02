@@ -32,6 +32,12 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgPlaneRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
+	OsgTexture.cpp
+	OsgTexture1d.cpp
+	OsgTexture2d.cpp
+	OsgTexture3d.cpp
+	OsgTextureCubeMap.cpp
+	OsgTextureRectangle.cpp
 	OsgUniformBase.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
@@ -57,6 +63,12 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRigidTransformConversions.h
 	OsgShader.h
 	OsgSphereRepresentation.h
+	OsgTexture.h
+	OsgTexture1d.h
+	OsgTexture2d.h
+	OsgTexture3d.h
+	OsgTextureCubeMap.h
+	OsgTextureRectangle.h
 	OsgUniform.h
 	OsgUniform-inl.h
 	OsgUniformBase.h
@@ -69,6 +81,12 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Representation.h
 	Shader.h
 	SphereRepresentation.h
+	Texture.h
+	Texture1d.h
+	Texture2d.h
+	Texture3d.h
+	TextureCubeMap.h
+	TextureRectangle.h
 	Uniform.h
 	UniformBase.h
 	View.h
