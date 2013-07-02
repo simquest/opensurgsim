@@ -83,11 +83,12 @@ public:
 	virtual void update(double dt);
 
 protected:
+	virtual void doUpdate(double dt);
+
 	osg::ref_ptr<osg::Switch> m_switch;
 	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
 
 private:
-	virtual void doUpdate(double dt);
 
 	/// Initial pose of the representation
 	SurgSim::Math::RigidTransform3d m_initialPose;

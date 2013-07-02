@@ -17,6 +17,7 @@
 /// Tests for the View class.
 
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
+#include <SurgSim/Graphics/OsgCamera.h>
 
 #include <gtest/gtest.h>
 
@@ -81,7 +82,7 @@ TEST(ViewTests, CameraTest)
 {
 	std::shared_ptr<View> view = std::make_shared<MockView>("test name");
 
-	std::shared_ptr<Camera> camera = std::make_shared<MockCamera>("test camera");
+	std::shared_ptr<Camera> camera = std::make_shared<OsgCamera>("test camera");
 
 	/// Set the camera and check that it set correctly
 	EXPECT_TRUE(view->setCamera(camera));

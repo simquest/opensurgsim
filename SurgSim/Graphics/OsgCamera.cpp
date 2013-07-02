@@ -36,8 +36,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 	Camera(name),
 	m_camera(new osg::Camera())
 {
-	m_switch = new osg::Switch();
-	m_switch->setName(name + " Switch");
+	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
 
 	m_switch->addChild(m_camera);

@@ -118,7 +118,12 @@ void OsgRepresentation::clearMaterial()
 	m_material = nullptr;
 }
 
-void doUpdate(double dt)
+osg::ref_ptr<osg::Node> OsgRepresentation::getOsgNode() const
+{
+	return m_switch;
+}
+
+void OsgRepresentation::doUpdate(double dt)
 {
 
 }

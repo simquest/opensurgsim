@@ -172,6 +172,30 @@ private:
 		return true;
 	}
 
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material) 
+	{
+		return false;
+	}
+
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	virtual void clearMaterial() 
+	{		
+	}
+
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+
+	}
+
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const 
+	{
+		return SurgSim::Math::RigidTransform3d::Identity();
+	}
+
 	/// Whether this representation is currently visible or not
 	bool m_isVisible;
 
@@ -314,6 +338,31 @@ public:
 	{
 		++m_numUpdates;
 		m_sumDt += dt;
+	}
+
+
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material) 
+	{
+		return false;
+	}
+
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	virtual void clearMaterial() 
+	{		
+	}
+
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+
+	}
+
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const 
+	{
+		return SurgSim::Math::RigidTransform3d::Identity();
 	}
 
 private:

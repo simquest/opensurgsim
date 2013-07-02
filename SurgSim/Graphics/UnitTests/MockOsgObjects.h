@@ -16,12 +16,12 @@
 #ifndef SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H
 
-#include <SurgSim/Graphics/OsgRepresentationBase.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <osg/Group>
 
 /// Representation class for testing
-class MockOsgRepresentation : public SurgSim::Graphics::OsgRepresentationBase
+class MockOsgRepresentation : public SurgSim::Graphics::OsgRepresentation
 {
 public:
 	/// Constructor
@@ -31,7 +31,7 @@ public:
 	/// \post m_isInitialized and m_isAwoken are set to false
 	/// \post m_isVisible is set to true
 	explicit MockOsgRepresentation(const std::string& name) : 
-        SurgSim::Graphics::OsgRepresentationBase(name),
+        SurgSim::Graphics::OsgRepresentation(name),
 		SurgSim::Graphics::Representation(name),
         m_isVisible(true),
         m_numUpdates(0),
@@ -133,5 +133,7 @@ private:
 	/// Rigid transform describing pose of the representation
 	SurgSim::Math::RigidTransform3d m_transform;
 };
+
+
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H

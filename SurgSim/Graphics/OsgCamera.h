@@ -112,9 +112,7 @@ public:
 	virtual void clearMaterial();
 
 private:
-	/// OSG switch to allow enabling and disabling of the camera
-	osg::ref_ptr<osg::Switch> m_switch;
-	/// OSG camera node
+
 	osg::ref_ptr<osg::Camera> m_camera;
 
 	/// Pose of the camera, which is the inverse of the view matrix

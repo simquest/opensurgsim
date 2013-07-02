@@ -47,10 +47,6 @@ public:
 	/// \param	name	Name of the representation
 	explicit OsgPlaneRepresentation(const std::string& name);
 
-	/// Updates the representation.
-	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
-
 private:
 
 	/// Shared plane, so that the geometry can be instanced rather than having multiple copies.
