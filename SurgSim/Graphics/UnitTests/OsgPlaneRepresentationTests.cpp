@@ -61,7 +61,7 @@ TEST(OsgPlaneRepresentationTests, OsgNodeTest)
 
 	ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 
-	osg::PositionAttitudeTransform* transformNode = 
+	osg::PositionAttitudeTransform* transformNode =
 		dynamic_cast<osg::PositionAttitudeTransform*>(switchNode->getChild(0));
 	ASSERT_NE(nullptr, transformNode) << "Could not get OSG transform node!";
 

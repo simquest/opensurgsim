@@ -40,7 +40,7 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 	m_switch->setName(name + " Transform");
 
 	m_switch->addChild(m_transform);
-	
+
 	setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 }
 
