@@ -193,7 +193,8 @@ private:
 
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
 	{
-		return SurgSim::Math::RigidTransform3d::Identity();
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
 	}
 
 	/// Whether this representation is currently visible or not
@@ -362,7 +363,8 @@ public:
 
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
 	{
-		return SurgSim::Math::RigidTransform3d::Identity();
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
 	}
 
 private:
