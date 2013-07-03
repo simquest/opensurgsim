@@ -17,7 +17,9 @@
 
 #if defined(_WIN32)
 #include <windows.h>
-#endif // defined(_WIN32)
+#else // not defined(_WIN32)
+#include <stdlib.h>
+#endif // not defined(_WIN32)
 
 
 namespace SurgSim
@@ -46,7 +48,7 @@ void AssertMessage::killApplication(const std::string& errorMessage)
 #if defined(_WIN32)
 	DebugBreak();
 #else  // not defined(_WIN32)
-	*static_cast<volatile int*>(nullptr) = 123;
+	abort();
 #endif // not defined(_WIN32)
 }
 
