@@ -38,7 +38,7 @@ DcdCollision::~DcdCollision()
 }
 
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
-	const double& dt, 
+	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
@@ -51,6 +51,10 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	{
 		int i = (*it)->getFirst()->getShapeType();
 		int j = (*it)->getSecond()->getShapeType();
+		if (m_contactCalculations[i][j]->needsSwap())
+		{
+			(*it)->swapRepresentations();
+		}
 		m_contactCalculations[i][j]->calculateContact(*it);
 		++it;
 	}

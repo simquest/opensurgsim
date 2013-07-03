@@ -198,7 +198,7 @@ TEST(SharedInstanceTest, CreateInstanceUsingCreator)
 
 	ObjectCounts::resetInstanceIndices();
 
-	SharedInstance<DataType>::InstanceCreator createDataType = []() { return std::make_shared<DataType>(); };
+	SharedInstance<DataType>::InstanceCreator createDataType( []() { return std::make_shared<DataType>(); } );
 	SharedInstance<DataType> shared(createDataType);
 
 	EXPECT_EQ(0, ObjectCounts::getNumInstancesCreated());
@@ -250,7 +250,7 @@ TEST(SharedInstanceTest, CreateNonDefaultConstructibleInstance)
 	// This should NOT work for a type that's not default-constructible:
 //	SharedInstance<DataType> shared;
 	// ...but this should:
-	SharedInstance<DataType>::InstanceCreator createDataType = []() { return std::make_shared<DataType>(2); };
+	SharedInstance<DataType>::InstanceCreator createDataType( []() { return std::make_shared<DataType>(2); } );
 	SharedInstance<DataType> shared(createDataType);
 
 	EXPECT_EQ(0, ObjectCounts::getNumInstancesCreated());

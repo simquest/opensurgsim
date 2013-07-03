@@ -73,7 +73,8 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(0u, osgSwitch->getNumChildren());
 
 	/// Add an representation and make sure the osg::Switch value for it is set correctly (should be true)
-	std::shared_ptr<OsgRepresentation> representation1 = std::make_shared<MockOsgRepresentation>("test representation 1");
+	std::shared_ptr<OsgRepresentation> representation1 =
+		std::make_shared<MockOsgRepresentation>("test representation 1");
 	group->add(representation1);
 	EXPECT_EQ(1u, group->getMembers().size());
 	EXPECT_EQ(1u, osgSwitch->getNumChildren());
@@ -86,7 +87,8 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_FALSE(osgSwitch->getChildValue(representation1->getOsgNode())) << "Representation 1 should not be visible!";
 
 	/// Add another representation and make sure the osg::Switch value for it is set correctly (should be false)
-	std::shared_ptr<OsgRepresentation> representation2 = std::make_shared<MockOsgRepresentation>("test representation 2");
+	std::shared_ptr<OsgRepresentation> representation2 =
+		std::make_shared<MockOsgRepresentation>("test representation 2");
 	group->add(representation2);
 	EXPECT_EQ(2u, group->getMembers().size());
 	EXPECT_EQ(2u, osgSwitch->getNumChildren());
@@ -120,15 +122,18 @@ TEST(OsgGroupTests, AddRemoveTest)
 	EXPECT_EQ(1u, osgSwitch->getChildIndex(representation1->getOsgNode()));
 
 	/// Try to add a non-OSG representation
-	std::shared_ptr<MockRepresentation> nonOsgRepresentation = std::make_shared<MockRepresentation>("non-osg representation");
-	EXPECT_FALSE(group->add(nonOsgRepresentation)) << "OsgGroup should only succeed on representations that derive from OsgRepresentation!";
+	std::shared_ptr<MockRepresentation> nonOsgRepresentation =
+		std::make_shared<MockRepresentation>("non-osg representation");
+	EXPECT_FALSE(group->add(nonOsgRepresentation)) <<
+		"OsgGroup should only succeed on representations that derive from OsgRepresentation!";
 	EXPECT_EQ(1u, group->getMembers().size());
-	EXPECT_EQ(group->getMembers().end(), std::find(group->getMembers().begin(), group->getMembers().end(),
-		nonOsgRepresentation)) << "Only subclasses of OsgRepresentation should be in an OsgGroup!";
+	EXPECT_EQ(group->getMembers().end(),
+			  std::find(group->getMembers().begin(), group->getMembers().end(), nonOsgRepresentation)) <<
+		"Only subclasses of OsgRepresentation should be in an OsgGroup!";
 	EXPECT_EQ(1u, osgSwitch->getNumChildren());
 }
 
-TEST(GroupTests, AppendTest)
+TEST(OsgGroupTests, AppendTest)
 {
 	std::shared_ptr<Group> group1 = std::make_shared<OsgGroup>("test group 1");
 	EXPECT_EQ(0u, group1->getMembers().size());
@@ -151,11 +156,14 @@ TEST(GroupTests, AppendTest)
 	EXPECT_TRUE(group2->append(group1));
 	EXPECT_EQ(3u, group2->getMembers().size());
 
-	/// Check that the representations from group 1 were added to group 2, and that it still has the representation that was added
-	/// directly to it.
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
-	EXPECT_NE(group2->getMembers().end(), std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
+	// Check that the representations from group 1 were added to group 2, and that it still has the representation
+	// that was added directly to it.
+	EXPECT_NE(group2->getMembers().end(),
+			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation1));
+	EXPECT_NE(group2->getMembers().end(),
+			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation2));
+	EXPECT_NE(group2->getMembers().end(),
+			  std::find(group2->getMembers().begin(), group2->getMembers().end(), representation3));
 
 	/// Try to append a group that has already been appended - this will try to add duplicate representations.
 	EXPECT_FALSE(group2->append(group1)) << "Append should return false if any representation is a duplicate!";
@@ -163,12 +171,15 @@ TEST(GroupTests, AppendTest)
 
 	/// Check that group 1 was not modified by appending it to group 2.
 	EXPECT_EQ(2u, group1->getMembers().size());
-	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
-	EXPECT_NE(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
+	EXPECT_NE(group1->getMembers().end(),
+			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation1));
+	EXPECT_NE(group1->getMembers().end(),
+			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation2));
 
 	/// Try to append a group that is not a subclass of OsgGroup
 	std::shared_ptr<Group> nonOsgGroup = std::make_shared<MockGroup>("non-osg group");
-	std::shared_ptr<Representation> nonOsgRepresentation = std::make_shared<MockRepresentation>("non-osg representation");
+	std::shared_ptr<Representation> nonOsgRepresentation =
+		std::make_shared<MockRepresentation>("non-osg representation");
 	/// Add an OSG and non-OSG representation to this group.
 	EXPECT_TRUE(nonOsgGroup->add(representation3));
 	EXPECT_TRUE(nonOsgGroup->add(nonOsgRepresentation));
@@ -176,9 +187,10 @@ TEST(GroupTests, AppendTest)
 	EXPECT_FALSE(group1->append(nonOsgGroup));
 	EXPECT_EQ(2u, group1->getMembers().size()) <<
 		"Nothing from the non-OSG group should have been added to the OsgGroup!";
-	EXPECT_EQ(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(), representation3));
-	EXPECT_EQ(group1->getMembers().end(), std::find(group1->getMembers().begin(), group1->getMembers().end(),
-		nonOsgRepresentation));
+	EXPECT_EQ(group1->getMembers().end(),
+			  std::find(group1->getMembers().begin(), group1->getMembers().end(), representation3));
+	EXPECT_EQ(group1->getMembers().end(),
+			  std::find(group1->getMembers().begin(), group1->getMembers().end(), nonOsgRepresentation));
 }
 
 TEST(OsgGroupTests, ClearTest)

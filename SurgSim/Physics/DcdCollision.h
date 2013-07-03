@@ -56,7 +56,7 @@ protected:
 	/// \param dt	The time passed.
 	/// \param state The PhysicsManagerState from previous computation.
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
-		const double& dt, 
+		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state) override;
 
 private:

@@ -19,16 +19,27 @@ include_directories(
 
 set(SURGSIM_PHYSICS_SOURCES
 	CollisionPair.cpp
+	CollisionRepresentation.cpp
+	Constraint.cpp
+	ConstraintData.cpp
+	ConstraintImplementation.cpp
 	ContactCalculation.cpp
 	ContactConstraintGeneration.cpp
 	Computation.cpp
 	DcdCollision.cpp
 	FemRepresentationParameters.cpp
+	FixedRepresentationContact.cpp
 	FreeMotion.cpp
 	Localization.cpp
 	PhysicsManager.cpp
+	PostUpdate.cpp
+	PreUpdate.cpp
+	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
+	RigidRepresentationBase.cpp
+	RigidRepresentationContact.cpp
+	RigidRepresentationLocalization.cpp
 	RigidShapeCollisionRepresentation.cpp
 	VtcRigidRepresentation.cpp
 )
@@ -39,12 +50,17 @@ set(SURGSIM_PHYSICS_HEADERS
 	CollisionPair.h
 	CollisionRepresentation.h
 	Computation.h
+	Constraint.h
+	ConstraintData.h
+	ConstraintImplementation.h
 	ContactCalculation.h
+	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
+	FixedRepresentationContact.h
 	FixedRepresentationLocalization.h
 	FreeMotion.h
 	Localization.h
@@ -55,11 +71,14 @@ set(SURGSIM_PHYSICS_HEADERS
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PlaneShape.h
+	PostUpdate.h
+	PreUpdate.h
 	Representation.h
 	RigidCollisionRepresentation.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBaseState.h
+	RigidRepresentationContact.h
 	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h

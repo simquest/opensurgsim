@@ -17,8 +17,11 @@
 
 #include <SurgSim/Physics/RigidRepresentation.h>
 
+#include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Valid.h>
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Physics/Localization.h>
+#include <SurgSim/Physics/Location.h>
 
 namespace SurgSim{
 

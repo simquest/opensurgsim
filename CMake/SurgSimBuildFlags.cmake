@@ -81,11 +81,7 @@ if(MSVC)
 	endif(MSVC_VERSION EQUAL 1700)
 endif(MSVC)
 
-# Windows-specific settings
-if(WIN32)
-	add_definitions( -D_WIN32_WINNT=0x0501 )  # request compatibility with WinXP
-endif(WIN32)
-
+# Settings for clang/LLVM.  May currently be OS X-specific...
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
  	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
@@ -96,3 +92,13 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
+
+# Windows-specific settings
+if(WIN32)
+	add_definitions( -D_WIN32_WINNT=0x0501 )  # request compatibility with WinXP
+endif(WIN32)
+
+# Linux-specific settings
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	add_definitions( -D_POSIX_C_SOURCE=200809L )  # request POSIX APIs
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

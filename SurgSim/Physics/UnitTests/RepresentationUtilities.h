@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_REPRESENTATIONUTILITIES_H
-#define SURGSIM_PHYSICS_REPRESENTATIONUTILITIES_H
+#ifndef SURGSIM_PHYSICS_UNITTESTS_REPRESENTATIONUTILITIES_H
+#define SURGSIM_PHYSICS_UNITTESTS_REPRESENTATIONUTILITIES_H
 
 #include <memory>
 

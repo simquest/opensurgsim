@@ -17,6 +17,7 @@
 /// Tests for the OsgRepresentation class.
 
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
@@ -36,7 +37,8 @@ namespace Graphics
 
 TEST(OsgRepresentationTests, InitTest)
 {
-	ASSERT_NO_THROW({std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");});
+	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
+		std::make_shared<MockOsgRepresentation>("test name");});
 
 	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
 
@@ -50,7 +52,8 @@ TEST(OsgRepresentationTests, OsgNodeTest)
 
 	EXPECT_NE(nullptr, representation->getOsgNode());
 
-	/// Check that the OSG node is a group (MockOsgRepresentation passes a new group as the node into the OsgRepresentation constructor)
+	// Check that the OSG node is a group (MockOsgRepresentation passes a new group as the node into the
+	// OsgRepresentation constructor)
 	osg::ref_ptr<osg::Group> osgGroup = dynamic_cast<osg::Group*>(representation->getOsgNode().get());
 	EXPECT_TRUE(osgGroup.valid()) << "Representation's OSG node should be a group!";
 }
@@ -102,6 +105,24 @@ TEST(OsgRepresentationTests, PoseTest)
 		representation->setInitialPose(initialPose);
 		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
+	}
+}
+
+TEST(OsgRepresentationTests, MaterialTest)
+{
+	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+
+	{
+		SCOPED_TRACE("Set material");
+		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>();
+		EXPECT_TRUE(representation->setMaterial(material));
+		EXPECT_EQ(material, representation->getMaterial());
+	}
+
+	{
+		SCOPED_TRACE("Clear material");
+		representation->clearMaterial();
+		EXPECT_EQ(nullptr, representation->getMaterial());
 	}
 }
 

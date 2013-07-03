@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_SIXENSESCAFFOLD_H
-#define SURGSIM_DEVICE_SIXENSESCAFFOLD_H
+#ifndef SURGSIM_DEVICES_SIXENSE_SIXENSESCAFFOLD_H
+#define SURGSIM_DEVICES_SIXENSE_SIXENSESCAFFOLD_H
 
 #include <memory>
 
@@ -115,7 +115,6 @@ private:
 	///
 	/// \param baseIndex Index of the base unit.
 	/// \param controllerIndex Index of the controller within the base unit.
-	/// \param uniqueName A unique name for the created device that will be used by the application.
 	/// \param device The device object to register if the index pair is in fact unused.
 	/// \param [in,out] numUsedDevicesSeen The number of devices that were found during the scan but were
 	/// 	already in use; incremented when an unused device is seen.
@@ -152,4 +151,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif // SURGSIM_DEVICE_SIXENSESCAFFOLD_H
+#endif  // SURGSIM_DEVICES_SIXENSE_SIXENSESCAFFOLD_H

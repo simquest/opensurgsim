@@ -42,68 +42,26 @@ public:
 	{
 	}
 
-	/// Set the initial pose of the rigid representation
-	/// \param pose The initial pose (translation + rotation)
-	void setInitialPose(const RigidTransform3d& pose)
-	{
-		m_initialState.setPose(pose);
-		m_currentState   = m_initialState;
-		m_previousState  = m_initialState;
-	}
-
-	/// Get the initial pose of the rigid representation
-	/// \return The initial pose (translation + rotation)
-	const RigidTransform3d& getInitialPose() const
-	{
-		return m_initialState.getPose();
-	}
-
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
 	void setPose(const RigidTransform3d& pose)
 	{
 		m_previousState = m_currentState;
+		m_finalState.setPose(pose);
 		m_currentState.setPose(pose);
 	}
 
-	/// Get the previous pose of the rigid representation
-	/// \return The previous pose (translation + rotation)
-	const RigidTransform3d& getPreviousPose() const
+	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 	{
-		return m_previousState.getPose();
-	}
-
-	/// Get the current/final pose of the rigid representation
-	/// \return The current pose (translation + rotation)
-	/// \note In the case of a fixed representation, the final pose is the current pose
-	const RigidTransform3d& getPose() const
-	{
-		return m_currentState.getPose();
-	}
-
-	/// Called to reset the fixed object to its initial/default state
-	/// \post all states are set to the initial state
-	void resetState()
-	{
-		Representation::resetState();
-
-		m_previousState  = m_initialState;
-		m_currentState   = m_initialState;
+		// Do Nothing it is a fixed object
 	}
 
 private:
-	/// Initial fixed representation state
-	RigidRepresentationBaseState m_initialState;
 
-	/// Previous fixed representation state
-	RigidRepresentationBaseState m_previousState;
-
-	/// Current fixed representation state
-	RigidRepresentationBaseState m_currentState;
 };
 
 }; // Physics
 
 }; // SurgSim
 
-#endif /// SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
+#endif  // SURGSIM_PHYSICS_FIXEDREPRESENTATION_H

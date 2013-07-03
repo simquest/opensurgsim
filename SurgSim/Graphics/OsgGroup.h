@@ -59,7 +59,8 @@ public:
 
 	/// Removes an representation
 	/// \param	representation	Representation to remove from this group
-	/// \return	True if the representation is removed successfully, false if representation is not in this group or other failure
+	/// \return	True if the representation is removed successfully, false if representation is not in this group or
+	///         other failure
 	virtual bool remove(std::shared_ptr<Representation> representation);
 
 	/// Removes all representations

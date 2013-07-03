@@ -15,8 +15,9 @@
 
 #include <SurgSim/Graphics/OsgPlaneRepresentation.h>
 
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgPlane.h>
+#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 
 #include <osg/Geode>
 #include <osg/Shape>
@@ -25,48 +26,13 @@
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgPlane;
 
-OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) : Representation(name), PlaneRepresentation(name),
-	OsgRepresentation(name, new osg::Switch()),
+OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) :
+	Representation(name),
+	PlaneRepresentation(name),
+	OsgRepresentation(name),
 	m_sharedPlane(getSharedPlane())
 {
-	m_switch = static_cast<osg::Switch*>(getOsgNode().get());
-	m_switch->setName(name + " Switch");
-
-	m_transform = new osg::PositionAttitudeTransform();
-	m_switch->setName(name + " Transform");
 	m_transform->addChild(m_sharedPlane->getNode());
-
-	m_switch->addChild(m_transform);
-
-	std::pair<osg::Quat, osg::Vec3d> pose = std::make_pair(m_transform->getAttitude(), m_transform->getPosition());
-	m_pose = fromOsg(pose);
-}
-
-void OsgPlaneRepresentation::setVisible(bool visible)
-{
-	m_switch->setChildValue(m_transform, visible);
-}
-
-bool OsgPlaneRepresentation::isVisible() const
-{
-	return m_switch->getChildValue(m_transform);
-}
-
-void OsgPlaneRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
-{
-	m_pose = transform;
-	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
-	m_transform->setAttitude(pose.first);
-	m_transform->setPosition(pose.second);
-}
-
-const SurgSim::Math::RigidTransform3d& OsgPlaneRepresentation::getPose() const
-{
-	return m_pose;
-}
-
-void OsgPlaneRepresentation::update(double dt)
-{
 }
 
 std::shared_ptr<OsgPlane> OsgPlaneRepresentation::getSharedPlane()

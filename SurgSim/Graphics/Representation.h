@@ -18,6 +18,7 @@
 
 #include <SurgSim/Framework/Representation.h>
 
+#include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim
@@ -31,16 +32,14 @@ class Material;
 
 /// Base graphics representation class, which defines the interface that all graphics representations must implement.
 ///
-/// A Graphics::Representation is the visual Framework::Representation of a Framework::SceneElement in the Framework::Scene.
+/// A Graphics::Representation is the visual Framework::Representation of a Framework::SceneElement in the
+/// Framework::Scene.
 class Representation : public SurgSim::Framework::Representation
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the representation
-	explicit Representation(const std::string& name) : SurgSim::Framework::Representation(name),
-		m_initialPose(SurgSim::Math::RigidTransform3d::Identity())
-	{
-	}
+	explicit Representation(const std::string& name);
 
 	/// Sets whether the representation is currently visible
 	/// \param	visible	True for visible, false for invisible
@@ -53,27 +52,29 @@ public:
 	/// Set the initial pose of the representation
 	/// \param	pose	The initial pose
 	/// \note	This will reset initial, current, and final poses all to the new initial pose.
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_initialPose = pose;
-		setPose(m_initialPose);
-	}
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
 
 	/// Get the initial pose of the representation
 	/// \return	The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
-	{
-		return m_initialPose;
-	}
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
+
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<Material> material) = 0;
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<Material> getMaterial() const = 0;
+
+
+	/// Removes the material from the representation
+	virtual void clearMaterial() = 0;
 
 	/// Updates the representation
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt) = 0;
 
-private:
-
-	/// Initial pose of the representation
-	SurgSim::Math::RigidTransform3d m_initialPose;
 };
 
 };  // namespace Graphics

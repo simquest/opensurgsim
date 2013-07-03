@@ -35,7 +35,7 @@ set(IDENTITY_POSE_DEVICE_HEADERS
 
 surgsim_add_library(
 	IdentityPoseDevice
-	"${IDENTITY_POSE_DEVICE_SOURCES}" 
+	"${IDENTITY_POSE_DEVICE_SOURCES}"
 	"${IDENTITY_POSE_DEVICE_HEADERS}"
 	"SurgSim/Devices/IdentityPoseDevice"
 )

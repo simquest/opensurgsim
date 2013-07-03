@@ -33,7 +33,7 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
-set(LIBS SurgSimBlocks SurgSimFramework SurgSimPhysics SurgSimGraphics gtest 
+set(LIBS SurgSimBlocks SurgSimFramework SurgSimPhysics SurgSimGraphics gtest
 	${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimBlocksTest)

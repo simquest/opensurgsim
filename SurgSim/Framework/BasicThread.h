@@ -42,7 +42,11 @@ class BasicThread
 {
 public:
 	explicit BasicThread(const std::string& name = "Unknown Thread");
-	virtual ~BasicThread();
+#ifdef _MSC_VER
+	virtual ~BasicThread() throw(...);  // Visual Studio does not support noexcept. The throw(...) is optional.
+#else
+	virtual ~BasicThread() noexcept(false);  /// C++11 introduced noexcept
+#endif
 
 	/// Live cycle functions, public implementation.
 	/// All of these have virtual partners as private functions
@@ -110,8 +114,11 @@ private:
 	virtual bool doInitialize() = 0;
 	virtual bool doStartUp() = 0;
 
-	//! \return false when the thread is done, this will stop execution
-	virtual bool doUpdate(double dt) = 0;
+	/// Implementation of actual work function for this thread, this has a default implementation to handle
+	/// destruction better, as it could be called while the thread is under destruction, if left unimplemented
+	/// this would trigger a call to a pure virtual function.
+	/// \return false when the thread is done, this will stop execution
+	virtual bool doUpdate(double dt);
 
 	/// Prepares the thread for its execution to be stopped
 	/// \note	Called from this thread before joined

@@ -25,42 +25,75 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
+	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
 	OsgGroup.cpp
 	OsgManager.cpp
+	OsgMaterial.cpp
 	OsgPlaneRepresentation.cpp
+	OsgRepresentation.cpp
+	OsgShader.cpp
 	OsgSphereRepresentation.cpp
+	OsgTexture.cpp
+	OsgTexture1d.cpp
+	OsgTexture2d.cpp
+	OsgTexture3d.cpp
+	OsgTextureCubeMap.cpp
+	OsgTextureRectangle.cpp
+	OsgUniformBase.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	Representation.cpp
 	ViewElement.cpp
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
+	BoxRepresentation.h
 	Camera.h
 	Group.h
 	Manager.h
+	Material.h
+	OsgBoxRepresentation.h
 	OsgCamera.h
 	OsgConversions.h
 	OsgGroup.h
 	OsgManager.h
+	OsgMaterial.h
 	OsgMatrixConversions.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgQuaternionConversions.h
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
+	OsgShader.h
 	OsgSphereRepresentation.h
+	OsgTexture.h
+	OsgTexture1d.h
+	OsgTexture2d.h
+	OsgTexture3d.h
+	OsgTextureCubeMap.h
+	OsgTextureRectangle.h
 	OsgUniform.h
 	OsgUniform-inl.h
+	OsgUniformBase.h
 	OsgUniformTypes.h
+	OsgUnitBox.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
 	Representation.h
+	Shader.h
 	SphereRepresentation.h
+	Texture.h
+	Texture1d.h
+	Texture2d.h
+	Texture3d.h
+	TextureCubeMap.h
+	TextureRectangle.h
 	Uniform.h
+	UniformBase.h
 	View.h
 	ViewElement.h
 )
@@ -71,7 +104,7 @@ surgsim_add_library(
 	"${SURGSIM_GRAPHICS_HEADERS}"
 	"SurgSim/Graphics"
 )
-target_link_libraries(SurgSimGraphics SurgSimFramework 
+target_link_libraries(SurgSimGraphics SurgSimFramework
 	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 

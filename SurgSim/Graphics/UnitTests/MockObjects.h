@@ -17,13 +17,15 @@
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H
 
 #include <SurgSim/Math/Vector.h>
-#include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Graphics/Camera.h>
 #include <SurgSim/Graphics/Group.h>
 #include <SurgSim/Graphics/Manager.h>
+#include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Graphics/Shader.h>
+#include <SurgSim/Graphics/UniformBase.h>
 #include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/ViewElement.h>
-
 
 /// Manager class for testing
 class MockManager : public SurgSim::Graphics::Manager
@@ -154,6 +156,41 @@ public:
 		return m_isAwoken;
 	}
 
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		return false;
+	}
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	/// Removes the material from the representation
+	virtual void clearMaterial()
+	{
+	}
+
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+	}
+
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -224,7 +261,9 @@ public:
 	/// \post m_numUpdates and m_sumDt are initialized to 0
 	/// \post m_transform is set to identity, m_eye to (0,0,0), m_center to (0, 0, -1), and m_up to (0, 1, 0)
 	/// \post m_isVisible is set to true
-	explicit MockCamera(const std::string& name) : SurgSim::Graphics::Representation(name), SurgSim::Graphics::Camera(name),
+	explicit MockCamera(const std::string& name) :
+		SurgSim::Graphics::Representation(name),
+		SurgSim::Graphics::Camera(name),
 		m_numUpdates(0),
 		m_sumDt(0.0),
 		m_isVisible(true)
@@ -310,6 +349,42 @@ public:
 	{
 		++m_numUpdates;
 		m_sumDt += dt;
+	}
+
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		return false;
+	}
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	/// Removes the material from the representation
+	virtual void clearMaterial()
+	{
+	}
+
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+
+	}
+
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
 	}
 
 private:

@@ -22,28 +22,34 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	CameraTests.cpp
 	GroupTests.cpp
 	ManagerTests.cpp
+	OsgBoxRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
+	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
+	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
+	OsgTextureTests.cpp
+	OsgTexture1dTests.cpp
+	OsgTexture2dTests.cpp
+	OsgTexture3dTests.cpp
+	OsgTextureCubeMapTests.cpp
+	OsgTextureRectangleTests.cpp
 	OsgUniformTests.cpp
+	OsgUniformBaseTests.cpp
 	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
 	OsgViewTests.cpp
 	OsgViewElementTests.cpp
-	PlaneRepresentationTests.cpp
-	RepresentationTests.cpp
-	SphereRepresentationTests.cpp
 	ViewTests.cpp
 	ViewElementTests.cpp
 )
@@ -52,6 +58,8 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 	MockOsgObjects.h
 )
+
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 

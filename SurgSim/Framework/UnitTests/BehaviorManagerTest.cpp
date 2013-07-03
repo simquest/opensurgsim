@@ -20,7 +20,10 @@
 #include <SurgSim/Framework/UnitTests/MockObjects.h>
 #include "boost/thread/thread.hpp"
 
-using namespace SurgSim::Framework;
+using SurgSim::Framework::BehaviorManager;
+using SurgSim::Framework::Runtime;
+using SurgSim::Framework::Scene;
+using SurgSim::Framework::SceneElement;
 
 TEST(BehaviorManagerTest, BehaviorInitTest)
 {

@@ -18,10 +18,9 @@
 #include <string>
 
 #include <SurgSim/Physics/RigidRepresentation.h>
-using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationState;
-using SurgSim::Physics::RigidRepresentationParameters;
-using SurgSim::Physics::SphereShape;
+#include <SurgSim/Physics/Localization.h>
+#include <SurgSim/Physics/Location.h>
+
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
@@ -31,6 +30,11 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+
+namespace SurgSim
+{
+namespace Physics
+{
 
 class RigidRepresentationTest : public ::testing::Test
 {
@@ -280,3 +284,32 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		ASSERT_FALSE(rigidBody->isActive());
 	}
 }
+
+TEST_F(RigidRepresentationTest, LocalizationCreation)
+{
+	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+	Location loc0;
+	loc0.globalPosition.setValue(Vector3d(1.0,2.0,3.0));
+
+	std::shared_ptr<Localization> localization = rigidBody->createLocalization(loc0);
+	localization->setRepresentation(rigidBody);
+
+	EXPECT_TRUE(loc0.globalPosition.getValue().isApprox(localization->calculatePosition(0.0)));
+	EXPECT_TRUE(loc0.globalPosition.getValue().isApprox(localization->calculatePosition(1.0)));
+
+	Location loc1;
+	loc1.rigidLocalPosition.setValue(Vector3d(3.0,2.0,1.0));
+
+	localization = rigidBody->createLocalization(loc1);
+	localization->setRepresentation(rigidBody);
+
+	Vector3d globalPos = rigidBody->getCurrentPose() * loc1.rigidLocalPosition.getValue();
+
+	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(0.0)));
+	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(1.0)));
+
+}
+
+}; // namespace Physics
+}; // namespace SurgSim
+

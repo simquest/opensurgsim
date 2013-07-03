@@ -19,9 +19,9 @@
 #include <string>
 
 #include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/FixedRepresentationLocalization.h>
+#include <SurgSim/Physics/RigidRepresentationLocalization.h>
 using SurgSim::Physics::FixedRepresentation;
-using SurgSim::Physics::FixedRepresentationLocalization;
+using SurgSim::Physics::RigidRepresentationLocalization;
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -70,41 +70,17 @@ public:
 	SurgSim::Math::RigidTransform3d m_identityTransformation;
 };
 
-TEST_F(FixedRepresentationLocalizationTest, ConstructorTest)
-{
-	ASSERT_NO_THROW( {FixedRepresentationLocalization fixedRepresentationLoc;});
-
-	ASSERT_NO_THROW(
-	{
-		std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("FixedRepresentation");
-		FixedRepresentationLocalization fixedRepresentationLoc(fixed);
-	});
-}
-
-TEST_F(FixedRepresentationLocalizationTest, SetGetRepresentation)
-{
-	FixedRepresentationLocalization fixedRepresentationLoc;
-	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("FixedRepresentation");
-	
-	EXPECT_EQ(nullptr, fixedRepresentationLoc.getRepresentation());
-
-	fixedRepresentationLoc.setRepresentation(fixed);
-	EXPECT_EQ(fixed, fixedRepresentationLoc.getRepresentation());
-
-	fixedRepresentationLoc.setRepresentation(nullptr);
-	EXPECT_EQ(nullptr, fixedRepresentationLoc.getRepresentation());
-}
-
 TEST_F(FixedRepresentationLocalizationTest, GetPositionTest)
 {
 	// Create the rigid body
-	std::shared_ptr<FixedRepresentation> fixedRepresentation = std::make_shared<FixedRepresentation>("FixedRepresentation");
+	std::shared_ptr<FixedRepresentation> fixedRepresentation =
+		std::make_shared<FixedRepresentation>("FixedRepresentation");
 
 	// Activate the rigid body and setup its initial pose
 	fixedRepresentation->setIsActive(true);
 	fixedRepresentation->setInitialPose(m_initialTransformation);
 
-	FixedRepresentationLocalization localization = FixedRepresentationLocalization(fixedRepresentation);
+	RigidRepresentationLocalization localization = RigidRepresentationLocalization(fixedRepresentation);
 	ASSERT_EQ(fixedRepresentation, localization.getRepresentation());
 
 	SurgSim::Math::Vector3d origin = m_initialTransformation.translation();

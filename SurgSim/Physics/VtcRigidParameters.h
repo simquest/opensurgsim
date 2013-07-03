@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_VTCRIGIDPARAMETERS_H
 #define SURGSIM_PHYSICS_VTCRIGIDPARAMETERS_H
 
-namespace SurgSim 
+namespace SurgSim
 {
 
 namespace Physics
@@ -55,72 +55,72 @@ public:
 	}
 
 	/// Set vtc linear stiffness
-	/// \param linearStiffness The stiffness of the vtc in linear mode (in N.m-1)
+	/// \param linearStiffness The stiffness of the vtc in linear mode (in N路m-1)
 	void setVtcLinearStiffness(double linearStiffness)
 	{
 		m_vtcLinearStiffness = linearStiffness;
 	}
 
 	/// Get vtc linear stiffness
-	/// \return The vtc linear stiffness (in N.m-1)
+	/// \return The vtc linear stiffness (in N路m-1)
 	double getVtcLinearStiffness() const
 	{
 		return m_vtcLinearStiffness;
 	}
 
 	/// Set vtc linear damping
-	/// \param linearDamping The damping of the vtc in linear mode (in N.s.m-1 or Kg.s-1)
+	/// \param linearDamping The damping of the vtc in linear mode (in N路s路m-1 or Kg路s-1)
 	void setVtcLinearDamping(double linearDamping)
 	{
 		m_vtcLinearDamping = linearDamping;
 	}
 
 	/// Get vtc linear damping
-	/// \return The vtc linear damping (in N.s.m-1 or Kg.s-1)
+	/// \return The vtc linear damping (in N路s路m-1 or Kg路s-1)
 	double getVtcLinearDamping() const
 	{
 		return m_vtcLinearDamping;
 	}
 
 	/// Set vtc angular stiffness
-	/// \param angularStiffness The stiffness of the vtc in angular mode (in N穖 rad-1)
+	/// \param angularStiffness The stiffness of the vtc in angular mode (in N路m rad-1)
 	void setVtcAngularStiffness(double angularStiffness)
 	{
 		m_vtcAngularStiffness = angularStiffness;
 	}
 
 	/// Get vtc angular stiffness
-	/// \return The vtc angular stiffness (in N穖 rad-1)
+	/// \return The vtc angular stiffness (in N路m rad-1)
 	double getVtcAngularStiffness() const
 	{
 		return m_vtcAngularStiffness;
 	}
 
 	/// Set vtc angular damping
-	/// \param angularDamping The damping of the vtc in angular mode (in N.m.s.rad-1)
+	/// \param angularDamping The damping of the vtc in angular mode (in N路m路s路rad-1)
 	void setVtcAngularDamping(double angularDamping)
 	{
 		m_vtcAngularDamping = angularDamping;
 	}
 
 	/// Get the vtc angular damping
-	/// \return the vtc angular damping (in N.m.s.rad-1)
+	/// \return the vtc angular damping (in N路m路s路rad-1)
 	double getVtcAngularDamping() const
 	{
 		return m_vtcAngularDamping;
 	}
 
 private:
-	/// Vtc stiffness parameter in linear mode (in N.m-1)
+	/// Vtc stiffness parameter in linear mode (in N路m-1)
 	double m_vtcLinearStiffness;
 
-	/// Vtc damping parameter in linear mode (in N.s.m-1 or Kg.s-1)
+	/// Vtc damping parameter in linear mode (in N路s路m-1 or Kg路s-1)
 	double m_vtcLinearDamping;
 
-	/// Vtc stiffness parameter in angular mode (in N穖 rad-1)
+	/// Vtc stiffness parameter in angular mode (in N路m rad-1)
 	double m_vtcAngularStiffness;
 
-	/// Vtc damping parameter in angular mode (in N.m.s.rad-1)
+	/// Vtc damping parameter in angular mode (in N路m路s路rad-1)
 	double m_vtcAngularDamping;
 };
 

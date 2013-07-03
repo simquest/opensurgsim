@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICE_SIXENSEDEVICE_H
-#define SURGSIM_DEVICE_SIXENSEDEVICE_H
+#ifndef SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H
+#define SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H
 
 #include <memory>
 #include <string>
@@ -55,9 +55,6 @@ public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	/// \param baseIndex Index of the base unit this controller is connected to.
-	/// \param controllerIndex Index of this controller within its base unit.
-	/// \param logger The logger used for diagnostic messages.
 	explicit SixenseDevice(const std::string& uniqueName);
 
 	/// Destructor.
@@ -79,4 +76,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif // SURGSIM_DEVICE_SIXENSEDEVICE_H
+#endif  // SURGSIM_DEVICES_SIXENSE_SIXENSEDEVICE_H

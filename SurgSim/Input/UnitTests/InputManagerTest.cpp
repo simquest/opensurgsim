@@ -34,7 +34,7 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
 
-#include "TestDevice.h"
+#include "SurgSim/Input/UnitTests/TestDevice.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;
@@ -58,7 +58,7 @@ protected:
 	virtual bool doInitialize() {return true;}
 	virtual bool doWakeUp() {return true;}
 };
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Input
 {
@@ -91,7 +91,7 @@ public:
 		return inputManager->executeAdditions(component);
 	}
 
-	bool testDoRemoveComponent(const std::shared_ptr<Component>& component) 
+	bool testDoRemoveComponent(const std::shared_ptr<Component>& component)
 	{
 		return inputManager->executeRemovals(component);
 	}
@@ -142,13 +142,13 @@ TEST_F(InputManagerTest, InputAddRemove)
 	EXPECT_FALSE(testDoAddComponent(notvalid));
 
 	// Excercise adds and removes
-	
+
 	// Duplicate false on duplicate will become deprecated
 	EXPECT_FALSE(testDoAddComponent(listener1));
 	EXPECT_TRUE(testDoRemoveComponent(listener1));
 	EXPECT_FALSE(testDoRemoveComponent(listener1));
 
-	// Should not be able to add random components 
+	// Should not be able to add random components
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>();
 	EXPECT_FALSE(testDoAddComponent(component));
 }

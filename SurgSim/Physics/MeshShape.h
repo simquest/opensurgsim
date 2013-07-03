@@ -203,20 +203,22 @@ private:
 
 		m_Faa = k1 * m_Paa;
 		m_Fbb = k1 * m_Pbb;
-		m_Fcc = k3 * (MeshShape::square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab + MeshShape::square(n[m_beta])*m_Pbb
-			+ w*(2*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
+		m_Fcc = k3 * (MeshShape::square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
+					  + MeshShape::square(n[m_beta])*m_Pbb + w*(2*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
 
 		m_Faaa = k1 * m_Paaa;
 		m_Fbbb = k1 * m_Pbbb;
 		m_Fccc = -k4 * (MeshShape::cube(n[m_alpha])*m_Paaa + 3*MeshShape::square(n[m_alpha])*n[m_beta]*m_Paab
-			+ 3*n[m_alpha]*MeshShape::square(n[m_beta])*m_Pabb + MeshShape::cube(n[m_beta])*m_Pbbb
-			+ 3*w*(MeshShape::square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab + MeshShape::square(n[m_beta])*m_Pbb)
-			+ w*w*(3*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
+						+ 3*n[m_alpha]*MeshShape::square(n[m_beta])*m_Pabb + MeshShape::cube(n[m_beta])*m_Pbbb
+						+ 3*w*(MeshShape::square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
+							   + MeshShape::square(n[m_beta])*m_Pbb)
+						+ w*w*(3*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
 
 		m_Faab = k1 * m_Paab;
 		m_Fbbc = -k2 * (n[m_alpha]*m_Pabb + n[m_beta]*m_Pbbb + w*m_Pbb);
-		m_Fcca = k3 * (MeshShape::square(n[m_alpha])*m_Paaa + 2*n[m_alpha]*n[m_beta]*m_Paab + MeshShape::square(n[m_beta])*m_Pabb
-			+ w*(2*(n[m_alpha]*m_Paa + n[m_beta]*m_Pab) + w*m_Pa));
+		m_Fcca = k3 * (MeshShape::square(n[m_alpha])*m_Paaa + 2*n[m_alpha]*n[m_beta]*m_Paab
+					   + MeshShape::square(n[m_beta])*m_Pabb
+					   + w*(2*(n[m_alpha]*m_Paa + n[m_beta]*m_Pab) + w*m_Pa));
 	}
 
 	/// Compute various volume integrals over the triangle mesh

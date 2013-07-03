@@ -22,11 +22,17 @@
 #include <osg/Camera>
 #include <osg/Switch>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4250)
+#endif
+
 namespace SurgSim
 {
-
 namespace Graphics
 {
+
+class Material;
 
 /// OSG implementation of a graphics camera.
 ///
@@ -94,10 +100,19 @@ public:
 		return m_camera;
 	}
 
+	osg::ref_ptr<osg::Node> getOsgNode() const
+	{
+		return m_switch;
+	}
+
+	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	virtual std::shared_ptr<Material> getMaterial() const;
+
+	virtual void clearMaterial();
+
 private:
-	/// OSG switch to allow enabling and disabling of the camera
-	osg::ref_ptr<osg::Switch> m_switch;
-	/// OSG camera node
+
 	osg::ref_ptr<osg::Camera> m_camera;
 
 	/// Pose of the camera, which is the inverse of the view matrix
@@ -109,7 +124,10 @@ private:
 };
 
 };  // namespace Graphics
-
 };  // namespace SurgSim
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif  // SURGSIM_GRAPHICS_OSGCAMERA_H

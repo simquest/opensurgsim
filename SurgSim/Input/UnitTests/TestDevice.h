@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TESTDEVICE_H
-#define TESTDEVICE_H
+#ifndef SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
+#define SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H
 
 #include <SurgSim/Input/CommonDevice.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
@@ -92,4 +92,4 @@ public:
 	  DataGroup m_nextSentOutput;
 };
 
-#endif // TESTDEVICE_H
+#endif  // SURGSIM_INPUT_UNITTESTS_TESTDEVICE_H

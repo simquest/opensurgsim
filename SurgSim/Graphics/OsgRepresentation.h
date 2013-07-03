@@ -16,43 +16,103 @@
 #ifndef SURGSIM_GRAPHICS_OSGREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGREPRESENTATION_H
 
+#include <memory>
+
 #include <SurgSim/Graphics/Representation.h>
 
-#include <osg/Node>
+#include <osg/ref_ptr>
+
+namespace osg
+{
+	class Switch;
+	class Node;
+	class PositionAttitudeTransform;
+}
 
 namespace SurgSim
 {
-
 namespace Graphics
 {
 
+class OsgMaterial;
+
 /// Base OSG implementation of a graphics representation.
 ///
-/// A Graphics::OsgRepresentation wraps a osg::Node that serves as the root node for this representation in the OSG scenegraph.
+/// Wraps an osg::Node which serves as the root for the representation's portion of the scene graph.
 class OsgRepresentation : public virtual Representation
 {
 public:
-	/// Constructor
-	/// \param	name	Name of the representation
-	/// \param	node	Root OSG node of the representation
-	explicit OsgRepresentation(const std::string& name, osg::Node* node) : Representation(name),
-		m_node(node)
-	{
-	}
 
-	/// Returns the root OSG node of the representation
-	osg::ref_ptr<osg::Node> getOsgNode() const
-	{
-		return m_node;
-	}
+	/// Constructor
+	explicit OsgRepresentation(const std::string& name);
+	/// Destructor
+	virtual ~OsgRepresentation();
+
+	/// Returns the root OSG Node for this representations portion of the scene graph
+	osg::ref_ptr<osg::Node> getOsgNode() const;
+
+	/// Sets whether the representation is currently visible
+	/// \param	visible	True for visible, false for invisible
+	virtual void setVisible(bool visible);
+
+	/// Gets whether the representation is currently visible
+	/// \return	visible	True for visible, false for invisible
+	virtual bool isVisible() const;
+
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose);
+
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const;
+
+	/// Sets the current pose of the representation
+	/// \param	transform	Rigid transformation that describes the current pose of the representation
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose);
+
+	/// Gets the current pose of the representation
+	/// \return	Rigid transformation that describes the current pose of the representation
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
+
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	/// \note	OsgPlaneRepresentation only accepts subclasses of OsgMaterial.
+	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<Material> getMaterial() const;
+
+	/// Removes the material from the representation
+	virtual void clearMaterial();
+
+	/// Updates the representation.
+	/// \param	dt	The time in seconds of the preceding timestep.
+	virtual void update(double dt);
+
+protected:
+	virtual void doUpdate(double dt);
+
+	/// Switch used to toggle the visibility of the representation
+	osg::ref_ptr<osg::Switch> m_switch;
+	/// Transform used to pose the representation
+	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
 
 private:
-	/// Root OSG node of the representation
-	osg::ref_ptr<osg::Node> m_node;
+
+	/// Initial pose of the representation
+	SurgSim::Math::RigidTransform3d m_initialPose;
+	/// Current pose of the representation
+	SurgSim::Math::RigidTransform3d m_pose;
+	/// Material defining the visual appearance of the representation
+	std::shared_ptr<OsgMaterial> m_material;
+
 };
 
-};  // namespace Graphics
+}; // Graphics
+}; // SurgSim
 
-};  // namespace SurgSim
-
-#endif  // SURGSIM_GRAPHICS_OSGREPRESENTATION_H
+#endif

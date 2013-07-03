@@ -1,0 +1,17 @@
+# Rules for the Logitech 3DConnexion SpaceNavigator and related devices.
+# By default, any user can read from and write to the devices.
+# The ID mappings taken from
+#   http://www.3dconnexion.com/index.php?id=200&faq_red=faq/27
+#
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c603", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacemouse_plus", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c605", MODE="0666", GROUP="plugdev", SYMLINK+="input/cadman", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c606", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacemouse_classic", SYMLINK+="input/3dconnexion"
+#
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c621", MODE="0666", GROUP="plugdev", SYMLINK+="input/spaceball5000", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c623", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacetraveler", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c625", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacepilot", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c626", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacenavigator", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c627", MODE="0666", GROUP="plugdev", SYMLINK+="input/spaceexplorer", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c628", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacenavigator_notebooks", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c629", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacepilot_pro", SYMLINK+="input/3dconnexion"
+KERNEL=="event[0-9]*", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c62b", MODE="0666", GROUP="plugdev", SYMLINK+="input/spacemouse_pro", SYMLINK+="input/3dconnexion"

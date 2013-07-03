@@ -49,7 +49,7 @@ public:
 	}
 
 private:
-	/// Root OSG node of the plane
+	/// Root OSG node of the sphere
 	osg::ref_ptr<osg::Geode> m_geode;
 };
 

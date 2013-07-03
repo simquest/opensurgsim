@@ -29,7 +29,8 @@ class View;
 
 /// Basic SceneElement that wraps a View so that it can be added to the Scene.
 ///
-/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Representation objects to be shown.
+/// A Scene needs at least one Graphics::View component for any visualization of Graphics:Representation objects
+/// to be shown.
 class ViewElement : public Framework::SceneElement
 {
 public:

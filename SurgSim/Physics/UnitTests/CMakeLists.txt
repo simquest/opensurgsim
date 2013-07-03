@@ -21,19 +21,25 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	CollisionPairTests.cpp
+	ConstraintTests.cpp
 	ContactCalculationTests.cpp
+	ContactConstraintDataTests.cpp
 	ComputationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
+	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
+	PostUpdateTests.cpp
+	PreUpdateTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
