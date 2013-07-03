@@ -30,6 +30,12 @@ namespace SurgSim
 namespace Graphics
 {
 
+class OsgTexture1d;
+class OsgTexture2d;
+class OsgTexture3d;
+class OsgTextureCubeMap;
+class OsgTextureRectangle;
+
 /// Returns the OSG uniform type enum value for the template parameter type.
 /// This template function is specialized to match each type with an enum value.
 /// Any types for which the function is not specialized will return osg::Uniform::UNDEFINED.
@@ -129,6 +135,36 @@ template <>
 inline osg::Uniform::Type getOsgUniformType<SurgSim::Math::Matrix44d>()
 {
 	return osg::Uniform::DOUBLE_MAT4;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<std::shared_ptr<OsgTexture1d>>()
+{
+	return osg::Uniform::SAMPLER_1D;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<std::shared_ptr<OsgTexture2d>>()
+{
+	return osg::Uniform::SAMPLER_2D;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<std::shared_ptr<OsgTexture3d>>()
+{
+	return osg::Uniform::SAMPLER_3D;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<std::shared_ptr<OsgTextureCubeMap>>()
+{
+	return osg::Uniform::SAMPLER_CUBE;
+}
+
+template <>
+inline osg::Uniform::Type getOsgUniformType<std::shared_ptr<OsgTextureRectangle>>()
+{
+	return osg::Uniform::SAMPLER_2D_RECT;
 }
 
 };  // namespace Graphics
