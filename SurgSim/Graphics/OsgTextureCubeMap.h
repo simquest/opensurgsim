@@ -56,8 +56,9 @@ public:
 	/// \param	filePath	Path to the image file
 	/// \return	True if the image is successfully loaded, otherwise false
 	/// \note
-	/// The image should contain the cube wrap unwrapped such that each face is width/3 x height/4 and the corners
-	/// for the faces are arranged as follows:
+	/// The image should contain the cube map unwrapped such that each face is width/3 x height/4 and the corners
+	/// for the faces are arranged as follows, with (0, 0) as the bottom-left corner and (width, height) as the
+	/// top-right corner:
 	/// (-Z): (width * 1/3, 0           ) to (width * 2/3, height * 1/4)
 	/// (-Y): (width * 1/3, height * 1/4) to (width * 2/3, height * 1/2)
 	/// (-X): (0,           height * 1/2) to (width * 1/3, height * 3/4)
