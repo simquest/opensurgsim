@@ -28,6 +28,11 @@ namespace Graphics
 class Texture
 {
 public:
+	/// Destructor
+	virtual ~Texture()
+	{
+	}
+
 	/// Loads an image into the texture from a file
 	/// \param	filePath	Path to the image file
 	/// \return	True if the image is successfully loaded, otherwise false
