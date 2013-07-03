@@ -32,6 +32,8 @@ set(SURGSIM_PHYSICS_SOURCES
 	FreeMotion.cpp
 	Localization.cpp
 	PhysicsManager.cpp
+	PostUpdate.cpp
+	PreUpdate.cpp
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
@@ -69,6 +71,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	PhysicsManager.h
 	PhysicsManagerState.h
 	PlaneShape.h
+	PostUpdate.h
+	PreUpdate.h
 	Representation.h
 	RigidCollisionRepresentation.h
 	RigidRepresentation.h
