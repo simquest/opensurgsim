@@ -40,7 +40,8 @@ set(SURGSIM_TEST_RUN_PREFIX)
 if(NOT WIN32)
 	if(SURGSIM_TESTS_RUN_WITH_VALGRIND)
 		set(SURGSIM_TEST_RUN_PREFIX valgrind --tool=memcheck --error-exitcode=1
-			--fullpath-after=)
+			--fullpath-after=
+			--suppressions=${SURGSIM_TOOLS_DIR}/memcheck.supp --gen-suppressions=all)
 		if(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
 			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} -v)
 		endif(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
