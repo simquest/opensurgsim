@@ -117,14 +117,11 @@ osg::ref_ptr<osg::Image> OsgTextureCubeMap::copyImageBlock(const osg::Image& sou
 
 	unsigned char* buffer = new unsigned char[(width*height) * pixelSize];
 
-	int eCol = column + width;
-	int eRow = row + height;
-
 	int index = 0;
 
-	for(int i = row; i < row; ++i)
+	for(int i = row; i < row + height; ++i)
 	{
-		for(int j = column; j < column; ++j)
+		for(int j = column; j < column + width; ++j)
 		{
 			const unsigned char* pixel = source.data(column, row, 0);
 
