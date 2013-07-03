@@ -33,6 +33,8 @@ set(UNIT_TEST_SOURCES
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
+	PostUpdateTests.cpp
+	PreUpdateTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
