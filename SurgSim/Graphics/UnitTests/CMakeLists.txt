@@ -38,6 +38,12 @@ set(UNIT_TEST_SOURCES
 	OsgRigidTransformConversionsTests.cpp
 	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
+	OsgTextureTests.cpp
+	OsgTexture1dTests.cpp
+	OsgTexture2dTests.cpp
+	OsgTexture3dTests.cpp
+	OsgTextureCubeMapTests.cpp
+	OsgTextureRectangleTests.cpp
 	OsgUniformTests.cpp
 	OsgUniformBaseTests.cpp
 	OsgUniformTypesTests.cpp
