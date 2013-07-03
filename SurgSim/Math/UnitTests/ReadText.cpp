@@ -417,13 +417,23 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 		testData->problem.constraintTypes[i] = currentType;
 	}
 
-	if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &(testData->problem.b)) ||
-		! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &(testData->problem.A)) ||
-		! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &(testData->problem.mu)) ||
-		! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &(testData->expectedLambda)))
+	Eigen::VectorXd b;
+	Eigen::MatrixXd A;
+	Eigen::VectorXd mu;
+	Eigen::VectorXd expectedLambda;
+
+	if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &b) ||
+		! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &A) ||
+		! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &mu) ||
+		! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &expectedLambda))
 	{
 		return false;
 	}
+
+	testData->problem.b = b;
+	testData->problem.A = A;
+	testData->problem.mu = mu;
+	testData->expectedLambda = expectedLambda;
 
 	if ((testData->problem.b.rows() != numAtomicConstraints) || (testData->problem.b.cols() != 1))
 	{

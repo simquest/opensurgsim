@@ -35,10 +35,10 @@ void RigidRepresentationContact::doBuild(double dt,
 			unsigned int indexOfConstraint,
 			ConstraintSideSign sign)
 {
-	Eigen::MatrixXd& H    = mlcp->H;
-	Eigen::MatrixXd& CHt  = mlcp->CHt;
-	Eigen::MatrixXd& HCHt = mlcp->A;
-	Eigen::VectorXd& b    = mlcp->b;
+	MlcpPhysicsProblem::Matrix& H    = mlcp->H;
+	MlcpPhysicsProblem::Matrix& CHt  = mlcp->CHt;
+	MlcpPhysicsProblem::Matrix& HCHt = mlcp->A;
+	MlcpPhysicsProblem::Vector& b    = mlcp->b;
 
 	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);

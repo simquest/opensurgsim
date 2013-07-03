@@ -141,31 +141,39 @@ public:
 	}
 
 private:
-	void computeEnforcementSystem(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-								  const Eigen::VectorXd& initialGuess_and_solution,
-								  const Eigen::VectorXd& frictionCoefs,
+	void computeEnforcementSystem(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+								  const MlcpProblem::Vector& b,
+								  const MlcpSolution::Vector& initialGuess_and_solution,
+								  const MlcpProblem::Vector& frictionCoefs,
 								  const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 								  int constraintID, int matrixEntryForConstraintID);
 
-	void calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-									  const Eigen::VectorXd& initialGuess_and_solution,
+	void calculateConvergenceCriteria(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+									  const MlcpProblem::Vector& b,
+									  const MlcpSolution::Vector& initialGuess_and_solution,
 									  const std::vector<MlcpConstraintType>& constraintsType,
 									  double subStep,
 									  double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
 									  double& convergence_criteria,
 									  bool& signoriniVerified, bool& signoriniValid);
 
-	void doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-						Eigen::VectorXd* initialGuess_and_solution,
-						const Eigen::VectorXd& frictionCoefs,
+	void doOneIteration(int n, const MlcpProblem::Matrix& A, int nbColumnInA, const MlcpProblem::Vector& b,
+						MlcpSolution::Vector* initialGuess_and_solution,
+						const MlcpProblem::Vector& frictionCoefs,
 						const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 						double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES], double& convergence_criteria,
 						bool& signoriniVerified);
 
-	void printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-									   const Eigen::VectorXd& initialGuess_and_solution,
-									   const std::vector<MlcpConstraintType>& constraintsType, double subStep, double convergence_criteria,
+	void printViolationsAndConvergence(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+									   const MlcpProblem::Vector& b,
+									   const MlcpSolution::Vector& initialGuess_and_solution,
+									   const std::vector<MlcpConstraintType>& constraintsType,
+									   double subStep, double convergence_criteria,
 									   bool signorini_verified, int nbLoop);
+
+
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
 
 
 	double       m_epsilonConvergence;
@@ -176,8 +184,8 @@ private:
 	bool         m_verbose;
 
 	int m_numEnforcedAtomicConstraints;
-	Eigen::MatrixXd m_lhsEnforcedLocalSystem;
-	Eigen::VectorXd m_rhsEnforcedLocalSystem;
+	Matrix m_lhsEnforcedLocalSystem;
+	Vector m_rhsEnforcedLocalSystem;
 };
 
 };  // namespace Math

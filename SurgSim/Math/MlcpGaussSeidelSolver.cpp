@@ -58,11 +58,11 @@ IN list of constraint type useful to define the number of atomic constraint per 
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {
 	int n = problem.getSize();
-	const Eigen::MatrixXd& A = problem.A;
+	const MlcpProblem::Matrix& A = problem.A;
 	const int nbColumnInA = A.cols();
-	const Eigen::VectorXd& b = problem.b;
-	Eigen::VectorXd& initialGuess_and_solution = solution->x;
-	const Eigen::VectorXd& frictionCoefs = problem.mu;
+	const MlcpProblem::Vector& b = problem.b;
+	MlcpSolution::Vector& initialGuess_and_solution = solution->x;
+	const MlcpProblem::Vector& frictionCoefs = problem.mu;
 	const std::vector<MlcpConstraintType>& constraintsType = problem.constraintTypes;
 	double subStep = 1.0;//XXX
 	int* MLCP_nbIterations = &solution->numIterations;
@@ -258,9 +258,9 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 }
 
 
-void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::MatrixXd& A, int nbColumnInA,
-														 const Eigen::VectorXd& b,
-														 const Eigen::VectorXd& initialGuess_and_solution,
+void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+														 const MlcpProblem::Vector& b,
+														 const MlcpSolution::Vector& initialGuess_and_solution,
 														 const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 														 double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
 														 double& convergence_criteria,
@@ -430,9 +430,9 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const Eigen::Mat
 }
 
 void MlcpGaussSeidelSolver::computeEnforcementSystem(
-	int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-	const Eigen::VectorXd& initialGuess_and_solution,
-	const Eigen::VectorXd& frictionCoefs,
+	int n, const MlcpProblem::Matrix& A, int nbColumnInA, const MlcpProblem::Vector& b,
+	const MlcpSolution::Vector& initialGuess_and_solution,
+	const MlcpProblem::Vector& frictionCoefs,
 	const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 	int constraintID, int matrixEntryForConstraintID)
 {
@@ -700,21 +700,21 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 }
 
 // Solve the system A x = b for x, with the assumption that the size is "size"
-static inline bool solveSystem(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, int size, Eigen::VectorXd* x)
+static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, int size, MlcpSolution::Vector* x)
 {
-	Eigen::MatrixXd AA = A.block(0, 0, size, size);
-	Eigen::VectorXd bb = b.head(size);
+	MlcpProblem::Matrix AA = A.block(0, 0, size, size);
+	MlcpProblem::Vector bb = b.head(size);
 
-	Eigen::VectorXd solution = AA.partialPivLu().solve(bb);
-	//Eigen::VectorXd solution = AA.colPivHouseholderQr().solve(bb);
-	//Eigen::VectorXd solution = AA.householderQr().solve(bb);
+	MlcpSolution::Vector solution = AA.partialPivLu().solve(bb);
+	//MlcpSolution::Vector solution = AA.colPivHouseholderQr().solve(bb);
+	//MlcpSolution::Vector solution = AA.householderQr().solve(bb);
 	*x = solution;
 	return true;
 }
 
-void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int nbColumnInA, const Eigen::VectorXd& b,
-										   Eigen::VectorXd* initialGuess_and_solution,
-										   const Eigen::VectorXd& frictionCoefs,
+void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, int nbColumnInA, const MlcpProblem::Vector& b,
+										   MlcpSolution::Vector* initialGuess_and_solution,
+										   const MlcpProblem::Vector& frictionCoefs,
 										   const std::vector<MlcpConstraintType>& constraintsType, double subStep,
 										   double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
 										   double& convergence_criteria, bool& signoriniVerified)
@@ -1482,9 +1482,9 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const Eigen::MatrixXd& A, int 
 	}
 }
 
-void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const Eigen::MatrixXd& A, int nbColumnInA,
-														  const Eigen::VectorXd& b,
-														  const Eigen::VectorXd& initialGuess_and_solution,
+void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+														  const MlcpProblem::Vector& b,
+														  const MlcpSolution::Vector& initialGuess_and_solution,
 														  const std::vector<MlcpConstraintType>& constraintsType,
 														  double subStep,
 														  double convergence_criteria, bool signorini_verified,
