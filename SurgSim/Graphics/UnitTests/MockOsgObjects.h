@@ -30,8 +30,9 @@ public:
 	/// \post m_transform is set to identity
 	/// \post m_isInitialized and m_isAwoken are set to false
 	/// \post m_isVisible is set to true
-	explicit MockOsgRepresentation(const std::string& name) : SurgSim::Graphics::Representation(name),
-        SurgSim::Graphics::OsgRepresentation(name, new osg::Group()),
+	explicit MockOsgRepresentation(const std::string& name) :
+        SurgSim::Graphics::OsgRepresentation(name),
+		SurgSim::Graphics::Representation(name),
         m_isVisible(true),
         m_numUpdates(0),
 		m_sumDt(0.0),
@@ -132,5 +133,7 @@ private:
 	/// Rigid transform describing pose of the representation
 	SurgSim::Math::RigidTransform3d m_transform;
 };
+
+
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H

@@ -131,7 +131,7 @@ TEST(OsgBoxRepresentationTests, SizeVector3dTest)
 
 TEST(OsgBoxRepresentationTests, PoseTest)
 {
-	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+	std::shared_ptr<Representation> representation = std::make_shared<OsgBoxRepresentation>("test name");
 
 	{
 		SCOPED_TRACE("Check Initial Pose");
@@ -170,7 +170,7 @@ TEST(OsgBoxRepresentationTests, PoseTest)
 
 TEST(OsgBoxRepresentationTests, MaterialTest)
 {
-	std::shared_ptr<OsgRepresentation> osgRepresentation = std::make_shared<OsgBoxRepresentation>("test name");
+	std::shared_ptr<OsgBoxRepresentation> osgRepresentation = std::make_shared<OsgBoxRepresentation>("test name");
 	std::shared_ptr<Representation> representation = osgRepresentation;
 
 	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();

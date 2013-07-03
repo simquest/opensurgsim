@@ -19,22 +19,24 @@
 #include <SurgSim/Graphics/OsgMatrixConversions.h>
 #include <SurgSim/Graphics/OsgQuaternionConversions.h>
 #include <SurgSim/Graphics/OsgVectorConversions.h>
+#include <SurgSim/Graphics/Manager.h>
+#include <SurgSim/Graphics/Material.h>
 
-using SurgSim::Graphics::OsgRepresentation;
-using SurgSim::Graphics::OsgCamera;
-using SurgSim::Graphics::OsgGroup;
-using SurgSim::Graphics::fromOsg;
-using SurgSim::Graphics::toOsg;
+
 using SurgSim::Math::makeRigidTransform;
 
+namespace SurgSim
+{
+namespace Graphics
+{
+
 OsgCamera::OsgCamera(const std::string& name) :
-	SurgSim::Graphics::Representation(name),
-	SurgSim::Graphics::Camera(name),
-	OsgRepresentation(name, new osg::Switch()),
+	Representation(name),
+	OsgRepresentation(name),
+	Camera(name),
 	m_camera(new osg::Camera())
 {
-	m_switch = static_cast<osg::Switch*>(getOsgNode().get());
-	m_switch->setName(name + " Switch");
+	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
 
 	m_switch->addChild(m_camera);
@@ -126,3 +128,26 @@ void OsgCamera::update(double dt)
 	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 }
+
+bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
+{
+	SURGSIM_FAILURE() << "You cannot assign a material to a camera node";
+	return false;
+}
+
+std::shared_ptr<Material> OsgCamera::getMaterial() const
+{
+	SURGSIM_FAILURE() << "A camera node does not have a material";
+	return nullptr;
+}
+
+void OsgCamera::clearMaterial()
+{
+	SURGSIM_FAILURE() << "A camera node does not have a material";
+}
+
+
+
+}; // namespace Graphics
+}; // namespace SurgSim
+

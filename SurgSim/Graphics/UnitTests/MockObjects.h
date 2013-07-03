@@ -156,6 +156,41 @@ public:
 		return m_isAwoken;
 	}
 
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		return false;
+	}
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	/// Removes the material from the representation
+	virtual void clearMaterial()
+	{
+	}
+
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+	}
+
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -314,6 +349,42 @@ public:
 	{
 		++m_numUpdates;
 		m_sumDt += dt;
+	}
+
+	/// Sets the material that defines the visual appearance of the representation
+	/// \param	material	Graphics material
+	/// \return	True if set successfully, otherwise false
+	virtual bool setMaterial(std::shared_ptr<SurgSim::Graphics::Material> material)
+	{
+		return false;
+	}
+
+	/// Gets the material that defines the visual appearance of the representation
+	/// \return	Graphics material
+	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
+	{
+		return nullptr;
+	}
+
+	/// Removes the material from the representation
+	virtual void clearMaterial()
+	{
+	}
+
+	/// Set the initial pose of the representation
+	/// \param	pose	The initial pose
+	/// \note	This will reset initial, current, and final poses all to the new initial pose.
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& transform)
+	{
+
+	}
+
+	/// Get the initial pose of the representation
+	/// \return	The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const
+	{
+		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
+		return identity;
 	}
 
 private:
@@ -517,77 +588,6 @@ private:
 	SurgSim::Math::RigidTransform3d m_initialPose;
 	/// Current pose of the representation
 	SurgSim::Math::RigidTransform3d m_currentPose;
-};
-
-/// Material class for testing
-class MockMaterial : public SurgSim::Graphics::Material
-{
-	/// Adds a uniform to this material
-	/// \param	uniform	Uniform to add
-	/// \return	True if uniform was added successfully, otherwise false
-	virtual bool addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
-	{
-		m_uniforms.push_back(uniform);
-		return true;
-	}
-
-	/// Removes a uniform from this material
-	/// \param	uniform	Uniform to remove
-	/// \return True if uniform was removed successfully, otherwise false
-	virtual bool removeUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
-	{
-		auto it = std::find(m_uniforms.begin(), m_uniforms.end(), uniform);
-		if (it != m_uniforms.end())
-		{
-			m_uniforms.erase(it);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/// Returns the number of uniforms in this material
-	virtual unsigned int getNumUniforms() const
-	{
-		return m_uniforms.size();
-	}
-
-	/// Gets a uniform in this material
-	/// \param	index	Index of the uniform in the material's list of uniforms
-	/// \return	Uniform at the index
-	virtual std::shared_ptr<SurgSim::Graphics::UniformBase> getUniform(unsigned int index) const
-	{
-		return m_uniforms[index];
-	}
-
-	/// Sets the shader used by this material
-	/// \param	shader	Shader program
-	/// \return	True if shader was set successfully, otherwise false
-	virtual bool setShader(std::shared_ptr<SurgSim::Graphics::Shader> shader)
-	{
-		m_shader = shader;
-		return true;
-	}
-
-	/// Gets the shader used by this material
-	/// \return	Shader program
-	virtual std::shared_ptr<SurgSim::Graphics::Shader> getShader() const
-	{
-		return m_shader;
-	}
-
-	/// Removes the shader from the material, falling back to fixed-function pipeline
-	virtual void clearShader()
-	{
-		m_shader = nullptr;
-	}
-private:
-	/// Uniforms
-	std::vector<std::shared_ptr<SurgSim::Graphics::UniformBase>> m_uniforms;
-	/// Shader
-	std::shared_ptr<SurgSim::Graphics::Shader> m_shader;
 };
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOBJECTS_H

@@ -17,6 +17,7 @@
 /// Tests for the OsgRepresentation class.
 
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
@@ -104,6 +105,24 @@ TEST(OsgRepresentationTests, PoseTest)
 		representation->setInitialPose(initialPose);
 		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
+	}
+}
+
+TEST(OsgRepresentationTests, MaterialTest)
+{
+	std::shared_ptr<Representation> representation = std::make_shared<MockOsgRepresentation>("test name");
+
+	{
+		SCOPED_TRACE("Set material");
+		std::shared_ptr<Material> material = std::make_shared<OsgMaterial>();
+		EXPECT_TRUE(representation->setMaterial(material));
+		EXPECT_EQ(material, representation->getMaterial());
+	}
+
+	{
+		SCOPED_TRACE("Clear material");
+		representation->clearMaterial();
+		EXPECT_EQ(nullptr, representation->getMaterial());
 	}
 }
 

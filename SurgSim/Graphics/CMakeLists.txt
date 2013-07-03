@@ -31,6 +31,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgManager.cpp
 	OsgMaterial.cpp
 	OsgPlaneRepresentation.cpp
+	OsgRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
 	OsgTexture.cpp

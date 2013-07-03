@@ -23,6 +23,7 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgMatrixConversions.h>
 #include <SurgSim/Math/Quaternion.h>
+#include <osg/ref_ptr>
 
 #include <gtest/gtest.h>
 
@@ -74,7 +75,7 @@ TEST(OsgCameraTests, OsgNodesTest)
 	EXPECT_EQ(1u, switchNode->getNumChildren());
 
 	osg::ref_ptr<osg::Camera> camera = osgCamera->getOsgCamera();
-	EXPECT_EQ(camera, switchNode->getChild(0));
+	EXPECT_EQ(camera.get(), switchNode->getChild(0));
 }
 
 TEST(OsgCameraTests, VisibilityTest)
@@ -192,6 +193,7 @@ TEST(OsgCameraTests, MatricesTest)
 	camera->setProjectionMatrix(projectionMatrix);
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
 }
+
 
 }  // namespace Graphics
 }  // namespace SurgSim

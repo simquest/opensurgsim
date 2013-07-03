@@ -155,7 +155,7 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 			Vector3d(1.0, 0.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleY2 + t * endAngleY2,
 			Vector3d(0.0, 1.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleZ2 + t * endAngleZ2,
 			Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition2 + t * endPosition2));
-		if(boxSetterType == int(BoxSetterTypeIndividual))
+		if(boxSetterType == static_cast<int>(BoxSetterTypeIndividual))
 		{
 			boxRepresentation1->setSizeX((1 - t) * startSizeX1 + t * endSizeX1);
 			boxRepresentation1->setSizeY((1 - t) * startSizeY1 + t * endSizeY1);
@@ -165,7 +165,7 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 			boxRepresentation2->setSizeY((1 - t) * startSizeY2 + t * endSizeY2);
 			boxRepresentation2->setSizeZ((1 - t) * startSizeZ2 + t * endSizeZ2);
 		}
-		else if(boxSetterType == int(BoxSetterTypeTogether))
+		else if(boxSetterType == static_cast<int>(BoxSetterTypeTogether))
 		{
 			boxRepresentation1->setSize((1 - t) * startSizeX1 + t * endSizeX1,
 										(1 - t) * startSizeY1 + t * endSizeY1,
@@ -175,7 +175,7 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 										(1 - t) * startSizeY2 + t * endSizeY2,
 										(1 - t) * startSizeZ2 + t * endSizeZ2);
 		}
-		else if(boxSetterType == int(BoxSetterTypeVector3d))
+		else if(boxSetterType == static_cast<int>(BoxSetterTypeVector3d))
 		{
 			box1Size.x() = (1 - t) * startSizeX1 + t * endSizeX1;
 			box1Size.y() = (1 - t) * startSizeY1 + t * endSizeY1;
