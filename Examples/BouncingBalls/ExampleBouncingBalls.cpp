@@ -30,6 +30,8 @@
 #include <SurgSim/Graphics/OsgPlaneRepresentation.h>
 #include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
+#include <SurgSim/Graphics/OsgTexture2d.h>
+#include <SurgSim/Graphics/OsgTextureUniform.h>
 #include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
@@ -50,6 +52,7 @@ using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
+using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
@@ -62,7 +65,6 @@ using SurgSim::Physics::PhysicsManager;
 
 ///\file Example of how to put together a very simple demo of  balls colliding with each other
 ///		 dcd is used in a very simple manner to detect the collisions between the spheres
-
 
 /// Simple behavior to show that the spheres are moving while we don't have graphics
 class PrintoutBehavior : public SurgSim::Framework::Behavior
@@ -103,7 +105,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
-std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
+	const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
@@ -138,7 +141,8 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name, const SurgSim
 	return planeElement;
 }
 
-std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
+	const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(name + " Physics");
@@ -155,7 +159,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
-	graphicsRepresentation->setRadius(0.1);
+	graphicsRepresentation->setRadius(shape->getRadius());
 	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
@@ -187,9 +191,55 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name, const SurgSi
 	return sphereElement;
 }
 
+std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name,
+	const SurgSim::Math::RigidTransform3d& pose)
+{
+	std::shared_ptr<RigidRepresentation> physicsRepresentation =
+		std::make_shared<RigidRepresentation>(name + " Physics");
+
+	RigidRepresentationParameters params;
+	params.setDensity(5513.0); // Earth
+	params.setLinearDamping(10.0);
+
+	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 1cm Sphere
+	params.setShapeUsedForMassInertia(shape);
+
+	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setInitialPose(pose);
+
+	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
+		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
+	graphicsRepresentation->setRadius(shape->getRadius());
+	graphicsRepresentation->setInitialPose(pose);
+
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgTexture2d> texture = std::make_shared<OsgTexture2d>();
+
+	std::string image = data.findFile("Earth.png");
+	SURGSIM_ASSERT(image != "") << "Could not find image file for sphere texture: " << image;
+	SURGSIM_ASSERT(texture->loadImage(image)) << "Could not load image file for sphere texture: " << image;
+
+	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTexture2d>>> uniform =
+		std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
+	uniform->set(texture);
+	material->addUniform(uniform);
+
+	graphicsRepresentation->setMaterial(material);
+
+	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
+	sphereElement->addComponent(physicsRepresentation);
+	sphereElement->addComponent(graphicsRepresentation);
+	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
+	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+		physicsRepresentation, graphicsRepresentation));
+	return sphereElement;
+}
+
 
 int main(int argc, char* argv[])
 {
+	const SurgSim::Framework::ApplicationData data("config.txt");
+
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
@@ -203,9 +253,11 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
-	scene->addSceneElement(createSphere("sphere1",
+	scene->addSceneElement(createSphere(data, "sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
-	scene->addSceneElement(createPlane("plane1",
+	scene->addSceneElement(createEarth(data, "earth1",
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
+	scene->addSceneElement(createPlane(data, "plane1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 

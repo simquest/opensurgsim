@@ -36,6 +36,12 @@ set(EXAMPLE_SOURCES
 set(EXAMPLE_HEADERS
 )
 
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+
 add_executable(ExampleBouncingBalls
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 
