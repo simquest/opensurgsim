@@ -37,10 +37,16 @@ option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 
 set(SURGSIM_COPY_WARNING_ONCE TRUE)
 set(SURGSIM_TEST_RUN_PREFIX)
+set(SURGSIM_TEST_RUN_SUFFIX)
 if(NOT WIN32)
 	if(SURGSIM_TESTS_RUN_WITH_VALGRIND)
 		set(SURGSIM_TEST_RUN_PREFIX valgrind --tool=memcheck --error-exitcode=1
-			--fullpath-after=)
+			--fullpath-after=
+			--suppressions=${SURGSIM_TOOLS_DIR}/memcheck.supp --gen-suppressions=all)
+		# The following assumes that the test is using Google Test.
+		# It's needed because by default tests use clone(), which doesn't
+		# play well with valgrind; fork() is supposed to work better.
+		set(SURGSIM_TEST_RUN_SUFFIX --gtest_death_test_use_fork)
 		if(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
 			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} -v)
 		endif(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
@@ -167,6 +173,7 @@ macro(surgsim_unit_test_run_only TESTNAME)
 	if(NOT SURGSIM_TESTS_ALL_IN_ONE)
 		add_custom_command(TARGET ${TESTNAME} POST_BUILD
 			COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TESTNAME}>
+				${SURGSIM_TEST_RUN_SUFFIX}
 			VERBATIM)
 	endif()
 endmacro()
