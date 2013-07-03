@@ -48,7 +48,7 @@ if(NOT WIN32)
 			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX}
 				--leak-check=full --show-reachable=yes)
 		else()
-			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} --leak-check=none)
+			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} --leak-check=no)
 		endif()
 	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
 endif(NOT WIN32)
