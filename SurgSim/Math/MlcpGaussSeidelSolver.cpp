@@ -569,7 +569,7 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 					A(matrixEntryForConstraintID+1, line);
 
 				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
-					(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
+					A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
 				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
 					A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
