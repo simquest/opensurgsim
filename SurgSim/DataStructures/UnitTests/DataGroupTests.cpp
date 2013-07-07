@@ -16,7 +16,6 @@
 /// \file
 /// Tests for the DataGroup class.
 
-#include <Eigen/Core>
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -92,7 +91,7 @@ TEST(DataGroupTests, PutName)
 	const SurgSim::Math::Quaterniond quat =
 		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(1, 0, 0));
 	const SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform(quat, vector);
-	Eigen::MatrixXd matrix(2,3);
+	DataGroup::DynamicMatrixType matrix(2,3);
 	matrix.fill(3.0);
 
 	data.poses().set("pose", pose);
@@ -142,7 +141,7 @@ TEST(DataGroupTests, GetName)
 	const SurgSim::Math::Quaterniond quat =
 		SurgSim::Math::makeRotationQuaternion(M_PI_2, SurgSim::Math::Vector3d(1, 0, 0));
 	const SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform(quat, vector);
-	Eigen::MatrixXd matrix(2,3);
+	DataGroup::DynamicMatrixType matrix(2,3);
 	matrix.fill(3.0);
 
 	data.poses().set("pose", pose);
@@ -165,7 +164,7 @@ TEST(DataGroupTests, GetName)
 		EXPECT_NEAR(0, (value - vector).norm(), 1e-9);
 	}
 	{
-		Eigen::MatrixXd value;
+		DataGroup::DynamicMatrixType value;
 		EXPECT_TRUE(data.matrices().get("matrix", &value));
 		EXPECT_EQ(matrix.cols(), value.cols());
 		EXPECT_EQ(matrix.rows(), value.rows());
