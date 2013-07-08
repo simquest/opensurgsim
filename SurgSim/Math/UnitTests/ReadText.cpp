@@ -42,6 +42,10 @@ static std::string getRawLine(FILE* in)
 	{
 		line.resize(line.length()-1);  // remove the last character
 	}
+	if ((line.length() > 0) && (line[line.length()-1] == '\r'))
+	{
+		line.resize(line.length()-1);  // remove the last character
+	}
 	return line;
 }
 
@@ -77,11 +81,11 @@ static bool readInt(const std::string& fileName, FILE* in, const char* label, in
 		fprintf(stderr, "Unexpected error or EOF in file '%s'\n", fileName.c_str());
 		return false;
 	}
-	std::string format = std::string(" ") + label + " %d";
-	if (fscanf(in, format.c_str(), value) != 1)
+	char buffer[1024];
+	if( fgets(buffer,sizeof(buffer), in) )
 	{
-		fprintf(stderr, "Bad integer input in '%s'\n  near text '%s'\n", fileName.c_str(), getRawLine(in).c_str());
-		return false;
+		std::string format = std::string(" ") + label + " %d";
+		sscanf(buffer, format.c_str(), value);
 	}
 	if (ferror(in))
 	{
@@ -111,7 +115,7 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 	}
 
 	// Read elements until ')' is found.
-	vector->resize(0);
+	std::vector<double> values;
 	while (true)
 	{
 		// Scan for a non-whitespace character and check it.
@@ -137,6 +141,20 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 					fprintf(stderr, "Unexpected error in file '%s'\n", fileName.c_str());
 					return false;
 				}
+
+				// If we are at the end of a line, we should read the CR/LF final characters to prepare the next item
+				int nextChar = fgetc(in);
+				if(nextChar != '\n' && nextChar != '\r')
+				{
+					fputc(nextChar, in);
+				}
+
+				vector->resize(values.size());
+				for (size_t i = 0; i < values.size(); i++)
+				{
+					(*vector)[i] = values[i];
+				}
+
 				return true;
 			}
 			else if (! isspace(nextCharacter))
@@ -162,12 +180,7 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 			return false;
 		}
 
-		int newSize = vector->cols() + 1;
-		Eigen::RowVectorXd newVector;
-		newVector.resize(newSize);
-		newVector.head(newSize-1) = *vector;
-		newVector[newSize-1] = nextValue;
-		*vector = newVector;
+		values.push_back(nextValue);
 	}
 }
 
@@ -228,6 +241,11 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 				{
 					fprintf(stderr, "Unexpected error in file '%s'\n", fileName.c_str());
 					return false;
+				}
+				int nextChar = fgetc(in);
+				if (nextChar != '\n' && nextChar != '\r')
+				{
+					fputc(nextChar, in);
 				}
 				return true;
 			}
@@ -417,23 +435,37 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 		testData->problem.constraintTypes[i] = currentType;
 	}
 
-	Eigen::VectorXd b;
-	Eigen::MatrixXd A;
-	Eigen::VectorXd mu;
-	Eigen::VectorXd expectedLambda;
-
-	if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &b) ||
-		! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &A) ||
-		! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &mu) ||
-		! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &expectedLambda))
 	{
-		return false;
-	}
+		Eigen::VectorXd b;
+		Eigen::MatrixXd A;
+		Eigen::VectorXd mu;
+		Eigen::VectorXd expectedLambda;
 
-	testData->problem.b = b;
-	testData->problem.A = A;
-	testData->problem.mu = mu;
-	testData->expectedLambda = expectedLambda;
+		if (! readEigenVector(fileName, in, TEXT_LABEL_E_VIOLATIONS_VECTOR, &b))
+		{
+			return false;
+		}
+
+		if (! readEigenMatrix(fileName, in, TEXT_LABEL_HCHt_MLCP_MATRIX, &A))
+		{
+			return false;
+		}
+
+		if (! readEigenVector(fileName, in, TEXT_LABEL_MU_FRICTION_VECTOR, &mu))
+		{
+			return false;
+		}
+
+		if (! readEigenVector(fileName, in, TEXT_LABEL_LAMBDA_VECTOR, &expectedLambda))
+		{
+			return false;
+		}
+
+		testData->problem.b = b;
+		testData->problem.A = A;
+		testData->problem.mu = mu;
+		testData->expectedLambda = expectedLambda;
+	}
 
 	if ((testData->problem.b.rows() != numAtomicConstraints) || (testData->problem.b.cols() != 1))
 	{
