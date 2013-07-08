@@ -62,6 +62,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgMatrixConversions.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
+	OsgPointCloudRepresentation.h
+	OsgPointCloudRepresentation-inl.h
 	OsgQuaternionConversions.h
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
@@ -83,6 +85,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
+	PointCloudRepresentation.h
 	Representation.h
 	Shader.h
 	SphereRepresentation.h
