@@ -50,8 +50,8 @@ OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	m_point = new osg::Point(1.0f);
-	m_geometry->getOrCreateStateSet()->setAttribute( m_point, osg::StateAttribute::ON ); 
-	
+	m_geometry->getOrCreateStateSet()->setAttribute( m_point, osg::StateAttribute::ON );
+
 	geode->addDrawable(m_geometry);
 	m_transform->addChild(geode);
 }

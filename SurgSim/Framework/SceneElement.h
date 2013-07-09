@@ -38,7 +38,7 @@ class SceneElement
 {
 
 public:
-	explicit SceneElement(const std::string& name) : 
+	explicit SceneElement(const std::string& name) :
 		m_name(name),
 		m_isInitialized(false),
 		m_isAwake(false)

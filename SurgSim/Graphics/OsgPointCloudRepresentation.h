@@ -42,7 +42,7 @@ class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, publi
 public:
 
 	/// Constructor
-	OsgPointCloudRepresentation(const std::string& name);
+	explicit OsgPointCloudRepresentation(const std::string& name);
 
 	/// Destructor
 	~OsgPointCloudRepresentation();
@@ -75,7 +75,7 @@ private:
 
 	/// Local pointer to mesh with data
 	std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> m_mesh;
-	
+
 	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 

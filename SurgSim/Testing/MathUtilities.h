@@ -35,25 +35,25 @@ namespace Testing
 	// Just to make sure delegate to the math version of interpolate for these two
 	template <>
 	SurgSim::Math::Quaterniond interpolate<SurgSim::Math::Quaterniond>(
-		const SurgSim::Math::Quaterniond& start, 
-		const SurgSim::Math::Quaterniond& end, 
+		const SurgSim::Math::Quaterniond& start,
+		const SurgSim::Math::Quaterniond& end,
 		const double& t);
-	
+
 	template <>
 	SurgSim::Math::RigidTransform3d interpolate<SurgSim::Math::RigidTransform3d>(
-		const SurgSim::Math::RigidTransform3d& start, 
-		const SurgSim::Math::RigidTransform3d& end, 
+		const SurgSim::Math::RigidTransform3d& start,
+		const SurgSim::Math::RigidTransform3d& end,
 		const double& t);
 
 
 	SurgSim::Math::RigidTransform3d interpolatePose(
-										const SurgSim::Math::Vector3d& startAngles, 
+										const SurgSim::Math::Vector3d& startAngles,
 										const SurgSim::Math::Vector3d& endAngles,
 										const SurgSim::Math::Vector3d& startPosition,
 										const SurgSim::Math::Vector3d& endPosition,
 										const double& t);
 
-} 
+}
 }
 
 #endif

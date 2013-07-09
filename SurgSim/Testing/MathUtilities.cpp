@@ -30,9 +30,9 @@ namespace Testing
 
 
 SurgSim::Math::RigidTransform3d interpolatePose(
-	const Vector3d& startAngles, 
-	const Vector3d& endAngles, 
-	const Vector3d& startPosition, 
+	const Vector3d& startAngles,
+	const Vector3d& endAngles,
+	const Vector3d& startPosition,
 	const Vector3d& endPosition,
 	const double& t)
 {
@@ -46,13 +46,19 @@ SurgSim::Math::RigidTransform3d interpolatePose(
 }
 
 template <>
-SurgSim::Math::Quaterniond interpolate(const SurgSim::Math::Quaterniond& start, const SurgSim::Math::Quaterniond& end, const double& t)
+SurgSim::Math::Quaterniond interpolate(
+	const SurgSim::Math::Quaterniond& start,
+	const SurgSim::Math::Quaterniond& end,
+	const double& t)
 {
 	return SurgSim::Math::interpolate(start, end, t);
 }
 
 template <>
-SurgSim::Math::RigidTransform3d interpolate(const SurgSim::Math::RigidTransform3d& start, const SurgSim::Math::RigidTransform3d& end, const double& t)
+SurgSim::Math::RigidTransform3d interpolate(
+	const SurgSim::Math::RigidTransform3d& start,
+	const SurgSim::Math::RigidTransform3d& end,
+	const double& t)
 {
 	return SurgSim::Math::interpolate(start, end, t);
 }

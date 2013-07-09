@@ -43,7 +43,7 @@ using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Graphics
 {
@@ -106,7 +106,7 @@ protected:
 
 	std::shared_ptr<PointCloudRepresentation<void>> makeCloud(std::shared_ptr<CloudMesh> mesh)
 	{
-		std::shared_ptr<PointCloudRepresentation<void>> cloud = 
+		std::shared_ptr<PointCloudRepresentation<void>> cloud =
 			std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
 
 		cloud->setMesh(mesh);
@@ -128,7 +128,7 @@ protected:
 TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 {
 	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
-	
+
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
@@ -176,9 +176,9 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		RigidTransform3d currentPose = 
+		RigidTransform3d currentPose =
 			interpolatePose(startAngles, endAngles, startPosition, endPosition, t);
-		
+
 		int id = 0;
 		for (auto it = std::begin(startVertices); it != std::end(startVertices); ++it, ++id)
 		{
@@ -192,7 +192,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 }
 
 TEST_F(OsgPointCloudRepresentationRenderTests, PointSize)
-{	
+{
 	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
 	/// Run the thread
 	runtime->start();
@@ -215,7 +215,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointSize)
 }
 
 TEST_F(OsgPointCloudRepresentationRenderTests, ColorTest)
-{	
+{
 	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
 	/// Run the thread
 	runtime->start();
@@ -226,7 +226,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, ColorTest)
 	cloud->setPointSize(4.0);
 
 	int numSteps = 100;
-	
+
 	SurgSim::Math::Vector4d startColor(0.0,1.0,0.0,1.0);
 	SurgSim::Math::Vector4d endColor(1.0,0.0,1.0,1.0);
 
