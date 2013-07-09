@@ -31,7 +31,7 @@ namespace Graphics
 template <class Data>
 OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string& name) :
 	Representation(name),
-	PointCloudRepresentation(name),
+	PointCloudRepresentation<Data>(name),
 	OsgRepresentation(name)
 {
 	osg::Geode* geode = new osg::Geode();
@@ -68,10 +68,10 @@ void OsgPointCloudRepresentation<Data>::doUpdate(double dt)
 {
 	if (m_mesh != nullptr)
 	{
-		std::vector<SurgSim::DataStructures::Mesh<Data>::Vertex> vertices = m_mesh->getVertices();
+		auto vertices = m_mesh->getVertices();
 		size_t count = vertices.size();
 
-		if (count != m_drawArrays->getCount())
+		if (count != static_cast<size_t>(m_drawArrays->getCount()))
 		{
 			m_drawArrays->setCount(count);
 			if (count > m_vertexData->size())
