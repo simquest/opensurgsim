@@ -13,6 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(
+	${EIGEN3_INCLUDE_DIR}
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
+)
+
+set(SURGSIM_TESTING_SOURCES
+	MathUtilities.cpp
+)
+
+set(SURGSIM_TESTING_HEADERS
+	MathUtilities.h
+)
+
+surgsim_add_library(
+    SurgSimTesting
+    "${SURGSIM_TESTING_SOURCES}"
+    "${SURGSIM_TESTING_HEADERS}"
+    "SurgSim/Testing"
+)
+
+target_link_libraries(SurgSimTesting SurgSimFramework ${Boost_LIBRARIES})
+
 if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
+
+
+
