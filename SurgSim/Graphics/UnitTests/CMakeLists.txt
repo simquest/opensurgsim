@@ -32,6 +32,7 @@ set(UNIT_TEST_SOURCES
 	OsgMatrixConversionsTests.cpp
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
+	OsgPointCloudRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
