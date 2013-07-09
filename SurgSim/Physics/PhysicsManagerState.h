@@ -19,6 +19,9 @@
 #include <memory>
 #include <vector>
 
+#include <SurgSim/Physics/MlcpPhysicsProblem.h>
+#include <SurgSim/Physics/MlcpPhysicsSolution.h>
+
 namespace SurgSim
 {
 namespace Physics
@@ -45,11 +48,26 @@ public:
 	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val)
 	{ m_collisionPairs = val; }
 
+	MlcpPhysicsProblem& getMlcpProblem()
+	{
+		return m_mlcpPhysicsProblem;
+	}
+
+	MlcpPhysicsSolution& getMlcpSolution()
+	{
+		return m_mlcpPhysicsSolution;
+	}
+
 private:
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
 	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
 
+	/// Mlcp problem for this Physics Manager State
+	MlcpPhysicsProblem m_mlcpPhysicsProblem;
+
+	/// Mlcp solution for this Physics Manager State
+	MlcpPhysicsSolution m_mlcpPhysicsSolution;
 };
 
 }; // Physics
