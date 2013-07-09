@@ -29,20 +29,32 @@ namespace Testing
 {
 
 
-SurgSim::Math::RigidTransform3d lerpPose(
-	const double& t, 
+SurgSim::Math::RigidTransform3d interpolatePose(
 	const Vector3d& startAngles, 
 	const Vector3d& endAngles, 
 	const Vector3d& startPosition, 
-	const Vector3d& endPosition)
+	const Vector3d& endPosition,
+	const double& t)
 {
-	Vector3d angles = lerp(t, startAngles, endAngles);
-	Vector3d position = lerp(t, startPosition, endPosition);
+	Vector3d angles = interpolate(startAngles, endAngles, t);
+	Vector3d position = interpolate(startPosition, endPosition, t);
 	return makeRigidTransform<SurgSim::Math::Quaterniond,Vector3d>(
 		Quaterniond(makeRotationQuaternion<double,Eigen::DontAlign>(angles.x(), Vector3d::UnitX()) *
 		makeRotationQuaternion<double,Eigen::DontAlign>(angles.y(), Vector3d::UnitY()) *
 		makeRotationQuaternion<double,Eigen::DontAlign>(angles.z(), Vector3d::UnitZ())),
 		position);
+}
+
+template <>
+SurgSim::Math::Quaterniond interpolate(const SurgSim::Math::Quaterniond& start, const SurgSim::Math::Quaterniond& end, const double& t)
+{
+	return SurgSim::Math::interpolate(start, end, t);
+}
+
+template <>
+SurgSim::Math::RigidTransform3d interpolate(const SurgSim::Math::RigidTransform3d& start, const SurgSim::Math::RigidTransform3d& end, const double& t)
+{
+	return SurgSim::Math::interpolate(start, end, t);
 }
 
 }; // Testing

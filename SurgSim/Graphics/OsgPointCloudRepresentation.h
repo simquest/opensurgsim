@@ -35,6 +35,7 @@ namespace Graphics
 #pragma warning(disable:4250)
 #endif
 
+/// Osg point cloud representation, implementation of a PointCloudRepresenation using OSG.
 template <class Data>
 class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, public OsgRepresentation
 {
@@ -42,26 +43,49 @@ public:
 
 	/// Constructor
 	OsgPointCloudRepresentation(const std::string& name);
+
+	/// Destructor
 	~OsgPointCloudRepresentation();
 
+	/// Sets a mesh.
+	/// \param	mesh	The mesh.
 	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh) override;
 
+	/// Gets the mesh.
+	/// \return	The mesh.
 	virtual std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> getMesh() const override;
 
+	/// Sets point size.
+	/// \param	val	The value.
 	virtual void setPointSize(double val) override;
 
+	/// Gets point size.
+	/// \return	The point size.
 	virtual double getPointSize() const override;
 
+	/// Executes the update operation.
+	/// \param	dt	The dt.
 	virtual void doUpdate(double dt) override;
 
+	/// Sets a color.
+	/// \param	color	The color.
 	virtual void setColor(const SurgSim::Math::Vector4d& color) override;
 
 private:
 
+	/// Local pointer to mesh with data
 	std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> m_mesh;
+	
+	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
+
+	/// OSG Geometry node holding the data
 	osg::ref_ptr<osg::Geometry> m_geometry;
+
+	/// OSG DrawArrays for local operations
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
+
+	/// OSG::Point for local operations
 	osg::ref_ptr<osg::Point> m_point;
 
 };

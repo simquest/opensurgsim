@@ -25,7 +25,10 @@ namespace SurgSim
 {
 namespace Graphics
 {
-
+/// Graphic representation of a point cloud, hase a very basic interface and is intentionally kept generic. It takes
+/// a Mesh<Data> as a template parameter, this will probably have to be subclassed for different kinds of data, e.g.
+/// particles, depth data, etc ... .
+/// \tparam	Data Type of the data.
 template <class Data>
 class PointCloudRepresentation : public virtual Representation
 {
@@ -41,13 +44,24 @@ public:
 	{
 	};
 
+	/// Sets the mesh for the point cloud.
+	/// \param	mesh	The mesh.
 	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh) = 0;
+
+	/// Pull the mesh.
+	/// \return	The mesh.
 	virtual std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> getMesh() const = 0;
 
+	/// Sets point size for the point elements.
+	/// \param	val	The value.
 	virtual void setPointSize(double val) = 0;
 
+	/// Gets point size.
+	/// \return	The point size.
 	virtual double getPointSize() const = 0;
 
+	/// Sets a color for all of the points together.
+	/// \param	color	The color.
 	virtual void setColor(const SurgSim::Math::Vector4d& color) = 0;
 
 private:

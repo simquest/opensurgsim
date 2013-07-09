@@ -19,6 +19,7 @@
 
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
+#include <SurgSim/Math/Quaternion.h>
 
 namespace SurgSim
 {
@@ -26,16 +27,31 @@ namespace Testing
 {
 
 	template <class T>
-	T lerp(const double& t, const T& start, const T& end)
+	T interpolate(const T& start, const T& end,const double& t)
 	{
 		return (1-t)*start + t*end;
 	}
 
-	SurgSim::Math::RigidTransform3d lerpPose(const double& t, 
+	// Just to make sure delegate to the math version of interpolate for these two
+	template <>
+	SurgSim::Math::Quaterniond interpolate<SurgSim::Math::Quaterniond>(
+		const SurgSim::Math::Quaterniond& start, 
+		const SurgSim::Math::Quaterniond& end, 
+		const double& t);
+	
+	template <>
+	SurgSim::Math::RigidTransform3d interpolate<SurgSim::Math::RigidTransform3d>(
+		const SurgSim::Math::RigidTransform3d& start, 
+		const SurgSim::Math::RigidTransform3d& end, 
+		const double& t);
+
+
+	SurgSim::Math::RigidTransform3d interpolatePose(
 										const SurgSim::Math::Vector3d& startAngles, 
 										const SurgSim::Math::Vector3d& endAngles,
 										const SurgSim::Math::Vector3d& startPosition,
-										const SurgSim::Math::Vector3d& endPosition);
+										const SurgSim::Math::Vector3d& endPosition,
+										const double& t);
 
 } 
 }

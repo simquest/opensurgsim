@@ -40,7 +40,8 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 
-using SurgSim::Testing::lerp;
+using SurgSim::Testing::interpolate;
+using SurgSim::Testing::interpolatePose;
 
 namespace SurgSim 
 {
@@ -145,7 +146,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setPose(SurgSim::Testing::lerpPose(t, startAngles, endAngles, startPosition, endPosition));
+		cloud->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 
@@ -176,7 +177,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		RigidTransform3d currentPose = 
-			SurgSim::Testing::lerpPose(t, startAngles, endAngles, startPosition, endPosition);
+			interpolatePose(startAngles, endAngles, startPosition, endPosition, t);
 		
 		int id = 0;
 		for (auto it = std::begin(startVertices); it != std::end(startVertices); ++it, ++id)
@@ -207,7 +208,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointSize)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setPointSize(lerp(t,startSize,endSize));
+		cloud->setPointSize(interpolate(startSize,endSize,t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 
@@ -233,7 +234,7 @@ TEST_F(OsgPointCloudRepresentationRenderTests, ColorTest)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setColor(lerp(t,startColor,endColor));
+		cloud->setColor(interpolate(startColor,endColor,t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
