@@ -29,7 +29,7 @@ namespace Testing
 {
 
 
-SurgSim::Math::RigidTransform3d lerpPoseFromAngles(
+SurgSim::Math::RigidTransform3d lerpPose(
 	const double& t, 
 	const Vector3d& startAngles, 
 	const Vector3d& endAngles, 

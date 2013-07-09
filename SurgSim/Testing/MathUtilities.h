@@ -31,7 +31,7 @@ namespace Testing
 		return (1-t)*start + t*end;
 	}
 
-	SurgSim::Math::RigidTransform3d lerpPoseFromAngles(const double& t, 
+	SurgSim::Math::RigidTransform3d lerpPose(const double& t, 
 										const SurgSim::Math::Vector3d& startAngles, 
 										const SurgSim::Math::Vector3d& endAngles,
 										const SurgSim::Math::Vector3d& startPosition,

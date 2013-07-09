@@ -19,6 +19,7 @@
 #include <memory>
 #include <SurgSim/DataStructures/Mesh.h>
 #include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
@@ -42,6 +43,12 @@ public:
 
 	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh) = 0;
 	virtual std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> getMesh() const = 0;
+
+	virtual void setPointSize(double val) = 0;
+
+	virtual double getPointSize() const = 0;
+
+	virtual void setColor(const SurgSim::Math::Vector4d& color) = 0;
 
 private:
 

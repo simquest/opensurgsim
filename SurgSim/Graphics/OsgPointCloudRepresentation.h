@@ -23,6 +23,7 @@
 #include <osg/PrimitiveSet>
 #include <osg/Geometry>
 #include <osg/Array>
+#include <osg/Point>
 
 namespace SurgSim
 {
@@ -47,7 +48,13 @@ public:
 
 	virtual std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> getMesh() const override;
 
-	virtual void doUpdate(double dt);
+	virtual void setPointSize(double val) override;
+
+	virtual double getPointSize() const override;
+
+	virtual void doUpdate(double dt) override;
+
+	virtual void setColor(const SurgSim::Math::Vector4d& color) override;
 
 private:
 
@@ -55,6 +62,7 @@ private:
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 	osg::ref_ptr<osg::Geometry> m_geometry;
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
+	osg::ref_ptr<osg::Point> m_point;
 
 };
 
