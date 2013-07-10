@@ -81,11 +81,11 @@ static bool readInt(const std::string& fileName, FILE* in, const char* label, in
 		fprintf(stderr, "Unexpected error or EOF in file '%s'\n", fileName.c_str());
 		return false;
 	}
-	char buffer[1024];
-	if (fgets(buffer,sizeof(buffer), in))
+	std::string format = std::string(" ") + label + " %d";
+	if (fscanf(in, format.c_str(), value) != 1)
 	{
-		std::string format = std::string(" ") + label + " %d";
-		sscanf(buffer, format.c_str(), value);
+		fprintf(stderr, "Bad integer input in '%s'\n  near text '%s'\n", fileName.c_str(), getRawLine(in).c_str());
+		return false;
 	}
 	if (ferror(in))
 	{
@@ -142,19 +142,11 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 					return false;
 				}
 
-				// If we are at the end of a line, we should read the CR/LF final characters to prepare the next item
-				int nextChar = fgetc(in);
-				if (nextChar != '\n' && nextChar != '\r')
-				{
-					fputc(nextChar, in);
-				}
-
 				vector->resize(values.size());
 				for (size_t i = 0; i < values.size(); i++)
 				{
 					(*vector)[i] = values[i];
 				}
-
 				return true;
 			}
 			else if (! isspace(nextCharacter))
@@ -241,11 +233,6 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 				{
 					fprintf(stderr, "Unexpected error in file '%s'\n", fileName.c_str());
 					return false;
-				}
-				int nextChar = fgetc(in);
-				if (nextChar != '\n' && nextChar != '\r')
-				{
-					fputc(nextChar, in);
 				}
 				return true;
 			}
