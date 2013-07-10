@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef READTEXT_H
-#define READTEXT_H
+#ifndef SURGSIM_MATH_UNITTESTS_READTEXT_H
+#define SURGSIM_MATH_UNITTESTS_READTEXT_H
 
 #include <string>
-#include "MlcpTestData.h"
+#include "SurgSim/Math/UnitTests/MlcpTestData.h"
 
 bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData);
 
-#endif // READTEXT_H
+#endif // SURGSIM_MATH_UNITTESTS_READTEXT_H

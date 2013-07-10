@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "ReadText.h"
+#include "SurgSim/Math/UnitTests/ReadText.h"
 
 #include <string>
 #include <vector>
@@ -24,8 +24,8 @@
 #include <SurgSim/Math/MlcpConstraintType.h>
 #include <SurgSim/Math/MlcpConstraintTypeName.h>
 
-#include "MlcpTestData.h"
-#include "TextLabels.h"
+#include "SurgSim/Math/UnitTests/MlcpTestData.h"
+#include "SurgSim/Math/UnitTests/TextLabels.h"
 
 
 // input helpers
@@ -82,7 +82,7 @@ static bool readInt(const std::string& fileName, FILE* in, const char* label, in
 		return false;
 	}
 	char buffer[1024];
-	if( fgets(buffer,sizeof(buffer), in) )
+	if (fgets(buffer,sizeof(buffer), in))
 	{
 		std::string format = std::string(" ") + label + " %d";
 		sscanf(buffer, format.c_str(), value);
@@ -144,7 +144,7 @@ static bool readEigenRowVector(const std::string& fileName, FILE* in, const char
 
 				// If we are at the end of a line, we should read the CR/LF final characters to prepare the next item
 				int nextChar = fgetc(in);
-				if(nextChar != '\n' && nextChar != '\r')
+				if (nextChar != '\n' && nextChar != '\r')
 				{
 					fputc(nextChar, in);
 				}

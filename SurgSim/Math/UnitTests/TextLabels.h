@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TEXTLABELS_H
-#define TEXTLABELS_H
+#ifndef SURGSIM_MATH_UNITTESTS_TEXTLABELS_H
+#define SURGSIM_MATH_UNITTESTS_TEXTLABELS_H
 
 extern const char* const TEXT_LABEL_FLAGS_LIST;
 extern const char* const TEXT_LABEL_NUM_DEGREES_OF_FREEDOM;
@@ -27,4 +27,4 @@ extern const char* const TEXT_LABEL_MU_FRICTION_VECTOR;
 extern const char* const TEXT_LABEL_LAMBDA_VECTOR;
 extern const char* const TEXT_LABEL_END_OF_FILE;
 
-#endif // TEXTABELS_H
+#endif // SURGSIM_MATH_UNITTESTS_TEXTLABELS_H

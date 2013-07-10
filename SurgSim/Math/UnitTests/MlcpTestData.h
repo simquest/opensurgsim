@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MLCPTESTDATA_H
-#define MLCPTESTDATA_H
+#ifndef SURGSIM_MATH_UNITTESTS_MLCPTESTDATA_H
+#define SURGSIM_MATH_UNITTESTS_MLCPTESTDATA_H
 
 #include <vector>
 #include <Eigen/Core>
@@ -72,4 +72,4 @@ public:
 const MlcpTestData* getTestProblem1();
 
 
-#endif // MLCPTESTDATA_H
+#endif // SURGSIM_MATH_UNITTESTS_MLCPTESTDATA_H

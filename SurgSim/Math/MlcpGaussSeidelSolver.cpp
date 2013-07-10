@@ -16,7 +16,6 @@
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 
 #include <math.h>
-#include <iostream>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
@@ -250,7 +249,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	else
 	{
 		std::cout << "LCP_3DContactFriction_GaussSeidel_Christian::solve converged after " <<
-			nbLoop << " iterations" << std::endl;
+				  nbLoop << " iterations" << std::endl;
 	}
 #endif // PRINTOUT_TEST_APP
 
@@ -261,8 +260,9 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
 														 const MlcpProblem::Vector& b,
 														 const MlcpSolution::Vector& initialGuess_and_solution,
-														 const std::vector<MlcpConstraintType>& constraintsType, double subStep,
-														 double constraint_convergence_criteria[MLCP_NUM_CONSTRAINT_TYPES],
+														 const std::vector<MlcpConstraintType>& constraintsType,
+														 double subStep,
+														 double constraint_convergence_criteria[],
 														 double& convergence_criteria,
 														 bool& signoriniVerified, bool& signoriniValid)
 {
@@ -354,7 +354,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 			}
 			// Enforce orthogonality condition
 			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
-				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&  violation >  m_contactTolerance) )
+				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
+				 violation > m_contactTolerance))
 			{
 				signoriniVerified=false;
 			}
@@ -371,7 +372,8 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 			}
 			// Enforce orthogonality condition
 			if (! SurgSim::Math::isValid(violation) || violation < -m_contactTolerance ||
-				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&  violation >  m_contactTolerance) )
+				(initialGuess_and_solution[currentAtomicIndex] > m_epsilonConvergence &&
+				 violation > m_contactTolerance))
 			{
 				signoriniVerified=false;
 			}
@@ -609,26 +611,41 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
 				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, line) = A(matrixEntryForConstraintID+2, line);
 
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
+					A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
+					A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] +=
+					A(matrixEntryForConstraintID+2, line) * initialGuess_and_solution[line];
 			}
 			// Compliance part for the {contact|sliding}
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+2);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+2);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+1);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+2) = A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+2);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID+2) =
+				A(matrixEntryForConstraintID, matrixEntryForConstraintID+2);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+2) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+2);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID+2, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+2, systemSizeWithoutConstraintID+2) =
+				A(matrixEntryForConstraintID+2, matrixEntryForConstraintID+2);
 			//...and complete the violation
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] += A(matrixEntryForConstraintID+2, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
+					A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
+					A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+2] +=
+					A(matrixEntryForConstraintID+2, column)*initialGuess_and_solution[column];
 			}
 		}
 		break; // That should not be the case...
@@ -644,20 +661,24 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 				m_lhsEnforcedLocalSystem(line, systemSizeWithoutConstraintID) = A(line, matrixEntryForConstraintID);
 				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, line) = A(matrixEntryForConstraintID, line);
 
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] +=
+					A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
 			}
 
 			// Compliance part for the {contact|sliding}
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID, systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID, matrixEntryForConstraintID);
 			//...and complete the violation for the normal contact constraint
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] += A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID] +=
+					A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
 			}
 		}
 		break;
 
-		// In any case of sliding, we only register the normals part...the friction part along the tangent is computed afterward !
+		// In any case of sliding, we only register the normals part...the friction part along the tangent is computed
+		// afterward !
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
@@ -672,20 +693,28 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   line) = A(matrixEntryForConstraintID,   line);
 				m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, line) = A(matrixEntryForConstraintID+1, line);
 
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   line) * initialGuess_and_solution[line];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
+					A(matrixEntryForConstraintID, line) * initialGuess_and_solution[line];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
+					A(matrixEntryForConstraintID+1, line) * initialGuess_and_solution[line];
 			}
 
 			// Compliance part for the {contact|sliding}
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
-			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) = A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID,   matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID,   systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID,   matrixEntryForConstraintID+1);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID);
+			m_lhsEnforcedLocalSystem(systemSizeWithoutConstraintID+1, systemSizeWithoutConstraintID+1) =
+				A(matrixEntryForConstraintID+1, matrixEntryForConstraintID+1);
 			//...and complete the violation for the normal contact constraints
 			for (int column=systemSizeWithoutConstraintID; column<n ; column++)
 			{
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] += A(matrixEntryForConstraintID,   column)*initialGuess_and_solution[column];
-				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] += A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID  ] +=
+					A(matrixEntryForConstraintID, column)*initialGuess_and_solution[column];
+				m_rhsEnforcedLocalSystem[systemSizeWithoutConstraintID+1] +=
+					A(matrixEntryForConstraintID+1, column)*initialGuess_and_solution[column];
 			}
 
 		}
@@ -700,7 +729,8 @@ void MlcpGaussSeidelSolver::computeEnforcementSystem(
 }
 
 // Solve the system A x = b for x, with the assumption that the size is "size"
-static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, int size, MlcpSolution::Vector* x)
+static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::Vector& b, int size,
+							   MlcpSolution::Vector* x)
 {
 	MlcpProblem::Matrix AA = A.block(0, 0, size, size);
 	MlcpProblem::Vector bb = b.head(size);
@@ -712,7 +742,8 @@ static inline bool solveSystem(const MlcpProblem::Matrix& A, const MlcpProblem::
 	return true;
 }
 
-void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, int nbColumnInA, const MlcpProblem::Vector& b,
+void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, int nbColumnInA,
+										   const MlcpProblem::Vector& b,
 										   MlcpSolution::Vector* initialGuess_and_solution,
 										   const MlcpProblem::Vector& frictionCoefs,
 										   const std::vector<MlcpConstraintType>& constraintsType, double subStep,
@@ -794,7 +825,9 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 			double& F1  = (*initialGuess_and_solution)[currentAtomicIndex  ];
 			double& F2  = (*initialGuess_and_solution)[currentAtomicIndex+1];
 			double& F3  = (*initialGuess_and_solution)[currentAtomicIndex+2];
-			double violation[3] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep , b[currentAtomicIndex+2]* subStep };
+			double violation[3] = { b[currentAtomicIndex]* subStep , b[currentAtomicIndex+1]* subStep ,
+									b[currentAtomicIndex+2]* subStep
+								  };
 			for (int j=0 ; j<n ; j++)
 			{
 				violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
@@ -817,10 +850,12 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 			double& Fn  = (*initialGuess_and_solution)[currentAtomicIndex];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,
+									 subStep, i, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
@@ -851,10 +886,12 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 			double& Ft2 = (*initialGuess_and_solution)[currentAtomicIndex+2];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,
+									 subStep, i, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
@@ -876,8 +913,10 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 					violation[1] += A(currentAtomicIndex+2, i)*(*initialGuess_and_solution)[i];
 				}
 
-				Ft1 -= 2*violation[0]/(A(currentAtomicIndex+1, currentAtomicIndex+1) + A(currentAtomicIndex+2, currentAtomicIndex+2));
-				Ft2 -= 2*violation[1]/(A(currentAtomicIndex+1, currentAtomicIndex+1) + A(currentAtomicIndex+2, currentAtomicIndex+2));
+				Ft1 -= 2*violation[0]/(A(currentAtomicIndex+1, currentAtomicIndex+1) +
+									   A(currentAtomicIndex+2, currentAtomicIndex+2));
+				Ft2 -= 2*violation[1]/(A(currentAtomicIndex+1, currentAtomicIndex+1) +
+									   A(currentAtomicIndex+2, currentAtomicIndex+2));
 
 				double normFt = sqrt(Ft1 * Ft1 + Ft2 * Ft2);
 				if (normFt>local_mu*Fn)
@@ -908,10 +947,12 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 			double& Fn2 = (*initialGuess_and_solution)[currentAtomicIndex+1];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,
+									 subStep, i, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
@@ -924,194 +965,234 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 			Fn1 -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-2];
 			Fn2 -= m_rhsEnforcedLocalSystem[m_numEnforcedAtomicConstraints-1];
 
-			//// 1st we analyze the constraints in the system to see if we should enforce any of them while solving the contact !
-			//if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT) // Bilateral 3D ?
-			//{
-			//	if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT) // Bilateral 3D+Directional constraints ?
-			//	{
-			//		if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT) // Bilateral 3D+Directional+Axial constraints ?
-			//		{
-			//			// HERE, we have:
-			//			// 1 bilateral   3D constraint store first in the system
-			//			// 1 directional 2D constraint store second in the system
-			//			// 1 axial       1D constraint store third in the system
-			//			// We want to enforce these constraints while solving the contact
-			//			// => solve 7x7 system, including the bilateral 3D constraint + directional 2D constraint + axial 1D rotation + contact normal force (1D)
-			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = (*initialGuess_and_solution)[0];
-			//			double &FY  = (*initialGuess_and_solution)[1];
-			//			double &FZ  = (*initialGuess_and_solution)[2];
-
-			//			double &FdirX  = (*initialGuess_and_solution)[3];
-			//			double &FdirY  = (*initialGuess_and_solution)[4];
-
-			//			double &Faxial  = (*initialGuess_and_solution)[5];
-
-			//			double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[5]*subStep,
-			//				b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
-			//			for( int j=0 ; j<n ; j++ )
-			//			{
-			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
-			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
-			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
-			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
-			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
-			//				violation[5] += A(5, j) * (*initialGuess_and_solution)[j];
-			//				violation[6] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//				violation[7] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//			}
-			//			double localA[64]={
-			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
-			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, 5), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
-			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, 5), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
-			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, 5), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
-			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, 5), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
-			//				A(5, 0), A(5, 1), A(5, 2), A(5, 3), A(5, 4), A(5, 5), A(5, currentAtomicIndex), A(5, currentAtomicIndex+1),
-			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   5), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
-			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, 5), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
-			//			};
-			//			double Ainv[64];
-			//			if( !inverseMatrix_using_BlockDecomposition<double,8,5,3>(localA,Ainv) ) // Try a block decomposition 7=5+3
-			//			{
-			//				cerr << " MLCP could not inverse a local 6x6 matrix for contact + (3D bilateral + 2D directional)" << endl;
-			//				cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
-			//				char wait;
-			//				cin >> wait;
-			//				exit(0);
-			//			}
-			//			double F[8];
-			//			MatrixVectorProduct_nxm<double,8,8>((const double *)Ainv , (const double *)violation, (double *)F);
-			//			FX    -= F[0];
-			//			FY    -= F[1];
-			//			FZ    -= F[2];
-			//			FdirX -= F[3];
-			//			FdirY -= F[4];
-			//			Faxial-= F[5];
-			//			Fn1   -= F[6];
-			//			Fn2   -= F[7];
-			//		}
-			//		else  // if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT)
-			//		{
-			//			// HERE, we have:
-			//			// 1 bilateral   3D constraint store first in the system
-			//			// 1 directional 2D constraint store second in the system
-			//			// We want to enforce these constraints while solving the contact
-			//			// => solve 6x6 system, including the bilateral 3D constraint + directional 2D constraint + contact normal force (1D)
-			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = (*initialGuess_and_solution)[0];
-			//			double &FY  = (*initialGuess_and_solution)[1];
-			//			double &FZ  = (*initialGuess_and_solution)[2];
-
-			//			double &FdirX  = (*initialGuess_and_solution)[3];
-			//			double &FdirY  = (*initialGuess_and_solution)[4];
-
-			//			double violation[7] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
-			//			for( int j=0 ; j<n ; j++ )
-			//			{
-			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
-			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
-			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
-			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
-			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
-			//				violation[5] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//				violation[6] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//			}
-			//			double localA[49]={
-			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
-			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
-			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
-			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
-			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
-			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
-			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
-			//			};
-			//			double Ainv[49];
-			//			if( !inverseMatrix_using_BlockDecomposition<double,7,4,3>(localA,Ainv) )
-			//			{
-			//				cerr << " MLCP could not inverse a local 6x6 matrix for contact + (3D bilateral + 2D directional)" << endl;
-			//				cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
-			//				char wait;
-			//				cin >> wait;
-			//				exit(0);
-			//			}
-			//			double F[7];
-			//			MatrixVectorProduct_nxm<double,7,7>((const double *)Ainv , (const double *)violation, (double *)F);
-			//			FX    -= F[0];
-			//			FY    -= F[1];
-			//			FZ    -= F[2];
-			//			FdirX -= F[3];
-			//			FdirY -= F[4];
-			//			Fn1   -= F[5];
-			//			Fn2   -= F[6];
-			//		}
-			//	}
-			//	else  // if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT)
-			//	{
-			//		// HERE, we have:
-			//		// 1 bilateral 3D constraint store first in the system
-			//		// We want to enforce this constraint while solving the contact
-			//		// => solve 4x4 system, including the bilateral 3D constraint + contact normal force (1D)
-			//		// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//		double &FX  = (*initialGuess_and_solution)[0];
-			//		double &FY  = (*initialGuess_and_solution)[1];
-			//		double &FZ  = (*initialGuess_and_solution)[2];
-			//		double violation[5] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
-			//		for( int j=0 ; j<n ; j++ )
-			//		{
-			//			violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
-			//			violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
-			//			violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
-			//			violation[3] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//			violation[4] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//		}
-			//		double localA[25]={
-			//			A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
-			//			A(1, 0), A(1, 1), A(1, 2), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
-			//			A(2, 0), A(2, 1), A(2, 2), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
-			//			A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
-			//			A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
-			//		};
-			//		double Ainv[25];
-			//		if( !inverseMatrix_using_BlockDecomposition<double,5,2,3>(localA,Ainv) )
-			//		{
-			//			cerr << " MLCP could not inverse a local 4x4 matrix for contact/bilateral" << endl;
-			//			cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
-			//			char wait;
-			//			cin >> wait;
-			//			exit(0);
-			//		}
-			//		double F[5];
-			//		MatrixVectorProduct_nxm<double,5,5>(Ainv,violation,F);
-			//		FX -= F[0];
-			//		FY -= F[1];
-			//		FZ -= F[2];
-			//		Fn1-= F[3];
-			//		Fn2-= F[4];
-			//	}
-			//}
-			//else  // if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT)
-			//{
-			//	// HERE, we do not have any expected constraints
-			//	// We treat this contact normally, without taking into account any other constraint than the current contact !
-			//	double violation[2] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
-			//	for( int j=0 ; j<n ; j++ )
-			//	{
-			//		violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//		violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//	}
-
-			//	// det = ad-bc
-			//	// [ a b ]   [  d -b ]       [ 1 0 ]
-			//	// [ c d ] . [ -c  a ]/det = [ 0 1 ]
-			//	double A_determinant = A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
-			//		A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
-			//	double Ainv[2][2]={
-			//		{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  , -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
-			//		{-A(currentAtomicIndex+1, currentAtomicIndex  )/A_determinant  ,  A(currentAtomicIndex,   currentAtomicIndex  )/A_determinant }
-			//	} ;
-			//	Fn1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
-			//	Fn2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
-			//}
+// 			// 1st we analyze the constraints in the system to see if we should enforce any of them while solving
+// 			// the contact !
+// 			if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT) // Bilateral 3D ?
+// 			{
+// 				if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT) // Bilateral 3D+Directional constraints ?
+// 				{
+// 					if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT) // Bilateral 3D+Directional+Axial constraints?
+// 					{
+// 						// HERE, we have:
+// 						// 1 bilateral   3D constraint store first in the system
+// 						// 1 directional 2D constraint store second in the system
+// 						// 1 axial       1D constraint store third in the system
+// 						// We want to enforce these constraints while solving the contact
+// 						// => solve 7x7 system, including the bilateral 3D constraint + directional 2D constraint +
+// 						//    + axial 1D rotation + contact normal force (1D)
+// 						// => if the resulting contact normal force is positive, we will compute some frictional forces
+// 						double &FX  = (*initialGuess_and_solution)[0];
+// 						double &FY  = (*initialGuess_and_solution)[1];
+// 						double &FZ  = (*initialGuess_and_solution)[2];
+//
+// 						double &FdirX  = (*initialGuess_and_solution)[3];
+// 						double &FdirY  = (*initialGuess_and_solution)[4];
+//
+// 						double &Faxial  = (*initialGuess_and_solution)[5];
+//
+// 						double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep ,
+// 							b[3]*subStep, b[4]*subStep, b[5]*subStep,
+// 							b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
+// 						for( int j=0 ; j<n ; j++ )
+// 						{
+// 							violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+// 							violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+// 							violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+// 							violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+// 							violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+// 							violation[5] += A(5, j) * (*initialGuess_and_solution)[j];
+// 							violation[6] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 							violation[7] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 						}
+// 						double localA[64]={
+// 							A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5),
+// 								A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+// 							A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, 5),
+// 								A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+// 							A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, 5),
+// 								A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+// 							A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, 5),
+// 								A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+// 							A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, 5),
+// 								A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+// 							A(5, 0), A(5, 1), A(5, 2), A(5, 3), A(5, 4), A(5, 5),
+// 								A(5, currentAtomicIndex), A(5, currentAtomicIndex+1),
+// 							A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2),
+// 								A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   5),
+// 									A(currentAtomicIndex,   currentAtomicIndex),
+// 										A(currentAtomicIndex,   currentAtomicIndex+1),
+// 							A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2),
+// 								A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, 5),
+// 								A(currentAtomicIndex+1, currentAtomicIndex),
+// 									A(currentAtomicIndex+1, currentAtomicIndex+1)
+// 						};
+// 						double Ainv[64];
+// 						// Try a block decomposition 7=5+3
+// 						if( !inverseMatrix_using_BlockDecomposition<double,8,5,3>(localA,Ainv) )
+// 						{
+// 							cerr << " MLCP could not inverse a local 6x6 matrix for contact + " <<
+// 								"(3D bilateral + 2D directional)" << endl;
+// 							cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
+// 							char wait;
+// 							cin >> wait;
+// 							exit(0);
+// 						}
+// 						double F[8];
+// 						MatrixVectorProduct_nxm<double,8,8>((const double *)Ainv , (const double *)violation,
+// 							(double *)F);
+// 						FX    -= F[0];
+// 						FY    -= F[1];
+// 						FZ    -= F[2];
+// 						FdirX -= F[3];
+// 						FdirY -= F[4];
+// 						Faxial-= F[5];
+// 						Fn1   -= F[6];
+// 						Fn2   -= F[7];
+// 					}
+// 					else  // if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT)
+// 					{
+// 						// HERE, we have:
+// 						// 1 bilateral   3D constraint store first in the system
+// 						// 1 directional 2D constraint store second in the system
+// 						// We want to enforce these constraints while solving the contact
+// 						// => solve 6x6 system, including the bilateral 3D constraint + directional 2D constraint +
+// 						//    + contact normal force (1D)
+// 						// => if the resulting contact normal force is positive, we will compute some frictional forces
+// 						double &FX  = (*initialGuess_and_solution)[0];
+// 						double &FY  = (*initialGuess_and_solution)[1];
+// 						double &FZ  = (*initialGuess_and_solution)[2];
+//
+// 						double &FdirX  = (*initialGuess_and_solution)[3];
+// 						double &FdirY  = (*initialGuess_and_solution)[4];
+//
+// 						double violation[7] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep,
+// 							b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
+// 						for( int j=0 ; j<n ; j++ )
+// 						{
+// 							violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+// 							violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+// 							violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+// 							violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+// 							violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+// 							violation[5] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 							violation[6] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 						}
+// 						double localA[49]={
+// 							A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4),
+// 								A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+// 							A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4),
+// 								A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+// 							A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4),
+// 								A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+// 							A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4),
+// 								A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+// 							A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4),
+// 								A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+// 							A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2),
+// 								A(currentAtomicIndex,   3), A(currentAtomicIndex,   4),
+// 									A(currentAtomicIndex,   currentAtomicIndex),
+// 										A(currentAtomicIndex,   currentAtomicIndex+1),
+// 							A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2),
+// 								A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4),
+// 									A(currentAtomicIndex+1, currentAtomicIndex),
+// 										A(currentAtomicIndex+1, currentAtomicIndex+1)
+// 						};
+// 						double Ainv[49];
+// 						if( !inverseMatrix_using_BlockDecomposition<double,7,4,3>(localA,Ainv) )
+// 						{
+// 							cerr << " MLCP could not inverse a local 6x6 matrix for contact + " <<
+// 								"(3D bilateral + 2D directional)" << endl;
+// 							cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
+// 							char wait;
+// 							cin >> wait;
+// 							exit(0);
+// 						}
+// 						double F[7];
+// 						MatrixVectorProduct_nxm<double,7,7>((const double *)Ainv , (const double *)violation,
+// 							(double *)F);
+// 						FX    -= F[0];
+// 						FY    -= F[1];
+// 						FZ    -= F[2];
+// 						FdirX -= F[3];
+// 						FdirY -= F[4];
+// 						Fn1   -= F[5];
+// 						Fn2   -= F[6];
+// 					}
+// 				}
+// 				else  // if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT)
+// 				{
+// 					// HERE, we have:
+// 					// 1 bilateral 3D constraint store first in the system
+// 					// We want to enforce this constraint while solving the contact
+// 					// => solve 4x4 system, including the bilateral 3D constraint + contact normal force (1D)
+// 					// => if the resulting contact normal force is positive, we will compute some frictional forces
+// 					double &FX  = (*initialGuess_and_solution)[0];
+// 					double &FY  = (*initialGuess_and_solution)[1];
+// 					double &FZ  = (*initialGuess_and_solution)[2];
+// 					double violation[5] = { b[0]*subStep , b[1]*subStep , b[2]*subStep ,
+// 						b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
+// 					for( int j=0 ; j<n ; j++ )
+// 					{
+// 						violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+// 						violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+// 						violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+// 						violation[3] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 						violation[4] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 					}
+// 					double localA[25]={
+// 						A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+// 						A(1, 0), A(1, 1), A(1, 2), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+// 						A(2, 0), A(2, 1), A(2, 2), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+// 						A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2),
+// 							A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+// 						A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2),
+// 							A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
+// 					};
+// 					double Ainv[25];
+// 					if( !inverseMatrix_using_BlockDecomposition<double,5,2,3>(localA,Ainv) )
+// 					{
+// 						cerr << " MLCP could not inverse a local 4x4 matrix for contact/bilateral" << endl;
+// 						cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
+// 						char wait;
+// 						cin >> wait;
+// 						exit(0);
+// 					}
+// 					double F[5];
+// 					MatrixVectorProduct_nxm<double,5,5>(Ainv,violation,F);
+// 					FX -= F[0];
+// 					FY -= F[1];
+// 					FZ -= F[2];
+// 					Fn1-= F[3];
+// 					Fn2-= F[4];
+// 				}
+// 			}
+// 			else  // if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT)
+// 			{
+// 				// HERE, we do not have any expected constraints
+// 				// We treat this contact normally, without taking into account any other constraint than the current
+// 				// contact !
+// 				double violation[2] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep };
+// 				for( int j=0 ; j<n ; j++ )
+// 				{
+// 					violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 					violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 				}
+//
+// 				// det = ad-bc
+// 				// [ a b ]   [  d -b ]       [ 1 0 ]
+// 				// [ c d ] . [ -c  a ]/det = [ 0 1 ]
+// 				double A_determinant =
+// 					A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
+// 					A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
+// 				double Ainv[2][2]={
+// 					{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  ,
+// 					 -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
+// 					{-A(currentAtomicIndex+1, currentAtomicIndex  )/A_determinant  ,
+// 					  A(currentAtomicIndex,   currentAtomicIndex  )/A_determinant }
+// 				} ;
+// 				Fn1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
+// 				Fn2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
+// 			}
 		}
 		currentAtomicIndex+=2;
 		break;
@@ -1127,10 +1208,12 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 			double& Ft  = (*initialGuess_and_solution)[currentAtomicIndex+2];
 
 			// Form the local system
-			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,subStep,i,currentAtomicIndex);
+			computeEnforcementSystem(n,A,nbColumnInA,b,(*initialGuess_and_solution),frictionCoefs,constraintsType,
+									 subStep, i, currentAtomicIndex);
 
 			// Solve A.f = violation
-			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints, &m_rhsEnforcedLocalSystem))
+			if (! solveSystem(m_lhsEnforcedLocalSystem, m_rhsEnforcedLocalSystem, m_numEnforcedAtomicConstraints,
+							  &m_rhsEnforcedLocalSystem))
 			{
 				return;
 			}
@@ -1165,309 +1248,353 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 				}
 			}
 
-			//// 1st we analyze the constraints in the system to see if we should enforce any of them while solving the contact !
-			//if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT) // Bilateral 3D ?
-			//{
-			//	if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT) // Bilateral 3D+Directional constraints ?
-			//	{
-			//		if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT) // Bilateral 3D+Directional+Axial constraints ?
-			//		{
-			//			// HERE, we have:
-			//			// 1 bilateral   3D constraint store first in the system
-			//			// 1 directional 2D constraint store second in the system
-			//			// 1 axial       1D constraint store third in the system
-			//			// We want to enforce these constraints while solving the contact
-			//			// => solve 7x7 system, including the bilateral 3D constraint + directional 2D constraint + axial 1D rotation + contact normal force (1D)
-			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = (*initialGuess_and_solution)[0];
-			//			double &FY  = (*initialGuess_and_solution)[1];
-			//			double &FZ  = (*initialGuess_and_solution)[2];
-
-			//			double &FdirX  = (*initialGuess_and_solution)[3];
-			//			double &FdirY  = (*initialGuess_and_solution)[4];
-
-			//			double &Faxial  = (*initialGuess_and_solution)[5];
-
-			//			double violation[9] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[5]*subStep,
-			//				b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
-			//			for( int j=0 ; j<n ; j++ )
-			//			{
-			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
-			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
-			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
-			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
-			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
-			//				violation[5] += A(5, j) * (*initialGuess_and_solution)[j];
-			//				violation[6] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//				violation[7] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//				if(j>=7 && j!=currentAtomicIndex)
-			//				{
-			//					violation[8] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
-			//				}
-			//			}
-			//			double localA[64]={
-			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
-			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, 5), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
-			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, 5), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
-			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, 5), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
-			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, 5), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
-			//				A(5, 0), A(5, 1), A(5, 2), A(5, 3), A(5, 4), A(5, 5), A(5, currentAtomicIndex), A(5, currentAtomicIndex+1),
-			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   5), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
-			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, 5), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
-			//			};
-			//			double Ainv[64];
-			//			if( !inverseMatrix_using_BlockDecomposition<double,8,5,3>(localA,Ainv) ) // Try a block decomposition 7=5+3
-			//			{
-			//				cerr << " MLCP could not inverse a local 6x6 matrix for contact + (3D bilateral + 2D directional)" << endl;
-			//				cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
-			//				char wait;
-			//				cin >> wait;
-			//				exit(0);
-			//			}
-			//			double F[8];
-			//			MatrixVectorProduct_nxm<double,8,8>((const double *)Ainv , (const double *)violation, (double *)F);
-			//			FX    -= F[0];
-			//			FY    -= F[1];
-			//			FZ    -= F[2];
-			//			FdirX -= F[3];
-			//			FdirY -= F[4];
-			//			Faxial-= F[5];
-			//			Fn1   -= F[6];
-			//			Fn2   -= F[7];
-
-			//			// No Signorini to verify here, it is NOT a unilateral constraint, but bilateral
-			//			//if(Fn>0.0)
-			//			{
-			//				// Complete the violation of the friction along t, with the missing terms...
-			//				violation[8] += A(currentAtomicIndex+2,      0)*FX +
-			//					A(currentAtomicIndex+2,                    1)*FY +
-			//					A(currentAtomicIndex+2,                    2)*FZ +
-			//					A(currentAtomicIndex+2,                    3)*FdirX +
-			//					A(currentAtomicIndex+2,                    4)*FdirY +
-			//					A(currentAtomicIndex+2,                    5)*Faxial+
-			//					A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1 +
-			//					A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
-
-			//				Ft -= violation[8]/A(currentAtomicIndex+2, currentAtomicIndex+2);
-
-			//				double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
-			//				double normFt = fabs(Ft);
-			//				if(normFt>local_mu*normFn)
-			//				{
-			//					// Here, the Friction is too strong, we keep the direction, but modulate its lenght
-			//					// to verify the Coulomb's law: |Ft| = mu |Fn|
-			//					Ft *= local_mu*normFn/normFt;
-			//				}
-			//			}
-			//		}
-			//		else  // if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT)
-			//		{
-			//			// HERE, we have:
-			//			// 1 bilateral   3D constraint store first in the system
-			//			// 1 directional 2D constraint store second in the system
-			//			// We want to enforce these constraints while solving the contact
-			//			// => solve 6x6 system, including the bilateral 3D constraint + directional 2D constraint + contact normal force (1D)
-			//			// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//			double &FX  = (*initialGuess_and_solution)[0];
-			//			double &FY  = (*initialGuess_and_solution)[1];
-			//			double &FZ  = (*initialGuess_and_solution)[2];
-
-			//			double &FdirX  = (*initialGuess_and_solution)[3];
-			//			double &FdirY  = (*initialGuess_and_solution)[4];
-
-			//			double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep, b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
-			//			for( int j=0 ; j<n ; j++ )
-			//			{
-			//				violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
-			//				violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
-			//				violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
-			//				violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
-			//				violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
-			//				violation[5] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//				violation[6] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//				if(j>=6 && j!=currentAtomicIndex)
-			//				{
-			//					violation[7] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
-			//				}
-			//			}
-			//			double localA[49]={
-			//				A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
-			//				A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
-			//				A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
-			//				A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
-			//				A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
-			//				A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
-			//				A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
-			//			};
-			//			double Ainv[49];
-			//			if( !inverseMatrix_using_BlockDecomposition<double,7,4,3>(localA,Ainv) )
-			//			{
-			//				cerr << " MLCP could not inverse a local 6x6 matrix for contact + (3D bilateral + 2D directional)" << endl;
-			//				cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
-			//				char wait;
-			//				cin >> wait;
-			//				exit(0);
-			//			}
-			//			double F[7];
-			//			MatrixVectorProduct_nxm<double,7,7>((const double *)Ainv , (const double *)violation, (double *)F);
-			//			FX    -= F[0];
-			//			FY    -= F[1];
-			//			FZ    -= F[2];
-			//			FdirX -= F[3];
-			//			FdirY -= F[4];
-			//			Fn1   -= F[5];
-			//			Fn2   -= F[6];
-
-			//			// No Signorini to verify here, we have a bilateral constraint, not a unilateral one
-			//			//if(Fn>0.0)
-			//			{
-			//				// Complete the violation of the friction along t, with the missing terms...
-			//				violation[7] += A(currentAtomicIndex+2,      0)*FX +
-			//					A(currentAtomicIndex+2,                    1)*FY +
-			//					A(currentAtomicIndex+2,                    2)*FZ +
-			//					A(currentAtomicIndex+2,                    3)*FdirX +
-			//					A(currentAtomicIndex+2,                    4)*FdirY +
-			//					A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1+
-			//					A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
-
-			//				Ft -= violation[7]/A(currentAtomicIndex+2, currentAtomicIndex+2);
-
-			//				double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
-			//				double normFt = fabs(Ft);
-			//				if(normFt>local_mu*normFn)
-			//				{
-			//					// Here, the Friction is too strong, we keep the direction, but modulate its lenght
-			//					// to verify the Coulomb's law: |Ft| = mu |Fn|
-			//					Ft *= local_mu*normFn/normFt;
-			//				}
-			//			}
-			//		}
-			//	}
-			//	else  // if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT)
-			//	{
-			//		// HERE, we have:
-			//		// 1 bilateral 3D constraint store first in the system
-			//		// We want to enforce this constraint while solving the contact
-			//		// => solve 4x4 system, including the bilateral 3D constraint + contact normal force (1D)
-			//		// => if the resulting contact normal force is positive, we will compute some frictional forces
-			//		double &FX  = (*initialGuess_and_solution)[0];
-			//		double &FY  = (*initialGuess_and_solution)[1];
-			//		double &FZ  = (*initialGuess_and_solution)[2];
-			//		double violation[6] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
-			//		for( int j=0 ; j<n ; j++ )
-			//		{
-			//			violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
-			//			violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
-			//			violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
-			//			violation[3] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//			violation[4] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//			if(j>=4 && j!=currentAtomicIndex)
-			//			{
-			//				violation[5] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
-			//			}
-			//		}
-			//		double localA[25]={
-			//			A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
-			//			A(1, 0), A(1, 1), A(1, 2), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
-			//			A(2, 0), A(2, 1), A(2, 2), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
-			//			A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2), A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
-			//			A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2), A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
-			//		};
-			//		double Ainv[25];
-			//		if( !inverseMatrix_using_BlockDecomposition<double,5,2,3>(localA,Ainv) )
-			//		{
-			//			cerr << " MLCP could not inverse a local 4x4 matrix for contact/bilateral" << endl;
-			//			cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
-			//			char wait;
-			//			cin >> wait;
-			//			exit(0);
-			//		}
-			//		double F[5];
-			//		MatrixVectorProduct_nxm<double,5,5>(Ainv,violation,F);
-			//		FX -= F[0];
-			//		FY -= F[1];
-			//		FZ -= F[2];
-			//		Fn1-= F[3];
-			//		Fn2-= F[4];
-
-			//		// No Signorini to verify here, we have a bilateral constraint, not a unilateral one !
-			//		//if(Fn>0.0)
-			//		{
-			//			// Complete the violation of the friction along t, with the missing terms...
-			//			violation[5] += A(currentAtomicIndex+2,      0)*FX +
-			//				A(currentAtomicIndex+2,                    1)*FY +
-			//				A(currentAtomicIndex+2,                    2)*FZ +
-			//				A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1+
-			//				A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
-
-			//			Ft -= violation[5]/A(currentAtomicIndex+2, currentAtomicIndex+2);
-
-			//			double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
-			//			double normFt = fabs(Ft);
-			//			if(normFt>local_mu*normFn)
-			//			{
-			//				// Here, the Friction is too strong, we keep the direction, but modulate its lenght
-			//				// to verify the Coulomb's law: |Ft| = mu |Fn|
-			//				Ft *= local_mu*normFn/normFt;
-			//			}
-			//		}
-			//	}
-			//}
-			//else  // if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT)
-			//{
-			//	// HERE, we do not have any expected constraints
-			//	// We treat this contact normally, without taking into account any other constraint than the current contact !
-			//	double violation[3] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep , b[currentAtomicIndex+2]*subStep };
-			//	for( int j=0 ; j<currentAtomicIndex ; j++ )
-			//	{
-			//		violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//		violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//		violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
-			//	}
-			//	for( int j=currentAtomicIndex+3 ; j<n ; j++ )
-			//	{
-			//		violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
-			//		violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
-			//		violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
-			//	}
-			//	violation[0] += A(currentAtomicIndex, currentAtomicIndex)*Fn1 +
-			//		A(currentAtomicIndex, currentAtomicIndex+1)*Fn2 +
-			//		A(currentAtomicIndex, currentAtomicIndex+2)*Ft;
-			//	violation[1] += A(currentAtomicIndex+1, currentAtomicIndex)*Fn1 +
-			//		A(currentAtomicIndex+1, currentAtomicIndex+1)*Fn2 +
-			//		A(currentAtomicIndex+1, currentAtomicIndex+2)*Ft;
-
-			//	// det = ad-bc
-			//	// [ a b ]   [  d -b ]       [ 1 0 ]
-			//	// [ c d ] . [ -c  a ]/det = [ 0 1 ]
-			//	double A_determinant = A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
-			//		A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
-			//	double Ainv[2][2]={
-			//		{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  , -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
-			//		{-A(currentAtomicIndex+1, currentAtomicIndex  )/A_determinant  ,  A(currentAtomicIndex,   currentAtomicIndex  )/A_determinant }
-			//	} ;
-			//	Fn1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
-			//	Fn2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
-
-			//	// No Signorini to verify here, we have bilaterals constraints, not unilateral ones !
-			//	//if(Fn>0.0)
-			//	{
-			//		violation[2] += A(currentAtomicIndex+2, currentAtomicIndex)*Fn1
-			//			+ A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2
-			//			+ A(currentAtomicIndex+2, currentAtomicIndex+2)*Ft;
-
-			//		Ft -= violation[2]/A(currentAtomicIndex+2, currentAtomicIndex+2);
-
-			//		double normFt = fabs(Ft);
-			//		double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
-			//		if(normFt>local_mu*normFn)
-			//		{
-			//			// Here, the Friction is too strong, we keep the direction, but modulate its lenght
-			//			// to verify the Coulomb's law: |Ft| = mu |Fn|
-			//			Ft *= local_mu*normFn/normFt;
-			//		}
-			//	}
-			//}
+// 			// 1st we analyze the constraints in the system to see if we should enforce any of them while solving
+// 			// the contact !
+// 			if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT) // Bilateral 3D ?
+// 			{
+// 				if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT) // Bilateral 3D+Directional constraints ?
+// 				{
+// 					if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT) // Bilateral 3D+Directional+Axial constraints?
+// 					{
+// 						// HERE, we have:
+// 						// 1 bilateral   3D constraint store first in the system
+// 						// 1 directional 2D constraint store second in the system
+// 						// 1 axial       1D constraint store third in the system
+// 						// We want to enforce these constraints while solving the contact
+// 						// => solve 7x7 system, including the bilateral 3D constraint + directional 2D constraint +
+// 						//    + axial 1D rotation + contact normal force (1D)
+// 						// => if the resulting contact normal force is positive, we will compute some frictional forces
+// 						double &FX  = (*initialGuess_and_solution)[0];
+// 						double &FY  = (*initialGuess_and_solution)[1];
+// 						double &FZ  = (*initialGuess_and_solution)[2];
+//
+// 						double &FdirX  = (*initialGuess_and_solution)[3];
+// 						double &FdirY  = (*initialGuess_and_solution)[4];
+//
+// 						double &Faxial  = (*initialGuess_and_solution)[5];
+//
+// 						double violation[9] = { b[0]*subStep , b[1]*subStep , b[2]*subStep ,
+// 							b[3]*subStep, b[4]*subStep, b[5]*subStep,
+// 							b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep ,
+// 							b[currentAtomicIndex+2]*subStep };
+// 						for( int j=0 ; j<n ; j++ )
+// 						{
+// 							violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+// 							violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+// 							violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+// 							violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+// 							violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+// 							violation[5] += A(5, j) * (*initialGuess_and_solution)[j];
+// 							violation[6] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 							violation[7] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 							if(j>=7 && j!=currentAtomicIndex)
+// 							{
+// 								violation[8] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
+// 							}
+// 						}
+// 						double localA[64]={
+// 							A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, 5),
+// 								A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+// 							A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, 5),
+// 								A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+// 							A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, 5),
+// 								A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+// 							A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, 5),
+// 								A(3, currentAtomicIndex), A(3, currentAtomicIndex+1),
+// 							A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, 5),
+// 								A(4, currentAtomicIndex), A(4, currentAtomicIndex+1),
+// 							A(5, 0), A(5, 1), A(5, 2), A(5, 3), A(5, 4), A(5, 5),
+// 								A(5, currentAtomicIndex), A(5, currentAtomicIndex+1),
+// 							A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2),
+// 								A(currentAtomicIndex,   3), A(currentAtomicIndex,   4), A(currentAtomicIndex,   5),
+// 									A(currentAtomicIndex,   currentAtomicIndex),
+// 										A(currentAtomicIndex,   currentAtomicIndex+1),
+// 							A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2),
+// 								A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4), A(currentAtomicIndex+1, 5),
+// 									A(currentAtomicIndex+1, currentAtomicIndex),
+// 										A(currentAtomicIndex+1, currentAtomicIndex+1)
+// 						};
+// 						double Ainv[64];
+// 						// Try a block decomposition 7=5+3
+// 						if( !inverseMatrix_using_BlockDecomposition<double,8,5,3>(localA,Ainv) )
+// 						{
+// 							cerr << " MLCP could not inverse a local 6x6 matrix for contact +" <<
+// 								" (3D bilateral + 2D directional)" << endl;
+// 							cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
+// 							char wait;
+// 							cin >> wait;
+// 							exit(0);
+// 						}
+// 						double F[8];
+// 						MatrixVectorProduct_nxm<double,8,8>((const double *)Ainv , (const double *)violation,
+// 							(double *)F);
+// 						FX    -= F[0];
+// 						FY    -= F[1];
+// 						FZ    -= F[2];
+// 						FdirX -= F[3];
+// 						FdirY -= F[4];
+// 						Faxial-= F[5];
+// 						Fn1   -= F[6];
+// 						Fn2   -= F[7];
+//
+// 						// No Signorini to verify here, it is NOT a unilateral constraint, but bilateral
+// 						//if(Fn>0.0)
+// 						{
+// 							// Complete the violation of the friction along t, with the missing terms...
+// 							violation[8] += A(currentAtomicIndex+2,      0)*FX +
+// 								A(currentAtomicIndex+2,                    1)*FY +
+// 								A(currentAtomicIndex+2,                    2)*FZ +
+// 								A(currentAtomicIndex+2,                    3)*FdirX +
+// 								A(currentAtomicIndex+2,                    4)*FdirY +
+// 								A(currentAtomicIndex+2,                    5)*Faxial+
+// 								A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1 +
+// 								A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
+//
+// 							Ft -= violation[8]/A(currentAtomicIndex+2, currentAtomicIndex+2);
+//
+// 							double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
+// 							double normFt = fabs(Ft);
+// 							if(normFt>local_mu*normFn)
+// 							{
+// 								// Here, the Friction is too strong, we keep the direction, but modulate its lenght
+// 								// to verify the Coulomb's law: |Ft| = mu |Fn|
+// 								Ft *= local_mu*normFn/normFt;
+// 							}
+// 						}
+// 					}
+// 					else  // if(constraintsType[2]==MLCP_BILATERAL_1D_CONSTRAINT)
+// 					{
+// 						// HERE, we have:
+// 						// 1 bilateral   3D constraint store first in the system
+// 						// 1 directional 2D constraint store second in the system
+// 						// We want to enforce these constraints while solving the contact
+// 						// => solve 6x6 system, including the bilateral 3D constraint + directional 2D constraint +
+// 						//    + contact normal force (1D)
+// 						// => if the resulting contact normal force is positive, we will compute some frictional forces
+// 						double &FX  = (*initialGuess_and_solution)[0];
+// 						double &FY  = (*initialGuess_and_solution)[1];
+// 						double &FZ  = (*initialGuess_and_solution)[2];
+//
+// 						double &FdirX  = (*initialGuess_and_solution)[3];
+// 						double &FdirY  = (*initialGuess_and_solution)[4];
+//
+// 						double violation[8] = { b[0]*subStep , b[1]*subStep , b[2]*subStep , b[3]*subStep, b[4]*subStep,
+// 							b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep ,
+// 							b[currentAtomicIndex+2]*subStep };
+// 						for( int j=0 ; j<n ; j++ )
+// 						{
+// 							violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+// 							violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+// 							violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+// 							violation[3] += A(3, j) * (*initialGuess_and_solution)[j];
+// 							violation[4] += A(4, j) * (*initialGuess_and_solution)[j];
+// 							violation[5] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 							violation[6] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 							if(j>=6 && j!=currentAtomicIndex)
+// 							{
+// 								violation[7] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
+// 							}
+// 						}
+// 						double localA[49]={
+// 							A(0, 0), A(0, 1), A(0, 2), A(0, 3), A(0, 4), A(0, currentAtomicIndex),
+// 								A(0, currentAtomicIndex+1),
+// 							A(1, 0), A(1, 1), A(1, 2), A(1, 3), A(1, 4), A(1, currentAtomicIndex),
+// 								A(1, currentAtomicIndex+1),
+// 							A(2, 0), A(2, 1), A(2, 2), A(2, 3), A(2, 4), A(2, currentAtomicIndex),
+// 								A(2, currentAtomicIndex+1),
+// 							A(3, 0), A(3, 1), A(3, 2), A(3, 3), A(3, 4), A(3, currentAtomicIndex),
+// 								A(3, currentAtomicIndex+1),
+// 							A(4, 0), A(4, 1), A(4, 2), A(4, 3), A(4, 4), A(4, currentAtomicIndex),
+// 								A(4, currentAtomicIndex+1),
+// 							A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2),
+// 								A(currentAtomicIndex,   3), A(currentAtomicIndex,   4),
+// 									A(currentAtomicIndex,   currentAtomicIndex),
+// 										A(currentAtomicIndex,   currentAtomicIndex+1),
+// 							A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2),
+// 								A(currentAtomicIndex+1, 3), A(currentAtomicIndex+1, 4),
+// 									A(currentAtomicIndex+1, currentAtomicIndex),
+// 										A(currentAtomicIndex+1, currentAtomicIndex+1)
+// 						};
+// 						double Ainv[49];
+// 						if( !inverseMatrix_using_BlockDecomposition<double,7,4,3>(localA,Ainv) )
+// 						{
+// 							cerr << " MLCP could not inverse a local 6x6 matrix for contact +" <<
+// 								" (3D bilateral + 2D directional)" << endl;
+// 							cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
+// 							char wait;
+// 							cin >> wait;
+// 							exit(0);
+// 						}
+// 						double F[7];
+// 						MatrixVectorProduct_nxm<double,7,7>((const double *)Ainv , (const double *)violation,
+// 							(double *)F);
+// 						FX    -= F[0];
+// 						FY    -= F[1];
+// 						FZ    -= F[2];
+// 						FdirX -= F[3];
+// 						FdirY -= F[4];
+// 						Fn1   -= F[5];
+// 						Fn2   -= F[6];
+//
+// 						// No Signorini to verify here, we have a bilateral constraint, not a unilateral one
+// 						//if(Fn>0.0)
+// 						{
+// 							// Complete the violation of the friction along t, with the missing terms...
+// 							violation[7] += A(currentAtomicIndex+2,      0)*FX +
+// 								A(currentAtomicIndex+2,                    1)*FY +
+// 								A(currentAtomicIndex+2,                    2)*FZ +
+// 								A(currentAtomicIndex+2,                    3)*FdirX +
+// 								A(currentAtomicIndex+2,                    4)*FdirY +
+// 								A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1+
+// 								A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
+//
+// 							Ft -= violation[7]/A(currentAtomicIndex+2, currentAtomicIndex+2);
+//
+// 							double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
+// 							double normFt = fabs(Ft);
+// 							if(normFt>local_mu*normFn)
+// 							{
+// 								// Here, the Friction is too strong, we keep the direction, but modulate its lenght
+// 								// to verify the Coulomb's law: |Ft| = mu |Fn|
+// 								Ft *= local_mu*normFn/normFt;
+// 							}
+// 						}
+// 					}
+// 				}
+// 				else  // if(constraintsType[1]==MLCP_BILATERAL_2D_CONSTRAINT)
+// 				{
+// 					// HERE, we have:
+// 					// 1 bilateral 3D constraint store first in the system
+// 					// We want to enforce this constraint while solving the contact
+// 					// => solve 4x4 system, including the bilateral 3D constraint + contact normal force (1D)
+// 					// => if the resulting contact normal force is positive, we will compute some frictional forces
+// 					double &FX  = (*initialGuess_and_solution)[0];
+// 					double &FY  = (*initialGuess_and_solution)[1];
+// 					double &FZ  = (*initialGuess_and_solution)[2];
+// 					double violation[6] = { b[0]*subStep , b[1]*subStep , b[2]*subStep ,
+// 						b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep ,
+// 						b[currentAtomicIndex+2]*subStep };
+// 					for( int j=0 ; j<n ; j++ )
+// 					{
+// 						violation[0] += A(0, j) * (*initialGuess_and_solution)[j];
+// 						violation[1] += A(1, j) * (*initialGuess_and_solution)[j];
+// 						violation[2] += A(2, j) * (*initialGuess_and_solution)[j];
+// 						violation[3] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 						violation[4] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 						if(j>=4 && j!=currentAtomicIndex)
+// 						{
+// 							violation[5] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
+// 						}
+// 					}
+// 					double localA[25]={
+// 						A(0, 0), A(0, 1), A(0, 2), A(0, currentAtomicIndex), A(0, currentAtomicIndex+1),
+// 						A(1, 0), A(1, 1), A(1, 2), A(1, currentAtomicIndex), A(1, currentAtomicIndex+1),
+// 						A(2, 0), A(2, 1), A(2, 2), A(2, currentAtomicIndex), A(2, currentAtomicIndex+1),
+// 						A(currentAtomicIndex,   0), A(currentAtomicIndex,   1), A(currentAtomicIndex,   2),
+// 							A(currentAtomicIndex,   currentAtomicIndex), A(currentAtomicIndex,   currentAtomicIndex+1),
+// 						A(currentAtomicIndex+1, 0), A(currentAtomicIndex+1, 1), A(currentAtomicIndex+1, 2),
+// 							A(currentAtomicIndex+1, currentAtomicIndex), A(currentAtomicIndex+1, currentAtomicIndex+1)
+// 					};
+// 					double Ainv[25];
+// 					if( !inverseMatrix_using_BlockDecomposition<double,5,2,3>(localA,Ainv) )
+// 					{
+// 						cerr << " MLCP could not inverse a local 4x4 matrix for contact/bilateral" << endl;
+// 						cerr << " Press any key + [ENTER] to unlock the simulation" << endl;
+// 						char wait;
+// 						cin >> wait;
+// 						exit(0);
+// 					}
+// 					double F[5];
+// 					MatrixVectorProduct_nxm<double,5,5>(Ainv,violation,F);
+// 					FX -= F[0];
+// 					FY -= F[1];
+// 					FZ -= F[2];
+// 					Fn1-= F[3];
+// 					Fn2-= F[4];
+//
+// 					// No Signorini to verify here, we have a bilateral constraint, not a unilateral one !
+// 					//if(Fn>0.0)
+// 					{
+// 						// Complete the violation of the friction along t, with the missing terms...
+// 						violation[5] += A(currentAtomicIndex+2,      0)*FX +
+// 							A(currentAtomicIndex+2,                    1)*FY +
+// 							A(currentAtomicIndex+2,                    2)*FZ +
+// 							A(currentAtomicIndex+2, currentAtomicIndex  )*Fn1+
+// 							A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2;
+//
+// 						Ft -= violation[5]/A(currentAtomicIndex+2, currentAtomicIndex+2);
+//
+// 						double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
+// 						double normFt = fabs(Ft);
+// 						if(normFt>local_mu*normFn)
+// 						{
+// 							// Here, the Friction is too strong, we keep the direction, but modulate its lenght
+// 							// to verify the Coulomb's law: |Ft| = mu |Fn|
+// 							Ft *= local_mu*normFn/normFt;
+// 						}
+// 					}
+// 				}
+// 			}
+// 			else  // if(constraintsType[0]==MLCP_BILATERAL_3D_CONSTRAINT)
+// 			{
+// 				// HERE, we do not have any expected constraints
+// 				// We treat this contact normally, without taking into account any other constraint than the current
+// 				// contact !
+// 				double violation[3] = { b[currentAtomicIndex]*subStep , b[currentAtomicIndex+1]*subStep ,
+// 					b[currentAtomicIndex+2]*subStep };
+// 				for( int j=0 ; j<currentAtomicIndex ; j++ )
+// 				{
+// 					violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 					violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 					violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
+// 				}
+// 				for( int j=currentAtomicIndex+3 ; j<n ; j++ )
+// 				{
+// 					violation[0] += A(currentAtomicIndex,   j) * (*initialGuess_and_solution)[j];
+// 					violation[1] += A(currentAtomicIndex+1, j) * (*initialGuess_and_solution)[j];
+// 					violation[2] += A(currentAtomicIndex+2, j) * (*initialGuess_and_solution)[j];
+// 				}
+// 				violation[0] += A(currentAtomicIndex, currentAtomicIndex)*Fn1 +
+// 					A(currentAtomicIndex, currentAtomicIndex+1)*Fn2 +
+// 					A(currentAtomicIndex, currentAtomicIndex+2)*Ft;
+// 				violation[1] += A(currentAtomicIndex+1, currentAtomicIndex)*Fn1 +
+// 					A(currentAtomicIndex+1, currentAtomicIndex+1)*Fn2 +
+// 					A(currentAtomicIndex+1, currentAtomicIndex+2)*Ft;
+//
+// 				// det = ad-bc
+// 				// [ a b ]   [  d -b ]       [ 1 0 ]
+// 				// [ c d ] . [ -c  a ]/det = [ 0 1 ]
+// 				double A_determinant =
+// 					A(currentAtomicIndex, currentAtomicIndex)*A(currentAtomicIndex+1, currentAtomicIndex+1)-
+// 					A(currentAtomicIndex, currentAtomicIndex+1)*A(currentAtomicIndex+1, currentAtomicIndex);
+// 				double Ainv[2][2]={
+// 					{ A(currentAtomicIndex+1, currentAtomicIndex+1)/A_determinant  ,
+// 					 -A(currentAtomicIndex,   currentAtomicIndex+1)/A_determinant },
+// 					{-A(currentAtomicIndex+1, currentAtomicIndex  )/A_determinant  ,
+// 					  A(currentAtomicIndex,   currentAtomicIndex  )/A_determinant }
+// 				} ;
+// 				Fn1 -= (Ainv[0][0]*violation[0] + Ainv[0][1]*violation[1]);
+// 				Fn2 -= (Ainv[1][0]*violation[0] + Ainv[1][1]*violation[1]);
+//
+// 				// No Signorini to verify here, we have bilaterals constraints, not unilateral ones !
+// 				//if(Fn>0.0)
+// 				{
+// 					violation[2] += A(currentAtomicIndex+2, currentAtomicIndex)*Fn1
+// 						+ A(currentAtomicIndex+2, currentAtomicIndex+1)*Fn2
+// 						+ A(currentAtomicIndex+2, currentAtomicIndex+2)*Ft;
+//
+// 					Ft -= violation[2]/A(currentAtomicIndex+2, currentAtomicIndex+2);
+//
+// 					double normFt = fabs(Ft);
+// 					double normFn = sqrt(Fn1*Fn1 + Fn2*Fn2);
+// 					if(normFt>local_mu*normFn)
+// 					{
+// 						// Here, the Friction is too strong, we keep the direction, but modulate its lenght
+// 						// to verify the Coulomb's law: |Ft| = mu |Fn|
+// 						Ft *= local_mu*normFn/normFt;
+// 					}
+// 				}
+// 			}
 		}
 		currentAtomicIndex+=3;
 		break;
@@ -1525,14 +1652,17 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g) ",violation[0],violation[1]);
-			printf("\n\t force=(%g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1]);
+			printf("\n\t force=(%g %g) ",
+				   initialGuess_and_solution[currentAtomicIndex],
+				   initialGuess_and_solution[currentAtomicIndex+1]);
 			currentAtomicIndex+=2;
 		}
 		break;
 		case MLCP_BILATERAL_3D_CONSTRAINT:
 		{
 			printf("BILATERAL_3D_CONSTRAINT");
-			printf("\n\t with initial violation b=(%g %g %g) ",b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]);
+			printf("\n\t with initial violation b=(%g %g %g) ",
+				   b[currentAtomicIndex], b[currentAtomicIndex+1], b[currentAtomicIndex+2]);
 			double violation[3] = {b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]};
 			for (int j=0 ; j<n ; j++)
 			{
@@ -1541,7 +1671,10 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
-			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);
+			printf("\n\t force=(%g %g %g) ",
+				   initialGuess_and_solution[currentAtomicIndex],
+				   initialGuess_and_solution[currentAtomicIndex+1],
+				   initialGuess_and_solution[currentAtomicIndex+2]);
 			currentAtomicIndex+=3;
 		}
 		break;
@@ -1567,7 +1700,10 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 		case MLCP_UNILATERAL_3D_FRICTIONAL_CONSTRAINT:
 		{
 			printf("UNILATERAL_3D_FRICTIONAL_CONSTRAINT");
-			printf("\n\t with initial violation b=(%g %g %g) ",b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]);
+			printf("\n\t with initial violation b=(%g %g %g) ",
+				   b[currentAtomicIndex],
+				   b[currentAtomicIndex+1],
+				   b[currentAtomicIndex+2]);
 			double violation[3] = {b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]};
 			for (int j=0 ; j<n ; j++)
 			{
@@ -1581,7 +1717,10 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 				printf("\n\t  => normal violation = %g < -contactTolerance => Signorini not verified yet !",
 					   violation[0]);
 			}
-			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);
+			printf("\n\t force=(%g %g %g) ",
+				   initialGuess_and_solution[currentAtomicIndex],
+				   initialGuess_and_solution[currentAtomicIndex+1],
+				   initialGuess_and_solution[currentAtomicIndex+2]);
 			currentAtomicIndex+=3;
 		}
 		break;
@@ -1596,14 +1735,19 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 				violation[1] += A(currentAtomicIndex+1, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g) ",violation[0],violation[1]);
-			printf("\n\t force=(%g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1]);
+			printf("\n\t force=(%g %g) ",
+				   initialGuess_and_solution[currentAtomicIndex],
+				   initialGuess_and_solution[currentAtomicIndex+1]);
 			currentAtomicIndex+=2;
 		}
 		break;
 		case MLCP_BILATERAL_FRICTIONAL_SLIDING_CONSTRAINT:
 		{
 			printf("UNILATERAL_3D_FRICTIONAL_SUTURING");
-			printf("\n\t with initial violation b=(%g %g %g) ",b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]);
+			printf("\n\t with initial violation b=(%g %g %g) ",
+				   b[currentAtomicIndex],
+				   b[currentAtomicIndex+1],
+				   b[currentAtomicIndex+2]);
 			double violation[3] = {b[currentAtomicIndex],b[currentAtomicIndex+1],b[currentAtomicIndex+2]};
 			for (int j=0 ; j<n ; j++)
 			{
@@ -1612,7 +1756,10 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 				violation[2] += A(currentAtomicIndex+2, j) * initialGuess_and_solution[j];
 			}
 			printf("\n\t with final   violation b-Ax=(%g %g %g) ",violation[0],violation[1],violation[2]);
-			printf("\n\t force=(%g %g %g) ",initialGuess_and_solution[currentAtomicIndex],initialGuess_and_solution[currentAtomicIndex+1],initialGuess_and_solution[currentAtomicIndex+2]);
+			printf("\n\t force=(%g %g %g) ",
+				   initialGuess_and_solution[currentAtomicIndex],
+				   initialGuess_and_solution[currentAtomicIndex+1],
+				   initialGuess_and_solution[currentAtomicIndex+2]);
 			currentAtomicIndex+=3;
 		}
 		break;
