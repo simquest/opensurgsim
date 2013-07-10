@@ -350,6 +350,7 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 	std::string line;
 	if (! getLine(fileName, in, &line))
 	{
+		fprintf(stderr, "Failed to read first line from the file.\n");
 		return false;
 	}
 
@@ -370,6 +371,7 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 
 		if (! getLine(fileName, in, &line))
 		{
+			fprintf(stderr, "Failed to read header comment block from the file.\n");
 			return false;
 		}
 	}
