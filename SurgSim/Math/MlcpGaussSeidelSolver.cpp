@@ -76,8 +76,7 @@ bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solu
 	bool catchExplodingConvergenceCriteria = true;
 	bool verbose = true;
 
-	int nbConstraints = static_cast<int>(constraintsType.size());
-
+	//int nbConstraints = static_cast<int>(constraintsType.size());
 	//cout << "======== MLCP ========" << endl;
 	//cout << "\tMLCP: nbAtomicEntry (nb Line In Matrix)="<<n<<" - nbConstraints=" << nbConstraints << endl;
 
@@ -944,7 +943,6 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 		//####################################
 		case MLCP_BILATERAL_FRICTIONLESS_SLIDING_CONSTRAINT:
 		{
-			double local_mu = frictionCoefs[i];
 			double& Fn1 = (*initialGuess_and_solution)[currentAtomicIndex  ];
 			double& Fn2 = (*initialGuess_and_solution)[currentAtomicIndex+1];
 
@@ -1770,7 +1768,8 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 		}
 		printf("\n");
 	}
-	printf("convergence_criteria=%g  Signorini verified=%b\n", convergence_criteria, signorini_verified);
+	printf("convergence_criteria=%g  Signorini verified=%s\n",
+	       convergence_criteria, (signorini_verified ? "yes" : "NO"));
 }
 
 };  // namespace Math
