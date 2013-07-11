@@ -39,7 +39,7 @@ namespace Graphics
 class OsgUnitBox;
 
 /// OSG implementation of a graphics box representation.
-class OsgBoxRepresentation : public virtual OsgRepresentation, public virtual BoxRepresentation
+class OsgBoxRepresentation : public OsgRepresentation, public BoxRepresentation
 {
 public:
 	/// Constructor
