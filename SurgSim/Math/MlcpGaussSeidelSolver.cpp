@@ -16,12 +16,14 @@
 #include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 
 #include <math.h>
+#include <stdio.h>
 
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/Dense>
 
 #include <SurgSim/Math/Valid.h>
+#include <SurgSim/Framework/Assert.h>
 
 
 namespace SurgSim
@@ -419,7 +421,7 @@ void MlcpGaussSeidelSolver::calculateConvergenceCriteria(int n, const MlcpProble
 
 		default:
 			//XXX
-			std::cerr << "MlcpGaussSeidelSolver::solve unknown constraint type ["<<constraintsType[i]<<"]" << std::endl;
+			SURGSIM_FAILURE() << "unknown constraint type [" << constraintsType[i] << "]";
 			break;
 		}
 
@@ -1603,7 +1605,7 @@ void MlcpGaussSeidelSolver::doOneIteration(int n, const MlcpProblem::Matrix& A, 
 		//####################################
 		default:
 			//XXX
-			std::cerr << "MlcpGaussSeidelSolver::solve constraint type unknown ["<<constraintsType[i]<<"]" << std::endl;
+			SURGSIM_FAILURE() << "unknown constraint type [" << constraintsType[i] << "]";
 			break;
 		}
 	}
