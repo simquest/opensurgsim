@@ -32,48 +32,61 @@ namespace Physics
 class Constraint
 {
 public:
-	/// Constructor
-	/// \param side0, side1 Both sides implementation of the constraint
-	Constraint(std::shared_ptr<ConstraintImplementation> side0, std::shared_ptr<ConstraintImplementation> side1);
+	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
+	/// is wrong with the constraint.
+	/// \param data The data for this constraint.
+	/// \param implementation0, implmentation1 Both sides implementation of the constraint.
+	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
+	Constraint(
+		std::shared_ptr<ConstraintData> data,
+		std::shared_ptr<ConstraintImplementation> implementation0,
+		std::shared_ptr<Localization> localization0,
+		std::shared_ptr<ConstraintImplementation> implementation1,
+		std::shared_ptr<Localization> localization1);
 
 	/// Destructor
 	virtual ~Constraint();
 
-	/// Sets both sides implementation
-	/// \param side0, side1 Both sides implementation of the constraint
-	void setImplementations(
-		std::shared_ptr<ConstraintImplementation> side0,
-		std::shared_ptr<ConstraintImplementation> side1);
+	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
+	/// is wrong with the constraint.
+	/// \param data The data for this constraint.
+	/// \param implementation0, implmentation1 Both sides implementation of the constraint.
+	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
+	void setInformation(
+		std::shared_ptr<ConstraintData> data,
+		std::shared_ptr<ConstraintImplementation> implementation0,
+		std::shared_ptr<Localization> localization0,
+		std::shared_ptr<ConstraintImplementation> implementation1,
+		std::shared_ptr<Localization> localization1);
 
-	/// Gets both sides implementation as a pair
-	/// \return the pair of implementations forming this constraint
+	/// Gets both sides implementation as a pair.
+	/// \return the pair of implementations forming this constraint.
 	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
 		getImplementations() const;
 
-	void setLocalizations(std::shared_ptr<Localization> side0, std::shared_ptr<Localization> side1);
-
+	/// Gets both sides implementation as a pair.
+	/// \return the pair of implementations forming this constraint.
 	const std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>>&
 		getLocalizations() const;
 
-
-	/// Sets the data associated to this constraint
-	/// \param data The data for this constraint
-	void setData(std::shared_ptr<ConstraintData> data);
-
-	/// Gets the data associated to this constraint
-	/// \return The data associated to this constraint
+	/// Gets the data associated to this constraint.
+	/// \return The data associated to this constraint.
 	std::shared_ptr<ConstraintData> getData() const;
 
-	/// Gets the number of degree of freedom for this constraint
-	/// \return The number of degree of freedom for this constraint
+	/// Gets the number of degree of freedom for this constraint.
+	/// \return The number of degree of freedom for this constraint.
 	unsigned int getNumDof() const;
 
-	/// Builds subset of an Mlcp physics problem associated to this constraint
-	/// \param dt The time step
-	/// \param [in,out] mlcpPhysicsProblem The Mlcp physics problem to be filled up
-	/// \param indexOfRepresentation0 The index of the 1st representation in the Mlcp
-	/// \param indexOfRepresentation1 The index of the 2nd representation in the Mlcp
-	/// \param indexOfConstraint The index of this constraint in the Mlcp
+	/// Gets the ConstraintType for this constraint.
+	/// \return	The type.
+	SurgSim::Math::MlcpConstraintType getType();
+
+	/// Builds subset of an Mlcp physics problem associated to this constraint.
+	/// \param dt The time step.
+	/// \param [in,out] mlcpPhysicsProblem The Mlcp physics problem to be filled up.
+	/// \param indexOfRepresentation0 The index of the 1st representation in the Mlcp.
+	/// \param indexOfRepresentation1 The index of the 2nd representation in the Mlcp.
+	/// \param indexOfConstraint The index of this constraint in the Mlcp.
 	void build(double dt,
 		MlcpPhysicsProblem* mlcpPhysicsProblem,
 		unsigned int indexOfRepresentation0,
@@ -83,10 +96,17 @@ public:
 private:
 	/// Specific data associated to this constraint
 	std::shared_ptr<ConstraintData> m_data;
+	
 	/// Pair of implementations defining the 2 sides of the constraint
 	std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>> m_implementations;
 	std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> m_localizations;
+	
+	/// The degrees of freedom that this constraint has
+	unsigned int m_numDof;
 
+	/// The type of this constraint
+	SurgSim::Math::MlcpConstraintType m_constraintType;
+	
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step
 	/// \param data The data specific to this constraint

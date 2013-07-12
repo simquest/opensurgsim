@@ -171,66 +171,59 @@ protected:
 	}
 };
 
-TEST_F (ConstraintTests, TestDefaultEmptyConstraint)
+TEST_F (ConstraintTests, TestConstructor)
 {
-	std::shared_ptr<ConstraintImplementation> imp0 = std::make_shared<FixedRepresentationContact>();
-	std::shared_ptr<ConstraintImplementation> imp1 = std::make_shared<FixedRepresentationContact>();
-	m_constraint = std::make_shared<Constraint>(imp0, imp1);
+	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 
-	EXPECT_EQ(nullptr, m_constraint->getData());
-	EXPECT_EQ(imp0, m_constraint->getImplementations().first);
-	EXPECT_EQ(imp1, m_constraint->getImplementations().second);
+	std::shared_ptr<ConstraintImplementation> fixedImp = std::make_shared<FixedRepresentationContact>();
+	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();
+
+	EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, nullptr, nullptr, nullptr);});
+	EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, nullptr, nullptr, nullptr);});
+	EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, nullptr);});
+	EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, nullptr);});
+	ASSERT_NO_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+
+	// Need more checks for the other error conditions
+
+	Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);
+
+	EXPECT_EQ(m_constraintData, c.getData());
+	EXPECT_EQ(fixedImp, c.getImplementations().first);
+	EXPECT_EQ(rigidImp, c.getImplementations().second);
+	EXPECT_EQ(fixedLoc, c.getLocalizations().first);
+	EXPECT_EQ(rigidLoc, c.getLocalizations().second);
 }
 
 TEST_F (ConstraintTests, TestGetNumDof)
 {
-	m_constraint = std::make_shared<Constraint>(m_implementationFixedPlane, m_implementationRigidSphere);
 
-	// 1 for a frictionless contact
-	EXPECT_EQ(1u, m_constraint->getNumDof());
+	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 
-	// 1 for a frictionless contact between 2 fixed representations
+	std::shared_ptr<ConstraintImplementation> fixedImp = std::make_shared<FixedRepresentationContact>();
+	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();
+
 	{
-		std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
-		std::shared_ptr<Localization> loc2 = std::make_shared<RigidRepresentationLocalization>();
-		std::shared_ptr<FixedRepresentationContact> implementation1;
-		std::shared_ptr<FixedRepresentationContact> implementation2;
-		implementation1 = std::make_shared<FixedRepresentationContact>();
-		implementation2 = std::make_shared<FixedRepresentationContact>();
-		m_constraint->setImplementations(implementation1, implementation2);
-		m_constraint->setLocalizations(loc1, loc2);
-		EXPECT_EQ(1u, m_constraint->getNumDof());
-		EXPECT_EQ(implementation1, m_constraint->getImplementations().first);
-		EXPECT_EQ(implementation2, m_constraint->getImplementations().second);
+		SCOPED_TRACE("1DOF for a frictionless contact");
+		Constraint c(m_constraintData, 
+			m_implementationFixedPlane, m_locFixedPlane, 
+			m_implementationRigidSphere, m_locRigidSphere);
+		EXPECT_EQ(1u, c.getNumDof());
 	}
 
-	// 1 for a frictionless contact between 1 fixed representation and 1 rigid representation
 	{
-		std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
-		std::shared_ptr<Localization> loc2 = std::make_shared<RigidRepresentationLocalization>();
-		std::shared_ptr<ConstraintImplementation> implementation1 = std::make_shared<FixedRepresentationContact>();
-		std::shared_ptr<ConstraintImplementation> implementation2 = std::make_shared<RigidRepresentationContact>();
-		m_constraint->setImplementations(implementation1, implementation2);
-		m_constraint->setLocalizations(loc1, loc2);
-		EXPECT_EQ(1u, m_constraint->getNumDof());
-		EXPECT_EQ(implementation1, m_constraint->getImplementations().first);
-		EXPECT_EQ(implementation2, m_constraint->getImplementations().second);
+		SCOPED_TRACE("1DOF for a frictionless contact between 2 fixed representations");
+		Constraint c(m_constraintData,fixedImp, fixedLoc, fixedImp, fixedLoc);
+		EXPECT_EQ(1u, c.getNumDof());
 	}
-}
 
-TEST_F (ConstraintTests, TestSetGetData)
-{
-	m_constraint = std::make_shared<Constraint>(m_implementationFixedPlane, m_implementationRigidSphere);
-
-	EXPECT_EQ(nullptr, m_constraint->getData());
-	m_constraint->setData(m_constraintData);
-	EXPECT_NE(nullptr, m_constraint->getData());
-	EXPECT_EQ(m_constraintData, m_constraint->getData());
-	EXPECT_EQ(m_implementationFixedPlane, m_constraint->getImplementations().first);
-	EXPECT_EQ(m_implementationRigidSphere, m_constraint->getImplementations().second);
-
-	m_constraint->setData(nullptr);
-	EXPECT_EQ(nullptr, m_constraint->getData());
+	{
+		SCOPED_TRACE("1DOF for a frictionless contact between 1 fixed representation and 1 rigid representation");
+		Constraint c(m_constraintData,fixedImp, fixedLoc, rigidImp, rigidLoc);
+		EXPECT_EQ(1u, c.getNumDof());
+	}
 }
 
 // Test case: Rigid sphere at (0 0 0) with radius 0.01 colliding with Fixed plane Y=0
@@ -239,12 +232,12 @@ TEST_F (ConstraintTests, TestSetGetData)
 // Constraint: (Sphere - Plane).n >= 0 with n=(0 1 0) The normal should be the contact normal on the 2nd object
 TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 {
-	m_constraint = std::make_shared<Constraint>(m_implementationRigidSphere, m_implementationFixedPlane);
-	m_constraint->setLocalizations(m_locRigidSphere, m_locFixedPlane);
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint->setData(m_constraintData);
+	m_constraint = std::make_shared<Constraint>(m_constraintData, 
+												m_implementationRigidSphere, m_locRigidSphere, 
+												m_implementationFixedPlane, m_locFixedPlane);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{
@@ -290,12 +283,12 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 // Constraint: (Plane - Sphere).n >= 0 with n=(0 -1 0) The normal should be the contact normal on the 2nd object
 TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 {
-	m_constraint = std::make_shared<Constraint>(m_implementationFixedPlane, m_implementationRigidSphere);
-	m_constraint->setLocalizations(m_locFixedPlane,m_locRigidSphere);
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint->setData(m_constraintData);
+	m_constraint = std::make_shared<Constraint>(m_constraintData, 
+		m_implementationFixedPlane, m_locFixedPlane,
+		m_implementationRigidSphere, m_locRigidSphere); 
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{
