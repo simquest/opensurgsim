@@ -56,13 +56,16 @@ namespace Math
 // TODO(advornik): Get rid of the constraint types and encode necessary info in other ways.
 struct MlcpProblem
 {
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+
 	/// Matrix \f$\mathbf{A}\f$ used to describe the mixed LCP problem.
-	Eigen::MatrixXd A;
+	Matrix A;
 	/// Vector \f$b\f$ used to describe the mixed LCP problem.
-	Eigen::VectorXd b;
+	Vector b;
 	/// A vector of friction coefficients used to describe the mixed LCP problem.
 	/// \todo This API will change in the future to something more independent of physics.
-	Eigen::VectorXd mu;
+	Vector mu;
 	/// A vector of constraint types used to describe the mixed LCP problem.
 	/// \todo This API will change in the future to something more independent of physics.
 	std::vector<MlcpConstraintType> constraintTypes;

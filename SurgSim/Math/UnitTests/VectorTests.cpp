@@ -965,3 +965,8 @@ TYPED_TEST(AllVectorTests, ArrayReadWrite)
 // testing for denormalized numbers
 // testing degeneracy (norm near 0)
 // compute an orthonormal frame based on a given normal (z-axis)
+
+TEST(VectorXdTests, CanResize)
+{
+	ASSERT_NO_THROW({Eigen::VectorXd a; a.resize(10);});
+}
