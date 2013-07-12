@@ -15,6 +15,7 @@
 
 #include <SurgSim/Physics/Constraint.h>
 #include <SurgSim/Physics/ConstraintData.h>
+#include <SurgSim/Physics/Localization.h>
 
 #include <SurgSim/Framework/Assert.h>
 
@@ -50,6 +51,17 @@ const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<Const
 	return m_implementations;
 }
 
+void Constraint::setLocalizations(std::shared_ptr<Localization> side0, std::shared_ptr<Localization> side1)
+{
+	SURGSIM_ASSERT(side0 != nullptr && side1 != nullptr) << "A constraint needs 2 valid constraint implementations!";
+	m_localizations = std::make_pair(side0, side1);
+}
+
+const std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>>& Constraint::getLocalizations() const
+{
+	return m_localizations;
+}
+
 void Constraint::setData(std::shared_ptr<ConstraintData> data)
 {
 	m_data = data;
@@ -83,14 +95,26 @@ void Constraint::build(double dt,
 
 	if (m_implementations.first)
 	{
-		m_implementations.first->build(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfConstraint,
+		m_implementations.first->build(
+			dt,
+			*m_data.get(),
+			m_localizations.first,
+			mlcp,
+			indexOfRepresentation0,
+			indexOfConstraint,
 			CONSTRAINT_POSITIVE_SIDE);
 		mlcpConstraintType = m_implementations.first->getMlcpConstraintType();
 	}
 
 	if (m_implementations.second)
 	{
-		m_implementations.second->build(dt, *m_data.get(), mlcp, indexOfRepresentation1, indexOfConstraint,
+		m_implementations.second->build(
+			dt, 
+			*m_data.get(),
+			m_localizations.second,
+			mlcp,
+			indexOfRepresentation1,
+			indexOfConstraint,
 			CONSTRAINT_NEGATIVE_SIDE);
 		SurgSim::Math::MlcpConstraintType mlcpConstraintType_2nd = m_implementations.second->getMlcpConstraintType();
 		if (mlcpConstraintType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)

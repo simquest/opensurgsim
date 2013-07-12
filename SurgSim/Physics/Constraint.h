@@ -41,13 +41,20 @@ public:
 
 	/// Sets both sides implementation
 	/// \param side0, side1 Both sides implementation of the constraint
-	void setImplementations(std::shared_ptr<ConstraintImplementation> side0,
+	void setImplementations(
+		std::shared_ptr<ConstraintImplementation> side0,
 		std::shared_ptr<ConstraintImplementation> side1);
 
 	/// Gets both sides implementation as a pair
 	/// \return the pair of implementations forming this constraint
 	const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
 		getImplementations() const;
+
+	void setLocalizations(std::shared_ptr<Localization> side0, std::shared_ptr<Localization> side1);
+
+	const std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>>&
+		getLocalizations() const;
+
 
 	/// Sets the data associated to this constraint
 	/// \param data The data for this constraint
@@ -78,6 +85,7 @@ private:
 	std::shared_ptr<ConstraintData> m_data;
 	/// Pair of implementations defining the 2 sides of the constraint
 	std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>> m_implementations;
+	std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> m_localizations;
 
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step

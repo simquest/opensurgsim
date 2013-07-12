@@ -32,7 +32,7 @@ class FixedRepresentationContact : public ConstraintImplementation
 public:
 	/// Constructor
 	/// \param localization The localization of the contact on the FixedRepresentation
-	explicit FixedRepresentationContact(std::shared_ptr<Localization> localization);
+	explicit FixedRepresentationContact();
 
 	/// Destructor
 	virtual ~FixedRepresentationContact();
@@ -52,6 +52,7 @@ private:
 	/// \note Empty for a Fixed Representation
 	void doBuild(double dt,
 		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,

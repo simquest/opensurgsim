@@ -141,8 +141,8 @@ protected:
 		locFixedPlane->setLocalPosition(m_contactPositionPlane);
 		locRigidSphere->setLocalPosition(m_contactPositionSphere);
 	
-		m_implementationFixedPlane = std::make_shared<FixedRepresentationContact>(m_locFixedPlane);
-		m_implementationRigidSphere = std::make_shared<RigidRepresentationContact>(m_locRigidSphere);
+		m_implementationFixedPlane = std::make_shared<FixedRepresentationContact>();
+		m_implementationRigidSphere = std::make_shared<RigidRepresentationContact>();
 
 		m_constraintData = std::make_shared<ContactConstraintData>();
 
@@ -173,8 +173,8 @@ protected:
 
 TEST_F (ConstraintTests, TestDefaultEmptyConstraint)
 {
-	std::shared_ptr<ConstraintImplementation> imp0 = std::make_shared<FixedRepresentationContact>(m_locFixedPlane);
-	std::shared_ptr<ConstraintImplementation> imp1 = std::make_shared<FixedRepresentationContact>(m_locFixedPlane);
+	std::shared_ptr<ConstraintImplementation> imp0 = std::make_shared<FixedRepresentationContact>();
+	std::shared_ptr<ConstraintImplementation> imp1 = std::make_shared<FixedRepresentationContact>();
 	m_constraint = std::make_shared<Constraint>(imp0, imp1);
 
 	EXPECT_EQ(nullptr, m_constraint->getData());
@@ -195,9 +195,10 @@ TEST_F (ConstraintTests, TestGetNumDof)
 		std::shared_ptr<Localization> loc2 = std::make_shared<RigidRepresentationLocalization>();
 		std::shared_ptr<FixedRepresentationContact> implementation1;
 		std::shared_ptr<FixedRepresentationContact> implementation2;
-		implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
-		implementation2 = std::make_shared<FixedRepresentationContact>(loc2);
+		implementation1 = std::make_shared<FixedRepresentationContact>();
+		implementation2 = std::make_shared<FixedRepresentationContact>();
 		m_constraint->setImplementations(implementation1, implementation2);
+		m_constraint->setLocalizations(loc1, loc2);
 		EXPECT_EQ(1u, m_constraint->getNumDof());
 		EXPECT_EQ(implementation1, m_constraint->getImplementations().first);
 		EXPECT_EQ(implementation2, m_constraint->getImplementations().second);
@@ -207,9 +208,10 @@ TEST_F (ConstraintTests, TestGetNumDof)
 	{
 		std::shared_ptr<Localization> loc1 = std::make_shared<FixedRepresentationLocalization>();
 		std::shared_ptr<Localization> loc2 = std::make_shared<RigidRepresentationLocalization>();
-		std::shared_ptr<ConstraintImplementation> implementation1 = std::make_shared<FixedRepresentationContact>(loc1);
-		std::shared_ptr<ConstraintImplementation> implementation2 = std::make_shared<RigidRepresentationContact>(loc2);
+		std::shared_ptr<ConstraintImplementation> implementation1 = std::make_shared<FixedRepresentationContact>();
+		std::shared_ptr<ConstraintImplementation> implementation2 = std::make_shared<RigidRepresentationContact>();
 		m_constraint->setImplementations(implementation1, implementation2);
+		m_constraint->setLocalizations(loc1, loc2);
 		EXPECT_EQ(1u, m_constraint->getNumDof());
 		EXPECT_EQ(implementation1, m_constraint->getImplementations().first);
 		EXPECT_EQ(implementation2, m_constraint->getImplementations().second);
@@ -238,6 +240,7 @@ TEST_F (ConstraintTests, TestSetGetData)
 TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 {
 	m_constraint = std::make_shared<Constraint>(m_implementationRigidSphere, m_implementationFixedPlane);
+	m_constraint->setLocalizations(m_locRigidSphere, m_locFixedPlane);
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
@@ -288,6 +291,7 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 {
 	m_constraint = std::make_shared<Constraint>(m_implementationFixedPlane, m_implementationRigidSphere);
+	m_constraint->setLocalizations(m_locFixedPlane,m_locRigidSphere);
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);

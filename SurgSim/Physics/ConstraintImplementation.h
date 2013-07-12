@@ -42,24 +42,10 @@ public:
 	/// Constructor
 	/// \param localization The localization for this implementation
 	/// \note Localization embbed the representation, so it is fully defined
-	explicit ConstraintImplementation(std::shared_ptr<Localization> localization);
+	explicit ConstraintImplementation();
 
 	/// Destructor
 	virtual ~ConstraintImplementation();
-
-	/// Sets the localization associated to this implementation
-	/// \param localization The localization for this implementation
-	void setLocalization(std::shared_ptr<Localization> localization)
-	{
-		m_localization = localization;
-	}
-
-	/// Gets the localization associated to this implementation
-	/// \return The localization of this implementation
-	std::shared_ptr<Localization> getLocalization() const
-	{
-		return m_localization;
-	}
 
 	/// Gets the number of degree of freedom for this implementation
 	/// \return The number of degree of freedom for this implementation
@@ -84,17 +70,16 @@ public:
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void build(double dt,
 		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign)
 	{
-		doBuild(dt, data, mlcp, indexOfRepresentation, indexOfConstraint, sign);
+		doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
 	}
 
 private:
-	/// Localization associated to this implementation
-	std::shared_ptr<Localization> m_localization;
 
 	/// Does get number of degree of freedom
 	/// \return The number of degree of freedom associated to this implementation
@@ -109,6 +94,7 @@ private:
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	virtual void doBuild(double dt,
 				const ConstraintData& data,
+				const std::shared_ptr<Localization>& localization,
 				MlcpPhysicsProblem* mlcp,
 				unsigned int indexOfRepresentation,
 				unsigned int indexOfConstraint,
@@ -116,10 +102,7 @@ private:
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
-	virtual SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const
-	{
-		return SurgSim::Math::MLCP_INVALID_CONSTRAINT;
-	}
+	virtual SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const;
 };
 
 };  // namespace Physics

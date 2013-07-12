@@ -34,13 +34,10 @@ class RigidRepresentationContact : public ConstraintImplementation
 public:
 	/// Constructor
 	/// \param localization The localization of the contact on the rigid representation
-	explicit RigidRepresentationContact(std::shared_ptr<Localization> localization) :
-	ConstraintImplementation(localization)
-	{}
+	RigidRepresentationContact();
 
 	/// Destructor
-	virtual ~RigidRepresentationContact()
-	{}
+	virtual ~RigidRepresentationContact();
 
 private:
 	/// Gets the number of degree of freedom for a frictionless contact
@@ -59,6 +56,7 @@ private:
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void doBuild(double dt,
 		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
