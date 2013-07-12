@@ -47,7 +47,7 @@ void FixedRepresentationContact::doBuild(double dt,
 	unsigned int indexOfConstraint,
 	ConstraintSideSign sign)
 {
-	Eigen::VectorXd& b = mlcp->b;
+	MlcpPhysicsProblem::Vector& b = mlcp->b;
 
 	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
 	std::shared_ptr<FixedRepresentation> fixed = std::static_pointer_cast<FixedRepresentation>(representation);
