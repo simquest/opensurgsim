@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_UNITTESTS_WRITETEXT_H
-#define SURGSIM_MATH_UNITTESTS_WRITETEXT_H
+#ifndef SURGSIM_TESTING_MLCPIO_READTEXT_H
+#define SURGSIM_TESTING_MLCPIO_READTEXT_H
 
 #include <string>
-#include "SurgSim/Math/UnitTests/MlcpTestData.h"
+#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
 
-bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& testData);
+bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData);
 
-#endif // SURGSIM_MATH_UNITTESTS_WRITETEXT_H
+#endif // SURGSIM_TESTING_MLCPIO_READTEXT_H

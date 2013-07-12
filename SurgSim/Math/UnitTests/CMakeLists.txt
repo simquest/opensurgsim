@@ -24,17 +24,10 @@ set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
-	ReadText.cpp
-	TextLabels.cpp
 	ValidTests.cpp
-	WriteText.cpp
 )
 
 set(UNIT_TEST_HEADERS
-	MlcpTestData.h
-	ReadText.h
-	TextLabels.h
-	WriteText.h
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
@@ -60,7 +53,7 @@ if(SURGSIM_TESTS_BUILD_EIGEN)
 	endif(MSVC AND CMAKE_CL_64)
 endif(SURGSIM_TESTS_BUILD_EIGEN)
 
-set(LIBS SurgSimMath SurgSimFramework ${Boost_LIBRARIES} gtest)
+set(LIBS SurgSimMath SurgSimFramework MlcpTestIO ${Boost_LIBRARIES} gtest)
 
 file(COPY MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

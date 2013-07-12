@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Math/UnitTests/WriteText.h"
+#include <SurgSim/Testing/MlcpIO/WriteText.h>
 
 #include <string>
 #include <vector>
@@ -24,8 +24,8 @@
 #include <SurgSim/Math/MlcpConstraintType.h>
 #include <SurgSim/Math/MlcpConstraintTypeName.h>
 
-#include "SurgSim/Math/UnitTests/MlcpTestData.h"
-#include "SurgSim/Math/UnitTests/TextLabels.h"
+#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
+#include <SurgSim/Testing/MlcpIO/TextLabels.h>
 
 
 // output helpers
