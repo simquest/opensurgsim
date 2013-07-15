@@ -40,7 +40,6 @@ class ConstraintImplementation
 {
 public:
 	/// Constructor
-	/// \param localization The localization for this implementation
 	/// \note Localization embbed the representation, so it is fully defined
 	explicit ConstraintImplementation();
 
@@ -64,6 +63,7 @@ public:
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
+	/// \param localization The localization for this implementation
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
 	/// \param indexOfConstraint The index of the constraint in the mlcp
@@ -88,6 +88,7 @@ private:
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
+	/// \param localization The localization for the constraint
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
 	/// \param indexOfConstraint The index of the constraint in the mlcp
