@@ -59,9 +59,8 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	std::shared_ptr<FixedRepresentationLocalization> loc = std::make_shared<FixedRepresentationLocalization>(fixed);
 	loc->setLocalPosition(contactPosition);
-	std::shared_ptr<FixedRepresentationContact> implementation = std::make_shared<FixedRepresentationContact>(loc);
+	std::shared_ptr<FixedRepresentationContact> implementation = std::make_shared<FixedRepresentationContact>();
 
-	EXPECT_EQ(loc, implementation->getLocalization());
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 
@@ -85,7 +84,8 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Fill up the Mlcp
 	double dt = 1e-3;
-	implementation->build(dt, constraintData, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+	implementation->build(dt, constraintData, loc, &mlcpPhysicsProblem, 
+						  0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// b should be exactly the violation
 	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);
