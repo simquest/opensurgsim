@@ -85,7 +85,7 @@ void Constraint::build(double dt,
 		CONSTRAINT_POSITIVE_SIDE);
 
 	m_implementations.second->build(
-		dt, 
+		dt,
 		*m_data.get(),
 		m_localizations.second,
 		mlcp,
@@ -106,7 +106,7 @@ void Constraint::doBuild(double dt,
 }
 
 void Constraint::setInformation(
-	std::shared_ptr<ConstraintData> data, 
+	std::shared_ptr<ConstraintData> data,
 	std::shared_ptr<ConstraintImplementation> implementation0,
 	std::shared_ptr<Localization> localization0,
 	std::shared_ptr<ConstraintImplementation> implementation1,

@@ -140,7 +140,7 @@ protected:
 
 		locFixedPlane->setLocalPosition(m_contactPositionPlane);
 		locRigidSphere->setLocalPosition(m_contactPositionSphere);
-	
+
 		m_implementationFixedPlane = std::make_shared<FixedRepresentationContact>();
 		m_implementationRigidSphere = std::make_shared<RigidRepresentationContact>();
 
@@ -207,8 +207,8 @@ TEST_F (ConstraintTests, TestGetNumDof)
 
 	{
 		SCOPED_TRACE("1DOF for a frictionless contact");
-		Constraint c(m_constraintData, 
-			m_implementationFixedPlane, m_locFixedPlane, 
+		Constraint c(m_constraintData,
+			m_implementationFixedPlane, m_locFixedPlane,
 			m_implementationRigidSphere, m_locRigidSphere);
 		EXPECT_EQ(1u, c.getNumDof());
 	}
@@ -235,8 +235,8 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	m_n.setZero();
 	m_n[1] = 1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint = std::make_shared<Constraint>(m_constraintData, 
-												m_implementationRigidSphere, m_locRigidSphere, 
+	m_constraint = std::make_shared<Constraint>(m_constraintData,
+												m_implementationRigidSphere, m_locRigidSphere,
 												m_implementationFixedPlane, m_locFixedPlane);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
@@ -286,9 +286,9 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 	m_n.setZero();
 	m_n[1] = -1.0;
 	m_constraintData->setPlaneEquation(m_n, m_d);
-	m_constraint = std::make_shared<Constraint>(m_constraintData, 
+	m_constraint = std::make_shared<Constraint>(m_constraintData,
 		m_implementationFixedPlane, m_locFixedPlane,
-		m_implementationRigidSphere, m_locRigidSphere); 
+		m_implementationRigidSphere, m_locRigidSphere);
 
 	// Simulate 1 time step...to make sure all representation have a valid compliance matrix...
 	{

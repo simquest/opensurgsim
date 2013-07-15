@@ -36,6 +36,11 @@ public:
 	{
 	}
 
+	virtual SurgSim::Physics::RepresentationType getType() const
+	{
+		return SurgSim::Physics::REPRESENTATION_TYPE_FIXED;
+	}
+
 	/// Sets the initial pose
 	/// \param pose The initial pose to set the MockRepresentation to
 	void setInitialPose(const RigidTransform3d& pose)

@@ -31,11 +31,6 @@ ConstraintImplementation::~ConstraintImplementation()
 {
 }
 
-SurgSim::Math::MlcpConstraintType ConstraintImplementation::doGetMlcpConstraintType() const
-{
-	return SurgSim::Math::MLCP_INVALID_CONSTRAINT;
-}
-
 }; // namespace Physics
 
 }; // namespace SurgSim

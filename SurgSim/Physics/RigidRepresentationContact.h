@@ -39,13 +39,18 @@ public:
 	/// Destructor
 	virtual ~RigidRepresentationContact();
 
+	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
+	/// \return The MLCP constraint type corresponding to this constraint implementation
+	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+
+	/// Gets the Type of representation that this implementation is concerned with
+	/// \return RepresentationType for this implementation
+	virtual RepresentationType getRepresentationType() const override;
+
 private:
 	/// Gets the number of degree of freedom for a frictionless contact
 	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction)
-	unsigned int doGetNumDof() const override
-	{
-		return 1;
-	}
+	unsigned int doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
@@ -62,12 +67,8 @@ private:
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign) override;
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
-	SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const override
-	{
-		return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
-	}
+
+
 };
 
 };  // namespace Physics

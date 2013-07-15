@@ -109,6 +109,21 @@ void RigidRepresentationContact::doBuild(double dt,
 		CHt.block<6, 1>(indexOfRepresentation, indexOfConstraint);
 }
 
+SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintType() const
+{
+	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+}
+
+SurgSim::Physics::RepresentationType RigidRepresentationContact::getRepresentationType() const
+{
+	return REPRESENTATION_TYPE_RIGID;
+}
+
+unsigned int RigidRepresentationContact::doGetNumDof() const
+{
+	return 1;
+}
+
 
 
 }; // namespace Physics

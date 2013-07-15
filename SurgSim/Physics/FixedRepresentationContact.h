@@ -37,6 +37,15 @@ public:
 	/// Destructor
 	virtual ~FixedRepresentationContact();
 
+
+	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
+	/// \return The MLCP constraint type corresponding to this constraint implementation
+	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
+
+	/// Gets the Type of representation that this implementation is concerned with
+	/// \return RepresentationType for this implementation
+	virtual RepresentationType getRepresentationType() const override;
+
 private:
 	/// Gets the number of degree of freedom
 	/// \return 1 as a frictionless contact is formed of 1 equation of constraint (along the normal direction)
@@ -58,9 +67,6 @@ private:
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign) override;
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
-	SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const override;
 };
 
 };  // namespace Physics
