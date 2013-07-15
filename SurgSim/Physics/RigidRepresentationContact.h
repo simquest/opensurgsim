@@ -28,12 +28,11 @@ namespace SurgSim
 namespace Physics
 {
 
-/// RigidRepresentation frictionless contact implementation
+/// RigidRepresentation frictionless contact implementation.
 class RigidRepresentationContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	/// \param localization The localization of the contact on the rigid representation
 	RigidRepresentationContact();
 
 	/// Destructor
@@ -48,17 +47,18 @@ public:
 	virtual RepresentationType getRepresentationType() const override;
 
 private:
-	/// Gets the number of degree of freedom for a frictionless contact
-	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction)
+	/// Gets the number of degree of freedom for a frictionless contact.
+	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction).
 	unsigned int doGetNumDof() const override;
 
-	/// Builds the subset of an Mlcp physics problem associated to this implementation
-	/// \param dt The time step
-	/// \param data The data associated to the constraint
-	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
-	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
-	/// \param indexOfConstraint The index of the constraint in the mlcp
-	/// \param sign The sign of this implementation in the constraint (positive or negative side)
+	/// Builds the subset of an Mlcp physics problem associated to this implementation.
+	/// \param dt The time step.
+	/// \param data The data associated to the constraint.
+	/// \param localization The localization for the representation.
+	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up.
+	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
+	/// \param indexOfConstraint The index of the constraint in the mlcp.
+	/// \param sign The sign of this implementation in the constraint (positive or negative side).
 	void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,

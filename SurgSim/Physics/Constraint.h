@@ -35,7 +35,7 @@ public:
 	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
 	/// is wrong with the constraint.
 	/// \param data The data for this constraint.
-	/// \param implementation0, implmentation1 Both sides implementation of the constraint.
+	/// \param implementation0, implementation1 Both sides implementation of the constraint.
 	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
 	Constraint(
 		std::shared_ptr<ConstraintData> data,
@@ -50,7 +50,7 @@ public:
 	/// Sets all the values for this constraints, does validation on the parameters and will throw it something
 	/// is wrong with the constraint.
 	/// \param data The data for this constraint.
-	/// \param implementation0, implmentation1 Both sides implementation of the constraint.
+	/// \param implementation0, implementation1 Both sides implementation of the constraint.
 	/// \param localization0, localization1 Both localizations of the representations involved in this constraint.
 	void setInformation(
 		std::shared_ptr<ConstraintData> data,
