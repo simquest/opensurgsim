@@ -47,28 +47,32 @@ public:
 	explicit OsgCylinderRepresentation(const std::string& name);
 
 	/// Sets the radius of the cylinder
+	/// \param	radius	Radius along X-axis and Z-axis of the cylinder
 	virtual void setRadius(double radius);
 	/// Returns the radius of the cylinder
+	/// \return	Radius along X-axis and Z-axis of cylinder
 	virtual double getRadius() const;
 
 	/// Sets the height of the cylinder
+	/// \param	height	Height along Y-axis of the cylinder
 	virtual void setHeight(double height);
 	/// Returns the height of the cylinder
+	/// \return	Height along Y-axis of the cylinder
 	virtual double getHeight() const;
 
 	/// Sets the size of the cylinder
-	/// \param radius Size along X-axis of the cylinder
+	/// \param radius Size along X-axis and Z-axis of the cylinder
 	/// \param height Size along Y-axis of the cylinder
 	virtual void setSize(double radius, double height);
 	/// Gets the size of the cylinder
-	/// \param radius Reference to store the size along X-axis of the cylinder
-	/// \param height Reference to store the size along Y-axis of the cylinder
+	/// \param [out] radius Variable to receive the size along X-axis and Z-axis of the cylinder
+	/// \param [out] height Variable to receive the size along Y-axis of the cylinder
 	virtual void getSize(double* radius, double* height);
 
 	/// Sets the size of the cylinder
 	/// \param size Size of the cylinder
 	virtual void setSize(SurgSim::Math::Vector2d size);
-	/// Returns the radius of the cylinder
+	/// Returns the size of the cylinder
 	/// \return Size of the cylinder
 	virtual SurgSim::Math::Vector2d getSize() const;
 
