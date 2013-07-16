@@ -90,7 +90,7 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Fill up the Mlcp
 	double dt = 1e-3;
-	implementation->build(dt, constraintData, loc, 
+	implementation->build(dt, constraintData, loc,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// Violation b should be exactly violation = -radius (the sphere center is on the plane)

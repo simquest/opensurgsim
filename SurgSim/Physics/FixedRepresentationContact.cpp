@@ -26,7 +26,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FixedRepresentationContact::FixedRepresentationContact() 
+FixedRepresentationContact::FixedRepresentationContact()
 {
 }
 

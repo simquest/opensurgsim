@@ -34,7 +34,8 @@ SolveMlcp::SolveMlcp()
 SolveMlcp::~SolveMlcp()
 {}
 
-std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
+	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 
