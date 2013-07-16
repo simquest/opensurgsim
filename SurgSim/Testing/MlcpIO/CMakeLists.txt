@@ -13,8 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_subdirectory(MlcpIO)
+include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+)
 
-if(GLUT_FOUND)
-	add_subdirectory(VisualTestCommon)
-endif(GLUT_FOUND)
+set(MLCP_IO_SOURCES
+	ReadText.cpp
+	TextLabels.cpp
+	WriteText.cpp
+)
+
+set(MLCP_IO_HEADERS
+	MlcpTestData.h
+	ReadText.h
+	TextLabels.h
+	WriteText.h
+)
+
+# The headers etc. for this do not need to be shipped, so do NOT use
+# surgsim_add_library here.
+add_library(MlcpTestIO
+	${MLCP_IO_SOURCES} ${MLCP_IO_HEADERS})
