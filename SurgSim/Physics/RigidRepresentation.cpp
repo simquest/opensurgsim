@@ -188,6 +188,11 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	m_invGlobalInertia = m_globalInertia.inverse();
 }
 
+SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
+{
+	return REPRESENTATION_TYPE_RIGID;
+}
+
 }; /// Physics
 
 }; /// SurgSim

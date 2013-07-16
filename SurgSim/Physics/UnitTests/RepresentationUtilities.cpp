@@ -16,6 +16,7 @@
 #include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/Shapes.h>
 
@@ -31,6 +32,7 @@ std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& 
 													  const Quaterniond& rotation,
 													  const Vector3d& position)
 {
+
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
 	std::shared_ptr<CollisionRepresentation> rep =
 		std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);

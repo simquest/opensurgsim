@@ -24,6 +24,7 @@ set(UNIT_TEST_SOURCES
 	ConstraintTests.cpp
 	ContactCalculationTests.cpp
 	ContactConstraintDataTests.cpp
+	ContactConstraintGenerationTests.cpp
 	ComputationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
@@ -50,6 +51,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	MockObjects.h
 	RepresentationUtilities.h
 )
 

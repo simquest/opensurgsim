@@ -48,6 +48,8 @@ public:
 	/// Destructor
 	virtual ~VtcRigidRepresentation();
 
+	virtual RepresentationType getType() const override;
+
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
 	/// \note This is done through the Vtc proxy !
@@ -212,6 +214,8 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	void updateGlobalInertiaMatrices(const RigidRepresentationState& state);
+
+
 
 	/// Initial physical parameters
 	RigidRepresentationParameters m_initialParameters;

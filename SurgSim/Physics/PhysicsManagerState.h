@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 namespace SurgSim
 {
@@ -26,6 +27,13 @@ namespace Physics
 
 class Representation;
 class CollisionPair;
+class Constraint;
+
+enum ConstraintGroupType
+{
+	CONSTRAINT_GROUP_TYPE_CONTACT = 0,
+	CONSTRAINT_GROUP_TYPE_COUNT
+};
 
 class PhysicsManagerState
 {
@@ -45,10 +53,21 @@ public:
 	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val)
 	{ m_collisionPairs = val; }
 
+	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(ConstraintGroupType type)
+	{
+		return m_constraints[type];
+	}
+
+	void setConstraintGroup(ConstraintGroupType type, const std::vector<std::shared_ptr<Constraint>>& constraints)
+	{
+		m_constraints[type] = constraints;
+	}
 private:
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
 	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
+
+	std::unordered_map<ConstraintGroupType, std::vector<std::shared_ptr<Constraint>>> m_constraints;
 
 };
 
