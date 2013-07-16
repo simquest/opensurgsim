@@ -47,8 +47,10 @@ class ContactConstraintGeneration : public Computation
 {
 public:
 	/// Constructor
-	ContactConstraintGeneration();
-	~ContactConstraintGeneration();
+	ContactConstraintGeneration(bool doCopyState);
+	
+	/// Destructor
+	virtual ~ContactConstraintGeneration();
 
 private:
 
@@ -58,7 +60,7 @@ private:
 	/// The logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
-	/// Overriden function from Computation, the actual work is done here
+	/// Overridden function from Computation, the actual work is done here
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
 		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state) override;

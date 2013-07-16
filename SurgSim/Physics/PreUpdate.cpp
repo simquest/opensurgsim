@@ -24,11 +24,15 @@ namespace SurgSim
 namespace Physics
 {
 
-PreUpdate::PreUpdate()
-{}
+PreUpdate::PreUpdate(bool doCopyState) : Computation(doCopyState)
+{
+
+}
 
 PreUpdate::~PreUpdate()
-{}
+{
+
+}
 
 std::shared_ptr<PhysicsManagerState> PreUpdate::doUpdate(
 	const double& dt,

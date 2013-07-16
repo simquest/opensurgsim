@@ -30,7 +30,6 @@ class Computation
 public:
 
 	/// Constructor
-	Computation();
 	explicit Computation(bool doCopyState);
 
 	/// Destructor

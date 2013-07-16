@@ -30,7 +30,7 @@ class PreUpdate : public Computation
 {
 public:
 	/// Constructor
-	PreUpdate();
+	explicit PreUpdate(bool doCopyState);
 
 	/// Destructor
 	virtual ~PreUpdate();

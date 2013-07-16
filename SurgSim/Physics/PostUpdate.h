@@ -31,7 +31,7 @@ class PostUpdate : public Computation
 public:
 
 	/// Constructor
-	PostUpdate();
+	explicit PostUpdate(bool doCopyState);
 
 	/// Destructor
 	virtual ~PostUpdate();
