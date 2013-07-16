@@ -23,13 +23,17 @@ namespace SurgSim
 namespace Physics
 {
 
-ConstraintImplementation::ConstraintImplementation(std::shared_ptr<Localization> localization):
-m_localization(localization)
+ConstraintImplementation::ConstraintImplementation()
 {
 }
 
 ConstraintImplementation::~ConstraintImplementation()
 {
+}
+
+SurgSim::Math::MlcpConstraintType ConstraintImplementation::doGetMlcpConstraintType() const
+{
+	return SurgSim::Math::MLCP_INVALID_CONSTRAINT;
 }
 
 }; // namespace Physics

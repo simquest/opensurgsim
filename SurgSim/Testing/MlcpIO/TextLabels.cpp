@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "TextLabels.h"
+#include <SurgSim/Testing/MlcpIO/TextLabels.h>
 
 const char* const TEXT_LABEL_FLAGS_LIST = "flags =";
 const char* const TEXT_LABEL_NUM_DEGREES_OF_FREEDOM = "total degrees of freedom =";

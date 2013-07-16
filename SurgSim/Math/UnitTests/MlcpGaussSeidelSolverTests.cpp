@@ -26,8 +26,8 @@
 #include <SurgSim/Math/Valid.h>
 #include <SurgSim/Math/MlcpGaussSeidelSolver.h>
 #include <SurgSim/Math/MlcpSolution.h>
-#include "MlcpTestData.h"
-#include "ReadText.h"
+#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
+#include <SurgSim/Testing/MlcpIO/ReadText.h>
 
 using SurgSim::Math::isValid;
 using SurgSim::Math::MlcpGaussSeidelSolver;
@@ -59,7 +59,8 @@ TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 
 
 static void solveAndCompareResult(const std::string& fileName,
-						  double gsSolverPrecision = 1e-9, double gsContactTolerance = 1e-9, int gsMaxIterations = 100)
+								  double gsSolverPrecision = 1e-9, double gsContactTolerance = 1e-9,
+								  int gsMaxIterations = 100)
 {
 	SCOPED_TRACE("while running test " + fileName);
 	printf("-- TEST %s --\n", fileName.c_str());

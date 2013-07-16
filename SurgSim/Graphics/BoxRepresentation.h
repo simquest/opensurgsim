@@ -45,14 +45,14 @@ public:
 
 	/// Sets the size along Y-axis of the box
 	/// \param sizeY Size along Y-axis of the box
-	virtual void setSizeY(double sizeX) = 0;
+	virtual void setSizeY(double sizeY) = 0;
 	/// Returns the size along Y-axis of the box
 	/// \return Size along Y-axis of the box
 	virtual double getSizeY() const = 0;
 
 	/// Sets the size along Z-axis of the box
 	/// \param sizeZ Size along Z-axis of the box
-	virtual void setSizeZ(double sizeX) = 0;
+	virtual void setSizeZ(double sizeZ) = 0;
 	/// Returns the size along Z-axis of the box
 	/// \return Size along Z-axis of the box
 	virtual double getSizeZ() const = 0;

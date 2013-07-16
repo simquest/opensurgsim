@@ -94,7 +94,7 @@ TEST(ComponentManagerTests, SimpleAddRemoveComponentTest)
 
 }
 
-TEST(ComponentManagerTests, CompundAddRemoveComponentTest)
+TEST(ComponentManagerTests, CompoundAddRemoveComponentTest)
 {
 	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");
 	std::shared_ptr<Component> mock2 = std::make_shared<MockComponent>("Component2");
@@ -115,4 +115,29 @@ TEST(ComponentManagerTests, CompundAddRemoveComponentTest)
 	manager.testProcessComponents();
 
 	EXPECT_EQ(1u, manager.getComponents().size());
+}
+
+// Bug: Components that were initialized by other threads, can be woken up by a thread
+// that does not have responsibility. Creating a race condition
+TEST(ComponentManagerTest, DoNotWakeupForeignComponents)
+{
+	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");
+	std::shared_ptr<Component> mock2 = std::make_shared<MockComponent>("Component2");
+	std::shared_ptr<Component> invalid = std::make_shared<MockBehavior>("Behavior1");
+
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	MockManager manager;
+
+	manager.setRuntime(runtime);
+	manager.enqueueAddComponent(mock1);
+	manager.enqueueAddComponent(mock2);
+	manager.enqueueAddComponent(invalid);
+
+	// Simulate another thread initializing 'invalid'
+	invalid->initialize(runtime);
+
+	manager.testProcessComponents();
+
+	// invalid should not be awoken ... 
+	EXPECT_FALSE(invalid->isAwake());
 }
