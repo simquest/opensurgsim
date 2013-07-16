@@ -71,6 +71,10 @@ public:
 	/// \param	color	The color.
 	virtual void setColor(const SurgSim::Math::Vector4d& color) override;
 
+	/// Gets the color.
+	/// \return The current color.
+	virtual SurgSim::Math::Vector4d getColor() const override;
+
 private:
 
 	/// Local pointer to mesh with data
@@ -87,6 +91,9 @@ private:
 
 	/// OSG::Point for local operations
 	osg::ref_ptr<osg::Point> m_point;
+
+	/// Color backing variable
+	SurgSim::Math::Vector4d m_color;
 
 };
 

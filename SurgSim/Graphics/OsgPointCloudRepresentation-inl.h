@@ -32,7 +32,8 @@ template <class Data>
 OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string& name) :
 	Representation(name),
 	PointCloudRepresentation<Data>(name),
-	OsgRepresentation(name)
+	OsgRepresentation(name),
+	m_color(1.0,1.0,1.0,1.0)
 {
 	osg::Geode* geode = new osg::Geode();
 	m_geometry = new osg::Geometry();
@@ -40,7 +41,7 @@ OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string
 
 	m_geometry->setVertexArray(m_vertexData);
 
-	setColor(SurgSim::Math::Vector4d(1.0,1.0,1.0,1.0));
+	setColor(m_color);
 
 	// At this stage there are no vertices in there
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,m_vertexData->size());
@@ -139,8 +140,14 @@ void OsgPointCloudRepresentation<Data>::setColor(const SurgSim::Math::Vector4d& 
 	colors->push_back(SurgSim::Graphics::toOsg(color));
 	m_geometry->setColorArray(colors);
 	m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+	m_color = color;
 }
 
+template <class Data>
+SurgSim::Math::Vector4d OsgPointCloudRepresentation<Data>::getColor() const
+{
+	return m_color;
+}
 
 }; // Graphics
 }; // SurgSim
