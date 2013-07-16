@@ -136,7 +136,7 @@ bool Runtime::execute()
 
 bool Runtime::start()
 {
-
+	SurgSim::Framework::Logger* logger = Logger::getDefaultLogger();
 	// Add all the scene Elements so they can be initialized during the startup process
 	preprocessSceneElements();
 
@@ -150,19 +150,19 @@ bool Runtime::start()
 
 	// Wait for all the managers to initialize
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers doInit() succeeded";
+	SURGSIM_LOG_INFO(logger) << "All managers doInit() succeeded";
 
 	// Wait for all the managers to startup
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All managers doStartup() succeeded";
+	SURGSIM_LOG_INFO(logger) << "All managers doStartup() succeeded";
 
 	// Wait for all the components to initialize()
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All component initialize() succeeded";
+	SURGSIM_LOG_INFO(logger) << "All component initialize() succeeded";
 
 	// Wait for all the components to wakeUp()
 	barrier->wait(true);
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "All component wakeUp() succeeded";
+	SURGSIM_LOG_INFO(logger) << "All component wakeUp() succeeded";
 
 	// Now wake up all the sceneelements
 	auto sceneElements = m_scene->getSceneElements();
@@ -173,7 +173,7 @@ bool Runtime::start()
 	barrier->wait(true);
 
 	m_isRunning = true;
-	SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Scene is initialized. All managers updating";
+	SURGSIM_LOG_INFO(logger) << "Scene is initialized. All managers updating";
 
 	return true;
 }
