@@ -31,7 +31,8 @@ class SolveMlcp : public Computation
 {
 public:
 	/// Constructor
-	SolveMlcp();
+	/// \param doCopyState Specify if the ouput state is a copy or not of the input state in Computation::Update()
+	explicit SolveMlcp(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~SolveMlcp();

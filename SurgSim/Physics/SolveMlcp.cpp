@@ -28,7 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-SolveMlcp::SolveMlcp()
+SolveMlcp::SolveMlcp(bool doCopyState) : Computation(doCopyState)
 {}
 
 SolveMlcp::~SolveMlcp()
