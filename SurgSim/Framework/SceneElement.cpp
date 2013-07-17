@@ -74,17 +74,14 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 
 bool SceneElement::initialize()
 {
-	bool result = true;
-	result = doInitialize() && result;
-
-	return result;
+	m_isInitialized = doInitialize();
+	return m_isInitialized;
 }
 
 bool SceneElement::wakeUp()
 {
-	bool result = true;
-	result = doWakeUp() && result;
-	return result;
+	m_isAwake = doWakeUp();
+	return m_isAwake;
 }
 
 std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
