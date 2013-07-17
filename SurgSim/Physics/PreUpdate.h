@@ -30,7 +30,8 @@ class PreUpdate : public Computation
 {
 public:
 	/// Constructor
-	PreUpdate();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit PreUpdate(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~PreUpdate();

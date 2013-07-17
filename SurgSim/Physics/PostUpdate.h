@@ -31,7 +31,8 @@ class PostUpdate : public Computation
 public:
 
 	/// Constructor
-	PostUpdate();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit PostUpdate(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~PostUpdate();

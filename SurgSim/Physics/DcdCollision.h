@@ -47,7 +47,10 @@ class DcdCollision : public Computation
 public:
 
 	/// Constructor
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit DcdCollision(bool doCopyState = false);
+
+	/// Destructor
 	virtual ~DcdCollision();
 
 protected:

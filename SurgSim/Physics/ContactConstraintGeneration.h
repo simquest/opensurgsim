@@ -33,13 +33,19 @@ class CollisionRepresentation;
 class ContactConstraintGeneration : public Computation
 {
 public:
-
 	/// Constructor
-	ContactConstraintGeneration();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit ContactConstraintGeneration(bool doCopyState = false);
+	
+	/// Destructor
 	~ContactConstraintGeneration();
 
 
 private:
+	/// Does the update
+	/// \param dt The time step
+	/// \param state The physics input state
+	/// \return The updated physics state
 	virtual std::shared_ptr<PhysicsManagerState> doUpdate(
 		const double& dt,
 		const std::shared_ptr<PhysicsManagerState>& state);

@@ -28,7 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-ContactConstraintGeneration::ContactConstraintGeneration()
+ContactConstraintGeneration::ContactConstraintGeneration(bool doCopyState) : Computation(doCopyState)
 {
 
 }
