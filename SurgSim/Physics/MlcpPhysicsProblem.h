@@ -38,11 +38,11 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// The matrix \f$\mathbf{H}\f$, which is a constraints matrix of size\f$c\times n\f$ that is used to describe
 	/// the correspondence between the \f$c\f$ constraints being applied to the system, and the \f$n\f$ total
 	/// system degrees of freedom.
-	Eigen::MatrixXd H;
+	Matrix H;
 
 	/// The matrix \f$\mathbf{C\;H^T}\f$, which is a matrix of size \f$n\times c\f$ that is used to convert the
 	/// vector of \f$c\f$ constraint forces to the \f$n\f$ displacements of each degree of freedom of the system.
-	Eigen::MatrixXd CHt;
+	Matrix CHt;
 };
 
 };  // namespace Physics

@@ -73,7 +73,8 @@ public:
 	bool wakeUp()
 	{
 		SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
-		return m_didWakeUp = doWakeUp();
+		m_didWakeUp = true;
+		return doWakeUp();
 	};
 
 	std::shared_ptr<Runtime> getRuntime()
