@@ -26,9 +26,6 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 # We always want to use defines from <math.h>.
 add_definitions( -D_USE_MATH_DEFINES )
 
-# We disable all Eigen alignement features
-add_definitions( -DEIGEN_DONT_ALIGN )
-
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags
