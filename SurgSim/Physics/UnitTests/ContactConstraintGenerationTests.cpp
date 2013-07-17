@@ -78,7 +78,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 	ContactConstraintGeneration generator;
 	generator.update(0.1,state);
 
-	ASSERT_EQ(1, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
 	auto constraints = state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT);
 	auto constraint = constraints[0];
@@ -119,7 +119,7 @@ TEST_F(ContactConstraintGenerationTests, CountTest)
 	generator.update(0.1,state);
 
 	// 3 Contacts should generate 3 constraints
-	ASSERT_EQ(3, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+	ASSERT_EQ(3u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
 }
 }; // namespace Physics

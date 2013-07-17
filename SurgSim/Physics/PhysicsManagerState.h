@@ -102,7 +102,7 @@ private:
 	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
 	
 	/// The local map of constraints
-	std::unordered_map<ConstraintGroupType, std::vector<std::shared_ptr<Constraint>>> m_constraints;
+	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
 	///@}
 };
 
