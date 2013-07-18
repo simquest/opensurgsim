@@ -36,9 +36,13 @@ public:
 	/// Destructor
 	virtual ~Computation();
 
-	/// Public Interface execute this objects computations, dt is the time from
-	/// the last update call in seconds
-	std::shared_ptr<PhysicsManagerState> update(double dt, const std::shared_ptr<PhysicsManagerState>& state);;
+	/// Public Interface execute this objects computations, dt is the time from the last update
+	/// call in seconds.
+	/// \param	dt   	The time passed from the last update in seconds.
+	/// \param	state	The physics state.
+	/// \return	The changed state of the, depending on the setting of doCopyState this is either the same instance
+	/// 		or a copied instance of the physics state.
+	std::shared_ptr<PhysicsManagerState> update(double dt, const std::shared_ptr<PhysicsManagerState>& state);
 
 	/// Sets up whether the computation will copy the state of PhysicsManagerState before executing.
 	/// \param	val	Whether to create a copy of the PhysicsState before running the update fuction.

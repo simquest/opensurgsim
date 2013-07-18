@@ -69,7 +69,7 @@ public:
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const;
 
 	/// Sets the current pose of the representation
-	/// \param	transform	Rigid transformation that describes the current pose of the representation
+	/// \param	pose	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Gets the current pose of the representation
