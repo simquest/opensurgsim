@@ -249,6 +249,11 @@ void VtcRigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentati
 	m_invGlobalInertia = m_globalInertia.inverse();
 }
 
+SurgSim::Physics::RepresentationType VtcRigidRepresentation::getType() const
+{
+	return REPRESENTATION_TYPE_VTC_RIGID;
+}
+
 
 }; /// Physics
 

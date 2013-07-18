@@ -20,6 +20,7 @@
 
 #include <Eigen/Core>
 
+#include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/ConstraintData.h>
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
@@ -55,10 +56,11 @@ public:
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const
-	{
-		return doGetMlcpConstraintType();
-	}
+	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const = 0;
+
+	/// Gets the Type of representation that this implementation is concerned with
+	/// \return RepresentationType for this implementation
+	virtual RepresentationType getRepresentationType() const = 0;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
@@ -101,9 +103,6 @@ private:
 				unsigned int indexOfConstraint,
 				ConstraintSideSign sign) = 0;
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
-	virtual SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const;
 };
 
 };  // namespace Physics

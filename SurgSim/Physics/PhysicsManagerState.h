@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
 #include <SurgSim/Physics/MlcpPhysicsSolution.h>
@@ -29,6 +30,13 @@ namespace Physics
 
 class Representation;
 class CollisionPair;
+class Constraint;
+
+enum ConstraintGroupType
+{
+	CONSTRAINT_GROUP_TYPE_CONTACT = 0,
+	CONSTRAINT_GROUP_TYPE_COUNT
+};
 
 class PhysicsManagerState
 {
@@ -38,15 +46,51 @@ public:
 	PhysicsManagerState() {}
 	~PhysicsManagerState() {}
 
-	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
-	{ return m_representations; }
+	/// Sets the representations for the state, these are the basis for all the computations.
+	/// \param	val The list of representations.
 	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val)
-	{ m_representations = val; }
+	{
+		m_representations = val; 
+	}
 
-	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const
-	{ return m_collisionPairs; }
+	/// Gets the representations.
+	/// \return	The representations.
+	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
+	{
+		return m_representations;
+	}
+
+	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
+	/// should only be from the list of representations that are in this state.
+	/// \param	val	The list of collision pairs.
 	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val)
-	{ m_collisionPairs = val; }
+	{
+		m_collisionPairs = val;
+	}
+
+	/// Gets collision pairs.
+	/// \return	The collision pairs.
+	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const
+	{
+		return m_collisionPairs;
+	}
+
+	/// Sets the group of constraints to a given value, the grouping indicates what type of constraint we are dealing
+	/// with.
+	/// \param	type	   	The type of constraint grouping e.g. Contact Constraints.
+	/// \param	constraints	The constraints.
+	void setConstraintGroup(ConstraintGroupType type, const std::vector<std::shared_ptr<Constraint>>& constraints)
+	{
+		m_constraints[type] = constraints;
+	}
+
+	/// Gets constraint group.
+	/// \param	type	The type.
+	/// \return	The constraint group.
+	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(ConstraintGroupType type)
+	{
+		return m_constraints[type];
+	}
 
 	MlcpPhysicsProblem& getMlcpProblem()
 	{
@@ -60,9 +104,19 @@ public:
 
 private:
 
+	///@{
+	/// Local state data structures, please note that the physics state may get copied, these data structures
+	/// should copy their contents on copy. With the caveat that objects contained within those structures might
+	/// not get copied themselves.
+	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
-	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
 
+	/// The local list of collision pairs 
+	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
+	
+	/// The local map of constraints
+	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
+	///@}
 	/// Mlcp problem for this Physics Manager State
 	MlcpPhysicsProblem m_mlcpPhysicsProblem;
 

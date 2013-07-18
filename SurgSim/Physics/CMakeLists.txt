@@ -23,6 +23,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
+	ConstraintImplementationFactory.cpp
 	ContactCalculation.cpp
 	ContactConstraintGeneration.cpp
 	Computation.cpp
@@ -54,6 +55,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Constraint.h
 	ConstraintData.h
 	ConstraintImplementation.h
+	ConstraintImplementationFactory.h
 	ContactCalculation.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h

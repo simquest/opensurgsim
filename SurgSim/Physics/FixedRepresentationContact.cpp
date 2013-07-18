@@ -34,11 +34,6 @@ FixedRepresentationContact::~FixedRepresentationContact()
 {
 }
 
-unsigned int FixedRepresentationContact::doGetNumDof() const
-{
-	return 1;
-}
-
 void FixedRepresentationContact::doBuild(double dt,
 	const ConstraintData& data,
 	const std::shared_ptr<Localization>& localization,
@@ -69,9 +64,19 @@ void FixedRepresentationContact::doBuild(double dt,
 	b[indexOfConstraint] += violation * scale;
 }
 
-SurgSim::Math::MlcpConstraintType FixedRepresentationContact::doGetMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType FixedRepresentationContact::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+}
+
+SurgSim::Physics::RepresentationType FixedRepresentationContact::getRepresentationType() const
+{
+	return REPRESENTATION_TYPE_FIXED;
+}
+
+unsigned int FixedRepresentationContact::doGetNumDof() const
+{
+	return 1;
 }
 
 };  //  namespace Physics

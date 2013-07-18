@@ -39,8 +39,8 @@ public:
 protected:
 
 	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
-		const std::shared_ptr<PhysicsManagerState>& state) override;
+	virtual std::shared_ptr<PhysicsManagerState>
+		doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
 };
 
 }; // Physics

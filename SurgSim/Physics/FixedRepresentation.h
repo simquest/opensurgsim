@@ -42,6 +42,11 @@ public:
 	{
 	}
 
+	virtual RepresentationType getType() const override
+	{
+		return REPRESENTATION_TYPE_FIXED;
+	}
+
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
 	void setPose(const RigidTransform3d& pose)

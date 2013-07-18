@@ -30,7 +30,8 @@ PostUpdate::PostUpdate()
 PostUpdate::~PostUpdate()
 {}
 
-std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(const double& dt,
+std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(
+	const double& dt,
 	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
