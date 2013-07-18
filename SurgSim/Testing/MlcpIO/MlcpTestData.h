@@ -16,6 +16,9 @@
 #ifndef SURGSIM_TESTING_MLCPIO_MLCPTESTDATA_H
 #define SURGSIM_TESTING_MLCPIO_MLCPTESTDATA_H
 
+#include <memory>
+#include <string>
+
 #include <vector>
 #include <Eigen/Core>
 #include <SurgSim/Math/MlcpProblem.h>
@@ -68,8 +71,10 @@ public:
 	}
 };
 
-
 const MlcpTestData* getTestProblem1();
 
+std::shared_ptr<MlcpTestData> loadTestData(const std::string& fileName);
+
+std::string getTestFileName(const std::string& prefix, int index, const std::string& suffix);
 
 #endif // SURGSIM_TESTING_MLCPIO_MLCPTESTDATA_H

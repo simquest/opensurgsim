@@ -32,25 +32,6 @@
 using SurgSim::Math::isValid;
 using SurgSim::Math::MlcpGaussSeidelSolver;
 
-
-static std::shared_ptr<MlcpTestData> loadTestData(const std::string& fileName)
-{
-	std::shared_ptr<MlcpTestData> data = std::make_shared<MlcpTestData>();
-	if (! readMlcpTestDataAsText("MlcpTestData/" + fileName, data.get()))
-	{
-		data.reset();
-	}
-	return data;
-}
-
-static inline std::string getTestFileName(const std::string& prefix, int index, const std::string& suffix)
-{
-	std::ostringstream stream;
-	stream << prefix << std::setfill('0') << std::setw(3) << index << suffix;
-	return stream.str();
-}
-
-
 TEST(MlcpGaussSeidelSolverTests, CanConstruct)
 {
 	//ASSERT_NO_THROW({
