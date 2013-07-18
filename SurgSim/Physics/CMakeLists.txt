@@ -23,6 +23,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
+	ConstraintImplementationFactory.cpp
 	ContactCalculation.cpp
 	ContactConstraintGeneration.cpp
 	Computation.cpp
@@ -41,6 +42,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	RigidShapeCollisionRepresentation.cpp
+	SolveMlcp.cpp
 	VtcRigidRepresentation.cpp
 )
 
@@ -53,6 +55,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Constraint.h
 	ConstraintData.h
 	ConstraintImplementation.h
+	ConstraintImplementationFactory.h
 	ContactCalculation.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
@@ -85,6 +88,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidShape.h
 	RigidShapeCollisionRepresentation.h
 	Shapes.h
+	SolveMlcp.h
 	SphereShape.h
 	VtcRigidParameters.h
 	VtcRigidRepresentation.h
@@ -96,7 +100,7 @@ surgsim_add_library(
     "${SURGSIM_PHYSICS_HEADERS}"
     "SurgSim/Physics"
 )
-target_link_libraries(SurgSimPhysics SurgSimFramework)
+target_link_libraries(SurgSimPhysics SurgSimFramework SurgSimMath)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

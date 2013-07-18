@@ -28,8 +28,8 @@ using SurgSim::Graphics::OsgUnitSphere;
 
 OsgSphereRepresentation::OsgSphereRepresentation(const std::string& name) :
 	Representation(name),
-	SphereRepresentation(name),
 	OsgRepresentation(name),
+	SphereRepresentation(name),
 	m_sharedUnitSphere(getSharedUnitSphere())
 {
 	m_transform->addChild(m_sharedUnitSphere->getNode());

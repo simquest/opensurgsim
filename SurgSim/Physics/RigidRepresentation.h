@@ -43,7 +43,7 @@ public:
 	/// Destructor
 	virtual ~RigidRepresentation();
 
-
+	virtual RepresentationType getType() const override;
 
 	/// Set the initial parameters of the rigid representation
 	/// \param parameters The initial parameters

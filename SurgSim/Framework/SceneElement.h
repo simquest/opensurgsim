@@ -38,7 +38,10 @@ class SceneElement
 {
 
 public:
-	explicit SceneElement(const std::string& name) : m_name(name)
+	explicit SceneElement(const std::string& name) :
+		m_name(name),
+		m_isInitialized(false),
+		m_isAwake(false)
 	{
 	}
 
@@ -90,7 +93,17 @@ public:
 
 	/// Gets the runtime.
 	/// \return	The runtime.
-	std::shared_ptr<Runtime> getRuntime();;
+	std::shared_ptr<Runtime> getRuntime();
+
+	bool isInitialized()
+	{
+		return m_isInitialized;
+	}
+
+	bool isAwake()
+	{
+		return m_isAwake;
+	}
 
 private:
 
@@ -99,6 +112,9 @@ private:
 	std::weak_ptr<Runtime> m_runtime;
 	virtual bool doInitialize() = 0;
 	virtual bool doWakeUp() = 0;
+
+	bool m_isInitialized;
+	bool m_isAwake;
 
 };
 

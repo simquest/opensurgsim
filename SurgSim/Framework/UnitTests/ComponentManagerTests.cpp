@@ -138,6 +138,6 @@ TEST(ComponentManagerTest, DoNotWakeupForeignComponents)
 
 	manager.testProcessComponents();
 
-	// invalid should not be awoken ... 
+	// invalid should not be awoken ...
 	EXPECT_FALSE(invalid->isAwake());
 }

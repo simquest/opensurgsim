@@ -28,8 +28,8 @@ using SurgSim::Graphics::OsgPlane;
 
 OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) :
 	Representation(name),
-	PlaneRepresentation(name),
 	OsgRepresentation(name),
+	PlaneRepresentation(name),
 	m_sharedPlane(getSharedPlane())
 {
 	m_transform->addChild(m_sharedPlane->getNode());

@@ -96,17 +96,17 @@ public:
 private:
 	/// Specific data associated to this constraint
 	std::shared_ptr<ConstraintData> m_data;
-	
+
 	/// Pair of implementations defining the 2 sides of the constraint
 	std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>> m_implementations;
 	std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> m_localizations;
-	
+
 	/// The degrees of freedom that this constraint has
 	unsigned int m_numDof;
 
 	/// The type of this constraint
 	SurgSim::Math::MlcpConstraintType m_constraintType;
-	
+
 	/// Builds subset of an Mlcp physics problem associated to this constraint user-defined call for extra treatment
 	/// \param dt The time step
 	/// \param data The data specific to this constraint
