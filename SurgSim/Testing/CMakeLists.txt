@@ -36,9 +36,7 @@ surgsim_add_library(
 
 target_link_libraries(SurgSimTesting SurgSimFramework ${Boost_LIBRARIES})
 
+add_subdirectory(MlcpIO)
 if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
-
-
-
