@@ -107,7 +107,7 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 
 	/// Number of times to step the capsule position and radius from start to end.
 	/// This number of steps will be done in 1 second.
-	int numSteps = 5;
+	int numSteps = 100;
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();

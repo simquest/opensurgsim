@@ -60,9 +60,9 @@ void OsgCapsuleRepresentation::setRadius(double radius)
 {
 	m_scale.x() = radius;
 	//m_transform->setScale(osg::Vec3d(radius, m_scale.y(), radius));
-	m_PatSphere1->setScale(osg::Vec3d(radius, m_scale.y(), radius));
-	m_PatSphere2->setScale(osg::Vec3d(radius, m_scale.y(), radius));
-
+	m_PatCylinder->setScale(osg::Vec3d(radius, m_scale.y(), radius));
+	m_PatSphere1->setScale(osg::Vec3d(radius, radius, radius));
+	m_PatSphere2->setScale(osg::Vec3d(radius, radius, radius));
 }
 double OsgCapsuleRepresentation::getRadius() const
 {
@@ -72,8 +72,16 @@ double OsgCapsuleRepresentation::getRadius() const
 void OsgCapsuleRepresentation::setHeight(double height)
 {
 	m_scale.y() = height;
+	osg::Vec3d sphere1OldPosition = m_PatSphere1->getPosition();
+	osg::Vec3d sphere2OldPosition = m_PatSphere2->getPosition();
+
 	//m_transform->setScale(osg::Vec3d(m_scale.x(), height, m_scale.x()));
 	m_PatCylinder->setScale(osg::Vec3d(m_scale.x(), height, m_scale.x()));
+
+	sphere1OldPosition.y() += height/2;
+	sphere2OldPosition.y() -= height/2;
+	m_PatSphere1->setPosition(sphere1OldPosition);
+	m_PatSphere2->setPosition(sphere2OldPosition);
 }
 double OsgCapsuleRepresentation::getHeight() const
 {
@@ -84,10 +92,18 @@ void OsgCapsuleRepresentation::setSize(double radius, double height)
 {
 	m_scale.x() = radius;
 	m_scale.y() = height;
+	osg::Vec3d sphere1OldPosition = m_PatSphere1->getPosition();
+	osg::Vec3d sphere2OldPosition = m_PatSphere2->getPosition();	
+	
 	//m_transform->setScale(osg::Vec3d(radius, height, radius));
-	m_PatCylinder->setScale(osg::Vec3d(m_scale.x(), height, m_scale.x()));
-	m_PatSphere1->setScale(osg::Vec3d(radius, m_scale.y(), radius));
-	m_PatSphere2->setScale(osg::Vec3d(radius, m_scale.y(), radius));
+	m_PatCylinder->setScale(osg::Vec3d(radius, height, radius));
+	m_PatSphere1->setScale(osg::Vec3d(radius, radius, radius));
+	m_PatSphere2->setScale(osg::Vec3d(radius, radius, radius));
+	
+	sphere1OldPosition.y() += height/2;
+	sphere2OldPosition.y() -= height/2;
+	m_PatSphere1->setPosition(sphere1OldPosition);
+	m_PatSphere2->setPosition(sphere2OldPosition);
 }
 void OsgCapsuleRepresentation::getSize(double* radius, double* height)
 {
@@ -98,10 +114,18 @@ void OsgCapsuleRepresentation::getSize(double* radius, double* height)
 void OsgCapsuleRepresentation::setSize(SurgSim::Math::Vector2d size)
 {
 	m_scale.set(size.x(), size.y());
+	osg::Vec3d sphere1OldPosition = m_PatSphere1->getPosition();
+	osg::Vec3d sphere2OldPosition = m_PatSphere2->getPosition();
+
 	//m_transform->setScale(osg::Vec3d(size.x(), size.y(), size.x()));
-	m_PatCylinder->setScale(osg::Vec3d(m_scale.x(), size.y(), m_scale.x()));
-	m_PatSphere1->setScale(osg::Vec3d(size.x(), m_scale.y(), size.x()));
-	m_PatSphere2->setScale(osg::Vec3d(size.x(), m_scale.y(), size.x()));
+	m_PatCylinder->setScale(osg::Vec3d(size.x(), size.y(), size.x()));
+	m_PatSphere1->setScale(osg::Vec3d(size.x(), size.x(), size.x()));
+	m_PatSphere2->setScale(osg::Vec3d(size.x(), size.x(), size.x()));
+
+	sphere1OldPosition.y() += size.y()/2;
+	sphere2OldPosition.y() -= size.y()/2;
+	m_PatSphere1->setPosition(sphere1OldPosition);
+	m_PatSphere2->setPosition(sphere2OldPosition);
 }
 SurgSim::Math::Vector2d OsgCapsuleRepresentation::getSize() const
 {
