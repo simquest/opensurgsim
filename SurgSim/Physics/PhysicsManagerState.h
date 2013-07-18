@@ -50,7 +50,7 @@ public:
 	/// \param	val The list of representations.
 	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val)
 	{
-		m_representations = val; 
+		m_representations = val;
 	}
 
 	/// Gets the representations.
@@ -111,9 +111,9 @@ private:
 	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
-	/// The local list of collision pairs 
+	/// The local list of collision pairs
 	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
-	
+
 	/// The local map of constraints
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
 	///@}
