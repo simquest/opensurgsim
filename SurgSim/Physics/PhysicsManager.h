@@ -36,8 +36,11 @@ namespace Physics
 {
 
 class Representation;
+class PreUpdate;
 class FreeMotion;
 class DcdCollision;
+class ContactConstraintGeneration;
+class PostUpdate;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -65,7 +68,7 @@ protected:
 	virtual bool doInitialize();
 	virtual bool doStartUp();
 	virtual bool doUpdate(double dt);
-
+	void initializeComputations(bool copyState);
 private:
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
@@ -73,8 +76,11 @@ private:
 
 	///@{
 	/// Steps to perform the physics update
+	std::unique_ptr<PreUpdate> m_preUpdateStep;
 	std::unique_ptr<FreeMotion> m_freeMotionStep;
-	std::unique_ptr<DcdCollision> m_dcdCollision;
+	std::unique_ptr<DcdCollision> m_dcdCollisionStep;
+	std::unique_ptr<ContactConstraintGeneration> m_constraintGenerationStep;
+	std::unique_ptr<PostUpdate> m_postUpdateStep;
 	///@}
 
 };
