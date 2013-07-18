@@ -47,7 +47,10 @@ class ContactConstraintGeneration : public Computation
 {
 public:
 	/// Constructor
-	ContactConstraintGeneration();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit ContactConstraintGeneration(bool doCopyState = false);
+	
+	/// Destructor
 	~ContactConstraintGeneration();
 
 private:
@@ -59,7 +62,7 @@ private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
 	/// Overriden function from Computation, the actual work is done here
-	///  \param	dt   	The time passed from the last update in seconds.
+	/// \param	dt		The time passed from the last update in seconds.
 	/// \param	state	The physics state.
 	/// \return	The changed state of the, depending on the setting of doCopyState this is either the same instance
 	/// 		or a copied instance of the physics state.

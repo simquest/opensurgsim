@@ -24,7 +24,7 @@ namespace SurgSim
 namespace Physics
 {
 
-PostUpdate::PostUpdate()
+PostUpdate::PostUpdate(bool doCopyState) : Computation(doCopyState)
 {}
 
 PostUpdate::~PostUpdate()
