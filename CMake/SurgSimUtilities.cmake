@@ -305,7 +305,7 @@ set(CPPLINT_DEFAULT_FILTER_LIST
 	# (it claims <unordered_map> is a C header!?):
 	-build/include_order
 	# things disallowed by Google's coding standards, but not ours:
-	-runtime/rtti
+	-runtime/rtti -readability/streams
 )
 string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")
@@ -320,7 +320,7 @@ mark_as_advanced(SURGSIM_CPPLINT_FILTERS)
 # Run cpplint (from Google's coding standards project) on specified files.
 #
 # Note the use of optional arguments:
-#   surgsim_run_cpplint(<testname> [<file>...])
+#   surgsim_run_cpplint(<testname> [<file|arg>...])
 #
 macro(surgsim_run_cpplint TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
@@ -339,7 +339,6 @@ endmacro()
 # files in the current directory and all of its subdirectories.
 macro(surgsim_cpplint_this_tree TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
-		file(GLOB_RECURSE ALL_CXX_SOURCE_FILES *.h *.cpp)
-		surgsim_run_cpplint("${TARGET}" ${ALL_CXX_SOURCE_FILES})
+		surgsim_run_cpplint("${TARGET}" "--traverse" "${CMAKE_CURRENT_SOURCE_DIR}")
 	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 endmacro()
