@@ -83,7 +83,7 @@ void ComponentManager::processComponents()
 bool ComponentManager::executeInitialization()
 {
 	// Please note that the implementation of this function needs to mirror processComponents()
-	// this function is called at startup whereas the other is called during the update call. 
+	// this function is called at startup whereas the other is called during the update call.
 
 	// Call BasicThread initialize to do the initialize and startup call
 	bool success = BasicThread::executeInitialization();

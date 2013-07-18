@@ -20,6 +20,9 @@
 #include <vector>
 #include <unordered_map>
 
+#include <SurgSim/Physics/MlcpPhysicsProblem.h>
+#include <SurgSim/Physics/MlcpPhysicsSolution.h>
+
 namespace SurgSim
 {
 namespace Physics
@@ -89,6 +92,16 @@ public:
 		return m_constraints[type];
 	}
 
+	MlcpPhysicsProblem& getMlcpProblem()
+	{
+		return m_mlcpPhysicsProblem;
+	}
+
+	MlcpPhysicsSolution& getMlcpSolution()
+	{
+		return m_mlcpPhysicsSolution;
+	}
+
 private:
 
 	///@{
@@ -104,6 +117,11 @@ private:
 	/// The local map of constraints
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
 	///@}
+	/// Mlcp problem for this Physics Manager State
+	MlcpPhysicsProblem m_mlcpPhysicsProblem;
+
+	/// Mlcp solution for this Physics Manager State
+	MlcpPhysicsSolution m_mlcpPhysicsSolution;
 };
 
 }; // Physics
