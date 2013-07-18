@@ -60,10 +60,10 @@ public:
 	/// \param [out] dataGroup The location to write the data.  The pointer must be non-null.
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
-	/// Overriden from Component, do nothing
+	/// Overridden from Component, do nothing
 	virtual bool doInitialize();
 
-	/// Overriden from Component, do nothing
+	/// Overridden from Component, do nothing
 	virtual bool doWakeUp();
 
 	/// Gets device name.
