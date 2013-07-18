@@ -22,6 +22,7 @@
 #include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/ContactConstraintGeneration.h>
+#include <SurgSim/Physics/SolveMlcp.h>
 #include <SurgSim/Physics/PostUpdate.h>
 
 #include <SurgSim/Framework/Log.h>
@@ -82,6 +83,7 @@ bool PhysicsManager::doUpdate(double dt)
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
 	stateList.push_back(m_dcdCollisionStep->update(dt, stateList.back()));
 	stateList.push_back(m_constraintGenerationStep->update(dt, stateList.back()));
+	stateList.push_back(m_solveMlcpStep->update(dt, stateList.back()));
 	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
 
 	return true;
@@ -93,6 +95,7 @@ void PhysicsManager::initializeComputations(bool copyState)
 	m_freeMotionStep.reset(new FreeMotion(copyState));
 	m_dcdCollisionStep.reset(new DcdCollision(copyState));
 	m_constraintGenerationStep.reset(new ContactConstraintGeneration(copyState));
+	m_solveMlcpStep.reset(new SolveMlcp(copyState));
 	m_postUpdateStep.reset(new PostUpdate(copyState));
 }
 
