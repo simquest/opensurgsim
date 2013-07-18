@@ -295,6 +295,10 @@ if __name__ == '__main__':
       ok = False
 
   if args.do_cpplint:
+    # TODO(advornik): Eventually, the file list will grow so long that
+    # we start running into the OS arg list limits, and we will need
+    # to start splitting it into several separate invocations of
+    # cpplint.  But we don't have that problem yet.
     if not run_cpplint(args.cpplint_script, args.cpplint_filter,
                        filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
                               args.files)):
