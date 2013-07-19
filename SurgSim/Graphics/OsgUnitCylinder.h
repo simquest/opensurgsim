@@ -39,7 +39,7 @@ public:
 		osg::ref_ptr<osg::Cylinder> unitCylinder = new osg::Cylinder(osg::Vec3(0.0, 0.0, 0.0), 1.0, 1.0);
 		osg::ref_ptr<osg::ShapeDrawable> drawable = new osg::ShapeDrawable(unitCylinder);
 		m_geode->addDrawable(drawable);
-		m_geode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+		m_geode->getOrCreateStateSet()->setMode(GL_RESCALE_NORMAL, osg::StateAttribute::ON);
 	}
 
 	/// Returns the root OSG node for the plane to be inserted into the scene-graph
