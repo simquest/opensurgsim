@@ -131,12 +131,6 @@ SurgSim::Math::Vector2d OsgCapsuleRepresentation::getSize() const
 {
 	return SurgSim::Math::Vector2d(m_scale._v);
 }
-/*
-std::shared_ptr<OsgUnitCapsule> OsgCapsuleRepresentation::getSharedUnitCapsule()
-{
-	static SurgSim::Framework::SharedInstance<OsgUnitCapsule> shared;
-	return shared.get();
-}*/
 
 std::shared_ptr<OsgUnitCylinder> OsgCapsuleRepresentation::getSharedUnitCylinder()
 {

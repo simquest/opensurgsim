@@ -107,7 +107,7 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 
 	/// Number of times to step the capsule position and radius from start to end.
 	/// This number of steps will be done in 1 second.
-	int numSteps = 100;
+	int numSteps = 10;
 
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
@@ -185,7 +185,7 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 		}
 		setterType = (setterType + 1) % BoxSetterTypeCount;
 		/// The total number of steps should complete in 1 second
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(10000 / numSteps));
 	}
 
 	runtime->stop();
