@@ -154,6 +154,68 @@ void RigidRepresentation::afterUpdate(double dt)
 	m_finalState = m_currentState;
 }
 
+void RigidRepresentation::applyDofCorrection(
+	double dt,
+	const Eigen::Block<SurgSim::Math::MlcpSolution::Vector>& dofCorrection)
+{
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::Matrix33d;
+	using SurgSim::Math::Quaterniond;
+
+	if (! isActive() || ! m_currentParameters.isValid())
+	{
+		return;
+	}
+
+	Vector3d          G = m_currentState.getPose().translation();
+	Vector3d         dG = m_currentState.getLinearVelocity();
+	Matrix33d         R = m_currentState.getPose().rotation();
+	Quaterniond       q = Quaterniond(R);
+	Vector3d          w = m_currentState.getAngularVelocity();
+
+	const SurgSim::Math::Vector3d& delta_dG = dofCorrection.block(0,0,3,1);
+	const SurgSim::Math::Vector3d& delta_w  = dofCorrection.block(3,0,3,1);
+	Quaterniond delta_dq = Quaterniond(delta_w[0],delta_w[1],delta_w[2],0.0) * q;
+	delta_dq.coeffs() *= 0.5;
+
+	dG += delta_dG;
+	w  += delta_w;
+	m_currentState.setLinearVelocity(dG);
+	m_currentState.setAngularVelocity(w);
+
+	// Integrate the velocities to get the rigid representation pose
+	{
+		// G(t+dt) = G(t) + dt. delta_dG(t+dt)
+		G += delta_dG * dt;
+		// q(t+dt) = q(t) + dt. delta_dq(t+dt)
+		q.coeffs() += delta_dq.coeffs() * dt;
+		// Normalize the quaternion to make sure we do have a rotation
+		q.normalize();
+	}
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(q, G));
+
+	// Compute the global inertia matrix with the current state
+	updateGlobalInertiaMatrices(m_currentState);
+
+	// If something went wrong, we deactivate the representation
+	bool condition = SurgSim::Math::isValid(G);
+	condition &= SurgSim::Math::isValid(q);
+	condition &= fabs(1.0 - q.norm()) < 1e-3;
+	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
+		" deactivated and reset because:" << std::endl << "m_G=(" <<
+		G[0] << "," << G[1] << "," << G[2] << ") " <<
+		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
+		"|q| after normalization="<< q.norm() << std::endl;
+	if (! condition)
+	{
+		resetState();
+		setIsActive(false);
+	}
+
+	// Prepare the compliance matrix
+	computeComplianceMatrix(dt);
+}
+
 void RigidRepresentation::computeComplianceMatrix(double dt)
 {
 	if (! isActive() || ! m_currentParameters.isValid())
