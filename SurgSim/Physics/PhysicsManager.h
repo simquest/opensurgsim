@@ -55,7 +55,6 @@ public:
 
 	friend class PhysicsManagerTest;
 
-
 protected:
 
 	///@{
@@ -65,10 +64,12 @@ protected:
 	///@}
 
 	///@{
-	/// Overridden from ComponentManager
-	virtual bool doInitialize();
-	virtual bool doStartUp();
-	virtual bool doUpdate(double dt);
+	/// Overridden from BasicThread
+	virtual bool doInitialize() override;
+	virtual bool doStartUp() override;
+	virtual bool doUpdate(double dt) override;
+	///@}
+
 	void initializeComputations(bool copyState);
 private:
 
