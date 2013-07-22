@@ -168,7 +168,7 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 		}
 }
 
-TEST(ContactCalculationTests, SperePlaneCalculation)
+TEST(ContactCalculationTests, SpherePlaneCalculation)
 {
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
