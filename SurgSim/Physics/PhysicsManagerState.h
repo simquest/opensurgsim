@@ -38,48 +38,49 @@ enum ConstraintGroupType
 	CONSTRAINT_GROUP_TYPE_COUNT
 };
 
-template <class T>
-class Mapping
-{
-public:
-	Mapping(){}
-
-	/// Clear the mapping
-	void clear()
-	{
-		m_indexMapping.clear();
-	}
-
-	/// Sets the key/value (add an entry if the key is not found, change the value otherwise)
-	void setValue(const T* key, int value)
-	{
-		typename std::unordered_map<const T*, int>::iterator found = m_indexMapping.find(key);
-		if (found == m_indexMapping.end())
-		{
-			m_indexMapping.insert(std::make_pair(key, value));
-		}
-		else
-		{
-			(*found).second = value;
-		}
-	}
-
-	/// Gets the value from a given key
-	int getValue(const T* key) const
-	{
-		typename std::unordered_map<const T*, int>::const_iterator returnValue = m_indexMapping.find(key);
-		return (returnValue == m_indexMapping.end() ? -1 : (*returnValue).second);
-	}
-
-private:
-
-	/// The index mapping data structure
-	std::unordered_map<const T*, int> m_indexMapping;
-};
-
 class PhysicsManagerState
 {
 public:
+
+	template <class T>
+	class Mapping
+	{
+	public:
+		Mapping(){}
+
+		/// Clear the mapping
+		void clear()
+		{
+			m_indexMapping.clear();
+		}
+
+		/// Sets the key/value (add an entry if the key is not found, change the value otherwise)
+		void setValue(const T* key, int value)
+		{
+			typename std::unordered_map<const T*, int>::iterator found = m_indexMapping.find(key);
+			if (found == m_indexMapping.end())
+			{
+				m_indexMapping.insert(std::make_pair(key, value));
+			}
+			else
+			{
+				(*found).second = value;
+			}
+		}
+
+		/// Gets the value from a given key
+		int getValue(const T* key) const
+		{
+			typename std::unordered_map<const T*, int>::const_iterator returnValue = m_indexMapping.find(key);
+			return (returnValue == m_indexMapping.end() ? -1 : (*returnValue).second);
+		}
+
+	private:
+
+		/// The index mapping data structure
+		std::unordered_map<const T*, int> m_indexMapping;
+	};
+
 
 	/// Constructor
 	PhysicsManagerState() {}

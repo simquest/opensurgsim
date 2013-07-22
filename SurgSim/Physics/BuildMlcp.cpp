@@ -47,12 +47,12 @@ std::shared_ptr<PhysicsManagerState>
 	unsigned int numDof = 0;
 
 	// Calculate numAtomicConstraint and numConstraint
-	//for (int constraintType = PhysicsManagerState::CONSTRAINT_TYPE_APPLICATION;
-	//	constraintType < PhysicsManagerState::CONSTRAINT_TYPE_MAX;
-	//	constraintType++)
+	for (int constraintType = CONSTRAINT_GROUP_TYPE_CONTACT;
+		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
+		constraintType++)
 	{
-		//auto constrainType = static_cast<PhysicsManagerState::ConstraintType>(constraintType);
-		auto const constraints = result->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT);
+		ConstraintGroupType constraintGroupType = static_cast<ConstraintGroupType>(constraintType);
+		auto const constraints = result->getConstraintGroup(constraintGroupType);
 		for (auto it = constraints.begin(); it != constraints.end(); it++)
 		{
 			numAtomicConstraint += (*it)->getNumDof();
@@ -89,12 +89,12 @@ std::shared_ptr<PhysicsManagerState>
 
 	// Fill up the Mlcp problem
 	unsigned int constraintId = 0;
-	//for (int constraintType = PhysicsManagerState::CONSTRAINT_TYPE_APPLICATION;
-	//	constraintType < PhysicsManagerState::CONSTRAINT_TYPE_MAX;
-	//	constraintType++)
+	for (int constraintType = CONSTRAINT_GROUP_TYPE_CONTACT;
+		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
+		constraintType++)
 	{
-		//auto constrainType = static_cast<PhysicsManagerState::ConstraintType>(constraintType);
-		auto const constraints = result->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT);
+		ConstraintGroupType constraintGroupType = static_cast<ConstraintGroupType>(constraintType);
+		auto const constraints = result->getConstraintGroup(constraintGroupType);
 		for (auto it = constraints.begin(); it != constraints.end(); it++)
 		{
 			int indexConstraint = result->getConstraintsMapping().getValue((*it).get());
@@ -108,7 +108,7 @@ std::shared_ptr<PhysicsManagerState>
 			std::shared_ptr<Localization> localization1 = (*it)->getLocalizations().second;
 			SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side[0]";
 			SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side[1]";
-			const Mapping<Representation>& mapping = result->getRepresentationsMapping();
+			const PhysicsManagerState::Mapping<Representation>& mapping = result->getRepresentationsMapping();
 			int indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
 			int indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
 			SURGSIM_ASSERT(indexRepresentation0 >= 0) << "Index for representation 0 is invalid: " <<

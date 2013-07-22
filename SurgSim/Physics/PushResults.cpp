@@ -48,12 +48,12 @@ std::shared_ptr<PhysicsManagerState>
 	// 2nd step
 	// Push the dof displacement correction to all representation, using their assigned index
 	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
-	auto it = representations.begin();
-	auto itEnd = representations.end();
-	for (; it != itEnd; ++it)
+	auto const itEnd = representations.end();
+	for (auto it = representations.begin(); it != itEnd; ++it)
 	{
 		int index = result->getRepresentationsMapping().getValue((*it).get());
 		SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << (*it)->getName() << std::endl;
+		//(*it)->applyDofCorrection(dt, dofCorrection.block(index, 0, (*it)->getNumDof(), 1));
 		(*it)->applyDofCorrection(dt, dofCorrection.block(index, 0, (*it)->getNumDof(), 1));
 	}
 
