@@ -55,6 +55,6 @@ endif(SURGSIM_TESTS_BUILD_EIGEN)
 
 set(LIBS SurgSimMath SurgSimFramework MlcpTestIO ${Boost_LIBRARIES} gtest)
 
-file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/MlcpIO/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimMathTest)
