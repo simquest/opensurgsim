@@ -36,7 +36,6 @@ namespace SurgSim
 namespace Graphics
 {
 
-//class OsgUnitCapsule;
 class OsgUnitCylinder;
 class OsgUnitSphere;
 
@@ -49,22 +48,26 @@ public:
 	explicit OsgCapsuleRepresentation(const std::string& name);
 
 	/// Sets the radius of the capsule
+	/// \param radius Radius of the capsule
 	virtual void setRadius(double radius);
 	/// Returns the radius of the capsule
+	/// \return Radius along X-axis and Z-axis of the capsule
 	virtual double getRadius() const;
 
 	/// Sets the height of the capsule
+	/// \param height Height of the capsule
 	virtual void setHeight(double height);
 	/// Returns the height of the capsule
+	/// \return Height along Y-axis of the capsule
 	virtual double getHeight() const;
 
 	/// Sets the size of the capsule
-	/// \param radius Size along X-axis of the capsule
+	/// \param radius Size along X-axis and Z-axis of the capsule
 	/// \param height Size along Y-axis of the capsule
 	virtual void setSize(double radius, double height);
 	/// Gets the size of the capsule
-	/// \param radius Reference to store the size along X-axis of the capsule
-	/// \param height Reference to store the size along Y-axis of the capsule
+	/// \param [out] radius Variable to receive the size along X-axis and Z-axis of the capsule
+	/// \param [out] height Variable to receive the size along Y-axis of the capsule
 	virtual void getSize(double* radius, double* height);
 
 	/// Sets the size of the capsule
@@ -75,15 +78,15 @@ public:
 	virtual SurgSim::Math::Vector2d getSize() const;
 
 private:
-	/// The OSG Capsule shape is a unit Capsule and this transform scales it to the size set.
+	/// The OSG Capsule shape consist of one unit cylinder and two unit spheres
+	/// This transform scales it to the size set.
 	osg::Vec2d m_scale;
 
-	/// Shared unit Capsule, so that the geometry can be instanced rather than having multiple copies.
+	/// Shared capsule, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitCylinder> m_sharedUnitCylinder;
 	std::shared_ptr<OsgUnitSphere> m_sharedUnitSphere1;
 	std::shared_ptr<OsgUnitSphere> m_sharedUnitSphere2;
-	/// Returns the shared unit capsule
-	//static std::shared_ptr<OsgUnitCapsule> getSharedUnitCapsule();
+	/// Returns the shared capsule
 	static std::shared_ptr<OsgUnitCylinder> getSharedUnitCylinder();
 	static std::shared_ptr<OsgUnitSphere> getSharedUnitSphere1();
 	static std::shared_ptr<OsgUnitSphere> getSharedUnitSphere2();

@@ -60,10 +60,6 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
     double startHeight1 = 0.011;
     /// Final capsule 1 sizeY;
     double endHeight1 = 0.02;
-    /// Initial capsule 1 sizeZ;
-    double startSizeZ1 = 0.021;
-    /// Final capsule 1 sizeZ;
-    double endSizeZ1 = 0.03;
     /// Initial capsule 1 angleX;
     double startAngleX1 = 0.0;
     /// Final capsule 1 angleX;
@@ -88,10 +84,6 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
     double startHeight2 = 0.011;
     /// Final capsule 2 sizeX;
     double endHeight2 = 0.02;
-    /// Initial capsule 2 sizeX;
-    double startSizeZ2 = 0.021;
-    /// Final capsule 2 sizeX;
-    double endSizeZ2 = 0.03;
     /// Initial capsule 2 angleX;
     double startAngleX2 = -M_PI / 2.0;;
     /// Final capsule 2 angleX;

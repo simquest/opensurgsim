@@ -16,10 +16,8 @@
 
 
 #include <SurgSim/Graphics/OsgCapsuleRepresentation.h>
-
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-//#include <SurgSim/Graphics/OsgUnitCapsule.h>
 #include <SurgSim/Graphics/OsgUnitCylinder.h>
 #include <SurgSim/Graphics/OsgUnitSphere.h>
 
@@ -28,7 +26,6 @@
 #include <osg/ShapeDrawable>
 
 using SurgSim::Graphics::OsgCapsuleRepresentation;
-//using SurgSim::Graphics::OsgUnitCapsule;
 using SurgSim::Graphics::OsgUnitCylinder;
 using SurgSim::Graphics::OsgUnitSphere;
 

@@ -39,26 +39,6 @@ namespace SurgSim
 namespace Graphics
 {
 
-TEST(OsgCapsuleRepresentationTests, InitTest)
-{
-	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
-		std::make_shared<OsgCapsuleRepresentation>("test name");});
-
-	std::shared_ptr<Representation> representation = std::make_shared<OsgCapsuleRepresentation>("test name");
-	EXPECT_EQ("test name", representation->getName());
-}
-
-TEST(OsgCapsuleRepresentationTests, VisibilityTest)
-{
-	std::shared_ptr<Representation> representation = std::make_shared<OsgCapsuleRepresentation>("test name");
-
-	representation->setVisible(true);
-	EXPECT_TRUE(representation->isVisible());
-
-	representation->setVisible(false);
-	EXPECT_FALSE(representation->isVisible());
-}
-
 TEST(OsgCapsuleRepresentationTests, RadiusTest)
 {
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
@@ -115,78 +95,6 @@ TEST(OsgCapsuleRepresentationTests, SizeVectordTest)
 
 	capsuleRepresentation->setSize(randomSize);
 	EXPECT_EQ(randomSize, capsuleRepresentation->getSize());
-}
-
-TEST(OsgCapsuleRepresentationTests, PoseTest)
-{
-	std::shared_ptr<Representation> representation = std::make_shared<OsgCapsuleRepresentation>("test name");
-
-	{
-		SCOPED_TRACE("Check Initial Pose");
-		EXPECT_TRUE(representation->getInitialPose().isApprox(RigidTransform3d::Identity()));
-		EXPECT_TRUE(representation->getPose().isApprox(RigidTransform3d::Identity()));
-	}
-
-	RigidTransform3d initialPose;
-	{
-		SCOPED_TRACE("Set Initial Pose");
-		initialPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setInitialPose(initialPose);
-		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
-	}
-
-	{
-		SCOPED_TRACE("Set Current Pose");
-		RigidTransform3d currentPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setPose(currentPose);
-		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getPose().isApprox(currentPose));
-	}
-
-	{
-		SCOPED_TRACE("Change Initial Pose");
-		initialPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
-		representation->setInitialPose(initialPose);
-		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
-		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
-	}
-}
-
-TEST(OsgCapsuleRepresentationTests, MaterialTest)
-{
-	std::shared_ptr<OsgCapsuleRepresentation> osgRepresentation =
-		std::make_shared<OsgCapsuleRepresentation>("test name");
-	std::shared_ptr<Representation> representation = osgRepresentation;
-
-	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
-	std::shared_ptr<Material> material = osgMaterial;
-	{
-		SCOPED_TRACE("Set material");
-		EXPECT_TRUE(representation->setMaterial(material));
-		EXPECT_EQ(material, representation->getMaterial());
-
-		osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
-		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
-		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
-		EXPECT_EQ(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should be the material's state set!";
-	}
-
-	{
-		SCOPED_TRACE("Clear material");
-		representation->clearMaterial();
-		EXPECT_EQ(nullptr, representation->getMaterial());
-
-		osg::Switch* switchNode = dynamic_cast<osg::Switch*>(osgRepresentation->getOsgNode().get());
-		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
-		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
-		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should have been cleared!";
-	}
 }
 
 };  // namespace Graphics
