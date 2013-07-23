@@ -18,20 +18,19 @@
 
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
-#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgCapsuleRepresentation.h>
-#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
+#include <SurgSim/Testing/MathUtilities.h>
 
 #include <gtest/gtest.h>
 
-#include <random>
-
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector2d;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::makeRigidTransform;
+using SurgSim::Testing::interpolate;
+
+namespace
+{
+	const double epsilon = 1e-10;
+};
 
 namespace SurgSim
 {
@@ -44,13 +43,15 @@ TEST(OsgCapsuleRepresentationTests, RadiusTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
-
-	double randomSize = distribution(generator);
-
-	capsuleRepresentation->setRadius(randomSize);
-	EXPECT_EQ(randomSize, capsuleRepresentation->getRadius());
+	double startRadius = 1.0;
+	double endRadius = 10.0;
+	double interpolatedRadius;
+	for (double t = 0; t < 100; ++t)
+	{
+		interpolatedRadius = interpolate(startRadius, endRadius, t/100);
+		capsuleRepresentation->setRadius(interpolatedRadius);
+		EXPECT_NEAR(capsuleRepresentation->getRadius(), interpolatedRadius, epsilon);
+	}
 }
 
 TEST(OsgCapsuleRepresentationTests, HeightTest)
@@ -58,13 +59,15 @@ TEST(OsgCapsuleRepresentationTests, HeightTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
-
-	double randomSize = distribution(generator);
-
-	capsuleRepresentation->setHeight(randomSize);
-	EXPECT_EQ(randomSize, capsuleRepresentation->getHeight());
+	double startHeight = 1.0;
+	double endHeight = 10.0;
+	double interpolatedHeight;
+	for (double t = 0; t < 100; ++t)
+	{
+		interpolatedHeight = interpolate(startHeight, endHeight, t/100);
+		capsuleRepresentation->setHeight(interpolatedHeight);
+		EXPECT_NEAR(capsuleRepresentation->getHeight(), interpolatedHeight, epsilon);
+	}
 }
 
 TEST(OsgCapsuleRepresentationTests, SizeTest)
@@ -72,15 +75,21 @@ TEST(OsgCapsuleRepresentationTests, SizeTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
-
-	double randomRadius = distribution(generator);
-	double randomHeight = distribution(generator);
-
-	capsuleRepresentation->setSize(randomRadius, randomHeight);
-	EXPECT_EQ(randomRadius, capsuleRepresentation->getRadius());
-	EXPECT_EQ(randomHeight, capsuleRepresentation->getHeight());
+	double startRadius = 1.0;
+	double endRadius = 10.0;
+	double startHeight = 1.0;
+	double endHeight = 10.0;
+	double interpolatedRadius, interpolatedHeight;
+	double radius, height;
+	for (double t = 0; t < 100; ++t)
+	{
+		interpolatedRadius = interpolate(startRadius, endRadius, t/100);
+		interpolatedHeight = interpolate(startHeight, endHeight, t/100);
+		capsuleRepresentation->setSize(interpolatedRadius, interpolatedHeight);
+		capsuleRepresentation->getSize(&radius, &height);
+		EXPECT_NEAR(radius, interpolatedRadius, epsilon);
+		EXPECT_NEAR(height, interpolatedHeight, epsilon);
+	}
 }
 
 TEST(OsgCapsuleRepresentationTests, SizeVectordTest)
@@ -88,13 +97,18 @@ TEST(OsgCapsuleRepresentationTests, SizeVectordTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
-
-	Vector2d randomSize(distribution(generator), distribution(generator));
-
-	capsuleRepresentation->setSize(randomSize);
-	EXPECT_EQ(randomSize, capsuleRepresentation->getSize());
+	double startRadius = 1.0;
+	double endRadius = 10.0;
+	double startHeight = 1.0;
+	double endHeight = 10.0;
+	Vector2d interpolation;
+	for (double t = 0; t < 100; ++t)
+	{
+		interpolation.x() = interpolate(startRadius, endRadius, t/100);
+		interpolation.y() = interpolate(startHeight, endHeight, t/100);
+		capsuleRepresentation->setSize(interpolation);
+		EXPECT_TRUE(capsuleRepresentation->getSize().isApprox(interpolation));
+	}
 }
 
 };  // namespace Graphics
