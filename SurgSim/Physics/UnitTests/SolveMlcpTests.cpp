@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include <memory>
+#include <string>
 
 #include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Physics/SolveMlcp.h>
@@ -38,9 +39,9 @@ TEST(SolveMlcpTest, CanConstruct)
 	ASSERT_NO_THROW({std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>();});
 }
 
-TEST(SolveMlcpTest, TestOriginalMlcp)
+static void testMlcp(std::string filename, double contactTolerance, double solverPrecision, int maxIteration)
 {
-	std::shared_ptr<MlcpTestData> data = loadTestData("mlcpOriginalTest.txt");
+	std::shared_ptr<MlcpTestData> data = loadTestData(filename);
 	ASSERT_NE(nullptr, data) << "Could not load data file 'mlcpOriginalTest.txt'";
 
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
@@ -48,9 +49,9 @@ TEST(SolveMlcpTest, TestOriginalMlcp)
 	std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>(false);
 	double dt = 1e-3;
 
-	solveMlcpComputation->setContactTolerance(2e-4);
-	solveMlcpComputation->setSolverPrecision(1e-4);
-	solveMlcpComputation->setMaxIterations(30);
+	solveMlcpComputation->setContactTolerance(contactTolerance);
+	solveMlcpComputation->setSolverPrecision(solverPrecision);
+	solveMlcpComputation->setMaxIterations(maxIteration);
 
 	// Copy the MlcpProblem data over into the input state
 	state->getMlcpProblem().A = data->problem.A;
@@ -66,7 +67,14 @@ TEST(SolveMlcpTest, TestOriginalMlcp)
 	state = solveMlcpComputation->update(dt, state);
 
 	// Compare the mlcp solution with the expected one
-	EXPECT_TRUE(state->getMlcpSolution().x.isApprox(data->expectedLambda, epsilon));
+	EXPECT_TRUE(state->getMlcpSolution().x.isApprox(data->expectedLambda, epsilon)) <<
+		"lambda:" << std::endl << state->getMlcpSolution().x.transpose() << std::endl <<
+		"expected:" << std::endl << data->expectedLambda.transpose() << std::endl;
+}
+
+TEST(SolveMlcpTest, TestOriginalMlcp)
+{
+	testMlcp("mlcpOriginalTest.txt", 2e-4, 1e-4, 30);
 }
 
 TEST(SolveMlcpTest, TestSequenceMlcps)
@@ -77,35 +85,6 @@ TEST(SolveMlcpTest, TestSequenceMlcps)
 		scopeName << "Testing Mlcp " << i;
 		SCOPED_TRACE(scopeName.str());
 
-		std::shared_ptr<MlcpTestData> data = loadTestData(getTestFileName("mlcpTest", i, ".txt"));
-		ASSERT_NE(nullptr, data) << "Could not load data file '"<< getTestFileName("mlcpTest", i, ".txt") <<"'";
-
-		std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
-		// default parameter explicitly marked just to be clear, we are working in 1 instance of the state, no copy.
-		std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>(false);
-		double dt = 1e-3;
-
-		solveMlcpComputation->setContactTolerance(1e-9);
-		solveMlcpComputation->setSolverPrecision(1e-9);
-		solveMlcpComputation->setMaxIterations(100);
-
-		// Copy the MlcpProblem data over into the input state
-		state->getMlcpProblem().A = data->problem.A;
-		state->getMlcpProblem().b = data->problem.b;
-		state->getMlcpProblem().constraintTypes = data->problem.constraintTypes;
-		state->getMlcpProblem().mu = data->problem.mu;
-
-		// Allocate the MlcpSolution to store the output
-		state->getMlcpSolution().x.resize(state->getMlcpProblem().b.size());
-		state->getMlcpSolution().x.setZero();
-
-		// Solve the mlcp problem and store the solution in the output state
-		state = solveMlcpComputation->update(dt, state);
-
-		// Compare the mlcp solution with the expected one
-		EXPECT_TRUE(state->getMlcpSolution().x.isApprox(data->expectedLambda)) <<
-			"lambda:" << std::endl << state->getMlcpSolution().x.transpose() << std::endl <<
-			"expected:" << std::endl << data->expectedLambda.transpose() << std::endl;
-
+		testMlcp(getTestFileName("mlcpTest", i, ".txt"), 1e-9, 1e-9, 100);
 	}
 }
