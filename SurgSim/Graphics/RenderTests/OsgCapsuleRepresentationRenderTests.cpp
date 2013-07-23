@@ -43,52 +43,42 @@ namespace SurgSim
 namespace Graphics
 {
 
-
-TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
+struct OsgCapsuleRepresentationRenderTests : public ::testing::Test
 {
-    /// Initial positoin of capsule 1
-    Vector3d startPosition1(-0.1, 0.0, -0.2);
-    /// Final position of capsule 1
-    Vector3d endPosition1(0.1, 0.0, -0.2);
-	/// Initial size (radius, hegiht) of capsule 1
-	Vector2d startSize1(0.001, 0.011);
-	/// Final size (radius, hegiht) of capsule 1
-	Vector2d endSize1(0.01, 0.02);
-	/// Initial angles (X, Y, Z) of the capsule 1
-	Vector3d startAngles1(0.0, 0.0, 0.0);
-	/// Final angles (X, Y, Z) of the capsule 1
-	Vector3d endAngles1(-M_PI / 4.0, -M_PI / 4.0, -M_PI / 4.0);
+	virtual void SetUp()
+	{
+		runtime = std::make_shared<SurgSim::Framework::Runtime>();
+		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-    /// Initial position capsule 2
-    Vector3d startPosition2(0.0, -0.1, -0.2);
-    /// Final position capsule 2
-    Vector3d endPosition2(0.0, 0.1, -0.2);
-	/// Initial size (radius, hegiht) of capsule 2
-	Vector2d startSize2(0.001, 0.01);
-	/// Final size (radius, hegiht) of capsule 2
-	Vector2d endSize2(0.011, 0.02);
-	/// Initial angles (X, Y, Z) of the capsule 2
-	Vector3d startAngles2(-M_PI / 2.0, -M_PI / 2.0, -M_PI / 2.0);
-	/// Final angles (X, Y, Z) of the capsule 2
-	Vector3d endAngles2(M_PI, M_PI, M_PI);
+		runtime->addManager(manager);
 
-    /// Number of times to step the capsule position and radius from start to end.
-    /// This number of steps will be done in 1 second.
-    int numSteps = 100;
+		scene = std::make_shared<SurgSim::Framework::Scene>();
+		runtime->setScene(scene);
 
-    std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+		viewElement = std::make_shared<OsgViewElement>("view element");
+		scene->addSceneElement(viewElement);
 
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-    runtime->addManager(manager);
+	}
 
-    std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-    runtime->setScene(scene);
+	virtual void TearDown()
+	{
+		runtime->stop();
+	}
 
-    /// Add a graphics view element to the scene
-    std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");
-    scene->addSceneElement(viewElement);
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
+	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
+	std::shared_ptr<SurgSim::Framework::Scene> scene;
+	std::shared_ptr<OsgViewElement> viewElement;
 
-    /// Add the two capsule representation to the view element so we don't need to make another concrete scene element
+protected:
+
+};
+
+
+
+TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
+{
+	/// Add the two capsule representation to the view element
     std::shared_ptr<CapsuleRepresentation> capsuleRepresentation1 =
         std::make_shared<OsgCapsuleRepresentation>("capsule representation 1");
     viewElement->addComponent(capsuleRepresentation1);
@@ -107,8 +97,38 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
                         // Add more setter types above this line.
                         BoxSetterTypeCount};
     int setterType = 0;
+
     Vector2d capsule1Size, capsule2Size;
 
+	/// Initial positoin of capsule 1
+    Vector3d startPosition1(-0.1, 0.0, -0.2);
+    /// Final position of capsule 1
+    Vector3d endPosition1(0.1, 0.0, -0.2);
+	/// Initial size (radius, hegiht) of capsule 1
+	Vector2d startSize1(0.001, 0.011);
+	/// Final size (radius, hegiht) of capsule 1
+	Vector2d endSize1(0.01, 0.02);
+	/// Initial angles (X, Y, Z) of the capsule 1
+	Vector3d startAngles1(0.0, 0.0, 0.0);
+	/// Final angles (X, Y, Z) of the capsule 1
+	Vector3d endAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
+
+    /// Initial position capsule 2
+    Vector3d startPosition2(0.0, -0.1, -0.2);
+    /// Final position capsule 2
+    Vector3d endPosition2(0.0, 0.1, -0.2);
+	/// Initial size (radius, hegiht) of capsule 2
+	Vector2d startSize2(0.001, 0.01);
+	/// Final size (radius, hegiht) of capsule 2
+	Vector2d endSize2(0.011, 0.02);
+	/// Initial angles (X, Y, Z) of the capsule 2
+	Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2);
+	/// Final angles (X, Y, Z) of the capsule 2
+	Vector3d endAngles2(M_PI, M_PI, M_PI);
+
+	/// Number of times to step the capsule position and radius from start to end.
+    /// This number of steps will be done in 1 second.
+    int numSteps = 100;
     for (int i = 0; i < numSteps; ++i)
     {
         /// Calculate t in [0.0, 1.0]
@@ -157,7 +177,6 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
         boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
     }
 
-    runtime->stop();
 }
 
 };  // namespace Graphics
