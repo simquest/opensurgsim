@@ -34,18 +34,18 @@ OsgCylinderRepresentation::OsgCylinderRepresentation(const std::string& name) :
 	OsgRepresentation(name),
 	m_scale(1.0, 1.0),
 	m_sharedUnitCylinder(getSharedUnitCylinder()),
-	m_PatCylinder(new osg::PositionAttitudeTransform)
+	m_patCylinder(new osg::PositionAttitudeTransform)
 {
-	m_PatCylinder->addChild(m_sharedUnitCylinder->getNode());
-	m_PatCylinder->setAttitude(osg::Quat(osg::PI_2, osg::Vec3d(1.0, 0.0, 0.0)));
-	m_transform->addChild(m_PatCylinder);
+	m_patCylinder->addChild(m_sharedUnitCylinder->getNode());
+	m_patCylinder->setAttitude(osg::Quat(osg::PI_2, osg::Vec3d(1.0, 0.0, 0.0)));
+	m_transform->addChild(m_patCylinder);
 }
 
 
 void OsgCylinderRepresentation::setRadius(double radius)
 {
 	m_scale.x() = radius;
-	m_PatCylinder->setScale(osg::Vec3d(radius, radius, m_scale.y()));
+	m_patCylinder->setScale(osg::Vec3d(radius, radius, m_scale.y()));
 }
 double OsgCylinderRepresentation::getRadius() const
 {
@@ -55,7 +55,7 @@ double OsgCylinderRepresentation::getRadius() const
 void OsgCylinderRepresentation::setHeight(double height)
 {
 	m_scale.y() = height;
-	m_PatCylinder->setScale(osg::Vec3d(m_scale.x(), m_scale.x(), height));
+	m_patCylinder->setScale(osg::Vec3d(m_scale.x(), m_scale.x(), height));
 }
 double OsgCylinderRepresentation::getHeight() const
 {
@@ -66,7 +66,7 @@ void OsgCylinderRepresentation::setSize(double radius, double height)
 {
 	m_scale.x() = radius;
 	m_scale.y() = height;
-	m_PatCylinder->setScale(osg::Vec3d(radius, radius, height));
+	m_patCylinder->setScale(osg::Vec3d(radius, radius, height));
 }
 void OsgCylinderRepresentation::getSize(double* radius, double* height)
 {
@@ -77,7 +77,7 @@ void OsgCylinderRepresentation::getSize(double* radius, double* height)
 void OsgCylinderRepresentation::setSize(SurgSim::Math::Vector2d size)
 {
 	m_scale.set(size.x(), size.y());
-	m_PatCylinder->setScale(osg::Vec3d(size.x(), size.x(), size.y()));
+	m_patCylinder->setScale(osg::Vec3d(size.x(), size.x(), size.y()));
 }
 SurgSim::Math::Vector2d OsgCylinderRepresentation::getSize() const
 {
