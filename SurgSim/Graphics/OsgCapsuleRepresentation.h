@@ -20,10 +20,8 @@
 #include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <SurgSim/Framework/SharedInstance.h>
-#include <SurgSim/Math/RigidTransform.h>
 
 #include <osg/PositionAttitudeTransform>
-#include <osg/Switch>
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -39,7 +37,7 @@ namespace Graphics
 class OsgUnitCylinder;
 class OsgUnitSphere;
 
-/// OSG implementation of a graphics Capsule representation.
+/// OSG implementation of a graphics capsule representation.
 class OsgCapsuleRepresentation : public OsgRepresentation, public CapsuleRepresentation
 {
 public:
@@ -49,33 +47,33 @@ public:
 
 	/// Sets the radius of the capsule
 	/// \param radius Radius of the capsule
-	virtual void setRadius(double radius);
+	virtual void setRadius(double radius) override;
 	/// Returns the radius of the capsule
 	/// \return Radius along X-axis and Z-axis of the capsule
-	virtual double getRadius() const;
+	virtual double getRadius() const override;
 
 	/// Sets the height of the capsule
 	/// \param height Height of the capsule
-	virtual void setHeight(double height);
+	virtual void setHeight(double height) override;
 	/// Returns the height of the capsule
 	/// \return Height along Y-axis of the capsule
-	virtual double getHeight() const;
+	virtual double getHeight() const override;
 
 	/// Sets the size of the capsule
 	/// \param radius Size along X-axis and Z-axis of the capsule
 	/// \param height Size along Y-axis of the capsule
-	virtual void setSize(double radius, double height);
+	virtual void setSize(double radius, double height) override;
 	/// Gets the size of the capsule
 	/// \param [out] radius Variable to receive the size along X-axis and Z-axis of the capsule
 	/// \param [out] height Variable to receive the size along Y-axis of the capsule
-	virtual void getSize(double* radius, double* height);
+	virtual void getSize(double* radius, double* height) override;
 
 	/// Sets the size of the capsule
 	/// \param size Size of the capsule
-	virtual void setSize(SurgSim::Math::Vector2d size);
+	virtual void setSize(SurgSim::Math::Vector2d size) override;
 	/// Returns the radius of the capsule
 	/// \return Size of the capsule
-	virtual SurgSim::Math::Vector2d getSize() const;
+	virtual SurgSim::Math::Vector2d getSize() const override;
 
 private:
 	/// The OSG Capsule shape consist of one unit cylinder and two unit spheres
@@ -84,16 +82,14 @@ private:
 
 	/// Shared capsule, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitCylinder> m_sharedUnitCylinder;
-	std::shared_ptr<OsgUnitSphere> m_sharedUnitSphere1;
-	std::shared_ptr<OsgUnitSphere> m_sharedUnitSphere2;
-	/// Returns the shared capsule
+	std::shared_ptr<OsgUnitSphere> m_sharedUnitSphere;
+	/// Returns the shared geometry
 	static std::shared_ptr<OsgUnitCylinder> getSharedUnitCylinder();
-	static std::shared_ptr<OsgUnitSphere> getSharedUnitSphere1();
-	static std::shared_ptr<OsgUnitSphere> getSharedUnitSphere2();
+	static std::shared_ptr<OsgUnitSphere> getSharedUnitSphere();
 
-	osg::ref_ptr<osg::PositionAttitudeTransform> m_PatCylinder;
-	osg::ref_ptr<osg::PositionAttitudeTransform> m_PatSphere1;
-	osg::ref_ptr<osg::PositionAttitudeTransform> m_PatSphere2;
+	osg::ref_ptr<osg::PositionAttitudeTransform> m_patCylinder;
+	osg::ref_ptr<osg::PositionAttitudeTransform> m_patSphere1;
+	osg::ref_ptr<osg::PositionAttitudeTransform> m_patSphere2;
 };
 
 };  // namespace Graphics

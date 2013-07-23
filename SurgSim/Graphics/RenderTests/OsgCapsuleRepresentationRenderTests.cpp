@@ -22,22 +22,20 @@
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
+#include <SurgSim/Testing/MathUtilities.h>
 
 #include <gtest/gtest.h>
-
-#include <random>
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
+using SurgSim::Testing::interpolate;
 
 namespace SurgSim
 {
@@ -48,62 +46,39 @@ namespace Graphics
 
 TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 {
-    /// Initial capsule 1 position
+    /// Initial positoin of capsule 1
     Vector3d startPosition1(-0.1, 0.0, -0.2);
-    /// Final capsule 1 position
+    /// Final position of capsule 1
     Vector3d endPosition1(0.1, 0.0, -0.2);
-    /// Initial capsule 1 sizeX;
-    double startRadius1 = 0.001;
-    /// Final capsule 1 sizeX;
-    double endRadius1 = 0.01;
-    /// Initial capsule 1 sizeY;
-    double startHeight1 = 0.011;
-    /// Final capsule 1 sizeY;
-    double endHeight1 = 0.02;
-    /// Initial capsule 1 angleX;
-    double startAngleX1 = 0.0;
-    /// Final capsule 1 angleX;
-    double endAngleX1 = - M_PI / 4.0;
-    /// Initial capsule 1 angleY;
-    double startAngleY1 = 0.0;
-    /// Final capsule 1 angleY;
-    double endAngleY1 = - M_PI / 4.0;
-    /// Initial capsule 1 angleZ;
-    double startAngleZ1 = 0.0;
-    /// Final capsule 1 angleZ;
-    double endAngleZ1 = - M_PI / 4.0;
-    /// Initial capsule 2 position
+	/// Initial size (radius, hegiht) of capsule 1
+	Vector2d startSize1(0.001, 0.011);
+	/// Final size (radius, hegiht) of capsule 1
+	Vector2d endSize1(0.01, 0.02);
+	/// Initial angles (X, Y, Z) of the capsule 1
+	Vector3d startAngles1(0.0, 0.0, 0.0);
+	/// Final angles (X, Y, Z) of the capsule 1
+	Vector3d endAngles1(-M_PI / 4.0, -M_PI / 4.0, -M_PI / 4.0);
+
+    /// Initial position capsule 2
     Vector3d startPosition2(0.0, -0.1, -0.2);
-    /// Final capsule 2 position
+    /// Final position capsule 2
     Vector3d endPosition2(0.0, 0.1, -0.2);
-    /// Initial capsule 2 sizeX;
-    double startRadius2 = 0.001;
-    /// Final capsule 2 sizeX;
-    double endRadius2 = 0.01;
-    /// Initial capsule 2 sizeX;
-    double startHeight2 = 0.011;
-    /// Final capsule 2 sizeX;
-    double endHeight2 = 0.02;
-    /// Initial capsule 2 angleX;
-    double startAngleX2 = -M_PI / 2.0;;
-    /// Final capsule 2 angleX;
-    double endAngleX2 = M_PI;
-    /// Initial capsule 2 angleY;
-    double startAngleY2 = -M_PI / 2.0;;
-    /// Final capsule 2 angleY;
-    double endAngleY2 = M_PI;
-    /// Initial capsule 2 angleZ;
-    double startAngleZ2 = -M_PI / 2.0;;
-    /// Final capsule 2 angleZ;
-    double endAngleZ2 = M_PI;
+	/// Initial size (radius, hegiht) of capsule 2
+	Vector2d startSize2(0.001, 0.01);
+	/// Final size (radius, hegiht) of capsule 2
+	Vector2d endSize2(0.011, 0.02);
+	/// Initial angles (X, Y, Z) of the capsule 2
+	Vector3d startAngles2(-M_PI / 2.0, -M_PI / 2.0, -M_PI / 2.0);
+	/// Final angles (X, Y, Z) of the capsule 2
+	Vector3d endAngles2(M_PI, M_PI, M_PI);
 
     /// Number of times to step the capsule position and radius from start to end.
     /// This number of steps will be done in 1 second.
     int numSteps = 100;
 
     std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-    std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
 
+	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
     runtime->addManager(manager);
 
     std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -138,41 +113,43 @@ TEST(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
     {
         /// Calculate t in [0.0, 1.0]
         double t = static_cast<double>(i) / numSteps;
-        /// Interpolate position and radius
+        /// Interpolate position and angle
         capsuleRepresentation1->setPose(makeRigidTransform(
-            makeRotationQuaternion((1.0 - t) * startAngleX1 + t * endAngleX1,
-            Vector3d(1.0, 0.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleY1 + t * endAngleY1,
-            Vector3d(0.0, 1.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleZ1 + t * endAngleZ1,
-            Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition1 + t * endPosition1));
+            makeRotationQuaternion(interpolate(startAngles1.x(), endAngles1.x(), t), Vector3d(1.0, 0.0, 0.0)) *
+			makeRotationQuaternion(interpolate(startAngles1.y(), endAngles1.y(), t), Vector3d(0.0, 1.0, 0.0)) *
+			makeRotationQuaternion(interpolate(startAngles1.z(), endAngles1.z(), t), Vector3d(0.0, 0.0, 1.0)),
+			interpolate(startPosition1, endPosition1, t)));
         capsuleRepresentation2->setPose(makeRigidTransform(
-            makeRotationQuaternion((1.0 - t) * startAngleX2 + t * endAngleX2,
-            Vector3d(1.0, 0.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleY2 + t * endAngleY2,
-            Vector3d(0.0, 1.0, 0.0)) * makeRotationQuaternion((1.0 - t) * startAngleZ2 + t * endAngleZ2,
-            Vector3d(0.0, 0.0, 1.0)), (1.0 - t) * startPosition2 + t * endPosition2));
+            makeRotationQuaternion(interpolate(startAngles2.x(), endAngles2.x(), t), Vector3d(1.0, 0.0, 0.0)) *
+			makeRotationQuaternion(interpolate(startAngles2.y(), endAngles2.y(), t), Vector3d(0.0, 1.0, 0.0)) *
+			makeRotationQuaternion(interpolate(startAngles2.z(), endAngles2.z(), t), Vector3d(0.0, 0.0, 1.0)),
+			interpolate(startPosition2, endPosition2, t)));
+
+		/// Test different ways to set the size of capsule
         if(setterType == static_cast<int>(SetterTypeIndividual))
         {
-            capsuleRepresentation1->setRadius((1 - t) * startRadius1 + t * endRadius1);
-            capsuleRepresentation1->setHeight((1 - t) * startHeight1 + t * endHeight1);
+            capsuleRepresentation1->setRadius(interpolate(startSize1.x(), endSize1.x(), t));
+            capsuleRepresentation1->setHeight(interpolate(startSize1.y(), endSize1.y(), t));
 
-            capsuleRepresentation2->setRadius((1 - t) * startRadius2 + t * endRadius2);
-            capsuleRepresentation2->setHeight((1 - t) * startHeight2 + t * endHeight2);
+            capsuleRepresentation2->setRadius(interpolate(startSize2.x(), endSize2.x(), t));
+            capsuleRepresentation2->setHeight(interpolate(startSize2.y(), endSize2.y(), t));
         }
         else if(setterType == static_cast<int>(SetterTypeTogether))
         {
-            capsuleRepresentation1->setSize((1 - t) * startRadius1 + t * endRadius1,
-(1 - t) * startHeight1 + t * endHeight1);
+            capsuleRepresentation1->setSize(interpolate(startSize1.x(), endSize1.x(), t),
+											interpolate(startSize1.y(), endSize1.y(), t));
 
-            capsuleRepresentation2->setSize((1 - t) * startRadius2 + t * endRadius2,
-(1 - t) * startHeight2 + t * endHeight2);
+            capsuleRepresentation2->setSize(interpolate(startSize2.x(), endSize2.x(), t),
+											interpolate(startSize2.y(), endSize2.y(), t));
         }
         else if(setterType == static_cast<int>(SetterTypeVector2d))
         {
-            capsule1Size.x() = (1 - t) * startRadius1 + t * endRadius1;
-            capsule1Size.y() = (1 - t) * startHeight1 + t * endHeight1;
+            capsule1Size.x() = interpolate(startSize1.x(), endSize1.x(), t);
+            capsule1Size.y() = interpolate(startSize1.y(), endSize1.y(), t);
             capsuleRepresentation1->setSize(capsule1Size);
 
-            capsule2Size.x() = (1 - t) * startRadius2 + t * endRadius2;
-            capsule2Size.y() = (1 - t) * startHeight2 + t * endHeight2;
+            capsule2Size.x() = interpolate(startSize2.x(), endSize2.x(), t);
+            capsule2Size.y() = interpolate(startSize2.y(), endSize2.y(), t);
             capsuleRepresentation2->setSize(capsule2Size);
         }
         setterType = (setterType + 1) % BoxSetterTypeCount;

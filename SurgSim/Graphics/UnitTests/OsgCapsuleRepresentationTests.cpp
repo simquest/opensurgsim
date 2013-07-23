@@ -20,12 +20,10 @@
 
 #include <SurgSim/Graphics/OsgCapsuleRepresentation.h>
 #include <SurgSim/Math/Vector.h>
-#include <SurgSim/Testing/MathUtilities.h>
 
 #include <gtest/gtest.h>
 
 using SurgSim::Math::Vector2d;
-using SurgSim::Testing::interpolate;
 
 namespace
 {
@@ -43,15 +41,9 @@ TEST(OsgCapsuleRepresentationTests, RadiusTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	double startRadius = 1.0;
-	double endRadius = 10.0;
-	double interpolatedRadius;
-	for (double t = 0; t < 100; ++t)
-	{
-		interpolatedRadius = interpolate(startRadius, endRadius, t/100);
-		capsuleRepresentation->setRadius(interpolatedRadius);
-		EXPECT_NEAR(capsuleRepresentation->getRadius(), interpolatedRadius, epsilon);
-	}
+	double radius = 1.0;
+	capsuleRepresentation->setRadius(radius);
+	EXPECT_NEAR(capsuleRepresentation->getRadius(), radius, epsilon);
 }
 
 TEST(OsgCapsuleRepresentationTests, HeightTest)
@@ -59,15 +51,9 @@ TEST(OsgCapsuleRepresentationTests, HeightTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	double startHeight = 1.0;
-	double endHeight = 10.0;
-	double interpolatedHeight;
-	for (double t = 0; t < 100; ++t)
-	{
-		interpolatedHeight = interpolate(startHeight, endHeight, t/100);
-		capsuleRepresentation->setHeight(interpolatedHeight);
-		EXPECT_NEAR(capsuleRepresentation->getHeight(), interpolatedHeight, epsilon);
-	}
+	double height = 1.0;
+	capsuleRepresentation->setHeight(height);
+	EXPECT_NEAR(capsuleRepresentation->getHeight(), height, epsilon);
 }
 
 TEST(OsgCapsuleRepresentationTests, SizeTest)
@@ -75,21 +61,14 @@ TEST(OsgCapsuleRepresentationTests, SizeTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	double startRadius = 1.0;
-	double endRadius = 10.0;
-	double startHeight = 1.0;
-	double endHeight = 10.0;
-	double interpolatedRadius, interpolatedHeight;
-	double radius, height;
-	for (double t = 0; t < 100; ++t)
-	{
-		interpolatedRadius = interpolate(startRadius, endRadius, t/100);
-		interpolatedHeight = interpolate(startHeight, endHeight, t/100);
-		capsuleRepresentation->setSize(interpolatedRadius, interpolatedHeight);
-		capsuleRepresentation->getSize(&radius, &height);
-		EXPECT_NEAR(radius, interpolatedRadius, epsilon);
-		EXPECT_NEAR(height, interpolatedHeight, epsilon);
-	}
+	double radius = 1.0, height = 1.0;
+	double retrievedRadius, retrievedHeight;
+
+	capsuleRepresentation->setSize(radius, height);
+	capsuleRepresentation->getSize(&retrievedRadius, &retrievedHeight);
+
+	EXPECT_NEAR(radius, retrievedRadius, epsilon);
+	EXPECT_NEAR(height, retrievedHeight, epsilon);
 }
 
 TEST(OsgCapsuleRepresentationTests, SizeVectordTest)
@@ -97,18 +76,9 @@ TEST(OsgCapsuleRepresentationTests, SizeVectordTest)
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("test name");
 
-	double startRadius = 1.0;
-	double endRadius = 10.0;
-	double startHeight = 1.0;
-	double endHeight = 10.0;
-	Vector2d interpolation;
-	for (double t = 0; t < 100; ++t)
-	{
-		interpolation.x() = interpolate(startRadius, endRadius, t/100);
-		interpolation.y() = interpolate(startHeight, endHeight, t/100);
-		capsuleRepresentation->setSize(interpolation);
-		EXPECT_TRUE(capsuleRepresentation->getSize().isApprox(interpolation));
-	}
+	Vector2d size(1.0, 1.0);
+	capsuleRepresentation->setSize(size);
+	EXPECT_TRUE(capsuleRepresentation->getSize().isApprox(size));
 }
 
 };  // namespace Graphics
