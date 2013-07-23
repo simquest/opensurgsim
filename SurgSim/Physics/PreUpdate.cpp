@@ -25,10 +25,14 @@ namespace Physics
 {
 
 PreUpdate::PreUpdate(bool doCopyState) : Computation(doCopyState)
-{}
+{
+
+}
 
 PreUpdate::~PreUpdate()
-{}
+{
+
+}
 
 std::shared_ptr<PhysicsManagerState> PreUpdate::doUpdate(
 	const double& dt,

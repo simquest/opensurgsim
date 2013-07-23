@@ -38,7 +38,7 @@ namespace Testing
 	}
 
 	/// Specialized template to call the correct function for Quaterniond, might be superfluous,
-	/// delegates to the eigen interpolation function for Quaterniond 
+	/// delegates to the eigen interpolation function for Quaterniond
 	/// \param	start	The start quaternion.
 	/// \param	end  	The end quaternion.
 	/// \param	t	 	The percentage for the interpolation.
@@ -61,8 +61,8 @@ namespace Testing
 		const SurgSim::Math::RigidTransform3d& end,
 		const double& t);
 
-	/// Does a linear interpolation on a pose, given Vector3d for angles and positions. The angles around the X, Y 
-	/// and Z axis are being passed in a Vector3d for a terser expression. 
+	/// Does a linear interpolation on a pose, given Vector3d for angles and positions. The angles around the X, Y
+	/// and Z axis are being passed in a Vector3d for a terser expression.
 	/// \param	startAngles  	The start angles in the order X/Y/Z angle axis value in radians.
 	/// \param	endAngles	 	The end angles in the order X/Y/Z angle axis value in radians.
 	/// \param	startPosition	The start position.

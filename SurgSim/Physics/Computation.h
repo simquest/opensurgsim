@@ -30,9 +30,6 @@ class Computation
 public:
 
 	/// Constructor
-	Computation();
-
-	/// Constructor
 	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
 	explicit Computation(bool doCopyState);
 
