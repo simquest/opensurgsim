@@ -25,6 +25,11 @@
 #include <osg/PositionAttitudeTransform>
 #include <osg/Switch>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4250)
+#endif
+
 namespace SurgSim
 {
 
@@ -34,47 +39,32 @@ namespace Graphics
 class OsgUnitBox;
 
 /// OSG implementation of a graphics box representation.
-class OsgBoxRepresentation : public BoxRepresentation, public OsgRepresentation
+class OsgBoxRepresentation : public OsgRepresentation, public BoxRepresentation
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the representation
 	explicit OsgBoxRepresentation(const std::string& name);
 
-	/// Sets whether the representation is currently visible
-	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible);
-
-	/// Gets whether the representation is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const;
-
-	/// Sets the material that defines the visual appearance of the representation
-	/// \param	material	Graphics material
-	/// \return	True if set successfully, otherwise false
-	/// \note	OsgBoxRepresentation only accepts subclasses of OsgMaterial.
-	virtual bool setMaterial(std::shared_ptr<Material> material);
-
-	/// Removes the material from the representation
-	virtual void clearMaterial();
-
 	/// Sets the size along X-axis of the box
 	/// \param sizeX Size along X-axis of the box
 	virtual void setSizeX(double sizeX);
+
 	/// Returns the size along X-axis of the box
 	/// \return Size along X-axis of the box
 	virtual double getSizeX() const;
 
 	/// Sets the size along Y-axis of the box
 	/// \param sizeY Size along Y-axis of the box
-	virtual void setSizeY(double sizeX);
+	virtual void setSizeY(double sizeY);
+
 	/// Returns the size along Y-axis of the box
 	/// \return Size along Y-axis of the box
 	virtual double getSizeY() const;
 
 	/// Sets the size along Z-axis of the box
 	/// \param sizeZ Size along Z-axis of the box
-	virtual void setSizeZ(double sizeX);
+	virtual void setSizeZ(double sizeZ);
 	/// Returns the size along Z-axis of the box
 	/// \return Size along Z-axis of the box
 	virtual double getSizeZ() const;
@@ -88,40 +78,22 @@ public:
 	/// \param sizeX Reference to store the size along X-axis of the box
 	/// \param sizeY Reference to store the size along Y-axis of the box
 	/// \param sizeZ Reference to store the size along Z-axis of the box
-	virtual void getSize(double& sizeX, double& sizeY, double& sizeZ);
+	virtual void getSize(double* sizeX, double* sizeY, double* sizeZ);
 
 	/// Sets the size of the box
 	/// \param size Size of the box
 	virtual void setSize(SurgSim::Math::Vector3d size);
-	/// Returns the radius of the sphere
+
+	/// Returns the extents of the box
 	/// \return Size of the box
 	virtual SurgSim::Math::Vector3d getSize() const;
 
-	/// Sets the current pose of the representation
-	/// \param	transform	Rigid transformation that describes the current pose of the representation
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
-
-	/// Gets the current pose of the representation
-	/// \return	Rigid transformation that describes the current pose of the representation
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
-
-	/// Updates the representation.
-	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
-
 private:
-	/// Pose of the box
-	SurgSim::Math::RigidTransform3d m_pose;
-	/// OSG switch to set the visibility of the box
-	osg::ref_ptr<osg::Switch> m_switch;
-	/// OSG transform to set the pose and scale of the box
 	/// The OSG box shape is a unit box and this transform scales it to the size set.
-	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
 	osg::Vec3d m_scale;
 
 	/// Shared unit box, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;
-
 	/// Returns the shared unit sphere
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
 };
@@ -129,5 +101,9 @@ private:
 };  // namespace Graphics
 
 };  // namespace SurgSim
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif  // SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H

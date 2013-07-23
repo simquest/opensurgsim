@@ -19,11 +19,14 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
+	MlcpGaussSeidelSolver.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
 	MlcpConstraintType.h
+	MlcpConstraintTypeName.h
+	MlcpGaussSeidelSolver.h
 	MlcpProblem.h
 	MlcpSolution.h
 	MlcpSolver.h

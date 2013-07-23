@@ -15,6 +15,7 @@
 
 #include <SurgSim/Physics/Constraint.h>
 #include <SurgSim/Physics/ConstraintData.h>
+#include <SurgSim/Physics/Localization.h>
 
 #include <SurgSim/Framework/Assert.h>
 
@@ -24,25 +25,20 @@ namespace SurgSim
 namespace Physics
 {
 
-Constraint::Constraint(std::shared_ptr<ConstraintImplementation> side0,
-                       std::shared_ptr<ConstraintImplementation> side1)
+Constraint::Constraint(
+	std::shared_ptr<ConstraintData> data,
+	std::shared_ptr<ConstraintImplementation> implementation0,
+	std::shared_ptr<Localization> localization0,
+	std::shared_ptr<ConstraintImplementation> implementation1,
+	std::shared_ptr<Localization> localization1)
 {
-	SURGSIM_ASSERT(side0 != nullptr && side1 != nullptr) << "A constraint needs 2 valid constraint implementations!";
-
-	m_implementations = std::make_pair(side0, side1);
+	setInformation(data, implementation0, localization0, implementation1, localization1);
 }
 
 Constraint::~Constraint()
 {
 }
 
-void Constraint::setImplementations(std::shared_ptr<ConstraintImplementation> side0,
-	std::shared_ptr<ConstraintImplementation> side1)
-{
-	SURGSIM_ASSERT(side0 != nullptr && side1 != nullptr) << "A constraint needs 2 valid constraint implementations!";
-
-	m_implementations = std::make_pair(side0, side1);
-}
 
 const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>&
 	Constraint::getImplementations() const
@@ -50,10 +46,11 @@ const std::pair<std::shared_ptr<ConstraintImplementation>, std::shared_ptr<Const
 	return m_implementations;
 }
 
-void Constraint::setData(std::shared_ptr<ConstraintData> data)
+const std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>>& Constraint::getLocalizations() const
 {
-	m_data = data;
+	return m_localizations;
 }
+
 
 std::shared_ptr<ConstraintData> Constraint::getData() const
 {
@@ -62,11 +59,12 @@ std::shared_ptr<ConstraintData> Constraint::getData() const
 
 unsigned int Constraint::getNumDof() const
 {
-	SURGSIM_ASSERT(m_implementations.first->getNumDof() == m_implementations.second->getNumDof()) <<
-		"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
-		" != " << m_implementations.second->getNumDof() <<")" << std::endl;
+	return m_numDof;
+}
 
-	return m_implementations.first->getNumDof();
+SurgSim::Math::MlcpConstraintType Constraint::getType()
+{
+	return m_constraintType;
 }
 
 void Constraint::build(double dt,
@@ -75,34 +73,27 @@ void Constraint::build(double dt,
 	unsigned int indexOfRepresentation1,
 	unsigned int indexOfConstraint)
 {
-	SURGSIM_ASSERT(m_data.get() != nullptr) << "Constraint data has not been set for this constraint." << std::endl;
-
-	SurgSim::Math::MlcpConstraintType mlcpConstraintType = SurgSim::Math::MLCP_INVALID_CONSTRAINT;
-
 	doBuild(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfRepresentation1, indexOfConstraint);
 
-	if (m_implementations.first)
-	{
-		m_implementations.first->build(dt, *m_data.get(), mlcp, indexOfRepresentation0, indexOfConstraint,
-			CONSTRAINT_POSITIVE_SIDE);
-		mlcpConstraintType = m_implementations.first->getMlcpConstraintType();
-	}
+	m_implementations.first->build(
+		dt,
+		*m_data.get(),
+		m_localizations.first,
+		mlcp,
+		indexOfRepresentation0,
+		indexOfConstraint,
+		CONSTRAINT_POSITIVE_SIDE);
 
-	if (m_implementations.second)
-	{
-		m_implementations.second->build(dt, *m_data.get(), mlcp, indexOfRepresentation1, indexOfConstraint,
-			CONSTRAINT_NEGATIVE_SIDE);
-		SurgSim::Math::MlcpConstraintType mlcpConstraintType_2nd = m_implementations.second->getMlcpConstraintType();
-		if (mlcpConstraintType == SurgSim::Math::MLCP_INVALID_CONSTRAINT)
-		{
-			mlcpConstraintType = mlcpConstraintType_2nd;
-		}
-		SURGSIM_ASSERT(mlcpConstraintType == mlcpConstraintType_2nd) <<
-			"A constraint has 2 incompatible implementations:( " << mlcpConstraintType << " , " <<
-			mlcpConstraintType_2nd << " )" << std::endl;
-	}
+	m_implementations.second->build(
+		dt,
+		*m_data.get(),
+		m_localizations.second,
+		mlcp,
+		indexOfRepresentation1,
+		indexOfConstraint,
+		CONSTRAINT_NEGATIVE_SIDE);
 
-	mlcp->constraintTypes.push_back(mlcpConstraintType);
+	mlcp->constraintTypes.push_back(m_constraintType);
 }
 
 void Constraint::doBuild(double dt,
@@ -112,6 +103,37 @@ void Constraint::doBuild(double dt,
 	unsigned int indexOfRepresentation1,
 	unsigned int indexOfConstraint)
 {
+}
+
+void Constraint::setInformation(
+	std::shared_ptr<ConstraintData> data,
+	std::shared_ptr<ConstraintImplementation> implementation0,
+	std::shared_ptr<Localization> localization0,
+	std::shared_ptr<ConstraintImplementation> implementation1,
+	std::shared_ptr<Localization> localization1)
+{
+	SURGSIM_ASSERT(data != nullptr) << "ConstraintData can't be nullptr";
+	SURGSIM_ASSERT(implementation0 != nullptr) << "First implementation can't be nullptr";
+	SURGSIM_ASSERT(localization0 != nullptr) << "First localization can't be nullptr";
+	SURGSIM_ASSERT(implementation1 != nullptr) << "Second implementation can't be nullptr";
+	SURGSIM_ASSERT(localization1 != nullptr) << "Second localization can't be nullptr";
+	SURGSIM_ASSERT(implementation0->getMlcpConstraintType() != SurgSim::Math::MLCP_INVALID_CONSTRAINT) <<
+		"First implementation has an invalid constraint type";
+	SURGSIM_ASSERT(implementation1->getMlcpConstraintType() != SurgSim::Math::MLCP_INVALID_CONSTRAINT) <<
+		"Second implementation has an invalid constraint type";
+	SURGSIM_ASSERT(implementation0->getMlcpConstraintType() == implementation1->getMlcpConstraintType()) <<
+		"Implementations have incompatible implementations first( " << implementation0->getMlcpConstraintType() <<
+		" != " << implementation1->getMlcpConstraintType() << " )";
+	SURGSIM_ASSERT(implementation0->getNumDof() == implementation1->getNumDof()) <<
+		"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
+		" != " << m_implementations.second->getNumDof() <<")";
+
+
+	m_data = data;
+	m_implementations = std::make_pair(implementation0, implementation1);
+	m_localizations = std::make_pair(localization0, localization1);
+	m_numDof = implementation0->getNumDof();
+	m_constraintType = implementation0->getMlcpConstraintType();
 }
 
 }; // namespace Physics

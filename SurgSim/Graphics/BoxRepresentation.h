@@ -45,18 +45,18 @@ public:
 
 	/// Sets the size along Y-axis of the box
 	/// \param sizeY Size along Y-axis of the box
-	virtual void setSizeY(double sizeX) = 0;
+	virtual void setSizeY(double sizeY) = 0;
 	/// Returns the size along Y-axis of the box
 	/// \return Size along Y-axis of the box
 	virtual double getSizeY() const = 0;
-	
+
 	/// Sets the size along Z-axis of the box
 	/// \param sizeZ Size along Z-axis of the box
-	virtual void setSizeZ(double sizeX) = 0;
+	virtual void setSizeZ(double sizeZ) = 0;
 	/// Returns the size along Z-axis of the box
 	/// \return Size along Z-axis of the box
 	virtual double getSizeZ() const = 0;
-	
+
 	/// Sets the size of the box
 	/// \param sizeX Size along X-axis of the box
 	/// \param sizeY Size along Y-axis of the box
@@ -66,8 +66,8 @@ public:
 	/// \param sizeX Reference to store the size along X-axis of the box
 	/// \param sizeY Reference to store the size along Y-axis of the box
 	/// \param sizeZ Reference to store the size along Z-axis of the box
-	virtual void getSize(double& sizeX, double& sizeY, double& sizeZ) = 0;
-	
+	virtual void getSize(double* sizeX, double* sizeY, double* sizeZ) = 0;
+
 	/// Sets the size of the box
 	/// \param size Size of the box
 	virtual void setSize(SurgSim::Math::Vector3d size) = 0;

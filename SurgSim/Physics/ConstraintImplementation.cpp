@@ -23,8 +23,7 @@ namespace SurgSim
 namespace Physics
 {
 
-ConstraintImplementation::ConstraintImplementation(std::shared_ptr<Localization> localization):
-m_localization(localization)
+ConstraintImplementation::ConstraintImplementation()
 {
 }
 

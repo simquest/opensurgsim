@@ -65,9 +65,8 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	std::shared_ptr<RigidRepresentationLocalization> loc = std::make_shared<RigidRepresentationLocalization>(rigid);
 	loc->setLocalPosition(contactPosition);
-	std::shared_ptr<RigidRepresentationContact> implementation = std::make_shared<RigidRepresentationContact>(loc);
+	std::shared_ptr<RigidRepresentationContact> implementation = std::make_shared<RigidRepresentationContact>();
 
-	EXPECT_EQ(loc, implementation->getLocalization());
 	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
 	EXPECT_EQ(1u, implementation->getNumDof());
 
@@ -91,7 +90,8 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Fill up the Mlcp
 	double dt = 1e-3;
-	implementation->build(dt, constraintData, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+	implementation->build(dt, constraintData, loc,
+		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// Violation b should be exactly violation = -radius (the sphere center is on the plane)
 	EXPECT_NEAR(violation, mlcpPhysicsProblem.b[0], epsilon);

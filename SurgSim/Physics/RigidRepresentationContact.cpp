@@ -28,19 +28,30 @@ namespace SurgSim
 namespace Physics
 {
 
+RigidRepresentationContact::RigidRepresentationContact()
+{
+
+}
+
+RigidRepresentationContact::~RigidRepresentationContact()
+{
+
+}
+
 void RigidRepresentationContact::doBuild(double dt,
 			const ConstraintData& data,
+			const std::shared_ptr<Localization>& localization,
 			MlcpPhysicsProblem* mlcp,
 			unsigned int indexOfRepresentation,
 			unsigned int indexOfConstraint,
 			ConstraintSideSign sign)
 {
-	Eigen::MatrixXd& H    = mlcp->H;
-	Eigen::MatrixXd& CHt  = mlcp->CHt;
-	Eigen::MatrixXd& HCHt = mlcp->A;
-	Eigen::VectorXd& b    = mlcp->b;
+	MlcpPhysicsProblem::Matrix& H    = mlcp->H;
+	MlcpPhysicsProblem::Matrix& CHt  = mlcp->CHt;
+	MlcpPhysicsProblem::Matrix& HCHt = mlcp->A;
+	MlcpPhysicsProblem::Vector& b    = mlcp->b;
 
-	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
+	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);
 
 	if (! rigid->isActive())
@@ -67,7 +78,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// b = n.P(t) + d             -> P(t) evaluated after free motion
 
-	SurgSim::Math::Vector3d globalPosition = getLocalization()->calculatePosition();
+	SurgSim::Math::Vector3d globalPosition = localization->calculatePosition();
 	SurgSim::Math::Vector3d GP = globalPosition - rigid->getCurrentState().getPose().translation();
 
 	// Fill up b with the constraint equation...
@@ -97,6 +108,23 @@ void RigidRepresentationContact::doBuild(double dt,
 		H.block<1, 6>(indexOfConstraint, indexOfRepresentation) *
 		CHt.block<6, 1>(indexOfRepresentation, indexOfConstraint);
 }
+
+SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintType() const
+{
+	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+}
+
+SurgSim::Physics::RepresentationType RigidRepresentationContact::getRepresentationType() const
+{
+	return REPRESENTATION_TYPE_RIGID;
+}
+
+unsigned int RigidRepresentationContact::doGetNumDof() const
+{
+	return 1;
+}
+
+
 
 }; // namespace Physics
 

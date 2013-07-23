@@ -34,7 +34,7 @@ namespace Physics
 struct MlcpPhysicsSolution: public SurgSim::Math::MlcpSolution
 {
 	/// Corrections to all of the degrees of freedom needed to satisfy the system equations.
-	Eigen::VectorXd dofCorrection;
+	Vector dofCorrection;
 };
 
 };  // namespace Physics

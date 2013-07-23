@@ -276,19 +276,19 @@ TEST_F(GeometryTest, DistancePointLine)
 
 	// Trivial point lies on the line
 	distance = distancePointLine<SizeType>(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ(0.0,distance);
+	EXPECT_NEAR(0.0,distance,epsilon);
 	EXPECT_EQ(plainSegment.pointOnLine(0.5),result);
 
 	// Point is away from the line
 	Vector3d offLinePoint = plainSegment.a + (plainNormal * 1.5);
 	distance = distancePointLine(offLinePoint, plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ(1.5, distance);
+	EXPECT_NEAR(1.5,distance,epsilon);
 	EXPECT_EQ(plainSegment.a, result);
 
 	// Degenerate line, just do plain distance
 	offLinePoint = plainSegment.a + plainNormal * 1.5;
 	distance = distancePointLine(offLinePoint, plainSegment.a, plainSegment.a, &result);
-	EXPECT_DOUBLE_EQ(1.5, distance);
+	EXPECT_NEAR(1.5,distance,epsilon);
 	EXPECT_EQ(plainSegment.a, result);
 }
 
@@ -299,40 +299,40 @@ TEST_F(GeometryTest, DistancePointSegment)
 
 	// Trivial point lies on the line
 	distance = distancePointSegment(plainSegment.pointOnLine(0.5), plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ(0.0,distance);
+	EXPECT_NEAR(0.0,distance,epsilon);
 	EXPECT_EQ(plainSegment.pointOnLine(0.5),result);
 
 	// Point On the line but outside the segment
 	VectorType point = plainSegment.pointOnLine(1.5);
 	distance = distancePointSegment(point, plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ((plainSegment.ab.norm()*0.5),distance);
+	EXPECT_NEAR((plainSegment.ab.norm()*0.5),distance,epsilon);
 	EXPECT_TRUE(eigenEqual(plainSegment.b,result));
 
 	// Point projection is on the segment
 	VectorType resultPoint = plainSegment.a + plainSegment.ab * 0.25;
 	VectorType offLinePoint = resultPoint + (plainNormal * 1.5);
 	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ(1.5, distance);
+	EXPECT_NEAR(1.5, distance,epsilon);
 	EXPECT_TRUE(eigenEqual(resultPoint, result));
 
 	// Point projection is away from the segment, distance is to the closest segment point
 	resultPoint = plainSegment.a;
 	offLinePoint = plainSegment.a - plainSegment.ab + (plainNormal * 1.5);
 	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ((offLinePoint - resultPoint).norm(), distance);
+	EXPECT_NEAR((offLinePoint - resultPoint).norm(), distance, epsilon);
 	EXPECT_TRUE(eigenEqual(resultPoint, result));
 
 	// Other Side of the above case
 	resultPoint = plainSegment.b;
 	offLinePoint = plainSegment.b + plainSegment.ab*0.01 + plainNormal * 0.1;
 	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.b, &result);
-	EXPECT_DOUBLE_EQ((offLinePoint - resultPoint).norm(), distance);
+	EXPECT_NEAR((offLinePoint - resultPoint).norm(), distance, epsilon);
 	EXPECT_TRUE(eigenEqual(resultPoint, result));
 
 
 	// Degenerated Segment
 	distance = distancePointSegment(offLinePoint, plainSegment.a, plainSegment.a, &result);
-	EXPECT_DOUBLE_EQ((offLinePoint - plainSegment.a).norm(), distance);
+	EXPECT_NEAR((offLinePoint - plainSegment.a).norm(), distance, epsilon);
 	EXPECT_TRUE(eigenEqual(plainSegment.a, result));
 }
 
@@ -389,17 +389,17 @@ TEST_F(GeometryTest, DistanceLineLine)
 
 	// Trivial the same line compared against itself
 	distance = distanceLineLine(plainSegment.a, plainSegment.b, plainSegment.a, plainSegment.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(0.0, distance);
+	EXPECT_NEAR(0.0, distance, epsilon);
 
 	// Parallel Line
 	Segment parallel = Segment(plainSegment.a + plainNormal*2, plainSegment.b + plainNormal*2);
 	distance = distanceLineLine(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(2.0, distance);
+	EXPECT_NEAR(2.0, distance, epsilon);
 
 	// Not quite parallel, trying to get below epsilon
 	parallel = Segment(plainSegment.a + plainNormal*2 , plainSegment.b + plainNormal*2 - plainNormal*1.0e-10);
 	distance = distanceLineLine(plainSegment.a, plainSegment.b, parallel.a, parallel.b, &p0, &p1);
-	EXPECT_DOUBLE_EQ(2.0, distance);
+	EXPECT_NEAR(2.0, distance, epsilon);
 
 	{
 		SCOPED_TRACE("Intersecting Lines");

@@ -152,8 +152,10 @@ private:
 	// Delegates to doAddComponent and calls initialize on all the components
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
-	void addAndIntializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
-							  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
+	void addAndIntializeComponents(
+		const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+		const std::vector<std::shared_ptr<Component>>::const_iterator& endIt,
+		std::vector<std::shared_ptr<Component>>* actualAdditions);
 
 	/// Wake all the components up, only the components that were successfully initialized get
 	/// the wakeup call, check for isAwake because there to catch multiple versions of the same

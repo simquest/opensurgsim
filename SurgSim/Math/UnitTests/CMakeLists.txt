@@ -17,11 +17,13 @@
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
+	MlcpGaussSeidelSolverTests.cpp
 	ValidTests.cpp
 )
 
@@ -51,8 +53,8 @@ if(SURGSIM_TESTS_BUILD_EIGEN)
 	endif(MSVC AND CMAKE_CL_64)
 endif(SURGSIM_TESTS_BUILD_EIGEN)
 
-set(LIBS gtest)
+set(LIBS SurgSimMath SurgSimFramework MlcpTestIO ${Boost_LIBRARIES} gtest)
 
-if(UNIT_TEST_SOURCES)
-	surgsim_add_unit_tests(SurgSimMathTest)
-endif(UNIT_TEST_SOURCES)
+file(COPY MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+surgsim_add_unit_tests(SurgSimMathTest)

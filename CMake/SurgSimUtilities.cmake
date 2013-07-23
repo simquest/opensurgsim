@@ -20,12 +20,45 @@
 #
 option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
 option(SURGSIM_TESTS_RUN "Run the unit tests at the end of the build" ON)
+if(NOT WIN32)
+	option(SURGSIM_TESTS_RUN_WITH_VALGRIND
+		"Run the unit tests using Valgrind's memcheck tool." OFF)
+	option(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE
+		"When running the unit tests using Valgrind, add verbose info." OFF)
+	mark_as_advanced(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
+	option(SURGSIM_TESTS_RUN_WITH_VALGRIND_LEAK_CHECK
+		"When running the unit tests using Valgrind, also check for leaks." OFF)
+	mark_as_advanced(SURGSIM_TESTS_RUN_WITH_VALGRIND_LEAK_CHECK)
+endif(NOT WIN32)
 option(SURGSIM_TESTS_ALL_IN_ONE
 	"Build a single binary with all unit tests.  [Does not work yet!]" OFF)
-option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
+option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 
 set(SURGSIM_COPY_WARNING_ONCE TRUE)
+set(SURGSIM_TEST_RUN_PREFIX)
+set(SURGSIM_TEST_RUN_SUFFIX)
+if(NOT WIN32)
+	if(SURGSIM_TESTS_RUN_WITH_VALGRIND)
+		set(SURGSIM_TEST_RUN_PREFIX valgrind --tool=memcheck --error-exitcode=1
+			--fullpath-after=
+			--suppressions=${SURGSIM_TOOLS_DIR}/memcheck.supp --gen-suppressions=all)
+		# The following assumes that the test is using Google Test.
+		# It's needed because by default tests use clone(), which doesn't
+		# play well with valgrind; fork() is supposed to work better.
+		set(SURGSIM_TEST_RUN_SUFFIX --gtest_death_test_use_fork)
+		if(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
+			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} -v)
+		endif(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
+		if(SURGSIM_TESTS_RUN_WITH_VALGRIND_LEAK_CHECK)
+			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX}
+				--leak-check=full --show-reachable=yes)
+		else()
+			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} --leak-check=no)
+		endif()
+	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
+endif(NOT WIN32)
+
 
 # Copy zero or more files to the location of a built target, after the
 # target is built successfully, but only if the condition (which
@@ -138,7 +171,9 @@ endmacro()
 #
 macro(surgsim_unit_test_run_only TESTNAME)
 	if(NOT SURGSIM_TESTS_ALL_IN_ONE)
-		add_custom_command(TARGET ${TESTNAME} POST_BUILD COMMAND ${TESTNAME}
+		add_custom_command(TARGET ${TESTNAME} POST_BUILD
+			COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TESTNAME}>
+				${SURGSIM_TEST_RUN_SUFFIX}
 			VERBATIM)
 	endif()
 endmacro()
@@ -270,7 +305,7 @@ set(CPPLINT_DEFAULT_FILTER_LIST
 	# (it claims <unordered_map> is a C header!?):
 	-build/include_order
 	# things disallowed by Google's coding standards, but not ours:
-	-runtime/rtti
+	-runtime/rtti -readability/streams
 )
 string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 	"--filter=${CPPLINT_DEFAULT_FILTER_LIST}")
@@ -285,7 +320,7 @@ mark_as_advanced(SURGSIM_CPPLINT_FILTERS)
 # Run cpplint (from Google's coding standards project) on specified files.
 #
 # Note the use of optional arguments:
-#   surgsim_run_cpplint(<testname> [<file>...])
+#   surgsim_run_cpplint(<testname> [<file|arg>...])
 #
 macro(surgsim_run_cpplint TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
@@ -304,7 +339,6 @@ endmacro()
 # files in the current directory and all of its subdirectories.
 macro(surgsim_cpplint_this_tree TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
-		file(GLOB_RECURSE ALL_CXX_SOURCE_FILES *.h *.cpp)
-		surgsim_run_cpplint("${TARGET}" ${ALL_CXX_SOURCE_FILES})
+		surgsim_run_cpplint("${TARGET}" "--traverse" "${CMAKE_CURRENT_SOURCE_DIR}")
 	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 endmacro()

@@ -42,7 +42,7 @@ public:
 	/// The type used for vectors.
 	typedef DataGroup::VectorType VectorType;
 	/// The type used for matrices.
-	typedef Eigen::MatrixXd DynamicMatrixType;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> DynamicMatrixType;
 	/// The type used for scalars.
 	typedef DataGroup::ScalarType ScalarType;
 	/// The type used for integers.

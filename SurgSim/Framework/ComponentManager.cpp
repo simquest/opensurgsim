@@ -59,18 +59,19 @@ bool ComponentManager::enqueueRemoveComponent(const std::shared_ptr<Component>& 
 
 void ComponentManager::processComponents()
 {
+	// Please note that the implementation of this function needs to mirror the executeInitialization() function
+	// this is called from within the update() function, the other is called at startup
 	std::vector<std::shared_ptr<Component>> inflightAdditions;
 	std::vector<std::shared_ptr<Component>> inflightRemovals;
+	std::vector<std::shared_ptr<Component>> actualAdditions;
 
 	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
+	actualAdditions.reserve(inflightAdditions.size());
 
 	if (!inflightAdditions.empty())
 	{
-		auto inflightBegin = std::begin(inflightAdditions);
-		auto inflightEnd = std::end(inflightAdditions);
-
-		addAndIntializeComponents(inflightBegin, inflightEnd);
-		wakeUpComponents(inflightBegin, inflightEnd);
+		addAndIntializeComponents(std::begin(inflightAdditions), std::end(inflightAdditions), &actualAdditions);
+		wakeUpComponents(std::begin(actualAdditions), std::end(actualAdditions));
 	}
 
 	if (!inflightRemovals.empty())
@@ -81,6 +82,9 @@ void ComponentManager::processComponents()
 
 bool ComponentManager::executeInitialization()
 {
+	// Please note that the implementation of this function needs to mirror processComponents()
+	// this function is called at startup whereas the other is called during the update call.
+
 	// Call BasicThread initialize to do the initialize and startup call
 	bool success = BasicThread::executeInitialization();
 	if (! success )
@@ -91,15 +95,14 @@ bool ComponentManager::executeInitialization()
 	// Now Initialize and and wakeup all the components
 	std::vector<std::shared_ptr<Component>> inflightAdditions;
 	std::vector<std::shared_ptr<Component>> inflightRemovals;
+	std::vector<std::shared_ptr<Component>> actualAdditions;
 
 	copyScheduledComponents(&inflightAdditions, &inflightRemovals);
-
-	auto inflightBegin = std::begin(inflightAdditions);
-	auto inflightEnd = std::end(inflightAdditions);
+	actualAdditions.reserve(inflightAdditions.size());
 
 	if (! inflightAdditions.empty())
 	{
-		addAndIntializeComponents(inflightBegin, inflightEnd);
+		addAndIntializeComponents(std::begin(inflightAdditions), std::end(inflightAdditions), &actualAdditions);
 	}
 
 	success = waitForBarrier(success);
@@ -110,7 +113,7 @@ bool ComponentManager::executeInitialization()
 
 	if (! inflightAdditions.empty())
 	{
-		wakeUpComponents(inflightBegin, inflightEnd);
+		wakeUpComponents(std::begin(actualAdditions), std::end(actualAdditions));
 	}
 
 	if (! inflightRemovals.empty())
@@ -151,15 +154,17 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 	}
 }
 
-void ComponentManager::addAndIntializeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
-	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt)
+void ComponentManager::addAndIntializeComponents(
+	const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
+	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt,
+	std::vector<std::shared_ptr<Component>>* actualAdditions)
 {
 	// Add All Components to the internal storage
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		if (executeAdditions(*it))
+		if (executeAdditions(*it) && (*it)->initialize(std::move(getRuntime())))
 		{
-			(*it)->initialize(std::move(getRuntime()));
+			actualAdditions->push_back(*it);
 		}
 	}
 }

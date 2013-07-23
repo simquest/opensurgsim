@@ -30,14 +30,16 @@ class PreUpdate : public Computation
 {
 public:
 	/// Constructor
-	PreUpdate();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit PreUpdate(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~PreUpdate();
 
 protected:
 	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
+	virtual std::shared_ptr<PhysicsManagerState>
+		doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
 };
 
 }; // Physics

@@ -1,0 +1,12 @@
+# MLCP Test 000 - size 0
+flags =
+total degrees of freedom = 0
+number of constraints = 0
+number of constraint DOFs ("atomic constraints") = 0
+constraint types =
+E = ()
+HCHt = (
+)
+friction = ()
+lambda = ()
+== END ==

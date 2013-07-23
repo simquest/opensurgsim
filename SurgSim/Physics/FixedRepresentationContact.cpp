@@ -26,8 +26,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FixedRepresentationContact::FixedRepresentationContact(std::shared_ptr<Localization> localization) :
-ConstraintImplementation(localization)
+FixedRepresentationContact::FixedRepresentationContact()
 {
 }
 
@@ -35,21 +34,17 @@ FixedRepresentationContact::~FixedRepresentationContact()
 {
 }
 
-unsigned int FixedRepresentationContact::doGetNumDof() const
-{
-	return 1;
-}
-
 void FixedRepresentationContact::doBuild(double dt,
 	const ConstraintData& data,
+	const std::shared_ptr<Localization>& localization,
 	MlcpPhysicsProblem* mlcp,
 	unsigned int indexOfRepresentation,
 	unsigned int indexOfConstraint,
 	ConstraintSideSign sign)
 {
-	Eigen::VectorXd& b = mlcp->b;
+	MlcpPhysicsProblem::Vector& b = mlcp->b;
 
-	std::shared_ptr<Representation> representation = getLocalization()->getRepresentation();
+	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	std::shared_ptr<FixedRepresentation> fixed = std::static_pointer_cast<FixedRepresentation>(representation);
 
 	if (! fixed->isActive())
@@ -62,16 +57,26 @@ void FixedRepresentationContact::doBuild(double dt,
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();
 
-	SurgSim::Math::Vector3d globalPosition = getLocalization()->calculatePosition();
+	SurgSim::Math::Vector3d globalPosition = localization->calculatePosition();
 
 	// Fill up b with the constraint equation...
 	double violation = n.dot(globalPosition) + d;
 	b[indexOfConstraint] += violation * scale;
 }
 
-SurgSim::Math::MlcpConstraintType FixedRepresentationContact::doGetMlcpConstraintType() const
+SurgSim::Math::MlcpConstraintType FixedRepresentationContact::getMlcpConstraintType() const
 {
 	return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT;
+}
+
+SurgSim::Physics::RepresentationType FixedRepresentationContact::getRepresentationType() const
+{
+	return REPRESENTATION_TYPE_FIXED;
+}
+
+unsigned int FixedRepresentationContact::doGetNumDof() const
+{
+	return 1;
 }
 
 };  //  namespace Physics

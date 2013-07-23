@@ -20,6 +20,7 @@
 
 #include <Eigen/Core>
 
+#include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/ConstraintData.h>
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
@@ -40,26 +41,11 @@ class ConstraintImplementation
 {
 public:
 	/// Constructor
-	/// \param localization The localization for this implementation
 	/// \note Localization embbed the representation, so it is fully defined
-	explicit ConstraintImplementation(std::shared_ptr<Localization> localization);
+	explicit ConstraintImplementation();
 
 	/// Destructor
 	virtual ~ConstraintImplementation();
-
-	/// Sets the localization associated to this implementation
-	/// \param localization The localization for this implementation
-	void setLocalization(std::shared_ptr<Localization> localization)
-	{
-		m_localization = localization;
-	}
-
-	/// Gets the localization associated to this implementation
-	/// \return The localization of this implementation
-	std::shared_ptr<Localization> getLocalization() const
-	{
-		return m_localization;
-	}
 
 	/// Gets the number of degree of freedom for this implementation
 	/// \return The number of degree of freedom for this implementation
@@ -70,31 +56,32 @@ public:
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
-	SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const
-	{
-		return doGetMlcpConstraintType();
-	}
+	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const = 0;
+
+	/// Gets the Type of representation that this implementation is concerned with
+	/// \return RepresentationType for this implementation
+	virtual RepresentationType getRepresentationType() const = 0;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
+	/// \param localization The localization for this implementation
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
 	/// \param indexOfConstraint The index of the constraint in the mlcp
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	void build(double dt,
 		const ConstraintData& data,
+		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign)
 	{
-		doBuild(dt, data, mlcp, indexOfRepresentation, indexOfConstraint, sign);
+		doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
 	}
 
 private:
-	/// Localization associated to this implementation
-	std::shared_ptr<Localization> m_localization;
 
 	/// Does get number of degree of freedom
 	/// \return The number of degree of freedom associated to this implementation
@@ -103,23 +90,19 @@ private:
 	/// Builds the subset of an Mlcp physics problem associated to this implementation
 	/// \param dt The time step
 	/// \param data The data associated to the constraint
+	/// \param localization The localization for the constraint
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp
 	/// \param indexOfConstraint The index of the constraint in the mlcp
 	/// \param sign The sign of this implementation in the constraint (positive or negative side)
 	virtual void doBuild(double dt,
 				const ConstraintData& data,
+				const std::shared_ptr<Localization>& localization,
 				MlcpPhysicsProblem* mlcp,
 				unsigned int indexOfRepresentation,
 				unsigned int indexOfConstraint,
 				ConstraintSideSign sign) = 0;
 
-	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
-	virtual SurgSim::Math::MlcpConstraintType doGetMlcpConstraintType() const
-	{
-		return SurgSim::Math::MLCP_INVALID_CONSTRAINT;
-	}
 };
 
 };  // namespace Physics

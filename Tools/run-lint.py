@@ -236,6 +236,8 @@ def check_length(flags, file, lines):
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description='Check source files for coding standard violations.')
+  parser.add_argument('--traverse', metavar='DIR', action='append',
+                      help='Find all applicable files in DIR and its subdirs.')
   parser.add_argument('--cpplint-script', metavar='PATH_TO_SCRIPT',
                       help='The path to Google\'s cpplint.py script.',
                       default='cpplint.py')
@@ -271,6 +273,18 @@ if __name__ == '__main__':
   else:
     WARNING_FORMAT = STANDARD_WARNING_FORMAT
 
+  if args.traverse is not None:
+    for traverse_dir in args.traverse:
+      for current_dir, subdirs, files in os.walk(traverse_dir):
+        args.files.extend(map(lambda x: os.path.join(current_dir, x),
+                              filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
+                                     files)))
+        # always skip .git, build directories, ThirdParty...
+        for bad in filter(lambda x:
+                            re.search(r'^(?:\.git|build.*|ThirdParty)$', x),
+                          subdirs):
+          subdirs.remove(bad)
+
   ok = True
 
   if args.do_check_extension:
@@ -281,6 +295,10 @@ if __name__ == '__main__':
       ok = False
 
   if args.do_cpplint:
+    # TODO(advornik): Eventually, the file list will grow so long that
+    # we start running into the OS arg list limits, and we will need
+    # to start splitting it into several separate invocations of
+    # cpplint.  But we don't have that problem yet.
     if not run_cpplint(args.cpplint_script, args.cpplint_filter,
                        filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
                               args.files)):
