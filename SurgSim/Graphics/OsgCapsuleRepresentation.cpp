@@ -113,6 +113,6 @@ std::shared_ptr<OsgUnitCylinder> OsgCapsuleRepresentation::getSharedUnitCylinder
 
 std::shared_ptr<OsgUnitSphere> OsgCapsuleRepresentation::getSharedUnitSphere()
 {
-	static SurgSim::Framework::SharedInstance<OsgUnitSphere> sharedSphere1;
-	return sharedSphere1.get();
+	static SurgSim::Framework::SharedInstance<OsgUnitSphere> sharedSphere;
+	return sharedSphere.get();
 }
