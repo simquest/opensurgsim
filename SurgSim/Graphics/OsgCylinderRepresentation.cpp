@@ -17,9 +17,10 @@
 
 #include <SurgSim/Graphics/OsgCylinderRepresentation.h>
 
-#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 #include <SurgSim/Graphics/OsgUnitCylinder.h>
+
+#include <SurgSim/Framework/SharedInstance.h>
 
 #include <osg/Geode>
 #include <osg/Shape>
