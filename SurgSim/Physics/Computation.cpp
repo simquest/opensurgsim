@@ -20,18 +20,10 @@ namespace SurgSim
 namespace Physics
 {
 
-Computation::Computation() : m_copyState(false)
-{
-
-}
-
-
 Computation::Computation(bool doCopyState) : m_copyState(doCopyState)
 {
 
 }
-
-
 
 Computation::~Computation()
 {
