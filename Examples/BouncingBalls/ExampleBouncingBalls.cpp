@@ -37,7 +37,7 @@
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/PlaneShape.h>
+#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -55,7 +55,7 @@ using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::PlaneShape;
+using SurgSim::Physics::DoubleSidedPlaneShape;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::PhysicsManager;
@@ -76,7 +76,7 @@ public:
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
-			m_representation->getPose().translation().transpose();
+								  m_representation->getPose().translation().transpose();
 	}
 protected:
 	virtual bool doInitialize()
@@ -204,9 +204,11 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
 	scene->addSceneElement(createSphere("sphere1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
+										SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
+																		  Vector3d(0.0,2.0,0.0))));
 	scene->addSceneElement(createPlane("plane1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
+									   SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
+																		 Vector3d(0.0,0.0,0.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(

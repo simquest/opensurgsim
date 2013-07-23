@@ -33,7 +33,7 @@ std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
-std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(
+std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
