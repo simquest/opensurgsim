@@ -115,3 +115,5 @@ install(EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT
 #install(EXPORT ${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
 
 #option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)
+
+surgsim_cpplint_this_tree(cpplint)

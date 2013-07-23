@@ -22,15 +22,17 @@
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Physics/Constraint.h>
+#include <SurgSim/Physics/ContactConstraintData.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-ContactConstraintGeneration::ContactConstraintGeneration()
+ContactConstraintGeneration::ContactConstraintGeneration(bool doCopyState) : Computation(doCopyState)
 {
-
+	m_logger = SurgSim::Framework::Logger::createConsoleLogger("ContactConstraintGeneration");
 }
 
 ContactConstraintGeneration::~ContactConstraintGeneration()
@@ -48,52 +50,98 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 	auto pairsIt = std::begin(pairs);
 	auto pairsEnd = std::end(pairs);
 
+	std::vector<std::shared_ptr<Constraint>> constraints;
+
+	// This will check all collision pairs for contacts, then iterate over all
+	// the contacts and for each contact will create a constraint between the
+	// sides of the collisionpair and the localizations created from the contact
+	// point. The list of all the constraints will be added back into the
+	// Physics state as a result of this computation
 	for (; pairsIt != pairsEnd; ++pairsIt)
 	{
 		if ((*pairsIt)->hasContacts())
 		{
-			auto firstContact  = (*pairsIt)->getContacts().front();
-			std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> localizations;
-			auto representations = (*pairsIt)->getRepresentations();
-			makeLocalization(
-				representations.first,
-				firstContact->penetrationPoints.first,
-				localizations.first);
-
-			if (localizations.first != nullptr)
+			auto contactsIt = std::begin((*pairsIt)->getContacts());
+			auto contactsEnd = std::end((*pairsIt)->getContacts());
+			for (; contactsIt != contactsEnd; ++contactsIt)
 			{
-				makeLocalization(
-					representations.second,
-					firstContact->penetrationPoints.second ,
-					localizations.second);
-			}
+				std::pair<std::shared_ptr<Localization>, std::shared_ptr<Localization>> localizations;
+				auto representations = (*pairsIt)->getRepresentations();
 
-			if (localizations.first != nullptr && localizations.second != nullptr)
-			{
-				// Make Constraint
+				localizations.first = makeLocalization(representations.first,(*contactsIt)->penetrationPoints.first);
+				localizations.second = makeLocalization(representations.second,(*contactsIt)->penetrationPoints.second);
+
+				if (localizations.first != nullptr && localizations.second != nullptr)
+				{
+					std::pair< std::shared_ptr<ConstraintImplementation>, std::shared_ptr<ConstraintImplementation>>
+						implementations;
+
+					// HS-2013-jul-12 The type of constraint is fixed here right now, to get to a constraint
+					// that we can change we probably will need to predefine collision pairs and their appropriate
+					// contact constraints so we can look up which constraint to use here
+
+					implementations.first = m_factory.getImplementation(
+						representations.first->getPhysicsRepresentation()->getType(),
+						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
+
+					implementations.second = m_factory.getImplementation(
+						representations.second->getPhysicsRepresentation()->getType(),
+						SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT);
+
+					if (implementations.first != nullptr && implementations.second != nullptr)
+					{
+						std::shared_ptr<ContactConstraintData> data = std::make_shared<ContactConstraintData>();
+						data->setPlaneEquation((*contactsIt)->normal, (*contactsIt)->depth);
+
+						constraints.push_back(std::make_shared<Constraint>(
+							data,
+							implementations.first,
+							localizations.first,
+							implementations.second,
+							localizations.second));
+
+					}
+					else
+					{
+						// This needs to be improved for debugging
+						SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
+							" There was a problem generating an implementation";
+					}
+				}
+				else
+				{
+					// This needs to be improved for debugging
+					SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
+						" There was a problem generating a localization";
+				}
 			}
 		}
 	}
 
+	result->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, constraints);
+
 	return std::move(result);
 }
 
-bool ContactConstraintGeneration::makeLocalization(
+std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
 	const std::shared_ptr<CollisionRepresentation>& representation,
-	const Location& location,
-	std::shared_ptr<Localization> localization)
+	const Location& location)
 {
-	bool result = false;
+	std::shared_ptr<Localization> result;
 	auto physicsRepresenation = representation->getPhysicsRepresentation();
 	if (physicsRepresenation != nullptr)
 	{
-		std::shared_ptr<Localization> localization = physicsRepresenation->createLocalization(location);
+		result = physicsRepresenation->createLocalization(location);
 
 		// HS 2013-jun-20 this is not quite right, we are passing in the pointer to the representation
 		// that we just asked about, but I don't know if we can use shared_from_this from the inside and
 		// still get the same reference count as with this  shared_ptr
-		localization->setRepresentation(physicsRepresenation);
-		result = true;
+		result->setRepresentation(physicsRepresenation);
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ <<
+			" Could not find PhysicsReprensentation in CollisionRepresenation ";
 	}
 	return result;
 }

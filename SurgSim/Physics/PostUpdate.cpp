@@ -24,13 +24,19 @@ namespace SurgSim
 namespace Physics
 {
 
-PostUpdate::PostUpdate()
-{}
+PostUpdate::PostUpdate(bool doCopyState) : Computation(doCopyState) 
+{
+
+}
 
 PostUpdate::~PostUpdate()
-{}
+{
 
-std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state)
+}
+
+std::shared_ptr<PhysicsManagerState> PostUpdate::doUpdate(
+	const double& dt,
+	const std::shared_ptr<PhysicsManagerState>& state)
 {
 	std::shared_ptr<PhysicsManagerState> result = state;
 	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();

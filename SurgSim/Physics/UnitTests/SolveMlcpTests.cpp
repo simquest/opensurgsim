@@ -13,24 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ConstraintImplementation.h>
+/// \file Simple Test for SolveMlcp computation
 
-namespace SurgSim
-{
+#include <gtest/gtest.h>
 
-namespace Physics
-{
+#include <memory>
 
-ConstraintImplementation::ConstraintImplementation()
+#include <SurgSim/Physics/PhysicsManagerState.h>
+#include <SurgSim/Physics/SolveMlcp.h>
+
+using SurgSim::Physics::PhysicsManagerState;
+using SurgSim::Physics::SolveMlcp;
+
+TEST(SolveMlcpTest, CanConstruct)
 {
+	ASSERT_NO_THROW({std::shared_ptr<SolveMlcp> solveMlcpComputation = std::make_shared<SolveMlcp>();});
 }
-
-ConstraintImplementation::~ConstraintImplementation()
-{
-}
-
-}; // namespace Physics
-
-}; // namespace SurgSim

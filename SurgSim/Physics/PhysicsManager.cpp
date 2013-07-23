@@ -16,9 +16,15 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/Representation.h>
+
+#include <SurgSim/Physics/PreUpdate.h>
+#include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/DcdCollision.h>
+#include <SurgSim/Physics/ContactConstraintGeneration.h>
+#include <SurgSim/Physics/SolveMlcp.h>
+#include <SurgSim/Physics/PostUpdate.h>
+
 #include <SurgSim/Framework/Log.h>
 
 
@@ -42,8 +48,7 @@ PhysicsManager::~PhysicsManager()
 
 bool PhysicsManager::doInitialize()
 {
-	m_freeMotionStep.reset(new FreeMotion());
-	m_dcdCollision.reset(new DcdCollision());
+	initializeComputations(false);
 	return m_logger != nullptr;
 }
 
@@ -69,24 +74,29 @@ bool PhysicsManager::doUpdate(double dt)
 	// Add all components that came in before the last update
 	processComponents();
 
-	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
-	{
-		(*it)->beforeUpdate(dt);
-	}
-
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 	stateList.push_back(state);
 	state->setRepresentations(m_representations);
-	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
-	stateList.push_back(m_dcdCollision->update(dt, stateList.back()));
 
-	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
-	{
-		(*it)->afterUpdate(dt);
-	}
+	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
+	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
+	stateList.push_back(m_dcdCollisionStep->update(dt, stateList.back()));
+	stateList.push_back(m_constraintGenerationStep->update(dt, stateList.back()));
+	stateList.push_back(m_solveMlcpStep->update(dt, stateList.back()));
+	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
 
 	return true;
+}
+
+void PhysicsManager::initializeComputations(bool copyState)
+{
+	m_preUpdateStep.reset(new PreUpdate(copyState));
+	m_freeMotionStep.reset(new FreeMotion(copyState));
+	m_dcdCollisionStep.reset(new DcdCollision(copyState));
+	m_constraintGenerationStep.reset(new ContactConstraintGeneration(copyState));
+	m_solveMlcpStep.reset(new SolveMlcp(copyState));
+	m_postUpdateStep.reset(new PostUpdate(copyState));
 }
 
 

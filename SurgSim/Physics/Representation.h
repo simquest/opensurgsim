@@ -30,6 +30,14 @@ namespace Physics
 class Localization;
 struct Location;
 
+enum RepresentationType
+{
+	REPRESENTATION_TYPE_FIXED = 0,
+	REPRESENTATION_TYPE_RIGID,
+	REPRESENTATION_TYPE_VTC_RIGID,
+	REPRESENTATION_TYPE_COUNT
+};
+
 /// The Representation class defines the base class for all physics objects
 class Representation : public SurgSim::Framework::Representation
 {
@@ -40,6 +48,8 @@ public:
 
 	/// Destructor
 	virtual ~Representation();
+
+	virtual RepresentationType getType() const = 0;
 
 	/// Reset the representation to its initial/default state
 	virtual void resetState();

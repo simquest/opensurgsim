@@ -13,36 +13,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_PREUPDATE_H
-#define SURGSIM_PHYSICS_PREUPDATE_H
+#ifndef SURGSIM_PHYSICS_SOLVEMLCP_H
+#define SURGSIM_PHYSICS_SOLVEMLCP_H
 
 #include <memory>
 
 #include <SurgSim/Physics/Computation.h>
+#include <SurgSim/Math/MlcpGaussSeidelSolver.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-/// Pre Update is called after everything else is done in the physics time step
-class PreUpdate : public Computation
+/// Solve the system Mixed Linear Complementarity Problem (Mlcp)
+class SolveMlcp : public Computation
 {
 public:
 	/// Constructor
-	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
-	explicit PreUpdate(bool doCopyState = false);
+	/// \param doCopyState Specify if the ouput state is a copy or not of the input state in Computation::Update()
+	explicit SolveMlcp(bool doCopyState = false);
 
 	/// Destructor
-	virtual ~PreUpdate();
+	virtual ~SolveMlcp();
 
 protected:
+
 	/// Override doUpdate from superclass
-	virtual std::shared_ptr<PhysicsManagerState>
-		doUpdate(const double& dt, const std::shared_ptr<PhysicsManagerState>& state) override;
+	/// \param dt The time step
+	/// \param state The Physics manager state
+	/// \return The updated physics manager state (input updated or copied updated)
+	virtual std::shared_ptr<PhysicsManagerState> doUpdate(const double& dt,
+		const std::shared_ptr<PhysicsManagerState>& state) override;
+
+private:
+
+	/// The Gauss-Seidel Mlcp solver
+	SurgSim::Math::MlcpGaussSeidelSolver m_gaussSeidelSolver;
 };
 
 }; // Physics
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_PREUPDATE_H
+#endif // SURGSIM_PHYSICS_SOLVEMLCP_H
