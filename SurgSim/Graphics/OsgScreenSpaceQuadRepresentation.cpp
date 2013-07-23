@@ -16,8 +16,6 @@
 #include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
 #include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/Texture2d.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
 
 #include <osg/Array>
 #include <osg/Geode>
@@ -34,7 +32,7 @@ namespace Graphics
 {
 
 OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
-		const std::string& name, 
+		const std::string& name,
 		std::shared_ptr<View> view) :
 	Representation(name),
 	OsgRepresentation(name),
@@ -42,17 +40,16 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 	m_view(view),
 	m_scale(1.0,1.0,1.0)
 {
-	// get rid of the transform we want to set this up ourselves 
+	// get rid of the transform we want to set this up ourselves
 	m_switch->removeChild(0u,1u);
-
 
 	m_view->getDimensions(&m_displayWidth, &m_displayHeight);
 
 	m_geode = new osg::Geode;
 
-	// Make the quad 
+	// Make the quad
 	osg::Geometry* geom = new osg::Geometry;
-	
+
 	osg::Vec3Array* m_vertices = new osg::Vec3Array;
 	float depth = 0.0;
 	m_vertices->push_back(osg::Vec3(0.0,1.0,depth));
@@ -60,30 +57,30 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 	m_vertices->push_back(osg::Vec3(1.0,0.0,depth));
 	m_vertices->push_back(osg::Vec3(1.0,1.0,depth));
 	setSize(1.0,1.0);
-	
+
 	geom->setVertexArray(m_vertices);
-	
+
 	osg::Vec3Array* normals = new osg::Vec3Array;
 	normals->push_back(osg::Vec3(0.0f,0.0f,1.0f));
 	geom->setNormalArray(normals);
 	geom->setNormalBinding(osg::Geometry::BIND_OVERALL);
-	
+
 	osg::Vec4Array* colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(1.0f,1.0,0.8f,0.2f));
 	geom->setColorArray(colors);
 	geom->setColorBinding(osg::Geometry::BIND_OVERALL);
-	
+
 	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
-	  
+
 	osg::StateSet* stateset = geom->getOrCreateStateSet();
 	stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
-	
+
 	m_geode->addDrawable(geom);
-	
+
 	m_transform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	m_transform->setCullingActive(false);
 	m_transform->addChild(m_geode);
-	
+
 	// Need to keep this around to modify the ortho projection when the view changes
 	m_projection = new osg::Projection;
 	m_projection->setMatrix(osg::Matrix::ortho2D(0,m_displayWidth,0,m_displayHeight));
@@ -131,27 +128,6 @@ void OsgScreenSpaceQuadRepresentation::setPose(const SurgSim::Math::RigidTransfo
 	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
 	m_transform->setPosition(pose.second);
 }
-
-void OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture2d> texture)
-{
-	if (texture == nullptr)
-	{
-		osg::StateSet* state = m_geode->getOrCreateStateSet();
-		state->setTextureAttributeAndModes(0, nullptr, osg::StateAttribute::OFF);
-	}
-	else
-	{
-		std::shared_ptr<OsgTexture2d> osgTexture = std::dynamic_pointer_cast<OsgTexture2d>(texture);
-		if (osgTexture != nullptr)
-		{
-			m_texture = osgTexture;
-			osg::StateSet* state = m_geode->getOrCreateStateSet();
-			state->setTextureAttributeAndModes(0, m_texture->getOsgTexture2d(), osg::StateAttribute::ON);
-		}
-	}
-}
-
-
 
 }; // Graphics
 }; // SurgSim

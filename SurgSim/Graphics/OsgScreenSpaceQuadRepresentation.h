@@ -39,8 +39,6 @@ namespace Graphics
 
 class View;
 class Vec3Array;
-class Texture2d;
-class OsgTexture2d;
 
 class OsgScreenSpaceQuadRepresentation : public OsgRepresentation, public ScreenSpaceQuadRepresentation
 {
@@ -56,13 +54,9 @@ public:
 	virtual void setSize(int width, int height) override;
 
 	/// Gets the size of the quad.
-	/// \param [in,out]	width 	If non-null, the width.
-	/// \param [in,out]	height	If non-null, the height.
-	virtual void OsgScreenSpaceQuadRepresentation::getSize(int* width, int* height) const override;
-
-	/// Sets the texture to display on the quad. Sets the quad to the size of the texture.
-	/// \param	texture	The texture to display on the quad, clears the texture if nullptr.
-	virtual void setTexture(std::shared_ptr<Texture2d> texture) override;
+	/// \param [out]	width 	If non-null, the width.
+	/// \param [out]	height	If non-null, the height.
+	virtual void getSize(int* width, int* height) const override;
 
 	/// Sets the current pose of the representation
 	/// \param	pose	Rigid transformation that describes the current pose of the representation
@@ -70,17 +64,25 @@ public:
 
 private:
 
+	/// The view that is being used
 	std::shared_ptr<View> m_view;
-	std::shared_ptr<OsgTexture2d> m_texture;
 
+	/// Local geode for geometry
 	osg::ref_ptr<osg::Geode> m_geode;
+
+	/// Projection matrix, needs to be updated when the view is changed
 	osg::ref_ptr<osg::Projection> m_projection;
 
+	/// Size of the quad
 	osg::Vec3 m_scale;
 
+	///@{
+	/// Cached view extensions
 	int m_displayWidth;
 	int m_displayHeight;
+	///@}
 
+	/// Overridden from Representation, execute local updates
 	virtual void doUpdate(double dt) override;
 };
 

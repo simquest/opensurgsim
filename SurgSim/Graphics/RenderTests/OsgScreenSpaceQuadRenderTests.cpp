@@ -33,7 +33,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Graphics
 {
@@ -73,7 +73,7 @@ protected:
 
 TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 {
-	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad = 
+	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad", viewElement->getView());
 
 	viewElement->addComponent(quad);
@@ -100,14 +100,15 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		RigidTransform3d currentPose =
-			SurgSim::Testing::interpolatePose(Vector3d::Identity(), Vector3d::Identity(), startPosition, endPosition, t);
+		RigidTransform3d currentPose = SurgSim::Testing::interpolatePose(
+			Vector3d::Identity(), Vector3d::Identity(),
+			startPosition, endPosition, t);
 
 		quad->setPose(currentPose);
 
 		SurgSim::Math::Vector2d size = SurgSim::Testing::interpolate(startSize,endSize,t);
 		quad->setSize(size.x(), size.y());
-		
+
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 

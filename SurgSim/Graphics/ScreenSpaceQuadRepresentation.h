@@ -24,18 +24,25 @@ namespace Graphics
 {
 
 class View;
-class Texture2d;
 
-
-/// A quad to display on the screen in screen space coordinates, can also take a textures to be shown on
-/// the quad.
+/// A quad to display on the screen in screen space coordinates, use setPose() to set the position but 
+/// x,y are presumed to be in screen space with 0|0 being in the lower left corner
 class ScreenSpaceQuadRepresentation : public virtual Representation
 {
 public:
 
-	/// Constructor
-	ScreenSpaceQuadRepresentation(const std::string name, std::shared_ptr<View> view) : Representation(name) {};
-	~ScreenSpaceQuadRepresentation() {};
+	/// Constructor.
+	/// \param	name	The name.
+	/// \param	view	The view that will contain this quad.
+	ScreenSpaceQuadRepresentation(const std::string name, std::shared_ptr<View> view) : Representation(name)
+	{
+
+	}
+
+	~ScreenSpaceQuadRepresentation()
+	{
+
+	}
 
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
@@ -46,10 +53,6 @@ public:
 	/// \param [in,out]	width 	If non-null, the width.
 	/// \param [in,out]	height	If non-null, the height.
 	virtual void getSize(int* width, int* height) const = 0;
-
-	/// Sets the texture to display on the quad. Sets the quad to the size of the texture.
-	/// \param	texture	The texture to display on the quad, clears the texture if nullptr.
-	virtual void setTexture(std::shared_ptr<Texture2d> texture) = 0;
 
 };
 
