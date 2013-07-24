@@ -36,6 +36,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Testing::interpolate;
+using SurgSim::Testing::interpolatePose;
 
 namespace SurgSim
 {
@@ -134,16 +135,8 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
         /// Calculate t in [0.0, 1.0]
         double t = static_cast<double>(i) / numSteps;
         /// Interpolate position and angle
-        capsuleRepresentation1->setPose(makeRigidTransform(
-            makeRotationQuaternion(interpolate(startAngles1.x(), endAngles1.x(), t), Vector3d(1.0, 0.0, 0.0)) *
-			makeRotationQuaternion(interpolate(startAngles1.y(), endAngles1.y(), t), Vector3d(0.0, 1.0, 0.0)) *
-			makeRotationQuaternion(interpolate(startAngles1.z(), endAngles1.z(), t), Vector3d(0.0, 0.0, 1.0)),
-			interpolate(startPosition1, endPosition1, t)));
-        capsuleRepresentation2->setPose(makeRigidTransform(
-            makeRotationQuaternion(interpolate(startAngles2.x(), endAngles2.x(), t), Vector3d(1.0, 0.0, 0.0)) *
-			makeRotationQuaternion(interpolate(startAngles2.y(), endAngles2.y(), t), Vector3d(0.0, 1.0, 0.0)) *
-			makeRotationQuaternion(interpolate(startAngles2.z(), endAngles2.z(), t), Vector3d(0.0, 0.0, 1.0)),
-			interpolate(startPosition2, endPosition2, t)));
+		capsuleRepresentation1->setPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
+		capsuleRepresentation2->setPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
 
 		/// Test different ways to set the size of capsule
         if(setterType == static_cast<int>(SetterTypeIndividual))
