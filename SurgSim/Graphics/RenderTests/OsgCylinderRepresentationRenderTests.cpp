@@ -22,7 +22,6 @@
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Testing/MathUtilities.h>
 
@@ -34,13 +33,10 @@
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
-using SurgSim::Math::makeRigidTransform;
-using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Testing::interpolate;
+using SurgSim::Testing::interpolatePose;
 
 
 namespace SurgSim
@@ -82,7 +78,7 @@ protected:
 
 TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
 {
-	/// Add the two cylinder representation to the view element so we don't need to make another concrete scene element
+	/// Add the two cylinder representation to the view element
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation1 =
 		std::make_shared<OsgCylinderRepresentation>("cylinder representation 1");
 	viewElement->addComponent(cylinderRepresentation1);
@@ -96,10 +92,10 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	enum SetterType {SetterTypeIndividual,
-						SetterTypeTogether,
-						SetterTypeVector2d,
-						// Add more setter types above this line.
-						BoxSetterTypeCount};
+					 SetterTypeTogether,
+					 SetterTypeVector2d,
+					 // Add more setter types above this line.
+					 BoxSetterTypeCount};
 	int setterType = 0;
 
 	Vector2d cylinder1Size, cylinder2Size;
@@ -138,16 +134,9 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
-		cylinderRepresentation1->setPose(makeRigidTransform(
-            makeRotationQuaternion(interpolate(startAngles1.x(), endAngles1.x(), t), Vector3d(1.0, 0.0, 0.0)) *
-            makeRotationQuaternion(interpolate(startAngles1.y(), endAngles1.y(), t), Vector3d(0.0, 1.0, 0.0)) *
-            makeRotationQuaternion(interpolate(startAngles1.z(), endAngles1.z(), t), Vector3d(0.0, 0.0, 1.0)),
-            interpolate(startPosition1, endPosition1, t)));
-		cylinderRepresentation2->setPose(makeRigidTransform(
-			makeRotationQuaternion(interpolate(startAngles2.x(), endAngles2.x(), t), Vector3d(1.0, 0.0, 0.0)) *
-            makeRotationQuaternion(interpolate(startAngles2.y(), endAngles2.y(), t), Vector3d(0.0, 1.0, 0.0)) *
-            makeRotationQuaternion(interpolate(startAngles2.z(), endAngles2.z(), t), Vector3d(0.0, 0.0, 1.0)),
-            interpolate(startPosition2, endPosition2, t)));
+		cylinderRepresentation1->setPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
+		cylinderRepresentation2->setPose(interpolatePose(startAngles2, endAngles2, startPosition1, endPosition2, t));
+
 		if(setterType == static_cast<int>(SetterTypeIndividual))
 		{
 			cylinderRepresentation1->setRadius(interpolate(startSize1.x(), endSize1.x(), t));
