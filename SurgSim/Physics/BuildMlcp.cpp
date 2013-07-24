@@ -29,7 +29,7 @@ namespace SurgSim
 namespace Physics
 {
 
-BuildMlcp::BuildMlcp()
+BuildMlcp::BuildMlcp(bool doCopyState) : Computation(doCopyState)
 {}
 
 BuildMlcp::~BuildMlcp()
@@ -108,7 +108,7 @@ std::shared_ptr<PhysicsManagerState>
 			std::shared_ptr<Localization> localization1 = (*it)->getLocalizations().second;
 			SURGSIM_ASSERT(localization0) << "ConstraintImplementation does not have a localization on side[0]";
 			SURGSIM_ASSERT(localization1) << "ConstraintImplementation does not have a localization on side[1]";
-			const PhysicsManagerState::Mapping<Representation>& mapping = result->getRepresentationsMapping();
+			const MlcpMapping<Representation>& mapping = result->getRepresentationsMapping();
 			int indexRepresentation0 = mapping.getValue(localization0->getRepresentation().get());
 			int indexRepresentation1 = mapping.getValue(localization1->getRepresentation().get());
 			SURGSIM_ASSERT(indexRepresentation0 >= 0) << "Index for representation 0 is invalid: " <<

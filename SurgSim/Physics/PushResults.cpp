@@ -23,7 +23,7 @@ namespace SurgSim
 namespace Physics
 {
 
-PushResults::PushResults()
+PushResults::PushResults(bool doCopyState) : Computation(doCopyState)
 {}
 
 PushResults::~PushResults()

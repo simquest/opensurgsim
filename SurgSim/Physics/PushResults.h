@@ -30,7 +30,8 @@ class PushResults : public Computation
 {
 public:
 	/// Constructor
-	PushResults();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit PushResults(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~PushResults();

@@ -21,6 +21,7 @@
 #include <unordered_map>
 
 #include <SurgSim/Physics/Constraint.h>
+#include <SurgSim/Physics/MlcpMapping.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
 #include <SurgSim/Physics/MlcpPhysicsSolution.h>
 #include <SurgSim/Physics/Representation.h>
@@ -41,47 +42,6 @@ enum ConstraintGroupType
 class PhysicsManagerState
 {
 public:
-
-	template <class T>
-	class Mapping
-	{
-	public:
-		Mapping(){}
-
-		/// Clear the mapping
-		void clear()
-		{
-			m_indexMapping.clear();
-		}
-
-		/// Sets the key/value (add an entry if the key is not found, change the value otherwise)
-		void setValue(const T* key, int value)
-		{
-			typename std::unordered_map<const T*, int>::iterator found = m_indexMapping.find(key);
-			if (found == m_indexMapping.end())
-			{
-				m_indexMapping.insert(std::make_pair(key, value));
-			}
-			else
-			{
-				(*found).second = value;
-			}
-		}
-
-		/// Gets the value from a given key
-		int getValue(const T* key) const
-		{
-			typename std::unordered_map<const T*, int>::const_iterator returnValue = m_indexMapping.find(key);
-			return (returnValue == m_indexMapping.end() ? -1 : (*returnValue).second);
-		}
-
-	private:
-
-		/// The index mapping data structure
-		std::unordered_map<const T*, int> m_indexMapping;
-	};
-
-
 	/// Constructor
 	PhysicsManagerState() {}
 	~PhysicsManagerState() {}
@@ -171,7 +131,7 @@ public:
 	/// Gets the representations mapping
 	/// \return	The representations mapping (mapping between the representation and the mlcp)
 	/// Each representation has an index in the mlcp. This mapping is about this index.
-	const Mapping<Representation>& getRepresentationsMapping() const
+	const MlcpMapping<Representation>& getRepresentationsMapping() const
 	{
 		return m_representationsIndexMapping;
 	}
@@ -179,7 +139,7 @@ public:
 	/// Gets the constraints mapping
 	/// \return	The constraints mapping (mapping between the constraints and the mlcp)
 	/// Each constraint has an index in the mlcp. This mapping is about this index.
-	const Mapping<Constraint>& getConstraintsMapping() const
+	const MlcpMapping<Constraint>& getConstraintsMapping() const
 	{
 		return m_constraintsIndexMapping;
 	}
@@ -200,10 +160,10 @@ private:
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
 
 	/// Representation mapping
-	Mapping<Representation> m_representationsIndexMapping;
+	MlcpMapping<Representation> m_representationsIndexMapping;
 
 	/// Constraints mapping
-	Mapping<Constraint> m_constraintsIndexMapping;
+	MlcpMapping<Constraint> m_constraintsIndexMapping;
 
 	///@}
 	/// Mlcp problem for this Physics Manager State

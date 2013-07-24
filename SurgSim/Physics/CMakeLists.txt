@@ -72,6 +72,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Location.h
 	MeshShape.h
+	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
 	PhysicsManager.h

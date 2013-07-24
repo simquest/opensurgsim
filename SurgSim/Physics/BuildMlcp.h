@@ -28,7 +28,8 @@ class BuildMlcp : public Computation
 {
 public:
 	/// Constructor
-	BuildMlcp();
+	/// \param doCopyState Specify if the output state in Computation::Update() is a copy or not of the input state
+	explicit BuildMlcp(bool doCopyState = false);
 
 	/// Destructor
 	virtual ~BuildMlcp();
