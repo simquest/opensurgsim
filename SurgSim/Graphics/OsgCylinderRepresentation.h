@@ -80,6 +80,8 @@ private:
 	std::shared_ptr<OsgUnitCylinder> m_sharedUnitCylinder;
 	/// Returns the shared unit cylinder
 	static std::shared_ptr<OsgUnitCylinder> getSharedUnitCylinder();
+
+	osg::ref_ptr<osg::PositionAttitudeTransform> m_patCylinder;
 };
 
 };  // namespace Graphics
