@@ -53,8 +53,7 @@ std::shared_ptr<PhysicsManagerState>
 	{
 		int index = result->getRepresentationsMapping().getValue((*it).get());
 		SURGSIM_ASSERT(index >= 0) << "Bad index found for representation " << (*it)->getName() << std::endl;
-		//(*it)->applyDofCorrection(dt, dofCorrection.block(index, 0, (*it)->getNumDof(), 1));
-		(*it)->applyDofCorrection(dt, dofCorrection.block(index, 0, (*it)->getNumDof(), 1));
+		(*it)->applyDofCorrection(dt, dofCorrection.segment(index, (*it)->getNumDof()));
 	}
 
 	return result;

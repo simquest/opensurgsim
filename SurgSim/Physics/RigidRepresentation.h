@@ -101,7 +101,7 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	void applyDofCorrection(double dt, const Eigen::Block<SurgSim::Math::MlcpSolution::Vector>& block) override;
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
 
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters()
