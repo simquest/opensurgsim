@@ -37,6 +37,7 @@ using SurgSim::Framework::SceneElement;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector2d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 
@@ -46,8 +47,43 @@ namespace SurgSim
 namespace Graphics
 {
 
+struct OsgRepresentationRenderTests : public ::testing::Test
+{
+    virtual void SetUp()
+    {
+        runtime = std::make_shared<SurgSim::Framework::Runtime>();
+        manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-TEST(OsgRepresentationRenderTests, RepresentationTest)
+        runtime->addManager(manager);
+
+        scene = std::make_shared<SurgSim::Framework::Scene>();
+        runtime->setScene(scene);
+
+        viewElement = std::make_shared<OsgViewElement>("view element");
+        scene->addSceneElement(viewElement);
+
+    }
+
+    virtual void TearDown()
+    {
+        runtime->stop();
+    }
+
+    std::shared_ptr<SurgSim::Framework::Runtime> runtime;
+    std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
+    std::shared_ptr<SurgSim::Framework::Scene> scene;
+    std::shared_ptr<OsgViewElement> viewElement;
+
+protected:
+
+};
+
+/// This test will put all shape one by one along the X-axis
+/// To make sure all shapes are aligned.
+/// X-axis points horizontally to the right
+/// Y-axis points vertically up
+/// Z-axis is perpendicular to the screen and points out
+TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 {
 	///	Box position
 	Vector3d boxPosition(0.0, 0.0, -0.2);
@@ -55,30 +91,12 @@ TEST(OsgRepresentationRenderTests, RepresentationTest)
 	Vector3d cylinderPosition(-0.05, 0.0, -0.2);
 	/// Sphere position
 	Vector3d spherePosition(0.05, 0.0, -0.2);
-	/// Size along X-axis of the box
-	double boxSizeX = 0.03;
-	/// Size along Y-axis of the box
-	double boxSizeY = 0.05;
-	/// Size along Z-axis of the box
-	double boxSizeZ = 0.05;
-	/// Radius along X-axis and Z-axis of the cylinder
-	double cylinderRadius= 0.005;
-	/// Height along Y-axis of the cylinder
-	double cylinderHeight = 0.015;
+	/// Size of the box
+	Vector3d boxSize(0.03, 0.05, 0.05);
+	/// Size of the cylinder
+	Vector2d cylinderSize(0.005, 0.015);
 	/// Radius of the sphere
 	double sphereRadius = 0.006;
-
-	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
-	std::shared_ptr<OsgManager> manager = std::make_shared<OsgManager>();
-
-	runtime->addManager(manager);
-
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
-
-	/// Add a graphics view element to the scene
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");
-	scene->addSceneElement(viewElement);
 
 	/// Add representations to the view element so we don't need to make another concrete scene element
 	std::shared_ptr<BoxRepresentation> boxRepresentation =
@@ -103,14 +121,14 @@ TEST(OsgRepresentationRenderTests, RepresentationTest)
 	sphereRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), spherePosition ));
 
 	/// Set the size of box
-	boxRepresentation->setSize(boxSizeX, boxSizeY, boxSizeZ);
+	boxRepresentation->setSize(boxSize.x(), boxSize.y(), boxSize.z());
 	/// Set the size of cylinder
-	cylinderRepresentation->setSize(cylinderRadius, cylinderHeight);
+	/// Cylinder should use Y-axis as its axis
+	cylinderRepresentation->setSize(cylinderSize.x(), cylinderSize.y());
 	/// Set the size of sphere
 	sphereRepresentation->setRadius(sphereRadius);
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
-	runtime->stop();
 }
 
 };  // namespace Graphics
