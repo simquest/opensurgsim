@@ -47,7 +47,7 @@ std::shared_ptr<PhysicsManagerState>
 	unsigned int numDof = 0;
 
 	// Calculate numAtomicConstraint and numConstraint
-	for (int constraintType = CONSTRAINT_GROUP_TYPE_CONTACT;
+	for (int constraintType = 0;
 		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
 		constraintType++)
 	{
@@ -89,7 +89,7 @@ std::shared_ptr<PhysicsManagerState>
 
 	// Fill up the Mlcp problem
 	unsigned int constraintId = 0;
-	for (int constraintType = CONSTRAINT_GROUP_TYPE_CONTACT;
+	for (int constraintType = 0;
 		constraintType < CONSTRAINT_GROUP_TYPE_COUNT;
 		constraintType++)
 	{
