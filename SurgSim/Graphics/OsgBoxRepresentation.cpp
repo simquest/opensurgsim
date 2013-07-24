@@ -30,8 +30,8 @@ using SurgSim::Graphics::OsgUnitBox;
 
 OsgBoxRepresentation::OsgBoxRepresentation(const std::string& name) :
 	Representation(name),
-	BoxRepresentation(name),
 	OsgRepresentation(name),
+	BoxRepresentation(name),
 	m_scale(1.0, 1.0, 1.0),
 	m_sharedUnitBox(getSharedUnitBox())
 {
