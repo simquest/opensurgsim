@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_PLANESHAPE_H
-#define SURGSIM_PHYSICS_PLANESHAPE_H
+#ifndef SURGSIM_PHYSICS_DOUBLESIDEDPLANESHAPE_H
+#define SURGSIM_PHYSICS_DOUBLESIDEDPLANESHAPE_H
 
 #include <SurgSim/Physics/RigidShape.h>
 
@@ -24,14 +24,14 @@ namespace SurgSim
 namespace Physics
 {
 
-/// PlaneShape: The XZ plane (d = 0) with normal pointing along
+/// DoubleSidedPlaneShape: The XZ plane (d = 0) with normal pointing along
 /// positive Y axis.
-class PlaneShape: public RigidShape
+class DoubleSidedPlaneShape: public RigidShape
 {
 public:
 
 	/// Constructor: No members to initialize.
-	PlaneShape()
+	DoubleSidedPlaneShape()
 	{
 
 	}
@@ -39,14 +39,14 @@ public:
 	/// \return the type of the shape
 	int getType()
 	{
-		return RIGID_SHAPE_TYPE_PLANE;
+		return RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE;
 	}
 
 	/// Calculate the volume of the plane
 	/// \return The volume of the plane, which is 0
 	double calculateVolume() const
 	{
-		return 0;
+		return 0.0;
 	}
 
 	/// Calculate the mass center of the plane
@@ -84,4 +84,4 @@ public:
 
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_PLANESHAPE_H
+#endif // SURGSIM_PHYSICS_DOUBLESIDEDPLANESHAPE_H

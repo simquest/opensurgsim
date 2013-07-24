@@ -71,8 +71,10 @@ void DcdCollision::populateCalculationTable()
 		}
 	}
 	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact());
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(false));
-	m_contactCalculations[RIGID_SHAPE_TYPE_PLANE][RIGID_SHAPE_TYPE_SPHERE].reset(new SpherePlaneDcdContact(true));
+	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE].
+		reset(new SphereDoubleSidedPlaneDcdContact(false));
+	m_contactCalculations[RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE][RIGID_SHAPE_TYPE_SPHERE].
+		reset(new SphereDoubleSidedPlaneDcdContact(true));
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)

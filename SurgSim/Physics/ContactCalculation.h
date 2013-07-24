@@ -100,14 +100,14 @@ public:
 };
 
 
-/// Class to calculate intersections between Spheres and Planes
-class SpherePlaneDcdContact : public ContactCalculation
+/// Class to calculate intersections between Spheres and DoubleSidedPlanes
+class SphereDoubleSidedPlaneDcdContact : public ContactCalculation
 {
 public:
 
 	/// Constructor.
 	/// \param	swapPairs	Set to true if the calculation needs to switch the members of the pair.
-	explicit SpherePlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
+	explicit SphereDoubleSidedPlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
 	{
 
 	}

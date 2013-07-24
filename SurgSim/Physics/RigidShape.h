@@ -29,10 +29,12 @@ namespace Physics
 /// (i.e. CylinderShape and CapsuleShape)
 typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTION_AXIS_Z=2} ShapeDirection;
 
-/// Fixed List of enums for the available RigidShape types, do not explicitely assign values, RigidShapeCount is
+/// Fixed List of enums for the available RigidShape types, do not explicitly assign values, RigidShapeCount is
 /// used to determine the number of actual shape types
-typedef enum {
+typedef enum
+{
 	RIGID_SHAPE_TYPE_PLANE = 0,
+	RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE,
 	RIGID_SHAPE_TYPE_SPHERE,
 	RIGID_SHAPE_TYPE_BOX,
 	RIGID_SHAPE_TYPE_CYLINDER,
@@ -42,7 +44,7 @@ typedef enum {
 } RigidShapeType;
 
 /// Generic rigid shape class defining a shape for a rigid representation
-/// \note This class gives the ability to analyse the shape and compute
+/// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
 class RigidShape
 {

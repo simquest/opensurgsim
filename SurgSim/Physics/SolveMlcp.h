@@ -37,6 +37,12 @@ public:
 	/// Destructor
 	virtual ~SolveMlcp();
 
+	void setMaxIterations(int maxIterations);
+
+	void setSolverPrecision(double epsilon);
+
+	void setContactTolerance(double epsilon);
+
 protected:
 
 	/// Override doUpdate from superclass

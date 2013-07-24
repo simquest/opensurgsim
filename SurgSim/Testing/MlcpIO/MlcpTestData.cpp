@@ -13,15 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_SHAPES_H
-#define SURGSIM_PHYSICS_SHAPES_H
+#include <iomanip>
 
-/// This file includes all the shapes
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/CapsuleShape.h>
-#include <SurgSim/Physics/CylinderShape.h>
-#include <SurgSim/Physics/MeshShape.h>
-#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
+#include <SurgSim/Testing/MlcpIO/ReadText.h>
 
-#endif // SURGSIM_PHYSICS_SHAPES_H
+std::shared_ptr<MlcpTestData> loadTestData(const std::string& fileName)
+{
+	std::shared_ptr<MlcpTestData> data = std::make_shared<MlcpTestData>();
+	if (! readMlcpTestDataAsText("MlcpTestData/" + fileName, data.get()))
+	{
+		data.reset();
+	}
+	return data;
+}
+
+std::string getTestFileName(const std::string& prefix, int index, const std::string& suffix)
+{
+	std::ostringstream stream;
+	stream << prefix << std::setfill('0') << std::setw(3) << index << suffix;
+	return stream.str();
+}

@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	BuildMlcpTests.cpp
 	CollisionPairTests.cpp
 	ConstraintTests.cpp
 	ContactCalculationTests.cpp
@@ -36,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
+	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
@@ -52,6 +54,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	CommonTests.h
 	MockObjects.h
 	RepresentationUtilities.h
 )
@@ -59,6 +62,8 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics MlcpTestIO gtest ${Boost_LIBRARIES})
+
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)

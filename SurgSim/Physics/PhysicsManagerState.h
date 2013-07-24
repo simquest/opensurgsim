@@ -20,17 +20,18 @@
 #include <vector>
 #include <unordered_map>
 
+#include <SurgSim/Physics/Constraint.h>
+#include <SurgSim/Physics/MlcpMapping.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
 #include <SurgSim/Physics/MlcpPhysicsSolution.h>
+#include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-class Representation;
 class CollisionPair;
-class Constraint;
 
 enum ConstraintGroupType
 {
@@ -41,7 +42,6 @@ enum ConstraintGroupType
 class PhysicsManagerState
 {
 public:
-
 	/// Constructor
 	PhysicsManagerState() {}
 	~PhysicsManagerState() {}
@@ -51,6 +51,14 @@ public:
 	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val)
 	{
 		m_representations = val;
+
+		int index = 0;
+		m_representationsIndexMapping.clear();
+		for (auto it = val.begin(); it != val.end(); it++)
+		{
+			m_representationsIndexMapping.setValue((*it).get(), index);
+			index += (*it)->getNumDof();
+		}
 	}
 
 	/// Gets the representations.
@@ -82,6 +90,20 @@ public:
 	void setConstraintGroup(ConstraintGroupType type, const std::vector<std::shared_ptr<Constraint>>& constraints)
 	{
 		m_constraints[type] = constraints;
+
+		// As of now, the mapping is redone entirely each time we call setConstraints
+		int index = 0;
+		m_constraintsIndexMapping.clear();
+		int constraintTypeEnd   = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
+		for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
+		{
+			//ConstraintGroupType type = static_cast<ConstraintGroupType>(constraintType);
+			for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
+			{
+				m_constraintsIndexMapping.setValue((*it).get(), index);
+				index += (*it)->getNumDof();
+			}
+		}
 	}
 
 	/// Gets constraint group.
@@ -92,14 +114,34 @@ public:
 		return m_constraints[type];
 	}
 
+	/// Gets the Mlcp problem
+	/// \return	The Mlcp problem for this physics manager state (read/write access).
 	MlcpPhysicsProblem& getMlcpProblem()
 	{
 		return m_mlcpPhysicsProblem;
 	}
 
+	/// Gets the Mlcp solution
+	/// \return	The Mlcp solution for this physics manager state (read/write access).
 	MlcpPhysicsSolution& getMlcpSolution()
 	{
 		return m_mlcpPhysicsSolution;
+	}
+
+	/// Gets the representations mapping
+	/// \return	The representations mapping (mapping between the representation and the mlcp)
+	/// Each representation has an index in the mlcp. This mapping is about this index.
+	const MlcpMapping<Representation>& getRepresentationsMapping() const
+	{
+		return m_representationsIndexMapping;
+	}
+
+	/// Gets the constraints mapping
+	/// \return	The constraints mapping (mapping between the constraints and the mlcp)
+	/// Each constraint has an index in the mlcp. This mapping is about this index.
+	const MlcpMapping<Constraint>& getConstraintsMapping() const
+	{
+		return m_constraintsIndexMapping;
 	}
 
 private:
@@ -116,6 +158,13 @@ private:
 
 	/// The local map of constraints
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
+
+	/// Representation mapping
+	MlcpMapping<Representation> m_representationsIndexMapping;
+
+	/// Constraints mapping
+	MlcpMapping<Constraint> m_constraintsIndexMapping;
+
 	///@}
 	/// Mlcp problem for this Physics Manager State
 	MlcpPhysicsProblem m_mlcpPhysicsProblem;
