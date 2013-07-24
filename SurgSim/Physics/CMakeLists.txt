@@ -73,7 +73,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MlcpPhysicsSolution.h
 	PhysicsManager.h
 	PhysicsManagerState.h
-	PlaneShape.h
+	DoubleSidedPlaneShape.h
 	PostUpdate.h
 	PreUpdate.h
 	Representation.h
