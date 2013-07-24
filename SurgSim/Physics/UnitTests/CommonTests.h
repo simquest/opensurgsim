@@ -14,6 +14,9 @@
 
 /// \file Common data structure for physics tests
 
+#ifndef SURGSIM_PHYSICS_UNITTESTS_COMMONTESTS_H
+#define SURGSIM_PHYSICS_UNITTESTS_COMMONTESTS_H
+
 #include <gtest/gtest.h>
 
 #include <string>
@@ -150,3 +153,5 @@ protected:
 
 }; // namespace Physics
 }; // namespace SurgSim
+
+#endif // SURGSIM_PHYSICS_UNITTESTS_COMMONTESTS_H

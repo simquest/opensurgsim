@@ -134,9 +134,8 @@ public:
 		// As of now, the mapping is redone entirely each time we call setConstraints
 		int index = 0;
 		m_constraintsIndexMapping.clear();
-		int constraintTypeBegin = static_cast<int>(CONSTRAINT_GROUP_TYPE_CONTACT);
 		int constraintTypeEnd   = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
-		for (int constraintType = constraintTypeBegin ; constraintType < constraintTypeEnd ; constraintType++)
+		for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
 		{
 			//ConstraintGroupType type = static_cast<ConstraintGroupType>(constraintType);
 			for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
