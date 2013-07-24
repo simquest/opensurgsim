@@ -54,6 +54,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	CommonTests.h
 	MockObjects.h
 	RepresentationUtilities.h
 )

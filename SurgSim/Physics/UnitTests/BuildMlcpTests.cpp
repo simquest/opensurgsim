@@ -19,114 +19,28 @@
 #include <string>
 #include <memory>
 
+#include <SurgSim/Physics/UnitTests/CommonTests.h>
 #include <SurgSim/Physics/BuildMlcp.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintImplementation.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/FixedRepresentationContact.h>
-#include <SurgSim/Physics/FixedRepresentationLocalization.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/MlcpPhysicsSolution.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationContact.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
-#include <SurgSim/Physics/RigidShape.h>
 
-namespace
-{
-	const double epsilon = 1e-10;
-};
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-class BuildMlcpTests : public ::testing::Test
+/// Redefine class
+class BuildMlcpTests : public CommonTests
 {
 public:
-	/// Setup the test case by creating all object
 	void SetUp()
 	{
-		// Set the time step
-		dt = 1e-3;
-
-		// Create a fixed world to define constraint against it
-		m_fixedWorldRepresentation = std::make_shared<FixedRepresentation>("FixedPlane");
-		m_fixedWorldRepresentation->setIsGravityEnabled(false);
-		{
-			// Simply do 1 time step to make sure things are initialized (compliance matrix...)
-			m_fixedWorldRepresentation->beforeUpdate(dt);
-			m_fixedWorldRepresentation->update(dt);
-			m_fixedWorldRepresentation->afterUpdate(dt);
-		}
-
-		// Create the physics manager state
-		m_physicsManagerState = std::make_shared<PhysicsManagerState>();
+		CommonTests::SetUp();
 
 		// Create the BuildMlcp computation
 		m_buildMlcpComputation = std::make_shared<BuildMlcp>();
-
-		// Create a Rigid Sphere
-		std::shared_ptr<RigidRepresentation> rigidSphereRepresentation;
-		rigidSphereRepresentation = std::make_shared<RigidRepresentation>("RigidSphere");
-		{
-			RigidRepresentationParameters param;
-			double radius = 1e-2;
-			param.setDensity(1000);
-			std::shared_ptr<RigidShape> shape = std::make_shared<SphereShape>(radius);
-			param.setShapeUsedForMassInertia(shape);
-			rigidSphereRepresentation->setInitialParameters(param);
-			rigidSphereRepresentation->setIsGravityEnabled(false);
-			{
-				// Simply do 1 time step to make sure things are initialized (compliance matrix...)
-				rigidSphereRepresentation->beforeUpdate(dt);
-				rigidSphereRepresentation->update(dt);
-				rigidSphereRepresentation->afterUpdate(dt);
-			}
-			m_allRepresentations.push_back(rigidSphereRepresentation);
-		}
-
-		// Create a Rigid Box
-		std::shared_ptr<RigidRepresentation> rigidBoxRepresentation = std::make_shared<RigidRepresentation>("RigidBox");
-		{
-			RigidRepresentationParameters param;
-			double size[3]={0.01, 0.02, 0.03};
-			param.setDensity(1000);
-			std::shared_ptr<RigidShape> shape = std::make_shared<BoxShape>(size[0], size[1], size[2]);
-			param.setShapeUsedForMassInertia(shape);
-			rigidBoxRepresentation->setInitialParameters(param);
-			rigidBoxRepresentation->setIsGravityEnabled(false);
-			{
-				// Simply do 1 time step to make sure things are initialized (compliance matrix...)
-				rigidBoxRepresentation->beforeUpdate(dt);
-				rigidBoxRepresentation->update(dt);
-				rigidBoxRepresentation->afterUpdate(dt);
-			}
-			m_allRepresentations.push_back(rigidBoxRepresentation);
-		}
 	}
 
 protected:
-	/// Time step
-	double dt;
-
-	/// Fixed representation to define constraint in fixed space
-	std::shared_ptr<Representation> m_fixedWorldRepresentation;
-
-	/// Vector of all representations
-	std::vector<std::shared_ptr<Representation>> m_allRepresentations;
-
-	/// Vector of representations useful for the current test
-	std::vector<std::shared_ptr<Representation>> m_usedRepresentations;
-
-	/// Vector of constraints useful for the current test
-	std::vector<std::shared_ptr<Constraint>> m_usedConstraints;
-
-	/// The unique physics manager state
-	std::shared_ptr<PhysicsManagerState> m_physicsManagerState;
 
 	/// The Build Mlcp computation
 	std::shared_ptr<BuildMlcp> m_buildMlcpComputation;
