@@ -47,7 +47,7 @@ std::shared_ptr<Representation> createSphere(const std::string& name, const Surg
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.01); // 1cm Sphere
+	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(1.0); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
 	representation->setInitialParameters(params);
@@ -72,5 +72,6 @@ TEST(DcdCollisionTest, SingleCollisionTest)
 	SurgSim::Physics::DcdCollision computation;
 	std::shared_ptr<PhysicsManagerState> newState = computation.update(1.0, state);
 
-	EXPECT_EQ(1u, newState->getCollisionPairs().size());
+	ASSERT_EQ(1u, newState->getCollisionPairs().size());
+	EXPECT_TRUE(newState->getCollisionPairs().at(0)->hasContacts());
 }
