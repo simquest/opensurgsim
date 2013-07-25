@@ -23,11 +23,12 @@ namespace Physics
 
 
 RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
-	std::shared_ptr<RigidShape> shape,
-	std::shared_ptr<Representation> representation) :
-	m_shape(shape), m_representation(representation)
+		const std::string& name,
+		std::shared_ptr<RigidShape> shape,
+		std::shared_ptr<SurgSim::Physics::Representation> representation) :
+	CollisionRepresentation(name,representation),
+	m_shape(shape)
 {
-
 }
 
 RigidShapeCollisionRepresentation::~RigidShapeCollisionRepresentation()
@@ -45,10 +46,7 @@ const std::shared_ptr<SurgSim::Physics::RigidShape> RigidShapeCollisionRepresent
 	return m_shape;
 }
 
-const SurgSim::Math::RigidTransform3d& RigidShapeCollisionRepresentation::getCurrentPose() const
-{
-	return m_representation->getPose();
-}
+
 
 }; // Physics
 }; // SurgSim

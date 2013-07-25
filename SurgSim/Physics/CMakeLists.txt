@@ -34,6 +34,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FreeMotion.cpp
 	Localization.cpp
 	PhysicsManager.cpp
+	PhysicsManagerState.cpp
 	PostUpdate.cpp
 	PreUpdate.cpp
 	PushResults.cpp

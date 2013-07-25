@@ -19,6 +19,7 @@
 
 #include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 
 namespace SurgSim
 {

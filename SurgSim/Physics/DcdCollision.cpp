@@ -19,6 +19,8 @@
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/ContactCalculation.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
+
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
@@ -78,35 +80,21 @@ void DcdCollision::populateCalculationTable()
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<Representation>> representations = state->getRepresentations();
-	std::list<std::shared_ptr<RigidRepresentation>> rigidRepresentations;
+	std::vector<std::shared_ptr<CollisionRepresentation>> representations = state->getCollisionRepresentations();
 
 	if (representations.size() > 1)
 	{
-		for (auto it = representations.cbegin(); it != representations.cend(); ++it)
-		{
-			std::shared_ptr<RigidRepresentation> rigid = std::dynamic_pointer_cast<RigidRepresentation>(*it);
-			if (rigid != nullptr && rigid->isActive())
-			{
-				rigidRepresentations.push_back(rigid);
-			}
-		}
-	}
-
-	if (rigidRepresentations.size() > 1)
-	{
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
-		auto firstEnd = rigidRepresentations.end();
+		auto firstEnd = std::end(representations);
 		--firstEnd;
-		for (auto first = rigidRepresentations.begin(); first != firstEnd; ++first)
+		for (auto first = std::begin(representations); first != firstEnd; ++first)
 		{
-			std::list<std::shared_ptr<RigidRepresentation>>::iterator second = first;
+			auto second = first;
 			++second;
-			for (; second != rigidRepresentations.end(); ++second)
+			for (; second != std::end(representations); ++second)
 			{
 				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-				pair->setRepresentations(std::make_shared<RigidCollisionRepresentation>(*first),
-					std::make_shared<RigidCollisionRepresentation>(*second));
+				pair->setRepresentations(*first,*second);
 				pairs.push_back(pair);
 			}
 		}

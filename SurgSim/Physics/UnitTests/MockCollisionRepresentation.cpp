@@ -22,18 +22,24 @@ namespace Physics
 
 
 MockCollisionRepresentation::MockCollisionRepresentation(
-	const std::shared_ptr<RigidShape>& shape,
-	const SurgSim::Math::Quaterniond& quat,
-	const SurgSim::Math::Vector3d& translation) :
-	m_shape(shape), m_transform(SurgSim::Math::makeRigidTransform(quat, translation))
+		const std::string& name,
+		const std::shared_ptr<RigidShape>& shape,
+		const SurgSim::Math::Quaterniond& quat,
+		const SurgSim::Math::Vector3d& translation) :
+	CollisionRepresentation(name),
+	m_shape(shape),
+	m_transform(SurgSim::Math::makeRigidTransform(quat, translation))
 {
 
 }
 
 MockCollisionRepresentation::MockCollisionRepresentation(
-	const std::shared_ptr<RigidShape>& shape,
-	const SurgSim::Math::RigidTransform3d& pose) :
-	m_shape(shape), m_transform(pose)
+		const std::string& name,
+		const std::shared_ptr<RigidShape>& shape,
+		const SurgSim::Math::RigidTransform3d& pose) :
+	CollisionRepresentation(name),
+	m_shape(shape),
+	m_transform(pose)
 {
 
 }
@@ -54,7 +60,7 @@ const std::shared_ptr<SurgSim::Physics::RigidShape> MockCollisionRepresentation:
 	return m_shape;
 }
 
-const SurgSim::Math::RigidTransform3d& MockCollisionRepresentation::getCurrentPose() const
+const SurgSim::Math::RigidTransform3d& MockCollisionRepresentation::getPose() const
 {
 	return m_transform;
 }

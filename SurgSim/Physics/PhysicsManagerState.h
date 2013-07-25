@@ -32,6 +32,7 @@ namespace Physics
 {
 
 class CollisionPair;
+class CollisionRepresentation;
 
 enum ConstraintGroupType
 {
@@ -43,106 +44,58 @@ class PhysicsManagerState
 {
 public:
 	/// Constructor
-	PhysicsManagerState() {}
-	~PhysicsManagerState() {}
+	PhysicsManagerState();
+	~PhysicsManagerState();
 
 	/// Sets the representations for the state, these are the basis for all the computations.
 	/// \param	val The list of representations.
-	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val)
-	{
-		m_representations = val;
-
-		int index = 0;
-		m_representationsIndexMapping.clear();
-		for (auto it = val.begin(); it != val.end(); it++)
-		{
-			m_representationsIndexMapping.setValue((*it).get(), index);
-			index += (*it)->getNumDof();
-		}
-	}
+	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val);
 
 	/// Gets the representations.
 	/// \return	The representations.
-	const std::vector<std::shared_ptr<Representation>>& getRepresentations() const
-	{
-		return m_representations;
-	}
+	const std::vector<std::shared_ptr<Representation>>& getRepresentations();
+
+	void setCollisionRepresentations(const std::vector<std::shared_ptr<CollisionRepresentation>>& val);
+
+	const std::vector<std::shared_ptr<CollisionRepresentation>>& getCollisionRepresentations();
 
 	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
 	/// should only be from the list of representations that are in this state.
 	/// \param	val	The list of collision pairs.
-	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val)
-	{
-		m_collisionPairs = val;
-	}
+	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val);
 
 	/// Gets collision pairs.
 	/// \return	The collision pairs.
-	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs() const
-	{
-		return m_collisionPairs;
-	}
+	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs();
 
 	/// Sets the group of constraints to a given value, the grouping indicates what type of constraint we are dealing
 	/// with.
 	/// \param	type	   	The type of constraint grouping e.g. Contact Constraints.
 	/// \param	constraints	The constraints.
-	void setConstraintGroup(ConstraintGroupType type, const std::vector<std::shared_ptr<Constraint>>& constraints)
-	{
-		m_constraints[type] = constraints;
-
-		// As of now, the mapping is redone entirely each time we call setConstraints
-		int index = 0;
-		m_constraintsIndexMapping.clear();
-		int constraintTypeEnd   = static_cast<int>(CONSTRAINT_GROUP_TYPE_COUNT);
-		for (int constraintType = 0 ; constraintType < constraintTypeEnd ; constraintType++)
-		{
-			//ConstraintGroupType type = static_cast<ConstraintGroupType>(constraintType);
-			for (auto it = m_constraints[constraintType].begin(); it != m_constraints[constraintType].end(); it++)
-			{
-				m_constraintsIndexMapping.setValue((*it).get(), index);
-				index += (*it)->getNumDof();
-			}
-		}
-	}
+	void setConstraintGroup(ConstraintGroupType type, const std::vector<std::shared_ptr<Constraint>>& constraints);
 
 	/// Gets constraint group.
 	/// \param	type	The type.
 	/// \return	The constraint group.
-	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(ConstraintGroupType type)
-	{
-		return m_constraints[type];
-	}
+	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(int type);
 
 	/// Gets the Mlcp problem
 	/// \return	The Mlcp problem for this physics manager state (read/write access).
-	MlcpPhysicsProblem& getMlcpProblem()
-	{
-		return m_mlcpPhysicsProblem;
-	}
+	MlcpPhysicsProblem& getMlcpProblem();
 
 	/// Gets the Mlcp solution
 	/// \return	The Mlcp solution for this physics manager state (read/write access).
-	MlcpPhysicsSolution& getMlcpSolution()
-	{
-		return m_mlcpPhysicsSolution;
-	}
+	MlcpPhysicsSolution& getMlcpSolution();
 
 	/// Gets the representations mapping
 	/// \return	The representations mapping (mapping between the representation and the mlcp)
 	/// Each representation has an index in the mlcp. This mapping is about this index.
-	const MlcpMapping<Representation>& getRepresentationsMapping() const
-	{
-		return m_representationsIndexMapping;
-	}
+	const MlcpMapping<Representation>& getRepresentationsMapping() const;
 
 	/// Gets the constraints mapping
 	/// \return	The constraints mapping (mapping between the constraints and the mlcp)
 	/// Each constraint has an index in the mlcp. This mapping is about this index.
-	const MlcpMapping<Constraint>& getConstraintsMapping() const
-	{
-		return m_constraintsIndexMapping;
-	}
+	const MlcpMapping<Constraint>& getConstraintsMapping() const;
 
 private:
 
@@ -152,6 +105,8 @@ private:
 	/// not get copied themselves.
 	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
+
+	std::vector<std::shared_ptr<CollisionRepresentation>> m_collisionRepresentations;
 
 	/// The local list of collision pairs
 	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;

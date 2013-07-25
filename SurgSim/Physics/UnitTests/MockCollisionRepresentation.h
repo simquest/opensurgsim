@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDSHAPECOLLISIONREPRESENTATION_H
-#define SURGSIM_PHYSICS_RIGIDSHAPECOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
+#define SURGSIM_PHYSICS_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShape.h>
@@ -34,21 +34,23 @@ class MockCollisionRepresentation : public CollisionRepresentation
 {
 public:
 	MockCollisionRepresentation(
+		const std::string& name,
 		const std::shared_ptr<RigidShape>& shape,
 		const SurgSim::Math::Quaterniond& quat,
 		const SurgSim::Math::Vector3d& translation);
 
 	MockCollisionRepresentation(
+		const std::string& name,
 		const std::shared_ptr<RigidShape>& shape,
 		const SurgSim::Math::RigidTransform3d& pose);
 
 	virtual ~MockCollisionRepresentation();
 
-	virtual int getShapeType() const;
+	virtual int getShapeType() const override;
 
-	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const;
+	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const override;
 
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 
 private:
 	std::shared_ptr<RigidShape> m_shape;

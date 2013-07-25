@@ -36,7 +36,7 @@ std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& 
 
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
 	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<MockCollisionRepresentation>(sphere, rotation, position);
+		std::make_shared<MockCollisionRepresentation>("TestSphere",sphere, rotation, position);
 	return rep;
 }
 
@@ -45,7 +45,7 @@ std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(cons
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<DoubleSidedPlaneShape>();
 	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<MockCollisionRepresentation>(plane, rotation, position);
+		std::make_shared<MockCollisionRepresentation>("TestSphere",plane, rotation, position);
 	return rep;
 }
 

@@ -30,26 +30,24 @@ namespace Physics
 
 class Representation;
 
-/// Class to wrap a plain RigidShape for use as a CollisionRepresentation, just delegate
-/// the access to the various RigidShape methods
+/// Use a RigidShape as a CollisionRepresentation, any SurgSim::Physics::Representation can
+/// be used as a backing representation
 class RigidShapeCollisionRepresentation : public CollisionRepresentation
 {
 public:
 	RigidShapeCollisionRepresentation(
+		const std::string& name,
 		std::shared_ptr<RigidShape> shape,
-		std::shared_ptr<Representation> representation);
+		std::shared_ptr<SurgSim::Physics::Representation> representation);
 
 	virtual ~RigidShapeCollisionRepresentation();
 
-	virtual int getShapeType() const;
+	virtual int getShapeType() const override;
 
-	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const;
-
-	virtual const SurgSim::Math::RigidTransform3d& getCurrentPose() const;
+	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const override;
 
 private:
 	std::shared_ptr<RigidShape> m_shape;
-	std::shared_ptr<Representation> m_representation;
 };
 
 
