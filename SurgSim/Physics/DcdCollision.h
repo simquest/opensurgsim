@@ -71,21 +71,11 @@ private:
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
 	/// Function to populate the m_contactCalculations table for each DcdContact class.
-	template <typename T>
-	void setDcdContactInTable()
-	{
-		T *dcdContact = new T();
-		m_contactCalculations[dcdContact->getFirstShapeType()][dcdContact->getSecondShapeType()].reset(dcdContact);
-		if(dcdContact->getFirstShapeType() != dcdContact->getSecondShapeType())
-		{
-			dcdContact = new T();
-			m_contactCalculations[dcdContact->getSecondShapeType()][dcdContact->getFirstShapeType()].reset(dcdContact);
-		}
-	}
+	void setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact);
 
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
-	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
+	std::shared_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
 
 };
 

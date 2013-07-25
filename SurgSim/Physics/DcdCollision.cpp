@@ -64,8 +64,8 @@ void DcdCollision::populateCalculationTable()
 			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
 		}
 	}
-	setDcdContactInTable<SphereSphereDcdContact>();
-	setDcdContactInTable<SphereDoubleSidedPlaneDcdContact>();
+	setDcdContactInTable(std::make_shared<SphereSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SphereDoubleSidedPlaneDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
@@ -103,6 +103,16 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			}
 		}
 		state->setCollisionPairs(pairs);
+	}
+}
+
+void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
+{
+	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
+	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;
+	if(shapeTypes.first != shapeTypes.second)
+	{
+		m_contactCalculations[shapeTypes.second][shapeTypes.first] = dcdContact;
 	}
 }
 

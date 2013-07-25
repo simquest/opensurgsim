@@ -58,8 +58,7 @@ public:
 		doCalculateContact(pair);
 	}
 
-	virtual int getFirstShapeType() = 0;
-	virtual int getSecondShapeType() = 0;
+	virtual std::pair<int,int> getShapeTypes() = 0;
 
 private:
 
@@ -69,8 +68,9 @@ private:
 
 	bool needsSwap(int firstShapeType, int secondShapeType)
 	{
-		return firstShapeType != secondShapeType && firstShapeType == getSecondShapeType() &&
-			secondShapeType == getFirstShapeType();
+		std::pair<int,int> shapeTypes = getShapeTypes();
+		return firstShapeType != secondShapeType && firstShapeType == shapeTypes.second &&
+			secondShapeType == shapeTypes.first;
 	}
 
 };
@@ -91,14 +91,9 @@ public:
 	/// Destructor
 	virtual ~DefaultContactCalculation() {}
 
-	virtual int getFirstShapeType() override
+	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return RIGID_SHAPE_TYPE_COUNT;
-	}
-
-	virtual int getSecondShapeType() override
-	{
-		return RIGID_SHAPE_TYPE_COUNT;
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_COUNT, RIGID_SHAPE_TYPE_COUNT);
 	}
 
 private:
@@ -117,14 +112,9 @@ public:
 	{
 	}
 
-	virtual int getFirstShapeType() override
+	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return RIGID_SHAPE_TYPE_SPHERE;
-	}
-
-	virtual int getSecondShapeType() override
-	{
-		return RIGID_SHAPE_TYPE_SPHERE;
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_SPHERE, RIGID_SHAPE_TYPE_SPHERE);
 	}
 
 private:
@@ -145,14 +135,9 @@ public:
 	{
 	}
 
-	virtual int getFirstShapeType() override
+	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return RIGID_SHAPE_TYPE_SPHERE;
-	}
-
-	virtual int getSecondShapeType() override
-	{
-		return RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE;
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_SPHERE, RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE);
 	}
 
 private:
