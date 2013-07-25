@@ -74,8 +74,6 @@ private:
 	/// the first pair object and the second pair object in order
 	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
 
-	/// List of collision pairs, recalculate every update call
-	std::list<std::shared_ptr<CollisionPair>> m_pairs;
 };
 
 }; // Physics
