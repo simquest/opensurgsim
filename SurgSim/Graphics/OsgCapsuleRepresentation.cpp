@@ -24,8 +24,8 @@ using SurgSim::Graphics::OsgUnitSphere;
 
 OsgCapsuleRepresentation::OsgCapsuleRepresentation(const std::string& name) :
 	Representation(name),
-	CapsuleRepresentation(name),
 	OsgRepresentation(name),
+	CapsuleRepresentation(name),
 	m_scale(1.0, 1.0),
 	m_sharedUnitCylinder(getSharedUnitCylinder()),
 	m_sharedUnitSphere(getSharedUnitSphere()),
