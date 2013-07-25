@@ -14,10 +14,11 @@
 // limitations under the License.
 
 #include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+
 #include <SurgSim/Physics/Shapes.h>
 
 using SurgSim::Math::Quaterniond;
@@ -35,7 +36,7 @@ std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& 
 
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
 	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);
+		std::make_shared<MockCollisionRepresentation>(sphere, rotation, position);
 	return rep;
 }
 
@@ -44,7 +45,7 @@ std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(cons
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<DoubleSidedPlaneShape>();
 	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
+		std::make_shared<MockCollisionRepresentation>(plane, rotation, position);
 	return rep;
 }
 

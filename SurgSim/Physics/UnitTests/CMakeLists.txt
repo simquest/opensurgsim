@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
+	MockCollisionRepresentation.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
@@ -56,6 +57,7 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 	CommonTests.h
 	MockObjects.h
+	MockCollisionRepresentation.h
 	RepresentationUtilities.h
 )
 
