@@ -101,8 +101,6 @@ protected:
 	/// Transform used to pose the representation
 	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
 
-private:
-
 	/// Initial pose of the representation
 	SurgSim::Math::RigidTransform3d m_initialPose;
 	/// Current pose of the representation
