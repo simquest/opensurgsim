@@ -22,6 +22,7 @@
 #include <SurgSim/Physics/CylinderShape.h>
 #include <SurgSim/Physics/MeshShape.h>
 #include <SurgSim/Physics/DoubleSidedPlaneShape.h>
+#include <SurgSim/Physics/PlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
 
 #endif // SURGSIM_PHYSICS_SHAPES_H

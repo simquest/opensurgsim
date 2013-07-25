@@ -64,6 +64,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
+	DoubleSidedPlaneShape.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationContact.h
@@ -77,7 +78,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	MlcpPhysicsSolution.h
 	PhysicsManager.h
 	PhysicsManagerState.h
-	DoubleSidedPlaneShape.h
+	PlaneShape.h
 	PostUpdate.h
 	PreUpdate.h
 	PushResults.h

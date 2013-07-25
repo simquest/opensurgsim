@@ -48,5 +48,14 @@ std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(cons
 	return rep;
 }
 
+std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(const Quaterniond& rotation,
+		const Vector3d& position)
+{
+	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>();
+	std::shared_ptr<CollisionRepresentation> rep =
+		std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
+	return rep;
+}
+
 }; // Physics
 }; // SurgSim
