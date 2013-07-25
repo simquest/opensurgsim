@@ -49,7 +49,7 @@ public:
 
 	/// Function that handles asymmetric pair and calls the actual contact calculation routine of the sub class.
 	/// \param	pair	The pair that is under consideration.
-	void calculateContact(std::shared_ptr<CollisionPair> pair) throw(...)
+	void calculateContact(std::shared_ptr<CollisionPair> pair)
 	{
 		if (needsSwap(pair->getFirst()->getShapeType(), pair->getSecond()->getShapeType()))
 		{
