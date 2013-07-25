@@ -19,6 +19,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGUNIFORMTYPES_H
 #define SURGSIM_GRAPHICS_OSGUNIFORMTYPES_H
 
+#include<memory>
+
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Vector.h>
 
