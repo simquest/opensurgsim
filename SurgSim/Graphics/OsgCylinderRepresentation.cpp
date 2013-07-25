@@ -31,8 +31,8 @@ using SurgSim::Graphics::OsgUnitCylinder;
 
 OsgCylinderRepresentation::OsgCylinderRepresentation(const std::string& name) :
 	Representation(name),
-	CylinderRepresentation(name),
 	OsgRepresentation(name),
+	CylinderRepresentation(name),
 	m_scale(1.0, 1.0),
 	m_sharedUnitCylinder(getSharedUnitCylinder()),
 	m_patCylinder(new osg::PositionAttitudeTransform)
