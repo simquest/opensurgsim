@@ -20,18 +20,13 @@
 
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgCylinderRepresentation.h>
-#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 
 #include <gtest/gtest.h>
 
 #include <random>
 
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector2d;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::makeRigidTransform;
 
 namespace
 {
@@ -49,13 +44,10 @@ TEST(OsgCylinderRepresentationTests, RadiusTest)
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation =
 		std::make_shared<OsgCylinderRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
+	double radius = 1.0;
 
-	double randomSize = distribution(generator);
-
-	cylinderRepresentation->setRadius(randomSize);
-	EXPECT_NEAR(randomSize, cylinderRepresentation->getRadius(), epsilon);
+	cylinderRepresentation->setRadius(radius);
+	EXPECT_NEAR(radius, cylinderRepresentation->getRadius(), epsilon);
 }
 
 TEST(OsgCylinderRepresentationTests, HeightTest)
@@ -63,13 +55,10 @@ TEST(OsgCylinderRepresentationTests, HeightTest)
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation =
 		std::make_shared<OsgCylinderRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
+	double height = 1.0;
 
-	double randomSize = distribution(generator);
-
-	cylinderRepresentation->setHeight(randomSize);
-	EXPECT_NEAR(randomSize, cylinderRepresentation->getHeight(), epsilon);
+	cylinderRepresentation->setHeight(height);
+	EXPECT_NEAR(height, cylinderRepresentation->getHeight(), epsilon);
 }
 
 TEST(OsgCylinderRepresentationTests, SizeTest)
@@ -77,15 +66,11 @@ TEST(OsgCylinderRepresentationTests, SizeTest)
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation =
 		std::make_shared<OsgCylinderRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
+	double radius = 1.0, height = 1.0;
 
-	double randomRadius = distribution(generator);
-	double randomHeight = distribution(generator);
-
-	cylinderRepresentation->setSize(randomRadius, randomHeight);
-	EXPECT_NEAR(randomRadius, cylinderRepresentation->getRadius(), epsilon);
-	EXPECT_NEAR(randomHeight, cylinderRepresentation->getHeight(), epsilon);
+	cylinderRepresentation->setSize(radius, height);
+	EXPECT_NEAR(radius, cylinderRepresentation->getRadius(), epsilon);
+	EXPECT_NEAR(height, cylinderRepresentation->getHeight(), epsilon);
 }
 
 TEST(OsgCylinderRepresentationTests, SizeVector2dTest)
@@ -93,13 +78,10 @@ TEST(OsgCylinderRepresentationTests, SizeVector2dTest)
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation =
 		std::make_shared<OsgCylinderRepresentation>("test name");
 
-	std::default_random_engine generator;
-	std::uniform_real_distribution<double> distribution(1.0, 10.0);
+	Vector2d size(1.0, 1.0);
 
-	Vector2d randomSize(distribution(generator), distribution(generator));
-
-	cylinderRepresentation->setSize(randomSize);
-	EXPECT_TRUE(randomSize.isApprox(cylinderRepresentation->getSize(), epsilon));
+	cylinderRepresentation->setSize(size);
+	EXPECT_TRUE(size.isApprox(cylinderRepresentation->getSize(), epsilon));
 }
 
 

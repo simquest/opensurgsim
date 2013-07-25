@@ -23,10 +23,12 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	OsgBoxRepresentationRenderTests.cpp
+	OsgCapsuleRepresentationRenderTests.cpp
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
+	OsgRepresentationRenderTests.cpp
 	OsgScreenSpaceQuadRenderTests.cpp
 	OsgShaderRenderTests.cpp
 	OsgSphereRepresentationRenderTests.cpp

@@ -34,7 +34,6 @@ DcdCollision::DcdCollision(bool doCopyState) : Computation(doCopyState)
 
 DcdCollision::~DcdCollision()
 {
-	m_pairs.clear();
 }
 
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
@@ -45,8 +44,8 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	updatePairs(result);
 
 	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();
-	auto it = m_pairs.cbegin();
-	auto itEnd = m_pairs.cend();
+	auto it = pairs.cbegin();
+	auto itEnd = pairs.cend();
 	while (it != itEnd)
 	{
 		m_contactCalculations[(*it)->getFirst()->getShapeType()][(*it)->getSecond()->getShapeType()]->

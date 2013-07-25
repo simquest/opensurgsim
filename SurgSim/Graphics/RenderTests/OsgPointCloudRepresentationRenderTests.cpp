@@ -149,8 +149,6 @@ TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
 		cloud->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
-
-	runtime->stop();
 }
 
 TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
@@ -187,8 +185,6 @@ TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
-
-	runtime->stop();
 }
 
 TEST_F(OsgPointCloudRepresentationRenderTests, PointSize)
@@ -211,7 +207,6 @@ TEST_F(OsgPointCloudRepresentationRenderTests, PointSize)
 		cloud->setPointSize(interpolate(startSize,endSize,t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
-
 }
 
 TEST_F(OsgPointCloudRepresentationRenderTests, ColorTest)
