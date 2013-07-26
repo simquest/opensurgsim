@@ -35,7 +35,18 @@ TEST(OsgUnitSphereTests, InitTest)
 	osg::ref_ptr<osg::Node> node = sphere.getNode();
 	EXPECT_NE(nullptr, node.get());
 
-	osg::ref_ptr<osg::Geode> geode = dynamic_cast<osg::Geode*>(node.get());
+	osg::ref_ptr<osg::PositionAttitudeTransform> transform = dynamic_cast<osg::PositionAttitudeTransform*>(node.get());
+	EXPECT_NE(nullptr, transform.get());
+
+	osg::Quat rotation;
+	rotation.makeRotate(osg::Vec3d(0.0, 0.0, 1.0), osg::Vec3d(0.0, 1.0, 0.0));
+	EXPECT_EQ(rotation, transform->getAttitude());
+	EXPECT_EQ(osg::Vec3(0.0, 0.0, 0.0), transform->getPosition());
+	EXPECT_EQ(osg::Vec3(1.0, 1.0, 1.0), transform->getScale());
+
+	EXPECT_EQ(1u, transform->getNumChildren());
+
+	osg::ref_ptr<osg::Geode> geode = dynamic_cast<osg::Geode*>(transform->getChild(0u));
 	EXPECT_NE(nullptr, geode.get());
 
 	EXPECT_EQ(1u, geode->getNumDrawables());
