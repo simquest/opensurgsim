@@ -28,6 +28,8 @@ namespace SurgSim
 namespace Physics
 {
 
+class Representation;
+
 /// Class to wrap a plain RigidShape for use as a CollisionRepresentation, just delegate
 /// the access to the various RigidShape methods
 class MockCollisionRepresentation : public CollisionRepresentation
@@ -37,12 +39,14 @@ public:
 		const std::string& name,
 		const std::shared_ptr<RigidShape>& shape,
 		const SurgSim::Math::Quaterniond& quat,
-		const SurgSim::Math::Vector3d& translation);
+		const SurgSim::Math::Vector3d& translation,
+		std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr);
 
 	MockCollisionRepresentation(
 		const std::string& name,
 		const std::shared_ptr<RigidShape>& shape,
-		const SurgSim::Math::RigidTransform3d& pose);
+		const SurgSim::Math::RigidTransform3d& pose,
+		std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr);
 
 	virtual ~MockCollisionRepresentation();
 

@@ -71,10 +71,6 @@ public:
 	/// \return Transformation of the contained Representation
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
 
-	/// Sets the physics representation for this collision representation.
-	/// \param	physicsRepresentation	The physics representation.
-	void setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation);
-
 	/// Gets physics representation.
 	/// \return	The physics representation.
 	std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation();
@@ -82,6 +78,10 @@ public:
 protected:
 	std::weak_ptr<SurgSim::Physics::Representation> m_physicsRepresentation;
 
+	/// Sets the physics representation for this collision representation.
+	/// \param	physicsRepresentation	The physics representation.
+	void setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation);
+	
 };
 
 

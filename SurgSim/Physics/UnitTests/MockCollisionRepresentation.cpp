@@ -14,19 +14,20 @@
 // limitations under the License.
 
 #include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
+#include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-
 MockCollisionRepresentation::MockCollisionRepresentation(
 		const std::string& name,
 		const std::shared_ptr<RigidShape>& shape,
 		const SurgSim::Math::Quaterniond& quat,
-		const SurgSim::Math::Vector3d& translation) :
-	CollisionRepresentation(name),
+		const SurgSim::Math::Vector3d& translation,
+		std::shared_ptr<SurgSim::Physics::Representation> representation) :
+	CollisionRepresentation(name, representation),
 	m_shape(shape),
 	m_transform(SurgSim::Math::makeRigidTransform(quat, translation))
 {
@@ -36,8 +37,9 @@ MockCollisionRepresentation::MockCollisionRepresentation(
 MockCollisionRepresentation::MockCollisionRepresentation(
 		const std::string& name,
 		const std::shared_ptr<RigidShape>& shape,
-		const SurgSim::Math::RigidTransform3d& pose) :
-	CollisionRepresentation(name),
+		const SurgSim::Math::RigidTransform3d& pose,
+		std::shared_ptr<SurgSim::Physics::Representation> representation) :
+	CollisionRepresentation(name,representation),
 	m_shape(shape),
 	m_transform(pose)
 {
