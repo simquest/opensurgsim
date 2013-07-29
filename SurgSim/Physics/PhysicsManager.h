@@ -40,7 +40,9 @@ class PreUpdate;
 class FreeMotion;
 class DcdCollision;
 class ContactConstraintGeneration;
+class BuildMlcp;
 class SolveMlcp;
+class PushResults;
 class PostUpdate;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
@@ -82,7 +84,9 @@ private:
 	std::unique_ptr<FreeMotion> m_freeMotionStep;
 	std::unique_ptr<DcdCollision> m_dcdCollisionStep;
 	std::unique_ptr<ContactConstraintGeneration> m_constraintGenerationStep;
+	std::unique_ptr<BuildMlcp> m_buildMlcpStep;
 	std::unique_ptr<SolveMlcp> m_solveMlcpStep;
+	std::unique_ptr<PushResults> m_pushResultsStep;
 	std::unique_ptr<PostUpdate> m_postUpdateStep;
 	///@}
 

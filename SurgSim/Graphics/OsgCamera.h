@@ -38,7 +38,7 @@ class Material;
 ///
 /// A Graphics::OsgCamera wraps a osg::Camera to provide camera functionality and a osg::Switch to allow enabling and
 /// disabling of the camera.
-class OsgCamera : public Camera, public OsgRepresentation
+class OsgCamera : public OsgRepresentation, public Camera
 {
 public:
 	/// Constructor

@@ -17,9 +17,10 @@
 
 #include <SurgSim/Graphics/OsgCylinderRepresentation.h>
 
-#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 #include <SurgSim/Graphics/OsgUnitCylinder.h>
+
+#include <SurgSim/Framework/SharedInstance.h>
 
 #include <osg/Geode>
 #include <osg/Shape>
@@ -30,19 +31,22 @@ using SurgSim::Graphics::OsgUnitCylinder;
 
 OsgCylinderRepresentation::OsgCylinderRepresentation(const std::string& name) :
 	Representation(name),
-	CylinderRepresentation(name),
 	OsgRepresentation(name),
+	CylinderRepresentation(name),
 	m_scale(1.0, 1.0),
-	m_sharedUnitCylinder(getSharedUnitCylinder())
+	m_sharedUnitCylinder(getSharedUnitCylinder()),
+	m_patCylinder(new osg::PositionAttitudeTransform)
 {
-	m_transform->addChild(m_sharedUnitCylinder->getNode());
+	m_patCylinder->addChild(m_sharedUnitCylinder->getNode());
+	m_patCylinder->setAttitude(osg::Quat(osg::PI_2, osg::Vec3d(1.0, 0.0, 0.0)));
+	m_transform->addChild(m_patCylinder);
 }
 
 
 void OsgCylinderRepresentation::setRadius(double radius)
 {
 	m_scale.x() = radius;
-	m_transform->setScale(osg::Vec3d(radius, m_scale.y(), radius));
+	m_patCylinder->setScale(osg::Vec3d(radius, radius, m_scale.y()));
 }
 double OsgCylinderRepresentation::getRadius() const
 {
@@ -52,7 +56,7 @@ double OsgCylinderRepresentation::getRadius() const
 void OsgCylinderRepresentation::setHeight(double height)
 {
 	m_scale.y() = height;
-	m_transform->setScale(osg::Vec3d(m_scale.x(), height, m_scale.x()));
+	m_patCylinder->setScale(osg::Vec3d(m_scale.x(), m_scale.x(), height));
 }
 double OsgCylinderRepresentation::getHeight() const
 {
@@ -63,7 +67,7 @@ void OsgCylinderRepresentation::setSize(double radius, double height)
 {
 	m_scale.x() = radius;
 	m_scale.y() = height;
-	m_transform->setScale(osg::Vec3d(radius, height, radius));
+	m_patCylinder->setScale(osg::Vec3d(radius, radius, height));
 }
 void OsgCylinderRepresentation::getSize(double* radius, double* height)
 {
@@ -74,7 +78,7 @@ void OsgCylinderRepresentation::getSize(double* radius, double* height)
 void OsgCylinderRepresentation::setSize(SurgSim::Math::Vector2d size)
 {
 	m_scale.set(size.x(), size.y());
-	m_transform->setScale(osg::Vec3d(size.x(), size.y(), size.x()));
+	m_patCylinder->setScale(osg::Vec3d(size.x(), size.x(), size.y()));
 }
 SurgSim::Math::Vector2d OsgCylinderRepresentation::getSize() const
 {

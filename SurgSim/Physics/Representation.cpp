@@ -18,6 +18,8 @@
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/Location.h>
 
+#include <SurgSim/Math/MlcpSolution.h>
+
 namespace SurgSim
 {
 namespace Physics
@@ -81,6 +83,11 @@ void Representation::afterUpdate(double dt)
 std::shared_ptr<Localization> Representation::createLocalization(const Location& location)
 {
 	return nullptr;
+}
+
+void Representation::applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block)
+{
+
 }
 
 void Representation::setNumDof(unsigned int numDof)

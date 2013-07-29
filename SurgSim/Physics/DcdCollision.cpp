@@ -34,7 +34,6 @@ DcdCollision::DcdCollision(bool doCopyState) : Computation(doCopyState)
 
 DcdCollision::~DcdCollision()
 {
-	m_pairs.clear();
 }
 
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
@@ -45,17 +44,12 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	updatePairs(result);
 
 	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();
-	auto it = m_pairs.cbegin();
-	auto itEnd = m_pairs.cend();
+	auto it = pairs.cbegin();
+	auto itEnd = pairs.cend();
 	while (it != itEnd)
 	{
-		int i = (*it)->getFirst()->getShapeType();
-		int j = (*it)->getSecond()->getShapeType();
-		if (m_contactCalculations[i][j]->needsSwap())
-		{
-			(*it)->swapRepresentations();
-		}
-		m_contactCalculations[i][j]->calculateContact(*it);
+		m_contactCalculations[(*it)->getFirst()->getShapeType()][(*it)->getSecond()->getShapeType()]->
+			calculateContact(*it);
 		++it;
 	}
 	return result;
@@ -70,9 +64,8 @@ void DcdCollision::populateCalculationTable()
 			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
 		}
 	}
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact());
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(false));
-	m_contactCalculations[RIGID_SHAPE_TYPE_PLANE][RIGID_SHAPE_TYPE_SPHERE].reset(new SpherePlaneDcdContact(true));
+	setDcdContactInTable(std::make_shared<SphereSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SphereDoubleSidedPlaneDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
@@ -110,6 +103,16 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			}
 		}
 		state->setCollisionPairs(pairs);
+	}
+}
+
+void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
+{
+	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
+	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;
+	if(shapeTypes.first != shapeTypes.second)
+	{
+		m_contactCalculations[shapeTypes.second][shapeTypes.first] = dcdContact;
 	}
 }
 

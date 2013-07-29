@@ -39,7 +39,7 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation");
 		sphere->setPhysicsRepresentation(rigid0);
 
-		plane = makePlaneRepresentation();
+		plane = makeDoubleSidedPlaneRepresentation();
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation");
 		plane->setPhysicsRepresentation(rigid1);
 
@@ -66,7 +66,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
 	// Test case setup, create a pair with a contact and set up the physics state with it
-	SpherePlaneDcdContact contactCalculation(false);
+	SphereDoubleSidedPlaneDcdContact contactCalculation;
 
 	contactCalculation.calculateContact(pair);
 	ASSERT_TRUE(pair->hasContacts());
@@ -98,7 +98,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 TEST_F(ContactConstraintGenerationTests, CountTest)
 {
 	std::shared_ptr<CollisionPair> pair;
-	SpherePlaneDcdContact contactCalculation(false);
+	SphereDoubleSidedPlaneDcdContact contactCalculation;
 
 	pair = std::make_shared<CollisionPair>(sphere, plane);
 	contactCalculation.calculateContact(pair);

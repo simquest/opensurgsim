@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(MLCP_IO_SOURCES
+	MlcpTestData.cpp
 	ReadText.cpp
 	TextLabels.cpp
 	WriteText.cpp
