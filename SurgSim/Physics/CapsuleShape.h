@@ -76,6 +76,20 @@ public:
 		return Vector3d(0.0, 0.0, 0.0);
 	}
 
+	/// Return the top centre of the top circle of the capsule
+	/// \return The top centre of the capsule
+	Vector3d topCentre() const
+	{
+		return Vector3d(0.0, m_length / 2, 0.0);
+	}
+
+	/// Return the centre of the bottom circle of the capsule
+	/// \return The bottom centre of the capsule
+	Vector3d bottomCentre() const
+	{
+		return Vector3d(0.0, -m_length / 2, 0.0);
+	}
+
 	/// Calculate the inertia from the capsule
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the capsule
