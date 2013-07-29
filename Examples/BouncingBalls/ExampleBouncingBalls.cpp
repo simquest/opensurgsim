@@ -263,21 +263,13 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
-<<<<<<< HEAD
 	scene->addSceneElement(createSphere(data, "sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
 	scene->addSceneElement(createPlane(data, "plane1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
-=======
-	scene->addSceneElement(createSphere("sphere1",
-										SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
-																		  Vector3d(0.0,2.0,0.0))));
-	scene->addSceneElement(createPlane("plane1",
-									   SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
-																		 Vector3d(0.0,0.0,0.0))));
->>>>>>> 23e2bdd87996aa9adecd332ddb06744f268d0a0d
+
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
