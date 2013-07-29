@@ -83,6 +83,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgTexture3d.h
 	OsgTextureCubeMap.h
 	OsgTextureRectangle.h
+	OsgTextureUniform.h
+	OsgTextureUniform-inl.h
 	OsgUniform.h
 	OsgUniform-inl.h
 	OsgUniformBase.h

@@ -17,6 +17,8 @@
 #define SURGSIM_GRAPHICS_OSGUNITSPHERE_H
 
 #include <osg/Geode>
+#include <osg/PositionAttitudeTransform>
+#include <osg/Quat>
 #include <osg/Shape>
 #include <osg/ShapeDrawable>
 
@@ -34,23 +36,28 @@ class OsgUnitSphere
 public:
 	/// Constructor
 	OsgUnitSphere() :
-		m_geode(new osg::Geode())
+		m_transform(new osg::PositionAttitudeTransform())
 	{
 		osg::ref_ptr<osg::Sphere> unitSphere = new osg::Sphere(osg::Vec3(0.0, 0.0, 0.0), 1.0);
 		osg::ref_ptr<osg::ShapeDrawable> drawable = new osg::ShapeDrawable(unitSphere);
-		m_geode->addDrawable(drawable);
-		m_geode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+		osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+		geode->addDrawable(drawable);
+		geode->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+		m_transform->addChild(geode);
+		osg::Quat rotation;
+		rotation.makeRotate(osg::Vec3d(0.0, 0.0, 1.0), osg::Vec3d(0.0, 1.0, 0.0));
+		m_transform->setAttitude(rotation);
 	}
 
 	/// Returns the root OSG node for the plane to be inserted into the scene-graph
 	osg::ref_ptr<osg::Node> getNode() const
 	{
-		return m_geode;
+		return m_transform;
 	}
 
 private:
 	/// Root OSG node of the sphere
-	osg::ref_ptr<osg::Geode> m_geode;
+	osg::ref_ptr<osg::PositionAttitudeTransform> m_transform;
 };
 
 };  // namespace Graphics
