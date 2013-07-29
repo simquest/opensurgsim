@@ -41,6 +41,8 @@
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/DoubleSidedPlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Physics/RigidCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -133,11 +135,16 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
+	std::shared_ptr<SurgSim::Physics::DoubleSidedPlaneShape> planeShape = 
+		std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
+
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 							   physicsRepresentation, graphicsRepresentation));
+	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
+		("Plane Collision",planeShape, physicsRepresentation));
 	return planeElement;
 }
 
@@ -188,6 +195,9 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								physicsRepresentation, graphicsRepresentation));
+	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
+		("Sphere Collision Representation", physicsRepresentation));
+
 	return sphereElement;
 }
 

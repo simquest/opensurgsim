@@ -17,12 +17,14 @@
 #define SURGSIM_PHYSICS_COMPUTATION_H
 
 #include <vector>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include <memory>
 
 namespace SurgSim
 {
 namespace Physics
 {
+
+class PhysicsManagerState;
 
 /// Encapsulates a calculation over a selection of objects, needs to be subclassed to be used
 class Computation

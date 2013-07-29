@@ -22,6 +22,7 @@ using Eigen::VectorXd;
 #include <SurgSim/Physics/ConstraintImplementation.h>
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Physics/MlcpPhysicsProblem.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim

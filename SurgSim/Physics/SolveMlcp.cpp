@@ -20,6 +20,7 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+#include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Physics/SolveMlcp.h>
 #include <SurgSim/Math/MlcpGaussSeidelSolver.h>
 

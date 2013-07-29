@@ -22,7 +22,6 @@
 
 
 #include <SurgSim/Framework/ReuseFactory.h>
-
 #include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/Representation.h>

@@ -18,13 +18,14 @@
 
 #include <SurgSim/Physics/PostUpdate.h>
 #include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 
 namespace SurgSim
 {
 namespace Physics
 {
 
-PostUpdate::PostUpdate(bool doCopyState) : Computation(doCopyState) 
+PostUpdate::PostUpdate(bool doCopyState) : Computation(doCopyState)
 {
 
 }
