@@ -16,13 +16,7 @@
 #ifndef SURGSIM_DEVICES_MULTIAXIS_FILEDESCRIPTOR_H
 #define SURGSIM_DEVICES_MULTIAXIS_FILEDESCRIPTOR_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include <string>
-
-#include <SurgSim/Framework/Assert.h>
 
 
 namespace SurgSim
@@ -35,103 +29,31 @@ namespace Device
 class FileDescriptor
 {
 public:
-	FileDescriptor() :
-		m_descriptor(INVALID_VALUE),
-		m_canRead(false),
-		m_canWrite(false)
-	{
-	}
+	FileDescriptor();
 
-	FileDescriptor(FileDescriptor&& other) :
-		m_descriptor(other.m_descriptor),
-		m_canRead(other.m_canRead),
-		m_canWrite(other.m_canWrite)
-	{
-		other.m_descriptor = INVALID_VALUE;  // take ownership
-	}
+	FileDescriptor(FileDescriptor&& other);
 
-	FileDescriptor& operator=(FileDescriptor&& other)
-	{
-		m_descriptor = other.m_descriptor;
-		m_canRead = other.m_canRead;
-		m_canWrite = other.m_canWrite;
-		other.m_descriptor = INVALID_VALUE;  // take ownership
-		return *this;
-	}
+	FileDescriptor& operator=(FileDescriptor&& other);
 
-	~FileDescriptor()
-	{
-		reset();
-	}
+	~FileDescriptor();
 
-	bool isValid() const
-	{
-		return (m_descriptor != INVALID_VALUE);
-	}
+	bool isValid() const;
 
-	bool canRead() const
-	{
-		return isValid() && m_canRead;
-	}
+	bool canRead() const;
 
-	bool canWrite() const
-	{
-		return isValid() && m_canWrite;
-	}
+	bool canWrite() const;
 
-	int get() const
-	{
-		SURGSIM_ASSERT(m_descriptor != INVALID_VALUE);
-		return m_descriptor;
-	}
+	int get() const;
 
-	bool openForReadingAndWriting(const std::string& path)
-	{
-		reset();
-		m_descriptor = open(path.c_str(), O_RDWR);
-		m_canRead = true;
-		m_canWrite = true;
-		return isValid();
-	}
+	bool openForReadingAndWriting(const std::string& path);
 
-	bool openForReading(const std::string& path)
-	{
-		reset();
-		m_descriptor = open(path.c_str(), O_RDONLY);
-		m_canRead = true;
-		m_canWrite = false;
-		return isValid();
-	}
+	bool openForReading(const std::string& path);
 
-	bool openForWriting(const std::string& path)
-	{
-		reset();
-		m_descriptor = open(path.c_str(), O_WRONLY);
-		m_canRead = false;
-		m_canWrite = true;
-		return isValid();
-	}
+	bool openForWriting(const std::string& path);
 
-	bool openForReadingAndMaybeWriting(const std::string& path)
-	{
-		if (! openForReadingAndWriting(path))
-		{
-			if (! openForReading(path))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+	bool openForReadingAndMaybeWriting(const std::string& path);
 
-	void reset()
-	{
-		if (m_descriptor != INVALID_VALUE)
-		{
-			close(m_descriptor);
-			m_descriptor = INVALID_VALUE;
-		}
-	}
+	void reset();
 
 private:
 	FileDescriptor(const FileDescriptor& other) = delete;

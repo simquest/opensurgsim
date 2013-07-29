@@ -26,6 +26,7 @@ include_directories(
 )
 
 set(MULTIAXIS_DEVICE_SOURCES
+	FileDescriptor.cpp
 	RawMultiAxisDevice.cpp
 	RawMultiAxisScaffold.cpp
 	RawMultiAxisThread.cpp
