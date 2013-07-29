@@ -29,18 +29,32 @@ namespace Device
 class FileDescriptor
 {
 public:
+	/// Default constructor.
+	/// Initializes the file descriptor to an invalid state.
 	FileDescriptor();
 
+	/// Move constructor.
+	/// \param [in,out]	other	The object to move.  The original object will be invalidated.
 	FileDescriptor(FileDescriptor&& other);
 
+	/// Move assignment operator.
+	/// \param [in,out]	other	The object to move.  The original object will be invalidated.
+	/// \return	A reference to this object.
 	FileDescriptor& operator=(FileDescriptor&& other);
 
+	/// Destructor.
 	~FileDescriptor();
 
+	/// Checks if the file descriptor is valid, i.e. has been opened.
+	/// \return	true if valid, false if not.
 	bool isValid() const;
 
+	/// Determines if the file descriptor can be read from.
+	/// \return	true if the descriptor has been open for reading.
 	bool canRead() const;
 
+	/// Determines if the file descriptor can be written to.
+	/// \return	true if the descriptor has been open for writing.
 	bool canWrite() const;
 
 	/// Checks whether this object has data available to be read.
@@ -54,16 +68,32 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	bool readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead);
 
+	/// Gets the raw underlying OS file descriptor.
+	/// \return	The raw file descriptor.
 	int get() const;
 
+	/// Attempts to open the file descriptor for reading and writing.
+	/// \param	path	Full pathname of the file.
+	/// \return	true if it succeeds, false if it fails.
 	bool openForReadingAndWriting(const std::string& path);
 
+	/// Attempts to open the file descriptor for reading only.
+	/// \param	path	Full pathname of the file.
+	/// \return	true if it succeeds, false if it fails.
 	bool openForReading(const std::string& path);
 
+	/// Attempts to open the file descriptor for writing only.
+	/// \param	path	Full pathname of the file.
+	/// \return	true if it succeeds, false if it fails.
 	bool openForWriting(const std::string& path);
 
+	/// Attempts to open the file descriptor for reading and (if permissions allow it) writing.
+	/// \param	path	Full pathname of the file.
+	/// \return	true if it succeeds, false if it fails.
 	bool openForReadingAndMaybeWriting(const std::string& path);
 
+	/// Resets the file descriptor back to an invalid state.
+	/// If the descriptor was open, it will be closed.
 	void reset();
 
 private:
