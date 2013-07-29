@@ -60,6 +60,8 @@ public:
 		return m_views;
 	}
 
+	virtual void dumpDebugInfo(const std::string& fileName) const = 0;
+
 protected:
 
 	/// Adds a component

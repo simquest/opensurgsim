@@ -40,40 +40,32 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 	m_view(view),
 	m_scale(1.0,1.0,1.0)
 {
-	// get rid of the transform we want to set this up ourselves
-	m_switch->removeChild(0u,1u);
+	m_switch = new osg::Switch;
+	m_switch->setName(name + " Switch");
+
+	m_transform = new osg::PositionAttitudeTransform();
+	m_transform->setName(name + " Transform");
 
 	m_view->getDimensions(&m_displayWidth, &m_displayHeight);
 
 	m_geode = new osg::Geode;
 
 	// Make the quad
-	osg::Geometry* geom = new osg::Geometry;
-
-	osg::Vec3Array* m_vertices = new osg::Vec3Array;
 	float depth = 0.0;
-	m_vertices->push_back(osg::Vec3(0.0,1.0,depth));
-	m_vertices->push_back(osg::Vec3(0.0,0.0,depth));
-	m_vertices->push_back(osg::Vec3(1.0,0.0,depth));
-	m_vertices->push_back(osg::Vec3(1.0,1.0,depth));
-	setSize(1.0,1.0);
-
-	geom->setVertexArray(m_vertices);
-
-	osg::Vec3Array* normals = new osg::Vec3Array;
-	normals->push_back(osg::Vec3(0.0f,0.0f,1.0f));
-	geom->setNormalArray(normals);
-	geom->setNormalBinding(osg::Geometry::BIND_OVERALL);
+	osg::Geometry* geom = osg::createTexturedQuadGeometry(
+		osg::Vec3(0,0,depth),
+		osg::Vec3(1.0,0.0,depth),
+		osg::Vec3(0.0,1.0,depth));
 
 	osg::Vec4Array* colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(1.0f,1.0,0.8f,0.2f));
+	colors->push_back(osg::Vec4(0.8f,0.0f,0.8f,0.2f));
 	geom->setColorArray(colors);
 	geom->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
 
-	osg::StateSet* stateset = geom->getOrCreateStateSet();
-	stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
+	//osg::StateSet* stateset = geom->getOrCreateStateSet();
+	//stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
 
 	m_geode->addDrawable(geom);
 

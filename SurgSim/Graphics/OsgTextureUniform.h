@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_H
 #define SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_H
 
-#include <SurgSim/Graphics/OsgUniform.h>
+/// \note HS-2013-jul-07 This file is included by OsgUniform.h, it is not meant to be used on its own
 
 namespace SurgSim
 {

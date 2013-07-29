@@ -88,5 +88,6 @@ private:
 };  // namespace SurgSim
 
 #include <SurgSim/Graphics/OsgUniform-inl.h>
+#include <SurgSim/Graphics/OsgTextureUniform.h>
 
 #endif  // SURGSIM_GRAPHICS_OSGUNIFORM_H

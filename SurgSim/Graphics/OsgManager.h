@@ -74,6 +74,8 @@ public:
 		return m_viewer;
 	}
 
+	virtual void dumpDebugInfo(const std::string& fileName) const;
+
 protected:
 	/// Performs an update for a single timestep
 	/// \param	dt	The time in seconds of the preceding timestep.

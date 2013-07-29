@@ -57,6 +57,7 @@ const std::shared_ptr<T>& OsgTextureUniform<T>::get() const
 template <class T>
 void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 {
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getDefaultLogger()) << "Add To Texture StateSet called";
 	const osg::StateSet::TextureAttributeList& textures = stateSet->getTextureAttributeList();
 	int availableUnit = 0;
 	for (auto it = textures.begin(); it != textures.end(); ++it)

@@ -26,6 +26,7 @@
 #include <SurgSim/Graphics/UniformBase.h>
 #include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/ViewElement.h>
+#include <SurgSim/Graphics/Texture.h>
 
 /// Manager class for testing
 class MockManager : public SurgSim::Graphics::Manager
@@ -51,6 +52,11 @@ public:
 	double getSumDt() const
 	{
 		return m_sumDt;
+	}
+
+	void dumpDebugInfo(const std::string& fileName) const
+	{
+		return;
 	}
 
 private:
@@ -359,6 +365,7 @@ public:
 		return false;
 	}
 
+
 	/// Gets the material that defines the visual appearance of the representation
 	/// \return	Graphics material
 	virtual std::shared_ptr<SurgSim::Graphics::Material> getMaterial() const
@@ -385,6 +392,16 @@ public:
 	{
 		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
 		return identity;
+	}
+
+	virtual bool setColorRenderTexture(std::shared_ptr<SurgSim::Graphics::Texture> texture)
+	{
+		return true;
+	}
+
+	virtual std::shared_ptr<SurgSim::Graphics::Texture> getColorRenderTexture() const
+	{
+		return nullptr;
 	}
 
 private:

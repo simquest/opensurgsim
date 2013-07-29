@@ -31,7 +31,6 @@
 #include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 #include <SurgSim/Graphics/OsgTexture2d.h>
-#include <SurgSim/Graphics/OsgTextureUniform.h>
 #include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
@@ -76,9 +75,9 @@ public:
 
 	virtual void update(double dt)
 	{
-		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
-		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
-								  m_representation->getPose().translation().transpose();
+// 		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
+// 		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
+// 								  m_representation->getPose().translation().transpose();
 	}
 protected:
 	virtual bool doInitialize()

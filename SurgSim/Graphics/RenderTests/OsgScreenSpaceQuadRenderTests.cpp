@@ -21,9 +21,17 @@
 
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/OsgCamera.h>
+#include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Graphics/OsgUniform.h>
+#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
 #include <SurgSim/Graphics/View.h>
+#include <SurgSim/Graphics/OsgTexture2d.h>
+#include <SurgSim/Graphics/OsgBoxRepresentation.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 
 #include <SurgSim/Testing/MathUtilities.h>
 
@@ -116,7 +124,61 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 
 TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 {
+	auto mainCamera = std::make_shared<OsgCamera>("Main Camera");
+	viewElement->getView()->setCamera(mainCamera);
+	
+	auto camera = std::make_shared<OsgCamera>("Texture Camera");
+	auto texture = std::make_shared<OsgTexture2d>();
+	texture->setSize(256,256);
+	camera->setColorRenderTexture(texture);
+	//viewElement->addComponent(camera);
 
+	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad", viewElement->getView());
+	quad->setSize(256,256);
+
+
+	auto texture2 = std::make_shared<OsgTexture2d>();
+	SURGSIM_ASSERT(texture2->loadImage("X:\\hscheirich-OpenSurgSim-fork\\Examples\\BouncingBalls\\Data\\Earth.png")) << "Could not load image file for sphere texture: ";
+
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTexture2d>>> uniform = 
+		std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
+	uniform->set(texture2);
+	material->addUniform(uniform);
+	quad->setMaterial(material);
+	viewElement->addComponent(quad);
+
+
+	Quaterniond quat;
+	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
+	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0,0.0,-0.2));
+	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
+	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0,0.0,-0.2));
+
+	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	boxRepresentation->setSize(0.05,0.05,0.05);
+	boxRepresentation->setPose(startPose);
+	auto group = std::make_shared<OsgGroup>("RenderPass");
+	// group->add(boxRepresentation);
+	// camera->setGroup(group);
+
+	boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	boxRepresentation->setSize(0.05,0.05,0.05);
+	viewElement->addComponent(boxRepresentation);
+
+	/// Run the thread
+	runtime->start();
+
+	int numSteps = 100;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	graphicsManager->dumpDebugInfo("tree-dump");
+	for (int i = 0; i < numSteps; ++i)
+	{
+		double t = static_cast<double>(i) / numSteps;
+		boxRepresentation->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(100000 / numSteps));
+	}
 }
 
 }; // namespace Graphics

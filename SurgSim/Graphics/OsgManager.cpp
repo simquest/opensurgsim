@@ -21,6 +21,9 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
 
+#include <osgViewer/Scene>
+#include <osgDB/WriteFile>
+
 using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
@@ -137,6 +140,7 @@ bool OsgManager::doUpdate(double dt)
 	if (Manager::doUpdate(dt))
 	{
 		m_viewer->frame();
+			dumpDebugInfo("filename");
 		return true;
 	}
 	else
@@ -147,6 +151,22 @@ bool OsgManager::doUpdate(double dt)
 
 void OsgManager::doBeforeStop()
 {
+
 	// Delete the viewer so that the graphics context will be released in the manager's thread
 	m_viewer = nullptr;
 }
+
+void SurgSim::Graphics::OsgManager::dumpDebugInfo(const std::string& fileName) const
+{
+// 	osgViewer::CompositeViewer::Scenes scenes;
+// 	m_viewer->getScenes(scenes);
+// 
+// 	for (auto it = std::begin(scenes); it != std::end(scenes); ++it)
+// 	{
+// 		osg::Node* node = (*it)->getSceneData();
+// 		osgDB::writeNodeFile(*node, fileName+".osgt");
+// 	}
+	osgDB::writeNodeFile(*(m_defaultGroup->getOsgGroup()),"default_group.osgt" );	
+	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()),"default_camera.osgt" );
+}
+

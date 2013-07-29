@@ -21,6 +21,7 @@
 #include <SurgSim/Graphics/OsgVectorConversions.h>
 #include <SurgSim/Graphics/Manager.h>
 #include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/OsgTexture2d.h>
 
 
 using SurgSim::Math::makeRigidTransform;
@@ -144,6 +145,33 @@ std::shared_ptr<Material> OsgCamera::getMaterial() const
 void OsgCamera::clearMaterial()
 {
 	SURGSIM_FAILURE() << "A camera node does not have a material";
+}
+
+bool OsgCamera::setColorRenderTexture(std::shared_ptr<Texture> texture)
+{
+	std::shared_ptr<OsgTexture2d> osgTexture = std::dynamic_pointer_cast<OsgTexture2d>(texture);
+	bool result = false;
+	if (osgTexture != nullptr )
+	{
+		m_camera->attach(osg::Camera::COLOR_BUFFER, osgTexture->getOsgTexture2d(),0,0);
+		m_camera->setRenderOrder(osg::Camera::PRE_RENDER);
+		m_textureMap[osg::Camera::COLOR_BUFFER] = osgTexture;
+		m_camera->setClearColor(osg::Vec4f(0.0,0.8,0.0,1.0));
+		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
+		
+		int width,height;
+		osgTexture->getSize(&width, &height);
+		m_camera->setViewport(0,0,width,height);
+		
+		result = m_camera->isRenderToTextureCamera();
+	}
+
+	return result;
+}
+
+std::shared_ptr<Texture> OsgCamera::getColorRenderTexture() const
+{
+	return nullptr;
 }
 
 
