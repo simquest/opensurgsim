@@ -32,6 +32,8 @@ set(MULTIAXIS_DEVICE_SOURCES
 )
 
 set(MULTIAXIS_DEVICE_HEADERS
+	BitSetBuffer.h
+	FileDescriptor.h
 	RawMultiAxisDevice.h
 	RawMultiAxisScaffold.h
 	RawMultiAxisThread.h
