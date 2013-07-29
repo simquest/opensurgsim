@@ -93,7 +93,7 @@ public:
 
 	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return std::pair<int,int>(RIGID_SHAPE_TYPE_COUNT, RIGID_SHAPE_TYPE_COUNT);
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_NONE, RIGID_SHAPE_TYPE_NONE);
 	}
 
 private:
