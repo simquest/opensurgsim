@@ -43,6 +43,17 @@ public:
 
 	bool canWrite() const;
 
+	/// Checks whether this object has data available to be read.
+	/// \return	true if there is data currently available.
+	bool hasDataToRead() const;
+
+	/// Reads bytes from the file descriptor.
+	/// \param [out]	dataBuffer	Buffer to read into.  Must have room for at least bytesToRead bytes of data.
+	/// \param	bytesToRead	The number of bytes to try reading.  Actual number of bytes received may be smaller.
+	/// \param [out]	bytesActuallyRead	The number of bytes that were actually read into the buffer.
+	/// \return	true if it succeeds, false if it fails.
+	bool readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead);
+
 	int get() const;
 
 	bool openForReadingAndWriting(const std::string& path);

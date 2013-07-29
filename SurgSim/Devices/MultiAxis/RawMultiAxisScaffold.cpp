@@ -17,8 +17,6 @@
 
 #include <linux/input.h>
 
-#include <unistd.h>
-#include <poll.h>
 #include <sys/ioctl.h>
 
 #include <vector>
@@ -401,18 +399,12 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 		}
 	}
 
-	struct pollfd pollData[1];
-	pollData[0].fd = info->fileDescriptor.get();
-	pollData[0].events = POLLIN;
-
-	//const int timeoutMsec = 10;
-	const int nonBlockingOnly = 0;
 	bool didUpdate = false;
-	while (poll(pollData, 1, nonBlockingOnly) > 0)
+	while (info->fileDescriptor.hasDataToRead())
 	{
 		struct input_event event;
-		int numRead = read(info->fileDescriptor.get(), &event, sizeof(event));
-		if (numRead < 0)
+		size_t numRead;
+		if (! info->fileDescriptor.readBytes(&event, sizeof(event), &numRead))
 		{
 
 			if (errno == ENODEV)

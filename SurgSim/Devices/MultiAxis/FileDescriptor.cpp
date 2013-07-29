@@ -18,6 +18,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <poll.h>
 
 #include <string>
 
@@ -124,6 +126,39 @@ void FileDescriptor::reset()
 	{
 		close(m_descriptor);
 		m_descriptor = INVALID_VALUE;
+	}
+}
+
+bool FileDescriptor::hasDataToRead() const
+{
+	if (! canRead())
+	{
+		return false;
+	}
+
+	struct pollfd pollData[1];
+	pollData[0].fd = m_descriptor;
+	pollData[0].events = POLLIN;
+
+	//const int timeoutMsec = 10;
+	const int nonBlockingOnly = 0;
+	int status = poll(pollData, 1, nonBlockingOnly);
+	return (status > 0);
+}
+
+bool FileDescriptor::readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead)
+{
+	SURGSIM_ASSERT(canRead());
+	ssize_t numBytesRead = read(m_descriptor, dataBuffer, bytesToRead);
+	if (numBytesRead < 0)
+	{
+		*bytesActuallyRead = 0;
+		return false;
+	}
+	else
+	{
+		*bytesActuallyRead = numBytesRead;
+		return true;
 	}
 }
 
