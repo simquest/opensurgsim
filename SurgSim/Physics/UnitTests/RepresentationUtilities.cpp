@@ -15,6 +15,7 @@
 
 #include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
 #include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
@@ -59,12 +60,20 @@ std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
 		representation);
 }
 
-std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(const Quaterniond& rotation,
-		const Vector3d& position)
+std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation,
+	const Quaterniond& rotation,
+	const Vector3d& position)
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
+		std::make_shared<MockCollisionRepresentation>(
+		"TestPlaneRepresentation",
+		plane,
+		rotation,
+		position,
+		representation);
+
 	return rep;
 }
 
