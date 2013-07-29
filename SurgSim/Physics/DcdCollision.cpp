@@ -48,13 +48,8 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	auto itEnd = pairs.cend();
 	while (it != itEnd)
 	{
-		int i = (*it)->getFirst()->getShapeType();
-		int j = (*it)->getSecond()->getShapeType();
-		if (m_contactCalculations[i][j]->needsSwap())
-		{
-			(*it)->swapRepresentations();
-		}
-		m_contactCalculations[i][j]->calculateContact(*it);
+		m_contactCalculations[(*it)->getFirst()->getShapeType()][(*it)->getSecond()->getShapeType()]->
+			calculateContact(*it);
 		++it;
 	}
 	return result;
@@ -69,11 +64,8 @@ void DcdCollision::populateCalculationTable()
 			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
 		}
 	}
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact());
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE].
-		reset(new SphereDoubleSidedPlaneDcdContact(false));
-	m_contactCalculations[RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE][RIGID_SHAPE_TYPE_SPHERE].
-		reset(new SphereDoubleSidedPlaneDcdContact(true));
+	setDcdContactInTable(std::make_shared<SphereSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SphereDoubleSidedPlaneDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
@@ -111,6 +103,16 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 			}
 		}
 		state->setCollisionPairs(pairs);
+	}
+}
+
+void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
+{
+	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
+	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;
+	if(shapeTypes.first != shapeTypes.second)
+	{
+		m_contactCalculations[shapeTypes.second][shapeTypes.first] = dcdContact;
 	}
 }
 

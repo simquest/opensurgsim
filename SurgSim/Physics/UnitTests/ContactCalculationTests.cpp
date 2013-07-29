@@ -140,7 +140,7 @@ void doSphereDoubleSidedPlaneTest(std::shared_ptr<SphereShape> sphere,
 	std::shared_ptr<CollisionRepresentation> sphereRep =
 		std::make_shared<RigidShapeCollisionRepresentation>(sphere,sphereQuat,sphereTrans);
 
-	SphereDoubleSidedPlaneDcdContact calcNormal(false);
+	SphereDoubleSidedPlaneDcdContact calcNormal;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);
 
 	// Again this replicates the way this is calculated in the contact calculation just with different
@@ -221,13 +221,11 @@ TEST(ContactCalculationTests, PlaneSphereShouldFail)
 	std::shared_ptr<CollisionRepresentation> repp1 = std::make_shared<RigidShapeCollisionRepresentation>
 													 (planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
 
-	std::shared_ptr<CollisionPair> pairps = std::make_shared<CollisionPair>(repp0, reps0);
 	std::shared_ptr<CollisionPair> pairpp = std::make_shared<CollisionPair>(repp0, repp1);
 	std::shared_ptr<CollisionPair> pairss = std::make_shared<CollisionPair>(reps0, reps1);
 
-	SphereDoubleSidedPlaneDcdContact contact(false);
+	SphereDoubleSidedPlaneDcdContact contact;
 
-	EXPECT_ANY_THROW(contact.calculateContact(pairps));
 	EXPECT_ANY_THROW(contact.calculateContact(pairpp));
 	EXPECT_ANY_THROW(contact.calculateContact(pairss));
 }

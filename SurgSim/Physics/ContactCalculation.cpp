@@ -27,7 +27,7 @@ namespace SurgSim
 namespace Physics
 {
 
-void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
+void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 
 	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<
@@ -39,7 +39,7 @@ void DefaultContactCalculation::calculateContact(std::shared_ptr<CollisionPair> 
 
 // Specific calculation for pairs of Spheres
 
-void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
+void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
 			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
@@ -68,7 +68,7 @@ void SphereSphereDcdContact::calculateContact(std::shared_ptr<CollisionPair> pai
 	}
 }
 
-void SphereDoubleSidedPlaneDcdContact::calculateContact(std::shared_ptr<CollisionPair> pair)
+void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	std::shared_ptr<CollisionRepresentation> representationPlane;
 	std::shared_ptr<CollisionRepresentation> representationSphere;
