@@ -118,6 +118,24 @@ public:
 
 };
 
+/// Class to calculate intersections between Spheres and Planes
+class SpherePlaneDcdContact : public ContactCalculation
+{
+public:
+
+	/// Constructor.
+	/// \param	swapPairs	Set to true if the calculation needs to switch the members of the pair.
+	explicit SpherePlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
+	{
+
+	}
+
+	/// Calculate the actual contact between two shapes of the give CollisionPair.
+	/// \param	pair	The pair that is under consideration.
+	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
+
+};
+
 }; // Physics
 }; // SurgSim
 
