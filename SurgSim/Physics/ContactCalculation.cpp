@@ -113,7 +113,64 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 }
 
 
+// Collision calculation between a box and a plane
+void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+{
+    using SurgSim::Math::Geometry::ScalarEpsilon;
 
+    std::shared_ptr<CollisionRepresentation> representationPlane;
+    std::shared_ptr<CollisionRepresentation> representationBox;
+
+    representationBox = pair->getFirst();
+    representationPlane = pair->getSecond();
+
+    SURGSIM_ASSERT(representationBox->getShapeType() == RIGID_SHAPE_TYPE_BOX) <<
+            "First Object, wrong type of object" << pair->getFirst()->getShapeType();
+    SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) <<
+            "Second Object, wrong type of object" << pair->getSecond()->getShapeType();
+
+    std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
+    std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+
+    // Transform the plane normal to box co-ordinate system.
+    SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
+                                                           representationPlane->getPose();
+    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.rotation() * plane->getNormal();
+    SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+    SurgSim::Math::Vector4d planePoint = planeLocalToBoxLocal * SurgSim::Math::Vector4d(planeNormalScaled.x(),
+                                         planeNormalScaled.y(), planeNormalScaled.z(), 1.0);
+    double planeD = -planeNormal.dot(SurgSim::Math::Vector3d(planePoint.x(), planePoint.y(), planePoint.z()));
+
+    // Loop through the box vertices (boxVertex) and check it it is below plane.
+    double d = 0.0;
+    SurgSim::Math::Vector3d boxVertex;
+	SurgSim::Math::Vector3d normal;
+	SurgSim::Math::Vector3d boxVertexGlobal;
+    for (int i = -1; i <= 1; i += 2)
+    {
+        for (int j = -1; j <= 1; j += 2)
+        {
+            for (int k = -1; k <= 1; k += 2)
+            {
+                boxVertex.x() = box->getSizeX() * double(i) * 0.5;
+                boxVertex.y() = box->getSizeY() * double(j) * 0.5;
+                boxVertex.z() = box->getSizeZ() * double(k) * 0.5;
+                d = planeNormal.dot(boxVertex) + planeD;
+				if (d < ScalarEpsilon)
+				{
+					// Add a contact.
+					normal = representationPlane->getPose().rotation() * plane->getNormal();
+					std::pair<Location,Location> penetrationPoints;
+					boxVertexGlobal = representationBox->getPose() * boxVertex;
+					penetrationPoints.first.globalPosition.setValue(boxVertexGlobal);
+					penetrationPoints.second.globalPosition.setValue(boxVertexGlobal - normal * d);
+
+					pair->addContact(d, normal, penetrationPoints);
+				}
+            }
+        }
+    }
+}
 
 }; // Physics
 }; // SurgSim

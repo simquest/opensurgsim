@@ -147,6 +147,27 @@ private:
 
 };
 
+/// Class to calculate intersections between Boxes and Planes
+class BoxPlaneDcdContact : public ContactCalculation
+{
+public:
+
+    /// Constructor.
+    explicit BoxPlaneDcdContact()
+    {
+    }
+
+	virtual std::pair<int,int> getShapeTypes() override
+	{
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_BOX, RIGID_SHAPE_TYPE_PLANE);
+	}
+
+private:
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param	pair	The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
+};
+
 }; // Physics
 }; // SurgSim
 
