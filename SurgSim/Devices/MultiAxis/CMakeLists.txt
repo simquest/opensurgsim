@@ -26,19 +26,43 @@ include_directories(
 )
 
 set(MULTIAXIS_DEVICE_SOURCES
-	FileDescriptor.cpp
 	RawMultiAxisDevice.cpp
 	RawMultiAxisScaffold.cpp
 	RawMultiAxisThread.cpp
 )
 
 set(MULTIAXIS_DEVICE_HEADERS
-	BitSetBuffer.h
-	FileDescriptor.h
 	RawMultiAxisDevice.h
 	RawMultiAxisScaffold.h
 	RawMultiAxisThread.h
 )
+
+set(MULTIAXIS_DEVICE_LINUX_SOURCES
+	FileDescriptor.cpp
+)
+
+set(MULTIAXIS_DEVICE_LINUX_HEADERS
+	BitSetBuffer.h
+	FileDescriptor.h
+)
+
+set(MULTIAXIS_DEVICE_WINHID_SOURCES
+	FileHandle.cpp
+)
+
+set(MULTIAXIS_DEVICE_WINHID_HEADERS
+	FileHandle.h
+)
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	#add_definitions( -D... )
+	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_LINUX_SOURCES})
+	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_LINUX_HEADERS})
+elseif(WINDDK_FOUND)
+	#add_definitions( -D... )
+	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_WINHID_SOURCES})
+	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_WINHID_HEADERS})
+endif()
 
 add_library(MultiAxisDevice
 	${MULTIAXIS_DEVICE_SOURCES} ${MULTIAXIS_DEVICE_HEADERS})
