@@ -101,7 +101,7 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 		// Calculate the normal going from the plane to the sphere, it is the plane normal transformed by the
 		// plane pose, flipped if the sphere is behind the plane and normalize it
 		Vector3d normal =
-			(representationPlane->getPose().rotation() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0);
+			((representationPlane->getPose() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0)).normalized();
 
 		std::pair<Location,Location> penetrationPoints;
 		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
