@@ -15,9 +15,22 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 
+#ifndef HID_WINDDK_XXX
 #include <linux/input.h>
 
 #include <sys/ioctl.h>
+#else /* HID_WINDDK_XXX */
+#undef  _WIN32_WINNT
+#define _WIN32_WINNT 0x0501   // request Windows XP-compatible SDK APIs
+#undef  WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN   // do not automatically include WinSock 1 and some other header files
+#include <windows.h>
+
+#include <setupapi.h>
+extern "C" {  // sigh...
+#include <hidsdi.h>
+}
+#endif /* HID_WINDDK_XXX */
 
 #include <vector>
 #include <list>
@@ -30,7 +43,11 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
+#ifndef HID_WINDDK_XXX
 #include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
+#else /* HID_WINDDK_XXX */
+#include "SurgSim/Devices/MultiAxis/FileHandle.h"
+#endif /* HID_WINDDK_XXX */
 #include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
@@ -54,6 +71,7 @@ namespace Device
 {
 
 
+#ifndef HID_WINDDK_XXX
 // Get the output location for the XSI version of strerror_r.
 static inline const char* systemErrorTextHelper(const char* buffer, int returnValue)
 {
@@ -84,18 +102,52 @@ static std::string getSystemErrorText(int error)
 	}
 	return std::string(message);
 }
+#else /* HID_WINDDK_XXX */
+static std::string getSystemErrorText(DWORD error)
+{
+	const size_t BUFFER_SIZE = 1024;
+	char errorBuf[BUFFER_SIZE];
+	if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, error, 0,
+					   errorBuf, BUFFER_SIZE-1, nullptr) <= 0)
+	{
+		sprintf(errorBuf, "<error code %d>", error);
+	}
+	
+	// strip terminal whitespace, if any
+	const int end = strnlen(errorBuf, BUFFER_SIZE-1);
+	if ((end > 0) && isspace(errorBuf[end-1]))
+	{
+		int lastWhitespace = end - 1;
+		while ((lastWhitespace > 0) && isspace(errorBuf[lastWhitespace-1]))
+		{
+			--lastWhitespace;
+		}
+		errorBuf[lastWhitespace] = '\0';
+	}
+
+	return std::string(errorBuf);
+}
+#endif /* HID_WINDDK_XXX */
 
 
 struct RawMultiAxisScaffold::DeviceData
 {
 public:
 	/// Initialize the data.
+#ifndef HID_WINDDK_XXX
 	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileDescriptor&& descriptor,
 			   const std::vector<int>& buttonCodeList) :
+#else /* HID_WINDDK_XXX */
+	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileHandle&& handle) :
+#endif /* HID_WINDDK_XXX */
 		devicePath(path),
 		deviceObject(device),
 		thread(),
+#ifndef HID_WINDDK_XXX
 		fileDescriptor(std::move(descriptor)),
+#else /* HID_WINDDK_XXX */
+		fileHandle(std::move(handle)),
+#endif /* HID_WINDDK_XXX */
 		axisStates(initialAxisStates()),
 		buttonStates(initialButtonStates()),
 		coordinateSystemRotation(defaultCoordinateSystemRotation()),
@@ -103,6 +155,7 @@ public:
 		orientationScale(device->getOrientationScale()),
 		useAxisDominance(device->isUsingAxisDominance())
 	{
+#ifndef HID_WINDDK_XXX
 		for (size_t i = 0;  (i < buttonCodeList.size()) && (i < NUM_BUTTONS);  ++i)
 		{
 			buttonCodes[i] = buttonCodeList[i];
@@ -111,6 +164,7 @@ public:
 		{
 			buttonCodes[i] = -1;
 		}
+#endif /* not HID_WINDDK_XXX */
 	}
 
 	// Initialize by moving the data from another object.
@@ -119,10 +173,16 @@ public:
 		devicePath(std::move(other.devicePath)),
 		deviceObject(std::move(other.deviceObject)),
 		thread(std::move(other.thread)),
+#ifndef HID_WINDDK_XXX
 		fileDescriptor(std::move(other.fileDescriptor)),
+#else /* HID_WINDDK_XXX */
+		fileHandle(std::move(other.fileHandle)),
+#endif /* HID_WINDDK_XXX */
 		axisStates(std::move(other.axisStates)),
 		buttonStates(std::move(other.buttonStates)),
+#ifndef HID_WINDDK_XXX
 		buttonCodes(std::move(other.buttonCodes)),
+#endif /* not HID_WINDDK_XXX */
 		coordinateSystemRotation(std::move(other.coordinateSystemRotation)),
 		positionScale(std::move(other.positionScale)),
 		orientationScale(std::move(other.orientationScale)),
@@ -168,14 +228,21 @@ public:
 	RawMultiAxisDevice* const deviceObject;
 	/// Processing thread.
 	std::unique_ptr<RawMultiAxisThread> thread;
+#ifndef HID_WINDDK_XXX
 	/// File descriptor to read from.
 	FileDescriptor fileDescriptor;
+#else /* HID_WINDDK_XXX */
+	/// File handle to read from.
+	FileHandle fileHandle;
+#endif /* HID_WINDDK_XXX */
 	/// Persistent axis states.
 	std::array<int, 6> axisStates;
 	/// Persistent button states.
 	std::array<bool, NUM_BUTTONS> buttonStates;
+#ifndef HID_WINDDK_XXX
 	/// Event library button code corresponding to each index.
 	std::array<int, NUM_BUTTONS> buttonCodes;
+#endif /* not HID_WINDDK_XXX */
 	/// The rotation of the coordinate system (used to reorient, e.g. point +Y up)
 	SurgSim::Math::Matrix33d coordinateSystemRotation;
 	/// Scale factor for the position axes.
@@ -188,9 +255,9 @@ public:
 	boost::mutex parametersMutex;
 
 private:
-	// prohibit copy construction and asignment
-	DeviceData(const DeviceData&) = delete;
-	DeviceData& operator=(const DeviceData&) = delete;
+	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
+	DeviceData(const DeviceData&) /*= delete*/;
+	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
 struct RawMultiAxisScaffold::StateData
@@ -211,9 +278,9 @@ public:
 	boost::mutex mutex;
 
 private:
-	// prohibit copy construction and asignment
-	StateData(const StateData&) = delete;
-	StateData& operator=(const StateData&) = delete;
+	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
+	StateData(const StateData&) /*= delete*/;
+	StateData& operator=(const StateData&) /*= delete*/;
 };
 
 
@@ -379,6 +446,13 @@ static int findDominantAxis(const std::array<int, 6>& axes)
 	return biggestAxis;
 }
 
+#ifdef HID_WINDDK_XXX
+static inline short signedShortData(unsigned char byte0, unsigned char byte1)
+{
+	return static_cast<short>(static_cast<unsigned short>(byte0) | (static_cast<unsigned short>(byte1) << 8));
+}
+#endif /* HID_WINDDK_XXX */
+
 bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
@@ -400,13 +474,13 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	}
 
 	bool didUpdate = false;
+#ifndef HID_WINDDK_XXX
 	while (info->fileDescriptor.hasDataToRead())
 	{
 		struct input_event event;
 		size_t numRead;
 		if (! info->fileDescriptor.readBytes(&event, sizeof(event), &numRead))
 		{
-
 			if (errno == ENODEV)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: read failed; device has been disconnected!  (ignoring)";
@@ -427,6 +501,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 		{
 			if (event.type == EV_REL)
 			{
+
 				if (event.code >= REL_X && event.code < (REL_X+3))  // Assume that X, Y, Z are consecutive
 				{
 					info->axisStates[0 + (event.code - REL_X)] = event.value;
@@ -465,6 +540,76 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 			}
 		}
 	}
+#else /* HID_WINDDK_XXX */
+
+	// We can't keep reading while data is available, because we don't know how to tell when data is available.
+	// Both WaitForSingleObject() and WaitForMultipleObjects() always claim data is available for 3DConnexion device
+	// file handles.  So we just do it once, blocking until we have data.
+	//
+	// We also can't unblock the read once we initiate it (closing the handle has no effect).
+
+	{
+		unsigned char deviceBuffer[7*128];
+		size_t numRead;
+		if (! info->fileHandle.readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
+		{
+			DWORD error = GetLastError();
+			SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << error << ", " <<
+				getSystemErrorText(error);
+		}
+		else if ((numRead >= 7) && (deviceBuffer[0] == 0x01))       // Translation
+		{
+			info->axisStates[0] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
+			info->axisStates[1] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
+			info->axisStates[2] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
+			didUpdate = true;
+
+			if ((numRead >= 14) && (deviceBuffer[7] == 0x02))  // translation data may have rotation appended to it
+			{
+				info->axisStates[3] = signedShortData(deviceBuffer[8],  deviceBuffer[9]);
+				info->axisStates[4] = signedShortData(deviceBuffer[10],  deviceBuffer[11]);
+				info->axisStates[5] = signedShortData(deviceBuffer[12],  deviceBuffer[13]);
+			}
+		}
+		else if ((numRead >= 7) && (deviceBuffer[0] == 0x02))  // Rotation
+		{
+			info->axisStates[3] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
+			info->axisStates[4] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
+			info->axisStates[5] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
+			didUpdate = true;
+
+			if ((numRead >= 14) && (deviceBuffer[7] == 0x01))  // rotation data may have translation appended to it
+			{
+				info->axisStates[0] = signedShortData(deviceBuffer[8],  deviceBuffer[9]);
+				info->axisStates[1] = signedShortData(deviceBuffer[10],  deviceBuffer[11]);
+				info->axisStates[2] = signedShortData(deviceBuffer[12],  deviceBuffer[13]);
+			}
+		}
+		else if ((numRead >= 2) && (deviceBuffer[0] == 0x03))  // Buttons
+		{
+			size_t currentByte = 1;  // Byte 0 specifies the packet type; data starts at byte 1
+			unsigned char currentBit = 0x01;
+			for (size_t i = 0;  i < DeviceData::NUM_BUTTONS;  ++i)
+			{
+				info->buttonStates[i] = ((deviceBuffer[currentByte] & currentBit) != 0);
+				if (currentBit < 0x80)
+				{
+					currentBit = currentBit << 1;
+				}
+				else
+				{
+					currentBit = 0x01;
+					++currentByte;
+					if (currentByte >= numRead)  // out of data?
+					{
+						break;
+					}
+				}
+			}
+			didUpdate = true;
+		}
+	}
+#endif /* HID_WINDDK_XXX */
 
 	if (didUpdate)
 	{
@@ -552,6 +697,7 @@ bool RawMultiAxisScaffold::finalizeSdk()
 	return true;
 }
 
+#ifndef HID_WINDDK_XXX
 FileDescriptor RawMultiAxisScaffold::openDevice(const std::string& path)
 {
 	FileDescriptor fd;
@@ -567,6 +713,20 @@ FileDescriptor RawMultiAxisScaffold::openDevice(const std::string& path)
 	}
 	return std::move(fd);
 }
+#else /* HID_WINDDK_XXX */
+FileHandle RawMultiAxisScaffold::openDevice(const std::string& path)
+{
+	FileHandle fh;
+	fh.openForReadingAndMaybeWriting(path);
+	if (! fh.isValid())
+	{
+		int error = GetLastError();
+		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": " <<
+			getSystemErrorText(error);
+	}
+	return std::move(fh);
+}
+#endif /* HID_WINDDK_XXX */
 
 bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* device, int* numUsedDevicesSeen)
 {
@@ -591,6 +751,22 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		return false;
 	}
 
+#ifdef HID_WINDDK_XXX
+	// Prepare to iterate over the attached HID devices
+	GUID hidGuid;
+	HidD_GetHidGuid(&hidGuid);
+	HDEVINFO hidDeviceInfo = SetupDiGetClassDevs(&hidGuid, NULL, NULL,
+		DIGCF_DEVICEINTERFACE | DIGCF_PRESENT | DIGCF_PROFILE);
+	if (hidDeviceInfo == INVALID_HANDLE_VALUE)
+	{
+		DWORD error = GetLastError();
+		SURGSIM_LOG_CRITICAL(m_logger) << "RawMultiAxis: Failed to query attached HID devices;" <<
+			" SetupDiGetClassDevs() failed with error " << error << ", " << getSystemErrorText(error);
+		return false;
+	}
+#endif /* HID_WINDDK_XXX */
+
+#ifndef HID_WINDDK_XXX
 	for (int i = 0;  i < 32;  ++i)
 	{
 		char devicePath[128];
@@ -636,6 +812,108 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		}
 	}
 
+#else /* HID_WINDDK_XXX */
+	// Loop through the device list, looking for the devices we want
+	int hidEnumerationIndex = 0;
+	SP_DEVICE_INTERFACE_DATA deviceInterfaceData;
+	deviceInterfaceData.cbSize = sizeof(deviceInterfaceData);
+	SP_DEVICE_INTERFACE_DETAIL_DATA* deviceInterfaceDetail = 0;
+	DWORD deviceInterfaceDetailSize = 0;
+
+	int numMultiAxisDevices = 0;
+	int numDevicesWithType  = 0;
+
+	while (1)
+	{
+		// Get the next interface in the list.
+		if (! SetupDiEnumDeviceInterfaces(hidDeviceInfo, NULL, &hidGuid, hidEnumerationIndex, &deviceInterfaceData))
+		{
+			DWORD error = GetLastError();
+			if (error == ERROR_NO_MORE_ITEMS)
+			{
+				break;
+			}
+			else
+			{
+				SURGSIM_LOG_CRITICAL(m_logger) << "RawMultiAxis: Failed to query attached HID devices;" <<
+					" SetupDiEnumDeviceInterfaces() failed with error " << error << ", " << getSystemErrorText(error);
+				return false;
+			}
+		}
+
+		// Increment the counter for the next pass.  Make sure not to use this value directly later in the loop!
+		++hidEnumerationIndex;
+
+		// Find out the required size.
+		DWORD neededSize = 0;
+		if (! SetupDiGetDeviceInterfaceDetail(hidDeviceInfo, &deviceInterfaceData, NULL, 0, &neededSize, NULL))
+		{
+			DWORD error = GetLastError();
+			if (error != ERROR_INSUFFICIENT_BUFFER)
+			{
+				SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Failed to get the required device detail size," <<
+					" device will be ignored; error " << error << ", " << getSystemErrorText(error);
+				continue;
+			}
+		}
+
+		// Make sure we have enough memory.
+		if (neededSize > deviceInterfaceDetailSize)
+		{
+			deviceInterfaceDetailSize = 2*neededSize;
+			if (deviceInterfaceDetail)
+				free(deviceInterfaceDetail);
+			deviceInterfaceDetail = reinterpret_cast<SP_DEVICE_INTERFACE_DETAIL_DATA*>( malloc(deviceInterfaceDetailSize) );
+		}
+
+		// Get the device detail (which actually just means the path).
+		deviceInterfaceDetail->cbSize = sizeof(*deviceInterfaceDetail);
+		if (! SetupDiGetDeviceInterfaceDetail(hidDeviceInfo, &deviceInterfaceData, deviceInterfaceDetail, deviceInterfaceDetailSize,
+			NULL, NULL))
+		{
+			DWORD error = GetLastError();
+			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Failed to get the HID device detail," <<
+					" device will be ignored; error " << error << ", " << getSystemErrorText(error);
+			continue;
+		}
+
+		// Check if this is the device we wanted.
+		// TODO(advornik): Implement device attribute scanning like we do on Linux.
+
+		std::string devicePath(deviceInterfaceDetail->DevicePath);
+		FileHandle fh = openDevice(devicePath);
+		if (! fh.isValid())
+		{
+			// message was already printed
+			continue;
+		}
+
+		char reportedName[1024] = "???";  // TODO(advornik): Implement querying names?
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
+
+		if (! deviceHasSixAxes(fh))
+		{
+			continue;
+		}
+
+		fh.reset();
+
+		if (registerIfUnused(devicePath, device, numUsedDevicesSeen))
+		{
+			return true;
+		}
+	}
+#endif /* HID_WINDDK_XXX */
+
+#ifdef HID_WINDDK_XXX
+	// Free the detail buffer
+	if (deviceInterfaceDetail)
+	{
+		free(deviceInterfaceDetail);
+		deviceInterfaceDetail = 0;
+	}
+#endif /* HID_WINDDK_XXX */
+
 	return false;
 }
 
@@ -654,18 +932,30 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 
 	// The controller is not yet in use.
 
+#ifndef HID_WINDDK_XXX
 	FileDescriptor fd = openDevice(path);
 	if (! fd.isValid())
+#else /* HID_WINDDK_XXX */
+	FileHandle fh = openDevice(path);
+	if (! fh.isValid())
+#endif /* HID_WINDDK_XXX */
 	{
 		return false;
 	}
 
+#ifndef HID_WINDDK_XXX
 	std::vector<int> buttons = getDeviceButtonsAndKeys(fd);
+#endif /* not HID_WINDDK_XXX */
 
 	// Construct the object, start its thread, then move it to the list.
 	// The thread needs a device entry pointer, but the unique_ptr indirection means we have one to provide even
 	// before we've put an entry in the active device array.
+#ifndef HID_WINDDK_XXX
 	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fd), buttons));
+#else /* HID_WINDDK_XXX */
+	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fh)));
+#endif /* HID_WINDDK_XXX */
+
 	createPerDeviceThread(info.get());
 	SURGSIM_ASSERT(info->thread);
 	m_state->activeDeviceList.emplace_back(std::move(info));
@@ -695,6 +985,7 @@ bool RawMultiAxisScaffold::destroyPerDeviceThread(DeviceData* data)
 	return true;
 }
 
+#ifndef HID_WINDDK_XXX
 bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDescriptor)
 {
 	BitSetBuffer<ABS_CNT> buffer;
@@ -723,6 +1014,8 @@ bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDe
 			}
 		}
 	}
+
+
 	if (numIgnoredAxes)
 	{
 		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional absolute axes.";
@@ -766,7 +1059,22 @@ bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDe
 
 	return true;
 }
+#else /* HID_WINDDK_XXX */
+bool RawMultiAxisScaffold::deviceHasSixAxes(const FileHandle& fileHandle)
+{
+	//SURGSIM_ASSERT(0) << "unimpl!";//XXX
 
+	int numIgnoredAxes = 0;//XXX
+	if (numIgnoredAxes)
+	{
+		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional absolute axes.";
+	}
+
+	return true;
+}
+#endif /* HID_WINDDK_XXX */
+
+#ifndef HID_WINDDK_XXX
 std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(const FileDescriptor& fileDescriptor)
 {
 	std::vector<int> result;
@@ -796,7 +1104,7 @@ std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(const FileDescrip
 
 	return result;
 }
-
+#endif /* not HID_WINDDK_XXX */
 
 SurgSim::DataStructures::DataGroup RawMultiAxisScaffold::buildDeviceInputData()
 {

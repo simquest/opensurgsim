@@ -30,6 +30,7 @@ namespace Device
 class RawMultiAxisDevice;
 class RawMultiAxisThread;
 class FileDescriptor;
+class FileHandle;
 
 /// A class that implements the behavior of RawMultiAxisDevice objects.
 ///
@@ -139,9 +140,15 @@ private:
 	bool destroyPerDeviceThread(DeviceData* data);
 
 	/// Opens the specified device.
+#ifndef HID_WINDDK_XXX
 	/// \return The FileDescriptor wrapper for the device.
 	FileDescriptor openDevice(const std::string& path);
+#else /* HID_WINDDK_XXX */
+	/// \return The FileHandle wrapper for the device.
+	FileHandle openDevice(const std::string& path);
+#endif /* HID_WINDDK_XXX */
 
+#ifndef HID_WINDDK_XXX
 	/// Checks if the specified device has all six absolute translation/rotation coordinate axes.
 	/// \param fileDescriptor The FileDescriptor wrapper for the device.
 	bool deviceHasSixAbsoluteAxes(const FileDescriptor& fileDescriptor);
@@ -153,6 +160,11 @@ private:
 	/// Gets the indices of the available device buttons.
 	/// \return a vector of indices.
 	std::vector<int> getDeviceButtonsAndKeys(const FileDescriptor& fileDescriptor);
+#else /* HID_WINDDK_XXX */
+	/// Checks if the specified device has all six translation/rotation coordinate axes.
+	/// \param fileDescriptor The FileHandle wrapper for the device.
+	bool deviceHasSixAxes(const FileHandle& fileDescriptor);
+#endif /* HID_WINDDK_XXX */
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
