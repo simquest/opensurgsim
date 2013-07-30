@@ -67,6 +67,7 @@ mark_as_advanced(Boost_DIR)
 
 find_package(OpenHaptics)
 find_package(SixenseSdk)
+find_package(WinDDK)
 
 
 if(SURGSIM_TESTS_BUILD)
