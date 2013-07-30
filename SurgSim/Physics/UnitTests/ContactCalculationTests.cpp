@@ -250,33 +250,32 @@ TEST(ContactCalculationTests, PlaneSphereShouldFail)
 	EXPECT_ANY_THROW(contact.calculateContact(pairss));
 }
 
-void doCapsuleSphereTest(double capsuleRadius, double capsuleHeight, Vector3d capsulePosition, 
-						 double sphereRadius, Vector3d spherePosition, bool hasContacts, double depth)
+void doCapsuleSphereTest(double capsuleRadius, double capsuleHeight, const Vector3d& capsulePosition, 
+						 double sphereRadius, const Vector3d& spherePosition, bool hasContacts, double depth, 
+						 const Vector3d& sphereProjection = Vector3d::Zero(), 
+						 const Vector3d& expectedNorm = Vector3d::Zero())
 {
-	CapsuleSphereDcdContact calc;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(
 		makeCapsuleRepresentation(nullptr, capsuleRadius, capsuleHeight, Quaterniond::Identity(), capsulePosition),
 		makeSphereRepresentation(nullptr, sphereRadius, Quaterniond::Identity(), spherePosition));
 
+	CapsuleSphereDcdContact calc;
 	calc.calculateContact(pair);
 	EXPECT_EQ(hasContacts, pair->hasContacts());
 
 	if (pair->hasContacts())
 	{
 		std::shared_ptr<Contact> contact(pair->getContacts().front());
-		Vector3d dist((spherePosition - capsulePosition).normalized());
 
-		EXPECT_TRUE(eigenEqual(dist, contact->normal, epsilon));
+		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
 		EXPECT_NEAR(depth, contact->depth, epsilon);
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 
-		// This technically repeats the calculation from the capsule sphere collision
-		// but there is only so many ways to calculate this
-		Vector3d penetrationPoint0(capsulePosition - dist * capsuleRadius);
-		Vector3d penetrationPoint1(spherePosition + dist * sphereRadius);
+		Vector3d penetrationPoint0(sphereProjection + expectedNorm * depth);
+		Vector3d penetrationPoint1(spherePosition - expectedNorm * depth);
 		EXPECT_TRUE(eigenEqual(penetrationPoint0, contact->penetrationPoints.first.globalPosition.getValue(), epsilon));
-		EXPECT_TRUE(eigenEqual(penetrationPoint1, contact->penetrationPoints.second.globalPosition.getValue(), epsilon));
+		EXPECT_TRUE(eigenEqual(penetrationPoint1, contact->penetrationPoints.second.globalPosition.getValue(),epsilon));
 	}
 }
 
@@ -290,7 +289,8 @@ TEST(ContactCalculationTests, CapsuleSphereCalculation)
 
 	{
 		SCOPED_TRACE("Intersection");
-		doCapsuleSphereTest(0.5, 0.5, Vector3d(0.0, 0.0, 0.0), 0.3, Vector3d(0.3, 0, 0), true, 0.5);
+		doCapsuleSphereTest(0.5, 0.5, Vector3d(0.0, 0.0, 0.0), 0.3, Vector3d(0.7, 0, 0), true, 0.1,
+			 Vector3d(0.0, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0));
 	}
 }
 

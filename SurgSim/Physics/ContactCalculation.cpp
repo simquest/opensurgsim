@@ -130,7 +130,8 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 	Vector3d sphereCenter(representationSphere->getPose().translation());
 	Vector3d result;
 
-	double dist = SurgSim::Math::distancePointSegment(sphereCenter, capsule->topCentre(), capsule->bottomCentre(), &result);
+	double dist = 
+		SurgSim::Math::distancePointSegment(sphereCenter, capsule->topCentre(), capsule->bottomCentre(), &result);
 	double distThreshold = capsule->getRadius() + sphere->getRadius();
 
 	if (dist < distThreshold)
@@ -138,11 +139,11 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 		double depth = distThreshold - dist;
 
 		// Calculate the normal going from the capsule to the sphere
-		Vector3d normal(sphereCenter - result);
+		Vector3d normal = (sphereCenter - result).normalized();
 		
 		std::pair<Location,Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(result - normal * depth);
-		penetrationPoints.second.globalPosition.setValue(sphereCenter + normal * depth);
+		penetrationPoints.first.globalPosition.setValue(result + normal * depth);
+		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * depth);
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}
