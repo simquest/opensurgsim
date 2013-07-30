@@ -218,7 +218,7 @@ TEST(ContactCalculationTests, SpherePlaneCalculation)
 	}
 }
 
-TEST(ContactCalculationTests, PlaneSphereShouldFail)
+TEST(ContactCalculationTests, DoubleSidedPlaneSphereShouldFail)
 {
 	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<MockCollisionRepresentation>(
 		"Collision Sphere 0",
@@ -335,7 +335,7 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& exp
         std::pair<Location, Location> penetrationPoint;
         penetrationPoint.first.globalPosition.setValue(vertex);
         depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-        penetrationPoint.second.globalPosition.setValue(vertex - planeNormal * depth);
+        penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
         expectedContacts.push_back(std::make_shared<Contact>(std::abs(depth), Vector3d::Zero(),
                                                              collisionNormal, penetrationPoint));
     }
@@ -381,7 +381,7 @@ void doBoxDoubleSidedPlaneTest(std::shared_ptr<BoxShape> box,
     contactsInfoEqualityTest(expectedContacts, pair->getContacts());
 }
 
-TEST(ContactCalculationTests, BoxPlaneCalculation)
+TEST(ContactCalculationTests, BoxDoubleSidedPlaneCalculation)
 {
     std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(1.0, 1.0, 1.0);
     std::shared_ptr<DoubleSidedPlaneShape> plane = std::make_shared<DoubleSidedPlaneShape>();
@@ -417,6 +417,19 @@ TEST(ContactCalculationTests, BoxPlaneCalculation)
 								  expectedBoxIndicesInContacts, collisionNormalIsPlaneNormal);
     }
 
+	{
+        SCOPED_TRACE("Intersection inside of plane, four contacts, rotated plane");
+        boxQuat = SurgSim::Math::makeRotationQuaternion(1.233469, Vector3d(0.91834,0.39687,0.8271).normalized());
+        boxTrans = Vector3d(0.5,10.0,350.0);
+        planeQuat = boxQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
+        planeTrans = boxTrans + boxQuat * Vector3d(-0.4,0.0,0.0);
+        int expectedNumberOfContacts = 4;
+        int expectedBoxIndicesInContacts[] = {0, 1, 2, 3};
+        bool collisionNormalIsPlaneNormal = true;
+        doBoxDoubleSidedPlaneTest(box, boxQuat, boxTrans, plane, planeQuat, planeTrans, expectedNumberOfContacts,
+								  expectedBoxIndicesInContacts, collisionNormalIsPlaneNormal);
+    }
+
     {
         SCOPED_TRACE("Intersection in front of plane, two contacts, rotated plane");
 		globalQuat = SurgSim::Math::makeRotationQuaternion(0.8753, Vector3d(0.235345,0.6754,0.4567).normalized());
@@ -424,6 +437,20 @@ TEST(ContactCalculationTests, BoxPlaneCalculation)
         boxTrans = Vector3d(std::sqrt(0.5),230.0,540.0);
         planeQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
         planeTrans = boxTrans + globalQuat * Vector3d(-std::sqrt(0.5),0.0,0.0);
+        int expectedNumberOfContacts = 2;
+        int expectedBoxIndicesInContacts[] = {0, 1};
+        bool collisionNormalIsPlaneNormal = true;
+        doBoxDoubleSidedPlaneTest(box, boxQuat, boxTrans, plane, planeQuat, planeTrans, expectedNumberOfContacts,
+								  expectedBoxIndicesInContacts, collisionNormalIsPlaneNormal);
+    }
+
+	{
+        SCOPED_TRACE("Intersection inside of plane, two contacts, rotated plane");
+		globalQuat = SurgSim::Math::makeRotationQuaternion(0.8753, Vector3d(0.235345,0.6754,0.4567).normalized());
+        boxQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_4, Vector3d(0.0,0.0,1.0));
+        boxTrans = Vector3d(std::sqrt(0.5),230.0,540.0);
+        planeQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
+        planeTrans = boxTrans + globalQuat * Vector3d(-std::sqrt(0.45),0.0,0.0);
         int expectedNumberOfContacts = 2;
         int expectedBoxIndicesInContacts[] = {0, 1};
         bool collisionNormalIsPlaneNormal = true;
@@ -440,6 +467,22 @@ TEST(ContactCalculationTests, BoxPlaneCalculation)
         boxTrans = Vector3d(std::sqrt(0.75),0.0,0.0);
         planeQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
         planeTrans = boxTrans + globalQuat * Vector3d(-std::sqrt(0.75),0.0,0.0);
+        int expectedNumberOfContacts = 1;
+        int expectedBoxIndicesInContacts[] = {1};
+        bool collisionNormalIsPlaneNormal = true;
+        doBoxDoubleSidedPlaneTest(box, boxQuat, boxTrans, plane, planeQuat, planeTrans, expectedNumberOfContacts,
+								  expectedBoxIndicesInContacts, collisionNormalIsPlaneNormal);
+    }
+
+	{
+        SCOPED_TRACE("Intersection inside of plane, one contact, rotated plane");
+        globalQuat = SurgSim::Math::makeRotationQuaternion(-0.3257, Vector3d(-0.4575,-0.8563,0.63457).normalized());
+        double angle = -35.264389682754654315377000330019*(M_PI/180.0);
+        boxQuat = globalQuat * Quaterniond(SurgSim::Math::makeRotationMatrix(angle, Vector3d(0.0,1.0,0.0)) *
+										   SurgSim::Math::makeRotationMatrix(-M_PI_4, Vector3d(0.0,0.0,1.0)));
+        boxTrans = Vector3d(std::sqrt(0.75),0.0,0.0);
+        planeQuat = globalQuat * SurgSim::Math::makeRotationQuaternion(-M_PI_2, Vector3d(0.0,0.0,1.0));
+        planeTrans = boxTrans + globalQuat * Vector3d(-std::sqrt(0.74),0.0,0.0);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {1};
         bool collisionNormalIsPlaneNormal = true;

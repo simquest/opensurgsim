@@ -237,8 +237,8 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
             {
                 std::pair<Location,Location> penetrationPoints;
                 boxVertexGlobal = representationBox->getPose() * boxVertices[i];
-                penetrationPoints.first.globalPosition.setValue(boxVertexGlobal + (normal * std::abs(d[i])));
-                penetrationPoints.second.globalPosition.setValue(boxVertexGlobal);
+                penetrationPoints.first.globalPosition.setValue(boxVertexGlobal);
+                penetrationPoints.second.globalPosition.setValue(boxVertexGlobal + normal * std::abs(d[i]));
 
                 pair->addContact(std::abs(d[i]), normal, penetrationPoints);
 
