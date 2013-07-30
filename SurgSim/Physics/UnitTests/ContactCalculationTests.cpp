@@ -64,7 +64,7 @@ namespace Physics
 namespace
 {
 std::shared_ptr<RigidShape> sphereShape = std::make_shared<SphereShape>(1.0);
-std::shared_ptr<RigidShape> doubleSidedPlaneShape = std::make_shared<DoubleSidedPlaneShape>();
+std::shared_ptr<RigidShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
 std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<MockCollisionRepresentation>
 	("TestSphere 1", sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
@@ -178,7 +178,7 @@ void doSphereDoubleSidedPlaneTest(std::shared_ptr<SphereShape> sphere,
 	}
 }
 
-TEST(ContactCalculationTests, SphereDoubleSidedPlaneCalculation)
+TEST(ContactCalculationTests, SpherePlaneCalculation)
 {
 	std::shared_ptr<DoubleSidedPlaneShape> plane = std::make_shared<DoubleSidedPlaneShape>();
 	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
@@ -218,7 +218,7 @@ TEST(ContactCalculationTests, SphereDoubleSidedPlaneCalculation)
 	}
 }
 
-TEST(ContactCalculationTests, DoubleSidedPlaneSphereShouldFail)
+TEST(ContactCalculationTests, PlaneSphereShouldFail)
 {
 	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<MockCollisionRepresentation>(
 		"Collision Sphere 0",
@@ -228,7 +228,7 @@ TEST(ContactCalculationTests, DoubleSidedPlaneSphereShouldFail)
 
 	std::shared_ptr<CollisionRepresentation> repp0 = std::make_shared<MockCollisionRepresentation>(
 		"Collision Plane 0",
-		doubleSidedPlaneShape,
+		planeShape,
 		Quaterniond::Identity(),
 		Vector3d(0.5,0.0,0.0));
 
@@ -240,7 +240,7 @@ TEST(ContactCalculationTests, DoubleSidedPlaneSphereShouldFail)
 
 	std::shared_ptr<CollisionRepresentation> repp1 = std::make_shared<MockCollisionRepresentation>(
 		"Collision Plane 1",
-		doubleSidedPlaneShape,
+		planeShape,
 		Quaterniond::Identity(),
 		Vector3d(0.5,0.0,0.0));
 
