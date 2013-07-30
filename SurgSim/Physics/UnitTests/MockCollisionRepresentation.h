@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDSHAPECOLLISIONREPRESENTATION_H
-#define SURGSIM_PHYSICS_RIGIDSHAPECOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
+#define SURGSIM_PHYSICS_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShape.h>
@@ -30,24 +30,35 @@ namespace Physics
 
 class Representation;
 
-/// Use a RigidShape as a CollisionRepresentation, any SurgSim::Physics::Representation can
-/// be used as a backing representation
-class RigidShapeCollisionRepresentation : public CollisionRepresentation
+/// Class to wrap a plain RigidShape for use as a CollisionRepresentation, just delegate
+/// the access to the various RigidShape methods
+class MockCollisionRepresentation : public CollisionRepresentation
 {
 public:
-	RigidShapeCollisionRepresentation(
+	MockCollisionRepresentation(
 		const std::string& name,
-		std::shared_ptr<RigidShape> shape,
-		std::shared_ptr<SurgSim::Physics::Representation> representation);
+		const std::shared_ptr<RigidShape>& shape,
+		const SurgSim::Math::Quaterniond& quat,
+		const SurgSim::Math::Vector3d& translation,
+		std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr);
 
-	virtual ~RigidShapeCollisionRepresentation();
+	MockCollisionRepresentation(
+		const std::string& name,
+		const std::shared_ptr<RigidShape>& shape,
+		const SurgSim::Math::RigidTransform3d& pose,
+		std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr);
+
+	virtual ~MockCollisionRepresentation();
 
 	virtual int getShapeType() const override;
 
 	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const override;
 
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
+
 private:
 	std::shared_ptr<RigidShape> m_shape;
+	SurgSim::Math::RigidTransform3d m_transform;
 };
 
 

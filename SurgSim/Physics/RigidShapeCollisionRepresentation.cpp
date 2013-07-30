@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {
@@ -22,22 +23,13 @@ namespace Physics
 
 
 RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
-	const std::shared_ptr<RigidShape>& shape,
-	const SurgSim::Math::Quaterniond& quat,
-	const SurgSim::Math::Vector3d& translation) :
-	m_shape(shape), m_transform(SurgSim::Math::makeRigidTransform(quat, translation))
+		const std::string& name,
+		std::shared_ptr<RigidShape> shape,
+		std::shared_ptr<SurgSim::Physics::Representation> representation) :
+	CollisionRepresentation(name,representation),
+	m_shape(shape)
 {
-
 }
-
-RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
-	const std::shared_ptr<RigidShape>& shape,
-	const SurgSim::Math::RigidTransform3d& pose) :
-	m_shape(shape), m_transform(pose)
-{
-
-}
-
 
 RigidShapeCollisionRepresentation::~RigidShapeCollisionRepresentation()
 {
@@ -54,10 +46,7 @@ const std::shared_ptr<SurgSim::Physics::RigidShape> RigidShapeCollisionRepresent
 	return m_shape;
 }
 
-const SurgSim::Math::RigidTransform3d& RigidShapeCollisionRepresentation::getCurrentPose() const
-{
-	return m_transform;
-}
+
 
 }; // Physics
 }; // SurgSim

@@ -24,6 +24,7 @@
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/Constraint.h>
 #include <SurgSim/Physics/ContactConstraintData.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 
 namespace SurgSim
 {

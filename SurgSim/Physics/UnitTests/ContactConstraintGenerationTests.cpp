@@ -26,6 +26,8 @@
 #include <SurgSim/Physics/ContactCalculation.h>
 #include <SurgSim/Physics/Constraint.h>
 
+#include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
+
 namespace SurgSim
 {
 namespace Physics
@@ -35,13 +37,11 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 {
 	virtual void SetUp()
 	{
-		sphere = makeSphereRepresentation(2.0);
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation");
-		sphere->setPhysicsRepresentation(rigid0);
+		sphere = makeSphereRepresentation(rigid0,2.0);
 
-		plane = makeDoubleSidedPlaneRepresentation();
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation");
-		plane->setPhysicsRepresentation(rigid1);
+		plane = makeDoubleSidedPlaneRepresentation(rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
 	}
@@ -66,7 +66,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
 	// Test case setup, create a pair with a contact and set up the physics state with it
-	SphereDoubleSidedPlaneDcdContact contactCalculation(false);
+	SphereDoubleSidedPlaneDcdContact contactCalculation;
 
 	contactCalculation.calculateContact(pair);
 	ASSERT_TRUE(pair->hasContacts());
@@ -98,7 +98,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 TEST_F(ContactConstraintGenerationTests, CountTest)
 {
 	std::shared_ptr<CollisionPair> pair;
-	SphereDoubleSidedPlaneDcdContact contactCalculation(false);
+	SphereDoubleSidedPlaneDcdContact contactCalculation;
 
 	pair = std::make_shared<CollisionPair>(sphere, plane);
 	contactCalculation.calculateContact(pair);

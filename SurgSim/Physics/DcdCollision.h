@@ -22,7 +22,6 @@
 
 
 #include <SurgSim/Framework/ReuseFactory.h>
-
 #include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/Representation.h>
@@ -70,9 +69,12 @@ private:
 	/// Updates the collision pairs
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
+	/// Function to populate the m_contactCalculations table for each DcdContact class.
+	void setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact);
+
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
-	std::unique_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
+	std::shared_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
 
 };
 

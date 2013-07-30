@@ -20,10 +20,13 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidCollisionRepresentation::RigidCollisionRepresentation(std::shared_ptr<RigidRepresentation> representation) :
-	m_representation(representation)
+RigidCollisionRepresentation::RigidCollisionRepresentation(
+		const std::string& name,
+		std::shared_ptr<RigidRepresentation> representation) :
+	CollisionRepresentation(name, representation),
+	m_localRepresentation(representation)
 {
-
+	setPhysicsRepresentation(representation);
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()
@@ -33,17 +36,17 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 
 int RigidCollisionRepresentation::getShapeType() const
 {
-	return m_representation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
+	return m_localRepresentation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
 const std::shared_ptr<RigidShape> RigidCollisionRepresentation::getShape() const
 {
-	return m_representation->getCurrentParameters().getShapeUsedForMassInertia();
+	return m_localRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
-const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getCurrentPose() const
+const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() const
 {
-	return m_representation->getCurrentPose();
+	return m_localRepresentation->getCurrentPose();
 }
 
 }; // Physics

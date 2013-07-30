@@ -35,15 +35,16 @@ namespace Framework
 namespace Physics
 {
 
-class Representation;
-class PreUpdate;
+class BuildMlcp;
+class CollisionRepresentation;
+class ContactConstraintGeneration;
 class FreeMotion;
 class DcdCollision;
-class ContactConstraintGeneration;
-class BuildMlcp;
-class SolveMlcp;
-class PushResults;
 class PostUpdate;
+class PreUpdate;
+class PushResults;
+class Representation;
+class SolveMlcp;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -76,6 +77,8 @@ protected:
 private:
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
+
+	std::vector<std::shared_ptr<CollisionRepresentation>> m_collisionRepresentations;
 
 
 	///@{

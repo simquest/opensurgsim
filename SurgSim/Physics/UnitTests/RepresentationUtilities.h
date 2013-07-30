@@ -18,8 +18,6 @@
 
 #include <memory>
 
-#include<SurgSim/Physics/CollisionRepresentation.h>
-
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 
@@ -27,17 +25,22 @@ namespace SurgSim
 {
 namespace Physics
 {
+class CollisionRepresentation;
+class Representation;
 
 std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(
-	const double& radius,
+	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
+	const double& radius = 1.0,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
 std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
 std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 

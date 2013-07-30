@@ -26,18 +26,18 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Base class responsible for calculating contact data between to given shapes, calculateContact needs to
+/// Base class responsible for calculating contact data between two given shapes, calculateContact needs to
 /// determine whether the two shapes intersect, and if yes calculate the correct data for this contact, which
 /// consists of, the normal to displace the first shape so that the two shapes just barely touch. And the
-/// penetration point for each shape, the point the is furthest inside the other object.
-/// If a subclass is works on asymmetric pairs it should implement a flag that enables the calculation to
-/// switch the direction of the pair.
+/// penetration point (the point that is furthest inside the other object) for each shape.
+/// This base class also handles the swapping of the shapes if the pair is asymmetric. The sub classes
+/// assume that the pair is always in correct order.
 class ContactCalculation
 {
 public:
 
 	/// Constructor
-	explicit ContactCalculation(bool doSwapPairs = false) : m_doSwapPairs(doSwapPairs)
+	explicit ContactCalculation()
 	{
 	}
 
@@ -47,18 +47,31 @@ public:
 	{
 	}
 
-	/// Calculate the actual contact between two shapes of the give CollisionPair.
+	/// Function that handles asymmetric pair and calls the actual contact calculation routine of the sub class.
 	/// \param	pair	The pair that is under consideration.
-	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) = 0;
-
-	bool needsSwap()
+	void calculateContact(std::shared_ptr<CollisionPair> pair)
 	{
-		return m_doSwapPairs;
+		if (needsSwap(pair->getFirst()->getShapeType(), pair->getSecond()->getShapeType()))
+		{
+			pair->swapRepresentations();
+		}
+		doCalculateContact(pair);
 	}
+
+	virtual std::pair<int,int> getShapeTypes() = 0;
 
 private:
 
-	bool m_doSwapPairs;
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param	pair	The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) = 0;
+
+	bool needsSwap(int firstShapeType, int secondShapeType)
+	{
+		std::pair<int,int> shapeTypes = getShapeTypes();
+		return firstShapeType != secondShapeType && firstShapeType == shapeTypes.second &&
+			secondShapeType == shapeTypes.first;
+	}
 
 };
 
@@ -78,12 +91,17 @@ public:
 	/// Destructor
 	virtual ~DefaultContactCalculation() {}
 
-
-	/// \param	pair	The pair that is under consideration.
-	virtual void calculateContact(std::shared_ptr<CollisionPair> pair) override;
+	virtual std::pair<int,int> getShapeTypes() override
+	{
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_NONE, RIGID_SHAPE_TYPE_NONE);
+	}
 
 private:
 	bool m_doAssert;
+	
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param	pair	The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 };
 
 /// Class to calculate intersections between spheres
@@ -94,9 +112,15 @@ public:
 	{
 	}
 
-	/// Calculate the actual contact between two shapes of the give CollisionPair.
-	/// \param	pair	The pair that is under consideration.
-	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
+	virtual std::pair<int,int> getShapeTypes() override
+	{
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_SPHERE, RIGID_SHAPE_TYPE_SPHERE);
+	}
+
+private:
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param	pair	The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
 };
 
 
@@ -106,14 +130,19 @@ class SphereDoubleSidedPlaneDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	explicit SphereDoubleSidedPlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
+	explicit SphereDoubleSidedPlaneDcdContact()
 	{
-
 	}
 
-	/// Calculate the actual contact between two shapes of the give CollisionPair.
-	/// \param	pair	The pair that is under consideration.
-	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
+	virtual std::pair<int,int> getShapeTypes() override
+	{
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_SPHERE, RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE);
+	}
+
+private:
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param	pair	The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
 
 };
 
@@ -123,14 +152,19 @@ class SpherePlaneDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	explicit SpherePlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
+	explicit SpherePlaneDcdContact()
 	{
-
 	}
 
-	/// Calculate the actual contact between two shapes of the give CollisionPair.
-	/// \param	pair	The pair that is under consideration.
-	virtual void calculateContact(std::shared_ptr<CollisionPair> pair);
+	virtual std::pair<int,int> getShapeTypes() override
+	{
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_SPHERE, RIGID_SHAPE_TYPE_PLANE);
+	}
+
+private:
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param	pair	The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
 
 };
 
