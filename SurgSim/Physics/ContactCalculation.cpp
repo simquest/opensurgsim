@@ -128,10 +128,12 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
 
 	Vector3d sphereCenter(representationSphere->getPose().translation());
+	Vector3d globalTop(representationCapsule->getPose() * capsule->topCentre());
+	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCentre());
 	Vector3d result;
 
 	double dist = 
-		SurgSim::Math::distancePointSegment(sphereCenter, capsule->topCentre(), capsule->bottomCentre(), &result);
+		SurgSim::Math::distancePointSegment(sphereCenter, globalTop, globalBottom, &result);
 	double distThreshold = capsule->getRadius() + sphere->getRadius();
 
 	if (dist < distThreshold)

@@ -85,7 +85,7 @@ std::shared_ptr<CollisionRepresentation> makeCapsuleRepresentation(
 	const Vector3d& position)
 {
 
-	std::shared_ptr<RigidShape> capsule= std::make_shared<CapsuleShape>(radius, length);
+	std::shared_ptr<RigidShape> capsule = std::make_shared<CapsuleShape>(radius, length);
 	return 	std::make_shared<MockCollisionRepresentation>(
 		"TestCapsuleShapeCollisionRep",
 		capsule,
