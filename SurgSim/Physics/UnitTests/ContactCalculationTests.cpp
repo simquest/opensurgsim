@@ -218,7 +218,7 @@ TEST(ContactCalculationTests, SpherePlaneCalculation)
 	}
 }
 
-TEST(ContactCalculationTests, DoubleSidedPlaneSphereShouldFail)
+TEST(ContactCalculationTests, PlaneSphereShouldFail)
 {
 	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<MockCollisionRepresentation>(
 		"Collision Sphere 0",
