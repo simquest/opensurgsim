@@ -154,7 +154,6 @@ class CapsuleSphereDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	/// \param	swapPairs	Set to true if the calculation needs to switch the members of the pair.
 	explicit CapsuleSphereDcdContact()
 	{
 	}
@@ -167,7 +166,7 @@ public:
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 };
 

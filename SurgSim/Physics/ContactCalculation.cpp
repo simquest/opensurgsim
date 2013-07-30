@@ -138,7 +138,7 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 	{
 		double depth = distThreshold - dist;
 
-		// Calculate the normal going from the capsule to the sphere
+		// Calculate the normal going from the sphere to the capsule
 		Vector3d normal = (sphereCenter - result).normalized();
 		
 		std::pair<Location,Location> penetrationPoints;
