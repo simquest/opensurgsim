@@ -38,7 +38,7 @@ add_executable(RawMultiAxisVisualTest
 
 set(LIBS MultiAxisDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
-	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})	
+	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 if(WINDDK_FOUND)
 	list(APPEND LIBS ${WINDDK_LIBRARIES})
 endif()

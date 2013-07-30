@@ -32,6 +32,8 @@ extern "C" {  // sigh...
 }
 #endif /* HID_WINDDK_XXX */
 
+#include <stdint.h>
+
 #include <vector>
 #include <list>
 #include <array>
@@ -110,9 +112,10 @@ static std::string getSystemErrorText(DWORD error)
 	if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, error, 0,
 					   errorBuf, BUFFER_SIZE-1, nullptr) <= 0)
 	{
-		sprintf(errorBuf, "<error code %d>", error);
+		_snprintf(errorBuf, BUFFER_SIZE, "<error code %d>", error);
 	}
-	
+	errorBuf[BUFFER_SIZE-1] = '\0';
+
 	// strip terminal whitespace, if any
 	const int end = strnlen(errorBuf, BUFFER_SIZE-1);
 	if ((end > 0) && isspace(errorBuf[end-1]))
@@ -447,9 +450,9 @@ static int findDominantAxis(const std::array<int, 6>& axes)
 }
 
 #ifdef HID_WINDDK_XXX
-static inline short signedShortData(unsigned char byte0, unsigned char byte1)
+static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
 {
-	return static_cast<short>(static_cast<unsigned short>(byte0) | (static_cast<unsigned short>(byte1) << 8));
+	return static_cast<int16_t>(static_cast<uint16_t>(byte0) | (static_cast<uint16_t>(byte1) << 8));
 }
 #endif /* HID_WINDDK_XXX */
 
@@ -863,13 +866,13 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 			deviceInterfaceDetailSize = 2*neededSize;
 			if (deviceInterfaceDetail)
 				free(deviceInterfaceDetail);
-			deviceInterfaceDetail = reinterpret_cast<SP_DEVICE_INTERFACE_DETAIL_DATA*>( malloc(deviceInterfaceDetailSize) );
+			deviceInterfaceDetail = static_cast<SP_DEVICE_INTERFACE_DETAIL_DATA*>( malloc(deviceInterfaceDetailSize) );
 		}
 
 		// Get the device detail (which actually just means the path).
 		deviceInterfaceDetail->cbSize = sizeof(*deviceInterfaceDetail);
-		if (! SetupDiGetDeviceInterfaceDetail(hidDeviceInfo, &deviceInterfaceData, deviceInterfaceDetail, deviceInterfaceDetailSize,
-			NULL, NULL))
+		if (! SetupDiGetDeviceInterfaceDetail(hidDeviceInfo, &deviceInterfaceData,
+			deviceInterfaceDetail, deviceInterfaceDetailSize, NULL, NULL))
 		{
 			DWORD error = GetLastError();
 			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Failed to get the HID device detail," <<
