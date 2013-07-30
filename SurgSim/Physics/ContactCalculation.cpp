@@ -113,7 +113,139 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 }
 
 
+// Collision calculation between a box and a plane
+void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+{
+    using SurgSim::Math::Geometry::ScalarEpsilon;
 
+    std::shared_ptr<CollisionRepresentation> representationPlane;
+    std::shared_ptr<CollisionRepresentation> representationBox;
+
+    representationBox = pair->getFirst();
+    representationPlane = pair->getSecond();
+
+    SURGSIM_ASSERT(representationBox->getShapeType() == RIGID_SHAPE_TYPE_BOX) <<
+            "First Object, wrong type of object" << pair->getFirst()->getShapeType();
+    SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE) <<
+            "Second Object, wrong type of object" << pair->getSecond()->getShapeType();
+
+    std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
+    std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+
+    // Transform the plane normal to box co-ordinate system.
+    SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
+                                                           representationPlane->getPose();
+    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.rotation() * plane->getNormal();
+    SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+    SurgSim::Math::Vector4d planePoint = planeLocalToBoxLocal * SurgSim::Math::Vector4d(planeNormalScaled.x(),
+                                         planeNormalScaled.y(), planeNormalScaled.z(), 1.0);
+    double planeD = -planeNormal.dot(SurgSim::Math::Vector3d(planePoint.x(), planePoint.y(), planePoint.z()));
+
+    // Loop through the box vertices (boxVertex) and calculate "d = (planeNormal.dot(boxVertex) + planeD)".
+    // Keep track of max and min of 'd'.
+    // Collision check overview:
+    // - If 'd' values contain both positive and negative values, there is an intersection.
+    // ---- Lower of the abs(maxD) and abs(minD) is the deepest penetration point.
+    // ---- collisionNormal is sign(d) * planeNormal.
+    // - If not, at least one of the 'd' values is zero.
+    // ---- collisionNormal is sign(max(abs(maxD), abs(minD))) * planeNormal.
+    double d[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double maxD = -DBL_MAX, minD = DBL_MAX;
+    SurgSim::Math::Vector3d boxVertices[8];
+    int iVertex = 0;
+    for (int i = -1; i <= 1; i += 2)
+    {
+        for (int j = -1; j <= 1; j += 2)
+        {
+            for (int k = -1; k <= 1; k += 2)
+            {
+                boxVertices[iVertex].x() = box->getSizeX() * double(i) * 0.5;
+                boxVertices[iVertex].y() = box->getSizeY() * double(j) * 0.5;
+                boxVertices[iVertex].z() = box->getSizeZ() * double(k) * 0.5;
+                d[iVertex] = planeNormal.dot(boxVertices[iVertex]) + planeD;
+                maxD = std::max(d[iVertex], maxD);
+                minD = std::min(d[iVertex], minD);
+                ++iVertex;
+            }
+        }
+    }
+
+    if (!(maxD > ScalarEpsilon && minD > ScalarEpsilon) && !(maxD < -ScalarEpsilon && minD < -ScalarEpsilon))
+    {
+        // There is an intersection.
+        // Two cases:
+        // - Vertex touching plane.
+        // - Vertex through plane.
+
+        SurgSim::Math::Vector3d normal;
+        SurgSim::Math::Vector3d boxVertexGlobal;
+
+        enum BoxPlaneIntersectionType
+        {
+            BoxPlaneIntersectionTypeEqualsZero,
+            BoxPlaneIntersectionTypeLessThanZero,
+            BoxPlaneIntersectionTypeGreaterThanZero
+        } boxPlaneIntersectionType;
+
+        if (std::abs(maxD) < ScalarEpsilon)
+        {
+            // Box is touching the "back side" of plane.
+            normal = -(representationPlane->getPose().rotation() * plane->getNormal());
+            boxPlaneIntersectionType = BoxPlaneIntersectionTypeEqualsZero;
+        }
+        else if (std::abs(minD) < ScalarEpsilon)
+        {
+            // Box is touching the "front side" of plane.
+            normal = representationPlane->getPose().rotation() * plane->getNormal();
+            boxPlaneIntersectionType = BoxPlaneIntersectionTypeEqualsZero;
+        }
+        else
+        {
+            if (std::abs(maxD) >= std::abs(minD))
+            {
+                // Box is penetrating through the "front side" of plane.
+                normal = representationPlane->getPose().rotation() * plane->getNormal();
+                boxPlaneIntersectionType = BoxPlaneIntersectionTypeLessThanZero;
+            }
+            else
+            {
+                // Box is penetrating through the "back side" of plane.
+                normal = -(representationPlane->getPose().rotation() * plane->getNormal());
+                boxPlaneIntersectionType = BoxPlaneIntersectionTypeGreaterThanZero;
+            }
+        }
+
+        // Loop through vertices and check if a contact point needs to be generated.
+        bool generateContact = false;
+        for (int i = 0; i < 8; ++i)
+        {
+            switch (boxPlaneIntersectionType)
+            {
+            case BoxPlaneIntersectionTypeEqualsZero:
+                generateContact = std::abs(d[i]) < ScalarEpsilon;
+                break;
+            case BoxPlaneIntersectionTypeLessThanZero:
+                generateContact = d[i] < -ScalarEpsilon;
+                break;
+            case BoxPlaneIntersectionTypeGreaterThanZero:
+                generateContact = d[i] > ScalarEpsilon;
+                break;
+            }
+
+            if (generateContact)
+            {
+                std::pair<Location,Location> penetrationPoints;
+                boxVertexGlobal = representationBox->getPose() * boxVertices[i];
+                penetrationPoints.first.globalPosition.setValue(boxVertexGlobal + (normal * std::abs(d[i])));
+                penetrationPoints.second.globalPosition.setValue(boxVertexGlobal);
+
+                pair->addContact(std::abs(d[i]), normal, penetrationPoints);
+
+                generateContact = false;
+            }
+        }
+    }
+}
 
 }; // Physics
 }; // SurgSim
