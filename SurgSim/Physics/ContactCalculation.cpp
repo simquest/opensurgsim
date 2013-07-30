@@ -130,7 +130,8 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
             "Second Object, wrong type of object" << pair->getSecond()->getShapeType();
 
     std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
-    std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+    std::shared_ptr<DoubleSidedPlaneShape> plane =
+		std::static_pointer_cast<DoubleSidedPlaneShape>(representationPlane->getShape());
 
     // Transform the plane normal to box co-ordinate system.
     SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
