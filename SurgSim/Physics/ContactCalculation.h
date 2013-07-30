@@ -106,7 +106,6 @@ class SphereDoubleSidedPlaneDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	/// \param	swapPairs	Set to true if the calculation needs to switch the members of the pair.
 	explicit SphereDoubleSidedPlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
 	{
 
@@ -124,7 +123,6 @@ class SpherePlaneDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	/// \param	swapPairs	Set to true if the calculation needs to switch the members of the pair.
 	explicit SpherePlaneDcdContact(bool swapPairs) : ContactCalculation(swapPairs)
 	{
 

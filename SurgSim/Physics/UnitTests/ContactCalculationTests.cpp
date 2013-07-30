@@ -62,7 +62,7 @@ namespace Physics
 namespace
 {
 std::shared_ptr<RigidShape> sphereShape = std::make_shared<SphereShape>(1.0);
-std::shared_ptr<RigidShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+std::shared_ptr<RigidShape> doubleSidedPlaneShape = std::make_shared<DoubleSidedPlaneShape>();
 
 std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<RigidShapeCollisionRepresentation>
 												(sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
@@ -215,11 +215,13 @@ TEST(ContactCalculationTests, DoubleSidedPlaneSphereShouldFail)
 	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<RigidShapeCollisionRepresentation>
 													 (sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
 	std::shared_ptr<CollisionRepresentation> repp0 = std::make_shared<RigidShapeCollisionRepresentation>
-													 (planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
+													 (doubleSidedPlaneShape,
+													 Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
 	std::shared_ptr<CollisionRepresentation> reps1 = std::make_shared<RigidShapeCollisionRepresentation>
 													 (sphereShape, Quaterniond::Identity(), Vector3d(1.0,0.0,0.0));
 	std::shared_ptr<CollisionRepresentation> repp1 = std::make_shared<RigidShapeCollisionRepresentation>
-													 (planeShape, Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
+													 (doubleSidedPlaneShape,
+													 Quaterniond::Identity(), Vector3d(0.5,0.0,0.0));
 
 	std::shared_ptr<CollisionPair> pairps = std::make_shared<CollisionPair>(repp0, reps0);
 	std::shared_ptr<CollisionPair> pairpp = std::make_shared<CollisionPair>(repp0, repp1);
