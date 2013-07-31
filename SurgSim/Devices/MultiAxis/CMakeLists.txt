@@ -39,19 +39,23 @@ set(MULTIAXIS_DEVICE_HEADERS
 
 set(MULTIAXIS_DEVICE_LINUX_SOURCES
 	FileDescriptor.cpp
+	GetSystemErrorLinux.cpp
 )
 
 set(MULTIAXIS_DEVICE_LINUX_HEADERS
 	BitSetBuffer.h
 	FileDescriptor.h
+	GetSystemError.h
 )
 
 set(MULTIAXIS_DEVICE_WINHID_SOURCES
 	FileHandle.cpp
+	GetSystemErrorWin32.cpp
 )
 
 set(MULTIAXIS_DEVICE_WINHID_HEADERS
 	FileHandle.h
+	GetSystemError.h
 )
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

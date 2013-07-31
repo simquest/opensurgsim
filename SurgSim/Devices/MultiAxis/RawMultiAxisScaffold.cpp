@@ -45,6 +45,7 @@ extern "C" {  // sigh...
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
+#include "SurgSim/Devices/MultiAxis/GetSystemError.h"
 #ifndef HID_WINDDK_XXX
 #include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
 #else /* HID_WINDDK_XXX */
@@ -60,77 +61,21 @@ extern "C" {  // sigh...
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector3f;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
+using SurgSim::Device::Internal::getSystemErrorCode;
+using SurgSim::Device::Internal::getSystemErrorText;
+
 
 namespace SurgSim
 {
 namespace Device
 {
-
-
-#ifndef HID_WINDDK_XXX
-// Get the output location for the XSI version of strerror_r.
-static inline const char* systemErrorTextHelper(const char* buffer, int returnValue)
-{
-	if (returnValue != 0)
-	{
-		return nullptr;
-	}
-	return buffer;
-}
-
-// Get the output location for the GNU version of strerror_r.
-static inline const char* systemErrorTextHelper(const char* buffer, const char* returnValue)
-{
-	return returnValue;
-}
-
-static std::string getSystemErrorText(int error)
-{
-	char buffer[1024];
-	buffer[0] = '\0';
-	// Unfortunately, on Linux you can't really know if you will get the XSI version or the GNU version of
-	// strerror_r.  Fortunately, the arguments are the same (only return type differs), so we can cheat.
-	const char* message = systemErrorTextHelper(buffer, strerror_r(error, buffer, sizeof(buffer)));
-	if (message == nullptr || message[0] == '\0')
-	{
-		snprintf(buffer, sizeof(buffer), "<system error %d>", error);
-		message = buffer;
-	}
-	return std::string(message);
-}
-#else /* HID_WINDDK_XXX */
-static std::string getSystemErrorText(DWORD error)
-{
-	const size_t BUFFER_SIZE = 1024;
-	char errorBuf[BUFFER_SIZE];
-	if (FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, 0, error, 0,
-					   errorBuf, BUFFER_SIZE-1, nullptr) <= 0)
-	{
-		_snprintf(errorBuf, BUFFER_SIZE, "<error code %d>", error);
-	}
-	errorBuf[BUFFER_SIZE-1] = '\0';
-
-	// strip terminal whitespace, if any
-	const int end = strnlen(errorBuf, BUFFER_SIZE-1);
-	if ((end > 0) && isspace(errorBuf[end-1]))
-	{
-		int lastWhitespace = end - 1;
-		while ((lastWhitespace > 0) && isspace(errorBuf[lastWhitespace-1]))
-		{
-			--lastWhitespace;
-		}
-		errorBuf[lastWhitespace] = '\0';
-	}
-
-	return std::string(errorBuf);
-}
-#endif /* HID_WINDDK_XXX */
 
 
 struct RawMultiAxisScaffold::DeviceData
@@ -484,15 +429,16 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 		size_t numRead;
 		if (! info->fileDescriptor.readBytes(&event, sizeof(event), &numRead))
 		{
-			if (errno == ENODEV)
+			int64_t error = getSystemErrorCode();
+			if (error == ENODEV)
 			{
 				SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: read failed; device has been disconnected!  (ignoring)";
 				return false;  // stop updating this device!
 			}
-			else if (errno != EAGAIN)
+			else if (error != EAGAIN)
 			{
-				SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << errno << ", " <<
-					getSystemErrorText(errno);
+				SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << error << ", " <<
+					getSystemErrorText(error);
 			}
 		}
 		else if (numRead != sizeof(event))
@@ -556,7 +502,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 		size_t numRead;
 		if (! info->fileHandle.readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
 		{
-			DWORD error = GetLastError();
+			int64_t error = getSystemErrorCode();
 			SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << error << ", " <<
 				getSystemErrorText(error);
 		}
@@ -707,11 +653,11 @@ FileDescriptor RawMultiAxisScaffold::openDevice(const std::string& path)
 	fd.openForReadingAndMaybeWriting(path);
 	if (! fd.isValid())
 	{
-		int error = errno;
+		int64_t error = getSystemErrorCode();
 		if (error != ENOENT)
 		{
-			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": " <<
-				getSystemErrorText(error);
+			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
+				", " << getSystemErrorText(error);
 		}
 	}
 	return std::move(fd);
@@ -723,9 +669,9 @@ FileHandle RawMultiAxisScaffold::openDevice(const std::string& path)
 	fh.openForReadingAndMaybeWriting(path);
 	if (! fh.isValid())
 	{
-		int error = GetLastError();
-		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": " <<
-			getSystemErrorText(error);
+		int64_t error = getSystemErrorCode();
+		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
+			", " << getSystemErrorText(error);
 	}
 	return std::move(fh);
 }
@@ -784,8 +730,9 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		char reportedName[1024];
 		if (ioctl(fd.get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): " << errno << ", " <<
-				getSystemErrorText(errno);
+			int error = errno;
+			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): error " << error << ", " <<
+				getSystemErrorText(error);
 			snprintf(reportedName, sizeof(reportedName), "???");
 		}
 		else
@@ -797,8 +744,9 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		struct input_id reportedId;
 		if (ioctl(fd.get(), EVIOCGID, &reportedId) < 0)
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGID): " << errno << ", " <<
-				getSystemErrorText(errno);
+			int error = errno;
+			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGID): error " << error << ", " <<
+				getSystemErrorText(error);
 			continue;
 		}
 
@@ -994,8 +942,9 @@ bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDe
 	BitSetBuffer<ABS_CNT> buffer;
 	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_ABS)): " << errno << ", " <<
-			getSystemErrorText(errno);
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_ABS)): error " << error << ", " <<
+			getSystemErrorText(error);
 		return false;
 	}
 
@@ -1032,8 +981,9 @@ bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDe
 	BitSetBuffer<REL_CNT> buffer;
 	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_REL)): " << errno << ", " <<
-			getSystemErrorText(errno);
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_REL)): error " << error << ", " <<
+			getSystemErrorText(error);
 		return false;
 	}
 
@@ -1084,8 +1034,9 @@ std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(const FileDescrip
 	BitSetBuffer<KEY_CNT> buffer;
 	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): " << errno << ", " <<
-			getSystemErrorText(errno);
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): error " << error << ", " <<
+			getSystemErrorText(error);
 		return result;
 	}
 
