@@ -52,22 +52,22 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 
 	// Make the quad
 	float depth = 0.0;
-	osg::Geometry* geom = osg::createTexturedQuadGeometry(
+	m_geometry = osg::createTexturedQuadGeometry(
 		osg::Vec3(0,0,depth),
 		osg::Vec3(1.0,0.0,depth),
 		osg::Vec3(0.0,1.0,depth));
 
 	osg::Vec4Array* colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(0.8f,0.0f,0.8f,0.2f));
-	geom->setColorArray(colors);
-	geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+	colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+	m_geometry->setColorArray(colors);
+	m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
-	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
+	m_geometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
 
 	//osg::StateSet* stateset = geom->getOrCreateStateSet();
 	//stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
 
-	m_geode->addDrawable(geom);
+	m_geode->addDrawable(m_geometry);
 
 	m_transform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	m_transform->setCullingActive(false);
@@ -119,6 +119,17 @@ void OsgScreenSpaceQuadRepresentation::setPose(const SurgSim::Math::RigidTransfo
 	m_pose = transform;
 	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
 	m_transform->setPosition(pose.second);
+}
+
+
+void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float bottom, float right, float top)
+{
+	osg::Vec2Array* tcoords = new osg::Vec2Array(4);
+	(*tcoords)[0].set(left,top);
+	(*tcoords)[1].set(left,bottom);
+	(*tcoords)[2].set(right,bottom);
+	(*tcoords)[3].set(right,top);
+	m_geometry->setTexCoordArray(0,tcoords);
 }
 
 }; // Graphics

@@ -70,6 +70,9 @@ private:
 	/// Local geode for geometry
 	osg::ref_ptr<osg::Geode> m_geode;
 
+	/// Local geometry 
+	osg::ref_ptr<osg::Geometry> m_geomtry;
+
 	/// Projection matrix, needs to be updated when the view is changed
 	osg::ref_ptr<osg::Projection> m_projection;
 
@@ -84,6 +87,14 @@ private:
 
 	/// Overridden from Representation, execute local updates
 	virtual void doUpdate(double dt) override;
+
+	virtual void setTexture(std::shared_ptr<SurgSim::Graphics::Texture2D> texture);
+
+	virtual void setTexture(std::shared_ptr<SurgSim::Graphics::TextureRectangle> texture);
+
+	/// Sets texture coordinates.
+	/// \param	left,bottom,right,top	The boundaries for the texture coordinates.
+	void setTextureCoordinates(float left, float bottom, float right, float top);
 };
 
 }; // Graphics

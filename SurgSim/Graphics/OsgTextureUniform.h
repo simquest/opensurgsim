@@ -120,6 +120,4 @@ public:
 
 };  // namespace SurgSim
 
-#include <SurgSim/Graphics/OsgTextureUniform-inl.h>
-
 #endif  // SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_H

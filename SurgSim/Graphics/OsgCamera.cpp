@@ -156,9 +156,10 @@ bool OsgCamera::setColorRenderTexture(std::shared_ptr<Texture> texture)
 		m_camera->attach(osg::Camera::COLOR_BUFFER, osgTexture->getOsgTexture2d(),0,0);
 		m_camera->setRenderOrder(osg::Camera::PRE_RENDER);
 		m_textureMap[osg::Camera::COLOR_BUFFER] = osgTexture;
-		m_camera->setClearColor(osg::Vec4f(0.0,0.8,0.0,1.0));
-		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT);
-		
+		m_camera->setClearColor(osg::Vec4f(0.0,0.0,0.0,1.0));
+		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::PIXEL_BUFFER);
+		m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+
 		int width,height;
 		osgTexture->getSize(&width, &height);
 		m_camera->setViewport(0,0,width,height);

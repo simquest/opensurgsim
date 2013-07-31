@@ -88,6 +88,12 @@ private:
 };  // namespace SurgSim
 
 #include <SurgSim/Graphics/OsgUniform-inl.h>
+
+/// \note HS-2013-jul-30 If OsgUniform.h is included by itself without OsgTextureUniform.h we have a
+/// 	  state where the specializations that are implemented in OsgTextureUniform.h will not be found
+/// 	  by the compiler, the code will compile but not work correctly, if you remove this include
+/// 	  make sure that OsgUniform.h AND OsgTextureUniform.h are included at the same time.
 #include <SurgSim/Graphics/OsgTextureUniform.h>
+#include <SurgSim/Graphics/OsgTextureUniform-inl.h>
 
 #endif  // SURGSIM_GRAPHICS_OSGUNIFORM_H
