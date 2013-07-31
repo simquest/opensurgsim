@@ -60,6 +60,8 @@ public:
 	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
 	virtual bool removeUniform(std::shared_ptr<UniformBase> uniform);
 
+	virtual bool removeUniform(const std::string& name);
+
 	/// Returns the number of uniforms in this material
 	virtual unsigned int getNumUniforms() const;
 
@@ -67,6 +69,10 @@ public:
 	/// \param	index	Index of the uniform in the material's list of uniforms
 	/// \return	Uniform at the index
 	virtual std::shared_ptr<UniformBase> getUniform(unsigned int index) const;
+
+	virtual std::shared_ptr<UniformBase> getUniform(const std::string& name) const;
+
+	virtual bool hasUniform(const std::string& name) const;
 
 	/// Sets the shader used by this material
 	/// \param	shader	Shader program
@@ -86,6 +92,8 @@ public:
 	{
 		return m_stateSet;
 	}
+
+
 
 private:
 	/// OSG state set which provides material properties in the scenegraph

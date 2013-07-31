@@ -73,6 +73,39 @@ std::shared_ptr<SurgSim::Graphics::UniformBase> OsgMaterial::getUniform(unsigned
 	return m_uniforms[index];
 }
 
+std::shared_ptr<SurgSim::Graphics::UniformBase> SurgSim::Graphics::OsgMaterial::getUniform(const std::string& name) const
+{
+	std::shared_ptr<UniformBase> result;
+	auto it = std::find_if(
+		std::begin(m_uniforms),
+		std::end(m_uniforms),
+		[&name] (const std::shared_ptr<OsgUniformBase>& uniform) {return uniform->getName() == name;});
+	if (it != std::end(m_uniforms))
+	{
+		result = *it;
+	}
+	return result;
+}
+
+bool SurgSim::Graphics::OsgMaterial::removeUniform(const std::string& name)
+{
+	bool result = false;
+	auto it = std::find_if(
+		std::begin(m_uniforms),
+		std::end(m_uniforms),
+		[&name] (const std::shared_ptr<OsgUniformBase>& uniform) {return uniform->getName() == name;});
+	if (it != std::end(m_uniforms))
+	{
+		result = removeUniform(*it);
+	}
+	return result;
+}
+
+bool SurgSim::Graphics::OsgMaterial::hasUniform(const std::string& name) const
+{
+	return (getUniform(name) != nullptr);
+}
+
 bool OsgMaterial::setShader(std::shared_ptr<SurgSim::Graphics::Shader> shader)
 {
 	bool didSucceed = false;
