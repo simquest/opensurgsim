@@ -27,10 +27,22 @@
 
 #include <osg/StateSet>
 
-namespace SurgSim 
+namespace SurgSim
 {
 namespace Graphics
 {
+
+TEST(OsgTextureUniformTest, AddUniformTest)
+{
+	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform");
+
+	EXPECT_ANY_THROW( { OsgMaterial material; material.addUniform(uniform2d);} );
+
+	auto texture2d = std::make_shared<OsgTexture2d>();
+	texture2d->setSize(256,256);
+	uniform2d->set(texture2d);
+	EXPECT_NO_THROW( { OsgMaterial material; material.addUniform(uniform2d);} );
+}
 
 
 /// Expose a bug where a texture uniform could be created that is not really a correctly specialized
@@ -38,7 +50,10 @@ namespace Graphics
 TEST(OsgTextureUniformTests, TextureUniformTemplateProblem)
 {
 	auto material = std::make_shared<OsgMaterial>();
-	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture1d>>>("Texture2d");
+	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("TextureUniform");
+	auto texture2d = std::make_shared<OsgTexture2d>();
+	texture2d->setSize(256,256);
+	uniform2d->set(texture2d);
 
 	material->addUniform(uniform2d);
 
@@ -46,6 +61,7 @@ TEST(OsgTextureUniformTests, TextureUniformTemplateProblem)
 
 	EXPECT_EQ(1u, stateSet->getTextureAttributeList().size());
 }
+
 
 }; // namespace Graphics
 }; // namespace SurgSim
