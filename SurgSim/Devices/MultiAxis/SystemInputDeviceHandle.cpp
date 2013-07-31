@@ -35,12 +35,13 @@ SystemInputDeviceHandle::~SystemInputDeviceHandle()
 {
 }
 
-std::unique_ptr<SystemInputDeviceHandle> SystemInputDeviceHandle::open(const std::string& path)
+std::unique_ptr<SystemInputDeviceHandle> SystemInputDeviceHandle::open(
+	const std::string& path, std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
 #if defined(SURGSIM_MULTIAXIS_USING_LINUX_INPUT)
-	return LinuxInputDeviceHandle::open(path);
+	return LinuxInputDeviceHandle::open(path, logger);
 #elif defined(SURGSIM_MULTIAXIS_USING_WINDOWS_HID)
-	return Win32HidDeviceHandle::open(path);
+	return Win32HidDeviceHandle::open(path, logger);
 #else
 #error No known derived SystemInputDeviceHandle device class is applicable!
 error: No known derived SystemInputDeviceHandle device class is applicable!

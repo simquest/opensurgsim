@@ -16,8 +16,7 @@
 #ifndef SURGSIM_DEVICES_MULTIAXIS_LINUXINPUTDEVICEHANDLE_H
 #define SURGSIM_DEVICES_MULTIAXIS_LINUXINPUTDEVICEHANDLE_H
 
-#include <string>
-#include <memory>
+#include <vector>
 
 #include <SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h>
 
@@ -36,8 +35,12 @@ public:
 
 	/// Opens the given path and creates an access wrapper for the device.
 	/// \param	path	Full pathname for the device.
+	/// \param logger	The logger to be used by the device.
 	/// \return	The created device object, or an empty unique_ptr on failure.
-	static std::unique_ptr<LinuxInputDeviceHandle> open(const std::string& path);
+	static std::unique_ptr<LinuxInputDeviceHandle> open(const std::string& path,
+		std::shared_ptr<SurgSim::Framework::Logger> logger);
+
+	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) override;
 
 	/// Determines if the file handle can be read from.
 	/// \return	true if the handle has been open for reading.
@@ -65,12 +68,15 @@ public:
 	virtual void* get() const override;
 #endif /* HID_WINDDK_XXX */
 
-protected:
-	/// Default constructor.
-	/// Cannot be called directly; see open and enumerate.
-	LinuxInputDeviceHandle();
-
 private:
+	/// Constructor.
+	/// Cannot be called directly; see open and enumerate.
+	explicit LinuxInputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger);
+
+	/// Gets the indices of the available device buttons.
+	/// \return a vector of indices.
+	std::vector<int> getDeviceButtonsAndKeys();
+
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	LinuxInputDeviceHandle(const LinuxInputDeviceHandle& other) /*= delete*/;
 	LinuxInputDeviceHandle& operator=(const LinuxInputDeviceHandle& other) /*= delete*/;

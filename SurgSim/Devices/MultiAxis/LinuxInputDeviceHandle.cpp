@@ -15,7 +15,16 @@
 
 #include "SurgSim/Devices/MultiAxis/LinuxInputDeviceHandle.h"
 
-#include <SurgSim/Devices/MultiAxis/FileDescriptor.h>
+#include <linux/input.h>
+#include <sys/ioctl.h>
+
+#include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
+#include "SurgSim/Devices/MultiAxis/GetSystemError.h"
+#include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
+#include <SurgSim/Framework/Log.h>
+
+using SurgSim::Device::Internal::getSystemErrorCode;
+using SurgSim::Device::Internal::getSystemErrorText;
 
 
 namespace SurgSim
@@ -26,16 +35,23 @@ namespace Device
 struct LinuxInputDeviceHandle::State
 {
 public:
-	State() :
+	explicit State(std::shared_ptr<SurgSim::Framework::Logger>&& logger_) :
+		logger(std::move(logger_)),
 		handle()
 	{
+		buttonCodes.fill(-1);
 	}
 
+	/// The logger to use.
+	std::shared_ptr<SurgSim::Framework::Logger> logger;
+	/// The underlying device file descriptor.
 	FileDescriptor handle;
+	/// Event library button code corresponding to each index.
+	std::array<int, SystemInputDeviceHandle::MAX_NUM_BUTTONS> buttonCodes;
 };
 
-LinuxInputDeviceHandle::LinuxInputDeviceHandle() :
-	m_state(new LinuxInputDeviceHandle::State)
+LinuxInputDeviceHandle::LinuxInputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
+	m_state(new LinuxInputDeviceHandle::State(std::move(logger)))
 {
 }
 
@@ -43,12 +59,26 @@ LinuxInputDeviceHandle::~LinuxInputDeviceHandle()
 {
 }
 
-std::unique_ptr<LinuxInputDeviceHandle> LinuxInputDeviceHandle::open(const std::string& path)
+std::unique_ptr<LinuxInputDeviceHandle> LinuxInputDeviceHandle::open(
+	const std::string& path, std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
-	std::unique_ptr<LinuxInputDeviceHandle> object(new LinuxInputDeviceHandle);
+	std::unique_ptr<LinuxInputDeviceHandle> object(new LinuxInputDeviceHandle(std::move(logger)));
 	if (! object->m_state->handle.openForReadingAndMaybeWriting(path))
 	{
 		object.reset();  // could not open the device handle; destroy the object again
+	}
+	else
+	{
+		const std::vector<int> buttonCodeList = object->getDeviceButtonsAndKeys();
+
+		for (size_t i = 0;  (i < object->m_state->buttonCodes.size()) && (i < buttonCodeList.size());  ++i)
+		{
+			object->m_state->buttonCodes[i] = buttonCodeList[i];
+		}
+		for (size_t i = buttonCodeList.size();  i < object->m_state->buttonCodes.size();  ++i)
+		{
+			object->m_state->buttonCodes[i] = -1;
+		}
 	}
 	return object;
 }
@@ -77,6 +107,109 @@ bool LinuxInputDeviceHandle::readBytes(void* dataBuffer, size_t bytesToRead, siz
 int LinuxInputDeviceHandle::get() const
 {
 	return m_state->handle.get();
+}
+
+bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
+{
+	while (m_state->handle.hasDataToRead())
+	{
+		struct input_event event;
+		size_t numRead;
+		if (! m_state->handle.readBytes(&event, sizeof(event), &numRead))
+		{
+			int64_t error = getSystemErrorCode();
+			if (error == ENODEV)
+			{
+				SURGSIM_LOG_SEVERE(m_state->logger) <<
+					"RawMultiAxis: read failed; device has been disconnected!  (stopping)";
+				return false;  // stop updating this device!
+			}
+			else if (error != EAGAIN)
+			{
+				SURGSIM_LOG_WARNING(m_state->logger) << "RawMultiAxis: read failed with error " << error << ", " <<
+					getSystemErrorText(error);
+			}
+		}
+		else if (numRead != sizeof(event))
+		{
+			SURGSIM_LOG_WARNING(m_state->logger) << "RawMultiAxis: reading produced " << numRead <<
+				" bytes (expected " << sizeof(event) << ")";
+		}
+		else
+		{
+			if (event.type == EV_REL)
+			{
+
+				if (event.code >= REL_X && event.code < (REL_X+3))  // Assume that X, Y, Z are consecutive
+				{
+					(*axisStates)[0 + (event.code - REL_X)] = event.value;
+					*updated = true;
+				}
+				else if (event.code >= REL_RX && event.code < (REL_RX+3))  // Assume that RX, RY, RZ are consecutive
+				{
+					(*axisStates)[3 + (event.code - REL_RX)] = event.value;
+					*updated = true;
+				}
+			}
+			else if (event.type == EV_ABS)
+			{
+				if (event.code >= ABS_X && event.code < (ABS_X+3))  // Assume that X, Y, Z are consecutive
+				{
+					(*axisStates)[0 + (event.code - ABS_X)] = event.value;
+					*updated = true;
+				}
+				else if (event.code >= ABS_RX && event.code < (ABS_RX+3))  // Assume that RX, RY, RZ are consecutive
+				{
+					(*axisStates)[3 + (event.code - ABS_RX)] = event.value;
+					*updated = true;
+				}
+			}
+			else if (event.type == EV_KEY)
+			{
+				for (size_t i = 0;  i < m_state->buttonCodes.size();  ++i)
+				{
+					if (event.code == m_state->buttonCodes[i])
+					{
+						(*buttonStates)[i] = (event.value != 0);
+						*updated = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
+
+std::vector<int> LinuxInputDeviceHandle::getDeviceButtonsAndKeys()
+{
+	std::vector<int> result;
+	BitSetBuffer<KEY_CNT> buffer;
+	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	{
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_state->logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): error " << error << ", " <<
+			getSystemErrorText(error);
+		return result;
+	}
+
+	// Start listing buttons/keys from BTN_0; then go back and cover the earlier ones.
+	for (int i = BTN_0;  i < KEY_CNT;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			result.push_back(i);
+		}
+	}
+	for (int i = 0;  i < BTN_0;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			result.push_back(i);
+		}
+	}
+
+	return result;
 }
 
 };  // namespace Device

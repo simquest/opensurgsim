@@ -18,9 +18,15 @@
 
 #include <string>
 #include <memory>
+#include <array>
 
 namespace SurgSim
 {
+namespace Framework
+{
+class Logger;
+};  // namespace Framework
+
 namespace Device
 {
 
@@ -28,13 +34,34 @@ namespace Device
 class SystemInputDeviceHandle
 {
 public:
+	/// The maximum number of axes supported by any device object.
+	static const size_t MAX_NUM_AXES = 6;
+	/// The maximum number of buttons supported by any device object.
+	static const size_t MAX_NUM_BUTTONS = 4;
+
+	/// Type used to store axis states.
+	typedef std::array<int, MAX_NUM_AXES> AxisStates;
+	/// Type used to store button states.
+	typedef std::array<bool, MAX_NUM_BUTTONS> ButtonStates;
+
+
 	/// Destructor.
 	virtual ~SystemInputDeviceHandle();
 
 	/// Opens the given path and creates an access wrapper for the device.
-	/// \param	path	Full pathname for the device.
+	/// \param path	Full pathname for the device.
+	/// \param logger	The logger to be used by the device.
 	/// \return	The created device object, or an empty unique_ptr on failure.
-	static std::unique_ptr<SystemInputDeviceHandle> open(const std::string& path);
+	static std::unique_ptr<SystemInputDeviceHandle> open(const std::string& path,
+		std::shared_ptr<SurgSim::Framework::Logger> logger);
+
+	/// Updates the axis and states from the device input, if any.
+	/// \param [in,out] axisStates	The states for each axis of the device.
+	/// \param [in,out] buttonStates	The states for each device button.
+	/// \param [out] updated True if any states were actually updated.  (Note that even if this value is true, the
+	/// 	states may not have changed value; one or more states could have been updated to the same value.)
+	/// \return	true if the operation was successful; false if the device is no longer in a usable state.
+	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) = 0;
 
 	/// Determines if the file handle can be read from.
 	/// \return	true if the handle has been open for reading.

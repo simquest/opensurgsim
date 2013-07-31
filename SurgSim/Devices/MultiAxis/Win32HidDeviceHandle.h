@@ -36,8 +36,12 @@ public:
 
 	/// Opens the given path and creates an access wrapper for the device.
 	/// \param	path	Full pathname for the device.
+	/// \param logger	The logger to be used by the device.
 	/// \return	The created device object, or an empty unique_ptr on failure.
-	static std::unique_ptr<Win32HidDeviceHandle> open(const std::string& path);
+	static std::unique_ptr<Win32HidDeviceHandle> open(const std::string& path,
+		std::shared_ptr<SurgSim::Framework::Logger> logger);
+
+	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) override;
 
 	/// Determines if the file handle can be read from.
 	/// \return	true if the handle has been open for reading.
@@ -65,12 +69,11 @@ public:
 	virtual void* get() const override;
 #endif /* HID_WINDDK_XXX */
 
-protected:
-	/// Default constructor.
-	/// Cannot be called directly; see open and enumerate.
-	Win32HidDeviceHandle();
-
 private:
+	/// Constructor.
+	/// Cannot be called directly; see open and enumerate.
+	explicit Win32HidDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger);
+
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
 	Win32HidDeviceHandle(const Win32HidDeviceHandle& other) /*= delete*/;
 	Win32HidDeviceHandle& operator=(const Win32HidDeviceHandle& other) /*= delete*/;

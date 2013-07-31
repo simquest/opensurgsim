@@ -78,12 +78,7 @@ struct RawMultiAxisScaffold::DeviceData
 {
 public:
 	/// Initialize the data.
-#ifndef HID_WINDDK_XXX
-	DeviceData(const std::string& path, RawMultiAxisDevice* device, std::unique_ptr<SystemInputDeviceHandle>&& handle,
-			   const std::vector<int>& buttonCodeList) :
-#else /* HID_WINDDK_XXX */
 	DeviceData(const std::string& path, RawMultiAxisDevice* device, std::unique_ptr<SystemInputDeviceHandle>&& handle) :
-#endif /* HID_WINDDK_XXX */
 		devicePath(path),
 		deviceObject(device),
 		thread(),
@@ -95,16 +90,6 @@ public:
 		orientationScale(device->getOrientationScale()),
 		useAxisDominance(device->isUsingAxisDominance())
 	{
-#ifndef HID_WINDDK_XXX
-		for (size_t i = 0;  (i < buttonCodeList.size()) && (i < NUM_BUTTONS);  ++i)
-		{
-			buttonCodes[i] = buttonCodeList[i];
-		}
-		for (size_t i = buttonCodeList.size();  i < NUM_BUTTONS;  ++i)
-		{
-			buttonCodes[i] = -1;
-		}
-#endif /* not HID_WINDDK_XXX */
 	}
 
 	// Initialize by moving the data from another object.
@@ -116,9 +101,6 @@ public:
 		deviceHandle(std::move(other.deviceHandle)),
 		axisStates(std::move(other.axisStates)),
 		buttonStates(std::move(other.buttonStates)),
-#ifndef HID_WINDDK_XXX
-		buttonCodes(std::move(other.buttonCodes)),
-#endif /* not HID_WINDDK_XXX */
 		coordinateSystemRotation(std::move(other.coordinateSystemRotation)),
 		positionScale(std::move(other.positionScale)),
 		orientationScale(std::move(other.orientationScale)),
@@ -129,8 +111,6 @@ public:
 	~DeviceData()
 	{
 	}
-
-	static const size_t NUM_BUTTONS = 4;
 
 	// Returns the default coordinate system rotation matrix.
 	static SurgSim::Math::Matrix33d defaultCoordinateSystemRotation()
@@ -144,16 +124,16 @@ public:
 		return coordinateSystemRotation;
 	}
 
-	static std::array<int, 6> initialAxisStates()
+	static SystemInputDeviceHandle::AxisStates initialAxisStates()
 	{
-		std::array<int, 6> zeros;
-		zeros.fill(0);
-		return zeros;
+		SystemInputDeviceHandle::AxisStates states;
+		states.fill(0);
+		return states;
 	}
 
-	static std::array<bool, NUM_BUTTONS> initialButtonStates()
+	static SystemInputDeviceHandle::ButtonStates initialButtonStates()
 	{
-		std::array<bool, NUM_BUTTONS> states;
+		SystemInputDeviceHandle::ButtonStates states;
 		states.fill(false);
 		return states;
 	}
@@ -167,13 +147,9 @@ public:
 	/// Device handle to read from.
 	std::unique_ptr<SystemInputDeviceHandle> deviceHandle;
 	/// Persistent axis states.
-	std::array<int, 6> axisStates;
+	SystemInputDeviceHandle::AxisStates axisStates;
 	/// Persistent button states.
-	std::array<bool, NUM_BUTTONS> buttonStates;
-#ifndef HID_WINDDK_XXX
-	/// Event library button code corresponding to each index.
-	std::array<int, NUM_BUTTONS> buttonCodes;
-#endif /* not HID_WINDDK_XXX */
+	SystemInputDeviceHandle::ButtonStates buttonStates;
 	/// The rotation of the coordinate system (used to reorient, e.g. point +Y up)
 	SurgSim::Math::Matrix33d coordinateSystemRotation;
 	/// Scale factor for the position axes.
@@ -377,13 +353,6 @@ static int findDominantAxis(const std::array<int, 6>& axes)
 	return biggestAxis;
 }
 
-#ifdef HID_WINDDK_XXX
-static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
-{
-	return static_cast<int16_t>(static_cast<uint16_t>(byte0) | (static_cast<uint16_t>(byte1) << 8));
-}
-#endif /* HID_WINDDK_XXX */
-
 bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
@@ -405,143 +374,11 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	}
 
 	bool didUpdate = false;
-#ifndef HID_WINDDK_XXX
-	while (info->deviceHandle->hasDataToRead())
+	if (! info->deviceHandle->updateStates(&(info->axisStates), &(info->buttonStates), &didUpdate))
 	{
-		struct input_event event;
-		size_t numRead;
-		if (! info->deviceHandle->readBytes(&event, sizeof(event), &numRead))
-		{
-			int64_t error = getSystemErrorCode();
-			if (error == ENODEV)
-			{
-				SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: read failed; device has been disconnected!  (ignoring)";
-				return false;  // stop updating this device!
-			}
-			else if (error != EAGAIN)
-			{
-				SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << error << ", " <<
-					getSystemErrorText(error);
-			}
-		}
-		else if (numRead != sizeof(event))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: reading produced " << numRead << " bytes (expected " <<
-				sizeof(event) << ")";
-		}
-		else
-		{
-			if (event.type == EV_REL)
-			{
-
-				if (event.code >= REL_X && event.code < (REL_X+3))  // Assume that X, Y, Z are consecutive
-				{
-					info->axisStates[0 + (event.code - REL_X)] = event.value;
-					didUpdate = true;
-				}
-				else if (event.code >= REL_RX && event.code < (REL_RX+3))  // Assume that RX, RY, RZ are consecutive
-				{
-					info->axisStates[3 + (event.code - REL_RX)] = event.value;
-					didUpdate = true;
-				}
-			}
-			else if (event.type == EV_ABS)
-			{
-				if (event.code >= ABS_X && event.code < (ABS_X+3))  // Assume that X, Y, Z are consecutive
-				{
-					info->axisStates[0 + (event.code - ABS_X)] = event.value;
-					didUpdate = true;
-				}
-				else if (event.code >= ABS_RX && event.code < (ABS_RX+3))  // Assume that RX, RY, RZ are consecutive
-				{
-					info->axisStates[3 + (event.code - ABS_RX)] = event.value;
-					didUpdate = true;
-				}
-			}
-			else if (event.type == EV_KEY)
-			{
-				for (size_t i = 0;  i < DeviceData::NUM_BUTTONS;  ++i)
-				{
-					if (event.code == info->buttonCodes[i])
-					{
-						info->buttonStates[i] = (event.value != 0);
-						didUpdate = true;
-						break;
-					}
-				}
-			}
-		}
+		// If updateStates returns false, the device is no longer usable, so we exit and stop its update loop.
+		return false;
 	}
-#else /* HID_WINDDK_XXX */
-
-	// We can't keep reading while data is available, because we don't know how to tell when data is available.
-	// Both WaitForSingleObject() and WaitForMultipleObjects() always claim data is available for 3DConnexion device
-	// file handles.  So we just do it once, blocking until we have data.
-	//
-	// We also can't unblock the read once we initiate it (closing the handle has no effect).
-
-	{
-		unsigned char deviceBuffer[7*128];
-		size_t numRead;
-		if (! info->deviceHandle->readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
-		{
-			int64_t error = getSystemErrorCode();
-			SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << error << ", " <<
-				getSystemErrorText(error);
-		}
-		else if ((numRead >= 7) && (deviceBuffer[0] == 0x01))       // Translation
-		{
-			info->axisStates[0] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
-			info->axisStates[1] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
-			info->axisStates[2] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
-			didUpdate = true;
-
-			if ((numRead >= 14) && (deviceBuffer[7] == 0x02))  // translation data may have rotation appended to it
-			{
-				info->axisStates[3] = signedShortData(deviceBuffer[8],  deviceBuffer[9]);
-				info->axisStates[4] = signedShortData(deviceBuffer[10],  deviceBuffer[11]);
-				info->axisStates[5] = signedShortData(deviceBuffer[12],  deviceBuffer[13]);
-			}
-		}
-		else if ((numRead >= 7) && (deviceBuffer[0] == 0x02))  // Rotation
-		{
-			info->axisStates[3] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
-			info->axisStates[4] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
-			info->axisStates[5] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
-			didUpdate = true;
-
-			if ((numRead >= 14) && (deviceBuffer[7] == 0x01))  // rotation data may have translation appended to it
-			{
-				info->axisStates[0] = signedShortData(deviceBuffer[8],  deviceBuffer[9]);
-				info->axisStates[1] = signedShortData(deviceBuffer[10],  deviceBuffer[11]);
-				info->axisStates[2] = signedShortData(deviceBuffer[12],  deviceBuffer[13]);
-			}
-		}
-		else if ((numRead >= 2) && (deviceBuffer[0] == 0x03))  // Buttons
-		{
-			size_t currentByte = 1;  // Byte 0 specifies the packet type; data starts at byte 1
-			unsigned char currentBit = 0x01;
-			for (size_t i = 0;  i < DeviceData::NUM_BUTTONS;  ++i)
-			{
-				info->buttonStates[i] = ((deviceBuffer[currentByte] & currentBit) != 0);
-				if (currentBit < 0x80)
-				{
-					currentBit = currentBit << 1;
-				}
-				else
-				{
-					currentBit = 0x01;
-					++currentByte;
-					if (currentByte >= numRead)  // out of data?
-					{
-						break;
-					}
-				}
-			}
-			didUpdate = true;
-		}
-	}
-#endif /* HID_WINDDK_XXX */
 
 	if (didUpdate)
 	{
@@ -631,7 +468,7 @@ bool RawMultiAxisScaffold::finalizeSdk()
 
 std::unique_ptr<SystemInputDeviceHandle> RawMultiAxisScaffold::openDevice(const std::string& path)
 {
-	std::unique_ptr<SystemInputDeviceHandle> handle = SystemInputDeviceHandle::open(path);
+	std::unique_ptr<SystemInputDeviceHandle> handle = SystemInputDeviceHandle::open(path, m_logger);
 	if (! handle)
 	{
 		int64_t error = getSystemErrorCode();
@@ -861,18 +698,10 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 		return false;
 	}
 
-#ifndef HID_WINDDK_XXX
-	std::vector<int> buttons = getDeviceButtonsAndKeys(handle.get());
-#endif /* not HID_WINDDK_XXX */
-
 	// Construct the object, start its thread, then move it to the list.
 	// The thread needs a device entry pointer, but the unique_ptr indirection means we have one to provide even
 	// before we've put an entry in the active device array.
-#ifndef HID_WINDDK_XXX
-	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(handle), buttons));
-#else /* HID_WINDDK_XXX */
 	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(handle)));
-#endif /* HID_WINDDK_XXX */
 
 	createPerDeviceThread(info.get());
 	SURGSIM_ASSERT(info->thread);
@@ -1000,39 +829,6 @@ bool RawMultiAxisScaffold::deviceHasSixAxes(SystemInputDeviceHandle* deviceHandl
 	return true;
 }
 #endif /* HID_WINDDK_XXX */
-
-#ifndef HID_WINDDK_XXX
-std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(SystemInputDeviceHandle* deviceHandle)
-{
-	std::vector<int> result;
-	BitSetBuffer<KEY_CNT> buffer;
-	if (ioctl(deviceHandle->get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
-	{
-		int error = errno;
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): error " << error << ", " <<
-			getSystemErrorText(error);
-		return result;
-	}
-
-	// Start listing buttons/keys from BTN_0; then go back and cover the earlier ones.
-	for (int i = BTN_0;  i < KEY_CNT;  ++i)
-	{
-		if (buffer.test(i))
-		{
-			result.push_back(i);
-		}
-	}
-	for (int i = 0;  i < BTN_0;  ++i)
-	{
-		if (buffer.test(i))
-		{
-			result.push_back(i);
-		}
-	}
-
-	return result;
-}
-#endif /* not HID_WINDDK_XXX */
 
 SurgSim::DataStructures::DataGroup RawMultiAxisScaffold::buildDeviceInputData()
 {
