@@ -135,7 +135,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<SurgSim::Physics::DoubleSidedPlaneShape> planeShape = 
+	std::shared_ptr<SurgSim::Physics::DoubleSidedPlaneShape> planeShape =
 		std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);

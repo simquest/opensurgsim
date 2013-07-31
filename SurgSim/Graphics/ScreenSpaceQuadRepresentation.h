@@ -24,8 +24,10 @@ namespace Graphics
 {
 
 class View;
+class Texture2d;
+class TextureRectangle;
 
-/// A quad to display on the screen in screen space coordinates, use setPose() to set the position but 
+/// A quad to display on the screen in screen space coordinates, use setPose() to set the position but
 /// x,y are presumed to be in screen space with 0|0 being in the lower left corner
 class ScreenSpaceQuadRepresentation : public virtual Representation
 {
@@ -53,6 +55,19 @@ public:
 	/// \param [in,out]	width 	If non-null, the width.
 	/// \param [in,out]	height	If non-null, the height.
 	virtual void getSize(int* width, int* height) const = 0;
+
+	/// Sets a Texture2d for this quad, this should replace a current texture, this is a convenience function and
+	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
+	/// from the outside as well by using the material.
+	/// \param	texture	The texture to be set on the quad.
+	/// \return	true if it succeeds, false if it fails.
+	virtual bool setTexture(std::shared_ptr<Texture2d> texture) = 0;
+
+	/// Sets a rectangular texture for this quad, this should replace a current texture,
+	/// this is a convenience function and will use the uniform name "diffuseMap" for the uniform in this operation.
+	/// \param	texture	The texture to be set on the quad.
+	/// \return	true if it succeeds, false if it fails.
+	virtual bool setTexture(std::shared_ptr<TextureRectangle> texture) = 0;
 
 };
 

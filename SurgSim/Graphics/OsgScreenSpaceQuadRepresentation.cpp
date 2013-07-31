@@ -13,9 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+
 #include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
+#include <SurgSim/Graphics/View.h>
+#include <SurgSim/Graphics/OsgUniform.h>
+#include <SurgSim/Graphics/OsgUniformBase.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
+#include <SurgSim/Graphics/Texture2d.h>
+#include <SurgSim/Graphics/TextureRectangle.h>
 
 #include <osg/Array>
 #include <osg/Geode>
@@ -32,50 +39,42 @@ namespace Graphics
 {
 
 OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
-		const std::string& name,
-		std::shared_ptr<View> view) :
+	const std::string& name,
+	std::shared_ptr<View> view) :
 	Representation(name),
 	OsgRepresentation(name),
 	ScreenSpaceQuadRepresentation(name,view),
 	m_view(view),
 	m_scale(1.0,1.0,1.0)
 {
-	// get rid of the transform we want to set this up ourselves
-	m_switch->removeChild(0u,1u);
+	m_switch = new osg::Switch;
+	m_switch->setName(name + " Switch");
+
+	m_transform = new osg::PositionAttitudeTransform();
+	m_transform->setName(name + " Transform");
 
 	m_view->getDimensions(&m_displayWidth, &m_displayHeight);
 
 	m_geode = new osg::Geode;
 
 	// Make the quad
-	osg::Geometry* geom = new osg::Geometry;
-
-	osg::Vec3Array* m_vertices = new osg::Vec3Array;
 	float depth = 0.0;
-	m_vertices->push_back(osg::Vec3(0.0,1.0,depth));
-	m_vertices->push_back(osg::Vec3(0.0,0.0,depth));
-	m_vertices->push_back(osg::Vec3(1.0,0.0,depth));
-	m_vertices->push_back(osg::Vec3(1.0,1.0,depth));
-	setSize(1.0,1.0);
-
-	geom->setVertexArray(m_vertices);
-
-	osg::Vec3Array* normals = new osg::Vec3Array;
-	normals->push_back(osg::Vec3(0.0f,0.0f,1.0f));
-	geom->setNormalArray(normals);
-	geom->setNormalBinding(osg::Geometry::BIND_OVERALL);
+	m_geometry = osg::createTexturedQuadGeometry(
+		osg::Vec3(0,0,depth),
+		osg::Vec3(1.0,0.0,depth),
+		osg::Vec3(0.0,1.0,depth));
 
 	osg::Vec4Array* colors = new osg::Vec4Array;
-	colors->push_back(osg::Vec4(1.0f,1.0,0.8f,0.2f));
-	geom->setColorArray(colors);
-	geom->setColorBinding(osg::Geometry::BIND_OVERALL);
+	colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
+	m_geometry->setColorArray(colors);
+	m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
-	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
+	m_geometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
 
-	osg::StateSet* stateset = geom->getOrCreateStateSet();
-	stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
+	//osg::StateSet* stateset = geom->getOrCreateStateSet();
+	//stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
 
-	m_geode->addDrawable(geom);
+	m_geode->addDrawable(m_geometry);
 
 	m_transform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	m_transform->setCullingActive(false);
@@ -128,6 +127,84 @@ void OsgScreenSpaceQuadRepresentation::setPose(const SurgSim::Math::RigidTransfo
 	std::pair<osg::Quat, osg::Vec3d> pose = toOsg(m_pose);
 	m_transform->setPosition(pose.second);
 }
+
+
+bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture2d> texture)
+{
+	std::shared_ptr<OsgTexture2d> osgTexture = std::dynamic_pointer_cast<OsgTexture2d>(texture);
+	SURGSIM_ASSERT(texture != nullptr) << "Null texture passed to setTexture";
+	SURGSIM_ASSERT(osgTexture != nullptr) << "Texture passed to setTexture not an OsgTexture";
+
+	bool result = false;
+
+	auto newUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
+	newUniform->set(osgTexture);
+	if (replaceUniform("diffuseMap", newUniform))
+	{
+		setTextureCoordinates(0.0,0.0,1.0,1.0);
+		result = true;
+	}
+	return result;
+}
+
+bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<TextureRectangle> texture)
+{
+	std::shared_ptr<OsgTextureRectangle> osgTexture = std::dynamic_pointer_cast<OsgTextureRectangle>(texture);
+	SURGSIM_ASSERT(texture != nullptr) << "Null texture passed to setTexture";
+	SURGSIM_ASSERT(osgTexture != nullptr) << "Texture passed to setTexture not an OsgTexture";
+
+	bool result = false;
+
+	auto newUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTextureRectangle>>>("diffuseMap");
+	newUniform->set(osgTexture);
+	if (replaceUniform("diffuseMap", newUniform))
+	{
+		int width, height;
+		texture->getSize(&width, &height);
+		setTextureCoordinates(0.0,0.0,static_cast<float>(width),static_cast<float>(height));
+		result = true;
+	}
+	return result;
+}
+
+bool OsgScreenSpaceQuadRepresentation::replaceUniform(const std::string& name, std::shared_ptr<UniformBase> newUniform)
+{
+	std::shared_ptr<OsgMaterial> material = std::dynamic_pointer_cast<OsgMaterial>(getMaterial());
+	if (material == nullptr)
+	{
+		material = std::make_shared<OsgMaterial>();
+		setMaterial(material);
+	}
+
+	std::shared_ptr<UniformBase> oldUniform = material->getUniform(name);
+
+	if (oldUniform != nullptr)
+	{
+		material->removeUniform(oldUniform);
+	}
+
+	bool result = material->addUniform(newUniform);
+
+	// if the add failed try to add the old one back on but report failure
+	if (! result && oldUniform != nullptr)
+	{
+		material->addUniform(oldUniform);
+	}
+
+	return result;
+}
+
+void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float bottom, float right, float top)
+{
+	osg::Vec2Array* tcoords = new osg::Vec2Array(4);
+	(*tcoords)[0].set(left,top);
+	(*tcoords)[1].set(left,bottom);
+	(*tcoords)[2].set(right,bottom);
+	(*tcoords)[3].set(right,top);
+	m_geometry->setTexCoordArray(0,tcoords);
+}
+
+
 
 }; // Graphics
 }; // SurgSim

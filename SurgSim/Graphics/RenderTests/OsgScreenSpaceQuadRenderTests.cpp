@@ -19,10 +19,14 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/RigidTransform.h>
 
+#include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Graphics/OsgTexture2d.h>
+#include <SurgSim/Graphics/OsgTextureRectangle.h>
 #include <SurgSim/Graphics/View.h>
 
 #include <SurgSim/Testing/MathUtilities.h>
@@ -116,7 +120,49 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 
 TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 {
+	std::vector<std::string> paths;
+	paths.push_back("Data/OsgScreenSpaceQuadRenderTests");
+	SurgSim::Framework::ApplicationData data(paths);
 
+	std::string checkerTexturePath = data.findFile("CheckerBoard.png");
+	std::string rectangleTexturePath = data.findFile("Rectangle.png");
+
+	EXPECT_NE("", checkerTexturePath) << "Could not find checker texture shader!";
+	EXPECT_NE("", rectangleTexturePath) << "Could not find rectangle texture!";
+
+	std::shared_ptr<OsgTexture2d> checkerTexture = std::make_shared<OsgTexture2d>();
+	EXPECT_TRUE(checkerTexture->loadImage(checkerTexturePath));
+
+	std::shared_ptr<OsgTextureRectangle> rectTexture = std::make_shared<OsgTextureRectangle>();
+	EXPECT_TRUE(rectTexture->loadImage(rectangleTexturePath));
+
+
+	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad1 =
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 1", viewElement->getView());
+
+	quad1->setSize(256,256);
+	quad1->setInitialPose(SurgSim::Math::makeRigidTransform(
+		Quaterniond::Identity(),
+		Vector3d(800-256,600-256,-0.2)));
+	EXPECT_TRUE(quad1->setTexture(checkerTexture));
+	viewElement->addComponent(quad1);
+
+
+	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad2 =
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 2", viewElement->getView());
+
+	int width, height;
+	rectTexture->getSize(&width, &height);
+	EXPECT_TRUE(quad2->setTexture(rectTexture));
+	quad2->setSize(width,height);
+	viewElement->addComponent(quad2);
+
+	/// Run the thread
+	runtime->start();
+	EXPECT_TRUE(graphicsManager->isInitialized());
+	EXPECT_TRUE(viewElement->isInitialized());
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 }
 
 }; // namespace Graphics

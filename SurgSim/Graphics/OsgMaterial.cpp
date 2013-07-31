@@ -73,7 +73,8 @@ std::shared_ptr<SurgSim::Graphics::UniformBase> OsgMaterial::getUniform(unsigned
 	return m_uniforms[index];
 }
 
-std::shared_ptr<SurgSim::Graphics::UniformBase> SurgSim::Graphics::OsgMaterial::getUniform(const std::string& name) const
+std::shared_ptr<SurgSim::Graphics::UniformBase>
+SurgSim::Graphics::OsgMaterial::getUniform(const std::string& name) const
 {
 	std::shared_ptr<UniformBase> result;
 	auto it = std::find_if(

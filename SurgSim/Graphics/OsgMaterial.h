@@ -60,6 +60,10 @@ public:
 	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
 	virtual bool removeUniform(std::shared_ptr<UniformBase> uniform);
 
+	/// Removes a uniform from this material
+	/// \param	name The name of the Uniform to remove
+	/// \return True if uniform was removed successfully, otherwise false
+	/// \note	OsgMaterial only accepts subclasses of OsgUniformBase
 	virtual bool removeUniform(const std::string& name);
 
 	/// Returns the number of uniforms in this material

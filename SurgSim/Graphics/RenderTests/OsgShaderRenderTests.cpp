@@ -16,6 +16,7 @@
 /// \file
 /// Render Tests for the OsgShader class.
 
+#include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgShader.h>

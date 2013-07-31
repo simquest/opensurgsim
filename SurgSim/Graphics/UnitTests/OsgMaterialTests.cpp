@@ -270,10 +270,9 @@ TEST(OsgMaterialTests, NamedAccessTest)
 	EXPECT_TRUE(material->hasUniform(uniform2Name));
 	EXPECT_EQ(uniform2.get(), material->getUniform(uniform2Name).get());
 
-	
 	EXPECT_FALSE(material->hasUniform("xxx"));
 	EXPECT_EQ(nullptr, material->getUniform("xxx"));
-	
+
 	EXPECT_TRUE(material->removeUniform(uniform1Name));
 	EXPECT_FALSE(material->hasUniform(uniform1Name));
 }
