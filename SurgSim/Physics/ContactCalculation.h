@@ -98,7 +98,7 @@ public:
 
 private:
 	bool m_doAssert;
-	
+
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
@@ -148,7 +148,7 @@ private:
 };
 
 
-/// Class to calculate intersections between a capsule and a sphere 
+/// Class to calculate intersections between a capsule and a sphere
 class CapsuleSphereDcdContact : public ContactCalculation
 {
 public:

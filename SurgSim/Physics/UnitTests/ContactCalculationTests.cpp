@@ -274,8 +274,8 @@ void doCapsuleSphereTest(double capsuleRadius, double capsuleHeight,
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 
-		Vector3d penetrationPoint0(sphereProjection + expectedNorm * depth);
-		Vector3d penetrationPoint1(spherePosition - expectedNorm * depth);
+		Vector3d penetrationPoint0(sphereProjection + expectedNorm * capsuleRadius);
+		Vector3d penetrationPoint1(spherePosition - expectedNorm * sphereRadius);
 		EXPECT_TRUE(eigenEqual(penetrationPoint0, contact->penetrationPoints.first.globalPosition.getValue(), epsilon));
 		EXPECT_TRUE(eigenEqual(penetrationPoint1, contact->penetrationPoints.second.globalPosition.getValue(),epsilon));
 	}
@@ -301,19 +301,10 @@ TEST(ContactCalculationTests, CapsuleSphereCalculation)
 		SCOPED_TRACE("Intersection with capsule roated along Z-axis clockwise 90 degrees");
 		doCapsuleSphereTest(0.1, 0.1, Vector3d(0.0, 0.0, 0.0),
 							SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
-							0.1, Vector3d(-0.2, 0.0, 0.0), 
+							0.1, Vector3d(-0.2, 0.0, 0.0),
 							Quaterniond::Identity(), true, 0.05,
 							Vector3d(-0.05, 0.0, 0.0), Vector3d(-1.0, 0.0, 0.0));
 	}
-
-	/*{
-		SCOPED_TRACE("Intersection");
-		doCapsuleSphereTest(0.1, 0.1, Vector3d(0.0, 0.0, 0.0), 
-							SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0, 0.0, 0.0)),
-							0.1, Vector3d(0.0, 0.0, 0.5),
-							Quaterniond::Identity(), true, 0.1,
-							Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 1.0));
-	}*/
 }
 
 }; // Physics
