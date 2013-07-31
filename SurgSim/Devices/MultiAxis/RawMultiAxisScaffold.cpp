@@ -46,11 +46,7 @@ extern "C" {  // sigh...
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
-#ifndef HID_WINDDK_XXX
-#include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
-#else /* HID_WINDDK_XXX */
-#include "SurgSim/Devices/MultiAxis/FileHandle.h"
-#endif /* HID_WINDDK_XXX */
+#include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
 #include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
@@ -83,19 +79,15 @@ struct RawMultiAxisScaffold::DeviceData
 public:
 	/// Initialize the data.
 #ifndef HID_WINDDK_XXX
-	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileDescriptor&& descriptor,
+	DeviceData(const std::string& path, RawMultiAxisDevice* device, std::unique_ptr<SystemInputDeviceHandle>&& handle,
 			   const std::vector<int>& buttonCodeList) :
 #else /* HID_WINDDK_XXX */
-	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileHandle&& handle) :
+	DeviceData(const std::string& path, RawMultiAxisDevice* device, std::unique_ptr<SystemInputDeviceHandle>&& handle) :
 #endif /* HID_WINDDK_XXX */
 		devicePath(path),
 		deviceObject(device),
 		thread(),
-#ifndef HID_WINDDK_XXX
-		fileDescriptor(std::move(descriptor)),
-#else /* HID_WINDDK_XXX */
-		fileHandle(std::move(handle)),
-#endif /* HID_WINDDK_XXX */
+		deviceHandle(std::move(handle)),
 		axisStates(initialAxisStates()),
 		buttonStates(initialButtonStates()),
 		coordinateSystemRotation(defaultCoordinateSystemRotation()),
@@ -121,11 +113,7 @@ public:
 		devicePath(std::move(other.devicePath)),
 		deviceObject(std::move(other.deviceObject)),
 		thread(std::move(other.thread)),
-#ifndef HID_WINDDK_XXX
-		fileDescriptor(std::move(other.fileDescriptor)),
-#else /* HID_WINDDK_XXX */
-		fileHandle(std::move(other.fileHandle)),
-#endif /* HID_WINDDK_XXX */
+		deviceHandle(std::move(other.deviceHandle)),
 		axisStates(std::move(other.axisStates)),
 		buttonStates(std::move(other.buttonStates)),
 #ifndef HID_WINDDK_XXX
@@ -176,13 +164,8 @@ public:
 	RawMultiAxisDevice* const deviceObject;
 	/// Processing thread.
 	std::unique_ptr<RawMultiAxisThread> thread;
-#ifndef HID_WINDDK_XXX
-	/// File descriptor to read from.
-	FileDescriptor fileDescriptor;
-#else /* HID_WINDDK_XXX */
-	/// File handle to read from.
-	FileHandle fileHandle;
-#endif /* HID_WINDDK_XXX */
+	/// Device handle to read from.
+	std::unique_ptr<SystemInputDeviceHandle> deviceHandle;
 	/// Persistent axis states.
 	std::array<int, 6> axisStates;
 	/// Persistent button states.
@@ -423,11 +406,11 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 
 	bool didUpdate = false;
 #ifndef HID_WINDDK_XXX
-	while (info->fileDescriptor.hasDataToRead())
+	while (info->deviceHandle->hasDataToRead())
 	{
 		struct input_event event;
 		size_t numRead;
-		if (! info->fileDescriptor.readBytes(&event, sizeof(event), &numRead))
+		if (! info->deviceHandle->readBytes(&event, sizeof(event), &numRead))
 		{
 			int64_t error = getSystemErrorCode();
 			if (error == ENODEV)
@@ -500,7 +483,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	{
 		unsigned char deviceBuffer[7*128];
 		size_t numRead;
-		if (! info->fileHandle.readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
+		if (! info->deviceHandle->readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
 		{
 			int64_t error = getSystemErrorCode();
 			SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << error << ", " <<
@@ -646,36 +629,24 @@ bool RawMultiAxisScaffold::finalizeSdk()
 	return true;
 }
 
+std::unique_ptr<SystemInputDeviceHandle> RawMultiAxisScaffold::openDevice(const std::string& path)
+{
+	std::unique_ptr<SystemInputDeviceHandle> handle = SystemInputDeviceHandle::open(path);
+	if (! handle)
+	{
+		int64_t error = getSystemErrorCode();
 #ifndef HID_WINDDK_XXX
-FileDescriptor RawMultiAxisScaffold::openDevice(const std::string& path)
-{
-	FileDescriptor fd;
-	fd.openForReadingAndMaybeWriting(path);
-	if (! fd.isValid())
-	{
-		int64_t error = getSystemErrorCode();
-		if (error != ENOENT)
+		// XXX FIXME TODO(advornik): does not belong here...
+		if (error == ENOENT)
 		{
-			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
-				", " << getSystemErrorText(error);
+			return std::move(handle);
 		}
-	}
-	return std::move(fd);
-}
-#else /* HID_WINDDK_XXX */
-FileHandle RawMultiAxisScaffold::openDevice(const std::string& path)
-{
-	FileHandle fh;
-	fh.openForReadingAndMaybeWriting(path);
-	if (! fh.isValid())
-	{
-		int64_t error = getSystemErrorCode();
+#endif /* HID_WINDDK_XXX */
 		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
 			", " << getSystemErrorText(error);
 	}
-	return std::move(fh);
+	return std::move(handle);
 }
-#endif /* HID_WINDDK_XXX */
 
 bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* device, int* numUsedDevicesSeen)
 {
@@ -721,14 +692,15 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		char devicePath[128];
 		snprintf(devicePath, sizeof(devicePath), "/dev/input/event%d", i);
 
-		FileDescriptor fd = openDevice(devicePath);
-		if (! fd.isValid())
+		std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(devicePath);
+		if (! handle)
 		{
+			// message was already printed
 			continue;
 		}
 
 		char reportedName[1024];
-		if (ioctl(fd.get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
+		if (ioctl(handle->get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
 		{
 			int error = errno;
 			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): error " << error << ", " <<
@@ -742,7 +714,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
 
 		struct input_id reportedId;
-		if (ioctl(fd.get(), EVIOCGID, &reportedId) < 0)
+		if (ioctl(handle->get(), EVIOCGID, &reportedId) < 0)
 		{
 			int error = errno;
 			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGID): error " << error << ", " <<
@@ -750,12 +722,12 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 			continue;
 		}
 
-		if (! deviceHasSixAbsoluteAxes(fd) && ! deviceHasSixRelativeAxes(fd))
+		if (! deviceHasSixAxes(handle.get()))
 		{
 			continue;
 		}
 
-		fd.reset();
+		handle.reset();
 
 		if (registerIfUnused(devicePath, device, numUsedDevicesSeen))
 		{
@@ -832,8 +804,8 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		// TODO(advornik): Implement device attribute scanning like we do on Linux.
 
 		std::string devicePath(deviceInterfaceDetail->DevicePath);
-		FileHandle fh = openDevice(devicePath);
-		if (! fh.isValid())
+		std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(devicePath);
+		if (! handle)
 		{
 			// message was already printed
 			continue;
@@ -842,12 +814,12 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		char reportedName[1024] = "???";  // TODO(advornik): Implement querying names?
 		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
 
-		if (! deviceHasSixAxes(fh))
+		if (! deviceHasSixAxes(handle.get()))
 		{
 			continue;
 		}
 
-		fh.reset();
+		handle.reset();
 
 		if (registerIfUnused(devicePath, device, numUsedDevicesSeen))
 		{
@@ -883,28 +855,23 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 
 	// The controller is not yet in use.
 
-#ifndef HID_WINDDK_XXX
-	FileDescriptor fd = openDevice(path);
-	if (! fd.isValid())
-#else /* HID_WINDDK_XXX */
-	FileHandle fh = openDevice(path);
-	if (! fh.isValid())
-#endif /* HID_WINDDK_XXX */
+	std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(path);
+	if (! handle)
 	{
 		return false;
 	}
 
 #ifndef HID_WINDDK_XXX
-	std::vector<int> buttons = getDeviceButtonsAndKeys(fd);
+	std::vector<int> buttons = getDeviceButtonsAndKeys(handle.get());
 #endif /* not HID_WINDDK_XXX */
 
 	// Construct the object, start its thread, then move it to the list.
 	// The thread needs a device entry pointer, but the unique_ptr indirection means we have one to provide even
 	// before we've put an entry in the active device array.
 #ifndef HID_WINDDK_XXX
-	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fd), buttons));
+	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(handle), buttons));
 #else /* HID_WINDDK_XXX */
-	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fh)));
+	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(handle)));
 #endif /* HID_WINDDK_XXX */
 
 	createPerDeviceThread(info.get());
@@ -937,13 +904,14 @@ bool RawMultiAxisScaffold::destroyPerDeviceThread(DeviceData* data)
 }
 
 #ifndef HID_WINDDK_XXX
-bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDescriptor)
+static bool deviceHasSixAbsoluteAxes(SystemInputDeviceHandle* deviceHandle,
+				     std::shared_ptr<SurgSim::Framework::Logger>* logger)
 {
 	BitSetBuffer<ABS_CNT> buffer;
-	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	if (ioctl(deviceHandle->get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_ABS)): error " << error << ", " <<
+		SURGSIM_LOG_DEBUG(*logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_ABS)): error " << error << ", " <<
 			getSystemErrorText(error);
 		return false;
 	}
@@ -951,7 +919,7 @@ bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDe
 	if (! buffer.test(ABS_X) || ! buffer.test(ABS_Y) || ! buffer.test(ABS_Z) ||
 		! buffer.test(ABS_RX) || ! buffer.test(ABS_RY) || ! buffer.test(ABS_RZ))
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: does not have the 6 absolute axes.";
+		SURGSIM_LOG_DEBUG(*logger) << "RawMultiAxis: does not have the 6 absolute axes.";
 		return false;
 	}
 
@@ -970,19 +938,20 @@ bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDe
 
 	if (numIgnoredAxes)
 	{
-		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional absolute axes.";
+		SURGSIM_LOG_INFO(*logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional absolute axes.";
 	}
 
 	return true;
 }
 
-bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDescriptor)
+static bool deviceHasSixRelativeAxes(SystemInputDeviceHandle* deviceHandle,
+				     std::shared_ptr<SurgSim::Framework::Logger>* logger)
 {
 	BitSetBuffer<REL_CNT> buffer;
-	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	if (ioctl(deviceHandle->get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_REL)): error " << error << ", " <<
+		SURGSIM_LOG_DEBUG(*logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_REL)): error " << error << ", " <<
 			getSystemErrorText(error);
 		return false;
 	}
@@ -990,7 +959,7 @@ bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDe
 	if (! buffer.test(REL_X) || ! buffer.test(REL_Y) || ! buffer.test(REL_Z) ||
 		! buffer.test(REL_RX) || ! buffer.test(REL_RY) || ! buffer.test(REL_RZ))
 	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: does not have the 6 relative axes.";
+		SURGSIM_LOG_DEBUG(*logger) << "RawMultiAxis: does not have the 6 relative axes.";
 		return false;
 	}
 
@@ -1007,13 +976,18 @@ bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDe
 	}
 	if (numIgnoredAxes)
 	{
-		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional relative axes.";
+		SURGSIM_LOG_INFO(*logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional relative axes.";
 	}
 
 	return true;
 }
+
+bool RawMultiAxisScaffold::deviceHasSixAxes(SystemInputDeviceHandle* deviceHandle)
+{
+  return deviceHasSixAbsoluteAxes(deviceHandle, &m_logger) || deviceHasSixRelativeAxes(deviceHandle, &m_logger);
+}
 #else /* HID_WINDDK_XXX */
-bool RawMultiAxisScaffold::deviceHasSixAxes(const FileHandle& fileHandle)
+bool RawMultiAxisScaffold::deviceHasSixAxes(SystemInputDeviceHandle* deviceHandle)
 {
 	//SURGSIM_ASSERT(0) << "unimpl!";//XXX
 
@@ -1028,11 +1002,11 @@ bool RawMultiAxisScaffold::deviceHasSixAxes(const FileHandle& fileHandle)
 #endif /* HID_WINDDK_XXX */
 
 #ifndef HID_WINDDK_XXX
-std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(const FileDescriptor& fileDescriptor)
+std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(SystemInputDeviceHandle* deviceHandle)
 {
 	std::vector<int> result;
 	BitSetBuffer<KEY_CNT> buffer;
-	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	if (ioctl(deviceHandle->get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
 		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): error " << error << ", " <<
