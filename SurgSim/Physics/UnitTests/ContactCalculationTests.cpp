@@ -213,6 +213,14 @@ TEST(ContactCalculationTests, SpherePlaneCalculation)
 									 plane, SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(1.0,0.0,0.0)),
 									 Vector3d(0.0,0.0,0.0), true, 0.5, Vector3d(0.0,0.0,1.0));
 	}
+
+	{
+		Vector3d planeTrans(365.321,-342.324,325.324);
+		Quaterniond planeQuat = SurgSim::Math::makeRotationQuaternion(1.23456, Vector3d(0.234,-0.986,0.646).normalized());
+		SCOPED_TRACE("Intersection front, rotated plane 2");
+		doSphereDoubleSidedPlaneTest(sphere, Quaterniond::Identity(), planeQuat * (Vector3d(0.0,0.5,0.0)) + planeTrans, plane,
+									 planeQuat, planeTrans, true, 0.5, planeQuat * Vector3d(0.0, 1.0, 0.0));
+	}
 }
 
 TEST(ContactCalculationTests, PlaneSphereShouldFail)
