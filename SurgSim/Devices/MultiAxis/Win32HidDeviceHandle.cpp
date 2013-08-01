@@ -203,6 +203,65 @@ void* Win32HidDeviceHandle::get() const
 	return m_state->handle.get();
 }
 
+static std::string convertWideString(const wchar_t* wideString)
+{
+	char buffer[4096];
+	int status = WideCharToMultiByte(CP_UTF8, 0, wideString, -1, buffer, sizeof(buffer), nullptr, nullptr);
+	if (! (status > 0 && status < sizeof(buffer)))
+	{
+		_snprintf(buffer, sizeof(buffer), "???");
+	}
+	return std::string(buffer);
+}
+
+std::string Win32HidDeviceHandle::getDeviceName() const
+{
+	wchar_t manufacturer[1024];
+	if (HidD_GetManufacturerString(m_state->handle.get(), manufacturer, sizeof(manufacturer)) != TRUE)
+	{
+		manufacturer[0] = '\0';
+	}
+
+	wchar_t product[1024];
+	if (HidD_GetProductString(m_state->handle.get(), product, sizeof(product)) != TRUE)
+	{
+		product[0] = '\0';
+	}
+
+	std::string result("");
+	if (manufacturer[0])
+	{
+		result = convertWideString(manufacturer) + " ";
+	}
+	if (product[0])
+	{
+		result += convertWideString(product);
+	}
+	else
+	{
+		result += "???";
+	}
+	return result;
+}
+
+bool Win32HidDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
+{
+	HIDD_ATTRIBUTES attributes;
+	attributes.Size = sizeof(attributes);
+	if (HidD_GetAttributes(m_state->handle.get(), &attributes) != TRUE)
+	{
+		DWORD error = GetLastError();
+		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: Could not get attributes/IDs: error " << error <<
+			", " << getSystemErrorText(error);
+		*vendorId = *productId = -1;
+		return false;
+	}
+
+	*vendorId  = attributes.VendorID;
+	*productId = attributes.ProductID;
+	return true;
+}
+
 bool Win32HidDeviceHandle::getCapabilities(HIDP_CAPS* capabilities) const
 {
 	PHIDP_PREPARSED_DATA preParsedData = 0;

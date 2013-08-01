@@ -61,6 +61,16 @@ public:
 	static std::unique_ptr<SystemInputDeviceHandle> open(const std::string& path,
 		std::shared_ptr<SurgSim::Framework::Logger> logger);
 
+	/// Gets the name returned by the operating system for this device.
+	/// \return	The reported name, or "???" if no name information could be found.
+	virtual std::string getDeviceName() const = 0;
+
+	/// Gets the device identifiers.
+	/// \param [out] vendorId	The USB or PCI vendor identifier.
+	/// \param [out] productId	The USB or PCI product identifier.
+	/// \return	true if it succeeds.
+	virtual bool getDeviceIds(int* vendorId, int* productId) const = 0;
+
 	/// Query if this device has 3 translation and 3 rotation axes.
 	/// \return	true if the desired axes are present.
 	virtual bool hasTranslationAndRotationAxes() const = 0;

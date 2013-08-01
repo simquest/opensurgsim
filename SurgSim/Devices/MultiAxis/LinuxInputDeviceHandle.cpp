@@ -137,6 +137,40 @@ int LinuxInputDeviceHandle::get() const
 	return m_state->handle.get();
 }
 
+std::string LinuxInputDeviceHandle::getDeviceName() const
+{
+	char reportedName[1024];
+	if (ioctl(m_state->handle.get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
+	{
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGNAME): error " << error << ", " <<
+			getSystemErrorText(error);
+		snprintf(reportedName, sizeof(reportedName), "???");
+	}
+	else
+	{
+		reportedName[sizeof(reportedName)-1] = '\0';
+	}
+	return std::string(reportedName);
+}
+
+bool LinuxInputDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
+{
+	struct input_id reportedId;
+	if (ioctl(m_state->handle.get(), EVIOCGID, &reportedId) < 0)
+	{
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGID): error " << error << ", " <<
+			getSystemErrorText(error);
+		*vendorId = *productId = -1;
+		return false;
+	}
+
+	*vendorId = reportedId.vendor;
+	*productId = reportedId.product;
+	return true;
+}
+
 bool LinuxInputDeviceHandle::hasAbsoluteTranslationAndRotationAxes() const
 {
 	BitSetBuffer<ABS_CNT> buffer;

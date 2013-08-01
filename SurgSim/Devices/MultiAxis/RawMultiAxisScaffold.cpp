@@ -516,35 +516,20 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 			continue;
 		}
 
-#ifndef HID_WINDDK_XXX
-		char reportedName[1024];
-		if (ioctl(handle->get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
+		const std::string reportedName = handle->getDeviceName();
+
+		int vendorId, productId;
+		if (handle->getDeviceIds(&vendorId, &productId))
 		{
-			int error = errno;
-			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): error " << error << ", " <<
-				getSystemErrorText(error);
-			snprintf(reportedName, sizeof(reportedName), "???");
+			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" <<
+				std::hex << std::setfill('0') << std::setw(4) << vendorId << ":" << std::setw(4) << productId << " " <<
+				reportedName << ")";
 		}
 		else
 		{
-			reportedName[sizeof(reportedName)-1] = '\0';
+			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (????:???? " <<
+				reportedName << ")";
 		}
-
-		struct input_id reportedId;
-		if (ioctl(handle->get(), EVIOCGID, &reportedId) < 0)
-		{
-			int error = errno;
-			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGID): error " << error << ", " <<
-				getSystemErrorText(error);
-			continue;
-		}
-#else /* HID_WINDDK_XXX */
-		// TODO(advornik): Implement device attribute scanning like we do on Linux.
-
-		char reportedName[1024] = "???";  // TODO(advornik): Implement querying names?
-#endif /* HID_WINDDK_XXX */
-
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
 
 		if (! handle->hasTranslationAndRotationAxes())
 		{
