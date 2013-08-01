@@ -18,6 +18,7 @@
 
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
+#include <SurgSim/Graphics/OsgCapsuleRepresentation.h>
 #include <SurgSim/Graphics/OsgCylinderRepresentation.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
@@ -87,12 +88,16 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 {
 	///	Box position
 	Vector3d boxPosition(0.0, 0.0, -0.2);
+	/// Capsule position
+	Vector3d capsulePosition(-0.08, 0.0, -0.2);
 	/// Cylinder position
-	Vector3d cylinderPosition(-0.05, 0.0, -0.2);
+	Vector3d cylinderPosition(-0.04, 0.0, -0.2);
 	/// Sphere position
 	Vector3d spherePosition(0.05, 0.0, -0.2);
 	/// Size of the box
 	Vector3d boxSize(0.03, 0.05, 0.05);
+	/// Size of the capsule (raidus, height)
+	Vector2d capsuleSize(0.01, 0.02);
 	/// Size of the cylinder
 	Vector2d cylinderSize(0.005, 0.015);
 	/// Radius of the sphere
@@ -102,9 +107,15 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	std::shared_ptr<BoxRepresentation> boxRepresentation =
 		std::make_shared<OsgBoxRepresentation>("box representation");
 	viewElement->addComponent(boxRepresentation);
+
+	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
+		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
+	viewElement->addComponent(capsuleRepresentation);
+
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation =
 		std::make_shared<OsgCylinderRepresentation>("cylinder representation");
 	viewElement->addComponent(cylinderRepresentation);
+
 	std::shared_ptr<SphereRepresentation> sphereRepresentation =
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
 	viewElement->addComponent(sphereRepresentation);
@@ -115,6 +126,8 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 
 	/// Interpolate position for box
 	boxRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), boxPosition ));
+	/// Interpolate position for capsule
+	capsuleRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition ));
 	/// Interpolate position for cylinder
 	cylinderRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), cylinderPosition ));
 	/// Interpolate position for sphere
@@ -122,6 +135,9 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 
 	/// Set the size of box
 	boxRepresentation->setSize(boxSize.x(), boxSize.y(), boxSize.z());
+	/// Set the size of capsule
+	/// Capsule should use Y-axis as its axis
+	capsuleRepresentation->setSize(capsuleSize.x(), capsuleSize.y());
 	/// Set the size of cylinder
 	/// Cylinder should use Y-axis as its axis
 	cylinderRepresentation->setSize(cylinderSize.x(), cylinderSize.y());
