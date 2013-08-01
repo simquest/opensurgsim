@@ -95,7 +95,7 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	/// Sphere position
 	Vector3d spherePosition(0.05, 0.0, -0.2);
 	/// Size of the box
-	Vector3d boxSize(0.01, 0.01, 0.01);
+	Vector3d boxSize(0.01, 0.015, 0.01);
 	/// Size of the capsule (raidus, height)
 	Vector2d capsuleSize(0.005, 0.015);
 	/// Size of the cylinder
