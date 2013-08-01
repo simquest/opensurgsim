@@ -20,6 +20,7 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+#include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Physics/SolveMlcp.h>
 #include <SurgSim/Math/MlcpGaussSeidelSolver.h>
 
@@ -45,6 +46,20 @@ std::shared_ptr<PhysicsManagerState> SolveMlcp::doUpdate(const double& dt,
 	return result;
 }
 
+void SolveMlcp::setMaxIterations(int maxIterations)
+{
+	m_gaussSeidelSolver.setMaxIterations(maxIterations);
+}
+
+void SolveMlcp::setSolverPrecision(double epsilon)
+{
+	m_gaussSeidelSolver.setEpsilonConvergence(epsilon);
+}
+
+void SolveMlcp::setContactTolerance(double epsilon)
+{
+	m_gaussSeidelSolver.setContactTolerance(epsilon);
+}
 
 }; // Physics
 }; // SurgSim

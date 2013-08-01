@@ -19,6 +19,7 @@
 
 #include <SurgSim/Physics/FreeMotion.h>
 #include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 
 namespace SurgSim
 {
@@ -44,9 +45,8 @@ std::shared_ptr<PhysicsManagerState> FreeMotion::doUpdate(
 	std::shared_ptr<PhysicsManagerState> result = state;
 	std::vector<std::shared_ptr<Representation>> representations = result->getRepresentations();
 
-	auto it = representations.begin();
-	auto itEnd = representations.end();
-	for (; it != itEnd; ++it)
+	auto const itEnd = representations.end();
+	for (auto it = representations.begin(); it != itEnd; ++it)
 	{
 		(*it)->update(dt);
 	}

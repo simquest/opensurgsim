@@ -14,10 +14,12 @@
 // limitations under the License.
 
 #include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
+#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
 
 #include <SurgSim/Physics/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+
 #include <SurgSim/Physics/Shapes.h>
 
 using SurgSim::Math::Quaterniond;
@@ -28,23 +30,50 @@ namespace SurgSim
 namespace Physics
 {
 
-std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(const double& radius,
-													  const Quaterniond& rotation,
-													  const Vector3d& position)
+std::shared_ptr<CollisionRepresentation> makeSphereRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation,
+	const double& radius,
+	const Quaterniond& rotation,
+	const Vector3d& position)
 {
 
 	std::shared_ptr<RigidShape> sphere = std::make_shared<SphereShape>(radius);
-	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<RigidShapeCollisionRepresentation>(sphere, rotation, position);
-	return rep;
+	return 	std::make_shared<MockCollisionRepresentation>(
+		"TestSphereShapeCollisionRep",
+		sphere,
+		rotation,
+		position,
+		representation);
 }
 
-std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(const Quaterniond& rotation,
-													  const Vector3d& position)
+std::shared_ptr<CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation,
+	const Quaterniond& rotation,
+	const Vector3d& position)
+{
+	std::shared_ptr<RigidShape> plane = std::make_shared<DoubleSidedPlaneShape>();
+	return 	std::make_shared<MockCollisionRepresentation>(
+		"TestDoubleSidedPlaneCollisionRep",
+		plane,
+		rotation,
+		position,
+		representation);
+}
+
+std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation,
+	const Quaterniond& rotation,
+	const Vector3d& position)
 {
 	std::shared_ptr<RigidShape> plane = std::make_shared<PlaneShape>();
 	std::shared_ptr<CollisionRepresentation> rep =
-		std::make_shared<RigidShapeCollisionRepresentation>(plane, rotation, position);
+		std::make_shared<MockCollisionRepresentation>(
+		"TestPlaneRepresentation",
+		plane,
+		rotation,
+		position,
+		representation);
+
 	return rep;
 }
 

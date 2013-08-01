@@ -46,17 +46,18 @@ public:
 
 	/// Gets the name.
 	/// \return	The name.
-	std::string getName()
+	std::string getName() const
 	{
 		return m_name;
 	};
 
-	bool isInitialized()
+	bool isInitialized() const
 	{
 		return m_didInit;
 	}
 
-	bool isAwake() {
+	bool isAwake() const
+	{
 		return m_didWakeUp;
 	}
 
@@ -77,7 +78,7 @@ public:
 		return doWakeUp();
 	};
 
-	std::shared_ptr<Runtime> getRuntime()
+	std::shared_ptr<Runtime> getRuntime() const
 	{
 		return m_runtime.lock();
 	}

@@ -19,8 +19,6 @@
 #include <SurgSim/Graphics/OsgUniformBase.h>
 #include <SurgSim/Graphics/Uniform.h>
 
-#include <osg/Uniform>
-
 namespace SurgSim
 {
 

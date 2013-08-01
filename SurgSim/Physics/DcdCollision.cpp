@@ -19,6 +19,8 @@
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/CollisionPair.h>
 #include <SurgSim/Physics/ContactCalculation.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
+
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
@@ -34,7 +36,6 @@ DcdCollision::DcdCollision(bool doCopyState) : Computation(doCopyState)
 
 DcdCollision::~DcdCollision()
 {
-	m_pairs.clear();
 }
 
 std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
@@ -45,17 +46,12 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 	updatePairs(result);
 
 	std::vector<std::shared_ptr<CollisionPair>> pairs = result->getCollisionPairs();
-	auto it = m_pairs.cbegin();
-	auto itEnd = m_pairs.cend();
+	auto it = pairs.cbegin();
+	auto itEnd = pairs.cend();
 	while (it != itEnd)
 	{
-		int i = (*it)->getFirst()->getShapeType();
-		int j = (*it)->getSecond()->getShapeType();
-		if (m_contactCalculations[i][j]->needsSwap())
-		{
-			(*it)->swapRepresentations();
-		}
-		m_contactCalculations[i][j]->calculateContact(*it);
+		m_contactCalculations[(*it)->getFirst()->getShapeType()][(*it)->getSecond()->getShapeType()]->
+			calculateContact(*it);
 		++it;
 	}
 	return result;
@@ -70,46 +66,41 @@ void DcdCollision::populateCalculationTable()
 			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
 		}
 	}
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_SPHERE].reset(new SphereSphereDcdContact());
-	m_contactCalculations[RIGID_SHAPE_TYPE_SPHERE][RIGID_SHAPE_TYPE_PLANE].reset(new SpherePlaneDcdContact(false));
-	m_contactCalculations[RIGID_SHAPE_TYPE_PLANE][RIGID_SHAPE_TYPE_SPHERE].reset(new SpherePlaneDcdContact(true));
+	setDcdContactInTable(std::make_shared<SphereSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SphereDoubleSidedPlaneDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<Representation>> representations = state->getRepresentations();
-	std::list<std::shared_ptr<RigidRepresentation>> rigidRepresentations;
+	std::vector<std::shared_ptr<CollisionRepresentation>> representations = state->getCollisionRepresentations();
 
 	if (representations.size() > 1)
 	{
-		for (auto it = representations.cbegin(); it != representations.cend(); ++it)
-		{
-			std::shared_ptr<RigidRepresentation> rigid = std::dynamic_pointer_cast<RigidRepresentation>(*it);
-			if (rigid != nullptr && rigid->isActive())
-			{
-				rigidRepresentations.push_back(rigid);
-			}
-		}
-	}
-
-	if (rigidRepresentations.size() > 1)
-	{
 		std::vector<std::shared_ptr<CollisionPair>> pairs;
-		auto firstEnd = rigidRepresentations.end();
+		auto firstEnd = std::end(representations);
 		--firstEnd;
-		for (auto first = rigidRepresentations.begin(); first != firstEnd; ++first)
+		for (auto first = std::begin(representations); first != firstEnd; ++first)
 		{
-			std::list<std::shared_ptr<RigidRepresentation>>::iterator second = first;
+			auto second = first;
 			++second;
-			for (; second != rigidRepresentations.end(); ++second)
+			for (; second != std::end(representations); ++second)
 			{
 				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
-				pair->setRepresentations(std::make_shared<RigidCollisionRepresentation>(*first),
-					std::make_shared<RigidCollisionRepresentation>(*second));
+				pair->setRepresentations(*first,*second);
 				pairs.push_back(pair);
 			}
 		}
 		state->setCollisionPairs(pairs);
+	}
+}
+
+void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
+{
+	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
+	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;
+	if(shapeTypes.first != shapeTypes.second)
+	{
+		m_contactCalculations[shapeTypes.second][shapeTypes.first] = dcdContact;
 	}
 }
 
