@@ -95,13 +95,13 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	/// Sphere position
 	Vector3d spherePosition(0.05, 0.0, -0.2);
 	/// Size of the box
-	Vector3d boxSize(0.03, 0.05, 0.05);
+	Vector3d boxSize(0.01, 0.01, 0.01);
 	/// Size of the capsule (raidus, height)
-	Vector2d capsuleSize(0.01, 0.02);
+	Vector2d capsuleSize(0.005, 0.015);
 	/// Size of the cylinder
 	Vector2d cylinderSize(0.005, 0.015);
 	/// Radius of the sphere
-	double sphereRadius = 0.006;
+	double sphereRadius = 0.005;
 
 	/// Add representations to the view element so we don't need to make another concrete scene element
 	std::shared_ptr<BoxRepresentation> boxRepresentation =
