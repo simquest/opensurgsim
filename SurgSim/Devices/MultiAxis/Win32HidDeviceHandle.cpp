@@ -177,32 +177,6 @@ std::unique_ptr<Win32HidDeviceHandle> Win32HidDeviceHandle::open(
 	return object;
 }
 
-bool Win32HidDeviceHandle::canRead() const
-{
-	return m_state->handle.canRead();
-}
-
-bool Win32HidDeviceHandle::canWrite() const
-{
-	return m_state->handle.canWrite();
-}
-
-bool Win32HidDeviceHandle::hasDataToRead() const
-{
-	return m_state->handle.hasDataToRead();
-}
-
-bool Win32HidDeviceHandle::readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead)
-{
-	return m_state->handle.readBytes(dataBuffer, bytesToRead, bytesActuallyRead);
-}
-
-// XXX HORRIBLE HACK!!!
-void* Win32HidDeviceHandle::get() const
-{
-	return m_state->handle.get();
-}
-
 static std::string convertWideString(const wchar_t* wideString)
 {
 	char buffer[4096];

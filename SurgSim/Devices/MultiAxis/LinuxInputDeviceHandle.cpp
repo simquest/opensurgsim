@@ -111,32 +111,6 @@ std::unique_ptr<LinuxInputDeviceHandle> LinuxInputDeviceHandle::open(
 	return object;
 }
 
-bool LinuxInputDeviceHandle::canRead() const
-{
-	return m_state->handle.canRead();
-}
-
-bool LinuxInputDeviceHandle::canWrite() const
-{
-	return m_state->handle.canWrite();
-}
-
-bool LinuxInputDeviceHandle::hasDataToRead() const
-{
-	return m_state->handle.hasDataToRead();
-}
-
-bool LinuxInputDeviceHandle::readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead)
-{
-	return m_state->handle.readBytes(dataBuffer, bytesToRead, bytesActuallyRead);
-}
-
-// XXX HORRIBLE HACK!!!
-int LinuxInputDeviceHandle::get() const
-{
-	return m_state->handle.get();
-}
-
 std::string LinuxInputDeviceHandle::getDeviceName() const
 {
 	char reportedName[1024];

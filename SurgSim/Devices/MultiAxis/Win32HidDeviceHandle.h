@@ -55,25 +55,10 @@ public:
 	virtual std::string getDeviceName() const override;
 
 	virtual bool getDeviceIds(int* vendorId, int* productId) const override;
-	
+
 	virtual bool hasTranslationAndRotationAxes() const override;
 
 	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) override;
-
-	virtual bool canRead() const override;
-
-	virtual bool canWrite() const override;
-
-	virtual bool hasDataToRead() const override;
-
-	virtual bool readBytes(void* dataBuffer, size_t bytesToRead, size_t* bytesActuallyRead) override;
-
-	// XXX HORRIBLE HACK!!!
-#ifndef HID_WINDDK_XXX
-	virtual int get() const override;
-#else /* HID_WINDDK_XXX */
-	virtual void* get() const override;
-#endif /* HID_WINDDK_XXX */
 
 private:
 	/// Constructor.

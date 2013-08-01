@@ -15,25 +15,6 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 
-#ifndef HID_WINDDK_XXX
-#include <linux/input.h>
-
-#include <sys/ioctl.h>
-#else /* HID_WINDDK_XXX */
-#undef  _WIN32_WINNT
-#define _WIN32_WINNT 0x0501   // request Windows XP-compatible SDK APIs
-#undef  WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN   // do not automatically include WinSock 1 and some other header files
-#include <windows.h>
-
-#include <setupapi.h>
-extern "C" {  // sigh...
-#include <hidsdi.h>
-}
-#endif /* HID_WINDDK_XXX */
-
-#include <stdint.h>
-
 #include <vector>
 #include <list>
 #include <array>
