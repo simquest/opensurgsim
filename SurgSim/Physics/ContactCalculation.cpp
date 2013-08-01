@@ -55,8 +55,7 @@ void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> p
 	Vector3d firstCenter = pair->getFirst()->getPose().translation();
 	Vector3d secondCenter = pair->getSecond()->getPose().translation();
 
-
-	Vector3d normal = secondCenter - firstCenter;
+	Vector3d normal = firstCenter - secondCenter;
 	double dist = normal.norm();
 	double maxDist = firstSphere->getRadius() + secondSphere->getRadius();
 	if (dist < maxDist)
@@ -111,8 +110,6 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 		pair->addContact(depth, normal, penetrationPoints);
 	}
 }
-
-
 
 
 }; // Physics
