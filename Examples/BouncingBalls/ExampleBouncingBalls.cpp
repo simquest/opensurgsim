@@ -30,7 +30,6 @@
 #include <SurgSim/Graphics/OsgPlaneRepresentation.h>
 #include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Graphics/OsgTextureUniform.h>
 #include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
