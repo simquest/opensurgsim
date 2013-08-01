@@ -16,8 +16,11 @@
 #ifndef SURGSIM_GRAPHICS_OSGCAMERA_H
 #define SURGSIM_GRAPHICS_OSGCAMERA_H
 
+#include <unordered_map>
+
 #include <SurgSim/Graphics/Camera.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
+#include <SurgSim/Graphics/Texture.h>
 
 #include <osg/Camera>
 #include <osg/Switch>
@@ -33,6 +36,7 @@ namespace Graphics
 {
 
 class Material;
+class Texture;
 
 /// OSG implementation of a graphics camera.
 ///
@@ -105,12 +109,22 @@ public:
 		return m_switch;
 	}
 
+	/// Sets a texture to be used as a color render target.
+	/// \param	texture	The texture to be used as a target.
+	/// \return	true if it succeeds, false if it fails.
+	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) override;
+
+	/// Gets the texture that is being used as the color render target.
+	/// \return	The color render texture.
+	virtual std::shared_ptr<Texture> getColorRenderTexture() const override;
+
+	///@{
+	/// This does not make a sense for a camera, they are disabled.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
-
 	virtual std::shared_ptr<Material> getMaterial() const;
-
 	virtual void clearMaterial();
-
+	///@}
+	///
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -121,6 +135,8 @@ private:
 	SurgSim::Math::Matrix44d m_viewMatrix;
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;
+
+	std::unordered_map<int, std::shared_ptr<Texture>> m_textureMap;
 };
 
 };  // namespace Graphics

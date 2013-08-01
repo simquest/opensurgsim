@@ -27,6 +27,7 @@ namespace Graphics
 {
 
 class Group;
+class Texture;
 
 /// Base graphics camera class, which defines the basic interface for all graphics cameras.
 ///
@@ -78,6 +79,10 @@ public:
 	/// Gets the projection matrix of the camera
 	/// \return	Projection matrix
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
+
+	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) = 0;
+
+	virtual std::shared_ptr<Texture> getColorRenderTexture() const = 0;
 
 private:
 	/// Group of representations that this camera sees

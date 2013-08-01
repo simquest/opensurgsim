@@ -23,11 +23,16 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Graphics/OsgUniform.h>
+#include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/OsgCamera.h>
+#include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Graphics/OsgTexture2d.h>
 #include <SurgSim/Graphics/OsgTextureRectangle.h>
 #include <SurgSim/Graphics/View.h>
+#include <SurgSim/Graphics/OsgBoxRepresentation.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 
 #include <SurgSim/Testing/MathUtilities.h>
 
@@ -163,6 +168,70 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 	EXPECT_TRUE(viewElement->isInitialized());
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
+}
+// Should show two rotating cubes, one in the middle of the screen being rendered normally, the
+// other one in the top right hand corner, being rendered onto a texture mapped on a quad
+TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
+{
+
+	auto defaultCamera = graphicsManager->getDefaultCamera();
+	auto camera = std::make_shared<OsgCamera>("Texture");
+	camera->setViewMatrix(defaultCamera->getViewMatrix());
+	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	auto texture = std::make_shared<OsgTexture2d>();
+	int width, height;
+	viewElement->getView()->getDimensions(&width,&height);
+
+	texture->setSize(width,height);
+	camera->setColorRenderTexture(texture);
+
+
+	viewElement->addComponent(camera);
+
+	width = width/3;
+	height = height/3;
+
+	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad", viewElement->getView());
+	quad->setSize(width,height);
+	Quaterniond quat;
+	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
+	quad->setInitialPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(800-width,600-height,-0.2)));
+	quad->setTexture(texture);
+	viewElement->addComponent(quad);
+
+
+	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0,0.0,-0.2));
+	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
+	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0,0.0,-0.2));
+
+	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	boxRepresentation1->setSize(0.05,0.05,0.05);
+	boxRepresentation1->setPose(startPose);
+	auto group = std::make_shared<OsgGroup>("RenderPass");
+	group->add(boxRepresentation1);
+	camera->setGroup(group);
+	viewElement->addComponent(group);
+
+	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
+	boxRepresentation->setSize(0.05,0.05,0.05);
+	viewElement->addComponent(boxRepresentation);
+
+	/// Run the thread
+	runtime->start();
+
+	int numSteps = 1000;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(5000));
+	for (int i = 0; i < numSteps; ++i)
+	{
+		double t = static_cast<double>(i) / numSteps;
+		boxRepresentation->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
+		boxRepresentation1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
+		camera->setViewMatrix(defaultCamera->getViewMatrix());
+		camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 100));
+	}
 }
 
 }; // namespace Graphics
