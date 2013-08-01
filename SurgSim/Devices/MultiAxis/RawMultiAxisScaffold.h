@@ -142,11 +142,6 @@ private:
 	/// \return The system-specific wrapper for the device.
 	std::unique_ptr<SystemInputDeviceHandle> openDevice(const std::string& path);
 
-	/// Checks if the specified device has all six translation/rotation coordinate axes.
-	/// \param [in,out]	deviceHandle	The system-specific wrapper for the device.
-	/// \return	true if it succeeds, false if it fails.
-	bool deviceHasSixAxes(SystemInputDeviceHandle* deviceHandle);
-
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 

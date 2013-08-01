@@ -41,6 +41,23 @@ namespace SurgSim
 namespace Device
 {
 
+// Usage page and usage IDs for interface devices; see e.g. http://www.usb.org/developers/devclass_docs/Hut1_12v2.pdf
+enum UsagePageConstants
+{
+	DEV_USAGE_PAGE_GENERIC_DESKTOP		= 0x01		// Generic Desktop usage page
+};
+enum UsageConstants
+{
+	// Usages for the DEV_USAGE_PAGE_GENERIC_DESKTOP usage page:
+	DEV_USAGE_ID_MOUSE						= 0x02,	// Mouse usage ID
+	DEV_USAGE_ID_JOYSTICK					= 0x04,	// Joystick usage ID
+	DEV_USAGE_ID_GAME_PAD					= 0x05,	// Game Pad usage ID
+	DEV_USAGE_ID_KEYBOARD					= 0x06,	// Keyboard usage ID
+	DEV_USAGE_ID_KEYPAD						= 0x07,	// Keypad usage ID
+	DEV_USAGE_ID_MULTI_AXIS_CONTROLLER		= 0x08	// Multi-axis Controller usage ID
+};
+
+
 struct Win32HidDeviceHandle::State
 {
 public:
@@ -184,6 +201,61 @@ bool Win32HidDeviceHandle::readBytes(void* dataBuffer, size_t bytesToRead, size_
 void* Win32HidDeviceHandle::get() const
 {
 	return m_state->handle.get();
+}
+
+bool Win32HidDeviceHandle::getCapabilities(HIDP_CAPS* capabilities) const
+{
+	PHIDP_PREPARSED_DATA preParsedData = 0;
+	if (HidD_GetPreparsedData(m_state->handle.get(), &preParsedData) != TRUE)
+	{
+		DWORD error = GetLastError();
+		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: Could not get preparsed data: error " << error <<
+			", " << getSystemErrorText(error);
+		return false;
+	}
+
+	if (HidP_GetCaps(preParsedData, capabilities) != HIDP_STATUS_SUCCESS)
+	{
+		DWORD error = GetLastError();
+		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: Could not get capabilities: error " << error <<
+			", " << getSystemErrorText(error);
+		HidD_FreePreparsedData(preParsedData);
+		return false;
+	}
+
+	HidD_FreePreparsedData(preParsedData);  // don't need the pre-parsed data any more
+	return true;
+}
+
+bool Win32HidDeviceHandle::hasTranslationAndRotationAxes() const
+{
+	HIDP_CAPS capabilities;
+	if (! getCapabilities(&capabilities))
+	{
+		// message already shown
+		return false;
+	}
+
+	if ((capabilities.UsagePage != DEV_USAGE_PAGE_GENERIC_DESKTOP) ||
+		(capabilities.Usage != DEV_USAGE_ID_MULTI_AXIS_CONTROLLER))
+	{
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Win32HidDeviceHandle: device is not a multi-axis controller.";
+		return false;
+	}
+
+	int numExtraAxes = static_cast<int>(capabilities.NumberInputValueCaps) - 6;
+	if (numExtraAxes < 0)
+	{
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Win32HidDeviceHandle: device does not have 6 input axes.";
+		return false;
+	}
+	else if (numExtraAxes > 0)
+	{
+		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: device has more than 6 axes;" <<
+			" ignoring " << numExtraAxes << " additional axes.";
+	}
+
+	return true;
 }
 
 static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)

@@ -137,6 +137,89 @@ int LinuxInputDeviceHandle::get() const
 	return m_state->handle.get();
 }
 
+bool LinuxInputDeviceHandle::hasAbsoluteTranslationAndRotationAxes() const
+{
+	BitSetBuffer<ABS_CNT> buffer;
+	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	{
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGBIT(EV_ABS)): error " <<
+			error << ", " << getSystemErrorText(error);
+		return false;
+	}
+
+	if (! buffer.test(ABS_X) || ! buffer.test(ABS_Y) || ! buffer.test(ABS_Z) ||
+		! buffer.test(ABS_RX) || ! buffer.test(ABS_RY) || ! buffer.test(ABS_RZ))
+	{
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: does not have the 6 absolute axes.";
+		return false;
+	}
+
+	int numIgnoredAxes = 0;
+	for (size_t i = 0;  i < ABS_CNT;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			if ((i != ABS_X) && (i != ABS_Y) && (i != ABS_Z) && (i != ABS_RX) && (i != ABS_RY) && (i != ABS_RZ))
+			{
+				++numIgnoredAxes;
+			}
+		}
+	}
+
+
+	if (numIgnoredAxes)
+	{
+		SURGSIM_LOG_INFO(m_state->logger) << "LinuxInputDeviceHandle: has absolute translation and rotation axes;" <<
+			" ignoring " << numIgnoredAxes << " additional axes.";
+	}
+
+	return true;
+}
+
+bool LinuxInputDeviceHandle::hasRelativeTranslationAndRotationAxes() const
+{
+	BitSetBuffer<REL_CNT> buffer;
+	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
+	{
+		int error = errno;
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGBIT(EV_REL)): error " <<
+			error << ", " << getSystemErrorText(error);
+		return false;
+	}
+
+	if (! buffer.test(REL_X) || ! buffer.test(REL_Y) || ! buffer.test(REL_Z) ||
+		! buffer.test(REL_RX) || ! buffer.test(REL_RY) || ! buffer.test(REL_RZ))
+	{
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: does not have the 6 relative axes.";
+		return false;
+	}
+
+	int numIgnoredAxes = 0;
+	for (size_t i = 0;  i < REL_CNT;  ++i)
+	{
+		if (buffer.test(i))
+		{
+			if ((i != REL_X) && (i != REL_Y) && (i != REL_Z) && (i != REL_RX) && (i != REL_RY) && (i != REL_RZ))
+			{
+				++numIgnoredAxes;
+			}
+		}
+	}
+	if (numIgnoredAxes)
+	{
+		SURGSIM_LOG_INFO(m_state->logger) << "LinuxInputDeviceHandle: has relative translation and rotation axes;" <<
+			" ignoring " << numIgnoredAxes << " additional axes.";
+	}
+
+	return true;
+}
+
+bool LinuxInputDeviceHandle::hasTranslationAndRotationAxes() const
+{
+	return hasAbsoluteTranslationAndRotationAxes() || hasRelativeTranslationAndRotationAxes();
+}
+
 bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	while (m_state->handle.hasDataToRead())

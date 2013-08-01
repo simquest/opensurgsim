@@ -61,6 +61,10 @@ public:
 	static std::unique_ptr<SystemInputDeviceHandle> open(const std::string& path,
 		std::shared_ptr<SurgSim::Framework::Logger> logger);
 
+	/// Query if this device has 3 translation and 3 rotation axes.
+	/// \return	true if the desired axes are present.
+	virtual bool hasTranslationAndRotationAxes() const = 0;
+
 	/// Updates the axis and states from the device input, if any.
 	/// \param [in,out] axisStates	The states for each axis of the device.
 	/// \param [in,out] buttonStates	The states for each device button.
