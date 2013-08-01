@@ -472,13 +472,6 @@ std::unique_ptr<SystemInputDeviceHandle> RawMultiAxisScaffold::openDevice(const 
 	if (! handle)
 	{
 		int64_t error = getSystemErrorCode();
-#ifndef HID_WINDDK_XXX
-		// XXX FIXME TODO(advornik): does not belong here...
-		if (error == ENOENT)
-		{
-			return std::move(handle);
-		}
-#endif /* HID_WINDDK_XXX */
 		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
 			", " << getSystemErrorText(error);
 	}
@@ -508,26 +501,13 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		return false;
 	}
 
-#ifdef HID_WINDDK_XXX
-	// Prepare to iterate over the attached HID devices
-	GUID hidGuid;
-	HidD_GetHidGuid(&hidGuid);
-	HDEVINFO hidDeviceInfo = SetupDiGetClassDevs(&hidGuid, NULL, NULL,
-		DIGCF_DEVICEINTERFACE | DIGCF_PRESENT | DIGCF_PROFILE);
-	if (hidDeviceInfo == INVALID_HANDLE_VALUE)
-	{
-		DWORD error = GetLastError();
-		SURGSIM_LOG_CRITICAL(m_logger) << "RawMultiAxis: Failed to query attached HID devices;" <<
-			" SetupDiGetClassDevs() failed with error " << error << ", " << getSystemErrorText(error);
-		return false;
-	}
-#endif /* HID_WINDDK_XXX */
+	const std::vector<std::string> devicePaths = SystemInputDeviceHandle::enumerate(m_logger.get());
 
-#ifndef HID_WINDDK_XXX
-	for (int i = 0;  i < 32;  ++i)
+	for (auto it = devicePaths.cbegin();  it != devicePaths.cend();  ++it)
 	{
-		char devicePath[128];
-		snprintf(devicePath, sizeof(devicePath), "/dev/input/event%d", i);
+		const std::string& devicePath = *it;
+
+		// Check if this is the device we wanted.
 
 		std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(devicePath);
 		if (! handle)
@@ -536,6 +516,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 			continue;
 		}
 
+#ifndef HID_WINDDK_XXX
 		char reportedName[1024];
 		if (ioctl(handle->get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
 		{
@@ -548,7 +529,6 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		{
 			reportedName[sizeof(reportedName)-1] = '\0';
 		}
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
 
 		struct input_id reportedId;
 		if (ioctl(handle->get(), EVIOCGID, &reportedId) < 0)
@@ -558,97 +538,12 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 				getSystemErrorText(error);
 			continue;
 		}
-
-		if (! deviceHasSixAxes(handle.get()))
-		{
-			continue;
-		}
-
-		handle.reset();
-
-		if (registerIfUnused(devicePath, device, numUsedDevicesSeen))
-		{
-			return true;
-		}
-	}
-
 #else /* HID_WINDDK_XXX */
-	// Loop through the device list, looking for the devices we want
-	int hidEnumerationIndex = 0;
-	SP_DEVICE_INTERFACE_DATA deviceInterfaceData;
-	deviceInterfaceData.cbSize = sizeof(deviceInterfaceData);
-	SP_DEVICE_INTERFACE_DETAIL_DATA* deviceInterfaceDetail = 0;
-	DWORD deviceInterfaceDetailSize = 0;
-
-	int numMultiAxisDevices = 0;
-	int numDevicesWithType  = 0;
-
-	while (1)
-	{
-		// Get the next interface in the list.
-		if (! SetupDiEnumDeviceInterfaces(hidDeviceInfo, NULL, &hidGuid, hidEnumerationIndex, &deviceInterfaceData))
-		{
-			DWORD error = GetLastError();
-			if (error == ERROR_NO_MORE_ITEMS)
-			{
-				break;
-			}
-			else
-			{
-				SURGSIM_LOG_CRITICAL(m_logger) << "RawMultiAxis: Failed to query attached HID devices;" <<
-					" SetupDiEnumDeviceInterfaces() failed with error " << error << ", " << getSystemErrorText(error);
-				return false;
-			}
-		}
-
-		// Increment the counter for the next pass.  Make sure not to use this value directly later in the loop!
-		++hidEnumerationIndex;
-
-		// Find out the required size.
-		DWORD neededSize = 0;
-		if (! SetupDiGetDeviceInterfaceDetail(hidDeviceInfo, &deviceInterfaceData, NULL, 0, &neededSize, NULL))
-		{
-			DWORD error = GetLastError();
-			if (error != ERROR_INSUFFICIENT_BUFFER)
-			{
-				SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Failed to get the required device detail size," <<
-					" device will be ignored; error " << error << ", " << getSystemErrorText(error);
-				continue;
-			}
-		}
-
-		// Make sure we have enough memory.
-		if (neededSize > deviceInterfaceDetailSize)
-		{
-			deviceInterfaceDetailSize = 2*neededSize;
-			if (deviceInterfaceDetail)
-				free(deviceInterfaceDetail);
-			deviceInterfaceDetail = static_cast<SP_DEVICE_INTERFACE_DETAIL_DATA*>( malloc(deviceInterfaceDetailSize) );
-		}
-
-		// Get the device detail (which actually just means the path).
-		deviceInterfaceDetail->cbSize = sizeof(*deviceInterfaceDetail);
-		if (! SetupDiGetDeviceInterfaceDetail(hidDeviceInfo, &deviceInterfaceData,
-			deviceInterfaceDetail, deviceInterfaceDetailSize, NULL, NULL))
-		{
-			DWORD error = GetLastError();
-			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Failed to get the HID device detail," <<
-					" device will be ignored; error " << error << ", " << getSystemErrorText(error);
-			continue;
-		}
-
-		// Check if this is the device we wanted.
 		// TODO(advornik): Implement device attribute scanning like we do on Linux.
 
-		std::string devicePath(deviceInterfaceDetail->DevicePath);
-		std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(devicePath);
-		if (! handle)
-		{
-			// message was already printed
-			continue;
-		}
-
 		char reportedName[1024] = "???";  // TODO(advornik): Implement querying names?
+#endif /* HID_WINDDK_XXX */
+
 		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
 
 		if (! deviceHasSixAxes(handle.get()))
@@ -663,16 +558,6 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 			return true;
 		}
 	}
-#endif /* HID_WINDDK_XXX */
-
-#ifdef HID_WINDDK_XXX
-	// Free the detail buffer
-	if (deviceInterfaceDetail)
-	{
-		free(deviceInterfaceDetail);
-		deviceInterfaceDetail = 0;
-	}
-#endif /* HID_WINDDK_XXX */
 
 	return false;
 }

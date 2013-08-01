@@ -18,6 +18,8 @@
 
 #include <string>
 #include <memory>
+#include <array>
+#include <vector>
 
 #include <SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h>
 
@@ -33,6 +35,11 @@ class Win32HidDeviceHandle : public SystemInputDeviceHandle
 public:
 	/// Destructor.
 	~Win32HidDeviceHandle();
+
+	/// Enumerates input devices.
+	/// \param logger	The logger to be used during enumeration.
+	/// \return	A list of device paths.
+	static std::vector<std::string> enumerate(SurgSim::Framework::Logger* logger);
 
 	/// Opens the given path and creates an access wrapper for the device.
 	/// \param	path	Full pathname for the device.

@@ -17,6 +17,7 @@
 
 #include <linux/input.h>
 #include <sys/ioctl.h>
+#include <errno.h>
 
 #include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
@@ -57,6 +58,33 @@ LinuxInputDeviceHandle::LinuxInputDeviceHandle(std::shared_ptr<SurgSim::Framewor
 
 LinuxInputDeviceHandle::~LinuxInputDeviceHandle()
 {
+}
+
+std::vector<std::string> LinuxInputDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
+{
+	std::vector<std::string> results;
+
+	for (int i = 0;  i < 100;  ++i)
+	{
+		char devicePath[128];
+		snprintf(devicePath, sizeof(devicePath), "/dev/input/event%d", i);
+
+		FileDescriptor handle;
+		if (! handle.openForReadingAndMaybeWriting(devicePath))
+		{
+			int error = errno;
+			if (error != ENOENT)
+			{
+				SURGSIM_LOG_INFO(logger) << "LinuxInputDeviceHandle::enumerate: Could not open device " << devicePath <<
+					": error " << error << ", " << getSystemErrorText(error);
+			}
+			continue;
+		}
+
+		results.push_back(devicePath);
+	}
+
+	return results;
 }
 
 std::unique_ptr<LinuxInputDeviceHandle> LinuxInputDeviceHandle::open(
