@@ -169,6 +169,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 }
+
 // Should show two rotating cubes, one in the middle of the screen being rendered normally, the
 // other one in the top right hand corner, being rendered onto a texture mapped on a quad
 TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
@@ -178,11 +179,15 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	auto camera = std::make_shared<OsgCamera>("Texture");
 	camera->setViewMatrix(defaultCamera->getViewMatrix());
 	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
-	auto texture = std::make_shared<OsgTexture2d>();
+	auto texture = std::make_shared<OsgTextureRectangle>();
 	int width, height;
 	viewElement->getView()->getDimensions(&width,&height);
-
 	texture->setSize(width,height);
+
+	osg::Texture* osgTexture = texture->getOsgTexture();
+	osgTexture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
+	osgTexture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
+
 	camera->setColorRenderTexture(texture);
 
 

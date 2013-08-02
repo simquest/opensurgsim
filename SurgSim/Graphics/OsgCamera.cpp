@@ -163,7 +163,7 @@ bool OsgCamera::setColorRenderTexture(std::shared_ptr<Texture> texture)
 		m_camera->setClearColor(osg::Vec4f(0.0, 0.0, 0.0, 1.0));
 		/// \todo HS-2013-aug-1 This should be FRAME_BUFFER_OBJECT for better performance but that
 		/// 	  does not seem to work, needs more investigation
-		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER, osg::Camera::PIXEL_BUFFER);
+		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::PIXEL_BUFFER);
 		m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 
 		int width = actualTexture->getTextureWidth();
