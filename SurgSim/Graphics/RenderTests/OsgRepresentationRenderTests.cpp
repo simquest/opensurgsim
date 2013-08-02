@@ -89,11 +89,11 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	///	Box position
 	Vector3d boxPosition(0.0, 0.0, -0.2);
 	/// Capsule position
-	Vector3d capsulePosition(-0.08, 0.0, -0.2);
+	Vector3d capsulePosition(-0.05, 0.0, -0.2);
 	/// Cylinder position
-	Vector3d cylinderPosition(-0.04, 0.0, -0.2);
+	Vector3d cylinderPosition(-0.025, 0.0, -0.2);
 	/// Sphere position
-	Vector3d spherePosition(0.05, 0.0, -0.2);
+	Vector3d spherePosition(0.025, 0.0, -0.2);
 	/// Size of the box
 	Vector3d boxSize(0.01, 0.015, 0.01);
 	/// Size of the capsule (raidus, height)
