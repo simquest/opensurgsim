@@ -45,3 +45,14 @@ TEST(SceneTest, ElementManagement)
 	EXPECT_EQ(element2, scene->getSceneElement("two"));
 	EXPECT_EQ(nullptr, scene->getSceneElement("nonexistentelement"));
 }
+
+TEST(SceneTest, AddAndTestScene)
+{
+	std::shared_ptr<Scene> scene(new Scene());
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement("element"));
+
+	EXPECT_TRUE(scene->addSceneElement(element));
+
+	EXPECT_EQ(scene, element->getScene());
+	
+}

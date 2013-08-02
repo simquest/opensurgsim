@@ -28,6 +28,7 @@ bool SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> el
 	std::string name = element->getName();
 	if (m_elements.find(name) == m_elements.end())
 	{
+		element->setScene(shared_from_this());
 		m_elements[name] = element;
 		std::shared_ptr<Runtime> runtime = m_runtime.lock();
 		if (runtime != nullptr)
@@ -54,6 +55,11 @@ std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) co
 void Scene::setRuntime(std::shared_ptr<Runtime> runtime)
 {
 	m_runtime = runtime;
+}
+
+std::shared_ptr<Runtime> Scene::getRuntime()
+{
+	return m_runtime.lock();
 }
 
 const std::map<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const

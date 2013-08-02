@@ -27,6 +27,8 @@ namespace Framework
 {
 
 // Forward References
+class SceneElement;
+class Scene;
 class Runtime;
 
 /// Component is the main interface class to pass information to the system managers each will decide
@@ -83,6 +85,33 @@ public:
 		return m_runtime.lock();
 	}
 
+	/// Sets the scene.
+	/// \param scene The scene for this component
+	void setScene(std::weak_ptr<Scene> scene)
+	{
+		m_scene = scene;
+	};
+
+	/// Gets the scene.
+	/// \return The scene for this component
+	std::shared_ptr<Scene> getScene()
+	{
+		return m_scene.lock();
+	};
+
+	/// Sets the scene element.
+	/// \param sceneElement The scene element for this component
+	void setSceneElement(std::weak_ptr<SceneElement> sceneElement)
+	{
+			m_sceneElement = sceneElement; 
+	};
+
+	/// Gets the scene element.
+	/// \return The scene element for this component
+	std::shared_ptr<SceneElement> getSceneElement()
+	{
+			return m_sceneElement.lock(); 
+	};
 protected:
 
 	/// Sets the name.
@@ -96,6 +125,9 @@ private:
 	std::string m_name;
 
 	std::weak_ptr<Runtime> m_runtime;
+	std::weak_ptr<Scene> m_scene;
+	std::weak_ptr<SceneElement> m_sceneElement;
+
 
 	virtual bool doInitialize() = 0;
 	virtual bool doWakeUp() = 0;

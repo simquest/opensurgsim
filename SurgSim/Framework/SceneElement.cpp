@@ -31,6 +31,9 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 
 	if (m_components.find(component->getName()) == m_components.end())
 	{
+		component->setSceneElement(getSharedPtr());
+		component->setScene(m_scene);
+		
 		m_components[component->getName()] = component;
 		result = true;
 	}
@@ -95,6 +98,16 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 	return result;
 }
 
+void SceneElement::setScene(std::weak_ptr<Scene> scene)
+{
+	m_scene = scene;
+}
+
+std::shared_ptr<Scene> SceneElement::getScene()
+{
+	return m_scene.lock();
+}
+
 void SceneElement::setRuntime(std::shared_ptr<Runtime> runtime)
 {
 	m_runtime = runtime;
@@ -103,6 +116,20 @@ void SceneElement::setRuntime(std::shared_ptr<Runtime> runtime)
 std::shared_ptr<Runtime> SceneElement::getRuntime()
 {
 	return m_runtime.lock();
+}
+
+std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
+{
+	std::shared_ptr<SceneElement> result;
+	try
+	{
+		result = shared_from_this();
+	}
+	catch (const std::exception&)
+	{
+		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr";
+	}
+	return result;
 }
 
 }; // namespace Framework
