@@ -141,11 +141,11 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 		double depth = distThreshold - dist;
 
 		// Calculate the normal going from the sphere to the capsule
-		Vector3d normal = (sphereCenter - result).normalized();
+		Vector3d normal = (result - sphereCenter).normalized();
 
 		std::pair<Location,Location> penetrationPoints;
-		penetrationPoints.first.globalPosition.setValue(result + normal * capsule->getRadius());
-		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
+		penetrationPoints.first.globalPosition.setValue(result - normal * capsule->getRadius());
+		penetrationPoints.second.globalPosition.setValue(sphereCenter + normal * sphere->getRadius());
 
 		pair->addContact(depth, normal, penetrationPoints);
 	}

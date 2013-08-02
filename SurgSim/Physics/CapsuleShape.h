@@ -24,7 +24,7 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Capsule shape: centered on (0 0 0), aligned along Y,
+/// Capsule shape: centered on (0, 0, 0), aligned along Y,
 /// with length and radius
 class CapsuleShape: public RigidShape
 {
@@ -76,15 +76,15 @@ public:
 		return Vector3d(0.0, 0.0, 0.0);
 	}
 
-	/// Return the top centre of the top circle of the capsule
-	/// \return The top centre of the capsule
+	/// Return the centre of the top sphere of the internal cylinder
+	/// \return The top centre of the sphere of the capsule
 	Vector3d topCentre() const
 	{
 		return Vector3d(0.0, m_length / 2.0, 0.0);
 	}
 
-	/// Return the centre of the bottom circle of the capsule
-	/// \return The bottom centre of the capsule
+	/// Return the centre of the bottom sphere of the internal cylinder
+	/// \return The bottom centre of the sphere of the capsule
 	Vector3d bottomCentre() const
 	{
 		return Vector3d(0.0, -m_length / 2.0, 0.0);
