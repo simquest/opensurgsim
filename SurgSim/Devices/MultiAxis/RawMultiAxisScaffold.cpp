@@ -578,7 +578,7 @@ bool RawMultiAxisScaffold::destroyPerDeviceThread(DeviceData* data)
 
 	std::unique_ptr<RawMultiAxisThread> thread = std::move(data->thread);
 	thread->stop();
-	thread.release();
+	thread.reset();
 
 	return true;
 }

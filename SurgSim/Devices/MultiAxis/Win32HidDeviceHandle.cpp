@@ -71,6 +71,11 @@ public:
 	std::shared_ptr<SurgSim::Framework::Logger> logger;
 	/// The underlying device file handle.
 	FileHandle handle;
+
+private:
+	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
+	State(const State& other) /*= delete*/;
+	State& operator=(const State& other) /*= delete*/;
 };
 
 Win32HidDeviceHandle::Win32HidDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
@@ -298,6 +303,8 @@ static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
 
 bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
+	*updated = false;
+
 	// We can't keep reading while data is available, because we don't know how to tell when data is available.
 	// Both WaitForSingleObject() and WaitForMultipleObjects() always claim data is available for 3DConnexion device
 	// file handles.  So we just do it once, blocking until we have data.
@@ -310,11 +317,21 @@ bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* bu
 		if (! m_state->handle.readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
 		{
 			int64_t error = getSystemErrorCode();
-			SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: read failed with error " << error << ", " <<
-				getSystemErrorText(error);
+			if (error == ERROR_DEVICE_NOT_CONNECTED)
+			{
+				SURGSIM_LOG_SEVERE(m_state->logger) <<
+					"Win32HidDeviceHandle: read failed; device has been disconnected!  (stopping)";
+				return false;  // stop updating this device!
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: read failed with error " <<
+					error << ", " << getSystemErrorText(error);
+			}
 		}
 		else if ((numRead >= 7) && (deviceBuffer[0] == 0x01))       // Translation
 		{
+			// We could parse this via HidP_GetData(), but that won't work for buttons (see below)
 			(*axisStates)[0] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
 			(*axisStates)[1] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
 			(*axisStates)[2] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
@@ -329,6 +346,7 @@ bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* bu
 		}
 		else if ((numRead >= 7) && (deviceBuffer[0] == 0x02))  // Rotation
 		{
+			// We could parse this via HidP_GetData(), but that won't work for buttons (see below)
 			(*axisStates)[3] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
 			(*axisStates)[4] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
 			(*axisStates)[5] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
@@ -343,6 +361,11 @@ bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* bu
 		}
 		else if ((numRead >= 2) && (deviceBuffer[0] == 0x03))  // Buttons
 		{
+			// We CAN'T parse buttons via HidP_GetData(), because 3DConnexion devices produce button state in a
+			// different report from the axes, so when the last button is released you simply get no data.  We could
+			// interpret "empty data list" as "the last button has been released", but that seems dangerous.  So we
+			// roll our own parsing for now, even though it may not work for other devices.  --advornik 2012-08-01
+
 			size_t currentByte = 1;  // Byte 0 specifies the packet type; data starts at byte 1
 			unsigned char currentBit = 0x01;
 			for (size_t i = 0;  i < (*buttonStates).size();  ++i)

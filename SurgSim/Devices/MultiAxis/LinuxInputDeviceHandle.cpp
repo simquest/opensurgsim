@@ -49,6 +49,11 @@ public:
 	FileDescriptor handle;
 	/// Event library button code corresponding to each index.
 	std::array<int, SystemInputDeviceHandle::MAX_NUM_BUTTONS> buttonCodes;
+
+private:
+	// Prevent copy construction and copy assignment.
+	State(const State& other) = delete;
+	State& operator=(const State& other) = delete;
 };
 
 LinuxInputDeviceHandle::LinuxInputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
@@ -230,6 +235,8 @@ bool LinuxInputDeviceHandle::hasTranslationAndRotationAxes() const
 
 bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
+	*updated = false;
+
 	while (m_state->handle.hasDataToRead())
 	{
 		struct input_event event;
@@ -240,18 +247,18 @@ bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* 
 			if (error == ENODEV)
 			{
 				SURGSIM_LOG_SEVERE(m_state->logger) <<
-					"RawMultiAxis: read failed; device has been disconnected!  (stopping)";
+					"LinuxInputDeviceHandle: read failed; device has been disconnected!  (stopping)";
 				return false;  // stop updating this device!
 			}
-			else if (error != EAGAIN)
+			else
 			{
-				SURGSIM_LOG_WARNING(m_state->logger) << "RawMultiAxis: read failed with error " << error << ", " <<
-					getSystemErrorText(error);
+				SURGSIM_LOG_WARNING(m_state->logger) << "LinuxInputDeviceHandle: read failed with error " <<
+					error << ", " << getSystemErrorText(error);
 			}
 		}
 		else if (numRead != sizeof(event))
 		{
-			SURGSIM_LOG_WARNING(m_state->logger) << "RawMultiAxis: reading produced " << numRead <<
+			SURGSIM_LOG_WARNING(m_state->logger) << "LinuxInputDeviceHandle: reading produced " << numRead <<
 				" bytes (expected " << sizeof(event) << ")";
 		}
 		else
@@ -307,8 +314,8 @@ std::vector<int> LinuxInputDeviceHandle::getDeviceButtonsAndKeys()
 	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): error " << error << ", " <<
-			getSystemErrorText(error);
+		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGBIT(EV_KEY)): error " <<
+			error << ", " << getSystemErrorText(error);
 		return result;
 	}
 
