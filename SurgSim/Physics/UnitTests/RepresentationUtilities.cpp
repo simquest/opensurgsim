@@ -79,13 +79,13 @@ std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(
 
 std::shared_ptr<CollisionRepresentation> makeCapsuleRepresentation(
 	std::shared_ptr<SurgSim::Physics::Representation> representation,
-	const double& radius,
 	const double& length,
+	const double& radius,
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
 
-	std::shared_ptr<RigidShape> capsule = std::make_shared<CapsuleShape>(radius, length);
+	std::shared_ptr<RigidShape> capsule = std::make_shared<CapsuleShape>(length, radius);
 	return 	std::make_shared<MockCollisionRepresentation>(
 		"TestCapsuleShapeCollisionRep",
 		capsule,

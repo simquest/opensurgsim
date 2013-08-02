@@ -120,9 +120,9 @@ void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> 
 	std::shared_ptr<CollisionRepresentation> representationSphere(pair->getSecond());
 
 	SURGSIM_ASSERT(representationCapsule->getShapeType() == RIGID_SHAPE_TYPE_CAPSULE) <<
-			"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
-	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
 			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+			"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
 
 	std::shared_ptr<CapsuleShape> capsule(std::static_pointer_cast<CapsuleShape>(representationCapsule->getShape()));
 	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));

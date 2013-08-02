@@ -250,7 +250,7 @@ TEST(ContactCalculationTests, PlaneSphereShouldFail)
 	EXPECT_ANY_THROW(contact.calculateContact(pairss));
 }
 
-void doCapsuleSphereTest(double capsuleRadius, double capsuleHeight,
+void doCapsuleSphereTest(double capsuleHeight, double capsuleRadius,
 						 const Vector3d& capsulePosition, const Quaterniond& capsuleQuat,
 						 double sphereRadius, const Vector3d& spherePosition, const Quaterniond& sphereQuat,
 						 bool hasContacts, double depth,
@@ -258,7 +258,7 @@ void doCapsuleSphereTest(double capsuleRadius, double capsuleHeight,
 						 const Vector3d& expectedNorm = Vector3d::Zero())
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(
-		makeCapsuleRepresentation(nullptr, capsuleRadius, capsuleHeight, capsuleQuat, capsulePosition),
+		makeCapsuleRepresentation(nullptr, capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
 		makeSphereRepresentation(nullptr, sphereRadius, sphereQuat, spherePosition));
 
 	CapsuleSphereDcdContact calc;
@@ -286,36 +286,36 @@ TEST(ContactCalculationTests, CapsuleSphereCalculation)
 {
 	{
 		SCOPED_TRACE("No Intersection");
-		doCapsuleSphereTest(0.1, 0.1, Vector3d::Zero(), Quaterniond::Identity(),
+		doCapsuleSphereTest(0.2, 0.1, Vector3d::Zero(), Quaterniond::Identity(),
 							0.1, Vector3d(1.0, 1.0, 1.0), Quaterniond::Identity(), false, 0.0);
 	}
 
 	{
-		SCOPED_TRACE("Intersection with capsule put along Y-axis");
-		doCapsuleSphereTest(0.5, 0.5, Vector3d::Zero(), Quaterniond::Identity(),
+		SCOPED_TRACE("Capsule along Y-axis, intersection with cylindrical part of the capsule");
+		doCapsuleSphereTest(0.8, 0.5, Vector3d::Zero(), Quaterniond::Identity(),
 							0.3, Vector3d(0.7, 0, 0), Quaterniond::Identity(), true, 0.1,
 							Vector3d::Zero(), Vector3d(-1.0, 0.0, 0.0));
 	}
 
 	{
-		SCOPED_TRACE("Intersection with capsule roated along Z-axis clockwise 90 degrees");
-		doCapsuleSphereTest(0.1, 0.1, Vector3d::Zero(),
+		SCOPED_TRACE("Capsule along X-axis, intersection with hemispherical part of the capsule");
+		doCapsuleSphereTest(0.1, 0.2, Vector3d::Zero(),
 							SurgSim::Math::makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
 							0.1, Vector3d(-0.2, 0.0, 0.0),
-							Quaterniond::Identity(), true, 0.05,
+							Quaterniond::Identity(), true, 0.15,
 							Vector3d(-0.05, 0.0, 0.0), Vector3d(1.0, 0.0, 0.0));
 	}
 
 	{
-		SCOPED_TRACE("Intersection with capsule roated along Z-axis clockwise 45 degrees");
+		SCOPED_TRACE("Intersection, capsule roated along Z-axis clockwise 45 degrees");
 		Vector3d sphereCenter(2.0, 0.0, 0.0);
 		Vector3d sphereProjection(1.0, 1.0, 0.0);
 		Vector3d expectedNormal = (sphereProjection - sphereCenter).normalized();
 
-		doCapsuleSphereTest(M_SQRT2, 2 * M_SQRT2, Vector3d::Zero(),
-							SurgSim::Math::makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
+		doCapsuleSphereTest(2 * M_SQRT2, M_SQRT2, Vector3d::Zero(),
+							SurgSim::Math::makeRotationQuaternion(-M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 							1.0, sphereCenter,
-							Quaterniond::Identity(), true, 1.0,
+							Quaterniond::Identity(), true, 1,
 							sphereProjection, expectedNormal);
 	}
 }
