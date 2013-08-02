@@ -32,6 +32,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 	if (m_components.find(component->getName()) == m_components.end())
 	{
 		component->setSceneElement(getSharedPtr());
+
 		component->setScene(m_scene);
 		
 		m_components[component->getName()] = component;

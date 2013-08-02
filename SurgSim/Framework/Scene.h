@@ -63,6 +63,7 @@ public:
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();
 
+	std::shared_ptr<Scene> getSharedPtr();
 
 private:
 	std::weak_ptr<Runtime> m_runtime;

@@ -73,7 +73,7 @@ public:
 
 	/// Gets all the components of this SceneElement.
 	/// \return	The components.
-	std::vector<std::shared_ptr<Component>> getComponents() const;
+	std::vector<std::shared_ptr<Component> > getComponents() const;
 
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.

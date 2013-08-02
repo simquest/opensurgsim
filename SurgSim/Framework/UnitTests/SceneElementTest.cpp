@@ -43,8 +43,8 @@ TEST(SceneElementTest, UpdateFunctions)
 
 TEST(SceneElementTest, AddAndTestComponents)
 {
-	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
-	std::shared_ptr<MockComponent> component(new MockComponent("TestComponent"));
+	std::shared_ptr<MockSceneElement> element = std::make_shared<MockSceneElement>();
+	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("TestComponent");
 	
 	EXPECT_TRUE(element->addComponent(component));
 

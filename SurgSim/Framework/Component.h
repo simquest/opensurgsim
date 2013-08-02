@@ -110,7 +110,7 @@ public:
 	/// \return The scene element for this component
 	std::shared_ptr<SceneElement> getSceneElement()
 	{
-			return m_sceneElement.lock(); 
+		return m_sceneElement.lock(); 
 	};
 protected:
 

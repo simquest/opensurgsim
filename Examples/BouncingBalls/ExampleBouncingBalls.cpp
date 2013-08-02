@@ -68,42 +68,6 @@ using SurgSim::Physics::PhysicsManager;
 ///\file Example of how to put together a very simple demo of  balls colliding with each other
 ///		 dcd is used in a very simple manner to detect the collisions between the spheres
 
-class SphereAddBehavior : public SurgSim::Framework::Behavior
-{
-public:
-	SphereAddBehavior():
-		Behavior("DynamicallyAddSphere"), m_totalTime(0.0)
-	{ }
-	
-	~SphereAddBehavior() {}
-
-	virtual void update(double dt)
-	{
-		m_totalTime += dt;
-		if (m_totalTime > 1.0) 
-		{
-			m_totalTime = 0.0;
-
-			setSceneElement(m_sphere);
-		}
-	}
-
-protected:
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
-	
-
-private:
-	double m_totalTime;
-	
-};
-
 /// Simple behavior to show that the spheres are moving while we don't have graphics
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
