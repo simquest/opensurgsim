@@ -29,6 +29,7 @@ extern "C" {  // sigh...
 #include <stdint.h>
 
 #include "SurgSim/Devices/MultiAxis/FileHandle.h"
+#include "SurgSim/Devices/MultiAxis/Win32NativeThread.h"
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
 #include <SurgSim/Framework/Log.h>
 
@@ -63,14 +64,26 @@ struct Win32HidDeviceHandle::State
 public:
 	explicit State(std::shared_ptr<SurgSim::Framework::Logger>&& logger_) :
 		logger(std::move(logger_)),
-		handle()
+		handle(),
+		readerThread(logger, "Win32HidDeviceHandle reader"),
+		wasReaderThreadStarted(false)
 	{
+		readerAxisStates.fill(0);
+		readerButtonStates.fill(false);
 	}
 
 	/// The logger to use.
 	std::shared_ptr<SurgSim::Framework::Logger> logger;
 	/// The underlying device file handle.
 	FileHandle handle;
+	/// The low-level thread that reads the data from the device.
+	Win32NativeThread readerThread;
+	/// True if the reader thread has been started.
+	bool wasReaderThreadStarted;
+	/// Axis states stored by the reader thread.
+	AxisStates readerAxisStates;
+	/// Button states stored by the reader thread.
+	ButtonStates readerButtonStates;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -85,6 +98,7 @@ Win32HidDeviceHandle::Win32HidDeviceHandle(std::shared_ptr<SurgSim::Framework::L
 
 Win32HidDeviceHandle::~Win32HidDeviceHandle()
 {
+	stopReaderThread();
 }
 
 std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
@@ -301,7 +315,7 @@ static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
 	return static_cast<int16_t>(static_cast<uint16_t>(byte0) | (static_cast<uint16_t>(byte1) << 8));
 }
 
-bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
+bool Win32HidDeviceHandle::readStateUpdates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	*updated = false;
 
@@ -390,6 +404,49 @@ bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* bu
 	}
 
 	return true;
+}
+
+bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
+{
+	if (! m_state->wasReaderThreadStarted)
+	{
+		startReaderThread();
+		m_state->wasReaderThreadStarted = true;
+	}
+	else if (! m_state->readerThread.isRunning())
+	{
+		SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: reader thread exited.";
+		return false;
+	}
+
+	// Copy the axis and button states from the reader thread's data.
+	//
+	// We do not do any locking or other synchronization, because synchronization in the reader thread could result in
+	// deadlock when the reader thread is killed.  The only real danger is that the reader states will be received
+	// out of order.
+	*axisStates = m_state->readerAxisStates;
+	*buttonStates = m_state->readerButtonStates;
+	*updated = true;
+	return true;
+}
+
+bool Win32HidDeviceHandle::startReaderThread()
+{
+	SURGSIM_ASSERT(! m_state->readerThread.isRunning());
+
+	AxisStates* axisStates = &(m_state->readerAxisStates);
+	ButtonStates* buttonStates = &(m_state->readerButtonStates);
+	auto task = [this, axisStates, buttonStates]() {
+		bool updated;
+		return readStateUpdates(axisStates, buttonStates, &updated);
+	};
+	return m_state->readerThread.start(task);
+}
+
+bool Win32HidDeviceHandle::stopReaderThread()
+{
+	bool status = m_state->readerThread.kill();
+	return (! m_state->readerThread.isRunning());
 }
 
 };  // namespace Device
