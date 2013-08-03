@@ -56,14 +56,12 @@ set(MULTIAXIS_DEVICE_WINHID_SOURCES
 	FileHandle.cpp
 	GetSystemErrorWin32.cpp
 	Win32HidDeviceHandle.cpp
-	Win32NativeThread.cpp
 )
 
 set(MULTIAXIS_DEVICE_WINHID_HEADERS
 	FileHandle.h
 	GetSystemError.h
 	Win32HidDeviceHandle.h
-	Win32NativeThread.h
 )
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

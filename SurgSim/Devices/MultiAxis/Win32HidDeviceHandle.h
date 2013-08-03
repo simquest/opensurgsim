@@ -74,23 +74,6 @@ private:
 	/// \return	true if it succeeds.
 	bool getCapabilities(struct _HIDP_CAPS* capabilities) const;
 
-	/// Reads state updates from the device.
-	/// May block indefinitely waiting for data.  This is a low-level call underlying the updateStates implementation.
-	/// \param [in,out] axisStates	The states for each axis of the device.
-	/// \param [in,out] buttonStates	The states for each device button.
-	/// \param [out] updated True if any states were actually updated.  (Note that even if this value is true, the
-	/// 	states may not have changed value; one or more states could have been updated to the same value.)
-	/// \return	true if the operation was successful; false if the device is no longer in a usable state.
-	bool readStateUpdates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated);
-
-	/// Starts the internal low-level reader thread.
-	/// \return	true if it succeeds.
-	bool startReaderThread();
-
-	/// Stops the internal low-level reader thread.
-	/// \return	true if it succeeds.
-	bool stopReaderThread();
-
 
 	struct State;
 	std::unique_ptr<State> m_state;
