@@ -44,6 +44,12 @@ std::shared_ptr<CollisionRepresentation> makePlaneRepresentation(
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
+std::shared_ptr<CollisionRepresentation> makeCapsuleRepresentation(
+	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
+	const double& length = 1.0,
+	const double& radius = 1.0,
+	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
+	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 }; // Physics
 }; // SurgSim
 

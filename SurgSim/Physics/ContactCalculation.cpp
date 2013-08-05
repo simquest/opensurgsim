@@ -38,7 +38,6 @@ void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair
 }
 
 // Specific calculation for pairs of Spheres
-
 void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	SURGSIM_ASSERT(pair->getFirst()->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
@@ -150,6 +149,44 @@ void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pa
 		pair->addContact(depth, normal, penetrationPoints);
 	}
 }
+
+void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+{
+	std::shared_ptr<CollisionRepresentation> representationCapsule(pair->getFirst());
+	std::shared_ptr<CollisionRepresentation> representationSphere(pair->getSecond());
+
+	SURGSIM_ASSERT(representationCapsule->getShapeType() == RIGID_SHAPE_TYPE_CAPSULE) <<
+			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+			"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
+
+	std::shared_ptr<CapsuleShape> capsule(std::static_pointer_cast<CapsuleShape>(representationCapsule->getShape()));
+	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
+
+	Vector3d sphereCenter(representationSphere->getPose().translation());
+	Vector3d globalTop(representationCapsule->getPose() * capsule->topCentre());
+	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCentre());
+	Vector3d result;
+
+	double dist =
+		SurgSim::Math::distancePointSegment(sphereCenter, globalTop, globalBottom, &result);
+	double distThreshold = capsule->getRadius() + sphere->getRadius();
+
+	if (dist < distThreshold)
+	{
+		double depth = distThreshold - dist;
+
+		// Calculate the normal going from the sphere to the capsule
+		Vector3d normal = (result - sphereCenter).normalized();
+
+		std::pair<Location,Location> penetrationPoints;
+		penetrationPoints.first.globalPosition.setValue(result - normal * capsule->getRadius());
+		penetrationPoints.second.globalPosition.setValue(sphereCenter + normal * sphere->getRadius());
+
+		pair->addContact(depth, normal, penetrationPoints);
+	}
+}
+
 
 }; // Physics
 }; // SurgSim
