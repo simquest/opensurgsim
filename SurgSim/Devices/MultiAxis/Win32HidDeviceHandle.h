@@ -74,6 +74,28 @@ private:
 	/// \return	true if it succeeds.
 	bool getCapabilities(struct _HIDP_CAPS* capabilities) const;
 
+	/// Starts an asynchronous read from the device.
+	/// Updates the internal flags to indicate the state of the device I/O.
+	/// \return	true if an asynchronous read has been started, or the read has already completed synchronously.
+	bool startAsynchronousRead();
+
+	/// Checks if an asynchronous read from the device has completed.
+	/// Updates the internal flags to indicate the state of the device I/O.
+	/// \param [out] numBytesRead	If the function returns true, the number of bytes read from the device.
+	/// \return true if data has been received; false if the asynchronous read is still pending or an error has
+	/// 	occurred.
+	bool finishAsynchronousRead(size_t* numBytesRead);
+
+	/// Decode the raw state update data received from the device.
+	/// \param rawData	Raw state update data.
+	/// \param rawDataSize	Size of the raw state update data.
+	/// \param [in,out] axisStates	The states for each axis of the device.
+	/// \param [in,out] buttonStates	The states for each device button.
+	/// \param [out] updated True if any states were actually updated.  (Note that even if this value is true, the
+	/// 	states may not have changed value; one or more states could have been updated to the same value.)
+	void decodeStateUpdates(const unsigned char* rawData, size_t rawDataSize,
+		AxisStates* axisStates, ButtonStates* buttonStates, bool* updated);
+
 
 	struct State;
 	std::unique_ptr<State> m_state;

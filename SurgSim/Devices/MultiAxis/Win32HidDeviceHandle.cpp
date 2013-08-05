@@ -63,7 +63,9 @@ struct Win32HidDeviceHandle::State
 public:
 	explicit State(std::shared_ptr<SurgSim::Framework::Logger>&& logger_) :
 		logger(std::move(logger_)),
-		handle()
+		handle(),
+		isOverlappedReadPending(false),
+		isDeviceDead(false)
 	{
 	}
 
@@ -71,6 +73,14 @@ public:
 	std::shared_ptr<SurgSim::Framework::Logger> logger;
 	/// The underlying device file handle.
 	FileHandle handle;
+	/// The OVERLAPPED state structure for overlapped (i.e. asynchronous) reads.
+	OVERLAPPED overlappedReadState;
+	/// The buffer used to store the output of overlapped (i.e. asynchronous) reads.
+	unsigned char overlappedReadBuffer[7*128];
+	/// True if we are waiting for the result of an overlapped (i.e. asynchronous) read.
+	bool isOverlappedReadPending;
+	/// True if the communication with this device has failed without possibility of recovery.
+	bool isDeviceDead;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -175,9 +185,15 @@ std::unique_ptr<Win32HidDeviceHandle> Win32HidDeviceHandle::open(
 	const std::string& path, std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
 	std::unique_ptr<Win32HidDeviceHandle> object(new Win32HidDeviceHandle(std::move(logger)));
+	object->m_state->handle.setFileOpenFlags(FILE_FLAG_OVERLAPPED);  // set up the handle for asynchronous I/O
 	if (! object->m_state->handle.openForReadingAndMaybeWriting(path))
 	{
 		object.reset();  // could not open the device handle; destroy the object again
+	}
+	else
+	{
+		object->m_state->isOverlappedReadPending = false;
+		object->m_state->isDeviceDead = false;
 	}
 	return object;
 }
@@ -296,101 +312,211 @@ bool Win32HidDeviceHandle::hasTranslationAndRotationAxes() const
 	return true;
 }
 
-static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
+bool Win32HidDeviceHandle::startAsynchronousRead()
 {
-	return static_cast<int16_t>(static_cast<uint16_t>(byte0) | (static_cast<uint16_t>(byte1) << 8));
+	SURGSIM_ASSERT(! m_state->isOverlappedReadPending) << "Previous asynchronous read has not been handled!";
+
+	memset(&(m_state->overlappedReadState), 0, sizeof(m_state->overlappedReadState));
+	if (ReadFile(m_state->handle.get(), m_state->overlappedReadBuffer, sizeof(m_state->overlappedReadBuffer),
+		NULL, &(m_state->overlappedReadState)) != TRUE)
+	{
+		DWORD error = GetLastError();
+		if (error == ERROR_IO_PENDING)
+		{
+			m_state->isOverlappedReadPending = true;
+		}
+		else if (error == ERROR_DEVICE_NOT_CONNECTED)
+		{
+			SURGSIM_LOG_SEVERE(m_state->logger) <<
+				"Win32HidDeviceHandle: read failed; device has been disconnected!  (stopping)";
+			m_state->isDeviceDead = true;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: read failed with error " <<
+				error << ", " << getSystemErrorText(error);
+		}
+	}
+	else
+	{
+		// Read succeeded synchronously. That means that the read has actually completed, but we still need to
+		// retrieve the returned data using GetOverlappedResult, just like for a pending result. 
+		m_state->isOverlappedReadPending = true;
+	}
+
+	return m_state->isOverlappedReadPending;
+}
+
+bool Win32HidDeviceHandle::finishAsynchronousRead(size_t* numBytesRead)
+{
+	SURGSIM_ASSERT(m_state->isOverlappedReadPending) << "Asynchronous read has not been started!";
+
+	DWORD numRead = 0;
+	if (GetOverlappedResult(m_state->handle.get(), &(m_state->overlappedReadState), &numRead, FALSE) == FALSE)
+	{
+		DWORD error = GetLastError();
+		if (error == ERROR_IO_INCOMPLETE)
+		{
+			// keep checking for asynchronous I/O completion
+		}
+		else if (error == ERROR_DEVICE_NOT_CONNECTED)
+		{
+			SURGSIM_LOG_SEVERE(m_state->logger) <<
+				"Win32HidDeviceHandle: read failed; device has been disconnected!  (stopping)";
+			m_state->isDeviceDead = true;
+			m_state->isOverlappedReadPending = false;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: GetOverlappedResult failed with error " <<
+				error << ", " << getSystemErrorText(error);
+			// keep checking for asynchronous I/O completion, I guess
+		}
+		*numBytesRead = 0;
+		return false;
+	}
+
+	// The read has been completed.
+	m_state->isOverlappedReadPending = false;
+	*numBytesRead = numRead;
+	return true;
 }
 
 bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	*updated = false;
 
-	// We can't keep reading while data is available, because we don't know how to tell when data is available.
 	// Both WaitForSingleObject() and WaitForMultipleObjects() always claim data is available for 3DConnexion device
-	// file handles.  So we just do it once, blocking until we have data.
-	//
-	// We also can't unblock the read once we initiate it (closing the handle has no effect).
+	// file handles.  So we can't check for data availability that way.  Instead, we use overlapped (asynchronous) I/O.
 
+	int numInitialFinished = 0;
+	int numStarted = 0;
+	int numFinished = 0;
+
+	if (m_state->isOverlappedReadPending)
 	{
-		unsigned char deviceBuffer[7*128];
-		size_t numRead;
-		if (! m_state->handle.readBytes(&deviceBuffer, sizeof(deviceBuffer), &numRead))
+		size_t numRead = 0;
+		if (! finishAsynchronousRead(&numRead))
 		{
-			int64_t error = getSystemErrorCode();
-			if (error == ERROR_DEVICE_NOT_CONNECTED)
+			if (m_state->isDeviceDead)
 			{
-				SURGSIM_LOG_SEVERE(m_state->logger) <<
-					"Win32HidDeviceHandle: read failed; device has been disconnected!  (stopping)";
+				return false;  // stop updating this device!
+			}
+		}
+		else
+		{
+			decodeStateUpdates(m_state->overlappedReadBuffer, numRead, axisStates, buttonStates, updated);
+			++numInitialFinished;
+		}
+	}
+
+	while (! m_state->isOverlappedReadPending)
+	{
+		if (! startAsynchronousRead())
+		{
+			if (m_state->isDeviceDead)
+			{
 				return false;  // stop updating this device!
 			}
 			else
 			{
-				SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: read failed with error " <<
-					error << ", " << getSystemErrorText(error);
+				break;
 			}
 		}
-		else if ((numRead >= 7) && (deviceBuffer[0] == 0x01))       // Translation
-		{
-			// We could parse this via HidP_GetData(), but that won't work for buttons (see below)
-			(*axisStates)[0] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
-			(*axisStates)[1] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
-			(*axisStates)[2] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
-			*updated = true;
+		++numStarted;
 
-			if ((numRead >= 14) && (deviceBuffer[7] == 0x02))  // translation data may have rotation appended to it
-			{
-				(*axisStates)[3] = signedShortData(deviceBuffer[8],  deviceBuffer[9]);
-				(*axisStates)[4] = signedShortData(deviceBuffer[10],  deviceBuffer[11]);
-				(*axisStates)[5] = signedShortData(deviceBuffer[12],  deviceBuffer[13]);
-			}
-		}
-		else if ((numRead >= 7) && (deviceBuffer[0] == 0x02))  // Rotation
+		size_t numRead = 0;
+		if (! finishAsynchronousRead(&numRead))
 		{
-			// We could parse this via HidP_GetData(), but that won't work for buttons (see below)
-			(*axisStates)[3] = signedShortData(deviceBuffer[1],  deviceBuffer[2]);
-			(*axisStates)[4] = signedShortData(deviceBuffer[3],  deviceBuffer[4]);
-			(*axisStates)[5] = signedShortData(deviceBuffer[5],  deviceBuffer[6]);
-			*updated = true;
-
-			if ((numRead >= 14) && (deviceBuffer[7] == 0x01))  // rotation data may have translation appended to it
+			if (m_state->isDeviceDead)
 			{
-				(*axisStates)[0] = signedShortData(deviceBuffer[8],  deviceBuffer[9]);
-				(*axisStates)[1] = signedShortData(deviceBuffer[10],  deviceBuffer[11]);
-				(*axisStates)[2] = signedShortData(deviceBuffer[12],  deviceBuffer[13]);
+				return false;  // stop updating this device!
 			}
 		}
-		else if ((numRead >= 2) && (deviceBuffer[0] == 0x03))  // Buttons
+		else
 		{
-			// We CAN'T parse buttons via HidP_GetData(), because 3DConnexion devices produce button state in a
-			// different report from the axes, so when the last button is released you simply get no data.  We could
-			// interpret "empty data list" as "the last button has been released", but that seems dangerous.  So we
-			// roll our own parsing for now, even though it may not work for other devices.  --advornik 2012-08-01
-
-			size_t currentByte = 1;  // Byte 0 specifies the packet type; data starts at byte 1
-			unsigned char currentBit = 0x01;
-			for (size_t i = 0;  i < (*buttonStates).size();  ++i)
-			{
-				(*buttonStates)[i] = ((deviceBuffer[currentByte] & currentBit) != 0);
-				if (currentBit < 0x80)
-				{
-					currentBit = currentBit << 1;
-				}
-				else
-				{
-					currentBit = 0x01;
-					++currentByte;
-					if (currentByte >= numRead)  // out of data?
-					{
-						break;
-					}
-				}
-			}
-			*updated = true;
+			decodeStateUpdates(m_state->overlappedReadBuffer, numRead, axisStates, buttonStates, updated);
+			++numFinished;
 		}
+	}
+
+	if (numInitialFinished > 0 || numStarted > 0 || numFinished > 0)
+	{
+		SURGSIM_LOG_DEBUG(m_state->logger) << "Win32HidDeviceHandle: started " << numStarted << " reads, finished " <<
+			numInitialFinished << "+" << numFinished << ", delta = " << (numStarted - numInitialFinished - numFinished);
 	}
 
 	return true;
 }
+
+static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
+{
+	return static_cast<int16_t>(static_cast<uint16_t>(byte0) | (static_cast<uint16_t>(byte1) << 8));
+}
+
+void Win32HidDeviceHandle::decodeStateUpdates(const unsigned char* rawData, size_t rawDataSize,
+											  AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
+{
+	if ((rawDataSize >= 7) && (rawData[0] == 0x01))       // Translation
+	{
+		// We could parse this via HidP_GetData(), but that won't work for buttons (see below)
+		(*axisStates)[0] = signedShortData(rawData[1],  rawData[2]);
+		(*axisStates)[1] = signedShortData(rawData[3],  rawData[4]);
+		(*axisStates)[2] = signedShortData(rawData[5],  rawData[6]);
+		*updated = true;
+
+		if ((rawDataSize >= 14) && (rawData[7] == 0x02))  // translation data may have rotation appended to it
+		{
+			(*axisStates)[3] = signedShortData(rawData[8],  rawData[9]);
+			(*axisStates)[4] = signedShortData(rawData[10],  rawData[11]);
+			(*axisStates)[5] = signedShortData(rawData[12],  rawData[13]);
+		}
+	}
+	else if ((rawDataSize >= 7) && (rawData[0] == 0x02))  // Rotation
+	{
+		// We could parse this via HidP_GetData(), but that won't work for buttons (see below)
+		(*axisStates)[3] = signedShortData(rawData[1],  rawData[2]);
+		(*axisStates)[4] = signedShortData(rawData[3],  rawData[4]);
+		(*axisStates)[5] = signedShortData(rawData[5],  rawData[6]);
+		*updated = true;
+
+		if ((rawDataSize >= 14) && (rawData[7] == 0x01))  // rotation data may have translation appended to it
+		{
+			(*axisStates)[0] = signedShortData(rawData[8],  rawData[9]);
+			(*axisStates)[1] = signedShortData(rawData[10],  rawData[11]);
+			(*axisStates)[2] = signedShortData(rawData[12],  rawData[13]);
+		}
+	}
+	else if ((rawDataSize >= 2) && (rawData[0] == 0x03))  // Buttons
+	{
+		// We CAN'T parse buttons via HidP_GetData(), because 3DConnexion devices produce button state in a
+		// different report from the axes, so when the last button is released you simply get no data.  We could
+		// interpret "empty data list" as "the last button has been released", but that seems dangerous.  So we
+		// roll our own parsing for now, even though it may not work for other devices.  --advornik 2012-08-01
+
+		size_t currentByte = 1;  // Byte 0 specifies the packet type; data starts at byte 1
+		unsigned char currentBit = 0x01;
+		for (size_t i = 0;  i < (*buttonStates).size();  ++i)
+		{
+			(*buttonStates)[i] = ((rawData[currentByte] & currentBit) != 0);
+			if (currentBit < 0x80)
+			{
+				currentBit = currentBit << 1;
+			}
+			else
+			{
+				currentBit = 0x01;
+				++currentByte;
+				if (currentByte >= rawDataSize)  // out of data?
+				{
+					break;
+				}
+			}
+		}
+		*updated = true;
+	}
+}
+
 
 };  // namespace Device
 };  // namespace SurgSim

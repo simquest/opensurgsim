@@ -38,14 +38,16 @@ static const FileHandle::RawHandleType INVALID_VALUE = INVALID_HANDLE_VALUE;
 FileHandle::FileHandle() :
 	m_handle(INVALID_VALUE),
 	m_canRead(false),
-	m_canWrite(false)
+	m_canWrite(false),
+	m_openFlags(0)
 {
 }
 
 FileHandle::FileHandle(FileHandle&& other) :
 	m_handle(other.m_handle),
 	m_canRead(other.m_canRead),
-	m_canWrite(other.m_canWrite)
+	m_canWrite(other.m_canWrite),
+	m_openFlags(other.m_openFlags)
 {
 	other.m_handle = INVALID_VALUE;  // take ownership
 }
@@ -55,6 +57,7 @@ FileHandle& FileHandle::operator=(FileHandle&& other)
 	m_handle = other.m_handle;
 	m_canRead = other.m_canRead;
 	m_canWrite = other.m_canWrite;
+	m_openFlags = other.m_openFlags;
 	other.m_handle = INVALID_VALUE;  // take ownership
 	return *this;
 }
@@ -90,7 +93,7 @@ bool FileHandle::openForReadingAndWriting(const std::string& path)
 	reset();
 	m_handle = CreateFile(path.c_str(),
 		GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE,   FILE_SHARE_READ | FILE_SHARE_WRITE,   NULL,
-		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL,   NULL);
+		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | m_openFlags,   NULL);
 	m_canRead = true;
 	m_canWrite = true;
 	return isValid();
@@ -101,7 +104,7 @@ bool FileHandle::openForReading(const std::string& path)
 	reset();
 	m_handle = CreateFile(path.c_str(),
 		GENERIC_READ | SYNCHRONIZE,   FILE_SHARE_READ | FILE_SHARE_WRITE,   NULL,
-		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL,   NULL);
+		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | m_openFlags,   NULL);
 	m_canRead = true;
 	m_canWrite = false;
 	return isValid();
@@ -112,7 +115,7 @@ bool FileHandle::openForWriting(const std::string& path)
 	reset();
 	m_handle = CreateFile(path.c_str(),
 		GENERIC_WRITE | SYNCHRONIZE,   FILE_SHARE_READ | FILE_SHARE_WRITE,   NULL,
-		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL,   NULL);
+		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | m_openFlags,   NULL);
 	m_canRead = false;
 	m_canWrite = true;
 	return isValid();
@@ -137,6 +140,17 @@ void FileHandle::reset()
 		CloseHandle(m_handle);
 		m_handle = INVALID_VALUE;
 	}
+}
+
+void FileHandle::setFileOpenFlags(unsigned long flags)
+{
+	SURGSIM_ASSERT(! isValid()) << "Flags need to be set before the file is opened!";
+	m_openFlags = flags;
+}
+
+unsigned long FileHandle::getFileOpenFlags() const
+{
+	return m_openFlags;
 }
 
 bool FileHandle::hasDataToRead() const
