@@ -98,7 +98,7 @@ public:
 
 private:
 	bool m_doAssert;
-
+	
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
@@ -130,7 +130,6 @@ class SphereDoubleSidedPlaneDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	/// \param	swapPairs	Set to true if the calculation needs to switch the members of the pair.
 	explicit SphereDoubleSidedPlaneDcdContact()
 	{
 	}
@@ -147,29 +146,27 @@ private:
 
 };
 
-
-/// Class to calculate intersections between a capsule and a sphere
-class CapsuleSphereDcdContact : public ContactCalculation
+/// Class to calculate intersections between Spheres and Planes
+class SpherePlaneDcdContact : public ContactCalculation
 {
 public:
 
 	/// Constructor.
-	explicit CapsuleSphereDcdContact()
+	explicit SpherePlaneDcdContact()
 	{
 	}
 
 	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return std::pair<int,int>(RIGID_SHAPE_TYPE_CAPSULE, RIGID_SHAPE_TYPE_SPHERE);
+		return std::pair<int,int>(RIGID_SHAPE_TYPE_SPHERE, RIGID_SHAPE_TYPE_PLANE);
 	}
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
 
 };
-
 
 }; // Physics
 }; // SurgSim
