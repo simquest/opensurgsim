@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DEVICES_MULTIAXIS_FILEHANDLE_H
 #define SURGSIM_DEVICES_MULTIAXIS_FILEHANDLE_H
 
+#include <stdint.h>
 #include <string>
 
 
