@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	MultiAxisDeviceTest.cpp
 	RawMultiAxisDeviceTest.cpp
 	RawMultiAxisScaffoldTest.cpp
 )

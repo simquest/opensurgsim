@@ -66,6 +66,13 @@ public:
 
 	virtual bool hasOutputProducer() override;
 
+	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".
+	/// \return A const reference to the initial input data.
+	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
+	{
+		return m_initialInputData;
+	}
+
 protected:
 	/// Push application input to consumers.
 	virtual void pushInput();
@@ -84,6 +91,14 @@ protected:
 	SurgSim::DataStructures::DataGroup& getInputData()
 	{
 		return m_inputData;
+	}
+
+	/// Set the entire input data \ref SurgSim::DataStructures::DataGroup "DataGroup" from derived classes.
+	/// Equivalent to <code>getInputData() = data;</code> but has more readable syntax.
+	/// \param data	The input data to be set.
+	void setInputData(const SurgSim::DataStructures::DataGroup& data)
+	{
+		m_inputData = data;
 	}
 
 	/// Provides access to the output data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.

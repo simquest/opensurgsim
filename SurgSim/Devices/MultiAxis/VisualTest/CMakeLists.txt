@@ -26,17 +26,19 @@ include_directories(
 	"${GLUT_INCLUDE_DIR}"
 )
 
+set(EXAMPLE_SOURCES
+	main.cpp
+)
+
+set(EXAMPLE_HEADERS
+)
+
 set(RAW_EXAMPLE_SOURCES
 	raw_test_main.cpp
 )
 
 set(RAW_EXAMPLE_HEADERS
 )
-
-add_executable(RawMultiAxisVisualTest
-	${RAW_EXAMPLE_SOURCES} ${RAW_EXAMPLE_HEADERS})
-surgsim_show_ide_folders(
-	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
 
 set(LIBS MultiAxisDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
@@ -45,4 +47,14 @@ if(WINDDK_FOUND)
 	list(APPEND LIBS ${WINDDK_LIBRARIES})
 endif()
 
+add_executable(MultiAxisVisualTest
+	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+surgsim_show_ide_folders(
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+target_link_libraries(MultiAxisVisualTest ${LIBS})
+
+add_executable(RawMultiAxisVisualTest
+	${RAW_EXAMPLE_SOURCES} ${RAW_EXAMPLE_HEADERS})
+surgsim_show_ide_folders(
+	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
 target_link_libraries(RawMultiAxisVisualTest ${LIBS})

@@ -79,6 +79,8 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 			return false;
 		}
 	}
+	// NB: callbacks are called with the local m_name, rather than the possibly overridden getName().
+	// This allows e.g. filters to call their callbacks with a name different from their "real" name.
 	inputConsumer->initializeInput(m_name, m_initialInputData);
 	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
@@ -147,6 +149,8 @@ void CommonDevice::pushInput()
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
 	{
+		// NB: callbacks are called with the local m_name, rather than the possibly overridden getName().
+		// This allows e.g. filters to call their callbacks with a name different from their "real" name.
 		(*it)->handleInput(m_name, m_inputData);
 	}
 }
@@ -156,6 +160,8 @@ bool CommonDevice::pullOutput()
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	if (m_state->outputProducer)
 	{
+		// NB: callbacks are called with the local m_name, rather than the possibly overridden getName().
+		// This allows e.g. filters to call their callbacks with a name different from their "real" name.
 		bool gotOutput = m_state->outputProducer->requestOutput(m_name, &m_outputData);
 		if (gotOutput)
 		{

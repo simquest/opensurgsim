@@ -14,23 +14,21 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the RawMultiAxisDevice class.
+/// Tests for the MultiAxisDevice class.
 
 #include <memory>
 #include <string>
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 #include <gtest/gtest.h>
-#include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
-//#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"  // only needed if calling setDefaultLogLevel()
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Matrix.h"
 
-using SurgSim::Device::RawMultiAxisDevice;
-using SurgSim::Device::RawMultiAxisScaffold;
+using SurgSim::Device::MultiAxisDevice;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
@@ -38,10 +36,10 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 
 
-struct RawTestListener : public InputConsumerInterface, public OutputProducerInterface
+struct TestListener : public InputConsumerInterface, public OutputProducerInterface
 {
 public:
-	RawTestListener() :
+	TestListener() :
 		m_numTimesInitializedInput(0),
 		m_numTimesReceivedInput(0),
 		m_numTimesRequestedOutput(0)
@@ -58,58 +56,55 @@ public:
 	DataGroup m_lastReceivedInput;
 };
 
-void RawTestListener::initializeInput(const std::string& device, const DataGroup& inputData)
+void TestListener::initializeInput(const std::string& device, const DataGroup& inputData)
 {
 	++m_numTimesInitializedInput;
 }
 
-void RawTestListener::handleInput(const std::string& device, const DataGroup& inputData)
+void TestListener::handleInput(const std::string& device, const DataGroup& inputData)
 {
 	++m_numTimesReceivedInput;
 	m_lastReceivedInput = inputData;
 }
 
-bool RawTestListener::requestOutput(const std::string& device, DataGroup* outputData)
+bool TestListener::requestOutput(const std::string& device, DataGroup* outputData)
 {
 	++m_numTimesRequestedOutput;
 	return false;
 }
 
 
-TEST(RawMultiAxisDeviceTest, CreateUninitializedDevice)
+TEST(MultiAxisDeviceTest, CreateUninitializedDevice)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 }
 
-TEST(RawMultiAxisDeviceTest, CreateAndInitializeDevice)
+TEST(MultiAxisDeviceTest, CreateAndInitializeDevice)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 	EXPECT_TRUE(device->isInitialized());
 }
 
-TEST(RawMultiAxisDeviceTest, Name)
+TEST(MultiAxisDeviceTest, Name)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	EXPECT_EQ("TestRawMultiAxis", device->getName());
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
-	EXPECT_EQ("TestRawMultiAxis", device->getName());
+	EXPECT_EQ("TestMultiAxis", device->getName());
+	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
+	EXPECT_EQ("TestMultiAxis", device->getName());
 }
 
 static void testCreateDeviceSeveralTimes(bool doSleep)
 {
 	for (int i = 0;  i < 6;  ++i)
 	{
-		std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
+		std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
 		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 		if (doSleep)
 		{
 			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
@@ -118,37 +113,34 @@ static void testCreateDeviceSeveralTimes(bool doSleep)
 	}
 }
 
-TEST(RawMultiAxisDeviceTest, CreateDeviceSeveralTimes)
+TEST(MultiAxisDeviceTest, CreateDeviceSeveralTimes)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	testCreateDeviceSeveralTimes(true);
 }
 
-TEST(RawMultiAxisDeviceTest, CreateSeveralDevices)
+TEST(MultiAxisDeviceTest, CreateSeveralDevices)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device1 = std::make_shared<RawMultiAxisDevice>("RawMultiAxis1");
+	std::shared_ptr<MultiAxisDevice> device1 = std::make_shared<MultiAxisDevice>("MultiAxis1");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
-	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 
 	// We can't check what happens with the scaffolds, since those are no longer a part of the device's API...
 
-	std::shared_ptr<RawMultiAxisDevice> device2 = std::make_shared<RawMultiAxisDevice>("RawMultiAxis2");
+	std::shared_ptr<MultiAxisDevice> device2 = std::make_shared<MultiAxisDevice>("MultiAxis2");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	if (! device2->initialize())
 	{
-		std::cerr << "[Warning: second RawMultiAxis controller did not come up; is it plugged in?]" << std::endl;
+		std::cerr << "[Warning: second MultiAxis controller did not come up; is it plugged in?]" << std::endl;
 	}
 }
 
-TEST(RawMultiAxisDeviceTest, CreateDevicesWithSameName)
+TEST(MultiAxisDeviceTest, CreateDevicesWithSameName)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device1 = std::make_shared<RawMultiAxisDevice>("RawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device1 = std::make_shared<MultiAxisDevice>("MultiAxis");
 	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
-	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 
-	std::shared_ptr<RawMultiAxisDevice> device2 = std::make_shared<RawMultiAxisDevice>("RawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device2 = std::make_shared<MultiAxisDevice>("MultiAxis");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
 	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
 }
@@ -163,15 +155,14 @@ inline std::string makeString(T value)
 	return out.str();
 }
 
-TEST(RawMultiAxisDeviceTest, CreateAllDevices)
+TEST(MultiAxisDeviceTest, CreateAllDevices)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::vector<std::shared_ptr<RawMultiAxisDevice>> devices;
+	std::vector<std::shared_ptr<MultiAxisDevice>> devices;
 
 	for (int i = 1;  ;  ++i)
 	{
-		std::string name = "RawMultiAxis" + makeString(i);
-		std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>(name);
+		std::string name = "MultiAxis" + makeString(i);
+		std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>(name);
 		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 		if (! device->initialize())
 		{
@@ -181,17 +172,16 @@ TEST(RawMultiAxisDeviceTest, CreateAllDevices)
 	}
 
 	std::cout << devices.size() << " devices initialized." << std::endl;
-	ASSERT_GT(devices.size(), 0U) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	ASSERT_GT(devices.size(), 0U) << "Initialization failed.  Is a MultiAxis device plugged in?";
 }
 
-TEST(RawMultiAxisDeviceTest, InputConsumer)
+TEST(MultiAxisDeviceTest, InputConsumer)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 
-	std::shared_ptr<RawTestListener> consumer = std::make_shared<RawTestListener>();
+	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
@@ -205,7 +195,7 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->addInputConsumer(consumer));
 
 	// Sleep for a second, to see how many times the consumer is invoked.
-	// (A RawMultiAxis device updates internally at 60Hz, but our code currently runs at 120Hz to reduce latency.)
+	// (A MultiAxis device updates internally at 60Hz, but our code currently runs at 120Hz to reduce latency.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
@@ -225,14 +215,13 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button4"));
 }
 
-TEST(RawMultiAxisDeviceTest, OutputProducer)
+TEST(MultiAxisDeviceTest, OutputProducer)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-	std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
+	std::shared_ptr<MultiAxisDevice> device = std::make_shared<MultiAxisDevice>("TestMultiAxis");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a MultiAxis device plugged in?";
 
-	std::shared_ptr<RawTestListener> producer = std::make_shared<RawTestListener>();
+	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device->removeOutputProducer(producer));
@@ -241,7 +230,7 @@ TEST(RawMultiAxisDeviceTest, OutputProducer)
 	EXPECT_TRUE(device->setOutputProducer(producer));
 
 	// Sleep for a second, to see how many times the producer is invoked.
-	// (A RawMultiAxis device is does not request any output.)
+	// (A MultiAxis device is does not request any output.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
