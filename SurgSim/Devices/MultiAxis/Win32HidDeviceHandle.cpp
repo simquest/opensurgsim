@@ -340,7 +340,7 @@ bool Win32HidDeviceHandle::startAsynchronousRead()
 	else
 	{
 		// Read succeeded synchronously. That means that the read has actually completed, but we still need to
-		// retrieve the returned data using GetOverlappedResult, just like for a pending result. 
+		// retrieve the returned data using GetOverlappedResult, just like for a pending result.
 		m_state->isOverlappedReadPending = true;
 	}
 

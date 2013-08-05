@@ -142,13 +142,13 @@ void FileHandle::reset()
 	}
 }
 
-void FileHandle::setFileOpenFlags(unsigned long flags)
+void FileHandle::setFileOpenFlags(uint64_t flags)
 {
 	SURGSIM_ASSERT(! isValid()) << "Flags need to be set before the file is opened!";
 	m_openFlags = flags;
 }
 
-unsigned long FileHandle::getFileOpenFlags() const
+uint64_t FileHandle::getFileOpenFlags() const
 {
 	return m_openFlags;
 }

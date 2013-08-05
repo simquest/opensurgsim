@@ -98,11 +98,11 @@ public:
 
 	/// Sets the flags that will be passed to CreateFile when opening the file.
 	/// \param flags	The flags, a combination of zero or more Windows FILE_FLAG_* flags.
-	void setFileOpenFlags(unsigned long flags);
+	void setFileOpenFlags(uint64_t flags);
 
 	/// Gets the flags that will be passed to CreateFile when opening the file.
 	/// \return	The value passed to setFileOpenFlags (or if never set, a default value).
-	unsigned long getFileOpenFlags() const;
+	uint64_t getFileOpenFlags() const;
 
 	/// Resets the file handle back to an invalid state.
 	/// If the handle was open, it will be closed.
@@ -116,7 +116,7 @@ private:
 	RawHandleType m_handle;
 	bool m_canRead;
 	bool m_canWrite;
-	unsigned long m_openFlags;
+	uint64_t m_openFlags;
 };
 
 };  // namespace Device
