@@ -135,7 +135,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
     // Transform the plane normal to box co-ordinate system.
     SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
                                                            representationPlane->getPose();
-    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.rotation() * plane->getNormal();
+    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
     SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
     SurgSim::Math::Vector4d planePoint = planeLocalToBoxLocal * SurgSim::Math::Vector4d(planeNormalScaled.x(),
                                          planeNormalScaled.y(), planeNormalScaled.z(), 1.0);
@@ -159,7 +159,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 				if (d < ScalarEpsilon)
 				{
 					// Add a contact.
-					normal = representationPlane->getPose().rotation() * plane->getNormal();
+					normal = representationPlane->getPose().linear() * plane->getNormal();
 					std::pair<Location,Location> penetrationPoints;
 					boxVertexGlobal = representationBox->getPose() * boxVertex;
 					penetrationPoints.first.globalPosition.setValue(boxVertexGlobal);
