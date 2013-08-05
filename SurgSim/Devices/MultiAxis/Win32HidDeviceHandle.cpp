@@ -382,6 +382,50 @@ bool Win32HidDeviceHandle::finishAsynchronousRead(size_t* numBytesRead)
 	return true;
 }
 
+void Win32HidDeviceHandle::cancelAsynchronousRead()
+{
+	if (CancelIo(m_state->handle.get()) == FALSE)
+	{
+		DWORD error = GetLastError();
+		if (error == ERROR_NOT_FOUND)
+		{
+			// No requests were pending.
+			SURGSIM_LOG_WARNING(m_state->logger) <<
+				"Win32HidDeviceHandle: No asynchronous I/O requests were pending when attempting to cancel.";
+			m_state->isOverlappedReadPending = false;
+		}
+		else
+		{
+			SURGSIM_LOG_WARNING(m_state->logger) <<
+				"Win32HidDeviceHandle: Could not cancel pending asynchronous I/O; error " <<
+				error << ", " << getSystemErrorText(error);
+		}
+	}
+	else
+	{
+		DWORD numRead = 0;
+		if (GetOverlappedResult(m_state->handle.get(), &(m_state->overlappedReadState), &numRead, TRUE) == FALSE)
+		{
+			DWORD error = GetLastError();
+			if (error == ERROR_OPERATION_ABORTED)
+			{
+				// It worked.
+				m_state->isOverlappedReadPending = false;
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(m_state->logger) <<
+					"Win32HidDeviceHandle: Final GetOverlappedResult failed with error " <<
+					error << ", " << getSystemErrorText(error);
+			}
+		}
+		else
+		{
+			m_state->isOverlappedReadPending = false;
+		}
+	}
+}
+
 bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	*updated = false;
@@ -447,6 +491,18 @@ bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* bu
 	}
 
 	return true;
+}
+
+void Win32HidDeviceHandle::prepareForShutdown()
+{
+	// When this code is running, the thread that calls updateStates() should no longer be running.
+	// So we make the assumption that no synchronization is needed.
+
+	// Cancel any pending asynchronous I/O, so it doesn't try reading into memory that is about to be freed.
+	if (m_state->isOverlappedReadPending)
+	{
+		cancelAsynchronousRead();
+	}
 }
 
 static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)

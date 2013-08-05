@@ -101,6 +101,12 @@ private:
 	/// \return true on success.
 	bool runInputFrame(DeviceData* info);
 
+	/// Executes the operations after the last input frame, as the device input loop thread is shutting down.
+	/// Should only be called from the context of the input loop thread.
+	/// \param info The internal device data.
+	/// \return true on success.
+	bool runAfterLastFrame(DeviceData* info);
+
 	/// Updates the device information for a single device.
 	/// \return true on success.
 	bool updateDevice(DeviceData* info);

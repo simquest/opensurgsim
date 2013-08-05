@@ -60,6 +60,8 @@ public:
 
 	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) override;
 
+	virtual void prepareForShutdown() override;
+
 private:
 	/// Constructor.
 	/// Cannot be called directly; see open and enumerate.
@@ -85,6 +87,10 @@ private:
 	/// \return true if data has been received; false if the asynchronous read is still pending or an error has
 	/// 	occurred.
 	bool finishAsynchronousRead(size_t* numBytesRead);
+
+	/// Cancels an asynchronous read from the device.
+	/// Should be executed in the context of the thread that called startAsynchronousRead.
+	void cancelAsynchronousRead();
 
 	/// Decode the raw state update data received from the device.
 	/// \param rawData	Raw state update data.

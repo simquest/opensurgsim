@@ -71,7 +71,7 @@ public:
 	/// \return	true if it succeeds.
 	virtual bool getDeviceIds(int* vendorId, int* productId) const = 0;
 
-	/// Query if this device has 3 translation and 3 rotation axes.
+	/// Queries if this device has 3 translation and 3 rotation axes.
 	/// \return	true if the desired axes are present.
 	virtual bool hasTranslationAndRotationAxes() const = 0;
 
@@ -82,6 +82,11 @@ public:
 	/// 	states may not have changed value; one or more states could have been updated to the same value.)
 	/// \return	true if the operation was successful; false if the device is no longer in a usable state.
 	virtual bool updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated) = 0;
+
+	/// Prepares the handle for sampling thread shutdown.
+	/// Should be called from the same thread that was calling updateStates, after the calls to updateStates
+	/// have been stopped, but before object destruction.
+	virtual void prepareForShutdown();
 
 protected:
 	/// Default constructor.

@@ -193,7 +193,13 @@ RawMultiAxisScaffold::~RawMultiAxisScaffold()
 		if (! m_state->activeDeviceList.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: Destroying scaffold while devices are active!?!";
-			// do anything special with each device?
+			for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
+			{
+				if ((*it)->thread)
+				{
+					destroyPerDeviceThread(it->get());
+				}
+			}
 			m_state->activeDeviceList.clear();
 		}
 
@@ -311,6 +317,12 @@ bool RawMultiAxisScaffold::runInputFrame(RawMultiAxisScaffold::DeviceData* info)
 		return false;
 	}
 	info->deviceObject->pushInput();
+	return true;
+}
+
+bool RawMultiAxisScaffold::runAfterLastFrame(RawMultiAxisScaffold::DeviceData* info)
+{
+	info->deviceHandle->prepareForShutdown();
 	return true;
 }
 

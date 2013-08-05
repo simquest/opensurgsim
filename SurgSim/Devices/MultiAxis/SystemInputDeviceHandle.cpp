@@ -60,5 +60,10 @@ error: No known derived SystemInputDeviceHandle device class is applicable!
 #endif
 }
 
+void SystemInputDeviceHandle::prepareForShutdown()
+{
+}
+
+
 };  // namespace Device
 };  // namespace SurgSim
