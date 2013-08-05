@@ -113,10 +113,9 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 }
 
 
-// Collision calculation between a box and a plane
 void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-    using SurgSim::Math::Geometry::ScalarEpsilon;
+    using SurgSim::Math::Geometry::DistanceEpsilon;
 
     std::shared_ptr<CollisionRepresentation> representationPlane;
     std::shared_ptr<CollisionRepresentation> representationBox;
@@ -136,7 +135,7 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
     // Transform the plane normal to box co-ordinate system.
     SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
                                                            representationPlane->getPose();
-    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.rotation() * plane->getNormal();
+    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
     SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
     SurgSim::Math::Vector4d planePoint = planeLocalToBoxLocal * SurgSim::Math::Vector4d(planeNormalScaled.x(),
                                          planeNormalScaled.y(), planeNormalScaled.z(), 1.0);
@@ -151,7 +150,8 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
     // - If not, at least one of the 'd' values is zero.
     // ---- collisionNormal is sign(max(abs(maxD), abs(minD))) * planeNormal.
     double d[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    double maxD = -DBL_MAX, minD = DBL_MAX;
+    double maxD = -std::numeric_limits<double>::max();
+	double minD = std::numeric_limits<double>::max();
     SurgSim::Math::Vector3d boxVertices[8];
     int iVertex = 0;
     for (int i = -1; i <= 1; i += 2)
@@ -171,7 +171,7 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
         }
     }
 
-    if (!(maxD > ScalarEpsilon && minD > ScalarEpsilon) && !(maxD < -ScalarEpsilon && minD < -ScalarEpsilon))
+    if (!(maxD > DistanceEpsilon && minD > DistanceEpsilon) && !(maxD < -DistanceEpsilon && minD < -DistanceEpsilon))
     {
         // There is an intersection.
         // Two cases:
@@ -188,16 +188,16 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
             BoxPlaneIntersectionTypeGreaterThanZero
         } boxPlaneIntersectionType;
 
-        if (std::abs(maxD) < ScalarEpsilon)
+        if (std::abs(maxD) < DistanceEpsilon)
         {
             // Box is touching the "back side" of plane.
-            normal = -(representationPlane->getPose().rotation() * plane->getNormal());
+            normal = -(representationPlane->getPose().linear() * plane->getNormal());
             boxPlaneIntersectionType = BoxPlaneIntersectionTypeEqualsZero;
         }
-        else if (std::abs(minD) < ScalarEpsilon)
+        else if (std::abs(minD) < DistanceEpsilon)
         {
             // Box is touching the "front side" of plane.
-            normal = representationPlane->getPose().rotation() * plane->getNormal();
+            normal = representationPlane->getPose().linear() * plane->getNormal();
             boxPlaneIntersectionType = BoxPlaneIntersectionTypeEqualsZero;
         }
         else
@@ -205,13 +205,13 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
             if (std::abs(maxD) >= std::abs(minD))
             {
                 // Box is penetrating through the "front side" of plane.
-                normal = representationPlane->getPose().rotation() * plane->getNormal();
+                normal = representationPlane->getPose().linear() * plane->getNormal();
                 boxPlaneIntersectionType = BoxPlaneIntersectionTypeLessThanZero;
             }
             else
             {
                 // Box is penetrating through the "back side" of plane.
-                normal = -(representationPlane->getPose().rotation() * plane->getNormal());
+                normal = -(representationPlane->getPose().linear() * plane->getNormal());
                 boxPlaneIntersectionType = BoxPlaneIntersectionTypeGreaterThanZero;
             }
         }
@@ -223,13 +223,13 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
             switch (boxPlaneIntersectionType)
             {
             case BoxPlaneIntersectionTypeEqualsZero:
-                generateContact = std::abs(d[i]) < ScalarEpsilon;
+                generateContact = std::abs(d[i]) < DistanceEpsilon;
                 break;
             case BoxPlaneIntersectionTypeLessThanZero:
-                generateContact = d[i] < -ScalarEpsilon;
+                generateContact = d[i] < -DistanceEpsilon;
                 break;
             case BoxPlaneIntersectionTypeGreaterThanZero:
-                generateContact = d[i] > ScalarEpsilon;
+                generateContact = d[i] > DistanceEpsilon;
                 break;
             }
 
