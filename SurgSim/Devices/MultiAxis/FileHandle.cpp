@@ -93,7 +93,7 @@ bool FileHandle::openForReadingAndWriting(const std::string& path)
 	reset();
 	m_handle = CreateFile(path.c_str(),
 		GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE,   FILE_SHARE_READ | FILE_SHARE_WRITE,   NULL,
-		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | m_openFlags,   NULL);
+		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | static_cast<DWORD>(m_openFlags),   NULL);
 	m_canRead = true;
 	m_canWrite = true;
 	return isValid();
@@ -104,7 +104,7 @@ bool FileHandle::openForReading(const std::string& path)
 	reset();
 	m_handle = CreateFile(path.c_str(),
 		GENERIC_READ | SYNCHRONIZE,   FILE_SHARE_READ | FILE_SHARE_WRITE,   NULL,
-		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | m_openFlags,   NULL);
+		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | static_cast<DWORD>(m_openFlags),   NULL);
 	m_canRead = true;
 	m_canWrite = false;
 	return isValid();
@@ -115,7 +115,7 @@ bool FileHandle::openForWriting(const std::string& path)
 	reset();
 	m_handle = CreateFile(path.c_str(),
 		GENERIC_WRITE | SYNCHRONIZE,   FILE_SHARE_READ | FILE_SHARE_WRITE,   NULL,
-		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | m_openFlags,   NULL);
+		OPEN_EXISTING,   FILE_ATTRIBUTE_NORMAL | static_cast<DWORD>(m_openFlags),   NULL);
 	m_canRead = false;
 	m_canWrite = true;
 	return isValid();
