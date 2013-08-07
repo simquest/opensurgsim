@@ -21,11 +21,8 @@ namespace SurgSim
 namespace Device
 {
 
-PoseIntegrator::PoseIntegrator(const std::string& filterName,
-							   const SurgSim::DataStructures::DataGroup& inputFilterData,
-							   const std::string& callbackDeviceName) :
-	CommonDevice(callbackDeviceName, inputFilterData),
-	m_name(filterName),
+PoseIntegrator::PoseIntegrator(const std::string& name) :
+	CommonDevice(name),
 	m_poseResult(PoseType::Identity())
 {
 }
@@ -36,11 +33,6 @@ const PoseIntegrator::PoseType& PoseIntegrator::integrate(const PoseType& pose)
 	m_poseResult.pretranslate(pose.translation());
 	m_poseResult.rotate(pose.rotation());
 	return m_poseResult;
-}
-
-std::string PoseIntegrator::getName() const
-{
-	return m_name;
 }
 
 bool PoseIntegrator::initialize()
@@ -60,8 +52,8 @@ bool PoseIntegrator::isInitialized() const
 
 void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	// Ignore the initialization.  Our own data comes from the constructor; calls to the derived classes'
-	// initializeInput are based on our own input consumer list management.
+	// The object was created with no initial input data, but now we can set the initial (and current) input data.
+	setInputData(inputData);
 }
 
 void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)

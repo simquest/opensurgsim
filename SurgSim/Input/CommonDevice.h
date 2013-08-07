@@ -50,11 +50,32 @@ public:
 	/// 	using a DataGroupBuilder, to that device's supported values that it will push to the application.
 	CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
 
+	/// Constructor.
+	///
+	/// Note that this form of the constructor does NOT initialize the initial input data from the device.
+	/// Therefore, the derived class MUST initialize it itself before any input consumers are added!
+	///
+	/// If you can use one of the other constructors, you should, but this one can be used when solving some
+	/// tricky situations with device filters.
+	///
+	/// \param name	The name associated with the input device.
+	explicit CommonDevice(const std::string& name);
+
 	/// Destructor.
 	virtual ~CommonDevice();
 
 	/// Return a (hopefully unique) device name.
 	virtual std::string getName() const override;
+
+	/// Set the name used for calling the input consumers and output producer.
+	/// By default, this will be the same as the name of the device that was passed to the constructor.
+	/// \param name	The name to be used.
+	void setNameForCallback(const std::string& name);
+
+	/// Get the name used for calling the input consumers and output producer.
+	/// By default, this will be the same as the name of the device that was passed to the constructor.
+	/// \return	The name being used.
+	std::string getNameForCallback() const;
 
 	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
@@ -66,19 +87,20 @@ public:
 
 	virtual bool hasOutputProducer() override;
 
+protected:
+
+	/// Push application input to consumers.
+	virtual void pushInput();
+
+	/// Pull application output from a producer.
+	virtual bool pullOutput();
+
 	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".
 	/// \return A const reference to the initial input data.
 	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
 	{
 		return m_initialInputData;
 	}
-
-protected:
-	/// Push application input to consumers.
-	virtual void pushInput();
-
-	/// Pull application output from a producer.
-	virtual bool pullOutput();
 
 	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
 	/// \return A const reference to the input data.
@@ -94,10 +116,16 @@ protected:
 	}
 
 	/// Set the entire input data \ref SurgSim::DataStructures::DataGroup "DataGroup" from derived classes.
-	/// Equivalent to <code>getInputData() = data;</code> but has more readable syntax.
+	/// Also sets the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup" if it has not been set.
+	/// Otherwise equivalent to <code>getInputData() = data;</code> but has more readable syntax.
 	/// \param data	The input data to be set.
 	void setInputData(const SurgSim::DataStructures::DataGroup& data)
 	{
+		if (! m_initialInputData.isValid())
+		{
+			m_initialInputData = data;
+			m_initialInputData.resetAll();
+		}
 		m_inputData = data;
 	}
 
@@ -113,8 +141,9 @@ protected:
 private:
 	struct State;
 
-	std::string m_name;
-	const SurgSim::DataStructures::DataGroup m_initialInputData;
+	const std::string m_name;
+	std::string m_nameForCallback;
+	SurgSim::DataStructures::DataGroup m_initialInputData;
 	SurgSim::DataStructures::DataGroup m_inputData;
 	SurgSim::DataStructures::DataGroup m_outputData;
 	std::unique_ptr<State> m_state;

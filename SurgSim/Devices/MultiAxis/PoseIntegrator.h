@@ -40,19 +40,13 @@ public:
 	typedef SurgSim::Math::RigidTransform3d PoseType;
 
 	/// Constructor.
-	/// \param filterName	Name of this filter device.
-	/// \param inputFilterData	Initial data coming from the device we're filtering.
-	/// \param callbackDeviceName Device name used when calling the callbacks; may be different from the filterName if
-	/// 	this filter participates in a composite device that wants us to pretend to be calling as the overall device.
-	PoseIntegrator(const std::string& filterName, const SurgSim::DataStructures::DataGroup& inputFilterData,
-				   const std::string& callbackDeviceName);
+	/// \param name	Name of this device filter.
+	explicit PoseIntegrator(const std::string& name);
 
 	/// Integrates the pose.
 	/// \param pose	The latest differential pose.
 	/// \return	The integrated pose.
 	const PoseType& integrate(const PoseType& pose);
-
-	virtual std::string getName() const override;
 
 	virtual bool initialize() override;
 
@@ -68,7 +62,6 @@ public:
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
 private:
-	std::string m_name;
 	PoseType m_poseResult;
 };
 
