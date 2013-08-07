@@ -24,7 +24,7 @@
 find_program(DOXYGEN_DOT_EXECUTABLE
 	NAMES dot
 	PATHS "$ENV{DOXYGEN_DOT_PATH}" "${DOXYGEN_DOT_PATH}"
-  DOC "Graphviz Dot tool for using Doxygen")
+	DOC "Graphviz Dot tool for using Doxygen")
 
 find_package(Doxygen)
 
@@ -56,11 +56,11 @@ set(HTML_FOOTER "${CMAKE_CURRENT_SOURCE_DIR}/footer.html")
 
 
 if(SURGSIM_DOCUMENTATION)
-  if (NOT DOXYGEN_FOUND)
-    message(FATAL_ERROR
-      "Doxygen is needed to generate the documentation, but was not found.")
+	if (NOT DOXYGEN_FOUND)
+		message(FATAL_ERROR
+			"Doxygen is needed to generate the documentation, but was not found.")
 
-  else(NOT DOXYGEN_FOUND)
+	else(NOT DOXYGEN_FOUND)
 		# Set DOT_PATH to DOXYGEN_DOT_EXECUTABLE, or empty if not found.
 		# Eliminates whining from Doxygen.
 		if(DOXYGEN_DOT_FOUND)

@@ -283,7 +283,7 @@ endif()
 
 set(SURGSIM_RUNLINT_EXTRA_FLAGS
 	${RUNLINT_DEFAULT_EXTRA_FLAGS}
-  CACHE STRING "Extra flags to pass to run-lint."
+	CACHE STRING "Extra flags to pass to run-lint."
 )
 mark_as_advanced(SURGSIM_RUNLINT_EXTRA_FLAGS)
 
@@ -312,7 +312,7 @@ string(REPLACE ";" "," CPPLINT_DEFAULT_FILTERS
 
 set(SURGSIM_CPPLINT_FILTERS
 	"${CPPLINT_DEFAULT_FILTERS}"
-  CACHE STRING "Filter settings to pass to cpplint via run-cpplint."
+	CACHE STRING "Filter settings to pass to cpplint via run-cpplint."
 )
 mark_as_advanced(SURGSIM_CPPLINT_FILTERS)
 
@@ -326,7 +326,7 @@ macro(surgsim_run_cpplint TARGET)
 	if(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 		add_custom_target("${TARGET}"
 			${PYTHON_EXECUTABLE}
-			  ${SURGSIM_TOOLS_DIR}/run-lint.py
+				${SURGSIM_TOOLS_DIR}/run-lint.py
 					--cpplint-script
 						${SURGSIM_THIRD_PARTY_DIR}/google-style-lint/cpplint.py
 					${SURGSIM_CPPLINT_FILTERS} ${SURGSIM_RUNLINT_EXTRA_FLAGS} ${ARGN}
