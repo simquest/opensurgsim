@@ -33,6 +33,8 @@ set(MULTIAXIS_DEVICE_SOURCES
 )
 
 set(MULTIAXIS_DEVICE_HEADERS
+	CreateInputDeviceHandle.h
+	GetSystemError.h
 	RawMultiAxisDevice.h
 	RawMultiAxisScaffold.h
 	RawMultiAxisThread.h
@@ -40,6 +42,7 @@ set(MULTIAXIS_DEVICE_HEADERS
 )
 
 set(MULTIAXIS_DEVICE_LINUX_SOURCES
+	linux/CreateInputDeviceHandle.cpp
 	linux/FileDescriptor.cpp
 	linux/GetSystemError.cpp
 	linux/InputDeviceHandle.cpp
@@ -47,19 +50,18 @@ set(MULTIAXIS_DEVICE_LINUX_SOURCES
 
 set(MULTIAXIS_DEVICE_LINUX_HEADERS
 	BitSetBuffer.h
-	GetSystemError.h
 	linux/FileDescriptor.h
 	linux/InputDeviceHandle.h
 )
 
 set(MULTIAXIS_DEVICE_WDK_HID_SOURCES
+	win32/CreateInputDeviceHandle.cpp
 	win32/FileHandle.cpp
 	win32/GetSystemError.cpp
 	win32/WdkHidDeviceHandle.cpp
 )
 
 set(MULTIAXIS_DEVICE_WDK_HID_HEADERS
-	GetSystemError.h
 	win32/FileHandle.h
 	win32/WdkHidDeviceHandle.h
 )

@@ -65,7 +65,7 @@ InputDeviceHandle::~InputDeviceHandle()
 {
 }
 
-std::vector<std::string> InputDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
+std::vector<std::string> InputDeviceHandle::enumeratePaths(SurgSim::Framework::Logger* logger)
 {
 	std::vector<std::string> results;
 
@@ -80,7 +80,7 @@ std::vector<std::string> InputDeviceHandle::enumerate(SurgSim::Framework::Logger
 			int error = errno;
 			if (error != ENOENT)
 			{
-				SURGSIM_LOG_INFO(logger) << "InputDeviceHandle::enumerate: Could not open device " << devicePath <<
+				SURGSIM_LOG_INFO(logger) << "InputDeviceHandle::enumeratePaths: Could not open device " << devicePath <<
 					": error " << error << ", " << getSystemErrorText(error);
 			}
 			continue;

@@ -28,6 +28,7 @@
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
 #include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
+#include "SurgSim/Devices/MultiAxis/CreateInputDeviceHandle.h"
 #include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
@@ -461,7 +462,7 @@ bool RawMultiAxisScaffold::finalizeSdk()
 
 std::unique_ptr<SystemInputDeviceHandle> RawMultiAxisScaffold::openDevice(const std::string& path)
 {
-	std::unique_ptr<SystemInputDeviceHandle> handle = SystemInputDeviceHandle::open(path, m_logger);
+	std::unique_ptr<SystemInputDeviceHandle> handle = createInputDeviceHandle(path, m_logger);
 	if (! handle)
 	{
 		int64_t error = getSystemErrorCode();
@@ -494,7 +495,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		return false;
 	}
 
-	const std::vector<std::string> devicePaths = SystemInputDeviceHandle::enumerate(m_logger.get());
+	const std::vector<std::string> devicePaths = enumerateInputDevicePaths(m_logger.get());
 
 	for (auto it = devicePaths.cbegin();  it != devicePaths.cend();  ++it)
 	{

@@ -97,7 +97,7 @@ WdkHidDeviceHandle::~WdkHidDeviceHandle()
 {
 }
 
-std::vector<std::string> WdkHidDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
+std::vector<std::string> WdkHidDeviceHandle::enumeratePaths(SurgSim::Framework::Logger* logger)
 {
 	std::vector<std::string> results;
 

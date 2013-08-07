@@ -23,15 +23,10 @@
 
 namespace SurgSim
 {
-namespace Framework
-{
-class Logger;
-};  // namespace Framework
-
 namespace Device
 {
 
-/// A wrapper for system-dependent access to a input/HID device.
+/// A wrapper for system-dependent access to an input/HID device.
 class SystemInputDeviceHandle
 {
 public:
@@ -48,18 +43,6 @@ public:
 
 	/// Destructor.
 	virtual ~SystemInputDeviceHandle();
-
-	/// Enumerates input devices.
-	/// \param logger	The logger to be used during enumeration.
-	/// \return	A list of device paths.
-	static std::vector<std::string> enumerate(SurgSim::Framework::Logger* logger);
-
-	/// Opens the given path and creates an access wrapper for the device.
-	/// \param path	Full pathname for the device.
-	/// \param logger	The logger to be used by the device.
-	/// \return	The created device object, or an empty unique_ptr on failure.
-	static std::unique_ptr<SystemInputDeviceHandle> open(const std::string& path,
-		std::shared_ptr<SurgSim::Framework::Logger> logger);
 
 	/// Gets the name returned by the operating system for this device.
 	/// \return	The reported name, or "???" if no name information could be found.

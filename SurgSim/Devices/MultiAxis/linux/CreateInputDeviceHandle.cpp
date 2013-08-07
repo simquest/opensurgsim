@@ -13,7 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
+#include "SurgSim/Devices/MultiAxis/CreateInputDeviceHandle.h"
+
+#include <SurgSim/Devices/MultiAxis/linux/InputDeviceHandle.h>
+
 
 namespace SurgSim
 {
@@ -21,16 +24,15 @@ namespace Device
 {
 
 
-SystemInputDeviceHandle::SystemInputDeviceHandle()
+std::unique_ptr<SystemInputDeviceHandle> createInputDeviceHandle(const std::string& path,
+		std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
+	return InputDeviceHandle::open(path, logger);
 }
 
-SystemInputDeviceHandle::~SystemInputDeviceHandle()
+std::vector<std::string> enumerateInputDevicePaths(SurgSim::Framework::Logger* logger)
 {
-}
-
-void SystemInputDeviceHandle::prepareForShutdown()
-{
+	return InputDeviceHandle::enumeratePaths(logger);
 }
 
 
