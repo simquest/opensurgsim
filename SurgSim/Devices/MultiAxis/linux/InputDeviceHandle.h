@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MULTIAXIS_LINUXINPUTDEVICEHANDLE_H
-#define SURGSIM_DEVICES_MULTIAXIS_LINUXINPUTDEVICEHANDLE_H
+#ifndef SURGSIM_DEVICES_MULTIAXIS_LINUX_INPUTDEVICEHANDLE_H
+#define SURGSIM_DEVICES_MULTIAXIS_LINUX_INPUTDEVICEHANDLE_H
 
 #include <string>
 #include <memory>
@@ -30,11 +30,11 @@ namespace Device
 {
 
 /// A wrapper for system-dependent access to a input/HID device.
-class LinuxInputDeviceHandle : public SystemInputDeviceHandle
+class InputDeviceHandle : public SystemInputDeviceHandle
 {
 public:
 	/// Destructor.
-	~LinuxInputDeviceHandle();
+	~InputDeviceHandle();
 
 	/// Enumerates input devices.
 	/// \param logger	The logger to be used during enumeration.
@@ -45,7 +45,7 @@ public:
 	/// \param	path	Full pathname for the device.
 	/// \param logger	The logger to be used by the device.
 	/// \return	The created device object, or an empty unique_ptr on failure.
-	static std::unique_ptr<LinuxInputDeviceHandle> open(const std::string& path,
+	static std::unique_ptr<InputDeviceHandle> open(const std::string& path,
 		std::shared_ptr<SurgSim::Framework::Logger> logger);
 
 	virtual std::string getDeviceName() const override;
@@ -59,11 +59,11 @@ public:
 private:
 	/// Constructor.
 	/// Cannot be called directly; see open and enumerate.
-	explicit LinuxInputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger);
+	explicit InputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger);
 
 	// Prevent copy construction and copy assignment.
-	LinuxInputDeviceHandle(const LinuxInputDeviceHandle& other) = delete;
-	LinuxInputDeviceHandle& operator=(const LinuxInputDeviceHandle& other) = delete;
+	InputDeviceHandle(const InputDeviceHandle& other) = delete;
+	InputDeviceHandle& operator=(const InputDeviceHandle& other) = delete;
 
 	/// Gets the indices of the available device buttons.
 	/// \return a vector of indices.
@@ -83,4 +83,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MULTIAXIS_LINUXINPUTDEVICEHANDLE_H
+#endif  // SURGSIM_DEVICES_MULTIAXIS_LINUX_INPUTDEVICEHANDLE_H

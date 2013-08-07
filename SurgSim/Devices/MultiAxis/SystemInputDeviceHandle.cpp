@@ -16,9 +16,9 @@
 #include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
 
 #if defined(SURGSIM_MULTIAXIS_USING_LINUX_INPUT)
-#include <SurgSim/Devices/MultiAxis/LinuxInputDeviceHandle.h>
+#include <SurgSim/Devices/MultiAxis/linux/InputDeviceHandle.h>
 #elif defined(SURGSIM_MULTIAXIS_USING_WINDOWS_HID)
-#include <SurgSim/Devices/MultiAxis/Win32HidDeviceHandle.h>
+#include <SurgSim/Devices/MultiAxis/win32/WdkHidDeviceHandle.h>
 #endif
 
 
@@ -38,9 +38,9 @@ SystemInputDeviceHandle::~SystemInputDeviceHandle()
 std::vector<std::string> SystemInputDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
 {
 #if defined(SURGSIM_MULTIAXIS_USING_LINUX_INPUT)
-	return LinuxInputDeviceHandle::enumerate(logger);
+	return InputDeviceHandle::enumerate(logger);
 #elif defined(SURGSIM_MULTIAXIS_USING_WINDOWS_HID)
-	return Win32HidDeviceHandle::enumerate(logger);
+	return WdkHidDeviceHandle::enumerate(logger);
 #else
 #error No known derived SystemInputDeviceHandle device class is applicable!
 error: No known derived SystemInputDeviceHandle device class is applicable!
@@ -51,9 +51,9 @@ std::unique_ptr<SystemInputDeviceHandle> SystemInputDeviceHandle::open(
 	const std::string& path, std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
 #if defined(SURGSIM_MULTIAXIS_USING_LINUX_INPUT)
-	return LinuxInputDeviceHandle::open(path, logger);
+	return InputDeviceHandle::open(path, logger);
 #elif defined(SURGSIM_MULTIAXIS_USING_WINDOWS_HID)
-	return Win32HidDeviceHandle::open(path, logger);
+	return WdkHidDeviceHandle::open(path, logger);
 #else
 #error No known derived SystemInputDeviceHandle device class is applicable!
 error: No known derived SystemInputDeviceHandle device class is applicable!

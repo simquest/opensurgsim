@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MULTIAXIS_FILEHANDLE_H
-#define SURGSIM_DEVICES_MULTIAXIS_FILEHANDLE_H
+#ifndef SURGSIM_DEVICES_MULTIAXIS_WIN32_FILEHANDLE_H
+#define SURGSIM_DEVICES_MULTIAXIS_WIN32_FILEHANDLE_H
 
 #include <stdint.h>
 #include <string>
@@ -123,4 +123,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MULTIAXIS_FILEHANDLE_H
+#endif  // SURGSIM_DEVICES_MULTIAXIS_WIN32_FILEHANDLE_H

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/Win32HidDeviceHandle.h"
+#include "SurgSim/Devices/MultiAxis/win32/WdkHidDeviceHandle.h"
 
 #undef  _WIN32_WINNT
 #define _WIN32_WINNT 0x0501   // request Windows XP-compatible SDK APIs
@@ -28,8 +28,8 @@ extern "C" {  // sigh...
 
 #include <stdint.h>
 
-#include "SurgSim/Devices/MultiAxis/FileHandle.h"
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
+#include "SurgSim/Devices/MultiAxis/win32/FileHandle.h"
 #include <SurgSim/Framework/Log.h>
 
 using SurgSim::Device::Internal::getSystemErrorCode;
@@ -58,7 +58,7 @@ enum UsageConstants
 };
 
 
-struct Win32HidDeviceHandle::State
+struct WdkHidDeviceHandle::State
 {
 public:
 	explicit State(std::shared_ptr<SurgSim::Framework::Logger>&& logger_) :
@@ -88,16 +88,16 @@ private:
 	State& operator=(const State& other) /*= delete*/;
 };
 
-Win32HidDeviceHandle::Win32HidDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
-	m_state(new Win32HidDeviceHandle::State(std::move(logger)))
+WdkHidDeviceHandle::WdkHidDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
+	m_state(new WdkHidDeviceHandle::State(std::move(logger)))
 {
 }
 
-Win32HidDeviceHandle::~Win32HidDeviceHandle()
+WdkHidDeviceHandle::~WdkHidDeviceHandle()
 {
 }
 
-std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
+std::vector<std::string> WdkHidDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
 {
 	std::vector<std::string> results;
 
@@ -109,7 +109,7 @@ std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Log
 	if (hidDeviceInfo == INVALID_HANDLE_VALUE)
 	{
 		DWORD error = GetLastError();
-		SURGSIM_LOG_CRITICAL(logger) << "Win32HidDeviceHandle::enumerate: Failed to query HID devices;" <<
+		SURGSIM_LOG_CRITICAL(logger) << "WdkHidDeviceHandle::enumerate: Failed to query HID devices;" <<
 			" SetupDiGetClassDevs() failed with error " << error << ", " << getSystemErrorText(error);
 		return results;
 	}
@@ -129,7 +129,7 @@ std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Log
 			}
 			else
 			{
-				SURGSIM_LOG_CRITICAL(logger) << "Win32HidDeviceHandle::enumerate: Failed to query HID devices;" <<
+				SURGSIM_LOG_CRITICAL(logger) << "WdkHidDeviceHandle::enumerate: Failed to query HID devices;" <<
 					" SetupDiEnumDeviceInterfaces() failed with error " << error << ", " << getSystemErrorText(error);
 				return results;
 			}
@@ -143,7 +143,7 @@ std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Log
 			DWORD error = GetLastError();
 			if (error != ERROR_INSUFFICIENT_BUFFER)
 			{
-				SURGSIM_LOG_INFO(logger) << "Win32HidDeviceHandle::enumerate: Failed to get the device detail size," <<
+				SURGSIM_LOG_INFO(logger) << "WdkHidDeviceHandle::enumerate: Failed to get the device detail size," <<
 					" device will be ignored; error " << error << ", " << getSystemErrorText(error);
 				continue;
 			}
@@ -157,7 +157,7 @@ std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Log
 			deviceInterfaceDetail, deviceInterfaceDetailSize, NULL, NULL))
 		{
 			DWORD error = GetLastError();
-			SURGSIM_LOG_INFO(logger) << "Win32HidDeviceHandle::enumerate: Failed to get the HID device detail," <<
+			SURGSIM_LOG_INFO(logger) << "WdkHidDeviceHandle::enumerate: Failed to get the HID device detail," <<
 				" device will be ignored; error " << error << ", " << getSystemErrorText(error);
 			free(deviceInterfaceDetail);
 			continue;
@@ -170,7 +170,7 @@ std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Log
 		if (! handle.openForReadingAndMaybeWriting(devicePath))
 		{
 			DWORD error = GetLastError();
-			SURGSIM_LOG_INFO(logger) << "Win32HidDeviceHandle::enumerate: Could not open device " << devicePath <<
+			SURGSIM_LOG_INFO(logger) << "WdkHidDeviceHandle::enumerate: Could not open device " << devicePath <<
 				": error " << error << ", " << getSystemErrorText(error);
 			continue;
 		}
@@ -181,10 +181,10 @@ std::vector<std::string> Win32HidDeviceHandle::enumerate(SurgSim::Framework::Log
 	return results;
 }
 
-std::unique_ptr<Win32HidDeviceHandle> Win32HidDeviceHandle::open(
+std::unique_ptr<WdkHidDeviceHandle> WdkHidDeviceHandle::open(
 	const std::string& path, std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
-	std::unique_ptr<Win32HidDeviceHandle> object(new Win32HidDeviceHandle(std::move(logger)));
+	std::unique_ptr<WdkHidDeviceHandle> object(new WdkHidDeviceHandle(std::move(logger)));
 	object->m_state->handle.setFileOpenFlags(FILE_FLAG_OVERLAPPED);  // set up the handle for asynchronous I/O
 	if (! object->m_state->handle.openForReadingAndMaybeWriting(path))
 	{
@@ -209,7 +209,7 @@ static std::string convertWideString(const wchar_t* wideString)
 	return std::string(buffer);
 }
 
-std::string Win32HidDeviceHandle::getDeviceName() const
+std::string WdkHidDeviceHandle::getDeviceName() const
 {
 	wchar_t manufacturer[1024];
 	if (HidD_GetManufacturerString(m_state->handle.get(), manufacturer, sizeof(manufacturer)) != TRUE)
@@ -239,14 +239,14 @@ std::string Win32HidDeviceHandle::getDeviceName() const
 	return result;
 }
 
-bool Win32HidDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
+bool WdkHidDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
 {
 	HIDD_ATTRIBUTES attributes;
 	attributes.Size = sizeof(attributes);
 	if (HidD_GetAttributes(m_state->handle.get(), &attributes) != TRUE)
 	{
 		DWORD error = GetLastError();
-		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: Could not get attributes/IDs: error " << error <<
+		SURGSIM_LOG_INFO(m_state->logger) << "WdkHidDeviceHandle: Could not get attributes/IDs: error " << error <<
 			", " << getSystemErrorText(error);
 		*vendorId = *productId = -1;
 		return false;
@@ -257,13 +257,13 @@ bool Win32HidDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
 	return true;
 }
 
-bool Win32HidDeviceHandle::getCapabilities(HIDP_CAPS* capabilities) const
+bool WdkHidDeviceHandle::getCapabilities(HIDP_CAPS* capabilities) const
 {
 	PHIDP_PREPARSED_DATA preParsedData = 0;
 	if (HidD_GetPreparsedData(m_state->handle.get(), &preParsedData) != TRUE)
 	{
 		DWORD error = GetLastError();
-		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: Could not get preparsed data: error " << error <<
+		SURGSIM_LOG_INFO(m_state->logger) << "WdkHidDeviceHandle: Could not get preparsed data: error " << error <<
 			", " << getSystemErrorText(error);
 		return false;
 	}
@@ -271,7 +271,7 @@ bool Win32HidDeviceHandle::getCapabilities(HIDP_CAPS* capabilities) const
 	if (HidP_GetCaps(preParsedData, capabilities) != HIDP_STATUS_SUCCESS)
 	{
 		DWORD error = GetLastError();
-		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: Could not get capabilities: error " << error <<
+		SURGSIM_LOG_INFO(m_state->logger) << "WdkHidDeviceHandle: Could not get capabilities: error " << error <<
 			", " << getSystemErrorText(error);
 		HidD_FreePreparsedData(preParsedData);
 		return false;
@@ -281,7 +281,7 @@ bool Win32HidDeviceHandle::getCapabilities(HIDP_CAPS* capabilities) const
 	return true;
 }
 
-bool Win32HidDeviceHandle::hasTranslationAndRotationAxes() const
+bool WdkHidDeviceHandle::hasTranslationAndRotationAxes() const
 {
 	HIDP_CAPS capabilities;
 	if (! getCapabilities(&capabilities))
@@ -293,26 +293,26 @@ bool Win32HidDeviceHandle::hasTranslationAndRotationAxes() const
 	if ((capabilities.UsagePage != DEV_USAGE_PAGE_GENERIC_DESKTOP) ||
 		(capabilities.Usage != DEV_USAGE_ID_MULTI_AXIS_CONTROLLER))
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Win32HidDeviceHandle: device is not a multi-axis controller.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "WdkHidDeviceHandle: device is not a multi-axis controller.";
 		return false;
 	}
 
 	int numExtraAxes = static_cast<int>(capabilities.NumberInputValueCaps) - 6;
 	if (numExtraAxes < 0)
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Win32HidDeviceHandle: device does not have 6 input axes.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "WdkHidDeviceHandle: device does not have 6 input axes.";
 		return false;
 	}
 	else if (numExtraAxes > 0)
 	{
-		SURGSIM_LOG_INFO(m_state->logger) << "Win32HidDeviceHandle: device has more than 6 axes;" <<
+		SURGSIM_LOG_INFO(m_state->logger) << "WdkHidDeviceHandle: device has more than 6 axes;" <<
 			" ignoring " << numExtraAxes << " additional axes.";
 	}
 
 	return true;
 }
 
-bool Win32HidDeviceHandle::startAsynchronousRead()
+bool WdkHidDeviceHandle::startAsynchronousRead()
 {
 	SURGSIM_ASSERT(! m_state->isOverlappedReadPending) << "Previous asynchronous read has not been handled!";
 
@@ -328,12 +328,12 @@ bool Win32HidDeviceHandle::startAsynchronousRead()
 		else if (error == ERROR_DEVICE_NOT_CONNECTED)
 		{
 			SURGSIM_LOG_SEVERE(m_state->logger) <<
-				"Win32HidDeviceHandle: read failed; device has been disconnected!  (stopping)";
+				"WdkHidDeviceHandle: read failed; device has been disconnected!  (stopping)";
 			m_state->isDeviceDead = true;
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: read failed with error " <<
+			SURGSIM_LOG_WARNING(m_state->logger) << "WdkHidDeviceHandle: read failed with error " <<
 				error << ", " << getSystemErrorText(error);
 		}
 	}
@@ -347,7 +347,7 @@ bool Win32HidDeviceHandle::startAsynchronousRead()
 	return m_state->isOverlappedReadPending;
 }
 
-bool Win32HidDeviceHandle::finishAsynchronousRead(size_t* numBytesRead)
+bool WdkHidDeviceHandle::finishAsynchronousRead(size_t* numBytesRead)
 {
 	SURGSIM_ASSERT(m_state->isOverlappedReadPending) << "Asynchronous read has not been started!";
 
@@ -362,13 +362,13 @@ bool Win32HidDeviceHandle::finishAsynchronousRead(size_t* numBytesRead)
 		else if (error == ERROR_DEVICE_NOT_CONNECTED)
 		{
 			SURGSIM_LOG_SEVERE(m_state->logger) <<
-				"Win32HidDeviceHandle: read failed; device has been disconnected!  (stopping)";
+				"WdkHidDeviceHandle: read failed; device has been disconnected!  (stopping)";
 			m_state->isDeviceDead = true;
 			m_state->isOverlappedReadPending = false;
 		}
 		else
 		{
-			SURGSIM_LOG_WARNING(m_state->logger) << "Win32HidDeviceHandle: GetOverlappedResult failed with error " <<
+			SURGSIM_LOG_WARNING(m_state->logger) << "WdkHidDeviceHandle: GetOverlappedResult failed with error " <<
 				error << ", " << getSystemErrorText(error);
 			// keep checking for asynchronous I/O completion, I guess
 		}
@@ -382,7 +382,7 @@ bool Win32HidDeviceHandle::finishAsynchronousRead(size_t* numBytesRead)
 	return true;
 }
 
-void Win32HidDeviceHandle::cancelAsynchronousRead()
+void WdkHidDeviceHandle::cancelAsynchronousRead()
 {
 	if (CancelIo(m_state->handle.get()) == FALSE)
 	{
@@ -391,13 +391,13 @@ void Win32HidDeviceHandle::cancelAsynchronousRead()
 		{
 			// No requests were pending.
 			SURGSIM_LOG_WARNING(m_state->logger) <<
-				"Win32HidDeviceHandle: No asynchronous I/O requests were pending when attempting to cancel.";
+				"WdkHidDeviceHandle: No asynchronous I/O requests were pending when attempting to cancel.";
 			m_state->isOverlappedReadPending = false;
 		}
 		else
 		{
 			SURGSIM_LOG_WARNING(m_state->logger) <<
-				"Win32HidDeviceHandle: Could not cancel pending asynchronous I/O; error " <<
+				"WdkHidDeviceHandle: Could not cancel pending asynchronous I/O; error " <<
 				error << ", " << getSystemErrorText(error);
 		}
 	}
@@ -415,7 +415,7 @@ void Win32HidDeviceHandle::cancelAsynchronousRead()
 			else
 			{
 				SURGSIM_LOG_WARNING(m_state->logger) <<
-					"Win32HidDeviceHandle: Final GetOverlappedResult failed with error " <<
+					"WdkHidDeviceHandle: Final GetOverlappedResult failed with error " <<
 					error << ", " << getSystemErrorText(error);
 			}
 		}
@@ -426,7 +426,7 @@ void Win32HidDeviceHandle::cancelAsynchronousRead()
 	}
 }
 
-bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
+bool WdkHidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	*updated = false;
 
@@ -486,14 +486,14 @@ bool Win32HidDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* bu
 
 	if (numInitialFinished > 0 || numStarted > 0 || numFinished > 0)
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "Win32HidDeviceHandle: started " << numStarted << " reads, finished " <<
+		SURGSIM_LOG_DEBUG(m_state->logger) << "WdkHidDeviceHandle: started " << numStarted << " reads, finished " <<
 			numInitialFinished << "+" << numFinished << ", delta = " << (numStarted - numInitialFinished - numFinished);
 	}
 
 	return true;
 }
 
-void Win32HidDeviceHandle::prepareForShutdown()
+void WdkHidDeviceHandle::prepareForShutdown()
 {
 	// When this code is running, the thread that calls updateStates() should no longer be running.
 	// So we make the assumption that no synchronization is needed.
@@ -510,7 +510,7 @@ static inline int16_t signedShortData(unsigned char byte0, unsigned char byte1)
 	return static_cast<int16_t>(static_cast<uint16_t>(byte0) | (static_cast<uint16_t>(byte1) << 8));
 }
 
-void Win32HidDeviceHandle::decodeStateUpdates(const unsigned char* rawData, size_t rawDataSize,
+void WdkHidDeviceHandle::decodeStateUpdates(const unsigned char* rawData, size_t rawDataSize,
 											  AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	if ((rawDataSize >= 7) && (rawData[0] == 0x01))       // Translation

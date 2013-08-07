@@ -40,28 +40,28 @@ set(MULTIAXIS_DEVICE_HEADERS
 )
 
 set(MULTIAXIS_DEVICE_LINUX_SOURCES
-	FileDescriptor.cpp
-	GetSystemErrorLinux.cpp
-	LinuxInputDeviceHandle.cpp
+	linux/FileDescriptor.cpp
+	linux/GetSystemError.cpp
+	linux/InputDeviceHandle.cpp
 )
 
 set(MULTIAXIS_DEVICE_LINUX_HEADERS
 	BitSetBuffer.h
-	FileDescriptor.h
 	GetSystemError.h
-	LinuxInputDeviceHandle.h
+	linux/FileDescriptor.h
+	linux/InputDeviceHandle.h
 )
 
-set(MULTIAXIS_DEVICE_WINHID_SOURCES
-	FileHandle.cpp
-	GetSystemErrorWin32.cpp
-	Win32HidDeviceHandle.cpp
+set(MULTIAXIS_DEVICE_WDK_HID_SOURCES
+	win32/FileHandle.cpp
+	win32/GetSystemError.cpp
+	win32/WdkHidDeviceHandle.cpp
 )
 
-set(MULTIAXIS_DEVICE_WINHID_HEADERS
-	FileHandle.h
+set(MULTIAXIS_DEVICE_WDK_HID_HEADERS
 	GetSystemError.h
-	Win32HidDeviceHandle.h
+	win32/FileHandle.h
+	win32/WdkHidDeviceHandle.h
 )
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
@@ -70,8 +70,8 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_LINUX_HEADERS})
 elseif(WINDDK_FOUND)
 	add_definitions( -DSURGSIM_MULTIAXIS_USING_WINDOWS_HID )
-	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_WINHID_SOURCES})
-	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_WINHID_HEADERS})
+	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_WDK_HID_SOURCES})
+	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_WDK_HID_HEADERS})
 endif()
 
 add_library(MultiAxisDevice

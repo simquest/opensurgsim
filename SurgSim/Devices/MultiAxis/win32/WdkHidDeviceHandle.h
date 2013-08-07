@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MULTIAXIS_WIN32HIDDEVICEHANDLE_H
-#define SURGSIM_DEVICES_MULTIAXIS_WIN32HIDDEVICEHANDLE_H
+#ifndef SURGSIM_DEVICES_MULTIAXIS_WIN32_WDKHIDDEVICEHANDLE_H
+#define SURGSIM_DEVICES_MULTIAXIS_WIN32_WDKHIDDEVICEHANDLE_H
 
 #include <string>
 #include <memory>
@@ -34,11 +34,11 @@ namespace Device
 {
 
 /// A wrapper for system-dependent access to a input/HID device.
-class Win32HidDeviceHandle : public SystemInputDeviceHandle
+class WdkHidDeviceHandle : public SystemInputDeviceHandle
 {
 public:
 	/// Destructor.
-	~Win32HidDeviceHandle();
+	~WdkHidDeviceHandle();
 
 	/// Enumerates input devices.
 	/// \param logger	The logger to be used during enumeration.
@@ -49,7 +49,7 @@ public:
 	/// \param	path	Full pathname for the device.
 	/// \param logger	The logger to be used by the device.
 	/// \return	The created device object, or an empty unique_ptr on failure.
-	static std::unique_ptr<Win32HidDeviceHandle> open(const std::string& path,
+	static std::unique_ptr<WdkHidDeviceHandle> open(const std::string& path,
 		std::shared_ptr<SurgSim::Framework::Logger> logger);
 
 	virtual std::string getDeviceName() const override;
@@ -65,11 +65,11 @@ public:
 private:
 	/// Constructor.
 	/// Cannot be called directly; see open and enumerate.
-	explicit Win32HidDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger);
+	explicit WdkHidDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger);
 
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	Win32HidDeviceHandle(const Win32HidDeviceHandle& other) /*= delete*/;
-	Win32HidDeviceHandle& operator=(const Win32HidDeviceHandle& other) /*= delete*/;
+	WdkHidDeviceHandle(const WdkHidDeviceHandle& other) /*= delete*/;
+	WdkHidDeviceHandle& operator=(const WdkHidDeviceHandle& other) /*= delete*/;
 
 	/// Gets the device capabilities.
 	/// \param [out] capabilities	The capabilities data for the device.
@@ -110,4 +110,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MULTIAXIS_WIN32HIDDEVICEHANDLE_H
+#endif  // SURGSIM_DEVICES_MULTIAXIS_WIN32_WDKHIDDEVICEHANDLE_H

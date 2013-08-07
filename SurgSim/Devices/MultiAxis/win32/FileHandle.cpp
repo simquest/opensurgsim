@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/FileHandle.h"
+#include "SurgSim/Devices/MultiAxis/win32/FileHandle.h"
 
 #undef  _WIN32_WINNT
 #define _WIN32_WINNT 0x0501   // request Windows XP-compatible SDK APIs

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
+#include "SurgSim/Devices/MultiAxis/linux/FileDescriptor.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MULTIAXIS_FILEDESCRIPTOR_H
-#define SURGSIM_DEVICES_MULTIAXIS_FILEDESCRIPTOR_H
+#ifndef SURGSIM_DEVICES_MULTIAXIS_LINUX_FILEDESCRIPTOR_H
+#define SURGSIM_DEVICES_MULTIAXIS_LINUX_FILEDESCRIPTOR_H
 
 #include <string>
 
@@ -110,4 +110,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MULTIAXIS_FILEDESCRIPTOR_H
+#endif  // SURGSIM_DEVICES_MULTIAXIS_LINUX_FILEDESCRIPTOR_H

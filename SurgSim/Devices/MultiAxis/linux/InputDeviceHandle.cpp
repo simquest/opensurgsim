@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/LinuxInputDeviceHandle.h"
+#include "SurgSim/Devices/MultiAxis/linux/InputDeviceHandle.h"
 
 #include <linux/input.h>
 #include <sys/ioctl.h>
 #include <errno.h>
 
-#include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
 #include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
+#include "SurgSim/Devices/MultiAxis/linux/FileDescriptor.h"
 #include <SurgSim/Framework/Log.h>
 
 using SurgSim::Device::Internal::getSystemErrorCode;
@@ -33,7 +33,7 @@ namespace SurgSim
 namespace Device
 {
 
-struct LinuxInputDeviceHandle::State
+struct InputDeviceHandle::State
 {
 public:
 	explicit State(std::shared_ptr<SurgSim::Framework::Logger>&& logger_) :
@@ -56,16 +56,16 @@ private:
 	State& operator=(const State& other) = delete;
 };
 
-LinuxInputDeviceHandle::LinuxInputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
-	m_state(new LinuxInputDeviceHandle::State(std::move(logger)))
+InputDeviceHandle::InputDeviceHandle(std::shared_ptr<SurgSim::Framework::Logger>&& logger) :
+	m_state(new InputDeviceHandle::State(std::move(logger)))
 {
 }
 
-LinuxInputDeviceHandle::~LinuxInputDeviceHandle()
+InputDeviceHandle::~InputDeviceHandle()
 {
 }
 
-std::vector<std::string> LinuxInputDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
+std::vector<std::string> InputDeviceHandle::enumerate(SurgSim::Framework::Logger* logger)
 {
 	std::vector<std::string> results;
 
@@ -80,7 +80,7 @@ std::vector<std::string> LinuxInputDeviceHandle::enumerate(SurgSim::Framework::L
 			int error = errno;
 			if (error != ENOENT)
 			{
-				SURGSIM_LOG_INFO(logger) << "LinuxInputDeviceHandle::enumerate: Could not open device " << devicePath <<
+				SURGSIM_LOG_INFO(logger) << "InputDeviceHandle::enumerate: Could not open device " << devicePath <<
 					": error " << error << ", " << getSystemErrorText(error);
 			}
 			continue;
@@ -92,10 +92,10 @@ std::vector<std::string> LinuxInputDeviceHandle::enumerate(SurgSim::Framework::L
 	return results;
 }
 
-std::unique_ptr<LinuxInputDeviceHandle> LinuxInputDeviceHandle::open(
+std::unique_ptr<InputDeviceHandle> InputDeviceHandle::open(
 	const std::string& path, std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
-	std::unique_ptr<LinuxInputDeviceHandle> object(new LinuxInputDeviceHandle(std::move(logger)));
+	std::unique_ptr<InputDeviceHandle> object(new InputDeviceHandle(std::move(logger)));
 	if (! object->m_state->handle.openForReadingAndMaybeWriting(path))
 	{
 		object.reset();  // could not open the device handle; destroy the object again
@@ -116,13 +116,13 @@ std::unique_ptr<LinuxInputDeviceHandle> LinuxInputDeviceHandle::open(
 	return object;
 }
 
-std::string LinuxInputDeviceHandle::getDeviceName() const
+std::string InputDeviceHandle::getDeviceName() const
 {
 	char reportedName[1024];
 	if (ioctl(m_state->handle.get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGNAME): error " << error << ", " <<
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: ioctl(EVIOCGNAME): error " << error << ", " <<
 			getSystemErrorText(error);
 		snprintf(reportedName, sizeof(reportedName), "???");
 	}
@@ -133,13 +133,13 @@ std::string LinuxInputDeviceHandle::getDeviceName() const
 	return std::string(reportedName);
 }
 
-bool LinuxInputDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
+bool InputDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
 {
 	struct input_id reportedId;
 	if (ioctl(m_state->handle.get(), EVIOCGID, &reportedId) < 0)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGID): error " << error << ", " <<
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: ioctl(EVIOCGID): error " << error << ", " <<
 			getSystemErrorText(error);
 		*vendorId = *productId = -1;
 		return false;
@@ -150,13 +150,13 @@ bool LinuxInputDeviceHandle::getDeviceIds(int* vendorId, int* productId) const
 	return true;
 }
 
-bool LinuxInputDeviceHandle::hasAbsoluteTranslationAndRotationAxes() const
+bool InputDeviceHandle::hasAbsoluteTranslationAndRotationAxes() const
 {
 	BitSetBuffer<ABS_CNT> buffer;
 	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGBIT(EV_ABS)): error " <<
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: ioctl(EVIOCGBIT(EV_ABS)): error " <<
 			error << ", " << getSystemErrorText(error);
 		return false;
 	}
@@ -164,7 +164,7 @@ bool LinuxInputDeviceHandle::hasAbsoluteTranslationAndRotationAxes() const
 	if (! buffer.test(ABS_X) || ! buffer.test(ABS_Y) || ! buffer.test(ABS_Z) ||
 		! buffer.test(ABS_RX) || ! buffer.test(ABS_RY) || ! buffer.test(ABS_RZ))
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: does not have the 6 absolute axes.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: does not have the 6 absolute axes.";
 		return false;
 	}
 
@@ -183,20 +183,20 @@ bool LinuxInputDeviceHandle::hasAbsoluteTranslationAndRotationAxes() const
 
 	if (numIgnoredAxes)
 	{
-		SURGSIM_LOG_INFO(m_state->logger) << "LinuxInputDeviceHandle: has absolute translation and rotation axes;" <<
+		SURGSIM_LOG_INFO(m_state->logger) << "InputDeviceHandle: has absolute translation and rotation axes;" <<
 			" ignoring " << numIgnoredAxes << " additional axes.";
 	}
 
 	return true;
 }
 
-bool LinuxInputDeviceHandle::hasRelativeTranslationAndRotationAxes() const
+bool InputDeviceHandle::hasRelativeTranslationAndRotationAxes() const
 {
 	BitSetBuffer<REL_CNT> buffer;
 	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGBIT(EV_REL)): error " <<
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: ioctl(EVIOCGBIT(EV_REL)): error " <<
 			error << ", " << getSystemErrorText(error);
 		return false;
 	}
@@ -204,7 +204,7 @@ bool LinuxInputDeviceHandle::hasRelativeTranslationAndRotationAxes() const
 	if (! buffer.test(REL_X) || ! buffer.test(REL_Y) || ! buffer.test(REL_Z) ||
 		! buffer.test(REL_RX) || ! buffer.test(REL_RY) || ! buffer.test(REL_RZ))
 	{
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: does not have the 6 relative axes.";
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: does not have the 6 relative axes.";
 		return false;
 	}
 
@@ -221,19 +221,19 @@ bool LinuxInputDeviceHandle::hasRelativeTranslationAndRotationAxes() const
 	}
 	if (numIgnoredAxes)
 	{
-		SURGSIM_LOG_INFO(m_state->logger) << "LinuxInputDeviceHandle: has relative translation and rotation axes;" <<
+		SURGSIM_LOG_INFO(m_state->logger) << "InputDeviceHandle: has relative translation and rotation axes;" <<
 			" ignoring " << numIgnoredAxes << " additional axes.";
 	}
 
 	return true;
 }
 
-bool LinuxInputDeviceHandle::hasTranslationAndRotationAxes() const
+bool InputDeviceHandle::hasTranslationAndRotationAxes() const
 {
 	return hasAbsoluteTranslationAndRotationAxes() || hasRelativeTranslationAndRotationAxes();
 }
 
-bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
+bool InputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* buttonStates, bool* updated)
 {
 	*updated = false;
 
@@ -247,18 +247,18 @@ bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* 
 			if (error == ENODEV)
 			{
 				SURGSIM_LOG_SEVERE(m_state->logger) <<
-					"LinuxInputDeviceHandle: read failed; device has been disconnected!  (stopping)";
+					"InputDeviceHandle: read failed; device has been disconnected!  (stopping)";
 				return false;  // stop updating this device!
 			}
 			else
 			{
-				SURGSIM_LOG_WARNING(m_state->logger) << "LinuxInputDeviceHandle: read failed with error " <<
+				SURGSIM_LOG_WARNING(m_state->logger) << "InputDeviceHandle: read failed with error " <<
 					error << ", " << getSystemErrorText(error);
 			}
 		}
 		else if (numRead != sizeof(event))
 		{
-			SURGSIM_LOG_WARNING(m_state->logger) << "LinuxInputDeviceHandle: reading produced " << numRead <<
+			SURGSIM_LOG_WARNING(m_state->logger) << "InputDeviceHandle: reading produced " << numRead <<
 				" bytes (expected " << sizeof(event) << ")";
 		}
 		else
@@ -307,14 +307,14 @@ bool LinuxInputDeviceHandle::updateStates(AxisStates* axisStates, ButtonStates* 
 	return true;
 }
 
-std::vector<int> LinuxInputDeviceHandle::getDeviceButtonsAndKeys()
+std::vector<int> InputDeviceHandle::getDeviceButtonsAndKeys()
 {
 	std::vector<int> result;
 	BitSetBuffer<KEY_CNT> buffer;
 	if (ioctl(m_state->handle.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
 	{
 		int error = errno;
-		SURGSIM_LOG_DEBUG(m_state->logger) << "LinuxInputDeviceHandle: ioctl(EVIOCGBIT(EV_KEY)): error " <<
+		SURGSIM_LOG_DEBUG(m_state->logger) << "InputDeviceHandle: ioctl(EVIOCGBIT(EV_KEY)): error " <<
 			error << ", " << getSystemErrorText(error);
 		return result;
 	}
