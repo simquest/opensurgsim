@@ -35,6 +35,8 @@ set(RAW_EXAMPLE_HEADERS
 
 add_executable(RawMultiAxisVisualTest
 	${RAW_EXAMPLE_SOURCES} ${RAW_EXAMPLE_HEADERS})
+surgsim_show_ide_folders(
+	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
 
 set(LIBS MultiAxisDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
