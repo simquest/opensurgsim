@@ -38,7 +38,8 @@ class Logger;
 namespace Device
 {
 
-/// A wrapper for system-dependent access to a input/HID device.
+/// Access to an input/HID device using the HID API from the Windows Driver Kit.
+/// \sa	SystemInputDeviceHandle
 class WdkHidDeviceHandle : public SystemInputDeviceHandle
 {
 public:

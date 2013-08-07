@@ -28,17 +28,28 @@ namespace SurgSim
 {
 namespace Device
 {
-
-
+/// A device filter that integrates the pose, turning a relative device into an absolute one.
+/// \sa	SurgSim::Input::CommonDevice
+/// \sa	SurgSim::Input::InputConsumerInterface
+/// \sa	SurgSim::Input::OutputProducerInterface
 class PoseIntegrator : public SurgSim::Input::CommonDevice,
 	public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
 {
 public:
+	/// The type used for poses.
 	typedef SurgSim::Math::RigidTransform3d PoseType;
 
+	/// Constructor.
+	/// \param filterName	Name of this filter device.
+	/// \param inputFilterData	Initial data coming from the device we're filtering.
+	/// \param callbackDeviceName Device name used when calling the callbacks; may be different from the filterName if
+	/// 	this filter participates in a composite device that wants us to pretend to be calling as the overall device.
 	PoseIntegrator(const std::string& filterName, const SurgSim::DataStructures::DataGroup& inputFilterData,
 				   const std::string& callbackDeviceName);
 
+	/// Integrates the pose.
+	/// \param pose	The latest differential pose.
+	/// \return	The integrated pose.
 	const PoseType& integrate(const PoseType& pose);
 
 	virtual std::string getName() const override;
