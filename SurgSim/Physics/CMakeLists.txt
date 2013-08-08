@@ -102,10 +102,10 @@ set(SURGSIM_PHYSICS_HEADERS
 )
 
 surgsim_add_library(
-    SurgSimPhysics
-    "${SURGSIM_PHYSICS_SOURCES}"
-    "${SURGSIM_PHYSICS_HEADERS}"
-    "SurgSim/Physics"
+	SurgSimPhysics
+	"${SURGSIM_PHYSICS_SOURCES}"
+	"${SURGSIM_PHYSICS_HEADERS}"
+	"SurgSim/Physics"
 )
 target_link_libraries(SurgSimPhysics SurgSimFramework SurgSimMath)
 
