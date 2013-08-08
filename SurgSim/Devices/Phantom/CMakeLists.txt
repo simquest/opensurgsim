@@ -28,16 +28,16 @@ include_directories(
 
 set(PHANTOM_DEVICE_SOURCES
 	PhantomDevice.cpp
-	PhantomManager.cpp
+	PhantomScaffold.cpp
 )
 
 set(PHANTOM_DEVICE_HEADERS
 	PhantomDevice.h
-	PhantomManager.h
+	PhantomScaffold.h
 )
 
 # TODO(advornik): the installation should NOT copy all the headers...
-add_library(
+surgsim_add_library(
 	PhantomDevice
 	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
 	SurgSim/Devices/Phantom

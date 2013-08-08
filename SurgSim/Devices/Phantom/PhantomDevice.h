@@ -25,8 +25,8 @@ namespace SurgSim
 {
 namespace Device
 {
+class PhantomScaffold;
 
-class PhantomManager;
 
 /// A class implementing the communication with a Sensable PHANTOM device.
 ///
@@ -53,65 +53,38 @@ class PhantomManager;
 ///   | vector     | "force"     | %Device output force (units are newtons).                      |
 ///   | vector     | "torque"    | %Device output torque (units are Nm).  NOT YET SUPPORTED.      |
 ///
-/// \sa SurgSim::Device::PhantomManager, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
+/// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class PhantomDevice : public SurgSim::Input::CommonDevice
 {
 public:
-	virtual ~PhantomDevice();
-
-	/// Gets the logger used by this object and the devices it manages.
-	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
-
-protected:
 	/// Constructor.
 	///
-	/// \param manager The PhantomManager object creating the device.
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param initializationName The name passed to HDAPI when initializing the device.  This should match a
 	/// 	configured PHANTOM device; alternately, an empty string indicates the default device.
-	PhantomDevice(const PhantomManager& manager, const std::string& uniqueName, const std::string& initializationName);
+	PhantomDevice(const std::string& uniqueName, const std::string& initializationName);
 
-	friend class PhantomManager;
+	/// Destructor.
+	virtual ~PhantomDevice();
 
-	virtual bool initialize();
+	/// Gets the name used by the Phantom device configuration to refer to this device.
+	/// Note that this may or may not be the same as the device name retrieved by getName().
+	/// An empty string indicates the default device.
+	/// \return	The initialization name.
+	std::string getInitializationName() const;
 
-	virtual bool finalize();
+	virtual bool initialize() override;
 
-	/// Communicates with the device, reading its state and writing the command parameters.
-	/// \return true on success.
-	bool update();
+	virtual bool finalize() override;
 
-	/// Builds the data layout for the application input (i.e. device output).
-	static SurgSim::DataStructures::DataGroup buildInputData();
-
-	/// Check for OpenHaptics HDAPI errors, display them, and signal fatal errors.
-	///
-	/// \param message An additional descriptive message.
-	/// \return true if there was a fatal error; false if everything is OK.
-	bool checkForFatalError(const char* message);
-
-	/// Check for OpenHaptics HDAPI errors, display them, and signal fatal errors.
-	/// This is an internal version of the method that is used by PhantomManager as well as PhantomDevice.
-	///
-	/// \param logger The logger to be used.
-	/// \param prefix A prefix to be shown before the \a message (e.g. "Manager: "), or an empty string.
-	/// \param message An additional descriptive message.
-	/// \return true if there was a fatal error; false if everything is OK.
-	static bool checkForFatalError(const std::shared_ptr<SurgSim::Framework::Logger>& logger,
-	                               const char* prefix, const char* message);
+	/// Check whether this device is initialized.
+	bool isInitialized() const;
 
 private:
-	/// Internal device state.
-	struct State;
+	friend class PhantomScaffold;
 
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	std::shared_ptr<PhantomScaffold> m_scaffold;
 	std::string m_initializationName;
-	std::string m_messageLabel;
-	std::unique_ptr<State> m_state;
 };
 
 };  // namespace Device
