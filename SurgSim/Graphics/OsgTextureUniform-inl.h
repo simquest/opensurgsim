@@ -70,6 +70,7 @@ void OsgTextureUniform<T>::addToStateSet(osg::StateSet* stateSet)
 
 	m_unit = availableUnit;
 
+	SURGSIM_ASSERT(m_texture != nullptr) << "Tried to add this uniform without a valid Texture";
 	stateSet->setTextureAttributeAndModes(m_unit, m_texture->getOsgTexture(), osg::StateAttribute::ON);
 	SURGSIM_ASSERT(m_uniform->set(m_unit)) << "Failed to set OSG texture uniform unit!" <<
 		" Uniform: " << getName() << " unit: " << m_unit;
