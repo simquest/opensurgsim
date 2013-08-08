@@ -21,13 +21,13 @@ set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
 	CollisionPair.cpp
 	CollisionRepresentation.cpp
+	Computation.cpp
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
 	ContactCalculation.cpp
 	ContactConstraintGeneration.cpp
-	Computation.cpp
 	DcdCollision.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
