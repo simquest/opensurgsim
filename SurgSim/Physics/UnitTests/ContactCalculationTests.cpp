@@ -83,7 +83,10 @@ TEST(ContactCalculationTests, DefaultCalculation)
 }
 
 
-void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts, double d)
+void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts, 
+						double expectedDepth = 0.0, Vector3d expectedNormal = Vector3d::UnitX(),
+						Vector3d expectedPenetrationPoint0 = Vector3d::Zero(),
+						Vector3d expectedPenetrationPoint1 = Vector3d::Zero())
 {
 	SphereSphereDcdContact calc;
 	std::shared_ptr<CollisionPair> pair =
@@ -95,18 +98,17 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 	if (pair->hasContacts())
 	{
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
-		Vector3d dist = (p1 - p0).normalized();
-		EXPECT_TRUE(eigenEqual(dist, contact->normal, epsilon));
-		EXPECT_NEAR(d, contact->depth, epsilon);
+		EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal, epsilon));
+		EXPECT_NEAR(expectedDepth, contact->depth, epsilon);
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 
-		// This technically repeats the calculation from the sphere sphere collision but there is
-		// only so many ways to calculate this
-		Vector3d penetrationPoint0 = p0 - dist * r0;
-		Vector3d penetrationPoint1 = p1 + dist * r1;
-		EXPECT_TRUE(eigenEqual(penetrationPoint0 ,contact->penetrationPoints.first.globalPosition.getValue(),epsilon));
-		EXPECT_TRUE(eigenEqual(penetrationPoint1 ,contact->penetrationPoints.second.globalPosition.getValue(),epsilon));
+		EXPECT_TRUE(eigenEqual(expectedPenetrationPoint0,
+							   contact->penetrationPoints.first.globalPosition.getValue(),
+							   epsilon));
+		EXPECT_TRUE(eigenEqual(expectedPenetrationPoint1,
+							   contact->penetrationPoints.second.globalPosition.getValue(),
+							   epsilon));
 	}
 }
 
@@ -115,12 +117,19 @@ TEST(ContactCalculationTests, SphereSphereCalculation)
 {
 	{
 		SCOPED_TRACE("No Intersection");
-		doSphereSphereTest(0.1, Vector3d(0.0,0.0,0.0), 0.1, Vector3d(1.0,1.0,1.0), false, 0.0);
+		doSphereSphereTest(0.1, Vector3d(0.0,0.0,0.0), 0.1, Vector3d(1.0,1.0,1.0), false);
 	}
 
 	{
-		SCOPED_TRACE("Intersection");
-		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0,0), true, 0.5);
+		SCOPED_TRACE("Sphere-Sphere intersection at origin");
+		doSphereSphereTest(0.5, Vector3d(-0.5+epsilon/2.0,0.0,0.0), 0.5, Vector3d(0.5-epsilon/2.0,0.0,0.0),
+						   true, epsilon, Vector3d(-1.0,0.0,0.0), Vector3d::Zero(), Vector3d::Zero());
+	}
+
+	{
+		SCOPED_TRACE("Sphere-Sphere intersection");
+		doSphereSphereTest(0.5, Vector3d(0.0,0.0,0.0), 0.5, Vector3d(0.5,0.0,0.0), true, 0.5,
+						   Vector3d(-1.0,0.0,0.0), Vector3d(0.5,0.0,0.0), Vector3d(0.0,0.0,0.0));
 	}
 }
 
