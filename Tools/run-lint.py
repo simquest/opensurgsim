@@ -33,7 +33,9 @@ import sys
 import subprocess
 import re
 import os
+
 from fix_header_guards import get_expected_header_guard
+from alphabetize_cmakelists import filename_sort_filter
 
 STANDARD_WARNING_FORMAT = \
     "{file}:{line}:{col}: {text} [{category}] [{level}]"
@@ -234,17 +236,22 @@ def check_length(flags, file, lines):
                            .format(len(bad[1]), flags.max_line_length)) })
 
 def get_listed_files(flags, file, lines):
-  flines = filter(lambda x: re.search(r'^\s.*\.(h|cpp)\s*$', x[1]), lines)
+  flines = filter(lambda x: re.search(r'^\s.*\.(?:h|cpp)\s*(?:\)\s*)?$', x[1]),
+                  lines)
   for f in flines:
     if not re.search(r'^\t\S', f[1]):
       emit_warning({'file': file, 'line': f[0],
                     'category': "opensurgsim/cmake_file_indent",
                     'text': "file name indentation is not a single tab."})
-    if re.search(r'\s$', f[1]):
+    if re.search(r'\)\s*$', f[1]):
+      emit_warning({'file': file, 'line': f[0],
+                    'category': "opensurgsim/cmake_file_parenthesis",
+                    'text': "file name is followed by a right parenthesis."})
+    elif re.search(r'\s$', f[1]):
       emit_warning({'file': file, 'line': f[0],
                     'category': "opensurgsim/cmake_file_trailing",
                     'text': "file name is followed by trailing whitespace."})
-  files = map(lambda x: (x[0], x[1].strip()), flines)
+  files = map(lambda x: (x[0], re.sub(r'\s*\)$', '', x[1].strip())), flines)
   for f in files:
     if re.search(r'\$', f[1]):
       emit_warning({'file': file, 'line': f[0],
@@ -254,16 +261,43 @@ def get_listed_files(flags, file, lines):
       emit_warning({'file': file, 'line': f[0],
                     'category': "opensurgsim/cmake_file_whitespace",
                     'text': "file name contains whitespace!"})
-  dir_path = os.path.dirname(file)
-  files = map(lambda x: (x[0], os.path.normpath(os.path.join(dir_path, x[1]))),
+  return files
+
+def check_file_order(flags, file, files):
+  saw_duplicated = False
+  saw_out_of_order = False
+  for i in range(1, len(files)):
+    if files[i-1][0] == (files[i][0]-1):
+      first  = filename_sort_filter(files[i-1][1])
+      second = filename_sort_filter(files[i][1])
+      if first == second and not saw_duplicated:
+        emit_warning({'file': file, 'line': files[i][0],
+                      'category': "opensurgsim/cmake_file_duplicate",
+                      'text': "file list contains duplicate entries." })
+        saw_duplicated = True
+      elif first > second and not saw_out_of_order:
+        emit_warning({'file': file, 'line': files[i][0],
+                      'category': "opensurgsim/cmake_file_order",
+                      'text': "file list is not correctly ordered." })
+        saw_out_of_order = True
+
+def decorate_listed_files(flags, file, files):
+  prefix = os.path.dirname(file)
+  paths = map(lambda x: (x[0], os.path.normpath(os.path.join(prefix, x[1]))),
               files)
-  for f in files:
-    if not os.path.exists(f[1]):
-      emit_warning({'file': file, 'line': f[0],
-                    'category': "opensurgsim/cmake_missing",
-                    'text': ("file " + f[1] +
+  for p in paths:
+    if not os.path.exists(p[1]):
+      emit_warning({'file': file, 'line': p[0],
+                    'category': "opensurgsim/cmake_file_missing",
+                    'text': ("file " + p[1] +
                              " does not exist but is listed in CMakeLists!") })
-  return map(lambda x: x[1], files)
+  return paths
+
+def get_listed_file_paths(flags, file, lines):
+  files = get_listed_files(flags, file, lines)
+  check_file_order(flags, file, files)
+  paths = decorate_listed_files(flags, file, files)
+  return map(lambda x: x[1], paths)
 
 def find_responsible_cmakelists(file):
   dir_path = os.path.dirname(file)
@@ -290,7 +324,7 @@ def check_file_lists(cmakelists_files, found_files):
     elif not cmakelists_files or found_files[0] < cmakelists_files[0]:
       # in the list but not in CMakeLists.
       emit_warning({'file': find_responsible_cmakelists(found_files[0]),
-                    'category': "opensurgsim/cmake_missing",
+                    'category': "opensurgsim/cmake_file_not_listed",
                     'text': ("file " + found_files[0] +
                              " not present in CMakeLists.txt!") })
       del found_files[0]
@@ -403,7 +437,7 @@ if __name__ == '__main__':
           continue
         if cmakelists_files is None:
             cmakelists_files = []
-        cmakelists_files.extend(get_listed_files(args, file, lines))
+        cmakelists_files.extend(get_listed_file_paths(args, file, lines))
         # cmakelists_files will be checked later...
 
   if args.do_check_file_lists and cmakelists_files is not None:
