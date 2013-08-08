@@ -172,9 +172,8 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
                                                            representationPlane->getPose();
     SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
     SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-    SurgSim::Math::Vector4d planePoint = planeLocalToBoxLocal * SurgSim::Math::Vector4d(planeNormalScaled.x(),
-                                         planeNormalScaled.y(), planeNormalScaled.z(), 1.0);
-    double planeD = -planeNormal.dot(SurgSim::Math::Vector3d(planePoint.x(), planePoint.y(), planePoint.z()));
+    SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
+    double planeD = -planeNormal.dot(planePoint);
 
     // Loop through the box vertices (boxVertex) and calculate "d = (planeNormal.dot(boxVertex) + planeD)".
     // Keep track of max and min of 'd'.
