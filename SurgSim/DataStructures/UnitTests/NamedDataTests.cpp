@@ -18,7 +18,9 @@
 
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
+#include "SurgSim/DataStructures/NamedAny.h"
 #include "gtest/gtest.h"
+#include "MockObjects.h"
 
 using SurgSim::DataStructures::NamedData;
 using SurgSim::DataStructures::NamedDataBuilder;
@@ -289,4 +291,52 @@ TEST(NamedDataTests, ResetOne)
 	EXPECT_TRUE(data.hasEntry("second"));
 	EXPECT_FALSE(data.hasData(1));
 	EXPECT_FALSE(data.hasData("second"));
+}
+
+TEST(NamedDataTests, NamedAny)
+{
+	SurgSim::DataStructures::NamedAnyBuilder builder;
+	builder.addEntry("test");
+	SurgSim::DataStructures::NamedAny data = builder.createData();
+
+	EXPECT_EQ(1, data.getNumEntries());
+	EXPECT_EQ(1u, data.size());
+
+	EXPECT_TRUE(data.isValid());
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("test"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("test"));
+	EXPECT_EQ(0, data.getIndex("test"));
+	EXPECT_EQ("test", data.getName(0));
+
+	EXPECT_FALSE(data.hasEntry(1));
+	EXPECT_FALSE(data.hasEntry("missing"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("missing"));
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_EQ("", data.getName(1));
+
+	MockData mockData;
+	mockData.intValue = 3;
+	mockData.floatValue = 2.7;
+	mockData.doubleVector.push_back(2.7);
+	mockData.doubleVector.push_back(1.7);
+	data.set("test", mockData);
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("test"));
+	EXPECT_TRUE(data.hasData(0));
+	EXPECT_TRUE(data.hasData("test"));
+
+	MockData value;
+	data.get("test", &value);
+	EXPECT_EQ(mockData.intValue, value.intValue);
+	EXPECT_NEAR(mockData.floatValue, value.floatValue, 1e-9);
+	EXPECT_EQ(mockData.doubleVector.size(), value.doubleVector.size());
+
+	data.resetAll();
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("test"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("test"));
 }

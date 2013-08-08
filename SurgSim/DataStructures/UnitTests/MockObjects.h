@@ -23,6 +23,13 @@
 #include <array>
 #include <limits>
 
+struct MockData
+{
+    int intValue;
+    float floatValue;
+    std::vector<double> doubleVector;
+};
+
 /// Vertex data for testing, storing ID and surface normal
 class MockVertexData
 {

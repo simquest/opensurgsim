@@ -35,7 +35,8 @@ inline DataGroup::DataGroup(const DataGroup& dataGroup) :
 	m_scalars(dataGroup.m_scalars),
 	m_integers(dataGroup.m_integers),
 	m_booleans(dataGroup.m_booleans),
-	m_strings(dataGroup.m_strings)
+	m_strings(dataGroup.m_strings),
+	m_customs(dataGroup.m_customs)
 {
 }
 
@@ -51,6 +52,7 @@ inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 	m_integers = dataGroup.m_integers;
 	m_booleans = dataGroup.m_booleans;
 	m_strings = dataGroup.m_strings;
+	m_customs= dataGroup.m_customs;
 
 	SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
 	return *this;
@@ -68,6 +70,7 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 	m_integers = std::move(dataGroup.m_integers);
 	m_booleans = std::move(dataGroup.m_booleans);
 	m_strings = std::move(dataGroup.m_strings);
+	m_customs= std::move(dataGroup.m_customs);
 
 	SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
 	return *this;
@@ -82,7 +85,8 @@ inline bool DataGroup::isValid() const
 	               scalars().isValid() == valid &&
 	               integers().isValid() == valid &&
 	               booleans().isValid() == valid &&
-	               strings().isValid() == valid) << "The object is only partially initialized!";
+	               strings().isValid() == valid &&
+	               customs().isValid() == valid) << "The object is only partially initialized!";
 	return valid;
 }
 
@@ -157,6 +161,16 @@ inline const NamedData<DataGroup::StringType>& DataGroup::strings() const
 	return m_strings;
 }
 
+inline NamedAny& DataGroup::customs()
+{
+	return m_customs;
+}
+
+inline const NamedAny& DataGroup::customs() const
+{
+	return m_customs;
+}
+
 inline void DataGroup::resetAll()
 {
 	m_poses.resetAll();
@@ -166,6 +180,7 @@ inline void DataGroup::resetAll()
 	m_integers.resetAll();
 	m_booleans.resetAll();
 	m_strings.resetAll();
+	m_customs.resetAll();
 }
 
 

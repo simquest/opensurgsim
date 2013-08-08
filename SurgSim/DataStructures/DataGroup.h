@@ -16,10 +16,13 @@
 #ifndef SURGSIM_DATASTRUCTURES_DATAGROUP_H
 #define SURGSIM_DATASTRUCTURES_DATAGROUP_H
 
+#include <Eigen/Core>
+#include <boost/any.hpp>
+
 #include <SurgSim/DataStructures/NamedData.h>
+#include <SurgSim/DataStructures/NamedAny.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
-#include <Eigen/Core>
 
 namespace SurgSim
 {
@@ -184,6 +187,14 @@ public:
 	/// \return the read-only string data.
 	inline const NamedData<StringType>& strings() const;
 
+	/// Return the custom data structure.
+	/// \return the mutable data.
+	inline NamedAny& customs();
+
+	/// Return the custom data structure.
+	/// \return the read-only data.
+	inline const NamedAny& customs() const;
+
 	/// Mark all data as not current.
 	inline void resetAll();
 
@@ -208,6 +219,9 @@ private:
 
 	/// The string values.
 	NamedData<StringType> m_strings;
+
+	/// The custom data values.
+	NamedAny m_customs;
 };
 
 };  // namespace Input

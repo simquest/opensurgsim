@@ -17,6 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
 
 #include <SurgSim/DataStructures/NamedDataBuilder.h>
+#include <SurgSim/DataStructures/NamedAny.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <Eigen/Core>
 
@@ -42,7 +43,7 @@ public:
 	/// The type used for vectors.
 	typedef DataGroup::VectorType VectorType;
 	/// The type used for matrices.
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign | Eigen::RowMajor> DynamicMatrixType;
+	typedef DataGroup::DynamicMatrixType DynamicMatrixType;
 	/// The type used for scalars.
 	typedef DataGroup::ScalarType ScalarType;
 	/// The type used for integers.
@@ -121,6 +122,14 @@ public:
 	/// \return a read-only reference to the sub-object that contains string value entries.
 	const NamedDataBuilder<StringType>& strings() const;
 
+	/// Provides access to the custom data entries.
+	/// \return a writable reference to the sub-object that contains custom data entries.
+	NamedAnyBuilder& customs();
+
+	/// Provides access to the custom data entries.
+	/// \return a read-only reference to the sub-object that contains custom data entries.
+	const NamedAnyBuilder& customs() const;
+
 	/// A shortcut for adding a named pose entry.
 	/// Identical to <code>%poses().addEntry(name)</code>.
 	void addPose(const std::string& name);
@@ -148,6 +157,10 @@ public:
 	/// A shortcut for adding a named string entry.
 	/// Identical to <code>%strings().addEntry(name)</code>.
 	void addString(const std::string& name);
+
+	/// A shortcut for adding a named custom data entry.
+	/// Identical to <code>%customs().addEntry(name)</code>.
+	void addCustom(const std::string& name);
 
 	/// Create new entries from another DataGroupBuilder.
 	/// \param builder The other builder.
@@ -182,6 +195,9 @@ private:
 
 	/// The subsidiary builder used for string values.
 	NamedDataBuilder<StringType> m_strings;
+
+	/// The subsidiary builder used for custom data.
+	NamedAnyBuilder m_customs;
 };
 
 };  // namespace Input
