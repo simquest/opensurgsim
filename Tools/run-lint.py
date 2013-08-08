@@ -233,6 +233,71 @@ def check_length(flags, file, lines):
                            " than {}!"
                            .format(len(bad[1]), flags.max_line_length)) })
 
+def get_listed_files(flags, file, lines):
+  flines = filter(lambda x: re.search(r'^\s.*\.(h|cpp)\s*$', x[1]), lines)
+  for f in flines:
+    if not re.search(r'^\t\S', f[1]):
+      emit_warning({'file': file, 'line': f[0],
+                    'category': "opensurgsim/cmake_file_indent",
+                    'text': "file name indentation is not a single tab."})
+    if re.search(r'\s$', f[1]):
+      emit_warning({'file': file, 'line': f[0],
+                    'category': "opensurgsim/cmake_file_trailing",
+                    'text': "file name is followed by trailing whitespace."})
+  files = map(lambda x: (x[0], x[1].strip()), flines)
+  for f in files:
+    if re.search(r'\$', f[1]):
+      emit_warning({'file': file, 'line': f[0],
+                    'category': "opensurgsim/cmake_file_variable",
+                    'text': "file name contains a variable!"})
+    if re.search(r'\s', f[1]):
+      emit_warning({'file': file, 'line': f[0],
+                    'category': "opensurgsim/cmake_file_whitespace",
+                    'text': "file name contains whitespace!"})
+  dir_path = os.path.dirname(file)
+  files = map(lambda x: (x[0], os.path.normpath(os.path.join(dir_path, x[1]))),
+              files)
+  for f in files:
+    if not os.path.exists(f[1]):
+      emit_warning({'file': file, 'line': f[0],
+                    'category': "opensurgsim/cmake_missing",
+                    'text': ("file " + f[1] +
+                             " does not exist but is listed in CMakeLists!") })
+  return map(lambda x: x[1], files)
+
+def find_responsible_cmakelists(file):
+  dir_path = os.path.dirname(file)
+  while True:
+    guess = os.path.join(dir_path, 'CMakeLists.txt')
+    if os.path.exists(guess):
+      return guess
+    parent = os.path.dirname(dir_path)
+    if parent == dir_path:
+      # uh-oh, we didn't find ANY CMakeLists.txt file?!?
+      return file
+    dir_path = parent
+
+def check_file_lists(cmakelists_files, found_files):
+  while cmakelists_files or found_files:
+    if (cmakelists_files and found_files and
+        cmakelists_files[0] == found_files[0]):
+      # lists match.  remove matching elements and keep going.
+      del cmakelists_files[0]
+      del found_files[0]
+    elif not found_files or cmakelists_files[0] < found_files[0]:
+      # in CMakeLists but not on disk.  should already have been handled.
+      del cmakelists_files[0]
+    elif not cmakelists_files or found_files[0] < cmakelists_files[0]:
+      # in the list but not in CMakeLists.
+      emit_warning({'file': find_responsible_cmakelists(found_files[0]),
+                    'category': "opensurgsim/cmake_missing",
+                    'text': ("file " + found_files[0] +
+                             " not present in CMakeLists.txt!") })
+      del found_files[0]
+    else:
+      assert False, "should not have reached here"
+
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
     description='Check source files for coding standard violations.')
@@ -255,6 +320,9 @@ if __name__ == '__main__':
   parser.add_argument('--ignore-length',
                       action='store_false', dest='do_check_length',
                       help='Do not check the line length.')
+  parser.add_argument('--ignore-file-lists',
+                      action='store_false', dest='do_check_file_lists',
+                      help='Do not check the files in CMakeLists.txt.')
   parser.add_argument('--ignore-ext',
                       action='store_false', dest='do_check_extension',
                       help='Do not check the file extensions.')
@@ -279,6 +347,8 @@ if __name__ == '__main__':
         args.files.extend(map(lambda x: os.path.join(current_dir, x),
                               filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
                                      files)))
+        if 'CMakeLists.txt' in files:
+          args.files.append(os.path.join(current_dir, 'CMakeLists.txt'))
         # always skip .git, build directories, ThirdParty...
         for bad in filter(lambda x:
                             re.search(r'^(?:\.git|build.*|ThirdParty)$', x),
@@ -288,7 +358,9 @@ if __name__ == '__main__':
   ok = True
 
   if args.do_check_extension:
-    bad_ext = filter(lambda x: not re.search(r'\.(?:h|cpp)$', x), args.files)
+    bad_ext = filter(lambda x:
+                       not re.search(r'\.(?:h|cpp)$|CMakeLists\.txt$', x),
+                     args.files)
     for file in bad_ext:
       emit_warning({'file': file,
                     'text': "unknown extension (expected .h or .cpp)"})
@@ -304,6 +376,7 @@ if __name__ == '__main__':
                               args.files)):
       ok = False
 
+  cmakelists_files = None
   for file in args.files:
     lines = None
 
@@ -322,6 +395,24 @@ if __name__ == '__main__':
           continue
       if not check_length(args, file, lines):
         ok = False
+
+    if args.do_check_file_lists and re.search(r'CMakeLists\.txt$', file):
+      if lines is None:
+        lines = slurp_numbered_lines(file)
+        if not lines:
+          continue
+        if cmakelists_files is None:
+            cmakelists_files = []
+        cmakelists_files.extend(get_listed_files(args, file, lines))
+        # cmakelists_files will be checked later...
+
+  if args.do_check_file_lists and cmakelists_files is not None:
+    cmakelists_files = sorted(cmakelists_files)
+    found_files = sorted(map(lambda x: os.path.normpath(x),
+                              filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
+                                     args.files)))
+    check_file_lists(cmakelists_files, found_files)
+
 
 #  if not ok:
 #    sys.exit(1)

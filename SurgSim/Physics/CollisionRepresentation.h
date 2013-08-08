@@ -81,7 +81,7 @@ protected:
 	/// Sets the physics representation for this collision representation.
 	/// \param	physicsRepresentation	The physics representation.
 	void setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation);
-	
+
 };
 
 

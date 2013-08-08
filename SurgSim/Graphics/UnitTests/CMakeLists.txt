@@ -45,6 +45,7 @@ set(UNIT_TEST_SOURCES
 	OsgTexture3dTests.cpp
 	OsgTextureCubeMapTests.cpp
 	OsgTextureRectangleTests.cpp
+	OsgTextureUniformTests.cpp
 	OsgUniformTests.cpp
 	OsgUniformBaseTests.cpp
 	OsgUniformTypesTests.cpp

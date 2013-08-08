@@ -30,16 +30,12 @@ namespace Physics
 
 void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-
-
 	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<
 								pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Contact calculation not implemented for pairs with types (" <<
 			pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
 }
-
-// Specific calculation for pairs of Spheres
 
 void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
@@ -55,8 +51,7 @@ void SphereSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> p
 	Vector3d firstCenter = pair->getFirst()->getPose().translation();
 	Vector3d secondCenter = pair->getSecond()->getPose().translation();
 
-
-	Vector3d normal = secondCenter - firstCenter;
+	Vector3d normal = firstCenter - secondCenter;
 	double dist = normal.norm();
 	double maxDist = firstSphere->getRadius() + secondSphere->getRadius();
 	if (dist < maxDist)
@@ -93,7 +88,8 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 	Vector3d planeLocalSphereCenter =  representationPlane->getPose().inverse() * sphereCenter;
 
 	Vector3d result;
-	double dist = SurgSim::Math::distancePointPlane(planeLocalSphereCenter, plane->getNormal(), plane->getD(), &result);
+	double dist = SurgSim::Math::distancePointPlane(planeLocalSphereCenter, plane->getNormal(), plane->getD(),
+													&result);
 	double distAbsolute = std::abs(dist);
 	if (distAbsolute < sphere->getRadius())
 	{
@@ -102,7 +98,7 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 		// Calculate the normal going from the plane to the sphere, it is the plane normal transformed by the
 		// plane pose, flipped if the sphere is behind the plane and normalize it
 		Vector3d normal =
-			((representationPlane->getPose() * plane->getNormal()) * ((dist < 0) ? -1.0 : 1.0)).normalized();
+			(representationPlane->getPose().linear() * plane->getNormal()) * ((dist < 0.0) ? -1.0 : 1.0);
 
 		std::pair<Location,Location> penetrationPoints;
 		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
@@ -112,8 +108,46 @@ void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collis
 	}
 }
 
+void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+{
+	std::shared_ptr<CollisionRepresentation> representationSphere;
+	std::shared_ptr<CollisionRepresentation> representationPlane;
 
-// Collision calculation between a box and a plane
+	representationSphere = pair->getFirst();
+	representationPlane = pair->getSecond();
+
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
+	SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) <<
+			"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
+
+	std::shared_ptr<SphereShape> sphere = std::static_pointer_cast<SphereShape>(representationSphere->getShape());
+	std::shared_ptr<PlaneShape> plane = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+
+	Vector3d sphereCenter = representationSphere->getPose().translation();
+
+	// Move into Plane coordinate system
+	Vector3d planeLocalSphereCenter =  representationPlane->getPose().inverse() * sphereCenter;
+
+	Vector3d result;
+	double dist = SurgSim::Math::distancePointPlane(planeLocalSphereCenter, plane->getNormal(), plane->getD(),
+													&result);
+	if (dist < sphere->getRadius())
+	{
+		double depth = sphere->getRadius() - dist;
+
+		// Calculate the normal going from the plane to the sphere, it is the plane normal transformed by the
+		// plane pose, flipped if the sphere is behind the plane and normalize it
+		Vector3d normal = representationPlane->getPose().linear() * plane->getNormal();
+
+		std::pair<Location,Location> penetrationPoints;
+		penetrationPoints.first.globalPosition.setValue(sphereCenter - normal * sphere->getRadius());
+		penetrationPoints.second.globalPosition.setValue(sphereCenter - normal * dist);
+
+		pair->addContact(depth, normal, penetrationPoints);
+	}
+}
+
 void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
     using SurgSim::Math::Geometry::ScalarEpsilon;
@@ -137,9 +171,8 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
                                                            representationPlane->getPose();
     SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
     SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-    SurgSim::Math::Vector4d planePoint = planeLocalToBoxLocal * SurgSim::Math::Vector4d(planeNormalScaled.x(),
-                                         planeNormalScaled.y(), planeNormalScaled.z(), 1.0);
-    double planeD = -planeNormal.dot(SurgSim::Math::Vector3d(planePoint.x(), planePoint.y(), planePoint.z()));
+    SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
+    double planeD = -planeNormal.dot(planePoint);
 
     // Loop through the box vertices (boxVertex) and check it it is below plane.
     double d = 0.0;
@@ -171,6 +204,44 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
         }
     }
 }
+
+void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+{
+	std::shared_ptr<CollisionRepresentation> representationCapsule(pair->getFirst());
+	std::shared_ptr<CollisionRepresentation> representationSphere(pair->getSecond());
+
+	SURGSIM_ASSERT(representationCapsule->getShapeType() == RIGID_SHAPE_TYPE_CAPSULE) <<
+			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
+	SURGSIM_ASSERT(representationSphere->getShapeType() == RIGID_SHAPE_TYPE_SPHERE) <<
+			"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
+
+	std::shared_ptr<CapsuleShape> capsule(std::static_pointer_cast<CapsuleShape>(representationCapsule->getShape()));
+	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
+
+	Vector3d sphereCenter(representationSphere->getPose().translation());
+	Vector3d globalTop(representationCapsule->getPose() * capsule->topCentre());
+	Vector3d globalBottom(representationCapsule->getPose() * capsule->bottomCentre());
+	Vector3d result;
+
+	double dist =
+		SurgSim::Math::distancePointSegment(sphereCenter, globalTop, globalBottom, &result);
+	double distThreshold = capsule->getRadius() + sphere->getRadius();
+
+	if (dist < distThreshold)
+	{
+		double depth = distThreshold - dist;
+
+		// Calculate the normal going from the sphere to the capsule
+		Vector3d normal = (result - sphereCenter).normalized();
+
+		std::pair<Location,Location> penetrationPoints;
+		penetrationPoints.first.globalPosition.setValue(result - normal * capsule->getRadius());
+		penetrationPoints.second.globalPosition.setValue(sphereCenter + normal * sphere->getRadius());
+
+		pair->addContact(depth, normal, penetrationPoints);
+	}
+}
+
 
 }; // Physics
 }; // SurgSim

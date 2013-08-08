@@ -43,6 +43,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	ApplicationData.h
 	Assert.h
 	AssertMessage.h
+	Barrier.h
 	BasicThread.h
 	Behavior.h
 	BehaviorManager.h

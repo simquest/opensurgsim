@@ -28,10 +28,10 @@ set(SURGSIM_TESTING_HEADERS
 )
 
 surgsim_add_library(
-    SurgSimTesting
-    "${SURGSIM_TESTING_SOURCES}"
-    "${SURGSIM_TESTING_HEADERS}"
-    "SurgSim/Testing"
+	SurgSimTesting
+	"${SURGSIM_TESTING_SOURCES}"
+	"${SURGSIM_TESTING_HEADERS}"
+	"SurgSim/Testing"
 )
 
 target_link_libraries(SurgSimTesting SurgSimFramework ${Boost_LIBRARIES})
