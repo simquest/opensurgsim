@@ -87,10 +87,6 @@ public:
 	/// \return	true if paused, false if not.
 	bool isPaused();
 
-	/// Gets a shared pointer to the runtime.
-	/// \return	The shared pointer.
-	std::shared_ptr<Runtime> getSharedPtr();
-
 	/// Gets a logger. If the logger does not exist yet it will be created with
 	/// the given name and a default output. Cleaning up the logger will be the
 	/// responsibility of this class, keep the logger reference
@@ -123,6 +119,11 @@ private:
 	/// \param	configFilePath	Full pathname of the configuration file, if path is empty
 	/// 						"." will be used as default path.
 	void initSearchPaths(const std::string& configFilePath);
+
+	/// Gets a shared pointer to the runtime.
+	/// \return	The shared pointer.
+	std::shared_ptr<Runtime> getSharedPtr();
+
 	bool m_isRunning;
 	std::vector< std::shared_ptr<ComponentManager> > m_managers;
 	std::shared_ptr<Scene> m_scene;

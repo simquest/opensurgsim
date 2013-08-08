@@ -102,6 +102,15 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 void SceneElement::setScene(std::weak_ptr<Scene> scene)
 {
 	m_scene = scene;
+
+	auto it = std::begin(m_components);
+	auto endIt = std::end(m_components);
+
+	for ( ;  it != endIt;  ++it)
+		{
+			(it->second)->setScene(scene);
+		}
+
 }
 
 std::shared_ptr<Scene> SceneElement::getScene()

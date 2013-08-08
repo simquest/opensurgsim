@@ -63,9 +63,12 @@ public:
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();
 
+private:
+
+	/// Get a shared pointer to Scene.
+	/// \return The shared pointer.
 	std::shared_ptr<Scene> getSharedPtr();
 
-private:
 	std::weak_ptr<Runtime> m_runtime;
 
 	std::map<std::string,std::shared_ptr<SceneElement>> m_elements;

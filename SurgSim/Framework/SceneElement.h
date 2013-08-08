@@ -50,7 +50,6 @@ public:
 	{
 	}
 
-
 	/// Adds a component
 	/// \param	component	The component.
 	/// \return	true if it succeeds, false if it fails.
@@ -126,8 +125,6 @@ private:
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;
 	std::weak_ptr<Scene> m_scene;
 	std::weak_ptr<Runtime> m_runtime;
-
-	// add Scene
 
 	virtual bool doInitialize() = 0;
 	virtual bool doWakeUp() = 0;

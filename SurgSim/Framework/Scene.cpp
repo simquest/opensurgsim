@@ -33,15 +33,6 @@ bool SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> el
 	{
 		element->setScene(getSharedPtr());
 
-		std::vector<std::shared_ptr<Component>> m_components = element->getComponents();
-		auto it = std::begin(m_components);
-		auto endIt = std::end(m_components);
-
-		for ( ;  it != endIt;  ++it)
-		{
-			(*it)->setScene(getSharedPtr());
-		}
-
 		m_elements[name] = element;
 		std::shared_ptr<Runtime> runtime = m_runtime.lock();
 		if (runtime != nullptr)
@@ -89,7 +80,7 @@ std::shared_ptr<Scene> Scene::getSharedPtr()
 	}
 	catch (const std::exception&)
 	{
-		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr";
+		SURGSIM_FAILURE() << "Scene was not created as a shared_ptr";
 	}
 	return result;
 }
