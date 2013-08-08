@@ -38,12 +38,12 @@ include(FindPackageHandleStandardArgs)
 # NB: use the same names here as FindGLUT.cmake, so you cam use both
 # interchangeably as described in the comments above.  --advornik
 find_package_handle_standard_args(GLUT
-  DEFAULT_MSG GLUT_glut_LIBRARY GLUT_INCLUDE_DIR)
+	DEFAULT_MSG GLUT_glut_LIBRARY GLUT_INCLUDE_DIR)
 
 if(GLUT_FOUND)
 	# What if GLUT needs additional libraries to work on this system?
 	# (I guess we can figure it out when we run across a system where it
 	# does; the GLUT implementations we use on Linux and Windows don't.)
-  set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
+	set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
 endif(GLUT_FOUND)
 mark_as_advanced(GLUT_LIBRARIES)

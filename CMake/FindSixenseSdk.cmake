@@ -174,7 +174,7 @@ if(SIXENSE_SDK_FOUND)
 			PATH_SUFFIXES "samples/${LIB_ARCH}/sixense_simple3d"
 			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 		)
-    if(NOT SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
+		if(NOT SIXENSE_SDK_DeviceDLL_SHARED_DEBUG)
 			# if not found, clear it and hope for the best...
 			message("Warning: DeviceDLL.dll (from Sixense) not found; continuing.")
 			set(SIXENSE_SDK_DeviceDLL_SHARED_DEBUG
