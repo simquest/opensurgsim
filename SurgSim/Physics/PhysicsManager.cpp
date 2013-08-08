@@ -41,7 +41,7 @@ namespace Physics
 PhysicsManager::PhysicsManager() :
   ComponentManager("Physics Manager")
 {
-
+	setRate(1000.0);
 }
 
 PhysicsManager::~PhysicsManager()
@@ -78,6 +78,8 @@ bool PhysicsManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::C
 
 bool PhysicsManager::doUpdate(double dt)
 {
+	dt = 1e-3;
+
 	// Add all components that came in before the last update
 	processComponents();
 

@@ -93,11 +93,6 @@ bool OsgView::setCamera(std::shared_ptr<SurgSim::Graphics::Camera> camera)
 
 void OsgView::update(double dt)
 {
-	if (m_isFirstUpdate)
-	{
-		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
-		m_isFirstUpdate = false;
-	}
 	if (m_areWindowSettingsDirty)
 	{
 		osg::Camera* viewCamera = m_view->getCamera();
@@ -122,5 +117,11 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
+	if (m_isFirstUpdate)
+	{
+		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+		m_isFirstUpdate = false;
+	}
+
 	return true;
 }

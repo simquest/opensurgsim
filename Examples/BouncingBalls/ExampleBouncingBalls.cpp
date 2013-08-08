@@ -154,7 +154,7 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
-	params.setLinearDamping(10.0);
+	params.setLinearDamping(0.1);
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
@@ -207,7 +207,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 
 	RigidRepresentationParameters params;
 	params.setDensity(5513.0); // Earth
-	params.setLinearDamping(10.0);
+	params.setLinearDamping(0.1);
 
 	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
