@@ -28,13 +28,14 @@ namespace Framework
 {
 
 class Component;
+class Scene;
 class Runtime;
 
 /// SceneElement is the basic part of a scene, it is a container of components. SceneElements
 /// doInit() will be called on all SceneElements before they are integrated into the system,
 /// doWakeup() will be called after all doInit() have been completed and all the static information
 /// has been initialized
-class SceneElement
+class SceneElement : public std::enable_shared_from_this<SceneElement>
 {
 
 public:
@@ -71,7 +72,7 @@ public:
 
 	/// Gets all the components of this SceneElement.
 	/// \return	The components.
-	std::vector<std::shared_ptr<Component>> getComponents() const;
+	std::vector<std::shared_ptr<Component> > getComponents() const;
 
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
@@ -86,6 +87,14 @@ public:
 	{
 		return m_name;
 	}
+
+	/// Sets the Scene.
+	/// \param scene Pointer to the scene.
+	void setScene(std::weak_ptr<Scene> scene);
+
+	/// Gets the Scene.
+	/// \return The scene.
+	std::shared_ptr<Scene> getScene();
 
 	/// Sets the Runtime.
 	/// \param runtime Pointer to the runtime.
@@ -105,11 +114,18 @@ public:
 		return m_isAwake;
 	}
 
+	/// Gets a shared pointer to the runtime.
+	/// \return	The shared pointer.
+	std::shared_ptr<SceneElement> getSharedPtr();
+
+
 private:
 
 	std::string m_name;
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;
+	std::weak_ptr<Scene> m_scene;
 	std::weak_ptr<Runtime> m_runtime;
+
 	virtual bool doInitialize() = 0;
 	virtual bool doWakeUp() = 0;
 

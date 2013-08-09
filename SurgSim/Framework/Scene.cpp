@@ -16,6 +16,9 @@
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/SceneElement.h>
+#include <SurgSim/Framework/Component.h>
+#include <SurgSim/Framework/Log.h>
+
 
 namespace SurgSim
 {
@@ -28,6 +31,8 @@ bool SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> el
 	std::string name = element->getName();
 	if (m_elements.find(name) == m_elements.end())
 	{
+		element->setScene(getSharedPtr());
+
 		m_elements[name] = element;
 		std::shared_ptr<Runtime> runtime = m_runtime.lock();
 		if (runtime != nullptr)
@@ -56,9 +61,28 @@ void Scene::setRuntime(std::shared_ptr<Runtime> runtime)
 	m_runtime = runtime;
 }
 
+std::shared_ptr<Runtime> Scene::getRuntime()
+{
+	return m_runtime.lock();
+}
+
 const std::map<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
 {
 	return m_elements;
+}
+
+std::shared_ptr<Scene> Scene::getSharedPtr()
+{
+	std::shared_ptr<Scene> result;
+	try
+	{
+		result = shared_from_this();
+	}
+	catch (const std::exception&)
+	{
+		SURGSIM_FAILURE() << "Scene was not created as a shared_ptr";
+	}
+	return result;
 }
 
 }; // namespace Framework
