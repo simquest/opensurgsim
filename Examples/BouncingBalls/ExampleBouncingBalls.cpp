@@ -188,57 +188,6 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	return planeElement;
 }
 
-std::shared_ptr<SceneElement> createSphere0(const std::string& name, const SurgSim::Math::RigidTransform3d& pose)
-{
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + " Physics");
-
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
-	params.setLinearDamping(10.0);
-
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
-	params.setShapeUsedForMassInertia(shape);
-
-	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
-
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
-	graphicsRepresentation->setRadius(shape->getRadius());
-	graphicsRepresentation->setInitialPose(pose);
-
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-
-	shader->setVertexShaderSource(
-		"varying vec4 color;\n"
-		"void main(void)\n"
-		"{\n"
-		"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-		"	color.rgb = gl_Normal;\n"
-		"	color.a = 1.0;\n"
-		"}");
-	shader->setFragmentShaderSource(
-		"varying vec4 color;\n"
-		"void main(void)\n"
-		"{\n"
-		"	gl_FragColor = color;\n"
-		"}");
-	material->setShader(shader);
-	graphicsRepresentation->setMaterial(material);
-
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
-	sphereElement->addComponent(physicsRepresentation);
-	sphereElement->addComponent(graphicsRepresentation);
-	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
-	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-		("Sphere Collision Representation", physicsRepresentation));
-	return sphereElement;
-}
-
 
 std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
