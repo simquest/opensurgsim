@@ -170,9 +170,9 @@ private:
 
 };
 
-#include <SurgSim/Framework/ComponentManager-inl.h>
-
 }; // namespace Framework
 }; // namespace SurgSim
+
+#include <SurgSim/Framework/ComponentManager-inl.h>
 
 #endif // SURGSIM_FRAMEWORK_COMPONENTMANAGER_H
