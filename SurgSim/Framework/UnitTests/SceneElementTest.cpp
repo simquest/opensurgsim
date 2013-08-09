@@ -45,21 +45,19 @@ TEST(SceneElementTest, AddAndTestComponents)
 {
 	std::shared_ptr<MockSceneElement> element = std::make_shared<MockSceneElement>();
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("TestComponent");
-	
+
 	EXPECT_TRUE(element->addComponent(component));
 
 	EXPECT_EQ(component->getSceneElement(), element);
 
 	// Should be able to get the same scene between element and component after addComponent
 	EXPECT_EQ(component->getScene(), element->getScene() );
-
-	
 }
 
 TEST(SceneElementTest, AddAndAccessComponents)
 {
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
-	
+
 	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
 	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 
@@ -84,7 +82,7 @@ TEST(SceneElementTest, AddAndAccessComponents)
 TEST(SceneElementTest, RemoveComponents)
 {
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
-	
+
 	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
 	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 
@@ -105,7 +103,7 @@ TEST(SceneElementTest, RemoveComponents)
 TEST(SceneElementTest, GetComponentsTest)
 {
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
-	
+
 	std::shared_ptr<MockComponent> component1(new MockComponent("TestComponent1"));
 	std::shared_ptr<MockComponent> component2(new MockComponent("TestComponent2"));
 

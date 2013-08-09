@@ -51,7 +51,7 @@ public:
 	std::string getName() const
 	{
 		return m_name;
-	};
+	}
 
 	bool isInitialized() const
 	{
@@ -71,14 +71,14 @@ public:
 
 		m_didInit = true;
 		return doInitialize();
-	};
+	}
 
 	bool wakeUp()
 	{
 		SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
 		m_didWakeUp = true;
 		return doWakeUp();
-	};
+	}
 
 	std::shared_ptr<Runtime> getRuntime() const
 	{
@@ -90,28 +90,28 @@ public:
 	void setScene(std::weak_ptr<Scene> scene)
 	{
 		m_scene = scene;
-	};
+	}
 
 	/// Gets the scene.
 	/// \return The scene for this component
 	std::shared_ptr<Scene> getScene()
 	{
 		return m_scene.lock();
-	};
+	}
 
 	/// Sets the scene element.
 	/// \param sceneElement The scene element for this component
 	void setSceneElement(std::weak_ptr<SceneElement> sceneElement)
 	{
-			m_sceneElement = sceneElement; 
-	};
+			m_sceneElement = sceneElement;
+	}
 
 	/// Gets the scene element.
 	/// \return The scene element for this component
 	std::shared_ptr<SceneElement> getSceneElement()
 	{
-		return m_sceneElement.lock(); 
-	};
+		return m_sceneElement.lock();
+	}
 protected:
 
 	/// Sets the name.

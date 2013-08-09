@@ -43,7 +43,7 @@ TEST(ComponentTests, SetAndGetSceneElementTest)
 	mock1->setSceneElement(element1);
 
 	EXPECT_EQ(element1, mock1->getSceneElement());
-	
+
 }
 
 TEST(ComponentTests, SetAndGetSceneTest)
@@ -55,6 +55,6 @@ TEST(ComponentTests, SetAndGetSceneTest)
 	mock1->setScene(scene);
 
 	EXPECT_EQ(scene, mock1->getScene());
-	
+
 }
 
