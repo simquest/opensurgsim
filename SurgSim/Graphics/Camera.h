@@ -80,8 +80,13 @@ public:
 	/// \return	Projection matrix
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
 
+	/// Sets a texture to be used as a color render target.
+	/// \param	texture	The texture to be used as a target.
+	/// \return	true if it succeeds, false if it fails.
 	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) = 0;
 
+	/// Gets the texture that is being used as the color render target.
+	/// \return	The color render texture.
 	virtual std::shared_ptr<Texture> getColorRenderTexture() const = 0;
 
 private:

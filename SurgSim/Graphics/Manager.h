@@ -60,6 +60,8 @@ public:
 		return m_views;
 	}
 
+	/// Generic unspecified debug handle, there are no requirements on this interface
+	/// the manager implementation can decide what to do
 	virtual void dumpDebugInfo() const = 0;
 
 protected:
