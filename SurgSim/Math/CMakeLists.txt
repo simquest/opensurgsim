@@ -24,13 +24,13 @@ set(SURGSIM_MATH_SOURCES
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
+	Matrix.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
 	MlcpProblem.h
 	MlcpSolution.h
 	MlcpSolver.h
-	Matrix.h
 	Quaternion.h
 	RigidTransform.h
 	Valid.h

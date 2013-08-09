@@ -22,16 +22,16 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
 	CollisionPairTests.cpp
+	ComputationTests.cpp
 	ConstraintTests.cpp
 	ContactCalculationTests.cpp
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
-	ComputationTests.cpp
 	DcdCollisionTests.cpp
 	FemRepresentationParametersTest.cpp
+	FixedRepresentationTest.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
-	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	MockCollisionRepresentation.cpp
@@ -47,7 +47,6 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
-	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
 	VtcRigidParametersTest.cpp
@@ -56,8 +55,8 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
-	MockObjects.h
 	MockCollisionRepresentation.h
+	MockObjects.h
 	RepresentationUtilities.h
 )
 

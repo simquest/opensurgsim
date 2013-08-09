@@ -25,9 +25,9 @@ set(UNIT_TEST_SOURCES
 	GroupTests.cpp
 	ManagerTests.cpp
 	OsgBoxRepresentationTests.cpp
+	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp
 	OsgCylinderRepresentationTests.cpp
-	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
