@@ -69,7 +69,7 @@ TEST(LoggerManagerTest, defaultLoggerTest)
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
 	std::shared_ptr<Logger> defaultLogger(loggerManager->getDefaultLogger());
 
-	EXPECT_TRUE( nullptr != defaultLogger);
+	EXPECT_TRUE(nullptr != defaultLogger);
 	EXPECT_EQ(loggerManager->getDefaultOutput(), defaultLogger->getOutput());
 	EXPECT_EQ(loggerManager->getThreshold(), defaultLogger->getThreshold());
 }
@@ -81,7 +81,7 @@ TEST(LoggerManagerTest, getLogger)
 
 	std::shared_ptr<Logger> retrieved(loggerManager->getLogger("test"));
 
-	EXPECT_TRUE( nullptr != retrieved);
+	EXPECT_TRUE(nullptr != retrieved);
 }
 
 TEST(LoggerManagerTest, threshold)

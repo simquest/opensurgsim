@@ -32,7 +32,7 @@ class LoggerManager
 {
 public:
 	/// Constructor
-	explicit LoggerManager();
+	LoggerManager();
 	~LoggerManager();
 
 	/// Sets default output.
