@@ -37,6 +37,7 @@ namespace Graphics
 
 class Material;
 class Texture;
+class RenderTarget;
 
 /// OSG implementation of a graphics camera.
 ///
@@ -125,6 +126,9 @@ public:
 	virtual void clearMaterial();
 	///@}
 	///
+
+	void attachRenderTarget(osg::Camera::BufferComponent buffer, std::shared_ptr<Texture> texture);
+	void OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget);
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;

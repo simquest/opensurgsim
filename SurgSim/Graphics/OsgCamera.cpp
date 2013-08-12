@@ -15,16 +15,38 @@
 
 #include <SurgSim/Graphics/OsgCamera.h>
 
+#include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/Manager.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgMatrixConversions.h>
 #include <SurgSim/Graphics/OsgQuaternionConversions.h>
 #include <SurgSim/Graphics/OsgVectorConversions.h>
-#include <SurgSim/Graphics/Manager.h>
-#include <SurgSim/Graphics/Material.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
+#include <SurgSim/Graphics/OsgRenderTarget.h>
 
 
 using SurgSim::Math::makeRigidTransform;
+
+namespace {
+	const osg::Camera::BufferComponent ColorBufferEnums[16] = {
+		osg::Camera::COLOR_BUFFER0, 
+		osg::Camera::COLOR_BUFFER1, 
+		osg::Camera::COLOR_BUFFER2, 
+		osg::Camera::COLOR_BUFFER3, 
+		osg::Camera::COLOR_BUFFER4, 
+		osg::Camera::COLOR_BUFFER5, 
+		osg::Camera::COLOR_BUFFER6, 
+		osg::Camera::COLOR_BUFFER7, 
+		osg::Camera::COLOR_BUFFER8, 
+		osg::Camera::COLOR_BUFFER9, 
+		osg::Camera::COLOR_BUFFER10, 
+		osg::Camera::COLOR_BUFFER11, 
+		osg::Camera::COLOR_BUFFER12, 
+		osg::Camera::COLOR_BUFFER13, 
+		osg::Camera::COLOR_BUFFER14, 
+		osg::Camera::COLOR_BUFFER15 
+	};
+};
+
 
 namespace SurgSim
 {
@@ -184,7 +206,46 @@ std::shared_ptr<Texture> OsgCamera::getColorRenderTexture() const
 	return m_textureMap.at(osg::Camera::COLOR_BUFFER);
 }
 
+void OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
+{
+	int width, height;
+	renderTarget->getSize(&width, &height);
+	m_camera->setViewport(0,0,width*renderTarget->getScale(),height*renderTarget->getScale());
 
+	//attachRenderTarget(osg::Camera::DEPTH_BUFFER, renderTarget->getDepthTarget());
+	//attachRenderTarget(osg::Camera::DEPTH_BUFFER, renderTarget->getStencilTarget());
+	// OSG has 16 COLOR_BUFFER objects
+	for (int i = 0; i < 16; ++i)
+	{
+		attachRenderTarget(ColorBufferEnums[i], renderTarget->getColorTarget(i));
+	}
+
+	// attachRenderTarget(osg::Camera::COLOR_BUFFER, renderTarget->getColorTarget(0));
+
+	m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::PIXEL_BUFFER);
+	m_camera->setRenderOrder(osg::Camera::PRE_RENDER); 
+	m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+	m_camera->setClearColor(osg::Vec4f(0.0, 1.0, 0.0, 1.0));
+
+}
+
+void OsgCamera::attachRenderTarget(osg::Camera::BufferComponent buffer, std::shared_ptr<Texture> texture)
+{
+	if (texture == nullptr) 
+	{
+		return;
+	}
+
+	std::shared_ptr<OsgTexture> osgTexture = std::dynamic_pointer_cast<OsgTexture>(texture);
+	SURGSIM_ASSERT(osgTexture != nullptr) << 
+		"RenderTarget used a texture that was not an OsgTexture subclass";
+
+	osg::Texture* actualTexture = osgTexture->getOsgTexture();
+	SURGSIM_ASSERT(actualTexture != nullptr) << 
+		"Could not find texture";
+
+	m_camera->attach(buffer, actualTexture, 0, 0);
+}
 
 }; // namespace Graphics
 }; // namespace SurgSim
