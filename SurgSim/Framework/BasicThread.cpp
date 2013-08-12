@@ -108,7 +108,7 @@ void BasicThread::operator()()
 		if (m_period > frameTime)
 		{
 			sleepTime = m_period - frameTime;
-			boost::this_thread::sleep_until(boost::chrono::system_clock::now() + sleepTime);
+			boost::this_thread::sleep_until(Clock::now() + sleepTime);
 		}
 
 		start = Clock::now();

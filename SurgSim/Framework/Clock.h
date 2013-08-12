@@ -18,11 +18,16 @@
 
 #include <boost/chrono.hpp>
 
+/// \file
+/// Place for a simple wrapper around boost
+
+
 namespace SurgSim
 {
 namespace Framework
 {
 
+	/// Wraps around the actual clock we are using.
 	typedef boost::chrono::system_clock Clock;
 
 }; // Framework
