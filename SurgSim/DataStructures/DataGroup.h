@@ -17,7 +17,6 @@
 #define SURGSIM_DATASTRUCTURES_DATAGROUP_H
 
 #include <Eigen/Core>
-#include <boost/any.hpp>
 
 #include <SurgSim/DataStructures/NamedData.h>
 #include <SurgSim/DataStructures/NamedAny.h>

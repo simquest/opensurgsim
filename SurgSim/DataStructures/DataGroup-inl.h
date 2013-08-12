@@ -52,7 +52,7 @@ inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 	m_integers = dataGroup.m_integers;
 	m_booleans = dataGroup.m_booleans;
 	m_strings = dataGroup.m_strings;
-	m_customs= dataGroup.m_customs;
+	m_customs = dataGroup.m_customs;
 
 	SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
 	return *this;
@@ -70,7 +70,7 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 	m_integers = std::move(dataGroup.m_integers);
 	m_booleans = std::move(dataGroup.m_booleans);
 	m_strings = std::move(dataGroup.m_strings);
-	m_customs= std::move(dataGroup.m_customs);
+	m_customs = std::move(dataGroup.m_customs);
 
 	SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
 	return *this;
