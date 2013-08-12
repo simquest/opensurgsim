@@ -21,6 +21,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	PhantomDeviceTest.cpp
+	PhantomScaffoldTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
