@@ -23,11 +23,46 @@
 #include <array>
 #include <limits>
 
-struct MockData
+template<typename T>
+class Mock3DData
 {
-    int intValue;
-    float floatValue;
-    std::vector<double> doubleVector;
+public:
+	Mock3DData()
+	: m_height(0),
+	  m_width(0),
+	  m_depth(0),
+	  m_buffer(0)
+	{
+	}
+
+	Mock3DData(int height, int width, int depth)
+	: m_height(height),
+	  m_width(width),
+	  m_depth(depth),
+	  m_buffer(height*depth*width)
+	{
+	}
+
+	T get(int i, int j, int k)
+	{
+		return m_buffer[getIndex(i,j,k)];
+	}
+
+	void set(int i, int j, int k, T value)
+	{
+		m_buffer[getIndex(i,j,k)] = value;
+	}
+
+private:
+	int getIndex(int i, int j, int k)
+	{
+		return i + j*m_width + k*m_width*m_height;
+	}
+
+	int m_height;
+	int m_width;
+	int m_depth;
+	std::vector<T> m_buffer;
 };
 
 /// Vertex data for testing, storing ID and surface normal

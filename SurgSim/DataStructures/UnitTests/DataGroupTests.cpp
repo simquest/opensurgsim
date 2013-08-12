@@ -99,10 +99,8 @@ TEST(DataGroupTests, PutName)
 	DataGroup::DynamicMatrixType matrix(2,3);
 	matrix.fill(3.0);
 
-	MockData mockData;
-	mockData.intValue = 2;
-	mockData.floatValue = 2.3;
-	mockData.doubleVector.push_back(3.2);
+	Mock3DData<double> mockData(10,10,10);
+	mockData.set(5, 5, 5, 1.2345);
 
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
@@ -159,10 +157,9 @@ TEST(DataGroupTests, GetName)
 	DataGroup::DynamicMatrixType matrix(2,3);
 	matrix.fill(3.0);
 
-	MockData mockData;
-	mockData.intValue = 2;
-	mockData.floatValue = 2.3;
-	mockData.doubleVector.push_back(3.2);
+	Mock3DData<double> mockData(10,10,10);
+	mockData.set(5, 5, 5, 1.23);
+	mockData.set(1, 2, 3, 4.56);
 
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
@@ -212,11 +209,10 @@ TEST(DataGroupTests, GetName)
 		EXPECT_EQ("string", value);
 	}
 	{
-		MockData value;
+		Mock3DData<double> value;
 		EXPECT_TRUE(data.customs().get("mock_data", &value));
-		EXPECT_EQ(mockData.intValue, value.intValue);
-		EXPECT_NEAR(mockData.floatValue, value.floatValue, 1e-9);
-		EXPECT_EQ(mockData.doubleVector.size(), value.doubleVector.size());
+		EXPECT_NEAR(1.23, value.get(5, 5, 5), 1e-9);
+		EXPECT_NEAR(4.56, value.get(1, 2, 3), 1e-9);
 	}
 }
 
@@ -232,7 +228,7 @@ TEST(DataGroupTests, ResetAll)
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
-	data.customs().set("fourth", MockData());
+	data.customs().set("fourth", Mock3DData<double>(10, 10, 10));
 
 	data.resetAll();
 
@@ -261,7 +257,7 @@ TEST(DataGroupTests, ResetOne)
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
-	data.customs().set("fourth", MockData());
+	data.customs().set("fourth", Mock3DData<double>(10, 10, 10));
 
 	data.strings().reset("third");
 

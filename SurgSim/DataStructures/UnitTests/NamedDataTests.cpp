@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the NamedData<T> class.
 
+#include <SurgSim/Framework/Assert.h>
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
 #include "SurgSim/DataStructures/NamedAny.h"
@@ -317,22 +318,37 @@ TEST(NamedDataTests, NamedAny)
 	EXPECT_EQ(-1, data.getIndex("missing"));
 	EXPECT_EQ("", data.getName(1));
 
-	MockData mockData;
-	mockData.intValue = 3;
-	mockData.floatValue = 2.7;
-	mockData.doubleVector.push_back(2.7);
-	mockData.doubleVector.push_back(1.7);
+	Mock3DData<float> mockData(5, 5, 5);
+	mockData.set(1, 1, 1, 1.23);
+	mockData.set(4, 3, 2, 4.56);
+
 	data.set("test", mockData);
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
 	EXPECT_TRUE(data.hasData(0));
 	EXPECT_TRUE(data.hasData("test"));
 
-	MockData value;
-	data.get("test", &value);
-	EXPECT_EQ(mockData.intValue, value.intValue);
-	EXPECT_NEAR(mockData.floatValue, value.floatValue, 1e-9);
-	EXPECT_EQ(mockData.doubleVector.size(), value.doubleVector.size());
+	{
+		Mock3DData<float> value;
+		EXPECT_TRUE(data.get("test", &value));
+		EXPECT_EQ(1.23f, value.get(1, 1, 1));
+		EXPECT_EQ(4.56f, value.get(4, 3, 2));
+	}
+	{
+		Mock3DData<float> value;
+		EXPECT_TRUE(data.get(0, &value));
+		EXPECT_EQ(1.23f, value.get(1, 1, 1));
+		EXPECT_EQ(4.56f, value.get(4, 3, 2));
+	}
+	{
+		Mock3DData<float> value;
+		EXPECT_FALSE(data.get(5, &value));
+		EXPECT_FALSE(data.get("missing", &value));
+	}
+	{
+		Mock3DData<unsigned char> wrongType;
+		EXPECT_THROW(data.get("test", &wrongType), SurgSim::Framework::AssertionFailure);
+	}
 
 	data.resetAll();
 	EXPECT_TRUE(data.hasEntry(0));
