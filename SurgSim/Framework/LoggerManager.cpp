@@ -31,7 +31,6 @@ LoggerManager::LoggerManager():
 	m_globalThreshold(LOG_LEVEL_WARNING),
 	m_mutex()
 {
-	m_loggers["default"] = std::make_shared<Logger>("default", m_defaultOutput);
 }
 
 LoggerManager::~LoggerManager()
@@ -52,23 +51,23 @@ std::shared_ptr<LogOutput> LoggerManager::getDefaultOutput() const
 
 void LoggerManager::setThreshold(int threshold)
 {
-	m_globalThreshold = threshold;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
+	m_globalThreshold = threshold;
 	for (auto it = m_loggers.cbegin(); it != m_loggers.cend(); ++it)
 	{
-		it->second->setThreshold(threshold);
+		(it->second).lock()->setThreshold(threshold);
 	}
 }
 
 void LoggerManager::setThreshold(const std::string& path, int threshold)
 {
-	m_globalThreshold = threshold;
 	boost::lock_guard<boost::mutex> lock(m_mutex);
+	m_globalThreshold = threshold;
 	for (auto it = m_loggers.cbegin(); it != m_loggers.cend(); ++it)
 	{
 		if (boost::istarts_with(it->first, path))
 		{
-			it->second->setThreshold(threshold);
+			(it->second).lock()->setThreshold(threshold);
 		}
 	}
 }
@@ -79,20 +78,22 @@ int LoggerManager::getThreshold() const
 }
 
 
-void LoggerManager::setLogger(std::string name, std::shared_ptr<Logger> logger)
-{
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	m_loggers[name] = logger;
-}
-
 std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 {
-	auto result = lookUpLogger(name);
-	if ( result == nullptr )
-	{
-		result = createLogger(name, m_defaultOutput);
-	}
+	boost::lock_guard<boost::mutex> lock(m_mutex);
 
+	auto it = m_loggers.find(name);
+	std::shared_ptr<Logger> result;
+	if ( it == m_loggers.end() )
+	{
+		result = std::make_shared<Logger>(name, m_defaultOutput);
+		result->setThreshold(m_globalThreshold);
+		m_loggers[name] = result;
+	}
+	else
+	{
+		result = (it->second).lock();
+	}
 	return result;
 }
 
@@ -101,38 +102,6 @@ std::shared_ptr<Logger> LoggerManager::getDefaultLogger()
 {
 	return getLogger("default");
 }
-
-
-std::shared_ptr<Logger> LoggerManager::createConsoleLogger(const std::string& name)
-{
-	auto result = lookUpLogger(name);
-	if ( result == nullptr )
-	{
-		static std::shared_ptr<StreamOutput> output(std::make_shared<StreamOutput>(std::cerr));
-		result = createLogger(name, output);
-	}
-
-	return result;
-}
-
-
-std::shared_ptr<Logger> LoggerManager::lookUpLogger(const std::string& name)
-{
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	return m_loggers[name];
-}
-
-std::shared_ptr<Logger> LoggerManager::createLogger(const std::string& name, std::shared_ptr<LogOutput> output)
-{
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	std::shared_ptr<Logger> result(std::make_shared<Logger>(name, output));
-	result->setThreshold(m_globalThreshold);
-	m_loggers[name] = result;
-
-	return result;
-}
-
-
 
 }; // Framework
 }; // SurgSim

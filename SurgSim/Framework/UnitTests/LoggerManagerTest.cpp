@@ -25,12 +25,6 @@ using SurgSim::Framework::Logger;
 using SurgSim::Framework::LoggerManager;
 using SurgSim::Framework::StreamOutput;
 
-
-namespace
-{
-	const double epsilon = 1e-10;
-};
-
 class MockOutput : public SurgSim::Framework::LogOutput
 {
 public:
@@ -76,28 +70,33 @@ TEST(LoggerManagerTest, defaultLoggerTest)
 	EXPECT_TRUE( nullptr != loggerManager->getDefaultLogger());
 }
 
-TEST(LoggerManagerTest, consoleLoggerTest)
-{
-	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
-	std::shared_ptr<Logger> console(loggerManager->createConsoleLogger("console"));
-	EXPECT_TRUE( nullptr != console);
-}
 
 TEST(LoggerManagerTest, Logger)
 {
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
-	std::shared_ptr<MockOutput> output(std::make_shared<MockOutput>());
-	std::shared_ptr<Logger> logger(std::make_shared<Logger>("test",output));
 
-	loggerManager->setLogger("test", logger);
 	std::shared_ptr<Logger> retrieved(loggerManager->getLogger("test"));
 
-	EXPECT_EQ(logger, retrieved);
+	EXPECT_TRUE( nullptr != retrieved);
 }
 
 TEST(LoggerManagerTest, threshold)
 {
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
-	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
-	EXPECT_NEAR(SurgSim::Framework::LOG_LEVEL_WARNING, loggerManager->getThreshold(), epsilon);
+	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_CRITICAL);
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_CRITICAL, loggerManager->getThreshold());
+	
+	std::shared_ptr<Logger> logger1(loggerManager->getLogger("logger1"));
+	std::shared_ptr<Logger> logger2(loggerManager->getLogger("logger2"));
+	std::shared_ptr<Logger> testLogger(loggerManager->getLogger("testLogger"));
+
+	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_INFO, logger1->getThreshold());
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_INFO, logger2->getThreshold());
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_INFO, testLogger->getThreshold());
+
+	loggerManager->setThreshold("logger", SurgSim::Framework::LOG_LEVEL_WARNING);
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger1->getThreshold());
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger2->getThreshold());
+	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, testLogger->getThreshold());
 }

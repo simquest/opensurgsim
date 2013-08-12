@@ -42,28 +42,15 @@ public:
 	/// Return the default output
 	std::shared_ptr<LogOutput> getDefaultOutput() const;
 
-
 	/// Gets the default logger
 	/// \return	The default logger.
 	std::shared_ptr<Logger> getDefaultLogger();
-
-	/// Creates a logger that logs to the standard error output.
-	/// \param name The name to use for the logger.
-	/// \return The new logger.
-	std::shared_ptr<Logger> createConsoleLogger(const std::string& name);
-
-
-	/// Sets a logger with a given name, overwriting the old logger
-	/// \param	name  	The name of logger.
-	/// \param	logger	The logger.
-	void setLogger(std::string name, std::shared_ptr<Logger> logger);
 
 	/// Gets a logger with a given name, creates a new one if none exists  or the logger
 	/// has been deallocated.
 	/// \param	name	The name.
 	/// \return	The logger.
 	std::shared_ptr<Logger> getLogger(const std::string& name);
-
 
 	/// Sets a threshold for all the loggers.
 	/// \param	threshold	The threshold.
@@ -80,20 +67,8 @@ public:
 	int getThreshold() const;
 
 private:
-
-	/// Search for a logger with given name and return it.
-	/// If not found, nulptr will be returned
-	/// \param	name	The name of the logger to be found.
-	/// \return	Logger with given name if found; Otherwise, nulptr
-	std::shared_ptr<Logger> lookUpLogger(const std::string& name);
-
-	/// Create a logger with given name and output
-	/// \param	name	The name of the logger to be created.
-	/// \param	output	Output class to be used by the logger.
-	std::shared_ptr<Logger> createLogger(const std::string& name, std::shared_ptr<LogOutput> output);
-
 	/// Keep track of all the loggers
-	std::unordered_map<std::string, std::shared_ptr<Logger>> m_loggers;
+	std::unordered_map<std::string, std::weak_ptr<Logger>> m_loggers;
 
 	/// Use for default output of the logger
 	std::shared_ptr<LogOutput> m_defaultOutput;
