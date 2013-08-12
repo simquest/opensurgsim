@@ -67,7 +67,7 @@ public:
 		}
 		catch(const boost::bad_any_cast &)
 		{
-			return false;
+			SURGSIM_FAILURE() << "Cannot cast the named value to the specified type.";
 		}
 		return true;
 	}
@@ -84,18 +84,8 @@ public:
 	template <typename T>
 	inline bool get(const std::string& name, T* value) const
 	{
-		boost::any a;
-		if (!NamedData::get(name, &a))
-			return false;
-		try
-		{
-			*value = boost::any_cast<T>(a);
-		}
-		catch(const boost::bad_any_cast &)
-		{
-			return false;
-		}
-		return true;
+		int index = getIndex(name);
+		return get(index, value);
 	}
 };
 
