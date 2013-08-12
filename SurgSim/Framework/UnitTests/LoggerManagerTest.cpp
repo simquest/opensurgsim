@@ -85,7 +85,7 @@ TEST(LoggerManagerTest, threshold)
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
 	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_CRITICAL);
 	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_CRITICAL, loggerManager->getThreshold());
-	
+
 	std::shared_ptr<Logger> logger1(loggerManager->getLogger("logger1"));
 	std::shared_ptr<Logger> logger2(loggerManager->getLogger("logger2"));
 	std::shared_ptr<Logger> testLogger(loggerManager->getLogger("testLogger"));
