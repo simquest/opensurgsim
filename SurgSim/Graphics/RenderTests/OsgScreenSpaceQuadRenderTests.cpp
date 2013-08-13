@@ -72,7 +72,12 @@ struct OsgScreenSpaceQuadRenderTests : public ::testing::Test
 		runtime->stop();
 	}
 
-	std::shared_ptr<ScreenSpaceQuadRepresentation> makeQuad(const std::string& name, int width, int height, int x, int y)
+	std::shared_ptr<ScreenSpaceQuadRepresentation> makeQuad(
+		const std::string& name,
+		int width,
+		int height,
+		int x,
+		int y)
 	{
 		std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
 			std::make_shared<OsgScreenSpaceQuadRepresentation>(name, viewElement->getView());
@@ -200,9 +205,9 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	viewElement->getView()->getDimensions(&width,&height);
 
 
-	std::shared_ptr<OsgRenderTargetRectangle> renderTargetOsg = 
-		std::make_shared<OsgRenderTargetRectangle>(width,height, 1.0/3.0, 2, true, false);
-		
+	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
+		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
+
 	camera->setRenderTarget(renderTargetOsg);
 
 	viewElement->addComponent(camera);
@@ -225,7 +230,6 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	quad = makeQuad("Depth", width, height, 0.0, screenHeight - height);
 	quad->setTexture(renderTargetOsg->getDepthTargetOsg());
 	viewElement->addComponent(quad);
-
 
 
 

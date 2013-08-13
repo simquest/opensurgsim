@@ -25,6 +25,11 @@ namespace Graphics
 
 class Texture;
 
+/// RenderTarget is an abstraction of a selection of Textures and possibly RenderBuffers that are
+/// used when a camera draws its' content. Color Information will always be written into a texture
+/// that can be used further down the path, depth information might be written into a RenderBuffer that
+/// cannot be directly fetched as a Texture.
+/// The RenderTarget is consider immutable after construction.
 class RenderTarget
 {
 public:
@@ -33,32 +38,31 @@ public:
 	RenderTarget()
 	{
 	};
-	
-	~RenderTarget()
+
+	virtual ~RenderTarget()
 	{
 	};
 
-	virtual void setSize(int width, int height) = 0;
+	/// Gets a size.
+	/// \param [out]	width, height	The width and height of the RenderTarget textures.
 	virtual void getSize(int* width, int* height) const = 0;
 
-	virtual void setScale(double scale) = 0;
-	virtual double getScale() const = 0;
-
-	/// Sets the number of color target textures to use, returns the actual number of textures
-	/// that can be used.
-	/// \param	count	Number of textures to use as targets.
-	/// \return	number of textures that will be used.
-	virtual int setColorTargetCount(int count) = 0;
+	/// Returns the number of textures that this RenderTarget uses to draw into.
+	/// \return	The color target count.
 	virtual int getColorTargetCount() const = 0;
+
+	/// Gets the indicated texture that is used as a target.
+	/// \param	index	Zero-based index of the texture to be used.
+	/// \return	The color target, nullptr if index exceeds getColorTargetCount().
 	virtual std::shared_ptr<Texture> getColorTarget(int index) const = 0;
 
-	virtual void useDepthTarget(bool val) = 0;
+	/// Check wether this draws into a depth texture.
+	/// \return	true if yes, otherwise false.
 	virtual bool doesUseDepthTarget() const = 0;
-	virtual std::shared_ptr<Texture> getDepthTarget() const = 0;
 
-	virtual void useStencilTarget(bool val) = 0;
-	virtual bool doesUseStencilTarget() const = 0;
-	virtual std::shared_ptr<Texture> getStencilTarget() const = 0;
+	/// Returns the texture that is used for the depth map drawing.
+	/// \return	The depth target.
+	virtual std::shared_ptr<Texture> getDepthTarget() const = 0;
 
 private:
 

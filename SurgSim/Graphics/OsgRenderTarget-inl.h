@@ -16,14 +16,13 @@
 #ifndef SURGSIM_GRAPHICS_OSGRENDERTARGET_INL_H
 #define SURGSIM_GRAPHICS_OSGRENDERTARGET_INL_H
 
-// OSG supports 16 color textures as of now + depth and stencil
-const int OsgSupportedTextureCount = 16 + 2;
+// Osg Supports 16 Color Attachments plus the depth texture
+const int OsgSupportedTextureCount = 16 + 1;
 
 template <class T>
 OsgRenderTarget<T>::OsgRenderTarget() :
 	m_width(0),
 	m_height(0),
-	m_scale(1.0),
 	m_colorTargetCount(0),
 	m_textures(OsgSupportedTextureCount)
 {
@@ -35,31 +34,20 @@ OsgRenderTarget<T>::OsgRenderTarget(
 		int height,
 		double scale,
 		int colorCount,
-		bool useDepth,
-		bool useStencil) :
-	m_scale(scale),
-	m_width(width),
-	m_height(height),
+		bool useDepth) :
+	m_width(width * scale),
+	m_height(height * scale),
 	m_textures(OsgSupportedTextureCount),
 	m_colorTargetCount(0)
 {
 	setColorTargetCount(colorCount);
 	useDepthTarget(useDepth);
-	useStencilTarget(useStencil);
 }
 
 
 template <class T>
 OsgRenderTarget<T>::~OsgRenderTarget()
 {
-}
-
-template <class T>
-void OsgRenderTarget<T>::setSize(int width, int height)
-{
-	m_width = width;
-	m_height = height;
-	rebuildTextures();
 }
 
 template <class T>
@@ -70,24 +58,12 @@ void OsgRenderTarget<T>::getSize(int* width, int* height) const
 }
 
 template <class T>
-void OsgRenderTarget<T>::setScale(double scale)
-{
-	m_scale = scale;
-	rebuildTextures();
-}
-
-template <class T>
-double OsgRenderTarget<T>::getScale() const
-{
-	return m_scale;
-}
-
-
-template <class T>
 int OsgRenderTarget<T>::setColorTargetCount(int count)
 {
 	int result = (count < 16) ? count : 16;
 
+	// This does not check against graphics card capabilities, the max 16 provided
+	// by OSG might not be supported by the current graphics card
 	// Keep the other texture allocated when the count goes down
 	// Rendertargets are probably not going to change that much once set up
 	// #memory
@@ -162,74 +138,32 @@ std::shared_ptr<T> OsgRenderTarget<T>::getDepthTargetOsg() const
 	return m_textures.at(TARGETTYPE_DEPTH);
 }
 
-
-template <class T>
-void OsgRenderTarget<T>::useStencilTarget(bool val)
-{
-	if (val)
-	{
-		setupTexture(TARGETTYPE_STENCIL);
-	}
-	else
-	{
-		m_textures[TARGETTYPE_STENCIL] = nullptr;
-	}
-}
-
-template <class T>
-bool OsgRenderTarget<T>::doesUseStencilTarget() const
-{
-	return m_textures.at(TARGETTYPE_STENCIL) != nullptr;
-}
-
-template <class T>
-std::shared_ptr<Texture> OsgRenderTarget<T>::getStencilTarget() const
-{
-	return m_textures.at(TARGETTYPE_STENCIL);
-}
-
-template <class T>
-std::shared_ptr<T> OsgRenderTarget<T>::getStencilTargetOsg() const
-{
-	return m_textures.at(TARGETTYPE_STENCIL);
-}
-
-template <class T>
-void OsgRenderTarget<T>::rebuildTextures()
-{
-	for (int i = 0; i < OsgSupportedTextureCount; ++i)
-	{
-		if (m_textures[i] != nullptr)
-		{
-			setupTexture(i);
-		}
-	}
-}
-
 template <class T>
 void OsgRenderTarget<T>::setupTexture(int type)
 {
 	if (m_textures[type] == nullptr)
 	{
 		m_textures[type] = std::make_shared<T>();
-		m_textures[type]->setSize(m_width*m_scale, m_height*m_scale);
+		m_textures[type]->setSize(m_width, m_height);
 		osg::Texture* osgTexture = m_textures[type]->getOsgTexture();
 		// We are not dealing with mipmaps, fix up the filters to enable rendering to FBO
 		// see http://www.opengl.org/wiki/Common_Mistakes#Creating_a_complete_texture
 		osgTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::LINEAR);
 		osgTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::LINEAR);
-		osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE); 
+		osgTexture->setWrap(osg::Texture::WRAP_S, osg::Texture::CLAMP_TO_EDGE);
 		osgTexture->setWrap(osg::Texture::WRAP_T, osg::Texture::CLAMP_TO_EDGE);
 		if (type == TARGETTYPE_DEPTH)
 		{
-			osgTexture->setSourceFormat(GL_DEPTH_COMPONENT); 
-			osgTexture->setSourceType(GL_FLOAT); 
 			osgTexture->setInternalFormat(GL_DEPTH_COMPONENT32F);
+			osgTexture->setSourceFormat(GL_DEPTH_COMPONENT);
+			osgTexture->setSourceType(GL_FLOAT);
+			osgTexture->setFilter(osg::Texture::MIN_FILTER,osg::Texture::NEAREST);
+			osgTexture->setFilter(osg::Texture::MAG_FILTER,osg::Texture::NEAREST);
 		}
 		if (type >= TARGETTYPE_COLORBASE)
 		{
-			osgTexture->setInternalFormat(GL_RGBA32F_ARB); 
-			osgTexture->setSourceFormat(GL_RGBA); 
+			osgTexture->setInternalFormat(GL_RGBA32F_ARB);
+			osgTexture->setSourceFormat(GL_RGBA);
 			osgTexture->setSourceType(GL_FLOAT);
 		}
 	}
