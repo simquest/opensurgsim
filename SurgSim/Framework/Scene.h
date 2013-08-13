@@ -30,7 +30,7 @@ namespace Framework
 class Runtime;
 
 /// Scene. Basic Container for SceneElements
-class Scene
+class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
 	Scene()
@@ -59,7 +59,16 @@ public:
 	/// \param	runtime	The runtime for this scene.
 	void setRuntime(std::shared_ptr<Runtime> runtime);
 
+	/// Gets the runtime
+	/// \return runtime The runtime for this scene.
+	std::shared_ptr<Runtime> getRuntime();
+
 private:
+
+	/// Get a shared pointer to Scene.
+	/// \return The shared pointer.
+	std::shared_ptr<Scene> getSharedPtr();
+
 	std::weak_ptr<Runtime> m_runtime;
 
 	std::map<std::string,std::shared_ptr<SceneElement>> m_elements;

@@ -17,8 +17,12 @@
 #include "MockObjects.h"  //NOLINT
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Framework/SceneElement.h>
+
 
 using SurgSim::Framework::Scene;
+using SurgSim::Framework::SceneElement;
+using SurgSim::Framework::Component;
 
 TEST(SceneTest, ConstructorTest)
 {
@@ -44,4 +48,18 @@ TEST(SceneTest, ElementManagement)
 	EXPECT_EQ(element1, scene->getSceneElement("one"));
 	EXPECT_EQ(element2, scene->getSceneElement("two"));
 	EXPECT_EQ(nullptr, scene->getSceneElement("nonexistentelement"));
+}
+
+TEST(SceneTest, AddAndTestScene)
+{
+	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+	std::shared_ptr<MockSceneElement> element = std::make_shared<MockSceneElement>("element");
+	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("component");
+
+	EXPECT_TRUE(element->addComponent(component));
+	EXPECT_TRUE(scene->addSceneElement(element));
+
+  	EXPECT_EQ(scene, component->getScene());
+	EXPECT_EQ(element, component->getSceneElement());
+	EXPECT_EQ(scene, element->getScene());
 }

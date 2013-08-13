@@ -26,9 +26,9 @@ set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
 	OsgBoxRepresentation.cpp
+	OsgCamera.cpp
 	OsgCapsuleRepresentation.cpp
 	OsgCylinderRepresentation.cpp
-	OsgCamera.cpp
 	OsgGroup.cpp
 	OsgManager.cpp
 	OsgMaterial.cpp
@@ -52,17 +52,17 @@ set(SURGSIM_GRAPHICS_SOURCES
 
 set(SURGSIM_GRAPHICS_HEADERS
 	BoxRepresentation.h
+	Camera.h
 	CapsuleRepresentation.h
 	CylinderRepresentation.h
-	Camera.h
 	Group.h
 	Manager.h
 	Material.h
 	OsgBoxRepresentation.h
-	OsgCapsuleRepresentation.h
-	OsgCylinderRepresentation.h
 	OsgCamera.h
+	OsgCapsuleRepresentation.h
 	OsgConversions.h
+	OsgCylinderRepresentation.h
 	OsgGroup.h
 	OsgManager.h
 	OsgMaterial.h

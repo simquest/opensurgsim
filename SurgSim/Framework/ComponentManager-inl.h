@@ -16,6 +16,11 @@
 #ifndef SURGSIM_FRAMEWORK_COMPONENTMANAGER_INL_H
 #define SURGSIM_FRAMEWORK_COMPONENTMANAGER_INL_H
 
+namespace SurgSim
+{
+namespace Framework
+{
+
 /// Executes the add component operation.
 /// \tparam	T	Type of the component to be added.
 /// \param	component		 	The component that is being added.
@@ -69,6 +74,9 @@ bool ComponentManager::tryRemoveComponent(std::shared_ptr<SurgSim::Framework::Co
 	}
 	return result;
 };
+
+}; // namespace Framework
+}; // namespace SurgSim
 
 #endif
 

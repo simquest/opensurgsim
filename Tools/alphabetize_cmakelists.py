@@ -46,7 +46,7 @@ def spew_lines(file, lines):
     print >> sys.stderr, e
     return False
 
-def normalize(file):
+def filename_sort_filter(file):
   return re.sub(r'Tests?$', '', re.sub(r'\.(?:h|cpp)$', '', file)).lower()
 
 def alphabetize(file, lines):
@@ -67,7 +67,7 @@ def alphabetize(file, lines):
         content = content[1:]  # strip the original set(... line
         content = filter(lambda x: len(x), map(lambda x: x.strip(), content))
         #print var_name + ":", content
-        content = sorted(content, key=normalize)
+        content = sorted(content, key=filename_sort_filter)
         result.append(indent + "set(" + var_name)
         result.extend(map(lambda x: indent + "\t" + x, content))
         result.append(indent + ")")

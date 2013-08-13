@@ -22,8 +22,10 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	ApplicationDataTest.cpp
 	AssertTest.cpp
+	BarrierTest.cpp
 	BasicThreadTests.cpp
 	BehaviorManagerTest.cpp
+	ComponentTest.cpp
 	ComponentManagerTests.cpp
 	LockedContainerTest.cpp
 	LoggerTest.cpp

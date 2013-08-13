@@ -27,8 +27,6 @@ TEST(RuntimeTest, Constructor)
 {
 	EXPECT_NO_THROW({std::shared_ptr<Runtime> runtime(new Runtime());});
 
-	Runtime runtime;
-	ASSERT_ANY_THROW(runtime.getSharedPtr());
 }
 
 TEST(RuntimeTest, SetScene)

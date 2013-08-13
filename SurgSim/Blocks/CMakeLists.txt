@@ -32,10 +32,10 @@ set(SURGSIM_BLOCKS_HEADERS
 )
 
 surgsim_add_library(
-    SurgSimBlocks
-    "${SURGSIM_BLOCKS_SOURCES}"
-    "${SURGSIM_BLOCKS_HEADERS}"
-    "SurgSim/Blocks"
+	SurgSimBlocks
+	"${SURGSIM_BLOCKS_SOURCES}"
+	"${SURGSIM_BLOCKS_HEADERS}"
+	"SurgSim/Blocks"
 )
 target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
 	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})

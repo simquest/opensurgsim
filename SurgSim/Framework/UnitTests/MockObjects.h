@@ -42,6 +42,9 @@ public:
 	{
 		m_localRuntime = std::make_shared<SurgSim::Framework::Runtime>();
 		setRuntime(m_localRuntime);
+
+		m_localScene = std::make_shared<SurgSim::Framework::Scene>();
+		setScene(m_localScene);
 	}
 
 	virtual void update(double dt)
@@ -75,6 +78,8 @@ public:
 	bool didFixedUpdate;
 private:
 	std::shared_ptr<SurgSim::Framework::Runtime> m_localRuntime;
+	std::shared_ptr<SurgSim::Framework::Scene> m_localScene;
+
 };
 
 class MockThread : public SurgSim::Framework::BasicThread
