@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the SURGSIM_LOG_*() macros and the related classes.
+/// Tests for LoggerManager class.
 
 #include <gtest/gtest.h>
 #include <SurgSim/Framework/Log.h>
@@ -55,7 +55,7 @@ TEST(LoggerManagerTest, Constructor)
 	EXPECT_NO_THROW({std::shared_ptr<LoggerManager> loggerManager(new LoggerManager());});
 }
 
-TEST(LoggerManagerTest, defaultOutput)
+TEST(LoggerManagerTest, DefaultOutput)
 {
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
 	std::shared_ptr<StreamOutput> output(std::make_shared<StreamOutput>(std::cerr));
@@ -64,10 +64,10 @@ TEST(LoggerManagerTest, defaultOutput)
 	EXPECT_EQ(output, loggerManager->getDefaultOutput());
 }
 
-TEST(LoggerManagerTest, defaultLoggerTest)
+TEST(LoggerManagerTest, DefaultLoggerTest)
 {
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
-	std::shared_ptr<Logger> defaultLogger(loggerManager->getDefaultLogger());
+	std::shared_ptr<Logger> defaultLogger = loggerManager->getDefaultLogger();
 
 	EXPECT_TRUE(nullptr != defaultLogger);
 	EXPECT_EQ(loggerManager->getDefaultOutput(), defaultLogger->getOutput());
@@ -75,16 +75,16 @@ TEST(LoggerManagerTest, defaultLoggerTest)
 }
 
 
-TEST(LoggerManagerTest, getLogger)
+TEST(LoggerManagerTest, GetLogger)
 {
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
 
-	std::shared_ptr<Logger> retrieved(loggerManager->getLogger("test"));
+	std::shared_ptr<Logger> retrieved = loggerManager->getLogger("test");
 
 	EXPECT_TRUE(nullptr != retrieved);
 }
 
-TEST(LoggerManagerTest, threshold)
+TEST(LoggerManagerTest, Threshold)
 {
 	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
 	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_CRITICAL);

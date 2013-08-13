@@ -33,9 +33,11 @@ class LoggerManager
 public:
 	/// Constructor
 	LoggerManager();
+
+	/// Destructor
 	~LoggerManager();
 
-	/// Sets default output.
+	/// Sets/Changes default output.
 	/// \param	output	The output class to be used.
 	void setDefaultOutput(std::shared_ptr<LogOutput> output);
 
@@ -52,12 +54,12 @@ public:
 	/// \return	The logger.
 	std::shared_ptr<Logger> getLogger(const std::string& name);
 
-	/// Sets a threshold for all the loggers.
+	/// Sets a threshold for all loggers.
 	/// \param	threshold	The threshold.
 	void setThreshold(int threshold);
 
 	/// Sets a threshold for a subgroup of loggers, the group is chosen by finding all loggers
-	/// whose pathname starts with the same string as the pathname given here.
+	/// whose pathname starts with the same string as the pathname given.
 	/// \param	path	 	Full pathname of the file.
 	/// \param	threshold	The threshold to use for these loggers.
 	void setThreshold(const std::string& path, int threshold);
@@ -77,6 +79,11 @@ private:
 	int m_globalThreshold;
 
 	boost::mutex m_mutex;
+
+	// Aug 13, 2013
+	// VS2012 does not support "delete" now
+	LoggerManager(const LoggerManager&);
+	LoggerManager& operator=(const LoggerManager&);
 };
 
 }; // Framework
