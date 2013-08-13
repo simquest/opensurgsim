@@ -30,12 +30,22 @@ namespace SurgSim
 namespace Framework
 {
 
-/// A shared smart pointer that manages a shared instance of an object.
+/// A utility class to manage a shared instance of an object.
 ///
-/// This class behaves similarly to the Singleton pattern, in that it manages a single shared instance of an
-/// object. However, the object will not only be created as needed, but also destroyed when all of the
-/// shared_ptr references to it are released.  If it is released and then needed again, a new instance will be
-/// created.
+
+/// This class behaves in a way that is superficially similar to the Singleton pattern, in that it manages a single
+/// shared instance of an object. However, there are some important differences to note:
+/// * The Singleton pattern applies to a <i>particular class,</i> so that a single instance is shared between any
+///   and all uses of that class.  The SharedInstance case applies to a <i>specific use</i> of a class: the user
+///   creates a (shared) SharedInstance&lt;T&gt; object that manages the sharing of one instance of T.  It is
+///   possible for another SharedInstance&lt;T&gt; that manages the same type T to be created elsewhere.  This
+///   second SharedInstance manages a second, separate instance of T.
+/// * The object will not only be created as needed, but also destroyed when all of the shared_ptr references to it
+///   are released.  If it is released and then needed again, a new instance will be created.
+/// * This life-cycle management based on reference counting makes it imperative for the calling code to <i>hold
+///   onto</i> their own shared_ptr for as long as they want to interact with the shared object instance.
+///   Releasing the shared_ptr indicates that the code using it is ready for the instance to be potentially
+///   destroyed.
 ///
 /// Code using this class will normally use the get() method to initialize its own shared_ptr referencing the
 /// shared instance.  Such code should hold onto the shared_ptr for as long as it needs to use the shared instance.
