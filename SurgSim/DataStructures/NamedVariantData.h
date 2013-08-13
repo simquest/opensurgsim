@@ -41,10 +41,29 @@ class NamedVariantData : public NamedData<boost::any>
 public:
 	NamedVariantData() {};
 
-	inline NamedVariantData(const NamedData<boost::any>& namedData):
-		NamedData<boost::any>(namedData)
-	{
-	}
+	inline NamedVariantData(const NamedData<boost::any>& namedData);
+
+	/// Check whether the entry with the specified index contains valid data.
+	/// The check verifies that the entry's data is of type T, was %set using 
+	/// set(int, const T&) or set(const std::string&, const T&), without being 
+	/// subsequently invalidated by reset(int) or reset(const std::string&).
+	///
+	/// \tparam T the data type to check for at the given index.
+	/// \param index The index of the entry.
+	/// \return true if that entry exists, is of type T, and contains valid data.
+	template <typename T>
+	inline bool hasTypedData(int index) const;
+
+	/// Check whether the entry with the specified name contains valid data.
+	/// The check verifies that the entry's data is of type T, was %set using 
+	/// set(int, const T&) or set(const std::string&, const T&), without being 
+	/// subsequently invalidated by reset(int) or reset(const std::string&).
+	///
+	/// \tparam T the data type to check for at the given index.
+	/// \param name The name of the entry.
+	/// \return true if that entry exists, is of type T, and contains valid data.
+	template <typename T>
+	inline bool hasTypedData(const std::string& name) const;
 
 	/// Given an index, get the corresponding value.
 	/// It's only possible to get the value if the data was %set using set(int, const T&) or
@@ -56,21 +75,7 @@ public:
 	/// \param [out] value The location for the retrieved value.  Must not be null.
 	/// \return true if a valid value is available, was written to \a value, and value is the correct type.
 	template <typename T>
-	inline bool get(int index, T* value) const
-	{
-		boost::any a;
-		if (!NamedData::get(index, &a))
-			return false;
-		try
-		{
-			*value = boost::any_cast<T>(a);
-		}
-		catch(const boost::bad_any_cast &)
-		{
-			SURGSIM_FAILURE() << "Cannot cast the named value to the specified type.";
-		}
-		return true;
-	}
+	inline bool get(int index, T* value) const;
 
 	/// Given a name, get the corresponding value.
 	/// It's only possible to get the value if the data was %set using set(int, const T&) or
@@ -82,14 +87,14 @@ public:
 	/// \param [out] value The location for the retrieved value.  Must not be null.
 	/// \return true if a valid value is available, was written to \a value, and value is the correct type.
 	template <typename T>
-	inline bool get(const std::string& name, T* value) const
-	{
-		int index = getIndex(name);
-		return get(index, value);
-	}
+	inline bool get(const std::string& name, T* value) const;
 };
 
 }; // namespace DataStructures
 }; // namespace SurgSim
+
+
+#include <SurgSim/DataStructures/NamedVariantData-inl.h>
+
 
 #endif // SURGSIM_DATASTRUCTURES_NAMEDVARIANTDATA_H
