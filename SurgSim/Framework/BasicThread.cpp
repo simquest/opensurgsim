@@ -17,9 +17,9 @@
 
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
-#include <boost/chrono.hpp>
 #include <boost/ref.hpp>
 #include <SurgSim/Framework/Assert.h>
+#include <SurgSim/Framework/Clock.h>
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 
@@ -98,7 +98,8 @@ void BasicThread::operator()()
 	if (! success) return;
 
 	boost::chrono::duration<double> frameTime(0.0);
-	boost::chrono::steady_clock::time_point start;
+	boost::chrono::duration<double> sleepTime(0.0);
+	Clock::time_point start;
 
 	m_isRunning = true;
 	while (m_isRunning && !m_stopExecution )
@@ -106,11 +107,13 @@ void BasicThread::operator()()
 		// Check for frameTime being > desired update period report error, adjust ...
 		if (m_period > frameTime)
 		{
-			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + (m_period - frameTime));
+			sleepTime = m_period - frameTime;
+			boost::this_thread::sleep_until(Clock::now() + sleepTime);
 		}
-		start = boost::chrono::steady_clock::now();
-		m_isRunning = doUpdate(m_period.count());
-		frameTime = boost::chrono::steady_clock::now() - start;
+
+		start = Clock::now();
+		m_isRunning = doUpdate(m_period.count());		
+		frameTime = Clock::now() - start;
 	}
 
 	doBeforeStop();
