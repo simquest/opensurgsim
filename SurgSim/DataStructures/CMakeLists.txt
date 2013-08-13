@@ -32,6 +32,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	MeshElement.h
 	MeshVertex.h
 	NamedVariantData.h
+	NamedVariantData-inl.h
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
