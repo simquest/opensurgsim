@@ -25,77 +25,62 @@ namespace Physics
 {
 
 /// Defines the state for all deformable representations
-/// It contains positions and velocities for all degrees of freedom
+/// It contains a collecion of position and velocity for all degrees of freedom
 class DeformableRepresentationState
 {
 public:
 	/// Default constructor
-	DeformableRepresentationState()
-	{
-	}
+	DeformableRepresentationState();
 
 	/// Destructor
-	~DeformableRepresentationState()
-	{
-	}
+	~DeformableRepresentationState();
 
 	/// Comparison operator (equality test)
 	/// \param state The state to compare it to
 	/// \return True if the 2 states are equal, False otherwise
-	bool operator ==(const DeformableRepresentationState& state) const
-	{
-		return m_x == state.m_x && m_v == state.m_v;
-	}
+	bool operator ==(const DeformableRepresentationState& state) const;
 
 	/// Comparison operator (difference test)
 	/// \param state The state to compare it to
 	/// \return False if the 2 states are equal, True otherwise
-	bool operator !=(const DeformableRepresentationState& state) const
-	{
-		return ! ((*this) == state);
-	}
+	bool operator !=(const DeformableRepresentationState& state) const;
 
 	/// Reset the state
 	/// \note Simply set all positions/velocities to 0
-	void reset()
-	{
-		m_x.setZero();
-		m_v.setZero();
-	}
+	void reset();
 
 	/// Allocate the state for a given number of degrees of freedom
 	/// \param numDof The number of degrees of freedom to account for
-	void allocate(int numDof)
-	{
-		m_x.resize(numDof);
-		m_v.resize(numDof);
-	}
+	void allocate(int numDof);
 
-	/// Retrieve position of all degrees of freedom
-	/// \return A vector of all positions
-	Eigen::Matrix<double, Eigen::Dynamic, 1>& getPositions()
-	{
-		return m_x;
-	}
+	/// Retrieve all degrees of freedom's position
+	/// \return Vector of collected DOF's position
+	Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& getPositions();
 
-	/// Retrieve velocity of all degrees of freedom
-	/// \return A vector of all velocities
-	Eigen::Matrix<double, Eigen::Dynamic, 1>& getVelocities()
-	{
-		return m_v;
-	}
+	/// Retrieve all degrees of freedom's position
+	/// \return Vector of collected DOF's position
+	const Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& getPositions() const;
+
+	/// Retrieve all degrees of freedom's velocity
+	/// \return Vector of collected DOF's velocity
+	Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& getVelocities();
+
+	/// Retrieve all degrees of freedom's velocity
+	/// \return Vector of collected DOF's velocity
+	const Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& getVelocities() const;
 
 private:
+	/// Default public copy constructor and assignment operator are being used on purpose
 
 	/// State on the position level
-	Eigen::Matrix<double, Eigen::Dynamic, 1> m_x;
+	Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> m_x;
 
 	/// State on the velocity level
-	Eigen::Matrix<double, Eigen::Dynamic, 1> m_v;
+	Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> m_v;
 };
 
-}; // Physics
+}; // namespace Physics
 
-}; // SurgSim
+}; // namespace SurgSim
 
 #endif // SURGSIM_PHYSICS_DEFORMABLEREPRESENTATIONSTATE_H

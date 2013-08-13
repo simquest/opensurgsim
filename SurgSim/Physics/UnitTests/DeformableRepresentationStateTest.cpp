@@ -17,6 +17,11 @@
 
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 
+namespace
+{
+	const double epsilon = 1e-10;
+};
+
 TEST(DeformableActorStateTest, ConstructorTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
@@ -126,5 +131,52 @@ TEST(DeformableActorStateTest, ResetTest)
 	{
 		EXPECT_EQ(0.0, state1.getPositions()[i]);
 		EXPECT_EQ(0.0, state1.getVelocities()[i]);
+	}
+}
+
+TEST(DeformableActorStateTest, CopyConstructorAndAssignmentTest)
+{
+	using SurgSim::Physics::DeformableRepresentationState;
+
+	DeformableRepresentationState state, stateAssigned;
+	state.allocate(10);
+	for(int i = 0; i < state.getPositions().size(); i++)
+	{
+		state.getPositions()[i] = (double)i;
+		state.getVelocities()[i] = 2.0*(double)i;
+	}
+
+	{
+		DeformableRepresentationState stateCopied(state);
+
+		ASSERT_EQ(10, stateCopied.getPositions().size());
+		ASSERT_EQ(state.getPositions().size(), stateCopied.getPositions().size());
+		ASSERT_EQ(10, stateCopied.getVelocities().size());
+		ASSERT_EQ(state.getVelocities().size(), stateCopied.getVelocities().size());
+
+		for(int i = 0; i < stateCopied.getPositions().size(); i++)
+		{
+			EXPECT_NEAR(state.getPositions()[i], stateCopied.getPositions()[i], epsilon);
+			EXPECT_NEAR((double)i, stateCopied.getPositions()[i], epsilon);
+			EXPECT_NEAR(state.getVelocities()[i], stateCopied.getVelocities()[i], epsilon);
+			EXPECT_NEAR(2.0*(double)i, stateCopied.getVelocities()[i], epsilon);
+		}
+	}
+
+	{
+		stateAssigned = state;
+
+		ASSERT_EQ(10, stateAssigned.getPositions().size());
+		ASSERT_EQ(state.getPositions().size(), stateAssigned.getPositions().size());
+		ASSERT_EQ(10, stateAssigned.getVelocities().size());
+		ASSERT_EQ(state.getVelocities().size(), stateAssigned.getVelocities().size());
+
+		for(int i = 0; i < stateAssigned.getPositions().size(); i++)
+		{
+			EXPECT_NEAR(state.getPositions()[i], stateAssigned.getPositions()[i], epsilon);
+			EXPECT_NEAR((double)i, stateAssigned.getPositions()[i], epsilon);
+			EXPECT_NEAR(state.getVelocities()[i], stateAssigned.getVelocities()[i], epsilon);
+			EXPECT_NEAR(2.0*(double)i, stateAssigned.getVelocities()[i], epsilon);
+		}
 	}
 }
