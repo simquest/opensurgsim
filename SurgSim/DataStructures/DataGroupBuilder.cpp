@@ -114,12 +114,12 @@ const NamedDataBuilder<DataGroupBuilder::StringType>& DataGroupBuilder::strings(
 	return m_strings;
 }
 
-NamedAnyBuilder& DataGroupBuilder::customs()
+NamedVariantDataBuilder& DataGroupBuilder::customs()
 {
 	return m_customs;
 }
 
-const NamedAnyBuilder& DataGroupBuilder::customs() const
+const NamedVariantDataBuilder& DataGroupBuilder::customs() const
 {
 	return m_customs;
 }

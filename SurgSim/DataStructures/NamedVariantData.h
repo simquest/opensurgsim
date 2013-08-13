@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_NAMEDANY_H
-#define SURGSIM_DATASTRUCTURES_NAMEDANY_H
+#ifndef SURGSIM_DATASTRUCTURES_NAMEDVARIANTDATA_H
+#define SURGSIM_DATASTRUCTURES_NAMEDVARIANTDATA_H
 
 #include <boost/any.hpp>
 #include <SurgSim/DataStructures/NamedData.h>
@@ -25,23 +25,23 @@ namespace SurgSim
 namespace DataStructures
 {
 
-typedef NamedDataBuilder<boost::any> NamedAnyBuilder;
+typedef NamedDataBuilder<boost::any> NamedVariantDataBuilder;
 
 /// A NamedData collection of variant data type.
 ///
-/// A NamedAny collection is a collection variant datatypes. Each entry in the collection can be
+/// A NamedVariantData collection is a collection variant datatypes. Each entry in the collection can be
 /// accessed by using either its unique name (a std::string) or its unique index (a non-negative integer).
 /// Access by name is more convenient, but also less efficient.
 ///
 /// This sub-class of NameData encapsulates the boost::any variant type, and adds two get functions that
 /// provide typed access to the contained data.
 
-class NamedAny : public NamedData<boost::any>
+class NamedVariantData : public NamedData<boost::any>
 {
 public:
-	NamedAny() {};
+	NamedVariantData() {};
 
-	inline NamedAny(const NamedData<boost::any>& namedData):
+	inline NamedVariantData(const NamedData<boost::any>& namedData):
 		NamedData<boost::any>(namedData)
 	{
 	}
@@ -92,4 +92,4 @@ public:
 }; // namespace DataStructures
 }; // namespace SurgSim
 
-#endif // SURGSIM_DATASTRUCTURES_NAMEDANY_H
+#endif // SURGSIM_DATASTRUCTURES_NAMEDVARIANTDATA_H

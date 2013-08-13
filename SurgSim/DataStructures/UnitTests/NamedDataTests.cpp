@@ -19,7 +19,7 @@
 #include <SurgSim/Framework/Assert.h>
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
-#include "SurgSim/DataStructures/NamedAny.h"
+#include "SurgSim/DataStructures/NamedVariantData.h"
 #include "gtest/gtest.h"
 #include "MockObjects.h"
 
@@ -294,11 +294,11 @@ TEST(NamedDataTests, ResetOne)
 	EXPECT_FALSE(data.hasData("second"));
 }
 
-TEST(NamedDataTests, NamedAny)
+TEST(NamedDataTests, NamedVariantData)
 {
-	SurgSim::DataStructures::NamedAnyBuilder builder;
+	SurgSim::DataStructures::NamedVariantDataBuilder builder;
 	builder.addEntry("test");
-	SurgSim::DataStructures::NamedAny data = builder.createData();
+	SurgSim::DataStructures::NamedVariantData data = builder.createData();
 
 	EXPECT_EQ(1, data.getNumEntries());
 	EXPECT_EQ(1u, data.size());

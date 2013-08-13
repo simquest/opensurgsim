@@ -161,12 +161,12 @@ inline const NamedData<DataGroup::StringType>& DataGroup::strings() const
 	return m_strings;
 }
 
-inline NamedAny& DataGroup::customs()
+inline NamedVariantData& DataGroup::customs()
 {
 	return m_customs;
 }
 
-inline const NamedAny& DataGroup::customs() const
+inline const NamedVariantData& DataGroup::customs() const
 {
 	return m_customs;
 }

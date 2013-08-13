@@ -17,7 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
 
 #include <SurgSim/DataStructures/NamedDataBuilder.h>
-#include <SurgSim/DataStructures/NamedAny.h>
+#include <SurgSim/DataStructures/NamedVariantData.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <Eigen/Core>
 
@@ -124,11 +124,11 @@ public:
 
 	/// Provides access to the custom data entries.
 	/// \return a writable reference to the sub-object that contains custom data entries.
-	NamedAnyBuilder& customs();
+	NamedVariantDataBuilder& customs();
 
 	/// Provides access to the custom data entries.
 	/// \return a read-only reference to the sub-object that contains custom data entries.
-	const NamedAnyBuilder& customs() const;
+	const NamedVariantDataBuilder& customs() const;
 
 	/// A shortcut for adding a named pose entry.
 	/// Identical to <code>%poses().addEntry(name)</code>.
@@ -197,7 +197,7 @@ private:
 	NamedDataBuilder<StringType> m_strings;
 
 	/// The subsidiary builder used for custom data.
-	NamedAnyBuilder m_customs;
+	NamedVariantDataBuilder m_customs;
 };
 
 };  // namespace Input

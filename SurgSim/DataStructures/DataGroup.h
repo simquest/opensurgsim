@@ -19,7 +19,7 @@
 #include <Eigen/Core>
 
 #include <SurgSim/DataStructures/NamedData.h>
-#include <SurgSim/DataStructures/NamedAny.h>
+#include <SurgSim/DataStructures/NamedVariantData.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
@@ -188,11 +188,11 @@ public:
 
 	/// Return the custom data structure.
 	/// \return the mutable data.
-	inline NamedAny& customs();
+	inline NamedVariantData& customs();
 
 	/// Return the custom data structure.
 	/// \return the read-only data.
-	inline const NamedAny& customs() const;
+	inline const NamedVariantData& customs() const;
 
 	/// Mark all data as not current.
 	inline void resetAll();
@@ -220,7 +220,7 @@ private:
 	NamedData<StringType> m_strings;
 
 	/// The custom data values.
-	NamedAny m_customs;
+	NamedVariantData m_customs;
 };
 
 };  // namespace Input
