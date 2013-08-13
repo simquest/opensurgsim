@@ -24,8 +24,12 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Defines the state for all deformable representations
-/// It contains a collecion of position and velocity for all degrees of freedom
+/// Defines the state for all deformable representations.
+/// It contains collections of position and velocity for all degrees of freedom
+/// A Degree of freedom (DOF) is a SINGLE INDEPENDENT parameter for defining the configuration of the model.
+/// Example 1: A mass in 3D space has 3DOF (independent coordinates along axis X, Y and Z).
+/// Example 2: A beam element model is a 6DOF model (independent coordinates along axis X, Y and Z,
+///                                           and independent rotation parameters along X, Y and Z).
 class DeformableRepresentationState
 {
 public:
@@ -51,7 +55,11 @@ public:
 
 	/// Allocate the state for a given number of degrees of freedom
 	/// \param numDof The number of degrees of freedom to account for
-	void allocate(int numDof);
+	void allocate(unsigned int numDof);
+
+	/// Retrieve the number of degrees of freedom
+	/// \return The number of DOF for this deformable representation
+	unsigned int getNumDof() const;
 
 	/// Retrieve all degrees of freedom's position
 	/// \return Vector of collected DOF's position

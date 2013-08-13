@@ -45,10 +45,15 @@ void DeformableRepresentationState::reset()
 	m_v.setZero();
 }
 
-void DeformableRepresentationState::allocate(int numDof)
+void DeformableRepresentationState::allocate(unsigned int numDof)
 {
 	m_x.resize(numDof);
 	m_v.resize(numDof);
+}
+
+unsigned int DeformableRepresentationState::getNumDof() const
+{
+	return static_cast<unsigned int>(m_x.size());
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& DeformableRepresentationState::getPositions()

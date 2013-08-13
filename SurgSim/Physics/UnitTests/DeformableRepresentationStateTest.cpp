@@ -43,22 +43,24 @@ TEST(DeformableActorStateTest, ConstructorTest)
 TEST(DeformableActorStateTest, AllocateTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
-	
+
 	DeformableRepresentationState state;
-	ASSERT_NO_THROW(state.allocate(10));
+	ASSERT_NO_THROW(state.allocate(10u));
 	EXPECT_EQ(10, state.getPositions().size());
+	EXPECT_EQ(10, state.getVelocities().size());
+	EXPECT_EQ(10u, state.getNumDof());
 }
 
 TEST(DeformableActorStateTest, GetPositionsTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
-	
+
 	DeformableRepresentationState state1, state2;
-	state1.allocate(10);
-	state2.allocate(10);
-	for(int i = 0; i < state1.getPositions().size(); i++)
+	state1.allocate(10u);
+	state2.allocate(10u);
+	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
-		state1.getPositions()[i] = (double)i;
+		state1.getPositions()[i] = static_cast<double>(i);
 		state2.getPositions()[i] = 0.0;
 	}
 	// state1.m_x contains (0 1 2 3 4 5 6 7 8 9 10) & state2.m_x contains (0 0 0 0 0 0 0 0 0 0 0)
@@ -69,10 +71,10 @@ TEST(DeformableActorStateTest, GetPositionsTest)
 
 	state1.reset();
 	// state1.m_x contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_x contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(int i = 0; i < state1.getPositions().size(); i++)
+	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getPositions()[i]);
-		EXPECT_EQ((double)i, state2.getPositions()[i]);
+		EXPECT_EQ(static_cast<double>(i), state2.getPositions()[i]);
 	}
 
 	state2.reset();
@@ -83,13 +85,13 @@ TEST(DeformableActorStateTest, GetPositionsTest)
 TEST(DeformableActorStateTest, GetVelocitiesTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
-	
+
 	DeformableRepresentationState state1, state2;
-	state1.allocate(10);
-	state2.allocate(10);
-	for(int i = 0; i < state1.getVelocities().size(); i++)
+	state1.allocate(10u);
+	state2.allocate(10u);
+	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
-		state1.getVelocities()[i] = (double)i;
+		state1.getVelocities()[i] = static_cast<double>(i);
 		state2.getVelocities()[i] = 0.0;
 	}
 	// state1.m_x contains (0 1 2 3 4 5 6 7 8 9 10) & state2.m_x contains (0 0 0 0 0 0 0 0 0 0 0)
@@ -100,10 +102,10 @@ TEST(DeformableActorStateTest, GetVelocitiesTest)
 
 	state1.reset();
 	// state1.m_x contains (0 0 0 0 0 0 0 0 0 0 0) & state2.m_x contains (0 1 2 3 4 5 6 7 8 9 10)
-	for(int i = 0; i < state1.getVelocities().size(); i++)
+	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getVelocities()[i]);
-		EXPECT_EQ((double)i, state2.getVelocities()[i]);
+		EXPECT_EQ(static_cast<double>(i), state2.getVelocities()[i]);
 	}
 
 	state2.reset();
@@ -114,20 +116,20 @@ TEST(DeformableActorStateTest, GetVelocitiesTest)
 TEST(DeformableActorStateTest, ResetTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
-	
+
 	DeformableRepresentationState state1, state2;
-	state1.allocate(10);
-	state2.allocate(10);
+	state1.allocate(10u);
+	state2.allocate(10u);
 	state2.reset();
-	for(int i = 0; i < state1.getPositions().size(); i++)
+	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
-		state1.getPositions()[i] = (double)i;
-		state1.getVelocities()[i] = 2.0*(double)i;
+		state1.getPositions()[i] = static_cast<double>(i);
+		state1.getVelocities()[i] = 2.0*static_cast<double>(i);
 	}
 	EXPECT_NE(state2, state1);
 	state1.reset();
 	EXPECT_EQ(state2, state1);
-	for(int i = 0; i < state1.getPositions().size(); i++)
+	for(unsigned int i = 0; i < state1.getNumDof(); i++)
 	{
 		EXPECT_EQ(0.0, state1.getPositions()[i]);
 		EXPECT_EQ(0.0, state1.getVelocities()[i]);
@@ -139,44 +141,48 @@ TEST(DeformableActorStateTest, CopyConstructorAndAssignmentTest)
 	using SurgSim::Physics::DeformableRepresentationState;
 
 	DeformableRepresentationState state, stateAssigned;
-	state.allocate(10);
-	for(int i = 0; i < state.getPositions().size(); i++)
+	state.allocate(10u);
+	for(unsigned int i = 0; i < state.getNumDof(); i++)
 	{
-		state.getPositions()[i] = (double)i;
-		state.getVelocities()[i] = 2.0*(double)i;
+		state.getPositions()[i] = static_cast<double>(i);
+		state.getVelocities()[i] = 2.0*static_cast<double>(i);
 	}
 
 	{
 		DeformableRepresentationState stateCopied(state);
 
+		ASSERT_EQ(10u, stateCopied.getNumDof());
+		ASSERT_EQ(state.getNumDof(), stateCopied.getNumDof());
 		ASSERT_EQ(10, stateCopied.getPositions().size());
 		ASSERT_EQ(state.getPositions().size(), stateCopied.getPositions().size());
 		ASSERT_EQ(10, stateCopied.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateCopied.getVelocities().size());
 
-		for(int i = 0; i < stateCopied.getPositions().size(); i++)
+		for(unsigned int i = 0; i < stateCopied.getNumDof(); i++)
 		{
 			EXPECT_NEAR(state.getPositions()[i], stateCopied.getPositions()[i], epsilon);
-			EXPECT_NEAR((double)i, stateCopied.getPositions()[i], epsilon);
+			EXPECT_NEAR(static_cast<double>(i), stateCopied.getPositions()[i], epsilon);
 			EXPECT_NEAR(state.getVelocities()[i], stateCopied.getVelocities()[i], epsilon);
-			EXPECT_NEAR(2.0*(double)i, stateCopied.getVelocities()[i], epsilon);
+			EXPECT_NEAR(2.0*static_cast<double>(i), stateCopied.getVelocities()[i], epsilon);
 		}
 	}
 
 	{
 		stateAssigned = state;
 
+		ASSERT_EQ(10u, stateAssigned.getNumDof());
+		ASSERT_EQ(state.getNumDof(), stateAssigned.getNumDof());
 		ASSERT_EQ(10, stateAssigned.getPositions().size());
 		ASSERT_EQ(state.getPositions().size(), stateAssigned.getPositions().size());
 		ASSERT_EQ(10, stateAssigned.getVelocities().size());
 		ASSERT_EQ(state.getVelocities().size(), stateAssigned.getVelocities().size());
 
-		for(int i = 0; i < stateAssigned.getPositions().size(); i++)
+		for(unsigned int i = 0; i < stateAssigned.getNumDof(); i++)
 		{
 			EXPECT_NEAR(state.getPositions()[i], stateAssigned.getPositions()[i], epsilon);
-			EXPECT_NEAR((double)i, stateAssigned.getPositions()[i], epsilon);
+			EXPECT_NEAR(static_cast<double>(i), stateAssigned.getPositions()[i], epsilon);
 			EXPECT_NEAR(state.getVelocities()[i], stateAssigned.getVelocities()[i], epsilon);
-			EXPECT_NEAR(2.0*(double)i, stateAssigned.getVelocities()[i], epsilon);
+			EXPECT_NEAR(2.0*static_cast<double>(i), stateAssigned.getVelocities()[i], epsilon);
 		}
 	}
 }
