@@ -248,5 +248,35 @@ TEST(OsgMaterialTests, SetAndClearShaderTest)
 	EXPECT_EQ(0u, attributes.size()) << "Shader should have been removed from the material's state attributes!";
 }
 
+TEST(OsgMaterialTests, NamedAccessTest)
+{
+	std::shared_ptr<OsgMaterial> osgMaterial = std::make_shared<OsgMaterial>();
+	std::shared_ptr<Material> material = osgMaterial;
+
+	std::string uniform1Name = "float uniform";
+	std::shared_ptr<OsgUniform<float>> osgUniform1 = std::make_shared<OsgUniform<float>>(uniform1Name);
+	std::shared_ptr<Uniform<float>> uniform1 = osgUniform1;
+
+	std::string uniform2Name = "Vector2f uniform";
+	std::shared_ptr<OsgUniform<Vector2f>> osgUniform2 = std::make_shared<OsgUniform<Vector2f>>(uniform2Name);
+	std::shared_ptr<Uniform<Vector2f>> uniform2 = osgUniform2;
+
+	material->addUniform(uniform1);
+	material->addUniform(uniform2);
+
+	EXPECT_TRUE(material->hasUniform(uniform1Name));
+	EXPECT_EQ(uniform1.get(), material->getUniform(uniform1Name).get());
+
+	EXPECT_TRUE(material->hasUniform(uniform2Name));
+	EXPECT_EQ(uniform2.get(), material->getUniform(uniform2Name).get());
+
+	EXPECT_FALSE(material->hasUniform("xxx"));
+	EXPECT_EQ(nullptr, material->getUniform("xxx"));
+
+	EXPECT_TRUE(material->removeUniform(uniform1Name));
+	EXPECT_FALSE(material->hasUniform(uniform1Name));
+}
+
+
 }  // namespace Graphics
 }  // namespace SurgSim

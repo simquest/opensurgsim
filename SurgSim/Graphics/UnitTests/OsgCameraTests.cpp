@@ -22,7 +22,10 @@
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgMatrixConversions.h>
+#include <SurgSim/Graphics/OsgTexture2d.h>
 #include <SurgSim/Math/Quaternion.h>
+
+#include <osg/Camera>
 #include <osg/ref_ptr>
 
 #include <gtest/gtest.h>
@@ -192,6 +195,20 @@ TEST(OsgCameraTests, MatricesTest)
 
 	camera->setProjectionMatrix(projectionMatrix);
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
+}
+
+TEST(OsgCameraTests, ColorTextureTest)
+{
+	auto osgCamera = std::make_shared<OsgCamera>("test camera");
+	std::shared_ptr<Camera> camera = osgCamera;
+
+	auto osgTexture = std::make_shared<OsgTexture2d>();
+	osgTexture->setSize(256,256);
+	std::shared_ptr<Texture2d> texture = osgTexture;
+
+	EXPECT_TRUE(camera->setColorRenderTexture(texture));
+	EXPECT_TRUE(osgCamera->getOsgCamera()->isRenderToTextureCamera());
+
 }
 
 

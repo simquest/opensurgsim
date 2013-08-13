@@ -43,34 +43,51 @@ public:
 	{
 	}
 
-	/// Adds a uniform to this material
-	/// \param	uniform	Uniform to add
-	/// \return	True if uniform was added successfully, otherwise false
+	/// Adds a uniform to this material.
+	/// \param	uniform	Uniform to add.
+	/// \return	True if uniform was added successfully, otherwise false.
 	virtual bool addUniform(std::shared_ptr<UniformBase> uniform) = 0;
 
-	/// Removes a uniform from this material
-	/// \param	uniform	Uniform to remove
-	/// \return True if uniform was removed successfully, otherwise false
+	/// Removes a uniform from this material.
+	/// \param	uniform	Uniform to remove.
+	/// \return True if uniform was removed successfully, otherwise false.
 	virtual bool removeUniform(std::shared_ptr<UniformBase> uniform) = 0;
 
-	/// Returns the number of uniforms in this material
-	virtual unsigned int getNumUniforms() const = 0;
+	/// Removes a uniform from this material.
+	/// \param	name Uniform to remove.
+	/// \return True if uniform was removed successfully, otherwise false.
+	virtual bool removeUniform(const std::string& name) = 0;
+
+
+	/// Gets a uniform in this material.
+	/// \param	name	The name of the Uniform to fetch.
+	/// \return	The uniform, nullptr if the uniform does not exist.
+	virtual std::shared_ptr<UniformBase> getUniform(const std::string& name) const = 0;
 
 	/// Gets a uniform in this material
 	/// \param	index	Index of the uniform in the material's list of uniforms
 	/// \return	Uniform at the index
 	virtual std::shared_ptr<UniformBase> getUniform(unsigned int index) const = 0;
 
-	/// Sets the shader used by this material
-	/// \param	shader	Shader program
-	/// \return	True if shader was set successfully, otherwise false
+	/// Checks if this material has a uniform with the given name.
+	/// \param	name	The name of the Uniform to check.
+	/// \return	true if the uniform is in the material, false otherwise.
+	virtual bool hasUniform(const std::string& name) const = 0;
+
+	/// Returns the number of uniforms in this material.
+	virtual unsigned int getNumUniforms() const = 0;
+
+
+	/// Sets the shader used by this material.
+	/// \param	shader	Shader program.
+	/// \return	True if shader was set successfully, otherwise false.
 	virtual bool setShader(std::shared_ptr<Shader> shader) = 0;
 
-	/// Gets the shader used by this material
-	/// \return	Shader program
+	/// Gets the shader used by this material.
+	/// \return	Shader program.
 	virtual std::shared_ptr<Shader> getShader() const = 0;
 
-	/// Removes the shader from the material, falling back to fixed-function pipeline
+	/// Removes the shader from the material, falling back to fixed-function pipeline.
 	virtual void clearShader() = 0;
 };
 
