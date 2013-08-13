@@ -13,38 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
+#include "SurgSim/Devices/MultiAxis/CreateInputDeviceHandle.h"
 
-#include <SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h>
+#include <SurgSim/Devices/MultiAxis/win32/WdkHidDeviceHandle.h>
+
 
 namespace SurgSim
 {
 namespace Device
 {
 
-RawMultiAxisThread::~RawMultiAxisThread()
+
+std::unique_ptr<SystemInputDeviceHandle> createInputDeviceHandle(const std::string& path,
+		std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
+	return WdkHidDeviceHandle::open(path, logger);
 }
 
-bool RawMultiAxisThread::doInitialize()
+std::vector<std::string> enumerateInputDevicePaths(SurgSim::Framework::Logger* logger)
 {
-	return true;
+	return WdkHidDeviceHandle::enumeratePaths(logger);
 }
 
-bool RawMultiAxisThread::doStartUp()
-{
-	return true;
-}
-
-bool RawMultiAxisThread::doUpdate(double dt)
-{
-	return m_scaffold->runInputFrame(m_deviceData);
-}
-
-void RawMultiAxisThread::doBeforeStop()
-{
-	m_scaffold->runAfterLastFrame(m_deviceData);
-}
 
 };  // namespace Device
 };  // namespace SurgSim

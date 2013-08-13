@@ -14,6 +14,46 @@
 # limitations under the License.
 
 
+## Options related to integration with Visual Studio and other IDEs.
+
+# options related to source file organization
+#
+option(SURGSIM_IDE_SEPARATE_SOURCES_HEADERS
+	"If turned on, separate header files from the source files in the IDE. " OFF)
+if(SURGSIM_IDE_SEPARATE_SOURCES_HEADERS)
+	set(SURGSIM_IDE_SOURCE_PREFIX "Source Files/")
+	set(SURGSIM_IDE_HEADER_PREFIX "Header Files/")
+else()
+	set(SURGSIM_IDE_SOURCE_PREFIX "Files/")
+	set(SURGSIM_IDE_HEADER_PREFIX "Files/")
+endif()
+
+# Sets up the source file organization, for Visual Studio etc.
+# This will group the source and header files in folders by directory.
+#
+# Note the use of optional arguments:
+#   surgsim_set_source_groups(PREFIX FILES...)
+#
+function(surgsim_source_hierarchy PREFIX)
+	foreach(FILE ${ARGN})
+		# Get the directory name.  Note that for files in the current
+		# directory (and empty prefix), you will get "" rather than ".".
+		get_filename_component(FILE_PREFIXED_DIR "${PREFIX}${FILE}" PATH)
+		# Apparently, the hierarchical separator is "\" (per CMake docs).
+		# Hopefully that works in Linux IDEs too...
+		string(REGEX REPLACE "/" "\\\\" FILE_GROUP "${FILE_PREFIXED_DIR}")
+		# Set the IDE source group.  Note that top level is "", not ".".
+		source_group("${FILE_GROUP}" FILES "${FILE}")
+		#message("SRC ${FILE}|${FILE_GROUP}")
+	endforeach(FILE ${ARGN})
+endfunction()
+
+# Sets up the folder organization for sources and headers in Visual Studio etc.
+function(surgsim_show_ide_folders SOURCES HEADERS)
+	surgsim_source_hierarchy("${SURGSIM_IDE_SOURCE_PREFIX}" ${SOURCES})
+	surgsim_source_hierarchy("${SURGSIM_IDE_HEADER_PREFIX}" ${HEADERS})
+endfunction()
+
 ## CMake support for unit test building and running during the build.
 
 # options related to unit tests
@@ -160,6 +200,7 @@ macro(surgsim_unit_test_build_only TESTNAME)
 		surgsim_copy_to_target_directory_for_debug(${TESTNAME}
 			${UNIT_TEST_SHARED_DEBUG_LIBS})
 	endif()
+	surgsim_show_ide_folders("${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
 endmacro()
 
 # Run the unit test executable (unless disabled or built all-in-one).
@@ -256,8 +297,10 @@ function(surgsim_add_library LIBRARY_NAME SOURCE_FILES HEADER_FILES HEADER_DIREC
 			PUBLIC_HEADER DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
 			
 		set(EXPORT_TARGETS ${LIBRARY_NAME} ${EXPORT_TARGETS} CACHE INTERNAL "export targets")
+		surgsim_show_ide_folders("${SOURCE_FILES}" "${HEADER_FILES}")
 	else()
 		install(FILES ${HEADER_FILES} DESTINATION ${INSTALL_INCLUDE_DIR}/${HEADER_DIRECTORY})
+		surgsim_show_ide_folders("" "${HEADER_FILES}")
 	endif()
 endfunction()
 

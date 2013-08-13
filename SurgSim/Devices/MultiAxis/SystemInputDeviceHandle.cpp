@@ -13,38 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
-
-#include <SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h>
+#include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
-RawMultiAxisThread::~RawMultiAxisThread()
+
+SystemInputDeviceHandle::SystemInputDeviceHandle()
 {
 }
 
-bool RawMultiAxisThread::doInitialize()
+SystemInputDeviceHandle::~SystemInputDeviceHandle()
 {
-	return true;
 }
 
-bool RawMultiAxisThread::doStartUp()
+void SystemInputDeviceHandle::prepareForShutdown()
 {
-	return true;
 }
 
-bool RawMultiAxisThread::doUpdate(double dt)
-{
-	return m_scaffold->runInputFrame(m_deviceData);
-}
-
-void RawMultiAxisThread::doBeforeStop()
-{
-	m_scaffold->runAfterLastFrame(m_deviceData);
-}
 
 };  // namespace Device
 };  // namespace SurgSim

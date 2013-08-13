@@ -103,16 +103,25 @@ TEST(RawMultiAxisDeviceTest, Name)
 	EXPECT_EQ("TestRawMultiAxis", device->getName());
 }
 
-TEST(RawMultiAxisDeviceTest, CreateDeviceSeveralTimes)
+void testCreateDeviceSeveralTimes(bool doSleep)
 {
-	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	for (int i = 0;  i < 6;  ++i)
 	{
 		std::shared_ptr<RawMultiAxisDevice> device = std::make_shared<RawMultiAxisDevice>("TestRawMultiAxis");
 		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
+		if (doSleep)
+		{
+			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
+		}
 		// the device will be destroyed here
 	}
+}
+
+TEST(RawMultiAxisDeviceTest, CreateDeviceSeveralTimes)
+{
+	//RawMultiAxisScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	testCreateDeviceSeveralTimes(true);
 }
 
 TEST(RawMultiAxisDeviceTest, CreateSeveralDevices)

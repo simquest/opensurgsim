@@ -67,6 +67,7 @@ mark_as_advanced(Boost_DIR)
 
 find_package(OpenHaptics)
 find_package(SixenseSdk)
+find_package(WinDDK)
 
 
 if(SURGSIM_TESTS_BUILD)
@@ -85,7 +86,7 @@ if(SURGSIM_EXAMPLES_BUILD)
 	add_subdirectory(Examples)
 endif()
 
-export(TARGETS ${EXPORT_TARGETS} 
+export(TARGETS ${EXPORT_TARGETS}
 	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
 
 #Register where to find this build-tree. On windows this in the registry, on
