@@ -57,8 +57,8 @@ TEST(LoggerManagerTest, Constructor)
 
 TEST(LoggerManagerTest, DefaultOutput)
 {
-	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
-	std::shared_ptr<StreamOutput> output(std::make_shared<StreamOutput>(std::cerr));
+	auto loggerManager = std::make_shared<LoggerManager>();
+	auto output = std::make_shared<StreamOutput>(std::cerr);
 	loggerManager->setDefaultOutput(output);
 
 	EXPECT_EQ(output, loggerManager->getDefaultOutput());
@@ -66,8 +66,8 @@ TEST(LoggerManagerTest, DefaultOutput)
 
 TEST(LoggerManagerTest, DefaultLoggerTest)
 {
-	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
-	std::shared_ptr<Logger> defaultLogger = loggerManager->getDefaultLogger();
+	auto loggerManager = std::make_shared<LoggerManager>();
+	auto defaultLogger = loggerManager->getDefaultLogger();
 
 	EXPECT_TRUE(nullptr != defaultLogger);
 	EXPECT_EQ(loggerManager->getDefaultOutput(), defaultLogger->getOutput());
@@ -77,30 +77,58 @@ TEST(LoggerManagerTest, DefaultLoggerTest)
 
 TEST(LoggerManagerTest, GetLogger)
 {
-	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
+	auto loggerManager = std::make_shared<LoggerManager>();
 
-	std::shared_ptr<Logger> retrieved = loggerManager->getLogger("test");
-
+	/// getLogger() will create a new logger if a logger with given name is not found
+	auto retrieved = loggerManager->getLogger("test");
 	EXPECT_TRUE(nullptr != retrieved);
+
+	/// getLogger() guarantees to return a logger with given name
+	{
+		auto temp = loggerManager->getLogger("logger");
+	}
+	EXPECT_TRUE(nullptr != loggerManager->getLogger("logger"));
 }
 
 TEST(LoggerManagerTest, Threshold)
 {
-	std::shared_ptr<LoggerManager> loggerManager(std::make_shared<LoggerManager>());
+	auto loggerManager = std::make_shared<LoggerManager>();
+
+	/// Check default log level
+	auto logger0 = loggerManager->getLogger("logger0");
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger0->getThreshold());
+
+	/// setThreshold(level) will change log level of existing loggers
+	/// and the default log level
 	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_CRITICAL);
 	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_CRITICAL, loggerManager->getThreshold());
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_CRITICAL, logger0->getThreshold());
 
-	std::shared_ptr<Logger> logger1(loggerManager->getLogger("logger1"));
-	std::shared_ptr<Logger> logger2(loggerManager->getLogger("logger2"));
-	std::shared_ptr<Logger> testLogger(loggerManager->getLogger("testLogger"));
+	/// setThreshold(level) will affect log level of newly created loggers
+	auto logger1 = loggerManager->getLogger("logger1");
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_CRITICAL, logger1->getThreshold());
 
-	loggerManager->setThreshold(SurgSim::Framework::LOG_LEVEL_INFO);
-	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_INFO, logger1->getThreshold());
-	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_INFO, logger2->getThreshold());
-	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_INFO, testLogger->getThreshold());
 
+	auto logger2 = loggerManager->getLogger("logger2");
+	auto logger3 = loggerManager->getLogger("logger3");
+	auto testLogger = loggerManager->getLogger("testLogger");
+
+	/// setThreshold(pattern, level) will change log level of existing loggers
+	/// which match given name pattern
+	/// Logger with different pattern will not be changed
+	/// Default log level will not be affected
 	loggerManager->setThreshold("logger", SurgSim::Framework::LOG_LEVEL_WARNING);
-	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger1->getThreshold());
 	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger2->getThreshold());
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_WARNING, logger3->getThreshold());
 	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, testLogger->getThreshold());
+	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, loggerManager->getThreshold());
+
+	/// setThreshold(pattern, level) will not affect newly created loggers
+	auto testLogger2 = loggerManager->getLogger("testLogger2");
+	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, testLogger2->getThreshold());
+
+	/// setThreshold(pattern, level) will not affect newly created loggers
+	/// even the logger's name match the pattern
+	auto logger5 = loggerManager->getLogger("logger5");
+	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, logger5->getThreshold());
 }
