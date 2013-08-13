@@ -47,6 +47,8 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
+#include "AddSphereBehavior.h"
+
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Framework::SceneElement;
@@ -70,41 +72,6 @@ using SurgSim::Physics::PhysicsManager;
 
 std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data,
 										   const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
-
-class SphereAddBehavior : public SurgSim::Framework::Behavior
-{
-public:
-	explicit SphereAddBehavior(const SurgSim::Framework::ApplicationData& data):
-		Behavior("DynamicallyAddSphere"), m_addedSphere(false), m_data(data.getPaths())
-	{}
-
-	~SphereAddBehavior() {}
-
-	virtual void update(double dt)
-	{
-		if (!m_addedSphere)
-		{
-			getScene()->addSceneElement(createSphere(m_data, "sphere0",
-				SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(1.0,3.0,0.0))));
-			m_addedSphere = true;
-		}
-	}
-
-protected:
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
-
-
-private:
-	bool m_addedSphere;
-	SurgSim::Framework::ApplicationData m_data;
-};
 
 /// Simple behavior to show that the spheres are moving while we don't have graphics
 class PrintoutBehavior : public SurgSim::Framework::Behavior
@@ -183,7 +150,8 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 							   physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
-	planeElement->addComponent(std::make_shared<SphereAddBehavior>(data));
+	planeElement->addComponent(std::make_shared<AddSphereBehavior>(createSphere(data, "sphere0",
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(1.0,3.0,0.0)))));
 
 	return planeElement;
 }
@@ -306,10 +274,10 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(createSphere(data, "sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
-
+	
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
-
+	
 	scene->addSceneElement(createPlane(data, "plane1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 
