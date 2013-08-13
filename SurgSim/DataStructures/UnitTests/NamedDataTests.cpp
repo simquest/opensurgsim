@@ -16,12 +16,9 @@
 /// \file
 /// Tests for the NamedData<T> class.
 
-#include <SurgSim/Framework/Assert.h>
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
-#include "SurgSim/DataStructures/NamedVariantData.h"
 #include "gtest/gtest.h"
-#include "MockObjects.h"
 
 using SurgSim::DataStructures::NamedData;
 using SurgSim::DataStructures::NamedDataBuilder;
@@ -294,65 +291,3 @@ TEST(NamedDataTests, ResetOne)
 	EXPECT_FALSE(data.hasData("second"));
 }
 
-TEST(NamedDataTests, NamedVariantData)
-{
-	SurgSim::DataStructures::NamedVariantDataBuilder builder;
-	builder.addEntry("test");
-	SurgSim::DataStructures::NamedVariantData data = builder.createData();
-
-	EXPECT_EQ(1, data.getNumEntries());
-	EXPECT_EQ(1u, data.size());
-
-	EXPECT_TRUE(data.isValid());
-	EXPECT_TRUE(data.hasEntry(0));
-	EXPECT_TRUE(data.hasEntry("test"));
-	EXPECT_FALSE(data.hasData(0));
-	EXPECT_FALSE(data.hasData("test"));
-	EXPECT_EQ(0, data.getIndex("test"));
-	EXPECT_EQ("test", data.getName(0));
-
-	EXPECT_FALSE(data.hasEntry(1));
-	EXPECT_FALSE(data.hasEntry("missing"));
-	EXPECT_FALSE(data.hasData(1));
-	EXPECT_FALSE(data.hasData("missing"));
-	EXPECT_EQ(-1, data.getIndex("missing"));
-	EXPECT_EQ("", data.getName(1));
-
-	Mock3DData<float> mockData(5, 5, 5);
-	mockData.set(1, 1, 1, 1.23);
-	mockData.set(4, 3, 2, 4.56);
-
-	data.set("test", mockData);
-	EXPECT_TRUE(data.hasEntry(0));
-	EXPECT_TRUE(data.hasEntry("test"));
-	EXPECT_TRUE(data.hasData(0));
-	EXPECT_TRUE(data.hasData("test"));
-
-	{
-		Mock3DData<float> value;
-		EXPECT_TRUE(data.get("test", &value));
-		EXPECT_EQ(1.23f, value.get(1, 1, 1));
-		EXPECT_EQ(4.56f, value.get(4, 3, 2));
-	}
-	{
-		Mock3DData<float> value;
-		EXPECT_TRUE(data.get(0, &value));
-		EXPECT_EQ(1.23f, value.get(1, 1, 1));
-		EXPECT_EQ(4.56f, value.get(4, 3, 2));
-	}
-	{
-		Mock3DData<float> value;
-		EXPECT_FALSE(data.get(5, &value));
-		EXPECT_FALSE(data.get("missing", &value));
-	}
-	{
-		Mock3DData<unsigned char> wrongType;
-		EXPECT_THROW(data.get("test", &wrongType), SurgSim::Framework::AssertionFailure);
-	}
-
-	data.resetAll();
-	EXPECT_TRUE(data.hasEntry(0));
-	EXPECT_TRUE(data.hasEntry("test"));
-	EXPECT_FALSE(data.hasData(0));
-	EXPECT_FALSE(data.hasData("test"));
-}

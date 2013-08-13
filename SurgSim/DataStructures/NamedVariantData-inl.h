@@ -35,8 +35,19 @@ inline bool NamedVariantData::hasTypedData(int index) const
 	{
 		return false;
 	}
-	boost::any a = NamedData::get(index, &a);
-	return a.type() == typeid(T);
+
+	boost::any a;
+	if (! NamedData::get(index, &a))
+	{
+		return false;
+	}
+
+	if (a.empty())
+	{
+		return false;
+	}
+
+	return (a.type() == typeid(T));
 }
 
 template <typename T>
@@ -46,10 +57,9 @@ inline bool NamedVariantData::hasTypedData(const std::string& name) const
 	{
 		return false;
 	}
-	boost::any a = NamedData::get(name, &a);
-	return a.type() == typeid(T);
+	int index = getIndex(name);
+	return hasTypedData<T>(index);
 }
-
 
 template <typename T>
 inline bool NamedVariantData::get(int index, T* value) const
