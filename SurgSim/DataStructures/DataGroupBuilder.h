@@ -124,11 +124,11 @@ public:
 
 	/// Provides access to the custom data entries.
 	/// \return a writable reference to the sub-object that contains custom data entries.
-	NamedVariantDataBuilder& customs();
+	NamedVariantDataBuilder& customData();
 
 	/// Provides access to the custom data entries.
 	/// \return a read-only reference to the sub-object that contains custom data entries.
-	const NamedVariantDataBuilder& customs() const;
+	const NamedVariantDataBuilder& customData() const;
 
 	/// A shortcut for adding a named pose entry.
 	/// Identical to <code>%poses().addEntry(name)</code>.
@@ -159,7 +159,7 @@ public:
 	void addString(const std::string& name);
 
 	/// A shortcut for adding a named custom data entry.
-	/// Identical to <code>%customs().addEntry(name)</code>.
+	/// Identical to <code>%customData().addEntry(name)</code>.
 	void addCustom(const std::string& name);
 
 	/// Create new entries from another DataGroupBuilder.
@@ -197,7 +197,7 @@ private:
 	NamedDataBuilder<StringType> m_strings;
 
 	/// The subsidiary builder used for custom data.
-	NamedVariantDataBuilder m_customs;
+	NamedVariantDataBuilder m_customData;
 };
 
 };  // namespace Input

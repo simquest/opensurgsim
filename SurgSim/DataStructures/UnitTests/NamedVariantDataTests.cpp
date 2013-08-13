@@ -122,7 +122,6 @@ TEST(NamedVariantDataTests, Get)
 		Mock3DData<unsigned char> wrongType;
 		EXPECT_THROW(data.get("test", &wrongType), SurgSim::Framework::AssertionFailure);
 	}
-
 }
 
 TEST(NamedVariantDataTests, Reset)

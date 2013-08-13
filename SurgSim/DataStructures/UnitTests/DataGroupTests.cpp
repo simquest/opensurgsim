@@ -109,7 +109,7 @@ TEST(DataGroupTests, PutName)
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
 	data.strings().set("string", "string");
-	data.customs().set("mock_data", mockData);
+	data.customData().set("mock_data", mockData);
 
 	EXPECT_TRUE(data.poses().hasEntry("pose"));
 	EXPECT_TRUE(data.poses().hasData("pose"));
@@ -132,8 +132,8 @@ TEST(DataGroupTests, PutName)
 	EXPECT_TRUE(data.strings().hasEntry("string"));
 	EXPECT_TRUE(data.strings().hasData("string"));
 
-	EXPECT_TRUE(data.customs().hasEntry("mock_data"));
-	EXPECT_TRUE(data.customs().hasData("mock_data"));
+	EXPECT_TRUE(data.customData().hasEntry("mock_data"));
+	EXPECT_TRUE(data.customData().hasData("mock_data"));
 }
 
 /// Getting data from the container.
@@ -168,7 +168,7 @@ TEST(DataGroupTests, GetName)
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
 	data.strings().set("string", "string");
-	data.customs().set("mock_data", mockData);
+	data.customData().set("mock_data", mockData);
 
 	{
 		SurgSim::Math::RigidTransform3d value = SurgSim::Math::RigidTransform3d::Identity();
@@ -210,7 +210,7 @@ TEST(DataGroupTests, GetName)
 	}
 	{
 		Mock3DData<double> value;
-		EXPECT_TRUE(data.customs().get("mock_data", &value));
+		EXPECT_TRUE(data.customData().get("mock_data", &value));
 		EXPECT_NEAR(1.23, value.get(5, 5, 5), 1e-9);
 		EXPECT_NEAR(4.56, value.get(1, 2, 3), 1e-9);
 	}
@@ -228,7 +228,7 @@ TEST(DataGroupTests, ResetAll)
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
-	data.customs().set("fourth", Mock3DData<double>(10, 10, 10));
+	data.customData().set("fourth", Mock3DData<double>(10, 10, 10));
 
 	data.resetAll();
 
@@ -241,8 +241,8 @@ TEST(DataGroupTests, ResetAll)
 	EXPECT_TRUE(data.strings().hasEntry("third"));
 	EXPECT_FALSE(data.strings().hasData("third"));
 
-	EXPECT_TRUE(data.customs().hasEntry("fourth"));
-	EXPECT_FALSE(data.customs().hasData("fourth"));
+	EXPECT_TRUE(data.customData().hasEntry("fourth"));
+	EXPECT_FALSE(data.customData().hasData("fourth"));
 }
 
 /// Resetting one data entry at a time.
@@ -257,7 +257,7 @@ TEST(DataGroupTests, ResetOne)
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
-	data.customs().set("fourth", Mock3DData<double>(10, 10, 10));
+	data.customData().set("fourth", Mock3DData<double>(10, 10, 10));
 
 	data.strings().reset("third");
 
@@ -270,8 +270,8 @@ TEST(DataGroupTests, ResetOne)
 	EXPECT_TRUE(data.strings().hasEntry("third"));
 	EXPECT_FALSE(data.strings().hasData("third"));
 
-	EXPECT_TRUE(data.customs().hasEntry("fourth"));
-	EXPECT_TRUE(data.customs().hasData("fourth"));
+	EXPECT_TRUE(data.customData().hasEntry("fourth"));
+	EXPECT_TRUE(data.customData().hasData("fourth"));
 
 	data.scalars().reset("second");
 

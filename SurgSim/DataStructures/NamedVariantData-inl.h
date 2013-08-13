@@ -23,6 +23,10 @@ namespace SurgSim
 namespace DataStructures
 {
 
+inline NamedVariantData::NamedVariantData()
+{
+}
+
 inline NamedVariantData::NamedVariantData(const NamedData<boost::any>& namedData) :
 	NamedData<boost::any>(namedData)
 {

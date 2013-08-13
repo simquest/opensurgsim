@@ -188,11 +188,11 @@ public:
 
 	/// Return the custom data structure.
 	/// \return the mutable data.
-	inline NamedVariantData& customs();
+	inline NamedVariantData& customData();
 
 	/// Return the custom data structure.
 	/// \return the read-only data.
-	inline const NamedVariantData& customs() const;
+	inline const NamedVariantData& customData() const;
 
 	/// Mark all data as not current.
 	inline void resetAll();
@@ -220,7 +220,7 @@ private:
 	NamedData<StringType> m_strings;
 
 	/// The custom data values.
-	NamedVariantData m_customs;
+	NamedVariantData m_customData;
 };
 
 };  // namespace Input

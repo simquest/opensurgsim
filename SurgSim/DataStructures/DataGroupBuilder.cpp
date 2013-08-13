@@ -35,7 +35,7 @@ DataGroup DataGroupBuilder::createData() const
 	data.integers() = integers().createData();
 	data.booleans() = booleans().createData();
 	data.strings() = strings().createData();
-	data.customs() = customs().createData();
+	data.customData() = customData().createData();
 	return data;
 }
 
@@ -114,14 +114,14 @@ const NamedDataBuilder<DataGroupBuilder::StringType>& DataGroupBuilder::strings(
 	return m_strings;
 }
 
-NamedVariantDataBuilder& DataGroupBuilder::customs()
+NamedVariantDataBuilder& DataGroupBuilder::customData()
 {
-	return m_customs;
+	return m_customData;
 }
 
-const NamedVariantDataBuilder& DataGroupBuilder::customs() const
+const NamedVariantDataBuilder& DataGroupBuilder::customData() const
 {
-	return m_customs;
+	return m_customData;
 }
 
 void DataGroupBuilder::addPose(const std::string& name)
@@ -161,7 +161,7 @@ void DataGroupBuilder::addString(const std::string& name)
 
 void DataGroupBuilder::addCustom(const std::string& name)
 {
-	customs().addEntry(name);
+	customData().addEntry(name);
 }
 
 
@@ -174,7 +174,7 @@ void DataGroupBuilder::addEntriesFrom(const DataGroupBuilder& builder)
 	integers().addEntriesFrom(builder.integers());
 	booleans().addEntriesFrom(builder.booleans());
 	strings().addEntriesFrom(builder.strings());
-	customs().addEntriesFrom(builder.customs());
+	customData().addEntriesFrom(builder.customData());
 }
 
 void DataGroupBuilder::addEntriesFrom(const DataGroup& data)
@@ -186,7 +186,7 @@ void DataGroupBuilder::addEntriesFrom(const DataGroup& data)
 	integers().addEntriesFrom(data.integers());
 	booleans().addEntriesFrom(data.booleans());
 	strings().addEntriesFrom(data.strings());
-	customs().addEntriesFrom(data.customs());
+	customData().addEntriesFrom(data.customData());
 }
 
 

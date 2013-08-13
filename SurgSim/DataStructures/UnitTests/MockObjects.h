@@ -27,19 +27,19 @@ template<typename T>
 class Mock3DData
 {
 public:
-	Mock3DData()
-	: m_height(0),
-	  m_width(0),
-	  m_depth(0),
-	  m_buffer(0)
+	Mock3DData() :
+		m_height(0),
+		m_width(0),
+		m_depth(0),
+		m_buffer(0)
 	{
 	}
 
-	Mock3DData(int height, int width, int depth)
-	: m_height(height),
-	  m_width(width),
-	  m_depth(depth),
-	  m_buffer(height*depth*width)
+	Mock3DData(int height, int width, int depth) :
+		m_height(height),
+		m_width(width),
+		m_depth(depth),
+		m_buffer(height*depth*width)
 	{
 	}
 

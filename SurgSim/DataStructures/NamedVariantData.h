@@ -39,7 +39,7 @@ typedef NamedDataBuilder<boost::any> NamedVariantDataBuilder;
 class NamedVariantData : public NamedData<boost::any>
 {
 public:
-	NamedVariantData() {};
+	NamedVariantData();
 
 	inline NamedVariantData(const NamedData<boost::any>& namedData);
 
