@@ -38,7 +38,12 @@ set(SIXENSE_DEVICE_HEADERS
 	SixenseThread.h
 )
 
-add_library(SixenseDevice ${SIXENSE_DEVICE_SOURCES} ${SIXENSE_DEVICE_HEADERS})
+# TODO(advornik): the installation should NOT copy all the headers...
+surgsim_add_library(
+	SixenseDevice
+	"${SIXENSE_DEVICE_SOURCES}" "${SIXENSE_DEVICE_HEADERS}"
+	SurgSim/Devices/Sixense
+)
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 
