@@ -14,7 +14,7 @@
 // limitations under the License.
 
 
-#include <SurgSim/ExampleBouncingBalls/AddSphereBehavior.h>
+#include "AddSphereBehavior.h"
 
 #include <SurgSim/Framework/Behavior.h>
 
