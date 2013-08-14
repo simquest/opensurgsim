@@ -46,8 +46,7 @@ TEST(OsgRenderTargetTests, PotDefaultConstructorTest)
 	ASSERT_EQ(0, target.getColorTargetCount());
 	for(int i=0; i<16; ++i)
 	{
-		SCOPED_TRACE("Color Buffer" + std::to_string(i));
-		EXPECT_TRUE(nullptr == target.getColorTarget(i));
+		EXPECT_TRUE(nullptr == target.getColorTarget(i)) << "color target should be nullptr at index:" << i;
 	}
 }
 
@@ -69,8 +68,7 @@ TEST(OsgRenderTargetTests, PotSpecificConstructorTest)
 	EXPECT_EQ(16, target.getColorTargetCount());
 	for(int i=0; i<16; ++i)
 	{
-		SCOPED_TRACE("Color Buffer " + std::to_string(i));
-		EXPECT_FALSE(nullptr == target.getColorTarget(i));
+		EXPECT_FALSE(nullptr == target.getColorTarget(i)) << "color target is nullptr at index:" << i;
 	}
 }
 
