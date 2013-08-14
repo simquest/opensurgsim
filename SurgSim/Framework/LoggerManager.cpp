@@ -51,14 +51,11 @@ std::shared_ptr<LogOutput> LoggerManager::getDefaultOutput() const
 
 void LoggerManager::setThreshold(int threshold)
 {
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	m_globalThreshold = threshold;
-	for (auto it = m_loggers.cbegin(); it != m_loggers.cend(); ++it)
 	{
-		auto temp = (it->second).lock();
-		if (temp != nullptr)
-			temp->setThreshold(threshold);
+		boost::lock_guard<boost::mutex> lock(m_mutex);
+		m_globalThreshold = threshold;
 	}
+	setThreshold("", threshold);
 }
 
 void LoggerManager::setThreshold(const std::string& path, int threshold)
@@ -68,9 +65,10 @@ void LoggerManager::setThreshold(const std::string& path, int threshold)
 	{
 		if (boost::istarts_with(it->first, path))
 		{
-			auto temp = (it->second).lock();
-			if (temp != nullptr)
-				temp->setThreshold(threshold);
+			if ( ! (it->second).expired())
+			{
+				(it->second).lock()->setThreshold(threshold);
+			}
 		}
 	}
 }
@@ -87,21 +85,16 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 
 	auto it = m_loggers.find(name);
 	std::shared_ptr<Logger> result;
-	if ( it == m_loggers.end() )
+
+	if ( it != m_loggers.end() && (! (it->second).expired()))
 	{
-		result = std::make_shared<Logger>(name, m_defaultOutput);
-		result->setThreshold(m_globalThreshold);
-		m_loggers[name] = result;
+		result = (it->second).lock();
 	}
 	else
 	{
-		result = (it->second).lock();
-		if (result == nullptr)
-		{
-			result = std::make_shared<Logger>(name, m_defaultOutput);
-			result->setThreshold(m_globalThreshold);
-			m_loggers[name] = result;
-		}
+  		result = std::make_shared<Logger>(name, m_defaultOutput);
+  		result->setThreshold(m_globalThreshold);
+  		m_loggers[name] = result;
 	}
 	return result;
 }
