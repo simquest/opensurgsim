@@ -35,7 +35,14 @@ set(RAW_EXAMPLE_HEADERS
 
 add_executable(RawMultiAxisVisualTest
 	${RAW_EXAMPLE_SOURCES} ${RAW_EXAMPLE_HEADERS})
-target_link_libraries(RawMultiAxisVisualTest
-	${LIBS} MultiAxisDevice IdentityPoseDevice VisualTestCommon
+surgsim_show_ide_folders(
+	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
+
+set(LIBS MultiAxisDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
 	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+if(WINDDK_FOUND)
+	list(APPEND LIBS ${WINDDK_LIBRARIES})
+endif()
+
+target_link_libraries(RawMultiAxisVisualTest ${LIBS})

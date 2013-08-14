@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_H
 #define SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_H
 
-#include <SurgSim/Graphics/OsgUniform.h>
+/// \note HS-2013-jul-07 This file is included by OsgUniform.h, it is not meant to be used on its own
 
 namespace SurgSim
 {
@@ -27,8 +27,7 @@ namespace Graphics
 /// OSG implementation of graphics uniform with a texture value
 /// \tparam	T	Texture type
 template <class T>
-class OsgTextureUniform : public Uniform<std::shared_ptr<T>>,
-	public OsgUniformBase
+class OsgTextureUniform : public Uniform<std::shared_ptr<T>>, public OsgUniformBase
 {
 public:
 	/// Constructor
@@ -119,7 +118,5 @@ public:
 };  // namespace Graphics
 
 };  // namespace SurgSim
-
-#include <SurgSim/Graphics/OsgTextureUniform-inl.h>
 
 #endif  // SURGSIM_GRAPHICS_OSGTEXTUREUNIFORM_H

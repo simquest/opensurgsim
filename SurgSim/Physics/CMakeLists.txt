@@ -21,14 +21,15 @@ set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
 	CollisionPair.cpp
 	CollisionRepresentation.cpp
+	Computation.cpp
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
 	ContactCalculation.cpp
 	ContactConstraintGeneration.cpp
-	Computation.cpp
 	DcdCollision.cpp
+	DeformableRepresentationState.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -65,6 +66,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
+	DeformableRepresentationState.h
 	DoubleSidedPlaneShape.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
@@ -102,10 +104,10 @@ set(SURGSIM_PHYSICS_HEADERS
 )
 
 surgsim_add_library(
-    SurgSimPhysics
-    "${SURGSIM_PHYSICS_SOURCES}"
-    "${SURGSIM_PHYSICS_HEADERS}"
-    "SurgSim/Physics"
+	SurgSimPhysics
+	"${SURGSIM_PHYSICS_SOURCES}"
+	"${SURGSIM_PHYSICS_HEADERS}"
+	"SurgSim/Physics"
 )
 target_link_libraries(SurgSimPhysics SurgSimFramework SurgSimMath)
 

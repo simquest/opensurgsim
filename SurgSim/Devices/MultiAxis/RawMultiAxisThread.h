@@ -47,6 +47,7 @@ protected:
 	virtual bool doInitialize() override;
 	virtual bool doStartUp() override;
 	virtual bool doUpdate(double dt) override;
+	virtual void doBeforeStop() override;
 
 private:
 	RawMultiAxisScaffold* m_scaffold;

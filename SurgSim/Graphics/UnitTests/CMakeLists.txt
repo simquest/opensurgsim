@@ -25,9 +25,9 @@ set(UNIT_TEST_SOURCES
 	GroupTests.cpp
 	ManagerTests.cpp
 	OsgBoxRepresentationTests.cpp
+	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp
 	OsgCylinderRepresentationTests.cpp
-	OsgCameraTests.cpp
 	OsgGroupTests.cpp
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
@@ -37,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	OsgQuaternionConversionsTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
+	OsgScreenSpaceQuadTests.cpp
 	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgTextureTests.cpp
@@ -45,6 +46,7 @@ set(UNIT_TEST_SOURCES
 	OsgTexture3dTests.cpp
 	OsgTextureCubeMapTests.cpp
 	OsgTextureRectangleTests.cpp
+	OsgTextureUniformTests.cpp
 	OsgUniformTests.cpp
 	OsgUniformBaseTests.cpp
 	OsgUniformTypesTests.cpp

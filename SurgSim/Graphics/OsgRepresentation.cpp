@@ -37,7 +37,7 @@ OsgRepresentation::OsgRepresentation(const std::string& name) :
 	m_switch->setName(name + " Switch");
 
 	m_transform = new osg::PositionAttitudeTransform();
-	m_switch->setName(name + " Transform");
+	m_transform->setName(name + " Transform");
 
 	m_switch->addChild(m_transform);
 

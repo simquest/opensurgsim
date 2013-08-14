@@ -21,6 +21,9 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgView.h>
 
+#include <osgViewer/Scene>
+#include <osgDB/WriteFile>
+
 using SurgSim::Graphics::OsgRepresentation;
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgGroup;
@@ -147,6 +150,13 @@ bool OsgManager::doUpdate(double dt)
 
 void OsgManager::doBeforeStop()
 {
+
 	// Delete the viewer so that the graphics context will be released in the manager's thread
 	m_viewer = nullptr;
 }
+
+void SurgSim::Graphics::OsgManager::dumpDebugInfo() const
+{
+	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()),"default_camera.osgt" );
+}
+

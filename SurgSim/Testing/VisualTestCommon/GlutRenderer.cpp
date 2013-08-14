@@ -65,7 +65,7 @@ void GlutSquare::draw() const
 	glNormal3d(- normal.x(), - normal.y(), - normal.z());
 	for (int i = 0; i < 4; ++i)
 	{
-		glVertex3d(squarePoints[4 - i].x(), squarePoints[4 - i].y(), squarePoints[4 - i].z());
+		glVertex3d(squarePoints[3 - i].x(), squarePoints[3 - i].y(), squarePoints[3 - i].z());
 	}
 
 	glEnd();

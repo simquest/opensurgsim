@@ -15,12 +15,6 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 
-#include <linux/input.h>
-
-#include <unistd.h>
-#include <poll.h>
-#include <sys/ioctl.h>
-
 #include <vector>
 #include <list>
 #include <array>
@@ -32,7 +26,9 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h"
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
-#include "SurgSim/Devices/MultiAxis/FileDescriptor.h"
+#include "SurgSim/Devices/MultiAxis/GetSystemError.h"
+#include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
+#include "SurgSim/Devices/MultiAxis/CreateInputDeviceHandle.h"
 #include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
@@ -43,11 +39,15 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
 
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector3f;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
+
+using SurgSim::Device::Internal::getSystemErrorCode;
+using SurgSim::Device::Internal::getSystemErrorText;
 
 
 namespace SurgSim
@@ -56,48 +56,15 @@ namespace Device
 {
 
 
-// Get the output location for the XSI version of strerror_r.
-static inline const char* systemErrorTextHelper(const char* buffer, int returnValue)
-{
-	if (returnValue != 0)
-	{
-		return nullptr;
-	}
-	return buffer;
-}
-
-// Get the output location for the GNU version of strerror_r.
-static inline const char* systemErrorTextHelper(const char* buffer, const char* returnValue)
-{
-	return returnValue;
-}
-
-static std::string getSystemErrorText(int error)
-{
-	char buffer[1024];
-	buffer[0] = '\0';
-	// Unfortunately, on Linux you can't really know if you will get the XSI version or the GNU version of
-	// strerror_r.  Fortunately, the arguments are the same (only return type differs), so we can cheat.
-	const char* message = systemErrorTextHelper(buffer, strerror_r(error, buffer, sizeof(buffer)));
-	if (message == nullptr || message[0] == '\0')
-	{
-		snprintf(buffer, sizeof(buffer), "<system error %d>", error);
-		message = buffer;
-	}
-	return std::string(message);
-}
-
-
 struct RawMultiAxisScaffold::DeviceData
 {
 public:
 	/// Initialize the data.
-	DeviceData(const std::string& path, RawMultiAxisDevice* device, FileDescriptor&& descriptor,
-			   const std::vector<int>& buttonCodeList) :
+	DeviceData(const std::string& path, RawMultiAxisDevice* device, std::unique_ptr<SystemInputDeviceHandle>&& handle) :
 		devicePath(path),
 		deviceObject(device),
 		thread(),
-		fileDescriptor(std::move(descriptor)),
+		deviceHandle(std::move(handle)),
 		axisStates(initialAxisStates()),
 		buttonStates(initialButtonStates()),
 		coordinateSystemRotation(defaultCoordinateSystemRotation()),
@@ -105,14 +72,6 @@ public:
 		orientationScale(device->getOrientationScale()),
 		useAxisDominance(device->isUsingAxisDominance())
 	{
-		for (size_t i = 0;  (i < buttonCodeList.size()) && (i < NUM_BUTTONS);  ++i)
-		{
-			buttonCodes[i] = buttonCodeList[i];
-		}
-		for (size_t i = buttonCodeList.size();  i < NUM_BUTTONS;  ++i)
-		{
-			buttonCodes[i] = -1;
-		}
 	}
 
 	// Initialize by moving the data from another object.
@@ -121,10 +80,9 @@ public:
 		devicePath(std::move(other.devicePath)),
 		deviceObject(std::move(other.deviceObject)),
 		thread(std::move(other.thread)),
-		fileDescriptor(std::move(other.fileDescriptor)),
+		deviceHandle(std::move(other.deviceHandle)),
 		axisStates(std::move(other.axisStates)),
 		buttonStates(std::move(other.buttonStates)),
-		buttonCodes(std::move(other.buttonCodes)),
 		coordinateSystemRotation(std::move(other.coordinateSystemRotation)),
 		positionScale(std::move(other.positionScale)),
 		orientationScale(std::move(other.orientationScale)),
@@ -135,8 +93,6 @@ public:
 	~DeviceData()
 	{
 	}
-
-	static const size_t NUM_BUTTONS = 4;
 
 	// Returns the default coordinate system rotation matrix.
 	static SurgSim::Math::Matrix33d defaultCoordinateSystemRotation()
@@ -150,16 +106,16 @@ public:
 		return coordinateSystemRotation;
 	}
 
-	static std::array<int, 6> initialAxisStates()
+	static SystemInputDeviceHandle::AxisStates initialAxisStates()
 	{
-		std::array<int, 6> zeros;
-		zeros.fill(0);
-		return zeros;
+		SystemInputDeviceHandle::AxisStates states;
+		states.fill(0);
+		return states;
 	}
 
-	static std::array<bool, NUM_BUTTONS> initialButtonStates()
+	static SystemInputDeviceHandle::ButtonStates initialButtonStates()
 	{
-		std::array<bool, NUM_BUTTONS> states;
+		SystemInputDeviceHandle::ButtonStates states;
 		states.fill(false);
 		return states;
 	}
@@ -170,14 +126,12 @@ public:
 	RawMultiAxisDevice* const deviceObject;
 	/// Processing thread.
 	std::unique_ptr<RawMultiAxisThread> thread;
-	/// File descriptor to read from.
-	FileDescriptor fileDescriptor;
+	/// Device handle to read from.
+	std::unique_ptr<SystemInputDeviceHandle> deviceHandle;
 	/// Persistent axis states.
-	std::array<int, 6> axisStates;
+	SystemInputDeviceHandle::AxisStates axisStates;
 	/// Persistent button states.
-	std::array<bool, NUM_BUTTONS> buttonStates;
-	/// Event library button code corresponding to each index.
-	std::array<int, NUM_BUTTONS> buttonCodes;
+	SystemInputDeviceHandle::ButtonStates buttonStates;
 	/// The rotation of the coordinate system (used to reorient, e.g. point +Y up)
 	SurgSim::Math::Matrix33d coordinateSystemRotation;
 	/// Scale factor for the position axes.
@@ -190,9 +144,9 @@ public:
 	boost::mutex parametersMutex;
 
 private:
-	// prohibit copy construction and asignment
-	DeviceData(const DeviceData&) = delete;
-	DeviceData& operator=(const DeviceData&) = delete;
+	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
+	DeviceData(const DeviceData&) /*= delete*/;
+	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
 struct RawMultiAxisScaffold::StateData
@@ -213,9 +167,9 @@ public:
 	boost::mutex mutex;
 
 private:
-	// prohibit copy construction and asignment
-	StateData(const StateData&) = delete;
-	StateData& operator=(const StateData&) = delete;
+	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
+	StateData(const StateData&) /*= delete*/;
+	StateData& operator=(const StateData&) /*= delete*/;
 };
 
 
@@ -240,7 +194,13 @@ RawMultiAxisScaffold::~RawMultiAxisScaffold()
 		if (! m_state->activeDeviceList.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: Destroying scaffold while devices are active!?!";
-			// do anything special with each device?
+			for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
+			{
+				if ((*it)->thread)
+				{
+					destroyPerDeviceThread(it->get());
+				}
+			}
 			m_state->activeDeviceList.clear();
 		}
 
@@ -361,6 +321,12 @@ bool RawMultiAxisScaffold::runInputFrame(RawMultiAxisScaffold::DeviceData* info)
 	return true;
 }
 
+bool RawMultiAxisScaffold::runAfterLastFrame(RawMultiAxisScaffold::DeviceData* info)
+{
+	info->deviceHandle->prepareForShutdown();
+	return true;
+}
+
 static int findDominantAxis(const std::array<int, 6>& axes)
 {
 	int biggestAxis = 0;
@@ -401,77 +367,11 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 		}
 	}
 
-	struct pollfd pollData[1];
-	pollData[0].fd = info->fileDescriptor.get();
-	pollData[0].events = POLLIN;
-
-	//const int timeoutMsec = 10;
-	const int nonBlockingOnly = 0;
 	bool didUpdate = false;
-	while (poll(pollData, 1, nonBlockingOnly) > 0)
+	if (! info->deviceHandle->updateStates(&(info->axisStates), &(info->buttonStates), &didUpdate))
 	{
-		struct input_event event;
-		int numRead = read(info->fileDescriptor.get(), &event, sizeof(event));
-		if (numRead < 0)
-		{
-
-			if (errno == ENODEV)
-			{
-				SURGSIM_LOG_SEVERE(m_logger) << "RawMultiAxis: read failed; device has been disconnected!  (ignoring)";
-				return false;  // stop updating this device!
-			}
-			else if (errno != EAGAIN)
-			{
-				SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: read failed with error " << errno << ", " <<
-					getSystemErrorText(errno);
-			}
-		}
-		else if (numRead != sizeof(event))
-		{
-			SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: reading produced " << numRead << " bytes (expected " <<
-				sizeof(event) << ")";
-		}
-		else
-		{
-			if (event.type == EV_REL)
-			{
-				if (event.code >= REL_X && event.code < (REL_X+3))  // Assume that X, Y, Z are consecutive
-				{
-					info->axisStates[0 + (event.code - REL_X)] = event.value;
-					didUpdate = true;
-				}
-				else if (event.code >= REL_RX && event.code < (REL_RX+3))  // Assume that RX, RY, RZ are consecutive
-				{
-					info->axisStates[3 + (event.code - REL_RX)] = event.value;
-					didUpdate = true;
-				}
-			}
-			else if (event.type == EV_ABS)
-			{
-				if (event.code >= ABS_X && event.code < (ABS_X+3))  // Assume that X, Y, Z are consecutive
-				{
-					info->axisStates[0 + (event.code - ABS_X)] = event.value;
-					didUpdate = true;
-				}
-				else if (event.code >= ABS_RX && event.code < (ABS_RX+3))  // Assume that RX, RY, RZ are consecutive
-				{
-					info->axisStates[3 + (event.code - ABS_RX)] = event.value;
-					didUpdate = true;
-				}
-			}
-			else if (event.type == EV_KEY)
-			{
-				for (size_t i = 0;  i < DeviceData::NUM_BUTTONS;  ++i)
-				{
-					if (event.code == info->buttonCodes[i])
-					{
-						info->buttonStates[i] = (event.value != 0);
-						didUpdate = true;
-						break;
-					}
-				}
-			}
-		}
+		// If updateStates returns false, the device is no longer usable, so we exit and stop its update loop.
+		return false;
 	}
 
 	if (didUpdate)
@@ -560,20 +460,16 @@ bool RawMultiAxisScaffold::finalizeSdk()
 	return true;
 }
 
-FileDescriptor RawMultiAxisScaffold::openDevice(const std::string& path)
+std::unique_ptr<SystemInputDeviceHandle> RawMultiAxisScaffold::openDevice(const std::string& path)
 {
-	FileDescriptor fd;
-	fd.openForReadingAndMaybeWriting(path);
-	if (! fd.isValid())
+	std::unique_ptr<SystemInputDeviceHandle> handle = createInputDeviceHandle(path, m_logger);
+	if (! handle)
 	{
-		int error = errno;
-		if (error != ENOENT)
-		{
-			SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": " <<
-				getSystemErrorText(error);
-		}
+		int64_t error = getSystemErrorCode();
+		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: Could not open device " << path << ": error " << error <<
+			", " << getSystemErrorText(error);
 	}
-	return std::move(fd);
+	return std::move(handle);
 }
 
 bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* device, int* numUsedDevicesSeen)
@@ -599,44 +495,42 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		return false;
 	}
 
-	for (int i = 0;  i < 32;  ++i)
-	{
-		char devicePath[128];
-		snprintf(devicePath, sizeof(devicePath), "/dev/input/event%d", i);
+	const std::vector<std::string> devicePaths = enumerateInputDevicePaths(m_logger.get());
 
-		FileDescriptor fd = openDevice(devicePath);
-		if (! fd.isValid())
+	for (auto it = devicePaths.cbegin();  it != devicePaths.cend();  ++it)
+	{
+		const std::string& devicePath = *it;
+
+		// Check if this is the device we wanted.
+
+		std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(devicePath);
+		if (! handle)
 		{
+			// message was already printed
 			continue;
 		}
 
-		char reportedName[1024];
-		if (ioctl(fd.get(), EVIOCGNAME(sizeof(reportedName)), reportedName) < 0)
+		const std::string reportedName = handle->getDeviceName();
+
+		int vendorId, productId;
+		if (handle->getDeviceIds(&vendorId, &productId))
 		{
-			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGNAME): " << errno << ", " <<
-				getSystemErrorText(errno);
-			snprintf(reportedName, sizeof(reportedName), "???");
+			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" <<
+				std::hex << std::setfill('0') << std::setw(4) << vendorId << ":" << std::setw(4) << productId << " " <<
+				reportedName << ")";
 		}
 		else
 		{
-			reportedName[sizeof(reportedName)-1] = '\0';
-		}
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (" << reportedName << ")";
-
-		struct input_id reportedId;
-		if (ioctl(fd.get(), EVIOCGID, &reportedId) < 0)
-		{
-			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGID): " << errno << ", " <<
-				getSystemErrorText(errno);
-			continue;
+			SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Examining device " << devicePath << " (????:???? " <<
+				reportedName << ")";
 		}
 
-		if (! deviceHasSixAbsoluteAxes(fd) && ! deviceHasSixRelativeAxes(fd))
+		if (! handle->hasTranslationAndRotationAxes())
 		{
 			continue;
 		}
 
-		fd.reset();
+		handle.reset();
 
 		if (registerIfUnused(devicePath, device, numUsedDevicesSeen))
 		{
@@ -662,18 +556,17 @@ bool RawMultiAxisScaffold::registerIfUnused(const std::string& path, RawMultiAxi
 
 	// The controller is not yet in use.
 
-	FileDescriptor fd = openDevice(path);
-	if (! fd.isValid())
+	std::unique_ptr<SystemInputDeviceHandle> handle = openDevice(path);
+	if (! handle)
 	{
 		return false;
 	}
 
-	std::vector<int> buttons = getDeviceButtonsAndKeys(fd);
-
 	// Construct the object, start its thread, then move it to the list.
 	// The thread needs a device entry pointer, but the unique_ptr indirection means we have one to provide even
 	// before we've put an entry in the active device array.
-	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(fd), buttons));
+	std::unique_ptr<DeviceData> info(new DeviceData(path, device, std::move(handle)));
+
 	createPerDeviceThread(info.get());
 	SURGSIM_ASSERT(info->thread);
 	m_state->activeDeviceList.emplace_back(std::move(info));
@@ -698,113 +591,10 @@ bool RawMultiAxisScaffold::destroyPerDeviceThread(DeviceData* data)
 
 	std::unique_ptr<RawMultiAxisThread> thread = std::move(data->thread);
 	thread->stop();
-	thread.release();
+	thread.reset();
 
 	return true;
 }
-
-bool RawMultiAxisScaffold::deviceHasSixAbsoluteAxes(const FileDescriptor& fileDescriptor)
-{
-	BitSetBuffer<ABS_CNT> buffer;
-	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_ABS, buffer.sizeBytes()), buffer.getPointer()) == -1)
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_ABS)): " << errno << ", " <<
-			getSystemErrorText(errno);
-		return false;
-	}
-
-	if (! buffer.test(ABS_X) || ! buffer.test(ABS_Y) || ! buffer.test(ABS_Z) ||
-		! buffer.test(ABS_RX) || ! buffer.test(ABS_RY) || ! buffer.test(ABS_RZ))
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: does not have the 6 absolute axes.";
-		return false;
-	}
-
-	int numIgnoredAxes = 0;
-	for (size_t i = 0;  i < ABS_CNT;  ++i)
-	{
-		if (buffer.test(i))
-		{
-			if ((i != ABS_X) && (i != ABS_Y) && (i != ABS_Z) && (i != ABS_RX) && (i != ABS_RY) && (i != ABS_RZ))
-			{
-				++numIgnoredAxes;
-			}
-		}
-	}
-	if (numIgnoredAxes)
-	{
-		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional absolute axes.";
-	}
-
-	return true;
-}
-
-bool RawMultiAxisScaffold::deviceHasSixRelativeAxes(const FileDescriptor& fileDescriptor)
-{
-	BitSetBuffer<REL_CNT> buffer;
-	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_REL, buffer.sizeBytes()), buffer.getPointer()) == -1)
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_REL)): " << errno << ", " <<
-			getSystemErrorText(errno);
-		return false;
-	}
-
-	if (! buffer.test(REL_X) || ! buffer.test(REL_Y) || ! buffer.test(REL_Z) ||
-		! buffer.test(REL_RX) || ! buffer.test(REL_RY) || ! buffer.test(REL_RZ))
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: does not have the 6 relative axes.";
-		return false;
-	}
-
-	int numIgnoredAxes = 0;
-	for (size_t i = 0;  i < REL_CNT;  ++i)
-	{
-		if (buffer.test(i))
-		{
-			if ((i != REL_X) && (i != REL_Y) && (i != REL_Z) && (i != REL_RX) && (i != REL_RY) && (i != REL_RZ))
-			{
-				++numIgnoredAxes;
-			}
-		}
-	}
-	if (numIgnoredAxes)
-	{
-		SURGSIM_LOG_INFO(m_logger) << "RawMultiAxis: ignoring " << numIgnoredAxes << " additional relative axes.";
-	}
-
-	return true;
-}
-
-std::vector<int> RawMultiAxisScaffold::getDeviceButtonsAndKeys(const FileDescriptor& fileDescriptor)
-{
-	std::vector<int> result;
-	BitSetBuffer<KEY_CNT> buffer;
-	if (ioctl(fileDescriptor.get(), EVIOCGBIT(EV_KEY, buffer.sizeBytes()), buffer.getPointer()) == -1)
-	{
-		SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: ioctl(EVIOCGBIT(EV_KEY)): " << errno << ", " <<
-			getSystemErrorText(errno);
-		return result;
-	}
-
-	// Start listing buttons/keys from BTN_0; then go back and cover the earlier ones.
-	for (int i = BTN_0;  i < KEY_CNT;  ++i)
-	{
-		if (buffer.test(i))
-		{
-			result.push_back(i);
-		}
-	}
-	for (int i = 0;  i < BTN_0;  ++i)
-	{
-		if (buffer.test(i))
-		{
-			result.push_back(i);
-		}
-	}
-
-	return result;
-}
-
 
 SurgSim::DataStructures::DataGroup RawMultiAxisScaffold::buildDeviceInputData()
 {

@@ -21,16 +21,16 @@ set(OPENSURGSIM_MAJOR_VERSION 0)
 set(OPENSURGSIM_MINOR_VERSION 0)
 set(OPENSURGSIM_PATCH_VERSION 0)
 set(OPENSURGSIM_VERSION
-  ${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
+	${OPENSURGSIM_MAJOR_VERSION}.${OPENSURGSIM_MINOR_VERSION}.${OPENSURGSIM_PATCH_VERSION})
 
 # Install Directories
 set(INSTALL_LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib)
 set(INSTALL_BIN_DIR ${CMAKE_INSTALL_PREFIX}/bin)
 set(INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
 if(WIN32 AND NOT CYGWIN)
-  set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/CMake)
+	set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/CMake)
 else()
-  set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/${PROJECT_NAME})
+	set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/${PROJECT_NAME})
 endif()
 
 set(SURGSIM_TOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
@@ -53,10 +53,10 @@ find_package(Eigen3 REQUIRED)
 find_package(GLUT)  # only needed for visual device tests
 find_package(GlutFromOsg)  # look for GLUT in the OSG tree if not found above
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    # The standard FindGLUT code in CMake 2.8 includes some annoying old
-    # junk (-lXmu -lXi) in GLUT_LIBRARIES for Unix/Linux, which is
-    # neither needed nor usually available.  We only need GLUT itself.
-    set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
+	# The standard FindGLUT code in CMake 2.8 includes some annoying old
+	# junk (-lXmu -lXi) in GLUT_LIBRARIES for Unix/Linux, which is
+	# neither needed nor usually available.  We only need GLUT itself.
+	set(GLUT_LIBRARIES ${GLUT_glut_LIBRARY})
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 set(Boost_USE_STATIC_LIBS ON)
@@ -67,6 +67,7 @@ mark_as_advanced(Boost_DIR)
 
 find_package(OpenHaptics)
 find_package(SixenseSdk)
+find_package(WinDDK)
 
 
 if(SURGSIM_TESTS_BUILD)
@@ -85,7 +86,7 @@ if(SURGSIM_EXAMPLES_BUILD)
 	add_subdirectory(Examples)
 endif()
 
-export(TARGETS ${EXPORT_TARGETS} 
+export(TARGETS ${EXPORT_TARGETS}
 	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
 
 #Register where to find this build-tree. On windows this in the registry, on

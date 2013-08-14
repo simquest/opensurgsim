@@ -31,6 +31,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	BehaviorManager.cpp
 	ComponentManager.cpp
 	Logger.cpp
+	LoggerManager.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
 	Representation.cpp
@@ -43,15 +44,18 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	ApplicationData.h
 	Assert.h
 	AssertMessage.h
+	Barrier.h
 	BasicThread.h
 	Behavior.h
 	BehaviorManager.h
+	Clock.h
 	Component.h
 	ComponentManager.h
 	ComponentManager-inl.h
 	LockedContainer.h
 	Log.h
 	Logger.h
+	LoggerManager.h
 	LogMacros.h
 	LogMessage.h
 	LogMessageBase.h

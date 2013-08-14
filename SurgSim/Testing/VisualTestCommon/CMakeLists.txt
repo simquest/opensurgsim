@@ -44,3 +44,5 @@ set(VISUAL_TEST_COMMON_HEADERS
 # surgsim_add_library here.
 add_library(VisualTestCommon
 	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})
+surgsim_show_ide_folders(
+	"${VISUAL_TEST_COMMON_SOURCES}" "${VISUAL_TEST_COMMON_HEADERS}")

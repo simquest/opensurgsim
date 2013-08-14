@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Graphics/OsgUniformBase.h>
+#include <SurgSim/Framework/Log.h>
 
 using SurgSim::Graphics::OsgUniformBase;
 
@@ -25,6 +26,7 @@ OsgUniformBase::OsgUniformBase(const std::string& name) : UniformBase(),
 
 void OsgUniformBase::addToStateSet(osg::StateSet* stateSet)
 {
+	SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getDefaultLogger()) << "Base Add To Texture StateSet called";
 	stateSet->addUniform(m_uniform);
 }
 

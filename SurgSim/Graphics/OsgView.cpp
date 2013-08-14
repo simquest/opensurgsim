@@ -16,6 +16,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 
 #include <SurgSim/Graphics/OsgCamera.h>
+#include <osgViewer/ViewerEventHandlers>
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
@@ -30,6 +31,7 @@ OsgView::OsgView(const std::string& name) : View(name),
 {
 	/// Don't allow the default camera here, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
+	m_view->addEventHandler(new osgViewer::StatsHandler);
 }
 
 bool OsgView::setPosition(int x, int y)
@@ -93,11 +95,6 @@ bool OsgView::setCamera(std::shared_ptr<SurgSim::Graphics::Camera> camera)
 
 void OsgView::update(double dt)
 {
-	if (m_isFirstUpdate)
-	{
-		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
-		m_isFirstUpdate = false;
-	}
 	if (m_areWindowSettingsDirty)
 	{
 		osg::Camera* viewCamera = m_view->getCamera();
@@ -122,5 +119,11 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
+	if (m_isFirstUpdate)
+	{
+		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+		m_isFirstUpdate = false;
+	}
+
 	return true;
 }

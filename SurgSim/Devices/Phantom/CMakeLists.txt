@@ -36,7 +36,12 @@ set(PHANTOM_DEVICE_HEADERS
 	PhantomManager.h
 )
 
-add_library(PhantomDevice ${PHANTOM_DEVICE_SOURCES} ${PHANTOM_DEVICE_HEADERS})
+# TODO(advornik): the installation should NOT copy all the headers...
+surgsim_add_library(
+	PhantomDevice
+	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
+	SurgSim/Devices/Phantom
+)
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)

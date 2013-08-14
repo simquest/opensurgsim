@@ -26,11 +26,6 @@ RawMultiAxisThread::~RawMultiAxisThread()
 {
 }
 
-bool RawMultiAxisThread::doUpdate(double dt)
-{
-	return m_scaffold->runInputFrame(m_deviceData);
-}
-
 bool RawMultiAxisThread::doInitialize()
 {
 	return true;
@@ -39,6 +34,16 @@ bool RawMultiAxisThread::doInitialize()
 bool RawMultiAxisThread::doStartUp()
 {
 	return true;
+}
+
+bool RawMultiAxisThread::doUpdate(double dt)
+{
+	return m_scaffold->runInputFrame(m_deviceData);
+}
+
+void RawMultiAxisThread::doBeforeStop()
+{
+	m_scaffold->runAfterLastFrame(m_deviceData);
 }
 
 };  // namespace Device
