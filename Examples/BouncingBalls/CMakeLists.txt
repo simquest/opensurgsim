@@ -31,11 +31,11 @@ include_directories(
 
 set(EXAMPLE_SOURCES
 	ExampleBouncingBalls.cpp
-	AddSphereBehavior.cpp
+	AddSceneElementBehavior.cpp
 )
 
 set(EXAMPLE_HEADERS
-	AddSphereBehavior.h
+	AddSceneElementBehavior.h
 )
 
 # Configure the path for the data files

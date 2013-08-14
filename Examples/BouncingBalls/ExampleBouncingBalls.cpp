@@ -47,7 +47,7 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include "AddSphereBehavior.h"
+#include "AddSceneElementBehavior.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
@@ -150,7 +150,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 							   physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
-	planeElement->addComponent(std::make_shared<AddSphereBehavior>(createSphere(data, "sphere0",
+	planeElement->addComponent(std::make_shared<AddSceneElementBehavior>(createSphere(data, "sphere0",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(1.0,3.0,0.0)))));
 
 	return planeElement;
@@ -274,10 +274,10 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(createSphere(data, "sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
-	
+
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
-	
+
 	scene->addSceneElement(createPlane(data, "plane1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 
