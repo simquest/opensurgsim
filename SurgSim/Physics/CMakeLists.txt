@@ -66,6 +66,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	ContactConstraintGeneration.h
 	CylinderShape.h
 	DcdCollision.h
+	DeformableRepresentation.h
 	DeformableRepresentationState.h
 	DoubleSidedPlaneShape.h
 	FemRepresentationParameters.h
