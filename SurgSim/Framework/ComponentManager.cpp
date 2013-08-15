@@ -26,7 +26,7 @@ namespace Framework
 {
 
 ComponentManager::ComponentManager(const std::string& name /*= "Unknown Component Manager"*/) :
-	BasicThread(name), m_logger (Logger::createConsoleLogger(name))
+	BasicThread(name), m_logger(Logger::getLogger(name))
 {
 }
 
@@ -40,7 +40,7 @@ void ComponentManager::setRuntime(std::shared_ptr<Runtime> val)
 	m_runtime = val;
 
 	// Now pull the shared logger out of the runtime
-	m_logger = val->getLogger(getName());
+	m_logger = Logger::getLogger(getName());
 }
 
 bool ComponentManager::enqueueAddComponent(const std::shared_ptr<Component>& component)

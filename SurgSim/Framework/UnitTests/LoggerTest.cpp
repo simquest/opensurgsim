@@ -70,7 +70,7 @@ TEST(LoggerTest, InitTest)
 
 TEST(LoggerTest, MessageTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
+	auto output = std::make_shared<MockOutput>();
 	Logger logger(Logger("TestLogger", output));
 
 	logger.writeMessage("TestMessage");
@@ -79,7 +79,7 @@ TEST(LoggerTest, MessageTest)
 
 TEST(LoggerTest, LogMacroTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
+	auto output = std::make_shared<MockOutput>();
 	Logger logger(Logger("TestLogger", output));
 	logger.setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
@@ -98,7 +98,7 @@ TEST(LoggerTest, LogMacroTest)
 
 TEST(LoggerTest, UniquePtrTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
+	auto output = std::make_shared<MockOutput>();
 	std::unique_ptr<Logger> logger(new Logger("TestLogger", output));
 	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
@@ -117,8 +117,8 @@ TEST(LoggerTest, UniquePtrTest)
 
 TEST(LoggerTest, SharedPtrTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
-	std::shared_ptr<Logger> logger = std::make_shared<Logger>("TestLogger", output);
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
 	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
 	output->reset();
@@ -134,76 +134,63 @@ TEST(LoggerTest, SharedPtrTest)
 	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
 }
 
-TEST(LoggerTest, ConsoleLoggerTest)
-{
-	std::shared_ptr<Logger> logger = Logger::createConsoleLogger("testConsoleLogger");
-	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
-
-	// Of course, we can't test what was written to the console...
-	std::cerr << "--- This should include exactly 2 messages (CRIT and WARN):" << std::endl;
-	SURGSIM_LOG(logger, CRITICAL) << "Test Text";
-	SURGSIM_LOG(logger, DEBUG) << "Missing Text";
-	SURGSIM_LOG(logger, WARNING) << "Exactly At Threshold";
-	std::cerr << "--- done!" << std::endl;
-}
-
 TEST(LoggerTest, LevelSpecificMacroTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
-	logger.setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
 	output->reset();
-	SURGSIM_LOG_CRITICAL(&logger) << "Test Text";
+	SURGSIM_LOG_CRITICAL(logger) << "Test Text";
 	EXPECT_TRUE(isContained("Test Text", output->logMessage));
 
 	output->reset();
-	SURGSIM_LOG_DEBUG(&logger) << "Missing Text";
+	SURGSIM_LOG_DEBUG(logger) << "Missing Text";
 	EXPECT_EQ("", output->logMessage);
 
 	output->reset();
-	SURGSIM_LOG_WARNING(&logger) << "Exactly At Threshold";
+	SURGSIM_LOG_WARNING(logger) << "Exactly At Threshold";
 	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
 }
 
 TEST(LoggerTest, IfMacroTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
-	logger.setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
 	output->reset();
-	SURGSIM_LOG_IF(true, &logger, CRITICAL) << "Test Text";
+	SURGSIM_LOG_IF(true, logger, CRITICAL) << "Test Text";
 	EXPECT_TRUE(isContained("Test Text", output->logMessage));
 	output->reset();
-	SURGSIM_LOG_IF(false, &logger, CRITICAL) << "Test Text";
+	SURGSIM_LOG_IF(false, logger, CRITICAL) << "Test Text";
 	EXPECT_EQ("", output->logMessage);
 
 	output->reset();
-	SURGSIM_LOG_IF(true, &logger, DEBUG) << "Missing Text";
+	SURGSIM_LOG_IF(true, logger, DEBUG) << "Missing Text";
 	EXPECT_EQ("", output->logMessage);
 	output->reset();
-	SURGSIM_LOG_IF(false, &logger, DEBUG) << "Missing Text";
+	SURGSIM_LOG_IF(false, logger, DEBUG) << "Missing Text";
 	EXPECT_EQ("", output->logMessage);
 
 	output->reset();
-	SURGSIM_LOG_IF(true, &logger, WARNING) << "Exactly At Threshold";
+	SURGSIM_LOG_IF(true, logger, WARNING) << "Exactly At Threshold";
 	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
 	output->reset();
-	SURGSIM_LOG_IF(false, &logger, WARNING) << "Exactly At Threshold";
+	SURGSIM_LOG_IF(false, logger, WARNING) << "Exactly At Threshold";
 	EXPECT_EQ("", output->logMessage);
 }
 
 TEST(LoggerTest, OnceMacroTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
-	logger.setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
 	for (int i = 0;  i < 3; ++i)
 	{
 		output->reset();
-		SURGSIM_LOG_ONCE(&logger, CRITICAL) << "Test Text";
+		SURGSIM_LOG_ONCE(logger, CRITICAL) << "Test Text";
 		if (i == 0)
 		{
 			EXPECT_TRUE(isContained("Test Text", output->logMessage));
@@ -214,11 +201,11 @@ TEST(LoggerTest, OnceMacroTest)
 		}
 
 		output->reset();
-		SURGSIM_LOG_ONCE(&logger, DEBUG) << "Missing Text";
+		SURGSIM_LOG_ONCE(logger, DEBUG) << "Missing Text";
 		EXPECT_EQ("", output->logMessage);
 
 		output->reset();
-		SURGSIM_LOG_ONCE(&logger, CRITICAL) << "More Text";
+		SURGSIM_LOG_ONCE(logger, CRITICAL) << "More Text";
 		if (i == 0)
 		{
 			EXPECT_TRUE(isContained("More Text", output->logMessage));
@@ -232,14 +219,14 @@ TEST(LoggerTest, OnceMacroTest)
 
 TEST(LoggerTest, OnceIfMacroTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
-	logger.setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
 	for (int i = 0;  i < 3; ++i)
 	{
 		output->reset();
-		SURGSIM_LOG_ONCE_IF(i >= 0, &logger, CRITICAL) << "Test Text";
+		SURGSIM_LOG_ONCE_IF(i >= 0, logger, CRITICAL) << "Test Text";
 		if (i == 0)
 		{
 			EXPECT_TRUE(isContained("Test Text", output->logMessage));
@@ -250,11 +237,11 @@ TEST(LoggerTest, OnceIfMacroTest)
 		}
 
 		output->reset();
-		SURGSIM_LOG_ONCE_IF(i >= 1, &logger, DEBUG) << "Missing Text";
+		SURGSIM_LOG_ONCE_IF(i >= 1, logger, DEBUG) << "Missing Text";
 		EXPECT_EQ("", output->logMessage);
 
 		output->reset();
-		SURGSIM_LOG_ONCE_IF(i >= 2, &logger, CRITICAL) << "More Text";
+		SURGSIM_LOG_ONCE_IF(i >= 2, logger, CRITICAL) << "More Text";
 		if (i == 2)
 		{
 			EXPECT_TRUE(isContained("More Text", output->logMessage));
@@ -268,59 +255,59 @@ TEST(LoggerTest, OnceIfMacroTest)
 
 TEST(LoggerTest, EndOfLineTest)
 {
-	std::shared_ptr<MockOutput> output = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
-	logger.setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
+	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
 
 	output->reset();
-	SURGSIM_LOG_CRITICAL(&logger) << "foo" << std::endl << "bar";
+	SURGSIM_LOG_CRITICAL(logger) << "foo" << std::endl << "bar";
 	EXPECT_TRUE(isContained("foo\nbar", output->logMessage));
 }
 
 TEST(LoggerTest, LogLevelTest)
 {
-	std::shared_ptr<MockOutput> output	 = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
+	auto output = std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
 
 	output->reset();
-	SURGSIM_LOG_INFO(&logger) << "a message";
+	SURGSIM_LOG_INFO(logger) << "a message";
 	EXPECT_TRUE(isContained("INFO", output->logMessage));
 
 	output->reset();
-	SURGSIM_LOG_DEBUG(&logger) << "a message";
+	SURGSIM_LOG_DEBUG(logger) << "a message";
 	EXPECT_TRUE(isContained("DEBUG", output->logMessage));
 
 	output->reset();
-	SURGSIM_LOG_WARNING(&logger) << "a message";
+	SURGSIM_LOG_WARNING(logger) << "a message";
 	EXPECT_TRUE(isContained("WARNING", output->logMessage));
 
 	output->reset();
-	SURGSIM_LOG_SEVERE(&logger) << "a message";
+	SURGSIM_LOG_SEVERE(logger) << "a message";
 	EXPECT_TRUE(isContained("SEVERE", output->logMessage));
 
 	output->reset();
-	SURGSIM_LOG_CRITICAL(&logger) << "a message";
+	SURGSIM_LOG_CRITICAL(logger) << "a message";
 	EXPECT_TRUE(isContained("CRITICAL", output->logMessage));
 }
 
 TEST(LoggerTest, ManipulatorTest)
 {
-	std::shared_ptr<MockOutput> output	 = std::make_shared<MockOutput>();
-	Logger logger(Logger("TestLogger", output));
+	auto output	= std::make_shared<MockOutput>();
+	auto logger = std::make_shared<Logger>("TestLogger", output);
 
 	output->reset();
-	SURGSIM_LOG_WARNING(&logger) << "aAa" << std::endl << "bBb";
+	SURGSIM_LOG_WARNING(logger) << "aAa" << std::endl << "bBb";
 	EXPECT_TRUE(isContained("aAa\nbBb", output->logMessage) || isContained("aAa\r\n\bBb", output->logMessage)) <<
 		"message: '" << output->logMessage << "'";
 
 	output->reset();
-	SURGSIM_LOG_WARNING(&logger) << "[" << std::hex << std::setw(5) << std::setfill('0') << 0x1234 << "]";
+	SURGSIM_LOG_WARNING(logger) << "[" << std::hex << std::setw(5) << std::setfill('0') << 0x1234 << "]";
 	EXPECT_TRUE(isContained("[01234]", output->logMessage)) <<
 		"message: '" << output->logMessage << "'";
 
 	output->reset();
 	// The next message should not show any evidence of previous manipulators.
-	SURGSIM_LOG_WARNING(&logger) << "[" << 987 << "]";
+	SURGSIM_LOG_WARNING(logger) << "[" << 987 << "]";
 	EXPECT_TRUE(isContained("[987]", output->logMessage)) <<
 		"message: '" << output->logMessage << "'";
 }

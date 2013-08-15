@@ -21,6 +21,7 @@
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
+#include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
@@ -47,6 +48,7 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
@@ -76,7 +78,7 @@ public:
 
 	virtual void update(double dt)
 	{
-		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
+		auto logger = Logger::getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 	}
@@ -98,7 +100,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 {
 	using SurgSim::Graphics::OsgViewElement;
 
-	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
+	auto viewElement = std::make_shared<OsgViewElement>(name);
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
@@ -108,19 +110,16 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
-	std::shared_ptr<FixedRepresentation> physicsRepresentation =
-		std::make_shared<FixedRepresentation>(name + " Physics");
-
+	auto physicsRepresentation = std::make_shared<FixedRepresentation>(name + " Physics");
 	physicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
-		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
+	auto graphicsRepresentation = std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 	graphicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	auto material = std::make_shared<OsgMaterial>();
+	auto shader = std::make_shared<OsgShader>();
 
-	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
+	auto uniform = std::make_shared<OsgUniform<Vector4f>>("color");
 	uniform->set(Vector4f(1.0f, 0.5f, 0.0f, 1.0f));
 	material->addUniform(uniform);
 
@@ -133,10 +132,9 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<SurgSim::Physics::DoubleSidedPlaneShape> planeShape =
-		std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
+	auto planeShape = std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
+	auto planeElement = std::make_shared<BasicSceneElement>(name);
 
-	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
@@ -149,26 +147,24 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + " Physics");
+	auto physicsRepresentation = std::make_shared<RigidRepresentation>(name + " Physics");
 
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
 	params.setLinearDamping(0.1);
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
+	auto shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
+	auto graphicsRepresentation = std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 	graphicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+	auto material = std::make_shared<OsgMaterial>();
+	auto shader = std::make_shared<OsgShader>();
 
 	shader->setVertexShaderSource(
 		"varying vec4 color;\n"
@@ -187,7 +183,7 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
+	auto sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
@@ -203,39 +199,36 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + " Physics");
+	auto physicsRepresentation = std::make_shared<RigidRepresentation>(name + " Physics");
 
 	RigidRepresentationParameters params;
 	params.setDensity(5513.0); // Earth
 	params.setLinearDamping(0.1);
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 1cm Sphere
+	auto shape = std::make_shared<SphereShape>(0.5); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
+	auto graphicsRepresentation = std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 	graphicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgTexture2d> texture = std::make_shared<OsgTexture2d>();
+	auto material = std::make_shared<OsgMaterial>();
+	auto texture = std::make_shared<OsgTexture2d>();
 
 	std::string image = data.findFile("Earth.png");
 	SURGSIM_ASSERT(image != "") << "Could not find image file for sphere texture: " << image;
 	SURGSIM_ASSERT(texture->loadImage(image)) << "Could not load image file for sphere texture: " << image;
 
-	std::shared_ptr<OsgUniform<std::shared_ptr<OsgTexture2d>>> uniform =
-		std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
+	auto uniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
 	uniform->set(texture);
 	material->addUniform(uniform);
 
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
+	auto sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
@@ -249,15 +242,11 @@ int main(int argc, char* argv[])
 {
 	const SurgSim::Framework::ApplicationData data("config.txt");
 
+	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	auto physicsManager = std::make_shared<SurgSim::Physics::PhysicsManager>();
+	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
+
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
-
-	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
-		std::make_shared<SurgSim::Framework::BehaviorManager>();
-
-	
-
 	runtime->addManager(physicsManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);

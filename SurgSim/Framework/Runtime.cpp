@@ -136,7 +136,8 @@ bool Runtime::execute()
 
 bool Runtime::start()
 {
-	SurgSim::Framework::Logger* logger = Logger::getDefaultLogger();
+	auto logger = Logger::getDefaultLogger();	
+	
 	// Add all the scene Elements so they can be initialized during the startup process
 	preprocessSceneElements();
 
@@ -164,7 +165,7 @@ bool Runtime::start()
 	barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All component wakeUp() succeeded";
 
-	// Now wake up all the sceneelements
+	// Now wake up all the scene elements
 	auto sceneElements = m_scene->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
@@ -203,23 +204,6 @@ void Runtime::preprocessSceneElements()
 	}
 
 	addComponents(newComponents);
-}
-
-std::shared_ptr<Logger> Runtime::getLogger(const std::string& loggerName)
-{
-	std::shared_ptr<Logger> logger = m_loggers[loggerName];
-	if (logger == nullptr)
-	{
-		boost::mutex::scoped_lock lock(m_mutex);
-		// Check again in the critical section
-		logger = m_loggers[loggerName];
-		if (logger == nullptr)
-		{
-			logger = std::make_shared<Logger>(loggerName, std::make_shared<StreamOutput>(std::cout));
-			m_loggers[loggerName] = logger;
-		}
-	}
-	return logger;
 }
 
 std::shared_ptr<Runtime> Runtime::getSharedPtr()

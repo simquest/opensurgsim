@@ -87,14 +87,6 @@ public:
 	/// \return	true if paused, false if not.
 	bool isPaused();
 
-	/// Gets a logger. If the logger does not exist yet it will be created with
-	/// the given name and a default output. Cleaning up the logger will be the
-	/// responsibility of this class, keep the logger reference
-	/// \todo This should be moved into a future LogFactory class HS-2012-feb-05
-	/// \param	loggerName	Name of the logger.
-	/// \return	The logger with the name loggerName.
-	std::shared_ptr<Logger> getLogger(const std::string& loggerName);
-
 	/// Gets application data for the runtime.
 	/// \return	The application data.
 	std::shared_ptr<const ApplicationData> getApplicationData() const;
@@ -128,9 +120,6 @@ private:
 	std::vector< std::shared_ptr<ComponentManager> > m_managers;
 	std::shared_ptr<Scene> m_scene;
 	std::shared_ptr<ApplicationData> m_applicationData;
-
-	std::map<std::string, std::shared_ptr<Logger>> m_loggers;
-
 
 	boost::mutex m_mutex;
 };

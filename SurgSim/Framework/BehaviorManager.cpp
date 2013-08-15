@@ -31,7 +31,7 @@ namespace Framework
 
 BehaviorManager::BehaviorManager() : ComponentManager("Behavior Manager")
 {
-	m_logger = SurgSim::Framework::Logger::createConsoleLogger(getName());
+	m_logger = SurgSim::Framework::Logger::getLogger(getName());
 }
 
 BehaviorManager::~BehaviorManager()
@@ -41,7 +41,7 @@ BehaviorManager::~BehaviorManager()
 
 bool BehaviorManager::doInitialize()
 {
-	m_logger = getRuntime()->getLogger(getName());
+	m_logger = Logger::getLogger(getName());
 	return true;
 }
 
