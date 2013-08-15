@@ -55,8 +55,8 @@ public:
 	inline bool hasTypedData(int index) const;
 
 	/// Check whether the entry with the specified name contains valid data.
-	/// The check verifies that the entry's data is of type T, was %set using 
-	/// set(int, const T&) or set(const std::string&, const T&), without being 
+	/// The check verifies that the entry's data is of type T, was %set using
+	/// set(int, const T&) or set(const std::string&, const T&), without being
 	/// subsequently invalidated by reset(int) or reset(const std::string&).
 	///
 	/// \tparam T the data type to check for at the given index.

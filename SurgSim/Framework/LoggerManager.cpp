@@ -63,11 +63,11 @@ void LoggerManager::setThreshold(int threshold)
 void LoggerManager::setThreshold(const std::string& path, int threshold)
 {
 	boost::lock_guard<boost::mutex> lock(m_mutex);
-	for (const auto& it: m_loggers)	
+	for (const auto& it: m_loggers)
 	{
 		if (boost::istarts_with(it.first, path))
 		{
-			if ( ! (it.second).expired())
+			if (! (it.second).expired())
 			{
 				(it.second).lock()->setThreshold(threshold);
 			}
@@ -88,7 +88,7 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 	auto it = m_loggers.find(name);
 	std::shared_ptr<Logger> result;
 
-	if ( it != m_loggers.end() && (! (it->second).expired()))
+	if (it != m_loggers.end() && (! (it->second).expired()))
 	{
 		result = (it->second).lock();
 	}

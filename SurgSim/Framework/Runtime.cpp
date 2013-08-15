@@ -122,7 +122,7 @@ bool Runtime::execute()
 			boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 			for (it = m_managers.cbegin(); it != m_managers.cend(); ++it)
 			{
-				if (!(*it)->isRunning())
+				if (! (*it)->isRunning())
 				{
 					doExit = true;
 					break;
