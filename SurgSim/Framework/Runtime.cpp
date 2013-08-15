@@ -136,8 +136,8 @@ bool Runtime::execute()
 
 bool Runtime::start()
 {
-	auto logger = Logger::getDefaultLogger();	
-	
+	auto logger = Logger::getDefaultLogger();
+
 	// Add all the scene Elements so they can be initialized during the startup process
 	preprocessSceneElements();
 

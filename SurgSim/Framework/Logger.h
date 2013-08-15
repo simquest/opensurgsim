@@ -16,7 +16,7 @@
 #ifndef SURGSIM_FRAMEWORK_LOGGER_H
 #define SURGSIM_FRAMEWORK_LOGGER_H
 
-#include "SurgSim/Framework/LoggerManager.h" 
+#include "SurgSim/Framework/LoggerManager.h"
 #include "SurgSim/Framework/LogOutput.h"
 
 #include <string>
@@ -111,14 +111,14 @@ public:
 	{
 		return m_name;
 	}
-	
+
 	/// Get a logger by name from Logger Manager
 	/// \return A logger with given name.
 	static std::shared_ptr<Logger> getLogger(const std::string& name)
 	{
 		return loggerManager->getLogger(name);
 	}
-	
+
 	/// Get default logger
 	/// \return Default logger
 	static std::shared_ptr<Logger> getDefaultLogger()

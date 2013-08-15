@@ -178,7 +178,7 @@ RawMultiAxisScaffold::RawMultiAxisScaffold(std::shared_ptr<SurgSim::Framework::L
 {
 	if (! m_logger)
 	{
-		m_logger = SurgSim::Framework::Logger::createConsoleLogger("RawMultiAxis device");
+		m_logger = SurgSim::Framework::Logger::getLogger("RawMultiAxis device");
 		m_logger->setThreshold(m_defaultLogLevel);
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "RawMultiAxis: Shared scaffold created.";
