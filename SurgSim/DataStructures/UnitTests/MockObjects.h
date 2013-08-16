@@ -183,7 +183,7 @@ class MockMesh : public SurgSim::DataStructures::Vertices<MockVertexData>
 {
 public:
 	/// Vertex type for convenience
-	typedef Vertices<MockVertexData>::Vertex Vertex;
+	typedef Vertices<MockVertexData>::VertexType Vertex;
 
 	/// Constructor. Start out with no vertices and 0 updates
 	MockMesh() : SurgSim::DataStructures::Vertices<MockVertexData>(),
@@ -234,11 +234,11 @@ class MockTriangleMesh : public SurgSim::DataStructures::TriangleMesh<MockVertex
 {
 public:
 	/// Vertex type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Vertex Vertex;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::VertexType Vertex;
 	/// Edge type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Edge Edge;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::EdgeType Edge;
 	/// Triangle type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Triangle Triangle;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::TriangleType Triangle;
 
 	/// Constructor. Start out with no vertices and 0 updates
 	MockTriangleMesh() :SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>(),

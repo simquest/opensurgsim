@@ -41,12 +41,12 @@ namespace DataStructures
 /// \tparam	Data	Type of extra data stored in the vertex (void for no data)
 /// \sa	Mesh
 template <class Data>
-struct MeshVertex
+struct Vertex
 {
 	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
-	MeshVertex(const SurgSim::Math::Vector3d& position, const Data& data) :
+	Vertex(const SurgSim::Math::Vector3d& position, const Data& data) :
 		position(position),
 		data(data)
 	{
@@ -58,13 +58,13 @@ struct MeshVertex
 	Data data;
 
 	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
+	friend bool operator==(const Vertex<Data>& vertex1, const Vertex<Data>& vertex2)
 	{
 		return vertex1.data == vertex2.data && vertex1.position == vertex2.position;
 	}
 
 	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
+	friend bool operator!=(const Vertex<Data>& vertex1, const Vertex<Data>& vertex2)
 	{
 		return ! (vertex1 == vertex2);
 	}
@@ -73,11 +73,11 @@ struct MeshVertex
 /// Specialization of MeshVertex with no data.
 /// \sa MeshVertex
 template <>
-struct MeshVertex<void>
+struct Vertex<void>
 {
 	/// Constructor
 	/// \param	position	Position of the vertex
-	explicit MeshVertex(const SurgSim::Math::Vector3d& position) : position(position)
+	explicit Vertex(const SurgSim::Math::Vector3d& position) : position(position)
 	{
 	}
 
@@ -85,13 +85,13 @@ struct MeshVertex<void>
 	SurgSim::Math::Vector3d position;
 
 	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const MeshVertex<void>& vertex1, const MeshVertex<void>& vertex2)
+	friend bool operator==(const Vertex<void>& vertex1, const Vertex<void>& vertex2)
 	{
 		return vertex1.position == vertex2.position;
 	}
 
 	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const MeshVertex<void>& vertex1, const MeshVertex<void>& vertex2)
+	friend bool operator!=(const Vertex<void>& vertex1, const Vertex<void>& vertex2)
 	{
 		return ! (vertex1 == vertex2);
 	}

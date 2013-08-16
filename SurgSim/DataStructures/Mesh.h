@@ -51,7 +51,7 @@ class Vertices
 {
 public:
 	/// Vertex type for convenience
-	typedef MeshVertex<VertexData> VertexType;
+	typedef Vertex<VertexData> VertexType;
 
 	/// Constructor. The mesh is initially empty (no vertices).
 	Vertices()

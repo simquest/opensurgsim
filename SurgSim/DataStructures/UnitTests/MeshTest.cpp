@@ -25,7 +25,7 @@
 #include <random>
 
 using SurgSim::DataStructures::Vertices;
-using SurgSim::DataStructures::MeshVertex;
+using SurgSim::DataStructures::Vertex;
 using SurgSim::Math::Vector3d;
 
 class MeshTest : public ::testing::Test
