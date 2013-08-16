@@ -52,15 +52,8 @@ enum LogLevel
 class Logger
 {
 public:
-	/// Constructor.
-	/// \param name The name used for this logger.
-	/// \param output The LogOutput instance used to display or log the data.
-	Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
-		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
-		m_name(name),
-		m_output(output)
-	{
-	}
+	
+	friend class LoggerManager;
 
 	/// Destructor.
 	~Logger()
@@ -116,19 +109,28 @@ public:
 	/// \return A logger with given name.
 	static std::shared_ptr<Logger> getLogger(const std::string& name)
 	{
-		return loggerManager->getLogger(name);
+		return getLoggerManager()->getLogger(name);
 	}
 
 	/// Get default logger
 	/// \return Default logger
 	static std::shared_ptr<Logger> getDefaultLogger()
 	{
-		return loggerManager->getDefaultLogger();
+		return getLoggerManager()->getDefaultLogger();
 	}
 
 private:
+	/// Constructor.
+	/// \param name The name used for this logger.
+	/// \param output The LogOutput instance used to display or log the data.
+	Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
+		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
+		m_name(name),
+		m_output(output)
+	{
+	}
 
-	static std::shared_ptr<LoggerManager> loggerManager;
+	static std::shared_ptr<LoggerManager> getLoggerManager();
 
 	int m_threshold;
 	std::string m_name;

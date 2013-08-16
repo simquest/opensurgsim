@@ -22,6 +22,10 @@ namespace SurgSim
 {
 namespace Framework
 {
-	std::shared_ptr<LoggerManager> Logger::loggerManager = std::make_shared<LoggerManager>();
+	std::shared_ptr<LoggerManager> Logger::getLoggerManager()
+	{
+		static std::shared_ptr<LoggerManager> loggerManager = std::make_shared<LoggerManager>();
+		return loggerManager;
+	}
 }
 }
