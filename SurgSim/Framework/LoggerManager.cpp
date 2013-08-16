@@ -63,13 +63,13 @@ void LoggerManager::setThreshold(int threshold)
 void LoggerManager::setThreshold(const std::string& path, int threshold)
 {
 	boost::lock_guard<boost::mutex> lock(m_mutex);
-	for (const auto& it: m_loggers)
+	for (auto it = m_loggers.cbegin(); it != m_loggers.cend(); ++it)
 	{
-		if (boost::istarts_with(it.first, path))
+		if (boost::istarts_with(it->first, path))
 		{
-			if (! (it.second).expired())
+			if (! (it->second).expired())
 			{
-				(it.second).lock()->setThreshold(threshold);
+				(it->second).lock()->setThreshold(threshold);
 			}
 		}
 	}

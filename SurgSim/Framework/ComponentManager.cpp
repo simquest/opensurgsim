@@ -38,9 +38,6 @@ ComponentManager::~ComponentManager()
 void ComponentManager::setRuntime(std::shared_ptr<Runtime> val)
 {
 	m_runtime = val;
-
-	// Now pull the shared logger out of the runtime
-	m_logger = Logger::getLogger(getName());
 }
 
 bool ComponentManager::enqueueAddComponent(const std::shared_ptr<Component>& component)

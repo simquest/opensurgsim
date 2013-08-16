@@ -41,7 +41,6 @@ BehaviorManager::~BehaviorManager()
 
 bool BehaviorManager::doInitialize()
 {
-	m_logger = Logger::getLogger(getName());
 	return true;
 }
 
