@@ -74,6 +74,9 @@ public:
 		return m_viewer;
 	}
 
+	/// OsgManager will write out the scenegraph in the working directory
+	virtual void dumpDebugInfo() const override;
+
 protected:
 	/// Performs an update for a single timestep
 	/// \param	dt	The time in seconds of the preceding timestep.

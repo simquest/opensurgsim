@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	ComponentManagerTests.cpp
 	LockedContainerTest.cpp
 	LoggerTest.cpp
+	LoggerManagerTest.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
 	SceneTest.cpp

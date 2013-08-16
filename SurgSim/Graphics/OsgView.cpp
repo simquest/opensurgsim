@@ -16,6 +16,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 
 #include <SurgSim/Graphics/OsgCamera.h>
+#include <osgViewer/ViewerEventHandlers>
 
 using SurgSim::Graphics::OsgCamera;
 using SurgSim::Graphics::OsgView;
@@ -30,6 +31,7 @@ OsgView::OsgView(const std::string& name) : View(name),
 {
 	/// Don't allow the default camera here, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
+	m_view->addEventHandler(new osgViewer::StatsHandler);
 }
 
 bool OsgView::setPosition(int x, int y)

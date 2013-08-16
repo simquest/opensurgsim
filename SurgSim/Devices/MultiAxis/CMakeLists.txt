@@ -29,16 +29,57 @@ set(MULTIAXIS_DEVICE_SOURCES
 	RawMultiAxisDevice.cpp
 	RawMultiAxisScaffold.cpp
 	RawMultiAxisThread.cpp
+	SystemInputDeviceHandle.cpp
 )
 
 set(MULTIAXIS_DEVICE_HEADERS
+	CreateInputDeviceHandle.h
+	GetSystemError.h
 	RawMultiAxisDevice.h
 	RawMultiAxisScaffold.h
 	RawMultiAxisThread.h
+	SystemInputDeviceHandle.h
 )
 
-add_library(MultiAxisDevice
-	${MULTIAXIS_DEVICE_SOURCES} ${MULTIAXIS_DEVICE_HEADERS})
+set(MULTIAXIS_DEVICE_LINUX_SOURCES
+	linux/CreateInputDeviceHandle.cpp
+	linux/FileDescriptor.cpp
+	linux/GetSystemError.cpp
+	linux/InputDeviceHandle.cpp
+)
+
+set(MULTIAXIS_DEVICE_LINUX_HEADERS
+	BitSetBuffer.h
+	linux/FileDescriptor.h
+	linux/InputDeviceHandle.h
+)
+
+set(MULTIAXIS_DEVICE_WDK_HID_SOURCES
+	win32/CreateInputDeviceHandle.cpp
+	win32/FileHandle.cpp
+	win32/GetSystemError.cpp
+	win32/WdkHidDeviceHandle.cpp
+)
+
+set(MULTIAXIS_DEVICE_WDK_HID_HEADERS
+	win32/FileHandle.h
+	win32/WdkHidDeviceHandle.h
+)
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_LINUX_SOURCES})
+	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_LINUX_HEADERS})
+elseif(WINDDK_FOUND)
+	list(APPEND MULTIAXIS_DEVICE_SOURCES ${MULTIAXIS_DEVICE_WDK_HID_SOURCES})
+	list(APPEND MULTIAXIS_DEVICE_HEADERS ${MULTIAXIS_DEVICE_WDK_HID_HEADERS})
+endif()
+
+# TODO(advornik): the installation should NOT copy all the headers...
+surgsim_add_library(
+	MultiAxisDevice
+	"${MULTIAXIS_DEVICE_SOURCES}" "${MULTIAXIS_DEVICE_HEADERS}"
+	SurgSim/Devices/MultiAxis
+)
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 

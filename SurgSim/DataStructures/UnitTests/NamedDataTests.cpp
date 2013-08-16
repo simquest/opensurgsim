@@ -290,3 +290,4 @@ TEST(NamedDataTests, ResetOne)
 	EXPECT_FALSE(data.hasData(1));
 	EXPECT_FALSE(data.hasData("second"));
 }
+
