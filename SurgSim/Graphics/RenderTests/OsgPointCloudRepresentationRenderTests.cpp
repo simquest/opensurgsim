@@ -99,7 +99,7 @@ protected:
 		std::shared_ptr<CloudMesh> mesh = std::make_shared<CloudMesh>();
 		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
 		{
-			mesh->addVertex(CloudMesh::Vertex(*it));
+			mesh->addVertex(CloudMesh::VertexType(*it));
 		}
 		return mesh;
 	}
