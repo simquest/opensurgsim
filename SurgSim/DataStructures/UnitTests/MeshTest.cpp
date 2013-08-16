@@ -24,7 +24,7 @@
 
 #include <random>
 
-using SurgSim::DataStructures::Mesh;
+using SurgSim::DataStructures::Vertices;
 using SurgSim::DataStructures::MeshVertex;
 using SurgSim::Math::Vector3d;
 
@@ -100,7 +100,7 @@ TEST_F(MeshTest, InitTest)
 	ASSERT_NO_THROW({MockMesh mesh;});
 
 	/// Check that we can also create a mesh with no data
-	ASSERT_NO_THROW({Mesh<void> mesh;});
+	ASSERT_NO_THROW({Vertices<void> mesh;});
 }
 
 TEST_F(MeshTest, CreateVerticesTest)

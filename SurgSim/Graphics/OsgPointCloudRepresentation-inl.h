@@ -107,14 +107,14 @@ void OsgPointCloudRepresentation<Data>::doUpdate(double dt)
 
 
 template <class Data>
-void OsgPointCloudRepresentation<Data>::setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh)
+void OsgPointCloudRepresentation<Data>::setMesh(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh)
 {
 	m_mesh = mesh;
 }
 
 
 template <class Data>
-std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> OsgPointCloudRepresentation<Data>::getMesh() const
+std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> OsgPointCloudRepresentation<Data>::getMesh() const
 {
 	return m_mesh;
 }

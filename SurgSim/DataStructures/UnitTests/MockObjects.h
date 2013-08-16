@@ -179,14 +179,14 @@ private:
 };
 
 /// Mesh for testing using MockVertexData
-class MockMesh : public SurgSim::DataStructures::Mesh<MockVertexData>
+class MockMesh : public SurgSim::DataStructures::Vertices<MockVertexData>
 {
 public:
 	/// Vertex type for convenience
-	typedef Mesh<MockVertexData>::Vertex Vertex;
+	typedef Vertices<MockVertexData>::Vertex Vertex;
 
 	/// Constructor. Start out with no vertices and 0 updates
-	MockMesh() : SurgSim::DataStructures::Mesh<MockVertexData>(),
+	MockMesh() : SurgSim::DataStructures::Vertices<MockVertexData>(),
 		m_numUpdates(0)
 	{
 	}

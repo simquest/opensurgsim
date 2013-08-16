@@ -46,11 +46,11 @@ public:
 
 	/// Sets the mesh for the point cloud.
 	/// \param	mesh	The mesh.
-	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh) = 0;
+	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) = 0;
 
 	/// Pull the mesh.
 	/// \return	The mesh.
-	virtual std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> getMesh() const = 0;
+	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getMesh() const = 0;
 
 	/// Sets point size for the point elements.
 	/// \param	val	The value.

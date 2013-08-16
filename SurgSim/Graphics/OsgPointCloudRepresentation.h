@@ -49,11 +49,11 @@ public:
 
 	/// Sets a mesh.
 	/// \param	mesh	The mesh.
-	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh) override;
+	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) override;
 
 	/// Gets the mesh.
 	/// \return	The mesh.
-	virtual std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> getMesh() const override;
+	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getMesh() const override;
 
 	/// Sets point size.
 	/// \param	val	The value.
@@ -78,7 +78,7 @@ public:
 private:
 
 	/// Local pointer to mesh with data
-	std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> m_mesh;
+	std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> m_mesh;
 
 	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;

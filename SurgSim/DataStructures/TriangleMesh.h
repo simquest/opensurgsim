@@ -53,13 +53,13 @@ namespace DataStructures
 /// \sa MeshVertex
 /// \sa MeshElement
 template <class VertexData, class EdgeData, class TriangleData>
-class TriangleMesh : public Mesh<VertexData>
+class TriangleMesh : public Vertices<VertexData>
 {
 public:
 	/// Edge type for convenience
-	typedef MeshElement<2, EdgeData> Edge;
+	typedef MeshElement<2, EdgeData> EdgeType;
 	/// Triangle type for convenience
-	typedef MeshElement<3, TriangleData> Triangle;
+	typedef MeshElement<3, TriangleData> TriangleType;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
 	TriangleMesh()
@@ -77,7 +77,7 @@ public:
 	/// on the vertices and other parameters.
 	/// \param	edge	Edge to add to the mesh
 	/// \return	Unique ID of the new edge.
-	unsigned int addEdge(const Edge& edge)
+	unsigned int addEdge(const EdgeType& edge)
 	{
 		m_edges.push_back(edge);
 		return m_edges.size() - 1;
@@ -89,7 +89,7 @@ public:
 	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
 	/// based on the vertices and other parameters.
 	/// \return	Unique ID of the new triangle.
-	unsigned int addTriangle(const Triangle& triangle)
+	unsigned int addTriangle(const TriangleType& triangle)
 	{
 		m_triangles.push_back(triangle);
 		return m_triangles.size() - 1;
@@ -107,24 +107,24 @@ public:
 	}
 
 	/// Returns a vector containing the position of each edge.
-	const std::vector<Edge>& getEdges() const
+	const std::vector<EdgeType>& getEdges() const
 	{
 		return m_edges;
 	}
 	/// Returns a vector containing the position of each triangle.
-	const std::vector<Triangle>& getTriangles() const
+	const std::vector<TriangleType>& getTriangles() const
 	{
 		return m_triangles;
 	}
 
 	/// Returns the specified edge.
-	const Edge& getEdge(unsigned int id) const
+	const EdgeType& getEdge(unsigned int id) const
 	{
 		return m_edges[id];
 	}
 
 	/// Returns the specified triangle.
-	const Triangle& getTriangle(unsigned int id) const
+	const TriangleType& getTriangle(unsigned int id) const
 	{
 		return m_triangles[id];
 	}
@@ -145,10 +145,10 @@ protected:
 	/// Override this method to provide custom comparison. Basic TriangleMesh implementation compares vertices,
 	/// edges and triangles: the order of vertices, edges, and triangles must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Mesh<VertexData>& mesh) const
+	virtual bool isEqual(const Vertices<VertexData>& mesh) const
 	{
 		const TriangleMesh& triangleMesh = static_cast<const TriangleMesh&>(mesh);
-		return Mesh<VertexData>::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
+		return Vertices<VertexData>::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
 			m_triangles == triangleMesh.getTriangles();
 	}
 private:
@@ -162,9 +162,9 @@ private:
 	}
 
 	/// Edges
-	std::vector<Edge> m_edges;
+	std::vector<EdgeType> m_edges;
 	/// Triangles
-	std::vector<Triangle> m_triangles;
+	std::vector<TriangleType> m_triangles;
 };
 
 };  // namespace DataStructures

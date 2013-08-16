@@ -48,7 +48,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-typedef SurgSim::DataStructures::Mesh<void> CloudMesh;
+typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
 
 struct OsgPointCloudRepresentationRenderTests : public ::testing::Test
 {

@@ -47,18 +47,18 @@ namespace DataStructures
 /// \sa MeshVertex
 /// \sa MeshElement
 template <class VertexData>
-class Mesh
+class Vertices
 {
 public:
 	/// Vertex type for convenience
-	typedef MeshVertex<VertexData> Vertex;
+	typedef MeshVertex<VertexData> VertexType;
 
 	/// Constructor. The mesh is initially empty (no vertices).
-	Mesh()
+	Vertices()
 	{
 	}
 	/// Destructor
-	virtual ~Mesh()
+	virtual ~Vertices()
 	{
 	}
 
@@ -81,7 +81,7 @@ public:
 	/// based on the other parameters.
 	/// \param	vertex	Vertex to add to the mesh
 	/// \return	Unique ID of the new vertex.
-	unsigned int addVertex(const Vertex& vertex)
+	unsigned int addVertex(const VertexType& vertex)
 	{
 		m_vertices.push_back(vertex);
 		return m_vertices.size() - 1;
@@ -94,13 +94,13 @@ public:
 	}
 
 	/// Returns the specified vertex.
-	const Vertex& getVertex(unsigned int id) const
+	const VertexType& getVertex(unsigned int id) const
 	{
 		return m_vertices[id];
 	}
 
 	/// Returns a vector containing the position of each vertex.
-	const std::vector<Vertex>& getVertices() const
+	const std::vector<VertexType>& getVertices() const
 	{
 		return m_vertices;
 	}
@@ -139,13 +139,13 @@ public:
 	}
 
 	/// Compares the meshes and returns true if equal, false if not equal.
-	bool operator==(const Mesh& mesh) const
+	bool operator==(const Vertices& mesh) const
 	{
 		return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
 	}
 
 	/// Compares the meshes and returns false if equal, true if not equal.
-	bool operator!=(const Mesh& mesh) const
+	bool operator!=(const Vertices& mesh) const
 	{
 		return (typeid(*this) != typeid(mesh)) || ! isEqual(mesh);
 	}
@@ -161,7 +161,7 @@ protected:
 	/// Override this method to provide custom comparison. Base Mesh implementation compares vertices:
 	/// the order of vertices must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Mesh& mesh) const
+	virtual bool isEqual(const Vertices& mesh) const
 	{
 		return m_vertices == mesh.m_vertices;
 	}
@@ -181,7 +181,7 @@ private:
 	}
 
 	/// Vertices
-	std::vector<Vertex> m_vertices;
+	std::vector<VertexType> m_vertices;
 };
 
 };  // namespace DataStructures
