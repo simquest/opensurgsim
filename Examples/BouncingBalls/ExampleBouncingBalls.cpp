@@ -126,7 +126,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
-	uniform->set(Vector4f(1.0f, 0.5f, 0.0f, 1.0f));
+	uniform->set(Vector4f(0.0f, 0.6f, 1.0f, 0.0f));
 	material->addUniform(uniform);
 
 	shader->setFragmentShaderSource(
@@ -148,8 +148,8 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 							   physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
-	planeElement->addComponent(std::make_shared<AddSceneElementBehavior>(createSphere(data, "sphere0",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(1.0,3.0,0.0)))));
+
+	planeElement->addComponent(std::make_shared<AddSceneElementBehavior>());
 
 	return planeElement;
 }

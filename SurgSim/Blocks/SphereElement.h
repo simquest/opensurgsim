@@ -13,42 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ADDSCENEELEMENTBEHAVIOR_H
-#define ADDSCENEELEMENTBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_SPHEREELEMENT_H
+#define SURGSIM_BLOCKS_SPHEREELEMENT_H
 
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/Scene.h>
+#include <SurgSim/Framework/SceneElement.h>
+
+#include <SurgSim/Math/RigidTransform.h>
 
 
-/// An example class to add a scene element into scene dynamically. 
-/// AddSceneElementBehavior will be updated by BehaviorManager
-/// through update() call. 
+namespace SurgSim
+{
 
-class AddSceneElementBehavior : public SurgSim::Framework::Behavior
+namespace Blocks
+{
+
+class SphereElement : public SurgSim::Framework::SceneElement
 {
 public:
-	explicit AddSceneElementBehavior();
 
-	~AddSceneElementBehavior();
+	explicit SphereElement(const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
 
-	virtual void update(double dt);
+	~SphereElement();
+
 
 protected:
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
+	virtual bool doInitialize();
+
+	virtual bool doWakeUp();
+
 
 private:
-	double m_totalTime;
-	int m_numballs;
+	std::string m_name;
+	SurgSim::Math::RigidTransform3d m_pose;
+
+};
+
+
+};
 };
 
 #endif
-
-
