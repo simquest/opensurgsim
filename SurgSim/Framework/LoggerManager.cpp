@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-#include <boost/thread/lock_guard.hpp>
+#include <boost/thread/locks.hpp>
 #include <boost/algorithm/string.hpp>
 
 namespace SurgSim
