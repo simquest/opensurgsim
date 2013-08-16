@@ -65,6 +65,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Runtime.h
 	Scene.h
 	SceneElement.h
+	SceneElement-inl.h
 	SharedInstance.h
 	SharedInstance-inl.h
 )
