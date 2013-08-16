@@ -17,7 +17,7 @@
 #define SURGSIM_GRAPHICS_POINTCLOUDREPRESENTATION_H
 
 #include <memory>
-#include <SurgSim/DataStructures/Mesh.h>
+#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Math/Vector.h>
 

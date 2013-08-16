@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_MESH_H
-#define SURGSIM_DATASTRUCTURES_MESH_H
+#ifndef SURGSIM_DATASTRUCTURES_VERTICES_H
+#define SURGSIM_DATASTRUCTURES_VERTICES_H
 
-#include <SurgSim/DataStructures/MeshVertex.h>
+#include <SurgSim/DataStructures/Vertex.h>
 #include <SurgSim/Framework/Assert.h>
 
 #include <array>

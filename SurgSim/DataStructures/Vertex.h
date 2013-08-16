@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_MESHVERTEX_H
-#define SURGSIM_DATASTRUCTURES_MESHVERTEX_H
+#ifndef SURGSIM_DATASTRUCTURES_VERTEX_H
+#define SURGSIM_DATASTRUCTURES_VERTEX_H
 
 #include <SurgSim/Math/Vector.h>
 

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
 
-#include <SurgSim/DataStructures/Mesh.h>
+#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/DataStructures/MeshElement.h>
 
 namespace SurgSim

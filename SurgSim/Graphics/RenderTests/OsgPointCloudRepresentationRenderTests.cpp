@@ -26,7 +26,7 @@
 #include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/DataStructures/Mesh.h>
+#include <SurgSim/DataStructures/Vertices.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>

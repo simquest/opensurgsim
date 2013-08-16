@@ -18,7 +18,7 @@
 
 #include <SurgSim/Graphics/PointCloudRepresentation.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/DataStructures/Mesh.h>
+#include <SurgSim/DataStructures/Vertices.h>
 
 #include <osg/PrimitiveSet>
 #include <osg/Geometry>

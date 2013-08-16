@@ -28,9 +28,9 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup-inl.h
 	DataGroupBuilder.h
 	IndexDirectory.h
-	Mesh.h
+	Vertices.h
 	MeshElement.h
-	MeshVertex.h
+	Vertex.h
 	NamedVariantData.h
 	NamedVariantData-inl.h
 	NamedData.h
