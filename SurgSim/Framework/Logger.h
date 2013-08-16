@@ -52,7 +52,7 @@ enum LogLevel
 class Logger
 {
 public:
-	
+
 	friend class LoggerManager;
 
 	/// Destructor.
@@ -123,12 +123,7 @@ private:
 	/// Constructor.
 	/// \param name The name used for this logger.
 	/// \param output The LogOutput instance used to display or log the data.
-	Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
-		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
-		m_name(name),
-		m_output(output)
-	{
-	}
+	Logger(const std::string& name, std::shared_ptr<LogOutput> output);
 
 	static std::shared_ptr<LoggerManager> getLoggerManager();
 

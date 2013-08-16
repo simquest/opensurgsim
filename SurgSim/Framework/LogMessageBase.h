@@ -44,7 +44,7 @@ public:
 	/// Construct a LogMessage
 	/// \param logger The logger to be used
 	/// \param level The logging level for this message
-	LogMessageBase(Logger* logger, int level);
+	LogMessageBase(std::shared_ptr<Logger> logger, int level);
 
 	/// Destructor.
 	~LogMessageBase()
@@ -93,7 +93,7 @@ protected:
 
 private:
 	std::ostringstream m_stream;
-	Logger* m_logger;
+	std::shared_ptr<Logger> m_logger;
 };
 
 

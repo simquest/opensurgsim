@@ -95,25 +95,6 @@ TEST(LoggerTest, LogMacroTest)
 	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
 }
 
-//TEST(LoggerTest, UniquePtrTest)
-//{
-//	auto logger = std::unique_ptr<Logger>(Logger::getLogger("TestLogger").get());
-//	auto output = std::make_shared<MockOutput>();
-//	logger->setOutput(output);
-//	logger->setThreshold(SurgSim::Framework::LOG_LEVEL_WARNING);
-//
-//	output->reset();
-//	SURGSIM_LOG(logger, CRITICAL) << "Test Text";
-//	EXPECT_TRUE(isContained("Test Text", output->logMessage));
-//
-//	output->reset();
-//	SURGSIM_LOG(logger, DEBUG) << "Missing Text";
-//	EXPECT_EQ("", output->logMessage);
-//
-//	output->reset();
-//	SURGSIM_LOG(logger, WARNING) << "Exactly At Threshold";
-//	EXPECT_TRUE(isContained("Exactly At Threshold", output->logMessage));
-//}
 
 TEST(LoggerTest, SharedPtrTest)
 {

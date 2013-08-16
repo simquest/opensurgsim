@@ -42,7 +42,7 @@ std::unique_ptr<SystemInputDeviceHandle> createInputDeviceHandle(const std::stri
 /// Enumerates input devices.
 /// \param logger	The logger to be used during enumeration.
 /// \return	A list of device paths.
-std::vector<std::string> enumerateInputDevicePaths(SurgSim::Framework::Logger* logger);
+std::vector<std::string> enumerateInputDevicePaths(std::shared_ptr<SurgSim::Framework::Logger> logger);
 
 
 };  // namespace Device

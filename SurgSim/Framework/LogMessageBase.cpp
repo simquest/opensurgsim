@@ -22,7 +22,7 @@ namespace SurgSim
 namespace Framework
 {
 
-LogMessageBase::LogMessageBase(Logger* logger, int level)
+LogMessageBase::LogMessageBase(std::shared_ptr<Logger> logger, int level)
 	: m_stream(), m_logger(logger)
 {
 	SURGSIM_ASSERT(logger) << "logger should not be a null pointer";

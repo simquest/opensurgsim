@@ -30,7 +30,7 @@ std::unique_ptr<SystemInputDeviceHandle> createInputDeviceHandle(const std::stri
 	return InputDeviceHandle::open(path, logger);
 }
 
-std::vector<std::string> enumerateInputDevicePaths(SurgSim::Framework::Logger* logger)
+std::vector<std::string> enumerateInputDevicePaths(std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
 	return InputDeviceHandle::enumeratePaths(logger);
 }

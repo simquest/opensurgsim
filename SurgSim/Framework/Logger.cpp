@@ -22,6 +22,13 @@ namespace SurgSim
 {
 namespace Framework
 {
+	Logger::Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
+		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
+		m_name(name),
+		m_output(output)
+	{
+	}
+
 	std::shared_ptr<LoggerManager> Logger::getLoggerManager()
 	{
 		static std::shared_ptr<LoggerManager> loggerManager = std::make_shared<LoggerManager>();

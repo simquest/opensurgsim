@@ -65,7 +65,7 @@ InputDeviceHandle::~InputDeviceHandle()
 {
 }
 
-std::vector<std::string> InputDeviceHandle::enumeratePaths(SurgSim::Framework::Logger* logger)
+std::vector<std::string> InputDeviceHandle::enumeratePaths(std::shared_ptr<SurgSim::Framework::Logger> logger)
 {
 	std::vector<std::string> results;
 

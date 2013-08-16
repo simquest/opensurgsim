@@ -50,19 +50,7 @@ public:
 
 	/// Constructor.
 	/// \param logger %Logger used to log this message.
-	explicit AssertMessage(Logger* logger) : LogMessageBase(logger, LOG_LEVEL_CRITICAL)
-	{
-	}
-
-	/// Constructor.
-	/// \param logger %Logger used to log this message.
-	explicit AssertMessage(const std::unique_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL)
-	{
-	}
-
-	/// Constructor.
-	/// \param logger %Logger used to log this message.
-	explicit AssertMessage(const std::shared_ptr<Logger>& logger) : LogMessageBase(logger.get(), LOG_LEVEL_CRITICAL)
+	explicit AssertMessage(const std::shared_ptr<Logger>& logger) : LogMessageBase(logger, LOG_LEVEL_CRITICAL)
 	{
 	}
 

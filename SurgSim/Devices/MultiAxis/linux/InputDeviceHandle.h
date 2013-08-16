@@ -44,7 +44,7 @@ public:
 	/// Enumerates input devices.
 	/// \param logger	The logger to be used during enumeration.
 	/// \return	A list of device paths.
-	static std::vector<std::string> enumeratePaths(SurgSim::Framework::Logger* logger);
+	static std::vector<std::string> enumeratePaths(std::shared_ptr<SurgSim::Framework::Logger> logger);
 
 	/// Opens the given path and creates an access wrapper for the device.
 	/// \param	path	Full pathname for the device.
