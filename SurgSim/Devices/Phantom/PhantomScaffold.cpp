@@ -400,7 +400,7 @@ bool PhantomScaffold::registerDevice(PhantomDevice* device)
 	}
 	m_state->activeDeviceList.emplace_back(std::move(info));
 
-	if (m_state->activeDeviceList.size() == 0)
+	if (m_state->activeDeviceList.size() == 1)
 	{
 		// If this is the first device, create the haptic loop as well.
 		// The haptic loop should be created AFTER initializing the device, or OpenHaptics will complain.
