@@ -28,24 +28,24 @@ namespace Device
 class PhantomScaffold;
 
 
-/// A class implementing the communication with a Sensable PHANTOM device.
+/// A class implementing the communication with a SensAble/Geomagic PHANTOM device.
 ///
-/// This should support any PHANTOM device that can communicate using OpenHaptics 3.0 toolkit, such as PHANTOM
-/// Omni, PHANTOM Desktop, and the PHANTOM Premium series devices.  The implementation is currently limited to
-/// 3DoF haptic output (forces only, no torques).
+/// This should support any device that can communicate using the OpenHaptics 3.x toolkit, such as the
+/// PHANTOM Omni (a.k.a. Geomagic Touch), PHANTOM Desktop (a.k.a. Geomagic Touch X), and the PHANTOM Premium
+/// series devices.  The implementation is currently limited to 3DoF haptic output (forces only, no torques).
 ///
 /// \par Application input provided by the device:
 ///   | type       | name        |                                                                |
 ///   | ----       | ----        | ---                                                            |
 ///   | pose       | "pose"      | %Device pose (units are meters).                               |
-///   | bool       | "button0"   | %State of the first device button.                             |
-///   | bool       | "button1"   | %State of the second device button if present.                 |
-///   | bool       | "button2"   | %State of the third device button (probaly doesn't exist).     |
-///   | bool       | "button3"   | %State of the third device button (probaly doesn't exist).     |
-/// Note that \c button0 through \c 3 correspond to the \c HD_DEVICE_BUTTON_1 through \c 4 provided by the
+///   | bool       | "button1"   | %State of the first device button.                             |
+///   | bool       | "button2"   | %State of the second device button if present.                 |
+///   | bool       | "button3"   | %State of the third device button (probably doesn't exist).    |
+///   | bool       | "button4"   | %State of the third device button (probably doesn't exist).    |
+/// Note that \c button1 through \c 4 correspond to the \c HD_DEVICE_BUTTON_1 through \c 4 provided by the
 /// OpenHaptics API, but your PHANTOM device likely has fewer than 4 buttons.  On one-button PHANTOM devices,
-/// the button state can be accessed through \c button0.  On a PHANTOM Omni, \c button0
-/// corresponds to the front (blue) stylus button, and \c button1 to the rear (white/gray) stylus button.
+/// the button state can be accessed through \c button1.  On a PHANTOM Omni or a Geomagic Touch, \c button1
+/// corresponds to the front (blue) stylus button, and \c button2 to the rear (white/gray) stylus button.
 ///
 /// \par Application output used by the device:
 ///   | type       | name        |                                                                |
