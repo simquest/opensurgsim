@@ -495,7 +495,7 @@ bool RawMultiAxisScaffold::findUnusedDeviceAndRegister(RawMultiAxisDevice* devic
 		return false;
 	}
 
-	const std::vector<std::string> devicePaths = enumerateInputDevicePaths(m_logger);
+	const std::vector<std::string> devicePaths = enumerateInputDevicePaths(m_logger.get());
 
 	for (auto it = devicePaths.cbegin();  it != devicePaths.cend();  ++it)
 	{

@@ -33,7 +33,16 @@ class Logger;
 class LogMessage : public LogMessageBase
 {
 public:
-	explicit LogMessage(const std::shared_ptr<Logger>& logger, int level) : LogMessageBase(logger, level)
+
+    explicit LogMessage(Logger* logger, int level) : LogMessageBase(logger, level)
+	{
+	}
+
+	explicit LogMessage(const std::unique_ptr<Logger>& logger, int level) : LogMessageBase(logger.get(), level)
+	{
+	}
+
+	explicit LogMessage(const std::shared_ptr<Logger>& logger, int level) : LogMessageBase(logger.get(), level)
 	{
 	}
 
