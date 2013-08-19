@@ -123,6 +123,28 @@ TEST(SceneElementTest, GetComponentsTest)
 	EXPECT_EQ(1u, components.size());
 }
 
+TEST(SceneElementTest, GetTypedComponentsTests)
+{
+	std::shared_ptr<SceneElement> element(new MockSceneElement());
+	std::shared_ptr<MockBehavior> behavior(new MockBehavior("MockBehavior"));
+	std::shared_ptr<MockComponent> component1(new MockComponent("Test Component1"));
+	std::shared_ptr<MockComponent> component2(new MockComponent("Test Component2"));
+
+	element->addComponent(behavior);
+	element->addComponent(component1);
+	element->addComponent(component2);
+
+	EXPECT_EQ(1u, element->getComponents<MockBehavior>().size());
+	EXPECT_EQ(2u, element->getComponents<MockComponent>().size());
+
+	element->removeComponent(component1);
+	EXPECT_EQ(1u, element->getComponents<MockComponent>().size());
+
+	element->removeComponent(component2);
+	EXPECT_EQ(0u, element->getComponents<MockComponent>().size());
+
+}
+
 TEST(SceneElementTest, InitComponentTest)
 {
 	std::shared_ptr<MockSceneElement> element(new MockSceneElement());

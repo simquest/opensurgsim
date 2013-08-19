@@ -74,6 +74,11 @@ public:
 	/// \return	The components.
 	std::vector<std::shared_ptr<Component> > getComponents() const;
 
+	/// Template version of getComponents method to get all the components with type T
+	/// \return The type T components
+	template <class T>
+	std::vector<std::shared_ptr<T>> getComponents() const;
+
 	/// Executes the initialize operation.
 	/// \return	true if it succeeds, false if it fails.
 	bool initialize();
@@ -133,6 +138,8 @@ private:
 	bool m_isAwake;
 
 };
+
+#include <SurgSim/Framework/SceneElement-inl.h>
 
 }; // namespace Framework
 }; // namespace SurgSim
