@@ -28,7 +28,7 @@ const SurgSim::Math::RigidTransform3d& DeformableRepresentation::getInitialPose(
 
 void DeformableRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
-	SURGSIM_ASSERT(true) << "setPose has been called on a physics DeformableRepresentation";
+	SURGSIM_ASSERT(false) << "setPose has been called on a physics DeformableRepresentation";
 }
 
 const SurgSim::Math::RigidTransform3d& DeformableRepresentation::getPose() const
@@ -44,14 +44,6 @@ void DeformableRepresentation::resetState()
 	m_currentState  = m_initialState;
 	m_previousState = m_initialState;
 	m_finalState    = m_initialState;
-}
-
-void DeformableRepresentation::setInitialState(const DeformableRepresentationState& state)
-{
-	m_initialState  = state;
-	m_currentState  = state;
-	m_previousState = state;
-	m_finalState    = state;
 }
 
 const DeformableRepresentationState& DeformableRepresentation::getInitialState() const

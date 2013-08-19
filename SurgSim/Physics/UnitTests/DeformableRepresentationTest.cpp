@@ -75,6 +75,15 @@ public:
 		// Backup the current state into the final state
 		m_finalState = m_currentState;
 	}
+
+	void setInitialState(const SurgSim::Physics::DeformableRepresentationState& initialState)
+	{
+		m_initialState  = initialState;
+
+		m_currentState  = initialState;
+		m_previousState = initialState;
+		m_finalState    = initialState;
+	}
 };
 
 class DeformableRepresentationTest: public MockObject, public ::testing::Test
@@ -132,16 +141,17 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 		// Test getNumDof
 	EXPECT_EQ(numDof, getNumDof());
 
-	// Test setInitialPose/getInitialPose (always return Identity)
+	// Test setInitialPose/getInitialPose
 	setInitialPose(m_nonIdentityTransform);
-	EXPECT_TRUE(getInitialPose().isApprox(m_identityTransform, epsilon));
+	EXPECT_TRUE(getInitialPose().isApprox(m_nonIdentityTransform, epsilon));
+	EXPECT_FALSE(getInitialPose().isApprox(m_identityTransform, epsilon));
 	setInitialPose(m_identityTransform);
+	EXPECT_FALSE(getInitialPose().isApprox(m_nonIdentityTransform, epsilon));
 	EXPECT_TRUE(getInitialPose().isApprox(m_identityTransform, epsilon));
 
 	// Test setPose/getPose (always return Identity)
-	setPose(m_nonIdentityTransform);
-	EXPECT_TRUE(getPose().isApprox(m_identityTransform, epsilon));
-	setPose(m_identityTransform);
+	EXPECT_THROW(setPose(m_nonIdentityTransform), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(setPose(m_identityTransform), SurgSim::Framework::AssertionFailure);
 	EXPECT_TRUE(getPose().isApprox(m_identityTransform, epsilon));
 
 	// Test setInitialState/getInitialState/getCurrentState
