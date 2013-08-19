@@ -32,87 +32,52 @@ class DeformableRepresentation : public Representation
 public:
 	/// Constructor
 	/// \param name The deformable representation's name
-	explicit DeformableRepresentation(const std::string& name)
-		: Representation(name)
-	{
-	}
+	explicit DeformableRepresentation(const std::string& name);
 
 	/// Destructor
-	virtual ~DeformableRepresentation()
-	{
-	}
+	virtual ~DeformableRepresentation();
 
-	/// Set the initial pose of the representation
+	/// Set the initial pose of the representation (used to transform the mesh on loading)
 	/// \param pose The initial pose
-	/// \note Pose is not being used for a deformable object
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override
-	{
-	}
+	/// \note This is a feature to place the object in the scene on loading
+	/// \note A deformable representation is expressed in global frame (local frame = global frame)
+	/// \note This method needs to be called prior to loading the mesh
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Get the initial pose of the representation
-	/// \return The initial pose
-	/// \note Pose is not being used for a deformable object
-	/// \note Therefore we return Identity
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override
-	{
-		static auto staticLocalId = SurgSim::Math::RigidTransform3d::Identity();
-		return staticLocalId;
-	}
+	/// \return The initial pose used to transform the loaded mesh
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
 
 	/// Set the current pose of the representation
 	/// \param pose The current pose
-	/// \note Pose is not being used for a deformable object
-	void setPose(const SurgSim::Math::RigidTransform3d& pose) override
-	{
-	}
+	/// \note A deformable representation is expressed in global frame (local frame = global frame)
+	/// \note This method should not be called, as a deformable pose cannot be set !
+	void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Get the current pose of the representation
-	/// \return The current pose
-	/// \note Pose is not being used for a deformable object
-	/// \note Therefore we return an identity transform
-	const SurgSim::Math::RigidTransform3d& getPose() const
-	{
-		static auto staticLocalId = SurgSim::Math::RigidTransform3d::Identity();
-		return staticLocalId;
-	}
+	/// \return The current pose (Identity)
+	/// \note A deformable representation is expressed in global frame (local frame = global frame)
+	/// \note Therefore its pose is always Identity
+	const SurgSim::Math::RigidTransform3d& getPose() const;
 
 	/// Called to reset the Representation state to its initial state
-	virtual void resetState() override
-	{
-		Representation::resetState();
+	virtual void resetState() override;
 
-		m_currentState  = m_initialState;
-		m_previousState = m_initialState;
-		m_finalState    = m_initialState;
-	}
-
-
-	/// Set the initial state
-	/// \param state The initial state for this deformable actor
-	/// \note This method sets the current/previous states to the initial state as well
-	void setInitialState(const DeformableRepresentationState& state)
-	{
-		m_initialState  = state;
-		m_currentState  = state;
-		m_previousState = state;
-		m_finalState    = state;
-	}
-
-	/// Get the initial state
+	/// Get the initial state (in the global frame)
 	/// \return The initial state of this deformable representation
-	const DeformableRepresentationState& getInitialState() const
-	{
-		return m_initialState;
-	}
+	const DeformableRepresentationState& getInitialState() const;
 
-	/// Get the current state
+	/// Get the current state (in the global frame)
 	/// \return The current state of this deformable representation
-	/// \note We are sending the current valid state, which is m_finalState
-	/// \note m_currentState and m_previousState are internal states
-	const DeformableRepresentationState& getCurrentState() const
-	{
-		return m_finalState;
-	}
+	const DeformableRepresentationState& getCurrentState() const;
+
+	/// Get the previous state (in the global frame)
+	/// \return The previous state of this deformable representation
+	const DeformableRepresentationState& getPreviousState() const;
+
+	/// Get the final state (in the global frame)
+	/// \return The final state of this deformable representation
+	const DeformableRepresentationState& getFinalState() const;
 
 protected:
 	/// Initial state (used for reseting the state)
@@ -126,6 +91,9 @@ protected:
 
 	/// Final state (last valid state)
 	DeformableRepresentationState m_finalState;
+
+	/// Initial pose that will transform the mesh on initialization
+	SurgSim::Math::RigidTransform3d m_initialPose;
 
 private:
 	/// NO copy constructor
