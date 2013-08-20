@@ -53,8 +53,8 @@ void VtcRigidRepresentation::beforeUpdate(double dt)
 		Vector3d p = m_currentVtcState.getPose().translation() - m_previousVtcState.getPose().translation();
 		m_currentVtcState.setLinearVelocity(p / dt);
 
-		const SurgSim::Math::Quaterniond q(m_currentVtcState.getPose().rotation());
-		const SurgSim::Math::Quaterniond qprev(m_previousVtcState.getPose().rotation());
+		const SurgSim::Math::Quaterniond q(m_currentVtcState.getPose().linear());
+		const SurgSim::Math::Quaterniond qprev(m_previousVtcState.getPose().linear());
 		SurgSim::Math::Quaterniond deltaq = q * qprev.inverse();
 		double angle;
 		Vector3d axis;
@@ -81,7 +81,7 @@ void VtcRigidRepresentation::update(double dt)
 	VtcRigidParameters& vtcParam = m_currentVtcParameters;
 	Vector3d         G = m_currentState.getPose().translation();
 	Vector3d        dG = m_currentState.getLinearVelocity();
-	const Matrix33d& R = m_currentState.getPose().rotation();
+	const Matrix33d& R = m_currentState.getPose().linear();
 	Quaterniond      q = Quaterniond(R);
 	Vector3d         w = m_currentState.getAngularVelocity();
 	Quaterniond     dq;
@@ -127,7 +127,7 @@ void VtcRigidRepresentation::update(double dt)
 		Vector3d Fvel = m_currentVtcState.getLinearVelocity() * vtcParam.getVtcLinearDamping();
 		m_force  += Fvel;
 
-		Quaterniond deltaq = Quaterniond(m_currentVtcState.getPose().rotation()) * q.inverse();
+		Quaterniond deltaq = Quaterniond(m_currentVtcState.getPose().linear()) * q.inverse();
 		deltaq.normalize();
 		double angle;
 		Vector3d axis;
@@ -244,7 +244,7 @@ void VtcRigidRepresentation::computeComplianceMatrix(double dt)
 
 void VtcRigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
-	const SurgSim::Math::Matrix33d& R = state.getPose().rotation();
+	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
 	m_globalInertia = R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
 }

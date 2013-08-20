@@ -187,7 +187,7 @@ TEST_F(RigidRepresentationTest, NoForceTorqueTest)
 	}
 
 	const Vector3d    G = rigidBody->getCurrentState().getPose().translation();
-	const Matrix33d&  R = rigidBody->getCurrentState().getPose().rotation();
+	const Matrix33d&  R = rigidBody->getCurrentState().getPose().linear();
 	const Quaterniond q = Quaterniond(R);
 	const Vector3d    v = rigidBody->getCurrentState().getLinearVelocity();
 	const Vector3d    w = rigidBody->getCurrentState().getAngularVelocity();
@@ -216,7 +216,7 @@ TEST_F(RigidRepresentationTest, GravityTest)
 		rigidBody->afterUpdate(m_dt);
 
 		const Vector3d    G = rigidBody->getCurrentState().getPose().translation();
-		const Matrix33d&  R = rigidBody->getCurrentState().getPose().rotation();
+		const Matrix33d&  R = rigidBody->getCurrentState().getPose().linear();
 		const Quaterniond q = Quaterniond(R);
 		const Vector3d    v = rigidBody->getCurrentState().getLinearVelocity();
 		const Vector3d    w = rigidBody->getCurrentState().getAngularVelocity();
