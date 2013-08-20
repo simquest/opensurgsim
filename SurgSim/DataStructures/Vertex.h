@@ -29,8 +29,8 @@ namespace DataStructures
 /// Vertex structure for meshes. Vertices are the lowest level of structure in a Mesh, providing a position and can
 /// store extra per-vertex data. MeshElements combine MeshVertices to form the structure of the mesh.
 ///
-/// MeshVertex is to be used purely as a data structure and not provide implementation of algorithms.
-/// For example, a physics FEM's nodes are not subclasses of MeshVertex if they provide code that is part of the FEM
+/// Vertex is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics FEM's nodes are not subclasses of Vertex if they provide code that is part of the FEM
 /// algorithm, but they may used with a Mesh to store the structure of the FEM.
 ///
 /// The extra Data is left up to the particular use of Mesh to specify. For example, for use collision detection,
@@ -70,8 +70,8 @@ struct Vertex
 	}
 };
 
-/// Specialization of MeshVertex with no data.
-/// \sa MeshVertex
+/// Specialization of Vertex with no data.
+/// \sa Vertex
 template <>
 struct Vertex<void>
 {
@@ -101,4 +101,4 @@ struct Vertex<void>
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATASTRUCTURES_MESHVERTEX_H
+#endif  // SURGSIM_DATASTRUCTURES_VERTEX_H

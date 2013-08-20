@@ -183,7 +183,7 @@ class MockMesh : public SurgSim::DataStructures::Vertices<MockVertexData>
 {
 public:
 	/// Vertex type for convenience
-	typedef Vertices<MockVertexData>::VertexType Vertex;
+	typedef Vertices<MockVertexData>::VertexType VertexType;
 
 	/// Constructor. Start out with no vertices and 0 updates
 	MockMesh() : SurgSim::DataStructures::Vertices<MockVertexData>(),
@@ -201,7 +201,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
-		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
+		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
 		return addVertex(vertex);
 	}
@@ -234,11 +234,11 @@ class MockTriangleMesh : public SurgSim::DataStructures::TriangleMesh<MockVertex
 {
 public:
 	/// Vertex type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::VertexType Vertex;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::VertexType VertexType;
 	/// Edge type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::EdgeType Edge;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::EdgeType EdgeType;
 	/// Triangle type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::TriangleType Triangle;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::TriangleType TriangleType;
 
 	/// Constructor. Start out with no vertices and 0 updates
 	MockTriangleMesh() :SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>(),
@@ -256,7 +256,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
-		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
+		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
 		return addVertex(vertex);
 	}
@@ -267,7 +267,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
 	{
-		Edge edge(vertices, MockEdgeData(getNumEdges()));
+		EdgeType edge(vertices, MockEdgeData(getNumEdges()));
 
 		return addEdge(edge);
 	}
@@ -278,7 +278,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
 	{
-		Triangle triangle(vertices, MockTriangleData(getNumTriangles(), edges));
+		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
 
 		return addTriangle(triangle);
 	}

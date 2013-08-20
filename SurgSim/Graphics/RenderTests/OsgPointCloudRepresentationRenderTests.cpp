@@ -109,7 +109,7 @@ protected:
 		std::shared_ptr<PointCloudRepresentation<void>> cloud =
 			std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
 
-		cloud->setMesh(mesh);
+		cloud->setVertices(mesh);
 		cloud->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
 
 		viewElement->addComponent(cloud);

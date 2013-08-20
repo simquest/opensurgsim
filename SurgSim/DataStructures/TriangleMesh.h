@@ -50,7 +50,7 @@ namespace DataStructures
 /// \tparam	VertexData	Type of extra data stored in each vertex
 /// \tparam	EdgeData	Type of extra data stored in each edge
 /// \tparam	TriangleData	Type of extra data stored in each triangle
-/// \sa MeshVertex
+/// \sa Vertex
 /// \sa MeshElement
 template <class VertexData, class EdgeData, class TriangleData>
 class TriangleMesh : public Vertices<VertexData>

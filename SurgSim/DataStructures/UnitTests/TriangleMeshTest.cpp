@@ -189,7 +189,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 
-		const std::vector<MockTriangleMesh::Vertex>& vertices = mesh.getVertices();
+		const std::vector<MockTriangleMesh::VertexType>& vertices = mesh.getVertices();
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
@@ -209,7 +209,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 
-		const std::vector<MockTriangleMesh::Edge>& edges = mesh.getEdges();
+		const std::vector<MockTriangleMesh::EdgeType>& edges = mesh.getEdges();
 		EXPECT_EQ(i + 1, edges.size());
 
 		/// Make sure each vertex is set properly
@@ -228,7 +228,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 
-		const std::vector<MockTriangleMesh::Triangle>& triangles = mesh.getTriangles();
+		const std::vector<MockTriangleMesh::TriangleType>& triangles = mesh.getTriangles();
 		EXPECT_EQ(i + 1, triangles.size());
 
 		/// Make sure each vertex is set properly
@@ -259,7 +259,7 @@ TEST_F(TriangleMeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(1, mesh.getNumUpdates());
 	EXPECT_EQ(testPositions.size(), mesh.getNumVertices());
 
-	const std::vector<MockMesh::Vertex>& vertices = mesh.getVertices();
+	const std::vector<MockMesh::VertexType>& vertices = mesh.getVertices();
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly

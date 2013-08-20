@@ -31,8 +31,8 @@ namespace DataStructures
 
 /// Base class for mesh structures, handling basic vertex functionality.
 ///
-/// Mesh is to be used purely as a data structure and not provide implementation of algorithms.
-/// For example, a physics FEM is not a subclass of Mesh, but may use a Mesh for storing the structure of the FEM.
+/// Vertices is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics FEM is not a subclass of Vertices, but may use a Mesh for storing the structure of the FEM.
 ///
 /// Subclasses of this class should handle the elements required for a specific type of mesh (as simple as just a
 /// generic triangle mesh or as specific as a triangle mesh for collision detection, which might also specify the data
@@ -44,7 +44,7 @@ namespace DataStructures
 /// Mesh.
 ///
 /// \tparam	VertexData	Type of extra data stored in each vertex (void for no data)
-/// \sa MeshVertex
+/// \sa Vertex
 /// \sa MeshElement
 template <class VertexData>
 class Vertices
@@ -175,7 +175,7 @@ private:
 
 	/// Performs any updates that are required when the vertices are modified.
 	/// Override this method to implement update functionality.
-	/// For example, this could be overridden to calculate normals for each MeshVertex.
+	/// For example, this could be overridden to calculate normals for each Vertex.
 	virtual void doUpdate()
 	{
 	}
@@ -188,4 +188,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATASTRUCTURES_MESH_H
+#endif  // SURGSIM_DATASTRUCTURES_VERTICES_H

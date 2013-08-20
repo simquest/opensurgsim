@@ -47,13 +47,13 @@ public:
 	/// Destructor
 	~OsgPointCloudRepresentation();
 
-	/// Sets a mesh.
+	/// Sets Vertices.
 	/// \param	mesh	The mesh.
-	virtual void setMesh(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) override;
+	virtual void setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) override;
 
-	/// Gets the mesh.
-	/// \return	The mesh.
-	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getMesh() const override;
+	/// Gets the vertices.
+	/// \return	The vertices.
+	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const override;
 
 	/// Sets point size.
 	/// \param	val	The value.
@@ -77,8 +77,8 @@ public:
 
 private:
 
-	/// Local pointer to mesh with data
-	std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> m_mesh;
+	/// Local pointer to vertices with data
+	std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> m_vertices;
 
 	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
