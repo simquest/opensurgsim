@@ -33,6 +33,7 @@ struct Location;
 
 enum RepresentationType
 {
+	REPRESENTATION_TYPE_INVALID = -1,
 	REPRESENTATION_TYPE_FIXED = 0,
 	REPRESENTATION_TYPE_RIGID,
 	REPRESENTATION_TYPE_VTC_RIGID,
@@ -50,6 +51,8 @@ public:
 	/// Destructor
 	virtual ~Representation();
 
+	/// Query the representation type
+	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const = 0;
 
 	/// Reset the representation to its initial/default state
