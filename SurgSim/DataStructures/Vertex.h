@@ -39,7 +39,7 @@ namespace DataStructures
 /// If no extra Data is needed, a specialization exists for void, in which case the constructor takes no data.
 ///
 /// \tparam	Data	Type of extra data stored in the vertex (void for no data)
-/// \sa	Mesh
+/// \sa	Vertices
 template <class Data>
 struct Vertex
 {
