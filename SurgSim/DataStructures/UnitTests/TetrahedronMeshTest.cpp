@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/MeshVertex.h"
+#include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
@@ -33,19 +33,17 @@ public:
 	void SetUp()
 	{
 		// Set to true to print the test positions.
-		bool printPositions = true;
+		bool printPositions = false;
 		// Set to true to print the test normals.
-		bool printNormals = true;
-		// Set to true to print the test triangles.
-		bool printTriangles = true;
-		// Set to true to print the test tetrahedrons.
-		bool printTetrahedrons = true;
+		bool printNormals = false;
 		// Set to true to print the test edges.
-		bool printEdges = true;
+		bool printEdges = false;
+		// Set to true to print the test triangles.
+		bool printTriangles = false;
+		// Set to true to print the test tetrahedrons.
+		bool printTetrahedrons = false;
 		// Set the number of test vertices
 		unsigned int numVertices = 10;
-		// Set the number of test triangles
-		unsigned int numTriangles = 20;
 		// Set the number of test tetrahedrons
 		unsigned int numTetrahedrons = 15;
 
@@ -108,7 +106,13 @@ public:
 			int edgeIDs[6][2] = { {0, 1}, {0, 2}, {0, 3}, {1, 2}, {1, 3}, {2, 3} };
 			for (int j = 0; j < 6; ++j)
 			{
-				std::array<unsigned int, 2> edgeVertices = {{ tetrahedronVertices[edgeIDs[j][0]], tetrahedronVertices[edgeIDs[j][1]] }};
+				std::array<unsigned int, 2> edgeVertices =
+				{
+					{
+						tetrahedronVertices[edgeIDs[j][0]],
+						tetrahedronVertices[edgeIDs[j][1]]
+					}
+				};
 				testEdgesVerticesId.push_back(edgeVertices);
 
 				tetrahedronEdges[j] = testEdgesVerticesId.size() - 1;
@@ -121,7 +125,14 @@ public:
 			std::array<unsigned int, 4> tetrahedronTriangles;
 			for (int j = 0; j < 4; ++j)
 			{
-				std::array<unsigned int, 3> triangleVertices = {{ tetrahedronVertices[vertexIDs[j][0]], tetrahedronVertices[vertexIDs[j][1]], tetrahedronVertices[vertexIDs[j][2]] }};
+				std::array<unsigned int, 3> triangleVertices =
+				{
+					{
+						tetrahedronVertices[vertexIDs[j][0]],
+						tetrahedronVertices[vertexIDs[j][1]],
+						tetrahedronVertices[vertexIDs[j][2]]
+					}
+				};
 				testTrianglesVerticesId.push_back(triangleVertices);
 
 				tetrahedronTriangles[j] = testTrianglesVerticesId.size() - 1;
@@ -137,11 +148,13 @@ public:
 
 			if (printTetrahedrons)
 			{
-				printf("\t%d: Vertices (%d, %d, %d, %d), Edges (%d, %d, %d, %d, %d, %d), Triangles (%d %d %d %d)\n", i,
+				printf("\t%d: Vertices (%d, %d, %d, %d), Edges (%d, %d, %d, %d, %d, %d), Triangles (%d %d %d %d)\n",
+					i,
 					tetrahedronVertices[0], tetrahedronVertices[1], tetrahedronVertices[2], tetrahedronVertices[3],
-					tetrahedronEdges[0], tetrahedronEdges[1], tetrahedronEdges[2], tetrahedronEdges[3], tetrahedronEdges[4], tetrahedronEdges[5],
-					tetrahedronTriangles[0], tetrahedronTriangles[1], tetrahedronTriangles[2], tetrahedronTriangles[3]
-					);
+					tetrahedronEdges[0], tetrahedronEdges[1], tetrahedronEdges[2],
+					tetrahedronEdges[3], tetrahedronEdges[4], tetrahedronEdges[5],
+					tetrahedronTriangles[0], tetrahedronTriangles[1],
+					tetrahedronTriangles[2], tetrahedronTriangles[3]);
 			}
 		}
 
@@ -212,7 +225,7 @@ TEST_F(TetrahedronMeshTest, InitTest)
 	ASSERT_NO_THROW({TetrahedronMeshNoEdgeData mesh;});
 	ASSERT_NO_THROW({TetrahedronMeshNoTriangleData mesh;});
 	ASSERT_NO_THROW({TetrahedronMeshNoTetrahedronData mesh;});
-	
+
 	/// Two void entries
 	typedef TetrahedronMesh<void, void, MockTriangleData, MockTetrahedronData> TetrahedronMeshNoVertexOrEdgeData;
 	typedef TetrahedronMesh<void, MockEdgeData, void, MockTetrahedronData> TetrahedronMeshNoVertexOrTriangleData;
@@ -254,7 +267,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 	EXPECT_EQ(0u, mesh.getTriangles().size());
 	EXPECT_EQ(0u, mesh.getNumTetrahedrons());
 	EXPECT_EQ(0u, mesh.getTetrahedrons().size());
-	
+
 	EXPECT_EQ(0, mesh.getNumUpdates());
 
 	/// Create the test vertices
@@ -263,7 +276,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 
-		const std::vector<MockTriangleMesh::Vertex>& vertices = mesh.getVertices();
+		const std::vector<MockTriangleMesh::VertexType>& vertices = mesh.getVertices();
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
@@ -283,7 +296,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createEdge(testEdgesVerticesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 
-		const std::vector<MockTriangleMesh::Edge>& edges = mesh.getEdges();
+		const std::vector<MockTriangleMesh::EdgeType>& edges = mesh.getEdges();
 		EXPECT_EQ(i + 1, edges.size());
 
 		/// Make sure each vertex is set properly
@@ -302,7 +315,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 
-		const std::vector<MockTriangleMesh::Triangle>& triangles = mesh.getTriangles();
+		const std::vector<MockTriangleMesh::TriangleType>& triangles = mesh.getTriangles();
 		EXPECT_EQ(i + 1, triangles.size());
 
 		/// Make sure each vertex is set properly
@@ -319,10 +332,11 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 	/// Create the test tetrahedrons
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		 EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTetrahedrons());
 
-		const std::vector<MockTetrahedronMesh::Tetrahedron>& tetrahedrons = mesh.getTetrahedrons();
+		const std::vector<MockTetrahedronMesh::TetrahedronType>& tetrahedrons = mesh.getTetrahedrons();
 		EXPECT_EQ(i + 1, tetrahedrons.size());
 
 		/// Make sure each tetrahedron is set properly
@@ -354,7 +368,7 @@ TEST_F(TetrahedronMeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(1, mesh.getNumUpdates());
 	EXPECT_EQ(testPositions.size(), mesh.getNumVertices());
 
-	const std::vector<MockMesh::Vertex>& vertices = mesh.getVertices();
+	const std::vector<MockMesh::VertexType>& vertices = mesh.getVertices();
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly
@@ -438,7 +452,8 @@ TEST_F(TetrahedronMeshTest, ClearTest)
 	}
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTetrahedrons());
 	}
 
@@ -501,7 +516,8 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 	}
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		EXPECT_EQ(i, mesh.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 	}
 
 	/// Create same mesh again
@@ -521,7 +537,8 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 	}
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, sameMesh.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		EXPECT_EQ(i, sameMesh.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 	}
 
 	/// Create mesh with test data, but each vertex has position and normal of (0,0,0) to make them different
@@ -540,7 +557,8 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 	}
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, meshWithDifferentVertices.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		EXPECT_EQ(i, meshWithDifferentVertices.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 	}
 
 	/// Create mesh with test data, but reverse each edge's vertex order to make them different
@@ -560,7 +578,8 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 	}
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, meshWithDifferentEdges.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		EXPECT_EQ(i, meshWithDifferentEdges.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 	}
 
 	/// Create mesh with test data, but only create half of the triangles to make the list different.
@@ -579,7 +598,8 @@ TEST_F(TetrahedronMeshTest, ComparisonTest)
 	}
 	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
 	{
-		EXPECT_EQ(i, meshWithDifferentTriangles.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
+		EXPECT_EQ(i, meshWithDifferentTriangles.createTetrahedron(testTetrahedronsVerticesId[i], \
+			testTetrahedronsEdgesId[i], testTetrahedronsTrianglesId[i]));
 	}
 
 	/// Test comparisons

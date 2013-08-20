@@ -51,18 +51,18 @@ namespace DataStructures
 /// \tparam	EdgeData	Type of extra data stored in each edge
 /// \tparam	TriangleData	Type of extra data stored in each triangle
 /// \tparam	TetrahedronData	Type of extra data stored in each tetrahedron
-/// \sa Mesh
+/// \sa Vertices
 /// \sa MeshElement
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
-class TetrahedronMesh : public Mesh<VertexData>
+class TetrahedronMesh : public Vertices<VertexData>
 {
 public:
 	/// Edge type for convenience
-	typedef MeshElement<2, EdgeData> Edge;
+	typedef MeshElement<2, EdgeData> EdgeType;
 	/// Triangle type for convenience
-	typedef MeshElement<3, TriangleData> Triangle;
+	typedef MeshElement<3, TriangleData> TriangleType;
 	/// Tetrahedron type for convenience
-	typedef MeshElement<4, TetrahedronData> Tetrahedron;
+	typedef MeshElement<4, TetrahedronData> TetrahedronType;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles, no tetrahedrons).
 	TetrahedronMesh()
@@ -80,7 +80,7 @@ public:
 	/// on the vertices and other parameters.
 	/// \param	edge	Edge to add to the mesh
 	/// \return	Unique ID of the new edge.
-	unsigned int addEdge(const Edge& edge)
+	unsigned int addEdge(const EdgeType& edge)
 	{
 		m_edges.push_back(edge);
 		return m_edges.size() - 1;
@@ -92,7 +92,7 @@ public:
 	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
 	/// based on the vertices and other parameters.
 	/// \return	Unique ID of the new triangle.
-	unsigned int addTriangle(const Triangle& triangle)
+	unsigned int addTriangle(const TriangleType& triangle)
 	{
 		m_triangles.push_back(triangle);
 		return m_triangles.size() - 1;
@@ -104,7 +104,7 @@ public:
 	/// createTetrahedron(vertices, other data...) method which performs any checking desired and sets up the
 	/// tetrahedron data based on the vertices and other parameters.
 	/// \return	Unique ID of the new tetrahedron.
-	unsigned int addTetrahedron(const Tetrahedron& tetrahedron)
+	unsigned int addTetrahedron(const TetrahedronType& tetrahedron)
 	{
 		m_tetrahedrons.push_back(tetrahedron);
 		return m_tetrahedrons.size() - 1;
@@ -132,20 +132,20 @@ public:
 
 	/// Returns a vector containing the position of each edge.
 	/// \return The vector containing all edges
-	const std::vector<Edge>& getEdges() const
+	const std::vector<EdgeType>& getEdges() const
 	{
 		return m_edges;
 	}
 	/// Returns a vector containing the position of each triangle.
 	/// \return The vector containing all triangles
-	const std::vector<Triangle>& getTriangles() const
+	const std::vector<TriangleType>& getTriangles() const
 	{
 		return m_triangles;
 	}
 
 	/// Returns a vector containing the position of each tetrahedron.
 	/// \return The vector containing all tetrahedrons
-	const std::vector<Tetrahedron>& getTetrahedrons() const
+	const std::vector<TetrahedronType>& getTetrahedrons() const
 	{
 		return m_tetrahedrons;
 	}
@@ -154,7 +154,7 @@ public:
 	/// \param id The edge's id
 	/// \return The edge id
 	/// \note No check is performed on the id
-	const Edge& getEdge(unsigned int id) const
+	const EdgeType& getEdge(unsigned int id) const
 	{
 		return m_edges[id];
 	}
@@ -163,7 +163,7 @@ public:
 	/// \param id The triangle's id
 	/// \return The triangle id
 	/// \note No check is performed on the id
-	const Triangle& getTriangle(unsigned int id) const
+	const TriangleType& getTriangle(unsigned int id) const
 	{
 		return m_triangles[id];
 	}
@@ -172,7 +172,7 @@ public:
 	/// \param id The tetrahedron's id
 	/// \return The tetrahedron id
 	/// \note No check is performed on the id
-	const Tetrahedron& getTetrahedron(unsigned int id) const
+	const TetrahedronType& getTetrahedron(unsigned int id) const
 	{
 		return m_tetrahedrons[id];
 	}
@@ -200,10 +200,10 @@ protected:
 	/// Override this method to provide custom comparison. Basic TriangleMesh implementation compares vertices,
 	/// edges and triangles: the order of vertices, edges, and triangles must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Mesh<VertexData>& mesh) const
+	virtual bool isEqual(const Vertices<VertexData>& mesh) const
 	{
 		const TetrahedronMesh& tetrahedronMesh = static_cast<const TetrahedronMesh&>(mesh);
-		return Mesh<VertexData>::isEqual(mesh) && m_edges == tetrahedronMesh.getEdges() &&
+		return Vertices<VertexData>::isEqual(mesh) && m_edges == tetrahedronMesh.getEdges() &&
 			m_triangles == tetrahedronMesh.getTriangles() && m_tetrahedrons == tetrahedronMesh.getTetrahedrons();
 	}
 private:
@@ -218,13 +218,13 @@ private:
 	}
 
 	/// Edges
-	std::vector<Edge> m_edges;
-	
+	std::vector<EdgeType> m_edges;
+
 	/// Triangles
-	std::vector<Triangle> m_triangles;
+	std::vector<TriangleType> m_triangles;
 
 	/// Tetrahedrons
-	std::vector<Tetrahedron> m_tetrahedrons;
+	std::vector<TetrahedronType> m_tetrahedrons;
 };
 
 };  // namespace DataStructures

@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TetrahedronMesh.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <array>
@@ -186,7 +187,9 @@ public:
 	/// \param	id	Unique ID of the tetrahedron in its mesh
 	/// \param	edges	IDs of the tetrahedron's edges in its mesh (6 edges)
 	/// \param	edges	IDs of the tetrahedron's triangles in its mesh (4 triangles)
-	MockTetrahedronData(unsigned int id, const std::array<unsigned int, 6>& edges, const std::array<unsigned int, 4>& triangles) :
+	MockTetrahedronData(unsigned int id,
+		const std::array<unsigned int, 6>& edges,
+		const std::array<unsigned int, 4>& triangles) :
 	  m_id(id), m_edges(edges), m_triangles(triangles)
 	  {
 	  }
@@ -365,16 +368,21 @@ class MockTetrahedronMesh : public SurgSim::DataStructures::TetrahedronMesh<Mock
 {
 public:
 	/// Vertex type for convenience
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::Vertex Vertex;
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::VertexType
+		VertexType;
 	/// Edge type for convenience
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::Edge Edge;
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::EdgeType
+		EdgeType;
 	/// Triangle type for convenience
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::Triangle Triangle;
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::TriangleType
+		TriangleType;
 	/// Tetrahedron type for convenience
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::Tetrahedron Tetrahedron;
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::TetrahedronType
+		TetrahedronType;
 
 	/// Constructor. Start out with no vertices and 0 updates
-	MockTetrahedronMesh() :SurgSim::DataStructures::TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>(),
+	MockTetrahedronMesh() :
+		SurgSim::DataStructures::TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>(),
 		m_numUpdates(0)
 	{
 	}
@@ -389,7 +397,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
-		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
+		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
 		return addVertex(vertex);
 	}
@@ -399,7 +407,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
 	{
-		Edge edge(vertices, MockEdgeData(getNumEdges()));
+		EdgeType edge(vertices, MockEdgeData(getNumEdges()));
 
 		return addEdge(edge);
 	}
@@ -410,7 +418,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
 	{
-		Triangle triangle(vertices, MockTriangleData(getNumTriangles(), edges));
+		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
 
 		return addTriangle(triangle);
 	}
@@ -420,9 +428,11 @@ public:
 	/// \param	edges connectivity (x6)
 	/// \param	triangles connectivity (x4)
 	/// \return	Unique ID of vertex in the mesh
-	unsigned int createTetrahedron(const std::array<unsigned int, 4>& vertices, const std::array<unsigned int, 6>& edges, const std::array<unsigned int, 4>& triangles)
+	unsigned int createTetrahedron(const std::array<unsigned int, 4>& vertices,
+		const std::array<unsigned int, 6>& edges,
+		const std::array<unsigned int, 4>& triangles)
 	{
-		Tetrahedron tetrahedron(vertices, MockTetrahedronData(getNumTetrahedrons(), edges, triangles));
+		TetrahedronType tetrahedron(vertices, MockTetrahedronData(getNumTetrahedrons(), edges, triangles));
 
 		return addTetrahedron(tetrahedron);
 	}

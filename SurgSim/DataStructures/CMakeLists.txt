@@ -29,11 +29,11 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroupBuilder.h
 	IndexDirectory.h
 	MeshElement.h
-	NamedVariantData.h
-	NamedVariantData-inl.h
 	NamedData.h
 	NamedData-inl.h
 	NamedDataBuilder.h
+	NamedVariantData.h
+	NamedVariantData-inl.h
 	OptionalValue.h
 	TetrahedronMesh.h
 	TriangleMesh.h
