@@ -16,10 +16,9 @@
 #ifndef SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 
-#include <SurgSim/DataStructures/Mesh.h>
-#include <SurgSim/DataStructures/TriangleMesh.h>
-#include <SurgSim/DataStructures/TetrahedronMesh.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <array>
 #include <limits>
@@ -233,14 +232,14 @@ private:
 };
 
 /// Mesh for testing using MockVertexData
-class MockMesh : public SurgSim::DataStructures::Mesh<MockVertexData>
+class MockMesh : public SurgSim::DataStructures::Vertices<MockVertexData>
 {
 public:
 	/// Vertex type for convenience
-	typedef Mesh<MockVertexData>::Vertex Vertex;
+	typedef Vertices<MockVertexData>::VertexType VertexType;
 
 	/// Constructor. Start out with no vertices and 0 updates
-	MockMesh() : SurgSim::DataStructures::Mesh<MockVertexData>(),
+	MockMesh() : SurgSim::DataStructures::Vertices<MockVertexData>(),
 		m_numUpdates(0)
 	{
 	}
@@ -255,7 +254,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
-		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
+		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
 		return addVertex(vertex);
 	}
@@ -288,11 +287,11 @@ class MockTriangleMesh : public SurgSim::DataStructures::TriangleMesh<MockVertex
 {
 public:
 	/// Vertex type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Vertex Vertex;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::VertexType VertexType;
 	/// Edge type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Edge Edge;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::EdgeType EdgeType;
 	/// Triangle type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::Triangle Triangle;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::TriangleType TriangleType;
 
 	/// Constructor. Start out with no vertices and 0 updates
 	MockTriangleMesh() :SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>(),
@@ -310,7 +309,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
 	{
-		Vertex vertex(position, MockVertexData(getNumVertices(), normal));
+		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
 
 		return addVertex(vertex);
 	}
@@ -321,7 +320,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
 	{
-		Edge edge(vertices, MockEdgeData(getNumEdges()));
+		EdgeType edge(vertices, MockEdgeData(getNumEdges()));
 
 		return addEdge(edge);
 	}
@@ -332,7 +331,7 @@ public:
 	/// \return	Unique ID of vertex in the mesh
 	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
 	{
-		Triangle triangle(vertices, MockTriangleData(getNumTriangles(), edges));
+		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
 
 		return addTriangle(triangle);
 	}

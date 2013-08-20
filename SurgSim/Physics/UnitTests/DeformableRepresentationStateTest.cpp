@@ -22,7 +22,7 @@ namespace
 	const double epsilon = 1e-10;
 };
 
-TEST(DeformableActorStateTest, ConstructorTest)
+TEST(DeformableRepresentationStateTest, ConstructorTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
 
@@ -40,7 +40,7 @@ TEST(DeformableActorStateTest, ConstructorTest)
 	ASSERT_NO_THROW( {DeformableRepresentationState* state = new DeformableRepresentationState[10]; delete [] state; });
 }
 
-TEST(DeformableActorStateTest, AllocateTest)
+TEST(DeformableRepresentationStateTest, AllocateTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
 
@@ -51,7 +51,7 @@ TEST(DeformableActorStateTest, AllocateTest)
 	EXPECT_EQ(10u, state.getNumDof());
 }
 
-TEST(DeformableActorStateTest, GetPositionsTest)
+TEST(DeformableRepresentationStateTest, GetPositionsTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
 
@@ -82,7 +82,7 @@ TEST(DeformableActorStateTest, GetPositionsTest)
 	EXPECT_EQ(state2.getPositions(), state1.getPositions());
 }
 
-TEST(DeformableActorStateTest, GetVelocitiesTest)
+TEST(DeformableRepresentationStateTest, GetVelocitiesTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
 
@@ -113,7 +113,7 @@ TEST(DeformableActorStateTest, GetVelocitiesTest)
 	EXPECT_EQ(state2.getVelocities(), state1.getVelocities());
 }
 
-TEST(DeformableActorStateTest, ResetTest)
+TEST(DeformableRepresentationStateTest, ResetTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
 
@@ -136,7 +136,7 @@ TEST(DeformableActorStateTest, ResetTest)
 	}
 }
 
-TEST(DeformableActorStateTest, CopyConstructorAndAssignmentTest)
+TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 {
 	using SurgSim::Physics::DeformableRepresentationState;
 

@@ -64,7 +64,7 @@ void RigidRepresentation::update(double dt)
 	RigidRepresentationParameters& p = m_currentParameters;
 	Vector3d         G = m_currentState.getPose().translation();
 	Vector3d        dG = m_currentState.getLinearVelocity();
-	Matrix33d        R = m_currentState.getPose().rotation();
+	Matrix33d        R = m_currentState.getPose().linear();
 	Quaterniond      q = Quaterniond(R);
 	Vector3d         w = m_currentState.getAngularVelocity();
 	Quaterniond     dq;
@@ -169,7 +169,7 @@ void RigidRepresentation::applyDofCorrection(
 
 	Vector3d          G = m_currentState.getPose().translation();
 	Vector3d         dG = m_currentState.getLinearVelocity();
-	Matrix33d         R = m_currentState.getPose().rotation();
+	Matrix33d         R = m_currentState.getPose().linear();
 	Quaterniond       q = Quaterniond(R);
 	Vector3d          w = m_currentState.getAngularVelocity();
 
@@ -245,7 +245,7 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 		return;
 	}
 
-	const SurgSim::Math::Matrix33d& R = state.getPose().rotation();
+	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
 	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
 }

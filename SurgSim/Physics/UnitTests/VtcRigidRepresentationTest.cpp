@@ -160,9 +160,9 @@ TEST_F(VtcRigidRepresentationTest, ResetTest)
 		const RigidTransform3d& initialPose = rigidBody->getInitialState().getPose();
 
 		EXPECT_NE(id4x4.translation(), pose.translation());
-		EXPECT_NE(id4x4.rotation(), pose.rotation());
+		EXPECT_NE(id4x4.linear(), pose.linear());
 		EXPECT_EQ(initialPose.translation(), pose.translation());
-		EXPECT_EQ(initialPose.rotation(), pose.rotation());
+		EXPECT_EQ(initialPose.linear(), pose.linear());
 	}
 	// previous state = initial state
 	EXPECT_EQ(rigidBody->getInitialState(), rigidBody->getPreviousState());
@@ -264,7 +264,7 @@ TEST_F(VtcRigidRepresentationTest, NoForceTorqueTest)
 	const RigidRepresentationState& state = rigidBody->getCurrentState();
 
 	const Vector3d    G = state.getPose().translation();
-	const Matrix33d&  R = state.getPose().rotation();
+	const Matrix33d&  R = state.getPose().linear();
 	const Quaterniond q = Quaterniond(R);
 	const Vector3d    v = state.getLinearVelocity();
 	const Vector3d    w = state.getAngularVelocity();
@@ -306,7 +306,7 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 		const RigidRepresentationState &vtcState = rigidBody->getCurrentVtcState();
 
 		const Vector3d    G = state.getPose().translation();
-		const Matrix33d&  R = state.getPose().rotation();
+		const Matrix33d&  R = state.getPose().linear();
 		const Quaterniond q = Quaterniond(R);
 		const Vector3d    w = state.getAngularVelocity();
 
