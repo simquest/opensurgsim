@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <string>
+#include <sstream>
 
 #include "AddSceneElementBehavior.h"
 
@@ -44,7 +45,9 @@ void AddSceneElementBehavior::update(double dt)
 	if (m_totalTime > 3.0)
 	{
 		m_totalTime = 0.0;
-		m_numballs++;
+
+		std::stringstream ss;
+		ss << m_numballs++;
 
 		std::srand((unsigned int) std::time(0));
 
@@ -52,7 +55,7 @@ void AddSceneElementBehavior::update(double dt)
 		double m_y = 1 + float(std::rand() % 2);
 		double m_z = float(std::rand() % 10)/10;
 
-		std::string name = "sphereId_" + std::to_string(m_numballs);
+		std::string name = "sphereId_" + ss.str();
 		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform
 			(SurgSim::Math::Quaterniond::Identity(), Vector3d(m_x,m_y,m_z));
 
