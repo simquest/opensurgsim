@@ -19,6 +19,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <fstream>
+
 namespace SurgSim
 {
 namespace Framework

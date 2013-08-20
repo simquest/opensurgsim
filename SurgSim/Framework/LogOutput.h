@@ -55,7 +55,7 @@ public:
 
 	/// \param message to be written out
 	/// \return true on success
-	virtual bool writeMessage(const std::string& message);
+	virtual bool writeMessage(const std::string& message) override;
 
 private:
 	std::string m_filename;
@@ -77,7 +77,7 @@ public:
 	/// Writes a message to the stream.
 	/// \param	message	Message to be written to the stream
 	/// \return	True on success
-	virtual bool writeMessage(const std::string& message);
+	virtual bool writeMessage(const std::string& message) override;
 
 private:
 	std::ostream& m_stream;

@@ -21,6 +21,7 @@
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
+#include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
@@ -47,6 +48,7 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
@@ -76,7 +78,7 @@ public:
 
 	virtual void update(double dt)
 	{
-		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
+		std::shared_ptr<SurgSim::Framework::Logger> logger = Logger::getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 	}
@@ -249,15 +251,12 @@ int main(int argc, char* argv[])
 {
 	const SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
-
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
-
 	
-
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
