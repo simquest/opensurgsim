@@ -18,14 +18,14 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/MeshVertex.h"
+#include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
 #include <random>
 
-using SurgSim::DataStructures::Mesh;
-using SurgSim::DataStructures::MeshVertex;
+using SurgSim::DataStructures::Vertices;
+using SurgSim::DataStructures::Vertex;
 using SurgSim::Math::Vector3d;
 
 class MeshTest : public ::testing::Test
@@ -100,7 +100,7 @@ TEST_F(MeshTest, InitTest)
 	ASSERT_NO_THROW({MockMesh mesh;});
 
 	/// Check that we can also create a mesh with no data
-	ASSERT_NO_THROW({Mesh<void> mesh;});
+	ASSERT_NO_THROW({Vertices<void> mesh;});
 }
 
 TEST_F(MeshTest, CreateVerticesTest)
@@ -116,7 +116,7 @@ TEST_F(MeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 
-		const std::vector<MockMesh::Vertex>& vertices = mesh.getVertices();
+		const std::vector<MockMesh::VertexType>& vertices = mesh.getVertices();
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
@@ -147,7 +147,7 @@ TEST_F(MeshTest, SetVertexPositionsTest)
 	EXPECT_EQ(1, mesh.getNumUpdates());
 	EXPECT_EQ(testPositions.size(), mesh.getNumVertices());
 
-	const std::vector<MockMesh::Vertex>& vertices = mesh.getVertices();
+	const std::vector<MockMesh::VertexType>& vertices = mesh.getVertices();
 	EXPECT_EQ(testPositions.size(), vertices.size());
 
 	/// Make sure each vertex is set properly
