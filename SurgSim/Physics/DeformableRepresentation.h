@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_H
 #define SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_H
 
-#include <SurgSim\Physics\Representation.h>
-#include <SurgSim\Physics\DeformableRepresentationState.h>
+#include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/DeformableRepresentationState.h>
 
 namespace SurgSim
 {
