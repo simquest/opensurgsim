@@ -18,17 +18,17 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/MeshVertex.h"
+#include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Vector.h"
 
-using SurgSim::DataStructures::MeshVertex;
+using SurgSim::DataStructures::Vertex;
 using SurgSim::Math::Vector3d;
 
 /// Vertex with ID and normal data
-typedef SurgSim::DataStructures::MeshVertex<MockVertexData> MockVertex;
+typedef SurgSim::DataStructures::Vertex<MockVertexData> MockVertex;
 /// Vertex with no data
-typedef SurgSim::DataStructures::MeshVertex<void> MockVertexNoData;
+typedef SurgSim::DataStructures::Vertex<void> MockVertexNoData;
 
 TEST(MeshVertexTest, InitTest)
 {

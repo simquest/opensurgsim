@@ -26,7 +26,7 @@
 #include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/DataStructures/Mesh.h>
+#include <SurgSim/DataStructures/Vertices.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
@@ -48,7 +48,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-typedef SurgSim::DataStructures::Mesh<void> CloudMesh;
+typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
 
 struct OsgPointCloudRepresentationRenderTests : public ::testing::Test
 {
@@ -99,7 +99,7 @@ protected:
 		std::shared_ptr<CloudMesh> mesh = std::make_shared<CloudMesh>();
 		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
 		{
-			mesh->addVertex(CloudMesh::Vertex(*it));
+			mesh->addVertex(CloudMesh::VertexType(*it));
 		}
 		return mesh;
 	}
@@ -109,7 +109,7 @@ protected:
 		std::shared_ptr<PointCloudRepresentation<void>> cloud =
 			std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
 
-		cloud->setMesh(mesh);
+		cloud->setVertices(mesh);
 		cloud->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
 
 		viewElement->addComponent(cloud);

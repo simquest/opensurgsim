@@ -67,9 +67,9 @@ OsgPointCloudRepresentation<Data>::~OsgPointCloudRepresentation()
 template <class Data>
 void OsgPointCloudRepresentation<Data>::doUpdate(double dt)
 {
-	if (m_mesh != nullptr)
+	if (m_vertices != nullptr)
 	{
-		auto vertices = m_mesh->getVertices();
+		auto vertices = m_vertices->getVertices();
 		size_t count = vertices.size();
 
 		if (count != static_cast<size_t>(m_drawArrays->getCount()))
@@ -107,16 +107,16 @@ void OsgPointCloudRepresentation<Data>::doUpdate(double dt)
 
 
 template <class Data>
-void OsgPointCloudRepresentation<Data>::setMesh(std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> mesh)
+void OsgPointCloudRepresentation<Data>::setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh)
 {
-	m_mesh = mesh;
+	m_vertices = mesh;
 }
 
 
 template <class Data>
-std::shared_ptr<SurgSim::DataStructures::Mesh<Data>> OsgPointCloudRepresentation<Data>::getMesh() const
+std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> OsgPointCloudRepresentation<Data>::getVertices() const
 {
-	return m_mesh;
+	return m_vertices;
 }
 
 

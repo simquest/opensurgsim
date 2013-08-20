@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	ContactConstraintGenerationTests.cpp
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
+	DeformableRepresentationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FixedRepresentationTest.cpp
 	FixedRepresentationContactTests.cpp

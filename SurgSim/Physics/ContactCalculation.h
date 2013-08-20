@@ -215,6 +215,29 @@ private:
 };
 
 
+/// Class to calculate intersections between a box and a sphere
+class BoxSphereDcdContact : public ContactCalculation
+{
+public:
+
+    /// Constructor.
+    explicit BoxSphereDcdContact()
+    {
+    }
+
+    virtual std::pair<int,int> getShapeTypes() override
+    {
+        return std::pair<int,int>(RIGID_SHAPE_TYPE_BOX, RIGID_SHAPE_TYPE_SPHERE);
+    }
+
+private:
+    /// Calculate the actual contact between two shapes of the given CollisionPair.
+    /// \param    pair    The symmetric pair that is under consideration.
+    virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+
+};
+
+
 /// Class to calculate intersections between a capsule and a sphere
 class CapsuleSphereDcdContact : public ContactCalculation
 {
