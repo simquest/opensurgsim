@@ -18,6 +18,7 @@
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/SphereElement.h>
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
@@ -49,6 +50,7 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Blocks::SphereElement;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
@@ -149,7 +151,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
 
-	planeElement->addComponent(std::make_shared<AddSceneElementBehavior>());
+	planeElement->addComponent(std::make_shared<AddSceneElementBehavior <SphereElement>>());
 
 	return planeElement;
 }
