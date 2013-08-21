@@ -30,12 +30,12 @@ include_directories(
 )
 
 set(EXAMPLE_SOURCES
+	AddSphereBehavior.cpp
 	ExampleBouncingBalls.cpp
-	AddSceneElementBehavior.cpp
 )
 
 set(EXAMPLE_HEADERS
-	AddSceneElementBehavior.h
+	AddSphereBehavior.h
 )
 
 # Configure the path for the data files

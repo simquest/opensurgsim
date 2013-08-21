@@ -45,7 +45,7 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include "AddSceneElementBehavior.h"
+#include "AddSphereBehavior.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
@@ -149,7 +149,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
 
-	planeElement->addComponent(std::make_shared<AddSceneElementBehavior>());
+	planeElement->addComponent(std::make_shared<AddSphereBehavior>());
 
 	return planeElement;
 }

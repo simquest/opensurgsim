@@ -16,7 +16,7 @@
 #include <string>
 #include <sstream>
 
-#include "AddSceneElementBehavior.h"
+#include "AddSphereBehavior.h"
 
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/SceneElement.h>
@@ -28,17 +28,17 @@ using SurgSim::Framework::Behavior;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Math::Vector3d;
 
-AddSceneElementBehavior::AddSceneElementBehavior():
-	Behavior("DynamicallyAddSceneElement"), m_totalTime(0.0), m_numballs(0)
+AddSphereBehavior::AddSphereBehavior():
+	Behavior("DynamicallyAddSphereElement"), m_totalTime(0.0), m_numElements(0)
 {
 }
 
 
-AddSceneElementBehavior::~AddSceneElementBehavior()
+AddSphereBehavior::~AddSphereBehavior()
 {
 }
 
-void AddSceneElementBehavior::update(double dt)
+void AddSphereBehavior::update(double dt)
 {
 	m_totalTime += dt;
 
@@ -47,10 +47,9 @@ void AddSceneElementBehavior::update(double dt)
 		m_totalTime = 0.0;
 
 		std::stringstream ss;
-		ss << m_numballs++;
+		ss << ++m_numElements;
 
 		std::srand((unsigned int) std::time(0));
-
 		double m_x = float(std::rand() % 10)/10;
 		double m_y = 1 + float(std::rand() % 2);
 		double m_z = float(std::rand() % 10)/10;
@@ -60,7 +59,6 @@ void AddSceneElementBehavior::update(double dt)
 			(SurgSim::Math::Quaterniond::Identity(), Vector3d(m_x,m_y,m_z));
 
 		std::shared_ptr<SceneElement> m_element = std::make_shared<SphereElement>(name, pose);
-	
 		getScene()->addSceneElement(m_element);
 	}
 }

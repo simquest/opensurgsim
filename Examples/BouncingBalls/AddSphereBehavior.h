@@ -13,24 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ADDSCENEELEMENTBEHAVIOR_H
-#define ADDSCENEELEMENTBEHAVIOR_H
+#ifndef ADDSPHEREBEHAVIOR_H
+#define ADDSPHEREBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Scene.h>
 
+/// An example class to add sphere elements into scene dynamically. 
+/// AddSphereBehavior will be updated by BehaviorManager through
+/// update() call.
 
-/// An example class to add a scene element into scene dynamically. 
-/// AddSceneElementBehavior will be updated by BehaviorManager
-/// through update() call. 
-
-class AddSceneElementBehavior : public SurgSim::Framework::Behavior
+class AddSphereBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	explicit AddSceneElementBehavior();
+	explicit AddSphereBehavior();
 
-	~AddSceneElementBehavior();
+	~AddSphereBehavior();
 
 	virtual void update(double dt);
 
@@ -46,9 +44,7 @@ protected:
 
 private:
 	double m_totalTime;
-	int m_numballs;
+	int m_numElements;
 };
 
 #endif
-
-
