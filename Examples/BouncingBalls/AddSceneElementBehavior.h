@@ -17,12 +17,14 @@
 #define ADDSCENEELEMENTBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
+#include <SurgSim/Framework/ApplicationData.h>
+#include <SurgSim/Framework/Scene.h>
 
-/// An example template class to add a scene element into scene dynamically. 
+
+/// An example class to add a scene element into scene dynamically. 
 /// AddSceneElementBehavior will be updated by BehaviorManager
 /// through update() call. 
 
-template <class T>
 class AddSceneElementBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -42,9 +44,10 @@ protected:
 		return true;
 	}
 
+private:
+	double m_totalTime;
+	int m_numballs;
 };
-
-#include <AddSceneElementBehavior-inl.h>
 
 #endif
 
