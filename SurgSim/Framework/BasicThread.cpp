@@ -112,7 +112,7 @@ void BasicThread::operator()()
 		}
 
 		start = Clock::now();
-		m_isRunning = doUpdate(m_period.count());		
+		m_isRunning = doUpdate(m_period.count());
 		frameTime = Clock::now() - start;
 	}
 

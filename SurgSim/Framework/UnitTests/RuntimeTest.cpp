@@ -77,18 +77,6 @@ TEST(RuntimeTest, StartupFailureDeathTest)
 	ASSERT_DEATH(runtime->start(), "");
 }
 
-TEST(RuntimeTest, LoggerManagement)
-{
-	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<Logger> newLogger = runtime->getLogger("TestLogger");
-
-	ASSERT_NE(nullptr, newLogger);
-	EXPECT_EQ("TestLogger", newLogger->getName());
-
-	std::shared_ptr<Logger> oldLogger = runtime->getLogger("TestLogger");
-	EXPECT_EQ(oldLogger, newLogger);
-}
-
 TEST(RuntimeTest, SceneInitialization)
 {
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();

@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <SurgSim/Framework/Logger.h>
+#include <SurgSim/Framework/LogOutput.h>
 #include <SurgSim/Framework/LoggerManager.h>
 
 #include <iostream>
@@ -65,7 +67,7 @@ void LoggerManager::setThreshold(const std::string& path, int threshold)
 	{
 		if (boost::istarts_with(it->first, path))
 		{
-			if ( ! (it->second).expired())
+			if (! (it->second).expired())
 			{
 				(it->second).lock()->setThreshold(threshold);
 			}
@@ -86,13 +88,13 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 	auto it = m_loggers.find(name);
 	std::shared_ptr<Logger> result;
 
-	if ( it != m_loggers.end() && (! (it->second).expired()))
+	if (it != m_loggers.end() && (! (it->second).expired()))
 	{
 		result = (it->second).lock();
 	}
 	else
 	{
-  		result = std::make_shared<Logger>(name, m_defaultOutput);
+  		result = std::make_shared<Logger>(Logger(name, m_defaultOutput));
   		result->setThreshold(m_globalThreshold);
   		m_loggers[name] = result;
 	}

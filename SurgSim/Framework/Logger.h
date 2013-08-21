@@ -16,6 +16,7 @@
 #ifndef SURGSIM_FRAMEWORK_LOGGER_H
 #define SURGSIM_FRAMEWORK_LOGGER_H
 
+#include "SurgSim/Framework/LoggerManager.h"
 #include "SurgSim/Framework/LogOutput.h"
 
 #include <string>
@@ -29,7 +30,6 @@ namespace Framework
 
 /// \addtogroup loggingAPI
 /// @{
-
 
 /// Logging levels.
 /// Please note that most logging macros take an abbreviated version of these enumerations, without the leading
@@ -52,36 +52,13 @@ enum LogLevel
 class Logger
 {
 public:
-	/// Constructor.
-	/// \param name The name used for this logger.
-	/// \param output The LogOutput instance used to display or log the data.
-	Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
-		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
-		m_name(name),
-		m_output(output)
-	{
-	}
+
+	friend class LoggerManager;
 
 	/// Destructor.
 	~Logger()
 	{
 	}
-
-	/// Get the shared default logger that will be used for assertions, and can be used whenever else necessary.
-	///
-	/// Note that this method currently returns a pointer, mostly for the convenience and efficiency of the
-	/// assert macros.  <b>DO NOT</b> attempt to wrap this into a smart pointer like std::shared_ptr; this will
-	/// likely cause it to be freed prematurely!
-	///
-	/// \return The default logger.
-	static Logger* getDefaultLogger();
-
-	/// Creates a logger that logs to the standard error output.
-	///
-	/// \param name The name to use for the logger.
-	///
-	/// \return The new logger.
-	static std::shared_ptr<Logger> createConsoleLogger(const std::string& name);
 
 	/// Uses the contained instance of LogOutput to write the log message
 	/// \return true on success
@@ -128,7 +105,28 @@ public:
 		return m_name;
 	}
 
+	/// Get a logger by name from Logger Manager
+	/// \return A logger with given name.
+	static std::shared_ptr<Logger> getLogger(const std::string& name)
+	{
+		return getLoggerManager()->getLogger(name);
+	}
+
+	/// Get default logger
+	/// \return Default logger
+	static std::shared_ptr<Logger> getDefaultLogger()
+	{
+		return getLoggerManager()->getDefaultLogger();
+	}
+
 private:
+	/// Constructor.
+	/// \param name The name used for this logger.
+	/// \param output The LogOutput instance used to display or log the data.
+	Logger(const std::string& name, std::shared_ptr<LogOutput> output);
+
+	static std::shared_ptr<LoggerManager> getLoggerManager();
+
 	int m_threshold;
 	std::string m_name;
 	std::shared_ptr<LogOutput> m_output;
