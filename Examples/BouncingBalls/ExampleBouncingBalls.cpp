@@ -34,11 +34,14 @@
 #include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/DoubleSidedPlaneShape.h>
+#include <SurgSim/Physics/VtcRigidParameters.h>
+#include <SurgSim/Physics/VtcRigidRepresentation.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
@@ -61,6 +64,8 @@ using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::DoubleSidedPlaneShape;
+using SurgSim::Physics::VtcRigidParameters;
+using SurgSim::Physics::VtcRigidRepresentation;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::PhysicsManager;
@@ -164,6 +169,13 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
+
+	std::shared_ptr<VtcRigidRepresentation> vtcRepresentation =
+		std::make_shared<VtcRigidRepresentation>(name + " Vtc");
+	vtcRepresentation->setPose(pose);
+	vtcRepresentation->setInitialParameters(params);
+	vtcRepresentation->setInitialVtcParameters(VtcRigidParameters());
+
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
@@ -191,6 +203,7 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
+	sphereElement->addComponent(vtcRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 
@@ -255,9 +268,12 @@ int main(int argc, char* argv[])
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
+	std::shared_ptr<SurgSim::Input::InputManager> inputManager =
+		std::make_shared<SurgSim::Input::InputManager>();
 	
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);
+	runtime->addManager(inputManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 
