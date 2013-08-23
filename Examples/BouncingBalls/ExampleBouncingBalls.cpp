@@ -34,6 +34,7 @@
 #include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
@@ -42,6 +43,8 @@
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Physics/VtcRigidParameters.h>
+#include <SurgSim/Physics/VtcRigidRepresentation.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -64,8 +67,10 @@ using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::DoubleSidedPlaneShape;
 using SurgSim::Physics::SphereShape;
-using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::PhysicsManager;
+using SurgSim::Physics::VtcRigidParameters;
+using SurgSim::Physics::VtcRigidRepresentation;
+using SurgSim::Physics::RigidRepresentationParameters;
 
 ///\file Example of how to put together a very simple demo of  balls colliding with each other
 ///		 dcd is used in a very simple manner to detect the collisions between the spheres
