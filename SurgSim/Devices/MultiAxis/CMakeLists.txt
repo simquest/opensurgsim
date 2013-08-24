@@ -26,6 +26,8 @@ include_directories(
 )
 
 set(MULTIAXIS_DEVICE_SOURCES
+	MultiAxisDevice.cpp
+	PoseIntegrator.cpp
 	RawMultiAxisDevice.cpp
 	RawMultiAxisScaffold.cpp
 	RawMultiAxisThread.cpp
@@ -35,6 +37,8 @@ set(MULTIAXIS_DEVICE_SOURCES
 set(MULTIAXIS_DEVICE_HEADERS
 	CreateInputDeviceHandle.h
 	GetSystemError.h
+	MultiAxisDevice.h
+	PoseIntegrator.h
 	RawMultiAxisDevice.h
 	RawMultiAxisScaffold.h
 	RawMultiAxisThread.h

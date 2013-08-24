@@ -34,7 +34,8 @@ class Logger;
 namespace Device
 {
 
-/// A wrapper for system-dependent access to a input/HID device.
+/// Access to an input/HID device using the Input API in Linux.
+/// \sa	SystemInputDeviceHandle
 class InputDeviceHandle : public SystemInputDeviceHandle
 {
 public:
