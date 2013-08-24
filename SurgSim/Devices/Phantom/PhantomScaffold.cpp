@@ -306,7 +306,7 @@ PhantomScaffold::PhantomScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 {
 	if (! m_logger)
 	{
-		m_logger = SurgSim::Framework::Logger::createConsoleLogger("Phantom device");
+		m_logger = SurgSim::Framework::Logger::getLogger("Phantom device");
 		m_logger->setThreshold(m_defaultLogLevel);
 	}
 

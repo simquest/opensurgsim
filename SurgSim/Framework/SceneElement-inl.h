@@ -13,26 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Logger.h"
+#ifndef SURGSIM_FRAMEWORK_SCENEELEMENT_INL_H
+#define SURGSIM_FRAMEWORK_SCENEELEMENT_INL_H
 
-#include <iostream>
-
-
-namespace SurgSim
+/// Implementation of getComponents method to get all the components with type T
+/// \return The type T components
+template <class T>
+std::vector<std::shared_ptr<T>> SceneElement::getComponents() const
 {
-namespace Framework
-{
-	Logger::Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
-		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
-		m_name(name),
-		m_output(output)
-	{
-	}
+	std::vector<std::shared_ptr<T>> result;
 
-	std::shared_ptr<LoggerManager> Logger::getLoggerManager()
+	for (auto componentIt = m_components.begin(); componentIt != m_components.end(); ++componentIt)
 	{
-		static std::shared_ptr<LoggerManager> loggerManager = std::make_shared<LoggerManager>();
-		return loggerManager;
+		std::shared_ptr<T> typedElement = std::dynamic_pointer_cast<T>(componentIt->second);
+		if (typedElement)
+		{
+			result.emplace_back(std::move(typedElement));
+		}
 	}
+	return result;
 }
-}
+
+#endif

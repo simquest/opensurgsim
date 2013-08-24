@@ -112,7 +112,7 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 			p[0] = cubePoints[i][0] * lx;
 			p[1] = cubePoints[i][1] * ly;
 			p[2] = cubePoints[i][2] * lz;
-			TriangleMesh::Vertex v(p, emptyData);
+			TriangleMesh::VertexType v(p, emptyData);
 			mesh->addVertex(v);
 		}
 		for (int i = 0; i < cubeNumEdges; i++)
@@ -124,7 +124,7 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 				edgePoints[j] = cubeEdges[i][j];
 			}
 			EdgeElement edgeElement(edgePoints, emptyData);
-			TriangleMesh::Edge e(edgeElement);
+			TriangleMesh::EdgeType e(edgeElement);
 			mesh->addEdge(e);
 		}
 		for (int i = 0; i < cubeNumTriangles; i++)
@@ -136,7 +136,7 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 				trianglePoints[j] = cubeTrianglesCCW[i][j];
 			}
 			TriangleElement triangleElement(trianglePoints, emptyData);
-			TriangleMesh::Triangle t(triangleElement);
+			TriangleMesh::TriangleType t(triangleElement);
 			mesh->addTriangle(t);
 		}
 

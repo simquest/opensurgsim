@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISDEVICE_H
-#define SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISDEVICE_H
+#ifndef SURGSIM_DEVICES_MULTIAXIS_MULTIAXISDEVICE_H
+#define SURGSIM_DEVICES_MULTIAXIS_MULTIAXISDEVICE_H
 
 #include <memory>
 #include <string>
@@ -25,16 +25,17 @@ namespace SurgSim
 {
 namespace Device
 {
-class RawMultiAxisScaffold;
+
+class RawMultiAxisDevice;
+class PoseIntegrator;
 
 
 /// A class implementing the communication with a multi-axis controller input device, for example a 3DConnexion
 /// SpaceNavigator.
 ///
-/// This object will only generate raw output reported by the controller, which indicates the
-/// movement of the controller from its rest state.  Normally, that result will need to be integrated to allow the
-/// controller to be treated as a differential device, where holding the controller moves the pose and releasing
-/// the controller lets the pose hold steady in its new state.  The MultiAxisDevice class provides that.
+/// This object will integrate the output of the physical device, treating it as a differential device.  In other
+/// words, holding the controller moves the pose and releasing the controller lets the pose hold steady in its
+/// new state.
 ///
 /// \par Application input provided by the device:
 ///   | type       | name              |                                                                           |
@@ -50,17 +51,19 @@ class RawMultiAxisScaffold;
 ///   | ----       | ----              | ---                                                                       |
 ///   | bool       | "led1"            | If the device has at least one LED light, controls the first one.         |
 ///
-/// \sa MultiAxisDevice, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
-class RawMultiAxisDevice : public SurgSim::Input::CommonDevice
+/// \sa RawMultiAxisDevice, SurgSim::Input::DeviceInterface
+class MultiAxisDevice : public SurgSim::Input::DeviceInterface
 {
 public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	explicit RawMultiAxisDevice(const std::string& uniqueName);
+	explicit MultiAxisDevice(const std::string& uniqueName);
 
 	/// Destructor.
-	virtual ~RawMultiAxisDevice();
+	virtual ~MultiAxisDevice();
+
+	virtual std::string getName() const override;
 
 	virtual bool initialize() override;
 
@@ -68,6 +71,16 @@ public:
 
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
+
+	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
+
+	virtual bool removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
+
+	virtual bool setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
+
+	virtual bool removeOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
+
+	virtual bool hasOutputProducer() override;
 
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
@@ -95,31 +108,25 @@ private:
 	// Returns the default position scale, in meters per tick.
 	static double defaultPositionScale()
 	{
-		// the position scale from Paul N's measurements of the SpaceNavigator; 1/16"/350 ticks
-		return 0.0000045;
+		return 0.00001;
 	}
 
 	// Returns the default rotation scale, in radians per tick.
 	static double defaultOrientationScale()
 	{
-		// the rotation scale from Paul N's measurements of the SpaceNavigator
-		return 0.0003;
+		return 0.0001;
 	}
 
 
-	friend class RawMultiAxisScaffold;
-
-	std::shared_ptr<RawMultiAxisScaffold> m_scaffold;
-
-	/// Scale factor for the position axes; stored locally before the device is initialized.
-	double m_positionScale;
-	/// Scale factor for the orientation axes; stored locally before the device is initialized.
-	double m_orientationScale;
-	/// Controls whether dominance will be enabled; stored locally before the device is initialized.
-	bool m_useAxisDominance;
+	/// The device name.
+	std::string m_name;
+	/// The raw underlying device.
+	std::shared_ptr<RawMultiAxisDevice> m_rawDevice;
+	/// The pose integration filter.
+	std::shared_ptr<PoseIntegrator> m_filter;
 };
 
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MULTIAXIS_RAWMULTIAXISDEVICE_H
+#endif  // SURGSIM_DEVICES_MULTIAXIS_MULTIAXISDEVICE_H
