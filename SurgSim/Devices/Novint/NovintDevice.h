@@ -43,6 +43,7 @@ class NovintScaffold;
 ///   | bool       | "button2"   | %State of the second device button if present.                 |
 ///   | bool       | "button3"   | %State of the third device button (probably doesn't exist).    |
 ///   | bool       | "button4"   | %State of the third device button (probably doesn't exist).    |
+///   | bool       | "isHomed"   | %Device homing status.                                         |
 /// Note that \c button1 through \c 4 correspond to the buttons 0 through 3 provided by the
 /// HDAL SDK, but a custom Novint device might have fewer than 4 buttons.
 ///

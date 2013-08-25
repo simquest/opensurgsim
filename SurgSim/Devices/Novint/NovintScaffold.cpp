@@ -251,6 +251,8 @@ struct NovintScaffold::DeviceData
 	double transformBuffer[16];
 	/// The button state read from the device.
 	ButtonStates buttonStates;
+	/// The homing state read from the device.
+	bool isDeviceHomed;
 
 	/// The raw force to be written to the device.
 	double forceBuffer[3];
@@ -521,6 +523,10 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	hdlGripGetAttributesb(HDL_GRIP_BUTTON, info->buttonStates.size(), info->buttonStates.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
 
+	// Check the device's homing state.
+	unsigned int deviceStateBitmask = hdlGetState();
+	info->isDeviceHomed = ((deviceStateBitmask & HDAL_NOT_CALIBRATED) == 0);
+
 	// Set the force command (in newtons).
 
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
@@ -537,6 +543,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		inputData.booleans().set("button2", info->buttonStates[1]);
 		inputData.booleans().set("button3", info->buttonStates[2]);
 		inputData.booleans().set("button4", info->buttonStates[3]);
+		inputData.booleans().set("isHomed", info->isDeviceHomed);
 	}
 
 	return !fatalError;
@@ -702,6 +709,7 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	builder.addBoolean("button2");
 	builder.addBoolean("button3");
 	builder.addBoolean("button4");
+	builder.addBoolean("isHomed");
 	return builder.createData();
 }
 

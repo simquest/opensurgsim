@@ -73,7 +73,7 @@ void MovingSquareGlutWindow::handleInput(const std::string& device, const DataGr
 void MovingSquareGlutWindow::updateTool(const DataGroup& inputData)
 {
 	RigidTransform3d devicePose;
-	bool button1, button2, button3, button4;
+	bool button1, button2, button3, button4, isHomed;
 	if (! inputData.poses().get("pose", &devicePose))
 	{
 		return;  // not much we can do without a pose...
@@ -94,27 +94,42 @@ void MovingSquareGlutWindow::updateTool(const DataGroup& inputData)
 	{
 		button4 = false;
 	}
+	if (! inputData.booleans().get("isHomed", &isHomed))
+	{
+		isHomed = true;  // if device has no homing indication, never show as un-homed
+	}
 
 	m_tool->pose = devicePose;
 
-	Vector3d color(1.0, 1.0, 1.0);
+	// We generate the color as a linear combination from various states and buttons.  We start from plain white.
+	Vector3d unscaledColor(1.0, 1.0, 1.0);
+	double colorScale = 1;
+	if (! isHomed)
+	{
+		unscaledColor += Vector3d(1.0, 0.0, 0.0);  // if un-homed, show the device as red
+		colorScale += 1;
+	}
 	if (button1)
 	{
-		color.x() = 0.4;
+		unscaledColor += 1.5 * Vector3d(0.0, 1.0, 1.0);
+		colorScale += 1.5;
 	}
 	if (button2)
 	{
-		color.y() = 0.4;
+		unscaledColor += 1.5 * Vector3d(1.0, 0.0, 1.0);
+		colorScale += 1.5;
 	}
 	if (button3)
 	{
-		color.z() = 0.4;
+		unscaledColor += 1.5 * Vector3d(1.0, 1.0, 0.0);
+		colorScale += 1.5;
 	}
 	if (button4)
 	{
-		color = (color + Vector3d(0.7, 0.7, 0.7)) * 0.5;
+		unscaledColor += 1.5 * Vector3d(0.7, 0.7, 0.7);
+		colorScale += 1.5;
 	}
-	m_toolSphere->color = color;
+	m_toolSphere->color = unscaledColor * (1.0 / colorScale);
 }
 
 void MovingSquareGlutWindow::updateSquare(const DataGroup& inputData)
