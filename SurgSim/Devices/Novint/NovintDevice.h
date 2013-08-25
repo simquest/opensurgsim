@@ -39,18 +39,19 @@ class NovintScaffold;
 ///   | type       | name        |                                                                |
 ///   | ----       | ----        | ---                                                            |
 ///   | pose       | "pose"      | %Device pose (units are meters).                               |
-///   | bool       | "button1"   | %State of the first device button.                             |
+///   | bool       | "button1"   | %State of the first device button if present.                  |
 ///   | bool       | "button2"   | %State of the second device button if present.                 |
-///   | bool       | "button3"   | %State of the third device button (probably doesn't exist).    |
-///   | bool       | "button4"   | %State of the third device button (probably doesn't exist).    |
+///   | bool       | "button3"   | %State of the third device button if present.                  |
+///   | bool       | "button4"   | %State of the third device button if present.                  |
 ///   | bool       | "isHomed"   | %Device homing status.                                         |
 /// Note that \c button1 through \c 4 correspond to the buttons 0 through 3 provided by the
 /// HDAL SDK, but a custom Novint device might have fewer than 4 buttons.
 ///
 /// \par Application output used by the device:
-///   | type       | name        |                                                                |
-///   | ----       | ----        | ---                                                            |
-///   | vector     | "force"     | %Device output force (units are newtons).                      |
+///   | type       | name                  |                                                      |
+///   | ----       | ----                  | ---                                                  |
+///   | vector     | "force"               | %Device output force (units are newtons).            |
+///   | bool       | "gravityCompensation" | Enable or disable hardware gravity compensation.     |
 ///
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class NovintDevice : public SurgSim::Input::CommonDevice

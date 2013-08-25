@@ -509,6 +509,10 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		info->forceValue.setZero();
 	}
 
+	bool desiredGravityCompensation = false;
+	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
+
+
 	hdlMakeCurrent(info->deviceHandle.get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
@@ -527,11 +531,17 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	unsigned int deviceStateBitmask = hdlGetState();
 	info->isDeviceHomed = ((deviceStateBitmask & HDAL_NOT_CALIBRATED) == 0);
 
-	// Set the force command (in newtons).
+	// Set the force command (in newtons) and gravity compensation.
 
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 	//hdlGripSetAttributesd(HDL_GRIP_TORQUE, 3, info->torqueBuffer);  // 2nd arg is size
+
+	if (shouldSetGravityCompensation)
+	{
+		setGravityCompensation(info, desiredGravityCompensation);
+	}
+
 
 	{
 		RigidTransform3d pose;
@@ -644,6 +654,99 @@ bool NovintScaffold::stopScheduler()
 		return false;
 	}
 	return true;
+}
+
+
+bool NovintScaffold::getGravityCompensation(const NovintScaffold::DeviceData* info, bool* gravityCompensationState)
+{
+	bool state1 = true;
+	hdlGripGetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &state1);
+	if (checkForFatalError("Cannot get gravity compensation (#1)"))
+	{
+		return false;  // HDAL reported an error; an error message was already logged.
+	}
+
+	bool state2 = false;
+	hdlGripGetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &state2);
+	if (checkForFatalError("Cannot get gravity compensation (#2)"))
+	{
+		return false;  // HDAL reported an error; an error message was already logged.
+	}
+
+	if (state1 == true && state2 == false)
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
+			"' does nothing!";
+		return false;
+	}
+	else if (state1 != state2)
+	{
+		SURGSIM_LOG_WARNING(m_logger) << "getting gravity compensation state for '" << info->deviceObject->getName() <<
+			"' keeps changing?!?";
+		return false;
+	}
+
+	*gravityCompensationState = state1;
+	return true;
+}
+
+
+bool NovintScaffold::enforceGravityCompensation(const NovintScaffold::DeviceData* info, bool gravityCompensationState)
+{
+	bool initialState;
+	bool isInitialStateValid = getGravityCompensation(info, &initialState);
+
+	const int maxAttempts = 20;
+	for (int i = 0;  i < maxAttempts;  ++i)
+	{
+		bool state = gravityCompensationState;
+		hdlGripSetAttributeb(HDL_GRIP_GRAVITY_COMP, 1, &state);
+		if (checkForFatalError("Cannot set gravity compensation state"))
+		{
+			return false;  // HDAL reported an error; an error message was already logged.
+		}
+
+		if (! getGravityCompensation(info, &state))
+		{
+			return false;  // HDAL reported an error; an error message was already logged.
+		}
+		else if (state == gravityCompensationState)
+		{
+			// If the state has been changed, log a message.
+			if (isInitialStateValid && (initialState != gravityCompensationState))
+			{
+				if (gravityCompensationState)
+				{
+					SURGSIM_LOG_INFO(m_logger) << "gravity compensation for '" << info->deviceObject->getName() <<
+						"' changed to ENABLED.";
+				}
+				else
+				{
+					SURGSIM_LOG_INFO(m_logger) << "gravity compensation for '" << info->deviceObject->getName() <<
+						"' changed to disabled.";
+				}
+			}
+			return true;
+		}
+	}
+
+	SURGSIM_LOG_WARNING(m_logger) << "failed to set gravity compensation for '" << info->deviceObject->getName() <<
+		"' to " << (gravityCompensationState ? "enabled" : "disabled") << " after " << maxAttempts << " attempts";
+	return false;
+}
+
+
+bool NovintScaffold::setGravityCompensation(const NovintScaffold::DeviceData* info, bool gravityCompensationState)
+{
+	bool initialState;
+	bool isInitialStateValid = getGravityCompensation(info, &initialState);
+
+	if (isInitialStateValid && (initialState == gravityCompensationState))
+	{
+		return true;  // no need to do anything
+	}
+
+	return enforceGravityCompensation(info, gravityCompensationState);
 }
 
 

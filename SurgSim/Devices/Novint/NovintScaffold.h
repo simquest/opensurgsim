@@ -134,6 +134,31 @@ private:
 	/// \return	true on success.
 	bool stopScheduler();
 
+	/// Gets the gravity compensation flag for the current device.
+	/// \param info	The device data.
+	/// \param [out] gravityCompensationState	State of the gravity compensation flag.
+	/// \return	true if it succeeds, false if it fails.
+	bool getGravityCompensation(const DeviceData* info, bool* gravityCompensationState);
+
+	/// Attempts to force the gravity compensation flag for the current device to the specified value.
+	///
+	/// Sets the flag repeatedly, until it reports the desired value, in order to work around the problem where
+	/// attempts to set the gravity compensation do not always change the actual gravity compensation flag in the
+	/// device.
+	///
+	/// Logs a message if the state is known to have been changed.
+	///
+	/// \param info	The device data.
+	/// \param gravityCompensationState	Desired state of the gravity compensation flag.
+	/// \return	true if it succeeds, false if it fails.
+	bool enforceGravityCompensation(const DeviceData* info, bool gravityCompensationState);
+
+	/// Sets the gravity compensation flag for the current device, unless it's already set as desired.
+	/// \param info	The device data.
+	/// \param gravityCompensationState	Desired state of the gravity compensation flag.
+	/// \return	true if it succeeds, false if it fails.
+	bool setGravityCompensation(const DeviceData* info, bool gravityCompensationState);
+
 	/// Check for HDAL errors, display them, and signal fatal errors.
 	/// Exactly equivalent to <code>checkForFatalError(false, message)</code>.
 	/// \param message An additional descriptive message.
