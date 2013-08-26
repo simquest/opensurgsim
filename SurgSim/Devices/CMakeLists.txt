@@ -15,9 +15,9 @@
 
 
 add_subdirectory(IdentityPoseDevice)
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WINDDK_FOUND)
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
 	add_subdirectory(MultiAxis)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WINDDK_FOUND)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
 if(OPENHAPTICS_FOUND)
 	add_subdirectory(Phantom)
 endif(OPENHAPTICS_FOUND)
