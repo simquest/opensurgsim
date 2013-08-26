@@ -32,6 +32,11 @@
 using SurgSim::Device::NovintDevice;
 using SurgSim::Device::NovintScaffold;
 
+
+// Use common device names defined in the NovintDeviceTest code.
+extern const char* const NOVINT_TEST_DEVICE_NAME;
+
+
 TEST(NovintScaffoldTest, CreateAndDestroyScaffold)
 {
 	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
@@ -81,7 +86,7 @@ TEST(NovintScaffoldTest, ScaffoldLifeCycle)
 	}
 
 	{
-		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestNovint", "Default Novint");
+		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 		ASSERT_NE(nullptr, device) << "Creation failed.  Is a Novint device plugged in?";
 		// note: the device is NOT initialized!
 		{
@@ -102,7 +107,7 @@ TEST(NovintScaffoldTest, ScaffoldLifeCycle)
 	}
 
 	{
-		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestNovint", "Default Novint");
+		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 		{
@@ -132,7 +137,7 @@ TEST(NovintScaffoldTest, ScaffoldLifeCycle)
 	}
 
 	{
-		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestNovint", "Default Novint");
+		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Didn't this work a moment ago?";
 		std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
@@ -153,7 +158,7 @@ TEST(NovintScaffoldTest, CreateDeviceSeveralTimes)
 	{
 		SCOPED_TRACE(i);
 		EXPECT_EQ(nullptr, lastScaffold.lock());
-		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestNovint", "Default Novint");
+		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 		std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
@@ -172,7 +177,7 @@ TEST(NovintScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
 	for (int i = 0;  i < 6;  ++i)
 	{
 		SCOPED_TRACE(i);
-		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestNovint", "Default Novint");
+		std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", NOVINT_TEST_DEVICE_NAME);
 		ASSERT_NE(nullptr, device) << "Device creation failed.";
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 		std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();

@@ -26,9 +26,16 @@ using SurgSim::Device::NovintDevice;
 using SurgSim::Device::IdentityPoseDevice;
 
 
+// Define the HDAL name of the device to use.
+static const char* const NOVINT_DEVICE_NAME = "FALCON_HTHR_R";
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_FRANKEN_L";
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_BURRv3_1";
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_BURRv3_2";
+
+
 int main(int argc, char** argv)
 {
-	std::shared_ptr<NovintDevice> toolDevice = std::make_shared<NovintDevice>("NovintDevice", "Default Novint");
+	std::shared_ptr<NovintDevice> toolDevice = std::make_shared<NovintDevice>("NovintDevice", NOVINT_DEVICE_NAME);
 
 	// The square is controlled by a second device.  For a simple test, we're using an IdentityPoseDevice--
 	// a pretend device that doesn't actually move.
