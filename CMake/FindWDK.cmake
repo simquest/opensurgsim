@@ -22,9 +22,9 @@ if(NOT DEFINED WDK_CAN_BUILD_DIRECTLY)
 		${CMAKE_SOURCE_DIR}/CMake/tryCompileWdk  tryCompileWdk
 		OUTPUT_VARIABLE dbg_tryCompileWdk
 	)
-	message("OUT:${dbg_tryCompileWdk}")
+	#message("OUT:${dbg_tryCompileWdk}")
 endif(NOT DEFINED WDK_CAN_BUILD_DIRECTLY)
-	
+
 if(WDK_CAN_BUILD_DIRECTLY)
 	# No include directory is needed.  Set it to . for convenience in other files.
 	set(WDK_INCLUDE_DIR . CACHE PATH "Include directory for the WDK.")
