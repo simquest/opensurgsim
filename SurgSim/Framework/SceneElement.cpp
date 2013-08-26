@@ -39,7 +39,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_runtime.lock()->getLogger("runtime")) <<
+		SURGSIM_LOG_WARNING(Logger::getLogger("runtime")) <<
 				"Component with name " << component->getName() <<
 				" already exists on SceneElement " << getName() <<
 				", did not add component";

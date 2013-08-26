@@ -23,7 +23,7 @@ namespace Framework
 {
 
 LogMessageBase::LogMessageBase(Logger* logger, int level)
-	: m_logger(logger)
+	: m_stream(), m_logger(logger)
 {
 	SURGSIM_ASSERT(logger) << "logger should not be a null pointer";
 	static std::string levelNames[5] = {"DEBUG   ", "INFO    ", "WARNING ", "SEVERE  ","CRITICAL"};

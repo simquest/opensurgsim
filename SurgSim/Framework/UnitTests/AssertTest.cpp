@@ -50,7 +50,8 @@ public:
 	void SetUp()
 	{
 		logOutput = std::make_shared<MockOutput>();
-		testLogger = std::unique_ptr<SurgSim::Framework::Logger>(new SurgSim::Framework::Logger("test", logOutput));
+		testLogger = SurgSim::Framework::Logger::getLogger("test");
+		testLogger->setOutput(logOutput);
 		// testLogger will be used for assertions in most tests, due to the definition of SURGSIM_ASSERT_LOGGER below.
 		savedCallback = SurgSim::Framework::AssertMessage::getFailureCallback();
 	}
@@ -63,7 +64,7 @@ public:
 	}
 
 	std::shared_ptr<MockOutput> logOutput;
-	std::unique_ptr<SurgSim::Framework::Logger> testLogger;
+	std::shared_ptr<SurgSim::Framework::Logger> testLogger;
 	SurgSim::Framework::AssertMessage::DeathCallback savedCallback;
 };
 

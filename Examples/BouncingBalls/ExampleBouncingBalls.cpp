@@ -21,6 +21,7 @@
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
+#include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
@@ -45,8 +46,11 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
+#include "AddSphereBehavior.h"
+
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
@@ -66,6 +70,9 @@ using SurgSim::Physics::PhysicsManager;
 ///\file Example of how to put together a very simple demo of  balls colliding with each other
 ///		 dcd is used in a very simple manner to detect the collisions between the spheres
 
+std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data,
+										   const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
+
 /// Simple behavior to show that the spheres are moving while we don't have graphics
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
@@ -76,7 +83,7 @@ public:
 
 	virtual void update(double dt)
 	{
-		std::shared_ptr<SurgSim::Framework::Logger> logger = getRuntime()->getLogger("printout");
+		std::shared_ptr<SurgSim::Framework::Logger> logger = Logger::getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 	}
@@ -121,7 +128,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 
 	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
-	uniform->set(Vector4f(1.0f, 0.5f, 0.0f, 1.0f));
+	uniform->set(Vector4f(0.0f, 0.6f, 1.0f, 0.0f));
 	material->addUniform(uniform);
 
 	shader->setFragmentShaderSource(
@@ -143,8 +150,12 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 							   physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
+
+	planeElement->addComponent(std::make_shared<AddSphereBehavior>());
+
 	return planeElement;
 }
+
 
 std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
@@ -191,7 +202,6 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
-
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								physicsRepresentation, graphicsRepresentation));
 	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
@@ -249,14 +259,11 @@ int main(int argc, char* argv[])
 {
 	const SurgSim::Framework::ApplicationData data("config.txt");
 
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
-
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
-
-	
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 
 	runtime->addManager(physicsManager);
 	runtime->addManager(graphicsManager);
@@ -266,8 +273,10 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(createSphere(data, "sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
+
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
+
 	scene->addSceneElement(createPlane(data, "plane1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
 

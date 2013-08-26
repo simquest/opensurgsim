@@ -13,26 +13,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Logger.h"
+#ifndef SURGSIM_BLOCKS_SPHEREELEMENT_H
+#define SURGSIM_BLOCKS_SPHEREELEMENT_H
 
-#include <iostream>
+#include <SurgSim/Framework/SceneElement.h>
+
+#include <SurgSim/Math/RigidTransform.h>
 
 
 namespace SurgSim
 {
-namespace Framework
-{
-	Logger::Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
-		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
-		m_name(name),
-		m_output(output)
-	{
-	}
 
-	std::shared_ptr<LoggerManager> Logger::getLoggerManager()
-	{
-		static std::shared_ptr<LoggerManager> loggerManager = std::make_shared<LoggerManager>();
-		return loggerManager;
-	}
-}
-}
+namespace Blocks
+{
+
+class SphereElement : public SurgSim::Framework::SceneElement
+{
+public:
+
+	explicit SphereElement(const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
+
+	~SphereElement();
+
+
+protected:
+	virtual bool doInitialize();
+
+	virtual bool doWakeUp();
+
+
+private:
+	std::string m_name;
+	SurgSim::Math::RigidTransform3d m_pose;
+
+};
+
+
+};
+};
+
+#endif

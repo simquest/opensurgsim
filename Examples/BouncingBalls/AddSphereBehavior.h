@@ -13,26 +13,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Logger.h"
+#ifndef ADDSPHEREBEHAVIOR_H
+#define ADDSPHEREBEHAVIOR_H
 
-#include <iostream>
+#include <SurgSim/Framework/Behavior.h>
+#include <SurgSim/Framework/Scene.h>
 
+/// An example class to add sphere elements into scene dynamically. 
+/// AddSphereBehavior will be updated by BehaviorManager through
+/// update() call.
 
-namespace SurgSim
+class AddSphereBehavior : public SurgSim::Framework::Behavior
 {
-namespace Framework
-{
-	Logger::Logger(const std::string& name, std::shared_ptr<LogOutput> output) :
-		m_threshold(LOG_LEVEL_DEBUG), // include all logging levels
-		m_name(name),
-		m_output(output)
+public:
+	explicit AddSphereBehavior();
+
+	~AddSphereBehavior();
+
+	virtual void update(double dt);
+
+protected:
+	virtual bool doInitialize()
 	{
+		return true;
+	}
+	virtual bool doWakeUp()
+	{
+		return true;
 	}
 
-	std::shared_ptr<LoggerManager> Logger::getLoggerManager()
-	{
-		static std::shared_ptr<LoggerManager> loggerManager = std::make_shared<LoggerManager>();
-		return loggerManager;
-	}
-}
-}
+private:
+	double m_totalTime;
+	int m_numElements;
+};
+
+#endif

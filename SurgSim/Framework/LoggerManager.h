@@ -19,12 +19,13 @@
 #include <unordered_map>
 #include <boost/thread/mutex.hpp>
 
-#include <SurgSim/Framework/Logger.h>
-
 namespace SurgSim
 {
 namespace Framework
 {
+
+class Logger;
+class LogOutput;
 
 /// Class to safely handle access to a group of loggers, manipulate the global
 /// logging threshold, and fetch logger(s) from a global pool

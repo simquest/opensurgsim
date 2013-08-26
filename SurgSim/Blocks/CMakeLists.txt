@@ -24,11 +24,13 @@ include_directories(
 
 set(SURGSIM_BLOCKS_SOURCES
 	BasicSceneElement.cpp
+	SphereElement.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
 	RepresentationPoseBehavior.h
+	SphereElement.h
 )
 
 surgsim_add_library(
