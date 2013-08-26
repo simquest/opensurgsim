@@ -37,8 +37,8 @@ OsgRenderTarget<T>::OsgRenderTarget(
 		bool useDepth) :
 	m_width(width * scale),
 	m_height(height * scale),
-	m_textures(OsgSupportedTextureCount),
-	m_colorTargetCount(0)
+	m_colorTargetCount(0),
+	m_textures(OsgSupportedTextureCount)
 {
 	setColorTargetCount(colorCount);
 	useDepthTarget(useDepth);

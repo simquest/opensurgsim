@@ -238,7 +238,7 @@ void OsgCamera::detachCurrentRenderTarget()
 	{
 		if (m_renderTarget->doesUseDepthTarget())
 		{
-			m_camera->detach(osg::Camera::BufferComponent::DEPTH_BUFFER);
+			m_camera->detach(osg::Camera::DEPTH_BUFFER);
 		}
 		for (int i = 0; i < m_renderTarget->getColorTargetCount(); ++i)
 		{
