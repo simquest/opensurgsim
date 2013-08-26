@@ -43,8 +43,8 @@ set(RAW_EXAMPLE_HEADERS
 set(LIBS MultiAxisDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
 	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
-if(WINDDK_FOUND)
-	list(APPEND LIBS ${WINDDK_LIBRARIES})
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
 add_executable(MultiAxisVisualTest
