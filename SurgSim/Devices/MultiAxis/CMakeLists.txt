@@ -24,17 +24,19 @@ include_directories(
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
 )
-include_directories(
-	# This is a hack needed to get the Visual Studio includes into the
-	# include path ahead of the WDK ones, which is needed for the WDK
-	# 7.1.0 not to interfere with includes provided by Visual Studio.
-	# CMake will prefix this entry by the current path, but Visual
-	# Studio will split the path at the semicolon; the net effect is to
-	# add $(IncludePath) to the Visual Studio include directories.
-	".;$(IncludePath)"
-	# Now it's safe to add ${WDK_INCLUDE_DIR}.
-	"${WDK_INCLUDE_DIR}"
-)
+if(WDK_FOUND)
+	include_directories(
+		# This is a hack needed to get the Visual Studio includes into the
+		# include path ahead of the WDK ones, which is needed for the WDK
+		# 7.1.0 not to interfere with includes provided by Visual Studio.
+		# CMake will prefix this entry by the current path, but Visual
+		# Studio will split the path at the semicolon; the net effect is to
+		# add $(IncludePath) to the Visual Studio include directories.
+		".;$(IncludePath)"
+		# Now it's safe to add ${WDK_INCLUDE_DIR}.
+		"${WDK_INCLUDE_DIR}"
+	)
+endif(WDK_FOUND)
 
 set(MULTIAXIS_DEVICE_SOURCES
 	MultiAxisDevice.cpp
