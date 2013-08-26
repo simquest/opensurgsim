@@ -123,7 +123,7 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	params.setDensity(700.0); // Wood
 	params.setLinearDamping(0.1);
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
+	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 1cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
 	physicsRepresentation->setInitialParameters(params);
@@ -166,7 +166,7 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
-	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
+	//sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								physicsRepresentation, graphicsRepresentation));
 	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
@@ -178,8 +178,6 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 
 int main(int argc, char* argv[])
 {
-	const SurgSim::Framework::ApplicationData data("config.txt");
-
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
