@@ -206,7 +206,7 @@ TEST(NovintDeviceTest, InputConsumer)
 
 	// Sleep for a second, to see how many times the consumer is invoked.
 	// (A Novint device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(10000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
@@ -214,8 +214,8 @@ TEST(NovintDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->removeInputConsumer(consumer));
 
 	// Check the number of invocations.
-	EXPECT_GE(consumer->m_numTimesReceivedInput, 700);
-	EXPECT_LE(consumer->m_numTimesReceivedInput, 1300);
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 10*700);
+	EXPECT_LE(consumer->m_numTimesReceivedInput, 10*1300);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button1"));
@@ -238,7 +238,7 @@ TEST(NovintDeviceTest, OutputProducer)
 
 	// Sleep for a second, to see how many times the producer is invoked.
 	// (A Novint Falcon device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(10000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
 
@@ -246,6 +246,6 @@ TEST(NovintDeviceTest, OutputProducer)
 	EXPECT_FALSE(device->removeOutputProducer(producer));
 
 	// Check the number of invocations.
-	EXPECT_GE(producer->m_numTimesRequestedOutput, 700);
-	EXPECT_LE(producer->m_numTimesRequestedOutput, 1300);
+	EXPECT_GE(producer->m_numTimesRequestedOutput, 10*700);
+	EXPECT_LE(producer->m_numTimesRequestedOutput, 10*1300);
 }
