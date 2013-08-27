@@ -27,6 +27,7 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${GLUT_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -48,8 +49,18 @@ add_executable(Input-VtcSphere
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 	
-set(LIBS MultiAxisDevice SurgSimBlocks SurgSimInput SurgSimFramework SurgSimDataStructures
-	SurgSimPhysics SurgSimGraphics ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY}
+set(LIBS 
+	IdentityPoseDevice
+	MultiAxisDevice
+	SurgSimBlocks
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimGraphics
+	SurgSimInput
+	SurgSimPhysics
+	VisualTestCommon
+	${OPENSCENEGRAPH_LIBRARIES} 
+	${OPENTHREADS_LIBRARY}
 	${Boost_LIBRARIES})
 if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})

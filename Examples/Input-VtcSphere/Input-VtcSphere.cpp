@@ -18,7 +18,9 @@
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
 #include <SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h>
+#include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Log.h>
@@ -33,6 +35,7 @@
 #include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Input/DeviceInterface.h>
 #include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
@@ -46,6 +49,11 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
+
+
+#include <GL/glut.h>
+#include "SurgSim/Testing/VisualTestCommon/MovingSquareForce.h"
+#include "SurgSim/Testing/VisualTestCommon/MovingSquareGlutWindow.h"
 
 
 using SurgSim::Blocks::BasicSceneElement;
@@ -130,7 +138,8 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name,
 	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
-	sphereElement->addComponent(physicsRepresentation);
+	//sphereElement->addComponent(physicsRepresentation);
+	sphereElement->addComponent(vtcRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								physicsRepresentation, graphicsRepresentation));
@@ -148,13 +157,21 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
-
-
-
-	std::shared_ptr<SurgSim::Device::RawMultiAxisDevice> device = std::make_shared<SurgSim::Device::RawMultiAxisDevice>("TestRawMultiAxis");
-	device->initialize();
-	inputManager->addDevice(device);
-
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	std::shared_ptr<SurgSim::Device::MultiAxisDevice> toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
+	toolDevice->setPositionScale(0.00002);
+	toolDevice->setOrientationScale(0.0005);
+	toolDevice->setAxisDominance(false);
+	if (! toolDevice->initialize())
+	{
+		printf("Could not initialize device '%s' for the tool.\n"
+			"--- Press Enter to quit the application! ---\n", toolDevice->getName().c_str());
+		getc(stdin);
+		return -1;
+	}
+	inputManager->addDevice(toolDevice);
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 
@@ -174,7 +191,19 @@ int main(int argc, char* argv[])
 
 	runtime->setScene(scene);
 
+
+	std::shared_ptr<MovingSquareGlutWindow> squareGlutWindow =
+		std::make_shared<MovingSquareGlutWindow>(toolDevice->getName(), toolDevice->getName());
+	toolDevice->addInputConsumer(squareGlutWindow);
+
+	// Wait for a key; the display, force generation, etc. all happen in separate threads.
+	getc(stdin);
+
+	toolDevice->removeInputConsumer(squareGlutWindow);
+
+
 	runtime->execute();
+
 
 	return 0;
 }
