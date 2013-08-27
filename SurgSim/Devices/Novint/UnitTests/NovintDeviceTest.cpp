@@ -28,6 +28,7 @@
 #include <SurgSim/Input/OutputProducerInterface.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Matrix.h>
+#include <SurgSim/Framework/Clock.h>
 
 using SurgSim::Device::NovintDevice;
 using SurgSim::Device::NovintScaffold;
@@ -36,6 +37,7 @@ using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
+using SurgSim::Framework::Clock;
 
 
 // Define common device names used in the Novint device tests.
@@ -131,7 +133,7 @@ static void testCreateDeviceSeveralTimes(bool doSleep)
 		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Novint device plugged in?";
 		if (doSleep)
 		{
-			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
+			boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(100));
 		}
 		// the device will be destroyed here
 	}
@@ -204,7 +206,7 @@ TEST(NovintDeviceTest, InputConsumer)
 
 	// Sleep for a second, to see how many times the consumer is invoked.
 	// (A Novint device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
@@ -236,7 +238,7 @@ TEST(NovintDeviceTest, OutputProducer)
 
 	// Sleep for a second, to see how many times the producer is invoked.
 	// (A Novint Falcon device is supposed to run at 1KHz.)
-	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
+	boost::this_thread::sleep_until(Clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeOutputProducer(producer));
 
