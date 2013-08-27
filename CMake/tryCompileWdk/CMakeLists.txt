@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-add_subdirectory(IdentityPoseDevice)
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-	add_subdirectory(MultiAxis)
-endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-if(OPENHAPTICS_FOUND)
-	add_subdirectory(Phantom)
-endif(OPENHAPTICS_FOUND)
-if(SIXENSE_SDK_FOUND)
-	add_subdirectory(Sixense)
-endif(SIXENSE_SDK_FOUND)
+project(tryCompileWdk)
+add_executable(tryCompileWdk main.cpp)
+target_link_libraries(tryCompileWdk hid setupapi)
