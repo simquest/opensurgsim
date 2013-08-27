@@ -22,6 +22,7 @@
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/thread.hpp>
 
 #include <hdl/hdl.h>
 
@@ -31,6 +32,7 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/Clock.h>
 #include <SurgSim/Framework/SharedInstance.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/DataStructures/DataGroupBuilder.h>
@@ -39,6 +41,8 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
+
+using SurgSim::Framework::Clock;
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
@@ -244,6 +248,8 @@ struct NovintScaffold::DeviceData
 
 	/// The device handle wrapper.
 	NovintScaffold::Handle deviceHandle;
+	/// Time of the initialization of the handle.
+	Clock::time_point initializationTime;
 
 	/// The raw position read from the device.
 	double positionBuffer[3];
@@ -410,6 +416,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 	{
 		return false;   // message already printed
 	}
+	info->initializationTime = Clock::now();
 	m_state->activeDeviceList.emplace_back(std::move(info));
 
 	if (m_state->activeDeviceList.size() == 1)
@@ -446,6 +453,12 @@ bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
 	}
 	else
 	{
+		// The HDAL seems to do bad things (and the CRT complains) if we uninitialize the device too soon.
+		const int MINIMUM_LIFETIME_MILLISECONDS = 500;
+		Clock::time_point earliestEndTime =
+			savedInfo->initializationTime + boost::chrono::milliseconds(MINIMUM_LIFETIME_MILLISECONDS);
+		boost::this_thread::sleep_until(earliestEndTime);
+
 		// The destroy-pop-create structure of this code mirrors the structure of the OpenHaptics code, and
 		// probably isn't necessary when using the HDAL.
 		destroyHapticLoop();
@@ -471,9 +484,9 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 		return false;  // message was already printed
 	}
 
-	// Enable forces.
+	// Select the handle.
 	hdlMakeCurrent(info->deviceHandle.get());
-	checkForFatalError("Couldn't enable forces");
+	checkForFatalError("Couldn't enable the handle");
 
 	return true;
 }
