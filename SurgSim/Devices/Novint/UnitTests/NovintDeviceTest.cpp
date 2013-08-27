@@ -100,7 +100,9 @@ TEST(NovintDeviceTest, CreateAndInitializeDevice)
 	EXPECT_TRUE(device->isInitialized());
 }
 
-TEST(NovintDeviceTest, CreateAndInitializeDefaultDevice)
+// Note: this should work if the "Default Falcon" device can be initialized... but we have no reason to think it can,
+// so I'm going to disable the test.
+TEST(NovintDeviceTest, DISABLED_CreateAndInitializeDefaultDevice)
 {
 	//NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 	std::shared_ptr<NovintDevice> device = std::make_shared<NovintDevice>("TestFalcon", "");
