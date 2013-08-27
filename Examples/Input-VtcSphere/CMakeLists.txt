@@ -47,15 +47,14 @@ add_executable(Input-VtcSphere
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+	
+set(LIBS MultiAxisDevice SurgSimBlocks SurgSimInput SurgSimFramework SurgSimDataStructures
+	SurgSimPhysics SurgSimGraphics ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY}
+	${Boost_LIBRARIES})
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
 
 target_link_libraries(Input-VtcSphere
-	SurgSimFramework
-	SurgSimBlocks
-	SurgSimDataStructures
-	SurgSimPhysics
-	SurgSimGraphics
-	SurgSimInput
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
+	${LIBS}
 )

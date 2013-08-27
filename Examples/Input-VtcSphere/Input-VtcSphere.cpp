@@ -18,7 +18,7 @@
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
-#include <SurgSim/Framework/ApplicationData.h>
+#include <SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Log.h>
@@ -28,7 +28,6 @@
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgPlaneRepresentation.h>
 #include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 #include <SurgSim/Graphics/OsgUniform.h>
@@ -39,7 +38,6 @@
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
@@ -55,7 +53,6 @@ using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
-using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgTexture2d;
@@ -64,43 +61,12 @@ using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::DoubleSidedPlaneShape;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::VtcRigidParameters;
 using SurgSim::Physics::VtcRigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
-///\file Example of how to put together a very simple demo of  balls colliding with each other
-///		 dcd is used in a very simple manner to detect the collisions between the spheres
-
-/// Simple behavior to show that the spheres are moving while we don't have graphics
-class PrintoutBehavior : public SurgSim::Framework::Behavior
-{
-public:
-	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
-		Behavior("PrintoutBehavior"), m_representation(representation) {}
-	~PrintoutBehavior() {}
-
-	virtual void update(double dt)
-	{
-		std::shared_ptr<SurgSim::Framework::Logger> logger = Logger::getLogger("printout");
-		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
-								  m_representation->getPose().translation().transpose();
-	}
-protected:
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
-
-private:
-	std::shared_ptr<RigidRepresentation> m_representation;
-};
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
 {
@@ -113,7 +79,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
-std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
+std::shared_ptr<SceneElement> createSphere(const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
@@ -166,7 +132,6 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
-	//sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								physicsRepresentation, graphicsRepresentation));
 	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
@@ -184,6 +149,13 @@ int main(int argc, char* argv[])
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
 
+
+
+	std::shared_ptr<SurgSim::Device::RawMultiAxisDevice> device = std::make_shared<SurgSim::Device::RawMultiAxisDevice>("TestRawMultiAxis");
+	device->initialize();
+	inputManager->addDevice(device);
+
+
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 
 	runtime->addManager(physicsManager);
@@ -193,7 +165,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
-	scene->addSceneElement(createSphere(data, "sphere1",
+	scene->addSceneElement(createSphere("sphere1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
