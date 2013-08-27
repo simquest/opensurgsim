@@ -30,10 +30,12 @@ include_directories(
 )
 
 set(EXAMPLE_SOURCES
+	AddSphereBehavior.cpp
 	ExampleBouncingBalls.cpp
 )
 
 set(EXAMPLE_HEADERS
+	AddSphereBehavior.h
 )
 
 # Configure the path for the data files
@@ -44,6 +46,8 @@ configure_file(
 
 add_executable(ExampleBouncingBalls
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+surgsim_show_ide_folders(
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
 target_link_libraries(ExampleBouncingBalls
 	SurgSimFramework

@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	MultiAxisDeviceTest.cpp
 	RawMultiAxisDeviceTest.cpp
 	RawMultiAxisScaffoldTest.cpp
 )
@@ -29,6 +30,9 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS MultiAxisDevice SurgSimInput SurgSimFramework SurgSimDataStructures
 	gtest ${Boost_LIBRARIES})
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by

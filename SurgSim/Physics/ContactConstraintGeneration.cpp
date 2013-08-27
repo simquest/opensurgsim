@@ -33,7 +33,7 @@ namespace Physics
 
 ContactConstraintGeneration::ContactConstraintGeneration(bool doCopyState) : Computation(doCopyState)
 {
-	m_logger = SurgSim::Framework::Logger::createConsoleLogger("ContactConstraintGeneration");
+	m_logger = SurgSim::Framework::Logger::getLogger("ContactConstraintGeneration");
 }
 
 ContactConstraintGeneration::~ContactConstraintGeneration()

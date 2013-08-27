@@ -46,12 +46,27 @@ struct CommonDevice::State
 
 
 CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
-	m_name(name), m_initialInputData(inputData), m_inputData(inputData), m_state(new State)
+	m_name(name),
+	m_nameForCallback(name),
+	m_initialInputData(inputData),
+	m_inputData(inputData),
+	m_state(new State)
 {
 }
 
 CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData) :
-	m_name(name), m_initialInputData(inputData), m_inputData(std::move(inputData)), m_state(new State)
+	m_name(name),
+	m_nameForCallback(name),
+	m_initialInputData(inputData),
+	m_inputData(std::move(inputData)),
+	m_state(new State)
+{
+}
+
+CommonDevice::CommonDevice(const std::string& name) :
+	m_name(name),
+	m_nameForCallback(name),
+	m_state(new State)
 {
 }
 
@@ -64,12 +79,24 @@ std::string CommonDevice::getName() const
 	return m_name;
 }
 
+void CommonDevice::setNameForCallback(const std::string& name)
+{
+	m_nameForCallback = name;
+}
+
+std::string CommonDevice::getNameForCallback() const
+{
+	return m_nameForCallback;
+}
+
 bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer)
 {
 	if (! inputConsumer)
 	{
 		return false;
 	}
+
+	SURGSIM_ASSERT(m_initialInputData.isValid());
 
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
@@ -79,7 +106,9 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 			return false;
 		}
 	}
-	inputConsumer->initializeInput(m_name, m_initialInputData);
+	// NB: callbacks are called with the local m_nameForCallback.
+	// This allows e.g. filters to call their callbacks with a name different from their "real" name.
+	inputConsumer->initializeInput(m_nameForCallback, m_initialInputData);
 	m_state->inputConsumerList.emplace_back(std::move(inputConsumer));
 	return true;
 }
@@ -144,10 +173,14 @@ bool CommonDevice::hasOutputProducer()
 
 void CommonDevice::pushInput()
 {
+	SURGSIM_ASSERT(m_inputData.isValid());
+
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
 	{
-		(*it)->handleInput(m_name, m_inputData);
+		// NB: callbacks are called with the local m_nameForCallback.
+		// This allows e.g. filters to call their callbacks with a name different from their "real" name.
+		(*it)->handleInput(m_nameForCallback, m_inputData);
 	}
 }
 
@@ -156,7 +189,9 @@ bool CommonDevice::pullOutput()
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	if (m_state->outputProducer)
 	{
-		bool gotOutput = m_state->outputProducer->requestOutput(m_name, &m_outputData);
+		// NB: callbacks are called with the local m_nameForCallback.
+		// This allows e.g. filters to call their callbacks with a name different from their "real" name.
+		bool gotOutput = m_state->outputProducer->requestOutput(m_nameForCallback, &m_outputData);
 		if (gotOutput)
 		{
 			return true;
@@ -170,7 +205,6 @@ bool CommonDevice::pullOutput()
 
 	return false;
 }
-
 
 
 };  // namespace Input

@@ -31,6 +31,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	BehaviorManager.cpp
 	ComponentManager.cpp
 	Logger.cpp
+	LoggerManager.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
 	Representation.cpp
@@ -54,6 +55,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LockedContainer.h
 	Log.h
 	Logger.h
+	LoggerManager.h
 	LogMacros.h
 	LogMessage.h
 	LogMessageBase.h
@@ -63,6 +65,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Runtime.h
 	Scene.h
 	SceneElement.h
+	SceneElement-inl.h
 	SharedInstance.h
 	SharedInstance-inl.h
 )

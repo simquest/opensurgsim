@@ -23,6 +23,8 @@
 #include "SurgSim/Math/Vector.h"
 #include "gtest/gtest.h"
 
+#include "MockObjects.h"
+
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 
@@ -38,6 +40,7 @@ TEST(DataGroupTests, CanConstruct)
 	builder.addInteger("test");
 	builder.addBoolean("test");
 	builder.addString("test");
+	builder.addCustom("test");
 	DataGroup data = builder.createData();
 
 	EXPECT_TRUE(data.isValid());
@@ -58,6 +61,7 @@ TEST(DataGroupTests, CanCreateShared)
 	builder.addInteger("test");
 	builder.addBoolean("test");
 	builder.addString("test");
+	builder.addCustom("test");
 	std::shared_ptr<DataGroup> data = builder.createSharedData();
 
 	EXPECT_TRUE(data->isValid());
@@ -85,6 +89,7 @@ TEST(DataGroupTests, PutName)
 	builder.addInteger("integer");
 	builder.addBoolean("boolean");
 	builder.addString("string");
+	builder.addCustom("mock_data");
 	DataGroup data = builder.createData();
 
 	const SurgSim::Math::Vector3d vector(1.23, 4.56, 7.89);
@@ -94,6 +99,9 @@ TEST(DataGroupTests, PutName)
 	DataGroup::DynamicMatrixType matrix(2,3);
 	matrix.fill(3.0);
 
+	Mock3DData<double> mockData(10,10,10);
+	mockData.set(5, 5, 5, 1.2345);
+
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
 	data.matrices().set("matrix", matrix);
@@ -101,6 +109,7 @@ TEST(DataGroupTests, PutName)
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
 	data.strings().set("string", "string");
+	data.customData().set("mock_data", mockData);
 
 	EXPECT_TRUE(data.poses().hasEntry("pose"));
 	EXPECT_TRUE(data.poses().hasData("pose"));
@@ -122,6 +131,9 @@ TEST(DataGroupTests, PutName)
 
 	EXPECT_TRUE(data.strings().hasEntry("string"));
 	EXPECT_TRUE(data.strings().hasData("string"));
+
+	EXPECT_TRUE(data.customData().hasEntry("mock_data"));
+	EXPECT_TRUE(data.customData().hasData("mock_data"));
 }
 
 /// Getting data from the container.
@@ -135,6 +147,7 @@ TEST(DataGroupTests, GetName)
 	builder.addInteger("integer");
 	builder.addBoolean("boolean");
 	builder.addString("string");
+	builder.addCustom("mock_data");
 	DataGroup data = builder.createData();
 
 	const SurgSim::Math::Vector3d vector(1.23, 4.56, 7.89);
@@ -144,6 +157,10 @@ TEST(DataGroupTests, GetName)
 	DataGroup::DynamicMatrixType matrix(2,3);
 	matrix.fill(3.0);
 
+	Mock3DData<double> mockData(10,10,10);
+	mockData.set(5, 5, 5, 1.23);
+	mockData.set(1, 2, 3, 4.56);
+
 	data.poses().set("pose", pose);
 	data.vectors().set("vector", vector);
 	data.matrices().set("matrix", matrix);
@@ -151,6 +168,7 @@ TEST(DataGroupTests, GetName)
 	data.integers().set("integer", 123);
 	data.booleans().set("boolean", true);
 	data.strings().set("string", "string");
+	data.customData().set("mock_data", mockData);
 
 	{
 		SurgSim::Math::RigidTransform3d value = SurgSim::Math::RigidTransform3d::Identity();
@@ -190,6 +208,12 @@ TEST(DataGroupTests, GetName)
 		EXPECT_TRUE(data.strings().get("string", &value));
 		EXPECT_EQ("string", value);
 	}
+	{
+		Mock3DData<double> value;
+		EXPECT_TRUE(data.customData().get("mock_data", &value));
+		EXPECT_NEAR(1.23, value.get(5, 5, 5), 1e-9);
+		EXPECT_NEAR(4.56, value.get(1, 2, 3), 1e-9);
+	}
 }
 
 /// Resetting the data in the container.
@@ -199,10 +223,12 @@ TEST(DataGroupTests, ResetAll)
 	builder.addPose("first");
 	builder.addScalar("second");
 	builder.addString("third");
+	builder.addCustom("fourth");
 	DataGroup data = builder.createData();
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
+	data.customData().set("fourth", Mock3DData<double>(10, 10, 10));
 
 	data.resetAll();
 
@@ -214,6 +240,9 @@ TEST(DataGroupTests, ResetAll)
 
 	EXPECT_TRUE(data.strings().hasEntry("third"));
 	EXPECT_FALSE(data.strings().hasData("third"));
+
+	EXPECT_TRUE(data.customData().hasEntry("fourth"));
+	EXPECT_FALSE(data.customData().hasData("fourth"));
 }
 
 /// Resetting one data entry at a time.
@@ -223,10 +252,12 @@ TEST(DataGroupTests, ResetOne)
 	builder.addPose("first");
 	builder.addScalar("second");
 	builder.addString("third");
+	builder.addCustom("fourth");
 	DataGroup data = builder.createData();
 
 	data.scalars().set("second", 1.23);
 	data.strings().set("third", "hello");
+	data.customData().set("fourth", Mock3DData<double>(10, 10, 10));
 
 	data.strings().reset("third");
 
@@ -238,6 +269,9 @@ TEST(DataGroupTests, ResetOne)
 
 	EXPECT_TRUE(data.strings().hasEntry("third"));
 	EXPECT_FALSE(data.strings().hasData("third"));
+
+	EXPECT_TRUE(data.customData().hasEntry("fourth"));
+	EXPECT_TRUE(data.customData().hasData("fourth"));
 
 	data.scalars().reset("second");
 

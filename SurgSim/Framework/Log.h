@@ -30,6 +30,7 @@
 /// Not meant for public consumption.
 
 #include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/LoggerManager.h"
 #include "SurgSim/Framework/LogMessage.h"
 #include "SurgSim/Framework/LogOutput.h"
 #include "SurgSim/Framework/LogMacros.h"

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_MESHVERTEX_H
-#define SURGSIM_DATASTRUCTURES_MESHVERTEX_H
+#ifndef SURGSIM_DATASTRUCTURES_VERTEX_H
+#define SURGSIM_DATASTRUCTURES_VERTEX_H
 
 #include <SurgSim/Math/Vector.h>
 
@@ -29,8 +29,8 @@ namespace DataStructures
 /// Vertex structure for meshes. Vertices are the lowest level of structure in a Mesh, providing a position and can
 /// store extra per-vertex data. MeshElements combine MeshVertices to form the structure of the mesh.
 ///
-/// MeshVertex is to be used purely as a data structure and not provide implementation of algorithms.
-/// For example, a physics FEM's nodes are not subclasses of MeshVertex if they provide code that is part of the FEM
+/// Vertex is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics FEM's nodes are not subclasses of Vertex if they provide code that is part of the FEM
 /// algorithm, but they may used with a Mesh to store the structure of the FEM.
 ///
 /// The extra Data is left up to the particular use of Mesh to specify. For example, for use collision detection,
@@ -39,14 +39,14 @@ namespace DataStructures
 /// If no extra Data is needed, a specialization exists for void, in which case the constructor takes no data.
 ///
 /// \tparam	Data	Type of extra data stored in the vertex (void for no data)
-/// \sa	Mesh
+/// \sa	Vertices
 template <class Data>
-struct MeshVertex
+struct Vertex
 {
 	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
-	MeshVertex(const SurgSim::Math::Vector3d& position, const Data& data) :
+	Vertex(const SurgSim::Math::Vector3d& position, const Data& data) :
 		position(position),
 		data(data)
 	{
@@ -58,26 +58,26 @@ struct MeshVertex
 	Data data;
 
 	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
+	friend bool operator==(const Vertex<Data>& vertex1, const Vertex<Data>& vertex2)
 	{
 		return vertex1.data == vertex2.data && vertex1.position == vertex2.position;
 	}
 
 	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const MeshVertex<Data>& vertex1, const MeshVertex<Data>& vertex2)
+	friend bool operator!=(const Vertex<Data>& vertex1, const Vertex<Data>& vertex2)
 	{
 		return ! (vertex1 == vertex2);
 	}
 };
 
-/// Specialization of MeshVertex with no data.
-/// \sa MeshVertex
+/// Specialization of Vertex with no data.
+/// \sa Vertex
 template <>
-struct MeshVertex<void>
+struct Vertex<void>
 {
 	/// Constructor
 	/// \param	position	Position of the vertex
-	explicit MeshVertex(const SurgSim::Math::Vector3d& position) : position(position)
+	explicit Vertex(const SurgSim::Math::Vector3d& position) : position(position)
 	{
 	}
 
@@ -85,13 +85,13 @@ struct MeshVertex<void>
 	SurgSim::Math::Vector3d position;
 
 	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const MeshVertex<void>& vertex1, const MeshVertex<void>& vertex2)
+	friend bool operator==(const Vertex<void>& vertex1, const Vertex<void>& vertex2)
 	{
 		return vertex1.position == vertex2.position;
 	}
 
 	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const MeshVertex<void>& vertex1, const MeshVertex<void>& vertex2)
+	friend bool operator!=(const Vertex<void>& vertex1, const Vertex<void>& vertex2)
 	{
 		return ! (vertex1 == vertex2);
 	}
@@ -101,4 +101,4 @@ struct MeshVertex<void>
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATASTRUCTURES_MESHVERTEX_H
+#endif  // SURGSIM_DATASTRUCTURES_VERTEX_H

@@ -77,7 +77,7 @@ public:
 	SixenseDevice* const deviceObject;
 
 private:
-	// prohibit copy construction and asignment
+	// prohibit copy construction and assignment
 	DeviceData(const DeviceData&);
 	DeviceData& operator=(const DeviceData&);
 };
@@ -103,7 +103,7 @@ public:
 	boost::mutex mutex;
 
 private:
-	// prohibit copy construction and asignment
+	// prohibit copy construction and assignment
 	StateData(const StateData&);
 	StateData& operator=(const StateData&);
 };
@@ -114,7 +114,7 @@ SixenseScaffold::SixenseScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 {
 	if (! m_logger)
 	{
-		m_logger = SurgSim::Framework::Logger::createConsoleLogger("Sixense/Hydra device");
+		m_logger = SurgSim::Framework::Logger::getLogger("Sixense/Hydra device");
 		m_logger->setThreshold(m_defaultLogLevel);
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "Sixense/Hydra: Shared scaffold created.";

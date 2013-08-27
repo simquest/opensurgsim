@@ -123,7 +123,7 @@ private:
 
 	/// Compute various integrations over projection of face
 	/// \param face A triangle
-	void computeProjectionIntegrals(const typename TriMesh::Triangle& face)
+	void computeProjectionIntegrals(const typename TriMesh::TriangleType& face)
 	{
 		double a0, a1, da;
 		double b0, b1, db;
@@ -182,7 +182,7 @@ private:
 
 	/// Compute various integrations on a face
 	/// \param face A triangle
-	void computeFaceIntegrals(const typename TriMesh::Triangle& face)
+	void computeFaceIntegrals(const typename TriMesh::TriangleType& face)
 	{
 		double k1, k2, k3, k4;
 
@@ -233,7 +233,7 @@ private:
 
 		for (i = 0; i < m_mesh->getNumTriangles(); i++)
 		{
-			const typename TriMesh::Triangle* f = &m_mesh->getTriangle(i);
+			const typename TriMesh::TriangleType* f = &m_mesh->getTriangle(i);
 
 			const Vector3d& ptA = m_mesh->getVertexPosition(f->vertices[0]);
 			const Vector3d& ptB = m_mesh->getVertexPosition(f->vertices[1]);

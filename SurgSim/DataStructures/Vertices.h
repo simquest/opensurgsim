@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_MESH_H
-#define SURGSIM_DATASTRUCTURES_MESH_H
+#ifndef SURGSIM_DATASTRUCTURES_VERTICES_H
+#define SURGSIM_DATASTRUCTURES_VERTICES_H
 
-#include <SurgSim/DataStructures/MeshVertex.h>
+#include <SurgSim/DataStructures/Vertex.h>
 #include <SurgSim/Framework/Assert.h>
 
 #include <array>
@@ -31,8 +31,8 @@ namespace DataStructures
 
 /// Base class for mesh structures, handling basic vertex functionality.
 ///
-/// Mesh is to be used purely as a data structure and not provide implementation of algorithms.
-/// For example, a physics FEM is not a subclass of Mesh, but may use a Mesh for storing the structure of the FEM.
+/// Vertices is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics FEM is not a subclass of Vertices, but may use a Mesh for storing the structure of the FEM.
 ///
 /// Subclasses of this class should handle the elements required for a specific type of mesh (as simple as just a
 /// generic triangle mesh or as specific as a triangle mesh for collision detection, which might also specify the data
@@ -44,21 +44,21 @@ namespace DataStructures
 /// Mesh.
 ///
 /// \tparam	VertexData	Type of extra data stored in each vertex (void for no data)
-/// \sa MeshVertex
+/// \sa Vertex
 /// \sa MeshElement
 template <class VertexData>
-class Mesh
+class Vertices
 {
 public:
 	/// Vertex type for convenience
-	typedef MeshVertex<VertexData> Vertex;
+	typedef Vertex<VertexData> VertexType;
 
 	/// Constructor. The mesh is initially empty (no vertices).
-	Mesh()
+	Vertices()
 	{
 	}
 	/// Destructor
-	virtual ~Mesh()
+	virtual ~Vertices()
 	{
 	}
 
@@ -81,7 +81,7 @@ public:
 	/// based on the other parameters.
 	/// \param	vertex	Vertex to add to the mesh
 	/// \return	Unique ID of the new vertex.
-	unsigned int addVertex(const Vertex& vertex)
+	unsigned int addVertex(const VertexType& vertex)
 	{
 		m_vertices.push_back(vertex);
 		return m_vertices.size() - 1;
@@ -94,13 +94,13 @@ public:
 	}
 
 	/// Returns the specified vertex.
-	const Vertex& getVertex(unsigned int id) const
+	const VertexType& getVertex(unsigned int id) const
 	{
 		return m_vertices[id];
 	}
 
 	/// Returns a vector containing the position of each vertex.
-	const std::vector<Vertex>& getVertices() const
+	const std::vector<VertexType>& getVertices() const
 	{
 		return m_vertices;
 	}
@@ -139,13 +139,13 @@ public:
 	}
 
 	/// Compares the meshes and returns true if equal, false if not equal.
-	bool operator==(const Mesh& mesh) const
+	bool operator==(const Vertices& mesh) const
 	{
 		return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
 	}
 
 	/// Compares the meshes and returns false if equal, true if not equal.
-	bool operator!=(const Mesh& mesh) const
+	bool operator!=(const Vertices& mesh) const
 	{
 		return (typeid(*this) != typeid(mesh)) || ! isEqual(mesh);
 	}
@@ -161,7 +161,7 @@ protected:
 	/// Override this method to provide custom comparison. Base Mesh implementation compares vertices:
 	/// the order of vertices must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Mesh& mesh) const
+	virtual bool isEqual(const Vertices& mesh) const
 	{
 		return m_vertices == mesh.m_vertices;
 	}
@@ -175,17 +175,17 @@ private:
 
 	/// Performs any updates that are required when the vertices are modified.
 	/// Override this method to implement update functionality.
-	/// For example, this could be overridden to calculate normals for each MeshVertex.
+	/// For example, this could be overridden to calculate normals for each Vertex.
 	virtual void doUpdate()
 	{
 	}
 
 	/// Vertices
-	std::vector<Vertex> m_vertices;
+	std::vector<VertexType> m_vertices;
 };
 
 };  // namespace DataStructures
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATASTRUCTURES_MESH_H
+#endif  // SURGSIM_DATASTRUCTURES_VERTICES_H

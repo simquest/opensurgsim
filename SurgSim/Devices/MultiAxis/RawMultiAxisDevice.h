@@ -66,7 +66,7 @@ public:
 
 	virtual bool finalize() override;
 
-	/// Check wheter this device is initialized.
+	/// Check whether this device is initialized.
 	bool isInitialized() const;
 
 	/// Sets the position scale for this device.

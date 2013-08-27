@@ -58,7 +58,7 @@ PhantomManager::PhantomManager(std::shared_ptr<SurgSim::Framework::Logger> logge
 {
 	if (m_logger == nullptr)
 	{
-		m_logger = SurgSim::Framework::Logger::createConsoleLogger("Phantom device");
+		m_logger = SurgSim::Framework::Logger::getLogger("Phantom device");
 	}
 
 	{
