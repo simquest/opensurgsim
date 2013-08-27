@@ -37,6 +37,7 @@ namespace Graphics
 
 class Material;
 class Texture;
+class RenderTarget;
 
 /// OSG implementation of a graphics camera.
 ///
@@ -125,6 +126,8 @@ public:
 	virtual void clearMaterial();
 	///@}
 	///
+
+	void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget);
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
@@ -137,6 +140,16 @@ private:
 	SurgSim::Math::Matrix44d m_projectionMatrix;
 
 	std::unordered_map<int, std::shared_ptr<Texture>> m_textureMap;
+	std::shared_ptr<RenderTarget> m_renderTarget;
+
+	/// Attach a specific texture to a specific BufferComponent, works for Depth and all the Colors.
+	/// \param	buffer 	The BufferComponent enum.
+	/// \param	texture	The specific texture to attach.
+	void attachRenderTargetTexture(osg::Camera::BufferComponent buffer, std::shared_ptr<Texture> texture);
+
+	/// Detach the current render target from the camera.
+	void detachCurrentRenderTarget();
+
 };
 
 };  // namespace Graphics
