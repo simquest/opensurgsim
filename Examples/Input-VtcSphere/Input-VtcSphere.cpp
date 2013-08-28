@@ -90,61 +90,41 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 std::shared_ptr<SceneElement> createSphere(const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + " Physics");
-
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
 	params.setLinearDamping(0.1);
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 1cm Sphere
+	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 5cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
-	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
-
+	VtcRigidParameters vtcParams;
+	vtcParams.setVtcAngularDamping(1);
+	vtcParams.setVtcAngularStiffness(1);
+	vtcParams.setVtcLinearDamping(1);
+	vtcParams.setVtcLinearStiffness(1);
 
 	std::shared_ptr<VtcRigidRepresentation> vtcRepresentation =
 		std::make_shared<VtcRigidRepresentation>(name + " Vtc");
 	vtcRepresentation->setInitialParameters(params);
-	vtcRepresentation->setInitialPose(pose);
-
-	VtcRigidParameters vtcParams;
 	vtcRepresentation->setInitialVtcParameters(vtcParams);
+	vtcRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 	graphicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-
-	shader->setVertexShaderSource(
-		"varying vec4 color;\n"
-		"void main(void)\n"
-		"{\n"
-		"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-		"	color.rgb = gl_Normal;\n"
-		"	color.a = 1.0;\n"
-		"}");
-	shader->setFragmentShaderSource(
-		"varying vec4 color;\n"
-		"void main(void)\n"
-		"{\n"
-		"	gl_FragColor = color;\n"
-		"}");
-	material->setShader(shader);
-	graphicsRepresentation->setMaterial(material);
+	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
+		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
 
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
-	//sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(vtcRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-								physicsRepresentation, graphicsRepresentation));
-	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-		("Sphere Collision Representation", physicsRepresentation));
+								vtcRepresentation, graphicsRepresentation));
+	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
+	//	("Sphere Collision Representation", vtcRepresentation));
+	sphereElement->addComponent(inputComponent);
 
 	return sphereElement;
 }
@@ -159,11 +139,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
 	std::shared_ptr<SurgSim::Device::MultiAxisDevice> toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
-	toolDevice->setPositionScale(0.00002);
-	toolDevice->setOrientationScale(0.0005);
-	toolDevice->setAxisDominance(false);
 	if (! toolDevice->initialize())
 	{
 		printf("Could not initialize device '%s' for the tool.\n"
@@ -171,41 +147,25 @@ int main(int argc, char* argv[])
 		getc(stdin);
 		return -1;
 	}
-	inputComponent->connectDevice(toolDevice);
 	inputManager->addDevice(toolDevice);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
-
 	runtime->addManager(physicsManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
-
 	scene->addSceneElement(createSphere("sphere1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, -1.0))));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->setScene(scene);
-
-
-	std::shared_ptr<MovingSquareGlutWindow> squareGlutWindow =
-		std::make_shared<MovingSquareGlutWindow>(toolDevice->getName(), toolDevice->getName());
-	toolDevice->addInputConsumer(squareGlutWindow);
-
-	// Wait for a key; the display, force generation, etc. all happen in separate threads.
-	getc(stdin);
-
-	toolDevice->removeInputConsumer(squareGlutWindow);
-
-
 	runtime->execute();
-
 
 	return 0;
 }

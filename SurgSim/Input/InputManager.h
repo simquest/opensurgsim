@@ -53,7 +53,7 @@ public:
 	/// \return	true if it succeeds, false if the device is not in.
 	bool removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
-private:
+//private:
 	virtual bool doInitialize() override;
 	virtual bool doStartUp() override;
 	virtual bool doUpdate(double dt) override;
@@ -76,13 +76,11 @@ private:
 
 	/// Specific call for input components.
 	bool addInputComponent(const std::shared_ptr<InputComponent>& input);
-
 	/// Specific call for output components.
 	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
 
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
-
 	/// Collection of all output components.
 	std::vector<std::shared_ptr<OutputComponent>> m_outputs;
 
