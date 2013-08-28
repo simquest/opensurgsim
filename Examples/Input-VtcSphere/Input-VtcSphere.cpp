@@ -159,6 +159,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
 	std::shared_ptr<SurgSim::Device::MultiAxisDevice> toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
 	toolDevice->setPositionScale(0.00002);
 	toolDevice->setOrientationScale(0.0005);
@@ -170,6 +171,7 @@ int main(int argc, char* argv[])
 		getc(stdin);
 		return -1;
 	}
+	inputComponent->connectDevice(toolDevice);
 	inputManager->addDevice(toolDevice);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
