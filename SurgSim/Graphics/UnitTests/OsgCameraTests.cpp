@@ -198,7 +198,7 @@ TEST(OsgCameraTests, MatricesTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
 }
 
-TEST(OsgCameraTests, ColorTextureTest_DISABLED)
+TEST(OsgCameraTests, RenderTargetTest)
 {
 	auto osgCamera = std::make_shared<OsgCamera>("test camera");
 	std::shared_ptr<Camera> camera = osgCamera;

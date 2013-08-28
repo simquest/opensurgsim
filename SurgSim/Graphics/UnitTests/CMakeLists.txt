@@ -16,6 +16,8 @@
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${gmock_SOURCE_DIR}/include
+	${gmock_SOURCE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
@@ -35,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
+	OsgRenderPassTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRenderTargetTests.cpp
 	OsgRigidTransformConversionsTests.cpp
@@ -60,12 +63,13 @@ set(UNIT_TEST_SOURCES
 )
 
 set(UNIT_TEST_HEADERS
+	MockCamera.h
 	MockObjects.h
 	MockOsgObjects.h
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+set(LIBS SurgSimFramework SurgSimGraphics gtest gmock ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)
