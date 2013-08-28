@@ -56,9 +56,9 @@ template <class VertexData, class EdgeData, class TriangleData>
 class TriangleMesh : public Vertices<VertexData>
 {
 public:
-	/// Edge type for convenience
+	/// Edge type for convenience  (Ids of the 2 vertices)
 	typedef MeshElement<2, EdgeData> EdgeType;
-	/// Triangle type for convenience
+	/// Triangle type for convenience  (Ids of the 3 vertices)
 	typedef MeshElement<3, TriangleData> TriangleType;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
