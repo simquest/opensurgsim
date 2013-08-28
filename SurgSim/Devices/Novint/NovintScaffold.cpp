@@ -399,8 +399,8 @@ bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 	// Make sure the initialization name is unique.
 	const std::string initializationName = device->getInitializationName();
 	auto sameInitializationName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[&deviceName](const std::unique_ptr<DeviceData>& info)
-			{ return info->deviceObject->getInitializationName() == deviceName; });
+		[&initializationName](const std::unique_ptr<DeviceData>& info)
+			{ return info->deviceObject->getInitializationName() == initializationName; });
 	if (sameInitializationName != m_state->activeDeviceList.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same initialization" <<
