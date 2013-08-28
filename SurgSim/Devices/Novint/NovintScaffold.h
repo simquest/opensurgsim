@@ -26,14 +26,17 @@ namespace SurgSim
 namespace Device
 {
 
+class NovintCommonDevice;
 class NovintDevice;
+
 
 /// A class that manages Novint Falcon devices.
 ///
 /// This should support any device that can communicate using the Novint HDAL SDK toolkit, such as the
 /// off-the-shelf Novint Falcon gaming controller and the Novint Falcon with the Open Surgery Grip.
 ///
-/// \sa SurgSim::Device::NovintDevice
+/// \sa SurgSim::Device::NovintDevice, SurgSim::Device::Novint7DofDevice
+/// \sa SurgSim::Device::NovintCommonDevice
 class NovintScaffold
 {
 public:
@@ -52,7 +55,7 @@ public:
 		return m_logger;
 	}
 
-	/// Gets or creates the scaffold shared by all NovintDevice instances.
+	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
 	static std::shared_ptr<NovintScaffold> getOrCreateSharedInstance();
@@ -73,6 +76,7 @@ private:
 	/// Wrapper for the HDAL device handle.
 	class Handle;
 
+	friend class NovintCommonDevice;
 	friend class NovintDevice;
 
 	/// Registers the specified device object.
@@ -80,14 +84,14 @@ private:
 	///
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
-	bool registerDevice(NovintDevice* device);
+	bool registerDevice(NovintCommonDevice* device);
 
 	/// Unregisters the specified device object.
 	/// The corresponding controller will become unused, and can be re-registered later.
 	///
 	/// \param device The device object.
 	/// \return true on success, false on failure.
-	bool unregisterDevice(const NovintDevice* device);
+	bool unregisterDevice(const NovintCommonDevice* device);
 
 	/// Initializes a single device, creating the necessary HDAL resources.
 	/// \param [in,out] info	The device data.

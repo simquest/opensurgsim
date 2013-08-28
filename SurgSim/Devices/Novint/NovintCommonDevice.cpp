@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Novint/NovintDevice.h"
+#include "SurgSim/Devices/Novint/NovintCommonDevice.h"
 
 #include <iostream>
 #include <iomanip>
@@ -41,14 +41,64 @@ namespace Device
 {
 
 
-NovintDevice::NovintDevice(const std::string& uniqueName, const std::string& initializationName) :
-	NovintCommonDevice(uniqueName, initializationName)
+NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName, const std::string& initializationName) :
+	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
+	m_initializationName(initializationName)
 {
 }
 
 
-NovintDevice::~NovintDevice()
+NovintCommonDevice::~NovintCommonDevice()
 {
+	if (isInitialized())
+	{
+		finalize();
+	}
+}
+
+
+std::string NovintCommonDevice::getInitializationName() const
+{
+	return m_initializationName;
+}
+
+
+bool NovintCommonDevice::initialize()
+{
+	SURGSIM_ASSERT(! isInitialized());
+	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold);
+
+	if (! scaffold->registerDevice(this))
+	{
+		return false;
+	}
+
+	m_scaffold = std::move(scaffold);
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
+	return true;
+}
+
+
+bool NovintCommonDevice::finalize()
+{
+	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	bool ok = m_scaffold->unregisterDevice(this);
+	m_scaffold.reset();
+	return ok;
+}
+
+
+bool NovintCommonDevice::isInitialized() const
+{
+	return (m_scaffold != nullptr);
+}
+
+
+bool NovintCommonDevice::is7DofDevice() const
+{
+	return false;
 }
 
 

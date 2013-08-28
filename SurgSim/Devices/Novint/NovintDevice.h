@@ -19,13 +19,12 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/CommonDevice.h>
+#include <SurgSim/Devices/Novint/NovintCommonDevice.h>
 
 namespace SurgSim
 {
 namespace Device
 {
-class NovintScaffold;
 
 
 /// A class implementing the communication with a Novint Falcon device.
@@ -53,38 +52,20 @@ class NovintScaffold;
 ///   | vector     | "force"               | %Device output force (units are newtons).            |
 ///   | bool       | "gravityCompensation" | Enable or disable hardware gravity compensation.     |
 ///
-/// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
-class NovintDevice : public SurgSim::Input::CommonDevice
+/// \sa Novint7DofHapticDevice
+/// \sa NovintCommonDevice, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
+class NovintDevice : public NovintCommonDevice
 {
 public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param initializationName The name passed to HDAL when initializing the device.  This should match a
-	/// 	configured NOVINT device; alternately, an empty string indicates the default device.
+	/// 	configured Novint device; alternately, an empty string indicates the default device.
 	NovintDevice(const std::string& uniqueName, const std::string& initializationName);
 
 	/// Destructor.
 	virtual ~NovintDevice();
-
-	/// Gets the name used by the Novint device configuration to refer to this device.
-	/// Note that this may or may not be the same as the device name retrieved by getName().
-	/// An empty string indicates the default device.
-	/// \return	The initialization name.
-	std::string getInitializationName() const;
-
-	virtual bool initialize() override;
-
-	virtual bool finalize() override;
-
-	/// Check whether this device is initialized.
-	bool isInitialized() const;
-
-private:
-	friend class NovintScaffold;
-
-	std::shared_ptr<NovintScaffold> m_scaffold;
-	std::string m_initializationName;
 };
 
 };  // namespace Device

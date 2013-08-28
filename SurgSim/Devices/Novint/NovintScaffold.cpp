@@ -219,7 +219,7 @@ private:
 struct NovintScaffold::DeviceData
 {
 	/// Initialize the state.
-	DeviceData(const std::string& apiName, NovintDevice* device) :
+	DeviceData(const std::string& apiName, NovintCommonDevice* device) :
 		initializationName(apiName),
 		deviceObject(device),
 		positionValue(positionBuffer),
@@ -244,7 +244,7 @@ struct NovintScaffold::DeviceData
 	/// The HDAL device name.
 	const std::string initializationName;
 	/// The corresponding device object.
-	NovintDevice* const deviceObject;
+	NovintCommonDevice* const deviceObject;
 
 	/// The device handle wrapper.
 	NovintScaffold::Handle deviceHandle;
@@ -367,7 +367,7 @@ NovintScaffold::~NovintScaffold()
 }
 
 
-bool NovintScaffold::registerDevice(NovintDevice* device)
+bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -428,7 +428,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 }
 
 
-bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
+bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 {
 	std::unique_ptr<DeviceData> savedInfo;
 	bool haveOtherDevices = false;
