@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	NamedDataTests.cpp
 	NamedVariantDataTests.cpp
 	OptionalValueTests.cpp
+	TetrahedronMeshTest.cpp
 	TriangleMeshTest.cpp
 )
 
