@@ -24,6 +24,7 @@ set(SURGSIM_MATH_SOURCES
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
+	Load.h
 	Matrix.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h

@@ -22,6 +22,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
+	LoadTests.cpp
 	MakeRigidTransformTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
 	ValidTests.cpp
