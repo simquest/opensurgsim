@@ -138,10 +138,19 @@ bool
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	isValid() const
 {
-	unsigned int numVertices = getNumVertices();
+	typedef typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::EdgeType
+		EdgeType;
+	typedef typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType
+		TriangleType;
+	typedef typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType
+		TetrahedronType;
+
+	unsigned int numVertices = Vertices<VertexData>::getNumVertices();
 
 	// Test edges validity
-	for (std::vector<EdgeType>::const_iterator it = m_edges.begin(); it != m_edges.end(); it++)
+	for (typename std::vector<EdgeType>::const_iterator it = m_edges.begin();
+		it != m_edges.end();
+		it++)
 	{
 		for (int vertexId = 0; vertexId < 2; vertexId++)
 		{
@@ -153,7 +162,9 @@ bool
 	}
 
 	// Test triangles validity
-	for (std::vector<TriangleType>::const_iterator it = m_triangles.begin(); it != m_triangles.end(); it++)
+	for (typename std::vector<TriangleType>::const_iterator it = m_triangles.begin();
+		it != m_triangles.end();
+		it++)
 	{
 		for (int vertexId = 0; vertexId < 3; vertexId++)
 		{
@@ -165,7 +176,9 @@ bool
 	}
 
 	// Test tetrahedrons validity
-	for (std::vector<TetrahedronType>::const_iterator it = m_tetrahedrons.begin(); it != m_tetrahedrons.end(); it++)
+	for (typename std::vector<TetrahedronType>::const_iterator it = m_tetrahedrons.begin();
+		it != m_tetrahedrons.end();
+		it++)
 	{
 		for (int vertexId = 0; vertexId < 4; vertexId++)
 		{
