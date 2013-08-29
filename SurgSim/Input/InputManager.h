@@ -53,7 +53,7 @@ public:
 	/// \return	true if it succeeds, false if the device is not in.
 	bool removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
-//private:
+private:
 	virtual bool doInitialize() override;
 	virtual bool doStartUp() override;
 	virtual bool doUpdate(double dt) override;

@@ -16,9 +16,14 @@
 #ifndef SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
 #define SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
 
+#include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Input/InputComponent.h>
+#include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Physics/Representation.h>
+
+using SurgSim::Math::RigidTransform3d;
 
 namespace SurgSim
 {
@@ -68,6 +73,54 @@ private:
 	/// Representation to set the pose
 	std::shared_ptr<SurgSim::Framework::Representation> m_to;
 };
+
+
+class InputVtcBehavior : public SurgSim::Framework::Behavior
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the behavior
+	/// \param	from	Representation to get the pose
+	/// \param	to	Representation to set the pose
+	InputVtcBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from,
+		std::shared_ptr<SurgSim::Framework::Representation> to) : SurgSim::Framework::Behavior(name),
+		m_from(from),
+		m_to(to)
+	{
+	}
+
+	/// Update the behavior
+	/// \param dt	The length of time (seconds) between update calls.
+	virtual void update(double dt)
+	{
+		SurgSim::DataStructures::DataGroup dataGroup;
+		m_from->getData(&dataGroup);
+		RigidTransform3d po;
+		dataGroup.poses().get("pose", &po);
+		m_to->setPose(po);
+	}
+
+protected:
+	/// Initialize the behavior
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+	/// Wakeup the behavior, which copies the initial pose
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+private:
+	/// Representation to get the pose
+	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
+	/// Representation to set the pose
+	std::shared_ptr<SurgSim::Framework::Representation> m_to;
+};
+
+
+
 
 };  // namespace Blocks
 

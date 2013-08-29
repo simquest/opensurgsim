@@ -58,6 +58,7 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Blocks::InputVtcBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
@@ -65,6 +66,7 @@ using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgTexture2d;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
@@ -104,13 +106,13 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name,
 	vtcParams.setVtcLinearStiffness(1);
 
 	std::shared_ptr<VtcRigidRepresentation> vtcRepresentation =
-		std::make_shared<VtcRigidRepresentation>(name + " Vtc");
+		std::make_shared<VtcRigidRepresentation>(name + "-Vtc");
 	vtcRepresentation->setInitialParameters(params);
 	vtcRepresentation->setInitialVtcParameters(vtcParams);
 	vtcRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
+		std::make_shared<OsgSphereRepresentation>(name + "-Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
 	graphicsRepresentation->setInitialPose(pose);
 
@@ -122,6 +124,8 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name,
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								vtcRepresentation, graphicsRepresentation));
+	sphereElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
+								inputComponent, vtcRepresentation));
 	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 	//	("Sphere Collision Representation", vtcRepresentation));
 	sphereElement->addComponent(inputComponent);
@@ -163,7 +167,7 @@ int main(int argc, char* argv[])
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
-
+	
 	runtime->setScene(scene);
 	runtime->execute();
 
