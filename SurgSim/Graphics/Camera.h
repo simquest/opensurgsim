@@ -28,6 +28,7 @@ namespace Graphics
 
 class Group;
 class Texture;
+class RenderTarget;
 
 /// Base graphics camera class, which defines the basic interface for all graphics cameras.
 ///
@@ -80,14 +81,13 @@ public:
 	/// \return	Projection matrix
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
 
-	/// Sets a texture to be used as a color render target.
-	/// \param	texture	The texture to be used as a target.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) = 0;
+	/// Sets RenderTarget for the current camera, enables the camera to render to offscreen textures..
+	/// \param	renderTarget	The render target.
+	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) = 0;
 
-	/// Gets the texture that is being used as the color render target.
-	/// \return	The color render texture.
-	virtual std::shared_ptr<Texture> getColorRenderTexture() const = 0;
+	/// Gets RenderTarget that is currently being used by the camera.
+	/// \return	The RenderTarget.
+	virtual std::shared_ptr<RenderTarget> getRenderTarget() const = 0;
 
 private:
 	/// Group of representations that this camera sees

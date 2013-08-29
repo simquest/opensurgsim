@@ -100,24 +100,23 @@ public:
 	virtual void update(double dt);
 
 	/// Returns the OSG camera node
-	osg::ref_ptr<osg::Camera> getOsgCamera() const
+	inline osg::ref_ptr<osg::Camera> getOsgCamera() const
 	{
 		return m_camera;
 	}
 
-	osg::ref_ptr<osg::Node> getOsgNode() const
+	inline osg::ref_ptr<osg::Node> getOsgNode() const
 	{
 		return m_switch;
 	}
 
-	/// Sets a texture to be used as a color render target.
-	/// \param	texture	The texture to be used as a target.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) override;
+	/// Sets RenderTarget for the current camera, enables the camera to render to offscreen textures..
+	/// \param	renderTarget	The RenderTarget to be used.
+	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
-	/// Gets the texture that is being used as the color render target.
-	/// \return	The color render texture.
-	virtual std::shared_ptr<Texture> getColorRenderTexture() const override;
+	/// Gets RenderTarget that is currently being used by the camera.
+	/// \return	The RenderTarget.
+	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
 	///@{
 	/// This does not make a sense for a camera, they are disabled.
@@ -127,7 +126,6 @@ public:
 	///@}
 	///
 
-	void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget);
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;

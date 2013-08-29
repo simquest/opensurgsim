@@ -35,8 +35,8 @@ set(UNIT_TEST_SOURCES
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
-	OsgRepresentationTests.cpp
 	OsgRenderTargetTests.cpp
+	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
 	OsgScreenSpaceQuadTests.cpp
 	OsgShaderTests.cpp
