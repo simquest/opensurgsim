@@ -137,6 +137,10 @@ public:
 	/// \note No check is performed on the id
 	const TetrahedronType& getTetrahedron(unsigned int id) const;
 
+	/// Test if the TetrahedronMesh is valid (valid vertex Ids used in all MeshElements)
+	/// \return True if the TetrahedronMesh is valid, False otherwise (the topology is then broken)
+	bool isValid() const;
+
 protected:
 	/// Remove all edges from the mesh.
 	virtual void doClearEdges();

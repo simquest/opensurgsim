@@ -50,7 +50,7 @@ public:
 		std::default_random_engine generator;
 		std::uniform_real_distribution<double> positionDistribution(-10.0, 10.0);
 		std::uniform_real_distribution<double> normalDistribution(-1.0, 1.0);
-		std::uniform_int_distribution<unsigned int> vertexIdDistribution(0, numVertices);
+		std::uniform_int_distribution<unsigned int> vertexIdDistribution(0, numVertices-1);
 
 		if (printPositions)
 		{
@@ -350,6 +350,46 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 			EXPECT_EQ(testTetrahedronsTrianglesId[j], data.getTriangles());
 		}
 	}
+}
+
+TEST_F(TetrahedronMeshTest, isValidTest)
+{
+	MockTetrahedronMesh mesh;
+
+	EXPECT_TRUE(mesh.isValid());
+
+	/// Create the edges (no vertices yet => the mesh is NOT valid)
+	for (unsigned int i = 0; i < testEdgesVerticesId.size(); ++i)
+	{
+		mesh.createEdge(testEdgesVerticesId[i]);
+	}
+
+	EXPECT_FALSE(mesh.isValid());
+
+	/// Create the triangles (no vertices yet => the mesh is NOT valid)
+	for (unsigned int i = 0; i < testTrianglesVerticesId.size(); ++i)
+	{
+		mesh.createTriangle(testTrianglesVerticesId[i], testTrianglesEdgesId[i]);
+	}
+
+	EXPECT_FALSE(mesh.isValid());
+
+	/// Create the tetrahedrons (no vertices yet => the mesh is NOT valid)
+	for (unsigned int i = 0; i < testTetrahedronsVerticesId.size(); ++i)
+	{
+		mesh.createTetrahedron(testTetrahedronsVerticesId[i], testTetrahedronsEdgesId[i], \
+			testTetrahedronsTrianglesId[i]);
+	}
+
+	EXPECT_FALSE(mesh.isValid());
+
+	/// Create the vertices
+	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	{
+		mesh.createVertex(testPositions[i], testNormals[i]);
+	}
+
+	EXPECT_TRUE(mesh.isValid());
 }
 
 TEST_F(TetrahedronMeshTest, SetVertexPositionsTest)

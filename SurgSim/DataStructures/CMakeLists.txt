@@ -38,6 +38,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h
 	TriangleMesh.h
+	TriangleMesh-inl.h
 	Vertex.h
 	Vertices.h
 )
