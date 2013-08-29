@@ -129,6 +129,40 @@ public:
 		return m_triangles[id];
 	}
 
+	/// Test if the TriangleMesh is valid (valid vertex Ids used in all MeshElements)
+	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
+	bool isValid() const
+	{
+		unsigned int numVertices = getNumVertices();
+
+		// Test edges validity
+		for (std::vector<EdgeType>::const_iterator it = m_edges.begin(); it != m_edges.end(); it++)
+		{
+			for (int vertexId = 0; vertexId < 2; vertexId++)
+			{
+				if (it->vertices[vertexId] >= numVertices)
+				{
+					return false;
+				}
+			}
+		}
+
+		// Test triangles validity
+		for (std::vector<TriangleType>::const_iterator it = m_triangles.begin(); it != m_triangles.end(); it++)
+		{
+			for (int vertexId = 0; vertexId < 3; vertexId++)
+			{
+				if (it->vertices[vertexId] >= numVertices)
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+
 protected:
 	/// Remove all edges from the mesh.
 	virtual void doClearEdges()

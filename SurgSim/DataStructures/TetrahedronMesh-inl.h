@@ -134,6 +134,52 @@ const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronDa
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+bool
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	isValid() const
+{
+	unsigned int numVertices = getNumVertices();
+
+	// Test edges validity
+	for (std::vector<EdgeType>::const_iterator it = m_edges.begin(); it != m_edges.end(); it++)
+	{
+		for (int vertexId = 0; vertexId < 2; vertexId++)
+		{
+			if (it->vertices[vertexId] >= numVertices)
+			{
+				return false;
+			}
+		}
+	}
+
+	// Test triangles validity
+	for (std::vector<TriangleType>::const_iterator it = m_triangles.begin(); it != m_triangles.end(); it++)
+	{
+		for (int vertexId = 0; vertexId < 3; vertexId++)
+		{
+			if (it->vertices[vertexId] >= numVertices)
+			{
+				return false;
+			}
+		}
+	}
+
+	// Test tetrahedrons validity
+	for (std::vector<TetrahedronType>::const_iterator it = m_tetrahedrons.begin(); it != m_tetrahedrons.end(); it++)
+	{
+		for (int vertexId = 0; vertexId < 4; vertexId++)
+		{
+			if (it->vertices[vertexId] >= numVertices)
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 void
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	doClearEdges()
