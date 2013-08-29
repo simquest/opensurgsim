@@ -18,6 +18,7 @@
 #include <SurgSim/Graphics/Material.h>
 #include <SurgSim/Graphics/Manager.h>
 #include <SurgSim/Graphics/OsgGroup.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgMatrixConversions.h>
 #include <SurgSim/Graphics/OsgQuaternionConversions.h>
 #include <SurgSim/Graphics/OsgVectorConversions.h>
@@ -81,7 +82,6 @@ bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && SurgSim::Graphics::Camera::setGroup(group))
 	{
-
 		m_camera->removeChildren(0, m_camera->getNumChildren());  /// Remove any previous group
 		m_camera->addChild(osgGroup->getOsgGroup());
 		return true;
@@ -186,19 +186,30 @@ std::shared_ptr<RenderTarget> OsgCamera::getRenderTarget() const
 
 bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
 {
-	SURGSIM_FAILURE() << "You cannot assign a material to a camera node";
-	return false;
+	std::shared_ptr<OsgGroup> osgGroup = std::static_pointer_cast<OsgGroup>(getGroup());
+	std::shared_ptr<OsgMaterial> osgMaterial = std::dynamic_pointer_cast<OsgMaterial>(material);
+	bool result = false;
+	if (osgGroup != nullptr && osgMaterial != nullptr)
+	{
+		osgGroup->getOsgGroup()->setStateSet(osgMaterial->getOsgStateSet());
+		result = true;
+		m_material = osgMaterial;
+	}
+	return result;
 }
 
 std::shared_ptr<Material> OsgCamera::getMaterial() const
 {
-	SURGSIM_FAILURE() << "A camera node does not have a material";
-	return nullptr;
+	return m_material;
 }
 
 void OsgCamera::clearMaterial()
 {
-	SURGSIM_FAILURE() << "A camera node does not have a material";
+	std::shared_ptr<OsgGroup> osgGroup = std::static_pointer_cast<OsgGroup>(getGroup());
+	if (osgGroup != nullptr) 
+	{
+		osgGroup->getOsgGroup()->setStateSet(new osg::StateSet());
+	}
 }
 
 void OsgCamera::detachCurrentRenderTarget()

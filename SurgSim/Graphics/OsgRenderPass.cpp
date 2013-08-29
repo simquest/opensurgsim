@@ -98,6 +98,7 @@ bool OsgRenderPass::setMaterial(std::shared_ptr<Material> val)
 	if (material != nullptr)
 	{
 		m_material = material;
+		m_camera->setMaterial(material);
 		result = true;
 	}
 	else

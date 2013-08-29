@@ -118,13 +118,17 @@ public:
 	/// \return	The RenderTarget.
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
-	///@{
-	/// This does not make a sense for a camera, they are disabled.
+	/// Sets a material the material on the group that has been attached to the camera.
+	/// \param	material	The material.
+	/// \return	true if it succeeds, false if there is no group or the material is not an OsgMaterial.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	/// Gets the material if set.
+	/// \return	The material.
 	virtual std::shared_ptr<Material> getMaterial() const;
+
+	/// Clears the material from the attached group
 	virtual void clearMaterial();
-	///@}
-	///
 
 private:
 
