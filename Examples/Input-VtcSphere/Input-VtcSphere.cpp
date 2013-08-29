@@ -18,10 +18,7 @@
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
-#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
-#include <SurgSim/Devices/MultiAxis/RawMultiAxisDevice.h>
 #include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
-#include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Runtime.h>
@@ -29,31 +26,20 @@
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Input/DeviceInterface.h>
 #include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/VtcRigidParameters.h>
 #include <SurgSim/Physics/VtcRigidRepresentation.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
 
 
 #include <GL/glut.h>
-#include "SurgSim/Testing/VisualTestCommon/MovingSquareForce.h"
-#include "SurgSim/Testing/VisualTestCommon/MovingSquareGlutWindow.h"
 
 
 using SurgSim::Blocks::BasicSceneElement;
@@ -61,14 +47,7 @@ using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Blocks::InputVtcBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::OsgMaterial;
-using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
-using SurgSim::Graphics::OsgTexture2d;
-using SurgSim::Graphics::OsgUniform;
-using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Vector4f;
-using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::SphereShape;
@@ -89,8 +68,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
-std::shared_ptr<SceneElement> createSphere(const std::string& name,
-	const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createSphere(const std::string& name)
 {
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
@@ -109,12 +87,10 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name,
 		std::make_shared<VtcRigidRepresentation>(name + "-Vtc");
 	vtcRepresentation->setInitialParameters(params);
 	vtcRepresentation->setInitialVtcParameters(vtcParams);
-	vtcRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSphereRepresentation>(name + "-Graphics");
 	graphicsRepresentation->setRadius(shape->getRadius());
-	graphicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
@@ -122,10 +98,11 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name,
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(vtcRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
-	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-								vtcRepresentation, graphicsRepresentation));
 	sphereElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
 								inputComponent, vtcRepresentation));
+	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+								vtcRepresentation, graphicsRepresentation));
+
 	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 	//	("Sphere Collision Representation", vtcRepresentation));
 	sphereElement->addComponent(inputComponent);
@@ -144,13 +121,8 @@ int main(int argc, char* argv[])
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::shared_ptr<SurgSim::Device::MultiAxisDevice> toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
-	if (! toolDevice->initialize())
-	{
-		printf("Could not initialize device '%s' for the tool.\n"
-			"--- Press Enter to quit the application! ---\n", toolDevice->getName().c_str());
-		getc(stdin);
-		return -1;
-	}
+	SURGSIM_ASSERT( toolDevice->initialize() == true )	<<"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
+
 	inputManager->addDevice(toolDevice);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -161,8 +133,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
-	scene->addSceneElement(createSphere("sphere1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, -1.0))));
+	scene->addSceneElement(createSphere("sphere1"));
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
