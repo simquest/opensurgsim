@@ -152,60 +152,6 @@ void OsgCamera::update(double dt)
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 }
 
-bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
-{
-	SURGSIM_FAILURE() << "You cannot assign a material to a camera node";
-	return false;
-}
-
-std::shared_ptr<Material> OsgCamera::getMaterial() const
-{
-	SURGSIM_FAILURE() << "A camera node does not have a material";
-	return nullptr;
-}
-
-void OsgCamera::clearMaterial()
-{
-	SURGSIM_FAILURE() << "A camera node does not have a material";
-}
-
-bool OsgCamera::setColorRenderTexture(std::shared_ptr<Texture> texture)
-{
-	std::shared_ptr<OsgTexture> osgTexture = std::dynamic_pointer_cast<OsgTexture>(texture);
-	osg::Texture* actualTexture;
-
-	actualTexture = osgTexture->getOsgTexture();
-
-	bool result = false;
-	if (actualTexture != nullptr )
-	{
-		m_camera->attach(osg::Camera::COLOR_BUFFER, actualTexture, 0, 0);
-		m_camera->setRenderOrder(osg::Camera::PRE_RENDER);
-		m_textureMap[osg::Camera::COLOR_BUFFER] = osgTexture;
-		m_camera->setClearColor(osg::Vec4f(0.0, 0.0, 0.0, 1.0));
-		m_camera->setRenderTargetImplementation(osg::Camera::FRAME_BUFFER_OBJECT, osg::Camera::PIXEL_BUFFER);
-		m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-
-		int width = actualTexture->getTextureWidth();
-		int height = actualTexture->getTextureHeight();
-		m_camera->setViewport(0,0,width,height);
-
-		result = m_camera->isRenderToTextureCamera();
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) << __FUNCTION__ <<
-			"Texture passed as ColorRenderTexture is null.";
-	}
-
-	return result;
-}
-
-std::shared_ptr<Texture> OsgCamera::getColorRenderTexture() const
-{
-	return m_textureMap.at(osg::Camera::COLOR_BUFFER);
-}
-
 void OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
 {
 	if (m_renderTarget != nullptr)
@@ -230,6 +176,29 @@ void OsgCamera::setRenderTarget(std::shared_ptr<RenderTarget> renderTarget)
 	m_camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	m_camera->setClearColor(osg::Vec4f(0.0, 0.0, 0.0, 1.0));
 	m_renderTarget = renderTarget;
+}
+
+std::shared_ptr<RenderTarget> OsgCamera::getRenderTarget() const
+{
+	return m_renderTarget;
+}
+
+
+bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
+{
+	SURGSIM_FAILURE() << "You cannot assign a material to a camera node";
+	return false;
+}
+
+std::shared_ptr<Material> OsgCamera::getMaterial() const
+{
+	SURGSIM_FAILURE() << "A camera node does not have a material";
+	return nullptr;
+}
+
+void OsgCamera::clearMaterial()
+{
+	SURGSIM_FAILURE() << "A camera node does not have a material";
 }
 
 void OsgCamera::detachCurrentRenderTarget()
