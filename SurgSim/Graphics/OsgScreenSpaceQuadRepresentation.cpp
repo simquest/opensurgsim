@@ -128,15 +128,28 @@ void OsgScreenSpaceQuadRepresentation::setPose(const SurgSim::Math::RigidTransfo
 	m_transform->setPosition(pose.second);
 }
 
-
-bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture2d> texture)
+bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture> texture)
 {
-	std::shared_ptr<OsgTexture2d> osgTexture = std::dynamic_pointer_cast<OsgTexture2d>(texture);
 	SURGSIM_ASSERT(texture != nullptr) << "Null texture passed to setTexture";
-	SURGSIM_ASSERT(osgTexture != nullptr) << "Texture passed to setTexture not an OsgTexture";
+	std::shared_ptr<OsgTexture2d> osgTexture2d = std::dynamic_pointer_cast<OsgTexture2d>(texture);
+	if (osgTexture2d != nullptr)
+	{
+		return setTexture(osgTexture2d);
+	}
 
+	std::shared_ptr<OsgTextureRectangle> osgTextureRectangle = std::dynamic_pointer_cast<OsgTextureRectangle>(texture);
+	if (osgTextureRectangle != nullptr)
+	{
+		return setTexture(osgTextureRectangle);
+	}
+
+	return false;
+
+}
+
+bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTexture2d> osgTexture)
+{
 	bool result = false;
-
 	auto newUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTexture2d>>>("diffuseMap");
 	newUniform->set(osgTexture);
 	if (replaceUniform("diffuseMap", newUniform))
@@ -147,25 +160,22 @@ bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<Texture2d> tex
 	return result;
 }
 
-bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<TextureRectangle> texture)
+bool OsgScreenSpaceQuadRepresentation::setTexture(std::shared_ptr<OsgTextureRectangle> osgTexture)
 {
-	std::shared_ptr<OsgTextureRectangle> osgTexture = std::dynamic_pointer_cast<OsgTextureRectangle>(texture);
-	SURGSIM_ASSERT(texture != nullptr) << "Null texture passed to setTexture";
-	SURGSIM_ASSERT(osgTexture != nullptr) << "Texture passed to setTexture not an OsgTexture";
-
 	bool result = false;
-
 	auto newUniform = std::make_shared<OsgUniform<std::shared_ptr<OsgTextureRectangle>>>("diffuseMap");
 	newUniform->set(osgTexture);
 	if (replaceUniform("diffuseMap", newUniform))
 	{
 		int width, height;
-		texture->getSize(&width, &height);
+		osgTexture->getSize(&width, &height);
 		setTextureCoordinates(0.0,0.0,static_cast<float>(width),static_cast<float>(height));
 		result = true;
 	}
 	return result;
 }
+
+
 
 bool OsgScreenSpaceQuadRepresentation::replaceUniform(const std::string& name, std::shared_ptr<UniformBase> newUniform)
 {
