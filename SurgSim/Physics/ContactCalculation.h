@@ -260,6 +260,27 @@ private:
 
 };
 
+/// Class to calculate intersections between a triangle mesh and a plan
+template <class VertexType, class EdgeType, class TriangleType>
+class TriangleMeshPlaneDcdContact : public ContactCalculation
+{
+public:
+	
+	explicit TriangleMeshPlaneDcdContact()
+	{
+	}
+
+	virtual std::pair<int, int> getShapeTypes() override
+	{
+		return std::pair<int, int> (RIGID_SHAPE_TYPE_MESH, RIGID_SHAPE_TYPE_PLANE);
+	}
+
+private:
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param pair The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+
+};
 
 }; // Physics
 }; // SurgSim
