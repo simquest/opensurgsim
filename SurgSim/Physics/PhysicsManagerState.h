@@ -26,13 +26,16 @@
 #include <SurgSim/Physics/MlcpPhysicsSolution.h>
 #include <SurgSim/Physics/Representation.h>
 
+#include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
+
+using SurgSim::Collision::CollisionPair;
+using SurgSim::Collision::CollisionRepresentation;
+
 namespace SurgSim
 {
 namespace Physics
 {
-
-class CollisionPair;
-class CollisionRepresentation;
 
 enum ConstraintGroupType
 {

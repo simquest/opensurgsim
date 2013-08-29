@@ -19,17 +19,20 @@
 
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Location.h>
-
+#include <SurgSim/Collision/Location.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+
+using SurgSim::Collision::Location;
+
 
 namespace SurgSim
 {

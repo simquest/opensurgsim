@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_COLLISIONPAIR_H
-#define SURGSIM_PHYSICS_COLLISIONPAIR_H
+#ifndef SURGSIM_COLLISION_COLLISIONPAIR_H
+#define SURGSIM_COLLISION_COLLISIONPAIR_H
 
 #include <memory>
 #include <list>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/Location.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Location.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 /// Contact data structure used when two representations touch each other
@@ -167,7 +167,7 @@ private:
 };
 
 
-}; // namespace physics
+}; // namespace Collision
 }; // namespace SurgSim
 
 #endif

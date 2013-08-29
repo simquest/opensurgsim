@@ -18,15 +18,20 @@
 
 #include <utility>
 
-#include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/ContactConstraintGeneration.h>
 #include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/ContactCalculation.h>
+#include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Physics/Constraint.h>
 
-#include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
+#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
+
+using SurgSim::Collision::CollisionRepresentation;
+using SurgSim::Collision::CollisionPair;
+using SurgSim::Collision::ContactCalculation;
+using SurgSim::Collision::MockCollisionRepresentation;
 
 namespace SurgSim
 {
@@ -38,10 +43,10 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	virtual void SetUp()
 	{
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation");
-		sphere = makeSphereRepresentation(rigid0,2.0);
+		sphere = SurgSim::Collision::makeSphereRepresentation(rigid0,2.0);
 
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation");
-		plane = makeDoubleSidedPlaneRepresentation(rigid1);
+		plane = SurgSim::Collision::makeDoubleSidedPlaneRepresentation(rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
 	}
@@ -66,7 +71,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
 	// Test case setup, create a pair with a contact and set up the physics state with it
-	SphereDoubleSidedPlaneDcdContact contactCalculation;
+	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
 
 	contactCalculation.calculateContact(pair);
 	ASSERT_TRUE(pair->hasContacts());
@@ -98,7 +103,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 TEST_F(ContactConstraintGenerationTests, CountTest)
 {
 	std::shared_ptr<CollisionPair> pair;
-	SphereDoubleSidedPlaneDcdContact contactCalculation;
+	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
 
 	pair = std::make_shared<CollisionPair>(sphere, plane);
 	contactCalculation.calculateContact(pair);

@@ -13,25 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_LOCATION_H
-#define SURGSIM_PHYSICS_LOCATION_H
 
-#include <SurgSim/DataStructures/OptionalValue.h>
-#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Collision/DefaultContactCalculation.h>
+#include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
-struct Location
+void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-public:
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
-};
+	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<
+		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
+	SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getDefaultLogger()) <<
+		"Contact calculation not implemented for pairs with types (" <<
+		pair->getFirst()->getShapeType() << ", " << pair->getSecond()->getShapeType() << ").";
+}
 
-}; // Physics
-}; // SurgSim
-
-#endif
+}; // namespace Collision
+}; // namespace SurgSim

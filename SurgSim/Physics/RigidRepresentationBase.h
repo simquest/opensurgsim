@@ -19,15 +19,16 @@
 #include <SurgSim/Physics/Representation.h>
 
 #include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Location.h>
+#include <SurgSim/Collision/Location.h>
 #include <SurgSim/Physics/RigidRepresentationState.h>
 #include <SurgSim/Physics/RigidRepresentationLocalization.h>
 
 #include <SurgSim/Math/RigidTransform.h>
 
+using SurgSim::Collision::Location;
+
 namespace SurgSim
 {
-
 namespace Physics
 {
 
