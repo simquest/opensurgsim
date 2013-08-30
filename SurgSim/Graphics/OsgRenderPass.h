@@ -57,6 +57,8 @@ public:
 	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> val) override;
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
+	virtual osg::ref_ptr<osg::Node> getOsgNode();
+
 private:
 
 	std::shared_ptr<OsgCamera> m_camera;

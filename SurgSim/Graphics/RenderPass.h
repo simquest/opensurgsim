@@ -30,6 +30,7 @@ class Group;
 class Material;
 class RenderTarget;
 
+// RenderPass probably should just be a component ...
 class RenderPass : public virtual Representation
 {
 public:

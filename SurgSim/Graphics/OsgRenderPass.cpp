@@ -132,5 +132,10 @@ bool OsgRenderPass::setRenderTarget(std::shared_ptr<RenderTarget> val)
 	return result;
 }
 
+osg::ref_ptr<osg::Node> OsgRenderPass::getOsgNode()
+{
+	return m_camera->getOsgNode();
+}
+
 }; // Graphics
 }; // SurgSim

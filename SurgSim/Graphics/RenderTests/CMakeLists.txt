@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	OsgManagerRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
+	OsgRenderPassRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
 	OsgScreenSpaceQuadRenderTests.cpp
 	OsgShaderRenderTests.cpp
