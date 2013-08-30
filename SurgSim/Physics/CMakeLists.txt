@@ -103,6 +103,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	SphereShape.h
 	VtcRigidParameters.h
 	VtcRigidRepresentation.h
+	VtcRigidRepresentation-inl.h
 )
 
 surgsim_add_library(

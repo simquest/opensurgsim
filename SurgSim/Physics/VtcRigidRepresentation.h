@@ -54,11 +54,8 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	/// \note This is done through the Vtc proxy !
 	/// \note We let the end-user drive the Vtc, not the virtual rigid representation directly
-	void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_currentVtcState.setPose(pose);
-	}
-
+	/// Overrides RigidRepresentation::setPose()
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Set the initial parameters of the rigid representation
 	/// \param parameters The initial parameters
@@ -156,50 +153,44 @@ public:
 	/// Get the final pose of the rigid representation
 	/// \return The final pose (translation + rotation)
 	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid representation
-	const SurgSim::Math::RigidTransform3d& getPose() const
+	/// Overrides SurgSim::Physics::RigidRepresentationBase::getPose()
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override
 	{
 		return m_finalState.getPose();
 	}
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
-	void beforeUpdate(double dt);
+	/// Overrides SurgSim::Physics::Representation::beforeUpdate()
+	virtual void beforeUpdate(double dt) override;
 
 	/// Update the representation state to the current time step
 	/// \param dt The time step (in seconds)
-	void update(double dt);
+	/// Overrides SurgSim::Physics::Representation::update()
+	virtual void update(double dt) override;
 
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
-	void afterUpdate(double dt);
+	/// Overrides SurgSim::Physics::Representation::afterUpdate()
+	virtual void afterUpdate(double dt) override;
 
 	/// Reset the rigid representation parameters to their initial values
 	/// \note Does not reset the Vtc parameters
-	void resetParameters()
-	{
-		RigidRepresentationBase::resetParameters();
-
-		m_currentParameters = m_initialParameters;
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
+	/// Overrides SurgSim::Physics::Representation::resetParameters()
+	virtual void resetParameters() override;
 
 	/// Reset the Vtc parameters to their initial values
-	void resetVtcParameters()
-	{
-		m_currentVtcParameters = m_initialVtcParameters;
-	}
+	void resetVtcParameters();
+
 
 protected:
 	/// Inertia matrices in global coordinates
 	SurgSim::Math::Matrix33d m_globalInertia;
-
 	/// Inverse of inertia matrix in global coordinates
 	SurgSim::Math::Matrix33d m_invGlobalInertia;
 
 	/// Current force applied on the rigid representation (in N)
 	SurgSim::Math::Vector3d m_force;
-
 	/// Current torque applied on the rigid representation (in N.m)
 	SurgSim::Math::Vector3d m_torque;
 
@@ -219,22 +210,18 @@ private:
 
 	/// Initial physical parameters
 	RigidRepresentationParameters m_initialParameters;
-
 	/// Current physical parameters
 	RigidRepresentationParameters m_currentParameters;
 
 	/// Initial Vtc state (useful for reset)
 	RigidRepresentationState m_initialVtcState;
-
 	/// Previous Vtc state
 	RigidRepresentationState m_previousVtcState;
-
 	/// Current Vtc state
 	RigidRepresentationState m_currentVtcState;
 
 	/// Initial Vtc parameters
 	VtcRigidParameters m_initialVtcParameters;
-
 	/// Current Vtc parameters
 	VtcRigidParameters m_currentVtcParameters;
 };
@@ -242,5 +229,7 @@ private:
 }; // Physics
 
 }; // SurgSim
+
+#include <SurgSim/Physics/VtcRigidRepresentation-inl.h>
 
 #endif // SURGSIM_PHYSICS_VTCRIGIDREPRESENTATION_H

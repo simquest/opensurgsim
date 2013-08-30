@@ -41,7 +41,8 @@ public:
 		m_lastInput.set(inputData);
 	}
 
-	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& initialData) override
+	virtual void initializeInput(const std::string& device,
+		const SurgSim::DataStructures::DataGroup& initialData) override
 	{
 		SURGSIM_ASSERT(initialData.isValid())
 			<< "Cannot initialize input with invalid data from device (" << device << ")";
