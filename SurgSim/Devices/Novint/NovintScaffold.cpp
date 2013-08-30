@@ -53,7 +53,7 @@ namespace SurgSim
 namespace Device
 {
 
-	
+
 class NovintScaffold::Handle
 {
 public:

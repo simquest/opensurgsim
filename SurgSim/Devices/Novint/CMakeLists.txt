@@ -27,12 +27,14 @@ include_directories(
 )
 
 set(NOVINT_DEVICE_SOURCES
+	Novint7DofDevice.cpp
 	NovintCommonDevice.cpp
 	NovintDevice.cpp
 	NovintScaffold.cpp
 )
 
 set(NOVINT_DEVICE_HEADERS
+	Novint7DofDevice.h
 	NovintCommonDevice.h
 	NovintDevice.h
 	NovintScaffold.h
