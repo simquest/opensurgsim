@@ -537,8 +537,8 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 			info->isDeviceRollAxisReversed = true;   // sigh
 			// I wish we had someplace to put these instead of hardcoding.
 			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = -75;
-			info->eulerAngleOffsetPitch = -50;
+			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
+			info->eulerAngleOffsetPitch = -50. * M_PI / 180.;
 		}
 		else
 		{
@@ -546,8 +546,8 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 			info->isDeviceRollAxisReversed = false;
 			// I wish we had someplace to put these instead of hardcoding.
 			info->eulerAngleOffsetRoll = 0;
-			info->eulerAngleOffsetYaw = +75;
-			info->eulerAngleOffsetPitch = +50;
+			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
+			info->eulerAngleOffsetPitch = +50. * M_PI / 180.;
 		}
 	}
 
