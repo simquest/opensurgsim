@@ -233,6 +233,7 @@ struct NovintScaffold::DeviceData
 		eulerAngleOffsetYaw(0.0),
 		eulerAngleOffsetPitch(0.0),
 		forwardPointingPoseThreshold(0.9),
+		torqueScale(Vector3d::Constant(1.0)),
 		positionValue(positionBuffer),
 		transformValue(transformBuffer),
 		forceValue(forceBuffer)
@@ -243,6 +244,7 @@ struct NovintScaffold::DeviceData
 		buttonStates.fill(false);
 
 		forceValue.setZero();   // also clears forceBuffer
+		torqueValue.setZero();
 	}
 
 
@@ -283,6 +285,7 @@ struct NovintScaffold::DeviceData
 	bool isDevice7Dof;
 	/// True if the roll axis of a 7DoF device has reverse polarity because the device is left-handed.
 	bool isDeviceRollAxisReversed;
+
 	/// The offset added to the roll Euler angle.
 	double eulerAngleOffsetRoll;
 	/// The offset added to the yaw Euler angle.
@@ -291,9 +294,13 @@ struct NovintScaffold::DeviceData
 	double eulerAngleOffsetPitch;
 	/// The threshold to determine if the device is pointing forwards before unlocking orientation.
 	double forwardPointingPoseThreshold;
+	/// The scaling factors for the torque axes.
+	Vector3d torqueScale;
 
 	/// The raw force to be written to the device.
 	double forceBuffer[3];
+	/// The torque value to be written to the device after conversion.
+	Vector3d torqueValue;
 
 	/// The position value from the device, permanently connected to positionBuffer.
 	Eigen::Map<Vector3d> positionValue;
@@ -347,6 +354,18 @@ HDLServoOpExitCode NovintScaffold::Callback::run(void* data)
 
 	// Should return HDL_SERVOOP_CONTINUE to wait for the next frame, or HDL_SERVOOP_EXIT to terminate the calls.
 	return HDL_SERVOOP_CONTINUE;
+}
+
+
+
+template <typename T>
+static inline T clampToRange(T value, T rangeMin, T rangeMax)
+{
+	if (value < rangeMin)
+		return rangeMin;
+	if (value > rangeMax)
+		return rangeMax;
+	return value;
 }
 
 
@@ -574,7 +593,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	// TODO(bert): this code should cache the access indices.
-	// TODO(bert): this needs to be split up into more methods.
+	// TODO(bert): this needs to be split up into more methods.  It is WAAAAY too big.
 
 	SurgSim::Math::Vector3d force;
 	if (outputData.vectors().get("force", &force))
@@ -584,6 +603,16 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	else
 	{
 		info->forceValue.setZero();
+	}
+
+	SurgSim::Math::Vector3d torque;
+	if (outputData.vectors().get("torque", &torque))
+	{
+		info->torqueValue = torque;
+	}
+	else
+	{
+		info->torqueValue.setZero();
 	}
 
 	bool desiredGravityCompensation = false;
@@ -683,6 +712,109 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	if (shouldSetGravityCompensation)
 	{
 		setGravityCompensation(info, desiredGravityCompensation);
+	}
+
+	// Set the torque command if applicable (and convert newton-meters to command counts).
+
+	if (info->isDevice7Dof)
+	{
+		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
+		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
+		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
+		// NB: the order of rotations is (rotY * rotZ * rotX), not XYZ!
+		// Construct the joint axes for the CURRENT pose of the device.
+		Vector3d jointAxisY = Vector3d::UnitY();
+		Vector3d jointAxisZ = rotationY * Vector3d::UnitZ();
+		Vector3d jointAxisX = rotationY * (rotationZ * Vector3d::UnitX());
+		// To convert from Cartesian space to motor-axis space, we assemble the axes into a basis matrix and invert it.
+		Matrix33d basisMatrix;
+		basisMatrix.col(0) = jointAxisX;
+		basisMatrix.col(1) = jointAxisY;
+		basisMatrix.col(2) = jointAxisZ;
+		double basisDeterminant = fabs(basisMatrix.determinant());
+
+		// Also construct a "fake" X axis orthogonal with the other two, to be used when the pose is degenerate.
+		// Note that the Y and Z axes are always perpendicular for the Falcon 7DoF, so the normalize() can't fail and
+		// is basically unnecessary, but...
+		Vector3d fakeAxisX  = jointAxisY.cross(jointAxisZ).normalized();
+		Matrix33d fakeBasisMatrix;
+		basisMatrix.col(0) = fakeAxisX;
+		basisMatrix.col(1) = jointAxisY;
+		basisMatrix.col(2) = jointAxisZ;
+
+		const double mediumBasisDeterminantThreshold = 0.6;
+		const double smallBasisDeterminantThreshold = 0.4;
+
+		Matrix33d decompositionMatrix;
+		if (basisDeterminant >= mediumBasisDeterminantThreshold)
+		{
+			// All is well!
+			decompositionMatrix = basisMatrix.inverse();
+		}
+		else if (basisDeterminant >= smallBasisDeterminantThreshold)
+		{
+			// If the determinant is "medium" but not "small", the device is in a near-degenerate configuration.
+			// Which axes are going to be commanded may be hugely dependent on small changes in the pose.
+			// We want to gradually decrease the amount of roll torque produced near the degenerate point.
+			double ratio =  ((basisDeterminant - smallBasisDeterminantThreshold) /
+				(mediumBasisDeterminantThreshold - smallBasisDeterminantThreshold));
+			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
+
+			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
+			// torque is then meaningless.
+			Matrix33d fakeDecompositionMatrix = fakeBasisMatrix.inverse();
+			fakeDecompositionMatrix.row(0) = Vector3d::Zero();
+
+			decompositionMatrix = basisMatrix.inverse() * ratio + fakeDecompositionMatrix * (1.-ratio);
+		}
+		else
+		{
+			// If the determinant is small, the matrix may not be invertible.
+			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
+			// torque is then meaningless.
+			decompositionMatrix = fakeBasisMatrix.inverse();
+			decompositionMatrix.row(0) = Vector3d::Zero();
+			// Moreover, near the degenerate position the X axis free-spins but is aligned with Y, so we want to reduce Y torques as well.
+			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
+			double ratio = 0;
+			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
+			// We just use linear drop-off.
+			decompositionMatrix.row(1) *= ratio;
+		}
+		Vector3d axisTorqueVector = decompositionMatrix * info->torqueValue;
+
+		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
+		const double axisTorqueMin = -2000;
+		const double axisTorqueMax = +2000;
+		// roll axis:  torque = 17.6 mNm  when command = 2000 (but flipped in left grip!)
+		const double rollTorqueScale  = axisTorqueMax / 17.6e-3;
+		// yaw axis:   torque = 47.96 mNm when command = 2000
+		const double yawTorqueScale   = axisTorqueMax / 47.96e-3;
+		// pitch axis: torque = 47.96 mNm when command = 2000
+		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
+
+		double deviceTorques[4];
+		deviceTorques[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+			axisTorqueMin, axisTorqueMax);
+		deviceTorques[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
+			axisTorqueMin, axisTorqueMax);
+		deviceTorques[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+			axisTorqueMin, axisTorqueMax);
+		deviceTorques[3] = 0;
+
+		if (info->isDeviceRollAxisReversed)  // commence swearing.
+		{
+			deviceTorques[0] = -deviceTorques[0];
+		}
+
+		// Set the torque vector (from the first 3 elements of the argument array).  Also set the jaw squeeze torque
+		// (as 4th element of the array)-- though this is not used anywhere at the moment.
+		// The 2nd arg to this call is the count; we're setting 4 doubles.
+		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, deviceTorques);
+		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
 
 
