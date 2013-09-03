@@ -134,7 +134,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name)
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation2);
 	sphereElement->addComponent(inputComponent);
-	
+
 	sphereElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
 								inputComponent, vtcRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
@@ -143,7 +143,6 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name)
 								vtcRepresentation, graphicsRepresentation2));
 	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 								//("Sphere Collision Representation", vtcRepresentation));
-	//SurgSim::Physics::RigidCollisionRepresentation("Test", vtcRepresentation);
 	return sphereElement;
 }
 
