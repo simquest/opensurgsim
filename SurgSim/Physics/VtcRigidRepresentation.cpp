@@ -34,6 +34,9 @@ VtcRigidRepresentation::VtcRigidRepresentation(const std::string& name)
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
 	setNumDof(6);
+
+	// Set the gravity flag to false by default
+	RigidRepresentationBase::setIsGravityEnabled(false);
 }
 
 VtcRigidRepresentation::~VtcRigidRepresentation()
@@ -62,6 +65,10 @@ void VtcRigidRepresentation::beforeUpdate(double dt)
 		// NOTE: axis*angle = rotationVector
 		m_currentVtcState.setAngularVelocity(axis * (angle / dt));
 	}
+
+	// Backup current state and current vtc state
+	m_previousState = m_currentState;
+	m_previousVtcState = m_currentVtcState;
 }
 
 void VtcRigidRepresentation::update(double dt)
@@ -86,10 +93,6 @@ void VtcRigidRepresentation::update(double dt)
 	Vector3d         w = m_currentState.getAngularVelocity();
 	Quaterniond     dq;
 	double       qNorm; // Norm of q before normalization.
-
-	// Backup current state and current vtc state
-	m_previousState = m_currentState;
-	m_previousVtcState = m_currentVtcState;
 
 	// Developing the equations integrating the Rayleigh damping on the velocity level:
 	// { Id33.m.(1/dt + alphaLinear ).v(t+dt) = m.v(t)/dt + f
@@ -205,6 +208,7 @@ void VtcRigidRepresentation::update(double dt)
 
 void VtcRigidRepresentation::afterUpdate(double dt)
 {
+	// Backup current state in the final state
 	m_finalState = m_currentState;
 }
 
@@ -248,6 +252,11 @@ void VtcRigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentati
 	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
 	m_globalInertia = R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
+}
+
+SurgSim::Physics::RepresentationType VtcRigidRepresentation::getType() const
+{
+	return REPRESENTATION_TYPE_VTC_RIGID;
 }
 
 }; /// Physics
