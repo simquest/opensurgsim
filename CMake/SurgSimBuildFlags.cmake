@@ -26,10 +26,6 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 # We always want to use defines from <math.h>.
 add_definitions( -D_USE_MATH_DEFINES )
 
-# Look for platform specific pthread
-find_package(Threads REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
-
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags

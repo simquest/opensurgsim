@@ -65,6 +65,14 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
 mark_as_advanced(Boost_DIR)
 
+# Look for platform specific pthread.
+find_package(Threads REQUIRED)
+# Append pthread and rt to Boost_LIBRARIES since they are boost dependancies
+list(APPEND Boost_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	list(APPEND Boost_LIBRARIES rt)
+endif()
+
 find_package(OpenHaptics)
 find_package(SixenseSdk)
 find_package(WDK)
