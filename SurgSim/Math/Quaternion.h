@@ -56,15 +56,40 @@ inline Eigen::Quaternion<T> makeRotationQuaternion(const T& angle, const Eigen::
 /// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
 /// \tparam VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
 /// \param quaternion the rotation quaternion to inspect.
-/// \param [out] angle the angle of the rotation, in radians.
+/// \param [out] angle the angle of the rotation within [-pi/2 +pi/2], in radians.
 /// \param [out] axis the axis of the rotation.
 template <typename T, int QOpt, int VOpt>
 inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
                                 T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
 {
-	Eigen::AngleAxis<T> angleAxis(quaternion);
-	*angle = angleAxis.angle();
-	*axis = angleAxis.axis();
+	const typename Eigen::Quaternion<T, QOpt>::Coefficients& c = quaternion.coeffs();
+	const T sa = sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2]);
+	if (sa <= std::numeric_limits<T>::epsilon())
+	{
+		(*axis)[0] = T(0);
+		(*axis)[1] = T(0);
+		(*axis)[2] = T(1);
+		*angle = T(0);  // if we don't have a meaningful axis, no point in computing the angle
+	}
+	else if (c[3] >= T(0))
+	{
+		// we want to make sure that we see a resulting rotation by less than pi, i.e. atan2() between -pi/2 and +pi/2
+		// atan2(y,x) with x >= 0 always returns values in the correct range so we are OK.
+		*angle = T(2) * atan2(sa, c[3]);
+		(*axis)[0] = c[0]/sa;
+		(*axis)[1] = c[1]/sa;
+		(*axis)[2] = c[2]/sa;
+	}
+	else
+	{
+		// we want to make sure that we see a resulting rotation by less than pi, i.e. atan2() between -pi/2 and +pi/2
+		// atan2(y,x) with x <= 0 returns values that would violate this, but quaternions are a double covering of
+		// rotations so we take the opposite quat instead.  Note that sa stays the same when we do this.
+		*angle = T(2) * atan2(sa, -c[3]);
+		(*axis)[0] = -c[0]/sa;
+		(*axis)[1] = -c[1]/sa;
+		(*axis)[2] = -c[2]/sa;
+	}
 }
 
 /// Get the angle corresponding to a quaternion's rotation, in radians.
@@ -72,16 +97,29 @@ inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
 /// \param quaternion the rotation quaternion to inspect.
-/// \returns the angle of the rotation, in radians.
+/// \returns the angle of the rotation within [-pi/2 +pi/2], in radians.
 template <typename T, int QOpt>
 inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 {
-	T w = std::abs(quaternion.w());
-	if (w >= 1.0)
+	const typename Eigen::Quaternion<T, QOpt>::Coefficients& c = quaternion.coeffs();
+	const T sa = sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2]);
+	if (sa <= std::numeric_limits<T>::epsilon())
 	{
-		return static_cast<T>(0);
+		return T(0);  // if we don't have a meaningful axis, no point in computing the angle
 	}
-	return static_cast<T>(2 * std::acos(w));
+	else if (c[3] >= T(0))
+	{
+		// we want to make sure that we see a resulting rotation by less than pi, i.e. atan2() between -pi/2 and +pi/2
+		// atan2(y,x) with x >= 0 always returns values in the correct range so we are OK.
+		return T(2) * atan2(sa, c[3]);
+	}
+	else
+	{
+		// we want to make sure that we see a resulting rotation by less than pi, i.e. atan2() between -pi/2 and +pi/2
+		// atan2(y,x) with x <= 0 returns values that would violate this, but quaternions are a double covering of
+		// rotations so we take the opposite quat instead.  Note that sa stays the same when we do this.
+		return T(2) * atan2(sa, -c[3]);
+	}
 }
 
 /// Quaternion negation (i.e. unary operator -)
