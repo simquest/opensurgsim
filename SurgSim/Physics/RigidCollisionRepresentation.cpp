@@ -22,7 +22,7 @@ namespace Physics
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(
 		const std::string& name,
-		std::shared_ptr<RigidRepresentation> representation) :
+		std::shared_ptr<RigidRepresentationBase> representation):
 	CollisionRepresentation(name, representation),
 	m_localRepresentation(representation)
 {
