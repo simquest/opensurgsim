@@ -29,6 +29,11 @@ using SurgSim::Physics::SphereShape;
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
+namespace
+{
+	const double epsilon = 1e-10;
+}
+
 class VtcRigidRepresentationTest : public ::testing::Test
 {
 public:
@@ -195,10 +200,14 @@ TEST_F(VtcRigidRepresentationTest, SetGetAndDefaultValueTest)
 	EXPECT_EQ(m_vtcStateDefault, rigidBody->getCurrentVtcState());
 	EXPECT_EQ(m_vtcStateDefault, rigidBody->getPreviousVtcState());
 	EXPECT_EQ(m_vtcStateDefault, rigidBody->getInitialVtcState());
+	EXPECT_TRUE(rigidBody->getPose().isApprox(m_vtcStateDefault.getPose()));
+	EXPECT_FALSE(rigidBody->getPose().isApprox(m_vtcState.getPose()));
 	rigidBody->setInitialVtcState(m_vtcState);
 	EXPECT_EQ(m_vtcState, rigidBody->getInitialVtcState());
 	EXPECT_EQ(m_vtcState, rigidBody->getCurrentVtcState());
 	EXPECT_EQ(m_vtcState, rigidBody->getPreviousVtcState());
+	EXPECT_TRUE(rigidBody->getPose().isApprox(m_vtcStateDefault.getPose()));
+	EXPECT_FALSE(rigidBody->getPose().isApprox(m_vtcState.getPose()));
 
 	// Get Vtc parameters (current, initial)
 	EXPECT_EQ(m_vtcParamDefault, rigidBody->getCurrentVtcParameters());
@@ -231,12 +240,12 @@ TEST_F(VtcRigidRepresentationTest, SetGetAndDefaultValueTest)
 	// Get numDof = 6
 	ASSERT_EQ(6u, rigidBody->getNumDof());
 
-	// Set/Get isGravityEnabled [default = true]
-	EXPECT_TRUE(rigidBody->isGravityEnabled());
+	// Set/Get isGravityEnabled [default = false]
+	EXPECT_FALSE(rigidBody->isGravityEnabled());
 	rigidBody->setIsGravityEnabled(false);
 	ASSERT_FALSE(rigidBody->isGravityEnabled());
-	rigidBody->setIsGravityEnabled(true);
-	ASSERT_TRUE(rigidBody->isGravityEnabled());
+	EXPECT_THROW(rigidBody->setIsGravityEnabled(true), SurgSim::Framework::AssertionFailure);
+	ASSERT_FALSE(rigidBody->isGravityEnabled());
 }
 
 TEST_F(VtcRigidRepresentationTest, NoForceTorqueTest)
@@ -250,15 +259,19 @@ TEST_F(VtcRigidRepresentationTest, NoForceTorqueTest)
 
 	// Setup phase
 	rigidBody->setIsActive(true);
-	rigidBody->setIsGravityEnabled(false);
 	rigidBody->setInitialParameters(m_param);
+	rigidBody->setInitialVtcParameters(m_vtcParam);
 
 	// Run few time steps
 	for (int timeStep = 0; timeStep < m_maxNumSimulationStepTest; timeStep++)
 	{
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);
+		// Current vs final pose (final not backed up yet, but no changes => == current)
+		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
 		rigidBody->afterUpdate(m_dt);
+		// Current vs final pose (final backed up == current)
+		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
 	}
 
 	const RigidRepresentationState& state = rigidBody->getCurrentState();
@@ -275,11 +288,39 @@ TEST_F(VtcRigidRepresentationTest, NoForceTorqueTest)
 	ASSERT_EQ(Vector3d::Zero(), w);
 }
 
+TEST_F(VtcRigidRepresentationTest, TestFinalPose)
+{
+	// Create the rigid body
+	std::shared_ptr<VtcRigidRepresentation> rigidBody = std::make_shared<VtcRigidRepresentation>("Rigid Vtc");
+
+	// Setup phase
+	rigidBody->setIsActive(true);
+	rigidBody->setInitialParameters(m_param);
+	rigidBody->setInitialVtcParameters(m_vtcParam);
+
+	// Run few time steps
+	for (int timeStep = 0; timeStep < m_maxNumSimulationStepTest; timeStep++)
+	{
+		// Move the VTC Input
+		SurgSim::Math::RigidTransform3d transform = rigidBody->getCurrentVtcState().getPose();
+		transform.translation()[0] += 1e-3;
+		rigidBody->setPose(transform);
+
+		// Do the simulation
+		rigidBody->beforeUpdate(m_dt);
+		rigidBody->update(m_dt);
+		// Current vs final pose (final not backed up yet != current)
+		ASSERT_FALSE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
+		rigidBody->afterUpdate(m_dt);
+		// Current vs final pose (final backed up == current)
+		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
+	}
+}
+
 // The rigid representation and the vtc are both initialized with
 // position (0 0 0) orientation (0 0 0 1)
 // velocity linear (0 0 0)/angular(0 0 0)
-// The Vtc does not move, holding the rigid representation in place,
-// fighting the gravity force.
+// The Vtc does not move, holding the rigid representation in place (no gravity even if flag setup to true)
 TEST_F(VtcRigidRepresentationTest, GravityTest)
 {
 	using SurgSim::Math::Vector3d;
@@ -291,7 +332,6 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 
 	// Setup phase
 	rigidBody->setIsActive(true);
-	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialParameters(m_param);
 	rigidBody->setInitialVtcParameters(m_vtcParam);
 
@@ -300,7 +340,11 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 	{
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);
+		// Current vs final pose (final not backed up yet but gravity ineffective in VTC => == current)
+		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
 		rigidBody->afterUpdate(m_dt);
+		// Current vs final pose (final backed up == current)
+		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
 
 		const RigidRepresentationState &state = rigidBody->getCurrentState();
 		const RigidRepresentationState &vtcState = rigidBody->getCurrentVtcState();
@@ -310,10 +354,9 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 		const Quaterniond q = Quaterniond(R);
 		const Vector3d    w = state.getAngularVelocity();
 
-		// 1mm margin with a stiff Vtc to keep the virtual object close by
-		double epsilon = 1e-3;
-		Vector3d diff = G - vtcState.getPose().translation();
-		ASSERT_NEAR(0.0, diff.norm(), epsilon);
+		// VTC and Rigid body simulation should not have moved from (0,0,0)
+		ASSERT_NEAR(0.0, G.norm(), epsilon);
+		ASSERT_NEAR(0.0, vtcState.getPose().translation().norm(), epsilon);
 		// We do not test the linear velocity as it varies to get the position
 		// close to the Vtc target
 		// Angular velocity should not be affected, nor the orientation
@@ -329,7 +372,6 @@ TEST_F(VtcRigidRepresentationTest, DisableWhenDivergeTest)
 
 	// Setup phase
 	rigidBody->setIsActive(true);
-	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialParameters(m_param);
 	rigidBody->setInitialState(m_stateDivergence);
 
