@@ -89,10 +89,11 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
+
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
+								physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
-		("Plane Collision",planeShape, physicsRepresentation));
+								("Plane Collision",planeShape, physicsRepresentation));
 	return planeElement;
 }
 
@@ -103,7 +104,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name)
 	params.setDensity(700.0); // Wood
 	params.setLinearDamping(0.1);
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(1); // 5cm Sphere
+	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 5cm Sphere
 	params.setShapeUsedForMassInertia(shape);
 
 	VtcRigidParameters vtcParams;
@@ -123,7 +124,7 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name)
 
 	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation2 =
 		std::make_shared<OsgSphereRepresentation>(name + "2-Graphics");
-	graphicsRepresentation->setRadius(shape->getRadius());
+	graphicsRepresentation2->setRadius(shape->getRadius());
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
@@ -132,17 +133,17 @@ std::shared_ptr<SceneElement> createSphere(const std::string& name)
 	sphereElement->addComponent(vtcRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation2);
+	sphereElement->addComponent(inputComponent);
+	
 	sphereElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
 								inputComponent, vtcRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								vtcRepresentation, graphicsRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior2>("Physics to Graphics2 Pose",
 								vtcRepresentation, graphicsRepresentation2));
-
 	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-	//	("Sphere Collision Representation", vtcRepresentation));
-	sphereElement->addComponent(inputComponent);
-
+								//("Sphere Collision Representation", vtcRepresentation));
+	//SurgSim::Physics::RigidCollisionRepresentation("Test", vtcRepresentation);
 	return sphereElement;
 }
 
@@ -158,6 +159,8 @@ int main(int argc, char* argv[])
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::shared_ptr<SurgSim::Device::MultiAxisDevice> toolDevice =
 		std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
+	toolDevice->setPositionScale(0.0003);
+	toolDevice->setOrientationScale(0.0003);
 	SURGSIM_ASSERT( toolDevice->initialize() == true ) <<
 		"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
 

@@ -205,6 +205,7 @@ void VtcRigidRepresentation::update(double dt)
 
 void VtcRigidRepresentation::afterUpdate(double dt)
 {
+	m_finalState = m_currentState;
 }
 
 void VtcRigidRepresentation::computeComplianceMatrix(double dt)
