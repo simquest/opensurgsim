@@ -20,6 +20,7 @@
 
 #include <SurgSim/Framework/ReuseFactory.h>
 #include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Math/Geometry.h>
 
 namespace SurgSim
 {
@@ -260,6 +261,7 @@ private:
 
 };
 
+
 /// Class to calculate intersections between a triangle mesh and a plan
 template <class VertexType, class EdgeType, class TriangleType>
 class TriangleMeshPlaneDcdContact : public ContactCalculation
@@ -282,7 +284,11 @@ private:
 
 };
 
+
 }; // Physics
 }; // SurgSim
+
+#include <SurgSim/Physics/ContactCalculation-inl.h>
+
 
 #endif

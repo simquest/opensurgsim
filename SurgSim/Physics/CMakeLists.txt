@@ -63,6 +63,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h
 	ContactCalculation.h
+	ContactCalculation-inl.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	CylinderShape.h
