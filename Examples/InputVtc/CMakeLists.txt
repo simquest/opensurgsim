@@ -29,12 +29,12 @@ include_directories(
 	"${OPENTHREADS_INCLUDE_DIR}"
 )
 
-set(INPUTVTCSPHEREEXAMPLE_SOURCES
-	InputVtcSphereExample.cpp
+set(INPUTVTCEXAMPLE_SOURCES
+	InputVtcExample.cpp
 )
 
-add_executable(ExampleInputVtcSphere
-	${INPUTVTCSPHEREEXAMPLE_SOURCES})
+add_executable(ExampleInputVtc
+	${INPUTVTCEXAMPLE_SOURCES})
 
 set(LIBS 
 	IdentityPoseDevice
@@ -52,6 +52,6 @@ if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
-target_link_libraries(ExampleInputVtcSphere
+target_link_libraries(ExampleInputVtc
 	${LIBS}
 )

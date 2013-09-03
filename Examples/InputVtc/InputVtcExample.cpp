@@ -24,17 +24,19 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
+#include <SurgSim/Graphics/OsgBoxRepresentation.h>
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgPlaneRepresentation.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
+#include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Input/InputManager.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Physics/BoxShape.h>
 #include <SurgSim/Physics/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/VtcRigidParameters.h>
@@ -48,12 +50,14 @@ using SurgSim::Blocks::RepresentationPoseBehavior2;
 using SurgSim::Blocks::InputVtcBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
+using SurgSim::Graphics::OsgBoxRepresentation;
+using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
-using SurgSim::Graphics::OsgSphereRepresentation;
+using SurgSim::Graphics::OsgShader;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::VtcRigidParameters;
 using SurgSim::Physics::VtcRigidRepresentation;
@@ -98,52 +102,66 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 }
 
 
-std::shared_ptr<SceneElement> createSphere(const std::string& name)
+std::shared_ptr<SceneElement> createBox(const std::string& name)
 {
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood
-	params.setLinearDamping(0.1);
 
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.5); // 5cm Sphere
-	params.setShapeUsedForMassInertia(shape);
+	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.1, 0.2, 0.3);
+	params.setShapeUsedForMassInertia(box);
 
 	VtcRigidParameters vtcParams;
-	vtcParams.setVtcAngularDamping(1);
-	vtcParams.setVtcAngularStiffness(1);
-	vtcParams.setVtcLinearDamping(1);
-	vtcParams.setVtcLinearStiffness(1);
+	vtcParams.setVtcAngularDamping(20);
+	vtcParams.setVtcAngularStiffness(20);
+	vtcParams.setVtcLinearDamping(100);
+	vtcParams.setVtcLinearStiffness(100);
 
 	std::shared_ptr<VtcRigidRepresentation> vtcRepresentation =
 		std::make_shared<VtcRigidRepresentation>(name + "-Vtc");
 	vtcRepresentation->setInitialParameters(params);
 	vtcRepresentation->setInitialVtcParameters(vtcParams);
 
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + "-Graphics");
-	graphicsRepresentation->setRadius(shape->getRadius());
+	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation =
+		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
+	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation2 =
-		std::make_shared<OsgSphereRepresentation>(name + "2-Graphics");
-	graphicsRepresentation2->setRadius(shape->getRadius());
+	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation2 =
+		std::make_shared<OsgBoxRepresentation>(name + "2-Graphics");
+	graphicsRepresentation2->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+
+	shader->setVertexShaderSource(
+		"void main(void)\n"
+		"{\n"
+		"    gl_Position = ftransform();\n"
+		"}");
+	shader->setFragmentShaderSource(
+		"void main(void)\n"
+		"{\n"
+		"    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);\n"
+		"}");
+	material->setShader(shader);
+	graphicsRepresentation2->setMaterial(material);
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
 
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
-	sphereElement->addComponent(vtcRepresentation);
-	sphereElement->addComponent(graphicsRepresentation);
-	sphereElement->addComponent(graphicsRepresentation2);
-	sphereElement->addComponent(inputComponent);
+	std::shared_ptr<SceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
+	boxElement->addComponent(vtcRepresentation);
+	boxElement->addComponent(graphicsRepresentation);
+	boxElement->addComponent(graphicsRepresentation2);
+	boxElement->addComponent(inputComponent);
 
-	sphereElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
-								inputComponent, vtcRepresentation));
-	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-								vtcRepresentation, graphicsRepresentation));
-	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior2>("Physics to Graphics2 Pose",
-								vtcRepresentation, graphicsRepresentation2));
+	boxElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
+		inputComponent, vtcRepresentation));
+	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+		vtcRepresentation, graphicsRepresentation));
+	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior2>("Physics to Graphics2 Pose",
+		vtcRepresentation, graphicsRepresentation2));
 	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-								//("Sphere Collision Representation", vtcRepresentation));
-	return sphereElement;
+	//("Sphere Collision Representation", vtcRepresentation));
+	return boxElement;
 }
 
 
@@ -158,8 +176,8 @@ int main(int argc, char* argv[])
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::shared_ptr<SurgSim::Device::MultiAxisDevice> toolDevice =
 		std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
-	toolDevice->setPositionScale(0.0003);
-	toolDevice->setOrientationScale(0.0003);
+	toolDevice->setPositionScale(toolDevice->getPositionScale() * 10.0);
+	toolDevice->setOrientationScale(toolDevice->getOrientationScale() * 3.0);
 	SURGSIM_ASSERT( toolDevice->initialize() == true ) <<
 		"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
 
@@ -173,10 +191,10 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
-	scene->addSceneElement(createSphere("sphere1"));
-	scene->addSceneElement(createPlane("plane1",
+	scene->addSceneElement(createBox("box"));
+	scene->addSceneElement(createPlane("plane",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
-	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
+	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));

@@ -14,4 +14,4 @@
 # limitations under the License.
 
 add_subdirectory(BouncingBalls)
-add_subdirectory(InputVtcSphere)
+add_subdirectory(InputVtc)
