@@ -43,6 +43,8 @@ public:
 	/// Destructor
 	virtual ~RigidRepresentation();
 
+	/// Query the representation type
+	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
 	/// Set the initial parameters of the rigid representation

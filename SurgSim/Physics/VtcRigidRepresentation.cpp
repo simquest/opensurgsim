@@ -35,6 +35,7 @@ VtcRigidRepresentation::VtcRigidRepresentation(const std::string& name)
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
 	setNumDof(6);
 
+	// Set the gravity flag to false by default
 	RigidRepresentationBase::setIsGravityEnabled(false);
 }
 
@@ -97,9 +98,13 @@ void VtcRigidRepresentation::update(double dt)
 	// { Id33.m.(1/dt + alphaLinear ).v(t+dt) = m.v(t)/dt + f
 	// { I     .(1/dt + alphaAngular).w(t+dt) = I.w(t)/dt + t - w(t)^(I.w(t))
 
-	// Compute external forces/torques (no gravity on a Vtc, it does not make any sense)
+	// Compute external forces/torques
 	m_force.setZero();
 	m_torque.setZero();
+	if (isGravityEnabled())
+	{
+		m_force += getGravity() * param.getMass();
+	}
 	m_torque -= w.cross(m_globalInertia * w);
 
 	// Vtc part
@@ -253,13 +258,6 @@ SurgSim::Physics::RepresentationType VtcRigidRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_VTC_RIGID;
 }
-
-
-void VtcRigidRepresentation::setIsGravityEnabled(bool isGravityEnabled)
-{
-	SURGSIM_ASSERT(! isGravityEnabled) << "Cannot set the gravity on a VtcRigidRepresentation";
-}
-
 
 }; /// Physics
 

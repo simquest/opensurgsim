@@ -32,6 +32,7 @@ using SurgSim::Physics::SphereShape;
 namespace
 {
 	const double epsilon = 1e-10;
+	const double epsilonGravity = 1e-2; // 1cm
 }
 
 class VtcRigidRepresentationTest : public ::testing::Test
@@ -43,7 +44,7 @@ public:
 		m_dtDivergenceTest = 1e+3;
 
 		double radius = 0.1;
-		m_param.setDensity(9000.0);
+		m_param.setDensity(700.0);
 		m_param.setAngularDamping(0.0);
 		m_param.setLinearDamping(0.0);
 		m_param.setShapeUsedForMassInertia(std::make_shared<SphereShape>(radius));
@@ -63,10 +64,10 @@ public:
 		const SurgSim::Math::Vector3d max(DBL_MAX, DBL_MAX, DBL_MAX);
 		m_stateDivergence.setAngularVelocity(max);
 
-		m_vtcParam.setVtcAngularDamping(5.0);
-		m_vtcParam.setVtcAngularStiffness(1000.0);
-		m_vtcParam.setVtcLinearDamping(1.0);
-		m_vtcParam.setVtcLinearStiffness(1000.0);
+		m_vtcParam.setVtcAngularDamping(20.0);
+		m_vtcParam.setVtcAngularStiffness(20.0);
+		m_vtcParam.setVtcLinearDamping(500.0);
+		m_vtcParam.setVtcLinearStiffness(500.0);
 
 		{
 			SurgSim::Math::Quaterniond   q(0.5, 0.4, 0.3, 0.2);
@@ -79,7 +80,7 @@ public:
 			m_vtcState.setPose(SurgSim::Math::makeRigidTransform(q, t));
 		}
 
-		m_maxNumSimulationStepTest = 1;
+		m_maxNumSimulationStepTest = 100;
 	}
 
 	void TearDown()
@@ -242,9 +243,9 @@ TEST_F(VtcRigidRepresentationTest, SetGetAndDefaultValueTest)
 
 	// Set/Get isGravityEnabled [default = false]
 	EXPECT_FALSE(rigidBody->isGravityEnabled());
+	rigidBody->setIsGravityEnabled(true);
+	ASSERT_TRUE(rigidBody->isGravityEnabled());
 	rigidBody->setIsGravityEnabled(false);
-	ASSERT_FALSE(rigidBody->isGravityEnabled());
-	EXPECT_THROW(rigidBody->setIsGravityEnabled(true), SurgSim::Framework::AssertionFailure);
 	ASSERT_FALSE(rigidBody->isGravityEnabled());
 }
 
@@ -320,7 +321,8 @@ TEST_F(VtcRigidRepresentationTest, TestFinalPose)
 // The rigid representation and the vtc are both initialized with
 // position (0 0 0) orientation (0 0 0 1)
 // velocity linear (0 0 0)/angular(0 0 0)
-// The Vtc does not move, holding the rigid representation in place (no gravity even if flag setup to true)
+// The Vtc does not move, holding the rigid representation in place
+// fighting against the gravity force
 TEST_F(VtcRigidRepresentationTest, GravityTest)
 {
 	using SurgSim::Math::Vector3d;
@@ -332,6 +334,7 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 
 	// Setup phase
 	rigidBody->setIsActive(true);
+	rigidBody->setIsGravityEnabled(true);
 	rigidBody->setInitialParameters(m_param);
 	rigidBody->setInitialVtcParameters(m_vtcParam);
 
@@ -340,8 +343,8 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 	{
 		rigidBody->beforeUpdate(m_dt);
 		rigidBody->update(m_dt);
-		// Current vs final pose (final not backed up yet but gravity ineffective in VTC => == current)
-		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
+		// Current vs final pose (final not backed up yet + gravity ON => != current)
+		ASSERT_FALSE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
 		rigidBody->afterUpdate(m_dt);
 		// Current vs final pose (final backed up == current)
 		ASSERT_TRUE(rigidBody->getPose().isApprox(rigidBody->getCurrentPose()));
@@ -354,9 +357,14 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 		const Quaterniond q = Quaterniond(R);
 		const Vector3d    w = state.getAngularVelocity();
 
-		// VTC and Rigid body simulation should not have moved from (0,0,0)
-		ASSERT_NEAR(0.0, G.norm(), epsilon);
-		ASSERT_NEAR(0.0, vtcState.getPose().translation().norm(), epsilon);
+		// VTC should not have moved from (0,0,0) and Identity rotation
+		ASSERT_TRUE(vtcState.getPose().translation().isConstant(0.0));
+		ASSERT_TRUE(vtcState.getPose().linear().isIdentity());
+		// Rigid body should have moved under gravity
+		ASSERT_FALSE(G.isApprox(vtcState.getPose().translation(), epsilon));
+		// But both should remain close by (all relative to the Vtc parameters,...)
+		SurgSim::Math::Vector3d diff = G - vtcState.getPose().translation();
+		ASSERT_NEAR(0.0, diff.norm(), epsilonGravity);
 		// We do not test the linear velocity as it varies to get the position
 		// close to the Vtc target
 		// Angular velocity should not be affected, nor the orientation

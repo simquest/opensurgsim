@@ -49,11 +49,9 @@ public:
 	/// Destructor
 	virtual ~VtcRigidRepresentation();
 
+	/// Query the representation type
+	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
-
-	/// Set the gravity enable flag
-	/// \param isGravityEnabled can only be False, otherwise an assert is triggered
-	virtual void setIsGravityEnabled(bool isGravityEnabled);
 
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
