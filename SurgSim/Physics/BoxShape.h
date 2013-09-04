@@ -109,11 +109,21 @@ public:
 	/// \param i The vertex index.
 	/// \param quat The orientation of the box.
 	/// \param trans The translation of the box.
+	/// \return The global vertex position.
 	Vector3d calculateGlobalVertex(const int i,
-									  const SurgSim::Math::Quaterniond& quat,
-									  const Vector3d& trans)
+								   const SurgSim::Math::Quaterniond& quat,
+								   const Vector3d& trans) const
 	{
 		return quat * m_vertices[i] + trans;
+	}
+
+	/// Function that returns the local vertex location, given an index.
+	/// and translation.
+	/// \param i The vertex index.
+	/// \return The local vertex position.
+	Vector3d getLocalVertex(const int i) const
+	{
+		return m_vertices[i];
 	}
 
 private:

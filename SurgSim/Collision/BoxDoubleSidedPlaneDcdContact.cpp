@@ -63,22 +63,12 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
     double maxD = -std::numeric_limits<double>::max();
 	double minD = std::numeric_limits<double>::max();
     SurgSim::Math::Vector3d boxVertices[8];
-    int iVertex = 0;
-    for (int i = -1; i <= 1; i += 2)
+    for (int i = 0; i < 8; ++i)
     {
-        for (int j = -1; j <= 1; j += 2)
-        {
-            for (int k = -1; k <= 1; k += 2)
-            {
-                boxVertices[iVertex].x() = box->getSizeX() * double(i) * 0.5;
-                boxVertices[iVertex].y() = box->getSizeY() * double(j) * 0.5;
-                boxVertices[iVertex].z() = box->getSizeZ() * double(k) * 0.5;
-                d[iVertex] = planeNormal.dot(boxVertices[iVertex]) + planeD;
-                maxD = std::max(d[iVertex], maxD);
-                minD = std::min(d[iVertex], minD);
-                ++iVertex;
-            }
-        }
+        boxVertices[i] = box->getLocalVertex(i);
+        d[i] = planeNormal.dot(boxVertices[i]) + planeD;
+        maxD = std::max(d[i], maxD);
+        minD = std::min(d[i], minD);
     }
 
     if (!(maxD > DistanceEpsilon && minD > DistanceEpsilon) && !(maxD < -DistanceEpsilon && minD < -DistanceEpsilon))

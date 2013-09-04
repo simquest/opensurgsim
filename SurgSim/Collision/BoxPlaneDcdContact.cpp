@@ -55,29 +55,21 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
     SurgSim::Math::Vector3d boxVertex;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d boxVertexGlobal;
-    for (int i = -1; i <= 1; i += 2)
+    for (int i = 0; i < 8; ++i)
     {
-        for (int j = -1; j <= 1; j += 2)
-        {
-            for (int k = -1; k <= 1; k += 2)
-            {
-                boxVertex.x() = box->getSizeX() * double(i) * 0.5;
-                boxVertex.y() = box->getSizeY() * double(j) * 0.5;
-                boxVertex.z() = box->getSizeZ() * double(k) * 0.5;
-                d = planeNormal.dot(boxVertex) + planeD;
-				if (d < DistanceEpsilon)
-				{
-					// Add a contact.
-					normal = representationPlane->getPose().linear() * plane->getNormal();
-					std::pair<Location,Location> penetrationPoints;
-					boxVertexGlobal = representationBox->getPose() * boxVertex;
-					penetrationPoints.first.globalPosition.setValue(boxVertexGlobal);
-					penetrationPoints.second.globalPosition.setValue(boxVertexGlobal - normal * d);
+        boxVertex = box->getLocalVertex(i);
+        d = planeNormal.dot(boxVertex) + planeD;
+		if (d < DistanceEpsilon)
+		{
+			// Add a contact.
+			normal = representationPlane->getPose().linear() * plane->getNormal();
+			std::pair<Location,Location> penetrationPoints;
+			boxVertexGlobal = representationBox->getPose() * boxVertex;
+			penetrationPoints.first.globalPosition.setValue(boxVertexGlobal);
+			penetrationPoints.second.globalPosition.setValue(boxVertexGlobal - normal * d);
 
-					pair->addContact(d, normal, penetrationPoints);
-				}
-            }
-        }
+			pair->addContact(d, normal, penetrationPoints);
+		}
     }
 }
 
