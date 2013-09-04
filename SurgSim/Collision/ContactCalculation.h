@@ -51,28 +51,10 @@ public:
 
 	/// Function that handles asymmetric pair and calls the actual contact calculation routine of the sub class.
 	/// \param	pair	The pair that is under consideration.
-	void calculateContact(std::shared_ptr<CollisionPair> pair)
-	{
-		if (needsSwap(pair->getFirst()->getShapeType(), pair->getSecond()->getShapeType()))
-		{
-			pair->swapRepresentations();
-		}
+	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
-		if(getShapeTypes().first != RigidShapeType::RIGID_SHAPE_TYPE_NONE)
-		{
-			SURGSIM_ASSERT(pair->getFirst()->getShapeType() == getShapeTypes().first) <<
-				"First Object, wrong type of object" << pair->getFirst()->getShapeType();
-		}
-
-		if(getShapeTypes().second != RigidShapeType::RIGID_SHAPE_TYPE_NONE)
-		{
-		SURGSIM_ASSERT(pair->getSecond()->getShapeType() == getShapeTypes().second) <<
-			"Second Object, wrong type of object" << pair->getSecond()->getShapeType();
-		}
-
-		doCalculateContact(pair);
-	}
-
+	/// Virtual function that returns the shapes that this ContactCalculation class handles.
+	/// Return the shape types this class handles.
 	virtual std::pair<int,int> getShapeTypes() = 0;
 
 private:
@@ -81,26 +63,9 @@ private:
 	/// \param	pair	The symmetric pair that is under consideration.
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) = 0;
 
-	bool needsSwap(int firstShapeType, int secondShapeType)
-	{
-		std::pair<int,int> shapeTypes = getShapeTypes();
-		return firstShapeType != secondShapeType && firstShapeType == shapeTypes.second &&
-			secondShapeType == shapeTypes.first;
-	}
-
 };
 
 }; // namespace Collision
 }; // namespace SurgSim
-
-
-#include <SurgSim/Collision/DefaultContactCalculation.h>
-#include <SurgSim/Collision/SphereSphereDcdContact.h>
-#include <SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h>
-#include <SurgSim/Collision/SpherePlaneDcdContact.h>
-#include <SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h>
-#include <SurgSim/Collision/BoxPlaneDcdContact.h>
-#include <SurgSim/Collision/BoxSphereDcdContact.h>
-#include <SurgSim/Collision/CapsuleSphereDcdContact.h>
 
 #endif

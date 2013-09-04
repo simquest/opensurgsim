@@ -24,6 +24,7 @@ set(SURGSIM_COLLISION_SOURCES
 	CapsuleSphereDcdContact.cpp
 	CollisionPair.cpp
 	CollisionRepresentation.cpp
+	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
 	RigidCollisionRepresentation.cpp
 	RigidShapeCollisionRepresentation.cpp
@@ -40,6 +41,7 @@ set(SURGSIM_COLLISION_HEADERS
 	CollisionPair.h
 	CollisionRepresentation.h
 	ContactCalculation.h
+	DcdCollision.h
 	DefaultContactCalculation.h
 	Location.h
 	RigidCollisionRepresentation.h

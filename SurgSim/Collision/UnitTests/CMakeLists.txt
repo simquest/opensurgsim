@@ -25,6 +25,7 @@ set(UNIT_TEST_SOURCES
 	BoxSphereContactCalculationTests.cpp
 	CapsuleSphereContactCalculationTests.cpp
 	CollisionPairTests.cpp
+	ContactCalculationTestsCommon.cpp
 	DefaultContactCalculationTests.cpp
 	MockCollisionRepresentation.cpp
 	RepresentationUtilities.cpp
@@ -40,13 +41,6 @@ set(UNIT_TEST_HEADERS
 )
 
 include_directories(
-)
-
-surgsim_add_library(
-	SurgSimCollisionTestLib
-	"${UNIT_TEST_SOURCES}"
-	"${UNIT_TEST_HEADERS}"
-	"SurgSim/Collision/UnitTests"
 )
 
 set(LIBS SurgSimFramework SurgSimDataStructures SurgSimCollision gtest ${Boost_LIBRARIES})

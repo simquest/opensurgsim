@@ -52,16 +52,14 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 	{
 		ASSERT_TRUE(pair->hasContacts());
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
-		EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
-		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
+		EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
+		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal));
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 		EXPECT_TRUE(eigenEqual(spherePenetration,
-							   contact->penetrationPoints.first.globalPosition.getValue(),
-							   epsilon));
+							   contact->penetrationPoints.first.globalPosition.getValue()));
 		EXPECT_TRUE(eigenEqual(planePenetration,
-							   contact->penetrationPoints.second.globalPosition.getValue(),
-							   epsilon));
+							   contact->penetrationPoints.second.globalPosition.getValue()));
 	}
 	else
 	{

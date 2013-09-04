@@ -24,6 +24,10 @@
 #include <SurgSim/Math/RigidTransform.h>
 
 #include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Physics/BoxShape.h>
+#include <SurgSim/Physics/PlaneShape.h>
+#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
+
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/CollisionPair.h>
@@ -36,142 +40,84 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
 using SurgSim::Physics::RigidShape;
+using SurgSim::Physics::BoxShape;
+using SurgSim::Physics::PlaneShape;
+using SurgSim::Physics::DoubleSidedPlaneShape;
 
 namespace SurgSim
 {
 namespace Collision
 {
 
-namespace
-{
-double epsilon = SurgSim::Math::Geometry::ScalarEpsilon;
-}
+/// Function that compares two 3d vectors and asserts that they are equal.
+/// The tolerance for the numerical values is SurgSim::Math::Geometry::DistanceEpsilon.
+/// \param left First vector.
+/// \param right Second vector.
+::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right);
 
-static ::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right, double epsilon)
-{
-	double dist = (left - right).norm();
-	if (std::abs(dist) < epsilon)
-	{
-		return ::testing::AssertionSuccess();
-	}
-	else
-	{
-		return ::testing::AssertionFailure() << std::endl << "Vectors not close, expected: " << left.transpose() <<
-			   std::endl << " result: " << right.transpose() << std::endl;
-	}
-}
+/// Function that checks if a given contact contains the given normal, depth and
+/// penetration points.
+/// \param contact The contact object that is being checked.
+/// \param expectedDepth The expected depth.
+/// \param expectedNormal The expected normal.
+/// \param expectedPenetrationPointFirst The expected first penetration point.
+/// \param expectedPenetrationPointSecond The expected second penetration point.
+void checkContactInfo(std::shared_ptr<Contact> contact, double expectedDepth,
+					  Vector3d &expectedNormal, Vector3d &expectedPenetrationPointFirst,
+					  Vector3d &expectedPenetrationPointSecond);
 
-static ::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
-														 const std::list<std::shared_ptr<Contact>>& contactsList)
-{
-    using SurgSim::Math::Geometry::ScalarEpsilon;
+/// Function that checks if a given contact is present in the list of given contacts.
+/// \param expected The expected contact.
+/// \param contactsList The list of contacts.
+::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
+												  const std::list<std::shared_ptr<Contact>>& contactsList);
 
-    bool contactPresent = false;
-    for (auto it = contactsList.begin(); it != contactsList.end() && !contactPresent; ++it)
-    {
-        // Compare the normals.
-        contactPresent = eigenEqual(expected->normal, it->get()->normal, ScalarEpsilon);
-        // Compare the global position of first object.
-        contactPresent &= eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
-                                     it->get()->penetrationPoints.first.globalPosition.getValue(), ScalarEpsilon);
-        // Compare the global position of second object.
-        contactPresent &= eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
-                                     it->get()->penetrationPoints.second.globalPosition.getValue(),
-                                     ScalarEpsilon);
-        // Compare the depth.
-        contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
-    }
+/// Function that checks if two given list of contacts are the same.
+/// \param expected The expected contact lists.
+/// \param contactsList The list of given contact list.
+void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
+							  const std::list<std::shared_ptr<Contact>>& calculatedContacts);
 
-    if (contactPresent)
-    {
-        return ::testing::AssertionSuccess();
-    }
-    else
-    {
-        return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\n" <<
-               "Normal: " << expected->normal << "\n" <<
-               "First objects' contact point: " << expected->penetrationPoints.first.globalPosition.getValue()
-               << "\n" <<
-               "Second objects' contact point: " << expected->penetrationPoints.second.globalPosition.getValue()
-               << "\n" <<
-               "Depth of penetration: " << expected->depth << "\n";
-    }
-}
+/// Function that generates (no collision detection performed) the contact information between a box and a plane,
+/// given the box vertex indices that are known to be in contact.
+/// \param expectedContacts The list where the generated contacts are added.
+/// \param expectedNumberOfContacts The number of contacts to be generated.
+/// \param expectedBoxIndicesInContacts The vertex indices of the box which are in collision with the plane.
+/// \param box The box shape.
+/// \param boxTrans The box translation in global co-ordinate system.
+/// \param boxQuat The box orientation in global co-ordinate system.
+/// \param plane The plane shape.
+/// \param planeTrans The plane translation in global co-ordinate system.
+/// \param planeQuat The plane orientation in global co-ordinate system.
+void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+							 const int expectedNumberOfContacts,
+							 const int* expectedBoxIndicesInContacts,
+							 const std::shared_ptr<BoxShape> box,
+							 const Vector3d& boxTrans, const Quaterniond& boxQuat,
+							 const std::shared_ptr<PlaneShape> plane,
+							 const Vector3d& planeTrans, const Quaterniond& planeQuat);
 
-static void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
-									 const std::list<std::shared_ptr<Contact>>& calculatedContacts)
-{
-    SCOPED_TRACE("Comparing the contact info.");
-
-    EXPECT_EQ(expectedContacts.size(), calculatedContacts.size());
-
-    for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
-    {
-        EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts));
-    }
-}
-
-static Vector3d calculateBoxVertex(const int i, const double* size,
-								   const Quaterniond& quat,
-								   const Vector3d& trans)
-{
-    static const double multiplier[8][3] = {{-0.5, -0.5, -0.5}, {-0.5, -0.5, 0.5}, {-0.5, 0.5, 0.5}, {-0.5, 0.5, -0.5},
-        {0.5, -0.5, -0.5}, {0.5, -0.5, 0.5}, {0.5, 0.5, 0.5}, {0.5, 0.5, -0.5}
-    };
-
-    return (quat * Vector3d(size[0] * multiplier[i][0], size[1] * multiplier[i][1], size[2] * multiplier[i][2])) +
-           trans;
-}
-
-static void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
-									const int expectedNumberOfContacts, const int* expectedBoxIndicesInContacts,
-									const double* size,
-									const Vector3d& boxTrans, const Quaterniond& boxQuat,
-									const Vector3d& planeNormal, const double planeD,
-									const Vector3d& planeTrans, const Quaterniond& planeQuat)
-{
-    Vector3d vertex;
-    Vector3d planeNormalGlobal = planeQuat * planeNormal;
-    Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * planeD);
-    double depth = 0.0;
-    Vector3d collisionNormal = planeNormalGlobal;
-    for (int i = 0; i < expectedNumberOfContacts; ++i)
-    {
-        vertex = calculateBoxVertex(expectedBoxIndicesInContacts[i], size, boxQuat, boxTrans);
-        std::pair<Location, Location> penetrationPoint;
-        penetrationPoint.first.globalPosition.setValue(vertex);
-        depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-        penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
-        expectedContacts.push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
-                                                             collisionNormal, penetrationPoint));
-    }
-}
-
-static void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
-											   const int expectedNumberOfContacts,
-											   const int* expectedBoxIndicesInContacts,
-											   const double* size,
-											   const Vector3d& boxTrans, const Quaterniond& boxQuat,
-											   const Vector3d& planeNormal, const double planeD,
-											   const Vector3d& planeTrans, const Quaterniond& planeQuat,
-											   const bool collisionNormalIsPlaneNormal)
-{
-    Vector3d vertex;
-    Vector3d planeNormalGlobal = planeQuat * planeNormal;
-    Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * planeD);
-    double depth = 0.0;
-    Vector3d collisionNormal = planeNormalGlobal * (collisionNormalIsPlaneNormal ? 1.0 : -1.0);
-    for (int i = 0; i < expectedNumberOfContacts; ++i)
-    {
-        vertex = calculateBoxVertex(expectedBoxIndicesInContacts[i], size, boxQuat, boxTrans);
-        std::pair<Location, Location> penetrationPoint;
-        penetrationPoint.first.globalPosition.setValue(vertex);
-        depth = planeNormalGlobal.dot(vertex - pointOnPlane);
-        penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
-        expectedContacts.push_back(std::make_shared<Contact>(std::abs(depth), Vector3d::Zero(),
-                                                             collisionNormal, penetrationPoint));
-    }
-}
+/// Function that generates (no collision detection performed) the contact information between a box and
+/// a double-sided plane, given the box vertex indices that are known to be in contact.
+/// \param expectedContacts The list where the generated contacts are added.
+/// \param expectedNumberOfContacts The number of contacts to be generated.
+/// \param expectedBoxIndicesInContacts The vertex indices of the box which are in collision
+///										with the double-sided plane.
+/// \param box The box shape.
+/// \param boxTrans The box translation in global co-ordinate system.
+/// \param boxQuat The box orientation in global co-ordinate system.
+/// \param plane The double-sided plane shape.
+/// \param planeTrans The double-sided plane translation in global co-ordinate system.
+/// \param planeQuat The double-sided plane orientation in global co-ordinate system.
+/// \param collisionNormalIsPlaneNormal Flag to represent if the box is in collision
+void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+										const int expectedNumberOfContacts,
+										const int* expectedBoxIndicesInContacts,
+										const std::shared_ptr<BoxShape> box,
+										const Vector3d& boxTrans, const Quaterniond& boxQuat,
+										const std::shared_ptr<DoubleSidedPlaneShape> plane,
+										const Vector3d& planeTrans, const Quaterniond& planeQuat,
+										const bool collisionNormalIsPlaneNormal);
 
 }; // namespace Collision
 }; // namespace SurgSim

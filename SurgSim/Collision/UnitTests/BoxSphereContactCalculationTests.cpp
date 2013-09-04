@@ -60,17 +60,15 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 	if (pair->hasContacts())
 	{
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
-		EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal, ScalarEpsilon));
+		EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal));
 		EXPECT_NEAR(expectedDepth, contact->depth, DistanceEpsilon);
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 
 		EXPECT_TRUE(eigenEqual(expectedPenetrationPoint0,
-							   contact->penetrationPoints.first.globalPosition.getValue(),
-							   ScalarEpsilon));
+							   contact->penetrationPoints.first.globalPosition.getValue()));
 		EXPECT_TRUE(eigenEqual(expectedPenetrationPoint1,
-							   contact->penetrationPoints.second.globalPosition.getValue(),
-							   ScalarEpsilon));
+							   contact->penetrationPoints.second.globalPosition.getValue()));
 	}
 }
 

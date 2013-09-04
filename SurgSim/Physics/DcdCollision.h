@@ -25,7 +25,7 @@
 #include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Collision/ContactCalculation.h>
+#include <SurgSim/Collision/DcdCollision.h>
 
 using SurgSim::Collision::ContactCalculation;
 

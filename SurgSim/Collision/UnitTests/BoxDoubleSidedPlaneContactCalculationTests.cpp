@@ -49,9 +49,8 @@ void doBoxDoubleSidedPlaneTest(std::shared_ptr<BoxShape> box,
     std::list<std::shared_ptr<Contact>> expectedContacts;
     if (expectedNumberOfContacts > 0)
     {
-        double boxSize[] = {box->getSizeX(), box->getSizeY(), box->getSizeZ()};
         generateBoxDoubleSidedPlaneContact(expectedContacts, expectedNumberOfContacts, expectedBoxIndicesInContacts,
-										   boxSize, boxTrans, boxQuat, plane->getNormal(), plane->getD(), planeTrans,
+										   box, boxTrans, boxQuat, plane, planeTrans,
 										   planeQuat, collisionNormalIsPlaneNormal);
     }
 

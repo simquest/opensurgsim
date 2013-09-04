@@ -34,6 +34,9 @@ void doSphereDoubleSidedPlaneTest(std::shared_ptr<SphereShape> sphere,
 								  const double& expectedDepth = 0 ,
 								  const Vector3d& expectedNorm = Vector3d::Zero())
 {
+	using SurgSim::Math::Geometry::ScalarEpsilon;
+	using SurgSim::Math::Geometry::DistanceEpsilon;
+
 	std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<MockCollisionRepresentation>(
 		"Collision Plane",
 		plane,
@@ -59,15 +62,13 @@ void doSphereDoubleSidedPlaneTest(std::shared_ptr<SphereShape> sphere,
 		ASSERT_TRUE(pair->hasContacts());
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
 		EXPECT_NEAR(expectedDepth, contact->depth, 1e-10);
-		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal, epsilon));
+		EXPECT_TRUE(eigenEqual(expectedNorm, contact->normal));
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 		EXPECT_TRUE(eigenEqual(spherePenetration,
-							   contact->penetrationPoints.first.globalPosition.getValue(),
-							   epsilon));
+							   contact->penetrationPoints.first.globalPosition.getValue()));
 		EXPECT_TRUE(eigenEqual(planePenetration,
-							   contact->penetrationPoints.second.globalPosition.getValue(),
-							   epsilon));
+							   contact->penetrationPoints.second.globalPosition.getValue()));
 	}
 	else
 	{

@@ -36,22 +36,22 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 	if (pair->hasContacts())
 	{
 		std::shared_ptr<Contact> contact = pair->getContacts().front();
-		EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal, epsilon));
-		EXPECT_NEAR(expectedDepth, contact->depth, epsilon);
+		EXPECT_TRUE(eigenEqual(expectedNormal, contact->normal));
+		EXPECT_NEAR(expectedDepth, contact->depth, SurgSim::Math::Geometry::DistanceEpsilon);
 		EXPECT_TRUE(contact->penetrationPoints.first.globalPosition.hasValue());
 		EXPECT_TRUE(contact->penetrationPoints.second.globalPosition.hasValue());
 
 		EXPECT_TRUE(eigenEqual(expectedPenetrationPoint0,
-							   contact->penetrationPoints.first.globalPosition.getValue(),
-							   epsilon));
+							   contact->penetrationPoints.first.globalPosition.getValue()));
 		EXPECT_TRUE(eigenEqual(expectedPenetrationPoint1,
-							   contact->penetrationPoints.second.globalPosition.getValue(),
-							   epsilon));
+							   contact->penetrationPoints.second.globalPosition.getValue()));
 	}
 }
 
 TEST(SphereSphereContactCalculationTests, UnitTests)
 {
+	using SurgSim::Math::Geometry::DistanceEpsilon;
+
 	{
 		SCOPED_TRACE("No Intersection");
 		doSphereSphereTest(0.1, Vector3d(0.0,0.0,0.0), 0.1, Vector3d(1.0,1.0,1.0), false);
@@ -59,8 +59,9 @@ TEST(SphereSphereContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("Sphere-Sphere intersection at origin");
-		doSphereSphereTest(0.5, Vector3d(-0.5+epsilon/2.0,0.0,0.0), 0.5, Vector3d(0.5-epsilon/2.0,0.0,0.0),
-						   true, epsilon, Vector3d(-1.0,0.0,0.0), Vector3d::Zero(), Vector3d::Zero());
+		doSphereSphereTest(0.5,
+						   Vector3d(-0.5+DistanceEpsilon/2.0,0.0,0.0), 0.5, Vector3d(0.5-DistanceEpsilon/2.0,0.0,0.0),
+						   true, DistanceEpsilon, Vector3d(-1.0,0.0,0.0), Vector3d::Zero(), Vector3d::Zero());
 	}
 
 	{

@@ -48,10 +48,8 @@ void doBoxPlaneTest(std::shared_ptr<BoxShape> box,
     std::list<std::shared_ptr<Contact>> expectedContacts;
     if (expectedNumberOfContacts > 0)
     {
-        double boxSize[] = {box->getSizeX(), box->getSizeY(), box->getSizeZ()};
         generateBoxPlaneContact(expectedContacts, expectedNumberOfContacts, expectedBoxIndicesInContacts,
-								boxSize, boxTrans, boxQuat, plane->getNormal(), plane->getD(), planeTrans,
-								planeQuat);
+								box, boxTrans, boxQuat, plane, planeTrans, planeQuat);
     }
 
     // Perform collision detection.

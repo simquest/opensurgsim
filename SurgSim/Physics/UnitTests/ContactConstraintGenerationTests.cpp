@@ -23,7 +23,7 @@
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/ContactConstraintGeneration.h>
 #include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Collision/ContactCalculation.h>
+#include <SurgSim/Collision/DcdCollision.h>
 #include <SurgSim/Physics/Constraint.h>
 
 #include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>

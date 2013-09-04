@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_BOXSHAPE_H
 
 #include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Quaternion.h>
 
 namespace SurgSim
 {
@@ -36,6 +37,8 @@ public:
 		m_size[0] = sizeX;
 		m_size[1] = sizeY;
 		m_size[2] = sizeZ;
+
+		calculateVertices();
 	}
 
 
@@ -101,9 +104,40 @@ public:
 		return inertia;
 	}
 
+	/// Function that calculates the global vertex locations, given an orientation
+	/// and translation.
+	/// \param i The vertex index.
+	/// \param quat The orientation of the box.
+	/// \param trans The translation of the box.
+	Vector3d calculateGlobalVertex(const int i,
+									  const SurgSim::Math::Quaterniond& quat,
+									  const Vector3d& trans)
+	{
+		return quat * m_vertices[i] + trans;
+	}
+
+private:
+	/// Function that calculates the box vertices.
+	void calculateVertices()
+	{
+		static const double multiplier[8][3] = {{-0.5, -0.5, -0.5}, {-0.5, -0.5, 0.5}, {-0.5, 0.5, 0.5}, {-0.5, 0.5, -0.5},
+			{0.5, -0.5, -0.5}, {0.5, -0.5, 0.5}, {0.5, 0.5, 0.5}, {0.5, 0.5, -0.5}
+		};
+
+		for(int i = 0; i < 8; ++i)
+		{
+			m_vertices[i][0] = m_size[0] * multiplier[i][0];
+			m_vertices[i][1] = m_size[1] * multiplier[i][1];
+			m_vertices[i][2] = m_size[2] * multiplier[i][2];
+		}
+	}
+
 private:
 	/// The box sizes along the 3 axis respectively {X,Y,Z}
 	double   m_size[3];
+	
+	/// The box vertices.
+	Vector3d m_vertices[8];
 };
 
 }; // Physics
