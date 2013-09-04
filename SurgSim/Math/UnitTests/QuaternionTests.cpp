@@ -29,6 +29,7 @@ class QuaternionTests : public testing::Test
 {
 public:
 	typedef T Quaternion;
+	typedef typename T::AngleAxisType AngleAxis;
 	typedef typename T::Scalar Scalar;
 };
 
@@ -197,33 +198,176 @@ TYPED_TEST(QuaternionTests, FromAngleAxis)
 	EXPECT_NEAR(axis.z() * std::sin(angle/2.0f), quaternion.z(), 1e-6) << "X wasn't properly initialized.";
 }
 
+template<class T>
+void testAngleAxis(const Eigen::Quaternion<T>& q, const Eigen::AngleAxis<T>& expectedAA,
+	bool expectNegatedQuatOppositeAxis = false)
+{
+	using SurgSim::Math::computeAngleAndAxis;
+	using SurgSim::Math::computeAngle;
+
+	Eigen::Matrix<T,3,1> axis, axisNeg;
+	T angle, angleNeg;
+
+	computeAngleAndAxis(q, &angle, &axis);
+	EXPECT_NEAR(expectedAA.angle(),   angle,    1e-6) << "angle wasn't properly computed.";
+	EXPECT_NEAR(expectedAA.axis()[0], axis.x(), 1e-6) << "X wasn't properly computed.";
+	EXPECT_NEAR(expectedAA.axis()[1], axis.y(), 1e-6) << "Y wasn't properly computed.";
+	EXPECT_NEAR(expectedAA.axis()[2], axis.z(), 1e-6) << "Y wasn't properly computed.";
+	EXPECT_NEAR(expectedAA.angle(), computeAngle(q), 1e-6) << "angle wasn't properly computed by computeAngle().";
+
+	Eigen::Quaternion<T> qNeg = SurgSim::Math::negate(q);
+	computeAngleAndAxis(qNeg, &angleNeg, &axisNeg);
+	EXPECT_NEAR(angle,    angleNeg,    1e-6) << "angle wasn't properly computed.";
+	if (expectNegatedQuatOppositeAxis)
+	{
+		EXPECT_NEAR(-axis.x(), axisNeg.x(), 1e-6) << "X wasn't properly computed.";
+		EXPECT_NEAR(-axis.y(), axisNeg.y(), 1e-6) << "Y wasn't properly computed.";
+		EXPECT_NEAR(-axis.z(), axisNeg.z(), 1e-6) << "Y wasn't properly computed.";
+	}
+	else
+	{
+		EXPECT_NEAR(axis.x(), axisNeg.x(), 1e-6) << "X wasn't properly computed.";
+		EXPECT_NEAR(axis.y(), axisNeg.y(), 1e-6) << "Y wasn't properly computed.";
+		EXPECT_NEAR(axis.z(), axisNeg.z(), 1e-6) << "Y wasn't properly computed.";
+	}
+}
 
 /// Test extracting an angle/axis rotation from a quaternion.
 TYPED_TEST(QuaternionTests, ToAngleAxis)
 {
+	using SurgSim::Math::makeRotationQuaternion;
+	using SurgSim::Math::computeAngleAndAxis;
+	using SurgSim::Math::computeAngle;
+
+	typedef typename TestFixture::AngleAxis AngleAxis;
 	typedef typename TestFixture::Quaternion Quaternion;
 	typedef typename TestFixture::Scalar T;
 
 	typedef Eigen::Matrix<T, 3, 1> Vector3;
 
-	T angle = -1.6f;
-	Vector3 axis = Vector3(1.f, 2.f, 3.f).normalized();
+	Vector3 axis(T(1.0), T(2.0), T(3.0));
+	AngleAxis expectedAA;
+	T angle;
+	axis.normalize();
 
-	using SurgSim::Math::makeRotationQuaternion;
-	using SurgSim::Math::computeAngleAndAxis;
-	using SurgSim::Math::computeAngle;
+	// Angle 0 in [0 pi]
+	angle = T(0);
+	// Expected result: 0 (to be in [0 pi]), same axis (same quaternion)
+	{
+		SCOPED_TRACE("Angle = 0");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis); // q=(0 0 1 0)
+		expectedAA.angle() = angle;
+		expectedAA.axis() = Vector3(0,0,1);
 
-	Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
 
-	T angle2;
-	Vector3 axis2;
-	computeAngleAndAxis(quaternion, &angle2, &axis2);
-	EXPECT_NEAR(-angle,    angle2,    1e-6) << "angle wasn't properly computed.";
-	EXPECT_NEAR(-axis.x(), axis2.x(), 1e-6) << "X wasn't properly computed.";
-	EXPECT_NEAR(-axis.y(), axis2.y(), 1e-6) << "Y wasn't properly computed.";
-	EXPECT_NEAR(-axis.z(), axis2.z(), 1e-6) << "Y wasn't properly computed.";
+	// Angle pi/2 in [0 pi]
+	angle = T(M_PI_2);
+	// Expected result: pi/2 (to be in [0 pi]), same axis (same quaternion)
+	{
+		SCOPED_TRACE("Angle = PI/2");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = angle;
+		expectedAA.axis() = axis;
 
-	EXPECT_NEAR(-angle, computeAngle(quaternion), 1e-6) << "angle wasn't properly computed by computeAngle().";
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
+
+	// Angle pi-epsilon in [0 pi]
+	// => cos(angle/2) = +epsilon'
+	angle = T(2) * acos(std::numeric_limits<T>::epsilon());
+	// Expected result: pi-epsilon (to be in [0 pi]), same axis (same quaternion)
+	{
+		SCOPED_TRACE("Angle = PI-epsilon");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = angle;
+		expectedAA.axis() = axis;
+
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
+
+	// Angle pi
+	angle = T(M_PI);
+	// Expected result: pi (to be in [0 pi]), same axis (same quaternion)
+	// For negated quaternion, we expected angle=pi and opposite axis
+	// Quaternion with w=0 are the only one for which q and -q will give different rotation axis
+	{
+		SCOPED_TRACE("Angle = PI");
+		// Calling makeRotationQuaternion(M_PI, axis) will not set w to 0 (=cos(PI/2)) because of numerical error
+		// So we set it manually to force the test
+		Quaternion quaternion;
+		quaternion.w() = T(0);
+		quaternion.x() = axis[0];
+		quaternion.y() = axis[1];
+		quaternion.z() = axis[2];
+
+		expectedAA.angle() = angle;
+		expectedAA.axis() = axis;
+
+		testAngleAxis<T>(quaternion, expectedAA, true);
+	}
+
+	// Angle pi+epsilon in [pi 2pi]
+	// => cos(angle/2) = -epsilon'
+	angle = T(2) * acos(-std::numeric_limits<T>::epsilon());
+	// Expected result: -(pi+epsilon-2pi) (to be in [0 pi]), opposite axis (modulo 2pi + opposite quaternion)
+	{
+		SCOPED_TRACE("Angle = PI+epsilon");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = T(2) * T(M_PI) - angle;
+		expectedAA.axis() = -axis;
+
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
+
+	// Angle in [-2pi -pi]
+	angle = T(-3.56);
+	// Expected result: angle+2PI (to be in [0 pi]), same axis (modulo 2pi + same quaternion)
+	{
+		SCOPED_TRACE("Angle in [-2PI -PI]");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = angle + (T)2.0 * T(M_PI);
+		expectedAA.axis() = axis;
+
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
+
+	// Angle in [-pi 0]
+	angle = T(-2.12);
+	// Expected result: Opposite angle (to be in [0 pi]), opposite axis (opposite quaternion)
+	{
+		SCOPED_TRACE("Angle in [-PI 0]");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = -angle;
+		expectedAA.axis() = -axis;
+
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
+
+	// Angle in [0 pi]
+	angle = T(0.34);
+	// Expected result: Same angle (already in [0 pi]), same axis (same quaternion)
+	{
+		SCOPED_TRACE("Angle in [0 PI]");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = angle;
+		expectedAA.axis() = axis;
+
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
+
+	// Angle in [pi, 2pi]
+	angle = T(4.73);
+	// Expected result: -(angle-2PI) to be in [0, pi], opposite axis (modulo 2pi + opposite quaternion)
+	{
+		SCOPED_TRACE("Angle in [PI 2PI]");
+		Quaternion quaternion = makeRotationQuaternion(angle, axis);
+		expectedAA.angle() = -angle + T(2) * T(M_PI);
+		expectedAA.axis() = -axis;
+
+		testAngleAxis<T>(quaternion, expectedAA);
+	}
 }
 
 /// Test setting a quaternion from a matrix.
