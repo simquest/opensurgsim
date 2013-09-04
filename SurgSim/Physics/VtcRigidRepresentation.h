@@ -79,21 +79,6 @@ public:
 		updateGlobalInertiaMatrices(m_currentState);
 	}
 
-	/// Get the initial parameters of the rigid representation
-	/// \return The initial parameters of the rigid representation
-	const RigidRepresentationParameters& getInitialParameters() const
-	{
-		return m_initialParameters;
-	}
-
-
-	/// Get the current parameters of the rigid representation
-	/// \return The current parameters of the rigid representation
-	const RigidRepresentationParameters& getCurrentParameters() const
-	{
-		return m_currentParameters;
-	}
-
 	/// Set the initial Vtc proxy state
 	/// \param state The initial Vtc state (pose + lin/ang velocities)
 	void setInitialVtcState(const RigidRepresentationState& state)
@@ -207,14 +192,7 @@ private:
 
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
-	void updateGlobalInertiaMatrices(const RigidRepresentationState& state);
-
-
-
-	/// Initial physical parameters
-	RigidRepresentationParameters m_initialParameters;
-	/// Current physical parameters
-	RigidRepresentationParameters m_currentParameters;
+	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
 
 	/// Initial Vtc state (useful for reset)
 	RigidRepresentationState m_initialVtcState;
