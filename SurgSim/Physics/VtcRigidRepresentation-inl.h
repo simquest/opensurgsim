@@ -28,6 +28,69 @@ inline void VtcRigidRepresentation::setPose(const SurgSim::Math::RigidTransform3
 	m_currentVtcState.setPose(pose);
 }
 
+inline const SurgSim::Math::RigidTransform3d& VtcRigidRepresentation::getPose() const 
+{
+	return m_finalState.getPose();
+}
+
+inline void VtcRigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
+{
+	m_initialParameters = parameters;
+	m_currentParameters = parameters;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+inline void VtcRigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
+{
+	m_currentParameters = parameters;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+inline void VtcRigidRepresentation::setInitialVtcState(const RigidRepresentationState& state)
+{
+	m_initialVtcState = state;
+	m_currentVtcState = state;
+	m_previousVtcState = state;
+}
+
+inline void VtcRigidRepresentation::setInitialVtcParameters(const VtcRigidParameters& parameters)
+{
+	m_initialVtcParameters = parameters;
+	m_currentVtcParameters = parameters;
+}
+
+inline void VtcRigidRepresentation::setCurrentVtcParameters(const VtcRigidParameters& parameters)
+{
+	m_currentVtcParameters = parameters;
+}
+
+inline const RigidRepresentationState& VtcRigidRepresentation::getInitialVtcState() const
+{
+	return m_initialVtcState;
+}
+
+inline const VtcRigidParameters& VtcRigidRepresentation::getInitialVtcParameters() const
+{
+	return m_initialVtcParameters;
+}
+
+inline const RigidRepresentationState& VtcRigidRepresentation::getCurrentVtcState() const
+{
+	return m_currentVtcState;
+}
+
+inline const RigidRepresentationState& VtcRigidRepresentation::getPreviousVtcState() const
+{
+	return m_previousVtcState;
+}
+
+inline const VtcRigidParameters& VtcRigidRepresentation::getCurrentVtcParameters() const
+{
+	return m_currentVtcParameters;
+}
+
 inline RepresentationType VtcRigidRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_VTC_RIGID;

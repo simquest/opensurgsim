@@ -30,6 +30,7 @@
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgPlaneRepresentation.h>
 #include <SurgSim/Graphics/OsgShader.h>
+#include <SurgSim/Graphics/OsgUniform.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Input/InputManager.h>
@@ -43,6 +44,7 @@
 #include <SurgSim/Physics/VtcRigidRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Vector.h>
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
@@ -54,6 +56,8 @@ using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
+using SurgSim::Graphics::OsgUniform;
+using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
@@ -80,12 +84,27 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 {
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
-
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
 		std::make_shared<OsgPlaneRepresentation>(name + " Graphics");
 	graphicsRepresentation->setInitialPose(pose);
+
+	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
+	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
+
+	std::shared_ptr<OsgUniform<Vector4f>> uniform = std::make_shared<OsgUniform<Vector4f>>("color");
+	uniform->set(Vector4f(0.0f, 0.6f, 1.0f, 0.0f));
+	material->addUniform(uniform);
+
+	shader->setFragmentShaderSource(
+		"uniform vec4 color;\n"
+		"void main(void)\n"
+		"{\n"
+		"	gl_FragColor = color;\n"
+		"}");
+	material->setShader(shader);
+	graphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SurgSim::Physics::DoubleSidedPlaneShape> planeShape =
 		std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
@@ -95,9 +114,9 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(graphicsRepresentation);
 
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-								physicsRepresentation, graphicsRepresentation));
+		physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
-								("Plane Collision",planeShape, physicsRepresentation));
+		("Plane Collision",planeShape, physicsRepresentation));
 	return planeElement;
 }
 
@@ -128,9 +147,9 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation2 =
 		std::make_shared<OsgBoxRepresentation>(name + "2-Graphics");
 	graphicsRepresentation2->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-
 	shader->setVertexShaderSource(
 		"void main(void)\n"
 		"{\n"
@@ -154,11 +173,11 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(inputComponent);
 
 	boxElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
-		inputComponent, vtcRepresentation));
+								inputComponent, vtcRepresentation));
 	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-		vtcRepresentation, graphicsRepresentation));
+								vtcRepresentation, graphicsRepresentation));
 	boxElement->addComponent(std::make_shared<VtcToGraphicsPoseBehavior>("Physics to Graphics2 Pose",
-		vtcRepresentation, graphicsRepresentation2));
+								vtcRepresentation, graphicsRepresentation2));
 	boxElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 								("Box Collision Representation", vtcRepresentation));
 	return boxElement;
@@ -193,7 +212,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 	scene->addSceneElement(createBox("box"));
 	scene->addSceneElement(createPlane("plane",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
