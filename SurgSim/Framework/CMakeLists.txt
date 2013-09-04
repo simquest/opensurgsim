@@ -76,11 +76,6 @@ surgsim_add_library(
 	"${SURGSIM_FRAMEWORK_HEADERS}"
 	"SurgSim/Framework"
 )
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-	target_link_libraries(SurgSimFramework rt)
-endif()
-
-
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

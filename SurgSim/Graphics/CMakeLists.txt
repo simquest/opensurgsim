@@ -100,7 +100,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
 	RenderTarget.h
-	Representation.h	
+	Representation.h
 	ScreenSpaceQuadRepresentation.h
 	Shader.h
 	SphereRepresentation.h

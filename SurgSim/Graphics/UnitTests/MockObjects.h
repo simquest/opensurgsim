@@ -21,6 +21,7 @@
 #include <SurgSim/Graphics/Group.h>
 #include <SurgSim/Graphics/Manager.h>
 #include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/RenderTarget.h>
 #include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Graphics/Shader.h>
 #include <SurgSim/Graphics/UniformBase.h>
@@ -400,6 +401,15 @@ public:
 	}
 
 	virtual std::shared_ptr<SurgSim::Graphics::Texture> getColorRenderTexture() const
+	{
+		return nullptr;
+	}
+
+	virtual void setRenderTarget(std::shared_ptr<SurgSim::Graphics::RenderTarget> renderTarget)
+	{
+	}
+
+	virtual std::shared_ptr<SurgSim::Graphics::RenderTarget> getRenderTarget() const
 	{
 		return nullptr;
 	}
