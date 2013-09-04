@@ -76,16 +76,15 @@ private:
 };
 
 
-/// Behavior to copy a pose from one representation to another.
-/// For example, this behavior is used to send pose updates from physics to graphics.
-class RepresentationPoseBehavior2 : public SurgSim::Framework::Behavior
+/// Behavior to copy a pose from Vtc representation to graphics representation.
+class VtcToGraphicsPoseBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	/// \param	from	Representation to get the pose
 	/// \param	to	Representation to set the pose
-	RepresentationPoseBehavior2(const std::string& name, std::shared_ptr<SurgSim::Physics::VtcRigidRepresentation> from,
+	VtcToGraphicsPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Physics::VtcRigidRepresentation> from,
 		std::shared_ptr<SurgSim::Framework::Representation> to) : SurgSim::Framework::Behavior(name),
 		m_from(from),
 		m_to(to)
@@ -146,9 +145,9 @@ public:
 	{
 		SurgSim::DataStructures::DataGroup dataGroup;
 		m_from->getData(&dataGroup);
-		RigidTransform3d po;
-		dataGroup.poses().get("pose", &po);
-		m_to->setPose(po);
+		RigidTransform3d pose;
+		dataGroup.poses().get("pose", &pose);
+		m_to->setPose(pose);
 	}
 
 protected:

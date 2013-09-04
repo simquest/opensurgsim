@@ -46,7 +46,7 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
-using SurgSim::Blocks::RepresentationPoseBehavior2;
+using SurgSim::Blocks::VtcToGraphicsPoseBehavior;
 using SurgSim::Blocks::InputVtcBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -157,10 +157,10 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 		inputComponent, vtcRepresentation));
 	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 		vtcRepresentation, graphicsRepresentation));
-	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior2>("Physics to Graphics2 Pose",
+	boxElement->addComponent(std::make_shared<VtcToGraphicsPoseBehavior>("Physics to Graphics2 Pose",
 		vtcRepresentation, graphicsRepresentation2));
-	//sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-	//("Sphere Collision Representation", vtcRepresentation));
+	boxElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
+								("Box Collision Representation", vtcRepresentation));
 	return boxElement;
 }
 
