@@ -22,10 +22,6 @@ namespace SurgSim
 namespace Physics
 {
 
-
-/// Set the initial parameters of the rigid representation
-/// \param parameters The initial parameters
-/// This will also set the current parameters to the initial parameters
 inline void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
 {
 	m_initialParameters = parameters;
@@ -34,8 +30,6 @@ inline void SurgSim::Physics::RigidRepresentation::setInitialParameters(const Ri
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-/// Set the current parameters of the rigid representation
-/// \param parameters The current parameters
 inline void SurgSim::Physics::RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
 {
 	m_currentParameters = parameters;
@@ -43,15 +37,10 @@ inline void SurgSim::Physics::RigidRepresentation::setCurrentParameters(const Ri
 }
 
 
-/// Set the current pose of the rigid representation
-/// \param pose The current pose (translation + rotation)
-/// \note Does Not Apply to this representation (the pose is fully controlled by the
-/// physics simulation).
 inline void SurgSim::Physics::RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 }
 
-/// Reset the rigid representation parameters to the initial parameters
 inline void SurgSim::Physics::RigidRepresentation::resetParameters()
 {
 	Representation::resetParameters();
@@ -60,8 +49,6 @@ inline void SurgSim::Physics::RigidRepresentation::resetParameters()
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-/// Retrieve the rigid body 6x6 compliance matrix
-/// \return the 6x6 compliance matrix
 inline const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
 	SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {

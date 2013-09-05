@@ -22,14 +22,12 @@ namespace SurgSim
 namespace Physics
 {
 
-/// Get the initial parameters of the rigid representation
-/// \return The initial parameters of the rigid representation
+
 inline const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getInitialParameters() const
 {
 	return m_initialParameters;
 }
-/// Get the current parameters of the rigid representation
-/// \return The current parameters of the rigid representation
+
 inline const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
 {
 	return m_currentParameters;

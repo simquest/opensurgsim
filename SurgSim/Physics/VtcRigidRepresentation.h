@@ -84,11 +84,11 @@ public:
 	/// \param parameters The current Vtc parameters
 	void setCurrentVtcParameters(const VtcRigidParameters& parameters);
 
-		/// Get the initial Vtc state
+	/// Get the initial Vtc state
 	/// \return The initial Vtc state (pose + lin/ang velocities)
 	const RigidRepresentationState& getInitialVtcState() const;
 
-		/// Get the initial Vtc parameters
+	/// Get the initial Vtc parameters
 	/// \return The initial Vtc parameters
 	const VtcRigidParameters& getInitialVtcParameters() const;
 
