@@ -51,6 +51,17 @@ inline Eigen::Quaternion<T> makeRotationQuaternion(const T& angle, const Eigen::
 	return Eigen::Quaternion<T>(Eigen::AngleAxis<T>(angle, axis));
 }
 
+/// Quaternion negation (i.e. unary operator -)
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam QOpt the option flags (alignment etc.) used for the quaternion arguments.  Can be deduced.
+/// \param q The quaternion to negate
+/// \returns the negation of q (i.e. -q)
+template <typename T, int QOpt>
+inline Eigen::Quaternion<T, QOpt> negate(const Eigen::Quaternion<T, QOpt>& q)
+{
+	return Eigen::Quaternion<T, QOpt>(q.coeffs() * -1.0);
+}
+
 /// Get the angle (in radians) and axis corresponding to a quaternion's rotation.
 /// \note Unit quaternions cover the unit sphere twice (q=-q). To make sure that the same rotation (q or -q)
 /// \note returns the same Axis/Angle, we need a pi range for the angle.
@@ -65,6 +76,8 @@ template <typename T, int QOpt, int VOpt>
 inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
                                 T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
 {
+	using SurgSim::Math::negate;
+
 	if (quaternion.w() >= T(0))
 	{
 		Eigen::AngleAxis<T> angleAxis(quaternion);
@@ -87,6 +100,8 @@ inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
 template <typename T, int QOpt>
 inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 {
+	using SurgSim::Math::negate;
+
 	if (quaternion.w() >= T(0))
 	{
 		Eigen::AngleAxis<T> angleAxis(quaternion);
@@ -97,17 +112,6 @@ inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 		Eigen::AngleAxis<T> angleAxis(negate(quaternion));
 		return angleAxis.angle();
 	}
-}
-
-/// Quaternion negation (i.e. unary operator -)
-/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
-/// \tparam QOpt the option flags (alignment etc.) used for the quaternion arguments.  Can be deduced.
-/// \param q The quaternion to negate
-/// \returns the negation of q (i.e. -q)
-template <typename T, int QOpt>
-inline Eigen::Quaternion<T, QOpt> negate(const Eigen::Quaternion<T, QOpt>& q)
-{
-	return Eigen::Quaternion<T, QOpt>(q.coeffs() * -1.0);
 }
 
 /// Interpolate (slerp) between 2 quaternions
