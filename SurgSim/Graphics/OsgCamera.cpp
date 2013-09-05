@@ -46,6 +46,12 @@ namespace {
 		osg::Camera::COLOR_BUFFER14,
 		osg::Camera::COLOR_BUFFER15
 	};
+
+	const osg::Camera::RenderOrder RenderOrderEnums[3] = {
+		osg::Camera::PRE_RENDER,
+		osg::Camera::NESTED_RENDER,
+		osg::Camera::POST_RENDER
+	};
 };
 
 
@@ -58,12 +64,14 @@ OsgCamera::OsgCamera(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	Camera(name),
-	m_camera(new osg::Camera())
+	m_camera(new osg::Camera()),
+	m_materialProxy(new osg::Group())
 {
 	m_switch->removeChildren(0, m_switch->getNumChildren());
 	m_camera->setName(name + " Camera");
 
 	m_switch->addChild(m_camera);
+	m_camera->addChild(m_materialProxy);
 
 	/// Update pose to inverse of view matrix
 	osg::Matrixd inverseViewMatrix = osg::Matrixd::inverse(m_camera->getViewMatrix());
@@ -75,6 +83,9 @@ OsgCamera::OsgCamera(const std::string& name) :
 	/// Update storage of view and projection matrices
 	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
+
+	// Set a default group
+	setGroup(std::make_shared<OsgGroup>(name+" default group"));
 }
 
 bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
@@ -82,8 +93,8 @@ bool OsgCamera::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && SurgSim::Graphics::Camera::setGroup(group))
 	{
-		m_camera->removeChildren(0, m_camera->getNumChildren());  /// Remove any previous group
-		m_camera->addChild(osgGroup->getOsgGroup());
+		m_materialProxy->removeChildren(0, m_camera->getNumChildren());  /// Remove any previous group
+		m_materialProxy->addChild(osgGroup->getOsgGroup());
 		return true;
 	}
 	else
@@ -186,12 +197,11 @@ std::shared_ptr<RenderTarget> OsgCamera::getRenderTarget() const
 
 bool OsgCamera::setMaterial(std::shared_ptr<Material> material)
 {
-	std::shared_ptr<OsgGroup> osgGroup = std::static_pointer_cast<OsgGroup>(getGroup());
 	std::shared_ptr<OsgMaterial> osgMaterial = std::dynamic_pointer_cast<OsgMaterial>(material);
 	bool result = false;
-	if (osgGroup != nullptr && osgMaterial != nullptr)
+	if (osgMaterial != nullptr)
 	{
-		osgGroup->getOsgGroup()->setStateSet(osgMaterial->getOsgStateSet());
+		m_materialProxy->setStateSet(osgMaterial->getOsgStateSet());
 		result = true;
 		m_material = osgMaterial;
 	}
@@ -205,11 +215,7 @@ std::shared_ptr<Material> OsgCamera::getMaterial() const
 
 void OsgCamera::clearMaterial()
 {
-	std::shared_ptr<OsgGroup> osgGroup = std::static_pointer_cast<OsgGroup>(getGroup());
-	if (osgGroup != nullptr) 
-	{
-		osgGroup->getOsgGroup()->setStateSet(new osg::StateSet());
-	}
+	m_materialProxy->setStateSet(new osg::StateSet());
 }
 
 void OsgCamera::detachCurrentRenderTarget()
@@ -244,6 +250,14 @@ void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, s
 		"Could not find texture";
 
 	m_camera->attach(buffer, actualTexture, 0, 0);
+}
+
+void OsgCamera::setRenderOrder(RenderOrder order, int value)
+{
+	if (order < 3)
+	{
+		m_camera->setRenderOrder(RenderOrderEnums[order], value);
+	}
 }
 
 }; // namespace Graphics

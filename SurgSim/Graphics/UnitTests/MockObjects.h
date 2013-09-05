@@ -414,6 +414,11 @@ public:
 		return nullptr;
 	}
 
+	virtual void setRenderOrder(int bin, int value) override
+	{
+
+	}
+
 private:
 	/// Number of times the camera has been updated
 	int m_numUpdates;

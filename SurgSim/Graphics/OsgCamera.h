@@ -130,9 +130,13 @@ public:
 	/// Clears the material from the attached group
 	virtual void clearMaterial();
 
+
+	virtual void setRenderOrder(RenderOrder bin, int value) override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
+	osg::ref_ptr<osg::Group> m_materialProxy;
 
 	/// Pose of the camera, which is the inverse of the view matrix
 	SurgSim::Math::RigidTransform3d m_pose;

@@ -41,6 +41,13 @@ class RenderTarget;
 class Camera : public virtual Representation
 {
 public:
+
+	enum RenderOrder {
+		RenderOrderPreRender = 0,
+		RenderOrderInOrderRender = 1,
+		RenderOrderPostRender = 2
+	};
+
 	/// Constructor
 	/// \param	name	Name of the camera
 	explicit Camera(const std::string& name) : Representation(name)
@@ -88,6 +95,8 @@ public:
 	/// Gets RenderTarget that is currently being used by the camera.
 	/// \return	The RenderTarget.
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const = 0;
+
+	virtual void setRenderOrder(RenderOrder bin, int value) = 0;
 
 private:
 	/// Group of representations that this camera sees

@@ -53,6 +53,7 @@ public:
 	MOCK_CONST_METHOD0(getMaterial, std::shared_ptr<Material>());
 	MOCK_METHOD0(clearMaterial, void());
 	MOCK_METHOD1(update, void(double));
+	MOCK_METHOD2(setRenderOrder, void(int, int));
 };
 
 class GMockGroup : public Group

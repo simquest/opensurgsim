@@ -19,10 +19,12 @@
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/OsgRenderPass.h>
 #include <SurgSim/Graphics/OsgRenderTarget.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 #include <SurgSim/Graphics/OsgGroup.h>
+#include <SurgSim/Graphics/OsgMaterial.h>
+#include <SurgSim/Graphics/OsgShader.h>
+#include <SurgSim/Graphics/OsgUniform.h>
 
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
@@ -33,7 +35,27 @@
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector3f;
 using SurgSim::Math::RigidTransform3d;
+
+std::string vertexShaderSource = 
+	"uniform vec3 ambientColor;\n"
+	"uniform vec3 otherColor;\n"
+	"varying vec4 color;\n"
+	"void main(void)\n"
+	"{\n"
+	"   vec3 lightVector =  normalize(vec3(1.0,-1.0,1.0));\n"
+	"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
+// This is not a realy lighting calculation ... just faking something ...
+	"	color.rgb = otherColor * max(dot(gl_Normal, lightVector), 0.0) + ambientColor;\n"
+	"	color.a = 1.0;\n"
+	"}";
+std::string fragmentShaderSource = 
+	"varying vec4 color;\n"
+	"void main(void)\n"
+	"{\n"
+	"	gl_FragColor = color;\n"
+	"}";
 
 
 namespace SurgSim
@@ -41,29 +63,54 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgRenderPassRenderTests: public RenderTest
+struct OsgCameraRenderTests: public RenderTest
 {
 
 };
 
-TEST_F(OsgRenderPassRenderTests, SimpleTest)
+TEST_F(OsgCameraRenderTests, PassTest)
 {
 	auto defaultCamera = graphicsManager->getDefaultCamera();
-	auto renderPass = std::make_shared<OsgRenderPass>("RenderPass");
+	auto renderPass = std::make_shared<OsgCamera>("RenderPass");
 
-	auto camera = renderPass->getCamera();
-	camera->setViewMatrix(defaultCamera->getViewMatrix());
-	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+	renderPass ->setViewMatrix(defaultCamera->getViewMatrix());
+	renderPass ->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 
 	int width, height;
 	viewElement->getView()->getDimensions(&width,&height);
 
-
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
 		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
 	renderPass->setRenderTarget(renderTargetOsg);
+	renderPass->setRenderOrder(Camera::RenderOrderPreRender, 0);
 
-	viewElement->addComponent(renderPass->getCamera());
+	auto shader = std::make_shared<OsgShader>();
+	shader->setFragmentShaderSource(fragmentShaderSource);
+	shader->setVertexShaderSource(vertexShaderSource);
+
+	auto material1 = std::make_shared<OsgMaterial>();
+	auto material2 = std::make_shared<OsgMaterial>();
+
+	material1->setShader(shader);
+	material2->setShader(shader);
+
+	renderPass->setMaterial(material2);
+
+
+	auto uniform = std::make_shared<OsgUniform<Vector3f>>("ambientColor");
+	uniform->set(Vector3f(0.2,0.2,0.2));
+	material1->addUniform(uniform);
+
+	uniform = std::make_shared<OsgUniform<Vector3f>>("otherColor");
+	uniform->set(Vector3f(1.0,0.0,0.0));
+	material1->addUniform(uniform);
+
+	uniform = std::make_shared<OsgUniform<Vector3f>>("otherColor");
+	uniform->set(Vector3f(0.0,1.0,0.0));
+	material2->addUniform(uniform);
+
+
+	viewElement->addComponent(renderPass);
 
 	int screenWidth = 800;
 	int screenHeight = 600;
@@ -96,6 +143,7 @@ TEST_F(OsgRenderPassRenderTests, SimpleTest)
 
 	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
 	boxRepresentation->setSize(0.05,0.05,0.05);
+	boxRepresentation->setMaterial(material1);
 	viewElement->addComponent(boxRepresentation);
 
 	/// Run the thread
@@ -108,8 +156,8 @@ TEST_F(OsgRenderPassRenderTests, SimpleTest)
 		double t = static_cast<double>(i) / numSteps;
 		boxRepresentation->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(startPose, endPose, t));
 		boxRepresentation1->setPose(SurgSim::Testing::interpolate<RigidTransform3d>(endPose, startPose, t));
-		camera->setViewMatrix(defaultCamera->getViewMatrix());
-		camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
+		renderPass->setViewMatrix(defaultCamera->getViewMatrix());
+		renderPass->setProjectionMatrix(defaultCamera->getProjectionMatrix());
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 100));
 	}
