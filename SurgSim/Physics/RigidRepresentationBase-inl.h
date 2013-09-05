@@ -22,17 +22,6 @@ namespace SurgSim
 namespace Physics
 {
 
-
-inline const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getInitialParameters() const
-{
-	return m_initialParameters;
-}
-
-inline const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
-{
-	return m_currentParameters;
-}
-
 template <class T>
 std::shared_ptr<T> SurgSim::Physics::RigidRepresentationBase::createTypedLocalization(const Location& location)
 {
