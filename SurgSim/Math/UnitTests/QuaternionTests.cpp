@@ -255,9 +255,9 @@ TYPED_TEST(QuaternionTests, ToAngleAxis)
 	// Expected result: 0 (to be in [0 pi]), same axis (same quaternion)
 	{
 		SCOPED_TRACE("Angle = 0");
-		Quaternion quaternion = makeRotationQuaternion(angle, axis); // q=(0 0 1 0)
+		Quaternion quaternion = makeRotationQuaternion(angle, axis); // q=(1 0 0 0)
 		expectedAA.angle() = angle;
-		expectedAA.axis() = Vector3(0,0,1);
+		expectedAA.axis() = Vector3(1,0,0);
 
 		testAngleAxis<T>(quaternion, expectedAA);
 	}
