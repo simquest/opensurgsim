@@ -28,9 +28,9 @@
 
 namespace osg
 {
-	class Projection;
-	class Geode;
-	class Geometry;
+class Projection;
+class Geode;
+class Geometry;
 }
 
 namespace SurgSim
@@ -40,6 +40,9 @@ namespace Graphics
 
 class View;
 class UniformBase;
+class Texture;
+class OsgTexture2d;
+class OsgTextureRectangle;
 
 class OsgScreenSpaceQuadRepresentation : public OsgRepresentation, public ScreenSpaceQuadRepresentation
 {
@@ -63,18 +66,25 @@ public:
 	/// \param	pose	Rigid transformation that describes the current pose of the representation
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
+	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
+	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
+	/// from the outside as well by using the material.
+	/// \param	texture	The texture to be set on the quad.
+	/// \return	true if it succeeds, false if it fails.
+	virtual bool setTexture(std::shared_ptr<Texture> texture) override;
+
 	/// Sets a Texture2d for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
 	/// from the outside as well by using the material.
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
-	virtual bool setTexture(std::shared_ptr<Texture2d> texture) override;
+	bool setTexture(std::shared_ptr<OsgTexture2d> texture);
 
 	/// Sets a rectangular texture for this quad, this should replace a current texture,
 	/// this is a convenience function and will use the uniform name "diffuseMap" for the uniform in this operation.
 	/// \param	texture	The texture to be set on the quad.
 	/// \return	true if it succeeds, false if it fails.
-	virtual bool setTexture(std::shared_ptr<TextureRectangle> texture) override;
+	bool setTexture(std::shared_ptr<OsgTextureRectangle> texture);
 
 private:
 

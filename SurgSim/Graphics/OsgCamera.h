@@ -118,17 +118,30 @@ public:
 	/// \return	The RenderTarget.
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
-	///@{
-	/// This does not make a sense for a camera, they are disabled.
+	/// Sets a material the material on the group that has been attached to the camera.
+	/// \param	material	The material.
+	/// \return	true if it succeeds, false if there is no group or the material is not an OsgMaterial.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	/// Gets the material if set.
+	/// \return	The material.
 	virtual std::shared_ptr<Material> getMaterial() const;
+
+	/// Clears the material from the attached group
 	virtual void clearMaterial();
-	///@}
-	///
+
+	/// Set and ordering when this camera will render the main camera will render at RenderInOrder,0
+	/// In general all preprocessing should be done in RenderOrderPreRender, HUD Displaying usually 
+	/// at RenderOrderPostRender
+	/// \param order The phase of rendering.
+	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
+	/// 			 determined.
+	virtual void setRenderOrder(RenderOrder bin, int value) override;
 
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
+	osg::ref_ptr<osg::Group> m_materialProxy;
 
 	/// Pose of the camera, which is the inverse of the view matrix
 	SurgSim::Math::RigidTransform3d m_pose;

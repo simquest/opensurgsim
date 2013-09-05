@@ -20,6 +20,7 @@
 #include <unordered_map>
 
 #include <SurgSim/Graphics/RenderTarget.h>
+#include <SurgSim/Graphics/OsgTexture.h>
 #include <SurgSim/Graphics/OsgTexture2d.h>
 #include <SurgSim/Graphics/OsgTextureRectangle.h>
 
@@ -29,10 +30,17 @@ namespace SurgSim
 {
 namespace Graphics
 {
+
+class OsgAbstractRenderTarget : public RenderTarget
+{
+	virtual std::shared_ptr<OsgTexture> getColorTargetOsg(int index) const = 0;
+	virtual std::shared_ptr<OsgTexture> getDepthTargetOsg() const = 0;
+};
+
 /// Speficig implementation of the render target class.
 /// \tparam	T	Type of the texture that should be used as targets probably either OsgTexture2d or OsgTextureRectangle.
 template <class T>
-class OsgRenderTarget : public RenderTarget
+class OsgRenderTarget : public OsgAbstractRenderTarget
 {
 public:
 
@@ -57,11 +65,11 @@ public:
 
 	virtual int getColorTargetCount() const override;
 	virtual std::shared_ptr<Texture> getColorTarget(int index) const override;
-	std::shared_ptr<TextureType> getColorTargetOsg(int index) const;
+	std::shared_ptr<OsgTexture> getColorTargetOsg(int index) const;
 
 	virtual bool doesUseDepthTarget() const override;
 	virtual std::shared_ptr<Texture> getDepthTarget() const override;
-	std::shared_ptr<TextureType> getDepthTargetOsg() const;
+	std::shared_ptr<OsgTexture> getDepthTargetOsg() const;
 
 private:
 
