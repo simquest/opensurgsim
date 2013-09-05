@@ -39,10 +39,9 @@ class ContactCalculation
 public:
 
 	/// Constructor
-	explicit ContactCalculation()
+	ContactCalculation()
 	{
 	}
-
 
 	/// Destructor
 	virtual ~ContactCalculation()
@@ -54,7 +53,7 @@ public:
 	void calculateContact(std::shared_ptr<CollisionPair> pair);
 
 	/// Virtual function that returns the shapes that this ContactCalculation class handles.
-	/// Return the shape types this class handles.
+	/// \return Return the shape types this class handles.
 	virtual std::pair<int,int> getShapeTypes() = 0;
 
 private:

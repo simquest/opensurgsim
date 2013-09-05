@@ -82,6 +82,8 @@ public:
 		m_isSwapped = false;
 	}
 
+	/// Function that returns the pair of representations of the objects that are colliding.
+	/// \return The pair of representations that are colliding.
 	inline const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
 		getRepresentations() const
 	{

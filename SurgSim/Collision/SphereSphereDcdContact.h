@@ -33,10 +33,13 @@ namespace Collision
 class SphereSphereDcdContact : public ContactCalculation
 {
 public:
-	explicit SphereSphereDcdContact()
+	/// Constructor
+	SphereSphereDcdContact()
 	{
 	}
 
+	/// Function that returns the shapes between which this class performs collision detection.
+	/// \return int std::pair containing the shape types.
 	virtual std::pair<int,int> getShapeTypes() override
 	{
 		return std::pair<int,int>(RigidShapeType::RIGID_SHAPE_TYPE_SPHERE, RigidShapeType::RIGID_SHAPE_TYPE_SPHERE);

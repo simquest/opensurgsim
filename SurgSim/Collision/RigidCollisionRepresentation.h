@@ -36,7 +36,7 @@ class RigidCollisionRepresentation : public CollisionRepresentation
 public:
 
 	/// Constructor
-	explicit RigidCollisionRepresentation(
+	RigidCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Physics::RigidRepresentation> representation);
 

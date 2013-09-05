@@ -33,16 +33,20 @@ namespace Collision
 class RigidShapeCollisionRepresentation : public CollisionRepresentation
 {
 public:
+	/// Constructor
 	RigidShapeCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Physics::RigidShape> shape,
 		std::shared_ptr<SurgSim::Physics::Representation> representation);
 
+	/// Destructor
 	virtual ~RigidShapeCollisionRepresentation();
 
+	///@{
+	/// Implementations of virtual functions from CollisionRepresentation
 	virtual int getShapeType() const override;
-
 	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const override;
+	///@}
 
 private:
 	std::shared_ptr<SurgSim::Physics::RigidShape> m_shape;
