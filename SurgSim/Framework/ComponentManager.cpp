@@ -183,5 +183,32 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 	}
 }
 
+bool ComponentManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
+{
+	return tryAddComponent(component, &m_behaviors) != nullptr;
+}
+
+bool ComponentManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
+{
+	return tryRemoveComponent(component, &m_behaviors);
+}
+
+
+bool ComponentManager::doUpdate(double dt)
+{
+	// Add all components that came in before the last update
+	processComponents();
+
+	auto it = std::begin(m_behaviors);
+	auto endIt = std::end(m_behaviors);
+	for ( ;  it != endIt;  ++it)
+	{
+		(*it)->update(dt);
+	}
+	return true;
+	return true;
+}
+
+
 }; // Framework
 }; // SurgSim

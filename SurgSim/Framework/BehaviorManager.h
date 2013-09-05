@@ -39,15 +39,18 @@ public:
 	~BehaviorManager();
 
 protected:
+	/*///Overrides ComponentManager::executeAdditions()
 	virtual bool executeAdditions(const std::shared_ptr<Component>& component) override;
-	virtual bool executeRemovals(const std::shared_ptr<Component>& component) override;
+	///Overrides ComponentManager::executeRemovals()
+	virtual bool executeRemovals(const std::shared_ptr<Component>& component) override;*/
 
 private:
-	virtual bool doUpdate(double dt) override;
+	///Overrides BasicThread::doInitialize()
 	virtual bool doInitialize() override;
+	///Overrides BasicThread::doStartUp()
 	virtual bool doStartUp() override;
-
-	std::vector<std::shared_ptr<Behavior>> m_behaviors;
+	/*///Overrides BasicThread::doUpdate()
+	virtual bool doUpdate(double dt) override;*/
 
 };
 
