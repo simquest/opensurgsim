@@ -63,7 +63,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h
 	ContactCalculation.h
-	ContactCalculation-inl.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	CylinderShape.h
@@ -102,6 +101,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Shapes.h
 	SolveMlcp.h
 	SphereShape.h
+	TriangleMeshPlaneDcdContact.h
+	TriangleMeshPlaneDcdContact-inl.h
 	VtcRigidParameters.h
 	VtcRigidRepresentation.h
 )

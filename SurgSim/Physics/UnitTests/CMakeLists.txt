@@ -51,6 +51,7 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationStateTest.cpp
 	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
+	TriangleMeshPlaneContactCalculationTests.cpp
 	VtcRigidParametersTest.cpp
 	VtcRigidRepresentationTest.cpp
 )
