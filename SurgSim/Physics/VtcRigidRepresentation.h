@@ -164,6 +164,4 @@ private:
 
 }; // SurgSim
 
-#include <SurgSim/Physics/VtcRigidRepresentation-inl.h>
-
 #endif // SURGSIM_PHYSICS_VTCRIGIDREPRESENTATION_H

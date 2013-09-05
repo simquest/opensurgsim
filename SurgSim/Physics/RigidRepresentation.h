@@ -110,6 +110,4 @@ private:
 
 }; // SurgSim
 
-#include <SurgSim/Physics/RigidRepresentation-inl.h>
-
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATION_H

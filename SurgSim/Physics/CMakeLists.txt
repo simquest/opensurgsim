@@ -90,7 +90,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	Representation.h
 	RigidCollisionRepresentation.h
 	RigidRepresentation.h
-	RigidRepresentation-inl.h
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
 	RigidRepresentationBaseState.h
@@ -105,7 +104,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	SphereShape.h
 	VtcRigidParameters.h
 	VtcRigidRepresentation.h
-	VtcRigidRepresentation-inl.h
 )
 
 surgsim_add_library(
