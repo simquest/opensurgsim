@@ -39,7 +39,6 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Physics::RigidShape;
 using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PlaneShape;
 using SurgSim::Physics::DoubleSidedPlaneShape;

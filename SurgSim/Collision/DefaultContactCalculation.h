@@ -22,8 +22,6 @@
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 
-using SurgSim::Physics::RigidShapeType;
-
 namespace SurgSim
 {
 namespace Collision
@@ -49,7 +47,7 @@ public:
 	/// \return int std::pair containing the shape types.
 	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return std::pair<int,int>(RigidShapeType::RIGID_SHAPE_TYPE_NONE, RigidShapeType::RIGID_SHAPE_TYPE_NONE);
+		return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_NONE, SurgSim::Physics::RIGID_SHAPE_TYPE_NONE);
 	}
 
 private:

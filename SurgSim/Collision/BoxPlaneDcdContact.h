@@ -43,7 +43,7 @@ public:
 	/// \return int std::pair containing the shape types.
 	virtual std::pair<int,int> getShapeTypes() override
 	{
-		return std::pair<int,int>(RigidShapeType::RIGID_SHAPE_TYPE_BOX, RigidShapeType::RIGID_SHAPE_TYPE_PLANE);
+		return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_BOX, SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE);
 	}
 
 private:

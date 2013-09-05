@@ -32,13 +32,13 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 		pair->swapRepresentations();
 	}
 
-	if(shapeTypes.first != RigidShapeType::RIGID_SHAPE_TYPE_NONE)
+	if(shapeTypes.first != SurgSim::Physics::RIGID_SHAPE_TYPE_NONE)
 	{
 		SURGSIM_ASSERT(firstShapeType == shapeTypes.first) <<
 			"First Object, wrong type of object" << firstShapeType;
 	}
 
-	if(shapeTypes.second != RigidShapeType::RIGID_SHAPE_TYPE_NONE)
+	if(shapeTypes.second != SurgSim::Physics::RIGID_SHAPE_TYPE_NONE)
 	{
 		SURGSIM_ASSERT(secondShapeType == shapeTypes.second) <<
 			"Second Object, wrong type of object" << secondShapeType;
