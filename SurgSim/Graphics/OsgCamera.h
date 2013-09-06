@@ -118,7 +118,7 @@ public:
 	/// \return	The RenderTarget.
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
-	/// Sets a material the material on the group that has been attached to the camera.
+	/// Sets a material on the group that has been attached to the camera.
 	/// \param	material	The material.
 	/// \return	true if it succeeds, false if there is no group or the material is not an OsgMaterial.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
@@ -130,9 +130,9 @@ public:
 	/// Clears the material from the attached group
 	virtual void clearMaterial();
 
-	/// Set and ordering when this camera will render the main camera will render at RenderInOrder,0
-	/// In general all preprocessing should be done in RenderOrderPreRender, HUD Displaying usually 
-	/// at RenderOrderPostRender
+	/// Determine when this camera will render. The main camera will render at (RENDER_ORDER_IN_ORDER,0)
+	/// In general all preprocessing should be done in RENDER_ORDER_PRE_ORDER, HUD Displaying usually 
+	/// at RENDER_ORDER_POST_ORDER. Overridden from Camera
 	/// \param order The phase of rendering.
 	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
 	/// 			 determined.

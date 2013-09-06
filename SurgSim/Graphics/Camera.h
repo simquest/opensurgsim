@@ -43,9 +43,10 @@ class Camera : public virtual Representation
 public:
 
 	enum RenderOrder {
-		RenderOrderPreRender = 0,
-		RenderOrderInOrderRender = 1,
-		RenderOrderPostRender = 2
+		RENDER_ORDER_PRE_RENDER = 0,
+		RENDER_ORDER_IN_ORDER,
+		RENDER_ORDER_POST_RENDER,
+		RENDER_ORDER_COUNT
 	};
 
 	/// Constructor
@@ -96,9 +97,9 @@ public:
 	/// \return	The RenderTarget.
 	virtual std::shared_ptr<RenderTarget> getRenderTarget() const = 0;
 
-	/// Set and ordering when this camera will render the main camera will render at RenderInOrder,0
-	/// In general all preprocessing should be done in RenderOrderPreRender, HUD Displaying usually 
-	/// at RenderOrderPostRender
+	/// Determine when this camera will render. The main camera will render at (RENDER_ORDER_IN_ORDER,0)
+	/// In general all preprocessing should be done in RENDER_ORDER_PRE_ORDER, HUD Displaying usually 
+	/// at RENDER_ORDER_POST_ORDER
 	/// \param order The phase of rendering.
 	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
 	/// 			 determined.

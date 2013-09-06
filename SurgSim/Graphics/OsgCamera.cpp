@@ -254,7 +254,7 @@ void OsgCamera::attachRenderTargetTexture(osg::Camera::BufferComponent buffer, s
 
 void OsgCamera::setRenderOrder(RenderOrder order, int value)
 {
-	if (order < 3)
+	if (order < RENDER_ORDER_COUNT)
 	{
 		m_camera->setRenderOrder(RenderOrderEnums[order], value);
 	}
