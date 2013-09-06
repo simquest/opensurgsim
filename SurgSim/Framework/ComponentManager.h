@@ -128,7 +128,6 @@ protected:
 		return m_logger;
 	}
 
-	virtual bool doUpdate(double dt) override;
 	std::vector<std::shared_ptr<Behavior>> m_behaviors;
 
 private:
@@ -172,8 +171,7 @@ private:
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	std::weak_ptr<Runtime> m_runtime;
-
-	
+	virtual bool doUpdate(double) override;
 };
 
 }; // namespace Framework

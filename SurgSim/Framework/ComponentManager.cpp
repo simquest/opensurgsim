@@ -183,6 +183,7 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 	}
 }
 
+
 bool ComponentManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	return tryAddComponent(component, &m_behaviors) != nullptr;
@@ -192,7 +193,6 @@ bool ComponentManager::executeRemovals(const std::shared_ptr<SurgSim::Framework:
 {
 	return tryRemoveComponent(component, &m_behaviors);
 }
-
 
 bool ComponentManager::doUpdate(double dt)
 {
@@ -205,10 +205,9 @@ bool ComponentManager::doUpdate(double dt)
 	{
 		(*it)->update(dt);
 	}
-	return true;
+
 	return true;
 }
-
 
 }; // Framework
 }; // SurgSim

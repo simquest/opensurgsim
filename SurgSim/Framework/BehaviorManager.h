@@ -49,9 +49,10 @@ private:
 	virtual bool doInitialize() override;
 	///Overrides BasicThread::doStartUp()
 	virtual bool doStartUp() override;
-	/*///Overrides BasicThread::doUpdate()
-	virtual bool doUpdate(double dt) override;*/
+	///Overrides BasicThread::doUpdate()
+	//virtual bool doUpdate(double dt) override;
 
+	//std::vector<std::shared_ptr<Behavior>> m_behaviors;
 };
 
 

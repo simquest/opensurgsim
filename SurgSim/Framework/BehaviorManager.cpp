@@ -50,17 +50,10 @@ bool BehaviorManager::doStartUp()
 }
 
 
+//
 //bool SurgSim::Framework::BehaviorManager::doUpdate(double dt)
 //{
-//	// Add all components that came in before the last update
-//	processComponents();
-//
-//	auto it = std::begin(m_behaviors);
-//	auto endIt = std::end(m_behaviors);
-//	for ( ;  it != endIt;  ++it)
-//	{
-//		(*it)->update(dt);
-//	}
+//	
 //	return true;
 //}
 
