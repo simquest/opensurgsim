@@ -68,6 +68,10 @@ void DcdCollision::populateCalculationTable()
 	}
 	setDcdContactInTable(std::make_shared<SphereSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<SphereDoubleSidedPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SpherePlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<BoxSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<BoxPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<BoxDoubleSidedPlaneDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)

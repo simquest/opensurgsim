@@ -16,6 +16,7 @@
 #include <SurgSim/Physics/ConstraintImplementationFactory.h>
 #include <SurgSim/Physics/FixedRepresentationContact.h>
 #include <SurgSim/Physics/RigidRepresentationContact.h>
+#include <SurgSim/Physics/VtcRigidRepresentationContact.h>
 
 namespace SurgSim
 {
@@ -26,11 +27,11 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 {
 	addImplementation(std::make_shared<FixedRepresentationContact>());
 	addImplementation(std::make_shared<RigidRepresentationContact>());
+	addImplementation(std::make_shared<VtcRigidRepresentationContact>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()
 {
-
 }
 
 std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getImplementation(

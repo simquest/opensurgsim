@@ -13,13 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONCONTACT_H
-#define SURGSIM_PHYSICS_RIGIDREPRESENTATIONCONTACT_H
+#ifndef SURGSIM_PHYSICS_VTCRIGIDREPRESENTATIONCONTACT_H
+#define SURGSIM_PHYSICS_VTCRIGIDREPRESENTATIONCONTACT_H
 
 #include <SurgSim/Physics/Constraint.h>
 #include <SurgSim/Physics/ConstraintData.h>
 #include <SurgSim/Physics/ConstraintImplementation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/Localization.h>
 
 namespace SurgSim
@@ -28,28 +27,29 @@ namespace SurgSim
 namespace Physics
 {
 
-/// RigidRepresentation frictionless contact implementation.
-class RigidRepresentationContact : public ConstraintImplementation
+/// VtcRigidRepresentation frictionless contact implementation.
+class VtcRigidRepresentationContact : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	RigidRepresentationContact();
-
+	VtcRigidRepresentationContact();
 	/// Destructor
-	virtual ~RigidRepresentationContact();
+	virtual ~VtcRigidRepresentationContact();
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
+	/// Overrides ConstraintImplementation::getMlcpConstraintType()
 	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
-
 	/// Gets the Type of representation that this implementation is concerned with
 	/// \return RepresentationType for this implementation
+	/// Overrides ConstraintImplementation::getRepresentationType()
 	virtual RepresentationType getRepresentationType() const override;
 
 private:
 	/// Gets the number of degree of freedom for a frictionless contact.
 	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction).
-	unsigned int doGetNumDof() const override;
+	/// Overrides ConstraintImplementation::doGetNumDof()
+	virtual unsigned int doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation.
 	/// \param dt The time step.
@@ -59,7 +59,8 @@ private:
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
 	/// \param indexOfConstraint The index of the constraint in the mlcp.
 	/// \param sign The sign of this implementation in the constraint (positive or negative side).
-	void doBuild(double dt,
+	/// Overrides ConstraintImplementation::doBuild()
+	virtual void doBuild(double dt,
 		const ConstraintData& data,
 		const std::shared_ptr<Localization>& localization,
 		MlcpPhysicsProblem* mlcp,
@@ -72,4 +73,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_PHYSICS_RIGIDREPRESENTATIONCONTACT_H
+#endif  // SURGSIM_PHYSICS_VTCRIGIDREPRESENTATIONCONTACT_H

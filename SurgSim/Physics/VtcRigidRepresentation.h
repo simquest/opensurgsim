@@ -45,7 +45,6 @@ public:
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit VtcRigidRepresentation(const std::string& name);
-
 	/// Destructor
 	virtual ~VtcRigidRepresentation();
 
@@ -87,11 +86,6 @@ public:
 	/// Get the initial Vtc state
 	/// \return The initial Vtc state (pose + lin/ang velocities)
 	const RigidRepresentationState& getInitialVtcState() const;
-
-	/// Get the initial Vtc parameters
-	/// \return The initial Vtc parameters
-	const VtcRigidParameters& getInitialVtcParameters() const;
-
 	/// Get the current Vtc state
 	/// \return The current Vtc state (pose + lin/ang velocities)
 	const RigidRepresentationState& getCurrentVtcState() const;
@@ -99,6 +93,9 @@ public:
 	/// \return The previous Vtc state (pose + lin/ang velocities)
 	const RigidRepresentationState& getPreviousVtcState() const;
 
+	/// Get the initial Vtc parameters
+	/// \return The initial Vtc parameters
+	const VtcRigidParameters& getInitialVtcParameters() const;
 	/// Get the current Vtc parameters
 	/// \return The current Vtc parameters
 	const VtcRigidParameters& getCurrentVtcParameters() const;
@@ -123,6 +120,12 @@ public:
 	/// Reset the Vtc parameters to their initial values
 	void resetVtcParameters();
 
+	/// Apply a correction to the internal degrees of freedom
+	/// \param dt The time step
+	/// \param block The block of a vector containing the correction to be applied to the dof
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
+
+	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const;
 
 protected:
 	/// Inertia matrices in global coordinates
