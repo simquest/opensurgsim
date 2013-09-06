@@ -82,7 +82,7 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
 		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
 	renderPass->setRenderTarget(renderTargetOsg);
-	renderPass->setRenderOrder(Camera::RenderOrderPreRender, 0);
+	renderPass->setRenderOrder(Camera::RENDER_ORDER_PRE_RENDER, 0);
 
 	auto shader = std::make_shared<OsgShader>();
 	shader->setFragmentShaderSource(fragmentShaderSource);
