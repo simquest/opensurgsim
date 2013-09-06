@@ -36,12 +36,11 @@ namespace Framework
 class Runtime;
 class Logger;
 
-/// Base Component Manager class. Component Managers manage a collection of
-/// components. The runtime will present each new component to the manager, and
-/// it is up to the manger to decide whether to handle a component of a given
-/// type or not.
-/// Adding and removing components is threadsafe, when the [add|remove]Component
-/// call is made the component is added to an intermediary datastructure, each
+/// Base Component Manager class. Component Managers manage a collection of components.
+/// The runtime will present each new component to the manager, and it is up to 
+/// the manger to decide whether to handle a component of a given type or not.
+/// Adding and removing components is thread-safe, when the [add|remove]Component
+/// call is made, the component is added to an intermediary data structure, each
 /// ComponentManager implementation must call processComponents() to trigger the
 /// actual addition and removal. Each ComponentManager subclass needs to implement
 /// doAddComponent() and doRemoveComponent() to the actual addition and removal of
@@ -69,14 +68,9 @@ public:
 
 	/// @{
 	/// Runtime accessors
-	inline std::shared_ptr<Runtime> getRuntime() const
-	{
-		return m_runtime.lock();
-	}
-
+	std::shared_ptr<Runtime> getRuntime() const;
 	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
-
 
 protected:
 	/// Template version of the addComponent method.
@@ -109,39 +103,34 @@ protected:
 	void copyScheduledComponents(std::vector<std::shared_ptr<Component>>* inflightAdditions,
 								 std::vector<std::shared_ptr<Component>>* inflightRemovals);
 
+	/// Returns this manager's logger
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
+
 	/// Blocks protects addition and removal queues
 	boost::mutex m_componentMutex;
 
 	///@{
-	/// Datastructures, to contain components scheduled for addition and
-	/// removal
+	/// Data structures
+	/// Contain components scheduled to be added/removed
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
 	///@}
-
+	
 	/// Logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-
-	/// Returns this manager's logger
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
-
-	std::vector<std::shared_ptr<Behavior>> m_behaviors;
 
 private:
 	/// Adds a component.
 	/// \param component The component to be added.
 	/// \return true if the component was scheduled for addition, this does not indicate that
 	/// 		the component will actually be added to this manager.
-	virtual bool executeAdditions(const std::shared_ptr<Component>& component);
+	virtual bool executeAdditions(const std::shared_ptr<Component>& component) = 0;
 
 	/// Handle representations, override for each thread
 	/// \param component	The component to be removed.
 	/// \return true if the component was scheduled for removal, this does not indicate that
 	/// 		the component will actually be removed from this manager.
-	virtual bool executeRemovals(const std::shared_ptr<Component>& component);
+	virtual bool executeRemovals(const std::shared_ptr<Component>& component) = 0;
 
 	/// Overridden from BasicThread, extends the initialization to contain component initialization
 	/// including waiting for the other threads to conclude their component initialization and wakeup
@@ -171,7 +160,6 @@ private:
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	std::weak_ptr<Runtime> m_runtime;
-	virtual bool doUpdate(double) override;
 };
 
 }; // namespace Framework

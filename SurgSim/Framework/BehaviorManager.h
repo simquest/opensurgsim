@@ -29,7 +29,7 @@ namespace Framework
 class Behavior;
 
 /// Manager to handle Behaviors. The manager will collect all the behaviors
-/// in the scene through addComponent (and removeComponent) calls. All the
+/// in the scene through addComponent/removeComponent calls. All the
 /// behaviors will be update once per period (default 30Hz) once the
 /// BehaviorManager is started.
 class BehaviorManager : public ComponentManager
@@ -39,10 +39,10 @@ public:
 	~BehaviorManager();
 
 protected:
-	/*///Overrides ComponentManager::executeAdditions()
+	///Overrides ComponentManager::executeAdditions()
 	virtual bool executeAdditions(const std::shared_ptr<Component>& component) override;
 	///Overrides ComponentManager::executeRemovals()
-	virtual bool executeRemovals(const std::shared_ptr<Component>& component) override;*/
+	virtual bool executeRemovals(const std::shared_ptr<Component>& component) override;
 
 private:
 	///Overrides BasicThread::doInitialize()
@@ -50,9 +50,9 @@ private:
 	///Overrides BasicThread::doStartUp()
 	virtual bool doStartUp() override;
 	///Overrides BasicThread::doUpdate()
-	//virtual bool doUpdate(double dt) override;
+	virtual bool doUpdate(double dt) override;
 
-	//std::vector<std::shared_ptr<Behavior>> m_behaviors;
+	std::vector<std::shared_ptr<Behavior>> m_behaviors;
 };
 
 

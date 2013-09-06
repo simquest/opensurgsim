@@ -49,13 +49,29 @@ bool BehaviorManager::doStartUp()
 	return true;
 }
 
+bool BehaviorManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
+{
+	return tryAddComponent(component, &m_behaviors) != nullptr;
+}
 
-//
-//bool SurgSim::Framework::BehaviorManager::doUpdate(double dt)
-//{
-//	
-//	return true;
-//}
+bool BehaviorManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
+{
+	return tryRemoveComponent(component, &m_behaviors);
+}
+
+bool BehaviorManager::doUpdate(double dt)
+{
+	// Add all components that came in before the last update
+	processComponents();
+
+	auto it = std::begin(m_behaviors);
+	auto endIt = std::end(m_behaviors);
+	for ( ;  it != endIt;  ++it)
+	{
+		(*it)->update(dt);
+	}
+	return true;
+}
 
 }; // namespace Framework
 }; // namespace SurgSim
