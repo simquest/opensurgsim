@@ -72,7 +72,7 @@ public:
 	/// Gets a size.
 	/// \param [out]	width, height	The width and height of the RenderTarget textures.
 	virtual void getSize(int* width, int* height) const override;
-.
+
 	/// \return	The number of color targets that are available.
 	virtual int getColorTargetCount() const override;
 
