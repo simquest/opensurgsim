@@ -123,17 +123,21 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 std::shared_ptr<SceneElement> createBox(const std::string& name)
 {
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
+	double density = 700.0;  // Wood in Kg.m-3
+	double size[3] = {0.8, 2.0, 0.2};
+	double volume = size[0] * size[1] * size[2];
+	double mass = volume * density;
 
-	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.1, 0.2, 0.3);
+	RigidRepresentationParameters params;
+	params.setDensity(density);
+	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(size[0], size[1], size[2]);
 	params.setShapeUsedForMassInertia(box);
 
 	VtcRigidParameters vtcParams;
-	vtcParams.setVtcAngularDamping(20);
-	vtcParams.setVtcAngularStiffness(20);
-	vtcParams.setVtcLinearDamping(100);
-	vtcParams.setVtcLinearStiffness(100);
+	vtcParams.setVtcAngularDamping(mass * 20);
+	vtcParams.setVtcAngularStiffness(mass * 50);
+	vtcParams.setVtcLinearDamping(mass * 20);
+	vtcParams.setVtcLinearStiffness(mass * 50);
 
 	std::shared_ptr<VtcRigidRepresentation> vtcRepresentation =
 		std::make_shared<VtcRigidRepresentation>(name + "-Vtc");
