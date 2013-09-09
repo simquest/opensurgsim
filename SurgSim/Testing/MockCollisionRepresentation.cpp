@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
+#include <SurgSim/Testing/MockCollisionRepresentation.h>
 #include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {
-namespace Collision
+namespace Testing
 {
 
 MockCollisionRepresentation::MockCollisionRepresentation(
@@ -67,5 +67,5 @@ const SurgSim::Math::RigidTransform3d& MockCollisionRepresentation::getPose() co
 	return m_transform;
 }
 
-}; // namespace Collision
+}; // namespace Testing
 }; // namespace SurgSim

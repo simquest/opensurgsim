@@ -15,7 +15,7 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Testing/RepresentationUtilities.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -32,6 +32,8 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+
+using SurgSim::Testing::makeSphereRepresentation;
 
 namespace SurgSim
 {

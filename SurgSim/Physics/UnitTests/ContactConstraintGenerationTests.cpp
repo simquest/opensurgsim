@@ -18,7 +18,7 @@
 
 #include <utility>
 
-#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Testing/RepresentationUtilities.h>
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/ContactConstraintGeneration.h>
@@ -26,12 +26,14 @@
 #include <SurgSim/Collision/DcdCollision.h>
 #include <SurgSim/Physics/Constraint.h>
 
-#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
+#include <SurgSim/Testing/MockCollisionRepresentation.h>
 
 using SurgSim::Collision::CollisionRepresentation;
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
-using SurgSim::Collision::MockCollisionRepresentation;
+using SurgSim::Testing::MockCollisionRepresentation;
+using SurgSim::Testing::makeSphereRepresentation;
+using SurgSim::Testing::makeDoubleSidedPlaneRepresentation;
 
 namespace SurgSim
 {
@@ -43,10 +45,10 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	virtual void SetUp()
 	{
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation");
-		sphere = SurgSim::Collision::makeSphereRepresentation(rigid0,2.0);
+		sphere = makeSphereRepresentation(rigid0,2.0);
 
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation");
-		plane = SurgSim::Collision::makeDoubleSidedPlaneRepresentation(rigid1);
+		plane = makeDoubleSidedPlaneRepresentation(rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
 	}

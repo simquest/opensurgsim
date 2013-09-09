@@ -21,10 +21,14 @@ include_directories(
 
 set(SURGSIM_TESTING_SOURCES
 	MathUtilities.cpp
+	MockCollisionRepresentation.cpp
+	RepresentationUtilities.cpp
 )
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
+	MockCollisionRepresentation.h
+	RepresentationUtilities.h
 )
 
 surgsim_add_library(

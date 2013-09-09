@@ -34,13 +34,11 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationLocalizationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
-	../../Collision/UnitTests/MockCollisionRepresentation.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
-	../../Collision/UnitTests/RepresentationUtilities.cpp
 	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationContactTests.cpp
@@ -55,15 +53,13 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
-	../../Collision/UnitTests/MockCollisionRepresentation.h
 	MockObjects.h
-	../../Collision/UnitTests/RepresentationUtilities.h
 )
 
 include_directories(
 )
 
-set(LIBS SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimDataStructures MlcpTestIO gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimTesting SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimDataStructures MlcpTestIO gtest ${Boost_LIBRARIES})
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
