@@ -71,6 +71,11 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 		return addOutputComponent(output);
 	}
 
+	{
+		boost::lock_guard<boost::mutex> lock(m_mutex);
+		return tryAddComponent(component, &m_behavior) != nullptr;
+	}
+
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
 	// return false
 	return false;

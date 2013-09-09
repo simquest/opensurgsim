@@ -19,6 +19,7 @@
 #include <memory>
 #include <vector>
 
+#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
 #include "SurgSim/Framework/ComponentManager.h"
 
 namespace SurgSim
@@ -52,7 +53,7 @@ private:
 	///Overrides BasicThread::doUpdate()
 	virtual bool doUpdate(double dt) override;
 
-	std::vector<std::shared_ptr<Behavior>> m_behaviors;
+	std::vector<std::shared_ptr<SurgSim::Blocks::RepresentationPoseBehavior>> m_behaviors;
 };
 
 

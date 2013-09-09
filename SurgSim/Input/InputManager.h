@@ -54,9 +54,12 @@ public:
 	bool removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
 private:
-	virtual bool doInitialize();
-	virtual bool doStartUp();
-	virtual bool doUpdate(double dt);
+	///Overrides BasicThread::doInitialize()
+	virtual bool doInitialize() override;
+	///Overrides BasicThread::doStartUp()
+	virtual bool doStartUp() override;
+	///Overrides BasicThread::doUpdate()
+	virtual bool doUpdate(double dt) override;
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
 	/// function in the device. For an InputComonent this will succeed if the device name
@@ -66,25 +69,29 @@ private:
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	///Overrides ComponentManager::executeAdditions()
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 	/// Removes the component described by component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	///Overrides ComponentManager::executeRemovals()
+	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 
 	/// Specific call for input components.
+	/// Link input consumer to input device, so that data produced by device can be
+	///    consumed by the component
 	bool addInputComponent(const std::shared_ptr<InputComponent>& input);
-
 	/// Specific call for output components.
 	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
 
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
-
 	/// Collection of all output components.
 	std::vector<std::shared_ptr<OutputComponent>> m_outputs;
+	/// Collection of all behaviors managed by InputManager
+	std::vector<std::shared_ptr<SurgSim::Blocks::RepresentationPoseBehavior>> m_behaviors
 
 	/// Collection of all devices that have been added to the input manager
 	/// key is the name, no two devices with the same name can be added to the
