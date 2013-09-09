@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_COLLISION_UNITTESTS_CONTACTCALCULATIONTESTSCOMMON_H
+#define SURGSIM_COLLISION_UNITTESTS_CONTACTCALCULATIONTESTSCOMMON_H
+
 #include <gtest/gtest.h>
 #include <memory>
 
@@ -120,3 +123,5 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& exp
 
 }; // namespace Collision
 }; // namespace SurgSim
+
+#endif

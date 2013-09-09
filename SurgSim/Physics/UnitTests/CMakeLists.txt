@@ -29,9 +29,9 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	FemRepresentationParametersTest.cpp
-	FixedRepresentationTest.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
+	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
@@ -39,12 +39,12 @@ set(UNIT_TEST_SOURCES
 	PreUpdateTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
-	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
+	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
 	VtcRigidParametersTest.cpp

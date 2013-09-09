@@ -35,7 +35,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 
     std::shared_ptr<CollisionRepresentation> representationBox;
 	std::shared_ptr<CollisionRepresentation> representationPlane;
-    
+
     representationBox = pair->getFirst();
     representationPlane = pair->getSecond();
 

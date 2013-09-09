@@ -117,7 +117,8 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		boxTrans = Vector3d(0.0,0.0,0.0);
 		sphereQuat.setIdentity();
 		sphereTrans = Vector3d(0.3345,-1.2,0.1234);
-		globalQuat = SurgSim::Math::makeRotationQuaternion(-0.35465, Vector3d(18.3454, -27.78567, 23.234346).normalized());
+		globalQuat = SurgSim::Math::makeRotationQuaternion(-0.35465,
+														   Vector3d(18.3454, -27.78567, 23.234346).normalized());
 		globalTrans = Vector3d(234.6,326.67,987.53);
 		boxQuat = globalQuat * boxQuat;
 		boxTrans = globalQuat * boxTrans + globalTrans;

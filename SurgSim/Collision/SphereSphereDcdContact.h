@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_SPHERESPHERECDCONTACT_H
-#define SURGSIM_COLLISION_SPHERESPHERECDCONTACT_H
+#ifndef SURGSIM_COLLISION_SPHERESPHEREDCDCONTACT_H
+#define SURGSIM_COLLISION_SPHERESPHEREDCDCONTACT_H
 
 #include <memory>
 

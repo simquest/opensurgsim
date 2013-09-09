@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DCDCOLLISION_H
-#define SURGSIM_DCDCOLLISION_H
+#ifndef SURGSIM_COLLISION_DCDCOLLISION_H
+#define SURGSIM_COLLISION_DCDCOLLISION_H
 
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/DefaultContactCalculation.h>
@@ -26,4 +26,4 @@
 #include <SurgSim/Collision/BoxSphereDcdContact.h>
 #include <SurgSim/Collision/CapsuleSphereDcdContact.h>
 
-#endif
+#endif // SURGSIM_COLLISION_DCDCOLLISION_H

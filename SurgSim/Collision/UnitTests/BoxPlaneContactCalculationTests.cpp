@@ -161,7 +161,7 @@ TEST(BoxPlaneContactCalculationTests, UnitTests)
         int expectedBoxIndicesInContacts[] = {0, 1, 2, 3};
         doBoxPlaneTest(box, boxQuat, boxTrans, plane, planeQuat, planeTrans, expectedNumberOfContacts,
 					   expectedBoxIndicesInContacts);
-    }    
+    }
 
 	{
         SCOPED_TRACE("Intersection inside of plane - case 1, eight contacts, rotated plane");

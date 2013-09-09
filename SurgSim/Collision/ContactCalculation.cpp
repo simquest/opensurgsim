@@ -25,7 +25,7 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 	std::pair<int,int> shapeTypes = getShapeTypes();
 	int firstShapeType = pair->getFirst()->getShapeType();
 	int secondShapeType = pair->getSecond()->getShapeType();
-	
+
 	if (firstShapeType != secondShapeType && firstShapeType == shapeTypes.second &&
 			secondShapeType == shapeTypes.first)
 	{

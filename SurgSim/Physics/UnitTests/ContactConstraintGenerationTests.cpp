@@ -43,7 +43,7 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	{
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation 0");
 		sphere = std::make_shared<RigidShapeCollisionRepresentation>("Collision Representation 0",
-																	 std::make_shared<SphereShape>(1.0),
+																	 std::make_shared<SphereShape>(2.0),
 																	 rigid0);
 
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation 1");
