@@ -28,7 +28,15 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) : Repr
 
 RigidRepresentationBase::~RigidRepresentationBase()
 {
+}
 
+void RigidRepresentationBase::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_initialState.setPose(pose);
+	m_currentState.setPose(pose);
+	m_previousState.setPose(pose);
+	m_finalState.setPose(pose);
+	updateGlobalInertiaMatrices(m_currentState);
 }
 
 void RigidRepresentationBase::setInitialState(const RigidRepresentationState& state)
@@ -36,6 +44,17 @@ void RigidRepresentationBase::setInitialState(const RigidRepresentationState& st
 	m_initialState = state;
 	m_currentState = state;
 	m_previousState = state;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+void RigidRepresentationBase::resetState()
+{
+	Representation::resetState();
+
+	m_currentState  = m_initialState;
+	m_previousState = m_initialState;
+	m_finalState    = m_initialState;
 
 	updateGlobalInertiaMatrices(m_currentState);
 }
@@ -55,25 +74,9 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 	return m_previousState;
 }
 
-void RigidRepresentationBase::resetState()
-{
-	Representation::resetState();
 
-	m_currentState  = m_initialState;
-	m_previousState = m_initialState;
-	m_finalState    = m_initialState;
 
-	updateGlobalInertiaMatrices(m_currentState);
-}
 
-void RigidRepresentationBase::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	m_initialState.setPose(pose);
-	m_currentState.setPose(pose);
-	m_previousState.setPose(pose);
-	m_finalState.setPose(pose);
-	updateGlobalInertiaMatrices(m_currentState);
-}
 
 const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getInitialPose() const
 {
@@ -98,6 +101,16 @@ const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getPose() const
 std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const Location& location)
 {
 	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
+}
+
+const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getInitialParameters() const
+{
+	return m_initialParameters;
+}
+
+const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getCurrentParameters() const
+{
+	return m_currentParameters;
 }
 
 }; // Physics
