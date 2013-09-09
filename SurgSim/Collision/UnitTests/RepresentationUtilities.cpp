@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Testing/RepresentationUtilities.h>
-#include <SurgSim/Testing/MockCollisionRepresentation.h>
+#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
 #include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
 
 #include <SurgSim/Collision/CollisionRepresentation.h>
@@ -25,11 +25,9 @@
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 
-using SurgSim::Testing::MockCollisionRepresentation;
-
 namespace SurgSim
 {
-namespace Testing
+namespace Collision
 {
 
 std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresentation(
@@ -93,5 +91,5 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeCapsuleRepresen
 		representation);
 }
 
-}; // Testing
+}; // Collision
 }; // SurgSim

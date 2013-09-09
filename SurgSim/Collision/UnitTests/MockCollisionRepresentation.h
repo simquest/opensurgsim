@@ -29,13 +29,8 @@ namespace SurgSim
 {
 namespace Collision
 {
+
 class Representation;
-}
-
-namespace Testing
-{
-
-using namespace SurgSim::Collision;
 
 /// Class to wrap a plain RigidShape for use as a CollisionRepresentation, just delegate
 /// the access to the various RigidShape methods
@@ -69,7 +64,7 @@ private:
 };
 
 
-}; // namespace Testing
+}; // namespace Collision
 }; // namespace SurgSim
 
 #endif

@@ -16,8 +16,6 @@
 #include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
 #include <SurgSim/Collision/SphereSphereDcdContact.h>
 
-using SurgSim::Testing::makeSphereRepresentation;
-
 namespace SurgSim
 {
 namespace Collision

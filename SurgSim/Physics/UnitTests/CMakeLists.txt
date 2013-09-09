@@ -59,7 +59,7 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimTesting SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimDataStructures MlcpTestIO gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimDataStructures MlcpTestIO gtest ${Boost_LIBRARIES})
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

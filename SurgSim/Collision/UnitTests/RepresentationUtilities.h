@@ -27,13 +27,8 @@ namespace SurgSim
 {
 namespace Collision
 {
+
 class Representation;
-}
-
-namespace Testing
-{
-
-using namespace SurgSim::Collision;
 
 std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresentation(
 	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
@@ -58,7 +53,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeCapsuleRepresen
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
-}; // namespace Testing
+}; // namespace Collision
 }; // namespace SurgSim
 
 #endif

@@ -27,6 +27,8 @@ set(UNIT_TEST_SOURCES
 	CollisionPairTests.cpp
 	ContactCalculationTestsCommon.cpp
 	DefaultContactCalculationTests.cpp
+	MockCollisionRepresentation.cpp
+	RepresentationUtilities.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp
 	SpherePlaneContactCalculationTests.cpp
 	SphereSphereContactCalculationTests.cpp
@@ -34,6 +36,8 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	ContactCalculationTestsCommon.h
+	MockCollisionRepresentation.h
+	RepresentationUtilities.h
 )
 
 include_directories(

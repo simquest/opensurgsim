@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/Testing/RepresentationUtilities.h>
-#include <SurgSim/Testing/MockCollisionRepresentation.h>
+#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -42,12 +42,6 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PlaneShape;
 using SurgSim::Physics::DoubleSidedPlaneShape;
-
-using SurgSim::Testing::MockCollisionRepresentation;
-using SurgSim::Testing::makeSphereRepresentation;
-using SurgSim::Testing::makeDoubleSidedPlaneRepresentation;
-using SurgSim::Testing::makePlaneRepresentation;
-using SurgSim::Testing::makeCapsuleRepresentation;
 
 namespace SurgSim
 {
