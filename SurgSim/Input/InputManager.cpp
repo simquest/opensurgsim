@@ -17,8 +17,7 @@
 
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Framework/Runtime.h>
-
-#include "SurgSim/Input/InputComponent.h"
+#include <SurgSim/Input/InputComponent.h>
 
 namespace SurgSim
 {
@@ -49,6 +48,13 @@ bool InputManager::doUpdate(double dt)
 	// Add all components that came in before the last update
 	processComponents();
 
+	auto it = std::begin(m_behaviors);
+	auto endIt = std::end(m_behaviors);
+	for ( ;  it != endIt;  ++it)
+	{
+		(*it)->update(dt);
+	}
+
 	return true;
 }
 
@@ -73,7 +79,7 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 
 	{
 		boost::lock_guard<boost::mutex> lock(m_mutex);
-		return tryAddComponent(component, &m_behavior) != nullptr;
+		return tryAddComponent(component, &m_behaviors) != nullptr;
 	}
 
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
