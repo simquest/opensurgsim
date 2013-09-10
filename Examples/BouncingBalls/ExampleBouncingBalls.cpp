@@ -46,7 +46,7 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include "AddSphereBehavior.h"
+#include <Examples/BouncingBalls/AddSphereBehavior.h>
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;

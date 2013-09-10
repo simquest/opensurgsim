@@ -19,7 +19,7 @@
 
 #include <SurgSim/Framework/Assert.h>
 #include "SurgSim/DataStructures/NamedVariantData.h"
-#include "MockObjects.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "gtest/gtest.h"
 
 using SurgSim::DataStructures::NamedVariantData;
