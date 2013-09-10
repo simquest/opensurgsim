@@ -38,7 +38,7 @@ public:
 	/// Constructor
 	explicit RigidCollisionRepresentation(
 		const std::string& name,
-		std::shared_ptr<RigidRepresentation> representation);
+		std::shared_ptr<RigidRepresentationBase> representation);
 
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();
@@ -53,8 +53,7 @@ public:
 private:
 
 	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
-	std::shared_ptr<RigidRepresentation> m_localRepresentation;
-
+	std::shared_ptr<RigidRepresentationBase> m_localRepresentation;
 };
 
 }; // Physics
