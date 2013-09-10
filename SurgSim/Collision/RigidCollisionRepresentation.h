@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H
-#define SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_COLLISION_RIGIDCOLLISIONREPRESENTATION_H
+#define SURGSIM_COLLISION_RIGIDCOLLISIONREPRESENTATION_H
 
 #include <memory>
 
-#include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/Math/RigidTransform.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 /// CollisionRepresentation class that wraps a RigidRepresentation, this can be used to strictly tie the
@@ -36,9 +36,9 @@ class RigidCollisionRepresentation : public CollisionRepresentation
 public:
 
 	/// Constructor
-	explicit RigidCollisionRepresentation(
+	RigidCollisionRepresentation(
 		const std::string& name,
-		std::shared_ptr<RigidRepresentationBase> representation);
+		std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
 
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();
@@ -46,17 +46,17 @@ public:
 	///@{
 	/// Implementations of virtual functions from CollisionRepresentation
 	virtual int getShapeType() const override;
-	virtual const std::shared_ptr<RigidShape> getShape() const override;
+	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const override;
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 	///@}
 
 private:
 
 	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
-	std::shared_ptr<RigidRepresentationBase> m_localRepresentation;
+	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> m_localRepresentation;
 };
 
-}; // Physics
-}; // SurgSim
+}; // namespace Collision
+}; // namespace SurgSim
 
 #endif

@@ -20,10 +20,10 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Physics/RigidCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/DoubleSidedPlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
@@ -31,15 +31,15 @@
 
 #include <SurgSim/Math/Quaternion.h>
 
-using SurgSim::Physics::CollisionRepresentation;
-using SurgSim::Physics::CollisionPair;
+using SurgSim::Collision::CollisionRepresentation;
+using SurgSim::Collision::CollisionPair;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
-using SurgSim::Physics::RigidCollisionRepresentation;
+using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidShape;
-using SurgSim::Physics::RigidShapeCollisionRepresentation;
+using SurgSim::Collision::RigidShapeCollisionRepresentation;
 using SurgSim::Physics::SphereShape;
 using SurgSim::Physics::DoubleSidedPlaneShape;
 using SurgSim::Physics::PhysicsManagerState;
