@@ -81,6 +81,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Representation.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
+	RigidRepresentationBase-inl.h
 	RigidRepresentationBaseState.h
 	RigidRepresentationContact.h
 	RigidRepresentationLocalization.h

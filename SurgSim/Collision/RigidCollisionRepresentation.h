@@ -38,7 +38,7 @@ public:
 	/// Constructor
 	RigidCollisionRepresentation(
 		const std::string& name,
-		std::shared_ptr<SurgSim::Physics::RigidRepresentation> representation);
+		std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
 
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();
@@ -53,8 +53,7 @@ public:
 private:
 
 	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
-	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_localRepresentation;
-
+	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> m_localRepresentation;
 };
 
 }; // namespace Collision
