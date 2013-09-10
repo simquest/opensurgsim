@@ -43,8 +43,8 @@ namespace Graphics
 /// 	  means that they all have to be downconverted from double, i don't know what the hit 
 /// 	  of going to double in the shaders would be
 OsgLight::OsgLight(const std::string& name) :
-	OsgRepresentation(name),
 	Representation(name),
+	OsgRepresentation(name),
 	Light(name),
 	m_ambientColor(0.0,0.0,0.0,1.0),
 	m_diffuseColor(1.0,1.0,1.0,1.0),

@@ -142,7 +142,7 @@ private:
 	std::shared_ptr<OsgGroup> m_group;
 
 	/// Map for managing all uniforms that this object owns
-	std::unordered_map<UniformType, osg::ref_ptr<osg::Uniform>> m_uniforms;
+	std::unordered_map<int, osg::ref_ptr<osg::Uniform>> m_uniforms;
 
 
 	SurgSim::Math::Vector4d m_ambientColor;		///< The actual ambient color that was set
