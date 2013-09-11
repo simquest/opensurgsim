@@ -15,30 +15,28 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
+#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
 #include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/Physics/SphereShape.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/ContactCalculation.h>
-#include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/ContactCalculation.h>
+#include <SurgSim/Collision/CollisionPair.h>
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
-
 
 TEST(CollisionPairTests, InitTest)
 {
@@ -106,6 +104,5 @@ TEST(CollisionPairTests, setRepresentationsTest)
 	EXPECT_FALSE(pair.isSwapped());
 }
 
-
-}; // namespace Physics
+}; // namespace Collision
 }; // namespace SurgSim

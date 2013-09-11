@@ -15,12 +15,12 @@
 
 #include <numeric>
 #include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
@@ -53,6 +53,6 @@ bool CollisionPair::isSwapped() const
 	return m_isSwapped;
 }
 
-}; // namespace Physics
+}; // namespace Collision
 }; // namespace SurgSim
 

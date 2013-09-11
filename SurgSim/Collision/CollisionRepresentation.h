@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_COLLISIONREPRESENTATION_H
-#define SURGSIM_PHYSICS_COLLISIONREPRESENTATION_H
+#ifndef SURGSIM_COLLISION_COLLISIONREPRESENTATION_H
+#define SURGSIM_COLLISION_COLLISIONREPRESENTATION_H
 
 #include <memory>
 
@@ -27,9 +27,12 @@ namespace SurgSim
 
 namespace Physics
 {
-
 class RigidShape;
 class Representation;
+};
+
+namespace Collision
+{
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
@@ -85,7 +88,7 @@ protected:
 };
 
 
-}; // namespace Physics
+}; // namespace Collision
 }; // namespace SurgSim
 
 #endif

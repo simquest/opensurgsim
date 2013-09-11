@@ -22,7 +22,7 @@ include_directories(
 )
 
 add_subdirectory(Blocks)
-# add_subdirectory(Collision)
+add_subdirectory(Collision)
 add_subdirectory(DataStructures)
 add_subdirectory(Devices)
 add_subdirectory(Framework)

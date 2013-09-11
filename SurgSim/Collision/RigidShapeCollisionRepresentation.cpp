@@ -13,18 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/RigidShape.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 
 RigidShapeCollisionRepresentation::RigidShapeCollisionRepresentation(
 		const std::string& name,
-		std::shared_ptr<RigidShape> shape,
+		std::shared_ptr<SurgSim::Physics::RigidShape> shape,
 		std::shared_ptr<SurgSim::Physics::Representation> representation) :
 	CollisionRepresentation(name,representation),
 	m_shape(shape)
@@ -48,5 +49,5 @@ const std::shared_ptr<SurgSim::Physics::RigidShape> RigidShapeCollisionRepresent
 
 
 
-}; // Physics
-}; // SurgSim
+}; // namespace Collision
+}; // namespace SurgSim

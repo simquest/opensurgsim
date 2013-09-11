@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 CollisionRepresentation::CollisionRepresentation(const std::string& name) :
@@ -47,7 +47,7 @@ void CollisionRepresentation::setPhysicsRepresentation(
 	m_physicsRepresentation = physicsRepresentation;
 }
 
-std::shared_ptr<Representation> CollisionRepresentation::getPhysicsRepresentation()
+std::shared_ptr<SurgSim::Physics::Representation> CollisionRepresentation::getPhysicsRepresentation()
 {
 	return m_physicsRepresentation.lock();
 }
@@ -76,5 +76,5 @@ void CollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pos
 	SURGSIM_FAILURE() << "Cannot set the pose on a collision representation.";
 }
 
-}; // Physics
-}; // SurgSim
+}; // namespace Collision
+}; // namespace SurgSim

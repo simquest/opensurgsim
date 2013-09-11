@@ -21,34 +21,30 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
-	CollisionPairTests.cpp
 	ComputationTests.cpp
 	ConstraintTests.cpp
-	ContactCalculationTests.cpp
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
 	DcdCollisionTests.cpp
 	DeformableRepresentationTest.cpp
 	DeformableRepresentationStateTest.cpp
 	FemRepresentationParametersTest.cpp
-	FixedRepresentationTest.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
+	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	MeshShapeTest.cpp
-	MockCollisionRepresentation.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
 	PushResultsTests.cpp
 	RepresentationTest.cpp
-	RepresentationUtilities.cpp
-	RigidRepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
 	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
+	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
 	VtcRigidParametersTest.cpp
@@ -57,15 +53,13 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
-	MockCollisionRepresentation.h
 	MockObjects.h
-	RepresentationUtilities.h
 )
 
 include_directories(
 )
 
-set(LIBS SurgSimFramework SurgSimDataStructures SurgSimPhysics MlcpTestIO gtest ${Boost_LIBRARIES})
+set(LIBS SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimDataStructures MlcpTestIO gtest ${Boost_LIBRARIES})
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
