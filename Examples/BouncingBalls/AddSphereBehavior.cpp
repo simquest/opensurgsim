@@ -15,8 +15,9 @@
 
 #include <string>
 #include <sstream>
+#include <stdlib.h>
 
-#include "AddSphereBehavior.h"
+#include <Examples/BouncingBalls/AddSphereBehavior.h>
 
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/SceneElement.h>
@@ -47,16 +48,16 @@ void AddSphereBehavior::update(double dt)
 		m_totalTime = 0.0;
 
 		std::stringstream ss;
-		ss << ++m_numElements;
+		ss << ++ m_numElements;
 
-		std::srand((unsigned int) std::time(0));
-		double m_x = float(std::rand() % 10)/10;
-		double m_y = 1 + float(std::rand() % 2);
-		double m_z = float(std::rand() % 10)/10;
+		std::srand(static_cast<unsigned int>(std::time(0)));
+		double m_x = static_cast<double>(std::rand() % 10) / 10.0;
+		double m_y = static_cast<double>(std::rand() % 2) + 1.0;
+		double m_z = static_cast<double>(std::rand() % 10) / 10.0;
 
 		std::string name = "sphereId_" + ss.str();
 		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform
-			(SurgSim::Math::Quaterniond::Identity(), Vector3d(m_x,m_y,m_z));
+			(SurgSim::Math::Quaterniond::Identity(), Vector3d(m_x, m_y, m_z));
 
 		std::shared_ptr<SceneElement> m_element = std::make_shared<SphereElement>(name, pose);
 		getScene()->addSceneElement(m_element);
