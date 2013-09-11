@@ -129,10 +129,19 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	double mass = volume * density;
 
 	RigidRepresentationParameters params;
-	params.setDensity(density);
-	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(size[0], size[1], size[2]);
+	params.setDensity(700.0); // Wood in Kg.m-3
+	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in m
 	params.setShapeUsedForMassInertia(box);
 
+	// The vtc parameters are the parameters for the spring between the device and the simulated rigid body.
+	// To understand how they are used, let's have a look at the physics under the hood.
+	// For a given spring between points A and B, of stiffness k and damping c, we have the Newton's law:
+	// m.a = F = k.AB - c.d(AB)/dt
+	// It is clear that the mass of the object has a direct inverse relationship with the spring
+	// stiffness and damping parameters. Therefore, if a set of parameters (k/c) behaves well for an object
+	// of mass m, an object of mass 2m will need a vtc with the parameters (2k/2c) to behave the same way
+	// on the physical system. The mass factor helps to scale the vtc parameters easily to different objects.
+	// The actual values of the vtc parameters are experimental and needs to be tweaked for each application.
 	VtcRigidParameters vtcParams;
 	vtcParams.setVtcAngularDamping(mass * 20);
 	vtcParams.setVtcAngularStiffness(mass * 50);

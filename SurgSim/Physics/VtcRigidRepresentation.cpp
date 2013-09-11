@@ -43,79 +43,6 @@ VtcRigidRepresentation::~VtcRigidRepresentation()
 {
 }
 
-RepresentationType VtcRigidRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_VTC_RIGID;
-}
-
-void VtcRigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	m_currentVtcState.setPose(pose);
-}
-
-const SurgSim::Math::RigidTransform3d& VtcRigidRepresentation::getPose() const
-{
-	return m_finalState.getPose();
-}
-
-void VtcRigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
-{
-	m_initialParameters = parameters;
-	m_currentParameters = parameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
-}
-
-void VtcRigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
-{
-	m_currentParameters = parameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
-}
-
-void VtcRigidRepresentation::setInitialVtcState(const RigidRepresentationState& state)
-{
-	m_initialVtcState = state;
-	m_currentVtcState = state;
-	m_previousVtcState = state;
-}
-
-void VtcRigidRepresentation::setInitialVtcParameters(const VtcRigidParameters& parameters)
-{
-	m_initialVtcParameters = parameters;
-	m_currentVtcParameters = parameters;
-}
-
-void VtcRigidRepresentation::setCurrentVtcParameters(const VtcRigidParameters& parameters)
-{
-	m_currentVtcParameters = parameters;
-}
-
-const RigidRepresentationState& VtcRigidRepresentation::getInitialVtcState() const
-{
-	return m_initialVtcState;
-}
-
-const RigidRepresentationState& VtcRigidRepresentation::getCurrentVtcState() const
-{
-	return m_currentVtcState;
-}
-
-const RigidRepresentationState& VtcRigidRepresentation::getPreviousVtcState() const
-{
-	return m_previousVtcState;
-}
-
-const VtcRigidParameters& VtcRigidRepresentation::getInitialVtcParameters() const
-{
-	return m_initialVtcParameters;
-}
-
-const VtcRigidParameters& VtcRigidRepresentation::getCurrentVtcParameters() const
-{
-	return m_currentVtcParameters;
-}
-
 void VtcRigidRepresentation::beforeUpdate(double dt)
 {
 	if (! isActive() || ! m_currentParameters.isValid())
@@ -285,18 +212,10 @@ void VtcRigidRepresentation::afterUpdate(double dt)
 	m_finalState = m_currentState;
 }
 
-void VtcRigidRepresentation::resetParameters()
+const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
+	VtcRigidRepresentation::getComplianceMatrix() const
 {
-	RigidRepresentationBase::resetParameters();
-
-	m_currentParameters = m_initialParameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
-}
-
-void VtcRigidRepresentation::resetVtcParameters()
-{
-	m_currentVtcParameters = m_initialVtcParameters;
+	return m_C;
 }
 
 void VtcRigidRepresentation::applyDofCorrection(
@@ -361,12 +280,6 @@ void VtcRigidRepresentation::applyDofCorrection(
 	computeComplianceMatrix(dt);
 }
 
-const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
-	VtcRigidRepresentation::getComplianceMatrix() const
-{
-	return m_C;
-}
-
 void VtcRigidRepresentation::computeComplianceMatrix(double dt)
 {
 	if (! isActive() || ! m_currentParameters.isValid())
@@ -407,6 +320,11 @@ void VtcRigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentati
 	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
 	m_globalInertia = R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
+}
+
+SurgSim::Physics::RepresentationType VtcRigidRepresentation::getType() const
+{
+	return REPRESENTATION_TYPE_VTC_RIGID;
 }
 
 }; /// Physics
