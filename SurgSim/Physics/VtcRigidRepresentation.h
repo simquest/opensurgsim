@@ -177,6 +177,15 @@ public:
 		m_currentVtcParameters = m_initialVtcParameters;
 	}
 
+	/// Retrieve the rigid body 6x6 compliance matrix (including with the Vtc compliance part)
+	/// \return the 6x6 compliance matrix
+	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const;
+
+	/// Apply a correction to the internal degrees of freedom
+	/// \param dt The time step
+	/// \param block The block of a vector containing the correction to be applied to the dof
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
+
 protected:
 	/// Inertia matrices in global coordinates
 	SurgSim::Math::Matrix33d m_globalInertia;
