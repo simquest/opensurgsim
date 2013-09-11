@@ -48,6 +48,8 @@ public:
 	/// Destructor
 	virtual ~VtcRigidRepresentation();
 
+	/// Query the representation type
+	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
 	/// Set the current pose of the rigid representation
@@ -77,21 +79,6 @@ public:
 		m_currentParameters = parameters;
 
 		updateGlobalInertiaMatrices(m_currentState);
-	}
-
-	/// Get the initial parameters of the rigid representation
-	/// \return The initial parameters of the rigid representation
-	const RigidRepresentationParameters& getInitialParameters() const
-	{
-		return m_initialParameters;
-	}
-
-
-	/// Get the current parameters of the rigid representation
-	/// \return The current parameters of the rigid representation
-	const RigidRepresentationParameters& getCurrentParameters() const
-	{
-		return m_currentParameters;
 	}
 
 	/// Set the initial Vtc proxy state
@@ -163,15 +150,15 @@ public:
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
-	void beforeUpdate(double dt);
+	virtual void beforeUpdate(double dt) override;
 
 	/// Update the representation state to the current time step
 	/// \param dt The time step (in seconds)
-	void update(double dt);
+	virtual	void update(double dt) override;
 
 	/// Postprocessing done after the update call
 	/// \param dt The time step (in seconds)
-	void afterUpdate(double dt);
+	virtual	void afterUpdate(double dt) override;
 
 	/// Reset the rigid representation parameters to their initial values
 	/// \note Does not reset the Vtc parameters
@@ -189,6 +176,15 @@ public:
 	{
 		m_currentVtcParameters = m_initialVtcParameters;
 	}
+
+	/// Retrieve the rigid body 6x6 compliance matrix (including with the Vtc compliance part)
+	/// \return the 6x6 compliance matrix
+	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const;
+
+	/// Apply a correction to the internal degrees of freedom
+	/// \param dt The time step
+	/// \param block The block of a vector containing the correction to be applied to the dof
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
 
 protected:
 	/// Inertia matrices in global coordinates
@@ -213,15 +209,8 @@ private:
 
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
-	void updateGlobalInertiaMatrices(const RigidRepresentationState& state);
+	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
 
-
-
-	/// Initial physical parameters
-	RigidRepresentationParameters m_initialParameters;
-
-	/// Current physical parameters
-	RigidRepresentationParameters m_currentParameters;
 
 	/// Initial Vtc state (useful for reset)
 	RigidRepresentationState m_initialVtcState;

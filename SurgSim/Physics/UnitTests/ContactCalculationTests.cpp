@@ -90,7 +90,7 @@ TEST(ContactCalculationTests, DefaultCalculation)
 }
 
 
-void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts, 
+void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool hasContacts,
 						double expectedDepth = 0.0, Vector3d expectedNormal = Vector3d::UnitX(),
 						Vector3d expectedPenetrationPoint0 = Vector3d::Zero(),
 						Vector3d expectedPenetrationPoint1 = Vector3d::Zero())
@@ -232,10 +232,11 @@ TEST(ContactCalculationTests, SphereDoubleSidedPlaneCalculation)
 
 	{
 		Vector3d planeTrans(365.321,-342.324,325.324);
-		Quaterniond planeQuat = SurgSim::Math::makeRotationQuaternion(1.23456, Vector3d(0.234,-0.986,0.646).normalized());
+		Quaterniond planeQuat =
+					SurgSim::Math::makeRotationQuaternion(1.23456, Vector3d(0.234,-0.986,0.646).normalized());
 		SCOPED_TRACE("Intersection front, rotated plane 2");
-		doSphereDoubleSidedPlaneTest(sphere, Quaterniond::Identity(), planeQuat * (Vector3d(0.0,0.5,0.0)) + planeTrans, plane,
-									 planeQuat, planeTrans, true, 0.5, planeQuat * Vector3d(0.0, 1.0, 0.0));
+		doSphereDoubleSidedPlaneTest(sphere, Quaterniond::Identity(), planeQuat * (Vector3d(0.0,0.5,0.0)) + planeTrans,
+								     plane, planeQuat, planeTrans, true, 0.5, planeQuat * Vector3d(0.0, 1.0, 0.0));
 	}
 }
 
@@ -585,7 +586,7 @@ TEST(ContactCalculationTests, BoxPlaneCalculation)
         int expectedBoxIndicesInContacts[] = {0, 1, 2, 3};
         doBoxPlaneTest(box, boxQuat, boxTrans, plane, planeQuat, planeTrans, expectedNumberOfContacts,
 					   expectedBoxIndicesInContacts);
-    }    
+    }
 
 	{
         SCOPED_TRACE("Intersection inside of plane - case 1, eight contacts, rotated plane");
@@ -942,7 +943,8 @@ TEST(ContactCalculationTests, BoxSphereCalculation)
 		boxTrans = Vector3d(0.0,0.0,0.0);
 		sphereQuat.setIdentity();
 		sphereTrans = Vector3d(0.3345,-1.2,0.1234);
-		globalQuat = SurgSim::Math::makeRotationQuaternion(-0.35465, Vector3d(18.3454, -27.78567, 23.234346).normalized());
+		globalQuat =
+			SurgSim::Math::makeRotationQuaternion(-0.35465, Vector3d(18.3454, -27.78567, 23.234346).normalized());
 		globalTrans = Vector3d(234.6,326.67,987.53);
 		boxQuat = globalQuat * boxQuat;
 		boxTrans = globalQuat * boxTrans + globalTrans;

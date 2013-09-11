@@ -155,8 +155,8 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 
 	std::shared_ptr<CollisionRepresentation> representationBox;
 	std::shared_ptr<CollisionRepresentation> representationPlane;
-    
-    representationBox = pair->getFirst();
+
+	representationBox = pair->getFirst();
     representationPlane = pair->getSecond();
 
 	SURGSIM_ASSERT(representationBox->getShapeType() == RIGID_SHAPE_TYPE_BOX) <<
@@ -195,9 +195,9 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
         {
             for (int k = -1; k <= 1; k += 2)
             {
-                boxVertices[iVertex].x() = box->getSizeX() * double(i) * 0.5;
-                boxVertices[iVertex].y() = box->getSizeY() * double(j) * 0.5;
-                boxVertices[iVertex].z() = box->getSizeZ() * double(k) * 0.5;
+                boxVertices[iVertex].x() = box->getSizeX() * static_cast<double>(i) * 0.5;
+                boxVertices[iVertex].y() = box->getSizeY() * static_cast<double>(j) * 0.5;
+                boxVertices[iVertex].z() = box->getSizeZ() * static_cast<double>(k) * 0.5;
                 d[iVertex] = planeNormal.dot(boxVertices[iVertex]) + planeD;
                 maxD = std::max(d[iVertex], maxD);
                 minD = std::min(d[iVertex], minD);
@@ -289,8 +289,8 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 
     std::shared_ptr<CollisionRepresentation> representationBox;
 	std::shared_ptr<CollisionRepresentation> representationPlane;
-    
-    representationBox = pair->getFirst();
+
+	representationBox = pair->getFirst();
     representationPlane = pair->getSecond();
 
     SURGSIM_ASSERT(representationBox->getShapeType() == RIGID_SHAPE_TYPE_BOX) <<
@@ -320,9 +320,9 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
         {
             for (int k = -1; k <= 1; k += 2)
             {
-                boxVertex.x() = box->getSizeX() * double(i) * 0.5;
-                boxVertex.y() = box->getSizeY() * double(j) * 0.5;
-                boxVertex.z() = box->getSizeZ() * double(k) * 0.5;
+                boxVertex.x() = box->getSizeX() * static_cast<double>(i) * 0.5;
+                boxVertex.y() = box->getSizeY() * static_cast<double>(j) * 0.5;
+                boxVertex.z() = box->getSizeZ() * static_cast<double>(k) * 0.5;
                 d = planeNormal.dot(boxVertex) + planeD;
 				if (d < DistanceEpsilon)
 				{

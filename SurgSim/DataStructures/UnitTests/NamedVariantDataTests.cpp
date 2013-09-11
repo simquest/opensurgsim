@@ -19,7 +19,7 @@
 
 #include <SurgSim/Framework/Assert.h>
 #include "SurgSim/DataStructures/NamedVariantData.h"
-#include "MockObjects.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "gtest/gtest.h"
 
 using SurgSim::DataStructures::NamedVariantData;
@@ -58,8 +58,8 @@ TEST(NamedVariantDataTests, Set)
 	SurgSim::DataStructures::NamedVariantData data = builder.createData();
 
 	Mock3DData<float> mockData(5, 5, 5);
-	mockData.set(1, 1, 1, 1.23);
-	mockData.set(4, 3, 2, 4.56);
+	mockData.set(1, 1, 1, 1.23f);
+	mockData.set(4, 3, 2, 4.56f);
 
 	data.set("test", mockData);
 	EXPECT_TRUE(data.hasEntry(0));
@@ -97,8 +97,8 @@ TEST(NamedVariantDataTests, Get)
 	SurgSim::DataStructures::NamedVariantData data = builder.createData();
 
 	Mock3DData<float> mockData(5, 5, 5);
-	mockData.set(1, 1, 1, 1.23);
-	mockData.set(4, 3, 2, 4.56);
+	mockData.set(1, 1, 1, 1.23f);
+	mockData.set(4, 3, 2, 4.56f);
 
 	data.set("test", mockData);
 	{
@@ -131,8 +131,8 @@ TEST(NamedVariantDataTests, Reset)
 	SurgSim::DataStructures::NamedVariantData data = builder.createData();
 
 	Mock3DData<float> mockData(5, 5, 5);
-	mockData.set(1, 1, 1, 1.23);
-	mockData.set(4, 3, 2, 4.56);
+	mockData.set(1, 1, 1, 1.23f);
+	mockData.set(4, 3, 2, 4.56f);
 
 	data.set("test", mockData);
 	EXPECT_TRUE(data.hasEntry(0));

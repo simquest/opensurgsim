@@ -339,11 +339,8 @@ static int findDominantAxis(const std::array<int, 6>& axes)
 			biggestValue = value;
 			biggestAxis = i;
 		}
-		else if (value == biggestValue)
-		{
-			return -1;  // a tie means no dominant axis
-		}
 	}
+	// Note that if a tie occurs, the 1st entry with the biggest absolute value wins !
 	return biggestAxis;
 }
 

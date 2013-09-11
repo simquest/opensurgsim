@@ -38,10 +38,10 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Matrix44d;
 
 
-struct TestListener : public InputConsumerInterface, public OutputProducerInterface
+struct RawTestListener : public InputConsumerInterface, public OutputProducerInterface
 {
 public:
-	TestListener() :
+	RawTestListener() :
 		m_numTimesInitializedInput(0),
 		m_numTimesReceivedInput(0),
 		m_numTimesRequestedOutput(0)
@@ -58,18 +58,18 @@ public:
 	DataGroup m_lastReceivedInput;
 };
 
-void TestListener::initializeInput(const std::string& device, const DataGroup& inputData)
+void RawTestListener::initializeInput(const std::string& device, const DataGroup& inputData)
 {
 	++m_numTimesInitializedInput;
 }
 
-void TestListener::handleInput(const std::string& device, const DataGroup& inputData)
+void RawTestListener::handleInput(const std::string& device, const DataGroup& inputData)
 {
 	++m_numTimesReceivedInput;
 	m_lastReceivedInput = inputData;
 }
 
-bool TestListener::requestOutput(const std::string& device, DataGroup* outputData)
+bool RawTestListener::requestOutput(const std::string& device, DataGroup* outputData)
 {
 	++m_numTimesRequestedOutput;
 	return false;
@@ -103,7 +103,7 @@ TEST(RawMultiAxisDeviceTest, Name)
 	EXPECT_EQ("TestRawMultiAxis", device->getName());
 }
 
-void testCreateDeviceSeveralTimes(bool doSleep)
+static void testCreateDeviceSeveralTimes(bool doSleep)
 {
 	for (int i = 0;  i < 6;  ++i)
 	{
@@ -191,7 +191,7 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
 
-	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
+	std::shared_ptr<RawTestListener> consumer = std::make_shared<RawTestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesInitializedInput);
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
 
@@ -215,6 +215,7 @@ TEST(RawMultiAxisDeviceTest, InputConsumer)
 
 	// Check the number of invocations.
 	EXPECT_EQ(1, consumer->m_numTimesInitializedInput);
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 90);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 110);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
@@ -231,7 +232,7 @@ TEST(RawMultiAxisDeviceTest, OutputProducer)
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a RawMultiAxis device plugged in?";
 
-	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
+	std::shared_ptr<RawTestListener> producer = std::make_shared<RawTestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
 
 	EXPECT_FALSE(device->removeOutputProducer(producer));
@@ -249,5 +250,6 @@ TEST(RawMultiAxisDeviceTest, OutputProducer)
 	EXPECT_FALSE(device->removeOutputProducer(producer));
 
 	// Check the number of invocations.
+	EXPECT_GE(producer->m_numTimesRequestedOutput, 90);
 	EXPECT_LE(producer->m_numTimesRequestedOutput, 110);
 }
