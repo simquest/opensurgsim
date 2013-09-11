@@ -119,13 +119,6 @@ public:
 	/// Reset the Vtc parameters to their initial values
 	void resetVtcParameters();
 
-	/// Apply a correction to the internal degrees of freedom
-	/// \param dt The time step
-	/// \param block The block of a vector containing the correction to be applied to the dof
-	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
-
-	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const;
-
 	/// Retrieve the rigid body 6x6 compliance matrix (including with the Vtc compliance part)
 	/// \return the 6x6 compliance matrix
 	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const;
