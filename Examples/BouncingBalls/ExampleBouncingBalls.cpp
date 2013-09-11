@@ -108,6 +108,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
+	viewElement->enableManipulator(true);
 
 	return viewElement;
 }

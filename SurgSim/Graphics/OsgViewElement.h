@@ -17,12 +17,15 @@
 #define SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 
 #include <SurgSim/Graphics/ViewElement.h>
+#include <osg/ref_ptr>
 
 namespace SurgSim
 {
 
 namespace Graphics
 {
+
+class OsgTrackballZoomManipulator;
 
 /// OSG-based implementation of graphics view element.
 ///
@@ -44,6 +47,11 @@ public:
 	/// Only allows OsgView components, any other will not be set and it will return false.
 	/// \return	True if it succeeds, false if it fails
 	virtual bool setView(std::shared_ptr<View> view);
+
+	void enableManipulator(bool val);
+
+private:
+	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
 };
 
 };  // namespace Graphics

@@ -43,6 +43,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTexture3d.cpp
 	OsgTextureCubeMap.cpp
 	OsgTextureRectangle.cpp
+	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
@@ -87,6 +88,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgTextureRectangle.h
 	OsgTextureUniform.h
 	OsgTextureUniform-inl.h
+	OsgTrackballZoomManipulator.h
 	OsgUniform.h
 	OsgUniform-inl.h
 	OsgUniformBase.h
