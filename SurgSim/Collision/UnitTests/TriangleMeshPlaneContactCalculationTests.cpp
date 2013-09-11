@@ -13,43 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-#include <SurgSim/Physics/UnitTests/RepresentationUtilities.h>
-#include <SurgSim/Physics/UnitTests/MockCollisionRepresentation.h>
-#include <memory>
+#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
+#include <SurgSim/Collision/TriangleMeshPlaneDcdContact.h>
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Physics/RigidShape.h>
-#include <SurgSim/Physics/SphereShape.h>
-#include <SurgSim/Physics/MeshShape.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/ContactCalculation.h>
-#include <SurgSim/Physics/CollisionPair.h>
-
-#include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
-#include <SurgSim/DataStructures/TriangleMesh.h>
-
-#include <SurgSim/Physics/TriangleMeshPlaneDcdContact.h>
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::DataStructures::TriangleMesh;
-
-namespace
-{
-double epsilon = 1e-10;
-}
-
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 namespace
@@ -105,71 +76,7 @@ public:
 	}
 };
 
-::testing::AssertionResult eigenEqual(const Vector3d& left, const Vector3d& right, double epsilon)
-{
-	double dist = (left - right).norm();
-	if (std::abs(dist) < epsilon)
-	{
-		return ::testing::AssertionSuccess();
-	}
-	else
-	{
-		return ::testing::AssertionFailure() << std::endl << "Vectors not close, expected: " << left.transpose() <<
-			   std::endl << " result: " << right.transpose() << std::endl;
-	}
-}
-
-::testing::AssertionResult isContactPresentInList(std::shared_ptr<Contact> expected,
-                                                  const std::list<std::shared_ptr<Contact>>& contactsList)
-{
-    using SurgSim::Math::Geometry::ScalarEpsilon;
-
-    bool contactPresent = false;
-    for (auto it = contactsList.begin(); it != contactsList.end() && !contactPresent; ++it)
-    {
-        // Compare the normals.
-        contactPresent = eigenEqual(expected->normal, it->get()->normal, ScalarEpsilon);
-        // Compare the global position of first object.
-        contactPresent &= eigenEqual(expected->penetrationPoints.first.globalPosition.getValue(),
-                                     it->get()->penetrationPoints.first.globalPosition.getValue(), ScalarEpsilon);
-        // Compare the global position of second object.
-        contactPresent &= eigenEqual(expected->penetrationPoints.second.globalPosition.getValue(),
-                                     it->get()->penetrationPoints.second.globalPosition.getValue(),
-                                     ScalarEpsilon);
-        // Compare the depth.
-        contactPresent &= std::abs(expected->depth - it->get()->depth) <= ScalarEpsilon;
-    }
-
-    if (contactPresent)
-    {
-        return ::testing::AssertionSuccess();
-    }
-    else
-    {
-        return ::testing::AssertionFailure() << "Expected contact not found in calculated contacts list:\n" <<
-               "Normal: " << expected->normal << "\n" <<
-               "First objects' contact point: " << expected->penetrationPoints.first.globalPosition.getValue()
-               << "\n" <<
-               "Second objects' contact point: " << expected->penetrationPoints.second.globalPosition.getValue()
-               << "\n" <<
-               "Depth of penetration: " << expected->depth << "\n";
-    }
-}
-
-void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expectedContacts,
-                              const std::list<std::shared_ptr<Contact>>& calculatedContacts)
-{
-    SCOPED_TRACE("Comparing the contact info.");
-
-    EXPECT_EQ(expectedContacts.size(), calculatedContacts.size());
-
-    for (auto it = expectedContacts.begin(); it != expectedContacts.end(); ++it)
-    {
-        EXPECT_TRUE(isContactPresentInList(*it, calculatedContacts));
-    }
-}
-
-Vector3d calculateMeshVertex(const int i,
+Vector3d calculateTriangleMeshVertex(const int i,
 							const Quaterniond& quat,
 							const Vector3d& trans)
 {
@@ -192,7 +99,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>& expec
 	
 	for (int i = 0; i < expectedNumberOfContacts; ++i)
 	{
-		vertex = calculateMeshVertex(expectedMeshIndicesInContacts[i], meshQuat, meshTrans);
+		vertex = calculateTriangleMeshVertex(expectedMeshIndicesInContacts[i], meshQuat, meshTrans);
 		std::pair<Location, Location> penetrationPoint;
 		penetrationPoint.first.globalPosition.setValue(vertex);
 		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
@@ -203,7 +110,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>& expec
 }
 
 template <class VertexType, class EdgeType, class TriangleType>
-void doTriangleMeshPlaneTest(std::shared_ptr<MeshShape<VertexType, EdgeType, TriangleType>> mesh,
+void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh,
 					const Quaterniond& meshQuat,
 					const Vector3d& meshTrans,
 					std::shared_ptr<PlaneShape> plane,
@@ -430,7 +337,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(-0.25*M_PI, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {5};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -490,8 +397,8 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		planeTrans = Vector3d(-1,-1,0.0)*(cubeSize/2-epsilonTrans);
         int expectedNumberOfContacts = 2;
         int expectedBoxIndicesInContacts[] = {0, 4};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, plane, planeQuat, planeTrans, expectedNumberOfContacts,
-					   expectedBoxIndicesInContacts);
+		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
+			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 }

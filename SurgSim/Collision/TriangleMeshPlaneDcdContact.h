@@ -13,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_TRIANGLEMESHDCDCONTACT_H
-#define SURGSIM_PHYSICS_TRIANGLEMESHDCDCONTACT_H
+#ifndef SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_H
+#define SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_H
 
 #include <memory>
 
 #include <SurgSim/Framework/ReuseFactory.h>
-#include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Math/Geometry.h>
+#include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/ContactCalculation.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 /// Class to calculate intersections between a triangle mesh and a plan
@@ -33,13 +33,15 @@ class TriangleMeshPlaneDcdContact : public ContactCalculation
 {
 public:
 	
-	explicit TriangleMeshPlaneDcdContact()
+	TriangleMeshPlaneDcdContact()
 	{
 	}
 
+	/// Function that returns the shapes between which this class performs collision detection.
+	/// \return int std::pair containing the shape types.
 	virtual std::pair<int, int> getShapeTypes() override
 	{
-		return std::pair<int, int> (RIGID_SHAPE_TYPE_MESH, RIGID_SHAPE_TYPE_PLANE);
+		return std::pair<int, int> (SurgSim::Physics::RIGID_SHAPE_TYPE_MESH, SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE);
 	}
 
 private:
@@ -52,7 +54,7 @@ private:
 };
 };
 
-#include <SurgSim/Physics/TriangleMeshPlaneDcdContact-inl.h>
+#include <SurgSim/Collision/TriangleMeshPlaneDcdContact-inl.h>
 
 
 #endif

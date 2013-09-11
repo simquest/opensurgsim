@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_TRIANGLEMESHDCDCONTACT_INL_H
-#define SURGSIM_PHYSICS_TRIANGLEMESHDCDCONTACT_INL_H
+#ifndef SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_INL_H
+#define SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_INL_H
 
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 template <class VertexType, class EdgeType, class TriangleType>
@@ -28,15 +28,14 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 	std::shared_ptr<CollisionRepresentation> representationTriangleMesh(pair->getFirst());
 	std::shared_ptr<CollisionRepresentation> representationPlane(pair->getSecond());
 
-	SURGSIM_ASSERT(representationTriangleMesh->getShapeType() == RIGID_SHAPE_TYPE_MESH) <<
+	SURGSIM_ASSERT(representationTriangleMesh->getShapeType() == SurgSim::Physics::RIGID_SHAPE_TYPE_MESH) <<
 			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
 
-	SURGSIM_ASSERT(representationPlane->getShapeType() == RIGID_SHAPE_TYPE_PLANE) <<
+	SURGSIM_ASSERT(representationPlane->getShapeType() == SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE) <<
 		"First Object, wrong type of object" << pair->getSecond()->getShapeType();
 
-	std::shared_ptr<MeshShape<VertexType, EdgeType, TriangleType>> mesh
-		(std::static_pointer_cast<MeshShape<VertexType, EdgeType, TriangleType>>
-		(representationTriangleMesh->getShape()));
+	std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh
+		(std::static_pointer_cast<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>>(representationTriangleMesh->getShape()));
 
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 
