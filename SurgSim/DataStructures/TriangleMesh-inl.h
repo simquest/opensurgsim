@@ -99,7 +99,7 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::isValid() const
 	{
 		for (int vertexId = 0; vertexId < 2; vertexId++)
 		{
-			if (it->vertices[vertexId] >= numVertices)
+			if (it->verticesId[vertexId] >= numVertices)
 			{
 				return false;
 			}
@@ -111,7 +111,7 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::isValid() const
 	{
 		for (int vertexId = 0; vertexId < 3; vertexId++)
 		{
-			if (it->vertices[vertexId] >= numVertices)
+			if (it->verticesId[vertexId] >= numVertices)
 			{
 				return false;
 			}

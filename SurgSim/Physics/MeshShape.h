@@ -137,10 +137,10 @@ private:
 
 		for (i = 0; i < 3; i++)
 		{
-			a0 = m_mesh->getVertexPosition(face.vertices[i])[m_alpha];
-			b0 = m_mesh->getVertexPosition(face.vertices[i])[m_beta];
-			a1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[m_alpha];
-			b1 = m_mesh->getVertexPosition(face.vertices[(i+1) % 3])[m_beta];
+			a0 = m_mesh->getVertexPosition(face.verticesId[i])[m_alpha];
+			b0 = m_mesh->getVertexPosition(face.verticesId[i])[m_beta];
+			a1 = m_mesh->getVertexPosition(face.verticesId[(i+1) % 3])[m_alpha];
+			b1 = m_mesh->getVertexPosition(face.verticesId[(i+1) % 3])[m_beta];
 			da = a1 - a0;
 			db = b1 - b0;
 			a0_2 = a0 * a0; a0_3 = a0_2 * a0; a0_4 = a0_3 * a0;
@@ -188,9 +188,9 @@ private:
 
 		computeProjectionIntegrals(face);
 
-		const Vector3d& ptA = m_mesh->getVertexPosition(face.vertices[0]);
-		const Vector3d& ptB = m_mesh->getVertexPosition(face.vertices[1]);
-		const Vector3d& ptC = m_mesh->getVertexPosition(face.vertices[2]);
+		const Vector3d& ptA = m_mesh->getVertexPosition(face.verticesId[0]);
+		const Vector3d& ptB = m_mesh->getVertexPosition(face.verticesId[1]);
+		const Vector3d& ptC = m_mesh->getVertexPosition(face.verticesId[2]);
 		Vector3d n = (ptB - ptA).cross(ptC - ptA);
 		n.normalize();
 		double w = -ptA.dot(n);
@@ -235,9 +235,9 @@ private:
 		{
 			const typename TriMesh::TriangleType* f = &m_mesh->getTriangle(i);
 
-			const Vector3d& ptA = m_mesh->getVertexPosition(f->vertices[0]);
-			const Vector3d& ptB = m_mesh->getVertexPosition(f->vertices[1]);
-			const Vector3d& ptC = m_mesh->getVertexPosition(f->vertices[2]);
+			const Vector3d& ptA = m_mesh->getVertexPosition(f->verticesId[0]);
+			const Vector3d& ptB = m_mesh->getVertexPosition(f->verticesId[1]);
+			const Vector3d& ptC = m_mesh->getVertexPosition(f->verticesId[2]);
 			Vector3d n = (ptB - ptA).cross(ptC - ptA);
 			n.normalize();
 			nx = fabs(n[0]);
