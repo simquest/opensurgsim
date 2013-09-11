@@ -38,7 +38,6 @@ namespace Physics
 /// \note The physical rigid body is driven by the Vtc through setPose(...)
 /// \note setPose sets the proxy (Vtc) pose.
 /// \note getPose gets the virtual rigid body pose.
-/// \note Their is no gravity on a VtcRigidRepresentation and you cannot set it
 class VtcRigidRepresentation : public RigidRepresentationBase
 {
 public:

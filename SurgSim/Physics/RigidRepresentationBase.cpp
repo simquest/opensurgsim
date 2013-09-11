@@ -28,16 +28,6 @@ RigidRepresentationBase::RigidRepresentationBase(const std::string& name) : Repr
 
 RigidRepresentationBase::~RigidRepresentationBase()
 {
-
-}
-
-void RigidRepresentationBase::setInitialState(const RigidRepresentationState& state)
-{
-	m_initialState = state;
-	m_currentState = state;
-	m_previousState = state;
-
-	updateGlobalInertiaMatrices(m_currentState);
 }
 
 void RigidRepresentationBase::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
@@ -46,6 +36,15 @@ void RigidRepresentationBase::setInitialPose(const SurgSim::Math::RigidTransform
 	m_currentState.setPose(pose);
 	m_previousState.setPose(pose);
 	m_finalState.setPose(pose);
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+void RigidRepresentationBase::setInitialState(const RigidRepresentationState& state)
+{
+	m_initialState = state;
+	m_currentState = state;
+	m_previousState = state;
+
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
@@ -74,6 +73,10 @@ const RigidRepresentationState& RigidRepresentationBase::getPreviousState() cons
 {
 	return m_previousState;
 }
+
+
+
+
 
 const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getInitialPose() const
 {

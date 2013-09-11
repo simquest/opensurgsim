@@ -16,8 +16,8 @@
 #include <SurgSim/Physics/PhysicsManagerState.h>
 
 #include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Physics/Representation.h>
 
 namespace SurgSim

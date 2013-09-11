@@ -13,19 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
-#define SURGSIM_PHYSICS_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_COLLISION_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
+#define SURGSIM_COLLISION_UNITTESTS_MOCKCOLLISIONREPRESENTATION_H
 
-#include <SurgSim/Physics/CollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidShape.h>
 
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 
+using SurgSim::Physics::RigidShape;
+
 namespace SurgSim
 {
-namespace Physics
+namespace Collision
 {
 
 class Representation;
@@ -62,7 +64,7 @@ private:
 };
 
 
-}; // Physics
-}; // SurgSim
+}; // namespace Collision
+}; // namespace SurgSim
 
 #endif

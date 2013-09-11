@@ -38,8 +38,8 @@
 #include <SurgSim/Physics/FixedRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/RigidCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/VtcRigidParameters.h>
 #include <SurgSim/Physics/VtcRigidRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -115,7 +115,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
 	return planeElement;
 }
@@ -182,7 +182,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 								vtcRepresentation, graphicsRepresentation));
 	boxElement->addComponent(std::make_shared<VtcToGraphicsPoseBehavior>("Physics to Graphics2 Pose",
 								vtcRepresentation, graphicsRepresentation2));
-	boxElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
+	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 								("Box Collision Representation", vtcRepresentation));
 	return boxElement;
 }

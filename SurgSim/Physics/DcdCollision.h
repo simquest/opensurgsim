@@ -23,15 +23,16 @@
 
 #include <SurgSim/Framework/ReuseFactory.h>
 #include <SurgSim/Physics/Computation.h>
-#include <SurgSim/Physics/CollisionPair.h>
+#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Collision/DcdCollision.h>
+
+using SurgSim::Collision::ContactCalculation;
 
 namespace SurgSim
 {
 namespace Physics
 {
-
-class ContactCalculation;
 
 /// Computation to determine the contacts between a list of CollisionPairs.
 /// This Computation class takes a list of representations, it will generate a list of collision pairs

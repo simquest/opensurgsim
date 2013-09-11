@@ -40,8 +40,8 @@
 #include <SurgSim/Physics/RigidRepresentationParameters.h>
 #include <SurgSim/Physics/DoubleSidedPlaneShape.h>
 #include <SurgSim/Physics/SphereShape.h>
-#include <SurgSim/Physics/RigidCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidCollisionRepresentation.h>
+#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -78,14 +78,14 @@ class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
-	Behavior("PrintoutBehavior"), m_representation(representation) {}
+		Behavior("PrintoutBehavior"), m_representation(representation) {}
 	~PrintoutBehavior() {}
 
 	virtual void update(double dt)
 	{
 		std::shared_ptr<SurgSim::Framework::Logger> logger = Logger::getLogger("printout");
 		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
-			m_representation->getPose().translation().transpose();
+								  m_representation->getPose().translation().transpose();
 	}
 protected:
 	virtual bool doInitialize()
@@ -113,7 +113,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 }
 
 std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-										  const SurgSim::Math::RigidTransform3d& pose)
+	const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
@@ -147,8 +147,8 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Physics::RigidShapeCollisionRepresentation>
+							   physicsRepresentation, graphicsRepresentation));
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
 
 	planeElement->addComponent(std::make_shared<AddSphereBehavior>());
@@ -158,7 +158,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 
 
 std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-										   const SurgSim::Math::RigidTransform3d& pose)
+	const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(name + " Physics");
@@ -203,15 +203,15 @@ std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::Application
 	sphereElement->addComponent(graphicsRepresentation);
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 	sphereElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	sphereElement->addComponent(std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
+								physicsRepresentation, graphicsRepresentation));
+	sphereElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		("Sphere Collision Representation", physicsRepresentation));
 
 	return sphereElement;
 }
 
 std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-										  const SurgSim::Math::RigidTransform3d& pose)
+	const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(name + " Physics");

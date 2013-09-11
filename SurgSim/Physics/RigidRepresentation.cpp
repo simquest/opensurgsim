@@ -21,11 +21,14 @@
 #include <SurgSim/Math/Valid.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Location.h>
+#include <SurgSim/Collision/Location.h>
 
-namespace SurgSim{
+using SurgSim::Collision::Location;
 
-namespace Physics{
+namespace SurgSim
+{
+namespace Physics
+{
 
 RigidRepresentation::RigidRepresentation(const std::string& name)
 	: RigidRepresentationBase(name)
@@ -51,6 +54,7 @@ void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepr
 
 	updateGlobalInertiaMatrices(m_currentState);
 }
+
 
 void SurgSim::Physics::RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
 {
@@ -286,6 +290,7 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
 }
+
 }; /// Physics
 
 }; /// SurgSim

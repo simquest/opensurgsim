@@ -21,6 +21,11 @@
 #include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Physics/ConstraintImplementationFactory.h>
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Collision/Location.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
+
+using SurgSim::Collision::Location;
+using SurgSim::Collision::CollisionRepresentation;
 
 namespace SurgSim
 {
@@ -29,9 +34,7 @@ namespace Physics
 
 class PhysicsManagerState;
 class Representation;
-struct Location;
 class Localization;
-class CollisionRepresentation;
 
 /// Generate a constraint for every contact that was calculated.
 /// The general algorithm is such, for each pair of CollisionRepresentations that has Contacts
