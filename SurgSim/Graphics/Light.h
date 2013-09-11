@@ -109,9 +109,6 @@ public:
 	/// Gets quadratic attenuation.
 	/// \return	The quadratic attenuation.
 	virtual double getQuadraticAttenuation() = 0;
-	
-private:
-
 };
 
 }; // Graphics

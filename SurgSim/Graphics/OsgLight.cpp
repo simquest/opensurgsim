@@ -87,7 +87,7 @@ bool OsgLight::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	if (group != nullptr && newGroup == nullptr)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) 
-			<< "OsgLight::setGroup() called with a group that is not an OsgGroupl.";
+			<< "OsgLight::setGroup() called with a group that is not an OsgGroup.";
 	}
 
 	bool clearGroup = m_group != nullptr && (newGroup != nullptr || group == nullptr);

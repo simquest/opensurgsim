@@ -70,7 +70,7 @@ public:
 
 	osg::ref_ptr<osg::Uniform> getUniform(std::shared_ptr<OsgLight> light, int type)
 	{
-		return light->m_uniforms[static_cast<OsgLight::UniformType>(type)];
+		return light->m_uniforms[type];
 	}
 };
 

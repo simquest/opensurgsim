@@ -54,7 +54,7 @@ public:
 	friend class OsgLightTests;
 
 	/// Constructor
-	OsgLight(const std::string& name);
+	explicit OsgLight(const std::string& name);
 	virtual ~OsgLight();
 
 	/// Sets the group for this light, setting nullptr here will remove the light from its current group
