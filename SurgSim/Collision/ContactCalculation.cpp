@@ -30,6 +30,7 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 			secondShapeType == shapeTypes.first)
 	{
 		pair->swapRepresentations();
+		std::swap(firstShapeType, secondShapeType);
 	}
 
 	if(shapeTypes.first != SurgSim::Physics::RIGID_SHAPE_TYPE_NONE)
