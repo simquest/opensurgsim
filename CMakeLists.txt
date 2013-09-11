@@ -83,6 +83,10 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(ThirdParty/gmock)
 endif()
 
+if(SURGSIM_YAMLCPP_BUILD)
+	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
+	add_subdirectory(ThirdParty/yaml-cpp)
+endif()
 
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
