@@ -48,12 +48,12 @@ void AddSphereBehavior::update(double dt)
 		m_totalTime = 0.0;
 
 		std::stringstream ss;
-		ss << ++m_numElements;
+		ss << ++ m_numElements;
 
 		std::srand(static_cast<unsigned int>(std::time(0)));
-		double m_x = static_cast<float>(std::rand() % 10) / 10;
-		double m_y = static_cast<float>(std::rand() % 2) + 1;
-		double m_z = static_cast<float>(std::rand() % 10) / 10;
+		double m_x = static_cast<double>(std::rand() % 10) / 10.0;
+		double m_y = static_cast<double>(std::rand() % 2) + 1.0;
+		double m_z = static_cast<double>(std::rand() % 10) / 10.0;
 
 		std::string name = "sphereId_" + ss.str();
 		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform
