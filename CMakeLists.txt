@@ -80,7 +80,7 @@ find_package(WDK)
 
 if(SURGSIM_TESTS_BUILD)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
-	add_subdirectory(ThirdParty/gtest)
+	add_subdirectory(ThirdParty/gmock)
 endif()
 
 

@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef ADDSPHEREBEHAVIOR_H
-#define ADDSPHEREBEHAVIOR_H
+#ifndef EXAMPLES_BOUNCINGBALLS_ADDSPHEREBEHAVIOR_H
+#define EXAMPLES_BOUNCINGBALLS_ADDSPHEREBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/Scene.h>
 
-/// An example class to add sphere elements into scene dynamically. 
+/// An example class to add sphere elements into scene dynamically.
 /// AddSphereBehavior will be updated by BehaviorManager through
 /// update() call.
 
@@ -47,4 +47,4 @@ private:
 	int m_numElements;
 };
 
-#endif
+#endif //EXAMPLES_BOUNCINGBALLS_ADDSPHEREBEHAVIOR_H
