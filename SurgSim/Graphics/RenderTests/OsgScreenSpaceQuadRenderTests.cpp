@@ -15,6 +15,7 @@
 
 
 #include <gtest/gtest.h>
+#include <SurgSim/Graphics/RenderTests/RenderTest.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -28,6 +29,7 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Graphics/OsgTexture.h>
 #include <SurgSim/Graphics/OsgTexture2d.h>
 #include <SurgSim/Graphics/OsgTextureRectangle.h>
 #include <SurgSim/Graphics/View.h>
@@ -48,53 +50,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgScreenSpaceQuadRenderTests : public ::testing::Test
+struct OsgScreenSpaceQuadRenderTests : public RenderTest
 {
-	virtual void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-
-		runtime->addManager(graphicsManager);
-
-		scene = std::make_shared<SurgSim::Framework::Scene>();
-		runtime->setScene(scene);
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		viewElement->getView()->setPosition(100,100);
-		viewElement->getView()->setWindowBorderEnabled(true);
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<ScreenSpaceQuadRepresentation> makeQuad(
-		const std::string& name,
-		int width,
-		int height,
-		int x,
-		int y)
-	{
-		std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-			std::make_shared<OsgScreenSpaceQuadRepresentation>(name, viewElement->getView());
-		quad->setSize(width,height);
-		Quaterniond quat;
-		quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
-		quad->setInitialPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(x,y,-0.2)));
-		return quad;
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
-
 
 };
 

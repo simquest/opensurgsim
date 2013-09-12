@@ -23,6 +23,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	OsgBoxRepresentationRenderTests.cpp
+	OsgCameraRenderTests.cpp
 	OsgCapsuleRepresentationRenderTests.cpp
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
@@ -33,9 +34,11 @@ set(UNIT_TEST_SOURCES
 	OsgShaderRenderTests.cpp
 	OsgSphereRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
+	RenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	RenderTest.h
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
