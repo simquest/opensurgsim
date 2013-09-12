@@ -38,7 +38,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector3f;
 using SurgSim::Math::RigidTransform3d;
 
-std::string vertexShaderSource = 
+std::string vertexShaderSource =
 	"uniform vec3 ambientColor;\n"
 	"uniform vec3 otherColor;\n"
 	"varying vec4 color;\n"
@@ -50,7 +50,7 @@ std::string vertexShaderSource =
 	"	color.rgb = otherColor * max(dot(gl_Normal, lightVector), 0.0) + ambientColor;\n"
 	"	color.a = 1.0;\n"
 	"}";
-std::string fragmentShaderSource = 
+std::string fragmentShaderSource =
 	"varying vec4 color;\n"
 	"void main(void)\n"
 	"{\n"
