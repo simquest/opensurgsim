@@ -68,6 +68,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedRepresentationLocalization.h
 	FreeMotion.h
 	Localization.h
+	MassSpringRepresentation.h
 	MeshShape.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
