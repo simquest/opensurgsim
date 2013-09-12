@@ -64,7 +64,7 @@ TEST(OsgCameraTests, InitTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
 		"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
-	EXPECT_EQ(nullptr, camera->getGroup());
+	EXPECT_NE(nullptr, camera->getGroup());
 }
 
 TEST(OsgCameraTests, OsgNodesTest)
@@ -111,7 +111,7 @@ TEST(OsgCameraTests, GroupTest)
 	std::shared_ptr<OsgCamera> osgCamera = std::make_shared<OsgCamera>("test name");
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	EXPECT_EQ(nullptr, camera->getGroup());
+	EXPECT_NE(nullptr, camera->getGroup());
 
 	/// Adding an OsgGroup should succeed
 	std::shared_ptr<OsgGroup> osgGroup = std::make_shared<OsgGroup>("test group");
@@ -120,13 +120,13 @@ TEST(OsgCameraTests, GroupTest)
 	EXPECT_EQ(group, camera->getGroup());
 
 	/// Check that the OSG node of the group is added to the OSG camera correctly
-	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0));
+	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 
 	/// Adding a group that does not derive from OsgGroup should fail
 	std::shared_ptr<Group> mockGroup = std::make_shared<MockGroup>("non-osg group");
 	EXPECT_FALSE(camera->setGroup(mockGroup));
 	EXPECT_EQ(group, camera->getGroup());
-	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0));
+	EXPECT_EQ(osgGroup->getOsgGroup(), osgCamera->getOsgCamera()->getChild(0)->asGroup()->getChild(0));
 }
 
 
@@ -198,7 +198,7 @@ TEST(OsgCameraTests, MatricesTest)
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(projectionMatrix));
 }
 
-TEST(OsgCameraTests, ColorTextureTest_DISABLED)
+TEST(OsgCameraTests, RenderTargetTest)
 {
 	auto osgCamera = std::make_shared<OsgCamera>("test camera");
 	std::shared_ptr<Camera> camera = osgCamera;
