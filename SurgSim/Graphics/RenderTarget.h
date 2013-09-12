@@ -25,10 +25,10 @@ namespace Graphics
 
 class Texture;
 
-/// RenderTarget is an abstraction of a selection of Textures and possibly RenderBuffers that are
-/// used when a camera draws its' content. Color Information will always be written into a texture
-/// that can be used further down the path, depth information might be written into a RenderBuffer that
-/// cannot be directly fetched as a Texture.
+/// RenderTarget is an abstraction of the target buffers that a Camera should use to render it's scene
+/// valid targets are a given number of color buffers, and an optional depth buffer. The buffers need to be
+/// made available as textures so they can be reused in another rendering step. The type of texture is not
+/// determined at this point and will depend on the concrete RenderTarget that is instantiated.
 /// The RenderTarget is consider immutable after construction.
 class RenderTarget
 {
