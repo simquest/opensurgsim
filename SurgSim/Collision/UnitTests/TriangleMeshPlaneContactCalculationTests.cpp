@@ -281,7 +281,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(-0.25*M_PI, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {4};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -295,7 +295,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(-M_PI/2-M_PI/4, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {7};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -309,7 +309,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(0.25*M_PI, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {0};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -323,7 +323,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(M_PI/2+M_PI/4, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {3};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -351,7 +351,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(-M_PI/2-M_PI/4, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {6};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -365,7 +365,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(0.25*M_PI, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {1};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
@@ -379,7 +379,7 @@ TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
 		mRotation = Eigen::AngleAxisd(M_PI/2 +M_PI/4, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation); 
 		planNormal = mRotation*SurgSim::Math::Vector3d(0, 1, 0);
-		planeTrans = -1*planNormal*(sqrt(3)*cubeSize/2 - epsilonTrans);
+		planeTrans = -1*planNormal*(sqrt(3.0)*cubeSize/2 - epsilonTrans);
         int expectedNumberOfContacts = 1;
         int expectedBoxIndicesInContacts[] = {2};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans, 
