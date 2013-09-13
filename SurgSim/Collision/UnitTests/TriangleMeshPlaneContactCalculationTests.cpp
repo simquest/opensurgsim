@@ -152,7 +152,7 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Physics::MeshShape<VertexT
 }
 
 
-TEST(ContactCalculationTests, TriangleMeshPlaneCalculation)
+TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 {
 	typedef SurgSim::DataStructures::TriangleMesh<EmptyData,EmptyData,EmptyData> TriangleMesh;
 	typedef SurgSim::DataStructures::MeshElement<2,EmptyData> EdgeElement;

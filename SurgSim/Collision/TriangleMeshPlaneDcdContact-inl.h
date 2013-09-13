@@ -28,12 +28,6 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 	std::shared_ptr<CollisionRepresentation> representationTriangleMesh(pair->getFirst());
 	std::shared_ptr<CollisionRepresentation> representationPlane(pair->getSecond());
 
-	SURGSIM_ASSERT(representationTriangleMesh->getShapeType() == SurgSim::Physics::RIGID_SHAPE_TYPE_MESH) <<
-			"First Object, wrong type of object" << pair->getFirst()->getShapeType();
-
-	SURGSIM_ASSERT(representationPlane->getShapeType() == SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE) <<
-		"First Object, wrong type of object" << pair->getSecond()->getShapeType();
-
 	std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh
 		(std::static_pointer_cast<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>>(representationTriangleMesh->getShape()));
 
