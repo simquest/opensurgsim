@@ -17,7 +17,6 @@
 #define SURGSIM_FRAMEWORK_BEHAVIORMANAGER_H
 
 #include <memory>
-#include <vector>
 
 #include "SurgSim/Framework/ComponentManager.h"
 

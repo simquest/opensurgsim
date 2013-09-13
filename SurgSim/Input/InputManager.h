@@ -20,7 +20,6 @@
 #include <unordered_map>
 #include <memory>
 
-#include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/ComponentManager.h>
 #include <SurgSim/Input/InputComponent.h>
 #include <SurgSim/Input/OutputComponent.h>
@@ -95,7 +94,6 @@ private:
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
 	/// Collection of all output components.
 	std::vector<std::shared_ptr<OutputComponent>> m_outputs;
-	/// Collection of all behaviors managed by InputManager
 
 	/// Collection of all devices that have been added to the input manager
 	/// key is the name, no two devices with the same name can be added to the

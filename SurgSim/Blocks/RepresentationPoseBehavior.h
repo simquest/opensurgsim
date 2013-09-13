@@ -62,7 +62,7 @@ protected:
 		m_to->setInitialPose(m_from->getInitialPose());
 		return true;
 	}
-
+	/// Return the type of manager that should be responsible for this behavior
 	virtual int getTargetManagerType() const override
 	{
 		return SurgSim::Framework::TARGET_MANAGER_TYPE_BEHAVIOR;

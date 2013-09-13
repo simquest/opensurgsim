@@ -19,7 +19,6 @@
 #include <SurgSim/Graphics/Manager.h>
 
 #include <memory>
-#include <vector>
 
 #include <osgViewer/CompositeViewer>
 

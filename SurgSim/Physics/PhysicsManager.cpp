@@ -13,23 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/Representation.h>
 
+#include <SurgSim/Framework/Component.h>
 #include <SurgSim/Physics/BuildMlcp.h>
 #include <SurgSim/Physics/ContactConstraintGeneration.h>
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Physics/FreeMotion.h>
+#include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Physics/PostUpdate.h>
 #include <SurgSim/Physics/PreUpdate.h>
 #include <SurgSim/Physics/PushResults.h>
+#include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/SolveMlcp.h>
-
-#include <SurgSim/Framework/Log.h>
-
 
 #include <list>
 

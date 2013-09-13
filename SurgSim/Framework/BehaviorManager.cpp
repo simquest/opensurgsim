@@ -15,14 +15,8 @@
 
 #include "SurgSim/Framework/BehaviorManager.h"
 
-#include <memory>
-#include <vector>
-
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/Logger.h"
-#include "SurgSim/Framework/Runtime.h"
-
 
 namespace SurgSim
 {
