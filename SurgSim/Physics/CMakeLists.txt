@@ -19,14 +19,11 @@ include_directories(
 
 set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
-	CollisionPair.cpp
-	CollisionRepresentation.cpp
 	Computation.cpp
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
-	ContactCalculation.cpp
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableRepresentation.cpp
@@ -41,12 +38,10 @@ set(SURGSIM_PHYSICS_SOURCES
 	PreUpdate.cpp
 	PushResults.cpp
 	Representation.cpp
-	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
-	RigidShapeCollisionRepresentation.cpp
 	SolveMlcp.cpp
 	VtcRigidRepresentation.cpp
 )
@@ -55,14 +50,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	BoxShape.h
 	BuildMlcp.h
 	CapsuleShape.h
-	CollisionPair.h
-	CollisionRepresentation.h
 	Computation.h
 	Constraint.h
 	ConstraintData.h
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h
-	ContactCalculation.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
 	CylinderShape.h
@@ -76,7 +68,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedRepresentationLocalization.h
 	FreeMotion.h
 	Localization.h
-	Location.h
 	MeshShape.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
@@ -88,16 +79,15 @@ set(SURGSIM_PHYSICS_HEADERS
 	PreUpdate.h
 	PushResults.h
 	Representation.h
-	RigidCollisionRepresentation.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
+	RigidRepresentationBase-inl.h
 	RigidRepresentationBaseState.h
 	RigidRepresentationContact.h
 	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
 	RigidShape.h
-	RigidShapeCollisionRepresentation.h
 	Shapes.h
 	SolveMlcp.h
 	SphereShape.h
@@ -111,7 +101,7 @@ surgsim_add_library(
 	"${SURGSIM_PHYSICS_HEADERS}"
 	"SurgSim/Physics"
 )
-target_link_libraries(SurgSimPhysics SurgSimFramework SurgSimMath)
+target_link_libraries(SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimMath)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

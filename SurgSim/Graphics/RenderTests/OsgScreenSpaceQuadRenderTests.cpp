@@ -15,6 +15,7 @@
 
 
 #include <gtest/gtest.h>
+#include <SurgSim/Graphics/RenderTests/RenderTest.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -28,11 +29,13 @@
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Graphics/OsgTexture.h>
 #include <SurgSim/Graphics/OsgTexture2d.h>
 #include <SurgSim/Graphics/OsgTextureRectangle.h>
 #include <SurgSim/Graphics/View.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 #include <SurgSim/Graphics/OsgMaterial.h>
+#include <SurgSim/Graphics/OsgRenderTarget.h>
 
 #include <SurgSim/Testing/MathUtilities.h>
 
@@ -47,35 +50,8 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgScreenSpaceQuadRenderTests : public ::testing::Test
+struct OsgScreenSpaceQuadRenderTests : public RenderTest
 {
-	virtual void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-
-		runtime->addManager(graphicsManager);
-
-		scene = std::make_shared<SurgSim::Framework::Scene>();
-		runtime->setScene(scene);
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
-
 
 };
 
@@ -170,6 +146,8 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 }
 
+
+
 // Should show two rotating cubes, one in the middle of the screen being rendered normally, the
 // other one in the top right hand corner, being rendered onto a texture mapped on a quad
 TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
@@ -179,33 +157,40 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 	auto camera = std::make_shared<OsgCamera>("Texture");
 	camera->setViewMatrix(defaultCamera->getViewMatrix());
 	camera->setProjectionMatrix(defaultCamera->getProjectionMatrix());
-	auto texture = std::make_shared<OsgTextureRectangle>();
+
 	int width, height;
 	viewElement->getView()->getDimensions(&width,&height);
-	texture->setSize(width,height);
 
-	osg::Texture* osgTexture = texture->getOsgTexture();
-	osgTexture->setFilter(osg::Texture2D::MIN_FILTER,osg::Texture2D::LINEAR);
-	osgTexture->setFilter(osg::Texture2D::MAG_FILTER,osg::Texture2D::LINEAR);
 
-	camera->setColorRenderTexture(texture);
+	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
+		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);
 
+	camera->setRenderTarget(renderTargetOsg);
 
 	viewElement->addComponent(camera);
+
+	int screenWidth = 800;
+	int screenHeight = 600;
 
 	width = width/3;
 	height = height/3;
 
-	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad", viewElement->getView());
-	quad->setSize(width,height);
-	Quaterniond quat;
-	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());
-	quad->setInitialPose(SurgSim::Math::makeRigidTransform(quat, Vector3d(800-width,600-height,-0.2)));
-	quad->setTexture(texture);
+	std::shared_ptr<ScreenSpaceQuadRepresentation> quad;
+	quad = makeQuad("Color1", width, height, screenWidth - width, screenHeight - height);
+	quad->setTexture(renderTargetOsg->getColorTargetOsg(0));
+	viewElement->addComponent(quad);
+
+	quad = makeQuad("Color2", width, height, screenWidth - width, screenHeight - height*2);
+	quad->setTexture(renderTargetOsg->getColorTargetOsg(1));
+	viewElement->addComponent(quad);
+
+	quad = makeQuad("Depth", width, height, 0.0, screenHeight - height);
+	quad->setTexture(renderTargetOsg->getDepthTargetOsg());
 	viewElement->addComponent(quad);
 
 
+
+	Quaterniond quat = Quaterniond::Identity();
 	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0,0.0,-0.2));
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
 	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0,0.0,-0.2));

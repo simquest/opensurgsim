@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TetrahedronMesh.h"
 #include "SurgSim/Math/Vector.h"
 
 #include <array>
@@ -172,10 +173,65 @@ public:
 		return data1.m_id == data2.m_id && data1.m_edges == data2.m_edges;
 	}
 private:
-	/// Edge's unique ID in its mesh
+	/// Triangle's unique ID in its mesh
 	unsigned int m_id;
 	/// The IDs of the triangle's edges in its mesh, in order: {vertex0->vertex1, vertex1->vertex2, vertex2->vertex3}
 	std::array<unsigned int, 3> m_edges;
+};
+
+/// Tetrahedron data for testing, storing ID and edge IDs, triangle IDs
+class MockTetrahedronData
+{
+public:
+	/// Constructor
+	/// \param	id	Unique ID of the tetrahedron in its mesh
+	/// \param	edges	IDs of the tetrahedron's edges in its mesh (6 edges)
+	/// \param	edges	IDs of the tetrahedron's triangles in its mesh (4 triangles)
+	MockTetrahedronData(unsigned int id,
+		const std::array<unsigned int, 6>& edges,
+		const std::array<unsigned int, 4>& triangles) :
+	  m_id(id), m_edges(edges), m_triangles(triangles)
+	  {
+	  }
+
+	  /// Destructor
+	  virtual ~MockTetrahedronData()
+	  {
+	  }
+
+	  /// Gets the tetrahedron's unique ID in its mesh.
+	  unsigned int getId() const
+	  {
+		  return m_id;
+	  }
+
+	  /// Gets the IDs of the tetrahedron's edges in its mesh.
+	  const std::array<unsigned int, 6>& getEdges() const
+	  {
+		  return m_edges;
+	  }
+
+	  /// Gets the IDs of the tetrahedron's triangles in its mesh.
+	  const std::array<unsigned int, 4>& getTriangles() const
+	  {
+		  return m_triangles;
+	  }
+
+	  /// Compare the tetrahedron data and return true if equal, false if not equal.
+	  friend bool operator==(const MockTetrahedronData& data1, const MockTetrahedronData& data2)
+	  {
+		  return data1.m_id == data2.m_id && data1.m_edges == data2.m_edges && data1.m_triangles == data2.m_triangles;
+	  }
+private:
+	/// Tetrahedron's unique ID in its mesh
+	unsigned int m_id;
+
+	/// The IDs of the tetrahedron's edges in its mesh, in order:
+	/// {vertex0->vertex1, vertex0->vertex2, vertex0->vertex3, vertex1->vertex2, vertex1->vertex3, vertex2->vertex3}
+	std::array<unsigned int, 6> m_edges;
+
+	/// The IDs of the tetrahedron's triangles in its mesh, in order: {vertex012, vertex123, vertex230, vertex301}
+	std::array<unsigned int, 4> m_triangles;
 };
 
 /// Mesh for testing using MockVertexData
@@ -281,6 +337,104 @@ public:
 		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
 
 		return addTriangle(triangle);
+	}
+
+	/// Returns the normal of a vertex
+	const SurgSim::Math::Vector3d& getVertexNormal(unsigned int id) const
+	{
+		return getVertex(id).data.getNormal();
+	}
+
+	/// Returns the number of updates performed on the mesh
+	int getNumUpdates() const
+	{
+		return m_numUpdates;
+	}
+
+private:
+	/// Provides update functionality, which just increments the number of updates
+	virtual void doUpdate()
+	{
+		++m_numUpdates;
+	}
+
+	/// Number of updates performed on the mesh
+	int m_numUpdates;
+};
+
+/// Tetrahedron Mesh for testing using MockVertexData, MockEdgeData, MockTriangleData and MockTetrahedronData
+class MockTetrahedronMesh : public SurgSim::DataStructures::TetrahedronMesh<MockVertexData, MockEdgeData,
+																		 MockTriangleData, MockTetrahedronData>
+{
+public:
+	/// Vertex type for convenience
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::VertexType
+		VertexType;
+	/// Edge type for convenience
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::EdgeType
+		EdgeType;
+	/// Triangle type for convenience
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::TriangleType
+		TriangleType;
+	/// Tetrahedron type for convenience
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>::TetrahedronType
+		TetrahedronType;
+
+	/// Constructor. Start out with no vertices and 0 updates
+	MockTetrahedronMesh() :
+		SurgSim::DataStructures::TetrahedronMesh<MockVertexData, MockEdgeData, MockTriangleData, MockTetrahedronData>(),
+		m_numUpdates(0)
+	{
+	}
+	/// Destructor
+	virtual ~MockTetrahedronMesh()
+	{
+	}
+
+	/// Create a new vertex in the mesh
+	/// \param	position	Position of the vertex
+	/// \param	normal	Normal of the vertex
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createVertex(const SurgSim::Math::Vector3d& position, const SurgSim::Math::Vector3d& normal)
+	{
+		VertexType vertex(position, MockVertexData(getNumVertices(), normal));
+
+		return addVertex(vertex);
+	}
+
+	/// Create a new edge in the mesh
+	/// \param	vertices	Edge vertices (x2)
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createEdge(const std::array<unsigned int, 2>& vertices)
+	{
+		EdgeType edge(vertices, MockEdgeData(getNumEdges()));
+
+		return addEdge(edge);
+	}
+
+	/// Create a new triangle in the mesh
+	/// \param	vertices (x3)
+	/// \param edges (x3)
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createTriangle(const std::array<unsigned int, 3>& vertices, const std::array<unsigned int, 3>& edges)
+	{
+		TriangleType triangle(vertices, MockTriangleData(getNumTriangles(), edges));
+
+		return addTriangle(triangle);
+	}
+
+	/// Create a new tetrahedron in the mesh
+	/// \param	vertices connectivity (x4)
+	/// \param	edges connectivity (x6)
+	/// \param	triangles connectivity (x4)
+	/// \return	Unique ID of vertex in the mesh
+	unsigned int createTetrahedron(const std::array<unsigned int, 4>& vertices,
+		const std::array<unsigned int, 6>& edges,
+		const std::array<unsigned int, 4>& triangles)
+	{
+		TetrahedronType tetrahedron(vertices, MockTetrahedronData(getNumTetrahedrons(), edges, triangles));
+
+		return addTetrahedron(tetrahedron);
 	}
 
 	/// Returns the normal of a vertex

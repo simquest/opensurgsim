@@ -30,8 +30,8 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS MultiAxisDevice SurgSimInput SurgSimFramework SurgSimDataStructures
 	gtest ${Boost_LIBRARIES})
-if(WINDDK_FOUND)
-	list(APPEND LIBS ${WINDDK_LIBRARIES})
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
 # The unit tests will be built whenever the library is built, but

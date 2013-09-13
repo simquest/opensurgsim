@@ -66,16 +66,28 @@ find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 find_package(NovintHdalSdk)
+# Look for platform specific pthread.
+find_package(Threads REQUIRED)
+# Append pthread and rt to Boost_LIBRARIES since they are boost dependancies
+list(APPEND Boost_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	list(APPEND Boost_LIBRARIES rt)
+endif()
+
 find_package(OpenHaptics)
 find_package(SixenseSdk)
-find_package(WinDDK)
+find_package(WDK)
 
 
 if(SURGSIM_TESTS_BUILD)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
-	add_subdirectory(ThirdParty/gtest)
+	add_subdirectory(ThirdParty/gmock)
 endif()
 
+if(SURGSIM_YAMLCPP_BUILD)
+	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
+	add_subdirectory(ThirdParty/yaml-cpp)
+endif()
 
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")

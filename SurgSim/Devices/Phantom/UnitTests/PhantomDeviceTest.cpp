@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the PhantomDevice and PhantomManager classes.
+/// Tests for the PhantomDevice class.
 
 #include <memory>
 #include <string>
@@ -22,7 +22,7 @@
 #include <boost/chrono.hpp>
 #include <gtest/gtest.h>
 #include <SurgSim/Devices/Phantom/PhantomDevice.h>
-#include <SurgSim/Devices/Phantom/PhantomManager.h>
+//#include <SurgSim/Devices/Phantom/PhantomScaffold.h>  // only needed if calling setDefaultLogLevel()
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Input/InputConsumerInterface.h>
 #include <SurgSim/Input/OutputProducerInterface.h>
@@ -30,7 +30,7 @@
 #include <SurgSim/Math/Matrix.h>
 
 using SurgSim::Device::PhantomDevice;
-using SurgSim::Device::PhantomManager;
+using SurgSim::Device::PhantomScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
@@ -42,21 +42,26 @@ struct TestListener : public InputConsumerInterface, public OutputProducerInterf
 {
 public:
 	TestListener() :
+		m_numTimesInitializedInput(0),
 		m_numTimesReceivedInput(0),
 		m_numTimesRequestedOutput(0)
 	{
 	}
 
-	virtual void initializeInput(const std::string& device, const DataGroup& initialInput)
-	{
-	}
+	virtual void initializeInput(const std::string& device, const DataGroup& inputData);
 	virtual void handleInput(const std::string& device, const DataGroup& inputData);
 	virtual bool requestOutput(const std::string& device, DataGroup* outputData);
 
+	int m_numTimesInitializedInput;
 	int m_numTimesReceivedInput;
 	int m_numTimesRequestedOutput;
 	DataGroup m_lastReceivedInput;
 };
+
+void TestListener::initializeInput(const std::string& device, const DataGroup& inputData)
+{
+	++m_numTimesInitializedInput;
+}
 
 void TestListener::handleInput(const std::string& device, const DataGroup& inputData)
 {
@@ -71,70 +76,111 @@ bool TestListener::requestOutput(const std::string& device, DataGroup* outputDat
 }
 
 
-TEST(PhantomDeviceTest, CanConstructManager)
+TEST(PhantomDeviceTest, CreateUninitializedDevice)
 {
-	ASSERT_NO_THROW({PhantomManager manager;});
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 }
 
-TEST(PhantomDeviceTest, CreateAndReleaseDevice)
+TEST(PhantomDeviceTest, CreateAndInitializeDevice)
 {
-	PhantomManager manager;
-	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-	manager.releaseDevice(device);
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_FALSE(device->isInitialized());
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
 }
 
-TEST(PhantomDeviceTest, DestroyManagerWithRunningDevice)
+TEST(PhantomDeviceTest, CreateAndInitializeDefaultDevice)
 {
-	PhantomManager manager;
-	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-
-	// NB: device NOT released here!
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_FALSE(device->isInitialized());
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
+	EXPECT_TRUE(device->isInitialized());
 }
 
 TEST(PhantomDeviceTest, Name)
 {
-	PhantomManager manager;
-	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_EQ("TestPhantom", device->getName());
+	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 	EXPECT_EQ("TestPhantom", device->getName());
 }
 
-TEST(PhantomDeviceTest, CreateDeviceTwice)
+static void testCreateDeviceSeveralTimes(bool doSleep)
 {
-	PhantomManager manager;
+	for (int i = 0;  i < 6;  ++i)
 	{
-		std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-		ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-		manager.releaseDevice(device);
-	}
-	{
-		std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-		ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
-		manager.releaseDevice(device);
+		std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+		ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
+		if (doSleep)
+		{
+			boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
+		}
+		// the device will be destroyed here
 	}
 }
 
-TEST(PhantomDeviceTest, CreateTwoDevices)
+TEST(PhantomDeviceTest, CreateDeviceSeveralTimes)
 {
-	PhantomManager manager;
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	testCreateDeviceSeveralTimes(true);
+}
 
-	std::shared_ptr<PhantomDevice> device1 = manager.createDevice("FirstPhantom", "Default PHANToM");
-	ASSERT_TRUE(device1) << "Initialization failed.  Is a Phantom device plugged in?";
+TEST(PhantomDeviceTest, CreateSeveralDevices)
+{
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom1", "Default PHANToM");
+	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
-	std::shared_ptr<PhantomDevice> device2 = manager.createDevice("SecondPhantom", "Second PHANToM");
-	if (! device2)
+	// We can't check what happens with the scaffolds, since those are no longer a part of the device's API...
+
+	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom2", "Second PHANToM");
+	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	if (! device2->initialize())
 	{
-		std::cerr << "[Warning: second Phantom device not actually created; is it plugged in?]" << std::endl;
+		std::cerr << "[Warning: second Phantom did not come up; is it plugged in?]" << std::endl;
 	}
+}
+
+TEST(PhantomDeviceTest, CreateDevicesWithSameName)
+{
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom", "Default PHANToM");
+	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
+
+	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom", "Second PHANToM");
+	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
+}
+
+TEST(PhantomDeviceTest, CreateDevicesWithSameInitializationName)
+{
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device1 = std::make_shared<PhantomDevice>("Phantom1", "Default PHANToM");
+	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
+
+	std::shared_ptr<PhantomDevice> device2 = std::make_shared<PhantomDevice>("Phantom2", "Default PHANToM");
+	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate initialization name.";
 }
 
 TEST(PhantomDeviceTest, InputConsumer)
 {
-	PhantomManager manager;
-	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
@@ -161,14 +207,15 @@ TEST(PhantomDeviceTest, InputConsumer)
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 1300);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button0"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button1"));
 }
 
 TEST(PhantomDeviceTest, OutputProducer)
 {
-	PhantomManager manager;
-	std::shared_ptr<PhantomDevice> device = manager.createDevice("TestPhantom", "Default PHANToM");
-	ASSERT_TRUE(device) << "Initialization failed.  Is a Phantom device plugged in?";
+	//PhantomScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	std::shared_ptr<PhantomDevice> device = std::make_shared<PhantomDevice>("TestPhantom", "Default PHANToM");
+	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a Phantom device plugged in?";
 
 	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);

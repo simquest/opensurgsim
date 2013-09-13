@@ -56,19 +56,16 @@ template <class VertexData, class EdgeData, class TriangleData>
 class TriangleMesh : public Vertices<VertexData>
 {
 public:
-	/// Edge type for convenience
+	/// Edge type for convenience  (Ids of the 2 vertices)
 	typedef MeshElement<2, EdgeData> EdgeType;
-	/// Triangle type for convenience
+	/// Triangle type for convenience  (Ids of the 3 vertices)
 	typedef MeshElement<3, TriangleData> TriangleType;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
-	TriangleMesh()
-	{
-	}
+	TriangleMesh();
+
 	/// Destructor
-	virtual ~TriangleMesh()
-	{
-	}
+	virtual ~TriangleMesh();
 
 	/// Adds an edge to the mesh.
 	/// No checking on the edge's vertices is performed.
@@ -77,11 +74,7 @@ public:
 	/// on the vertices and other parameters.
 	/// \param	edge	Edge to add to the mesh
 	/// \return	Unique ID of the new edge.
-	unsigned int addEdge(const EdgeType& edge)
-	{
-		m_edges.push_back(edge);
-		return m_edges.size() - 1;
-	}
+	unsigned int addEdge(const EdgeType& edge);
 
 	/// Adds a triangle to the mesh.
 	/// \param	triangle	Triangle to add to the mesh
@@ -89,80 +82,57 @@ public:
 	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
 	/// based on the vertices and other parameters.
 	/// \return	Unique ID of the new triangle.
-	unsigned int addTriangle(const TriangleType& triangle)
-	{
-		m_triangles.push_back(triangle);
-		return m_triangles.size() - 1;
-	}
+	unsigned int addTriangle(const TriangleType& triangle);
 
+	/// Get the number of edges
 	/// Returns the number of edges in this mesh.
-	unsigned int getNumEdges() const
-	{
-		return m_edges.size();
-	}
+	unsigned int getNumEdges() const;
+
+	/// Get the number of triangles
 	/// Returns the number of triangles in this mesh.
-	unsigned int getNumTriangles() const
-	{
-		return m_triangles.size();
-	}
+	unsigned int getNumTriangles() const;
 
+	/// Retrieve all edges
 	/// Returns a vector containing the position of each edge.
-	const std::vector<EdgeType>& getEdges() const
-	{
-		return m_edges;
-	}
+	const std::vector<EdgeType>& getEdges() const;
+
+	/// Retrieve all triangles
 	/// Returns a vector containing the position of each triangle.
-	const std::vector<TriangleType>& getTriangles() const
-	{
-		return m_triangles;
-	}
+	const std::vector<TriangleType>& getTriangles() const;
 
+	/// Retrieve a specific edge
 	/// Returns the specified edge.
-	const EdgeType& getEdge(unsigned int id) const
-	{
-		return m_edges[id];
-	}
+	const EdgeType& getEdge(unsigned int id) const;
 
+	/// Retrieve a specific triangle
 	/// Returns the specified triangle.
-	const TriangleType& getTriangle(unsigned int id) const
-	{
-		return m_triangles[id];
-	}
+	const TriangleType& getTriangle(unsigned int id) const;
+
+	/// Test if the TriangleMesh is valid (valid vertex Ids used in all MeshElements)
+	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
+	bool isValid() const;
 
 protected:
 	/// Remove all edges from the mesh.
-	virtual void doClearEdges()
-	{
-		m_edges.clear();
-	}
+	virtual void doClearEdges();
+
 	/// Remove all triangles from the mesh.
-	virtual void doClearTriangles()
-	{
-		m_triangles.clear();
-	}
+	virtual void doClearTriangles();
 
 	/// Internal comparison of meshes of the same type: returns true if equal, false if not equal.
 	/// Override this method to provide custom comparison. Basic TriangleMesh implementation compares vertices,
 	/// edges and triangles: the order of vertices, edges, and triangles must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
-	virtual bool isEqual(const Vertices<VertexData>& mesh) const
-	{
-		const TriangleMesh& triangleMesh = static_cast<const TriangleMesh&>(mesh);
-		return Vertices<VertexData>::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
-			m_triangles == triangleMesh.getTriangles();
-	}
+	/// \return True if the vertices are equals, False otherwise
+	virtual bool isEqual(const Vertices<VertexData>& mesh) const;
 private:
 
 	/// Clear mesh to return to an empty state (no vertices, no edges, no triangles).
-	virtual void doClear()
-	{
-		doClearTriangles();
-		doClearEdges();
-		this->doClearVertices();
-	}
+	virtual void doClear();
 
 	/// Edges
 	std::vector<EdgeType> m_edges;
+
 	/// Triangles
 	std::vector<TriangleType> m_triangles;
 };
@@ -170,5 +140,7 @@ private:
 };  // namespace DataStructures
 
 };  // namespace SurgSim
+
+#include <SurgSim/DataStructures/TriangleMesh-inl.h>
 
 #endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H

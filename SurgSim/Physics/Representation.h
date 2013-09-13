@@ -21,15 +21,16 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/MlcpSolution.h>
 #include <SurgSim/Framework/Representation.h>
+#include <SurgSim/Collision/Location.h>
+
+using SurgSim::Collision::Location;
 
 namespace SurgSim
 {
-
 namespace Physics
 {
 
 class Localization;
-struct Location;
 
 enum RepresentationType
 {
