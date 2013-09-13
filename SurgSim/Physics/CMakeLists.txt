@@ -32,6 +32,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
 	Localization.cpp
+	MassSpringRepresentation.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
