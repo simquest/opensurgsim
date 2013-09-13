@@ -60,6 +60,11 @@ public:
 		return;
 	}
 
+	virtual int getType() const override
+	{
+		return SurgSim::Framework::MANAGER_TYPE_MOCK;
+	}
+
 private:
 	/// Updates the manager.
 	/// \param	dt	The time in seconds of the preceding timestep.

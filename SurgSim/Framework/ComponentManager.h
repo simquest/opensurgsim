@@ -36,6 +36,19 @@ namespace Framework
 class Runtime;
 class Logger;
 
+
+/// Fixed List of enums for the available manager types, do not explicitly assign values,
+/// MANAGER_TYPE_COUNT is used to determine the number of actual manager types
+enum {
+	MANAGER_TYPE_NONE = -1,
+	MANAGER_TYPE_BEHAVIOR,
+	MANAGER_TYPE_GRAPHICS,
+	MANAGER_TYPE_INPUT,
+	MANAGER_TYPE_MOCK,
+	MANAGER_TYPE_PHYSICS,
+	MANAGER_TYPE_COUNT
+};
+
 /// Base Component Manager class. Component Managers manage a collection of components.
 /// The runtime will present each new component to the manager, and it is up to
 /// the manger to decide whether to handle a component of a given type or not.
@@ -96,6 +109,11 @@ protected:
 	/// Processes all the components that are scheduled for addition or removal, this needs to be called
 	/// inside the doUpdate() function.
 	void processComponents();
+	/// Processes behaviors
+	/// This needs to be called inside doUpdate() function in each 'sub' manager.
+	void processBehaviors(const double dt);
+
+	virtual int getType() const = 0;
 
 	/// Helper, blocks access to the additions and removal queue and copies the components
 	/// from there to the intermediate inflight queues, after this call, the incoming
@@ -119,6 +137,9 @@ protected:
 	/// Logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
+	/// Collection of behaviors
+	// Each behavior will have a type to be matched with the corresponding manager
+	// Managers will only handle matching behaviors
 	std::vector<std::shared_ptr<SurgSim::Framework::Behavior>> m_behaviors;
 
 private:

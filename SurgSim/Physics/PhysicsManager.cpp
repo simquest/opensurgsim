@@ -49,6 +49,11 @@ PhysicsManager::~PhysicsManager()
 
 }
 
+int PhysicsManager::getType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
+}
+
 bool PhysicsManager::doInitialize()
 {
 	initializeComputations(false);

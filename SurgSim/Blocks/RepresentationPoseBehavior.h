@@ -35,7 +35,7 @@ public:
 	/// \param	name	Name of the behavior
 	/// \param	from	Representation to get the pose
 	/// \param	to	Representation to set the pose
-	RepresentationPoseBehavior(const std::string& name, 
+	RepresentationPoseBehavior(const std::string& name,
 							std::shared_ptr<SurgSim::Framework::Representation> from,
 							std::shared_ptr<SurgSim::Framework::Representation> to)
 							:SurgSim::Framework::Behavior(name),
@@ -61,6 +61,11 @@ protected:
 	{
 		m_to->setInitialPose(m_from->getInitialPose());
 		return true;
+	}
+
+	virtual int getTargetManagerType() const override
+	{
+		return SurgSim::Framework::TARGET_MANAGER_TYPE_BEHAVIOR;
 	}
 
 private:

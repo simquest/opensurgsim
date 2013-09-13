@@ -33,6 +33,40 @@ InputManager::~InputManager(void)
 {
 }
 
+bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
+{
+	bool result = false;
+	boost::lock_guard<boost::mutex> lock(m_mutex);
+	if (m_devices.find(device->getName()) == m_devices.cend())
+	{
+		m_devices[device->getName()] = device;
+		result = true;
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ << "Device already available in Input Manager";
+	}
+	return result;
+}
+
+bool InputManager::removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
+{
+	bool result = false;
+	boost::lock_guard<boost::mutex> lock(m_mutex);
+	auto it = m_devices.find(device->getName());
+	if (it != m_devices.end())
+	{
+		m_devices.erase(it);
+		result = true;
+	}
+	return result;
+}
+
+int InputManager::getType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_INPUT;
+}
+
 bool InputManager::doInitialize()
 {
 	return true;
@@ -48,16 +82,8 @@ bool InputManager::doUpdate(double dt)
 	// Add all components that came in before the last update
 	processComponents();
 
-	auto it = std::begin(m_behaviors);
-	auto endIt = std::end(m_behaviors);
-	for ( ;  it != endIt;  ++it)
-	{
-		if ( (*it)->getBehaviorType() == SurgSim::Framework::BEHAVIOR_TYPE_INPUTVTC)
-		{
-			(*it)->update(dt);
-		}
-	}
-
+	// Process specific behaviors belongs to this manager
+	processBehaviors(dt);
 	return true;
 }
 
@@ -150,34 +176,7 @@ bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Com
 	return result;
 }
 
-bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
-{
-	bool result = false;
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	if (m_devices.find(device->getName()) == m_devices.cend())
-	{
-		m_devices[device->getName()] = device;
-		result = true;
-	}
-	else
-	{
-		SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ << "Device already available in Input Manager";
-	}
-	return result;
-}
 
-bool InputManager::removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
-{
-	bool result = false;
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	auto it = m_devices.find(device->getName());
-	if (it != m_devices.end())
-	{
-		m_devices.erase(it);
-		result = true;
-	}
-	return result;
-}
 
 } // Input
 } // SurgSim

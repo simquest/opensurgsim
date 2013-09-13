@@ -81,6 +81,22 @@ void ComponentManager::processComponents()
 	}
 }
 
+void ComponentManager::processBehaviors(const double dt)
+{
+	auto it = std::begin(m_behaviors);
+	auto endIt = std::end(m_behaviors);
+	for ( ;  it != endIt;  ++it)
+	{
+		// Type must be matched
+		// Enum for getTargetManagerType() is defined in Behavior.h
+		// Enum for getType() is defined in ComponentManager.h
+		if ( (*it)->getTargetManagerType() == getType())
+		{
+			(*it)->update(dt);
+		}
+	}
+}
+
 bool ComponentManager::executeInitialization()
 {
 	// Please note that the implementation of this function needs to mirror processComponents()

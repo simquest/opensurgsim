@@ -36,6 +36,9 @@ public:
 	BehaviorManager();
 	~BehaviorManager();
 
+	///Overrides ComponentManager::getType()
+	virtual	int BehaviorManager::getType() const override;
+
 protected:
 	///Overrides ComponentManager::executeAdditions()
 	virtual bool executeAdditions(const std::shared_ptr<Component>& component) override;

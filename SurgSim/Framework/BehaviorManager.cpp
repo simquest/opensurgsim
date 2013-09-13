@@ -64,16 +64,14 @@ bool BehaviorManager::doUpdate(double dt)
 	// Add all components that came in before the last update
 	processComponents();
 
-	auto it = std::begin(m_behaviors);
-	auto endIt = std::end(m_behaviors);
-	for ( ;  it != endIt;  ++it)
-	{
-		if ((*it)->getBehaviorType() == SurgSim::Framework::BEHAVIOR_TYPE_REPRESENTATIONPOSE)
-		{
-			(*it)->update(dt);
-		}
-	}
+	// Process specific behaviors belongs to this manager
+	processBehaviors(dt);
 	return true;
+}
+
+int BehaviorManager::getType() const
+{
+	return MANAGER_TYPE_BEHAVIOR;
 }
 
 }; // namespace Framework
