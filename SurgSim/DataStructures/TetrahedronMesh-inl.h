@@ -94,6 +94,14 @@ const std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, T
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::EdgeType>&
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	getEdges()
+{
+	return m_edges;
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType>&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getTriangles() const
@@ -102,9 +110,25 @@ const std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, T
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType>&
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	getTriangles()
+{
+	return m_triangles;
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType>&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getTetrahedrons() const
+{
+	return m_tetrahedrons;
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+std::vector<typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType>&
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	getTetrahedrons()
 {
 	return m_tetrahedrons;
 }
@@ -134,9 +158,25 @@ const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronDa
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType&
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	getTriangle(unsigned int id)
+{
+	return m_triangles[id];
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getTetrahedron(unsigned int id) const
+{
+	return m_tetrahedrons[id];
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TetrahedronType&
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	getTetrahedron(unsigned int id)
 {
 	return m_tetrahedrons[id];
 }

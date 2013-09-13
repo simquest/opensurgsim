@@ -95,18 +95,30 @@ public:
 	/// Retrieve all edges
 	/// Returns a vector containing the position of each edge.
 	const std::vector<EdgeType>& getEdges() const;
+	/// Retrieve all edges (non const version)
+	/// Returns a vector containing the position of each edge.
+	std::vector<EdgeType>& getEdges();
 
 	/// Retrieve all triangles
 	/// Returns a vector containing the position of each triangle.
 	const std::vector<TriangleType>& getTriangles() const;
+	/// Retrieve all triangles (non const version)
+	/// Returns a vector containing the position of each triangle.
+	std::vector<TriangleType>& getTriangles();
 
 	/// Retrieve a specific edge
 	/// Returns the specified edge.
 	const EdgeType& getEdge(unsigned int id) const;
+	/// Retrieve a specific edge (non const version)
+	/// Returns the specified edge.
+	EdgeType& getEdge(unsigned int id);
 
 	/// Retrieve a specific triangle
 	/// Returns the specified triangle.
 	const TriangleType& getTriangle(unsigned int id) const;
+	/// Retrieve a specific triangle (non const version)
+	/// Returns the specified triangle.
+	TriangleType& getTriangle(unsigned int id);
 
 	/// Test if the TriangleMesh is valid (valid vertex Ids used in all MeshElements)
 	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)

@@ -25,6 +25,7 @@ set(UNIT_TEST_SOURCES
 	BoxSphereContactCalculationTests.cpp
 	CapsuleSphereContactCalculationTests.cpp
 	CollisionPairTests.cpp
+	ContactCalculationTests.cpp
 	ContactCalculationTestsCommon.cpp
 	DefaultContactCalculationTests.cpp
 	MockCollisionRepresentation.cpp

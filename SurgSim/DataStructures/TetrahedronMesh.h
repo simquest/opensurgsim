@@ -110,14 +110,23 @@ public:
 	/// Returns a vector containing the position of each edge.
 	/// \return The vector containing all edges
 	const std::vector<EdgeType>& getEdges() const;
+	/// Returns a vector containing the position of each edge (non const version).
+	/// \return The vector containing all edges
+	std::vector<EdgeType>& getEdges();
 
 	/// Returns a vector containing the position of each triangle.
 	/// \return The vector containing all triangles
 	const std::vector<TriangleType>& getTriangles() const;
+	/// Returns a vector containing the position of each triangle (non const version).
+	/// \return The vector containing all triangles
+	std::vector<TriangleType>& getTriangles();
 
 	/// Returns a vector containing the position of each tetrahedron.
 	/// \return The vector containing all tetrahedrons
 	const std::vector<TetrahedronType>& getTetrahedrons() const;
+	/// Returns a vector containing the position of each tetrahedron (non const version).
+	/// \return The vector containing all tetrahedrons
+	std::vector<TetrahedronType>& getTetrahedrons();
 
 	/// Returns the specified edge.
 	/// \param id The edge's id
@@ -135,12 +144,22 @@ public:
 	/// \return The triangle id
 	/// \note No check is performed on the id
 	const TriangleType& getTriangle(unsigned int id) const;
+	/// Returns the specified triangle (non const version).
+	/// \param id The triangle's id
+	/// \return The triangle id
+	/// \note No check is performed on the id
+	TriangleType& getTriangle(unsigned int id);
 
 	/// Returns the specified tetrahedron.
 	/// \param id The tetrahedron's id
 	/// \return The tetrahedron id
 	/// \note No check is performed on the id
 	const TetrahedronType& getTetrahedron(unsigned int id) const;
+	/// Returns the specified tetrahedron (non const version).
+	/// \param id The tetrahedron's id
+	/// \return The tetrahedron id
+	/// \note No check is performed on the id
+	TetrahedronType& getTetrahedron(unsigned int id);
 
 	/// Test if the TetrahedronMesh is valid (valid vertex Ids used in all MeshElements)
 	/// \return True if the TetrahedronMesh is valid, False otherwise (the topology is then broken)

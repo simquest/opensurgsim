@@ -60,15 +60,6 @@ public:
 	{
 	}
 
-	// Initialize by moving the data from another object.
-	// Needed because Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers.
-	DeviceData(DeviceData&& other) :
-		deviceBaseIndex(std::move(other.deviceBaseIndex)),
-		deviceControllerIndex(std::move(other.deviceControllerIndex)),
-		deviceObject(std::move(other.deviceObject))
-	{
-	}
-
 	/// The index of the Sixense base unit for this device.
 	const int deviceBaseIndex;
 	/// The index of the Sixense controller for this device.
@@ -97,7 +88,7 @@ public:
 	std::unique_ptr<SixenseThread> thread;
 
 	/// The list of known devices.
-	std::list<SixenseScaffold::DeviceData> activeDeviceList;
+	std::list<std::unique_ptr<SixenseScaffold::DeviceData>> activeDeviceList;
 
 	/// The mutex that protects the list of known devices.
 	boost::mutex mutex;
@@ -224,7 +215,7 @@ bool SixenseScaffold::unregisterDevice(const SixenseDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-			[device](const DeviceData& info) { return info.deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		if (matching != m_state->activeDeviceList.end())
 		{
 			m_state->activeDeviceList.erase(matching);
@@ -247,9 +238,9 @@ bool SixenseScaffold::runInputFrame()
 	for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
 	{
 		// We don't call it->deviceObject->pullOutput() because we don't use any output at all.
-		if (updateDevice(*it))
+		if (updateDevice(**it))
 		{
-			it->deviceObject->pushInput();
+			(*it)->deviceObject->pushInput();
 		}
 	}
 
@@ -346,14 +337,14 @@ bool SixenseScaffold::findUnusedDeviceAndRegister(SixenseDevice* device, int* nu
 
 	// Make sure the object is unique.
 	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[device](const DeviceData& info) { return info.deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "Sixense/Hydra: Tried to register a device" <<
 		" which is already present!";
 
 	// Make sure the name is unique.
 	const std::string deviceName = device->getName();
 	auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[&deviceName](const DeviceData& info) { return info.deviceObject->getName() == deviceName; });
+		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
 	if (sameName != m_state->activeDeviceList.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Sixense/Hydra: Tried to register a device when the same name is" <<
@@ -415,8 +406,8 @@ bool SixenseScaffold::registerIfUnused(int baseIndex, int controllerIndex, Sixen
 {
 	// Check existing devices.
 	auto sameIndices = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[baseIndex, controllerIndex](const DeviceData& info)
-			{ return ((info.deviceBaseIndex == baseIndex) && (info.deviceControllerIndex == controllerIndex)); });
+		[baseIndex, controllerIndex](const std::unique_ptr<DeviceData>& info)
+			{ return ((info->deviceBaseIndex == baseIndex) && (info->deviceControllerIndex == controllerIndex)); });
 	if (sameIndices != m_state->activeDeviceList.end())
 	{
 		// We found an existing device for this controller.
@@ -431,9 +422,11 @@ bool SixenseScaffold::registerIfUnused(int baseIndex, int controllerIndex, Sixen
 		createThread();
 	}
 
-	// This constructs the object first, then moves it to the list.  That's only needed because Visual Studio 2010
-	// doesn't support multi-argument emplace_back() for STL containers; modern compilers don't need the DeviceData().
-	m_state->activeDeviceList.emplace_back(DeviceData(baseIndex, controllerIndex, device));
+	// Construct the object, start its thread, then move it to the list.
+	// Note that since Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers, storing a
+	// list of unique_ptr results in nicer code than storing a list of DeviceData values directly.
+	std::unique_ptr<DeviceData> info(new DeviceData(baseIndex, controllerIndex, device));
+	m_state->activeDeviceList.emplace_back(std::move(info));
 
 	return true;
 }
