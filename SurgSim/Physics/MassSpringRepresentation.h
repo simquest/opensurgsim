@@ -50,26 +50,45 @@ protected:
 class LinearSpring
 {
 public:
+	LinearSpring(double stiffness, double damping, double l0) : m_stiffness(stiffness), m_damping(damping), m_l0(l0)
+	{
+	}
+	
+	const Vector3d getF(
+		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& xA,
+		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& xB,
+		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& vA,
+		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& vB) const
+	{
+		Vector3d u = xB - xA;
+		double m_l = u.norm();
+		u /= m_l;
 
-	void setStiffness(double k){}
-	void setDamping(double d){}
-	const Vector3d& getF() const { return m_F; }
-	const Matrix33d& getdF_dx() const { return m_dF_dx; }
-	const Matrix33d& getdF_dv() const { return m_dF_dv; }
+		return u * (m_l - m_l0) * m_stiffness;
+	}
 
-	void update(const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& x,
-		const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& v) {}
+	const Matrix33d getdF_dx(const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& x,
+		const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& v) const
+	{
+		return Matrix33d::Identity(); 
+	}
+
+	const Matrix33d getdF_dv(const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& x,
+		const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& v) const
+	{
+		return Matrix33d::Identity();
+	}
 
 	bool operator ==(const LinearSpring& m) const { return true; }
 	bool operator !=(const LinearSpring& m) const { return !((*this) == m); }
 
 private:
-	Vector3d m_F;
-	Matrix33d m_dF_dx, m_dF_dv;
+	const double m_l0;
+	const double m_stiffness, m_damping;
 };
 
 /// MassSpring model is a specialized deformable model (a set of masses connected by springs).
-/// Note that the structure is stored into a TetrahedronMesh for the sake of reusability.
+/// Note that the structure is stored into a TetrahedronMesh for the sake of re usability.
 ///  -> The masses are specific data for each vertex.
 ///  -> The linear springs are specific data for each edge.
 /// The class can handle 3 type of numerical integration scheme (Euler explicit, modified and implicit).
@@ -201,6 +220,14 @@ protected:
 	/// \param useModifiedEuler True if modified Euler should be used, False if not (default = false)
 	/// \note The modified Euler explicit is a semi-implicit scheme, therefore slightly more stable than explicit
 	void updateEulerExplicit(double dt, bool useModifiedEuler = false);
+
+	/// Add the Rayleigh damping forces to f
+	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
+	/// \param v The velocity vector
+	/// \param scale A scaling factor to apply on the damping force
+	/// \note M.a + D.v + K.x = F          with D = c.M + d.K (Rayleigh damping definition)
+	/// \note M.a + K.x = F - (c.M.v + d.K.v)
+	void addRayleighDampingForce(Vector *f, const Vector &v, double scale);
 
 private:
 	/// TetrahedronMesh containing the Masses (on the vertices) and Springs (on the edges)
