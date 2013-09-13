@@ -3,7 +3,7 @@
 # Once done this will define
 #  SIXENSE_SDK_FOUND - system has the Sixense SDK directory
 #  SIXENSE_SDK_INCLUDE_DIR - the Sixense SDK include directory
-#  SIXENSE_SDK_LIBRARIES - the Sixense SDK HDAPI libraries
+#  SIXENSE_SDK_LIBRARIES - the Sixense SDK libraries
 
 # This file is a part of the OpenSurgSim project.
 # Copyright 2013, SimQuest Solutions Inc.
@@ -87,7 +87,7 @@ endif(SIXENSE_SDK_INCLUDE_DIR)
 
 
 macro(sixense_shared_from_link OUTPUT)
-	set(${OUTPUT} CACHE STRING "DLLs/SOs from the Sixense SDK.")
+	set(SHARED_LIST)
 	foreach(FILE ${ARGN})
 		if(WIN32)
 			string(REPLACE "/lib/" "/bin/" SHARED "${FILE}")
@@ -96,11 +96,13 @@ macro(sixense_shared_from_link OUTPUT)
 			set(SHARED "${FILE}")
 		endif()
 		if(EXISTS "${SHARED}")
-			list(APPEND ${OUTPUT} "${SHARED}")
+			list(APPEND SHARED_LIST "${SHARED}")
 		else()
 			message(SEND_ERROR "Could not find dynamic library for ${FILE}")
 		endif()
 	endforeach(FILE ${ARGN})
+	set(${OUTPUT} ${SHARED_LIST}
+		CACHE STRING "DLLs/SOs from the Sixense SDK.")
 	mark_as_advanced(${OUTPUT})
 endmacro()
 

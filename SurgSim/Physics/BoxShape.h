@@ -145,7 +145,7 @@ private:
 private:
 	/// The box sizes along the 3 axis respectively {X,Y,Z}
 	double   m_size[3];
-	
+
 	/// The box vertices.
 	Vector3d m_vertices[8];
 };

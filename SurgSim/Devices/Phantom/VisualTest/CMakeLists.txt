@@ -14,39 +14,33 @@
 # limitations under the License.
 
 
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+link_directories(
+	${Boost_LIBRARY_DIRS}
+)
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
-	"${OPENHAPTICS_INCLUDE_DIR}"
+	"${GLUT_INCLUDE_DIR}"
 )
 
-set(PHANTOM_DEVICE_SOURCES
-	PhantomDevice.cpp
-	PhantomScaffold.cpp
+set(EXAMPLE_SOURCES
+	main.cpp
 )
 
-set(PHANTOM_DEVICE_HEADERS
-	PhantomDevice.h
-	PhantomScaffold.h
+set(EXAMPLE_HEADERS
 )
 
-# TODO(advornik): the installation should NOT copy all the headers...
-surgsim_add_library(
-	PhantomDevice
-	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
-	SurgSim/Devices/Phantom
-)
-if(SURGSIM_TESTS_BUILD)
-	# The unit tests will be built whenever the library is built.
-	add_subdirectory(UnitTests)
+add_executable(PhantomVisualTest
+	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+surgsim_show_ide_folders(
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-	if(GLUT_FOUND)
-		add_subdirectory(VisualTest)
-	endif(GLUT_FOUND)
-endif()
+set(LIBS PhantomDevice IdentityPoseDevice VisualTestCommon
+	SurgSimInput SurgSimFramework SurgSimDataStructures
+	${OPENHAPTICS_LIBRARIES}
+	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+target_link_libraries(PhantomVisualTest ${LIBS})
