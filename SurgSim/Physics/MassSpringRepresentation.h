@@ -74,6 +74,20 @@ public:
 	/// \return the spring for the given springId
 	const LinearSpringParameter& getSpringParameter(unsigned int springId) const;
 
+	/// Gets the current state (as a TetrahedronMesh<MassParameter, LinearSpringParameter, void, void)
+	/// \return the current state
+	const TetrahedronMesh<MassParameter, LinearSpringParameter, void, void>& getFinalState() const
+	{
+		return m_finalState;
+	}
+
+	/// Gets the initial state (as a TetrahedronMesh<MassParameter, LinearSpringParameter, void, void)
+	/// \return the current state
+	const TetrahedronMesh<MassParameter, LinearSpringParameter, void, void>& getInitialState() const
+	{
+		return m_initialState;
+	}
+
 	/// Gets the total mass of the mass spring
 	/// \return The total mass of the mass spring (in Kg)
 	double getTotalMass(void) const;

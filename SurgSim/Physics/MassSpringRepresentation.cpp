@@ -26,10 +26,14 @@ namespace SurgSim
 namespace Physics
 {
 
-MassSpringRepresentation::MassSpringRepresentation(const std::string& name) : Representation(name)
+MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
+Representation(name), m_integrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER)
 {
 	m_identityPose.setIdentity();
 	m_initialPose.setIdentity();
+
+	m_rayleighDamping.massCoefficient = 0.0;
+	m_rayleighDamping.stiffnessCoefficient = 0.0;
 }
 
 MassSpringRepresentation::~MassSpringRepresentation()

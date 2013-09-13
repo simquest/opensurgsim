@@ -57,9 +57,9 @@ public:
 	void setStiffness(double stiffness) { m_stiffness = stiffness; }
 	void setDamping(double damping) { m_damping = damping; }
 	void setInitialLength(double l0) { m_l0 = l0; }
-	double getStiffness() { return m_stiffness; }
-	double getDamping() { return m_damping; }
-	double getInitialLength() { return m_l0; }
+	double getStiffness() const { return m_stiffness; }
+	double getDamping() const { return m_damping; }
+	double getInitialLength() const { return m_l0; }
 
 	const Vector3d getF(
 		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& xA,
