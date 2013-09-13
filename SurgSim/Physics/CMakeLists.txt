@@ -70,6 +70,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FreeMotion.h
 	Localization.h
 	MassSpringRepresentation.h
+	MassSpringRepresentationState.h
 	MeshShape.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h

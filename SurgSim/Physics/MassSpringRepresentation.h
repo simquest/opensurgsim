@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_MASSSPRINGREPRESENTATION_H
 #define SURGSIM_PHYSICS_MASSSPRINGREPRESENTATION_H
 
-#include <SurgSim/Physics/DeformableRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/MassSpringRepresentationState.h>
 #include <SurgSim/DataStructures/TetrahedronMesh.h>
 #include <Surgsim/Math/Vector.h>
 #include <Surgsim/Math/Matrix.h>
@@ -32,69 +32,14 @@ namespace SurgSim
 namespace Physics
 {
 
-class Mass
-{
-public:
-	Mass(double m = 0.0) : m_mass(m){}
-
-	void setMass(double mass){ m_mass = mass; }
-	double getMass() const { return m_mass; }
-
-	bool operator ==(const Mass& m) const { return (m_mass == m.m_mass); }
-	bool operator !=(const Mass& m) const { return !((*this) == m); }
-
-protected:
-	double m_mass;
-};
-
-class LinearSpring
-{
-public:
-	LinearSpring(double stiffness, double damping, double l0) : m_stiffness(stiffness), m_damping(damping), m_l0(l0)
-	{
-	}
-	
-	const Vector3d getF(
-		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& xA,
-		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& xB,
-		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& vA,
-		const Eigen::VectorBlock<Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>>& vB) const
-	{
-		Vector3d u = xB - xA;
-		double m_l = u.norm();
-		u /= m_l;
-
-		return u * (m_l - m_l0) * m_stiffness;
-	}
-
-	const Matrix33d getdF_dx(const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& x,
-		const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& v) const
-	{
-		return Matrix33d::Identity(); 
-	}
-
-	const Matrix33d getdF_dv(const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& x,
-		const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& v) const
-	{
-		return Matrix33d::Identity();
-	}
-
-	bool operator ==(const LinearSpring& m) const { return true; }
-	bool operator !=(const LinearSpring& m) const { return !((*this) == m); }
-
-private:
-	const double m_l0;
-	const double m_stiffness, m_damping;
-};
-
-/// MassSpring model is a specialized deformable model (a set of masses connected by springs).
-/// Note that the structure is stored into a TetrahedronMesh for the sake of re usability.
-///  -> The masses are specific data for each vertex.
-///  -> The linear springs are specific data for each edge.
+/// MassSpring model is a deformable model (a set of masses connected by springs).
+/// Note that the state is stored into a TetrahedronMesh for the sake of re usability.
+///  -> The masses are specific data for each vertex (position, velocity and mass).
+///  -> The linear springs are specific data for each edge (stiffness, damping).
 /// The class can handle 3 type of numerical integration scheme (Euler explicit, modified and implicit).
 /// The model handles damping through the Rayleigh damping (damping is a combination of mass and stiffness).
 /// Boundary conditions can be defined on the model, which are the fixed node ids.
-class MassSpringRepresentation: public DeformableRepresentation
+class MassSpringRepresentation: public Representation
 {
 public:
 	typedef Eigen::Matrix<double, Eigen::Dynamic,              1, Eigen::DontAlign> Vector;
@@ -123,11 +68,11 @@ public:
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
-	const Mass& getMass(unsigned int nodeId) const;
+	const MassParameter& getMassParameter(unsigned int nodeId) const;
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
-	const LinearSpring& getSpring(unsigned int springId) const;
+	const LinearSpringParameter& getSpringParameter(unsigned int springId) const;
 
 	/// Gets the total mass of the mass spring
 	/// \return The total mass of the mass spring (in Kg)
@@ -210,6 +155,26 @@ public:
 	/// \param block The block of a vector containing the correction to be applied to the dof
 	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block);
 
+	/// Set the initial pose of the representation
+	/// \param pose The initial pose
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose){ m_initialPose = pose; };
+
+	/// Get the initial pose of the representation
+	/// \return The initial pose (always identity)
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const { return m_initialPose; };
+
+	/// Set the pose of the representation
+	/// \param pose The pose to set the representation to
+	/// \note Impossible for a MassSpring (always in global space => pose = identity)
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose)
+	{
+		SURGSIM_ASSERT(false) << "Cannot set the pose of a MassSpring";
+	}
+
+	/// Get the pose of the representation
+	/// \return The pose of this representation (always Identity)
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const { return m_identityPose; }
+
 protected:
 	/// Allocate all the data structure for a given size
 	/// \param numDof The number of Dof to account for in all the data structure
@@ -230,8 +195,21 @@ protected:
 	void addRayleighDampingForce(Vector *f, const Vector &v, double scale);
 
 private:
-	/// TetrahedronMesh containing the Masses (on the vertices) and Springs (on the edges)
-	TetrahedronMesh<Mass, LinearSpring, void, void> m_tetrahedronMesh;
+	/// Initial and final states (stored as TetrahedronMeshes)
+	MassSpringRepresentationState m_initialState, m_finalState;
+
+	/// Internal Eigen vectors to store/compute current/previous position
+	Vector m_x, m_xPrevious;
+	/// Internal Eigen vectors to store/compute current velocity
+	Vector m_v;
+	/// Internal Eigen vectors to store/compute current force
+	Vector m_f;
+
+	/// Identity pose: stored positions are always in global space (Identity transformation)
+	SurgSim::Math::RigidTransform3d m_identityPose;
+	/// Initial pose that will be used to transform the mesh on initialization
+	/// Stored positions are always in global space (Identity transformation)
+	SurgSim::Math::RigidTransform3d m_initialPose;
 
 	/// Rayleigh damping parameters (massCoefficient and stiffnessCoefficient)
 	/// D = massCoefficient.M + stiffnessCoefficient.K
@@ -246,9 +224,6 @@ private:
 
 	/// Numerical Integration scheme (dynamic explicit/implicit solver)
 	IntegrationScheme m_integrationScheme;
-
-	/// Current forces applied on each dof
-	Vector m_f;
 };
 
 } // namespace Physics

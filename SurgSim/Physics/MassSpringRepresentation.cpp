@@ -26,9 +26,10 @@ namespace SurgSim
 namespace Physics
 {
 
-MassSpringRepresentation::MassSpringRepresentation(const std::string& name) : DeformableRepresentation(name)
+MassSpringRepresentation::MassSpringRepresentation(const std::string& name) : Representation(name)
 {
-
+	m_identityPose.setIdentity();
+	m_initialPose.setIdentity();
 }
 
 MassSpringRepresentation::~MassSpringRepresentation()
@@ -38,31 +39,31 @@ MassSpringRepresentation::~MassSpringRepresentation()
 
 unsigned int MassSpringRepresentation::getNumMasses(void) const
 {
-	return m_tetrahedronMesh.getNumVertices();
+	return m_finalState.getNumVertices();
 }
 
 unsigned int MassSpringRepresentation::getNumSprings(void) const
 {
-	return m_tetrahedronMesh.getNumEdges();
+	return m_finalState.getNumEdges();
 }
 
-const Mass& MassSpringRepresentation::getMass(unsigned int nodeId) const
+const MassParameter& MassSpringRepresentation::getMassParameter(unsigned int nodeId) const
 {
 	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";
-	return m_tetrahedronMesh.getVertex(nodeId).data;
+	return m_finalState.getVertex(nodeId).data;
 }
 
-const LinearSpring& MassSpringRepresentation::getSpring(unsigned int springId) const
+const LinearSpringParameter& MassSpringRepresentation::getSpringParameter(unsigned int springId) const
 {
 	SURGSIM_ASSERT(springId < getNumSprings()) << "Invalid spring id";
-	return m_tetrahedronMesh.getEdge(springId).data;
+	return m_finalState.getEdge(springId).data;
 }
 
 double MassSpringRepresentation::getTotalMass(void) const
 {
 	double mass = 0.0;
-	const std::vector<Vertex<Mass>> &vertices = m_tetrahedronMesh.getVertices();
-	for (std::vector<Vertex<Mass>>::const_iterator it = vertices.begin(); it != vertices.end(); it++)
+	const std::vector<Vertex<MassParameter>> &vertices = m_finalState.getVertices();
+	for (std::vector<Vertex<MassParameter>>::const_iterator it = vertices.begin(); it != vertices.end(); it++)
 	{
 		mass += it->data.getMass();
 	}
@@ -123,35 +124,44 @@ void MassSpringRepresentation::init1D(const Vector3d extremities[2], int numNode
 	// Allocate all Eigen data structures and all states
 	allocate(numNodesPerDim[0] * 3);
 
+	// Initialize the nodes position, transforming them by m_initialPose
 	Vector3d delta = (extremities[1] - extremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
 	for (int massId = 0; massId < numNodesPerDim[0]; massId++)
 	{
-		Mass mass(totalMass / static_cast<double>(numNodesPerDim[0]));
-		Vertex<Mass> vertex(extremities[0] + massId * delta, mass);
-		m_tetrahedronMesh.addVertex(vertex);
+		MassParameter mass;
+		mass.setMass(totalMass / static_cast<double>(numNodesPerDim[0]));
+		mass.setVelocity(Vector3d::Zero());
+		Vertex<MassParameter> vertex( m_initialPose * (extremities[0] + massId * delta), mass);
+		m_initialState.addVertex(vertex);
 	}
 
 	for (int massId = 0; massId < numNodesPerDim[0] - 1; massId++)
 	{
+		LinearSpringParameter spring;
 		std::array<unsigned int, 2> element;
+
 		element[0] = massId;
 		element[1] = massId + 1;
-		const Vector3d& A = m_tetrahedronMesh.getVertexPosition(element[0]);
-		const Vector3d& B = m_tetrahedronMesh.getVertexPosition(element[1]);
-		LinearSpring spring(springStiffness, springDamping, (B-A).norm());
+		const Vector3d& A = m_initialState.getVertexPosition(element[0]);
+		const Vector3d& B = m_initialState.getVertexPosition(element[1]);
+		spring.setStiffness(springStiffness);
+		spring.setDamping(springDamping);
+		spring.setInitialLength((B-A).norm());
 
-		MeshElement<2, LinearSpring> edge(element, spring);
-		m_tetrahedronMesh.addEdge(edge);
+		MeshElement<2, LinearSpringParameter> edge(element, spring);
+		m_initialState.addEdge(edge);
 	}
 
-	// Initialize all 4 states with the proper vertices position
-	for (int massId = 0; massId < numNodesPerDim[0]; massId++)
+	// Initialize the final state as a copy of the initial state
+	m_finalState = m_initialState;
+
+	// Initialize the internal current and previous state (Eigen vector)
+	for (int nodeId = 0; nodeId < numNodesPerDim[0]; nodeId++)
 	{
-		m_initialState.getPositions().block(3*massId, 0, 3, 1) = m_tetrahedronMesh.getVertexPosition(massId);
+		m_x.segment(3 * nodeId, 3) = m_initialState.getVertexPosition(nodeId);
+		m_xPrevious.segment(3 * nodeId, 3) = m_initialState.getVertexPosition(nodeId);
+		m_v.segment(3 * nodeId, 3) = m_initialState.getVertex(nodeId).data.getVelocity();
 	}
-	m_previousState = m_initialState;
-	m_currentState  = m_initialState;
-	m_finalState    = m_initialState;
 
 	// Set the number of dof for the Representation
 	setNumDof(numNodesPerDim[0]*3);
@@ -181,7 +191,7 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	}
 
 	// Backup current state into previous state
-	m_previousState = m_currentState;
+	m_xPrevious = m_x;
 }
 
 void MassSpringRepresentation::update(double dt)
@@ -208,8 +218,12 @@ void MassSpringRepresentation::afterUpdate(double dt)
 		return;
 	}
 
-	// Backup current state into final state
-	m_finalState = m_currentState;
+	// Back fill the new mass spring position into the mesh
+	for (unsigned int vertexId = 0 ;vertexId < m_finalState.getNumVertices(); vertexId++)
+	{
+		m_finalState.getVertex(vertexId).position = m_x.segment(3 * vertexId, 3);
+		m_finalState.getVertex(vertexId).data.setVelocity(m_v.segment(3 * vertexId, 3));
+	}
 }
 
 void MassSpringRepresentation::applyDofCorrection(double dt,
@@ -223,9 +237,6 @@ void MassSpringRepresentation::applyDofCorrection(double dt,
 
 void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEuler)
 {
-	Vector& x = m_currentState.getPositions();
-	Vector& v = m_currentState.getVelocities();
-
 	m_f.setZero();
 
 	// For all node, we have m.a = F
@@ -244,21 +255,21 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 	{
 		for (unsigned int nodeId = 0; nodeId < getNumMasses(); nodeId++)
 		{
-			m_f.block(3 * nodeId, 0, 3, 1) = getGravity() * getMass(nodeId).getMass();
+			m_f.block(3 * nodeId, 0, 3, 1) = getGravity() * getMassParameter(nodeId).getMass();
 		}
 	}
 	
 	// 2) Add Rayleigh damping
-	addRayleighDampingForce(&m_f, v, 1.0);
+	addRayleighDampingForce(&m_f, m_v, 1.0);
 
 	// 3) Add spring forces
 	for (unsigned int springId = 0; springId < getNumSprings(); springId++)
 	{
-		int nodeId0 = m_tetrahedronMesh.getEdge(springId).vertices[0];
-		int nodeId1 = m_tetrahedronMesh.getEdge(springId).vertices[1];
-		const Vector3d& f = m_tetrahedronMesh.getEdge(springId).data.getF(
-			x.segment(3*nodeId0, 3), x.segment(3*nodeId1, 3),
-			v.segment(3*nodeId0, 3), v.segment(3*nodeId1, 3));
+		int nodeId0 = m_finalState.getEdge(springId).vertices[0];
+		int nodeId1 = m_finalState.getEdge(springId).vertices[1];
+		const Vector3d& f = m_finalState.getEdge(springId).data.getF(
+			m_x.segment(3 * nodeId0, 3), m_x.segment(3 * nodeId1, 3),
+			m_v.segment(3 * nodeId0, 3), m_v.segment(3 * nodeId1, 3));
 		m_f.block(3 * nodeId0, 0, 3, 1) += f;
 		m_f.block(3 * nodeId1, 0, 3, 1) -= f;
 	}
@@ -266,21 +277,21 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 	// 4) Compute acceleration (dividing by the mass)
 	for (unsigned int nodeId = 0; nodeId < getNumMasses(); nodeId++)
 	{
-		m_f.block(3 * nodeId, 0, 3, 1) /= getMass(nodeId).getMass();
+		m_f.block(3 * nodeId, 0, 3, 1) /= getMassParameter(nodeId).getMass();
 	}
 
 	// 5) Apply numerical integration scheme
 	if (useModifiedEuler)
 	{
-		v += m_f * dt;
+		m_v += m_f * dt;
 		// apply the boundary conditions
 		for (std::vector<int>::const_iterator bcIt = m_boundaryConditions.begin(); bcIt != m_boundaryConditions.end(); bcIt++)
 		{
-			v[3 * (*bcIt) + 0] = 0.0;
-			v[3 * (*bcIt) + 1] = 0.0;
-			v[3 * (*bcIt) + 2] = 0.0;
+			m_v[3 * (*bcIt) + 0] = 0.0;
+			m_v[3 * (*bcIt) + 1] = 0.0;
+			m_v[3 * (*bcIt) + 2] = 0.0;
 		}
-		x += v * dt;
+		m_x += m_v * dt;
 	}
 	else
 	{
@@ -291,30 +302,28 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 			m_f[3 * (*bcIt) + 1] = 0.0;
 			m_f[3 * (*bcIt) + 2] = 0.0;
 
-			v[3 * (*bcIt) + 0] = 0.0;
-			v[3 * (*bcIt) + 1] = 0.0;
-			v[3 * (*bcIt) + 2] = 0.0;
+			m_v[3 * (*bcIt) + 0] = 0.0;
+			m_v[3 * (*bcIt) + 1] = 0.0;
+			m_v[3 * (*bcIt) + 2] = 0.0;
 		}
-		x += v * dt;
-		v += m_f * dt;
+		m_x += m_v * dt;
+		m_v += m_f * dt;
 	}
 }
 
 void MassSpringRepresentation::allocate(int numDof)
 {	
+	// Allocate internal Eigen data structure
+	m_x.resize(numDof);
+	m_xPrevious.resize(numDof);
+	m_v.resize(numDof);
 	m_f.resize(numDof);
 
-	// Allocate the 4 states
-	m_initialState.allocate(numDof);
-	m_previousState.allocate(numDof);
-	m_currentState.allocate(numDof);
-	m_finalState.allocate(numDof);
-
 	// Zero-out the 4 states
-	m_initialState.reset();
-	m_previousState.reset();
-	m_currentState.reset();
-	m_finalState.reset();
+	m_x.setZero();
+	m_xPrevious.setZero();
+	m_v.setZero();
+	m_f.setZero();
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector *f, const Vector &v, double scale)
@@ -325,11 +334,11 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector *f, const Vector &
 		for (size_t nodeID = 0; nodeID < getNumMasses(); nodeID++)
 		{
 			(*f)[3*nodeID+0] -=
-				scale * m_rayleighDamping.massCoefficient * getMass(nodeID).getMass() * v[3 * nodeID + 0];
+				scale * m_rayleighDamping.massCoefficient * getMassParameter(nodeID).getMass() * v[3 * nodeID + 0];
 			(*f)[3*nodeID+1] -=
-				scale * m_rayleighDamping.massCoefficient * getMass(nodeID).getMass() * v[3 * nodeID + 1];
+				scale * m_rayleighDamping.massCoefficient * getMassParameter(nodeID).getMass() * v[3 * nodeID + 1];
 			(*f)[3*nodeID+2] -=
-				scale * m_rayleighDamping.massCoefficient * getMass(nodeID).getMass() * v[3 * nodeID + 2];
+				scale * m_rayleighDamping.massCoefficient * getMassParameter(nodeID).getMass() * v[3 * nodeID + 2];
 		}
 	}
 

@@ -27,6 +27,9 @@ class MassSpringRepresentationTests : public ::testing::Test
 public:
 	void SetUp() override
 	{
+		// Initialization values for the simulation
+		m_dt = 1e-3;
+
 		// Initialization values for 1D case
 		m_extremities1D[0] = Vector3d(-1.0, 0.0, 0.0);
 		m_extremities1D[1] = Vector3d( 1.0, 0.0, 0.0);
@@ -69,6 +72,9 @@ public:
 	}
 
 protected:
+	/// Simulation parameters
+	double m_dt;
+
 	/// Initialization 1D case (extremities)
 	Vector3d m_extremities1D[2];
 	/// Initialization 1D case (number of nodes per dimension)
@@ -126,4 +132,18 @@ TEST_F(MassSpringRepresentationTests, Init3D)
 
 	massSpring.init3D(m_extremities3D, m_numNodesPerDim3D, m_totalMass3D, m_springStiffness3D, m_springDamping3D);
 	//EXPECT_EQ(m_numNodesPerDim3D[0] * m_numNodesPerDim3D[1] * m_numNodesPerDim3D[2] * 3, massSpring.getNumDof());
+}
+
+TEST_F(MassSpringRepresentationTests, NoGravityTest)
+{
+	MassSpringRepresentation massSpring("MassSpring");
+
+	massSpring.init1D(m_extremities1D, m_numNodesPerDim1D, m_totalMass1D, m_springStiffness1D, m_springDamping1D);
+	massSpring.setIsActive(true);
+	massSpring.setIsGravityEnabled(false);
+	massSpring.setIntegrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER);
+
+	massSpring.beforeUpdate(m_dt);
+	massSpring.update(m_dt);
+	massSpring.afterUpdate(m_dt);
 }
