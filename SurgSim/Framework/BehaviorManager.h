@@ -19,15 +19,12 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
 #include "SurgSim/Framework/ComponentManager.h"
 
 namespace SurgSim
 {
 namespace Framework
 {
-
-class Behavior;
 
 /// Manager to handle Behaviors. The manager will collect all the behaviors
 /// in the scene through addComponent/removeComponent calls. All the
@@ -52,8 +49,6 @@ private:
 	virtual bool doStartUp() override;
 	///Overrides BasicThread::doUpdate()
 	virtual bool doUpdate(double dt) override;
-
-	std::vector<std::shared_ptr<SurgSim::Blocks::RepresentationPoseBehavior>> m_behaviors;
 };
 
 

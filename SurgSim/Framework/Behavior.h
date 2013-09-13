@@ -23,6 +23,15 @@ namespace SurgSim
 namespace Framework
 {
 
+/// Fixed List of enums for the available behavior types, do not explicitly assign values,
+/// BEHAVIOR_TYPE_COUNT is used to determine the number of actual behavior types
+enum {
+	BEHAVIOR_TYPE_NONE = -1,
+	BEHAVIOR_TYPE_REPRESENTATIONPOSE,
+	BEHAVIOR_TYPE_INPUTVTC,
+	BEHAVIOR_TYPE_COUNT
+};
+
 /// Behaviors perform actions. They can update components, facilitate
 /// communication between components, and create new components. They are
 /// updated periodicly by the BehaviorManager through update() call.
@@ -39,6 +48,7 @@ public:
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt) = 0;
+	virtual int getBehaviorType() const { return BEHAVIOR_TYPE_NONE; }
 };
 
 }; //namespace Framework

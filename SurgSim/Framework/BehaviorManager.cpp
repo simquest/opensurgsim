@@ -68,7 +68,10 @@ bool BehaviorManager::doUpdate(double dt)
 	auto endIt = std::end(m_behaviors);
 	for ( ;  it != endIt;  ++it)
 	{
-		(*it)->update(dt);
+		if ((*it)->getBehaviorType() == SurgSim::Framework::BEHAVIOR_TYPE_REPRESENTATIONPOSE)
+		{
+			(*it)->update(dt);
+		}
 	}
 	return true;
 }

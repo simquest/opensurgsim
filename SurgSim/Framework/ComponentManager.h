@@ -37,7 +37,7 @@ class Runtime;
 class Logger;
 
 /// Base Component Manager class. Component Managers manage a collection of components.
-/// The runtime will present each new component to the manager, and it is up to 
+/// The runtime will present each new component to the manager, and it is up to
 /// the manger to decide whether to handle a component of a given type or not.
 /// Adding and removing components is thread-safe, when the [add|remove]Component
 /// call is made, the component is added to an intermediary data structure, each
@@ -115,9 +115,11 @@ protected:
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
 	///@}
-	
+
 	/// Logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+
+	std::vector<std::shared_ptr<SurgSim::Framework::Behavior>> m_behaviors;
 
 private:
 	/// Adds a component.

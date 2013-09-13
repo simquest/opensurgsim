@@ -52,7 +52,10 @@ bool InputManager::doUpdate(double dt)
 	auto endIt = std::end(m_behaviors);
 	for ( ;  it != endIt;  ++it)
 	{
-		(*it)->update(dt);
+		if ( (*it)->getBehaviorType() == SurgSim::Framework::BEHAVIOR_TYPE_INPUTVTC)
+		{
+			(*it)->update(dt);
+		}
 	}
 
 	return true;
@@ -75,11 +78,6 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 		boost::lock_guard<boost::mutex> lock(m_mutex);
 		// Early exit
 		return addOutputComponent(output);
-	}
-
-	{
-		boost::lock_guard<boost::mutex> lock(m_mutex);
-		return tryAddComponent(component, &m_behaviors) != nullptr;
 	}
 
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
