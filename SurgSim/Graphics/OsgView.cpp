@@ -122,6 +122,8 @@ bool OsgView::doWakeUp()
 	if (m_isFirstUpdate)
 	{
 		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+		m_view->getCamera()->getGraphicsContext()->getState()->setUseModelViewAndProjectionUniforms(true);
+		m_view->getCamera()->getGraphicsContext()->getState()->setUseVertexAttributeAliasing(true);
 		m_isFirstUpdate = false;
 	}
 

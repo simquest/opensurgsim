@@ -102,7 +102,7 @@ bool OsgManager::addGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && Manager::addGroup(osgGroup))
 	{
-		// Check if there are any represenations that might want to be included
+		// Check if there are any representations that might want to be included
 		// in this group
 		std::string name = group->getName();
 		auto representations = getRepresentations();
