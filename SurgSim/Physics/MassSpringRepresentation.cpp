@@ -46,10 +46,10 @@ unsigned int MassSpringRepresentation::getNumSprings(void) const
 	return m_tetrahedronMesh.getNumEdges();
 }
 
-const Mass& MassSpringRepresentation::getMass(unsigned int massId) const
+const Mass& MassSpringRepresentation::getMass(unsigned int nodeId) const
 {
-	SURGSIM_ASSERT(massId < getNumMasses()) << "Invalid mass id";
-	return m_tetrahedronMesh.getVertex(massId).data;
+	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";
+	return m_tetrahedronMesh.getVertex(nodeId).data;
 }
 
 const LinearSpring& MassSpringRepresentation::getSpring(unsigned int springId) const
@@ -60,16 +60,12 @@ const LinearSpring& MassSpringRepresentation::getSpring(unsigned int springId) c
 
 double MassSpringRepresentation::getTotalMass(void) const
 {
-	using std::vector;
-
 	double mass = 0.0;
-	const vector<Vertex<Mass>> &vertices = m_tetrahedronMesh.getVertices();
-
-	for (vector<Vertex<Mass>>::const_iterator it = vertices.begin(); it != vertices.end(); it++)
+	const std::vector<Vertex<Mass>> &vertices = m_tetrahedronMesh.getVertices();
+	for (std::vector<Vertex<Mass>>::const_iterator it = vertices.begin(); it != vertices.end(); it++)
 	{
 		mass += it->data.getMass();
 	}
-
 	return mass;
 }
 
@@ -93,18 +89,18 @@ void MassSpringRepresentation::setRayleighDampingMass(double massCoef)
 	m_rayleighDamping.massCoefficient = massCoef;
 }
 
-void MassSpringRepresentation::addBC(int nodeID)
+void MassSpringRepresentation::addBoundaryCondition(int nodeId)
 {
-	m_boundaryConditions.push_back(nodeID);
+	m_boundaryConditions.push_back(nodeId);
 }
 
-int MassSpringRepresentation::getBC(size_t bcID) const
+int MassSpringRepresentation::getBoundaryCondition(size_t bcId) const
 {
-	SURGSIM_ASSERT(bcID >= 0 && bcID < m_boundaryConditions.size()) << "Invalid boundary condition " << bcID;
-	return m_boundaryConditions[bcID];
+	SURGSIM_ASSERT(bcId >= 0 && bcId < m_boundaryConditions.size()) << "Invalid boundary condition " << bcId;
+	return m_boundaryConditions[bcId];
 }
 
-size_t MassSpringRepresentation::getNumBC(void) const
+size_t MassSpringRepresentation::getNumBoundaryConditions(void) const
 {
 	return m_boundaryConditions.size();
 }
@@ -119,7 +115,6 @@ MassSpringRepresentation::IntegrationScheme MassSpringRepresentation::getIntegra
 	return m_integrationScheme;
 }
 
-//! Initialization
 void MassSpringRepresentation::init1D(const Vector3d extremities[2], int numNodesPerDim[1],
 	double totalMass, double springStiffness, double springDamping)
 {
@@ -163,34 +158,40 @@ void MassSpringRepresentation::init1D(const Vector3d extremities[2], int numNode
 	setNumDof(numNodesPerDim[0]*3);
 }
 
-void MassSpringRepresentation::init2D(const Vector3d extremities[2][2], int numNodesPerDim[2])
+void MassSpringRepresentation::init2D(const Vector3d extremities[2][2], int numNodesPerDim[2],
+	double totalMass, double springStiffness, double springDamping)
 {
 
 }
-void MassSpringRepresentation::init3D(const Vector3d extremities[2][2][2], int numNodesPerDim[3])
+void MassSpringRepresentation::init3D(const Vector3d extremities[2][2][2], int numNodesPerDim[3],
+	double totalMass, double springStiffness, double springDamping)
 {
 
 }
 
-/// Query the representation type
-/// \return the RepresentationType for this representation
 RepresentationType MassSpringRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_MASSSPRING;
 }
 
-/// Preprocessing done before the update call
-/// \param dt The time step (in seconds)
 void MassSpringRepresentation::beforeUpdate(double dt)
 {
+	if (! isActive())
+	{
+		return;
+	}
+
 	// Backup current state into previous state
 	m_previousState = m_currentState;
 }
 
-/// Update the representation state to the current time step
-/// \param dt The time step (in seconds)
 void MassSpringRepresentation::update(double dt)
 {
+	if (! isActive())
+	{
+		return;
+	}
+
 	if (getIntegrationScheme() == INTEGRATIONSCHEME_EXPLICIT_EULER)
 	{
 		updateEulerExplicit(dt);
@@ -201,42 +202,53 @@ void MassSpringRepresentation::update(double dt)
 	}
 }
 
-/// Postprocessing done after the update call
-/// \param dt The time step (in seconds)
 void MassSpringRepresentation::afterUpdate(double dt)
 {
+	if (! isActive())
+	{
+		return;
+	}
+
 	// Backup current state into final state
 	m_finalState = m_currentState;
 }
 
-/// Apply a correction to the internal degrees of freedom
-/// \param dt The time step
-/// \param block The block of a vector containing the correction to be applied to the dof
-void MassSpringRepresentation::applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block)
+void MassSpringRepresentation::applyDofCorrection(double dt,
+	const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block)
 {
-
+	if (! isActive())
+	{
+		return;
+	}
 }
 
 void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEuler)
 {
+	m_f.setZero();
+
 	// For all node, we have m.a = F
 	// Note that at this stage, m_x and m_v contains information at time t (not t+dt)
+	// 0) Update all spring forces
 	// 1) Apply gravity to all node if gravity enabled
-	// 2) Loop through all springs and compute forces F(t) on proper nodes
+	// 2) Loop through all springs and apply forces F(t) on proper nodes
 	// 3) Compute acceleration a(t) = F(t)/m
 	// 4) Apply integration scheme 
 	//     Euler explicit               OR   Modified Euler Explicit
 	// {x(t+dt) = x(t) + dt.v(t)             {v(t+dt) = v(t) + dt.a(t)
 	// {v(t+dt) = v(t) + dt.a(t)             {x(t+dt) = x(t) + dt.v(t+dt)
-	
-	m_f.setZero();
+
+	// 0) Update all the springs forces and matrices (stiffness and damping)
+	for (unsigned int springId = 0; springId < getNumSprings(); springId++)
+	{
+		m_tetrahedronMesh.getEdge(springId).data.update(m_currentState.getPositions(), m_currentState.getVelocities());
+	}
 
 	// 1) Apply gravity
 	if (isGravityEnabled())
 	{
 		for (unsigned int nodeId = 0; nodeId < getNumMasses(); nodeId++)
 		{
-			m_f.block(3 * nodeId, 0, 3, 1) += getGravity() * getMass(nodeId).getMass();
+			m_f.block(3 * nodeId, 0, 3, 1) = getGravity() * getMass(nodeId).getMass();
 		}
 	}
 	
@@ -256,12 +268,19 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 		m_f.block(3 * nodeId, 0, 3, 1) /= getMass(nodeId).getMass();
 	}
 
+
 	// 4) Apply numerical integration scheme
 	Vector& x = m_currentState.getPositions();
 	Vector& v = m_currentState.getVelocities();
 	if (useModifiedEuler)
 	{
 		v += m_f * dt;
+		//for (std::vector<int>::const_iterator bcIt = m_boundaryConditions.begin(); bcIt != m_boundaryConditions.end(); bcIt++)
+		//{
+		//	v[3 * (*bcIt) + 0] = 0.0;
+		//	v[3 * (*bcIt) + 1] = 0.0;
+		//	v[3 * (*bcIt) + 2] = 0.0;
+		//}
 		x +=   v * dt;
 	}
 	else

@@ -124,6 +124,11 @@ public:
 	/// \return The edge id
 	/// \note No check is performed on the id
 	const EdgeType& getEdge(unsigned int id) const;
+	/// Returns the specified edge (non const version).
+	/// \param id The edge's id
+	/// \return The edge id
+	/// \note No check is performed on the id
+	EdgeType& getEdge(unsigned int id);
 
 	/// Returns the specified triangle.
 	/// \param id The triangle's id

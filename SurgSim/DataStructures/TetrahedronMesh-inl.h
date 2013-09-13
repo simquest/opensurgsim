@@ -118,6 +118,14 @@ const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronDa
 }
 
 template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
+typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::EdgeType&
+	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
+	getEdge(unsigned int id)
+{
+	return m_edges[id];
+}
+
+template <class VertexData, class EdgeData, class TriangleData, class TetrahedronData>
 const typename TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::TriangleType&
 	TetrahedronMesh<VertexData, EdgeData, TriangleData, TetrahedronData>::
 	getTriangle(unsigned int id) const

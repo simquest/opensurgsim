@@ -57,6 +57,9 @@ public:
 	const Matrix33d& getdF_dx() const { return m_dF_dx; }
 	const Matrix33d& getdF_dv() const { return m_dF_dv; }
 
+	void update(const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& x,
+		const Eigen::Matrix<double,Eigen::Dynamic,1,Eigen::DontAlign>& v) {}
+
 	bool operator ==(const LinearSpring& m) const { return true; }
 	bool operator !=(const LinearSpring& m) const { return !((*this) == m); }
 
@@ -65,45 +68,107 @@ private:
 	Matrix33d m_dF_dx, m_dF_dv;
 };
 
-/// MassSpring model
+/// MassSpring model is a specialized deformable model (a set of masses connected by springs).
+/// Note that the structure is stored into a TetrahedronMesh for the sake of reusability.
+///  -> The masses are specific data for each vertex.
+///  -> The linear springs are specific data for each edge.
+/// The class can handle 3 type of numerical integration scheme (Euler explicit, modified and implicit).
+/// The model handles damping through the Rayleigh damping (damping is a combination of mass and stiffness).
+/// Boundary conditions can be defined on the model, which are the fixed node ids.
 class MassSpringRepresentation: public DeformableRepresentation
 {
 public:
 	typedef Eigen::Matrix<double, Eigen::Dynamic,              1, Eigen::DontAlign> Vector;
 	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
 
+	/// The diverse numerical integration scheme supported
 	enum IntegrationScheme {
 		INTEGRATIONSCHEME_EXPLICIT_EULER = 0,
 		INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
 		INTEGRATIONSCHEME_IMPLICIT_EULER
 	};
 
+	/// Constructor
+	/// \param name The name of the MassSpringRepresentation
 	MassSpringRepresentation(const std::string& name);
+
+	/// Destructor
 	virtual ~MassSpringRepresentation();
 
+	/// Gets the number of masses
+	/// \return the number of masses
 	unsigned int getNumMasses(void) const;
+	/// Gets the number of springs
+	/// \return the number of springs
 	unsigned int getNumSprings(void) const;
-	const Mass& getMass(unsigned int massId) const;
+	/// Retrieves the mass of a given node
+	/// \param nodeId The node id for which the mass is requested
+	/// \return the mass attribute of a node
+	const Mass& getMass(unsigned int nodeId) const;
+	/// Retrieves a given spring from its id
+	/// \param springId The spring id for which the spring is requested
+	/// \return the spring for the given springId
 	const LinearSpring& getSpring(unsigned int springId) const;
 
+	/// Gets the total mass of the mass spring
+	/// \return The total mass of the mass spring (in Kg)
 	double getTotalMass(void) const;
 
+	/// Gets the Rayleigh stiffness parameter
+	/// \return The Rayleigh stiffness parameter
 	double getRayleighDampingStiffness(void) const;
+	/// Gets the Rayleigh mass parameter
+	/// \return The Rayleigh mass parameter
 	double getRayleighDampingMass(void) const;
+	/// Sets the Rayleigh stiffness parameter
+	/// \param stiffnessCoef The Rayleigh stiffness parameter
 	void setRayleighDampingStiffness(double stiffnessCoef);
+	/// Sets the Rayleigh mass  parameter
+	/// \param massCoef The Rayleigh mass parameter
 	void setRayleighDampingMass(double massCoef);
 
-	void addBC(int nodeID);
-	int getBC(size_t bcID) const;
-	size_t getNumBC(void) const;
+	/// Adds a boundary condition to the mass spring
+	/// \param nodeId The id of the node to fix
+	void addBoundaryCondition(int nodeId);
+	/// Gets a specific boundary condition
+	/// \param bcId The id of the boundary condition to retrieve
+	/// \return The requested boundary condition (i.e. a node id)
+	int getBoundaryCondition(size_t bcId) const;
+	/// Gets the number of boundary conditions
+	/// \return The number of boundary conditions
+	size_t getNumBoundaryConditions(void) const;
 
+	/// Sets the numerical integration scheme
+	/// \param integrationScheme The integration scheme to use
 	void setIntegrationScheme(IntegrationScheme integrationScheme);
+	/// Gets the numerical integration scheme
+	/// \return The integration scheme currently in use
 	IntegrationScheme getIntegrationScheme(void) const;
 
-	//! Initialization
-	void init1D(const Vector3d extremities[2], int numNodesPerDim[1], double totalMass, double springStiffness, double springDamping);
-	void init2D(const Vector3d extremities[2][2], int numNodesPerDim[2]);
-	void init3D(const Vector3d extremities[2][2][2], int numNodesPerDim[3]);
+	/// Initializes a 1D model
+	/// \param extremities Array of 2 positions forming the extremities of the 1D model
+	/// \param numNodesPerDim The number of nodes to be created for each dimension (here 1)
+	/// \param totalMass The total mass of the mass spring (evenly spread out on the masses)
+	/// \param springStiffness The spring stiffness for all springs
+	/// \param springDamping The spring damping for all springs
+	void init1D(const Vector3d extremities[2], int numNodesPerDim[1],
+		double totalMass, double springStiffness, double springDamping);
+	/// Initializes a 2D model
+	/// \param extremities 4 positions forming the extremities of the 2D regular model (4 corners)
+	/// \param numNodesPerDim The number of nodes to be created for each dimension (here 2)
+	/// \param totalMass The total mass of the mass spring (evenly spread out on the masses)
+	/// \param springStiffness The spring stiffness for all springs
+	/// \param springDamping The spring damping for all springs
+	void init2D(const Vector3d extremities[2][2], int numNodesPerDim[2],
+		double totalMass, double springStiffness, double springDamping);
+	/// Initializes a 3D model
+	/// \param extremities 8 positions forming the extremities of the 3D regular model (8 corners)
+	/// \param numNodesPerDim The number of nodes to be created for each dimension (here 3)
+	/// \param totalMass The total mass of the mass spring (evenly spread out on the masses)
+	/// \param springStiffness The spring stiffness for all springs
+	/// \param springDamping The spring damping for all springs
+	void init3D(const Vector3d extremities[2][2][2], int numNodesPerDim[3],
+		double totalMass, double springStiffness, double springDamping);
 
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
@@ -127,8 +192,14 @@ public:
 	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block);
 
 protected:
+	/// Allocate all the data structure for a given size
+	/// \param numDof The number of Dof to account for in all the data structure
 	void allocate(int numDof);
 
+	/// Update method for the Euler explicit numerical integration scheme
+	/// \param dt The time step
+	/// \param useModifiedEuler True if modified Euler should be used, False if not (default = false)
+	/// \note The modified Euler explicit is a semi-implicit scheme, therefore slightly more stable than explicit
 	void updateEulerExplicit(double dt, bool useModifiedEuler = false);
 
 private:
@@ -148,12 +219,6 @@ private:
 
 	/// Numerical Integration scheme (dynamic explicit/implicit solver)
 	IntegrationScheme m_integrationScheme;
-
-	///// Initial, current and previous dof position
-	//Vector m_x0, m_x, m_xprev;
-
-	///// Initial and current dof velocity
-	//Vector m_v0, m_v;
 
 	/// Current forces applied on each dof
 	Vector m_f;
