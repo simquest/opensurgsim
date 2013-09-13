@@ -81,6 +81,39 @@ public:
 		}
 
 		m_maxNumSimulationStepTest = 100;
+
+		// compute expected compliance matrix with m_param and m_state
+		{
+			//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] =
+			//                               = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
+			//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] =
+			//                               = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
+
+			// Compliance matrix for interactions:
+			// C = ( Mlinear^-1       0     )
+			//     (   0        Mangular^-1 )
+			// with Mlinear^-1  = Id33.(1/m)/(1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m)
+			// with Mangular^-1 = [I.(1/dt + alphaAngular) + Id33.alphaAngularVtc]^-1
+			m_expectedCompliance.setZero();
+
+			const SurgSim::Math::Matrix33d& R = m_state.getPose().linear();
+			SurgSim::Math::Matrix33d globalInertia = R * m_param.getLocalInertia() * R.transpose();
+
+			const double invMass = 1.0 / m_param.getMass();
+			const double linDamp = m_param.getLinearDamping();
+			const double angDamp = m_param.getAngularDamping();
+			const double vtcLinDamp = m_vtcParam.getVtcLinearDamping();
+			const double vtcLinStif = m_vtcParam.getVtcLinearStiffness();
+			const double vtcAngDamp = m_vtcParam.getVtcAngularDamping();
+
+			double coefLin = 1.0/m_dt + linDamp + (vtcLinDamp + m_dt * vtcLinStif) * invMass;
+			m_expectedCompliance(0,0) = m_expectedCompliance(1,1) = m_expectedCompliance(2,2) = invMass / coefLin;
+
+			SurgSim::Math::Matrix33d mat33;
+			const SurgSim::Math::Matrix33d id33 = SurgSim::Math::Matrix33d::Identity();
+			mat33 = globalInertia * (1.0 / m_dt + angDamp) + id33 * vtcAngDamp;
+			m_expectedCompliance.block(3,3,3,3) = mat33.inverse();
+		}
 	}
 
 	void TearDown()
@@ -90,6 +123,9 @@ public:
 	// Time step
 	double m_dt;
 	double m_dtDivergenceTest;
+
+	// Expected compliance matrix
+	Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> m_expectedCompliance;
 
 	// Rigid representation parameters
 	RigidRepresentationParameters m_param;
@@ -247,6 +283,14 @@ TEST_F(VtcRigidRepresentationTest, SetGetAndDefaultValueTest)
 	ASSERT_TRUE(rigidBody->isGravityEnabled());
 	rigidBody->setIsGravityEnabled(false);
 	ASSERT_FALSE(rigidBody->isGravityEnabled());
+
+	// Get Compliance matrix
+	{
+		// Compliance matrix is computed by the update method
+		rigidBody->update(m_dt);
+	}
+	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& C = rigidBody->getComplianceMatrix();
+	ASSERT_TRUE(C.isApprox(m_expectedCompliance)) << "C=" << C << std::endl << "Expected C=" << m_expectedCompliance;
 }
 
 TEST_F(VtcRigidRepresentationTest, NoForceTorqueTest)

@@ -74,6 +74,7 @@ option(SURGSIM_TESTS_ALL_IN_ONE
 	"Build a single binary with all unit tests.  [Does not work yet!]" OFF)
 mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
 option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
+option(SURGSIM_YAMLCPP_BUILD "Include Yaml cpp in the build" ON)
 
 set(SURGSIM_COPY_WARNING_ONCE TRUE)
 set(SURGSIM_TEST_RUN_PREFIX)
@@ -191,7 +192,7 @@ macro(surgsim_unit_test_build_only TESTNAME)
 		#     So this option does not currently do anything useful...
 	else()
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} gtest_main ${LIBS})
+		target_link_libraries(${TESTNAME} gmock_main ${LIBS})
 		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 		surgsim_copy_to_target_directory(${TESTNAME}
 			${UNIT_TEST_SHARED_LIBS})

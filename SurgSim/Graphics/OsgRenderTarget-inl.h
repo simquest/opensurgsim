@@ -95,7 +95,7 @@ std::shared_ptr<Texture> OsgRenderTarget<T>::getColorTarget(int index) const
 }
 
 template <class T>
-std::shared_ptr<T> OsgRenderTarget<T>::getColorTargetOsg(int index) const
+std::shared_ptr<OsgTexture> OsgRenderTarget<T>::getColorTargetOsg(int index) const
 {
 	std::shared_ptr<T> result;
 
@@ -133,7 +133,7 @@ std::shared_ptr<Texture> OsgRenderTarget<T>::getDepthTarget() const
 }
 
 template <class T>
-std::shared_ptr<T> OsgRenderTarget<T>::getDepthTargetOsg() const
+std::shared_ptr<OsgTexture> OsgRenderTarget<T>::getDepthTargetOsg() const
 {
 	return m_textures.at(TARGETTYPE_DEPTH);
 }

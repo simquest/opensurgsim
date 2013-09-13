@@ -20,6 +20,7 @@
 #include <unordered_map>
 
 #include <SurgSim/Graphics/RenderTarget.h>
+#include <SurgSim/Graphics/OsgTexture.h>
 #include <SurgSim/Graphics/OsgTexture2d.h>
 #include <SurgSim/Graphics/OsgTextureRectangle.h>
 
@@ -29,13 +30,30 @@ namespace SurgSim
 {
 namespace Graphics
 {
-/// Speficig implementation of the render target class.
+
+
+/// Osg abstract render target, this hides the type of the actual osg texture and lets us use
+/// OsgRenderTarget without the template type
+class OsgAbstractRenderTarget : public RenderTarget
+{
+	/// Accessor for the color target as an OsgTexture.
+	/// \param	index	Zero-based index of the color texture.
+	/// \return	The color target as an osg specific class.
+	virtual std::shared_ptr<OsgTexture> getColorTargetOsg(int index) const = 0;
+
+	/// Accessor for the depth target as an OsgTexture.
+	/// \return	The depth target as an osg specific class.
+	virtual std::shared_ptr<OsgTexture> getDepthTargetOsg() const = 0;
+};
+
+/// Specific implementation of the render target class. It is templated so different texture formats can be chosen.
 /// \tparam	T	Type of the texture that should be used as targets probably either OsgTexture2d or OsgTextureRectangle.
 template <class T>
-class OsgRenderTarget : public RenderTarget
+class OsgRenderTarget : public OsgAbstractRenderTarget
 {
 public:
 
+	/// The internal type of the texture, not exposed in the public interface
 	typedef T TextureType;
 
 	/// Default constructor
@@ -55,13 +73,30 @@ public:
 	/// \param [out]	width, height	The width and height of the RenderTarget textures.
 	virtual void getSize(int* width, int* height) const override;
 
+	/// \return	The number of color targets that are available.
 	virtual int getColorTargetCount() const override;
-	virtual std::shared_ptr<Texture> getColorTarget(int index) const override;
-	std::shared_ptr<TextureType> getColorTargetOsg(int index) const;
 
+	/// Generic accessor for a specific color target texture.
+	/// \param	index	Zero-based index of the texure.
+	/// \return	The actual Texture.
+	virtual std::shared_ptr<Texture> getColorTarget(int index) const override;
+
+	/// Accessor for the color target as an OsgTexture.
+	/// \param	index	Zero-based index of the color texture.
+	/// \return	The color target as an osg specific class.
+	std::shared_ptr<OsgTexture> getColorTargetOsg(int index) const;
+
+	/// Determines if RenderTarget does use a depth target.
+	/// \return	true if it does.
 	virtual bool doesUseDepthTarget() const override;
+
+	/// Generic accessor for the depth Target.
+	/// \return	The depth target.
 	virtual std::shared_ptr<Texture> getDepthTarget() const override;
-	std::shared_ptr<TextureType> getDepthTargetOsg() const;
+
+	/// Accessor for the depth target as an OsgTexture.
+	/// \return	The depth target as an osg specific class.
+	std::shared_ptr<OsgTexture> getDepthTargetOsg() const;
 
 private:
 
@@ -99,8 +134,11 @@ private:
 
 #include <SurgSim/Graphics/OsgRenderTarget-inl.h>
 
+///@{
+/// Predefine specialized render targets
 typedef OsgRenderTarget<OsgTexture2d> OsgRenderTarget2d;
 typedef OsgRenderTarget<OsgTextureRectangle> OsgRenderTargetRectangle;
+///@}
 
 }; // Graphics
 }; // SurgSim

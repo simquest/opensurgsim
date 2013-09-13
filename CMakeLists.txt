@@ -80,9 +80,13 @@ find_package(WDK)
 
 if(SURGSIM_TESTS_BUILD)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
-	add_subdirectory(ThirdParty/gtest)
+	add_subdirectory(ThirdParty/gmock)
 endif()
 
+if(SURGSIM_YAMLCPP_BUILD)
+	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
+	add_subdirectory(ThirdParty/yaml-cpp)
+endif()
 
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")

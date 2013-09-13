@@ -23,7 +23,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "gtest/gtest.h"
 
-#include "MockObjects.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;

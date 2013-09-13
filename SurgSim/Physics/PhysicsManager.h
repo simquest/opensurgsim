@@ -32,11 +32,14 @@ namespace Framework
 	class Component;
 }
 
+namespace Collision
+{
+	class CollisionRepresentation;
+}
 namespace Physics
 {
 
 class BuildMlcp;
-class CollisionRepresentation;
 class ContactConstraintGeneration;
 class FreeMotion;
 class DcdCollision;
@@ -45,6 +48,7 @@ class PreUpdate;
 class PushResults;
 class Representation;
 class SolveMlcp;
+using SurgSim::Collision::CollisionRepresentation;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
