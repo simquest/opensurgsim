@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_H
-#define SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_H
+#ifndef SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_H
+#define SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_H
 
 #include <memory>
 
@@ -32,7 +32,7 @@ template <class VertexType, class EdgeType, class TriangleType>
 class TriangleMeshPlaneDcdContact : public ContactCalculation
 {
 public:
-	
+
 	TriangleMeshPlaneDcdContact()
 	{
 	}

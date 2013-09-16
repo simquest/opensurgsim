@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_INL_H
-#define SURGSIM_COLLISION_TRIANGLEMESHDCDCONTACT_INL_H
+#ifndef SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_INL_H
+#define SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_INL_H
 
 namespace SurgSim
 {
@@ -29,7 +29,8 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 	std::shared_ptr<CollisionRepresentation> representationPlane(pair->getSecond());
 
 	std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh
-		(std::static_pointer_cast<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>>(representationTriangleMesh->getShape()));
+		(std::static_pointer_cast<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>>
+		(representationTriangleMesh->getShape()));
 
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 
