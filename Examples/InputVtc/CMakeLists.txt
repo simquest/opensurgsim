@@ -29,34 +29,29 @@ include_directories(
 	"${OPENTHREADS_INCLUDE_DIR}"
 )
 
-set(EXAMPLE_SOURCES
-	AddSphereBehavior.cpp
-	ExampleBouncingBalls.cpp
+set(INPUTVTCEXAMPLE_SOURCES
+	InputVtcExample.cpp
 )
 
-set(EXAMPLE_HEADERS
-	AddSphereBehavior.h
-)
+add_executable(ExampleInputVtc
+	${INPUTVTCEXAMPLE_SOURCES})
 
-# Configure the path for the data files
-configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
-)
-
-add_executable(ExampleBouncingBalls
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
-
-target_link_libraries(ExampleBouncingBalls
-	SurgSimFramework
+set(LIBS 
+	IdentityPoseDevice
+	MultiAxisDevice
 	SurgSimBlocks
 	SurgSimDataStructures
-	SurgSimPhysics
+	SurgSimFramework
 	SurgSimGraphics
 	SurgSimInput
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
+	SurgSimPhysics
+	${OPENSCENEGRAPH_LIBRARIES} 
 	${OPENTHREADS_LIBRARY}
+	${Boost_LIBRARIES})
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
+
+target_link_libraries(ExampleInputVtc
+	${LIBS}
 )

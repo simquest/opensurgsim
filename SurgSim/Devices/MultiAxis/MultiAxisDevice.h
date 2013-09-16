@@ -66,18 +66,15 @@ public:
 	virtual std::string getName() const override;
 
 	virtual bool initialize() override;
-
 	virtual bool finalize() override;
 
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
 
 	virtual bool addInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
-
 	virtual bool removeInputConsumer(std::shared_ptr<SurgSim::Input::InputConsumerInterface> inputConsumer) override;
 
 	virtual bool setOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
-
 	virtual bool removeOutputProducer(std::shared_ptr<SurgSim::Input::OutputProducerInterface> outputProducer) override;
 
 	virtual bool hasOutputProducer() override;

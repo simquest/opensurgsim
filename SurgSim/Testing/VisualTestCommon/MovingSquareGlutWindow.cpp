@@ -22,7 +22,8 @@ using SurgSim::Math::RigidTransform3d;
 
 MovingSquareGlutWindow::MovingSquareGlutWindow(const std::string& toolDeviceName, const std::string& squareDeviceName) :
 	m_toolDeviceName(toolDeviceName),
-	m_squareDeviceName(squareDeviceName)
+	m_squareDeviceName(squareDeviceName),
+	m_tool(std::make_shared<GlutGroup>())
 {
 	m_camera = std::make_shared<GlutCamera>(Vector3d(-0.15, 0.15, 0.3), Vector3d(0.0, 0.0, 0.0),
 											Vector3d(0.0, 1.0, 0.0), 45.0, 0.001, 1.0);
@@ -34,9 +35,9 @@ MovingSquareGlutWindow::MovingSquareGlutWindow(const std::string& toolDeviceName
 
 	m_toolSphere = std::make_shared<GlutSphere>(0.010, Vector3d(1.0, 1.0, 1.0));
 	std::shared_ptr<GlutAxes> toolAxes = std::make_shared<GlutAxes>(0.025, 5.0f);
-	m_tool = std::make_shared<GlutGroup>();
 	m_tool->children.push_back(m_toolSphere);
 	m_tool->children.push_back(toolAxes);
+
 	GlutRenderer::addObject(m_tool);
 
 	m_renderThread = boost::thread(boost::ref(GlutRenderer::run));
