@@ -85,9 +85,9 @@ public:
 		// compute expected compliance matrix with m_param and m_state
 		{
 			//{ Id33.m.v(t+dt).[1/dt + alphaLinear  + alphaLinearVtc/m    + dt.k_t/m] =
-			//                       = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
+			//                  = f                 + alphaLinearVtc.v(target)  + k_t.[x(target)-x(t)] + m.v(t)/dt
 			//{ I     .w(t+dt).[1/dt + alphaAngular + I^-1.alphaAngularVtc          ] =
-			//                       = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
+			//                  = t - w(t)^(I.w(t)) + alphaAngularVtc.w(target) + k_r.(alpha.u)        + I.w(t)/dt
 
 			// Compliance matrix for interactions:
 			// C = ( Mlinear^-1       0     )

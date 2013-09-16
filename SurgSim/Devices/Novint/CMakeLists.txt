@@ -16,31 +16,31 @@
 
 
 link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+set(LIBS ${LIBS} ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
-	"${OPENHAPTICS_INCLUDE_DIR}"
+	"${NOVINT_HDAL_SDK_INCLUDE_DIR}"
 )
 
-set(PHANTOM_DEVICE_SOURCES
-	PhantomDevice.cpp
-	PhantomScaffold.cpp
+set(NOVINT_DEVICE_SOURCES
+	NovintDevice.cpp
+	NovintScaffold.cpp
 )
 
-set(PHANTOM_DEVICE_HEADERS
-	PhantomDevice.h
-	PhantomScaffold.h
+set(NOVINT_DEVICE_HEADERS
+	NovintDevice.h
+	NovintScaffold.h
 )
 
 # TODO(advornik): the installation should NOT copy all the headers...
 surgsim_add_library(
-	PhantomDevice
-	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
-	SurgSim/Devices/Phantom
+	NovintDevice
+	"${NOVINT_DEVICE_SOURCES}" "${NOVINT_DEVICE_HEADERS}"
+	SurgSim/Devices/Novint
 )
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.

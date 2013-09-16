@@ -13,18 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Phantom/PhantomDevice.h"
+#include "SurgSim/Devices/Novint/NovintDevice.h"
 
 #include <iostream>
 #include <iomanip>
-
-#include <HD/hd.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Framework/Log.h>
-#include <SurgSim/Devices/Phantom/PhantomScaffold.h>
+#include <SurgSim/Devices/Novint/NovintScaffold.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/DataStructures/DataGroupBuilder.h>
 
@@ -43,14 +41,14 @@ namespace Device
 {
 
 
-PhantomDevice::PhantomDevice(const std::string& uniqueName, const std::string& initializationName) :
-	SurgSim::Input::CommonDevice(uniqueName, PhantomScaffold::buildDeviceInputData()),
+NovintDevice::NovintDevice(const std::string& uniqueName, const std::string& initializationName) :
+	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
 	m_initializationName(initializationName)
 {
 }
 
 
-PhantomDevice::~PhantomDevice()
+NovintDevice::~NovintDevice()
 {
 	if (isInitialized())
 	{
@@ -59,16 +57,16 @@ PhantomDevice::~PhantomDevice()
 }
 
 
-std::string PhantomDevice::getInitializationName() const
+std::string NovintDevice::getInitializationName() const
 {
 	return m_initializationName;
 }
 
 
-bool PhantomDevice::initialize()
+bool NovintDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<PhantomScaffold> scaffold = PhantomScaffold::getOrCreateSharedInstance();
+	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
 	if (! scaffold->registerDevice(this))
@@ -82,7 +80,7 @@ bool PhantomDevice::initialize()
 }
 
 
-bool PhantomDevice::finalize()
+bool NovintDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
@@ -92,7 +90,7 @@ bool PhantomDevice::finalize()
 }
 
 
-bool PhantomDevice::isInitialized() const
+bool NovintDevice::isInitialized() const
 {
 	return (m_scaffold != nullptr);
 }

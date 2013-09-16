@@ -44,14 +44,14 @@ public:
 	///   | type       | name        |                                                                |
 	///   | ----       | ----        | ---                                                            |
 	///   | pose       | "pose"      | %Device pose (units are meters).                               |
-	///   | bool       | "button0"   | %Device button 0 state.                                        |
-	///   | bool       | "button1"   | %Device button 1 state.                                        |
+	///   | bool       | "button1"   | State of the first device button.                              |
+	///   | bool       | "button2"   | State of the second device button (and so on).                 |
 	///
 	/// Other possible contents includes:
 	///   | type       | name        |                                                                |
 	///   | ----       | ----        |                                                                |
 	///   | bool       | "isHomed"   | %Device homing status.                                         |
-	///   | bool       | "isHomed0"  | Individual axis homing status, etc.                            |
+	///   | bool       | "isHomedX"  | Individual homing status for the X axis (and so on).           |
 	///   | bool       | "isHeld"    | Safety sensor etc. status.                                     |
 	///   | string     | "model"     | %Device model description.                                     |
 	///   | string     | "serial"    | Serial number string.                                          |
