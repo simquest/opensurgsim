@@ -98,9 +98,19 @@ public:
 	{
 		return m_vertices[id];
 	}
+	/// Returns the specified vertex (non const version).
+	VertexType& getVertex(unsigned int id)
+	{
+		return m_vertices[id];
+	}
 
 	/// Returns a vector containing the position of each vertex.
 	const std::vector<VertexType>& getVertices() const
+	{
+		return m_vertices;
+	}
+	/// Returns a vector containing the position of each vertex (non const version).
+	std::vector<VertexType>& getVertices()
 	{
 		return m_vertices;
 	}

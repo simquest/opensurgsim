@@ -66,8 +66,22 @@ const std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::Edg
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType>&
+	TriangleMesh<VertexData, EdgeData, TriangleData>::getEdges()
+{
+	return m_edges;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 const std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType>&
 	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangles() const
+{
+	return m_triangles;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType>&
+	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangles()
 {
 	return m_triangles;
 }
@@ -80,8 +94,22 @@ const typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType&
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType&
+	TriangleMesh<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id)
+{
+	return m_edges[id];
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 const typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
 	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id) const
+{
+	return m_triangles[id];
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
+	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id)
 {
 	return m_triangles[id];
 }
