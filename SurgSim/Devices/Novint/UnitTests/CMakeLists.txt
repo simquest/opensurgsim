@@ -20,21 +20,21 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	PhantomDeviceTest.cpp
-	PhantomScaffoldTest.cpp
+	NovintDeviceTest.cpp
+	NovintScaffoldTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS PhantomDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
+set(LIBS NovintDevice SurgSimInput SurgSimFramework SurgSimDataStructures
+	gtest ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by
 # default.
-option(SURGSIM_TESTS_RUN_DEVICE_PHANTOM
-	"Run the Phantom tests as part of unit tests.  (Requires hardware, OpenHaptics 3.0 and device license!)"
+option(SURGSIM_TESTS_RUN_DEVICE_NOVINT
+	"Run the Novint tests as part of unit tests.  (Requires hardware and Novint HDAL SDK!)"
 	OFF)
-surgsim_add_unit_tests(PhantomDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_PHANTOM})
+surgsim_add_unit_tests(NovintDeviceTest
+	RUN ${SURGSIM_TESTS_RUN_DEVICE_NOVINT})
