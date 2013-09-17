@@ -78,11 +78,9 @@ public:
 	std::string getNameForCallback() const;
 
 	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
-
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
 	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
-
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
 	virtual bool hasOutputProducer() override;

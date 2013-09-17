@@ -30,6 +30,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgCapsuleRepresentation.cpp
 	OsgCylinderRepresentation.cpp
 	OsgGroup.cpp
+	OsgLight.cpp
 	OsgManager.cpp
 	OsgMaterial.cpp
 	OsgPlaneRepresentation.cpp
@@ -56,6 +57,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	CapsuleRepresentation.h
 	CylinderRepresentation.h
 	Group.h
+	Light.h
 	Manager.h
 	Material.h
 	OsgBoxRepresentation.h
@@ -64,6 +66,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgConversions.h
 	OsgCylinderRepresentation.h
 	OsgGroup.h
+	OsgLight.h
 	OsgManager.h
 	OsgMaterial.h
 	OsgMatrixConversions.h

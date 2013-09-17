@@ -65,6 +65,7 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
 mark_as_advanced(Boost_DIR)
 
+find_package(NovintHdalSdk)
 # Look for platform specific pthread.
 find_package(Threads REQUIRED)
 # Append pthread and rt to Boost_LIBRARIES since they are boost dependancies
@@ -83,6 +84,10 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(ThirdParty/gmock)
 endif()
 
+if(SURGSIM_YAMLCPP_BUILD)
+	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
+	add_subdirectory(ThirdParty/yaml-cpp)
+endif()
 
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")

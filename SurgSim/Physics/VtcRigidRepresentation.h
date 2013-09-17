@@ -44,7 +44,6 @@ public:
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit VtcRigidRepresentation(const std::string& name);
-
 	/// Destructor
 	virtual ~VtcRigidRepresentation();
 
@@ -56,126 +55,69 @@ public:
 	/// \param pose The current pose (translation + rotation)
 	/// \note This is done through the Vtc proxy !
 	/// \note We let the end-user drive the Vtc, not the virtual rigid representation directly
-	void setPose(const SurgSim::Math::RigidTransform3d& pose)
-	{
-		m_currentVtcState.setPose(pose);
-	}
-
-
-	/// Set the initial parameters of the rigid representation
-	/// \param parameters The initial parameters
-	void setInitialParameters(const RigidRepresentationParameters& parameters)
-	{
-		m_initialParameters = parameters;
-		m_currentParameters = parameters;
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
-
-	/// Set the current parameters of the rigid representation
-	/// \param parameters The current parameters
-	void setCurrentParameters(const RigidRepresentationParameters& parameters)
-	{
-		m_currentParameters = parameters;
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
-
-	/// Set the initial Vtc proxy state
-	/// \param state The initial Vtc state (pose + lin/ang velocities)
-	void setInitialVtcState(const RigidRepresentationState& state)
-	{
-		m_initialVtcState = state;
-		m_currentVtcState = state;
-		m_previousVtcState = state;
-	}
-
-	/// Set the initial Vtc parameters
-	/// \param parameters The initial Vtc parameters
-	void setInitialVtcParameters(const VtcRigidParameters& parameters)
-	{
-		m_initialVtcParameters = parameters;
-		m_currentVtcParameters = parameters;
-	}
-
-	/// Set the current Vtc parameters
-	/// \param parameters The current Vtc parameters
-	void setCurrentVtcParameters(const VtcRigidParameters& parameters)
-	{
-		m_currentVtcParameters = parameters;
-	}
-
-	/// Get the initial Vtc state
-	/// \return The initial Vtc state (pose + lin/ang velocities)
-	const RigidRepresentationState& getInitialVtcState() const
-	{
-		return m_initialVtcState;
-	}
-
-	/// Get the initial Vtc parameters
-	/// \return The initial Vtc parameters
-	const VtcRigidParameters& getInitialVtcParameters() const
-	{
-		return m_initialVtcParameters;
-	}
-
-	/// Get the current Vtc state
-	/// \return The current Vtc state (pose + lin/ang velocities)
-	const RigidRepresentationState& getCurrentVtcState() const
-	{
-		return m_currentVtcState;
-	}
-
-	/// Get the previous Vtc state
-	/// \return The previous Vtc state (pose + lin/ang velocities)
-	const RigidRepresentationState& getPreviousVtcState() const
-	{
-		return m_previousVtcState;
-	}
-
-	/// Get the current Vtc parameters
-	/// \return The current Vtc parameters
-	const VtcRigidParameters& getCurrentVtcParameters() const
-	{
-		return m_currentVtcParameters;
-	}
+	/// Overrides RigidRepresentation::setPose()
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Get the final pose of the rigid representation
 	/// \return The final pose (translation + rotation)
 	/// \note The end-user set the pose of the Vtc but retrieve information from the virtual rigid representation
-	const SurgSim::Math::RigidTransform3d& getPose() const
-	{
-		return m_finalState.getPose();
-	}
+	/// Overrides SurgSim::Physics::RigidRepresentationBase::getPose()
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
+
+	/// Set the initial parameters of the rigid representation
+	/// \param parameters The initial parameters
+	void setInitialParameters(const RigidRepresentationParameters& parameters);
+	/// Set the current parameters of the rigid representation
+	/// \param parameters The current parameters
+	void setCurrentParameters(const RigidRepresentationParameters& parameters);
+
+	/// Set the initial Vtc proxy state
+	/// \param state The initial Vtc state (pose + lin/ang velocities)
+	void setInitialVtcState(const RigidRepresentationState& state);
+
+	/// Set the initial Vtc parameters
+	/// \param parameters The initial Vtc parameters
+	void setInitialVtcParameters(const VtcRigidParameters& parameters);
+	/// Set the current Vtc parameters
+	/// \param parameters The current Vtc parameters
+	void setCurrentVtcParameters(const VtcRigidParameters& parameters);
+
+	/// Get the initial Vtc state
+	/// \return The initial Vtc state (pose + lin/ang velocities)
+	const RigidRepresentationState& getInitialVtcState() const;
+	/// Get the current Vtc state
+	/// \return The current Vtc state (pose + lin/ang velocities)
+	const RigidRepresentationState& getCurrentVtcState() const;
+	/// Get the previous Vtc state
+	/// \return The previous Vtc state (pose + lin/ang velocities)
+	const RigidRepresentationState& getPreviousVtcState() const;
+
+	/// Get the initial Vtc parameters
+	/// \return The initial Vtc parameters
+	const VtcRigidParameters& getInitialVtcParameters() const;
+	/// Get the current Vtc parameters
+	/// \return The current Vtc parameters
+	const VtcRigidParameters& getCurrentVtcParameters() const;
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
+	/// Overrides SurgSim::Physics::Representation::beforeUpdate()
 	virtual void beforeUpdate(double dt) override;
-
 	/// Update the representation state to the current time step
 	/// \param dt The time step (in seconds)
-	virtual	void update(double dt) override;
-
-	/// Postprocessing done after the update call
+	/// Overrides SurgSim::Physics::Representation::update()
+	virtual void update(double dt) override;
+	/// Post-processing done after the update call
 	/// \param dt The time step (in seconds)
-	virtual	void afterUpdate(double dt) override;
+	/// Overrides SurgSim::Physics::Representation::afterUpdate()
+	virtual void afterUpdate(double dt) override;
 
 	/// Reset the rigid representation parameters to their initial values
 	/// \note Does not reset the Vtc parameters
-	void resetParameters()
-	{
-		RigidRepresentationBase::resetParameters();
-
-		m_currentParameters = m_initialParameters;
-
-		updateGlobalInertiaMatrices(m_currentState);
-	}
-
+	/// Overrides SurgSim::Physics::Representation::resetParameters()
+	virtual void resetParameters() override;
 	/// Reset the Vtc parameters to their initial values
-	void resetVtcParameters()
-	{
-		m_currentVtcParameters = m_initialVtcParameters;
-	}
+	void resetVtcParameters();
 
 	/// Retrieve the rigid body 6x6 compliance matrix (including with the Vtc compliance part)
 	/// \return the 6x6 compliance matrix
@@ -189,13 +131,11 @@ public:
 protected:
 	/// Inertia matrices in global coordinates
 	SurgSim::Math::Matrix33d m_globalInertia;
-
 	/// Inverse of inertia matrix in global coordinates
 	SurgSim::Math::Matrix33d m_invGlobalInertia;
 
 	/// Current force applied on the rigid representation (in N)
 	SurgSim::Math::Vector3d m_force;
-
 	/// Current torque applied on the rigid representation (in N.m)
 	SurgSim::Math::Vector3d m_torque;
 
@@ -211,19 +151,15 @@ private:
 	/// \param state The state of the rigid representation to use for the update
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
 
-
 	/// Initial Vtc state (useful for reset)
 	RigidRepresentationState m_initialVtcState;
-
 	/// Previous Vtc state
 	RigidRepresentationState m_previousVtcState;
-
 	/// Current Vtc state
 	RigidRepresentationState m_currentVtcState;
 
 	/// Initial Vtc parameters
 	VtcRigidParameters m_initialVtcParameters;
-
 	/// Current Vtc parameters
 	VtcRigidParameters m_currentVtcParameters;
 };

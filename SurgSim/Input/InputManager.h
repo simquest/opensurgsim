@@ -54,9 +54,9 @@ public:
 	bool removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
 private:
-	virtual bool doInitialize();
-	virtual bool doStartUp();
-	virtual bool doUpdate(double dt);
+	virtual bool doInitialize() override;
+	virtual bool doStartUp() override;
+	virtual bool doUpdate(double dt) override;
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
 	/// function in the device. For an InputComonent this will succeed if the device name
@@ -66,23 +66,21 @@ private:
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 	/// Removes the component described by component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 
 	/// Specific call for input components.
 	bool addInputComponent(const std::shared_ptr<InputComponent>& input);
-
 	/// Specific call for output components.
 	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
 
 	/// Collection of all input components.
 	std::vector<std::shared_ptr<InputComponent>> m_inputs;
-
 	/// Collection of all output components.
 	std::vector<std::shared_ptr<OutputComponent>> m_outputs;
 
@@ -95,6 +93,6 @@ private:
 	boost::mutex m_mutex;
 };
 
-}
-}
+}; //namespace Input
+}; //namespace SurgSim
 #endif
