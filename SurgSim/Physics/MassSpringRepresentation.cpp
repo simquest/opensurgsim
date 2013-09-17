@@ -338,40 +338,22 @@ void MassSpringRepresentation::allocate(int numDof)
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector *f, const Vector &v, double scale)
 {
-	//! Rayleigh damping mass
+	// Rayleigh damping mass: F = - (coeffMass.M).v
+	// M is diagonal, so this calculation can be done nodes per nodes
 	if (m_rayleighDamping.massCoefficient)
 	{
-		for (size_t nodeID = 0; nodeID < getNumMasses(); nodeID++)
+		for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
 		{
-			(*f)[3*nodeID+0] -=
-				scale * m_rayleighDamping.massCoefficient * getMassParameter(nodeID).getMass() * v[3 * nodeID + 0];
-			(*f)[3*nodeID+1] -=
-				scale * m_rayleighDamping.massCoefficient * getMassParameter(nodeID).getMass() * v[3 * nodeID + 1];
-			(*f)[3*nodeID+2] -=
-				scale * m_rayleighDamping.massCoefficient * getMassParameter(nodeID).getMass() * v[3 * nodeID + 2];
+			double mass = getMassParameter(nodeID).getMass();
+			f->segment(3 * nodeID, 3) -= scale * m_rayleighDamping.massCoefficient * mass * v.segment(3 * nodeID, 3);
 		}
 	}
 
-	//! Rayleigh damping stiffness
+	// Rayleigh damping stiffness: F = - (coeffStiffness.K).v
+	// K is not diagonal and links all dof of the 2 connected nodes
+	// We need the spring stiffness matrix to complete that part...to be completed !
 	if (m_rayleighDamping.stiffnessCoefficient)
 	{
-		//for (std::vector<LinearSpring<T> >::const_iterator it = m_springsStretching.begin();
-		//     it != m_springsStretching.end();
-		//     it++)
-		//{
-		//	//(*it).addDForceTo(f, v, v, scale*m_RayleighDampingStiffness);
-		//	int nodeID0 = (*it).getNodeID(0);
-		//	int nodeID1 = (*it).getNodeID(1);
-		//	const Matrix33& K = (*it).getDForce_dx();
-		//	Vector3 Kv = K*(v.block(3*nodeID0,0 , 3,1) - v.segment(3 * nodeID1, 3));
-		//	f[3*nodeID0+0] -= scale*m_RayleighDampingStiffness * Kv[0];
-		//	f[3*nodeID0+1] -= scale*m_RayleighDampingStiffness * Kv[1];
-		//	f[3*nodeID0+2] -= scale*m_RayleighDampingStiffness * Kv[2];
-
-		//	f[3*nodeID1+0] += scale*m_RayleighDampingStiffness * Kv[0];
-		//	f[3*nodeID1+1] += scale*m_RayleighDampingStiffness * Kv[1];
-		//	f[3*nodeID1+2] += scale*m_RayleighDampingStiffness * Kv[2];
-		//}
 	}
 }
 
@@ -379,13 +361,15 @@ void MassSpringRepresentation::addSpringForces(Vector *f, const Vector& x, const
 {
 	for (unsigned int springId = 0; springId < getNumSprings(); springId++)
 	{
-		int nodeId0 = m_finalState.getEdge(springId).vertices[0];
-		int nodeId1 = m_finalState.getEdge(springId).vertices[1];
+		unsigned int rowNodeId0 = 3 * m_finalState.getEdge(springId).vertices[0];
+		unsigned int rowNodeId1 = 3 * m_finalState.getEdge(springId).vertices[1];
+		
 		const Vector3d localF = m_finalState.getEdge(springId).data.getF(
-			x.segment(3 * nodeId0, 3), x.segment(3 * nodeId1, 3),
-			v.segment(3 * nodeId0, 3), v.segment(3 * nodeId1, 3));
-		f->segment(3 * nodeId0, 3) += localF * scale;
-		f->segment(3 * nodeId1, 3) -= localF * scale;
+			x.segment(rowNodeId0, 3), x.segment(rowNodeId1, 3),
+			v.segment(rowNodeId0, 3), v.segment(rowNodeId1, 3));
+
+		f->segment(rowNodeId0, 3) += localF * scale;
+		f->segment(rowNodeId1, 3) -= localF * scale;
 	}
 }
 
