@@ -87,8 +87,9 @@ void ComponentManager::processBehaviors(const double dt)
 	auto endIt = std::end(m_behaviors);
 	for ( ;  it != endIt;  ++it)
 	{
-		// Type must be matched for a behavior to be processed by the corresponding manager
-		// Enum for types is defined in Behavior.h
+		// Type must be matched
+		// Enum for getTargetManagerType() is defined in Behavior.h
+		// Enum for getType() is defined in ComponentManager.h
 		if ( (*it)->getTargetManagerType() == getType())
 		{
 			(*it)->update(dt);
