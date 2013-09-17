@@ -81,6 +81,7 @@ bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 	}
 
 	bool result = false;
+
 	result = sceneElement->initialize();
 
 	if (result)
@@ -96,6 +97,18 @@ bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 	return result;
 }
 
+void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components)
+{
+	auto componentsIt = std::begin(components);
+	auto componentsEnd = std::end(components);
+	for (; componentsIt != componentsEnd; ++componentsIt)
+	{
+		for (auto manager = std::begin(m_managers); manager != std::end(m_managers); ++manager)
+		{
+			(*manager)->enqueueAddComponent(*componentsIt);
+		}
+	}
+}
 
 bool Runtime::execute()
 {
@@ -134,6 +147,7 @@ bool Runtime::start()
 	{
 		(*it)->start(barrier);
 	}
+
 
 	// Wait for all the managers to initialize
 	barrier->wait(true);
@@ -230,19 +244,6 @@ void Runtime::addComponent(const std::shared_ptr<Component>& component)
 	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
 	{
 		(*it)->enqueueAddComponent(component);
-	}
-}
-
-void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components)
-{
-	auto componentsIt = std::begin(components);
-	auto componentsEnd = std::end(components);
-	for (; componentsIt != componentsEnd; ++componentsIt)
-	{
-		for (auto manager = std::begin(m_managers); manager != std::end(m_managers); ++manager)
-		{
-			(*manager)->enqueueAddComponent(*componentsIt);
-		}
 	}
 }
 
