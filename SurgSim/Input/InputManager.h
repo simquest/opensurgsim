@@ -19,7 +19,6 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-
 #include <SurgSim/Framework/ComponentManager.h>
 #include <SurgSim/Input/InputComponent.h>
 #include <SurgSim/Input/OutputComponent.h>
@@ -54,15 +53,11 @@ public:
 	/// \return	true if it succeeds, false if the device is not in.
 	bool removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
 
-	/// Overrides ComponentManager::getType()
 	virtual int getType() const override;
 
 private:
-	///Overrides BasicThread::doInitialize()
 	virtual bool doInitialize() override;
-	///Overrides BasicThread::doStartUp()
 	virtual bool doStartUp() override;
-	///Overrides BasicThread::doUpdate()
 	virtual bool doUpdate(double dt) override;
 
 	/// Adds a component, this can be either input or output, it will call the appropriate
@@ -73,19 +68,17 @@ private:
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the device cannot be found to the component
 	/// 		has already been added to the manager, and return false.
-	///Overrides ComponentManager::executeAdditions()
 	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 	/// Removes the component described by component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, it will fail if the component cannot be found and return false.
-	///Overrides ComponentManager::executeRemovals()
 	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 
 
 	/// Specific call for input components.
-	/// Link input consumer to input device, so that data produced by device can be
-	///    consumed by the component
+	/// Link input consumer to input device
+	/// Data produced by device will then be consumed by input consumer
 	bool addInputComponent(const std::shared_ptr<InputComponent>& input);
 	/// Specific call for output components.
 	bool addOutputComponent(const std::shared_ptr<OutputComponent>& output);
@@ -104,6 +97,6 @@ private:
 	boost::mutex m_mutex;
 };
 
-}
-}
+}; //namespace Input
+}; //namespace SurgSim
 #endif
