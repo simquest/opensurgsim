@@ -100,7 +100,7 @@ protected:
 	void processBehaviors(const double dt);
 
 	/// Returns the type of Manager
-	// Enum is defined in the beginning of this file
+	// Enum is defined in Behavior.h
 	virtual int getType() const = 0;
 
 	/// Helper, blocks access to the additions and removal queue and copies the components
