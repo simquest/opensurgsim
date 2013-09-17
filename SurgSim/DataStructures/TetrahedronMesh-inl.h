@@ -202,7 +202,7 @@ bool
 	{
 		for (int vertexId = 0; vertexId < 2; vertexId++)
 		{
-			if (it->vertices[vertexId] >= numVertices)
+			if (it->verticesId[vertexId] >= numVertices)
 			{
 				return false;
 			}
@@ -216,7 +216,7 @@ bool
 	{
 		for (int vertexId = 0; vertexId < 3; vertexId++)
 		{
-			if (it->vertices[vertexId] >= numVertices)
+			if (it->verticesId[vertexId] >= numVertices)
 			{
 				return false;
 			}
@@ -230,7 +230,7 @@ bool
 	{
 		for (int vertexId = 0; vertexId < 4; vertexId++)
 		{
-			if (it->vertices[vertexId] >= numVertices)
+			if (it->verticesId[vertexId] >= numVertices)
 			{
 				return false;
 			}
