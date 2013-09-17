@@ -62,7 +62,7 @@ public:
 
 	virtual int getType() const override
 	{
-		return SurgSim::Framework::MANAGER_TYPE_MOCK;
+		return SurgSim::Framework::MANAGER_TYPE_NONE;
 	}
 
 private:

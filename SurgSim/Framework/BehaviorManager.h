@@ -35,21 +35,15 @@ public:
 	BehaviorManager();
 	~BehaviorManager();
 
-	///Overrides ComponentManager::getType()
 	virtual	int BehaviorManager::getType() const override;
 
 protected:
-	///Overrides ComponentManager::executeAdditions()
 	virtual bool executeAdditions(const std::shared_ptr<Component>& component) override;
-	///Overrides ComponentManager::executeRemovals()
 	virtual bool executeRemovals(const std::shared_ptr<Component>& component) override;
 
 private:
-	///Overrides BasicThread::doInitialize()
 	virtual bool doInitialize() override;
-	///Overrides BasicThread::doStartUp()
 	virtual bool doStartUp() override;
-	///Overrides BasicThread::doUpdate()
 	virtual bool doUpdate(double dt) override;
 };
 

@@ -65,7 +65,7 @@ protected:
 	/// Return the type of manager that should be responsible for this behavior
 	virtual int getTargetManagerType() const override
 	{
-		return SurgSim::Framework::TARGET_MANAGER_TYPE_BEHAVIOR;
+		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
 	}
 
 private:

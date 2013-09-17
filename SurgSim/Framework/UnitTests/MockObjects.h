@@ -201,7 +201,7 @@ public:
 
 	virtual int getTargetManagerType() const override
 	{
-		return SurgSim::Framework::TARGET_MANAGER_TYPE_BEHAVIOR;
+		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
 	}
 
 	bool succeedWithInit;
@@ -229,7 +229,7 @@ public:
 
 	virtual int getType() const override
 	{
-		return SurgSim::Framework::MANAGER_TYPE_MOCK;
+		return SurgSim::Framework::MANAGER_TYPE_NONE;
 	}
 
 	const std::vector<std::shared_ptr<MockComponent>>& getComponents()

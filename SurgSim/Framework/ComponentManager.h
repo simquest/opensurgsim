@@ -35,19 +35,6 @@ namespace Framework
 class Runtime;
 class Logger;
 
-
-/// Fixed List of enums for the available manager types, do not explicitly assign values,
-/// MANAGER_TYPE_COUNT is used to determine the number of actual manager types
-enum {
-	MANAGER_TYPE_NONE = -1,
-	MANAGER_TYPE_BEHAVIOR,
-	MANAGER_TYPE_GRAPHICS,
-	MANAGER_TYPE_INPUT,
-	MANAGER_TYPE_MOCK,
-	MANAGER_TYPE_PHYSICS,
-	MANAGER_TYPE_COUNT
-};
-
 /// Base Component Manager class. Component Managers manage a collection of components.
 /// The runtime will present each new component to the manager, and it is up to
 /// the manger to decide whether to handle a component of a given type or not.
