@@ -150,5 +150,47 @@ TEST(OsgRepresentationTests, UpdateTest)
 	}
 }
 
+TEST(OsgRepresentationTests, GroupTest)
+{
+	std::shared_ptr<Representation> rep = std::make_shared<MockOsgRepresentation>("TestRepresentation");
+
+	EXPECT_TRUE(rep->addGroupReference("group1"));
+	EXPECT_FALSE(rep->addGroupReference("group1"));
+
+	EXPECT_TRUE(rep->addGroupReference("group2"));
+	EXPECT_TRUE(rep->addGroupReference("group3"));
+
+	std::vector<std::string> groups = rep->getGroupReferences();
+
+	EXPECT_EQ(3U, groups.size());
+
+	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group1"));
+	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group2"));
+	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group3"));
+	
+}
+
+TEST(OsgRepresentationTests, GroupsTest)
+{
+	std::shared_ptr<Representation> rep = std::make_shared<MockOsgRepresentation>("TestRepresentation");
+
+	std::vector<std::string> newGroups;
+	newGroups.push_back("group1");
+	newGroups.push_back("group1");
+	newGroups.push_back("group2");
+	newGroups.push_back("group3");
+
+	rep->addGroupReferences(newGroups);
+	std::vector<std::string> groups = rep->getGroupReferences();
+
+	EXPECT_EQ(3U, groups.size());
+
+	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group1"));
+	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group2"));
+	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group3"));
+
+
+}
+
 }  // namespace Graphics
 }  // namespace SurgSim

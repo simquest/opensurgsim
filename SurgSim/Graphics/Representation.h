@@ -75,6 +75,20 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt) = 0;
 
+	/// Add a reference to a group, this will eventual add this representation to the group with the
+	/// the same name.
+	/// \param	name	The name of the group.
+	/// \return	true if it succeeds, false if the group reference already exists.
+	virtual bool addGroupReference(const std::string& name) = 0;
+
+	/// Adds a list of group references.
+	/// \param	groups	The references.
+	virtual void addGroupReferences(const std::vector<std::string>& groups) = 0;
+
+	/// Gets group references.
+	/// \return	The group references.
+	virtual std::vector<std::string> getGroupReferences() = 0;
+
 };
 
 };  // namespace Graphics
