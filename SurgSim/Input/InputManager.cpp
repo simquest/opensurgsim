@@ -30,7 +30,7 @@ InputManager::InputManager() :
 {
 }
 
-InputManager::~InputManager(void)
+InputManager::~InputManager()
 {
 }
 
@@ -76,6 +76,26 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	return false;
 }
 
+bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
+{
+
+	bool result = false;
+	boost::lock_guard<boost::mutex> lock(m_mutex);
+	if (tryRemoveComponent(component, &m_inputs))
+	{
+		auto input = std::static_pointer_cast<InputComponent>(component);
+		input->disconnectDevice(m_devices[input->getDeviceName()]);
+		result = true;
+	}
+	else if(tryRemoveComponent(component, &m_outputs))
+	{
+		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
+		m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
+		result = true;
+	}
+	return result;
+}
+
 bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& input)
 {
 	bool result = false;
@@ -117,26 +137,6 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	{
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
 			                        output->getDeviceName() << " when adding component " << output->getName();
-	}
-	return result;
-}
-
-bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
-{
-
-	bool result = false;
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	if (tryRemoveComponent(component, &m_inputs))
-	{
-		auto input = std::static_pointer_cast<InputComponent>(component);
-		input->disconnectDevice(m_devices[input->getDeviceName()]);
-		result = true;
-	}
-	else if(tryRemoveComponent(component, &m_outputs))
-	{
-		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
-		m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
-		result = true;
 	}
 	return result;
 }
