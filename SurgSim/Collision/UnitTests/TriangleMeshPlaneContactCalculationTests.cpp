@@ -134,9 +134,6 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Physics::MeshShape<VertexT
 	std::list<std::shared_ptr<Contact>> expectedContacts;
 	if (expectedNumberOfContacts > 0)
 	{
-		unsigned int totalMeshVertices = mesh->getMesh()->getNumVertices();
-		const std::vector<SurgSim::DataStructures::Vertex<VertexType>> Vertices = mesh->getMesh()->getVertices();
-
 		generateTriangleMeshPlaneContact(expectedContacts, expectedNumberOfContacts, expectedMeshIndicesInContacts,
 			meshTrans, meshQuat, plane->getNormal(), plane->getD(), planeTrans,
 			planeQuat);
