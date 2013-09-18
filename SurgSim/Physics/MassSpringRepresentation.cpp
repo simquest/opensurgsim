@@ -41,12 +41,12 @@ MassSpringRepresentation::~MassSpringRepresentation()
 
 }
 
-unsigned int MassSpringRepresentation::getNumMasses(void) const
+unsigned int MassSpringRepresentation::getNumMasses() const
 {
 	return m_finalState.getNumVertices();
 }
 
-unsigned int MassSpringRepresentation::getNumSprings(void) const
+unsigned int MassSpringRepresentation::getNumSprings() const
 {
 	return m_finalState.getNumEdges();
 }
@@ -75,7 +75,7 @@ const TetrahedronMesh<MassParameter, LinearSpringParameter, void, void>&
 	return m_initialState;
 }
 
-double MassSpringRepresentation::getTotalMass(void) const
+double MassSpringRepresentation::getTotalMass() const
 {
 	double mass = 0.0;
 	const std::vector<Vertex<MassParameter>> &vertices = m_finalState.getVertices();
@@ -86,12 +86,12 @@ double MassSpringRepresentation::getTotalMass(void) const
 	return mass;
 }
 
-double MassSpringRepresentation::getRayleighDampingStiffness(void) const
+double MassSpringRepresentation::getRayleighDampingStiffness() const
 {
 	return m_rayleighDamping.stiffnessCoefficient;
 }
 
-double MassSpringRepresentation::getRayleighDampingMass(void) const
+double MassSpringRepresentation::getRayleighDampingMass() const
 {
 	return m_rayleighDamping.massCoefficient;
 }
@@ -111,15 +111,16 @@ void MassSpringRepresentation::addBoundaryCondition(unsigned int nodeId)
 	m_boundaryConditions.insert(nodeId);
 }
 
-unsigned int MassSpringRepresentation::getBoundaryCondition(unsigned int bcId) const
+unsigned int MassSpringRepresentation::getBoundaryCondition(unsigned int boundaryConditionId) const
 {
-	SURGSIM_ASSERT(bcId >= 0u && bcId < getNumBoundaryConditions()) << "Invalid boundary condition id " << bcId;
+	SURGSIM_ASSERT(boundaryConditionId >= 0u && boundaryConditionId < getNumBoundaryConditions()) \
+		<< "Invalid boundary condition id " << boundaryConditionId;
 	std::set<unsigned int>::const_iterator it = m_boundaryConditions.begin();
-	for (unsigned int i = 0; i < bcId; i++) it++;
+	for (unsigned int i = 0; i < boundaryConditionId; i++) it++;
 	return *it;
 }
 
-unsigned int MassSpringRepresentation::getNumBoundaryConditions(void) const
+unsigned int MassSpringRepresentation::getNumBoundaryConditions() const
 {
 	return static_cast<unsigned int>(m_boundaryConditions.size());
 }
@@ -129,7 +130,7 @@ void MassSpringRepresentation::setIntegrationScheme(IntegrationScheme integratio
 	m_integrationScheme = integrationScheme;
 }
 
-MassSpringRepresentation::IntegrationScheme MassSpringRepresentation::getIntegrationScheme(void) const
+MassSpringRepresentation::IntegrationScheme MassSpringRepresentation::getIntegrationScheme() const
 {
 	return m_integrationScheme;
 }
@@ -186,7 +187,7 @@ void MassSpringRepresentation::init1D(const Vector3d extremities[2], unsigned in
 	}
 
 	// Set the number of dof for the Representation
-	setNumDof(numNodesPerDim[0]*3);
+	setNumDof(numNodesPerDim[0] * 3);
 }
 
 void MassSpringRepresentation::init2D(const Vector3d extremities[2][2], unsigned int numNodesPerDim[2],

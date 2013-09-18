@@ -45,7 +45,7 @@ namespace Physics
 class MassSpringRepresentation: public Representation
 {
 public:
-	typedef Eigen::Matrix<double, Eigen::Dynamic,              1, Eigen::DontAlign> Vector;
+	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
 
 	/// The diverse numerical integration scheme supported
 	enum IntegrationScheme {
@@ -56,17 +56,17 @@ public:
 
 	/// Constructor
 	/// \param name The name of the MassSpringRepresentation
-	MassSpringRepresentation(const std::string& name);
+	explicit MassSpringRepresentation(const std::string& name);
 
 	/// Destructor
 	virtual ~MassSpringRepresentation();
 
 	/// Gets the number of masses
 	/// \return the number of masses
-	unsigned int getNumMasses(void) const;
+	unsigned int getNumMasses() const;
 	/// Gets the number of springs
 	/// \return the number of springs
-	unsigned int getNumSprings(void) const;
+	unsigned int getNumSprings() const;
 
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
@@ -86,14 +86,14 @@ public:
 
 	/// Gets the total mass of the mass spring
 	/// \return The total mass of the mass spring (in Kg)
-	double getTotalMass(void) const;
+	double getTotalMass() const;
 
 	/// Gets the Rayleigh stiffness parameter
 	/// \return The Rayleigh stiffness parameter
-	double getRayleighDampingStiffness(void) const;
+	double getRayleighDampingStiffness() const;
 	/// Gets the Rayleigh mass parameter
 	/// \return The Rayleigh mass parameter
-	double getRayleighDampingMass(void) const;
+	double getRayleighDampingMass() const;
 	/// Sets the Rayleigh stiffness parameter
 	/// \param stiffnessCoef The Rayleigh stiffness parameter
 	void setRayleighDampingStiffness(double stiffnessCoef);
@@ -108,17 +108,17 @@ public:
 	/// Gets a specific boundary condition
 	/// \param bcId The id of the boundary condition to retrieve
 	/// \return The requested boundary condition (i.e. a node id) or throw an exception is bcId is invalid
-	unsigned int getBoundaryCondition(unsigned int bcId) const;
+	unsigned int getBoundaryCondition(unsigned int boundaryConditionId) const;
 	/// Gets the number of boundary conditions
 	/// \return The number of boundary conditions
-	unsigned int getNumBoundaryConditions(void) const;
+	unsigned int getNumBoundaryConditions() const;
 
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
 	void setIntegrationScheme(IntegrationScheme integrationScheme);
 	/// Gets the numerical integration scheme
 	/// \return The integration scheme currently in use
-	IntegrationScheme getIntegrationScheme(void) const;
+	IntegrationScheme getIntegrationScheme() const;
 
 	/// Initializes a 1D model
 	/// \param extremities Array of 2 positions forming the extremities of the 1D model
@@ -164,27 +164,36 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block);
+	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
 
 	/// Set the initial pose of the representation
 	/// \param pose The initial pose
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose){ m_initialPose = pose; };
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override
+	{
+		m_initialPose = pose;
+	}
 
 	/// Get the initial pose of the representation
 	/// \return The initial pose (always identity)
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const { return m_initialPose; };
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override
+	{
+		return m_initialPose;
+	}
 
 	/// Set the pose of the representation
 	/// \param pose The pose to set the representation to
 	/// \note Impossible for a MassSpring (always in global space => pose = identity)
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose)
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override
 	{
 		SURGSIM_ASSERT(false) << "Cannot set the pose of a MassSpring";
 	}
 
 	/// Get the pose of the representation
 	/// \return The pose of this representation (always Identity)
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const { return m_identityPose; }
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override
+	{
+		return m_identityPose;
+	}
 
 protected:
 	/// Allocate all the data structure for a given size
