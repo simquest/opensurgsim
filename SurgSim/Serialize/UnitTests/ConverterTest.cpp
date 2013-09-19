@@ -20,7 +20,7 @@
 
 TEST(SerializeTest, ConverterVector3dTest)
 {
-	std::ofstream fout("config_vector3d.yaml");		
+	std::ofstream fout("config_vector3d.yaml");
 	YAML::Node outnode;
 
 	SurgSim::Math::Vector3d vector3(1.000001, 2.000001, 3.000001);
@@ -35,7 +35,7 @@ TEST(SerializeTest, ConverterVector3dTest)
 
 TEST(SerializeTest, ConverterVector4dTest)
 {
-	std::ofstream fout("config_vector4d.yaml");		
+	std::ofstream fout("config_vector4d.yaml");
 	YAML::Node outnode;
 
 	SurgSim::Math::Vector4d vector4(1.000001, 2.000001, 3.000001, 4.000001);
@@ -51,7 +51,7 @@ TEST(SerializeTest, ConverterVector4dTest)
 
 TEST(SerializeTest, ConverterQuaterniondTest)
 {
-	std::ofstream fout("config_quaterniond.yaml");		
+	std::ofstream fout("config_quaterniond.yaml");
 	YAML::Node outnode;
 
 	SurgSim::Math::Quaterniond quat(3, 2, 1, 1);
@@ -71,7 +71,7 @@ TEST(SerializeTest, ConverterQuaterniondTest)
 
 TEST(SerializeTest, ConverterMatrix44dTest)
 {
-	std::ofstream fout("config_matrix44d.yaml");		
+	std::ofstream fout("config_matrix44d.yaml");
 	YAML::Node outnode;
 
 	SurgSim::Math::Matrix44d mat44d;
@@ -86,13 +86,13 @@ TEST(SerializeTest, ConverterMatrix44dTest)
 
 	YAML::Node innode = YAML::LoadFile("config_matrix44d.yaml");
 	SurgSim::Math::Matrix44d expectedm44d = innode[0].as<SurgSim::Math::Matrix44d>();
-	
+
 	EXPECT_EQ(expectedm44d, mat44d);
 }
 
 TEST(SerializeTest, ConverterRigidTransform3dTest)
 {
-	std::ofstream fout("config_rigidtransform3d.yaml");		
+	std::ofstream fout("config_rigidtransform3d.yaml");
 	YAML::Node outnode;
 
 	SurgSim::Math::RigidTransform3d rigid = SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),

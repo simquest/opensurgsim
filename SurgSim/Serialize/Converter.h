@@ -16,14 +16,36 @@
 #ifndef SURGSIM_SERIALIZE_CONVERTER_H
 #define SURGSIM_SERIALIZE_CONVERTER_H
 
+#include <yaml-cpp/yaml.h>
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Math/Matrix.h>
+#include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/RigidTransform.h>
+
 #include <SurgSim/Serialize/Converter-inl.h>
 
-namespace SurgSim
-{
-namespace Serialize
-{
 
-};
+namespace YAML
+{
+	/// declaration of specialization convert<SurgSim::Math::Vector3d>
+	template <>
+	struct convert <SurgSim::Math::Vector3d>;
+
+	/// declaration of specialization convert<SurgSim::Math::Vector4d>
+	template <>
+	struct convert <SurgSim::Math::Vector4d>;
+
+	/// declaration of specialization convert<SurgSim::Math::Vector4d>
+	template <>
+	struct convert <SurgSim::Math::Quaterniond>;
+
+	/// declaration of specialization convert<SurgSim::Math::Matrix44d>
+	template <>
+	struct convert <SurgSim::Math::Matrix44d>;
+
+	/// declaration of specialization convert<SurgSim::Math::RigidTransform3d>
+	template <>
+	struct convert <SurgSim::Math::RigidTransform3d>;
 };
 
 #endif // SURGSIM_SERIALIZE_CONVERTER_H

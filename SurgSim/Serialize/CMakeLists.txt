@@ -21,7 +21,6 @@ include_directories(
 )
 
 set(SURGSIM_SERIALIZE_SOURCES
-	Converter.cpp
 )
 
 set(SURGSIM_SERIALIZE_HEADERS
@@ -35,6 +34,7 @@ surgsim_add_library(
 	"${SURGSIM_SERIALIZE_HEADERS}"
 	"SurgSim/Serialize"
 )
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()

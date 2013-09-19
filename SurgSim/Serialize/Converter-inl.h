@@ -16,12 +16,6 @@
 #ifndef SURGSIM_SERIALIZE_CONVERTER_INL_H
 #define SURGSIM_SERIALIZE_CONVERTER_INL_H
 
-#include <yaml-cpp/yaml.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-
 namespace YAML
 {
 	/// Specialize of YAML::convert<> template vector3d class.
@@ -73,14 +67,14 @@ namespace YAML
 	template <>
 	struct convert <SurgSim::Math::Quaterniond> {
 		static Node encode(const SurgSim::Math::Quaterniond& rhs) {
-			
+
 			Node node;
 			node = convert<SurgSim::Math::Vector4d>::encode(rhs.coeffs());
 			return node;
 		}
 
 		static bool decode(const Node& node, SurgSim::Math::Quaterniond& rhs) {
-			
+
 			SurgSim::Math::Vector4d coeffs;
 			convert<SurgSim::Math::Vector4d>::decode(node, rhs.coeffs());
 			return true;
