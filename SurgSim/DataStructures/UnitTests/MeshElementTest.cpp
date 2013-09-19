@@ -53,7 +53,7 @@ TEST(MeshElementTest, EdgeTest)
 	MockEdgeData edgeData(5);
 	MockEdge edge(edgeVertices, edgeData);
 
-	EXPECT_EQ(edgeVertices, edge.vertices);
+	EXPECT_EQ(edgeVertices, edge.verticesId);
 	EXPECT_EQ(edgeData, edge.data);
 
 	{
@@ -90,7 +90,7 @@ TEST(MeshElementTest, TriangleTest)
 	MockTriangleData triangleData(4, triangleEdges);
 	MockTriangle triangle(triangleVertices, triangleData);
 
-	EXPECT_EQ(triangleVertices, triangle.vertices);
+	EXPECT_EQ(triangleVertices, triangle.verticesId);
 	EXPECT_EQ(triangleData, triangle.data);
 
 	{
@@ -127,7 +127,7 @@ TEST(MeshElementTest, TetrahedronTest)
 	std::array<unsigned int, 4> tetrahedronVertices = {{5, 2, 10, 6}};
 	MockTetrahedron tetrahedron(tetrahedronVertices);
 
-	EXPECT_EQ(tetrahedronVertices, tetrahedron.vertices);
+	EXPECT_EQ(tetrahedronVertices, tetrahedron.verticesId);
 
 	/// Check comparisons
 

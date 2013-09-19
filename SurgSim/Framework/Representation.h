@@ -57,6 +57,7 @@ public:
 	/// \note getPose may or may not return the pose last sets by setPose
 	/// \note In physics, the simulation will drive the pose internally
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
+
 private:
 	virtual bool doInitialize();
 	virtual bool doWakeUp();
