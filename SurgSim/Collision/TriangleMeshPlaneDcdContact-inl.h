@@ -51,7 +51,7 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 	SurgSim::Math::Vector3d meshVertex;
 	SurgSim::Math::Vector3d meshVertexGlobal;
 
-	for (unsigned int i=0; i < totalMeshVertices; ++i)
+	for (unsigned int i = 0; i < totalMeshVertices; ++i)
 	{
 		meshVertex = mesh->getMesh()->getVertex(i).position;
 		d = planeNormal.dot(meshVertex) + planeD;
