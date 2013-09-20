@@ -22,8 +22,6 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include <SurgSim/Serialize/Converter-inl.h>
-
 
 namespace YAML
 {
@@ -47,5 +45,7 @@ namespace YAML
 	template <>
 	struct convert <SurgSim::Math::RigidTransform3d>;
 };
+
+#include <SurgSim/Serialize/Converter-inl.h>
 
 #endif // SURGSIM_SERIALIZE_CONVERTER_H
