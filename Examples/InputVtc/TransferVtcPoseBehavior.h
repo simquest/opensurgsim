@@ -18,14 +18,14 @@
 
 
 /// Behavior to copy proxy pose from Vtc representation to a representation.
-class TransferVtcProxyPoseBehavior : public SurgSim::Framework::Behavior
+class TransferVtcPoseBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	/// \param	from	VtcRigidRepresentation to get the pose
 	/// \param	to		Representation to set the pose
-	TransferVtcProxyPoseBehavior(const std::string& name,
+	TransferVtcPoseBehavior(const std::string& name,
 								 std::shared_ptr<SurgSim::Physics::VtcRigidRepresentation> from,
 								 std::shared_ptr<SurgSim::Framework::Representation> to) :
 		SurgSim::Framework::Behavior(name),
