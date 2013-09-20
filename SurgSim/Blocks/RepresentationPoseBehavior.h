@@ -124,18 +124,22 @@ private:
 
 
 
-
-class InputVtcBehavior : public SurgSim::Framework::Behavior
+class TransferInputPoseBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	/// \param	from	Representation to get the pose
-	/// \param	to	Representation to set the pose
-	InputVtcBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from,
-		std::shared_ptr<SurgSim::Physics::VtcRigidRepresentation> to) : SurgSim::Framework::Behavior(name),
+	/// \param	to		Representation to set the pose
+	/// \param	poseName Name of the pose data in the input to transfer
+	TransferInputPoseBehavior(const std::string& name,
+							  std::shared_ptr<SurgSim::Input::InputComponent> from,
+							  std::shared_ptr<SurgSim::Framework::Representation> to,
+							  const std::string& poseName = "pose") :
+		SurgSim::Framework::Behavior(name),
 		m_from(from),
-		m_to(to)
+		m_to(to),
+		m_poseName(poseName)
 	{
 	}
 
@@ -146,7 +150,7 @@ public:
 		SurgSim::DataStructures::DataGroup dataGroup;
 		m_from->getData(&dataGroup);
 		RigidTransform3d pose;
-		dataGroup.poses().get("pose", &pose);
+		dataGroup.poses().get(m_poseName, &pose);
 		m_to->setPose(pose);
 	}
 
@@ -167,6 +171,8 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 	/// Representation to set the pose
 	std::shared_ptr<SurgSim::Framework::Representation> m_to;
+
+	std::string m_poseName;
 };
 
 
