@@ -17,7 +17,7 @@
 /// Tests for the TransferPoseBehavior class.
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Blocks/UnitTests/MockObjects.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Runtime.h>

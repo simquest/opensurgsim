@@ -26,7 +26,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	BasicSceneElementTests.cpp
-	RepresentationPoseBehaviorTests.cpp
+	TransferPoseBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

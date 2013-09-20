@@ -21,7 +21,7 @@
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
 
 

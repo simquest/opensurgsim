@@ -17,7 +17,7 @@
 #include <boost/thread.hpp>
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>

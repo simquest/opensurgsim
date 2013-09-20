@@ -29,7 +29,8 @@ set(SURGSIM_BLOCKS_SOURCES
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
-	RepresentationPoseBehavior.h
+	TransferPoseBehavior.h
+	TransferInputPoseBehavior.h
 	SphereElement.h
 )
 
