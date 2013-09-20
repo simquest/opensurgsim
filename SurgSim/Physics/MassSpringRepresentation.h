@@ -224,6 +224,8 @@ protected:
 	Vector m_x, m_xPrevious;
 	/// Internal Eigen vectors to store/compute current velocity
 	Vector m_v;
+	/// Internal Eigen vectors to store/compute current acceleration
+	Vector m_a;
 	/// Internal Eigen vectors to store/compute current force
 	Vector m_f;
 

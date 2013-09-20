@@ -291,13 +291,13 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 	// 4) Compute acceleration (dividing by the mass)
 	for (unsigned int nodeId = 0; nodeId < getNumMasses(); nodeId++)
 	{
-		m_f.segment(3 * nodeId, 3) /= getMassParameter(nodeId).getMass();
+		m_a.segment(3 * nodeId, 3) = m_f.segment(3 * nodeId, 3) / getMassParameter(nodeId).getMass();
 	}
 
 	// 5) Apply numerical integration scheme
 	if (useModifiedEuler)
 	{
-		m_v += m_f * dt;
+		m_v += m_a * dt;
 		// apply the boundary conditions (v = 0 => x unchanged when updated)
 		for (std::set<unsigned int>::const_iterator bcIt = m_boundaryConditions.begin();
 			bcIt != m_boundaryConditions.end();
@@ -314,11 +314,11 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 			bcIt != m_boundaryConditions.end();
 			bcIt++)
 		{
-			m_f.segment(3 * (*bcIt), 3) = Vector3d::Zero();
+			m_a.segment(3 * (*bcIt), 3) = Vector3d::Zero();
 			m_v.segment(3 * (*bcIt), 3) = Vector3d::Zero();
 		}
 		m_x += m_v * dt;
-		m_v += m_f * dt;
+		m_v += m_a * dt;
 	}
 }
 
@@ -329,12 +329,14 @@ void MassSpringRepresentation::allocate(int numDof)
 	m_xPrevious.resize(numDof);
 	m_v.resize(numDof);
 	m_f.resize(numDof);
+	m_a.resize(numDof);
 
 	// Zero-out the 4 states
 	m_x.setZero();
 	m_xPrevious.setZero();
 	m_v.setZero();
 	m_f.setZero();
+	m_a.setZero();
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector *f, const Vector &v, double scale)

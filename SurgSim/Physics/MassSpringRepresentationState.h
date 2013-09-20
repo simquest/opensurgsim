@@ -140,17 +140,17 @@ public:
 	}
 
 	/// Get the spring force given a state
-	/// \param xA, xB The positions of the 2 nodes
-	/// \param vA, vB The velocities of the 2 nodes
+	/// \param position1, position2 The positions of the 2 nodes
+	/// \param velocity1, velocity2 The velocities of the 2 nodes
 	/// \return The Force on the 1st node. The force on the 2nd node is the opposite.
 	template <class M>
 	const Vector3d getF(
-		const Eigen::VectorBlock<M>& xA,
-		const Eigen::VectorBlock<M>& xB,
-		const Eigen::VectorBlock<M>& vA,
-		const Eigen::VectorBlock<M>& vB) const
+		const Eigen::VectorBlock<M>& position1,
+		const Eigen::VectorBlock<M>& position2,
+		const Eigen::VectorBlock<M>& velocity1,
+		const Eigen::VectorBlock<M>& velocity2) const
 	{
-		Vector3d u = xB - xA;
+		Vector3d u = position2 - position1;
 		double m_l = u.norm();
 		u /= m_l;
 
