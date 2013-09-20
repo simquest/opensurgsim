@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_BOUNCINGBALLS_ADDSPHEREBEHAVIOR_H
-#define EXAMPLES_BOUNCINGBALLS_ADDSPHEREBEHAVIOR_H
+#ifndef EXAMPLES_BOUNCINGBALLS_ADDRANDOMSPHEREBEHAVIOR_H
+#define EXAMPLES_BOUNCINGBALLS_ADDRANDOMSPHEREBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/Scene.h>
@@ -23,12 +23,12 @@
 /// AddSphereBehavior will be updated by BehaviorManager through
 /// update() call.
 
-class AddSphereBehavior : public SurgSim::Framework::Behavior
+class AddRandomSphereBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	explicit AddSphereBehavior();
+	explicit AddRandomSphereBehavior();
 
-	~AddSphereBehavior();
+	~AddRandomSphereBehavior();
 
 	virtual void update(double dt);
 
@@ -47,4 +47,4 @@ private:
 	int m_numElements;
 };
 
-#endif //EXAMPLES_BOUNCINGBALLS_ADDSPHEREBEHAVIOR_H
+#endif //EXAMPLES_BOUNCINGBALLS_ADDRANDOMSPHEREBEHAVIOR_H

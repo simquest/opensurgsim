@@ -16,7 +16,7 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include <Examples/AddSphereFromInput/ShootSphereBehavior.h>
+#include <Examples/AddSphereFromInput/AddSphereBehavior.h>
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
 #include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
@@ -194,7 +194,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 		vtcRepresentation, graphicsRepresentation2));
 	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		("Box Collision Representation", vtcRepresentation));
-	boxElement->addComponent(std::make_shared<SurgSim::Input::ShootSphereFromInputBehavior>("Input", inputComponent));
+	boxElement->addComponent(std::make_shared<SurgSim::Input::AddSphereFromInputBehavior>("Input", inputComponent));
 	return boxElement;
 }
 

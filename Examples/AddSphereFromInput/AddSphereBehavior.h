@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_ADDSPHEREFROMINPUT_SHOOTSPHEREBEHAVIOR_H
-#define EXAMPLES_ADDSPHEREFROMINPUT_SHOOTSPHEREBEHAVIOR_H
+#ifndef EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H
+#define EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H
 
 #include <SurgSim/Blocks/SphereElement.h>
 #include <SurgSim/DataStructures/DataGroup.h>
@@ -31,13 +31,13 @@ namespace SurgSim
 namespace Input
 {
 
-class ShootSphereFromInputBehavior: public SurgSim::Framework::Behavior
+class AddSphereFromInputBehavior: public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	/// \param	from	Input component to get the pose
-	ShootSphereFromInputBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
+	AddSphereFromInputBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
 		SurgSim::Framework::Behavior(name), m_from(from)
 	{
 	}
@@ -86,4 +86,4 @@ private:
 
 };  // namespace SurgSim
 
-#endif  // EXAMPLES_ADDSPHEREFROMINPUT_SHOOTSPHEREBEHAVIOR_H
+#endif  // EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H

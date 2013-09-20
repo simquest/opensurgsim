@@ -35,7 +35,7 @@ set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
 
 
 set(ADDSPHEREFROMINPUT_EXAMPLE_HEADER
-	ShootSphereBehavior.h
+	AddSphereBehavior.h
 )
 
 add_executable(ExampleAddSphereFromInput
