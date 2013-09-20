@@ -34,14 +34,14 @@ namespace Blocks
 
 /// Behavior to copy a pose from one representation to another.
 /// For example, this behavior is used to send pose updates from physics to graphics.
-class RepresentationPoseBehavior : public SurgSim::Framework::Behavior
+class TransferPoseBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	/// \param	from	Representation to get the pose
 	/// \param	to	Representation to set the pose
-	RepresentationPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Framework::Representation> from,
+	TransferPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Framework::Representation> from,
 		std::shared_ptr<SurgSim::Framework::Representation> to) : SurgSim::Framework::Behavior(name),
 		m_from(from),
 		m_to(to)

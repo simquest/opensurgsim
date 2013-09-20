@@ -26,7 +26,7 @@
 
 
 using SurgSim::Blocks::SphereElement;
-using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Collision::RigidCollisionRepresentation;
@@ -87,7 +87,7 @@ bool SphereElement::doInitialize()
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
 	addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		("Sphere Collision Representation", physicsRepresentation));

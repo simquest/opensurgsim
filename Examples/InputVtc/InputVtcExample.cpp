@@ -49,7 +49,7 @@
 #include "TransferVtcProxyPoseBehavior.h"
 
 using SurgSim::Blocks::BasicSceneElement;
-using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Blocks::TransferInputPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -114,7 +114,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
@@ -188,7 +188,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 
 	boxElement->addComponent(std::make_shared<TransferInputPoseBehavior>("Input to Vtc",
 								inputComponent, vtcRepresentation));
-	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	boxElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 								vtcRepresentation, graphicsRepresentation));
 	boxElement->addComponent(std::make_shared<TransferVtcProxyPoseBehavior>("Physics to Graphics2 Pose",
 								vtcRepresentation, graphicsRepresentation2));
