@@ -46,9 +46,10 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
+#include "TransferVtcProxyPoseBehavior.h"
+
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
-using SurgSim::Blocks::VtcToGraphicsPoseBehavior;
 using SurgSim::Blocks::TransferInputPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -189,7 +190,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 								inputComponent, vtcRepresentation));
 	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
 								vtcRepresentation, graphicsRepresentation));
-	boxElement->addComponent(std::make_shared<VtcToGraphicsPoseBehavior>("Physics to Graphics2 Pose",
+	boxElement->addComponent(std::make_shared<TransferVtcProxyPoseBehavior>("Physics to Graphics2 Pose",
 								vtcRepresentation, graphicsRepresentation2));
 	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 								("Box Collision Representation", vtcRepresentation));

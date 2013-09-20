@@ -76,54 +76,6 @@ private:
 };
 
 
-/// Behavior to copy a pose from Vtc representation to graphics representation.
-class VtcToGraphicsPoseBehavior : public SurgSim::Framework::Behavior
-{
-public:
-	/// Constructor
-	/// \param	name	Name of the behavior
-	/// \param	from	Representation to get the pose
-	/// \param	to	Representation to set the pose
-	VtcToGraphicsPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Physics::VtcRigidRepresentation> from,
-		std::shared_ptr<SurgSim::Framework::Representation> to) : SurgSim::Framework::Behavior(name),
-		m_from(from),
-		m_to(to)
-	{
-	}
-
-	/// Update the behavior
-	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt)
-	{
-		m_to->setPose(m_from->getCurrentVtcState().getPose());
-	}
-
-protected:
-	/// Initialize the behavior
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-	/// Wakeup the behavior, which copies the initial pose
-	virtual bool doWakeUp()
-	{
-		m_to->setInitialPose(m_from->getInitialPose());
-		return true;
-	}
-
-private:
-	/// Representation to get the pose
-	std::shared_ptr<SurgSim::Physics::VtcRigidRepresentation> m_from;
-	/// Representation to set the pose
-	std::shared_ptr<SurgSim::Framework::Representation> m_to;
-};
-
-
-
-
-
-
-
 class TransferInputPoseBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -174,8 +126,6 @@ private:
 
 	std::string m_poseName;
 };
-
-
 
 
 };  // namespace Blocks
