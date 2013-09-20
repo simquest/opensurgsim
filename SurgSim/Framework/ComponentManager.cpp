@@ -32,7 +32,6 @@ ComponentManager::ComponentManager(const std::string& name /*= "Unknown Componen
 
 ComponentManager::~ComponentManager()
 {
-
 }
 
 void ComponentManager::setRuntime(std::shared_ptr<Runtime> val)
@@ -54,10 +53,15 @@ bool ComponentManager::enqueueRemoveComponent(const std::shared_ptr<Component>& 
 	return true;
 }
 
+std::shared_ptr<Runtime> ComponentManager::getRuntime() const
+{
+	return m_runtime.lock();
+}
+
 void ComponentManager::processComponents()
 {
-	// Please note that the implementation of this function needs to mirror the executeInitialization() function
-	// this is called from within the update() function, the other is called at startup
+	// Please note that the implementation of this function needs to mirror the executeInitialization() function.
+	// This is called from within the update() function, and executeInitialization() is called at startup
 	std::vector<std::shared_ptr<Component>> inflightAdditions;
 	std::vector<std::shared_ptr<Component>> inflightRemovals;
 	std::vector<std::shared_ptr<Component>> actualAdditions;
@@ -74,6 +78,22 @@ void ComponentManager::processComponents()
 	if (!inflightRemovals.empty())
 	{
 		removeComponents(std::begin(inflightRemovals), std::end(inflightRemovals));
+	}
+}
+
+void ComponentManager::processBehaviors(const double dt)
+{
+	auto it = std::begin(m_behaviors);
+	auto endIt = std::end(m_behaviors);
+	for ( ;  it != endIt;  ++it)
+	{
+		// Type must be matched
+		// Enum for getTargetManagerType() is defined in Behavior.h
+		// Enum for getType() is defined in ComponentManager.h
+		if ( (*it)->getTargetManagerType() == getType())
+		{
+			(*it)->update(dt);
+		}
 	}
 }
 
@@ -131,7 +151,6 @@ void ComponentManager::copyScheduledComponents(
 	std::vector<std::shared_ptr<Component>>* inflightRemovals
 )
 {
-
 	// Lock for any more additions or removals and then copy to local storage
 	// this will insulate us from the actual add or remove call taking longer than it should
 	boost::lock_guard<boost::mutex> lock(m_componentMutex);
@@ -181,6 +200,12 @@ void ComponentManager::wakeUpComponents(const std::vector<std::shared_ptr<Compon
 			}
 		}
 	}
+}
+
+/// Returns this manager's logger
+std::shared_ptr<SurgSim::Framework::Logger> ComponentManager::getLogger() const
+{
+	return m_logger;
 }
 
 }; // Framework

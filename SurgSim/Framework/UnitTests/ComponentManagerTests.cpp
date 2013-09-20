@@ -141,3 +141,9 @@ TEST(ComponentManagerTest, DoNotWakeupForeignComponents)
 	// invalid should not be awoken ...
 	EXPECT_FALSE(invalid->isAwake());
 }
+
+TEST(ComponentManagerTests, TypeTest)
+{
+	MockManager manager;
+	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_NONE, manager.getType());
+}
