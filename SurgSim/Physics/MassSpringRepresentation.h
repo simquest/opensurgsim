@@ -21,8 +21,8 @@
 #include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/MassSpringRepresentationState.h>
 #include <SurgSim/DataStructures/TetrahedronMesh.h>
-#include <Surgsim/Math/Vector.h>
-#include <Surgsim/Math/Matrix.h>
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Math/Matrix.h>
 
 using SurgSim::DataStructures::TetrahedronMesh;
 using SurgSim::Math::Vector3d;
