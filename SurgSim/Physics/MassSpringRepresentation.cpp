@@ -364,8 +364,8 @@ void MassSpringRepresentation::addSpringForces(Vector *f, const Vector& x, const
 {
 	for (unsigned int springId = 0; springId < getNumSprings(); springId++)
 	{
-		unsigned int rowNodeId0 = 3 * m_finalState.getEdge(springId).vertices[0];
-		unsigned int rowNodeId1 = 3 * m_finalState.getEdge(springId).vertices[1];
+		unsigned int rowNodeId0 = 3 * m_finalState.getEdge(springId).verticesId[0];
+		unsigned int rowNodeId1 = 3 * m_finalState.getEdge(springId).verticesId[1];
 		
 		const Vector3d localF = m_finalState.getEdge(springId).data.getF(
 			x.segment(rowNodeId0, 3), x.segment(rowNodeId1, 3),
