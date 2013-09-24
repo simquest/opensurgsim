@@ -229,7 +229,7 @@ public:
 
 	virtual int getType() const override
 	{
-		return SurgSim::Framework::MANAGER_TYPE_NONE;
+		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
 	}
 
 	const std::vector<std::shared_ptr<MockComponent>>& getComponents()

@@ -26,7 +26,6 @@ namespace Framework
 /// Fixed List of enums for the available manager types, do not explicitly assign values,
 /// MANAGER_TYPE_COUNT is used to determine the number of actual manager types
 enum {
-	MANAGER_TYPE_NONE = -1,
 	MANAGER_TYPE_BEHAVIOR,
 	MANAGER_TYPE_GRAPHICS,
 	MANAGER_TYPE_INPUT,
@@ -52,7 +51,7 @@ public:
 	virtual void update(double dt) = 0;
 
 	/// Specifies which manger will handle this behavior
-	virtual int getTargetManagerType() const { return MANAGER_TYPE_NONE; }
+	virtual int getTargetManagerType() const { return MANAGER_TYPE_BEHAVIOR; }
 };
 
 }; //namespace Framework

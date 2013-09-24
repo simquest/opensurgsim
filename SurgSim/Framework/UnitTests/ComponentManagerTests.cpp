@@ -145,5 +145,5 @@ TEST(ComponentManagerTest, DoNotWakeupForeignComponents)
 TEST(ComponentManagerTests, TypeTest)
 {
 	MockManager manager;
-	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_NONE, manager.getType());
+	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_BEHAVIOR, manager.getType());
 }
