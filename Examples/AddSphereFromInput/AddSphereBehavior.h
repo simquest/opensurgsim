@@ -40,7 +40,6 @@ public:
 protected:
 	/// Initialize the behavior
 	virtual bool doInitialize() override;
-
 	/// Wakeup the behavior
 	virtual bool doWakeUp() override;
 

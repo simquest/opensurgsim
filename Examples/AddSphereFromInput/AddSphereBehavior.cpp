@@ -47,7 +47,7 @@ namespace Input
 		static bool previouslyPressed = false;
 		bool button1;
 		dataGroup.booleans().get("button1", &button1);
-		if( button1 && !previouslyPressed )
+		if (button1 && ! previouslyPressed )
 		{
 			std::string name = "sphereId_" + m_numElements++;
 			std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
@@ -55,7 +55,7 @@ namespace Input
 
 			getScene()->addSceneElement(m_element);
 		}
-		previouslyPressed = !previouslyPressed;
+		previouslyPressed = !button1;
 	}
 
 	bool AddSphereFromInputBehavior::doInitialize()
