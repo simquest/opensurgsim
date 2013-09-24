@@ -60,6 +60,15 @@ public:
 	/// physics simulation).
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
+	/// Set the external force being applied to the rigid representation,
+	/// not including gravity
+	/// \param force The external force
+	void setExternalForce(const SurgSim::Math::Vector3d& force);
+
+	/// Set the external torque being applied to the rigid representation
+	/// \param torque The external torque 
+	void setExternalTorque(const SurgSim::Math::Vector3d& torque);
+
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt) override;
@@ -92,6 +101,9 @@ protected:
 	SurgSim::Math::Vector3d m_force;
 	/// Current torque applied on the rigid representation (in N.m)
 	SurgSim::Math::Vector3d m_torque;
+
+	SurgSim::Math::Vector3d m_externalForce;
+	SurgSim::Math::Vector3d m_externalTorque;
 
 	/// Compliance matrix (size of the number of Dof = 6)
 	Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> m_C;

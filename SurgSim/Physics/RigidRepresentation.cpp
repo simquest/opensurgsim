@@ -30,8 +30,10 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentation::RigidRepresentation(const std::string& name)
-	: RigidRepresentationBase(name)
+RigidRepresentation::RigidRepresentation(const std::string& name) :
+	RigidRepresentationBase(name),
+	m_externalForce(SurgSim::Math::Vector3d::Zero()),
+	m_externalTorque(SurgSim::Math::Vector3d::Zero())
 {
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
@@ -47,7 +49,7 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
+void RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
 {
 	m_initialParameters = parameters;
 	m_currentParameters = parameters;
@@ -56,14 +58,24 @@ void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepr
 }
 
 
-void SurgSim::Physics::RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
+void RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
 {
 	m_currentParameters = parameters;
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-void SurgSim::Physics::RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
+void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
+}
+
+void RigidRepresentation::setExternalForce(const SurgSim::Math::Vector3d& force)
+{
+	m_externalForce = force;
+}
+
+void RigidRepresentation::setExternalTorque(const SurgSim::Math::Vector3d& torque)
+{
+	m_externalTorque = torque;
 }
 
 void RigidRepresentation::beforeUpdate(double dt)
@@ -111,6 +123,8 @@ void RigidRepresentation::update(double dt)
 	// Compute external forces/torques
 	m_force.setZero();
 	m_torque.setZero();
+	m_force += m_externalForce;
+	m_torque += m_externalTorque;
 	if (isGravityEnabled())
 	{
 		m_force += getGravity() * p.getMass();

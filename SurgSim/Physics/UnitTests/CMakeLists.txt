@@ -48,8 +48,6 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
-	VtcRigidParametersTest.cpp
-	VtcRigidRepresentationTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
