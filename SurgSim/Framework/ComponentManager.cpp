@@ -160,7 +160,7 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 {
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		tryRemoveComponent(*it, &m_behaviors)
+		tryRemoveComponent(*it, &m_behaviors);
 		executeRemovals(*it);
 	}
 }

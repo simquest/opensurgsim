@@ -26,6 +26,7 @@ namespace Framework
 /// Fixed List of enums for the available manager types, do not explicitly assign values,
 /// MANAGER_TYPE_COUNT is used to determine the number of actual manager types
 enum {
+	MANAGER_TYPE_NONE = -1,
 	MANAGER_TYPE_BEHAVIOR,
 	MANAGER_TYPE_GRAPHICS,
 	MANAGER_TYPE_INPUT,

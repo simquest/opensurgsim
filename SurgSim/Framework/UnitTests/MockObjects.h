@@ -199,11 +199,6 @@ public:
 		updateCount++;
 	}
 
-	virtual int getTargetManagerType() const override
-	{
-		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
-	}
-
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
 	bool isInitialized;
@@ -229,7 +224,7 @@ public:
 
 	virtual int getType() const override
 	{
-		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
+		return SurgSim::Framework::MANAGER_TYPE_NONE;
 	}
 
 	const std::vector<std::shared_ptr<MockComponent>>& getComponents()
