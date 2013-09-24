@@ -98,7 +98,6 @@ def run_cpplint(script, filter, files):
   if filter is not None:
     argv.extend(['--filter', filter])
   argv.extend(files)
-
   try:
     cmd = subprocess.Popen(argv, stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT)
@@ -401,14 +400,16 @@ if __name__ == '__main__':
       ok = False
 
   if args.do_cpplint:
-    # TODO(advornik): Eventually, the file list will grow so long that
-    # we start running into the OS arg list limits, and we will need
-    # to start splitting it into several separate invocations of
-    # cpplint.  But we don't have that problem yet.
-    if not run_cpplint(args.cpplint_script, args.cpplint_filter,
+    # Batch the files through cpplint, 100 at a time so we don't exceed OS limits on
+    # command size or amount of parameters
+    index = 0
+    ok = True
+    while index < len(files) :    
+        if not run_cpplint(args.cpplint_script, args.cpplint_filter,
                        filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
-                              args.files)):
-      ok = False
+                              args.files[index:index+100])):
+            ok = False
+        index += 100
 
   cmakelists_files = None
   for file in args.files:
