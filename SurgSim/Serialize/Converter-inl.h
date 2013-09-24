@@ -34,7 +34,10 @@ namespace YAML
 		static bool decode(const Node &node, SurgSim::Math::Vector3d& rhs)
 		{
 			if (! node.IsSequence() || node.size() != 3)
+			{
 				return false;
+			}
+
 			rhs[0] = node[0].as<double>();
 			rhs[1] = node[1].as<double>();
 			rhs[2] = node[2].as<double>();
@@ -58,8 +61,11 @@ namespace YAML
 		}
 
 		static bool decode(const Node& node, SurgSim::Math::Vector4d& rhs) {
-			if (! node.IsSequence() || node.size() != 4 )
+			if (! node.IsSequence() || node.size() != 4)
+			{
 				return false;
+			}
+
 			rhs[0] = node[0].as<double>();
 			rhs[1] = node[1].as<double>();
 			rhs[2] = node[2].as<double>();
@@ -82,7 +88,10 @@ namespace YAML
 		static bool decode(const Node& node, SurgSim::Math::Quaterniond& rhs)
 		{
 			if (! node.IsSequence() || node.size() != 4)
+			{
 				return false;
+			}
+
 			SurgSim::Math::Vector4d coeffs;
 			convert<SurgSim::Math::Vector4d>::decode(node, rhs.coeffs());
 			return true;
@@ -105,7 +114,9 @@ namespace YAML
 		static bool decode(const Node& node, SurgSim::Math::Matrix33d& rhs)
 		{
 			if (! node.IsSequence())
+			{
 				return false;
+			}
 
 			/// A row-major decoding
 			SurgSim::Math::Vector3d vector3d = vector3d.setZero();
@@ -134,7 +145,9 @@ namespace YAML
 		static bool decode(const Node& node, SurgSim::Math::Matrix44d& rhs)
 		{
 			if (! node.IsSequence())
+			{
 				return false;
+			}
 
 			/// A row-major decoding
 			SurgSim::Math::Vector4d vector4d = vector4d.setZero();
@@ -154,25 +167,27 @@ namespace YAML
 		static Node encode(const SurgSim::Math::RigidTransform3d& rhs)
 		{
 			Node node;
-			SurgSim::Math::Matrix44d mTransform = rhs.matrix();
-			node = convert<SurgSim::Math::Matrix44d>::encode(mTransform);
+			SurgSim::Math::Matrix44d transform = rhs.matrix();
+			node = convert<SurgSim::Math::Matrix44d>::encode(transform);
 			return node;
 		}
 
 		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs)
 		{
 			if (! node.IsSequence())
+			{
 				return false;
+			}
 
-			SurgSim::Math::Matrix44d mTransform;
-			convert<SurgSim::Math::Matrix44d>::decode(node, mTransform);
-			rhs.matrix() = mTransform;
+			SurgSim::Math::Matrix44d transform;
+			convert<SurgSim::Math::Matrix44d>::decode(node, transform);
+			rhs.matrix() = transform;
 			return true;
 		}
 	};
 
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
+	/// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs)
 	{
 		out << Flow;
@@ -180,7 +195,7 @@ namespace YAML
 		return out;
 	}
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::Vector4d type
+	/// Overload << for YAML::Emitter to support SurgSim::Math::Vector4d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector4d& rhs)
 	{
 		out << Flow;
@@ -188,39 +203,41 @@ namespace YAML
 		return out;
 	}
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::Quaterniond type
+	/// Overload << for YAML::Emitter to support SurgSim::Math::Quaterniond type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Quaterniond& rhs)
 	{
 		return (out << rhs.coeffs());
 	}
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix33d type
+	/// Overload << for YAML::Emitter to support SurgSim::Math::Matrix33d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix33d& rhs)
 	{
 		out << BeginSeq;
 		for (auto row = 0; row < rhs.rows(); ++row)
+		{
 			out << static_cast<SurgSim::Math::Vector3d>(rhs.row(row));
-
+		}
 		out << EndSeq;
 		return out;
 	}
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
+	/// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix44d& rhs)
 	{
 		out << BeginSeq;
 		for (auto row = 0; row < rhs.rows(); ++row)
+		{
 			out << static_cast<SurgSim::Math::Vector4d>(rhs.row(row));
-
+		}
 		out << EndSeq;
 		return out;
 	}
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
+	/// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs)
 	{
-		SurgSim::Math::Matrix44d mTransform = rhs.matrix();
-		return (out << mTransform);
+		SurgSim::Math::Matrix44d transform = rhs.matrix();
+		return (out << transform);
 	}
 }
 
