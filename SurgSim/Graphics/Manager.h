@@ -111,6 +111,9 @@ protected:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual bool doUpdate(double dt);
 
+	/// Overrides ComponentManager::getType()
+	virtual int getType() const override;
+
 private:
 	/// Initializes the manager
 	/// \return True if it succeeds, false if it fails

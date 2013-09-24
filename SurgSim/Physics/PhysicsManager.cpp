@@ -84,6 +84,8 @@ bool PhysicsManager::doUpdate(double dt)
 	// Add all components that came in before the last update
 	processComponents();
 
+	processBehaviors(dt);
+
 	std::list<std::shared_ptr<PhysicsManagerState>> stateList;
 	std::shared_ptr<PhysicsManagerState> state = std::make_shared<PhysicsManagerState>();
 	stateList.push_back(state);

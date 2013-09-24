@@ -185,6 +185,7 @@ bool Manager::doStartUp()
 bool Manager::doUpdate(double dt)
 {
 	processComponents();
+	processBehaviors(dt);
 
 	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
@@ -195,4 +196,9 @@ bool Manager::doUpdate(double dt)
 		(*it)->update(dt);
 	}
 	return true;
+}
+
+int Manager::getType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_GRAPHICS;
 }
