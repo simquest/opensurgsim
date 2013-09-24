@@ -50,7 +50,7 @@ namespace YAML
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector4d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector4d& rhs);
-	
+
 	// Overload << for YAML::Emitter to support SurgSim::Math::Quaterniond type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Quaterniond& rhs);
 

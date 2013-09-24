@@ -216,7 +216,7 @@ namespace YAML
 		return out;
 	}
 
-	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
+	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs)
 	{
 		SurgSim::Math::Matrix44d mTransform = rhs.matrix();
