@@ -16,14 +16,8 @@
 #ifndef EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H
 #define EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H
 
-#include <SurgSim/Blocks/SphereElement.h>
-#include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/Framework/Scene.h>
-
-using SurgSim::Math::RigidTransform3d;
 
 namespace SurgSim
 {
@@ -37,52 +31,25 @@ public:
 	/// Constructor
 	/// \param	name	Name of the behavior
 	/// \param	from	Input component to get the pose
-	AddSphereFromInputBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
-		SurgSim::Framework::Behavior(name), m_from(from)
-	{
-	}
+	AddSphereFromInputBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt)
-	{
-		SurgSim::DataStructures::DataGroup dataGroup;
-		m_from->getData(&dataGroup);
-		RigidTransform3d pose;
-		dataGroup.poses().get("pose", &pose);
-
-		// Dynamically add sphere to the scene from input
-		static int m_numElements = 0;
-		bool button1;
-		dataGroup.booleans().get("button1", &button1);
-		if( button1 )
-		{
-			std::string name = "sphereId_" + m_numElements++;
-			std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
-				std::make_shared<SurgSim::Blocks::SphereElement>(name, pose);
-
-			getScene()->addSceneElement(m_element);
-		}
-	}
+	virtual void update(double dt) override;
 
 protected:
 	/// Initialize the behavior
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-	/// Wakeup the behavior, which copies the initial pose
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
+	virtual bool doInitialize() override;
+
+	/// Wakeup the behavior
+	virtual bool doWakeUp() override;
 
 private:
 	/// Input component to get the pose
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 };
 
-};  // namespace Blocks
+};  // namespace Input
 
 };  // namespace SurgSim
 

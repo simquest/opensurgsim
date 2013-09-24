@@ -30,6 +30,7 @@ include_directories(
 )
 
 set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
+	AddSphereBehavior.cpp
 	AddSphereFromInput.cpp
 )
 

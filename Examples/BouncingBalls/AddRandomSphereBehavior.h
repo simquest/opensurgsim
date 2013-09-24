@@ -22,28 +22,39 @@
 /// An example class to add sphere elements into scene dynamically.
 /// AddSphereBehavior will be updated by BehaviorManager through
 /// update() call.
-
 class AddRandomSphereBehavior : public SurgSim::Framework::Behavior
 {
 public:
+	/// Constructor
 	explicit AddRandomSphereBehavior();
 
+	/// Destructor
 	~AddRandomSphereBehavior();
 
+	/// Update the behavior
+	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt);
 
 protected:
+
+	/// Initialize the behavior
 	virtual bool doInitialize()
 	{
 		return true;
 	}
+
+	/// Wakeup the behavior
 	virtual bool doWakeUp()
 	{
 		return true;
 	}
 
 private:
+
+	/// Control how often a sphere is added
 	double m_totalTime;
+
+	/// Record how many sphere have been added
 	int m_numElements;
 };
 
