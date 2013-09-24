@@ -45,9 +45,13 @@ public:
 
 	/// Sets the view component that provides the visualization of the graphics representations
 	/// Only allows OsgView components, any other will not be set and it will return false.
-	/// \return	True if it succeeds, false if it fails
+	/// \param view The view that should be used.
+	/// \return	True if it succeeds, false if it fails.
 	virtual bool setView(std::shared_ptr<View> view);
 
+	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
+	/// the OSG input events rather than reading from the OpenSurgSim input. 
+	/// \param val whether to enable the manipulator or not.
 	void enableManipulator(bool val);
 
 private:

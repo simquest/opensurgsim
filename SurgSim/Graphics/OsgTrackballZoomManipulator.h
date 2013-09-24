@@ -54,8 +54,8 @@ public:
 	/// Sets the minimum amount to change the zoom factor in one step
 	/// \param amount Minimum zoom amount
 	virtual void setMinZoomAmount(double amount);
+
 	/// Gets the minimum amount to change the zoom factor in one step
-	
 	/// \return Minimum zoom factor
 	double getMinZoomAmount() const;//
 
@@ -76,7 +76,7 @@ public:
 	double getZoomFactor() const;
 
 	/// Sets the scale applied to the zoom factor before it is applied to the FOV
-	/// \param scale Scale applied to the zoom factor
+	/// \param factor Scale applied to the zoom factor
 	virtual void setZoomFactorScale(double factor);
 
 	/// Gets the current zoom factor
@@ -114,11 +114,13 @@ protected:
 	/// Handle keyboard CTRL-U events to make the view upright
 	/// \param eventAdapter Event adapter
 	/// \param actionAdapter Action adapter
+	/// \return true if the event was handled, false otherwise
 	virtual bool handle(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter);
 
 	/// Handle mouse wheel scrolling to zoom in or out
 	/// \param eventAdapter Event adapter
 	/// \param actionAdapter Action adapter
+	/// \return true if the mouse wheel was handled, false otherwise
 	virtual bool handleMouseWheel(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter);
 };
 
