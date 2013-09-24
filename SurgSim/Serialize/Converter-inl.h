@@ -89,6 +89,35 @@ namespace YAML
 		}
 	};
 
+	/// Specialize of YAML::convert<> template maxtrix33d class.
+	template <>
+	struct convert <SurgSim::Math::Matrix33d>
+	{
+		static Node encode(const SurgSim::Math::Matrix33d& rhs)
+		{
+			Node node;
+			/// A row-major encoding
+			for (auto row = 0; row < rhs.rows(); ++row)
+				node.push_back(convert<SurgSim::Math::Vector3d>::encode(rhs.row(row)));
+			return node;
+		}
+
+		static bool decode(const Node& node, SurgSim::Math::Matrix33d& rhs)
+		{
+			if (! node.IsSequence())
+				return false;
+
+			/// A row-major decoding
+			SurgSim::Math::Vector3d vector3d = vector3d.setZero();
+			for (auto row = 0; row < rhs.rows(); ++row)
+			{
+				convert<SurgSim::Math::Vector3d>::decode(node[row], vector3d);
+				rhs.row(row) = vector3d;
+			}
+			return true;
+		}
+	};
+
 	/// Specialize of YAML::convert<> template maxtrix44d class.
 	template <>
 	struct convert <SurgSim::Math::Matrix44d>
@@ -130,7 +159,7 @@ namespace YAML
 			return node;
 		}
 
-		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs) 
+		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs)
 		{
 			if (! node.IsSequence())
 				return false;
@@ -142,6 +171,57 @@ namespace YAML
 		}
 	};
 
+
+	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
+	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs)
+	{
+		out << Flow;
+		out << BeginSeq << rhs[0] << rhs[1] << rhs[2] << EndSeq;
+		return out;
+	}
+
+	// Overload << for YAML::Emitter to support SurgSim::Math::Vector4d type
+	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector4d& rhs)
+	{
+		out << Flow;
+		out << BeginSeq << rhs[0] << rhs[1] << rhs[2] << rhs[3] << EndSeq;
+		return out;
+	}
+
+	// Overload << for YAML::Emitter to support SurgSim::Math::Quaterniond type
+	Emitter& operator << (Emitter& out, const SurgSim::Math::Quaterniond& rhs)
+	{
+		return (out << rhs.coeffs());
+	}
+
+	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix33d type
+	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix33d& rhs)
+	{
+		out << BeginSeq;
+		for (auto row = 0; row < rhs.rows(); ++row)
+			out << static_cast<SurgSim::Math::Vector3d>(rhs.row(row));
+
+		out << EndSeq;
+		return out;
+	}
+
+	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
+	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix44d& rhs)
+	{
+		out << BeginSeq;
+		for (auto row = 0; row < rhs.rows(); ++row)
+			out << static_cast<SurgSim::Math::Vector4d>(rhs.row(row));
+
+		out << EndSeq;
+		return out;
+	}
+
+	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
+	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs)
+	{
+		SurgSim::Math::Matrix44d mTransform = rhs.matrix();
+		return (out << mTransform);
+	}
 }
 
 #endif // SURGSIM_SERIALIZE_CONVERTER_INL_H

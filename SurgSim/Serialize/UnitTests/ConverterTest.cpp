@@ -18,38 +18,50 @@
 #include <gtest/gtest.h>
 #include <SurgSim/Serialize/Converter.h>
 
-TEST(SerializeTest, ConverterVector3dTest)
+TEST(SerializeTest, ConverterVector3dEmitterTest)
 {
 	std::ofstream fout("config_vector3d.yaml");
-	YAML::Node outnode;
+	YAML::Emitter outnode(fout);
 
 	SurgSim::Math::Vector3d vector3(1.000001, 2.000001, 3.000001);
-	outnode.push_back(vector3);
-	fout << outnode;
+	outnode << vector3;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile("config_vector3d.yaml");
-	SurgSim::Math::Vector3d expectedv3d = innode[0].as<SurgSim::Math::Vector3d>();
+	SurgSim::Math::Vector3d expectedv3d = innode.as<SurgSim::Math::Vector3d>();
 	EXPECT_EQ(expectedv3d, vector3);
 }
 
-TEST(SerializeTest, ConverterVector4dTest)
+TEST(SerializeTest, ConverterVector4dNodeTest)
 {
 	std::ofstream fout("config_vector4d.yaml");
 	YAML::Node outnode;
 
 	SurgSim::Math::Vector4d vector4(1.000001, 2.000001, 3.000001, 4.000001);
-	outnode.push_back(vector4);
+	outnode = vector4;
 	fout << outnode;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile("config_vector4d.yaml");
-	SurgSim::Math::Vector4d expectedv4d = innode[0].as<SurgSim::Math::Vector4d>();
+	SurgSim::Math::Vector4d expectedv4d = innode.as<SurgSim::Math::Vector4d>();
 	EXPECT_EQ(expectedv4d, vector4);
 }
 
+TEST(SerializeTest, ConverterVector4dEmitterTest)
+{
+	std::ofstream fout("config_vector4d.yaml");
+	YAML::Emitter outnode(fout);
 
-TEST(SerializeTest, ConverterQuaterniondTest)
+	SurgSim::Math::Vector4d vector4(1.000001, 2.000001, 3.000001, 4.000001);
+	outnode <<  vector4;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile("config_vector4d.yaml");
+	SurgSim::Math::Vector4d expectedv4d = innode.as<SurgSim::Math::Vector4d>();
+	EXPECT_EQ(expectedv4d, vector4);
+}
+
+TEST(SerializeTest, ConverterQuaterniondNodeTest)
 {
 	std::ofstream fout("config_quaterniond.yaml");
 	YAML::Node outnode;
@@ -68,8 +80,64 @@ TEST(SerializeTest, ConverterQuaterniondTest)
 	EXPECT_EQ(expectedQuat.w(), quat.w());
 }
 
+TEST(SerializeTest, ConverterQuaterniondEmitterTest)
+{
+	std::ofstream fout("config_quaterniond.yaml");
+	YAML::Emitter outnode(fout);
 
-TEST(SerializeTest, ConverterMatrix44dTest)
+	SurgSim::Math::Quaterniond quat(3, 2, 1, 1);
+	outnode << quat;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile("config_quaterniond.yaml");
+	SurgSim::Math::Quaterniond expectedQuat = innode.as<SurgSim::Math::Quaterniond>();
+
+	EXPECT_EQ(expectedQuat.x(), quat.x());
+	EXPECT_EQ(expectedQuat.y(), quat.y());
+	EXPECT_EQ(expectedQuat.z(), quat.z());
+	EXPECT_EQ(expectedQuat.w(), quat.w());
+}
+
+TEST(SerializeTest, ConverterMatrix33dNodeTest)
+{
+	std::ofstream fout("config_matrix33d.yaml");
+	YAML::Node outnode;
+
+	SurgSim::Math::Matrix33d mat33d;
+	mat33d <<	1, 2, 3,
+		3, 2, 1,
+		1, 2, 3;
+
+	outnode = mat33d;
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile("config_matrix33d.yaml");
+	SurgSim::Math::Matrix33d expectedm33d = innode.as<SurgSim::Math::Matrix33d>();
+
+	EXPECT_EQ(expectedm33d, mat33d);
+}
+
+TEST(SerializeTest, ConverterMatrix33dEmitterTest)
+{
+	std::ofstream fout("config_matrix33d.yaml");
+	YAML::Emitter outnode(fout);
+
+	SurgSim::Math::Matrix33d mat33d;
+	mat33d <<	1, 2, 3,
+		3, 2, 1,
+		1, 2, 3;
+
+	outnode << mat33d;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile("config_matrix33d.yaml");
+	SurgSim::Math::Matrix33d expectedm33d = innode.as<SurgSim::Math::Matrix33d>();
+
+	EXPECT_EQ(expectedm33d, mat33d);
+}
+
+TEST(SerializeTest, ConverterMatrix44dNodeTest)
 {
 	std::ofstream fout("config_matrix44d.yaml");
 	YAML::Node outnode;
@@ -80,17 +148,37 @@ TEST(SerializeTest, ConverterMatrix44dTest)
 				1, 2, 3, 4,
 				4, 3, 2, 1;
 
-	outnode.push_back(mat44d);
+	outnode = mat44d;
 	fout << outnode;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile("config_matrix44d.yaml");
-	SurgSim::Math::Matrix44d expectedm44d = innode[0].as<SurgSim::Math::Matrix44d>();
+	SurgSim::Math::Matrix44d expectedm44d = innode.as<SurgSim::Math::Matrix44d>();
 
 	EXPECT_EQ(expectedm44d, mat44d);
 }
 
-TEST(SerializeTest, ConverterRigidTransform3dTest)
+TEST(SerializeTest, ConverterMatrix44dEmitterTest)
+{
+	std::ofstream fout("config_matrix44d.yaml");
+	YAML::Emitter outnode(fout);
+
+	SurgSim::Math::Matrix44d mat44d;
+	mat44d <<	1, 2, 3, 4,
+		4, 3, 2, 1,
+		1, 2, 3, 4,
+		4, 3, 2, 1;
+
+	outnode << mat44d;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile("config_matrix44d.yaml");
+	SurgSim::Math::Matrix44d expectedm44d = innode.as<SurgSim::Math::Matrix44d>();
+
+	EXPECT_EQ(expectedm44d, mat44d);
+}
+
+TEST(SerializeTest, ConverterRigidTransform3dNodeTest)
 {
 	std::ofstream fout("config_rigidtransform3d.yaml");
 	YAML::Node outnode;
@@ -98,12 +186,29 @@ TEST(SerializeTest, ConverterRigidTransform3dTest)
 	SurgSim::Math::RigidTransform3d rigid = SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
 		SurgSim::Math::Vector3d(1.0, 2.0, 3.0));
 
-	outnode.push_back(rigid);
+	outnode = rigid;
 	fout << outnode;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile("config_rigidtransform3d.yaml");
-	SurgSim::Math::RigidTransform3d expectedRigid = innode[0].as<SurgSim::Math::RigidTransform3d>();
+	SurgSim::Math::RigidTransform3d expectedRigid = innode.as<SurgSim::Math::RigidTransform3d>();
+
+	EXPECT_EQ(expectedRigid.matrix(), rigid.matrix());
+}
+
+TEST(SerializeTest, ConverterRigidTransform3dEmitterTest)
+{
+	std::ofstream fout("config_rigidtransform3d.yaml");
+	YAML::Emitter outnode(fout);
+
+	SurgSim::Math::RigidTransform3d rigid = SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
+		SurgSim::Math::Vector3d(1.0, 2.0, 3.0));
+
+	outnode << rigid;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile("config_rigidtransform3d.yaml");
+	SurgSim::Math::RigidTransform3d expectedRigid = innode.as<SurgSim::Math::RigidTransform3d>();
 
 	EXPECT_EQ(expectedRigid.matrix(), rigid.matrix());
 }
