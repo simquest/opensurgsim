@@ -17,8 +17,10 @@
 #include <osgUtil/UpdateVisitor>
 
 /// Calculate the key code value of Ctrl-{character}, given the uppercase character.
-//  If a key is pressed while holding Ctrl, OSG "helpfully" gives you the key code of the control character (i.e. ^A == 1) instead of the key itself ('A' == 65).
-//  To cope with this, you can use CONTROL_CHAR_FROM_UPPERCASE('A') which is easier to read than strange character ('\001') or integral (1) constants.
+/// If a key is pressed while holding Ctrl, OSG "helpfully" gives you the key code of the control character 
+/// (i.e. ^A == 1) instead of the key itself ('A' == 65).
+/// To cope with this, you can use CONTROL_CHAR_FROM_UPPERCASE('A') which is easier to read than 
+/// strange character ('\001') or integral (1) constants.
 #define CONTROL_CHAR_FROM_UPPERCASE(uppercaseCharacter)   ((uppercaseCharacter) - ('A' - 1))
 
 namespace SurgSim
@@ -28,7 +30,12 @@ namespace Graphics
 
 OsgTrackballZoomManipulator::OsgTrackballZoomManipulator() :
 	osgGA::TrackballManipulator(),
-	m_minZoomFactor(0.05), m_maxZoomFactor(1.0), m_minZoomAmount(0.01), m_maxZoomAmount(1.0), m_zoomFactor(1.0), m_zoomFactorScale(1.0)
+	m_minZoomFactor(0.05),
+	m_maxZoomFactor(1.0),
+	m_minZoomAmount(0.01),
+	m_maxZoomAmount(1.0),
+	m_zoomFactor(1.0),
+	m_zoomFactorScale(1.0)
 {
 }
 
@@ -139,7 +146,9 @@ void OsgTrackballZoomManipulator::makeUpright()
 	setRotation(rotationMatrix.getRotate());
 }
 
-bool OsgTrackballZoomManipulator::handle(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter)
+bool OsgTrackballZoomManipulator::handle(
+	const osgGA::GUIEventAdapter& eventAdapter,
+	osgGA::GUIActionAdapter& actionAdapter)
 {
 	unsigned int mask = eventAdapter.getModKeyMask();
 
@@ -155,7 +164,9 @@ bool OsgTrackballZoomManipulator::handle(const osgGA::GUIEventAdapter& eventAdap
 			case CONTROL_CHAR_FROM_UPPERCASE('U'):
 				{
 					// ctrl-U makes the camera upright, so that the up axis points up
-					if ((mask & osgGA::GUIEventAdapter::MODKEY_CTRL) && !(mask & osgGA::GUIEventAdapter::MODKEY_ALT) && !(mask & osgGA::GUIEventAdapter::MODKEY_SHIFT))
+					if ((mask & osgGA::GUIEventAdapter::MODKEY_CTRL) && 
+						!(mask & osgGA::GUIEventAdapter::MODKEY_ALT) && 
+						!(mask & osgGA::GUIEventAdapter::MODKEY_SHIFT))
 					{
 						makeUpright();
 					}
@@ -168,7 +179,9 @@ bool OsgTrackballZoomManipulator::handle(const osgGA::GUIEventAdapter& eventAdap
 	return osgGA::TrackballManipulator::handle(eventAdapter, actionAdapter);
 }
 
-bool OsgTrackballZoomManipulator::handleMouseWheel(const osgGA::GUIEventAdapter& eventAdapter, osgGA::GUIActionAdapter& actionAdapter)
+bool OsgTrackballZoomManipulator::handleMouseWheel(
+	const osgGA::GUIEventAdapter& eventAdapter,
+	osgGA::GUIActionAdapter& actionAdapter)
 {
 	osgGA::GUIEventAdapter::ScrollingMotion scrollingMotion = eventAdapter.getScrollingMotion();
 

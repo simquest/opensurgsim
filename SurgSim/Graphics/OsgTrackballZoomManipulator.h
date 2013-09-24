@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_TRACKBALLZOOMMANIPULATOR
-#define SURGSIM_GRAPHICS_TRACKBALLZOOMMANIPULATOR
+#ifndef SURGSIM_GRAPHICS_OSGTRACKBALLZOOMMANIPULATOR_H
+#define SURGSIM_GRAPHICS_OSGTRACKBALLZOOMMANIPULATOR_H
 
 #include <osgGA/TrackballManipulator>
 
