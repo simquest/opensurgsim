@@ -41,20 +41,8 @@ namespace Math
 
 //! MLCP_GaussSeidel::solve Resolution of a given MLCP (Gauss Seidel iterative solver)
 /*!
-@param n
-IN 1st dimension of the matrix A (=number of atomic constraint)
-@param A
-IN Matrix A defining the LHS MLCP
-@param nbColumnInA
-IN number of actual column in Matrix A (alocated in memory)
-@param b
-IN Vector b defining the RHS LCP
-@param initalGuess_and_solution
-INOUT Vector of initial guess and solution
-@param frictionCoefs
-IN vector containing the friction coefficient for each constraint
-@param vector<MlcpConstraintType>
-IN list of constraint type useful to define the number of atomic constraint per entry and how to handle each constraint.
+@param problem The mlcp problem
+@param solution The mlcp solution
 */
 bool MlcpGaussSeidelSolver::solve(const MlcpProblem& problem, MlcpSolution* solution)
 {

@@ -106,8 +106,8 @@ public:
 	/// \note
 	void addBoundaryCondition(unsigned int nodeId);
 	/// Gets a specific boundary condition
-	/// \param bcId The id of the boundary condition to retrieve
-	/// \return The requested boundary condition (i.e. a node id) or throw an exception is bcId is invalid
+	/// \param boundaryConditionId The id of the boundary condition to retrieve
+	/// \return The requested boundary condition (i.e. a node id) or throw an exception for invalid boundaryConditionId
 	unsigned int getBoundaryCondition(unsigned int boundaryConditionId) const;
 	/// Gets the number of boundary conditions
 	/// \return The number of boundary conditions
@@ -164,7 +164,8 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
+	virtual void applyDofCorrection(double dt,
+		const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
 
 	/// Set the initial pose of the representation
 	/// \param pose The initial pose

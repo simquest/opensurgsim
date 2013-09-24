@@ -16,6 +16,12 @@
 #ifndef SURGSIM_GRAPHICS_OSGRENDERTARGET_INL_H
 #define SURGSIM_GRAPHICS_OSGRENDERTARGET_INL_H
 
+namespace SurgSim
+{
+
+namespace Graphics
+{
+
 // Osg Supports 16 Color Attachments plus the depth texture
 const int OsgSupportedTextureCount = 16 + 1;
 
@@ -168,5 +174,9 @@ void OsgRenderTarget<T>::setupTexture(int type)
 		}
 	}
 }
+
+}; // namespace Graphics
+
+}; // namespace SurgSim
 
 #endif
