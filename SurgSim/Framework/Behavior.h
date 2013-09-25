@@ -52,7 +52,7 @@ public:
 	virtual void update(double dt) = 0;
 
 	/// Specifies which manger will handle this behavior
-	virtual int getTargetManagerType() const { return MANAGER_TYPE_NONE; }
+	virtual int getTargetManagerType() const { return MANAGER_TYPE_BEHAVIOR; }
 };
 
 }; //namespace Framework

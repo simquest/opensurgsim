@@ -41,11 +41,6 @@ OsgManager::~OsgManager()
 {
 }
 
-int OsgManager::getType() const
-{
-	return SurgSim::Framework::MANAGER_TYPE_GRAPHICS;
-}
-
 bool OsgManager::setDefaultCamera(std::shared_ptr<OsgCamera> camera)
 {
 	m_defaultCamera = camera;

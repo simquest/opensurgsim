@@ -87,13 +87,7 @@ void ComponentManager::processBehaviors(const double dt)
 	auto endIt = std::end(m_behaviors);
 	for ( ;  it != endIt;  ++it)
 	{
-		// Type must be matched
-		// Enum for getTargetManagerType() is defined in Behavior.h
-		// Enum for getType() is defined in ComponentManager.h
-		if ( (*it)->getTargetManagerType() == getType())
-		{
-			(*it)->update(dt);
-		}
+		(*it)->update(dt);
 	}
 }
 
@@ -166,6 +160,7 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 {
 	for(auto it = beginIt; it != endIt; ++it)
 	{
+		tryRemoveComponent(*it, &m_behaviors);
 		executeRemovals(*it);
 	}
 }
@@ -178,7 +173,18 @@ void ComponentManager::addAndIntializeComponents(
 	// Add All Components to the internal storage
 	for(auto it = beginIt; it != endIt; ++it)
 	{
-		if (executeAdditions(*it) && (*it)->initialize(std::move(getRuntime())))
+		std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(*it);
+		if (behavior != nullptr)
+		{
+			if (behavior->getTargetManagerType() == getType())
+			{
+				if (tryAddComponent(*it, &m_behaviors) != nullptr && (*it)->initialize(std::move(getRuntime())))
+				{
+					actualAdditions->push_back(*it);
+				}
+			}
+		}
+		else if (executeAdditions(*it) && (*it)->initialize(std::move(getRuntime())))
 		{
 			actualAdditions->push_back(*it);
 		}
