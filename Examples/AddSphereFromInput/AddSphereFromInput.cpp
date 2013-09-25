@@ -19,7 +19,7 @@
 #include <Examples/AddSphereFromInput/AddSphereBehavior.h>
 #include <Examples/AddSphereFromInput/InputGraphicsBehavior.h>
 #include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Log.h>
@@ -47,7 +47,7 @@
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Blocks::BasicSceneElement;
-using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
@@ -62,7 +62,6 @@ using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PhysicsManager;
-using SurgSim::Physics::VtcRigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
 
@@ -111,7 +110,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));

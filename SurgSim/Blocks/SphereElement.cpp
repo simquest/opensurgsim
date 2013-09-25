@@ -21,12 +21,12 @@
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgShader.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
 
 
 using SurgSim::Blocks::SphereElement;
-using SurgSim::Blocks::RepresentationPoseBehavior;
+using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Collision::RigidCollisionRepresentation;
@@ -87,7 +87,7 @@ bool SphereElement::doInitialize()
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
 	addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		("Sphere Collision Representation", physicsRepresentation));

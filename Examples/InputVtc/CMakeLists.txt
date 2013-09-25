@@ -33,8 +33,12 @@ set(INPUTVTCEXAMPLE_SOURCES
 	InputVtcExample.cpp
 )
 
+set(INPUTVTCEXAMPLE_HEADERS
+	TransferVtcPoseBehavior.h
+)
+
 add_executable(ExampleInputVtc
-	${INPUTVTCEXAMPLE_SOURCES})
+	${INPUTVTCEXAMPLE_SOURCES} ${INPUTVTCEXAMPLE_HEADERS})
 
 set(LIBS 
 	IdentityPoseDevice

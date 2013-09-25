@@ -17,7 +17,8 @@
 #include <boost/thread.hpp>
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
+#include <SurgSim/Blocks/TransferInputPoseBehavior.h>
 #include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Log.h>
@@ -46,10 +47,11 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
+#include "TransferVtcPoseBehavior.h"
+
 using SurgSim::Blocks::BasicSceneElement;
-using SurgSim::Blocks::RepresentationPoseBehavior;
-using SurgSim::Blocks::VtcToGraphicsPoseBehavior;
-using SurgSim::Blocks::InputVtcBehavior;
+using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Blocks::TransferInputPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
@@ -113,7 +115,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	planeElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
 	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
@@ -185,11 +187,11 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(graphicsRepresentation2);
 	boxElement->addComponent(inputComponent);
 
-	boxElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
+	boxElement->addComponent(std::make_shared<TransferInputPoseBehavior>("Input to Vtc",
 								inputComponent, vtcRepresentation));
-	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
+	boxElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 								vtcRepresentation, graphicsRepresentation));
-	boxElement->addComponent(std::make_shared<VtcToGraphicsPoseBehavior>("Physics to Graphics2 Pose",
+	boxElement->addComponent(std::make_shared<TransferVtcPoseBehavior>("Physics to Graphics VTC Pose",
 								vtcRepresentation, graphicsRepresentation2));
 	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 								("Box Collision Representation", vtcRepresentation));
