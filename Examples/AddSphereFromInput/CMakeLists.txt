@@ -32,11 +32,13 @@ include_directories(
 set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
 	AddSphereBehavior.cpp
 	AddSphereFromInput.cpp
+	InputGraphicsBehavior.cpp
 )
 
 
 set(ADDSPHEREFROMINPUT_EXAMPLE_HEADER
 	AddSphereBehavior.h
+	InputGraphicsBehavior.h
 )
 
 add_executable(ExampleAddSphereFromInput

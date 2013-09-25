@@ -17,6 +17,7 @@
 #include <boost/thread.hpp>
 
 #include <Examples/AddSphereFromInput/AddSphereBehavior.h>
+#include <Examples/AddSphereFromInput/InputGraphicsBehavior.h>
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/RepresentationPoseBehavior.h>
 #include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
@@ -50,7 +51,6 @@
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
 using SurgSim::Blocks::VtcToGraphicsPoseBehavior;
-using SurgSim::Blocks::InputVtcBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
@@ -58,6 +58,7 @@ using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Input::InputGraphicsBehavior;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
@@ -124,76 +125,23 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 std::shared_ptr<SceneElement> createBox(const std::string& name)
 {
-	double density = 700.0;  // Wood in Kg.m-3
-	double size[3] = {0.8, 2.0, 0.2};
-	double volume = size[0] * size[1] * size[2];
-	double mass = volume * density;
-
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood in Kg.m-3
+	
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.2, 0.2, 0.2); // in m
-	params.setShapeUsedForMassInertia(box);
-
-	// The vtc parameters are the parameters for the spring between the device and the simulated rigid body.
-	// To understand how they are used, let's have a look at the physics under the hood.
-	// For a given spring between points A and B, of stiffness k and damping c, we have the Newton's law:
-	// m.a = F = k.AB - c.d(AB)/dt
-	// It is clear that the mass of the object has a direct inverse relationship with the spring
-	// stiffness and damping parameters. Therefore, if a set of parameters (k/c) behaves well for an object
-	// of mass m, an object of mass 2m will need a vtc with the parameters (2k/2c) to behave the same way
-	// on the physical system. The mass factor helps to scale the vtc parameters easily to different objects.
-	// The actual values of the vtc parameters are experimental and needs to be tweaked for each application.
-	VtcRigidParameters vtcParams;
-	vtcParams.setVtcAngularDamping(mass * 20);
-	vtcParams.setVtcAngularStiffness(mass * 50);
-	vtcParams.setVtcLinearDamping(mass * 20);
-	vtcParams.setVtcLinearStiffness(mass * 50);
-
-	std::shared_ptr<VtcRigidRepresentation> vtcRepresentation =
-		std::make_shared<VtcRigidRepresentation>(name + "-Vtc");
-	vtcRepresentation->setInitialParameters(params);
-	vtcRepresentation->setInitialVtcParameters(vtcParams);
 
 	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
 	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
-	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation2 =
-		std::make_shared<OsgBoxRepresentation>(name + "2-Graphics");
-	graphicsRepresentation2->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
-
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-	shader->setVertexShaderSource(
-		"void main(void)\n"
-		"{\n"
-		"    gl_Position = ftransform();\n"
-		"}");
-	shader->setFragmentShaderSource(
-		"void main(void)\n"
-		"{\n"
-		"    gl_FragColor = vec4(0.2, 0.2, 0.2, 1.0);\n"
-		"}");
-	material->setShader(shader);
-	graphicsRepresentation2->setMaterial(material);
-
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
 
 	std::shared_ptr<SceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
-	boxElement->addComponent(vtcRepresentation);
 	boxElement->addComponent(graphicsRepresentation);
-	boxElement->addComponent(graphicsRepresentation2);
 	boxElement->addComponent(inputComponent);
 
-	boxElement->addComponent(std::make_shared<InputVtcBehavior>("Input to Vtc",
-		inputComponent, vtcRepresentation));
-	boxElement->addComponent(std::make_shared<RepresentationPoseBehavior>("Physics to Graphics Pose",
-		vtcRepresentation, graphicsRepresentation));
-	boxElement->addComponent(std::make_shared<VtcToGraphicsPoseBehavior>("Physics to Graphics2 Pose",
-		vtcRepresentation, graphicsRepresentation2));
-	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Box Collision Representation", vtcRepresentation));
+	boxElement->addComponent(std::make_shared<InputGraphicsBehavior>("Input to Graphics",
+		inputComponent, graphicsRepresentation));
+	
 	boxElement->addComponent(std::make_shared<SurgSim::Input::AddSphereFromInputBehavior>("Input", inputComponent));
 	return boxElement;
 }
