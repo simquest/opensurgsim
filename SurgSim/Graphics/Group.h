@@ -37,7 +37,8 @@ class Group : public SurgSim::Framework::Component
 {
 public:
 	/// Constructor. The group is initially empty.
-	/// \param	name	Name of the group
+	/// \param	name	Name of the group, this has to be unique over the whole system, otherwise
+	/// 				adding the group will fail
 	explicit Group(const std::string& name);
 
 	/// Destructor
