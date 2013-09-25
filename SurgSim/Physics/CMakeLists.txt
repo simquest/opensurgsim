@@ -32,6 +32,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
 	Localization.cpp
+	MassSpringRepresentation.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
@@ -69,6 +70,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedRepresentationLocalization.h
 	FreeMotion.h
 	Localization.h
+	MassSpringRepresentation.h
+	MassSpringRepresentationState.h
 	MeshShape.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h

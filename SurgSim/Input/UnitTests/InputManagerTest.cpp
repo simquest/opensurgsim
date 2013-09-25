@@ -202,6 +202,11 @@ TEST_F(InputManagerTest, OutputPush)
 	EXPECT_EQ("outputdata",testDevice1->lastPulledData);
 }
 
+TEST_F(InputManagerTest, TypeTest)
+{
+	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_INPUT, inputManager->getType());
+}
+
 }; // namespace Input
 }; // namespace SurgSim
 

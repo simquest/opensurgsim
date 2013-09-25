@@ -60,6 +60,11 @@ public:
 		return;
 	}
 
+	virtual int getType() const override
+	{
+		return SurgSim::Framework::MANAGER_TYPE_NONE;
+	}
+
 private:
 	/// Updates the manager.
 	/// \param	dt	The time in seconds of the preceding timestep.
@@ -196,6 +201,20 @@ public:
 	{
 		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
 		return identity;
+	}
+
+	virtual bool addGroupReference(const std::string& name) override
+	{
+		return false;
+	}
+
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual std::vector<std::string> getGroupReferences() override
+	{
+		return std::vector<std::string>();
 	}
 
 private:
@@ -417,6 +436,20 @@ public:
 	virtual void setRenderOrder(RenderOrder bin, int value) override
 	{
 
+	}
+
+	virtual bool addGroupReference(const std::string& name) override
+	{
+		return false;
+	}
+
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual std::vector<std::string> getGroupReferences() override
+	{
+		return std::vector<std::string>();
 	}
 
 private:

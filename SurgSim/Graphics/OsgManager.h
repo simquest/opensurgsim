@@ -19,7 +19,6 @@
 #include <SurgSim/Graphics/Manager.h>
 
 #include <memory>
-#include <vector>
 
 #include <osgViewer/CompositeViewer>
 
@@ -76,6 +75,9 @@ public:
 
 	/// OsgManager will write out the scenegraph in the working directory
 	virtual void dumpDebugInfo() const override;
+
+	/// Overrides ComponentManager::getType()
+	virtual int getType() const override;
 
 protected:
 	/// Performs an update for a single timestep
