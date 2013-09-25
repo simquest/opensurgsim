@@ -203,6 +203,20 @@ public:
 		return identity;
 	}
 
+	virtual bool addGroupReference(const std::string& name) override
+	{
+		return false;
+	}
+
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual std::vector<std::string> getGroupReferences() override
+	{
+		return std::vector<std::string>();
+	}
+
 private:
 	/// Initializes the representation
 	/// \post m_isInitialized is set to true
@@ -422,6 +436,20 @@ public:
 	virtual void setRenderOrder(RenderOrder bin, int value) override
 	{
 
+	}
+
+	virtual bool addGroupReference(const std::string& name) override
+	{
+		return false;
+	}
+
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual std::vector<std::string> getGroupReferences() override
+	{
+		return std::vector<std::string>();
 	}
 
 private:
