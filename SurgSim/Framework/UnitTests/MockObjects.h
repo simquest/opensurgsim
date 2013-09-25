@@ -199,11 +199,6 @@ public:
 		updateCount++;
 	}
 
-	virtual int getTargetManagerType() const override
-	{
-		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
-	}
-
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
 	bool isInitialized;
