@@ -60,6 +60,9 @@ public:
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
+	/// Overrides ComponentManager::getType()
+	virtual int getType() const override;
+
 	friend class PhysicsManagerTest;
 
 protected:

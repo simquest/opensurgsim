@@ -49,6 +49,8 @@ set(SURGSIM_COLLISION_HEADERS
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h
+	TriangleMeshPlaneDcdContact.h
+	TriangleMeshPlaneDcdContact-inl.h
 )
 
 surgsim_add_library(

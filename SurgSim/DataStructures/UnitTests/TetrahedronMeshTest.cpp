@@ -302,7 +302,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		/// Make sure each vertex is set properly
 		for (unsigned int j = 0; j < mesh.getNumEdges(); ++j)
 		{
-			EXPECT_EQ(testEdgesVerticesId[j], edges[j].vertices);
+			EXPECT_EQ(testEdgesVerticesId[j], edges[j].verticesId);
 
 			const MockEdgeData& data = edges[j].data;
 			EXPECT_EQ(j, data.getId());
@@ -321,7 +321,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		/// Make sure each vertex is set properly
 		for (unsigned int j = 0; j < mesh.getNumTriangles(); ++j)
 		{
-			EXPECT_EQ(testTrianglesVerticesId[j], triangles[j].vertices);
+			EXPECT_EQ(testTrianglesVerticesId[j], triangles[j].verticesId);
 
 			const MockTriangleData& data = triangles[j].data;
 			EXPECT_EQ(j, data.getId());
@@ -342,7 +342,7 @@ TEST_F(TetrahedronMeshTest, CreateVerticesTest)
 		/// Make sure each tetrahedron is set properly
 		for (unsigned int j = 0; j < mesh.getNumTetrahedrons(); ++j)
 		{
-			EXPECT_EQ(testTetrahedronsVerticesId[j], tetrahedrons[j].vertices);
+			EXPECT_EQ(testTetrahedronsVerticesId[j], tetrahedrons[j].verticesId);
 
 			const MockTetrahedronData& data = tetrahedrons[j].data;
 			EXPECT_EQ(j, data.getId());

@@ -250,6 +250,11 @@ TEST_F(OsgManagerTest, AddRemoveTest)
 		"Removing a component that this manager is not concerned with should return true";
 }
 
+TEST_F(OsgManagerTest, TypeTest)
+{
+	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_GRAPHICS, graphicsManager->getType());
+}
+
 TEST_F(OsgManagerTest, LazyGroupsTest)
 {
 	osgViewer::CompositeViewer* compositeViewer = graphicsManager->getOsgCompositeViewer();

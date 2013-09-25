@@ -23,6 +23,17 @@ namespace SurgSim
 namespace Framework
 {
 
+/// Fixed List of enums for the available manager types, do not explicitly assign values,
+/// MANAGER_TYPE_COUNT is used to determine the number of actual manager types
+enum {
+	MANAGER_TYPE_NONE = -1,
+	MANAGER_TYPE_BEHAVIOR,
+	MANAGER_TYPE_GRAPHICS,
+	MANAGER_TYPE_INPUT,
+	MANAGER_TYPE_PHYSICS,
+	MANAGER_TYPE_COUNT
+};
+
 /// Behaviors perform actions. They can update components, facilitate
 /// communication between components, and create new components. They are
 /// updated periodicly by the BehaviorManager through update() call.
@@ -39,6 +50,9 @@ public:
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt) = 0;
+
+	/// Specifies which manger will handle this behavior
+	virtual int getTargetManagerType() const { return MANAGER_TYPE_NONE; }
 };
 
 }; //namespace Framework
