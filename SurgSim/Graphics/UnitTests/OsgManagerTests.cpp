@@ -111,6 +111,7 @@ TEST_F(OsgManagerTest, AddRemoveTest)
 		std::make_shared<MockOsgRepresentation>("test representation 2");
 	std::shared_ptr<OsgGroup> group1 = std::make_shared<OsgGroup>("test group 1");
 	std::shared_ptr<OsgGroup> group2 = std::make_shared<OsgGroup>("test group 2");
+
 	std::shared_ptr<OsgView> view1 = std::make_shared<OsgView>("test view 1");
 	std::shared_ptr<OsgView> view2 = std::make_shared<OsgView>("test view 2");
 	std::shared_ptr<MockRepresentation> nonOsgRepresentation
@@ -247,6 +248,51 @@ TEST_F(OsgManagerTest, AddRemoveTest)
 	/// Try to remove a component that is not graphics-related
 	EXPECT_TRUE(componentManager->enqueueRemoveComponent(nonGraphicsComponent)) <<
 		"Removing a component that this manager is not concerned with should return true";
+}
+
+TEST_F(OsgManagerTest, LazyGroupsTest)
+{
+	osgViewer::CompositeViewer* compositeViewer = graphicsManager->getOsgCompositeViewer();
+
+	std::shared_ptr<OsgRepresentation> representation1 =
+		std::make_shared<MockOsgRepresentation>("TestRepresentation_1");
+	std::shared_ptr<OsgRepresentation> representation2 =
+		std::make_shared<MockOsgRepresentation>("TestRepresentation_2");
+	std::shared_ptr<OsgRepresentation> representation3 =
+		std::make_shared<MockOsgRepresentation>("TestRepresentation_3");
+
+	std::shared_ptr<OsgGroup> group1 = std::make_shared<OsgGroup>("TestGroup_1");
+	std::shared_ptr<OsgGroup> group2 = std::make_shared<OsgGroup>("TestGroup_2");
+	std::shared_ptr<OsgGroup> group3 = std::make_shared<OsgGroup>("TestGroup_3");
+
+	graphicsManager->enqueueAddComponent(group1);
+	graphicsManager->enqueueAddComponent(group2);
+	doProcessComponents();
+
+	representation1->addGroupReference("TestGroup_1");
+	representation1->addGroupReference("TestGroup_2");
+	representation1->addGroupReference("TestGroup_3");
+	representation2->addGroupReference("TestGroup_2");
+	representation2->addGroupReference("TestGroup_3");
+	representation3->addGroupReference("TestGroup_3");
+	
+
+	graphicsManager->enqueueAddComponent(representation1);
+	graphicsManager->enqueueAddComponent(representation2);
+	graphicsManager->enqueueAddComponent(representation3);
+	doProcessComponents();
+
+	EXPECT_EQ(1U, group1->getMembers().size());
+	EXPECT_EQ(2U, group2->getMembers().size());
+
+	graphicsManager->enqueueAddComponent(group3);
+	doProcessComponents();
+
+	EXPECT_EQ(1U, group1->getMembers().size());
+	EXPECT_EQ(2U, group2->getMembers().size());
+	EXPECT_EQ(3U, group3->getMembers().size());
+
+
 }
 
 }; // namespace Graphics

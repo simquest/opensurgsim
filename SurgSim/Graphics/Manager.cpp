@@ -95,7 +95,10 @@ bool Manager::addRepresentation(std::shared_ptr<Representation> representation)
 bool Manager::addGroup(std::shared_ptr<Group> group)
 {
 	bool result = false;
-	if (std::find(m_groups.begin(), m_groups.end(), group) == m_groups.end())
+	if (std::find_if(
+		m_groups.begin(), 
+		m_groups.end(), 
+		[group](std::shared_ptr<Group> in){ return in->getName() == group->getName();}) == m_groups.end())
 	{
 		m_groups.push_back(group);
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added group " << group->getName();
@@ -185,6 +188,7 @@ bool Manager::doStartUp()
 bool Manager::doUpdate(double dt)
 {
 	processComponents();
+	processBehaviors(dt);
 
 	for (auto it = m_representations.begin(); it != m_representations.end(); ++it)
 	{
@@ -195,4 +199,9 @@ bool Manager::doUpdate(double dt)
 		(*it)->update(dt);
 	}
 	return true;
+}
+
+int Manager::getType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_GRAPHICS;
 }

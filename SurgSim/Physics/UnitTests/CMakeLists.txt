@@ -33,6 +33,7 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
+	MassSpringRepresentationTests.cpp
 	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
