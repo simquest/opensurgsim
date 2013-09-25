@@ -253,8 +253,6 @@ TEST_F(OsgManagerTest, AddRemoveTest)
 TEST_F(OsgManagerTest, LazyGroupsTest)
 {
 	osgViewer::CompositeViewer* compositeViewer = graphicsManager->getOsgCompositeViewer();
-	/// Perform add and remove from a pointer to a ComponentManager to check that the intended polymorphism is working.
-	std::shared_ptr<ComponentManager> componentManager = graphicsManager;
 
 	std::shared_ptr<OsgRepresentation> representation1 =
 		std::make_shared<MockOsgRepresentation>("TestRepresentation_1");
