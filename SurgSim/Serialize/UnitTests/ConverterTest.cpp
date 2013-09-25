@@ -22,7 +22,7 @@
 class ConverterTest : public ::testing::Test
 {
 protected:
-	
+
 	// Setup out stream file
 	void SetUp()
 	{
@@ -43,6 +43,22 @@ protected:
 	std::string datafile;
 };
 
+
+TEST_F(ConverterTest, ConverterVector3dInvalidTest)
+{
+	YAML::Node outnode;
+	SurgSim::Math::Vector3d vector3(1.000001, 2.000001, 3.000001);
+
+	// Add NaN value
+	vector3(1)= std::numeric_limits<SurgSim::Math::Vector3d::Scalar>::quiet_NaN();
+
+	outnode = vector3;
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile(datafile);
+	EXPECT_THROW(innode.as<SurgSim::Math::Vector3d>(), YAML::BadConversion);
+}
 
 TEST_F(ConverterTest, ConverterVector3dNodeTest)
 {
@@ -72,6 +88,23 @@ TEST_F(ConverterTest, ConverterVector3dEmitterTest)
 	EXPECT_EQ(expectedv3d, vector3);
 }
 
+TEST_F(ConverterTest, ConverterVector4dInvalidTest)
+{
+	YAML::Node outnode;
+	SurgSim::Math::Vector4d vector4(1.000001, 2.000001, 3.000001, 4.000001);
+
+	// Add NaN value
+	vector4(1)= std::numeric_limits<SurgSim::Math::Vector4d::Scalar>::quiet_NaN();
+
+	outnode = vector4;
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile(datafile);
+	EXPECT_THROW(innode.as<SurgSim::Math::Vector4d>(), YAML::BadConversion);
+}
+
+
 TEST_F(ConverterTest, ConverterVector4dNodeTest)
 {
 	YAML::Node outnode;
@@ -98,18 +131,32 @@ TEST_F(ConverterTest, ConverterVector4dEmitterTest)
 	SurgSim::Math::Vector4d expectedv4d = innode.as<SurgSim::Math::Vector4d>();
 	EXPECT_EQ(expectedv4d, vector4);
 }
+TEST_F(ConverterTest, ConverterQuaterniondInvalidTest)
+{
+	YAML::Node outnode;
+
+	SurgSim::Math::Quaterniond quat(3, 2, 1, 1);
+	quat.x() = std::numeric_limits<SurgSim::Math::Quaterniond::Scalar>::quiet_NaN();
+
+	outnode.push_back(quat);
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile(datafile);
+	EXPECT_THROW(innode.as<SurgSim::Math::Quaterniond>(), YAML::BadConversion);
+}
 
 TEST_F(ConverterTest, ConverterQuaterniondNodeTest)
 {
 	YAML::Node outnode;
 
 	SurgSim::Math::Quaterniond quat(3, 2, 1, 1);
-	outnode.push_back(quat);
+	outnode = quat;
 	fout << outnode;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	SurgSim::Math::Quaterniond expectedQuat = innode[0].as<SurgSim::Math::Quaterniond>();
+	SurgSim::Math::Quaterniond expectedQuat = innode.as<SurgSim::Math::Quaterniond>();
 
 	EXPECT_EQ(expectedQuat.x(), quat.x());
 	EXPECT_EQ(expectedQuat.y(), quat.y());
@@ -132,6 +179,26 @@ TEST_F(ConverterTest, ConverterQuaterniondEmitterTest)
 	EXPECT_EQ(expectedQuat.y(), quat.y());
 	EXPECT_EQ(expectedQuat.z(), quat.z());
 	EXPECT_EQ(expectedQuat.w(), quat.w());
+}
+
+TEST_F(ConverterTest, ConverterMatrix33dInvalidTest)
+{
+	YAML::Node outnode;
+
+	SurgSim::Math::Matrix33d mat33d;
+	mat33d <<	1, 2, 3,
+		3, 2, 1,
+		1, 2, 3;
+
+	mat33d(1,1) = std::numeric_limits<SurgSim::Math::Matrix33d::Scalar>::quiet_NaN();
+
+	outnode = mat33d;
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile(datafile);
+	EXPECT_THROW(innode.as<SurgSim::Math::Matrix33d>(), YAML::BadConversion);
+
 }
 
 TEST_F(ConverterTest, ConverterMatrix33dNodeTest)
@@ -169,6 +236,26 @@ TEST_F(ConverterTest, ConverterMatrix33dEmitterTest)
 	SurgSim::Math::Matrix33d expectedm33d = innode.as<SurgSim::Math::Matrix33d>();
 
 	EXPECT_EQ(expectedm33d, mat33d);
+}
+
+TEST_F(ConverterTest, ConverterMatrix44dInvalidTest)
+{
+	YAML::Node outnode;
+
+	SurgSim::Math::Matrix44d mat44d;
+	mat44d <<	1, 2, 3, 4,
+		4, 3, 2, 1,
+		1, 2, 3, 4,
+		4, 3, 2, 1;
+
+	mat44d(1,1) = std::numeric_limits<SurgSim::Math::Matrix44d::Scalar>::quiet_NaN();
+
+	outnode = mat44d;
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile(datafile);
+	EXPECT_THROW(innode.as<SurgSim::Math::Matrix44d>(), YAML::BadConversion);
 }
 
 TEST_F(ConverterTest, ConverterMatrix44dNodeTest)
@@ -209,6 +296,23 @@ TEST_F(ConverterTest, ConverterMatrix44dEmitterTest)
 
 	EXPECT_EQ(expectedm44d, mat44d);
 }
+
+TEST_F(ConverterTest, ConverterRigidTransform3dInvalidTest)
+{
+	YAML::Node outnode;
+	SurgSim::Math::Vector3d vec3(1.0, 2.0, 3.0);
+	vec3[0] = std::numeric_limits<SurgSim::Math::RigidTransform3d::Scalar>::quiet_NaN();
+	SurgSim::Math::RigidTransform3d rigid = SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
+		vec3);
+
+	outnode = rigid;
+	fout << outnode;
+	fout.close();
+
+	YAML::Node innode = YAML::LoadFile(datafile);
+	EXPECT_THROW(innode.as<SurgSim::Math::RigidTransform3d>(), YAML::BadConversion);
+}
+
 
 TEST_F(ConverterTest, ConverterRigidTransform3dNodeTest)
 {
