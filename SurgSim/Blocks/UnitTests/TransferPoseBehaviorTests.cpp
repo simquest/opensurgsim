@@ -14,10 +14,10 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the RepresentationPoseBehavior class.
+/// Tests for the TransferPoseBehavior class.
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/RepresentationPoseBehavior.h>
+#include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Blocks/UnitTests/MockObjects.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Runtime.h>
@@ -42,22 +42,22 @@ namespace SurgSim
 namespace Blocks
 {
 
-TEST(RepresentationPoseBehaviorTests, InitTest)
+TEST(TransferPoseBehaviorTests, InitTest)
 {
 	std::shared_ptr<MockRepresentation> from = std::make_shared<MockRepresentation>("from");
 	std::shared_ptr<MockRepresentation> to = std::make_shared<MockRepresentation>("to");
 
-	std::shared_ptr<Behavior> behavior = std::make_shared<RepresentationPoseBehavior>("test name", from, to);
+	std::shared_ptr<Behavior> behavior = std::make_shared<TransferPoseBehavior>("test name", from, to);
 
 	EXPECT_EQ("test name", behavior->getName());
 }
 
-TEST(RepresentationPoseBehaviorTests, UpdateTest)
+TEST(TransferPoseBehaviorTests, UpdateTest)
 {
 	std::shared_ptr<MockRepresentation> from = std::make_shared<MockRepresentation>("from");
 	std::shared_ptr<MockRepresentation> to = std::make_shared<MockRepresentation>("to");
 
-	std::shared_ptr<Behavior> behavior = std::make_shared<RepresentationPoseBehavior>("behavior", from, to);
+	std::shared_ptr<Behavior> behavior = std::make_shared<TransferPoseBehavior>("behavior", from, to);
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 

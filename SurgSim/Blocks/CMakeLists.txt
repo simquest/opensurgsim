@@ -25,11 +25,14 @@ include_directories(
 set(SURGSIM_BLOCKS_SOURCES
 	BasicSceneElement.cpp
 	SphereElement.cpp
+	TransferPoseBehavior.cpp
+	TransferInputPoseBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
-	RepresentationPoseBehavior.h
+	TransferPoseBehavior.h
+	TransferInputPoseBehavior.h
 	SphereElement.h
 )
 
