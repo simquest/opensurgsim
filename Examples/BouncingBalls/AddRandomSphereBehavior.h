@@ -51,7 +51,7 @@ private:
 	int m_numElements;
 };
 
-};  // namespace Blocks 
+};  // namespace Blocks
 
 };  // namespace SurgSim
 

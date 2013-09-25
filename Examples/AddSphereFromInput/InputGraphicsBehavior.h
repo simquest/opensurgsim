@@ -33,12 +33,16 @@ public:
 	/// \param	name	Name of the behavior
 	/// \param	from	Input component to get the pose
 	/// \param	to	Representation to set the pose
-	InputGraphicsBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from,
+	InputGraphicsBehavior(const std::string& name,
+		std::shared_ptr<SurgSim::Input::InputComponent> from,
 		std::shared_ptr<SurgSim::Framework::Representation> to);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt) override;
+
+	/// Return the type of manager that should be responsible for this behavior
+	virtual int getTargetManagerType() const override;
 
 protected:
 	/// Initialize the behavior

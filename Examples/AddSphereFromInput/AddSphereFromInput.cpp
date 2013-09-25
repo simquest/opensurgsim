@@ -42,15 +42,12 @@
 #include <SurgSim/Physics/BoxShape.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
 #include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/VtcRigidParameters.h>
-#include <SurgSim/Physics/VtcRigidRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::RepresentationPoseBehavior;
-using SurgSim::Blocks::VtcToGraphicsPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
@@ -65,7 +62,6 @@ using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PhysicsManager;
-using SurgSim::Physics::VtcRigidParameters;
 using SurgSim::Physics::VtcRigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
@@ -125,7 +121,6 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 std::shared_ptr<SceneElement> createBox(const std::string& name)
 {
-	
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.2, 0.2, 0.2); // in m
 
 	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation =
@@ -141,8 +136,9 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 
 	boxElement->addComponent(std::make_shared<InputGraphicsBehavior>("Input to Graphics",
 		inputComponent, graphicsRepresentation));
-	
+
 	boxElement->addComponent(std::make_shared<SurgSim::Input::AddSphereFromInputBehavior>("Input", inputComponent));
+
 	return boxElement;
 }
 

@@ -15,13 +15,7 @@
 
 #include <Examples/AddSphereFromInput/InputGraphicsBehavior.h>
 
-#include <SurgSim/Blocks/SphereElement.h>
 #include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/Representation.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/Framework/Scene.h>
 
 using SurgSim::Math::RigidTransform3d;
 
@@ -30,26 +24,29 @@ namespace SurgSim
 
 namespace Input
 {
-	InputGraphicsBehavior::InputGraphicsBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from,
-		std::shared_ptr<SurgSim::Framework::Representation> to) : SurgSim::Framework::Behavior(name),
-		m_from(from),
-		m_to(to)
+	InputGraphicsBehavior::InputGraphicsBehavior(const std::string& name,
+		std::shared_ptr<SurgSim::Input::InputComponent> from,
+		std::shared_ptr<SurgSim::Framework::Representation> to):
+			SurgSim::Framework::Behavior(name),
+			m_from(from),
+			m_to(to)
 	{
 	}
 
-	/// Update the behavior
-	/// \param dt	The length of time (seconds) between update calls.
 	void InputGraphicsBehavior::update(double dt)
 	{
 		SurgSim::DataStructures::DataGroup dataGroup;
 		m_from->getData(&dataGroup);
+
 		RigidTransform3d pose;
 		dataGroup.poses().get("pose", &pose);
 		m_to->setPose(pose);
-		
-		std::cout<<"test\n";
 	}
 
+	int InputGraphicsBehavior::getTargetManagerType() const
+	{
+		return SurgSim::Framework::MANAGER_TYPE_BEHAVIOR;
+	}
 
 	bool InputGraphicsBehavior::doInitialize()
 	{

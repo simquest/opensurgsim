@@ -17,9 +17,7 @@
 
 #include <SurgSim/Blocks/SphereElement.h>
 #include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Input/InputComponent.h>
 #include <SurgSim/Framework/Scene.h>
 
 using SurgSim::Math::RigidTransform3d;
@@ -31,7 +29,7 @@ namespace Input
 {
 	AddSphereFromInputBehavior::AddSphereFromInputBehavior(
 		const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
-		SurgSim::Framework::Behavior(name), m_from(from)
+		SurgSim::Framework::Behavior(name), m_from(from), m_numElements(0), m_buttonPreviouslyPressed(false)
 	{
 	}
 
@@ -41,15 +39,15 @@ namespace Input
 		// Then use the pose as the location to add sphere
 		SurgSim::DataStructures::DataGroup dataGroup;
 		m_from->getData(&dataGroup);
+
 		RigidTransform3d pose;
 		dataGroup.poses().get("pose", &pose);
 
-		// Dynamically add sphere to the scene from input
-		static int m_numElements = 0;
-		static bool previouslyPressed = false;
+		// Add sphere to the scene from input
 		bool button1;
 		dataGroup.booleans().get("button1", &button1);
-		if (button1 && ! previouslyPressed)
+
+		if (button1 && ! m_buttonPreviouslyPressed)
 		{
 			std::string name = "sphereId_" + std::to_string(m_numElements++);
 			std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
@@ -57,8 +55,12 @@ namespace Input
 
 			getScene()->addSceneElement(m_element);
 		}
+		m_buttonPreviouslyPressed = button1;
+	}
 
-		previouslyPressed = button1;
+	int AddSphereFromInputBehavior::getTargetManagerType() const
+	{
+		return SurgSim::Framework::MANAGER_TYPE_INPUT;
 	}
 
 	bool AddSphereFromInputBehavior::doInitialize()

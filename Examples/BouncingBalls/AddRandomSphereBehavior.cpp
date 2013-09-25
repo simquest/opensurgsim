@@ -81,6 +81,6 @@ void AddRandomSphereBehavior::update(double dt)
 	}
 }
 
-};  // namespace Blocks 
+};  // namespace Blocks
 
 };  // namespace SurgSim

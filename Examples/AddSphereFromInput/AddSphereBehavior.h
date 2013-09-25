@@ -37,6 +37,9 @@ public:
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt) override;
 
+	/// Return the type of manager that should be responsible for this behavior
+	virtual int getTargetManagerType() const override;
+
 protected:
 	/// Initialize the behavior
 	virtual bool doInitialize() override;
@@ -46,6 +49,12 @@ protected:
 private:
 	/// Input component to get the pose
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
+
+	/// Used to record the number of spheres added
+	int m_numElements;
+
+	/// Used to record if button was previously pressed
+	bool m_buttonPreviouslyPressed;
 };
 
 };  // namespace Input
