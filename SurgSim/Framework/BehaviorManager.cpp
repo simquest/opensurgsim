@@ -45,12 +45,12 @@ bool BehaviorManager::doStartUp()
 
 bool BehaviorManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	return nullptr;
+	return false;
 }
 
 bool BehaviorManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-	return nullptr;
+	return false;
 }
 
 bool BehaviorManager::doUpdate(double dt)
