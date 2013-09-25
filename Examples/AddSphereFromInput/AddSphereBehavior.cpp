@@ -37,6 +37,8 @@ namespace Input
 
 	void AddSphereFromInputBehavior::update(double dt)
 	{
+		// Get the pose information from input device
+		// Then use the pose as the location to add sphere
 		SurgSim::DataStructures::DataGroup dataGroup;
 		m_from->getData(&dataGroup);
 		RigidTransform3d pose;
@@ -47,15 +49,16 @@ namespace Input
 		static bool previouslyPressed = false;
 		bool button1;
 		dataGroup.booleans().get("button1", &button1);
-		if (button1 && ! previouslyPressed )
+		if (button1 && ! previouslyPressed)
 		{
-			std::string name = "sphereId_" + m_numElements++;
+			std::string name = "sphereId_" + std::to_string(m_numElements++);
 			std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
 				std::make_shared<SurgSim::Blocks::SphereElement>(name, pose);
 
 			getScene()->addSceneElement(m_element);
 		}
-		previouslyPressed = !button1;
+
+		previouslyPressed = button1;
 	}
 
 	bool AddSphereFromInputBehavior::doInitialize()
