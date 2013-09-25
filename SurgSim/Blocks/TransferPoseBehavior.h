@@ -17,12 +17,15 @@
 #define SURGSIM_BLOCKS_TRANSFERPOSEBEHAVIOR_H
 
 #include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Graphics/Representation.h>
 
-using SurgSim::Math::RigidTransform3d;
 
 namespace SurgSim
 {
+
+namespace Framework
+{
+	class Representation;
+}
 
 namespace Blocks
 {
@@ -37,32 +40,18 @@ public:
 	/// \param	from	Representation to get the pose
 	/// \param	to	Representation to set the pose
 	TransferPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Framework::Representation> from,
-						 std::shared_ptr<SurgSim::Framework::Representation> to) :
-		SurgSim::Framework::Behavior(name),
-		m_from(from),
-		m_to(to)
-	{
-	}
+						 std::shared_ptr<SurgSim::Framework::Representation> to);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
-	virtual void update(double dt)
-	{
-		m_to->setPose(m_from->getPose());
-	}
+	virtual void update(double dt);
 
 protected:
 	/// Initialize the behavior
-	virtual bool doInitialize()
-	{
-		return true;
-	}
+	virtual bool doInitialize();
+
 	/// Wakeup the behavior, which copies the initial pose
-	virtual bool doWakeUp()
-	{
-		m_to->setInitialPose(m_from->getInitialPose());
-		return true;
-	}
+	virtual bool doWakeUp();
 
 private:
 	/// Representation to get the pose

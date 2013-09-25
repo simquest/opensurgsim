@@ -61,4 +61,4 @@ private:
 	std::shared_ptr<SurgSim::Framework::Representation> m_to;
 };
 
-#endif //SURGSIM_BLOCKS_REPRESENTATIONPOSEBEHAVIOR_H
+#endif //EXAMPLES_INPUTVTC_TRANSFERVTCPROXYPOSEBEHAVIOR_H
