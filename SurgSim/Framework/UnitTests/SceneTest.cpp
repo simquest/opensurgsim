@@ -37,13 +37,13 @@ TEST(SceneTest, ElementManagement)
 
 	EXPECT_EQ(0u, scene->getSceneElements().size());
 
-	EXPECT_TRUE(scene->addSceneElement(element1));
+	scene->addSceneElement(element1);
 	EXPECT_EQ(1u, scene->getSceneElements().size());
-	EXPECT_TRUE(scene->addSceneElement(element2));
+	scene->addSceneElement(element2);
 	EXPECT_EQ(2u, scene->getSceneElements().size());
 
-	EXPECT_FALSE(scene->addSceneElement(element1));
-	EXPECT_EQ(2u, scene->getSceneElements().size());
+	scene->addSceneElement(element1);
+	EXPECT_EQ(3u, scene->getSceneElements().size());
 
 	EXPECT_EQ(element1, scene->getSceneElement("one"));
 	EXPECT_EQ(element2, scene->getSceneElement("two"));
@@ -57,7 +57,7 @@ TEST(SceneTest, AddAndTestScene)
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("component");
 
 	EXPECT_TRUE(element->addComponent(component));
-	EXPECT_TRUE(scene->addSceneElement(element));
+	scene->addSceneElement(element);
 
   	EXPECT_EQ(scene, component->getScene());
 	EXPECT_EQ(element, component->getSceneElement());
