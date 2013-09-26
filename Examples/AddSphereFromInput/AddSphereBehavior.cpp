@@ -24,61 +24,52 @@
 
 using SurgSim::Math::RigidTransform3d;
 
-namespace SurgSim
+AddSphereFromInputBehavior::AddSphereFromInputBehavior(
+	const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
+	SurgSim::Framework::Behavior(name), m_from(from), m_numElements(0), m_buttonPreviouslyPressed(false)
 {
+}
 
-namespace Input
+void AddSphereFromInputBehavior::update(double dt)
 {
-	AddSphereFromInputBehavior::AddSphereFromInputBehavior(
-		const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
-		SurgSim::Framework::Behavior(name), m_from(from), m_numElements(0), m_buttonPreviouslyPressed(false)
+	// Get the pose information from input device
+	// Then use the pose as the location to add sphere
+	SurgSim::DataStructures::DataGroup dataGroup;
+	m_from->getData(&dataGroup);
+
+	RigidTransform3d pose;
+	dataGroup.poses().get("pose", &pose);
+
+	// Add sphere to the scene from input
+	bool button1;
+	dataGroup.booleans().get("button1", &button1);
+
+	if (button1 && ! m_buttonPreviouslyPressed)
 	{
+		std::stringstream elementCount;
+		elementCount << ++ m_numElements;
+
+		std::string name = "sphereId_" + elementCount.str();
+
+		std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
+			std::make_shared<SurgSim::Blocks::SphereElement>(name, pose);
+
+		getScene()->addSceneElement(m_element);
 	}
+	m_buttonPreviouslyPressed = button1;
+}
 
-	void AddSphereFromInputBehavior::update(double dt)
-	{
-		// Get the pose information from input device
-		// Then use the pose as the location to add sphere
-		SurgSim::DataStructures::DataGroup dataGroup;
-		m_from->getData(&dataGroup);
+int AddSphereFromInputBehavior::getTargetManagerType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_INPUT;
+}
 
-		RigidTransform3d pose;
-		dataGroup.poses().get("pose", &pose);
+bool AddSphereFromInputBehavior::doInitialize()
+{
+	return true;
+}
 
-		// Add sphere to the scene from input
-		bool button1;
-		dataGroup.booleans().get("button1", &button1);
-
-		if (button1 && ! m_buttonPreviouslyPressed)
-		{
-			std::stringstream elementCount;
-			elementCount << ++ m_numElements;
-
-			std::string name = "sphereId_" + elementCount.str();
-
-			std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
-				std::make_shared<SurgSim::Blocks::SphereElement>(name, pose);
-
-			getScene()->addSceneElement(m_element);
-		}
-		m_buttonPreviouslyPressed = button1;
-	}
-
-	int AddSphereFromInputBehavior::getTargetManagerType() const
-	{
-		return SurgSim::Framework::MANAGER_TYPE_INPUT;
-	}
-
-	bool AddSphereFromInputBehavior::doInitialize()
-	{
-		return true;
-	}
-
-	bool AddSphereFromInputBehavior::doWakeUp()
-	{
-		return true;
-	}
-
-};  // namespace Blocks
-
-};  // namespace SurgSim
+bool AddSphereFromInputBehavior::doWakeUp()
+{
+	return true;
+}

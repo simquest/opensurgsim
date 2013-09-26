@@ -19,12 +19,6 @@
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Input/InputComponent.h>
 
-namespace SurgSim
-{
-
-namespace Input
-{
-
 class AddSphereFromInputBehavior: public SurgSim::Framework::Behavior
 {
 public:
@@ -56,9 +50,5 @@ private:
 	/// Used to record if button was previously pressed
 	bool m_buttonPreviouslyPressed;
 };
-
-};  // namespace Input
-
-};  // namespace SurgSim
 
 #endif  // EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H

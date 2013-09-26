@@ -136,7 +136,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(std::make_shared<TransferInputPoseBehavior>("Input to Graphics",
 		inputComponent, graphicsRepresentation));
 
-	boxElement->addComponent(std::make_shared<SurgSim::Input::AddSphereFromInputBehavior>("Input", inputComponent));
+	boxElement->addComponent(std::make_shared<AddSphereFromInputBehavior>("SphereAdder", inputComponent));
 
 	return boxElement;
 }
