@@ -18,11 +18,12 @@
 
 #include <memory>
 #include <string>
-#include <queue>
+#include <vector>
 
 #include <boost/thread/mutex.hpp>
 
 #include <SurgSim/Framework/BasicThread.h>
+#include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Component.h>
 
@@ -34,12 +35,11 @@ namespace Framework
 class Runtime;
 class Logger;
 
-/// Base Component Manager class. Component Managers manage a collection of
-/// components. The runtime will present each new component to the manager, and
-/// it is up to the manger to decide whether to handle a component of a given
-/// type or not.
-/// Adding and removing components is threadsafe, when the [add|remove]Component
-/// call is made the component is added to an intermediary datastructure, each
+/// Base Component Manager class. Component Managers manage a collection of components.
+/// The runtime will present each new component to the manager, and it is up to
+/// the manger to decide whether to handle a component of a given type or not.
+/// Adding and removing components is thread-safe, when the [add|remove]Component
+/// call is made, the component is added to an intermediary data structure, each
 /// ComponentManager implementation must call processComponents() to trigger the
 /// actual addition and removal. Each ComponentManager subclass needs to implement
 /// doAddComponent() and doRemoveComponent() to the actual addition and removal of
@@ -67,14 +67,9 @@ public:
 
 	/// @{
 	/// Runtime accessors
-	inline std::shared_ptr<Runtime> getRuntime() const
-	{
-		return m_runtime.lock();
-	}
-
+	std::shared_ptr<Runtime> getRuntime() const;
 	void setRuntime(std::shared_ptr<Runtime> val);
 	/// @}
-
 
 protected:
 	/// Template version of the addComponent method.
@@ -100,6 +95,13 @@ protected:
 	/// Processes all the components that are scheduled for addition or removal, this needs to be called
 	/// inside the doUpdate() function.
 	void processComponents();
+	/// Processes behaviors
+	/// This needs to be called inside doUpdate() function in each 'sub' manager.
+	void processBehaviors(const double dt);
+
+	/// Returns the type of Manager
+	// Enum is defined in the beginning of this file
+	virtual int getType() const = 0;
 
 	/// Helper, blocks access to the additions and removal queue and copies the components
 	/// from there to the intermediate inflight queues, after this call, the incoming
@@ -107,12 +109,15 @@ protected:
 	void copyScheduledComponents(std::vector<std::shared_ptr<Component>>* inflightAdditions,
 								 std::vector<std::shared_ptr<Component>>* inflightRemovals);
 
+	/// Returns this manager's logger
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
+
 	/// Blocks protects addition and removal queues
 	boost::mutex m_componentMutex;
 
 	///@{
-	/// Datastructures, to contain components scheduled for addition and
-	/// removal
+	/// Data structures
+	/// Contain components scheduled to be added/removed
 	std::vector<std::shared_ptr<Component>> m_componentAdditions;
 	std::vector<std::shared_ptr<Component>> m_componentRemovals;
 	///@}
@@ -120,11 +125,10 @@ protected:
 	/// Logger for this class
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 
-	/// Returns this manager's logger
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
+	/// Collection of behaviors
+	// Each behavior will have a type to be matched with the corresponding manager
+	// Managers will only handle matching behaviors
+	std::vector<std::shared_ptr<SurgSim::Framework::Behavior>> m_behaviors;
 
 private:
 	/// Adds a component.
@@ -143,15 +147,16 @@ private:
 	/// including waiting for the other threads to conclude their component initialization and wakeup
 	virtual bool executeInitialization() override;
 
-	// Delegates to doRemoveComponent to remove all the components in the indicated array.
+	/// Delegates to doRemoveComponent to remove all the components in the indicated array.
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
 	void removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
-	// Delegates to doAddComponent and calls initialize on all the components
+	/// Delegates to doAddComponent and calls initialize on all the components
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
+	/// \param[out] actualAdditions	List of components actually added
 	void addAndIntializeComponents(
 		const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 		const std::vector<std::shared_ptr<Component>>::const_iterator& endIt,
@@ -167,7 +172,6 @@ private:
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
 	std::weak_ptr<Runtime> m_runtime;
-
 };
 
 }; // namespace Framework

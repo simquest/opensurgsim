@@ -119,7 +119,7 @@ private:
 	std::vector<std::shared_ptr<TextureType>> m_textures;
 
 	/// Sets color target count.
-	/// \param	size	The number of color textures to use.
+	/// \param	count	The number of color textures to use.
 	/// \return	.
 	int setColorTargetCount(int count);
 
@@ -132,8 +132,6 @@ private:
 	void setupTexture(int type);
 };
 
-#include <SurgSim/Graphics/OsgRenderTarget-inl.h>
-
 ///@{
 /// Predefine specialized render targets
 typedef OsgRenderTarget<OsgTexture2d> OsgRenderTarget2d;
@@ -142,5 +140,7 @@ typedef OsgRenderTarget<OsgTextureRectangle> OsgRenderTargetRectangle;
 
 }; // Graphics
 }; // SurgSim
+
+#include <SurgSim/Graphics/OsgRenderTarget-inl.h>
 
 #endif

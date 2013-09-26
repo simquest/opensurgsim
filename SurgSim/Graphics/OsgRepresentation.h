@@ -17,6 +17,7 @@
 #define SURGSIM_GRAPHICS_OSGREPRESENTATION_H
 
 #include <memory>
+#include <unordered_set>
 
 #include <SurgSim/Graphics/Representation.h>
 
@@ -93,6 +94,20 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt);
 
+	/// Add a reference to a group, this will eventual add this representation to the group with the
+	/// the same name.
+	/// \param	name	The name of the group.
+	/// \return	true if it succeeds, false if the group reference already exists.
+	virtual bool addGroupReference(const std::string& name) override;
+
+	/// Adds a list of group references.
+	/// \param	groups	The references.
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override;
+	
+	/// Gets group references.
+	/// \return	The group references.
+	virtual std::vector<std::string> getGroupReferences() override;
+
 protected:
 	virtual void doUpdate(double dt);
 
@@ -107,6 +122,8 @@ protected:
 	SurgSim::Math::RigidTransform3d m_pose;
 	/// Material defining the visual appearance of the representation
 	std::shared_ptr<OsgMaterial> m_material;
+
+	std::unordered_set<std::string> m_groups;
 
 };
 

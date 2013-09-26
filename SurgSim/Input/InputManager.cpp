@@ -16,9 +16,7 @@
 #include "SurgSim/Input/InputManager.h"
 
 #include <SurgSim/Framework/Component.h>
-#include <SurgSim/Framework/Runtime.h>
-
-#include "SurgSim/Input/InputComponent.h"
+#include <SurgSim/Input/InputComponent.h>
 
 namespace SurgSim
 {
@@ -48,6 +46,9 @@ bool InputManager::doUpdate(double dt)
 {
 	// Add all components that came in before the last update
 	processComponents();
+
+	// Process specific behaviors belongs to this manager
+	processBehaviors(dt);
 
 	return true;
 }
@@ -168,6 +169,11 @@ bool InputManager::removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface>
 		result = true;
 	}
 	return result;
+}
+
+int InputManager::getType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_INPUT;
 }
 
 } // Input

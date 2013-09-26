@@ -145,12 +145,12 @@ struct GlutCamera
 	double zFar;
 
 	/// Constructor
-	/// \param eye Eye position.
-	/// \param center Center (look at) position.
-	/// \param up Up direction.
-	/// \param fovY Field of view angle (in degrees) in the vertical direction.
-	/// \param near Near clipping plane distance from camera, in meters.
-	/// \param far Far clipping plane distance from camera, in meters.
+	/// \param eye_ Eye position.
+	/// \param center_ Center (look at) position.
+	/// \param up_ Up direction.
+	/// \param fovY_ Field of view angle (in degrees) in the vertical direction.
+	/// \param zNear_ Near clipping plane distance from camera, in meters.
+	/// \param zFar_ Far clipping plane distance from camera, in meters.
 	GlutCamera(const SurgSim::Math::Vector3d& eye_, const SurgSim::Math::Vector3d& center_,
 			   const SurgSim::Math::Vector3d& up_, const double fovY_, double zNear_, double zFar_) :
 		eye(eye_),

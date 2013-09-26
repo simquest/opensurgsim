@@ -110,7 +110,7 @@ public:
 		return m_switch;
 	}
 
-	/// Sets RenderTarget for the current camera, enables the camera to render to offscreen textures..
+	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The RenderTarget to be used.
 	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
@@ -136,7 +136,7 @@ public:
 	/// \param order The phase of rendering.
 	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
 	/// 			 determined.
-	virtual void setRenderOrder(RenderOrder bin, int value) override;
+	virtual void setRenderOrder(RenderOrder order, int value) override;
 
 private:
 

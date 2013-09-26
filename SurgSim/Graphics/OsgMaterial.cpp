@@ -23,12 +23,18 @@
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgUniformBase;
 
-OsgMaterial::OsgMaterial() : SurgSim::Graphics::Material(),
+namespace SurgSim
+{
+
+namespace Graphics
+{
+
+OsgMaterial::OsgMaterial() : Material(),
 	m_stateSet(new osg::StateSet())
 {
 }
 
-bool OsgMaterial::addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
+bool OsgMaterial::addUniform(std::shared_ptr<UniformBase> uniform)
 {
 	bool didSucceed = false;
 
@@ -43,7 +49,7 @@ bool OsgMaterial::addUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uni
 	return didSucceed;
 }
 
-bool OsgMaterial::removeUniform(std::shared_ptr<SurgSim::Graphics::UniformBase> uniform)
+bool OsgMaterial::removeUniform(std::shared_ptr<UniformBase> uniform)
 {
 	std::shared_ptr<OsgUniformBase> osgUniform = std::dynamic_pointer_cast<OsgUniformBase>(uniform);
 
@@ -68,13 +74,14 @@ unsigned int OsgMaterial::getNumUniforms() const
 {
 	return m_uniforms.size();
 }
-std::shared_ptr<SurgSim::Graphics::UniformBase> OsgMaterial::getUniform(unsigned int index) const
+
+std::shared_ptr<UniformBase> OsgMaterial::getUniform(unsigned int index) const
 {
 	return m_uniforms[index];
 }
 
-std::shared_ptr<SurgSim::Graphics::UniformBase>
-SurgSim::Graphics::OsgMaterial::getUniform(const std::string& name) const
+std::shared_ptr<UniformBase>
+OsgMaterial::getUniform(const std::string& name) const
 {
 	std::shared_ptr<UniformBase> result;
 	auto it = std::find_if(
@@ -88,7 +95,7 @@ SurgSim::Graphics::OsgMaterial::getUniform(const std::string& name) const
 	return result;
 }
 
-bool SurgSim::Graphics::OsgMaterial::removeUniform(const std::string& name)
+bool OsgMaterial::removeUniform(const std::string& name)
 {
 	bool result = false;
 	auto it = std::find_if(
@@ -102,12 +109,12 @@ bool SurgSim::Graphics::OsgMaterial::removeUniform(const std::string& name)
 	return result;
 }
 
-bool SurgSim::Graphics::OsgMaterial::hasUniform(const std::string& name) const
+bool OsgMaterial::hasUniform(const std::string& name) const
 {
 	return (getUniform(name) != nullptr);
 }
 
-bool OsgMaterial::setShader(std::shared_ptr<SurgSim::Graphics::Shader> shader)
+bool OsgMaterial::setShader(std::shared_ptr<Shader> shader)
 {
 	bool didSucceed = false;
 
@@ -126,7 +133,7 @@ bool OsgMaterial::setShader(std::shared_ptr<SurgSim::Graphics::Shader> shader)
 	return didSucceed;
 }
 
-std::shared_ptr<SurgSim::Graphics::Shader> OsgMaterial::getShader() const
+std::shared_ptr<Shader> OsgMaterial::getShader() const
 {
 	return m_shader;
 }
@@ -139,3 +146,7 @@ void OsgMaterial::clearShader()
 	}
 	m_shader = nullptr;
 }
+
+}; // namespace Graphics
+
+}; // namespace SurgSim
