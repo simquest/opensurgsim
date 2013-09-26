@@ -76,7 +76,7 @@ template <unsigned int N>
 struct MeshElement<N, void>
 {
 	/// Constructor
-	/// \param	vertices	IDs of the N element vertices
+	/// \param	verticesId	IDs of the N element vertices
 	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
 		verticesId(verticesId)
 	{

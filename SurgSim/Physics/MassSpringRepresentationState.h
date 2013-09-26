@@ -158,19 +158,19 @@ public:
 	}
 
 	/// Comparison operator (equality)
-	/// \param s LinearSpringParameter to compare it to
+	/// \param spring LinearSpringParameter to compare it to
 	/// \return True if the 2 LinearSpringParameter contains the same information, false otherwise
-	bool operator ==(const LinearSpringParameter& s) const
+	bool operator ==(const LinearSpringParameter& spring) const
 	{
-		return m_l0 == s.m_l0 && m_stiffness == s.m_stiffness && m_damping == s.m_damping;
+		return m_l0 == spring.m_l0 && m_stiffness == spring.m_stiffness && m_damping == spring.m_damping;
 	}
 
 	/// Comparison operator (inequality)
-	/// \param s LinearSpringParameter to compare it to
+	/// \param spring LinearSpringParameter to compare it to
 	/// \return False if the 2 LinearSpringParameter contains the same information, true otherwise
-	bool operator !=(const LinearSpringParameter& m) const
+	bool operator !=(const LinearSpringParameter& spring) const
 	{
-		return !((*this) == m);
+		return !((*this) == spring);
 	}
 
 private:
