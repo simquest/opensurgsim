@@ -41,7 +41,6 @@ public:
 	void SetUp()
 	{
 		m_dt = 1e-3;
-		m_dtDivergenceTest = 1e+3;
 
 		double radius = 0.1;
 		m_param.setDensity(700.0);
@@ -59,10 +58,6 @@ public:
 			q.normalize();
 			m_state.setPose(SurgSim::Math::makeRigidTransform(q, t));
 		}
-
-		// State to be used to test divergence
-		const SurgSim::Math::Vector3d max(DBL_MAX, DBL_MAX, DBL_MAX);
-		m_stateDivergence.setAngularVelocity(max);
 
 		m_vtcParam.setVtcAngularDamping(20.0);
 		m_vtcParam.setVtcAngularStiffness(20.0);
@@ -122,7 +117,6 @@ public:
 
 	// Time step
 	double m_dt;
-	double m_dtDivergenceTest;
 
 	// Expected compliance matrix
 	Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> m_expectedCompliance;
@@ -147,9 +141,6 @@ public:
 
 	// Rigid representation state
 	RigidRepresentationState m_state;
-
-	// Rigid representation state for divergence test
-	RigidRepresentationState m_stateDivergence;
 
 	// Rigid representation default state
 	RigidRepresentationState m_defaultState;
@@ -417,25 +408,60 @@ TEST_F(VtcRigidRepresentationTest, GravityTest)
 	}
 }
 
-TEST_F(VtcRigidRepresentationTest, DisableWhenDivergeTest)
+void disableWhenDivergeTest(std::shared_ptr<VtcRigidRepresentation> vtcRigidBody,
+	const RigidRepresentationParameters& param, const RigidRepresentationState& state, double dt)
 {
-	// Create the rigid body
-	std::shared_ptr<VtcRigidRepresentation> rigidBody = std::make_shared<VtcRigidRepresentation>("Rigid Vtc");
-
 	// Setup phase
-	rigidBody->setIsActive(true);
-	rigidBody->setInitialParameters(m_param);
-	rigidBody->setInitialState(m_stateDivergence);
+	vtcRigidBody->setIsActive(true);
+	vtcRigidBody->setIsGravityEnabled(true);
+	vtcRigidBody->setInitialParameters(param);
+	vtcRigidBody->setInitialState(state);
 
 	// Run 1 time step and make sure that the rigid body has been disabled
 	// The rotation explode under the angular velocity too strong !
 	{
-		ASSERT_TRUE(rigidBody->isActive());
+		ASSERT_TRUE(vtcRigidBody->isActive());
 
-		rigidBody->beforeUpdate(m_dtDivergenceTest);
-		rigidBody->update(m_dtDivergenceTest);
-		rigidBody->afterUpdate(m_dtDivergenceTest);
+		vtcRigidBody->beforeUpdate(dt);
+		vtcRigidBody->update(dt);
+		vtcRigidBody->afterUpdate(dt);
 
-		ASSERT_FALSE(rigidBody->isActive());
+		ASSERT_FALSE(vtcRigidBody->isActive());
+	}
+}
+
+TEST_F(VtcRigidRepresentationTest, DisableWhenDivergeTest)
+{
+	// Test with Signaling Nan
+	{
+		// Create the rigid body
+		std::shared_ptr<VtcRigidRepresentation> vtcRigidBody = std::make_shared<VtcRigidRepresentation>("Rigid");
+		vtcRigidBody->setInitialVtcParameters(m_vtcParam);
+		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
+
+		SCOPED_TRACE("Testing with Signaling Nan");
+		disableWhenDivergeTest(vtcRigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test with quiet Nan
+	{
+		// Create the rigid body
+		std::shared_ptr<VtcRigidRepresentation> vtcRigidBody = std::make_shared<VtcRigidRepresentation>("Rigid");
+		vtcRigidBody->setInitialVtcParameters(m_vtcParam);
+		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
+
+		SCOPED_TRACE("Testing with Quiet Nan");
+		disableWhenDivergeTest(vtcRigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test with numerical maximum value
+	{
+		// Create the rigid body
+		std::shared_ptr<VtcRigidRepresentation> vtcRigidBody = std::make_shared<VtcRigidRepresentation>("Rigid");
+		vtcRigidBody->setInitialVtcParameters(m_vtcParam);
+		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
+
+		SCOPED_TRACE("Testing with Quiet Nan");
+		disableWhenDivergeTest(vtcRigidBody, m_param, m_state, m_dt);
 	}
 }
