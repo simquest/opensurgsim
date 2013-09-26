@@ -17,7 +17,10 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <SurgSim/Serialize/Converter.h>
+#include <SurgSim/Math/Valid.h>
+#include <limits>
 
+using SurgSim::Math::isValid;
 
 class ConverterTest : public ::testing::Test
 {
@@ -57,7 +60,8 @@ TEST_F(ConverterTest, ConverterVector3dInvalidTest)
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	EXPECT_THROW(innode.as<SurgSim::Math::Vector3d>(), YAML::BadConversion);
+	SurgSim::Math::Vector3d expectedv3d = innode.as<SurgSim::Math::Vector3d>();
+	EXPECT_TRUE(! isValid(expectedv3d));
 }
 
 TEST_F(ConverterTest, ConverterVector3dNodeTest)
@@ -101,7 +105,8 @@ TEST_F(ConverterTest, ConverterVector4dInvalidTest)
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	EXPECT_THROW(innode.as<SurgSim::Math::Vector4d>(), YAML::BadConversion);
+	SurgSim::Math::Vector4d expectedv4d = innode.as<SurgSim::Math::Vector4d>();
+	EXPECT_TRUE(! isValid(expectedv4d));
 }
 
 
@@ -138,12 +143,13 @@ TEST_F(ConverterTest, ConverterQuaterniondInvalidTest)
 	SurgSim::Math::Quaterniond quat(3, 2, 1, 1);
 	quat.x() = std::numeric_limits<SurgSim::Math::Quaterniond::Scalar>::quiet_NaN();
 
-	outnode.push_back(quat);
+	outnode = quat;
 	fout << outnode;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	EXPECT_THROW(innode.as<SurgSim::Math::Quaterniond>(), YAML::BadConversion);
+	SurgSim::Math::Quaterniond expectedQuat = innode.as<SurgSim::Math::Quaterniond>();
+	EXPECT_TRUE(! isValid(expectedQuat));
 }
 
 TEST_F(ConverterTest, ConverterQuaterniondNodeTest)
@@ -197,7 +203,9 @@ TEST_F(ConverterTest, ConverterMatrix33dInvalidTest)
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	EXPECT_THROW(innode.as<SurgSim::Math::Matrix33d>(), YAML::BadConversion);
+	SurgSim::Math::Matrix33d expectedm33d = innode.as<SurgSim::Math::Matrix33d>();
+
+	EXPECT_TRUE(! isValid(expectedm33d));
 
 }
 
@@ -255,7 +263,8 @@ TEST_F(ConverterTest, ConverterMatrix44dInvalidTest)
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	EXPECT_THROW(innode.as<SurgSim::Math::Matrix44d>(), YAML::BadConversion);
+	SurgSim::Math::Matrix44d expectedm44d = innode.as<SurgSim::Math::Matrix44d>();
+	EXPECT_TRUE(! isValid(expectedm44d));
 }
 
 TEST_F(ConverterTest, ConverterMatrix44dNodeTest)
@@ -310,7 +319,8 @@ TEST_F(ConverterTest, ConverterRigidTransform3dInvalidTest)
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
-	EXPECT_THROW(innode.as<SurgSim::Math::RigidTransform3d>(), YAML::BadConversion);
+	SurgSim::Math::RigidTransform3d expectedRigid = innode.as<SurgSim::Math::RigidTransform3d>();
+	EXPECT_TRUE(! isValid(expectedRigid));
 }
 
 

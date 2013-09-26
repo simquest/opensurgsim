@@ -22,7 +22,6 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-
 namespace YAML
 {
 	/// declaration of specialization convert<SurgSim::Math::Vector3d>
@@ -36,6 +35,10 @@ namespace YAML
 	/// declaration of specialization convert<SurgSim::Math::Vector4d>
 	template <>
 	struct convert <SurgSim::Math::Quaterniond>;
+
+	/// declaration of specialization convert<SurgSim::Math::Matrix33d>
+	template <>
+	struct convert <SurgSim::Math::Matrix33d>;
 
 	/// declaration of specialization convert<SurgSim::Math::Matrix44d>
 	template <>

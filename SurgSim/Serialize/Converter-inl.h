@@ -37,6 +37,7 @@ namespace YAML
 			{
 				return false;
 			}
+
 			for (unsigned i = 0; i < node.size(); ++i)
 			{
 				try
@@ -45,7 +46,7 @@ namespace YAML
 				}
 				catch(YAML::RepresentationException)
 				{
-					return false;
+					rhs[i] = std::numeric_limits<SurgSim::Math::Vector3d::Scalar>::quiet_NaN();
 				}
 			}
 			return true;
@@ -81,7 +82,7 @@ namespace YAML
 				}
 				catch(YAML::RepresentationException)
 				{
-					return false;
+					rhs[i] = std::numeric_limits<SurgSim::Math::Vector4d::Scalar>::quiet_NaN();
 				}
 			}
 			return true;
@@ -136,11 +137,7 @@ namespace YAML
 			SurgSim::Math::Vector3d vector3d = vector3d.setZero();
 			for (auto row = 0; row < rhs.rows(); ++row)
 			{
-				bool validDecode = convert<SurgSim::Math::Vector3d>::decode(node[row], vector3d);
-				if (! validDecode)
-				{
-					return false;
-				}
+				convert<SurgSim::Math::Vector3d>::decode(node[row], vector3d);
 				rhs.row(row) = vector3d;
 			}
 			return true;
@@ -171,11 +168,7 @@ namespace YAML
 			SurgSim::Math::Vector4d vector4d = vector4d.setZero();
 			for (auto row = 0; row < rhs.rows(); ++row)
 			{
-				bool validDecode = convert<SurgSim::Math::Vector4d>::decode(node[row], vector4d);
-				if (! validDecode)
-				{
-					return false;
-				}
+				convert<SurgSim::Math::Vector4d>::decode(node[row], vector4d);
 				rhs.row(row) = vector4d;
 			}
 			return true;
@@ -202,11 +195,7 @@ namespace YAML
 			}
 
 			SurgSim::Math::Matrix44d transform;
-			bool validDecode = convert<SurgSim::Math::Matrix44d>::decode(node, transform);
-			if (! validDecode)
-			{
-				return false;
-			}
+			convert<SurgSim::Math::Matrix44d>::decode(node, transform);
 			rhs.matrix() = transform;
 			return true;
 		}
