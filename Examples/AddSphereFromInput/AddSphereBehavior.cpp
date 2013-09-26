@@ -20,6 +20,8 @@
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Framework/Scene.h>
 
+#include <sstream>
+
 using SurgSim::Math::RigidTransform3d;
 
 namespace SurgSim
@@ -49,7 +51,11 @@ namespace Input
 
 		if (button1 && ! m_buttonPreviouslyPressed)
 		{
-			std::string name = "sphereId_" + std::to_string(m_numElements++);
+			std::stringstream elementCount;
+			elementCount << ++ m_numElements;
+
+			std::string name = "sphereId_" + elementCount.str();
+
 			std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
 				std::make_shared<SurgSim::Blocks::SphereElement>(name, pose);
 
