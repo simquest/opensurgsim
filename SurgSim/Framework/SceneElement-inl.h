@@ -16,6 +16,12 @@
 #ifndef SURGSIM_FRAMEWORK_SCENEELEMENT_INL_H
 #define SURGSIM_FRAMEWORK_SCENEELEMENT_INL_H
 
+namespace SurgSim
+{
+
+namespace Framework
+{
+
 /// Implementation of getComponents method to get all the components with type T
 /// \return The type T components
 template <class T>
@@ -33,5 +39,9 @@ std::vector<std::shared_ptr<T>> SceneElement::getComponents() const
 	}
 	return result;
 }
+
+}; // namespace Framework
+
+}; // namespace SurgSim
 
 #endif
