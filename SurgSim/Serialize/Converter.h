@@ -22,6 +22,9 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
+#include <SurgSim/Framework/Log.h>
+
+
 namespace YAML
 {
 	/// declaration of specialization convert<SurgSim::Math::Vector3d>
