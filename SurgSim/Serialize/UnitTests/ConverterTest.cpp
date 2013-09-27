@@ -19,6 +19,11 @@
 #include <SurgSim/Serialize/Converter.h>
 #include <SurgSim/Math/Valid.h>
 #include <limits>
+#include <SurgSim/Graphics/SphereRepresentation.h>
+#include <SurgSim/Graphics/OsgSphereRepresentation.h>
+
+
+#include <random>
 
 using SurgSim::Math::isValid;
 
@@ -355,4 +360,33 @@ TEST_F(ConverterTest, ConverterRigidTransform3dEmitterTest)
 	SurgSim::Math::RigidTransform3d expectedRigid = innode.as<SurgSim::Math::RigidTransform3d>();
 
 	EXPECT_EQ(expectedRigid.matrix(), rigid.matrix());
+}
+
+TEST_F(ConverterTest, ConvertSphereRepresentationTest)
+{
+	YAML::Emitter outnode(fout);
+
+	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> sphereRepresentation = 
+		std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("Sphere_Obj");
+
+	double sphereRadius = 5.0;
+	sphereRepresentation->setRadius(sphereRadius);
+
+	SurgSim::Math::RigidTransform3d spherePose = SurgSim::Math::makeRigidTransform(
+		SurgSim::Math::Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(),
+		SurgSim::Math::Vector3d::Random());
+	sphereRepresentation->setPose(spherePose);
+
+	/// Encoding sphere representation
+	outnode << sphereRepresentation;
+	fout.close();
+	/*
+	/// Decoding sphere representation
+	YAML::Node innode = YAML::LoadFile(datafile);
+	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> expectedSphere =  std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
+	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, expectedSphere);
+
+	EXPECT_EQ(sphereRepresentation->getRadius(), expectedSphere->getRadius());
+	EXPECT_EQ(sphereRepresentation->getInitialPose().matrix(), expectedSphere->getInitialPose().matrix());
+	*/
 }

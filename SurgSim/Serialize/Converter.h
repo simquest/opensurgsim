@@ -21,6 +21,8 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Graphics/SphereRepresentation.h>
+#include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
 #include <SurgSim/Framework/Log.h>
 
@@ -51,6 +53,11 @@ namespace YAML
 	template <>
 	struct convert <SurgSim::Math::RigidTransform3d>;
 
+	/// declaration of specialization convert<SurgSim::Math::SphereRepresentation>
+	template <>
+	struct convert <SurgSim::Graphics::SphereRepresentation>;
+
+
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
 
@@ -68,6 +75,9 @@ namespace YAML
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
+
+	// Overload << for YAML::Emitter to support SurgSim::Graphics::SpherePresentation type
+	Emitter& operator << (Emitter& out, const SurgSim::Graphics::SphereRepresentation& rhs);
 
 };
 

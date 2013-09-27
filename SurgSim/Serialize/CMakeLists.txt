@@ -17,6 +17,7 @@
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${YAML_CPP_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
 )
 
 set(SURGSIM_SERIALIZE_SOURCES
@@ -33,6 +34,9 @@ surgsim_add_library(
 	"${SURGSIM_SERIALIZE_HEADERS}"
 	"SurgSim/Serialize"
 )
+
+set(LIBS SurgSimFramework SurgSimGraphics ${Boost_LIBRARIES})
+
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

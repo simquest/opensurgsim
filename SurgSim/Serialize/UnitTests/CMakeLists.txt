@@ -29,6 +29,6 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimFramework gtest yaml-cpp ${Boost_LIBRARIES})
+set(LIBS SurgSimFramework SurgSimGraphics gtest yaml-cpp ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimSerializeTest)
