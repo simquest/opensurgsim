@@ -77,12 +77,14 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 
 bool SceneElement::initialize()
 {
+	SURGSIM_ASSERT(! m_isInitialized)<<"Double initialization calls on SceneElement "<<m_name;
 	m_isInitialized = doInitialize();
 	return m_isInitialized;
 }
 
 bool SceneElement::wakeUp()
 {
+	SURGSIM_ASSERT(! m_isAwake)<<"Double wake up calls on SceneElement "<<m_name;
 	m_isAwake = doWakeUp();
 	return m_isAwake;
 }
