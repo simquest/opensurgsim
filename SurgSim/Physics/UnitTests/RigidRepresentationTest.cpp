@@ -306,7 +306,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
-		SCOPED_TRACE("Testing with Quiet Nan");
+		SCOPED_TRACE("Testing with double max");
 		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
 	}
 }

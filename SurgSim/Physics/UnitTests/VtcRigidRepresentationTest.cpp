@@ -461,7 +461,7 @@ TEST_F(VtcRigidRepresentationTest, DisableWhenDivergeTest)
 		vtcRigidBody->setInitialVtcParameters(m_vtcParam);
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
-		SCOPED_TRACE("Testing with Quiet Nan");
+		SCOPED_TRACE("Testing with double max");
 		disableWhenDivergeTest(vtcRigidBody, m_param, m_state, m_dt);
 	}
 }
