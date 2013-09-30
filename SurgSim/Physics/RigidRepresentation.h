@@ -35,6 +35,7 @@ namespace Physics
 class RigidRepresentation : public RigidRepresentationBase
 {
 public:
+
 	/// Constructor
 	/// \param name The rigid representation's name
 	explicit RigidRepresentation(const std::string& name);
@@ -63,11 +64,13 @@ public:
 	/// Set the external force being applied to the rigid representation,
 	/// not including gravity
 	/// \param force The external force
-	void setExternalForce(const SurgSim::Math::Vector3d& force);
+	/// \param compliance The linear compliance associated with the force
+	void setExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& compliance);
 
 	/// Set the external torque being applied to the rigid representation
 	/// \param torque The external torque 
-	void setExternalTorque(const SurgSim::Math::Vector3d& torque);
+	/// \param compliance The angular compliance associated with the torque
+	void setExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& compliance);
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -87,9 +90,11 @@ public:
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters();
 
+	typedef Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> ComplianceMatrixType;
+
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
-	const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>& getComplianceMatrix() const;
+	const ComplianceMatrixType& getComplianceMatrix() const;
 
 protected:
 	/// Inertia matrices in global coordinates
@@ -106,7 +111,9 @@ protected:
 	SurgSim::Math::Vector3d m_externalTorque;
 
 	/// Compliance matrix (size of the number of Dof = 6)
-	Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> m_C;
+	ComplianceMatrixType m_C;
+	SurgSim::Math::Matrix33d m_externalForceCompliance;
+	SurgSim::Math::Matrix33d m_externalTorqueCompliance;
 
 private:
 	/// Compute compliance matrix (internal data structure)

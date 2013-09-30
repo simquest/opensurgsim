@@ -33,7 +33,9 @@ namespace Physics
 RigidRepresentation::RigidRepresentation(const std::string& name) :
 	RigidRepresentationBase(name),
 	m_externalForce(SurgSim::Math::Vector3d::Zero()),
-	m_externalTorque(SurgSim::Math::Vector3d::Zero())
+	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
+	m_externalForceCompliance(SurgSim::Math::Matrix33d::Zero()),
+	m_externalTorqueCompliance(SurgSim::Math::Matrix33d::Zero())
 {
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
@@ -68,14 +70,16 @@ void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 }
 
-void RigidRepresentation::setExternalForce(const SurgSim::Math::Vector3d& force)
+void RigidRepresentation::setExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& compliance)
 {
 	m_externalForce = force;
+	m_externalForceCompliance = compliance;
 }
 
-void RigidRepresentation::setExternalTorque(const SurgSim::Math::Vector3d& torque)
+void RigidRepresentation::setExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& compliance)
 {
 	m_externalTorque = torque;
+	m_externalTorqueCompliance = compliance;
 }
 
 void RigidRepresentation::beforeUpdate(double dt)
@@ -278,19 +282,26 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 		return;
 	}
 
+	using SurgSim::Math::Matrix33d;
+	Matrix33d inverseLinearCompliance;
+	inverseLinearCompliance = (m_currentParameters.getMass()/dt) * Matrix33d::Identity();
+	inverseLinearCompliance += m_currentParameters.getLinearDamping() * Matrix33d::Identity();
+	if (! m_externalForceCompliance.isZero())
+	{
+		inverseLinearCompliance += m_externalForceCompliance.inverse();
+	}
+
+	Matrix33d inverseAngularCompliance;
+	inverseAngularCompliance = m_globalInertia / dt;
+	inverseAngularCompliance += m_currentParameters.getAngularDamping() * Matrix33d::Identity();
+	if (! m_externalTorqueCompliance.isZero())
+	{
+		inverseAngularCompliance += m_externalTorqueCompliance.inverse();
+	}
+
 	m_C.setZero();
-
-	// Compliance matrix for interactions:
-	// C = ( Mlinear^-1       0     )
-	//     (   0        Mangular^-1 )
-	// with Mlinear^-1  = Id33.(1/m)/(1/dt + alphaLinear)]
-	// with Mangular^-1 = I^-1      /(1/dt + alphaAngular)
-	RigidRepresentationParameters& p = m_currentParameters;
-	double coefLin = (1.0/p.getMass()) / (1.0/dt + p.getLinearDamping());
-	double coefAng =        1.0        / (1.0/dt + p.getAngularDamping());
-
-	m_C(0,0) = m_C(1,1) = m_C(2,2) = coefLin;
-	m_C.block<3,3>(3,3) = m_invGlobalInertia * coefAng;
+	m_C.block<3,3>(0,0) = inverseLinearCompliance.inverse();
+	m_C.block<3,3>(3,3) = inverseAngularCompliance.inverse();
 }
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)

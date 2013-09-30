@@ -19,11 +19,13 @@
 #include <SurgSim/Framework/Logger.h>
 #include <SurgSim/Input/InputComponent.h>
 #include <SurgSim/Math/Vector.h>
+#include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
 
@@ -80,8 +82,15 @@ void VtcBehavior::update(double dt)
 	torque += m_parameters.getAngularStiffness() * computeRotationVector(inputPose, objectPose);
 	torque += m_parameters.getAngularDamping() * (inputAngularVelocity - objectAnglularVelocity);
 	
-	m_rigid->setExternalForce(force);
-	m_rigid->setExternalTorque(torque);
+	double coefficent = 1.0 / (m_parameters.getLinearDamping() + dt * m_parameters.getLinearStiffness());
+	Matrix33d linearCompliance = coefficent * Matrix33d::Identity();
+
+	coefficent = 1.0 / (m_parameters.getAngularDamping() + dt * m_parameters.getAngularStiffness());
+	Matrix33d angularCompliance = coefficent * Matrix33d::Identity();
+
+	m_rigid->setExternalForce(force, linearCompliance);
+	m_rigid->setExternalTorque(torque, angularCompliance);
+
 	m_previousState.setPose(inputPose);
 	m_previousState.setLinearVelocity(inputLinearVelocity);
 	m_previousState.setAngularVelocity(inputAngularVelocity);
