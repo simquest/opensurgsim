@@ -404,7 +404,7 @@ if __name__ == '__main__':
     # command size or amount of parameters
     index = 0
     ok = True
-    while index < len(files) :    
+    while index < len(args.files) :    
         if not run_cpplint(args.cpplint_script, args.cpplint_filter,
                        filter(lambda x: re.search(r'\.(?:h|cpp)$', x),
                               args.files[index:index+100])):
