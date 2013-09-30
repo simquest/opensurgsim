@@ -46,9 +46,10 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include <Examples/BouncingBalls/AddSphereBehavior.h>
+#include <Examples/BouncingBalls/AddRandomSphereBehavior.h>
 
 using SurgSim::Blocks::BasicSceneElement;
+using SurgSim::Blocks::AddRandomSphereBehavior;
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
@@ -151,7 +152,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
 
-	planeElement->addComponent(std::make_shared<AddSphereBehavior>());
+	planeElement->addComponent(std::make_shared<AddRandomSphereBehavior>());
 
 	return planeElement;
 }
