@@ -61,7 +61,7 @@ public:
 			}
 			else if (!doesHave && uniform != nullptr)
 			{
-				return testing::AssertionFailure() << "Did not expect uniform " << it->second->getName() << 
+				return testing::AssertionFailure() << "Did not expect uniform " << it->second->getName() <<
 					" but found it.";
 			}
 		}
@@ -187,7 +187,7 @@ TEST_F(OsgLightTests, PositionUniformTest)
 	Vector3d translate(5.0,6.0,7.0);
 
 	pose.translate(translate);
-	
+
 	light->setPose(pose);
 
 	osg::Vec3f osgTranslate;

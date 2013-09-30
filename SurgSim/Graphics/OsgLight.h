@@ -38,9 +38,9 @@ class StateSet;
 
 }
 
-namespace SurgSim 
+namespace SurgSim
 {
-namespace Graphics 
+namespace Graphics
 {
 
 class OsgGroup;
@@ -125,8 +125,8 @@ private:
 	/// Removes all the lights variable from the given StateSet
 	void remove(osg::ref_ptr<osg::StateSet> stateSet);
 
-	/// Internal for managing uniforms 
-	enum UniformType 
+	/// Internal for managing uniforms
+	enum UniformType
 	{
 		POSITION = 0,
 		AMBIENT_COLOR,
@@ -136,7 +136,7 @@ private:
 		LINEAR_ATTENUATION,
 		QUADRATIC_ATTENUATION
 	};
-	
+
 
 	/// The group for this light
 	std::shared_ptr<OsgGroup> m_group;
