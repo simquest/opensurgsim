@@ -45,7 +45,6 @@ public:
 	void SetUp()
 	{
 		m_dt = 1e-3;
-		m_dtDivergenceTest = 1e+3;
 
 		double radius = 0.1;
 		m_param.setDensity(9000.0);
@@ -60,9 +59,6 @@ public:
 		m_state.setLinearVelocity(Vector3d(3, 2, 1));
 		m_state.setPose(SurgSim::Math::makeRigidTransform(q,t ));
 
-		// State to be used for divergence test
-		m_stateDivergence.setAngularVelocity(Vector3d(DBL_MAX, DBL_MAX, DBL_MAX));
-
 		m_maxNumSimulationStepTest = 100;
 	}
 
@@ -72,7 +68,6 @@ public:
 
 	// Time step
 	double m_dt;
-	double m_dtDivergenceTest;
 
 	// Rigid representation parameters
 	RigidRepresentationParameters m_param;
@@ -82,9 +77,6 @@ public:
 
 	// Rigid representation state
 	RigidRepresentationState m_state;
-
-	// Rigid representation state for divergence test
-	RigidRepresentationState m_stateDivergence;
 
 	// Rigid representation default state
 	RigidRepresentationState m_defaultState;
@@ -264,27 +256,58 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 	}
 }
 
-TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
+void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
+	const RigidRepresentationParameters& param, const RigidRepresentationState& state, double dt)
 {
-	// Create the rigid body
-	std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
-
 	// Setup phase
 	rigidBody->setIsActive(true);
 	rigidBody->setIsGravityEnabled(true);
-	rigidBody->setInitialParameters(m_param);
-	rigidBody->setInitialState(m_stateDivergence);
+	rigidBody->setInitialParameters(param);
+	rigidBody->setInitialState(state);
 
 	// Run 1 time step and make sure that the rigid body has been disabled
 	// The rotation explode under the angular velocity too strong !
 	{
 		ASSERT_TRUE(rigidBody->isActive());
 
-		rigidBody->beforeUpdate(m_dtDivergenceTest);
-		rigidBody->update(m_dtDivergenceTest);
-		rigidBody->afterUpdate(m_dtDivergenceTest);
+		rigidBody->beforeUpdate(dt);
+		rigidBody->update(dt);
+		rigidBody->afterUpdate(dt);
 
 		ASSERT_FALSE(rigidBody->isActive());
+	}
+}
+
+TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
+{
+	// Test with Signaling Nan
+	{
+		// Create the rigid body
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
+
+		SCOPED_TRACE("Testing with Signaling Nan");
+		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test with quiet Nan
+	{
+		// Create the rigid body
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
+
+		SCOPED_TRACE("Testing with Quiet Nan");
+		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test with numerical maximum value
+	{
+		// Create the rigid body
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
+
+		SCOPED_TRACE("Testing with double max");
+		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
 	}
 }
 
