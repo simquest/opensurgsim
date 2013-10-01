@@ -141,8 +141,8 @@ bool OsgRepresentation::addGroupReference(const std::string& name)
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) << 
-			"Representation::requestGroup() was called while the component was already awake for component " << 
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
+			"Representation::requestGroup() was called while the component was already awake for component " <<
 			getName() << " this has no effect and should be avoided.";
 	}
 	return result;
@@ -160,8 +160,8 @@ void OsgRepresentation::addGroupReferences(const std::vector<std::string>& group
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) << 
-			"Representation::requestGroups() was called while the component was already awake for component " << 
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
+			"Representation::requestGroups() was called while the component was already awake for component " <<
 			getName() << " this has no effect and should be avoided.";
 	}
 }

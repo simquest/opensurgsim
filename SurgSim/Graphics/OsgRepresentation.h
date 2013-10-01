@@ -103,7 +103,7 @@ public:
 	/// Adds a list of group references.
 	/// \param	groups	The references.
 	virtual void addGroupReferences(const std::vector<std::string>& groups) override;
-	
+
 	/// Gets group references.
 	/// \return	The group references.
 	virtual std::vector<std::string> getGroupReferences() override;
