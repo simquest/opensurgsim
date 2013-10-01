@@ -29,34 +29,39 @@ include_directories(
 	"${OPENTHREADS_INCLUDE_DIR}"
 )
 
-set(EXAMPLE_SOURCES
-	AddRandomSphereBehavior.cpp
-	ExampleBouncingBalls.cpp
+set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
+	AddSphereBehavior.cpp
+	AddSphereFromInput.cpp
 )
 
-set(EXAMPLE_HEADERS
-	AddRandomSphereBehavior.h
+
+set(ADDSPHEREFROMINPUT_EXAMPLE_HEADER
+	AddSphereBehavior.h
 )
 
-# Configure the path for the data files
-configure_file(
-	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
-	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
-)
+add_executable(ExampleAddSphereFromInput
+	${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}
+	${ADDSPHEREFROMINPUT_EXAMPLE_HEADER})
 
-add_executable(ExampleBouncingBalls
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+"${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}" "${ADDSPHEREFROMINPUT_EXAMPLE_HEADER}")
 
-target_link_libraries(ExampleBouncingBalls
-	SurgSimFramework
+set(LIBS 
+	IdentityPoseDevice
+	MultiAxisDevice
 	SurgSimBlocks
 	SurgSimDataStructures
-	SurgSimPhysics
+	SurgSimFramework
 	SurgSimGraphics
 	SurgSimInput
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
+	SurgSimPhysics
+	${OPENSCENEGRAPH_LIBRARIES} 
 	${OPENTHREADS_LIBRARY}
+	${Boost_LIBRARIES})
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
+
+target_link_libraries(ExampleAddSphereFromInput
+	${LIBS}
 )

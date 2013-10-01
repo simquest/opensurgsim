@@ -47,7 +47,7 @@ namespace SurgSim
 namespace Device
 {
 
-	
+
 class PhantomScaffold::Handle
 {
 public:

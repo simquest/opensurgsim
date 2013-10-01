@@ -39,13 +39,13 @@ class Group;
 /// uniform float ossLightLinearAttenuation
 /// uniform float ossLightQuadraticAttenuation
 /// \endcode
-/// 
+///
 class Light : public virtual Representation
 {
 public:
 
 	/// Constructor
-	explicit Light(const std::string& name) : Representation(name) 
+	explicit Light(const std::string& name) : Representation(name)
 	{
 	}
 

@@ -17,9 +17,10 @@
 #include <sstream>
 #include <stdlib.h>
 
-#include <Examples/BouncingBalls/AddSphereBehavior.h>
+#include <Examples/BouncingBalls/AddRandomSphereBehavior.h>
 
 #include <SurgSim/Framework/Behavior.h>
+#include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Blocks/SphereElement.h>
 #include <SurgSim/Math/Vector.h>
@@ -29,17 +30,33 @@ using SurgSim::Framework::Behavior;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Math::Vector3d;
 
-AddSphereBehavior::AddSphereBehavior():
+namespace SurgSim
+{
+
+namespace Blocks
+{
+
+AddRandomSphereBehavior::AddRandomSphereBehavior():
 	Behavior("DynamicallyAddSphereElement"), m_totalTime(0.0), m_numElements(0)
 {
 }
 
 
-AddSphereBehavior::~AddSphereBehavior()
+AddRandomSphereBehavior::~AddRandomSphereBehavior()
 {
 }
 
-void AddSphereBehavior::update(double dt)
+bool AddRandomSphereBehavior::doInitialize()
+{
+	return true;
+}
+
+bool AddRandomSphereBehavior::doWakeUp()
+{
+	return true;
+}
+
+void AddRandomSphereBehavior::update(double dt)
 {
 	m_totalTime += dt;
 
@@ -63,3 +80,7 @@ void AddSphereBehavior::update(double dt)
 		getScene()->addSceneElement(m_element);
 	}
 }
+
+};  // namespace Blocks
+
+};  // namespace SurgSim

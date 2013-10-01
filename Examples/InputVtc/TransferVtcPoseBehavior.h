@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_INPUTVTC_TRANSFERVTCPROXYPOSEBEHAVIOR_H
-#define EXAMPLES_INPUTVTC_TRANSFERVTCPROXYPOSEBEHAVIOR_H
+#ifndef EXAMPLES_INPUTVTC_TRANSFERVTCPOSEBEHAVIOR_H
+#define EXAMPLES_INPUTVTC_TRANSFERVTCPOSEBEHAVIOR_H
 
 
 /// Behavior to copy proxy pose from Vtc representation to a representation.
@@ -61,4 +61,4 @@ private:
 	std::shared_ptr<SurgSim::Framework::Representation> m_to;
 };
 
-#endif //EXAMPLES_INPUTVTC_TRANSFERVTCPROXYPOSEBEHAVIOR_H
+#endif //EXAMPLES_INPUTVTC_TRANSFERVTCPOSEBEHAVIOR_H
