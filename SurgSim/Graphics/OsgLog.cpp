@@ -25,34 +25,14 @@ namespace Graphics
 
 OsgLog::OsgLog() : m_logger(SurgSim::Framework::Logger::getLogger("OsgLogger"))
 {
-	int level = m_logger->getThreshold();
-
-	// Initialize osg::Notify level based on OSS logger level
-	if (SurgSim::Framework::LOG_LEVEL_DEBUG == level)
-	{
-		osg::setNotifyLevel(osg::DEBUG_INFO);
-	}
-	else if (SurgSim::Framework::LOG_LEVEL_INFO == level)
-	{
-		osg::setNotifyLevel(osg::NOTICE);
-	}
-	else if (SurgSim::Framework::LOG_LEVEL_WARNING == level)
-	{
-		osg::setNotifyLevel(osg::WARN);
-	}
-	else if (SurgSim::Framework::LOG_LEVEL_SEVERE == level)
-	{
-		osg::setNotifyLevel(osg::FATAL);
-	}
-	else
-	{
-		osg::setNotifyLevel(osg::ALWAYS);
-	}
+	// Set osg's notify level to the lowest, i.e. all info will be logged
+	osg::setNotifyLevel(osg::DEBUG_FP);
 }
 
 
 void OsgLog::notify(osg::NotifySeverity severity, const char *message)
 {
+	// Map osg logging levels in OSS logging levels
 	if (severity <= osg::FATAL)
 	{
 		SURGSIM_LOG(m_logger, CRITICAL) << message;
@@ -68,6 +48,10 @@ void OsgLog::notify(osg::NotifySeverity severity, const char *message)
 	else if (osg::INFO < severity && severity <= osg::DEBUG_FP)
 	{
 		SURGSIM_LOG(m_logger, DEBUG) << message;
+	}
+	else
+	{
+		SURGSIM_LOG(m_logger, CRITICAL) << "Unknown severity in OsgLog::notify()";
 	}
 }
 

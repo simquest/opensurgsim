@@ -137,7 +137,7 @@ private:
 
 
 /// Enable Logging of OSG through SurgSim Logging System
-class MockOsgLog : public osg::NotifyHandler 
+class MockOsgLog : public osg::NotifyHandler
 {
 public:
 	virtual void notify(osg::NotifySeverity severity, const char *message) override

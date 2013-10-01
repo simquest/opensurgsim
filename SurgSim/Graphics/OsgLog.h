@@ -25,9 +25,9 @@ namespace SurgSim
 
 namespace Graphics
 {
-	
-/// Enable Logging of OSG through SurgSim Logging System
-class OsgLog : public osg::NotifyHandler 
+
+/// Enable logging of OSG through SurgSim Logging System
+class OsgLog : public osg::NotifyHandler
 {
 public:
 	OsgLog();
