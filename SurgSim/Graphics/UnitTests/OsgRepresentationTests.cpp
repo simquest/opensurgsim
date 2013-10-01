@@ -167,7 +167,7 @@ TEST(OsgRepresentationTests, GroupTest)
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group1"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group2"));
 	EXPECT_NE(std::end(groups), std::find(std::begin(groups), std::end(groups), "group3"));
-	
+
 }
 
 TEST(OsgRepresentationTests, GroupsTest)

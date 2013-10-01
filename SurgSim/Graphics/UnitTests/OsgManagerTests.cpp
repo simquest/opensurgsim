@@ -275,7 +275,7 @@ TEST_F(OsgManagerTest, LazyGroupsTest)
 	representation2->addGroupReference("TestGroup_2");
 	representation2->addGroupReference("TestGroup_3");
 	representation3->addGroupReference("TestGroup_3");
-	
+
 
 	graphicsManager->enqueueAddComponent(representation1);
 	graphicsManager->enqueueAddComponent(representation2);

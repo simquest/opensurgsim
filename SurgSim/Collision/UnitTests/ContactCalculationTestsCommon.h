@@ -91,7 +91,7 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
 /// \param plane The plane shape.
 /// \param planeTrans The plane translation in global co-ordinate system.
 /// \param planeQuat The plane orientation in global co-ordinate system.
-void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContacts,
 							 const int expectedNumberOfContacts,
 							 const int* expectedBoxIndicesInContacts,
 							 const std::shared_ptr<BoxShape> box,
@@ -112,7 +112,7 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContac
 /// \param planeTrans The double-sided plane translation in global co-ordinate system.
 /// \param planeQuat The double-sided plane orientation in global co-ordinate system.
 /// \param collisionNormalIsPlaneNormal Flag to represent if the box is in collision
-void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContacts,
 										const int expectedNumberOfContacts,
 										const int* expectedBoxIndicesInContacts,
 										const std::shared_ptr<BoxShape> box,

@@ -32,7 +32,7 @@ class MockMassSpring : public MassSpringRepresentation
 public:
 	typedef MassSpringRepresentation::Vector Vector;
 
-	MockMassSpring(const std::string& name): MassSpringRepresentation(name)
+	explicit MockMassSpring(const std::string& name): MassSpringRepresentation(name)
 	{}
 
 	virtual ~MockMassSpring()
@@ -342,7 +342,7 @@ TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 		Vector3d f = ( m_springStiffness1D * (m_extremities1D[0] - x) ) / (m_totalMass1D/2.0);
 		v += f * m_dt;
 		x += v * m_dt;
-		
+
 		const Vector3d& finalMeshPosition = m.getFinalState().getVertex(1).position;
 		EXPECT_TRUE(finalMeshPosition.isApprox(m.getCurrentPositionEigenState().segment(3 * 1, 3)));
 		EXPECT_TRUE(finalMeshPosition.isApprox(x, 1e-8));
@@ -352,7 +352,7 @@ TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 		EXPECT_FALSE(deltaCompare.isZero(1e-9)) << "Error is " << deltaCompare.norm();
 		deltaCompare = m.getCurrentPositionEigenState().segment(3 * 1, 3) - m_extremities1D[1];
 		EXPECT_FALSE(deltaCompare.isZero(1e-9)) << "Error is " << deltaCompare.norm();
-		
+
 		time += m_dt;
 	}
 

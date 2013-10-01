@@ -85,7 +85,7 @@ Vector3d calculateTriangleMeshVertex(const int i,
 		trans;
 }
 
-void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContacts,
 	const int expectedNumberOfContacts, const int* expectedMeshIndicesInContacts,
 	const Vector3d& meshTrans, const Quaterniond& meshQuat,
 	const Vector3d& planeNormal, const double planeD,
@@ -104,7 +104,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>& expec
 		penetrationPoint.first.globalPosition.setValue(vertex);
 		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
 		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
-		expectedContacts.push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
+		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
 			collisionNormal, penetrationPoint));
 	}
 }
@@ -134,7 +134,7 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Physics::MeshShape<VertexT
 	std::list<std::shared_ptr<Contact>> expectedContacts;
 	if (expectedNumberOfContacts > 0)
 	{
-		generateTriangleMeshPlaneContact(expectedContacts, expectedNumberOfContacts, expectedMeshIndicesInContacts,
+		generateTriangleMeshPlaneContact(&expectedContacts, expectedNumberOfContacts, expectedMeshIndicesInContacts,
 			meshTrans, meshQuat, plane->getNormal(), plane->getD(), planeTrans,
 			planeQuat);
 	}
