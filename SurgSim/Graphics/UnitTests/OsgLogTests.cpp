@@ -13,24 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file
-/// Tests for the SURGSIM_LOG_*() macros and the related classes.
-
 #include <gtest/gtest.h>
 #include <iostream>
+
 #include <SurgSim/Graphics/OsgLog.h>
+#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
-TEST(LoggerTest, MessageTest)
+TEST(OsgLogTests, MessageTest)
 {
-	SurgSim::Graphics::OsgLog osgLog;
-	osg::NotifyHandler* pOsgLog = &osgLog;
+	osg::NotifyHandler* pOsgLog = new MockOsgLog;
+	osg::setNotifyHandler(pOsgLog);
 
-	/*osg::setNotifyHandler(pOsgLog);*/
-	osg::notify()<<"Test info\n";
+	// Level is below default level (osg::INFO)
+	osg::notify(osg::DEBUG_FP) << "Test" << std::endl;
+	EXPECT_EQ("", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
 
-int x;
-std::cin>>x;
-std::cout<<x<<std::endl;
-
-std::cin>>x;
+	// Level is above default level (osg::INFO)
+	osg::notify(osg::FATAL) << "Fatal" << std::endl;
+	EXPECT_EQ("Fatal\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
 }

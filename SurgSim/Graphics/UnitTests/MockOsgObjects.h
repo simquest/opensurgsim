@@ -19,6 +19,7 @@
 #include <SurgSim/Graphics/OsgRepresentation.h>
 
 #include <osg/Group>
+#include <osg/Notify>
 
 /// Representation class for testing
 class MockOsgRepresentation : public SurgSim::Graphics::OsgRepresentation
@@ -134,6 +135,20 @@ private:
 	SurgSim::Math::RigidTransform3d m_transform;
 };
 
+
+/// Enable Logging of OSG through SurgSim Logging System
+class MockOsgLog : public osg::NotifyHandler 
+{
+public:
+	virtual void notify(osg::NotifySeverity severity, const char *message) override
+	{
+		m_message = message;
+	}
+
+	std::string m_message;
+
+	std::string getMessage() const {return m_message;}
+};
 
 
 #endif  // SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H

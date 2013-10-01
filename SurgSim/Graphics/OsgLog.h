@@ -18,6 +18,8 @@
 
 #include <osg/Notify>
 
+#include <SurgSim/Framework/Log.h>
+
 namespace SurgSim
 {
 
@@ -28,7 +30,12 @@ namespace Graphics
 class OsgLog : public osg::NotifyHandler 
 {
 public:
+	OsgLog();
+
 	virtual void notify(osg::NotifySeverity severity, const char *message) override;
+
+private:
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 };  // namespace Graphics

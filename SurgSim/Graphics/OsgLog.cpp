@@ -13,27 +13,64 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Log.h>
 #include <SurgSim/Graphics/OsgLog.h>
 
 using SurgSim::Graphics::OsgLog;
+
+namespace SurgSim
+{
+
+namespace Graphics
+{
+
+OsgLog::OsgLog() : m_logger(SurgSim::Framework::Logger::getLogger("OsgLogger"))
+{
+	int level = m_logger->getThreshold();
+
+	// Initialize osg::Notify level based on OSS logger level
+	if (SurgSim::Framework::LOG_LEVEL_DEBUG == level)
+	{
+		osg::setNotifyLevel(osg::DEBUG_INFO);
+	}
+	else if (SurgSim::Framework::LOG_LEVEL_INFO == level)
+	{
+		osg::setNotifyLevel(osg::NOTICE);
+	}
+	else if (SurgSim::Framework::LOG_LEVEL_WARNING == level)
+	{
+		osg::setNotifyLevel(osg::WARN);
+	}
+	else if (SurgSim::Framework::LOG_LEVEL_SEVERE == level)
+	{
+		osg::setNotifyLevel(osg::FATAL);
+	}
+	else
+	{
+		osg::setNotifyLevel(osg::ALWAYS);
+	}
+}
+
 
 void OsgLog::notify(osg::NotifySeverity severity, const char *message)
 {
 	if (severity <= osg::FATAL)
 	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getLogger("OsgLog"))<<message;
+		SURGSIM_LOG(m_logger, CRITICAL) << message;
 	}
 	else if (osg::FATAL < severity && severity <= osg::WARN)
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("OsgLog"))<<message;
+		SURGSIM_LOG(m_logger, WARNING) << message;
 	}
-	else if (osg::WARN< severity && severity <= osg::INFO)
+	else if (osg::WARN < severity && severity <= osg::INFO)
 	{
-		SURGSIM_LOG_INFO(SurgSim::Framework::Logger::getLogger("OsgLog"))<<message;
+		SURGSIM_LOG(m_logger, INFO) << message;
 	}
 	else if (osg::INFO < severity && severity <= osg::DEBUG_FP)
 	{
-		SURGSIM_LOG_DEBUG(SurgSim::Framework::Logger::getLogger("OsgLog"))<<message;
+		SURGSIM_LOG(m_logger, DEBUG) << message;
 	}
 }
+
+};  // namespace Graphics
+
+};  // namespace SurgSim
