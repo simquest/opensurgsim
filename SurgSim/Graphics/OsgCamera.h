@@ -37,6 +37,7 @@ namespace Graphics
 
 class Material;
 class Texture;
+class RenderTarget;
 
 /// OSG implementation of a graphics camera.
 ///
@@ -99,35 +100,48 @@ public:
 	virtual void update(double dt);
 
 	/// Returns the OSG camera node
-	osg::ref_ptr<osg::Camera> getOsgCamera() const
+	inline osg::ref_ptr<osg::Camera> getOsgCamera() const
 	{
 		return m_camera;
 	}
 
-	osg::ref_ptr<osg::Node> getOsgNode() const
+	inline osg::ref_ptr<osg::Node> getOsgNode() const
 	{
 		return m_switch;
 	}
 
-	/// Sets a texture to be used as a color render target.
-	/// \param	texture	The texture to be used as a target.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) override;
+	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
+	/// \param	renderTarget	The RenderTarget to be used.
+	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
-	/// Gets the texture that is being used as the color render target.
-	/// \return	The color render texture.
-	virtual std::shared_ptr<Texture> getColorRenderTexture() const override;
+	/// Gets RenderTarget that is currently being used by the camera.
+	/// \return	The RenderTarget.
+	virtual std::shared_ptr<RenderTarget> getRenderTarget() const override;
 
-	///@{
-	/// This does not make a sense for a camera, they are disabled.
+	/// Sets a material on the group that has been attached to the camera.
+	/// \param	material	The material.
+	/// \return	true if it succeeds, false if there is no group or the material is not an OsgMaterial.
 	virtual bool setMaterial(std::shared_ptr<Material> material);
+
+	/// Gets the material if set.
+	/// \return	The material.
 	virtual std::shared_ptr<Material> getMaterial() const;
+
+	/// Clears the material from the attached group
 	virtual void clearMaterial();
-	///@}
-	///
+
+	/// Determine when this camera will render. The main camera will render at (RENDER_ORDER_IN_ORDER,0)
+	/// In general all preprocessing should be done in RENDER_ORDER_PRE_ORDER, HUD Displaying usually
+	/// at RENDER_ORDER_POST_ORDER. Overridden from Camera
+	/// \param order The phase of rendering.
+	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
+	/// 			 determined.
+	virtual void setRenderOrder(RenderOrder order, int value) override;
+
 private:
 
 	osg::ref_ptr<osg::Camera> m_camera;
+	osg::ref_ptr<osg::Group> m_materialProxy;
 
 	/// Pose of the camera, which is the inverse of the view matrix
 	SurgSim::Math::RigidTransform3d m_pose;
@@ -137,6 +151,16 @@ private:
 	SurgSim::Math::Matrix44d m_projectionMatrix;
 
 	std::unordered_map<int, std::shared_ptr<Texture>> m_textureMap;
+	std::shared_ptr<RenderTarget> m_renderTarget;
+
+	/// Attach a specific texture to a specific BufferComponent, works for Depth and all the Colors.
+	/// \param	buffer 	The BufferComponent enum.
+	/// \param	texture	The specific texture to attach.
+	void attachRenderTargetTexture(osg::Camera::BufferComponent buffer, std::shared_ptr<Texture> texture);
+
+	/// Detach the current render target from the camera.
+	void detachCurrentRenderTarget();
+
 };
 
 };  // namespace Graphics

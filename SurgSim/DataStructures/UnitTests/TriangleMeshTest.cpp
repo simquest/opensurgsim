@@ -48,7 +48,7 @@ public:
 		std::default_random_engine generator;
 		std::uniform_real_distribution<double> positionDistribution(-10.0, 10.0);
 		std::uniform_real_distribution<double> normalDistribution(-1.0, 1.0);
-		std::uniform_int_distribution<unsigned int> vertexIdDistribution(0, numVertices);
+		std::uniform_int_distribution<unsigned int> vertexIdDistribution(0, numVertices - 1);
 
 		if (printPositions)
 		{
@@ -215,7 +215,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		/// Make sure each vertex is set properly
 		for (unsigned int j = 0; j < mesh.getNumEdges(); ++j)
 		{
-			EXPECT_EQ(testEdgeVertices[j], edges[j].vertices);
+			EXPECT_EQ(testEdgeVertices[j], edges[j].verticesId);
 
 			const MockEdgeData& data = edges[j].data;
 			EXPECT_EQ(j, data.getId());
@@ -234,13 +234,44 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		/// Make sure each vertex is set properly
 		for (unsigned int j = 0; j < mesh.getNumTriangles(); ++j)
 		{
-			EXPECT_EQ(testTriangleVertices[j], triangles[j].vertices);
+			EXPECT_EQ(testTriangleVertices[j], triangles[j].verticesId);
 
 			const MockTriangleData& data = triangles[j].data;
 			EXPECT_EQ(j, data.getId());
 			EXPECT_EQ(testTriangleEdges[j], data.getEdges());
 		}
 	}
+}
+
+TEST_F(TriangleMeshTest, isValidTest)
+{
+	MockTriangleMesh mesh;
+
+	EXPECT_TRUE(mesh.isValid());
+
+	/// Create the edges (no vertices yet => the mesh is NOT valid)
+	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	{
+		mesh.createEdge(testEdgeVertices[i]);
+	}
+
+	EXPECT_FALSE(mesh.isValid());
+
+	/// Create the triangles (no vertices yet => the mesh is NOT valid)
+	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	{
+		mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]);
+	}
+
+	EXPECT_FALSE(mesh.isValid());
+
+	/// Create the vertices
+	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	{
+		mesh.createVertex(testPositions[i], testNormals[i]);
+	}
+
+	EXPECT_TRUE(mesh.isValid());
 }
 
 TEST_F(TriangleMeshTest, SetVertexPositionsTest)

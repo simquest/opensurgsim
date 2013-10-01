@@ -76,14 +76,17 @@ protected:
 	/// \return	True if it succeeds or the manager is not concerned with the component, false if it fails.
 	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
 
-	/// Adds an representation to the manager
+	/// Adds an representation to the manager. This will also add the representation to all of the groups
+	/// contained in its groupRenferences.
 	/// \param	representation	The representation to be added.
 	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
 	virtual bool addRepresentation(std::shared_ptr<Representation> representation);
 
-	/// Adds a group to the manager
+	/// Adds a group to the manager, this will also add all representations whose groupreferences include this
+	/// group to the group.
 	/// \param	group	The group to be added.
-	/// \return	True if the group was not in this manager and has been successfully added, false if it fails.
+	/// \return	True if the group was not in this manager and has been successfully added, it will return false
+	///				when a group with the same name already exists in the manager.
 	virtual bool addGroup(std::shared_ptr<Group> group);
 
 	/// Adds a view to the manager
@@ -110,6 +113,9 @@ protected:
 	/// Performs an update for a single timestep
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual bool doUpdate(double dt);
+
+	/// Overrides ComponentManager::getType()
+	virtual int getType() const override;
 
 private:
 	/// Initializes the manager

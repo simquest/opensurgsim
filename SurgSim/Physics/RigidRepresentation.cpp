@@ -21,11 +21,14 @@
 #include <SurgSim/Math/Valid.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Location.h>
+#include <SurgSim/Collision/Location.h>
 
-namespace SurgSim{
+using SurgSim::Collision::Location;
 
-namespace Physics{
+namespace SurgSim
+{
+namespace Physics
+{
 
 RigidRepresentation::RigidRepresentation(const std::string& name)
 	: RigidRepresentationBase(name)
@@ -36,6 +39,30 @@ RigidRepresentation::RigidRepresentation(const std::string& name)
 }
 
 RigidRepresentation::~RigidRepresentation()
+{
+}
+
+SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
+{
+	return REPRESENTATION_TYPE_RIGID;
+}
+
+void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
+{
+	m_initialParameters = parameters;
+	m_currentParameters = parameters;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+
+void SurgSim::Physics::RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
+{
+	m_currentParameters = parameters;
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+void SurgSim::Physics::RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 }
 
@@ -216,6 +243,20 @@ void RigidRepresentation::applyDofCorrection(
 	computeComplianceMatrix(dt);
 }
 
+void SurgSim::Physics::RigidRepresentation::resetParameters()
+{
+	Representation::resetParameters();
+	m_currentParameters = m_initialParameters;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
+	SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
+{
+	return m_C;
+}
+
 void RigidRepresentation::computeComplianceMatrix(double dt)
 {
 	if (! isActive() || ! m_currentParameters.isValid())
@@ -248,11 +289,6 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
 	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
-}
-
-SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_RIGID;
 }
 
 }; /// Physics

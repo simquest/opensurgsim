@@ -30,12 +30,12 @@ include_directories(
 )
 
 set(EXAMPLE_SOURCES
-	AddSphereBehavior.cpp
+	AddRandomSphereBehavior.cpp
 	ExampleBouncingBalls.cpp
 )
 
 set(EXAMPLE_HEADERS
-	AddSphereBehavior.h
+	AddRandomSphereBehavior.h
 )
 
 # Configure the path for the data files
@@ -55,6 +55,7 @@ target_link_libraries(ExampleBouncingBalls
 	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
+	SurgSimInput
 	${Boost_LIBRARIES}
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}

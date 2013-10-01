@@ -66,9 +66,6 @@ private:
 		unsigned int indexOfRepresentation,
 		unsigned int indexOfConstraint,
 		ConstraintSideSign sign) override;
-
-
-
 };
 
 };  // namespace Physics

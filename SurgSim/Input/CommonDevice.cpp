@@ -99,13 +99,12 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 	SURGSIM_ASSERT(m_initialInputData.isValid());
 
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
-	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
+	auto it = std::find(m_state->inputConsumerList.begin(), m_state->inputConsumerList.end(), inputConsumer);
+	if (it != m_state->inputConsumerList.end())
 	{
-		if (*it == inputConsumer)
-		{
-			return false;
-		}
+		return false;
 	}
+
 	// NB: callbacks are called with the local m_nameForCallback.
 	// This allows e.g. filters to call their callbacks with a name different from their "real" name.
 	inputConsumer->initializeInput(m_nameForCallback, m_initialInputData);

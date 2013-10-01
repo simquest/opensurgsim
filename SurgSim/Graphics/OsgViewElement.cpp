@@ -16,6 +16,7 @@
 #include <SurgSim/Graphics/OsgViewElement.h>
 
 #include <SurgSim/Graphics/OsgView.h>
+#include <SurgSim/Graphics/OsgTrackballZoomManipulator.h>
 
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
@@ -38,5 +39,26 @@ bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 	else
 	{
 		return false;
+	}
+}
+
+void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
+{
+	if (m_manipulator == nullptr)
+	{
+		m_manipulator = new OsgTrackballZoomManipulator();
+	}
+
+	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
+	if (view != nullptr)
+	{
+		if (val)
+		{
+			view->getOsgView()->setCameraManipulator(m_manipulator);
+		}
+		else
+		{
+			view->getOsgView()->setCameraManipulator(nullptr);
+		}
 	}
 }

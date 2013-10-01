@@ -17,7 +17,6 @@
 #define SURGSIM_FRAMEWORK_BEHAVIORMANAGER_H
 
 #include <memory>
-#include <vector>
 
 #include "SurgSim/Framework/ComponentManager.h"
 
@@ -26,10 +25,8 @@ namespace SurgSim
 namespace Framework
 {
 
-class Behavior;
-
 /// Manager to handle Behaviors. The manager will collect all the behaviors
-/// in the scene through addComponent (and removeComponent) calls. All the
+/// in the scene through addComponent/removeComponent calls. All the
 /// behaviors will be update once per period (default 30Hz) once the
 /// BehaviorManager is started.
 class BehaviorManager : public ComponentManager
@@ -38,17 +35,16 @@ public:
 	BehaviorManager();
 	~BehaviorManager();
 
+	virtual	int getType() const override;
+
 protected:
 	virtual bool executeAdditions(const std::shared_ptr<Component>& component) override;
 	virtual bool executeRemovals(const std::shared_ptr<Component>& component) override;
 
 private:
-	virtual bool doUpdate(double dt) override;
 	virtual bool doInitialize() override;
 	virtual bool doStartUp() override;
-
-	std::vector<std::shared_ptr<Behavior>> m_behaviors;
-
+	virtual bool doUpdate(double dt) override;
 };
 
 

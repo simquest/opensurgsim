@@ -16,9 +16,7 @@
 #include "SurgSim/Input/InputManager.h"
 
 #include <SurgSim/Framework/Component.h>
-#include <SurgSim/Framework/Runtime.h>
-
-#include "SurgSim/Input/InputComponent.h"
+#include <SurgSim/Input/InputComponent.h>
 
 namespace SurgSim
 {
@@ -30,7 +28,7 @@ InputManager::InputManager() :
 {
 }
 
-InputManager::~InputManager(void)
+InputManager::~InputManager()
 {
 }
 
@@ -48,6 +46,9 @@ bool InputManager::doUpdate(double dt)
 {
 	// Add all components that came in before the last update
 	processComponents();
+
+	// Process specific behaviors belongs to this manager
+	processBehaviors(dt);
 
 	return true;
 }
@@ -74,6 +75,26 @@ bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Co
 	// If we got he the component was neither an Input nor and OutputComponent, no add was performed
 	// return false
 	return false;
+}
+
+bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
+{
+
+	bool result = false;
+	boost::lock_guard<boost::mutex> lock(m_mutex);
+	if (tryRemoveComponent(component, &m_inputs))
+	{
+		auto input = std::static_pointer_cast<InputComponent>(component);
+		input->disconnectDevice(m_devices[input->getDeviceName()]);
+		result = true;
+	}
+	else if(tryRemoveComponent(component, &m_outputs))
+	{
+		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
+		m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
+		result = true;
+	}
+	return result;
 }
 
 bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& input)
@@ -121,26 +142,6 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	return result;
 }
 
-bool InputManager::executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component)
-{
-
-	bool result = false;
-	boost::lock_guard<boost::mutex> lock(m_mutex);
-	if (tryRemoveComponent(component, &m_inputs))
-	{
-		auto input = std::static_pointer_cast<InputComponent>(component);
-		input->disconnectDevice(m_devices[input->getDeviceName()]);
-		result = true;
-	}
-	else if(tryRemoveComponent(component, &m_outputs))
-	{
-		auto output = std::dynamic_pointer_cast<OutputComponent>(component);
-		m_devices[output->getDeviceName()]->setOutputProducer(nullptr);
-		result = true;
-	}
-	return result;
-}
-
 bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
 {
 	bool result = false;
@@ -168,6 +169,11 @@ bool InputManager::removeDevice(std::shared_ptr<SurgSim::Input::DeviceInterface>
 		result = true;
 	}
 	return result;
+}
+
+int InputManager::getType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_INPUT;
 }
 
 } // Input

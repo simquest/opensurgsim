@@ -15,7 +15,11 @@
 
 #include <SurgSim/Graphics/OsgRepresentation.h>
 
+#include <algorithm>
+
 #include <boost/thread/locks.hpp>
+
+#include <SurgSim/Framework/Log.h>
 
 #include <SurgSim/Graphics/OsgMaterial.h>
 #include <SurgSim/Graphics/OsgRigidTransformConversions.h>
@@ -125,6 +129,46 @@ osg::ref_ptr<osg::Node> OsgRepresentation::getOsgNode() const
 void OsgRepresentation::doUpdate(double dt)
 {
 
+}
+
+bool OsgRepresentation::addGroupReference(const std::string& name)
+{
+	bool result = false;
+	if (! isAwake())
+	{
+		auto insertion = m_groups.insert(name);
+		result = insertion.second;
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
+			"Representation::requestGroup() was called while the component was already awake for component " <<
+			getName() << " this has no effect and should be avoided.";
+	}
+	return result;
+
+}
+
+void OsgRepresentation::addGroupReferences(const std::vector<std::string>& groups)
+{
+	if (! isAwake())
+	{
+		for (auto it = groups.cbegin(); it!= groups.cend(); ++it)
+		{
+			addGroupReference(*it);
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
+			"Representation::requestGroups() was called while the component was already awake for component " <<
+			getName() << " this has no effect and should be avoided.";
+	}
+}
+
+std::vector<std::string> OsgRepresentation::getGroupReferences()
+{
+	return std::vector<std::string>(std::begin(m_groups), std::end(m_groups));
 }
 
 }; // Graphics

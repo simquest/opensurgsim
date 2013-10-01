@@ -32,11 +32,14 @@ namespace Framework
 	class Component;
 }
 
+namespace Collision
+{
+	class CollisionRepresentation;
+}
 namespace Physics
 {
 
 class BuildMlcp;
-class CollisionRepresentation;
 class ContactConstraintGeneration;
 class FreeMotion;
 class DcdCollision;
@@ -45,6 +48,7 @@ class PreUpdate;
 class PushResults;
 class Representation;
 class SolveMlcp;
+using SurgSim::Collision::CollisionRepresentation;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -56,14 +60,17 @@ public:
 	PhysicsManager();
 	virtual ~PhysicsManager();
 
+	/// Overrides ComponentManager::getType()
+	virtual int getType() const override;
+
 	friend class PhysicsManagerTest;
 
 protected:
 
 	///@{
 	/// Overridden from ComponentManager
-	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component);
-	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component);
+	bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
+	bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override;
 	///@}
 
 	///@{

@@ -29,12 +29,14 @@ set(UNIT_TEST_SOURCES
 	OsgCapsuleRepresentationTests.cpp
 	OsgCylinderRepresentationTests.cpp
 	OsgGroupTests.cpp
+	OsgLightTests.cpp
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
+	OsgRenderTargetTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
 	OsgScreenSpaceQuadTests.cpp

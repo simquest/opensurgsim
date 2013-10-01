@@ -28,6 +28,7 @@ namespace Graphics
 
 class Group;
 class Texture;
+class RenderTarget;
 
 /// Base graphics camera class, which defines the basic interface for all graphics cameras.
 ///
@@ -40,6 +41,14 @@ class Texture;
 class Camera : public virtual Representation
 {
 public:
+
+	enum RenderOrder {
+		RENDER_ORDER_PRE_RENDER = 0,
+		RENDER_ORDER_IN_ORDER,
+		RENDER_ORDER_POST_RENDER,
+		RENDER_ORDER_COUNT
+	};
+
 	/// Constructor
 	/// \param	name	Name of the camera
 	explicit Camera(const std::string& name) : Representation(name)
@@ -80,14 +89,21 @@ public:
 	/// \return	Projection matrix
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
 
-	/// Sets a texture to be used as a color render target.
-	/// \param	texture	The texture to be used as a target.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool setColorRenderTexture(std::shared_ptr<Texture> texture) = 0;
+	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
+	/// \param	renderTarget	The render target.
+	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) = 0;
 
-	/// Gets the texture that is being used as the color render target.
-	/// \return	The color render texture.
-	virtual std::shared_ptr<Texture> getColorRenderTexture() const = 0;
+	/// Gets RenderTarget that is currently being used by the camera.
+	/// \return	The RenderTarget.
+	virtual std::shared_ptr<RenderTarget> getRenderTarget() const = 0;
+
+	/// Determine when this camera will render. The main camera will render at (RENDER_ORDER_IN_ORDER,0)
+	/// In general all preprocessing should be done in RENDER_ORDER_PRE_ORDER, HUD Displaying usually
+	/// at RENDER_ORDER_POST_ORDER
+	/// \param order The phase of rendering.
+	/// \param value The index within the phase, the order between two cameras of the same phase and index is not
+	/// 			 determined.
+	virtual void setRenderOrder(RenderOrder order, int value) = 0;
 
 private:
 	/// Group of representations that this camera sees

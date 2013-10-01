@@ -14,11 +14,11 @@
 // limitations under the License.
 
 #include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Physics/CollisionRepresentation.h>
-#include <SurgSim/Physics/RigidCollisionRepresentation.h>
+#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/CollisionPair.h>
-#include <SurgSim/Physics/ContactCalculation.h>
+#include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Physics/PhysicsManagerState.h>
 
 #include <SurgSim/Math/RigidTransform.h>
@@ -63,11 +63,16 @@ void DcdCollision::populateCalculationTable()
 	{
 		for (int j = 0; j < RIGID_SHAPE_TYPE_COUNT; ++j)
 		{
-			m_contactCalculations[i][j].reset(new DefaultContactCalculation(false));
+			m_contactCalculations[i][j].reset(new SurgSim::Collision::DefaultContactCalculation(false));
 		}
 	}
-	setDcdContactInTable(std::make_shared<SphereSphereDcdContact>());
-	setDcdContactInTable(std::make_shared<SphereDoubleSidedPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereDoubleSidedPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::SpherePlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxDoubleSidedPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxSphereDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::CapsuleSphereDcdContact>());
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)

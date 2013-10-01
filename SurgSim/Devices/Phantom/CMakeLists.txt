@@ -28,12 +28,12 @@ include_directories(
 
 set(PHANTOM_DEVICE_SOURCES
 	PhantomDevice.cpp
-	PhantomManager.cpp
+	PhantomScaffold.cpp
 )
 
 set(PHANTOM_DEVICE_HEADERS
 	PhantomDevice.h
-	PhantomManager.h
+	PhantomScaffold.h
 )
 
 # TODO(advornik): the installation should NOT copy all the headers...
@@ -45,4 +45,8 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
+
+	if(GLUT_FOUND)
+		add_subdirectory(VisualTest)
+	endif(GLUT_FOUND)
 endif()

@@ -21,6 +21,7 @@
 #include <SurgSim/Graphics/Group.h>
 #include <SurgSim/Graphics/Manager.h>
 #include <SurgSim/Graphics/Material.h>
+#include <SurgSim/Graphics/RenderTarget.h>
 #include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Graphics/Shader.h>
 #include <SurgSim/Graphics/UniformBase.h>
@@ -57,6 +58,11 @@ public:
 	void dumpDebugInfo() const
 	{
 		return;
+	}
+
+	virtual int getType() const override
+	{
+		return SurgSim::Framework::MANAGER_TYPE_NONE;
 	}
 
 private:
@@ -195,6 +201,20 @@ public:
 	{
 		static SurgSim::Math::RigidTransform3d identity = SurgSim::Math::RigidTransform3d::Identity();
 		return identity;
+	}
+
+	virtual bool addGroupReference(const std::string& name) override
+	{
+		return false;
+	}
+
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual std::vector<std::string> getGroupReferences() override
+	{
+		return std::vector<std::string>();
 	}
 
 private:
@@ -402,6 +422,34 @@ public:
 	virtual std::shared_ptr<SurgSim::Graphics::Texture> getColorRenderTexture() const
 	{
 		return nullptr;
+	}
+
+	virtual void setRenderTarget(std::shared_ptr<SurgSim::Graphics::RenderTarget> renderTarget)
+	{
+	}
+
+	virtual std::shared_ptr<SurgSim::Graphics::RenderTarget> getRenderTarget() const
+	{
+		return nullptr;
+	}
+
+	virtual void setRenderOrder(RenderOrder bin, int value) override
+	{
+
+	}
+
+	virtual bool addGroupReference(const std::string& name) override
+	{
+		return false;
+	}
+
+	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual std::vector<std::string> getGroupReferences() override
+	{
+		return std::vector<std::string>();
 	}
 
 private:

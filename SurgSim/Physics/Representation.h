@@ -21,15 +21,16 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/MlcpSolution.h>
 #include <SurgSim/Framework/Representation.h>
+#include <SurgSim/Collision/Location.h>
+
+using SurgSim::Collision::Location;
 
 namespace SurgSim
 {
-
 namespace Physics
 {
 
 class Localization;
-struct Location;
 
 enum RepresentationType
 {
@@ -37,6 +38,7 @@ enum RepresentationType
 	REPRESENTATION_TYPE_FIXED = 0,
 	REPRESENTATION_TYPE_RIGID,
 	REPRESENTATION_TYPE_VTC_RIGID,
+	REPRESENTATION_TYPE_MASSSPRING,
 	REPRESENTATION_TYPE_COUNT
 };
 

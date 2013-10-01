@@ -34,10 +34,86 @@ VtcRigidRepresentation::VtcRigidRepresentation(const std::string& name)
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
 	setNumDof(6);
+
+	// Set the gravity flag to false by default
+	RigidRepresentationBase::setIsGravityEnabled(false);
 }
 
 VtcRigidRepresentation::~VtcRigidRepresentation()
 {
+}
+
+RepresentationType VtcRigidRepresentation::getType() const
+{
+	return REPRESENTATION_TYPE_VTC_RIGID;
+}
+
+void VtcRigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+    m_currentVtcState.setPose(pose);
+}
+
+const SurgSim::Math::RigidTransform3d& VtcRigidRepresentation::getPose() const
+{
+    return m_finalState.getPose();
+}
+
+void VtcRigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
+{
+    m_initialParameters = parameters;
+    m_currentParameters = parameters;
+
+    updateGlobalInertiaMatrices(m_currentState);
+}
+
+void VtcRigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
+{
+    m_currentParameters = parameters;
+
+    updateGlobalInertiaMatrices(m_currentState);
+}
+
+void VtcRigidRepresentation::setInitialVtcState(const RigidRepresentationState& state)
+{
+    m_initialVtcState = state;
+    m_currentVtcState = state;
+    m_previousVtcState = state;
+}
+
+void VtcRigidRepresentation::setInitialVtcParameters(const VtcRigidParameters& parameters)
+{
+    m_initialVtcParameters = parameters;
+    m_currentVtcParameters = parameters;
+}
+
+void VtcRigidRepresentation::setCurrentVtcParameters(const VtcRigidParameters& parameters)
+{
+    m_currentVtcParameters = parameters;
+}
+
+const RigidRepresentationState& VtcRigidRepresentation::getInitialVtcState() const
+{
+    return m_initialVtcState;
+}
+
+const RigidRepresentationState& VtcRigidRepresentation::getCurrentVtcState() const
+{
+    return m_currentVtcState;
+}
+
+const RigidRepresentationState& VtcRigidRepresentation::getPreviousVtcState() const
+{
+    return m_previousVtcState;
+}
+
+const VtcRigidParameters& VtcRigidRepresentation::getInitialVtcParameters() const
+{
+    return m_initialVtcParameters;
+}
+
+const VtcRigidParameters& VtcRigidRepresentation::getCurrentVtcParameters() const
+{
+    return m_currentVtcParameters;
 }
 
 void VtcRigidRepresentation::beforeUpdate(double dt)
@@ -62,6 +138,10 @@ void VtcRigidRepresentation::beforeUpdate(double dt)
 		// NOTE: axis*angle = rotationVector
 		m_currentVtcState.setAngularVelocity(axis * (angle / dt));
 	}
+
+	// Backup current state and current vtc state
+	m_previousState = m_currentState;
+	m_previousVtcState = m_currentVtcState;
 }
 
 void VtcRigidRepresentation::update(double dt)
@@ -86,10 +166,6 @@ void VtcRigidRepresentation::update(double dt)
 	Vector3d         w = m_currentState.getAngularVelocity();
 	Quaterniond     dq;
 	double       qNorm; // Norm of q before normalization.
-
-	// Backup current state and current vtc state
-	m_previousState = m_currentState;
-	m_previousVtcState = m_currentVtcState;
 
 	// Developing the equations integrating the Rayleigh damping on the velocity level:
 	// { Id33.m.(1/dt + alphaLinear ).v(t+dt) = m.v(t)/dt + f
@@ -205,6 +281,90 @@ void VtcRigidRepresentation::update(double dt)
 
 void VtcRigidRepresentation::afterUpdate(double dt)
 {
+	// Backup current state in the final state
+	m_finalState = m_currentState;
+}
+
+void VtcRigidRepresentation::resetParameters()
+{
+    RigidRepresentationBase::resetParameters();
+
+    m_currentParameters = m_initialParameters;
+
+    updateGlobalInertiaMatrices(m_currentState);
+}
+
+void VtcRigidRepresentation::resetVtcParameters()
+{
+    m_currentVtcParameters = m_initialVtcParameters;
+}
+
+const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
+	VtcRigidRepresentation::getComplianceMatrix() const
+{
+	return m_C;
+}
+
+void VtcRigidRepresentation::applyDofCorrection(
+	double dt,
+	const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& dofCorrection)
+{
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::Matrix33d;
+	using SurgSim::Math::Quaterniond;
+
+	if (! isActive() || ! m_currentParameters.isValid())
+	{
+		return;
+	}
+
+	Vector3d          G = m_currentState.getPose().translation();
+	Vector3d         dG = m_currentState.getLinearVelocity();
+	Matrix33d         R = m_currentState.getPose().linear();
+	Quaterniond       q = Quaterniond(R);
+	Vector3d          w = m_currentState.getAngularVelocity();
+
+	const SurgSim::Math::Vector3d& delta_dG = dofCorrection.segment(0,3);
+	const SurgSim::Math::Vector3d& delta_w  = dofCorrection.segment(3,3);
+	Quaterniond delta_dq = Quaterniond(delta_w[0],delta_w[1],delta_w[2],0.0) * q;
+	delta_dq.coeffs() *= 0.5;
+
+	dG += delta_dG;
+	w  += delta_w;
+	m_currentState.setLinearVelocity(dG);
+	m_currentState.setAngularVelocity(w);
+
+	// Integrate the velocities to get the rigid representation pose
+	{
+		// G(t+dt) = G(t) + dt. delta_dG(t+dt)
+		G += delta_dG * dt;
+		// q(t+dt) = q(t) + dt. delta_dq(t+dt)
+		q.coeffs() += delta_dq.coeffs() * dt;
+		// Normalize the quaternion to make sure we do have a rotation
+		q.normalize();
+	}
+	m_currentState.setPose(SurgSim::Math::makeRigidTransform(q, G));
+
+	// Compute the global inertia matrix with the current state
+	updateGlobalInertiaMatrices(m_currentState);
+
+	// If something went wrong, we deactivate the representation
+	bool condition = SurgSim::Math::isValid(G);
+	condition &= SurgSim::Math::isValid(q);
+	condition &= fabs(1.0 - q.norm()) < 1e-3;
+	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
+		" deactivated and reset because:" << std::endl << "m_G=(" <<
+		G[0] << "," << G[1] << "," << G[2] << ") " <<
+		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
+		"|q| after normalization="<< q.norm() << std::endl;
+	if (! condition)
+	{
+		resetState();
+		setIsActive(false);
+	}
+
+	// Prepare the compliance matrix
+	computeComplianceMatrix(dt);
 }
 
 void VtcRigidRepresentation::computeComplianceMatrix(double dt)
@@ -248,12 +408,6 @@ void VtcRigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentati
 	m_globalInertia = R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
 }
-
-SurgSim::Physics::RepresentationType VtcRigidRepresentation::getType() const
-{
-	return REPRESENTATION_TYPE_VTC_RIGID;
-}
-
 
 }; /// Physics
 

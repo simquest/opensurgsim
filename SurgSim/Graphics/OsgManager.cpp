@@ -66,6 +66,28 @@ bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representa
 	if (osgRepresentation && Manager::addRepresentation(osgRepresentation))
 	{
 		SURGSIM_ASSERT(m_defaultGroup->add(osgRepresentation)) << "Failed to add representation to default group!";
+
+		// Add the component to all the groups that it wants to be in
+		std::vector<std::string> requestedGroups = representation->getGroupReferences();
+		std::vector<std::shared_ptr<Group>> groups = getGroups();
+		for (auto it = std::begin(requestedGroups); it != std::end(requestedGroups); ++it)
+		{
+			auto groupIt = std::find_if(
+				std::begin(groups),
+				std::end(groups),
+				[it](std::shared_ptr<Group> group){return *it == group->getName();});
+			if (groupIt != std::end(groups))
+			{
+				(*groupIt)->add(representation);
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(getLogger()) << "OsgManager::addRepresentation: " <<
+					"The component <" << representation->getName() << "> requested a group <" << *it << "> that could"<<
+					" not be found";
+			}
+		}
+
 		return true;
 	}
 	else
@@ -80,6 +102,19 @@ bool OsgManager::addGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && Manager::addGroup(osgGroup))
 	{
+		// Check if there are any represenations that might want to be included
+		// in this group
+		std::string name = group->getName();
+		auto representations = getRepresentations();
+		for (auto it = std::begin(representations); it != std::end(representations); ++it)
+		{
+			auto requested = (*it)->getGroupReferences();
+			if (std::find(std::begin(requested), std::end(requested), name) != std::end(requested))
+			{
+				group->add(*it);
+			}
+		}
+
 		return true;
 	}
 	else

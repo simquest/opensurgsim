@@ -51,39 +51,6 @@ inline Eigen::Quaternion<T> makeRotationQuaternion(const T& angle, const Eigen::
 	return Eigen::Quaternion<T>(Eigen::AngleAxis<T>(angle, axis));
 }
 
-/// Get the angle (in radians) and axis corresponding to a quaternion's rotation.
-/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
-/// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
-/// \tparam VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
-/// \param quaternion the rotation quaternion to inspect.
-/// \param [out] angle the angle of the rotation, in radians.
-/// \param [out] axis the axis of the rotation.
-template <typename T, int QOpt, int VOpt>
-inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
-                                T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
-{
-	Eigen::AngleAxis<T> angleAxis(quaternion);
-	*angle = angleAxis.angle();
-	*axis = angleAxis.axis();
-}
-
-/// Get the angle corresponding to a quaternion's rotation, in radians.
-/// If you don't care about the rotation axis, this is more efficient than computeAngleAndAxis().
-/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
-/// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
-/// \param quaternion the rotation quaternion to inspect.
-/// \returns the angle of the rotation, in radians.
-template <typename T, int QOpt>
-inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
-{
-	T w = std::abs(quaternion.w());
-	if (w >= 1.0)
-	{
-		return static_cast<T>(0);
-	}
-	return static_cast<T>(2 * std::acos(w));
-}
-
 /// Quaternion negation (i.e. unary operator -)
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam QOpt the option flags (alignment etc.) used for the quaternion arguments.  Can be deduced.
@@ -93,6 +60,58 @@ template <typename T, int QOpt>
 inline Eigen::Quaternion<T, QOpt> negate(const Eigen::Quaternion<T, QOpt>& q)
 {
 	return Eigen::Quaternion<T, QOpt>(q.coeffs() * -1.0);
+}
+
+/// Get the angle (in radians) and axis corresponding to a quaternion's rotation.
+/// \note Unit quaternions cover the unit sphere twice (q=-q). To make sure that the same rotation (q or -q)
+/// \note returns the same Axis/Angle, we need a pi range for the angle.
+/// \note We choose to enforce half the angle in the quadrant [0 +pi/2], which leads to an output angle in [0 +pi].
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
+/// \param quaternion the rotation quaternion to inspect.
+/// \param [out] angle the angle of the rotation in [0 +pi], in radians.
+/// \param [out] axis the axis of the rotation.
+template <typename T, int QOpt, int VOpt>
+inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
+                                T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
+{
+	using SurgSim::Math::negate;
+
+	if (quaternion.w() >= T(0))
+	{
+		Eigen::AngleAxis<T> angleAxis(quaternion);
+		*angle = angleAxis.angle();
+		*axis = angleAxis.axis();
+	}
+	else
+	{
+		Eigen::AngleAxis<T> angleAxis(negate(quaternion));
+		*angle = angleAxis.angle();
+		*axis = angleAxis.axis();
+	}
+}
+
+/// Get the angle corresponding to a quaternion's rotation, in radians.
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam QOpt the option flags (alignment etc.) used for the quaternion argument.  Can be deduced.
+/// \param quaternion the rotation quaternion to inspect.
+/// \returns the angle of the rotation within [0 +pi], in radians.
+template <typename T, int QOpt>
+inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
+{
+	using SurgSim::Math::negate;
+
+	if (quaternion.w() >= T(0))
+	{
+		Eigen::AngleAxis<T> angleAxis(quaternion);
+		return angleAxis.angle();
+	}
+	else
+	{
+		Eigen::AngleAxis<T> angleAxis(negate(quaternion));
+		return angleAxis.angle();
+	}
 }
 
 /// Interpolate (slerp) between 2 quaternions
