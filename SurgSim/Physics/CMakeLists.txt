@@ -94,7 +94,6 @@ set(SURGSIM_PHYSICS_HEADERS
 	Shapes.h
 	SolveMlcp.h
 	SphereShape.h
-	VtcParameters.h
 	VtcBehavior.h
 )
 

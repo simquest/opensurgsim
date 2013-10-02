@@ -41,7 +41,6 @@
 #include <SurgSim/Physics/BoxShape.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
 #include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/VtcParameters.h>
 #include <SurgSim/Physics/VtcBehavior.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -63,7 +62,6 @@ using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PhysicsManager;
-using SurgSim::Physics::VtcParameters;
 using SurgSim::Physics::VtcBehavior;
 using SurgSim::Physics::RigidRepresentationParameters;
 
@@ -172,14 +170,12 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	// of mass m, an object of mass 2m will need a vtc with the parameters (2k/2c) to behave the same way
 	// on the physical system. The mass factor helps to scale the vtc parameters easily to different objects.
 	// The actual values of the vtc parameters are experimental and needs to be tweaked for each application.
-	VtcParameters vtcParams;
-	vtcParams.setAngularDamping(mass * 20);
-	vtcParams.setAngularStiffness(mass * 50);
-	vtcParams.setLinearDamping(mass * 50);
-	vtcParams.setLinearStiffness(mass * 200);
 	std::shared_ptr<VtcBehavior> vtcBehavior = 
 		std::make_shared<VtcBehavior>("Vtc Behavior", inputComponent, physicsRepresentation);
-	vtcBehavior->setParameters(vtcParams);
+	vtcBehavior->setAngularDamping(mass * 20);
+	vtcBehavior->setAngularStiffness(mass * 50);
+	vtcBehavior->setLinearDamping(mass * 50);
+	vtcBehavior->setLinearStiffness(mass * 200);
 
 	std::shared_ptr<SceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
 	boxElement->addComponent(physicsRepresentation);

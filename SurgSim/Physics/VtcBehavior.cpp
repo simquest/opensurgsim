@@ -50,7 +50,11 @@ VtcBehavior::VtcBehavior(const std::string& name, std::shared_ptr<SurgSim::Input
 	SurgSim::Framework::Behavior(name),
 	m_input(input),
 	m_rigid(rigid),
-	m_poseName(poseName)
+	m_poseName(poseName),
+	m_linearStiffness(0.0),
+	m_linearDamping(0.0),
+	m_angularStiffness(0.0),
+	m_angularDamping(0.0)
 {
 }
 
@@ -75,18 +79,15 @@ void VtcBehavior::update(double dt)
 	Vector3d objectAnglularVelocity(objectState.getAngularVelocity());
 
 	Vector3d force = Vector3d::Zero();
-	force += m_parameters.getLinearStiffness() * (inputPose.translation() - objectPose.translation());
-	force += m_parameters.getLinearDamping() * (inputLinearVelocity - objectLinearVelocity);
+	force += m_linearStiffness * (inputPose.translation() - objectPose.translation());
+	force += m_linearDamping * (inputLinearVelocity - objectLinearVelocity);
 
 	Vector3d torque = Vector3d::Zero();
-	torque += m_parameters.getAngularStiffness() * computeRotationVector(inputPose, objectPose);
-	torque += m_parameters.getAngularDamping() * (inputAngularVelocity - objectAnglularVelocity);
+	torque += m_angularStiffness * computeRotationVector(inputPose, objectPose);
+	torque += m_angularDamping * (inputAngularVelocity - objectAnglularVelocity);
 	
-	double coefficent = 1.0 / (m_parameters.getLinearDamping() + dt * m_parameters.getLinearStiffness());
-	Matrix33d linearCompliance = coefficent * Matrix33d::Identity();
-
-	coefficent = 1.0 / (m_parameters.getAngularDamping() + dt * m_parameters.getAngularStiffness());
-	Matrix33d angularCompliance = coefficent * Matrix33d::Identity();
+	Matrix33d linearCompliance = Matrix33d::Identity() / (m_linearDamping + dt * m_linearStiffness);
+	Matrix33d angularCompliance = Matrix33d::Identity() / (m_angularDamping + dt * m_angularStiffness);
 
 	m_rigid->setExternalForce(force, linearCompliance);
 	m_rigid->setExternalTorque(torque, angularCompliance);
@@ -112,14 +113,24 @@ int VtcBehavior::getTargetManagerType() const
 	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
 }
 
-const VtcParameters& VtcBehavior::getParameters() const
+void VtcBehavior::setLinearStiffness(double linearStiffness)
 {
-    return m_parameters;
+	m_linearStiffness = linearStiffness;
 }
 
-void VtcBehavior::setParameters(const VtcParameters& parameters)
+void VtcBehavior::setLinearDamping(double linearDamping)
 {
-    m_parameters = parameters;
+	m_linearDamping = linearDamping;
+}
+
+void VtcBehavior::setAngularStiffness(double angularStiffness)
+{
+	m_angularStiffness = angularStiffness;
+}
+
+void VtcBehavior::setAngularDamping(double angularDamping)
+{
+	m_angularDamping = angularDamping;
 }
 
 
