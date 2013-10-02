@@ -19,16 +19,41 @@
 #include <SurgSim/Graphics/OsgLog.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
+TEST(OsgLogTests, ConstructorTest)
+{
+	EXPECT_EQ(osg::NOTICE, osg::getNotifyLevel());
+	auto mockOsgLog = new MockOsgLog;
+	EXPECT_EQ(osg::DEBUG_FP, osg::getNotifyLevel());
+}
+
 TEST(OsgLogTests, MessageTest)
 {
 	osg::NotifyHandler* pOsgLog = new MockOsgLog;
 	osg::setNotifyHandler(pOsgLog);
 
-	// Level is below default level (osg::INFO)
-	osg::notify(osg::DEBUG_FP) << "Test" << std::endl;
 	EXPECT_EQ("", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
 
-	// Level is above default level (osg::INFO)
-	osg::notify(osg::FATAL) << "Fatal" << std::endl;
-	EXPECT_EQ("Fatal\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+	osg::notify(osg::ALWAYS) << "osg::ALWAYS Test" << std::endl;
+	EXPECT_EQ("CRITICAL osg::ALWAYS Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::FATAL) << "osg::FATAL Test" << std::endl;
+	EXPECT_EQ("CRITICAL osg::FATAL Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::WARN) << "osg::WARN Test" << std::endl;
+	EXPECT_EQ("WARNING osg::WARN Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::NOTICE) << "osg::NOTICE Test" << std::endl;
+	EXPECT_EQ("INFO osg::NOTICE Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::INFO) << "osg::INFO Test" << std::endl;
+	EXPECT_EQ("INFO osg::INFO Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::DEBUG_INFO) << "osg::DEBUG_INFO Test" << std::endl;
+	EXPECT_EQ("DEBUG osg::DEBUG_INFO Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::DEBUG_FP) << "osg::DEBUG_FP Test" << std::endl;
+	EXPECT_EQ("DEBUG osg::DEBUG_FP Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
+
+	osg::notify(osg::DEBUG_FP) << "osg::DEBUG_FP Test" << std::endl;
+	EXPECT_EQ("DEBUG osg::DEBUG_FP Test\n", dynamic_cast<MockOsgLog*>(pOsgLog)->getMessage());
 }

@@ -26,10 +26,15 @@ namespace Graphics
 OsgLog::OsgLog() : m_logger(SurgSim::Framework::Logger::getLogger("Osg"))
 {
 	// Default level is set to osg::NOTICE
-	// Messages have lowwer priority than osg::NOTICE will be ignored.
-	// Set osg's notify level to the lowest, so that all info can be logged.
+	// Messages have lowwer priority than osg::NOTICE will be ignored by "osg::notify(LEVEL)" call.
+
+	// When debugging, set osg's notify level to the lowest (osg::DEBUG_FP),
+	// so that all info can be logged.
 	// However, message can still be filter out in notify() method.
+#ifdef OSS_DEBUG
 	osg::setNotifyLevel(osg::DEBUG_FP);
+#endif
+	//Otherwise, keep osg's default log level (osg::NOTICE)
 }
 
 
