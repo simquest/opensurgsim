@@ -61,16 +61,23 @@ public:
 	/// physics simulation).
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
-	/// Set the external force being applied to the rigid representation,
-	/// not including gravity
+	/// Set the external force being applied to the rigid representation
+	/// Note this force will be zeroed every update of the rigid representation
 	/// \param force The external force
-	/// \param compliance The linear compliance associated with the force
-	void setExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& compliance);
+	/// \param K The stiffness matrix associated with the force (jacobian of the force w.r.t position)
+	/// \param D The damping matrix associated with the force (jacobian of the force w.r.t velocity)
+	void addExternalForce(const SurgSim::Math::Vector3d& force,
+						  const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
+						  const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
 
 	/// Set the external torque being applied to the rigid representation
+	/// Note this torque will be zeroed every update of the rigid representation
 	/// \param torque The external torque 
-	/// \param compliance The angular compliance associated with the torque
-	void setExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& compliance);
+	/// \param K The angular stiffness matrix associated with the torque (jacobian of the torque w.r.t position)
+	/// \param D The angular damping matrix associated with the torque (jacobian of the torque w.r.t velocity)
+	void addExternalTorque(const SurgSim::Math::Vector3d& torque,
+						  const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
+						  const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -107,13 +114,13 @@ protected:
 	/// Current torque applied on the rigid representation (in N.m)
 	SurgSim::Math::Vector3d m_torque;
 
-	SurgSim::Math::Vector3d m_externalForce;
-	SurgSim::Math::Vector3d m_externalTorque;
-
 	/// Compliance matrix (size of the number of Dof = 6)
 	ComplianceMatrixType m_C;
-	SurgSim::Math::Matrix33d m_externalForceCompliance;
-	SurgSim::Math::Matrix33d m_externalTorqueCompliance;
+
+	SurgSim::Math::Vector3d m_externalForce;
+	SurgSim::Math::Vector3d m_externalTorque;
+	ComplianceMatrixType m_externalStiffnessMatrix;
+	ComplianceMatrixType m_externalDampingMatrix;
 
 private:
 	/// Compute compliance matrix (internal data structure)

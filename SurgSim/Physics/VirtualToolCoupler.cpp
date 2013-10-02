@@ -78,19 +78,17 @@ void VirtualToolCoupler::update(double dt)
 	Vector3d objectLinearVelocity(objectState.getLinearVelocity());
 	Vector3d objectAnglularVelocity(objectState.getAngularVelocity());
 
-	Vector3d force = Vector3d::Zero();
-	force += m_linearStiffness * (inputPose.translation() - objectPose.translation());
+	Vector3d force;
+	force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
 	force += m_linearDamping * (inputLinearVelocity - objectLinearVelocity);
 
-	Vector3d torque = Vector3d::Zero();
-	torque += m_angularStiffness * computeRotationVector(inputPose, objectPose);
+	Vector3d torque;
+	torque = m_angularStiffness * computeRotationVector(inputPose, objectPose);
 	torque += m_angularDamping * (inputAngularVelocity - objectAnglularVelocity);
 	
-	Matrix33d linearCompliance = Matrix33d::Identity() / (m_linearDamping + dt * m_linearStiffness);
-	Matrix33d angularCompliance = Matrix33d::Identity() / (m_angularDamping + dt * m_angularStiffness);
-
-	m_rigid->setExternalForce(force, linearCompliance);
-	m_rigid->setExternalTorque(torque, angularCompliance);
+	const Matrix33d identity3x3 = Matrix33d::Identity();
+	m_rigid->addExternalForce(force, m_linearStiffness*identity3x3, m_linearDamping*identity3x3);
+	m_rigid->addExternalTorque(torque, m_angularStiffness*identity3x3, m_angularDamping*identity3x3);
 
 	m_previousState.setPose(inputPose);
 	m_previousState.setLinearVelocity(inputLinearVelocity);

@@ -34,8 +34,8 @@ RigidRepresentation::RigidRepresentation(const std::string& name) :
 	RigidRepresentationBase(name),
 	m_externalForce(SurgSim::Math::Vector3d::Zero()),
 	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
-	m_externalForceCompliance(SurgSim::Math::Matrix33d::Zero()),
-	m_externalTorqueCompliance(SurgSim::Math::Matrix33d::Zero())
+	m_externalStiffnessMatrix(ComplianceMatrixType::Zero()),
+	m_externalDampingMatrix(ComplianceMatrixType::Zero())
 {
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
@@ -70,16 +70,20 @@ void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 }
 
-void RigidRepresentation::setExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& compliance)
+void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
+										   const SurgSim::Math::Matrix33d& D)
 {
 	m_externalForce = force;
-	m_externalForceCompliance = compliance;
+	m_externalStiffnessMatrix.block<3,3>(0,0) = K;
+	m_externalDampingMatrix.block<3,3>(0,0) = D;
 }
 
-void RigidRepresentation::setExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& compliance)
+void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& K,
+											const SurgSim::Math::Matrix33d& D)
 {
 	m_externalTorque = torque;
-	m_externalTorqueCompliance = compliance;
+	m_externalStiffnessMatrix.block<3,3>(3,3) = K;
+	m_externalDampingMatrix.block<3,3>(3,3) = D;
 }
 
 void RigidRepresentation::beforeUpdate(double dt)
@@ -197,6 +201,10 @@ void RigidRepresentation::afterUpdate(double dt)
 	}
 
 	m_finalState = m_currentState;
+	m_externalForce = SurgSim::Math::Vector3d::Zero();
+	m_externalTorque = SurgSim::Math::Vector3d::Zero();
+	m_externalStiffnessMatrix = ComplianceMatrixType::Zero();
+	m_externalDampingMatrix = ComplianceMatrixType::Zero();
 }
 
 void RigidRepresentation::applyDofCorrection(
@@ -282,26 +290,19 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 		return;
 	}
 
-	using SurgSim::Math::Matrix33d;
-	Matrix33d inverseLinearCompliance;
-	inverseLinearCompliance = (m_currentParameters.getMass()/dt) * Matrix33d::Identity();
-	inverseLinearCompliance += m_currentParameters.getLinearDamping() * Matrix33d::Identity();
-	if (! m_externalForceCompliance.isZero())
-	{
-		inverseLinearCompliance += m_externalForceCompliance.inverse();
-	}
-
-	Matrix33d inverseAngularCompliance;
-	inverseAngularCompliance = m_globalInertia / dt;
-	inverseAngularCompliance += m_currentParameters.getAngularDamping() * Matrix33d::Identity();
-	if (! m_externalTorqueCompliance.isZero())
-	{
-		inverseAngularCompliance += m_externalTorqueCompliance.inverse();
-	}
+	ComplianceMatrixType systemMatrix;
+	RigidRepresentationParameters& parameters = m_currentParameters;
+	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
+	systemMatrix.block<3,3>(0,0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
+	systemMatrix.block<3,3>(3,3) = m_globalInertia / dt + parameters.getAngularDamping() * identity3x3;
+	systemMatrix += m_externalDampingMatrix + m_externalStiffnessMatrix * dt;
 
 	m_C.setZero();
-	m_C.block<3,3>(0,0) = inverseLinearCompliance.inverse();
-	m_C.block<3,3>(3,3) = inverseAngularCompliance.inverse();
+
+	//Invert systemMatrix
+	//We can use this shortcut because we know the linear and angular terms are independant
+	m_C.block<3,3>(0,0) = systemMatrix.block<3,3>(0,0).inverse();
+	m_C.block<3,3>(3,3) = systemMatrix.block<3,3>(3,3).inverse();
 }
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
