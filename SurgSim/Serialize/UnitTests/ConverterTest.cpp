@@ -51,7 +51,6 @@ protected:
 	std::string datafile;
 };
 
-
 TEST_F(ConverterTest, ConverterVector3dInvalidTest)
 {
 	YAML::Node outnode;
@@ -328,7 +327,6 @@ TEST_F(ConverterTest, ConverterRigidTransform3dInvalidTest)
 	EXPECT_TRUE(! isValid(expectedRigid));
 }
 
-
 TEST_F(ConverterTest, ConverterRigidTransform3dNodeTest)
 {
 	YAML::Node outnode;
@@ -348,12 +346,14 @@ TEST_F(ConverterTest, ConverterRigidTransform3dNodeTest)
 
 TEST_F(ConverterTest, ConverterRigidTransform3dEmitterTest)
 {
+	YAML::Node node;
 	YAML::Emitter outnode(fout);
 
 	SurgSim::Math::RigidTransform3d rigid = SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
 		SurgSim::Math::Vector3d(1.0, 2.0, 3.0));
 
-	outnode << rigid;
+	node = rigid;
+	outnode << node;
 	fout.close();
 
 	YAML::Node innode = YAML::LoadFile(datafile);
@@ -364,6 +364,7 @@ TEST_F(ConverterTest, ConverterRigidTransform3dEmitterTest)
 
 TEST_F(ConverterTest, ConvertSphereRepresentationTest)
 {
+	YAML::Node node;
 	YAML::Emitter outnode(fout);
 
 	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> sphereRepresentation = 
@@ -378,15 +379,18 @@ TEST_F(ConverterTest, ConvertSphereRepresentationTest)
 	sphereRepresentation->setPose(spherePose);
 
 	/// Encoding sphere representation
-	outnode << sphereRepresentation;
+	node = YAML::convert<SurgSim::Graphics::SphereRepresentation>::encode(sphereRepresentation);
+	outnode << node;
 	fout.close();
-	/*
+	
 	/// Decoding sphere representation
 	YAML::Node innode = YAML::LoadFile(datafile);
 	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> expectedSphere =  std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
 	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, expectedSphere);
 
+	double precision= 1e-8;
+	
 	EXPECT_EQ(sphereRepresentation->getRadius(), expectedSphere->getRadius());
-	EXPECT_EQ(sphereRepresentation->getInitialPose().matrix(), expectedSphere->getInitialPose().matrix());
-	*/
+	EXPECT_TRUE(expectedSphere->getInitialPose().matrix().isApprox(sphereRepresentation->getInitialPose().matrix()));
+	EXPECT_TRUE(expectedSphere->getPose().matrix().isApprox(sphereRepresentation->getPose().matrix()));
 }
