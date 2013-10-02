@@ -6,6 +6,7 @@
 #endif
 
 #include "yaml-cpp/eventhandler.h"
+#include "yaml-cpp/emittermanip.h"
 #include <stack>
 
 namespace YAML
@@ -23,12 +24,15 @@ namespace YAML
 		virtual void OnNull(const Mark& mark, anchor_t anchor);
 		virtual void OnAlias(const Mark& mark, anchor_t anchor);
 		virtual void OnScalar(const Mark& mark, const std::string& tag, anchor_t anchor, const std::string& value);
+
+		virtual void OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_MANIP style);
 		
 		virtual void OnSequenceStart(const Mark& mark, const std::string& tag, anchor_t anchor);
 		virtual void OnSequenceEnd();
-		
+
 		virtual void OnMapStart(const Mark& mark, const std::string& tag, anchor_t anchor);
 		virtual void OnMapEnd();
+
 		
 	private:
 		void BeginNode();

@@ -28,6 +28,10 @@ namespace YAML
     DispositionNode(pNode);
   }
   
+  void GraphBuilderAdapter::OnSequenceStart(const Mark& mark, const std::string& tag, anchor_t anchor, YAML::EMITTER_MANIP style)
+  {
+  }
+
   void GraphBuilderAdapter::OnSequenceStart(const Mark& mark, const std::string& tag, anchor_t anchor)
   {
     void *pNode = m_builder.NewSequence(mark, tag, GetCurrentParent());

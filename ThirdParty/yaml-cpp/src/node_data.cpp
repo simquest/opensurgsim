@@ -59,6 +59,11 @@ namespace YAML
 			m_tag = tag;
 		}
 		
+		void node_data::set_style(const YAML::EMITTER_MANIP style)
+		{
+			m_style = style;
+		}
+
 		void node_data::set_null()
 		{
 			m_isDefined = true;

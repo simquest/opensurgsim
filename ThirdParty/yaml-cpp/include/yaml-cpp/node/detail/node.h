@@ -10,6 +10,7 @@
 #include "yaml-cpp/node/type.h"
 #include "yaml-cpp/node/ptr.h"
 #include "yaml-cpp/node/detail/node_ref.h"
+#include "yaml-cpp/emittermanip.h"
 #include <set>
 #include <boost/utility.hpp>
 
@@ -30,6 +31,8 @@ namespace YAML
 			
 			const std::string& scalar() const { return m_pRef->scalar(); }
 			const std::string& tag() const { return m_pRef->tag(); }
+			const YAML::EMITTER_MANIP style() const { return m_pRef->style(); }
+			
 			
 			void mark_defined() {
 				if(is_defined())
@@ -77,6 +80,11 @@ namespace YAML
 				m_pRef->set_tag(tag);
 			}
 
+			// style
+			void set_style(const YAML::EMITTER_MANIP style) {
+				mark_defined();
+				m_pRef->set_style(style);
+			}
 			// size/iterator
 			std::size_t size() const { return m_pRef->size(); }
 			

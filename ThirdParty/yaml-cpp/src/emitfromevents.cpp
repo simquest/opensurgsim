@@ -53,6 +53,15 @@ namespace YAML
 		m_emitter << BeginSeq;
 		m_stateStack.push(State::WaitingForSequenceEntry);
 	}
+
+	void EmitFromEvents::OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_MANIP style)
+	{
+		BeginNode();
+		EmitProps(tag, anchor);
+		m_emitter << style;
+		m_emitter << BeginSeq;
+		m_stateStack.push(State::WaitingForSequenceEntry);
+	}
 	
 	void EmitFromEvents::OnSequenceEnd()
 	{

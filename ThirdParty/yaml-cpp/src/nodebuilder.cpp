@@ -53,6 +53,14 @@ namespace YAML
 		Pop();
 	}
 	
+	void NodeBuilder::OnSequenceStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor, const YAML::EMITTER_MANIP style)
+	{
+		detail::node& node = Push(anchor);
+		node.set_tag(tag);
+		node.set_type(NodeType::Sequence);
+		node.set_style(style);
+	}
+
 	void NodeBuilder::OnSequenceStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor)
 	{
 		detail::node& node = Push(anchor);
