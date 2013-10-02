@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_VTCBEHAVIOR_H
-#define SURGSIM_PHYSICS_VTCBEHAVIOR_H
+#ifndef SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
+#define SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 
 #include <SurgSim/Physics/RigidRepresentationState.h>
 #include <SurgSim/Framework/Behavior.h>
@@ -32,9 +32,8 @@ namespace Physics
 
 class RigidRepresentation;
 
-/// The VtcBehavior controls a rigid body representation using a  
-/// Virtual tool coupler (i.e. god-object or proxy)
-class VtcBehavior : public SurgSim::Framework::Behavior
+/// The VirtualToolCoupler couples a rigid object to an input through a spring.
+class VirtualToolCoupler : public SurgSim::Framework::Behavior
 {
 public:
     /// Constructor
@@ -42,10 +41,10 @@ public:
     /// \param    from    Input to get the pose
     /// \param    to      Rigid Representation to control
     /// \param    poseName Name of the pose data in the input to transfer
-    VtcBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
+    VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
 				std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid, const std::string& poseName = "pose");
 
-	~VtcBehavior();
+	~VirtualToolCoupler();
 
     /// Update the behavior
     /// \param dt    The length of time (seconds) between update calls.
@@ -99,4 +98,4 @@ private:
 
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_VTCRIGIDREPRESENTATION_H
+#endif // SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H

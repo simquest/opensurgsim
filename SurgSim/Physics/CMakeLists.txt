@@ -44,7 +44,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	SolveMlcp.cpp
-	VtcBehavior.cpp
+	VirtualToolCoupler.cpp
 )
 
 set(SURGSIM_PHYSICS_HEADERS
@@ -94,7 +94,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Shapes.h
 	SolveMlcp.h
 	SphereShape.h
-	VtcBehavior.h
+	VirtualToolCoupler.h
 )
 
 surgsim_add_library(

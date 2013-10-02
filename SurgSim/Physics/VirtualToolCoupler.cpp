@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/VtcBehavior.h>
+#include <SurgSim/Physics/VirtualToolCoupler.h>
 
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/Logger.h>
@@ -44,7 +44,7 @@ Vector3d computeRotationVector(const RigidTransform3d& t1, const RigidTransform3
 	return angle*axis;
 }
 
-VtcBehavior::VtcBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
+VirtualToolCoupler::VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
 						 std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid,
 						 const std::string& poseName) :
 	SurgSim::Framework::Behavior(name),
@@ -58,11 +58,11 @@ VtcBehavior::VtcBehavior(const std::string& name, std::shared_ptr<SurgSim::Input
 {
 }
 
-VtcBehavior::~VtcBehavior()
+VirtualToolCoupler::~VirtualToolCoupler()
 {
 }
 
-void VtcBehavior::update(double dt)
+void VirtualToolCoupler::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_input->getData(&dataGroup);
@@ -97,38 +97,38 @@ void VtcBehavior::update(double dt)
 	m_previousState.setAngularVelocity(inputAngularVelocity);
 }
 
-bool VtcBehavior::doInitialize()
+bool VirtualToolCoupler::doInitialize()
 {
 	return true;
 }
 
-bool VtcBehavior::doWakeUp()
+bool VirtualToolCoupler::doWakeUp()
 {
 	m_previousState = m_rigid->getCurrentState();
 	return true;
 }
 
-int VtcBehavior::getTargetManagerType() const
+int VirtualToolCoupler::getTargetManagerType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_PHYSICS;
 }
 
-void VtcBehavior::setLinearStiffness(double linearStiffness)
+void VirtualToolCoupler::setLinearStiffness(double linearStiffness)
 {
 	m_linearStiffness = linearStiffness;
 }
 
-void VtcBehavior::setLinearDamping(double linearDamping)
+void VirtualToolCoupler::setLinearDamping(double linearDamping)
 {
 	m_linearDamping = linearDamping;
 }
 
-void VtcBehavior::setAngularStiffness(double angularStiffness)
+void VirtualToolCoupler::setAngularStiffness(double angularStiffness)
 {
 	m_angularStiffness = angularStiffness;
 }
 
-void VtcBehavior::setAngularDamping(double angularDamping)
+void VirtualToolCoupler::setAngularDamping(double angularDamping)
 {
 	m_angularDamping = angularDamping;
 }
