@@ -40,8 +40,13 @@ public:
 	/// Note that message can still be filtered out in user defined derived method notify().
 	OsgLog();
 
+
+
 	/// User defined derived log Method
 	/// Based on log level 'severity', this method decides whether to log 'message' with OSS logging system.
+
+	/// \param	severity Log level of message to be logged.
+	/// \param	message The actual message to be logged.
 	virtual void notify(osg::NotifySeverity severity, const char *message) override;
 
 private:
