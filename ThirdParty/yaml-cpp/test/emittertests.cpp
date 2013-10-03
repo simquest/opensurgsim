@@ -38,6 +38,7 @@ namespace Test
 
 		void SimpleFlowSeqNode(YAML::Emitter& out, std::string& desiredOutput) {
 			YAML::Node node;
+
 			node.SetStyle(YAML::FlowStyle);
 			node.push_back(1.01);
 			node.push_back(2.01);
@@ -75,7 +76,7 @@ namespace Test
 
 		void NestFlowSeqNode(YAML::Emitter& out, std::string& desiredOutput) {
 			YAML::Node node, cell0, cell1;
-
+			
 			cell0.push_back(1.01);
 			cell0.push_back(2.01);
 			cell0.push_back(3.01);
@@ -91,6 +92,27 @@ namespace Test
 			out << node;
 
 			desiredOutput = "[[1.01, 2.01, 3.01], [4.01, 5.01, 6.01]]";
+		}
+
+		void MixBlockFlowSeqNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, cell0, cell1;
+			
+			cell0.SetStyle(YAML::FlowStyle);
+			cell0.push_back(1.01);
+			cell0.push_back(2.01);
+			cell0.push_back(3.01);
+
+			cell1.push_back(4.01);
+			cell1.push_back(5.01);
+			cell1.push_back(6.01);
+
+			node.SetStyle(YAML::BlockStyle);
+			node.push_back(cell0);
+			node.push_back(cell1);
+
+			out << node;
+
+			desiredOutput = "- [1.01, 2.01, 3.01]\n-\n  - 4.01\n  - 5.01\n  - 6.01";
 		}
 
 		void SimpleMap(YAML::Emitter& out, std::string& desiredOutput) {
@@ -1140,6 +1162,7 @@ namespace Test
 		RunEmitterTest(&Emitter::NestedFlowSeq, "nested flow seq", passed, total);
 		RunEmitterTest(&Emitter::NestFlowSeqNode, "nest flow seq Node", passed, total);
 		RunEmitterTest(&Emitter::SimpleMap, "simple map", passed, total);
+		RunEmitterTest(&Emitter::MixBlockFlowSeqNode, "nest flow seq Node", passed, total);
 		RunEmitterTest(&Emitter::SimpleFlowMap, "simple flow map", passed, total);
 		RunEmitterTest(&Emitter::MapAndList, "map and list", passed, total);
 		RunEmitterTest(&Emitter::ListAndMap, "list and map", passed, total);

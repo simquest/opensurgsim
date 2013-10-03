@@ -94,12 +94,20 @@ namespace YAML
 				m_scanner.pop();
 				return;
 			case Token::FLOW_SEQ_START:
+				eventHandler.OnSequenceStart(mark, tag, anchor, EMITTER_STYLE::FlowStyle);
+				HandleSequence(eventHandler);
+				eventHandler.OnSequenceEnd();
+				return;
 			case Token::BLOCK_SEQ_START:
 				eventHandler.OnSequenceStart(mark, tag, anchor, EMITTER_STYLE::BlockStyle);
 				HandleSequence(eventHandler);
 				eventHandler.OnSequenceEnd();
 				return;
 			case Token::FLOW_MAP_START:
+				eventHandler.OnMapStart(mark, tag, anchor, EMITTER_STYLE::FlowStyle);
+				HandleMap(eventHandler);
+				eventHandler.OnMapEnd();
+				return;
 			case Token::BLOCK_MAP_START:
 				eventHandler.OnMapStart(mark, tag, anchor, EMITTER_STYLE::BlockStyle);
 				HandleMap(eventHandler);

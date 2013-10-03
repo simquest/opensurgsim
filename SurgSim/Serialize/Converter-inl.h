@@ -28,7 +28,7 @@ namespace YAML
 		static Node encode(const SurgSim::Math::Vector3d& rhs)
 		{
 			Node node;
-			node.SetStyle(YAML::Flow);
+			node.SetStyle(YAML::FlowStyle);
 			node.push_back(rhs[0]);
 			node.push_back(rhs[1]);
 			node.push_back(rhs[2]);
@@ -68,7 +68,7 @@ namespace YAML
 		static Node encode(const SurgSim::Math::Vector4d& rhs)
 		{
 			Node node;
-			node.SetStyle(YAML::Flow);
+			node.SetStyle(YAML::FlowStyle);
 			node.push_back(rhs[0]);
 			node.push_back(rhs[1]);
 			node.push_back(rhs[2]);
@@ -131,7 +131,7 @@ namespace YAML
 		static Node encode(const SurgSim::Math::Matrix33d& rhs)
 		{
 			Node node;
-			node.SetStyle(YAML::Flow);
+			node.SetStyle(YAML::FlowStyle);
 			/// A row-major encoding
 			for (auto row = 0; row < rhs.rows(); ++row)
 				node.push_back(convert<SurgSim::Math::Vector3d>::encode(rhs.row(row)));
@@ -163,7 +163,7 @@ namespace YAML
 		static Node encode(const SurgSim::Math::Matrix44d& rhs)
 		{
 			Node node;
-			node.SetStyle(YAML::Flow);
+			node.SetStyle(YAML::FlowStyle);
 			/// A row-major encoding
 			for (auto row = 0; row < rhs.rows(); ++row)
 				node.push_back(convert<SurgSim::Math::Vector4d>::encode(rhs.row(row)));
