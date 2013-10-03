@@ -48,6 +48,7 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationTest.cpp
 	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
+	VirtualToolCouplerTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -58,7 +59,17 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimDataStructures MlcpTestIO gtest ${Boost_LIBRARIES})
+set(LIBS
+	IdentityPoseDevice
+	SurgSimCollision
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	SurgSimPhysics
+	MlcpTestIO
+	gtest
+	${Boost_LIBRARIES}
+)
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
