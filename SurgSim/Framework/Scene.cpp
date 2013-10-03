@@ -19,30 +19,26 @@
 #include <SurgSim/Framework/Component.h>
 #include <SurgSim/Framework/Log.h>
 
+#include <utility>
+
 
 namespace SurgSim
 {
 namespace Framework
 {
 
-bool SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> element)
+void SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 {
-	bool result = false;
 	std::string name = element->getName();
-	if (m_elements.find(name) == m_elements.end())
-	{
-		element->setScene(getSharedPtr());
+	element->setScene(getSharedPtr());
 
-		m_elements[name] = element;
-		std::shared_ptr<Runtime> runtime = m_runtime.lock();
-		if (runtime != nullptr)
-		{
-			std::shared_ptr<Runtime> runtime(m_runtime);
-			runtime->addSceneElement(element);
-		}
-		result = true;
+	m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
+	std::shared_ptr<Runtime> runtime = m_runtime.lock();
+	if (runtime != nullptr)
+	{
+		std::shared_ptr<Runtime> runtime(m_runtime);
+		runtime->addSceneElement(element);
 	}
-	return result;
 }
 
 std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) const
@@ -66,7 +62,7 @@ std::shared_ptr<Runtime> Scene::getRuntime()
 	return m_runtime.lock();
 }
 
-const std::map<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
+const std::multimap<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
 {
 	return m_elements;
 }

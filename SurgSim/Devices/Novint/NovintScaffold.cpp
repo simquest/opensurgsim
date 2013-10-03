@@ -40,6 +40,7 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::RigidTransform3d;
 
 using SurgSim::Framework::Clock;
@@ -219,18 +220,31 @@ private:
 struct NovintScaffold::DeviceData
 {
 	/// Initialize the state.
-	DeviceData(const std::string& apiName, NovintDevice* device) :
+	DeviceData(const std::string& apiName, NovintCommonDevice* device) :
 		initializationName(apiName),
 		deviceObject(device),
+		isPositionHomed(false),
+		isOrientationHomed(false),
+		isDeviceHomed(false),
+		isDeviceHeld(false),
+		isDevice7Dof(device->is7DofDevice()),
+		isDeviceRollAxisReversed(false),
+		eulerAngleOffsetRoll(0.0),
+		eulerAngleOffsetYaw(0.0),
+		eulerAngleOffsetPitch(0.0),
+		forwardPointingPoseThreshold(0.9),
+		torqueScale(Vector3d::Constant(1.0)),
 		positionValue(positionBuffer),
 		transformValue(transformBuffer),
 		forceValue(forceBuffer)
 	{
 		positionValue.setZero();   // also clears positionBuffer
 		transformValue.setIdentity();   // also sets transformBuffer
+		jointAngles.setZero();
 		buttonStates.fill(false);
 
 		forceValue.setZero();   // also clears forceBuffer
+		torqueValue.setZero();
 	}
 
 
@@ -244,7 +258,7 @@ struct NovintScaffold::DeviceData
 	/// The HDAL device name.
 	const std::string initializationName;
 	/// The corresponding device object.
-	NovintDevice* const deviceObject;
+	NovintCommonDevice* const deviceObject;
 
 	/// The device handle wrapper.
 	NovintScaffold::Handle deviceHandle;
@@ -255,20 +269,45 @@ struct NovintScaffold::DeviceData
 	double positionBuffer[3];
 	/// The raw pose transform read from the device.
 	double transformBuffer[16];
+	/// The joint angles for the device orientation.
+	Vector3d jointAngles;
 	/// The button state read from the device.
 	ButtonStates buttonStates;
 	/// The homing state read from the device.
+	bool isPositionHomed;
+	/// The homing state read from the device.
+	bool isOrientationHomed;
+	/// The homing state read from the device.
 	bool isDeviceHomed;
+	/// The proximity state read from the device.
+	bool isDeviceHeld;
+	/// True if this is a 7DoF device.
+	bool isDevice7Dof;
+	/// True if the roll axis of a 7DoF device has reverse polarity because the device is left-handed.
+	bool isDeviceRollAxisReversed;
+
+	/// The offset added to the roll Euler angle.
+	double eulerAngleOffsetRoll;
+	/// The offset added to the yaw Euler angle.
+	double eulerAngleOffsetYaw;
+	/// The offset added to the pitch Euler angle.
+	double eulerAngleOffsetPitch;
+	/// The threshold to determine if the device is pointing forwards before unlocking orientation.
+	double forwardPointingPoseThreshold;
+	/// The scaling factors for the torque axes.
+	Vector3d torqueScale;
 
 	/// The raw force to be written to the device.
 	double forceBuffer[3];
+	/// The torque value to be written to the device after conversion.
+	Vector3d torqueValue;
 
 	/// The position value from the device, permanently connected to positionBuffer.
 	Eigen::Map<Vector3d> positionValue;
 	/// The pose transform value from the device, permanently connected to transformBuffer.
 	Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::ColMajor>> transformValue;
 
-	/// The force value to be written to the device, permanently connected to positionBuffer.
+	/// The force value to be written to the device, permanently connected to forceBuffer.
 	Eigen::Map<Vector3d> forceValue;
 
 private:
@@ -315,6 +354,18 @@ HDLServoOpExitCode NovintScaffold::Callback::run(void* data)
 
 	// Should return HDL_SERVOOP_CONTINUE to wait for the next frame, or HDL_SERVOOP_EXIT to terminate the calls.
 	return HDL_SERVOOP_CONTINUE;
+}
+
+
+
+template <typename T>
+static inline T clampToRange(T value, T rangeMin, T rangeMax)
+{
+	if (value < rangeMin)
+		return rangeMin;
+	if (value > rangeMax)
+		return rangeMax;
+	return value;
 }
 
 
@@ -367,7 +418,7 @@ NovintScaffold::~NovintScaffold()
 }
 
 
-bool NovintScaffold::registerDevice(NovintDevice* device)
+bool NovintScaffold::registerDevice(NovintCommonDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -399,8 +450,8 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 	// Make sure the initialization name is unique.
 	const std::string initializationName = device->getInitializationName();
 	auto sameInitializationName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[&deviceName](const std::unique_ptr<DeviceData>& info)
-			{ return info->deviceObject->getInitializationName() == deviceName; });
+		[&initializationName](const std::unique_ptr<DeviceData>& info)
+			{ return info->deviceObject->getInitializationName() == initializationName; });
 	if (sameInitializationName != m_state->activeDeviceList.end())
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "Novint: Tried to register a device when the same initialization" <<
@@ -428,7 +479,7 @@ bool NovintScaffold::registerDevice(NovintDevice* device)
 }
 
 
-bool NovintScaffold::unregisterDevice(const NovintDevice* const device)
+bool NovintScaffold::unregisterDevice(const NovintCommonDevice* const device)
 {
 	std::unique_ptr<DeviceData> savedInfo;
 	bool haveOtherDevices = false;
@@ -488,6 +539,37 @@ bool NovintScaffold::initializeDeviceState(DeviceData* info)
 	hdlMakeCurrent(info->deviceHandle.get());
 	checkForFatalError("Couldn't enable the handle");
 
+	if (info->isDevice7Dof)
+	{
+		int gripStatus[2] = { 0, 0 };
+		// OSG2 grips report their "handedness" in the LSB of the second raw status byte
+		hdlGripGetAttributes (HDL_GRIP_STATUS, 2, gripStatus);
+		if (checkForFatalError("Cannot get grip status"))
+		{
+			// HDL reported an error.  An error message was already logged.
+			return false;
+		}
+		bool leftHanded = ((gripStatus[1] & 0x01) != 0);
+		if (leftHanded)
+		{
+			SURGSIM_LOG_DEBUG(m_logger) << "'" << info->initializationName << "' is LEFT-handed.";
+			info->isDeviceRollAxisReversed = true;   // sigh
+			// I wish we had someplace to put these instead of hardcoding.
+			info->eulerAngleOffsetRoll = 0;
+			info->eulerAngleOffsetYaw = -75. * M_PI / 180.;
+			info->eulerAngleOffsetPitch = -50. * M_PI / 180.;
+		}
+		else
+		{
+			SURGSIM_LOG_DEBUG(m_logger) << "'" << info->initializationName << "' is right-handed.";
+			info->isDeviceRollAxisReversed = false;
+			// I wish we had someplace to put these instead of hardcoding.
+			info->eulerAngleOffsetRoll = 0;
+			info->eulerAngleOffsetYaw = +75. * M_PI / 180.;
+			info->eulerAngleOffsetPitch = +50. * M_PI / 180.;
+		}
+	}
+
 	return true;
 }
 
@@ -511,6 +593,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	// TODO(bert): this code should cache the access indices.
+	// TODO(bert): this needs to be split up into more methods.  It is WAAAAY too big.
 
 	SurgSim::Math::Vector3d force;
 	if (outputData.vectors().get("force", &force))
@@ -520,6 +603,16 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	else
 	{
 		info->forceValue.setZero();
+	}
+
+	SurgSim::Math::Vector3d torque;
+	if (outputData.vectors().get("torque", &torque))
+	{
+		info->torqueValue = torque;
+	}
+	else
+	{
+		info->torqueValue.setZero();
 	}
 
 	bool desiredGravityCompensation = false;
@@ -540,9 +633,75 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	hdlGripGetAttributesb(HDL_GRIP_BUTTON, info->buttonStates.size(), info->buttonStates.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
 
+	// Get the additional 7DoF data if available.
+
+	if (info->isDevice7Dof)
+	{
+		// We compute the device orientation from the joint angles, for two reasons.  The first that it lets us
+		// compensate for recurrent bugs in the HDAL grip code.  The second is that we'll need the joint angles in
+		// order to correctly generate joint torques.
+		double angles[4];
+		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
+		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
+
+		// The zero values are NOT the home orientation.  Shoot me now.
+		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;  // 0 for 7DoF Falcon
+		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;   // +/-75deg
+		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch; // +/-50deg
+
+		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
+		Matrix33d orientation = rotationY * rotationZ * rotationX;
+		// Put the result into the orientation transform matrix:
+		info->transformValue.block<3, 3>(0, 0) = orientation;
+	}
+
 	// Check the device's homing state.
+
 	unsigned int deviceStateBitmask = hdlGetState();
-	info->isDeviceHomed = ((deviceStateBitmask & HDAL_NOT_CALIBRATED) == 0);
+	info->isPositionHomed = ((deviceStateBitmask & HDAL_NOT_CALIBRATED) == 0);
+
+	if (info->isDevice7Dof)
+	{
+		// The homing state is communicated using the button information.
+		info->isOrientationHomed = info->buttonStates[0] && info->buttonStates[1];
+		// So is the state of whether the device is currently held (proximity sensor).
+		info->isDeviceHeld = info->buttonStates[2];
+		// There are no ACTUAL buttons on the 7DoF Falcons, so we clear the button buffer.
+		info->buttonStates.fill(false);
+	}
+	else
+	{
+		// The 3-DoF device doesn't need the orientation homing shenanigans...
+		info->isOrientationHomed = true;
+		info->isDeviceHomed = info->isPositionHomed;
+		info->isDeviceHeld = true;  // ...I guess
+	}
+
+	if (info->isPositionHomed && info->isOrientationHomed && ! info->isDeviceHomed)
+	{
+		// Wait until the tool is pointed forwards (i.e. perpendicular to the Falcon centerline) before proclaiming the
+		// whole device homed.
+		Vector3d forwardDirection = Vector3d::UnitX();
+		double forwardMetric = forwardDirection.dot(info->transformValue.block<3, 3>(0, 0) * forwardDirection);
+
+		if (forwardMetric >= info->forwardPointingPoseThreshold)
+		{
+			// It looks like everything is ready!
+			info->isDeviceHomed = true;
+		}
+	}
+
+	if (! info->isPositionHomed)
+	{
+		info->positionValue.setZero();
+	}
+	if (! info->isOrientationHomed)
+	{
+		info->transformValue.setIdentity();
+	}
 
 	// Set the force command (in newtons) and gravity compensation.
 
@@ -553,6 +712,109 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	if (shouldSetGravityCompensation)
 	{
 		setGravityCompensation(info, desiredGravityCompensation);
+	}
+
+	// Set the torque command if applicable (and convert newton-meters to command counts).
+
+	if (info->isDevice7Dof)
+	{
+		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
+		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
+		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
+		// NB: the order of rotations is (rotY * rotZ * rotX), not XYZ!
+		// Construct the joint axes for the CURRENT pose of the device.
+		Vector3d jointAxisY = Vector3d::UnitY();
+		Vector3d jointAxisZ = rotationY * Vector3d::UnitZ();
+		Vector3d jointAxisX = rotationY * (rotationZ * Vector3d::UnitX());
+		// To convert from Cartesian space to motor-axis space, we assemble the axes into a basis matrix and invert it.
+		Matrix33d basisMatrix;
+		basisMatrix.col(0) = jointAxisX;
+		basisMatrix.col(1) = jointAxisY;
+		basisMatrix.col(2) = jointAxisZ;
+		double basisDeterminant = fabs(basisMatrix.determinant());
+
+		// Also construct a "fake" X axis orthogonal with the other two, to be used when the pose is degenerate.
+		// Note that the Y and Z axes are always perpendicular for the Falcon 7DoF, so the normalize() can't fail and
+		// is basically unnecessary, but...
+		Vector3d fakeAxisX  = jointAxisY.cross(jointAxisZ).normalized();
+		Matrix33d fakeBasisMatrix;
+		basisMatrix.col(0) = fakeAxisX;
+		basisMatrix.col(1) = jointAxisY;
+		basisMatrix.col(2) = jointAxisZ;
+
+		const double mediumBasisDeterminantThreshold = 0.6;
+		const double smallBasisDeterminantThreshold = 0.4;
+
+		Matrix33d decompositionMatrix;
+		if (basisDeterminant >= mediumBasisDeterminantThreshold)
+		{
+			// All is well!
+			decompositionMatrix = basisMatrix.inverse();
+		}
+		else if (basisDeterminant >= smallBasisDeterminantThreshold)
+		{
+			// If the determinant is "medium" but not "small", the device is in a near-degenerate configuration.
+			// Which axes are going to be commanded may be hugely dependent on small changes in the pose.
+			// We want to gradually decrease the amount of roll torque produced near the degenerate point.
+			double ratio =  ((basisDeterminant - smallBasisDeterminantThreshold) /
+				(mediumBasisDeterminantThreshold - smallBasisDeterminantThreshold));
+			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
+
+			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
+			// torque is then meaningless.
+			Matrix33d fakeDecompositionMatrix = fakeBasisMatrix.inverse();
+			fakeDecompositionMatrix.row(0) = Vector3d::Zero();
+
+			decompositionMatrix = basisMatrix.inverse() * ratio + fakeDecompositionMatrix * (1.-ratio);
+		}
+		else
+		{
+			// If the determinant is small, the matrix may not be invertible.
+			// The "fake" basis matrix replaces the X axis with a fake (so it's always invertible), but the output X
+			// torque is then meaningless.
+			decompositionMatrix = fakeBasisMatrix.inverse();
+			decompositionMatrix.row(0) = Vector3d::Zero();
+			// Moreover, near the degenerate position the X axis free-spins but is aligned with Y, so we want to reduce Y torques as well.
+			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
+			double ratio = 0;
+			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
+			// We just use linear drop-off.
+			decompositionMatrix.row(1) *= ratio;
+		}
+		Vector3d axisTorqueVector = decompositionMatrix * info->torqueValue;
+
+		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
+		const double axisTorqueMin = -2000;
+		const double axisTorqueMax = +2000;
+		// roll axis:  torque = 17.6 mNm  when command = 2000 (but flipped in left grip!)
+		const double rollTorqueScale  = axisTorqueMax / 17.6e-3;
+		// yaw axis:   torque = 47.96 mNm when command = 2000
+		const double yawTorqueScale   = axisTorqueMax / 47.96e-3;
+		// pitch axis: torque = 47.96 mNm when command = 2000
+		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
+
+		double deviceTorques[4];
+		deviceTorques[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+			axisTorqueMin, axisTorqueMax);
+		deviceTorques[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
+			axisTorqueMin, axisTorqueMax);
+		deviceTorques[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+			axisTorqueMin, axisTorqueMax);
+		deviceTorques[3] = 0;
+
+		if (info->isDeviceRollAxisReversed)  // commence swearing.
+		{
+			deviceTorques[0] = -deviceTorques[0];
+		}
+
+		// Set the torque vector (from the first 3 elements of the argument array).  Also set the jaw squeeze torque
+		// (as 4th element of the array)-- though this is not used anywhere at the moment.
+		// The 2nd arg to this call is the count; we're setting 4 doubles.
+		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, deviceTorques);
+		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
 
 
@@ -567,6 +829,8 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		inputData.booleans().set("button3", info->buttonStates[2]);
 		inputData.booleans().set("button4", info->buttonStates[3]);
 		inputData.booleans().set("isHomed", info->isDeviceHomed);
+		inputData.booleans().set("isPositionHomed", info->isPositionHomed);
+		inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
 	}
 
 	return !fatalError;
@@ -826,6 +1090,8 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	builder.addBoolean("button3");
 	builder.addBoolean("button4");
 	builder.addBoolean("isHomed");
+	builder.addBoolean("isPositionHomed");
+	builder.addBoolean("isOrientationHomed");
 	return builder.createData();
 }
 

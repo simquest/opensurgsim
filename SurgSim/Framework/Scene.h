@@ -41,10 +41,9 @@ public:
 	{
 	}
 
-	/// Adds a scene element to 'element'.
+	/// Adds a scene element to member data 'm_element'.
 	/// \param	element	The element.
-	/// \return	true if it succeeds, false if it fails.
-	bool addSceneElement(std::shared_ptr<SceneElement> element);
+	void addSceneElement(std::shared_ptr<SceneElement> element);
 
 	/// Gets scene element with a given name
 	/// \param	name	The name.
@@ -53,7 +52,7 @@ public:
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
-	const std::map<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
+	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
 
 	/// Sets the runtime.
 	/// \param	runtime	The runtime for this scene.
@@ -71,7 +70,7 @@ private:
 
 	std::weak_ptr<Runtime> m_runtime;
 
-	std::map<std::string,std::shared_ptr<SceneElement>> m_elements;
+	std::multimap<std::string, std::shared_ptr<SceneElement>> m_elements;
 };
 
 }; // namespace Framework

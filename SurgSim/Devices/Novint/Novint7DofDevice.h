@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_NOVINT_NOVINTDEVICE_H
-#define SURGSIM_DEVICES_NOVINT_NOVINTDEVICE_H
+#ifndef SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
+#define SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
 
 #include <memory>
 #include <string>
@@ -27,34 +27,29 @@ namespace Device
 {
 
 
-/// A class implementing the communication with a Novint Falcon device.
-///
-/// This should provide basic support for any device that can communicate using the Novint HDAL SDK toolkit, such as
-/// the off-the-shelf Novint Falcon haptic gaming controller.  Note that certain devices may require device-specific
-/// support in the code to enable particular hardware features.  In particular, the Novint Falcon with the Open Surgery
-/// Grip will not be able to produce torques unless it is accessed using the Novint7DofHapticDevice class.
+/// A class implementing the communication with a Novint Falcon with the Open Surgery Grip 7-DoF device.
 ///
 /// \par Application input provided by the device:
 ///   | type       | name        |                                                                |
 ///   | ----       | ----        | ---                                                            |
 ///   | pose       | "pose"      | %Device pose (units are meters).                               |
-///   | bool       | "button1"   | %State of the first device button if present.                  |
-///   | bool       | "button2"   | %State of the second device button if present.                 |
-///   | bool       | "button3"   | %State of the third device button if present.                  |
-///   | bool       | "button4"   | %State of the third device button if present.                  |
+///   | bool       | "button1"   | %Always false (there are no buttons present).                  |
+///   | bool       | "button2"   | %Always false (there are no buttons present).                  |
+///   | bool       | "button3"   | %Always false (there are no buttons present).                  |
+///   | bool       | "button4"   | %Always false (there are no buttons present).                  |
 ///   | bool       | "isHomed"   | %Device homing status.                                         |
-/// Note that \c button1 through \c 4 correspond to the buttons 0 through 3 provided by the
-/// HDAL SDK, but a custom Novint device might have fewer than 4 buttons.
+///   | bool       | "isHeld"    | %Device homing status.                                         |
 ///
 /// \par Application output used by the device:
 ///   | type       | name                  |                                                      |
 ///   | ----       | ----                  | ---                                                  |
 ///   | vector     | "force"               | %Device output force (units are newtons).            |
+///   | vector     | "torque"              | %Device output torque (units are newton-meters).     |
 ///   | bool       | "gravityCompensation" | Enable or disable hardware gravity compensation.     |
 ///
-/// \sa Novint7DofHapticDevice
+/// \sa NovintHapticDevice
 /// \sa NovintCommonDevice, SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
-class NovintDevice : public NovintCommonDevice
+class Novint7DofDevice : public NovintCommonDevice
 {
 public:
 	/// Constructor.
@@ -62,13 +57,16 @@ public:
 	/// \param uniqueName A unique name for the device that will be used by the application.
 	/// \param initializationName The name passed to HDAL when initializing the device.  This should match a
 	/// 	configured Novint device; alternately, an empty string indicates the default device.
-	NovintDevice(const std::string& uniqueName, const std::string& initializationName);
+	Novint7DofDevice(const std::string& uniqueName, const std::string& initializationName);
 
 	/// Destructor.
-	virtual ~NovintDevice();
+	virtual ~Novint7DofDevice();
+
+private:
+	virtual bool is7DofDevice() const override;
 };
 
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_NOVINT_NOVINTDEVICE_H
+#endif  // SURGSIM_DEVICES_NOVINT_NOVINT7DOFDEVICE_H
