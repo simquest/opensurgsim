@@ -15,6 +15,24 @@ namespace Test
 			desiredOutput = "Hello, World!";
 		}
 		
+		void EmptySeqNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node;
+
+			node[0];
+			out << node;
+
+			desiredOutput = "[]";
+		}
+
+		void EmptyMapNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node;
+
+			node["undefined"];
+			out << node;
+
+			desiredOutput = "{}";
+		}
+
 		void SimpleSeq(YAML::Emitter& out, std::string& desiredOutput) {
 			out << YAML::BeginSeq;
 			out << "eggs";
@@ -1153,6 +1171,8 @@ namespace Test
 	{
 		int passed = 0;
 		int total = 0;
+		RunEmitterTest(&Emitter::EmptySeqNode, "simple scalar", passed, total);
+		RunEmitterTest(&Emitter::EmptyMapNode, "simple scalar", passed, total);
 		RunEmitterTest(&Emitter::SimpleScalar, "simple scalar", passed, total);
 		RunEmitterTest(&Emitter::SimpleSeq, "simple seq", passed, total);
 		RunEmitterTest(&Emitter::SimpleFlowSeq, "simple flow seq", passed, total);
