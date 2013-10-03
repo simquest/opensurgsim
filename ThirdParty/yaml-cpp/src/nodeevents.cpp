@@ -81,7 +81,7 @@ namespace YAML
 				handler.OnSequenceEnd();
 				break;
 			case NodeType::Map:
-				handler.OnMapStart(Mark(), node.tag(), anchor);
+				handler.OnMapStart(Mark(), node.tag(), anchor, node.style());
 				for(detail::const_node_iterator it=node.begin();it!=node.end();++it) {
 					Emit(*it->first, handler, am);
 					Emit(*it->second, handler, am);

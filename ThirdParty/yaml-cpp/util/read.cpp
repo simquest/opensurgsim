@@ -7,6 +7,7 @@ class NullEventHandler: public YAML::EventHandler
 public:
     typedef YAML::Mark Mark;
     typedef YAML::anchor_t anchor_t;
+	typedef YAML::EMITTER_STYLE style;
     
     NullEventHandler() {}
     
@@ -15,9 +16,9 @@ public:
     virtual void OnNull(const Mark&, anchor_t) {}
     virtual void OnAlias(const Mark&, anchor_t) {}
     virtual void OnScalar(const Mark&, const std::string&, anchor_t, const std::string&) {}
-    virtual void OnSequenceStart(const Mark&, const std::string&, anchor_t) {}
+    virtual void OnSequenceStart(const Mark&, const std::string&, anchor_t, const style) {}
     virtual void OnSequenceEnd() {}
-    virtual void OnMapStart(const Mark&, const std::string&, anchor_t) {}
+    virtual void OnMapStart(const Mark&, const std::string&, anchor_t, const style) {}
     virtual void OnMapEnd() {}
 };
 

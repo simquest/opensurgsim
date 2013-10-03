@@ -31,7 +31,7 @@ namespace YAML
 			
 			const std::string& scalar() const { return m_pRef->scalar(); }
 			const std::string& tag() const { return m_pRef->tag(); }
-			const YAML::EMITTER_MANIP style() const { return m_pRef->style(); }
+			const YAML::EMITTER_STYLE style() const { return m_pRef->style(); }
 			
 			
 			void mark_defined() {
@@ -81,7 +81,7 @@ namespace YAML
 			}
 
 			// style
-			void set_style(const YAML::EMITTER_MANIP style) {
+			void set_style(const YAML::EMITTER_STYLE style) {
 				mark_defined();
 				m_pRef->set_style(style);
 			}

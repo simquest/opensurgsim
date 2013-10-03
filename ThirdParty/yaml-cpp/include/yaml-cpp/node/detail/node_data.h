@@ -32,13 +32,13 @@ namespace YAML
 			void set_scalar(const std::string& scalar);
 
 			// style
-			void set_style(const YAML::EMITTER_MANIP style);
+			void set_style(const YAML::EMITTER_STYLE style);
 			
 			bool is_defined() const { return m_isDefined; }
 			NodeType::value type() const { return m_isDefined ? m_type : NodeType::Undefined; }
 			const std::string& scalar() const { return m_scalar; }
 			const std::string& tag() const { return m_tag; }
-			const YAML::EMITTER_MANIP style() const {return m_style;}
+			const YAML::EMITTER_STYLE style() const {return m_style;}
 			
 			// size/iterator
 			std::size_t size() const;
@@ -93,7 +93,7 @@ namespace YAML
 			std::string m_tag;
 			
 			// style
-			YAML::EMITTER_MANIP m_style;
+			YAML::EMITTER_STYLE m_style;
 			
 			// scalar
 			std::string m_scalar;

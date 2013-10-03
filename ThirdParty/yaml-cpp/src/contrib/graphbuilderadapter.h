@@ -29,11 +29,10 @@ namespace YAML
     virtual void OnAlias(const Mark& mark, anchor_t anchor);
     virtual void OnScalar(const Mark& mark, const std::string& tag, anchor_t anchor, const std::string& value);
     
-	virtual void OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_MANIP style);
-    virtual void OnSequenceStart(const Mark& mark, const std::string& tag, anchor_t anchor);
+	virtual void OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE style);
     virtual void OnSequenceEnd();
     
-    virtual void OnMapStart(const Mark& mark, const std::string& tag, anchor_t anchor);
+    virtual void OnMapStart(const Mark& mark, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE style);
     virtual void OnMapEnd();
     
     void *RootNode() const {return m_pRootNode;}

@@ -45,20 +45,22 @@ namespace YAML
 		EmitProps(tag, anchor);
 		m_emitter << value;
 	}
-	
-	void EmitFromEvents::OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor)
-	{
-		BeginNode();
-		EmitProps(tag, anchor);
-		m_emitter << BeginSeq;
-		m_stateStack.push(State::WaitingForSequenceEntry);
-	}
 
-	void EmitFromEvents::OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_MANIP style)
+	void EmitFromEvents::OnSequenceStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE style)
 	{
 		BeginNode();
 		EmitProps(tag, anchor);
-		m_emitter << style;
+		switch (style)
+		{
+		case BlockStyle:
+			m_emitter << YAML::Block;
+			break;
+		case FlowStyle:
+			m_emitter << YAML::Flow;
+			break;
+		default:
+			break;
+		}
 		m_emitter << BeginSeq;
 		m_stateStack.push(State::WaitingForSequenceEntry);
 	}
@@ -70,10 +72,21 @@ namespace YAML
 		m_stateStack.pop();
 	}
 	
-	void EmitFromEvents::OnMapStart(const Mark&, const std::string& tag, anchor_t anchor)
+	void EmitFromEvents::OnMapStart(const Mark&, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE style)
 	{
 		BeginNode();
 		EmitProps(tag, anchor);
+		switch (style)
+		{
+		case BlockStyle:
+			m_emitter << YAML::Block;
+			break;
+		case FlowStyle:
+			m_emitter << YAML::Flow;
+			break;
+		default:
+			break;
+		}
 		m_emitter << BeginMap;
 		m_stateStack.push(State::WaitingForKey);
 	}

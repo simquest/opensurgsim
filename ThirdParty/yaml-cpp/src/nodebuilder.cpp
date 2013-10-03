@@ -53,19 +53,12 @@ namespace YAML
 		Pop();
 	}
 	
-	void NodeBuilder::OnSequenceStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor, const YAML::EMITTER_MANIP style)
+	void NodeBuilder::OnSequenceStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE style)
 	{
 		detail::node& node = Push(anchor);
 		node.set_tag(tag);
 		node.set_type(NodeType::Sequence);
 		node.set_style(style);
-	}
-
-	void NodeBuilder::OnSequenceStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor)
-	{
-		detail::node& node = Push(anchor);
-		node.set_tag(tag);
-		node.set_type(NodeType::Sequence);
 	}
 	
 	void NodeBuilder::OnSequenceEnd()
@@ -73,11 +66,12 @@ namespace YAML
 		Pop();
 	}
 	
-	void NodeBuilder::OnMapStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor)
+	void NodeBuilder::OnMapStart(const Mark& /* mark */, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE style)
 	{
 		detail::node& node = Push(anchor);
 		node.set_type(NodeType::Map);
 		node.set_tag(tag);
+		node.set_style(style);
 		m_mapDepth++;
 	}
 	

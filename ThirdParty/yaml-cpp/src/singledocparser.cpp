@@ -57,7 +57,7 @@ namespace YAML
 		
 		// special case: a value node by itself must be a map, with no header
 		if(m_scanner.peek().type == Token::VALUE) {
-			eventHandler.OnMapStart(mark, "?", NullAnchor);
+			eventHandler.OnMapStart(mark, "?", NullAnchor, EMITTER_STYLE::DefaultStyle);
 			HandleMap(eventHandler);
 			eventHandler.OnMapEnd();
 			return;
@@ -95,20 +95,20 @@ namespace YAML
 				return;
 			case Token::FLOW_SEQ_START:
 			case Token::BLOCK_SEQ_START:
-				eventHandler.OnSequenceStart(mark, tag, anchor);
+				eventHandler.OnSequenceStart(mark, tag, anchor, EMITTER_STYLE::BlockStyle);
 				HandleSequence(eventHandler);
 				eventHandler.OnSequenceEnd();
 				return;
 			case Token::FLOW_MAP_START:
 			case Token::BLOCK_MAP_START:
-				eventHandler.OnMapStart(mark, tag, anchor);
+				eventHandler.OnMapStart(mark, tag, anchor, EMITTER_STYLE::BlockStyle);
 				HandleMap(eventHandler);
 				eventHandler.OnMapEnd();
 				return;
 			case Token::KEY:
 				// compact maps can only go in a flow sequence
 				if(m_pCollectionStack->GetCurCollectionType() == CollectionType::FlowSeq) {
-					eventHandler.OnMapStart(mark, tag, anchor);
+					eventHandler.OnMapStart(mark, tag, anchor, EMITTER_STYLE::FlowStyle);
 					HandleMap(eventHandler);
 					eventHandler.OnMapEnd();
 					return;

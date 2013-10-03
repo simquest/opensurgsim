@@ -175,7 +175,7 @@ namespace YAML
 	}
 
 	// style
-	inline void Node::SetStyle(const YAML::EMITTER_MANIP style)
+	inline void Node::SetStyle(const YAML::EMITTER_STYLE style)
 	{
 		if(!m_isValid)
 			throw InvalidNode();

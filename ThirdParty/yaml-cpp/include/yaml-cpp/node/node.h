@@ -55,7 +55,7 @@ namespace YAML
 		void SetTag(const std::string& tag);
 
 		// style
-		void SetStyle(const YAML::EMITTER_MANIP style);
+		void SetStyle(const YAML::EMITTER_STYLE style);
 
 		// assignment
 		bool is(const Node& rhs) const;

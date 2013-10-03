@@ -26,7 +26,7 @@ namespace YAML
 			NodeType::value type() const { return m_pData->type(); }
 			const std::string& scalar() const { return m_pData->scalar(); }
 			const std::string& tag() const { return m_pData->tag(); }
-			const YAML::EMITTER_MANIP style() const { return m_pData->style(); }
+			const YAML::EMITTER_STYLE style() const { return m_pData->style(); }
 			
 			void mark_defined() { m_pData->mark_defined(); }
 			void set_data(const node_ref& rhs) { m_pData = rhs.m_pData; }
@@ -37,7 +37,7 @@ namespace YAML
 			void set_scalar(const std::string& scalar) { m_pData->set_scalar(scalar); }
 
 			// style
-			void set_style(const YAML::EMITTER_MANIP style) {m_pData->set_style(style); }
+			void set_style(const YAML::EMITTER_STYLE style) {m_pData->set_style(style); }
 			
 			// size/iterator
 			std::size_t size() const { return m_pData->size(); }
