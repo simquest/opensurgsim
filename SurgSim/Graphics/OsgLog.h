@@ -27,11 +27,21 @@ namespace Graphics
 {
 
 /// Enable logging of OSG through SurgSim Logging System
+/// To use this, an object of OsgLog class must be created.
+/// Then call osg::setNotifyHandler() to let OSG use OSS logging system.
 class OsgLog : public osg::NotifyHandler
 {
 public:
+	/// Constructor
+	/// If OSS_DEBUG is defined, set OSG's log level to the lowest (osg::DEBUG_FP).
+	/// So that all info can be logged.
+	/// Otherwise, keep OSG's default log level (osg::NOTICE).
+
+	/// Note that message can still be filtered out in user defined derived method notify().
 	OsgLog();
 
+	/// User defined derived log Method
+	/// Based on log level 'severity', this method decides whether to log 'message' with OSS logging system.
 	virtual void notify(osg::NotifySeverity severity, const char *message) override;
 
 private:
