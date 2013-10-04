@@ -121,11 +121,6 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 std::shared_ptr<SceneElement> createBox(const std::string& name)
 {
-	double density = 700.0;  // Wood in Kg.m-3
-	double size[3] = {0.8, 2.0, 0.2};
-	double volume = size[0] * size[1] * size[2];
-	double mass = volume * density;
-
 	RigidRepresentationParameters params;
 	params.setDensity(700.0); // Wood in Kg.m-3
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(0.8, 2.0, 0.2); // in m
@@ -172,10 +167,10 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	// The actual values of the vtc parameters are experimental and needs to be tweaked for each application.
 	std::shared_ptr<VirtualToolCoupler> inputCoupler = 
 		std::make_shared<VirtualToolCoupler>("Input Coupler", inputComponent, physicsRepresentation);
-	inputCoupler->setAngularDamping(mass * 20);
-	inputCoupler->setAngularStiffness(mass * 50);
-	inputCoupler->setLinearDamping(mass * 50);
-	inputCoupler->setLinearStiffness(mass * 200);
+	inputCoupler->setAngularDamping(params.getMass() * 20);
+	inputCoupler->setAngularStiffness(params.getMass() * 50);
+	inputCoupler->setLinearDamping(params.getMass() * 50);
+	inputCoupler->setLinearStiffness(params.getMass() * 200);
 
 	std::shared_ptr<SceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
 	boxElement->addComponent(physicsRepresentation);
