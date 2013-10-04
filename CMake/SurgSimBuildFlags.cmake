@@ -26,6 +26,9 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 # We always want to use defines from <math.h>.
 add_definitions( -D_USE_MATH_DEFINES )
 
+# Define our own debug symbol
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
+
 # G++ (C++ compilation) specific settings
 if(CMAKE_COMPILER_IS_GNUCXX)
 	# default G++ compilation flags
