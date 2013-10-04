@@ -38,7 +38,7 @@ namespace SurgSim
 namespace Physics
 {
 
-const double epsilon = 1e-8;
+const double epsilon = 1e-4;
 
 struct VirtualToolCouplerTest : public ::testing::Test
 {
@@ -96,20 +96,21 @@ protected:
 TEST_F(VirtualToolCouplerTest, LinearDisplacement)
 {
 	RigidTransform3d initialPose = RigidTransform3d::Identity();
-	initialPose.translation() = Vector3d(-1.0, 0.0, 0.0);
+	initialPose.translation() = Vector3d(0.1, 0.0, 0.0);
 	rigidBody->setInitialPose(initialPose);
 	rigidBody->setIsGravityEnabled(false);
 
 	EXPECT_TRUE(rigidBody->isActive());
-	runSystem(5000);
+	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
 	RigidRepresentationState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isZero(epsilon));
-	EXPECT_TRUE(state.getPose().linear().isApprox(Matrix33d::Identity(), epsilon));
 
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
 TEST_F(VirtualToolCouplerTest, AngularDisplacement)
@@ -120,14 +121,16 @@ TEST_F(VirtualToolCouplerTest, AngularDisplacement)
 	rigidBody->setIsGravityEnabled(false);
 
 	EXPECT_TRUE(rigidBody->isActive());
-	runSystem(5000);
+	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
 	RigidRepresentationState state = rigidBody->getCurrentState();
 	EXPECT_TRUE(state.getLinearVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getAngularVelocity().isZero(epsilon));
 	EXPECT_TRUE(state.getPose().translation().isZero(epsilon));
-	EXPECT_TRUE(state.getPose().linear().isApprox(Matrix33d::Identity(), epsilon));
+
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
 TEST_F(VirtualToolCouplerTest, WithGravity)
@@ -141,7 +144,7 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	virtualToolCoupler->setLinearStiffness(stiffness);
 
 	EXPECT_TRUE(rigidBody->isActive());
-	runSystem(5000);
+	runSystem(2000);
 	EXPECT_TRUE(rigidBody->isActive());
 
 	RigidRepresentationState state = rigidBody->getCurrentState();
@@ -152,7 +155,9 @@ TEST_F(VirtualToolCouplerTest, WithGravity)
 	Vector3d g = Vector3d(0.0, -9.81, 0.0);
 	Vector3d expectedPosition = parameters.getMass() * g / stiffness;
 	EXPECT_TRUE(state.getPose().translation().isApprox(expectedPosition, epsilon));
-	EXPECT_TRUE(state.getPose().linear().isApprox(Matrix33d::Identity(), epsilon));
+
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(state.getPose().linear());
+	EXPECT_NEAR(0.0, angleAxis.angle(), epsilon);
 }
 
 }; // namespace Physics
