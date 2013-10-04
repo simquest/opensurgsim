@@ -34,8 +34,8 @@ RigidRepresentation::RigidRepresentation(const std::string& name) :
 	RigidRepresentationBase(name),
 	m_externalForce(SurgSim::Math::Vector3d::Zero()),
 	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
-	m_externalStiffnessMatrix(ComplianceMatrixType::Zero()),
-	m_externalDampingMatrix(ComplianceMatrixType::Zero())
+	m_externalStiffnessMatrix(Matrix66d::Zero()),
+	m_externalDampingMatrix(Matrix66d::Zero())
 {
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
@@ -203,8 +203,8 @@ void RigidRepresentation::afterUpdate(double dt)
 	m_finalState = m_currentState;
 	m_externalForce = SurgSim::Math::Vector3d::Zero();
 	m_externalTorque = SurgSim::Math::Vector3d::Zero();
-	m_externalStiffnessMatrix = ComplianceMatrixType::Zero();
-	m_externalDampingMatrix = ComplianceMatrixType::Zero();
+	m_externalStiffnessMatrix = Matrix66d::Zero();
+	m_externalDampingMatrix = Matrix66d::Zero();
 }
 
 void RigidRepresentation::applyDofCorrection(
@@ -290,7 +290,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 		return;
 	}
 
-	ComplianceMatrixType systemMatrix;
+	Matrix66d systemMatrix;
 	RigidRepresentationParameters& parameters = m_currentParameters;
 	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
 	systemMatrix.block<3,3>(0,0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
