@@ -37,9 +37,9 @@ class VirtualToolCoupler : public SurgSim::Framework::Behavior
 {
 public:
     /// Constructor
-    /// \param    name    Name of the behavior
-    /// \param    from    Input to get the pose
-    /// \param    to      Rigid Representation to control
+    /// \param    name     Name of the behavior
+    /// \param    input    Input Component to get the pose from
+    /// \param    rigid    Rigid Representation to control
     /// \param    poseName Name of the pose data in the input to transfer
     VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
 				std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid, const std::string& poseName = "pose");
