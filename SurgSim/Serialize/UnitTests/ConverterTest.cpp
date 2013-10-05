@@ -374,8 +374,8 @@ TEST_F(ConverterTest, ConvertSphereRepresentationTest)
 	sphereRepresentation->setRadius(sphereRadius);
 
 	SurgSim::Math::RigidTransform3d spherePose = SurgSim::Math::makeRigidTransform(
-		SurgSim::Math::Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(),
-		SurgSim::Math::Vector3d::Random());
+		SurgSim::Math::Quaterniond(SurgSim::Math::Vector4d::Identity()).normalized(),
+		SurgSim::Math::Vector3d::Identity());
 	sphereRepresentation->setPose(spherePose);
 
 	/// Encoding sphere representation
