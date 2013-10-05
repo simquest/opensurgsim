@@ -57,7 +57,8 @@ namespace YAML
 		
 		// special case: a value node by itself must be a map, with no header
 		if(m_scanner.peek().type == Token::VALUE) {
-			eventHandler.OnMapStart(mark, "?", NullAnchor, EMITTER_STYLE::DefaultStyle);
+			const YAML::EMITTER_STYLE style = DefaultStyle;
+			eventHandler.OnMapStart(mark, "?", NullAnchor, style);
 			HandleMap(eventHandler);
 			eventHandler.OnMapEnd();
 			return;
@@ -94,12 +95,12 @@ namespace YAML
 				m_scanner.pop();
 				return;
 			case Token::FLOW_SEQ_START:
-				eventHandler.OnSequenceStart(mark, tag, anchor, EMITTER_STYLE::FlowStyle);
+				eventHandler.OnSequenceStart(mark, tag, anchor, YAML::EMITTER_STYLE::FlowStyle);
 				HandleSequence(eventHandler);
 				eventHandler.OnSequenceEnd();
 				return;
 			case Token::BLOCK_SEQ_START:
-				eventHandler.OnSequenceStart(mark, tag, anchor, EMITTER_STYLE::BlockStyle);
+				eventHandler.OnSequenceStart(mark, tag, anchor, YAML::EMITTER_STYLE::BlockStyle);
 				HandleSequence(eventHandler);
 				eventHandler.OnSequenceEnd();
 				return;
