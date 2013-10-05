@@ -26,6 +26,7 @@ namespace YAML
 		static Node encode(const std::shared_ptr<SurgSim::Graphics::SphereRepresentation> rhs)
 		{
 			Node node;
+			node.SetStyle(YAML::BlockStyle);
 			node["name"] = "SphereRepresentation";
 			node["radius"] = rhs->getRadius();
 			node["initialPose"] = rhs->getInitialPose();

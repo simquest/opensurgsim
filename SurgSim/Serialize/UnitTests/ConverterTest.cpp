@@ -387,8 +387,6 @@ TEST_F(ConverterTest, ConvertSphereRepresentationTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> expectedSphere =  std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
 	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, expectedSphere);
-
-	double precision= 1e-8;
 	
 	EXPECT_EQ(sphereRepresentation->getRadius(), expectedSphere->getRadius());
 	EXPECT_TRUE(expectedSphere->getInitialPose().matrix().isApprox(sphereRepresentation->getInitialPose().matrix()));
