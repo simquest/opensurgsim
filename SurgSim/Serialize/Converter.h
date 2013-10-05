@@ -81,6 +81,7 @@ namespace YAML
 
 };
 
-#include <SurgSim/Serialize/Converter-inl.h>
+#include <SurgSim/Serialize/MathConverter-inl.h>
+#include <SurgSim/Serialize/ObjectConverter-inl.h>
 
 #endif // SURGSIM_SERIALIZE_CONVERTER_H
