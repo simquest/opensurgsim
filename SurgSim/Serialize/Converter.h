@@ -53,10 +53,17 @@ namespace YAML
 	template <>
 	struct convert <SurgSim::Math::RigidTransform3d>;
 
+	/// Specialize of YAML::convert<> template Component class.
+	template <>
+	struct convert <SurgSim::Framework::Component>;
+
+	/// Specialize of YAML::convert<> template Presensation class.
+	template <>
+	struct convert <SurgSim::Graphics::Representation>;
+
 	/// declaration of specialization convert<SurgSim::Math::SphereRepresentation>
 	template <>
 	struct convert <SurgSim::Graphics::SphereRepresentation>;
-
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
@@ -75,10 +82,6 @@ namespace YAML
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
-
-	// Overload << for YAML::Emitter to support SurgSim::Graphics::SpherePresentation type
-	Emitter& operator << (Emitter& out, const SurgSim::Graphics::SphereRepresentation& rhs);
-
 };
 
 #include <SurgSim/Serialize/MathConverter-inl.h>

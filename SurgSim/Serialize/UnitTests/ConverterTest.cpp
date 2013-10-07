@@ -378,8 +378,8 @@ TEST_F(ConverterTest, ConvertSphereRepresentationTest)
 		SurgSim::Math::Vector3d::Identity());
 	sphereRepresentation->setPose(spherePose);
 
-	/// Encoding sphere representation
-	node = YAML::convert<SurgSim::Graphics::SphereRepresentation>::encode(sphereRepresentation);
+	/// Encoding sphere representation 
+	node = YAML::convert<SurgSim::Graphics::SphereRepresentation>::encode(*sphereRepresentation);
 	outnode << node;
 	fout.close();
 	
@@ -388,7 +388,7 @@ TEST_F(ConverterTest, ConvertSphereRepresentationTest)
 	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> expectedSphere =  std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
 	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, expectedSphere);
 	
-	EXPECT_EQ(sphereRepresentation->getRadius(), expectedSphere->getRadius());
+	EXPECT_EQ(expectedSphere->getRadius(), sphereRepresentation->getRadius());
 	EXPECT_TRUE(expectedSphere->getInitialPose().matrix().isApprox(sphereRepresentation->getInitialPose().matrix()));
 	EXPECT_TRUE(expectedSphere->getPose().matrix().isApprox(sphereRepresentation->getPose().matrix()));
 }
