@@ -56,6 +56,7 @@ namespace YAML
 
 		// style
 		void SetStyle(const YAML::EMITTER_STYLE style);
+		YAML::EMITTER_STYLE Style() const; 
 
 		// assignment
 		bool is(const Node& rhs) const;

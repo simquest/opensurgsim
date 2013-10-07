@@ -183,6 +183,11 @@ namespace YAML
 		m_pNode->set_style(style);
 	}
 
+	inline YAML::EMITTER_STYLE Node::Style() const
+	{
+		return m_pNode->style();
+	}
+
 	// assignment
 	inline bool Node::is(const Node& rhs) const
 	{
