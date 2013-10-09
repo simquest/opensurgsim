@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_MATHCONVERTER_INL_H
-#define SURGSIM_SERIALIZE_MATHCONVERTER_INL_H
+#ifndef SURGSIM_SERIALIZE_MATHCONVERT_INL_H
+#define SURGSIM_SERIALIZE_MATHCONVERT_INL_H
 
 namespace YAML
 {
@@ -75,7 +75,7 @@ namespace YAML
 			node.push_back(rhs[3]);
 			return node;
 		}
-
+		 
 		static bool decode(const Node& node, SurgSim::Math::Vector4d& rhs) {
 			if (! node.IsSequence() || node.size() != 4)
 			{
@@ -272,4 +272,4 @@ namespace YAML
 
 }
 
-#endif // SURGSIM_SERIALIZE_MATHCONVERTER_INL_H
+#endif // SURGSIM_SERIALIZE_MATHCONVERT_INL_H

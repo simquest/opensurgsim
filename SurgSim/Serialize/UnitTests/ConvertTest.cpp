@@ -16,18 +16,16 @@
 
 #include <fstream>
 #include <gtest/gtest.h>
-#include <SurgSim/Serialize/Converter.h>
+#include <SurgSim/Serialize/MathConvert.h>
+#include <SurgSim/Serialize/GraphicsConvert.h>
 #include <SurgSim/Math/Valid.h>
 #include <limits>
 #include <SurgSim/Graphics/SphereRepresentation.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
-
-#include <random>
-
 using SurgSim::Math::isValid;
 
-class ConverterTest : public ::testing::Test
+class ConvertTest : public ::testing::Test
 {
 protected:
 
@@ -51,7 +49,7 @@ protected:
 	std::string datafile;
 };
 
-TEST_F(ConverterTest, ConverterVector3dInvalidTest)
+TEST_F(ConvertTest, ConvertVector3dInvalidTest)
 {
 	YAML::Node outnode;
 	SurgSim::Math::Vector3d vector3(1.000001, 2.000001, 3.000001);
@@ -68,7 +66,7 @@ TEST_F(ConverterTest, ConverterVector3dInvalidTest)
 	EXPECT_TRUE(! isValid(expectedv3d));
 }
 
-TEST_F(ConverterTest, ConverterVector3dNodeTest)
+TEST_F(ConvertTest, ConvertVector3dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -83,7 +81,7 @@ TEST_F(ConverterTest, ConverterVector3dNodeTest)
 }
 
 
-TEST_F(ConverterTest, ConverterVector3dEmitterTest)
+TEST_F(ConvertTest, ConvertVector3dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -96,7 +94,7 @@ TEST_F(ConverterTest, ConverterVector3dEmitterTest)
 	EXPECT_EQ(expectedv3d, vector3);
 }
 
-TEST_F(ConverterTest, ConverterVector4dInvalidTest)
+TEST_F(ConvertTest, ConvertVector4dInvalidTest)
 {
 	YAML::Node outnode;
 	SurgSim::Math::Vector4d vector4(1.000001, 2.000001, 3.000001, 4.000001);
@@ -114,7 +112,7 @@ TEST_F(ConverterTest, ConverterVector4dInvalidTest)
 }
 
 
-TEST_F(ConverterTest, ConverterVector4dNodeTest)
+TEST_F(ConvertTest, ConvertVector4dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -128,7 +126,7 @@ TEST_F(ConverterTest, ConverterVector4dNodeTest)
 	EXPECT_EQ(expectedv4d, vector4);
 }
 
-TEST_F(ConverterTest, ConverterVector4dEmitterTest)
+TEST_F(ConvertTest, ConvertVector4dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -140,7 +138,7 @@ TEST_F(ConverterTest, ConverterVector4dEmitterTest)
 	SurgSim::Math::Vector4d expectedv4d = innode.as<SurgSim::Math::Vector4d>();
 	EXPECT_EQ(expectedv4d, vector4);
 }
-TEST_F(ConverterTest, ConverterQuaterniondInvalidTest)
+TEST_F(ConvertTest, ConvertQuaterniondInvalidTest)
 {
 	YAML::Node outnode;
 
@@ -156,7 +154,7 @@ TEST_F(ConverterTest, ConverterQuaterniondInvalidTest)
 	EXPECT_TRUE(! isValid(expectedQuat));
 }
 
-TEST_F(ConverterTest, ConverterQuaterniondNodeTest)
+TEST_F(ConvertTest, ConvertQuaterniondNodeTest)
 {
 	YAML::Node outnode;
 
@@ -174,7 +172,7 @@ TEST_F(ConverterTest, ConverterQuaterniondNodeTest)
 	EXPECT_EQ(expectedQuat.w(), quat.w());
 }
 
-TEST_F(ConverterTest, ConverterQuaterniondEmitterTest)
+TEST_F(ConvertTest, ConvertQuaterniondEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -191,7 +189,7 @@ TEST_F(ConverterTest, ConverterQuaterniondEmitterTest)
 	EXPECT_EQ(expectedQuat.w(), quat.w());
 }
 
-TEST_F(ConverterTest, ConverterMatrix33dInvalidTest)
+TEST_F(ConvertTest, ConvertMatrix33dInvalidTest)
 {
 	YAML::Node outnode;
 
@@ -213,7 +211,7 @@ TEST_F(ConverterTest, ConverterMatrix33dInvalidTest)
 
 }
 
-TEST_F(ConverterTest, ConverterMatrix33dNodeTest)
+TEST_F(ConvertTest, ConvertMatrix33dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -232,7 +230,7 @@ TEST_F(ConverterTest, ConverterMatrix33dNodeTest)
 	EXPECT_EQ(expectedm33d, mat33d);
 }
 
-TEST_F(ConverterTest, ConverterMatrix33dEmitterTest)
+TEST_F(ConvertTest, ConvertMatrix33dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -250,7 +248,7 @@ TEST_F(ConverterTest, ConverterMatrix33dEmitterTest)
 	EXPECT_EQ(expectedm33d, mat33d);
 }
 
-TEST_F(ConverterTest, ConverterMatrix44dInvalidTest)
+TEST_F(ConvertTest, ConvertMatrix44dInvalidTest)
 {
 	YAML::Node outnode;
 
@@ -271,7 +269,7 @@ TEST_F(ConverterTest, ConverterMatrix44dInvalidTest)
 	EXPECT_TRUE(! isValid(expectedm44d));
 }
 
-TEST_F(ConverterTest, ConverterMatrix44dNodeTest)
+TEST_F(ConvertTest, ConvertMatrix44dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -291,7 +289,7 @@ TEST_F(ConverterTest, ConverterMatrix44dNodeTest)
 	EXPECT_EQ(expectedm44d, mat44d);
 }
 
-TEST_F(ConverterTest, ConverterMatrix44dEmitterTest)
+TEST_F(ConvertTest, ConvertMatrix44dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -310,7 +308,7 @@ TEST_F(ConverterTest, ConverterMatrix44dEmitterTest)
 	EXPECT_EQ(expectedm44d, mat44d);
 }
 
-TEST_F(ConverterTest, ConverterRigidTransform3dInvalidTest)
+TEST_F(ConvertTest, ConvertRigidTransform3dInvalidTest)
 {
 	YAML::Node outnode;
 	SurgSim::Math::Vector3d vec3(1.0, 2.0, 3.0);
@@ -327,7 +325,7 @@ TEST_F(ConverterTest, ConverterRigidTransform3dInvalidTest)
 	EXPECT_TRUE(! isValid(expectedRigid));
 }
 
-TEST_F(ConverterTest, ConverterRigidTransform3dNodeTest)
+TEST_F(ConvertTest, ConvertRigidTransform3dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -344,7 +342,7 @@ TEST_F(ConverterTest, ConverterRigidTransform3dNodeTest)
 	EXPECT_EQ(expectedRigid.matrix(), rigid.matrix());
 }
 
-TEST_F(ConverterTest, ConverterRigidTransform3dEmitterTest)
+TEST_F(ConvertTest, ConvertRigidTransform3dEmitterTest)
 {
 	YAML::Node node;
 	YAML::Emitter outnode(fout);
@@ -362,7 +360,7 @@ TEST_F(ConverterTest, ConverterRigidTransform3dEmitterTest)
 	EXPECT_EQ(expectedRigid.matrix(), rigid.matrix());
 }
 
-TEST_F(ConverterTest, ConvertSphereRepresentationTest)
+TEST_F(ConvertTest, ConvertSphereRepresentationTest)
 {
 	YAML::Node node;
 	YAML::Emitter outnode(fout);

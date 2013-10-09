@@ -13,35 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_OBJECTCONVERTER_INL_H
-#define SURGSIM_SERIALIZE_OBJECTCONVERTER_INL_H
+#ifndef SURGSIM_SERIALIZE_GRAPHICSCONVERT_INL_H
+#define SURGSIM_SERIALIZE_GRAPHICSCONVERT_INL_H
+
+#include <SurgSim/Serialize/FrameworkConvert.h>
+#include <SurgSim/Graphics/SphereRepresentation.h>
+#include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
 namespace YAML
 {
-	/// Specialize of YAML::convert<> template Component class.
-	template <>
-	struct convert <SurgSim::Framework::Component>
-	{
-		static Node encode(const SurgSim::Framework::Component& rhs)
-		{
-			Node node;
-			node["name"] = rhs.getName();
-			return node;
-		}
-
-		static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component> rhs)
-		{
-			if (! node.IsMap())
-			{
-				return false;
-			}
-			rhs->setName(node["name"].as<std::string>());
-			return true; 
-			
-		}
-
-	};
-
 	/// Specialize of YAML::convert<> template Presensation class.
 	template <>
 	struct convert <SurgSim::Graphics::Representation>
@@ -53,7 +33,7 @@ namespace YAML
 			node = convert<SurgSim::Framework::Component>::encode(rhs);
 			node["initialPose"] = rhs.getInitialPose();
 			node["pose"] = rhs.getPose();
-			
+
 			return node;
 		}
 
@@ -78,7 +58,7 @@ namespace YAML
 		static Node encode(const SurgSim::Graphics::SphereRepresentation& rhs)
 		{
 			Node node;
-			
+
 			node = convert<SurgSim::Graphics::Representation>::encode(rhs);
 			node["class"] = "SphereRepresentation";
 			node["radius"] = rhs.getRadius();
@@ -86,7 +66,7 @@ namespace YAML
 		}
 
 		static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::SphereRepresentation> rhs)
-		{		
+		{
 			if (! node.IsMap())
 			{
 				return false;
