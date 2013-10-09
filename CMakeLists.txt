@@ -44,9 +44,8 @@ include(SurgSimUtilities)
 
 ### Find required libraries
 
-#find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-#find_package(Qt4 COMPONENTS QtCore)
-#find_package(OpenThreads)
+find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 REQUIRED)
 
