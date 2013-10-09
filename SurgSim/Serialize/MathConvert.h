@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_YAML_MATHCONVERT_H
-#define SURGSIM_YAML_MATHCONVERT_H
+#ifndef SURGSIM_SERIALIZE_MATHCONVERT_H
+#define SURGSIM_SERIALIZE_MATHCONVERT_H
 
 #include <yaml-cpp/yaml.h>
 

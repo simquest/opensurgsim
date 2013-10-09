@@ -146,7 +146,7 @@ namespace YAML
 			}
 
 			/// A row-major decoding
-			SurgSim::Math::Vector3d vector3d = vector3d.setZero();
+			SurgSim::Math::Vector3d vector3d = SurgSim::Math::Vector3d::Zero();
 			for (auto row = 0; row < rhs.rows(); ++row)
 			{
 				convert<SurgSim::Math::Vector3d>::decode(node[row], vector3d);
@@ -178,7 +178,7 @@ namespace YAML
 			}
 
 			/// A row-major decoding
-			SurgSim::Math::Vector4d vector4d = vector4d.setZero();
+			SurgSim::Math::Vector4d vector4d = SurgSim::Math::Vector4d::Zero();
 			for (auto row = 0; row < rhs.rows(); ++row)
 			{
 				convert<SurgSim::Math::Vector4d>::decode(node[row], vector4d);
