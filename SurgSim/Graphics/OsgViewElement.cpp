@@ -55,6 +55,11 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 		if (val)
 		{
 			view->getOsgView()->setCameraManipulator(m_manipulator);
+
+			// Set a default position
+			m_manipulator->setTransformation(osg::Vec3d(2.0f,2.0f,0.0f),
+											 osg::Vec3d(0.0f,0.0f,0.0f),
+											 osg::Vec3d(0.0f,1.0f,0.0f));
 		}
 		else
 		{
