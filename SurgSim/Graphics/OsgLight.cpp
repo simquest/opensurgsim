@@ -40,7 +40,7 @@ namespace Graphics
 {
 
 /// \note HS-2013-sep-09 Right now we are implementing all the shader uniforms as floats, this
-/// 	  means that they all have to be downconverted from double, i don't know what the hit 
+/// 	  means that they all have to be downconverted from double, i don't know what the hit
 /// 	  of going to double in the shaders would be
 OsgLight::OsgLight(const std::string& name) :
 	Representation(name),
@@ -86,14 +86,14 @@ bool OsgLight::setGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 
 	if (group != nullptr && newGroup == nullptr)
 	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) 
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics"))
 			<< "OsgLight::setGroup() called with a group that is not an OsgGroup.";
 	}
 
 	bool clearGroup = m_group != nullptr && (newGroup != nullptr || group == nullptr);
 	bool setGroup = (newGroup != nullptr);
 	bool success  = (group != nullptr && newGroup != nullptr) || group == nullptr;
-	
+
 	if (clearGroup)
 	{
 		osg::ref_ptr<osg::StateSet> stateSet = m_group->getOsgGroup()->getOrCreateStateSet();

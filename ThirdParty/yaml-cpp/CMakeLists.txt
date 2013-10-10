@@ -150,6 +150,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 		COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
 		COMMENT "Adjusting settings for release compilation"
 		VERBATIM)
+
+	# Disable warnings caused by deprecated auto_ptr
+	set(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations ${CMAKE_CXX_FLAGS}")
 endif()
 
 # Microsoft VisualC++ specialities

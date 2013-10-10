@@ -25,15 +25,15 @@ include_directories(
 set(SURGSIM_BLOCKS_SOURCES
 	BasicSceneElement.cpp
 	SphereElement.cpp
-	TransferPoseBehavior.cpp
 	TransferInputPoseBehavior.cpp
+	TransferPoseBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
-	TransferPoseBehavior.h
-	TransferInputPoseBehavior.h
 	SphereElement.h
+	TransferInputPoseBehavior.h
+	TransferPoseBehavior.h
 )
 
 surgsim_add_library(

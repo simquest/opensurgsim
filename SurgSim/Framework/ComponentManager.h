@@ -147,15 +147,16 @@ private:
 	/// including waiting for the other threads to conclude their component initialization and wakeup
 	virtual bool executeInitialization() override;
 
-	// Delegates to doRemoveComponent to remove all the components in the indicated array.
+	/// Delegates to doRemoveComponent to remove all the components in the indicated array.
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
 	void removeComponents(const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 						  const std::vector<std::shared_ptr<Component>>::const_iterator& endIt);
 
-	// Delegates to doAddComponent and calls initialize on all the components
+	/// Delegates to doAddComponent and calls initialize on all the components
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
+	/// \param[out] actualAdditions	List of components actually added
 	void addAndIntializeComponents(
 		const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 		const std::vector<std::shared_ptr<Component>>::const_iterator& endIt,

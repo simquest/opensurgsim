@@ -48,7 +48,7 @@ void doBoxPlaneTest(std::shared_ptr<BoxShape> box,
     std::list<std::shared_ptr<Contact>> expectedContacts;
     if (expectedNumberOfContacts > 0)
     {
-        generateBoxPlaneContact(expectedContacts, expectedNumberOfContacts, expectedBoxIndicesInContacts,
+        generateBoxPlaneContact(&expectedContacts, expectedNumberOfContacts, expectedBoxIndicesInContacts,
 								box, boxTrans, boxQuat, plane, planeTrans, planeQuat);
     }
 

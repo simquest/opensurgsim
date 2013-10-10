@@ -89,7 +89,7 @@ public:
 	/// \return	Projection matrix
 	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const = 0;
 
-	/// Sets RenderTarget for the current camera, enables the camera to render to offscreen textures..
+	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The render target.
 	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) = 0;
 

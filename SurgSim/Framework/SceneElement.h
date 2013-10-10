@@ -139,9 +139,9 @@ private:
 
 };
 
-#include <SurgSim/Framework/SceneElement-inl.h>
-
 }; // namespace Framework
 }; // namespace SurgSim
+
+#include <SurgSim/Framework/SceneElement-inl.h>
 
 #endif // SURGSIM_FRAMEWORK_SCENEELEMENT_H

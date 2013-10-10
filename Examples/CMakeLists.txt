@@ -15,3 +15,4 @@
 
 add_subdirectory(BouncingBalls)
 add_subdirectory(InputVtc)
+add_subdirectory(AddSphereFromInput)

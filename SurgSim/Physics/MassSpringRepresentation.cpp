@@ -242,7 +242,7 @@ void MassSpringRepresentation::afterUpdate(double dt)
 	}
 
 	// Back fill the new mass spring position into the mesh
-	for (unsigned int vertexId = 0 ;vertexId < m_finalState.getNumVertices(); vertexId++)
+	for (unsigned int vertexId = 0 ; vertexId < m_finalState.getNumVertices(); vertexId++)
 	{
 		m_finalState.getVertex(vertexId).position = m_x.segment(3 * vertexId, 3);
 		m_finalState.getVertex(vertexId).data.setVelocity(m_v.segment(3 * vertexId, 3));
@@ -281,7 +281,7 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 			m_f.segment(3 * nodeId, 3) = getGravity() * getMassParameter(nodeId).getMass();
 		}
 	}
-	
+
 	// 2) Add Rayleigh damping
 	addRayleighDampingForce(&m_f, m_v);
 
@@ -323,7 +323,7 @@ void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEu
 }
 
 void MassSpringRepresentation::allocate(int numDof)
-{	
+{
 	// Allocate internal Eigen data structure
 	m_x.resize(numDof);
 	m_xPrevious.resize(numDof);
@@ -366,7 +366,7 @@ void MassSpringRepresentation::addSpringForces(Vector *f, const Vector& x, const
 	{
 		unsigned int rowNodeId0 = 3 * m_finalState.getEdge(springId).verticesId[0];
 		unsigned int rowNodeId1 = 3 * m_finalState.getEdge(springId).verticesId[1];
-		
+
 		const Vector3d localF = m_finalState.getEdge(springId).data.getF(
 			x.segment(rowNodeId0, 3), x.segment(rowNodeId1, 3),
 			v.segment(rowNodeId0, 3), v.segment(rowNodeId1, 3));

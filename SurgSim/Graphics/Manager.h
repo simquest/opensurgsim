@@ -82,10 +82,10 @@ protected:
 	/// \return	True if the representation was not in this manager and has been successfully added, false if it fails.
 	virtual bool addRepresentation(std::shared_ptr<Representation> representation);
 
-	/// Adds a group to the manager, this will also add all representations whose groupreferences include this 
+	/// Adds a group to the manager, this will also add all representations whose groupreferences include this
 	/// group to the group.
 	/// \param	group	The group to be added.
-	/// \return	True if the group was not in this manager and has been successfully added, it will return fallse 
+	/// \return	True if the group was not in this manager and has been successfully added, it will return false
 	///				when a group with the same name already exists in the manager.
 	virtual bool addGroup(std::shared_ptr<Group> group);
 

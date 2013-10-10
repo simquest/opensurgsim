@@ -163,3 +163,27 @@ TEST(SceneElementTest, InitComponentTest)
 
 	EXPECT_TRUE(element->didWakeUp);
 }
+
+TEST(SceneElementTest, DoubleInitTest)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+
+	EXPECT_FALSE(element->didInit);
+
+	element->initialize();
+	EXPECT_TRUE(element->didInit);
+
+	ASSERT_ANY_THROW(element->initialize());
+}
+
+TEST(SceneElementTest, DoubleWakeupTest)
+{
+	std::shared_ptr<MockSceneElement> element(new MockSceneElement());
+	element->initialize();
+	EXPECT_TRUE(element->didInit);
+	EXPECT_FALSE(element->didWakeUp);
+
+	element->wakeUp();
+	EXPECT_TRUE(element->didWakeUp);
+	ASSERT_ANY_THROW(element->wakeUp());
+}
