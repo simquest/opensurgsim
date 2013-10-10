@@ -30,8 +30,12 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentation::RigidRepresentation(const std::string& name)
-	: RigidRepresentationBase(name)
+RigidRepresentation::RigidRepresentation(const std::string& name) :
+	RigidRepresentationBase(name),
+	m_externalForce(SurgSim::Math::Vector3d::Zero()),
+	m_externalTorque(SurgSim::Math::Vector3d::Zero()),
+	m_externalStiffnessMatrix(Matrix66d::Zero()),
+	m_externalDampingMatrix(Matrix66d::Zero())
 {
 	// Initialize the number of degrees of freedom
 	// 6 for a rigid body velocity-based (linear and angular velocities are the Dof)
@@ -47,7 +51,7 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
+void RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
 {
 	m_initialParameters = parameters;
 	m_currentParameters = parameters;
@@ -56,14 +60,30 @@ void SurgSim::Physics::RigidRepresentation::setInitialParameters(const RigidRepr
 }
 
 
-void SurgSim::Physics::RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
+void RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
 {
 	m_currentParameters = parameters;
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-void SurgSim::Physics::RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
+void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
+}
+
+void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
+										   const SurgSim::Math::Matrix33d& D)
+{
+	m_externalForce = force;
+	m_externalStiffnessMatrix.block<3,3>(0,0) = K;
+	m_externalDampingMatrix.block<3,3>(0,0) = D;
+}
+
+void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& K,
+											const SurgSim::Math::Matrix33d& D)
+{
+	m_externalTorque = torque;
+	m_externalStiffnessMatrix.block<3,3>(3,3) = K;
+	m_externalDampingMatrix.block<3,3>(3,3) = D;
 }
 
 void RigidRepresentation::beforeUpdate(double dt)
@@ -111,6 +131,8 @@ void RigidRepresentation::update(double dt)
 	// Compute external forces/torques
 	m_force.setZero();
 	m_torque.setZero();
+	m_force += m_externalForce;
+	m_torque += m_externalTorque;
 	if (isGravityEnabled())
 	{
 		m_force += getGravity() * p.getMass();
@@ -179,6 +201,10 @@ void RigidRepresentation::afterUpdate(double dt)
 	}
 
 	m_finalState = m_currentState;
+	m_externalForce = SurgSim::Math::Vector3d::Zero();
+	m_externalTorque = SurgSim::Math::Vector3d::Zero();
+	m_externalStiffnessMatrix = Matrix66d::Zero();
+	m_externalDampingMatrix = Matrix66d::Zero();
 }
 
 void RigidRepresentation::applyDofCorrection(
@@ -264,19 +290,19 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 		return;
 	}
 
+	Matrix66d systemMatrix;
+	RigidRepresentationParameters& parameters = m_currentParameters;
+	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
+	systemMatrix.block<3,3>(0,0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
+	systemMatrix.block<3,3>(3,3) = m_globalInertia / dt + parameters.getAngularDamping() * identity3x3;
+	systemMatrix += m_externalDampingMatrix + m_externalStiffnessMatrix * dt;
+
 	m_C.setZero();
 
-	// Compliance matrix for interactions:
-	// C = ( Mlinear^-1       0     )
-	//     (   0        Mangular^-1 )
-	// with Mlinear^-1  = Id33.(1/m)/(1/dt + alphaLinear)]
-	// with Mangular^-1 = I^-1      /(1/dt + alphaAngular)
-	RigidRepresentationParameters& p = m_currentParameters;
-	double coefLin = (1.0/p.getMass()) / (1.0/dt + p.getLinearDamping());
-	double coefAng =        1.0        / (1.0/dt + p.getAngularDamping());
-
-	m_C(0,0) = m_C(1,1) = m_C(2,2) = coefLin;
-	m_C.block<3,3>(3,3) = m_invGlobalInertia * coefAng;
+	//Invert systemMatrix
+	//We can use this shortcut because we know the linear and angular terms are independant
+	m_C.block<3,3>(0,0) = systemMatrix.block<3,3>(0,0).inverse();
+	m_C.block<3,3>(3,3) = systemMatrix.block<3,3>(3,3).inverse();
 }
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
