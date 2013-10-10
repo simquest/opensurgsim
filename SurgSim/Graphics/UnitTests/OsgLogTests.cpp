@@ -19,13 +19,6 @@
 #include <SurgSim/Graphics/OsgLog.h>
 #include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
 
-TEST(OsgLogTests, ConstructorTest)
-{
-	EXPECT_EQ(osg::NOTICE, osg::getNotifyLevel());
-	auto mockOsgLog = new MockOsgLog;
-	EXPECT_EQ(osg::DEBUG_FP, osg::getNotifyLevel());
-}
-
 TEST(OsgLogTests, MessageTest)
 {
 	osg::NotifyHandler* pOsgLog = new MockOsgLog;
