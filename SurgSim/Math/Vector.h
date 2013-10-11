@@ -51,6 +51,9 @@ typedef Eigen::Matrix<double, 3, 1, Eigen::DontAlign>  Vector3d;
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign>  Vector4d;
 
+/// A dynamic size column vector
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+
 };  // namespace Math
 };  // namespace SurgSim
 

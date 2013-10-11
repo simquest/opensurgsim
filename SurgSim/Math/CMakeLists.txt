@@ -20,10 +20,12 @@ include_directories(
 
 set(SURGSIM_MATH_SOURCES
 	MlcpGaussSeidelSolver.cpp
+	OdeSolver.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h
+	LinearSolveAndInverse.h
 	Matrix.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
@@ -31,6 +33,11 @@ set(SURGSIM_MATH_HEADERS
 	MlcpProblem.h
 	MlcpSolution.h
 	MlcpSolver.h
+	OdeEquation.h
+	OdeSolver.h
+	OdeSolverEulerExplicit.h
+	OdeSolverEulerExplicitModified.h
+	OdeSolverEulerImplicit.h
 	Quaternion.h
 	RigidTransform.h
 	Valid.h

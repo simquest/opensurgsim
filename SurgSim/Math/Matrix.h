@@ -52,7 +52,11 @@ typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign | Eigen::RowMajor>  Matrix3
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 4, Eigen::DontAlign | Eigen::RowMajor>  Matrix44d;
 
+/// A dynamic size diagonal matrix
+typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> DiagonalMatrix;
 
+/// A dynamic size matrix
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
 
 /// Create a rotation matrix corresponding to the specified angle (in radians) and axis.
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
