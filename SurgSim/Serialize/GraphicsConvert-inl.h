@@ -16,10 +16,6 @@
 #ifndef SURGSIM_SERIALIZE_GRAPHICSCONVERT_INL_H
 #define SURGSIM_SERIALIZE_GRAPHICSCONVERT_INL_H
 
-#include <SurgSim/Serialize/FrameworkConvert.h>
-#include <SurgSim/Graphics/SphereRepresentation.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
-
 namespace YAML
 {
 	/// Specialize of YAML::convert<> template Presensation class.

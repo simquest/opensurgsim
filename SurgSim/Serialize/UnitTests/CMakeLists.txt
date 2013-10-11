@@ -20,7 +20,8 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	ConvertTest.cpp
+	MathConvertTest.cpp
+	GraphicsConvertTest.cpp
 )
 
 set(UNIT_TEST_HEADERS

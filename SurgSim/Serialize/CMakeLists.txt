@@ -24,12 +24,10 @@ set(SURGSIM_SERIALIZE_SOURCES
 )
 
 set(SURGSIM_SERIALIZE_HEADERS
-	MathConvert.h
+	Convert.h
 	MathConvert-inl.h
-	FrameworkConvert.h
-	FrameworkConvert-inl.h
-	GraphicsConvert.h
 	GraphicsConvert-inl.h
+	FrameworkConvert-inl.h
 )
 
 surgsim_add_library(

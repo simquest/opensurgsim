@@ -216,7 +216,7 @@ namespace YAML
 
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs)
+	static Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs)
 	{
 		out << Flow;
 		out << BeginSeq << rhs[0] << rhs[1] << rhs[2] << EndSeq;
@@ -224,7 +224,7 @@ namespace YAML
 	}
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::Vector4d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector4d& rhs)
+	static Emitter& operator << (Emitter& out, const SurgSim::Math::Vector4d& rhs)
 	{
 		out << Flow;
 		out << BeginSeq << rhs[0] << rhs[1] << rhs[2] << rhs[3] << EndSeq;
@@ -232,13 +232,13 @@ namespace YAML
 	}
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::Quaterniond type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Quaterniond& rhs)
+	static Emitter& operator << (Emitter& out, const SurgSim::Math::Quaterniond& rhs)
 	{
 		return (out << rhs.coeffs());
 	}
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::Matrix33d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix33d& rhs)
+	static Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix33d& rhs)
 	{
 		out << Flow;
 		out << BeginSeq;
@@ -251,7 +251,7 @@ namespace YAML
 	}
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix44d& rhs)
+	static Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix44d& rhs)
 	{
 		out << Flow;
 		out << BeginSeq;
@@ -264,7 +264,7 @@ namespace YAML
 	}
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs)
+	static Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs)
 	{
 		SurgSim::Math::Matrix44d transform = rhs.matrix();
 		return (out << transform);

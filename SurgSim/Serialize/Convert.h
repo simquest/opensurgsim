@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_MATHCONVERT_H
-#define SURGSIM_SERIALIZE_MATHCONVERT_H
+#ifndef SURGSIM_SERIALIZE_CONVERT_H
+#define SURGSIM_SERIALIZE_CONVERT_H
 
 #include <yaml-cpp/yaml.h>
 
@@ -22,11 +22,14 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-
+#include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Graphics/SphereRepresentation.h>
 #include <SurgSim/Framework/Log.h>
+
 
 namespace YAML
 {
+	
 	/// declaration of specialization convert<SurgSim::Math::Vector3d>
 	template <>
 	struct convert <SurgSim::Math::Vector3d>;
@@ -51,6 +54,18 @@ namespace YAML
 	template <>
 	struct convert <SurgSim::Math::RigidTransform3d>;
 
+	/// Specialize of YAML::convert<> template Component class.
+	template <>
+	struct convert <SurgSim::Framework::Component>;
+	
+	/// Specialize of YAML::convert<> template Presensation class.
+	template <>
+	struct convert <SurgSim::Graphics::Representation>;
+
+	/// Specialize of YAML::convert<> template SpherePresensation class.
+	template <>
+	struct convert <SurgSim::Graphics::SphereRepresentation>;
+	
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
 
@@ -68,9 +83,12 @@ namespace YAML
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
-
+	
+	
 };
 
 #include <SurgSim/Serialize/MathConvert-inl.h>
+#include <SurgSim/Serialize/FrameworkConvert-inl.h>
+#include <SurgSim/Serialize/GraphicsConvert-inl.h>
 
 #endif // SURGSIM_SERIALIZE_MATHCONVERT_H

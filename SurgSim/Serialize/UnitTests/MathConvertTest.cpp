@@ -16,16 +16,14 @@
 
 #include <fstream>
 #include <gtest/gtest.h>
-#include <SurgSim/Serialize/MathConvert.h>
-#include <SurgSim/Serialize/GraphicsConvert.h>
+#include <yaml-cpp/yaml.h>
+#include <SurgSim/Serialize/Convert.h>
 #include <SurgSim/Math/Valid.h>
 #include <limits>
-#include <SurgSim/Graphics/SphereRepresentation.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
 using SurgSim::Math::isValid;
 
-class ConvertTest : public ::testing::Test
+class MathConvertTest : public ::testing::Test
 {
 protected:
 
@@ -49,7 +47,7 @@ protected:
 	std::string datafile;
 };
 
-TEST_F(ConvertTest, ConvertVector3dInvalidTest)
+TEST_F(MathConvertTest, ConvertVector3dInvalidTest)
 {
 	YAML::Node outnode;
 	SurgSim::Math::Vector3d vector3(1.000001, 2.000001, 3.000001);
@@ -66,7 +64,7 @@ TEST_F(ConvertTest, ConvertVector3dInvalidTest)
 	EXPECT_TRUE(! isValid(actualv3d));
 }
 
-TEST_F(ConvertTest, ConvertVector3dNodeTest)
+TEST_F(MathConvertTest, ConvertVector3dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -81,7 +79,7 @@ TEST_F(ConvertTest, ConvertVector3dNodeTest)
 }
 
 
-TEST_F(ConvertTest, ConvertVector3dEmitterTest)
+TEST_F(MathConvertTest, ConvertVector3dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -94,7 +92,7 @@ TEST_F(ConvertTest, ConvertVector3dEmitterTest)
 	EXPECT_EQ(actualv3d, vector3);
 }
 
-TEST_F(ConvertTest, ConvertVector4dInvalidTest)
+TEST_F(MathConvertTest, ConvertVector4dInvalidTest)
 {
 	YAML::Node outnode;
 	SurgSim::Math::Vector4d vector4(1.000001, 2.000001, 3.000001, 4.000001);
@@ -112,7 +110,7 @@ TEST_F(ConvertTest, ConvertVector4dInvalidTest)
 }
 
 
-TEST_F(ConvertTest, ConvertVector4dNodeTest)
+TEST_F(MathConvertTest, ConvertVector4dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -126,7 +124,7 @@ TEST_F(ConvertTest, ConvertVector4dNodeTest)
 	EXPECT_EQ(actualv4d, vector4);
 }
 
-TEST_F(ConvertTest, ConvertVector4dEmitterTest)
+TEST_F(MathConvertTest, ConvertVector4dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -138,7 +136,7 @@ TEST_F(ConvertTest, ConvertVector4dEmitterTest)
 	SurgSim::Math::Vector4d actualv4d = innode.as<SurgSim::Math::Vector4d>();
 	EXPECT_EQ(actualv4d, vector4);
 }
-TEST_F(ConvertTest, ConvertQuaterniondInvalidTest)
+TEST_F(MathConvertTest, ConvertQuaterniondInvalidTest)
 {
 	YAML::Node outnode;
 
@@ -154,7 +152,7 @@ TEST_F(ConvertTest, ConvertQuaterniondInvalidTest)
 	EXPECT_TRUE(! isValid(actualQuat));
 }
 
-TEST_F(ConvertTest, ConvertQuaterniondNodeTest)
+TEST_F(MathConvertTest, ConvertQuaterniondNodeTest)
 {
 	YAML::Node outnode;
 
@@ -172,7 +170,7 @@ TEST_F(ConvertTest, ConvertQuaterniondNodeTest)
 	EXPECT_EQ(actualQuat.w(), quat.w());
 }
 
-TEST_F(ConvertTest, ConvertQuaterniondEmitterTest)
+TEST_F(MathConvertTest, ConvertQuaterniondEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -189,7 +187,7 @@ TEST_F(ConvertTest, ConvertQuaterniondEmitterTest)
 	EXPECT_EQ(actualQuat.w(), quat.w());
 }
 
-TEST_F(ConvertTest, ConvertMatrix33dInvalidTest)
+TEST_F(MathConvertTest, ConvertMatrix33dInvalidTest)
 {
 	YAML::Node outnode;
 
@@ -211,7 +209,7 @@ TEST_F(ConvertTest, ConvertMatrix33dInvalidTest)
 
 }
 
-TEST_F(ConvertTest, ConvertMatrix33dNodeTest)
+TEST_F(MathConvertTest, ConvertMatrix33dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -230,7 +228,7 @@ TEST_F(ConvertTest, ConvertMatrix33dNodeTest)
 	EXPECT_EQ(actualm33d, mat33d);
 }
 
-TEST_F(ConvertTest, ConvertMatrix33dEmitterTest)
+TEST_F(MathConvertTest, ConvertMatrix33dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -248,7 +246,7 @@ TEST_F(ConvertTest, ConvertMatrix33dEmitterTest)
 	EXPECT_EQ(actualm33d, mat33d);
 }
 
-TEST_F(ConvertTest, ConvertMatrix44dInvalidTest)
+TEST_F(MathConvertTest, ConvertMatrix44dInvalidTest)
 {
 	YAML::Node outnode;
 
@@ -269,7 +267,7 @@ TEST_F(ConvertTest, ConvertMatrix44dInvalidTest)
 	EXPECT_TRUE(! isValid(actualm44d));
 }
 
-TEST_F(ConvertTest, ConvertMatrix44dNodeTest)
+TEST_F(MathConvertTest, ConvertMatrix44dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -289,7 +287,7 @@ TEST_F(ConvertTest, ConvertMatrix44dNodeTest)
 	EXPECT_EQ(actualm44d, mat44d);
 }
 
-TEST_F(ConvertTest, ConvertMatrix44dEmitterTest)
+TEST_F(MathConvertTest, ConvertMatrix44dEmitterTest)
 {
 	YAML::Emitter outnode(fout);
 
@@ -308,7 +306,7 @@ TEST_F(ConvertTest, ConvertMatrix44dEmitterTest)
 	EXPECT_EQ(actualm44d, mat44d);
 }
 
-TEST_F(ConvertTest, ConvertRigidTransform3dInvalidTest)
+TEST_F(MathConvertTest, ConvertRigidTransform3dInvalidTest)
 {
 	YAML::Node outnode;
 	SurgSim::Math::Vector3d vec3(1.0, 2.0, 3.0);
@@ -325,7 +323,7 @@ TEST_F(ConvertTest, ConvertRigidTransform3dInvalidTest)
 	EXPECT_TRUE(! isValid(actualRigid));
 }
 
-TEST_F(ConvertTest, ConvertRigidTransform3dNodeTest)
+TEST_F(MathConvertTest, ConvertRigidTransform3dNodeTest)
 {
 	YAML::Node outnode;
 
@@ -342,7 +340,7 @@ TEST_F(ConvertTest, ConvertRigidTransform3dNodeTest)
 	EXPECT_EQ(actualRigid.matrix(), rigid.matrix());
 }
 
-TEST_F(ConvertTest, ConvertRigidTransform3dEmitterTest)
+TEST_F(MathConvertTest, ConvertRigidTransform3dEmitterTest)
 {
 	YAML::Node node;
 	YAML::Emitter outnode(fout);
@@ -358,36 +356,4 @@ TEST_F(ConvertTest, ConvertRigidTransform3dEmitterTest)
 	SurgSim::Math::RigidTransform3d actualRigid = innode.as<SurgSim::Math::RigidTransform3d>();
 
 	EXPECT_EQ(actualRigid.matrix(), rigid.matrix());
-}
-
-TEST_F(ConvertTest, ConvertSphereRepresentationTest)
-{
-	YAML::Node node;
-	YAML::Emitter outnode(fout);
-
-	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> sphereRepresentation = 
-		std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("Sphere_Obj");
-
-	double sphereRadius = 5.0;
-	sphereRepresentation->setRadius(sphereRadius);
-
-	SurgSim::Math::RigidTransform3d spherePose = SurgSim::Math::makeRigidTransform(
-		SurgSim::Math::Quaterniond(SurgSim::Math::Vector4d::Identity()).normalized(),
-		SurgSim::Math::Vector3d::Identity());
-	sphereRepresentation->setPose(spherePose);
-
-	/// Encoding sphere representation 
-	node = YAML::convert<SurgSim::Graphics::SphereRepresentation>::encode(*sphereRepresentation);
-	outnode << node;
-	fout.close();
-	
-	/// Decoding sphere representation
-	YAML::Node innode = YAML::LoadFile(datafile);
-	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> actualSphere =  
-		std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
-	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, actualSphere);
-	
-	EXPECT_EQ(actualSphere->getRadius(), sphereRepresentation->getRadius());
-	EXPECT_TRUE(actualSphere->getInitialPose().matrix().isApprox(sphereRepresentation->getInitialPose().matrix()));
-	EXPECT_TRUE(actualSphere->getPose().matrix().isApprox(sphereRepresentation->getPose().matrix()));
 }
