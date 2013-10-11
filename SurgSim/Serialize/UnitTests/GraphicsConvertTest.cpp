@@ -19,8 +19,6 @@
 #include <SurgSim/Graphics/SphereRepresentation.h>
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
-using SurgSim::Graphics::SphereRepresentation;
-
 class GraphicsConvertTest : public ::testing::Test
 {
 protected:

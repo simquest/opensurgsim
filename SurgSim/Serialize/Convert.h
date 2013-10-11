@@ -26,10 +26,17 @@
 #include <SurgSim/Graphics/SphereRepresentation.h>
 #include <SurgSim/Framework/Log.h>
 
+namespace SurgSim
+{
+namespace Serialize
+{
+	/// Logger name for Serialization
+	const std::string serializeLogger = "Serialization";
+}
+}
 
 namespace YAML
-{
-	
+{	
 	/// declaration of specialization convert<SurgSim::Math::Vector3d>
 	template <>
 	struct convert <SurgSim::Math::Vector3d>;

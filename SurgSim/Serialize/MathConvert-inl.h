@@ -18,9 +18,6 @@
 
 namespace YAML
 {
-	/// Logger name for Serialization
-	const std::string loggerName = "Serialization";
-
 	/// Specialize of YAML::convert<> template vector3d class.
 	template <>
 	struct convert <SurgSim::Math::Vector3d>
@@ -52,7 +49,7 @@ namespace YAML
 				{
 					rhs[i] = std::numeric_limits<SurgSim::Math::Vector3d::Scalar>::quiet_NaN();
 
-					auto logger = SurgSim::Framework::Logger::getLogger(loggerName);
+					auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::Serialize::serializeLogger);
 					SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
 				}
 			}
@@ -92,7 +89,7 @@ namespace YAML
 				{
 					rhs[i] = std::numeric_limits<SurgSim::Math::Vector4d::Scalar>::quiet_NaN();
 
-					auto logger = SurgSim::Framework::Logger::getLogger(loggerName);
+					auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::Serialize::serializeLogger);
 					SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
 				}
 			}
