@@ -307,7 +307,7 @@ const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
 
 void VtcRigidRepresentation::applyDofCorrection(
 	double dt,
-	const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& dofCorrection)
+	const Eigen::VectorBlock<Vector>& dofCorrection)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;

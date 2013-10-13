@@ -26,11 +26,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	ConstraintImplementationFactory.cpp
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
-	DeformableRepresentation.cpp
 	DeformableRepresentationState.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
+	LinearSpring.cpp
 	Localization.cpp
 	MassSpringRepresentation.cpp
 	PhysicsManager.cpp
@@ -62,6 +62,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	CylinderShape.h
 	DcdCollision.h
 	DeformableRepresentation.h
+	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
 	DoubleSidedPlaneShape.h
 	FemRepresentationParameters.h
@@ -69,9 +70,10 @@ set(SURGSIM_PHYSICS_HEADERS
 	FixedRepresentationContact.h
 	FixedRepresentationLocalization.h
 	FreeMotion.h
+	LinearSpring.h
 	Localization.h
+	Mass.h
 	MassSpringRepresentation.h
-	MassSpringRepresentationState.h
 	MeshShape.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
@@ -95,6 +97,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Shapes.h
 	SolveMlcp.h
 	SphereShape.h
+	Spring.h
 	VtcRigidParameters.h
 	VtcRigidRepresentation.h
 	VtcRigidRepresentationContact.h

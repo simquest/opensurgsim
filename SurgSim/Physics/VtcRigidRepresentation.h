@@ -126,7 +126,7 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block) override;
 
 protected:
 	/// Inertia matrices in global coordinates
