@@ -119,10 +119,10 @@ protected:
 
 	/// Mass matrix (templatized type for performance reason)
 	MType m_M;
-	
+
 	/// Damping matrix (templatized type for performance reason)
 	DType m_D;
-	
+
 	/// Stiffness matrix (templatized type for performance reason)
 	KType m_K;
 

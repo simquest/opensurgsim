@@ -28,7 +28,7 @@ class Mass
 public:
 	/// Constructor
 	/// \param mass The mass (in Kg) default value is 0
-	Mass(double mass = 0.0) : m_mass(mass)
+	explicit Mass(double mass = 0.0) : m_mass(mass)
 	{
 	}
 

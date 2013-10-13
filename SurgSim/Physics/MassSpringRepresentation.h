@@ -88,7 +88,7 @@ public:
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
 	const std::shared_ptr<Mass> getMass(unsigned int nodeId) const;
-	
+
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
@@ -101,15 +101,15 @@ public:
 	/// Gets the Rayleigh stiffness parameter
 	/// \return The Rayleigh stiffness parameter
 	double getRayleighDampingStiffness() const;
-	
+
 	/// Gets the Rayleigh mass parameter
 	/// \return The Rayleigh mass parameter
 	double getRayleighDampingMass() const;
-	
+
 	/// Sets the Rayleigh stiffness parameter
 	/// \param stiffnessCoef The Rayleigh stiffness parameter
 	void setRayleighDampingStiffness(double stiffnessCoef);
-	
+
 	/// Sets the Rayleigh mass parameter
 	/// \param massCoef The Rayleigh mass parameter
 	void setRayleighDampingMass(double massCoef);
@@ -117,7 +117,7 @@ public:
 	/// Sets the numerical integration scheme
 	/// \param integrationScheme The integration scheme to use
 	void setIntegrationScheme(IntegrationScheme integrationScheme);
-	
+
 	/// Gets the numerical integration scheme
 	/// \return The integration scheme currently in use
 	IntegrationScheme getIntegrationScheme() const;
@@ -177,7 +177,7 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const DeformableRepresentationState& state,
-		Vector** f, DiagonalMatrix** Mass, Matrix** Damping, Matrix** Stiffness) override;
+		Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K) override;
 
 protected:
 	/// Add the Rayleigh damping forces
@@ -211,7 +211,7 @@ protected:
 private:
 	/// Masses
 	std::vector<std::shared_ptr<Mass>> m_masses;
-	
+
 	/// Springs
 	std::vector<std::shared_ptr<Spring>> m_springs;
 

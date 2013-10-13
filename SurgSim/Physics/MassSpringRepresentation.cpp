@@ -274,7 +274,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 
 	m_D.setZero();
 
-	// D += rayMass.M 
+	// D += rayMass.M
 	if (rayMass)
 	{
 		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
@@ -285,7 +285,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 		}
 	}
 
-	// D += rayStiff.K 
+	// D += rayStiff.K
 	if (rayStiff)
 	{
 		for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
@@ -342,7 +342,7 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 }
 
 void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& state,
-	Vector** f, DiagonalMatrix** Mass, Matrix** Damping, Matrix** Stiffness)
+	Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K)
 {
 	// Make sure the force vector has been properly allocated
 	if (! m_f.size() && state.getNumDof())
@@ -374,7 +374,7 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 
 	// Computes the mass matrix m_M
 	computeM(state);
-	
+
 	// Computes the stiffness matrix m_K
 	// Add the springs damping matrix to m_D
 	// Add the springs force to m_f
@@ -425,9 +425,9 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	}
 
 	*f = &m_f;
-	*Mass = &m_M;
-	*Damping = &m_D;
-	*Stiffness = &m_K;
+	*M = &m_M;
+	*D = &m_D;
+	*K = &m_K;
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const DeformableRepresentationState& state,
@@ -508,7 +508,8 @@ void MassSpringRepresentation::addGravityForce(Vector *f, const DeformableRepres
 static void transformVectorByBlockOf3(const RigidTransform3d& transform, Vector* x, bool rotationOnly = false)
 {
 	unsigned int numNodes = x->size() / 3;
-	SURGSIM_ASSERT(numNodes * 3 == x->size()) << "Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
+	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<
+		"Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
 
 	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 	{

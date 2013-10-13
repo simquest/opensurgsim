@@ -33,7 +33,7 @@ LinearSpring::LinearSpring(unsigned int nodeId0, unsigned int nodeId1) :
 
 	m_K.resize(6, 6);
 	m_K.setZero();
-	
+
 	m_D.resize(6, 6);
 	m_D.setZero();
 }
