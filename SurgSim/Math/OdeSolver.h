@@ -16,14 +16,10 @@
 #ifndef SURGSIM_MATH_ODESOLVER_H
 #define SURGSIM_MATH_ODESOLVER_H
 
-#include <Eigen/core>
-#include <Eigen/Sparse>
-
-#include <SurgSim/Math/OdeEquation.h>
-#include <SurgSim/Math/LinearSolveAndInverse.h>
-
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
+
+#include <SurgSim/Math/OdeEquation.h>
 
 namespace SurgSim
 {
@@ -36,32 +32,34 @@ namespace Math
 /// \note y' = ( x' ) = ( dx/dt ) = (       v        )
 /// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
 /// \note To allow the use of explicit and implicit solver, we need to be able to evaluate
+/// \note M(x(t), v(t))
 /// \note f(t, x(t), v(t)) but also
-/// \note K = -df/dx(t, x(t), v(t))
-/// \note D = -df/dv(t, x(t), v(t))
-/// \note Models wanting the use of implicit solvers will need to compute these Jacobians matrices.
+/// \note K = -df/dx(x(t), v(t))
+/// \note D = -df/dv(x(t), v(t))
+/// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
 /// \note Also, the matrices types are all templatized to allow for optimization
 /// \tparam State Type of the state y=(x v)
-/// \tparam MType Type of the M matrix
-/// \tparam DType Type of the D matrix
-/// \tparam KType Type of the K matrix
-/// \tparam SType Type of the system matrix
-/// \note State type is expected to have the methods
-/// \note Vector& getPositions();
-/// \note Vector& getVelocities();
-template <class State, class MType, class DType, class KType, class SType>
+/// \tparam MT Type of the matrix M
+/// \tparam DT Type of the matrix D
+/// \tparam KT Type of the matrix K
+/// \tparam ST Type of the system matrix (linear combination of M, D, K)
+/// \note State is expected to hold on to the dof derivatives and have the API:
+/// \note   Vector& getPositions();
+/// \note   Vector& getVelocities();
+/// \note   Vector& getAccelerations();
+template <class State, class MT, class DT, class KT, class ST>
 class OdeSolver
 {
 public:
-	typedef Eigen::Matrix<double, Eigen::Dynamic,              1, Eigen::DontAlign> Vector;
-	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
-	typedef SurgSim::Math::OdeEquation<State, MType, DType, KType, SType> OdeEquation;
-
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	/// \param initialState The initial state
-	OdeSolver(const OdeEquation& equation, const State& initialState);
-	
+	/// \param initialState The initial state (can be useful for static resolution for example)
+	OdeSolver(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState);
+
+	/// Virtual destructor
+	virtual ~OdeSolver()
+	{}
+
 	/// Gets the solver's name
 	/// \return The solver name
 	virtual const std::string getName() const = 0;
@@ -71,97 +69,38 @@ public:
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
 	virtual void solve(double dt, const State& currentState, State* newState) = 0;
-	
-	/// Queries the current M matrix
-	/// \return The latest M matrix calculated
-	const MType& getM() const;
-
-	/// Queries the current D matrix
-	/// \return The latest D matrix calculated
-	const DType& getD() const;
-
-	/// Queries the current K matrix
-	/// \return The latest K matrix calculated
-	const KType& getK() const;
 
 	/// Queries the current system matrix
 	/// \return The latest system matrix calculated
-	const SType& getSystemMatrix() const;
+	const ST& getSystemMatrix() const;
 
 	/// Queries the current compliance matrix
 	/// \return The latest compliance matrix calculated
 	const Matrix& getCompliance() const;
 
-	/// Queries the current value of f
-	/// \return The latest vector f calculated
-	const Vector& getF() const;
-
-	/// Queries the current value of a
-	/// \return The latest vector a calculated
-	const Vector& getA() const;
-
 protected:
-
-	/// Allocates the data structure
+	/// Allocates the system and compliance matrices
 	/// \param size The size to account for in the data structure
 	void allocate(unsigned int size);
 
-	/// Computes vector m_f (to keep the API computeM/D/K/F consistent)
-	/// \param currentState The state to compute the vector with
-	void computeF(const State& currentState);
-
-	/// Computes matrix m_M, optimizing computation for constant/non-constant cases
-	/// \param currentState The state to compute the matrix with (if needed)
-	void computeM(const State& currentState);
-
-	/// Computes matrix m_D, optimizing computation for constant/non-constant cases
-	/// \param currentState The state to compute the matrix with (if needed)
-	void computeD(const State& currentState);
-
-	/// Computes matrix m_K, optimizing computation for constant/non-constant cases
-	/// \param currentState The state to compute the matrix with (if needed)
-	void computeK(const State& currentState);
-
 	/// The ode equation (API providing the necessary evaluation methods)
-	const OdeEquation& m_equation;
-	
+	OdeEquation<State, MT, DT, KT, ST>& m_equation;
+
 	/// The initial state (useful for static resolution)
 	const State& m_initialState;
 
-	/// Vector f, contains latest evaluation of f(x,v)
-	Vector m_f;
-	
-	/// Vector a, contains latest evaluation of M^{-1}.f(x,v)
-	Vector m_a;
-
-	/// Matrix M
-	MType m_M;
-
-	/// Matrix D = -df/dv
-	DType m_D;
-
-	/// Matrix K = -df/dx
-	KType m_K;
-	
 	/// System matrix (can be M, K, combination of MDK depending on the solver)
-	SType m_systemMatrix;
+	ST m_systemMatrix;
 
-	/// The compliance matrix is the inverse of the system matrix
+	/// Compliance matrix which is the inverse of the system matrix
 	/// Compliance is always a dense matrix (full matrix unless we have a diagonal matrix)
 	Matrix m_compliance;
-
-	/// If M is a constant matrix, this variable keeps track of its initialization
-	bool m_constantMinitialized;
-
-	/// If D is a constant matrix, this variable keeps track of its initialization
-	bool m_constantDinitialized;
-
-	/// If K is a constant matrix, this variable keeps track of its initialization
-	bool m_constantKinitialized;
 };
 
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#include <SurgSim/Math/OdeSolver-inl.h>
 
 #endif // SURGSIM_MATH_ODESOLVER_H

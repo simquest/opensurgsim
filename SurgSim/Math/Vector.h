@@ -19,6 +19,8 @@
 #ifndef SURGSIM_MATH_VECTOR_H
 #define SURGSIM_MATH_VECTOR_H
 
+#include <vector>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -53,6 +55,65 @@ typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign>  Vector4d;
 
 /// A dynamic size column vector
 typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+
+/// Helper method to add a sub-vector into a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param subVector The sub-vector
+/// \param blockId The block index in vector
+/// \param blockSize The block size
+/// \param[out] vector The vector to add the sub-vector into
+template <class Vector, class SubVector>
+void addSubVector(const SubVector& subVector,unsigned int blockId, unsigned int blockSize, Vector* vector)
+{
+	vector->segment(blockSize * blockId, blockSize) += subVector;
+}
+
+/// Helper method to add a sub-vector per block into a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param subVector The sub-vector (containing all the blocks)
+/// \param blockIds Vector of block indices (for accessing vector) corresponding to the blocks in sub-vector
+/// \param blockSize The block size
+/// \param[out] vector The vector to add the sub-vector blocks into
+template <class Vector, class SubVector>
+void addSubVector(const SubVector& subVector, const std::vector<unsigned int> blockIds,
+	unsigned int blockSize, Vector* vector)
+{
+	const unsigned int springNumNodes = blockIds.size();
+
+	for (unsigned int springNodeId = 0; springNodeId < springNumNodes; springNodeId++)
+	{
+		unsigned int nodeId = blockIds[springNodeId];
+
+		vector->segment(blockSize * nodeId, blockSize) += subVector.segment(blockSize * springNodeId, blockSize);
+	}
+}
+
+/// Helper method to set a sub-vector into a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param subVector The sub-vector
+/// \param blockId The block index in vector
+/// \param blockSize The size of the sub-vector
+/// \param[out] vector The vector to set the sub-vector into
+template <class Vector, class SubVector>
+void setSubVector(const SubVector& subVector,unsigned int blockId, unsigned int blockSize, Vector* vector)
+{
+	vector->segment(blockSize * blockId, blockSize) = subVector;
+}
+
+/// Helper method to access a sub-vector from a vector, for the sake of clarity
+/// \tparam Vector The vector type to get the sub-vector from
+/// \param vector The vector to get the sub-vector from
+/// \param blockId The block index
+/// \param blockSize The block size
+/// \return The requested sub-vector
+template <class Vector>
+Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, unsigned int blockSize)
+{
+	return vector.segment(blockSize * blockId, blockSize);
+}
 
 };  // namespace Math
 };  // namespace SurgSim

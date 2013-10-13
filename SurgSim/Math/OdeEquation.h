@@ -16,9 +16,6 @@
 #ifndef SURGSIM_MATH_ODEEQUATION_H
 #define SURGSIM_MATH_ODEEQUATION_H
 
-#include <Eigen/core>
-#include <Eigen/Sparse>
-
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 
@@ -30,60 +27,59 @@ namespace Math
 
 /// Ode equation of order 2 of the form M(x,v).a = F(x, v)
 /// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
-/// \note y' = ( x' ) = ( dx/dt ) = (       v        )                   
+/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
 /// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.F(x, v) )
 /// \note To allow the use of explicit and implicit solver, we need to be able to evaluate
-/// \note F(x,v) but also dF/dx(x,v) = -K, dF/dv(x,v) = -D
-/// \note Models wanting the use of implicit solvers will need to compute these Jacobians matrices.
+/// \note M(x,v), F(x,v) but also K = -dF/dx(x,v), D = -dF/dv(x,v)
+/// \note Models wanting the use of implicit solvers will need to compute these Jacobian matrices.
 /// \note Also, the matrices types are all templatized to allow for optimization
 /// \tparam State Type of the state y=(x v)
-/// \tparam MType Type of the M matrix
-/// \tparam DType Type of the D matrix
-/// \tparam KType Type of the K matrix
-/// \tparam SType Type of the system matrix
-template <class State, class MType, class DType, class KType, class SType>
+/// \tparam MT Type of the matrix M
+/// \tparam DT Type of the matrix D
+/// \tparam KT Type of the matrix K
+/// \tparam ST Type of the system matrix (linear combination of M, D, K)
+template <class State, class MT, class DT, class KT, class ST>
 class OdeEquation
 {
 public:
-	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+	/// Virtual destructor
+	virtual ~OdeEquation()
+	{}
 
-	/// RHS vector f for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the vector f with
-	/// \param[out] f The vector f to store the result into
-	virtual void computeF(const State& state, Vector* F) = 0;
+	/// Evaluation of the RHS function f(x,v) for a given state
+	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
+	/// \return The vector containing f(x,v)
+	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
+	virtual Vector& computeF(const State& state) = 0;
 
-	/// LHS matrix M for a given state
-	/// \param state (x, v) the current position and velocity to evaluate the matrix M with
-	/// \param[out] M The matrix M to store the result into
-	virtual void computeM(const State& state, MType* M) = 0;
-	/// Is the matrix M independent of the state or not ?
-	/// \return True if M is a constant matrix over time, False otherwise
-	virtual bool isMConstant() const = 0;
-		
-	/// Opposite of the 1st derivative of f w.r.t. v for a given state: D = -df/dv (x,v)
+	/// Evaluation of the LHS matrix M(x,v) for a given state
+	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
+	/// \return The matrix M(x,v)
+	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
+	virtual const MT& computeM(const State& state) = 0;
+
+	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \param[out] The matrix D = -df/dv to store the result into
-	virtual void computeD(const State& state, DType* D) = 0;
-	/// Is the matrix D independent of the state or not ?
-	/// \return True if D is a constant matrix over time, False otherwise
-	virtual bool isDConstant() const = 0;
+	/// \return The matrix D = -df/dv(x,v)
+	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
+	virtual const DT& computeD(const State& state) = 0;
 
-	/// Opposite of the 1st derivative of f w.r.t. x for a given state: K = - df/dx (x,v)
+	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
-	/// \param[out] The matrix K = -df/dx to store the result into
-	virtual void computeK(const State& state, KType* dFdx) = 0;
-	/// Is the matrix K independent of the state or not ?
-	/// \return True if K is a constant matrix over time, False otherwise
-	virtual bool isKConstant() const = 0;
+	/// \return The matrix K = -df/dx(x,v)
+	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
+	virtual const KT& computeK(const State& state) = 0;
 
-	/// Helper methods to allocate the various matrices type with the proper size
-	/// \param[in,out] M, D, K, systemMatrix matrices to resize
-	/// \param size The size to account for
-	virtual void resizeMatricesToFitState(MType& M, DType& D, KType& K, SType& systemMatrix, unsigned int size) = 0;
-	/// Helper methods to allocate a vector with the proper size
-	/// \param[in,out] x vector to resize
-	/// \param size The size to account for
-	virtual void resizeVectorToFitState(Vector& x, unsigned int size) = 0;
+	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
+	/// When all the terms are needed, this method can perform optimization in evaluating everything together
+	/// \param state (x, v) the current position and velocity to evaluate the various terms with
+	/// \param[out] f The RHS f(x,v)
+	/// \param[out] M The matrix M(x,v)
+	/// \param[out] D The matrix D = -df/dv(x,v)
+	/// \param[out] K The matrix K = -df/dx(x,v)
+	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
+	/// \note computeF(), computeM(), computeD(), computeK()
+	virtual void computeFMDK(const State& state, Vector** f, MT** M, DT** D, KT** K) = 0;
 };
 
 }; // namespace Math

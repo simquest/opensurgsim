@@ -19,8 +19,9 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
+	LinearSolveAndInverse.cpp
+	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
-	OdeSolver.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
@@ -35,6 +36,7 @@ set(SURGSIM_MATH_HEADERS
 	MlcpSolver.h
 	OdeEquation.h
 	OdeSolver.h
+	OdeSolver-inl.h
 	OdeSolverEulerExplicit.h
 	OdeSolverEulerExplicitModified.h
 	OdeSolverEulerImplicit.h

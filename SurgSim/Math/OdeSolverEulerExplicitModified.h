@@ -25,18 +25,32 @@ namespace SurgSim
 namespace Math
 {
 
-/// Modified Euler Explicit ode solver
-/// { x(t+dt) = x(t) + dt.v(t+dt)
-/// { v(t+dt) = v(t) + dt.a(t)
-template <class State, class MType, class DType, class KType, class SType>
-class ModifiedExplicitEuler : public OdeSolver<State, MType, DType, KType, SType>
+/// Euler Explicit Modified ode solver
+/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
+/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
+/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
+/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
+/// \note By simply using the newly computed velocity in the position update, the method gains in stability:
+/// \note { x(t+dt) = x(t) + dt.v(t+dt)
+/// \note { v(t+dt) = v(t) + dt.a(t)
+/// \tparam State Type of the state y=(x v)
+/// \tparam MT Type of the matrix M
+/// \tparam DT Type of the matrix D
+/// \tparam KT Type of the matrix K
+/// \tparam ST Type of the system matrix (linear combination of M, D, K)
+/// \note State is expected to hold on to the dof derivatives and have the API:
+/// \note   Vector& getPositions();
+/// \note   Vector& getVelocities();
+/// \note   Vector& getAccelerations();
+template <class State, class MT, class DT, class KT, class ST>
+class ModifiedExplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
 	/// \param initialState The initial state
-	ModifiedExplicitEuler(const OdeEquation& equation, const State& initialState) :
-		OdeSolver(equation, initialState)
+	ModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState) :
+		OdeSolver<State, MT, DT, KT, ST>(equation, initialState)
 	{
 	}
 
@@ -54,35 +68,39 @@ public:
 	void solve(double dt, const State& currentState, State* newState) override
 	{
 		// General equation to solve:
-		//   M.a(t) = F(t, x(t), v(t))
+		//   M.a(t) = f(t, x(t), v(t))
 		// System on the velocity level:
-		//   (M/dt).deltaV = F(t, x(t), v(t))
+		//   (M/dt).deltaV = f(t, x(t), v(t))
 
-		// Computes m_f = f(t, x(t), v(t))
-		computeF(currentState);
+		// Computes f(t, x(t), v(t))
+		const Vector& f = this->m_equation.computeF(currentState);
 
-		// Computes m_M = M
-		computeM(currentState);
+		// Compute M
+		const MT& M = this->m_equation.computeM(currentState);
 
 		// Computes the system matrix (left-hand-side matrix)
-		m_systemMatrix = m_M * (1.0 / dt);
+		m_MsystemMatrix = M * (1.0 / dt);
+		this->m_systemMatrix = m_MsystemMatrix; // Type conversion
 
-		// Computes deltaV (stored in m_a) and m_compliance = 1/m_systemMatrix
-		Vector& deltaV = m_a;
-		m_solveAndInverse.solveAndComputeInverse(m_M, m_f, &deltaV, &m_compliance);
+		// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
+		Vector& deltaV = newState->getAccelerations();
+		m_solveAndInverse(m_MsystemMatrix, f, &deltaV, &(this->m_compliance));
 
 		// Compute the new state using the Modified Euler Explicit scheme:
 		newState->getVelocities() = currentState.getVelocities() + deltaV;
 		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
 
-		// Adjust the variable m_a to contain accelerations: m_a = deltaV/dt
-		m_a /= dt;
+		// Adjust the acceleration variable to contain accelerations: a = deltaV/dt
+		newState->getAccelerations() /= dt;
 	}
 
 private:
 	/// Helper class to solve and inverse a system of linear equations
 	/// Optimized with the matrix type
-	SolveAndInverse<MType> m_solveAndInverse;
+	SolveAndInverse<MT> m_solveAndInverse;
+
+	/// Temporary matrix to modify the mass matrix into the system matrix while keeping the proper type
+	MT m_MsystemMatrix;
 };
 
 }; // namespace Math

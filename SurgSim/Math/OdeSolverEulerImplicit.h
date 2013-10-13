@@ -26,17 +26,34 @@ namespace Math
 {
 
 /// Euler Implicit ode solver
-/// { x(t+dt) = x(t) + dt.v(t+dt)
-/// { v(t+dt) = v(t) + dt.a(t+dt)
-template <class State, class MType, class DType, class KType, class SType>
-class ImplicitEuler : public OdeSolver<State, MType, DType, KType, SType>
+/// \note M(x(t), v(t)).a(t) = f(t, x(t), v(t))
+/// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
+/// \note y' = ( x' ) = ( dx/dt ) = (       v        )
+/// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.f(x, v) )
+/// \note y' = f(t, y)
+/// \note Euler Implicit is also called backward Euler as it solves this integral using a backward evaluation:
+/// \note y' = (y(t) - y(t-dt)) / dt
+/// \note which leads to the integration scheme:
+/// \note { x(t+dt) = x(t) + dt.v(t+dt)
+/// \note { v(t+dt) = v(t) + dt.a(t+dt)
+/// \tparam State Type of the state y=(x v)
+/// \tparam MT Type of the matrix M
+/// \tparam DT Type of the matrix D
+/// \tparam KT Type of the matrix K
+/// \tparam ST Type of the system matrix (linear combination of M, D, K)
+/// \note State is expected to hold on to the dof derivatives and have the API:
+/// \note   Vector& getPositions();
+/// \note   Vector& getVelocities();
+/// \note   Vector& getAccelerations();
+template <class State, class MT, class DT, class KT, class ST>
+class ImplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
 {
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
 	/// \param initialState The initial state
-	ImplicitEuler(const OdeEquation& equation, const State& initialState) :
-		OdeSolver(equation, initialState)
+	ImplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState) :
+		OdeSolver<State, MT, DT, KT, ST>(equation, initialState)
 	{
 	}
 
@@ -60,42 +77,38 @@ public:
 		// Compliance matrix on the velocity level:
 		//   (M.deltaV)/dt = f(t) - K.(dt.v(t) + dt.deltaV) - D.deltaV
 		//   (M/dt + D + dt.K).deltaV = f(t) - dt.K.v(t)
-		// Resolution for the acceleration:
-		//   (M + dt.D + dt^2.K).a = f(t) - dt.K.v(t)
 
-		// Computes m_M = M
-		computeM(currentState);
-		// Computes m_D = D
-		computeD(currentState);
-		// Computes m_K = K
-		computeK(currentState);
-		// Computes m_f = f(t, x(t), v(t))
-		computeF(currentState);
+		// Computes f(t, x(t), v(t)), M, D, K all at the same time
+		MT* M;
+		DT* D;
+		KT* K;
+		Vector* f;
+		this->m_equation.computeFMDK(currentState, &f, &M, &D, &K);
 
 		// Adds the Euler Implicit terms on the right-hand-side
-		m_f -= (m_K * currentState.getVelocities()) * dt;
+		*f -= ((*K) * currentState.getVelocities()) * dt;
 
 		// Computes the system matrix (left-hand-side matrix)
-		m_systemMatrix  = m_M * (1.0 / dt);
-		m_systemMatrix += m_D;
-		m_systemMatrix += m_K * dt;
+		this->m_systemMatrix  = (*M) * (1.0 / dt);
+		this->m_systemMatrix += (*D);
+		this->m_systemMatrix += (*K) * dt;
 
-		// Computes deltaV (stored in m_a) and m_compliance = 1/m_systemMatrix
-		Vector& deltaV = m_a;
-		m_solveAndInverse.solveAndComputeInverse(m_systemMatrix, m_f, &deltaV, &m_compliance);
+		// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
+		Vector& deltaV = newState->getAccelerations();
+		m_solveAndInverse(this->m_systemMatrix, *f, &deltaV, &(this->m_compliance));
 
 		// Compute the new state using the Euler Implicit scheme:
 		newState->getVelocities() = currentState.getVelocities() + deltaV;
 		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
 
-		// Adjust the variable m_a to contain accelerations: m_a = deltaV / dt
-		m_a /= dt;
+		// Adjust the acceleration variable to contain accelerations: a = deltaV/dt
+		newState->getAccelerations() /= dt;
 	}
 
 private:
-	/// Helper class to solve and inverse a system of linear equations
-	/// Optimized with the matrix type
-	SolveAndInverse<SType> m_solveAndInverse;
+	/// Helper variable to solve and inverse a system of linear equations
+	/// Optimized for the system matrix type
+	SolveAndInverse<ST> m_solveAndInverse;
 };
 
 }; // namespace Math

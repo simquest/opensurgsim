@@ -19,6 +19,10 @@
 #ifndef SURGSIM_MATH_MATRIX_H
 #define SURGSIM_MATH_MATRIX_H
 
+#include <vector>
+
+#include <SurgSim/Framework/Assert.h>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/LU> 		// needed for determinant() and inverse()
@@ -99,6 +103,88 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 	Eigen::AngleAxis<T> angleAxis(matrix);
 	return angleAxis.angle();
 }
+
+/// Helper method to add a sub-matrix into a matrix, for the sake of clarity
+/// \tparam Matrix The matrix type
+/// \tparam SubMatrix The sub-matrix type
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices in matrix
+/// \param blockSizeRow, blockSizeCol The block size (size of the sub-matrix)
+/// \param[out] matrix The matrix to add the sub-matrix into
+template <class Matrix, class SubMatrix>
+void addSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned int blockIdCol,
+	unsigned int blockSizeRow, unsigned int blockSizeCol, Matrix* matrix)
+{
+	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol) += subMatrix;
+}
+
+/// Helper method to add a sub-matrix per block into a square matrix, for the sake of clarity
+/// \tparam Matrix The matrix type
+/// \tparam SubMatrix The sub-matrix type
+/// \param subMatrix The sub-matrix (containing all the blocks)
+/// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
+/// \param blockSize The block size (square)
+/// \param[out] matrix The matrix to add the sub-matrix blocks into
+template <class Matrix, class SubMatrix>
+void addSubMatrix(const SubMatrix& subMatrix, const std::vector<unsigned int> blockIds,
+	unsigned int blockSize, Matrix* matrix)
+{
+	const unsigned int springNumNodes = blockIds.size();
+
+	for (unsigned int springNodeId0 = 0; springNodeId0 < springNumNodes; springNodeId0++)
+	{
+		unsigned int nodeId0 = blockIds[springNodeId0];
+
+		for (unsigned int springNodeId1 = 0; springNodeId1 < springNumNodes; springNodeId1++)
+		{
+			unsigned int nodeId1 = blockIds[springNodeId1];
+
+			matrix->block(blockSize * nodeId0, blockSize * nodeId1, blockSize, blockSize)
+				+= subMatrix.block(blockSize * springNodeId0, blockSize * springNodeId1, blockSize, blockSize);
+		}
+	}
+}
+
+/// Helper method to set a sub-matrix into a matrix, for the sake of clarity
+/// \tparam Matrix The matrix type
+/// \tparam SubMatrix The sub-matrix type
+/// \param subMatrix The sub-matrix
+/// \param blockIdRow, blockIdCol The block indices for row and column in matrix
+/// \param blockSizeRow, blockSizeCol The size of the sub-matrix
+/// \param[out] matrix The matrix to set the sub-matrix into
+template <class Matrix, class SubMatrix>
+void setSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned int blockIdCol,
+	unsigned int blockSizeRow, unsigned int blockSizeCol, Matrix* matrix)
+{
+	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol,
+		blockSizeRow, blockSizeCol) = subMatrix;
+}
+
+/// Helper method to access a sub-matrix from a matrix, for the sake of clarity
+/// \tparam Matrix The matrix type to get the sub-matrix from
+/// \param matrix The matrix to get the sub-matrix from
+/// \param blockIdRow, blockIdCol The block indices
+/// \param blockSizeRow, blockSizeCol The block size
+/// \return The requested sub-matrix
+template <class Matrix>
+Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsigned int blockIdCol,
+	unsigned int blockSizeRow, unsigned int blockSizeCol)
+{
+	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
+}
+
+/// Helper methods to resize/allocate a matrix with a given size
+/// \param[in,out] A matrix to resize
+/// \param numRow, numCol The size to account for
+/// \note This template method is useful to account for different matrix class having different API
+template <class Matrix>
+void resize(Matrix* A, unsigned int numRow, unsigned int numCol)
+{
+	A->resize(numRow, numCol);
+}
+
+template <>
+void resize<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol);
 
 };  // namespace Math
 };  // namespace SurgSim
