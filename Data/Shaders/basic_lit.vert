@@ -43,6 +43,6 @@ void main(void)
     float attenuation = 1.0 / (gl_LightSource[0].constantAttenuation + gl_LightSource[0].linearAttenuation*lightDistance + 
 		gl_LightSource[0].quadraticAttenuation*lightDistance*lightDistance);
     
-    color.rgb = attenuation * dot(lightDir, normal) * osg_Color.rgb * gl_LightSource[0].diffuse.rgb;
+    color.rgb = attenuation * dot(lightDir, normal) * osg_Color.rgb * gl_LightSource[0].diffuse.rgb + gl_LightSource[0].ambient.rgb;
 	color.a = osg_Color.a;
 } 

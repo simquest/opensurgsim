@@ -96,13 +96,14 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView()->setDimensions(width, height);
 	viewElement->getView();
 	viewElement->enableManipulator(true);
+	viewElement->setManipulatorParameters(SurgSim::Math::Vector3d(8.0,4.0,8.0), SurgSim::Math::Vector3d(0.0,0.0,0.0));
 	
 
 	std::shared_ptr<SurgSim::Graphics::Group> group = std::make_shared<SurgSim::Graphics::OsgGroup>("Light");
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Main Light");
-	light->setAmbientColor(Vector4d(1.0,0.0,0.0,1.0));
-	light->setDiffuseColor(Vector4d(0.0,1.0,0.0,1.0));
-	light->setSpecularColor(Vector4d(0.0,0.0,1.0,1.0));
+	light->setAmbientColor(Vector4d(0.5,0.5,0.5,1.0));
+	light->setDiffuseColor(Vector4d(0.5,0.5,0.5,1.0));
+	light->setSpecularColor(Vector4d(0.8,0.8,0.8,1.0));
 	light->setInitialPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(),Vector3d(10.0,10.0,10.0)));
 
 	viewElement->addComponent(light); 

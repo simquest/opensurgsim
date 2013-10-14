@@ -49,7 +49,7 @@ OsgLight::OsgLight(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	Light(name),
-	m_ambientColor(0.0,0.0,0.0,1.0),
+	m_ambientColor(0.2,0.2,0.2,1.0),
 	m_diffuseColor(1.0,1.0,1.0,1.0),
 	m_specularColor(1.0,1.0,1.0,1.0),
 	m_constantAttenuation(1.0),
