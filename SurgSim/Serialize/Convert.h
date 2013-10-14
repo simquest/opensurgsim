@@ -89,8 +89,8 @@ namespace YAML
 	template <>
 	struct convert <SurgSim::Framework::Component>
 	{
-		static Node encode(const ::SurgSim::Framework::Component& rhs);
-		static bool decode(const Node& node, ::std::shared_ptr<::SurgSim::Framework::Component> rhs);
+		static Node encode(const SurgSim::Framework::Component& rhs);
+		static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component> rhs);
 	};
 	
 	/// Specialize of YAML::convert<> template Presensation class.

@@ -26,13 +26,13 @@ namespace YAML
 	}
 
 	bool convert<SurgSim::Framework::Component>::decode(const Node& node,
-		 std::shared_ptr<::SurgSim::Framework::Component> rhs)
+		 std::shared_ptr<SurgSim::Framework::Component> rhs)
 	{
 		if (! node.IsMap())
 		{
 			return false;
 		}
-		rhs->setName(node["name"].as<::std::string>());
+		rhs->setName(node["name"].as<std::string>());
 		return true; 
 
 	}
