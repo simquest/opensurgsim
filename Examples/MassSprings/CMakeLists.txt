@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,37 +16,39 @@
 find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 
+link_directories(
+	${Boost_LIBRARY_DIRS}
+)
+
 include_directories(
-	${EIGEN3_INCLUDE_DIR}
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+	"${Boost_INCLUDE_DIR}"
+	"${OSG_INCLUDE_DIR}"
+	"${OPENTHREADS_INCLUDE_DIR}"
 )
 
-set(SURGSIM_BLOCKS_SOURCES
-	BasicSceneElement.cpp
-	SphereElement.cpp
-	TransferInputPoseBehavior.cpp
-	TransferPoseBehavior.cpp
+set(EXAMPLE_SOURCES
+	ExampleMassSprings.cpp
 )
 
-set(SURGSIM_BLOCKS_HEADERS
-	BasicSceneElement.h
-	SphereElement.h
-	TransferDeformableStateToVerticesBehavior.h
-	TransferDeformableStateToVerticesBehavior-inl.h
-	TransferInputPoseBehavior.h
-	TransferPoseBehavior.h
+set(EXAMPLE_HEADERS
 )
 
-surgsim_add_library(
+add_executable(ExampleMassSprings
+	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+surgsim_show_ide_folders(
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+
+target_link_libraries(ExampleMassSprings
+	SurgSimFramework
 	SurgSimBlocks
-	"${SURGSIM_BLOCKS_SOURCES}"
-	"${SURGSIM_BLOCKS_HEADERS}"
-	"SurgSim/Blocks"
+	SurgSimDataStructures
+	SurgSimPhysics
+	SurgSimGraphics
+	SurgSimInput
+	${Boost_LIBRARIES}
+	${OPENSCENEGRAPH_LIBRARIES}
+	${OPENTHREADS_LIBRARY}
 )
-target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
-	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
-
-if(SURGSIM_TESTS_BUILD)
-	add_subdirectory(UnitTests)
-endif()
