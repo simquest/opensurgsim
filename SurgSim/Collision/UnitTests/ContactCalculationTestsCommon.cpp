@@ -96,7 +96,7 @@ void contactsInfoEqualityTest(const std::list<std::shared_ptr<Contact>>& expecte
     }
 }
 
-void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContacts,
 							 const int expectedNumberOfContacts,
 							 const int* expectedBoxIndicesInContacts,
 							 const std::shared_ptr<BoxShape> box,
@@ -116,12 +116,12 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContac
         penetrationPoint.first.globalPosition.setValue(vertex);
         depth = planeNormalGlobal.dot(vertex - pointOnPlane);
         penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
-        expectedContacts.push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
+        expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
                                                              collisionNormal, penetrationPoint));
     }
 }
 
-void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& expectedContacts,
+void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContacts,
 										const int expectedNumberOfContacts,
 										const int* expectedBoxIndicesInContacts,
 										const std::shared_ptr<BoxShape> box,
@@ -142,7 +142,7 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>& exp
         penetrationPoint.first.globalPosition.setValue(vertex);
         depth = planeNormalGlobal.dot(vertex - pointOnPlane);
         penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
-        expectedContacts.push_back(std::make_shared<Contact>(std::abs(depth), Vector3d::Zero(),
+        expectedContacts->push_back(std::make_shared<Contact>(std::abs(depth), Vector3d::Zero(),
                                                              collisionNormal, penetrationPoint));
     }
 }

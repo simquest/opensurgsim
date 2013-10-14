@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Novint/NovintDevice.h"
+#include "SurgSim/Devices/Novint/Novint7DofDevice.h"
 
 #include <iostream>
 #include <iomanip>
@@ -41,14 +41,20 @@ namespace Device
 {
 
 
-NovintDevice::NovintDevice(const std::string& uniqueName, const std::string& initializationName) :
+Novint7DofDevice::Novint7DofDevice(const std::string& uniqueName, const std::string& initializationName) :
 	NovintCommonDevice(uniqueName, initializationName)
 {
 }
 
 
-NovintDevice::~NovintDevice()
+Novint7DofDevice::~Novint7DofDevice()
 {
+}
+
+
+bool Novint7DofDevice::is7DofDevice() const
+{
+	return true;
 }
 
 
