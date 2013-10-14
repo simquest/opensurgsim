@@ -24,6 +24,9 @@ include_directories(
 
 set(SURGSIM_BLOCKS_SOURCES
 	BasicSceneElement.cpp
+	MassSpring1DRepresentation.cpp
+	MassSpring2DRepresentation.cpp
+	MassSpring3DRepresentation.cpp
 	SphereElement.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
@@ -31,6 +34,9 @@ set(SURGSIM_BLOCKS_SOURCES
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
+	MassSpring1DRepresentation.h
+	MassSpring2DRepresentation.h
+	MassSpring3DRepresentation.h
 	SphereElement.h
 	TransferDeformableStateToVerticesBehavior.h
 	TransferDeformableStateToVerticesBehavior-inl.h

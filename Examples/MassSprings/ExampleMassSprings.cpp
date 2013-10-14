@@ -37,11 +37,12 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::PhysicsManager;
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
-#include <SurgSim/Physics/Mass.h>
-#include <SurgSim/Physics/LinearSpring.h>
-using SurgSim::Physics::MassSpringRepresentation;
-using SurgSim::Physics::DeformableRepresentationState;
+#include <SurgSim/Blocks/MassSpring1DRepresentation.h>
+#include <SurgSim/Blocks/MassSpring2DRepresentation.h>
+#include <SurgSim/Blocks/MassSpring3DRepresentation.h>
+using SurgSim::Blocks::MassSpring1DRepresentation;
+using SurgSim::Blocks::MassSpring2DRepresentation;
+using SurgSim::Blocks::MassSpring3DRepresentation;
 
 #include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
 using SurgSim::Graphics::OsgPointCloudRepresentation;
@@ -62,44 +63,154 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
-std::shared_ptr<SceneElement> createMassSpring(const std::string& name, const SurgSim::Math::RigidTransform3d& pose,
+std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name, const SurgSim::Math::RigidTransform3d& pose,
 	SurgSim::Math::Vector4d color, MassSpringRepresentation::IntegrationScheme integrationScheme)
 {
-	using SurgSim::Math::setSubVector;
-	using SurgSim::Physics::Mass;
-	using SurgSim::Physics::LinearSpring;
-
-	const unsigned int numNodes = 20;
-
-	std::shared_ptr<MassSpringRepresentation> physicsRepresentation =
-		std::make_shared<MassSpringRepresentation>(name + " Physics");
+	std::shared_ptr<MassSpring1DRepresentation> physicsRepresentation =
+		std::make_shared<MassSpring1DRepresentation>(name + " Physics");
 
 	// Note: setInitialPose MUST be called before setInitialState to be effective !
+	// When using MassSpringnDRepresentation, setInitialPose must be called before initnD !
 	physicsRepresentation->setInitialPose(pose);
 
-	std::shared_ptr<DeformableRepresentationState> state;
-	state = std::make_shared<DeformableRepresentationState>();
-	state->setNumDof(3 * numNodes);
-	for (unsigned int i = 0; i < numNodes; i++)
-	{
-		Vector3d p(static_cast<double>(i)/static_cast<double>(numNodes), 0, 0);
-		setSubVector(p, i, 3, &state->getPositions());
-		physicsRepresentation->addMass(std::make_shared<Mass>(0.01));
-	}
-	state->addBoundaryCondition(0); // 1st node dof X
-	state->addBoundaryCondition(1); // 1st node dof Y
-	state->addBoundaryCondition(2); // 1st node dof Z
-	for (unsigned int i = 0; i < numNodes - 1; i++)
-	{
-		std::shared_ptr<LinearSpring> spring = std::make_shared<LinearSpring>(i, i+1);
-		spring->setDamping(0.0);
-		spring->setStiffness(100.0);
-		spring->setInitialLength(1.0/static_cast<double>(numNodes));
-		physicsRepresentation->addSpring(spring);
-	}
-	physicsRepresentation->setInitialState(state);
+	std::vector<unsigned int> boundaryConditions;
+	boundaryConditions.push_back(0);
+	boundaryConditions.push_back(1);
+	boundaryConditions.push_back(2);
+	SurgSim::Math::Vector3d extremities[2] = { Vector3d(0,0,0), Vector3d(1,0,0) };
+	unsigned int numNodesPerDim[1] = {6};
+	physicsRepresentation->init1D(extremities,
+		numNodesPerDim,
+		boundaryConditions,
+		0.1, // total mass (in Kg)
+		100.0, // Stiffness stretching
+		0.0, // Damping stretching
+		10.0, // Stiffness bending
+		0.0); // Damping bending
+
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
-	physicsRepresentation->setRayleighDampingMass(1e0);
+	physicsRepresentation->setRayleighDampingMass(1e-1);
+	physicsRepresentation->setRayleighDampingStiffness(1e-2);
+
+	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
+		std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics");
+	std::shared_ptr<SurgSim::DataStructures::Vertices<void>> vertices;
+	vertices = std::make_shared<SurgSim::DataStructures::Vertices<void>>();
+	graphicsRepresentation->setVertices(vertices);
+	graphicsRepresentation->setColor(color);
+	graphicsRepresentation->setPointSize(3.0f);
+	graphicsRepresentation->setVisible(true);
+
+	std::shared_ptr<SceneElement> massSpringElement = std::make_shared<BasicSceneElement>(name);
+	massSpringElement->addComponent(physicsRepresentation);
+	massSpringElement->addComponent(graphicsRepresentation);
+	massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
+		("Physics to Graphics deformable points",
+		physicsRepresentation->getFinalState(),
+		physicsRepresentation->getNumDof() / physicsRepresentation->getNumMasses(),
+		graphicsRepresentation->getVertices()));
+
+	return massSpringElement;
+}
+
+std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name, const SurgSim::Math::RigidTransform3d& pose,
+	SurgSim::Math::Vector4d color, MassSpringRepresentation::IntegrationScheme integrationScheme)
+{
+	std::shared_ptr<MassSpring2DRepresentation> physicsRepresentation =
+		std::make_shared<MassSpring2DRepresentation>(name + " Physics");
+
+	// Note: setInitialPose MUST be called before setInitialState to be effective !
+	// When using MassSpringnDRepresentation, setInitialPose must be called before initnD !
+	physicsRepresentation->setInitialPose(pose);
+
+	std::vector<unsigned int> boundaryConditions;
+	boundaryConditions.push_back(0);
+	boundaryConditions.push_back(1);
+	boundaryConditions.push_back(2);
+	SurgSim::Math::Vector3d extremities[2][2] = {
+		{ Vector3d(0,0,0), Vector3d(1,0,0) },
+		{ Vector3d(0,-1,0), Vector3d(1,-1,0) }
+	};
+	unsigned int numNodesPerDim[2] = {3, 3};
+	physicsRepresentation->init2D(extremities,
+		numNodesPerDim,
+		boundaryConditions,
+		0.1, // total mass (in Kg)
+		100.0, // Stiffness stretching
+		0.0, // Damping stretching
+		10.0, // Stiffness bending
+		0.0, // Damping bending
+		10.0, // Stiffness face diagonal
+		0.0); // Damping face diagonal
+
+	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->setRayleighDampingMass(1e-1);
+	physicsRepresentation->setRayleighDampingStiffness(1e-2);
+
+	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
+		std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics");
+	std::shared_ptr<SurgSim::DataStructures::Vertices<void>> vertices;
+	vertices = std::make_shared<SurgSim::DataStructures::Vertices<void>>();
+	graphicsRepresentation->setVertices(vertices);
+	graphicsRepresentation->setColor(color);
+	graphicsRepresentation->setPointSize(3.0f);
+	graphicsRepresentation->setVisible(true);
+
+	std::shared_ptr<SceneElement> massSpringElement = std::make_shared<BasicSceneElement>(name);
+	massSpringElement->addComponent(physicsRepresentation);
+	massSpringElement->addComponent(graphicsRepresentation);
+	massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
+		("Physics to Graphics deformable points",
+		physicsRepresentation->getFinalState(),
+		physicsRepresentation->getNumDof() / physicsRepresentation->getNumMasses(),
+		graphicsRepresentation->getVertices()));
+
+	return massSpringElement;
+}
+
+std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name, const SurgSim::Math::RigidTransform3d& pose,
+	SurgSim::Math::Vector4d color, MassSpringRepresentation::IntegrationScheme integrationScheme)
+{
+	std::shared_ptr<MassSpring3DRepresentation> physicsRepresentation =
+		std::make_shared<MassSpring3DRepresentation>(name + " Physics");
+
+	// Note: setInitialPose MUST be called before setInitialState to be effective !
+	// When using MassSpringnDRepresentation, setInitialPose must be called before initnD !
+	physicsRepresentation->setInitialPose(pose);
+
+	std::vector<unsigned int> boundaryConditions;
+	boundaryConditions.push_back(0);
+	boundaryConditions.push_back(1);
+	boundaryConditions.push_back(2);
+	SurgSim::Math::Vector3d extremities[2][2][2] = {
+		{
+			{ Vector3d(0,0,0), Vector3d(1,0,0) }
+			,
+			{ Vector3d(0,-1,0), Vector3d(1,-1,0) }
+		}
+		,
+		{
+			{ Vector3d(0,0,-1), Vector3d(1,0,-1) }
+			,
+			{ Vector3d(0,-1,-1), Vector3d(1,-1,-1) }
+		},
+	};
+	unsigned int numNodesPerDim[3] = {3, 3, 3};
+	physicsRepresentation->init3D(extremities,
+		numNodesPerDim,
+		boundaryConditions,
+		0.1, // total mass (in Kg)
+		100.0, // Stiffness stretching
+		0.0, // Damping stretching
+		10.0, // Stiffness bending
+		0.0,  // Damping bending
+		10.0, // Stiffness face diagonal
+		0.0, // Damping face diagonal
+		10.0, // Stiffness volume diagonal
+		0.0); // Damping volume diagonal
+
+	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->setRayleighDampingMass(1e-1);
 	physicsRepresentation->setRayleighDampingStiffness(1e-2);
 
 	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
@@ -141,28 +252,82 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
+	SurgSim::Math::Vector3d translate(0,0,-3);
 
-	scene->addSceneElement(createMassSpring("MassSpring 1D Euler Explicit",
-		makeRigidTransform(qIdentity, Vector3d(-1.0, 0.0, 0.0)), Vector4d(1, 0, 0, 1),
-		MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+	// MassSpring1D
+	{
+		// All separate on the screen
+		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(-3.0, 3.0, 0.0)), Vector4d(1, 0, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 3.0, 0.0)), Vector4d(0, 1, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(1.0, 3.0, 0.0)), Vector4d(0, 0, 1, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
-	scene->addSceneElement(createMassSpring("MassSpring 1D Modified Euler Explicit",
-		makeRigidTransform(qIdentity, Vector3d(0.0, 0.0, 0.0)), Vector4d(0, 1, 0, 1),
-		MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		// All superposed on the screen
+		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)), Vector4d(1, 0, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)), Vector4d(0, 1, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)), Vector4d(0, 0, 1, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+	}
 
-	scene->addSceneElement(createMassSpring("MassSpring 1D Euler Implicit",
-		makeRigidTransform(qIdentity, Vector3d(1.0, 0.0, 0.0)), Vector4d(0, 0, 1, 1),
-		MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+	// MassSpring2D
+	{
+		// All separate on the screen
+		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(-3.0, 1.5, 0.0)), Vector4d(1, 0, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 1.5, 0.0)), Vector4d(0, 1, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(1.0, 1.5, 0.0)), Vector4d(0, 0, 1, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
-	scene->addSceneElement(createMassSpring("MassSpring 1D Euler Explicit",
-		makeRigidTransform(qIdentity, Vector3d(0.0, 2.0, 0.0)), Vector4d(1, 0, 0, 1),
-		MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
-	scene->addSceneElement(createMassSpring("MassSpring 1D Modified Euler Explicit",
-		makeRigidTransform(qIdentity, Vector3d(0.0, 2.0, 0.0)), Vector4d(0, 1, 0, 1),
-		MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
-	scene->addSceneElement(createMassSpring("MassSpring 1D Euler Implicit",
-		makeRigidTransform(qIdentity, Vector3d(0.0, 2.0, 0.0)), Vector4d(0, 0, 1, 1),
-		MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+		// All superposed on the screen
+		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, 1.5, 0.0)), Vector4d(1, 0, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, 1.5, 0.0)), Vector4d(0, 1, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, 1.5, 0.0)), Vector4d(0, 0, 1, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+	}
+
+	// MassSpring3D
+	{
+		// All separate on the screen
+		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(-3.0, -0.5, 0.0)), Vector4d(1, 0, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(-1.0, -0.5, 0.0)), Vector4d(0, 1, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(1.0, -0.5, 0.0)), Vector4d(0, 0, 1, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+
+		// All superposed on the screen
+		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, -0.5, 0.0)), Vector4d(1, 0, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, -0.5, 0.0)), Vector4d(0, 1, 0, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
+			makeRigidTransform(qIdentity, translate+Vector3d(3.0, -0.5, 0.0)), Vector4d(0, 0, 1, 1),
+			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+	}
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
