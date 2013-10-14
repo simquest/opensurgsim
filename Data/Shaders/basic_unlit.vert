@@ -16,16 +16,11 @@
 /// \file basic_unlit.vert
 /// Basic vertex shader, transform vertex and pass through the color
 
-uniform mat4 osg_ModelViewProjectionMatrix; 
-
-attribute vec4 osg_Color;
-attribute vec4 osg_Vertex;
-
 varying vec4 color;
 
 void main(void) 
 {
-	gl_Position = osg_ModelViewProjectionMatrix * osg_Vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
-    color = osg_Color;
+    color = gl_Color;
 } 

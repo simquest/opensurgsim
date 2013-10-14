@@ -17,32 +17,24 @@
 /// Basic vertex shader with one light, only diffuse term is used for 
 /// lighting, lighting is per vertex, light is considered to be a point light
 
-uniform mat3 osg_NormalMatrix; 
-uniform mat4 osg_ModelViewProjectionMatrix; 
-uniform mat4 osg_ModelViewMatrix;
-
-attribute vec4 osg_Color;
-attribute vec4 osg_Vertex;
-attribute vec3 osg_Normal;
-
 varying vec4 color;
 
 void main(void) 
 {
-	gl_Position = osg_ModelViewProjectionMatrix * osg_Vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	
-	vec4 eyeDir4 = osg_ModelViewMatrix * osg_Vertex;
+	vec4 eyeDir4 = gl_ModelViewMatrix * gl_Vertex;
 	vec3 eyeDir = normalize(eyeDir4.xyz);
 
 	vec3 lightDir = gl_LightSource[0].position.xyz - eyeDir4.xyz;
 	float lightDistance = length(lightDir);
     lightDir = normalize(lightDir);
 	
-	vec3 normal = normalize(osg_NormalMatrix * osg_Normal);
+	vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
     
     float attenuation = 1.0 / (gl_LightSource[0].constantAttenuation + gl_LightSource[0].linearAttenuation*lightDistance + 
 		gl_LightSource[0].quadraticAttenuation*lightDistance*lightDistance);
     
-    color.rgb = attenuation * dot(lightDir, normal) * osg_Color.rgb * gl_LightSource[0].diffuse.rgb + gl_LightSource[0].ambient.rgb;
-	color.a = osg_Color.a;
+    color.rgb = attenuation * dot(lightDir, normal) * gl_Color.rgb * gl_LightSource[0].diffuse.rgb + gl_LightSource[0].ambient.rgb;
+	color.a = gl_Color.a;
 } 
