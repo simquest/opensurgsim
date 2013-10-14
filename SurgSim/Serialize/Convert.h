@@ -32,46 +32,83 @@ namespace Serialize
 {
 	/// Logger name for Serialization
 	const std::string serializeLogger = "Serialization";
-}
-}
+};
+};
 
 namespace YAML
 {	
 	/// declaration of specialization convert<SurgSim::Math::Vector3d>
 	template <>
-	struct convert <SurgSim::Math::Vector3d>;
+	struct convert <SurgSim::Math::Vector3d>
+	{
+		static Node encode(const SurgSim::Math::Vector3d& rhs);
+		static bool decode(const Node &node, SurgSim::Math::Vector3d& rhs);
+	};
 
 	/// declaration of specialization convert<SurgSim::Math::Vector4d>
 	template <>
-	struct convert <SurgSim::Math::Vector4d>;
+	struct convert <SurgSim::Math::Vector4d>
+	{
+		static Node encode(const SurgSim::Math::Vector4d& rhs);
+		static bool decode(const Node& node, SurgSim::Math::Vector4d& rhs);
+	};
 
 	/// declaration of specialization convert<SurgSim::Math::Vector4d>
 	template <>
-	struct convert <SurgSim::Math::Quaterniond>;
+	struct convert <SurgSim::Math::Quaterniond>
+	{
+		static Node encode(const SurgSim::Math::Quaterniond& rhs);
+		static bool decode(const Node& node, SurgSim::Math::Quaterniond& rhs);
+	};
 
 	/// declaration of specialization convert<SurgSim::Math::Matrix33d>
 	template <>
-	struct convert <SurgSim::Math::Matrix33d>;
+	struct convert <SurgSim::Math::Matrix33d>
+	{
+		static Node encode(const SurgSim::Math::Matrix33d& rhs);
+		static bool decode(const Node& node, SurgSim::Math::Matrix33d& rhs);
+	};
 
 	/// declaration of specialization convert<SurgSim::Math::Matrix44d>
 	template <>
-	struct convert <SurgSim::Math::Matrix44d>;
+	struct convert <SurgSim::Math::Matrix44d>
+	{
+		static Node encode(const SurgSim::Math::Matrix44d& rhs);
+		static bool decode(const Node& node, SurgSim::Math::Matrix44d& rhs);
+	};
 
 	/// declaration of specialization convert<SurgSim::Math::RigidTransform3d>
 	template <>
-	struct convert <SurgSim::Math::RigidTransform3d>;
+	struct convert <SurgSim::Math::RigidTransform3d>
+	{
+		static Node encode(const SurgSim::Math::RigidTransform3d& rhs);
+		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs);
+	};
 
 	/// Specialize of YAML::convert<> template Component class.
 	template <>
-	struct convert <SurgSim::Framework::Component>;
+	struct convert <SurgSim::Framework::Component>
+	{
+		static Node encode(const ::SurgSim::Framework::Component& rhs);
+		static bool decode(const Node& node, ::std::shared_ptr<::SurgSim::Framework::Component> rhs);
+	};
 	
 	/// Specialize of YAML::convert<> template Presensation class.
 	template <>
-	struct convert <SurgSim::Graphics::Representation>;
+	struct convert <SurgSim::Graphics::Representation>
+	{
+		static Node encode(const SurgSim::Graphics::Representation& rhs);
+		static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::Representation> rhs);
+
+	};
 
 	/// Specialize of YAML::convert<> template SpherePresensation class.
 	template <>
-	struct convert <SurgSim::Graphics::SphereRepresentation>;
+	struct convert <SurgSim::Graphics::SphereRepresentation>
+	{
+		static Node encode(const SurgSim::Graphics::SphereRepresentation& rhs);
+		static bool decode(const Node& node, std::shared_ptr<SurgSim::Graphics::SphereRepresentation> rhs);
+	};
 	
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
@@ -94,8 +131,4 @@ namespace YAML
 	
 };
 
-#include <SurgSim/Serialize/MathConvert-inl.h>
-#include <SurgSim/Serialize/FrameworkConvert-inl.h>
-#include <SurgSim/Serialize/GraphicsConvert-inl.h>
-
-#endif // SURGSIM_SERIALIZE_MATHCONVERT_H
+#endif // SURGSIM_SERIALIZE_CONVERT_H

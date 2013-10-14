@@ -13,34 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_FRAMEWORKCONVERT_INL_H
-#define SURGSIM_SERIALIZE_FRAMEWORKCONVERT_INL_H
+#include <SurgSim/Serialize/Convert.h>
 
 namespace YAML
 {
 	/// Specialize of YAML::convert<> template Component class.
-	template <>
-	struct convert <::SurgSim:: Framework::Component>
+	Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Component& rhs)
 	{
-		static Node encode(const ::SurgSim::Framework::Component& rhs)
+		Node node;
+		node["name"] = rhs.getName();
+		return node;
+	}
+
+	bool convert<SurgSim::Framework::Component>::decode(const Node& node,
+		 std::shared_ptr<::SurgSim::Framework::Component> rhs)
+	{
+		if (! node.IsMap())
 		{
-			Node node;
-			node["name"] = rhs.getName();
-			return node;
+			return false;
 		}
+		rhs->setName(node["name"].as<::std::string>());
+		return true; 
 
-		static bool decode(const Node& node, ::std::shared_ptr<::SurgSim::Framework::Component> rhs)
-		{
-			if (! node.IsMap())
-			{
-				return false;
-			}
-			rhs->setName(node["name"].as<::std::string>());
-			return true; 
-
-		}
-
-	};
+	}
 }
-
-#endif // SURGSIM_SERIALIZE_FRAMEWORKCONVERT_INL_H

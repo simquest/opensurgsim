@@ -21,13 +21,13 @@ include_directories(
 )
 
 set(SURGSIM_SERIALIZE_SOURCES
+	FrameworkConvert.cpp
+	GraphicsConvert.cpp
+	MathConvert.cpp
 )
 
 set(SURGSIM_SERIALIZE_HEADERS
 	Convert.h
-	MathConvert-inl.h
-	GraphicsConvert-inl.h
-	FrameworkConvert-inl.h
 )
 
 surgsim_add_library(
