@@ -13,10 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGOBJECT_H
-#define SURGSIM_GRAPHICS_OSGOBJECT_H
+#ifndef SURGSIM_GRAPHICS_OSGSCENERYOBJECTREPRESENTATION_H
+#define SURGSIM_GRAPHICS_OSGSCENERYOBJECTREPRESENTATION_H
 
-#include <SurgSim/Graphics/Object.h>
+#include <SurgSim/Graphics/OsgRepresentation.h>
+#include <SurgSim/Graphics/SceneryObjectRepresentation.h>
 
 #include <osg/Object>
 
@@ -26,30 +27,29 @@ namespace SurgSim
 namespace Graphics
 {
 
-class OsgObject : public SurgSim::Graphics::Object
+class OsgSceneryObjectRepresentation : 
+	public SurgSim::Graphics::OsgRepresentation,
+	public SurgSim::Graphics::SceneryObjectRepresentation
 {
 public:
 	/// Constructor
-	OsgObject();
-
-	/// Loads an osg object from a file
-	/// \param	filePath	Path to the object file
-	/// \return	True if the object is successfully loaded, otherwise false
-	virtual bool loadObject(const std::string& filePath) override;
-
-	/// Release any held object
-	virtual void unloadObject() override;
+	explicit OsgSceneryObjectRepresentation(const std::string& name, const std::string& filePath = "");
 
 	/// Returns the object
-	osg::ref_ptr<osg::Object> getOsgObject() const;
+	osg::ref_ptr<osg::Object> getOsgSceneryObjectRepresentation() const;
 
 private:
+	virtual bool doInitialize() override;
+
 	/// OSG object
-	osg::ref_ptr<osg::Object> m_object;
+	osg::ref_ptr<osg::Object> m_sceneryObjectRepresentation;
+	
+	/// Path of the object file to be loaded
+	std::string m_filePath;
 };
 
 };  // namespace Graphics
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OSGOBJECT_H
+#endif  // SURGSIM_GRAPHICS_OSGSCENERYOBJECTREPRESENTATION_H

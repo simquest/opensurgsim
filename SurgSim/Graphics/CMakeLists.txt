@@ -34,9 +34,9 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgLog.cpp
 	OsgManager.cpp
 	OsgMaterial.cpp
-	OsgObject.cpp
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
+	OsgSceneryObjectRepresentation.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
@@ -63,7 +63,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Light.h
 	Manager.h
 	Material.h
-	Object.h
 	OsgBoxRepresentation.h
 	OsgCamera.h
 	OsgCapsuleRepresentation.h
@@ -75,7 +74,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgManager.h
 	OsgMaterial.h
 	OsgMatrixConversions.h
-	OsgObject.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
@@ -85,6 +83,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRenderTarget-inl.h
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
+	OsgSceneryObjectRepresentation.h
 	OsgScreenSpaceQuadRepresentation.h
 	OsgShader.h
 	OsgSphereRepresentation.h
@@ -111,6 +110,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	PointCloudRepresentation.h
 	RenderTarget.h
 	Representation.h
+	SceneryObjectRepresentation.h
 	ScreenSpaceQuadRepresentation.h
 	Shader.h
 	SphereRepresentation.h

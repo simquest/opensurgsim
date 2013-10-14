@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OBJECT_H
-#define SURGSIM_GRAPHICS_OBJECT_H
+#ifndef SURGSIM_GRAPHICS_SCENERYOBJECTREPRESENTATION_H
+#define SURGSIM_GRAPHICS_SCENERYOBJECTREPRESENTATION_H
 
 #include <string>
 
@@ -24,26 +24,18 @@ namespace SurgSim
 namespace Graphics
 {
 
-/// Base class defining the interface for a Graphics Object.
-class Object
+/// Base class defining the interface for a Graphics Scenery Object.
+class SceneryObjectRepresentation
 {
 public:
 	/// Destructor
-	virtual ~Object()
+	virtual ~SceneryObjectRepresentation()
 	{
 	}
-
-	/// Loads an object from a file
-	/// \param	filePath	Path to the osg object file
-	/// \return	True if the object is successfully loaded, otherwise false
-	virtual bool loadObject(const std::string& filePath) = 0;
-
-	/// Release the held object
-	virtual void unloadObject() = 0;
 };
 
 };  // namespace Graphics
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_GRAPHICS_OBJECT_H
+#endif  // SURGSIM_GRAPHICS_SCENERYOBJECTREPRESENTATION_H
