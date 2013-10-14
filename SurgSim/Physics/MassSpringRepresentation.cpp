@@ -73,13 +73,13 @@ unsigned int MassSpringRepresentation::getNumSprings() const
 	return m_springs.size();
 }
 
-const std::shared_ptr<Mass> MassSpringRepresentation::getMass(unsigned int nodeId) const
+std::shared_ptr<Mass> MassSpringRepresentation::getMass(unsigned int nodeId)
 {
 	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";
 	return m_masses[nodeId];
 }
 
-const std::shared_ptr<Spring> MassSpringRepresentation::getSpring(unsigned int springId) const
+std::shared_ptr<Spring> MassSpringRepresentation::getSpring(unsigned int springId)
 {
 	SURGSIM_ASSERT(springId < getNumSprings()) << "Invalid spring id";
 	return m_springs[springId];

@@ -34,8 +34,8 @@ TransferDeformableStateToVerticesBehavior<VertexData>::TransferDeformableStateTo
 	std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> to) :
 	SurgSim::Framework::Behavior(name),
 	m_from(from),
-	m_to(to),
-	m_numDofPerNode(numDofPerNode)
+	m_numDofPerNode(numDofPerNode),
+	m_to(to)
 {
 }
 

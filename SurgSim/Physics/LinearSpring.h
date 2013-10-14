@@ -84,16 +84,16 @@ public:
 		SurgSim::Math::Vector** f, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K);
 
 	/// Comparison operator (equality)
-	/// \param spring LinearSpring to compare it to
-	/// \return True if the 2 LinearSpring contains the same information, false otherwise
-	/// \note Comparison is based on rest length, stiffness and damping coefficients ONLY
-	bool operator ==(const LinearSpring& spring) const;
+	/// \param spring Spring to compare it to
+	/// \return True if the 2 springs contains the same information, false otherwise
+	/// \note Comparison is based on spring type, rest length, stiffness and damping coefficients ONLY
+	bool operator ==(const Spring& spring) const;
 
 	/// Comparison operator (inequality)
-	/// \param spring LinearSpring to compare it to
-	/// \return False if the 2 LinearSpring contains the same information, true otherwise
-	/// \note Comparison is based on rest length, stiffness and damping coefficients ONLY
-	bool operator !=(const LinearSpring& spring) const;
+	/// \param spring Spring to compare it to
+	/// \return False if the 2 springs contains the same information, true otherwise
+	/// \note Comparison is based on spring type, rest length, stiffness and damping coefficients ONLY
+	bool operator !=(const Spring& spring) const;
 
 private:
 	/// Rest length (in m)

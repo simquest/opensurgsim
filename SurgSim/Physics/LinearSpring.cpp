@@ -147,12 +147,18 @@ void LinearSpring::computeFDK(const DeformableRepresentationState& state,
 	*D = &m_D;
 }
 
-bool LinearSpring::operator ==(const LinearSpring& spring) const
+bool LinearSpring::operator ==(const Spring& spring) const
 {
-	return m_l0 == spring.m_l0 && m_stiffness == spring.m_stiffness && m_damping == spring.m_damping;
+	const LinearSpring *ls = dynamic_cast<const LinearSpring*>(&spring);
+	if (! ls)
+	{
+		return false;
+	}
+	return m_nodeIds == ls->m_nodeIds &&
+		m_l0 == ls->m_l0 && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
 }
 
-bool LinearSpring::operator !=(const LinearSpring& spring) const
+bool LinearSpring::operator !=(const Spring& spring) const
 {
 	return ! ((*this) == spring);
 }

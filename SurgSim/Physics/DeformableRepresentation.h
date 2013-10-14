@@ -61,6 +61,7 @@ public:
 	/// \param pose The current pose
 	/// \note A deformable representation is expressed in global frame (local frame = global frame)
 	/// \note This method should not be called, as a deformable pose cannot be set !
+	/// \note Calling this method will raise an exception
 	void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
 	/// Get the current pose of the representation

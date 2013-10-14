@@ -87,12 +87,14 @@ public:
 	/// Retrieves the mass of a given node
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
-	const std::shared_ptr<Mass> getMass(unsigned int nodeId) const;
+	/// \note The mass is returned with read/write access
+	std::shared_ptr<Mass> getMass(unsigned int nodeId);
 
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
-	const std::shared_ptr<Spring> getSpring(unsigned int springId) const;
+	/// \note The spring is returned with read/write access
+	std::shared_ptr<Spring> getSpring(unsigned int springId);
 
 	/// Gets the total mass of the mass spring
 	/// \return The total mass of the mass spring (in Kg)
