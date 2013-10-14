@@ -34,7 +34,6 @@ set(INPUTVTCEXAMPLE_SOURCES
 )
 
 set(INPUTVTCEXAMPLE_HEADERS
-	TransferVtcPoseBehavior.h
 )
 
 add_executable(ExampleInputVtc
