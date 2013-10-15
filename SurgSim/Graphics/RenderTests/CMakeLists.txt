@@ -27,10 +27,10 @@ set(UNIT_TEST_SOURCES
 	OsgCapsuleRepresentationRenderTests.cpp
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
-	OsgSceneryObjectRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
+	OsgSceneryRepresentationRenderTests.cpp
 	OsgScreenSpaceQuadRenderTests.cpp
 	OsgShaderRenderTests.cpp
 	OsgSphereRepresentationRenderTests.cpp

@@ -14,13 +14,13 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the OsgSceneryObject class.
+/// Tests for the OsgSceneryRepresentation class.
 
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgSceneryObject.h>
+#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 
 #include <memory>
@@ -34,9 +34,9 @@ namespace SurgSim
 namespace Graphics
 {
 
-TEST(OsgSceneryObjectTest, InitTest)
+TEST(OsgSceneryRepresentationTest, InitTest)
 {
-	auto sceneryObject = std::make_shared<OsgSceneryObject>("test", "Data/OsgSceneryObjectTests/table_extension.obj");
+	auto sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	auto manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 	auto scene = std::make_shared<SurgSim::Framework::Scene>();
@@ -47,8 +47,10 @@ TEST(OsgSceneryObjectTest, InitTest)
 	runtime->addManager(manager);
 	runtime->setScene(scene);
 
+	sceneryObject->setModelName("OsgSceneryObjectTests");
+	sceneryObject->setFileName("table_extension.obj");
 	sceneryObject->initialize(runtime);
-	EXPECT_NE(nullptr, sceneryObject->getOsgSceneryObject());
+	EXPECT_NE(nullptr, sceneryObject->getOsgSceneryRepresentation());
 }
 
 

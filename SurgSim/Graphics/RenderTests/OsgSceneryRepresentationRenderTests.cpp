@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Render Tests for the OsgSceneryObject class.
+/// Render Tests for OsgSceneryRepresentation class.
 
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Runtime.h>
@@ -23,7 +23,7 @@
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgSceneryObject.h>
+#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
@@ -39,7 +39,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgSceneryObjectRenderTests : public ::testing::Test
+struct OsgSceneryRepresentationRenderTests : public ::testing::Test
 {
 	virtual void SetUp()
 	{
@@ -73,14 +73,16 @@ protected:
 
 };
 
-TEST_F(OsgSceneryObjectRenderTests, RenderTest)
+TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 {
-	std::shared_ptr<OsgSceneryObject> sceneryObject =
-		std::make_shared<OsgSceneryObject>("Table", "Data/OsgSceneryObjectTests/table_extension.obj");
+	std::shared_ptr<OsgSceneryRepresentation> sceneryObject =
+		std::make_shared<OsgSceneryRepresentation>("Table");
+	sceneryObject->setModelName("OsgSceneryObjectTests");
+	sceneryObject->setFileName("table_extension.obj");
 	viewElement->addComponent(sceneryObject);
 
 	runtime->start();
-	ASSERT_NE(nullptr, sceneryObject->getOsgSceneryObject());
+	ASSERT_NE(nullptr, sceneryObject->getOsgSceneryRepresentation());
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 }

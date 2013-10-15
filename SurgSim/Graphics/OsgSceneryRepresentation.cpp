@@ -15,44 +15,59 @@
 
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Graphics/OsgSceneryObjectRepresentation.h>
+#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
 
 #include <osgDB/ReadFile>
+#include <osg/Switch>
 
-using SurgSim::Graphics::OsgSceneryObjectRepresentation;
+using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::OsgRepresentation;
 
-OsgSceneryObjectRepresentation::OsgSceneryObjectRepresentation(const std::string& name, const std::string& filePath) :
+OsgSceneryRepresentation::OsgSceneryRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
-	m_object(nullptr),
-	m_filePath(filePath)
+	SceneryRepresentation(name),
+	m_sceneryRepresentation(nullptr),
+	m_modelName(), m_fileName()
 {
 }
 
-osg::ref_ptr<osg::Object> OsgSceneryObjectRepresentation::getOsgSceneryObjectRepresentation() const
+osg::ref_ptr<osg::Node> OsgSceneryRepresentation::getOsgSceneryRepresentation() const
 {
-	return m_sceneryObjectRepresentation;
+	return m_sceneryRepresentation;
 }
 
-bool OsgSceneryObjectRepresentation::doInitialize()
+bool OsgSceneryRepresentation::doInitialize()
 {
-	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData(getRuntime()->getApplicationData());
+	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
 
-	std::string objectPath = applicationData->findFile(m_filePath);
-	if (objectPath.empty())
-	{
-		return false;
-	}
+	std::string filePath = "Data/" + m_modelName + "/" + m_fileName;
+	std::string objectPath = applicationData->findFile(filePath);
+	SURGSIM_ASSERT(! objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
 
-	m_sceneryObjectRepresentation = osgDB::readNodeFile(objectPath);
-	//If the object is loaded correctly, return true; Otherwise, false.
-	if (m_sceneryObjectRepresentation.valid())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
+	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << filePath << std::endl;
+
+	m_switch->addChild(m_sceneryRepresentation);
+	return true;
+}
+
+std::string SurgSim::Graphics::OsgSceneryRepresentation::getModelName() const
+{
+	return m_modelName;
+}
+
+void SurgSim::Graphics::OsgSceneryRepresentation::setModelName( const std::string& modelName )
+{
+	m_modelName = modelName;
+}
+
+std::string SurgSim::Graphics::OsgSceneryRepresentation::getFileName() const
+{
+	return m_fileName;
+}
+
+void SurgSim::Graphics::OsgSceneryRepresentation::setFileName( const std::string& fileName )
+{
+	m_fileName = fileName;
 }
