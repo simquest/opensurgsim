@@ -62,7 +62,7 @@ public:
 
 	/// Gets the solver's name
 	/// \return The solver name
-	virtual const std::string getName() const = 0;
+	const std::string getName() const;
 
 	/// Solves the equation
 	/// \param dt The time step
@@ -79,6 +79,9 @@ public:
 	const Matrix& getCompliance() const;
 
 protected:
+	/// Name for this solver (will be given by the derived classes)
+	std::string m_name;
+
 	/// Allocates the system and compliance matrices
 	/// \param size The size to account for in the data structure
 	void allocate(unsigned int size);

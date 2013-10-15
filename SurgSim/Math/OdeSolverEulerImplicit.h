@@ -52,58 +52,13 @@ public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
 	/// \param initialState The initial state
-	ImplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState) :
-		OdeSolver<State, MT, DT, KT, ST>(equation, initialState)
-	{
-	}
-
-	/// Gets the solver's name
-	/// \return The solver name
-	const std::string getName() const override
-	{
-		return "Implicit Euler";
-	}
+	ImplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState);
 
 	/// Solves the equation
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	void solve(double dt, const State& currentState, State* newState) override
-	{
-		// General equation to solve:
-		//   M.a(t+dt) = f(t+dt, x(t+dt), v(t+dt))
-		//   M.a(t+dt) = f(t) + df/dx.deltaX + df/dv.deltaV
-		// Note that K = -df/dx and D = -df/dv
-		// Compliance matrix on the velocity level:
-		//   (M.deltaV)/dt = f(t) - K.(dt.v(t) + dt.deltaV) - D.deltaV
-		//   (M/dt + D + dt.K).deltaV = f(t) - dt.K.v(t)
-
-		// Computes f(t, x(t), v(t)), M, D, K all at the same time
-		MT* M;
-		DT* D;
-		KT* K;
-		Vector* f;
-		this->m_equation.computeFMDK(currentState, &f, &M, &D, &K);
-
-		// Adds the Euler Implicit terms on the right-hand-side
-		*f -= ((*K) * currentState.getVelocities()) * dt;
-
-		// Computes the system matrix (left-hand-side matrix)
-		this->m_systemMatrix  = (*M) * (1.0 / dt);
-		this->m_systemMatrix += (*D);
-		this->m_systemMatrix += (*K) * dt;
-
-		// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
-		Vector& deltaV = newState->getAccelerations();
-		m_solveAndInverse(this->m_systemMatrix, *f, &deltaV, &(this->m_compliance));
-
-		// Compute the new state using the Euler Implicit scheme:
-		newState->getVelocities() = currentState.getVelocities() + deltaV;
-		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
-
-		// Adjust the acceleration variable to contain accelerations: a = deltaV/dt
-		newState->getAccelerations() /= dt;
-	}
+	void solve(double dt, const State& currentState, State* newState) override;
 
 private:
 	/// Helper variable to solve and inverse a system of linear equations
@@ -114,5 +69,7 @@ private:
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#include <SurgSim/Math/OdeSolverEulerImplicit-inl.h>
 
 #endif // SURGSIM_MATH_ODESOLVEREULERIMPLICIT_H

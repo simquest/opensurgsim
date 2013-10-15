@@ -31,6 +31,12 @@ OdeSolver<State, MT, DT, KT, ST>::OdeSolver(OdeEquation<State, MT, DT, KT, ST>& 
 }
 
 template <class State, class MT, class DT, class KT, class ST>
+const std::string OdeSolver<State, MT, DT, KT, ST>::getName() const
+{
+	return m_name;
+}
+
+template <class State, class MT, class DT, class KT, class ST>
 const ST& OdeSolver<State, MT, DT, KT, ST>::getSystemMatrix() const
 {
 	return m_systemMatrix;

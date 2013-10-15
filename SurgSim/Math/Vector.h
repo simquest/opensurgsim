@@ -115,6 +115,28 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, un
 	return vector.segment(blockSize * blockId, blockSize);
 }
 
+/// Helper method to resize a vector (if necessary), and potentially zero it out
+/// \tparam Vector The vector type
+/// \param[in,out] v The vector to resize and potentially zero out
+/// \param size The size to resize the vector v to
+/// \param zeroOut True if the vector v should be filled up with 0 after having been resized, False if not
+template <class Vector>
+void resize(Vector *v, unsigned int size, bool zeroOut = false)
+{
+	if (! v)
+	{
+		return;
+	}
+	if (v->size() != size)
+	{
+		v->resize(size);
+	}
+	if (zeroOut)
+	{
+		v->setZero();
+	}
+}
+
 };  // namespace Math
 };  // namespace SurgSim
 

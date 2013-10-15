@@ -173,18 +173,30 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsig
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
 }
 
-/// Helper methods to resize/allocate a matrix with a given size
+/// Helper methods to resize/allocate a matrix with a given size (if necessary), and potentially zero it out
 /// \param[in,out] A matrix to resize
 /// \param numRow, numCol The size to account for
+/// \param zeroOut True if the vector v should be filled up with 0, False if not
 /// \note This template method is useful to account for different matrix class having different API
 template <class Matrix>
-void resize(Matrix* A, unsigned int numRow, unsigned int numCol)
+void resize(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = false)
 {
-	A->resize(numRow, numCol);
+	if (! A)
+	{
+		return;
+	}
+	if (A->rows() != numRow && A->cols() != numCol)
+	{
+		A->resize(numRow, numCol);
+	}
+	if (zeroOut)
+	{
+		A->setZero();
+	}
 }
 
 template <>
-void resize<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol);
+void resize<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut);
 
 };  // namespace Math
 };  // namespace SurgSim

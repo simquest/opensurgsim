@@ -227,6 +227,8 @@ private:
 
 	/// Numerical Integration scheme (dynamic explicit/implicit solver)
 	IntegrationScheme m_integrationScheme;
+	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
+	bool m_needToReloadOdeSolver;
 
 	/// Ode solver (its type depends on the numerical integration scheme)
 	std::shared_ptr<OdeSolver<DeformableRepresentationState, DiagonalMatrix, Matrix, Matrix, Matrix>> m_odeSolver;

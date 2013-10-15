@@ -43,7 +43,8 @@ namespace Physics
 
 MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
 	DeformableRepresentation(name),
-	m_integrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER)
+	m_integrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER),
+	m_needToReloadOdeSolver(true)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
@@ -121,8 +122,8 @@ void MassSpringRepresentation::setIntegrationScheme(IntegrationScheme integratio
 	{
 		// Sets the integration scheme variable
 		m_integrationScheme = integrationScheme;
-		// Reset the ode solver (will be re-allocated with the proper ode solver on the next call to beforeUpdate())
-		m_odeSolver.reset();
+		// The integration scheme has changed, the ode solver needs to be reloaded
+		m_needToReloadOdeSolver = true;
 	}
 }
 
@@ -150,8 +151,14 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumDof()) <<
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
 
-	if (! m_odeSolver)
+	if (m_needToReloadOdeSolver)
 	{
+		if (m_odeSolver)
+		{
+			// If the ode solver exist already, we need to reset it first (free memory)
+			m_odeSolver.reset();
+		}
+
 		switch(m_integrationScheme)
 		{
 		case INTEGRATIONSCHEME_EXPLICIT_EULER:
@@ -174,6 +181,8 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 				"Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
 			break;
 		}
+
+		m_needToReloadOdeSolver = false;
 	}
 }
 
@@ -213,13 +222,9 @@ void MassSpringRepresentation::applyDofCorrection(double dt, const Eigen::Vector
 
 Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& state)
 {
-	// Make sure the force vector has been properly allocated
-	if (! m_f.size() && state.getNumDof())
-	{
-		m_f.resize(state.getNumDof());
-	}
+	// Make sure the force vector has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
-	m_f.setZero();
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
 	addSpringsForce(&m_f, state);
@@ -238,10 +243,8 @@ Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& 
 const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableRepresentationState& state)
 {
 	// Make sure the mass matrix has been properly allocated
-	if (! m_M.rows() && state.getNumDof())
-	{
-		m_M.resize(state.getNumDof());
-	}
+	// It does not need to be zeroed out, as it will be directly set
+	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
 
 	DiagonalMatrix::DiagonalVectorType& diagonal = m_M.diagonal();
 
@@ -266,16 +269,11 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 	const double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayMass = m_rayleighDamping.massCoefficient;
 
-	// Make sure the damping matrix has been properly allocated
-	if (! m_D.rows() && state.getNumDof())
-	{
-		m_D.resize(state.getNumDof(), state.getNumDof());
-	}
-
-	m_D.setZero();
+	// Make sure the damping matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
 
 	// D += rayMass.M
-	if (rayMass)
+	if (rayMass != 0.0)
 	{
 		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
 		{
@@ -286,7 +284,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 	}
 
 	// D += rayStiff.K
-	if (rayStiff)
+	if (rayStiff != 0.0)
 	{
 		for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 		{
@@ -315,13 +313,8 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 
 const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationState& state)
 {
-	// Make sure the stiffness matrix has been properly allocated
-	if (! m_K.rows() && state.getNumDof())
-	{
-		m_K.resize(state.getNumDof(), state.getNumDof());
-	}
-
-	m_K.setZero();
+	// Make sure the stiffness matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -344,33 +337,18 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& state,
 	Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K)
 {
-	// Make sure the force vector has been properly allocated
-	if (! m_f.size() && state.getNumDof())
-	{
-		m_f.resize(state.getNumDof());
-	}
-	m_f.setZero();
+	// Make sure the force vector has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
 	// Make sure the mass matrix has been properly allocated
-	// No need to zero out the mass matrix, it will be directly set
-	if (! m_M.rows() && state.getNumDof())
-	{
-		m_M.resize(state.getNumDof());
-	}
+	// It does not need to be zeroed out, as it will be directly set
+	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
 
-	// Make sure the damping matrix has been properly allocated
-	if (! m_D.rows() && state.getNumDof())
-	{
-		m_D.resize(state.getNumDof(), state.getNumDof());
-	}
-	m_D.setZero();
+	// Make sure the damping matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
 
-	// Make sure the stiffness matrix has been properly allocated
-	if (! m_K.rows() && state.getNumDof())
-	{
-		m_K.resize(state.getNumDof(), state.getNumDof());
-	}
-	m_K.setZero();
+	// Make sure the stiffness matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
 
 	// Computes the mass matrix m_M
 	computeM(state);
@@ -440,7 +418,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 
 	// Rayleigh damping mass: F = - rayMass.M.v(t)
 	// M is diagonal, so this calculation can be done node per node
-	if (rayMass)
+	if (rayMass != 0.0)
 	{
 		for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
 		{
@@ -452,7 +430,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 
 	// Rayleigh damping stiffness: F = - rayStiff.K.v(t)
 	// K is not diagonal and links all dof of the N connected nodes
-	if (rayStiff)
+	if (rayStiff != 0.0)
 	{
 		if (useGlobalStiffnessMatrix)
 		{

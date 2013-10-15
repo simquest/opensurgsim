@@ -49,50 +49,13 @@ public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
 	/// \param initialState The initial state
-	ModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState) :
-		OdeSolver<State, MT, DT, KT, ST>(equation, initialState)
-	{
-	}
-
-	/// Gets the solver's name
-	/// \return The solver name
-	const std::string getName() const override
-	{
-		return "Modified Explicit Euler";
-	}
+	ModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState);
 
 	/// Solves the equation
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	void solve(double dt, const State& currentState, State* newState) override
-	{
-		// General equation to solve:
-		//   M.a(t) = f(t, x(t), v(t))
-		// System on the velocity level:
-		//   (M/dt).deltaV = f(t, x(t), v(t))
-
-		// Computes f(t, x(t), v(t))
-		const Vector& f = this->m_equation.computeF(currentState);
-
-		// Compute M
-		const MT& M = this->m_equation.computeM(currentState);
-
-		// Computes the system matrix (left-hand-side matrix)
-		m_MsystemMatrix = M * (1.0 / dt);
-		this->m_systemMatrix = m_MsystemMatrix; // Type conversion
-
-		// Computes deltaV (stored in the accelerations) and m_compliance = 1/m_systemMatrix
-		Vector& deltaV = newState->getAccelerations();
-		m_solveAndInverse(m_MsystemMatrix, f, &deltaV, &(this->m_compliance));
-
-		// Compute the new state using the Modified Euler Explicit scheme:
-		newState->getVelocities() = currentState.getVelocities() + deltaV;
-		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();
-
-		// Adjust the acceleration variable to contain accelerations: a = deltaV/dt
-		newState->getAccelerations() /= dt;
-	}
+	void solve(double dt, const State& currentState, State* newState) override;
 
 private:
 	/// Helper class to solve and inverse a system of linear equations
@@ -106,5 +69,7 @@ private:
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#include <SurgSim/Math/OdeSolverEulerExplicitModified-inl.h>
 
 #endif // SURGSIM_MATH_ODESOLVEREULEREXPLICITMODIFIED_H

@@ -38,8 +38,11 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolver.h
 	OdeSolver-inl.h
 	OdeSolverEulerExplicit.h
+	OdeSolverEulerExplicit-inl.h
 	OdeSolverEulerExplicitModified.h
+	OdeSolverEulerExplicitModified-inl.h
 	OdeSolverEulerImplicit.h
+	OdeSolverEulerImplicit-inl.h
 	Quaternion.h
 	RigidTransform.h
 	Valid.h
