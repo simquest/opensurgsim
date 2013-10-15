@@ -20,9 +20,13 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
+#include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Graphics/OsgSceneryObject.h>
+#include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Vector.h>
 
 #include <memory>
 #include <boost/filesystem.hpp>
@@ -50,6 +54,9 @@ struct OsgSceneryObjectRenderTests : public ::testing::Test
 		viewElement = std::make_shared<OsgViewElement>("view element");
 		scene->addSceneElement(viewElement);
 
+		manager->getDefaultCamera()->setInitialPose(
+			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
+											  SurgSim::Math::Vector3d(0.0, 0.5, 5.0)));
 	}
 
 	virtual void TearDown()
@@ -73,7 +80,9 @@ TEST_F(OsgSceneryObjectRenderTests, RenderTest)
 	viewElement->addComponent(sceneryObject);
 
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
+	ASSERT_NE(nullptr, sceneryObject->getOsgSceneryObject());
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 }
 
 
