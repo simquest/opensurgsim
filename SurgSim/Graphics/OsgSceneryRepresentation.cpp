@@ -44,7 +44,7 @@ bool OsgSceneryObjectRepresentation::doInitialize()
 	{
 		return false;
 	}
-	
+
 	m_sceneryObjectRepresentation = osgDB::readNodeFile(objectPath);
 	//If the object is loaded correctly, return true; Otherwise, false.
 	if (m_sceneryObjectRepresentation.valid())
