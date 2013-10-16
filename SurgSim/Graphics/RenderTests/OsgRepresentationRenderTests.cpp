@@ -17,6 +17,7 @@
 /// Render Tests for the OsgBoxRepresentation class.
 
 #include <SurgSim/Graphics/OsgManager.h>
+#include <SurgSim/Graphics/OsgAxesRepresentation.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
 #include <SurgSim/Graphics/OsgCapsuleRepresentation.h>
 #include <SurgSim/Graphics/OsgCylinderRepresentation.h>
@@ -87,7 +88,7 @@ protected:
 TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 {
 	///	Box position
-	Vector3d boxPosition(0.0, 0.0, -0.2);
+	Vector3d boxPosition(0.05, 0.0, -0.2);
 	/// Capsule position
 	Vector3d capsulePosition(-0.05, 0.0, -0.2);
 	/// Cylinder position
@@ -96,7 +97,7 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	Vector3d spherePosition(0.025, 0.0, -0.2);
 	/// Size of the box
 	Vector3d boxSize(0.01, 0.015, 0.01);
-	/// Size of the capsule (raidus, height)
+	/// Size of the capsule (radius, height)
 	Vector2d capsuleSize(0.005, 0.015);
 	/// Size of the cylinder
 	Vector2d cylinderSize(0.005, 0.015);
@@ -120,18 +121,20 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 		std::make_shared<OsgSphereRepresentation>("sphere representation");
 	viewElement->addComponent(sphereRepresentation);
 
+
+	std::shared_ptr<AxesRepresentation> axesRepresentation = 
+		std::make_shared<OsgAxesRepresentation>("axes");
+	viewElement->addComponent(axesRepresentation);
+
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
 
-	/// Interpolate position for box
 	boxRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), boxPosition ));
-	/// Interpolate position for capsule
 	capsuleRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition ));
-	/// Interpolate position for cylinder
 	cylinderRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), cylinderPosition ));
-	/// Interpolate position for sphere
 	sphereRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), spherePosition ));
+	axesRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
 
 	/// Set the size of box
 	boxRepresentation->setSize(boxSize.x(), boxSize.y(), boxSize.z());
@@ -143,6 +146,8 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	cylinderRepresentation->setSize(cylinderSize.x(), cylinderSize.y());
 	/// Set the size of sphere
 	sphereRepresentation->setRadius(sphereRadius);
+
+	axesRepresentation->setSize(0.01);
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 }
