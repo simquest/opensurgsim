@@ -16,7 +16,6 @@
 /// \file
 /// Render Tests for OsgSceneryRepresentation class.
 
-#include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
@@ -29,9 +28,9 @@
 #include <SurgSim/Math/Vector.h>
 
 #include <memory>
-#include <boost/filesystem.hpp>
 
 #include <gtest/gtest.h>
+
 #include <SurgSim/Graphics/OsgSphereRepresentation.h>
 
 namespace SurgSim
@@ -56,7 +55,7 @@ struct OsgSceneryRepresentationRenderTests : public ::testing::Test
 
 		manager->getDefaultCamera()->setInitialPose(
 			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
-											  SurgSim::Math::Vector3d(0.0, 0.5, 5.0)));
+											  SurgSim::Math::Vector3d(0.0, 0.5, 200.0)));
 	}
 
 	virtual void TearDown()
@@ -68,21 +67,16 @@ struct OsgSceneryRepresentationRenderTests : public ::testing::Test
 	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
 	std::shared_ptr<SurgSim::Framework::Scene> scene;
 	std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
-
 };
 
 TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 {
 	std::shared_ptr<OsgSceneryRepresentation> sceneryObject =
 		std::make_shared<OsgSceneryRepresentation>("Table");
-	sceneryObject->setModelName("OsgSceneryObjectTests");
-	sceneryObject->setFileName("table_extension.obj");
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/table_extension.obj");
 	viewElement->addComponent(sceneryObject);
 
 	runtime->start();
-	ASSERT_NE(nullptr, sceneryObject->getOsgSceneryRepresentation());
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
 }

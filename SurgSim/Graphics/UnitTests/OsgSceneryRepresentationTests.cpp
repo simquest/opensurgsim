@@ -14,9 +14,8 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the OsgSceneryRepresentation class.
+/// Unit Tests for the OsgSceneryRepresentation class.
 
-#include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Graphics/OsgManager.h>
@@ -24,7 +23,6 @@
 #include <SurgSim/Graphics/OsgViewElement.h>
 
 #include <memory>
-#include <boost/filesystem.hpp>
 
 #include <gtest/gtest.h>
 
@@ -34,23 +32,44 @@ namespace SurgSim
 namespace Graphics
 {
 
-TEST(OsgSceneryRepresentationTest, InitTest)
+class OsgSceneryRepresentationTest: public ::testing::Test
 {
-	auto sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
-	auto manager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	auto scene = std::make_shared<SurgSim::Framework::Scene>();
-	auto viewElement = std::make_shared<OsgViewElement>("view element");
+public:
+	virtual void SetUp() override
+	{
+		sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
+		runtime = std::make_shared<SurgSim::Framework::Runtime>();
+		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
+		scene = std::make_shared<SurgSim::Framework::Scene>();
+		viewElement = std::make_shared<OsgViewElement>("view element");
 
-	viewElement->addComponent(sceneryObject);
-	scene->addSceneElement(viewElement);
-	runtime->addManager(manager);
-	runtime->setScene(scene);
+		viewElement->addComponent(sceneryObject);
+		scene->addSceneElement(viewElement);
+		runtime->addManager(manager);
+		runtime->setScene(scene);
+	}
 
-	sceneryObject->setModelName("OsgSceneryObjectTests");
-	sceneryObject->setFileName("table_extension.obj");
-	sceneryObject->initialize(runtime);
-	EXPECT_NE(nullptr, sceneryObject->getOsgSceneryRepresentation());
+	virtual void TearDown() override
+	{
+	}
+
+	std::shared_ptr<SurgSim::Graphics::OsgSceneryRepresentation> sceneryObject;
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
+	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
+	std::shared_ptr<SurgSim::Framework::Scene> scene;
+	std::shared_ptr<SurgSim::Graphics::OsgViewElement> viewElement;
+};
+
+TEST_F(OsgSceneryRepresentationTest, FileNameTest)
+{
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/table_extension.obj");
+	EXPECT_EQ("OsgSceneryRepresentationTests/table_extension.obj", sceneryObject->getFileName());
+}
+
+TEST_F(OsgSceneryRepresentationTest, InitTest)
+{
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/table_extension.obj");
+	ASSERT_NO_THROW(sceneryObject->initialize(runtime));
 }
 
 

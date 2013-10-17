@@ -21,9 +21,13 @@
 
 #include <osg/Node>
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4250)
+#endif
+
 namespace SurgSim
 {
-
 namespace Graphics
 {
 
@@ -38,13 +42,6 @@ public:
 	/// \param filePath Path to the file to be loaded
 	explicit OsgSceneryRepresentation(const std::string& name);
 
-	/// Return the name of the model of the object
-	/// \return Model name of the object
-	std::string getModelName() const;
-	/// Sets the name of model of the object to be loaded
-	/// \param	modelName	Name of the model
-	void setModelName(const std::string& modelName);
-
 	/// Return file name of the object
 	/// \return File name of the object
 	std::string getFileName() const;
@@ -52,9 +49,6 @@ public:
 	/// \param	modelName	Name of the model
 	void setFileName(const std::string& fileName);
 
-	/// Returns the object
-	/// \return A osg Node representing the loaded object
-	osg::ref_ptr<osg::Node> getOsgSceneryRepresentation() const;
 
 private:
 	virtual bool doInitialize() override;
@@ -62,8 +56,6 @@ private:
 	/// A osg::Node to hold the objet loaded from file
 	osg::ref_ptr<osg::Node> m_sceneryRepresentation;
 
-	/// Name the model/type of the object to be loaded
-	std::string m_modelName;
 	/// Name of the object file to be loaded
 	std::string m_fileName;
 };
@@ -71,5 +63,9 @@ private:
 };  // namespace Graphics
 
 };  // namespace SurgSim
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif  // SURGSIM_GRAPHICS_OSGSCENERYREPRESENTATION_H

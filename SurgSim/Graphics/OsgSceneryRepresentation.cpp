@@ -28,38 +28,22 @@ OsgSceneryRepresentation::OsgSceneryRepresentation(const std::string& name) :
 	OsgRepresentation(name),
 	SceneryRepresentation(name),
 	m_sceneryRepresentation(nullptr),
-	m_modelName(), m_fileName()
+	m_fileName()
 {
-}
-
-osg::ref_ptr<osg::Node> OsgSceneryRepresentation::getOsgSceneryRepresentation() const
-{
-	return m_sceneryRepresentation;
 }
 
 bool OsgSceneryRepresentation::doInitialize()
 {
 	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
 
-	std::string filePath = "Data/" + m_modelName + "/" + m_fileName;
-	std::string objectPath = applicationData->findFile(filePath);
+	std::string objectPath = applicationData->findFile("Data/" + m_fileName);
 	SURGSIM_ASSERT(! objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
 
 	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
-	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << filePath << std::endl;
+	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << m_fileName << std::endl;
 
 	m_switch->addChild(m_sceneryRepresentation);
 	return true;
-}
-
-std::string SurgSim::Graphics::OsgSceneryRepresentation::getModelName() const
-{
-	return m_modelName;
-}
-
-void SurgSim::Graphics::OsgSceneryRepresentation::setModelName( const std::string& modelName )
-{
-	m_modelName = modelName;
 }
 
 std::string SurgSim::Graphics::OsgSceneryRepresentation::getFileName() const
