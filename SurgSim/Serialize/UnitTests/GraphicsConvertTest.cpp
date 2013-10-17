@@ -71,7 +71,7 @@ TEST_F(GraphicsConvertTest, ConvertSphereRepresentationTest)
 		std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
 	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, actualSphere);
 	
-	EXPECT_EQ(actualSphere->getRadius(), sphereRepresentation->getRadius());
+	EXPECT_EQ(sphereRepresentation->getRadius(), actualSphere->getRadius());
 	EXPECT_TRUE(actualSphere->getInitialPose().matrix().isApprox(sphereRepresentation->getInitialPose().matrix()));
 	EXPECT_TRUE(actualSphere->getPose().matrix().isApprox(sphereRepresentation->getPose().matrix()));
 }

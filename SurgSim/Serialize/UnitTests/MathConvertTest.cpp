@@ -75,7 +75,7 @@ TEST_F(MathConvertTest, ConvertVector3dNodeTest)
 
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Vector3d actualv3d = innode.as<SurgSim::Math::Vector3d>();
-	EXPECT_EQ(actualv3d, vector3);
+	EXPECT_EQ(vector3, actualv3d);
 }
 
 
@@ -89,7 +89,7 @@ TEST_F(MathConvertTest, ConvertVector3dEmitterTest)
 
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Vector3d actualv3d = innode.as<SurgSim::Math::Vector3d>();
-	EXPECT_EQ(actualv3d, vector3);
+	EXPECT_EQ(vector3, actualv3d);
 }
 
 TEST_F(MathConvertTest, ConvertVector4dInvalidTest)
@@ -121,7 +121,7 @@ TEST_F(MathConvertTest, ConvertVector4dNodeTest)
 
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Vector4d actualv4d = innode.as<SurgSim::Math::Vector4d>();
-	EXPECT_EQ(actualv4d, vector4);
+	EXPECT_EQ(vector4, actualv4d);
 }
 
 TEST_F(MathConvertTest, ConvertVector4dEmitterTest)
@@ -134,7 +134,7 @@ TEST_F(MathConvertTest, ConvertVector4dEmitterTest)
 
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Vector4d actualv4d = innode.as<SurgSim::Math::Vector4d>();
-	EXPECT_EQ(actualv4d, vector4);
+	EXPECT_EQ(vector4, actualv4d);
 }
 TEST_F(MathConvertTest, ConvertQuaterniondInvalidTest)
 {
@@ -164,10 +164,10 @@ TEST_F(MathConvertTest, ConvertQuaterniondNodeTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Quaterniond actualQuat = innode.as<SurgSim::Math::Quaterniond>();
 
-	EXPECT_EQ(actualQuat.x(), quat.x());
-	EXPECT_EQ(actualQuat.y(), quat.y());
-	EXPECT_EQ(actualQuat.z(), quat.z());
-	EXPECT_EQ(actualQuat.w(), quat.w());
+	EXPECT_EQ(quat.x(), actualQuat.x());
+	EXPECT_EQ(quat.y(), actualQuat.y());
+	EXPECT_EQ(quat.z(), actualQuat.z());
+	EXPECT_EQ(quat.w(), actualQuat.w());
 }
 
 TEST_F(MathConvertTest, ConvertQuaterniondEmitterTest)
@@ -181,10 +181,10 @@ TEST_F(MathConvertTest, ConvertQuaterniondEmitterTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Quaterniond actualQuat = innode.as<SurgSim::Math::Quaterniond>();
 
-	EXPECT_EQ(actualQuat.x(), quat.x());
-	EXPECT_EQ(actualQuat.y(), quat.y());
-	EXPECT_EQ(actualQuat.z(), quat.z());
-	EXPECT_EQ(actualQuat.w(), quat.w());
+	EXPECT_EQ(quat.x(), actualQuat.x());
+	EXPECT_EQ(quat.y(), actualQuat.y());
+	EXPECT_EQ(quat.z(), actualQuat.z());
+	EXPECT_EQ(quat.w(), actualQuat.w());
 }
 
 TEST_F(MathConvertTest, ConvertMatrix33dInvalidTest)
@@ -225,7 +225,7 @@ TEST_F(MathConvertTest, ConvertMatrix33dNodeTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Matrix33d actualm33d = innode.as<SurgSim::Math::Matrix33d>();
 
-	EXPECT_EQ(actualm33d, mat33d);
+	EXPECT_EQ(mat33d, actualm33d);
 }
 
 TEST_F(MathConvertTest, ConvertMatrix33dEmitterTest)
@@ -243,7 +243,7 @@ TEST_F(MathConvertTest, ConvertMatrix33dEmitterTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Matrix33d actualm33d = innode.as<SurgSim::Math::Matrix33d>();
 
-	EXPECT_EQ(actualm33d, mat33d);
+	EXPECT_EQ(mat33d, actualm33d);
 }
 
 TEST_F(MathConvertTest, ConvertMatrix44dInvalidTest)
@@ -284,7 +284,7 @@ TEST_F(MathConvertTest, ConvertMatrix44dNodeTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Matrix44d actualm44d = innode.as<SurgSim::Math::Matrix44d>();
 
-	EXPECT_EQ(actualm44d, mat44d);
+	EXPECT_EQ(mat44d, actualm44d);
 }
 
 TEST_F(MathConvertTest, ConvertMatrix44dEmitterTest)
@@ -303,7 +303,7 @@ TEST_F(MathConvertTest, ConvertMatrix44dEmitterTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::Matrix44d actualm44d = innode.as<SurgSim::Math::Matrix44d>();
 
-	EXPECT_EQ(actualm44d, mat44d);
+	EXPECT_EQ(mat44d, actualm44d);
 }
 
 TEST_F(MathConvertTest, ConvertRigidTransform3dInvalidTest)
@@ -337,7 +337,7 @@ TEST_F(MathConvertTest, ConvertRigidTransform3dNodeTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::RigidTransform3d actualRigid = innode.as<SurgSim::Math::RigidTransform3d>();
 
-	EXPECT_EQ(actualRigid.matrix(), rigid.matrix());
+	EXPECT_EQ(rigid.matrix(), actualRigid.matrix());
 }
 
 TEST_F(MathConvertTest, ConvertRigidTransform3dEmitterTest)
@@ -355,5 +355,5 @@ TEST_F(MathConvertTest, ConvertRigidTransform3dEmitterTest)
 	YAML::Node innode = YAML::LoadFile(datafile);
 	SurgSim::Math::RigidTransform3d actualRigid = innode.as<SurgSim::Math::RigidTransform3d>();
 
-	EXPECT_EQ(actualRigid.matrix(), rigid.matrix());
+	EXPECT_EQ(rigid.matrix(), actualRigid.matrix());
 }
