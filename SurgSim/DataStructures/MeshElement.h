@@ -52,8 +52,10 @@ struct MeshElement
 	{
 	}
 
+	typedef std::array<unsigned int, N> IdType;
+
 	/// Element vertices.
-	std::array<unsigned int, N> verticesId;
+	IdType verticesId;
 	/// Extra element data.
 	Data data;
 
