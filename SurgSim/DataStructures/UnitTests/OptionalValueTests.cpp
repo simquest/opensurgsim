@@ -24,7 +24,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-TEST(TestableValueTests, InitTest)
+TEST(OptionalValueTests, InitTest)
 {
 	EXPECT_NO_THROW({OptionalValue<int> a;});
 	EXPECT_NO_THROW({OptionalValue<double> b(10.0);});
@@ -33,7 +33,7 @@ TEST(TestableValueTests, InitTest)
 	EXPECT_FALSE(a.hasValue());
 }
 
-TEST(TestableValueTests, AssertTest)
+TEST(OptionalValueTests, AssertTest)
 {
 	OptionalValue<std::shared_ptr<int>> a;
 
@@ -41,7 +41,7 @@ TEST(TestableValueTests, AssertTest)
 }
 
 
-TEST(TestableValueTests, SetValueTest)
+TEST(OptionalValueTests, SetValueTest)
 {
 	OptionalValue<double> a;
 	EXPECT_FALSE(a.hasValue());
@@ -53,6 +53,27 @@ TEST(TestableValueTests, SetValueTest)
 	a.invalidate();
 
 	EXPECT_FALSE(a.hasValue());
+}
+
+TEST(OptionalValueTests, ComparatorTest)
+{
+	OptionalValue<int> a;
+	OptionalValue<int> b;
+
+	// Unassigned should be not equal
+	EXPECT_TRUE(a == b);
+
+	a.setValue(10);
+	EXPECT_FALSE(a == b);
+
+	b.setValue(10);
+	EXPECT_TRUE(a == b);
+
+	b.setValue(20);
+	EXPECT_FALSE(a == b);
+
+	a.invalidate();
+	EXPECT_FALSE(a == b);
 }
 
 

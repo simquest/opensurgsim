@@ -62,6 +62,21 @@ public:
 		return m_value;
 	}
 
+	/// Equality operator.
+	/// \param	rhs	The right hand side.
+	/// \return	true if the parameters are considered equivalent.
+	bool operator==(const OptionalValue<T>& rhs) const
+	{
+		if (m_hasValue)
+		{
+			return m_value == rhs.m_value;
+		}
+		else
+		{
+			return m_hasValue == rhs.m_hasValue;
+		}
+	}
+
 private:
 	bool m_hasValue;
 	T m_value;
