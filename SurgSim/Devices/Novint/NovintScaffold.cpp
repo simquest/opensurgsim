@@ -777,7 +777,8 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 			// torque is then meaningless.
 			decompositionMatrix = fakeBasisMatrix.inverse();
 			decompositionMatrix.row(0) = Vector3d::Zero();
-			// Moreover, near the degenerate position the X axis free-spins but is aligned with Y, so we want to reduce Y torques as well.
+			// Moreover, near the degenerate position the X axis free-spins but is aligned with Y,
+			// so we want to reduce Y torques as well.
 			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
 			double ratio = 0;
 			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.

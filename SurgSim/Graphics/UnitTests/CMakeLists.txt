@@ -29,8 +29,8 @@ set(UNIT_TEST_SOURCES
 	OsgCapsuleRepresentationTests.cpp
 	OsgCylinderRepresentationTests.cpp
 	OsgGroupTests.cpp
-	OsgLogTests.cpp
 	OsgLightTests.cpp
+	OsgLogTests.cpp
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp

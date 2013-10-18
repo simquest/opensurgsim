@@ -72,7 +72,7 @@ public:
 
 	/// Set the external torque being applied to the rigid representation
 	/// Note this torque will be zeroed every update of the rigid representation
-	/// \param torque The external torque 
+	/// \param torque The external torque
 	/// \param K The angular stiffness matrix associated with the torque (jacobian of the torque w.r.t position)
 	/// \param D The angular damping matrix associated with the torque (jacobian of the torque w.r.t velocity)
 	void addExternalTorque(const SurgSim::Math::Vector3d& torque,
