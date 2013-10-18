@@ -56,7 +56,7 @@ private:
 	/// Returns the shared unit axes
 	static std::shared_ptr<OsgUnitAxes> getShareUnitAxes();
 
-	/// Hold the size 
+	/// Hold the size
 	double m_size;
 };
 

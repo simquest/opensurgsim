@@ -122,7 +122,7 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	viewElement->addComponent(sphereRepresentation);
 
 
-	std::shared_ptr<AxesRepresentation> axesRepresentation = 
+	std::shared_ptr<AxesRepresentation> axesRepresentation =
 		std::make_shared<OsgAxesRepresentation>("axes");
 	viewElement->addComponent(axesRepresentation);
 
