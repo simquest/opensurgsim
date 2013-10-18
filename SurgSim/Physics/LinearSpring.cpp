@@ -23,7 +23,7 @@ namespace Physics
 {
 
 LinearSpring::LinearSpring(unsigned int nodeId0, unsigned int nodeId1) :
-	Spring(), m_l0(0.0), m_stiffness(0.0), m_damping(0.0)
+	Spring(), m_restLength(0.0), m_stiffness(0.0), m_damping(0.0)
 {
 	m_nodeIds.push_back(nodeId0);
 	m_nodeIds.push_back(nodeId1);
@@ -58,14 +58,14 @@ double LinearSpring::getDamping() const
 	return m_damping;
 }
 
-void LinearSpring::setInitialLength(double l0)
+void LinearSpring::setRestLength(double restLength)
 {
-	m_l0 = l0;
+	m_restLength = restLength;
 }
 
 double LinearSpring::getInitialLength() const
 {
-	return m_l0;
+	return m_restLength;
 }
 
 const SurgSim::Math::Vector& LinearSpring::computeForce(const DeformableRepresentationState& state)
@@ -80,7 +80,7 @@ const SurgSim::Math::Vector& LinearSpring::computeForce(const DeformableRepresen
 
 	Vector3d f = x1 - x0;
 	double m_l = f.norm();
-	f *= (m_l - m_l0)/m_l * m_stiffness;
+	f *= (m_l - m_restLength)/m_l * m_stiffness;
 
 	SurgSim::Math::setSubVector( f, 0, 3, &m_f);
 	SurgSim::Math::setSubVector(-f, 1, 3, &m_f);
@@ -98,7 +98,7 @@ const SurgSim::Math::Matrix& LinearSpring::computeStiffness(const DeformableRepr
 	const SurgSim::Math::Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
 	SurgSim::Math::Vector3d u = x1 - x0;
 	double m_l = u.norm();
-	double lRatio = (m_l - m_l0) / m_l;
+	double lRatio = (m_l - m_restLength) / m_l;
 	u /= m_l;
 
 	SurgSim::Math::Matrix33d K00 = SurgSim::Math::Matrix33d::Identity() * (m_stiffness * lRatio);
@@ -128,7 +128,7 @@ void LinearSpring::computeFDK(const DeformableRepresentationState& state,
 	const SurgSim::Math::Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
 	SurgSim::Math::Vector3d u = x1 - x0;
 	double m_l = u.norm();
-	double lRatio = (m_l - m_l0) / m_l;
+	double lRatio = (m_l - m_restLength) / m_l;
 	u /= m_l;
 
 	SurgSim::Math::Matrix33d K00 = SurgSim::Math::Matrix33d::Identity() * (m_stiffness * lRatio);
@@ -139,7 +139,7 @@ void LinearSpring::computeFDK(const DeformableRepresentationState& state,
 	setSubMatrix( K00, 1, 1, 3, 3, &m_K);
 	*K = &m_K;
 
-	u *= (m_l - m_l0) * m_stiffness;
+	u *= (m_l - m_restLength) * m_stiffness;
 	setSubVector( u, 0, 3, &m_f);
 	setSubVector(-u, 1, 3, &m_f);
 	*f = &m_f;
@@ -155,7 +155,7 @@ bool LinearSpring::operator ==(const Spring& spring) const
 		return false;
 	}
 	return m_nodeIds == ls->m_nodeIds &&
-		m_l0 == ls->m_l0 && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
+		m_restLength == ls->m_restLength && m_stiffness == ls->m_stiffness && m_damping == ls->m_damping;
 }
 
 bool LinearSpring::operator !=(const Spring& spring) const

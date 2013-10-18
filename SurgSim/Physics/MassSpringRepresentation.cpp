@@ -48,6 +48,8 @@ MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
+
+	this->m_numDofPerNode = 3;
 }
 
 MassSpringRepresentation::~MassSpringRepresentation()

@@ -58,20 +58,17 @@ bool TransferDeformableStateToVerticesBehavior<VertexData>::doWakeUp()
 	return true;
 }
 
-
 template <class VertexData>
 void TransferDeformableStateToVerticesBehavior<VertexData>::transfer()
 {
-	using SurgSim::Math::getSubVector;
+	const unsigned int numNodes = m_from->getNumNodes();
 
-	const SurgSim::Math::Vector& x = m_from->getPositions();
-	const unsigned int numNodes = x.size() / m_numDofPerNode;
-
-	if (m_to->getNumVertices() == 0 && numNodes)
+	// If vertices is empty, let's populate it properly
+	if (m_to->getNumVertices() == 0 && numNodes != 0)
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{
-			SurgSim::DataStructures::Vertex<void> v(getSubVector(x, nodeId, m_numDofPerNode));
+			SurgSim::DataStructures::Vertex<VertexData> v(m_from->getPosition(nodeId), VertexData());
 			m_to->addVertex(v);
 		}
 	}
@@ -79,10 +76,13 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::transfer()
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{
-			m_to->setVertexPosition(nodeId, getSubVector(x, nodeId, m_numDofPerNode));
+			m_to->setVertexPosition(nodeId, m_from->getPosition(nodeId));
 		}
 	}
 }
+
+template <>
+void TransferDeformableStateToVerticesBehavior<void>::transfer();
 
 }; //namespace Blocks
 

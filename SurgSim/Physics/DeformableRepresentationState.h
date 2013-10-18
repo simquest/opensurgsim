@@ -58,12 +58,17 @@ public:
 	void reset();
 
 	/// Allocates the state for a given number of degrees of freedom
-	/// \param numDof The number of degrees of freedom to account for
-	void setNumDof(unsigned int numDof);
+	/// \param numDofPerNode The number of degrees of freedom per node to account for
+	/// \param numNodes The number of nodes to account for
+	void setNumDof(unsigned int numDofPerNode, unsigned int numNodes);
 
 	/// Retrieves the number of degrees of freedom
 	/// \return The number of DOF for this deformable representation
 	unsigned int getNumDof() const;
+
+	/// Retrieves the number of nodes
+	/// \return The number of nodes for this deformable representation
+	unsigned int getNumNodes() const;
 
 	/// Retrieves all degrees of freedom's position (non-const version)
 	/// \return Vector of collected DOF's position
@@ -73,6 +78,12 @@ public:
 	/// \return Vector of collected DOF's position
 	const SurgSim::Math::Vector& getPositions() const;
 
+	/// Retrieves the position of a given node (const version)
+	/// \param nodeId The desired node id for which the position is requested (must be a valid id)
+	/// \return The position of the node nodeId
+	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
+	const SurgSim::Math::Vector3d getPosition(unsigned int nodeId) const;
+
 	/// Retrieves all degrees of freedom's velocity (non-const version)
 	/// \return Vector of collected DOF's velocity
 	SurgSim::Math::Vector& getVelocities();
@@ -81,6 +92,12 @@ public:
 	/// \return Vector of collected DOF's velocity
 	const SurgSim::Math::Vector& getVelocities() const;
 
+	/// Retrieves the velocity of a given node (const version)
+	/// \param nodeId The desired node id for which the velocity is requested (must be a valid id)
+	/// \return The velocity of the node nodeId
+	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
+	const SurgSim::Math::Vector3d getVelocity(unsigned int nodeId) const;
+
 	/// Retrieves all degrees of freedom's acceleration (non-const version)
 	/// \return Vector of collected DOF's acceleration
 	SurgSim::Math::Vector& getAccelerations();
@@ -88,6 +105,12 @@ public:
 	/// Retrieves all degrees of freedom's acceleration (const version)
 	/// \return Vector of collected DOF's acceleration
 	const SurgSim::Math::Vector& getAccelerations() const;
+
+	/// Retrieves the acceleration of a given node (const version)
+	/// \param nodeId The desired node id for which the acceleration is requested (must be a valid id)
+	/// \return The acceleration of the node nodeId
+	/// \note Behavior undefined if the nodeId is not in the correct range [0 getNumNodes()-1]
+	const SurgSim::Math::Vector3d getAcceleration(unsigned int nodeId) const;
 
 	/// Adds a boundary condition on a given dof
 	/// \param dof The dof to set as a boundary condition
@@ -119,6 +142,9 @@ public:
 
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose
+
+	/// Keep track of the number of degrees of freedom per node and the number of nodes
+	unsigned int m_numDofPerNode, m_numNodes;
 
 	/// Degrees of freedom position
 	SurgSim::Math::Vector m_x;

@@ -68,14 +68,6 @@ public:
 		double stiffnessVolumeDiagonal, double dampingVolumeDiagonal);
 
 private:
-	/// Helper method to initialize/add a spring
-	/// \param state The state to initialize the springs with (rest lengths calculation)
-	/// \param nodeId0, nodeId1 Node ids of the 2 connected masses
-	/// \param stiffness, damping The spring parameters
-	void initSpring(const std::shared_ptr<DeformableRepresentationState> state,
-		unsigned int nodeId0, unsigned int nodeId1,
-		double stiffness, double damping);
-
 	/// Helper method to initialize/add all stretching springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions

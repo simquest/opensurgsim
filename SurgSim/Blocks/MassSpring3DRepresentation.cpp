@@ -14,9 +14,8 @@
 // limitations under the License.
 
 #include <SurgSim/Blocks/MassSpring3DRepresentation.h>
-#include <SurgSim//Physics/LinearSpring.h>
+#include <SurgSim/Blocks/MassSpringNDRepresentationUtils.h>
 
-using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::Mass;
 
 namespace SurgSim
@@ -24,21 +23,6 @@ namespace SurgSim
 
 namespace Blocks
 {
-
-void MassSpring3DRepresentation::initSpring(const std::shared_ptr<DeformableRepresentationState> state,
-	unsigned int nodeId0, unsigned int nodeId1,
-	double stiffness, double damping)
-{
-	std::shared_ptr<LinearSpring> spring = std::make_shared<LinearSpring>(nodeId0, nodeId1);
-
-	const Vector3d& A = SurgSim::Math::getSubVector(state->getPositions(), nodeId0, 3);
-	const Vector3d& B = SurgSim::Math::getSubVector(state->getPositions(), nodeId1, 3);
-	spring->setStiffness(stiffness);
-	spring->setDamping(damping);
-	spring->setInitialLength((B-A).norm());
-
-	addSpring(spring);
-}
 
 void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<DeformableRepresentationState> state,
 	unsigned int numNodesPerDim[3], double stiffness, double damping)
@@ -58,7 +42,7 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<D
 				for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + colOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + colOffset, stiffness, damping));
 				}
 			}
 		}
@@ -70,7 +54,7 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<D
 				for (unsigned int row = 0; row < numNodesPerDim[1] - 1; row++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + rowOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + rowOffset, stiffness, damping));
 				}
 			}
 		}
@@ -82,7 +66,7 @@ void MassSpring3DRepresentation::init3DStretchingSprings(const std::shared_ptr<D
 				for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + depthOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + depthOffset, stiffness, damping));
 				}
 			}
 		}
@@ -107,7 +91,7 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Defo
 				for (unsigned int col = 0; col < numNodesPerDim[0] - 2; col++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + 2 * colOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + 2 * colOffset, stiffness, damping));
 				}
 			}
 		}
@@ -119,7 +103,7 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Defo
 				for (unsigned int row = 0; row < numNodesPerDim[1] - 2; row++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + 2 * rowOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + 2 * rowOffset, stiffness, damping));
 				}
 			}
 		}
@@ -131,7 +115,7 @@ void MassSpring3DRepresentation::init3DBendingSprings(const std::shared_ptr<Defo
 				for (unsigned int depth = 0; depth < numNodesPerDim[2] - 2; depth++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + 2 * depthOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + 2 * depthOffset, stiffness, damping));
 				}
 			}
 		}
@@ -156,8 +140,8 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 				for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + rowOffset + colOffset, stiffness, damping);
-					initSpring(state, nodeId + colOffset, nodeId + rowOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + rowOffset + colOffset, stiffness, damping));
+					addSpring(createLinearSpring(state, nodeId + colOffset, nodeId + rowOffset, stiffness, damping));
 				}
 			}
 		}
@@ -169,8 +153,8 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 				for (unsigned int col = 0; col < numNodesPerDim[0] - 1; col++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + depthOffset + colOffset, stiffness, damping);
-					initSpring(state, nodeId + colOffset, nodeId + depthOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + depthOffset + colOffset, stiffness, damping));
+					addSpring(createLinearSpring(state, nodeId + colOffset, nodeId + depthOffset, stiffness, damping));
 				}
 			}
 		}
@@ -182,8 +166,8 @@ void MassSpring3DRepresentation::init3DFaceDiagonalSprings(const std::shared_ptr
 				for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + depthOffset + rowOffset, stiffness, damping);
-					initSpring(state, nodeId + rowOffset, nodeId + depthOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + depthOffset + rowOffset, stiffness, damping));
+					addSpring(createLinearSpring(state, nodeId + rowOffset, nodeId + depthOffset, stiffness, damping));
 				}
 			}
 		}
@@ -197,6 +181,10 @@ void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_p
 	const int rowOffset = numNodesPerDim[0];
 	const int colOffset = 1;
 
+	// For convenience
+	double &s = stiffness;
+	double &d = damping;
+
 	// Initialize the volume diagonal springs
 	if (stiffness || damping)
 	{
@@ -207,10 +195,10 @@ void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_p
 				for (unsigned int depth = 0; depth < numNodesPerDim[2] - 1; depth++)
 				{
 					unsigned int nodeId = depth * depthOffset + row * rowOffset + col * colOffset;
-					initSpring(state, nodeId, nodeId + depthOffset + rowOffset + colOffset, stiffness, damping);
-					initSpring(state, nodeId + colOffset, nodeId + depthOffset + rowOffset, stiffness, damping);
-					initSpring(state, nodeId + rowOffset, nodeId + depthOffset + colOffset, stiffness, damping);
-					initSpring(state, nodeId + rowOffset + colOffset, nodeId + depthOffset, stiffness, damping);
+					addSpring(createLinearSpring(state, nodeId, nodeId + depthOffset + rowOffset + colOffset, s, d));
+					addSpring(createLinearSpring(state, nodeId + colOffset, nodeId + depthOffset + rowOffset, s, d));
+					addSpring(createLinearSpring(state, nodeId + rowOffset, nodeId + depthOffset + colOffset, s, d));
+					addSpring(createLinearSpring(state, nodeId + rowOffset + colOffset, nodeId + depthOffset, s, d));
 				}
 			}
 		}
@@ -228,7 +216,7 @@ void MassSpring3DRepresentation::init3D(
 {
 	std::shared_ptr<DeformableRepresentationState> state;
 	state = std::make_shared<DeformableRepresentationState>();
-	state->setNumDof(numNodesPerDim[0] * numNodesPerDim[1] * numNodesPerDim[2] * 3);
+	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0] * numNodesPerDim[1] * numNodesPerDim[2]);
 
 	// Nodes distribution is done by column 1st, row 2nd, depth 3rd
 	// Example: given a nodeId

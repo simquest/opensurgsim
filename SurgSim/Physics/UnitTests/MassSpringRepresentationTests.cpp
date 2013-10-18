@@ -72,7 +72,7 @@ public:
 			spring->setStiffness(springStiffness);
 			const Vector3d& xi = getSubVector(state->getPositions(), i, 3);
 			const Vector3d& xj = getSubVector(state->getPositions(), i+1, 3);
-			spring->setInitialLength( (xj - xi).norm() );
+			spring->setRestLength( (xj - xi).norm() );
 			addSpring(spring);
 		}
 		setInitialState(state);
@@ -195,7 +195,7 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	std::shared_ptr<LinearSpring> spring0 = std::make_shared<LinearSpring>(0, 1);
 	spring0->setStiffness(1.0);
 	spring0->setDamping(1.0);
-	spring0->setInitialLength(1.0);
+	spring0->setRestLength(1.0);
 	m.addSpring(spring0);
 	EXPECT_EQ(1u, m.getNumSprings());
 	EXPECT_EQ(spring0, m.getSpring(0));
@@ -261,7 +261,7 @@ TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 		MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 
 	// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
-	std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setInitialLength(0.0);
+	std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
 	m.setIsGravityEnabled(false);
 
 	// Frequency = 1/(2PI) sqrt(k / m)

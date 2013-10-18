@@ -14,9 +14,8 @@
 // limitations under the License.
 
 #include <SurgSim/Blocks/MassSpring1DRepresentation.h>
-#include <SurgSim//Physics/LinearSpring.h>
+#include <SurgSim/Blocks/MassSpringNDRepresentationUtils.h>
 
-using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::Mass;
 
 namespace SurgSim
@@ -24,21 +23,6 @@ namespace SurgSim
 
 namespace Blocks
 {
-
-void MassSpring1DRepresentation::initSpring(const std::shared_ptr<DeformableRepresentationState> state,
-	unsigned int nodeId0, unsigned int nodeId1,
-	double stiffness, double damping)
-{
-	std::shared_ptr<LinearSpring> spring = std::make_shared<LinearSpring>(nodeId0, nodeId1);
-
-	const Vector3d& A = SurgSim::Math::getSubVector(state->getPositions(), nodeId0, 3);
-	const Vector3d& B = SurgSim::Math::getSubVector(state->getPositions(), nodeId1, 3);
-	spring->setStiffness(stiffness);
-	spring->setDamping(damping);
-	spring->setInitialLength((B-A).norm());
-
-	addSpring(spring);
-}
 
 void MassSpring1DRepresentation::init1D(
 	const Vector3d extremities[2], unsigned int numNodesPerDim[1],
@@ -49,7 +33,7 @@ void MassSpring1DRepresentation::init1D(
 {
 	std::shared_ptr<DeformableRepresentationState> state;
 	state = std::make_shared<DeformableRepresentationState>();
-	state->setNumDof(numNodesPerDim[0] * 3);
+	state->setNumDof(getNumDofPerNode(), numNodesPerDim[0]);
 
 	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes incorrect: " << numNodesPerDim[0];
 
@@ -69,7 +53,7 @@ void MassSpring1DRepresentation::init1D(
 	{
 		for (unsigned int massId = 0; massId < numNodesPerDim[0] - 1; massId++)
 		{
-			initSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching);
+			addSpring(createLinearSpring(state, massId, massId + 1, stiffnessStretching, dampingStretching));
 		}
 	}
 
@@ -78,7 +62,7 @@ void MassSpring1DRepresentation::init1D(
 	{
 		for (unsigned int massId = 0; massId < numNodesPerDim[0] - 2; massId++)
 		{
-			initSpring(state, massId, massId + 2, stiffnessBending, dampingBending);
+			addSpring(createLinearSpring(state, massId, massId + 2, stiffnessBending, dampingBending));
 		}
 	}
 

@@ -95,6 +95,10 @@ public:
 	/// \return The final state of this deformable representation
 	const std::shared_ptr<DeformableRepresentationState> getFinalState() const;
 
+	/// Gets the number of degrees of freedom per node
+	/// \return The number of degrees of freedom per node for this Deformable Representation
+	unsigned int getNumDofPerNode() const;
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
@@ -126,6 +130,10 @@ protected:
 
 	/// Stiffness matrix (templatized type for performance reason)
 	KType m_K;
+
+	/// Number of degrees of freedom per node (varies per deformable model)
+	/// \note MUST be set by the derived classes
+	unsigned int m_numDofPerNode;
 
 private:
 	/// NO copy constructor

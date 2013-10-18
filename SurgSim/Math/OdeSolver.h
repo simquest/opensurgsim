@@ -79,7 +79,8 @@ public:
 	const Matrix& getCompliance() const;
 
 protected:
-	/// Name for this solver (will be given by the derived classes)
+	/// Name for this solver
+	/// \note MUST be set by the derived classes
 	std::string m_name;
 
 	/// Allocates the system and compliance matrices

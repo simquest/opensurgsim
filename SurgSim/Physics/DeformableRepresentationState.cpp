@@ -50,8 +50,13 @@ void DeformableRepresentationState::reset()
 	m_boundaryConditionsAsDofIds.clear();
 }
 
-void DeformableRepresentationState::setNumDof(unsigned int numDof)
+void DeformableRepresentationState::setNumDof(unsigned int numDofPerNode, unsigned int numNodes)
 {
+	const unsigned int numDof = numDofPerNode * numNodes;
+
+	m_numDofPerNode = numDofPerNode;
+	m_numNodes = numNodes;
+
 	m_x.resize(numDof);
 	m_v.resize(numDof);
 	m_a.resize(numDof);
@@ -63,10 +68,17 @@ void DeformableRepresentationState::setNumDof(unsigned int numDof)
 
 unsigned int DeformableRepresentationState::getNumDof() const
 {
-	SURGSIM_ASSERT(m_x.size() == m_v.size() && m_x.size() == m_a.size() &&
-		m_x.size() == m_boundaryConditionsPerDof.size());
+	const unsigned int numDof = m_numDofPerNode * m_numNodes;
 
-	return static_cast<unsigned int>(m_x.size());
+	SURGSIM_ASSERT(m_x.size() == m_v.size() && m_x.size() == m_a.size() &&
+		m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() == numDof);
+
+	return numDof;
+}
+
+unsigned int DeformableRepresentationState::getNumNodes() const
+{
+	return m_numNodes;
 }
 
 SurgSim::Math::Vector& DeformableRepresentationState::getPositions()
@@ -79,6 +91,11 @@ const SurgSim::Math::Vector& DeformableRepresentationState::getPositions() const
 	return m_x;
 }
 
+const SurgSim::Math::Vector3d DeformableRepresentationState::getPosition(unsigned int nodeId) const
+{
+	return SurgSim::Math::getSubVector(m_x, nodeId, m_numDofPerNode);
+}
+
 SurgSim::Math::Vector& DeformableRepresentationState::getVelocities()
 {
 	return m_v;
@@ -89,6 +106,11 @@ const SurgSim::Math::Vector& DeformableRepresentationState::getVelocities() cons
 	return m_v;
 }
 
+const SurgSim::Math::Vector3d DeformableRepresentationState::getVelocity(unsigned int nodeId) const
+{
+	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode);
+}
+
 SurgSim::Math::Vector& DeformableRepresentationState::getAccelerations()
 {
 	return m_a;
@@ -97,6 +119,11 @@ SurgSim::Math::Vector& DeformableRepresentationState::getAccelerations()
 const SurgSim::Math::Vector& DeformableRepresentationState::getAccelerations() const
 {
 	return m_a;
+}
+
+const SurgSim::Math::Vector3d DeformableRepresentationState::getAcceleration(unsigned int nodeId) const
+{
+	return SurgSim::Math::getSubVector(m_a, nodeId, m_numDofPerNode);
 }
 
 void DeformableRepresentationState::addBoundaryCondition(unsigned int dof)

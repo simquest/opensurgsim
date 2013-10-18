@@ -49,7 +49,7 @@ TEST(LinearSpringTests, SetGetMethods)
 	ASSERT_DOUBLE_EQ(0.45, ls.getDamping());
 
 	// Rest length getter/setter
-	ls.setInitialLength(1.23);
+	ls.setRestLength(1.23);
 	ASSERT_DOUBLE_EQ(1.23, ls.getInitialLength());
 
 	// Operator ==/!= (with same node Ids)
@@ -59,7 +59,7 @@ TEST(LinearSpringTests, SetGetMethods)
 	ASSERT_TRUE(ls != ls2);
 	ls2.setDamping(ls.getDamping());
 	ASSERT_TRUE(ls != ls2);
-	ls2.setInitialLength(ls.getInitialLength());
+	ls2.setRestLength(ls.getInitialLength());
 	ASSERT_TRUE(ls == ls2);
 	ls2.setDamping(ls.getDamping() + 0.55);
 	ASSERT_TRUE(ls != ls2);
@@ -74,7 +74,7 @@ TEST(LinearSpringTests, SetGetMethods)
 	ASSERT_TRUE(ls != ls3);
 	ls3.setDamping(ls.getDamping());
 	ASSERT_TRUE(ls != ls3);
-	ls3.setInitialLength(ls.getInitialLength());
+	ls3.setRestLength(ls.getInitialLength());
 	ASSERT_TRUE(ls != ls3);
 }
 
@@ -86,7 +86,7 @@ TEST(LinearSpringTests, computeMethods)
 	LinearSpring ls(0, 1);
 	ls.setStiffness(0.34);
 	ls.setDamping(0.45);
-	ls.setInitialLength(1.23);
+	ls.setRestLength(1.23);
 
 	// Calculating spring force
 	Vector3d expectedF3D(0.58375208191171812, 1.0406015373208888, 0.30456630360611381);

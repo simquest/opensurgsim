@@ -49,8 +49,8 @@ public:
 	double getDamping() const;
 
 	/// Sets the rest length of the spring
-	/// \param l0 The rest length to assign to the spring (in m)
-	void setInitialLength(double l0);
+	/// \param restLength The rest length to assign to the spring (in m)
+	void setRestLength(double restLength);
 
 	/// Gets the rest length of the spring
 	/// \return The rest length assigned to the spring (in m)
@@ -97,7 +97,7 @@ public:
 
 private:
 	/// Rest length (in m)
-	double m_l0;
+	double m_restLength;
 
 	/// Stiffness parameters (in N.m-1)
 	double m_stiffness;

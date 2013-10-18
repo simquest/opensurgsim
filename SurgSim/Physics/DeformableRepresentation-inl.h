@@ -26,7 +26,7 @@ namespace Physics
 
 template <class M, class D, class K>
 DeformableRepresentation<M,D,K>::DeformableRepresentation(const std::string& name) :
-Representation(name)
+Representation(name), m_numDofPerNode(0)
 {
 	m_initialPose.setIdentity();
 	m_identityPose.setIdentity();
@@ -109,6 +109,12 @@ template <class M, class D, class K>
 const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M,D,K>::getFinalState() const
 {
 	return m_finalState;
+}
+
+template <class M, class D, class K>
+unsigned int DeformableRepresentation<M,D,K>::getNumDofPerNode() const
+{
+	return m_numDofPerNode;
 }
 
 }; // namespace Physics
