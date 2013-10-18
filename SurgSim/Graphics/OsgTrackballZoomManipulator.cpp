@@ -17,9 +17,9 @@
 #include <osgUtil/UpdateVisitor>
 
 /// Calculate the key code value of Ctrl-{character}, given the uppercase character.
-/// If a key is pressed while holding Ctrl, OSG "helpfully" gives you the key code of the control character 
+/// If a key is pressed while holding Ctrl, OSG "helpfully" gives you the key code of the control character
 /// (i.e. ^A == 1) instead of the key itself ('A' == 65).
-/// To cope with this, you can use CONTROL_CHAR_FROM_UPPERCASE('A') which is easier to read than 
+/// To cope with this, you can use CONTROL_CHAR_FROM_UPPERCASE('A') which is easier to read than
 /// strange character ('\001') or integral (1) constants.
 #define CONTROL_CHAR_FROM_UPPERCASE(uppercaseCharacter)   ((uppercaseCharacter) - ('A' - 1))
 
@@ -164,13 +164,13 @@ bool OsgTrackballZoomManipulator::handle(
 			case CONTROL_CHAR_FROM_UPPERCASE('U'):
 				{
 					// ctrl-U makes the camera upright, so that the up axis points up
-					if ((mask & osgGA::GUIEventAdapter::MODKEY_CTRL) && 
-						!(mask & osgGA::GUIEventAdapter::MODKEY_ALT) && 
+					if ((mask & osgGA::GUIEventAdapter::MODKEY_CTRL) &&
+						!(mask & osgGA::GUIEventAdapter::MODKEY_ALT) &&
 						!(mask & osgGA::GUIEventAdapter::MODKEY_SHIFT))
 					{
 						makeUpright();
 					}
-				}				
+				}
 				break;
 			}
 		}
