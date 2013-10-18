@@ -17,8 +17,9 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Graphics/OsgSceneryRepresentation.h>
 
-#include <osgDB/ReadFile>
+#include <osg/PositionAttitudeTransform>
 #include <osg/Switch>
+#include <osgDB/ReadFile>
 
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::OsgRepresentation;
@@ -42,7 +43,7 @@ bool OsgSceneryRepresentation::doInitialize()
 	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
 	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << m_fileName << std::endl;
 
-	m_switch->addChild(m_sceneryRepresentation);
+	m_transform->addChild(m_sceneryRepresentation);
 	return true;
 }
 
