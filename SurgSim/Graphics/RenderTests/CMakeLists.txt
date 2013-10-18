@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	OsgCapsuleRepresentationRenderTests.cpp
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
+	OsgMeshRepresentationRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
@@ -39,11 +40,18 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	RenderTest.h
+	TestCube.h
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-set(LIBS SurgSimFramework SurgSimGraphics SurgSimTesting gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+
+set(LIBS SurgSimFramework SurgSimGraphics SurgSimTesting SurgSimBlocks gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires a window system and is disabled by
