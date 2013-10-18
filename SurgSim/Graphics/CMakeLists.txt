@@ -22,6 +22,7 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
+	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
 	OsgCapsuleRepresentation.cpp
@@ -44,6 +45,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTextureRectangle.cpp
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
+	OsgUnitAxes.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	Representation.cpp
@@ -51,6 +53,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
+	AxesRepresentation.h
 	BoxRepresentation.h
 	Camera.h
 	CapsuleRepresentation.h
@@ -59,6 +62,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Light.h
 	Manager.h
 	Material.h
+	OsgAxesRepresentation.h
 	OsgBoxRepresentation.h
 	OsgCamera.h
 	OsgCapsuleRepresentation.h
@@ -95,6 +99,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUniform-inl.h
 	OsgUniformBase.h
 	OsgUniformTypes.h
+	OsgUnitAxes.h
 	OsgUnitBox.h
 	OsgUnitCylinder.h
 	OsgUnitSphere.h
