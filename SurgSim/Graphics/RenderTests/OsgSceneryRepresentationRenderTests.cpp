@@ -55,7 +55,7 @@ struct OsgSceneryRepresentationRenderTests : public ::testing::Test
 
 		manager->getDefaultCamera()->setInitialPose(
 			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(),
-											  SurgSim::Math::Vector3d(0.0, 0.5, 200.0)));
+											  SurgSim::Math::Vector3d(0.0, 0.5, 10.0)));
 	}
 
 	virtual void TearDown()
@@ -71,10 +71,13 @@ struct OsgSceneryRepresentationRenderTests : public ::testing::Test
 
 TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 {
-	std::shared_ptr<OsgSceneryRepresentation> sceneryObject =
-		std::make_shared<OsgSceneryRepresentation>("Table");
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/table_extension.obj");
+	auto sceneryObject = std::make_shared<OsgSceneryRepresentation>("Cube");
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/cube.obj");
 	viewElement->addComponent(sceneryObject);
+
+	auto sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("Box");
+	sceneryObject2->setFileName("OsgSceneryRepresentationTests/box.osgb");
+	viewElement->addComponent(sceneryObject2);
 
 	runtime->start();
 

@@ -38,12 +38,14 @@ public:
 	virtual void SetUp() override
 	{
 		sceneryObject = std::make_shared<OsgSceneryRepresentation>("test");
+		sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("test2");
 		runtime = std::make_shared<SurgSim::Framework::Runtime>();
 		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 		scene = std::make_shared<SurgSim::Framework::Scene>();
 		viewElement = std::make_shared<OsgViewElement>("view element");
 
 		viewElement->addComponent(sceneryObject);
+		viewElement->addComponent(sceneryObject2);
 		scene->addSceneElement(viewElement);
 		runtime->addManager(manager);
 		runtime->setScene(scene);
@@ -54,6 +56,7 @@ public:
 	}
 
 	std::shared_ptr<SurgSim::Graphics::OsgSceneryRepresentation> sceneryObject;
+	std::shared_ptr<SurgSim::Graphics::OsgSceneryRepresentation> sceneryObject2;
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
 	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
 	std::shared_ptr<SurgSim::Framework::Scene> scene;
@@ -62,14 +65,17 @@ public:
 
 TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 {
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/table_extension.obj");
-	EXPECT_EQ("OsgSceneryRepresentationTests/table_extension.obj", sceneryObject->getFileName());
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/cube.obj");
+	EXPECT_EQ("OsgSceneryRepresentationTests/cube.obj", sceneryObject->getFileName());
 }
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/table_extension.obj");
+	sceneryObject->setFileName("OsgSceneryRepresentationTests/cube.obj");
 	ASSERT_NO_THROW(sceneryObject->initialize(runtime));
+
+	sceneryObject2->setFileName("OsgSceneryRepresentationTests/box.osgb");
+	ASSERT_NO_THROW(sceneryObject2->initialize(runtime));
 }
 
 
