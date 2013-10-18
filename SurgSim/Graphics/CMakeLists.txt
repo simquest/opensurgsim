@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
