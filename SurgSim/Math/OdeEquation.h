@@ -46,6 +46,10 @@ public:
 	virtual ~OdeEquation()
 	{}
 
+	/// Retrieves the ode initial conditions (x0, v0) (i.e. the initial state)
+	/// \return The initial state
+	const std::shared_ptr<State> getInitialState() const;
+
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
@@ -80,6 +84,11 @@ public:
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
 	virtual void computeFMDK(const State& state, Vector** f, MT** M, DT** D, KT** K) = 0;
+
+protected:
+	/// The initial state (which defines the ODE initial conditions (x0, v0))
+	/// \note MUST be set by the derived classes
+	std::shared_ptr<State> m_initialState;
 };
 
 }; // namespace Math

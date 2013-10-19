@@ -23,6 +23,9 @@
 
 #include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/DeformableRepresentationState.h>
+#include <SurgSim/Math/OdeEquation.h>
+
+using SurgSim::Math::OdeEquation;
 
 namespace SurgSim
 {
@@ -31,12 +34,20 @@ namespace Physics
 {
 
 /// Base class for all deformable representations MassSprings, Finite Element Models,...
-/// \note It holds the representation states (common to all deformable)
-/// \note It holds the initial pose (the pose is always identity and therefore cannot be set)
-/// \note   -> the initial pose should be set before setting the initial state so the state can be properly transformed
+/// \note It is both a Physics::Representation and a Math::OdeEquation
+/// \note It holds the representation states (common to all deformable) except the initial state,
+/// \note   which is being held by the OdeEquation (initial condition of the ode problem).
+/// \note It holds the initial pose, which should be set before setting the initial state so the states
+/// \note   can be properly transformed.
+/// \note The current pose is always identity and therefore cannot be set. Calling setPose will result
+/// \note   raise an exception.
 /// \note It holds the force vector; the mass, damping and stiffness matrices (templated type)
-template <class MType, class DType, class KType>
-class DeformableRepresentation : public Representation
+/// \note Derived classes must implement the Representation API and the OdeEquation API, also set
+/// \note   m_numDofPerNode and call Representation::setNumDof()
+template <class MType, class DType, class KType, class SType>
+class DeformableRepresentation :
+	public Representation,
+	public OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>
 {
 public:
 	/// Constructor
@@ -79,9 +90,9 @@ public:
 	/// \note All states are transformed by the initialPose, if any as been specified prior to calling this method
 	void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState);
 
-	/// Get the initial state (in the global frame)
-	/// \return The initial state of this deformable representation
-	const std::shared_ptr<DeformableRepresentationState> getInitialState() const;
+	///// Get the initial state (in the global frame)
+	///// \return The initial state of this deformable representation
+	//const std::shared_ptr<DeformableRepresentationState> getInitialState() const;
 
 	/// Get the current state (in the global frame)
 	/// \return The current state of this deformable representation
@@ -106,12 +117,13 @@ protected:
 	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
 		const SurgSim::Math::RigidTransform3d& transform) = 0;
 
-	/// Initial state (used for reseting the state), and final state (last valid state)
-	std::shared_ptr<DeformableRepresentationState> m_initialState, m_finalState;
-
 	/// Previous, current and new states (internal use)
 	/// New state is a temporary variable to store the newly computed state
 	std::shared_ptr<DeformableRepresentationState> m_previousState, m_currentState, m_newState;
+
+	/// Last valid state (a.k.a final state)
+	/// Backup of the last valid state for safe access from other thread while the current state is being recomputed.
+	std::shared_ptr<DeformableRepresentationState> m_finalState;
 
 	/// Initial pose that will transform the state on setup
 	SurgSim::Math::RigidTransform3d m_initialPose;

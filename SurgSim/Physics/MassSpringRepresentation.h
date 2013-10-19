@@ -45,11 +45,9 @@ namespace Physics
 /// MassSpring model is a deformable model (a set of masses connected by springs).
 /// \note The class can handle 3 type of numerical integration scheme (Euler explicit, modified and implicit).
 /// \note The model handles damping through the Rayleigh damping (damping is a combination of mass and stiffness).
-/// \note It is a DeformableRepresentation
-/// \note It is a OdeEquation (defines a dynamic system M.a=F(x,v)) with M diagonal
-class MassSpringRepresentation:
-	public DeformableRepresentation<DiagonalMatrix, Matrix, Matrix>,
-	public OdeEquation<DeformableRepresentationState, DiagonalMatrix, Matrix, Matrix, Matrix>
+/// \note It is a DeformableRepresentation (Physics::Representation + Math::OdeEquation)
+/// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
+class MassSpringRepresentation: public DeformableRepresentation<DiagonalMatrix, Matrix, Matrix, Matrix>
 {
 public:
 	/// The diverse numerical integration scheme supported

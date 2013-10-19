@@ -22,6 +22,7 @@ set(SURGSIM_MATH_SOURCES
 	LinearSolveAndInverse.cpp
 	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
+	OdeEquation.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
