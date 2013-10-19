@@ -161,15 +161,15 @@ void  DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 		{
 		case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(*this);
+				<ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(*this);
+				<ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
 			m_odeSolver = std::make_shared
-				<ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(*this);
+				<ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		default:
 			SURGSIM_ASSERT(m_odeSolver) <<

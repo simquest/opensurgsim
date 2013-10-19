@@ -24,7 +24,7 @@ namespace Math
 
 template <class State, class MT, class DT, class KT, class ST>
 ImplicitEuler<State, MT, DT, KT, ST>::ImplicitEuler(
-	OdeEquation<State, MT, DT, KT, ST>& equation) :
+	OdeEquation<State, MT, DT, KT, ST>* equation) :
 	OdeSolver<State, MT, DT, KT, ST>(equation)
 {
 	this->m_name = "Implicit Euler";

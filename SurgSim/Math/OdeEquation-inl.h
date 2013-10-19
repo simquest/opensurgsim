@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_MATH_ODEEQUATION_INL_H
+#define SURGSIM_MATH_ODEEQUATION_INL_H
+
 #include <SurgSim/Math/OdeEquation.h>
 
 namespace SurgSim
@@ -30,3 +33,5 @@ const std::shared_ptr<State> OdeEquation<State, MT, DT, KT, ST>::getInitialState
 }; // namespace Math
 
 }; // namespace SurgSim
+
+#endif // SURGSIM_MATH_ODEEQUATION_INL_H

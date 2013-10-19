@@ -21,7 +21,8 @@ include_directories(
 set(SURGSIM_MATH_SOURCES
 	LinearSolveAndInverse.cpp
 	Matrix.cpp
-	MlcpGaussSeidelSolver.cpp)
+	MlcpGaussSeidelSolver.cpp
+)
 
 set(SURGSIM_MATH_HEADERS
 	Geometry.h

@@ -48,7 +48,7 @@ class ModifiedExplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	ModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation);
+	ModifiedExplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	/// Solves the equation
 	/// \param dt The time step

@@ -51,7 +51,7 @@ class ExplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	ExplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation);
+	ExplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	/// Solves the equation
 	/// \param dt The time step

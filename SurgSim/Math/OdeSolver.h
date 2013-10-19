@@ -60,7 +60,7 @@ class OdeSolver
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	OdeSolver(OdeEquation<State, MT, DT, KT, ST>& equation);
+	OdeSolver(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	/// Virtual destructor
 	virtual ~OdeSolver()

@@ -24,7 +24,7 @@ namespace Math
 
 template <class State, class MT, class DT, class KT, class ST>
 ModifiedExplicitEuler<State, MT, DT, KT, ST>::ModifiedExplicitEuler(
-	OdeEquation<State, MT, DT, KT, ST>& equation) :
+	OdeEquation<State, MT, DT, KT, ST>* equation) :
 	OdeSolver<State, MT, DT, KT, ST>(equation)
 {
 	this->m_name = "Modified Explicit Euler";
