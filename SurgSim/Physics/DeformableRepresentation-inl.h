@@ -87,12 +87,6 @@ void DeformableRepresentation<M,D,K,S>::setInitialState(std::shared_ptr<Deformab
 	setNumDof(initialState->getNumDof());
 }
 
-//template <class M, class D, class K, class S>
-//const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M,D,K,S>::getInitialState() const
-//{
-//	return m_initialState;
-//}
-
 template <class M, class D, class K, class S>
 const std::shared_ptr<DeformableRepresentationState> DeformableRepresentation<M,D,K,S>::getCurrentState() const
 {
