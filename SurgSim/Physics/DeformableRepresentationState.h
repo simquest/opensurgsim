@@ -20,7 +20,6 @@
 
 #include <SurgSim/Math/Vector.h>
 
-
 namespace SurgSim
 {
 
@@ -131,15 +130,6 @@ public:
 	/// \note No test is performed on dof, the behavior is undefined when dof is out of range
 	bool isBoundaryCondition(unsigned int dof) const;
 
-	/// Queries the boundary conditions for a specific node
-	/// \param nodeId The requested node
-	/// \param numDofPerNode The number of degree of freedom per node
-	/// \return A bit-mask containing boundary conditions for each dof of this node
-	/// \note No test is performed on nodeId/numDofPerNode, the behavior is undefined if they point out of range
-	/// \note The returned value is a bit-mask value. Each bit set to 1 indicates a boundary condition for this dof
-	/// \note The bit ordering is as follow: bit i-th = dof i-th
-	unsigned char getBoundaryConditionsForNode(unsigned int nodeId, unsigned int numDofPerNode) const;
-
 private:
 	/// Default public copy constructor and assignment operator are being used on purpose
 
@@ -158,8 +148,8 @@ private:
 	/// Boundary conditions stored as a list of dof ids
 	std::vector<unsigned int> m_boundaryConditionsAsDofIds;
 
-	/// Boundary conditions stored per dof (1 indicates a boundary condition, 0 does not)
-	Eigen::Matrix<unsigned char, Eigen::Dynamic, 1, Eigen::DontAlign> m_boundaryConditionsPerDof;
+	/// Boundary conditions stored per dof (True indicates a boundary condition, False does not)
+	Eigen::Matrix<bool, Eigen::Dynamic, 1> m_boundaryConditionsPerDof;
 };
 
 }; // namespace Physics

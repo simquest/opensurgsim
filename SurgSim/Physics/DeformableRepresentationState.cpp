@@ -130,7 +130,7 @@ void DeformableRepresentationState::addBoundaryCondition(unsigned int dof)
 {
 	if (! m_boundaryConditionsPerDof[dof])
 	{
-		m_boundaryConditionsPerDof[dof] = 1;
+		m_boundaryConditionsPerDof[dof] = true;
 		m_boundaryConditionsAsDofIds.push_back(dof);
 	}
 }
@@ -147,18 +147,7 @@ const std::vector<unsigned int>& DeformableRepresentationState::getBoundaryCondi
 
 bool DeformableRepresentationState::isBoundaryCondition(unsigned int dof) const
 {
-	return m_boundaryConditionsPerDof[dof] == 1u;
-}
-
-unsigned char DeformableRepresentationState::getBoundaryConditionsForNode(
-	unsigned int nodeId, unsigned int numDofPerNode) const
-{
-	unsigned char res = 0;
-	for (unsigned int bit = 0; bit < numDofPerNode; bit++)
-	{
-		res |= m_boundaryConditionsPerDof[numDofPerNode * nodeId + bit] << bit;
-	}
-	return res;
+	return m_boundaryConditionsPerDof[dof];
 }
 
 }; // namespace Physics
