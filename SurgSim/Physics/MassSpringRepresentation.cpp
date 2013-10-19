@@ -42,9 +42,7 @@ namespace Physics
 {
 
 MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
-	DeformableRepresentation(name),
-	m_integrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER),
-	m_needToReloadOdeSolver(true)
+	DeformableRepresentation(name)
 {
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
@@ -118,21 +116,6 @@ void MassSpringRepresentation::setRayleighDampingMass(double massCoef)
 	m_rayleighDamping.massCoefficient = massCoef;
 }
 
-void MassSpringRepresentation::setIntegrationScheme(IntegrationScheme integrationScheme)
-{
-	if (m_integrationScheme != integrationScheme )
-	{
-		// Sets the integration scheme variable
-		m_integrationScheme = integrationScheme;
-		// The integration scheme has changed, the ode solver needs to be reloaded
-		m_needToReloadOdeSolver = true;
-	}
-}
-
-MassSpringRepresentation::IntegrationScheme MassSpringRepresentation::getIntegrationScheme() const
-{
-	return m_integrationScheme;
-}
 
 RepresentationType MassSpringRepresentation::getType() const
 {
@@ -153,39 +136,7 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumDof()) <<
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
 
-	if (m_needToReloadOdeSolver)
-	{
-		if (m_odeSolver)
-		{
-			// If the ode solver exist already, we need to reset it first (free memory)
-			m_odeSolver.reset();
-		}
-
-		switch(m_integrationScheme)
-		{
-		case INTEGRATIONSCHEME_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared
-				<ExplicitEuler<DeformableRepresentationState, DiagonalMatrix, Matrix, Matrix, Matrix>>
-				(*this, *m_initialState.get());
-			break;
-		case INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
-			m_odeSolver = std::make_shared
-				<ModifiedExplicitEuler<DeformableRepresentationState, DiagonalMatrix, Matrix, Matrix, Matrix>>
-				(*this, *m_initialState.get());
-			break;
-		case INTEGRATIONSCHEME_IMPLICIT_EULER:
-			m_odeSolver = std::make_shared
-				<ImplicitEuler<DeformableRepresentationState, DiagonalMatrix, Matrix, Matrix, Matrix>>
-				(*this, *m_initialState.get());
-			break;
-		default:
-			SURGSIM_ASSERT(m_odeSolver) <<
-				"Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
-			break;
-		}
-
-		m_needToReloadOdeSolver = false;
-	}
+	DeformableRepresentation::beforeUpdate(dt);
 }
 
 void MassSpringRepresentation::update(double dt)

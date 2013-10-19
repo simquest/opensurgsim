@@ -51,8 +51,7 @@ class ImplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	/// \param initialState The initial state
-	ImplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState);
+	ImplicitEuler(OdeEquation<State, MT, DT, KT, ST>& equation);
 
 	/// Solves the equation
 	/// \param dt The time step

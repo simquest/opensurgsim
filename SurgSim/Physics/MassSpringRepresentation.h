@@ -43,20 +43,12 @@ namespace Physics
 {
 
 /// MassSpring model is a deformable model (a set of masses connected by springs).
-/// \note The class can handle 3 type of numerical integration scheme (Euler explicit, modified and implicit).
-/// \note The model handles damping through the Rayleigh damping (damping is a combination of mass and stiffness).
-/// \note It is a DeformableRepresentation (Physics::Representation + Math::OdeEquation)
+/// \note A MassSpring is a DeformableRepresentation (Physics::Representation + Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
+/// \note The model handles damping through the Rayleigh damping (damping is a combination of mass and stiffness).
 class MassSpringRepresentation: public DeformableRepresentation<DiagonalMatrix, Matrix, Matrix, Matrix>
 {
 public:
-	/// The diverse numerical integration scheme supported
-	enum IntegrationScheme {
-		INTEGRATIONSCHEME_EXPLICIT_EULER = 0,
-		INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
-		INTEGRATIONSCHEME_IMPLICIT_EULER
-	};
-
 	/// Constructor
 	/// \param name The name of the MassSpringRepresentation
 	explicit MassSpringRepresentation(const std::string& name);
@@ -113,14 +105,6 @@ public:
 	/// Sets the Rayleigh mass parameter
 	/// \param massCoef The Rayleigh mass parameter
 	void setRayleighDampingMass(double massCoef);
-
-	/// Sets the numerical integration scheme
-	/// \param integrationScheme The integration scheme to use
-	void setIntegrationScheme(IntegrationScheme integrationScheme);
-
-	/// Gets the numerical integration scheme
-	/// \return The integration scheme currently in use
-	IntegrationScheme getIntegrationScheme() const;
 
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
@@ -222,14 +206,6 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
-
-	/// Numerical Integration scheme (dynamic explicit/implicit solver)
-	IntegrationScheme m_integrationScheme;
-	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
-	bool m_needToReloadOdeSolver;
-
-	/// Ode solver (its type depends on the numerical integration scheme)
-	std::shared_ptr<OdeSolver<DeformableRepresentationState, DiagonalMatrix, Matrix, Matrix, Matrix>> m_odeSolver;
 };
 
 } // namespace Physics

@@ -24,8 +24,10 @@
 #include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 #include <SurgSim/Math/OdeEquation.h>
+#include <SurgSim/Math/OdeSolver.h>
 
 using SurgSim::Math::OdeEquation;
+using SurgSim::Math::OdeSolver;
 
 namespace SurgSim
 {
@@ -110,6 +112,19 @@ public:
 	/// \return The number of degrees of freedom per node for this Deformable Representation
 	unsigned int getNumDofPerNode() const;
 
+	/// Sets the numerical integration scheme
+	/// \param integrationScheme The integration scheme to use
+	void setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme);
+
+	/// Gets the numerical integration scheme
+	/// \return The integration scheme currently in use
+	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
+
+	/// Preprocessing done before the update call
+	/// \param dt The time step (in seconds)
+	/// \note DeformableRepresentation::beforeUpdate takes care of the OdeSolver setup
+	virtual void beforeUpdate(double dt) override;
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
@@ -118,11 +133,12 @@ protected:
 		const SurgSim::Math::RigidTransform3d& transform) = 0;
 
 	/// Previous, current and new states (internal use)
-	/// New state is a temporary variable to store the newly computed state
+	/// \note New state is a temporary variable to store the newly computed state
+	/// \note The initial state is held by the OdeEquation
 	std::shared_ptr<DeformableRepresentationState> m_previousState, m_currentState, m_newState;
 
 	/// Last valid state (a.k.a final state)
-	/// Backup of the last valid state for safe access from other thread while the current state is being recomputed.
+	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
 	std::shared_ptr<DeformableRepresentationState> m_finalState;
 
 	/// Initial pose that will transform the state on setup
@@ -146,6 +162,15 @@ protected:
 	/// Number of degrees of freedom per node (varies per deformable model)
 	/// \note MUST be set by the derived classes
 	unsigned int m_numDofPerNode;
+
+	/// Numerical Integration scheme (dynamic explicit/implicit solver)
+	SurgSim::Math::IntegrationScheme m_integrationScheme;
+
+	/// Specify if the Ode Solver needs to be (re)loaded (do not exist yet, or integration scheme has changed)
+	bool m_needToReloadOdeSolver;
+
+	/// Ode solver (its type depends on the numerical integration scheme)
+	std::shared_ptr<OdeSolver<DeformableRepresentationState, MType, DType, KType, SType>> m_odeSolver;
 
 private:
 	/// NO copy constructor

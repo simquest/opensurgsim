@@ -27,6 +27,13 @@ namespace SurgSim
 namespace Math
 {
 
+/// The diverse numerical integration scheme supported
+enum IntegrationScheme {
+	INTEGRATIONSCHEME_EXPLICIT_EULER = 0,
+	INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,
+	INTEGRATIONSCHEME_IMPLICIT_EULER
+};
+
 /// Base class for all solvers of ode equation of order 2 of the form M(x(t), v(t)).a(t) = f(t, x(t), v(t))
 /// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
 /// \note y' = ( x' ) = ( dx/dt ) = (       v        )
@@ -53,8 +60,7 @@ class OdeSolver
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	/// \param initialState The initial state (can be useful for static resolution for example)
-	OdeSolver(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState);
+	OdeSolver(OdeEquation<State, MT, DT, KT, ST>& equation);
 
 	/// Virtual destructor
 	virtual ~OdeSolver()
@@ -87,11 +93,8 @@ protected:
 	/// \param size The size to account for in the data structure
 	void allocate(unsigned int size);
 
-	/// The ode equation (API providing the necessary evaluation methods)
+	/// The ode equation (API providing the necessary evaluation methods and the initial state)
 	OdeEquation<State, MT, DT, KT, ST>& m_equation;
-
-	/// The initial state (useful for static resolution)
-	const State& m_initialState;
 
 	/// System matrix (can be M, K, combination of MDK depending on the solver)
 	ST m_systemMatrix;

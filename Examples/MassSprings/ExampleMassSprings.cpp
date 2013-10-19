@@ -65,7 +65,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-	SurgSim::Math::Vector4d color, MassSpringRepresentation::IntegrationScheme integrationScheme)
+	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<MassSpring1DRepresentation> physicsRepresentation =
 		std::make_shared<MassSpring1DRepresentation>(name + " Physics");
@@ -130,7 +130,7 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 
 std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-	SurgSim::Math::Vector4d color, MassSpringRepresentation::IntegrationScheme integrationScheme)
+	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<MassSpring2DRepresentation> physicsRepresentation =
 		std::make_shared<MassSpring2DRepresentation>(name + " Physics");
@@ -199,7 +199,7 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 
 std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-	SurgSim::Math::Vector4d color, MassSpringRepresentation::IntegrationScheme integrationScheme)
+	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<MassSpring3DRepresentation> physicsRepresentation =
 		std::make_shared<MassSpring3DRepresentation>(name + " Physics");
@@ -304,21 +304,21 @@ int main(int argc, char* argv[])
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
 			gfxPoses, Vector4d(1, 0, 0, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 3.0, 0.0)));
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
 			gfxPoses, Vector4d(0, 1, 0, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(1.0, 3.0, 0.0)));
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
 			gfxPoses, Vector4d(0, 0, 1, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	// MassSpring2D
@@ -328,21 +328,21 @@ int main(int argc, char* argv[])
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
 			gfxPoses, Vector4d(1, 0, 0, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 1.5, 0.0)));
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
 			gfxPoses, Vector4d(0, 1, 0, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 1.0, 1.5, 0.0)));
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
 			gfxPoses, Vector4d(0, 0, 1, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	// MassSpring3D
@@ -352,21 +352,21 @@ int main(int argc, char* argv[])
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
 			gfxPoses, Vector4d(1, 0, 0, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, -0.5, 0.0)));
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
 			gfxPoses, Vector4d(0, 1, 0, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 1.0, -0.5, 0.0)));
 		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
 			gfxPoses, Vector4d(0, 0, 1, 1),
-			MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER));
+			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));

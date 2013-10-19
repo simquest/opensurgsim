@@ -18,6 +18,14 @@
 
 #include <SurgSim/Framework/Assert.h>
 
+#include <SurgSim/Math/OdeSolverEulerExplicit.h>
+#include <SurgSim/Math/OdeSolverEulerExplicitModified.h>
+#include <SurgSim/Math/OdeSolverEulerImplicit.h>
+
+using SurgSim::Math::ExplicitEuler;
+using SurgSim::Math::ModifiedExplicitEuler;
+using SurgSim::Math::ImplicitEuler;
+
 namespace SurgSim
 {
 
@@ -26,7 +34,11 @@ namespace Physics
 
 template <class M, class D, class K, class S>
 DeformableRepresentation<M,D,K,S>::DeformableRepresentation(const std::string& name) :
-Representation(name), m_numDofPerNode(0)
+	Representation(name),
+	OdeEquation<DeformableRepresentationState, M, D, K, S>(),
+	m_numDofPerNode(0),
+	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER),
+	m_needToReloadOdeSolver(true)
 {
 	m_initialPose.setIdentity();
 	m_identityPose.setIdentity();
@@ -66,9 +78,9 @@ void DeformableRepresentation<M,D,K,S>::resetState()
 {
 	Representation::resetState();
 
-	*m_currentState  = *m_initialState;
-	*m_previousState = *m_initialState;
-	*m_finalState    = *m_initialState;
+	*m_currentState  = *this->m_initialState;
+	*m_previousState = *this->m_initialState;
+	*m_finalState    = *this->m_initialState;
 }
 
 template <class M, class D, class K, class S>
@@ -76,15 +88,15 @@ void DeformableRepresentation<M,D,K,S>::setInitialState(std::shared_ptr<Deformab
 {
 	// This initializes and allocates the m_initialState data member
 	this->m_initialState = initialState;
-	transformState(m_initialState, m_initialPose);
+	transformState(this->m_initialState, m_initialPose);
 
-	m_previousState = std::make_shared<DeformableRepresentationState>(*initialState);
-	m_currentState = std::make_shared<DeformableRepresentationState>(*initialState);
-	m_newState = std::make_shared<DeformableRepresentationState>(*initialState);
-	m_finalState = std::make_shared<DeformableRepresentationState>(*initialState);
+	m_previousState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
+	m_currentState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
+	m_newState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
+	m_finalState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
 
 	// Set the representation number of degree of freedom
-	setNumDof(initialState->getNumDof());
+	setNumDof(this->m_initialState->getNumDof());
 }
 
 template <class M, class D, class K, class S>
@@ -109,6 +121,64 @@ template <class M, class D, class K, class S>
 unsigned int DeformableRepresentation<M,D,K,S>::getNumDofPerNode() const
 {
 	return m_numDofPerNode;
+}
+
+template <class M, class D, class K, class S>
+void DeformableRepresentation<M,D,K,S>::setIntegrationScheme(SurgSim::Math::IntegrationScheme integrationScheme)
+{
+	if (m_integrationScheme != integrationScheme )
+	{
+		// Sets the integration scheme variable
+		m_integrationScheme = integrationScheme;
+		// The integration scheme has changed, the ode solver needs to be reloaded
+		m_needToReloadOdeSolver = true;
+	}
+}
+
+template <class M, class D, class K, class S>
+SurgSim::Math::IntegrationScheme DeformableRepresentation<M,D,K,S>::getIntegrationScheme() const
+{
+	return m_integrationScheme;
+}
+
+template <class M, class D, class K, class S>
+void  DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
+{
+	if (! isActive())
+	{
+		return;
+	}
+
+	if (m_needToReloadOdeSolver)
+	{
+		if (m_odeSolver)
+		{
+			// If the ode solver exist already, we need to reset it first (free memory)
+			m_odeSolver.reset();
+		}
+
+		switch(m_integrationScheme)
+		{
+		case SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER:
+			m_odeSolver = std::make_shared
+				<ExplicitEuler<DeformableRepresentationState, M, D, K, S>>(*this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER:
+			m_odeSolver = std::make_shared
+				<ModifiedExplicitEuler<DeformableRepresentationState, M, D, K, S>>(*this);
+			break;
+		case SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER:
+			m_odeSolver = std::make_shared
+				<ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(*this);
+			break;
+		default:
+			SURGSIM_ASSERT(m_odeSolver) <<
+				"Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
+			break;
+		}
+
+		m_needToReloadOdeSolver = false;
+	}
 }
 
 }; // namespace Physics

@@ -23,11 +23,10 @@ namespace Math
 {
 
 template <class State, class MT, class DT, class KT, class ST>
-OdeSolver<State, MT, DT, KT, ST>::OdeSolver(OdeEquation<State, MT, DT, KT, ST>& equation, const State& initialState) :
-	m_equation(equation),
-	m_initialState(initialState)
+OdeSolver<State, MT, DT, KT, ST>::OdeSolver(OdeEquation<State, MT, DT, KT, ST>& equation) :
+	m_equation(equation)
 {
-	allocate(initialState.getPositions().size());
+	allocate(equation.getInitialState()->getPositions().size());
 }
 
 template <class State, class MT, class DT, class KT, class ST>

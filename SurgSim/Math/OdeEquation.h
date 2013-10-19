@@ -95,4 +95,6 @@ protected:
 
 }; // namespace SurgSim
 
+#include <SurgSim/Math/OdeEquation-inl.h>
+
 #endif // SURGSIM_MATH_ODEEQUATION_H
