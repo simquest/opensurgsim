@@ -16,12 +16,11 @@
 #ifndef SURGSIM_BLOCKS_MASSSPRING3DREPRESENTATION_H
 #define SURGSIM_BLOCKS_MASSSPRING3DREPRESENTATION_H
 
-#include <SurgSim/Math/Vector.h>
+#include <vector>
+
 #include <SurgSim/Physics/MassSpringRepresentation.h>
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 
-using SurgSim::Math::Vector3d;
-using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::DeformableRepresentationState;
 
 namespace SurgSim
@@ -30,13 +29,14 @@ namespace SurgSim
 namespace Blocks
 {
 
-// This class instantiate a simple 3D structures
-class MassSpring3DRepresentation : public MassSpringRepresentation
+// This class defines a simple MassSpring 3D structures
+class MassSpring3DRepresentation : public SurgSim::Physics::MassSpringRepresentation
 {
 public:
 	/// Constructor
 	/// \param name The model name
-	explicit MassSpring3DRepresentation(const std::string& name) : MassSpringRepresentation(name)
+	explicit MassSpring3DRepresentation(const std::string& name) :
+		SurgSim::Physics::MassSpringRepresentation(name)
 	{
 	}
 
@@ -59,7 +59,7 @@ public:
 	/// \note   [0][0][0] <-   |   | *         -> [1][0][0]
 	/// \note        [0][0][1] *---* [1][0][1]
 	void init3D(
-		const Vector3d extremities[2][2][2], unsigned int numNodesPerDim[3],
+		const SurgSim::Math::Vector3d extremities[2][2][2], unsigned int numNodesPerDim[3],
 		std::vector<unsigned int> boundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,

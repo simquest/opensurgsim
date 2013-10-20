@@ -16,15 +16,9 @@
 #ifndef SURGSIM_BLOCKS_MASSSPRING1DREPRESENTATION_H
 #define SURGSIM_BLOCKS_MASSSPRING1DREPRESENTATION_H
 
-#include <memory>
+#include <vector>
 
-#include <SurgSim/Math/Vector.h>
 #include <SurgSim/Physics/MassSpringRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Physics::MassSpringRepresentation;
-using SurgSim::Physics::DeformableRepresentationState;
 
 namespace SurgSim
 {
@@ -32,13 +26,14 @@ namespace SurgSim
 namespace Blocks
 {
 
-// This class instantiate a simple 1D structures
-class MassSpring1DRepresentation : public MassSpringRepresentation
+// This class defines a simple MassSpring 1D structures
+class MassSpring1DRepresentation : public SurgSim::Physics::MassSpringRepresentation
 {
 public:
 	/// Constructor
 	/// \param name The model name
-	explicit MassSpring1DRepresentation(const std::string& name) : MassSpringRepresentation(name)
+	explicit MassSpring1DRepresentation(const std::string& name) :
+		SurgSim::Physics::MassSpringRepresentation(name)
 	{
 	}
 
@@ -51,7 +46,7 @@ public:
 	/// \param stiffnessBending, dampingBending The spring param for all bending springs (edges)
 	/// \note Stretching springs are connecting neighbors, bending springs are connecting 1 node
 	/// \note to its 2nd degree neighbors, creating a bending force around the middle node.
-	void init1D(const Vector3d extremities[2], unsigned int numNodesPerDim[1],
+	void init1D(const SurgSim::Math::Vector3d extremities[2], unsigned int numNodesPerDim[1],
 		std::vector<unsigned int> boundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,

@@ -21,26 +21,32 @@
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
+#include <SurgSim/Math/OdeSolver.h> // Need access to the enum IntegrationScheme
+#include <SurgSim/Math/OdeSolverEulerExplicit.h>
+#include <SurgSim/Math/OdeSolverEulerExplicitModified.h>
+#include <SurgSim/Math/OdeSolverEulerImplicit.h>
 
 using SurgSim::Physics::DeformableRepresentation;
 using SurgSim::Physics::DeformableRepresentationState;
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix;
 
 namespace
 {
 	const unsigned int numNodes = 100;
-	const unsigned int numDof = 3 * numNodes;
+	const unsigned int numDofPerNode = 3;
+	const unsigned int numDof = numDofPerNode * numNodes;
 	const double epsilon = 1e-10;
 };
 
-class MockObject : public DeformableRepresentation<Matrix, Matrix, Matrix>
+class MockObject : public DeformableRepresentation<Matrix, Matrix, Matrix, Matrix>
 {
 public:
 	MockObject()
-		: DeformableRepresentation<Matrix, Matrix, Matrix>("MockObject")
+		: DeformableRepresentation<Matrix, Matrix, Matrix, Matrix>("MockObject")
 	{
-		setNumDof(numDof);
+		this->m_numDofPerNode = numDofPerNode;
 	}
 
 	virtual ~MockObject()
@@ -60,6 +66,8 @@ public:
 	/// \param dt The time step for the current update
 	virtual void beforeUpdate(double dt) override
 	{
+		DeformableRepresentation::beforeUpdate(dt);
+
 		// Backup the current state into the previous state
 		*m_previousState = *m_currentState;
 	}
@@ -83,6 +91,46 @@ public:
 		// Backup the current state into the final state
 		*m_finalState = *m_currentState;
 	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	Vector& computeF(const DeformableRepresentationState& state) override
+	{
+		static Vector F;
+		return F;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	const Matrix& computeM(const DeformableRepresentationState& state) override
+	{
+		static Matrix M;
+		return M;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	const Matrix& computeD(const DeformableRepresentationState& state) override
+	{
+		static Matrix D;
+		return D;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	const Matrix& computeK(const DeformableRepresentationState& state) override
+	{
+		static Matrix K;
+		return K;
+	}
+
+	/// OdeEquation API (empty) is not tested here as DeformableRep does not provide an implementation
+	/// This API will be tested in derived classes when the API will be provided
+	void computeFMDK(const DeformableRepresentationState& state,
+		Vector **f, Matrix **M, Matrix **D, Matrix **K) override
+	{
+	}
+
 protected:
 	void transformState(std::shared_ptr<DeformableRepresentationState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override
@@ -116,7 +164,7 @@ public:
 	void SetUp() override
 	{
 		m_localInitialState = std::make_shared<DeformableRepresentationState>();
-		m_localInitialState->setNumDof(numDof);
+		m_localInitialState->setNumDof(numDofPerNode, numNodes);
 		for (unsigned int i = 0; i < numDof; i++)
 		{
 			m_localInitialState->getPositions()[i] = static_cast<double>(i);
@@ -149,13 +197,13 @@ TEST_F(DeformableRepresentationTest, ConstructorTest)
 
 	// Test the object creation through the operator new []
 	ASSERT_NO_THROW({MockObject *deformable = new MockObject[10]; delete [] deformable;});
+
+	// Test the object creation through a shared_ptr
+	ASSERT_NO_THROW({std::shared_ptr<MockObject> deformable = std::make_shared<MockObject>(); });
 }
 
 TEST_F(DeformableRepresentationTest, SetGetTest)
 {
-		// Test getNumDof
-	EXPECT_EQ(numDof, getNumDof());
-
 	// Test setInitialPose/getInitialPose
 	setInitialPose(m_nonIdentityTransform);
 	EXPECT_TRUE(getInitialPose().isApprox(m_nonIdentityTransform, epsilon));
@@ -169,8 +217,9 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_THROW(setPose(m_identityTransform), SurgSim::Framework::AssertionFailure);
 	EXPECT_TRUE(getPose().isApprox(m_identityTransform, epsilon));
 
-	// Test setInitialState/getInitialState/getCurrentState
-	EXPECT_EQ(getNumDof(), m_localInitialState->getNumDof());
+	// Test set/get states
+	// Note that the initialState is in OdeEquation but is set in DeformableRepresentation
+	// Its getter is actually in OdeEquation (considered tested here)
 	setInitialState(m_localInitialState);
 	EXPECT_TRUE(*m_initialState     == *m_localInitialState);
 	EXPECT_TRUE(*m_currentState     == *m_localInitialState);
@@ -180,6 +229,49 @@ TEST_F(DeformableRepresentationTest, SetGetTest)
 	EXPECT_TRUE(*getPreviousState() == *m_localInitialState);
 	EXPECT_TRUE(*getCurrentState()  == *m_localInitialState);
 	EXPECT_TRUE(*getFinalState()    == *m_localInitialState);
+
+	// Test getNumDof (needs to be tested after setInitialState has been called)
+	EXPECT_EQ(numDof, getNumDof());
+
+	// Test getNumDofPerNode
+	EXPECT_EQ(numDofPerNode, getNumDofPerNode());
+
+	/// Set/Get the numerical integration scheme
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, getIntegrationScheme());
+	setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+	EXPECT_EQ(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, getIntegrationScheme());
+}
+
+TEST_F(DeformableRepresentationTest, BeforeUpdateInitializesOdeSolverTest)
+{
+	using SurgSim::Math::ExplicitEuler;
+	using SurgSim::Math::ModifiedExplicitEuler;
+	using SurgSim::Math::ImplicitEuler;
+
+	// setInitialState sets all 4 states (tested in method above !)
+	setInitialState(m_localInitialState);
+
+	// beforeUpdate should initialize the odeSolver with the default integration scheme (Euler Explicit)
+	beforeUpdate(1e-3);
+	ASSERT_NE(nullptr, m_odeSolver);
+
+	typedef ExplicitEuler<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> EESolver;
+	EESolver* explicitEuler;
+	explicitEuler = dynamic_cast<EESolver*>(m_odeSolver.get());
+	ASSERT_NE(nullptr, explicitEuler);
+
+	typedef ModifiedExplicitEuler<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> MEESolver;
+	MEESolver* modifiedExplicitEuler;
+	modifiedExplicitEuler = dynamic_cast<MEESolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, modifiedExplicitEuler);
+
+	typedef ImplicitEuler<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix> IESolver;
+	IESolver* implicitEuler;
+	implicitEuler = dynamic_cast<IESolver*>(m_odeSolver.get());
+	ASSERT_EQ(nullptr, implicitEuler);
 }
 
 TEST_F(DeformableRepresentationTest, UpdateChangesStateTest)

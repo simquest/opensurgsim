@@ -13,27 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/Assert.h>
 
 #include <SurgSim/Physics/MassSpringRepresentation.h>
 
-#include <SurgSim/Math/OdeSolverEulerExplicit.h>
-#include <SurgSim/Math/OdeSolverEulerExplicitModified.h>
-#include <SurgSim/Math/OdeSolverEulerImplicit.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
-
-using SurgSim::Math::ExplicitEuler;
-using SurgSim::Math::ModifiedExplicitEuler;
-using SurgSim::Math::ImplicitEuler;
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::setSubVector;
-using SurgSim::Math::getSubVector;
-using SurgSim::Math::addSubVector;
-using SurgSim::Math::getSubMatrix;
-using SurgSim::Math::addSubMatrix;
 
 namespace SurgSim
 {
@@ -47,6 +32,8 @@ MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
 
+	// Reminder: m_numDofPerNode is held by DeformableRepresentation
+	// but needs to be set by all concrete derived classes
 	this->m_numDofPerNode = 3;
 }
 
@@ -136,6 +123,7 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 	SURGSIM_ASSERT(getNumDof()) <<
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
 
+	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
 	DeformableRepresentation::beforeUpdate(dt);
 }
 
@@ -146,6 +134,7 @@ void MassSpringRepresentation::update(double dt)
 		return;
 	}
 
+	// Solve the ode
 	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
 
 	// Back up the current state into the previous state (by swapping)
@@ -195,6 +184,9 @@ Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& 
 
 const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableRepresentationState& state)
 {
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::setSubVector;
+
 	// Make sure the mass matrix has been properly allocated
 	// It does not need to be zeroed out, as it will be directly set
 	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
@@ -219,6 +211,10 @@ const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableReprese
 
 const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationState& state)
 {
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::setSubVector;
+	using SurgSim::Math::addSubMatrix;
+
 	const double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayMass = m_rayleighDamping.massCoefficient;
 
@@ -266,6 +262,8 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 
 const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationState& state)
 {
+	using SurgSim::Math::addSubMatrix;
+
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
 
@@ -290,6 +288,9 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& state,
 	Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K)
 {
+	using SurgSim::Math::addSubVector;
+	using SurgSim::Math::addSubMatrix;
+
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
@@ -364,6 +365,10 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const DeformableRepresentationState& state,
 	bool useGlobalStiffnessMatrix, double scale)
 {
+	using SurgSim::Math::getSubVector;
+	using SurgSim::Math::addSubVector;
+	using SurgSim::Math::getSubMatrix;
+
 	// Temporary variables for convenience
 	double& rayMass = m_rayleighDamping.massCoefficient;
 	double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
@@ -376,7 +381,7 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 		for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
 		{
 			double mass = getMass(nodeID)->getMass();
-			Vector3d f = - scale * rayMass * mass * getSubVector(v, nodeID, 3);
+			SurgSim::Math::Vector3d f = - scale * rayMass * mass * getSubVector(v, nodeID, 3);
 			addSubVector(f, nodeID, 3, force);
 		}
 	}
@@ -419,6 +424,8 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 
 void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRepresentationState& state, double scale)
 {
+	using SurgSim::Math::addSubVector;
+
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
 		addSubVector((*spring)->computeForce(state), (*spring)->getNodeIds(), 3, force);
@@ -427,6 +434,8 @@ void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRe
 
 void MassSpringRepresentation::addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale)
 {
+	using SurgSim::Math::addSubVector;
+
 	if (isGravityEnabled())
 	{
 		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
@@ -436,7 +445,8 @@ void MassSpringRepresentation::addGravityForce(Vector *f, const DeformableRepres
 	}
 }
 
-static void transformVectorByBlockOf3(const RigidTransform3d& transform, Vector* x, bool rotationOnly = false)
+static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
+									  Vector* x, bool rotationOnly = false)
 {
 	unsigned int numNodes = x->size() / 3;
 	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<
@@ -444,8 +454,8 @@ static void transformVectorByBlockOf3(const RigidTransform3d& transform, Vector*
 
 	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 	{
-		Vector3d xi = getSubVector(*x, nodeId, 3);
-		Vector3d xiTransformed;
+		SurgSim::Math::Vector3d xi = SurgSim::Math::getSubVector(*x, nodeId, 3);
+		SurgSim::Math::Vector3d xiTransformed;
 		if (rotationOnly)
 		{
 			xiTransformed = transform.linear() * xi;
@@ -454,12 +464,12 @@ static void transformVectorByBlockOf3(const RigidTransform3d& transform, Vector*
 		{
 			xiTransformed = transform * xi;
 		}
-		setSubVector(xiTransformed, nodeId, 3, x);
+		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
 	}
 }
 
 void MassSpringRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
-	const RigidTransform3d& transform)
+	const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);

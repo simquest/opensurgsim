@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Math
 {
 
-/// Ode equation of order 2 of the form M(x,v).a = F(x, v)
+/// Ode equation of 2nd order of the form M(x,v).a = F(x, v) with (x0, v0) the initial conditions.
 /// \note This ode equation is solved as an ode of order 1 by defining the state vector y = (x v)^t:
 /// \note y' = ( x' ) = ( dx/dt ) = (       v        )
 /// \note      ( v' ) = ( dv/dt ) = ( M(x, v)^{-1}.F(x, v) )

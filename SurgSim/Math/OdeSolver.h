@@ -28,6 +28,7 @@ namespace Math
 {
 
 /// The diverse numerical integration scheme supported
+/// Each Ode Solver should have its own entry in this enum
 enum IntegrationScheme {
 	INTEGRATIONSCHEME_EXPLICIT_EULER = 0,
 	INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER,

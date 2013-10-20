@@ -50,7 +50,7 @@ TEST(LinearSpringTests, SetGetMethods)
 
 	// Rest length getter/setter
 	ls.setRestLength(1.23);
-	ASSERT_DOUBLE_EQ(1.23, ls.getInitialLength());
+	ASSERT_DOUBLE_EQ(1.23, ls.getRestLength());
 
 	// Operator ==/!= (with same node Ids)
 	LinearSpring ls2(0, 1);
@@ -59,7 +59,7 @@ TEST(LinearSpringTests, SetGetMethods)
 	ASSERT_TRUE(ls != ls2);
 	ls2.setDamping(ls.getDamping());
 	ASSERT_TRUE(ls != ls2);
-	ls2.setRestLength(ls.getInitialLength());
+	ls2.setRestLength(ls.getRestLength());
 	ASSERT_TRUE(ls == ls2);
 	ls2.setDamping(ls.getDamping() + 0.55);
 	ASSERT_TRUE(ls != ls2);
@@ -74,7 +74,7 @@ TEST(LinearSpringTests, SetGetMethods)
 	ASSERT_TRUE(ls != ls3);
 	ls3.setDamping(ls.getDamping());
 	ASSERT_TRUE(ls != ls3);
-	ls3.setRestLength(ls.getInitialLength());
+	ls3.setRestLength(ls.getRestLength());
 	ASSERT_TRUE(ls != ls3);
 }
 
@@ -92,7 +92,7 @@ TEST(LinearSpringTests, computeMethods)
 	Vector3d expectedF3D(0.58375208191171812, 1.0406015373208888, 0.30456630360611381);
 	DeformableRepresentationState state;
 	Vector expectedF;
-	state.setNumDof(6u);
+	state.setNumDof(3u, 2u);
 	expectedF.resize(6u);
 	setSubVector(Vector3d(0.0, 0.0, 0.0), 0, 3, &state.getPositions());
 	setSubVector(Vector3d(2.3, 4.1, 1.2), 1, 3, &state.getPositions());

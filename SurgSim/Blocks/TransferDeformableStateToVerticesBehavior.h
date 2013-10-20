@@ -43,12 +43,10 @@ class TransferDeformableStateToVerticesBehavior : public SurgSim::Framework::Beh
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	/// \param	from	DeformableState to get the positions from
-	/// \param	numDofPerNode	Number of degrees of freedom per node in the deformable state
+	/// \param	from	DeformableRepresentationState to get the positions from
 	/// \param	to	Vertices to set the positions into
 	TransferDeformableStateToVerticesBehavior(const std::string& name,
 		std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> from,
-		unsigned int numDofPerNode,
 		std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> to);
 
 	/// Update the behavior
@@ -66,14 +64,12 @@ private:
 	/// Transfer the data from Deformable state m_from to Vertices m_to
 	void transfer();
 
-	/// Deformable state to get the positions from
+	/// Deformable representation state to get the positions from
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> m_from;
-	/// Number of degrees of freedom per node in the Deformable state
-	unsigned int m_numDofPerNode;
+
 	/// Vertices to set the positions into
 	std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> m_to;
 };
-
 
 };  // namespace Blocks
 

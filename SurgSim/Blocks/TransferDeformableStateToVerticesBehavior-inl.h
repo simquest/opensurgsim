@@ -30,11 +30,9 @@ template <class VertexData>
 TransferDeformableStateToVerticesBehavior<VertexData>::TransferDeformableStateToVerticesBehavior(
 	const std::string& name,
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> from,
-	unsigned int numDofPerNode,
 	std::shared_ptr<SurgSim::DataStructures::Vertices<VertexData>> to) :
 	SurgSim::Framework::Behavior(name),
 	m_from(from),
-	m_numDofPerNode(numDofPerNode),
 	m_to(to)
 {
 }

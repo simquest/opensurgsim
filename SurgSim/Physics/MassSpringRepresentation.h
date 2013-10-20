@@ -25,16 +25,10 @@
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/OdeEquation.h>
-#include <SurgSim/Math/OdeSolver.h>
 
-using SurgSim::Math::OdeEquation;
-using SurgSim::Math::OdeSolver;
+using SurgSim::Math::Vector;
 using SurgSim::Math::DiagonalMatrix;
 using SurgSim::Math::Matrix;
-using SurgSim::Math::Vector;
-using SurgSim::Math::RigidTransform3d;
 
 namespace SurgSim
 {
@@ -43,9 +37,9 @@ namespace Physics
 {
 
 /// MassSpring model is a deformable model (a set of masses connected by springs).
-/// \note A MassSpring is a DeformableRepresentation (Physics::Representation + Math::OdeEquation)
+/// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
-/// \note The model handles damping through the Rayleigh damping (damping is a combination of mass and stiffness).
+/// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
 class MassSpringRepresentation: public DeformableRepresentation<DiagonalMatrix, Matrix, Matrix, Matrix>
 {
 public:
@@ -59,7 +53,7 @@ public:
 	/// Adds a mass
 	/// \param mass The mass to add to the representation
 	/// \note Masses are kept in an ordered list, giving them an index
-	/// \note This mass will be associated with the node of same index
+	/// \note This mass will be associated with the node of same index in any associated DeformableRepresentationState
 	void addMass(const std::shared_ptr<Mass> mass);
 
 	/// Adds a spring
@@ -78,12 +72,14 @@ public:
 	/// \param nodeId The node id for which the mass is requested
 	/// \return the mass attribute of a node
 	/// \note The mass is returned with read/write access
+	/// \note Out of range nodeId will raise an exception
 	std::shared_ptr<Mass> getMass(unsigned int nodeId);
 
 	/// Retrieves a given spring from its id
 	/// \param springId The spring id for which the spring is requested
 	/// \return the spring for the given springId
 	/// \note The spring is returned with read/write access
+	/// \note Out of range springId will raise an exception
 	std::shared_ptr<Spring> getSpring(unsigned int springId);
 
 	/// Gets the total mass of the mass spring
@@ -190,7 +186,8 @@ protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
-	void transformState(std::shared_ptr<DeformableRepresentationState> state, const RigidTransform3d& transform);
+	void transformState(std::shared_ptr<DeformableRepresentationState> state,
+		const SurgSim::Math::RigidTransform3d& transform);
 
 private:
 	/// Masses

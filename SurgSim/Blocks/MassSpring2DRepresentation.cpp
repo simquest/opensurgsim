@@ -17,6 +17,7 @@
 #include <SurgSim/Blocks/MassSpringNDRepresentationUtils.h>
 
 using SurgSim::Physics::Mass;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {

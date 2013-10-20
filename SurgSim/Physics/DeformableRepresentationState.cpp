@@ -23,7 +23,8 @@ namespace SurgSim
 namespace Physics
 {
 
-DeformableRepresentationState::DeformableRepresentationState()
+DeformableRepresentationState::DeformableRepresentationState() :
+	m_numDofPerNode(0u), m_numNodes(0u)
 {
 }
 
@@ -46,7 +47,7 @@ void DeformableRepresentationState::reset()
 	m_x.setZero();
 	m_v.setZero();
 	m_a.setZero();
-	m_boundaryConditionsPerDof.setZero();
+	m_boundaryConditionsPerDof.setConstant(false);
 	m_boundaryConditionsAsDofIds.clear();
 }
 

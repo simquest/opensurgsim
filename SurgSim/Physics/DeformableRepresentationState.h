@@ -59,6 +59,7 @@ public:
 	/// Allocates the state for a given number of degrees of freedom
 	/// \param numDofPerNode The number of degrees of freedom per node to account for
 	/// \param numNodes The number of nodes to account for
+	/// \note This method clears all the data structures and remove all existing boundary conditions
 	void setNumDof(unsigned int numDofPerNode, unsigned int numNodes);
 
 	/// Retrieves the number of degrees of freedom
@@ -127,7 +128,7 @@ public:
 	/// Queries if a specific dof is a boundary condition or not
 	/// \param dof The requested dof
 	/// \return True if dof is a boundary condition, False otherwise
-	/// \note No test is performed on dof, the behavior is undefined when dof is out of range
+	/// \note The behavior is undefined when dof is out of range [0 getNumBoundaryConditions()-1]
 	bool isBoundaryCondition(unsigned int dof) const;
 
 private:
@@ -139,10 +140,10 @@ private:
 	/// Degrees of freedom position
 	SurgSim::Math::Vector m_x;
 
-	/// Degrees of freedom velocity (1st derivative w.r.t. time)
+	/// Degrees of freedom velocity (m_x 1st derivative w.r.t. time)
 	SurgSim::Math::Vector m_v;
 
-	/// Degrees of freedom acceleration (2nd derivative w.r.t. time)
+	/// Degrees of freedom acceleration (m_x 2nd derivative w.r.t. time)
 	SurgSim::Math::Vector m_a;
 
 	/// Boundary conditions stored as a list of dof ids

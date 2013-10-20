@@ -54,7 +54,7 @@ public:
 
 	/// Gets the rest length of the spring
 	/// \return The rest length assigned to the spring (in m)
-	double getInitialLength() const;
+	double getRestLength() const;
 
 	/// Computes the spring force from a given state
 	/// \param state The state to compute the force with

@@ -63,7 +63,7 @@ void LinearSpring::setRestLength(double restLength)
 	m_restLength = restLength;
 }
 
-double LinearSpring::getInitialLength() const
+double LinearSpring::getRestLength() const
 {
 	return m_restLength;
 }

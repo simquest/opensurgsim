@@ -41,8 +41,7 @@ namespace Physics
 /// \note   which is being held by the OdeEquation (initial condition of the ode problem).
 /// \note It holds the initial pose, which should be set before setting the initial state so the states
 /// \note   can be properly transformed.
-/// \note The current pose is always identity and therefore cannot be set. Calling setPose will result
-/// \note   raise an exception.
+/// \note The current pose is always identity and therefore cannot be set. Calling setPose will raise an exception.
 /// \note It holds the force vector; the mass, damping and stiffness matrices (templated type)
 /// \note Derived classes must implement the Representation API and the OdeEquation API, also set
 /// \note   m_numDofPerNode and call Representation::setNumDof()
@@ -87,14 +86,13 @@ public:
 	virtual void resetState() override;
 
 	/// Set the initial state (in the global frame)
-	/// \param initialState The initial state for this deformable representation
-	/// \note All states are initialized with initialState as well to make the simulation ready
-	/// \note All states are transformed by the initialPose, if any as been specified prior to calling this method
+	/// \param initialState The initial state for this deformable representation (will potentially be changed)
+	/// \note 'initialState' will be transformed by the initialPose, if any has been specified
+	/// \note The parameter will be kept internally as the shared_ptr and the content will be transformed,
+	/// \note   so after this call, do not expect 'initialState' to be unchanged.
+	/// \note All internal states are initialized with the transformed initialState to make the simulation ready.
+	/// \note This method also sets the number of dof for this Representation
 	void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState);
-
-	///// Get the initial state (in the global frame)
-	///// \return The initial state of this deformable representation
-	//const std::shared_ptr<DeformableRepresentationState> getInitialState() const;
 
 	/// Get the current state (in the global frame)
 	/// \return The current state of this deformable representation
@@ -123,6 +121,7 @@ public:
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	/// \note DeformableRepresentation::beforeUpdate takes care of the OdeSolver setup
+	/// \note All derived classes overriding this method should call DeformableRepresentation::beforeUpdate(dt)
 	virtual void beforeUpdate(double dt) override;
 
 protected:

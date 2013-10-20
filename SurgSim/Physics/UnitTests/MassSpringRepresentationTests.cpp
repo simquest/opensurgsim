@@ -41,7 +41,7 @@ public:
 		double totalMass,
 		double rayleighDampingMass, double rayleighDampingStiffness,
 		double springStiffness, double springDamping,
-		MassSpringRepresentation::IntegrationScheme integrationScheme) :
+		SurgSim::Math::IntegrationScheme integrationScheme) :
 		MassSpringRepresentation(name)
 	{
 		using SurgSim::Math::getSubVector;
@@ -54,7 +54,7 @@ public:
 
 		std::shared_ptr<DeformableRepresentationState> state;
 		state = std::make_shared<DeformableRepresentationState>();
-		state->setNumDof(3 * numNodes);
+		state->setNumDof(3, numNodes);
 		for (unsigned int i = 0; i < numNodes; i++)
 		{
 			Vector3d p(static_cast<double>(i)/static_cast<double>(numNodes), 0, 0);
@@ -145,6 +145,9 @@ TEST_F(MassSpringRepresentationTests, Constructor)
 	ASSERT_NO_THROW({MassSpringRepresentation m("MassSpring");});
 
 	ASSERT_NO_THROW({MassSpringRepresentation* m = new MassSpringRepresentation("MassSpring"); delete m;});
+
+	ASSERT_NO_THROW({std::shared_ptr<MassSpringRepresentation> m = \
+		std::make_shared<MassSpringRepresentation>("MassSpring");});
 }
 
 TEST_F(MassSpringRepresentationTests, SetGetMethods)
@@ -176,7 +179,7 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	// setInitialState is part of DeformableRepresentation...already tested !
 	std::shared_ptr<DeformableRepresentationState> state;
 	state = std::make_shared<DeformableRepresentationState>();
-	state->setNumDof(6);
+	state->setNumDof(3, 2);
 	state->getPositions().setRandom();
 	m.setInitialState(state);
 
@@ -191,7 +194,7 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	EXPECT_EQ(mass1, m.getMass(1));
 	EXPECT_EQ(*mass1, *m.getMass(1));
 
-	// addMass/getNumMasses/getMass
+	// addSpring/getNumSprings/getSpring
 	std::shared_ptr<LinearSpring> spring0 = std::make_shared<LinearSpring>(0, 1);
 	spring0->setStiffness(1.0);
 	spring0->setDamping(1.0);
@@ -210,14 +213,6 @@ TEST_F(MassSpringRepresentationTests, SetGetMethods)
 	m.setRayleighDampingStiffness(5.4);
 	EXPECT_DOUBLE_EQ(5.4, m.getRayleighDampingStiffness());
 
-	// set/get IntegrationScheme
-	m.setIntegrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER);
-	EXPECT_EQ(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER, m.getIntegrationScheme());
-	m.setIntegrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-	EXPECT_EQ(MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER, m.getIntegrationScheme());
-	m.setIntegrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER);
-	EXPECT_EQ(MassSpringRepresentation::INTEGRATIONSCHEME_IMPLICIT_EULER, m.getIntegrationScheme());
-
 	// set/get Type
 	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING, m.getType());
 }
@@ -227,7 +222,7 @@ TEST_F(MassSpringRepresentationTests, NoGravityTest)
 	// Note the use of identity pose to avoid small variation between the spring rest length and current length
 	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_boundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER);
+		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
 	m.setIsGravityEnabled(false);
 
@@ -239,7 +234,6 @@ TEST_F(MassSpringRepresentationTests, NoGravityTest)
 	EXPECT_EQ(*m.getInitialState(), *m.getCurrentState());
 	EXPECT_EQ(*m.getInitialState(), *m.getPreviousState());
 }
-
 
 TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 {
@@ -258,7 +252,7 @@ TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 	// (explicit adds energy to the system, implicit removes energy to the system)
 	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		MassSpringRepresentation::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+		SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
 
 	// Pull on the free mass, by simply making the initial length shorter (creating an extension right away)
 	std::static_pointer_cast<LinearSpring>(m.getSpring(0))->setRestLength(0.0);
@@ -331,7 +325,7 @@ TEST_F(MassSpringRepresentationTests, FallingTest)
 
 	MockMassSpring m("MassSpring", m_poseRandom, m_numNodes, m_boundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
-		MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER);
+		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
 
 	// run few iterations of simulation...
 	for (int i = 0; i< 5; i++)

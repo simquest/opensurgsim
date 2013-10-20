@@ -22,10 +22,6 @@
 #include <SurgSim/Math/OdeSolverEulerExplicitModified.h>
 #include <SurgSim/Math/OdeSolverEulerImplicit.h>
 
-using SurgSim::Math::ExplicitEuler;
-using SurgSim::Math::ModifiedExplicitEuler;
-using SurgSim::Math::ImplicitEuler;
-
 namespace SurgSim
 {
 
@@ -78,8 +74,10 @@ void DeformableRepresentation<M,D,K,S>::resetState()
 {
 	Representation::resetState();
 
+	// Reminder: m_initialState is being held in OdeEquation
 	*m_currentState  = *this->m_initialState;
 	*m_previousState = *this->m_initialState;
+	// m_newState does not need to be reset, it is a temporary variable
 	*m_finalState    = *this->m_initialState;
 }
 
@@ -128,7 +126,7 @@ void DeformableRepresentation<M,D,K,S>::setIntegrationScheme(SurgSim::Math::Inte
 {
 	if (m_integrationScheme != integrationScheme )
 	{
-		// Sets the integration scheme variable
+		// Sets the new integration scheme
 		m_integrationScheme = integrationScheme;
 		// The integration scheme has changed, the ode solver needs to be reloaded
 		m_needToReloadOdeSolver = true;
@@ -144,6 +142,10 @@ SurgSim::Math::IntegrationScheme DeformableRepresentation<M,D,K,S>::getIntegrati
 template <class M, class D, class K, class S>
 void  DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 {
+	using SurgSim::Math::ExplicitEuler;
+	using SurgSim::Math::ModifiedExplicitEuler;
+	using SurgSim::Math::ImplicitEuler;
+
 	if (! isActive())
 	{
 		return;

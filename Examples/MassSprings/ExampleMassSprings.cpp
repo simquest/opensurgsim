@@ -17,6 +17,10 @@
 #include <boost/thread.hpp>
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
+#include <SurgSim/Blocks/MassSpring1DRepresentation.h>
+#include <SurgSim/Blocks/MassSpring2DRepresentation.h>
+#include <SurgSim/Blocks/MassSpring3DRepresentation.h>
+#include <SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Runtime.h>
@@ -26,29 +30,23 @@
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
 #include <SurgSim/Physics/PhysicsManager.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
-using SurgSim::Blocks::BasicSceneElement;
-using SurgSim::Framework::Logger;
-using SurgSim::Framework::SceneElement;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector4f;
-using SurgSim::Physics::PhysicsManager;
 
-#include <SurgSim/Blocks/MassSpring1DRepresentation.h>
-#include <SurgSim/Blocks/MassSpring2DRepresentation.h>
-#include <SurgSim/Blocks/MassSpring3DRepresentation.h>
+using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::MassSpring1DRepresentation;
 using SurgSim::Blocks::MassSpring2DRepresentation;
 using SurgSim::Blocks::MassSpring3DRepresentation;
-
-#include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
-using SurgSim::Graphics::OsgPointCloudRepresentation;
-
-#include <SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h>
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Framework::Logger;
+using SurgSim::Framework::SceneElement;
+using SurgSim::Graphics::OsgPointCloudRepresentation;
+using SurgSim::Physics::PhysicsManager;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4f;
 
 ///\file Example of how to put together a very simple demo of mass springs
 
@@ -118,7 +116,6 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
 			(ss.str(),
 			physicsRepresentation->getFinalState(),
-			physicsRepresentation->getNumDof() / physicsRepresentation->getNumMasses(),
 			graphicsRepresentation->getVertices()));
 
 		gfxObjectId++;
@@ -188,7 +185,6 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
 			(ss.str(),
 			physicsRepresentation->getFinalState(),
-			physicsRepresentation->getNumDof() / physicsRepresentation->getNumMasses(),
 			graphicsRepresentation->getVertices()));
 
 		gfxObjectId++;
@@ -268,7 +264,6 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
 			(ss.str(),
 			physicsRepresentation->getFinalState(),
-			physicsRepresentation->getNumDof() / physicsRepresentation->getNumMasses(),
 			graphicsRepresentation->getVertices()));
 
 		gfxObjectId++;
