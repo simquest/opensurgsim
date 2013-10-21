@@ -41,9 +41,10 @@ bool OsgSceneryRepresentation::doInitialize()
 	SURGSIM_ASSERT(! objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
 
 	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
-	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << m_fileName << std::endl;
+	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << objectPath << std::endl;
 
 	m_transform->addChild(m_sceneryRepresentation);
+	m_switch->addChild(m_sceneryRepresentation);
 	return true;
 }
 
