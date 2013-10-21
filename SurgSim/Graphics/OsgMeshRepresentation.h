@@ -23,6 +23,7 @@
 #include <SurgSim/Graphics/Mesh.h>
 
 #include <osg/ref_ptr>
+#include <osg/Array>
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -57,6 +58,9 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	virtual bool setMesh(std::shared_ptr<Mesh> mesh) override;
 
+	void updateVertices();
+
+
 	/// Gets the mesh.
 	/// \return	The mesh.
 	virtual std::shared_ptr<Mesh> getMesh() override;
@@ -65,13 +69,29 @@ public:
 	/// \param	val	true to value.
 	void setDrawAsWireFrame(bool val);
 
+	/// Updates the mesh with the new vertex positions.
+	/// \param	dt	The dt.
+	virtual void update(double dt);
+
 private:
 
 	/// The mesh.
 	std::shared_ptr<Mesh> m_mesh;
+
 	
 	/// The Osg Geometry.
 	osg::ref_ptr<osg::Geometry> m_geometry;	
+
+	size_t m_vertexCount;
+
+	osg::ref_ptr<osg::Vec3Array> m_vertices;
+	osg::ref_ptr<osg::Vec4Array> m_colors;
+	osg::ref_ptr<osg::Vec3Array> m_normals;
+	osg::ref_ptr<osg::Vec2Array> m_textureCoordinates;
+
+	void updateColors();
+	void updateNormals();
+
 };
 
 
