@@ -185,9 +185,9 @@ void resize(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = 
 	{
 		return;
 	}
-	if (A->rows() != numRow && A->cols() != numCol)
+	if (A->rows() != static_cast<int>(numRow) && A->cols() != static_cast<int>(numCol))
 	{
-		A->resize(numRow, numCol);
+		A->resize(static_cast<int>(numRow), static_cast<int>(numCol));
 	}
 	if (zeroOut)
 	{

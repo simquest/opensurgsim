@@ -127,9 +127,9 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 	{
 		return;
 	}
-	if (v->size() != size)
+	if (v->size() != static_cast<int>(size))
 	{
-		v->resize(size);
+		v->resize(static_cast<int>(size));
 	}
 	if (zeroOut)
 	{

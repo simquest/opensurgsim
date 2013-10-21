@@ -72,7 +72,7 @@ unsigned int DeformableRepresentationState::getNumDof() const
 	const unsigned int numDof = m_numDofPerNode * m_numNodes;
 
 	SURGSIM_ASSERT(m_x.size() == m_v.size() && m_x.size() == m_a.size() &&
-		m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() == numDof);
+		m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() == static_cast<int>(numDof));
 
 	return numDof;
 }

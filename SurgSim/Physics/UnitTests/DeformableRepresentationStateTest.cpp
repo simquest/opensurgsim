@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include <SurgSim/Physics/DeformableRepresentationState.h>
+
 using SurgSim::Physics::DeformableRepresentationState;
 
 namespace
@@ -53,19 +54,19 @@ TEST(DeformableRepresentationStateTest, AllocateTest)
 	EXPECT_EQ(0u, state.getNumDof());
 	EXPECT_EQ(0u, state.getNumNodes());
 	EXPECT_EQ(0u, state.getNumBoundaryConditions());
-	EXPECT_EQ(0u, state.getBoundaryConditions().size());
-	EXPECT_EQ(0u, state.getPositions().size());
-	EXPECT_EQ(0u, state.getVelocities().size());
-	EXPECT_EQ(0u, state.getAccelerations().size());
+	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0), state.getBoundaryConditions().size());
+	EXPECT_EQ(0, state.getPositions().size());
+	EXPECT_EQ(0, state.getVelocities().size());
+	EXPECT_EQ(0, state.getAccelerations().size());
 
 	ASSERT_NO_THROW(state.setNumDof(3u, 3u));
 	EXPECT_EQ(9u, state.getNumDof());
 	EXPECT_EQ(3u, state.getNumNodes());
-	EXPECT_EQ(9u, state.getPositions().size());
-	EXPECT_EQ(9u, state.getVelocities().size());
-	EXPECT_EQ(9u, state.getAccelerations().size());
+	EXPECT_EQ(9, state.getPositions().size());
+	EXPECT_EQ(9, state.getVelocities().size());
+	EXPECT_EQ(9, state.getAccelerations().size());
 	EXPECT_EQ(0u , state.getNumBoundaryConditions());
-	EXPECT_EQ(0u , state.getBoundaryConditions().size());
+	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0) , state.getBoundaryConditions().size());
 }
 
 TEST(DeformableRepresentationStateTest, GetPositionsTest)
@@ -163,7 +164,7 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 	state.addBoundaryCondition(0);
 	EXPECT_EQ(6u, state.getNumDof());
 	EXPECT_EQ(1u, state.getNumBoundaryConditions());
-	ASSERT_EQ(1u, state.getBoundaryConditions().size());
+	ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(1), state.getBoundaryConditions().size());
 	for (unsigned int dofId = 1; dofId < 6; dofId++)
 	{
 		if (dofId == 0u)
@@ -176,9 +177,9 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 		}
 	}
 	EXPECT_EQ(0u, state.getBoundaryConditions()[0]);
-	EXPECT_EQ(6u, state.getPositions().size());
-	EXPECT_EQ(6u, state.getVelocities().size());
-	EXPECT_EQ(6u, state.getAccelerations().size());
+	EXPECT_EQ(6, state.getPositions().size());
+	EXPECT_EQ(6, state.getVelocities().size());
+	EXPECT_EQ(6, state.getAccelerations().size());
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
 	EXPECT_TRUE(state.getAccelerations().isZero());
@@ -186,7 +187,7 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 	state.addBoundaryCondition(2);
 	EXPECT_EQ(6u, state.getNumDof());
 	EXPECT_EQ(2u, state.getNumBoundaryConditions());
-	ASSERT_EQ(2u, state.getBoundaryConditions().size());
+	ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(2), state.getBoundaryConditions().size());
 	EXPECT_EQ(0u, state.getBoundaryConditions()[0]);
 	EXPECT_EQ(2u, state.getBoundaryConditions()[1]);
 	for (unsigned int dofId = 1; dofId < 6; dofId++)
@@ -200,9 +201,9 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 			EXPECT_FALSE(state.isBoundaryCondition(dofId));
 		}
 	}
-	EXPECT_EQ(6u, state.getPositions().size());
-	EXPECT_EQ(6u, state.getVelocities().size());
-	EXPECT_EQ(6u, state.getAccelerations().size());
+	EXPECT_EQ(6, state.getPositions().size());
+	EXPECT_EQ(6, state.getVelocities().size());
+	EXPECT_EQ(6, state.getAccelerations().size());
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
 	EXPECT_TRUE(state.getAccelerations().isZero());
@@ -210,7 +211,7 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 	state.addBoundaryCondition(4);
 	EXPECT_EQ(6u, state.getNumDof());
 	EXPECT_EQ(3u, state.getNumBoundaryConditions());
-	ASSERT_EQ(3u, state.getBoundaryConditions().size());
+	ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(3), state.getBoundaryConditions().size());
 	EXPECT_EQ(0u, state.getBoundaryConditions()[0]);
 	EXPECT_EQ(2u, state.getBoundaryConditions()[1]);
 	EXPECT_EQ(4u, state.getBoundaryConditions()[2]);
@@ -225,9 +226,9 @@ TEST(DeformableRepresentationStateTest, AddGetIsBoundaryConditionsTest)
 			EXPECT_FALSE(state.isBoundaryCondition(dofId));
 		}
 	}
-	EXPECT_EQ(6u, state.getPositions().size());
-	EXPECT_EQ(6u, state.getVelocities().size());
-	EXPECT_EQ(6u, state.getAccelerations().size());
+	EXPECT_EQ(6, state.getPositions().size());
+	EXPECT_EQ(6, state.getVelocities().size());
+	EXPECT_EQ(6, state.getAccelerations().size());
 	EXPECT_TRUE(state.getPositions().isZero());
 	EXPECT_TRUE(state.getVelocities().isZero());
 	EXPECT_TRUE(state.getAccelerations().isZero());
@@ -256,7 +257,7 @@ TEST(DeformableRepresentationStateTest, ResetTest)
 	EXPECT_TRUE(state1.getVelocities().isZero());
 	EXPECT_TRUE(state1.getAccelerations().isZero());
 	EXPECT_EQ(0u, state1.getNumBoundaryConditions());
-	EXPECT_EQ(0u, state1.getBoundaryConditions().size());
+	EXPECT_EQ(static_cast<std::vector<unsigned int>::size_type>(0), state1.getBoundaryConditions().size());
 }
 
 TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
@@ -296,7 +297,7 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateCopied.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateCopied.getNumBoundaryConditions());
-		ASSERT_EQ(2u, stateCopied.getBoundaryConditions().size());
+		ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(2), stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateCopied.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateCopied.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateCopied.getBoundaryConditions()[0]);
@@ -328,7 +329,7 @@ TEST(DeformableRepresentationStateTest, CopyConstructorAndAssignmentTest)
 
 		ASSERT_EQ(2u, stateAssigned.getNumBoundaryConditions());
 		ASSERT_EQ(state.getNumBoundaryConditions(), stateAssigned.getNumBoundaryConditions());
-		ASSERT_EQ(2u, stateAssigned.getBoundaryConditions().size());
+		ASSERT_EQ(static_cast<std::vector<unsigned int>::size_type>(2), stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(state.getBoundaryConditions().size(), stateAssigned.getBoundaryConditions().size());
 		ASSERT_EQ(0u, stateAssigned.getBoundaryConditions()[0]);
 		ASSERT_EQ(state.getBoundaryConditions()[0], stateAssigned.getBoundaryConditions()[0]);

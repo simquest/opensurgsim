@@ -449,7 +449,7 @@ static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& tra
 									  Vector* x, bool rotationOnly = false)
 {
 	unsigned int numNodes = x->size() / 3;
-	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<
+	SURGSIM_ASSERT(static_cast<int>(numNodes * 3) == x->size()) <<
 		"Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
 
 	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
