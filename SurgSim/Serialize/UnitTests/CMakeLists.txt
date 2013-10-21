@@ -14,21 +14,22 @@
 # limitations under the License.
 
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
 include_directories(
-	"${Boost_INCLUDE_DIR}"
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
 )
 
-add_subdirectory(Blocks)
-add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Physics)
-add_subdirectory(Serialize)
-add_subdirectory(Testing)
+set(UNIT_TEST_SOURCES
+	GraphicsConvertTest.cpp
+	MathConvertTest.cpp
+)
+
+set(UNIT_TEST_HEADERS
+)
+
+include_directories(
+)
+
+set(LIBS SurgSimSerialize SurgSimFramework SurgSimGraphics gtest yaml-cpp ${Boost_LIBRARIES})
+
+surgsim_add_unit_tests(SurgSimSerializeTest)

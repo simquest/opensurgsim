@@ -1,6 +1,7 @@
 #include "tests.h"
 #include "handlermacros.h"
 #include "yaml-cpp/yaml.h"
+#include "yaml-cpp/emittermanip.h"
 #include <iostream>
 
 namespace Test
@@ -14,6 +15,24 @@ namespace Test
 			desiredOutput = "Hello, World!";
 		}
 		
+		void EmptySeqNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node;
+
+			node[0];
+			out << node;
+
+			desiredOutput = "[]";
+		}
+
+		void EmptyMapNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node;
+
+			node["undefined"];
+			out << node;
+
+			desiredOutput = "{}";
+		}
+
 		void SimpleSeq(YAML::Emitter& out, std::string& desiredOutput) {
 			out << YAML::BeginSeq;
 			out << "eggs";
@@ -33,6 +52,18 @@ namespace Test
 			out << YAML::EndSeq;
 			
 			desiredOutput = "[Larry, Curly, Moe]";
+		}
+
+		void SimpleFlowSeqNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node;
+
+			node.SetStyle(YAML::FlowStyle);
+			node.push_back(1.01);
+			node.push_back(2.01);
+			node.push_back(3.01);
+			out << node;
+
+			desiredOutput = "[1.01, 2.01, 3.01]";
 		}
 		
 		void EmptyFlowSeq(YAML::Emitter& out, std::string& desiredOutput) {
@@ -61,6 +92,83 @@ namespace Test
 			desiredOutput = "- one\n- [two, three]";
 		}
 
+		void NestFlowSeqNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, cell0, cell1;
+			
+			cell0.push_back(1.01);
+			cell0.push_back(2.01);
+			cell0.push_back(3.01);
+
+			cell1.push_back(4.01);
+			cell1.push_back(5.01);
+			cell1.push_back(6.01);
+
+			node.SetStyle(YAML::FlowStyle);
+			node.push_back(cell0);
+			node.push_back(cell1);
+
+			out << node;
+
+			desiredOutput = "[[1.01, 2.01, 3.01], [4.01, 5.01, 6.01]]";
+		}
+
+		void MixBlockFlowSeqNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, cell0, cell1;
+			
+			cell0.SetStyle(YAML::FlowStyle);
+			cell0.push_back(1.01);
+			cell0.push_back(2.01);
+			cell0.push_back(3.01);
+
+			cell1.push_back(4.01);
+			cell1.push_back(5.01);
+			cell1.push_back(6.01);
+
+			node.SetStyle(YAML::BlockStyle);
+			node.push_back(cell0);
+			node.push_back(cell1);
+
+			out << node;
+
+			desiredOutput = "- [1.01, 2.01, 3.01]\n-\n  - 4.01\n  - 5.01\n  - 6.01";
+		}
+
+		void NestBlockFlowMapListNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, mapNode, blockNode;
+
+			node.push_back(1.01);
+			node.push_back(2.01);
+			node.push_back(3.01);
+
+			mapNode.SetStyle(YAML::FlowStyle);
+			mapNode["position"] = node;
+
+			blockNode.push_back(1.01);
+			blockNode.push_back(mapNode);
+
+			out << blockNode;
+
+			desiredOutput = "- 1.01\n- {position: [1.01, 2.01, 3.01]}";
+		}
+
+		void NestBlockMixMapListNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, mapNode, blockNode;
+
+			node.push_back(1.01);
+			node.push_back(2.01);
+			node.push_back(3.01);
+
+			mapNode.SetStyle(YAML::FlowStyle);
+			mapNode["position"] = node;
+
+			blockNode["scalar"] = 1.01;
+			blockNode["object"] = mapNode;
+
+			out << blockNode;
+
+			desiredOutput = "scalar: 1.01\nobject: {position: [1.01, 2.01, 3.01]}";
+		}
+
 		void SimpleMap(YAML::Emitter& out, std::string& desiredOutput) {
 			out << YAML::BeginMap;
 			out << YAML::Key << "name";
@@ -83,7 +191,7 @@ namespace Test
 			
 			desiredOutput = "{shape: square, color: blue}";
 		}
-		
+
 		void MapAndList(YAML::Emitter& out, std::string& desiredOutput) {
 			out << YAML::BeginMap;
 			out << YAML::Key << "name";
@@ -139,6 +247,36 @@ namespace Test
 			out << YAML::EndMap;
 			
 			desiredOutput = "{name: Fred, grades: {algebra: A, physics: C+, literature: B}}";
+		}
+
+		void NestBlockMapListNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, mapNode;
+
+			node.push_back(1.01);
+			node.push_back(2.01);
+			node.push_back(3.01);
+
+			mapNode.SetStyle(YAML::BlockStyle);
+			mapNode["position"] = node;
+
+			out << mapNode;
+
+			desiredOutput = "position:\n  - 1.01\n  - 2.01\n  - 3.01";
+		}
+
+		void NestFlowMapListNode(YAML::Emitter& out, std::string& desiredOutput) {
+			YAML::Node node, mapNode;
+			
+			node.push_back(1.01);
+			node.push_back(2.01);
+			node.push_back(3.01);
+
+			mapNode.SetStyle(YAML::FlowStyle);
+			mapNode["position"] = node;
+
+			out << mapNode;
+
+			desiredOutput = "{position: [1.01, 2.01, 3.01]}";
 		}
 		
 		void MapListMix(YAML::Emitter& out, std::string& desiredOutput) {
@@ -1069,18 +1207,27 @@ namespace Test
 	{
 		int passed = 0;
 		int total = 0;
+		RunEmitterTest(&Emitter::EmptySeqNode, "simple scalar", passed, total);
+		RunEmitterTest(&Emitter::EmptyMapNode, "simple scalar", passed, total);
 		RunEmitterTest(&Emitter::SimpleScalar, "simple scalar", passed, total);
 		RunEmitterTest(&Emitter::SimpleSeq, "simple seq", passed, total);
 		RunEmitterTest(&Emitter::SimpleFlowSeq, "simple flow seq", passed, total);
+		RunEmitterTest(&Emitter::SimpleFlowSeqNode, "simple flow seq Node", passed, total);
 		RunEmitterTest(&Emitter::EmptyFlowSeq, "empty flow seq", passed, total);
 		RunEmitterTest(&Emitter::NestedBlockSeq, "nested block seq", passed, total);
 		RunEmitterTest(&Emitter::NestedFlowSeq, "nested flow seq", passed, total);
+		RunEmitterTest(&Emitter::NestFlowSeqNode, "nest flow seq Node", passed, total);
 		RunEmitterTest(&Emitter::SimpleMap, "simple map", passed, total);
+		RunEmitterTest(&Emitter::MixBlockFlowSeqNode, "nest flow seq Node", passed, total);
 		RunEmitterTest(&Emitter::SimpleFlowMap, "simple flow map", passed, total);
 		RunEmitterTest(&Emitter::MapAndList, "map and list", passed, total);
 		RunEmitterTest(&Emitter::ListAndMap, "list and map", passed, total);
 		RunEmitterTest(&Emitter::NestedBlockMap, "nested block map", passed, total);
 		RunEmitterTest(&Emitter::NestedFlowMap, "nested flow map", passed, total);
+		RunEmitterTest(&Emitter::NestBlockMapListNode, "nested flow map", passed, total);
+		RunEmitterTest(&Emitter::NestBlockFlowMapListNode, "nested flow map", passed, total);
+		RunEmitterTest(&Emitter::NestBlockMixMapListNode, "nested flow map", passed, total);
+		RunEmitterTest(&Emitter::NestFlowMapListNode, "nested flow map", passed, total);
 		RunEmitterTest(&Emitter::MapListMix, "map list mix", passed, total);
 		RunEmitterTest(&Emitter::SimpleLongKey, "simple long key", passed, total);
 		RunEmitterTest(&Emitter::SingleLongKey, "single long key", passed, total);

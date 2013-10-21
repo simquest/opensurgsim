@@ -11,6 +11,7 @@
 #include "yaml-cpp/node/detail/memory.h"
 #include "yaml-cpp/node/detail/node.h"
 #include "yaml-cpp/exceptions.h"
+#include "yaml-cpp/emittermanip.h"
 #include <string>
 
 namespace YAML
@@ -171,6 +172,20 @@ namespace YAML
             throw InvalidNode();
 		EnsureNodeExists();
 		m_pNode->set_tag(tag);
+	}
+
+	// style
+	inline void Node::SetStyle(const YAML::EMITTER_STYLE style)
+	{
+		if(!m_isValid)
+			throw InvalidNode();
+		EnsureNodeExists();
+		m_pNode->set_style(style);
+	}
+
+	inline YAML::EMITTER_STYLE Node::Style() const
+	{
+		return m_pNode->style();
 	}
 
 	// assignment
