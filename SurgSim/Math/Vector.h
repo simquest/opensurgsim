@@ -109,8 +109,11 @@ void setSubVector(const SubVector& subVector,unsigned int blockId, unsigned int 
 /// \param blockId The block index
 /// \param blockSize The block size
 /// \return The requested sub-vector
+/// \note Disable cpplint warnings for use of non-const reference
+/// \note Eigen has a specific type for VectorBlock that we want to return with read/write access
+/// \note therefore the Vector from which the VectorBlock is built from must not be const
 template <class Vector>
-Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, unsigned int blockSize)
+Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, unsigned int blockSize) // NOLINT
 {
 	return vector.segment(blockSize * blockId, blockSize);
 }

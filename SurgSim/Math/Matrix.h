@@ -166,8 +166,11 @@ void setSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned 
 /// \param blockIdRow, blockIdCol The block indices
 /// \param blockSizeRow, blockSizeCol The block size
 /// \return The requested sub-matrix
+/// \note Disable cpplint warnings for use of non-const reference
+/// \note Eigen has a specific type for Block that we want to return with read/write access
+/// \note therefore the Matrix from which the Block is built from must not be const
 template <class Matrix>
-Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsigned int blockIdCol,
+Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsigned int blockIdCol,  // NOLINT
 	unsigned int blockSizeRow, unsigned int blockSizeCol)
 {
 	return matrix.block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol);
