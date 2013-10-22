@@ -104,6 +104,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUnitCylinder.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
+	OsgVectorFieldRepresentation.h
+	OsgVectorFieldRepresentation-inl.h
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
@@ -121,6 +123,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	TextureRectangle.h
 	Uniform.h
 	UniformBase.h
+	VectorFieldRepresentation.h
 	View.h
 	ViewElement.h
 )
