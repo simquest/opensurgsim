@@ -76,6 +76,9 @@ namespace Testing
 										const SurgSim::Math::Vector3d& endPosition,
 										const double& t);
 
+	SurgSim::Math::RigidTransform3d makeRigidTransformFromAngles(
+										SurgSim::Math::Vector3d angles,
+										SurgSim::Math::Vector3d position);
 }
 }
 
