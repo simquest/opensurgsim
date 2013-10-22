@@ -40,7 +40,7 @@ class NamedVariantData : public NamedData<boost::any>
 {
 public:
 	NamedVariantData();
-	
+
 	/// Implicit conversion for NamedVariantData constructor is used on purpose.
 	NamedVariantData(const NamedData<boost::any>& namedData); //NOLINT
 
