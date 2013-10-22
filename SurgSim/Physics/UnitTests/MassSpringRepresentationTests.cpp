@@ -103,7 +103,7 @@ public:
 
 	}
 
-	void FallingTest(MockMassSpring &m);
+	void FallingTest(MockMassSpring &m); //NOLINT
 
 protected:
 	/// Simulation parameters
@@ -372,7 +372,8 @@ TEST_F(MassSpringRepresentationTests, OneSpringFrequencyTest)
 	EXPECT_TRUE(deltaCompare.isZero(8e-9)) << "Error is " << deltaCompare.norm();
 }
 
-void MassSpringRepresentationTests::FallingTest(MockMassSpring &m)
+/// Parameter of MockMassSpring type to be passed by non-const reference on purpose.
+void MassSpringRepresentationTests::FallingTest(MockMassSpring &m) //NOLINT
 {
 	m.setIsActive(true);
 	m.setIsGravityEnabled(true);

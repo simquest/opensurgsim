@@ -40,8 +40,9 @@ class NamedVariantData : public NamedData<boost::any>
 {
 public:
 	NamedVariantData();
-
-	NamedVariantData(const NamedData<boost::any>& namedData);
+	
+	/// Implicit conversion for NamedVariantData constructor is used on purpose.
+	NamedVariantData(const NamedData<boost::any>& namedData); //NOLINT
 
 	/// Check whether the entry with the specified index contains valid data.
 	/// The check verifies that the entry's data is of type T, was %set using

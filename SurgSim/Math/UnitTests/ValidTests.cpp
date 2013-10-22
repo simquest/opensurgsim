@@ -414,7 +414,6 @@ template <typename T>
 static void compareMatrices(const T& a, const T& b)
 {
 	typedef T Matrix;
-	typedef typename Matrix::Scalar Scalar;
 	typedef typename Matrix::Index Index;
 
 	EXPECT_EQ(a.rows(), b.rows());
@@ -447,7 +446,6 @@ static void matrixSetSubnormalHelper(const T& validMatrix)
 
 	typedef T Matrix;
 	typedef typename Matrix::Scalar Scalar;
-	typedef typename Matrix::Index Index;
 
 	EXPECT_TRUE(SurgSim::Math::isValid(validMatrix));
 	EXPECT_FALSE(SurgSim::Math::isSubnormal(validMatrix));
@@ -635,7 +633,6 @@ template <typename T>
 static void compareAngleAxis(const T& a, const T& b)
 {
 	typedef T AngleAxis;
-	typedef typename AngleAxis::Scalar Scalar;
 
 	bool isValidAngleA = SurgSim::Math::isValid(a.angle());
 	bool isValidAngleB = SurgSim::Math::isValid(b.angle());
