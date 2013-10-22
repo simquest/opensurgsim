@@ -88,6 +88,7 @@ private:
 	osg::ref_ptr<osg::Vec4Array> m_colors;
 	osg::ref_ptr<osg::Vec3Array> m_normals;
 	osg::ref_ptr<osg::Vec2Array> m_textureCoordinates;
+	osg::ref_ptr<osg::PrimitiveSet> m_set;
 
 	void updateColors();
 	void updateNormals();

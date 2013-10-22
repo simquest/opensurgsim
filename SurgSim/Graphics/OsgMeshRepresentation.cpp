@@ -113,7 +113,10 @@ bool OsgMeshRepresentation::setMesh(std::shared_ptr<Mesh> mesh)
 		triangles[j+1] = mesh->getTriangle(i).verticesId[1];
 		triangles[j+2] = mesh->getTriangle(i).verticesId[2];
 	}
-	m_geometry->addPrimitiveSet(new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES,triangleCount*3,triangles));
+
+	m_set = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES,triangleCount*3,triangles);
+
+	m_geometry->addPrimitiveSet(m_set);
 
 	// Create normals, currently per triangle
 	m_normals = new osg::Vec3Array(m_vertices->size());
@@ -143,7 +146,6 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 	if (val)
 	{
 		 polygonMode = new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::LINE);
-
 	}
 	else
 	{
@@ -167,6 +169,12 @@ void OsgMeshRepresentation::update(double dt)
 		updateColors();
 	}
 	updateNormals();
+
+	m_set->dirty();
+	m_geometry->dirtyDisplayList();
+
+	// Rather than dirtying the bounds we should recalculate them on the fly
+	m_geometry->dirtyBound();
 }
 
 void OsgMeshRepresentation::updateColors()
@@ -187,6 +195,7 @@ void OsgMeshRepresentation::updateColors()
 			(*m_colors)[i] = SurgSim::Graphics::toOsg(m_mesh->getVertex(i).data.color.getValue());
 		}
 	}
+	m_switch->dirtyBound();
 }
 
 void OsgMeshRepresentation::updateVertices()
@@ -195,6 +204,8 @@ void OsgMeshRepresentation::updateVertices()
 	{
 		(*m_vertices)[i].set(toOsg(m_mesh->getVertexPosition(i)));
 	}
+
+	// Recalculate the bounding box here 
 }
 
 void OsgMeshRepresentation::updateNormals()
