@@ -98,7 +98,7 @@ protected:
 
 		for (size_t i = 0; i < triangles.size()/3; ++i )
 		{
-			Mesh::TriangleType::IdType ids = {triangles[3*i], triangles[3*i+1],triangles[3*i+2]};
+			Mesh::TriangleType::IdType ids = {{triangles[3*i], triangles[3*i+1],triangles[3*i+2]}};
 			Mesh::TriangleType triangle(ids, SurgSim::Graphics::TriangleData());
 			mesh->addTriangle(triangle);
 		}
