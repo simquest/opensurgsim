@@ -53,70 +53,16 @@ using SurgSim::Math::makeRotationQuaternion;
 
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
+using SurgSim::Testing::makeRigidTransformFromAngles;
 
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Framework/Behavior.h>
+#include <utility>
 
 namespace SurgSim
 {
 namespace Graphics
 {
-
-
-class PoseInterpolator : public SurgSim::Framework::Behavior
-{
-public:
-	explicit PoseInterpolator(const std::string& name) :
-		Behavior(name),
-		m_from(RigidTransform3d::Identity()),
-		m_to(RigidTransform3d::Identity()),
-		m_duration(1.0),
-		m_currentTime(0.0)
-	{}
-
-	void setFrom(const SurgSim::Math::RigidTransform3d transform) {m_from.setValue(transform);}
-	void setTo(const SurgSim::Math::RigidTransform3d transform) {m_to = transform;}
-	void setTarget(std::shared_ptr<SurgSim::Graphics::Representation> target) {m_target = target;}
-
-	void setDuration(double t) {m_duration = t;}
-
-	bool doWakeUp() override
-	{
-		return true;
-	}
-
-	bool doInitialize() override
-	{
-		if (! m_from.hasValue())
-		{
-			m_from.setValue(m_target->getPose());
-		}
-
-		return true;
-	}
-
-	void update(double dt) override
-	{
-		bool result = true;
-		m_currentTime += dt;
-
-		m_target->setPose(interpolate(m_from.getValue(), m_to, m_currentTime/m_duration));
-
-		if (m_currentTime > m_duration)
-		{
-			getSceneElement()->removeComponent(getName());
-		}
-	}
-
-private:
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::RigidTransform3d> m_from;
-	SurgSim::Math::RigidTransform3d m_to;
-	std::shared_ptr<SurgSim::Graphics::Representation> m_target;
-
-	double m_duration;
-	double m_currentTime;
-};
-
 
 struct OsgMeshrepresentationRenderTests : public RenderTest
 {
@@ -127,35 +73,6 @@ protected:
 	std::vector<unsigned int> cubeTriangles;
 	std::vector<Vector4d> cubeColors;
 	std::vector<Vector2d> cubeTextures;
-
-	void makeCube(std::vector<Vector3d>* vertices,
-				  std::vector<Vector4d>* colors,
-				  std::vector<Vector2d>* textures,
-				  std::vector<unsigned int>* triangles)
-	{
-		using SurgSim::Testing::Cube::numVertices;
-		using SurgSim::Testing::Cube::numTriangles;
-		using SurgSim::Testing::Cube::vertexData;
-		using SurgSim::Testing::Cube::colorData;
-		using SurgSim::Testing::Cube::textureData;
-		using SurgSim::Testing::Cube::triangleData;
-
-		vertices->resize(numVertices);
-		colors->resize(numVertices);
-		textures->resize(numVertices);
-
-		double scale = 0.1;
-
-		for (int i=0; i<numVertices; ++i)
-		{
-			(*vertices)[i] = Vector3d(vertexData[3*i]*scale, vertexData[3*i+1]*scale, vertexData[3*i+2]*scale);
-			(*colors)[i] = Vector4d(colorData[4*i], colorData[4*i+1], colorData[4*i+2], colorData[4*i+3]);
-			(*textures)[i] = Vector2d(textureData[2*i], textureData[2*i+1]);
-		}
-
-		triangles->resize(numTriangles*3);
-		std::copy(triangleData, triangleData+12*3,std::begin(*triangles));
-	}
 
 	std::shared_ptr<Mesh> makeMesh(const std::vector<Vector3d>& vertices,
 								   const std::vector<Vector4d>& colors,
@@ -204,24 +121,24 @@ protected:
 	}
 };
 
-TEST_F(OsgMeshrepresentationRenderTests, StaticRotate)
+TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 {
 	std::shared_ptr<SurgSim::Blocks::BasicSceneElement> element =
 		std::make_shared<SurgSim::Blocks::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
 
-
-	makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
-	std::shared_ptr<SurgSim::Graphics::Representation> mesh1;
-	mesh1 = makeRepresentation(
+	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
+	
+	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> meshRepresentation1;
+	meshRepresentation1 = makeRepresentation(
 		makeMesh(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles), "colormesh");
-	mesh1->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.15,0.0,0.0)));
+	meshRepresentation1->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
 
 	// make a textured cube
-	std::shared_ptr<SurgSim::Graphics::Representation> mesh2;
-	mesh2 = makeRepresentation(makeMesh
+	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> meshRepresentation2;
+	meshRepresentation2 = makeRepresentation(makeMesh
 		(cubeVertices, std::vector<Vector4d>(), cubeTextures, cubeTriangles), "texturemesh");
-	mesh2->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-0.15,0.0,0.0)));
+	meshRepresentation2->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-0.0,0.0,-0.0)));
 	auto material = std::make_shared<OsgMaterial>();
 	auto texture = std::make_shared<OsgTexture2d>();
 	texture->loadImage(applicationData->findFile("OsgMeshRepresentationRenderTests/cube.png"));
@@ -229,39 +146,78 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotate)
 	auto uniform2d = std::make_shared<OsgUniform<std::shared_ptr<SurgSim::Graphics::OsgTexture2d>>>("oss_diffuseMap");
 	uniform2d->set(texture);
 	material->addUniform(uniform2d);
-	mesh2->setMaterial(material);
+	meshRepresentation2->setMaterial(material);
 
-	element->addComponent(mesh1);
-	element->addComponent(mesh2);
-	viewElement->enableManipulator(true);
+	element->addComponent(meshRepresentation1);
+	element->addComponent(meshRepresentation2);
 
 	auto axes = std::make_shared<OsgAxesRepresentation>("Origin");
 	viewElement->addComponent(axes);
 
-	auto interpolator = std::make_shared<PoseInterpolator>("Interpolator");
-	interpolator->setTarget(mesh2);
-	interpolator->setDuration(2.0);
-	Quaterniond quat = makeRotationQuaternion<double>(M_PI_2,Vector3d(0.0,1.0,0.0));
-	interpolator->setTo(makeRigidTransform(quat,Vector3d(-0.15,0.0,0.0)));
-	viewElement->addComponent(interpolator);
+	struct InterpolationData
+	{
+	public:
+		RigidTransform3d transform;
+		double scale;
+	};
+
+	typedef std::pair<InterpolationData, InterpolationData> Interpolator;
+
+	std::vector<Interpolator> interpolators;
+	Interpolator interpolator;
+	
+	interpolator.first.transform = 
+		makeRigidTransformFromAngles(Vector3d(0.0, 0.0, 0.0), Vector3d(-0.1, 0.0, -0.2));
+	interpolator.first.scale = 0.001;
+	interpolator.second.transform = 
+		makeRigidTransformFromAngles(Vector3d(M_PI_4, M_PI_4, M_PI_4), Vector3d(0.1, 0.0, -0.2));
+	interpolator.second.scale = 0.03;
+	interpolators.push_back(interpolator);
+
+	interpolator.first.transform = 
+		makeRigidTransformFromAngles(Vector3d(-M_PI_2, -M_PI_2, -M_PI_2), Vector3d(0.0, -0.1, -0.2));
+	interpolator.first.scale = 0.001;
+	interpolator.second.transform = 
+		makeRigidTransformFromAngles(Vector3d(M_PI_2, M_PI_2, M_PI_2), Vector3d(0.0, 0.1, -0.2));
+	interpolator.second.scale = 0.03;
+	interpolators.push_back(interpolator);
+
+	std::vector<std::shared_ptr<Mesh>> meshes;
+	meshes.push_back(meshRepresentation1->getMesh());
+	meshes.push_back(meshRepresentation2->getMesh());
 
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 
 	int numSteps = 1000;
 
-	Vector3d startAngles(0.0,0.0,0.0);
-	Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
-	Vector3d startPosition (-0.1, 0.0, -0.0);
-	Vector3d endPosition(0.1, 0.0, -0.4);
+	std::vector<Vector3d> newVertices(cubeVertices.size());
 
-	graphicsManager->dumpDebugInfo();
+	for (int i = 0; i < numSteps; ++i)
+	{
+		double t = static_cast<double>(i) / numSteps;
 
-	boost::this_thread::sleep(boost::posix_time::milliseconds(3000));
+		for (size_t j = 0; j < interpolators.size(); ++j)
+		{
+			InterpolationData from = interpolators[j].first;
+			InterpolationData to = interpolators[j].second;
 
+			double scale = interpolate(from.scale, to.scale, t);
+			RigidTransform3d transform = interpolate(from.transform, to.transform, t);
+			for (size_t index = 0; index < cubeVertices.size(); ++index)
+			{
+				newVertices[index] =  transform * (cubeVertices[index] * scale);
+			}
+			meshes[j]->setVertexPositions(newVertices,true);
+		}
+
+		/// The total number of steps should complete in 1 second
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps)*4);
+	}
 }
 
 }; // namespace Graphics

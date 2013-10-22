@@ -16,6 +16,12 @@
 #ifndef SURGSIM_GRAPHICS_RENDERTESTS_TESTCUBE_H
 #define SURGSIM_GRAPHICS_RENDERTESTS_TESTCUBE_H
 
+#include <SurgSim/Math/Vector.h>
+
+using SurgSim::Math::Vector2d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
+
 /// \file
 /// Data for a cube, vertices, color, textures and triangles
 
@@ -136,6 +142,29 @@ namespace Cube
 		17,18,22,
 		17,22,21
 	};
+
+
+	void makeCube(std::vector<Vector3d>* vertices,
+		std::vector<Vector4d>* colors,
+		std::vector<Vector2d>* textures,
+		std::vector<unsigned int>* triangles)
+	{
+		vertices->resize(numVertices);
+		colors->resize(numVertices);
+		textures->resize(numVertices);
+
+		double scale = 1.0;
+
+		for (int i=0; i<numVertices; ++i)
+		{
+			(*vertices)[i] = Vector3d(vertexData[3*i]*scale, vertexData[3*i+1]*scale, vertexData[3*i+2]*scale);
+			(*colors)[i] = Vector4d(colorData[4*i], colorData[4*i+1], colorData[4*i+2], colorData[4*i+3]);
+			(*textures)[i] = Vector2d(textureData[2*i], textureData[2*i+1]);
+		}
+
+		triangles->resize(numTriangles*3);
+		std::copy(triangleData, triangleData+12*3,std::begin(*triangles));
+	}
 
 }; // Cube
 }; // Testing
