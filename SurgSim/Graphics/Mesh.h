@@ -34,7 +34,9 @@ public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> color;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> normal;
 
-	/// Compare the vertices and return true if equal, false if not equal.
+	/// Equality operator.
+	/// \param	rhs	The right hand side.
+	/// \return	true if the parameters are considered equivalent.
 	bool operator==(const SurgSim::Graphics::VertexData& rhs) const
 	{
 		return texture == rhs.texture &&
@@ -42,6 +44,9 @@ public:
 			   normal == rhs.normal;
 	}
 
+	/// Inequality operator.
+	/// \param	rhs	The right hand side.
+	/// \return	true if the parameters are not considered equivalent.
 	bool operator !=(const SurgSim::Graphics::VertexData& rhs) const
 	{
 		return !((*this) == rhs);
@@ -52,12 +57,17 @@ class TriangleData {
 public:
 	SurgSim::Math::Vector3d normal;
 
-	/// Compare the vertices and return true if equal, false if not equal.
+	/// Equality operator.
+	/// \param	rhs	The right hand side.
+	/// \return	true if the parameters are considered equivalent.
 	bool operator==(const SurgSim::Graphics::TriangleData& rhs) const
 	{
 		return normal == rhs.normal;
 	}
 
+	/// Inequality operator.
+	/// \param	rhs	The right hand side.
+	/// \return	true if the parameters are not considered equivalent.
 	bool operator !=(const SurgSim::Graphics::TriangleData& rhs) const
 	{
 		return !((*this) == rhs);

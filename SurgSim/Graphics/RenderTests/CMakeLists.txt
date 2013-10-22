@@ -36,6 +36,7 @@ set(UNIT_TEST_SOURCES
 	OsgSphereRepresentationRenderTests.cpp
 	OsgViewElementRenderTests.cpp
 	RenderTest.cpp
+	TestCube.cpp
 )
 
 set(UNIT_TEST_HEADERS

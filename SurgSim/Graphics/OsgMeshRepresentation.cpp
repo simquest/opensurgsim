@@ -72,7 +72,7 @@ bool OsgMeshRepresentation::setMesh(std::shared_ptr<Mesh> mesh)
 	{
 		m_colors = new osg::Vec4Array(m_vertexCount);
 		m_colors->setDataVariance(osg::Object::DYNAMIC);
-		m_geometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);		
+		m_geometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);
 		updateColors();
 	}
 	else
@@ -103,7 +103,7 @@ bool OsgMeshRepresentation::setMesh(std::shared_ptr<Mesh> mesh)
 			(*m_textureCoordinates)[i] = SurgSim::Graphics::toOsg(mesh->getVertex(i).data.texture.getValue());
 		}
 	}
-		
+
 	// Copy triangles from mesh
 	size_t triangleCount = mesh->getNumTriangles();
 	unsigned int* triangles = new unsigned int[triangleCount*3];
@@ -158,7 +158,7 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 void OsgMeshRepresentation::update(double dt)
 {
 	// We probably should lock access to the mesh at this time ...
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == m_vertexCount) << 
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == m_vertexCount) <<
 		"Mesh structure changed, the OsgMeshRepresentation does not support this at the moment";
 
 	updateVertices();
@@ -205,7 +205,7 @@ void OsgMeshRepresentation::updateVertices()
 		(*m_vertices)[i].set(toOsg(m_mesh->getVertexPosition(i)));
 	}
 
-	// Recalculate the bounding box here 
+	// Recalculate the bounding box here
 }
 
 void OsgMeshRepresentation::updateNormals()

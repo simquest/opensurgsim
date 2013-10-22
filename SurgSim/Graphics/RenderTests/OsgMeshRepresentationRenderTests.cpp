@@ -128,7 +128,7 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 	scene->addSceneElement(element);
 
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
-	
+
 	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> meshRepresentation1;
 	meshRepresentation1 = makeRepresentation(
 		makeMesh(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles), "colormesh");
@@ -165,19 +165,19 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 
 	std::vector<Interpolator> interpolators;
 	Interpolator interpolator;
-	
-	interpolator.first.transform = 
+
+	interpolator.first.transform =
 		makeRigidTransformFromAngles(Vector3d(0.0, 0.0, 0.0), Vector3d(-0.1, 0.0, -0.2));
 	interpolator.first.scale = 0.001;
-	interpolator.second.transform = 
+	interpolator.second.transform =
 		makeRigidTransformFromAngles(Vector3d(M_PI_4, M_PI_4, M_PI_4), Vector3d(0.1, 0.0, -0.2));
 	interpolator.second.scale = 0.03;
 	interpolators.push_back(interpolator);
 
-	interpolator.first.transform = 
+	interpolator.first.transform =
 		makeRigidTransformFromAngles(Vector3d(-M_PI_2, -M_PI_2, -M_PI_2), Vector3d(0.0, -0.1, -0.2));
 	interpolator.first.scale = 0.001;
-	interpolator.second.transform = 
+	interpolator.second.transform =
 		makeRigidTransformFromAngles(Vector3d(M_PI_2, M_PI_2, M_PI_2), Vector3d(0.0, 0.1, -0.2));
 	interpolator.second.scale = 0.03;
 	interpolators.push_back(interpolator);

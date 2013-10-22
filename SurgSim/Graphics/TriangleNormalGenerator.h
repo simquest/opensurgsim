@@ -36,8 +36,6 @@ public:
 	/// Sets the arrays required to generate normals
 	/// \param vertexArray Array containing vertex positions
 	/// \param normalArray Array to store calculated normals
-	/// \param isDeformableArray Array containing whether each vertex is deformable and should have its normal updated;
-	/// 						 if not specified all vertex normals are updated
 	void set(const osg::Vec3Array* vertexArray,
 			 osg::Vec3Array* normalArray);
 

@@ -30,7 +30,7 @@ class AxesRepresentation : public virtual Representation
 public:
 
 	/// Constructor
-	explicit AxesRepresentation(const std::string& name) : Representation(name) {};
+	explicit AxesRepresentation(const std::string& name) : Representation(name) {}
 
 	/// Sets the size of the shown axes.
 	/// \param	val	The value.

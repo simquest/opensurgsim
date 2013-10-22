@@ -50,7 +50,7 @@ public:
 	virtual bool setView(std::shared_ptr<View> view);
 
 	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
-	/// the OSG input events rather than reading from the OpenSurgSim input. 
+	/// the OSG input events rather than reading from the OpenSurgSim input.
 	/// \param val whether to enable the manipulator or not.
 	void enableManipulator(bool val);
 

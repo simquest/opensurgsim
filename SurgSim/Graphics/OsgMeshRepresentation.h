@@ -43,23 +43,21 @@ namespace Graphics
 class OsgTexture;
 class Texture;
 
-
 /// Implementation of a MeshRepresentation for rendering under osg.
 class OsgMeshRepresentation : public OsgRepresentation, public MeshRepresentation
 {
 public:
 
-	/// Constructor
+	/// Constructor.
+	/// \param	name	The name.
 	explicit OsgMeshRepresentation(const std::string& name);
+
 	~OsgMeshRepresentation();
 
 	/// Sets the mesh.
 	/// \param	mesh	The mesh.
 	/// \return	true if it succeeds, false if it fails.
 	virtual bool setMesh(std::shared_ptr<Mesh> mesh) override;
-
-	void updateVertices();
-
 
 	/// Gets the mesh.
 	/// \return	The mesh.
@@ -78,9 +76,9 @@ private:
 	/// The mesh.
 	std::shared_ptr<Mesh> m_mesh;
 
-	
+
 	/// The Osg Geometry.
-	osg::ref_ptr<osg::Geometry> m_geometry;	
+	osg::ref_ptr<osg::Geometry> m_geometry;
 
 	size_t m_vertexCount;
 
@@ -90,11 +88,14 @@ private:
 	osg::ref_ptr<osg::Vec2Array> m_textureCoordinates;
 	osg::ref_ptr<osg::PrimitiveSet> m_set;
 
+	///@{
+	/// Local update operations, usually iterate over all items and recalculate or copy information from the mesh
 	void updateColors();
 	void updateNormals();
+	void updateVertices();
+	///@}
 
 };
-
 
 #if defined(_MSC_VER)
 #pragma warning(pop)

@@ -16,6 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_RENDERTESTS_TESTCUBE_H
 #define SURGSIM_GRAPHICS_RENDERTESTS_TESTCUBE_H
 
+#include <vector>
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Math::Vector2d;
@@ -24,7 +25,9 @@ using SurgSim::Math::Vector4d;
 
 /// \file
 /// Data for a cube, vertices, color, textures and triangles
-
+/// This cube is for using as a mesh. OpenGl does not support per face attributes, therefore
+/// to implement sharp edges vertices are duplicated over different faces, for a cube all
+/// vertices need to exist as three copies
 
 namespace SurgSim
 {
@@ -33,138 +36,11 @@ namespace Testing
 namespace Cube
 {
 
-	int numVertices = 24;
-	const double val = 1;
-
-	double vertexData[] =
-	{
-		-val,-val,-val,
-		-val,-val, val,
-		 val,-val, val,
-		 val,-val,-val,
-		-val, val,-val,
-		-val, val, val,
-		 val, val, val,
-		 val, val,-val,
-
-		-val,-val,-val,
-		-val,-val, val,
-		 val,-val, val,
-		 val,-val,-val,
-		-val, val,-val,
-		-val, val, val,
-		 val, val, val,
-		 val, val,-val,
-
-		-val,-val,-val,
-		-val,-val, val,
-		 val,-val, val,
-		 val,-val,-val,
-		-val, val,-val,
-		-val, val, val,
-		 val, val, val,
-		 val, val,-val
-	};
-
-	double colorData[] =
-	{
-		0.9,0.0,0.0,1.0,
-		0.9,0.0,0.0,1.0,
-		0.9,0.0,0.0,1.0,
-		0.9,0.0,0.0,1.0,
-		0.9,0.5,0.5,1.0,
-		0.9,0.5,0.5,1.0,
-		0.9,0.5,0.5,1.0,
-		0.9,0.5,0.5,1.0,
-
-		0.0,0.9,0.0,1.0,
-		0.0,0.9,0.0,1.0,
-		0.5,0.9,0.5,1.0,
-		0.5,0.9,0.5,1.0,
-		0.0,0.9,0.0,1.0,
-		0.0,0.9,0.0,1.0,
-		0.5,0.9,0.5,1.0,
-		0.5,0.9,0.5,1.0,
-
-		0.0,0.0,0.9,1.0,
-		0.5,0.5,0.9,1.0,
-		0.5,0.5,0.9,1.0,
-		0.0,0.0,0.9,1.0,
-		0.0,0.0,0.9,1.0,
-		0.5,0.5,0.9,1.0,
-		0.5,0.5,0.9,1.0,
-		0.0,0.0,0.9,1.0
-	};
-
-	double textureData[] =
-	{
-		0.25,0.25,
-		0.25,0.50,
-		0.0, 0.50,
-		0.0, 0.25,
-		0.50,0.25,
-		0.50,0.50,
-		0.50,0.50,
-		0.50,0.25,
-
-		0.25,0.25,
-		0.25,0.50,
-		1.0, 0.50,
-		1.0, 0.25,
-		0.50,0.25,
-		0.50,0.50,
-		0.75,0.50,
-		0.75,0.25,
-
-		0.50,0.0 ,
-		0.50,0.75,
-		0.75,0.75,
-		0.75,0.0,
-		0.50,0.25,
-		0.50,0.50,
-		0.75,0.50,
-		0.75,0.25
-	};
-
-	unsigned int numTriangles = 12;
-	unsigned int triangleData[] =
-	{
-		0, 3, 2,
-		0, 2, 1,
-		4, 6, 7,
-		4, 5, 6,
-		8, 9,13,
-		8,13,12,
-		10,15,14,
-		10,11,15,
-		16,20,23,
-		16,23,19,
-		17,18,22,
-		17,22,21
-	};
-
-
+	/// Fill our standard structures with the correct data types from the cube data
 	void makeCube(std::vector<Vector3d>* vertices,
 		std::vector<Vector4d>* colors,
 		std::vector<Vector2d>* textures,
-		std::vector<unsigned int>* triangles)
-	{
-		vertices->resize(numVertices);
-		colors->resize(numVertices);
-		textures->resize(numVertices);
-
-		double scale = 1.0;
-
-		for (int i=0; i<numVertices; ++i)
-		{
-			(*vertices)[i] = Vector3d(vertexData[3*i]*scale, vertexData[3*i+1]*scale, vertexData[3*i+2]*scale);
-			(*colors)[i] = Vector4d(colorData[4*i], colorData[4*i+1], colorData[4*i+2], colorData[4*i+3]);
-			(*textures)[i] = Vector2d(textureData[2*i], textureData[2*i+1]);
-		}
-
-		triangles->resize(numTriangles*3);
-		std::copy(triangleData, triangleData+12*3,std::begin(*triangles));
-	}
+		std::vector<unsigned int>* triangles);
 
 }; // Cube
 }; // Testing
