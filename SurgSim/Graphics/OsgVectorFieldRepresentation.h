@@ -93,10 +93,6 @@ private:
 
 	/// A vector of colors for each vector in vector field
 	std::vector<Vector4d> m_colors;
-
-
-	osg::Geometry* pyramidGeometry;
-
 };
 
 #if defined(_MSC_VER)

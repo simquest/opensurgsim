@@ -48,7 +48,7 @@ protected:
 	std::vector<Vector3d> makeVertices()
 	{
 		std::vector<Vector3d> result;
-		result.emplace_back(Vector3d(0.0, 0.0,  0.01));
+		result.emplace_back(Vector3d(0.0, 0.005,  0.01));
 		result.emplace_back(Vector3d(0.0, 0.01, 0.01));
 
 		result.emplace_back(Vector3d(0.0, 0.015, 0.01));
@@ -147,60 +147,60 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, StaticRotate)
 //		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 //	}
 //}
-
-TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
-{
-	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
-	
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	int numSteps = 100;
-	double startWidth = 0;
-	double endWidth = 20.0;
-
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-		vectorRepresentation->setLineWidth(interpolate(startWidth, endWidth, t));
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
-
-TEST_F(OsgVectorFieldRepresentationRenderTests, ColorTest)
-{
-	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	vectorRepresentation->setLineWidth(4.0);
-
-	int numSteps = 100;
-
-	SurgSim::Math::Vector4d startColor(0.0, 1.0, 0.0, 1.0);
-	SurgSim::Math::Vector4d endColor(1.0, 1.0, 1.0, 1.0);
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-
-		std::vector<Vector4d> vColor;
-		vColor.push_back(interpolate(startColor,endColor,t));
-	
-
-		vectorRepresentation->setColors(vColor);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-}
+//
+//TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
+//{
+//	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
+//	
+//	/// Run the thread
+//	runtime->start();
+//	EXPECT_TRUE(graphicsManager->isInitialized());
+//	EXPECT_TRUE(viewElement->isInitialized());
+//	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+//
+//	int numSteps = 100;
+//	double startWidth = 0;
+//	double endWidth = 20.0;
+//
+//	for (int i = 0; i < numSteps; ++i)
+//	{
+//		/// Calculate t in [0.0, 1.0]
+//		double t = static_cast<double>(i) / numSteps;
+//		vectorRepresentation->setLineWidth(interpolate(startWidth, endWidth, t));
+//		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+//	}
+//}
+//
+//TEST_F(OsgVectorFieldRepresentationRenderTests, ColorTest)
+//{
+//	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
+//	/// Run the thread
+//	runtime->start();
+//	EXPECT_TRUE(graphicsManager->isInitialized());
+//	EXPECT_TRUE(viewElement->isInitialized());
+//	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+//
+//	vectorRepresentation->setLineWidth(4.0);
+//
+//	int numSteps = 100;
+//
+//	SurgSim::Math::Vector4d startColor(0.0, 1.0, 0.0, 1.0);
+//	SurgSim::Math::Vector4d endColor(1.0, 1.0, 1.0, 1.0);
+//	for (int i = 0; i < numSteps; ++i)
+//	{
+//		/// Calculate t in [0.0, 1.0]
+//		double t = static_cast<double>(i) / numSteps;
+//
+//		std::vector<Vector4d> vColor;
+//		vColor.push_back(interpolate(startColor,endColor,t));
+//	
+//
+//		vectorRepresentation->setColors(vColor);
+//		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+//	}
+//
+//	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+//}
 
 }; // namespace Graphics
 }; // namespace SurgSim

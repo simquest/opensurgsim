@@ -38,21 +38,31 @@ OsgVectorFieldRepresentation<Data>::OsgVectorFieldRepresentation(const std::stri
 {
 	m_vertexData = new osg::Vec3Array;
 	m_geometry = new osg::Geometry();
-	m_geometry->setVertexArray(m_vertexData);
-
-	// At this stage there are no vertices in there
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, m_vertexData->size());
+	m_line = new osg::LineWidth(1.0f);
 	
+	m_geometry->setVertexArray(m_vertexData);
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
-	m_line = new osg::LineWidth(1.0f);
 	m_geometry->getOrCreateStateSet()->setAttribute(m_line, osg::StateAttribute::ON);
+
+	////////////////////////////////////////////////////////////////////
+	// Put a point at origin of the coordinate
+	auto m_pointGeometry = new osg::Geometry();
+	auto m_point = new osg::Point(2.0f);
+	auto m_pointArray = new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, 1);
+
+	m_pointGeometry->addPrimitiveSet(m_pointArray);
+	m_pointGeometry->setUseDisplayList(false);
+	m_pointGeometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	m_pointGeometry->getOrCreateStateSet()->setAttribute(m_point, osg::StateAttribute::ON);
+	///////////////////////////////////////////////////////////////////
 
 	osg::Geode* geode = new osg::Geode();
 	geode->addDrawable(m_geometry);
+	geode->addDrawable(m_pointGeometry);
 	m_transform->addChild(geode);
 }
 
@@ -99,6 +109,7 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 			m_geometry->dirtyBound();
 		}
 	}
+
 }
 
 
