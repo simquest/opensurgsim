@@ -16,7 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 
-#include <memory>
 #include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/Representation.h>
 #include <SurgSim/Math/Vector.h>
@@ -25,29 +24,26 @@ namespace SurgSim
 {
 namespace Graphics
 {
-/// Graphic representation of a point cloud, hase a very basic interface and is intentionally kept generic. It takes
-/// a Mesh<Data> as a template parameter, this will probably have to be subclassed for different kinds of data, e.g.
+/// Graphic representation of a vector field, hence a very basic interface and is intentionally kept generic. It takes
+/// a Vertices<Data> as a template parameter, this will probably have to be subclassed for different kinds of data, e.g.
 /// particles, depth data, etc ... .
-/// \tparam	Data Type of the data.
+/// \tparam	Data Type associated with vertex.
 template <class Data>
 class VectorFieldRepresentation : public virtual Representation
 {
 public:
-
    	/// Constructor
    	explicit VectorFieldRepresentation(const std::string& name) : Representation(name)
    	{
-
    	}
 
    	~VectorFieldRepresentation()
    	{
-   	};
+   	}
 
    	/// Sets the vertices for the point cloud.
    	/// \param	mesh	The mesh.
    	virtual void setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) = 0;
-
    	/// Pull the vertices.
    	/// \return	The mesh.
    	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const = 0;
@@ -55,21 +51,16 @@ public:
    	/// Sets line width for the line elements.
    	/// \param	width Width of the line	
    	virtual void setLineWidth(double width) = 0;
-
    	/// Gets line width 
    	/// \return	The line width.
    	virtual double getLineWidth() const = 0;
 
-   	/// Sets a color for all of the points together.
-   	/// \param	color	The color.
-   	virtual void setColors(const std::vector<SurgSim::Math::Vector4d>& color) = 0;
-
-   	/// Gets the color.
-   	/// \return The current color.
+   	/// Sets color for each vector in the vector field
+   	/// \param	color	The colors.
+   	virtual void setColors(const std::vector<SurgSim::Math::Vector4d>& colors) = 0;
+   	/// Gets the colors.
+   	/// \return The current colors.
    	virtual std::vector<SurgSim::Math::Vector4d> getColors() const = 0;
-
-private:
-
 };
 
 }; // Graphics

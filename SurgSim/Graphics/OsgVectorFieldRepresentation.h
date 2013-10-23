@@ -18,12 +18,12 @@
 
 #include <SurgSim/Graphics/VectorFieldRepresentation.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/DataStructures/Vertices.h>
 
 #include <osg/PrimitiveSet>
 #include <osg/Geometry>
 #include <osg/Array>
 #include <osg/LineWidth>
+#include <osg/Point>
 
 namespace SurgSim
 {
@@ -47,14 +47,12 @@ public:
 
 	/// Constructor
 	explicit OsgVectorFieldRepresentation(const std::string& name);
-
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
 	/// Sets Vertices.
 	/// \param	mesh	The mesh.
 	virtual void setVertices(std::shared_ptr<Vertices<Data>> mesh) override;
-
 	/// Gets the vertices.
 	/// \return	The vertices.
 	virtual std::shared_ptr<Vertices<Data>> getVertices() const override;
@@ -62,7 +60,6 @@ public:
 	/// Sets line width.
 	/// \param	val	Width of line.
 	virtual void setLineWidth(double width) override;
-
 	/// Gets line width.
 	/// \return	The line width.
 	virtual double getLineWidth() const override;
@@ -73,21 +70,19 @@ public:
 
 	/// Sets a color.
 	/// \param	color	The color.
-	virtual void setColors(const std::vector<Vector4d>& color) override;
-
+	virtual void setColors(const std::vector<Vector4d>& colors) override;
 	/// Gets the color.
 	/// \return The current color.
 	virtual std::vector<Vector4d> getColors() const override;
 
 private:
-
 	/// Local pointer to vertices with data
-	std::shared_ptr<Vertices<Data>> m_vertices;
+	std::shared_ptr< Vertices<Data> > m_vertices;
 
 	/// OSG vertex data for updating
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 
-	/// OSG Geometry node holding the data
+	/// OSG Geometry node holding vertexData
 	osg::ref_ptr<osg::Geometry> m_geometry;
 
 	/// OSG DrawArrays for local operations
@@ -98,6 +93,9 @@ private:
 
 	/// A vector of colors for each vector in vector field
 	std::vector<Vector4d> m_colors;
+
+
+	osg::Geometry* pyramidGeometry;
 
 };
 

@@ -17,23 +17,22 @@
 #include <gtest/gtest.h>
 
 #include <memory>
-#include <vector>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Graphics/VectorFieldRepresentation.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/DataStructures/Vertices.h>
-
+#include <SurgSim/Graphics/RenderTests/RenderTest.h>
+#include <SurgSim/Graphics/VectorFieldRepresentation.h>
+#include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/RigidTransform.h>
-
 #include <SurgSim/Testing/MathUtilities.h>
 
+namespace SurgSim
+{
+namespace Graphics
+{
+
+using SurgSim::DataStructures::Vertices;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -43,95 +42,48 @@ using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
 
-namespace SurgSim
+struct OsgVectorFieldRepresentationRenderTests : public SurgSim::Graphics::RenderTest 
 {
-namespace Graphics
-{
-
-typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
-
-struct OsgVectorFieldRepresentationRenderTests : public ::testing::Test
-{
-	virtual void SetUp()
-	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-
-		runtime->addManager(graphicsManager);
-
-		scene = std::make_shared<SurgSim::Framework::Scene>();
-		runtime->setScene(scene);
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
-
 protected:
-	std::vector<Vector3d> makeCube()
+	std::vector<Vector3d> makeVertices()
 	{
 		std::vector<Vector3d> result;
-		/*result.push_back(Vector3d( 0.01,-0.01, 0.01));
-		result.push_back(Vector3d( 0.01,-0.01, 0.01));
-		result.push_back(Vector3d(-0.01,-0.01, 0.01));
-		result.push_back(Vector3d(-0.01,-0.01,-0.01));
-		result.push_back(Vector3d( 0.01,-0.01,-0.01));
+		result.emplace_back(Vector3d(0.0, 0.0,  0.01));
+		result.emplace_back(Vector3d(0.0, 0.01, 0.01));
 
-		result.push_back(Vector3d( 0.01, 0.01, 0.01));
-		result.push_back(Vector3d(-0.01, 0.01, 0.01));
-		result.push_back(Vector3d(-0.01, 0.01,-0.01));
-		result.push_back(Vector3d( 0.01, 0.01,-0.01));*/
-		result.emplace_back(Vector3d( 0.01, 0.01, 0.01));
-		result.emplace_back(Vector3d( 0.02, 0.01, 0.01));
-		result.emplace_back(Vector3d( 0.08, 0.01, 0.01));
-		result.emplace_back(Vector3d( 0.09, 0.01, 0.01));
+		result.emplace_back(Vector3d(0.0, 0.015, 0.01));
+		result.emplace_back(Vector3d(0.01,0.02, 0.01));
+
+		result.emplace_back(Vector3d(0.015,0.02, 0.01));
+		result.emplace_back(Vector3d(0.02, 0.02, 0.01));
+
+		result.emplace_back(Vector3d(0.025, 0.02, 0.01));
+		result.emplace_back(Vector3d(0.03, 0.03, 0.01));
 		return result;
 	}
 
-	std::shared_ptr<CloudMesh> makeMesh(const std::vector<Vector3d>& vertices)
+	std::shared_ptr<VectorFieldRepresentation<void>> makeCloud(const std::vector<Vector3d>& vertices)
 	{
-		std::shared_ptr<CloudMesh> mesh = std::make_shared<CloudMesh>();
+		auto vectorRepresentation =	std::make_shared<OsgVectorFieldRepresentation<void>>("vectorRepresentation representation");
+
+		auto mesh = std::make_shared<Vertices<void>>();
 		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
 		{
-			mesh->addVertex(CloudMesh::VertexType(*it));
+			mesh->addVertex(Vertices<void>::VertexType(*it));
 		}
-		return mesh;
-	}
 
-	std::shared_ptr<VectorFieldRepresentation<void>> makeCloud(std::shared_ptr<CloudMesh> mesh)
-	{
-		std::shared_ptr<VectorFieldRepresentation<void>> cloud =
-			std::make_shared<OsgVectorFieldRepresentation<void>>("cloud representation");
+		vectorRepresentation->setVertices(mesh);
+		vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
 
-		cloud->setVertices(mesh);
-		cloud->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
+		viewElement->addComponent(vectorRepresentation);
 
-		viewElement->addComponent(cloud);
-
-		return cloud;
+		return vectorRepresentation;
 	}
 };
 
-
-
-
-
-
-
-
 TEST_F(OsgVectorFieldRepresentationRenderTests, StaticRotate)
 {
-	std::shared_ptr<VectorFieldRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
+	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
 
 	/// Run the thread
 	runtime->start();
@@ -143,6 +95,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, StaticRotate)
 
 	Vector3d startAngles(0.0,0.0,0.0);
 	Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
+
 	Vector3d startPosition (-0.1, 0.0, -0.0);
 	Vector3d endPosition(0.1, 0.0, -0.4);
 
@@ -150,50 +103,55 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, StaticRotate)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
+		vectorRepresentation->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
-
-TEST_F(OsgVectorFieldRepresentationRenderTests, DynamicRotate)
-{
-	std::vector<Vector3d> startVertices = makeCube();
-	std::shared_ptr<CloudMesh> mesh = makeMesh(startVertices);
-	std::shared_ptr<VectorFieldRepresentation<void>> cloud = makeCloud(mesh);
-
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	int numSteps = 100;
-
-	Vector3d startAngles(0.0,0.0,0.0);
-	Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
-	Vector3d startPosition (-0.1, 0.0, 0.2);
-	Vector3d endPosition(0.1, 0.0, -0.2);
-
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-		RigidTransform3d currentPose =
-			interpolatePose(startAngles, endAngles, startPosition, endPosition, t);
-
-		int id = 0;
-		for (auto it = std::begin(startVertices); it != std::end(startVertices); ++it, ++id)
-		{
-			mesh->setVertexPosition(id, currentPose * (*it));
-		}
-
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
+//
+//TEST_F(OsgVectorFieldRepresentationRenderTests, DynamicRotate)
+//{
+//	auto mesh = std::make_shared<std::vector<Vector3d>>(makeVertices());
+//	auto vectorRepresentation = makeCloud((*mesh.get()));
+//
+//	/// Run the thread
+//	runtime->start();
+//	EXPECT_TRUE(graphicsManager->isInitialized());
+//	EXPECT_TRUE(viewElement->isInitialized());
+//	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+//
+//	int numSteps = 100;
+//
+//	Vector3d startAngles(0.0,0.0,0.0);
+//	Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
+//	Vector3d startPosition (-0.1, 0.0, 0.2);
+//	Vector3d endPosition(0.1, 0.0, -0.2);
+//
+//	for (int i = 0; i < numSteps; ++i)
+//	{
+//		/// Calculate t in [0.0, 1.0]
+//		double t = static_cast<double>(i) / numSteps;
+//		RigidTransform3d currentPose =
+//			interpolatePose(startAngles, endAngles, startPosition, endPosition, t);
+//
+//		int id = 0;
+//		auto vs = std::make_shared<SurgSim::DataStructures::Vertices<void>>();
+//		for (auto it = std::begin((*mesh.get())); it != std::end((*mesh.get())); ++it)
+//		{
+//			vs->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
+//		}
+//		for (auto it = std::begin((*mesh.get())); it != std::end((*mesh.get())); ++it, ++id)
+//		{
+//			vs->setVertexPosition(id, currentPose * (*it));
+//		}
+//		vectorRepresentation->setVertices(vs);
+//		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+//	}
+//}
 
 TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 {
-	std::shared_ptr<VectorFieldRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
+	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
+	
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
@@ -201,50 +159,47 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	int numSteps = 100;
-	double startSize = 0;
-	double endSize = 20.0;
+	double startWidth = 0;
+	double endWidth = 20.0;
 
 	for (int i = 0; i < numSteps; ++i)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
-		cloud->setLineWidth(interpolate(startSize,endSize,t));
+		vectorRepresentation->setLineWidth(interpolate(startWidth, endWidth, t));
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
 
 TEST_F(OsgVectorFieldRepresentationRenderTests, ColorTest)
 {
-	std::shared_ptr<VectorFieldRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
+	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	cloud->setLineWidth(4.0);
+	vectorRepresentation->setLineWidth(4.0);
 
 	int numSteps = 100;
 
-	SurgSim::Math::Vector4d startColor(0.0,1.0,0.0,1.0);
-	SurgSim::Math::Vector4d endColor(1.0,0.0,1.0,1.0);
-
-	
-
+	SurgSim::Math::Vector4d startColor(0.0, 1.0, 0.0, 1.0);
+	SurgSim::Math::Vector4d endColor(1.0, 1.0, 1.0, 1.0);
 	for (int i = 0; i < numSteps; ++i)
 	{
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 
 		std::vector<Vector4d> vColor;
-		for (size_t c = 0; c != 2; ++c)
-		{
-			vColor.push_back(interpolate(startColor,endColor,t/c));
-		}
+		vColor.push_back(interpolate(startColor,endColor,t));
+	
 
-		cloud->setColors(vColor);
+		vectorRepresentation->setColors(vColor);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 }
 
 }; // namespace Graphics

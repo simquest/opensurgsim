@@ -19,6 +19,7 @@
 #include <osg/LineWidth>
 #include <osg/PositionAttitudeTransform>
 #include <osg/StateAttribute>
+#include <osg/Geometry>
 
 #include <SurgSim/Graphics/OsgConversions.h>
 
@@ -32,26 +33,25 @@ OsgVectorFieldRepresentation<Data>::OsgVectorFieldRepresentation(const std::stri
 	Representation(name),
 	VectorFieldRepresentation<Data>(name),
 	OsgRepresentation(name),
+	m_vertices(),
 	m_colors()
 {
-	osg::Geode* geode = new osg::Geode();
-	m_geometry = new osg::Geometry();
 	m_vertexData = new osg::Vec3Array;
-
+	m_geometry = new osg::Geometry();
 	m_geometry->setVertexArray(m_vertexData);
-
-	/*setColors(m_colors);*/
 
 	// At this stage there are no vertices in there
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, m_vertexData->size());
+	
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
 	m_line = new osg::LineWidth(1.0f);
-	m_geometry->getOrCreateStateSet()->setAttribute(m_line, osg::StateAttribute::ON );
+	m_geometry->getOrCreateStateSet()->setAttribute(m_line, osg::StateAttribute::ON);
 
+	osg::Geode* geode = new osg::Geode();
 	geode->addDrawable(m_geometry);
 	m_transform->addChild(geode);
 }
@@ -67,18 +67,17 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 {
 	if (m_vertices != nullptr)
 	{
+		// std::vector< Vertex<Data> > vertices
 		auto vertices = m_vertices->getVertices();
 		size_t count = vertices.size();
 
-		if (count != static_cast<size_t>(m_drawArrays->getCount()))
+		if (count != static_cast<size_t>(m_drawArrays->getCount()) &&
+			count > m_vertexData->size())
 		{
-			m_drawArrays->setCount(count);
-			if (count > m_vertexData->size())
-			{
-				m_vertexData->resize(count);
-			}
+			m_vertexData->resize(count);
 		}
-
+		
+		// Copy OSS Vertices (data structure) into osg vertices
 		for (size_t i = 0; i < count; ++i)
 		{
 			(*m_vertexData)[i][0] = static_cast<float>(vertices[i].position[0]);
@@ -86,7 +85,7 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 			(*m_vertexData)[i][2] = static_cast<float>(vertices[i].position[2]);
 		}
 
-		m_drawArrays->set(osg::PrimitiveSet::LINES, 0, count);
+		m_drawArrays->setCount(count);
 		m_drawArrays->dirty();
 		m_geometry->dirtyBound();
 		m_geometry->dirtyDisplayList();
@@ -139,7 +138,7 @@ void OsgVectorFieldRepresentation<Data>::setColors(const std::vector<SurgSim::Ma
 		osgColors->push_back(SurgSim::Graphics::toOsg(*it));
 	}
 	m_geometry->setColorArray(osgColors);
-	m_geometry->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE_SET);
+	m_geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 	m_colors = colors;
 }
 
