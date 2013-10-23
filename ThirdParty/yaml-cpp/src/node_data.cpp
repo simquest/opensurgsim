@@ -10,7 +10,7 @@ namespace YAML
 	{
 		std::string node_data::empty_scalar;
 
-		node_data::node_data(): m_isDefined(false), m_type(NodeType::Null), m_seqSize(0)
+		node_data::node_data(): m_isDefined(false), m_type(NodeType::Null), m_style(YAML::DefaultStyle), m_seqSize(0)
 		{
 		}
 
@@ -59,6 +59,11 @@ namespace YAML
 			m_tag = tag;
 		}
 		
+		void node_data::set_style(const YAML::EMITTER_STYLE style)
+		{
+			m_style = style;
+		}
+
 		void node_data::set_null()
 		{
 			m_isDefined = true;

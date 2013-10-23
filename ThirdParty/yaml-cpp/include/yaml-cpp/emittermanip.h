@@ -61,6 +61,12 @@ namespace YAML
 		// Auto, // duplicate
 		LongKey
 	};
+
+	enum EMITTER_STYLE {
+		DefaultStyle,
+		FlowStyle,
+		BlockStyle
+	};
 	
 	struct _Indent {
 		_Indent(int value_): value(value_) {}

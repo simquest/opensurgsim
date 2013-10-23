@@ -14,21 +14,32 @@
 # limitations under the License.
 
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
 include_directories(
-	"${Boost_INCLUDE_DIR}"
+	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
+	${OSG_INCLUDE_DIR}
 )
 
-add_subdirectory(Blocks)
-add_subdirectory(Collision)
-add_subdirectory(DataStructures)
-add_subdirectory(Devices)
-add_subdirectory(Framework)
-add_subdirectory(Graphics)
-add_subdirectory(Input)
-add_subdirectory(Math)
-add_subdirectory(Physics)
-add_subdirectory(Serialize)
-add_subdirectory(Testing)
+set(SURGSIM_SERIALIZE_SOURCES
+	FrameworkConvert.cpp
+	GraphicsConvert.cpp
+	MathConvert.cpp
+)
+
+set(SURGSIM_SERIALIZE_HEADERS
+	Convert.h
+)
+
+surgsim_add_library(
+	SurgSimSerialize
+	"${SURGSIM_SERIALIZE_SOURCES}"
+	"${SURGSIM_SERIALIZE_HEADERS}"
+	"SurgSim/Serialize"
+)
+
+set(LIBS SurgSimFramework SurgSimGraphics ${Boost_LIBRARIES})
+
+
+if(SURGSIM_TESTS_BUILD)
+	add_subdirectory(UnitTests)
+endif()
