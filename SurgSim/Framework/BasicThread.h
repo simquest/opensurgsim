@@ -43,7 +43,7 @@ class Runtime;
 /// will wait for the barrier to trigger before it executes another update. When running asynchronously the thread
 /// cannot be stopped with the stop() call, a barrier wait with an argument of false has to be used
 /// to stop the thread. The thread can be set back to asynchronous execution, one last barrier wait after
-/// the switch has to be executed for the thread to come out of the wait. 
+/// the switch has to be executed for the thread to come out of the wait.
 class BasicThread
 {
 public:
@@ -66,7 +66,7 @@ public:
 	/// 					 means that only one step will be performed at a time
 	void start(std::shared_ptr<Barrier> startupBarrier=nullptr, bool isSynchronous = false);
 
-	/// Stopping the execution, blocks until the running thread has actually stopped, 
+	/// Stopping the execution, blocks until the running thread has actually stopped,
 	/// \note When the thread is in synchronous mode, it needs to be stopped with a call to
 	/// 	  the barrier wait function with an argument of false, of course it can always be stopped
 	/// 	  by going back to asynchronous mode and then calling stop

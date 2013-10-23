@@ -125,16 +125,17 @@ TEST(BasicThreadTest, SynchronousThread)
 	EXPECT_FALSE(m.didInitialize);
 	EXPECT_FALSE(m.didStartUp);
 	EXPECT_FALSE(m.isRunning());
-	EXPECT_TRUE(m.isSynchronous());
+	EXPECT_FALSE(m.isSynchronous());
 
 	m.start(barrier, true);
-	
+
 	// Run through the initialization
 	barrier->wait(true);
 	barrier->wait(true);
 	barrier->wait(true);
 
 	EXPECT_TRUE(m.isRunning());
+	EXPECT_TRUE(m.isSynchronous());
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	// It's running but waiting for a new wait call
@@ -156,7 +157,7 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 	EXPECT_FALSE(m.didInitialize);
 	EXPECT_FALSE(m.didStartUp);
 	EXPECT_FALSE(m.isRunning());
-	EXPECT_TRUE(m.isSynchronous());
+	EXPECT_FALSE(m.isSynchronous());
 
 	m.start(barrier, false);
 
@@ -188,7 +189,7 @@ TEST(BasicThreadTest, SwitchSyncOnThread)
 
 	count = count - 1;
 	m.setSynchronous(false);
-	// restart the thread ... 
+	// restart the thread ...
 	barrier->wait(true);
 
 	// Thread is running count should decrease and keep decreasing

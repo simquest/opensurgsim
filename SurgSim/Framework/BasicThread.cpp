@@ -33,7 +33,8 @@ BasicThread::BasicThread(const std::string& name) :
 	m_period(1.0/30),
 	m_isInitialized(false),
 	m_isRunning(false),
-	m_stopExecution(false)
+	m_stopExecution(false),
+	m_isSynchronous(false)
 {
 }
 
@@ -121,12 +122,14 @@ void BasicThread::operator()()
 		{
 			// if waitForBarrier is false this means it is time to come out of sync mode and stop running
 			bool success = waitForBarrier(true);
-			m_isRunning = doUpdate(m_period.count());
-			if (!success || !m_isRunning)
+			if (success)
+			{
+				m_isRunning = doUpdate(m_period.count());
+			}
+			if (! success || !m_isRunning)
 			{
 				m_isRunning = false;
 				m_isSynchronous = false;
-
 			}
 		}
 	}
@@ -141,7 +144,6 @@ void BasicThread::stop()
 {
 	m_stopExecution = true;
 
-	
 	if (! m_isSynchronous)
 	{
 		if (! m_thisThread.joinable())
