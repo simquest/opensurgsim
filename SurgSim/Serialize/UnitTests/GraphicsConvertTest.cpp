@@ -49,7 +49,7 @@ TEST_F(GraphicsConvertTest, ConvertSphereRepresentationTest)
 	YAML::Node node;
 	YAML::Emitter outnode(fout);
 
-	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> sphereRepresentation = 
+	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> sphereRepresentation =
 		std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("Sphere_Obj");
 
 	double sphereRadius = 5.0;
@@ -60,17 +60,17 @@ TEST_F(GraphicsConvertTest, ConvertSphereRepresentationTest)
 		SurgSim::Math::Vector3d::Identity());
 	sphereRepresentation->setPose(spherePose);
 
-	/// Encoding sphere representation 
+	/// Encoding sphere representation
 	node = YAML::convert<SurgSim::Graphics::SphereRepresentation>::encode(*sphereRepresentation);
 	outnode << node;
 	fout.close();
-	
+
 	/// Decoding sphere representation
 	YAML::Node innode = YAML::LoadFile(datafile);
-	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> actualSphere =  
+	std::shared_ptr<SurgSim::Graphics::SphereRepresentation> actualSphere =
 		std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>("ImageSphere");
 	YAML::convert<SurgSim::Graphics::SphereRepresentation>::decode(innode, actualSphere);
-	
+
 	EXPECT_EQ(sphereRepresentation->getRadius(), actualSphere->getRadius());
 	EXPECT_TRUE(actualSphere->getInitialPose().matrix().isApprox(sphereRepresentation->getInitialPose().matrix()));
 	EXPECT_TRUE(actualSphere->getPose().matrix().isApprox(sphereRepresentation->getPose().matrix()));

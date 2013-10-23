@@ -25,15 +25,15 @@ set(UNIT_TEST_SOURCES
 	BarrierTest.cpp
 	BasicThreadTests.cpp
 	BehaviorManagerTest.cpp
-	ComponentTest.cpp
 	ComponentManagerTests.cpp
+	ComponentTest.cpp
 	LockedContainerTest.cpp
-	LoggerTest.cpp
 	LoggerManagerTest.cpp
+	LoggerTest.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
-	SceneTest.cpp
 	SceneElementTest.cpp
+	SceneTest.cpp
 	SharedInstanceTest.cpp
 )
 

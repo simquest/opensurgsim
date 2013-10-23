@@ -34,8 +34,8 @@ set(UNIT_TEST_SOURCES
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
-	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
+	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRenderTargetTests.cpp
 	OsgRepresentationTests.cpp
@@ -43,22 +43,22 @@ set(UNIT_TEST_SOURCES
 	OsgScreenSpaceQuadTests.cpp
 	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
-	OsgTextureTests.cpp
 	OsgTexture1dTests.cpp
 	OsgTexture2dTests.cpp
 	OsgTexture3dTests.cpp
 	OsgTextureCubeMapTests.cpp
 	OsgTextureRectangleTests.cpp
+	OsgTextureTests.cpp
 	OsgTextureUniformTests.cpp
-	OsgUniformTests.cpp
 	OsgUniformBaseTests.cpp
+	OsgUniformTests.cpp
 	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
-	OsgViewTests.cpp
 	OsgViewElementTests.cpp
-	ViewTests.cpp
+	OsgViewTests.cpp
 	ViewElementTests.cpp
+	ViewTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
