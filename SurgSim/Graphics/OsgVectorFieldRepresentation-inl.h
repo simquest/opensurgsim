@@ -13,13 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL
-#define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL
+#ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL_H
+#define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL_H
 
 #include <osg/LineWidth>
 #include <osg/PositionAttitudeTransform>
 #include <osg/StateAttribute>
 #include <osg/Geometry>
+#include <osg/Vec4f>
 
 #include <SurgSim/Graphics/OsgConversions.h>
 
@@ -28,6 +29,7 @@ namespace SurgSim
 namespace Graphics
 {
 
+// Vector Field used for this class: F(x,y,z) = (-y)i + (x+y-z)j + (x+y)k
 template <class Data>
 OsgVectorFieldRepresentation<Data>::OsgVectorFieldRepresentation(const std::string& name) :
 	Representation(name),
@@ -84,18 +86,29 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 		if (count != static_cast<size_t>(m_drawArrays->getCount()) &&
 			count > m_vertexData->size())
 		{
-			m_vertexData->resize(count);
+			m_vertexData->resize(count*2);
 		}
 		
 		// Copy OSS Vertices (data structure) into osg vertices
 		for (size_t i = 0; i < count; ++i)
 		{
-			(*m_vertexData)[i][0] = static_cast<float>(vertices[i].position[0]);
-			(*m_vertexData)[i][1] = static_cast<float>(vertices[i].position[1]);
-			(*m_vertexData)[i][2] = static_cast<float>(vertices[i].position[2]);
+			float x = static_cast<float>(vertices[i].position[0]); 
+			float y = static_cast<float>(vertices[i].position[1]); 
+			float z = static_cast<float>(vertices[i].position[2]);
+
+			float newX = y - z;
+			float newY = x - z;
+			float newZ = x + y;
+
+			(*m_vertexData)[2*i][0] = x;
+			(*m_vertexData)[2*i][1] = y;
+			(*m_vertexData)[2*i][2] = z;
+			(*m_vertexData)[2*i+1][0] = x + newX/10;
+			(*m_vertexData)[2*i+1][1] = y + newY/10;
+			(*m_vertexData)[2*i+1][2] = z + newZ/10;
 		}
 
-		m_drawArrays->setCount(count);
+		m_drawArrays->setCount(count*2);
 		m_drawArrays->dirty();
 		m_geometry->dirtyBound();
 		m_geometry->dirtyDisplayList();
@@ -142,10 +155,12 @@ double OsgVectorFieldRepresentation<Data>::getLineWidth() const
 template <class Data>
 void OsgVectorFieldRepresentation<Data>::setColors(const std::vector<SurgSim::Math::Vector4d>& colors)
 {
+	SURGSIM_ASSERT( colors.size() == m_vertices->getVertices().size() ) << "Size of colors does not match size of veritces";
 	// Set the color of the particles to one single color by default
 	osg::Vec4Array* osgColors = new osg::Vec4Array;
 	for (auto it = std::begin(colors); it != std::end(colors); ++it)
 	{
+		osgColors->push_back(SurgSim::Graphics::toOsg(*it));
 		osgColors->push_back(SurgSim::Graphics::toOsg(*it));
 	}
 	m_geometry->setColorArray(osgColors);
@@ -162,4 +177,4 @@ std::vector<SurgSim::Math::Vector4d> OsgVectorFieldRepresentation<Data>::getColo
 }; // Graphics
 }; // SurgSim
 
-#endif // SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL
+#endif // SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL_H
