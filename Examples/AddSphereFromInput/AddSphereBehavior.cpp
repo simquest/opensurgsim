@@ -41,7 +41,7 @@ void AddSphereFromInputBehavior::update(double dt)
 	dataGroup.poses().get("pose", &pose);
 
 	// Add sphere to the scene from input
-	bool button1;
+	bool button1 = false;
 	dataGroup.booleans().get("button1", &button1);
 
 	if (button1 && ! m_buttonPreviouslyPressed)
