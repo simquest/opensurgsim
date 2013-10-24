@@ -16,6 +16,7 @@
 #ifndef SURGSIM_BLOCKS_MASSSPRING1DREPRESENTATION_H
 #define SURGSIM_BLOCKS_MASSSPRING1DREPRESENTATION_H
 
+#include <array>
 #include <vector>
 
 #include <SurgSim/Physics/MassSpringRepresentation.h>
@@ -46,7 +47,8 @@ public:
 	/// \param stiffnessBending, dampingBending The spring param for all bending springs (edges)
 	/// \note Stretching springs are connecting neighbors, bending springs are connecting 1 node
 	/// \note to its 2nd degree neighbors, creating a bending force around the middle node.
-	void init1D(const SurgSim::Math::Vector3d extremities[2], unsigned int numNodesPerDim[1],
+	void init1D(const std::array<SurgSim::Math::Vector3d, 2> extremities,
+		unsigned int numNodesPerDim[1],
 		std::vector<unsigned int> boundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,

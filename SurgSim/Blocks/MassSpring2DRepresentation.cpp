@@ -107,7 +107,8 @@ void MassSpring2DRepresentation::init2DFaceDiagonalSprings(const std::shared_ptr
 }
 
 void MassSpring2DRepresentation::init2D(
-	const Vector3d extremities[2][2], unsigned int numNodesPerDim[2],
+	const std::array<std::array<Vector3d, 2>, 2> extremities,
+	unsigned int numNodesPerDim[2],
 	std::vector<unsigned int> boundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,

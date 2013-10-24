@@ -16,6 +16,7 @@
 #ifndef SURGSIM_BLOCKS_MASSSPRING2DREPRESENTATION_H
 #define SURGSIM_BLOCKS_MASSSPRING2DREPRESENTATION_H
 
+#include <array>
 #include <vector>
 
 #include <SurgSim/Physics/MassSpringRepresentation.h>
@@ -55,7 +56,8 @@ public:
 	/// \note   [0][1] *---* [1][1]
 	/// \note          |   |
 	/// \note   [0][0] *---* [1][0]
-	void init2D(const SurgSim::Math::Vector3d extremities[2][2], unsigned int numNodesPerDim[2],
+	void init2D(const std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities,
+		unsigned int numNodesPerDim[2],
 		std::vector<unsigned int> boundaryConditions,
 		double totalMass,
 		double stiffnessStretching, double dampingStretching,

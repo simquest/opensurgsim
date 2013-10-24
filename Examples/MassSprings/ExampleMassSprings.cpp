@@ -75,7 +75,7 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
-	SurgSim::Math::Vector3d extremities[2] = { Vector3d(0,0,0), Vector3d(1,0,0) };
+	std::array<SurgSim::Math::Vector3d, 2> extremities = {{ Vector3d(0,0,0), Vector3d(1,0,0) }};
 	unsigned int numNodesPerDim[1] = {6};
 	physicsRepresentation->init1D(extremities,
 		numNodesPerDim,
@@ -139,10 +139,10 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
-	SurgSim::Math::Vector3d extremities[2][2] = {
-		{ Vector3d(0,0,0), Vector3d(1,0,0) },
-		{ Vector3d(0,-1,0), Vector3d(1,-1,0) }
-	};
+	std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities = {{
+		{{ Vector3d(0,0,0), Vector3d(1,0,0) }},
+		{{ Vector3d(0,-1,0), Vector3d(1,-1,0) }}
+	}};
 	unsigned int numNodesPerDim[2] = {3, 3};
 	physicsRepresentation->init2D(extremities,
 		numNodesPerDim,
@@ -207,19 +207,19 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
-	SurgSim::Math::Vector3d extremities[2][2][2] = {
-		{
-			{ Vector3d(0,0,0), Vector3d(1,0,0) }
+	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities = {{
+		{{
+			{{ Vector3d(0,0,0), Vector3d(1,0,0) }}
 			,
-			{ Vector3d(0,-1,0), Vector3d(1,-1,0) }
-		}
+			{{ Vector3d(0,-1,0), Vector3d(1,-1,0) }}
+		}}
 		,
-		{
-			{ Vector3d(0,0,-1), Vector3d(1,0,-1) }
+		{{
+			{{ Vector3d(0,0,-1), Vector3d(1,0,-1) }}
 			,
-			{ Vector3d(0,-1,-1), Vector3d(1,-1,-1) }
-		},
-	};
+			{{ Vector3d(0,-1,-1), Vector3d(1,-1,-1) }}
+		}},
+	}};
 	unsigned int numNodesPerDim[3] = {3, 3, 3};
 	physicsRepresentation->init3D(extremities,
 		numNodesPerDim,

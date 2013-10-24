@@ -26,7 +26,8 @@ namespace Blocks
 {
 
 void MassSpring1DRepresentation::init1D(
-	const Vector3d extremities[2], unsigned int numNodesPerDim[1],
+	const std::array<Vector3d, 2> extremities,
+	unsigned int numNodesPerDim[1],
 	std::vector<unsigned int> boundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,

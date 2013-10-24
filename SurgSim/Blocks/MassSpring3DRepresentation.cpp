@@ -207,7 +207,8 @@ void MassSpring3DRepresentation::init3DVolumeDiagonalSprings(const std::shared_p
 }
 
 void MassSpring3DRepresentation::init3D(
-	const Vector3d extremities[2][2][2], unsigned int numNodesPerDim[3],
+	const std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities,
+	unsigned int numNodesPerDim[3],
 	std::vector<unsigned int> boundaryConditions,
 	double totalMass,
 	double stiffnessStretching, double dampingStretching,
