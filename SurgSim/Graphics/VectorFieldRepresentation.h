@@ -18,16 +18,18 @@
 
 #include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
 namespace Graphics
 {
 
+using SurgSim::DataStructures::Vertices;
+using SurgSim::DataStructures::Vertex;
 /// Graphic representation of a vector field
-/// \tparam	Data Type associated with vertex.
-template <class Data>
+/// For each point, it is associated with a vector and an optional color
+/// \tparam	Data Optional color information associated with each vector
+template < class Data >
 class VectorFieldRepresentation : public virtual Representation
 {
 public:
@@ -40,26 +42,19 @@ public:
 	{
 	}
 
-	/// Sets the vertices for the point cloud.
-	/// \param	mesh	The mesh.
-	virtual void setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) = 0;
-	/// Pull the vertices.
-	/// \return	The mesh.
-	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const = 0;
+	/// Sets Vertices
+	/// \param	vertices The Vertices (data structure)
+	virtual void setVertices(std::shared_ptr< Vertices < Vertex<Data> > > vertices) = 0;
+	/// Gets the Vertices (data structure)
+	/// \return	The Vertices (data structure)
+	virtual std::shared_ptr< Vertices< Vertex<Data> > > getVertices() const = 0;
 
-	/// Sets line width for the line elements.
-	/// \param	width Width of the line
+	/// Sets vector line width
+	/// \param	val	Width of vector line
 	virtual void setLineWidth(double width) = 0;
 	/// Gets line width
-	/// \return	The line width.
+	/// \return	The line width
 	virtual double getLineWidth() const = 0;
-
-	/// Sets color for each vector in the vector field
-	/// \param	color	The colors.
-	virtual void setColors(const std::vector<SurgSim::Math::Vector4d>& colors) = 0;
-	/// Gets the colors.
-	/// \return The current colors.
-	virtual std::vector<SurgSim::Math::Vector4d> getColors() const = 0;
 };
 
 }; // Graphics

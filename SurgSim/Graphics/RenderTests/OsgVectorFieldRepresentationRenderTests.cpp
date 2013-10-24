@@ -13,12 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// Render Tests for the OsgVectorFieldRepresentation class.
 
-#include <gtest/gtest.h>
-
-#include <memory>
-
-#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/RenderTests/RenderTest.h>
 #include <SurgSim/Graphics/VectorFieldRepresentation.h>
 #include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
@@ -27,48 +23,77 @@
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Testing/MathUtilities.h>
 
-namespace SurgSim
-{
-namespace Graphics
-{
-
+using SurgSim::DataStructures::Vertex;
 using SurgSim::DataStructures::Vertices;
+using SurgSim::Graphics::OsgVectorFieldRepresentation;
+using SurgSim::Graphics::VectorFieldRepresentation;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
-using SurgSim::Math::makeRotationQuaternion;
-
 using SurgSim::Testing::interpolate;
-using SurgSim::Testing::interpolatePose;
 
 struct OsgVectorFieldRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
 protected:
 	std::vector<Vector3d> makeVertices()
 	{
-		std::vector<Vector3d> result;
-		result.emplace_back(Vector3d(0.00, 0.01, 0.00));
-		result.emplace_back(Vector3d(-0.01, 0.00, 0.00));
-		
-		result.emplace_back(Vector3d(0.00, 0.00, -0.01));
-		result.emplace_back(Vector3d(0.00, -0.01, 0.00));
-		return result;
+		std::vector<Vector3d> points;
+		points.emplace_back(Vector3d(1.0, 0.0, 0.0));
+		points.emplace_back(Vector3d(0.0, 1.0, 0.0));
+
+		points.emplace_back(Vector3d(-1.0, 0.0, 0.0));
+		points.emplace_back(Vector3d(0.0, -1.0, 0.0));
+
+		points.emplace_back(Vector3d(2.0, 0.0, 0.0));
+		points.emplace_back(Vector3d(0.0, 2.0, 0.0));
+
+		points.emplace_back(Vector3d(-2.0, 0.0, 0.0));
+		points.emplace_back(Vector3d(0.0, -2.0, 0.0));
+		return points;
 	}
 
-	std::shared_ptr<VectorFieldRepresentation<void>> makeCloud(const std::vector<Vector3d>& vertices)
+	std::shared_ptr<VectorFieldRepresentation<void>> makeVectorRepresentation(const std::vector<Vector3d>& points)
 	{
-		auto vectorRepresentation =	
+		auto vectorRepresentation =
 			std::make_shared<OsgVectorFieldRepresentation<void>>("vectorRepresentation representation");
 
-		auto mesh = std::make_shared<Vertices<void>>();
-		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
+		auto vertices = std::make_shared<Vertices< Vertex<void> > >();
+		for (auto it = std::begin(points); it != std::end(points); ++it)
 		{
-			mesh->addVertex(Vertices<void>::VertexType(*it));
+			auto vector = Vertex<void>(*it);
+			vertices->addVertex(Vertices< Vertex<void> >::VertexType((*it), vector));
 		}
 
-		vectorRepresentation->setVertices(mesh);
-		vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.05)));
+		vectorRepresentation->setVertices(vertices);
+		vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
+
+		viewElement->addComponent(vectorRepresentation);
+
+		return vectorRepresentation;
+	}
+
+	std::shared_ptr<VectorFieldRepresentation<Vector4d>>
+		makeVectorRepresentationWithColors(const std::vector<Vector3d>& points)
+	{
+		auto vectorRepresentation =
+			std::make_shared<OsgVectorFieldRepresentation<Vector4d>>("vectorRepresentation representation");
+
+		auto vertices = std::make_shared<Vertices< Vertex<Vector4d> > >();
+
+		// Used to generate different colors for vectors
+		unsigned index = 0;
+
+		for (auto it = std::begin(points); it != std::end(points); ++it)
+		{
+			auto color = Vector4d(1.0, 0.0, 0.0, 0.0);
+			color[(index++)%4] = 1.0;
+			auto vector = Vertex<Vector4d>(*it, color);
+			vertices->addVertex(Vertices< Vertex<Vector4d> >::VertexType((*it), vector));
+		}
+
+		vectorRepresentation->setVertices(vertices);
+		vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 		viewElement->addComponent(vectorRepresentation);
 
@@ -78,16 +103,15 @@ protected:
 
 TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 {
-	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
+	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeVectorRepresentation(makeVertices());
 
-	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	int numSteps = 100;
-	double startWidth = 0;
+	double startWidth = 0.0;
 	double endWidth = 10.0;
 
 	for (int i = 0; i < numSteps; ++i)
@@ -95,48 +119,17 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		vectorRepresentation->setLineWidth(interpolate(startWidth, endWidth, t));
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(500 / numSteps));
 	}
 }
 
 TEST_F(OsgVectorFieldRepresentationRenderTests, ColorTest)
 {
-	std::shared_ptr<VectorFieldRepresentation<void>> vectorRepresentation = makeCloud(makeVertices());
-	/// Run the thread
+	std::shared_ptr<VectorFieldRepresentation<Vector4d>> vectorRepresentation =
+		makeVectorRepresentationWithColors(makeVertices());
+
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
 	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	int numSteps = 10;
-
-	SurgSim::Math::Vector4d startColor(0.0, 0.0, 0.0, 0.0);
-	SurgSim::Math::Vector4d endColor(1.0, 1.0, 0.0, 0.0);
-
-	SurgSim::Math::Vector4d startColor2(0.0, 0.0, 1.0, 0.0);
-	SurgSim::Math::Vector4d endColor2(0.0, 1.0, 0.0, 0.0);
-
-	SurgSim::Math::Vector4d startColor3(0.0, 0.0, 1.0, 0.0);
-	SurgSim::Math::Vector4d endColor3(0.0, 0.0, 1.0, 1.0);
-
-	SurgSim::Math::Vector4d startColor4(0.0, 0.0, 0.0, 1.0);
-	SurgSim::Math::Vector4d endColor4(1.0, 1.0, 1.0, 0.0);
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-
-		std::vector<Vector4d> vColor;
-		vColor.emplace_back(interpolate(startColor,endColor,t));
-		vColor.emplace_back(interpolate(startColor2,endColor2,t));
-		vColor.emplace_back(interpolate(startColor3,endColor3,t));
-		vColor.emplace_back(interpolate(startColor4,endColor4,t));
-		vectorRepresentation->setColors(vColor);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 }
-
-}; // namespace Graphics
-}; // namespace SurgSim

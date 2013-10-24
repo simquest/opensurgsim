@@ -16,14 +16,14 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 
-#include <SurgSim/Graphics/VectorFieldRepresentation.h>
+#include <SurgSim/DataStructures/Vertex.h>
+#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
+#include <SurgSim/Graphics/VectorFieldRepresentation.h>
 
-#include <osg/PrimitiveSet>
 #include <osg/Geometry>
 #include <osg/Array>
 #include <osg/LineWidth>
-#include <osg/Point>
 
 namespace SurgSim
 {
@@ -36,63 +36,52 @@ namespace Graphics
 #endif
 
 
+using SurgSim::DataStructures::Vertex;
 using SurgSim::DataStructures::Vertices;
-using SurgSim::Math::Vector4d;
 
-/// Osg vector field representation, implementation of a VectorFieldRepresenation using OSG.
+/// OSG vector field representation, implements a VectorFieldRepresenation using OSG.
 template <class Data>
 class OsgVectorFieldRepresentation : public VectorFieldRepresentation<Data>, public OsgRepresentation
 {
 public:
-
 	/// Constructor
 	explicit OsgVectorFieldRepresentation(const std::string& name);
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
-	/// Sets Vertices.
-	/// \param	mesh	The mesh.
-	virtual void setVertices(std::shared_ptr<Vertices<Data>> mesh) override;
-	/// Gets the vertices.
-	/// \return	The vertices.
-	virtual std::shared_ptr<Vertices<Data>> getVertices() const override;
+	/// Sets Vertices
+	/// \param	vertices The Vertices (data structure)
+	virtual void setVertices(std::shared_ptr< Vertices < Vertex<Data> > > vertices) override;
+	/// Gets the Vertices (data structure)
+	/// \return	The Vertices (data structure)
+	virtual std::shared_ptr< Vertices< Vertex<Data> > > getVertices() const override;
 
-	/// Sets line width.
-	/// \param	val	Width of line.
+	/// Sets vector line width
+	/// \param	val	Width of vector line
 	virtual void setLineWidth(double width) override;
-	/// Gets line width.
-	/// \return	The line width.
+	/// Gets line width
+	/// \return	The line width
 	virtual double getLineWidth() const override;
 
-	/// Executes the update operation.
-	/// \param	dt	The dt.
+	/// Executes the update operation
+	/// \param	dt	The time difference
 	virtual void doUpdate(double dt) override;
 
-	/// Sets a color.
-	/// \param	color	The color.
-	virtual void setColors(const std::vector<Vector4d>& colors) override;
-	/// Gets the color.
-	/// \return The current color.
-	virtual std::vector<Vector4d> getColors() const override;
-
 private:
-	/// Local pointer to vertices with data
-	std::shared_ptr< Vertices<Data> > m_vertices;
+	/// Vertices (data structure) holding a list of Vertex(s) (data structure)
+	std::shared_ptr< Vertices< Vertex<Data> > > m_vertices;
 
-	/// OSG vertex data for updating
+	/// OSG vertex data structure
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 
-	/// OSG Geometry node holding vertexData
-	osg::ref_ptr<osg::Geometry> m_geometry;
+	/// OSG::Geometry node holding OSG vertex
+	osg::ref_ptr<osg::Geometry> m_lineGeometry;
 
-	/// OSG DrawArrays for local operations
+	/// OSG::DrawArrays specifying how vertices wiil be drawn
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
 
-	/// OSG::LineWidth for local operations
+	/// OSG::LineWidth for representing vector
 	osg::ref_ptr<osg::LineWidth> m_line;
-
-	/// A vector of colors for each vector in vector field
-	std::vector<Vector4d> m_colors;
 };
 
 #if defined(_MSC_VER)

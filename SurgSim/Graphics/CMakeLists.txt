@@ -46,6 +46,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
 	OsgUnitAxes.cpp
+	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	Representation.cpp

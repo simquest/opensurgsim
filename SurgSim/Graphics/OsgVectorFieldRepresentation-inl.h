@@ -16,12 +16,17 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL_H
 #define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_INL_H
 
-#include <osg/LineWidth>
-#include <osg/PositionAttitudeTransform>
-#include <osg/StateAttribute>
 #include <osg/Geometry>
-#include <osg/Vec4f>
+#include <osg/Geode>
+#include <osg/LineWidth>
+#include <osg/Point>
+#include <osg/PositionAttitudeTransform>
+#include <osg/PrimitiveSet>
+#include <osg/ref_ptr>
+#include <osg/StateAttribute>
 
+#include <SurgSim/DataStructures/Vertex.h>
+#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/OsgConversions.h>
 
 namespace SurgSim
@@ -29,42 +34,44 @@ namespace SurgSim
 namespace Graphics
 {
 
-// Vector Field used for this class: F(x,y,z) = (-y)i + (x+y-z)j + (x+y)k
+using SurgSim::DataStructures::Vertex;
+using SurgSim::DataStructures::Vertices;
+
 template <class Data>
 OsgVectorFieldRepresentation<Data>::OsgVectorFieldRepresentation(const std::string& name) :
 	Representation(name),
 	VectorFieldRepresentation<Data>(name),
 	OsgRepresentation(name),
-	m_vertices(),
-	m_colors()
+	m_vertices(nullptr)
 {
 	m_vertexData = new osg::Vec3Array;
-	m_geometry = new osg::Geometry();
-	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINES, 0, m_vertexData->size());
-	m_line = new osg::LineWidth(1.0f);
-	
-	m_geometry->setVertexArray(m_vertexData);
-	m_geometry->addPrimitiveSet(m_drawArrays);
-	m_geometry->setUseDisplayList(false);
-	m_geometry->setDataVariance(osg::Object::DYNAMIC);
-	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	m_geometry->getOrCreateStateSet()->setAttribute(m_line, osg::StateAttribute::ON);
+	m_lineGeometry = new osg::Geometry;
+	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::LINES);
+	m_line = new osg::LineWidth;
 
-	////////////////////////////////////////////////////////////////////
+	m_lineGeometry->setVertexArray(m_vertexData);
+	m_lineGeometry->addPrimitiveSet(m_drawArrays);
+	m_lineGeometry->setUseDisplayList(false);
+	m_lineGeometry->setDataVariance(osg::Object::DYNAMIC);
+	m_lineGeometry->getOrCreateStateSet()->setAttribute(m_line, osg::StateAttribute::ON);
+
 	// Put a point at origin of the coordinate
-	auto m_pointGeometry = new osg::Geometry();
-	auto m_point = new osg::Point(2.0f);
-	auto m_pointArray = new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, 1);
+	osg::ref_ptr<osg::Geometry> pointGeometry = new osg::Geometry;
+	osg::ref_ptr<osg::Point> point = new osg::Point(2.0f);
+	osg::ref_ptr<osg::DrawElementsUInt> pointElement = new osg::DrawElementsUInt(osg::PrimitiveSet::POINTS);
+	pointElement->push_back(0);
+	osg::ref_ptr<osg::Vec3Array> pointData = new osg::Vec3Array;
+	pointData->push_back(osg::Vec3(0.0, 0.0, 0.0));
 
-	m_pointGeometry->addPrimitiveSet(m_pointArray);
-	m_pointGeometry->setUseDisplayList(false);
-	m_pointGeometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	m_pointGeometry->getOrCreateStateSet()->setAttribute(m_point, osg::StateAttribute::ON);
-	///////////////////////////////////////////////////////////////////
+	pointGeometry->setVertexArray(pointData);
+	pointGeometry->addPrimitiveSet(pointElement);
+	pointGeometry->setUseDisplayList(false);
+	pointGeometry->getOrCreateStateSet()->setAttribute(point, osg::StateAttribute::ON);
 
 	osg::Geode* geode = new osg::Geode();
-	geode->addDrawable(m_geometry);
-	geode->addDrawable(m_pointGeometry);
+	geode->addDrawable(m_lineGeometry);
+	geode->addDrawable(pointGeometry);
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 	m_transform->addChild(geode);
 }
 
@@ -88,17 +95,17 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 		{
 			m_vertexData->resize(count*2);
 		}
-		
+
 		// Copy OSS Vertices (data structure) into osg vertices
 		for (size_t i = 0; i < count; ++i)
 		{
-			float x = static_cast<float>(vertices[i].position[0]); 
-			float y = static_cast<float>(vertices[i].position[1]); 
+			float x = static_cast<float>(vertices[i].position[0]);
+			float y = static_cast<float>(vertices[i].position[1]);
 			float z = static_cast<float>(vertices[i].position[2]);
 
-			float newX = y - z;
-			float newY = x - z;
-			float newZ = x + y;
+			float newX = static_cast<float>(vertices[i].data.position[0]);
+			float newY = static_cast<float>(vertices[i].data.position[1]);
+			float newZ = static_cast<float>(vertices[i].data.position[2]);
 
 			(*m_vertexData)[2*i][0] = x;
 			(*m_vertexData)[2*i][1] = y;
@@ -107,11 +114,10 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 			(*m_vertexData)[2*i+1][1] = y + newY/10;
 			(*m_vertexData)[2*i+1][2] = z + newZ/10;
 		}
-
 		m_drawArrays->setCount(count*2);
 		m_drawArrays->dirty();
-		m_geometry->dirtyBound();
-		m_geometry->dirtyDisplayList();
+		m_lineGeometry->dirtyBound();
+		m_lineGeometry->dirtyDisplayList();
 	}
 	else
 	{
@@ -119,7 +125,7 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 		{
 			m_drawArrays->setCount(0);
 			m_drawArrays->dirty();
-			m_geometry->dirtyBound();
+			m_lineGeometry->dirtyBound();
 		}
 	}
 
@@ -127,14 +133,14 @@ void OsgVectorFieldRepresentation<Data>::doUpdate(double dt)
 
 
 template <class Data>
-void OsgVectorFieldRepresentation<Data>::setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh)
+void OsgVectorFieldRepresentation<Data>::setVertices(std::shared_ptr< Vertices< Vertex<Data> > > mesh)
 {
 	m_vertices = mesh;
 }
 
 
 template <class Data>
-std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> OsgVectorFieldRepresentation<Data>::getVertices() const
+std::shared_ptr< Vertices< Vertex<Data> > > OsgVectorFieldRepresentation<Data>::getVertices() const
 {
 	return m_vertices;
 }
@@ -152,27 +158,9 @@ double OsgVectorFieldRepresentation<Data>::getLineWidth() const
 	return static_cast<double>(m_line->getWidth());
 }
 
-template <class Data>
-void OsgVectorFieldRepresentation<Data>::setColors(const std::vector<SurgSim::Math::Vector4d>& colors)
-{
-	SURGSIM_ASSERT( colors.size() == m_vertices->getVertices().size() ) << "Size of colors does not match size of veritces";
-	// Set the color of the particles to one single color by default
-	osg::Vec4Array* osgColors = new osg::Vec4Array;
-	for (auto it = std::begin(colors); it != std::end(colors); ++it)
-	{
-		osgColors->push_back(SurgSim::Graphics::toOsg(*it));
-		osgColors->push_back(SurgSim::Graphics::toOsg(*it));
-	}
-	m_geometry->setColorArray(osgColors);
-	m_geometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-	m_colors = colors;
-}
 
-template <class Data>
-std::vector<SurgSim::Math::Vector4d> OsgVectorFieldRepresentation<Data>::getColors() const
-{
-	return m_colors;
-}
+template <>
+void OsgVectorFieldRepresentation<SurgSim::Math::Vector4d>::doUpdate(double dt);
 
 }; // Graphics
 }; // SurgSim
