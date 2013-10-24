@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
-#include <SurgSim/DataStructures/Vertex.h>
-#include <SurgSim/DataStructures/MeshElement.h>
+#include <SurgSim/Framework/Assert.h>
 
-using SurgSim::DataStructures::Vertex;
-using SurgSim::DataStructures::MeshElement;
+#include <SurgSim/Physics/MassSpringRepresentation.h>
+
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Math/Matrix.h>
 
 namespace SurgSim
 {
@@ -27,61 +27,58 @@ namespace Physics
 {
 
 MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
-Representation(name), m_integrationScheme(MassSpringRepresentation::INTEGRATIONSCHEME_EXPLICIT_EULER)
+	DeformableRepresentation(name)
 {
-	m_identityPose.setIdentity();
-	m_initialPose.setIdentity();
-
 	m_rayleighDamping.massCoefficient = 0.0;
 	m_rayleighDamping.stiffnessCoefficient = 0.0;
+
+	// Reminder: m_numDofPerNode is held by DeformableRepresentation
+	// but needs to be set by all concrete derived classes
+	this->m_numDofPerNode = 3;
 }
 
 MassSpringRepresentation::~MassSpringRepresentation()
 {
+}
 
+void MassSpringRepresentation::addMass(const std::shared_ptr<Mass> mass)
+{
+	m_masses.push_back(mass);
+}
+
+void MassSpringRepresentation::addSpring(const std::shared_ptr<Spring> spring)
+{
+	m_springs.push_back(spring);
 }
 
 unsigned int MassSpringRepresentation::getNumMasses() const
 {
-	return m_finalState.getNumVertices();
+	return m_masses.size();
 }
 
 unsigned int MassSpringRepresentation::getNumSprings() const
 {
-	return m_finalState.getNumEdges();
+	return m_springs.size();
 }
 
-MassParameter& MassSpringRepresentation::getMassParameter(unsigned int nodeId)
+std::shared_ptr<Mass> MassSpringRepresentation::getMass(unsigned int nodeId)
 {
 	SURGSIM_ASSERT(nodeId < getNumMasses()) << "Invalid node id to request a mass from";
-	return m_finalState.getVertex(nodeId).data;
+	return m_masses[nodeId];
 }
 
-LinearSpringParameter& MassSpringRepresentation::getSpringParameter(unsigned int springId)
+std::shared_ptr<Spring> MassSpringRepresentation::getSpring(unsigned int springId)
 {
 	SURGSIM_ASSERT(springId < getNumSprings()) << "Invalid spring id";
-	return m_finalState.getEdge(springId).data;
-}
-
-const TetrahedronMesh<MassParameter, LinearSpringParameter, void, void>&
-	MassSpringRepresentation::getFinalState() const
-{
-	return m_finalState;
-}
-
-const TetrahedronMesh<MassParameter, LinearSpringParameter, void, void>&
-	MassSpringRepresentation::getInitialState() const
-{
-	return m_initialState;
+	return m_springs[springId];
 }
 
 double MassSpringRepresentation::getTotalMass() const
 {
 	double mass = 0.0;
-	const std::vector<Vertex<MassParameter>> &vertices = m_finalState.getVertices();
-	for (std::vector<Vertex<MassParameter>>::const_iterator it = vertices.begin(); it != vertices.end(); it++)
+	for (auto it = std::begin(m_masses); it != std::end(m_masses); it++)
 	{
-		mass += it->data.getMass();
+		mass += (*it)->getMass();
 	}
 	return mass;
 }
@@ -106,100 +103,6 @@ void MassSpringRepresentation::setRayleighDampingMass(double massCoef)
 	m_rayleighDamping.massCoefficient = massCoef;
 }
 
-void MassSpringRepresentation::addBoundaryCondition(unsigned int nodeId)
-{
-	m_boundaryConditions.insert(nodeId);
-}
-
-unsigned int MassSpringRepresentation::getBoundaryCondition(unsigned int boundaryConditionId) const
-{
-	SURGSIM_ASSERT(boundaryConditionId >= 0u && boundaryConditionId < getNumBoundaryConditions()) \
-		<< "Invalid boundary condition id " << boundaryConditionId;
-	std::set<unsigned int>::const_iterator it = m_boundaryConditions.begin();
-	for (unsigned int i = 0; i < boundaryConditionId; i++) it++;
-	return *it;
-}
-
-unsigned int MassSpringRepresentation::getNumBoundaryConditions() const
-{
-	return static_cast<unsigned int>(m_boundaryConditions.size());
-}
-
-void MassSpringRepresentation::setIntegrationScheme(IntegrationScheme integrationScheme)
-{
-	m_integrationScheme = integrationScheme;
-}
-
-MassSpringRepresentation::IntegrationScheme MassSpringRepresentation::getIntegrationScheme() const
-{
-	return m_integrationScheme;
-}
-
-void MassSpringRepresentation::init1D(const Vector3d extremities[2], unsigned int numNodesPerDim[1],
-	double totalMass, double springStiffness, double springDamping)
-{
-	SURGSIM_ASSERT(numNodesPerDim[0] > 0) << "Number of nodes incorrect: " << numNodesPerDim[0];
-
-	// Allocate all Eigen data structures and all states
-	allocate(numNodesPerDim[0] * 3);
-
-	// Initialize the initial mesh state
-	{
-		// Initialize the nodes position (transforming them by m_initialPose), velocity and mass
-		Vector3d delta = (extremities[1] - extremities[0]) / static_cast<double>(numNodesPerDim[0] - 1);
-		for (unsigned int massId = 0; massId < numNodesPerDim[0]; massId++)
-		{
-			MassParameter mass;
-			mass.setMass(totalMass / static_cast<double>(numNodesPerDim[0]));
-			mass.setVelocity(Vector3d::Zero());
-			Vertex<MassParameter> vertex( m_initialPose * (extremities[0] + massId * delta), mass);
-			m_initialState.addVertex(vertex);
-		}
-
-		// Initialize the springs
-		for (unsigned int massId = 0; massId < numNodesPerDim[0] - 1; massId++)
-		{
-			LinearSpringParameter spring;
-			std::array<unsigned int, 2> element;
-
-			element[0] = massId;
-			element[1] = massId + 1;
-			const Vector3d& A = m_initialState.getVertexPosition(element[0]);
-			const Vector3d& B = m_initialState.getVertexPosition(element[1]);
-			spring.setStiffness(springStiffness);
-			spring.setDamping(springDamping);
-			spring.setInitialLength((B-A).norm());
-
-			MeshElement<2, LinearSpringParameter> edge(element, spring);
-			m_initialState.addEdge(edge);
-		}
-	}
-
-	// Initialize the final state as a copy of the initial state
-	m_finalState = m_initialState;
-
-	// Initialize the internal current, previous state (Eigen vector) as well as velocity
-	for (unsigned int nodeId = 0; nodeId < numNodesPerDim[0]; nodeId++)
-	{
-		m_x.segment(3 * nodeId, 3) = m_initialState.getVertexPosition(nodeId);
-		m_xPrevious.segment(3 * nodeId, 3) = m_initialState.getVertexPosition(nodeId);
-		m_v.segment(3 * nodeId, 3) = m_initialState.getVertex(nodeId).data.getVelocity();
-	}
-
-	// Set the number of dof for the Representation
-	setNumDof(numNodesPerDim[0] * 3);
-}
-
-void MassSpringRepresentation::init2D(const Vector3d extremities[2][2], unsigned int numNodesPerDim[2],
-	double totalMass, double springStiffness, double springDamping)
-{
-
-}
-void MassSpringRepresentation::init3D(const Vector3d extremities[2][2][2], unsigned int numNodesPerDim[3],
-	double totalMass, double springStiffness, double springDamping)
-{
-
-}
 
 RepresentationType MassSpringRepresentation::getType() const
 {
@@ -213,8 +116,15 @@ void MassSpringRepresentation::beforeUpdate(double dt)
 		return;
 	}
 
-	// Backup current state into previous state
-	m_xPrevious = m_x;
+	SURGSIM_ASSERT(3 * getNumMasses() == getNumDof()) <<
+		"Mismatch between the number of masses ("<<getNumMasses()<<") and the number of dof ("<<getNumDof()<<")";
+	SURGSIM_ASSERT(getNumMasses()) << "No masses specified yet, call addMass() prior to running the simulation";
+	SURGSIM_ASSERT(getNumSprings()) << "No springs specified yet, call addSpring() prior to running the simulation";
+	SURGSIM_ASSERT(getNumDof()) <<
+		"State has not been initialized yet, call setInitialState() prior to running the simulation";
+
+	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
+	DeformableRepresentation::beforeUpdate(dt);
 }
 
 void MassSpringRepresentation::update(double dt)
@@ -224,14 +134,13 @@ void MassSpringRepresentation::update(double dt)
 		return;
 	}
 
-	if (getIntegrationScheme() == INTEGRATIONSCHEME_EXPLICIT_EULER)
-	{
-		updateEulerExplicit(dt);
-	}
-	else if (getIntegrationScheme() == INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER)
-	{
-		updateEulerExplicit(dt, true);
-	}
+	// Solve the ode
+	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
+
+	// Back up the current state into the previous state (by swapping)
+	m_currentState.swap(m_previousState);
+	// Make the new state, the current state (by swapping)
+	m_currentState.swap(m_newState);
 }
 
 void MassSpringRepresentation::afterUpdate(double dt)
@@ -241,16 +150,11 @@ void MassSpringRepresentation::afterUpdate(double dt)
 		return;
 	}
 
-	// Back fill the new mass spring position into the mesh
-	for (unsigned int vertexId = 0 ; vertexId < m_finalState.getNumVertices(); vertexId++)
-	{
-		m_finalState.getVertex(vertexId).position = m_x.segment(3 * vertexId, 3);
-		m_finalState.getVertex(vertexId).data.setVelocity(m_v.segment(3 * vertexId, 3));
-	}
+	// Back up the current state into the final state
+	*m_finalState = *m_currentState;
 }
 
-void MassSpringRepresentation::applyDofCorrection(double dt,
-	const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block)
+void MassSpringRepresentation::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
 {
 	if (! isActive())
 	{
@@ -258,122 +162,318 @@ void MassSpringRepresentation::applyDofCorrection(double dt,
 	}
 }
 
-void MassSpringRepresentation::updateEulerExplicit(double dt, bool useModifiedEuler)
+Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& state)
 {
-	// For all node, we have m.a = F
-	// Note that at this stage, m_x and m_v contains information at time t (not t+dt)
-	// 1) Add gravity forces if gravity enabled
-	// 2) Add Rayleigh damping forces
-	// 3) Add spring forces
-	// 4) Compute acceleration a(t) = F(t)/m
-	// 5) Apply integration scheme (with boundary conditions)
-	//     Euler explicit               OR   Modified Euler Explicit
-	// {x(t+dt) = x(t) + dt.v(t)             {v(t+dt) = v(t) + dt.a(t)
-	// {v(t+dt) = v(t) + dt.a(t)             {x(t+dt) = x(t) + dt.v(t+dt)
+	// Make sure the force vector has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
-	m_f.setZero();
+	addGravityForce(&m_f, state);
+	addRayleighDampingForce(&m_f, state);
+	addSpringsForce(&m_f, state);
 
-	// 1) Add gravity
-	if (isGravityEnabled())
+	// Apply boundary conditions globally
+	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
+		boundaryCondition != std::end(state.getBoundaryConditions());
+		boundaryCondition++)
 	{
-		for (unsigned int nodeId = 0; nodeId < getNumMasses(); nodeId++)
-		{
-			m_f.segment(3 * nodeId, 3) = getGravity() * getMassParameter(nodeId).getMass();
-		}
+		m_f[*boundaryCondition] = 0.0;
 	}
 
-	// 2) Add Rayleigh damping
-	addRayleighDampingForce(&m_f, m_v);
-
-	// 3) Add spring forces
-	addSpringForces(&m_f, m_x, m_v);
-
-	// 4) Compute acceleration (dividing by the mass)
-	for (unsigned int nodeId = 0; nodeId < getNumMasses(); nodeId++)
-	{
-		m_a.segment(3 * nodeId, 3) = m_f.segment(3 * nodeId, 3) / getMassParameter(nodeId).getMass();
-	}
-
-	// 5) Apply numerical integration scheme
-	if (useModifiedEuler)
-	{
-		m_v += m_a * dt;
-		// apply the boundary conditions (v = 0 => x unchanged when updated)
-		for (std::set<unsigned int>::const_iterator bcIt = m_boundaryConditions.begin();
-			bcIt != m_boundaryConditions.end();
-			bcIt++)
-		{
-			m_v.segment(3 * (*bcIt), 3) = Vector3d::Zero();
-		}
-		m_x += m_v * dt;
-	}
-	else
-	{
-		// apply the boundary conditions (v = 0 => x unchanged + f = 0 => v = 0)
-		for (std::set<unsigned int>::const_iterator bcIt = m_boundaryConditions.begin();
-			bcIt != m_boundaryConditions.end();
-			bcIt++)
-		{
-			m_a.segment(3 * (*bcIt), 3) = Vector3d::Zero();
-			m_v.segment(3 * (*bcIt), 3) = Vector3d::Zero();
-		}
-		m_x += m_v * dt;
-		m_v += m_a * dt;
-	}
+	return m_f;
 }
 
-void MassSpringRepresentation::allocate(int numDof)
+const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableRepresentationState& state)
 {
-	// Allocate internal Eigen data structure
-	m_x.resize(numDof);
-	m_xPrevious.resize(numDof);
-	m_v.resize(numDof);
-	m_f.resize(numDof);
-	m_a.resize(numDof);
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::setSubVector;
 
-	// Zero-out the 4 states
-	m_x.setZero();
-	m_xPrevious.setZero();
-	m_v.setZero();
-	m_f.setZero();
-	m_a.setZero();
+	// Make sure the mass matrix has been properly allocated
+	// It does not need to be zeroed out, as it will be directly set
+	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
+
+	DiagonalMatrix::DiagonalVectorType& diagonal = m_M.diagonal();
+
+	for (unsigned int massId = 0; massId < getNumMasses(); massId++)
+	{
+		setSubVector(Vector3d::Ones() * getMass(massId)->getMass(), massId, 3, &diagonal);
+	}
+
+	// Apply boundary conditions globally
+	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
+		boundaryCondition != std::end(state.getBoundaryConditions());
+		boundaryCondition++)
+	{
+		diagonal[*boundaryCondition] = 1e9;
+	}
+
+	return m_M;
 }
 
-void MassSpringRepresentation::addRayleighDampingForce(Vector *f, const Vector &v, double scale)
+const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationState& state)
 {
-	// Rayleigh damping mass: F = - (coeffMass.M).v
-	// M is diagonal, so this calculation can be done nodes per nodes
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::setSubVector;
+	using SurgSim::Math::addSubMatrix;
+
+	const double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
+	const double& rayMass = m_rayleighDamping.massCoefficient;
+
+	// Make sure the damping matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
+
+	// D += rayMass.M
+	if (rayMass != 0.0)
+	{
+		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
+		{
+			double coef = rayMass * getMass(massId)->getMass();
+			Matrix::DiagonalReturnType Ddiagonal = m_D.diagonal();
+			setSubVector(Vector3d::Ones() * coef, massId, 3, &Ddiagonal);
+		}
+	}
+
+	// D += rayStiff.K
+	if (rayStiff != 0.0)
+	{
+		for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+		{
+			addSubMatrix(rayStiff * (*spring)->computeStiffness(state), (*spring)->getNodeIds(), 3, &m_D);
+		}
+	}
+
+	// D += Springs damping matrix
+	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+	{
+		addSubMatrix((*spring)->computeDamping(state), (*spring)->getNodeIds(), 3, &m_D);
+	}
+
+	// Apply boundary conditions globally
+	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
+		boundaryCondition != std::end(state.getBoundaryConditions());
+		boundaryCondition++)
+	{
+		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+	}
+
+	return m_D;
+}
+
+const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationState& state)
+{
+	using SurgSim::Math::addSubMatrix;
+
+	// Make sure the stiffness matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
+
+	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+	{
+		addSubMatrix((*spring)->computeStiffness(state), (*spring)->getNodeIds(), 3, &m_K);
+	}
+
+	// Apply boundary conditions globally
+	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
+		boundaryCondition != std::end(state.getBoundaryConditions());
+		boundaryCondition++)
+	{
+		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
+	}
+
+	return m_K;
+}
+
+void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& state,
+	Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K)
+{
+	using SurgSim::Math::addSubVector;
+	using SurgSim::Math::addSubMatrix;
+
+	// Make sure the force vector has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
+
+	// Make sure the mass matrix has been properly allocated
+	// It does not need to be zeroed out, as it will be directly set
+	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
+
+	// Make sure the damping matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
+
+	// Make sure the stiffness matrix has been properly allocated and zeroed out
+	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
+
+	// Computes the mass matrix m_M
+	computeM(state);
+
+	// Computes the stiffness matrix m_K
+	// Add the springs damping matrix to m_D
+	// Add the springs force to m_f
+	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+	{
+		Vector* f;
+		Matrix* D;
+		Matrix* K;
+		(*spring)->computeFDK(state, &f, &D, &K);
+
+		addSubMatrix(*K, (*spring)->getNodeIds(), 3, &m_K);
+		addSubMatrix(*D, (*spring)->getNodeIds(), 3, &m_D);
+		addSubVector(*f, (*spring)->getNodeIds(), 3, &m_f);
+	}
+
+	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
+	{
+		m_D.diagonal() += m_M.diagonal() * m_rayleighDamping.massCoefficient;
+	}
+	if (m_rayleighDamping.stiffnessCoefficient)
+	{
+		m_D += m_K * m_rayleighDamping.stiffnessCoefficient;
+	}
+
+	// Add the gravity to m_f
+	addGravityForce(&m_f, state);
+
+	// Add the Rayleigh damping force to m_f
+	addRayleighDampingForce(&m_f, state, false);
+
+	// Apply boundary conditions globally
+	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
+		boundaryCondition != std::end(state.getBoundaryConditions());
+		boundaryCondition++)
+	{
+		m_M.diagonal()[*boundaryCondition] = 1e9;
+
+		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+
+		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
+
+		m_f[*boundaryCondition] = 0.0;
+	}
+
+	*f = &m_f;
+	*M = &m_M;
+	*D = &m_D;
+	*K = &m_K;
+}
+
+void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const DeformableRepresentationState& state,
+	bool useGlobalStiffnessMatrix, double scale)
+{
+	using SurgSim::Math::getSubVector;
+	using SurgSim::Math::addSubVector;
+	using SurgSim::Math::getSubMatrix;
+
+	// Temporary variables for convenience
+	double& rayMass = m_rayleighDamping.massCoefficient;
+	double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
+	const Vector& v = state.getVelocities();
+
+	// Rayleigh damping mass: F = - rayMass.M.v(t)
+	// M is diagonal, so this calculation can be done node per node
+	if (rayMass != 0.0)
 	{
 		for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
 		{
-			double mass = getMassParameter(nodeID).getMass();
-			f->segment(3 * nodeID, 3) -= scale * m_rayleighDamping.massCoefficient * mass * v.segment(3 * nodeID, 3);
+			double mass = getMass(nodeID)->getMass();
+			SurgSim::Math::Vector3d f = - scale * rayMass * mass * getSubVector(v, nodeID, 3);
+			addSubVector(f, nodeID, 3, force);
 		}
 	}
 
-	// Rayleigh damping stiffness: F = - (coeffStiffness.K).v
-	// K is not diagonal and links all dof of the 2 connected nodes
-	// We need the spring stiffness matrix to complete that part...to be completed !
-	if (m_rayleighDamping.stiffnessCoefficient)
+	// Rayleigh damping stiffness: F = - rayStiff.K.v(t)
+	// K is not diagonal and links all dof of the N connected nodes
+	if (rayStiff != 0.0)
 	{
+		if (useGlobalStiffnessMatrix)
+		{
+			*force -= scale * rayStiff * (m_K * v);
+		}
+		else
+		{
+			// Loop through each spring to compute its contribution
+			for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+			{
+				const Matrix& springK = (*spring)->computeStiffness(state);
+				const unsigned int springNumNodes = (*spring)->getNumNodes();
+
+				// This spring contribution is F = - rayStiff.springK.v (with v a subset of the global velocity vector)
+				// We do this matrix-vector product node by node
+				for (unsigned int springNodeIdRow = 0; springNodeIdRow < springNumNodes; springNodeIdRow++)
+				{
+					unsigned int nodeIdRow = (*spring)->getNodeId(springNodeIdRow);
+
+					for (unsigned int springNodeIdCol = 0; springNodeIdCol < springNumNodes; springNodeIdCol++)
+					{
+						unsigned int nodeIdCol = (*spring)->getNodeId(springNodeIdCol);
+
+						auto springKij = getSubMatrix(springK, springNodeIdRow, springNodeIdCol, 3, 3);
+						auto vj        = getSubVector(v, nodeIdCol, 3);
+						addSubVector(- scale * rayStiff * (springKij * vj), nodeIdRow, 3, force);
+					}
+				}
+			}
+		}
 	}
 }
 
-void MassSpringRepresentation::addSpringForces(Vector *f, const Vector& x, const Vector& v, double scale)
+void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRepresentationState& state, double scale)
 {
-	for (unsigned int springId = 0; springId < getNumSprings(); springId++)
+	using SurgSim::Math::addSubVector;
+
+	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
-		unsigned int rowNodeId0 = 3 * m_finalState.getEdge(springId).verticesId[0];
-		unsigned int rowNodeId1 = 3 * m_finalState.getEdge(springId).verticesId[1];
-
-		const Vector3d localF = m_finalState.getEdge(springId).data.getF(
-			x.segment(rowNodeId0, 3), x.segment(rowNodeId1, 3),
-			v.segment(rowNodeId0, 3), v.segment(rowNodeId1, 3));
-
-		f->segment(rowNodeId0, 3) += localF * scale;
-		f->segment(rowNodeId1, 3) -= localF * scale;
+		addSubVector((*spring)->computeForce(state), (*spring)->getNodeIds(), 3, force);
 	}
+}
+
+void MassSpringRepresentation::addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale)
+{
+	using SurgSim::Math::addSubVector;
+
+	if (isGravityEnabled())
+	{
+		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
+		{
+			addSubVector(getGravity() * getMass(massId)->getMass(), massId, 3, f);
+		}
+	}
+}
+
+static void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
+									  Vector* x, bool rotationOnly = false)
+{
+	unsigned int numNodes = x->size() / 3;
+	SURGSIM_ASSERT(static_cast<int>(numNodes * 3) == x->size()) <<
+		"Unexpected number of dof in a MassSpring state vector (not a multiple of 3)";
+
+	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+	{
+		SurgSim::Math::Vector3d xi = SurgSim::Math::getSubVector(*x, nodeId, 3);
+		SurgSim::Math::Vector3d xiTransformed;
+		if (rotationOnly)
+		{
+			xiTransformed = transform.linear() * xi;
+		}
+		else
+		{
+			xiTransformed = transform * xi;
+		}
+		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
+	}
+}
+
+void MassSpringRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
+	const SurgSim::Math::RigidTransform3d& transform)
+{
+	transformVectorByBlockOf3(transform, &state->getPositions());
+	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
+	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
 }
 
 } // namespace Physics
