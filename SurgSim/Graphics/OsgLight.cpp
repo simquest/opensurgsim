@@ -31,6 +31,9 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
 #include <osg/Uniform>
+#include <osg/Light>
+#include <osg/LightSource>
+#include <osg/Node>
 
 using osg::Uniform;
 
@@ -46,32 +49,42 @@ OsgLight::OsgLight(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	Light(name),
-	m_ambientColor(0.0,0.0,0.0,1.0),
+	m_ambientColor(0.2,0.2,0.2,1.0),
 	m_diffuseColor(1.0,1.0,1.0,1.0),
 	m_specularColor(1.0,1.0,1.0,1.0),
 	m_constantAttenuation(1.0),
 	m_linearAttenuation(0.0),
 	m_quadraticAttenuation(0.0)
 {
-	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC3,"ossLightPosition");
+	std::string prefix = "oss_LightSource.";
+
+	m_light = new osg::Light();
+	m_light->setName(name);
+	m_light->setLightNum(0);
+	m_lightSource = new osg::LightSource();
+	m_lightSource->setLight(m_light);
+
+	m_switch->addChild(m_lightSource);
+
+	m_uniforms[POSITION] = new osg::Uniform(Uniform::FLOAT_VEC4,prefix + "position");
 	setPose(getPose());
 
-	m_uniforms[AMBIENT_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, "ossLightAmbientColor");
+	m_uniforms[AMBIENT_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "ambient");
 	setAmbientColor(m_ambientColor);
 
-	m_uniforms[DIFFUSE_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, "ossLightDiffuseColor");
+	m_uniforms[DIFFUSE_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "diffuse");
 	setDiffuseColor(m_diffuseColor);
 
-	m_uniforms[SPECULAR_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, "ossLightSpecularColor");
+	m_uniforms[SPECULAR_COLOR] = new osg::Uniform(Uniform::FLOAT_VEC4, prefix + "specular");
 	setSpecularColor(m_specularColor);
 
-	m_uniforms[CONSTANT_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, "ossLightConstantAttenuation");
+	m_uniforms[CONSTANT_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "constantAttenuation");
 	setConstantAttenuation(m_constantAttenuation);
 
-	m_uniforms[LINEAR_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, "ossLightLinearAttenuation");
+	m_uniforms[LINEAR_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "linearAttenuation");
 	setLinearAttenuation(m_linearAttenuation);
 
-	m_uniforms[QUADRATIC_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, "ossLightQuadraticAttenuation");
+	m_uniforms[QUADRATIC_ATTENUATION] = new osg::Uniform(Uniform::FLOAT, prefix + "quadraticAttenuation");
 	setQuadraticAttenuation(m_quadraticAttenuation);
 }
 
@@ -120,7 +133,9 @@ void OsgLight::setAmbientColor(const SurgSim::Math::Vector4d& color)
 {
 	m_ambientColor = color;
 	SurgSim::Math::Vector4f floatColor = color.cast<float>();
-	m_uniforms[AMBIENT_COLOR]->set(toOsg(floatColor));
+	osg::Vec4f osgVec = toOsg(floatColor);
+	m_uniforms[AMBIENT_COLOR]->set(osgVec);
+	m_light->setAmbient(osgVec);
 }
 
 SurgSim::Math::Vector4d OsgLight::getAmbientColor()
@@ -132,7 +147,9 @@ void OsgLight::setDiffuseColor(const SurgSim::Math::Vector4d& color)
 {
 	m_diffuseColor = color;
 	SurgSim::Math::Vector4f floatColor = color.cast<float>();
-	m_uniforms[DIFFUSE_COLOR]->set(toOsg(floatColor));
+	osg::Vec4f osgVec = toOsg(floatColor);
+	m_uniforms[DIFFUSE_COLOR]->set(osgVec);
+	m_light->setDiffuse(osgVec);
 }
 
 SurgSim::Math::Vector4d OsgLight::getDiffuseColor()
@@ -144,7 +161,9 @@ void OsgLight::setSpecularColor(const SurgSim::Math::Vector4d& color)
 {
 	m_specularColor = color;
 	SurgSim::Math::Vector4f floatColor = color.cast<float>();
-	m_uniforms[SPECULAR_COLOR]->set(toOsg(floatColor));
+	osg::Vec4f osgVec = toOsg(floatColor);
+	m_uniforms[SPECULAR_COLOR]->set(osgVec);
+	m_light->setSpecular(osgVec);
 }
 
 SurgSim::Math::Vector4d OsgLight::getSpecularColor()
@@ -156,6 +175,7 @@ void OsgLight::setConstantAttenuation(double val)
 {
 	m_constantAttenuation = val;
 	m_uniforms[CONSTANT_ATTENUATION]->set(static_cast<float>(val));
+	m_light->setConstantAttenuation(val);
 }
 
 double OsgLight::getConstantAttenuation()
@@ -167,6 +187,7 @@ void OsgLight::setLinearAttenuation(double val)
 {
 	m_linearAttenuation = val;
 	m_uniforms[LINEAR_ATTENUATION]->set(static_cast<float>(val));
+	m_light->setLinearAttenuation(val);
 }
 
 double OsgLight::getLinearAttenuation()
@@ -178,6 +199,7 @@ void OsgLight::setQuadraticAttenuation(double val)
 {
 	m_quadraticAttenuation = val;
 	m_uniforms[QUADRATIC_ATTENUATION]->set(static_cast<float>(val));
+	m_light->setQuadraticAttenuation(val);
 }
 
 double OsgLight::getQuadraticAttenuation()
@@ -205,7 +227,9 @@ void OsgLight::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	OsgRepresentation::setPose(pose);
 	SurgSim::Math::Vector3f position = pose.translation().cast<float>();
-	m_uniforms[POSITION]->set(toOsg(position));
+	osg::Vec4f osgVec(osg::Vec4f(toOsg(position),1.0));
+	m_uniforms[POSITION]->set(osgVec);
+	m_light->setPosition(osgVec);
 }
 
 

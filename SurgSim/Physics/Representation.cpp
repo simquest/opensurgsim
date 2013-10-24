@@ -85,7 +85,7 @@ std::shared_ptr<Localization> Representation::createLocalization(const Location&
 	return nullptr;
 }
 
-void Representation::applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block)
+void Representation::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
 {
 
 }

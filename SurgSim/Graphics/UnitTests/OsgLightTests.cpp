@@ -175,27 +175,5 @@ TEST_F(OsgLightTests, AttenuationAccessorTests)
 	EXPECT_NEAR(quadraticAttenuation, static_cast<double>(osgValue), epsilon);
 }
 
-TEST_F(OsgLightTests, PositionUniformTest)
-{
-	std::shared_ptr<OsgLight> light = std::make_shared<OsgLight>("TestLight");
-	std::shared_ptr<OsgGroup> group = std::make_shared<OsgGroup>("TestGroup");
-
-	light->setGroup(group);
-
-	RigidTransform3d pose = RigidTransform3d::Identity();
-
-	Vector3d translate(5.0,6.0,7.0);
-
-	pose.translate(translate);
-
-	light->setPose(pose);
-
-	osg::Vec3f osgTranslate;
-	getUniform(light,0)->get(osgTranslate);
-
-	EXPECT_TRUE(translate.isApprox(fromOsg(osgTranslate).cast<double>()));
-}
-
-
 }; // namespace Graphics
 }; // namespace SurgSim
