@@ -15,5 +15,6 @@
 
 add_subdirectory(AddSphereFromInput)
 add_subdirectory(BouncingBalls)
+add_subdirectory(GraphicsScene)
 add_subdirectory(InputVtc)
 add_subdirectory(MassSprings)

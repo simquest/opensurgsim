@@ -47,7 +47,9 @@ def spew_lines(file, lines):
     return False
 
 def filename_sort_filter(file):
-  return re.sub(r'Tests?$', '', re.sub(r'\.(?:h|cpp)$', '', file)).lower()
+#  return re.sub(r'Tests?$', '', re.sub(r'\.(?:h|cpp)$', '', file)).lower()
+# Taking out the string 'Tests' screws up the file ordering test
+  return re.sub(r'\.(?:h|cpp)$', '', file).lower()
 
 def alphabetize(file, lines):
   if lines is None:

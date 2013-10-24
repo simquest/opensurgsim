@@ -139,7 +139,8 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
-	std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities = {{
+	std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities =
+	{{
 		{{ Vector3d(0,0,0), Vector3d(1,0,0) }},
 		{{ Vector3d(0,-1,0), Vector3d(1,-1,0) }}
 	}};
@@ -207,7 +208,8 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
-	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities = {{
+	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities =
+	{{
 		{{
 			{{ Vector3d(0,0,0), Vector3d(1,0,0) }}
 			,
