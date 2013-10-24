@@ -42,57 +42,13 @@ namespace Device
 
 
 NovintDevice::NovintDevice(const std::string& uniqueName, const std::string& initializationName) :
-	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_initializationName(initializationName)
+	NovintCommonDevice(uniqueName, initializationName)
 {
 }
 
 
 NovintDevice::~NovintDevice()
 {
-	if (isInitialized())
-	{
-		finalize();
-	}
-}
-
-
-std::string NovintDevice::getInitializationName() const
-{
-	return m_initializationName;
-}
-
-
-bool NovintDevice::initialize()
-{
-	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<NovintScaffold> scaffold = NovintScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold);
-
-	if (! scaffold->registerDevice(this))
-	{
-		return false;
-	}
-
-	m_scaffold = std::move(scaffold);
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
-	return true;
-}
-
-
-bool NovintDevice::finalize()
-{
-	SURGSIM_ASSERT(isInitialized());
-	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
-	bool ok = m_scaffold->unregisterDevice(this);
-	m_scaffold.reset();
-	return ok;
-}
-
-
-bool NovintDevice::isInitialized() const
-{
-	return (m_scaffold != nullptr);
 }
 
 

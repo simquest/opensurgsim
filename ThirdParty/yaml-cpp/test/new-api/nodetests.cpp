@@ -56,6 +56,13 @@ namespace Test
 			return true;
 		}
 
+		TEST StyleNode()
+		{
+			YAML::Node node(0);
+			YAML_ASSERT(node.Style() == YAML::DefaultStyle);
+			return true;
+		}
+
 		TEST SimpleAppendSequence()
 		{
 			YAML::Node node;

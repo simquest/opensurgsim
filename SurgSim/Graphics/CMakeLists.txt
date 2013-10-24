@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
@@ -25,12 +22,14 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
+	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
 	OsgCapsuleRepresentation.cpp
 	OsgCylinderRepresentation.cpp
 	OsgGroup.cpp
 	OsgLight.cpp
+	OsgLog.cpp
 	OsgManager.cpp
 	OsgMaterial.cpp
 	OsgPlaneRepresentation.cpp
@@ -46,6 +45,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTextureRectangle.cpp
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
+	OsgUnitAxes.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	Representation.cpp
@@ -53,6 +53,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 )
 
 set(SURGSIM_GRAPHICS_HEADERS
+	AxesRepresentation.h
 	BoxRepresentation.h
 	Camera.h
 	CapsuleRepresentation.h
@@ -61,12 +62,14 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Light.h
 	Manager.h
 	Material.h
+	OsgAxesRepresentation.h
 	OsgBoxRepresentation.h
 	OsgCamera.h
 	OsgCapsuleRepresentation.h
 	OsgConversions.h
 	OsgCylinderRepresentation.h
 	OsgGroup.h
+	OsgLog.h
 	OsgLight.h
 	OsgManager.h
 	OsgMaterial.h
@@ -96,6 +99,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUniform-inl.h
 	OsgUniformBase.h
 	OsgUniformTypes.h
+	OsgUnitAxes.h
 	OsgUnitBox.h
 	OsgUnitCylinder.h
 	OsgUnitSphere.h

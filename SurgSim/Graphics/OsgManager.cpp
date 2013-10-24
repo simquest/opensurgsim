@@ -35,7 +35,8 @@ OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 {
 	m_defaultCamera = std::make_shared<OsgCamera>("Default Camera");
 	m_defaultCamera->setGroup(m_defaultGroup);
-	m_defaultGroup->getOsgGroup()->getOrCreateStateSet()->setGlobalDefaults();
+	m_defaultGroup->getOsgGroup()->
+		getOrCreateStateSet()->setGlobalDefaults();
 }
 
 OsgManager::~OsgManager()

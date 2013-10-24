@@ -94,7 +94,7 @@ private:
 
 	/// Shared unit box, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;
-	/// Returns the shared unit sphere
+	/// Returns the shared unit box
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
 };
 

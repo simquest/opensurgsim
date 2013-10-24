@@ -33,14 +33,26 @@ set(EXAMPLE_SOURCES
 set(EXAMPLE_HEADERS
 )
 
-add_executable(NovintVisualTest
-	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-surgsim_show_ide_folders(
-	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+set(SEVEN_DOF_EXAMPLE_SOURCES
+	falcon_7dof_main.cpp
+)
+
+set(SEVEN_DOF_EXAMPLE_HEADERS
+)
 
 set(LIBS NovintDevice IdentityPoseDevice VisualTestCommon
 	SurgSimInput SurgSimFramework SurgSimDataStructures
 	${NOVINT_HDAL_SDK_LIBRARIES}
 	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
+add_executable(NovintVisualTest
+	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
 target_link_libraries(NovintVisualTest ${LIBS})
+surgsim_show_ide_folders(
+	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
+
+add_executable(Novint7DofVisualTest
+	${SEVEN_DOF_EXAMPLE_SOURCES} ${SEVEN_DOF_EXAMPLE_HEADERS})
+target_link_libraries(Novint7DofVisualTest ${LIBS})
+surgsim_show_ide_folders(
+	"${SEVEN_DOF_EXAMPLE_SOURCES}" "${SEVEN_DOF_EXAMPLE_HEADERS}")

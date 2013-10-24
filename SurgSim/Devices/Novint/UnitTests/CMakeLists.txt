@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	Novint7DofDeviceTest.cpp
 	NovintDeviceTest.cpp
 	NovintScaffoldTest.cpp
 )
