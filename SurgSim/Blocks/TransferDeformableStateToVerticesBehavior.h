@@ -62,7 +62,10 @@ protected:
 
 private:
 	/// Transfer the data from Deformable state m_from to Vertices m_to
-	void transfer();
+	/// \param doInitialization True if the recipient should be initialized if needed, False otherwise
+	/// \note if doInitialization is true and Vertices is empty, it will be filled accordingly
+	/// \note with a default vertex data instanciation (if VertexData type is not 'void')
+	void transfer(bool doInitialization = false);
 
 	/// Deformable representation state to get the positions from
 	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> m_from;

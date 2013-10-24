@@ -22,12 +22,12 @@ namespace Blocks
 {
 
 template <>
-void TransferDeformableStateToVerticesBehavior<void>::transfer()
+void TransferDeformableStateToVerticesBehavior<void>::transfer(bool doInitialization)
 {
 	const unsigned int numNodes = m_from->getNumNodes();
 
-	// If vertices is empty, let's populate it properly
-	if (m_to->getNumVertices() == 0 && numNodes != 0)
+	// If initialization is requested and vertices is empty, let's populate it properly
+	if (doInitialization == true && m_to->getNumVertices() == 0 && numNodes != 0)
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{
@@ -35,7 +35,7 @@ void TransferDeformableStateToVerticesBehavior<void>::transfer()
 			m_to->addVertex(v);
 		}
 	}
-	else
+	else if (m_to->getNumVertices() == numNodes)
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{

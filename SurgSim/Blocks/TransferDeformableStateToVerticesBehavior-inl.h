@@ -40,6 +40,8 @@ TransferDeformableStateToVerticesBehavior<VertexData>::TransferDeformableStateTo
 template <class VertexData>
 void TransferDeformableStateToVerticesBehavior<VertexData>::update(double dt)
 {
+	// Note that transfer is called without initialization on
+	// This should have been done in doWakeUp already
 	transfer();
 }
 
@@ -52,17 +54,19 @@ bool TransferDeformableStateToVerticesBehavior<VertexData>::doInitialize()
 template <class VertexData>
 bool TransferDeformableStateToVerticesBehavior<VertexData>::doWakeUp()
 {
-	transfer();
+	// Note that transfer is called with initialization on
+	// This is done in doWakeUp as an external data structure will be initialized (Vertices)
+	transfer(true);
 	return true;
 }
 
 template <class VertexData>
-void TransferDeformableStateToVerticesBehavior<VertexData>::transfer()
+void TransferDeformableStateToVerticesBehavior<VertexData>::transfer(bool doInitialization)
 {
 	const unsigned int numNodes = m_from->getNumNodes();
 
-	// If vertices is empty, let's populate it properly
-	if (m_to->getNumVertices() == 0 && numNodes != 0)
+	// If initialization is requested and vertices is empty, let's populate it properly
+	if (doInitialization == true && m_to->getNumVertices() == 0 && numNodes != 0)
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{
@@ -70,7 +74,7 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::transfer()
 			m_to->addVertex(v);
 		}
 	}
-	else
+	else if (m_to->getNumVertices() == numNodes)
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{
@@ -80,7 +84,7 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::transfer()
 }
 
 template <>
-void TransferDeformableStateToVerticesBehavior<void>::transfer();
+void TransferDeformableStateToVerticesBehavior<void>::transfer(bool doInitialization);
 
 }; //namespace Blocks
 
