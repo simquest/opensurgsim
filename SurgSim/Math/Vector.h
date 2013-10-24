@@ -80,13 +80,13 @@ template <class Vector, class SubVector>
 void addSubVector(const SubVector& subVector, const std::vector<unsigned int> blockIds,
 	unsigned int blockSize, Vector* vector)
 {
-	const unsigned int springNumNodes = blockIds.size();
+	const unsigned int numBlocks = blockIds.size();
 
-	for (unsigned int springNodeId = 0; springNodeId < springNumNodes; springNodeId++)
+	for (unsigned int block = 0; block < numBlocks; block++)
 	{
-		unsigned int nodeId = blockIds[springNodeId];
+		unsigned int blockId = blockIds[block];
 
-		vector->segment(blockSize * nodeId, blockSize) += subVector.segment(blockSize * springNodeId, blockSize);
+		vector->segment(blockSize * blockId, blockSize) += subVector.segment(blockSize * block, blockSize);
 	}
 }
 
@@ -126,7 +126,7 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, un
 template <class Vector>
 void resize(Vector *v, unsigned int size, bool zeroOut = false)
 {
-	if (! v)
+	if (v == nullptr)
 	{
 		return;
 	}

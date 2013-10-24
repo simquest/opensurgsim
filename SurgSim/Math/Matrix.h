@@ -118,29 +118,29 @@ void addSubMatrix(const SubMatrix& subMatrix, unsigned int blockIdRow, unsigned 
 	matrix->block(blockSizeRow * blockIdRow, blockSizeCol * blockIdCol, blockSizeRow, blockSizeCol) += subMatrix;
 }
 
-/// Helper method to add a sub-matrix per block into a square matrix, for the sake of clarity
+/// Helper method to add a sub-matrix made of squared-blocks into a matrix, for the sake of clarity
 /// \tparam Matrix The matrix type
 /// \tparam SubMatrix The sub-matrix type
-/// \param subMatrix The sub-matrix (containing all the blocks)
+/// \param subMatrix The sub-matrix (containing all the squared-blocks)
 /// \param blockIds Vector of block indices (for accessing matrix) corresponding to the blocks in sub-matrix
-/// \param blockSize The block size (square)
+/// \param blockSize The blocks size
 /// \param[out] matrix The matrix to add the sub-matrix blocks into
 template <class Matrix, class SubMatrix>
 void addSubMatrix(const SubMatrix& subMatrix, const std::vector<unsigned int> blockIds,
 	unsigned int blockSize, Matrix* matrix)
 {
-	const unsigned int springNumNodes = blockIds.size();
+	const unsigned int numBlocks = blockIds.size();
 
-	for (unsigned int springNodeId0 = 0; springNodeId0 < springNumNodes; springNodeId0++)
+	for (unsigned int block0 = 0; block0 < numBlocks; block0++)
 	{
-		unsigned int nodeId0 = blockIds[springNodeId0];
+		unsigned int blockId0 = blockIds[block0];
 
-		for (unsigned int springNodeId1 = 0; springNodeId1 < springNumNodes; springNodeId1++)
+		for (unsigned int block1 = 0; block1 < numBlocks; block1++)
 		{
-			unsigned int nodeId1 = blockIds[springNodeId1];
+			unsigned int blockId1 = blockIds[block1];
 
-			matrix->block(blockSize * nodeId0, blockSize * nodeId1, blockSize, blockSize)
-				+= subMatrix.block(blockSize * springNodeId0, blockSize * springNodeId1, blockSize, blockSize);
+			matrix->block(blockSize * blockId0, blockSize * blockId1, blockSize, blockSize)
+				+= subMatrix.block(blockSize * block0, blockSize * block1, blockSize, blockSize);
 		}
 	}
 }
@@ -184,7 +184,7 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsig
 template <class Matrix>
 void resize(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = false)
 {
-	if (! A)
+	if (A == nullptr)
 	{
 		return;
 	}
