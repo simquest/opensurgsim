@@ -273,12 +273,12 @@ def check_file_order(flags, file, files):
         emit_warning({'file': file, 'line': files[i][0],
                       'category': "opensurgsim/cmake_file_duplicate",
                       'text': "file list contains duplicate entries." })
-        saw_duplicated = True
+        saw_duplicated = False
       elif first > second and not saw_out_of_order:
         emit_warning({'file': file, 'line': files[i][0],
                       'category': "opensurgsim/cmake_file_order",
                       'text': "file list is not correctly ordered." })
-        saw_out_of_order = True
+        saw_out_of_order = False
 
 def decorate_listed_files(flags, file, files):
   prefix = os.path.dirname(file)

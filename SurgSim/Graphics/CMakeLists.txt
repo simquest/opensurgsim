@@ -70,8 +70,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgConversions.h
 	OsgCylinderRepresentation.h
 	OsgGroup.h
-	OsgLog.h
 	OsgLight.h
+	OsgLog.h
 	OsgManager.h
 	OsgMaterial.h
 	OsgMatrixConversions.h

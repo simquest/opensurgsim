@@ -267,8 +267,8 @@ static bool readEigenMatrix(const std::string& fileName, FILE* in, const char* l
 			int newNumRows = matrix->rows() + 1;
 			if (rowVector.cols() != numCols)
 			{
-				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%d vs %ld)\n  in file '%s'\n",
-						numCols, static_cast<unsigned long>(rowVector.cols()), fileName.c_str());
+				fprintf(stderr, "Inconsistent number of columns for Eigen matrix (%d vs %d)\n  in file '%s'\n",
+						numCols, static_cast<int>(rowVector.cols()), fileName.c_str());
 				return false;
 			}
 			matrix->conservativeResize(newNumRows, numCols);
@@ -406,8 +406,8 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 	}
 	if (static_cast<int>(constraintTypeNames.size()) != numConstraints)
 	{
-		fprintf(stderr, "Expected %d constraint types, saw %lu\n  in file '%s'\n",
-				numConstraints, static_cast<unsigned long>(constraintTypeNames.size()), fileName.c_str());
+		fprintf(stderr, "Expected %d constraint types, saw %u\n  in file '%s'\n",
+				numConstraints, static_cast<unsigned int>(constraintTypeNames.size()), fileName.c_str());
 		return false;
 	}
 	testData->problem.constraintTypes.resize(numConstraints);
@@ -458,37 +458,37 @@ bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData)
 
 	if ((testData->problem.b.rows() != numAtomicConstraints) || (testData->problem.b.cols() != 1))
 	{
-		fprintf(stderr, "Expected %dx%d vector E, saw %ldx%ld\n  in file '%s'\n",
-				numAtomicConstraints, 1, static_cast<long>(testData->problem.b.rows()),
-				static_cast<long>(testData->problem.b.cols()), fileName.c_str());
+		fprintf(stderr, "Expected %dx%d vector E, saw %dx%d\n  in file '%s'\n",
+				numAtomicConstraints, 1, static_cast<int>(testData->problem.b.rows()),
+				static_cast<int>(testData->problem.b.cols()), fileName.c_str());
 		return false;
 	}
 	if ((testData->problem.A.rows() != numAtomicConstraints) || (testData->problem.A.cols() != numAtomicConstraints))
 	{
-		fprintf(stderr, "Expected %dx%d matrix A, saw %ldx%ld\n  in file '%s'\n",
-				numAtomicConstraints, numAtomicConstraints, static_cast<long>(testData->problem.A.rows()),
-				static_cast<long>(testData->problem.A.cols()), fileName.c_str());
+		fprintf(stderr, "Expected %dx%d matrix A, saw %dx%d\n  in file '%s'\n",
+				numAtomicConstraints, numAtomicConstraints, static_cast<int>(testData->problem.A.rows()),
+				static_cast<int>(testData->problem.A.cols()), fileName.c_str());
 		return false;
 	}
 	if ((testData->problem.mu.rows() != numConstraints) || (testData->problem.mu.cols() != 1))
 	{
-		fprintf(stderr, "Expected %dx%d vector mu, saw %ldx%ld\n  in file '%s'\n",
-				numConstraints, 1, static_cast<long>(testData->problem.mu.rows()),
-				static_cast<long>(testData->problem.mu.cols()), fileName.c_str());
+		fprintf(stderr, "Expected %dx%d vector mu, saw %dx%d\n  in file '%s'\n",
+				numConstraints, 1, static_cast<int>(testData->problem.mu.rows()),
+				static_cast<int>(testData->problem.mu.cols()), fileName.c_str());
 		return false;
 	}
 	if ((testData->expectedLambda.rows() != numAtomicConstraints) || (testData->expectedLambda.cols() != 1))
 	{
-		fprintf(stderr, "Expected %dx%d vector lambda, saw %ldx%ld\n  in file '%s'\n",
-				numAtomicConstraints, 1, static_cast<long>(testData->expectedLambda.rows()),
-				static_cast<long>(testData->expectedLambda.cols()), fileName.c_str());
+		fprintf(stderr, "Expected %dx%d vector lambda, saw %dx%d\n  in file '%s'\n",
+				numAtomicConstraints, 1, static_cast<int>(testData->expectedLambda.rows()),
+				static_cast<int>(testData->expectedLambda.cols()), fileName.c_str());
 		return false;
 	}
 
 	if (! getLine(fileName, in, &line) || ! checkInputLine(fileName, TEXT_LABEL_END_OF_FILE, line))
 	{
-		fprintf(stderr, "Expected %d constraint types, saw %lu\n", numConstraints,
-				static_cast<unsigned long>(constraintTypeNames.size()));
+		fprintf(stderr, "Expected %d constraint types, saw %u\n", numConstraints,
+				static_cast<unsigned int>(constraintTypeNames.size()));
 		return false;
 	}
 

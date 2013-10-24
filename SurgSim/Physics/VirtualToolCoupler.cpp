@@ -85,7 +85,7 @@ void VirtualToolCoupler::update(double dt)
 	Vector3d torque;
 	torque = m_angularStiffness * computeRotationVector(inputPose, objectPose);
 	torque += m_angularDamping * (inputAngularVelocity - objectAnglularVelocity);
-	
+
 	const Matrix33d identity3x3 = Matrix33d::Identity();
 	m_rigid->addExternalForce(force, m_linearStiffness*identity3x3, m_linearDamping*identity3x3);
 	m_rigid->addExternalTorque(torque, m_angularStiffness*identity3x3, m_angularDamping*identity3x3);

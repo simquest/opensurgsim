@@ -51,7 +51,7 @@ namespace YAML
 		}
 		return true;
 	}
-	
+
 
 
 	/// Specialize of YAML::convert<> template vector4d class.
@@ -65,8 +65,8 @@ namespace YAML
 		node.push_back(rhs[3]);
 		return node;
 	}
-		 
-	bool convert<SurgSim::Math::Vector4d>::decode(const Node& node, SurgSim::Math::Vector4d& rhs) 
+
+	bool convert<SurgSim::Math::Vector4d>::decode(const Node& node, SurgSim::Math::Vector4d& rhs)
 	{
 		if (! node.IsSequence() || node.size() != 4)
 		{
