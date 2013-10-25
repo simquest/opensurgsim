@@ -36,36 +36,49 @@ using SurgSim::Math::Vector4d;
 
 TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 {
-	std::vector<Vector3d> vecs;
-	vecs.emplace_back(Vector3d(1.0, 0.0, 0.0));
-	vecs.emplace_back(Vector3d(0.0, 1.0, 0.0));
+	std::vector<Vector3d> points;
+	points.emplace_back(Vector3d(1.0, 0.0, 0.0));
+	points.emplace_back(Vector3d(0.0, 1.0, 0.0));
+	points.emplace_back(Vector3d(-1.0, 0.0, 0.0));
+	points.emplace_back(Vector3d(0.0, -1.0, 0.0));
 
-	vecs.emplace_back(Vector3d(-1.0, 0.0, 0.0));
-	vecs.emplace_back(Vector3d(0.0, -1.0, 0.0));
+	points.emplace_back(Vector3d(2.0, 0.0, 0.0));
+	points.emplace_back(Vector3d(0.0, 2.0, 0.0));
+	points.emplace_back(Vector3d(-2.0, 0.0, 0.0));
+	points.emplace_back(Vector3d(0.0, -2.0, 0.0));
 
-	vecs.emplace_back(Vector3d(2.0, 0.0, 0.0));
-	vecs.emplace_back(Vector3d(0.0, 2.0, 0.0));
+	// Vector3d: Coordinates of the (mathematical vector)
+	// Vector4d: Color (R,G,B,alpha) information of the vector
+	// Color information is optional. Color of vector is set to white by default
+	std::vector<SurgSim::DataStructures::Vector> vectors;
+	vectors.emplace_back(Vector3d(1.0, 0.0, 0.0));
+	vectors.emplace_back(Vector3d(0.0, 1.0, 0.0));
+	vectors.emplace_back(Vector3d(-1.0, 0.0, 0.0), Vector4d(1.0, 0.0, 0.0, 1.0));
+	vectors.emplace_back(Vector3d(0.0, -1.0, 0.0));
 
-	vecs.emplace_back(Vector3d(-2.0, 0.0, 0.0));
-	vecs.emplace_back(Vector3d(0.0, -2.0, 0.0));
+	vectors.emplace_back(Vector3d(2.0, 0.0, 0.0));
+	vectors.emplace_back(Vector3d(0.0, 2.0, 0.0), Vector4d(0.0, 1.0, 1.0, 1.0));
+	vectors.emplace_back(Vector3d(-2.0, 0.0, 0.0));
+	vectors.emplace_back(Vector3d(0.0, -2.0, 0.0));
 
-	auto vertices = std::make_shared<Vertices< Vertex<void> > >();
-	for (auto it = std::begin(vecs); it != std::end(vecs); ++it)
+	auto vertices = std::make_shared<Vertices<SurgSim::DataStructures::Vector>>();
+	auto it = std::begin(points);
+	auto v = std::begin(vectors);
+	for (; it != std::end(points); ++it, ++v)
 	{
-		auto vector = Vertex<void>(*it);
-		vertices->addVertex(Vertices< Vertex<void> >::VertexType((*it), vector));
+		vertices->addVertex(Vertex<SurgSim::DataStructures::Vector>((*it), *v));
 	}
 
-	std::shared_ptr<VectorFieldRepresentation<void>> vectorFieldRepresentation =
-		std::make_shared<OsgVectorFieldRepresentation<void>>("Vector Field");
+	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
+		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
 	vectorFieldRepresentation->setVertices(vertices);
 	EXPECT_EQ(vertices, vectorFieldRepresentation->getVertices());
 }
 
 TEST(OsgVectorFieldRepresentationTests, LineWidthTest)
 {
-	std::shared_ptr<VectorFieldRepresentation<void>> vectorFieldRepresentation =
-		std::make_shared<OsgVectorFieldRepresentation<void>>("Vector Field");
+	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
+		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
 	vectorFieldRepresentation->setLineWidth(1.25);
 	EXPECT_NEAR( 1.25, vectorFieldRepresentation->getLineWidth(), epsilon);
 }

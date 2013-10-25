@@ -16,6 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 
+#include <SurgSim/DataStructures/Vector.h>
 #include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/Representation.h>
 
@@ -26,10 +27,11 @@ namespace Graphics
 
 using SurgSim::DataStructures::Vertices;
 using SurgSim::DataStructures::Vertex;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
+
 /// Graphic representation of a vector field
-/// For each point, it is associated with a vector and an optional color
-/// \tparam	Data Optional color information associated with each vector
-template < class Data >
+/// Each point in the vector field is associated with a vector and an optional color
 class VectorFieldRepresentation : public virtual Representation
 {
 public:
@@ -38,16 +40,16 @@ public:
 	{
 	}
 
-	~VectorFieldRepresentation()
+	virtual ~VectorFieldRepresentation()
 	{
 	}
 
 	/// Sets Vertices
 	/// \param	vertices The Vertices (data structure)
-	virtual void setVertices(std::shared_ptr< Vertices < Vertex<Data> > > vertices) = 0;
+	virtual void setVertices(std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > vertices) = 0;
 	/// Gets the Vertices (data structure)
 	/// \return	The Vertices (data structure)
-	virtual std::shared_ptr< Vertices< Vertex<Data> > > getVertices() const = 0;
+	virtual std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > getVertices() const = 0;
 
 	/// Sets vector line width
 	/// \param	val	Width of vector line
@@ -56,6 +58,7 @@ public:
 	/// \return	The line width
 	virtual double getLineWidth() const = 0;
 };
+
 
 }; // Graphics
 }; // SurgSim

@@ -16,6 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 
+#include <SurgSim/DataStructures/Vector.h>
 #include <SurgSim/DataStructures/Vertex.h>
 #include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
@@ -35,13 +36,10 @@ namespace Graphics
 #pragma warning(disable:4250)
 #endif
 
-
-using SurgSim::DataStructures::Vertex;
 using SurgSim::DataStructures::Vertices;
 
 /// OSG vector field representation, implements a VectorFieldRepresenation using OSG.
-template <class Data>
-class OsgVectorFieldRepresentation : public VectorFieldRepresentation<Data>, public OsgRepresentation
+class OsgVectorFieldRepresentation : public VectorFieldRepresentation, public OsgRepresentation
 {
 public:
 	/// Constructor
@@ -51,10 +49,10 @@ public:
 
 	/// Sets Vertices
 	/// \param	vertices The Vertices (data structure)
-	virtual void setVertices(std::shared_ptr< Vertices < Vertex<Data> > > vertices) override;
+	virtual void setVertices(std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > vertices) override;
 	/// Gets the Vertices (data structure)
 	/// \return	The Vertices (data structure)
-	virtual std::shared_ptr< Vertices< Vertex<Data> > > getVertices() const override;
+	virtual std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > getVertices() const override;
 
 	/// Sets vector line width
 	/// \param	val	Width of vector line
@@ -68,8 +66,9 @@ public:
 	virtual void doUpdate(double dt) override;
 
 private:
-	/// Vertices (data structure) holding a list of Vertex(s) (data structure)
-	std::shared_ptr< Vertices< Vertex<Data> > > m_vertices;
+	/// Vertices (data structure) holding a list of vertices/points in 3D space
+	/// Each point is associated with a vector and an optional color
+	std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > m_vertices;
 
 	/// OSG vertex data structure
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
@@ -91,6 +90,5 @@ private:
 }; // Graphics
 }; // SurgSim
 
-#include <SurgSim/Graphics/OsgVectorFieldRepresentation-inl.h>
 
 #endif // SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
