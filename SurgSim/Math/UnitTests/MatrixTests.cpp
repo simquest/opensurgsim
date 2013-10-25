@@ -81,6 +81,13 @@ public:
 	typedef T Matrix;
 };
 
+template <class T>
+class AllDynamicMatrixTests : public MatrixTestBase<typename T::Scalar>
+{
+public:
+	typedef T Matrix;
+};
+
 // This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Matrix22d,
 						 SurgSim::Math::Matrix22f,
@@ -90,8 +97,21 @@ typedef ::testing::Types<SurgSim::Math::Matrix22d,
 						 SurgSim::Math::Matrix44f> AllMatrixVariants;
 TYPED_TEST_CASE(AllMatrixTests, AllMatrixVariants);
 
+// This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
+typedef ::testing::Types<Eigen::MatrixXd,
+						 Eigen::MatrixXf,
+						 SurgSim::Math::Matrix> AllDynamicMatrixVariants;
+TYPED_TEST_CASE(AllDynamicMatrixTests, AllDynamicMatrixVariants);
+
 template <class T>
 class UnalignedMatrixTests : public MatrixTestBase<typename T::Scalar>
+{
+public:
+	typedef T Matrix;
+};
+
+template <class T>
+class UnalignedDynamicMatrixTests : public MatrixTestBase<typename T::Scalar>
 {
 public:
 	typedef T Matrix;
@@ -105,6 +125,10 @@ typedef ::testing::Types<SurgSim::Math::Matrix22d,
 						 SurgSim::Math::Matrix44f> UnalignedMatrixVariants;
 TYPED_TEST_CASE(UnalignedMatrixTests, UnalignedMatrixVariants);
 
+typedef ::testing::Types<Eigen::MatrixXd,
+						 Eigen::MatrixXf,
+						 SurgSim::Math::Matrix> UnalignedDynamicMatrixVariants;
+TYPED_TEST_CASE(UnalignedDynamicMatrixTests, UnalignedDynamicMatrixVariants);
 
 
 // Now we're ready to start testing...
@@ -1132,3 +1156,210 @@ TYPED_TEST(AllMatrixTests, ArrayReadWrite)
 // non-checked access via coeff()
 // testing numerical validity
 // testing for denormalized numbers
+
+
+namespace
+{
+	template <class T>
+	void testScalar(T valueExpected, T value){}
+
+	template <>
+	void testScalar<double>(double valueExpected, double value)
+	{
+		EXPECT_DOUBLE_EQ(valueExpected, value);
+	}
+
+	template <>
+	void testScalar<float>(float valueExpected, float value)
+	{
+		EXPECT_FLOAT_EQ(valueExpected, value);
+	}
+};
+
+TYPED_TEST(AllDynamicMatrixTests, resize)
+{
+	typedef typename TestFixture::Matrix Matrix;
+
+	Matrix m;
+
+	ASSERT_NO_THROW(SurgSim::Math::resize(&m, 10, 10, false););
+	EXPECT_EQ(10, static_cast<int>(m.rows()));
+	EXPECT_EQ(10, static_cast<int>(m.cols()));
+
+	ASSERT_NO_THROW(SurgSim::Math::resize(&m, 13, 13, true););
+	EXPECT_EQ(13, static_cast<int>(m.rows()));
+	EXPECT_EQ(13, static_cast<int>(m.cols()));
+	EXPECT_TRUE(m.isZero());
+	
+	{
+		SCOPED_TRACE("DiagonalMatrix");
+		
+		SurgSim::Math::DiagonalMatrix m;
+		ASSERT_NO_THROW(SurgSim::Math::resize(&m, 10, 10, false););
+		EXPECT_EQ(10, static_cast<int>(m.rows()));
+		EXPECT_EQ(10, static_cast<int>(m.cols()));
+
+		ASSERT_NO_THROW(SurgSim::Math::resize(&m, 13, 13, true););
+		EXPECT_EQ(13, static_cast<int>(m.rows()));
+		EXPECT_EQ(13, static_cast<int>(m.cols()));
+		EXPECT_TRUE(m.diagonal().isZero());
+	}
+}
+
+TYPED_TEST(AllDynamicMatrixTests, addSubMatrix)
+{
+	typedef typename TestFixture::Matrix Matrix;
+
+	Matrix m, mInit, m2, m2Init;
+	SurgSim::Math::resize(&m, 18, 18);   m.setRandom();   mInit  = m;
+	SurgSim::Math::resize(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
+
+	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3,3, 3,3), 2,2, 3,3, &m););
+
+	EXPECT_TRUE(m2.isApprox(m2Init));
+	EXPECT_FALSE(m.isApprox(mInit));
+	for (int rowId = 0; rowId < 6; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+	for (int rowId = 6; rowId < 9; rowId++)
+	{
+		for (int colId = 6; colId < 9; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-6), m(rowId, colId));
+		}
+	}
+	for (int rowId = 9; rowId < 18; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+}
+
+TYPED_TEST(AllDynamicMatrixTests, addSubMatrixBlocks)
+{
+	typedef typename TestFixture::Matrix Matrix;
+
+	Matrix m, mInit, m2, m2Init;
+	std::vector<unsigned int> nodeIds;
+	SurgSim::Math::resize(&m, 18, 18);   m.setRandom();   mInit = m;
+	SurgSim::Math::resize(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
+	nodeIds.push_back(1);
+	nodeIds.push_back(3);
+	nodeIds.push_back(5);
+
+	ASSERT_NO_THROW(SurgSim::Math::addSubMatrix(m2.block(3,3, 9,9), nodeIds, 3, &m););
+	EXPECT_TRUE(m2.isApprox(m2Init));
+	EXPECT_FALSE(m.isApprox(mInit));
+	for (int rowId = 0; rowId < 3; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+	for (int rowId = 3; rowId < 6; rowId++)
+	{
+		for (int colId = 3; colId < 6; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-3, 3 + colId-3), m(rowId, colId));
+		}
+		for (int colId = 9; colId < 12; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-3, 3 + colId-6), m(rowId, colId));
+		}
+		for (int colId = 15; colId < 18; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-3, 3 + colId-9), m(rowId, colId));
+		}
+	}
+	for (int rowId = 6; rowId < 9; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+	for (int rowId = 9; rowId < 12; rowId++)
+	{
+		for (int colId = 3; colId < 6; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-3), m(rowId, colId));
+		}
+		for (int colId = 9; colId < 12; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-6), m(rowId, colId));
+		}
+		for (int colId = 15; colId < 18; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-6, 3 + colId-9), m(rowId, colId));
+		}
+	}
+	for (int rowId = 12; rowId < 15; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+	for (int rowId = 15; rowId < 18; rowId++)
+	{
+		for (int colId = 3; colId < 6; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-9, 3 + colId-3), m(rowId, colId));
+		}
+		for (int colId = 9; colId < 12; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-9, 3 + colId-6), m(rowId, colId));
+		}
+		for (int colId = 15; colId < 18; colId++)
+		{
+			testScalar(mInit(rowId, colId) + m2Init(3 + rowId-9, 3 + colId-9), m(rowId, colId));
+		}
+	}
+}
+
+TYPED_TEST(AllDynamicMatrixTests, setSubMatrix)
+{
+	typedef typename TestFixture::Matrix Matrix;
+
+	Matrix m, mInit, m2, m2Init;
+	SurgSim::Math::resize(&m, 18, 18);   m.setRandom();   mInit  = m;
+	SurgSim::Math::resize(&m2, 18, 18);  m2.setRandom();  m2Init = m2;
+
+	ASSERT_NO_THROW(SurgSim::Math::setSubMatrix(m2.block(3,3, 3,3), 2,2, 3,3, &m););
+	EXPECT_TRUE(m2.isApprox(m2Init));
+	EXPECT_FALSE(m.isApprox(mInit));
+	for (int rowId = 0; rowId < 6; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+	for (int rowId = 6; rowId < 6+3; rowId++)
+	{
+		for (int colId = 6; colId < 6+3; colId++)
+		{
+			testScalar(m2Init(3 + rowId-6, 3 + colId-6), m(rowId, colId));
+		}
+	}
+	for (int rowId = 6+3; rowId < 18; rowId++)
+	{
+		EXPECT_TRUE(m.row(rowId).isApprox(mInit.row(rowId)));
+		EXPECT_TRUE(m.col(rowId).isApprox(mInit.col(rowId)));
+	}
+}
+
+TYPED_TEST(AllDynamicMatrixTests, getSubMatrix)
+{
+	typedef typename TestFixture::Matrix Matrix;
+
+	Matrix m, mInit;
+	SurgSim::Math::resize(&m, 18, 18); m.setRandom(); mInit = m;
+
+	Eigen::Block<Matrix> subMatrix = SurgSim::Math::getSubMatrix(m, 2,2, 3,3);
+	EXPECT_TRUE(m.isApprox(mInit));
+	for (int rowId = 0; rowId < 3; rowId++)
+	{
+		for (int colId = 0; colId < 3; colId++)
+		{
+			testScalar(m(2 * 3 + rowId, 2 * 3 + colId) , subMatrix(rowId, colId));
+			// Also test that the returned value are pointing to the correct data
+			EXPECT_EQ(&subMatrix(rowId, colId), &m(2 * 3 + rowId, 2 * 3 + colId));
+		}
+	}
+}

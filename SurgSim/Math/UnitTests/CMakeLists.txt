@@ -24,13 +24,19 @@ set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
+	OdeSolverEulerExplicitModifiedTests.cpp
+	OdeSolverEulerExplicitTests.cpp
+	OdeSolverEulerImplicitTests.cpp
+	OdeSolverTests.cpp
 	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	MockObject.h
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
+	LinearSolveAndInverseTests.cpp
 	MatrixTests.cpp
 	QuaternionTests.cpp
 	RigidTransformTests.cpp
