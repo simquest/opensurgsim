@@ -100,9 +100,6 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 				(*osgColors)[2*i + 1] = color;
 			}
 		}
-		// In current implementation, a vector will be associated with white color by default if no color info is given.
-		// Thus, this "else()" clause will nerver be reached.
-		// Probably need some discussion here.
 		else
 		{
 			osgColors = new osg::Vec4Array(1);

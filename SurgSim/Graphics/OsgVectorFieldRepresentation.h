@@ -45,7 +45,7 @@ public:
 	/// Sets vector field
 	/// \param	vertices A Vertices (data structure) contains a (mathematical) vector and an optional color
 	virtual void setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) override;
-	/// Gets the vector field 
+	/// Gets the vector field
 	/// \return	A Vertices (data structure) contains a (mathematical) vector and an optional color information
 	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVertices() const override;
 
@@ -86,7 +86,6 @@ private:
 
 	/// A scale to scale the length of vector
 	double m_scale;
-	
 };
 
 #if defined(_MSC_VER)

@@ -36,31 +36,39 @@ using SurgSim::Math::Vector4d;
 
 TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 {
-	std::vector<Vector3d> points;
-	points.emplace_back(Vector3d(1.0, 0.0, 0.0));
-	points.emplace_back(Vector3d(0.0, 1.0, 0.0));
-	points.emplace_back(Vector3d(-1.0, 0.0, 0.0));
-	points.emplace_back(Vector3d(0.0, -1.0, 0.0));
+	// Locations in 3D space to draw vectors
+	std::vector<Vector3d> points(8);
+	points[0] = Vector3d(1.0, 0.0, 0.0);
+	points[1] = Vector3d(0.0, 1.0, 0.0);
+	points[2] = Vector3d(-1.0, 0.0, 0.0);
+	points[3] = Vector3d(0.0, -1.0, 0.0);
 
-	points.emplace_back(Vector3d(2.0, 0.0, 0.0));
-	points.emplace_back(Vector3d(0.0, 2.0, 0.0));
-	points.emplace_back(Vector3d(-2.0, 0.0, 0.0));
-	points.emplace_back(Vector3d(0.0, -2.0, 0.0));
+	points[4] = Vector3d(2.0, 0.0, 0.0);
+	points[5] = Vector3d(0.0, 2.0, 0.0);
+	points[6] = Vector3d(-2.0, 0.0, 0.0);
+	points[7] = Vector3d(0.0, -2.0, 0.0);
 
-	// Vector3d: Coordinates of the (mathematical vector)
+	std::vector<Vector4d> colors(8);
+	colors[0] = Vector4d(1.0, 0.0, 0.0, 1.0);
+	colors[1] = Vector4d(1.0, 0.0, 0.0, 1.0);
+	colors[2] = Vector4d(1.0, 0.0, 0.0, 1.0);
+	colors[3] = Vector4d(1.0, 0.0, 0.0, 1.0);
+
+	colors[4] = Vector4d(1.0, 0.0, 0.0, 1.0);
+	colors[5] = Vector4d(0.0, 1.0, 1.0, 1.0);
+	colors[6] = Vector4d(1.0, 0.0, 0.0, 1.0);
+	colors[7] = Vector4d(1.0, 0.0, 0.0, 1.0);
+
+	// Vector3d: Coordinates of the (mathematical) vector
 	// Vector4d: Color (R,G,B,alpha) information of the vector
-	// Color information is optional. Color of vector is set to white by default
-	std::vector<SurgSim::Graphics::VectorFieldData> vectors;
-	vectors.emplace_back(Vector3d(1.0, 0.0, 0.0));
-	vectors.emplace_back(Vector3d(0.0, 1.0, 0.0));
-	vectors.emplace_back(Vector3d(-1.0, 0.0, 0.0), Vector4d(1.0, 0.0, 0.0, 1.0));
-	vectors.emplace_back(Vector3d(0.0, -1.0, 0.0));
+	std::vector<SurgSim::Graphics::VectorFieldData> vectors(8);
+	for (auto i = 0; i < 8; ++i)
+	{
+		vectors[i].vectorDirection.setValue(points[i]);
+		vectors[i].vectorColor.setValue(colors[i]);
+	}
 
-	vectors.emplace_back(Vector3d(2.0, 0.0, 0.0));
-	vectors.emplace_back(Vector3d(0.0, 2.0, 0.0), Vector4d(0.0, 1.0, 1.0, 1.0));
-	vectors.emplace_back(Vector3d(-2.0, 0.0, 0.0));
-	vectors.emplace_back(Vector3d(0.0, -2.0, 0.0));
-
+	// Associate vectors to points (locations in 3D space)
 	auto vertices = std::make_shared<SurgSim::Graphics::VectorField>();
 	auto it = std::begin(points);
 	auto v = std::begin(vectors);
@@ -80,5 +88,5 @@ TEST(OsgVectorFieldRepresentationTests, LineWidthTest)
 	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
 	vectorFieldRepresentation->setLineWidth(1.25);
-	EXPECT_NEAR( 1.25, vectorFieldRepresentation->getLineWidth(), epsilon);
+	EXPECT_NEAR(1.25, vectorFieldRepresentation->getLineWidth(), epsilon);
 }
