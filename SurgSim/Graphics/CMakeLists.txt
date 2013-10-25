@@ -78,6 +78,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
+	OsgPointCloudRepresentation-inl.h
 	OsgQuaternionConversions.h
 	OsgRenderTarget.h
 	OsgRenderTarget-inl.h
