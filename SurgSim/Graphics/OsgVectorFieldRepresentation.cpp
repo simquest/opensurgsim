@@ -76,7 +76,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 {
 	if (m_vertices != nullptr)
 	{
-		// std::vector< Vertex<SurgSim::DataStructures::Vector>> vertices
+		// auto = std::vector< Vertex<VectorFieldData> >
 		auto vertices = m_vertices->getVertices();
 		size_t count = vertices.size();
 
@@ -86,6 +86,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 			m_vertexData->resize(count*2);
 		}
 
+		// Assign color to osg line
 		osg::ref_ptr<osg::Vec4Array> osgColors;
 		if (vertices[0].data.vectorColor.hasValue())
 		{
@@ -134,13 +135,13 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 }
 
 
-void OsgVectorFieldRepresentation::setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices)
+void OsgVectorFieldRepresentation::setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices)
 {
 	m_vertices = vertices;
 }
 
 
-std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVertices() const
+std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVectorField() const
 {
 	return m_vertices;
 }

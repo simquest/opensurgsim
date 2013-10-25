@@ -29,12 +29,11 @@ namespace Graphics
 {
 
 /// A (mathematical) vector is represented as (X,Y,Z) associated with an optional color (R,G,B,alpha) information
-/// The vector is set to white by default
 struct VectorFieldData
 {
-	/// vector (X, Y, Z)
+	/// Direction (X,Y,Z) of the vector
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> vectorDirection;
-	/// color (R,G,B, alpha)
+	/// Color (R,G,B,alpha) of the vector
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> vectorColor;
 
 	/// Compare the vectors and return true if equal, false if not equal.
@@ -44,7 +43,7 @@ struct VectorFieldData
 			   vertex1.vectorColor.getValue() == vertex2.vectorColor.getValue();
 	}
 
-	/// Compare the vectors and return false if equal, true if not equal.
+	/// Compare the vectors and return true if not equal, false if equal.
 	friend bool operator!=(const VectorFieldData& vertex1, const VectorFieldData& vertex2)
 	{
 		return ! (vertex1 == vertex2);

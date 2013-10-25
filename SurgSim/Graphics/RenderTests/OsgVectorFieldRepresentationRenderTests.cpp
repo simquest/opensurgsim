@@ -144,7 +144,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 
 	auto vectorRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
-	vectorRepresentation->setVertices(vertices);
+	vectorRepresentation->setVectorField(vertices);
 	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 	viewElement->addComponent(vectorRepresentation);
@@ -177,7 +177,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingLocations)
 	auto vectorRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
 
-	vectorRepresentation->setVertices(vertices);
+	vectorRepresentation->setVectorField(vertices);
 	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 	viewElement->addComponent(vectorRepresentation);
@@ -197,7 +197,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingLocations)
 			points[j] = interpolate(startPoints[j], endPoints[j], t);
 		}
 		auto newVertices = makeVectorField(points, vectors);
-		vectorRepresentation->setVertices(newVertices);
+		vectorRepresentation->setVectorField(newVertices);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
@@ -213,7 +213,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectors)
 
 	auto vectorRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
-	vectorRepresentation->setVertices(vertices);
+	vectorRepresentation->setVectorField(vertices);
 	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 	viewElement->addComponent(vectorRepresentation);
@@ -234,7 +234,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectors)
 		}
 		auto newVectors = makeVectors(vecs, colors);
 		auto newVertices = makeVectorField(points, newVectors);
-		vectorRepresentation->setVertices(newVertices);
+		vectorRepresentation->setVectorField(newVertices);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }
@@ -249,7 +249,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingColors)
 
 	auto vectorRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
-	vectorRepresentation->setVertices(vertices);
+	vectorRepresentation->setVectorField(vertices);
 	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
 	viewElement->addComponent(vectorRepresentation);
@@ -270,7 +270,7 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingColors)
 		}
 		auto newVectors = makeVectors(points, colors);
 		auto newVertices = makeVectorField(points, newVectors);
-		vectorRepresentation->setVertices(newVertices);
+		vectorRepresentation->setVectorField(newVertices);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
 	}
 }

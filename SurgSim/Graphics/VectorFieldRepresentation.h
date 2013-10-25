@@ -28,7 +28,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 
 /// Graphic representation of a vector field
-/// Each point in the vector field is associated with a vector and an optional color
+/// Each point/location, i.e. (X,Y,Z), in the vector field is associated with a vector and an optional color
 class VectorFieldRepresentation : public virtual Representation
 {
 public:
@@ -37,16 +37,18 @@ public:
 	{
 	}
 
+	/// Destructor
 	virtual ~VectorFieldRepresentation()
 	{
 	}
 
-	/// Sets Vertices
-	/// \param	vertices The Vertices (data structure)
-	virtual void setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) = 0;
-	/// Gets the Vertices (data structure)
-	/// \return	The Vertices (data structure)
-	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVertices() const = 0;
+	/// Sets vector filed.
+	/// \param	vertices	A vector field contains a list of vertices in 3D space.
+	/// Each vertex is associated with a vector and an optional color.
+	virtual void setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) = 0;
+	/// Gets a vector field
+	/// \return A vector field
+	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const = 0;
 
 	/// Sets vector line width
 	/// \param	val	Width of vector line

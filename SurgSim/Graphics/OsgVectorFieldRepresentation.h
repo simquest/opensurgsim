@@ -42,12 +42,13 @@ public:
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
-	/// Sets vector field
-	/// \param	vertices A Vertices (data structure) contains a (mathematical) vector and an optional color
-	virtual void setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) override;
-	/// Gets the vector field
-	/// \return	A Vertices (data structure) contains a (mathematical) vector and an optional color information
-	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVertices() const override;
+	/// Sets vector filed.
+	/// \param	vertices	A vector field contains a list of vertices in 3D space.
+	/// Each vertex is associated with a vector and an optional color.
+	virtual void setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) override;
+	/// Gets a vector field
+	/// \return A vector field
+	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
 
 	/// Sets vector line width
 	/// \param	val	Width of vector line
@@ -68,7 +69,7 @@ public:
 	virtual void doUpdate(double dt) override;
 
 private:
-	/// Vertices (data structure) holding a list of vertices/points in 3D space
+	/// Vector Field holds a list of vertices/points (X,Y,Z) in 3D space
 	/// Each point is associated with a vector and an optional color
 	std::shared_ptr< SurgSim::Graphics::VectorField > m_vertices;
 

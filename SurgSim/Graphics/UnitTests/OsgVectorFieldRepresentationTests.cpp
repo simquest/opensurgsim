@@ -79,8 +79,8 @@ TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 
 	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
-	vectorFieldRepresentation->setVertices(vertices);
-	EXPECT_EQ(vertices, vectorFieldRepresentation->getVertices());
+	vectorFieldRepresentation->setVectorField(vertices);
+	EXPECT_EQ(vertices, vectorFieldRepresentation->getVectorField());
 }
 
 TEST(OsgVectorFieldRepresentationTests, LineWidthTest)
