@@ -140,7 +140,6 @@ TYPED_TEST_CASE(UnalignedDynamicMatrixTests, UnalignedDynamicMatrixVariants);
 TYPED_TEST(Matrix22Tests, CanConstruct)
 {
 	typedef typename TestFixture::Matrix22 Matrix22;
-	typedef typename TestFixture::Scalar  T;
 
 	// Warning: Eigen *does not* provide a 1-argument constructor that
 	// initializes all elements to the same value!  If you do something like
@@ -156,7 +155,6 @@ TYPED_TEST(Matrix22Tests, CanConstruct)
 TYPED_TEST(Matrix33Tests, CanConstruct)
 {
 	typedef typename TestFixture::Matrix33 Matrix33;
-	typedef typename TestFixture::Scalar  T;
 
 	// Warning: Eigen *does not* provide a 1-argument constructor that
 	// initializes all elements to the same value!  If you do something like
@@ -172,7 +170,6 @@ TYPED_TEST(Matrix33Tests, CanConstruct)
 TYPED_TEST(Matrix44Tests, CanConstruct)
 {
 	typedef typename TestFixture::Matrix44 Matrix44;
-	typedef typename TestFixture::Scalar  T;
 
 	// Warning: Eigen *does not* provide a 1-argument constructor that
 	// initializes all elements to the same value!  If you do something like
@@ -194,7 +191,6 @@ TYPED_TEST(Matrix44Tests, CanConstruct)
 TYPED_TEST(UnalignedMatrixTests, DefaultConstructorInitialization)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	EXPECT_TRUE(SIZE >= 2 && SIZE <= 4);
@@ -225,7 +221,6 @@ TYPED_TEST(UnalignedMatrixTests, DefaultConstructorInitialization)
 TYPED_TEST(Matrix22Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Matrix22 Matrix22;
-	typedef typename TestFixture::Scalar  T;
 
 	Matrix22 matrix;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -246,7 +241,6 @@ TYPED_TEST(Matrix22Tests, ShiftCommaInitialization)
 TYPED_TEST(Matrix33Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Matrix33 Matrix33;
-	typedef typename TestFixture::Scalar  T;
 
 	Matrix33 matrix;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -268,7 +262,6 @@ TYPED_TEST(Matrix33Tests, ShiftCommaInitialization)
 TYPED_TEST(Matrix44Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Matrix44 Matrix44;
-	typedef typename TestFixture::Scalar  T;
 
 	Matrix44 matrix;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -291,7 +284,6 @@ TYPED_TEST(Matrix44Tests, ShiftCommaInitialization)
 TYPED_TEST(AllMatrixTests, ZeroValue)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix matrix = 1000 * Matrix::Zero();
@@ -308,7 +300,6 @@ TYPED_TEST(AllMatrixTests, ZeroValue)
 TYPED_TEST(AllMatrixTests, SetToZero)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix matrix;
@@ -326,7 +317,6 @@ TYPED_TEST(AllMatrixTests, SetToZero)
 TYPED_TEST(AllMatrixTests, ConstantValue)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix matrix = 2 * Matrix::Constant(0.5f);
@@ -343,7 +333,6 @@ TYPED_TEST(AllMatrixTests, ConstantValue)
 TYPED_TEST(AllMatrixTests, SetToConstant)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix matrix;
@@ -444,7 +433,6 @@ TYPED_TEST(AllMatrixTests, InitializeFromArray)
 TYPED_TEST(AllMatrixTests, Assign)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Constant(6.0f);
@@ -586,7 +574,6 @@ TYPED_TEST(Matrix33Tests, ToAngleAxis)
 TYPED_TEST(AllMatrixTests, Negate)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Constant(0.1f);
@@ -599,7 +586,6 @@ TYPED_TEST(AllMatrixTests, Negate)
 TYPED_TEST(AllMatrixTests, Add)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Constant(0.1f);
@@ -612,7 +598,6 @@ TYPED_TEST(AllMatrixTests, Add)
 TYPED_TEST(AllMatrixTests, Subtract)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Constant(0.1f);
@@ -625,7 +610,6 @@ TYPED_TEST(AllMatrixTests, Subtract)
 TYPED_TEST(AllMatrixTests, AddTo)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Constant(0.1f);
@@ -638,7 +622,6 @@ TYPED_TEST(AllMatrixTests, AddTo)
 TYPED_TEST(AllMatrixTests, SubtractFrom)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Constant(1.1f);
@@ -651,7 +634,6 @@ TYPED_TEST(AllMatrixTests, SubtractFrom)
 TYPED_TEST(AllMatrixTests, MultiplyMatrixScalar)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 
 	Matrix a = Matrix::Random();
 	Matrix b = a * 1.23f;
@@ -662,7 +644,6 @@ TYPED_TEST(AllMatrixTests, MultiplyMatrixScalar)
 TYPED_TEST(AllMatrixTests, MultiplyScalarMatrix)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 
 	Matrix a = Matrix::Random();
 	Matrix b = 1.23f * a;
@@ -673,7 +654,6 @@ TYPED_TEST(AllMatrixTests, MultiplyScalarMatrix)
 TYPED_TEST(AllMatrixTests, DivideScalar)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 
 	Matrix a = Matrix::Random();
 	Matrix b = a / 1.23f;
@@ -700,7 +680,6 @@ TYPED_TEST(AllMatrixTests, MultiplyMatrixVector)
 TYPED_TEST(AllMatrixTests, MultiplyMatrixMatrix)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = Matrix::Random();
@@ -713,7 +692,6 @@ TYPED_TEST(AllMatrixTests, MultiplyMatrixMatrix)
 TYPED_TEST(AllMatrixTests, Inverse)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a = 2.0f * Matrix::Identity() + 0.5f * Matrix::Random();   // try to make an invertible matrix
@@ -728,7 +706,6 @@ TYPED_TEST(AllMatrixTests, Inverse)
 TYPED_TEST(AllMatrixTests, Transpose)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix a;
@@ -757,7 +734,6 @@ TYPED_TEST(AllMatrixTests, Transpose)
 TYPED_TEST(AllMatrixTests, ComponentwiseMultiply)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 
 	Matrix a = Matrix::Random();
 	Matrix b = Matrix::Identity();
@@ -770,7 +746,6 @@ TYPED_TEST(AllMatrixTests, ComponentwiseMultiply)
 TYPED_TEST(AllMatrixTests, ComponentwiseDivide)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 
 	Matrix a = Matrix::Random();
 	Matrix b = Matrix::Constant(0.5f);
@@ -866,7 +841,6 @@ TYPED_TEST(AllMatrixTests, Trace)
 TYPED_TEST(AllMatrixTests, Determinant)
 {
 	typedef typename TestFixture::Matrix Matrix;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Matrix::RowsAtCompileTime;
 
 	Matrix m = exp(1.f) * Matrix::Identity();

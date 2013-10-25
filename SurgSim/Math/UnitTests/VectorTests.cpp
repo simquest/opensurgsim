@@ -234,7 +234,6 @@ TYPED_TEST(Vector4Tests, NArgumentConstructorInitialization)
 TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	EXPECT_TRUE(SIZE >= 2 && SIZE <= 4);
@@ -262,7 +261,6 @@ TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 TYPED_TEST(Vector2Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Vector2 Vector2;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector2 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -274,7 +272,6 @@ TYPED_TEST(Vector2Tests, ShiftCommaInitialization)
 TYPED_TEST(Vector3Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Vector3 Vector3;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector3 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -286,7 +283,6 @@ TYPED_TEST(Vector3Tests, ShiftCommaInitialization)
 TYPED_TEST(Vector4Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Vector4 Vector4;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector4 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -298,7 +294,6 @@ TYPED_TEST(Vector4Tests, ShiftCommaInitialization)
 TYPED_TEST(AllVectorTests, ZeroValue)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector = 1000 * Vector::Zero();
@@ -312,7 +307,6 @@ TYPED_TEST(AllVectorTests, ZeroValue)
 TYPED_TEST(AllVectorTests, SetToZero)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector;
@@ -327,7 +321,6 @@ TYPED_TEST(AllVectorTests, SetToZero)
 TYPED_TEST(AllVectorTests, ConstantValue)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector = 2 * Vector::Constant(0.5f);
@@ -341,7 +334,6 @@ TYPED_TEST(AllVectorTests, ConstantValue)
 TYPED_TEST(AllVectorTests, SetToConstant)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector;
@@ -585,7 +577,6 @@ TYPED_TEST(AllVectorTests, DotProduct)
 TYPED_TEST(Vector3Tests, CrossProduct)
 {
 	typedef typename TestFixture::Vector3 Vector3;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector3 v;
 	v << 3.4f, 5.6f, 7.8f;
