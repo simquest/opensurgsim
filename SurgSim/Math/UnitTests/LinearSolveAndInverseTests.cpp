@@ -125,23 +125,10 @@ typedef LinearSolveAndInverseTests<Eigen::SparseMatrix<double,Eigen::ColMajor>> 
 TEST_F(LinearSolveAndInverseDiagonalMatrixTests, solve)
 {
 	SolveAndInverse<DiagonalMatrix> solveAndInverse;
-	//printf("before calling\n");
 	solveAndInverse(matrix, b, &x, &inverse);
-	//printf("after calling\n");
 
-	//std::cout << x.transpose() << std::endl;
-	//std::cout << expectedX.transpose() << std::endl;
 	EXPECT_TRUE(x.isApprox(expectedX));
-	//std::cout << " inv = " << std::endl << inverse << std::endl;
-	//std::cout << " inv = " << std::endl << expectedInverse << std::endl;
-	//std::cout << inverse.isApprox(expectedInverse) << std::endl;
-	EXPECT_TRUE(inverse.isDiagonal());
-	EXPECT_TRUE(expectedInverse.isDiagonal());
-	Vector diag = inverse.diagonal();
-	Vector diagExpected = expectedInverse.diagonal();
-	EXPECT_TRUE(diag.isApprox(diagExpected));
-	//std::cout << "All done !" << std::endl;
-	//printf("All good !\n");
+	EXPECT_TRUE(inverse.isApprox(expectedInverse));
 };
 
 TEST_F(LinearSolveAndInverseMatrixTests, solve)
