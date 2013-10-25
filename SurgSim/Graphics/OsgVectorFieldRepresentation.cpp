@@ -29,14 +29,12 @@ namespace SurgSim
 namespace Graphics
 {
 
-using SurgSim::DataStructures::Vertex;
-using SurgSim::DataStructures::Vertices;
-
 OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& name) :
 	Representation(name),
 	VectorFieldRepresentation(name),
 	OsgRepresentation(name),
-	m_vertices(nullptr)
+	m_vertices(nullptr),
+	m_scale(10)
 {
 	m_vertexData = new osg::Vec3Array;
 	m_lineGeometry = new osg::Geometry;
@@ -88,31 +86,39 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 			m_vertexData->resize(count*2);
 		}
 
-		// Construct osg lines (start point, end point and color)
-		osg::ref_ptr<osg::Vec4Array> osgColors = new osg::Vec4Array;
+		osg::ref_ptr<osg::Vec4Array> osgColors;
+		if (vertices[0].data.vectorColor.hasValue())
+		{
+			osgColors = new osg::Vec4Array(count*2);
+			osgColors->setDataVariance(osg::Object::DYNAMIC);
+			m_lineGeometry->setColorArray(osgColors, osg::Array::BIND_PER_VERTEX);
+			for (size_t i = 0; i < count; ++i)
+			{
+				// Assign color to the osg line
+				osg::Vec4d color = SurgSim::Graphics::toOsg(vertices[i].data.vectorColor.getValue());
+				(*osgColors)[2*i] = color;
+				(*osgColors)[2*i + 1] = color;
+			}
+		}
+		// In current implementation, a vector will be associated with white color by default if no color info is given.
+		// Thus, this "else()" clause will nerver be reached.
+		// Probably need some discussion here.
+		else
+		{
+			osgColors = new osg::Vec4Array(1);
+			(*osgColors)[0]= osg::Vec4(1.0f,1.0f,1.0f,1.0f);
+			m_lineGeometry->setColorArray(osgColors, osg::Array::BIND_OVERALL);
+		}
+
+		// Construct osg lines (start point and end point)
 		for (size_t i = 0; i < count; ++i)
 		{
 			Vector3d point = vertices[i].position;
-			// 'vector' is the (mathematical) vector associates with the vertex at 'point' in 3D space
-			Vector3d vector = vertices[i].data.vector;
+			(*m_vertexData)[2*i] = SurgSim::Graphics::toOsg(point);
 
-			// Construct coordinates of the staring point of osg line
-			(*m_vertexData)[2*i][0] = point[0];
-			(*m_vertexData)[2*i][1] = point[1];
-			(*m_vertexData)[2*i][2] = point[2];
-
-			// Construct coordinates of the ending point of osg line
-			(*m_vertexData)[2*i+1][0] = point[0] + vector[0]/10;
-			(*m_vertexData)[2*i+1][1] = point[1] + vector[1]/10;
-			(*m_vertexData)[2*i+1][2] = point[2] + vector[2]/10;
-
-			// Assign color to the osg line
-			osg::Vec4d color = SurgSim::Graphics::toOsg(vertices[i].data.color);
-			osgColors->push_back(color);
-			osgColors->push_back(color);
+			(*m_vertexData)[2*i + 1] = SurgSim::Graphics::toOsg(point) +
+									   SurgSim::Graphics::toOsg(vertices[i].data.vectorDirection.getValue())/m_scale;
 		}
-		m_lineGeometry->setColorArray(osgColors, osg::Array::Binding::BIND_PER_VERTEX);
-
 		m_drawArrays->setCount(count*2);
 		m_drawArrays->dirty();
 		m_lineGeometry->dirtyBound();
@@ -131,13 +137,13 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 }
 
 
-void OsgVectorFieldRepresentation::setVertices(std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > vertices)
+void OsgVectorFieldRepresentation::setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices)
 {
 	m_vertices = vertices;
 }
 
 
-std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > OsgVectorFieldRepresentation::getVertices() const
+std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVertices() const
 {
 	return m_vertices;
 }
@@ -151,6 +157,16 @@ void OsgVectorFieldRepresentation::setLineWidth(double width)
 double OsgVectorFieldRepresentation::getLineWidth() const
 {
 	return static_cast<double>(m_line->getWidth());
+}
+
+void OsgVectorFieldRepresentation::setScale( double scale )
+{
+	m_scale = scale;
+}
+
+double OsgVectorFieldRepresentation::getScale() const
+{
+	return m_scale;
 }
 
 }; // Graphics

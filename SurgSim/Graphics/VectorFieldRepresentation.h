@@ -16,17 +16,14 @@
 #ifndef SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 
-#include <SurgSim/DataStructures/Vector.h>
-#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/Representation.h>
+#include <SurgSim/Graphics/VectorField.h>
 
 namespace SurgSim
 {
 namespace Graphics
 {
 
-using SurgSim::DataStructures::Vertices;
-using SurgSim::DataStructures::Vertex;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 
@@ -46,10 +43,10 @@ public:
 
 	/// Sets Vertices
 	/// \param	vertices The Vertices (data structure)
-	virtual void setVertices(std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > vertices) = 0;
+	virtual void setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) = 0;
 	/// Gets the Vertices (data structure)
 	/// \return	The Vertices (data structure)
-	virtual std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > getVertices() const = 0;
+	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVertices() const = 0;
 
 	/// Sets vector line width
 	/// \param	val	Width of vector line

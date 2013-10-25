@@ -16,9 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 
-#include <SurgSim/DataStructures/Vector.h>
-#include <SurgSim/DataStructures/Vertex.h>
-#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/VectorFieldRepresentation.h>
 
@@ -36,8 +33,6 @@ namespace Graphics
 #pragma warning(disable:4250)
 #endif
 
-using SurgSim::DataStructures::Vertices;
-
 /// OSG vector field representation, implements a VectorFieldRepresenation using OSG.
 class OsgVectorFieldRepresentation : public VectorFieldRepresentation, public OsgRepresentation
 {
@@ -47,12 +42,12 @@ public:
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
-	/// Sets Vertices
-	/// \param	vertices The Vertices (data structure)
-	virtual void setVertices(std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > vertices) override;
-	/// Gets the Vertices (data structure)
-	/// \return	The Vertices (data structure)
-	virtual std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > getVertices() const override;
+	/// Sets vector field
+	/// \param	vertices A Vertices (data structure) contains a (mathematical) vector and an optional color
+	virtual void setVertices(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) override;
+	/// Gets the vector field 
+	/// \return	A Vertices (data structure) contains a (mathematical) vector and an optional color information
+	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVertices() const override;
 
 	/// Sets vector line width
 	/// \param	val	Width of vector line
@@ -61,6 +56,13 @@ public:
 	/// \return	The line width
 	virtual double getLineWidth() const override;
 
+	/// Sets a scale to scale vector
+	/// \param scale The scale
+	void setScale(double scale);
+	/// Gets the scale used to scale vector
+	/// \return The scale
+	double getScale() const;
+
 	/// Executes the update operation
 	/// \param	dt	The time difference
 	virtual void doUpdate(double dt) override;
@@ -68,7 +70,7 @@ public:
 private:
 	/// Vertices (data structure) holding a list of vertices/points in 3D space
 	/// Each point is associated with a vector and an optional color
-	std::shared_ptr< Vertices<SurgSim::DataStructures::Vector> > m_vertices;
+	std::shared_ptr< SurgSim::Graphics::VectorField > m_vertices;
 
 	/// OSG vertex data structure
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
@@ -81,6 +83,10 @@ private:
 
 	/// OSG::LineWidth for representing vector
 	osg::ref_ptr<osg::LineWidth> m_line;
+
+	/// A scale to scale the length of vector
+	double m_scale;
+	
 };
 
 #if defined(_MSC_VER)

@@ -122,6 +122,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	TextureRectangle.h
 	Uniform.h
 	UniformBase.h
+	VectorField.h
 	VectorFieldRepresentation.h
 	View.h
 	ViewElement.h

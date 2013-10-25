@@ -50,7 +50,7 @@ TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 	// Vector3d: Coordinates of the (mathematical vector)
 	// Vector4d: Color (R,G,B,alpha) information of the vector
 	// Color information is optional. Color of vector is set to white by default
-	std::vector<SurgSim::DataStructures::Vector> vectors;
+	std::vector<SurgSim::Graphics::VectorFieldData> vectors;
 	vectors.emplace_back(Vector3d(1.0, 0.0, 0.0));
 	vectors.emplace_back(Vector3d(0.0, 1.0, 0.0));
 	vectors.emplace_back(Vector3d(-1.0, 0.0, 0.0), Vector4d(1.0, 0.0, 0.0, 1.0));
@@ -61,12 +61,12 @@ TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 	vectors.emplace_back(Vector3d(-2.0, 0.0, 0.0));
 	vectors.emplace_back(Vector3d(0.0, -2.0, 0.0));
 
-	auto vertices = std::make_shared<Vertices<SurgSim::DataStructures::Vector>>();
+	auto vertices = std::make_shared<SurgSim::Graphics::VectorField>();
 	auto it = std::begin(points);
 	auto v = std::begin(vectors);
 	for (; it != std::end(points); ++it, ++v)
 	{
-		vertices->addVertex(Vertex<SurgSim::DataStructures::Vector>((*it), *v));
+		vertices->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
 	}
 
 	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =

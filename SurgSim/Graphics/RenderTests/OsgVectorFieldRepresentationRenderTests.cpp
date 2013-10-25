@@ -15,7 +15,10 @@
 
 /// Render Tests for the OsgVectorFieldRepresentation class.
 
+#include <SurgSim/DataStructures/Vertex.h>
+#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/RenderTests/RenderTest.h>
+#include <SurgSim/Graphics/VectorField.h>
 #include <SurgSim/Graphics/VectorFieldRepresentation.h>
 #include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -53,9 +56,9 @@ protected:
 		return points;
 	}
 
-	std::vector<SurgSim::DataStructures::Vector> makeVector()
+	std::vector<SurgSim::Graphics::VectorFieldData> makeVector()
 	{
-		std::vector<SurgSim::DataStructures::Vector> points;
+		std::vector<SurgSim::Graphics::VectorFieldData> points;
 		// Vector3d: Coordinates of the (mathematical vector)
 		// Vector4d: Color (R,G,B,alpha) information of the vector
 		points.emplace_back(Vector3d(1.0, 0.0, 0.0), Vector4d(1.0, 0.0, 0.0, 0.0));
@@ -77,15 +80,15 @@ protected:
 		auto vectorRepresentation =
 			std::make_shared<OsgVectorFieldRepresentation>("vector filed representation");
 
-		auto vertices = std::make_shared<Vertices<SurgSim::DataStructures::Vector>>();
-		std::vector<SurgSim::DataStructures::Vector> vectors = makeVector();
+		auto vertices = std::make_shared<SurgSim::Graphics::VectorField>();
+		std::vector<SurgSim::Graphics::VectorFieldData> vectors = makeVector();
 
 		// Binding vectors to points
 		auto it = std::begin(points);
 		auto v = std::begin(vectors);
 		for (; it != std::end(points); ++it, ++v)
 		{
-			vertices->addVertex(Vertex<SurgSim::DataStructures::Vector>((*it), *v));
+			vertices->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
 		}
 
 		vectorRepresentation->setVertices(vertices);
