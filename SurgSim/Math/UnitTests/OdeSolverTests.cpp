@@ -22,7 +22,7 @@
 #include <gtest/gtest.h>
 
 #include <SurgSim/Math/OdeSolver.h>
-#include "MockObject.h"
+#include <SurgSim/Math/UnitTests/MockObject.h>
 
 namespace SurgSim
 {
@@ -66,7 +66,7 @@ TEST(OdeSolver, ConstructorTest)
 {
 	// OdeEquation is tested separately and is considered valid to use here.
 	MassPoint m;
-	
+
 	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
 
 	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});

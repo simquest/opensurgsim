@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	MassSpring1DRepresentationTests.cpp
 	MassSpring2DRepresentationTests.cpp
 	MassSpring3DRepresentationTests.cpp
+	MassSpringNDRepresentationUtilsTests.cpp
 	TransferDeformableStateToVerticesBehaviorTests.cpp
 	TransferPoseBehaviorTests.cpp
 )

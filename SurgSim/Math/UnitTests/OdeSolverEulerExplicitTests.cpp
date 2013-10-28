@@ -22,7 +22,7 @@
 #include <gtest/gtest.h>
 
 #include <SurgSim/Math/OdeSolverEulerExplicit.h>
-#include "MockObject.h"
+#include <SurgSim/Math/UnitTests/MockObject.h>
 
 namespace SurgSim
 {
@@ -45,15 +45,33 @@ TEST(OdeSolverEulerExplicit, SolveTest)
 {
 	typedef ExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix> SolverType;
 
-	MassPoint m;
-	MassPointState defaultState, currentState, newState;
+	{
+		SCOPED_TRACE("OdeSolverEulerExplicit solve test with 0 viscosity");
 
-	SolverType solver(&m);
-	ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
-	EXPECT_EQ(defaultState, currentState);
-	EXPECT_NE(defaultState, newState);
-	EXPECT_TRUE(newState.getVelocities().isApprox(m.m_gravity * 1e-3));
-	EXPECT_TRUE(newState.getPositions().isZero());
+		MassPoint m;
+		MassPointState defaultState, currentState, newState;
+
+		SolverType solver(&m);
+		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
+		EXPECT_EQ(defaultState, currentState);
+		EXPECT_NE(defaultState, newState);
+		EXPECT_TRUE(newState.getVelocities().isApprox(m.m_gravity * 1e-3));
+		EXPECT_TRUE(newState.getPositions().isZero());
+	}
+
+	{
+		SCOPED_TRACE("OdeSolverEulerExplicit solve test with non 0 viscosity");
+
+		MassPoint m(0.1);
+		MassPointState defaultState, currentState, newState;
+
+		SolverType solver(&m);
+		ASSERT_NO_THROW({solver.solve(1e-3, currentState, &newState);});
+		EXPECT_EQ(defaultState, currentState);
+		EXPECT_NE(defaultState, newState);
+		EXPECT_TRUE(newState.getVelocities().isApprox((m.m_gravity - 0.1 * currentState.getVelocities()) * 1e-3));
+		EXPECT_TRUE(newState.getPositions().isZero());
+	}
 }
 
 }; // Math

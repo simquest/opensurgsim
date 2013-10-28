@@ -24,6 +24,7 @@ set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
+	OdeEquationTests.cpp
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp

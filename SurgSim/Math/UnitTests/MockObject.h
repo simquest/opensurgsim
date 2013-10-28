@@ -63,9 +63,21 @@ public:
 	/// Constructor
 	/// \param x The mass initial position
 	/// \param mass The mass (in Kg)
-	MassPoint() : m_mass(1.0), m_gravity(0.0, -9.81, 0.0), m_f(3), m_M(3, 3), m_D(3, 3), m_K(3, 3)
+	explicit MassPoint(double viscosity = 0.0) :
+		m_mass(1.0),
+		m_viscosity(viscosity),
+		m_gravity(0.0, -9.81, 0.0),
+		m_f(3),
+		m_M(3, 3),
+		m_D(3, 3),
+		m_K(3, 3)
 	{
 		this->m_initialState = std::make_shared<MassPointState>();
+	}
+
+	void disableGravity()
+	{
+		m_gravity.setZero();
 	}
 
 	/// Evaluation of the RHS function f(x,v) for a given state
@@ -74,7 +86,7 @@ public:
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
 	Vector& computeF(const MassPointState& state) override
 	{
-		m_f = m_mass * m_gravity;
+		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
 		return m_f;
 	}
 
@@ -95,7 +107,8 @@ public:
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
 	const Matrix& computeD(const MassPointState& state) override
 	{
-		m_D.setZero();
+		m_D.setIdentity();
+		m_D *= m_viscosity;
 		return m_D;
 	}
 
@@ -122,9 +135,10 @@ public:
 	{
 		m_M.setIdentity();
 		m_M *= m_mass;
-		m_D.setZero();
+		m_D.setIdentity();
+		m_D *= m_viscosity;
 		m_K.setZero();
-		m_f = m_mass * m_gravity;
+		m_f = m_mass * m_gravity - m_viscosity * state.getVelocities();
 
 		*f = &m_f;
 		*K = &m_K;
@@ -132,14 +146,7 @@ public:
 		*M = &m_M;
 	}
 
-	double getEnergy(const MassPointState& s) const
-	{
-		double kineticEnergy = 0.5 * m_mass * s.getVelocities().dot(s.getVelocities());
-		double potentialEnergy = 0.5 * m_mass * m_gravity.norm() * s.getPositions()[1];
-		return kineticEnergy + potentialEnergy;
-	}
-
-	double m_mass;
+	double m_mass, m_viscosity;
 	Vector3d m_gravity;
 	Vector m_f;
 	Matrix m_M, m_D, m_K;

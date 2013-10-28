@@ -1015,7 +1015,7 @@ TYPED_TEST(AllDynamicVectorTests, addSubVector)
 	Vector v, vInit, v2, v2Init;
 	v.resize(18);   v.setRandom();   vInit  = v;
 	v2.resize(18);  v2.setRandom();  v2Init = v2;
-	
+
 	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3,3), 2, 3, &v););
 	EXPECT_TRUE(v2.isApprox(v2Init));
 	EXPECT_FALSE(v.isApprox(vInit));
