@@ -33,6 +33,7 @@ class VectorFieldRepresentation : public virtual Representation
 {
 public:
 	/// Constructor
+	/// \param name Name of VectorFieldRepresentation
 	explicit VectorFieldRepresentation(const std::string& name) : Representation(name)
 	{
 	}
@@ -42,16 +43,16 @@ public:
 	{
 	}
 
-	/// Sets vector filed.
-	/// \param	vertices	A vector field contains a list of vertices in 3D space.
-	/// Each vertex is associated with a vector and an optional color.
+	/// Sets vector field
+	/// \param	vertices	A vector field contains a list of vertices in 3D space
+	/// \note Each vertex is associated with a vector and an optional color
 	virtual void setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) = 0;
-	/// Gets a vector field
+	/// Gets the vector field
 	/// \return A vector field
 	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const = 0;
 
 	/// Sets vector line width
-	/// \param	val	Width of vector line
+	/// \param	width	Width of vector line
 	virtual void setLineWidth(double width) = 0;
 	/// Gets line width
 	/// \return	The line width

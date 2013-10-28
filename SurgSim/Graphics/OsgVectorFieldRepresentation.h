@@ -38,6 +38,7 @@ class OsgVectorFieldRepresentation : public VectorFieldRepresentation, public Os
 {
 public:
 	/// Constructor
+	/// \param name Name of OsgVectorFieldRepresentation
 	explicit OsgVectorFieldRepresentation(const std::string& name);
 	/// Destructor
 	~OsgVectorFieldRepresentation();
@@ -47,25 +48,25 @@ public:
 	/// Each vertex is associated with a vector and an optional color.
 	virtual void setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) override;
 	/// Gets a vector field
-	/// \return A vector field
+	/// \return The vector field
 	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
 
 	/// Sets vector line width
-	/// \param	val	Width of vector line
+	/// \param	width	Width of vector line
 	virtual void setLineWidth(double width) override;
 	/// Gets line width
 	/// \return	The line width
 	virtual double getLineWidth() const override;
 
-	/// Sets a scale to scale vector
+	/// Sets the scale to be applied to all vectors
 	/// \param scale The scale
 	void setScale(double scale);
-	/// Gets the scale used to scale vector
+	/// Gets the scale applied to all vectors
 	/// \return The scale
 	double getScale() const;
 
 	/// Executes the update operation
-	/// \param	dt	The time difference
+	/// \param	dt	The time step 
 	virtual void doUpdate(double dt) override;
 
 private:

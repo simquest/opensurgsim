@@ -37,13 +37,17 @@ struct VectorFieldData
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> vectorColor;
 
 	/// Compare the vectors and return true if equal, false if not equal.
+	/// \return True if vertex1 and vertex2 have the same value; Otherwise, false.
 	friend bool operator==(const VectorFieldData& vertex1, const VectorFieldData& vertex2)
 	{
-		return vertex1.vectorDirection.getValue() == vertex2.vectorDirection.getValue() &&
+		return vertex1.vectorDirection.hasValue() && vertex2.vectorDirection.hasValue() &&
+			   vertex1.vectorColor.hasValue() && vertex2.vectorColor.hasValue() &&
+			   vertex1.vectorDirection.getValue() == vertex2.vectorDirection.getValue() &&
 			   vertex1.vectorColor.getValue() == vertex2.vectorColor.getValue();
 	}
 
 	/// Compare the vectors and return true if not equal, false if equal.
+	/// \return True if vertex1 and vertex2 have different values; Otherwise, false.
 	friend bool operator!=(const VectorFieldData& vertex1, const VectorFieldData& vertex2)
 	{
 		return ! (vertex1 == vertex2);

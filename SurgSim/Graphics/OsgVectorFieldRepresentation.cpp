@@ -34,7 +34,7 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	VectorFieldRepresentation(name),
 	OsgRepresentation(name),
 	m_vertices(nullptr),
-	m_scale(10)
+	m_scale(10.0)
 {
 	m_vertexData = new osg::Vec3Array;
 	m_lineGeometry = new osg::Geometry;
@@ -53,7 +53,7 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	osg::ref_ptr<osg::DrawElementsUInt> pointElement = new osg::DrawElementsUInt(osg::PrimitiveSet::POINTS);
 	pointElement->push_back(0);
 	osg::ref_ptr<osg::Vec3Array> pointData = new osg::Vec3Array;
-	pointData->push_back(osg::Vec3(0.0, 0.0, 0.0));
+	pointData->push_back(osg::Vec3(0.0f, 0.0f, 0.0));
 
 	pointGeometry->setVertexArray(pointData);
 	pointGeometry->addPrimitiveSet(pointElement);
@@ -83,28 +83,28 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 		if (count != static_cast<size_t>(m_drawArrays->getCount()) &&
 			count > m_vertexData->size())
 		{
-			m_vertexData->resize(count*2);
+			m_vertexData->resize(count * 2);
 		}
 
 		// Assign color to osg line
 		osg::ref_ptr<osg::Vec4Array> osgColors;
 		if (vertices[0].data.vectorColor.hasValue())
 		{
-			osgColors = new osg::Vec4Array(count*2);
+			osgColors = new osg::Vec4Array(count * 2);
 			osgColors->setDataVariance(osg::Object::DYNAMIC);
 			m_lineGeometry->setColorArray(osgColors, osg::Array::BIND_PER_VERTEX);
 			for (size_t i = 0; i < count; ++i)
 			{
 				// Assign color to the osg line
 				osg::Vec4d color = SurgSim::Graphics::toOsg(vertices[i].data.vectorColor.getValue());
-				(*osgColors)[2*i] = color;
-				(*osgColors)[2*i + 1] = color;
+				(*osgColors)[2 * i] = color;
+				(*osgColors)[2 * i + 1] = color;
 			}
 		}
 		else
 		{
 			osgColors = new osg::Vec4Array(1);
-			(*osgColors)[0]= osg::Vec4(1.0f,1.0f,1.0f,1.0f);
+			(*osgColors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
 			m_lineGeometry->setColorArray(osgColors, osg::Array::BIND_OVERALL);
 		}
 
@@ -112,12 +112,12 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 		for (size_t i = 0; i < count; ++i)
 		{
 			Vector3d point = vertices[i].position;
-			(*m_vertexData)[2*i] = SurgSim::Graphics::toOsg(point);
+			(*m_vertexData)[2 * i] = SurgSim::Graphics::toOsg(point);
 
-			(*m_vertexData)[2*i + 1] = SurgSim::Graphics::toOsg(point) +
+			(*m_vertexData)[2 * i + 1] = SurgSim::Graphics::toOsg(point) +
 									   SurgSim::Graphics::toOsg(vertices[i].data.vectorDirection.getValue())/m_scale;
 		}
-		m_drawArrays->setCount(count*2);
+		m_drawArrays->setCount(count * 2);
 		m_drawArrays->dirty();
 		m_lineGeometry->dirtyBound();
 		m_lineGeometry->dirtyDisplayList();
@@ -157,7 +157,7 @@ double OsgVectorFieldRepresentation::getLineWidth() const
 	return static_cast<double>(m_line->getWidth());
 }
 
-void OsgVectorFieldRepresentation::setScale( double scale )
+void OsgVectorFieldRepresentation::setScale(double scale)
 {
 	m_scale = scale;
 }
