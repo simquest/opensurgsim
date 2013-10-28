@@ -214,6 +214,21 @@ void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float b
 	m_geometry->setTexCoordArray(0,tcoords);
 }
 
+void OsgScreenSpaceQuadRepresentation::setLocation(double x, double y)
+{
+	SurgSim::Math::RigidTransform3d transform = 
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(x,y,0));
+	setPose(transform);
+}
+
+void OsgScreenSpaceQuadRepresentation::getLocation(double* x, double* y)
+{
+	SURGSIM_ASSERT( x !=  nullptr && y != nullptr) << "Can't use nullptr to fetch size";
+	SurgSim::Math::Vector3d position = getPose().translation();
+	*x = position.x();
+	*y = position.y();
+}
+
 
 
 }; // Graphics

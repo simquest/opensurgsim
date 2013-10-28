@@ -45,6 +45,16 @@ public:
 
 	}
 
+	/// Sets a location.
+	/// \param	x	The x coordinate in screen space.
+	/// \param	y	The y coordinate in screen space.
+	virtual void setLocation(double x, double y) = 0;
+
+	/// Gets a location.
+	/// \param [out]	x	If non-null, the x coordinate.
+	/// \param [out]	y	If non-null, the y coordinate.
+	virtual void getLocation(double* x, double* y) = 0;
+
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.

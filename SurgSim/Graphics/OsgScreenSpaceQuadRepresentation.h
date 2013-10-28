@@ -52,6 +52,16 @@ public:
 	OsgScreenSpaceQuadRepresentation(const std::string& name, std::shared_ptr<View> view);
 	~OsgScreenSpaceQuadRepresentation();
 
+	/// Sets a location in screen space.
+	/// \param	x	The x coordinate.
+	/// \param	y	The y coordinate.
+	virtual void setLocation(double x, double y);
+
+	/// Gets a location in screen space.
+	/// \param [out]	x	If non-null, the x coordinate.
+	/// \param [out]	y	If non-null, the y coordinate.
+	virtual void getLocation(double* x, double* y);
+
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
@@ -121,6 +131,8 @@ private:
 	/// \param	newUniform	The new uniform.
 	/// \return	true if it succeeds, false if it fails.
 	bool replaceUniform(const std::string& name, std::shared_ptr<SurgSim::Graphics::UniformBase> newUniform);
+
+
 };
 
 }; // Graphics
