@@ -104,6 +104,37 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 	return angleAxis.angle();
 }
 
+/// Makes view matrix from eye, center and up vectors.
+/// \tparam	typename T	T the numeric data type used for arguments and the return value. Can usually be deduced.
+/// \tparam	int VOpt  	VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
+/// \param	eye   	The eyepoint of the camera.
+/// \param	center	The center of the camera view direction.
+/// \param	up	  	The up vector for the camera.
+/// \return	a matrix transforming the world into one that has the camera at the center.
+template <typename T, int VOpt>
+inline Eigen::Matrix<T, 4, 4> makeViewMatrix(const Eigen::Matrix<T, 3, 1, VOpt>& eye,
+											 const Eigen::Matrix<T, 3, 1, VOpt>& center,
+											 const Eigen::Matrix<T, 3, 1, VOpt>& up)
+{
+	Eigen::Matrix<T, 3, 1, VOpt> f = (center - eye).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> s = (f.cross(up)).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> u = s.cross(f).normalized();
+
+	Eigen::Matrix<T, 4, 4> rotation;
+	rotation << s[0],  s[1],  s[2], 0.0,
+		        u[0],  u[1],  u[2], 0.0, 
+		       -f[0], -f[1], -f[2], 0.0,
+		         0.0,   0.0,   0.0, 1.0;  
+
+	Eigen::Matrix<T, 4, 4> translation;
+	translation << 1.0, 0.0, 0.0, -eye.x(),
+				   0.0, 1.0, 0.0, -eye.y(),
+				   0.0, 0.0, 1.0, -eye.z(),
+				   0.0, 0.0, 0.0,    1.0;
+
+	return rotation*translation;
+}
+
 /// Helper method to add a sub-matrix into a matrix, for the sake of clarity
 /// \tparam Matrix The matrix type
 /// \tparam SubMatrix The sub-matrix type
