@@ -32,7 +32,8 @@ class MeshRepresentation : public virtual Representation
 {
 public:
 
-	/// Constructor
+	/// Constructor.
+	/// \param	name	The name of the representation.
 	explicit MeshRepresentation(const std::string& name) : Representation(name) {}
 	virtual ~MeshRepresentation() {}
 

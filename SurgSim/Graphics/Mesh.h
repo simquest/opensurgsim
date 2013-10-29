@@ -26,7 +26,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-class VertexData {
+struct VertexData {
 
 public:
 
@@ -53,7 +53,7 @@ public:
 	}
 };
 
-class TriangleData {
+struct TriangleData {
 public:
 	SurgSim::Math::Vector3d normal;
 

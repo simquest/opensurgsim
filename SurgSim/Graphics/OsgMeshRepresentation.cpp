@@ -52,6 +52,10 @@ OsgMeshRepresentation::~OsgMeshRepresentation()
 
 bool OsgMeshRepresentation::setMesh(std::shared_ptr<Mesh> mesh)
 {
+	SURGSIM_ASSERT(mesh != nullptr) << "Can't set a nullptr mesh";
+	SURGSIM_ASSERT(mesh->isValid()) << "An invalid mesh was passed to OsgMeshRepresentation";
+
+	osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry();
 
 	SURGSIM_ASSERT(mesh->isValid()) << "Mesh is invalid, " <<
 		"Cannot use and invalid mesh for creating a MeshRepresentation";
@@ -107,11 +111,11 @@ bool OsgMeshRepresentation::setMesh(std::shared_ptr<Mesh> mesh)
 	// Copy triangles from mesh
 	size_t triangleCount = mesh->getNumTriangles();
 	unsigned int* triangles = new unsigned int[triangleCount*3];
-	for (size_t i=0,j=0; i < triangleCount; ++i, j+=3)
+	for (size_t i=0; i < triangleCount; ++i)
 	{
-		triangles[j] = mesh->getTriangle(i).verticesId[0];
-		triangles[j+1] = mesh->getTriangle(i).verticesId[1];
-		triangles[j+2] = mesh->getTriangle(i).verticesId[2];
+		triangles[i*3] = mesh->getTriangle(i).verticesId[0];
+		triangles[i*3+1] = mesh->getTriangle(i).verticesId[1];
+		triangles[i*3+2] = mesh->getTriangle(i).verticesId[2];
 	}
 
 	m_set = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES,triangleCount*3,triangles);
