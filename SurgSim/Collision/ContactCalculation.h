@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/ReuseFactory.h>
 #include <SurgSim/Collision/CollisionPair.h>
 
 using SurgSim::Physics::RigidShapeType;

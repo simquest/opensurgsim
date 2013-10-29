@@ -18,8 +18,6 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/ReuseFactory.h>
-#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 
 using SurgSim::Physics::RigidShapeType;
@@ -28,6 +26,8 @@ namespace SurgSim
 {
 namespace Collision
 {
+
+class CollisionPair;
 
 /// Class to calculate intersections between Boxes and Planes
 class BoxPlaneDcdContact : public ContactCalculation

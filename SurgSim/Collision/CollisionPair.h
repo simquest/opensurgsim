@@ -50,14 +50,11 @@ struct Contact {
 /// Collision Pair class, it signifies a pair of items that should be checked with the
 /// collision algorithm, this structure will be used for input as well as output, as contacts
 /// get appended to the contacts list when found.
-/// \note When used in a ReuseFactory, please note that contained contacts won't get deallocated
-/// 	  until the next use, which might not be until the end of the program
 class CollisionPair
 {
 public:
-
-	/// Default constructor needed for ReuseFactory
-	CollisionPair() {}
+	/// Default Constructor
+	CollisionPair() {};
 
 	/// Normal constructor
 	CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,

@@ -18,14 +18,14 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/ReuseFactory.h>
-#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 
 namespace SurgSim
 {
 namespace Collision
 {
+
+class CollisionPair;
 
 /// A default calculation, it does nothing and can be used as a placeholder
 class DefaultContactCalculation : public ContactCalculation

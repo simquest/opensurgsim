@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include <SurgSim/Collision/DefaultContactCalculation.h>
+
+#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Framework/Log.h>
 
 namespace SurgSim

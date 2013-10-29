@@ -18,14 +18,14 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/ReuseFactory.h>
-#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 
 namespace SurgSim
 {
 namespace Collision
 {
+
+class CollisionPair;
 
 /// Class to calculate intersections between spheres
 class SphereSphereDcdContact : public ContactCalculation
