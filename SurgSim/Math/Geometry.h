@@ -1439,6 +1439,53 @@ T distanceTriangleTriangle(
 	return (minDst);
 }
 
+/// Calculate the intersections between a line segment and an axis aligned box
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param sv0,sv1	Extremities of the line segment.
+/// \param box		Axis aligned bounding box
+/// \param [out] intersections The points of intersection between the segment and the box
+template <class T, int MOpt>
+void intersectionsSegmentBox(
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::AlignedBox<T, 3>& box,
+	std::vector<Eigen::Matrix<T, 3, 1, MOpt> >* intersections)
+{
+	Eigen::Array<double, 3, 1> v01 = sv1 - sv0;
+	auto parralelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
+	if (parralelToPlane.any())
+	{
+		auto beyondMinCorner = (sv0.array() < box.min().array());
+		auto beyondMaxCorner = (sv0.array() > box.max().array());
+		if ((parralelToPlane * beyondMinCorner * beyondMaxCorner).any())
+		{
+			return;
+		}
+	}
+
+	Eigen::Array<double, 3, 2> planeIntersections;
+	planeIntersections.col(0) = (box.min().array() - sv0.array());
+	planeIntersections.col(1) = (box.max().array()- sv0.array());
+	planeIntersections.colwise() /= v01;
+
+	double entrance = planeIntersections.rowwise().minCoeff().maxCoeff();
+	double exit = planeIntersections.rowwise().maxCoeff().minCoeff();
+	if (entrance < exit && exit > 0.0)
+	{
+		if (entrance >= 0.0 && entrance <= 1.0)
+		{
+			intersections->push_back(sv0 + v01.matrix() * entrance);
+		}
+
+		if (exit >= 0.0 && exit <= 1.0)
+		{
+			intersections->push_back(sv0 + v01.matrix() * exit);
+		}
+	}
+}
+
+
 }; // namespace Math
 }; // namespace SurgSim
 

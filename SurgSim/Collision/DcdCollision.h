@@ -21,6 +21,7 @@
 #include <SurgSim/Collision/SphereSphereDcdContact.h>
 #include <SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h>
 #include <SurgSim/Collision/SpherePlaneDcdContact.h>
+#include <SurgSim/Collision/BoxCapsuleDcdContact.h>
 #include <SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h>
 #include <SurgSim/Collision/BoxPlaneDcdContact.h>
 #include <SurgSim/Collision/BoxSphereDcdContact.h>

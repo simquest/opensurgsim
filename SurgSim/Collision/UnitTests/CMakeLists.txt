@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	BoxCapsuleContactCalculationTests.cpp
 	BoxDoubleSidedPlaneContactCalculationTests.cpp
 	BoxPlaneContactCalculationTests.cpp
 	BoxSphereContactCalculationTests.cpp
