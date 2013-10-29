@@ -240,6 +240,7 @@ add_library(yaml-cpp
 	${contrib_public_headers}
 	${contrib_private_headers}
 )
+set_target_properties(yaml-cpp PROPERTIES FOLDER "ThirdParty")
 
 set_target_properties(yaml-cpp PROPERTIES
 	VERSION "${YAML_CPP_VERSION}"

@@ -48,3 +48,6 @@ include_directories(
 set(LIBS SurgSimTesting SurgSimFramework SurgSimDataStructures SurgSimCollision gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
+
+# Put SurgSimCollisionTest into folder "Collision"
+set_target_properties(SurgSimCollisionTest PROPERTIES FOLDER "Collision") 

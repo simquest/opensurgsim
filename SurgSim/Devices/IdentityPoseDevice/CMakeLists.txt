@@ -43,3 +43,6 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put IdentityPoseDevice into folder "Devices"
+set_target_properties(IdentityPoseDevice PROPERTIES FOLDER "Devices")

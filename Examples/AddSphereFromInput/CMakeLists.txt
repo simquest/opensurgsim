@@ -65,3 +65,6 @@ endif()
 target_link_libraries(ExampleAddSphereFromInput
 	${LIBS}
 )
+
+# Put ExampleAddSphereFromInput into folder "Examples"
+set_target_properties(ExampleAddSphereFromInput PROPERTIES FOLDER "Examples") 

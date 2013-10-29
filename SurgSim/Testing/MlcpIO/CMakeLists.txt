@@ -38,3 +38,6 @@ set(MLCP_IO_HEADERS
 add_library(MlcpTestIO
 	${MLCP_IO_SOURCES} ${MLCP_IO_HEADERS})
 surgsim_show_ide_folders("${MLCP_IO_SOURCES}" "${MLCP_IO_HEADERS}")
+
+# Put MlcpTestIO into folder "Testing"
+set_target_properties(MlcpTestIO PROPERTIES FOLDER "Testing")

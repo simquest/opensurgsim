@@ -16,6 +16,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 project(OpenSurgSim)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(OPENSURGSIM_MAJOR_VERSION 0)
 set(OPENSURGSIM_MINOR_VERSION 0)

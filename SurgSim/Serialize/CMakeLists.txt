@@ -43,3 +43,6 @@ set(LIBS SurgSimFramework SurgSimGraphics ${Boost_LIBRARIES})
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimSerialize into folder "Serialize"
+set_target_properties(SurgSimSerialize PROPERTIES FOLDER "Serialize")

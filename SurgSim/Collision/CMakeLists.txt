@@ -64,3 +64,6 @@ target_link_libraries(SurgSimCollision SurgSimFramework SurgSimMath)
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimCollision into folder "Collision"
+set_target_properties(SurgSimCollision PROPERTIES FOLDER "Collision")

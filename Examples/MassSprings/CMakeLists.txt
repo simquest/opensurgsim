@@ -52,3 +52,6 @@ target_link_libraries(ExampleMassSprings
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
 )
+
+# Put ExampleMassSprings into folder "Examples"
+set_target_properties(ExampleMassSprings PROPERTIES FOLDER "Examples") 
