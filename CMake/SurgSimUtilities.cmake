@@ -388,6 +388,6 @@ macro(surgsim_cpplint_this_tree TARGET)
 endmacro()
 
 
-# options related to build ipnut devices
+# options related to build input devices
 #
-option(SURGSIM_DEVICES_BUILD "Include input devices in the build" OFF)
+option(SURGSIM_DEVICES_BUILD "Include input devices in the build" ON)
