@@ -205,12 +205,13 @@ bool BasicThread::waitForBarrier(bool success)
 	return success;
 }
 
-void BasicThread::setSynchronous(bool val)
+bool BasicThread::setSynchronous(bool val)
 {
 	if(m_startupBarrier!=nullptr)
 	{
 		m_isSynchronous = val;
 	}
+	return m_isSynchronous;
 }
 
 bool BasicThread::isSynchronous()

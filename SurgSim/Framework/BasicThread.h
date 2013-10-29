@@ -96,9 +96,10 @@ public:
 	/// Sets the thread to synchronized execution in concert with the startup
 	/// barrier, the startup barrier has to exist for this call to succeed.
 	/// When the thread is set to run synchronized it will only execute one update at a time
-	/// and then wait for the startup barrier to wake it up again
-	/// \param	val	true to value.
-	void setSynchronous(bool val);
+	/// and then wait for the startup barrier to wake it up again.
+	/// \param	val	if true the thread will need to be controlled via the barrier.
+	/// \return the actual value of isSynchronous()
+	bool setSynchronous(bool val);
 
 	/// Query if this object is synchronized.
 	/// \return	true if synchronized, false if not.

@@ -76,7 +76,10 @@ public:
 	bool start(bool paused = false);
 
 	/// Pause all managers, this will set all managers to synchronous execution, they will all complete
-	/// their updates and then wait for step() to proceed, call resume to go back to uninterupted execution
+	/// their updates and then wait for step() to proceed, call resume to go back to uninterupted execution.
+	/// \note HS-2013-nov-01 this is mostly to be used as a facillity for testing and debugging, the threads 
+	/// 	  are not executed at the correct rates against each other, this is an issue that can be resolved
+	/// 	  but is not necessary right now. 
 	void pause();
 
 	/// Resume from pause, causes all managers to resume normal processing
