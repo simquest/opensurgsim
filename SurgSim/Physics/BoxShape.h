@@ -16,6 +16,8 @@
 #ifndef SURGSIM_PHYSICS_BOXSHAPE_H
 #define SURGSIM_PHYSICS_BOXSHAPE_H
 
+#include <array>
+
 #include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/Math/Quaternion.h>
 
@@ -32,12 +34,9 @@ class BoxShape: public RigidShape
 public:
 	/// Constructor
 	/// \param sizeX, sizeY, sizeZ the box sizes in all 3 directions (in m)
-	BoxShape(double sizeX, double sizeY, double sizeZ)
+	BoxShape(double sizeX, double sizeY, double sizeZ) :
+		m_size(Vector3d(sizeX, sizeY, sizeZ))
 	{
-		m_size[0] = sizeX;
-		m_size[1] = sizeY;
-		m_size[2] = sizeZ;
-
 		calculateVertices();
 	}
 
@@ -46,6 +45,11 @@ public:
 	int getType()
 	{
 		return RIGID_SHAPE_TYPE_BOX;
+	}
+
+	Vector3d getSize() const
+	{
+		return m_size;
 	}
 
 	/// Get size in X direction
@@ -90,64 +94,52 @@ public:
 	{
 		const double mass = calculateMass(rho);
 
-		const double SquarelengthX = m_size[0] * m_size[0];
-		const double SquarelengthY = m_size[1] * m_size[1];
-		const double SquarelengthZ = m_size[2] * m_size[2];
+		const Vector3d sizeSquared = m_size.array() * m_size.array();
 		const double coef = 1.0 / 12.0 * mass;
-
-		Matrix33d inertia;
-		inertia.setZero();
-		inertia(0, 0) = coef * (SquarelengthY + SquarelengthZ);
-		inertia(1, 1) = coef * (SquarelengthX + SquarelengthZ);
-		inertia(2, 2) = coef * (SquarelengthX + SquarelengthY);
-
+		Matrix33d inertia = Matrix33d::Zero();
+		inertia.diagonal() = coef * Vector3d(sizeSquared[1] + sizeSquared[2],
+											sizeSquared[0] + sizeSquared[2],
+											sizeSquared[0] + sizeSquared[1]);
 		return inertia;
 	}
 
-	/// Function that calculates the global vertex locations, given an orientation
-	/// and translation.
-	/// \param i The vertex index.
-	/// \param quat The orientation of the box.
-	/// \param trans The translation of the box.
-	/// \return The global vertex position.
-	Vector3d calculateGlobalVertex(const int i,
-								   const SurgSim::Math::Quaterniond& quat,
-								   const Vector3d& trans) const
-	{
-		return quat * m_vertices[i] + trans;
-	}
-
 	/// Function that returns the local vertex location, given an index.
-	/// and translation.
 	/// \param i The vertex index.
 	/// \return The local vertex position.
-	Vector3d getLocalVertex(const int i) const
+	Vector3d getVertex(const int i) const
 	{
 		return m_vertices[i];
+	}
+
+	const std::array<Vector3d, 8>& getVertices() const
+	{
+		return m_vertices;
 	}
 
 private:
 	/// Function that calculates the box vertices.
 	void calculateVertices()
 	{
-		static const double multiplier[8][3] = {{-0.5, -0.5, -0.5}, {-0.5, -0.5, 0.5}, {-0.5, 0.5, 0.5},
-			{-0.5, 0.5, -0.5}, {0.5, -0.5, -0.5}, {0.5, -0.5, 0.5}, {0.5, 0.5, 0.5}, {0.5, 0.5, -0.5}
-		};
-
+		static const std::array<Vector3d, 8> multiplier = {Vector3d(-0.5, -0.5, -0.5),
+														   Vector3d(-0.5, -0.5,  0.5),
+														   Vector3d(-0.5,  0.5,  0.5),
+														   Vector3d(-0.5,  0.5, -0.5),
+														   Vector3d( 0.5, -0.5, -0.5),
+														   Vector3d( 0.5, -0.5,  0.5),
+														   Vector3d( 0.5,  0.5,  0.5),
+														   Vector3d( 0.5,  0.5, -0.5)};
 		for(int i = 0; i < 8; ++i)
 		{
-			m_vertices[i][0] = m_size[0] * multiplier[i][0];
-			m_vertices[i][1] = m_size[1] * multiplier[i][1];
-			m_vertices[i][2] = m_size[2] * multiplier[i][2];
+			m_vertices[i] = m_size.array() * multiplier[i].array();
 		}
 	}
 
 private:
 	/// The box sizes along the 3 axis respectively {X,Y,Z}
-	double   m_size[3];
+	Vector3d m_size;
 
 	/// The box vertices.
-	Vector3d m_vertices[8];
+	std::array<Vector3d,8> m_vertices;
 };
 
 }; // Physics

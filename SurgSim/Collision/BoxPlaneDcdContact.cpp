@@ -57,7 +57,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	SurgSim::Math::Vector3d boxVertexGlobal;
     for (int i = 0; i < 8; ++i)
     {
-        boxVertex = box->getLocalVertex(i);
+        boxVertex = box->getVertex(i);
         d = planeNormal.dot(boxVertex) + planeD;
 		if (d < DistanceEpsilon)
 		{
