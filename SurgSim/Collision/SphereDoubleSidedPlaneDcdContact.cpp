@@ -29,6 +29,16 @@ namespace SurgSim
 namespace Collision
 {
 
+SphereDoubleSidedPlaneDcdContact::SphereDoubleSidedPlaneDcdContact()
+{
+}
+
+std::pair<int,int> SphereDoubleSidedPlaneDcdContact::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE,
+		SurgSim::Physics::RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE);
+}
+
 void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	std::shared_ptr<CollisionRepresentation> representationPlane;

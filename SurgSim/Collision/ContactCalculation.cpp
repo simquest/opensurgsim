@@ -20,6 +20,14 @@ namespace SurgSim
 namespace Collision
 {
 
+ContactCalculation::ContactCalculation()
+{
+}
+
+ContactCalculation::~ContactCalculation()
+{
+}
+
 void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	std::pair<int,int> shapeTypes = getShapeTypes();

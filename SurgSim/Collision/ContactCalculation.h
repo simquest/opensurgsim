@@ -38,14 +38,10 @@ class ContactCalculation
 public:
 
 	/// Constructor
-	ContactCalculation()
-	{
-	}
+	ContactCalculation();
 
 	/// Destructor
-	virtual ~ContactCalculation()
-	{
-	}
+	virtual ~ContactCalculation();
 
 	/// Function that handles asymmetric pair and calls the actual contact calculation routine of the sub class.
 	/// \param	pair	The pair that is under consideration.

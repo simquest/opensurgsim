@@ -22,6 +22,17 @@ namespace Collision
 {
 
 template <class VertexType, class EdgeType, class TriangleType>
+TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::TriangleMeshPlaneDcdContact()
+{
+}
+
+template <class VertexType, class EdgeType, class TriangleType>
+std::pair<int, int> TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::getShapeTypes()
+{
+	return std::pair<int, int> (SurgSim::Physics::RIGID_SHAPE_TYPE_MESH, SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE);
+}
+
+template <class VertexType, class EdgeType, class TriangleType>
 void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculateContact
 	(std::shared_ptr<CollisionPair> pair)
 {

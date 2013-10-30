@@ -29,6 +29,15 @@ namespace SurgSim
 namespace Collision
 {
 
+BoxSphereDcdContact::BoxSphereDcdContact()
+{
+}
+
+std::pair<int,int> BoxSphereDcdContact::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_BOX, SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE);
+}
+
 void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	using SurgSim::Math::Geometry::DistanceEpsilon;

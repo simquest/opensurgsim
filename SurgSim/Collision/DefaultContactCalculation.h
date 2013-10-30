@@ -36,19 +36,14 @@ public:
 	/// \param doAssert If set the calculation will throw an exception if it is executed, this
 	/// 				can be used to detect cases where a  contact calculation is being called
 	/// 				on a pair that should be implemented
-	explicit DefaultContactCalculation(bool doAssert = false) : m_doAssert(doAssert)
-	{
-	}
+	explicit DefaultContactCalculation(bool doAssert = false);
 
 	/// Destructor
-	virtual ~DefaultContactCalculation() {}
+	virtual ~DefaultContactCalculation();
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int,int> getShapeTypes() override
-	{
-		return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_NONE, SurgSim::Physics::RIGID_SHAPE_TYPE_NONE);
-	}
+	virtual std::pair<int,int> getShapeTypes() override;
 
 private:
 	bool m_doAssert;

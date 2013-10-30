@@ -23,6 +23,20 @@ namespace SurgSim
 namespace Collision
 {
 
+DefaultContactCalculation::DefaultContactCalculation(bool doAssert) :
+	m_doAssert(doAssert)
+{
+}
+
+DefaultContactCalculation::~DefaultContactCalculation()
+{
+}
+
+std::pair<int,int> DefaultContactCalculation::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_NONE, SurgSim::Physics::RIGID_SHAPE_TYPE_NONE);
+}
+
 void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	SURGSIM_ASSERT(!m_doAssert) << "Contact calculation not implemented for pairs with types ("<<

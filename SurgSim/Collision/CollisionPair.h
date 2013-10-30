@@ -54,7 +54,7 @@ class CollisionPair
 {
 public:
 	/// Default Constructor
-	CollisionPair() {};
+	CollisionPair();
 
 	/// Normal constructor
 	CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
@@ -66,82 +66,47 @@ public:
 	/// Sets the representations in this pair, representations cannot be the same instance and neither can be nullptr.
 	/// \param	first 	The first CollisionRepresentation.
 	/// \param	second	The second CollisionRepresentation.
-	inline void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
-								   const std::shared_ptr<CollisionRepresentation>& second)
-	{
-		SURGSIM_ASSERT(first != second) << "Should try to collide with self";
-		SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
-
-		// Invalidate the current contacts
-		clearContacts();
-		m_representations.first = first;
-		m_representations.second = second;
-		m_isSwapped = false;
-	}
+	void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
+							const std::shared_ptr<CollisionRepresentation>& second);
 
 	/// Function that returns the pair of representations of the objects that are colliding.
 	/// \return The pair of representations that are colliding.
-	inline const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
-		getRepresentations() const
-	{
-		return m_representations;
-	}
+	const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
+	getRepresentations() const;
 
 	/// \return The representation considered to be the first
-	inline std::shared_ptr<CollisionRepresentation> getFirst() const
-	{
-		return m_representations.first;
-	}
+	std::shared_ptr<CollisionRepresentation> getFirst() const;
 
 	/// \return The representation considered to be the second
-	inline std::shared_ptr<CollisionRepresentation> getSecond() const
-	{
-		return m_representations.second;
-	}
+	std::shared_ptr<CollisionRepresentation> getSecond() const;
 
 	/// \return true if there are any contacts assigned to the pair, false otherwise
-	inline bool hasContacts() const
-	{
-		return !m_contacts.empty();
-	}
+	bool hasContacts() const;
 
 	/// Adds a contact to the collision pair.
 	/// \param	depth			The depth of the intersection.
 	/// \param	contactPoint	The contact point, between the two bodies.
 	/// \param	normal			The normal of the contact pointing into the first representation.
 	/// \param	penetrationPoints The points furthest into the opposing object
-	inline void addContact(const double& depth,
+	void addContact(const double& depth,
 						   const SurgSim::Math::Vector3d& contactPoint,
 						   const SurgSim::Math::Vector3d& normal,
-						   const std::pair<Location, Location>& penetrationPoints)
-	{
-		m_contacts.push_back(std::make_shared<Contact>(depth,contactPoint,normal,penetrationPoints));
-	}
+						   const std::pair<Location, Location>& penetrationPoints);
 
 	/// Adds a contact to the collision pair.
 	/// \param	depth			The depth of the intersection.
 	/// \param	normal			The normal of the contact pointing into the first representation.
 	/// \param	penetrationPoints The points furthest into the opposing object
-	inline void addContact(const double& depth,
+	void addContact(const double& depth,
 						   const SurgSim::Math::Vector3d& normal,
-						   const std::pair<Location, Location>& penetrationPoints)
-	{
-		m_contacts.push_back(
-			std::make_shared<Contact>(depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal, penetrationPoints));
-	}
+						   const std::pair<Location, Location>& penetrationPoints);
 
 	/// Adds a contact.
 	/// \param	contact	The contact between the first and the second representation.
-	inline void addContact(const std::shared_ptr<Contact>& contact)
-	{
-		m_contacts.push_back(contact);
-	}
+	void addContact(const std::shared_ptr<Contact>& contact);
 
 	/// \return	All the contacts.
-	const std::list<std::shared_ptr<Contact>>& getContacts() const
-	{
-		return m_contacts;
-	}
+	const std::list<std::shared_ptr<Contact>>& getContacts() const;
 
 	/// Reset clear the list of contacts, invalidating all the contacts
 	void clearContacts();
