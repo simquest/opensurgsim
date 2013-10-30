@@ -31,52 +31,31 @@ class DoubleSidedPlaneShape: public RigidShape
 public:
 
 	/// Constructor: No members to initialize.
-	DoubleSidedPlaneShape()
-	{
-
-	}
+	DoubleSidedPlaneShape();
 
 	/// \return the type of the shape
-	int getType()
-	{
-		return RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE;
-	}
+	virtual int getType();
 
 	/// Calculate the volume of the plane
 	/// \return The volume of the plane, which is 0
-	double calculateVolume() const
-	{
-		return 0.0;
-	}
+	virtual double calculateVolume() const;
 
 	/// Calculate the mass center of the plane
 	/// \return The mass center of the plane
-	Vector3d calculateMassCenter() const
-	{
-		return Vector3d(0.0, 0.0, 0.0);
-	}
+	virtual Vector3d calculateMassCenter() const;
 
 	/// Calculate the inertia of the box
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the plane
-	Matrix33d calculateInertia(double rho) const
-	{
-		return Matrix33d::Identity();
-	}
+	virtual Matrix33d calculateInertia(double rho) const;
 
 	/// Gets the d of the plane equation.
 	/// \return	The value of d (always 0).
-	inline double getD()
-	{
-		return 0.0;
-	}
+	double getD() const;
 
 	/// Gets the normal of the plane equation.
 	/// \return	The value of the normal (always Y axis).
-	inline Vector3d getNormal()
-	{
-		return Vector3d(0.0, 1.0, 0.0);
-	}
+	Vector3d getNormal() const;
 
 };
 

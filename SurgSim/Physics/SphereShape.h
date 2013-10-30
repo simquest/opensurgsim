@@ -30,53 +30,27 @@ class SphereShape: public RigidShape
 public:
 	/// Constructor
 	/// \param radius The sphere radius (in m)
-	explicit SphereShape(double radius)
-	{
-		m_radius = radius;
-	}
+	explicit SphereShape(double radius);
 
 	/// \return the type of the shape
-	int getType()
-	{
-		return RIGID_SHAPE_TYPE_SPHERE;
-	}
+	virtual int getType();
 
 	/// Get the sphere radius
 	/// \return The sphere radius
-	double getRadius() const
-	{
-		return m_radius;
-	}
+	double getRadius() const;
 
 	/// Calculate the volume of the sphere
 	/// \return The volume of the sphere (in m-3)
-	double calculateVolume() const
-	{
-		return 4.0 / 3.0 * M_PI * m_radius * m_radius * m_radius;
-	}
+	virtual double calculateVolume() const;
 
 	/// Calculate the mass center of the sphere
 	/// \return The mass center of the sphere
-	Vector3d calculateMassCenter() const
-	{
-		return Vector3d(0.0, 0.0, 0.0);
-	}
+	virtual Vector3d calculateMassCenter() const;
 
 	/// Calculate the inertia of the sphere
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the sphere
-	Matrix33d calculateInertia(double rho) const
-	{
-		const double mass = calculateMass(rho);
-
-		double diagonalCoefficient = 2.0 / 5.0 * mass * m_radius * m_radius;
-
-		Matrix33d inertia;
-		inertia.setZero();
-		inertia.diagonal().setConstant(diagonalCoefficient);
-
-		return inertia;
-	}
+	virtual Matrix33d calculateInertia(double rho) const;
 
 private:
 	/// Sphere radius
