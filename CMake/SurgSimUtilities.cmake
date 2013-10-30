@@ -386,3 +386,8 @@ macro(surgsim_cpplint_this_tree TARGET)
 		surgsim_run_cpplint("${TARGET}" "--traverse" "${CMAKE_CURRENT_SOURCE_DIR}")
 	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 endmacro()
+
+
+# options related to build input devices
+#
+option(SURGSIM_DEVICES_BUILD "Include input devices in the build" ON)
