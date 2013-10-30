@@ -61,7 +61,7 @@ endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
+find_package(Boost 1.50 COMPONENTS chrono date_time filesystem system thread REQUIRED)
 mark_as_advanced(Boost_DIR)
 
 find_package(NovintHdalSdk)
