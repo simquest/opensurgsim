@@ -56,3 +56,6 @@ target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramew
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimBlocks into folder "Blocks"
+set_target_properties(SurgSimBlocks PROPERTIES FOLDER "Blocks") 

@@ -28,3 +28,6 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS IdentityPoseDevice SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
 surgsim_add_unit_tests(IdentityPoseDeviceTest)
+
+# Put IdentityPoseDeviceTest into folder "Devices"
+set_target_properties(IdentityPoseDeviceTest PROPERTIES FOLDER "Devices")

@@ -34,3 +34,6 @@ set(LIBS SurgSimBlocks SurgSimFramework SurgSimPhysics SurgSimGraphics gtest
 	${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
+
+# Put SurgSimBlocksTest into folder "Blocks"
+set_target_properties(SurgSimBlocksTest PROPERTIES FOLDER "Blocks") 

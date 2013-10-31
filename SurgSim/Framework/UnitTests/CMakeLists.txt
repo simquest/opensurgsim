@@ -49,3 +49,6 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
+
+# Put SurgSimFrameworkTest into folder "Framework"
+set_target_properties(SurgSimFrameworkTest PROPERTIES FOLDER "Framework")
