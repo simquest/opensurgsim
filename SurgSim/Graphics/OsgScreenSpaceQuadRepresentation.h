@@ -53,24 +53,22 @@ public:
 	~OsgScreenSpaceQuadRepresentation();
 
 	/// Sets a location in screen space.
-	/// \param	x	The x coordinate.
-	/// \param	y	The y coordinate.
+	/// \param	x,y	The x and y coordinates.
 	virtual void setLocation(double x, double y);
 
 	/// Gets a location in screen space.
-	/// \param [out]	x	If non-null, the x coordinate.
-	/// \param [out]	y	If non-null, the y coordinate.
+	/// \param [out]	x,y	If non-null the x and y coordinates. Throws exception otherwise.
 	virtual void getLocation(double* x, double* y);
 
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
-	virtual void setSize(int width, int height) override;
+	virtual void setSize(double width, double height) override;
 
 	/// Gets the size of the quad.
-	/// \param [out]	width 	If non-null, the width.
-	/// \param [out]	height	If non-null, the height.
-	virtual void getSize(int* width, int* height) const override;
+	/// \param [out]	width 	If non-null, the width. Throws exception otherwise.
+	/// \param [out]	height	If non-null, the height. Throws exception otherwise.
+	virtual void getSize(double* width, double* height) const override;
 
 	/// Sets the current pose of the representation
 	/// \param	pose	Rigid transformation that describes the current pose of the representation

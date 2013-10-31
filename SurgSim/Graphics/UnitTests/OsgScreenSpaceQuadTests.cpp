@@ -95,31 +95,60 @@ TEST(OsgScreenSpaceQuadRepresentationTests, SetTextureRectangle)
 	EXPECT_EQ(1u, stateSet->getTextureAttributeList().size());
 }
 
+TEST(OsgScreenSpaceQuadRepresentation, SetSize)
+{
+	std::shared_ptr<OsgView> view = std::make_shared<OsgView>("view");
+	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
+
+	double width = 100.0;
+	double height = 100.0; 
+
+	ASSERT_ANY_THROW(quad->getSize(nullptr, &height));
+	ASSERT_ANY_THROW(quad->getSize(&width, nullptr));
+	ASSERT_ANY_THROW(quad->getSize(nullptr, nullptr));
+
+	quad->getLocation(&width, &height);
+	EXPECT_DOUBLE_EQ(0.0, width);
+	EXPECT_DOUBLE_EQ(0.0, height);
+
+	quad->setSize(100.0,200.0);
+	quad->getSize(&width, &height);
+
+	EXPECT_DOUBLE_EQ(100.0, width);
+	EXPECT_DOUBLE_EQ(200.0, height);
+
+}
+
 TEST(OsgScreenSpaceQuadRepresentationTests, SetLocation)
 {
 	std::shared_ptr<OsgView> view = std::make_shared<OsgView>("view");
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
 
-	double x = 100;
-	double y = 100; 
+	double x = 100.0;
+	double y = 100.0; 
+
+	ASSERT_ANY_THROW(quad->getLocation(nullptr, &y));
+	ASSERT_ANY_THROW(quad->getLocation(&x, nullptr));
+	ASSERT_ANY_THROW(quad->getLocation(nullptr, nullptr));
 
 	quad->getLocation(&x, &y);
-	EXPECT_DOUBLE_EQ(0, x);
-	EXPECT_DOUBLE_EQ(0, y);
+	EXPECT_DOUBLE_EQ(0.0, x);
+	EXPECT_DOUBLE_EQ(0.0, y);
 
-	quad->setLocation(100,200);
+	quad->setLocation(100.0,200.0);
 	quad->getLocation(&x, &y);
 
-	EXPECT_DOUBLE_EQ(100, x);
-	EXPECT_DOUBLE_EQ(200, y);
+	EXPECT_DOUBLE_EQ(100.0, x);
+	EXPECT_DOUBLE_EQ(200.0, y);
 
-	Vector3d position(300,400,0);
+	Vector3d position(300.0, 400.0, 0.0);
 	quad->setPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), position));
 
 	quad->getLocation(&x,&y);
-	EXPECT_DOUBLE_EQ(300, x);
-	EXPECT_DOUBLE_EQ(400, y);
+	EXPECT_DOUBLE_EQ(300.0, x);
+	EXPECT_DOUBLE_EQ(400.0, y);
 
 }
 

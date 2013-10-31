@@ -45,25 +45,23 @@ public:
 
 	}
 
-	/// Sets a location.
-	/// \param	x	The x coordinate in screen space.
-	/// \param	y	The y coordinate in screen space.
+	/// Sets a location in screen space.
+	/// \param	x,y	The x and y coordinates.
 	virtual void setLocation(double x, double y) = 0;
 
-	/// Gets a location.
-	/// \param [out]	x	If non-null, the x coordinate.
-	/// \param [out]	y	If non-null, the y coordinate.
+	/// Gets a location in screen space.
+	/// \param [out]	x,y	If non-null the x and y coordinates.
 	virtual void getLocation(double* x, double* y) = 0;
 
 	/// Sets the size for the quad in screen coordinates.
 	/// \param	width 	The width of the quad in screen coordinates.
 	/// \param	height	The height of the quad in screen coordinates.
-	virtual void setSize(int width, int height) = 0;
+	virtual void setSize(double width, double height) = 0;
 
 	/// Gets the size of the quad.
-	/// \param [in,out]	width 	If non-null, the width.
-	/// \param [in,out]	height	If non-null, the height.
-	virtual void getSize(int* width, int* height) const = 0;
+	/// \param [out]	width 	If non-null, the width.
+	/// \param [out]	height	If non-null, the height.
+	virtual void getSize(double* width, double* height) const = 0;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
 	/// this will use the uniform name "diffuseMap" for the uniform in this operation. This can be accomplished
