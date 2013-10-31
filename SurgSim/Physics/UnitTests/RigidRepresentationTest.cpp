@@ -343,7 +343,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
-		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
+		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
 
 		SCOPED_TRACE("Testing angular with Quiet Nan");
 		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
@@ -356,7 +356,7 @@ TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 		// Sets the state
 		m_state.reset();
 		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
-		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
+		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
 		SCOPED_TRACE("Testing angular with double max");
 		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
