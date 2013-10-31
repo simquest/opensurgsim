@@ -16,67 +16,26 @@
 /// \file
 /// Render Tests for the OsgCylinderRepresentation class.
 
-#include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgCylinderRepresentation.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Framework/Runtime.h>
+#include <SurgSim/Graphics/RenderTests/RenderTest.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Testing/MathUtilities.h>
 
-
-#include <gtest/gtest.h>
-
-#include <random>
-
-using SurgSim::Framework::Runtime;
-using SurgSim::Framework::Scene;
-using SurgSim::Framework::SceneElement;
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
 
-
 namespace SurgSim
 {
-
 namespace Graphics
 {
 
-struct OsgCylinderRepresentationRenderTests : public ::testing::Test
+struct OsgCylinderRepresentationRenderTests : public RenderTest
 {
-    virtual void SetUp()
-    {
-        runtime = std::make_shared<SurgSim::Framework::Runtime>();
-        manager = std::make_shared<SurgSim::Graphics::OsgManager>();
-
-        runtime->addManager(manager);
-
-        scene = std::make_shared<SurgSim::Framework::Scene>();
-        runtime->setScene(scene);
-
-        viewElement = std::make_shared<OsgViewElement>("view element");
-        scene->addSceneElement(viewElement);
-
-    }
-
-    virtual void TearDown()
-    {
-        runtime->stop();
-    }
-
-    std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-    std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
-    std::shared_ptr<SurgSim::Framework::Scene> scene;
-    std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
-
 };
 
-TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
+TEST_F(OsgCylinderRepresentationRenderTests, MovingCylinderTest)
 {
 	/// Add the two cylinder representation to the view element
 	std::shared_ptr<CylinderRepresentation> cylinderRepresentation1 =
@@ -88,7 +47,7 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
 
 	/// Run the thread
 	runtime->start();
-	EXPECT_TRUE(manager->isInitialized());
+	EXPECT_TRUE(graphicsManager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
 	enum SetterType {SetterTypeIndividual,
@@ -100,31 +59,19 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
 
 	Vector2d cylinder1Size, cylinder2Size;
 
-	/// Initial positoin of capsule 1
-    Vector3d startPosition1(-0.1, 0.0, -0.2);
-    /// Final position of capsule 1
-    Vector3d endPosition1(0.1, 0.0, -0.2);
-    /// Initial size (radius, hegiht) of capsule 1
-    Vector2d startSize1(0.001, 0.011);
-    /// Final size (radius, hegiht) of capsule 1
-    Vector2d endSize1(0.01, 0.02);
-    /// Initial angles (X, Y, Z) of the capsule 1
-    Vector3d startAngles1(0.0, 0.0, 0.0);
-    /// Final angles (X, Y, Z) of the capsule 1
-    Vector3d endAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
+	/// Initial and final position (X, Y, Z) of cylinder 1
+    Vector3d startPosition1(-0.1, 0.0, -0.2), finalPosition1(0.1, 0.0, -0.2);
+    /// Initial size (radius, height) and final size of cylinder 1
+    Vector2d startSize1(0.001, 0.011), finalSize1(0.01, 0.02);
+    /// Initial angles (X, Y, Z) and final of the cylinder 1
+    Vector3d startAngles1(0.0, 0.0, 0.0), finalAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
 
-    /// Initial position capsule 2
-    Vector3d startPosition2(0.0, -0.1, -0.2);
-    /// Final position capsule 2
-    Vector3d endPosition2(0.0, 0.1, -0.2);
-    /// Initial size (radius, hegiht) of capsule 2
-    Vector2d startSize2(0.001, 0.011);
-    /// Final size (radius, hegiht) of capsule 2
-    Vector2d endSize2(0.01, 0.02);
-    /// Initial angles (X, Y, Z) of the capsule 2
-    Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2);
-    /// Final angles (X, Y, Z) of the capsule 2
-    Vector3d endAngles2(M_PI, M_PI, M_PI);
+    /// Initial and final position (X, Y, Z) cylinder 2
+    Vector3d startPosition2(0.0, -0.1, -0.2), finalPosition2(0.0, 0.1, -0.2);
+    /// Initial and final size (radius, height) of cylinder 2
+    Vector2d startSize2(0.001, 0.011), finalSize2(0.01, 0.02);
+    /// Initial and final angles (X, Y, Z) of the cylinder 2
+    Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2), finalAngles2(M_PI, M_PI, M_PI);
 
 	/// Number of times to step the cylinder position and radius from start to end.
 	/// This number of steps will be done in 1 second.
@@ -134,33 +81,35 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCapsuleTest)
 		/// Calculate t in [0.0, 1.0]
 		double t = static_cast<double>(i) / numSteps;
 		/// Interpolate position and radius
-		cylinderRepresentation1->setPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
-		cylinderRepresentation2->setPose(interpolatePose(startAngles2, endAngles2, startPosition1, endPosition2, t));
+		cylinderRepresentation1->setPose(
+			interpolatePose(startAngles1, finalAngles1, startPosition1, finalPosition1, t));
+		cylinderRepresentation2->setPose(
+			interpolatePose(startAngles2, finalAngles2, startPosition1, finalPosition2, t));
 
 		if(setterType == static_cast<int>(SetterTypeIndividual))
 		{
-			cylinderRepresentation1->setRadius(interpolate(startSize1.x(), endSize1.x(), t));
-			cylinderRepresentation1->setHeight(interpolate(startSize1.y(), endSize1.y(), t));
+			cylinderRepresentation1->setRadius(interpolate(startSize1.x(), finalSize1.x(), t));
+			cylinderRepresentation1->setHeight(interpolate(startSize1.y(), finalSize1.y(), t));
 
-			cylinderRepresentation2->setRadius(interpolate(startSize2.x(), endSize2.x(), t));
-			cylinderRepresentation2->setHeight(interpolate(startSize2.y(), endSize2.y(), t));
+			cylinderRepresentation2->setRadius(interpolate(startSize2.x(), finalSize2.x(), t));
+			cylinderRepresentation2->setHeight(interpolate(startSize2.y(), finalSize2.y(), t));
 		}
 		else if(setterType == static_cast<int>(SetterTypeTogether))
 		{
-			cylinderRepresentation1->setSize(interpolate(startSize1.x(), endSize1.x(), t),
-interpolate(startSize1.y(), endSize1.y(), t));
+			cylinderRepresentation1->setSize(interpolate(startSize1.x(), finalSize1.x(), t),
+interpolate(startSize1.y(), finalSize1.y(), t));
 
-			cylinderRepresentation2->setSize(interpolate(startSize2.x(), endSize2.x(), t),
-interpolate(startSize2.y(), endSize2.y(), t));
+			cylinderRepresentation2->setSize(interpolate(startSize2.x(), finalSize2.x(), t),
+interpolate(startSize2.y(), finalSize2.y(), t));
 		}
 		else if(setterType == static_cast<int>(SetterTypeVector2d))
 		{
-			cylinder1Size.x() = interpolate(startSize1.x(), endSize1.x(), t);
-			cylinder1Size.y() = interpolate(startSize1.y(), endSize1.y(), t);
+			cylinder1Size.x() = interpolate(startSize1.x(), finalSize1.x(), t);
+			cylinder1Size.y() = interpolate(startSize1.y(), finalSize1.y(), t);
 			cylinderRepresentation1->setSize(cylinder1Size);
 
-			cylinder2Size.x() = interpolate(startSize2.x(), endSize2.x(), t);
-			cylinder2Size.y() = interpolate(startSize2.y(), endSize2.y(), t);
+			cylinder2Size.x() = interpolate(startSize2.x(), finalSize2.x(), t);
+			cylinder2Size.y() = interpolate(startSize2.y(), finalSize2.y(), t);
 			cylinderRepresentation2->setSize(cylinder2Size);
 		}
 		setterType = (setterType + 1) % BoxSetterTypeCount;
