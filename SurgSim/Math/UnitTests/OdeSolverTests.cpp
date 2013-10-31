@@ -68,10 +68,32 @@ TEST(OdeSolver, ConstructorTest)
 	MassPoint m;
 
 	ASSERT_NO_THROW({MockOdeSolver solver(&m);});
+	{
+		MockOdeSolver solver(&m);
+		EXPECT_EQ(3, solver.getCompliance().rows());
+		EXPECT_EQ(3, solver.getCompliance().cols());
+		EXPECT_EQ(3, solver.getSystemMatrix().rows());
+		EXPECT_EQ(3, solver.getSystemMatrix().cols());
+	}
 
 	ASSERT_NO_THROW({MockOdeSolver* solver = new MockOdeSolver(&m); delete solver;});
+	{
+		MockOdeSolver* solver = new MockOdeSolver(&m);
+		EXPECT_EQ(3, solver->getCompliance().rows());
+		EXPECT_EQ(3, solver->getCompliance().cols());
+		EXPECT_EQ(3, solver->getSystemMatrix().rows());
+		EXPECT_EQ(3, solver->getSystemMatrix().cols());
+		delete solver;
+	}
 
 	ASSERT_NO_THROW({std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m); });
+	{
+		std::shared_ptr<MockOdeSolver> solver = std::make_shared<MockOdeSolver>(&m);
+		EXPECT_EQ(3, solver->getCompliance().rows());
+		EXPECT_EQ(3, solver->getCompliance().cols());
+		EXPECT_EQ(3, solver->getSystemMatrix().rows());
+		EXPECT_EQ(3, solver->getSystemMatrix().cols());
+	}
 }
 
 TEST(OdeSolver, GetTest)

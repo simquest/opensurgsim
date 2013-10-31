@@ -18,39 +18,23 @@
 
 #include <gtest/gtest.h>
 
-#include<SurgSim/Blocks/MassSpring2DRepresentation.h>
-using SurgSim::Blocks::MassSpring2DRepresentation;
+#include <SurgSim/Blocks/MassSpring2DRepresentation.h>
+#include <SurgSim/Blocks/UnitTests/SpringTestUtils.h>
+#include <SurgSim/Physics/LinearSpring.h>
 
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include<SurgSim/Physics/LinearSpring.h>
-using SurgSim::Physics::DeformableRepresentationState;
+using SurgSim::Math::Vector3d;
 using SurgSim::Physics::LinearSpring;
-
-static void springTest(std::shared_ptr<LinearSpring> spring,
-	std::shared_ptr<DeformableRepresentationState> state,
-	unsigned int expectedNodeId0, unsigned int expectedNodeId1,
-	double expectedStiffness, double expectedDamping)
-{
-	EXPECT_DOUBLE_EQ(expectedStiffness, spring->getStiffness());
-	EXPECT_DOUBLE_EQ(expectedDamping, spring->getDamping());
-	EXPECT_EQ(expectedNodeId0, spring->getNodeId(0));
-	EXPECT_EQ(expectedNodeId1, spring->getNodeId(1));
-	Vector& x = state->getPositions();
-	Eigen::VectorBlock<Vector> x0 = SurgSim::Math::getSubVector(x, expectedNodeId0, 3);
-	Eigen::VectorBlock<Vector> x1 = SurgSim::Math::getSubVector(x, expectedNodeId1, 3);
-	EXPECT_DOUBLE_EQ((x1 - x0).norm(), spring->getRestLength());
-}
+using SurgSim::Blocks::MassSpring2DRepresentation;
+using SurgSim::Blocks::springTest;
 
 TEST(MassSpring2DRepresentationTests, init2DTest)
 {
-	using SurgSim::Math::Vector3d;
-
 	MassSpring2DRepresentation m("MassSpring2D");
 
 	std::array<std::array<Vector3d, 2>, 2> extremities =
 	{{
-		{{Vector3d::Random(), Vector3d::Random()}},
-		{{Vector3d::Random(), Vector3d::Random()}}
+		{{Vector3d(0.1, 0.2, 0.3), Vector3d(1.1, 1.2, 1.3)}},
+		{{Vector3d(10.1, 10.2, 10.4), Vector3d(9.5, 9.6, 9.3)}}
 	}};
 	unsigned int numNodesPerDim[2] = {10, 5};
 	std::vector<unsigned int> boundaryConditions;

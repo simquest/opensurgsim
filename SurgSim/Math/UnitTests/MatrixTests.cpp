@@ -97,7 +97,6 @@ typedef ::testing::Types<SurgSim::Math::Matrix22d,
 						 SurgSim::Math::Matrix44f> AllMatrixVariants;
 TYPED_TEST_CASE(AllMatrixTests, AllMatrixVariants);
 
-// This used to contain aligned (via Eigen::AutoAlign) matrix type aliases, but we got rid of those.
 typedef ::testing::Types<Eigen::MatrixXd,
 						 Eigen::MatrixXf,
 						 SurgSim::Math::Matrix> AllDynamicMatrixVariants;

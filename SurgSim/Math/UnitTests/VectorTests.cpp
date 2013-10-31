@@ -98,7 +98,6 @@ typedef ::testing::Types<SurgSim::Math::Vector2d,
 						 SurgSim::Math::Vector4f> AllVectorVariants;
 TYPED_TEST_CASE(AllVectorTests, AllVectorVariants);
 
-// This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<Eigen::VectorXd,
 						 Eigen::VectorXf,
 						 SurgSim::Math::Vector> AllDynamicVectorVariants;

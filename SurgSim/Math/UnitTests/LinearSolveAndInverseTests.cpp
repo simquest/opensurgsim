@@ -30,26 +30,38 @@ namespace Math
 namespace
 {
 	const int size = 10;
+	SurgSim::Math::Matrix gMatrix(size, size);
+	SurgSim::Math::Vector gVector(size);
+
+	void initializeMatrixVector()
+	{
+		for (size_t row = 0; row < size; row++)
+		{
+			for (size_t col = 0; col < size; col++)
+			{
+				gMatrix(row, col) = 1.47 * sqrt((static_cast<double>(row + 1))) + 8.3 * row * col - 0.24 * col + 13.24;
+			}
+			gVector(row) = -4.1 * row * row + 3.46;
+		}
+	}
 };
 
-template <class T>
-class LinearSolveAndInverseTests : public ::testing::Test
-{
-public:
-	LinearSolveAndInverseTests(){}
-};
 
-template <>
-class LinearSolveAndInverseTests<Matrix> : public ::testing::Test
+class LinearSolveAndInverseMatrixTests : public ::testing::Test
 {
 public:
-	LinearSolveAndInverseTests()
+	static void SetUpTestCase()
+	{
+		initializeMatrixVector();
+	}
+
+	LinearSolveAndInverseMatrixTests()
 	{
 		resize(&matrix, size, size, false);
-		matrix.setRandom();
+		matrix = gMatrix;
 		expectedInverse = matrix.inverse();
 		resize(&b, size);
-		b.setRandom();
+		b = gVector;
 		resize(&x, size);
 		expectedX = expectedInverse * b;
 	}
@@ -58,20 +70,23 @@ public:
 	Vector b;
 	Vector x, expectedX;
 };
-typedef LinearSolveAndInverseTests<Matrix> LinearSolveAndInverseMatrixTests;
 
-template <>
-class LinearSolveAndInverseTests<DiagonalMatrix> : public ::testing::Test
+class LinearSolveAndInverseDiagonalMatrixTests : public ::testing::Test
 {
 public:
-	LinearSolveAndInverseTests()
+	static void SetUpTestCase()
+	{
+		initializeMatrixVector();
+	}
+
+	LinearSolveAndInverseDiagonalMatrixTests()
 	{
 		resize(&matrix, size, size, false);
-		matrix.diagonal().setRandom();
+		matrix.diagonal() = gMatrix.diagonal();
 		denseMatrix = matrix;
 		expectedInverse = denseMatrix.inverse();
 		resize(&b, size);
-		b.setRandom();
+		b = gVector;
 		resize(&x, size);
 		expectedX = expectedInverse * b;
 	}
@@ -82,13 +97,16 @@ public:
 	Vector b;
 	Vector x, expectedX;
 };
-typedef LinearSolveAndInverseTests<DiagonalMatrix> LinearSolveAndInverseDiagonalMatrixTests;
 
-template <>
-class LinearSolveAndInverseTests<Eigen::SparseMatrix<double,Eigen::ColMajor>> : public ::testing::Test
+class LinearSolveAndInverseSparseMatrixTests : public ::testing::Test
 {
 public:
-	LinearSolveAndInverseTests() : matrix(size, size)
+	static void SetUpTestCase()
+	{
+		initializeMatrixVector();
+	}
+
+	LinearSolveAndInverseSparseMatrixTests() : matrix(size, size)
 	{
 		std::vector<Eigen::Triplet<double>> coefficients; // list of non-zeros coefficients
 		coefficients.reserve(size + size-1+ size-1); // Tri diagonal matrix structure
@@ -109,7 +127,7 @@ public:
 		denseMatrix = matrix;
 		expectedInverse = denseMatrix.inverse();
 		resize(&b, size);
-		b.setRandom();
+		b = gVector;
 		resize(&x, size);
 		expectedX = expectedInverse * b;
 	}
@@ -120,7 +138,6 @@ public:
 	Vector b;
 	Vector x, expectedX;
 };
-typedef LinearSolveAndInverseTests<Eigen::SparseMatrix<double,Eigen::ColMajor>> LinearSolveAndInverseSparseMatrixTests;
 
 TEST_F(LinearSolveAndInverseDiagonalMatrixTests, solve)
 {

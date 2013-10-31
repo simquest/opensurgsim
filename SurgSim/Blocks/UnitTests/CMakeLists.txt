@@ -27,12 +27,14 @@ set(UNIT_TEST_SOURCES
 	MassSpring2DRepresentationTests.cpp
 	MassSpring3DRepresentationTests.cpp
 	MassSpringNDRepresentationUtilsTests.cpp
+	SpringTestUtils.cpp
 	TransferDeformableStateToVerticesBehaviorTests.cpp
 	TransferPoseBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
+	SpringTestUtils.h
 )
 
 set(LIBS SurgSimBlocks SurgSimFramework SurgSimPhysics SurgSimGraphics gtest
