@@ -104,7 +104,8 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 	return angleAxis.angle();
 }
 
-/// Makes view matrix from eye, center and up vectors.
+/// Makes view matrix from eye, center and up vectors. Use the formula from
+/// http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
 /// \tparam	typename T	T the numeric data type used for arguments and the return value. Can usually be deduced.
 /// \tparam	int VOpt  	VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
 /// \param	eye   	The eyepoint of the camera.
@@ -116,15 +117,15 @@ inline Eigen::Matrix<T, 4, 4> makeViewMatrix(const Eigen::Matrix<T, 3, 1, VOpt>&
 											 const Eigen::Matrix<T, 3, 1, VOpt>& center,
 											 const Eigen::Matrix<T, 3, 1, VOpt>& up)
 {
-	Eigen::Matrix<T, 3, 1, VOpt> f = (center - eye).normalized();
-	Eigen::Matrix<T, 3, 1, VOpt> s = (f.cross(up)).normalized();
-	Eigen::Matrix<T, 3, 1, VOpt> u = s.cross(f).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> forward = (center - eye).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> side = (forward.cross(up)).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> actualUp = side.cross(forward).normalized();
 
 	Eigen::Matrix<T, 4, 4> rotation;
-	rotation << s[0],  s[1],  s[2], 0.0,
-		        u[0],  u[1],  u[2], 0.0, 
-		       -f[0], -f[1], -f[2], 0.0,
-		         0.0,   0.0,   0.0, 1.0;  
+	rotation <<     side[0],      side[1],      side[2], 0.0,
+		        actualUp[0],  actualUp[1],  actualUp[2], 0.0, 
+		        -forward[0],  -forward[1],  -forward[2], 0.0,
+		                0.0,          0.0,          0.0, 1.0;  
 
 	Eigen::Matrix<T, 4, 4> translation;
 	translation << 1.0, 0.0, 0.0, -eye.x(),

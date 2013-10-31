@@ -575,12 +575,12 @@ TYPED_TEST(Matrix44Tests, MakeLookAt)
 	typedef Eigen::Matrix<T, 3, 1> Vector3;
 	typedef Eigen::Matrix<T, 4, 1> Vector4;
 
-	Vector3 origin(0,0,0);
-	Vector3 eye(10,10,10);
-	Vector3 up(0,1,0);
+	Vector3 origin(0.0, 0.0, 0.0);
+	Vector3 eye(10.0, 10.0, 10.0);
+	Vector3 up(0.0, 1.0, 0.0);
 
-	Vector4 point4(10,10,10, 1.0);
-	Vector4 origin4( 0.0, 0.0, 0.0, 1.0);
+	Vector4 point4(10.0, 10.0, 10.0, 1.0);
+	Vector4 origin4(0.0, 0.0, 0.0, 1.0);
 
 	Matrix matrix = SurgSim::Math::makeViewMatrix(eye, origin, up);
 
