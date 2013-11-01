@@ -52,11 +52,11 @@ public:
 	OsgScreenSpaceQuadRepresentation(const std::string& name, std::shared_ptr<View> view);
 	~OsgScreenSpaceQuadRepresentation();
 
-	/// Sets a location in screen space.
+	/// Sets the location in screen space.
 	/// \param	x,y	The x and y coordinates.
 	virtual void setLocation(double x, double y);
 
-	/// Gets a location in screen space.
+	/// Gets the location in screen space.
 	/// \param [out]	x,y	If non-null the x and y coordinates. Throws exception otherwise.
 	virtual void getLocation(double* x, double* y);
 

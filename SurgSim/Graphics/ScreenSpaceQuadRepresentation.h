@@ -45,12 +45,12 @@ public:
 
 	}
 
-	/// Sets a location in screen space.
+	/// Sets the location in screen space.
 	/// \param	x,y	The x and y coordinates.
 	virtual void setLocation(double x, double y) = 0;
 
-	/// Gets a location in screen space.
-	/// \param [out]	x,y	If non-null the x and y coordinates.
+	/// Gets the location in screen space.
+	/// \param [out]	x,y	If non-null the x and y coordinates, may throw if null is passed.
 	virtual void getLocation(double* x, double* y) = 0;
 
 	/// Sets the size for the quad in screen coordinates.
@@ -59,8 +59,8 @@ public:
 	virtual void setSize(double width, double height) = 0;
 
 	/// Gets the size of the quad.
-	/// \param [out]	width 	If non-null, the width.
-	/// \param [out]	height	If non-null, the height.
+	/// \param [out]	width 	If non-null, the width, may throw if null is passed.
+	/// \param [out]	height	If non-null, the height, may throw if null is passed.
 	virtual void getSize(double* width, double* height) const = 0;
 
 	/// Sets a Texture for this quad, this should replace a current texture, this is a convenience function and
