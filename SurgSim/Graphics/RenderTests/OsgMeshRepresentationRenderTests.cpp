@@ -43,6 +43,8 @@
 #include <SurgSim/Graphics/RenderTests/RenderTest.h>
 #include <SurgSim/Graphics/RenderTests/TestCube.h>
 
+
+
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Vector2d;
@@ -53,7 +55,6 @@ using SurgSim::Math::makeRotationQuaternion;
 
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
-using SurgSim::Testing::makeRigidTransformFromAngles;
 
 #include <SurgSim/Framework/SceneElement.h>
 #include <SurgSim/Framework/Behavior.h>
@@ -167,18 +168,18 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 	Interpolator interpolator;
 
 	interpolator.first.transform =
-		makeRigidTransformFromAngles(Vector3d(0.0, 0.0, 0.0), Vector3d(-0.1, 0.0, -0.2));
+		makeRigidTransform(makeRotationQuaternion(0.0,Vector3d(1.0,1.0,1.0)), Vector3d(-0.1, 0.0, -0.2));
 	interpolator.first.scale = 0.001;
 	interpolator.second.transform =
-		makeRigidTransformFromAngles(Vector3d(M_PI_4, M_PI_4, M_PI_4), Vector3d(0.1, 0.0, -0.2));
+		makeRigidTransform(makeRotationQuaternion(M_PI_2,Vector3d(1.0,-1.0,1.0)), Vector3d(0.1, 0.0, -0.2));
 	interpolator.second.scale = 0.03;
 	interpolators.push_back(interpolator);
 
 	interpolator.first.transform =
-		makeRigidTransformFromAngles(Vector3d(-M_PI_2, -M_PI_2, -M_PI_2), Vector3d(0.0, -0.1, -0.2));
+		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0,-1.0,0.0)), Vector3d(0.0, -0.1, -0.2));
 	interpolator.first.scale = 0.001;
 	interpolator.second.transform =
-		makeRigidTransformFromAngles(Vector3d(M_PI_2, M_PI_2, M_PI_2), Vector3d(0.0, 0.1, -0.2));
+		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0,1.0,0.0)), Vector3d(0.0, 0.1, -0.2));
 	interpolator.second.scale = 0.03;
 	interpolators.push_back(interpolator);
 
