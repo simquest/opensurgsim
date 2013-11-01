@@ -44,11 +44,12 @@ public:
 	}
 
 	/// Sets vector field
-	/// \param	vertices	A vector field contains a list of vertices in 3D space
+	/// \param	vectorField	A vector field contains a list of vertices in 3D space
+	/// \return True if update is successfully; Otherwise, false;
 	/// \note Each vertex is associated with a vector and an optional color
-	virtual void setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) = 0;
+	virtual bool setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vectorField) = 0;
 	/// Gets the vector field
-	/// \return A vector field
+	/// \return The vector field
 	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const = 0;
 
 	/// Sets vector line width
@@ -57,8 +58,21 @@ public:
 	/// Gets line width
 	/// \return	The line width
 	virtual double getLineWidth() const = 0;
-};
 
+	/// Sets the scale to be applied to all vectors
+	/// \param scale The scale
+	virtual void setScale(double scale) = 0;
+	/// Gets the scale applied to all vectors
+	/// \return The scale
+	virtual double getScale() const = 0;
+
+	/// Sets the size of point indicating the starting of vector
+	/// \param size	Size of starting point of a vector
+	virtual void setPointSize(double size) = 0;
+	/// Gets the size of starting point of a vector
+	/// \return The size of starting point of a vector
+	virtual	double getPointSize() const = 0;
+};
 
 }; // Graphics
 }; // SurgSim

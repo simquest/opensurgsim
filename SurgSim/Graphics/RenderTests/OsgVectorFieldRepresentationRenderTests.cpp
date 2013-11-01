@@ -16,7 +16,6 @@
 /// Render Tests for the OsgVectorFieldRepresentation class.
 
 #include <SurgSim/DataStructures/Vertex.h>
-#include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Graphics/RenderTests/RenderTest.h>
 #include <SurgSim/Graphics/VectorField.h>
 #include <SurgSim/Graphics/VectorFieldRepresentation.h>
@@ -27,7 +26,6 @@
 #include <SurgSim/Testing/MathUtilities.h>
 
 using SurgSim::DataStructures::Vertex;
-using SurgSim::DataStructures::Vertices;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorFieldRepresentation;
 using SurgSim::Math::Vector3d;
@@ -40,7 +38,7 @@ struct OsgVectorFieldRepresentationRenderTests : public SurgSim::Graphics::Rende
 {
 protected:
 	// A point is a location (X,Y,Z) in 3D space
-	std::vector<Vector3d> makePoints()
+	std::vector<Vector3d> makeStartingPoints()
 	{
 		std::vector<Vector3d> points(8);
 		points[0] = Vector3d(1.0, 0.0, 0.0);
@@ -55,7 +53,7 @@ protected:
 		return points;
 	}
 
-	std::vector<Vector3d> makePoints2()
+	std::vector<Vector3d> makeEndingPoints()
 	{
 		std::vector<Vector3d> points(8);
 		points[0] = Vector3d(1.0, 1.0, 0.0);
@@ -71,7 +69,7 @@ protected:
 	}
 
 	// Color is represented as (R, G, B, alpha)
-	std::vector<Vector4d> makeColors()
+	std::vector<Vector4d> makeStartingColors()
 	{
 		std::vector<Vector4d> colors(8);
 		colors[0] = Vector4d(1.0, 0.0, 0.0, 0.0);
@@ -86,7 +84,7 @@ protected:
 		return colors;
 	}
 
-	std::vector<Vector4d> makeColors2()
+	std::vector<Vector4d> makeEndingColors()
 	{
 		std::vector<Vector4d> colors(8);
 		colors[0] = Vector4d(0.0, 1.0, 0.0, 0.0);
@@ -107,13 +105,13 @@ protected:
 		std::vector<SurgSim::Graphics::VectorFieldData> vecs(8);
 		for (auto i = 0; i < 8; ++i)
 		{
-			vecs[i].vectorDirection.setValue(points[i]);
-			vecs[i].vectorColor.setValue(colors[i]);
+			vecs[i].direction = points[i];
+			vecs[i].color.setValue(colors[i]);
 		}
 		return vecs;
 	}
 
-	std::shared_ptr< SurgSim::Graphics::VectorField>
+	std::shared_ptr< SurgSim::Graphics::VectorField >
 		makeVectorField(const std::vector<Vector3d>& points,
 						const std::vector<SurgSim::Graphics::VectorFieldData>& vectors)
 	{
@@ -132,13 +130,8 @@ protected:
 
 TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 {
-	/* points: locations to draw vectors
-	   vectors: A list of vectors associated with optional color information
-	   colors: A list of colors (SurgSim::Math::Vector4d)
-	   vertices: A Vector Field object
-	*/
-	auto points = makePoints();
-	auto colors = makeColors();
+	auto points = makeStartingPoints();
+	auto colors = makeStartingColors();
 	auto vectors = makeVectors(points, colors);
 	auto vertices = makeVectorField(points, vectors);
 
@@ -166,17 +159,20 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, LineWidth)
 	}
 }
 
-TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingLocations)
+TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectorField)
 {
-	auto startPoints = makePoints();
-	auto endPoints = makePoints2();
-	auto colors = makeColors();
-	auto vectors = makeVectors(startPoints, colors);
-	auto vertices = makeVectorField(startPoints, vectors);
+	auto startPoints = makeStartingPoints();
+	auto endPoints = makeEndingPoints();
 
-	auto vectorRepresentation =
-		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
+	auto startColors = makeStartingColors();
+	auto endColors = makeStartingColors();
 
+	auto startVectors = makeVectors(startPoints, startColors);
+	auto endVectors = makeVectors(endPoints, endColors);
+
+	auto vertices = makeVectorField(startPoints, endVectors);
+
+	auto vectorRepresentation =	std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
 	vectorRepresentation->setVectorField(vertices);
 	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 
@@ -186,91 +182,17 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingLocations)
 	EXPECT_TRUE(viewElement->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	std::vector<Vector3d> points(8);
+	auto & vertexList = vertices->getVertices();
 	int numSteps = 100;
-	// Vary locations to draw the vector as time changes
 	for (int i = 0; i < numSteps; ++i)
 	{
 		double t = static_cast<double>(i) / numSteps;
 		for (int j = 0; j < 8; ++j)
 		{
-			points[j] = interpolate(startPoints[j], endPoints[j], t);
+			vertexList[j].position = interpolate(startPoints[j], endPoints[j], t);
+			vertexList[j].data.direction = interpolate(endVectors[j].direction, startVectors[j].direction, t);
+			vertexList[j].data.color.setValue(interpolate(startColors[j], endColors[j], t));
 		}
-		auto newVertices = makeVectorField(points, vectors);
-		vectorRepresentation->setVectorField(newVertices);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
-
-TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingVectors)
-{
-	auto points = makePoints();
-	auto startVectors= makePoints();
-	auto endVectors = makePoints2();
-	auto colors = makeColors();
-	auto vectors = makeVectors(startVectors, colors);
-	auto vertices = makeVectorField(points, vectors);
-
-	auto vectorRepresentation =
-		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
-	vectorRepresentation->setVectorField(vertices);
-	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
-
-	viewElement->addComponent(vectorRepresentation);
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	std::vector<Vector3d> vecs(8);
-	int numSteps = 100;
-	// Vary vector directions as time changes
-	for (int i = 0; i < numSteps; ++i)
-	{
-		double t = static_cast<double>(i) / numSteps;
-		for (int j = 0; j < 8; ++j)
-		{
-			vecs[j] = interpolate(startVectors[j], endVectors[j], t);
-		}
-		auto newVectors = makeVectors(vecs, colors);
-		auto newVertices = makeVectorField(points, newVectors);
-		vectorRepresentation->setVectorField(newVertices);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
-
-TEST_F(OsgVectorFieldRepresentationRenderTests, ChangingColors)
-{
-	auto points = makePoints();
-	auto startColors= makeColors();
-	auto endColors= makeColors2();
-	auto vectors = makeVectors(points, startColors);
-	auto vertices = makeVectorField(points, vectors);
-
-	auto vectorRepresentation =
-		std::make_shared<OsgVectorFieldRepresentation>("vector field representation");
-	vectorRepresentation->setVectorField(vertices);
-	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
-
-	viewElement->addComponent(vectorRepresentation);
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	std::vector<Vector4d> colors(8);
-	int numSteps = 100;
-	// Vary colors as time changes
-	for (int i = 0; i < numSteps; ++i)
-	{
-		double t = static_cast<double>(i) / numSteps;
-		for (int j = 0; j < 8; ++j)
-		{
-			colors[j] = interpolate(startColors[j], endColors[j], t);
-		}
-		auto newVectors = makeVectors(points, colors);
-		auto newVertices = makeVectorField(points, newVectors);
-		vectorRepresentation->setVectorField(newVertices);
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(5000 / numSteps));
 	}
 }

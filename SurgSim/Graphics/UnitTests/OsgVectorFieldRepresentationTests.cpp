@@ -28,7 +28,6 @@ namespace
 };
 
 using SurgSim::DataStructures::Vertex;
-using SurgSim::DataStructures::Vertices;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;
 using SurgSim::Graphics::VectorFieldRepresentation;
 using SurgSim::Math::Vector3d;
@@ -64,23 +63,25 @@ TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 	std::vector<SurgSim::Graphics::VectorFieldData> vectors(8);
 	for (auto i = 0; i < 8; ++i)
 	{
-		vectors[i].vectorDirection.setValue(points[i]);
-		vectors[i].vectorColor.setValue(colors[i]);
+		vectors[i].direction = points[i];
+		vectors[i].color.setValue(colors[i]);
 	}
 
-	// Associate vectors to points (locations in 3D space)
-	auto vertices = std::make_shared<SurgSim::Graphics::VectorField>();
+	// Associate vectors to points, i.e. locations in 3D space
+	auto vectorField = std::make_shared<SurgSim::Graphics::VectorField>();
 	auto it = std::begin(points);
 	auto v = std::begin(vectors);
 	for (; it != std::end(points); ++it, ++v)
 	{
-		vertices->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
+		vectorField->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
 	}
 
 	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
-	vectorFieldRepresentation->setVectorField(vertices);
-	EXPECT_EQ(vertices, vectorFieldRepresentation->getVectorField());
+	EXPECT_TRUE(vectorFieldRepresentation->setVectorField(vectorField));
+	vectorFieldRepresentation->wakeUp();
+	EXPECT_FALSE(vectorFieldRepresentation->setVectorField(vectorField));
+	EXPECT_EQ(vectorField, vectorFieldRepresentation->getVectorField());
 }
 
 TEST(OsgVectorFieldRepresentationTests, LineWidthTest)
@@ -89,4 +90,20 @@ TEST(OsgVectorFieldRepresentationTests, LineWidthTest)
 		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
 	vectorFieldRepresentation->setLineWidth(1.25);
 	EXPECT_NEAR(1.25, vectorFieldRepresentation->getLineWidth(), epsilon);
+}
+
+TEST(OsgVectorFieldRepresentationTests, ScaleTest)
+{
+	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
+		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
+	vectorFieldRepresentation->setScale(1.25);
+	EXPECT_NEAR(1.25, vectorFieldRepresentation->getScale(), epsilon);
+}
+
+TEST(OsgVectorFieldRepresentationTests, PointSizeTest)
+{
+	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
+		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
+	vectorFieldRepresentation->setPointSize(1.25);
+	EXPECT_NEAR(1.25, vectorFieldRepresentation->getPointSize(), epsilon);
 }

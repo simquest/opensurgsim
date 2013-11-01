@@ -20,11 +20,8 @@
 #include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/Math/Vector.h>
 
-#include <memory>
-
 namespace SurgSim
 {
-
 namespace Graphics
 {
 
@@ -32,32 +29,36 @@ namespace Graphics
 struct VectorFieldData
 {
 	/// Direction (X,Y,Z) of the vector
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> vectorDirection;
-	/// Color (R,G,B,alpha) of the vector
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> vectorColor;
+	SurgSim::Math::Vector3d direction;
+	/// Color (R,G,B,alpha) of the vector (Optional)
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> color;
 
-	/// Compare the vectors and return true if equal, false if not equal.
-	/// \return True if vertex1 and vertex2 have the same value; Otherwise, false.
-	friend bool operator==(const VectorFieldData& vertex1, const VectorFieldData& vertex2)
+	/// Compare the vectors and return true if equal; Othwise, false.
+	/// \return True if vector1 and vector2 have the same value; Otherwise, false.
+	friend bool operator==(const VectorFieldData& vector1, const VectorFieldData& vector2)
 	{
-		return vertex1.vectorDirection.hasValue() && vertex2.vectorDirection.hasValue() &&
-			   vertex1.vectorColor.hasValue() && vertex2.vectorColor.hasValue() &&
-			   vertex1.vectorDirection.getValue() == vertex2.vectorDirection.getValue() &&
-			   vertex1.vectorColor.getValue() == vertex2.vectorColor.getValue();
+		if (vector1.color.hasValue() && vector2.color.hasValue())
+		{
+			return vector1.direction == vector2.direction &&
+				   vector1.color.getValue() == vector2.color.getValue();
+		}
+		else
+		{
+			return vector1.direction == vector2.direction;
+		}
 	}
 
 	/// Compare the vectors and return true if not equal, false if equal.
-	/// \return True if vertex1 and vertex2 have different values; Otherwise, false.
-	friend bool operator!=(const VectorFieldData& vertex1, const VectorFieldData& vertex2)
+	/// \return True if vector1 and vector2 have different values; Otherwise, false.
+	friend bool operator!=(const VectorFieldData& vector1, const VectorFieldData& vector2)
 	{
-		return ! (vertex1 == vertex2);
+		return ! (vector1 == vector2);
 	}
 };
 
 typedef SurgSim::DataStructures::Vertices<VectorFieldData> VectorField;
 
 };  // namespace Graphics
-
 };  // namespace SurgSim
 
 #endif  // SURGSIM_GRAPHICS_VECTORFIELD_H

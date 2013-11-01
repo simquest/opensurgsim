@@ -19,9 +19,10 @@
 #include <SurgSim/Graphics/OsgRepresentation.h>
 #include <SurgSim/Graphics/VectorFieldRepresentation.h>
 
-#include <osg/Geometry>
 #include <osg/Array>
+#include <osg/Geometry>
 #include <osg/LineWidth>
+#include <osg/Point>
 
 namespace SurgSim
 {
@@ -43,11 +44,12 @@ public:
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
-	/// Sets vector filed.
-	/// \param	vertices	A vector field contains a list of vertices in 3D space.
+	/// Sets vector field.
+	/// \param	vectorField	A vector field contains a list of vertices in 3D space.
+	/// \return True if update is successfully; Otherwise, false;
 	/// Each vertex is associated with a vector and an optional color.
-	virtual void setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vertices) override;
-	/// Gets a vector field
+	virtual bool setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vectorField) override;
+	/// Gets the vector field
 	/// \return The vector field
 	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
 
@@ -60,31 +62,47 @@ public:
 
 	/// Sets the scale to be applied to all vectors
 	/// \param scale The scale
-	void setScale(double scale);
+	virtual void setScale(double scale) override;
 	/// Gets the scale applied to all vectors
 	/// \return The scale
-	double getScale() const;
+	virtual double getScale() const override;
+
+	/// Sets the size of point indicating the starting of vector
+	/// \param size	Size of starting point of a vector
+	virtual void setPointSize(double size);
+	/// Gets the size of starting point of a vector
+	/// \return The size of starting point of a vector
+	virtual	double getPointSize() const;
 
 	/// Executes the update operation
-	/// \param	dt	The time step 
+	/// \param	dt	The time step
 	virtual void doUpdate(double dt) override;
 
 private:
 	/// Vector Field holds a list of vertices/points (X,Y,Z) in 3D space
 	/// Each point is associated with a vector and an optional color
-	std::shared_ptr< SurgSim::Graphics::VectorField > m_vertices;
+	std::shared_ptr< SurgSim::Graphics::VectorField > m_vectorField;
 
 	/// OSG vertex data structure
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;
 
-	/// OSG::Geometry node holding OSG vertex
+	/// OSG::Geometry node holding OSG representation of vectors
 	osg::ref_ptr<osg::Geometry> m_lineGeometry;
+	/// OSG::Geometry node holding OSG representation of vector starting points
+	osg::ref_ptr<osg::Geometry> m_pointGeometry;
 
-	/// OSG::DrawArrays specifying how vertices wiil be drawn
+	/// OSG::DrawArrays specifying how vectors wiil be drawn
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
+	/// OSG::DrawElementUInt specifying how vector starting points wiil be drawn
+	osg::ref_ptr<osg::DrawElementsUInt> m_drawPoints;
 
 	/// OSG::LineWidth for representing vector
 	osg::ref_ptr<osg::LineWidth> m_line;
+	/// OSG::Point for representing vector starting point
+	osg::ref_ptr<osg::Point> m_point;
+
+	/// OSG::Vec4Array to hold color for each vector
+	osg::ref_ptr<osg::Vec4Array> m_colors;
 
 	/// A scale to scale the length of vector
 	double m_scale;
@@ -96,6 +114,5 @@ private:
 
 }; // Graphics
 }; // SurgSim
-
 
 #endif // SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
