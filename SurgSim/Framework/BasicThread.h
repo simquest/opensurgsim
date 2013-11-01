@@ -99,6 +99,8 @@ public:
 	/// and then wait for the startup barrier to wake it up again.
 	/// \param	val	if true the thread will need to be controlled via the barrier.
 	/// \return the actual value of isSynchronous()
+	/// \note HS-2013-nov-01 Currently mostly for use in unit tests and debugging, when multiple thread with differing
+	/// 	  rates are being synchronized the call rates will not correspond to the expected rates.
 	bool setSynchronous(bool val);
 
 	/// Query if this object is synchronized.
