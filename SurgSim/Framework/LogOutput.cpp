@@ -54,7 +54,7 @@ bool SurgSim::Framework::FileOutput::writeMessage(const std::string& message)
 }
 
 
-StreamOutput::StreamOutput(std::ostream& ostream) : m_stream(ostream)
+StreamOutput::StreamOutput(std::ostream& ostream) : m_stream(ostream) //NOLINT
 {
 }
 

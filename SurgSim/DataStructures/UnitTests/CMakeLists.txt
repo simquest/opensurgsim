@@ -22,8 +22,8 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	DataGroupTests.cpp
 	IndexDirectoryTests.cpp
-	MeshTest.cpp
 	MeshElementTest.cpp
+	MeshTest.cpp
 	MeshVertexTest.cpp
 	NamedDataTests.cpp
 	NamedVariantDataTests.cpp
@@ -42,3 +42,6 @@ include_directories(
 set(LIBS SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimDataStructuresTest)
+
+# Put SurgSimDataStructuresTest into folder "DataStructure"
+set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructure")

@@ -58,3 +58,6 @@ add_executable(RawMultiAxisVisualTest
 surgsim_show_ide_folders(
 	"${RAW_EXAMPLE_SOURCES}" "${RAW_EXAMPLE_HEADERS}")
 target_link_libraries(RawMultiAxisVisualTest ${LIBS})
+
+# Put RawMultiAxisVisualTest into folder "Devices"
+set_target_properties(RawMultiAxisVisualTest PROPERTIES FOLDER "Devices")

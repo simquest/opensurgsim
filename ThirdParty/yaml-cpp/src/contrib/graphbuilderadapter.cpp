@@ -28,7 +28,7 @@ namespace YAML
     DispositionNode(pNode);
   }
   
-  void GraphBuilderAdapter::OnSequenceStart(const Mark& mark, const std::string& tag, anchor_t anchor)
+  void GraphBuilderAdapter::OnSequenceStart(const Mark& mark, const std::string& tag, anchor_t anchor, YAML::EMITTER_STYLE)
   {
     void *pNode = m_builder.NewSequence(mark, tag, GetCurrentParent());
     m_containers.push(ContainerFrame(pNode));
@@ -43,7 +43,7 @@ namespace YAML
     DispositionNode(pSequence);
   }
   
-  void GraphBuilderAdapter::OnMapStart(const Mark& mark, const std::string& tag, anchor_t anchor)
+  void GraphBuilderAdapter::OnMapStart(const Mark& mark, const std::string& tag, anchor_t anchor, const YAML::EMITTER_STYLE)
   {
     void *pNode = m_builder.NewMap(mark, tag, GetCurrentParent());
     m_containers.push(ContainerFrame(pNode, m_pKeyNode));

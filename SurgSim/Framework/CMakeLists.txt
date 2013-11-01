@@ -80,3 +80,7 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+
+# Put SurgSimFramework into folder "Framework"
+set_target_properties(SurgSimFramework PROPERTIES FOLDER "Framework")

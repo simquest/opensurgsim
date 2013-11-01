@@ -507,7 +507,8 @@ typedef LockedContainer<BigData> SharedData;
 class DataWriter
 {
 public:
-	explicit DataWriter(SharedData& data, int start = 0, int step = 1, int loops = 100000) :
+	/// data parameter to be passed by non-const reference on purpose.
+	explicit DataWriter(SharedData& data, int start = 0, int step = 1, int loops = 100000) : //NOLINT
 		m_data(data),
 		m_start(start),
 		m_step(step),

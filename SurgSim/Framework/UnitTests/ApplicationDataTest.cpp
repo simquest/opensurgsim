@@ -164,6 +164,17 @@ TEST (ApplicationDataTest, FindFileTest)
 	EXPECT_EQ("", data.findFile("missingFile.txt"));
 }
 
+
+TEST (ApplicationDataTest, DirectorywithSpaceTest)
+{
+	ASSERT_TRUE(boost::filesystem::exists("Data"));
+
+	std::string path = "Data/ApplicationDataTest/Test Directory/uniqueFile.txt";
+	ApplicationData data (path);
+
+	EXPECT_TRUE(fileIsFoundCorrectly(data,"uniqueFile.txt","Test Directory"));
+}
+
 // We don't accept anything that contains backslashes ...
 TEST (ApplicationDataTest, MessedUpSlashesTest)
 {

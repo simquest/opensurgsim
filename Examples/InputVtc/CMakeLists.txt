@@ -55,3 +55,6 @@ endif()
 target_link_libraries(ExampleInputVtc
 	${LIBS}
 )
+
+# Put ExampleInputVtc into folder "Examples"
+set_target_properties(ExampleInputVtc PROPERTIES FOLDER "Examples") 

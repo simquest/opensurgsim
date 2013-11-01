@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <SurgSim/Framework/Assert.h>
+
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 
 namespace SurgSim
@@ -21,7 +23,8 @@ namespace SurgSim
 namespace Physics
 {
 
-DeformableRepresentationState::DeformableRepresentationState()
+DeformableRepresentationState::DeformableRepresentationState() :
+	m_numDofPerNode(0u), m_numNodes(0u)
 {
 }
 
@@ -31,7 +34,7 @@ DeformableRepresentationState::~DeformableRepresentationState()
 
 bool DeformableRepresentationState::operator ==(const DeformableRepresentationState& state) const
 {
-	return m_x == state.m_x && m_v == state.m_v;
+	return m_x == state.m_x && m_v == state.m_v && m_boundaryConditionsPerDof == state.m_boundaryConditionsPerDof;
 }
 
 bool DeformableRepresentationState::operator !=(const DeformableRepresentationState& state) const
@@ -43,37 +46,109 @@ void DeformableRepresentationState::reset()
 {
 	m_x.setZero();
 	m_v.setZero();
+	m_a.setZero();
+	m_boundaryConditionsPerDof.setConstant(false);
+	m_boundaryConditionsAsDofIds.clear();
 }
 
-void DeformableRepresentationState::allocate(unsigned int numDof)
+void DeformableRepresentationState::setNumDof(unsigned int numDofPerNode, unsigned int numNodes)
 {
+	const unsigned int numDof = numDofPerNode * numNodes;
+
+	m_numDofPerNode = numDofPerNode;
+	m_numNodes = numNodes;
+
 	m_x.resize(numDof);
 	m_v.resize(numDof);
+	m_a.resize(numDof);
+	m_boundaryConditionsPerDof.resize(numDof);
+
+	// Zero-out everything
+	reset();
 }
 
 unsigned int DeformableRepresentationState::getNumDof() const
 {
-	return static_cast<unsigned int>(m_x.size());
+	const unsigned int numDof = m_numDofPerNode * m_numNodes;
+
+	SURGSIM_ASSERT(m_x.size() == m_v.size() && m_x.size() == m_a.size() &&
+		m_x.size() == m_boundaryConditionsPerDof.size() && m_x.size() == static_cast<int>(numDof));
+
+	return numDof;
 }
 
-Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& DeformableRepresentationState::getPositions()
+unsigned int DeformableRepresentationState::getNumNodes() const
+{
+	return m_numNodes;
+}
+
+SurgSim::Math::Vector& DeformableRepresentationState::getPositions()
 {
 	return m_x;
 }
 
-const Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& DeformableRepresentationState::getPositions() const
+const SurgSim::Math::Vector& DeformableRepresentationState::getPositions() const
 {
 	return m_x;
 }
 
-Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& DeformableRepresentationState::getVelocities()
+const SurgSim::Math::Vector3d DeformableRepresentationState::getPosition(unsigned int nodeId) const
+{
+	return SurgSim::Math::getSubVector(m_x, nodeId, m_numDofPerNode);
+}
+
+SurgSim::Math::Vector& DeformableRepresentationState::getVelocities()
 {
 	return m_v;
 }
 
-const Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign>& DeformableRepresentationState::getVelocities() const
+const SurgSim::Math::Vector& DeformableRepresentationState::getVelocities() const
 {
 	return m_v;
+}
+
+const SurgSim::Math::Vector3d DeformableRepresentationState::getVelocity(unsigned int nodeId) const
+{
+	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode);
+}
+
+SurgSim::Math::Vector& DeformableRepresentationState::getAccelerations()
+{
+	return m_a;
+}
+
+const SurgSim::Math::Vector& DeformableRepresentationState::getAccelerations() const
+{
+	return m_a;
+}
+
+const SurgSim::Math::Vector3d DeformableRepresentationState::getAcceleration(unsigned int nodeId) const
+{
+	return SurgSim::Math::getSubVector(m_a, nodeId, m_numDofPerNode);
+}
+
+void DeformableRepresentationState::addBoundaryCondition(unsigned int dof)
+{
+	if (! m_boundaryConditionsPerDof[dof])
+	{
+		m_boundaryConditionsPerDof[dof] = true;
+		m_boundaryConditionsAsDofIds.push_back(dof);
+	}
+}
+
+unsigned int DeformableRepresentationState::getNumBoundaryConditions() const
+{
+	return m_boundaryConditionsAsDofIds.size();
+}
+
+const std::vector<unsigned int>& DeformableRepresentationState::getBoundaryConditions() const
+{
+	return m_boundaryConditionsAsDofIds;
+}
+
+bool DeformableRepresentationState::isBoundaryCondition(unsigned int dof) const
+{
+	return m_boundaryConditionsPerDof[dof];
 }
 
 }; // namespace Physics

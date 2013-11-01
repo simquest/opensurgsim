@@ -35,6 +35,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
+	OsgSceneryRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
 	OsgTexture.cpp
@@ -70,8 +71,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgConversions.h
 	OsgCylinderRepresentation.h
 	OsgGroup.h
-	OsgLog.h
 	OsgLight.h
+	OsgLog.h
 	OsgManager.h
 	OsgMaterial.h
 	OsgMatrixConversions.h
@@ -85,6 +86,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
 	OsgScreenSpaceQuadRepresentation.h
+	OsgSceneryRepresentation.h
 	OsgShader.h
 	OsgSphereRepresentation.h
 	OsgTexture.h
@@ -112,6 +114,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	PointCloudRepresentation.h
 	RenderTarget.h
 	Representation.h
+	SceneryRepresentation.h
 	ScreenSpaceQuadRepresentation.h
 	Shader.h
 	SphereRepresentation.h
@@ -143,3 +146,6 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 	add_subdirectory(RenderTests)
 endif()
+
+# Put SurgSimGraphics into folder "Graphics"
+set_target_properties(SurgSimGraphics PROPERTIES FOLDER "Graphics")

@@ -38,3 +38,6 @@ option(SURGSIM_TESTS_RUN_DEVICE_PHANTOM
 	OFF)
 surgsim_add_unit_tests(PhantomDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_PHANTOM})
+
+# Put PhantomDeviceTest into folder "Devices"
+set_target_properties(PhantomDeviceTest PROPERTIES FOLDER "Devices")

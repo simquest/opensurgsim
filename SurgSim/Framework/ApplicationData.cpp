@@ -47,7 +47,7 @@ ApplicationData::ApplicationData(const std::string& configurationFileName)
 	std::string line;
 	while (! in.eof())
 	{
-		in >> line;
+		getline(in, line);
 		paths.push_back(line);
 		// Skip possible Trailing newlines
 		in >> std::ws;

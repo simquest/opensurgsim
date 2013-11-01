@@ -40,3 +40,6 @@ add_subdirectory(MlcpIO)
 if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
+
+# Put SurgSimTesting into folder "Testing"
+set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")

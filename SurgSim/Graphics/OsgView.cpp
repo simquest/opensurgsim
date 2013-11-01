@@ -31,7 +31,6 @@ OsgView::OsgView(const std::string& name) : View(name),
 {
 	/// Don't allow the default camera here, let that be handled at a higher level.
 	m_view->setCamera(nullptr);
-	m_view->addEventHandler(new osgViewer::StatsHandler);
 }
 
 bool OsgView::setPosition(int x, int y)
@@ -119,11 +118,7 @@ bool OsgView::doInitialize()
 
 bool OsgView::doWakeUp()
 {
-	if (m_isFirstUpdate)
-	{
-		m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
-		m_isFirstUpdate = false;
-	}
-
+	m_view->setUpViewInWindow(m_x, m_y, m_width, m_height);
+	m_view->addEventHandler(new osgViewer::StatsHandler);
 	return true;
 }

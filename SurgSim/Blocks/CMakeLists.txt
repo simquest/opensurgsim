@@ -21,14 +21,25 @@ include_directories(
 
 set(SURGSIM_BLOCKS_SOURCES
 	BasicSceneElement.cpp
+	MassSpring1DRepresentation.cpp
+	MassSpring2DRepresentation.cpp
+	MassSpring3DRepresentation.cpp
+	MassSpringNDRepresentationUtils.cpp
 	SphereElement.cpp
+	TransferDeformableStateToVerticesBehavior.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
+	MassSpring1DRepresentation.h
+	MassSpring2DRepresentation.h
+	MassSpring3DRepresentation.h
+	MassSpringNDRepresentationUtils.h
 	SphereElement.h
+	TransferDeformableStateToVerticesBehavior.h
+	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
 	TransferPoseBehavior.h
 )
@@ -45,3 +56,6 @@ target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramew
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimBlocks into folder "Blocks"
+set_target_properties(SurgSimBlocks PROPERTIES FOLDER "Blocks") 

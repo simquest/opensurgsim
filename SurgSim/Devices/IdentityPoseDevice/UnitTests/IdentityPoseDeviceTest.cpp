@@ -95,7 +95,7 @@ TEST(IdentityPoseDeviceTest, AddInputConsumer)
 	RigidTransform3d pose;
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().get("pose", &pose));
 	EXPECT_NEAR(0, (pose.matrix() - Matrix44d::Identity()).norm(), 1e-6);
-	bool button0;
+	bool button0 = false;
 	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().get("button0", &button0));
 	EXPECT_FALSE(button0);
 

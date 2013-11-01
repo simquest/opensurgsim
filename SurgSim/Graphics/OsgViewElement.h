@@ -19,6 +19,8 @@
 #include <SurgSim/Graphics/ViewElement.h>
 #include <osg/ref_ptr>
 
+#include <SurgSim/Math/Vector.h>
+
 namespace SurgSim
 {
 
@@ -50,12 +52,20 @@ public:
 	virtual bool setView(std::shared_ptr<View> view);
 
 	/// Enables a camera manipulator, implemented via a trackball, this is a temporary solution as it uses
-	/// the OSG input events rather than reading from the OpenSurgSim input. 
+	/// the OSG input events rather than reading from the OpenSurgSim input.
 	/// \param val whether to enable the manipulator or not.
 	void enableManipulator(bool val);
 
+	/// As the camera is not accessible from here and as it cannot be controlled from the outside
+	/// any more we let the user set the parameters from here.
+	/// \param	position	The position of the camera.
+	/// \param	lookat  	The location the camera looks at.
+	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
+
 private:
 	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
+	SurgSim::Math::Vector3d m_manipulatorPosition;
+	SurgSim::Math::Vector3d m_manipulatorLookat;
 };
 
 };  // namespace Graphics

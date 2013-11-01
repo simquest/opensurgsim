@@ -165,7 +165,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	// of mass m, an object of mass 2m will need a vtc with the parameters (2k/2c) to behave the same way
 	// on the physical system. The mass factor helps to scale the vtc parameters easily to different objects.
 	// The actual values of the vtc parameters are experimental and needs to be tweaked for each application.
-	std::shared_ptr<VirtualToolCoupler> inputCoupler = 
+	std::shared_ptr<VirtualToolCoupler> inputCoupler =
 		std::make_shared<VirtualToolCoupler>("Input Coupler", inputComponent, physicsRepresentation);
 	inputCoupler->setAngularDamping(params.getMass() * 20);
 	inputCoupler->setAngularStiffness(params.getMass() * 50);

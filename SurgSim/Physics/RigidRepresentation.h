@@ -72,7 +72,7 @@ public:
 
 	/// Set the external torque being applied to the rigid representation
 	/// Note this torque will be zeroed every update of the rigid representation
-	/// \param torque The external torque 
+	/// \param torque The external torque
 	/// \param K The angular stiffness matrix associated with the torque (jacobian of the torque w.r.t position)
 	/// \param D The angular damping matrix associated with the torque (jacobian of the torque w.r.t velocity)
 	void addExternalTorque(const SurgSim::Math::Vector3d& torque,
@@ -92,7 +92,7 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block) override;
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block) override;
 
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters();

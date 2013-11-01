@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Graphics/OsgViewElement.h>
+#include <SurgSim/Graphics/OsgConversions.h>
 
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgTrackballZoomManipulator.h>
@@ -22,9 +23,12 @@ using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
 
 OsgViewElement::OsgViewElement(const std::string& name) :
-	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View"))
+	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View")),
+	m_manipulatorPosition(SurgSim::Math::Vector3d(3.0,3.0,3.0)),
+	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0,0.0,0.0))
 {
 }
+
 OsgViewElement::~OsgViewElement()
 {
 }
@@ -47,6 +51,11 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 	if (m_manipulator == nullptr)
 	{
 		m_manipulator = new OsgTrackballZoomManipulator();
+		// Set a default position
+		m_manipulator->setTransformation(
+			SurgSim::Graphics::toOsg(m_manipulatorPosition),
+			SurgSim::Graphics::toOsg(m_manipulatorLookat),
+			osg::Vec3d(0.0f,1.0f,0.0f));
 	}
 
 	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
@@ -55,10 +64,25 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 		if (val)
 		{
 			view->getOsgView()->setCameraManipulator(m_manipulator);
-		}
+
+			}
 		else
 		{
 			view->getOsgView()->setCameraManipulator(nullptr);
 		}
+	}
+}
+
+void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat)
+{
+	m_manipulatorPosition = position;
+	m_manipulatorLookat = lookat;
+
+	if (m_manipulator != nullptr)
+	{
+		m_manipulator->setTransformation(
+			SurgSim::Graphics::toOsg(m_manipulatorPosition),
+			SurgSim::Graphics::toOsg(m_manipulatorLookat),
+			osg::Vec3d(0.0f,1.0f,0.0f));
 	}
 }

@@ -112,7 +112,6 @@ public:
 	{
 		return m_sceneElement.lock();
 	}
-protected:
 
 	/// Sets the name.
 	/// \param	name	The name.

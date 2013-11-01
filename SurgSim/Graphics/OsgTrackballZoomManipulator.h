@@ -27,7 +27,7 @@ namespace Graphics
 
 /// Trackball manipulator that uses the mouse wheel to control zoom amount.
 /// The output matrices are view matrices and do not include the zoom.
-/// To apply the zoom, get the value from getZoomFactor() and multiply 
+/// To apply the zoom, get the value from getZoomFactor() and multiply
 /// it by some base FOV to calculate the FOV for the current zoom level.
 class OsgTrackballZoomManipulator : public osgGA::TrackballManipulator
 {
@@ -46,7 +46,7 @@ public:
 	/// Sets the maximum zoom factor (zoomed out)
 	/// \param factor Maximum zoom factor
 	virtual void setMaxZoomFactor(double factor);
-	
+
 	/// Gets the maximum zoom factor
 	/// \return Maximum zoom factor
 	double getMaxZoomFactor() const;
@@ -97,7 +97,7 @@ protected:
 	/// Maximum zoom factor value (zoomed out)
 	double m_maxZoomFactor;
 
-	/// Minimum amount to change the zoom factor in one step	
+	/// Minimum amount to change the zoom factor in one step
 	/// This minimum prevents zooming by infinitely smaller amounts.
 	double m_minZoomAmount;
 

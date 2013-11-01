@@ -53,3 +53,6 @@ surgsim_copy_to_target_directory_for_debug(SixenseVisualTest
 	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
 	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
+
+# Put SixenseVisualTest into folder "Devices"
+set_target_properties(SixenseVisualTest PROPERTIES FOLDER "Devices")

@@ -47,3 +47,6 @@ option(SURGSIM_TESTS_RUN_DEVICE_SIXENSE
 	OFF)
 surgsim_add_unit_tests(SixenseDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_SIXENSE})
+
+# Put SixenseDeviceTest into folder "Devices"
+set_target_properties(SixenseDeviceTest PROPERTIES FOLDER "Devices")
