@@ -53,14 +53,13 @@ public:
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt);
 
-protected:
+private:
 	/// Initialize the behavior
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
 
 	/// Wakeup the behavior, which simply do a copy (same as update)
-	virtual bool doWakeUp();
+	virtual bool doWakeUp() override;
 
-private:
 	/// Transfer the data from Deformable state m_from to Vertices m_to
 	/// \param doInitialization True if the recipient should be initialized if needed, False otherwise
 	/// \note if doInitialization is true and Vertices is empty, it will be filled accordingly

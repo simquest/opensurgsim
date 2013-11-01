@@ -120,7 +120,6 @@ TYPED_TEST(QuaternionTests, InitializeFromArray)
 TYPED_TEST(QuaternionTests, IdentityValue)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 
 	Quaternion quaternion = Quaternion::Identity();
 	EXPECT_NEAR(1.0, quaternion.w(), 1e-6) << "W wasn't properly initialized.";
@@ -133,7 +132,6 @@ TYPED_TEST(QuaternionTests, IdentityValue)
 TYPED_TEST(QuaternionTests, SetToIdentity)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 
 	Quaternion quaternion;
 	quaternion.setIdentity();
@@ -165,7 +163,6 @@ TYPED_TEST(QuaternionTests, ZeroValue)
 TYPED_TEST(QuaternionTests, SetToZero)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 
 	// There is no Quaternion::setZero(), but you can do this:
 	Quaternion quaternion;
@@ -429,7 +426,6 @@ TYPED_TEST(QuaternionTests, ToMatrix)
 TYPED_TEST(QuaternionTests, Conjugate)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 
 	Quaternion q(2.1f, 2.2f, 2.3f, 2.4f);
 	Quaternion n = q.conjugate();
@@ -496,7 +492,6 @@ TYPED_TEST(QuaternionTests, ApplyToVector)
 TYPED_TEST(QuaternionTests, NormAndSquared)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 
 	Quaternion q(3.1f, 3.4f, 3.7f, 4.0f);
 	// sum of the squares of the components
@@ -510,7 +505,6 @@ TYPED_TEST(QuaternionTests, NormAndSquared)
 TYPED_TEST(QuaternionTests, Normalize)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 
 	Quaternion q(3.1f, 3.4f, 3.7f, 4.0f);
 	// sum of the squares of the components
@@ -535,7 +529,6 @@ TYPED_TEST(QuaternionTests, Normalize)
 TYPED_TEST(QuaternionTests, TypeCasting)
 {
 	typedef typename TestFixture::Quaternion Quaternion;
-	typedef typename TestFixture::Scalar T;
 	typedef Eigen::Quaternion<double> Quaterniond;
 	typedef Eigen::Quaternion<float>  Quaternionf;
 

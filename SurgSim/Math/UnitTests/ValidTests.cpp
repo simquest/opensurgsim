@@ -632,8 +632,6 @@ TYPED_TEST(ValidTests, ClearSubnormalQuaternion)
 template <typename T>
 static void compareAngleAxis(const T& a, const T& b)
 {
-	typedef T AngleAxis;
-
 	bool isValidAngleA = SurgSim::Math::isValid(a.angle());
 	bool isValidAngleB = SurgSim::Math::isValid(b.angle());
 
