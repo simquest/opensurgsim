@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_RIGIDSHAPECOLLISIONREPRESENTATION_H
-#define SURGSIM_COLLISION_RIGIDSHAPECOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
+#define SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Math/Shape.h>

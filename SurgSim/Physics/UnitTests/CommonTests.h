@@ -22,7 +22,7 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Math/Shape.h>
+#include <SurgSim/Math/Shapes.h>
 #include <SurgSim/Physics/Constraint.h>
 #include <SurgSim/Physics/ConstraintImplementation.h>
 #include <SurgSim/Physics/ContactConstraintData.h>
@@ -36,6 +36,7 @@
 #include <SurgSim/Physics/RigidRepresentationContact.h>
 #include <SurgSim/Physics/RigidRepresentationLocalization.h>
 
+using SurgSim::Math::BoxShape;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 
