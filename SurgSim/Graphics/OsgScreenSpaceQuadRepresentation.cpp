@@ -60,9 +60,9 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 	// Make the quad
 	float depth = 0.0;
 	m_geometry = osg::createTexturedQuadGeometry(
-		osg::Vec3(0,0,depth),
-		osg::Vec3(1.0,0.0,depth),
-		osg::Vec3(0.0,1.0,depth));
+		osg::Vec3(0.0, 0.0, depth),
+		osg::Vec3(1.0, 0.0, depth),
+		osg::Vec3(0.0, 1.0, depth));
 
 	osg::Vec4Array* colors = new osg::Vec4Array;
 	colors->push_back(osg::Vec4(1.0f,1.0f,1.0f,1.0f));
@@ -70,7 +70,7 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 	m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 
 	m_geometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
-
+	
 	//osg::StateSet* stateset = geom->getOrCreateStateSet();
 	//stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
 
@@ -84,6 +84,7 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 	m_projection = new osg::Projection;
 	m_projection->setMatrix(osg::Matrix::ortho2D(0,m_displayWidth,0,m_displayHeight));
 	m_projection->addChild(m_transform);
+
 
 	m_switch->addChild(m_projection);
 }
@@ -105,17 +106,18 @@ void OsgScreenSpaceQuadRepresentation::doUpdate(double dt)
 	}
 }
 
-void OsgScreenSpaceQuadRepresentation::setSize(int width, int height)
+void OsgScreenSpaceQuadRepresentation::setSize(double width, double height)
 {
 	m_scale.x() = width;
 	m_scale.y() = height;
 	m_transform->setScale(m_scale);
 }
 
-void OsgScreenSpaceQuadRepresentation::getSize(int* width, int* height) const
+void OsgScreenSpaceQuadRepresentation::getSize(double* width, double* height) const
 {
-	*width = static_cast<int>(m_scale.x());
-	*height = static_cast<int>(m_scale.y());
+	SURGSIM_ASSERT(width != nullptr && height  != nullptr) << "Cannot use a nullptr as an output parameter";
+	*width = m_scale.x();
+	*height = m_scale.y();
 }
 
 void OsgScreenSpaceQuadRepresentation::setPose(const SurgSim::Math::RigidTransform3d& transform)
@@ -212,6 +214,21 @@ void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float b
 	(*tcoords)[2].set(right,bottom);
 	(*tcoords)[3].set(right,top);
 	m_geometry->setTexCoordArray(0,tcoords);
+}
+
+void OsgScreenSpaceQuadRepresentation::setLocation(double x, double y)
+{
+	SurgSim::Math::RigidTransform3d transform = 
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(x,y,0));
+	setPose(transform);
+}
+
+void OsgScreenSpaceQuadRepresentation::getLocation(double* x, double* y)
+{
+	SURGSIM_ASSERT( x !=  nullptr && y != nullptr) << "Cannot use a nulptr as an output paramter.";
+	SurgSim::Math::Vector3d position = getPose().translation();
+	*x = position.x();
+	*y = position.y();
 }
 
 
