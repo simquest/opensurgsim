@@ -39,14 +39,13 @@ public:
 
 	/// Constructor
 	/// \param name Name of OsgSceneryRepresentation
-	/// \param filePath Path to the file to be loaded
 	explicit OsgSceneryRepresentation(const std::string& name);
 
 	/// Return file name of the object
 	/// \return File name of the object
 	std::string getFileName() const;
 	/// Set file name of the object to be loaded
-	/// \param	modelName	Name of the model
+	/// \param	fileName Name of the file to be loaded
 	void setFileName(const std::string& fileName);
 
 
