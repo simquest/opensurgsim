@@ -18,21 +18,6 @@
 #define SURGSIM_MATH_MESHSHAPE_INL_H
 
 
-namespace
-{
-
-double square(double x)
-{
-	return ((x)*(x));
-}
-
-double cube(double x)
-{
-	return ((x)*(x)*(x));
-}
-
-};
-
 namespace SurgSim
 {
 namespace Math
@@ -170,6 +155,11 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeFaceIntegrals(
 	n.normalize();
 	double w = -ptA.dot(n);
 
+	const double alpha_squared = n[m_alpha] * n[m_alpha];
+	const double alpha_cubed = alpha_squared * n[m_alpha];
+	const double beta_squared = n[m_beta] * n[m_beta];
+	const double beta_cubed = beta_squared * n[m_beta];
+
 	k1 = 1 / n[m_gamma]; k2 = k1 * k1; k3 = k2 * k1; k4 = k3 * k1;
 
 	m_Fa = k1 * m_Pa;
@@ -178,21 +168,21 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeFaceIntegrals(
 
 	m_Faa = k1 * m_Paa;
 	m_Fbb = k1 * m_Pbb;
-	m_Fcc = k3 * (square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
-				  + square(n[m_beta])*m_Pbb + w*(2*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
+	m_Fcc = k3 * (alpha_squared*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
+				  + beta_squared*m_Pbb + w*(2*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
 
 	m_Faaa = k1 * m_Paaa;
 	m_Fbbb = k1 * m_Pbbb;
-	m_Fccc = -k4 * (cube(n[m_alpha])*m_Paaa + 3*square(n[m_alpha])*n[m_beta]*m_Paab
-					+ 3*n[m_alpha]*square(n[m_beta])*m_Pabb + cube(n[m_beta])*m_Pbbb
-					+ 3*w*(square(n[m_alpha])*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
-						   + square(n[m_beta])*m_Pbb)
+	m_Fccc = -k4 * (alpha_cubed*m_Paaa + 3*alpha_squared*n[m_beta]*m_Paab
+					+ 3*n[m_alpha]*beta_squared*m_Pabb + beta_cubed*m_Pbbb
+					+ 3*w*(alpha_squared*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
+						   + beta_squared*m_Pbb)
 					+ w*w*(3*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
 
 	m_Faab = k1 * m_Paab;
 	m_Fbbc = -k2 * (n[m_alpha]*m_Pabb + n[m_beta]*m_Pbbb + w*m_Pbb);
-	m_Fcca = k3 * (square(n[m_alpha])*m_Paaa + 2*n[m_alpha]*n[m_beta]*m_Paab
-				   + square(n[m_beta])*m_Pabb
+	m_Fcca = k3 * (alpha_squared*m_Paaa + 2*n[m_alpha]*n[m_beta]*m_Paab
+				   + beta_squared*m_Pabb
 				   + w*(2*(n[m_alpha]*m_Paa + n[m_beta]*m_Pab) + w*m_Pa));
 }
 
