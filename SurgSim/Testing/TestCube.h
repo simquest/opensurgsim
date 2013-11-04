@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_RENDERTESTS_TESTCUBE_H
-#define SURGSIM_GRAPHICS_RENDERTESTS_TESTCUBE_H
+#ifndef SURGSIM_TESTING_TESTCUBE_H
+#define SURGSIM_TESTING_TESTCUBE_H
 
 #include <vector>
 #include <SurgSim/Math/Vector.h>
@@ -29,8 +29,11 @@ using SurgSim::Math::Vector4d;
 /// to implement sharp edges vertices are duplicated over different faces, for a cube all
 /// vertices need to exist as three copies
 
+#include <memory>
+
 namespace SurgSim
 {
+
 namespace Testing
 {
 namespace Cube
@@ -41,6 +44,7 @@ namespace Cube
 		std::vector<Vector4d>* colors,
 		std::vector<Vector2d>* textures,
 		std::vector<unsigned int>* triangles);
+
 
 }; // Cube
 }; // Testing

@@ -24,6 +24,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	GroupTests.cpp
 	ManagerTests.cpp
+	MeshTests.cpp
 	OsgBoxRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp
@@ -34,6 +35,7 @@ set(UNIT_TEST_SOURCES
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
+	OsgMeshRepresentationTests.cpp
 	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgQuaternionConversionsTests.cpp
@@ -68,6 +70,6 @@ set(UNIT_TEST_HEADERS
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+set(LIBS SurgSimFramework SurgSimGraphics SurgSimTesting gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)

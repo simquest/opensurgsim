@@ -41,7 +41,7 @@
 #include <SurgSim/Testing/MathUtilities.h>
 
 #include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Graphics/RenderTests/TestCube.h>
+#include <SurgSim/Testing/TestCube.h>
 
 
 
@@ -75,49 +75,12 @@ protected:
 	std::vector<Vector4d> cubeColors;
 	std::vector<Vector2d> cubeTextures;
 
-	std::shared_ptr<Mesh> makeMesh(const std::vector<Vector3d>& vertices,
-								   const std::vector<Vector4d>& colors,
-								   const std::vector<Vector2d>& textures,
-								   const std::vector<unsigned int>& triangles)
-	{
-		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
-		size_t i = 0;
-		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
-		{
-			VertexData data;
-			if (! colors.empty())
-			{
-				data.color.setValue(colors[i]);
-			}
-			if (! textures.empty())
-			{
-				data.texture.setValue(textures[i]);
-			}
-			mesh->addVertex(Mesh::VertexType(*it, data));
-			++i;
-		}
 
-		for (size_t i = 0; i < triangles.size()/3; ++i )
-		{
-			Mesh::TriangleType::IdType ids = {{triangles[3*i], triangles[3*i+1],triangles[3*i+2]}};
-			Mesh::TriangleType triangle(ids, SurgSim::Graphics::TriangleData());
-			mesh->addTriangle(triangle);
-		}
 
-		return mesh;
-	}
-
-	std::shared_ptr<MeshRepresentation> makeRepresentation(std::shared_ptr<Mesh> mesh, const std::string& name)
+	std::shared_ptr<MeshRepresentation> makeRepresentation(const std::string& name)
 	{
 		auto meshRepresentation = std::make_shared<OsgMeshRepresentation>(name);
-
-		EXPECT_TRUE(mesh->isValid());
-
-		meshRepresentation->setMesh(mesh);
 		meshRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
-
-		//meshRepresentation->setDrawAsWireFrame(true);
-
 		return meshRepresentation;
 	}
 };
@@ -130,16 +93,16 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
 
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> meshRepresentation1;
-	meshRepresentation1 = makeRepresentation(
-		makeMesh(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles), "colormesh");
-	meshRepresentation1->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
+	// make a colored cube
+	auto meshRepresentation1 = makeRepresentation("colormesh");
+	meshRepresentation1->getMesh()->initialize(cubeVertices, cubeColors, std::vector<Vector2d>(), cubeTriangles);
+	meshRepresentation1->setUpdateOptions(MeshRepresentation::UPDATE_OPTION_COLORS |
+										  MeshRepresentation::UPDATE_OPTION_VERTICES);
 
 	// make a textured cube
-	std::shared_ptr<SurgSim::Graphics::MeshRepresentation> meshRepresentation2;
-	meshRepresentation2 = makeRepresentation(makeMesh
-		(cubeVertices, std::vector<Vector4d>(), cubeTextures, cubeTriangles), "texturemesh");
-	meshRepresentation2->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-0.0,0.0,-0.0)));
+	auto meshRepresentation2 = makeRepresentation("textureMesh");
+	meshRepresentation2->getMesh()->initialize(cubeVertices, std::vector<Vector4d>(), cubeTextures, cubeTriangles);
+
 	auto material = std::make_shared<OsgMaterial>();
 	auto texture = std::make_shared<OsgTexture2d>();
 	texture->loadImage(applicationData->findFile("OsgMeshRepresentationRenderTests/cube.png"));
@@ -158,29 +121,29 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 	struct InterpolationData
 	{
 	public:
-		RigidTransform3d transform;
-		double scale;
+		std::pair<RigidTransform3d, RigidTransform3d> transform;
+		std::pair<double,double> scale;
 	};
 
-	typedef std::pair<InterpolationData, InterpolationData> Interpolator;
 
-	std::vector<Interpolator> interpolators;
-	Interpolator interpolator;
+	std::vector<InterpolationData> interpolators;
+	InterpolationData interpolator;
 
-	interpolator.first.transform =
+
+	interpolator.transform.first =
 		makeRigidTransform(makeRotationQuaternion(0.0,Vector3d(1.0,1.0,1.0)), Vector3d(-0.1, 0.0, -0.2));
-	interpolator.first.scale = 0.001;
-	interpolator.second.transform =
+	interpolator.scale.first = 0.001;
+	interpolator.transform.second =
 		makeRigidTransform(makeRotationQuaternion(M_PI_2,Vector3d(1.0,-1.0,1.0)), Vector3d(0.1, 0.0, -0.2));
-	interpolator.second.scale = 0.03;
+	interpolator.scale.second = 0.03;
 	interpolators.push_back(interpolator);
 
-	interpolator.first.transform =
+	interpolator.transform.first =
 		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0,-1.0,0.0)), Vector3d(0.0, -0.1, -0.2));
-	interpolator.first.scale = 0.001;
-	interpolator.second.transform =
+	interpolator.scale.first = 0.001;
+	interpolator.transform.second =
 		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0,1.0,0.0)), Vector3d(0.0, 0.1, -0.2));
-	interpolator.second.scale = 0.03;
+	interpolator.scale.second = 0.03;
 	interpolators.push_back(interpolator);
 
 	std::vector<std::shared_ptr<Mesh>> meshes;
@@ -204,16 +167,24 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 
 		for (size_t j = 0; j < interpolators.size(); ++j)
 		{
-			InterpolationData from = interpolators[j].first;
-			InterpolationData to = interpolators[j].second;
+			InterpolationData data = interpolators[j];
 
-			double scale = interpolate(from.scale, to.scale, t);
-			RigidTransform3d transform = interpolate(from.transform, to.transform, t);
+			double scale = interpolate(data.scale, t);
+			RigidTransform3d transform = interpolate(data.transform, t);
 			for (size_t index = 0; index < cubeVertices.size(); ++index)
 			{
 				newVertices[index] =  transform * (cubeVertices[index] * scale);
 			}
 			meshes[j]->setVertexPositions(newVertices,true);
+		}
+
+		if (i == 500)
+		{
+			for (size_t v = 0; v < cubeColors.size(); ++v)
+			{
+				//meshes[0]->getVertex(v).data.color.setValue(cubeColors[(v+numSteps)%cubeColors.size()]);
+				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0,0.0,0.5,1.0));
+			}
 		}
 
 		/// The total number of steps should complete in 1 second

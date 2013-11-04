@@ -32,19 +32,33 @@ class MeshRepresentation : public virtual Representation
 {
 public:
 
+	enum UpdateOption
+	{
+		UPDATE_OPTION_NONE = 0,
+		UPDATE_OPTION_VERTICES = 1,
+		UPDATE_OPTION_COLORS = 2,
+		UPDATE_OPTION_TEXTURES = 4,
+		UPDATE_OPTION_TRIANGLES = 8,
+		UPDATE_OPTION_ALL = 15
+	};
+
 	/// Constructor.
 	/// \param	name	The name of the representation.
 	explicit MeshRepresentation(const std::string& name) : Representation(name) {}
 	virtual ~MeshRepresentation() {}
 
-	/// Sets a mesh.
-	/// \param	mesh	The mesh.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool setMesh(std::shared_ptr<Mesh> mesh) = 0;
-
 	/// Gets the mesh.
 	/// \return	The mesh.
 	virtual std::shared_ptr<Mesh> getMesh() = 0;
+
+	/// Sets the Structures that are expected to change during the lifetime of the mesh, these will be updated
+	/// every frame, independent of a structural change in the mesh, by default the mesh will update its vertices.
+	/// \param	val	Boolean or expression of UpdateOption enum.
+	virtual void setUpdateOptions(int val) = 0;
+
+	/// Gets update options for this mesh.
+	/// \return	The update options.
+	virtual int getUpdateOptions() = 0;
 };
 
 }; // Graphics

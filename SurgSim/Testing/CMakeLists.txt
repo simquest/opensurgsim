@@ -21,10 +21,12 @@ include_directories(
 
 set(SURGSIM_TESTING_SOURCES
 	MathUtilities.cpp
+	TestCube.cpp
 )
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
+	TestCube.h
 )
 
 surgsim_add_library(

@@ -22,6 +22,7 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
+	Mesh.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp

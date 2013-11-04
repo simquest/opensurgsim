@@ -16,9 +16,11 @@
 #ifndef SURGSIM_GRAPHICS_MESH_H
 #define SURGSIM_GRAPHICS_MESH_H
 
+#include <vector>
+
 #include <SurgSim/DataStructures/TriangleMesh.h>
 #include <SurgSim/DataStructures/OptionalValue.h>
-
+#include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
 {
@@ -74,7 +76,26 @@ public:
 	}
 };
 
-typedef SurgSim::DataStructures::TriangleMesh<VertexData, void, TriangleData> Mesh;
+class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, void, TriangleData>
+{
+public:
+	/// Utility function to initialize a mesh with plain data,
+	/// \param	vertices 	An array of vertex coordinates.
+	/// \param	colors   	The colors, the number of colors can be 0 or
+	/// 					there have to be at least as many colors as vertices.
+	/// \param	textures 	The textures coordinates, the number of coordinates can be 0 or
+	/// 					threre have to be at least as many texture coordinates as there are vertices.
+	/// \param	triangles	The triangles, a plain array of triplets of triangle indices, the indices should be
+	/// 					points in the vertices array.
+	/// \return	A built Mesh datastructure.
+	void initialize(
+		const std::vector<SurgSim::Math::Vector3d>& vertices,
+		const std::vector<SurgSim::Math::Vector4d>& colors,
+		const std::vector<SurgSim::Math::Vector2d>& textures,
+		const std::vector<unsigned int>& triangles);
+};
+
+
 
 }; // Graphics
 }; // SurgSim

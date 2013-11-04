@@ -40,101 +40,52 @@ namespace Graphics
 OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
-	MeshRepresentation(name)
+	MeshRepresentation(name),
+	m_updateOptions(UPDATE_OPTION_VERTICES),
+	m_mesh(std::make_shared<Mesh>())
 {
-
-}
-
-OsgMeshRepresentation::~OsgMeshRepresentation()
-{
-
-}
-
-bool OsgMeshRepresentation::setMesh(std::shared_ptr<Mesh> mesh)
-{
-	SURGSIM_ASSERT(mesh != nullptr) << "Can't set a nullptr mesh";
-	SURGSIM_ASSERT(mesh->isValid()) << "An invalid mesh was passed to OsgMeshRepresentation";
-
-	osg::ref_ptr<osg::Geometry> geometry = new osg::Geometry();
-
-	SURGSIM_ASSERT(mesh->isValid()) << "Mesh is invalid, " <<
-		"Cannot use and invalid mesh for creating a MeshRepresentation";
+	// The actual size of the mesh is not known at this time, just allocate the
+	// osg structures that are needed and add them to the geometry, and the node
 
 	m_geometry = new osg::Geometry();
-	m_mesh = mesh;
-	// Copy Vertices from mesh
-	m_vertexCount = mesh->getNumVertices();
-	m_vertices = new osg::Vec3Array(m_vertexCount);
+
+	// Set up vertices array
+	m_vertices = new osg::Vec3Array();
 	m_vertices->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->setVertexArray(m_vertices);
-	updateVertices();
 
-	// Check if the color on the vertex is set then assume perVertex colors
-	// otherwise assign one color
+	// Set up color array with default color
+	m_colors = new osg::Vec4Array(1);
+	(*m_colors)[0]= osg::Vec4(1.0f,1.0f,1.0f,1.0f);
+	m_geometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
 
-	if (mesh->getVertex(0).data.color.hasValue())
-	{
-		m_colors = new osg::Vec4Array(m_vertexCount);
-		m_colors->setDataVariance(osg::Object::DYNAMIC);
-		m_geometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);
-		updateColors();
-	}
-	else
-	{
-		m_colors = new osg::Vec4Array(1);
-		(*m_colors)[0]= osg::Vec4(1.0f,1.0f,1.0f,1.0f);
-		m_geometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
-	}
 
-	// Check if the texture coordinates on vertex[0] is set if yes, assume
-	// that there are textures
-	if (mesh->getVertex(0).data.texture.hasValue())
-	{
-		m_textureCoordinates = new osg::Vec2Array(m_vertices->size());
-		m_geometry->setTexCoordArray(0,m_textureCoordinates, osg::Array::BIND_PER_VERTEX);
+	// Set up textureCoordinates array, texture coords are optional, don't add them to the
+	// geometry yet
+	m_textureCoordinates = new osg::Vec2Array(0);
+	m_textureCoordinates->setDataVariance(osg::Object::DYNAMIC);
 
-		osg::Vec2 coordinates;
-		osg::Vec2 defaultCoordinates(0.5f, 0.5f);
-		for (size_t i=0; i<m_vertices->size(); ++i)
-		{
-			if (! m_mesh->getVertex(i).data.texture.hasValue())
-			{
-				SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-					"OsgMeshRepresentation::setMesh(): Missing texture coordinates for Vertex <" <<
-					i << "> in Mesh, using default coordinates";
-				(*m_textureCoordinates)[i] = defaultCoordinates;
-			}
-			(*m_textureCoordinates)[i] = SurgSim::Graphics::toOsg(mesh->getVertex(i).data.texture.getValue());
-		}
-	}
 
-	// Copy triangles from mesh
-	size_t triangleCount = mesh->getNumTriangles();
-	unsigned int* triangles = new unsigned int[triangleCount*3];
-	for (size_t i=0; i < triangleCount; ++i)
-	{
-		triangles[i*3] = mesh->getTriangle(i).verticesId[0];
-		triangles[i*3+1] = mesh->getTriangle(i).verticesId[1];
-		triangles[i*3+2] = mesh->getTriangle(i).verticesId[2];
-	}
-
-	m_set = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES,triangleCount*3,triangles);
-
-	m_geometry->addPrimitiveSet(m_set);
+	// Set up primitive set for triangles
+	m_triangles = new osg::DrawElementsUInt(osg::PrimitiveSet::TRIANGLES);
+	m_triangles->setDataVariance(osg::Object::DYNAMIC);
+	m_geometry->addPrimitiveSet(m_triangles);
 
 	// Create normals, currently per triangle
-	m_normals = new osg::Vec3Array(m_vertices->size());
+	m_normals = new osg::Vec3Array();
 	m_normals->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->setNormalArray(m_normals,osg::Array::BIND_PER_VERTEX);
-	updateNormals();
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
 	geode->addDrawable(m_geometry);
 
 	m_transform->addChild(geode);
 
+}
 
-	return true;
+OsgMeshRepresentation::~OsgMeshRepresentation()
+{
+
 }
 
 std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
@@ -161,55 +112,58 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 
 void OsgMeshRepresentation::update(double dt)
 {
-	// We probably should lock access to the mesh at this time ...
-	SURGSIM_ASSERT(m_mesh->getNumVertices() == m_vertexCount) <<
-		"Mesh structure changed, the OsgMeshRepresentation does not support this at the moment";
+	SURGSIM_ASSERT(m_mesh->isValid()) << "An invalid mesh was passed to OsgMeshRepresentation";
 
-	updateVertices();
+	int updateOptions =  updateOsgArrays();
+	updateOptions |= m_updateOptions;
 
-	// Only update colors if there is an actual color array
-	if (m_colors->getDataVariance() == osg::Object::DYNAMIC)
+	if ( (updateOptions & (UPDATE_OPTION_VERTICES | UPDATE_OPTION_TEXTURES | UPDATE_OPTION_COLORS)) != 0)
 	{
-		updateColors();
+		updateVertices(updateOptions);
+		m_geometry->dirtyDisplayList();
+		m_geometry->dirtyBound();
 	}
-	updateNormals();
 
-	m_set->dirty();
-	m_geometry->dirtyDisplayList();
-
-	// Rather than dirtying the bounds we should recalculate them on the fly
-	m_geometry->dirtyBound();
+	if ( (updateOptions & UPDATE_OPTION_TRIANGLES) != 0)
+	{
+		updateTriangles();
+		m_triangles->dirty();
+	}
 }
 
-void OsgMeshRepresentation::updateColors()
+void OsgMeshRepresentation::updateVertices(int updateOptions)
 {
 	static osg::Vec4 defaultColor(0.8f, 0.2f, 0.2f, 1.0f);
+	static osg::Vec2 defaultTextureCoord(0.0f, 0.0f);
 
-	for (size_t i=0; i<m_vertices->size(); ++i)
+	bool updateColors = (updateOptions & UPDATE_OPTION_COLORS) != 0;
+	bool updateTextures = (updateOptions & UPDATE_OPTION_TEXTURES) != 0;
+	bool updateVertices = (updateOptions & UPDATE_OPTION_VERTICES) != 0;
+	size_t vertexCount = m_mesh->getNumVertices();
+
+	for (size_t i=0; i < vertexCount; ++i)
 	{
-		if (! m_mesh->getVertex(i).data.color.hasValue())
+		Mesh::VertexType vertex = m_mesh->getVertex(i);
+		if (updateVertices)
 		{
-			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-				"OsgMeshRepresentation::setMesh(): Missing Vertex Color for Vertex <" <<
-				i << "> in Mesh, using default";
-			(*m_colors)[i] = defaultColor;
+			(*m_vertices)[i].set(toOsg(vertex.position));
 		}
-		else
+		if (updateColors)
 		{
-			(*m_colors)[i] = SurgSim::Graphics::toOsg(m_mesh->getVertex(i).data.color.getValue());
+			(*m_colors)[i] =
+				(vertex.data.color.hasValue()) ? toOsg(vertex.data.color.getValue()) : defaultColor;
+		}
+		if (updateTextures)
+		{
+			(*m_textureCoordinates)[i] =
+				(vertex.data.texture.hasValue()) ? toOsg(vertex.data.texture.getValue()) : defaultTextureCoord;
 		}
 	}
-	m_switch->dirtyBound();
-}
 
-void OsgMeshRepresentation::updateVertices()
-{
-	for (size_t i=0; i < m_vertexCount; ++i)
+	if (updateVertices)
 	{
-		(*m_vertices)[i].set(toOsg(m_mesh->getVertexPosition(i)));
+		updateNormals();
 	}
-
-	// Recalculate the bounding box here
 }
 
 void OsgMeshRepresentation::updateNormals()
@@ -220,6 +174,95 @@ void OsgMeshRepresentation::updateNormals()
 	m_geometry->accept(normalGenerator);
 	normalGenerator.normalize();
 }
+
+void OsgMeshRepresentation::updateTriangles()
+{
+	std::vector<Mesh::TriangleType> triangles = m_mesh->getTriangles();
+	auto endIt = std::end(triangles);
+	int i = 0;
+	for (auto it = std::begin(triangles); it != endIt; ++it)
+	{
+		(*m_triangles)[i++] = it->verticesId[0];
+		(*m_triangles)[i++] = it->verticesId[1];
+		(*m_triangles)[i++] = it->verticesId[2];
+	}
+}
+
+int OsgMeshRepresentation::updateOsgArrays()
+{
+	int result = 0;
+
+	size_t numVertices = m_mesh->getNumVertices();
+	if (numVertices > m_vertices->size())
+	{
+		m_vertices->resize(numVertices);
+		m_normals->resize(numVertices);
+
+		m_vertices->setDataVariance(getDataVariance(UPDATE_OPTION_VERTICES));
+		m_normals->setDataVariance(getDataVariance(UPDATE_OPTION_VERTICES));
+
+		result |= UPDATE_OPTION_VERTICES;
+	}
+
+	// The first vertex determines what values the mesh should have ...
+	Mesh::VertexType vertex = m_mesh->getVertex(0);
+
+	if (vertex.data.color.hasValue() && numVertices > m_colors->size())
+	{
+		if (m_colors->size() == 1)
+		{
+			m_colors->setDataVariance(getDataVariance(UPDATE_OPTION_COLORS));
+			m_geometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);
+		}
+		m_colors->resize(numVertices);
+		result |= UPDATE_OPTION_COLORS;
+	}
+
+	if (vertex.data.texture.hasValue() && numVertices > m_textureCoordinates->size())
+	{
+		bool setTextureArray = m_textureCoordinates->size() == 0;
+		m_textureCoordinates->resize(numVertices);
+		if (setTextureArray)
+		{
+			m_geometry->setTexCoordArray(0, m_textureCoordinates, osg::Array::BIND_PER_VERTEX);
+			m_textureCoordinates->setDataVariance(getDataVariance(UPDATE_OPTION_TEXTURES));
+		}
+		result |= UPDATE_OPTION_TEXTURES;
+	}
+
+	if (m_mesh->getNumTriangles() > m_triangles->size())
+	{
+		m_triangles->resize(m_mesh->getNumTriangles()*3);
+		m_triangles->setDataVariance(getDataVariance(UPDATE_OPTION_TRIANGLES));
+		result |= UPDATE_OPTION_TRIANGLES;
+	}
+	return result;
+}
+
+void OsgMeshRepresentation::setUpdateOptions(int val)
+{
+	if (val <= UPDATE_OPTION_ALL && val >= 0)
+	{
+		m_updateOptions = val;
+	}
+}
+
+int OsgMeshRepresentation::getUpdateOptions()
+{
+	return m_updateOptions;
+}
+
+osg::ref_ptr<osg::Geometry> OsgMeshRepresentation::getOsgGeometry()
+{
+	return m_geometry;
+}
+
+osg::Object::DataVariance OsgMeshRepresentation::getDataVariance(int updateOption)
+{
+	return ((m_updateOptions & updateOption) != 0) ? osg::Object::DYNAMIC : osg::Object::STATIC;
+}
+
+
 
 
 }; // Graphics

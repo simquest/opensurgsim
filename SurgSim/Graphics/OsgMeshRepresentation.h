@@ -33,6 +33,7 @@
 namespace osg
 {
 	class Geometry;
+	class DrawElementsUInt;
 }
 
 namespace SurgSim
@@ -54,14 +55,7 @@ public:
 
 	~OsgMeshRepresentation();
 
-	/// Sets the mesh.
-	/// \param	mesh	The mesh.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool setMesh(std::shared_ptr<Mesh> mesh) override;
-
-	/// Gets the mesh.
-	/// \return	The mesh.
-	virtual std::shared_ptr<Mesh> getMesh() override;
+	std::shared_ptr<Mesh> getMesh();
 
 	/// Sets the mesh to render as a wire frame.
 	/// \param	val	true to value.
@@ -71,30 +65,54 @@ public:
 	/// \param	dt	The dt.
 	virtual void update(double dt);
 
+	/// Sets the Structures that are expected to change during the lifetime of the mesh, these will be updated
+	/// every frame, independent of a structural change in the mesh, by default the mesh will update its vertices.
+	/// \param	val	Boolean or expression of UpdateOption enum.
+	virtual void setUpdateOptions(int val) override;
+
+	/// Gets update options for this mesh.
+	/// \return	The update options.
+	virtual int getUpdateOptions() override;
+
+	osg::ref_ptr<osg::Geometry> getOsgGeometry();
 private:
 
 	/// The mesh.
 	std::shared_ptr<Mesh> m_mesh;
 
-
-	/// The Osg Geometry.
+	///@{
+	/// Osg structures
 	osg::ref_ptr<osg::Geometry> m_geometry;
-
-	size_t m_vertexCount;
-
 	osg::ref_ptr<osg::Vec3Array> m_vertices;
 	osg::ref_ptr<osg::Vec4Array> m_colors;
 	osg::ref_ptr<osg::Vec3Array> m_normals;
 	osg::ref_ptr<osg::Vec2Array> m_textureCoordinates;
-	osg::ref_ptr<osg::PrimitiveSet> m_set;
-
-	///@{
-	/// Local update operations, usually iterate over all items and recalculate or copy information from the mesh
-	void updateColors();
-	void updateNormals();
-	void updateVertices();
+	osg::ref_ptr<osg::DrawElementsUInt> m_triangles;
 	///@}
 
+	/// Updates the internal arrays in accordance to the sizes given in the mesh
+	/// \return updateOptions value that indicates which of the structures where updated in size and
+	/// 		will have to be updated independent of the value set in setUpdateOptions()
+	int updateOsgArrays();
+
+	/// Copies the attributes for each mesh vertex in the appropriate osg structure, this will only be done
+	/// for the data as is indicated by updateOptions
+	/// \param updateOptions Set of flags indicating wether a specific vertex attribute should be updated
+	void updateVertices(int updateOptions);
+
+	/// Updates the normals.
+	void updateNormals();
+
+	/// Updates the triangles.
+	void updateTriangles();
+
+	/// Indicates which elements of the mesh should be update on every frame
+	int m_updateOptions;
+
+	/// Gets data variance for a given update option.
+	/// \param	updateOption	The update option.
+	/// \return	The data variance.
+	osg::Object::DataVariance getDataVariance(int updateOption);
 };
 
 #if defined(_MSC_VER)
