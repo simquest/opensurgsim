@@ -35,7 +35,7 @@ public:
 	CapsuleShape(double length, double radius);
 
 	/// \return the type of the shape
-	int getType();
+	virtual int getType() override;
 
 	/// Get the capsule length (i.e. cylinder length)
 	/// \return The capsule length (in m)
@@ -47,11 +47,11 @@ public:
 
 	/// Calculate the volume of the capsule
 	/// \return The volume of the capsule (in m-3)
-	double calculateVolume() const;
+	virtual double calculateVolume() const override;
 
 	/// Calculate the mass center of the capsule
 	/// \return The mass center of the capsule
-	Vector3d calculateMassCenter() const;
+	virtual Vector3d calculateMassCenter() const override;
 
 	/// Return the centre of the top sphere of the internal cylinder
 	/// \return The top centre of the sphere of the capsule
@@ -64,7 +64,7 @@ public:
 	/// Calculate the inertia from the capsule
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the capsule
-	Matrix33d calculateInertia(double rho) const;
+	virtual Matrix33d calculateInertia(double rho) const override;
 
 private:
 	/// Capsule radius

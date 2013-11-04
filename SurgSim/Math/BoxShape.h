@@ -35,7 +35,7 @@ public:
 	BoxShape(double sizeX, double sizeY, double sizeZ);
 
 	/// \return the type of the shape
-	virtual int getType();
+	virtual int getType() override;
 
 	/// Get size in X direction
 	/// \return the size in the X direction (in m)
@@ -51,16 +51,16 @@ public:
 
 	/// Calculate the volume of the box
 	/// \return The volume of the box (in m-3)
-	virtual double calculateVolume() const;
+	virtual double calculateVolume() const override;
 
 	/// Calculate the mass center of the box
 	/// \return The mass center of the box
-	virtual Vector3d calculateMassCenter() const;
+	virtual Vector3d calculateMassCenter() const override;
 
 	/// Calculate the inertia of the box
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the box
-	virtual Matrix33d calculateInertia(double rho) const;
+	virtual Matrix33d calculateInertia(double rho) const override;
 
 	/// Function that calculates the global vertex locations, given an orientation
 	/// and translation.
