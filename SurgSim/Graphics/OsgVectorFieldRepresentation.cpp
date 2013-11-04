@@ -60,7 +60,7 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
 	geode->addDrawable(m_lineGeometry);
 	geode->addDrawable(m_pointGeometry);
-	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+	geode->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
 	m_transform->addChild(geode);
 }
 
