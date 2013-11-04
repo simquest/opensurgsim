@@ -25,9 +25,13 @@
 namespace SurgSim
 {
 
+namespace Math
+{
+class Shape;
+};
+
 namespace Physics
 {
-class RigidShape;
 class Representation;
 };
 
@@ -53,7 +57,7 @@ public:
 	virtual int getShapeType() const = 0;
 
 	/// \return The actual shape used for collision.
-	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const = 0;
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
 	/// Overridden from Representation, this is not applicable for a CollisionRepresentation
 	/// the program will abort if this function is called

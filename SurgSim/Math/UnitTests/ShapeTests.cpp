@@ -24,18 +24,18 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-#include <SurgSim/Physics/Shapes.h>
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::SphereShape;
-using SurgSim::Physics::CylinderShape;
-using SurgSim::Physics::CapsuleShape;
-using SurgSim::Physics::MeshShape;
+#include <SurgSim/Math/Shapes.h>
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::CylinderShape;
+using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::MeshShape;
 
 namespace {
 	const double epsilon = 1e-10;
 }
 
-class RigidShapeTest : public ::testing::Test
+class ShapeTest : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -65,12 +65,12 @@ public:
 	double m_size[3];
 };
 
-TEST_F(RigidShapeTest, Sphere)
+TEST_F(ShapeTest, Sphere)
 {
 	ASSERT_NO_THROW({SphereShape s(m_radius);});
 
 	SphereShape s(m_radius);
-	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE, s.getType());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_SPHERE, s.getType());
 	EXPECT_EQ(m_radius, s.getRadius());
 
 	const double& r = m_radius;
@@ -96,7 +96,7 @@ TEST_F(RigidShapeTest, Sphere)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(RigidShapeTest, Box)
+TEST_F(ShapeTest, Box)
 {
 	ASSERT_NO_THROW({BoxShape b(m_size[0], m_size[1], m_size[2]);});
 
@@ -104,7 +104,7 @@ TEST_F(RigidShapeTest, Box)
 	EXPECT_EQ(m_size[0], b.getSizeX());
 	EXPECT_EQ(m_size[1], b.getSizeY());
 	EXPECT_EQ(m_size[2], b.getSizeZ());
-	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_BOX, b.getType());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_BOX, b.getType());
 
 	double expectedVolume = m_size[0] * m_size[1] * m_size[2];
 	double expectedMass = m_rho * expectedVolume;
@@ -130,14 +130,14 @@ TEST_F(RigidShapeTest, Box)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(RigidShapeTest, Cylinder)
+TEST_F(ShapeTest, Cylinder)
 {
 	ASSERT_NO_THROW({CylinderShape c(m_length, m_radius);});
 
 	CylinderShape c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
-	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_CYLINDER, c.getType());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CYLINDER, c.getType());
 
 	double expectedVolume = M_PI * m_radius * m_radius * m_length;
 	double expectedMass = m_rho * expectedVolume;
@@ -164,14 +164,14 @@ TEST_F(RigidShapeTest, Cylinder)
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
-TEST_F(RigidShapeTest, Capsule)
+TEST_F(ShapeTest, Capsule)
 {
 	ASSERT_NO_THROW({CapsuleShape c(m_length, m_radius);});
 
 	CapsuleShape c(m_length, m_radius);
 	EXPECT_EQ(m_length, c.getLength());
 	EXPECT_EQ(m_radius, c.getRadius());
-	EXPECT_EQ(SurgSim::Physics::RIGID_SHAPE_TYPE_CAPSULE, c.getType());
+	EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_CAPSULE, c.getType());
 
 	double r2 = m_radius * m_radius;
 	double r3 = r2 * m_radius;

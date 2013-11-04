@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/CapsuleShape.h>
+#include <SurgSim/Math/CapsuleShape.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Math
 {
 
 CapsuleShape::CapsuleShape(double length, double radius)
@@ -28,7 +28,7 @@ CapsuleShape::CapsuleShape(double length, double radius)
 
 int CapsuleShape::getType()
 {
-	return RIGID_SHAPE_TYPE_CAPSULE;
+	return SHAPE_TYPE_CAPSULE;
 }
 
 double CapsuleShape::getLength() const
@@ -105,5 +105,5 @@ SurgSim::Math::Matrix33d CapsuleShape::calculateInertia(double rho) const
 	return inertia;
 }
 
-}; // namespace Physics
+}; // namespace Math
 }; // namespace SurgSim

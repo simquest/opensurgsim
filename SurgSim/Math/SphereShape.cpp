@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Math/SphereShape.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Math
 {
 
 SphereShape::SphereShape(double radius)
@@ -27,7 +27,7 @@ SphereShape::SphereShape(double radius)
 
 int SphereShape::getType()
 {
-	return RIGID_SHAPE_TYPE_SPHERE;
+	return SHAPE_TYPE_SPHERE;
 }
 
 double SphereShape::getRadius() const
@@ -59,5 +59,5 @@ SurgSim::Math::Matrix33d SphereShape::calculateInertia(double rho) const
 }
 
 
-}; // namespace Physics
+}; // namespace Math
 }; // namespace SurgSim

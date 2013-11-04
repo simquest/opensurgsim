@@ -15,14 +15,14 @@
 
 #include <SurgSim/Collision/BoxSphereDcdContact.h>
 
-#include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Math/BoxShape.h>
 #include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/SphereShape.h>
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::SphereShape;
 
 namespace SurgSim
 {
@@ -35,7 +35,7 @@ BoxSphereDcdContact::BoxSphereDcdContact()
 
 std::pair<int,int> BoxSphereDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_BOX, SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE);
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_SPHERE);
 }
 
 void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)

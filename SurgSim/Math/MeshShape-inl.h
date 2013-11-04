@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef SURGSIM_PHYSICS_MESHSHAPE_INL_H
-#define SURGSIM_PHYSICS_MESHSHAPE_INL_H
+#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
+#define SURGSIM_MATH_MESHSHAPE_INL_H
 
 
 namespace
@@ -35,7 +35,7 @@ double cube(double x)
 
 namespace SurgSim
 {
-namespace Physics
+namespace Math
 {
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -49,7 +49,7 @@ MeshShape<VertexData, EdgeData, TriangleData>::MeshShape(
 template <class VertexData, class EdgeData, class TriangleData>
 int MeshShape<VertexData, EdgeData, TriangleData>::getType()
 {
-	return RIGID_SHAPE_TYPE_MESH;
+	return SHAPE_TYPE_MESH;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -249,7 +249,7 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeVolumeIntegrals()
 	m_TP[0] /= 2; m_TP[1] /= 2; m_TP[2] /= 2;
 }
 
-}; // namespace Physics
+}; // namespace Math
 }; // namespace SurgSim
 
-#endif //SURGSIM_PHYSICS_MESHSHAPE_INL_H
+#endif //SURGSIM_MATH_MESHSHAPE_INL_H

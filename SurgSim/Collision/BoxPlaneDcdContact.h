@@ -20,7 +20,6 @@
 
 #include <SurgSim/Collision/ContactCalculation.h>
 
-using SurgSim::Physics::RigidShapeType;
 
 namespace SurgSim
 {

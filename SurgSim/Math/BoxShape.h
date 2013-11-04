@@ -13,21 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_BOXSHAPE_H
-#define SURGSIM_PHYSICS_BOXSHAPE_H
+#ifndef SURGSIM_MATH_BOXSHAPE_H
+#define SURGSIM_MATH_BOXSHAPE_H
 
-#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Shape.h>
 #include <SurgSim/Math/Quaternion.h>
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
 /// Box shape: box centered on (0 0 0), aligned with the axis
 /// with different sizes along X, Y and Z
-class BoxShape: public RigidShape
+class BoxShape: public Shape
 {
 public:
 	/// Constructor
@@ -89,8 +89,8 @@ private:
 	Vector3d m_vertices[8];
 };
 
-}; // Physics
+}; // Math
 
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_BOXSHAPE_H
+#endif // SURGSIM_MATH_BOXSHAPE_H

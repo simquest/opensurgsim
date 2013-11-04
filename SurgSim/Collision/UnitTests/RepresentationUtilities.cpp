@@ -15,12 +15,12 @@
 
 #include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
 #include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
-#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 
-#include <SurgSim/Physics/Shapes.h>
+#include <SurgSim/Math/Shapes.h>
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
@@ -37,7 +37,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresent
 	const Vector3d& position)
 {
 
-	std::shared_ptr<RigidShape> sphere = std::make_shared<SurgSim::Physics::SphereShape>(radius);
+	std::shared_ptr<Shape> sphere = std::make_shared<SurgSim::Math::SphereShape>(radius);
 	return 	std::make_shared<MockCollisionRepresentation>(
 		"TestSphereShapeCollisionRep",
 		sphere,
@@ -51,7 +51,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeDoubleSidedPlan
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
-	std::shared_ptr<RigidShape> plane = std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
+	std::shared_ptr<Shape> plane = std::make_shared<SurgSim::Math::DoubleSidedPlaneShape>();
 	return 	std::make_shared<MockCollisionRepresentation>(
 		"TestDoubleSidedPlaneCollisionRep",
 		plane,
@@ -65,7 +65,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makePlaneRepresenta
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
-	std::shared_ptr<RigidShape> plane = std::make_shared<SurgSim::Physics::PlaneShape>();
+	std::shared_ptr<Shape> plane = std::make_shared<SurgSim::Math::PlaneShape>();
 	return  std::make_shared<MockCollisionRepresentation>(
 		"TestPlaneRepresentation",
 		plane,
@@ -82,7 +82,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeCapsuleRepresen
 	const Vector3d& position)
 {
 
-	std::shared_ptr<RigidShape> capsule = std::make_shared<SurgSim::Physics::CapsuleShape>(length, radius);
+	std::shared_ptr<Shape> capsule = std::make_shared<SurgSim::Math::CapsuleShape>(length, radius);
 	return 	std::make_shared<MockCollisionRepresentation>(
 		"TestCapsuleShapeCollisionRep",
 		capsule,

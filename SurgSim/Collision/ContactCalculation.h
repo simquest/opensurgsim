@@ -20,7 +20,6 @@
 
 #include <SurgSim/Collision/CollisionPair.h>
 
-using SurgSim::Physics::RigidShapeType;
 
 namespace SurgSim
 {

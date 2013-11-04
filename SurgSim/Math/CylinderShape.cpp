@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/CylinderShape.h>
+#include <SurgSim/Math/CylinderShape.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Math
 {
 
 CylinderShape::CylinderShape(double length, double radius)
@@ -28,7 +28,7 @@ CylinderShape::CylinderShape(double length, double radius)
 
 int CylinderShape::getType()
 {
-	return RIGID_SHAPE_TYPE_CYLINDER;
+	return SHAPE_TYPE_CYLINDER;
 }
 
 double CylinderShape::getLength() const
@@ -67,5 +67,5 @@ SurgSim::Math::Matrix33d CylinderShape::calculateInertia(double rho) const
 	return inertia;
 }
 
-}; // namespace Physics
+}; // namespace Math
 }; // namespace SurgSim

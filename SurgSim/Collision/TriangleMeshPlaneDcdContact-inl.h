@@ -29,7 +29,7 @@ TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::TriangleMeshPla
 template <class VertexType, class EdgeType, class TriangleType>
 std::pair<int, int> TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::getShapeTypes()
 {
-	return std::pair<int, int> (SurgSim::Physics::RIGID_SHAPE_TYPE_MESH, SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE);
+	return std::pair<int, int> (SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
 template <class VertexType, class EdgeType, class TriangleType>
@@ -39,8 +39,8 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 	std::shared_ptr<CollisionRepresentation> representationTriangleMesh(pair->getFirst());
 	std::shared_ptr<CollisionRepresentation> representationPlane(pair->getSecond());
 
-	std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh
-		(std::static_pointer_cast<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>>
+	std::shared_ptr<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>> mesh
+		(std::static_pointer_cast<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>>
 		(representationTriangleMesh->getShape()));
 
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));

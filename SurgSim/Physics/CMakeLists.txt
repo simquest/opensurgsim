@@ -18,19 +18,15 @@ include_directories(
 )
 
 set(SURGSIM_PHYSICS_SOURCES
-	BoxShape.cpp
 	BuildMlcp.cpp
-	CapsuleShape.cpp
 	Computation.cpp
 	Constraint.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
 	ContactConstraintGeneration.cpp
-	CylinderShape.cpp
 	DcdCollision.cpp
 	DeformableRepresentationState.cpp
-	DoubleSidedPlaneShape.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -39,7 +35,6 @@ set(SURGSIM_PHYSICS_SOURCES
 	MassSpringRepresentation.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
-	PlaneShape.cpp
 	PostUpdate.cpp
 	PreUpdate.cpp
 	PushResults.cpp
@@ -49,14 +44,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	SolveMlcp.cpp
-	SphereShape.cpp
 	VirtualToolCoupler.cpp
 )
 
 set(SURGSIM_PHYSICS_HEADERS
-	BoxShape.h
 	BuildMlcp.h
-	CapsuleShape.h
 	Computation.h
 	Constraint.h
 	ConstraintData.h
@@ -64,12 +56,10 @@ set(SURGSIM_PHYSICS_HEADERS
 	ConstraintImplementationFactory.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
-	CylinderShape.h
 	DcdCollision.h
 	DeformableRepresentation.h
 	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
-	DoubleSidedPlaneShape.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationContact.h
@@ -79,14 +69,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Mass.h
 	MassSpringRepresentation.h
-	MeshShape.h
-	MeshShape-inl.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
 	PhysicsManager.h
 	PhysicsManagerState.h
-	PlaneShape.h
 	PostUpdate.h
 	PreUpdate.h
 	PushResults.h
@@ -99,10 +86,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
-	RigidShape.h
-	Shapes.h
 	SolveMlcp.h
-	SphereShape.h
 	Spring.h
 	VirtualToolCoupler.h
 )

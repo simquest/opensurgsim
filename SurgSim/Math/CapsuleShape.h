@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_CAPSULESHAPE_H
-#define SURGSIM_PHYSICS_CAPSULESHAPE_H
+#ifndef SURGSIM_MATH_CAPSULESHAPE_H
+#define SURGSIM_MATH_CAPSULESHAPE_H
 
-#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Shape.h>
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
 /// Capsule shape: centered on (0, 0, 0), aligned along Y,
 /// with length and radius
-class CapsuleShape: public RigidShape
+class CapsuleShape: public Shape
 {
 public:
 	/// Constructor
@@ -74,8 +74,8 @@ private:
 	double   m_length;
 };
 
-}; // Physics
+}; // Math
 
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_CAPSULESHAPE_H
+#endif // SURGSIM_MATH_CAPSULESHAPE_H

@@ -13,46 +13,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
+#include <SurgSim/Math/PlaneShape.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Math
 {
 
-DoubleSidedPlaneShape::DoubleSidedPlaneShape()
+PlaneShape::PlaneShape()
 {
 }
 
-int DoubleSidedPlaneShape::getType()
+int PlaneShape::getType()
 {
-	return RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE;
+	return SHAPE_TYPE_PLANE;
 }
 
-double DoubleSidedPlaneShape::calculateVolume() const
+double PlaneShape::calculateVolume() const
 {
 	return 0.0;
 }
 
-SurgSim::Math::Vector3d DoubleSidedPlaneShape::calculateMassCenter() const
+SurgSim::Math::Vector3d PlaneShape::calculateMassCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d DoubleSidedPlaneShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d PlaneShape::calculateInertia(double rho) const
 {
 	return Matrix33d::Identity();
 }
 
-double DoubleSidedPlaneShape::getD() const
+double PlaneShape::getD() const
 {
 	return 0.0;
 }
 
-SurgSim::Math::Vector3d DoubleSidedPlaneShape::getNormal() const
+SurgSim::Math::Vector3d PlaneShape::getNormal() const
 {
 	return Vector3d(0.0, 1.0, 0.0);
 }
 
-}; // namespace Physics
+}; // namespace Math
 }; // namespace SurgSim

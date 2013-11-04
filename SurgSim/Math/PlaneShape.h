@@ -13,25 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_DOUBLESIDEDPLANESHAPE_H
-#define SURGSIM_PHYSICS_DOUBLESIDEDPLANESHAPE_H
+#ifndef SURGSIM_MATH_PLANESHAPE_H
+#define SURGSIM_MATH_PLANESHAPE_H
 
-#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Shape.h>
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
-/// DoubleSidedPlaneShape: The XZ plane (d = 0) with normal pointing along
-/// positive Y axis.
-class DoubleSidedPlaneShape: public RigidShape
+/// The XZ plane (d = 0) with normal pointing along positive Y axis.
+/// The difference between PlaneShape and DoubleSidedPlane shape is in the way the Physics scene
+/// handles these in terms of collision detection. While the DoubleSidedPlane is handled as a thin
+/// solid of (essentially) zero thickness and space on either side it, the PlaneShape is considered
+/// to be a entirely solid on the side of the plane which is opposite to the normal. It is made of
+/// space only on the positive side of the plane normal. This results in having a robust collision
+/// object which does not let any objects through, and could be useful to define the scene floor.
+class PlaneShape: public Shape
 {
 public:
 
 	/// Constructor: No members to initialize.
-	DoubleSidedPlaneShape();
+	PlaneShape();
 
 	/// \return the type of the shape
 	virtual int getType();
@@ -59,8 +64,7 @@ public:
 
 };
 
-}; // Physics
-
+}; // Math
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_DOUBLESIDEDPLANESHAPE_H
+#endif // SURGSIM_MATH_PLANESHAPE_H

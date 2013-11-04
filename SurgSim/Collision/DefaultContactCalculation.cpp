@@ -34,7 +34,7 @@ DefaultContactCalculation::~DefaultContactCalculation()
 
 std::pair<int,int> DefaultContactCalculation::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_NONE, SurgSim::Physics::RIGID_SHAPE_TYPE_NONE);
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_NONE, SurgSim::Math::SHAPE_TYPE_NONE);
 }
 
 void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)

@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_SPHERESHAPE_H
-#define SURGSIM_PHYSICS_SPHERESHAPE_H
+#ifndef SURGSIM_MATH_SPHERESHAPE_H
+#define SURGSIM_MATH_SPHERESHAPE_H
 
-#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Shape.h>
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
 /// Sphere shape: sphere centered on (0 0 0), defined with radius
-class SphereShape: public RigidShape
+class SphereShape: public Shape
 {
 public:
 	/// Constructor
@@ -57,8 +57,8 @@ private:
 	double m_radius;
 };
 
-}; // Physics
+}; // Math
 
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_SPHERESHAPE_H
+#endif // SURGSIM_MATH_SPHERESHAPE_H

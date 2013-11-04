@@ -18,16 +18,16 @@
 // (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
 
 
-#ifndef SURGSIM_PHYSICS_MESHSHAPE_H
-#define SURGSIM_PHYSICS_MESHSHAPE_H
+#ifndef SURGSIM_MATH_MESHSHAPE_H
+#define SURGSIM_MATH_MESHSHAPE_H
 
-#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Shape.h>
 #include <SurgSim/DataStructures/TriangleMesh.h>
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
 /// Mesh shape: shape made of a triangle mesh
@@ -35,7 +35,7 @@ namespace Physics
 /// work by Brian Mirtich.
 /// http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html
 template <class VertexData, class EdgeData, class TriangleData>
-class MeshShape : public RigidShape
+class MeshShape : public Shape
 {
 	/// Type TriMesh for convenience
 	typedef SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData> TriMesh;
@@ -96,9 +96,9 @@ private:
 	std::shared_ptr<TriMesh> m_mesh;
 };
 
-}; // Physics
+}; // Math
 }; // SurgSim
 
-#include <SurgSim/Physics/MeshShape-inl.h>
+#include <SurgSim/Math/MeshShape-inl.h>
 
-#endif // SURGSIM_PHYSICS_MESHSHAPE_H
+#endif // SURGSIM_MATH_MESHSHAPE_H

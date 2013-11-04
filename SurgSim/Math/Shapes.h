@@ -13,46 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/PlaneShape.h>
+#ifndef SURGSIM_MATH_SHAPES_H
+#define SURGSIM_MATH_SHAPES_H
 
-namespace SurgSim
-{
-namespace Physics
-{
+/// This file includes all the shapes
+#include <SurgSim/Math/BoxShape.h>
+#include <SurgSim/Math/CapsuleShape.h>
+#include <SurgSim/Math/CylinderShape.h>
+#include <SurgSim/Math/MeshShape.h>
+#include <SurgSim/Math/DoubleSidedPlaneShape.h>
+#include <SurgSim/Math/PlaneShape.h>
+#include <SurgSim/Math/SphereShape.h>
 
-PlaneShape::PlaneShape()
-{
-}
-
-int PlaneShape::getType()
-{
-	return RIGID_SHAPE_TYPE_PLANE;
-}
-
-double PlaneShape::calculateVolume() const
-{
-	return 0.0;
-}
-
-SurgSim::Math::Vector3d PlaneShape::calculateMassCenter() const
-{
-	return Vector3d(0.0, 0.0, 0.0);
-}
-
-SurgSim::Math::Matrix33d PlaneShape::calculateInertia(double rho) const
-{
-	return Matrix33d::Identity();
-}
-
-double PlaneShape::getD() const
-{
-	return 0.0;
-}
-
-SurgSim::Math::Vector3d PlaneShape::getNormal() const
-{
-	return Vector3d(0.0, 1.0, 0.0);
-}
-
-}; // namespace Physics
-}; // namespace SurgSim
+#endif // SURGSIM_MATH_SHAPES_H

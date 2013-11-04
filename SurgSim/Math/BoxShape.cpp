@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/BoxShape.h>
+#include <SurgSim/Math/BoxShape.h>
 
 namespace SurgSim
 {
-namespace Physics
+namespace Math
 {
 
 BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ)
@@ -32,7 +32,7 @@ BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ)
 
 int BoxShape::getType()
 {
-	return RIGID_SHAPE_TYPE_BOX;
+	return SHAPE_TYPE_BOX;
 }
 
 double BoxShape::getSizeX() const
@@ -104,5 +104,5 @@ void BoxShape::calculateVertices()
 	}
 }
 
-}; // namespace Physics
+}; // namespace Math
 }; // namespace SurgSim

@@ -15,14 +15,14 @@
 
 #include <SurgSim/Collision/SpherePlaneDcdContact.h>
 
-#include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Physics/SphereShape.h>
-#include <SurgSim/Physics/PlaneShape.h>
+#include <SurgSim/Math/PlaneShape.h>
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/SphereShape.h>
 
-using SurgSim::Physics::SphereShape;
-using SurgSim::Physics::PlaneShape;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::PlaneShape;
 
 namespace SurgSim
 {
@@ -35,7 +35,7 @@ SpherePlaneDcdContact::SpherePlaneDcdContact()
 
 std::pair<int,int> SpherePlaneDcdContact::getShapeTypes()
 {
-	return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE, SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE);
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_SPHERE, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
 void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
