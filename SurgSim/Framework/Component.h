@@ -27,8 +27,8 @@ namespace Framework
 {
 
 // Forward References
-class SceneElement;
 class Scene;
+class SceneElement;
 class Runtime;
 
 /// Component is the main interface class to pass information to the system managers each will decide
@@ -38,101 +38,79 @@ class Runtime;
 class Component
 {
 public:
-	explicit Component(const std::string& name) : m_name(name), m_didInit(false), m_didWakeUp(false)
-	{
-	}
+	/// Constructor
+	/// \param	name	Name of the component
+	explicit Component(const std::string& name);
+	/// Destructor
+	virtual ~Component();
 
-	virtual ~Component()
-	{
-	}
+	/// Gets component name.
+	/// \return	Name of this component.
+	std::string getName() const;
+	/// Sets the name of component.
+	/// \param	name	The name of this component.
+	void setName(const std::string& name);
 
-	/// Gets the name.
-	/// \return	The name.
-	std::string getName() const
-	{
-		return m_name;
-	}
+	/// \return True if this component is initialized; otherwise, false.
+	bool isInitialized() const;
+	/// Initialize this component.
+	/// \param runtime	The runtime which contains this component.
+	/// \return True if this component is initialized successfully; otherwise, false.
+	bool initialize(const std::shared_ptr<Runtime>& runtime);
 
-	bool isInitialized() const
-	{
-		return m_didInit;
-	}
-
-	bool isAwake() const
-	{
-		return m_didWakeUp;
-	}
-
-	bool initialize(const std::shared_ptr<Runtime>& runtime)
-	{
-		SURGSIM_ASSERT(! m_didInit) << "Double initialization called on component " << getName();
-		SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be nullptr";
-		m_runtime = runtime;
-
-		m_didInit = true;
-		return doInitialize();
-	}
-
-	bool wakeUp()
-	{
-		SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
-		m_didWakeUp = true;
-		return doWakeUp();
-	}
-
-	std::shared_ptr<Runtime> getRuntime() const
-	{
-		return m_runtime.lock();
-	}
+	/// \return True if this component is awake; otherwise, false.
+	bool isAwake() const;
+	/// Wakeup this component
+	/// \return True if this component is woken up successfully; otherwise, false.
+	bool wakeUp();
 
 	/// Sets the scene.
 	/// \param scene The scene for this component
-	void setScene(std::weak_ptr<Scene> scene)
-	{
-		m_scene = scene;
-	}
-
+	void setScene(std::weak_ptr<Scene> scene);
 	/// Gets the scene.
 	/// \return The scene for this component
-	std::shared_ptr<Scene> getScene()
-	{
-		return m_scene.lock();
-	}
+	std::shared_ptr<Scene> getScene();
 
 	/// Sets the scene element.
 	/// \param sceneElement The scene element for this component
-	void setSceneElement(std::weak_ptr<SceneElement> sceneElement)
-	{
-			m_sceneElement = sceneElement;
-	}
-
+	void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
 	/// Gets the scene element.
 	/// \return The scene element for this component
-	std::shared_ptr<SceneElement> getSceneElement()
-	{
-		return m_sceneElement.lock();
-	}
+	std::shared_ptr<SceneElement> getSceneElement();
 
-	/// Sets the name.
-	/// \param	name	The name.
-	void setName(const std::string& name)
-	{
-		m_name = name;
-	}
+	/// Get the runtime which contains this component
+	/// \return The runtime which contains this component
+	std::shared_ptr<Runtime> getRuntime() const;
 
 private:
+	/// Name of this component
 	std::string m_name;
 
+	/// Runtime which contains this component
 	std::weak_ptr<Runtime> m_runtime;
+
+	/// Scene which contains this component
 	std::weak_ptr<Scene> m_scene;
+
+	/// SceneElement which contains this component
 	std::weak_ptr<SceneElement> m_sceneElement;
 
-
+	/// Interface to be implemented by derived classes
+	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize() = 0;
+	/// Interface to be implemented by derived classes
+	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+	/// Indicates if doInitialize() has been called
 	bool m_didInit;
+	/// Indicates if doWakeup() has been called
 	bool m_didWakeUp;
+
+	/// Indicates if this component is initialized
+	bool m_isInitialized;
+	/// Indicates if this component is awake
+	bool m_isAwake;
 };
 
 }; // namespace Framework

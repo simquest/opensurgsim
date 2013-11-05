@@ -29,6 +29,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Barrier.cpp
 	BasicThread.cpp
 	BehaviorManager.cpp
+	Component.cpp
 	ComponentManager.cpp
 	Logger.cpp
 	LoggerManager.cpp
