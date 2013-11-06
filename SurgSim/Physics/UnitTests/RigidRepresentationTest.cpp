@@ -26,10 +26,11 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 using SurgSim::Collision::Location;
 

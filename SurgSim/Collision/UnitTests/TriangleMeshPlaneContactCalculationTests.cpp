@@ -110,7 +110,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 }
 
 template <class VertexType, class EdgeType, class TriangleType>
-void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh,
+void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>> mesh,
 					const Quaterniond& meshQuat,
 					const Vector3d& meshTrans,
 					std::shared_ptr<PlaneShape> plane,
@@ -192,8 +192,8 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData>> cubeMesh =
-		std::make_shared<SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData>>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData>> cubeMesh =
+		std::make_shared<SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData>>(mesh);
 
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	SurgSim::Math::Quaterniond meshQuat;

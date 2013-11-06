@@ -23,7 +23,7 @@ namespace Collision
 
 MockCollisionRepresentation::MockCollisionRepresentation(
 		const std::string& name,
-		const std::shared_ptr<RigidShape>& shape,
+		const std::shared_ptr<Shape>& shape,
 		const SurgSim::Math::Quaterniond& quat,
 		const SurgSim::Math::Vector3d& translation,
 		std::shared_ptr<SurgSim::Physics::Representation> representation) :
@@ -36,7 +36,7 @@ MockCollisionRepresentation::MockCollisionRepresentation(
 
 MockCollisionRepresentation::MockCollisionRepresentation(
 		const std::string& name,
-		const std::shared_ptr<RigidShape>& shape,
+		const std::shared_ptr<Shape>& shape,
 		const SurgSim::Math::RigidTransform3d& pose,
 		std::shared_ptr<SurgSim::Physics::Representation> representation) :
 	CollisionRepresentation(name,representation),
@@ -57,7 +57,7 @@ int MockCollisionRepresentation::getShapeType() const
 	return m_shape->getType();
 }
 
-const std::shared_ptr<SurgSim::Physics::RigidShape> MockCollisionRepresentation::getShape() const
+const std::shared_ptr<Shape> MockCollisionRepresentation::getShape() const
 {
 	return m_shape;
 }

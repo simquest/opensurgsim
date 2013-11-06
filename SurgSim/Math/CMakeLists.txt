@@ -19,15 +19,27 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
+	BoxShape.cpp
+	CapsuleShape.cpp
+	CylinderShape.cpp
+	DoubleSidedPlaneShape.cpp
 	LinearSolveAndInverse.cpp
 	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
+	PlaneShape.cpp
+	SphereShape.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
+	BoxShape.h
+	CapsuleShape.h
+	CylinderShape.h
+	DoubleSidedPlaneShape.h
 	Geometry.h
 	LinearSolveAndInverse.h
 	Matrix.h
+	MeshShape.h
+	MeshShape-inl.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
@@ -44,8 +56,12 @@ set(SURGSIM_MATH_HEADERS
 	OdeSolverEulerExplicitModified-inl.h
 	OdeSolverEulerImplicit.h
 	OdeSolverEulerImplicit-inl.h
+	PlaneShape.h
 	Quaternion.h
 	RigidTransform.h
+	Shape.h
+	Shapes.h
+	SphereShape.h
 	Valid.h
 	Valid-inl.h
 	Vector.h

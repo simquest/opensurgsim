@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_RIGIDSHAPE_H
-#define SURGSIM_PHYSICS_RIGIDSHAPE_H
+#ifndef SURGSIM_MATH_SHAPE_H
+#define SURGSIM_MATH_SHAPE_H
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
@@ -22,38 +22,38 @@
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
 /// Type defining the shape direction for certain templatized shape
 /// (i.e. CylinderShape and CapsuleShape)
 typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTION_AXIS_Z=2} ShapeDirection;
 
-/// Fixed List of enums for the available RigidShape types, do not explicitly assign values, RigidShapeCount is
+/// Fixed List of enums for the available Shape types, do not explicitly assign values, ShapeCount is
 /// used to determine the number of actual shape types
 typedef enum
 {
-	RIGID_SHAPE_TYPE_NONE = -1,
-	RIGID_SHAPE_TYPE_PLANE,
-	RIGID_SHAPE_TYPE_DOUBLESIDEDPLANE,
-	RIGID_SHAPE_TYPE_SPHERE,
-	RIGID_SHAPE_TYPE_BOX,
-	RIGID_SHAPE_TYPE_CYLINDER,
-	RIGID_SHAPE_TYPE_CAPSULE,
-	RIGID_SHAPE_TYPE_MESH,
-	RIGID_SHAPE_TYPE_COUNT
-} RigidShapeType;
+	SHAPE_TYPE_NONE = -1,
+	SHAPE_TYPE_PLANE,
+	SHAPE_TYPE_DOUBLESIDEDPLANE,
+	SHAPE_TYPE_SPHERE,
+	SHAPE_TYPE_BOX,
+	SHAPE_TYPE_CYLINDER,
+	SHAPE_TYPE_CAPSULE,
+	SHAPE_TYPE_MESH,
+	SHAPE_TYPE_COUNT
+} ShapeType;
 
-/// Generic rigid shape class defining a shape for a rigid representation
+/// Generic rigid shape class defining a shape
 /// \note This class gives the ability to analyze the shape and compute
 /// \note physical information (volume, mass, mass center, inertia)
-class RigidShape
+class Shape
 {
 public:
 	typedef ::SurgSim::Math::Vector3d Vector3d;
 	typedef ::SurgSim::Math::Matrix33d Matrix33d;
 
-	virtual ~RigidShape() {}
+	virtual ~Shape() {}
 
 	/// \return the type of shape
 	virtual int getType() = 0;
@@ -80,8 +80,8 @@ public:
 	virtual Matrix33d calculateInertia(double rho) const = 0;
 };
 
-}; // Physics
+}; // Math
 
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_RIGIDSHAPE_H
+#endif // SURGSIM_MATH_SHAPE_H

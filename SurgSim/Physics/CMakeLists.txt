@@ -48,9 +48,7 @@ set(SURGSIM_PHYSICS_SOURCES
 )
 
 set(SURGSIM_PHYSICS_HEADERS
-	BoxShape.h
 	BuildMlcp.h
-	CapsuleShape.h
 	Computation.h
 	Constraint.h
 	ConstraintData.h
@@ -58,12 +56,10 @@ set(SURGSIM_PHYSICS_HEADERS
 	ConstraintImplementationFactory.h
 	ContactConstraintData.h
 	ContactConstraintGeneration.h
-	CylinderShape.h
 	DcdCollision.h
 	DeformableRepresentation.h
 	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
-	DoubleSidedPlaneShape.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationContact.h
@@ -73,13 +69,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Mass.h
 	MassSpringRepresentation.h
-	MeshShape.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
 	PhysicsManager.h
 	PhysicsManagerState.h
-	PlaneShape.h
 	PostUpdate.h
 	PreUpdate.h
 	PushResults.h
@@ -92,10 +86,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
 	RigidRepresentationState.h
-	RigidShape.h
-	Shapes.h
 	SolveMlcp.h
-	SphereShape.h
 	Spring.h
 	VirtualToolCoupler.h
 )

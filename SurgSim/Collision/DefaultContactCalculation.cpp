@@ -14,12 +14,28 @@
 // limitations under the License.
 
 #include <SurgSim/Collision/DefaultContactCalculation.h>
+
+#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
 {
 namespace Collision
 {
+
+DefaultContactCalculation::DefaultContactCalculation(bool doAssert) :
+	m_doAssert(doAssert)
+{
+}
+
+DefaultContactCalculation::~DefaultContactCalculation()
+{
+}
+
+std::pair<int,int> DefaultContactCalculation::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_NONE, SurgSim::Math::SHAPE_TYPE_NONE);
+}
 
 void DefaultContactCalculation::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {

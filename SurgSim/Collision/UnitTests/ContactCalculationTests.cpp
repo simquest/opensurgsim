@@ -18,8 +18,8 @@
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/SpherePlaneDcdContact.h>
 
-#include <SurgSim/Physics/SphereShape.h>
-#include <SurgSim/Physics/PlaneShape.h>
+#include <SurgSim/Math/SphereShape.h>
+#include <SurgSim/Math/PlaneShape.h>
 
 #include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
 
@@ -31,8 +31,8 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Physics::PlaneShape;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Math::PlaneShape;
+using SurgSim::Math::SphereShape;
 
 namespace SurgSim
 {

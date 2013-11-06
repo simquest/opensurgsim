@@ -23,29 +23,27 @@
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Physics/DcdCollision.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 #include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
-#include <SurgSim/Physics/SphereShape.h>
 #include <SurgSim/Physics/PhysicsManagerState.h>
 
+#include <SurgSim/Math/DoubleSidedPlaneShape.h>
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/SphereShape.h>
 
 using SurgSim::Collision::CollisionRepresentation;
 using SurgSim::Collision::CollisionPair;
+using SurgSim::Collision::RigidCollisionRepresentation;
+using SurgSim::Collision::ShapeCollisionRepresentation;
+using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::Shape;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
-using SurgSim::Collision::RigidCollisionRepresentation;
-using SurgSim::Physics::RigidShape;
-using SurgSim::Collision::RigidShapeCollisionRepresentation;
-using SurgSim::Physics::SphereShape;
-using SurgSim::Physics::DoubleSidedPlaneShape;
-using SurgSim::Physics::PhysicsManagerState;
-
-using SurgSim::Math::Vector3d;
-
 
 std::shared_ptr<RigidRepresentation> createSphere(const std::string& name, const SurgSim::Math::Vector3d& position)
 {
@@ -106,8 +104,8 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 		"Sphere1 Collision",
 		sphere1);
 
-	std::shared_ptr<RigidShape> shape = std::make_shared<DoubleSidedPlaneShape>();
-	std::shared_ptr<CollisionRepresentation> fixedCollision = std::make_shared<RigidShapeCollisionRepresentation>(
+	std::shared_ptr<Shape> shape = std::make_shared<DoubleSidedPlaneShape>();
+	std::shared_ptr<CollisionRepresentation> fixedCollision = std::make_shared<ShapeCollisionRepresentation>(
 		"Sphere1 Collision",
 		shape,
 		fixed);
