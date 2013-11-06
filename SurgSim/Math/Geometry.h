@@ -1458,29 +1458,32 @@ void intersectionsSegmentBox(
 	{
 		auto beyondMinCorner = (sv0.array() < box.min().array());
 		auto beyondMaxCorner = (sv0.array() > box.max().array());
-		if ((parralelToPlane * beyondMinCorner * beyondMaxCorner).any())
+		if ((parralelToPlane && (beyondMinCorner || beyondMaxCorner)).any())
 		{
 			return;
 		}
 	}
 
-	Eigen::Array<double, 3, 2> planeIntersections;
-	planeIntersections.col(0) = (box.min().array() - sv0.array());
-	planeIntersections.col(1) = (box.max().array()- sv0.array());
-	planeIntersections.colwise() /= v01;
+	// Calculate the intesection of the segment with each of the 6 box planes.
+	// The intersection is calculated as the distance along the segment (abscissa)
+	// scaled from 0 to 1.
+	Eigen::Array<double, 3, 2> planeIntersectionAbscissas;
+	planeIntersectionAbscissas.col(0) = (box.min().array() - sv0.array());
+	planeIntersectionAbscissas.col(1) = (box.max().array()- sv0.array());
+	planeIntersectionAbscissas.colwise() /= v01;
 
-	double entrance = planeIntersections.rowwise().minCoeff().maxCoeff();
-	double exit = planeIntersections.rowwise().maxCoeff().minCoeff();
-	if (entrance < exit && exit > 0.0)
+	double entranceAbscissa = planeIntersectionAbscissas.rowwise().minCoeff().maxCoeff();
+	double exitAbscissa = planeIntersectionAbscissas.rowwise().maxCoeff().minCoeff();
+	if (entranceAbscissa < exitAbscissa && exitAbscissa > 0.0)
 	{
-		if (entrance >= 0.0 && entrance <= 1.0)
+		if (entranceAbscissa >= 0.0 && entranceAbscissa <= 1.0)
 		{
-			intersections->push_back(sv0 + v01.matrix() * entrance);
+			intersections->push_back(sv0 + v01.matrix() * entranceAbscissa);
 		}
 
-		if (exit >= 0.0 && exit <= 1.0)
+		if (exitAbscissa >= 0.0 && exitAbscissa <= 1.0)
 		{
-			intersections->push_back(sv0 + v01.matrix() * exit);
+			intersections->push_back(sv0 + v01.matrix() * exitAbscissa);
 		}
 	}
 }

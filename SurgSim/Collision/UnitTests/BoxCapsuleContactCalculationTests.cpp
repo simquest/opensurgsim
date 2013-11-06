@@ -77,6 +77,32 @@ TEST(BoxCapsuleContactCalculationTests, UnitTests)
     }
 
     {
+        SCOPED_TRACE("No intersection, capsule beyond corner of box");
+        boxQuat = SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+        boxTrans = Vector3d::Zero();
+        capsuleQuat = SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+        int expectedInContact = false;
+        capsuleTrans = Vector3d(1.5, 0.0, 1.5);
+        doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+        capsuleTrans = Vector3d(1.5, 0.0, -1.5);
+        doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+        capsuleTrans = Vector3d(-1.5, 0.0, 1.5);
+        doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+        capsuleTrans = Vector3d(-1.5, 0.0, -1.5);
+        doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+    }
+
+    {
+        SCOPED_TRACE("No intersection, box below capsule");
+        boxQuat = SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+        boxTrans = Vector3d(0.0, -3.6, 0.0);
+        capsuleQuat = SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
+        capsuleTrans = Vector3d::Zero();
+        int expectedInContact = false;
+        doBoxCapsuleTest(box, boxQuat, boxTrans, capsule, capsuleQuat, capsuleTrans, expectedInContact);
+    }
+
+    {
         SCOPED_TRACE("Intersection, box intersection with capsule side");
         boxQuat = SurgSim::Math::makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0));
         boxTrans = Vector3d(1.0 , 0.0, 0.0);

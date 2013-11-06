@@ -116,7 +116,9 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 
 		// Collisions between a capulse and a box are the same as a segment and a dilated
 		// box with rounded corners. If the intersection occurs outside the original box
-		// in two or more dimensions, we need to check if it is inside these rounded corners.
+		// in two dimensions (collision with an edge of the dilated box) or three
+		// dimensions (collision with the corner of the dilated box) dimensions, we need
+		// to check if it is inside these rounded corners.
 		if ((dimensionsOutsideBox < 2) ||
 		   (distancePointSegment(clampedIntersection, capsuleBottom, capsuleTop, &unusedResult) < capsuleRadius))
 		{
