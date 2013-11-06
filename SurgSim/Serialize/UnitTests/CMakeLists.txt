@@ -33,3 +33,6 @@ include_directories(
 set(LIBS SurgSimSerialize SurgSimFramework SurgSimGraphics gtest yaml-cpp ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimSerializeTest)
+
+# Put SurgSimSerializeTest into folder "Serialize"
+set_target_properties(SurgSimSerializeTest PROPERTIES FOLDER "Serialize")

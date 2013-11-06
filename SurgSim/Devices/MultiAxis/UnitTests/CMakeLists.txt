@@ -42,3 +42,6 @@ option(SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS
 	OFF)
 surgsim_add_unit_tests(MultiAxisDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS})
+
+# Put MultiAxisDeviceTest into folder "Devices"
+set_target_properties(MultiAxisDeviceTest PROPERTIES FOLDER "Devices")

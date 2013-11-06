@@ -56,3 +56,6 @@ target_link_libraries(ExampleGraphicsScene
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
 )
+
+# Put ExampleGraphicsScene into folder "Examples"
+set_target_properties(ExampleGraphicsScene PROPERTIES FOLDER "Examples") 

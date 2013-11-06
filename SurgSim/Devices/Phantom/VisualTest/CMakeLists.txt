@@ -44,3 +44,6 @@ set(LIBS PhantomDevice IdentityPoseDevice VisualTestCommon
 	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
 target_link_libraries(PhantomVisualTest ${LIBS})
+
+# Put PhantomVisualTest into folder "Devices"
+set_target_properties(PhantomVisualTest PROPERTIES FOLDER "Devices")

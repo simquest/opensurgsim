@@ -55,3 +55,6 @@ option(SURGSIM_TESTS_RUN_GRAPHICS_RENDER
 	OFF)
 surgsim_add_unit_tests(SurgSimGraphicsRenderTest
 	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
+
+# Put SurgSimGraphicsRenderTest into folder "Graphics"
+set_target_properties(SurgSimGraphicsRenderTest PROPERTIES FOLDER "Graphics")

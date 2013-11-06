@@ -77,3 +77,6 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimMath into folder "Math"
+set_target_properties(SurgSimMath PROPERTIES FOLDER "Math")

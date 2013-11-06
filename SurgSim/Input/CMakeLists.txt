@@ -45,3 +45,6 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimInput into folder "Input"
+set_target_properties(SurgSimInput PROPERTIES FOLDER "Input")

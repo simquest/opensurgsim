@@ -102,3 +102,6 @@ target_link_libraries(SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimMa
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimPhysics into folder "Physics"
+set_target_properties(SurgSimPhysics PROPERTIES FOLDER "Physics")

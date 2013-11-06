@@ -53,3 +53,6 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimDataStructures into folder "DataStructure"
+set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructure")

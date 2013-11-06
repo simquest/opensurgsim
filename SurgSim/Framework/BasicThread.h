@@ -37,7 +37,13 @@ class Runtime;
 /// after calling doRun() a thread be be set off and doInit() and doStartup() will
 /// be called in succession. If given a startup barrier the sequence will pause at
 /// both steps until all other threads are done with these steps.
-/// Initialization can be further customized by implementing a executeInitialization() function
+/// Initialization can be further customized by implementing a executeInitialization() function.
+/// When a barrier was used to start up the thread it can also be used to run the thread in a
+/// synchronous fashion. Use setIsSynchrous(true) to switch the thread over, after that the thread
+/// will wait for the barrier to trigger before it executes another update. When running asynchronously the thread
+/// cannot be stopped with the stop() call, a barrier wait with an argument of false has to be used
+/// to stop the thread. The thread can be set back to asynchronous execution, one last barrier wait after
+/// the switch has to be executed for the thread to come out of the wait.
 class BasicThread
 {
 public:
@@ -53,12 +59,17 @@ public:
 
 	/// Start the thread from the outside, this will call the private
 	/// run() function that can be overridden for each implementor of this
-	/// interface
+	/// interface.
 	/// \param startupBarrier is a barrier it synchronizes a group of thread that should go through their startup
 	/// sequence in step.
-	void start(std::shared_ptr<Barrier> startupBarrier=nullptr);
+	/// \param isSynchronous when true the thread will wait on the barrier after each call to update(dt), this
+	/// 					 means that only one step will be performed at a time
+	void start(std::shared_ptr<Barrier> startupBarrier=nullptr, bool isSynchronous = false);
 
-	/// Stopping the execution, blocks until the running thread has actually stopped
+	/// Stopping the execution, blocks until the running thread has actually stopped,
+	/// \note When the thread is in synchronous mode, it needs to be stopped with a call to
+	/// 	  the barrier wait function with an argument of false, of course it can always be stopped
+	/// 	  by going back to asynchronous mode and then calling stop
 	void stop();
 
 	/// Query if this object is initialized.
@@ -81,6 +92,20 @@ public:
 	/// Set the update rate of the thread
 	/// \param val	rate in hertz (updates per second) of the thread
 	void setRate(double val) {m_period = boost::chrono::duration<double>(1.0/val);}
+
+	/// Sets the thread to synchronized execution in concert with the startup
+	/// barrier, the startup barrier has to exist for this call to succeed.
+	/// When the thread is set to run synchronized it will only execute one update at a time
+	/// and then wait for the startup barrier to wake it up again.
+	/// \param	val	if true the thread will need to be controlled via the barrier.
+	/// \return the actual value of isSynchronous()
+	/// \note HS-2013-nov-01 Currently mostly for use in unit tests and debugging, when multiple thread with differing
+	/// 	  rates are being synchronized the call rates will not correspond to the expected rates.
+	bool setSynchronous(bool val);
+
+	/// Query if this object is synchronized.
+	/// \return	true if synchronized, false if not.
+	bool isSynchronous();
 
 protected:
 
@@ -110,6 +135,7 @@ private:
 	bool m_isInitialized;
 	bool m_isRunning;
 	bool m_stopExecution;
+	bool m_isSynchronous;
 
 	virtual bool doInitialize() = 0;
 	virtual bool doStartUp() = 0;

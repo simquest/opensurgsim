@@ -57,3 +57,6 @@ target_link_libraries(ExampleBouncingBalls
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
 )
+
+# Put ExampleBouncingBalls into folder "Examples"
+set_target_properties(ExampleBouncingBalls PROPERTIES FOLDER "Examples") 

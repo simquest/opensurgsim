@@ -74,3 +74,6 @@ file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DEST
 set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)
+
+# Put SurgSimGraphicsTest into folder "Graphics"
+set_target_properties(SurgSimGraphicsTest PROPERTIES FOLDER "Graphics")
