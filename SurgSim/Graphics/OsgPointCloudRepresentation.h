@@ -47,10 +47,6 @@ public:
 	/// Destructor
 	~OsgPointCloudRepresentation();
 
-	/// Sets Vertices.
-	/// \param	mesh	The mesh.
-	virtual void setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) override;
-
 	/// Gets the vertices.
 	/// \return	The vertices.
 	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const override;
