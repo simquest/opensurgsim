@@ -214,7 +214,8 @@ public:
 		succeedStartup(succeedStartup),
 		didInitialize(false),
 		didStartUp(false),
-		didBeforeStop(false)
+		didBeforeStop(false),
+		count(0)
 	{
 	}
 
@@ -252,6 +253,7 @@ public:
 	bool didInitialize;
 	bool didStartUp;
 	bool didBeforeStop;
+	int count;
 
 private:
 	virtual bool doInitialize()
@@ -266,6 +268,7 @@ private:
 	};
 	virtual bool doUpdate(double dt)
 	{
+		++count;
 		return true;
 	};
 
