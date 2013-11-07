@@ -18,6 +18,7 @@ include_directories(
 	${gtest_SOURCE_DIR}
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 	${OPENTHREADS_INCLUDE_DIR}
 )
 

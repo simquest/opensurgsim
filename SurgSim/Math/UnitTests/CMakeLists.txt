@@ -62,7 +62,7 @@ if(SURGSIM_TESTS_BUILD_EIGEN)
 	endif(MSVC AND CMAKE_CL_64)
 endif(SURGSIM_TESTS_BUILD_EIGEN)
 
-set(LIBS SurgSimMath SurgSimFramework MlcpTestIO ${Boost_LIBRARIES} gtest)
+set(LIBS SurgSimMath SurgSimFramework MlcpTestIO ${Boost_LIBRARIES} gtest yaml-cpp)
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

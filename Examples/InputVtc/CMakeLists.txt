@@ -24,6 +24,7 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${YAML_CPP_SOURCE_DIR}/include"
 )
 
 set(INPUTVTCEXAMPLE_SOURCES
@@ -45,6 +46,7 @@ set(LIBS
 	SurgSimGraphics
 	SurgSimInput
 	SurgSimPhysics
+	yaml-cpp
 	${OPENSCENEGRAPH_LIBRARIES} 
 	${OPENTHREADS_LIBRARY}
 	${Boost_LIBRARIES})

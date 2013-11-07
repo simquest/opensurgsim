@@ -68,6 +68,7 @@ set(LIBS
 	SurgSimPhysics
 	MlcpTestIO
 	gtest
+	yaml-cpp
 	${Boost_LIBRARIES}
 )
 

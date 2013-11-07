@@ -24,6 +24,8 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${YAML_CPP_SOURCE_DIR}/include"
+
 )
 
 set(EXAMPLE_SOURCES
@@ -53,6 +55,7 @@ target_link_libraries(ExampleBouncingBalls
 	SurgSimPhysics
 	SurgSimGraphics
 	SurgSimInput
+	yaml-cpp
 	${Boost_LIBRARIES}
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
