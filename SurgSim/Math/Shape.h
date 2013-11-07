@@ -82,10 +82,10 @@ public:
 	virtual Matrix33d calculateInertia(double rho) const = 0;
 
 	/// Store data of RigidShape
-	virtual YAML::Node SurgSim::Math::Shape::encode();
+	virtual YAML::Node encode();
 
 	/// Load data of RigidShape
-	virtual bool SurgSim::Math::Shape::decode(const YAML::Node& node);
+	virtual bool decode(const YAML::Node& node);
 
 	/// Get class name
 	virtual std::string getClassName() = 0;

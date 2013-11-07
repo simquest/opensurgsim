@@ -239,6 +239,20 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeVolumeIntegrals()
 	m_TP[0] /= 2; m_TP[1] /= 2; m_TP[2] /= 2;
 }
 
+template <class VertexData, class EdgeData, class TriangleData>
+YAML::Node SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::encode()
+{
+	YAML::Node node;
+	return node;
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
+bool SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::decode(const YAML::Node& node)
+{
+	return true;
+}
+
+
 }; // namespace Math
 }; // namespace SurgSim
 

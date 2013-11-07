@@ -30,7 +30,8 @@ namespace Serialize
 		{
 		}
 
-		std::shared_ptr<SurgSim::Math::Shape> SurgSim::Serialize::ShapesFactory::createShape(const std::string& className)
+		std::shared_ptr<SurgSim::Math::Shape> SurgSim::Serialize::ShapesFactory::
+			createShape(const std::string& className)
 		{
 			auto it = m_registerDirectory.find(className);
 

@@ -33,7 +33,7 @@ namespace YAML
 			return false;
 		}
 		rhs->setName(node["name"].as<std::string>());
-		return true; 
+		return true;
 
 	}
 }

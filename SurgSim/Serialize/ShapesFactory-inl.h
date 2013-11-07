@@ -28,7 +28,7 @@ void SurgSim::Serialize::ShapesFactory::registerShape(const std::string& classNa
 {
 	if (m_registerDirectory.find(className) == m_registerDirectory.end())
 	{
-		m_registerDirectory[className] = boost::factory <std::shared_ptr<Derived> >();
+		m_registerDirectory[className] = boost::factory<std::shared_ptr<Derived>>();
 	};
 };
 
