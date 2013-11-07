@@ -76,9 +76,9 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 	std::shared_ptr<CollisionRepresentation> boxRepresentation = pair->getFirst();
 	std::shared_ptr<CollisionRepresentation> capsuleRepresentation = pair->getSecond();
 
-    std::shared_ptr<CapsuleShape> capsuleShape = 
+	std::shared_ptr<CapsuleShape> capsuleShape =
 		std::static_pointer_cast<CapsuleShape>(capsuleRepresentation->getShape());
-    std::shared_ptr<BoxShape> boxShape = std::static_pointer_cast<BoxShape>(boxRepresentation->getShape());
+	std::shared_ptr<BoxShape> boxShape = std::static_pointer_cast<BoxShape>(boxRepresentation->getShape());
 
 	SurgSim::Math::RigidTransform3d capsuleToBoxTransform;
 	capsuleToBoxTransform = boxRepresentation->getPose().inverse() * capsuleRepresentation->getPose();

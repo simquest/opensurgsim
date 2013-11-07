@@ -34,10 +34,10 @@ class BoxCapsuleDcdContact : public ContactCalculation
 {
 public:
 
-    /// Constructor.
-    BoxCapsuleDcdContact()
-    {
-    }
+	/// Constructor.
+	BoxCapsuleDcdContact()
+	{
+	}
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
