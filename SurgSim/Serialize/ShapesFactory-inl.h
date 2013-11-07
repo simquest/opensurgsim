@@ -13,25 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_CONVERT_H
-#define SURGSIM_SERIALIZE_CONVERT_H
 
-#include <yaml-cpp/yaml.h>
-#include <SurgSim/Framework/Log.h>
+#ifndef SURGSIM_SERIALIZE_SHAPESFACTORY_INL_H
+#define SURGSIM_SERIALIZE_SHAPESFACTORY_INL_H
 
-#define OSS_SERIALIZE(T)\
-	YAML::Node encode();\
-	bool decode(const YAML::Node& node);\
-	std::string getClassName() {return std::string(#T);}\
 
 namespace SurgSim
 {
 namespace Serialize
 {
-	/// Logger name for Serialization
-	const std::string serializeLogger = "Serialization";
+
+template <class Derived>
+void SurgSim::Serialize::ShapesFactory::registerShape(const std::string& className)
+{
+	if (m_registerDirectory.find(className) == m_registerDirectory.end())
+	{
+		m_registerDirectory[className] = boost::factory <std::shared_ptr<Derived> >();
+	};
+};
 
 };
 };
-
-#endif // SURGSIM_SERIALIZE_CONVERT_H
+#endif // SURGSIM_SERIALIZE_SHAPESFACTORY_INL_H

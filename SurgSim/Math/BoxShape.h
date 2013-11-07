@@ -19,6 +19,8 @@
 #include <SurgSim/Math/Shape.h>
 #include <SurgSim/Math/Quaternion.h>
 
+#include <SurgSim/Serialize/Convert.h>
+
 namespace SurgSim
 {
 
@@ -32,7 +34,7 @@ class BoxShape: public Shape
 public:
 	/// Constructor
 	/// \param sizeX, sizeY, sizeZ the box sizes in all 3 directions (in m)
-	BoxShape(double sizeX, double sizeY, double sizeZ);
+	BoxShape(double sizeX = 0, double sizeY = 0, double sizeZ = 0);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -77,6 +79,9 @@ public:
 	/// \param i The vertex index.
 	/// \return The local vertex position.
 	Vector3d getLocalVertex(const int i) const;
+
+	/// Serialize declarations of the box
+	OSS_SERIALIZE(SurgSim::Math::BoxShape);
 
 private:
 	/// Function that calculates the box vertices.

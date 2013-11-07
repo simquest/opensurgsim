@@ -62,6 +62,8 @@ public:
 	/// \return	The value of the normal (always Y axis).
 	Vector3d getNormal() const;
 
+	/// Serialize declarations of the plane
+	OSS_SERIALIZE(SurgSim::Math::PlaneShape);
 };
 
 }; // Math

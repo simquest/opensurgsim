@@ -30,7 +30,7 @@ class SphereShape: public Shape
 public:
 	/// Constructor
 	/// \param radius The sphere radius (in m)
-	explicit SphereShape(double radius);
+	explicit SphereShape(double radius = 0);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -51,6 +51,9 @@ public:
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the sphere
 	virtual Matrix33d calculateInertia(double rho) const override;
+
+	/// Serialize declarations of the sphere
+	OSS_SERIALIZE(SurgSim::Math::SphereShape);
 
 private:
 	/// Sphere radius

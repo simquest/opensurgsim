@@ -32,7 +32,7 @@ public:
 	/// Constructor
 	/// \param length The capsule length (i.e. of the cylinder) (in m)
 	/// \param radius The capsule radius (i.e. of the cylinder/spheres) (in m)
-	CapsuleShape(double length, double radius);
+	CapsuleShape(double length = 0, double radius = 0);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -65,6 +65,9 @@ public:
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the capsule
 	virtual Matrix33d calculateInertia(double rho) const override;
+
+	/// Serialize declarations of the capsule
+	OSS_SERIALIZE(SurgSim::Math::CapsuleShape);
 
 private:
 	/// Capsule radius

@@ -54,5 +54,21 @@ SurgSim::Math::Vector3d DoubleSidedPlaneShape::getNormal() const
 	return Vector3d(0.0, 1.0, 0.0);
 }
 
+YAML::Node SurgSim::Math::DoubleSidedPlaneShape::encode()
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	return node;
+}
+
+bool SurgSim::Math::DoubleSidedPlaneShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+	return true;
+}
 }; // namespace Math
 }; // namespace SurgSim

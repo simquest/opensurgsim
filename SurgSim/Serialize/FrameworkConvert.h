@@ -13,25 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_CONVERT_H
-#define SURGSIM_SERIALIZE_CONVERT_H
+#ifndef SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
+#define SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
 
-#include <yaml-cpp/yaml.h>
-#include <SurgSim/Framework/Log.h>
+#include <SurgSim/Serialize/Convert.h>
 
-#define OSS_SERIALIZE(T)\
-	YAML::Node encode();\
-	bool decode(const YAML::Node& node);\
-	std::string getClassName() {return std::string(#T);}\
+#include <SurgSim/Framework/Component.h>
 
-namespace SurgSim
+namespace YAML
 {
-namespace Serialize
-{
-	/// Logger name for Serialization
-	const std::string serializeLogger = "Serialization";
+	/// Specialize of YAML::convert<> template Component class.
+	template <>
+	struct convert <SurgSim::Framework::Component>
+	{
+		static Node encode(const SurgSim::Framework::Component& rhs);
+		static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component> rhs);
+	};
 
 };
-};
 
-#endif // SURGSIM_SERIALIZE_CONVERT_H
+#endif // SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
