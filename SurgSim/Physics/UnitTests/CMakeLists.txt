@@ -64,6 +64,7 @@ set(LIBS
 	SurgSimCollision
 	SurgSimDataStructures
 	SurgSimFramework
+	SurgSimMath
 	SurgSimInput
 	SurgSimPhysics
 	MlcpTestIO

@@ -43,6 +43,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimDataStructures
 	SurgSimFramework
+	SurgSimMath
 	SurgSimGraphics
 	SurgSimInput
 	SurgSimPhysics

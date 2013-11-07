@@ -54,6 +54,7 @@ target_link_libraries(ExampleBouncingBalls
 	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimInput
 	yaml-cpp
 	${Boost_LIBRARIES}

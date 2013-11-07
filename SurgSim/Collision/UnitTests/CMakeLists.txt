@@ -45,7 +45,7 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimTesting SurgSimFramework SurgSimDataStructures SurgSimCollision gtest yaml-cpp ${Boost_LIBRARIES})
+set(LIBS SurgSimTesting SurgSimMath SurgSimFramework SurgSimDataStructures SurgSimCollision gtest yaml-cpp ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
 

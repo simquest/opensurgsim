@@ -48,6 +48,7 @@ target_link_libraries(ExampleMassSprings
 	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimInput
 	yaml-cpp
 	${Boost_LIBRARIES}

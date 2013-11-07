@@ -57,6 +57,7 @@ set(LIBS
 	SurgSimGraphics
 	SurgSimInput
 	SurgSimPhysics
+	SurgSimMath
 	yaml-cpp
 	${OPENSCENEGRAPH_LIBRARIES} 
 	${OPENTHREADS_LIBRARY}
