@@ -33,9 +33,9 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	Representation(name),
 	VectorFieldRepresentation(name),
 	OsgRepresentation(name),
-	m_vectorField(nullptr),
-	m_scale(10.0)
+	m_scale(0.1)
 {
+	m_vectorField = std::make_shared< SurgSim::Graphics::VectorField >();
 	m_vertexData = new osg::Vec3Array;
 	m_lineGeometry = new osg::Geometry;
 	m_pointGeometry = new osg::Geometry;
@@ -50,12 +50,14 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	m_lineGeometry->setUseDisplayList(false);
 	m_lineGeometry->setDataVariance(osg::Object::DYNAMIC);
 	m_lineGeometry->getOrCreateStateSet()->setAttribute(m_line, osg::StateAttribute::ON);
+	m_lineGeometry->setColorArray(m_colors);
 
 	m_pointGeometry->setVertexArray(m_vertexData);
 	m_pointGeometry->addPrimitiveSet(m_drawPoints);
 	m_pointGeometry->setUseDisplayList(false);
 	m_pointGeometry->setDataVariance(osg::Object::DYNAMIC);
 	m_pointGeometry->getOrCreateStateSet()->setAttribute(m_point, osg::StateAttribute::ON);
+	m_pointGeometry->setColorArray(m_colors);
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode();
 	geode->addDrawable(m_lineGeometry);
@@ -74,6 +76,27 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 	std::vector< Vertex<VectorFieldData> > vertices = m_vectorField->getVertices();
 	size_t count = vertices.size();
 
+	if (2 * count != static_cast<size_t>(m_drawArrays->getCount()))
+	{
+		m_drawArrays->setCount(count * 2);
+		m_drawArrays->dirty();
+	}
+	
+	if (count != static_cast<size_t>(m_drawPoints->size()))
+	{
+		m_drawPoints->resize(count);
+		for (size_t i = 0; i < count; ++i)
+		{
+			m_drawPoints->at(i) = (2 * i);
+		}
+		m_drawPoints->dirty();
+	}
+	
+
+	if (2 * count > m_vertexData->size())
+	{
+		m_vertexData->resize(count * 2);
+	}
 	// Update vertices information to be used in OSG
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -81,10 +104,11 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 		(*m_vertexData)[2 * i] = SurgSim::Graphics::toOsg(vertices[i].position);
 		// Ending location of vector
 		(*m_vertexData)[2 * i + 1] = SurgSim::Graphics::toOsg(vertices[i].position) +
-			SurgSim::Graphics::toOsg(vertices[i].data.direction) / m_scale;
+			SurgSim::Graphics::toOsg(vertices[i].data.direction) * m_scale;
 	}
 
-	if (count > m_colors->size() * 2)
+
+	if (2 * count > m_colors->size())
 	{
 		m_colors->resize(count * 2);
 	}
@@ -96,45 +120,16 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 			(*m_colors)[2 * i] = color;
 			(*m_colors)[2 * i + 1] = color;
 		}
-		m_lineGeometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);
-		m_pointGeometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);
+		m_lineGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+		m_pointGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 	}
 	else
 	{
-		m_colors = new osg::Vec4Array(1);
 		(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		m_lineGeometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
-		m_pointGeometry->setColorArray(m_colors, osg::Array::BIND_OVERALL);
+		m_lineGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+		m_pointGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 	}
 }
-
-
-bool OsgVectorFieldRepresentation::setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vectorField)
-{
-	if (! isAwake())
-	{
-		m_vectorField = vectorField;
-		size_t count = m_vectorField->getVertices().size();
-
-		m_drawArrays->setCount(count * 2);
-		m_drawArrays->dirty();
-
-		m_vertexData->resize(count * 2);
-
-		m_drawPoints->dirty();
-		m_drawPoints->resize(count);
-		for (size_t i = 0; i < count; ++i)
-		{
-			m_drawPoints->at(i) = (2 * i);
-		}
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
 
 std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVectorField() const
 {

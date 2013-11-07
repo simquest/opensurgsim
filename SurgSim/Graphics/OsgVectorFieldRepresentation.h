@@ -44,11 +44,6 @@ public:
 	/// Destructor
 	~OsgVectorFieldRepresentation();
 
-	/// Sets vector field.
-	/// \param	vectorField	A vector field contains a list of vertices in 3D space.
-	/// \return True if update is successfully; Otherwise, false;
-	/// Each vertex is associated with a vector and an optional color.
-	virtual bool setVectorField(std::shared_ptr< SurgSim::Graphics::VectorField > vectorField) override;
 	/// Gets the vector field
 	/// \return The vector field
 	virtual std::shared_ptr< SurgSim::Graphics::VectorField > getVectorField() const override;
