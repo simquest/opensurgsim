@@ -21,15 +21,15 @@
 
 #include <SurgSim/Math/Shapes.h>
 
-/* CUBE
-     3*----------*2
-     /          /|
-   7*----------* |
-    |         6| |
-    | *0       | *1
-    |          |/
-   4*----------*5
-*/
+// CUBE
+//     3*----------*2
+//     /          /|
+//   7*----------* |
+//    |         6| |
+//    | *0       | *1
+//    |          |/
+//   4*----------*5
+
 static const int cubeNumPoints = 8;
 static const SurgSim::Math::Vector3d cubePoints[8]=
 {

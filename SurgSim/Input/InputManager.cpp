@@ -103,14 +103,13 @@ bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& inpu
 	if (m_devices.find(input->getDeviceName()) != m_devices.end())
 	{
 		input->connectDevice(m_devices[input->getDeviceName()]);
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-			                        " Added component " << input->getName();
+		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added component " << input->getName();
 		result = true;
 	}
 	else
 	{
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
-			                        input->getDeviceName() << " when adding component " << input->getName();
+								   input->getDeviceName() << " when adding component " << input->getName();
 	}
 	return result;
 }
@@ -137,7 +136,7 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	else
 	{
 		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
-			                        output->getDeviceName() << " when adding component " << output->getName();
+									output->getDeviceName() << " when adding component " << output->getName();
 	}
 	return result;
 }
