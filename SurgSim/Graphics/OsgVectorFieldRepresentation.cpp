@@ -53,7 +53,6 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	m_lineGeometry->setColorArray(m_colors);
 
 	m_pointGeometry->setVertexArray(m_vertexData);
-	m_pointGeometry->addPrimitiveSet(m_drawPoints);
 	m_pointGeometry->setUseDisplayList(false);
 	m_pointGeometry->setDataVariance(osg::Object::DYNAMIC);
 	m_pointGeometry->getOrCreateStateSet()->setAttribute(m_point, osg::StateAttribute::ON);
@@ -76,12 +75,24 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 	std::vector< Vertex<VectorFieldData> > vertices = m_vectorField->getVertices();
 	size_t count = vertices.size();
 
+	if (0 == count)
+	{
+		return;
+	}
+
+	// osg::DrawElementsUInt can NOT work properly when this is no data in m_vertexData
+	// Thus, only use osg::DrawElementsUInt when there is something in m_vertexData
+	if (m_pointGeometry->getPrimitiveSetIndex(m_drawPoints) == m_pointGeometry->getNumPrimitiveSets() )
+	{
+		m_pointGeometry->addPrimitiveSet(m_drawPoints);
+	}
+
 	if (2 * count != static_cast<size_t>(m_drawArrays->getCount()))
 	{
 		m_drawArrays->setCount(count * 2);
 		m_drawArrays->dirty();
 	}
-	
+
 	if (count != static_cast<size_t>(m_drawPoints->size()))
 	{
 		m_drawPoints->resize(count);
@@ -91,7 +102,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 		}
 		m_drawPoints->dirty();
 	}
-	
+
 
 	if (2 * count > m_vertexData->size())
 	{
@@ -129,13 +140,15 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 		m_lineGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 		m_pointGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
 	}
+
+	m_lineGeometry->dirtyBound();
+	m_pointGeometry->dirtyBound();
 }
 
 std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVectorField() const
 {
 	return m_vectorField;
 }
-
 
 void OsgVectorFieldRepresentation::setLineWidth(double width)
 {

@@ -135,14 +135,9 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, AddVectors)
 	auto colors = makeStartingColors();
 	auto vectors = makeVectors(points, colors);
 	auto vectorField = vectorRepresentation->getVectorField();
-	
-	vectorRepresentation->setPointSize(2.0f);
+
 	vectorRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -8.0)));
 	viewElement->addComponent(vectorRepresentation);
-
-	auto it = std::begin(points);
-	auto v = std::begin(vectors);
-	vectorField->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));
 
 	/// Run the thread
 	runtime->start();
@@ -150,7 +145,8 @@ TEST_F(OsgVectorFieldRepresentationRenderTests, AddVectors)
 	EXPECT_TRUE(viewElement->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	++it; ++v;	
+	auto it = std::begin(points);
+	auto v = std::begin(vectors);
 	for (; it != std::end(points); ++it, ++v)
 	{
 		vectorField->addVertex(Vertex<SurgSim::Graphics::VectorFieldData>((*it), *v));

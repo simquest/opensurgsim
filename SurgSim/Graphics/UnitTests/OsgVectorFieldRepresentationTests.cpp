@@ -34,7 +34,7 @@ TEST(OsgVectorFieldRepresentationTests, VerticesTest)
 {
 	std::shared_ptr<VectorFieldRepresentation> vectorFieldRepresentation =
 		std::make_shared<OsgVectorFieldRepresentation>("Vector Field");
-	
+
 	EXPECT_EQ(0u, vectorFieldRepresentation->getVectorField()->getNumVertices());
 }
 
