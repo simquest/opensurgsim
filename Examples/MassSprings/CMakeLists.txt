@@ -17,7 +17,7 @@ find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA
 find_package(OpenThreads)
 
 link_directories(
-	${Boost_LIBRARY_DIRS}
+	${Boost_LIBRARY_DIRS}	
 )
 
 include_directories(
@@ -42,18 +42,23 @@ add_executable(ExampleMassSprings
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-target_link_libraries(ExampleMassSprings
-	SurgSimFramework
+
+set(LIBS 
 	SurgSimBlocks
 	SurgSimDataStructures
-	SurgSimPhysics
+	SurgSimFramework
 	SurgSimGraphics
-	SurgSimMath
 	SurgSimInput
+	SurgSimPhysics
+	SurgSimCollision
+	SurgSimMath
 	yaml-cpp
 	${Boost_LIBRARIES}
 	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
+	${OPENTHREADS_LIBRARY})
+
+target_link_libraries(ExampleMassSprings
+	${LIBS}
 )
 
 # Put ExampleMassSprings into folder "Examples"
