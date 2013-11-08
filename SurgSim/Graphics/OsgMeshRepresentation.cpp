@@ -41,8 +41,8 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
 	MeshRepresentation(name),
-	m_updateOptions(UPDATE_OPTION_VERTICES),
-	m_mesh(std::make_shared<Mesh>())
+	m_mesh(std::make_shared<Mesh>()),
+	m_updateOptions(UPDATE_OPTION_VERTICES)
 {
 	// The actual size of the mesh is not known at this time, just allocate the
 	// osg structures that are needed and add them to the geometry, and the node
@@ -133,8 +133,8 @@ void OsgMeshRepresentation::update(double dt)
 
 void OsgMeshRepresentation::updateVertices(int updateOptions)
 {
-	static osg::Vec4 defaultColor(0.8f, 0.2f, 0.2f, 1.0f);
-	static osg::Vec2 defaultTextureCoord(0.0f, 0.0f);
+	static osg::Vec4d defaultColor(0.8f, 0.2f, 0.2f, 1.0f);
+	static osg::Vec2d defaultTextureCoord(0.0f, 0.0f);
 
 	bool updateColors = (updateOptions & UPDATE_OPTION_COLORS) != 0;
 	bool updateTextures = (updateOptions & UPDATE_OPTION_TEXTURES) != 0;

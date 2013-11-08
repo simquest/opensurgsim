@@ -29,12 +29,8 @@ namespace Graphics
 {
 
 struct VertexData {
-
-public:
-
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector2d> texture;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> color;
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> normal;
 
 	/// Equality operator.
 	/// \param	rhs	The right hand side.
@@ -42,8 +38,7 @@ public:
 	bool operator==(const SurgSim::Graphics::VertexData& rhs) const
 	{
 		return texture == rhs.texture &&
-			   color == rhs.color &&
-			   normal == rhs.normal;
+			   color == rhs.color;
 	}
 
 	/// Inequality operator.
@@ -55,28 +50,7 @@ public:
 	}
 };
 
-struct TriangleData {
-public:
-	SurgSim::Math::Vector3d normal;
-
-	/// Equality operator.
-	/// \param	rhs	The right hand side.
-	/// \return	true if the parameters are considered equivalent.
-	bool operator==(const SurgSim::Graphics::TriangleData& rhs) const
-	{
-		return normal == rhs.normal;
-	}
-
-	/// Inequality operator.
-	/// \param	rhs	The right hand side.
-	/// \return	true if the parameters are not considered equivalent.
-	bool operator !=(const SurgSim::Graphics::TriangleData& rhs) const
-	{
-		return !((*this) == rhs);
-	}
-};
-
-class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, void, TriangleData>
+class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, void, void>
 {
 public:
 	/// Utility function to initialize a mesh with plain data,

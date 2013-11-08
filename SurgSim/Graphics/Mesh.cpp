@@ -37,7 +37,7 @@ void Mesh::initialize(
 	clear();
 
 	size_t i = 0;
-	for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
+	for (auto it = std::begin(vertices); it != std::end(vertices); ++it, ++i)
 	{
 		VertexData data;
 		if (! colors.empty())
@@ -49,15 +49,14 @@ void Mesh::initialize(
 			data.texture.setValue(textures[i]);
 		}
 		addVertex(Mesh::VertexType(*it, data));
-		++i;
 	}
 
-	for (size_t i = 0; i < triangles.size()/3; ++i )
+	for (size_t i = 0; i < triangles.size(); i += 3)
 	{
-		Mesh::TriangleType::IdType ids = {{triangles[3*i], triangles[3*i+1],triangles[3*i+2]}};
+		TriangleType::IdType ids = {{triangles[i], triangles[i+1],triangles[i+2]}};
 
 		bool valid = true;
-		for (auto it = std::begin(triangles); it != std::end(triangles); ++it)
+		for (auto it = std::begin(ids); it != std::end(ids); ++it)
 		{
 			if (*it >= getNumVertices())
 			{
@@ -68,7 +67,7 @@ void Mesh::initialize(
 
 		if (valid)
 		{
-			Mesh::TriangleType triangle(ids, SurgSim::Graphics::TriangleData());
+			Mesh::TriangleType triangle(ids);
 			addTriangle(triangle);
 		}
 		else

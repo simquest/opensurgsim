@@ -60,20 +60,24 @@ TEST(OptionalValueTests, ComparatorTest)
 	OptionalValue<int> a;
 	OptionalValue<int> b;
 
-	// Unassigned should be not equal
 	EXPECT_TRUE(a == b);
+	EXPECT_FALSE(a != b);
 
 	a.setValue(10);
 	EXPECT_FALSE(a == b);
-
+	EXPECT_TRUE(a != b);
+	
 	b.setValue(10);
 	EXPECT_TRUE(a == b);
+	EXPECT_FALSE(a != b);
 
 	b.setValue(20);
 	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a != b);
 
 	a.invalidate();
 	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a != b);
 }
 
 

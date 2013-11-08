@@ -58,7 +58,7 @@ public:
 	/// \return	The assigned value if set, excepts if no value was set.
 	const T& getValue() const
 	{
-		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid TestableValue";
+		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid OptionalValue";
 		return m_value;
 	}
 
@@ -67,13 +67,28 @@ public:
 	/// \return	true if the parameters are considered equivalent.
 	bool operator==(const OptionalValue<T>& rhs) const
 	{
-		if (m_hasValue)
+		if (m_hasValue == true && rhs.m_hasValue == true)
 		{
 			return m_value == rhs.m_value;
 		}
 		else
 		{
 			return m_hasValue == rhs.m_hasValue;
+		}
+	}
+	
+	/// Inequality operator
+	/// \param rhs the right hand side.
+	/// \return true if the parameters are not considered equivalent
+	bool operator!=(const OptionalValue<T>& rhs) const
+	{
+		if (m_hasValue == true && rhs.m_hasValue == true)
+		{
+			return m_value != rhs.m_value;
+		}
+		else
+		{
+			return m_hasValue != rhs.m_hasValue;
 		}
 	}
 

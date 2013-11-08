@@ -77,6 +77,7 @@ struct MeshElement
 template <unsigned int N>
 struct MeshElement<N, void>
 {
+
 	/// Constructor
 	/// \param	verticesId	IDs of the N element vertices
 	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
@@ -84,8 +85,10 @@ struct MeshElement<N, void>
 	{
 	}
 
+	typedef std::array<unsigned int, N> IdType;
+
 	/// Element vertices.
-	std::array<unsigned int, N> verticesId;
+	IdType verticesId;
 
 	/// Compare the elements and return true if equal, false if not equal.
 	friend bool operator==(const MeshElement<N, void>& element1, const MeshElement<N, void>& element2)
