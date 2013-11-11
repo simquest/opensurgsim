@@ -112,7 +112,7 @@ public:
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The RenderTarget to be used.
-	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
+	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
 	/// Gets RenderTarget that is currently being used by the camera.
 	/// \return	The RenderTarget.

@@ -44,14 +44,15 @@ class View;
 /// Encapsulation of all the components necessary needed to implement a full renderpass, this SceneElement contains
 /// a Camera and Group, it can also take a Material (for shaders and uniforms) and a RenderTarget for textures that
 /// are used as the output for the camera.
-/// Other components do not need to be added to the pass explicitely, they only need to refer to the passes name in
-/// their respective
+/// Other components do not need to be added to the pass explicitly, they only need to refer to the passes name in
+/// their respective groupReferences to be added to the render pass. The passes attributes should all be set up through
+/// uniforms in the material.
 class RenderPass : public SurgSim::Framework::SceneElement
 {
 public:
 
 	/// Constructor
-	RenderPass(const std::string& name);
+	explicit RenderPass(const std::string& name);
 	~RenderPass();
 
 	/// Executes the initialize operation.
@@ -73,7 +74,7 @@ public:
 
 	/// Sets render target for the camera, this abstracts the textures that are being used for rendering into.
 	/// \param	target	The rendertarget structure.
-	void setRenderTarget(std::shared_ptr<RenderTarget> target);
+	bool setRenderTarget(std::shared_ptr<RenderTarget> target);
 
 	/// Gets render target that is being used in this pass.
 	/// \return	The render target that should be used.
@@ -84,12 +85,17 @@ public:
 	/// \param	value	An order value for this pass, lower means earlier.
 	virtual void setRenderOrder(SurgSim::Graphics::Camera::RenderOrder order, int value);
 
-
+	/// Gets the camera.
+	/// \return	The camera.
 	std::shared_ptr<Camera> getCamera();
 
-	std::shared_ptr<Material> getMaterial();
-	void setMaterial(std::shared_ptr<Material> material);
+	/// Gets the group.
+	/// \return	The group.
+	std::shared_ptr<Group> getGroup();
 
+	bool setMaterial(std::shared_ptr<Material> material);
+
+	std::shared_ptr<Material> getMaterial();
 	/// Shows a quad on the screen with the texture used as the color target for this pass.
 	/// \param	x,y	  	The x and y coordinates on the screen.
 	/// \param	width,height 	The width and height on the scree.

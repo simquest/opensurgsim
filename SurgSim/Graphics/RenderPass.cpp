@@ -61,6 +61,11 @@ std::shared_ptr<Camera> RenderPass::getCamera()
 	return m_camera;
 }
 
+std::shared_ptr<Group> RenderPass::getGroup()
+{
+	return m_group;
+}
+
 void RenderPass::setView(std::shared_ptr<View> view)
 {
 	m_view = view;
@@ -71,10 +76,14 @@ std::shared_ptr<View> RenderPass::getView()
 	return m_view;
 }
 
-void RenderPass::setRenderTarget(std::shared_ptr<RenderTarget> target)
+bool RenderPass::setRenderTarget(std::shared_ptr<RenderTarget> target)
 {
-	m_camera->setRenderTarget(target);
-	m_renderTarget = target;
+	bool result = m_camera->setRenderTarget(target);
+	if (result)
+	{
+		m_renderTarget = target;
+	}
+	return result;
 }
 
 std::shared_ptr<RenderTarget> RenderPass::getRenderTarget()
@@ -82,15 +91,19 @@ std::shared_ptr<RenderTarget> RenderPass::getRenderTarget()
 	return m_renderTarget;
 }
 
+bool RenderPass::setMaterial(std::shared_ptr<Material> material)
+{
+	bool result = m_camera->setMaterial(material);
+	if (result)
+	{
+		m_material = material;
+	}
+	return result;
+}
+
 std::shared_ptr<Material> RenderPass::getMaterial()
 {
 	return m_material;
-}
-
-void RenderPass::setMaterial(std::shared_ptr<Material> material)
-{
-	m_camera->setMaterial(material);
-	m_material = material;
 }
 
 void RenderPass::setRenderOrder(SurgSim::Graphics::Camera::RenderOrder order, int value)
