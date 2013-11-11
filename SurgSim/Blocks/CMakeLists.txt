@@ -26,7 +26,6 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring3DRepresentation.cpp
 	MassSpringNDRepresentationUtils.cpp
 	SphereElement.cpp
-	TransferDeformableStateToVerticesBehavior.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
 )
