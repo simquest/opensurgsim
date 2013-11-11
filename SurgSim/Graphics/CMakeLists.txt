@@ -136,12 +136,11 @@ surgsim_add_library(
 )
 
 SET(LIBS
-	SurgSimGraphics
 	SurgSimFramework
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 
-target_link_libraries(${LIBS})
+target_link_libraries(SurgSimGraphics ${LIBS})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

@@ -52,13 +52,12 @@ surgsim_add_library(
 )
 
 SET(LIBS
-	SurgSimBlocks
 	SurgSimFramework
 	SurgSimPhysics
 	${Boost_LIBRARIES}
 )
 
-target_link_libraries(${LIBS}
+target_link_libraries(SurgSimBlocks ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)

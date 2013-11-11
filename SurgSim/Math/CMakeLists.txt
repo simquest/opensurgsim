@@ -75,13 +75,12 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	SurgSimMath 
 	SurgSimFramework 
 	SurgSimTesting
 	MlcpTestIO
 )
 
-target_link_libraries(${LIBS})
+target_link_libraries(SurgSimMath ${LIBS})
 
 
 if(SURGSIM_TESTS_BUILD)

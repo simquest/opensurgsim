@@ -98,13 +98,12 @@ surgsim_add_library(
 	SurgSim/Devices/MultiAxis
 )
 
-set(LIBS 
-	MultiAxisDevice 
+set(LIBS  
 	SurgSimInput 
 	SurgSimFramework 
 )
 
-target_link_libraries(${LIBS}
+target_link_libraries(MultiAxisDevice ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)

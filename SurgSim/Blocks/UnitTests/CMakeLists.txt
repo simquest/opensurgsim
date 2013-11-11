@@ -37,7 +37,9 @@ set(UNIT_TEST_HEADERS
 	SpringTestUtils.h
 )
 
-set(LIBS SurgSimBlocks gtest
+set(LIBS 
+	SurgSimBlocks
+	gtest
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)

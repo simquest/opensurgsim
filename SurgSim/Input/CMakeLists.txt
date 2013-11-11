@@ -42,13 +42,12 @@ surgsim_add_library(
 	"SurgSim/Input"
 )
 
-set(LIBS 
-	SurgSimInput 
+set(LIBS  
 	SurgSimFramework 
 	SurgSimDataStructures 
 )
 
-target_link_libraries(${LIBS}
+target_link_libraries(SurgSimInput ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)

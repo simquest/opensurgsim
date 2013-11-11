@@ -45,7 +45,9 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimCollision gtest)
+set(LIBS
+	SurgSimCollision
+	gtest)
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
 

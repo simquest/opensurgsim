@@ -79,11 +79,10 @@ surgsim_add_library(
 )
 
 SET(LIBS
-        SurgSimFramework
         ${Boost_LIBRARIES}
 )
 
-target_link_libraries(${LIBS}
+target_link_libraries(SurgSimFramework ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)

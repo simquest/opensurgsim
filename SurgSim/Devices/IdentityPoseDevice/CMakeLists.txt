@@ -41,11 +41,10 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	IdentityPoseDevice
 	SurgSimInput
 )
 
-target_link_libraries(${LIBS}
+target_link_libraries(IdentityPoseDevice ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)

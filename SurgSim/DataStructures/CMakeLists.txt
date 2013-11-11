@@ -57,7 +57,7 @@ set(LIBS
 	${Boost_LIBRARIES}
 )
 
-target_link_libraries(${LIBS}
+target_link_libraries(SurgSimDataStructures ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)
