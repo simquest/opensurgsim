@@ -97,7 +97,15 @@ surgsim_add_library(
 	"${SURGSIM_PHYSICS_HEADERS}"
 	"SurgSim/Physics"
 )
-target_link_libraries(SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimMath)
+
+SET(LIBS
+	SurgSimPhysics
+	MlcpTestIO
+	IdentityPoseDevice
+	SurgSimCollision
+)
+
+target_link_libraries(${LIBS})
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

@@ -50,8 +50,15 @@ surgsim_add_library(
 	"${SURGSIM_BLOCKS_HEADERS}"
 	"SurgSim/Blocks"
 )
-target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
-	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
+SET(LIBS
+	SurgSimBlocks
+	SurgSimFramework
+	SurgSimPhysics
+)
+
+target_link_libraries(${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

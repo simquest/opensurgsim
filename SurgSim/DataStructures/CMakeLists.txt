@@ -50,6 +50,14 @@ surgsim_add_library(
 	"SurgSim/DataStructures"
 )
 
+set(LIBS 
+	SurgSimDataStructures
+	SurgSimMath 
+	SurgSimFramework)
+
+target_link_libraries(${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()

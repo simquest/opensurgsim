@@ -40,6 +40,14 @@ surgsim_add_library(
 	"SurgSim/Devices/IdentityPoseDevice"
 )
 
+set(LIBS 
+	IdentityPoseDevice
+	SurgSimInput
+)
+
+target_link_libraries(${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
