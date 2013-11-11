@@ -38,38 +38,20 @@ public:
 	void addNode(unsigned int nodeId)
 	{
 		this->m_nodeIds.push_back(nodeId);
-		allocate();
-	}
-
-	const Vector& getF() const
-	{
-		return m_f;
-	}
-	const Matrix& getM() const
-	{
-		return m_M;
-	}
-	const Matrix& getD() const
-	{
-		return m_D;
-	}
-	const Matrix& getK() const
-	{
-		return m_K;
 	}
 
 	virtual double getVolume(const DeformableRepresentationState& state) const override
 	{ return 0; }
-	virtual const Vector& computeForce(const DeformableRepresentationState& state) override
-	{ return m_f; }
-	virtual const Matrix& computeMass(const DeformableRepresentationState& state) override
-	{ return m_M; }
-	virtual const Matrix& computeDamping(const DeformableRepresentationState& state) override
-	{ return m_D; }
-	virtual const Matrix& computeStiffness(const DeformableRepresentationState& state) override
-	{ return m_K; }
-	virtual void computeFMDK(const DeformableRepresentationState& state, Vector** f, Matrix** M,
-		Matrix** D, Matrix** K) override
+	virtual void addForce(const DeformableRepresentationState& state, Vector* F) override
+	{}
+	virtual void addMass(const DeformableRepresentationState& state, Matrix* M) override
+	{}
+	virtual void addDamping(const DeformableRepresentationState& state, Matrix* D) override
+	{}
+	virtual void addStiffness(const DeformableRepresentationState& state, Matrix* K) override
+	{}
+	virtual void addFMDK(const DeformableRepresentationState& state, Vector* f, Matrix* M,
+		Matrix* D, Matrix* K) override
 	{}
 };
 
@@ -92,10 +74,6 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_EQ(3u, femElement.getNumDofPerNode());
 	EXPECT_EQ(0u, femElement.getNumNodes());
 	EXPECT_EQ(0, femElement.getNodeIds().size());
-	testSize(femElement.getF(), 0);
-	testSize(femElement.getM(), 0, 0);
-	testSize(femElement.getD(), 0, 0);
-	testSize(femElement.getK(), 0, 0);
 
 	// Add 1 node
 	femElement.addNode(0);
@@ -104,10 +82,6 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_EQ(1, femElement.getNodeIds().size());
 	EXPECT_EQ(0, femElement.getNodeIds()[0]);
 	EXPECT_EQ(0, femElement.getNodeId(0));
-	testSize(femElement.getF(), 3);
-	testSize(femElement.getM(), 3, 3);
-	testSize(femElement.getD(), 3, 3);
-	testSize(femElement.getK(), 3, 3);
 
 	// Add 1 more node
 	femElement.addNode(9);
@@ -118,8 +92,4 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_EQ(0, femElement.getNodeId(0));
 	EXPECT_EQ(9, femElement.getNodeIds()[1]);
 	EXPECT_EQ(9, femElement.getNodeId(1));
-	testSize(femElement.getF(), 6);
-	testSize(femElement.getM(), 6, 6);
-	testSize(femElement.getD(), 6, 6);
-	testSize(femElement.getK(), 6, 6);
 }

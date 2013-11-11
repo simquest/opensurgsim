@@ -68,50 +68,54 @@ public:
 	/// \param state The deformable state to compute the volume with
 	virtual double getVolume(const DeformableRepresentationState& state) const override;
 
-	/// Computes the element force from a given state
+	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
-	/// \return The computed element force of size (getNumDofPerNode() x getNumNodes())
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	/// \note This method suppose that the incoming state contains information with the same number of dof
+	/// \param[in,out] F The complete system force vector to add the element force into
+	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
+	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual const SurgSim::Math::Vector& computeForce(const DeformableRepresentationState& state) override;
+	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F) override;
 
-	/// Computes the element mass matrix M from a given state
+	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param state The state to compute the mass matrix with
-	/// \return The computed element square mass matrix  of size getNumDofPerNode() x getNumNodes()
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	/// \note This method suppose that the incoming state contains information with the same number of
+	/// \param[in,out] M The complete system mass matrix to add the element mass-matrix into
+	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
+	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual const SurgSim::Math::Matrix& computeMass(const DeformableRepresentationState& state) override;
+	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M) override;
 
-	/// Computes the element damping matrix D (= -df/dv) from a given state
+	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
+	/// to a complete system damping matrix D (assembly)
 	/// \param state The state to compute the damping matrix with
-	/// \return The computed element square damping matrix  of size getNumDofPerNode() x getNumNodes()
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	/// \note This method suppose that the incoming state contains information with the same number of
+	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
+	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
+	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual const SurgSim::Math::Matrix& computeDamping(const DeformableRepresentationState& state) override;
+	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D) override;
 
-	/// Computes the element stiffness matrix K (= -df/dx) from a given state
+	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
+	/// to a complete system stiffness matrix K (assembly)
 	/// \param state The state to compute the stiffness matrix with
-	/// \return The computed element square stiffness matrix of size getNumDofPerNode() x getNumNodes()
-	/// \note (non-const) because it uses an internal data member to store and return the result
-	/// \note This method suppose that the incoming state contains information with the same number of
+	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
+	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
+	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual const SurgSim::Math::Matrix& computeStiffness(const DeformableRepresentationState& state) override;
+	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K) override;
 
-	/// Computes the element force vector, mass, stiffness and damping matrices from a given state
+	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
+	/// into a complete system data structure F, M, D, K (assembly)
 	/// \param state The state to compute everything with
-	/// \param[out] f The computed element force of size (getNumDofPerNode() x getNumNodes())
-	/// \param[out] M The computed element square mass of size getNumDofPerNode() x getNumNodes()
-	/// \param[out] D The computed element square damping matrix of size getNumDofPerNode() x getNumNodes()
-	/// \param[out] K The computed element square stiffness matrix of size getNumDofPerNode() x getNumNodes()
-	/// \note (non-const) because it uses internal data members to store and return the results
-	/// \note This method suppose that the incoming state contains information with the same number of dof
+	/// \param[in,out] F The complete system force vector to add the element force into
+	/// \param[in,out] M The complete system mass matrix to add the element mass matrix into
+	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
+	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
+	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void computeFMDK(const DeformableRepresentationState& state,
-		SurgSim::Math::Vector** f,
-		SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
+	virtual void addFMDK(const DeformableRepresentationState& state,
+		SurgSim::Math::Vector* F,
+		SurgSim::Math::Matrix* M,
+		SurgSim::Math::Matrix* D,
+		SurgSim::Math::Matrix* K) override;
 
 protected:
 	/// Computes the determinant of 3 vectors
@@ -123,6 +127,11 @@ protected:
 	/// \param restState The deformable rest state to compute the shape function from
 	void computeShapeFunctions(const DeformableRepresentationState& restState);
 
+	/// Computes the tetrahedron stiffness matrix
+	/// \param state The deformable state to compute the stiffness matrix from
+	/// \param[out] k The stiffness matrix to store the result into
+	void computeStiffness(const DeformableRepresentationState& state, Eigen::Matrix<double, 12, 12>* k);
+
 	/// Mass density (in Kg.m-3)
 	double m_rho;
 	/// Young modulus (in N.m-2)
@@ -130,7 +139,7 @@ protected:
 	/// Poisson ratio (unitless)
 	double m_nu;
 
-	/// Tetrahedron base functions coefficients Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
+	/// Tetrahedron shape functions coefficients Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
 	double m_restVolume, m_ai[4], m_bi[4], m_ci[4], m_di[4];
 
 	/// The tetrahedon rest state

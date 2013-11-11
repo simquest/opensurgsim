@@ -37,10 +37,6 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 		this->m_nodeIds.push_back(*nodeId);
 	}
 
-	// getNumDofPerNode() and getNumNodes() will now return the correct numbers
-	// We can now call allocate to reserve the memory for all internal data structure
-	this->allocate();
-
 	// Compute the fem tetrahedron shape functions Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
 	computeShapeFunctions(restState);
 
@@ -81,23 +77,26 @@ double FemElement3DTetrahedron::getPoissonRatio() const
 	return m_nu;
 }
 
-const SurgSim::Math::Vector& FemElement3DTetrahedron::computeForce(const DeformableRepresentationState& state)
+void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F)
 {
 	using SurgSim::Math::getSubVector;
+	using SurgSim::Math::addSubVector;
 
 	// K.U = F
 	// K.(x - x0) = F
 	Eigen::Matrix<double, 12, 1> x;
+	Eigen::Matrix<double, 12, 1> f;
+	Eigen::Matrix<double, 12, 12> k;
+	computeStiffness(state, &k);
 	getSubVector(x, 0, 3) = getSubVector(state.getPositions(), m_nodeIds[0], 3);
 	getSubVector(x, 1, 3) = getSubVector(state.getPositions(), m_nodeIds[1], 3);
 	getSubVector(x, 2, 3) = getSubVector(state.getPositions(), m_nodeIds[2], 3);
 	getSubVector(x, 3, 3) = getSubVector(state.getPositions(), m_nodeIds[3], 3);
-	m_f = computeStiffness(state) * (x - m_x0);
-
-	return m_f;
+	f = k * (x - m_x0);
+	addSubVector(f, m_nodeIds, 3, F);
 }
 
-const SurgSim::Math::Matrix& FemElement3DTetrahedron::computeMass(const DeformableRepresentationState& state)
+void FemElement3DTetrahedron::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M)
 {
 	using SurgSim::Math::getSubMatrix;
 
@@ -130,26 +129,26 @@ const SurgSim::Math::Matrix& FemElement3DTetrahedron::computeMass(const Deformab
 	{
 		for (unsigned int colNodeId = 0; colNodeId < 4; colNodeId++)
 		{
-			auto Mii = getSubMatrix(m_M, rowNodeId, colNodeId, 3, 3);
-			Mii.setIdentity();
+			auto Mii = getSubMatrix(*M, m_nodeIds[rowNodeId], m_nodeIds[colNodeId], 3, 3);
+
 			if (rowNodeId == colNodeId)
 			{
-				Mii *= 2.0;
+				Mii += SurgSim::Math::Matrix33d::Identity() * 2.0 * coef;
+			}
+			else
+			{
+				Mii += SurgSim::Math::Matrix33d::Identity() * coef;
 			}
 		}
 	}
-	m_M *= coef;
-
-	return m_M;
 }
 
-const SurgSim::Math::Matrix& FemElement3DTetrahedron::computeDamping(const DeformableRepresentationState& state)
+void FemElement3DTetrahedron::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D)
 {
-	// m_D is zeroed on creation, no need to zero it here.
-	return m_D;
 }
 
-const SurgSim::Math::Matrix& FemElement3DTetrahedron::computeStiffness(const DeformableRepresentationState& state)
+void FemElement3DTetrahedron::computeStiffness(const DeformableRepresentationState& state,
+											   Eigen::Matrix<double, 12, 12>* k)
 {
 	m_Em.setZero();
 	m_strain.setZero();
@@ -178,36 +177,53 @@ const SurgSim::Math::Matrix& FemElement3DTetrahedron::computeStiffness(const Def
 	m_stress = m_Em * m_strain;
 
 	// Compute the stiffness matrix
-	m_K = m_restVolume * m_strain.transpose() * m_stress;
+	*k = m_restVolume * m_strain.transpose() * m_stress;
 
 	// Ke is symmetric but numerical computation might introduce epsilon, we force the symmetry here
-	m_K = (m_K + m_K.transpose()) * 0.5;
-
-	return m_K;
+	*k = ((*k) + (*k).transpose()) * 0.5;
 }
 
-void FemElement3DTetrahedron::computeFMDK(const DeformableRepresentationState& state,
-	SurgSim::Math::Vector** f, SurgSim::Math::Matrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K)
+void FemElement3DTetrahedron::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K)
+{
+	using SurgSim::Math::getSubMatrix;
+	using SurgSim::Math::addSubMatrix;
+
+	Eigen::Matrix<double, 12, 12> k;
+	computeStiffness(state, &k);
+	addSubMatrix(k, getNodeIds(), 3, K);
+}
+
+void FemElement3DTetrahedron::addFMDK(const DeformableRepresentationState& state,
+	SurgSim::Math::Vector* F,
+	SurgSim::Math::Matrix* M,
+	SurgSim::Math::Matrix* D,
+	SurgSim::Math::Matrix* K)
 {
 	using SurgSim::Math::getSubVector;
+	using SurgSim::Math::getSubMatrix;
+	using SurgSim::Math::addSubMatrix;
+	using SurgSim::Math::addSubVector;
 
-	computeStiffness(state);
-	computeDamping(state);
-	computeMass(state);
+	addMass(state, M);
+	addDamping(state, D);
 
+	Eigen::Matrix<double, 12, 12> k;
+	computeStiffness(state, &k);
+
+	// Assemble the stiffness matrix (using k)
+	addSubMatrix(k, m_nodeIds, 3, K);
+
+	// Assemble the force vector (using k)
 	// K.U = F
 	// K.(x - x0) = F
 	Eigen::Matrix<double, 12, 1> x;
+	Eigen::Matrix<double, 12, 1> f;
 	getSubVector(x, 0, 3) = getSubVector(state.getPositions(), m_nodeIds[0], 3);
 	getSubVector(x, 1, 3) = getSubVector(state.getPositions(), m_nodeIds[1], 3);
 	getSubVector(x, 2, 3) = getSubVector(state.getPositions(), m_nodeIds[2], 3);
 	getSubVector(x, 3, 3) = getSubVector(state.getPositions(), m_nodeIds[3], 3);
-	m_f = m_K * (x - m_x0);
-
-	*f = &m_f;
-	*M = &m_M;
-	*D = &m_D;
-	*K = &m_K;
+	f = k * (x - m_x0);
+	addSubVector(f, m_nodeIds, 3, F);
 }
 
 double FemElement3DTetrahedron::det(const Vector3d& a, const Vector3d& b, const Vector3d& c) const

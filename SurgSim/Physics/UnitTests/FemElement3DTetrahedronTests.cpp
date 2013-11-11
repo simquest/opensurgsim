@@ -45,7 +45,7 @@ double N(unsigned int i, double V, double *ai, double *bi, double *ci, double *d
 class MockFemElement3DTet : public FemElement3DTetrahedron
 {
 public:
-	MockFemElement3DTet(std::array<unsigned int,4> nodeIds, const DeformableRepresentationState& restState) :
+	MockFemElement3DTet(std::array<unsigned int, 4> nodeIds, const DeformableRepresentationState& restState) :
 		FemElement3DTetrahedron(nodeIds, restState)
 	{
 	}
@@ -67,23 +67,6 @@ public:
 	{
 		return m_x0;
 	}
-
-	const Vector& getF() const
-	{
-		return m_f;
-	}
-	const Matrix& getM() const
-	{
-		return m_M;
-	}
-	const Matrix& getD() const
-	{
-		return m_D;
-	}
-	const Matrix& getK() const
-	{
-		return m_K;
-	}
 };
 
 class FemElement3DTetrahedronTests : public ::testing::Test
@@ -95,20 +78,24 @@ public:
 	double m_expectedVolume;
 	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_expectedX0;
 	double m_rho, m_E, m_nu;
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_expectedMassMatrix;
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_expectedDampingMatrix;
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_expectedStiffnessMatrix;
-	Eigen::Matrix<double, 12, 12, Eigen::DontAlign> m_expectedStiffnessMatrix2;
+	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix;
+	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
 
 	virtual void SetUp() override
 	{
 		using SurgSim::Math::getSubVector;
 		using SurgSim::Math::getSubMatrix;
+		using SurgSim::Math::addSubMatrix;
 
 		m_nodeIds[0] = 3;
 		m_nodeIds[1] = 1;
 		m_nodeIds[2] = 14;
 		m_nodeIds[3] = 9;
+		std::vector<unsigned int> m_nodeIdsVectorForm; // Useful for assembly helper function
+		m_nodeIdsVectorForm.push_back(m_nodeIds[0]);
+		m_nodeIdsVectorForm.push_back(m_nodeIds[1]);
+		m_nodeIdsVectorForm.push_back(m_nodeIds[2]);
+		m_nodeIdsVectorForm.push_back(m_nodeIds[3]);
 
 		m_restState.setNumDof(3, 15);
 		Vector& x0 = m_restState.getPositions();
@@ -126,7 +113,6 @@ public:
 		getSubVector(x, m_nodeIds[2], 3) += Vector3d(0.1, 0.1, 0.1);
 		getSubVector(x, m_nodeIds[3], 3) += Vector3d(0.1, 0.1, 0.1);
 
-
 		// The tet is part of a cube of size 1x1x1 (it occupies 1/6 of the cube's volume)
 		m_expectedVolume = 1.0 / 6.0;
 
@@ -134,21 +120,33 @@ public:
 		m_E = 1e6;
 		m_nu = 0.45;
 
+		m_expectedMassMatrix.resize(3*15, 3*15);
 		m_expectedMassMatrix.setZero();
+		m_expectedDampingMatrix.resize(3*15, 3*15);
+		m_expectedDampingMatrix.setZero();
+		m_expectedStiffnessMatrix.resize(3*15, 3*15);
+		m_expectedStiffnessMatrix.setZero();
+		m_expectedStiffnessMatrix2.resize(3*15, 3*15);
+		m_expectedStiffnessMatrix2.setZero();
+
+		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> M;
+		M.setZero();
 		{
-			m_expectedMassMatrix.diagonal().setConstant(2.0);
-			m_expectedMassMatrix.block(0, 3, 9, 9).diagonal().setConstant(1.0);
-			m_expectedMassMatrix.block(0, 6, 6, 6).diagonal().setConstant(1.0);
-			m_expectedMassMatrix.block(0, 9, 3, 3).diagonal().setConstant(1.0);
-			m_expectedMassMatrix.block(3, 0, 9, 9).diagonal().setConstant(1.0);
-			m_expectedMassMatrix.block(6, 0, 6, 6).diagonal().setConstant(1.0);
-			m_expectedMassMatrix.block(9, 0, 3, 3).diagonal().setConstant(1.0);
+			M.diagonal().setConstant(2.0);
+			M.block(0, 3, 9, 9).diagonal().setConstant(1.0);
+			M.block(0, 6, 6, 6).diagonal().setConstant(1.0);
+			M.block(0, 9, 3, 3).diagonal().setConstant(1.0);
+			M.block(3, 0, 9, 9).diagonal().setConstant(1.0);
+			M.block(6, 0, 6, 6).diagonal().setConstant(1.0);
+			M.block(9, 0, 3, 3).diagonal().setConstant(1.0);
 		}
-		m_expectedMassMatrix *= m_rho * m_expectedVolume / 20.0;
+		M *= m_rho * m_expectedVolume / 20.0;
+		addSubMatrix(M, m_nodeIdsVectorForm, 3 , &m_expectedMassMatrix);
 
 		m_expectedDampingMatrix.setZero();
 
-		m_expectedStiffnessMatrix.setZero();
+		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> K;
+		K.setZero();
 		{
 			// Calculation done by hand from
 			// http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
@@ -174,15 +172,15 @@ public:
 			E.block(3, 3, 3, 3).diagonal().setConstant(0.5 - m_nu);
 			E *= m_E / (( 1.0 + m_nu) * (1.0 - 2.0 * m_nu));
 
-			m_expectedStiffnessMatrix = m_expectedVolume * B.transpose() * E * B;
+			K = m_expectedVolume * B.transpose() * E * B;
 		}
+		addSubMatrix(K, m_nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
 
 		// Expecte stiffness matrix given for our case in:
 		// http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
 		double E = m_E / (12.0*(1.0 - 2.0*m_nu)*(1.0 + m_nu));
 		double n0 = 1.0 - 2.0 * m_nu;
 		double n1 = 1.0 - m_nu;
-		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>& K = m_expectedStiffnessMatrix2;
 		K.setZero();
 
 		// Fill up the upper triangle part first (without diagonal elements)
@@ -213,6 +211,8 @@ public:
 		K(3, 3) = K(7, 7) = K(11, 11) = 2.0 * n1; // diagonal elements
 
 		K *= E;
+
+		addSubMatrix(K, m_nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix2);
 	}
 };
 
@@ -222,31 +222,9 @@ extern void testSize(const Matrix& m, int expectedRows, int expectedCols);
 TEST_F(FemElement3DTetrahedronTests, ConstructorTest)
 {
 	ASSERT_NO_THROW({MockFemElement3DTet tet(m_nodeIds, m_restState);});
-	{
-		MockFemElement3DTet tet(m_nodeIds, m_restState);
-		testSize(tet.getF(), 12);
-		testSize(tet.getM(), 12, 12);
-		testSize(tet.getD(), 12, 12);
-		testSize(tet.getK(), 12, 12);
-	}
 	ASSERT_NO_THROW({MockFemElement3DTet* tet = new MockFemElement3DTet(m_nodeIds, m_restState); delete tet;});
-	{
-		MockFemElement3DTet* tet = new MockFemElement3DTet(m_nodeIds, m_restState);
-		testSize(tet->getF(), 12);
-		testSize(tet->getM(), 12, 12);
-		testSize(tet->getD(), 12, 12);
-		testSize(tet->getK(), 12, 12);
-		delete tet;
-	}
 	ASSERT_NO_THROW({std::shared_ptr<MockFemElement3DTet> tet =
 		std::make_shared<MockFemElement3DTet>(m_nodeIds, m_restState);});
-	{
-		std::shared_ptr<MockFemElement3DTet> tet = std::make_shared<MockFemElement3DTet>(m_nodeIds, m_restState);
-		testSize(tet->getF(), 12);
-		testSize(tet->getM(), 12, 12);
-		testSize(tet->getD(), 12, 12);
-		testSize(tet->getK(), 12, 12);
-	}
 }
 
 TEST_F(FemElement3DTetrahedronTests, DefaultValueTest)
@@ -314,25 +292,25 @@ TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)
 		Ni_p2[i] = N(i, m_expectedVolume, ai, bi, ci, di, p2);
 		Ni_p3[i] = N(i, m_expectedVolume, ai, bi, ci, di, p3);
 	}
-	EXPECT_NEAR(Ni_p0[0], 1.0, 1e-10);
-	EXPECT_NEAR(Ni_p0[1], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p0[2], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p0[3], 0.0, 1e-10);
+	EXPECT_NEAR(Ni_p0[0], 1.0, 1e-12);
+	EXPECT_NEAR(Ni_p0[1], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p0[2], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p0[3], 0.0, 1e-12);
 
-	EXPECT_NEAR(Ni_p1[0], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p1[1], 1.0, 1e-10);
-	EXPECT_NEAR(Ni_p1[2], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p1[3], 0.0, 1e-10);
+	EXPECT_NEAR(Ni_p1[0], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p1[1], 1.0, 1e-12);
+	EXPECT_NEAR(Ni_p1[2], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p1[3], 0.0, 1e-12);
 
-	EXPECT_NEAR(Ni_p2[0], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p2[1], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p2[2], 1.0, 1e-10);
-	EXPECT_NEAR(Ni_p2[3], 0.0, 1e-10);
+	EXPECT_NEAR(Ni_p2[0], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p2[1], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p2[2], 1.0, 1e-12);
+	EXPECT_NEAR(Ni_p2[3], 0.0, 1e-12);
 
-	EXPECT_NEAR(Ni_p3[0], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p3[1], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p3[2], 0.0, 1e-10);
-	EXPECT_NEAR(Ni_p3[3], 1.0, 1e-10);
+	EXPECT_NEAR(Ni_p3[0], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p3[1], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p3[2], 0.0, 1e-12);
+	EXPECT_NEAR(Ni_p3[3], 1.0, 1e-12);
 
 	// We should have the relation sum(Ni(x,y,z) = 1) for all points in the volume
 	// We verify that relation by sampling the tetrahedron volume
@@ -366,22 +344,42 @@ TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
 	tet.setYoungModulus(m_E);
 	tet.setPoissonRatio(m_nu);
 
+	SurgSim::Math::Vector forceVector(3*15);
+	SurgSim::Math::Matrix massMatrix(3*15, 3*15);
+	SurgSim::Math::Matrix dampingMatrix(3*15, 3*15);
+	SurgSim::Math::Matrix stiffnessMatrix(3*15, 3*15);
+
+	forceVector.setZero();
+	massMatrix.setZero();
+	dampingMatrix.setZero();
+	stiffnessMatrix.setZero();
+
 	// Make sure that the 2 ways of computing the expected stiffness matrix gives the same result
 	EXPECT_TRUE(m_expectedStiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
-	EXPECT_TRUE(tet.computeForce(m_restState).isZero());
-	EXPECT_TRUE(tet.computeMass(m_restState).isApprox(m_expectedMassMatrix));
-	EXPECT_TRUE(tet.computeDamping(m_restState).isApprox(m_expectedDampingMatrix));
-	EXPECT_TRUE(tet.computeStiffness(m_restState).isApprox(m_expectedStiffnessMatrix));
-	EXPECT_TRUE(tet.computeStiffness(m_restState).isApprox(m_expectedStiffnessMatrix2));
+	tet.addForce(m_restState, &forceVector);
+	EXPECT_TRUE(forceVector.isZero());
 
-	Vector *f;
-	Matrix *M, *D, *K;
-	tet.computeFMDK(m_restState, &f, &M, &D, &K);
-	EXPECT_TRUE(f->isZero());
-	EXPECT_TRUE(M->isApprox(m_expectedMassMatrix));
-	EXPECT_TRUE(D->isApprox(m_expectedDampingMatrix));
-	EXPECT_TRUE(K->isApprox(m_expectedStiffnessMatrix));
-	EXPECT_TRUE(K->isApprox(m_expectedStiffnessMatrix2));
+	tet.addMass(m_restState, &massMatrix);
+	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix));
+
+	tet.addDamping(m_restState, &dampingMatrix);
+	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
+
+	tet.addStiffness(m_restState, &stiffnessMatrix);
+	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
+	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
+
+	forceVector.setZero();
+	massMatrix.setZero();
+	dampingMatrix.setZero();
+	stiffnessMatrix.setZero();
+
+	tet.addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
+	EXPECT_TRUE(forceVector.isZero());
+	EXPECT_TRUE(massMatrix.isApprox(m_expectedMassMatrix));
+	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
+	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
+	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
 }
