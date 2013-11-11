@@ -58,6 +58,7 @@ set(UNIT_TEST_SOURCES
 	OsgVectorConversionsTests.cpp
 	OsgViewElementTests.cpp
 	OsgViewTests.cpp
+	RenderPassTests.cpp
 	ViewElementTests.cpp
 	ViewTests.cpp
 )

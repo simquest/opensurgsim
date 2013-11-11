@@ -42,7 +42,8 @@ class Camera : public virtual Representation
 {
 public:
 
-	enum RenderOrder {
+	enum RenderOrder
+	{
 		RENDER_ORDER_PRE_RENDER = 0,
 		RENDER_ORDER_IN_ORDER,
 		RENDER_ORDER_POST_RENDER,
@@ -91,7 +92,7 @@ public:
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The render target.
-	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) = 0;
+	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) = 0;
 
 	/// Gets RenderTarget that is currently being used by the camera.
 	/// \return	The RenderTarget.
