@@ -78,6 +78,14 @@ surgsim_add_library(
 	"SurgSim/Framework"
 )
 
+SET(LIBS
+        SurgSimFramework
+        ${Boost_LIBRARIES}
+)
+
+target_link_libraries(${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()

@@ -53,7 +53,9 @@ surgsim_add_library(
 set(LIBS 
 	SurgSimDataStructures
 	SurgSimMath 
-	SurgSimFramework)
+	SurgSimFramework
+	${Boost_LIBRARIES}
+)
 
 target_link_libraries(${LIBS}
 )
