@@ -21,8 +21,8 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::CapsuleShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::CapsuleShape;
 
 namespace SurgSim
 {

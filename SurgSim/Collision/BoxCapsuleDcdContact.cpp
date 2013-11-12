@@ -20,11 +20,11 @@
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Math/Geometry.h>
 #include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/CapsuleShape.h>
+#include <SurgSim/Math/BoxShape.h>
+#include <SurgSim/Math/CapsuleShape.h>
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::CapsuleShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::distancePointSegment;
 using SurgSim::Math::intersectionsSegmentBox;
 using SurgSim::Math::Geometry::DistanceEpsilon;
@@ -70,6 +70,16 @@ Vector3d directionToClosestEdge(const Vector3d& pt, const Eigen::AlignedBox<doub
 	direction[index] = 0.0;
 	return direction;
 }
+
+BoxCapsuleDcdContact::BoxCapsuleDcdContact()
+{
+}
+
+std::pair<int,int> BoxCapsuleDcdContact::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_CAPSULE);
+}
+
 
 void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {

@@ -20,7 +20,6 @@
 
 #include <SurgSim/Collision/ContactCalculation.h>
 
-using SurgSim::Physics::RigidShapeType;
 
 namespace SurgSim
 {
@@ -35,16 +34,11 @@ class BoxCapsuleDcdContact : public ContactCalculation
 public:
 
 	/// Constructor.
-	BoxCapsuleDcdContact()
-	{
-	}
+	BoxCapsuleDcdContact();
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int,int> getShapeTypes() override
-	{
-		return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_BOX, SurgSim::Physics::RIGID_SHAPE_TYPE_CAPSULE);
-	}
+	virtual std::pair<int,int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
