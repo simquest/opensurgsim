@@ -71,7 +71,8 @@ public:
 
 	/// Constructor
 	/// \param ostream stream to be used for writing
-	explicit StreamOutput(std::ostream& ostream);
+	/// ostream parameter to be passed by non-const reference on purpose.
+	explicit StreamOutput(std::ostream& ostream); //NOLINT
 	virtual ~StreamOutput();
 
 	/// Writes a message to the stream.

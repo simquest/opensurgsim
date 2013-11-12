@@ -21,11 +21,11 @@
 #include <list>
 
 
-#include <SurgSim/Framework/ReuseFactory.h>
-#include <SurgSim/Physics/Computation.h>
 #include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Collision/DcdCollision.h>
+#include <SurgSim/Math/Shape.h>
+#include <SurgSim/Physics/Computation.h>
+#include <SurgSim/Physics/Representation.h>
 
 using SurgSim::Collision::ContactCalculation;
 
@@ -75,7 +75,8 @@ private:
 
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
-	std::shared_ptr<ContactCalculation> m_contactCalculations[RIGID_SHAPE_TYPE_COUNT][RIGID_SHAPE_TYPE_COUNT];
+	std::shared_ptr<ContactCalculation> m_contactCalculations[SurgSim::Math::SHAPE_TYPE_COUNT]
+															 [SurgSim::Math::SHAPE_TYPE_COUNT];
 
 };
 

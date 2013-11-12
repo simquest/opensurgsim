@@ -23,14 +23,23 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
+	MeshShapeTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
+	OdeEquationTests.cpp
+	OdeSolverEulerExplicitModifiedTests.cpp
+	OdeSolverEulerExplicitTests.cpp
+	OdeSolverEulerImplicitTests.cpp
+	OdeSolverTests.cpp
+	ShapeTests.cpp
 	ValidTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	MockObject.h
 )
 
 set(UNIT_TEST_EIGEN_TYPE_SOURCES
+	LinearSolveAndInverseTests.cpp
 	MatrixTests.cpp
 	QuaternionTests.cpp
 	RigidTransformTests.cpp
@@ -58,3 +67,6 @@ set(LIBS SurgSimMath SurgSimFramework MlcpTestIO ${Boost_LIBRARIES} gtest)
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimMathTest)
+
+# Put SurgSimMathTest into folder "Math"
+set_target_properties(SurgSimMathTest PROPERTIES FOLDER "Math")

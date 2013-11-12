@@ -16,6 +16,7 @@
 
 cmake_minimum_required(VERSION 2.6)
 project(OpenSurgSim)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(OPENSURGSIM_MAJOR_VERSION 0)
 set(OPENSURGSIM_MINOR_VERSION 0)
@@ -44,9 +45,8 @@ include(SurgSimUtilities)
 
 ### Find required libraries
 
-#find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-#find_package(Qt4 COMPONENTS QtCore)
-#find_package(OpenThreads)
+find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
+find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 REQUIRED)
 
@@ -62,10 +62,9 @@ endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.50 COMPONENTS thread system chrono filesystem REQUIRED)
+find_package(Boost 1.50 COMPONENTS chrono date_time filesystem system thread REQUIRED)
 mark_as_advanced(Boost_DIR)
 
-find_package(NovintHdalSdk)
 # Look for platform specific pthread.
 find_package(Threads REQUIRED)
 # Append pthread and rt to Boost_LIBRARIES since they are boost dependancies
@@ -74,10 +73,12 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-find_package(OpenHaptics)
-find_package(SixenseSdk)
-find_package(WDK)
-
+if(SURGSIM_DEVICES_BUILD)
+	find_package(NovintHdalSdk)
+	find_package(OpenHaptics)
+	find_package(SixenseSdk)
+	find_package(WDK)
+endif(SURGSIM_DEVICES_BUILD)
 
 if(SURGSIM_TESTS_BUILD)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)

@@ -35,6 +35,8 @@ OsgManager::OsgManager() : SurgSim::Graphics::Manager(),
 {
 	m_defaultCamera = std::make_shared<OsgCamera>("Default Camera");
 	m_defaultCamera->setGroup(m_defaultGroup);
+	m_defaultGroup->getOsgGroup()->
+		getOrCreateStateSet()->setGlobalDefaults();
 }
 
 OsgManager::~OsgManager()
@@ -102,7 +104,7 @@ bool OsgManager::addGroup(std::shared_ptr<SurgSim::Graphics::Group> group)
 	std::shared_ptr<OsgGroup> osgGroup = std::dynamic_pointer_cast<OsgGroup>(group);
 	if (osgGroup && Manager::addGroup(osgGroup))
 	{
-		// Check if there are any represenations that might want to be included
+		// Check if there are any representations that might want to be included
 		// in this group
 		std::string name = group->getName();
 		auto representations = getRepresentations();

@@ -54,3 +54,6 @@ if(SURGSIM_TESTS_BUILD)
 		add_subdirectory(VisualTest)
 	endif(GLUT_FOUND)
 endif()
+
+# Put NovintDevice into folder "Devices"
+set_target_properties(NovintDevice PROPERTIES FOLDER "Devices")

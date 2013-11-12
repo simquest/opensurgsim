@@ -39,3 +39,6 @@ option(SURGSIM_TESTS_RUN_DEVICE_NOVINT
 	OFF)
 surgsim_add_unit_tests(NovintDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_NOVINT})
+
+# Put NovintDeviceTest into folder "Devices"
+set_target_properties(NovintDeviceTest PROPERTIES FOLDER "Devices")

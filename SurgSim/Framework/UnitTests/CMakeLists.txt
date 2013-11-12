@@ -25,15 +25,15 @@ set(UNIT_TEST_SOURCES
 	BarrierTest.cpp
 	BasicThreadTests.cpp
 	BehaviorManagerTest.cpp
-	ComponentTest.cpp
 	ComponentManagerTests.cpp
+	ComponentTest.cpp
 	LockedContainerTest.cpp
-	LoggerTest.cpp
 	LoggerManagerTest.cpp
+	LoggerTest.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
-	SceneTest.cpp
 	SceneElementTest.cpp
+	SceneTest.cpp
 	SharedInstanceTest.cpp
 )
 
@@ -49,3 +49,6 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBS SurgSimFramework gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
+
+# Put SurgSimFrameworkTest into folder "Framework"
+set_target_properties(SurgSimFrameworkTest PROPERTIES FOLDER "Framework")

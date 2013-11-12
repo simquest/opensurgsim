@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
@@ -26,14 +23,24 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	BasicSceneElementTests.cpp
+	MassSpring1DRepresentationTests.cpp
+	MassSpring2DRepresentationTests.cpp
+	MassSpring3DRepresentationTests.cpp
+	MassSpringNDRepresentationUtilsTests.cpp
+	SpringTestUtils.cpp
+	TransferDeformableStateToVerticesBehaviorTests.cpp
 	TransferPoseBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
+	SpringTestUtils.h
 )
 
 set(LIBS SurgSimBlocks SurgSimFramework SurgSimPhysics SurgSimGraphics gtest
 	${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
+
+# Put SurgSimBlocksTest into folder "Blocks"
+set_target_properties(SurgSimBlocksTest PROPERTIES FOLDER "Blocks") 

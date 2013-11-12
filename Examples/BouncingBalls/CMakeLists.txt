@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
@@ -60,3 +57,6 @@ target_link_libraries(ExampleBouncingBalls
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
 )
+
+# Put ExampleBouncingBalls into folder "Examples"
+set_target_properties(ExampleBouncingBalls PROPERTIES FOLDER "Examples") 

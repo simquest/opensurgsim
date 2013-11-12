@@ -28,7 +28,7 @@ set(SURGSIM_COLLISION_SOURCES
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
 	RigidCollisionRepresentation.cpp
-	RigidShapeCollisionRepresentation.cpp
+	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
 	SpherePlaneDcdContact.cpp
 	SphereSphereDcdContact.cpp
@@ -47,7 +47,7 @@ set(SURGSIM_COLLISION_HEADERS
 	DefaultContactCalculation.h
 	Location.h
 	RigidCollisionRepresentation.h
-	RigidShapeCollisionRepresentation.h
+	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h
@@ -66,3 +66,6 @@ target_link_libraries(SurgSimCollision SurgSimFramework SurgSimMath)
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimCollision into folder "Collision"
+set_target_properties(SurgSimCollision PROPERTIES FOLDER "Collision")

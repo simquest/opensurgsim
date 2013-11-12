@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(OpenSceneGraph COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
-find_package(OpenThreads)
-
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
@@ -58,3 +55,6 @@ endif()
 target_link_libraries(ExampleInputVtc
 	${LIBS}
 )
+
+# Put ExampleInputVtc into folder "Examples"
+set_target_properties(ExampleInputVtc PROPERTIES FOLDER "Examples") 

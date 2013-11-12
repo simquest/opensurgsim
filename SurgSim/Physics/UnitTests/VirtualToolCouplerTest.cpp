@@ -31,6 +31,7 @@ using SurgSim::Input::InputComponent;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;
 
 namespace SurgSim

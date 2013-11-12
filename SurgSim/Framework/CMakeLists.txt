@@ -29,6 +29,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Barrier.cpp
 	BasicThread.cpp
 	BehaviorManager.cpp
+	Component.cpp
 	ComponentManager.cpp
 	Logger.cpp
 	LoggerManager.cpp
@@ -80,3 +81,7 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+
+# Put SurgSimFramework into folder "Framework"
+set_target_properties(SurgSimFramework PROPERTIES FOLDER "Framework")

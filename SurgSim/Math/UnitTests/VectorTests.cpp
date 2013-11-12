@@ -17,6 +17,8 @@
 /// Tests that exercise the functionality of our vector typedefs, which come
 /// straight from Eigen.
 
+#include <vector>
+
 #include <math.h>
 #include "SurgSim/Math/Vector.h"
 #include "gtest/gtest.h"
@@ -80,6 +82,13 @@ public:
 	typedef T Vector;
 };
 
+template <class T>
+class AllDynamicVectorTests : public VectorTestBase<typename T::Scalar>
+{
+public:
+	typedef T Vector;
+};
+
 // This used to contain aligned (via Eigen::AutoAlign) vector type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Vector2d,
 						 SurgSim::Math::Vector2f,
@@ -89,8 +98,20 @@ typedef ::testing::Types<SurgSim::Math::Vector2d,
 						 SurgSim::Math::Vector4f> AllVectorVariants;
 TYPED_TEST_CASE(AllVectorTests, AllVectorVariants);
 
+typedef ::testing::Types<Eigen::VectorXd,
+						 Eigen::VectorXf,
+						 SurgSim::Math::Vector> AllDynamicVectorVariants;
+TYPED_TEST_CASE(AllDynamicVectorTests, AllDynamicVectorVariants);
+
 template <class T>
 class UnalignedVectorTests : public VectorTestBase<typename T::Scalar>
+{
+public:
+	typedef T Vector;
+};
+
+template <class T>
+class UnalignedDynamicVectorTests : public VectorTestBase<typename T::Scalar>
 {
 public:
 	typedef T Vector;
@@ -104,6 +125,10 @@ typedef ::testing::Types<SurgSim::Math::Vector2d,
 						 SurgSim::Math::Vector4f> UnalignedVectorVariants;
 TYPED_TEST_CASE(UnalignedVectorTests, UnalignedVectorVariants);
 
+typedef ::testing::Types<Eigen::VectorXd,
+						 Eigen::VectorXf,
+						 SurgSim::Math::Vector> UnalignedDynamicVectorVariants;
+TYPED_TEST_CASE(UnalignedDynamicVectorTests, UnalignedDynamicVectorVariants);
 
 
 // Now we're ready to start testing...
@@ -208,7 +233,6 @@ TYPED_TEST(Vector4Tests, NArgumentConstructorInitialization)
 TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	EXPECT_TRUE(SIZE >= 2 && SIZE <= 4);
@@ -236,7 +260,6 @@ TYPED_TEST(UnalignedVectorTests, DefaultConstructorInitialization)
 TYPED_TEST(Vector2Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Vector2 Vector2;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector2 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -248,7 +271,6 @@ TYPED_TEST(Vector2Tests, ShiftCommaInitialization)
 TYPED_TEST(Vector3Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Vector3 Vector3;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector3 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -260,7 +282,6 @@ TYPED_TEST(Vector3Tests, ShiftCommaInitialization)
 TYPED_TEST(Vector4Tests, ShiftCommaInitialization)
 {
 	typedef typename TestFixture::Vector4 Vector4;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector4 vector;
 	// Initialize elements in order.  Do NOT put parentheses around the list!
@@ -272,7 +293,6 @@ TYPED_TEST(Vector4Tests, ShiftCommaInitialization)
 TYPED_TEST(AllVectorTests, ZeroValue)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector = 1000 * Vector::Zero();
@@ -286,7 +306,6 @@ TYPED_TEST(AllVectorTests, ZeroValue)
 TYPED_TEST(AllVectorTests, SetToZero)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector;
@@ -301,7 +320,6 @@ TYPED_TEST(AllVectorTests, SetToZero)
 TYPED_TEST(AllVectorTests, ConstantValue)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector = 2 * Vector::Constant(0.5f);
@@ -315,7 +333,6 @@ TYPED_TEST(AllVectorTests, ConstantValue)
 TYPED_TEST(AllVectorTests, SetToConstant)
 {
 	typedef typename TestFixture::Vector Vector;
-	typedef typename TestFixture::Scalar T;
 	const int SIZE = Vector::RowsAtCompileTime;
 
 	Vector vector;
@@ -559,7 +576,6 @@ TYPED_TEST(AllVectorTests, DotProduct)
 TYPED_TEST(Vector3Tests, CrossProduct)
 {
 	typedef typename TestFixture::Vector3 Vector3;
-	typedef typename TestFixture::Scalar  T;
 
 	Vector3 v;
 	v << 3.4f, 5.6f, 7.8f;
@@ -966,7 +982,149 @@ TYPED_TEST(AllVectorTests, ArrayReadWrite)
 // testing degeneracy (norm near 0)
 // compute an orthonormal frame based on a given normal (z-axis)
 
-TEST(VectorXdTests, CanResize)
+TYPED_TEST(AllDynamicVectorTests, CanResize)
 {
-	ASSERT_NO_THROW({Eigen::VectorXd a; a.resize(10);});
+	typedef typename TestFixture::Vector Vector;
+
+	ASSERT_NO_THROW({Vector a; a.resize(10);});
+}
+
+namespace
+{
+	template <class T>
+	void testScalar(T valueExpected, T value){}
+
+	template <>
+	void testScalar<double>(double valueExpected, double value)
+	{
+		EXPECT_DOUBLE_EQ(valueExpected, value);
+	}
+
+	template <>
+	void testScalar<float>(float valueExpected, float value)
+	{
+		EXPECT_FLOAT_EQ(valueExpected, value);
+	}
+};
+
+TYPED_TEST(AllDynamicVectorTests, addSubVector)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v, vInit, v2, v2Init;
+	v.resize(18);   v.setRandom();   vInit  = v;
+	v2.resize(18);  v2.setRandom();  v2Init = v2;
+
+	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3,3), 2, 3, &v););
+	EXPECT_TRUE(v2.isApprox(v2Init));
+	EXPECT_FALSE(v.isApprox(vInit));
+	for (int dofId = 0; dofId < 6; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+	for (int dofId = 6; dofId < 9; dofId++)
+	{
+		testScalar(vInit[dofId] + v2Init[3 + dofId-6], v[dofId]);
+	}
+	for (int dofId = 9; dofId < 18; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+}
+
+TYPED_TEST(AllDynamicVectorTests, addSubVectorBlocks)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v, vInit, v2, v2Init;
+	std::vector<unsigned int> nodeIds;
+	v.resize(18);   v.setRandom();   vInit = v;
+	v2.resize(18);  v2.setRandom();  v2Init = v2;
+	nodeIds.push_back(1);
+	nodeIds.push_back(3);
+	nodeIds.push_back(5);
+
+	ASSERT_NO_THROW(SurgSim::Math::addSubVector(v2.segment(3,15), nodeIds, 3, &v););
+	EXPECT_TRUE(v2.isApprox(v2Init));
+	EXPECT_FALSE(v.isApprox(vInit));
+	for (int dofId = 0; dofId < 3; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+	for (int dofId = 3; dofId < 6; dofId++)
+	{
+		testScalar(vInit[dofId] + v2Init[3 + (dofId - 3)], v[dofId]);
+	}
+	for (int dofId = 6; dofId < 9; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+	for (int dofId = 9; dofId < 12; dofId++)
+	{
+		testScalar(vInit[dofId] + v2Init[3 + (dofId - 6)], v[dofId]);
+	}
+	for (int dofId = 12; dofId < 15; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+	for (int dofId = 15; dofId < 18; dofId++)
+	{
+		testScalar(vInit[dofId] + v2Init[3 + (dofId - 9)], v[dofId]);
+	}
+}
+
+TYPED_TEST(AllDynamicVectorTests, setSubVector)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v, vInit, v2, v2Init;
+	v.resize(18);   v.setRandom();   vInit  = v;
+	v2.resize(18);  v2.setRandom();  v2Init = v2;
+
+	ASSERT_NO_THROW(SurgSim::Math::setSubVector(v2.segment(3,3), 2, 3, &v););
+	EXPECT_TRUE(v2.isApprox(v2Init));
+	EXPECT_FALSE(v.isApprox(vInit));
+	for (int dofId = 0; dofId < 6; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+	for (int dofId = 6; dofId < 9; dofId++)
+	{
+		testScalar(v2Init[3 + dofId-6], v[dofId]);
+	}
+	for (int dofId = 9; dofId < 18; dofId++)
+	{
+		testScalar(vInit[dofId], v[dofId]);
+	}
+}
+
+TYPED_TEST(AllDynamicVectorTests, getSubVector)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v, vInit;
+	v.resize(18); v.setRandom(); vInit = v;
+
+	Eigen::VectorBlock<Vector> subVector = SurgSim::Math::getSubVector(v, 2, 3);
+	EXPECT_TRUE(v.isApprox(vInit));
+	for (int dofId = 0; dofId < 3; dofId++)
+	{
+		testScalar(v[2 * 3 + dofId], subVector[dofId]);
+		// Also test that the returned value are pointing to the correct data
+		EXPECT_EQ(&subVector[dofId], &v[2 * 3 + dofId]);
+	}
+}
+
+TYPED_TEST(AllDynamicVectorTests, resize)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v;
+
+	ASSERT_NO_THROW(SurgSim::Math::resize(&v, 10, false););
+	EXPECT_EQ(10, static_cast<int>(v.size()));
+
+	ASSERT_NO_THROW(SurgSim::Math::resize(&v, 13, true););
+	EXPECT_EQ(13, static_cast<int>(v.size()));
+	EXPECT_TRUE(v.isZero());
 }

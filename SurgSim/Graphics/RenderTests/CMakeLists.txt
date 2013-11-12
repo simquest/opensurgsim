@@ -30,6 +30,7 @@ set(UNIT_TEST_SOURCES
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
+	OsgSceneryRepresentationRenderTests.cpp
 	OsgScreenSpaceQuadRenderTests.cpp
 	OsgShaderRenderTests.cpp
 	OsgSphereRepresentationRenderTests.cpp
@@ -42,6 +43,7 @@ set(UNIT_TEST_HEADERS
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 set(LIBS SurgSimFramework SurgSimGraphics SurgSimTesting gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
@@ -53,3 +55,6 @@ option(SURGSIM_TESTS_RUN_GRAPHICS_RENDER
 	OFF)
 surgsim_add_unit_tests(SurgSimGraphicsRenderTest
 	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
+
+# Put SurgSimGraphicsRenderTest into folder "Graphics"
+set_target_properties(SurgSimGraphicsRenderTest PROPERTIES FOLDER "Graphics")

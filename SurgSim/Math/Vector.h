@@ -19,6 +19,8 @@
 #ifndef SURGSIM_MATH_VECTOR_H
 #define SURGSIM_MATH_VECTOR_H
 
+#include <vector>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -50,6 +52,93 @@ typedef Eigen::Matrix<double, 3, 1, Eigen::DontAlign>  Vector3d;
 /// A 4D vector of doubles.
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 1, Eigen::DontAlign>  Vector4d;
+
+/// A dynamic size column vector
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
+
+/// Helper method to add a sub-vector into a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param subVector The sub-vector
+/// \param blockId The block index in vector
+/// \param blockSize The block size
+/// \param[out] vector The vector to add the sub-vector into
+template <class Vector, class SubVector>
+void addSubVector(const SubVector& subVector,unsigned int blockId, unsigned int blockSize, Vector* vector)
+{
+	vector->segment(blockSize * blockId, blockSize) += subVector;
+}
+
+/// Helper method to add a sub-vector per block into a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param subVector The sub-vector (containing all the blocks)
+/// \param blockIds Vector of block indices (for accessing vector) corresponding to the blocks in sub-vector
+/// \param blockSize The block size
+/// \param[out] vector The vector to add the sub-vector blocks into
+template <class Vector, class SubVector>
+void addSubVector(const SubVector& subVector, const std::vector<unsigned int> blockIds,
+	unsigned int blockSize, Vector* vector)
+{
+	const unsigned int numBlocks = blockIds.size();
+
+	for (unsigned int block = 0; block < numBlocks; block++)
+	{
+		unsigned int blockId = blockIds[block];
+
+		vector->segment(blockSize * blockId, blockSize) += subVector.segment(blockSize * block, blockSize);
+	}
+}
+
+/// Helper method to set a sub-vector into a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param subVector The sub-vector
+/// \param blockId The block index in vector
+/// \param blockSize The size of the sub-vector
+/// \param[out] vector The vector to set the sub-vector into
+template <class Vector, class SubVector>
+void setSubVector(const SubVector& subVector,unsigned int blockId, unsigned int blockSize, Vector* vector)
+{
+	vector->segment(blockSize * blockId, blockSize) = subVector;
+}
+
+/// Helper method to access a sub-vector from a vector, for the sake of clarity
+/// \tparam Vector The vector type to get the sub-vector from
+/// \param vector The vector to get the sub-vector from
+/// \param blockId The block index
+/// \param blockSize The block size
+/// \return The requested sub-vector
+/// \note Disable cpplint warnings for use of non-const reference
+/// \note Eigen has a specific type for VectorBlock that we want to return with read/write access
+/// \note therefore the Vector from which the VectorBlock is built from must not be const
+template <class Vector>
+Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, unsigned int blockSize) // NOLINT
+{
+	return vector.segment(blockSize * blockId, blockSize);
+}
+
+/// Helper method to resize a vector (if necessary), and potentially zero it out
+/// \tparam Vector The vector type
+/// \param[in,out] v The vector to resize and potentially zero out
+/// \param size The size to resize the vector v to
+/// \param zeroOut True if the vector v should be filled up with 0 after having been resized, False if not
+template <class Vector>
+void resize(Vector *v, unsigned int size, bool zeroOut = false)
+{
+	if (v == nullptr)
+	{
+		return;
+	}
+	if (v->size() != static_cast<int>(size))
+	{
+		v->resize(static_cast<int>(size));
+	}
+	if (zeroOut)
+	{
+		v->setZero();
+	}
+}
 
 };  // namespace Math
 };  // namespace SurgSim

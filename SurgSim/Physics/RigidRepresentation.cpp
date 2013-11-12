@@ -174,6 +174,8 @@ void RigidRepresentation::update(double dt)
 
 	// If something went wrong, we deactivate the representation
 	bool condition = SurgSim::Math::isValid(G);
+	condition &= SurgSim::Math::isValid(dG);
+	condition &= SurgSim::Math::isValid(w);
 	condition &= qNorm != 0.0;
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
@@ -209,7 +211,7 @@ void RigidRepresentation::afterUpdate(double dt)
 
 void RigidRepresentation::applyDofCorrection(
 	double dt,
-	const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& dofCorrection)
+	const Eigen::VectorBlock<Vector>& dofCorrection)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;

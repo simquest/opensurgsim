@@ -13,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if(SURGSIM_DEVICES_BUILD)
+	add_subdirectory(AddSphereFromInput)
+	add_subdirectory(InputVtc)
+endif(SURGSIM_DEVICES_BUILD)
+
 add_subdirectory(BouncingBalls)
-add_subdirectory(InputVtc)
-add_subdirectory(AddSphereFromInput)
+add_subdirectory(GraphicsScene)
+add_subdirectory(MassSprings)

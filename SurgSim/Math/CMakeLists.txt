@@ -19,20 +19,49 @@ include_directories(
 )
 
 set(SURGSIM_MATH_SOURCES
+	BoxShape.cpp
+	CapsuleShape.cpp
+	CylinderShape.cpp
+	DoubleSidedPlaneShape.cpp
+	LinearSolveAndInverse.cpp
+	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
+	PlaneShape.cpp
+	SphereShape.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
+	BoxShape.h
+	CapsuleShape.h
+	CylinderShape.h
+	DoubleSidedPlaneShape.h
 	Geometry.h
+	LinearSolveAndInverse.h
 	Matrix.h
+	MeshShape.h
+	MeshShape-inl.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
 	MlcpProblem.h
 	MlcpSolution.h
 	MlcpSolver.h
+	OdeEquation.h
+	OdeEquation-inl.h
+	OdeSolver.h
+	OdeSolver-inl.h
+	OdeSolverEulerExplicit.h
+	OdeSolverEulerExplicit-inl.h
+	OdeSolverEulerExplicitModified.h
+	OdeSolverEulerExplicitModified-inl.h
+	OdeSolverEulerImplicit.h
+	OdeSolverEulerImplicit-inl.h
+	PlaneShape.h
 	Quaternion.h
 	RigidTransform.h
+	Shape.h
+	Shapes.h
+	SphereShape.h
 	Valid.h
 	Valid-inl.h
 	Vector.h
@@ -48,3 +77,6 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimMath into folder "Math"
+set_target_properties(SurgSimMath PROPERTIES FOLDER "Math")
