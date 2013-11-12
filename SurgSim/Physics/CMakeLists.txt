@@ -27,6 +27,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableRepresentationState.cpp
+	FemElement.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp

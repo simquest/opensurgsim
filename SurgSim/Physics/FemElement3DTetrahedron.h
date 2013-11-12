@@ -19,9 +19,6 @@
 #include <array>
 #include <SurgSim/Physics/FemElement.h>
 
-using SurgSim::Math::Vector;
-using SurgSim::Math::Vector3d;
-
 namespace SurgSim
 {
 
@@ -42,13 +39,6 @@ public:
 	/// \param nodeIds An array of 4 node ids defining this tetrahedron element in a overall mesh
 	/// \param restState The rest state to initialize the Tetrahedron with
 	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds, const DeformableRepresentationState& restState);
-
-	/// Sets the mass density (in Kg.m-3)
-	/// \param rho The mass density
-	void setMassDensity(double rho);
-	/// Gets the mass density (in Kg.m-3)
-	/// \return The mass density
-	double getMassDensity() const;
 
 	/// Sets the Young modulus (in N.m-2)
 	/// \param E The Young modulus
@@ -121,7 +111,9 @@ protected:
 	/// Computes the determinant of 3 vectors
 	/// \param a, b, c The 3 vectors to compute the determinant from
 	/// \return |a b c|, The determinant of the 3 vectors a, b and c
-	double det(const Vector3d& a, const Vector3d& b, const Vector3d& c) const;
+	double det(const SurgSim::Math::Vector3d& a,
+		const SurgSim::Math::Vector3d& b,
+		const SurgSim::Math::Vector3d& c) const;
 
 	/// Computes the tetrahdron shape functions
 	/// \param restState The deformable rest state to compute the shape function from
@@ -132,8 +124,17 @@ protected:
 	/// \param[out] k The stiffness matrix to store the result into
 	void computeStiffness(const DeformableRepresentationState& state, Eigen::Matrix<double, 12, 12>* k);
 
-	/// Mass density (in Kg.m-3)
-	double m_rho;
+	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
+	/// This method relies on a given stiffness matrix and does not evaluate it from the state
+	/// \param state The state to compute the force with
+	/// \param k The given element stiffness matrix
+	/// \param[in,out] F The complete system force vector to add the element force into
+	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
+	/// \note This method supposes that the incoming state contains information with the same number of dof
+	/// \note per node as getNumDofPerNode()
+	void addForce(const DeformableRepresentationState& state, const Eigen::Matrix<double, 12, 12>& k,
+		SurgSim::Math::Vector* F);
+
 	/// Young modulus (in N.m-2)
 	double m_E;
 	/// Poisson ratio (unitless)

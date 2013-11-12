@@ -38,37 +38,39 @@ class DeformableRepresentationState;
 class FemElement
 {
 public:
+	/// Constructor
+	FemElement();
+
 	/// Virtual destructor
-	virtual ~FemElement()
-	{}
+	virtual ~FemElement();
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node
-	unsigned int getNumDofPerNode() const
-	{
-		return m_numDofPerNode;
-	}
+	unsigned int getNumDofPerNode() const;
 
 	/// Gets the number of nodes connected by this element
 	/// \return The number of nodes
-	unsigned int getNumNodes() const
-	{
-		return m_nodeIds.size();
-	}
+	unsigned int getNumNodes() const;
 
 	/// Gets the elementNodeId-th node id
 	/// \return The requested node id
-	unsigned int getNodeId(unsigned int elementNodeId) const
-	{
-		return m_nodeIds[elementNodeId];
-	}
+	unsigned int getNodeId(unsigned int elementNodeId) const;
 
 	/// Gets the node ids for this element
 	/// \return A vector containing the node ids on which the element is defined
-	const std::vector<unsigned int>& getNodeIds() const
-	{
-		return m_nodeIds;
-	}
+	const std::vector<unsigned int>& getNodeIds() const;
+
+	/// Sets the mass density (in Kg.m-3)
+	/// \param rho The mass density
+	void setMassDensity(double rho);
+
+	/// Gets the mass density (in Kg.m-3)
+	/// \return The mass density
+	double getMassDensity() const;
+
+	/// Get the element mass based on the input state (in Kg)
+	/// \param state The deformable state to compute the mass with
+	double getMass(const DeformableRepresentationState& state) const;
 
 	/// Get the element volume based on the input state
 	/// \param state The deformable state to compute the volume with
@@ -124,11 +126,20 @@ public:
 		SurgSim::Math::Matrix* K) = 0;
 
 protected:
+	/// Sets the number of degrees of freedom per node
+	/// \param numDofPerNode The number of dof per node
+	/// \note Protected to be accessible only to derived classes which should be the only
+	/// \note ones able to set this parameter
+	void setNumDofPerNode(unsigned int numDofPerNode);
+
 	/// Number of degree of freedom per node for this element
 	unsigned int m_numDofPerNode;
 
 	/// Node ids connected by this element
 	std::vector<unsigned int> m_nodeIds;
+
+	/// Mass density (in Kg.m-3)
+	double m_rho;
 };
 
 } // namespace Physics

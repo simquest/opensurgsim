@@ -25,6 +25,7 @@
 
 using SurgSim::Physics::FemElement3DTetrahedron;
 using SurgSim::Physics::DeformableRepresentationState;
+using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 
@@ -231,7 +232,6 @@ TEST_F(FemElement3DTetrahedronTests, DefaultValueTest)
 {
 	FemElement3DTetrahedron tet(m_nodeIds, m_restState);
 
-	EXPECT_DOUBLE_EQ(0.0, tet.getMassDensity());
 	EXPECT_DOUBLE_EQ(0.0, tet.getYoungModulus());
 	EXPECT_DOUBLE_EQ(0.0, tet.getPoissonRatio());
 }
@@ -240,8 +240,6 @@ TEST_F(FemElement3DTetrahedronTests, SetGetTest)
 {
 	FemElement3DTetrahedron tet(m_nodeIds, m_restState);
 
-	tet.setMassDensity(3.4);
-	EXPECT_DOUBLE_EQ(3.4, tet.getMassDensity());
 	tet.setYoungModulus(4534.33);
 	EXPECT_DOUBLE_EQ(4534.33, tet.getYoungModulus());
 	tet.setPoissonRatio(0.34);

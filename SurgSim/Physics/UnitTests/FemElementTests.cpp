@@ -32,7 +32,7 @@ class MockFemElement : public FemElement
 public:
 	MockFemElement() : FemElement()
 	{
-		this->m_numDofPerNode = 3;
+		setNumDofPerNode(3);
 	}
 
 	void addNode(unsigned int nodeId)
@@ -41,7 +41,7 @@ public:
 	}
 
 	virtual double getVolume(const DeformableRepresentationState& state) const override
-	{ return 0; }
+	{ return 1; }
 	virtual void addForce(const DeformableRepresentationState& state, Vector* F) override
 	{}
 	virtual void addMass(const DeformableRepresentationState& state, Matrix* M) override
@@ -70,10 +70,26 @@ TEST(FemElementTests, GetSetAddMethods)
 {
 	MockFemElement femElement;
 
-	// Initial setup (numDofPerNode set), no nodes defined yet.
+	// Initial setup (numDofPerNode set), no nodes defined yet, density = 0
 	EXPECT_EQ(3u, femElement.getNumDofPerNode());
 	EXPECT_EQ(0u, femElement.getNumNodes());
 	EXPECT_EQ(0, femElement.getNodeIds().size());
+	EXPECT_DOUBLE_EQ(0.0, femElement.getMassDensity());
+
+	// Test Set/Get mass density
+	femElement.setMassDensity(2343.13);
+	EXPECT_DOUBLE_EQ(2343.13, femElement.getMassDensity());
+	femElement.setMassDensity(0.0);
+	EXPECT_DOUBLE_EQ(0.0, femElement.getMassDensity());
+
+	// Test GetMass
+	DeformableRepresentationState fakeState;
+	femElement.setMassDensity(0.0);
+	EXPECT_DOUBLE_EQ(0.0, femElement.getMass(fakeState));
+	femElement.setMassDensity(1.14);
+	EXPECT_DOUBLE_EQ(1.14, femElement.getMass(fakeState));
+	femElement.setMassDensity(434.55);
+	EXPECT_DOUBLE_EQ(434.55, femElement.getMass(fakeState));
 
 	// Add 1 node
 	femElement.addNode(0);

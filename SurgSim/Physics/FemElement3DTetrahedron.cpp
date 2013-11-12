@@ -16,6 +16,14 @@
 #include <SurgSim/Physics/FemElement3DTetrahedron.h>
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 
+using SurgSim::Math::getSubVector;
+using SurgSim::Math::getSubMatrix;
+using SurgSim::Math::addSubVector;
+using SurgSim::Math::addSubMatrix;
+
+using SurgSim::Math::Vector;
+using SurgSim::Math::Vector3d;
+
 namespace SurgSim
 {
 
@@ -24,13 +32,10 @@ namespace Physics
 
 FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds,
 												 const DeformableRepresentationState& restState) :
-	m_rho(0.0),
 	m_E(0.0),
 	m_nu(0.0)
 {
-	using SurgSim::Math::getSubVector;
-
-	this->m_numDofPerNode = 3; // 3 dof per node (x, y, z)
+	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 
 	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
 	{
@@ -45,16 +50,6 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 	getSubVector(m_x0, 1, 3) = getSubVector(restState.getPositions(), m_nodeIds[1], 3);
 	getSubVector(m_x0, 2, 3) = getSubVector(restState.getPositions(), m_nodeIds[2], 3);
 	getSubVector(m_x0, 3, 3) = getSubVector(restState.getPositions(), m_nodeIds[3], 3);
-}
-
-void FemElement3DTetrahedron::setMassDensity(double rho)
-{
-	m_rho = rho;
-}
-
-double FemElement3DTetrahedron::getMassDensity() const
-{
-	return m_rho;
 }
 
 void FemElement3DTetrahedron::setYoungModulus(double E)
@@ -77,17 +72,13 @@ double FemElement3DTetrahedron::getPoissonRatio() const
 	return m_nu;
 }
 
-void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F)
+void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state,
+									   const Eigen::Matrix<double, 12, 12>& k, SurgSim::Math::Vector* F)
 {
-	using SurgSim::Math::getSubVector;
-	using SurgSim::Math::addSubVector;
-
 	// K.U = F
 	// K.(x - x0) = F
 	Eigen::Matrix<double, 12, 1> x;
 	Eigen::Matrix<double, 12, 1> f;
-	Eigen::Matrix<double, 12, 12> k;
-	computeStiffness(state, &k);
 	getSubVector(x, 0, 3) = getSubVector(state.getPositions(), m_nodeIds[0], 3);
 	getSubVector(x, 1, 3) = getSubVector(state.getPositions(), m_nodeIds[1], 3);
 	getSubVector(x, 2, 3) = getSubVector(state.getPositions(), m_nodeIds[2], 3);
@@ -96,10 +87,15 @@ void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& stat
 	addSubVector(f, m_nodeIds, 3, F);
 }
 
+void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F)
+{
+	Eigen::Matrix<double, 12, 12> k;
+	computeStiffness(state, &k);
+	addForce(state, k, F);
+}
+
 void FemElement3DTetrahedron::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M)
 {
-	using SurgSim::Math::getSubMatrix;
-
 	// From Przemieniecki book
 	// -> section 11 "Inertia properties of structural elements
 	//  -> subsection 8 "Solid Tetrahedron"
@@ -155,14 +151,17 @@ void FemElement3DTetrahedron::computeStiffness(const DeformableRepresentationSta
 
 	// Compute the strain matrix
 	double coef = 1.0 / (6.0 * m_restVolume);
-	for(int i=0 ; i<4 ; i++)
+	for(int i = 0; i < 4; i++)
 	{
-		m_strain(0, 3*i  ) = coef * m_bi[i];
-		m_strain(1, 3*i+1) = coef * m_ci[i];
-		m_strain(2, 3*i+2) = coef * m_di[i];
-		m_strain(3, 3*i  ) = coef * m_ci[i]; m_strain(3, 3*i+1) = coef * m_bi[i];
-		m_strain(4 ,3*i+1) = coef * m_di[i]; m_strain(4, 3*i+2) = coef * m_ci[i];
-		m_strain(5 ,3*i  ) = coef * m_di[i]; m_strain(5, 3*i+2) = coef * m_bi[i];
+		m_strain(0, 3 * i    ) = coef * m_bi[i];
+		m_strain(1, 3 * i + 1) = coef * m_ci[i];
+		m_strain(2, 3 * i + 2) = coef * m_di[i];
+		m_strain(3, 3 * i    ) = coef * m_ci[i];
+		m_strain(3, 3 * i + 1) = coef * m_bi[i];
+		m_strain(4 ,3 * i + 1) = coef * m_di[i];
+		m_strain(4, 3 * i + 2) = coef * m_ci[i];
+		m_strain(5 ,3 * i    ) = coef * m_di[i];
+		m_strain(5, 3 * i + 2) = coef * m_bi[i];
 	}
 
 	// Compute the elasticity material matrix
@@ -185,9 +184,6 @@ void FemElement3DTetrahedron::computeStiffness(const DeformableRepresentationSta
 
 void FemElement3DTetrahedron::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K)
 {
-	using SurgSim::Math::getSubMatrix;
-	using SurgSim::Math::addSubMatrix;
-
 	Eigen::Matrix<double, 12, 12> k;
 	computeStiffness(state, &k);
 	addSubMatrix(k, getNodeIds(), 3, K);
@@ -199,12 +195,10 @@ void FemElement3DTetrahedron::addFMDK(const DeformableRepresentationState& state
 	SurgSim::Math::Matrix* D,
 	SurgSim::Math::Matrix* K)
 {
-	using SurgSim::Math::getSubVector;
-	using SurgSim::Math::getSubMatrix;
-	using SurgSim::Math::addSubMatrix;
-	using SurgSim::Math::addSubVector;
-
+	// Assemble the mass matrix
 	addMass(state, M);
+
+	// Assemble the damping matrix
 	addDamping(state, D);
 
 	Eigen::Matrix<double, 12, 12> k;
@@ -214,16 +208,7 @@ void FemElement3DTetrahedron::addFMDK(const DeformableRepresentationState& state
 	addSubMatrix(k, m_nodeIds, 3, K);
 
 	// Assemble the force vector (using k)
-	// K.U = F
-	// K.(x - x0) = F
-	Eigen::Matrix<double, 12, 1> x;
-	Eigen::Matrix<double, 12, 1> f;
-	getSubVector(x, 0, 3) = getSubVector(state.getPositions(), m_nodeIds[0], 3);
-	getSubVector(x, 1, 3) = getSubVector(state.getPositions(), m_nodeIds[1], 3);
-	getSubVector(x, 2, 3) = getSubVector(state.getPositions(), m_nodeIds[2], 3);
-	getSubVector(x, 3, 3) = getSubVector(state.getPositions(), m_nodeIds[3], 3);
-	f = k * (x - m_x0);
-	addSubVector(f, m_nodeIds, 3, F);
+	addForce(state, k, F);
 }
 
 double FemElement3DTetrahedron::det(const Vector3d& a, const Vector3d& b, const Vector3d& c) const
@@ -233,9 +218,6 @@ double FemElement3DTetrahedron::det(const Vector3d& a, const Vector3d& b, const 
 
 double FemElement3DTetrahedron::getVolume(const DeformableRepresentationState& state) const
 {
-	using SurgSim::Math::Vector;
-	using SurgSim::Math::getSubVector;
-
 	/// Computes the tetrahedron volume 1/6 * | 1 p0x p0y p0z |
 	///                                       | 1 p1x p1y p1z |
 	///                                       | 1 p2x p2y p2z |
@@ -256,63 +238,120 @@ double FemElement3DTetrahedron::getVolume(const DeformableRepresentationState& s
 void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentationState& restState)
 {
 	// The tetrahedron nodes 3D position {a,b,c,d}
-	Vector3d a = SurgSim::Math::getSubVector(restState.getPositions(), m_nodeIds[0], 3);
-	Vector3d b = SurgSim::Math::getSubVector(restState.getPositions(), m_nodeIds[1], 3);
-	Vector3d c = SurgSim::Math::getSubVector(restState.getPositions(), m_nodeIds[2], 3);
-	Vector3d d = SurgSim::Math::getSubVector(restState.getPositions(), m_nodeIds[3], 3);
-	double tmp, tmpa, tmpb, tmpc, tmpd;
+	Vector3d a = getSubVector(restState.getPositions(), m_nodeIds[0], 3);
+	Vector3d b = getSubVector(restState.getPositions(), m_nodeIds[1], 3);
+	Vector3d c = getSubVector(restState.getPositions(), m_nodeIds[2], 3);
+	Vector3d d = getSubVector(restState.getPositions(), m_nodeIds[3], 3);
 
 	m_restVolume = getVolume(restState);
 
-	m_ai[0] =  det( b , c , d ); // 6 V(0,b,c,d)
-	m_ai[1] = -det( a , c , d ); // 6 V(0,c,d,a)
-	m_ai[2] =  det( a , b , d ); // 6 V(0,d,a,b)
-	m_ai[3] = -det( a , b , c ); // 6 V(0,a,b,c)
+	// See http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf for more details.
+	// Relationship between the notations in this source code and the document mentioned above:
+	// a(x1 y1 z1)   b(x2 y2 z2)   c(x3 y3 z3)   d(x4 y4 z4)
 
-	// We should have m_restVolume = m_ai[0] + m_ai[1] + m_ai[2] + m_ai[3]
+	// Shape functions link the 3D space (x, y, z) to the natural parametrization (sigmai) of the shape.
+	// (i.e. sigmai are the barycentric coordinates for the respective 4 nodes of the tetrahedon)
+	// (1)   ( 1  1  1  1) (sigma1)
+	// (x) = (x1 x2 x3 x4) (sigma2)
+	// (y)   (y1 y2 y3 y4) (sigma3)
+	// (z)   (z1 z2 z3 z4) (sigma4)
+	//
+	// The shape functions Ni(x, y, z) are given by the inverse relationship:
+	// (sigma1)   ( 1  1  1  1)^-1 (1)        (m_a[0] m_b[0] m_c[0] m_d[0]) (1)       | 1  1  1  1|
+	// (sigma2) = (x1 x2 x3 x4)    (x) = 1/6V (m_a[1] m_b[1] m_c[1] m_d[1]) (x) where |x1 x2 x3 x4| = 6V
+	// (sigma3)   (y1 y2 y3 y4)    (y)        (m_a[2] m_b[2] m_c[2] m_d[2]) (y)       |y1 y2 y3 y4|
+	// (sigma4)   (z1 z2 z3 z4)    (z)        (m_a[3] m_b[3] m_c[3] m_d[3]) (z)       |z1 z2 z3 z4|
 
-	// Save the 'x' component of the 4 vertices
-	tmpa = a[0]; tmpb = b[0]; tmpc = c[0]; tmpd = d[0];
-	// And replace them by '1'
-	a[0] = 1.; b[0] = 1.; c[0] = 1.; d[0] = 1.;
+	// Computes the shape functions parameters m_ai (noted 6V0i in the document mentioned above, eq 9.12)
+	// m_ai[0] = 6V01 = 6V(origin,b,c,d) = x2(y3z4 - y4z3) + x3(y4z2 - y2z4) + x4(y2z3 - y3z2) =  |b c d|
+	// m_ai[1] = 6V02 = 6V(origin,c,d,a) = x1(y4z3 - y3z4) + x3(y1z4 - y4z1) + x4(y3z1 - y1z3) = -|a c d|
+	// m_ai[2] = 6V03 = 6V(origin,d,a,b) = x1(y2z4 - y4z2) + x2(y4z1 - y1z4) + x4(y1z2 - y2z1) =  |a b d|
+	// m_ai[3] = 6V04 = 6V(origin,a,b,c) = x1(y3z2 - y2z3) + x2(y1z3 - y3z1) + x3(y2z1 - y1z2) = -|a b c|
+	m_ai[0] =  det(b, c, d);
+	m_ai[1] = -det(a, c, d);
+	m_ai[2] =  det(a, b, d);
+	m_ai[3] = -det(a, b, c);
 
-	// HERE WE HAVE for example with BCD:
-	// | 1 yb zb |
-	// | 1 yc zc |
-	// | 1 yd zd |
-	m_bi[0] = -( det( b , c , d ) );
-	m_bi[1] =  ( det( a , c , d ) );
-	m_bi[2] = -( det( a , b , d ) );
-	m_bi[3] =  ( det( a , b , c ) );
+	// Computes the shape function parameters m_bi (noted ai in the document mentioned above, eq 9.11)
+	// m_bi[0] = y42z32 - y32z42 = (y4-y2)(z3-z2) - (y3-y2)(z4-z2) = |1 y2 z2| = |1 by bz|
+	//                                                              -|1 y3 z3|  -|1 cy cz|
+	//                                                               |1 y4 z4|   |1 dy dz|
+	//
+	// m_bi[1] = y31z43 - y34z13 = (y3-y1)(z4-z3) - (y3-y4)(z1-z3) = |1 y1 z1| = |1 ay az|
+	//                                                               |1 y3 z3|   |1 cy cz|
+	//                                                               |1 y4 z4|   |1 dy dz|
+	//
+	// m_bi[2] = y24z14 - y14z24 = (y2-y4)(z1-z4) - (y1-y4)(z2-z4) = |1 y1 z1| = |1 ay az|
+	//                                                              -|1 y2 z2|  -|1 by bz|
+	//                                                               |1 y4 z4|   |1 dy dz|
+	//
+	// m_bi[3] = y13z21 - y12z31 = (y1-y3)(z2-z1) - (y1-y2)(z3-z1) = |1 y1 z1| = |1 ay az|
+	//                                                               |1 y2 z2|   |1 by bz|
+	//                                                               |1 y3 z3|   |1 cy cz|
+	{
+		Vector3d atilde(1, a[1], a[2]);
+		Vector3d btilde(1, b[1], b[2]);
+		Vector3d ctilde(1, c[1], c[2]);
+		Vector3d dtilde(1, d[1], d[2]);
+		m_bi[0] = -det(btilde, ctilde, dtilde);
+		m_bi[1] =  det(atilde, ctilde, dtilde);
+		m_bi[2] = -det(atilde, btilde, dtilde);
+		m_bi[3] =  det(atilde, btilde, ctilde);
+	}
 
-	// Save the 'y' component of the 4 vertices and replace it with the 'x' one which was stored in tmpx values
-	tmp = a[1]; a[1] = tmpa; tmpa = tmp;
-	tmp = b[1]; b[1] = tmpb; tmpb = tmp;
-	tmp = c[1]; c[1] = tmpc; tmpc = tmp;
-	tmp = d[1]; d[1] = tmpd; tmpd = tmp;
-	// HERE WE HAVE for example with BCD:
-	// | 1 xb zb |
-	// | 1 xc zc |
-	// | 1 xd zd |
-	m_ci[0] =  ( det( b , c , d ) );
-	m_ci[1] = -( det( a , c , d ) );
-	m_ci[2] =  ( det( a , b , d ) );
-	m_ci[3] = -( det( a , b , c ) );
+	// Computes the shape function parameters m_ci (noted bi in the document mentioned above, eq 9.11)
+	// m_ci[0] = x32z42 - x42z32 = (x3-x2)(z4-z2) - (x4-x2)(z3-z2) = |1 x2 z2| = |1 bx bz|
+	//                                                               |1 x3 z3|   |1 cx cz|
+	//                                                               |1 x4 z4|   |1 dx dz|
+	//
+	// m_ci[1] = x43z31 - x13z34 = (x4-x3)(z3-z1) - (x1-x3)(z3-z4) = |1 x1 z1| = |1 ax az|
+	//                                                              -|1 x3 z3|  -|1 cx cz|
+	//                                                               |1 x4 z4|   |1 dx dz|
+	//
+	// m_ci[2] = x14z24 - x24z14 = (x1-x4)(z2-z4) - (x2-x4)(z1-z4) = |1 x1 z1| = |1 ax az|
+	//                                                               |1 x2 z2|   |1 bx bz|
+	//                                                               |1 x4 z4|   |1 dx dz|
+	//
+	// m_ci[3] = x21z13 - x31z12 = (x2-x1)(z1-z3) - (x3-x1)(z1-z2) = |1 x1 z1| = |1 ax az|
+	//                                                              -|1 x2 z2|  -|1 bx bz|
+	//                                                               |1 x3 z3|   |1 cx cz|
+	{
+		Vector3d atilde(1, a[0], a[2]);
+		Vector3d btilde(1, b[0], b[2]);
+		Vector3d ctilde(1, c[0], c[2]);
+		Vector3d dtilde(1, d[0], d[2]);
+		m_ci[0] =  det(btilde, ctilde, dtilde);
+		m_ci[1] = -det(atilde, ctilde, dtilde);
+		m_ci[2] =  det(atilde, btilde, dtilde);
+		m_ci[3] = -det(atilde, btilde, ctilde);
+	}
 
-	// Replace the 'z' component of the 4 vertices with the 'y' component stores in the tmpx values
-	// No need to save the 'z' component as it won't be used any further !
-	// HERE WE HAVE for example with BCD:
-	// | 1 xb yb |
-	// | 1 xc yc |
-	// | 1 xd yd |
-	a[2] = tmpa;
-	b[2] = tmpb;
-	c[2] = tmpc;
-	d[2] = tmpd;
-	m_di[0] = -( det( b , c , d ) );
-	m_di[1] =  ( det( a , c , d ) );
-	m_di[2] = -( det( a , b , d ) );
-	m_di[3] =  ( det( a , b , c ) );
+	// Computes the shape function parameters m_di (noted ci in the document mentioned above, eq 9.11)
+	// m_di[0] = x42y32 - x32y42 = (x4-x2)(y3-y2) - (x3-x2)(y4-y2) =  |1 x2 y2| =  |1 bx by|
+	//                                                               -|1 x3 y3|   -|1 cx cy|
+	//                                                                |1 x4 y4|    |1 dx dy|
+	//
+	// m_di[1] = x31y43 - x34y13 = (x3-x1)(y4-y3) - (x3-x4)(y1-y3) =  |1 x1 y1| =  |1 ax ay|
+	//                                                                |1 x3 y3|    |1 cx cy|
+	//                                                                |1 x4 y4|    |1 dx dy|
+	//
+	// m_di[2] = x24y14 - x14y24 = (x2-x4)(y1-y4) - (x1-x4)(y2-y4) =  |1 x1 y1| =  |1 ax ay|
+	//                                                               -|1 x2 y2|   -|1 bx by|
+	//                                                                |1 x4 y4|    |1 dx dy|
+	//
+	// m_di[3] = x13y21 - x12y31 = (x1-x3)(y2-y1) - (x1-x2)(y3-y1) =  |1 x1 y1| =  |1 ax ay|
+	//                                                                |1 x2 y2|    |1 bx by|
+	//                                                                |1 x3 y3|    |1 cx cy|
+	{
+		Vector3d atilde(1, a[0], a[1]);
+		Vector3d btilde(1, b[0], b[1]);
+		Vector3d ctilde(1, c[0], c[1]);
+		Vector3d dtilde(1, d[0], d[1]);
+		m_di[0] = -det(btilde, ctilde, dtilde);
+		m_di[1] =  det(atilde, ctilde, dtilde);
+		m_di[2] = -det(atilde, btilde, dtilde);
+		m_di[3] =  det(atilde, btilde, ctilde);
+	}
 }
 
 } // namespace Physics
