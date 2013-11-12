@@ -43,6 +43,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 
 set(SURGSIM_FRAMEWORK_HEADERS
 	ApplicationData.h
+	Accessible.h
 	Assert.h
 	AssertMessage.h
 	Barrier.h
