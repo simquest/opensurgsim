@@ -83,12 +83,14 @@ public:
 	/// \return The mass density
 	double getMassDensity() const;
 
-	/// Get the element mass based on the input state (in Kg)
+	/// Gets the element mass based on the input state (in Kg)
 	/// \param state The deformable state to compute the mass with
+	/// \return The mass of this element (in Kg)
 	double getMass(const DeformableRepresentationState& state) const;
 
-	/// Get the element volume based on the input state
+	/// Gets the element volume based on the input state (in m-3)
 	/// \param state The deformable state to compute the volume with
+	/// \return The volume of this element (in m-3)
 	virtual double getVolume(const DeformableRepresentationState& state) const = 0;
 
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
