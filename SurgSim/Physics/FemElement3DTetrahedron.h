@@ -94,13 +94,6 @@ public:
 		SurgSim::Math::Matrix* K) override;
 
 protected:
-	/// Computes the determinant of 3 vectors
-	/// \param a, b, c The 3 vectors to compute the determinant from
-	/// \return |a b c|, The determinant of the 3 vectors a, b and c
-	double det(const SurgSim::Math::Vector3d& a,
-		const SurgSim::Math::Vector3d& b,
-		const SurgSim::Math::Vector3d& c) const;
-
 	/// Computes the tetrahdron shape functions
 	/// \param restState The deformable rest state to compute the shape function from
 	void computeShapeFunctions(const DeformableRepresentationState& restState);
@@ -121,8 +114,10 @@ protected:
 	void addForce(const DeformableRepresentationState& state, const Eigen::Matrix<double, 12, 12>& k,
 		SurgSim::Math::Vector* F);
 
-	/// Tetrahedron shape functions coefficients Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
-	double m_restVolume, m_ai[4], m_bi[4], m_ci[4], m_di[4];
+	/// Shape functions: Tetrahedron rest volume
+	double m_restVolume;
+	/// Shape functions coefficients Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
+	std::array<double, 4> m_ai, m_bi, m_ci, m_di;
 
 	/// The tetrahedon rest state
 	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_x0;

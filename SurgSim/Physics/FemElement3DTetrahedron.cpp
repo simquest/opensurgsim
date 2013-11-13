@@ -24,6 +24,19 @@ using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 
+namespace
+{
+
+/// Computes the determinant of 3 vectors
+/// \param a, b, c The 3 vectors to compute the determinant from
+/// \return |a b c|, The determinant of the 3 vectors a, b and c
+double det(const Vector3d& a, const Vector3d& b, const Vector3d& c)
+{
+	return a[0]*b[1]*c[2] + a[2]*b[0]*c[1] + a[1]*b[2]*c[0] - a[2]*b[1]*c[0] - a[1]*b[0]*c[2] - a[0]*b[2]*c[1];
+}
+
+};
+
 namespace SurgSim
 {
 
@@ -187,11 +200,6 @@ void FemElement3DTetrahedron::addFMDK(const DeformableRepresentationState& state
 
 	// Assemble the force vector (using k)
 	addForce(state, k, F);
-}
-
-double FemElement3DTetrahedron::det(const Vector3d& a, const Vector3d& b, const Vector3d& c) const
-{
-	return a[0]*b[1]*c[2] + a[2]*b[0]*c[1] + a[1]*b[2]*c[0] - a[2]*b[1]*c[0] - a[1]*b[0]*c[2] - a[0]*b[2]*c[1];
 }
 
 double FemElement3DTetrahedron::getVolume(const DeformableRepresentationState& state) const
