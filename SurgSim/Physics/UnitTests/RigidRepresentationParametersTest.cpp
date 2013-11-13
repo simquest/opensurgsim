@@ -22,6 +22,8 @@
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Valid.h>
 
+using SurgSim::Math::SphereShape;
+
 namespace SurgSim
 {
 
@@ -92,7 +94,7 @@ TEST_F(RigidRepresentationParametersTest, DefaultValueTest)
 	EXPECT_EQ(0.0, rigidRepresentationParam->getAngularDamping());
 	// Mesh [default = nullptr]
 	EXPECT_EQ(0u, rigidRepresentationParam->getShapes().size());
-	// RigidShape [default = nullptr]
+	// Shape [default = nullptr]
 	EXPECT_EQ(nullptr, rigidRepresentationParam->getShapeUsedForMassInertia());
 	// isValid [default = false]
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
@@ -146,7 +148,7 @@ TEST_F(RigidRepresentationParametersTest, SetGetTest)
 	rigidRepresentationParam->setAngularDamping(0.0);
 	EXPECT_EQ(0.0, rigidRepresentationParam->getAngularDamping());
 
-	// RigidShape
+	// Shape
 	rigidRepresentationParam->setShapeUsedForMassInertia(m_sphere);
 	EXPECT_EQ(m_sphere, rigidRepresentationParam->getShapeUsedForMassInertia());
 	EXPECT_EQ(m_sphere, rigidRepresentationParam->getShapes()[0]);
@@ -166,7 +168,7 @@ TEST_F(RigidRepresentationParametersTest, ShapesTest)
 	std::shared_ptr<RigidRepresentationParameters> rigidRepresentationParam =
 		std::make_shared<RigidRepresentationParameters>();
 
-	// RigidShape
+	// Shape
 	rigidRepresentationParam->setShapeUsedForMassInertia(m_sphere);
 	EXPECT_EQ(1u, rigidRepresentationParam->getShapes().size());
 	rigidRepresentationParam->addShape(m_sphere);
@@ -227,7 +229,7 @@ TEST_F(RigidRepresentationParametersTest, DensityWithSphereShapeTest)
 	// Test isValid
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
 
-	// RigidShape
+	// Shape
 	rigidRepresentationParam->setShapeUsedForMassInertia(m_sphere);
 
 	// Test isValid

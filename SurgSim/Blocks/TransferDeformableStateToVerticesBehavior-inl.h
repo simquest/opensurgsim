@@ -70,7 +70,7 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::transfer(bool doInit
 	{
 		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 		{
-			SurgSim::DataStructures::Vertex<VertexData> v(m_from->getPosition(nodeId), VertexData());
+			SurgSim::DataStructures::Vertex<VertexData> v(m_from->getPosition(nodeId));
 			m_to->addVertex(v);
 		}
 	}
@@ -82,9 +82,6 @@ void TransferDeformableStateToVerticesBehavior<VertexData>::transfer(bool doInit
 		}
 	}
 }
-
-template <>
-void TransferDeformableStateToVerticesBehavior<void>::transfer(bool doInitialization);
 
 }; //namespace Blocks
 

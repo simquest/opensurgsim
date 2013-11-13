@@ -16,8 +16,8 @@
 #include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
 #include <SurgSim/Collision/BoxSphereDcdContact.h>
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::SphereShape;
 
 namespace SurgSim
 {

@@ -22,9 +22,7 @@
 #include <SurgSim/Math/RigidTransform.h>
 
 #include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidShape.h>
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/CollisionPair.h>

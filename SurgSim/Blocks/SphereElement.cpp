@@ -30,7 +30,7 @@ using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Collision::RigidCollisionRepresentation;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Math::SphereShape;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;

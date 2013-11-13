@@ -23,12 +23,14 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
+	MeshShapeTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
 	OdeEquationTests.cpp
 	OdeSolverEulerExplicitModifiedTests.cpp
 	OdeSolverEulerExplicitTests.cpp
 	OdeSolverEulerImplicitTests.cpp
 	OdeSolverTests.cpp
+	ShapeTests.cpp
 	ValidTests.cpp
 )
 

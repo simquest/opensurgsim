@@ -39,7 +39,7 @@ int RigidCollisionRepresentation::getShapeType() const
 	return m_localRepresentation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
-const std::shared_ptr<SurgSim::Physics::RigidShape> RigidCollisionRepresentation::getShape() const
+const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	return m_localRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
 }

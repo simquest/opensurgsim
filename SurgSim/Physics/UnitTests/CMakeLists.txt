@@ -38,7 +38,6 @@ set(UNIT_TEST_SOURCES
 	LinearSpringTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
-	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
@@ -50,7 +49,6 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp
-	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
 	VirtualToolCouplerTest.cpp
 )
