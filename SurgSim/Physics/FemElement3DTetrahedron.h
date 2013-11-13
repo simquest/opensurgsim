@@ -30,7 +30,7 @@ namespace Physics
 /// \note    "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 /// \note The force and stiffness matrix of the tetrahedron is derived from
 /// \note    http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch09.d/AFEM.Ch09.pdf
-/// \note The deformation is based on the elasticity theory and not on the visco-elasticity theory.
+/// \note The deformation is based on the linear elasticity theory and not on the visco-elasticity theory.
 /// \note Therefore the element does not have any damping component.
 class FemElement3DTetrahedron : public FemElement
 {
@@ -39,20 +39,6 @@ public:
 	/// \param nodeIds An array of 4 node ids defining this tetrahedron element in a overall mesh
 	/// \param restState The rest state to initialize the Tetrahedron with
 	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds, const DeformableRepresentationState& restState);
-
-	/// Sets the Young modulus (in N.m-2)
-	/// \param E The Young modulus
-	void setYoungModulus(double E);
-	/// Gets the Young modulus (in N.m-2)
-	/// \return The Young modulus
-	double getYoungModulus() const;
-
-	/// Sets the Poisson ratio (unitless)
-	/// \param nu The Poisson ratio
-	void setPoissonRatio(double nu);
-	/// Gets the Poisson ratio (unitless)
-	/// \return The Poisson ratio
-	double getPoissonRatio() const;
 
 	/// Get the element volume based on the input state
 	/// \param state The deformable state to compute the volume with
@@ -134,11 +120,6 @@ protected:
 	/// \note per node as getNumDofPerNode()
 	void addForce(const DeformableRepresentationState& state, const Eigen::Matrix<double, 12, 12>& k,
 		SurgSim::Math::Vector* F);
-
-	/// Young modulus (in N.m-2)
-	double m_E;
-	/// Poisson ratio (unitless)
-	double m_nu;
 
 	/// Tetrahedron shape functions coefficients Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
 	double m_restVolume, m_ai[4], m_bi[4], m_ci[4], m_di[4];

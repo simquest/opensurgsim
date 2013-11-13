@@ -228,22 +228,16 @@ TEST_F(FemElement3DTetrahedronTests, ConstructorTest)
 		std::make_shared<MockFemElement3DTet>(m_nodeIds, m_restState);});
 }
 
-TEST_F(FemElement3DTetrahedronTests, DefaultValueTest)
+TEST_F(FemElement3DTetrahedronTests, NodeIdsTest)
 {
 	FemElement3DTetrahedron tet(m_nodeIds, m_restState);
-
-	EXPECT_DOUBLE_EQ(0.0, tet.getYoungModulus());
-	EXPECT_DOUBLE_EQ(0.0, tet.getPoissonRatio());
-}
-
-TEST_F(FemElement3DTetrahedronTests, SetGetTest)
-{
-	FemElement3DTetrahedron tet(m_nodeIds, m_restState);
-
-	tet.setYoungModulus(4534.33);
-	EXPECT_DOUBLE_EQ(4534.33, tet.getYoungModulus());
-	tet.setPoissonRatio(0.34);
-	EXPECT_DOUBLE_EQ(0.34, tet.getPoissonRatio());
+	EXPECT_EQ(4u, tet.getNumNodes());
+	EXPECT_EQ(4u, tet.getNodeIds().size());
+	for (int i = 0; i < 4; i++)
+	{
+		EXPECT_EQ(m_nodeIds[i], tet.getNodeId(i));
+		EXPECT_EQ(m_nodeIds[i], tet.getNodeIds()[i]);
+	}
 }
 
 TEST_F(FemElement3DTetrahedronTests, VolumeTest)

@@ -35,6 +35,7 @@ class DeformableRepresentationState;
 /// A extra method also exist to compute all of them at once for performance purposes.
 /// It holds on to the actual computed values (m_f, m_M, m_D, m_K) as its size is not predefined from outside
 /// and would requires intensive (de)allocation or a temporary variable anyway.
+/// It contains the linear elasticity parameter (Young modulus and Poisson ratio) as well as mass density
 class FemElement
 {
 public:
@@ -59,6 +60,20 @@ public:
 	/// Gets the node ids for this element
 	/// \return A vector containing the node ids on which the element is defined
 	const std::vector<unsigned int>& getNodeIds() const;
+
+	/// Sets the Young modulus (in N.m-2)
+	/// \param E The Young modulus
+	void setYoungModulus(double E);
+	/// Gets the Young modulus (in N.m-2)
+	/// \return The Young modulus
+	double getYoungModulus() const;
+
+	/// Sets the Poisson ratio (unitless)
+	/// \param nu The Poisson ratio
+	void setPoissonRatio(double nu);
+	/// Gets the Poisson ratio (unitless)
+	/// \return The Poisson ratio
+	double getPoissonRatio() const;
 
 	/// Sets the mass density (in Kg.m-3)
 	/// \param rho The mass density
@@ -140,6 +155,12 @@ protected:
 
 	/// Mass density (in Kg.m-3)
 	double m_rho;
+
+	/// Young modulus (in N.m-2)
+	double m_E;
+
+	/// Poisson ratio (unitless)
+	double m_nu;
 };
 
 } // namespace Physics

@@ -75,6 +75,20 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_EQ(0u, femElement.getNumNodes());
 	EXPECT_EQ(0, femElement.getNodeIds().size());
 	EXPECT_DOUBLE_EQ(0.0, femElement.getMassDensity());
+	EXPECT_DOUBLE_EQ(0.0, femElement.getYoungModulus());
+	EXPECT_DOUBLE_EQ(0.0, femElement.getPoissonRatio());
+
+	// Test Set/Get Young modulus
+	femElement.setYoungModulus(4455.33);
+	EXPECT_DOUBLE_EQ(4455.33, femElement.getYoungModulus());
+	femElement.setYoungModulus(0.0);
+	EXPECT_DOUBLE_EQ(0.0, femElement.getYoungModulus());
+
+	// Test Set/Get Poisson ratio
+	femElement.setPoissonRatio(0.45);
+	EXPECT_DOUBLE_EQ(0.45, femElement.getPoissonRatio());
+	femElement.setPoissonRatio(0.0);
+	EXPECT_DOUBLE_EQ(0.0, femElement.getPoissonRatio());
 
 	// Test Set/Get mass density
 	femElement.setMassDensity(2343.13);

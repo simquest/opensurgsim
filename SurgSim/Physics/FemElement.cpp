@@ -21,7 +21,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0)
+FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0), m_E(0.0), m_nu(0.0)
 {}
 
 FemElement::~FemElement()
@@ -50,6 +50,26 @@ unsigned int FemElement::getNodeId(unsigned int elementNodeId) const
 const std::vector<unsigned int>& FemElement::getNodeIds() const
 {
 	return m_nodeIds;
+}
+
+void FemElement::setYoungModulus(double E)
+{
+	m_E = E;
+}
+
+double FemElement::getYoungModulus() const
+{
+	return m_E;
+}
+
+void FemElement::setPoissonRatio(double nu)
+{
+	m_nu = nu;
+}
+
+double FemElement::getPoissonRatio() const
+{
+	return m_nu;
 }
 
 void FemElement::setMassDensity(double rho)

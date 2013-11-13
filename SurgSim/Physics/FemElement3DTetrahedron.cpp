@@ -31,9 +31,7 @@ namespace Physics
 {
 
 FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds,
-												 const DeformableRepresentationState& restState) :
-	m_E(0.0),
-	m_nu(0.0)
+												 const DeformableRepresentationState& restState)
 {
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 
@@ -50,26 +48,6 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 	getSubVector(m_x0, 1, 3) = getSubVector(restState.getPositions(), m_nodeIds[1], 3);
 	getSubVector(m_x0, 2, 3) = getSubVector(restState.getPositions(), m_nodeIds[2], 3);
 	getSubVector(m_x0, 3, 3) = getSubVector(restState.getPositions(), m_nodeIds[3], 3);
-}
-
-void FemElement3DTetrahedron::setYoungModulus(double E)
-{
-	m_E = E;
-}
-
-double FemElement3DTetrahedron::getYoungModulus() const
-{
-	return m_E;
-}
-
-void FemElement3DTetrahedron::setPoissonRatio(double nu)
-{
-	m_nu = nu;
-}
-
-double FemElement3DTetrahedron::getPoissonRatio() const
-{
-	return m_nu;
 }
 
 void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state,
