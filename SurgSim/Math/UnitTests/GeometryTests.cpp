@@ -25,23 +25,10 @@
 #include <SurgSim/Math/Geometry.h>
 #include <boost/math/special_functions/fpclassify.hpp>
 
-
-using SurgSim::Math::Vector3d;
-
-using SurgSim::Math::barycentricCoordinates;
-using SurgSim::Math::distancePointLine;
-using SurgSim::Math::distancePointSegment;
-using SurgSim::Math::distanceLineLine;
-using SurgSim::Math::distanceSegmentSegment;
-using SurgSim::Math::distancePointPlane;
-using SurgSim::Math::distancePointTriangle;
-using SurgSim::Math::isPointInsideTriangle;
-using SurgSim::Math::distanceSegmentPlane;
-using SurgSim::Math::distanceSegmentTriangle;
-using SurgSim::Math::doesCollideSegmentTriangle;
-using SurgSim::Math::doesIntersectPlanePlane;
-using SurgSim::Math::distanceTrianglePlane;
-using SurgSim::Math::distanceTriangleTriangle;
+namespace SurgSim
+{
+namespace Math
+{
 
 typedef double SizeType;
 typedef Eigen::Matrix<SizeType, 3, 1, Eigen::DontAlign> VectorType;
@@ -1384,3 +1371,68 @@ TEST_F(GeometryTest, distanceTriangleTriangle)
 		checkTriTriDistance(TriTriDistanceData(t1, t0, closest1, closest0));
 	}
 }
+
+TEST_F(GeometryTest, IntersectionsSegmentBox)
+{
+	Eigen::AlignedBox<SizeType, 3> box;
+	{
+		SCOPED_TRACE("No intersection, zero length segment");
+		VectorType point1(0.0, 0.0, 0.0);
+		VectorType point2(0.0, 0.0, 0.0);
+		box.min() = VectorType(1.0 , 1.0, 1.0);
+		box.max() = VectorType(5.0 , 5.0, 5.0);
+		std::vector<VectorType> intersections;
+		intersectionsSegmentBox(point1, point2, box, &intersections);
+		EXPECT_EQ(0, intersections.size());
+	}
+
+	{
+		SCOPED_TRACE("No intersection, zero size box");
+		VectorType point1(0.0, 0.0, 0.0);
+		VectorType point2(0.0, 5.0, 0.0);
+		box.min() = VectorType(1.0 , 1.0, 1.0);
+		box.max() = VectorType(1.0 , 1.0, 1.0);
+		std::vector<VectorType> intersections;
+		intersectionsSegmentBox(point1, point2, box, &intersections);
+		EXPECT_EQ(0, intersections.size());
+	}
+
+	{
+		SCOPED_TRACE("No Intersection, parallel and beyond corners");
+		VectorType point1(-0.0, 0.0, -0.0);
+		VectorType point2(0.0, 5.0, -0.0);
+		box.min() = VectorType(1.0 , 1.0, 1.0);
+		box.max() = VectorType(5.0 , 5.0, 5.0);
+		std::vector<VectorType> intersections;
+		intersectionsSegmentBox(point1, point2, box, &intersections);
+		EXPECT_EQ(0, intersections.size());
+	}
+
+	{
+		SCOPED_TRACE("Entering box, but not leaving");
+		VectorType point1(2.0, 2.0, 0.0);
+		VectorType point2(3.0, 3.0, 2.0);
+		box.min() = VectorType(1.0 , 1.0, 1.0);
+		box.max() = VectorType(5.0 , 5.0, 5.0);
+		std::vector<VectorType> intersections;
+		intersectionsSegmentBox(point1, point2, box, &intersections);
+		EXPECT_EQ(1, intersections.size());
+		EXPECT_TRUE(intersections[0].isApprox(VectorType(2.5, 2.5, 1.0)));
+	}
+
+	{
+		SCOPED_TRACE("Entering and exiting box, through box corners");
+		VectorType point1(0.0, 0.0, 0.0);
+		VectorType point2(6.0, 6.0, 6.0);
+		box.min() = VectorType(1.0 , 1.0, 1.0);
+		box.max() = VectorType(5.0 , 5.0, 5.0);
+		std::vector<VectorType> intersections;
+		intersectionsSegmentBox(point1, point2, box, &intersections);
+		EXPECT_EQ(2, intersections.size());
+		EXPECT_TRUE(intersections[0].isApprox(box.min()) || intersections[0].isApprox(box.max()));
+		EXPECT_TRUE(intersections[1].isApprox(box.min()) || intersections[1].isApprox(box.max()));
+	}
+}
+
+}; // namespace Math 
+}; // namespace SurgSim
