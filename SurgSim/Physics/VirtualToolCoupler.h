@@ -36,19 +36,19 @@ class RigidRepresentation;
 class VirtualToolCoupler : public SurgSim::Framework::Behavior
 {
 public:
-    /// Constructor
-    /// \param    name     Name of the behavior
-    /// \param    input    Input Component to get the pose from
-    /// \param    rigid    Rigid Representation to control
-    /// \param    poseName Name of the pose data in the input to transfer
-    VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
-				std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid, const std::string& poseName = "pose");
+	/// Constructor
+	/// \param    name     Name of the behavior
+	/// \param    input    Input Component to get the pose from
+	/// \param    rigid    Rigid Representation to control
+	/// \param    poseName Name of the pose data in the input to transfer
+	VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
+			std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid, const std::string& poseName = "pose");
 
 	~VirtualToolCoupler();
 
-    /// Update the behavior
-    /// \param dt    The length of time (seconds) between update calls.
-    virtual void update(double dt);
+	/// Update the behavior
+	/// \param dt    The length of time (seconds) between update calls.
+	virtual void update(double dt);
 
 	/// Set vtc linear stiffness
 	/// \param linearStiffness The stiffness of the vtc in linear mode (in N·m-1)
@@ -67,18 +67,18 @@ public:
 	void setAngularDamping(double angularDamping);
 
 protected:
-    /// Initialize the behavior
-    virtual bool doInitialize();
+	/// Initialize the behavior
+	virtual bool doInitialize();
 
-    /// Wakeup the behavior
-    virtual bool doWakeUp();
+	/// Wakeup the behavior
+	virtual bool doWakeUp();
 
 	virtual int getTargetManagerType() const;
 
 private:
-    std::shared_ptr<SurgSim::Input::InputComponent> m_input;
-    std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
-    std::string m_poseName;
+	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
+	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
+	std::string m_poseName;
 	RigidRepresentationState m_previousState;
 
 	/// Vtc stiffness parameter in linear mode (in N·m-1)

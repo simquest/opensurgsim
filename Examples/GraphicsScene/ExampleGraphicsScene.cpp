@@ -76,7 +76,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
 		return nullptr;
 	}
 	success = success && shader->loadFragmentShaderSource(filename);
-	
+
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
 	if (success)
 	{
@@ -84,7 +84,6 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
 		material->setShader(shader);
 	}
 	return material;
-	
 }
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
@@ -97,7 +96,6 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView();
 	viewElement->enableManipulator(true);
 	viewElement->setManipulatorParameters(SurgSim::Math::Vector3d(8.0,4.0,8.0), SurgSim::Math::Vector3d(0.0,0.0,0.0));
-	
 
 	std::shared_ptr<SurgSim::Graphics::Group> group = std::make_shared<SurgSim::Graphics::OsgGroup>("Light");
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Main Light");

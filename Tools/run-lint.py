@@ -234,6 +234,17 @@ def check_length(flags, file, lines):
                            " than {}!"
                            .format(len(bad[1]), flags.max_line_length)) })
 
+def check_tab_indentation(flags, file, lines):
+  for line_number, line in lines:
+    # Not a blank line
+    if len(line) > 0:
+      # Check that lines start with 0 or more tab characters.
+      # 0 to 3 spaces is allowed for alignment, but anymore and a tab is expected.
+      if re.search(r'^\t* {0,3}\S' , line) is None:
+        emit_warning({'file': file, 'line': line_number,
+                      'category': "opensurgsim/tab_indention",
+                      'text': "the line does not correctly indent using tabs."})
+
 def get_listed_files(flags, file, lines):
   flines = filter(lambda x: re.search(r'^\s.*\.(?:h|cpp)\s*(?:\)\s*)?$', x[1]),
                   lines)
@@ -348,6 +359,9 @@ if __name__ == '__main__':
   parser.add_argument('--ignore-guards',
                       action='store_false', dest='do_check_guards',
                       help='Do not check the header file include guards.')
+  parser.add_argument('--ignore-tab-indentation',
+                      action='store_false', dest='do_check_tab_indentation',
+                      help='Do not check that lines are indented with tabs.')
   parser.add_argument('--max-line-length', type=int, default=120,
                       help='Maximum allowed line length for C++ code.')
   parser.add_argument('--ignore-length',
@@ -384,7 +398,7 @@ if __name__ == '__main__':
           args.files.append(os.path.join(current_dir, 'CMakeLists.txt'))
         # always skip .git, build directories, ThirdParty...
         for bad in filter(lambda x:
-                            re.search(r'^(?:\.git|build.*|ThirdParty)$', x),
+                            re.search(r'^(?:\.git|build.*|ThirdParty)$', x, re.IGNORECASE),
                           subdirs):
           subdirs.remove(bad)
 
@@ -440,6 +454,14 @@ if __name__ == '__main__':
             cmakelists_files = []
         cmakelists_files.extend(get_listed_file_paths(args, file, lines))
         # cmakelists_files will be checked later...
+
+    if args.do_check_tab_indentation and re.search(r'(\.h|\.cpp|CMakeLists\.txt$)', file):
+      if lines is None:
+        lines = slurp_numbered_lines(file)
+        if not lines:
+          continue
+      if not check_tab_indentation(args, file, lines):
+        ok = False
 
   if args.do_check_file_lists and cmakelists_files is not None:
     cmakelists_files = sorted(cmakelists_files)

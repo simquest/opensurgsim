@@ -32,8 +32,8 @@ class BoxDoubleSidedPlaneDcdContact : public ContactCalculation
 {
 public:
 
-    /// Constructor.
-    BoxDoubleSidedPlaneDcdContact();
+	/// Constructor.
+	BoxDoubleSidedPlaneDcdContact();
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.

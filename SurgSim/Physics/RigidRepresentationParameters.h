@@ -129,7 +129,7 @@ public:
 		m_mass = mass;
 
 		m_rho = 0.0; // Invalidate the density information
-		             // Density is not automcatically computed, only set
+					 // Density is not automcatically computed, only set
 
 		m_isValid = checkValidity();
 	}

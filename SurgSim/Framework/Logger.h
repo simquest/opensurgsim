@@ -39,13 +39,13 @@ enum LogLevel
 	/// Use at your discretion.
 	LOG_LEVEL_DEBUG,
 	/// Informational, notify of state changes.
-    LOG_LEVEL_INFO,
+	LOG_LEVEL_INFO,
 	/// Something failed, but the impact of the failure is not know or minimal (e.g. purely visual).
-    LOG_LEVEL_WARNING,
+	LOG_LEVEL_WARNING,
 	/// Something failed and will impact functionality, some parts of the program will not function correctly.
-    LOG_LEVEL_SEVERE,
+	LOG_LEVEL_SEVERE,
 	/// Used by assertion, after using this level the program will not be functional at all.
-    LOG_LEVEL_CRITICAL
+	LOG_LEVEL_CRITICAL
 };
 
 /// An object that can be used to control logging parameters, such as verbosity and log output destination.

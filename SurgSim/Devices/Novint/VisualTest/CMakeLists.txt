@@ -56,6 +56,6 @@ add_executable(Novint7DofVisualTest
 target_link_libraries(Novint7DofVisualTest ${LIBS})
 surgsim_show_ide_folders(
 	"${SEVEN_DOF_EXAMPLE_SOURCES}" "${SEVEN_DOF_EXAMPLE_HEADERS}")
-	
+
 # Put Novint7DofVisualTest into folder "Devices"
 set_target_properties(Novint7DofVisualTest PROPERTIES FOLDER "Devices")
