@@ -1,0 +1,89 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+
+#include <iostream>
+#include <iomanip>
+
+#include <SurgSim/Math/Vector.h>
+#include <SurgSim/Math/Matrix.h>
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Framework/Log.h>
+#include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
+#include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/DataStructures/DataGroupBuilder.h>
+
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Matrix44d;
+using SurgSim::Math::Matrix33d;
+using SurgSim::Math::RigidTransform3d;
+
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
+
+
+namespace SurgSim
+{
+namespace Device
+{
+
+KeyboardDevice::KeyboardDevice(const std::string& deviceName) :
+	SurgSim::Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData()),
+	m_delay(-1), m_repeatSpeed(0)
+{
+}
+
+KeyboardDevice::~KeyboardDevice()
+{
+	if (isInitialized())
+	{
+		finalize();
+	}
+}
+
+bool KeyboardDevice::initialize()
+{
+	SURGSIM_ASSERT(! isInitialized());
+	std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(scaffold);
+
+	if (! scaffold->registerDevice(this))
+	{
+		return false;
+	}
+
+	m_scaffold = std::move(scaffold);
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
+	return true;
+}
+
+bool KeyboardDevice::finalize()
+{
+	SURGSIM_ASSERT(isInitialized());
+	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
+	bool ok = m_scaffold->unregisterDevice(this);
+	m_scaffold.reset();
+	return ok;
+}
+
+bool KeyboardDevice::isInitialized() const
+{
+	return (m_scaffold != nullptr);
+}
+
+
+};  // namespace Device
+};  // namespace SurgSim
