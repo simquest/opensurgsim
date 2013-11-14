@@ -21,7 +21,7 @@ namespace Input
 {
 
 OutputComponent::OutputComponent(const std::string& name, const std::string& deviceName,
-                                 const SurgSim::DataStructures::DataGroup& outputData) :
+								 const SurgSim::DataStructures::DataGroup& outputData) :
 	Component(name),
 	m_deviceName(deviceName),
 	m_outputData(outputData)

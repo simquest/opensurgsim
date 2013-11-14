@@ -35,7 +35,7 @@ public:
 	/// \post m_isVisible is set to true
 	explicit MockOsgRepresentation(const std::string& name) :
 		SurgSim::Graphics::Representation(name),
-        	SurgSim::Graphics::OsgRepresentation(name),
+		SurgSim::Graphics::OsgRepresentation(name),
 		m_isVisible(true),
 		m_numUpdates(0),
 		m_sumDt(0.0),

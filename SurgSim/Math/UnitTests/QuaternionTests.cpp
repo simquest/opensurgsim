@@ -414,10 +414,10 @@ TYPED_TEST(QuaternionTests, ToMatrix)
 
 	Matrix33 matrix1 = quaternion.matrix();
 	EXPECT_NEAR(0, (matrix1 - expectedMatrix).norm(), 9e-6) << "The rotation matrix wasn't properly computed" <<
-	                                                        " by matrix().";
+															   " by matrix().";
 	Matrix33 matrix2 = quaternion.toRotationMatrix();
 	EXPECT_NEAR(0, (matrix2 - expectedMatrix).norm(), 9e-6) << "The rotation matrix wasn't properly computed" <<
-	                                                        " by toRotationMatrix().";
+															   " by toRotationMatrix().";
 }
 
 // ==================== ARITHMETIC ====================
