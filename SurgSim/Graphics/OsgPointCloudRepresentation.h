@@ -42,6 +42,7 @@ class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, publi
 public:
 
 	/// Constructor
+	/// \param name The name of the Representation.
 	explicit OsgPointCloudRepresentation(const std::string& name);
 
 	/// Destructor

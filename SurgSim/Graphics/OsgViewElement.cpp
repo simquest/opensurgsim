@@ -73,7 +73,9 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 	}
 }
 
-void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat)
+void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(
+	SurgSim::Math::Vector3d position,
+	SurgSim::Math::Vector3d lookat)
 {
 	m_manipulatorPosition = position;
 	m_manipulatorLookat = lookat;

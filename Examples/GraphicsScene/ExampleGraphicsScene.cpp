@@ -45,13 +45,13 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Framework::Logger;
 
-namespace 
+namespace
 {
 
 std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> materials;
 
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
-	const SurgSim::Framework::ApplicationData& data, 
+	const SurgSim::Framework::ApplicationData& data,
 	const std::string& name)
 {
 	std::string vertexShaderName = name+".vert";
@@ -76,7 +76,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
 		return nullptr;
 	}
 	success = success && shader->loadFragmentShaderSource(filename);
-	
+
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
 	if (success)
 	{
@@ -84,7 +84,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
 		material->setShader(shader);
 	}
 	return material;
-	
+
 }
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
@@ -97,7 +97,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->getView();
 	viewElement->enableManipulator(true);
 	viewElement->setManipulatorParameters(SurgSim::Math::Vector3d(8.0,4.0,8.0), SurgSim::Math::Vector3d(0.0,0.0,0.0));
-	
+
 
 	std::shared_ptr<SurgSim::Graphics::Group> group = std::make_shared<SurgSim::Graphics::OsgGroup>("Light");
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Main Light");
@@ -106,7 +106,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	light->setSpecularColor(Vector4d(0.8,0.8,0.8,1.0));
 	light->setInitialPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(),Vector3d(10.0,10.0,10.0)));
 
-	viewElement->addComponent(light); 
+	viewElement->addComponent(light);
 
 	return viewElement;
 }
@@ -133,7 +133,7 @@ public:
 	}
 
 	void setPose(const RigidTransform3d& pose)
-	{ 
+	{
 		m_box->setPose(pose);
 	}
 

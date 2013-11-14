@@ -120,7 +120,7 @@ namespace SurgSim
 			auto pointCloud = representation->getVertices();
 			representation->setPointSize(2.0);
 
-			RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.2, Vector3d(1.0,1.0,1.0)), 
+			RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.2, Vector3d(1.0,1.0,1.0)),
 				Vector3d(0.0,0.0,-0.2));
 			representation->setInitialPose(pose);
 
@@ -180,10 +180,10 @@ namespace SurgSim
 
 			int numSteps = 100;
 
-			RigidTransform3d start = makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(1.0,1.0,1.0)), 
+			RigidTransform3d start = makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(1.0,1.0,1.0)),
 														Vector3d(-0.1,0.0,0.2));
 
-			RigidTransform3d end = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(1.0,1.0,1.0)), 
+			RigidTransform3d end = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(1.0,1.0,1.0)),
 														Vector3d(0.1,0.0,-0.2));
 
 			for (int i = 0; i < numSteps; ++i)
@@ -213,7 +213,7 @@ namespace SurgSim
 
 			int numSteps = 100;
 			std::pair<double, double> size = std::make_pair(0.0,20.0);
-			std::pair<Vector4d, Vector4d> color = 
+			std::pair<Vector4d, Vector4d> color =
 				std::make_pair(Vector4d(0.0,1.0,0.0,1.0), Vector4d(1.0,0.0,1.0,1.0));
 
 			for (int i = 0; i < numSteps; ++i)
