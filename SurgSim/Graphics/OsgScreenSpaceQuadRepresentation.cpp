@@ -218,7 +218,7 @@ void OsgScreenSpaceQuadRepresentation::setTextureCoordinates(float left, float b
 
 void OsgScreenSpaceQuadRepresentation::setLocation(double x, double y)
 {
-	SurgSim::Math::RigidTransform3d transform = 
+	SurgSim::Math::RigidTransform3d transform =
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(x,y,0));
 	setPose(transform);
 }
