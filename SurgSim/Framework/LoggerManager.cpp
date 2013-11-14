@@ -94,9 +94,9 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 	}
 	else
 	{
-  		result = std::make_shared<Logger>(Logger(name, m_defaultOutput));
-  		result->setThreshold(m_globalThreshold);
-  		m_loggers[name] = result;
+		result = std::make_shared<Logger>(Logger(name, m_defaultOutput));
+		result->setThreshold(m_globalThreshold);
+		m_loggers[name] = result;
 	}
 	return result;
 }

@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_SHAPES_H
-#define SURGSIM_PHYSICS_SHAPES_H
+#ifndef SURGSIM_MATH_SHAPES_H
+#define SURGSIM_MATH_SHAPES_H
 
 /// This file includes all the shapes
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/CapsuleShape.h>
-#include <SurgSim/Physics/CylinderShape.h>
-#include <SurgSim/Physics/MeshShape.h>
-#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
-#include <SurgSim/Physics/PlaneShape.h>
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Math/BoxShape.h>
+#include <SurgSim/Math/CapsuleShape.h>
+#include <SurgSim/Math/CylinderShape.h>
+#include <SurgSim/Math/MeshShape.h>
+#include <SurgSim/Math/DoubleSidedPlaneShape.h>
+#include <SurgSim/Math/PlaneShape.h>
+#include <SurgSim/Math/SphereShape.h>
 
-#endif // SURGSIM_PHYSICS_SHAPES_H
+#endif // SURGSIM_MATH_SHAPES_H

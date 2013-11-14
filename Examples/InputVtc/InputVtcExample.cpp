@@ -35,16 +35,17 @@
 #include <SurgSim/Graphics/OsgView.h>
 #include <SurgSim/Graphics/OsgViewElement.h>
 #include <SurgSim/Input/InputManager.h>
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/VirtualToolCoupler.h>
+#include <SurgSim/Math/BoxShape.h>
+#include <SurgSim/Math/DoubleSidedPlaneShape.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
+#include <SurgSim/Physics/PhysicsManager.h>
+#include <SurgSim/Physics/FixedRepresentation.h>
+#include <SurgSim/Physics/RigidRepresentationParameters.h>
+#include <SurgSim/Collision/RigidCollisionRepresentation.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
+#include <SurgSim/Physics/VirtualToolCoupler.h>
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
@@ -56,11 +57,12 @@ using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::BoxShape;
 using SurgSim::Physics::PhysicsManager;
 using SurgSim::Physics::VirtualToolCoupler;
 using SurgSim::Physics::RigidRepresentationParameters;
@@ -104,8 +106,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<SurgSim::Physics::DoubleSidedPlaneShape> planeShape =
-		std::make_shared<SurgSim::Physics::DoubleSidedPlaneShape>();
+	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
@@ -113,7 +114,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidShapeCollisionRepresentation>
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>
 		("Plane Collision",planeShape, physicsRepresentation));
 	return planeElement;
 }

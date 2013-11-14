@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_PLANESHAPE_H
-#define SURGSIM_PHYSICS_PLANESHAPE_H
+#ifndef SURGSIM_MATH_PLANESHAPE_H
+#define SURGSIM_MATH_PLANESHAPE_H
 
-#include <SurgSim/Physics/RigidShape.h>
+#include <SurgSim/Math/Shape.h>
 
 namespace SurgSim
 {
 
-namespace Physics
+namespace Math
 {
 
 /// The XZ plane (d = 0) with normal pointing along positive Y axis.
@@ -31,62 +31,40 @@ namespace Physics
 /// to be a entirely solid on the side of the plane which is opposite to the normal. It is made of
 /// space only on the positive side of the plane normal. This results in having a robust collision
 /// object which does not let any objects through, and could be useful to define the scene floor.
-class PlaneShape: public RigidShape
+class PlaneShape: public Shape
 {
 public:
 
 	/// Constructor: No members to initialize.
-	PlaneShape()
-	{
-
-	}
+	PlaneShape();
 
 	/// \return the type of the shape
-	int getType()
-	{
-		return RIGID_SHAPE_TYPE_PLANE;
-	}
+	virtual int getType() override;
 
 	/// Calculate the volume of the plane
 	/// \return The volume of the plane, which is 0
-	double calculateVolume() const
-	{
-		return 0.0;
-	}
+	virtual double calculateVolume() const override;
 
 	/// Calculate the mass center of the plane
 	/// \return The mass center of the plane
-	Vector3d calculateMassCenter() const
-	{
-		return Vector3d(0.0, 0.0, 0.0);
-	}
+	virtual Vector3d calculateMassCenter() const override;
 
 	/// Calculate the inertia of the box
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the plane
-	Matrix33d calculateInertia(double rho) const
-	{
-		return Matrix33d::Identity();
-	}
+	virtual Matrix33d calculateInertia(double rho) const override;
 
 	/// Gets the d of the plane equation.
 	/// \return	The value of d (always 0).
-	inline double getD()
-	{
-		return 0.0;
-	}
+	double getD() const;
 
 	/// Gets the normal of the plane equation.
 	/// \return	The value of the normal (always Y axis).
-	inline Vector3d getNormal()
-	{
-		return Vector3d(0.0, 1.0, 0.0);
-	}
+	Vector3d getNormal() const;
 
 };
 
-}; // Physics
-
+}; // Math
 }; // SurgSim
 
-#endif // SURGSIM_PHYSICS_PLANESHAPE_H
+#endif // SURGSIM_MATH_PLANESHAPE_H

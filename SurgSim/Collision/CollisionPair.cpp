@@ -23,6 +23,10 @@ namespace SurgSim
 namespace Collision
 {
 
+CollisionPair::CollisionPair()
+{
+}
+
 CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
 							 const std::shared_ptr<CollisionRepresentation>& second) :
 		m_representations(first, second), m_isSwapped(false)
@@ -34,6 +38,66 @@ CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& fir
 CollisionPair::~CollisionPair()
 {
 
+}
+
+void CollisionPair::setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
+							   const std::shared_ptr<CollisionRepresentation>& second)
+{
+	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
+	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
+
+	// Invalidate the current contacts
+	clearContacts();
+	m_representations.first = first;
+	m_representations.second = second;
+	m_isSwapped = false;
+}
+
+const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
+	CollisionPair::getRepresentations() const
+{
+	return m_representations;
+}
+
+std::shared_ptr<CollisionRepresentation> CollisionPair::getFirst() const
+{
+	return m_representations.first;
+}
+
+std::shared_ptr<CollisionRepresentation> CollisionPair::getSecond() const
+{
+	return m_representations.second;
+}
+
+bool CollisionPair::hasContacts() const
+{
+	return !m_contacts.empty();
+}
+
+void CollisionPair::addContact(const double& depth,
+					   const SurgSim::Math::Vector3d& contactPoint,
+					   const SurgSim::Math::Vector3d& normal,
+					   const std::pair<Location, Location>& penetrationPoints)
+{
+	m_contacts.push_back(std::make_shared<Contact>(depth,contactPoint,normal,penetrationPoints));
+}
+
+void CollisionPair::addContact(const double& depth,
+					   const SurgSim::Math::Vector3d& normal,
+					   const std::pair<Location, Location>& penetrationPoints)
+{
+	m_contacts.push_back(
+		std::make_shared<Contact>(depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal, penetrationPoints));
+}
+
+void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
+{
+	m_contacts.push_back(contact);
+}
+
+const std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts() const
+{
+	return m_contacts;
 }
 
 void CollisionPair::clearContacts()

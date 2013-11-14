@@ -80,31 +80,31 @@ protected:
 TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 {
 	/// Add the two capsule representation to the view element
-    std::shared_ptr<CapsuleRepresentation> capsuleRepresentation1 =
-        std::make_shared<OsgCapsuleRepresentation>("capsule representation 1");
-    viewElement->addComponent(capsuleRepresentation1);
-    std::shared_ptr<CapsuleRepresentation> capsuleRepresentation2 =
-        std::make_shared<OsgCapsuleRepresentation>("capsule representation 2");
-    viewElement->addComponent(capsuleRepresentation2);
+	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation1 =
+		std::make_shared<OsgCapsuleRepresentation>("capsule representation 1");
+	viewElement->addComponent(capsuleRepresentation1);
+	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation2 =
+		std::make_shared<OsgCapsuleRepresentation>("capsule representation 2");
+	viewElement->addComponent(capsuleRepresentation2);
 
-    /// Run the thread
-    runtime->start();
-    EXPECT_TRUE(manager->isInitialized());
-    boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	/// Run the thread
+	runtime->start();
+	EXPECT_TRUE(manager->isInitialized());
+	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-    enum SetterType {SetterTypeIndividual,
-                        SetterTypeTogether,
-                        SetterTypeVector2d,
-                        // Add more setter types above this line.
-                        BoxSetterTypeCount};
-    int setterType = 0;
+	enum SetterType {SetterTypeIndividual,
+					 SetterTypeTogether,
+					 SetterTypeVector2d,
+					 // Add more setter types above this line.
+					 BoxSetterTypeCount};
+	int setterType = 0;
 
-    Vector2d capsule1Size, capsule2Size;
+	Vector2d capsule1Size, capsule2Size;
 
 	/// Initial positoin of capsule 1
-    Vector3d startPosition1(-0.1, 0.0, -0.2);
-    /// Final position of capsule 1
-    Vector3d endPosition1(0.1, 0.0, -0.2);
+	Vector3d startPosition1(-0.1, 0.0, -0.2);
+	/// Final position of capsule 1
+	Vector3d endPosition1(0.1, 0.0, -0.2);
 	/// Initial size (radius, hegiht) of capsule 1
 	Vector2d startSize1(0.001, 0.011);
 	/// Final size (radius, hegiht) of capsule 1
@@ -114,10 +114,10 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 	/// Final angles (X, Y, Z) of the capsule 1
 	Vector3d endAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
 
-    /// Initial position capsule 2
-    Vector3d startPosition2(0.0, -0.1, -0.2);
-    /// Final position capsule 2
-    Vector3d endPosition2(0.0, 0.1, -0.2);
+	/// Initial position capsule 2
+	Vector3d startPosition2(0.0, -0.1, -0.2);
+	/// Final position capsule 2
+	Vector3d endPosition2(0.0, 0.1, -0.2);
 	/// Initial size (radius, hegiht) of capsule 2
 	Vector2d startSize2(0.001, 0.01);
 	/// Final size (radius, hegiht) of capsule 2
@@ -128,47 +128,47 @@ TEST_F(OsgCapsuleRepresentationRenderTests, MovingCapsuleTest)
 	Vector3d endAngles2(M_PI, M_PI, M_PI);
 
 	/// Number of times to step the capsule position and radius from start to end.
-    /// This number of steps will be done in 1 second.
-    int numSteps = 100;
-    for (int i = 0; i < numSteps; ++i)
-    {
-        /// Calculate t in [0.0, 1.0]
-        double t = static_cast<double>(i) / numSteps;
-        /// Interpolate position and angle
+	/// This number of steps will be done in 1 second.
+	int numSteps = 100;
+	for (int i = 0; i < numSteps; ++i)
+	{
+		/// Calculate t in [0.0, 1.0]
+		double t = static_cast<double>(i) / numSteps;
+		/// Interpolate position and angle
 		capsuleRepresentation1->setPose(interpolatePose(startAngles1, endAngles1, startPosition1, endPosition1, t));
 		capsuleRepresentation2->setPose(interpolatePose(startAngles2, endAngles2, startPosition2, endPosition2, t));
 
 		/// Test different ways to set the size of capsule
-        if(setterType == static_cast<int>(SetterTypeIndividual))
-        {
-            capsuleRepresentation1->setRadius(interpolate(startSize1.x(), endSize1.x(), t));
-            capsuleRepresentation1->setHeight(interpolate(startSize1.y(), endSize1.y(), t));
+		if(setterType == static_cast<int>(SetterTypeIndividual))
+		{
+			capsuleRepresentation1->setRadius(interpolate(startSize1.x(), endSize1.x(), t));
+			capsuleRepresentation1->setHeight(interpolate(startSize1.y(), endSize1.y(), t));
 
-            capsuleRepresentation2->setRadius(interpolate(startSize2.x(), endSize2.x(), t));
-            capsuleRepresentation2->setHeight(interpolate(startSize2.y(), endSize2.y(), t));
-        }
-        else if(setterType == static_cast<int>(SetterTypeTogether))
-        {
-            capsuleRepresentation1->setSize(interpolate(startSize1.x(), endSize1.x(), t),
-											interpolate(startSize1.y(), endSize1.y(), t));
+			capsuleRepresentation2->setRadius(interpolate(startSize2.x(), endSize2.x(), t));
+			capsuleRepresentation2->setHeight(interpolate(startSize2.y(), endSize2.y(), t));
+		}
+		else if(setterType == static_cast<int>(SetterTypeTogether))
+		{
+			capsuleRepresentation1->setSize(interpolate(startSize1.x(), endSize1.x(), t),
+					interpolate(startSize1.y(), endSize1.y(), t));
 
-            capsuleRepresentation2->setSize(interpolate(startSize2.x(), endSize2.x(), t),
-											interpolate(startSize2.y(), endSize2.y(), t));
-        }
-        else if(setterType == static_cast<int>(SetterTypeVector2d))
-        {
-            capsule1Size.x() = interpolate(startSize1.x(), endSize1.x(), t);
-            capsule1Size.y() = interpolate(startSize1.y(), endSize1.y(), t);
-            capsuleRepresentation1->setSize(capsule1Size);
+			capsuleRepresentation2->setSize(interpolate(startSize2.x(), endSize2.x(), t),
+					interpolate(startSize2.y(), endSize2.y(), t));
+		}
+		else if(setterType == static_cast<int>(SetterTypeVector2d))
+		{
+			capsule1Size.x() = interpolate(startSize1.x(), endSize1.x(), t);
+			capsule1Size.y() = interpolate(startSize1.y(), endSize1.y(), t);
+			capsuleRepresentation1->setSize(capsule1Size);
 
-            capsule2Size.x() = interpolate(startSize2.x(), endSize2.x(), t);
-            capsule2Size.y() = interpolate(startSize2.y(), endSize2.y(), t);
-            capsuleRepresentation2->setSize(capsule2Size);
-        }
-        setterType = (setterType + 1) % BoxSetterTypeCount;
-        /// The total number of steps should complete in 1 second
-        boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-    }
+			capsule2Size.x() = interpolate(startSize2.x(), endSize2.x(), t);
+			capsule2Size.y() = interpolate(startSize2.y(), endSize2.y(), t);
+			capsuleRepresentation2->setSize(capsule2Size);
+		}
+		setterType = (setterType + 1) % BoxSetterTypeCount;
+		/// The total number of steps should complete in 1 second
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+	}
 
 }
 

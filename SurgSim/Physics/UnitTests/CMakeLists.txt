@@ -28,6 +28,8 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
+	FemElement3DTetrahedronTests.cpp
+	FemElementTests.cpp
 	FemRepresentationParametersTest.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
@@ -36,7 +38,6 @@ set(UNIT_TEST_SOURCES
 	LinearSpringTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
-	MeshShapeTest.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
@@ -48,7 +49,6 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp
-	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
 	VirtualToolCouplerTest.cpp
 )

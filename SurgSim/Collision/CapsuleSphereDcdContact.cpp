@@ -15,19 +15,28 @@
 
 #include <SurgSim/Collision/CapsuleSphereDcdContact.h>
 
-#include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Math/CapsuleShape.h>
 #include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Physics/CapsuleShape.h>
-#include <SurgSim/Physics/SphereShape.h>
+#include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/SphereShape.h>
 
-using SurgSim::Physics::CapsuleShape;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::SphereShape;
 
 namespace SurgSim
 {
 namespace Collision
 {
+
+CapsuleSphereDcdContact::CapsuleSphereDcdContact()
+{
+}
+
+std::pair<int,int> CapsuleSphereDcdContact::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_CAPSULE, SurgSim::Math::SHAPE_TYPE_SPHERE);
+}
 
 void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {

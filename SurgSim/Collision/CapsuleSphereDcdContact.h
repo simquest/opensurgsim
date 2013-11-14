@@ -18,8 +18,6 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/ReuseFactory.h>
-#include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 
 namespace SurgSim
@@ -27,28 +25,24 @@ namespace SurgSim
 namespace Collision
 {
 
+class CollisionPair;
+
 /// Class to calculate intersections between a capsule and a sphere
 class CapsuleSphereDcdContact : public ContactCalculation
 {
 public:
 
-    /// Constructor.
-    CapsuleSphereDcdContact()
-    {
-    }
+	/// Constructor.
+	CapsuleSphereDcdContact();
 
-    /// Function that returns the shapes between which this class performs collision detection.
+	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int,int> getShapeTypes() override
-    {
-        return std::pair<int,int>(SurgSim::Physics::RIGID_SHAPE_TYPE_CAPSULE,
-			SurgSim::Physics::RIGID_SHAPE_TYPE_SPHERE);
-    }
+	virtual std::pair<int,int> getShapeTypes() override;
 
 private:
-    /// Calculate the actual contact between two shapes of the given CollisionPair.
-    /// \param    pair    The symmetric pair that is under consideration.
-    virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
+	/// Calculate the actual contact between two shapes of the given CollisionPair.
+	/// \param    pair    The symmetric pair that is under consideration.
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 };
 

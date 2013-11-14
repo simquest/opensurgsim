@@ -34,7 +34,8 @@ namespace Framework
 
 Runtime::Runtime() :
 	m_isRunning(false),
-	m_scene(new Scene())
+	m_scene(new Scene()),
+	m_isPaused(false)
 {
 	initSearchPaths("");
 }
@@ -134,35 +135,36 @@ bool Runtime::execute()
 	return true;
 }
 
-bool Runtime::start()
+bool Runtime::start(bool paused)
 {
 	auto logger = Logger::getDefaultLogger();
 
 	// Add all the scene Elements so they can be initialized during the startup process
 	preprocessSceneElements();
 
+	m_isPaused = paused;
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
-	std::shared_ptr<Barrier> barrier(new Barrier(m_managers.size()+1));
+	m_barrier.reset(new Barrier(m_managers.size()+1));
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
-		(*it)->start(barrier);
+		(*it)->start(m_barrier, m_isPaused);
 	}
 
-
 	// Wait for all the managers to initialize
-	barrier->wait(true);
+	m_barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All managers doInit() succeeded";
 
 	// Wait for all the managers to startup
-	barrier->wait(true);
+	m_barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All managers doStartup() succeeded";
 
 	// Wait for all the components to initialize()
-	barrier->wait(true);
+	m_barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All component initialize() succeeded";
 
 	// Wait for all the components to wakeUp()
-	barrier->wait(true);
+	m_barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All component wakeUp() succeeded";
 
 	// Now wake up all the scene elements
@@ -171,7 +173,7 @@ bool Runtime::start()
 	{
 		it->second->wakeUp();
 	}
-	barrier->wait(true);
+	m_barrier->wait(true);
 
 	m_isRunning = true;
 	SURGSIM_LOG_INFO(logger) << "Scene is initialized. All managers updating";
@@ -181,12 +183,53 @@ bool Runtime::start()
 
 bool Runtime::stop()
 {
+	if (isPaused())
+	{
+		resume();
+	}
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
 		(*it)->stop();
 	}
+
 	return true;
+}
+
+void Runtime::pause()
+{
+	m_isPaused = true;
+	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	{
+		(*it)->setSynchronous(true);
+	}
+}
+
+void Runtime::resume()
+{
+	if (isPaused())
+	{
+		m_isPaused = false;
+		for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+		{
+			(*it)->setSynchronous(false);
+		}
+		m_barrier->wait(true);
+	}
+}
+
+void Runtime::step()
+{
+	if (isPaused())
+	{
+		m_barrier->wait(true);
+	}
+}
+
+bool Runtime::isPaused()
+{
+	return m_isPaused;
 }
 
 void Runtime::preprocessSceneElements()

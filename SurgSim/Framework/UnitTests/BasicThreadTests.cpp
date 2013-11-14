@@ -117,6 +117,94 @@ TEST(BasicThreadTest, DestructStoppedThread)
 	EXPECT_NO_THROW(m.release());
 }
 
+TEST(BasicThreadTest, SynchronousThread)
+{
+	MockThread m(10);
+	EXPECT_EQ(10, m.count);
+	std::shared_ptr<Barrier> barrier = std::make_shared<Barrier>(2);
+	EXPECT_FALSE(m.didInitialize);
+	EXPECT_FALSE(m.didStartUp);
+	EXPECT_FALSE(m.isRunning());
+	EXPECT_FALSE(m.isSynchronous());
+
+	m.start(barrier, true);
+
+	// Run through the initialization
+	barrier->wait(true);
+	barrier->wait(true);
+	barrier->wait(true);
+
+	EXPECT_TRUE(m.isRunning());
+	EXPECT_TRUE(m.isSynchronous());
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	// It's running but waiting for a new wait call
+	EXPECT_EQ(9, m.count);
+	barrier->wait(true);
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(8, m.count);
+	barrier->wait(true);
+
+	barrier->wait(false);
+	m.stop();
+}
+
+TEST(BasicThreadTest, SwitchSyncOnThread)
+{
+	MockThread m(-1);
+	std::shared_ptr<Barrier> barrier = std::make_shared<Barrier>(2);
+	EXPECT_FALSE(m.didInitialize);
+	EXPECT_FALSE(m.didStartUp);
+	EXPECT_FALSE(m.isRunning());
+	EXPECT_FALSE(m.isSynchronous());
+
+	m.start(barrier, false);
+
+	// Run through the initialization
+	barrier->wait(true);
+	barrier->wait(true);
+
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_TRUE(m.isRunning());
+
+	// Thread is running, count should be less than count after waiting
+	int count = m.count;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_GT(count, m.count);
+
+	m.setSynchronous(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+
+	// Thread is stopped count should be equal to count after waiting
+	count = m.count;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(count, m.count);
+
+	// Take one step, count should be just on less than last count
+	barrier->wait(true);
+	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+	EXPECT_EQ(count-1, m.count);
+
+	count = count - 1;
+	m.setSynchronous(false);
+	// restart the thread ...
+	barrier->wait(true);
+
+	// Thread is running count should decrease and keep decreasing
+	count = m.count;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+	EXPECT_GT(count, m.count);
+
+	// Thread is running count should decrease and keep decreasing
+	count = m.count;
+	boost::this_thread::sleep(boost::posix_time::milliseconds(200));
+	EXPECT_GT(count, m.count);
+
+	m.stop();
+}
+
 // HS-2013-jun-25 Can't figure out how to make this work or what is going wrong with the test
 class BasicThreadDeathTest : public ::testing::Test
 {

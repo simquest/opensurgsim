@@ -148,13 +148,17 @@ public:
 		}
 	}
 
-	/// Compares the meshes and returns true if equal, false if not equal.
+	/// Compares the mesh with another one (equality)
+	/// \param mesh The Vertices to compare it to
+	/// \return True if the two vertices are equals, False otherwise
 	bool operator==(const Vertices& mesh) const
 	{
 		return (typeid(*this) == typeid(mesh)) && isEqual(mesh);
 	}
 
-	/// Compares the meshes and returns false if equal, true if not equal.
+	/// Compares the mesh with another one (inequality)
+	/// \param mesh The Vertices to compare it to
+	/// \return False if the two vertices are equals, True otherwise
 	bool operator!=(const Vertices& mesh) const
 	{
 		return (typeid(*this) != typeid(mesh)) || ! isEqual(mesh);

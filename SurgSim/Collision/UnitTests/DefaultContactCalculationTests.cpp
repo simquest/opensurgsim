@@ -23,7 +23,7 @@ namespace Collision
 
 TEST(DefaultContactCalculationTests, UnitTests)
 {
-	std::shared_ptr<RigidShape> sphereShape = std::make_shared<SurgSim::Physics::SphereShape>(1.0);
+	std::shared_ptr<Shape> sphereShape = std::make_shared<SurgSim::Math::SphereShape>(1.0);
 
 	std::shared_ptr<CollisionRepresentation> rep0 = std::make_shared<MockCollisionRepresentation>
 		("TestSphere 1", sphereShape, Quaterniond::Identity(), Vector3d(3.0,0.0,0.0));
