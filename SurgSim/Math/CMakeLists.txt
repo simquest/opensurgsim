@@ -80,7 +80,8 @@ set(LIBS
 	MlcpTestIO
 )
 
-target_link_libraries(SurgSimMath ${LIBS})
+target_link_libraries(SurgSimMath ${LIBS}
+)
 
 
 if(SURGSIM_TESTS_BUILD)

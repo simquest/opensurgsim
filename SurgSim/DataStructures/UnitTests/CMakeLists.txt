@@ -36,7 +36,10 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
-set(LIBS SurgSimDataStructures gtest)
+set(LIBS
+	SurgSimDataStructures
+	gtest
+)
 
 surgsim_add_unit_tests(SurgSimDataStructuresTest)
 

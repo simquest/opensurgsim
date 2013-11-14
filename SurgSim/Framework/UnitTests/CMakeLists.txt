@@ -46,7 +46,8 @@ include_directories(
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-set(LIBS SurgSimFramework gtest)
+set(LIBS SurgSimFramework gtest
+)
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
 

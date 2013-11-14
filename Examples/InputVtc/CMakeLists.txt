@@ -46,8 +46,7 @@ if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
-target_link_libraries(ExampleInputVtc
-	${LIBS}
+target_link_libraries(ExampleInputVtc ${LIBS}
 )
 
 # Put ExampleInputVtc into folder "Examples"

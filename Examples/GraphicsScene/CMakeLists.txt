@@ -51,8 +51,8 @@ SET(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 )
-target_link_libraries(ExampleGraphicsScene
-	${LIBS}
+
+target_link_libraries(ExampleGraphicsScene ${LIBS}
 )
 
 # Put ExampleGraphicsScene into folder "Examples"

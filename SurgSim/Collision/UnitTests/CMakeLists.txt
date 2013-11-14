@@ -47,7 +47,8 @@ include_directories(
 
 set(LIBS
 	SurgSimCollision
-	gtest)
+	gtest
+)
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
 

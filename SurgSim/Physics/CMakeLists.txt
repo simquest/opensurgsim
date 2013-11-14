@@ -99,13 +99,13 @@ surgsim_add_library(
 )
 
 SET(LIBS
-	SurgSimPhysics
 	MlcpTestIO
 	IdentityPoseDevice
 	SurgSimCollision
 )
 
-target_link_libraries(${LIBS})
+target_link_libraries(SurgSimPhysics ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

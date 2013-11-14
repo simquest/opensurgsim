@@ -52,8 +52,7 @@ SET(LIBS
 	SurgSimGraphics
 )
 
-target_link_libraries(ExampleBouncingBalls
-	${LIBS}
+target_link_libraries(ExampleBouncingBalls ${LIBS}
 )
 
 # Put ExampleBouncingBalls into folder "Examples"

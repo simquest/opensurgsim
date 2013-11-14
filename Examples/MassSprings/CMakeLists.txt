@@ -47,8 +47,7 @@ SET(LIBS
 	SurgSimGraphics
 )
 
-target_link_libraries(ExampleMassSprings
-	${LIBS}
+target_link_libraries(ExampleMassSprings ${LIBS}
 )
 
 # Put ExampleMassSprings into folder "Examples"

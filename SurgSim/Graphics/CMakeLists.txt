@@ -140,7 +140,8 @@ SET(LIBS
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 
-target_link_libraries(SurgSimGraphics ${LIBS})
+target_link_libraries(SurgSimGraphics ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
