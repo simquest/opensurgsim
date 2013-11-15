@@ -34,19 +34,28 @@ public:
 	ShapeCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Math::Shape> shape,
-		std::shared_ptr<SurgSim::Physics::Representation> representation);
+		const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Destructor
 	virtual ~ShapeCollisionRepresentation();
+
+	/// Overridden from Representation
+	/// \param pose
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
+	/// \return Transformation to transform the shape into world coordinates
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 
 	///@{
 	/// Implementations of virtual functions from CollisionRepresentation
 	virtual int getShapeType() const override;
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
+	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;
 	///@}
 
 private:
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
+	SurgSim::Math::RigidTransform3d m_pose;
 };
 
 

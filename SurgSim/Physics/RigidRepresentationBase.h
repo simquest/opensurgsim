@@ -85,6 +85,14 @@ public:
 
 	std::shared_ptr<Localization> createLocalization(const Location& location);
 
+	/// Set the initial parameters of the rigid representation
+	/// \param parameters The initial parameters
+	/// This will also set the current parameters to the initial parameters
+	void setInitialParameters(const RigidRepresentationParameters& parameters);
+	/// Set the current parameters of the rigid representation
+	/// \param parameters The current parameters
+	void setCurrentParameters(const RigidRepresentationParameters& parameters);
+
 	/// Get the initial parameters of the rigid representation
 	/// \return The initial parameters of the rigid representation
 	const RigidRepresentationParameters& getInitialParameters() const;

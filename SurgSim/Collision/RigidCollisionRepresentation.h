@@ -48,12 +48,13 @@ public:
 	virtual int getShapeType() const override;
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
+	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;
 	///@}
 
 private:
 
-	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
-	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> m_localRepresentation;
+	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
 };
 
 }; // namespace Collision

@@ -103,6 +103,20 @@ std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const 
 	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
 }
 
+void RigidRepresentationBase::setInitialParameters(const RigidRepresentationParameters& parameters)
+{
+	m_initialParameters = parameters;
+	m_currentParameters = parameters;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+void RigidRepresentationBase::setCurrentParameters(const RigidRepresentationParameters& parameters)
+{
+	m_currentParameters = parameters;
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
 const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getInitialParameters() const
 {
 	return m_initialParameters;

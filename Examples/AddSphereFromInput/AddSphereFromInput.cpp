@@ -21,7 +21,6 @@
 #include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Blocks/TransferInputPoseBehavior.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 #include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
 #include <SurgSim/Framework/BehaviorManager.h>
 #include <SurgSim/Framework/Log.h>
@@ -80,8 +79,13 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 std::shared_ptr<SceneElement> createPlane(const std::string& name,
 										  const SurgSim::Math::RigidTransform3d& pose)
 {
+	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
+	RigidRepresentationParameters params;
+	params.setShapeUsedForMassInertia(planeShape);
+	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
@@ -104,16 +108,14 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
-
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
 	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>
-		("Plane Collision",planeShape, physicsRepresentation));
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Plane Collision", physicsRepresentation));
 	return planeElement;
 }
 

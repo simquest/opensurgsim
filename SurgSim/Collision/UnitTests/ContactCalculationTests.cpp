@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <SurgSim/Collision/ContactCalculation.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 #include <SurgSim/Collision/SpherePlaneDcdContact.h>
 
 #include <SurgSim/Math/SphereShape.h>
@@ -50,10 +51,10 @@ TEST(ContactCalculationTests, SwappedPairTest)
 	Vector3d trans(0.0,0.0,0.0);
 	Quaterniond quat = Quaterniond::Identity();
 
-	std::shared_ptr<CollisionRepresentation> planeRep =
-		std::make_shared<MockCollisionRepresentation>("Plane Shape",plane,quat,trans);
-	std::shared_ptr<CollisionRepresentation> sphereRep =
-		std::make_shared<MockCollisionRepresentation>("Sphere Shape",sphere,quat,trans);
+	std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
+			"Plane Shape", plane, SurgSim::Math::makeRigidTransform(quat, trans));
+	std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
+			"Sphere Shape",sphere, SurgSim::Math::makeRigidTransform(quat, trans));
 
 	std::shared_ptr<CollisionPair> pair1 = std::make_shared<CollisionPair>(sphereRep, planeRep);
 	std::shared_ptr<CollisionPair> pair2 = std::make_shared<CollisionPair>(planeRep, sphereRep);

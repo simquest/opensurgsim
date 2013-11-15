@@ -27,36 +27,9 @@ CollisionRepresentation::CollisionRepresentation(const std::string& name) :
 
 }
 
-CollisionRepresentation::CollisionRepresentation(
-	const std::string& name,
-	std::shared_ptr<SurgSim::Physics::Representation> representation) :
-	Representation(name),
-	m_physicsRepresentation(representation)
-{
-
-}
-
 CollisionRepresentation::~CollisionRepresentation()
 {
 
-}
-
-void CollisionRepresentation::setPhysicsRepresentation(
-	const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation)
-{
-	m_physicsRepresentation = physicsRepresentation;
-}
-
-std::shared_ptr<SurgSim::Physics::Representation> CollisionRepresentation::getPhysicsRepresentation()
-{
-	return m_physicsRepresentation.lock();
-}
-
-const SurgSim::Math::RigidTransform3d& CollisionRepresentation::getPose() const
-{
-	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
-	return m_physicsRepresentation.lock()->getPose();
 }
 
 void CollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
@@ -66,14 +39,8 @@ void CollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform
 
 const SurgSim::Math::RigidTransform3d& CollisionRepresentation::getInitialPose() const
 {
-	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
-	return m_physicsRepresentation.lock()->getPose();
-}
-
-void CollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "Cannot set the pose on a collision representation.";
+	SURGSIM_FAILURE() << "No initial pose on a collision representation.";
+	return SurgSim::Math::RigidTransform3d::Identity();
 }
 
 }; // namespace Collision

@@ -19,7 +19,6 @@
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include <SurgSim/Blocks/TransferPoseBehavior.h>
 #include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 #include <SurgSim/Framework/ApplicationData.h>
 #include <SurgSim/Framework/Behavior.h>
 #include <SurgSim/Framework/BehaviorManager.h>
@@ -148,9 +147,14 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
+	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+
 	// A FixedRepresentation has no motion or compliance. It does not change.
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
+	RigidRepresentationParameters params;
+	params.setShapeUsedForMassInertia(planeShape);
+	physicsRepresentation->setInitialParameters(params);
 
 	// A RigidTransform3d pose is the 6 degree-of-freedom (DOF) position and orientation.
 	physicsRepresentation->setInitialPose(pose);
@@ -182,8 +186,6 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
-
 	// Here the SceneElement for the plane is created, to which the various Components that collectively define the
 	// plane are added.
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
@@ -196,13 +198,13 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	// practice to ensure that the physics and graphics poses are synced anyway.
 	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 							   physicsRepresentation, graphicsRepresentation));
-	// ShapeCollisionRepresentation will use the provided Shape and physics to do collisions.  Collision detection
+	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>
-		("Plane Collision",planeShape, physicsRepresentation));
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Plane Collision", physicsRepresentation));
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
 	planeElement->addComponent(std::make_shared<AddRandomSphereBehavior>());

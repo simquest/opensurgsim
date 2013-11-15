@@ -20,7 +20,6 @@
 #include <memory>
 
 #include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
-#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
 
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Quaternion.h>
@@ -34,6 +33,7 @@
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 
 #include <SurgSim/Math/Geometry.h>
 #include <SurgSim/Collision/ShapeCollisionRepresentation.h>

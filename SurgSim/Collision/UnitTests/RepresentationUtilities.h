@@ -31,23 +31,19 @@ namespace Collision
 class Representation;
 
 std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
 	const double& radius = 1.0,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
 std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
 std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makePlaneRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),
 	const SurgSim::Math::Vector3d& position = SurgSim::Math::Vector3d::Zero());
 
 std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeCapsuleRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation = nullptr,
 	const double& length = 1.0,
 	const double& radius = 1.0,
 	const SurgSim::Math::Quaterniond& rotation = SurgSim::Math::Quaterniond::Identity(),

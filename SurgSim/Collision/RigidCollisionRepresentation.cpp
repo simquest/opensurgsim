@@ -23,10 +23,9 @@ namespace Collision
 RigidCollisionRepresentation::RigidCollisionRepresentation(
 	const std::string& name,
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation):
-	CollisionRepresentation(name, representation),
-	m_localRepresentation(representation)
+	CollisionRepresentation(name),
+	m_physicsRepresentation(representation)
 {
-	setPhysicsRepresentation(representation);
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()
@@ -36,17 +35,33 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 
 int RigidCollisionRepresentation::getShapeType() const
 {
-	return m_localRepresentation->getCurrentParameters().getShapeUsedForMassInertia()->getType();
+	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
+	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
 {
-	return m_localRepresentation->getCurrentParameters().getShapeUsedForMassInertia();
+	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
+	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
 const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() const
 {
-	return m_localRepresentation->getCurrentPose();
+	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
+	return m_physicsRepresentation.lock()->getCurrentPose();
+}
+
+void RigidCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	SURGSIM_FAILURE() << "Cannot set the pose on a RigidCollisionRepresentation.";
+}
+
+std::shared_ptr<SurgSim::Physics::Representation> RigidCollisionRepresentation::getPhysicsRepresentation()
+{
+	return m_physicsRepresentation.lock();
 }
 
 }; // namespace Collision
