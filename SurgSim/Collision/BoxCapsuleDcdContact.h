@@ -43,7 +43,7 @@ public:
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param	pair	The symmetric pair that is under consideration.
-	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair);
+	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 };
 
