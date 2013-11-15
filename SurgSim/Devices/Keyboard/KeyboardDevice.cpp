@@ -13,27 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
-
-#include <iostream>
-#include <iomanip>
-
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Framework/Log.h>
+#include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
 #include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Matrix44d;
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::RigidTransform3d;
-
-using SurgSim::DataStructures::DataGroup;
-using SurgSim::DataStructures::DataGroupBuilder;
-
+#include <SurgSim/Framework/Log.h>
 
 namespace SurgSim
 {
@@ -41,8 +23,7 @@ namespace Device
 {
 
 KeyboardDevice::KeyboardDevice(const std::string& deviceName) :
-	SurgSim::Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData()),
-	m_delay(-1), m_repeatSpeed(0)
+	SurgSim::Input::CommonDevice(deviceName, KeyboardScaffold::buildDeviceInputData())
 {
 }
 

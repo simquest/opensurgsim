@@ -29,13 +29,11 @@ include_directories(
 set(KEYBOARD_DEVICE_SOURCES
 	KeyboardDevice.cpp
 	KeyboardScaffold.cpp
-	KeyboardThread.cpp
 )
 
 set(KEYBOARD_DEVICE_HEADERS
 	KeyboardDevice.h
 	KeyboardScaffold.h
-	KeyboardThread.h
 )
 
 surgsim_add_library(

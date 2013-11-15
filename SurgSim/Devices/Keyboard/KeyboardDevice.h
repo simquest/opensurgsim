@@ -34,48 +34,25 @@ class KeyboardDevice : public SurgSim::Input::CommonDevice
 
 public:
 	/// Constructor
-	/// \param uniqueName A unique name for the device that will be used by the application.
+	/// \param deviceName Name for keyboard device
 	explicit KeyboardDevice(const std::string& deviceName);
 	/// Destructor
 	virtual ~KeyboardDevice();
 
-	/// Initialize corresponding KeyboardScaffold
-	/// \return True if KeyboardScaffold intialized successfully; Otherwise, false
+	/// Initialize corresponding KeyboardScaffold.
+	/// \return True if KeyboardScaffold is intialized successfully; Otherwise, false.
 	virtual bool initialize() override;
-	/// "De"-initialize corresponding KeyboardScaffold
-	/// \return True if KeyboardScaffold 'de'-intialized successfully; Otherwise, false
+	/// "De"-initialize corresponding KeyboardScaffold.
+	/// \return True if KeyboardScaffold is 'de'-intialized successfully; Otherwise, false.
 	virtual bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.
-	/// \return True if this the scaffold of this device is initialized; Otherwise, false
+	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
 	bool isInitialized() const;
 
-	/// Sets the delay before repeat for this device.
-	/// The delay before repeat controls when a pressed key starts to repeat itself.
-	/// \param delay Time before repeat starts
-	void setDelay(double delay);
-	/// Gets the delay before repeat for this device
-	/// \return Delay before repeat
-	double getDelay() const;
-
-	/// Sets the repeat speed for this device.
-	/// The repeat speed controls how fast a pressed key repeats itself.
-	/// \param repeatSpeed Speed of repeat
-	void setRepeatSpeed(double repeatSpeed);
-	/// Gets the speed of repeat of a key
-	/// \return Speed of repeat
-	double getRepeatSpeed() const;
-
 private:
-	/// Communication with hardware is handled by scaffold
+	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<KeyboardScaffold> m_scaffold;
-
-	/// Time before a pressed key starts to repeat itself
-	double m_delay;
-
-	/// Speed of a key repeating itself
-	double m_repeatSpeed;
-
 };
 
 };  // namespace Device

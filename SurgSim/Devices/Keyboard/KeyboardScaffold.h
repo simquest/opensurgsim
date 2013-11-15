@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/Logger.h>
 #include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/Framework/Logger.h>
 
 namespace SurgSim
 {
@@ -28,16 +28,14 @@ namespace Device
 class KeyboardDevice;
 
 /// A class that implements the behavior of KeyboardDevice objects.
-///
 /// \sa SurgSim::Device::KeyboardDevice
 class KeyboardScaffold
 {
 	friend class KeyboardDevice;
-	friend class KeyboardThread;
 
 public:
 	/// Constructor.
-	/// \param logger (optional) The logger to be used for the scaffold object and the devices it manages.
+	/// \param logger (optional) The logger to be used by the scaffold object and the devices it manages.
 	/// If unspecified or empty, a console logger will be created and used.
 	explicit KeyboardScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
 	/// Destructor
@@ -79,27 +77,6 @@ private:
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
 
-	/// Initializes the Keyboard SDK.
-	/// \return true on success.
-	bool initializeSdk();
-	/// Finalizes (de-initializes) the Keyboard SDK.
-	/// \return true on success.
-	bool finalizeSdk();
-
-
-	/// Creates the input loop thread.
-	/// \return true on success.
-	bool createPerDeviceThread(DeviceData* data);
-	/// Destroys the input loop thread.
-	/// \return true on success.
-	bool destroyPerDeviceThread(DeviceData* data);
-
-	/// Executes the operations for a single input frame for a single device.
-	/// Should only be called from the context of the input loop thread.
-	/// \param info The internal device data.
-	/// \return true on success.
-	bool runInputFrame(DeviceData* info);
-
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
@@ -107,12 +84,11 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
+	/// The default logging level.
+	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 
 	/// Internal scaffold state.
 	std::unique_ptr<StateData> m_state;
-
-	/// The default logging level.
-	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 };
 
 };  // namespace Device

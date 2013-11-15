@@ -13,26 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
-
 #include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
-#include <SurgSim/Devices/Keyboard/KeyboardThread.h>
+#include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
 
-#include <vector>
 #include <memory>
 #include <utility>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <osgGA/GUIEventHandler>
-
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/SharedInstance.h>
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/DataStructures/DataGroupBuilder.h>
-
+#include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/SharedInstance.h>
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
@@ -44,28 +37,18 @@ namespace Device
 
 struct KeyboardScaffold::DeviceData
 {
-	/// Initialize the state.
-	//DeviceData(KeyboardDevice* device,
-	//	std::unique_ptr<KeyboardHandle>&& handle) :
-	//	deviceObject(device),
-	//	deviceHandle(std::move(handle))
-	//{
-	//}
-	explicit DeviceData(KeyboardDevice* device):
-		deviceObject(device)
+	/// Constructor
+	/// \param device
+	explicit DeviceData(KeyboardDevice* device) : deviceObject(device)
 	{
-
 	}
 
+	/// Destructor
 	~DeviceData()
 	{
 	}
 
 	KeyboardDevice* const deviceObject;
-	//std::unique_ptr<KeyboardHandle> deviceHandle;
-
-	/// Processing thread.
-	std::unique_ptr<KeyboardThread> thread;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -115,21 +98,9 @@ KeyboardScaffold::~KeyboardScaffold()
 		if (! m_state->activeDeviceList.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "Keyboard: Destroying scaffold while devices are active!?!";
-			// do anything special with each device?
-			for (auto it = m_state->activeDeviceList.begin();  it != m_state->activeDeviceList.end();  ++it)
-			{
-				if ((*it)->thread)
-				{
-					destroyPerDeviceThread(it->get());
-				}
-			}
 			m_state->activeDeviceList.clear();
 		}
 
-		if (m_state->isApiInitialized)
-		{
-			finalizeSdk();
-		}
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "Keyboard: Shared scaffold destroyed.";
 }
@@ -142,14 +113,6 @@ std::shared_ptr<SurgSim::Framework::Logger> KeyboardScaffold::getLogger() const
 bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-	if (! m_state->isApiInitialized)
-	{
-		if (! initializeSdk())
-		{
-			return false;
-		}
-	}
 
 	// Make sure the object is unique.
 	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
@@ -168,80 +131,29 @@ bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
 		return false;
 	}
 
-	// Construct the object, start its thread, then move it to the list.
-	// Note that since Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers, storing a
-	// list of unique_ptr results in nicer code than storing a list of DeviceData values directly.
 	std::unique_ptr<DeviceData> info(new DeviceData(device));
-	//if (! initializeDeviceState(info.get()))
-	//{
-	//	return false;   // message already printed
-	//}
-
-	createPerDeviceThread(info.get());
 	m_state->activeDeviceList.emplace_back(std::move(info));
 
 	return true;
 }
 
-
 bool KeyboardScaffold::unregisterDevice(const KeyboardDevice* const device)
 {
-	//std::unique_ptr<DeviceData> savedInfo;
-	//bool haveOtherDevices = false;
-	//{
-	//	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-	//	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-	//		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	//	if (matching != m_state->activeDeviceList.end())
-	//	{
-	//		savedInfo = std::move(*matching);
-	//		m_state->activeDeviceList.erase(matching);
-	//		// the iterator is now invalid but that's OK
-	//	}
-	//	haveOtherDevices = (m_state->activeDeviceList.size() > 0);
-	//}
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-	//bool status = true;
-	//if (! savedInfo)
-	//{
-	//	SURGSIM_LOG_WARNING(m_logger) << "Keyboard: Attempted to release a non-registered device.";
-	//	status = false;
-	//}
-	//else
-	//{
-	//	finalizeDeviceState(savedInfo.get());
-	//	savedInfo.reset(nullptr);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
-	//	if (haveOtherDevices)
-	//	{
-	//		//// If there are other devices left, we need to recreate the haptic callback.
-	//		//// If there aren't, we don't need the callback... and moreover, trying to create it will fail.
-	//		//createHapticLoop();
-	//	}
-	//}
-	//return status;
-	bool found = false;
+	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-		if (matching != m_state->activeDeviceList.end())
-		{
-			if ((*matching)->thread)
-			{
-				destroyPerDeviceThread(matching->get());
-			}
-			m_state->activeDeviceList.erase(matching);
-			// the iterator is now invalid but that's OK
-			found = true;
-		}
+		m_state->activeDeviceList.erase(matching);
+		return true;
 	}
-
-	if (! found)
+	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "RawMultiAxis: Attempted to release a non-registered device.";
+		SURGSIM_LOG_WARNING(m_logger) << "Keyboard: Attempted to release a non-registered device.";
+		return false;
 	}
-	return found;
 }
 
 //bool KeyboardScaffold::initializeDeviceState(DeviceData* info)
@@ -268,46 +180,13 @@ bool KeyboardScaffold::unregisterDevice(const KeyboardDevice* const device)
 
 bool KeyboardScaffold::updateDevice(DeviceData* info)
 {
-	/*SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	/* osgGA communication
+	info->updateKeyStatus(info->keyStatus, info->keyModifier, info->updated);
 
-	info->deviceHandle.getKeyStatus(info->keyStatus);
-
-	inputData.integers().set("KEY", info->keyStatus.first);
-	inputData.integers().set("KEY_STATUS", info->keyStatus.second);*/
-
-	return true;
-}
-
-bool KeyboardScaffold::createPerDeviceThread(DeviceData* data)
-{
-	SURGSIM_ASSERT(! data->thread);
-
-	std::unique_ptr<KeyboardThread> thread(new KeyboardThread(this, data));
-	thread->start();
-	data->thread = std::move(thread);
-
-	return true;
-}
-
-bool KeyboardScaffold::destroyPerDeviceThread(DeviceData* data)
-{
-	SURGSIM_ASSERT(data->thread);
-
-	std::unique_ptr<KeyboardThread> thread = std::move(data->thread);
-	thread->stop();
-	thread.reset();
-
-	return true;
-}
-
-bool KeyboardScaffold::runInputFrame(KeyboardScaffold::DeviceData* info)
-{
-	info->deviceObject->pullOutput();
-	if (! updateDevice(info))
-	{
-		return false;
-	}
-	info->deviceObject->pushInput();
+	inputData.integers().set("key", info->keyStatus[0]);
+	inputData.integers().set("key_modifier", info->keyModifier);
+	*/
 	return true;
 }
 
@@ -315,7 +194,6 @@ bool KeyboardScaffold::runInputFrame(KeyboardScaffold::DeviceData* info)
 SurgSim::DataStructures::DataGroup KeyboardScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	// KEY_DOWN = 0, KEY_UP = 1
 	builder.addInteger("key");
 	builder.addInteger("key_modifier");
 	return builder.createData();
@@ -325,22 +203,6 @@ std::shared_ptr<KeyboardScaffold> KeyboardScaffold::getOrCreateSharedInstance()
 {
 	static SurgSim::Framework::SharedInstance<KeyboardScaffold> sharedInstance;
 	return sharedInstance.get();
-}
-
-bool KeyboardScaffold::initializeSdk()
-{
-	SURGSIM_ASSERT(! m_state->isApiInitialized);
-	// nothing to do!
-	m_state->isApiInitialized = true;
-	return true;
-}
-
-bool KeyboardScaffold::finalizeSdk()
-{
-	SURGSIM_ASSERT(m_state->isApiInitialized);
-	// nothing to do!
-	m_state->isApiInitialized = false;
-	return true;
 }
 
 void KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
