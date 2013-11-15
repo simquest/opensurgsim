@@ -24,6 +24,8 @@
 #include <SurgSim/Graphics/OsgVectorConversions.h>
 #include <SurgSim/Graphics/OsgRenderTarget.h>
 
+#include <osgUtil/CullVisitor>
+
 
 using SurgSim::Math::makeRigidTransform;
 
@@ -82,6 +84,8 @@ OsgCamera::OsgCamera(const std::string& name) :
 
 	m_camera->setViewMatrixAsLookAt(osg::Vec3d(0.0, 0.0, 0.0), osg::Vec3d(0.0, 0.0, -1.0), osg::Vec3d(0.0, 1.0, 0.0));
 	m_camera->setProjectionMatrixAsPerspective(45.0, 1.0, 0.01, 10.0);
+
+	m_camera->setComputeNearFarMode(osgUtil::CullVisitor::DO_NOT_COMPUTE_NEAR_FAR);
 
 	/// Update storage of view and projection matrices
 	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
