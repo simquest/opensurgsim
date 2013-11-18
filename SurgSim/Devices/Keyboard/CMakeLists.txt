@@ -45,6 +45,7 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
+	add_subdirectory(VisualTests)
 endif()
 
 # Put KeyboardDevice into folder "Devices"

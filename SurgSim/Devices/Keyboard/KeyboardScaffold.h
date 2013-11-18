@@ -56,30 +56,28 @@ public:
 	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
 private:
-	/// Internal shared state data type.
-	struct StateData;
 	/// Internal per-device information.
 	struct DeviceData;
 
 	/// Registers the specified device object.
-	/// If successful, the device object will become connected to an unused hardware device.
+	/// If successful, the device object will become connected to an hardware device.
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(KeyboardDevice* device);
 	/// Unregisters the specified device object.
-	/// The corresponding hardware device will become unused, and can be re-registered later.
-	/// \param device The device object.
+	/// The corresponding controller will become unused, and can be re-registered later.
 	/// \return true on success, false on failure.
-	bool unregisterDevice(const KeyboardDevice* device);
+	bool unregisterDevice();
 
 	/// Updates the device information for a single device.
 	/// \param info	The device data.
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
 
+	std::shared_ptr<KeyboardHandler> getKeyboardHandler() const;
+
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
-
 
 
 	/// Logger used by the scaffold and all devices.
@@ -87,8 +85,7 @@ private:
 	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 
-	/// Internal scaffold state.
-	std::unique_ptr<StateData> m_state;
+	std::shared_ptr<DeviceData> m_device;
 };
 
 };  // namespace Device

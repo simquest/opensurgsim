@@ -63,13 +63,4 @@ TEST(KeyboardDeviceTest, InputConsumer)
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("key"));
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("key_modifier"));
-
-	int key, key_modifier;
-	consumer->m_lastReceivedInput.integers().get("key", &key);
-	consumer->m_lastReceivedInput.integers().get("key_modifier", &key_modifier);
-
-	// 65: osgGA key code for KEY_A
-	EXPECT_EQ(65u, key);
-	// 65505: osgGA key code for KEY_LIFT_SHIFT
-	EXPECT_EQ(65505u, key_modifier);
 }

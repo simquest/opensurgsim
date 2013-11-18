@@ -41,12 +41,8 @@ bool KeyboardDevice::initialize()
 	std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(scaffold);
 
-	if (! scaffold->registerDevice(this))
-	{
-		return false;
-	}
-
-	m_scaffold = std::move(scaffold);
+	m_scaffold = std::make_shared<KeyboardScaffold>();
+	m_scaffold->registerDevice(this);
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
 	return true;
 }
@@ -55,14 +51,18 @@ bool KeyboardDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
-	bool ok = m_scaffold->unregisterDevice(this);
 	m_scaffold.reset();
-	return ok;
+	return true;
 }
 
 bool KeyboardDevice::isInitialized() const
 {
 	return (m_scaffold != nullptr);
+}
+
+std::shared_ptr<KeyboardHandler> KeyboardDevice::getKeyboardHandler() const
+{
+	return m_scaffold->getKeyboardHandler();
 }
 
 

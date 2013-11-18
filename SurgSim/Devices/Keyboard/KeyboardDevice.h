@@ -26,6 +26,7 @@ namespace SurgSim
 namespace Device
 {
 class KeyboardScaffold;
+class KeyboardHandler;
 
 /// A class implementing the communication with a keyboard
 class KeyboardDevice : public SurgSim::Input::CommonDevice
@@ -49,6 +50,8 @@ public:
 	/// Check if the scaffold of this device is initialized.
 	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
 	bool isInitialized() const;
+
+	std::shared_ptr<KeyboardHandler> getKeyboardHandler() const;
 
 private:
 	/// Communication with hardware is handled by scaffold.

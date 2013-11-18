@@ -19,21 +19,45 @@
 #include <memory>
 #include <utility>
 
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
-
 #include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/DataStructures/DataGroupBuilder.h>
 #include <SurgSim/Framework/Log.h>
 #include <SurgSim/Framework/SharedInstance.h>
 
-using SurgSim::DataStructures::DataGroup;
-using SurgSim::DataStructures::DataGroupBuilder;
+#include <osgGA/GUIEventHandler>
 
 namespace SurgSim
 {
 namespace Device
 {
+using SurgSim::DataStructures::DataGroup;
+using SurgSim::DataStructures::DataGroupBuilder;
+
+
+class KeyboardHandler : public osgGA::GUIEventHandler
+{
+public:
+
+	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&)
+	{
+		switch(ea.getEventType())
+		{
+		case(osgGA::GUIEventAdapter::KEYDOWN):
+		{
+			key = ea.getUnmodifiedKey();
+			key_modifier = 0;  //This is not correct right now
+			return true;
+		}
+		default:
+			return false;
+		}
+	}
+
+	int key;
+	int key_modifier;
+};
+
+
 
 struct KeyboardScaffold::DeviceData
 {
@@ -41,6 +65,7 @@ struct KeyboardScaffold::DeviceData
 	/// \param device
 	explicit DeviceData(KeyboardDevice* device) : deviceObject(device)
 	{
+		keyboardEventHandler = std::make_shared<KeyboardHandler>();
 	}
 
 	/// Destructor
@@ -49,6 +74,7 @@ struct KeyboardScaffold::DeviceData
 	}
 
 	KeyboardDevice* const deviceObject;
+	std::shared_ptr<KeyboardHandler> keyboardEventHandler;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -56,31 +82,8 @@ private:
 	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
-
-struct KeyboardScaffold::StateData
-{
-	/// Initialize the state.
-	StateData() : isApiInitialized(false)
-	{
-	}
-
-	/// True if the API has been initialized (and not finalized).
-	bool isApiInitialized;
-
-	/// The list of known devices.
-	std::list<std::unique_ptr<KeyboardScaffold::DeviceData>> activeDeviceList;
-
-	/// The mutex that protects the list of known devices.
-	boost::mutex mutex;
-
-private:
-	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
-	StateData(const StateData&) /*= delete*/;
-	StateData& operator=(const StateData&) /*= delete*/;
-};
-
 KeyboardScaffold::KeyboardScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+	m_logger(logger)
 {
 	if (! m_logger)
 	{
@@ -92,103 +95,52 @@ KeyboardScaffold::KeyboardScaffold(std::shared_ptr<SurgSim::Framework::Logger> l
 
 KeyboardScaffold::~KeyboardScaffold()
 {
-	{
-		boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-		if (! m_state->activeDeviceList.empty())
-		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Keyboard: Destroying scaffold while devices are active!?!";
-			m_state->activeDeviceList.clear();
-		}
-
-	}
-	SURGSIM_LOG_DEBUG(m_logger) << "Keyboard: Shared scaffold destroyed.";
-}
-
-std::shared_ptr<SurgSim::Framework::Logger> KeyboardScaffold::getLogger() const
-{
-	return m_logger;
+	unregisterDevice();
 }
 
 bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
 {
-	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-	// Make sure the object is unique.
-	auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-	SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "Keyboard: Tried to register a device" <<
-		" which is already present!";
-
-	// Make sure the name is unique.
-	const std::string deviceName = device->getName();
-	auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-		[&deviceName](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == deviceName; });
-	if (sameName != m_state->activeDeviceList.end())
+	m_device = std::make_shared<DeviceData>(device);
+	if (m_device == nullptr)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "Keyboard: Tried to register a device when the same name is" <<
-			" already present!";
+		SURGSIM_LOG_CRITICAL(m_logger) << "KeyboardScaffold::registerDevice(): failed to create a DeviceData";
 		return false;
 	}
-
-	std::unique_ptr<DeviceData> info(new DeviceData(device));
-	m_state->activeDeviceList.emplace_back(std::move(info));
-
-	return true;
+	else
+	{
+		return true;
+	}
 }
 
-bool KeyboardScaffold::unregisterDevice(const KeyboardDevice* const device)
+bool KeyboardScaffold::unregisterDevice()
 {
-	boost::lock_guard<boost::mutex> lock(m_state->mutex);
-
-	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
-
-	if (matching != m_state->activeDeviceList.end())
+	m_device.reset();
+	if (m_device == nullptr)
 	{
-		m_state->activeDeviceList.erase(matching);
+		SURGSIM_LOG_DEBUG(m_logger) << "Keyboard: Shared scaffold unregistered.";
 		return true;
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << "Keyboard: Attempted to release a non-registered device.";
 		return false;
 	}
 }
 
-//bool KeyboardScaffold::initializeDeviceState(DeviceData* info)
-//{
-//	//SURGSIM_ASSERT(! info->deviceHandle.isValid());
-//
-//	//if (! info->deviceHandle.create(info->deviceObject->getName(), info->deviceObject->getInitializationName()))
-//	//{
-//	//	return false;  // message was already printed
-//	//}
-//	return true;
-//}
-//
-//
-//bool KeyboardScaffold::finalizeDeviceState(DeviceData* info)
-//{
-//	/*bool status = false;
-//	if (info->deviceHandle.isValid())
-//	{
-//	status = info->deviceHandle.destroy();
-//	}*/
-//	return true;
-//}
-
 bool KeyboardScaffold::updateDevice(DeviceData* info)
 {
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	/* osgGA communication
-	info->updateKeyStatus(info->keyStatus, info->keyModifier, info->updated);
+	
+	inputData.integers().set("key", info->keyboardEventHandler->key);
+	inputData.integers().set("key_modifier", info->keyboardEventHandler->key_modifier);
 
-	inputData.integers().set("key", info->keyStatus[0]);
-	inputData.integers().set("key_modifier", info->keyModifier);
-	*/
 	return true;
 }
+
+std::shared_ptr<KeyboardHandler> KeyboardScaffold::getKeyboardHandler() const
+{
+	return m_device->keyboardEventHandler;
+}
+
 
 /// Builds the data layout for the application input (i.e. device output).
 SurgSim::DataStructures::DataGroup KeyboardScaffold::buildDeviceInputData()
@@ -209,6 +161,12 @@ void KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 {
 	m_defaultLogLevel = logLevel;
 }
+
+std::shared_ptr<SurgSim::Framework::Logger> KeyboardScaffold::getLogger() const
+{
+	return m_logger;
+}
+
 
 SurgSim::Framework::LogLevel KeyboardScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
