@@ -25,7 +25,8 @@ OsgShader::OsgShader() : SurgSim::Graphics::Shader(),
 
 void OsgShader::addToStateSet(osg::StateSet* stateSet)
 {
-	stateSet->setAttributeAndModes(m_program, osg::StateAttribute::ON);
+	int attribute = osg::StateAttribute::ON | ((m_globalScope) ? osg::StateAttribute::OVERRIDE : 0);
+	stateSet->setAttributeAndModes(m_program, attribute);
 }
 
 void OsgShader::removeFromStateSet(osg::StateSet* stateSet)
@@ -175,4 +176,19 @@ bool OsgShader::getFragmentShaderSource(std::string* source) const
 		*source = "";
 		return false;
 	}
+}
+
+osg::ref_ptr<osg::Program> SurgSim::Graphics::OsgShader::getOsgProgram() const
+{
+	return m_program;
+}
+
+void SurgSim::Graphics::OsgShader::setGlobalScope(bool val)
+{
+	m_globalScope = val;
+}
+
+bool SurgSim::Graphics::OsgShader::isGlobalScope()
+{
+	return m_globalScope;
 }

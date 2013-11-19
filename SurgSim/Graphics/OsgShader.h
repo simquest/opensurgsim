@@ -108,10 +108,12 @@ public:
 	virtual bool getFragmentShaderSource(std::string* source) const;
 
 	/// Returns the OSG program attribute
-	osg::ref_ptr<osg::Program> getOsgProgram() const
-	{
-		return m_program;
-	}
+	osg::ref_ptr<osg::Program> getOsgProgram() const;
+
+	virtual void setGlobalScope(bool val);
+
+	virtual bool isGlobalScope();
+
 
 private:
 	/// OSG program attribute
@@ -123,6 +125,8 @@ private:
 	osg::ref_ptr<osg::Shader> m_geometryShader;
 	/// OSG fragment shader
 	osg::ref_ptr<osg::Shader> m_fragmentShader;
+
+	bool m_globalScope;
 };
 
 };  // namespace Graphics
