@@ -18,6 +18,13 @@
 
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Physics/Representation.h>
+#include <SurgSim/Physics/FemElement.h>
+#include <SurgSim/Physics/FemRepresentation.h>
+
+#include <SurgSim/Math/OdeSolver.h>
+#include <SurgSim/Math/Matrix.h>
+using SurgSim::Math::Matrix;
+using SurgSim::Math::OdeSolver;
 
 namespace SurgSim
 {
@@ -99,6 +106,79 @@ public:
 	{ return m_postUpdateCount; }
 };
 
+class MockFemElement : public FemElement
+{
+public:
+	MockFemElement() : FemElement()
+	{
+		setNumDofPerNode(3);
+	}
+
+	void addNode(unsigned int nodeId)
+	{
+		this->m_nodeIds.push_back(nodeId);
+	}
+
+	virtual double getVolume(const DeformableRepresentationState& state) const override
+	{ return 1; }
+	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+		double scale = 1.0) override
+	{}
+	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
+		double scale = 1.0) override
+	{}
+	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+		double scale = 1.0) override
+	{}
+	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+		double scale = 1.0) override
+	{}
+	virtual void addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* f,
+		SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K) override
+	{}
+	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
+		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
+	{}
+};
+
+// Concrete class for testing
+class MockFemRepresentation : public
+	FemRepresentation<Matrix, Matrix, Matrix, Matrix>
+{
+public:
+	/// Constructor
+	/// \param name The name of the FemRepresentation
+	explicit MockFemRepresentation(const std::string& name) :
+	FemRepresentation<Matrix, Matrix, Matrix, Matrix>(name)
+	{
+		this->m_numDofPerNode = 3;
+	}
+
+	/// Destructor
+	virtual ~MockFemRepresentation(){}
+
+	/// Query the representation type
+	/// \return the RepresentationType for this representation
+	virtual RepresentationType getType() const override
+	{
+		return REPRESENTATION_TYPE_INVALID;
+	}
+
+	std::shared_ptr<OdeSolver<DeformableRepresentationState, Matrix, Matrix, Matrix, Matrix>>
+		getOdeSolver() const
+	{
+		return this->m_odeSolver;
+	}
+
+protected:
+	/// Transform a state using a given transformation
+	/// \param[in,out] state The state to be transformed
+	/// \param transform The transformation to apply
+	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
+		const SurgSim::Math::RigidTransform3d& transform) override
+	{
+	}
+};
 
 }; // Physics
 }; // SurgSim

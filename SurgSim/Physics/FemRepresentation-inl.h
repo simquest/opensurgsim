@@ -41,6 +41,8 @@ FemRepresentation<MT, DT, KT, ST>::~FemRepresentation()
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::Initialize()
 {
+	SURGSIM_ASSERT(this->m_initialState != nullptr) << "You must set the initial state befor ecalling Initialize";
+
 	// Allocate the vector m_massPerNode
 	if (m_massPerNode.size() == 0 || m_massPerNode.size() < this->m_initialState->getNumNodes())
 	{
@@ -83,7 +85,7 @@ double FemRepresentation<MT, DT, KT, ST>::getTotalMass() const
 	double mass = 0.0;
 	for (auto it = std::begin(m_femElements); it != std::end(m_femElements); it++)
 	{
-		mass += (*it)->getMass(this->m_currentState);
+		mass += (*it)->getMass(*(this->m_currentState));
 	}
 	return mass;
 }
@@ -137,6 +139,11 @@ void FemRepresentation<MT, DT, KT, ST>::update(double dt)
 		return;
 	}
 
+	SURGSIM_ASSERT(this->m_odeSolver != nullptr) <<
+		"Ode solver has not been set yet. Did you call beforeUpdate() ?";
+	SURGSIM_ASSERT(this->m_initialState != nullptr) <<
+		"Initial state has not been set yet. Did you call setInitialState() ?";
+
 	// Solve the ode
 	this->m_odeSolver->solve(dt, *(this->m_currentState), this->m_newState.get());
 
@@ -153,6 +160,9 @@ void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 	{
 		return;
 	}
+
+	SURGSIM_ASSERT(this->m_initialState != nullptr) <<
+		"Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Back up the current state into the final state
 	*(this->m_finalState) = *(this->m_currentState);

@@ -21,42 +21,12 @@
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
+#include <SurgSim/Physics/UnitTests/MockObjects.h>
 
 using SurgSim::Physics::FemElement;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
-
-class MockFemElement : public FemElement
-{
-public:
-	MockFemElement() : FemElement()
-	{
-		setNumDofPerNode(3);
-	}
-
-	void addNode(unsigned int nodeId)
-	{
-		this->m_nodeIds.push_back(nodeId);
-	}
-
-	virtual double getVolume(const DeformableRepresentationState& state) const override
-	{ return 1; }
-	virtual void addForce(const DeformableRepresentationState& state, Vector* F, double scale = 1.0) override
-	{}
-	virtual void addMass(const DeformableRepresentationState& state, Matrix* M, double scale = 1.0) override
-	{}
-	virtual void addDamping(const DeformableRepresentationState& state, Matrix* D, double scale = 1.0) override
-	{}
-	virtual void addStiffness(const DeformableRepresentationState& state, Matrix* K, double scale = 1.0) override
-	{}
-	virtual void addFMDK(const DeformableRepresentationState& state, Vector* f, Matrix* M,
-		Matrix* D, Matrix* K) override
-	{}
-	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
-		const Vector& x, Vector* F) override
-	{}
-};
 
 void testSize(const Vector& v, int expectedSize)
 {
@@ -68,6 +38,12 @@ void testSize(const Matrix& m, int expectedRows, int expectedCols)
 	EXPECT_EQ(expectedRows, static_cast<int>(m.rows()));
 	EXPECT_EQ(expectedCols, static_cast<int>(m.cols()));
 }
+
+namespace SurgSim
+{
+
+namespace Physics
+{
 
 TEST(FemElementTests, GetSetAddMethods)
 {
@@ -126,3 +102,7 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_EQ(9, femElement.getNodeIds()[1]);
 	EXPECT_EQ(9, femElement.getNodeId(1));
 }
+
+} // namespace Physics
+
+} // namespace SurgSim
