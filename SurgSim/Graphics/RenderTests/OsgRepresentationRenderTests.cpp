@@ -51,30 +51,30 @@ namespace Graphics
 
 struct OsgRepresentationRenderTests : public ::testing::Test
 {
-    virtual void SetUp()
-    {
-        runtime = std::make_shared<SurgSim::Framework::Runtime>();
-        manager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	virtual void SetUp()
+	{
+		runtime = std::make_shared<SurgSim::Framework::Runtime>();
+		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-        runtime->addManager(manager);
+		runtime->addManager(manager);
 
-        scene = std::make_shared<SurgSim::Framework::Scene>();
-        runtime->setScene(scene);
+		scene = std::make_shared<SurgSim::Framework::Scene>();
+		runtime->setScene(scene);
 
-        viewElement = std::make_shared<OsgViewElement>("view element");
-        scene->addSceneElement(viewElement);
+		viewElement = std::make_shared<OsgViewElement>("view element");
+		scene->addSceneElement(viewElement);
 
-    }
+	}
 
-    virtual void TearDown()
-    {
-        runtime->stop();
-    }
+	virtual void TearDown()
+	{
+		runtime->stop();
+	}
 
-    std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-    std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
-    std::shared_ptr<SurgSim::Framework::Scene> scene;
-    std::shared_ptr<OsgViewElement> viewElement;
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
+	std::shared_ptr<SurgSim::Graphics::OsgManager> manager;
+	std::shared_ptr<SurgSim::Framework::Scene> scene;
+	std::shared_ptr<OsgViewElement> viewElement;
 
 protected:
 

@@ -42,14 +42,11 @@ class OsgPointCloudRepresentation : public PointCloudRepresentation<Data>, publi
 public:
 
 	/// Constructor
+	/// \param name The name of the Representation.
 	explicit OsgPointCloudRepresentation(const std::string& name);
 
 	/// Destructor
 	~OsgPointCloudRepresentation();
-
-	/// Sets Vertices.
-	/// \param	mesh	The mesh.
-	virtual void setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) override;
 
 	/// Gets the vertices.
 	/// \return	The vertices.

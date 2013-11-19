@@ -35,6 +35,8 @@ OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string
 	OsgRepresentation(name),
 	m_color(1.0,1.0,1.0,1.0)
 {
+	m_vertices = std::make_shared<SurgSim::DataStructures::Vertices<Data>>();
+
 	osg::Geode* geode = new osg::Geode();
 	m_geometry = new osg::Geometry();
 	m_vertexData = new osg::Vec3Array;
@@ -47,6 +49,7 @@ OsgPointCloudRepresentation<Data>::OsgPointCloudRepresentation(const std::string
 	m_drawArrays = new osg::DrawArrays(osg::PrimitiveSet::POINTS,0,m_vertexData->size());
 	m_geometry->addPrimitiveSet(m_drawArrays);
 	m_geometry->setUseDisplayList(false);
+	// m_geometry->setUseVertexBufferObjects(true);
 	m_geometry->setDataVariance(osg::Object::DYNAMIC);
 	m_geometry->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
@@ -67,51 +70,32 @@ OsgPointCloudRepresentation<Data>::~OsgPointCloudRepresentation()
 template <class Data>
 void OsgPointCloudRepresentation<Data>::doUpdate(double dt)
 {
-	if (m_vertices != nullptr)
+	auto vertices = m_vertices->getVertices();
+	size_t count = vertices.size();
+
+	// Check for size change in number of vertices
+	if (count != static_cast<size_t>(m_drawArrays->getCount()))
 	{
-		auto vertices = m_vertices->getVertices();
-		size_t count = vertices.size();
-
-		if (count != static_cast<size_t>(m_drawArrays->getCount()))
+		m_drawArrays->setCount(count);
+		if (count > m_vertexData->size())
 		{
-			m_drawArrays->setCount(count);
-			if (count > m_vertexData->size())
-			{
-				m_vertexData->resize(count);
-			}
+			m_vertexData->resize(count);
 		}
 
-		for (size_t i = 0; i < count; ++i)
-		{
-			(*m_vertexData)[i][0] = static_cast<float>(vertices[i].position[0]);
-			(*m_vertexData)[i][1] = static_cast<float>(vertices[i].position[1]);
-			(*m_vertexData)[i][2] = static_cast<float>(vertices[i].position[2]);
-		}
-
-		// todo recalculate the bounds here as well ...
 		m_drawArrays->set(osg::PrimitiveSet::POINTS,0,count);
 		m_drawArrays->dirty();
-		m_geometry->dirtyBound();
-		m_geometry->dirtyDisplayList();
 	}
-	else
+
+	for (size_t i = 0; i < count; ++i)
 	{
-		if (m_drawArrays->getCount() != 0)
-		{
-			m_drawArrays->setCount(0);
-			m_drawArrays->dirty();
-			m_geometry->dirtyBound();
-		}
+		(*m_vertexData)[i][0] = static_cast<float>(vertices[i].position[0]);
+		(*m_vertexData)[i][1] = static_cast<float>(vertices[i].position[1]);
+		(*m_vertexData)[i][2] = static_cast<float>(vertices[i].position[2]);
 	}
+
+	m_geometry->dirtyBound();
+	m_geometry->dirtyDisplayList();
 }
-
-
-template <class Data>
-void OsgPointCloudRepresentation<Data>::setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh)
-{
-	m_vertices = mesh;
-}
-
 
 template <class Data>
 std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> OsgPointCloudRepresentation<Data>::getVertices() const
@@ -136,10 +120,14 @@ template <class Data>
 void OsgPointCloudRepresentation<Data>::setColor(const SurgSim::Math::Vector4d& color)
 {
 	// Set the color of the particles to one single color by default
-	osg::Vec4Array* colors = new osg::Vec4Array;
-	colors->push_back(SurgSim::Graphics::toOsg(color));
-	m_geometry->setColorArray(colors);
-	m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+	osg::Vec4Array* colors = dynamic_cast<osg::Vec4Array*>(m_geometry->getColorArray());
+	if (colors == nullptr)
+	{
+		colors = new osg::Vec4Array(1);
+		m_geometry->setColorArray(colors);
+		m_geometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+	}
+	(*colors)[0] = SurgSim::Graphics::toOsg(color);
 	m_color = color;
 }
 
