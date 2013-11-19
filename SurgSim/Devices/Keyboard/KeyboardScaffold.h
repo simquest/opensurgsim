@@ -17,21 +17,28 @@
 #define SURGSIM_DEVICES_KEYBOARD_KEYBOARDSCAFFOLD_H
 
 #include <memory>
-
-#include <SurgSim/DataStructures/DataGroup.h>
 #include <SurgSim/Framework/Logger.h>
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+	class DataGroup;
+}
+
 namespace Device
 {
 class KeyboardDevice;
+class KeyboardHandler;
 
 /// A class that implements the behavior of KeyboardDevice objects.
 /// \sa SurgSim::Device::KeyboardDevice
 class KeyboardScaffold
 {
 	friend class KeyboardDevice;
+	friend class KeyboardHandler;
+	friend class KeyboardDeviceTest;
 
 public:
 	/// Constructor.
@@ -72,8 +79,10 @@ private:
 	/// Updates the device information for a single device.
 	/// \param info	The device data.
 	/// \return	true on success.
-	bool updateDevice(DeviceData* info);
+	bool updateDevice(int key, int key_modifier);
 
+	/// Get keyboard handler
+	/// \return The keyboard handler associated with this device
 	std::shared_ptr<KeyboardHandler> getKeyboardHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
@@ -84,7 +93,7 @@ private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
-
+	/// The keyboard device managed by this scaffold
 	std::shared_ptr<DeviceData> m_device;
 };
 

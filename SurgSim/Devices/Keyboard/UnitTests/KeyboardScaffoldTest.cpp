@@ -16,18 +16,9 @@
 ///// \file
 ///// Tests for the KeyboardScaffold class and its device interactions.
 //
-//#include <memory>
-//#include <string>
-//#include <boost/thread.hpp>
-//#include <boost/chrono.hpp>
 //#include <gtest/gtest.h>
 //#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 //#include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
-//#include "SurgSim/DataStructures/DataGroup.h"
-//#include "SurgSim/Input/InputConsumerInterface.h"
-//#include "SurgSim/Input/OutputProducerInterface.h"
-//#include "SurgSim/Math/RigidTransform.h"
-//#include "SurgSim/Math/Matrix.h"
 //
 //using SurgSim::Device::KeyboardDevice;
 //using SurgSim::Device::KeyboardScaffold;
@@ -36,7 +27,7 @@
 //{
 //	//KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
 //	std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//	ASSERT_NE(nullptr, scaffold) << "The scaffold was not created!";
+//	ASSERT_TRUE(nullptr != scaffold) << "The scaffold was not created!";
 //	std::weak_ptr<KeyboardScaffold> scaffold1 = scaffold;
 //	{
 //		std::shared_ptr<KeyboardScaffold> stillHaveScaffold = scaffold1.lock();
@@ -52,136 +43,15 @@
 //	scaffold.reset();
 //	{
 //		std::shared_ptr<KeyboardScaffold> dontHaveScaffold = scaffold1.lock();
-//		EXPECT_EQ(nullptr, dontHaveScaffold) << "Able to get scaffold from weak ref (with no strong ref)";
+//		EXPECT_TRUE(nullptr == dontHaveScaffold) << "Able to get scaffold from weak ref (with no strong ref)";
 //	}
 //
 //	scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//	ASSERT_NE(nullptr, scaffold) << "The scaffold was not created the 2nd time!";
+//	ASSERT_TRUE(nullptr != scaffold) << "The scaffold was not created the 2nd time!";
 //	std::weak_ptr<KeyboardScaffold> scaffold2 = scaffold;
 //	{
 //		std::shared_ptr<KeyboardScaffold> stillHaveScaffold = scaffold2.lock();
 //		ASSERT_NE(nullptr, stillHaveScaffold) << "Unable to get scaffold from weak ref (while strong ref exists)";
 //		ASSERT_EQ(scaffold, stillHaveScaffold) << "Scaffold mismatch!";
-//	}
-//}
-//
-//TEST(KeyboardScaffoldTest, ScaffoldLifeCycle)
-//{
-//	//KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-//	std::weak_ptr<KeyboardScaffold> lastScaffold;
-//	{
-//		std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//		ASSERT_NE(nullptr, scaffold) << "The scaffold was not created!";
-//		lastScaffold = scaffold;
-//	}
-//	{
-//		std::shared_ptr<KeyboardScaffold> dontHaveScaffold = lastScaffold.lock();
-//		EXPECT_EQ(nullptr, dontHaveScaffold) << "Able to get scaffold from weak ref (with no strong ref)";
-//		lastScaffold.reset();
-//	}
-//
-//	{
-//		std::shared_ptr<KeyboardDevice> device = std::make_shared<KeyboardDevice>("TestPhantom", "Default PHANToM");
-//		ASSERT_NE(nullptr, device) << "Creation failed.  Is a Keyboard device plugged in?";
-//		// note: the device is NOT initialized!
-//		{
-//			std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//			EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-//			lastScaffold = scaffold;  // save the scaffold for later
-//
-//			std::shared_ptr<KeyboardScaffold> sameScaffold = lastScaffold.lock();
-//			EXPECT_NE(nullptr, sameScaffold);
-//			EXPECT_EQ(scaffold, sameScaffold);
-//		}
-//		// The device has not been initialized, so it should NOT be hanging on to the device!
-//		{
-//			std::shared_ptr<KeyboardScaffold> deadScaffold = lastScaffold.lock();
-//			EXPECT_EQ(nullptr, deadScaffold);
-//		}
-//		// the ("empty") device is about to get destroyed
-//	}
-//
-//	{
-//		std::shared_ptr<KeyboardDevice> device = std::make_shared<KeyboardDevice>("TestPhantom", "Default PHANToM");
-//		ASSERT_NE(nullptr, device) << "Device creation failed.";
-//		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Keyboard device plugged in?";
-//		{
-//			std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//			EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-//			lastScaffold = scaffold;  // save the scaffold for later
-//
-//			std::shared_ptr<KeyboardScaffold> sameScaffold = lastScaffold.lock();
-//			EXPECT_NE(nullptr, sameScaffold);
-//			EXPECT_EQ(scaffold, sameScaffold);
-//		}
-//		// The same scaffold is supposed to still be around because of the device
-//		{
-//			std::shared_ptr<KeyboardScaffold> sameScaffold = lastScaffold.lock();
-//			EXPECT_NE(nullptr, sameScaffold);
-//
-//			std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//			EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-//			EXPECT_EQ(sameScaffold, scaffold);
-//		}
-//		// the device and the scaffold are about to get destroyed
-//	}
-//
-//	{
-//		std::shared_ptr<KeyboardScaffold> deadScaffold = lastScaffold.lock();
-//		EXPECT_EQ(nullptr, deadScaffold);
-//	}
-//
-//	{
-//		std::shared_ptr<KeyboardDevice> device = std::make_shared<KeyboardDevice>("TestPhantom", "Default PHANToM");
-//		ASSERT_NE(nullptr, device) << "Device creation failed.";
-//		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Didn't this work a moment ago?";
-//		std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//		EXPECT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-//
-//		std::shared_ptr<KeyboardScaffold> deadScaffold = lastScaffold.lock();
-//		EXPECT_EQ(nullptr, deadScaffold);
-//	}
-//}
-//
-//
-//TEST(KeyboardScaffoldTest, CreateDeviceSeveralTimes)
-//{
-//	//KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-//	std::weak_ptr<KeyboardScaffold> lastScaffold;
-//
-//	for (int i = 0;  i < 6;  ++i)
-//	{
-//		SCOPED_TRACE(i);
-//		EXPECT_EQ(nullptr, lastScaffold.lock());
-//		std::shared_ptr<KeyboardDevice> device = std::make_shared<KeyboardDevice>("TestPhantom", "Default PHANToM");
-//		ASSERT_NE(nullptr, device) << "Device creation failed.";
-//		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Keyboard device plugged in?";
-//		std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//		ASSERT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-//		lastScaffold = scaffold;
-//		// the device and the scaffold will be destroyed here
-//	}
-//}
-//
-//
-//TEST(KeyboardScaffoldTest, CreateDeviceSeveralTimesWithScaffoldRef)
-//{
-//	//KeyboardScaffold::setDefaultLogLevel(SurgSim::Framework::LOG_LEVEL_DEBUG);
-//	std::shared_ptr<KeyboardScaffold> lastScaffold;
-//
-//	for (int i = 0;  i < 6;  ++i)
-//	{
-//		SCOPED_TRACE(i);
-//		std::shared_ptr<KeyboardDevice> device = std::make_shared<KeyboardDevice>("TestPhantom", "Default PHANToM");
-//		ASSERT_NE(nullptr, device) << "Device creation failed.";
-//		ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a Keyboard device plugged in?";
-//		std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-//		ASSERT_NE(nullptr, scaffold) << "The scaffold was not retrieved!";
-//		if (! lastScaffold)
-//		{
-//			lastScaffold = scaffold;
-//		}
-//		EXPECT_EQ(lastScaffold, scaffold);
-//		// the device will be destroyed here, but the scaffold stays around because we have a shared_ptr to it.
 //	}
 //}

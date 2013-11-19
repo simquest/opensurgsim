@@ -38,20 +38,23 @@ KeyboardDevice::~KeyboardDevice()
 bool KeyboardDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
-	std::shared_ptr<KeyboardScaffold> scaffold = KeyboardScaffold::getOrCreateSharedInstance();
-	SURGSIM_ASSERT(scaffold);
 
-	m_scaffold = std::make_shared<KeyboardScaffold>();
+	m_scaffold = KeyboardScaffold::getOrCreateSharedInstance();
+	SURGSIM_ASSERT(m_scaffold);
+
 	m_scaffold->registerDevice(this);
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Initialized.";
+
 	return true;
 }
 
 bool KeyboardDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
+
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	m_scaffold.reset();
+
 	return true;
 }
 

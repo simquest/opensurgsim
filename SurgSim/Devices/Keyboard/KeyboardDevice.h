@@ -32,6 +32,7 @@ class KeyboardHandler;
 class KeyboardDevice : public SurgSim::Input::CommonDevice
 {
 	friend class KeyboardScaffold;
+	friend class KeyboardDeviceTest;
 
 public:
 	/// Constructor
@@ -51,6 +52,8 @@ public:
 	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
 	bool isInitialized() const;
 
+	/// Get keyboard handler
+	/// \return The keyboard handler associated with this device
 	std::shared_ptr<KeyboardHandler> getKeyboardHandler() const;
 
 private:
