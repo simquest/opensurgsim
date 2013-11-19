@@ -161,12 +161,8 @@ std::shared_ptr<SceneElement> createFem3D(const std::string& name,
 		ss << name + " Graphics object " << gfxObjectId;
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
 			std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
-		std::shared_ptr<SurgSim::DataStructures::Vertices<void>> vertices;
-		vertices = std::make_shared<SurgSim::DataStructures::Vertices<void>>();
 
 		graphicsRepresentation->setInitialPose(*gfxPose);
-
-		graphicsRepresentation->setVertices(vertices);
 		graphicsRepresentation->setColor(color);
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
