@@ -42,16 +42,19 @@ public:
 
 	virtual double getVolume(const DeformableRepresentationState& state) const override
 	{ return 1; }
-	virtual void addForce(const DeformableRepresentationState& state, Vector* F) override
+	virtual void addForce(const DeformableRepresentationState& state, Vector* F, double scale = 1.0) override
 	{}
-	virtual void addMass(const DeformableRepresentationState& state, Matrix* M) override
+	virtual void addMass(const DeformableRepresentationState& state, Matrix* M, double scale = 1.0) override
 	{}
-	virtual void addDamping(const DeformableRepresentationState& state, Matrix* D) override
+	virtual void addDamping(const DeformableRepresentationState& state, Matrix* D, double scale = 1.0) override
 	{}
-	virtual void addStiffness(const DeformableRepresentationState& state, Matrix* K) override
+	virtual void addStiffness(const DeformableRepresentationState& state, Matrix* K, double scale = 1.0) override
 	{}
 	virtual void addFMDK(const DeformableRepresentationState& state, Vector* f, Matrix* M,
 		Matrix* D, Matrix* K) override
+	{}
+	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
+		const Vector& x, Vector* F) override
 	{}
 };
 
