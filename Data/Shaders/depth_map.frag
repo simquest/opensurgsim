@@ -14,7 +14,8 @@
 // limitations under the License.
 
 /// \file depth.frag
-/// Fragment shader to produce simple depth map
+/// Calculate the distance of fragments from a given origin (in most cases 
+/// a light source)
 
 vec4 encodeDepth(float depth)
 {

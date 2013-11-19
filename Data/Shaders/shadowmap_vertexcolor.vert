@@ -13,21 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// \file shadowMapping.frag
-/// Vertex Shader, moves the point into the coordinate system of the depth map generated
-/// by depth.[vert|frag]
+/// \file shadowmap_vertexcolor.vert
+/// Vertex shader for simple default material, lighting from a single light source, per vertex
 
-uniform mat4 oss_inverseViewMatrix;
-uniform mat4 oss_lightViewMatrix;
-uniform mat4 oss_lightProjectionMatrix;
+/// outgoing calculated color for this vertex
+varying vec4 color;
 
-varying vec4 lightCoord;
+/// outgoing calculated projected coordinates for this vertex
+varying vec4 clipCoord;
 
 void main(void) 
 {
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	clipCoord = gl_Position;
+	
+	vec4 eyeDir4 = gl_ModelViewMatrix * gl_Vertex;
+	vec3 eyeDir = normalize(eyeDir4.xyz);
 
-	//compute light coord
-    lightCoord = oss_lightProjectionMatrix * oss_lightViewMatrix * oss_inverseViewMatrix * gl_ModelViewMatrix *  gl_Vertex;
+	vec3 lightDir = gl_LightSource[0].position.xyz - eyeDir4.xyz;
+	float lightDistance = length(lightDir);
+    lightDir = normalize(lightDir);
+	
+	vec3 normal = normalize(gl_NormalMatrix * gl_Normal);
+    
+    float attenuation = 1.0 / (gl_LightSource[0].constantAttenuation + gl_LightSource[0].linearAttenuation*lightDistance + 
+		gl_LightSource[0].quadraticAttenuation*lightDistance*lightDistance);
+    
+    color.rgb = attenuation * dot(lightDir, normal) * gl_Color.rgb * gl_LightSource[0].diffuse.rgb;
+	color.a = gl_Color.a;
 } 
- 
