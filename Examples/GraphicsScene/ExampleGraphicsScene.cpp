@@ -51,6 +51,7 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Framework::Logger;
 
 using SurgSim::Graphics::OsgUniform;
+using SurgSim::Graphics::OsgTextureUniform;
 using SurgSim::Graphics::OsgTexture2d;
 
 #include <osg/Matrix>
@@ -76,17 +77,26 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
 	if (filename == "")
 	{
 		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not find vertex shader " << vertexShaderName;
-		return nullptr;
+		success = false;
 	}
-	success = success && shader->loadVertexShaderSource(filename);
+	else if (! shader->loadVertexShaderSource(filename))
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not load vertex shader " << vertexShaderName;
+		success = false;
+	}
+
 
 	filename = data.findFile(fragmentShaderName);
 	if (filename == "")
 	{
 		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not find fragment shader " << fragmentShaderName;
-		return nullptr;
+		success = false;
 	}
-	success = success && shader->loadFragmentShaderSource(filename);
+	if (! shader->loadFragmentShaderSource(filename))
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not load fragment shader " << fragmentShaderName;
+		success = false;
+	}
 
 	std::shared_ptr<SurgSim::Graphics::OsgMaterial> material;
 	if (success)
@@ -94,6 +104,7 @@ std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
 		material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
 		material->setShader(shader);
 	}
+
 	return material;
 
 }
@@ -126,6 +137,7 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> lightMapPass()
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
+	materials["depthMap"]->getShader()->setGlobalScope(true);
 	pass->setMaterial(materials["depthMap"]);
 	return pass;
 }
@@ -136,18 +148,19 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> shadowCastPass()
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
 	pass->setRenderTarget(renderTarget);
 	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 1);
-	pass->setMaterial(materials["shadowedVertexColors"]);
+	materials["shadowMap"]->getShader()->setGlobalScope(true);
+	pass->setMaterial(materials["shadowMap"]);
 	return pass;
 }
 
 class SimpleBox : public SurgSim::Blocks::BasicSceneElement
 {
 public:
-	SimpleBox(const std::string& name) : BasicSceneElement(name)
+	explicit SimpleBox(const std::string& name) : BasicSceneElement(name)
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName()+" Graphics");
 		m_box->setInitialPose(RigidTransform3d::Identity());
-		//m_box->setMaterial(materials["default"]);
+		m_box->setMaterial(materials["basicShadowed"]);
 		m_box->addGroupReference("shadowing");
 		m_box->addGroupReference("shadowed");
 	}
@@ -206,7 +219,7 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 
 	camera = pass2->getCamera();
 	camera->setViewMatrix(SurgSim::Math::makeViewMatrix(Vector3d(3,3,3), Vector3d(0,0,0), Vector3d(0,1,0)));
-	
+
 
 	// Connect pass1 parameters to pass2 parameters
 	// Pass1 Camera becomes lightViewCamera in Pass2
@@ -229,13 +242,22 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	inverseViewMatrix->set(pass2->getCamera()->getViewMatrix().inverse().cast<float>());
 	pass2->getMaterial()->addUniform(inverseViewMatrix);
 
-	auto lightDepthTexture = 
-		std::make_shared<SurgSim::Graphics::OsgUniform<std::shared_ptr<SurgSim::Graphics::OsgTexture2d>>>("oss_encodedLightDepthMap");
+	auto lightDepthTexture =
+		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_encodedLightDepthMap");
 	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass1->getRenderTarget()->getColorTarget(0)));
 	pass2->getMaterial()->addUniform(lightDepthTexture);
 
 	scene->addSceneElement(pass1);
 	scene->addSceneElement(pass2);
+
+	// Put the result of the last pass into the main camera to make it accessible
+	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
+	auto shadowMapTexture =
+		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_shadowmap");
+	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass2->getRenderTarget()->getColorTarget(0)));
+	material->addUniform(shadowMapTexture);
+
+	graphicsManager->getDefaultCamera()->setMaterial(material);
 
 	return scene;
 }
@@ -247,16 +269,17 @@ int main(int argc, char* argv[])
 
 	materials["basicLit"] = loadMaterial(data, "Shaders/basic_lit");
 	materials["basicUnlit"] = loadMaterial(data, "Shaders/basic_unlit");
+	materials["basicShadowed"] = loadMaterial(data, "Shaders/shadowmap_vertexcolor");
 	materials["depthMap"] = loadMaterial(data, "Shaders/depth_map");
-	materials["shadowedVertexColors"] = loadMaterial(data, "Shaders/shadowmap_vertexcolor");
-	materials["default"] = materials["basicLit"];
+	materials["shadowMap"] = loadMaterial(data, "Shaders/shadow_map");
+	materials["default"] = materials["basic_lit"];
 
 	auto runtime(std::make_shared<SurgSim::Framework::Runtime>());
 	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.5, 0.5, 0.5)));
-	
+
 	runtime->addManager(graphicsManager);
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
