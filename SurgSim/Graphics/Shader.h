@@ -34,7 +34,7 @@ public:
 	virtual ~Shader() = 0;
 
 	/// Returns true if the vertex shader has been set, otherwise false.
-	virtual bool hasVertexShader() = 0;
+	virtual bool hasVertexShader() const = 0;
 
 	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
 	virtual void clearVertexShader() = 0;
@@ -107,7 +107,7 @@ public:
 
 	/// Query if this shader is of global scope.
 	/// \return	true if global scope, false if not.
-	virtual bool isGlobalScope() = 0;
+	virtual bool isGlobalScope() const = 0;
 
 };
 

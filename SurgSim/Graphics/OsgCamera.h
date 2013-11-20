@@ -57,47 +57,47 @@ public:
 	/// Only the representations in this group will be rendered when this camera's view is rendered.
 	/// \param	group	Group of representations
 	/// \return	True if it succeeded, false if it failed
-	virtual bool setGroup(std::shared_ptr<Group> group);
+	virtual bool setGroup(std::shared_ptr<Group> group) override;
 
 	/// Sets whether the camera is currently visible
 	/// When the camera is invisible, it does not produce an image.
 	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible);
+	virtual void setVisible(bool visible) override;
 
 	/// Gets whether the camera is currently visible
 	/// When the camera is invisible, it does not produce an image.
 	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const;
+	virtual bool isVisible() const override;
 
 	/// Sets the current pose of the camera
 	/// The view matrix is set to the inverse of the transform.
 	/// \param	transform	Rigid transformation that describes the current pose of the camera
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform);
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& transform) override;
 
 	/// Gets the current pose of the camera
 	/// The transform returned is the inverse of the view matrix.
 	/// \return	Rigid transformation that describes the current pose of the camera
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const;
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 
 	/// Sets the view matrix of the camera
 	/// \param	matrix	View matrix
-	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix);
+	virtual void setViewMatrix(const SurgSim::Math::Matrix44d& matrix) override;
 
 	/// Gets the view matrix of the camera
 	/// \return	View matrix
-	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const;
+	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const override;
 
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
-	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
+	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) override;
 
 	/// Gets the projection matrix of the camera
 	/// \return	Projection matrix
-	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const;
+	virtual const SurgSim::Math::Matrix44d& getProjectionMatrix() const override;
 
 	/// Updates the camera.
 	/// \param	dt	The time in seconds of the preceding timestep.
-	virtual void update(double dt);
+	virtual void update(double dt) override;
 
 	/// Returns the OSG camera node
 	inline osg::ref_ptr<osg::Camera> getOsgCamera() const
@@ -121,14 +121,14 @@ public:
 	/// Sets a material on the group that has been attached to the camera.
 	/// \param	material	The material.
 	/// \return	true if it succeeds, false if there is no group or the material is not an OsgMaterial.
-	virtual bool setMaterial(std::shared_ptr<Material> material);
+	virtual bool setMaterial(std::shared_ptr<Material> material) override;
 
 	/// Gets the material if set.
 	/// \return	The material.
-	virtual std::shared_ptr<Material> getMaterial() const;
+	virtual std::shared_ptr<Material> getMaterial() const override;
 
 	/// Clears the material from the attached group
-	virtual void clearMaterial();
+	virtual void clearMaterial() override;
 
 	/// Determine when this camera will render. The main camera will render at (RENDER_ORDER_IN_ORDER,0)
 	/// In general all preprocessing should be done in RENDER_ORDER_PRE_ORDER, HUD Displaying usually

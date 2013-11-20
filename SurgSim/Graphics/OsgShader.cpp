@@ -34,7 +34,7 @@ void OsgShader::removeFromStateSet(osg::StateSet* stateSet)
 	stateSet->removeAttribute(m_program);
 }
 
-bool OsgShader:: hasVertexShader()
+bool OsgShader:: hasVertexShader() const
 {
 	return m_vertexShader.valid();
 }
@@ -188,7 +188,7 @@ void SurgSim::Graphics::OsgShader::setGlobalScope(bool val)
 	m_globalScope = val;
 }
 
-bool SurgSim::Graphics::OsgShader::isGlobalScope()
+bool SurgSim::Graphics::OsgShader::isGlobalScope() const
 {
 	return m_globalScope;
 }

@@ -50,7 +50,7 @@ public:
 	virtual void removeFromStateSet(osg::StateSet* stateSet);
 
 	/// Returns true if the vertex shader has been set, otherwise false.
-	virtual bool hasVertexShader();
+	virtual bool hasVertexShader() const;
 
 	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
 	virtual void clearVertexShader();
@@ -110,9 +110,9 @@ public:
 	/// Returns the OSG program attribute
 	osg::ref_ptr<osg::Program> getOsgProgram() const;
 
-	virtual void setGlobalScope(bool val);
+	virtual void setGlobalScope(bool val) override;
 
-	virtual bool isGlobalScope();
+	virtual bool isGlobalScope() const override;
 
 
 private:
