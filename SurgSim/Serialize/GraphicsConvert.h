@@ -25,7 +25,7 @@
 
 namespace YAML
 {
-	/// Specialize of YAML::convert<> template Presensation class.
+	/// Specialize of YAML::convert<> template Represensation class.
 	template <>
 	struct convert <SurgSim::Graphics::Representation>
 	{
@@ -34,7 +34,7 @@ namespace YAML
 
 	};
 
-	/// Specialize of YAML::convert<> template SpherePresensation class.
+	/// Specialize of YAML::convert<> template SphereRepresensation class.
 	template <>
 	struct convert <SurgSim::Graphics::SphereRepresentation>
 	{

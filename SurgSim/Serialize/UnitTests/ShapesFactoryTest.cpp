@@ -38,28 +38,14 @@
 
 #include <SurgSim/Serialize/ShapesFactory.h>
 
-class ShapesFactoryTest : public ::testing::Test
-{
-protected:
 
-	// Setup the testing
-	void SetUp()
-	{
-	}
-
-	// Remove the testing
-	void TearDown()
-	{
-	}
-};
-
-TEST_F(ShapesFactoryTest, InitTest)
+TEST(ShapesFactoryTest, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<SurgSim::Serialize::ShapesFactory> rigidShapesFactory =
 		std::make_shared<SurgSim::Serialize::ShapesFactory>();});
 }
 
-TEST_F(ShapesFactoryTest, CreateShapeInstancesTest)
+TEST(ShapesFactoryTest, CreateShapeInstancesTest)
 {
 	std::shared_ptr<SurgSim::Serialize::ShapesFactory> rigidShapesFactory =
 		std::make_shared<SurgSim::Serialize::ShapesFactory>();
@@ -78,7 +64,7 @@ TEST_F(ShapesFactoryTest, CreateShapeInstancesTest)
 	EXPECT_NE(boxShape1, boxShape2);
 }
 
-TEST_F(ShapesFactoryTest, CreateShapesTest)
+TEST(ShapesFactoryTest, CreateShapesTest)
 {
 	std::shared_ptr<SurgSim::Serialize::ShapesFactory> rigidShapesFactory =
 		std::make_shared<SurgSim::Serialize::ShapesFactory>();
@@ -117,7 +103,7 @@ TEST_F(ShapesFactoryTest, CreateShapesTest)
 
 }
 
-TEST_F(ShapesFactoryTest, NonRegisterTest)
+TEST(ShapesFactoryTest, NonRegisterTest)
 {
 	std::shared_ptr<SurgSim::Serialize::ShapesFactory> rigidShapesFactory =
 		std::make_shared<SurgSim::Serialize::ShapesFactory>();

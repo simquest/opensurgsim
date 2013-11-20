@@ -20,9 +20,9 @@
 #include <SurgSim/Framework/Log.h>
 
 #define OSS_SERIALIZE(T)\
-	YAML::Node encode();\
-	bool decode(const YAML::Node& node);\
-	std::string getClassName() {return std::string(#T);}\
+	virtual YAML::Node encode() override;\
+	virtual bool decode(const YAML::Node& node) override; \
+	virtual std::string getClassName() override {return std::string(#T);}\
 
 namespace SurgSim
 {

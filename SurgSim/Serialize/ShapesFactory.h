@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Serialize
 {
 
-/// An factory implementation for shapes
+/// A factory implementation for shapes
 class ShapesFactory
 {
 public:
@@ -48,10 +48,10 @@ public:
 
 private:
 	/// A wrapper of function object
-	typedef boost::function<std::shared_ptr<SurgSim::Math::Shape> ()> shapesFactoryFunction;
+	typedef boost::function<std::shared_ptr<SurgSim::Math::Shape> ()> ShapesFactoryFunction;
 
 	/// Look up table for shapes factory.
-	std::map<std::string, shapesFactoryFunction> m_registerDirectory;
+	std::map<std::string, ShapesFactoryFunction> m_registerDirectory;
 
 };
 

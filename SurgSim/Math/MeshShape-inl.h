@@ -243,13 +243,17 @@ template <class VertexData, class EdgeData, class TriangleData>
 YAML::Node SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::encode()
 {
 	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+
 	return node;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 bool SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::decode(const YAML::Node& node)
 {
-	return true;
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	
+	return isSuccess;
 }
 
 

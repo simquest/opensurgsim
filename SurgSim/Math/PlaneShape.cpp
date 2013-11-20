@@ -64,12 +64,7 @@ YAML::Node SurgSim::Math::PlaneShape::encode()
 bool SurgSim::Math::PlaneShape::decode(const YAML::Node& node)
 {
 	bool isSuccess = SurgSim::Math::Shape::decode(node);
-	if (! isSuccess)
-	{
-		return false;
-	}
-
-	return true;
+	return isSuccess;
 }
 
 }; // namespace Math

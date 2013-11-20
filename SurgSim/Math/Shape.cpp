@@ -25,5 +25,6 @@ YAML::Node SurgSim::Math::Shape::encode()
 
 bool SurgSim::Math::Shape::decode(const YAML::Node& node)
 {
+	SURGSIM_ASSERT(node["ClassName"].as<std::string>() == getClassName());
 	return true;
 }
