@@ -95,10 +95,12 @@ public:
 		return m_normal;
 	}
 
-	/// Compare the vertex data and return true if equal, false if not equal.
-	friend bool operator==(const MockVertexData& data1, const MockVertexData& data2)
+	/// Compare the vertex data to another one (equality)
+	/// \param data The MockVertexData to compare it to
+	/// \return True if the two vertex data are equal, False otherwise
+	bool operator==(const MockVertexData& data) const
 	{
-		return data1.m_id == data2.m_id && (data1.m_normal - data2.m_normal).norm() < 1.0e-10;
+		return m_id == data.m_id && (m_normal - data.m_normal).norm() < 1.0e-10;
 	}
 private:
 	/// Vertex's unique ID in its mesh
@@ -128,10 +130,12 @@ public:
 		return m_id;
 	}
 
-	/// Compare the edge data and return true if equal, false if not equal.
-	friend bool operator==(const MockEdgeData& data1, const MockEdgeData& data2)
+	/// Compare the edge data to another one (equality)
+	/// \param data The MockEdgeData to compare it to
+	/// \return True if the two edge data are equal, False otherwise
+	bool operator==(const MockEdgeData& data) const
 	{
-		return data1.m_id == data2.m_id;
+		return m_id == data.m_id;
 	}
 private:
 	/// Edge's unique ID in its mesh
@@ -167,10 +171,12 @@ public:
 		return m_edges;
 	}
 
-	/// Compare the triangle data and return true if equal, false if not equal.
-	friend bool operator==(const MockTriangleData& data1, const MockTriangleData& data2)
+	/// Compare the triangle data to another one (equality)
+	/// \param data The MockTriangleData to compare it to
+	/// \return True if the two triangle data are equal, False otherwise
+	bool operator==(const MockTriangleData& data) const
 	{
-		return data1.m_id == data2.m_id && data1.m_edges == data2.m_edges;
+		return m_id == data.m_id && m_edges == data.m_edges;
 	}
 private:
 	/// Triangle's unique ID in its mesh
@@ -191,37 +197,39 @@ public:
 		const std::array<unsigned int, 6>& edges,
 		const std::array<unsigned int, 4>& triangles) :
 	  m_id(id), m_edges(edges), m_triangles(triangles)
-	  {
-	  }
+	{
+	}
 
-	  /// Destructor
-	  virtual ~MockTetrahedronData()
-	  {
-	  }
+	/// Destructor
+	virtual ~MockTetrahedronData()
+	{
+	}
 
-	  /// Gets the tetrahedron's unique ID in its mesh.
-	  unsigned int getId() const
-	  {
-		  return m_id;
-	  }
+	/// Gets the tetrahedron's unique ID in its mesh.
+	unsigned int getId() const
+	{
+		return m_id;
+	}
 
-	  /// Gets the IDs of the tetrahedron's edges in its mesh.
-	  const std::array<unsigned int, 6>& getEdges() const
-	  {
-		  return m_edges;
-	  }
+	/// Gets the IDs of the tetrahedron's edges in its mesh.
+	const std::array<unsigned int, 6>& getEdges() const
+	{
+		return m_edges;
+	}
 
-	  /// Gets the IDs of the tetrahedron's triangles in its mesh.
-	  const std::array<unsigned int, 4>& getTriangles() const
-	  {
-		  return m_triangles;
-	  }
+	/// Gets the IDs of the tetrahedron's triangles in its mesh.
+	const std::array<unsigned int, 4>& getTriangles() const
+	{
+		return m_triangles;
+	}
 
-	  /// Compare the tetrahedron data and return true if equal, false if not equal.
-	  friend bool operator==(const MockTetrahedronData& data1, const MockTetrahedronData& data2)
-	  {
-		  return data1.m_id == data2.m_id && data1.m_edges == data2.m_edges && data1.m_triangles == data2.m_triangles;
-	  }
+	/// Compare the tetrahedron data (equality)
+	/// \param data The MockTetrahedronData to compare it to
+	/// \return True if the two tetrahedron data are equals, False otherwise
+	bool operator==(const MockTetrahedronData& data) const
+	{
+		return m_id == data.m_id && m_edges == data.m_edges && m_triangles == data.m_triangles;
+	}
 private:
 	/// Tetrahedron's unique ID in its mesh
 	unsigned int m_id;

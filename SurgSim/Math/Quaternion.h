@@ -74,7 +74,7 @@ inline Eigen::Quaternion<T, QOpt> negate(const Eigen::Quaternion<T, QOpt>& q)
 /// \param [out] axis the axis of the rotation.
 template <typename T, int QOpt, int VOpt>
 inline void computeAngleAndAxis(const Eigen::Quaternion<T, QOpt>& quaternion,
-                                T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
+								T* angle, Eigen::Matrix<T, 3, 1, VOpt>* axis)
 {
 	using SurgSim::Math::negate;
 

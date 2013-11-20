@@ -57,16 +57,20 @@ struct MeshElement
 	/// Extra element data.
 	Data data;
 
-	/// Compare the elements and return true if equal, false if not equal.
-	friend bool operator==(const MeshElement<N, Data>& element1, const MeshElement<N, Data>& element2)
+	/// Compare the element with another one (equality)
+	/// \param element The MeshElement to compare it to
+	/// \return True if the two MeshElements are equals, False otherwise
+	bool operator==(const MeshElement<N, Data>& element) const
 	{
-		return element1.verticesId == element2.verticesId && element1.data == element2.data;
+		return verticesId == element.verticesId && data == element.data;
 	}
 
-	/// Compare the elements and return false if equal, true if not equal.
-	friend bool operator!=(const MeshElement<N, Data>& element1, const MeshElement<N, Data>& element2)
+	/// Compare the element with another one (inequality)
+	/// \param element The MeshElement to compare it to
+	/// \return False if the two MeshElements are equals, True otherwise
+	bool operator!=(const MeshElement<N, Data>& element) const
 	{
-		return ! (element1 == element2);
+		return ! ((*this) == element);
 	}
 };
 
@@ -85,16 +89,20 @@ struct MeshElement<N, void>
 	/// Element vertices.
 	std::array<unsigned int, N> verticesId;
 
-	/// Compare the elements and return true if equal, false if not equal.
-	friend bool operator==(const MeshElement<N, void>& element1, const MeshElement<N, void>& element2)
+	/// Compare the element with another one (equality)
+	/// \param element The MeshElement to compare it to
+	/// \return True if the two MeshElements are equals, False otherwise
+	bool operator==(const MeshElement<N, void>& element) const
 	{
-		return element1.verticesId == element2.verticesId;
+		return verticesId == element.verticesId;
 	}
 
-	/// Compare the elements and return false if equal, true if not equal.
-	friend bool operator!=(const MeshElement<N, void>& element1, const MeshElement<N, void>& element2)
+	/// Compare the element with another one (inequality)
+	/// \param element The MeshElement to compare it to
+	/// \return False if the two MeshElements are equals, True otherwise
+	bool operator!=(const MeshElement<N, void>& element) const
 	{
-		return ! (element1 == element2);
+		return ! ((*this) == element);
 	}
 };
 

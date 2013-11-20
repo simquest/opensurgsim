@@ -60,18 +60,18 @@ TEST_F(OsgCylinderRepresentationRenderTests, MovingCylinderTest)
 	Vector2d cylinder1Size, cylinder2Size;
 
 	/// Initial and final position (X, Y, Z) of cylinder 1
-    Vector3d startPosition1(-0.1, 0.0, -0.2), finalPosition1(0.1, 0.0, -0.2);
-    /// Initial size (radius, height) and final size of cylinder 1
-    Vector2d startSize1(0.001, 0.011), finalSize1(0.01, 0.02);
-    /// Initial angles (X, Y, Z) and final of the cylinder 1
-    Vector3d startAngles1(0.0, 0.0, 0.0), finalAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
+	Vector3d startPosition1(-0.1, 0.0, -0.2), finalPosition1(0.1, 0.0, -0.2);
+	/// Initial size (radius, height) and final size of cylinder 1
+	Vector2d startSize1(0.001, 0.011), finalSize1(0.01, 0.02);
+	/// Initial angles (X, Y, Z) and final of the cylinder 1
+	Vector3d startAngles1(0.0, 0.0, 0.0), finalAngles1(-M_PI_4, -M_PI_4, -M_PI_4);
 
-    /// Initial and final position (X, Y, Z) cylinder 2
-    Vector3d startPosition2(0.0, -0.1, -0.2), finalPosition2(0.0, 0.1, -0.2);
-    /// Initial and final size (radius, height) of cylinder 2
-    Vector2d startSize2(0.001, 0.011), finalSize2(0.01, 0.02);
-    /// Initial and final angles (X, Y, Z) of the cylinder 2
-    Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2), finalAngles2(M_PI, M_PI, M_PI);
+	/// Initial and final position (X, Y, Z) cylinder 2
+	Vector3d startPosition2(0.0, -0.1, -0.2), finalPosition2(0.0, 0.1, -0.2);
+	/// Initial and final size (radius, height) of cylinder 2
+	Vector2d startSize2(0.001, 0.011), finalSize2(0.01, 0.02);
+	/// Initial and final angles (X, Y, Z) of the cylinder 2
+	Vector3d startAngles2(-M_PI_2, -M_PI_2, -M_PI_2), finalAngles2(M_PI, M_PI, M_PI);
 
 	/// Number of times to step the cylinder position and radius from start to end.
 	/// This number of steps will be done in 1 second.

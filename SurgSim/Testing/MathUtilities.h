@@ -16,6 +16,7 @@
 #ifndef SURGSIM_TESTING_MATHUTILITIES_H
 #define SURGSIM_TESTING_MATHUTILITIES_H
 
+#include <utility>
 
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Vector.h>
@@ -35,6 +36,12 @@ namespace Testing
 	T interpolate(const T& start, const T& end,const double& t)
 	{
 		return (1-t)*start + t*end;
+	}
+
+	template <class T>
+	T interpolate(const std::pair<T,T>& values, const double& t)
+	{
+		return interpolate<T>(values.first, values.second, t);
 	}
 
 	/// Specialized template to call the correct function for Quaterniond, might be superfluous,
