@@ -16,6 +16,11 @@
 #include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
 #include <SurgSim/Devices/Keyboard/KeyboardHandler.h>
 
+#include <osg/Geode>
+#include <osg/MatrixTransform>
+#include <osg/Projection>
+#include <osgGA/GUIEventHandler>
+#include <osgText/Text>
 #include <osgViewer/config/SingleWindow>
 #include <osgViewer/Viewer>
 
@@ -23,11 +28,30 @@ int main(int argc, char* argv[])
 {
 	auto toolDevice	 = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
 	toolDevice->initialize();
-	auto keyboardHandler = toolDevice->getKeyboardHandler();
-	osgViewer::Viewer viewer;
-	viewer.addEventHandler(keyboardHandler);
-	viewer.setSceneData(new osg::Group);
-	viewer.apply(new osgViewer::SingleWindow(100, 200, 600, 400));
-	viewer.run();
+	osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandler = toolDevice->getKeyboardHandler();
+
+	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
+	viewer->apply(new osgViewer::SingleWindow(100, 200, 600, 400));
+	viewer->addEventHandler(keyboardHandler);
+
+	osg::ref_ptr<osg::Group> group = new osg::Group;
+	viewer->setSceneData(group);
+
+	osg::ref_ptr<osg::MatrixTransform> matrixTransform = new osg::MatrixTransform;
+	matrixTransform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+
+	osg::ref_ptr<osg::Projection> projection = new osg::Projection;
+	projection->setMatrix(osg::Matrix::ortho2D(0, 600, -300, 400));
+
+	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
+	osg::ref_ptr<osgText::Text> text = new osgText::Text;
+	text->setText("Press any key\nAnd the key code will\nbe shown in std::cerr");
+
+	geode->addDrawable(text);
+	projection->addChild(geode);
+	matrixTransform->addChild(projection);
+	group->addChild(matrixTransform);
+
+	viewer->run();
 	return 0;
 }

@@ -43,16 +43,16 @@ void TransferKeyboardBehavior::update(double dt)
 	auto pose = m_to->getPose();
 	switch(key)
 	{
-	case SurgSim::Device::KeyCode::KEY_Left:
+	case SurgSim::Device::KeyCode::KEY_LEFT:
 		std::cerr << "Left Arrow key pressed" << std::endl;
 		break;
-	case SurgSim::Device::KeyCode::KEY_Up:
+	case SurgSim::Device::KeyCode::KEY_UP:
 		std::cerr << "Up Arrow key pressed" << std::endl;
 		break;
-	case SurgSim::Device::KeyCode::KEY_Right:
+	case SurgSim::Device::KeyCode::KEY_RIGHT:
 		std::cerr << "Right Arrow key pressed" << std::endl;
 		break;
-	case SurgSim::Device::KeyCode::KEY_Down:
+	case SurgSim::Device::KeyCode::KEY_DOWN:
 		std::cerr << "Down Arrow key pressed" << std::endl;
 		break;
 	default:

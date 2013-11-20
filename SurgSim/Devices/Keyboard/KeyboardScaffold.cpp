@@ -37,19 +37,10 @@ struct KeyboardScaffold::DeviceData
 		keyboardHandler = new KeyboardHandler();
 	}
 
-	~DeviceData()
-	{
-		/* Not releasing keyboardHandler leads to memory leak here.
-		   However, after adding keyboardHandler to a OsgView,
-		   when a OsgView being destroyed, it will accidentally (bug in OSG) delete
-		   the keyboard event handler it has.
-		*/
-	}
-
 	/// Device object managed by this scaffold.
 	KeyboardDevice* const deviceObject;
 	/// Keyboard Handler to communicate with underneath API.
-	KeyboardHandler* keyboardHandler;
+	osg::ref_ptr<KeyboardHandler> keyboardHandler;
 	/// The mutex that protects the externally modifiable parameters.
 	boost::mutex mutex;
 
@@ -108,7 +99,7 @@ bool KeyboardScaffold::updateDevice(int key, int key_modifier)
 	return true;
 }
 
-KeyboardHandler* KeyboardScaffold::getKeyboardHandler() const
+osg::ref_ptr<KeyboardHandler> KeyboardScaffold::getKeyboardHandler() const
 {
 	return m_device->keyboardHandler;
 }

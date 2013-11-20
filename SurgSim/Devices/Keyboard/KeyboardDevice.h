@@ -21,6 +21,8 @@
 
 #include <SurgSim/Input/CommonDevice.h>
 
+#include <osg/ref_ptr>
+
 namespace SurgSim
 {
 namespace Device
@@ -54,7 +56,7 @@ public:
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	KeyboardHandler* getKeyboardHandler() const;
+	osg::ref_ptr<KeyboardHandler> getKeyboardHandler() const;
 
 private:
 	/// Communication with hardware is handled by scaffold.

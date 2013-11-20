@@ -19,6 +19,8 @@
 #include <memory>
 #include <SurgSim/Framework/Logger.h>
 
+#include <osg/ref_ptr>
+
 namespace SurgSim
 {
 
@@ -83,7 +85,7 @@ private:
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	KeyboardHandler* getKeyboardHandler() const;
+	osg::ref_ptr<KeyboardHandler> getKeyboardHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();

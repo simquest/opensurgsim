@@ -40,8 +40,9 @@ public:
 		switch(ea.getEventType())
 		{
 		case(osgGA::GUIEventAdapter::KEYDOWN) :
-		{
-			m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), 0); //key_modifier is passed as '0' for now
+		{// Note that we are setting the modifier mask here instead of the modifier itself
+			m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), ea.getModKeyMask());
+			std::cerr << "Key code for pressed key: "<< ea.getKey() << std::endl;
 			return true;
 		}
 		case(osgGA::GUIEventAdapter::KEYUP) :

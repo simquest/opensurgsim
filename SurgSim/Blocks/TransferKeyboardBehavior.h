@@ -34,7 +34,9 @@ namespace Framework
 
 namespace Blocks
 {
-
+/// Behavior to get input information from a keyboard device and perform some action.
+/// Currently, only "Left", "Right", "Up" and "Down" key information is captured by this behavior.
+/// After recieving thoes keys, this bevhavior will simply output a message on std::cerr.
 class TransferKeyboardBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -51,9 +53,11 @@ public:
 
 protected:
 	/// Initialize the behavior
+	/// \return True if initialization is successful; otherwise, false;
 	virtual bool doInitialize() override;
 
 	/// Wakeup the behavior
+	/// \return True if wake up is successful; otherwise, false;
 	virtual bool doWakeUp() override;
 
 private:
@@ -62,7 +66,6 @@ private:
 	/// Representation to set the pose
 	std::shared_ptr<SurgSim::Framework::Representation> m_to;
 };
-
 
 };  // namespace Blocks
 };  // namespace SurgSim

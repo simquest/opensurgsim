@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
+#include <SurgSim/Devices/Keyboard/KeyboardHandler.h>
 #include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
 #include <SurgSim/Framework/Log.h>
 
@@ -61,7 +62,7 @@ bool KeyboardDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
-KeyboardHandler* KeyboardDevice::getKeyboardHandler() const
+osg::ref_ptr<KeyboardHandler> KeyboardDevice::getKeyboardHandler() const
 {
 	return m_scaffold->getKeyboardHandler();
 }
