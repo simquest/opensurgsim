@@ -227,7 +227,6 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	auto osgCamera = (std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(pass1->getCamera()))->getOsgCamera();
 
 	osg::Matrixd m1 = osgCamera->getViewMatrix();
-	SurgSim::Math::Matrix44d m2 = pass1->getCamera()->getViewMatrix();
 
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
 	lightViewMatrix->set(pass1->getCamera()->getViewMatrix().cast<float>());
