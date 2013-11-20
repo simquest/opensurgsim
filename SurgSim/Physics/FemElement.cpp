@@ -27,6 +27,16 @@ FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0), m_E(0.0), m_nu(0.0)
 FemElement::~FemElement()
 {}
 
+void FemElement::Initialize(const DeformableRepresentationState& state)
+{
+	SURGSIM_ASSERT(m_rho != 0.0) << "Mass density is not set. Did you call setMassDensity() ?";
+	SURGSIM_ASSERT(m_nu != 0.0) << "Poisson ratio is not set. Did you call setPoissonRatio() ?";
+	SURGSIM_ASSERT(m_E != 0.0) << "Young modulus is not set. Did you call setYoungModulus() ?";
+	SURGSIM_ASSERT(m_rho > 0.0) << "Mass desnity ("<<m_rho<<") is invalid, it should be positive";
+	SURGSIM_ASSERT(m_nu > 0.0 && m_nu < 0.5) << "Poisson ratio ("<<m_nu<<") is invalid, it should be within [0 0.5)";
+	SURGSIM_ASSERT(m_E > 0.0) << "Young modulus ("<<m_E<<") is invalid, it should be positive";
+}
+
 unsigned int FemElement::getNumDofPerNode() const
 {
 	return m_numDofPerNode;

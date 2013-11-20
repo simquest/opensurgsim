@@ -328,9 +328,37 @@ TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
 	using SurgSim::Math::getSubVector;
 
 	MockFemElement3DTet tet(m_nodeIds, m_restState);
-	tet.setMassDensity(m_rho);
-	tet.setYoungModulus(m_E);
-	tet.setPoissonRatio(m_nu);
+
+	// Test the various mode of failure related to the physical parameters
+	// This has been already tested in FemElementTests, but this is to make sure this method is called properly
+	// So the same behavior should be expected
+	{
+		// Mass density not set
+		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+
+		// Poisson Ratio not set
+		tet.setMassDensity(-1234.56);
+		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+
+		// Young modulus not set
+		tet.setPoissonRatio(0.55);
+		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+
+		// Invalid mass density
+		tet.setYoungModulus(-4321.33);
+		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+
+		// Invalid Poisson ratio
+		tet.setMassDensity(m_rho);
+		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+
+		// Invalid Young modulus
+		tet.setPoissonRatio(m_nu);
+		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+
+		tet.setYoungModulus(m_E);
+		ASSERT_NO_THROW(tet.Initialize(m_restState));
+	}
 
 	SurgSim::Math::Vector forceVector(3*15);
 	SurgSim::Math::Matrix massMatrix(3*15, 3*15);

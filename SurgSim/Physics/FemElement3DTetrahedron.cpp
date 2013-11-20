@@ -61,12 +61,13 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 	computeShapeFunctions(restState);
 
 	// Store the rest state for this tetrahedron in m_x0
-	auto A = getSubVector(m_x0, 0, 3) = getSubVector(restState.getPositions(), m_nodeIds[0], 3);
-	auto B = getSubVector(m_x0, 1, 3) = getSubVector(restState.getPositions(), m_nodeIds[1], 3);
-	auto C = getSubVector(m_x0, 2, 3) = getSubVector(restState.getPositions(), m_nodeIds[2], 3);
-	auto D = getSubVector(m_x0, 3, 3) = getSubVector(restState.getPositions(), m_nodeIds[3], 3);
+	getSubVector(restState.getPositions(), m_nodeIds, 3, &m_x0);
 
 	// Verify the Counter clock-wise condition
+	auto A = getSubVector(m_x0, 0, 3);
+	auto B = getSubVector(m_x0, 1, 3);
+	auto C = getSubVector(m_x0, 2, 3);
+	auto D = getSubVector(m_x0, 3, 3);
 	SurgSim::Math::Vector3d AB = B - A;
 	SurgSim::Math::Vector3d AC = C - A;
 	SurgSim::Math::Vector3d AD = D - A;
@@ -75,18 +76,25 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 		m_nodeIds[0]<<", "<<m_nodeIds[1]<<", "<<m_nodeIds[2]<<", "<<m_nodeIds[3]<<"]";
 }
 
+void FemElement3DTetrahedron::Initialize(const DeformableRepresentationState& state)
+{
+	// Test the validity of the physical parameters
+	FemElement::Initialize(state);
+
+	// Pre-compute the mass and stiffness matrix
+	computeMass(state, &m_M);
+	computeStiffness(state, &m_K);
+}
+
 void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state,
 									   const Eigen::Matrix<double, 12, 12>& k, SurgSim::Math::Vector* F, double scale)
 {
+	Eigen::Matrix<double, 12, 1> x, f;
+
 	// K.U = Fext
 	// K.(x - x0) = Fext
 	// 0 = Fext + Fint     with Fint = -K.(x - x0)
-	Eigen::Matrix<double, 12, 1> x;
-	Eigen::Matrix<double, 12, 1> f;
-	getSubVector(x, 0, 3) = getSubVector(state.getPositions(), m_nodeIds[0], 3);
-	getSubVector(x, 1, 3) = getSubVector(state.getPositions(), m_nodeIds[1], 3);
-	getSubVector(x, 2, 3) = getSubVector(state.getPositions(), m_nodeIds[2], 3);
-	getSubVector(x, 3, 3) = getSubVector(state.getPositions(), m_nodeIds[3], 3);
+	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
 	f = (- scale) * k * (x - m_x0);
 	addSubVector(f, m_nodeIds, 3, F);
 }
@@ -94,7 +102,6 @@ void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& stat
 void FemElement3DTetrahedron::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
 									   double scale)
 {
-	computeStiffness(state, &m_K);
 	addForce(state, m_K, F, scale);
 }
 
@@ -147,8 +154,7 @@ void FemElement3DTetrahedron::computeMass(const DeformableRepresentationState& s
 void FemElement3DTetrahedron::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
 									  double scale)
 {
-	computeMass(state, &m_M);
-	addSubMatrix(m_M, m_nodeIds, 3, M);
+	addSubMatrix(m_M * scale, m_nodeIds, 3, M);
 }
 
 void FemElement3DTetrahedron::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
@@ -198,7 +204,6 @@ void FemElement3DTetrahedron::computeStiffness(const DeformableRepresentationSta
 void FemElement3DTetrahedron::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
 										   double scale)
 {
-	computeStiffness(state, &m_K);
 	addSubMatrix(m_K * scale, getNodeIds(), 3, K);
 }
 
@@ -214,13 +219,11 @@ void FemElement3DTetrahedron::addFMDK(const DeformableRepresentationState& state
 	// Assemble the damping matrix
 	addDamping(state, D);
 
-	computeStiffness(state, &m_K);
+	// Assemble the damping matrix
+	addStiffness(state, K);
 
-	// Assemble the stiffness matrix (using k)
-	addSubMatrix(m_K, m_nodeIds, 3, K);
-
-	// Assemble the force vector (using k)
-	addForce(state, m_K, F);
+	// Assemble the force vector
+	addForce(state, F);
 }
 
 void FemElement3DTetrahedron::addMatVec(const DeformableRepresentationState& state,
@@ -236,16 +239,11 @@ void FemElement3DTetrahedron::addMatVec(const DeformableRepresentationState& sta
 	}
 
 	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> xLoc, resLoc;
-
-	for (unsigned int i = 0; i < getNumNodes(); i++)
-	{
-		getSubVector(xLoc, i, 3) = getSubVector(x, m_nodeIds[i], 3);
-	}
+	getSubVector(x, m_nodeIds, 3, &xLoc);
 
 	// Adds the mass contribution
 	if (alphaM)
 	{
-		computeMass(state, &m_M);
 		resLoc = alphaM * (m_M * xLoc);
 		addSubVector(resLoc, m_nodeIds, 3, F);
 	}
@@ -255,7 +253,6 @@ void FemElement3DTetrahedron::addMatVec(const DeformableRepresentationState& sta
 	// Adds the stiffness contribution
 	if (alphaK)
 	{
-		computeStiffness(state, &m_K);
 		resLoc = alphaK * (m_K * xLoc);
 		addSubVector(resLoc, m_nodeIds, 3, F);
 	}
@@ -268,10 +265,10 @@ double FemElement3DTetrahedron::getVolume(const DeformableRepresentationState& s
 	///                                       | 1 p2x p2y p2z |
 	///                                       | 1 p3x p3y p3z |
 	const Vector& x = state.getPositions();
-	const Eigen::VectorBlock<const Vector> p0 = getSubVector(x, m_nodeIds[0], 3);
-	const Eigen::VectorBlock<const Vector> p1 = getSubVector(x, m_nodeIds[1], 3);
-	const Eigen::VectorBlock<const Vector> p2 = getSubVector(x, m_nodeIds[2], 3);
-	const Eigen::VectorBlock<const Vector> p3 = getSubVector(x, m_nodeIds[3], 3);
+	auto p0 = getSubVector(x, m_nodeIds[0], 3);
+	auto p1 = getSubVector(x, m_nodeIds[1], 3);
+	auto p2 = getSubVector(x, m_nodeIds[2], 3);
+	auto p3 = getSubVector(x, m_nodeIds[3], 3);
 
 	// fabs is necessary if we don't pay attention to the indexing !
 	// If the tetrahedron verify ABC counter clock wise viewed from D, this determinant is always positive = 6V

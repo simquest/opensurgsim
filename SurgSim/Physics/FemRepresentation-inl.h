@@ -58,6 +58,12 @@ void FemRepresentation<MT, DT, KT, ST>::Initialize()
 			m_massPerNode[*nodeId] += mass / (*element)->getNumNodes();
 		}
 	}
+
+	// Initialize the FemElements
+	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
+	{
+		(*element)->Initialize(*(this->getInitialState()));
+	}
 }
 
 template <class MT, class DT, class KT, class ST>

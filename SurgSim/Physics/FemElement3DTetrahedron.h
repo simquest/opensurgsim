@@ -43,6 +43,11 @@ public:
 	/// \note A warning will be logged in if this condition is not met, but the simulation will keep running
 	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds, const DeformableRepresentationState& restState);
 
+	/// Initialize the FemElement once everything has been set
+	/// \param state The state to initialize the FemElement with
+	/// \note We use the theory of linear elasticity, so this method pre-compute the stiffness and mass matrices
+	virtual void Initialize(const DeformableRepresentationState& state) override;
+
 	/// Get the element volume based on the input state
 	/// \param state The deformable state to compute the volume with
 	virtual double getVolume(const DeformableRepresentationState& state) const override;

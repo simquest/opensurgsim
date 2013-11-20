@@ -45,6 +45,10 @@ public:
 	/// Virtual destructor
 	virtual ~FemElement();
 
+	/// Initialize the FemElement once everything has been set
+	/// \param state The state to initialize the FemElement with
+	virtual void Initialize(const DeformableRepresentationState& state);
+
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node
 	unsigned int getNumDofPerNode() const;
@@ -78,7 +82,6 @@ public:
 	/// Sets the mass density (in Kg.m-3)
 	/// \param rho The mass density
 	void setMassDensity(double rho);
-
 	/// Gets the mass density (in Kg.m-3)
 	/// \return The mass density
 	double getMassDensity() const;
