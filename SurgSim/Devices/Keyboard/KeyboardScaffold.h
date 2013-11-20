@@ -83,7 +83,7 @@ private:
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	std::shared_ptr<KeyboardHandler> getKeyboardHandler() const;
+	KeyboardHandler* getKeyboardHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
@@ -94,7 +94,7 @@ private:
 	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
 	/// The keyboard device managed by this scaffold
-	std::shared_ptr<DeviceData> m_device;
+	std::unique_ptr<DeviceData> m_device;
 };
 
 };  // namespace Device

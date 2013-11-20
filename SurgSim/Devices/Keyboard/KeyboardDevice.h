@@ -54,7 +54,7 @@ public:
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	std::shared_ptr<KeyboardHandler> getKeyboardHandler() const;
+	KeyboardHandler* getKeyboardHandler() const;
 
 private:
 	/// Communication with hardware is handled by scaffold.

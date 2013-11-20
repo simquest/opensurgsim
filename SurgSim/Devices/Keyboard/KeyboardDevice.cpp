@@ -51,10 +51,8 @@ bool KeyboardDevice::initialize()
 bool KeyboardDevice::finalize()
 {
 	SURGSIM_ASSERT(isInitialized());
-
 	SURGSIM_LOG_INFO(m_scaffold->getLogger()) << "Device " << getName() << ": " << "Finalizing.";
 	m_scaffold.reset();
-
 	return true;
 }
 
@@ -63,7 +61,7 @@ bool KeyboardDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
-std::shared_ptr<KeyboardHandler> KeyboardDevice::getKeyboardHandler() const
+KeyboardHandler* KeyboardDevice::getKeyboardHandler() const
 {
 	return m_scaffold->getKeyboardHandler();
 }

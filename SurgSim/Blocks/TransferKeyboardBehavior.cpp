@@ -16,6 +16,7 @@
 #include <SurgSim/Blocks/TransferKeyboardBehavior.h>
 
 #include <SurgSim/DataStructures/DataGroup.h>
+#include <SurgSim/Devices/Keyboard/KeyboardCode.h>
 #include <SurgSim/Framework/Representation.h>
 #include <SurgSim/Input/InputComponent.h>
 
@@ -42,16 +43,16 @@ void TransferKeyboardBehavior::update(double dt)
 	auto pose = m_to->getPose();
 	switch(key)
 	{
-	case 65361:
+	case SurgSim::Device::KeyCode::KEY_Left:
 		std::cerr << "Left Arrow key pressed" << std::endl;
 		break;
-	case 65362:
+	case SurgSim::Device::KeyCode::KEY_Up:
 		std::cerr << "Up Arrow key pressed" << std::endl;
 		break;
-	case 65363:
+	case SurgSim::Device::KeyCode::KEY_Right:
 		std::cerr << "Right Arrow key pressed" << std::endl;
 		break;
-	case 65364:
+	case SurgSim::Device::KeyCode::KEY_Down:
 		std::cerr << "Down Arrow key pressed" << std::endl;
 		break;
 	default:

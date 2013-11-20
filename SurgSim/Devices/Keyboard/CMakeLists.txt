@@ -32,6 +32,7 @@ set(KEYBOARD_DEVICE_SOURCES
 )
 
 set(KEYBOARD_DEVICE_HEADERS
+	KeyboardCode.h
 	KeyboardDevice.h
 	KeyboardHandler.h
 	KeyboardScaffold.h

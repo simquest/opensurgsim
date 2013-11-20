@@ -41,12 +41,12 @@ public:
 		{
 		case(osgGA::GUIEventAdapter::KEYDOWN) :
 		{
-			m_keyboardScaffold->updateDevice(ea.getUnmodifiedKey(), 0);
+			m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), 0); //key_modifier is passed as '0' for now
 			return true;
 		}
 		case(osgGA::GUIEventAdapter::KEYUP) :
 			{
-				m_keyboardScaffold->updateDevice(-1, 0);
+				m_keyboardScaffold.lock()->updateDevice(-1, 0);
 				return true;
 			}
 		default:
@@ -55,7 +55,7 @@ public:
 	}
 
 private:
-	std::shared_ptr<KeyboardScaffold> m_keyboardScaffold;
+	std::weak_ptr<KeyboardScaffold> m_keyboardScaffold;
 };
 
 };  // namespace Device

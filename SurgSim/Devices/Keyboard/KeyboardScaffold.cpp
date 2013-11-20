@@ -34,19 +34,24 @@ struct KeyboardScaffold::DeviceData
 	/// \param device Device to be managed by this scaffold
 	explicit DeviceData(KeyboardDevice* device) : deviceObject(device)
 	{
-		keyboardHandler = std::make_shared<KeyboardHandler>();
+		keyboardHandler = new KeyboardHandler();
 	}
 
-	/// Destructor
 	~DeviceData()
 	{
+		/* Not releasing keyboardHandler leads to memory leak here.
+		   However, after adding keyboardHandler to a OsgView,
+		   when a OsgView being destroyed, it will accidentally (bug in OSG) delete
+		   the keyboard event handler it has.
+		*/
 	}
 
 	/// Device object managed by this scaffold.
-	//KeyboardDevice* const deviceObject;
-	std::unique_ptr<KeyboardDevice> deviceObject;
+	KeyboardDevice* const deviceObject;
 	/// Keyboard Handler to communicate with underneath API.
-	std::shared_ptr<KeyboardHandler> keyboardHandler;
+	KeyboardHandler* keyboardHandler;
+	/// The mutex that protects the externally modifiable parameters.
+	boost::mutex mutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -71,7 +76,7 @@ KeyboardScaffold::~KeyboardScaffold()
 
 bool KeyboardScaffold::registerDevice(KeyboardDevice* device)
 {
-	m_device = std::make_shared<DeviceData>(device);
+	m_device.reset(new DeviceData(device));
 	if (m_device == nullptr)
 	{
 		SURGSIM_LOG_CRITICAL(m_logger) << "KeyboardScaffold::registerDevice(): failed to create a DeviceData";
@@ -93,6 +98,7 @@ bool KeyboardScaffold::unregisterDevice()
 
 bool KeyboardScaffold::updateDevice(int key, int key_modifier)
 {
+	boost::lock_guard<boost::mutex> lock(m_device->mutex);
 	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
 
 	inputData.integers().set("key", key);
@@ -102,7 +108,7 @@ bool KeyboardScaffold::updateDevice(int key, int key_modifier)
 	return true;
 }
 
-std::shared_ptr<KeyboardHandler> KeyboardScaffold::getKeyboardHandler() const
+KeyboardHandler* KeyboardScaffold::getKeyboardHandler() const
 {
 	return m_device->keyboardHandler;
 }
