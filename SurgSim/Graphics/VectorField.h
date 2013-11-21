@@ -34,25 +34,25 @@ struct VectorFieldData
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector4d> color;
 
 	/// Compare the vectors and return true if equal; Othwise, false.
-	/// \return True if vector1 and vector2 have the same value; Otherwise, false.
-	friend bool operator==(const VectorFieldData& vector1, const VectorFieldData& vector2)
+	/// \return True if vector1 and rhs have the same value; Otherwise, false.
+	bool operator==(const VectorFieldData& rhs) const
 	{
-		if (vector1.color.hasValue() && vector2.color.hasValue())
+		if (color.hasValue() && rhs.color.hasValue())
 		{
-			return vector1.direction == vector2.direction &&
-				   vector1.color.getValue() == vector2.color.getValue();
+			return direction == rhs.direction &&
+				   color.getValue() == rhs.color.getValue();
 		}
 		else
 		{
-			return vector1.direction == vector2.direction;
+			return direction == rhs.direction;
 		}
 	}
 
 	/// Compare the vectors and return true if not equal, false if equal.
-	/// \return True if vector1 and vector2 have different values; Otherwise, false.
-	friend bool operator!=(const VectorFieldData& vector1, const VectorFieldData& vector2)
+	/// \return True if vector1 and rhs have different values; Otherwise, false.
+	bool operator!=(const VectorFieldData& rhs) const
 	{
-		return ! (vector1 == vector2);
+		return ! (*this == rhs);
 	}
 };
 

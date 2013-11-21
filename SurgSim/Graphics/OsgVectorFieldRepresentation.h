@@ -76,7 +76,7 @@ public:
 private:
 	/// Vector Field holds a list of vertices/points (X,Y,Z) in 3D space
 	/// Each point is associated with a vector and an optional color
-	std::shared_ptr< SurgSim::Graphics::VectorField > m_vectorField;
+	std::shared_ptr<SurgSim::Graphics::VectorField> m_vectorField;
 
 	/// OSG vertex data structure
 	osg::ref_ptr<osg::Vec3Array> m_vertexData;

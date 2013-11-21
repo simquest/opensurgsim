@@ -35,7 +35,7 @@ OsgVectorFieldRepresentation::OsgVectorFieldRepresentation(const std::string& na
 	OsgRepresentation(name),
 	m_scale(0.1)
 {
-	m_vectorField = std::make_shared< SurgSim::Graphics::VectorField >();
+	m_vectorField = std::make_shared<SurgSim::Graphics::VectorField>();
 	m_vertexData = new osg::Vec3Array;
 	m_lineGeometry = new osg::Geometry;
 	m_pointGeometry = new osg::Geometry;
@@ -72,77 +72,66 @@ OsgVectorFieldRepresentation::~OsgVectorFieldRepresentation()
 
 void OsgVectorFieldRepresentation::doUpdate(double dt)
 {
-	std::vector< Vertex<VectorFieldData> > vertices = m_vectorField->getVertices();
+	std::vector<Vertex<VectorFieldData>> vertices = m_vectorField->getVertices();
 	size_t count = vertices.size();
 
-	if (0 == count)
+	if (0 != count)
 	{
-		return;
-	}
+		// osg::DrawElementsUInt can NOT work properly when this is no data in m_vertexData
+		// Thus, only use osg::DrawElementsUInt when there is something in m_vertexData
+		if (0 == m_pointGeometry->getNumPrimitiveSets())
+		{
+			m_pointGeometry->addPrimitiveSet(m_drawPoints);
+		}
 
-	// osg::DrawElementsUInt can NOT work properly when this is no data in m_vertexData
-	// Thus, only use osg::DrawElementsUInt when there is something in m_vertexData
-	if (m_pointGeometry->getPrimitiveSetIndex(m_drawPoints) == m_pointGeometry->getNumPrimitiveSets() )
-	{
-		m_pointGeometry->addPrimitiveSet(m_drawPoints);
-	}
+		SURGSIM_ASSERT(2 * m_drawPoints->size() == static_cast<std::size_t>(m_drawArrays->getCount()));
+		SURGSIM_ASSERT(m_vertexData->size() == m_colors->size());
+		SURGSIM_ASSERT(2 * m_drawPoints->size() == m_colors->size());
+		// Check for size change in number of vertices
+		if (count != m_drawPoints->size())
+		{
+			m_drawArrays->setCount(count * 2);
+			m_drawPoints->resize(count);
+			m_vertexData->resize(count * 2);
+			m_colors->resize(count * 2);
 
-	if (2 * count != static_cast<size_t>(m_drawArrays->getCount()))
-	{
-		m_drawArrays->setCount(count * 2);
-		m_drawArrays->dirty();
-	}
+			m_drawArrays->dirty();
+			m_drawPoints->dirty();
+		}
 
-	if (count != static_cast<size_t>(m_drawPoints->size()))
-	{
-		m_drawPoints->resize(count);
 		for (size_t i = 0; i < count; ++i)
 		{
+			// Starting location of vector
+			(*m_vertexData)[2 * i] = SurgSim::Graphics::toOsg(vertices[i].position);
+			// Ending location of vector
+			(*m_vertexData)[2 * i + 1] = SurgSim::Graphics::toOsg(vertices[i].position) +
+				SurgSim::Graphics::toOsg(vertices[i].data.direction) * m_scale;
+
 			m_drawPoints->at(i) = (2 * i);
 		}
-		m_drawPoints->dirty();
-	}
 
-
-	if (2 * count > m_vertexData->size())
-	{
-		m_vertexData->resize(count * 2);
-	}
-	// Update vertices information to be used in OSG
-	for (size_t i = 0; i < count; ++i)
-	{
-		// Starting location of vector
-		(*m_vertexData)[2 * i] = SurgSim::Graphics::toOsg(vertices[i].position);
-		// Ending location of vector
-		(*m_vertexData)[2 * i + 1] = SurgSim::Graphics::toOsg(vertices[i].position) +
-			SurgSim::Graphics::toOsg(vertices[i].data.direction) * m_scale;
-	}
-
-
-	if (2 * count > m_colors->size())
-	{
-		m_colors->resize(count * 2);
-	}
-	if (vertices[0].data.color.hasValue())
-	{
-		for (size_t i = 0; i < count; ++i)
+		// Update color information
+		if (vertices[0].data.color.hasValue())
 		{
-			osg::Vec4d color = SurgSim::Graphics::toOsg(vertices[i].data.color.getValue());
-			(*m_colors)[2 * i] = color;
-			(*m_colors)[2 * i + 1] = color;
+			for (size_t i = 0; i < count; ++i)
+			{
+				osg::Vec4d color = SurgSim::Graphics::toOsg(vertices[i].data.color.getValue());
+				(*m_colors)[2 * i] = color;
+				(*m_colors)[2 * i + 1] = color;
+			}
+			m_lineGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+			m_pointGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
 		}
-		m_lineGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-		m_pointGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
-	}
-	else
-	{
-		(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		m_lineGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-		m_pointGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
-	}
+		else
+		{
+			(*m_colors)[0]= osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f);
+			m_lineGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+			m_pointGeometry->setColorBinding(osg::Geometry::BIND_OVERALL);
+		}
 
-	m_lineGeometry->dirtyBound();
-	m_pointGeometry->dirtyBound();
+		m_lineGeometry->dirtyBound();
+		m_pointGeometry->dirtyBound();
+	}
 }
 
 std::shared_ptr< SurgSim::Graphics::VectorField > OsgVectorFieldRepresentation::getVectorField() const
