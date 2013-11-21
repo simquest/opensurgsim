@@ -61,6 +61,7 @@ bool AddRandomSphereBehavior::doWakeUp()
 
 void AddRandomSphereBehavior::update(double dt)
 {
+	// Accumulate the time steps since the previous sphere was created.
 	m_totalTime += dt;
 
 	if (m_totalTime > 3.0)
@@ -70,16 +71,20 @@ void AddRandomSphereBehavior::update(double dt)
 		std::stringstream ss;
 		ss << ++ m_numElements;
 
+		// Generate a random position.
 		std::srand(static_cast<unsigned int>(std::time(0)));
 		double m_x = static_cast<double>(std::rand() % 10) / 10.0;
 		double m_y = static_cast<double>(std::rand() % 2) + 1.0;
 		double m_z = static_cast<double>(std::rand() % 10) / 10.0;
 
 		std::string name = "sphereId_" + ss.str();
+		// Create the pose, with no rotation and the previously determined position.
 		SurgSim::Math::RigidTransform3d pose = SurgSim::Math::makeRigidTransform
 			(SurgSim::Math::Quaterniond::Identity(), Vector3d(m_x, m_y, m_z));
 
+		// Create the SphereElement.
 		std::shared_ptr<SceneElement> m_element = std::make_shared<SphereElement>(name, pose);
+		// Add the SphereElement to the Scene.
 		getScene()->addSceneElement(m_element);
 	}
 }
