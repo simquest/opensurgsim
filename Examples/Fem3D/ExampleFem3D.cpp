@@ -118,9 +118,6 @@ namespace
 			tet->setYoungModulus(1e6);
 			(*physicsRepresentation)->addFemElement(tet);
 		}
-
-		// Calls Initialize() after adding the FemElements and setting the initial state
-		(*physicsRepresentation)->Initialize();
 	}
 
 };

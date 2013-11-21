@@ -39,20 +39,20 @@ FemRepresentation<MT, DT, KT, ST>::~FemRepresentation()
 }
 
 template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::Initialize()
+bool FemRepresentation<MT, DT, KT, ST>::doInitialize()
 {
-	SURGSIM_ASSERT(this->m_initialState != nullptr) << "You must set the initial state befor ecalling Initialize";
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state befor ecalling Initialize";
 
 	// Allocate the vector m_massPerNode
-	if (m_massPerNode.size() == 0 || m_massPerNode.size() < this->m_initialState->getNumNodes())
+	if (m_massPerNode.size() == 0 || m_massPerNode.size() < m_initialState->getNumNodes())
 	{
-		m_massPerNode.resize(this->m_initialState->getNumNodes());
+		m_massPerNode.resize(m_initialState->getNumNodes());
 	}
 
 	// Compute the entries of m_massPerNode from the FemElements mass information
 	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
 	{
-		double mass = (*element)->getMass(*(this->m_initialState));
+		double mass = (*element)->getMass(*m_initialState);
 		for (auto nodeId = std::begin((*element)->getNodeIds()); nodeId != std::end((*element)->getNodeIds()); nodeId++)
 		{
 			m_massPerNode[*nodeId] += mass / (*element)->getNumNodes();
@@ -62,8 +62,10 @@ void FemRepresentation<MT, DT, KT, ST>::Initialize()
 	// Initialize the FemElements
 	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
 	{
-		(*element)->Initialize(*(this->getInitialState()));
+		(*element)->initialize(*m_initialState);
 	}
+
+	return true;
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -91,7 +93,7 @@ double FemRepresentation<MT, DT, KT, ST>::getTotalMass() const
 	double mass = 0.0;
 	for (auto it = std::begin(m_femElements); it != std::end(m_femElements); it++)
 	{
-		mass += (*it)->getMass(*(this->m_currentState));
+		mass += (*it)->getMass(*m_currentState);
 	}
 	return mass;
 }
@@ -123,14 +125,14 @@ void FemRepresentation<MT, DT, KT, ST>::setRayleighDampingMass(double massCoef)
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::beforeUpdate(double dt)
 {
-	if (! this->isActive())
+	if (! isActive())
 	{
 		return;
 	}
 
 	SURGSIM_ASSERT(getNumFemElements()) <<
 		"No fem element specified yet, call addFemElement() prior to running the simulation";
-	SURGSIM_ASSERT(this->getNumDof()) <<
+	SURGSIM_ASSERT(getNumDof()) <<
 		"State has not been initialized yet, call setInitialState() prior to running the simulation";
 
 	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
@@ -140,44 +142,44 @@ void FemRepresentation<MT, DT, KT, ST>::beforeUpdate(double dt)
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::update(double dt)
 {
-	if (! this->isActive())
+	if (! isActive())
 	{
 		return;
 	}
 
-	SURGSIM_ASSERT(this->m_odeSolver != nullptr) <<
+	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
 		"Ode solver has not been set yet. Did you call beforeUpdate() ?";
-	SURGSIM_ASSERT(this->m_initialState != nullptr) <<
+	SURGSIM_ASSERT(m_initialState != nullptr) <<
 		"Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Solve the ode
-	this->m_odeSolver->solve(dt, *(this->m_currentState), this->m_newState.get());
+	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
 
 	// Back up the current state into the previous state (by swapping)
-	this->m_currentState.swap(this->m_previousState);
+	m_currentState.swap(m_previousState);
 	// Make the new state, the current state (by swapping)
-	this->m_currentState.swap(this->m_newState);
+	m_currentState.swap(m_newState);
 }
 
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 {
-	if (! this->isActive())
+	if (! isActive())
 	{
 		return;
 	}
 
-	SURGSIM_ASSERT(this->m_initialState != nullptr) <<
+	SURGSIM_ASSERT(m_initialState != nullptr) <<
 		"Initial state has not been set yet. Did you call setInitialState() ?";
 
 	// Back up the current state into the final state
-	*(this->m_finalState) = *(this->m_currentState);
+	*m_finalState = *m_currentState;
 }
 
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
 {
-	if (! this->isActive())
+	if (! isActive())
 	{
 		return;
 	}
@@ -187,21 +189,21 @@ template <class MT, class DT, class KT, class ST>
 Vector& FemRepresentation<MT, DT, KT, ST>::computeF(const DeformableRepresentationState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_f, state.getNumDof(), true);
+	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
-	addGravityForce(&this->m_f, state);
-	addRayleighDampingForce(&this->m_f, state);
-	addFemElementsForce(&this->m_f, state);
+	addGravityForce(&m_f, state);
+	addRayleighDampingForce(&m_f, state);
+	addFemElementsForce(&m_f, state);
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
 		boundaryCondition != std::end(state.getBoundaryConditions());
 		boundaryCondition++)
 	{
-		this->m_f[*boundaryCondition] = 0.0;
+		m_f[*boundaryCondition] = 0.0;
 	}
 
-	return this->m_f;
+	return m_f;
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -211,11 +213,11 @@ const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresenta
 	using SurgSim::Math::setSubVector;
 
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_M, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), true);
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addMass(state, &this->m_M);
+		(*femElement)->addMass(state, &m_M);
 	}
 
 	// Apply boundary conditions globally
@@ -223,12 +225,12 @@ const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresenta
 		boundaryCondition != std::end(state.getBoundaryConditions());
 		boundaryCondition++)
 	{
-		this->m_M.block(*boundaryCondition, 0, 1, this->getNumDof()).setZero();
-		this->m_M.block(0, *boundaryCondition, this->getNumDof(), 1).setZero();
-		this->m_M(*boundaryCondition, *boundaryCondition) = 1e9;
+		m_M.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_M.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_M(*boundaryCondition, *boundaryCondition) = 1e9;
 	}
 
-	return this->m_M;
+	return m_M;
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -242,14 +244,14 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 	const double& rayMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_D, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
 
 	// D += rayMass.M
 	if (rayMass != 0.0)
 	{
 		for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 		{
-			(*femElement)->addMass(state, &this->m_D, rayMass);
+			(*femElement)->addMass(state, &m_D, rayMass);
 		}
 	}
 
@@ -258,14 +260,14 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 	{
 		for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 		{
-			(*femElement)->addStiffness(state, &this->m_D, rayStiff);
+			(*femElement)->addStiffness(state, &m_D, rayStiff);
 		}
 	}
 
 	// D += Springs damping matrix
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addDamping(state, &this->m_D);
+		(*femElement)->addDamping(state, &m_D);
 	}
 
 	// Apply boundary conditions globally
@@ -273,12 +275,12 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 		boundaryCondition != std::end(state.getBoundaryConditions());
 		boundaryCondition++)
 	{
-		this->m_D.block(*boundaryCondition, 0, 1, this->getNumDof()).setZero();
-		this->m_D.block(0, *boundaryCondition, this->getNumDof(), 1).setZero();
-		this->m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
 	}
 
-	return this->m_D;
+	return m_D;
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -287,11 +289,11 @@ const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresenta
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_K, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
 
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addStiffness(state, &this->m_K);
+		(*femElement)->addStiffness(state, &m_K);
 	}
 
 	// Apply boundary conditions globally
@@ -299,12 +301,12 @@ const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresenta
 		boundaryCondition != std::end(state.getBoundaryConditions());
 		boundaryCondition++)
 	{
-		this->m_K.block(*boundaryCondition, 0, 1, this->getNumDof()).setZero();
-		this->m_K.block(0, *boundaryCondition, this->getNumDof(), 1).setZero();
-		this->m_K(*boundaryCondition, *boundaryCondition) = 1e9;
+		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
 	}
 
-	return this->m_K;
+	return m_K;
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -315,63 +317,63 @@ void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentati
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the force vector has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_f, state.getNumDof(), true);
+	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
 	// Make sure the mass matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_M, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), true);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_D, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&this->m_K, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
 
 	// Add all the FemElement contribution to f, M, D, K
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
-		(*femElement)->addFMDK(state, &this->m_f, &this->m_M, &this->m_D, &this->m_K);
+		(*femElement)->addFMDK(state, &m_f, &m_M, &m_D, &m_K);
 	}
 
 	// Add the Rayleigh damping matrix
 	if (m_rayleighDamping.massCoefficient)
 	{
-		this->m_D += this->m_M * m_rayleighDamping.massCoefficient;
+		m_D += m_M * m_rayleighDamping.massCoefficient;
 	}
 	if (m_rayleighDamping.stiffnessCoefficient)
 	{
-		this->m_D += this->m_K * m_rayleighDamping.stiffnessCoefficient;
+		m_D += m_K * m_rayleighDamping.stiffnessCoefficient;
 	}
 
 	// Add the gravity to m_f
-	addGravityForce(&this->m_f, state);
+	addGravityForce(&m_f, state);
 
 	// Add the Rayleigh damping force to m_f
-	addRayleighDampingForce(&this->m_f, state, true);
+	addRayleighDampingForce(&m_f, state, true);
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
 		boundaryCondition != std::end(state.getBoundaryConditions());
 		boundaryCondition++)
 	{
-		this->m_M.block(*boundaryCondition, 0, 1, this->getNumDof()).setZero();
-		this->m_M.block(0, *boundaryCondition, this->getNumDof(), 1).setZero();
-		this->m_M(*boundaryCondition, *boundaryCondition) = 1e9;
+		m_M.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_M.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_M(*boundaryCondition, *boundaryCondition) = 1e9;
 
-		this->m_D.block(*boundaryCondition, 0, 1, this->getNumDof()).setZero();
-		this->m_D.block(0, *boundaryCondition, this->getNumDof(), 1).setZero();
-		this->m_D(*boundaryCondition, *boundaryCondition) = 1e9;
+		m_D.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_D.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_D(*boundaryCondition, *boundaryCondition) = 1e9;
 
-		this->m_K.block(*boundaryCondition, 0, 1, this->getNumDof()).setZero();
-		this->m_K.block(0, *boundaryCondition, this->getNumDof(), 1).setZero();
-		this->m_K(*boundaryCondition, *boundaryCondition) = 1e9;
+		m_K.block(*boundaryCondition, 0, 1, getNumDof()).setZero();
+		m_K.block(0, *boundaryCondition, getNumDof(), 1).setZero();
+		m_K(*boundaryCondition, *boundaryCondition) = 1e9;
 
-		this->m_f[*boundaryCondition] = 0.0;
+		m_f[*boundaryCondition] = 0.0;
 	}
 
-	*f = &this->m_f;
-	*M = &this->m_M;
-	*D = &this->m_D;
-	*K = &this->m_K;
+	*f = &m_f;
+	*M = &m_M;
+	*D = &m_D;
+	*K = &m_K;
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -391,7 +393,7 @@ void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
 	// If we have the damping matrix build (D = rayMass.M + rayStiff.K), F = -D.v(t)
 	if (useGlobalDampingMatrix && rayStiff != 0.0 && rayMass != 0.0)
 	{
-		*force -= scale * (this->m_D * v);
+		*force -= scale * (m_D * v);
 	}
 	else // Otherwise we unroll the calculation separately on the mass and stiffness components
 	{
@@ -401,7 +403,7 @@ void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
 			// If we have the mass matrix, we can compute directly F = -rayMass.M.v(t)
 			if (useGlobalMassMatrix)
 			{
-				*force -= (scale * rayMass) * (this->m_M * v);
+				*force -= (scale * rayMass) * (m_M * v);
 			}
 			else
 			{
@@ -419,7 +421,7 @@ void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
 		{
 			if (useGlobalStiffnessMatrix)
 			{
-				*force -= scale * rayStiff * (this->m_K * v);
+				*force -= scale * rayStiff * (m_K * v);
 			}
 			else
 			{
@@ -456,16 +458,16 @@ void FemRepresentation<MT, DT, KT, ST>::addGravityForce(Vector *f, const Deforma
 
 	// Prepare a gravity vector of the proper size
 	Vector gravitynD;
-	gravitynD.resize(this->getNumDofPerNode());
+	gravitynD.resize(getNumDofPerNode());
 	gravitynD.setZero();
-	gravitynD.segment(0, 3) = this->getGravity();
+	gravitynD.segment(0, 3) = getGravity();
 
-	if (this->isGravityEnabled())
+	if (isGravityEnabled())
 	{
 		for (unsigned int nodeId = 0; nodeId < state.getNumNodes(); nodeId++)
 		{
 			// F = mg
-			addSubVector(gravitynD * (scale * m_massPerNode[nodeId]), nodeId, this->getNumDofPerNode(), f);
+			addSubVector(gravitynD * (scale * m_massPerNode[nodeId]), nodeId, getNumDofPerNode(), f);
 		}
 	}
 }

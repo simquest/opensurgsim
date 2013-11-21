@@ -54,7 +54,7 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 
 	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
 	{
-		this->m_nodeIds.push_back(*nodeId);
+		m_nodeIds.push_back(*nodeId);
 	}
 
 	// Compute the fem tetrahedron shape functions Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
@@ -76,10 +76,10 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 		m_nodeIds[0]<<", "<<m_nodeIds[1]<<", "<<m_nodeIds[2]<<", "<<m_nodeIds[3]<<"]";
 }
 
-void FemElement3DTetrahedron::Initialize(const DeformableRepresentationState& state)
+void FemElement3DTetrahedron::initialize(const DeformableRepresentationState& state)
 {
 	// Test the validity of the physical parameters
-	FemElement::Initialize(state);
+	FemElement::initialize(state);
 
 	// Pre-compute the mass and stiffness matrix
 	computeMass(state, &m_M);

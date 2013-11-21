@@ -47,10 +47,6 @@ public:
 	/// Destructor
 	virtual ~FemRepresentation();
 
-	/// Initializes the FemRepresentation
-	/// \note This method should be called after all FemElement have been added and the initial state setup.
-	void Initialize();
-
 	/// Adds a FemElement
 	/// \param element The FemElement to add to the representation
 	void addFemElement(const std::shared_ptr<FemElement> element);
@@ -174,6 +170,10 @@ protected:
 	void addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
 
 private:
+	/// Interface to be implemented by derived classes
+	/// \return True if component is initialized successfully; otherwise, false.
+	virtual bool doInitialize() override;
+
 	/// FemElements
 	std::vector<std::shared_ptr<FemElement>> m_femElements;
 
@@ -187,6 +187,29 @@ private:
 		double massCoefficient;
 		double stiffnessCoefficient;
 	} m_rayleighDamping;
+
+	// Dependent names resolution (need to be in public/protected to be accessible in derived classes)
+public:
+	// Used API from Physics::OdeEquation through Physics::DeformableRepresentation
+	using DeformableRepresentation<MT, DT, KT, ST>::m_initialState;
+
+	// Used API from Physics::DeformableRepresentation
+	using DeformableRepresentation<MT, DT, KT, ST>::m_previousState;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_currentState;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_newState;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_finalState;
+	using DeformableRepresentation<MT, DT, KT, ST>::getNumDofPerNode;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_odeSolver;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_f;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_M;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_D;
+	using DeformableRepresentation<MT, DT, KT, ST>::m_K;
+
+	// Used API from Physics::Representation through Physics::DeformableRepresentation
+	using DeformableRepresentation<MT, DT, KT, ST>::isActive;
+	using DeformableRepresentation<MT, DT, KT, ST>::isGravityEnabled;
+	using DeformableRepresentation<MT, DT, KT, ST>::getNumDof;
+	using DeformableRepresentation<MT, DT, KT, ST>::getGravity;
 };
 
 } // namespace Physics

@@ -47,7 +47,7 @@ public:
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
-	virtual void Initialize(const DeformableRepresentationState& state);
+	virtual void initialize(const DeformableRepresentationState& state);
 
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node

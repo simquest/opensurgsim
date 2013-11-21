@@ -109,30 +109,30 @@ TEST(FemElementTests, InitializeMethods)
 	DeformableRepresentationState fakeState;
 
 	// Mass density not set
-	ASSERT_ANY_THROW(femElement.Initialize(fakeState));
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
 
 	// Poisson Ratio not set
 	femElement.setMassDensity(-1234.56);
-	ASSERT_ANY_THROW(femElement.Initialize(fakeState));
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
 
 	// Young modulus not set
 	femElement.setPoissonRatio(0.55);
-	ASSERT_ANY_THROW(femElement.Initialize(fakeState));
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
 
 	// Invalid mass density
 	femElement.setYoungModulus(-4321.33);
-	ASSERT_ANY_THROW(femElement.Initialize(fakeState));
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
 
 	// Invalid Poisson ratio
 	femElement.setMassDensity(1234.56);
-	ASSERT_ANY_THROW(femElement.Initialize(fakeState));
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
 
 	// Invalid Young modulus
 	femElement.setPoissonRatio(0.499);
-	ASSERT_ANY_THROW(femElement.Initialize(fakeState));
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
 
 	femElement.setYoungModulus(4321.33);
-	ASSERT_NO_THROW(femElement.Initialize(fakeState));
+	ASSERT_NO_THROW(femElement.initialize(fakeState));
 }
 
 } // namespace Physics

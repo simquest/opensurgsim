@@ -27,7 +27,7 @@ FemElement::FemElement() : m_numDofPerNode(0), m_rho(0.0), m_E(0.0), m_nu(0.0)
 FemElement::~FemElement()
 {}
 
-void FemElement::Initialize(const DeformableRepresentationState& state)
+void FemElement::initialize(const DeformableRepresentationState& state)
 {
 	SURGSIM_ASSERT(m_rho != 0.0) << "Mass density is not set. Did you call setMassDensity() ?";
 	SURGSIM_ASSERT(m_nu != 0.0) << "Poisson ratio is not set. Did you call setPoissonRatio() ?";

@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <SurgSim/Framework/Runtime.h> //< Used to initialize the Component Fem3DRepresentation
+
 #include <SurgSim/Physics/UnitTests/MockObjects.h>
 
 namespace SurgSim
@@ -145,6 +147,8 @@ TEST_F(FemRepresentationTests, ComputesTest)
 
 TEST_F(FemRepresentationTests, InitializeTest)
 {
+	using SurgSim::Framework::Runtime;
+
 	MockFemRepresentation fem("name");
 	std::shared_ptr<DeformableRepresentationState> initialState =
 		std::make_shared<DeformableRepresentationState>();
@@ -169,7 +173,7 @@ TEST_F(FemRepresentationTests, InitializeTest)
 	// Note as well that the number of nodes don't match between initialState and state
 	ASSERT_ANY_THROW({Vector F = fem.computeF(*state);});
 
-	fem.Initialize();
+	fem.initialize(std::make_shared<Runtime>());
 	// Initial state setup (and we even have 1 FemElement) + Initialize called
 	// BUTE note as well that the number of nodes don't match between initialState and state
 	ASSERT_ANY_THROW({Vector F = fem.computeF(*state);});

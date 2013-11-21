@@ -334,30 +334,30 @@ TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
 	// So the same behavior should be expected
 	{
 		// Mass density not set
-		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
 
 		// Poisson Ratio not set
 		tet.setMassDensity(-1234.56);
-		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
 
 		// Young modulus not set
 		tet.setPoissonRatio(0.55);
-		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
 
 		// Invalid mass density
 		tet.setYoungModulus(-4321.33);
-		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
 
 		// Invalid Poisson ratio
 		tet.setMassDensity(m_rho);
-		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
 
 		// Invalid Young modulus
 		tet.setPoissonRatio(m_nu);
-		ASSERT_ANY_THROW(tet.Initialize(m_restState));
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
 
 		tet.setYoungModulus(m_E);
-		ASSERT_NO_THROW(tet.Initialize(m_restState));
+		ASSERT_NO_THROW(tet.initialize(m_restState));
 	}
 
 	SurgSim::Math::Vector forceVector(3*15);

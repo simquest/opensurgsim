@@ -46,7 +46,7 @@ public:
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
 	/// \note We use the theory of linear elasticity, so this method pre-compute the stiffness and mass matrices
-	virtual void Initialize(const DeformableRepresentationState& state) override;
+	virtual void initialize(const DeformableRepresentationState& state) override;
 
 	/// Get the element volume based on the input state
 	/// \param state The deformable state to compute the volume with
