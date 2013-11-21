@@ -24,6 +24,7 @@ include_directories(
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
+	Accessible.cpp
 	ApplicationData.cpp
 	AssertMessage.cpp
 	Barrier.cpp
@@ -42,8 +43,9 @@ set(SURGSIM_FRAMEWORK_SOURCES
 )
 
 set(SURGSIM_FRAMEWORK_HEADERS
-	ApplicationData.h
 	Accessible.h
+	Accessible-inl.h
+	ApplicationData.h
 	Assert.h
 	AssertMessage.h
 	Barrier.h
