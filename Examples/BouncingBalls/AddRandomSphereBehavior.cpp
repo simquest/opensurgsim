@@ -40,7 +40,7 @@ namespace Blocks
 {
 
 AddRandomSphereBehavior::AddRandomSphereBehavior():
-	Behavior("DynamicallyAddSphereElement"), m_totalTime(0.0), m_numElements(0)
+	Behavior("DynamicallyAddSphereElement"), m_totalTime(0.0), m_numElements(0), m_distribution_xz(0.0, 1.0), m_distribution_y(1.0, 2.0)
 {
 }
 
@@ -72,10 +72,9 @@ void AddRandomSphereBehavior::update(double dt)
 		ss << ++ m_numElements;
 
 		// Generate a random position.
-		std::srand(static_cast<unsigned int>(std::time(0)));
-		double m_x = static_cast<double>(std::rand() % 10) / 10.0;
-		double m_y = static_cast<double>(std::rand() % 2) + 1.0;
-		double m_z = static_cast<double>(std::rand() % 10) / 10.0;
+		double m_x = m_distribution_xz(m_generator);
+		double m_y = m_distribution_y(m_generator);
+		double m_z = m_distribution_xz(m_generator);
 
 		std::string name = "sphereId_" + ss.str();
 		// Create the pose, with no rotation and the previously determined position.
