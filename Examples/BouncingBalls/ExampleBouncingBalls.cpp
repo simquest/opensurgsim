@@ -91,8 +91,7 @@ public:
 	virtual void update(double dt)
 	{
 		// SURGSIM_LOG_DEBUG is a macro to ensure only messages of a certain threshold are output.
-		std::shared_ptr<SurgSim::Framework::Logger> logger = Logger::getLogger("printout");
-		SURGSIM_LOG_DEBUG(logger) << m_representation->getName() << ": " <<
+		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 	}
 protected:
@@ -102,6 +101,10 @@ protected:
 	/// which calls doInitialize() to setup the internal structures.
 	virtual bool doInitialize()
 	{
+		// If the named logger does not exist, the LoggerManager creates a new logger that uses the default output
+		m_logger = Logger::getLogger("printout");
+		// Set the threshold for display of messages.
+		m_logger->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
 		return true;
 	}
 	/// Setup foreign references. After this the Component is ready to update().
@@ -117,6 +120,9 @@ private:
 	// A Representation is a type of Component that stores information.
 	// A RigidRepresentation stores 6 degree-of-freedom (DOF) pose, force, torque, inertia, and compliance.
 	std::shared_ptr<RigidRepresentation> m_representation;
+
+	// A Logger can output to file or stream.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 /// Create a ViewElement to be added to the Scene.
