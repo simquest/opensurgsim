@@ -27,7 +27,6 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpringNDRepresentationUtils.cpp
 	SphereElement.cpp
 	TransferInputPoseBehavior.cpp
-	TransferKeyboardBehavior.cpp
 	TransferPoseBehavior.cpp
 )
 
@@ -41,7 +40,6 @@ set(SURGSIM_BLOCKS_HEADERS
 	TransferDeformableStateToVerticesBehavior.h
 	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
-	TransferKeyboardBehavior.h
 	TransferPoseBehavior.h
 )
 

@@ -42,7 +42,6 @@ public:
 		case(osgGA::GUIEventAdapter::KEYDOWN) :
 		{// Note that we are setting the modifier mask here instead of the modifier itself
 			m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), ea.getModKeyMask());
-			std::cerr << "Key code for pressed key: "<< ea.getKey() << std::endl;
 			return true;
 		}
 		case(osgGA::GUIEventAdapter::KEYUP) :
