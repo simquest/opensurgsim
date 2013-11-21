@@ -63,6 +63,7 @@ include_directories(
 
 set(LIBS
 	SurgSimPhysics
+	SurgSimMath
 	gtest
 	yaml-cpp
 )
