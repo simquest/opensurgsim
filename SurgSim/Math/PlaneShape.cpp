@@ -57,14 +57,12 @@ SurgSim::Math::Vector3d PlaneShape::getNormal() const
 YAML::Node SurgSim::Math::PlaneShape::encode()
 {
 	YAML::Node node;
-	node = SurgSim::Math::Shape::encode();
-	return node;
+	return SurgSim::Math::Shape::encode();
 }
 
 bool SurgSim::Math::PlaneShape::decode(const YAML::Node& node)
 {
-	bool isSuccess = SurgSim::Math::Shape::decode(node);
-	return isSuccess;
+	return SurgSim::Math::Shape::decode(node);
 }
 
 }; // namespace Math
