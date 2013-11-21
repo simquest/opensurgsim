@@ -37,8 +37,10 @@ set(UNIT_TEST_HEADERS
 	SpringTestUtils.h
 )
 
-set(LIBS SurgSimBlocks SurgSimFramework SurgSimPhysics SurgSimGraphics gtest
-	${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+set(LIBS 
+	SurgSimBlocks
+	gtest
+)
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
 

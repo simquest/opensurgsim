@@ -35,6 +35,7 @@
 #include <SurgSim/Testing/MathUtilities.h>
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
@@ -45,194 +46,184 @@ using SurgSim::Testing::interpolatePose;
 
 namespace SurgSim
 {
-namespace Graphics
-{
-
-typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
-
-struct OsgPointCloudRepresentationRenderTests : public ::testing::Test
-{
-	virtual void SetUp()
+	namespace Graphics
 	{
-		runtime = std::make_shared<SurgSim::Framework::Runtime>();
-		graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-		runtime->addManager(graphicsManager);
+		typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
 
-		scene = std::make_shared<SurgSim::Framework::Scene>();
-		runtime->setScene(scene);
-
-		viewElement = std::make_shared<OsgViewElement>("view element");
-		scene->addSceneElement(viewElement);
-
-	}
-
-	virtual void TearDown()
-	{
-		runtime->stop();
-	}
-
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime;
-	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
-	std::shared_ptr<SurgSim::Framework::Scene> scene;
-	std::shared_ptr<OsgViewElement> viewElement;
-
-protected:
-	std::vector<Vector3d> makeCube()
-	{
-		std::vector<Vector3d> result;
-		result.push_back(Vector3d( 0.01,-0.01, 0.01));
-		result.push_back(Vector3d( 0.01,-0.01, 0.01));
-		result.push_back(Vector3d(-0.01,-0.01, 0.01));
-		result.push_back(Vector3d(-0.01,-0.01,-0.01));
-		result.push_back(Vector3d( 0.01,-0.01,-0.01));
-
-		result.push_back(Vector3d( 0.01, 0.01, 0.01));
-		result.push_back(Vector3d(-0.01, 0.01, 0.01));
-		result.push_back(Vector3d(-0.01, 0.01,-0.01));
-		result.push_back(Vector3d( 0.01, 0.01,-0.01));
-		return result;
-	}
-
-	std::shared_ptr<CloudMesh> makeMesh(const std::vector<Vector3d>& vertices)
-	{
-		std::shared_ptr<CloudMesh> mesh = std::make_shared<CloudMesh>();
-		for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
+		struct OsgPointCloudRepresentationRenderTests : public ::testing::Test
 		{
-			mesh->addVertex(CloudMesh::VertexType(*it));
-		}
-		return mesh;
-	}
+			virtual void SetUp()
+			{
+				runtime = std::make_shared<SurgSim::Framework::Runtime>();
+				graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
-	std::shared_ptr<PointCloudRepresentation<void>> makeCloud(std::shared_ptr<CloudMesh> mesh)
-	{
-		std::shared_ptr<PointCloudRepresentation<void>> cloud =
-			std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
+				runtime->addManager(graphicsManager);
 
-		cloud->setVertices(mesh);
-		cloud->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
+				scene = std::make_shared<SurgSim::Framework::Scene>();
+				runtime->setScene(scene);
 
-		viewElement->addComponent(cloud);
+				viewElement = std::make_shared<OsgViewElement>("view element");
+				scene->addSceneElement(viewElement);
 
-		return cloud;
-	}
-};
+			}
 
+			virtual void TearDown()
+			{
+				runtime->stop();
+			}
 
+			std::shared_ptr<SurgSim::Framework::Runtime> runtime;
+			std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager;
+			std::shared_ptr<SurgSim::Framework::Scene> scene;
+			std::shared_ptr<OsgViewElement> viewElement;
 
+		protected:
+			std::vector<Vector3d> makeCube()
+			{
+				std::vector<Vector3d> result;
+				result.push_back(Vector3d( 0.01,-0.01, 0.01));
+				result.push_back(Vector3d( 0.01,-0.01, 0.01));
+				result.push_back(Vector3d(-0.01,-0.01, 0.01));
+				result.push_back(Vector3d(-0.01,-0.01,-0.01));
+				result.push_back(Vector3d( 0.01,-0.01,-0.01));
 
+				result.push_back(Vector3d( 0.01, 0.01, 0.01));
+				result.push_back(Vector3d(-0.01, 0.01, 0.01));
+				result.push_back(Vector3d(-0.01, 0.01,-0.01));
+				result.push_back(Vector3d( 0.01, 0.01,-0.01));
+				return result;
+			}
 
+			std::shared_ptr<PointCloudRepresentation<void>> makeCloud(std::vector<Vector3d> vertices)
+			{
+				std::shared_ptr<PointCloudRepresentation<void>> cloud =
+					std::make_shared<OsgPointCloudRepresentation<void>>("cloud representation");
 
+				cloud->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
+				for (auto it = std::begin(vertices); it != std::end(vertices); ++it)
+				{
+					cloud->getVertices()->addVertex(SurgSim::DataStructures::Vertices<void>::VertexType(*it));
+				}
 
+				viewElement->addComponent(cloud);
 
-TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
-{
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
+				return cloud;
+			}
+		};
 
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	int numSteps = 100;
-
-	Vector3d startAngles(0.0,0.0,0.0);
-	Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
-	Vector3d startPosition (-0.1, 0.0, -0.0);
-	Vector3d endPosition(0.1, 0.0, -0.4);
-
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-		cloud->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
-
-TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
-{
-	std::vector<Vector3d> startVertices = makeCube();
-	std::shared_ptr<CloudMesh> mesh = makeMesh(startVertices);
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(mesh);
-
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-
-	int numSteps = 100;
-
-	Vector3d startAngles(0.0,0.0,0.0);
-	Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
-	Vector3d startPosition (-0.1, 0.0, 0.2);
-	Vector3d endPosition(0.1, 0.0, -0.2);
-
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-		RigidTransform3d currentPose =
-			interpolatePose(startAngles, endAngles, startPosition, endPosition, t);
-
-		int id = 0;
-		for (auto it = std::begin(startVertices); it != std::end(startVertices); ++it, ++id)
+		TEST_F(OsgPointCloudRepresentationRenderTests, PointAdd)
 		{
-			mesh->setVertexPosition(id, currentPose * (*it));
+			std::vector<Vector3d> vertices = makeCube();
+
+			auto representation = std::make_shared<OsgPointCloudRepresentation<void>>("pointcloud representation");
+			auto pointCloud = representation->getVertices();
+			representation->setPointSize(2.0);
+
+			RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(0.2, Vector3d(1.0,1.0,1.0)),
+				Vector3d(0.0,0.0,-0.2));
+			representation->setInitialPose(pose);
+
+			viewElement->addComponent(representation);
+
+			/// Run the thread
+			runtime->start();
+			EXPECT_TRUE(graphicsManager->isInitialized());
+			EXPECT_TRUE(viewElement->isInitialized());
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+
+			for (size_t i = 0; i < vertices.size(); ++i)
+			{
+				pointCloud->addVertex(CloudMesh::VertexType(vertices[i]));
+				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+			}
 		}
 
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
+		TEST_F(OsgPointCloudRepresentationRenderTests, StaticRotate)
+		{
+			std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeCube());
 
-TEST_F(OsgPointCloudRepresentationRenderTests, PointSize)
-{
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+			/// Run the thread
+			runtime->start();
+			EXPECT_TRUE(graphicsManager->isInitialized());
+			EXPECT_TRUE(viewElement->isInitialized());
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	int numSteps = 100;
-	double startSize = 0;
-	double endSize = 20.0;
+			int numSteps = 100;
 
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-		cloud->setPointSize(interpolate(startSize,endSize,t));
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
+			Vector3d startAngles(0.0,0.0,0.0);
+			Vector3d endAngles(M_PI_4, M_PI_2, M_PI_2);
+			Vector3d startPosition (-0.1, 0.0, -0.0);
+			Vector3d endPosition(0.1, 0.0, -0.4);
 
-TEST_F(OsgPointCloudRepresentationRenderTests, ColorTest)
-{
-	std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeMesh(makeCube()));
-	/// Run the thread
-	runtime->start();
-	EXPECT_TRUE(graphicsManager->isInitialized());
-	EXPECT_TRUE(viewElement->isInitialized());
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+			for (int i = 0; i < numSteps; ++i)
+			{
+				/// Calculate t in [0.0, 1.0]
+				double t = static_cast<double>(i) / numSteps;
+				cloud->setPose(interpolatePose(startAngles, endAngles, startPosition, endPosition, t));
+				boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+			}
+		}
 
-	cloud->setPointSize(4.0);
+		TEST_F(OsgPointCloudRepresentationRenderTests, DynamicRotate)
+		{
+			std::vector<Vector3d> startVertices = makeCube();
+			std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(startVertices);
+			std::shared_ptr<CloudMesh> mesh = cloud->getVertices();
 
-	int numSteps = 100;
+			/// Run the thread
+			runtime->start();
+			EXPECT_TRUE(graphicsManager->isInitialized());
+			EXPECT_TRUE(viewElement->isInitialized());
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	SurgSim::Math::Vector4d startColor(0.0,1.0,0.0,1.0);
-	SurgSim::Math::Vector4d endColor(1.0,0.0,1.0,1.0);
+			int numSteps = 100;
 
-	for (int i = 0; i < numSteps; ++i)
-	{
-		/// Calculate t in [0.0, 1.0]
-		double t = static_cast<double>(i) / numSteps;
-		cloud->setColor(interpolate(startColor,endColor,t));
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
-	}
-}
+			RigidTransform3d start = makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(1.0,1.0,1.0)),
+														Vector3d(-0.1,0.0,0.2));
 
-}; // namespace Graphics
+			RigidTransform3d end = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(1.0,1.0,1.0)),
+														Vector3d(0.1,0.0,-0.2));
+
+			for (int i = 0; i < numSteps; ++i)
+			{
+				/// Calculate t in [0.0, 1.0]
+				double t = static_cast<double>(i) / numSteps;
+				RigidTransform3d currentPose = interpolate(start, end, t);
+
+				int id = 0;
+				for (auto it = std::begin(startVertices); it != std::end(startVertices); ++it, ++id)
+				{
+					mesh->setVertexPosition(id, currentPose * (*it));
+				}
+
+				boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+			}
+		}
+
+		TEST_F(OsgPointCloudRepresentationRenderTests, PointSizeAndColor)
+		{
+			std::shared_ptr<PointCloudRepresentation<void>> cloud = makeCloud(makeCube());
+			/// Run the thread
+			runtime->start();
+			EXPECT_TRUE(graphicsManager->isInitialized());
+			EXPECT_TRUE(viewElement->isInitialized());
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+
+			int numSteps = 100;
+			std::pair<double, double> size = std::make_pair(0.0,20.0);
+			std::pair<Vector4d, Vector4d> color =
+				std::make_pair(Vector4d(0.0,1.0,0.0,1.0), Vector4d(1.0,0.0,1.0,1.0));
+
+			for (int i = 0; i < numSteps; ++i)
+			{
+				/// Calculate t in [0.0, 1.0]
+				double t = static_cast<double>(i) / numSteps;
+				cloud->setPointSize(interpolate(size,t));
+				cloud->setColor(interpolate(color,t));
+				boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps));
+			}
+		}
+	}; // namespace Graphics
 }; // namespace SurgSim

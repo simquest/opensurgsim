@@ -47,7 +47,7 @@ public:
 	virtual bool solve(const MlcpProblem& problem, MlcpSolution* solution) = 0;
 
 private:
-	// Prevent copy construction and assignment.
+	/// Prevent copy construction and assignment.
 	MlcpSolver(const MlcpSolver&);
 	MlcpSolver& operator==(const MlcpSolver&);
 };

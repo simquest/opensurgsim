@@ -26,25 +26,25 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-#include <SurgSim/Physics/RigidShape.h>
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/PlaneShape.h>
-#include <SurgSim/Physics/DoubleSidedPlaneShape.h>
+#include <SurgSim/Math/Shape.h>
+#include <SurgSim/Math/BoxShape.h>
+#include <SurgSim/Math/PlaneShape.h>
+#include <SurgSim/Math/DoubleSidedPlaneShape.h>
 
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/CollisionPair.h>
 
 #include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Collision/RigidShapeCollisionRepresentation.h>
+#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::PlaneShape;
-using SurgSim::Physics::DoubleSidedPlaneShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::PlaneShape;
+using SurgSim::Math::DoubleSidedPlaneShape;
 
 namespace SurgSim
 {

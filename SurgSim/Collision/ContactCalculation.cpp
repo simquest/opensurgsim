@@ -20,6 +20,14 @@ namespace SurgSim
 namespace Collision
 {
 
+ContactCalculation::ContactCalculation()
+{
+}
+
+ContactCalculation::~ContactCalculation()
+{
+}
+
 void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	std::pair<int,int> shapeTypes = getShapeTypes();
@@ -33,13 +41,13 @@ void ContactCalculation::calculateContact(std::shared_ptr<CollisionPair> pair)
 		std::swap(firstShapeType, secondShapeType);
 	}
 
-	if(shapeTypes.first != SurgSim::Physics::RIGID_SHAPE_TYPE_NONE)
+	if(shapeTypes.first != SurgSim::Math::SHAPE_TYPE_NONE)
 	{
 		SURGSIM_ASSERT(firstShapeType == shapeTypes.first) <<
 			"First Object, wrong type of object" << firstShapeType;
 	}
 
-	if(shapeTypes.second != SurgSim::Physics::RIGID_SHAPE_TYPE_NONE)
+	if(shapeTypes.second != SurgSim::Math::SHAPE_TYPE_NONE)
 	{
 		SURGSIM_ASSERT(secondShapeType == shapeTypes.second) <<
 			"Second Object, wrong type of object" << secondShapeType;

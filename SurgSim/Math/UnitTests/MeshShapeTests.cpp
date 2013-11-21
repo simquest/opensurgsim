@@ -19,17 +19,17 @@
 
 #include <SurgSim/Math/Vector.h>
 
-#include <SurgSim/Physics/Shapes.h>
+#include <SurgSim/Math/Shapes.h>
 
-/* CUBE
-     3*----------*2
-     /          /|
-   7*----------* |
-    |         6| |
-    | *0       | *1
-    |          |/
-   4*----------*5
-*/
+// CUBE
+//     3*----------*2
+//     /          /|
+//   7*----------* |
+//    |         6| |
+//    | *0       | *1
+//    |          |/
+//   4*----------*5
+
 static const int cubeNumPoints = 8;
 static const SurgSim::Math::Vector3d cubePoints[8]=
 {
@@ -140,9 +140,9 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 			mesh->addTriangle(t);
 		}
 
-		SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData> boxMesh(mesh);
+		SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData> boxMesh(mesh);
 
-		SurgSim::Physics::BoxShape boxShape(lx, ly, lz);
+		SurgSim::Math::BoxShape boxShape(lx, ly, lz);
 
 		SurgSim::Math::Matrix33d expectedInertia;
 		SurgSim::Math::Vector3d expectedMassCenter;

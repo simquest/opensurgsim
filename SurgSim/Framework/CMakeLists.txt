@@ -29,6 +29,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Barrier.cpp
 	BasicThread.cpp
 	BehaviorManager.cpp
+	Component.cpp
 	ComponentManager.cpp
 	Logger.cpp
 	LoggerManager.cpp
@@ -75,6 +76,13 @@ surgsim_add_library(
 	"${SURGSIM_FRAMEWORK_SOURCES}"
 	"${SURGSIM_FRAMEWORK_HEADERS}"
 	"SurgSim/Framework"
+)
+
+SET(LIBS
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimFramework ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)

@@ -16,8 +16,8 @@
 #include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
 #include <SurgSim/Collision/BoxSphereDcdContact.h>
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::SphereShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::SphereShape;
 
 namespace SurgSim
 {
@@ -39,21 +39,21 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 	using SurgSim::Math::Geometry::ScalarEpsilon;
 
-    std::shared_ptr<CollisionRepresentation> boxRep = std::make_shared<MockCollisionRepresentation>(
+	std::shared_ptr<CollisionRepresentation> boxRep = std::make_shared<MockCollisionRepresentation>(
 		"Collision Box 0",
 		box,
 		boxQuat,
 		boxTrans);
-    std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<MockCollisionRepresentation>(
+	std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<MockCollisionRepresentation>(
 		"Collision Sphere 0",
 		sphere,
 		sphereQuat,
 		sphereTrans);
 
-    // Perform collision detection.
-    BoxSphereDcdContact calcContact;
-    std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, sphereRep);
-    calcContact.calculateContact(pair);
+	// Perform collision detection.
+	BoxSphereDcdContact calcContact;
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, sphereRep);
+	calcContact.calculateContact(pair);
 
 	// Compare contact info.
 	EXPECT_EQ(hasContacts, pair->hasContacts());
@@ -75,11 +75,11 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 TEST(BoxSphereContactCalculationTests, UnitTests)
 {
 	std::shared_ptr<BoxShape> box = std::make_shared<BoxShape>(1.0, 1.0, 1.0);
-    std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
-    SurgSim::Math::Quaterniond boxQuat;
-    SurgSim::Math::Vector3d boxTrans;
-    SurgSim::Math::Quaterniond sphereQuat;
-    SurgSim::Math::Vector3d sphereTrans;
+	std::shared_ptr<SphereShape> sphere = std::make_shared<SphereShape>(1.0);
+	SurgSim::Math::Quaterniond boxQuat;
+	SurgSim::Math::Vector3d boxTrans;
+	SurgSim::Math::Quaterniond sphereQuat;
+	SurgSim::Math::Vector3d sphereTrans;
 	SurgSim::Math::Quaterniond globalQuat;
 	SurgSim::Math::Vector3d globalTrans;
 

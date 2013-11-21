@@ -130,3 +130,71 @@ TEST(RuntimeTest, SceneInitialization)
 	EXPECT_TRUE(manager->didBeforeStop);
 }
 
+TEST(RuntimeTest, PausedStep)
+{
+	std::shared_ptr<Runtime> runtime(new Runtime());
+	std::shared_ptr<MockManager> manager1(new MockManager());
+	std::shared_ptr<MockManager> manager2(new MockManager());
+
+	runtime->addManager(manager1);
+	runtime->addManager(manager2);
+
+	runtime->start(true);
+
+	EXPECT_TRUE(runtime->isPaused());
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+
+	EXPECT_TRUE(manager1->isSynchronous());
+	EXPECT_TRUE(manager2->isSynchronous());
+
+	int count = manager1->count;
+
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(count+1,manager1->count);
+
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_EQ(count+2,manager1->count);
+
+	runtime->stop();
+}
+
+
+TEST(RuntimeTest, PauseResume)
+{
+	std::shared_ptr<Runtime> runtime(new Runtime());
+	std::shared_ptr<MockManager> manager1(new MockManager());
+	std::shared_ptr<MockManager> manager2(new MockManager());
+
+	runtime->addManager(manager1);
+	runtime->addManager(manager2);
+
+	runtime->start(false);
+
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+
+	EXPECT_FALSE(manager1->isSynchronous());
+	EXPECT_FALSE(manager2->isSynchronous());
+
+	runtime->pause();
+
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	EXPECT_TRUE(manager1->isSynchronous());
+	EXPECT_TRUE(manager2->isSynchronous());
+
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	runtime->step();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+	runtime->resume();
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+
+	EXPECT_FALSE(manager1->isSynchronous());
+	EXPECT_FALSE(manager2->isSynchronous());
+
+	runtime->stop();
+}
+

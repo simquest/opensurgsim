@@ -26,7 +26,6 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring3DRepresentation.cpp
 	MassSpringNDRepresentationUtils.cpp
 	SphereElement.cpp
-	TransferDeformableStateToVerticesBehavior.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
 )
@@ -50,8 +49,15 @@ surgsim_add_library(
 	"${SURGSIM_BLOCKS_HEADERS}"
 	"SurgSim/Blocks"
 )
-target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
-	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
+SET(LIBS
+	SurgSimFramework
+	SurgSimPhysics
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimBlocks ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 
-#include <SurgSim/Physics/Shapes.h>
+#include <SurgSim/Math/Shapes.h>
 #include <SurgSim/Math/Valid.h>
 
 namespace SurgSim
@@ -129,7 +129,7 @@ public:
 		m_mass = mass;
 
 		m_rho = 0.0; // Invalidate the density information
-		             // Density is not automcatically computed, only set
+					 // Density is not automcatically computed, only set
 
 		m_isValid = checkValidity();
 	}
@@ -195,7 +195,7 @@ public:
 
 	/// Add a shape to this rigid representation
 	/// \param shape A shape to add to this rigid representation
-	void addShape(const std::shared_ptr<RigidShape> shape)
+	void addShape(const std::shared_ptr<SurgSim::Math::Shape> shape)
 	{
 		m_shapes.push_back(shape);
 	}
@@ -203,7 +203,7 @@ public:
 	/// Remove a shape from this rigid representation
 	/// \param shape The shape to be detached from this rigid representation
 	/// \note Does nothing if the shape is not found
-	void removeShape(const std::shared_ptr<RigidShape> shape)
+	void removeShape(const std::shared_ptr<SurgSim::Math::Shape> shape)
 	{
 		auto it = std::find(m_shapes.begin(), m_shapes.end(), shape);
 		if (it != m_shapes.end())
@@ -219,7 +219,7 @@ public:
 
 	/// Get all the shapes associated to this rigid representation
 	/// \return The vector containing all the shapes
-	std::vector<std::shared_ptr<RigidShape>> getShapes() const
+	std::vector<std::shared_ptr<SurgSim::Math::Shape>> getShapes() const
 	{
 		return m_shapes;
 	}
@@ -227,7 +227,7 @@ public:
 	/// Set the shape to use internally for physical parameters computation
 	/// \param shape The shape to use for the mass/inertia calculation
 	/// \note Also add the shape to the shape list if it has not been added yet
-	void setShapeUsedForMassInertia(const std::shared_ptr<RigidShape> shape)
+	void setShapeUsedForMassInertia(const std::shared_ptr<SurgSim::Math::Shape> shape)
 	{
 		m_shapeForMassInertia = shape;
 
@@ -253,7 +253,7 @@ public:
 
 	/// Get the shape used internally for physical parameters computation
 	/// \return The shape used for calculation, nullptr if none exist
-	const std::shared_ptr<RigidShape> getShapeUsedForMassInertia() const
+	const std::shared_ptr<SurgSim::Math::Shape> getShapeUsedForMassInertia() const
 	{
 		return m_shapeForMassInertia;
 	}
@@ -299,10 +299,10 @@ private:
 	double m_angularDamping;
 
 	/// Shapes associated to this rigid representation
-	std::vector<std::shared_ptr<RigidShape>>  m_shapes;
+	std::vector<std::shared_ptr<SurgSim::Math::Shape>>  m_shapes;
 
 	/// Shape to be used for the mass/inertia calculation
-	std::shared_ptr<RigidShape> m_shapeForMassInertia;
+	std::shared_ptr<SurgSim::Math::Shape> m_shapeForMassInertia;
 
 	/// Validity of the set of parameters
 	bool m_isValid;

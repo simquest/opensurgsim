@@ -25,15 +25,15 @@ namespace Collision
 
 namespace
 {
-/* CUBE
-     3*----------*2
-     /          /|
-   7*----------* |
-    |         6| |
-    | *0       | *1
-    |          |/
-   4*----------*5
-*/
+// CUBE
+//   3*----------*2
+//   /          /|
+// 7*----------* |
+//  |         6| |
+//  | *0       | *1
+//  |          |/
+// 4*----------*5
+
 static const int cubeNumPoints = 8;
 static const SurgSim::Math::Vector3d cubePoints[8]=
 {
@@ -110,7 +110,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 }
 
 template <class VertexType, class EdgeType, class TriangleType>
-void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Physics::MeshShape<VertexType, EdgeType, TriangleType>> mesh,
+void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>> mesh,
 					const Quaterniond& meshQuat,
 					const Vector3d& meshTrans,
 					std::shared_ptr<PlaneShape> plane,
@@ -192,8 +192,8 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData>> cubeMesh =
-		std::make_shared<SurgSim::Physics::MeshShape<EmptyData, EmptyData, EmptyData>>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData>> cubeMesh =
+		std::make_shared<SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData>>(mesh);
 
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	SurgSim::Math::Quaterniond meshQuat;
@@ -208,196 +208,195 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 	const double cubeSize = 1;
 
 	{
-        SCOPED_TRACE("No intersection, box in front of plane, no rotation");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("No intersection, box in front of plane, no rotation");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		planeQuat = Quaterniond::Identity();
 		planeTrans = Vector3d(0.0, -(cubeSize / 2 + epsilonTrans), 0.0);
-        int expectedNumberOfContacts = 0;
-        int expectedBoxIndicesInContacts[] = {0};
+		int expectedNumberOfContacts = 0;
+		int expectedBoxIndicesInContacts[] = {0};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("Intersection, 04 contacts, no rotation");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("Intersection, 04 contacts, no rotation");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		planeQuat = Quaterniond::Identity();
-        planeTrans = Vector3d(0.0,0.0,0.0);
-        int expectedNumberOfContacts = 4;
-        int expectedBoxIndicesInContacts[] = {0, 1, 4, 5};
+		planeTrans = Vector3d(0.0,0.0,0.0);
+		int expectedNumberOfContacts = 4;
+		int expectedBoxIndicesInContacts[] = {0, 1, 4, 5};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 08 contacts, no rotation");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 08 contacts, no rotation");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		planeQuat = Quaterniond::Identity();
 		planeTrans = Vector3d(0.0,(cubeSize / 2 + epsilonTrans),0.0);
-        int expectedNumberOfContacts = 8;
-        int expectedBoxIndicesInContacts[] = {0, 1, 2, 3, 4, 5, 6, 7};
+		int expectedNumberOfContacts = 8;
+		int expectedBoxIndicesInContacts[] = {0, 1, 2, 3, 4, 5, 6, 7};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 02 contacts, plane rotate(Z, -45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 02 contacts, plane rotate(Z, -45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(-0.25 * M_PI, SurgSim::Math::Vector3d(0, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planeTrans = Vector3d(-1,-1,0.0) * (cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 2;
-        int expectedBoxIndicesInContacts[] = {0, 4};
+		int expectedNumberOfContacts = 2;
+		int expectedBoxIndicesInContacts[] = {0, 4};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 06 contacts, plane rotate(Z, 45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 06 contacts, plane rotate(Z, 45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(-0.25 * M_PI, SurgSim::Math::Vector3d(0, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = planNormal * (cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 6;
-        int expectedBoxIndicesInContacts[] = {0, 4, 1, 3, 7, 5};
+		int expectedNumberOfContacts = 6;
+		int expectedBoxIndicesInContacts[] = {0, 4, 1, 3, 7, 5};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	// Test cases to cover all collisions between each corner of the cube with the plane
 	{
 		SCOPED_TRACE("intersection, 01 contact, plane rotate(XZ, -45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(-0.25 * M_PI, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {4};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {4};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+XZ,-M_PI/2-45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+XZ,-M_PI/2-45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(-M_PI / 2 - M_PI / 4, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {7};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {7};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z, +45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z, +45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(0.25 * M_PI, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {0};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {0};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z, M_PI/2+45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z, M_PI/2+45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(M_PI / 2 + M_PI / 4, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {3};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {3};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z, -45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z, -45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(-0.25 * M_PI, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {5};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {5};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z,-M_PI/2-45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X-Z,-M_PI/2-45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(-M_PI / 2 - M_PI / 4, SurgSim::Math::Vector3d(1, 0, -1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {6};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {6};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X+Z, +45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X+Z, +45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(0.25 * M_PI, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {1};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {1};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X+Z, M_PI/2+45)");
-        meshQuat = Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		SCOPED_TRACE("intersection, 01 contacts, plane rotate(+X+Z, M_PI/2+45)");
+		meshQuat = Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		mRotation = Eigen::AngleAxisd(M_PI / 2 + M_PI / 4, SurgSim::Math::Vector3d(1, 0, 1).normalized());
 		planeQuat = SurgSim::Math::Quaterniond(mRotation);
 		planNormal = mRotation * SurgSim::Math::Vector3d(0, 1, 0);
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 1;
-        int expectedBoxIndicesInContacts[] = {2};
+		int expectedNumberOfContacts = 1;
+		int expectedBoxIndicesInContacts[] = {2};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
 	{
-        SCOPED_TRACE("intersection, 01 contacts, plane & cube -0.8*M_PI*rotate(Z, -M_PI/4)");
+		SCOPED_TRACE("intersection, 01 contacts, plane & cube -0.8*M_PI*rotate(Z, -M_PI/4)");
 		globalQuat = SurgSim::Math::makeRotationQuaternion(-1.318, Vector3d(0,0,1).normalized());
-        meshQuat = globalQuat * Quaterniond::Identity();
-        meshTrans = Vector3d(0.0,0.0,0.0);
+		meshQuat = globalQuat * Quaterniond::Identity();
+		meshTrans = Vector3d(0.0,0.0,0.0);
 		double angle = -0.25 * M_PI;
 		SurgSim::Math::Vector3d axis(0, 0, 1);
 		planeQuat = globalQuat*SurgSim::Math::Quaterniond(Eigen::AngleAxisd(angle, axis.normalized()));
 		planeTrans = Vector3d(-1,-1,0.0) * (cubeSize / 2 - epsilonTrans);
-        int expectedNumberOfContacts = 2;
-        int expectedBoxIndicesInContacts[] = {0, 4};
+		int expectedNumberOfContacts = 2;
+		int expectedBoxIndicesInContacts[] = {0, 4};
 		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
-			plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
+				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
-
 }
 
 

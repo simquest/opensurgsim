@@ -20,8 +20,8 @@
 
 #include <SurgSim/Collision/CollisionRepresentation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidShape.h>
 #include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Shape.h>
 
 namespace SurgSim
 {
@@ -46,7 +46,7 @@ public:
 	///@{
 	/// Implementations of virtual functions from CollisionRepresentation
 	virtual int getShapeType() const override;
-	virtual const std::shared_ptr<SurgSim::Physics::RigidShape> getShape() const override;
+	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 	///@}
 
