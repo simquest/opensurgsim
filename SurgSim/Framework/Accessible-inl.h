@@ -19,7 +19,6 @@
 template <class T>
 bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
 {
-	bool result = true;
 	auto element = m_getters.find(name);
 	if (value != nullptr && element != std::end(m_getters))
 	{
