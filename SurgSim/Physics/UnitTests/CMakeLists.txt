@@ -28,6 +28,8 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
+	FemElement3DTetrahedronTests.cpp
+	FemElementTests.cpp
 	FemRepresentationParametersTest.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
@@ -60,17 +62,9 @@ include_directories(
 )
 
 set(LIBS
-	IdentityPoseDevice
-	SurgSimCollision
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimMath
-	SurgSimInput
 	SurgSimPhysics
-	MlcpTestIO
 	gtest
 	yaml-cpp
-	${Boost_LIBRARIES}
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

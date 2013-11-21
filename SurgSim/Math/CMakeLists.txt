@@ -76,6 +76,16 @@ surgsim_add_library(
 	"SurgSim/Math"
 )
 
+set(LIBS 
+	SurgSimFramework 
+	SurgSimTesting
+	MlcpTestIO
+)
+
+target_link_libraries(SurgSimMath ${LIBS}
+)
+
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()

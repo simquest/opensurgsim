@@ -36,10 +36,10 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
-include_directories(
+set(LIBS
+	SurgSimDataStructures
+	gtest
 )
-
-set(LIBS SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimDataStructuresTest)
 

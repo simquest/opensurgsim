@@ -231,7 +231,7 @@ TYPED_TEST(Matrix22Tests, ShiftCommaInitialization)
 		for (int col = 0;  col < 2;  ++col)
 		{
 			EXPECT_NEAR(1.1 + 0.2*row + 0.1*col, matrix(row, col), 1e-6) <<
-			        row << "," << col << " wasn't properly initialized.";
+				row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -252,7 +252,7 @@ TYPED_TEST(Matrix33Tests, ShiftCommaInitialization)
 		for (int col = 0;  col < 3;  ++col)
 		{
 			EXPECT_NEAR(1.1 + 0.3*row + 0.1*col, matrix(row, col), 1e-6) <<
-			        row << "," << col << " wasn't properly initialized.";
+				row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -274,7 +274,7 @@ TYPED_TEST(Matrix44Tests, ShiftCommaInitialization)
 		for (int col = 0;  col < 4;  ++col)
 		{
 			EXPECT_NEAR(1.1 + 0.4*row + 0.1*col, matrix(row, col), 1e-6) <<
-			        row << "," << col << " wasn't properly initialized.";
+				row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -368,7 +368,7 @@ TYPED_TEST(AllMatrixTests, InitializeRowMajorFromArray)
 		for (int col = 0;  col < SIZE;  ++col)
 		{
 			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
-			        row << "," << col << " wasn't properly initialized.";
+				row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -396,7 +396,7 @@ TYPED_TEST(AllMatrixTests, InitializeColumnMajorFromArray)
 		for (int col = 0;  col < SIZE;  ++col)
 		{
 			EXPECT_NEAR(0.01 + (col*SIZE + row) * 1.01, matrix(row, col), 1e-6) <<
-			        row << "," << col << " wasn't properly initialized.";
+				row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }
@@ -423,7 +423,7 @@ TYPED_TEST(AllMatrixTests, InitializeFromArray)
 		for (int col = 0;  col < SIZE;  ++col)
 		{
 			EXPECT_NEAR(0.01 + (row*SIZE + col) * 1.01, matrix(row, col), 1e-6) <<
-			        row << "," << col << " wasn't properly initialized.";
+				row << "," << col << " wasn't properly initialized.";
 		}
 	}
 }

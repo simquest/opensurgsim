@@ -28,6 +28,8 @@ set(SURGSIM_PHYSICS_SOURCES
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableRepresentationState.cpp
+	FemElement.cpp
+	FemElement3DTetrahedron.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -61,6 +63,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentation.h
 	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
+	FemElement.h
+	FemElement3DTetrahedron.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationContact.h
@@ -98,7 +102,15 @@ surgsim_add_library(
 	"${SURGSIM_PHYSICS_HEADERS}"
 	"SurgSim/Physics"
 )
-target_link_libraries(SurgSimPhysics SurgSimCollision SurgSimFramework SurgSimMath)
+
+SET(LIBS
+	MlcpTestIO
+	IdentityPoseDevice
+	SurgSimCollision
+)
+
+target_link_libraries(SurgSimPhysics ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

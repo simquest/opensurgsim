@@ -34,8 +34,8 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgMaterial.cpp
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
-	OsgScreenSpaceQuadRepresentation.cpp
 	OsgSceneryRepresentation.cpp
+	OsgScreenSpaceQuadRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
 	OsgTexture.cpp
@@ -84,8 +84,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRenderTarget-inl.h
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
-	OsgScreenSpaceQuadRepresentation.h
 	OsgSceneryRepresentation.h
+	OsgScreenSpaceQuadRepresentation.h
 	OsgShader.h
 	OsgSphereRepresentation.h
 	OsgTexture.h
@@ -134,9 +134,14 @@ surgsim_add_library(
 	"${SURGSIM_GRAPHICS_HEADERS}"
 	"SurgSim/Graphics"
 )
-target_link_libraries(SurgSimGraphics SurgSimFramework
-	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
+SET(LIBS
+	SurgSimFramework
+	${OPENSCENEGRAPH_LIBRARIES}
+)
+
+target_link_libraries(SurgSimGraphics ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

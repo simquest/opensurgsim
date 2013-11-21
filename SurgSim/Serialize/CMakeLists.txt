@@ -43,8 +43,13 @@ surgsim_add_library(
 	"SurgSim/Serialize"
 )
 
-set(LIBS SurgSimFramework SurgSimGraphics ${Boost_LIBRARIES})
+set(LIBS 
+	SurgSimFramework
+	SurgSimGraphics
+)
 
+target_link_libraries(SurgSimSerialize ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

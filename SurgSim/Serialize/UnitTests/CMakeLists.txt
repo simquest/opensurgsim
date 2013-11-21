@@ -30,7 +30,10 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-include_directories(
+set(LIBS
+	SurgSimSerialize
+	gtest
+	yaml-cpp
 )
 
 set(LIBS SurgSimSerialize SurgSimPhysics SurgSimMath SurgSimFramework SurgSimGraphics gtest yaml-cpp ${Boost_LIBRARIES})
