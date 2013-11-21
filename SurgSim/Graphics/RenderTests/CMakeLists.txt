@@ -45,7 +45,11 @@ set(UNIT_TEST_HEADERS
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
-set(LIBS SurgSimFramework SurgSimGraphics SurgSimTesting gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+set(LIBS 
+	SurgSimGraphics
+	SurgSimTesting
+	gtest
+)
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires a window system and is disabled by
