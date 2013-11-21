@@ -30,6 +30,9 @@ using SurgSim::Framework::Behavior;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Math::Vector3d;
 
+/// \file
+/// A Behavior that creates randomly positioned SphereElements at a fixed rate.
+/// \sa SurgSim::Blocks::SphereElement
 namespace SurgSim
 {
 

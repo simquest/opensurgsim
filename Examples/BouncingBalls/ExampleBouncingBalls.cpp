@@ -68,8 +68,9 @@ using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::PhysicsManager;
 
-///\file Example of how to put together a very simple demo of  balls colliding with each other
-///		 dcd is used in a very simple manner to detect the collisions between the spheres
+/// \file
+///      Example of how to put together a very simple demo of balls colliding with each other.
+///	 	 Discrete Collision Detection (dcd) is used to detect collisions between spheres.
 
 std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data,
 										   const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
