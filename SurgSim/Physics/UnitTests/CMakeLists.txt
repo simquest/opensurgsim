@@ -62,15 +62,8 @@ include_directories(
 )
 
 set(LIBS
-	IdentityPoseDevice
-	SurgSimCollision
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimInput
 	SurgSimPhysics
-	MlcpTestIO
 	gtest
-	${Boost_LIBRARIES}
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -28,8 +28,11 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS MultiAxisDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES})
+set(LIBS 
+	MultiAxisDevice
+	gtest
+)
+
 if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
