@@ -72,8 +72,6 @@ using SurgSim::Physics::PhysicsManager;
 ///      Example of how to put together a very simple demo of balls colliding with each other.
 ///	 	 Discrete Collision Detection (dcd) is used to detect collisions between spheres.
 
-std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data,
-										   const std::string& name, const SurgSim::Math::RigidTransform3d& pose);
 
 /// Simple behavior to show that the spheres are moving while we don't have graphics.
 /// \note A Behavior is a type of Component that causes changes or actions.
@@ -216,59 +214,6 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 /// Creates a SceneElement of a rigid sphere with a graphic texture loaded from an image file.
 /// \note This SceneElement does not have a collision Component.
 /// \note Alternatively, a SurgSim::Blocks::SphereElement could be constructed and then its member variables altered.
-std::shared_ptr<SceneElement> createSphere(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-	const SurgSim::Math::RigidTransform3d& pose)
-{
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(name + " Physics");
-
-	RigidRepresentationParameters params;
-	params.setDensity(700.0); // Wood
-	params.setLinearDamping(0.1);
-
-	std::shared_ptr<SphereShape> shape = std::make_shared<SphereShape>(0.1); // 1cm Sphere
-	params.setShapeUsedForMassInertia(shape);
-
-	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
-
-	std::shared_ptr<OsgSphereRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSphereRepresentation>(name + " Graphics");
-	graphicsRepresentation->setRadius(shape->getRadius());
-	graphicsRepresentation->setInitialPose(pose);
-
-	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
-	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
-
-	shader->setVertexShaderSource(
-		"varying vec4 color;\n"
-		"void main(void)\n"
-		"{\n"
-		"	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
-		"	color.rgb = gl_Normal;\n"
-		"	color.a = 1.0;\n"
-		"}");
-	shader->setFragmentShaderSource(
-		"varying vec4 color;\n"
-		"void main(void)\n"
-		"{\n"
-		"	gl_FragColor = color;\n"
-		"}");
-	material->setShader(shader);
-	graphicsRepresentation->setMaterial(material);
-
-	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
-	sphereElement->addComponent(physicsRepresentation);
-	sphereElement->addComponent(graphicsRepresentation);
-	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
-	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-								physicsRepresentation, graphicsRepresentation));
-	sphereElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Sphere Collision Representation", physicsRepresentation));
-
-	return sphereElement;
-}
-
 std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
@@ -345,9 +290,6 @@ int main(int argc, char* argv[])
 
 	// A Scene is a container for all of the SceneElements.
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
-
-	scene->addSceneElement(createSphere(data, "sphere1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,2.0,0.0))));
 
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
