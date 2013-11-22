@@ -223,7 +223,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 
 	// A RigidRepresentationParameters defines physical parameters for a rigid body like mass/inertia/damping.
 	RigidRepresentationParameters params;
-	// Density determines inertia and compliance, which are used in collisions.
+	// Density determines inertia and compliance, which are used in the collision response.
 	params.setDensity(5513.0); // Earth
 	// Damping generates a force that opposes the velocity.
 	params.setLinearDamping(0.1);
@@ -262,7 +262,8 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(graphicsRepresentation);
 	// By adding the PrintoutBehavior, this SceneElement will output its position each update.
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
-	// After the physics Component updates the pose, transfer the new pose to the graphics Component.
+	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
+	// graphics Representation.
 	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
 	return sphereElement;
@@ -271,14 +272,20 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 
 int main(int argc, char* argv[])
 {
-	// The config file contains a list of folder locations which will be used to find images.
+	// The config file contains a list of folder locations which will be used to find resources, such as images, shader
+	// code, physics descriptions, etc.
 	const SurgSim::Framework::ApplicationData data("config.txt");
 
-	// An OsgManager is an implementation of a SurgSim::Graphics::Manager, and handles the updates to the graphics.
+	// Here the various Managers are created.  Managers contain and update their type of Components. A Manager is a
+	// sub-class of BasicThread, so each Manager runs in its own thread and can have its own target update rate.
+	// The three types of Managers are:
+	// a) Graphics::Manager to display the graphic scene from graphics representations (using graphics-shapes,
+	// materials, shaders, etc.),
+	// b) PhysicsManager to update the physics simulation based on physics representations (using physics-shapes,
+	// fixed/rigid/FEM models, compliance, inertia, collision type, etc.), and
+	// c) BehaviorManager for any actions not handled in the graphics or physics threads.
 	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	// A PhysicsManager handles the updates to the physics.
 	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
-	// A BehaviorManager handles the updates to the behaviors.
 	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager =
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	// A Runtime is the top-level container for all of the Managers and a single Scene.
@@ -288,7 +295,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 
-	// A Scene is a container for all of the SceneElements.
+	// A Scene is a container for all of the SceneElements, which in turn contain their Components.
 	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
 
 	scene->addSceneElement(createEarth(data, "earth1",
@@ -304,11 +311,15 @@ int main(int argc, char* argv[])
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
-	// Tell the Runtime which Scene.
+	// Tell the Runtime which Scene to use. Since the Scene contains all of the Elements, a Runtime therefore has
+	// access to all of the Components.
 	runtime->setScene(scene);
 
-	// Start the simulation: initialize/startup of Managers/Components/SceneElements.
-	// Blocks until one of the Managers quits.
+	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
+	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the
+	// Managers (Runtime::addComponents).  The Managers only accept the types of Components that they manage. Once the
+	// Managers are running, the Runtime can be used to stop/step the Managers.
+	// Runtime::execute() will block until one of the Managers quits.
 	runtime->execute();
 
 	return 0;
