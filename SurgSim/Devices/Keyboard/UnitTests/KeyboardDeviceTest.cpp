@@ -84,7 +84,7 @@ TEST_F(KeyboardDeviceTest, InputConsumer)
 	KeyboardDeviceTest::update(device);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("key"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("key_modifier"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.integers().hasData("modifierMask"));
 
 	device->finalize();
 }

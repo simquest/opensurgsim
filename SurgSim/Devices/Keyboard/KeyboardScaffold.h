@@ -85,7 +85,7 @@ private:
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	osg::ref_ptr<KeyboardHandler> getKeyboardHandler() const;
+	KeyboardHandler* getKeyboardHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();

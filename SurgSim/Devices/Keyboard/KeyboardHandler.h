@@ -17,6 +17,7 @@
 #define SURGSIM_DEVICES_KEYBOARD_KEYBOARDHANDLER_H
 
 #include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
+#include <SurgSim/Devices/Keyboard/KeyCode.h>
 
 #include <memory>
 
@@ -46,7 +47,7 @@ public:
 		}
 		case(osgGA::GUIEventAdapter::KEYUP) :
 			{
-				m_keyboardScaffold.lock()->updateDevice(-1, 0);
+				m_keyboardScaffold.lock()->updateDevice(KeyCode::NONE, ModKeyMask::MODKEY_NONE);
 				return true;
 			}
 		default:

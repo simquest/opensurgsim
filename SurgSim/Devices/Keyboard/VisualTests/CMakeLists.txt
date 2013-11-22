@@ -14,11 +14,7 @@
 # limitations under the License.
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -32,16 +28,10 @@ add_executable(KeyboardVisualTest
 	${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 
 set(LIBS KeyboardDevice
-		 SurgSimBlocks SurgSimDataStructures 
-         SurgSimFramework SurgSimGraphics 
+		 SurgSimDataStructures 
 		 SurgSimInput SurgSimTesting 
-		 gtest 
-		 ${Boost_LIBRARIES} 
-		 ${OPENSCENEGRAPH_LIBRARIES} 
-		 ${OPENTHREADS_LIBRARY}
+		 ${OPENSCENEGRAPH_LIBRARIES}
 	)
-
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	
 target_link_libraries(KeyboardVisualTest ${LIBS})
 

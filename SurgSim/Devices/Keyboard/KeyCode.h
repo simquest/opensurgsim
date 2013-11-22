@@ -23,6 +23,7 @@ namespace Device
 	// KeyCode pulled out from osgGA/GUIEventAdapter
 	enum KeyCode
 	{
+		NONE                = -1,
 		KEY_SPACE           = 0x20,
 		KEY_0               = '0',
 		KEY_1               = '1',
@@ -209,6 +210,38 @@ namespace Device
 		KEY_SUPER_R         = 0xFFEC,        /* Right super */
 		KEY_HYPER_L         = 0xFFED,        /* Left hyper */
 		KEY_HYPER_R         = 0xFFEE         /* Right hyper */
+	};
+
+	// Masks pulled out from osgGA/GUIEventAdapter
+	enum ModKeyMask
+	{
+		MODKEY_NONE           = 0,
+		MODKEY_LEFT_SHIFT     = 0x0001,
+		MODKEY_RIGHT_SHIFT    = 0x0002,
+		MODKEY_LEFT_CTRL      = 0x0004,
+		MODKEY_RIGHT_CTRL     = 0x0008,
+		MODKEY_LEFT_ALT       = 0x0010,
+		MODKEY_RIGHT_ALT      = 0x0020,
+		MODKEY_LEFT_META      = 0x0040,
+		MODKEY_RIGHT_META     = 0x0080,
+		MODKEY_LEFT_SUPER     = 0x0100,
+		MODKEY_RIGHT_SUPER    = 0x0200,
+		MODKEY_LEFT_HYPER     = 0x0400,
+		MODKEY_RIGHT_HYPER    = 0x0800,
+		MODKEY_NUM_LOCK       = 0x1000,
+		MODKEY_CAPS_LOCK      = 0x2000,
+		MODKEY_CTRL           = (MODKEY_LEFT_CTRL|MODKEY_RIGHT_CTRL),
+		MODKEY_SHIFT          = (MODKEY_LEFT_SHIFT|MODKEY_RIGHT_SHIFT),
+		MODKEY_ALT            = (MODKEY_LEFT_ALT|MODKEY_RIGHT_ALT),
+		MODKEY_META           = (MODKEY_LEFT_META|MODKEY_RIGHT_META),
+		MODKEY_SUPER          = (MODKEY_LEFT_SUPER|MODKEY_RIGHT_SUPER),
+		MODKEY_HYPER          = (MODKEY_LEFT_HYPER|MODKEY_RIGHT_HYPER),
+		MODKEY_CAPS_SHIFT_L   = (MODKEY_CAPS_LOCK|MODKEY_LEFT_SHIFT),
+		MODKEY_CAPS_SHIFT_R   = (MODKEY_CAPS_LOCK|MODKEY_RIGHT_SHIFT),
+		MODKEY_CAPS_CONTROL_L = (MODKEY_CAPS_LOCK|MODKEY_LEFT_CTRL),
+		MODKEY_CAPS_CONTROL_R = (MODKEY_CAPS_LOCK|MODKEY_RIGHT_CTRL),
+		MODKEY_CAPS_ALT_L     = (MODKEY_CAPS_LOCK|MODKEY_LEFT_ALT),
+		MODKEY_CAPS_ALT_R     = (MODKEY_CAPS_LOCK|MODKEY_RIGHT_ALT)
 	};
 };  // namespace Device
 };  // namespace SurgSim

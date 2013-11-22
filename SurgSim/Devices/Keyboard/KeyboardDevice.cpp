@@ -62,7 +62,7 @@ bool KeyboardDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
-osg::ref_ptr<KeyboardHandler> KeyboardDevice::getKeyboardHandler() const
+KeyboardHandler* KeyboardDevice::getKeyboardHandler() const
 {
 	return m_scaffold->getKeyboardHandler();
 }

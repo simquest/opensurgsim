@@ -87,21 +87,21 @@ bool KeyboardScaffold::unregisterDevice()
 	return false;
 }
 
-bool KeyboardScaffold::updateDevice(int key, int key_modifier)
+bool KeyboardScaffold::updateDevice(int key, int modifierMask)
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
 	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
 
 	inputData.integers().set("key", key);
-	inputData.integers().set("key_modifier", key_modifier);
+	inputData.integers().set("modifierMask", modifierMask);
 
 	m_device->deviceObject->pushInput();
 	return true;
 }
 
-osg::ref_ptr<KeyboardHandler> KeyboardScaffold::getKeyboardHandler() const
+KeyboardHandler* KeyboardScaffold::getKeyboardHandler() const
 {
-	return m_device->keyboardHandler;
+	return m_device->keyboardHandler.get();
 }
 
 
@@ -110,7 +110,7 @@ SurgSim::DataStructures::DataGroup KeyboardScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addInteger("key");
-	builder.addInteger("key_modifier");
+	builder.addInteger("modifierMask");
 	return builder.createData();
 }
 
