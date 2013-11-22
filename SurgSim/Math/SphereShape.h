@@ -30,7 +30,7 @@ class SphereShape: public Shape
 public:
 	/// Constructor
 	/// \param radius The sphere radius (in m)
-	explicit SphereShape(double radius = 0);
+	explicit SphereShape(double radius = 0.0);
 
 	/// \return the type of the shape
 	virtual int getType() override;

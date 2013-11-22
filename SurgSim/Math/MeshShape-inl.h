@@ -242,7 +242,6 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeVolumeIntegrals()
 template <class VertexData, class EdgeData, class TriangleData>
 YAML::Node SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::encode()
 {
-	YAML::Node node;
 	return SurgSim::Math::Shape::encode();
 }
 

@@ -56,7 +56,6 @@ SurgSim::Math::Vector3d DoubleSidedPlaneShape::getNormal() const
 
 YAML::Node SurgSim::Math::DoubleSidedPlaneShape::encode()
 {
-	YAML::Node node;
 	return SurgSim::Math::Shape::encode();
 }
 

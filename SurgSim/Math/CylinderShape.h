@@ -32,7 +32,7 @@ public:
 	/// Constructor
 	/// \param length The length of the cylinder (in m)
 	/// \param radius The cylinder radius (in m)
-	CylinderShape(double length = 0, double radius = 0);
+	CylinderShape(double length = 0.0, double radius = 0.0);
 
 	/// \return the type of the shape
 	virtual int getType() override;

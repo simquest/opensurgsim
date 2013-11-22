@@ -56,7 +56,6 @@ SurgSim::Math::Vector3d PlaneShape::getNormal() const
 
 YAML::Node SurgSim::Math::PlaneShape::encode()
 {
-	YAML::Node node;
 	return SurgSim::Math::Shape::encode();
 }
 

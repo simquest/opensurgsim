@@ -32,7 +32,7 @@ public:
 	/// Constructor
 	/// \param length The capsule length (i.e. of the cylinder) (in m)
 	/// \param radius The capsule radius (i.e. of the cylinder/spheres) (in m)
-	CapsuleShape(double length = 0, double radius = 0);
+	CapsuleShape(double length = 0.0, double radius = 0.0);
 
 	/// \return the type of the shape
 	virtual int getType() override;
