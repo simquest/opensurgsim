@@ -281,6 +281,16 @@ void OsgCamera::setRenderOrder(RenderOrder order, int value)
 	}
 }
 
+osg::ref_ptr<osg::Camera> OsgCamera::getOsgCamera() const
+{
+	return m_camera;
+}
+
+osg::ref_ptr<osg::Node> OsgCamera::getOsgNode() const
+{
+	return m_switch;
+}
+
 }; // namespace Graphics
 }; // namespace SurgSim
 

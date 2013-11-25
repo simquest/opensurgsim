@@ -52,6 +52,7 @@ class RenderPass : public SurgSim::Framework::SceneElement
 public:
 
 	/// Constructor
+	/// \param name The name for this SceneElement
 	explicit RenderPass(const std::string& name);
 	~RenderPass();
 
@@ -64,7 +65,8 @@ public:
 	virtual bool doWakeUp() override;
 
 	/// Sets a view.
-	/// \note HS-2013-nov-11 this is currently necessary for the debug quads to work
+	/// \note HS-2013-nov-11 this is currently necessary for the debug quads to work, this is only a workaround and
+	/// 	  should go away when we have a different way to get to the current view
 	/// \param	view	The view.
 	void setView(std::shared_ptr<View> view);
 
@@ -74,6 +76,7 @@ public:
 
 	/// Sets render target for the camera, this abstracts the textures that are being used for rendering into.
 	/// \param	target	The rendertarget structure.
+	/// \return true if the target was successfully set
 	bool setRenderTarget(std::shared_ptr<RenderTarget> target);
 
 	/// Gets render target that is being used in this pass.
@@ -93,9 +96,15 @@ public:
 	/// \return	The group.
 	std::shared_ptr<Group> getGroup();
 
+	/// Sets the material used for rendering.
+	/// \param	material	The material.
+	/// \return	true if it succeeds, false if it fails.
 	bool setMaterial(std::shared_ptr<Material> material);
 
+	/// Gets the current material.
+	/// \return	The material.
 	std::shared_ptr<Material> getMaterial();
+	
 	/// Shows a quad on the screen with the texture used as the color target for this pass.
 	/// \param	x,y	  	The x and y coordinates on the screen.
 	/// \param	width,height 	The width and height on the scree.
@@ -128,8 +137,6 @@ private:
 
 	/// Utility function to build a debug quad.
 	/// \param	name   	The name for the component.
-	/// \param	x,y	   	The x and y coordinates.
-	/// \param	width, height  	The width and height.
 	/// \param	texture	The texture for redering.
 	/// \return	a constructed quads.
 	std::shared_ptr<ScreenSpaceQuadRepresentation> buildDebugQuad(
