@@ -104,6 +104,38 @@ inline T computeAngle(const Eigen::Matrix<T, 3, 3, MOpt>& matrix)
 	return angleAxis.angle();
 }
 
+/// Makes view matrix from eye, center and up vectors. Use the formula from
+/// http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
+/// \tparam	typename T	T the numeric data type used for arguments and the return value. Can usually be deduced.
+/// \tparam	int VOpt  	VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
+/// \param	eye   	The eyepoint of the camera.
+/// \param	center	The center of the camera view direction.
+/// \param	up	  	The up vector for the camera.
+/// \return	a matrix transforming the world into one that has the camera at the center.
+template <typename T, int VOpt>
+inline Eigen::Matrix<T, 4, 4> makeViewMatrix(const Eigen::Matrix<T, 3, 1, VOpt>& eye,
+											 const Eigen::Matrix<T, 3, 1, VOpt>& center,
+											 const Eigen::Matrix<T, 3, 1, VOpt>& up)
+{
+	Eigen::Matrix<T, 3, 1, VOpt> forward = (center - eye).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> side = (forward.cross(up)).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> actualUp = side.cross(forward).normalized();
+
+	Eigen::Matrix<T, 4, 4> rotation;
+	rotation <<     side[0],      side[1],      side[2], 0.0,
+		        actualUp[0],  actualUp[1],  actualUp[2], 0.0, 
+		        -forward[0],  -forward[1],  -forward[2], 0.0,
+		                0.0,          0.0,          0.0, 1.0;  
+
+	Eigen::Matrix<T, 4, 4> translation;
+	translation << 1.0, 0.0, 0.0, -eye.x(),
+				   0.0, 1.0, 0.0, -eye.y(),
+				   0.0, 0.0, 1.0, -eye.z(),
+				   0.0, 0.0, 0.0,    1.0;
+
+	return rotation*translation;
+}
+
 /// Helper method to add a sub-matrix into a matrix, for the sake of clarity
 /// \tparam Matrix The matrix type
 /// \tparam SubMatrix The sub-matrix type

@@ -50,7 +50,7 @@ public:
 	virtual void removeFromStateSet(osg::StateSet* stateSet);
 
 	/// Returns true if the vertex shader has been set, otherwise false.
-	virtual bool hasVertexShader();
+	virtual bool hasVertexShader() const;
 
 	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
 	virtual void clearVertexShader();
@@ -108,10 +108,16 @@ public:
 	virtual bool getFragmentShaderSource(std::string* source) const;
 
 	/// Returns the OSG program attribute
-	osg::ref_ptr<osg::Program> getOsgProgram() const
-	{
-		return m_program;
-	}
+	osg::ref_ptr<osg::Program> getOsgProgram() const;
+
+	/// Enables the shader to override other material shaders
+	/// \param	val	if true the shader will replace other shaders in a lower hierarchy.
+	virtual void setGlobalScope(bool val) override;
+
+	/// Query if this object is global scope and overrides other lower level shaders.
+	/// \return	true if global scope, false if not.
+	virtual bool isGlobalScope() const override;
+
 
 private:
 	/// OSG program attribute
@@ -123,6 +129,9 @@ private:
 	osg::ref_ptr<osg::Shader> m_geometryShader;
 	/// OSG fragment shader
 	osg::ref_ptr<osg::Shader> m_fragmentShader;
+
+	/// Is the shader supposed to be used globally
+	bool m_globalScope;
 };
 
 };  // namespace Graphics

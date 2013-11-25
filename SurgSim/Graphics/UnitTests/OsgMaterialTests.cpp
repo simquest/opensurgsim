@@ -21,6 +21,7 @@
 #include <SurgSim/Graphics/OsgUniform.h>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 using SurgSim::Math::Vector2f;
 
@@ -39,114 +40,31 @@ public:
 	}
 };
 
-/// Shader that does not subclass OsgShader
 class MockShader : public Shader
 {
 public:
-	/// Constructor
-	MockShader() : Shader()
-	{
-	}
+	MOCK_CONST_METHOD0(hasGeometryShader, bool());
+	MOCK_CONST_METHOD0(hasVertexShader, bool());
+	MOCK_CONST_METHOD0(hasFragmentShader, bool());
 
-	/// Returns true if the vertex shader has been set, otherwise false.
-	virtual bool hasVertexShader()
-	{
-		return false;
-	}
+	MOCK_METHOD1(setGeometryShaderSource, void(const std::string&));
+	MOCK_METHOD1(setVertexShaderSource, void(const std::string&));
+	MOCK_METHOD1(setFragmentShaderSource, void(const std::string&));
 
-	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
-	virtual void clearVertexShader()
-	{
-	}
+	MOCK_METHOD1(loadGeometryShaderSource, bool(const std::string&));
+	MOCK_METHOD1(loadVertexShaderSource, bool(const std::string&));
+	MOCK_METHOD1(loadFragmentShaderSource, bool(const std::string&));
 
-	/// Loads the vertex shader source code from a file
-	/// \param	filePath	Path to file containing shader source code
-	/// \return	True if the source is successfully loaded, otherwise false.
-	virtual bool loadVertexShaderSource(const std::string& filePath)
-	{
-		return false;
-	}
+	MOCK_CONST_METHOD1(getGeometryShaderSource, bool(std::string*));
+	MOCK_CONST_METHOD1(getVertexShaderSource, bool(std::string*));
+	MOCK_CONST_METHOD1(getFragmentShaderSource, bool(std::string*));
 
-	/// Set the vertex shader source code
-	/// \param	source	Shader source code
-	virtual void setVertexShaderSource(const std::string& source)
-	{
-	}
+	MOCK_METHOD0(clearGeometryShader, void());
+	MOCK_METHOD0(clearVertexShader, void());
+	MOCK_METHOD0(clearFragmentShader, void());
 
-	/// Gets the vertex shader source code
-	/// \return	Shader source code
-	virtual bool getVertexShaderSource(std::string* source) const
-	{
-		*source = "";
-		return false;
-	}
-
-	/// Returns true if the geometry shader has been set, otherwise false.
-	virtual bool hasGeometryShader() const
-	{
-		return false;
-	}
-
-	/// Removes the geometry shader, returning that portion of the shader program to fixed-function.
-	virtual void clearGeometryShader()
-	{
-	}
-
-	/// Loads the geometry shader source code from a file
-	/// \param	filePath	Path to file containing shader source code
-	/// \return	True if the source is successfully loaded, otherwise false.
-	virtual bool loadGeometryShaderSource(const std::string& filePath)
-	{
-		return false;
-	}
-
-	/// Set the geometry shader source code
-	/// \param	source	Shader source code
-	virtual void setGeometryShaderSource(const std::string& source)
-	{
-	}
-
-	/// Gets the geometry shader source code
-	/// \return	Shader source code
-	virtual bool getGeometryShaderSource(std::string* source) const
-	{
-		*source = "";
-		return false;
-	}
-
-
-	/// Returns true if the fragment shader has been set, otherwise false.
-	virtual bool hasFragmentShader() const
-	{
-		return false;
-	}
-
-	/// Removes the fragment shader, returning that portion of the shader program to fixed-function.
-	virtual void clearFragmentShader()
-	{
-	}
-
-	/// Loads the fragment shader source code from a file
-	/// \param	filePath	Path to file containing shader source code
-	/// \return	True if the source is successfully loaded, otherwise false.
-	virtual bool loadFragmentShaderSource(const std::string& filePath)
-	{
-		return false;
-	}
-
-	/// Set the fragment shader source code
-	/// \param	source	Shader source code
-	virtual void setFragmentShaderSource(const std::string& source)
-	{
-	}
-
-	/// Gets the fragment shader source code
-	/// \return	Shader source code
-	virtual bool getFragmentShaderSource(std::string* source) const
-	{
-		*source = "";
-		return false;
-	}
+	MOCK_CONST_METHOD0(isGlobalScope, bool());
+	MOCK_METHOD1(setGlobalScope, void(bool));
 };
 
 
