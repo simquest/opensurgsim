@@ -49,6 +49,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgUnitAxes.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	RenderPass.cpp
 	Representation.cpp
 	ViewElement.cpp
 )
@@ -110,6 +111,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgViewElement.h
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
+	RenderPass.h
 	RenderTarget.h
 	Representation.h
 	SceneryRepresentation.h
