@@ -49,15 +49,6 @@ public:
 	/// \return	visible	True for visible, false for invisible
 	virtual bool isVisible() const = 0;
 
-	/// Set the initial pose of the representation
-	/// \param	pose	The initial pose
-	/// \note	This will reset initial, current, and final poses all to the new initial pose.
-	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
-
-	/// Get the initial pose of the representation
-	/// \return	The initial pose
-	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
-
 	/// Sets the material that defines the visual appearance of the representation
 	/// \param	material	Graphics material
 	/// \return	True if set successfully, otherwise false
