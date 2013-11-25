@@ -73,7 +73,7 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 	SurgSim::Math::Vector3d boxVertices[8];
 	for (int i = 0; i < 8; ++i)
 	{
-		boxVertices[i] = box->getLocalVertex(i);
+		boxVertices[i] = box->getVertex(i);
 		d[i] = planeNormal.dot(boxVertices[i]) + planeD;
 		maxD = std::max(d[i], maxD);
 		minD = std::min(d[i], minD);

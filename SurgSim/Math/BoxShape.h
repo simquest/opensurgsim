@@ -16,8 +16,10 @@
 #ifndef SURGSIM_MATH_BOXSHAPE_H
 #define SURGSIM_MATH_BOXSHAPE_H
 
-#include <SurgSim/Math/Shape.h>
+#include <array>
+
 #include <SurgSim/Math/Quaternion.h>
+#include <SurgSim/Math/Shape.h>
 
 namespace SurgSim
 {
@@ -36,6 +38,10 @@ public:
 
 	/// \return the type of the shape
 	virtual int getType() override;
+
+	/// Get size of the box
+	/// \return the size of the box (in m)
+	Vector3d getSize() const;
 
 	/// Get size in X direction
 	/// \return the size in the X direction (in m)
@@ -62,31 +68,24 @@ public:
 	/// \return The 3x3 symmetric inertia matrix of the box
 	virtual Matrix33d calculateInertia(double rho) const override;
 
-	/// Function that calculates the global vertex locations, given an orientation
-	/// and translation.
-	/// \param i The vertex index.
-	/// \param quat The orientation of the box.
-	/// \param trans The translation of the box.
-	/// \return The global vertex position.
-	Vector3d calculateGlobalVertex(const int i,
-								   const SurgSim::Math::Quaterniond& quat,
-								   const Vector3d& trans) const;
-
 	/// Function that returns the local vertex location, given an index.
-	/// and translation.
 	/// \param i The vertex index.
 	/// \return The local vertex position.
-	Vector3d getLocalVertex(const int i) const;
+	Vector3d getVertex(const int i) const;
+
+	/// Function that returns the local vertices' location
+	/// \return All eight vertices of the box
+	const std::array<Vector3d, 8>& getVertices() const;
 
 private:
 	/// Function that calculates the box vertices.
 	void calculateVertices();
 
 	/// The box sizes along the 3 axis respectively {X,Y,Z}
-	double   m_size[3];
+	Vector3d m_size;
 
 	/// The box vertices.
-	Vector3d m_vertices[8];
+	std::array<Vector3d,8> m_vertices;
 };
 
 }; // Math
