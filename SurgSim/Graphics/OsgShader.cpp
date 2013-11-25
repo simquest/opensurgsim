@@ -193,6 +193,11 @@ osg::ref_ptr<osg::Program> SurgSim::Graphics::OsgShader::getOsgProgram() const
 void SurgSim::Graphics::OsgShader::setGlobalScope(bool val)
 {
 	m_globalScope = val;
+	osg::StateAttribute::ParentList parents = m_program->getParents();
+	for (auto it = std::begin(parents); it != std::end(parents); ++it)
+	{
+		addToStateSet(*it);
+	}
 }
 
 bool SurgSim::Graphics::OsgShader::isGlobalScope() const
