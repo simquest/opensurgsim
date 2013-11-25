@@ -60,21 +60,20 @@ public:
 
 	/// Is this node a leaf node
 	/// \return true if this node has no children
-    bool isLeafNode() const;
+	bool isLeafNode() const;
 
 	/// Subdivide the node into 8 equal regions. Each subregion will be stored
 	/// as this nodes children.
-    void subdivide();
+	/// NOTE: The data stored in the current node will not be automatically subdivided.
+	void subdivide();
 
-	/// Add a leaf node to this octree
-	/// The octree will build the octree as necessary to add the leaf
+	/// Add data to a node in this this octree
+	/// The octree will build the octree as necessary to add the
 	/// node at the specified level
-	/// \param position The position of the new node
+	/// \param position The position to add the data at
 	/// \param nodeData The data to store in the node
-	/// \param level The number of levels down the octree to store this node
-	/// \param currentLevel the current level of this node
-    bool addNode(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
-			const int currentLevel=1);
+	/// \param level The number of levels down the octree to store the data
+	bool addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level);
 
 	/// Get the children of this node
 	/// \return vector of all eight children
@@ -88,9 +87,12 @@ public:
 	Data data;
 
 private:
+	bool doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
+			const int currentLevel);
+
 	BoundingBoxType m_boundingBox;
 	bool m_isActive;
-    bool m_isLeafNode;
+	bool m_isLeafNode;
 	std::vector<std::shared_ptr<OctreeNode<Data> > > m_children;
 };
 

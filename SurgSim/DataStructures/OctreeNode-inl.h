@@ -81,7 +81,13 @@ void OctreeNode<Data>::subdivide()
 }
 
 template<class Data>
-bool OctreeNode<Data>::addNode(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
+bool OctreeNode<Data>::addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level)
+{
+	return doAddData(position, nodeData, level, 1);
+}
+
+template<class Data>
+bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
 		const int currentLevel)
 {
 	if (! m_boundingBox.contains(position))
@@ -102,7 +108,7 @@ bool OctreeNode<Data>::addNode(const SurgSim::Math::Vector3d& position, const Da
 	}
 	for (auto child=m_children.begin(); child!=m_children.end(); ++child)
 	{
-		if ((*child)->addNode(position, nodeData, level, currentLevel+1))
+		if ((*child)->doAddData(position, nodeData, level, currentLevel+1))
 		{
 			m_isActive = true;
 			return true;

@@ -131,8 +131,8 @@ TEST(OctreeNodeTests, AddNodes)
 	EXPECT_TRUE(octree->isLeafNode());
 	EXPECT_FALSE(octree->isActive());
 
-	EXPECT_TRUE(octree->addNode(Vector3d(1.0, 1.0, 1.0), data, levels));
-	EXPECT_TRUE(octree->addNode(Vector3d(-4.0, 5.0, -7.0), data, levels));
+	EXPECT_TRUE(octree->addData(Vector3d(1.0, 1.0, 1.0), data, levels));
+	EXPECT_TRUE(octree->addData(Vector3d(-4.0, 5.0, -7.0), data, levels));
 
 	EXPECT_EQ(8, octree->getChildren().size());
 	EXPECT_FALSE(octree->isLeafNode());
@@ -162,7 +162,7 @@ TEST(OctreeNodeTests, Data)
 	EXPECT_EQ(0, octree.getChildren().size());
 	EXPECT_TRUE(octree.isLeafNode());
 	EXPECT_FALSE(octree.isActive());
-	EXPECT_TRUE(octree.addNode(Vector3d(1.0, 1.0, 1.0), expectedData, levels));
+	EXPECT_TRUE(octree.addData(Vector3d(1.0, 1.0, 1.0), expectedData, levels));
 	EXPECT_EQ(0, octree.getChildren().size());
 	EXPECT_TRUE(octree.isLeafNode());
 	EXPECT_TRUE(octree.isActive());
