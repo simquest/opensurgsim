@@ -1469,7 +1469,7 @@ void intersectionsSegmentBox(
 	// scaled from 0 to 1.
 	Eigen::Array<double, 3, 2> planeIntersectionAbscissas;
 	planeIntersectionAbscissas.col(0) = (box.min().array() - sv0.array());
-	planeIntersectionAbscissas.col(1) = (box.max().array()- sv0.array());
+	planeIntersectionAbscissas.col(1) = (box.max().array() - sv0.array());
 
 	// While we could be dividing by zero here, INF values are 
 	// correctly handled by the rest of the function.

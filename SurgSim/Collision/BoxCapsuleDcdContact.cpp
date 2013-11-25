@@ -37,7 +37,7 @@ namespace Collision
 Vector3d clamp(const Vector3d& vector, const Vector3d& min, const Vector3d& max)
 {
 	Vector3d clampedVector = vector;
-	for (int i=0; i<3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		if (vector[i] > max[i])
 		{
@@ -54,9 +54,9 @@ Vector3d clamp(const Vector3d& vector, const Vector3d& min, const Vector3d& max)
 Vector3d directionToClosestEdge(const Vector3d& pt, const Eigen::AlignedBox<double, 3>& box)
 {
 	Vector3d direction;
-	for (int i=0; i<3; i++)
+	for (int i = 0; i < 3; i++)
 	{
-		if (pt[i] > 0)
+		if (pt[i] > 0.0)
 		{
 			direction[i] = box.max()[i] - pt[i];
 		}

@@ -73,9 +73,8 @@ public:
 	/// \return The local vertex position.
 	Vector3d getVertex(const int i) const;
 
-	/// Function that returns the local vertex location, given an index.
-	/// \param i The vertex index.
-	/// \return The local vertex position.
+	/// Function that returns the local vertices' location
+	/// \return All eight vertices of the box
 	const std::array<Vector3d, 8>& getVertices() const;
 
 private:
