@@ -41,16 +41,13 @@ add_executable(ExampleMassSprings
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-target_link_libraries(ExampleMassSprings
-	SurgSimFramework
+SET(LIBS
 	SurgSimBlocks
-	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
-	SurgSimInput
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
+)
+
+target_link_libraries(ExampleMassSprings ${LIBS}
 )
 
 # Put ExampleMassSprings into folder "Examples"

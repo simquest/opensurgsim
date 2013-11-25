@@ -37,23 +37,16 @@ add_executable(ExampleInputVtc
 	${INPUTVTCEXAMPLE_SOURCES} ${INPUTVTCEXAMPLE_HEADERS})
 
 set(LIBS 
-	IdentityPoseDevice
 	MultiAxisDevice
 	SurgSimBlocks
-	SurgSimDataStructures
-	SurgSimFramework
 	SurgSimGraphics
-	SurgSimInput
-	SurgSimPhysics
-	${OPENSCENEGRAPH_LIBRARIES} 
-	${OPENTHREADS_LIBRARY}
-	${Boost_LIBRARIES})
+)
+
 if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
-target_link_libraries(ExampleInputVtc
-	${LIBS}
+target_link_libraries(ExampleInputVtc ${LIBS}
 )
 
 # Put ExampleInputVtc into folder "Examples"
