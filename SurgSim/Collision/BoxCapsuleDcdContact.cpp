@@ -151,7 +151,7 @@ void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pai
 			penetrationPoints.second.globalPosition.setValue(intersectionGlobal + penetration);
 
 			distance = penetration.norm();
-			pair->addContact(distance, penetration / distance, penetrationPoints);
+			pair->addContact(distance, -penetration / distance, penetrationPoints);
 		}
 	}
 }

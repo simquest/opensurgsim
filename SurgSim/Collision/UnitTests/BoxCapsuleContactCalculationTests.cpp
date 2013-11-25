@@ -53,8 +53,30 @@ void doBoxCapsuleTest(std::shared_ptr<BoxShape> box,
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(boxRep, capsuleRep);
 	calcContact.calculateContact(pair);
 
-	bool inContact = (pair->getContacts().size() > 0);
-	EXPECT_EQ(expectedInContact, inContact);
+	EXPECT_EQ(expectedInContact, pair->hasContacts());
+
+	if (expectedInContact)
+	{
+		SurgSim::Math::Vector3d capsuleToBox;
+		capsuleToBox = boxTrans - capsuleTrans;
+
+		double depthMax = box->getSize().norm();
+		depthMax += capsule->getLength() / 2.0 + capsule->getRadius();
+
+		auto contacts = pair->getContacts();
+		for (auto contact=contacts.cbegin(); contact!=contacts.cend(); ++contact)
+		{
+			if (! capsuleToBox.isZero())
+			{
+				// Check that each normal is pointing into the box
+				EXPECT_LT(0.0, (*contact)->normal.dot(capsuleToBox));
+			}
+
+			// Check that the depth is sane
+			EXPECT_LT(0.0, (*contact)->depth);
+			EXPECT_GT(depthMax, (*contact)->depth);
+		}
+	}
 }
 
 TEST(BoxCapsuleContactCalculationTests, UnitTests)
