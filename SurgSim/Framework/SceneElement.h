@@ -48,6 +48,7 @@ public:
 	/// \param	component	The component.
 	/// \return	true if it succeeds, false if it fails.
 	bool addComponent(std::shared_ptr<Component> component);
+	/// Removes a given component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, false if it fails or the component cannot be found.
 	bool removeComponent(std::shared_ptr<Component> component);
