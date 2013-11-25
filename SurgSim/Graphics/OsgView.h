@@ -90,10 +90,10 @@ public:
 protected:
 	/// Initialize the view
 	/// \post The view's window is setup.
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
 
 	/// Wake up the view
-	virtual bool doWakeUp();
+	virtual bool doWakeUp() override;
 
 private:
 	/// Position of the view on the screen (in pixels)
