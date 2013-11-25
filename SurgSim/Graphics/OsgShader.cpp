@@ -18,20 +18,27 @@
 using SurgSim::Graphics::OsgShader;
 
 OsgShader::OsgShader() : SurgSim::Graphics::Shader(),
-	m_program(new osg::Program())
+	m_program(new osg::Program()),
+	m_globalScope(false)
 {
 
 }
 
 void OsgShader::addToStateSet(osg::StateSet* stateSet)
 {
-	int attribute = osg::StateAttribute::ON | ((m_globalScope) ? osg::StateAttribute::OVERRIDE : 0);
-	stateSet->setAttributeAndModes(m_program, attribute);
+	if (stateSet != nullptr)
+	{
+		int attribute = osg::StateAttribute::ON | ((m_globalScope) ? osg::StateAttribute::OVERRIDE : 0);
+		stateSet->setAttributeAndModes(m_program, attribute);
+	}
 }
 
 void OsgShader::removeFromStateSet(osg::StateSet* stateSet)
 {
-	stateSet->removeAttribute(m_program);
+	if (stateSet != nullptr)
+	{
+		stateSet->removeAttribute(m_program);
+	}
 }
 
 bool OsgShader:: hasVertexShader() const

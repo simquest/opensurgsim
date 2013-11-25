@@ -110,8 +110,12 @@ public:
 	/// Returns the OSG program attribute
 	osg::ref_ptr<osg::Program> getOsgProgram() const;
 
+	/// Enables the shader to override other material shaders
+	/// \param	val	if true the shader will replace other shaders in a lower hierarchy.
 	virtual void setGlobalScope(bool val) override;
 
+	/// Query if this object is global scope and overrides other lower level shaders.
+	/// \return	true if global scope, false if not.
 	virtual bool isGlobalScope() const override;
 
 
@@ -126,6 +130,7 @@ private:
 	/// OSG fragment shader
 	osg::ref_ptr<osg::Shader> m_fragmentShader;
 
+	/// Is the shader supposed to be used globally
 	bool m_globalScope;
 };
 
