@@ -52,6 +52,7 @@ set(LIBS
 	MultiAxisDevice
 	SurgSimBlocks
 	SurgSimGraphics
+	SurgSimMath
 	yaml-cpp
 )
 

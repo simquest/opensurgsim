@@ -51,6 +51,7 @@ SET(LIBS
 	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimGraphics
+	SurgSimMath
 	yaml-cpp
 )
 
