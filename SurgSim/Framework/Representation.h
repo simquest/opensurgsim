@@ -27,21 +27,21 @@ namespace SurgSim
 namespace Framework
 {
 
-class SceneElement;
-
 /// Representations are manifestations of a SceneElement. For example, a
 /// SceneElement can be represented in graphics, physics, etc. Each of these
 /// representation will be derived from this class.
 class Representation : public Component
 {
 public:
-	explicit Representation(const std::string& m_name);
+	/// Constructor
+	/// \param name Name of the representation 
+	explicit Representation(const std::string& name);
+	/// Destructor
 	virtual ~Representation();
 
 	/// Set the initial pose of the representation
 	/// \param pose The initial pose
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
-
 	/// Get the initial pose of the representation
 	/// \return The initial pose
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const = 0;
@@ -51,7 +51,6 @@ public:
 	/// \note This requests the representation to set its pose to the given pose
 	/// \note In physics, the actual pose of the representation might not be exactly the requested one
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
-
 	/// Get the pose of the representation
 	/// \return The pose of this representation
 	/// \note getPose may or may not return the pose last sets by setPose
@@ -59,12 +58,15 @@ public:
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const = 0;
 
 private:
-	virtual bool doInitialize();
-	virtual bool doWakeUp();
+	/// Initialize this representation
+	/// \return True if initialization is succesfful; otherwise, false
+	virtual bool doInitialize() override;
+	/// Wakeup this representation
+	/// \return True if wakeup is succesfful; otherwise, false
+	virtual bool doWakeUp() override;
 };
 
 }; // namespace Framework
-
 }; // namespace SurgSim
 
 #endif // SURGSIM_FRAMEWORK_REPRESENTATION_H
