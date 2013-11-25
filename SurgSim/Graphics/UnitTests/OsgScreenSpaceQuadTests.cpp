@@ -102,7 +102,7 @@ TEST(OsgScreenSpaceQuadRepresentation, SetSize)
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
 
 	double width = 100.0;
-	double height = 100.0; 
+	double height = 100.0;
 
 	ASSERT_ANY_THROW(quad->getSize(nullptr, &height));
 	ASSERT_ANY_THROW(quad->getSize(&width, nullptr));
@@ -127,7 +127,7 @@ TEST(OsgScreenSpaceQuadRepresentationTests, SetLocation)
 		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
 
 	double x = 100.0;
-	double y = 100.0; 
+	double y = 100.0;
 
 	ASSERT_ANY_THROW(quad->getLocation(nullptr, &y));
 	ASSERT_ANY_THROW(quad->getLocation(&x, nullptr));

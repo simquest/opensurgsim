@@ -40,34 +40,34 @@ std::pair<int,int> BoxPlaneDcdContact::getShapeTypes()
 
 void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-    using SurgSim::Math::Geometry::DistanceEpsilon;
+	using SurgSim::Math::Geometry::DistanceEpsilon;
 
-    std::shared_ptr<CollisionRepresentation> representationBox;
+	std::shared_ptr<CollisionRepresentation> representationBox;
 	std::shared_ptr<CollisionRepresentation> representationPlane;
 
-    representationBox = pair->getFirst();
-    representationPlane = pair->getSecond();
+	representationBox = pair->getFirst();
+	representationPlane = pair->getSecond();
 
-    std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
-    std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+	std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
+	std::shared_ptr<PlaneShape> plane = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
 
-    // Transform the plane normal to box co-ordinate system.
-    SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
-                                                           representationPlane->getPose();
-    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
-    SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-    SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
-    double planeD = -planeNormal.dot(planePoint);
+	// Transform the plane normal to box co-ordinate system.
+	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
+														   representationPlane->getPose();
+	SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
+	SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
+	double planeD = -planeNormal.dot(planePoint);
 
-    // Loop through the box vertices (boxVertex) and check it it is below plane.
-    double d = 0.0;
-    SurgSim::Math::Vector3d boxVertex;
+	// Loop through the box vertices (boxVertex) and check it it is below plane.
+	double d = 0.0;
+	SurgSim::Math::Vector3d boxVertex;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d boxVertexGlobal;
-    for (int i = 0; i < 8; ++i)
-    {
-        boxVertex = box->getVertex(i);
-        d = planeNormal.dot(boxVertex) + planeD;
+	for (int i = 0; i < 8; ++i)
+	{
+		boxVertex = box->getVertex(i);
+		d = planeNormal.dot(boxVertex) + planeD;
 		if (d < DistanceEpsilon)
 		{
 			// Add a contact.
@@ -79,7 +79,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 
 			pair->addContact(d, normal, penetrationPoints);
 		}
-    }
+	}
 }
 
 }; // namespace Collision

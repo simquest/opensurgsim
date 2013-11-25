@@ -16,6 +16,8 @@
 #ifndef EXAMPLES_BOUNCINGBALLS_ADDRANDOMSPHEREBEHAVIOR_H
 #define EXAMPLES_BOUNCINGBALLS_ADDRANDOMSPHEREBEHAVIOR_H
 
+#include <random>
+
 #include <SurgSim/Framework/Behavior.h>
 
 namespace SurgSim
@@ -49,6 +51,12 @@ private:
 	double m_totalTime;
 	/// Record how many sphere have been added
 	int m_numElements;
+	/// Random number generator for randomized positions.
+	std::default_random_engine m_generator;
+	/// Distribution of random numbers for the x and z coordinates.
+	std::uniform_real_distribution<double> m_distribution_xz;
+	/// Distribution of random numbers for the y coordinate.
+	std::uniform_real_distribution<double> m_distribution_y;
 };
 
 };  // namespace Blocks

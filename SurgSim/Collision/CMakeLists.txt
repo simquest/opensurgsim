@@ -61,7 +61,15 @@ surgsim_add_library(
 	"${SURGSIM_COLLISION_HEADERS}"
 	"SurgSim/Collision"
 )
-target_link_libraries(SurgSimCollision SurgSimFramework SurgSimMath)
+
+SET(LIBS
+	SurgSimFramework
+	SurgSimMath
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimCollision ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)

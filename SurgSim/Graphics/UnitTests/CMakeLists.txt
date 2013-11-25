@@ -40,8 +40,8 @@ set(UNIT_TEST_SOURCES
 	OsgRenderTargetTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
-	OsgScreenSpaceQuadTests.cpp
 	OsgSceneryRepresentationTests.cpp
+	OsgScreenSpaceQuadTests.cpp
 	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
 	OsgTexture1dTests.cpp
@@ -71,7 +71,10 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 
-set(LIBS SurgSimFramework SurgSimGraphics gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+set(LIBS 
+	SurgSimGraphics 
+	gtest
+)
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)
 

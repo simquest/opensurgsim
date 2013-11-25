@@ -672,7 +672,7 @@ TYPED_TEST(ValidTests, ClearSubnormalAngleAxis)
 	compareAngleAxis(AngleAxis(-1, Vector3(1, std::numeric_limits<Scalar>::infinity(), 3)), rotation);
 
 	rotation = AngleAxis(std::numeric_limits<Scalar>::denorm_min(),
-	                     Vector3(1, 2, std::numeric_limits<Scalar>::infinity()));
+						 Vector3(1, 2, std::numeric_limits<Scalar>::infinity()));
 	EXPECT_TRUE(setSubnormalToZero(&rotation));
 	compareAngleAxis(AngleAxis(0, Vector3(1, 2, std::numeric_limits<Scalar>::infinity())), rotation);
 }

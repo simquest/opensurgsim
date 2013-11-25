@@ -62,7 +62,7 @@ bool near(double val1, double val2, double abs_error)
 	else
 	{
 		return ::testing::AssertionFailure() << "Eigen Matrices not the same " << std::endl <<
-		       "expected: " << expected << std::endl << "actual: " << actual <<std::endl;
+			   "expected: " << expected << std::endl << "actual: " << actual <<std::endl;
 	}
 }
 
@@ -182,11 +182,11 @@ TEST_F(GeometryTest, BaryCentricWithNormal)
 
 	// Halfway points
 	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0.5,0),
-	                                           tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+											   tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.5,0),outputPoint));
 
 	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0,0.5),
-	                                           tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+											   tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.0,0.5),outputPoint));
 
 	// Center Point
@@ -227,11 +227,11 @@ TEST_F(GeometryTest, BaryCentricWithoutNormal)
 
 	// Halfway points
 	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0.5,0),
-	                                           tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+											   tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.5,0),outputPoint));
 
 	EXPECT_TRUE(barycentricCoordinates<double>(tri.pointInTriangle(0,0.5),
-	                                           tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
+											   tri.v0,tri.v1,tri.v2,tri.n,&outputPoint));
 	EXPECT_TRUE(eigenEqual(VectorType(0.5,0.0,0.5),outputPoint));
 
 	// Center Point
