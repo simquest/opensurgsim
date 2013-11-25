@@ -34,7 +34,7 @@ class Representation : public Component
 {
 public:
 	/// Constructor
-	/// \param name Name of the representation 
+	/// \param name Name of the representation
 	explicit Representation(const std::string& name);
 	/// Destructor
 	virtual ~Representation();
