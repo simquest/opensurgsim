@@ -48,7 +48,7 @@ include(SurgSimUtilities)
 find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB osgGA osgAnimation REQUIRED)
 find_package(OpenThreads)
 find_package(OpenGL)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.2.0 REQUIRED)
 
 find_package(GLUT)  # only needed for visual device tests
 find_package(GlutFromOsg)  # look for GLUT in the OSG tree if not found above

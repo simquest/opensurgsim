@@ -20,12 +20,9 @@ namespace SurgSim
 namespace Math
 {
 
-BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ)
+BoxShape::BoxShape(double sizeX, double sizeY, double sizeZ) :
+	m_size(Vector3d(sizeX, sizeY, sizeZ))
 {
-	m_size[0] = sizeX;
-	m_size[1] = sizeY;
-	m_size[2] = sizeZ;
-
 	calculateVertices();
 }
 
@@ -34,6 +31,12 @@ int BoxShape::getType()
 {
 	return SHAPE_TYPE_BOX;
 }
+
+Vector3d BoxShape::getSize() const
+{
+	return m_size;
+}
+
 
 double BoxShape::getSizeX() const
 {
@@ -64,43 +67,38 @@ SurgSim::Math::Matrix33d BoxShape::calculateInertia(double rho) const
 {
 	const double mass = calculateMass(rho);
 
-	const double SquarelengthX = m_size[0] * m_size[0];
-	const double SquarelengthY = m_size[1] * m_size[1];
-	const double SquarelengthZ = m_size[2] * m_size[2];
+	const Vector3d sizeSquared = m_size.array() * m_size.array();
 	const double coef = 1.0 / 12.0 * mass;
-
-	Matrix33d inertia;
-	inertia.setZero();
-	inertia(0, 0) = coef * (SquarelengthY + SquarelengthZ);
-	inertia(1, 1) = coef * (SquarelengthX + SquarelengthZ);
-	inertia(2, 2) = coef * (SquarelengthX + SquarelengthY);
-
+	Matrix33d inertia = Matrix33d::Zero();
+	inertia.diagonal() = coef * Vector3d(sizeSquared[1] + sizeSquared[2],
+										sizeSquared[0] + sizeSquared[2],
+										sizeSquared[0] + sizeSquared[1]);
 	return inertia;
 }
 
-SurgSim::Math::Vector3d BoxShape::calculateGlobalVertex(const int i,
-										 const SurgSim::Math::Quaterniond& quat,
-										 const Vector3d& trans) const
-{
-	return quat * m_vertices[i] + trans;
-}
-
-SurgSim::Math::Vector3d BoxShape::getLocalVertex(const int i) const
+SurgSim::Math::Vector3d BoxShape::getVertex(const int i) const
 {
 	return m_vertices[i];
 }
 
+const std::array<Vector3d, 8>& BoxShape::getVertices() const
+{
+	return m_vertices;
+}
+
 void BoxShape::calculateVertices()
 {
-	static const double multiplier[8][3] = {{-0.5, -0.5, -0.5}, {-0.5, -0.5, 0.5}, {-0.5, 0.5, 0.5},
-		{-0.5, 0.5, -0.5}, {0.5, -0.5, -0.5}, {0.5, -0.5, 0.5}, {0.5, 0.5, 0.5}, {0.5, 0.5, -0.5}
-	};
-
+	static const std::array<Vector3d, 8> multiplier = {Vector3d(-0.5, -0.5, -0.5),
+													   Vector3d(-0.5, -0.5,  0.5),
+													   Vector3d(-0.5,  0.5,  0.5),
+													   Vector3d(-0.5,  0.5, -0.5),
+													   Vector3d( 0.5, -0.5, -0.5),
+													   Vector3d( 0.5, -0.5,  0.5),
+													   Vector3d( 0.5,  0.5,  0.5),
+													   Vector3d( 0.5,  0.5, -0.5)};
 	for(int i = 0; i < 8; ++i)
 	{
-		m_vertices[i][0] = m_size[0] * multiplier[i][0];
-		m_vertices[i][1] = m_size[1] * multiplier[i][1];
-		m_vertices[i][2] = m_size[2] * multiplier[i][2];
+		m_vertices[i] = m_size.array() * multiplier[i].array();
 	}
 }
 
