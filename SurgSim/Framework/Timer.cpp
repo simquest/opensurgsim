@@ -76,7 +76,7 @@ double SurgSim::Framework::Timer::getLastFrameRate() const
 
 void SurgSim::Framework::Timer::setNumberOfFrames(size_t numberOfFrames)
 {
-	m_numberOfFrames = (numberOfFrames > 0 ? numberOfFrames : 1);
+	m_numberOfFrames = (numberOfFrames > 0) ? numberOfFrames : 1;
 	while (m_frames.size() > m_numberOfFrames)
 	{
 		m_frames.pop_front();
