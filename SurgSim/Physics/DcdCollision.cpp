@@ -69,6 +69,7 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SpherePlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxCapsuleDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxSphereDcdContact>());

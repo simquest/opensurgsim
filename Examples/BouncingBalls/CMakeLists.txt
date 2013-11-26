@@ -46,16 +46,13 @@ add_executable(ExampleBouncingBalls
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-target_link_libraries(ExampleBouncingBalls
-	SurgSimFramework
+SET(LIBS
 	SurgSimBlocks
-	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
-	SurgSimInput
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
+)
+
+target_link_libraries(ExampleBouncingBalls ${LIBS}
 )
 
 # Put ExampleBouncingBalls into folder "Examples"

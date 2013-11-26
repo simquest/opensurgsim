@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	BoxCapsuleContactCalculationTests.cpp
 	BoxDoubleSidedPlaneContactCalculationTests.cpp
 	BoxPlaneContactCalculationTests.cpp
 	BoxSphereContactCalculationTests.cpp
@@ -45,7 +46,10 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimTesting SurgSimFramework SurgSimDataStructures SurgSimCollision gtest ${Boost_LIBRARIES})
+set(LIBS
+	SurgSimCollision
+	gtest
+)
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
 

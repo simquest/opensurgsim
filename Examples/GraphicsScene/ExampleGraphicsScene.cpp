@@ -45,13 +45,13 @@ using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Framework::Logger;
 
-namespace 
+namespace
 {
 
 std::unordered_map<std::string, std::shared_ptr<SurgSim::Graphics::OsgMaterial>> materials;
 
 std::shared_ptr<SurgSim::Graphics::OsgMaterial> loadMaterial(
-	const SurgSim::Framework::ApplicationData& data, 
+	const SurgSim::Framework::ApplicationData& data,
 	const std::string& name)
 {
 	std::string vertexShaderName = name+".vert";
@@ -104,7 +104,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	light->setSpecularColor(Vector4d(0.8,0.8,0.8,1.0));
 	light->setInitialPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(),Vector3d(10.0,10.0,10.0)));
 
-	viewElement->addComponent(light); 
+	viewElement->addComponent(light);
 
 	return viewElement;
 }
@@ -131,7 +131,7 @@ public:
 	}
 
 	void setPose(const RigidTransform3d& pose)
-	{ 
+	{
 		m_box->setPose(pose);
 	}
 

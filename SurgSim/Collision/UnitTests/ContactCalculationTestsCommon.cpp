@@ -109,15 +109,16 @@ void generateBoxPlaneContact(std::list<std::shared_ptr<Contact>>* expectedContac
 	Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * plane->getD());
 	double depth = 0.0;
 	Vector3d collisionNormal = planeNormalGlobal;
+	RigidTransform3d boxTransform = SurgSim::Math::makeRigidTransform(boxQuat, boxTrans);
 	for (int i = 0; i < expectedNumberOfContacts; ++i)
 	{
-		vertex = box->calculateGlobalVertex(expectedBoxIndicesInContacts[i], boxQuat, boxTrans);
+		vertex = boxTransform * box->getVertex(expectedBoxIndicesInContacts[i]);
 		std::pair<Location, Location> penetrationPoint;
 		penetrationPoint.first.globalPosition.setValue(vertex);
 		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
 		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
 		expectedContacts->push_back(std::make_shared<Contact>(depth, Vector3d::Zero(),
-					collisionNormal, penetrationPoint));
+															 collisionNormal, penetrationPoint));
 	}
 }
 
@@ -135,15 +136,16 @@ void generateBoxDoubleSidedPlaneContact(std::list<std::shared_ptr<Contact>>* exp
 	Vector3d pointOnPlane = planeTrans + (planeNormalGlobal * plane->getD());
 	double depth = 0.0;
 	Vector3d collisionNormal = planeNormalGlobal * (collisionNormalIsPlaneNormal ? 1.0 : -1.0);
+	RigidTransform3d boxTransform = SurgSim::Math::makeRigidTransform(boxQuat, boxTrans);
 	for (int i = 0; i < expectedNumberOfContacts; ++i)
 	{
-		vertex = box->calculateGlobalVertex(expectedBoxIndicesInContacts[i], boxQuat, boxTrans);
+		vertex = boxTransform * box->getVertex(expectedBoxIndicesInContacts[i]);
 		std::pair<Location, Location> penetrationPoint;
 		penetrationPoint.first.globalPosition.setValue(vertex);
 		depth = planeNormalGlobal.dot(vertex - pointOnPlane);
 		penetrationPoint.second.globalPosition.setValue(vertex - planeNormalGlobal * depth);
 		expectedContacts->push_back(std::make_shared<Contact>(std::abs(depth), Vector3d::Zero(),
-									collisionNormal, penetrationPoint));
+															 collisionNormal, penetrationPoint));
 	}
 }
 
