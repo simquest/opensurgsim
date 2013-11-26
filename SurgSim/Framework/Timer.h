@@ -38,7 +38,7 @@ public:
 	/// Time points used by the Timer class.
 	typedef boost::chrono::time_point<TimerClock, TimerDuration> TimerTimePoint;
 
-	/// Instantiate a TimersClock and start a timing run.
+	/// Instantiate a TimerClock and start a timing run.
 	Timer();
 
 	/// Begin a timing run by storing the current time and clearing out the stored frames.
@@ -76,7 +76,7 @@ public:
 	int getNumberOfClockFails() const;
 
 private:
-	/// Get the current time.  Handles any error codes from the clock.  May \c assert if the clock fails.
+	/// Get the current time.  Handles any error codes from the clock.  May assert if the clock fails.
 	/// \return Current time.
 	TimerTimePoint now();
 
