@@ -161,6 +161,9 @@ public:
 	/// Step the timer and output the update rate for the Graphics Manager.
 	virtual void update(double dt) override
 	{
+		// The inUpdateTimer starts its frame now, so the frame does not time anything that occurs before update was
+		// called.
+		m_inUpdateTimer.beginFrame();
 		// Tell the timer one frame has passed.
 		m_timer.endFrame();
 		// Log the update rate.
@@ -170,6 +173,11 @@ public:
 			SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " timer's clock failed " <<
 				m_timer.getNumberOfClockFails() << " times.";
 		}
+		// The inUpdateTimer ends its frame now.
+		m_inUpdateTimer.endFrame();
+		// Log the average period spend inside update (minus this log).
+		SURGSIM_LOG_DEBUG(m_logger) << "Average time inside behavior update: "
+			<< m_inUpdateTimer.getAverageFramePeriod();
 	}
 
 	/// This Behavior is handled by the Graphics Manager.
@@ -177,7 +185,7 @@ public:
 
 private:
 	// A Timer can be used to measure update rates.
-	SurgSim::Framework::Timer m_timer;
+	SurgSim::Framework::Timer m_timer, m_inUpdateTimer;
 };
 
 /// Simple behavior to output the Physics update rate.
