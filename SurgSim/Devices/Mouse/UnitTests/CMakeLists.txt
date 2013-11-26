@@ -14,22 +14,25 @@
 # limitations under the License.
 
 
-add_subdirectory(IdentityPoseDevice)
+include_directories(
+	${gtest_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}
+)
 
-if(SURGSIM_DEVICES_BUILD)
-	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-		add_subdirectory(MultiAxis)
-	endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-	if(NOVINT_HDAL_SDK_FOUND)
-		add_subdirectory(Novint)
-	endif(NOVINT_HDAL_SDK_FOUND)
-	if(OPENHAPTICS_FOUND)
-		add_subdirectory(Phantom)
-	endif(OPENHAPTICS_FOUND)
-	if(SIXENSE_SDK_FOUND)
-		add_subdirectory(Sixense)
-	endif(SIXENSE_SDK_FOUND)
-	if(OPENSCENEGRAPH_FOUND)
-		add_subdirectory(Mouse)
-	endif(OPENSCENEGRAPH_FOUND)
-endif(SURGSIM_DEVICES_BUILD)
+set(UNIT_TEST_SOURCES
+	MouseDeviceTest.cpp
+	MouseScaffoldTest.cpp
+)
+
+set(LIBS MouseDevice 
+		 SurgSimInput 
+		 SurgSimFramework 
+		 SurgSimDataStructures
+		 gtest 
+		 ${OPENSCENEGRAPH_LIBRARIES}
+	)
+
+surgsim_add_unit_tests(MouseDeviceTest)
+
+# Put PhantomDeviceTest into folder "Devices"
+set_target_properties(MouseDeviceTest PROPERTIES FOLDER "Devices")
