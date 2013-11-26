@@ -17,7 +17,7 @@
 #include "SurgSim/Framework/Timer.h"
 
 SurgSim::Framework::Timer::Timer() :
-	m_stopped(true), m_number_of_frames(100), m_clock_fails(0)
+	m_stopped(true), m_numberOfFrames(100), m_clockFails(0)
 {
 	start();
 }
@@ -26,20 +26,20 @@ void SurgSim::Framework::Timer::start()
 {
 	m_stopped = false;
 	m_frames.clear();
-	m_clock_fails = 0;
-	m_last_time = now();
+	m_clockFails = 0;
+	m_lastTime = now();
 }
 
 void SurgSim::Framework::Timer::frameStep()
 {
 	SURGSIM_ASSERT(!m_stopped) << "Tried to step the frame of a Timer that is stopped.";
-	TimerTimePoint current_time = now();
-	m_frames.push_back(current_time - m_last_time);
-	if (m_frames.size() > m_number_of_frames)
+	TimerTimePoint currentTime = now();
+	m_frames.push_back(currentTime - m_lastTime);
+	if (m_frames.size() > m_numberOfFrames)
 	{
 		m_frames.pop_front();
 	}
-	m_last_time = current_time;
+	m_lastTime = currentTime;
 }
 
 void SurgSim::Framework::Timer::stop()
@@ -50,12 +50,12 @@ void SurgSim::Framework::Timer::stop()
 double SurgSim::Framework::Timer::getAverageFramePeriod() const
 {
 	SURGSIM_ASSERT(m_frames.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
-	TimerDuration cumulative_time;
+	TimerDuration cumulativeTime;
 	for (auto it = m_frames.begin(); it != m_frames.end(); ++it)
 	{
-		cumulative_time += *it;
+		cumulativeTime += *it;
 	}
-	return cumulative_time.count() / m_frames.size();
+	return cumulativeTime.count() / m_frames.size();
 }
 
 double SurgSim::Framework::Timer::getAverageFrameRate() const
@@ -74,10 +74,10 @@ double SurgSim::Framework::Timer::getLastFrameRate() const
 	return 1.0 / getLastFramePeriod();
 }
 
-void SurgSim::Framework::Timer::setNumberOfFrames(size_t number_of_frames)
+void SurgSim::Framework::Timer::setNumberOfFrames(size_t numberOfFrames)
 {
-	m_number_of_frames = (number_of_frames > 0 ? number_of_frames : 1);
-	while (m_frames.size() > m_number_of_frames)
+	m_numberOfFrames = (numberOfFrames > 0 ? numberOfFrames : 1);
+	while (m_frames.size() > m_numberOfFrames)
 	{
 		m_frames.pop_front();
 	}
@@ -90,22 +90,22 @@ size_t SurgSim::Framework::Timer::getCurrentNumberOfFrames() const
 
 int SurgSim::Framework::Timer::getNumberOfClockFails() const
 {
-	return m_clock_fails;
+	return m_clockFails;
 }
 
 SurgSim::Framework::Timer::TimerTimePoint SurgSim::Framework::Timer::now()
 {
 	boost::system::error_code ec;
-	TimerTimePoint current_time = m_clock.now(ec);
+	TimerTimePoint currentTime = m_clock.now(ec);
 	if (ec.value() != 0)
 	{
-		int fails_this_call = 0;
+		int failsThisCall = 0;
 		while (ec.value() != 0)
 		{
-			SURGSIM_ASSERT(++fails_this_call < 4) << "A Timer's clock failed four consecutive calls.";
-			current_time = m_clock.now(ec);
+			SURGSIM_ASSERT(++failsThisCall < 4) << "A Timer's clock failed four consecutive calls.";
+			currentTime = m_clock.now(ec);
 		}
-		m_clock_fails += fails_this_call;
+		m_clockFails += failsThisCall;
 	}
-	return current_time;
+	return currentTime;
 }

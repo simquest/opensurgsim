@@ -67,7 +67,7 @@ public:
 	double getLastFrameRate() const;
 
 	/// Set the maximum number of frames to store.
-	void setNumberOfFrames(size_t number_of_frames);
+	void setNumberOfFrames(size_t numberOfFrames);
 
 	/// \return Number of frames currently stored (not the maximum number of frames).
 	size_t getCurrentNumberOfFrames() const;
@@ -84,19 +84,19 @@ private:
 	static const TimerClock m_clock;
 
 	/// The time at last \c start or \c frameStep.
-	TimerTimePoint m_last_time;
+	TimerTimePoint m_lastTime;
 
 	/// Is this Timer stopped?
 	bool m_stopped;
 
 	/// Number of frames to average.
-	size_t m_number_of_frames;
+	size_t m_numberOfFrames;
 
 	/// Durations of the frames.
 	std::deque<TimerDuration> m_frames;
 
 	/// Number of clock errors since start.
-	int m_clock_fails;
+	int m_clockFails;
 };
 
 } // Framework
