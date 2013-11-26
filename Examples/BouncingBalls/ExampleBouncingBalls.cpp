@@ -132,7 +132,7 @@ public:
 		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 		// Tell the timer one frame has passed.
-		m_timer.frameStep();
+		m_timer.endFrame();
 		// Log the update rate.
 		SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " average update rate: " << m_timer.getAverageFrameRate();
 		if (m_timer.getNumberOfClockFails() > 0)
@@ -162,7 +162,7 @@ public:
 	virtual void update(double dt) override
 	{
 		// Tell the timer one frame has passed.
-		m_timer.frameStep();
+		m_timer.endFrame();
 		// Log the update rate.
 		SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " average update rate: " << m_timer.getAverageFrameRate();
 		if (m_timer.getNumberOfClockFails() > 0)
@@ -191,7 +191,7 @@ public:
 	virtual void update(double dt) override
 	{
 		// Tell the timer one frame has passed.
-		m_timer.frameStep();
+		m_timer.endFrame();
 		// Log the update rate.
 		SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " average update rate: " << m_timer.getAverageFrameRate();
 		if (m_timer.getNumberOfClockFails() > 0)

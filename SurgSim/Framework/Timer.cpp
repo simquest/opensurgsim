@@ -27,10 +27,15 @@ void SurgSim::Framework::Timer::start()
 	m_stopped = false;
 	m_frames.clear();
 	m_clockFails = 0;
+	beginFrame();
+}
+
+void SurgSim::Framework::Timer::beginFrame()
+{
 	m_lastTime = now();
 }
 
-void SurgSim::Framework::Timer::frameStep()
+void SurgSim::Framework::Timer::endFrame()
 {
 	SURGSIM_ASSERT(!m_stopped) << "Tried to step the frame of a Timer that is stopped.";
 	TimerTimePoint currentTime = now();

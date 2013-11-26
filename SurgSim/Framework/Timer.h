@@ -44,9 +44,12 @@ public:
 	/// Begin a timing run by storing the current time and clearing out the stored frames.
 	void start();
 
-	/// Continue a timing run by storing the duration since the last \c start or \c frameStep.
+	/// Begin a frame by storing the current time.
+	void beginFrame();
+
+	/// Ends this frame by storing the duration since the last \c start or \c beginFrame.  Also stores the current time.
 	/// Asserts if the timer is stopped.
-	void frameStep();
+	void endFrame();
 
 	/// Stop the timing run.  Does not affect the stored durations.  No effect if called on a stopped Timer.
 	void stop();
