@@ -19,8 +19,6 @@
 #include <memory>
 #include <SurgSim/Framework/Logger.h>
 
-#include <osg/ref_ptr>
-
 namespace SurgSim
 {
 

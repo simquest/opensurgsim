@@ -21,8 +21,6 @@
 
 #include <SurgSim/Input/CommonDevice.h>
 
-#include <osg/ref_ptr>
-
 namespace SurgSim
 {
 namespace Device
