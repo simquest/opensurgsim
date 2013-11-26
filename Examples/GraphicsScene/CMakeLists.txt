@@ -31,9 +31,11 @@ include_directories(
 
 set(EXAMPLE_SOURCES
 	ExampleGraphicsScene.cpp
+	PoseInterpolator.cpp
 )
 
 set(EXAMPLE_HEADERS
+	PoseInterpolator.cpp
 )
 
 # Configure the path for the data files
