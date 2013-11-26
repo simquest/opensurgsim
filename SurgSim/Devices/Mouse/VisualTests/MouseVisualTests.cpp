@@ -44,13 +44,13 @@ struct TestListener : public SurgSim::Input::InputConsumerInterface
 		inputData.integers().get("scrollDeltaX", &scrollDeltaX);
 		inputData.integers().get("scrollDeltaY", &scrollDeltaY);
 
-		std::cerr <<"button1 = "<< button1 << std::endl
-				  <<"button2 = "<< button2 << std::endl
-				  <<"button3 = "<< button3 << std::endl
-				  <<"x = "<< x << std::endl
-				  <<"y = "<< y << std::endl
-				  <<"scrollDeltaX = " << scrollDeltaX << std::endl
-				  <<"scrollDeltaY = " << scrollDeltaY << std::endl << std::endl;
+		std::cerr << "button1 = " << button1 << std::endl
+				  << "button2 = " << button2 << std::endl
+				  << "button3 = " << button3 << std::endl
+				  << "x = " << x << std::endl
+				  << "y = " << y << std::endl
+				  << "scrollDeltaX = " << scrollDeltaX << std::endl
+				  << "scrollDeltaY = " << scrollDeltaY << std::endl << std::endl;
 	}
 };
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 	toolDevice->addInputConsumer(consumer);
 
 	osg::ref_ptr<osgText::Text> text = new osgText::Text;
-	text->setText("Press any key in this window \n\nto verify keyboard driver \n\nworks correctly.");
+	text->setText("Move/click/drag mouse in\n\nthis window to verify that\n\nmouse driver works correctly.");
 	text->setPosition(osg::Vec3(0, 300, 0.0f));
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode;

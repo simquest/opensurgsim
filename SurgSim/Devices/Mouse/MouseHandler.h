@@ -30,11 +30,15 @@ namespace Device
 class MouseHandler : public osgGA::GUIEventHandler
 {
 public:
-
+	/// Constructor
 	MouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedInstance())
 	{
 	}
 
+	/// Method to handle GUI event
+	/// \param ea A osgGA::GUIEventAdapter
+	/// \param _2 A dummy parameter (required by this virtual method)
+	/// \return True if the event has been handled by this method; Otherwise, false.
 	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override
 	{
 		switch(ea.getEventType())
@@ -73,6 +77,7 @@ public:
 	}
 
 private:
+	/// A back pointer to the scaffold which owns this handle
 	std::weak_ptr<MouseScaffold> m_mouseScaffold;
 };
 

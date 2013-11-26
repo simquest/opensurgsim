@@ -115,13 +115,13 @@ MouseHandler* MouseScaffold::getMouseHandler() const
 SurgSim::DataStructures::DataGroup MouseScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addBoolean("button1");
-	builder.addBoolean("button2");
-	builder.addBoolean("button3");
-	builder.addScalar("x");
-	builder.addScalar("y");
-	builder.addInteger("scrollDeltaX");
-	builder.addInteger("scrollDeltaY");
+	builder.addBoolean("button1");		// Indicates mouse left button
+	builder.addBoolean("button2"); 		// Indicates mouse middle button (i.e. wheel)
+	builder.addBoolean("button3"); 		// Indicates mouse right button
+	builder.addScalar("x");				// Indicates mouse's X-coordinate the current window, left bottom = (0, 0)
+	builder.addScalar("y");				// Indicates mouse's Y-coordinate the current window, left bottom = (0, 0)
+	builder.addInteger("scrollDeltaX"); // Indicates mouse wheel vertical movement
+	builder.addInteger("scrollDeltaY"); // Indicates mouse wheel horizontal movement
 
 	return builder.createData();
 }
