@@ -27,7 +27,6 @@
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 #include <SurgSim/Framework/SceneElement.h>
-#include "SurgSim/Framework/Timer.h"
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgManager.h>
 #include <SurgSim/Graphics/OsgMaterial.h>
@@ -73,13 +72,14 @@ using SurgSim::Physics::PhysicsManager;
 ///      Example of how to put together a very simple demo of balls colliding with each other.
 ///	 	 Discrete Collision Detection (dcd) is used to detect collisions between spheres.
 
-/// A Behavior with a logger, to be inherited by a Behavior that will log information.
+/// Simple behavior to show that the spheres are moving while we don't have graphics.
 /// \note A Behavior is a type of Component that causes changes or actions.
-class LoggingBehavior : public SurgSim::Framework::Behavior
+class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	explicit LoggingBehavior(const std::string& name) : Behavior(name) {}
-	virtual ~LoggingBehavior() {}
+	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
+		Behavior("PrintoutBehavior"), m_representation(representation) {}
+	~PrintoutBehavior() {}
 
 	/// Perform per-period actions, i.e., what to do each "frame".
 	/// \note Behavior::update() is called by ComponentManager::processBehaviors(), which is called by
@@ -87,7 +87,12 @@ public:
 	/// output of Behavior::getTargetManagerType().  Those manager's \c doUpdate() functions are called by
 	/// BasicThread() inside a \c while(running) loop.
 	/// Managers (e.g., ComponentManager) are threads and run their own update loops.
-	virtual void update(double dt) = 0;
+	virtual void update(double dt)
+	{
+		// SURGSIM_LOG_DEBUG is a macro to ensure only messages of a certain threshold are output.
+		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
+								  m_representation->getPose().translation().transpose();
+	}
 
 protected:
 	/// Allocate the internal structures.
@@ -111,110 +116,13 @@ protected:
 		return true;
 	}
 
-	// A Logger can output to file or stream.
-	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-};
-
-/// Simple behavior to show that the spheres are moving while we don't have graphics.
-/// \note A Behavior is a type of Component that causes changes or actions.
-class PrintoutBehavior : public LoggingBehavior
-{
-public:
-	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
-		LoggingBehavior("PrintoutBehavior"), m_representation(representation) {}
-	~PrintoutBehavior() {}
-
-	/// Each time the BehaviorManager asks this Behavior to update, we print the position of the provided
-	/// Representation.  We also print the rate that update is being called on this Behavior.
-	virtual void update(double dt) override
-	{
-		// SURGSIM_LOG_DEBUG is a macro to ensure only messages of a certain threshold are output.
-		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
-								  m_representation->getPose().translation().transpose();
-		// Tell the timer one frame has passed.
-		m_timer.endFrame();
-		// Log the update rate.
-		SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " average update rate: " << m_timer.getAverageFrameRate();
-		if (m_timer.getNumberOfClockFails() > 0)
-		{
-			SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " timer's clock failed " <<
-				m_timer.getNumberOfClockFails() << " times.";
-		}
-	}
-
 private:
 	// A Representation is a type of Component that stores information.
 	// A RigidRepresentation stores 6 degree-of-freedom (DOF) pose, force, torque, inertia, and compliance.
 	std::shared_ptr<RigidRepresentation> m_representation;
 
-	// A Timer can be used to measure update rates.
-	SurgSim::Framework::Timer m_timer;
-};
-
-/// Simple behavior to output the Graphics update rate.
-class PrintoutGraphicsBehavior : public LoggingBehavior
-{
-public:
-	explicit PrintoutGraphicsBehavior() : LoggingBehavior("PrintoutGraphicsBehavior") {}
-	~PrintoutGraphicsBehavior() {}
-
-	/// Step the timer and output the update rate for the Graphics Manager.
-	virtual void update(double dt) override
-	{
-		// The inUpdateTimer starts its frame now, so the frame does not time anything that occurs before update was
-		// called.
-		m_inUpdateTimer.beginFrame();
-		// Tell the timer one frame has passed.
-		m_timer.endFrame();
-		// Log the update rate.
-		SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " average update rate: " << m_timer.getAverageFrameRate();
-		if (m_timer.getNumberOfClockFails() > 0)
-		{
-			SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " timer's clock failed " <<
-				m_timer.getNumberOfClockFails() << " times.";
-		}
-		// The inUpdateTimer ends its frame now.
-		m_inUpdateTimer.endFrame();
-		// Log the average period spend inside update (minus this log).
-		SURGSIM_LOG_DEBUG(m_logger) << "Average time inside behavior update: "
-			<< m_inUpdateTimer.getAverageFramePeriod();
-	}
-
-	/// This Behavior is handled by the Graphics Manager.
-	virtual int getTargetManagerType() const override { return SurgSim::Framework::MANAGER_TYPE_GRAPHICS; }
-
-private:
-	// A Timer can be used to measure update rates.
-	SurgSim::Framework::Timer m_timer, m_inUpdateTimer;
-};
-
-/// Simple behavior to output the Physics update rate.
-class PrintoutPhysicsBehavior : public LoggingBehavior
-{
-public:
-	explicit PrintoutPhysicsBehavior() : LoggingBehavior("PrintoutPhysicsBehavior") {}
-	~PrintoutPhysicsBehavior() {}
-
-	/// Step the timer and output the update rate for the Graphics Manager.
-	virtual void update(double dt) override
-	{
-		// Tell the timer one frame has passed.
-		m_timer.endFrame();
-		// Log the update rate.
-		SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " average update rate: " << m_timer.getAverageFrameRate();
-		if (m_timer.getNumberOfClockFails() > 0)
-		{
-			SURGSIM_LOG_DEBUG(m_logger) << this->getName() << " timer's clock failed " <<
-				m_timer.getNumberOfClockFails() << " times.";
-		}
-	}
-
-	/// This Behavior is handled by the Physics Manager.
-	virtual int getTargetManagerType() const override { return SurgSim::Framework::MANAGER_TYPE_PHYSICS; }
-
-private:
-	// A Timer can be used to measure update rates.
-	SurgSim::Framework::Timer m_timer;
+	// A Logger can output to file or stream.
+	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 };
 
 /// Create a ViewElement to be added to the Scene.
@@ -356,10 +264,6 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(graphicsRepresentation);
 	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
-	// By adding the PrintoutGraphicsBehavior, the Graphics Manager will output its update rate each update.
-	sphereElement->addComponent(std::make_shared<PrintoutGraphicsBehavior>());
-	// By adding the PrintoutPhysicsBehavior, the Physics Manager will output its update rate each update.
-	sphereElement->addComponent(std::make_shared<PrintoutPhysicsBehavior>());
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
 	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
