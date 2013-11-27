@@ -116,11 +116,11 @@ private:
 	/// A (weak) back pointer to the Runtime containing this SceneElement
 	std::weak_ptr<Runtime> m_runtime;
 
-	/// Method to initialized this SceneElement. To be overridden by derived class(es).
-	/// \return Ture if initialization is successful; Otherwise, false.
+	/// Method to initialize this SceneElement. To be overridden by derived class(es).
+	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doInitialize() = 0;
 	/// Method to wake up this SceneElement. To be overridden by derived class(es).
-	/// \return Ture if initialization is successful; Otherwise, false.
+	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doWakeUp() = 0;
 
 	/// Indicates if this SceneElement has been initialized or not.

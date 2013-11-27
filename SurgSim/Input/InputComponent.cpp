@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Input
 {
 
-/// A input consumer monitors device and signal state update
+/// An input consumer monitors device and signal state update
 class InputConsumer: public InputConsumerInterface
 {
 public:

@@ -42,11 +42,11 @@ public:
 	virtual ~ViewElement();
 
 	/// Sets the view component that provides the visualization of the graphics representations
-	/// \return	True if it succeeds, false if it fails
+	/// \return	True if setView() succeeds; Otherwise, false.
 	virtual bool setView(std::shared_ptr<View> view);
 
 	/// Returns the view component that provides the visualization of the graphics representations
-	/// \return A shared_ptr points to the View component
+	/// \return A shared_ptr pointing to the View component
 	std::shared_ptr<View> getView() const;
 
 protected:
