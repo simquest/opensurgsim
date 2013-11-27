@@ -51,9 +51,6 @@ public:
 	/// Asserts if the timer is stopped.
 	void endFrame();
 
-	/// Stop the timing run.  Does not affect the stored durations.  No effect if called on a stopped Timer.
-	void stop();
-
 	/// Return the time between frames, on average.  Asserts if there are no frames.
 	/// \return Average period in seconds.
 	double getAverageFramePeriod() const;

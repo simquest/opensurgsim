@@ -24,7 +24,6 @@ SurgSim::Framework::Timer::Timer() :
 
 void SurgSim::Framework::Timer::start()
 {
-	m_stopped = false;
 	m_frames.clear();
 	m_clockFails = 0;
 	beginFrame();
@@ -37,7 +36,6 @@ void SurgSim::Framework::Timer::beginFrame()
 
 void SurgSim::Framework::Timer::endFrame()
 {
-	SURGSIM_ASSERT(!m_stopped) << "Tried to step the frame of a Timer that is stopped.";
 	TimerTimePoint currentTime = now();
 	m_frames.push_back(currentTime - m_lastTime);
 	if (m_frames.size() > m_numberOfFrames)
@@ -45,11 +43,6 @@ void SurgSim::Framework::Timer::endFrame()
 		m_frames.pop_front();
 	}
 	m_lastTime = currentTime;
-}
-
-void SurgSim::Framework::Timer::stop()
-{
-	m_stopped = true;
 }
 
 double SurgSim::Framework::Timer::getAverageFramePeriod() const
