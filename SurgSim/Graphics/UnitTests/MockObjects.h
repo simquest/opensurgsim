@@ -424,8 +424,9 @@ public:
 		return nullptr;
 	}
 
-	virtual void setRenderTarget(std::shared_ptr<SurgSim::Graphics::RenderTarget> renderTarget)
+	virtual bool setRenderTarget(std::shared_ptr<SurgSim::Graphics::RenderTarget> renderTarget)
 	{
+		return true;
 	}
 
 	virtual std::shared_ptr<SurgSim::Graphics::RenderTarget> getRenderTarget() const

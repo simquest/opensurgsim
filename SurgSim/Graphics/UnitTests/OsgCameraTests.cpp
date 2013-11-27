@@ -56,13 +56,13 @@ TEST(OsgCameraTests, InitTest)
 
 	EXPECT_TRUE(camera->getPose().matrix().isApprox(
 					fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).inverse())) <<
-		"Camera's pose should be initialized to the inverse of the osg::Camera's view matrix!";
+							"Camera's pose should be initialized to the inverse of the osg::Camera's view matrix!";
 
 	EXPECT_TRUE(camera->getViewMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()))) <<
-		"Camera's view matrix should be initialized to the osg::Camera's view matrix!";
+			"Camera's view matrix should be initialized to the osg::Camera's view matrix!";
 
 	EXPECT_TRUE(camera->getProjectionMatrix().isApprox(fromOsg(osgCamera->getOsgCamera()->getProjectionMatrix()))) <<
-		"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
+			"Camera's projection matrix should be initialized to the osg::Camera's projection matrix!";
 
 	EXPECT_NE(nullptr, camera->getGroup());
 }
@@ -145,7 +145,7 @@ TEST(OsgCameraTests, PoseTest)
 	{
 		SCOPED_TRACE("Set Initial Pose");
 		initialPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
@@ -167,7 +167,7 @@ TEST(OsgCameraTests, PoseTest)
 	{
 		SCOPED_TRACE("Change Initial Pose");
 		initialPose = SurgSim::Math::makeRigidTransform(
-			Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
+						  Quaterniond(SurgSim::Math::Vector4d::Random()).normalized(), Vector3d::Random());
 		camera->setInitialPose(initialPose);
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
@@ -203,11 +203,10 @@ TEST(OsgCameraTests, RenderTargetTest)
 	auto osgCamera = std::make_shared<OsgCamera>("test camera");
 	std::shared_ptr<Camera> camera = osgCamera;
 
-	std::shared_ptr<RenderTarget> renderTarget = std::make_shared<OsgRenderTarget2d>(256,256, 1.0, 2, true);
+	std::shared_ptr<RenderTarget> renderTarget = std::make_shared<OsgRenderTarget2d>(256, 256, 1.0, 2, true);
 
 	EXPECT_NO_THROW(camera->setRenderTarget(renderTarget));
 	EXPECT_TRUE(osgCamera->getOsgCamera()->isRenderToTextureCamera());
-
 }
 
 
