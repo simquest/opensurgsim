@@ -65,16 +65,16 @@ public:
 
 TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 {
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
-	EXPECT_EQ("OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
+	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
+	EXPECT_EQ("Data/OsgSceneryRepresentationTests/Torus.obj", sceneryObject->getFileName());
 }
 
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
-	sceneryObject->setFileName("OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
 	ASSERT_NO_THROW(sceneryObject->initialize(runtime));
 
-	sceneryObject2->setFileName("OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
 	ASSERT_NO_THROW(sceneryObject2->initialize(runtime));
 }
 
