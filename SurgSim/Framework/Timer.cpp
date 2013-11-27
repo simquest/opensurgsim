@@ -20,7 +20,7 @@ namespace SurgSim {
 namespace Framework {
 
 Timer::Timer() :
-	m_stopped(true), m_numberOfFrames(100), m_clockFails(0)
+	m_stopped(true), m_maxNumberOfFrames(100), m_clockFails(0)
 {
 	start();
 }
@@ -41,7 +41,7 @@ void Timer::endFrame()
 {
 	TimerTimePoint currentTime = now();
 	m_frameDurations.push_back(currentTime - m_lastTime);
-	if (m_frameDurations.size() > m_numberOfFrames)
+	if (m_frameDurations.size() > m_maxNumberOfFrames)
 	{
 		m_frameDurations.pop_front();
 	}
@@ -77,10 +77,10 @@ double Timer::getLastFrameRate() const
 	return 1.0 / getLastFramePeriod();
 }
 
-void Timer::setNumberOfFrames(size_t numberOfFrames)
+void Timer::setNumberOfFrames(size_t maxNumberOfFrames)
 {
-	m_numberOfFrames = (numberOfFrames > 0) ? numberOfFrames : 1;
-	while (m_frameDurations.size() > m_numberOfFrames)
+	m_maxNumberOfFrames = (maxNumberOfFrames > 0) ? maxNumberOfFrames : 1;
+	while (m_frameDurations.size() > m_maxNumberOfFrames)
 	{
 		m_frameDurations.pop_front();
 	}

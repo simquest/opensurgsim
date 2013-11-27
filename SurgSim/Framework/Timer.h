@@ -90,7 +90,7 @@ private:
 	bool m_stopped;
 
 	/// Number of frames to average.
-	size_t m_numberOfFrames;
+	size_t m_maxNumberOfFrames;
 
 	/// Durations of the frames.
 	std::deque<TimerDuration> m_frameDurations;
