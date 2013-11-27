@@ -16,25 +16,28 @@
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Timer.h"
 
-SurgSim::Framework::Timer::Timer() :
+namespace SurgSim {
+namespace Framework {
+
+Timer::Timer() :
 	m_stopped(true), m_numberOfFrames(100), m_clockFails(0)
 {
 	start();
 }
 
-void SurgSim::Framework::Timer::start()
+void Timer::start()
 {
 	m_frames.clear();
 	m_clockFails = 0;
 	beginFrame();
 }
 
-void SurgSim::Framework::Timer::beginFrame()
+void Timer::beginFrame()
 {
 	m_lastTime = now();
 }
 
-void SurgSim::Framework::Timer::endFrame()
+void Timer::endFrame()
 {
 	TimerTimePoint currentTime = now();
 	m_frames.push_back(currentTime - m_lastTime);
@@ -45,7 +48,7 @@ void SurgSim::Framework::Timer::endFrame()
 	m_lastTime = currentTime;
 }
 
-double SurgSim::Framework::Timer::getAverageFramePeriod() const
+double Timer::getAverageFramePeriod() const
 {
 	SURGSIM_ASSERT(m_frames.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
 	TimerDuration cumulativeTime;
@@ -56,23 +59,23 @@ double SurgSim::Framework::Timer::getAverageFramePeriod() const
 	return cumulativeTime.count() / m_frames.size();
 }
 
-double SurgSim::Framework::Timer::getAverageFrameRate() const
+double Timer::getAverageFrameRate() const
 {
 	return 1.0 / getAverageFramePeriod();
 }
 
-double SurgSim::Framework::Timer::getLastFramePeriod() const
+double Timer::getLastFramePeriod() const
 {
 	SURGSIM_ASSERT(m_frames.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
 	return m_frames.back().count();
 }
 
-double SurgSim::Framework::Timer::getLastFrameRate() const
+double Timer::getLastFrameRate() const
 {
 	return 1.0 / getLastFramePeriod();
 }
 
-void SurgSim::Framework::Timer::setNumberOfFrames(size_t numberOfFrames)
+void Timer::setNumberOfFrames(size_t numberOfFrames)
 {
 	m_numberOfFrames = (numberOfFrames > 0) ? numberOfFrames : 1;
 	while (m_frames.size() > m_numberOfFrames)
@@ -81,17 +84,17 @@ void SurgSim::Framework::Timer::setNumberOfFrames(size_t numberOfFrames)
 	}
 }
 
-size_t SurgSim::Framework::Timer::getCurrentNumberOfFrames() const
+size_t Timer::getCurrentNumberOfFrames() const
 {
 	return m_frames.size();
 }
 
-int SurgSim::Framework::Timer::getNumberOfClockFails() const
+int Timer::getNumberOfClockFails() const
 {
 	return m_clockFails;
 }
 
-SurgSim::Framework::Timer::TimerTimePoint SurgSim::Framework::Timer::now()
+Timer::TimerTimePoint Timer::now()
 {
 	boost::system::error_code ec;
 	TimerTimePoint currentTime = m_clock.now(ec);
@@ -107,3 +110,6 @@ SurgSim::Framework::Timer::TimerTimePoint SurgSim::Framework::Timer::now()
 	}
 	return currentTime;
 }
+
+}; // namespace Framework
+}; // namespace SurgSim
