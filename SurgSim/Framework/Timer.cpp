@@ -51,7 +51,7 @@ void Timer::endFrame()
 double Timer::getAverageFramePeriod() const
 {
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
-		"Attempted to access the last frame period for a Timer with no frames.\n";
+		"Attempted to access the frames for a Timer with no frames.\n";
 	TimerDuration cumulativeTime;
 	for (auto it = m_frameDurations.begin(); it != m_frameDurations.end(); ++it)
 	{
