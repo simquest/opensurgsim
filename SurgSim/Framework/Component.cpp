@@ -28,6 +28,7 @@ class Runtime;
 Component::Component(const std::string& name) :
 	m_name(name), m_didInit(false), m_didWakeUp(false), m_isInitialized(false), m_isAwake(false)
 {
+	SURGSIM_ADD_RW_PROPERTY(Component, std::string, name, getName, setName);
 }
 
 Component::~Component()

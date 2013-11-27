@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <SurgSim/Framework/Log.h>
+#include <SurgSim/Framework/Accessible.h>
 
 namespace SurgSim
 {
@@ -35,7 +36,7 @@ class Runtime;
 /// whether to handle a component of a given type or not. Components will get initialized by having
 /// doInit(), and doWakeUp() called in succession, all components together will have doInit() called before
 /// any component will recieve doWakeUp()
-class Component
+class Component : public Accessible
 {
 public:
 	/// Constructor
