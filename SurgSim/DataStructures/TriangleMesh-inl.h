@@ -16,6 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
 
+#include <SurgSim/Math/Geometry.h>
+
 namespace SurgSim
 {
 
@@ -149,6 +151,42 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::isValid() const
 	return true;
 }
 
+template <class VertexData, class EdgeData, class TriangleData>
+void TriangleMesh<VertexData, EdgeData, TriangleData>::farthestPointAlongDirection(const Vector3d& direction,
+	std::pair<Vector3d, double>* farthestPoint) const
+{
+    using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
+
+    farthestPoint->first.setZero();
+    farthestPoint->second = -std::numeric_limits<double>::max();
+    double dotProduct = 0.0, dotProductDifference = 0.0;
+    int count = 1;
+
+    for (unsigned int i = 0; i < getNumVertices(); ++i)
+    {
+        dotProduct = direction.dot(getVertexPosition(i));
+        dotProductDifference = dotProduct - farthestPoint->second;
+        if (dotProductDifference > -SquaredDistanceEpsilon)
+        {
+            if (dotProductDifference < SquaredDistanceEpsilon)
+            {
+                farthestPoint->first += getVertexPosition(i);
+                ++count;
+            }
+            else
+            {
+                farthestPoint->first = getVertexPosition(i);
+                farthestPoint->second = dotProduct;
+                count = 1;
+            }
+        }
+    }
+
+    if (count > 1)
+    {
+        farthestPoint->first /= static_cast<double>(count);
+    }
+}
 
 template <class VertexData, class EdgeData, class TriangleData>
 void TriangleMesh<VertexData, EdgeData, TriangleData>::doClearEdges()

@@ -27,6 +27,8 @@ set(SURGSIM_COLLISION_SOURCES
 	CollisionRepresentation.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
+	GjkCollisionAlgorithm.cpp
+	GjkSimplex.cpp
 	RigidCollisionRepresentation.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -45,6 +47,8 @@ set(SURGSIM_COLLISION_HEADERS
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
+	GjkCollisionAlgorithm.h
+	GjkSimplex.h
 	Location.h
 	RigidCollisionRepresentation.h
 	ShapeCollisionRepresentation.h

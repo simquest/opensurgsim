@@ -78,6 +78,13 @@ public:
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the shape
 	virtual Matrix33d calculateInertia(double rho) const = 0;
+
+	/// Given a direction vector, find the point on the shape which is farthest along it.
+    /// \param direction The direction vector (need not be a unit vector).
+    /// \param farthestPoint The point on the shape which is farthest along the direction.
+    virtual void farthestPointAlongDirection(const Vector3d& direction,
+											 std::pair<Vector3d, double>* farthestPoint) const
+    {}
 };
 
 }; // Math

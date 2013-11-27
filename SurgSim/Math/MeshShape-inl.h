@@ -82,6 +82,13 @@ SurgSim::Math::Matrix33d MeshShape<VertexData, EdgeData, TriangleData>::calculat
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+void MeshShape<VertexData, EdgeData, TriangleData>::farthestPointAlongDirection(const Vector3d& direction,
+		std::pair<Vector3d, double>* farthestPoint) const
+{
+	m_mesh->farthestPointAlongDirection(direction, farthestPoint);
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 void MeshShape<VertexData, EdgeData, TriangleData>::computeProjectionIntegrals(
 		const typename MeshShape<VertexData, EdgeData, TriangleData>::TriMesh::TriangleType& face)
 {

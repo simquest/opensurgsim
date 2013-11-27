@@ -29,6 +29,8 @@ set(UNIT_TEST_SOURCES
 	ContactCalculationTests.cpp
 	ContactCalculationTestsCommon.cpp
 	DefaultContactCalculationTests.cpp
+	GjkCollisionAlgorithmTests.cpp
+	GjkSimplexTests.cpp
 	MockCollisionRepresentation.cpp
 	RepresentationUtilities.cpp
 	SphereDoubleSidedPlaneContactCalculationTests.cpp

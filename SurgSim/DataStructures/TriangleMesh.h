@@ -19,6 +19,8 @@
 #include <SurgSim/DataStructures/Vertices.h>
 #include <SurgSim/DataStructures/MeshElement.h>
 
+using SurgSim::Math::Vector3d;
+
 namespace SurgSim
 {
 
@@ -123,6 +125,11 @@ public:
 	/// Test if the TriangleMesh is valid (valid vertex Ids used in all MeshElements)
 	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
 	bool isValid() const;
+
+	/// Given a direction vector, find the point on the shape which is farthest along it.
+    /// \param direction The direction vector (need not be a unit vector).
+    /// \param farthestPoint The point on the shape which is farthest along the direction.
+	void farthestPointAlongDirection(const Vector3d& direction, std::pair<Vector3d, double>* farthestPoint) const;
 
 protected:
 	/// Remove all edges from the mesh.

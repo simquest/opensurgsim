@@ -65,6 +65,12 @@ public:
 	/// \return The 3x3 symmetric inertia matrix of the mesh
 	virtual Matrix33d calculateInertia(double rho) const override;
 
+	/// Given a direction vector, find the point on the shape which is farthest along it.
+    /// \param direction The direction vector (need not be a unit vector).
+    /// \param farthestPoint The point on the shape which is farthest along the direction.
+    virtual void farthestPointAlongDirection(const Vector3d& direction,
+											 std::pair<Vector3d, double>* farthestPoint) const override;
+
 private:
 
 	/// Compute various integrations over projection of face
