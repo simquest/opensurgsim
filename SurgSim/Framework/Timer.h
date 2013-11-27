@@ -73,7 +73,7 @@ public:
 	size_t getCurrentNumberOfFrames() const;
 
 	/// \return Number of times the clock returned an error code since \c start.
-	int getNumberOfClockFails() const;
+	size_t getNumberOfClockFails() const;
 
 private:
 	/// Get the current time.  Handles any error codes from the clock.  May assert if the clock fails.
@@ -96,7 +96,7 @@ private:
 	std::deque<TimerDuration> m_frameDurations;
 
 	/// Number of clock errors since start.
-	int m_clockFails;
+	size_t m_clockFails;
 };
 
 } // Framework

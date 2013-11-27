@@ -89,7 +89,7 @@ size_t Timer::getCurrentNumberOfFrames() const
 	return m_frameDurations.size();
 }
 
-int Timer::getNumberOfClockFails() const
+size_t Timer::getNumberOfClockFails() const
 {
 	return m_clockFails;
 }
