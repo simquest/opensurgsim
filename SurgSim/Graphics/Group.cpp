@@ -23,6 +23,7 @@ using SurgSim::Graphics::Group;
 Group::Group(const std::string& name) : SurgSim::Framework::Component(name)
 {
 }
+
 Group::~Group()
 {
 }
@@ -62,6 +63,11 @@ bool Group::remove(std::shared_ptr<Representation> representation)
 		result = true;
 	}
 	return result;
+}
+
+const std::vector<std::shared_ptr<Representation>>& Group::getMembers() const
+{
+	return m_representations;
 }
 
 void Group::clear()

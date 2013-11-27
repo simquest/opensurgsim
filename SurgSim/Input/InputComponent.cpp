@@ -25,22 +25,30 @@ namespace SurgSim
 namespace Input
 {
 
+/// An input consumer monitors device and signal state update
 class InputConsumer: public InputConsumerInterface
 {
 public:
+	/// Constructor
 	InputConsumer()
 	{
 	}
-
+	/// Destructor
 	virtual ~InputConsumer()
 	{
 	}
 
+	/// Handle the input coming from device.
+	/// \param device The name of the device that is producing the input.
+	/// \param inputData The input data coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
 		m_lastInput.set(inputData);
 	}
 
+	/// Initialize the input data information stored in this input consumer.
+	/// \param device The name of the device that is producing the input.
+	/// \param inputData Initial input data of the device.
 	virtual void initializeInput(const std::string& device,
 		const SurgSim::DataStructures::DataGroup& initialData) override
 	{
@@ -49,12 +57,15 @@ public:
 		m_lastInput.set(initialData);
 	}
 
+	/// Retrieve input data information stored in this input consumer
+	/// \param [out] dataGroup Used to accept the retrieved input data information
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup)
 	{
 		m_lastInput.get(dataGroup);
 	}
 
 private:
+	/// Used to store input data information passed in from device
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastInput;
 };
 
@@ -65,12 +76,10 @@ InputComponent::InputComponent(const std::string& name, const std::string& devic
 	m_deviceConnected(false),
 	m_input(std::make_shared<InputConsumer>())
 {
-
 }
 
 InputComponent::~InputComponent()
 {
-
 }
 
 bool InputComponent::isDeviceConnected()

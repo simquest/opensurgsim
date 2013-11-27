@@ -39,7 +39,11 @@ class InputConsumer;
 class InputComponent : public SurgSim::Framework::Component
 {
 public:
+	/// Constructor
+	/// \param name Name of this input component
+	/// \param deviceName Name of the device this input component connects
 	InputComponent(const std::string& name, const std::string& deviceName);
+	/// Destructor
 	virtual ~InputComponent();
 
 	/// Is a device connected
@@ -71,8 +75,11 @@ public:
 	std::string getDeviceName() const;
 
 private:
+	/// Name of the device to which this input component connects
 	std::string m_deviceName;
+	/// Indicates if this input component is connected to a device
 	bool m_deviceConnected;
+	/// Input consumer which brings in information from hardware device
 	std::shared_ptr<InputConsumer> m_input;
 };
 
