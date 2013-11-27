@@ -100,13 +100,7 @@ Timer::TimerTimePoint Timer::now()
 	TimerTimePoint currentTime = m_clock.now(ec);
 	if (ec.value() != 0)
 	{
-		int failsThisCall = 0;
-		while (ec.value() != 0)
-		{
-			SURGSIM_ASSERT(++failsThisCall < 4) << "A Timer's clock failed four consecutive calls.";
-			currentTime = m_clock.now(ec);
-		}
-		m_clockFails += failsThisCall;
+		++ m_clockFails;
 	}
 	return currentTime;
 }
