@@ -47,7 +47,7 @@ public:
 	/// Begin a frame by storing the current time.
 	void beginFrame();
 
-	/// Ends this frame by storing the duration since the last \c start or \c beginFrame.  Also stores the current time.
+	/// End this frame by storing the duration since the last \c start or \c beginFrame.  Also stores the current time.
 	/// Asserts if the timer is stopped.
 	void endFrame();
 
