@@ -64,7 +64,7 @@ endif(SURGSIM_TESTS_BUILD_EIGEN)
 
 set(LIBS 
 	SurgSimMath
-	gtest 
+	gtest
 	yaml-cpp
 )
 

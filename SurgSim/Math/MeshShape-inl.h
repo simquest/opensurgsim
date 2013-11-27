@@ -240,15 +240,9 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeVolumeIntegrals()
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-YAML::Node SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::encode()
+std::string MeshShape<VertexData, EdgeData, TriangleData>::getClassName()
 {
-	return SurgSim::Math::Shape::encode();
-}
-
-template <class VertexData, class EdgeData, class TriangleData>
-bool SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>::decode(const YAML::Node& node)
-{
-	return SurgSim::Math::Shape::decode(node);
+	return std::string("SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>");
 }
 
 

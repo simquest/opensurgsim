@@ -42,9 +42,6 @@ class MeshShape : public Shape
 	/// Type TriMesh for convenience
 	typedef SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData> TriMesh;
 
-	/// Type SerializeMesh for OSS_SERIALIZE macro
-	typedef SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData> SerializeMesh;
-
 public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
@@ -70,8 +67,8 @@ public:
 	/// \return The 3x3 symmetric inertia matrix of the mesh
 	virtual Matrix33d calculateInertia(double rho) const override;
 
-	/// Serialize declarations of the mesh
-	OSS_SERIALIZE(SerializeMesh);
+	/// Get the complete name of the mesh
+	virtual std::string getClassName() override;
 
 private:
 
