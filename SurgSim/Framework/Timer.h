@@ -41,32 +41,34 @@ public:
 	/// Instantiate a TimerClock and start a timing run.
 	Timer();
 
-	/// Begin a timing run by storing the current time and clearing out the stored frames.
+	/// Begin a timing run by clearing out the stored frames and beginning a frame.
 	void start();
 
-	/// Begin a frame by storing the current time.
+	/// Begin a frame (storing the current time).
 	void beginFrame();
 
-	/// End this frame by storing the duration since the last \c start or \c beginFrame.  Also stores the current time.
+	/// End this frame by storing the duration since the current frame was begun.  Then begins a new frame.
 	/// Asserts if the timer is stopped.
 	void endFrame();
 
-	/// Return the sum of the durations over all the stored frames.
+	/// Return the sum of the durations over all the stored frames.  Asserts if there are no frames.
 	/// \return Sum of stored frame durations in seconds.
 	double getCumulativeTime() const;
 
-	/// Return the time between frames, on average.  Asserts if there are no frames.
+	/// Return the average duration across all stored frames.  Asserts if there are no frames.
 	/// \return Average period in seconds.
 	double getAverageFramePeriod() const;
 
+	/// Return the inverse of the average duration across all stored frames.  Asserts if there are no frames.
 	/// \return The average frequency in Hz.
 	double getAverageFrameRate() const;
 
-	/// Return the time between the last frame step and the previous frame step or start.  Asserts if there are no
-	/// frames.
+	/// Return the duration of the most-recent frame (time between latest \c endFrame and the previous \c start,
+	/// \c beginFrame, or \c endFrame ).  Asserts if there are no frames.
 	/// \return Most-recent period in seconds.
 	double getLastFramePeriod() const;
 
+	/// Return the inverse of the duration of the most-recent frame.  Asserts if there are no frames.
 	/// \return Most-recent frequency in Hz.
 	double getLastFrameRate() const;
 
@@ -93,7 +95,7 @@ private:
 	/// Is this Timer stopped?
 	bool m_stopped;
 
-	/// Number of frames to average.
+	/// Maximum number of frames to store.
 	size_t m_maxNumberOfFrames;
 
 	/// Durations of the frames.
