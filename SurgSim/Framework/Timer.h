@@ -51,6 +51,10 @@ public:
 	/// Asserts if the timer is stopped.
 	void endFrame();
 
+	/// Return the sum of the durations over all the stored frames.
+	/// \return Sum of stored frame durations in seconds.
+	double getCumulativeTime() const;
+
 	/// Return the time between frames, on average.  Asserts if there are no frames.
 	/// \return Average period in seconds.
 	double getAverageFramePeriod() const;

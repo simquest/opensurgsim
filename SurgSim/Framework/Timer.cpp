@@ -48,7 +48,7 @@ void Timer::endFrame()
 	m_lastTime = currentTime;
 }
 
-double Timer::getAverageFramePeriod() const
+double Timer::getCumulativeTime() const
 {
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
 		"Attempted to access the frames for a Timer with no frames.\n";
@@ -57,7 +57,12 @@ double Timer::getAverageFramePeriod() const
 	{
 		cumulativeTime += *it;
 	}
-	return cumulativeTime.count() / m_frameDurations.size();
+	return cumulativeTime.count();
+}
+
+double Timer::getAverageFramePeriod() const
+{
+	return getCumulativeTime() / m_frameDurations.size();
 }
 
 double Timer::getAverageFrameRate() const
