@@ -39,7 +39,7 @@ typedef OctreeNode<MockData>::BoundingBoxType BoundingBoxType;
 
 namespace
 {
-const int epsilon = 1e-10;
+const double epsilon = 1e-14;
 }
 
 TEST(OctreeNodeTests, CanConstruct)

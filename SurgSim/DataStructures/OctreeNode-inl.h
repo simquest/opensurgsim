@@ -24,7 +24,7 @@ namespace DataStructures
 
 
 template<class Data>
-OctreeNode<Data>::OctreeNode(const OctreeNode<Data>::BoundingBoxType& boundingBox) :
+OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::BoundingBoxType& boundingBox) :
 	m_boundingBox(boundingBox),
 	m_isActive(false),
 	m_isLeafNode(true),
@@ -66,7 +66,7 @@ void OctreeNode<Data>::subdivide()
 
 		Vector3d childsSize = (m_boundingBox.max() - m_boundingBox.min()) / 2.0;
 		BoundingBoxType childsBoundingBox;
-		for (int i=0; i<8; i++)
+		for (int i = 0; i < 8; i++)
 		{
 			// Use the index to pick one of the eight regions
 			Vector3d regionIndex = Vector3d(((i & 1) == 0) ? 0 : 1,
@@ -106,7 +106,7 @@ bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const 
 	{
 		subdivide();
 	}
-	for (auto child=m_children.begin(); child!=m_children.end(); ++child)
+	for (auto child = m_children.begin(); child != m_children.end(); ++child)
 	{
 		if ((*child)->doAddData(position, nodeData, level, currentLevel+1))
 		{
