@@ -86,9 +86,9 @@ private:
 	/// OSG::Geometry node holding OSG representation of vector starting points
 	osg::ref_ptr<osg::Geometry> m_pointGeometry;
 
-	/// OSG::DrawArrays specifying how vectors wiil be drawn
+	/// An OSG::DrawArrays object specifying how vectors will be drawn
 	osg::ref_ptr<osg::DrawArrays> m_drawArrays;
-	/// OSG::DrawElementUInt specifying how vector starting points wiil be drawn
+	/// An OSG::DrawElementUInt object specifying how vector starting points will be drawn
 	osg::ref_ptr<osg::DrawElementsUInt> m_drawPoints;
 
 	/// OSG::LineWidth for representing vector

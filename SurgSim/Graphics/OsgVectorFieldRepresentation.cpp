@@ -77,7 +77,7 @@ void OsgVectorFieldRepresentation::doUpdate(double dt)
 
 	if (0 != count)
 	{
-		// osg::DrawElementsUInt can NOT work properly when this is no data in m_vertexData
+		// osg::DrawElementsUInt can NOT work properly when there is no data in m_vertexData
 		// Thus, only use osg::DrawElementsUInt when there is something in m_vertexData
 		if (0 == m_pointGeometry->getNumPrimitiveSets())
 		{
