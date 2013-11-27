@@ -93,7 +93,7 @@ private:
 	size_t m_numberOfFrames;
 
 	/// Durations of the frames.
-	std::deque<TimerDuration> m_frames;
+	std::deque<TimerDuration> m_frameDurations;
 
 	/// Number of clock errors since start.
 	int m_clockFails;

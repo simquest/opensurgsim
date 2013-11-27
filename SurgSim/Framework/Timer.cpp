@@ -27,7 +27,7 @@ Timer::Timer() :
 
 void Timer::start()
 {
-	m_frames.clear();
+	m_frameDurations.clear();
 	m_clockFails = 0;
 	beginFrame();
 }
@@ -40,23 +40,23 @@ void Timer::beginFrame()
 void Timer::endFrame()
 {
 	TimerTimePoint currentTime = now();
-	m_frames.push_back(currentTime - m_lastTime);
-	if (m_frames.size() > m_numberOfFrames)
+	m_frameDurations.push_back(currentTime - m_lastTime);
+	if (m_frameDurations.size() > m_numberOfFrames)
 	{
-		m_frames.pop_front();
+		m_frameDurations.pop_front();
 	}
 	m_lastTime = currentTime;
 }
 
 double Timer::getAverageFramePeriod() const
 {
-	SURGSIM_ASSERT(m_frames.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
+	SURGSIM_ASSERT(m_frameDurations.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
 	TimerDuration cumulativeTime;
-	for (auto it = m_frames.begin(); it != m_frames.end(); ++it)
+	for (auto it = m_frameDurations.begin(); it != m_frameDurations.end(); ++it)
 	{
 		cumulativeTime += *it;
 	}
-	return cumulativeTime.count() / m_frames.size();
+	return cumulativeTime.count() / m_frameDurations.size();
 }
 
 double Timer::getAverageFrameRate() const
@@ -66,8 +66,8 @@ double Timer::getAverageFrameRate() const
 
 double Timer::getLastFramePeriod() const
 {
-	SURGSIM_ASSERT(m_frames.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
-	return m_frames.back().count();
+	SURGSIM_ASSERT(m_frameDurations.size() > 0) << "Attempted to access the last frame period for a Timer with no frames.\n";
+	return m_frameDurations.back().count();
 }
 
 double Timer::getLastFrameRate() const
@@ -78,15 +78,15 @@ double Timer::getLastFrameRate() const
 void Timer::setNumberOfFrames(size_t numberOfFrames)
 {
 	m_numberOfFrames = (numberOfFrames > 0) ? numberOfFrames : 1;
-	while (m_frames.size() > m_numberOfFrames)
+	while (m_frameDurations.size() > m_numberOfFrames)
 	{
-		m_frames.pop_front();
+		m_frameDurations.pop_front();
 	}
 }
 
 size_t Timer::getCurrentNumberOfFrames() const
 {
-	return m_frames.size();
+	return m_frameDurations.size();
 }
 
 int Timer::getNumberOfClockFails() const
