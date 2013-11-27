@@ -31,10 +31,12 @@ include_directories(
 
 set(EXAMPLE_SOURCES
 	ExampleGraphicsScene.cpp
+	CopyPropertiesBehavior.cpp
 	PoseInterpolator.cpp
 )
 
 set(EXAMPLE_HEADERS
+	CopyPropertiesBehavior.h
 	PoseInterpolator.cpp
 )
 
