@@ -24,7 +24,6 @@ namespace SurgSim
 namespace Graphics
 {
 
-class Camera;
 class View;
 
 /// Basic SceneElement that wraps a View so that it can be added to the Scene.
@@ -43,31 +42,28 @@ public:
 	virtual ~ViewElement();
 
 	/// Sets the view component that provides the visualization of the graphics representations
-	/// \return	True if it succeeds, false if it fails
+	/// \return	True if setView() succeeds; Otherwise, false.
 	virtual bool setView(std::shared_ptr<View> view);
 
 	/// Returns the view component that provides the visualization of the graphics representations
-	std::shared_ptr<View> getView() const
-	{
-		return m_view;
-	}
+	/// \return A shared_ptr pointing to the View component
+	std::shared_ptr<View> getView() const;
 
 protected:
 	/// Initializes the scene element
 	/// \return True if it succeeds, false if it fails
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
 
 private:
 	/// Wakes up the scene element
 	/// \return True if it succeeds, false if it fails
-	virtual bool doWakeUp();
+	virtual bool doWakeUp() override;
 
 	/// View component that provides the visualization of the graphics representations
 	std::shared_ptr<View> m_view;
 };
 
 };  // namespace Graphics
-
 };  // namespace SurgSim
 
 #endif  // SURGSIM_GRAPHICS_VIEWELEMENT_H
