@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Framework/Timer.h"
-//#include "MockObjects.h"  //NOLINT
 
 using SurgSim::Framework::Timer;
 
