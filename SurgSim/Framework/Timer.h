@@ -41,13 +41,13 @@ public:
 	/// Instantiate a TimerClock and start a timing run.
 	Timer();
 
-	/// Begin a timing run by clearing out the stored frames and beginning a frame.
+	/// Begin a timing run by clearing out any stored frames and beginning a frame.
 	void start();
 
 	/// Begin a frame (storing the current time).
 	void beginFrame();
 
-	/// End this frame by storing the duration since the current frame was begun.  Then begins a new frame.
+	/// End this frame by storing the duration since the current frame was begun.  Then begin a new frame.
 	void endFrame();
 
 	/// Return the sum of the durations over all the stored frames.  Asserts if there are no frames.
@@ -62,7 +62,7 @@ public:
 	/// \return The average frequency in Hz.
 	double getAverageFrameRate() const;
 
-	/// Return the duration of the most-recent frame (time between latest \c endFrame and the previous \c start,
+	/// Return the duration of the most-recent frame (time between last \c endFrame and the previous \c start,
 	/// \c beginFrame, or \c endFrame ).  Asserts if there are no frames.
 	/// \return Most-recent period in seconds.
 	double getLastFramePeriod() const;
@@ -77,27 +77,28 @@ public:
 	/// \return Number of frames currently stored (not the maximum number of frames).
 	size_t getCurrentNumberOfFrames() const;
 
-	/// \return Number of times the clock returned an error code since \c start.
+	/// \return Number of times the clock returned an error code since \c start.  If this is non-zero, the frame
+	/// durations may be incorrect.
 	size_t getNumberOfClockFails() const;
 
 private:
-	/// Get the current time.  Handles any error codes from the clock.  May assert if the clock fails.
+	/// Get the current time.  Checks for any error code from the clock.
 	/// \return Current time.
 	TimerTimePoint now();
 
 	/// The clock used to get the time.
 	static const TimerClock m_clock;
 
-	/// The time at last \c start or \c frameStep.
+	/// The time at last \c start, \c beginFrame, or \c endFrame.
 	TimerTimePoint m_lastTime;
 
 	/// Maximum number of frames to store.
 	size_t m_maxNumberOfFrames;
 
-	/// Durations of the frames.
+	/// Durations of the frames, i.e., the "stored frames".
 	std::deque<TimerDuration> m_frameDurations;
 
-	/// Number of clock errors since start.
+	/// Number of clock errors since last \c start.
 	size_t m_clockFails;
 };
 
