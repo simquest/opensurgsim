@@ -48,7 +48,6 @@ public:
 	void beginFrame();
 
 	/// End this frame by storing the duration since the current frame was begun.  Then begins a new frame.
-	/// Asserts if the timer is stopped.
 	void endFrame();
 
 	/// Return the sum of the durations over all the stored frames.  Asserts if there are no frames.
@@ -91,9 +90,6 @@ private:
 
 	/// The time at last \c start or \c frameStep.
 	TimerTimePoint m_lastTime;
-
-	/// Is this Timer stopped?
-	bool m_stopped;
 
 	/// Maximum number of frames to store.
 	size_t m_maxNumberOfFrames;

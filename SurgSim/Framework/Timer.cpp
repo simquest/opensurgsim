@@ -20,7 +20,7 @@ namespace SurgSim {
 namespace Framework {
 
 Timer::Timer() :
-	m_stopped(true), m_maxNumberOfFrames(100), m_clockFails(0)
+	m_maxNumberOfFrames(100), m_clockFails(0)
 {
 	start();
 }
