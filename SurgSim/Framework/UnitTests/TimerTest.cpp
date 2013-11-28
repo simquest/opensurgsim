@@ -27,7 +27,7 @@ TEST(TimerTest, Constructor)
 
 TEST(TimerTest, Starting)
 {
-	std::shared_ptr<Timer> timer(new Timer());
+	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 0);
 	EXPECT_EQ(timer->getNumberOfClockFails(), 0);
 	EXPECT_THROW(timer->getCumulativeTime(), SurgSim::Framework::AssertionFailure);
@@ -66,6 +66,8 @@ TEST(TimerTest, Comparison)
 		timer2->endFrame();
 		timer1->endFrame();
 	}
+	// timer1's frames include timer2's frames and the for-loop operations, so timer1's frame period should be longer
+	// than timer2's frames (or at least no shorter).
 	EXPECT_GE(timer1->getAverageFramePeriod(), timer2->getAverageFramePeriod());
 	EXPECT_GT(timer1->getCumulativeTime(), timer1->getLastFramePeriod());
 }
