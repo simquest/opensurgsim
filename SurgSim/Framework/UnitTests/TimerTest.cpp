@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "SurgSim/Framework/Timer.h"
+#include "SurgSim/Framework/Assert.h"
 
 using SurgSim::Framework::Timer;
 
@@ -29,6 +30,11 @@ TEST(TimerTest, Starting)
 	std::shared_ptr<Timer> timer(new Timer());
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 0);
 	EXPECT_EQ(timer->getNumberOfClockFails(), 0);
+	EXPECT_THROW(timer->getCumulativeTime(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(timer->getAverageFramePeriod(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(timer->getAverageFrameRate(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(timer->getLastFramePeriod(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(timer->getLastFrameRate(), SurgSim::Framework::AssertionFailure);
 }
 
 TEST(TimerTest, SettingFrames)
@@ -38,6 +44,7 @@ TEST(TimerTest, SettingFrames)
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 1);
 	EXPECT_EQ(timer->getAverageFrameRate(), timer->getLastFrameRate());
 	EXPECT_EQ(timer->getAverageFramePeriod(), timer->getLastFramePeriod());
+	EXPECT_EQ(timer->getLastFramePeriod(), timer->getCumulativeTime());
 
 	timer->start();
 	timer->setMaxNumberOfFrames(3);
@@ -59,7 +66,8 @@ TEST(TimerTest, Comparison)
 		timer2->endFrame();
 		timer1->endFrame();
 	}
-	EXPECT_TRUE(timer1->getAverageFramePeriod() >= timer2->getAverageFramePeriod());
+	EXPECT_GE(timer1->getAverageFramePeriod(), timer2->getAverageFramePeriod());
+	EXPECT_GT(timer1->getCumulativeTime(), timer1->getLastFramePeriod());
 }
 
 
