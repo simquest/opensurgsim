@@ -45,7 +45,7 @@ void Timer::endFrame()
 	{
 		m_frameDurations.pop_front();
 	}
-	m_lastTime = currentTime;
+	beginFrame();
 }
 
 double Timer::getCumulativeTime() const
