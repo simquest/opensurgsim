@@ -40,7 +40,7 @@ TEST(TimerTest, SettingFrames)
 	EXPECT_EQ(timer->getAverageFramePeriod(), timer->getLastFramePeriod());
 
 	timer->start();
-	timer->setNumberOfFrames(3);
+	timer->setMaxNumberOfFrames(3);
 	for (auto i = 0; i < 5; ++i)
 	{
 		timer->endFrame();

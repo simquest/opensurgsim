@@ -82,7 +82,7 @@ double Timer::getLastFrameRate() const
 	return 1.0 / getLastFramePeriod();
 }
 
-void Timer::setNumberOfFrames(size_t maxNumberOfFrames)
+void Timer::setMaxNumberOfFrames(size_t maxNumberOfFrames)
 {
 	m_maxNumberOfFrames = (maxNumberOfFrames > 0) ? maxNumberOfFrames : 1;
 	while (m_frameDurations.size() > m_maxNumberOfFrames)

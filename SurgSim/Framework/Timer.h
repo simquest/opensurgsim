@@ -73,7 +73,7 @@ public:
 	double getLastFrameRate() const;
 
 	/// Set the maximum number of frames to store.
-	void setNumberOfFrames(size_t numberOfFrames);
+	void setMaxNumberOfFrames(size_t numberOfFrames);
 
 	/// \return Number of frames currently stored (not the maximum number of frames).
 	size_t getCurrentNumberOfFrames() const;
