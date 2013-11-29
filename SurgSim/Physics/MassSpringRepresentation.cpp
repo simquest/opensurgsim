@@ -34,7 +34,7 @@ MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
 
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
-	this->m_numDofPerNode = 3;
+	m_numDofPerNode = 3;
 }
 
 MassSpringRepresentation::~MassSpringRepresentation()

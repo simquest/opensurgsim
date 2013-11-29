@@ -37,40 +37,37 @@ public:
 	/// \param	name	Name of the group
 	explicit OsgGroup(const std::string& name);
 
-	/// Sets whether the group is currently visible
+	/// Sets whether this group is currently visible
 	/// \param	visible	True for visible, false for invisible
-	virtual void setVisible(bool visible);
+	virtual void setVisible(bool visible) override;
 
-	/// Gets whether the group is currently visible
-	/// \return	visible	True for visible, false for invisible
-	virtual bool isVisible() const;
+	/// Gets whether this group is currently visible
+	/// \return	True for visible, false for invisible
+	virtual bool isVisible() const override;
 
 	/// Adds an representation
 	/// \param	representation	Representation to add to this group
 	/// \return	True if the representation is added successfully, false if failure
 	/// Only subclasses of OsgRepresentation will be added successfully.
-	virtual bool add(std::shared_ptr<Representation> representation);
+	virtual bool add(std::shared_ptr<Representation> representation) override;
 
 	/// Adds all representations in another group to this group
 	/// \param	group	Group of representations to add
 	/// \return	True if all representations are added successfully, false if failure
 	/// Only subclasses of OsgGroup will be appended successfully.
-	virtual bool append(std::shared_ptr<Group> group);
+	virtual bool append(std::shared_ptr<Group> group) override;
 
 	/// Removes an representation
 	/// \param	representation	Representation to remove from this group
 	/// \return	True if the representation is removed successfully, false if representation is not in this group or
 	///         other failure
-	virtual bool remove(std::shared_ptr<Representation> representation);
+	virtual bool remove(std::shared_ptr<Representation> representation) override;
 
 	/// Removes all representations
-	virtual void clear();
+	virtual void clear() override;
 
 	/// Returns the root OSG group node
-	osg::ref_ptr<osg::Group> getOsgGroup() const
-	{
-		return m_switch;
-	}
+	osg::ref_ptr<osg::Group> getOsgGroup() const;
 
 private:
 	/// Whether the group is currently visible or not

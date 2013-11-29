@@ -239,6 +239,13 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeVolumeIntegrals()
 	m_TP[0] /= 2; m_TP[1] /= 2; m_TP[2] /= 2;
 }
 
+template <class VertexData, class EdgeData, class TriangleData>
+std::string MeshShape<VertexData, EdgeData, TriangleData>::getClassName()
+{
+	return std::string("SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>");
+}
+
+
 }; // namespace Math
 }; // namespace SurgSim
 

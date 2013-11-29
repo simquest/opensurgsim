@@ -177,6 +177,10 @@ private:
 
 	/// NO assignment operator
 	DeformableRepresentation& operator =(const DeformableRepresentation& a);
+
+	// Dependent names resolution (need to be in public/protected to be accessible in derived classes)
+public:
+	using OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>::m_initialState;
 };
 
 }; // namespace Physics

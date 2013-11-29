@@ -45,6 +45,10 @@ public:
 	/// Virtual destructor
 	virtual ~FemElement();
 
+	/// Initialize the FemElement once everything has been set
+	/// \param state The state to initialize the FemElement with
+	virtual void initialize(const DeformableRepresentationState& state);
+
 	/// Gets the number of degree of freedom per node
 	/// \return The number of dof per node
 	unsigned int getNumDofPerNode() const;
@@ -78,7 +82,6 @@ public:
 	/// Sets the mass density (in Kg.m-3)
 	/// \param rho The mass density
 	void setMassDensity(double rho);
-
 	/// Gets the mass density (in Kg.m-3)
 	/// \return The mass density
 	double getMassDensity() const;
@@ -96,36 +99,42 @@ public:
 	/// Adds the element force (computed for a given state) to a complete system force vector F (assembly)
 	/// \param state The state to compute the force with
 	/// \param[in,out] F The complete system force vector to add the element force into
+	/// \param scale A factor to scale the added force with
 	/// \note The element force is of size (getNumDofPerNode() x getNumNodes())
 	/// \note This method supposes that the incoming state contains information with the same number of dof
 	/// \note per node as getNumDofPerNode()
-	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F) = 0;
+	virtual void addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale = 1.0) = 0;
 
 	/// Adds the element mass matrix M (computed for a given state) to a complete system mass matrix M (assembly)
 	/// \param state The state to compute the mass matrix with
 	/// \param[in,out] M The complete system mass matrix to add the element mass-matrix into
+	/// \param scale A factor to scale the added mass matrix with
 	/// \note The element mass matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M) = 0;
+	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M, double scale = 1.0) = 0;
 
 	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
 	/// to a complete system damping matrix D (assembly)
 	/// \param state The state to compute the damping matrix with
 	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
+	/// \param scale A factor to scale the added damping matrix with
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D) = 0;
+	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
+		double scale = 1.0) = 0;
 
 	/// Adds the element stiffness matrix K (= -df/dx) (computed for a given state)
 	/// to a complete system stiffness matrix K (assembly)
 	/// \param state The state to compute the stiffness matrix with
 	/// \param[in,out] K The complete system stiffness matrix to add the element stiffness matrix into
+	/// \param scale A factor to scale the added stiffness matrix with
 	/// \note The element stiffness matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
-	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K) = 0;
+	virtual void addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
+		double scale = 1.0) = 0;
 
 	/// Adds the element force vector, mass, stiffness and damping matrices (computed for a given state)
 	/// into a complete system data structure F, M, D, K (assembly)
@@ -141,6 +150,19 @@ public:
 		SurgSim::Math::Matrix* M,
 		SurgSim::Math::Matrix* D,
 		SurgSim::Math::Matrix* K) = 0;
+
+	/// Adds the element matrix-vector contribution F += (alphaM.M + alphaD.D + alphaK.K).x (computed for a given state)
+	/// into a complete system data structure F (assembly)
+	/// \param state The state to compute everything with
+	/// \param alphaM The scaling factor for the mass contribution
+	/// \param alphaD The scaling factor for the damping contribution
+	/// \param alphaK The scaling factor for the stiffness contribution
+	/// \param x A complete system vector to be used as the vector in the matrix-vector multiplication
+	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
+	/// \note This method supposes that the incoming state contains information with the same number of dof
+	/// \note per node as getNumDofPerNode()
+	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
+		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
 
 protected:
 	/// Sets the number of degrees of freedom per node

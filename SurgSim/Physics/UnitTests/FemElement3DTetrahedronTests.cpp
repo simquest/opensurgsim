@@ -41,6 +41,8 @@ double N(unsigned int i, double V, double *ai, double *bi, double *ci, double *d
 	double inv6V = 1.0 / (6.0 * V);
 	return inv6V * (ai[i] + bi[i] * p[0] + ci[i] * p[1] + di[i] * p[2]);
 }
+
+const double epsilon = 1e-9;
 };
 
 class MockFemElement3DTet : public FemElement3DTetrahedron
@@ -75,12 +77,12 @@ class FemElement3DTetrahedronTests : public ::testing::Test
 public:
 	std::array<unsigned int, 4> m_nodeIds;
 	DeformableRepresentationState m_restState;
-	DeformableRepresentationState m_deformedState;
 	double m_expectedVolume;
 	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_expectedX0;
 	double m_rho, m_E, m_nu;
 	SurgSim::Math::Matrix m_expectedMassMatrix, m_expectedDampingMatrix;
 	SurgSim::Math::Matrix m_expectedStiffnessMatrix, m_expectedStiffnessMatrix2;
+	SurgSim::Math::Vector m_vectorOnes;
 
 	virtual void SetUp() override
 	{
@@ -106,14 +108,6 @@ public:
 		getSubVector(m_expectedX0, 2, 3) = getSubVector(x0, m_nodeIds[2], 3) = Vector3d(0.1, 2.2, 2.3);
 		getSubVector(m_expectedX0, 3, 3) = getSubVector(x0, m_nodeIds[3], 3) = Vector3d(0.1, 1.2, 3.3);
 
-		// The deformedState will be the rest state with an epsilon on each node
-		m_deformedState = m_restState;
-		Vector& x = m_deformedState.getPositions();
-		getSubVector(x, m_nodeIds[0], 3) += Vector3d(0.1, 0.1, 0.1);
-		getSubVector(x, m_nodeIds[1], 3) += Vector3d(0.1, 0.1, 0.1);
-		getSubVector(x, m_nodeIds[2], 3) += Vector3d(0.1, 0.1, 0.1);
-		getSubVector(x, m_nodeIds[3], 3) += Vector3d(0.1, 0.1, 0.1);
-
 		// The tet is part of a cube of size 1x1x1 (it occupies 1/6 of the cube's volume)
 		m_expectedVolume = 1.0 / 6.0;
 
@@ -129,6 +123,8 @@ public:
 		m_expectedStiffnessMatrix.setZero();
 		m_expectedStiffnessMatrix2.resize(3*15, 3*15);
 		m_expectedStiffnessMatrix2.setZero();
+		m_vectorOnes.resize(3*15);
+		m_vectorOnes.setConstant(1.0);
 
 		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> M;
 		M.setZero();
@@ -332,9 +328,37 @@ TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
 	using SurgSim::Math::getSubVector;
 
 	MockFemElement3DTet tet(m_nodeIds, m_restState);
-	tet.setMassDensity(m_rho);
-	tet.setYoungModulus(m_E);
-	tet.setPoissonRatio(m_nu);
+
+	// Test the various mode of failure related to the physical parameters
+	// This has been already tested in FemElementTests, but this is to make sure this method is called properly
+	// So the same behavior should be expected
+	{
+		// Mass density not set
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
+
+		// Poisson Ratio not set
+		tet.setMassDensity(-1234.56);
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
+
+		// Young modulus not set
+		tet.setPoissonRatio(0.55);
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
+
+		// Invalid mass density
+		tet.setYoungModulus(-4321.33);
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
+
+		// Invalid Poisson ratio
+		tet.setMassDensity(m_rho);
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
+
+		// Invalid Young modulus
+		tet.setPoissonRatio(m_nu);
+		ASSERT_ANY_THROW(tet.initialize(m_restState));
+
+		tet.setYoungModulus(m_E);
+		ASSERT_NO_THROW(tet.initialize(m_restState));
+	}
 
 	SurgSim::Math::Vector forceVector(3*15);
 	SurgSim::Math::Matrix massMatrix(3*15, 3*15);
@@ -374,4 +398,36 @@ TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
 	EXPECT_TRUE(dampingMatrix.isApprox(m_expectedDampingMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(m_expectedStiffnessMatrix2));
+
+	// Test addMatVec API with Mass component only
+	forceVector.setZero();
+	tet.addMatVec(m_restState, 1.0, 0.0, 0.0, m_vectorOnes, &forceVector);
+	for (int rowId = 0; rowId < 3 * 15; rowId++)
+	{
+		EXPECT_NEAR(m_expectedMassMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
+	}
+	// Test addMatVec API with Damping component only
+	forceVector.setZero();
+	tet.addMatVec(m_restState, 0.0, 1.0, 0.0, m_vectorOnes, &forceVector);
+	for (int rowId = 0; rowId < 3 * 15; rowId++)
+	{
+		EXPECT_NEAR(m_expectedDampingMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
+	}
+	// Test addMatVec API with Stiffness component only
+	forceVector.setZero();
+	tet.addMatVec(m_restState, 0.0, 0.0, 1.0, m_vectorOnes, &forceVector);
+	for (int rowId = 0; rowId < 3 * 15; rowId++)
+	{
+		EXPECT_NEAR(m_expectedStiffnessMatrix.row(rowId).sum(), forceVector[rowId], epsilon);
+	}
+	// Test addMatVec API with mix Mass/Damping/Stiffness components
+	forceVector.setZero();
+	tet.addMatVec(m_restState, 1.0, 2.0, 3.0, m_vectorOnes, &forceVector);
+	for (int rowId = 0; rowId < 3 * 15; rowId++)
+	{
+		double expectedCoef = 1.0 * m_expectedMassMatrix.row(rowId).sum() +
+			2.0 * m_expectedDampingMatrix.row(rowId).sum() +
+			3.0 * m_expectedStiffnessMatrix.row(rowId).sum();
+		EXPECT_NEAR(expectedCoef, forceVector[rowId], epsilon);
+	}
 }

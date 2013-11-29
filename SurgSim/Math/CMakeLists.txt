@@ -16,6 +16,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(SURGSIM_MATH_SOURCES
@@ -27,6 +28,7 @@ set(SURGSIM_MATH_SOURCES
 	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
 	PlaneShape.cpp
+	Shape.cpp
 	SphereShape.cpp
 )
 

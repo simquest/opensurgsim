@@ -45,6 +45,10 @@ SET(LIBS
 	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimGraphics
+	SurgSimCollision
+	SurgSimFramework
+	SurgSimMath
+	yaml-cpp
 )
 
 target_link_libraries(ExampleMassSprings ${LIBS}

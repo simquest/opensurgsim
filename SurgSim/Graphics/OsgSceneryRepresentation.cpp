@@ -37,7 +37,7 @@ bool OsgSceneryRepresentation::doInitialize()
 {
 	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
 
-	std::string objectPath = applicationData->findFile("Data/" + m_fileName);
+	std::string objectPath = applicationData->findFile(m_fileName);
 	SURGSIM_ASSERT(! objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
 
 	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
