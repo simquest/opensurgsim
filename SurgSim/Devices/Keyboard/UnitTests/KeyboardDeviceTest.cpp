@@ -17,11 +17,11 @@
 /// Tests for the KeyboardDevice class.
 #include <gtest/gtest.h>
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
-#include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
 
 namespace SurgSim
 {

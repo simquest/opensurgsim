@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/CommonDevice.h>
+#include "SurgSim/Input/CommonDevice.h"
 
 namespace SurgSim
 {
@@ -29,6 +29,18 @@ class KeyboardScaffold;
 class KeyboardHandler;
 
 /// A class implementing the communication with a keyboard
+///
+/// \par Application input provided from the device:
+///   | type       | name			  |															  |
+///   | ----       | ----			  | ---                                      				  |
+///   | int		   | "key"			  | %Key code for the pressed key, if any. Default: -1		  |
+///   | int		   | "modifierMask"   | %Mask for the pressed modifier, if any. Default: 0        |
+///
+/// \par Application output used by the device:
+///	  NONE
+///
+/// \note Key 'Fn' is not currently captured (No key code is assigned to it).
+/// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class KeyboardDevice : public SurgSim::Input::CommonDevice
 {
 	friend class KeyboardScaffold;

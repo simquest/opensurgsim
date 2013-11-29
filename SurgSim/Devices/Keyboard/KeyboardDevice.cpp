@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
-#include <SurgSim/Devices/Keyboard/KeyboardHandler.h>
-#include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
+#include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {

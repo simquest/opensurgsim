@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
-#include <SurgSim/Devices/Keyboard/KeyboardHandler.h>
-#include <SurgSim/Devices/Keyboard/KeyCode.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
+#include "SurgSim/Devices/Keyboard/KeyCode.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
 
 #include <osg/Camera>
 #include <osg/Geode>

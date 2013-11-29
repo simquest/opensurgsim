@@ -17,7 +17,8 @@
 #define SURGSIM_DEVICES_KEYBOARD_KEYBOARDSCAFFOLD_H
 
 #include <memory>
-#include <SurgSim/Framework/Logger.h>
+
+#include "SurgSim/Framework/Logger.h"
 
 namespace SurgSim
 {

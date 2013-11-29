@@ -13,21 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
 	"${OPENSCENEGRAPH_INCLUDE_DIR}"
 )
 
 set(KEYBOARD_DEVICE_SOURCES
 	KeyboardDevice.cpp
+	KeyboardHandler.cpp
 	KeyboardScaffold.cpp
 )
 

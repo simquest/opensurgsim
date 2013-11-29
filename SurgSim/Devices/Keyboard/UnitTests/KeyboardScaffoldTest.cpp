@@ -17,6 +17,7 @@
 /// Tests for the KeyboardScaffold class and its device interactions.
 
 #include <gtest/gtest.h>
+
 #include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
 
 using SurgSim::Device::KeyboardScaffold;

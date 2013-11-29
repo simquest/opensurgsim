@@ -12,22 +12,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <SurgSim/Devices/Keyboard/KeyboardScaffold.h>
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
-#include <SurgSim/Devices/Keyboard/KeyboardDevice.h>
-#include <SurgSim/Devices/Keyboard/KeyboardHandler.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/SharedInstance.h>
+#include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
+
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
 
 namespace SurgSim
 {
 namespace Device
 {
+
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 
+/// Struct to hold a KeyboardDevice object, a KeyboardHandler object, and a mutex for data passing.
 struct KeyboardScaffold::DeviceData
 {
 	/// Constructor
