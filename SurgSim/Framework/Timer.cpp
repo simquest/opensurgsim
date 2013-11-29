@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <numeric>
+
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Timer.h"
 
@@ -57,11 +59,8 @@ double Timer::getCumulativeTime() const
 {
 	SURGSIM_ASSERT(m_frameDurations.size() > 0) <<
 		"Attempted to access the frames for a Timer with no frames.\n";
-	TimerDuration cumulativeTime;
-	for (auto it = m_frameDurations.begin(); it != m_frameDurations.end(); ++it)
-	{
-		cumulativeTime += *it;
-	}
+	TimerDuration cumulativeTime = std::accumulate(std::begin(m_frameDurations), std::end(m_frameDurations),
+		TimerDuration());
 	return cumulativeTime.count();
 }
 
@@ -90,9 +89,10 @@ double Timer::getLastFrameRate() const
 void Timer::setMaxNumberOfFrames(size_t maxNumberOfFrames)
 {
 	m_maxNumberOfFrames = (maxNumberOfFrames > 0) ? maxNumberOfFrames : 1;
-	while (m_frameDurations.size() > m_maxNumberOfFrames)
+	if (m_frameDurations.size() > m_maxNumberOfFrames)
 	{
-		m_frameDurations.pop_front();
+		m_frameDurations.erase(std::begin(m_frameDurations),
+							std::begin(m_frameDurations) + m_frameDurations.size() - m_maxNumberOfFrames);
 	}
 }
 
