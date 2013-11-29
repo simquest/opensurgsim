@@ -13,22 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Representation.h"
+#ifndef SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
+#define SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
 
-SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
+template <class T>
+bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
 {
+	auto element = m_getters.find(name);
+	if (value != nullptr && element != std::end(m_getters))
+	{
+		*value = boost::any_cast<T>(element->second());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
-SurgSim::Framework::Representation::~Representation()
-{
-}
-
-bool SurgSim::Framework::Representation::doInitialize()
-{
-	return true;
-}
-
-bool SurgSim::Framework::Representation::doWakeUp()
-{
-	return true;
-}
+#endif

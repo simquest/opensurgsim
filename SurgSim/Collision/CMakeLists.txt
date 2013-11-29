@@ -19,6 +19,7 @@ include_directories(
 )
 
 set(SURGSIM_COLLISION_SOURCES
+	BoxCapsuleDcdContact.cpp
 	BoxDoubleSidedPlaneDcdContact.cpp
 	BoxPlaneDcdContact.cpp
 	BoxSphereDcdContact.cpp
@@ -35,6 +36,7 @@ set(SURGSIM_COLLISION_SOURCES
 )
 
 set(SURGSIM_COLLISION_HEADERS
+	BoxCapsuleDcdContact.h
 	BoxDoubleSidedPlaneDcdContact.h
 	BoxPlaneDcdContact.h
 	BoxSphereDcdContact.h

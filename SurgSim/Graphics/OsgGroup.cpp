@@ -101,3 +101,8 @@ void OsgGroup::clear()
 			" failed while attempting to clear group " << getName() << "!";
 	}
 }
+
+osg::ref_ptr<osg::Group> OsgGroup::getOsgGroup() const
+{
+	return m_switch;
+}

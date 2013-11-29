@@ -47,8 +47,10 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
 	OsgUnitAxes.cpp
+	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	RenderPass.cpp
 	Representation.cpp
 	ViewElement.cpp
 )
@@ -106,10 +108,12 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUnitCylinder.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
+	OsgVectorFieldRepresentation.h
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
+	RenderPass.h
 	RenderTarget.h
 	Representation.h
 	SceneryRepresentation.h
@@ -124,6 +128,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	TextureRectangle.h
 	Uniform.h
 	UniformBase.h
+	VectorField.h
+	VectorFieldRepresentation.h
 	View.h
 	ViewElement.h
 )

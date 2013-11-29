@@ -112,7 +112,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 class SimpleBox : public SurgSim::Blocks::BasicSceneElement
 {
 public:
-	SimpleBox(const std::string& name) : BasicSceneElement(name)
+	explicit SimpleBox(const std::string& name) : BasicSceneElement(name)
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName()+" Graphics");
 		m_box->setInitialPose(RigidTransform3d::Identity());

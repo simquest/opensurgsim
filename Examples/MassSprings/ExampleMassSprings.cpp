@@ -48,7 +48,8 @@ using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 
-///\file Example of how to put together a very simple demo of mass springs
+/// \file
+/// Example of how to put together a very simple demo of mass springs
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
 {
