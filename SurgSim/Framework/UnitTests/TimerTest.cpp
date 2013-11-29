@@ -22,7 +22,6 @@ using SurgSim::Framework::Timer;
 TEST(TimerTest, Constructor)
 {
 	EXPECT_NO_THROW({std::shared_ptr<Timer> timer(new Timer());});
-
 }
 
 TEST(TimerTest, Starting)
@@ -46,11 +45,11 @@ TEST(TimerTest, SettingFrames)
 	EXPECT_EQ(timer->getAverageFramePeriod(), timer->getLastFramePeriod());
 	EXPECT_EQ(timer->getLastFramePeriod(), timer->getCumulativeTime());
 
-	timer->start();
 	timer->setMaxNumberOfFrames(3);
+	timer->start();
 	for (auto i = 0; i < 5; ++i)
 	{
-		timer->endFrame();
+		timer->markFrame();
 	}
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 3);
 }
@@ -64,7 +63,7 @@ TEST(TimerTest, Comparison)
 	{
 		timer2->beginFrame();
 		timer2->endFrame();
-		timer1->endFrame();
+		timer1->markFrame();
 	}
 	// timer1's frames include timer2's frames and the for-loop operations, so timer1's frame period should be longer
 	// than timer2's frames (or at least no shorter).

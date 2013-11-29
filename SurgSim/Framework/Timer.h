@@ -47,8 +47,13 @@ public:
 	/// Begin a frame (storing the current time).
 	void beginFrame();
 
-	/// End this frame by storing the duration since the current frame was begun.  Then begin a new frame.
+	/// End this frame by storing the duration since the current frame was begun.
+	/// \note \c endFrame does not start a new frame, call \c beginFrame to do so.
+	/// \sa Timer::markFrame
 	void endFrame();
+
+	/// End the current frame and begin a new frame.
+	void markFrame();
 
 	/// Return the sum of the durations over all the stored frames.  Asserts if there are no frames.
 	/// \return Sum of stored frame durations in seconds.

@@ -45,6 +45,11 @@ void Timer::endFrame()
 	{
 		m_frameDurations.pop_front();
 	}
+}
+
+void Timer::markFrame()
+{
+	endFrame();
 	beginFrame();
 }
 
