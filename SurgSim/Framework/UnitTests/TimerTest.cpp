@@ -38,7 +38,7 @@ TEST(TimerTest, Starting)
 
 TEST(TimerTest, SettingFrames)
 {
-	std::shared_ptr<Timer> timer(new Timer());
+	std::shared_ptr<Timer> timer = std::make_shared<Timer>();
 	timer->endFrame();
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 1);
 	EXPECT_EQ(timer->getAverageFrameRate(), timer->getLastFrameRate());
@@ -58,8 +58,8 @@ TEST(TimerTest, SettingFrames)
 
 TEST(TimerTest, Comparison)
 {
-	std::shared_ptr<Timer> timer1(new Timer());
-	std::shared_ptr<Timer> timer2(new Timer());
+	std::shared_ptr<Timer> timer1 = std::make_shared<Timer>();
+	std::shared_ptr<Timer> timer2 = std::make_shared<Timer>();
 
 	for (auto i = 0; i < 100; ++i)
 	{
