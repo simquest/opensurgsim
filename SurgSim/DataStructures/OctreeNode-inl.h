@@ -27,8 +27,7 @@ template<class Data>
 OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::BoundingBoxType& boundingBox) :
 	m_boundingBox(boundingBox),
 	m_isActive(false),
-	m_isLeafNode(true),
-	m_children(0)
+	m_hasChildren(false)
 {
 }
 
@@ -50,9 +49,9 @@ bool OctreeNode<Data>::isActive() const
 }
 
 template<class Data>
-bool OctreeNode<Data>::isLeafNode() const
+bool OctreeNode<Data>::hasChildren() const
 {
-	return m_isLeafNode;
+	return m_hasChildren;
 }
 
 template<class Data>
@@ -60,10 +59,8 @@ void OctreeNode<Data>::subdivide()
 {
 	using SurgSim::Math::Vector3d;
 
-	if (m_isLeafNode)
+	if (! m_hasChildren)
 	{
-		m_children.resize(8);
-
 		Vector3d childsSize = (m_boundingBox.max() - m_boundingBox.min()) / 2.0;
 		BoundingBoxType childsBoundingBox;
 		for (int i = 0; i < 8; i++)
@@ -76,7 +73,7 @@ void OctreeNode<Data>::subdivide()
 			childsBoundingBox.max() = childsBoundingBox.min() + childsSize;
 			m_children[i] = std::make_shared<OctreeNode<Data>>(childsBoundingBox);
 		}
-		m_isLeafNode = false;
+		m_hasChildren = true;
 	}
 }
 
@@ -102,7 +99,7 @@ bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const 
 		return true;
 	}
 
-	if (m_isLeafNode)
+	if (! m_hasChildren)
 	{
 		subdivide();
 	}
@@ -118,13 +115,13 @@ bool OctreeNode<Data>::doAddData(const SurgSim::Math::Vector3d& position, const 
 }
 
 template<class Data>
-std::vector<std::shared_ptr<OctreeNode<Data> > >& OctreeNode<Data>::getChildren()
+std::array<std::shared_ptr<OctreeNode<Data> >, 8>& OctreeNode<Data>::getChildren()
 {
 	return m_children;
 }
 
 template<class Data>
-const std::vector<std::shared_ptr<OctreeNode<Data> > >& OctreeNode<Data>::getChildren() const
+const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& OctreeNode<Data>::getChildren() const
 {
 	return m_children;
 }

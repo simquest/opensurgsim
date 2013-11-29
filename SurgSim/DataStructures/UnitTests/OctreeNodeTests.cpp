@@ -56,9 +56,14 @@ TEST(OctreeNodeTests, InitialValues)
 	OctreeNodeType octree(expectedBoundingBox);
 
 	EXPECT_FALSE(octree.isActive());
-	EXPECT_TRUE(octree.isLeafNode());
+	EXPECT_FALSE(octree.hasChildren());
 	EXPECT_TRUE(expectedBoundingBox.isApprox(octree.getBoundingBox()));
-	EXPECT_EQ(0, octree.getChildren().size());
+
+	auto children = octree.getChildren();
+	for(auto child=children.cbegin(); child!=children.cend(); ++child)
+	{
+		EXPECT_EQ(nullptr, *child);
+	}
 }
 
 TEST(OctreeNodeTests, Subdivide)
@@ -66,20 +71,18 @@ TEST(OctreeNodeTests, Subdivide)
 	BoundingBoxType boundingBox(Vector3d::Zero(), Vector3d::Ones() * 16.0);
 	OctreeNodeType octree(boundingBox);
 
-	EXPECT_EQ(0, octree.getChildren().size());
-	EXPECT_TRUE(octree.isLeafNode());
+	EXPECT_FALSE(octree.hasChildren());
 	EXPECT_FALSE(octree.isActive());
 	octree.subdivide();
-	EXPECT_EQ(8, octree.getChildren().size());
-	EXPECT_FALSE(octree.isLeafNode());
+	EXPECT_TRUE(octree.hasChildren());
 	EXPECT_FALSE(octree.isActive());
 
 	auto children = octree.getChildren();
 	for(auto child=children.cbegin(); child!=children.cend(); ++child)
 	{
+		ASSERT_NE(nullptr, *child);
 		EXPECT_FALSE((*child)->isActive());
-		EXPECT_TRUE((*child)->isLeafNode());
-		EXPECT_EQ(0, (*child)->getChildren().size());
+		EXPECT_FALSE((*child)->hasChildren());
 	}
 
 	std::array<BoundingBoxType, 8> expectedBoxes = {
@@ -108,13 +111,22 @@ TEST(OctreeNodeTests, Subdivide)
 
 int countOctreeLevels(std::shared_ptr<OctreeNodeType> node)
 {
-	auto children = node->getChildren();
-	for(auto child=children.cbegin(); child!=children.cend(); ++child)
+	if (node->hasChildren())
 	{
-		if ((*child)->isActive())
+		auto children = node->getChildren();
+		int maxLevels = 0;
+		for(auto child=children.cbegin(); child!=children.cend(); ++child)
 		{
-			return countOctreeLevels(*child) + 1;
+			if ((*child)->isActive())
+			{
+				int levels = countOctreeLevels(*child);
+				if (levels > maxLevels)
+				{
+					maxLevels = levels;
+				}
+			}
 		}
+		return maxLevels + 1;
 	}
 	return 1;
 }
@@ -127,15 +139,13 @@ TEST(OctreeNodeTests, AddNodes)
 	const int levels = 5;
 	MockData data = {1, 3.14, "string"};
 
-	EXPECT_EQ(0, octree->getChildren().size());
-	EXPECT_TRUE(octree->isLeafNode());
+	EXPECT_FALSE(octree->hasChildren());
 	EXPECT_FALSE(octree->isActive());
 
 	EXPECT_TRUE(octree->addData(Vector3d(1.0, 1.0, 1.0), data, levels));
 	EXPECT_TRUE(octree->addData(Vector3d(-4.0, 5.0, -7.0), data, levels));
 
-	EXPECT_EQ(8, octree->getChildren().size());
-	EXPECT_FALSE(octree->isLeafNode());
+	EXPECT_TRUE(octree->hasChildren());
 	EXPECT_TRUE(octree->isActive());
 	EXPECT_EQ(5, countOctreeLevels(octree));
 
@@ -159,12 +169,10 @@ TEST(OctreeNodeTests, Data)
 	const int levels = 1;
 	MockData expectedData = {1, 3.14, "string"};
 
-	EXPECT_EQ(0, octree.getChildren().size());
-	EXPECT_TRUE(octree.isLeafNode());
+	EXPECT_FALSE(octree.hasChildren());
 	EXPECT_FALSE(octree.isActive());
 	EXPECT_TRUE(octree.addData(Vector3d(1.0, 1.0, 1.0), expectedData, levels));
-	EXPECT_EQ(0, octree.getChildren().size());
-	EXPECT_TRUE(octree.isLeafNode());
+	EXPECT_FALSE(octree.hasChildren());
 	EXPECT_TRUE(octree.isActive());
 
 	EXPECT_EQ(expectedData.mockInt, octree.data.mockInt);

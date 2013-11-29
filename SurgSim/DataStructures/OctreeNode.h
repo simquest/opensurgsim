@@ -16,8 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_OCTREENODE_H
 #define SURGSIM_DATASTRUCTURES_OCTREENODE_H
 
+#include <array>
 #include <Eigen/Geometry>
-#include <vector>
 
 #include <SurgSim/Math/Vector.h>
 
@@ -55,19 +55,20 @@ public:
 	const BoundingBoxType& getBoundingBox() const;
 
 	/// Is this node active
-	/// \return true if the node is active
+	/// \return true if there is any data inside this node, including data held 
+	/// by children, children's children, etc.
 	bool isActive() const;
 
-	/// Is this node a leaf node
+	/// Does this node have children
 	/// \return true if this node has no children
-	bool isLeafNode() const;
+	bool hasChildren() const;
 
 	/// Subdivide the node into 8 equal regions. Each subregion will be stored
 	/// as this nodes children.
 	/// NOTE: The data stored in the current node will not be automatically subdivided.
 	void subdivide();
 
-	/// Add data to a node in this this octree
+	/// Add data to a node in this octree
 	/// The octree will build the octree as necessary to add the
 	/// node at the specified level
 	/// \param position The position to add the data at
@@ -75,13 +76,13 @@ public:
 	/// \param level The number of levels down the octree to store the data
 	bool addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level);
 
-	/// Get the children of this node
-	/// \return vector of all eight children
-	std::vector<std::shared_ptr<OctreeNode<Data> > >& getChildren();
-
 	/// Get the children of this node (non const version)
 	/// \return vector of all eight children
-	const std::vector<std::shared_ptr<OctreeNode<Data> > >& getChildren() const;
+	std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren();
+
+	/// Get the children of this node
+	/// \return vector of all eight children
+	const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren() const;
 
 	/// Extra node data
 	Data data;
@@ -92,8 +93,8 @@ private:
 
 	BoundingBoxType m_boundingBox;
 	bool m_isActive;
-	bool m_isLeafNode;
-	std::vector<std::shared_ptr<OctreeNode<Data> > > m_children;
+	bool m_hasChildren;
+	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
 };
 
 };  // namespace DataStructures
