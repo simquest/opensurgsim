@@ -80,6 +80,7 @@ public:
 	/// \note The element damping matrix is square of size getNumDofPerNode() x getNumNodes()
 	/// \note This method supposes that the incoming state contains information with the same number of
 	/// \note dof per node as getNumDofPerNode()
+	/// \note FemElement3DTetrahedron uses linear elasticity (not visco-elasticity), so it does not give any damping.
 	virtual void addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
 		double scale = 1.0) override;
 

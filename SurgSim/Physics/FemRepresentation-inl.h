@@ -41,7 +41,7 @@ FemRepresentation<MT, DT, KT, ST>::~FemRepresentation()
 template <class MT, class DT, class KT, class ST>
 bool FemRepresentation<MT, DT, KT, ST>::doInitialize()
 {
-	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state befor ecalling Initialize";
+	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
 	// Allocate the vector m_massPerNode
 	if (m_massPerNode.size() == 0 || m_massPerNode.size() < m_initialState->getNumNodes())
@@ -179,10 +179,6 @@ void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
 {
-	if (! isActive())
-	{
-		return;
-	}
 }
 
 template <class MT, class DT, class KT, class ST>
@@ -209,9 +205,6 @@ Vector& FemRepresentation<MT, DT, KT, ST>::computeF(const DeformableRepresentati
 template <class MT, class DT, class KT, class ST>
 const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresentationState& state)
 {
-	using SurgSim::Math::Vector3d;
-	using SurgSim::Math::setSubVector;
-
 	// Make sure the mass matrix has been properly allocated and zeroed out
 	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), true);
 
@@ -236,10 +229,6 @@ const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresenta
 template <class MT, class DT, class KT, class ST>
 const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresentationState& state)
 {
-	using SurgSim::Math::Vector3d;
-	using SurgSim::Math::setSubVector;
-	using SurgSim::Math::addSubMatrix;
-
 	const double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
 	const double& rayMass = m_rayleighDamping.massCoefficient;
 
@@ -286,8 +275,6 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 template <class MT, class DT, class KT, class ST>
 const KT& FemRepresentation<MT, DT, KT, ST>::computeK(const DeformableRepresentationState& state)
 {
-	using SurgSim::Math::addSubMatrix;
-
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
 	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
 
@@ -313,9 +300,6 @@ template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::computeFMDK(const DeformableRepresentationState& state,
 	Vector** f, MT** M, DT** D, KT** K)
 {
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::addSubMatrix;
-
 	// Make sure the force vector has been properly allocated and zeroed out
 	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
 
@@ -381,10 +365,6 @@ void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
 	Vector* force, const DeformableRepresentationState& state,
 	bool useGlobalDampingMatrix, bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
-	using SurgSim::Math::getSubVector;
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubMatrix;
-
 	// Temporary variables for convenience
 	double& rayMass = m_rayleighDamping.massCoefficient;
 	double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
@@ -439,8 +419,6 @@ template <class MT, class DT, class KT, class ST>
 void FemRepresentation<MT, DT, KT, ST>::addFemElementsForce(Vector *force, const DeformableRepresentationState& state,
 															double scale)
 {
-	using SurgSim::Math::addSubVector;
-
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		(*femElement)->addForce(state, force, scale);
@@ -458,8 +436,7 @@ void FemRepresentation<MT, DT, KT, ST>::addGravityForce(Vector *f, const Deforma
 
 	// Prepare a gravity vector of the proper size
 	Vector gravitynD;
-	gravitynD.resize(getNumDofPerNode());
-	gravitynD.setZero();
+	SurgSim::Math::resize(&gravitynD, getNumDofPerNode(), true);
 	gravitynD.segment(0, 3) = getGravity();
 
 	if (isGravityEnabled())

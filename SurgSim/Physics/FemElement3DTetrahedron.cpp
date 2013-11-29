@@ -216,10 +216,9 @@ void FemElement3DTetrahedron::addFMDK(const DeformableRepresentationState& state
 	// Assemble the mass matrix
 	addMass(state, M);
 
-	// Assemble the damping matrix
-	addDamping(state, D);
+	// No damping matrix as we are using linear elasticity (not visco-elasticity)
 
-	// Assemble the damping matrix
+	// Assemble the stiffness matrix
 	addStiffness(state, K);
 
 	// Assemble the force vector
