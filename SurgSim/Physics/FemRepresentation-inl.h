@@ -264,7 +264,7 @@ const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresenta
 		}
 	}
 
-	// D += Springs damping matrix
+	// D += FemElements damping matrix
 	for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 	{
 		(*femElement)->addDamping(state, &m_D);

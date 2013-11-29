@@ -51,5 +51,5 @@ SET(LIBS
 
 target_link_libraries(ExampleFem3D ${LIBS})
 
-# Put ExampleMassSprings into folder "Examples"
+# Put ExampleFem3D into folder "Examples"
 set_target_properties(ExampleFem3D PROPERTIES FOLDER "Examples") 

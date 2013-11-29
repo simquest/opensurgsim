@@ -148,8 +148,8 @@ std::shared_ptr<SceneElement> createFem3D(const std::string& name,
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	std::shared_ptr<SceneElement> massSpringElement = std::make_shared<BasicSceneElement>(name);
-	massSpringElement->addComponent(physicsRepresentation);
+	std::shared_ptr<SceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
+	femSceneElement->addComponent(physicsRepresentation);
 
 	unsigned int gfxObjectId = 0;
 	for (auto gfxPose = std::begin(gfxPoses); gfxPose != std::end(gfxPoses); gfxPose++)
@@ -164,10 +164,10 @@ std::shared_ptr<SceneElement> createFem3D(const std::string& name,
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
 
-		massSpringElement->addComponent(graphicsRepresentation);
+		femSceneElement->addComponent(graphicsRepresentation);
 		ss.clear();
 		ss << "Physics to Graphics ("<< gfxObjectId <<") deformable points";
-		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
+		femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
 			(ss.str(),
 			physicsRepresentation->getFinalState(),
 			graphicsRepresentation->getVertices()));
@@ -175,7 +175,7 @@ std::shared_ptr<SceneElement> createFem3D(const std::string& name,
 		gfxObjectId++;
 	}
 
-	return massSpringElement;
+	return femSceneElement;
 
 }
 
