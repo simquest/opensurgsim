@@ -29,7 +29,7 @@ class OutputComponent : public SurgSim::Framework::Component, public SurgSim::In
 {
 public:
 	OutputComponent(const std::string& name, const std::string& deviceName,
-	                const SurgSim::DataStructures::DataGroup& outputData);
+					const SurgSim::DataStructures::DataGroup& outputData);
 	virtual ~OutputComponent();
 
 	/// Overridden callback from OutputProducerInterface, the device will call this to fetch the

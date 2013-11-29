@@ -26,10 +26,11 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
 
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 using SurgSim::Collision::Location;
 
@@ -280,33 +281,85 @@ void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
 
 TEST_F(RigidRepresentationTest, DisableWhenDivergeTest)
 {
-	// Test with Signaling Nan
+	SurgSim::Math::Quaterniond q  = SurgSim::Math::Quaterniond::Identity();
+	SurgSim::Math::Vector3d vZero = SurgSim::Math::Vector3d::Zero();
+	SurgSim::Math::Vector3d vMax  = SurgSim::Math::Vector3d::Constant(std::numeric_limits<double>::max());
+
+	// Test linear failure (with Signaling Nan)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		// Sets the state
+		m_state.reset();
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
 
-		SCOPED_TRACE("Testing with Signaling Nan");
+		SCOPED_TRACE("Testing linear with Signaling Nan");
 		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
 	}
 
-	// Test with quiet Nan
+	// Test linear failure (with quiet Nan)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		// Sets the state
+		m_state.reset();
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
 
-		SCOPED_TRACE("Testing with Quiet Nan");
+		SCOPED_TRACE("Testing linear with Quiet Nan");
 		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
 	}
 
-	// Test with numerical maximum value
+	// Test linear failure (with numerical maximum value)
 	{
 		// Create the rigid body
 		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		// Sets the state
+		m_state.reset();
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vMax));
 		m_state.setLinearVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
 
-		SCOPED_TRACE("Testing with double max");
+		SCOPED_TRACE("Testing linear with double max");
+		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test angular failure (with Signaling Nan)
+	{
+		// Create the rigid body
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		// Sets the state
+		m_state.reset();
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
+		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::signaling_NaN()));
+
+		SCOPED_TRACE("Testing angular with Signaling Nan");
+		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test angular failure (with quiet Nan)
+	{
+		// Create the rigid body
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		// Sets the state
+		m_state.reset();
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
+		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::quiet_NaN()));
+
+		SCOPED_TRACE("Testing angular with Quiet Nan");
+		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
+	}
+
+	// Test angular failure (with numerical maximum value)
+	{
+		// Create the rigid body
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		// Sets the state
+		m_state.reset();
+		m_state.setPose(SurgSim::Math::makeRigidTransform(q, vZero));
+		m_state.setAngularVelocity(Vector3d::Constant(std::numeric_limits<double>::max()));
+
+		SCOPED_TRACE("Testing angular with double max");
 		disableWhenDivergeTest(rigidBody, m_param, m_state, m_dt);
 	}
 }

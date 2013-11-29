@@ -40,6 +40,16 @@ surgsim_add_library(
 	"SurgSim/Devices/IdentityPoseDevice"
 )
 
+set(LIBS 
+	SurgSimInput
+)
+
+target_link_libraries(IdentityPoseDevice ${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put IdentityPoseDevice into folder "Devices"
+set_target_properties(IdentityPoseDevice PROPERTIES FOLDER "Devices")

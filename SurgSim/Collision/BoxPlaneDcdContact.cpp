@@ -15,50 +15,59 @@
 
 #include <SurgSim/Collision/BoxPlaneDcdContact.h>
 
-#include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Physics/BoxShape.h>
-#include <SurgSim/Physics/PlaneShape.h>
+#include <SurgSim/Math/BoxShape.h>
+#include <SurgSim/Math/PlaneShape.h>
+#include <SurgSim/Math/RigidTransform.h>
 
-using SurgSim::Physics::BoxShape;
-using SurgSim::Physics::PlaneShape;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::PlaneShape;
 
 namespace SurgSim
 {
 namespace Collision
 {
 
+BoxPlaneDcdContact::BoxPlaneDcdContact()
+{
+}
+
+std::pair<int,int> BoxPlaneDcdContact::getShapeTypes()
+{
+	return std::pair<int,int>(SurgSim::Math::SHAPE_TYPE_BOX, SurgSim::Math::SHAPE_TYPE_PLANE);
+}
+
 void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-    using SurgSim::Math::Geometry::DistanceEpsilon;
+	using SurgSim::Math::Geometry::DistanceEpsilon;
 
-    std::shared_ptr<CollisionRepresentation> representationBox;
+	std::shared_ptr<CollisionRepresentation> representationBox;
 	std::shared_ptr<CollisionRepresentation> representationPlane;
 
-    representationBox = pair->getFirst();
-    representationPlane = pair->getSecond();
+	representationBox = pair->getFirst();
+	representationPlane = pair->getSecond();
 
-    std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
-    std::shared_ptr<PlaneShape> plane  = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
+	std::shared_ptr<BoxShape> box = std::static_pointer_cast<BoxShape>(representationBox->getShape());
+	std::shared_ptr<PlaneShape> plane = std::static_pointer_cast<PlaneShape>(representationPlane->getShape());
 
-    // Transform the plane normal to box co-ordinate system.
-    SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
-                                                           representationPlane->getPose();
-    SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
-    SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-    SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
-    double planeD = -planeNormal.dot(planePoint);
+	// Transform the plane normal to box co-ordinate system.
+	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
+														   representationPlane->getPose();
+	SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
+	SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
+	double planeD = -planeNormal.dot(planePoint);
 
-    // Loop through the box vertices (boxVertex) and check it it is below plane.
-    double d = 0.0;
-    SurgSim::Math::Vector3d boxVertex;
+	// Loop through the box vertices (boxVertex) and check it it is below plane.
+	double d = 0.0;
+	SurgSim::Math::Vector3d boxVertex;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d boxVertexGlobal;
-    for (int i = 0; i < 8; ++i)
-    {
-        boxVertex = box->getLocalVertex(i);
-        d = planeNormal.dot(boxVertex) + planeD;
+	for (int i = 0; i < 8; ++i)
+	{
+		boxVertex = box->getVertex(i);
+		d = planeNormal.dot(boxVertex) + planeD;
 		if (d < DistanceEpsilon)
 		{
 			// Add a contact.
@@ -70,7 +79,7 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 
 			pair->addContact(d, normal, penetrationPoints);
 		}
-    }
+	}
 }
 
 }; // namespace Collision

@@ -1757,7 +1757,7 @@ void MlcpGaussSeidelSolver::printViolationsAndConvergence(int n, const MlcpProbl
 		printf("\n");
 	}
 	printf("convergence_criteria=%g  Signorini verified=%s\n",
-	       convergence_criteria, (signorini_verified ? "yes" : "NO"));
+		   convergence_criteria, (signorini_verified ? "yes" : "NO"));
 }
 
 };  // namespace Math

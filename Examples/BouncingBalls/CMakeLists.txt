@@ -24,6 +24,7 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${YAML_CPP_SOURCE_DIR}/include"
 )
 
 set(EXAMPLE_SOURCES
@@ -46,14 +47,16 @@ add_executable(ExampleBouncingBalls
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-target_link_libraries(ExampleBouncingBalls
-	SurgSimFramework
+SET(LIBS
 	SurgSimBlocks
-	SurgSimDataStructures
 	SurgSimPhysics
 	SurgSimGraphics
-	SurgSimInput
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
+	SurgSimMath
+	yaml-cpp
 )
+
+target_link_libraries(ExampleBouncingBalls ${LIBS}
+)
+
+# Put ExampleBouncingBalls into folder "Examples"
+set_target_properties(ExampleBouncingBalls PROPERTIES FOLDER "Examples") 

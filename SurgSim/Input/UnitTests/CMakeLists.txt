@@ -33,6 +33,12 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS SurgSimInput SurgSimFramework SurgSimDataStructures gtest ${Boost_LIBRARIES})
+set(LIBS 
+	SurgSimInput 
+	gtest 
+)
 
 surgsim_add_unit_tests(SurgSimInputTest)
+
+# Put SurgSimInputTest into folder "Input"
+set_target_properties(SurgSimInputTest PROPERTIES FOLDER "Input")

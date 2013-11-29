@@ -46,7 +46,7 @@ struct Vertex
 	/// Constructor
 	/// \param	position	Position of the vertex
 	/// \param	data	Extra data to be stored in the vertex
-	Vertex(const SurgSim::Math::Vector3d& position, const Data& data) :
+	Vertex(const SurgSim::Math::Vector3d& position, const Data& data = Data()) :
 		position(position),
 		data(data)
 	{
@@ -57,16 +57,20 @@ struct Vertex
 	/// Extra vertex data.
 	Data data;
 
-	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const Vertex<Data>& vertex1, const Vertex<Data>& vertex2)
+	/// Compare the vertex to another one (equality)
+	/// \param vertex The Vertex to compare it to
+	/// \return True if the two vertices are equal, false otherwise.
+	bool operator==(const Vertex<Data>& vertex) const
 	{
-		return vertex1.data == vertex2.data && vertex1.position == vertex2.position;
+		return data == vertex.data && position == vertex.position;
 	}
 
-	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const Vertex<Data>& vertex1, const Vertex<Data>& vertex2)
+	/// Compare the vertex to another one (inequality)
+	/// \param vertex The Vertex to compare it to
+	/// \return False if the two vertices are equal, true otherwise.
+	bool operator!=(const Vertex<Data>& vertex) const
 	{
-		return ! (vertex1 == vertex2);
+		return ! ((*this) == vertex);
 	}
 };
 
@@ -84,16 +88,20 @@ struct Vertex<void>
 	/// Position of the vertex.
 	SurgSim::Math::Vector3d position;
 
-	/// Compare the vertices and return true if equal, false if not equal.
-	friend bool operator==(const Vertex<void>& vertex1, const Vertex<void>& vertex2)
+	/// Compare the vertex to another one (equality)
+	/// \param vertex The Vertex to compare it to
+	/// \return True if the two vertices are equal, false otherwise.
+	bool operator==(const Vertex<void>& vertex) const
 	{
-		return vertex1.position == vertex2.position;
+		return position == vertex.position;
 	}
 
-	/// Compare the vertices and return false if equal, true if not equal.
-	friend bool operator!=(const Vertex<void>& vertex1, const Vertex<void>& vertex2)
+	/// Compare the vertex to another one (inequality)
+	/// \param vertex The Vertex to compare it to
+	/// \return False if the two vertices are equal, true otherwise.
+	bool operator!=(const Vertex<void>& vertex) const
 	{
-		return ! (vertex1 == vertex2);
+		return ! ((*this) == vertex);
 	}
 };
 

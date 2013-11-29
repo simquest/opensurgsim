@@ -30,37 +30,40 @@ set(UNIT_TEST_SOURCES
 	OsgCapsuleRepresentationTests.cpp
 	OsgCylinderRepresentationTests.cpp
 	OsgGroupTests.cpp
-	OsgLogTests.cpp
 	OsgLightTests.cpp
+	OsgLogTests.cpp
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgMeshRepresentationTests.cpp
-	OsgPlaneTests.cpp
 	OsgPlaneRepresentationTests.cpp
+	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp
 	OsgRenderTargetTests.cpp
 	OsgRepresentationTests.cpp
 	OsgRigidTransformConversionsTests.cpp
+	OsgSceneryRepresentationTests.cpp
 	OsgScreenSpaceQuadTests.cpp
 	OsgShaderTests.cpp
 	OsgSphereRepresentationTests.cpp
-	OsgTextureTests.cpp
 	OsgTexture1dTests.cpp
 	OsgTexture2dTests.cpp
 	OsgTexture3dTests.cpp
 	OsgTextureCubeMapTests.cpp
 	OsgTextureRectangleTests.cpp
+	OsgTextureTests.cpp
 	OsgTextureUniformTests.cpp
-	OsgUniformTests.cpp
 	OsgUniformBaseTests.cpp
+	OsgUniformTests.cpp
 	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
-	OsgViewTests.cpp
+	OsgVectorFieldRepresentationTests.cpp
 	OsgViewElementTests.cpp
-	ViewTests.cpp
+	OsgViewTests.cpp
+	RenderPassTests.cpp
 	ViewElementTests.cpp
+	ViewTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -69,7 +72,15 @@ set(UNIT_TEST_HEADERS
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
-set(LIBS SurgSimFramework SurgSimGraphics SurgSimTesting gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
+set(LIBS 
+	SurgSimGraphics 
+	gtest
+)
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)
+
+# Put SurgSimGraphicsTest into folder "Graphics"
+set_target_properties(SurgSimGraphicsTest PROPERTIES FOLDER "Graphics")

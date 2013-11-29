@@ -17,10 +17,15 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(SURGSIM_BLOCKS_SOURCES
 	BasicSceneElement.cpp
+	MassSpring1DRepresentation.cpp
+	MassSpring2DRepresentation.cpp
+	MassSpring3DRepresentation.cpp
+	MassSpringNDRepresentationUtils.cpp
 	SphereElement.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
@@ -28,7 +33,13 @@ set(SURGSIM_BLOCKS_SOURCES
 
 set(SURGSIM_BLOCKS_HEADERS
 	BasicSceneElement.h
+	MassSpring1DRepresentation.h
+	MassSpring2DRepresentation.h
+	MassSpring3DRepresentation.h
+	MassSpringNDRepresentationUtils.h
 	SphereElement.h
+	TransferDeformableStateToVerticesBehavior.h
+	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
 	TransferPoseBehavior.h
 )
@@ -39,9 +50,19 @@ surgsim_add_library(
 	"${SURGSIM_BLOCKS_HEADERS}"
 	"SurgSim/Blocks"
 )
-target_link_libraries(SurgSimBlocks SurgSimPhysics SurgSimGraphics SurgSimFramework
-	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
+
+SET(LIBS
+	SurgSimFramework
+	SurgSimPhysics
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimBlocks ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimBlocks into folder "Blocks"
+set_target_properties(SurgSimBlocks PROPERTIES FOLDER "Blocks") 

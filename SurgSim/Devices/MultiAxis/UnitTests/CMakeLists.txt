@@ -28,8 +28,11 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS MultiAxisDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES})
+set(LIBS 
+	MultiAxisDevice
+	gtest
+)
+
 if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
@@ -42,3 +45,6 @@ option(SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS
 	OFF)
 surgsim_add_unit_tests(MultiAxisDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS})
+
+# Put MultiAxisDeviceTest into folder "Devices"
+set_target_properties(MultiAxisDeviceTest PROPERTIES FOLDER "Devices")

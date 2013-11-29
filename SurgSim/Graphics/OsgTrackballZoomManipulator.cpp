@@ -174,6 +174,8 @@ bool OsgTrackballZoomManipulator::handle(
 				break;
 			}
 		}
+	default:
+		break;
 	}
 
 	return osgGA::TrackballManipulator::handle(eventAdapter, actionAdapter);

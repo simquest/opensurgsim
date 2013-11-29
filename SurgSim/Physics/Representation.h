@@ -24,6 +24,7 @@
 #include <SurgSim/Collision/Location.h>
 
 using SurgSim::Collision::Location;
+using SurgSim::Math::Vector;
 
 namespace SurgSim
 {
@@ -111,7 +112,7 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::MlcpSolution::Vector>& block);
+	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block);
 
 protected:
 	/// Set the number of degrees of freedom

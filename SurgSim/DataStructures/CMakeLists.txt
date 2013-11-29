@@ -50,6 +50,18 @@ surgsim_add_library(
 	"SurgSim/DataStructures"
 )
 
+set(LIBS 
+	SurgSimMath 
+	SurgSimFramework
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimDataStructures ${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimDataStructures into folder "DataStructure"
+set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructure")

@@ -34,7 +34,7 @@ class LogMessage : public LogMessageBase
 {
 public:
 
-    explicit LogMessage(Logger* logger, int level) : LogMessageBase(logger, level)
+	explicit LogMessage(Logger* logger, int level) : LogMessageBase(logger, level)
 	{
 	}
 

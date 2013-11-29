@@ -36,9 +36,11 @@ surgsim_add_library(
 	"SurgSim/Testing"
 )
 
-target_link_libraries(SurgSimTesting SurgSimFramework ${Boost_LIBRARIES})
-
 add_subdirectory(MlcpIO)
+
 if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
+
+# Put SurgSimTesting into folder "Testing"
+set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")

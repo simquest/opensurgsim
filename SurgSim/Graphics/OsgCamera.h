@@ -99,20 +99,16 @@ public:
 	/// \param	dt	The time in seconds of the preceding timestep.
 	virtual void update(double dt);
 
-	/// Returns the OSG camera node
-	inline osg::ref_ptr<osg::Camera> getOsgCamera() const
-	{
-		return m_camera;
-	}
+	/// \return the OSG camera node
+	osg::ref_ptr<osg::Camera> getOsgCamera() const;
 
-	inline osg::ref_ptr<osg::Node> getOsgNode() const
-	{
-		return m_switch;
-	}
+	/// \return the OSG parent node for this object 
+	osg::ref_ptr<osg::Node> getOsgNode() const;
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
-	/// \param	renderTarget	The RenderTarget to be used.
-	virtual void setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
+	/// \param	renderTarget	The render target.
+	/// \return true if sucessful
+	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) override;
 
 	/// Gets RenderTarget that is currently being used by the camera.
 	/// \return	The RenderTarget.

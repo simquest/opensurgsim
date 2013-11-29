@@ -1439,6 +1439,59 @@ T distanceTriangleTriangle(
 	return (minDst);
 }
 
+/// Calculate the intersections between a line segment and an axis aligned box
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param sv0,sv1	Extremities of the line segment.
+/// \param box		Axis aligned bounding box
+/// \param [out] intersections The points of intersection between the segment and the box
+template <class T, int MOpt>
+void intersectionsSegmentBox(
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& sv1,
+	const Eigen::AlignedBox<T, 3>& box,
+	std::vector<Eigen::Matrix<T, 3, 1, MOpt> >* intersections)
+{
+	Eigen::Array<double, 3, 1> v01 = sv1 - sv0;
+	auto parralelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
+	if (parralelToPlane.any())
+	{
+		auto beyondMinCorner = (sv0.array() < box.min().array());
+		auto beyondMaxCorner = (sv0.array() > box.max().array());
+		if ((parralelToPlane && (beyondMinCorner || beyondMaxCorner)).any())
+		{
+			return;
+		}
+	}
+
+	// Calculate the intesection of the segment with each of the 6 box planes.
+	// The intersection is calculated as the distance along the segment (abscissa)
+	// scaled from 0 to 1.
+	Eigen::Array<double, 3, 2> planeIntersectionAbscissas;
+	planeIntersectionAbscissas.col(0) = (box.min().array() - sv0.array());
+	planeIntersectionAbscissas.col(1) = (box.max().array() - sv0.array());
+
+	// While we could be dividing by zero here, INF values are 
+	// correctly handled by the rest of the function.
+	planeIntersectionAbscissas.colwise() /= v01;
+
+	double entranceAbscissa = planeIntersectionAbscissas.rowwise().minCoeff().maxCoeff();
+	double exitAbscissa = planeIntersectionAbscissas.rowwise().maxCoeff().minCoeff();
+	if (entranceAbscissa < exitAbscissa && exitAbscissa > 0.0)
+	{
+		if (entranceAbscissa >= 0.0 && entranceAbscissa <= 1.0)
+		{
+			intersections->push_back(sv0 + v01.matrix() * entranceAbscissa);
+		}
+
+		if (exitAbscissa >= 0.0 && exitAbscissa <= 1.0)
+		{
+			intersections->push_back(sv0 + v01.matrix() * exitAbscissa);
+		}
+	}
+}
+
+
 }; // namespace Math
 }; // namespace SurgSim
 

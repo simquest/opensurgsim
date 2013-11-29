@@ -44,10 +44,6 @@ public:
 	{
 	};
 
-	/// Sets the vertices for the point cloud.
-	/// \param	mesh	The mesh.
-	virtual void setVertices(std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> mesh) = 0;
-
 	/// Pull the vertices.
 	/// \return	The mesh.
 	virtual std::shared_ptr<SurgSim::DataStructures::Vertices<Data>> getVertices() const = 0;

@@ -252,7 +252,6 @@ TEST_F(OsgManagerTest, AddRemoveTest)
 
 TEST_F(OsgManagerTest, LazyGroupsTest)
 {
-	osgViewer::CompositeViewer* compositeViewer = graphicsManager->getOsgCompositeViewer();
 
 	std::shared_ptr<OsgRepresentation> representation1 =
 		std::make_shared<MockOsgRepresentation>("TestRepresentation_1");

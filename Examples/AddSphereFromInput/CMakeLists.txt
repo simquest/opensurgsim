@@ -27,6 +27,8 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${YAML_CPP_SOURCE_DIR}/include"
+
 )
 
 set(ADDSPHEREFROMINPUT_EXAMPLE_SOURCE
@@ -47,21 +49,19 @@ surgsim_show_ide_folders(
 "${ADDSPHEREFROMINPUT_EXAMPLE_SOURCE}" "${ADDSPHEREFROMINPUT_EXAMPLE_HEADER}")
 
 set(LIBS 
-	IdentityPoseDevice
 	MultiAxisDevice
 	SurgSimBlocks
-	SurgSimDataStructures
-	SurgSimFramework
 	SurgSimGraphics
-	SurgSimInput
-	SurgSimPhysics
-	${OPENSCENEGRAPH_LIBRARIES} 
-	${OPENTHREADS_LIBRARY}
-	${Boost_LIBRARIES})
+	SurgSimMath
+	yaml-cpp
+)
+
 if(WDK_FOUND)
 	list(APPEND LIBS ${WDK_LIBRARIES})
 endif()
 
-target_link_libraries(ExampleAddSphereFromInput
-	${LIBS}
+target_link_libraries(ExampleAddSphereFromInput ${LIBS}
 )
+
+# Put ExampleAddSphereFromInput into folder "Examples"
+set_target_properties(ExampleAddSphereFromInput PROPERTIES FOLDER "Examples") 

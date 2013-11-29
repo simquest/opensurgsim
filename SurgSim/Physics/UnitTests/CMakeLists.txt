@@ -26,15 +26,18 @@ set(UNIT_TEST_SOURCES
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
 	DcdCollisionTests.cpp
-	DeformableRepresentationTest.cpp
 	DeformableRepresentationStateTest.cpp
+	DeformableRepresentationTest.cpp
+	FemElement3DTetrahedronTests.cpp
+	FemElementTests.cpp
 	FemRepresentationParametersTest.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
+	LinearSpringTest.cpp
 	MassSpringRepresentationTests.cpp
-	MeshShapeTest.cpp
+	MassTest.cpp
 	PhysicsManagerTests.cpp
 	PostUpdateTests.cpp
 	PreUpdateTests.cpp
@@ -46,7 +49,6 @@ set(UNIT_TEST_SOURCES
 	RigidRepresentationParametersTest.cpp
 	RigidRepresentationStateTest.cpp
 	RigidRepresentationTest.cpp
-	RigidShapeTest.cpp
 	SolveMlcpTests.cpp
 	VirtualToolCouplerTest.cpp
 )
@@ -60,17 +62,15 @@ include_directories(
 )
 
 set(LIBS
-	IdentityPoseDevice
-	SurgSimCollision
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimInput
 	SurgSimPhysics
-	MlcpTestIO
+	SurgSimMath
 	gtest
-	${Boost_LIBRARIES}
+	yaml-cpp
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)
+
+# Put SurgSimPhysicsTest into folder "Physics"
+set_target_properties(SurgSimPhysicsTest PROPERTIES FOLDER "Physics")

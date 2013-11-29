@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/ReuseFactory.h>
 #include <SurgSim/Collision/CollisionPair.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 
@@ -33,16 +32,12 @@ class TriangleMeshPlaneDcdContact : public ContactCalculation
 {
 public:
 
-	TriangleMeshPlaneDcdContact()
-	{
-	}
+	/// Constructor
+	TriangleMeshPlaneDcdContact();
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int, int> getShapeTypes() override
-	{
-		return std::pair<int, int> (SurgSim::Physics::RIGID_SHAPE_TYPE_MESH, SurgSim::Physics::RIGID_SHAPE_TYPE_PLANE);
-	}
+	virtual std::pair<int, int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.

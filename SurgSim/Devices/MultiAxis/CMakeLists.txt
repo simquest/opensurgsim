@@ -97,6 +97,15 @@ surgsim_add_library(
 	"${MULTIAXIS_DEVICE_SOURCES}" "${MULTIAXIS_DEVICE_HEADERS}"
 	SurgSim/Devices/MultiAxis
 )
+
+set(LIBS  
+	SurgSimInput 
+	SurgSimFramework 
+)
+
+target_link_libraries(MultiAxisDevice ${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 
@@ -104,3 +113,6 @@ if(SURGSIM_TESTS_BUILD)
 		add_subdirectory(VisualTest)
 	endif(GLUT_FOUND)
 endif()
+
+# Put MultiAxisDevice into folder "Devices"
+set_target_properties(MultiAxisDevice PROPERTIES FOLDER "Devices")

@@ -33,7 +33,8 @@ BasicThread::BasicThread(const std::string& name) :
 	m_period(1.0/30),
 	m_isInitialized(false),
 	m_isRunning(false),
-	m_stopExecution(false)
+	m_stopExecution(false),
+	m_isSynchronous(false)
 {
 }
 
@@ -76,11 +77,12 @@ bool BasicThread::startUp()
 	return doStartUp();
 }
 
-void BasicThread::start(std::shared_ptr<Barrier> startupBarrier)
+void BasicThread::start(std::shared_ptr<Barrier> startupBarrier, bool isSynchronized)
 {
 	m_startupBarrier = startupBarrier;
 	m_stopExecution = false;
 	m_isRunning = false;
+	m_isSynchronous = isSynchronized;
 
 	// Start the thread with a reference to this
 	// prevents making a copy
@@ -104,16 +106,32 @@ void BasicThread::operator()()
 	m_isRunning = true;
 	while (m_isRunning && !m_stopExecution )
 	{
-		// Check for frameTime being > desired update period report error, adjust ...
-		if (m_period > frameTime)
+		if (! m_isSynchronous)
 		{
-			sleepTime = m_period - frameTime;
-			boost::this_thread::sleep_until(Clock::now() + sleepTime);
+			// Check for frameTime being > desired update period report error, adjust ...
+			if (m_period > frameTime)
+			{
+				sleepTime = m_period - frameTime;
+				boost::this_thread::sleep_until(Clock::now() + sleepTime);
+			}
+			start = Clock::now();
+			m_isRunning = doUpdate(m_period.count());
+			frameTime = Clock::now() - start;
 		}
-
-		start = Clock::now();
-		m_isRunning = doUpdate(m_period.count());
-		frameTime = Clock::now() - start;
+		else
+		{
+			// if waitForBarrier is false this means it is time to come out of sync mode and stop running
+			bool success = waitForBarrier(true);
+			if (success)
+			{
+				m_isRunning = doUpdate(m_period.count());
+			}
+			if (! success || !m_isRunning)
+			{
+				m_isRunning = false;
+				m_isSynchronous = false;
+			}
+		}
 	}
 
 	doBeforeStop();
@@ -125,14 +143,23 @@ void BasicThread::operator()()
 void BasicThread::stop()
 {
 	m_stopExecution = true;
-	if (! m_thisThread.joinable())
+
+	if (! m_isSynchronous)
 	{
-		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
-			" is detached, cannot wait for it to stop.";
+		if (! m_thisThread.joinable())
+		{
+			SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
+				" is detached, cannot wait for it to stop.";
+		}
+		else
+		{
+			m_thisThread.join();
+		}
 	}
 	else
 	{
-		m_thisThread.join();
+		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
+			" is in synchronouse mode, stop with a barrier->wait(false).";
 	}
 }
 
@@ -176,6 +203,20 @@ bool BasicThread::waitForBarrier(bool success)
 		success = m_startupBarrier->wait(success);
 	}
 	return success;
+}
+
+bool BasicThread::setSynchronous(bool val)
+{
+	if(m_startupBarrier!=nullptr)
+	{
+		m_isSynchronous = val;
+	}
+	return m_isSynchronous;
+}
+
+bool BasicThread::isSynchronous()
+{
+	return m_isSynchronous;
 }
 
 bool BasicThread::doUpdate(double dt)

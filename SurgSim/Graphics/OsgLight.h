@@ -35,6 +35,8 @@ namespace osg
 
 class Uniform;
 class StateSet;
+class Light;
+class LightSource;
 
 }
 
@@ -152,6 +154,9 @@ private:
 	double m_constantAttenuation;				///< The actual constant attenuation value that was set
 	double m_linearAttenuation;					///< The actual linear attenuation value that was set
 	double m_quadraticAttenuation;				///< The actual quadratic attenuation value that was set
+
+	osg::ref_ptr<osg::Light> m_light;
+	osg::ref_ptr<osg::LightSource> m_lightSource;
 
 };
 

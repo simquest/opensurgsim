@@ -59,9 +59,9 @@ std::shared_ptr<PhysicsManagerState> DcdCollision::doUpdate(
 
 void DcdCollision::populateCalculationTable()
 {
-	for (int i = 0; i < RIGID_SHAPE_TYPE_COUNT; ++i)
+	for (int i = 0; i < SurgSim::Math::SHAPE_TYPE_COUNT; ++i)
 	{
-		for (int j = 0; j < RIGID_SHAPE_TYPE_COUNT; ++j)
+		for (int j = 0; j < SurgSim::Math::SHAPE_TYPE_COUNT; ++j)
 		{
 			m_contactCalculations[i][j].reset(new SurgSim::Collision::DefaultContactCalculation(false));
 		}
@@ -69,6 +69,7 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SphereDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::SpherePlaneDcdContact>());
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxCapsuleDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxDoubleSidedPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxSphereDcdContact>());

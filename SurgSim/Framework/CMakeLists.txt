@@ -24,11 +24,13 @@ include_directories(
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
+	Accessible.cpp
 	ApplicationData.cpp
 	AssertMessage.cpp
 	Barrier.cpp
 	BasicThread.cpp
 	BehaviorManager.cpp
+	Component.cpp
 	ComponentManager.cpp
 	Logger.cpp
 	LoggerManager.cpp
@@ -41,6 +43,8 @@ set(SURGSIM_FRAMEWORK_SOURCES
 )
 
 set(SURGSIM_FRAMEWORK_HEADERS
+	Accessible.h
+	Accessible-inl.h
 	ApplicationData.h
 	Assert.h
 	AssertMessage.h
@@ -77,6 +81,17 @@ surgsim_add_library(
 	"SurgSim/Framework"
 )
 
+SET(LIBS
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimFramework ${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+
+# Put SurgSimFramework into folder "Framework"
+set_target_properties(SurgSimFramework PROPERTIES FOLDER "Framework")

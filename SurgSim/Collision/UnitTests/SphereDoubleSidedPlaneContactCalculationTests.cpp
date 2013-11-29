@@ -16,8 +16,8 @@
 #include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
 #include <SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h>
 
-using SurgSim::Physics::SphereShape;
-using SurgSim::Physics::DoubleSidedPlaneShape;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::DoubleSidedPlaneShape;
 
 namespace SurgSim
 {
@@ -127,8 +127,8 @@ TEST(SphereDoubleSidedPlaneContactCalculationTests, UnitTests)
 
 TEST(SphereDoubleSidedPlaneContactCalculationTests, ShouldFail)
 {
-	std::shared_ptr<RigidShape> sphereShape = std::make_shared<SphereShape>(1.0);
-	std::shared_ptr<RigidShape> doubleSidedPlaneShape = std::make_shared<DoubleSidedPlaneShape>();
+	std::shared_ptr<Shape> sphereShape = std::make_shared<SphereShape>(1.0);
+	std::shared_ptr<Shape> doubleSidedPlaneShape = std::make_shared<DoubleSidedPlaneShape>();
 
 	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<MockCollisionRepresentation>(
 		"Collision Sphere 0",

@@ -36,6 +36,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgMeshRepresentation.cpp
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
+	OsgSceneryRepresentation.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
@@ -48,8 +49,10 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
 	OsgUnitAxes.cpp
+	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
+	RenderPass.cpp
 	Representation.cpp
 	TriangleNormalGenerator.cpp
 	ViewElement.cpp
@@ -74,8 +77,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgConversions.h
 	OsgCylinderRepresentation.h
 	OsgGroup.h
-	OsgLog.h
 	OsgLight.h
+	OsgLog.h
 	OsgManager.h
 	OsgMaterial.h
 	OsgMatrixConversions.h
@@ -89,6 +92,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRenderTarget-inl.h
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
+	OsgSceneryRepresentation.h
 	OsgScreenSpaceQuadRepresentation.h
 	OsgShader.h
 	OsgSphereRepresentation.h
@@ -110,12 +114,15 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUnitCylinder.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
+	OsgVectorFieldRepresentation.h
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
 	PointCloudRepresentation.h
+	RenderPass.h
 	RenderTarget.h
 	Representation.h
+	SceneryRepresentation.h
 	ScreenSpaceQuadRepresentation.h
 	Shader.h
 	SphereRepresentation.h
@@ -128,6 +135,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	TriangleNormalGenerator.h
 	Uniform.h
 	UniformBase.h
+	VectorField.h
+	VectorFieldRepresentation.h
 	View.h
 	ViewElement.h
 )
@@ -138,11 +147,19 @@ surgsim_add_library(
 	"${SURGSIM_GRAPHICS_HEADERS}"
 	"SurgSim/Graphics"
 )
-target_link_libraries(SurgSimGraphics SurgSimFramework
-	${OPENSCENEGRAPH_LIBRARIES} ${OPENTHREADS_LIBRARY})
 
+SET(LIBS
+	SurgSimFramework
+	${OPENSCENEGRAPH_LIBRARIES}
+)
+
+target_link_libraries(SurgSimGraphics ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 	add_subdirectory(RenderTests)
 endif()
+
+# Put SurgSimGraphics into folder "Graphics"
+set_target_properties(SurgSimGraphics PROPERTIES FOLDER "Graphics")

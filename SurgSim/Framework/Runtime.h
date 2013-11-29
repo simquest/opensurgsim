@@ -29,6 +29,7 @@ namespace Framework
 {
 
 class ApplicationData;
+class Barrier;
 class ComponentManager;
 class Component;
 class Logger;
@@ -72,7 +73,20 @@ public:
 
 	/// Start all the threads non returns after the startup as succeeded
 	/// \return	true if it succeeds, false if it fails.
-	bool start();
+	bool start(bool paused = false);
+
+	/// Pause all managers, this will set all managers to synchronous execution, they will all complete
+	/// their updates and then wait for step() to proceed, call resume to go back to uninterupted execution.
+	/// \note HS-2013-nov-01 this is mostly to be used as a facillity for testing and debugging, the threads
+	/// 	  are not executed at the correct rates against each other, this is an issue that can be resolved
+	/// 	  but is not necessary right now.
+	void pause();
+
+	/// Resume from pause, causes all managers to resume normal processing
+	void resume();
+
+	/// Make all managers execute 1 update loop, afterwards they will wait for another step() call or resume()
+	void step();
 
 	/// Stops the simulation.
 	/// The call will wait for all the threads to finish, except for any threads that have been detached.
@@ -91,10 +105,13 @@ public:
 	/// \return	The application data.
 	std::shared_ptr<const ApplicationData> getApplicationData() const;
 
+	/// Adds a component.
+	/// \param	component	The component.
 	void addComponent(const std::shared_ptr<Component>& component);
 
+	/// Removes the component described by component.
+	/// \param	component	The component.
 	void removeComponent(const std::shared_ptr<Component>& component);
-
 
 private:
 
@@ -122,6 +139,9 @@ private:
 	std::shared_ptr<ApplicationData> m_applicationData;
 
 	boost::mutex m_mutex;
+
+	std::shared_ptr<Barrier> m_barrier;
+	bool m_isPaused;
 };
 
 }; // namespace Framework

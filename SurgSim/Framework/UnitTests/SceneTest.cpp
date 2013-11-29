@@ -59,7 +59,7 @@ TEST(SceneTest, AddAndTestScene)
 	EXPECT_TRUE(element->addComponent(component));
 	scene->addSceneElement(element);
 
-  	EXPECT_EQ(scene, component->getScene());
+	EXPECT_EQ(scene, component->getScene());
 	EXPECT_EQ(element, component->getSceneElement());
 	EXPECT_EQ(scene, element->getScene());
 }

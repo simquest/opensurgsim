@@ -15,9 +15,11 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(SURGSIM_COLLISION_SOURCES
+	BoxCapsuleDcdContact.cpp
 	BoxDoubleSidedPlaneDcdContact.cpp
 	BoxPlaneDcdContact.cpp
 	BoxSphereDcdContact.cpp
@@ -27,13 +29,14 @@ set(SURGSIM_COLLISION_SOURCES
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
 	RigidCollisionRepresentation.cpp
-	RigidShapeCollisionRepresentation.cpp
+	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
 	SpherePlaneDcdContact.cpp
 	SphereSphereDcdContact.cpp
 )
 
 set(SURGSIM_COLLISION_HEADERS
+	BoxCapsuleDcdContact.h
 	BoxDoubleSidedPlaneDcdContact.h
 	BoxPlaneDcdContact.h
 	BoxSphereDcdContact.h
@@ -45,7 +48,7 @@ set(SURGSIM_COLLISION_HEADERS
 	DefaultContactCalculation.h
 	Location.h
 	RigidCollisionRepresentation.h
-	RigidShapeCollisionRepresentation.h
+	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h
@@ -59,8 +62,19 @@ surgsim_add_library(
 	"${SURGSIM_COLLISION_HEADERS}"
 	"SurgSim/Collision"
 )
-target_link_libraries(SurgSimCollision SurgSimFramework SurgSimMath)
+
+SET(LIBS
+	SurgSimFramework
+	SurgSimMath
+	${Boost_LIBRARIES}
+)
+
+target_link_libraries(SurgSimCollision ${LIBS}
+)
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
 endif()
+
+# Put SurgSimCollision into folder "Collision"
+set_target_properties(SurgSimCollision PROPERTIES FOLDER "Collision")
