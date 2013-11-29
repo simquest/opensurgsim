@@ -36,6 +36,10 @@ namespace Physics
 /// \note Therefore, it defines a dynamic system M.a=F(x,v)
 /// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
 /// \note At this level, no assumption is made on the matrices type. The derived classes will specialize the type.
+/// \tparam MT Mass matrix type
+/// \tparam DT Damping matrix type
+/// \tparam KT Stiffness matrix type
+/// \tparam ST System matrix type (best type to store a combination of matrices of type MT, DT and KT)
 template <class MT, class DT, class KT, class ST>
 class FemRepresentation: public DeformableRepresentation<MT, DT, KT, ST>
 {
