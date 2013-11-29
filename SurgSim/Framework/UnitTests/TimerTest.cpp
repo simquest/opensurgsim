@@ -52,6 +52,8 @@ TEST(TimerTest, SettingFrames)
 		timer->markFrame();
 	}
 	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 3);
+	timer->setMaxNumberOfFrames(2);
+	EXPECT_EQ(timer->getCurrentNumberOfFrames(), 2);
 }
 
 TEST(TimerTest, Comparison)
