@@ -75,26 +75,26 @@ void DeformableRepresentation<M,D,K,S>::resetState()
 	Representation::resetState();
 
 	// Reminder: m_initialState is being held in OdeEquation
-	*m_currentState  = *this->m_initialState;
-	*m_previousState = *this->m_initialState;
+	*m_currentState  = *m_initialState;
+	*m_previousState = *m_initialState;
 	// m_newState does not need to be reset, it is a temporary variable
-	*m_finalState    = *this->m_initialState;
+	*m_finalState    = *m_initialState;
 }
 
 template <class M, class D, class K, class S>
 void DeformableRepresentation<M,D,K,S>::setInitialState(std::shared_ptr<DeformableRepresentationState> initialState)
 {
 	// This initializes and allocates the m_initialState data member
-	this->m_initialState = initialState;
-	transformState(this->m_initialState, m_initialPose);
+	m_initialState = initialState;
+	transformState(m_initialState, m_initialPose);
 
-	m_previousState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
-	m_currentState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
-	m_newState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
-	m_finalState = std::make_shared<DeformableRepresentationState>(*this->m_initialState);
+	m_previousState = std::make_shared<DeformableRepresentationState>(*m_initialState);
+	m_currentState = std::make_shared<DeformableRepresentationState>(*m_initialState);
+	m_newState = std::make_shared<DeformableRepresentationState>(*m_initialState);
+	m_finalState = std::make_shared<DeformableRepresentationState>(*m_initialState);
 
 	// Set the representation number of degree of freedom
-	setNumDof(this->m_initialState->getNumDof());
+	setNumDof(m_initialState->getNumDof());
 }
 
 template <class M, class D, class K, class S>

@@ -21,39 +21,12 @@
 #include <SurgSim/Physics/DeformableRepresentationState.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
+#include <SurgSim/Physics/UnitTests/MockObjects.h>
 
 using SurgSim::Physics::FemElement;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
-
-class MockFemElement : public FemElement
-{
-public:
-	MockFemElement() : FemElement()
-	{
-		setNumDofPerNode(3);
-	}
-
-	void addNode(unsigned int nodeId)
-	{
-		this->m_nodeIds.push_back(nodeId);
-	}
-
-	virtual double getVolume(const DeformableRepresentationState& state) const override
-	{ return 1; }
-	virtual void addForce(const DeformableRepresentationState& state, Vector* F) override
-	{}
-	virtual void addMass(const DeformableRepresentationState& state, Matrix* M) override
-	{}
-	virtual void addDamping(const DeformableRepresentationState& state, Matrix* D) override
-	{}
-	virtual void addStiffness(const DeformableRepresentationState& state, Matrix* K) override
-	{}
-	virtual void addFMDK(const DeformableRepresentationState& state, Vector* f, Matrix* M,
-		Matrix* D, Matrix* K) override
-	{}
-};
 
 void testSize(const Vector& v, int expectedSize)
 {
@@ -65,6 +38,12 @@ void testSize(const Matrix& m, int expectedRows, int expectedCols)
 	EXPECT_EQ(expectedRows, static_cast<int>(m.rows()));
 	EXPECT_EQ(expectedCols, static_cast<int>(m.cols()));
 }
+
+namespace SurgSim
+{
+
+namespace Physics
+{
 
 TEST(FemElementTests, GetSetAddMethods)
 {
@@ -123,3 +102,39 @@ TEST(FemElementTests, GetSetAddMethods)
 	EXPECT_EQ(9, femElement.getNodeIds()[1]);
 	EXPECT_EQ(9, femElement.getNodeId(1));
 }
+
+TEST(FemElementTests, InitializeMethods)
+{
+	MockFemElement femElement;
+	DeformableRepresentationState fakeState;
+
+	// Mass density not set
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
+
+	// Poisson Ratio not set
+	femElement.setMassDensity(-1234.56);
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
+
+	// Young modulus not set
+	femElement.setPoissonRatio(0.55);
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
+
+	// Invalid mass density
+	femElement.setYoungModulus(-4321.33);
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
+
+	// Invalid Poisson ratio
+	femElement.setMassDensity(1234.56);
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
+
+	// Invalid Young modulus
+	femElement.setPoissonRatio(0.499);
+	ASSERT_ANY_THROW(femElement.initialize(fakeState));
+
+	femElement.setYoungModulus(4321.33);
+	ASSERT_NO_THROW(femElement.initialize(fakeState));
+}
+
+} // namespace Physics
+
+} // namespace SurgSim
