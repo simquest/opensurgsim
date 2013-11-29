@@ -42,11 +42,13 @@ surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
 SET(LIBS
-	SurgSimFramework
 	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimGraphics
-	${Boost_LIBRARIES}
+	SurgSimCollision
+	SurgSimFramework
+	SurgSimMath
+	yaml-cpp
 )
 
 target_link_libraries(ExampleFem3D ${LIBS})
