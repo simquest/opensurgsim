@@ -1115,6 +1115,41 @@ TYPED_TEST(AllDynamicVectorTests, getSubVector)
 	}
 }
 
+TYPED_TEST(AllDynamicVectorTests, getSubVectorBlocks)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v, vInit, v2;
+	std::vector<unsigned int> nodeIds;
+	v.resize(18);   v.setRandom();   vInit = v;
+	v2.resize(9);  v2.setZero();
+	nodeIds.push_back(1);
+	nodeIds.push_back(3);
+	nodeIds.push_back(5);
+
+	EXPECT_EQ(18, v.size());
+	EXPECT_TRUE(v.isApprox(vInit));
+	EXPECT_EQ(9, v2.size());
+	EXPECT_TRUE(v2.isZero());
+	ASSERT_NO_THROW(SurgSim::Math::getSubVector(v, nodeIds, 3, &v2););
+	EXPECT_EQ(18, v.size());
+	EXPECT_TRUE(v.isApprox(vInit));
+	EXPECT_EQ(9, v2.size());
+	EXPECT_FALSE(v2.isZero());
+	for (int dofId = 0; dofId < 3; dofId++)
+	{
+		testScalar(v[3 + dofId], v2[dofId]);
+	}
+	for (int dofId = 3; dofId < 6; dofId++)
+	{
+		testScalar(v[9 + (dofId - 3)], v2[dofId]);
+	}
+	for (int dofId = 6; dofId < 9; dofId++)
+	{
+		testScalar(v[15 + (dofId - 6)], v2[dofId]);
+	}
+}
+
 TYPED_TEST(AllDynamicVectorTests, resize)
 {
 	typedef typename TestFixture::Vector Vector;
