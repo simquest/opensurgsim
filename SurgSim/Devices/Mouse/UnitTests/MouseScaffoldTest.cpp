@@ -17,6 +17,7 @@
 /// Tests for the MouseScaffold class and its device interactions.
 
 #include <gtest/gtest.h>
+
 #include "SurgSim/Devices/Mouse/MouseScaffold.h"
 
 using SurgSim::Device::MouseScaffold;

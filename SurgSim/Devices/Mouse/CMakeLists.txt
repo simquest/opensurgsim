@@ -23,6 +23,7 @@ include_directories(
 
 set(Mouse_DEVICE_SOURCES
 	MouseDevice.cpp
+	MouseHandler.cpp
 	MouseScaffold.cpp
 )
 

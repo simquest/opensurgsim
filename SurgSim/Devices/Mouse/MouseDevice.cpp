@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Devices/Mouse/MouseDevice.h>
-#include <SurgSim/Devices/Mouse/MouseHandler.h>
-#include <SurgSim/Devices/Mouse/MouseScaffold.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/MouseHandler.h"
+#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {

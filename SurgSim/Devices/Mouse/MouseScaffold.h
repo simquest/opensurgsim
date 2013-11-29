@@ -17,7 +17,8 @@
 #define SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
 
 #include <memory>
-#include <SurgSim/Framework/Logger.h>
+
+#include "SurgSim/Framework/Logger.h"
 
 namespace SurgSim
 {

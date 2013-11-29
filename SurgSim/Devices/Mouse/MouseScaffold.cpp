@@ -12,22 +12,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include <SurgSim/Devices/Mouse/MouseScaffold.h>
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
-#include <SurgSim/Devices/Mouse/MouseDevice.h>
-#include <SurgSim/Devices/Mouse/MouseHandler.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/SharedInstance.h>
+#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/MouseHandler.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
 
 namespace SurgSim
 {
 namespace Device
 {
+
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 
+/// Struct to hold a MouseDevice object, a MouseHandler, and a mutex for data passing.
 struct MouseScaffold::DeviceData
 {
 	/// Constructor
@@ -100,7 +103,6 @@ bool MouseScaffold::updateDevice(int buttonMask, float x, float y, int scrollDel
 	inputData.integers().set("scrollDeltaX", scrollDeltaX);
 	inputData.integers().set("scrollDeltaY", scrollDeltaY);
 
-
 	m_device->deviceObject->pushInput();
 	return true;
 }
@@ -118,8 +120,8 @@ SurgSim::DataStructures::DataGroup MouseScaffold::buildDeviceInputData()
 	builder.addBoolean("button1");		// Indicates mouse left button
 	builder.addBoolean("button2"); 		// Indicates mouse middle button (i.e. wheel)
 	builder.addBoolean("button3"); 		// Indicates mouse right button
-	builder.addScalar("x");				// Indicates mouse's X-coordinate the current window, left bottom = (0, 0)
-	builder.addScalar("y");				// Indicates mouse's Y-coordinate the current window, left bottom = (0, 0)
+	builder.addScalar("x");				// Indicates mouse's X-coordinate in the current window, left bottom = (0, 0)
+	builder.addScalar("y");				// Indicates mouse's Y-coordinate in the current window, left bottom = (0, 0)
 	builder.addInteger("scrollDeltaX"); // Indicates mouse wheel vertical movement
 	builder.addInteger("scrollDeltaY"); // Indicates mouse wheel horizontal movement
 

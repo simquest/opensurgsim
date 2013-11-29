@@ -34,5 +34,5 @@ set(LIBS MouseDevice
 
 surgsim_add_unit_tests(MouseDeviceTest)
 
-# Put PhantomDeviceTest into folder "Devices"
+# Put MouseDeviceTest into folder "Devices"
 set_target_properties(MouseDeviceTest PROPERTIES FOLDER "Devices")

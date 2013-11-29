@@ -17,10 +17,10 @@
 /// Tests for the MouseDevice class.
 #include <gtest/gtest.h>
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Devices/Mouse/MouseDevice.h>
-#include <SurgSim/Devices/Mouse/MouseScaffold.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
 
 namespace SurgSim
 {

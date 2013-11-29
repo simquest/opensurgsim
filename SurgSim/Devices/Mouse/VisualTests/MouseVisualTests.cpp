@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Devices/Mouse/MouseDevice.h>
-#include <SurgSim/Devices/Mouse/MouseHandler.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/MouseHandler.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
 
 #include <osg/Camera>
 #include <osg/Geode>
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 	auto toolDevice	 = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
 	toolDevice->initialize();
 
-	osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandler = toolDevice->getMouseHandler();
+	osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler = toolDevice->getMouseHandler();
 	auto consumer = std::make_shared<TestListener>();
 	toolDevice->addInputConsumer(consumer);
 
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer;
 	viewer->setUpViewInWindow(400, 400, 640, 480);
-	viewer->addEventHandler(keyboardHandler);
+	viewer->addEventHandler(mouseHandler);
 	viewer->setSceneData(group);
 
 	viewer->run();

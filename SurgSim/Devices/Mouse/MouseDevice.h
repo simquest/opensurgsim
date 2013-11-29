@@ -19,16 +19,17 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/CommonDevice.h>
+#include "SurgSim/Input/CommonDevice.h"
 
 namespace SurgSim
 {
 namespace Device
 {
+
 class MouseScaffold;
 class MouseHandler;
 
-/// A class implementing the communication with a keyboard
+/// A class implementing the communication with a mouse
 class MouseDevice : public SurgSim::Input::CommonDevice
 {
 	friend class MouseScaffold;
@@ -36,24 +37,24 @@ class MouseDevice : public SurgSim::Input::CommonDevice
 
 public:
 	/// Constructor
-	/// \param deviceName Name for keyboard device
+	/// \param deviceName Name for mouse device
 	explicit MouseDevice(const std::string& deviceName);
 	/// Destructor
 	virtual ~MouseDevice();
 
 	/// Initialize corresponding MouseScaffold.
-	/// \return True if MouseScaffold is intialized successfully; Otherwise, false.
+	/// \return True if MouseScaffold is initialized successfully; Otherwise, false.
 	virtual bool initialize() override;
 	/// "De"-initialize corresponding MouseScaffold.
-	/// \return True if MouseScaffold is 'de'-intialized successfully; Otherwise, false.
+	/// \return True if MouseScaffold is 'de'-initialized successfully; Otherwise, false.
 	virtual bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.
 	/// \return True if this the scaffold of this device is initialized; Otherwise, false.
 	bool isInitialized() const;
 
-	/// Get keyboard handler
-	/// \return The keyboard handler associated with this device
+	/// Get mouse handler
+	/// \return The mouse handler associated with this device
 	MouseHandler* getMouseHandler() const;
 
 private:
