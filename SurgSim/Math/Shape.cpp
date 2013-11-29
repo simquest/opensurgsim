@@ -13,25 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_CONVERT_H
-#define SURGSIM_SERIALIZE_CONVERT_H
+#include <SurgSim/Math/Shape.h>
 
-#include <yaml-cpp/yaml.h>
-#include <SurgSim/Framework/Log.h>
-
-#define OSS_SERIALIZE(T)\
-	virtual YAML::Node encode() override;\
-	virtual bool decode(const YAML::Node& node) override; \
-	virtual std::string getClassName() override {return std::string(#T);}\
-
-namespace SurgSim
+/// Specialize of YAML::convert<> template RigidShape class.
+YAML::Node SurgSim::Math::Shape::encode()
 {
-namespace Serialize
+	YAML::Node node;
+	node["ClassName"] = getClassName();
+	return node;
+}
+
+bool SurgSim::Math::Shape::decode(const YAML::Node& node)
 {
-	/// Logger name for Serialization
-	const std::string serializeLogger = "Serialization";
-
-};
-};
-
-#endif // SURGSIM_SERIALIZE_CONVERT_H
+	SURGSIM_ASSERT(node["ClassName"].as<std::string>() == getClassName());
+	return true;
+}

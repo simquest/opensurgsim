@@ -54,5 +54,15 @@ SurgSim::Math::Vector3d PlaneShape::getNormal() const
 	return Vector3d(0.0, 1.0, 0.0);
 }
 
+YAML::Node SurgSim::Math::PlaneShape::encode()
+{
+	return SurgSim::Math::Shape::encode();
+}
+
+bool SurgSim::Math::PlaneShape::decode(const YAML::Node& node)
+{
+	return SurgSim::Math::Shape::decode(node);
+}
+
 }; // namespace Math
 }; // namespace SurgSim

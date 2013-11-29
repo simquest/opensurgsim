@@ -15,6 +15,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(SURGSIM_PHYSICS_SOURCES

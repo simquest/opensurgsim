@@ -102,5 +102,32 @@ void BoxShape::calculateVertices()
 	}
 }
 
+YAML::Node SurgSim::Math::BoxShape::encode()
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	node["SizeX"] = getSizeX();
+	node["SizeY"] = getSizeY();
+	node["SizeZ"] = getSizeZ();
+
+	return node;
+}
+
+bool SurgSim::Math::BoxShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+
+	m_size[0] = node["SizeX"].as<double>();
+	m_size[1] = node["SizeY"].as<double>();
+	m_size[2] = node["SizeZ"].as<double>();
+
+	return true;
+}
+
+
 }; // namespace Math
 }; // namespace SurgSim

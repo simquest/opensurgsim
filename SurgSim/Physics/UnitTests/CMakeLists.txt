@@ -63,7 +63,9 @@ include_directories(
 
 set(LIBS
 	SurgSimPhysics
+	SurgSimMath
 	gtest
+	yaml-cpp
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

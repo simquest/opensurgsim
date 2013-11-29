@@ -24,6 +24,8 @@
 #include <SurgSim/Math/Shape.h>
 #include <SurgSim/DataStructures/TriangleMesh.h>
 
+#include <SurgSim/Serialize/Convert.h>
+
 namespace SurgSim
 {
 
@@ -64,6 +66,9 @@ public:
 	/// \param rho The mass density (in Kg.m-3)
 	/// \return The 3x3 symmetric inertia matrix of the mesh
 	virtual Matrix33d calculateInertia(double rho) const override;
+
+	/// Get the complete name of the mesh
+	virtual std::string getClassName() override;
 
 private:
 
