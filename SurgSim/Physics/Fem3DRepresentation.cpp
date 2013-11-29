@@ -19,28 +19,30 @@
 
 namespace
 {
-	void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
-										  Vector* x, bool rotationOnly = false)
-	{
-		unsigned int numNodes = x->size() / 3;
-		SURGSIM_ASSERT(static_cast<int>(numNodes * 3) == x->size()) <<
-			"Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
+void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
+										Vector* x, bool rotationOnly = false)
+{
+	typedef Vector::Index IndexType;
 
-		for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
+	IndexType numNodes = x->size() / 3;
+	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<
+		"Unexpected number of dof in a Fem3D state vector (not a multiple of 3)";
+
+	for (IndexType nodeId = 0; nodeId < numNodes; nodeId++)
+	{
+		SurgSim::Math::Vector3d xi = SurgSim::Math::getSubVector(*x, nodeId, 3);
+		SurgSim::Math::Vector3d xiTransformed;
+		if (rotationOnly)
 		{
-			SurgSim::Math::Vector3d xi = SurgSim::Math::getSubVector(*x, nodeId, 3);
-			SurgSim::Math::Vector3d xiTransformed;
-			if (rotationOnly)
-			{
-				xiTransformed = transform.linear() * xi;
-			}
-			else
-			{
-				xiTransformed = transform * xi;
-			}
-			SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
+			xiTransformed = transform.linear() * xi;
 		}
+		else
+		{
+			xiTransformed = transform * xi;
+		}
+		SurgSim::Math::setSubVector(xiTransformed, nodeId, 3, x);
 	}
+}
 }
 
 namespace SurgSim
