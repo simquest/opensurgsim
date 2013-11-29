@@ -60,7 +60,7 @@ public:
 	bool isActive() const;
 
 	/// Does this node have children
-	/// \return true if this node has no children
+	/// \return true if this node has children
 	bool hasChildren() const;
 
 	/// Subdivide the node into 8 equal regions. Each subregion will be stored
