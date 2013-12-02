@@ -36,8 +36,8 @@ template <class VertexType, class EdgeType, class TriangleType>
 void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculateContact
 	(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<CollisionRepresentation> representationTriangleMesh(pair->getFirst());
-	std::shared_ptr<CollisionRepresentation> representationPlane(pair->getSecond());
+	std::shared_ptr<Representation> representationTriangleMesh(pair->getFirst());
+	std::shared_ptr<Representation> representationPlane(pair->getSecond());
 
 	std::shared_ptr<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>> mesh
 		(std::static_pointer_cast<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>>

@@ -42,8 +42,8 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 
-	std::shared_ptr<CollisionRepresentation> representationBox;
-	std::shared_ptr<CollisionRepresentation> representationPlane;
+	std::shared_ptr<Representation> representationBox;
+	std::shared_ptr<Representation> representationPlane;
 
 	representationBox = pair->getFirst();
 	representationPlane = pair->getSecond();

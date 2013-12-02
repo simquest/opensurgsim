@@ -32,8 +32,8 @@ void doCapsuleSphereTest(double capsuleHeight, double capsuleRadius,
 						 const Vector3d& expectedNorm = Vector3d::Zero())
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(
-		makeCapsuleRepresentation(nullptr, capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
-		makeSphereRepresentation(nullptr, sphereRadius, sphereQuat, spherePosition));
+		makeCapsuleRepresentation(capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
+		makeSphereRepresentation(sphereRadius, sphereQuat, spherePosition));
 
 	CapsuleSphereDcdContact calc;
 	calc.calculateContact(pair);

@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Representation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 #include <SurgSim/Math/RigidTransform.h>
 #include <SurgSim/Math/Shape.h>
@@ -28,10 +28,10 @@ namespace SurgSim
 namespace Collision
 {
 
-/// CollisionRepresentation class that wraps a RigidRepresentation, this can be used to strictly tie the
-/// CollisionRepresentation to the Rigid, so even if the shape of the rigid changes, the collision representation
+/// Collision Representation class that wraps a RigidRepresentation, this can be used to strictly tie the
+/// Collision Representation to the Rigid, so even if the shape of the rigid changes, the collision representation
 /// will use the appropriate shape.
-class RigidCollisionRepresentation : public CollisionRepresentation
+class RigidCollisionRepresentation : public Representation
 {
 public:
 
@@ -44,16 +44,17 @@ public:
 	virtual ~RigidCollisionRepresentation();
 
 	///@{
-	/// Implementations of virtual functions from CollisionRepresentation
+	/// Implementations of virtual functions from Collision Representation
 	virtual int getShapeType() const override;
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
+	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;
 	///@}
 
 private:
 
-	/// \note HS-2013-may-30 Should this be a std::weak_ptr ?
-	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> m_localRepresentation;
+	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;
 };
 
 }; // namespace Collision

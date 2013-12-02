@@ -66,7 +66,8 @@ bool PhysicsManager::doStartUp()
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
-	std::shared_ptr<CollisionRepresentation> collisionRep= tryAddComponent(component, &m_collisionRepresentations);
+	std::shared_ptr<SurgSim::Collision::Representation> collisionRep =
+		tryAddComponent(component, &m_collisionRepresentations);
 	return representation != nullptr || collisionRep != nullptr;
 }
 

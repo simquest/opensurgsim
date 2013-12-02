@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_COLLISIONREPRESENTATION_H
-#define SURGSIM_COLLISION_COLLISIONREPRESENTATION_H
+#ifndef SURGSIM_COLLISION_REPRESENTATION_H
+#define SURGSIM_COLLISION_REPRESENTATION_H
 
 #include <memory>
 
@@ -41,17 +41,16 @@ namespace Collision
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
 /// is a nullptr or a has gone out of scope ASSERT's will be triggered
-class CollisionRepresentation : public SurgSim::Framework::Representation
+class Representation : public SurgSim::Framework::Representation
 {
 public:
 
 	///@{
 	/// Constructors
-	explicit CollisionRepresentation(const std::string& name);
-	CollisionRepresentation(const std::string& name, std::shared_ptr<SurgSim::Physics::Representation> representation);
+	explicit Representation(const std::string& name);
 	///@}
 
-	virtual ~CollisionRepresentation();
+	virtual ~Representation();
 
 	/// \return The unique type of the shape, used to determine which calculation to use.
 	virtual int getShapeType() const = 0;
@@ -59,35 +58,19 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
-	/// Overridden from Representation, this is not applicable for a CollisionRepresentation
-	/// the program will abort if this function is called
-	/// \param pose will be ignored
-	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
+	/// Gets physics representation.
+	/// \return	The physics representation.
+	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
 
-	/// \return Transformation to transform the shape into world coordinates
-	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
-
-	/// Overridden from Representation, this is not applicable for a CollisionRepresentation
+	/// Overridden from Representation, this is not applicable for a Collision Representation
 	/// the program will abort if this function is called
 	/// \param pose will be ignored
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
 
-
-	/// Overridden from Representation, this will delegate to the Physics::Representation contained
-	/// in this class
+	/// Overridden from Representation, this is not applicable for a Collision Representation
+	/// the program will abort if this function is called
 	/// \return Transformation of the contained Representation
 	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
-
-	/// Gets physics representation.
-	/// \return	The physics representation.
-	std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation();
-
-protected:
-	std::weak_ptr<SurgSim::Physics::Representation> m_physicsRepresentation;
-
-	/// Sets the physics representation for this collision representation.
-	/// \param	physicsRepresentation	The physics representation.
-	void setPhysicsRepresentation(const std::shared_ptr<SurgSim::Physics::Representation>& physicsRepresentation);
 
 };
 

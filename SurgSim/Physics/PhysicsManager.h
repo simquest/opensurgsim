@@ -34,7 +34,7 @@ namespace Framework
 
 namespace Collision
 {
-	class CollisionRepresentation;
+	class Representation;
 }
 namespace Physics
 {
@@ -48,7 +48,6 @@ class PreUpdate;
 class PushResults;
 class Representation;
 class SolveMlcp;
-using SurgSim::Collision::CollisionRepresentation;
 
 /// PhyicsManager handles the physics and motion calculation, it uses Computations to
 /// separate the algorithmic steps into smaller pieces.
@@ -85,7 +84,7 @@ private:
 
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
-	std::vector<std::shared_ptr<CollisionRepresentation>> m_collisionRepresentations;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
 
 	///@{

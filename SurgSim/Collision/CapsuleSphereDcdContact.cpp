@@ -40,8 +40,8 @@ std::pair<int,int> CapsuleSphereDcdContact::getShapeTypes()
 
 void CapsuleSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<CollisionRepresentation> representationCapsule(pair->getFirst());
-	std::shared_ptr<CollisionRepresentation> representationSphere(pair->getSecond());
+	std::shared_ptr<Representation> representationCapsule(pair->getFirst());
+	std::shared_ptr<Representation> representationSphere(pair->getSecond());
 
 	std::shared_ptr<CapsuleShape> capsule(std::static_pointer_cast<CapsuleShape>(representationCapsule->getShape()));
 	std::shared_ptr<SphereShape> sphere(std::static_pointer_cast<SphereShape>(representationSphere->getShape()));
