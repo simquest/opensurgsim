@@ -23,16 +23,17 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	RenderTest.cpp	
+	TruthCubeRenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
 
 )
 
-include_directories(
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
-
 set(LIBS
 	SurgSimGraphics
 	SurgSimPhysics
