@@ -65,45 +65,46 @@ bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
 			break;
 		}
 		}
-		lastEvent = osgGA::GUIEventAdapter::SCROLL;
+		m_lastEvent = osgGA::GUIEventAdapter::SCROLL;
 		handled = true;
 		break;
 	}
 	case(osgGA::GUIEventAdapter::DRAG) :
 	{
 		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		lastEvent = osgGA::GUIEventAdapter::DRAG;
+		m_lastEvent = osgGA::GUIEventAdapter::DRAG;
 		handled = true;
 		break;
 	}
 	case(osgGA::GUIEventAdapter::PUSH) :
 	{
 		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		lastEvent = osgGA::GUIEventAdapter::PUSH;
+		m_lastEvent = osgGA::GUIEventAdapter::PUSH;
 		handled = true;
 		break;
 	}
 	case(osgGA::GUIEventAdapter::MOVE) :
-	{
-		if (osgGA::GUIEventAdapter::EventType::RELEASE != lastEvent && ea.getX() != lastX && ea.getY() != lastY)
+	{// Work around for the issue that osgGA generates an extra "MOVE" event after a "RELEASE" event on Windows platform
+		if (! (osgGA::GUIEventAdapter::EventType::RELEASE == m_lastEvent &&
+			   ea.getX() == m_lastX && ea.getY() == m_lastY))
 		{
 			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
 		}
-		lastEvent = osgGA::GUIEventAdapter::MOVE;
+		m_lastEvent = osgGA::GUIEventAdapter::MOVE;
 		handled = true;
 		break;
 	}
 	case(osgGA::GUIEventAdapter::RELEASE) :
 	{
 		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		lastEvent = osgGA::GUIEventAdapter::RELEASE;
+		m_lastEvent = osgGA::GUIEventAdapter::RELEASE;
 		handled = true;
 		break;
 	}
 	}
 
-	lastX = ea.getX();
-	lastY = ea.getY();
+	m_lastX = ea.getX();
+	m_lastY = ea.getY();
 
 	return handled;
 }

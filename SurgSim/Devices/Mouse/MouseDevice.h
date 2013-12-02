@@ -45,8 +45,12 @@ class MouseHandler;
 /// \par Application output used by the device:
 ///      NONE
 ///
-/// \note "scroolDeltaX/Y" will remain its value even the movement of mouse wheel has stopped.
-///						   The value of this variable will get updated when handling next mouse event.
+/// \note  osgGA will generate scroll events when mouse wheel starts to move (up/down/left/right) and store vertical
+///        movements (+1 for scroll up and -1 for scroll down) in 'scrollDeltaX" and horizontal movements (-1 for scroll
+///        left and +1 for scroll right) in 'scrollDeltaY".
+///        However, osgGA will not generate any event when the movements stop.
+///        Values of 'scrollDeltaX/Y" will be set to 0 (indicating no movement) in the next (non wheel) mouse event.
+///
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class MouseDevice : public SurgSim::Input::CommonDevice
 {
