@@ -17,6 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_OCTREENODE_H
 
 #include <array>
+#include <memory>
 #include <Eigen/Geometry>
 
 #include <SurgSim/Math/Vector.h>

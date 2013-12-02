@@ -15,21 +15,26 @@
 
 #include <gtest/gtest.h>
 
+#include <SurgSim/DataStructures/OctreeNode.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
+#include <SurgSim/Math/Shapes.h>
+
+using SurgSim::DataStructures::OctreeNode;
+
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-#include <SurgSim/Math/Shapes.h>
 using SurgSim::Math::BoxShape;
-using SurgSim::Math::SphereShape;
 using SurgSim::Math::CylinderShape;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::MeshShape;
+using SurgSim::Math::OctreeShape;
+using SurgSim::Math::SphereShape;
 
 namespace {
 	const double epsilon = 1e-10;
@@ -204,4 +209,41 @@ TEST_F(ShapeTest, Capsule)
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_NEAR(expectedMass, mass, epsilon);
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
+}
+
+struct OctreeData
+{
+	double value;
+};
+
+TEST_F(ShapeTest, Octree)
+{
+	OctreeNode<OctreeData>::BoundingBoxType boundingBox(Vector3d::Zero(), m_size);
+	std::shared_ptr<OctreeNode<OctreeData> > node = std::make_shared<OctreeNode<OctreeData> >(boundingBox);
+
+	{
+		ASSERT_NO_THROW({OctreeShape<OctreeData> octree;});
+		ASSERT_NO_THROW({OctreeShape<OctreeData> octree(node);});
+	}
+
+	{
+		OctreeShape<OctreeData> octree;
+		EXPECT_EQ(nullptr, octree.getRootNode());
+		octree.setRootNode(node);
+		EXPECT_EQ(node, octree.getRootNode());
+	}
+
+	{
+		OctreeShape<OctreeData> octree(node);
+		EXPECT_EQ(node, octree.getRootNode());
+	}
+
+	{
+		OctreeShape<OctreeData> octree(node);
+		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
+		EXPECT_NEAR(0.0, octree.calculateVolume(), epsilon);
+		EXPECT_NEAR(0.0, octree.calculateMass(m_rho), epsilon);
+		EXPECT_TRUE(octree.calculateMassCenter().isApprox(Vector3d::Zero(), epsilon));
+		EXPECT_TRUE(octree.calculateInertia(m_rho).isApprox(Matrix33d::Zero(), epsilon));
+	}
 }

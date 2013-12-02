@@ -66,6 +66,10 @@ public:
 	/// \param node the octree root node of this shape
 	virtual void setRootNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> node);
 
+	/// Get the name of the class
+	/// \return the class name
+	virtual std::string getClassName() override;
+
 private:
 	std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> m_rootNode;
 };

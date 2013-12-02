@@ -75,6 +75,11 @@ void OctreeShape<NodeData>::setRootNode(std::shared_ptr<SurgSim::DataStructures:
 	m_rootNode = node;
 }
 
+template<class NodeData>
+std::string OctreeShape<NodeData>::getClassName()
+{
+	return std::string("SurgSim::Math::OctreeShape");
+}
 
 }; // namespace Math
 
