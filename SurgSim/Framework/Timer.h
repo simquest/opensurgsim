@@ -29,15 +29,6 @@ namespace Framework
 class Timer
 {
 public:
-	/// The Clock used by the Timer class.
-	typedef boost::chrono::steady_clock TimerClock;
-
-	/// Durations used by the Timer class.
-	typedef boost::chrono::duration<double> TimerDuration;
-
-	/// Time points used by the Timer class.
-	typedef boost::chrono::time_point<TimerClock, TimerDuration> TimerTimePoint;
-
 	/// Instantiate a TimerClock and start a timing run.
 	Timer();
 
@@ -87,6 +78,15 @@ public:
 	size_t getNumberOfClockFails() const;
 
 private:
+	/// The Clock used by the Timer class.
+	typedef boost::chrono::steady_clock TimerClock;
+
+	/// Durations used by the Timer class.
+	typedef boost::chrono::duration<double> TimerDuration;
+
+	/// Time points used by the Timer class.
+	typedef boost::chrono::time_point<TimerClock, TimerDuration> TimerTimePoint;
+
 	/// Get the current time.  Checks for any error code from the clock.
 	/// \return Current time.
 	TimerTimePoint now();
