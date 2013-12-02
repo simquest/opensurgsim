@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Serialize/Convert.h>
+#include <SurgSim/Serialize/GraphicsConvert.h>
 
 namespace YAML
 {

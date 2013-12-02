@@ -48,7 +48,9 @@ include_directories(
 
 set(LIBS
 	SurgSimCollision
+	SurgSimMath
 	gtest
+	yaml-cpp
 )
 
 surgsim_add_unit_tests(SurgSimCollisionTest)

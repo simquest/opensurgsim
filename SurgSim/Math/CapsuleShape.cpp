@@ -105,5 +105,28 @@ SurgSim::Math::Matrix33d CapsuleShape::calculateInertia(double rho) const
 	return inertia;
 }
 
+YAML::Node SurgSim::Math::CapsuleShape::encode()
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	node["Radius"] = getRadius();
+	node["Length"] = getLength();
+
+	return node;
+}
+
+bool SurgSim::Math::CapsuleShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+
+	m_radius = node["Radius"].as<double>();
+	m_length = node["Length"].as<double>();
+	return true;
+}
+
 }; // namespace Math
 }; // namespace SurgSim

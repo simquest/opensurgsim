@@ -16,6 +16,8 @@
 #ifndef SURGSIM_MATH_ODEEQUATION_H
 #define SURGSIM_MATH_ODEEQUATION_H
 
+#include <memory>
+
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 

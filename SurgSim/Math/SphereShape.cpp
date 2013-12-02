@@ -58,6 +58,26 @@ SurgSim::Math::Matrix33d SphereShape::calculateInertia(double rho) const
 	return inertia;
 }
 
+YAML::Node SurgSim::Math::SphereShape::encode()
+
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	node["Radius"] = getRadius();
+	return node;
+}
+
+bool SurgSim::Math::SphereShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+
+	m_radius = node["Radius"].as<double>();
+	return true;
+}
 
 }; // namespace Math
 }; // namespace SurgSim
