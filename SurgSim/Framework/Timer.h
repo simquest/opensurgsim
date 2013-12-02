@@ -94,7 +94,7 @@ private:
 	/// The clock used to get the time.
 	static const TimerClock m_clock;
 
-	/// The time at last \c start, \c beginFrame, or \c endFrame.
+	/// The time at last \c start, \c beginFrame, or \c markFrame.
 	TimerTimePoint m_lastTime;
 
 	/// Maximum number of frames to store.
