@@ -84,6 +84,7 @@ void PoseInterpolator::update(double dt)
 		}
 		else if (isPingPong())
 		{
+			m_currentTime = 0.0;
 			std::swap(m_from, m_to);
 		}
 		else
