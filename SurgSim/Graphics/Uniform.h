@@ -32,6 +32,13 @@ template <class T>
 class Uniform : public virtual UniformBase
 {
 public:
+
+	Uniform() {
+		setAccessors("value",
+			std::bind(&Uniform<T>::set, this),
+			std::bind(&Uniform<T>::get, this, std::bind(SurgSim::Framework::convert<T>,std::placeholders::_1)));
+	}
+
 	/// Sets the value of the uniform
 	virtual void set(const T& value) = 0;
 
