@@ -80,6 +80,37 @@ TEST(OptionalValueTests, ComparatorTest)
 	EXPECT_TRUE(a != b);
 }
 
+TEST(OptionalValueTests, CopyConstructorTest)
+{
+	OptionalValue<int> one;
+	OptionalValue<int> copyOfOne(one);
+
+	EXPECT_EQ(one, copyOfOne);
+
+	OptionalValue<int> two(10);
+	OptionalValue<int> copyOfTwo(two);
+
+	EXPECT_EQ(two, copyOfTwo);
+}
+
+TEST(OptionalValueTests, AssignmentOperatorTest)
+{
+	OptionalValue<int> one;
+	OptionalValue<int> two(10);
+	OptionalValue<int> target(100);
+
+	EXPECT_NE(one, target);
+	EXPECT_NE(two, target);
+
+	target = one;
+	EXPECT_EQ(one, target);
+	EXPECT_NE(two, target);
+
+	target = two;
+	EXPECT_NE(one, target);
+	EXPECT_EQ(two, target);
+}
+
 
 }; // namespace DataStructures
 }; // namespace SurgSim
