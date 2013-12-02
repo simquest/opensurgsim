@@ -16,6 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_UNIFORMBASE_H
 #define SURGSIM_GRAPHICS_UNIFORMBASE_H
 
+#include <SurgSim/Framework/Accessible.h>
+#include <SurgSim/Framework/Assert.h>
+
 namespace SurgSim
 {
 
@@ -28,7 +31,7 @@ namespace Graphics
 /// \note
 /// SurgSim::Graphics::Uniform is templated on the type of value, so this base class allows a pointer to any type
 /// of Uniform.
-class UniformBase
+class UniformBase : public SurgSim::Framework::Accessible
 {
 public:
 	/// Destructor
