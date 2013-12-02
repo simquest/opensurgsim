@@ -30,7 +30,6 @@
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/SphereShape.h>
 
-using SurgSim::Collision::CollisionRepresentation;
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Math::DoubleSidedPlaneShape;
@@ -67,19 +66,17 @@ TEST(DcdCollisionTest, RigidRigidCollisionTest)
 	std::shared_ptr<RigidRepresentation> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
 	std::shared_ptr<RigidRepresentation> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
 
-	std::shared_ptr<CollisionRepresentation> sphere1Collision = std::make_shared<RigidCollisionRepresentation>(
-		"Sphere1 Collision",
-		sphere1);
-	std::shared_ptr<CollisionRepresentation> sphere2Collision = std::make_shared<RigidCollisionRepresentation>(
-		"Sphere2 Collision",
-		sphere2);
+	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
+		std::make_shared<RigidCollisionRepresentation>("Sphere1 Collision", sphere1);
+	std::shared_ptr<SurgSim::Collision::Representation> sphere2Collision =
+		std::make_shared<RigidCollisionRepresentation>("Sphere2 Collision", sphere2);
 
 	std::vector<std::shared_ptr<Representation>> representations;
 	representations.push_back(sphere1);
 	representations.push_back(sphere2);
 	state->setRepresentations(representations);
 
-	std::vector<std::shared_ptr<CollisionRepresentation>> collisions;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> collisions;
 	collisions.push_back(sphere1Collision);
 	collisions.push_back(sphere2Collision);
 	state->setCollisionRepresentations(collisions);
@@ -97,26 +94,23 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 
 	std::shared_ptr<RigidRepresentation> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
 
-	std::shared_ptr<CollisionRepresentation> sphere1Collision = std::make_shared<RigidCollisionRepresentation>(
-		"Sphere Collision",
-		sphere1);
+	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
+		std::make_shared<RigidCollisionRepresentation>("Sphere Collision", sphere1);
 
 	RigidRepresentationParameters params;
 	std::shared_ptr<Shape> shape = std::make_shared<DoubleSidedPlaneShape>();
 	params.setShapeUsedForMassInertia(shape);
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
 	fixed->setInitialParameters(params);
-	std::shared_ptr<CollisionRepresentation> fixedCollision = std::make_shared<RigidCollisionRepresentation>(
-		"Plane Collision",
-		fixed);
-
+	std::shared_ptr<SurgSim::Collision::Representation> fixedCollision =
+		std::make_shared<RigidCollisionRepresentation>("Plane Collision", fixed);
 
 	std::vector<std::shared_ptr<Representation>> representations;
 	representations.push_back(sphere1);
 	representations.push_back(fixed);
 	state->setRepresentations(representations);
 
-	std::vector<std::shared_ptr<CollisionRepresentation>> collisions;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> collisions;
 	collisions.push_back(sphere1Collision);
 	collisions.push_back(fixedCollision);
 	state->setCollisionRepresentations(collisions);

@@ -17,7 +17,7 @@
 #include <memory>
 
 #include <SurgSim/Collision/BoxCapsuleDcdContact.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Representation.h>
 #include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 #include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/RigidTransform.h>
@@ -38,9 +38,9 @@ void doBoxCapsuleTest(std::shared_ptr<BoxShape> box,
 					  const SurgSim::Math::Vector3d& capsuleTrans,
 					  const int expectedInContact)
 {
-	std::shared_ptr<CollisionRepresentation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
-	std::shared_ptr<CollisionRepresentation> capsuleRep = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> capsuleRep = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Capsule 0", capsule, SurgSim::Math::makeRigidTransform(capsuleQuat, capsuleTrans));
 
 	// Perform collision detection.

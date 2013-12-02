@@ -16,7 +16,7 @@
 #ifndef SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 #define SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Representation.h>
 #include <SurgSim/Math/Shape.h>
 
 
@@ -25,9 +25,9 @@ namespace SurgSim
 namespace Collision
 {
 
-/// Use a Shape as a CollisionRepresentation, any SurgSim::Physics::Representation can
+/// Use a Shape as a Collision Representation, any SurgSim::Physics::Representation can
 /// be used as a backing representation
-class ShapeCollisionRepresentation : public CollisionRepresentation
+class ShapeCollisionRepresentation : public Representation
 {
 public:
 	/// Constructor
@@ -47,7 +47,7 @@ public:
 	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
 
 	///@{
-	/// Implementations of virtual functions from CollisionRepresentation
+	/// Implementations of virtual functions from Collision Representation
 	virtual int getShapeType() const override;
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;

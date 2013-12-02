@@ -18,16 +18,15 @@
 
 #include <utility>
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
 #include <SurgSim/Collision/CollisionPair.h>
+#include <SurgSim/Collision/Representation.h>
+#include <SurgSim/Collision/RigidCollisionRepresentation.h>
 #include <SurgSim/Physics/ContactConstraintGeneration.h>
 #include <SurgSim/Physics/PhysicsManagerState.h>
 #include <SurgSim/Collision/DcdCollision.h>
 #include <SurgSim/Physics/Constraint.h>
 
 
-using SurgSim::Collision::CollisionRepresentation;
 using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
@@ -62,10 +61,10 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	{
 	}
 
-	std::shared_ptr<CollisionRepresentation> sphere;
+	std::shared_ptr<SurgSim::Collision::Representation> sphere;
 	std::shared_ptr<RigidRepresentation> rigid0;
 
-	std::shared_ptr<CollisionRepresentation> plane;
+	std::shared_ptr<SurgSim::Collision::Representation> plane;
 	std::shared_ptr<RigidRepresentation> rigid1;
 
 

@@ -38,9 +38,9 @@ void doSphereDoubleSidedPlaneTest(std::shared_ptr<SphereShape> sphere,
 	using SurgSim::Math::Geometry::ScalarEpsilon;
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 
-	std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Plane", plane, SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
-	std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Sphere", sphere, SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	SphereDoubleSidedPlaneDcdContact calcNormal;
@@ -125,19 +125,19 @@ TEST(SphereDoubleSidedPlaneContactCalculationTests, ShouldFail)
 	std::shared_ptr<Shape> sphereShape = std::make_shared<SphereShape>(1.0);
 	std::shared_ptr<Shape> doubleSidedPlaneShape = std::make_shared<DoubleSidedPlaneShape>();
 
-	std::shared_ptr<CollisionRepresentation> reps0 = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> reps0 = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Sphere 0", sphereShape,
 		SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0,0.0,0.0)));
 
-	std::shared_ptr<CollisionRepresentation> repp0 = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> repp0 = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Plane 0", doubleSidedPlaneShape,
 		SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(0.5,0.0,0.0)));
 
-	std::shared_ptr<CollisionRepresentation> reps1 = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> reps1 = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Sphere 1", sphereShape,
 		SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0,0.0,0.0)));
 
-	std::shared_ptr<CollisionRepresentation> repp1 = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> repp1 = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Plane 1", doubleSidedPlaneShape,
 		SurgSim::Math::makeRigidTransform(Quaterniond::Identity(), Vector3d(0.5,0.0,0.0)));
 

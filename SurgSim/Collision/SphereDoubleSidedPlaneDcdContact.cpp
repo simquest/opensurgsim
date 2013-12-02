@@ -40,8 +40,8 @@ std::pair<int,int> SphereDoubleSidedPlaneDcdContact::getShapeTypes()
 
 void SphereDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<CollisionRepresentation> representationPlane;
-	std::shared_ptr<CollisionRepresentation> representationSphere;
+	std::shared_ptr<Representation> representationPlane;
+	std::shared_ptr<Representation> representationSphere;
 
 	representationSphere = pair->getFirst();
 	representationPlane = pair->getSecond();

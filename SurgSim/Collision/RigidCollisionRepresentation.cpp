@@ -23,7 +23,7 @@ namespace Collision
 RigidCollisionRepresentation::RigidCollisionRepresentation(
 	const std::string& name,
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation):
-	CollisionRepresentation(name),
+	Representation(name),
 	m_physicsRepresentation(representation)
 {
 }
@@ -36,21 +36,21 @@ RigidCollisionRepresentation::~RigidCollisionRepresentation()
 int RigidCollisionRepresentation::getShapeType() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
+		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia()->getType();
 }
 
 const std::shared_ptr<SurgSim::Math::Shape> RigidCollisionRepresentation::getShape() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
+		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentParameters().getShapeUsedForMassInertia();
 }
 
 const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() const
 {
 	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
-		"PhysicsRepresentation went out of scope for CollisionRepresentation " << getName();
+		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
 	return m_physicsRepresentation.lock()->getCurrentPose();
 }
 

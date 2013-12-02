@@ -33,9 +33,9 @@ void doBoxPlaneTest(std::shared_ptr<BoxShape> box,
 					const int expectedNumberOfContacts,
 					const int* expectedBoxIndicesInContacts)
 {
-	std::shared_ptr<CollisionRepresentation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
-	std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
+	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
 		"Collision Plane 0", plane, SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
 
 	// First calculate the expected contact info.

@@ -23,7 +23,7 @@
 
 #include <SurgSim/Physics/RigidRepresentationState.h>
 #include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Representation.h>
 #include <SurgSim/Collision/ContactCalculation.h>
 #include <SurgSim/Collision/CollisionPair.h>
 
@@ -41,8 +41,8 @@ TEST(CollisionPairTests, InitTest)
 	// Default Constructor, needs to work for ReuseFrepresentationy
 	EXPECT_NO_THROW({CollisionPair pair;});
 
-	std::shared_ptr<CollisionRepresentation> rep0 = makeSphereRepresentation(1.0);
-	std::shared_ptr<CollisionRepresentation> rep1 = makeSphereRepresentation(2.0);
+	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
+	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
 
 	EXPECT_ANY_THROW({CollisionPair pair(rep0, rep0);});
 	EXPECT_ANY_THROW({CollisionPair pair(nullptr, rep0);});
@@ -64,8 +64,8 @@ TEST(CollisionPairTests, InitTest)
 
 TEST(CollisionPairTests, SwapTest)
 {
-	std::shared_ptr<CollisionRepresentation> rep0 = makeSphereRepresentation(1.0);
-	std::shared_ptr<CollisionRepresentation> rep1 = makeSphereRepresentation(2.0);
+	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
+	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
 
 	CollisionPair pair(rep0,rep1);
 	EXPECT_FALSE(pair.isSwapped());
@@ -86,10 +86,10 @@ TEST(CollisionPairTests, SwapTest)
 
 TEST(CollisionPairTests, setRepresentationsTest)
 {
-	std::shared_ptr<CollisionRepresentation> rep0 = makeSphereRepresentation(1.0);
-	std::shared_ptr<CollisionRepresentation> rep1 = makeSphereRepresentation(2.0);
-	std::shared_ptr<CollisionRepresentation> repA = makeSphereRepresentation(99.0);
-	std::shared_ptr<CollisionRepresentation> repB = makeSphereRepresentation(100.0);
+	std::shared_ptr<Representation> rep0 = makeSphereRepresentation(1.0);
+	std::shared_ptr<Representation> rep1 = makeSphereRepresentation(2.0);
+	std::shared_ptr<Representation> repA = makeSphereRepresentation(99.0);
+	std::shared_ptr<Representation> repB = makeSphereRepresentation(100.0);
 
 	CollisionPair pair(repA,repB);
 	EXPECT_FALSE(pair.isSwapped());

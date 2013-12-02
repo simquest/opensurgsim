@@ -26,7 +26,7 @@ ShapeCollisionRepresentation::ShapeCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Math::Shape> shape,
 		const SurgSim::Math::RigidTransform3d& pose ) :
-	CollisionRepresentation(name),
+	Representation(name),
 	m_shape(shape),
 	m_pose(pose)
 {

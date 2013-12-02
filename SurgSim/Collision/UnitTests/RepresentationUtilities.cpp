@@ -16,7 +16,7 @@
 #include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
 #include <SurgSim/Collision/ShapeCollisionRepresentation.h>
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Representation.h>
 #include <SurgSim/Physics/RigidRepresentation.h>
 
 #include <SurgSim/Math/Shapes.h>
@@ -30,7 +30,7 @@ namespace SurgSim
 namespace Collision
 {
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresentation(
+std::shared_ptr<SurgSim::Collision::Representation> makeSphereRepresentation(
 	const double& radius,
 	const Quaterniond& rotation,
 	const Vector3d& position)
@@ -41,7 +41,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresent
 		"TestSphereShapeCollisionRep", sphere, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
+std::shared_ptr<SurgSim::Collision::Representation> makeDoubleSidedPlaneRepresentation(
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
@@ -50,7 +50,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeDoubleSidedPlan
 		"TestDoubleSidedPlaneCollisionRep", plane, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makePlaneRepresentation(
+std::shared_ptr<SurgSim::Collision::Representation> makePlaneRepresentation(
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
@@ -59,7 +59,7 @@ std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makePlaneRepresenta
 		"TestPlaneRepresentation", plane, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeCapsuleRepresentation(
+std::shared_ptr<SurgSim::Collision::Representation> makeCapsuleRepresentation(
 	const double& length,
 	const double& radius,
 	const Quaterniond& rotation,
