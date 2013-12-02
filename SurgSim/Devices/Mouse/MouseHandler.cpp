@@ -31,7 +31,10 @@ MouseHandler::MouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedI
 
 bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&)
 {
-	switch(ea.getEventType())
+	bool handled = false;
+
+	auto eventType = ea.getEventType();
+	switch(eventType)
 	{
 	case(osgGA::GUIEventAdapter::SCROLL) :
 	{
@@ -39,12 +42,8 @@ bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
 		switch(scroll)
 		{
 		case(osgGA::GUIEventAdapter::NONE):
-		{
-			break;
-		}
 		case(osgGA::GUIEventAdapter::SCROLL_2D):
 		{
-			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 1);
 			break;
 		}
 		case(osgGA::GUIEventAdapter::SCROLL_UP):
@@ -66,19 +65,47 @@ bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
 			break;
 		}
 		}
-		return true;
+		lastEvent = osgGA::GUIEventAdapter::SCROLL;
+		handled = true;
+		break;
+	}
+	case(osgGA::GUIEventAdapter::DRAG) :
+	{
+		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+		lastEvent = osgGA::GUIEventAdapter::DRAG;
+		handled = true;
+		break;
+	}
+	case(osgGA::GUIEventAdapter::PUSH) :
+	{
+		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+		lastEvent = osgGA::GUIEventAdapter::PUSH;
+		handled = true;
+		break;
 	}
 	case(osgGA::GUIEventAdapter::MOVE) :
-	case(osgGA::GUIEventAdapter::DRAG) :
-	case(osgGA::GUIEventAdapter::PUSH) :
+	{
+		if (osgGA::GUIEventAdapter::EventType::RELEASE != lastEvent && ea.getX() != lastX && ea.getY() != lastY)
+		{
+			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+		}
+		lastEvent = osgGA::GUIEventAdapter::MOVE;
+		handled = true;
+		break;
+	}
 	case(osgGA::GUIEventAdapter::RELEASE) :
 	{
 		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		return true;
+		lastEvent = osgGA::GUIEventAdapter::RELEASE;
+		handled = true;
+		break;
 	}
-	default:
-		return false;
 	}
+
+	lastX = ea.getX();
+	lastY = ea.getY();
+
+	return handled;
 }
 
 };  // namespace Device

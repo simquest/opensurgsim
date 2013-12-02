@@ -30,6 +30,24 @@ class MouseScaffold;
 class MouseHandler;
 
 /// A class implementing the communication with a mouse
+///
+/// \par Application input provided from the device:
+///   | type       | name              |                                                          |
+///   | ----       | ----              | ---                                                      |
+///   | bool       | "button1"         | %State of mouse left button						      |
+///   | bool       | "button2"		   | %State of mouse middle button							  |
+///   | bool       | "button3"		   | %State of mouse right button							  |
+///   | scalar	   | "x"			   | %X-coordinate of mouse									  |
+///   | scalar	   | "y"			   | %Y-coordinate of mouse									  |
+///   | int		   | "scrollDeltaX"	   | %Indicates vertical movement direction of mouse wheel	  |
+///   | int		   | "scrollDeltaY"	   | %Indicates horizontal movement direction of mouse wheel  |
+///
+/// \par Application output used by the device:
+///      NONE
+///
+/// \note "scroolDeltaX/Y" will remain its value even the movement of mouse wheel has stopped.
+///						   The value of this variable will get updated when handling next mouse event.
+/// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class MouseDevice : public SurgSim::Input::CommonDevice
 {
 	friend class MouseScaffold;

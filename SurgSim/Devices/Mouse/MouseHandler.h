@@ -42,6 +42,14 @@ public:
 private:
 	/// A back pointer to the scaffold which owns this handle
 	std::weak_ptr<MouseScaffold> m_mouseScaffold;
+
+	/// Used to record last mouse event
+	/// \note This is a work around for the issue that OSG generates an extra "MOVE" event after mouse button release.
+	osgGA::GUIEventAdapter::EventType lastEvent;
+
+	/// lastX is the X-coordinate of mouse's last location
+	/// lastY is the Y-coordinate of mouse's last location
+	float lastX, lastY;
 };
 
 };  // namespace Device
