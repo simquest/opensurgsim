@@ -71,7 +71,6 @@ using SurgSim::Physics::PhysicsManager;
 ///      Example of how to put together a very simple demo of balls colliding with each other.
 ///	 	 Discrete Collision Detection (dcd) is used to detect collisions between spheres.
 
-
 /// Simple behavior to show that the spheres are moving while we don't have graphics.
 /// \note A Behavior is a type of Component that causes changes or actions.
 class PrintoutBehavior : public SurgSim::Framework::Behavior
@@ -83,7 +82,9 @@ public:
 
 	/// Perform per-period actions, i.e., what to do each "frame".
 	/// \note Behavior::update() is called by ComponentManager::processBehaviors(), which is called by
-	/// BehaviorManager::doUpdate(), which is called by BasicThread() inside a while(running) loop.
+	/// BehaviorManager::doUpdate() or Graphics::Manager::doUpdate() or PhysicsManager::doUpdate() depending on the
+	/// output of Behavior::getTargetManagerType().  Those manager's \c doUpdate() functions are called by
+	/// BasicThread() inside a \c while(running) loop.
 	/// Managers (e.g., ComponentManager) are threads and run their own update loops.
 	virtual void update(double dt)
 	{
@@ -91,6 +92,7 @@ public:
 		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 	}
+
 protected:
 	/// Allocate the internal structures.
 	/// \return Success?
@@ -262,7 +264,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
-	// By adding the PrintoutBehavior, this SceneElement will output its position each update.
+	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
