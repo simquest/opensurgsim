@@ -19,6 +19,8 @@
 #include <functional>
 #include <boost/any.hpp>
 
+#include <memory>
+
 class TestClass : public SurgSim::Framework::Accessible
 {
 public:
@@ -29,16 +31,25 @@ public:
 		setSetter("a", std::bind(&TestClass::setA, this, std::bind(SurgSim::Framework::convert<int>,
 						std::placeholders::_1)));
 
+
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, b, getB, setB);
+		SURGSIM_ADD_RW_PROPERTY(TestClass, std::shared_ptr<int>, c, getC, setC);
+	
+		c = std::make_shared<int>(4);
 	}
 	int a;
 	double b;
 
-	int getA() { return a;}
-	void setA(int val) { a = val;}
+	std::shared_ptr<int> c;
 
-	double getB() { return b;}
-	void setB(double val) { b = val;}
+	int getA() { return a; }
+	void setA(int val) { a = val; }
+
+	double getB() { return b; }
+	void setB(double val) { b = val; }
+
+	std::shared_ptr<int> getC() { return c; }
+	void setC(std::shared_ptr<int> val) { c = val; } 
 };
 
 namespace SurgSim
@@ -107,6 +118,20 @@ TEST(AccessibleTest, TemplateFunction)
 	double* noValue = nullptr;
 
 	EXPECT_FALSE(a.getValue("a", noValue));
+}
+
+TEST(AccessibleTest, SharedPointerTest)
+{
+	TestClass a;
+	std::shared_ptr<int> x = std::make_shared<int>(5);
+	std::shared_ptr<int> y;
+
+	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("c"));
+	EXPECT_EQ(4,*y);
+
+	a.setValue("c",x);
+	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("c"));
+	EXPECT_EQ(5,*y);
 
 }
 
