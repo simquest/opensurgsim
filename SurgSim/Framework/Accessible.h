@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <functional>
 #include <boost/any.hpp>
+#include <SurgSim/Math/Matrix.h>
 
 namespace SurgSim
 {
@@ -31,6 +32,9 @@ T convert(boost::any val)
 {
 	return boost::any_cast<T>(val);
 }
+
+template <>
+SurgSim::Math::Matrix44f convert(boost::any val);
 
 /// Mixin class for enabling a property system on OSS classes, the instance still needs to initialise properties in
 /// the constructor by using either addSetter, addGetter, addAccessors or the macro for each member variable
@@ -90,6 +94,11 @@ private:
 	setAccessors(#property, \
 				std::bind(&class::getter, this),\
 				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)))
+
+#define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \
+	setGetter(#property, \
+	std::bind(&class::getter, this));
+
 
 }; // Framework
 }; // SurgSim
