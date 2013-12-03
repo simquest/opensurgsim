@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <SurgSim/Framework/Accessible.h>
+#include <SurgSim/Math/Matrix.h>
 
 namespace SurgSim
 {
@@ -58,6 +59,16 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 	setGetter(name, getter);
 	setSetter(name, setter);
 }
+
+template<>
+SurgSim::Math::Matrix44f convert(boost::any val)
+{
+
+	SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
+	SurgSim::Math::Matrix44f floatResult = result.cast<float>();
+	return floatResult;
+}
+
 
 }; // Framework
 }; // SurgSim
