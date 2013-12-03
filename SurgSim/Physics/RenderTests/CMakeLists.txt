@@ -23,11 +23,12 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	RenderTest.cpp
 	TruthCubeRenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
-
+	RenderTest.h
 )
 
 configure_file(

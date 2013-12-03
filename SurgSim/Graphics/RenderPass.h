@@ -104,7 +104,7 @@ public:
 	/// Gets the current material.
 	/// \return	The material.
 	std::shared_ptr<Material> getMaterial();
-	
+
 	/// Shows a quad on the screen with the texture used as the color target for this pass.
 	/// \param	x,y	  	The x and y coordinates on the screen.
 	/// \param	width,height 	The width and height on the scree.
