@@ -90,21 +90,21 @@ inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransfo
 /// \param	center	The point to which the object should point.
 /// \param	up	  	The up vector to be used for this calculation.
 /// \return	a RigidTransform that locates the object at position rotated into the direction of center.
-template <typename V>
-inline Eigen::Transform<typename V::Scalar, 3, Eigen::Isometry> makeRigidTransform(
-	const Eigen::MatrixBase<V>& position,
-	const Eigen::MatrixBase<V>& center,
-	const Eigen::MatrixBase<V>& up)
+template <typename T, int VOpt>
+inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(
+	const Eigen::Matrix<T, 3, 1, VOpt>& position,
+	const Eigen::Matrix<T, 3, 1, VOpt>& center,
+	const Eigen::Matrix<T, 3, 1, VOpt>& up)
 {
 
-	Eigen::Transform<typename V::Scalar, 3, Eigen::Isometry> rigid;
+	Eigen::Transform<T, 3, Eigen::Isometry> rigid;
 	rigid.makeAffine();
 
-	Eigen::MatrixBase<V> forward = (center - position).normalized();
-	Eigen::MatrixBase<V> side = (forward.cross(up)).normalized();
-	Eigen::MatrixBase<V> actualUp = side.cross(forward).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> forward = (center - position).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> side = (forward.cross(up)).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> actualUp = side.cross(forward).normalized();
 
-	typename Eigen::Transform<typename V::Scalar, 3, Eigen::Isometry>::LinearMatrixType rotation;
+	typename Eigen::Transform<T, 3, Eigen::Isometry>::LinearMatrixType rotation;
 	rotation << side[0], actualUp[0], -forward[0],
 				side[1], actualUp[1], -forward[1],
 				side[2], actualUp[2], -forward[2];
