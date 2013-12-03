@@ -25,88 +25,58 @@ namespace SurgSim
 namespace Device
 {
 
-MouseHandler::MouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedInstance())
+MouseHandler::MouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedInstance()),
+							   m_lastX(0.0), m_lastY(0.0), m_lastButtonMask(0), m_lastScrollX(0), m_lastScrollY(0)
 {
 }
 
 bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&)
 {
-	bool handled = false;
-
-	auto eventType = ea.getEventType();
-	switch(eventType)
+	int scrollX = 0, scrollY = 0;
+	if (ea.getEventType() == osgGA::GUIEventAdapter::EventType::SCROLL)
 	{
-	case(osgGA::GUIEventAdapter::SCROLL) :
-	{
-		auto scroll = ea.getScrollingMotion();
-		switch(scroll)
+		switch(ea.getScrollingMotion())
 		{
-		case(osgGA::GUIEventAdapter::NONE):
-		case(osgGA::GUIEventAdapter::SCROLL_2D):
+		case(osgGA::GUIEventAdapter::SCROLL_UP) :
 		{
+			scrollY = 1;
 			break;
 		}
-		case(osgGA::GUIEventAdapter::SCROLL_UP):
+		case(osgGA::GUIEventAdapter::SCROLL_DOWN) :
 		{
-			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 1);
+			scrollY = -1;
 			break;
 		}
-		case(osgGA::GUIEventAdapter::SCROLL_DOWN):
+		case(osgGA::GUIEventAdapter::SCROLL_LEFT) :
 		{
-			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, -1);
+			scrollX = -1;
 			break;
 		}
-		case(osgGA::GUIEventAdapter::SCROLL_LEFT):
-		{	m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), -1, 0);
-			break;
-		}
-		case(osgGA::GUIEventAdapter::SCROLL_RIGHT):
-		{	m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 1, 0);
-			break;
-		}
-		}
-		m_lastEvent = osgGA::GUIEventAdapter::SCROLL;
-		handled = true;
-		break;
-	}
-	case(osgGA::GUIEventAdapter::DRAG) :
-	{
-		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		m_lastEvent = osgGA::GUIEventAdapter::DRAG;
-		handled = true;
-		break;
-	}
-	case(osgGA::GUIEventAdapter::PUSH) :
-	{
-		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		m_lastEvent = osgGA::GUIEventAdapter::PUSH;
-		handled = true;
-		break;
-	}
-	case(osgGA::GUIEventAdapter::MOVE) :
-	{// Work around for the issue that osgGA generates an extra "MOVE" event after a "RELEASE" event on Windows platform
-		if (! (osgGA::GUIEventAdapter::EventType::RELEASE == m_lastEvent &&
-			   ea.getX() == m_lastX && ea.getY() == m_lastY))
+		case(osgGA::GUIEventAdapter::SCROLL_RIGHT) :
 		{
-			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+			scrollX = 1;
+			break;
 		}
-		m_lastEvent = osgGA::GUIEventAdapter::MOVE;
-		handled = true;
-		break;
-	}
-	case(osgGA::GUIEventAdapter::RELEASE) :
-	{
-		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
-		m_lastEvent = osgGA::GUIEventAdapter::RELEASE;
-		handled = true;
-		break;
-	}
+		default:
+			break;
+		}
 	}
 
-	m_lastX = ea.getX();
-	m_lastY = ea.getY();
+	// Any mouse state change will cause an update
+	if( ea.getX() != m_lastX || ea.getY() != m_lastY ||
+		ea.getButtonMask() != m_lastButtonMask ||
+		m_lastScrollX != scrollX || m_lastScrollY != scrollY)
+	{
+		m_lastX = ea.getX();
+		m_lastY = ea.getY();
+		m_lastButtonMask = ea.getButtonMask();
+		m_lastScrollX = scrollX;
+		m_lastScrollY = scrollY;
 
-	return handled;
+		m_mouseScaffold.lock()->updateDevice(m_lastButtonMask, m_lastX, m_lastY, m_lastScrollX, m_lastScrollY);
+	}
+
+	return true;
 }
 
 };  // namespace Device
