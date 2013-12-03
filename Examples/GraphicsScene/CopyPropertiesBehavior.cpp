@@ -77,6 +77,8 @@ bool CopyPropertiesBehavior::doInitialize()
 
 bool CopyPropertiesBehavior::doWakeUp()
 {
+	// Do an update step to initialize all the values
+	update(0.0);
 	return true;
 }
 

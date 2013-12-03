@@ -17,7 +17,7 @@
 
 SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
 {
-//	SURGSIM_ADD_RW_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, pose, getPose, setPose);
+	SURGSIM_ADD_RW_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, pose, getPose, setPose);
 }
 
 SurgSim::Framework::Representation::~Representation()

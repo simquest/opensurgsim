@@ -71,7 +71,6 @@ bool PoseInterpolator::doWakeUp()
 
 void PoseInterpolator::update(double dt)
 {
-	bool result = true;
 	m_currentTime += dt;
 
 	m_target->setPose(SurgSim::Math::interpolate(m_from, m_to, m_currentTime/m_duration));

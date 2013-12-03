@@ -24,6 +24,7 @@
 
 #include <SurgSim/Graphics/Light.h>
 #include <SurgSim/Graphics/OsgBoxRepresentation.h>
+#include <SurgSim/Graphics/OsgSphereRepresentation.h>
 #include <SurgSim/Graphics/OsgCamera.h>
 #include <SurgSim/Graphics/OsgGroup.h>
 #include <SurgSim/Graphics/OsgLight.h>
@@ -156,6 +157,7 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> lightMapPass()
 	pass->setRenderOrder(SurgSim::Graphics::Camera::RENDER_ORDER_PRE_RENDER, 0);
 	materials["depthMap"]->getShader()->setGlobalScope(true);
 	pass->setMaterial(materials["depthMap"]);
+
 	return pass;
 }
 
@@ -177,7 +179,7 @@ public:
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName()+" Graphics");
 		m_box->setInitialPose(RigidTransform3d::Identity());
-		//m_box->setMaterial(materials["basicShadowed"]);
+		m_box->setMaterial(materials["basicShadowed"]);
 		m_box->addGroupReference("shadowing");
 		m_box->addGroupReference("shadowed");
 	}
@@ -203,6 +205,58 @@ private:
 };
 
 
+class SimpleSphere : public SurgSim::Blocks::BasicSceneElement
+{
+public:
+	explicit SimpleSphere(const std::string& name) : BasicSceneElement(name)
+	{
+		m_sphere = std::make_shared<SurgSim::Graphics::OsgSphereRepresentation>(getName()+" Graphics");
+		m_sphere->setInitialPose(RigidTransform3d::Identity());
+		m_sphere->setMaterial(materials["basicShadowed"]);
+		m_sphere->addGroupReference("shadowing");
+		m_sphere->addGroupReference("shadowed");
+	}
+
+	virtual bool doInitialize() override
+	{
+		addComponent(m_sphere);
+		return true;
+	}
+
+	void setRadius(double radius)
+	{
+		m_sphere->setRadius(radius);
+	}
+
+	void setPose(const RigidTransform3d& pose)
+	{
+		m_sphere->setPose(pose);
+	}
+
+private:
+	std::shared_ptr<SurgSim::Graphics::OsgSphereRepresentation> m_sphere;
+};
+
+
+}
+
+void addSpheres(std::shared_ptr<SurgSim::Framework::Scene> scene)
+{
+	double radius = 0.05;
+	Vector3d origin (-1.0, 0.0, -1.0);
+	Vector3d spacing (0.5, 0.5, 0.5);
+	for (int i=0; i<3; ++i)
+	{
+		for (int j=0; j<3; ++j)
+		{
+			auto sphere = std::make_shared<SimpleSphere>("Sphere_"+std::to_string(i*3+j));
+			sphere->setRadius(radius);
+			Vector3d position = origin + Vector3d(spacing.array() * Vector3d(i,1.0,j).array());
+			sphere->setPose(makeRigidTransform(Quaterniond::Identity(), position));
+			scene->addSceneElement(sphere);
+		}
+	}
+
 }
 
 std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager)
@@ -216,7 +270,9 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	box = std::make_shared<SimpleBox>("Box 1");
 	box->setSize(1.0,0.5,0.25);
 	box->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(-0.0,0.5,-0.0)));
-	scene->addSceneElement(box);
+	//scene->addSceneElement(box);
+
+	addSpheres(scene);
 
 	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 0, 0, 1024, 768);
 	scene->addSceneElement(viewElement);
@@ -236,35 +292,33 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	auto camera = pass1->getCamera();
 	// connect the light pose and the camera pose
 	copier->addConnection("pose", light, "pose", camera);
-
-	camera = pass2->getCamera();
-	camera->setViewMatrix(SurgSim::Math::makeViewMatrix(Vector3d(3,3,3), Vector3d(0,0,0), Vector3d(0,1,0)));
-
-
-	// Connect pass1 parameters to pass2 parameters
-	// Pass1 Camera becomes lightViewCamera in Pass2
-
-	auto osgCamera = (std::dynamic_pointer_cast<SurgSim::Graphics::OsgCamera>(pass1->getCamera()))->getOsgCamera();
-
-	osg::Matrixd m1 = osgCamera->getViewMatrix();
+	//copier->addConnection("pose", light, "pose", graphicsManager->getDefaultCamera());
 
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
-	lightViewMatrix->set(pass1->getCamera()->getViewMatrix().cast<float>());
+	// lightViewMatrix->setValue("value", pass1->getCamera()->getViewMatrix().cast<float>());
+	copier->addConnection("floatViewMatrix", pass1->getCamera(), "value", lightViewMatrix);
 	pass2->getMaterial()->addUniform(lightViewMatrix);
 
 	auto lightProjectionMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightProjectionMatrix");
-	lightProjectionMatrix->set(pass1->getCamera()->getProjectionMatrix().cast<float>());
+	// lightProjectionMatrix->set(pass1->getCamera()->getProjectionMatrix().cast<float>());
+	copier->addConnection("floatProjectionMatrix", pass1->getCamera(), "value", lightProjectionMatrix);
 	pass2->getMaterial()->addUniform(lightProjectionMatrix);
 
 	// Need to send the inverse view matrix of the main camera
+	// \note this should probably be a default camera uniform
 	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_inverseViewMatrix");
-	inverseViewMatrix->set(pass2->getCamera()->getViewMatrix().inverse().cast<float>());
+	// inverseViewMatrix->set(pass2->getCamera()->getViewMatrix().inverse().cast<float>());
+	copier->addConnection("floatInverseViewMatrix", pass2->getCamera(), "value", inverseViewMatrix);
 	pass2->getMaterial()->addUniform(inverseViewMatrix);
+
+	copier->addConnection("pose", graphicsManager->getDefaultCamera(), "pose", pass2->getCamera());
+
 
 	auto lightDepthTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_encodedLightDepthMap");
 	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass1->getRenderTarget()->getColorTarget(0)));
 	pass2->getMaterial()->addUniform(lightDepthTexture);
+
 
 	scene->addSceneElement(pass1);
 	scene->addSceneElement(pass2);
@@ -278,9 +332,9 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 
 
 	camera = graphicsManager->getDefaultCamera();
-	RigidTransform3d pose = makeRigidTransform(Vector3d(-4.0, 3.0,-4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
+	RigidTransform3d pose = makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
 	camera->setPose(pose);
-	//camera->setMaterial(material);
+	camera->setMaterial(material);
 	
 	return scene;
 }
