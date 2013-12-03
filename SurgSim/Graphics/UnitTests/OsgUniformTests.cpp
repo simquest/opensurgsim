@@ -72,6 +72,16 @@ std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 	return std::make_pair(uniform->get(), osgValue);
 }
 
+template <class Type>
+std::pair<Type, boost::any> testAccessible(const Type& value)
+{
+	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+
+	osgUniform->setValue("value",value);
+
+	return std::make_pair(osgUniform->get(), osgUniform->getValue("value"));
+}
+
 /// Constructs an OsgUniform that stores a vector of values, sets it to the given vector values, and returns the result
 /// of Uniform::get() and the wrapped osg::Uniform::get().
 /// \tparam	Type	Uniform's value type
@@ -115,6 +125,11 @@ void testUniformFloat(FloatType min, FloatType max)
 	std::pair<FloatType, FloatType> result = testUniformConstruction<FloatType, FloatType>(value);
 	EXPECT_NEAR(value, result.first, Eigen::NumTraits<FloatType>::dummy_precision());
 	EXPECT_NEAR(value, result.second, Eigen::NumTraits<FloatType>::dummy_precision());
+
+	auto accessibleResult = testAccessible<FloatType>(value);
+	FloatType resultValue;
+	ASSERT_NO_THROW({resultValue = boost::any_cast<FloatType>(accessibleResult.second);});
+	EXPECT_NEAR(value,resultValue, Eigen::NumTraits<FloatType>::dummy_precision());
 }
 
 /// Tests OsgUniform with a vector of random floating point type values.
@@ -156,6 +171,11 @@ void testUniformInt(IntType min, IntType max)
 	std::pair<IntType, IntType> result = testUniformConstruction<IntType, IntType>(value);
 	EXPECT_EQ(value, result.first);
 	EXPECT_EQ(value, result.second);
+
+	auto accessibleResult = testAccessible<IntType>(value);
+	IntType resultValue;
+	ASSERT_NO_THROW({resultValue = boost::any_cast<IntType>(accessibleResult.second);});
+	EXPECT_EQ(value,resultValue);
 }
 
 /// Tests OsgUniform with a vector of random integer type values.
@@ -195,6 +215,11 @@ void testUniformEigen()
 	std::pair<Type, OsgType> result = testUniformConstruction<Type, OsgType>(value);
 	EXPECT_TRUE(result.first.isApprox(value));
 	EXPECT_TRUE(fromOsg(result.second).isApprox(value));
+
+	auto accessibleResult = testAccessible<Type>(value);
+	Type resultValue;
+	ASSERT_NO_THROW({resultValue = boost::any_cast<Type>(accessibleResult.second);});
+	EXPECT_TRUE(value.isApprox(resultValue));
 }
 
 /// Tests OsgUniform with a vector of random Eigen type values.

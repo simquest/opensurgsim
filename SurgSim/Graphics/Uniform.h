@@ -34,9 +34,7 @@ class Uniform : public virtual UniformBase
 public:
 
 	Uniform() {
-		setAccessors("value",
-			std::bind(&Uniform<T>::set, this),
-			std::bind(&Uniform<T>::get, this, std::bind(SurgSim::Framework::convert<T>,std::placeholders::_1)));
+		SURGSIM_ADD_RW_PROPERTY(Uniform, T, value, get, set);
 	}
 
 	/// Sets the value of the uniform
