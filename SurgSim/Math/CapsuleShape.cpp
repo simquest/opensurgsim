@@ -41,7 +41,7 @@ double CapsuleShape::getRadius() const
 	return m_radius;
 }
 
-double CapsuleShape::calculateVolume() const
+double CapsuleShape::getVolume() const
 {
 	const double r2 = m_radius * m_radius;
 	const double localCylinderVolume = M_PI * (r2) * m_length;
@@ -50,7 +50,7 @@ double CapsuleShape::calculateVolume() const
 	return localCylinderVolume + localSphereVolume;
 }
 
-SurgSim::Math::Vector3d CapsuleShape::calculateMassCenter() const
+SurgSim::Math::Vector3d CapsuleShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
@@ -65,44 +65,44 @@ SurgSim::Math::Vector3d CapsuleShape::bottomCentre() const
 	return Vector3d(0.0, -m_length / 2.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d CapsuleShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentMatrix() const
 {
 	const double &r = m_radius;
 	const double &l = m_length;
 	const double r2 = r * r;
 	const double l2 = l * l;
-	const double cylinderMass = rho * M_PI * (r2) * l;
-	const double sphereMass   = rho * 4.0 / 3.0 * M_PI * r2 * r;
+	const double cylinderVolume = M_PI * (r2) * l;
+	const double sphereVolume = 4.0 / 3.0 * M_PI * r2 * r;
 
-	// The Inertia matrix is a combination of the cylinder inertia and
-	// the 2 hemispheres inertia:
+	// The matrix is a combination of the cylinder and
+	// the 2 hemispheres:
 	//
-	// Inertia of cylinder along the Y axis
-	// mc = PI.radius.radius.length (mass of the cylinder)
-	// a = 1/2.mc.r^2
-	// b = 1/12.mc.(3.r^2 + h^2)
+	// Second central moment of cylinder along the Y axis
+	// vc = PI.radius.radius.length (volume of the cylinder)
+	// a = 1/2.vc.r^2
+	// b = 1/12.vc.(3.r^2 + h^2)
 	//               (b 0 0)
 	// I(cylinder) = (0 a 0)
 	//               (0 0 b)
 	//
-	// Inertia of the 2 hemispheres along the X axis (direction = 0)
-	// ms = 4/3 pi.radius.radius.radius (mass of the entire sphere)
-	// c = 2/5.ms.r^2
-	// d = 2/5.ms.r^2 + ms.h^2/4 + 3/8.ms.r.h
+	// Second central moment of the 2 hemispheres along the X axis (direction = 0)
+	// vs = 4/3 pi.radius.radius.radius (volume of the entire sphere)
+	// c = 2/5.vs.r^2
+	// d = 2/5.vs.r^2 + vs.h^2/4 + 3/8.vs.r.h
 	//                    (d 0 0)
 	// I(2 hemispheres) = (0 c 0)
 	//                    (0 0 d)
-	double a = 1.0 / 2.0  * cylinderMass * r2;
-	double b = 1.0 / 12.0 * cylinderMass * (3.0 * r2 + l2);
-	double c = 2.0 / 5.0  * sphereMass   * r2;
-	double d = c + sphereMass * l * (l / 4.0 + 3.0 / 8.0 * r);
+	double a = 1.0 / 2.0  * cylinderVolume * r2;
+	double b = 1.0 / 12.0 * cylinderVolume * (3.0 * r2 + l2);
+	double c = 2.0 / 5.0  * sphereVolume * r2;
+	double d = c + sphereVolume * l * (l / 4.0 + 3.0 / 8.0 * r);
 
-	Matrix33d inertia;
-	inertia.setZero();
-	inertia.diagonal().setConstant(b + d);
-	inertia(1, 1) = a + c;
+	Matrix33d secondMoment;
+	secondMoment.setZero();
+	secondMoment.diagonal().setConstant(b + d);
+	secondMoment(1, 1) = a + c;
 
-	return inertia;
+	return secondMoment;
 }
 
 YAML::Node SurgSim::Math::CapsuleShape::encode()

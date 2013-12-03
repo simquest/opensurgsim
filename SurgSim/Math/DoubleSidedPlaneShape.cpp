@@ -29,19 +29,19 @@ int DoubleSidedPlaneShape::getType()
 	return SHAPE_TYPE_DOUBLESIDEDPLANE;
 }
 
-double DoubleSidedPlaneShape::calculateVolume() const
+double DoubleSidedPlaneShape::getVolume() const
 {
 	return 0.0;
 }
 
-SurgSim::Math::Vector3d DoubleSidedPlaneShape::calculateMassCenter() const
+SurgSim::Math::Vector3d DoubleSidedPlaneShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d DoubleSidedPlaneShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d DoubleSidedPlaneShape::getSecondMomentMatrix() const
 {
-	return Matrix33d::Identity();
+	return Matrix33d::Zero();
 }
 
 double DoubleSidedPlaneShape::getD() const

@@ -42,29 +42,22 @@ int OctreeShape<NodeData>::getType()
 }
 
 template<class NodeData>
-double OctreeShape<NodeData>::calculateVolume() const
+double OctreeShape<NodeData>::getVolume() const
 {
-	SURGSIM_FAILURE() << "OctreeShape::calculateVolume not implemented";
+	SURGSIM_FAILURE() << "OctreeShape::getVolume not implemented";
 	return 0.0;
 }
 
 template<class NodeData>
-double OctreeShape<NodeData>::calculateMass(double rho) const
-{
-	SURGSIM_FAILURE() << "OctreeShape::calculateMass not implemented";
-	return 0.0;
-}
-
-template<class NodeData>
-Vector3d OctreeShape<NodeData>::calculateMassCenter() const
+Vector3d OctreeShape<NodeData>::getCenter() const
 {
 	return Vector3d::Zero();
 }
 
 template<class NodeData>
-Matrix33d OctreeShape<NodeData>::calculateInertia(double rho) const
+Matrix33d OctreeShape<NodeData>::getSecondMomentMatrix() const
 {
-	SURGSIM_FAILURE() << "OctreeShape::calculateInertia not implemented";
+	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentMatrix not implemented";
 	return Matrix33d::Zero();
 }
 

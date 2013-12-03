@@ -29,19 +29,19 @@ int PlaneShape::getType()
 	return SHAPE_TYPE_PLANE;
 }
 
-double PlaneShape::calculateVolume() const
+double PlaneShape::getVolume() const
 {
 	return 0.0;
 }
 
-SurgSim::Math::Vector3d PlaneShape::calculateMassCenter() const
+SurgSim::Math::Vector3d PlaneShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d PlaneShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d PlaneShape::getSecondMomentMatrix() const
 {
-	return Matrix33d::Identity();
+	return Matrix33d::Zero();
 }
 
 double PlaneShape::getD() const
