@@ -89,6 +89,7 @@ OsgCamera::OsgCamera(const std::string& name) :
 
 	/// Update storage of view and projection matrices
 	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
+	m_inverseViewMatrix = fromOsg(m_camera->getInverseViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 
 	// Set a default group
@@ -140,6 +141,8 @@ void OsgCamera::setViewMatrix(const SurgSim::Math::Matrix44d& matrix)
 	m_pose = makeRigidTransform(fromOsg<double>(osgInverseViewMatrix.getRotate()),
 								fromOsg(osgInverseViewMatrix.getTrans()));
 
+	m_inverseViewMatrix = fromOsg(osgInverseViewMatrix);
+
 	m_camera->setViewMatrix(osgViewMatrix);
 }
 
@@ -167,6 +170,7 @@ void OsgCamera::update(double dt)
 
 	/// Update storage of view and projection matrices
 	m_viewMatrix = fromOsg(m_camera->getViewMatrix());
+	m_inverseViewMatrix = fromOsg(m_camera->getInverseViewMatrix());
 	m_projectionMatrix = fromOsg(m_camera->getProjectionMatrix());
 }
 
@@ -293,6 +297,11 @@ osg::ref_ptr<osg::Camera> OsgCamera::getOsgCamera() const
 osg::ref_ptr<osg::Node> OsgCamera::getOsgNode() const
 {
 	return m_switch;
+}
+
+const SurgSim::Math::Matrix44d& OsgCamera::getInverseViewMatrix() const
+{
+	return m_inverseViewMatrix;
 }
 
 }; // namespace Graphics
