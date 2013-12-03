@@ -49,28 +49,38 @@ bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
 		case(osgGA::GUIEventAdapter::SCROLL_UP):
 		{
 			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 1);
-			handled = true;
 			break;
 		}
 		case(osgGA::GUIEventAdapter::SCROLL_DOWN):
 		{
 			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, -1);
-			handled = true;
 			break;
 		}
 		case(osgGA::GUIEventAdapter::SCROLL_LEFT):
 		{	m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), -1, 0);
-			handled = true;
 			break;
 		}
 		case(osgGA::GUIEventAdapter::SCROLL_RIGHT):
 		{	m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 1, 0);
-			handled = true;
 			break;
 		}
-		default:
-			break;
 		}
+		m_lastEvent = osgGA::GUIEventAdapter::SCROLL;
+		handled = true;
+		break;
+	}
+	case(osgGA::GUIEventAdapter::DRAG) :
+	{
+		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+		m_lastEvent = osgGA::GUIEventAdapter::DRAG;
+		handled = true;
+		break;
+	}
+	case(osgGA::GUIEventAdapter::PUSH) :
+	{
+		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+		m_lastEvent = osgGA::GUIEventAdapter::PUSH;
+		handled = true;
 		break;
 	}
 	case(osgGA::GUIEventAdapter::MOVE) :
@@ -80,22 +90,19 @@ bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
 		{
 			m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
 		}
+		m_lastEvent = osgGA::GUIEventAdapter::MOVE;
 		handled = true;
 		break;
 	}
-	case(osgGA::GUIEventAdapter::DRAG) :
-	case(osgGA::GUIEventAdapter::PUSH) :
 	case(osgGA::GUIEventAdapter::RELEASE) :
 	{
 		m_mouseScaffold.lock()->updateDevice(ea.getButtonMask(), ea.getX(), ea.getY(), 0, 0);
+		m_lastEvent = osgGA::GUIEventAdapter::RELEASE;
 		handled = true;
 		break;
 	}
-	default:
-		break;
 	}
 
-	m_lastEvent = eventType;
 	m_lastX = ea.getX();
 	m_lastY = ea.getY();
 
