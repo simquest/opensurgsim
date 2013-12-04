@@ -66,7 +66,7 @@ TEST(OptionalValueTests, ComparatorTest)
 	a.setValue(10);
 	EXPECT_FALSE(a == b);
 	EXPECT_TRUE(a != b);
-	
+
 	b.setValue(10);
 	EXPECT_TRUE(a == b);
 	EXPECT_FALSE(a != b);

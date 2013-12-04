@@ -75,7 +75,7 @@ namespace SurgSim
 		/// \param	startPosition	The start position.
 		/// \param	endPosition  	The end position.
 		/// \param	t			 	The percentage for the interpolation.
-		/// \return					The transform gained by interpolating and 
+		/// \return					The transform gained by interpolating and
 		/// 						assembling the rotation and position values.
 		SurgSim::Math::RigidTransform3d interpolatePose(
 			const SurgSim::Math::Vector3d& startAngles,

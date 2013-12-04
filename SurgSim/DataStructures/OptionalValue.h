@@ -90,7 +90,7 @@ public:
 			return m_hasValue == rhs.m_hasValue;
 		}
 	}
-	
+
 	/// Inequality operator
 	/// \param rhs the right hand side.
 	/// \return true if the parameters are not considered equivalent
