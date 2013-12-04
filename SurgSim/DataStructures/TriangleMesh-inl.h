@@ -157,25 +157,28 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::farthestPointAlongDirecti
 {
     using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
 
+	SURGSIM_ASSERT(farthestPoint != nullptr)
+		<< "Null pointer passed in, when an object was expected.";
+
     farthestPoint->first.setZero();
     farthestPoint->second = -std::numeric_limits<double>::max();
     double dotProduct = 0.0, dotProductDifference = 0.0;
-    int count = 1;
+    size_t count = 1;
 
-    for (unsigned int i = 0; i < getNumVertices(); ++i)
+    for (size_t i = 0; i < Vertices<VertexData>::getNumVertices(); ++i)
     {
-        dotProduct = direction.dot(getVertexPosition(i));
+        dotProduct = direction.dot(Vertices<VertexData>::getVertexPosition(i));
         dotProductDifference = dotProduct - farthestPoint->second;
         if (dotProductDifference > -SquaredDistanceEpsilon)
         {
             if (dotProductDifference < SquaredDistanceEpsilon)
             {
-                farthestPoint->first += getVertexPosition(i);
+                farthestPoint->first += Vertices<VertexData>::getVertexPosition(i);
                 ++count;
             }
             else
             {
-                farthestPoint->first = getVertexPosition(i);
+                farthestPoint->first = Vertices<VertexData>::getVertexPosition(i);
                 farthestPoint->second = dotProduct;
                 count = 1;
             }
