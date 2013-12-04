@@ -130,14 +130,14 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	light->setAmbientColor(Vector4d(0.5,0.5,0.5,1.0));
 	light->setDiffuseColor(Vector4d(0.5,0.5,0.5,1.0));
 	light->setSpecularColor(Vector4d(0.8,0.8,0.8,1.0));
-	light->setInitialPose(SurgSim::Math::makeRigidTransform(Quaterniond::Identity(),Vector3d(10.0,10.0,10.0)));
+	light->setInitialPose(makeRigidTransform(Vector3d(-4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0)));
 
 	viewElement->addComponent(light);
 
 	// Move the light from left to right over along the scene
 	auto interpolator = std::make_shared<PoseInterpolator>("Interpolator");
-	RigidTransform3d from = makeRigidTransform(Vector3d(-4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
-	RigidTransform3d to = makeRigidTransform(Vector3d(4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
+	RigidTransform3d from = makeRigidTransform(Vector3d(4.0, 3.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
+	RigidTransform3d to = makeRigidTransform(Vector3d(-4.0, 3.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	interpolator->setTarget(light);
 	interpolator->setFrom(from);
 	interpolator->setDuration(10.0);
@@ -312,6 +312,7 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	pass2->getMaterial()->addUniform(inverseViewMatrix);
 
 	copier->addConnection("pose", graphicsManager->getDefaultCamera(), "pose", pass2->getCamera());
+	copier->addConnection("projectionMatrix", graphicsManager->getDefaultCamera(), "projectionMatrix", pass2->getCamera());
 
 
 	auto lightDepthTexture =
@@ -335,6 +336,18 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	RigidTransform3d pose = makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
 	camera->setPose(pose);
 	camera->setMaterial(material);
+
+	// Move the light from left to right over along the scene
+	auto interpolator = std::make_shared<PoseInterpolator>("Interpolator_2");
+	RigidTransform3d from = makeRigidTransform(Vector3d(-4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
+	RigidTransform3d to = makeRigidTransform(Vector3d(4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
+	interpolator->setTarget(camera);
+	interpolator->setFrom(from);
+	interpolator->setDuration(10.0);
+	interpolator->setTo(to);
+	interpolator->setPingPong(true);
+
+	viewElement->addComponent(interpolator);
 	
 	return scene;
 }

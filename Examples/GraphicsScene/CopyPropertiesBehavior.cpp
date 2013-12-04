@@ -82,3 +82,8 @@ bool CopyPropertiesBehavior::doWakeUp()
 	return true;
 }
 
+int CopyPropertiesBehavior::getTargetManagerType() const
+{
+	return SurgSim::Framework::MANAGER_TYPE_GRAPHICS;
+}
+

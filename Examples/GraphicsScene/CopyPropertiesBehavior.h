@@ -31,11 +31,14 @@ public:
 
 	bool addConnection(const std::string& sourcePropertyName, std::shared_ptr<SurgSim::Framework::Accessible> source, const std::string& targetPropertyName, std::shared_ptr<SurgSim::Framework::Accessible> taget);
 
+
 private:
 
  	virtual bool doInitialize() override;
  	virtual bool doWakeUp() override;
 	virtual void update(double dt) override;
+
+	virtual int getTargetManagerType() const;
 
 	typedef std::pair<std::string, std::weak_ptr<SurgSim::Framework::Accessible>> Property;
 
