@@ -17,7 +17,7 @@
 /// "Establishing Physical Standards for Real Time Soft Tissue Simulation" project.
 ///  URL: http://biorobotics.harvard.edu/truthcube/truthcube.html
 
-#include <SurgSim/Physics/RenderTests/RenderTest.h>
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 namespace SurgSim
 {
@@ -30,9 +30,7 @@ void RenderTests::SetUp()
 	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
 	runtime->addManager(graphicsManager);
-
 	scene = std::make_shared<SurgSim::Framework::Scene>();
-
 	runtime->setScene(scene);
 
 	viewElement = std::make_shared<SurgSim::Graphics::OsgViewElement>("Physics Render Scene");
