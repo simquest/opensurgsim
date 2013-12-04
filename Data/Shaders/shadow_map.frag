@@ -34,8 +34,7 @@ float decodeDepth(vec4 color)
 
 void main(void) 
 {	
-    vec3 lightCoord3 = (lightCoord.xyz / lightCoord.w) * vec3(0.5) + vec3(0.5);
+	vec3 lightCoord3 = (lightCoord.xyz / lightCoord.w) * vec3(0.5) + vec3(0.5);
 	float depth = decodeDepth(texture2D(oss_encodedLightDepthMap, lightCoord3.xy));
-	float a = (depth + 0.00001 > lightCoord3.z ? 0.0 : 1.0);
 	gl_FragColor = vec4(depth + 0.00001 > lightCoord3.z ? 0.0 : 1.0);
 }
