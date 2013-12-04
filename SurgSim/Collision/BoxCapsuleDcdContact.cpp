@@ -83,8 +83,8 @@ std::pair<int,int> BoxCapsuleDcdContact::getShapeTypes()
 
 void BoxCapsuleDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<CollisionRepresentation> boxRepresentation = pair->getFirst();
-	std::shared_ptr<CollisionRepresentation> capsuleRepresentation = pair->getSecond();
+	std::shared_ptr<Representation> boxRepresentation = pair->getFirst();
+	std::shared_ptr<Representation> capsuleRepresentation = pair->getSecond();
 
 	std::shared_ptr<CapsuleShape> capsuleShape =
 		std::static_pointer_cast<CapsuleShape>(capsuleRepresentation->getShape());

@@ -1434,5 +1434,5 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 	}
 }
 
-}; // namespace Math 
+}; // namespace Math
 }; // namespace SurgSim

@@ -43,8 +43,8 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 	using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
 
-	std::shared_ptr<CollisionRepresentation> representationBox;
-	std::shared_ptr<CollisionRepresentation> representationSphere;
+	std::shared_ptr<Representation> representationBox;
+	std::shared_ptr<Representation> representationSphere;
 
 	representationBox = pair->getFirst();
 	representationSphere = pair->getSecond();

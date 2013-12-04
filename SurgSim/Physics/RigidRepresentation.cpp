@@ -51,21 +51,6 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 	return REPRESENTATION_TYPE_RIGID;
 }
 
-void RigidRepresentation::setInitialParameters(const RigidRepresentationParameters& parameters)
-{
-	m_initialParameters = parameters;
-	m_currentParameters = parameters;
-
-	updateGlobalInertiaMatrices(m_currentState);
-}
-
-
-void RigidRepresentation::setCurrentParameters(const RigidRepresentationParameters& parameters)
-{
-	m_currentParameters = parameters;
-	updateGlobalInertiaMatrices(m_currentState);
-}
-
 void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 }

@@ -47,14 +47,6 @@ public:
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
-	/// Set the initial parameters of the rigid representation
-	/// \param parameters The initial parameters
-	/// This will also set the current parameters to the initial parameters
-	void setInitialParameters(const RigidRepresentationParameters& parameters);
-	/// Set the current parameters of the rigid representation
-	/// \param parameters The current parameters
-	void setCurrentParameters(const RigidRepresentationParameters& parameters);
-
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
 	/// \note Does Not Apply to this representation (the pose is fully controlled by the

@@ -16,7 +16,7 @@
 #include <numeric>
 #include <SurgSim/Framework/Assert.h>
 #include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
+#include <SurgSim/Collision/Representation.h>
 
 namespace SurgSim
 {
@@ -27,12 +27,12 @@ CollisionPair::CollisionPair()
 {
 }
 
-CollisionPair::CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
-							 const std::shared_ptr<CollisionRepresentation>& second) :
+CollisionPair::CollisionPair(const std::shared_ptr<Representation>& first,
+							 const std::shared_ptr<Representation>& second) :
 		m_representations(first, second), m_isSwapped(false)
 {
-	SURGSIM_ASSERT(first != second) << "CollisionRepresentation cannot collide with itself";
-	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
+	SURGSIM_ASSERT(first != second) << "Collision Representation cannot collide with itself";
+	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Collision Representation cannot be null";
 }
 
 CollisionPair::~CollisionPair()
@@ -40,11 +40,11 @@ CollisionPair::~CollisionPair()
 
 }
 
-void CollisionPair::setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
-							   const std::shared_ptr<CollisionRepresentation>& second)
+void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& first,
+							   const std::shared_ptr<Representation>& second)
 {
 	SURGSIM_ASSERT(first != second) << "Should try to collide with self";
-	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "CollisionRepresentation cannot be null";
+	SURGSIM_ASSERT(first != nullptr && second != nullptr) << "Collision Representation cannot be null";
 
 	// Invalidate the current contacts
 	clearContacts();
@@ -53,18 +53,18 @@ void CollisionPair::setRepresentations(const std::shared_ptr<CollisionRepresenta
 	m_isSwapped = false;
 }
 
-const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
+const std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>>&
 	CollisionPair::getRepresentations() const
 {
 	return m_representations;
 }
 
-std::shared_ptr<CollisionRepresentation> CollisionPair::getFirst() const
+std::shared_ptr<Representation> CollisionPair::getFirst() const
 {
 	return m_representations.first;
 }
 
-std::shared_ptr<CollisionRepresentation> CollisionPair::getSecond() const
+std::shared_ptr<Representation> CollisionPair::getSecond() const
 {
 	return m_representations.second;
 }
