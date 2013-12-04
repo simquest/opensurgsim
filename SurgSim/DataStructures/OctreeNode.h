@@ -56,7 +56,7 @@ public:
 	const BoundingBoxType& getBoundingBox() const;
 
 	/// Is this node active
-	/// \return true if there is any data inside this node, including data held 
+	/// \return true if there is any data inside this node, including data held
 	/// by children, children's children, etc.
 	bool isActive() const;
 
