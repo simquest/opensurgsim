@@ -13,10 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// This test is based on Truth Cube experimental dataset that is obtained from:
-/// "Establishing Physical Standards for Real Time Soft Tissue Simulation" project.
-///  URL: http://biorobotics.harvard.edu/truthcube/truthcube.html
-
 #ifndef SURGSIM_PHYSICS_RENDERTESTS_RENDERTEST_H
 #define SURGSIM_PHYSICS_RENDERTESTS_RENDERTEST_H
 
