@@ -48,6 +48,8 @@ set(SURGSIM_MATH_HEADERS
 	MlcpProblem.h
 	MlcpSolution.h
 	MlcpSolver.h
+	OctreeShape.h
+	OctreeShape-inl.h
 	OdeEquation.h
 	OdeEquation-inl.h
 	OdeSolver.h

@@ -1471,7 +1471,7 @@ void intersectionsSegmentBox(
 	planeIntersectionAbscissas.col(0) = (box.min().array() - sv0.array());
 	planeIntersectionAbscissas.col(1) = (box.max().array() - sv0.array());
 
-	// While we could be dividing by zero here, INF values are 
+	// While we could be dividing by zero here, INF values are
 	// correctly handled by the rest of the function.
 	planeIntersectionAbscissas.colwise() /= v01;
 
