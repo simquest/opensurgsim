@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
-#define SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
+#ifndef SURGSIM_DEVICES_MOUSE_OSGMOUSESCAFFOLD_H
+#define SURGSIM_DEVICES_MOUSE_OSGMOUSESCAFFOLD_H
 
 #include <memory>
 
@@ -35,7 +35,7 @@ class MouseHandler;
 
 /// A class that implements the behavior of MouseDevice objects.
 /// \sa SurgSim::Device::MouseDevice
-class MouseScaffold
+class OsgMouseScaffold
 {
 	friend class MouseDevice;
 	friend class MouseHandler;
@@ -45,9 +45,9 @@ public:
 	/// Constructor.
 	/// \param logger (optional) The logger to be used by the scaffold object and the devices it manages.
 	/// If unspecified or empty, a console logger will be created and used.
-	explicit MouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	explicit OsgMouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
 	/// Destructor
-	~MouseScaffold();
+	~OsgMouseScaffold();
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
@@ -56,7 +56,7 @@ public:
 	/// Gets or creates the scaffold shared by all MouseDevice instances.
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
-	static std::shared_ptr<MouseScaffold> getOrCreateSharedInstance();
+	static std::shared_ptr<OsgMouseScaffold> getOrCreateSharedInstance();
 
 	/// Sets the default log level.
 	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
@@ -82,8 +82,8 @@ private:
 	/// \return	true on success.
 	bool updateDevice(int buttons, float x, float y, int scrollDeltaX, int scrollDeltaY);
 
-	/// Get keyboard handler
-	/// \return The keyboard handler associated with this device
+	/// Get mouse handler
+	/// \return The mouse handler associated with this device
 	MouseHandler* getMouseHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
@@ -94,11 +94,11 @@ private:
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
 	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
-	/// The keyboard device managed by this scaffold
+	/// The mouse device managed by this scaffold
 	std::unique_ptr<DeviceData> m_device;
 };
 
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
+#endif  // SURGSIM_DEVICES_MOUSE_OSGMOUSESCAFFOLD_H

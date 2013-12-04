@@ -15,7 +15,7 @@
 
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Devices/Mouse/MouseHandler.h"
-#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
 #include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
@@ -24,7 +24,7 @@ namespace Device
 {
 
 MouseDevice::MouseDevice(const std::string& deviceName) :
-	SurgSim::Input::CommonDevice(deviceName, MouseScaffold::buildDeviceInputData())
+	SurgSim::Input::CommonDevice(deviceName, OsgMouseScaffold::buildDeviceInputData())
 {
 }
 
@@ -40,7 +40,7 @@ bool MouseDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
 
-	m_scaffold = MouseScaffold::getOrCreateSharedInstance();
+	m_scaffold = OsgMouseScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(m_scaffold);
 
 	m_scaffold->registerDevice(this);

@@ -16,17 +16,17 @@
 #ifndef SURGSIM_DEVICES_MOUSE_MOUSEDEVICE_H
 #define SURGSIM_DEVICES_MOUSE_MOUSEDEVICE_H
 
+#include "SurgSim/Input/CommonDevice.h"
+
 #include <memory>
 #include <string>
-
-#include "SurgSim/Input/CommonDevice.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
-class MouseScaffold;
+class OsgMouseScaffold;
 class MouseHandler;
 
 /// A class implementing the communication with a mouse
@@ -45,16 +45,12 @@ class MouseHandler;
 /// \par Application output used by the device:
 ///      NONE
 ///
-/// \note  osgGA will generate scroll events when mouse wheel starts to move (up/down/left/right) and store vertical
-///        movements (+1 for scroll up and -1 for scroll down) in 'scrollDeltaX" and horizontal movements (-1 for scroll
-///        left and +1 for scroll right) in 'scrollDeltaY".
-///        However, osgGA will not generate any event when the movements stop.
-///        Values of 'scrollDeltaX/Y" will be set to 0 (indicating no movement) in the next (non wheel) mouse event.
+/// \note  Mouse wheel movement will be indicated by +1/-1 (scroll up/down, right/left) followed by a 0.
 ///
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class MouseDevice : public SurgSim::Input::CommonDevice
 {
-	friend class MouseScaffold;
+	friend class OsgMouseScaffold;
 	friend class MouseDeviceTest;
 
 public:
@@ -81,7 +77,7 @@ public:
 
 private:
 	/// Communication with hardware is handled by scaffold.
-	std::shared_ptr<MouseScaffold> m_scaffold;
+	std::shared_ptr<OsgMouseScaffold> m_scaffold;
 };
 
 };  // namespace Device

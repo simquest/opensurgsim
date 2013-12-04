@@ -21,7 +21,7 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	MouseDeviceTest.cpp
-	MouseScaffoldTest.cpp
+	OsgMouseScaffoldTest.cpp
 )
 
 set(LIBS MouseDevice 

@@ -14,41 +14,41 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the MouseScaffold class and its device interactions.
+/// Tests for the OsgMouseScaffold class and its device interactions.
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
 
-using SurgSim::Device::MouseScaffold;
+using SurgSim::Device::OsgMouseScaffold;
 
 TEST(MouseScaffoldTest, CreateAndDestroyScaffold)
 {
-	std::shared_ptr<MouseScaffold> scaffold = MouseScaffold::getOrCreateSharedInstance();
+	std::shared_ptr<OsgMouseScaffold> scaffold = OsgMouseScaffold::getOrCreateSharedInstance();
 	ASSERT_TRUE(nullptr != scaffold) << "The scaffold was not created!";
-	std::weak_ptr<MouseScaffold> scaffold1 = scaffold;
+	std::weak_ptr<OsgMouseScaffold> scaffold1 = scaffold;
 	{
-		std::shared_ptr<MouseScaffold> stillHaveScaffold = scaffold1.lock();
+		std::shared_ptr<OsgMouseScaffold> stillHaveScaffold = scaffold1.lock();
 		EXPECT_NE(nullptr, stillHaveScaffold) << "Unable to get scaffold from weak ref (while strong ref exists)";
 		EXPECT_EQ(scaffold, stillHaveScaffold) << "Scaffold mismatch!";
 	}
 	{
-		std::shared_ptr<MouseScaffold> sameScaffold = MouseScaffold::getOrCreateSharedInstance();
+		std::shared_ptr<OsgMouseScaffold> sameScaffold = OsgMouseScaffold::getOrCreateSharedInstance();
 		EXPECT_NE(nullptr, sameScaffold) << "Unable to get scaffold from class";
 		EXPECT_EQ(scaffold, sameScaffold) << "Scaffold mismatch!";
 	}
 
 	scaffold.reset();
 	{
-		std::shared_ptr<MouseScaffold> dontHaveScaffold = scaffold1.lock();
+		std::shared_ptr<OsgMouseScaffold> dontHaveScaffold = scaffold1.lock();
 		EXPECT_TRUE(nullptr == dontHaveScaffold) << "Able to get scaffold from weak ref (with no strong ref)";
 	}
 
-	scaffold = MouseScaffold::getOrCreateSharedInstance();
+	scaffold = OsgMouseScaffold::getOrCreateSharedInstance();
 	ASSERT_TRUE(nullptr != scaffold) << "The scaffold was not created the 2nd time!";
-	std::weak_ptr<MouseScaffold> scaffold2 = scaffold;
+	std::weak_ptr<OsgMouseScaffold> scaffold2 = scaffold;
 	{
-		std::shared_ptr<MouseScaffold> stillHaveScaffold = scaffold2.lock();
+		std::shared_ptr<OsgMouseScaffold> stillHaveScaffold = scaffold2.lock();
 		ASSERT_NE(nullptr, stillHaveScaffold) << "Unable to get scaffold from weak ref (while strong ref exists)";
 		ASSERT_EQ(scaffold, stillHaveScaffold) << "Scaffold mismatch!";
 	}

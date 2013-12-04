@@ -25,7 +25,7 @@ namespace SurgSim
 namespace Device
 {
 
-class MouseScaffold;
+class OsgMouseScaffold;
 
 class MouseHandler : public osgGA::GUIEventHandler
 {
@@ -37,11 +37,11 @@ public:
 	/// \param ea A osgGA::GUIEventAdapter
 	/// \param _2 A dummy parameter (required by this virtual method)
 	/// \return True if the event has been handled by this method; Otherwise, false.
-	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override;
+	virtual bool handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter&) override;
 
 private:
 	/// A back pointer to the scaffold which owns this handle
-	std::weak_ptr<MouseScaffold> m_mouseScaffold;
+	std::weak_ptr<OsgMouseScaffold> m_mouseScaffold;
 
 	/// lastX is the X-coordinate of mouse's last location
 	/// lastY is the Y-coordinate of mouse's last location

@@ -19,7 +19,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
-#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 
 namespace SurgSim

@@ -24,13 +24,13 @@ include_directories(
 set(Mouse_DEVICE_SOURCES
 	MouseDevice.cpp
 	MouseHandler.cpp
-	MouseScaffold.cpp
+	OsgMouseScaffold.cpp
 )
 
 set(Mouse_DEVICE_HEADERS
 	MouseDevice.h
 	MouseHandler.h
-	MouseScaffold.h
+	OsgMouseScaffold.h
 )
 
 surgsim_add_library(

@@ -14,28 +14,24 @@
 // limitations under the License.
 
 #include "SurgSim/Devices/Mouse/MouseHandler.h"
-#include "SurgSim/Devices/Mouse/MouseScaffold.h"
-
-#include <memory>
-
-#include <osgGA/GUIEventHandler>
+#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
-MouseHandler::MouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedInstance()),
+MouseHandler::MouseHandler() : m_mouseScaffold(OsgMouseScaffold::getOrCreateSharedInstance()),
 							   m_lastX(0.0), m_lastY(0.0), m_lastButtonMask(0), m_lastScrollX(0), m_lastScrollY(0)
 {
 }
 
-bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&)
+bool MouseHandler::handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter&)
 {
 	int scrollX = 0, scrollY = 0;
-	if (ea.getEventType() == osgGA::GUIEventAdapter::EventType::SCROLL)
+	if (eventHandler.getEventType() == osgGA::GUIEventAdapter::EventType::SCROLL)
 	{
-		switch(ea.getScrollingMotion())
+		switch(eventHandler.getScrollingMotion())
 		{
 		case(osgGA::GUIEventAdapter::SCROLL_UP) :
 		{
@@ -63,13 +59,13 @@ bool MouseHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdap
 	}
 
 	// Any mouse state change will cause an update
-	if( ea.getX() != m_lastX || ea.getY() != m_lastY ||
-		ea.getButtonMask() != m_lastButtonMask ||
+	if( eventHandler.getX() != m_lastX || eventHandler.getY() != m_lastY ||
+		eventHandler.getButtonMask() != m_lastButtonMask ||
 		m_lastScrollX != scrollX || m_lastScrollY != scrollY)
 	{
-		m_lastX = ea.getX();
-		m_lastY = ea.getY();
-		m_lastButtonMask = ea.getButtonMask();
+		m_lastX = eventHandler.getX();
+		m_lastY = eventHandler.getY();
+		m_lastButtonMask = eventHandler.getButtonMask();
 		m_lastScrollX = scrollX;
 		m_lastScrollY = scrollY;
 
