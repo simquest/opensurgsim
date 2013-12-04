@@ -18,6 +18,7 @@
 #include <SurgSim/Framework/Accessible.h>
 #include <functional>
 #include <boost/any.hpp>
+#include <SurgSim/Math/Matrix.h>
 
 #include <memory>
 
@@ -26,15 +27,13 @@ class TestClass : public SurgSim::Framework::Accessible
 public:
 	TestClass()
 	{
-
 		setGetter("a", std::bind(&TestClass::getA, this));
 		setSetter("a", std::bind(&TestClass::setA, this, std::bind(SurgSim::Framework::convert<int>,
 						std::placeholders::_1)));
 
-
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, b, getB, setB);
 		SURGSIM_ADD_RW_PROPERTY(TestClass, std::shared_ptr<int>, c, getC, setC);
-	
+
 		c = std::make_shared<int>(4);
 	}
 	int a;
@@ -49,7 +48,7 @@ public:
 	void setB(double val) { b = val; }
 
 	std::shared_ptr<int> getC() { return c; }
-	void setC(std::shared_ptr<int> val) { c = val; } 
+	void setC(std::shared_ptr<int> val) { c = val; }
 };
 
 namespace SurgSim
@@ -64,8 +63,7 @@ TEST(AccessibleTests, GetterTest)
 
 	EXPECT_EQ(5, boost::any_cast<int>(t.getValue("a")));
 
-	EXPECT_NO_THROW(t.getValue("xxx"));
-	EXPECT_TRUE(t.getValue("xxx").empty());
+	EXPECT_ANY_THROW(t.getValue("xxx"));
 }
 
 TEST(AccessibleTests, SetterTest)
@@ -75,7 +73,7 @@ TEST(AccessibleTests, SetterTest)
 
 	t.setValue("a", 4);
 	EXPECT_EQ(4, t.getA());
-	EXPECT_NO_THROW(t.setValue("xxxx",666.66));
+	EXPECT_ANY_THROW(t.setValue("xxxx",666.66));
 }
 
 TEST(AccessibleTests, TransferTest)
@@ -132,7 +130,18 @@ TEST(AccessibleTest, SharedPointerTest)
 	a.setValue("c",x);
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("c"));
 	EXPECT_EQ(5,*y);
+}
 
+TEST(AccessibleTest, ConvertDoubleToFloat)
+{
+	// Values don't matter only care for them to be filled
+	SurgSim::Math::Matrix44d sourceDouble = SurgSim::Math::Matrix44d::Random();
+	SurgSim::Math::Matrix44f sourceFloat = SurgSim::Math::Matrix44f::Random();
+
+	SurgSim::Math::Matrix44f target;
+
+	EXPECT_NO_THROW({target = convert<SurgSim::Math::Matrix44f>(sourceDouble);});
+	EXPECT_NO_THROW({target = convert<SurgSim::Math::Matrix44f>(sourceFloat);});
 }
 
 }; // namespace Framework

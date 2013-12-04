@@ -30,6 +30,7 @@ boost::any Framework::Accessible::getValue(const std::string& name)
 	}
 	else
 	{
+		SURGSIM_FAILURE() << "No property with name: " << name <<" found.";
 		return boost::any();
 	}
 }
@@ -40,6 +41,10 @@ void Framework::Accessible::setValue(const std::string& name, const boost::any& 
 	if (element != std::end(m_setters))
 	{
 		element->second(value);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Can't set property with name: " << name << ".";
 	}
 }
 
@@ -63,9 +68,16 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 template<>
 SurgSim::Math::Matrix44f convert(boost::any val)
 {
-
-	SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
-	SurgSim::Math::Matrix44f floatResult = result.cast<float>();
+	SurgSim::Math::Matrix44f floatResult;
+	try
+	{
+		SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
+		floatResult = result.cast<float>();
+	}
+	catch (boost::bad_any_cast &)
+	{
+		floatResult = boost::any_cast<SurgSim::Math::Matrix44f>(val);
+	}
 	return floatResult;
 }
 
