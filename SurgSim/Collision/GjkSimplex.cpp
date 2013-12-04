@@ -35,10 +35,6 @@ GjkSimplex::GjkSimplex()
     m_vertexInB.clear();
     m_vertexBaryCenterInMinkowskiSpace.clear();
     m_numberOfActiveVertices = 0;
-    for (int i = 0; i < 4; ++i)
-    {
-        m_verticesToBeRemoved[i] = false;
-    }
 }
 
 void GjkSimplex::addVertex(const SurgSim::Math::Vector3d& vertexInMinkowskiSpace,
@@ -56,9 +52,8 @@ void GjkSimplex::addVertex(const SurgSim::Math::Vector3d& vertexInMinkowskiSpace
     ++m_numberOfActiveVertices;
 }
 
-void GjkSimplex::removeVertex(unsigned int index)
+void GjkSimplex::removeVertex(size_t index)
 {
-    SURGSIM_ASSERT(m_numberOfActiveVertices > 0);
     SURGSIM_ASSERT(index < m_numberOfActiveVertices);
 
     m_vertexInMinkowskiSpace.erase(m_vertexInMinkowskiSpace.begin() + index);
@@ -69,7 +64,7 @@ void GjkSimplex::removeVertex(unsigned int index)
     --m_numberOfActiveVertices;
 }
 
-void GjkSimplex::update(SurgSim::Math::Vector3d *closestVertexToOrigin)
+void GjkSimplex::update(SurgSim::Math::Vector3d *closestPointToOrigin)
 {
     using SurgSim::Math::Vector3d;
     using SurgSim::Math::Geometry::DistanceEpsilon;
@@ -86,19 +81,19 @@ void GjkSimplex::update(SurgSim::Math::Vector3d *closestVertexToOrigin)
     case 1:
         {
             // The simplex is a single vertex => a.
-            // Therefore, closestVertexToOrigin is a.
-            *closestVertexToOrigin = m_vertexInMinkowskiSpace[0];
+            // Therefore, closestPointToOrigin is a.
+            *closestPointToOrigin = m_vertexInMinkowskiSpace[0];
             m_vertexBaryCenterInMinkowskiSpace[0] = 1.0;
         }
         break;
     case 2:
-        closestPointFromLineSegment(closestVertexToOrigin);
+        closestPointFromLineSegment(closestPointToOrigin);
         break;
     case 3:
-        closestPointFromTriangle(closestVertexToOrigin);
+        closestPointFromTriangle(closestPointToOrigin);
         break;
     case 4:
-        closestPointFromTetrahedron(closestVertexToOrigin);
+        closestPointFromTetrahedron(closestPointToOrigin);
         break;
     }
 }
@@ -112,54 +107,50 @@ void GjkSimplex::clear()
     m_vertexBaryCenterInMinkowskiSpace.clear();
 }
 
-unsigned int GjkSimplex::getNumberOfVertices() const
+size_t GjkSimplex::getNumberOfVertices() const
 {
     return m_numberOfActiveVertices;
 }
 
-SurgSim::Math::Vector3d GjkSimplex::getVertexInMinkowskiSpace(unsigned int id) const
+SurgSim::Math::Vector3d GjkSimplex::getVertexInMinkowskiSpace(size_t id) const
 {
-    SURGSIM_ASSERT(id >= 0 && id < m_numberOfActiveVertices)
+    SURGSIM_ASSERT(id < m_numberOfActiveVertices)
         << "Index out of bounds while retrieving vertex from GjkSimplex";
 
     return m_vertexInMinkowskiSpace[id];
 }
 
-SurgSim::Math::Vector3d GjkSimplex::getVertexInA(unsigned int id) const
+SurgSim::Math::Vector3d GjkSimplex::getVertexInA(size_t id) const
 {
-    SURGSIM_ASSERT(id >= 0 && id < m_numberOfActiveVertices)
+    SURGSIM_ASSERT(id < m_numberOfActiveVertices)
         << "Index out of bounds while retrieving vertex from GjkSimplex";
 
     return m_vertexInA[id];
 }
 
-SurgSim::Math::Vector3d GjkSimplex::getVertexInB(unsigned int id) const
+SurgSim::Math::Vector3d GjkSimplex::getVertexInB(size_t id) const
 {
-    SURGSIM_ASSERT(id >= 0 && id < m_numberOfActiveVertices)
+    SURGSIM_ASSERT(id < m_numberOfActiveVertices)
         << "Index out of bounds while retrieving vertex from GjkSimplex";
 
     return m_vertexInB[id];
 }
 
-double GjkSimplex::getVertexBaryCenterInMinkowskiSpace(unsigned int id) const
+double GjkSimplex::getVertexBarycentricCoordinateInMinkowskiSpace(size_t id) const
 {
-    SURGSIM_ASSERT(id >= 0 && id < m_numberOfActiveVertices)
-        << "Index out of bounds while retrieving bary center co-ordinate from GjkSimplex";
+    SURGSIM_ASSERT(id < m_numberOfActiveVertices)
+        << "Index out of bounds while retrieving barycentric coordinate from GjkSimplex";
 
     return m_vertexBaryCenterInMinkowskiSpace[id];
 }
 
-void GjkSimplex::closestPointFromLineSegment(SurgSim::Math::Vector3d *closestVertexToOrigin)
+void GjkSimplex::closestPointFromLineSegment(SurgSim::Math::Vector3d *closestPointToOrigin)
 {
     // The simplex is a line segment => (a, b).
     //
-    // /* Gughan TODO *****************
     // IMPORTANT NOTE:
-    // b was added to the simplex by searching in the direction sd, towards the origin from a.
-    // And, b was on the other side of origin from a => DotProduct(b, sd) > 0.
-    // From this information, we can be sure that the closest point to the origin is WITHIN the
-    // line segment ab.
-    // *******************************/
+    // b was added to the simplex by searching in the direction of ao.
+    // From this information, we can be sure that the closest point to the origin is not a.
     //
     // Based on that, origin is
     // - ao denotes the vector from a to origin.
@@ -175,52 +166,41 @@ void GjkSimplex::closestPointFromLineSegment(SurgSim::Math::Vector3d *closestVer
     //      |             |
     //
     // 2 cases:
-    // 1) closestVertexToOrigin is within ab => No reduction of simplex.
-    // 2) closestVertexToOrigin is one of the extremities of ab => The other
+    // 1) closestPointToOrigin is within ab => No reduction of simplex.
+    // 2) closestPointToOrigin is one of the extremities of ab => The other
     //    extremity is removed from simplex.
 
     Vector3d ao = -m_vertexInMinkowskiSpace[0];
     Vector3d ab = m_vertexInMinkowskiSpace[1] - m_vertexInMinkowskiSpace[0];
     double aoProjectedOnab = ao.dot(ab);
 
-    if (aoProjectedOnab > 0.0)
+	// a is NOT the closest point.
+	SURGSIM_ASSERT(aoProjectedOnab > 0.0)
+		<< "Vertex a in the line segment (simplex) should not be closest to origin";
+
+    double abLengthSquared = ab.squaredNorm();
+    if (aoProjectedOnab < abLengthSquared)
     {
-        // a is NOT the closest point.
-        // Squared length of ab.
-        double abLengthSquared = ab.squaredNorm();
-        if (aoProjectedOnab < abLengthSquared)
-        {
-            // Closest point is within the line segment.
-            aoProjectedOnab /= abLengthSquared;
-            *closestVertexToOrigin = m_vertexInMinkowskiSpace[0] + ab * aoProjectedOnab;
-            // The bary centric co-ordinate of the closestVertexToOrigin.
-            m_vertexBaryCenterInMinkowskiSpace[0] = 1.0 - aoProjectedOnab;
-            m_vertexBaryCenterInMinkowskiSpace[1] = aoProjectedOnab;
-        }
-        else
-        {
-            // b is the closest point.
-            // Remove a from simplex.
-            removeVertex(0);
-            // Closest point is b.
-            *closestVertexToOrigin = m_vertexInMinkowskiSpace[0];
-            // The bary centric co-ordinate of the closestVertexToOrigin.
-            m_vertexBaryCenterInMinkowskiSpace[0] = 1.0;
-        }
+        // Closest point is within the line segment.
+        double aoProjectedOnNormalizedab = aoProjectedOnab / abLengthSquared;
+        *closestPointToOrigin = m_vertexInMinkowskiSpace[0] + ab * aoProjectedOnNormalizedab;
+        // The barycentric coordinate of the closestPointToOrigin.
+        m_vertexBaryCenterInMinkowskiSpace[0] = 1.0 - aoProjectedOnNormalizedab;
+        m_vertexBaryCenterInMinkowskiSpace[1] = aoProjectedOnNormalizedab;
     }
     else
     {
-        // a is the closest point.
-        // Remove b from simplex.
-        removeVertex(1);
-        // Closest point is a.
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0];
-        // The bary centric co-ordinate of the closestVertexToOrigin.
+        // b is the closest point.
+        // Remove a from simplex.
+        removeVertex(0);
+        // Closest point is b.
+        *closestPointToOrigin = m_vertexInMinkowskiSpace[0];
+        // The barycentric coordinate of the closestPointToOrigin.
         m_vertexBaryCenterInMinkowskiSpace[0] = 1.0;
     }
 }
 
-void GjkSimplex::closestPointFromTriangle(SurgSim::Math::Vector3d *closestVertexToOrigin)
+void GjkSimplex::closestPointFromTriangle(SurgSim::Math::Vector3d *closestPointToOrigin)
 {
     // The simplex is a triangle => (a, b, c).
     //
@@ -262,32 +242,20 @@ void GjkSimplex::closestPointFromTriangle(SurgSim::Math::Vector3d *closestVertex
     Vector3d ao = -m_vertexInMinkowskiSpace[0];
     double aoProjectedOnab = ao.dot(ab);
     double aoProjectedOnac = ao.dot(ac);
-    if (aoProjectedOnab < 0.0 && aoProjectedOnac < 0.0)
-    {
-        removeVertex(2);
-        removeVertex(1);
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0];
-        // The bary centric co-ordinate of the closestVertexToOrigin.
-        m_vertexBaryCenterInMinkowskiSpace[0] = 1.0;
-        return;
-    }
 
-    // 2) The origin is closest to b.
+	SURGSIM_ASSERT(!(aoProjectedOnab < 0.0 && aoProjectedOnac < 0.0))
+		<< "Vertex a in the triangle (simplex) should not be closest to origin";
+    
+	// 2) The origin is closest to b.
     Vector3d bc = m_vertexInMinkowskiSpace[2] - m_vertexInMinkowskiSpace[1];
     Vector3d bo = -m_vertexInMinkowskiSpace[1];
     double boProjectedOnab = bo.dot(ab);
     double boProjectedOnbc = bo.dot(bc);
-    if (boProjectedOnab >= 0.0 && boProjectedOnbc < 0.0)
-    {
-        removeVertex(2);
-        removeVertex(0);
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0];
-        // The bary centric co-ordinate of the closestVertexToOrigin.
-        m_vertexBaryCenterInMinkowskiSpace[0] = 1.0;
-        return;
-    }
-
-    // 3) The origin is closest to c.
+    
+	SURGSIM_ASSERT(!(boProjectedOnab >= 0.0 && boProjectedOnbc < 0.0))
+		<< "Vertex b in the triangle (simplex) should not be closest to origin";
+    
+	// 3) The origin is closest to c.
     Vector3d co = -m_vertexInMinkowskiSpace[2];
     double coProjectedOnbc = co.dot(bc);
     double coProjectedOnac = co.dot(ac);
@@ -295,8 +263,8 @@ void GjkSimplex::closestPointFromTriangle(SurgSim::Math::Vector3d *closestVertex
     {
         removeVertex(1);
         removeVertex(0);
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0];
-        // The bary centric co-ordinate of the closestVertexToOrigin.
+        *closestPointToOrigin = m_vertexInMinkowskiSpace[0];
+        // The barycentric coordinate of the closestPointToOrigin.
         m_vertexBaryCenterInMinkowskiSpace[0] = 1.0;
         return;
     }
@@ -304,29 +272,21 @@ void GjkSimplex::closestPointFromTriangle(SurgSim::Math::Vector3d *closestVertex
     // 4) The origin is closest to ab.
     Vector3d triangleNormal = ab.cross(ac);
     double baryCoordC = triangleNormal.dot(ao.cross(bo));
-    if (baryCoordC <= 0.0 && aoProjectedOnab >= 0.0 && boProjectedOnab <= 0.0)
-    {
-        removeVertex(2);
-        // The bary centric co-ordinate of the closestVertexToOrigin.
-        m_vertexBaryCenterInMinkowskiSpace[1] = aoProjectedOnab / (aoProjectedOnab - boProjectedOnab);
-        m_vertexBaryCenterInMinkowskiSpace[0] = 1.0 - m_vertexBaryCenterInMinkowskiSpace[1];
-        // The closest vertex to origin.
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0] +
-                                 ab * m_vertexBaryCenterInMinkowskiSpace[1];
-        return;
-    }
+
+	SURGSIM_ASSERT(!(baryCoordC <= 0.0 && aoProjectedOnab >= 0.0 && boProjectedOnab <= 0.0))
+		<< "Edge ab in the triangle (simplex) should not be closest to origin";
 
     // 5) The origin is closest to ac.
     double baryCoordB = triangleNormal.dot(co.cross(ao));
     if (baryCoordB <= 0.0 && aoProjectedOnac >= 0.0 && coProjectedOnac <= 0.0)
     {
         removeVertex(1);
-        // The bary centric co-ordinate of the closestVertexToOrigin.
+        // The barycentric coordinate of the closestPointToOrigin.
         m_vertexBaryCenterInMinkowskiSpace[1] = aoProjectedOnac / (aoProjectedOnac - coProjectedOnac);
         m_vertexBaryCenterInMinkowskiSpace[0] = 1.0 - m_vertexBaryCenterInMinkowskiSpace[1];
-        // The closest vertex to origin.
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0] +
-                                 ac * m_vertexBaryCenterInMinkowskiSpace[1];
+        // The closest point to origin.
+        *closestPointToOrigin = m_vertexInMinkowskiSpace[0] +
+                                ac * m_vertexBaryCenterInMinkowskiSpace[1];
         return;
     }
 
@@ -335,29 +295,29 @@ void GjkSimplex::closestPointFromTriangle(SurgSim::Math::Vector3d *closestVertex
     if (baryCoordA <= 0.0 && boProjectedOnbc >= 0.0 && coProjectedOnbc <= 0.0)
     {
         removeVertex(0);
-        // The bary centric co-ordinate of the closestVertexToOrigin.
+        // The barycentric coordinate of the closestPointToOrigin.
         m_vertexBaryCenterInMinkowskiSpace[1] = boProjectedOnbc / (boProjectedOnbc - coProjectedOnbc);
         m_vertexBaryCenterInMinkowskiSpace[0] = 1.0 - m_vertexBaryCenterInMinkowskiSpace[1];
-        // The closest vertex to origin.
-        *closestVertexToOrigin = m_vertexInMinkowskiSpace[0] +
-                                 bc * m_vertexBaryCenterInMinkowskiSpace[1];
+        // The closest point to origin.
+        *closestPointToOrigin = m_vertexInMinkowskiSpace[0] +
+                                bc * m_vertexBaryCenterInMinkowskiSpace[1];
         return;
     }
 
     // 7) The origin is closest to the triangle face.
-    // The bary centric co-ordinate of the closestVertexToOrigin.
+    // The barycentric coordinate of the closestPointToOrigin.
     double denom = 1.0 / (baryCoordA + baryCoordB + baryCoordC);
     m_vertexBaryCenterInMinkowskiSpace[0] = baryCoordA * denom;
     m_vertexBaryCenterInMinkowskiSpace[1] = baryCoordB * denom;
     m_vertexBaryCenterInMinkowskiSpace[2] = 1.0 - m_vertexBaryCenterInMinkowskiSpace[0] -
                                             m_vertexBaryCenterInMinkowskiSpace[1];
-    // The closest vertex to origin.
-    *closestVertexToOrigin = m_vertexInMinkowskiSpace[0] * m_vertexBaryCenterInMinkowskiSpace[0] +
-                             m_vertexInMinkowskiSpace[1] * m_vertexBaryCenterInMinkowskiSpace[1] +
-                             m_vertexInMinkowskiSpace[2] * m_vertexBaryCenterInMinkowskiSpace[2];
+    // The closest point to origin.
+    *closestPointToOrigin = m_vertexInMinkowskiSpace[0] * m_vertexBaryCenterInMinkowskiSpace[0] +
+                            m_vertexInMinkowskiSpace[1] * m_vertexBaryCenterInMinkowskiSpace[1] +
+                            m_vertexInMinkowskiSpace[2] * m_vertexBaryCenterInMinkowskiSpace[2];
 }
 
-void GjkSimplex::closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestVertexToOrigin)
+void GjkSimplex::closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestPointToOrigin)
 {
     // The simplex is a tetrahedron => (a, b, c, d).
     //
@@ -413,7 +373,7 @@ void GjkSimplex::closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestVer
     if ((distanceToOriginFromTriangle * distanceToFourthVertexFromTriangle) <= 0.0)
     {
         removeVertex(2);
-        closestPointFromTriangle(closestVertexToOrigin);
+        closestPointFromTriangle(closestPointToOrigin);
         return;
     }
 
@@ -426,7 +386,7 @@ void GjkSimplex::closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestVer
     if ((distanceToOriginFromTriangle * distanceToFourthVertexFromTriangle) <= 0.0)
     {
         removeVertex(0);
-        closestPointFromTriangle(closestVertexToOrigin);
+        closestPointFromTriangle(closestPointToOrigin);
         return;
     }
 
@@ -439,23 +399,22 @@ void GjkSimplex::closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestVer
     if ((distanceToOriginFromTriangle * distanceToFourthVertexFromTriangle) <= 0.0)
     {
         removeVertex(1);
-        closestPointFromTriangle(closestVertexToOrigin);
+        closestPointFromTriangle(closestPointToOrigin);
         return;
     }
 
     // 4) The origin is inside the tetrahedron.
-    closestVertexToOrigin->setZero();
-    // The bary centric co-ordinate of the closestVertexToOrigin.
+    closestPointToOrigin->setZero();
+    // The barycentric coordinate of the closestPointToOrigin.
     // m_vertexBaryCenterInMinkowskiSpace = (b0, b1, b2, b3)
-    // [b0,b1,b2]' = inverse([v0-v3 v1-v3 v2-v3]) * (-v3)
+    // [b0,b1,b2] = inverse([a-d b-d c-d]) * (-d)
     // where, b0+b1+b2+b3 = 1.
-    Matrix33d baryCenterMatrix;
-    // Calculate [v0-v3 v1-v3 v2-v3].
-    baryCenterMatrix.block(0, 0, 3, 1) = m_vertexInMinkowskiSpace[0] - m_vertexInMinkowskiSpace[3];
-    baryCenterMatrix.block(0, 1, 3, 1) = m_vertexInMinkowskiSpace[1] - m_vertexInMinkowskiSpace[3];
-    baryCenterMatrix.block(0, 2, 3, 1) = m_vertexInMinkowskiSpace[2] - m_vertexInMinkowskiSpace[3];
-    // Calculate [b0,b1,b2]'.
-    Vector3d b0b1b2 = baryCenterMatrix.inverse() * -m_vertexInMinkowskiSpace[3];
+    Matrix33d barycenterMatrix;
+	barycenterMatrix.block(0, 0, 3, 1) = m_vertexInMinkowskiSpace[0] - m_vertexInMinkowskiSpace[3];
+    barycenterMatrix.block(0, 1, 3, 1) = m_vertexInMinkowskiSpace[1] - m_vertexInMinkowskiSpace[3];
+    barycenterMatrix.block(0, 2, 3, 1) = m_vertexInMinkowskiSpace[2] - m_vertexInMinkowskiSpace[3];
+    // Calculate [b0,b1,b2].
+    Vector3d b0b1b2 = barycenterMatrix.inverse() * -m_vertexInMinkowskiSpace[3];
     // Calculate m_vertexBaryCenterInMinkowskiSpace = (b0, b1, b2, b3).
     m_vertexBaryCenterInMinkowskiSpace[0] = b0b1b2.x();
     m_vertexBaryCenterInMinkowskiSpace[1] = b0b1b2.y();

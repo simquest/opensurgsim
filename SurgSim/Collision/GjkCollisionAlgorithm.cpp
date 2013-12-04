@@ -86,16 +86,16 @@ bool GjkCollisionAlgorithm::detectCollision(std::shared_ptr<SurgSim::Collision::
     //  the terms in Minkowski(A,-B) will be zero.
     //
     // Algorithm to check if Minkowski(A,-B) contains the origin:
-    //  Let [S#], be the set of vertices, S0, S1, S2 and S3. This is referred to as the simplex.
+    //  Let {S#}, be the set of vertices, S0, S1, S2 and S3. This is referred to as the simplex.
     //  The objective of the algorithm is to find these 4 vertices in Minkowski(A,-B), which
     //  encloses the origin.
     //  1) Choose a point, P, in Minkowski(A,-B). Preferably Centeroid(A) - Centeroid(B).
     //     If that turns out to be zero, the shapes are in collision => Go to step 7.
     //  2) From P, find the direction, D, towards the origin => (0 - P) => -P.
     //  3) Find the farthest point, S, along D on the Minkowski(A,-B).
-    //     If DotProduct(S, D) >= 0, add S to [S#]. Else, go to step 8.
-    //  4) Check if [S#] encloses the origin. If it does, go to step 7.
-    //  5) From [S#], find the closest point, P, to the origin. Adjust [S#] accordingly.
+    //     If DotProduct(S, D) >= 0, add S to {S#}. Else, go to step 8.
+    //  4) Check if {S#} encloses the origin. If it does, go to step 7.
+    //  5) From {S#}, find the closest point, P, to the origin. Adjust {S#} accordingly.
     //  6) Go to step 2.
     //  7) There is a collision. Return true.
     //  8) There is no collision. Return false.
@@ -103,12 +103,12 @@ bool GjkCollisionAlgorithm::detectCollision(std::shared_ptr<SurgSim::Collision::
     // Flag to set if a collision is detected.
     bool collisionDetected = false;
 
-    // The shape transforms.
+    // The shapes transforms.
     RigidTransform3d convexTransformA = representationConvexA->getPose();
     RigidTransform3d convexTransformB = representationConvexB->getPose();
 
-    // The inverse of the shape transforms.
-    // Used to transform the world search direciton to local shape's co-ordinate system.
+    // The inverse of the shapes transforms.
+    // Used to transform the world search direction to local shape's coordinate system.
     RigidTransform3d convexTransformInverseA = convexTransformA.inverse();
     RigidTransform3d convexTransformInverseB = convexTransformB.inverse();
 
@@ -186,12 +186,12 @@ bool GjkCollisionAlgorithm::detectCollision(std::shared_ptr<SurgSim::Collision::
                 // The vertex in convexA and convexB which are the penetration points.
                 m_vertexInA.setZero();
                 m_vertexInB.setZero();
-                double baryCenterCoOrd = 0.0;
+                double barycentricCoordinate = 0.0;
                 for (unsigned int i = 0; i < gjkSimplex.getNumberOfVertices(); ++i)
                 {
-                    baryCenterCoOrd = gjkSimplex.getVertexBaryCenterInMinkowskiSpace(i);
-                    m_vertexInA += gjkSimplex.getVertexInA(i) * baryCenterCoOrd;
-                    m_vertexInB += gjkSimplex.getVertexInB(i) * baryCenterCoOrd;
+                    barycentricCoordinate = gjkSimplex.getVertexBarycentricCoordinateInMinkowskiSpace(i);
+                    m_vertexInA += gjkSimplex.getVertexInA(i) * barycentricCoordinate;
+                    m_vertexInB += gjkSimplex.getVertexInB(i) * barycentricCoordinate;
                 }
                 break;
             }

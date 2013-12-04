@@ -38,7 +38,7 @@ class GjkCollisionAlgorithm
 public:
     /// Constructor
     /// \param maximumIterations The iterations count limit for the algorithm.
-    GjkCollisionAlgorithm(unsigned int maximumIterations = 1000)
+    explicit GjkCollisionAlgorithm(unsigned int maximumIterations = 1000)
                           : m_maximumIterations(maximumIterations)
     {
         m_separatingAxis.setZero();
@@ -72,7 +72,7 @@ public:
 
     /// Detect collision.
     /// \param pair The collision pair which contains the two shapes, between which the algorithm is run.
-    /// \return True, if a collsion is detected. False, otherwise.
+    /// \return True, if a collision is detected. False, otherwise.
     bool detectCollision(std::shared_ptr<SurgSim::Collision::CollisionPair> pair);
 
 private:

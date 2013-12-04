@@ -31,7 +31,7 @@ namespace Collision
 /// Class to maintain the list of (up to four) vertices which are a subset of the Miskowski(A,-B).
 /// The objective is to enclose the origin with the tetahedron formed with the 4 vertices.
 /// The vertices in the list are in the order in which they were added to the simplex. Maintaining
-/// this order presents with the oppurtunity of making some assumptions when searching for the
+/// this order presents the opportunity of making some assumptions when searching for the
 /// closest point to the origin from the simplex.
 class GjkSimplex
 {
@@ -48,50 +48,50 @@ public:
                    const SurgSim::Math::Vector3d& vertexInB);
 
     /// Find the closest point from the simplex to the origin.
-    /// \param closestVertexToOrigin The closest vertex on the simplex to the origin.
-    void update(SurgSim::Math::Vector3d *closestVertexToOrigin);
+    /// \param closestPointToOrigin The closest vertex on the simplex to the origin.
+    void update(SurgSim::Math::Vector3d *closestPointToOrigin);
 
     /// Clear the simplex.
     void clear();
 
     /// Get the number of vertices in this simplex.
     /// \return The number of vertices in this simplex.
-    unsigned int getNumberOfVertices() const;
+    size_t getNumberOfVertices() const;
 
     /// Get the vertex in Minkowski difference space (A, -B) for the given id.
     /// \return The vertex in Minkowski difference space (A, -B).
-    SurgSim::Math::Vector3d getVertexInMinkowskiSpace(unsigned int id) const;
+    SurgSim::Math::Vector3d getVertexInMinkowskiSpace(size_t id) const;
 
     /// Get the vertex in A, given the id.
     /// \return The vertex in A.
-    SurgSim::Math::Vector3d getVertexInA(unsigned int id) const;
+    SurgSim::Math::Vector3d getVertexInA(size_t id) const;
 
     /// Get the vertex in B, given the id.
     /// \return The vertex in B.
-    SurgSim::Math::Vector3d getVertexInB(unsigned int id) const;
+    SurgSim::Math::Vector3d getVertexInB(size_t id) const;
 
-    /// Get the bary center co-ordinate for the given vertex id.
-    /// \return The bary center co-ordinate for the vertex id.
-    double getVertexBaryCenterInMinkowskiSpace(unsigned int id) const;
+    /// Get the barycentric coordinate for the given vertex id.
+    /// \return The barycentric coordinate for the vertex id.
+    double getVertexBarycentricCoordinateInMinkowskiSpace(size_t id) const;
 
 private:
     /// Set the flag to remove the vertex whose index is specified.
     /// \param index The index of the vertex to be removed.
-    void removeVertex(unsigned int index);
+    void removeVertex(size_t index);
 
     /// Find the closest point to the origin from the simplex, which is a line segment.
-    /// \param closestVertexToOrigin The closest vertex on the line segment to the origin.
-    void closestPointFromLineSegment(SurgSim::Math::Vector3d *closestVertexToOrigin);
+    /// \param [out] closestPointToOrigin The closest point on the line segment to the origin.
+    void closestPointFromLineSegment(SurgSim::Math::Vector3d *closestPointToOrigin);
 
     /// Find the closest point to the origin from the simplex, which is a triangle.
-    /// \param closestVertexToOrigin The closest vertex on the triangle to the origin.
-    void closestPointFromTriangle(SurgSim::Math::Vector3d *closestVertexToOrigin);
+    /// \param [out] closestPointToOrigin The closest point on the triangle to the origin.
+    void closestPointFromTriangle(SurgSim::Math::Vector3d *closestPointToOrigin);
 
     /// Find the closest point to the origin from the simplex, which is a tetrahedron.
-    /// \param closestVertexToOrigin The closest vertex on the tetrahedron to the origin.
+    /// \param [out] closestPointToOrigin The closest point on the tetrahedron to the origin.
     /// \note The closest point from tetrahedron is assumed to be in the half space
-    /// of the plane (a,b,c) which contains the vertex d.
-    void closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestVertexToOrigin);
+    /// defined by the plane (a,b,c) containing the vertex d.
+    void closestPointFromTetrahedron(SurgSim::Math::Vector3d *closestPointToOrigin);
 
 private:
     /// The vertex in Minkowski(A,-B), which is also the vector from B to A.
@@ -100,12 +100,10 @@ private:
     std::vector<SurgSim::Math::Vector3d> m_vertexInA;
     /// The vertex in shape B.
     std::vector<SurgSim::Math::Vector3d> m_vertexInB;
-    /// The barycentric co-ordinates of the closest vertex to the origin within the simplex.
+    /// The barycentric coordinates of the closest vertex to the origin within the simplex.
     std::vector<double> m_vertexBaryCenterInMinkowskiSpace;
     /// The number of vertices being actively used.
-    unsigned int m_numberOfActiveVertices;
-    /// The indices of the vertices to be removed.
-    bool m_verticesToBeRemoved[4];
+    size_t m_numberOfActiveVertices;
 
 };
 
