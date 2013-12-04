@@ -30,6 +30,7 @@ using SurgSim::Physics::DeformableRepresentation;
 using SurgSim::Physics::DeformableRepresentationState;
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector;
 using SurgSim::Math::Matrix;
 
 namespace
@@ -173,7 +174,7 @@ public:
 
 		SurgSim::Math::Quaterniond q(0.1, 0.4, 0.5, 0.2);
 		q.normalize();
-		SurgSim::Math::Vector3d t(1.45, 5.4, 2.42);
+		Vector3d t(1.45, 5.4, 2.42);
 		m_nonIdentityTransform = SurgSim::Math::makeRigidTransform(q, t);
 		m_identityTransform = SurgSim::Math::RigidTransform3d::Identity();
 	}

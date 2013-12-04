@@ -103,7 +103,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 	}
 }
 
-void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
+void DcdCollision::setDcdContactInTable(std::shared_ptr<SurgSim::Collision::ContactCalculation> dcdContact)
 {
 	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
 	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;

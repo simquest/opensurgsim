@@ -23,11 +23,9 @@
 
 #include <SurgSim/Physics/Representation.h>
 #include <SurgSim/Physics/DeformableRepresentationState.h>
+
 #include <SurgSim/Math/OdeEquation.h>
 #include <SurgSim/Math/OdeSolver.h>
-
-using SurgSim::Math::OdeEquation;
-using SurgSim::Math::OdeSolver;
 
 namespace SurgSim
 {
@@ -48,7 +46,7 @@ namespace Physics
 template <class MType, class DType, class KType, class SType>
 class DeformableRepresentation :
 	public Representation,
-	public OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>
+	public SurgSim::Math::OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>
 {
 public:
 	/// Constructor
@@ -147,7 +145,7 @@ protected:
 	SurgSim::Math::RigidTransform3d m_identityPose;
 
 	/// Force applied on the deformable representation
-	Vector m_f;
+	SurgSim::Math::Vector m_f;
 
 	/// Mass matrix (templatized type for performance reason)
 	MType m_M;
@@ -169,7 +167,7 @@ protected:
 	bool m_needToReloadOdeSolver;
 
 	/// Ode solver (its type depends on the numerical integration scheme)
-	std::shared_ptr<OdeSolver<DeformableRepresentationState, MType, DType, KType, SType>> m_odeSolver;
+	std::shared_ptr<SurgSim::Math::OdeSolver<DeformableRepresentationState, MType, DType, KType, SType>> m_odeSolver;
 
 private:
 	/// NO copy constructor
@@ -180,7 +178,7 @@ private:
 
 	// Dependent names resolution (need to be in public/protected to be accessible in derived classes)
 public:
-	using OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>::m_initialState;
+	using SurgSim::Math::OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>::m_initialState;
 };
 
 }; // namespace Physics

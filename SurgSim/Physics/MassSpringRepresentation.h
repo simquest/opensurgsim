@@ -26,10 +26,6 @@
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Matrix.h>
 
-using SurgSim::Math::Vector;
-using SurgSim::Math::DiagonalMatrix;
-using SurgSim::Math::Matrix;
-
 namespace SurgSim
 {
 
@@ -40,7 +36,11 @@ namespace Physics
 /// \note A MassSpring is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v) with the particularity that M is diagonal
 /// \note The model handles damping through the Rayleigh damping (where damping is a combination of mass and stiffness)
-class MassSpringRepresentation: public DeformableRepresentation<DiagonalMatrix, Matrix, Matrix, Matrix>
+class MassSpringRepresentation : public DeformableRepresentation<
+	SurgSim::Math::DiagonalMatrix,
+	SurgSim::Math::Matrix,
+	SurgSim::Math::Matrix,
+	SurgSim::Math::Matrix>
 {
 public:
 	/// Constructor
@@ -121,31 +121,31 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block) override;
+	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	virtual Vector& computeF(const DeformableRepresentationState& state) override;
+	virtual SurgSim::Math::Vector& computeF(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of the LHS matrix M(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
 	/// \return The matrix M(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeM() or computeFMDK()
-	virtual const DiagonalMatrix& computeM(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::DiagonalMatrix& computeM(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of D = -df/dv (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix D = -df/dv(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeD() or computeFMDK()
-	virtual const Matrix& computeD(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeD(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of K = -df/dx (x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the Jacobian matrix with
 	/// \return The matrix K = -df/dx(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeK() or computeFMDK()
-	virtual const Matrix& computeK(const DeformableRepresentationState& state) override;
+	virtual const SurgSim::Math::Matrix& computeK(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of f(x,v), M(x,v), D = -df/dv(x,v), K = -df/dx(x,v)
 	/// When all the terms are needed, this method can perform optimization in evaluating everything together
@@ -156,8 +156,8 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const DeformableRepresentationState& state,
-		Vector** f, DiagonalMatrix** M, Matrix** D, Matrix** K) override;
+	virtual void computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
+		SurgSim::Math::DiagonalMatrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
 protected:
 	/// Add the Rayleigh damping forces
@@ -167,21 +167,21 @@ protected:
 	/// \param scale A scaling factor to apply on the damping force
 	/// \note M.a + D.v + K.x = F          with D = c.M + d.K (Rayleigh damping definition)
 	/// \note M.a + K.x = F - (c.M.v + d.K.v)
-	void addRayleighDampingForce(Vector* f, const DeformableRepresentationState& state,
+	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
 		bool useGlobalStiffnessMatrix = false, double scale = 1.0);
 
 	/// Add the springs force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the spring forces into
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the spring forces with
-	void addSpringsForce(Vector* f, const DeformableRepresentationState& state, double scale = 1.0);
+	void addSpringsForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state, double scale = 1.0);
 
 	/// Add the gravity force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the gravity force into
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the gravity force with
 	/// \note This method does not do anything if gravity is disabled
-	void addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
+	void addGravityForce(SurgSim::Math::Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
 
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed

@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_FEMELEMENT3DTETRAHEDRON_H
 
 #include <array>
+
 #include <SurgSim/Physics/FemElement.h>
 
 namespace SurgSim

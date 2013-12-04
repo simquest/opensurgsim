@@ -59,6 +59,7 @@ using SurgSim::Graphics::OsgUniform;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;

@@ -24,9 +24,6 @@ namespace SurgSim
 namespace Graphics
 {
 
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector4d;
-
 /// Graphic representation of a vector field
 /// Each point/location, i.e. (X,Y,Z), in the vector field is associated with a vector and an optional color
 class VectorFieldRepresentation : public virtual Representation

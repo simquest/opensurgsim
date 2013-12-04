@@ -196,7 +196,7 @@ void RigidRepresentation::afterUpdate(double dt)
 
 void RigidRepresentation::applyDofCorrection(
 	double dt,
-	const Eigen::VectorBlock<Vector>& dofCorrection)
+	const Eigen::VectorBlock<SurgSim::Math::Vector>& dofCorrection)
 {
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Matrix33d;
@@ -213,8 +213,8 @@ void RigidRepresentation::applyDofCorrection(
 	Quaterniond       q = Quaterniond(R);
 	Vector3d          w = m_currentState.getAngularVelocity();
 
-	const SurgSim::Math::Vector3d& delta_dG = dofCorrection.segment(0,3);
-	const SurgSim::Math::Vector3d& delta_w  = dofCorrection.segment(3,3);
+	const Vector3d& delta_dG = dofCorrection.segment(0,3);
+	const Vector3d& delta_w  = dofCorrection.segment(3,3);
 	Quaterniond delta_dq = Quaterniond(delta_w[0],delta_w[1],delta_w[2],0.0) * q;
 	delta_dq.coeffs() *= 0.5;
 

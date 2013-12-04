@@ -34,6 +34,7 @@
 #include <SurgSim/Math/Vector.h>
 
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace
 {
@@ -53,7 +54,7 @@ protected:
 	/// Rigid sphere pose
 	SurgSim::Math::RigidTransform3d m_poseRigid;
 	/// Contact normal direction
-	SurgSim::Math::Vector3d m_n;
+	Vector3d m_n;
 	/// Distance to origin of the contact plane equation
 	double m_d;
 	/// Sphere radius
@@ -67,9 +68,9 @@ protected:
 	/// Mlcp index of the constraint (frictionless contact)
 	unsigned int m_indexConstraint;
 	/// Contact location on the plane (point on the plane with the most penetration)
-	SurgSim::Math::Vector3d m_contactPositionPlane;
+	Vector3d m_contactPositionPlane;
 	/// Contact location on the sphere (point on the sphere with the most penetration)
-	SurgSim::Math::Vector3d m_contactPositionSphere;
+	Vector3d m_contactPositionSphere;
 
 	/// Rigid sphere
 	std::shared_ptr<RigidRepresentation> m_rigid;
@@ -265,7 +266,7 @@ TEST_F (ConstraintTests, TestBuildMlcpSpherePlane)
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// The rigid sphere being the 1st representation in the pair, it has the positive sign in the constraint !
 	double sign = 1.0;
-	SurgSim::Math::Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
+	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
 	EXPECT_NEAR(sign * m_dt * m_n[0] , m_mlcpPhysicsProblem.H(0, 0), epsilon);
 	EXPECT_NEAR(sign * m_dt * m_n[1] , m_mlcpPhysicsProblem.H(0, 1), epsilon);
@@ -316,7 +317,7 @@ TEST_F (ConstraintTests, TestBuildMlcpPlaneSphere)
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
 	// The rigid sphere being the 2nd representation in the pair, it has the negative sign in the constraint !
 	double sign = -1.0;
-	SurgSim::Math::Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
+	Vector3d n_GP = m_n.cross(Vector3d(0.0, -m_radius, 0.0));
 
 	EXPECT_NEAR(sign * m_dt * m_n[0] , m_mlcpPhysicsProblem.H(0, 0), epsilon);
 	EXPECT_NEAR(sign * m_dt * m_n[1] , m_mlcpPhysicsProblem.H(0, 1), epsilon);
