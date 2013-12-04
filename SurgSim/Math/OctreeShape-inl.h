@@ -16,6 +16,8 @@
 #ifndef SURGSIM_MATH_OCTREESHAPE_INL_H
 #define SURGSIM_MATH_OCTREESHAPE_INL_H
 
+#include <SurgSim/Framework/Assert.h>
+
 namespace SurgSim
 {
 
@@ -42,12 +44,14 @@ int OctreeShape<NodeData>::getType()
 template<class NodeData>
 double OctreeShape<NodeData>::calculateVolume() const
 {
+	SURGSIM_FAILURE() << "OctreeShape::calculateVolume not implemented";
 	return 0.0;
 }
 
 template<class NodeData>
 double OctreeShape<NodeData>::calculateMass(double rho) const
 {
+	SURGSIM_FAILURE() << "OctreeShape::calculateMass not implemented";
 	return 0.0;
 }
 
@@ -60,6 +64,7 @@ Vector3d OctreeShape<NodeData>::calculateMassCenter() const
 template<class NodeData>
 Matrix33d OctreeShape<NodeData>::calculateInertia(double rho) const
 {
+	SURGSIM_FAILURE() << "OctreeShape::calculateInertia not implemented";
 	return Matrix33d::Zero();
 }
 

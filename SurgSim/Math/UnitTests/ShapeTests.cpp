@@ -241,9 +241,9 @@ TEST_F(ShapeTest, Octree)
 	{
 		OctreeShape<OctreeData> octree(node);
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
-		EXPECT_NEAR(0.0, octree.calculateVolume(), epsilon);
-		EXPECT_NEAR(0.0, octree.calculateMass(m_rho), epsilon);
+		EXPECT_THROW(octree.calculateVolume(), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(octree.calculateMass(m_rho), SurgSim::Framework::AssertionFailure);
 		EXPECT_TRUE(octree.calculateMassCenter().isApprox(Vector3d::Zero(), epsilon));
-		EXPECT_TRUE(octree.calculateInertia(m_rho).isApprox(Matrix33d::Zero(), epsilon));
+		EXPECT_THROW(octree.calculateInertia(m_rho), SurgSim::Framework::AssertionFailure);
 	}
 }
