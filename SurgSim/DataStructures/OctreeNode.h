@@ -75,6 +75,7 @@ public:
 	/// \param position The position to add the data at
 	/// \param nodeData The data to store in the node
 	/// \param level The number of levels down the octree to store the data
+	/// \return true if data is added
 	bool addData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level);
 
 	/// Get the children of this node (non const version)
@@ -89,12 +90,25 @@ public:
 	Data data;
 
 private:
+	/// Recursive function that does the adding of the data to the octree
+	/// \param position The position to add the data at
+	/// \param nodeData The data to store in the node
+	/// \param level The number of levels down the octree to store the data
+	/// \param currentLevel Used to keep track of the current level during recursive calls
+	/// \return true if data is added
 	bool doAddData(const SurgSim::Math::Vector3d& position, const Data& nodeData, const int level,
 			const int currentLevel);
 
+	/// The bounding box of the current OctreeNode
 	BoundingBoxType m_boundingBox;
+
+	/// True if there is any data inside this node, including data held by children, children's children, etc.
 	bool m_isActive;
+
+	/// True if the node has children
 	bool m_hasChildren;
+
+	/// The children of this node
 	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
 };
 

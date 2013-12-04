@@ -71,6 +71,7 @@ public:
 	virtual std::string getClassName() override;
 
 private:
+	/// Root node of the octree datastructure
 	std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> m_rootNode;
 };
 
