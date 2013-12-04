@@ -245,5 +245,6 @@ TEST_F(ShapeTest, Octree)
 		EXPECT_THROW(octree.calculateMass(m_rho), SurgSim::Framework::AssertionFailure);
 		EXPECT_TRUE(octree.calculateMassCenter().isApprox(Vector3d::Zero(), epsilon));
 		EXPECT_THROW(octree.calculateInertia(m_rho), SurgSim::Framework::AssertionFailure);
+		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 	}
 }
