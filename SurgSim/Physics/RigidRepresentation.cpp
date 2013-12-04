@@ -17,9 +17,10 @@
 
 #include <SurgSim/Physics/RigidRepresentation.h>
 
+#include <SurgSim/Math/Geometry.h>
+#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Math/Vector.h>
 #include <SurgSim/Math/Valid.h>
-#include <SurgSim/Math/Quaternion.h>
 #include <SurgSim/Physics/Localization.h>
 #include <SurgSim/Collision/Location.h>
 
@@ -302,6 +303,19 @@ void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationS
 	const SurgSim::Math::Matrix33d& R = state.getPose().linear();
 	m_globalInertia =  R * m_currentParameters.getLocalInertia() * R.transpose();
 	m_invGlobalInertia = m_globalInertia.inverse();
+}
+
+bool RigidRepresentation::doInitialize()
+{
+	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
+	SURGSIM_ASSERT(shapeVolume > SurgSim::Math::Geometry::ScalarEpsilon) <<
+		"Cannot use a shape with zero volume for RigidRepresentations";
+
+	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
+	SURGSIM_ASSERT(shapeVolume > SurgSim::Math::Geometry::ScalarEpsilon) <<
+		"Cannot use a shape with zero volume for RigidRepresentations";
+
+	return true;
 }
 
 }; /// Physics
