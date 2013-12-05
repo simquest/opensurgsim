@@ -23,7 +23,6 @@
 #include <SurgSim/Physics/FemElement.h>
 
 #include <SurgSim/Math/Vector.h>
-using SurgSim::Math::Vector;
 
 namespace SurgSim
 {
@@ -156,7 +155,7 @@ protected:
 	/// \note    the mass      component will be computed FemElement by FemElement
 	/// \note If useGlobalDampingMatrix is False and useGlobalStiffnessMatrix is False
 	/// \note    the stiffness component will be computed FemElement by FemElement
-	void addRayleighDampingForce(Vector* f, const DeformableRepresentationState& state,
+	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
 		bool useGlobalDampingMatrix = false,
 		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false,
 		double scale = 1.0);
