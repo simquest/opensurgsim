@@ -47,7 +47,7 @@ SET(LIBS
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 
-target_link_libraries(KeyboardDevice ${LIBS}
+target_link_libraries(MouseDevice ${LIBS}
 )
 
 if(SURGSIM_TESTS_BUILD)
