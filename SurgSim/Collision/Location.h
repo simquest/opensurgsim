@@ -16,7 +16,10 @@
 #ifndef SURGSIM_COLLISION_LOCATION_H
 #define SURGSIM_COLLISION_LOCATION_H
 
+#include <vector>
+
 #include <SurgSim/DataStructures/OptionalValue.h>
+#include <SurgSim/Math/OctreeShape.h>
 #include <SurgSim/Math/Vector.h>
 
 namespace SurgSim
@@ -29,6 +32,7 @@ struct Location
 public:
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> globalPosition;
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::Vector3d> rigidLocalPosition;
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::OctreePath> octreeNodePath;
 };
 
 }; // namespace Collision

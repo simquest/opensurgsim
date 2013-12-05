@@ -81,6 +81,17 @@ void OctreeShape<NodeData>::setRootNode(std::shared_ptr<SurgSim::DataStructures:
 }
 
 template<class NodeData>
+std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> OctreeShape<NodeData>::getNode(const OctreePath& path)
+{
+	std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> node = m_rootNode;
+	for (auto index = path.cbegin(); index != path.cend(); ++index)
+	{
+		node = node->getChild(*index);
+	}
+	return node;
+}
+
+template<class NodeData>
 std::string OctreeShape<NodeData>::getClassName()
 {
 	return std::string("SurgSim::Math::OctreeShape");

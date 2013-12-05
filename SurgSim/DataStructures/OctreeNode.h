@@ -86,6 +86,16 @@ public:
 	/// \return vector of all eight children
 	const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren() const;
 
+	/// Get a child of this node (non const version)
+	/// \param index the child index
+	/// \return octree node
+	std::shared_ptr<OctreeNode<Data> > getChild(size_t index);
+
+	/// Get a child of this node
+	/// \param index the child index
+	/// \return octree node
+	const std::shared_ptr<OctreeNode<Data> > getChild(size_t index) const;
+
 	/// Extra node data
 	Data data;
 

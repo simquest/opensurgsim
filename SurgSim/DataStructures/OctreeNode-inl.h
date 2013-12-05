@@ -126,6 +126,17 @@ const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& OctreeNode<Data>::getCh
 	return m_children;
 }
 
+template<class Data>
+std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index)
+{
+	return m_children[index];
+}
+
+template<class Data>
+const std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index) const
+{
+	return m_children[index];
+}
 
 };  // namespace DataStructures
 

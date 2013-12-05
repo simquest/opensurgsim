@@ -16,6 +16,8 @@
 #ifndef SURGSIM_MATH_OCTREESHAPE_H
 #define SURGSIM_MATH_OCTREESHAPE_H
 
+#include <vector>
+
 #include <SurgSim/DataStructures/OctreeNode.h>
 #include <SurgSim/Math/Shape.h>
 
@@ -24,6 +26,11 @@ namespace SurgSim
 
 namespace Math
 {
+
+/// Typedef of octree path
+/// The path is a vector of children indexes that lead to the specific node
+/// the front of the vector holds the index of the root's children.
+typedef std::vector<size_t> OctreePath;
 
 template<class NodeData>
 class OctreeShape : public Shape
@@ -65,6 +72,10 @@ public:
 	/// Set the root node
 	/// \param node the octree root node of this shape
 	virtual void setRootNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> node);
+
+	/// Get the node at the supplied path
+	/// \param path the path to the specific node
+	virtual std::shared_ptr<SurgSim::DataStructures::OctreeNode<NodeData>> getNode(const OctreePath& path);
 
 	/// Get the name of the class
 	/// \return the class name

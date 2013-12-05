@@ -47,6 +47,8 @@ set(SURGSIM_COLLISION_HEADERS
 	DcdCollision.h
 	DefaultContactCalculation.h
 	Location.h
+	OctreeDcdContact.h
+	OctreeDcdContact-inl.h
 	RigidCollisionRepresentation.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
