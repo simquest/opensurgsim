@@ -16,14 +16,14 @@
 /// \file
 /// Render Tests for the OsgBoxRepresentation class.
 
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

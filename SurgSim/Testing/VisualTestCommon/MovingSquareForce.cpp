@@ -15,14 +15,14 @@
 
 #include "SurgSim/Testing/VisualTestCommon/MovingSquareForce.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;

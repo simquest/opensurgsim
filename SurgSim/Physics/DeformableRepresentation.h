@@ -21,10 +21,10 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Math/OdeEquation.h>
-#include <SurgSim/Math/OdeSolver.h>
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/OdeSolver.h"
 
 using SurgSim::Math::OdeEquation;
 using SurgSim::Math::OdeSolver;
@@ -187,6 +187,6 @@ public:
 
 }; // namespace SurgSim
 
-#include <SurgSim/Physics/DeformableRepresentation-inl.h>
+#include "SurgSim/Physics/DeformableRepresentation-inl.h"
 
 #endif // SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_H

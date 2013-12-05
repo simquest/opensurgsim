@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGGROUP_H
 #define SURGSIM_GRAPHICS_OSGGROUP_H
 
-#include <SurgSim/Graphics/Group.h>
+#include "SurgSim/Graphics/Group.h"
 
 #include <osg/Group>
 #include <osg/Switch>

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgLog.h>
+#include "SurgSim/Graphics/OsgLog.h"
 
 using SurgSim::Graphics::OsgLog;
 

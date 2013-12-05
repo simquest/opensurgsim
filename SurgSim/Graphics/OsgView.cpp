@@ -15,7 +15,7 @@
 
 #include "SurgSim/Graphics/OsgView.h"
 
-#include <SurgSim/Graphics/OsgCamera.h>
+#include "SurgSim/Graphics/OsgCamera.h"
 #include <osgViewer/ViewerEventHandlers>
 
 using SurgSim::Graphics::OsgCamera;

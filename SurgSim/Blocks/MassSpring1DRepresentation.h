@@ -19,7 +19,7 @@
 #include <array>
 #include <vector>
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 
 namespace SurgSim
 {

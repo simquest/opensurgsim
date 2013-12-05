@@ -16,8 +16,8 @@
 /// \file
 /// Tests for the OsgTexture class.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Graphics/OsgTexture.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Graphics/OsgTexture.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

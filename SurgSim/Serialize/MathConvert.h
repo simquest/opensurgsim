@@ -16,12 +16,12 @@
 #ifndef SURGSIM_SERIALIZE_MATHCONVERT_H
 #define SURGSIM_SERIALIZE_MATHCONVERT_H
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace YAML
 {

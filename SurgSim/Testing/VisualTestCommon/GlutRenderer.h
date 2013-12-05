@@ -20,8 +20,8 @@
 #include <memory>
 #include <GL/glut.h>
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 /// Abstract definition of an object that can render itself with Glut.
 struct GlutRenderObject

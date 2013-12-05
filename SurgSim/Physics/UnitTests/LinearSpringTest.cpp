@@ -17,10 +17,10 @@
 
 #include <string>
 
-#include <SurgSim/Physics/LinearSpring.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::DeformableRepresentationState;

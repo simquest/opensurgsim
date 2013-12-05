@@ -14,9 +14,9 @@
 // limitations under the License.
 
 #include <numeric>
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/Representation.h>
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {

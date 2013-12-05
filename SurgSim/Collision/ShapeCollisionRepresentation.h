@@ -16,8 +16,8 @@
 #ifndef SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 #define SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 
-#include <SurgSim/Collision/Representation.h>
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Math/Shape.h"
 
 
 namespace SurgSim

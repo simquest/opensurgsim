@@ -15,7 +15,7 @@
 
 #include "SurgSim/Devices/MultiAxis/CreateInputDeviceHandle.h"
 
-#include <SurgSim/Devices/MultiAxis/win32/WdkHidDeviceHandle.h>
+#include "SurgSim/Devices/MultiAxis/win32/WdkHidDeviceHandle.h"
 
 
 namespace SurgSim

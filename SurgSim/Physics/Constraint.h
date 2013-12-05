@@ -16,9 +16,9 @@
 #ifndef SURGSIM_PHYSICS_CONSTRAINT_H
 #define SURGSIM_PHYSICS_CONSTRAINT_H
 
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ConstraintImplementation.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
 #include <memory>
 

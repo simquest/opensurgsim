@@ -15,11 +15,11 @@
 
 #include <memory>
 
-#include <SurgSim/Input/DeviceInterface.h>
-#include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
-#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
+#include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 
-#include <SurgSim/Testing/VisualTestCommon/ToolSquareTest.h>
+#include "SurgSim/Testing/VisualTestCommon/ToolSquareTest.h"
 
 using SurgSim::Input::DeviceInterface;
 using SurgSim::Device::MultiAxisDevice;

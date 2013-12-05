@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -97,6 +97,6 @@ protected:
 
 }; // namespace SurgSim
 
-#include <SurgSim/Math/OdeEquation-inl.h>
+#include "SurgSim/Math/OdeEquation-inl.h"
 
 #endif // SURGSIM_MATH_ODEEQUATION_H

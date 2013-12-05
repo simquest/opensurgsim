@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/Representation.h>
+#include "SurgSim/Framework/Representation.h"
 
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {

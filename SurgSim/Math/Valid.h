@@ -231,7 +231,7 @@ inline bool setSubnormalToZero(Eigen::Transform<T, D, M, O>* value);
 };  // namespace SurgSim
 
 
-#include <SurgSim/Math/Valid-inl.h>
+#include "SurgSim/Math/Valid-inl.h"
 
 
 #endif  // SURGSIM_MATH_VALID_H

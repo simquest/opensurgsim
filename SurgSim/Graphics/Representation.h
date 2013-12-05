@@ -16,10 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_REPRESENTATION_H
 #define SURGSIM_GRAPHICS_REPRESENTATION_H
 
-#include <SurgSim/Framework/Representation.h>
+#include "SurgSim/Framework/Representation.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {

@@ -22,7 +22,7 @@
 #include "SurgSim/Devices/MultiAxis/GetSystemError.h"
 #include "SurgSim/Devices/MultiAxis/BitSetBuffer.h"
 #include "SurgSim/Devices/MultiAxis/linux/FileDescriptor.h"
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
 using SurgSim::Device::Internal::getSystemErrorCode;
 using SurgSim::Device::Internal::getSystemErrorText;

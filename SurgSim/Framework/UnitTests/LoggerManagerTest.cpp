@@ -17,7 +17,7 @@
 /// Tests for LoggerManager class.
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
 #include <string>
 

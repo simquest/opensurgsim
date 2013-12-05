@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgCamera.h>
+#include "SurgSim/Graphics/OsgCamera.h"
 
-#include <SurgSim/Graphics/Material.h>
-#include <SurgSim/Graphics/Manager.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgMatrixConversions.h>
-#include <SurgSim/Graphics/OsgQuaternionConversions.h>
-#include <SurgSim/Graphics/OsgVectorConversions.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
+#include "SurgSim/Graphics/Material.h"
+#include "SurgSim/Graphics/Manager.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgMatrixConversions.h"
+#include "SurgSim/Graphics/OsgQuaternionConversions.h"
+#include "SurgSim/Graphics/OsgVectorConversions.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
 
 
 using SurgSim::Math::makeRigidTransform;

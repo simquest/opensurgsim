@@ -19,7 +19,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 
-#include <SurgSim/Blocks/MassSpringNDRepresentationUtils.h>
+#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
 
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::LinearSpring;

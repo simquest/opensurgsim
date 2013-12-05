@@ -16,9 +16,9 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Physics/PreUpdate.h>
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Physics/PreUpdate.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 namespace SurgSim
 {

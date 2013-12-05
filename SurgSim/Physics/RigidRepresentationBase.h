@@ -16,15 +16,15 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/Representation.h"
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Collision/Location.h>
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Collision::Location;
 
@@ -130,6 +130,6 @@ private:
 
 }; // SurgSim
 
-#include <SurgSim/Physics/RigidRepresentationBase-inl.h>
+#include "SurgSim/Physics/RigidRepresentationBase-inl.h"
 
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H

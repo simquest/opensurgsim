@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGMATERIAL_H
 #define SURGSIM_GRAPHICS_OSGMATERIAL_H
 
-#include <SurgSim/Graphics/Material.h>
+#include "SurgSim/Graphics/Material.h"
 
 #include <osg/Material>
 #include <osg/StateSet>

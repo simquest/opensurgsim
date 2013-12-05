@@ -16,9 +16,9 @@
 #ifndef SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
 #define SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 namespace YAML
 {

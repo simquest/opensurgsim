@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 #define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 
-#include <SurgSim/Math/MlcpProblem.h>
+#include "SurgSim/Math/MlcpProblem.h"
 
 namespace SurgSim
 {

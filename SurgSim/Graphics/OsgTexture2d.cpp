@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgTexture2d.h>
+#include "SurgSim/Graphics/OsgTexture2d.h"
 
 using SurgSim::Graphics::OsgTexture2d;
 
