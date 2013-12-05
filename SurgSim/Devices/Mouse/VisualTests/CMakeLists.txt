@@ -13,23 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(
+	${OSG_INCLUDE_DIR}
+)
 
-add_subdirectory(IdentityPoseDevice)
+set(UNIT_TEST_SOURCES
+	MouseVisualTests.cpp
+)
 
-if(SURGSIM_DEVICES_BUILD)
-	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-		add_subdirectory(MultiAxis)
-	endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-	if(NOVINT_HDAL_SDK_FOUND)
-		add_subdirectory(Novint)
-	endif(NOVINT_HDAL_SDK_FOUND)
-	if(OPENHAPTICS_FOUND)
-		add_subdirectory(Phantom)
-	endif(OPENHAPTICS_FOUND)
-	if(SIXENSE_SDK_FOUND)
-		add_subdirectory(Sixense)
-	endif(SIXENSE_SDK_FOUND)
-	if(OPENSCENEGRAPH_FOUND)
-		add_subdirectory(Mouse)
-	endif(OPENSCENEGRAPH_FOUND)
-endif(SURGSIM_DEVICES_BUILD)
+set(UNIT_TEST_HEADERS
+)
+
+add_executable(MouseVisualTest
+	${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
+
+set(LIBS MouseDevice
+		 SurgSimDataStructures 
+		 SurgSimInput 
+		 SurgSimTesting 
+		 ${OPENSCENEGRAPH_LIBRARIES}
+	)
+
+target_link_libraries(MouseVisualTest ${LIBS})
+
+# Put MouseVisualTest into folder "Devices"
+set_target_properties(MouseVisualTest PROPERTIES FOLDER "Devices")
