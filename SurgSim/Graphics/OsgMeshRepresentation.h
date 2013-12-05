@@ -32,8 +32,8 @@
 
 namespace osg
 {
-	class Geometry;
-	class DrawElementsUInt;
+class Geometry;
+class DrawElementsUInt;
 }
 
 namespace SurgSim
@@ -53,26 +53,30 @@ public:
 	/// \param	name	The name.
 	explicit OsgMeshRepresentation(const std::string& name);
 
+	/// Destructor
 	~OsgMeshRepresentation();
 
-	std::shared_ptr<Mesh> getMesh();
+	/// Get the mesh that is used by this representation.
+	/// \return The mesh structure;
+	virtual std::shared_ptr<Mesh> getMesh() override;
 
 	/// Sets the mesh to render as a wire frame.
-	/// \param	val	true to value.
-	void setDrawAsWireFrame(bool val);
+	/// \param	val	true if this mesh should be rendered as a wire-frame.
+	virtual void setDrawAsWireFrame(bool val) override;
 
 	/// Updates the mesh with the new vertex positions.
-	/// \param	dt	The dt.
-	virtual void update(double dt);
+	/// \param	dt	The time step.
+	virtual void update(double dt) override;
 
-	/// Sets the Structures that are expected to change during the lifetime of the mesh, these will be updated
-	/// every frame, independent of a structural change in the mesh, by default the mesh will update its vertices.
+	/// Sets the structures that are expected to change during the lifetime of the mesh, these will be updated
+	/// every frame, independent of a structural change in the mesh. UPDATE_OPTION_VERTICES is set in the constructor
+	/// as a default value.
 	/// \param	val	Boolean or expression of UpdateOption enum.
 	virtual void setUpdateOptions(int val) override;
 
 	/// Gets update options for this mesh.
 	/// \return	The update options.
-	virtual int getUpdateOptions() override;
+	virtual int getUpdateOptions() const override;
 
 	osg::ref_ptr<osg::Geometry> getOsgGeometry();
 private:
@@ -97,7 +101,7 @@ private:
 
 	/// Copies the attributes for each mesh vertex in the appropriate osg structure, this will only be done
 	/// for the data as is indicated by updateOptions
-	/// \param updateOptions Set of flags indicating wether a specific vertex attribute should be updated
+	/// \param updateOptions Set of flags indicating whether a specific vertex attribute should be updated
 	void updateVertices(int updateOptions);
 
 	/// Updates the normals.
@@ -106,7 +110,7 @@ private:
 	/// Updates the triangles.
 	void updateTriangles();
 
-	/// Indicates which elements of the mesh should be update on every frame
+	/// Indicates which elements of the mesh should be updated on every frame
 	int m_updateOptions;
 
 	/// Gets data variance for a given update option.

@@ -39,11 +39,11 @@ namespace Testing
 namespace Cube
 {
 
-	/// Fill our standard structures with the correct data types from the cube data
-	void makeCube(std::vector<Vector3d>* vertices,
-		std::vector<Vector4d>* colors,
-		std::vector<Vector2d>* textures,
-		std::vector<unsigned int>* triangles);
+/// Fill our standard structures with the correct data types from the cube data
+void makeCube(std::vector<Vector3d>* vertices,
+	std::vector<Vector4d>* colors,
+	std::vector<Vector2d>* textures,
+	std::vector<unsigned int>* triangles);
 
 
 }; // Cube

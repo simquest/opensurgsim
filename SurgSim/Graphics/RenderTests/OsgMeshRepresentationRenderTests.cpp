@@ -65,7 +65,7 @@ namespace SurgSim
 namespace Graphics
 {
 
-struct OsgMeshrepresentationRenderTests : public RenderTest
+struct OsgMeshRepresentationRenderTests : public RenderTest
 {
 
 protected:
@@ -80,12 +80,12 @@ protected:
 	std::shared_ptr<MeshRepresentation> makeRepresentation(const std::string& name)
 	{
 		auto meshRepresentation = std::make_shared<OsgMeshRepresentation>(name);
-		meshRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,0.0)));
+		meshRepresentation->setInitialPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0)));
 		return meshRepresentation;
 	}
 };
 
-TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
+TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 {
 	std::shared_ptr<SurgSim::Blocks::BasicSceneElement> element =
 		std::make_shared<SurgSim::Blocks::BasicSceneElement>("Scene");
@@ -125,24 +125,22 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 		std::pair<double,double> scale;
 	};
 
-
 	std::vector<InterpolationData> interpolators;
 	InterpolationData interpolator;
 
-
 	interpolator.transform.first =
-		makeRigidTransform(makeRotationQuaternion(0.0,Vector3d(1.0,1.0,1.0)), Vector3d(-0.1, 0.0, -0.2));
+		makeRigidTransform(makeRotationQuaternion(0.0,Vector3d(1.0, 1.0, 1.0)), Vector3d(-0.1, 0.0, -0.2));
 	interpolator.scale.first = 0.001;
 	interpolator.transform.second =
-		makeRigidTransform(makeRotationQuaternion(M_PI_2,Vector3d(1.0,-1.0,1.0)), Vector3d(0.1, 0.0, -0.2));
+		makeRigidTransform(makeRotationQuaternion(M_PI_2,Vector3d(1.0, -1.0, 1.0)), Vector3d(0.1, 0.0, -0.2));
 	interpolator.scale.second = 0.03;
 	interpolators.push_back(interpolator);
 
 	interpolator.transform.first =
-		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0,-1.0,0.0)), Vector3d(0.0, -0.1, -0.2));
+		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0, -1.0, 0.0)), Vector3d(0.0, -0.1, -0.2));
 	interpolator.scale.first = 0.001;
 	interpolator.transform.second =
-		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0,1.0,0.0)), Vector3d(0.0, 0.1, -0.2));
+		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0, 1.0 ,0.0)), Vector3d(0.0, 0.1, -0.2));
 	interpolator.scale.second = 0.03;
 	interpolators.push_back(interpolator);
 
@@ -183,12 +181,12 @@ TEST_F(OsgMeshrepresentationRenderTests, StaticRotateDynamicScale)
 			for (size_t v = 0; v < cubeColors.size(); ++v)
 			{
 				//meshes[0]->getVertex(v).data.color.setValue(cubeColors[(v+numSteps)%cubeColors.size()]);
-				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0,0.0,0.5,1.0));
+				meshes[0]->getVertex(v).data.color.setValue(Vector4d(1.0, 0.0, 0.5, 1.0));
 			}
 		}
 
 		/// The total number of steps should complete in 1 second
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps)*4);
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / numSteps) * 4);
 	}
 }
 

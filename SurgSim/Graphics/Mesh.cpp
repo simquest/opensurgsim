@@ -53,7 +53,7 @@ void Mesh::initialize(
 
 	for (size_t i = 0; i < triangles.size(); i += 3)
 	{
-		TriangleType::IdType ids = {{triangles[i], triangles[i+1],triangles[i+2]}};
+		TriangleType::IdType ids = {{triangles[i], triangles[i+1], triangles[i+2]}};
 
 		bool valid = true;
 		for (auto it = std::begin(ids); it != std::end(ids); ++it)

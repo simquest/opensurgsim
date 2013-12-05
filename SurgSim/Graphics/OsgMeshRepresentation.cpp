@@ -80,12 +80,10 @@ OsgMeshRepresentation::OsgMeshRepresentation(const std::string& name) :
 	geode->addDrawable(m_geometry);
 
 	m_transform->addChild(geode);
-
 }
 
 OsgMeshRepresentation::~OsgMeshRepresentation()
 {
-
 }
 
 std::shared_ptr<Mesh> OsgMeshRepresentation::getMesh()
@@ -112,19 +110,19 @@ void OsgMeshRepresentation::setDrawAsWireFrame(bool val)
 
 void OsgMeshRepresentation::update(double dt)
 {
-	SURGSIM_ASSERT(m_mesh->isValid()) << "An invalid mesh was passed to OsgMeshRepresentation";
+	SURGSIM_ASSERT(m_mesh->isValid()) << "The mesh in the OsgMeshRepresentation " << getName() << " is invalid.";
 
-	int updateOptions =  updateOsgArrays();
+	int updateOptions = updateOsgArrays();
 	updateOptions |= m_updateOptions;
 
-	if ( (updateOptions & (UPDATE_OPTION_VERTICES | UPDATE_OPTION_TEXTURES | UPDATE_OPTION_COLORS)) != 0)
+	if ((updateOptions & (UPDATE_OPTION_VERTICES | UPDATE_OPTION_TEXTURES | UPDATE_OPTION_COLORS)) != 0)
 	{
 		updateVertices(updateOptions);
 		m_geometry->dirtyDisplayList();
 		m_geometry->dirtyBound();
 	}
 
-	if ( (updateOptions & UPDATE_OPTION_TRIANGLES) != 0)
+	if ((updateOptions & UPDATE_OPTION_TRIANGLES) != 0)
 	{
 		updateTriangles();
 		m_triangles->dirty();
@@ -133,8 +131,8 @@ void OsgMeshRepresentation::update(double dt)
 
 void OsgMeshRepresentation::updateVertices(int updateOptions)
 {
-	static osg::Vec4d defaultColor(0.8f, 0.2f, 0.2f, 1.0f);
-	static osg::Vec2d defaultTextureCoord(0.0f, 0.0f);
+	static osg::Vec4d defaultColor(0.8, 0.2, 0.2, 1.0);
+	static osg::Vec2d defaultTextureCoord(0.0, 0.0);
 
 	bool updateColors = (updateOptions & UPDATE_OPTION_COLORS) != 0;
 	bool updateTextures = (updateOptions & UPDATE_OPTION_TEXTURES) != 0;
@@ -241,13 +239,13 @@ int OsgMeshRepresentation::updateOsgArrays()
 
 void OsgMeshRepresentation::setUpdateOptions(int val)
 {
-	if (val <= UPDATE_OPTION_ALL && val >= 0)
+	if (val <= UPDATE_OPTION_ALL && val >= UPDATE_OPTION_NONE)
 	{
 		m_updateOptions = val;
 	}
 }
 
-int OsgMeshRepresentation::getUpdateOptions()
+int OsgMeshRepresentation::getUpdateOptions() const
 {
 	return m_updateOptions;
 }
