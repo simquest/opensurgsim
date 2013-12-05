@@ -21,9 +21,9 @@
 namespace SurgSim
 {
 
-namespace Device
+namespace Input 
 {
-class KeyboardDevice;
+class CommonDevice;
 }
 
 namespace Graphics
@@ -54,9 +54,9 @@ public:
 	/// \return A shared_ptr pointing to the View component
 	std::shared_ptr<View> getView() const;
 
-	/// Enables a keyboard device to be used.
-	/// \param val whether to enable the manipulator or not.
-	std::shared_ptr<SurgSim::Device::KeyboardDevice> getKeyboardDevice();
+	/// Return the keyboard to be used with this view.
+	/// \return A keyboard device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() = 0;
 
 protected:
 	/// Initializes the scene element

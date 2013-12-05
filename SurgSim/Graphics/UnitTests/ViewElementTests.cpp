@@ -18,6 +18,7 @@
 
 #include <SurgSim/Graphics/UnitTests/MockObjects.h>
 
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 #include <SurgSim/Framework/Runtime.h>
 #include <SurgSim/Framework/Scene.h>
 
@@ -62,6 +63,12 @@ public:
 	std::shared_ptr<MockView> getMockView() const
 	{
 		return std::static_pointer_cast<MockView>(getView());
+	}
+
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override
+	{
+		static auto device = std::make_shared<SurgSim::Device::KeyboardDevice>("TestKeyboardDevice");
+		return device;
 	}
 
 	/// Gets whether the view element has been initialized
@@ -230,7 +237,7 @@ TEST(ViewElementTests, GetDeviceTest)
 {
 	std::shared_ptr<ViewElement> element = std::make_shared<MockViewElement>("test name");
 
-	std::shared_ptr<SurgSim::Device::KeyboardDevice> keyboard = element->getKeyboardDevice();
+	std::shared_ptr<SurgSim::Input::CommonDevice> keyboard = element->getKeyboardDevice();
 	EXPECT_TRUE(nullptr != keyboard);
 }
 

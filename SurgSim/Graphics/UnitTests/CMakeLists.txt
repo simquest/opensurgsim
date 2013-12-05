@@ -75,6 +75,8 @@ file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DEST
 
 set(LIBS 
 	SurgSimGraphics 
+	SurgSimInput
+	KeyboardDevice
 	gtest
 )
 
