@@ -33,16 +33,17 @@ TriangleNormalGenerator::TriangleNormalGenerator() :
 }
 
 void TriangleNormalGenerator::set(
-	const osg::Vec3Array* vertexArray,
+	osg::Vec3Array* vertexArray,
 	osg::Vec3Array* normalArray)
 {
+
+	SURGSIM_ASSERT(vertexArray != nullptr) << "Need vertex array to generate normals!";
+	SURGSIM_ASSERT(normalArray != nullptr) << "Need normal array to store normals!";
+	SURGSIM_ASSERT(normalArray->size() == vertexArray->size()) << "Vertex and normal array need to have same size";
+
 	m_vertexArray = vertexArray;
 	m_normalArray = normalArray;
-
-
-	SURGSIM_ASSERT(m_vertexArray != nullptr) << "Need vertex array to generate normals!";
-	SURGSIM_ASSERT(m_normalArray != nullptr) << "Need normal array to store normals!";
-	SURGSIM_ASSERT(m_normalArray->size() == m_vertexArray->size()) << "Vertex and normal array need to have same size";
+	m_size = vertexArray->size();
 }
 
 void TriangleNormalGenerator::normalize()
@@ -70,6 +71,10 @@ void TriangleNormalGenerator::operator() (unsigned int vertexIndex1,
 	{
 		return;
 	}
+
+	SURGSIM_ASSERT(vertexIndex1 < m_size && vertexIndex2 < m_size && vertexIndex3 < m_size) <<
+		"Mismatch between geomtry information that is being traversed and the one that is being held" <<
+		" by the TriangleNormalGenerator.";
 
 	const osg::Vec3& v1 = (*m_vertexArray)[vertexIndex1];
 	const osg::Vec3& v2 = (*m_vertexArray)[vertexIndex2];

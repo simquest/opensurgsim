@@ -1,4 +1,4 @@
-// This file is a part of the OpenSurgSim project.
+ // This file is a part of the OpenSurgSim project.
 // Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ public:
 	/// Sets the arrays required to generate normals
 	/// \param vertexArray Array containing vertex positions
 	/// \param normalArray Array to store calculated normals
-	void set(const osg::Vec3Array* vertexArray,
+	void set(osg::Vec3Array* vertexArray,
 			 osg::Vec3Array* normalArray);
 
 	/// Normalizes the calculated normals, this needs to be called after the pass to normalize all the normals
@@ -54,10 +54,12 @@ public:
 
 private:
 	/// Array containing vertex positions
-	const osg::Vec3Array* m_vertexArray;
+	osg::ref_ptr<osg::Vec3Array> m_vertexArray;
 
 	/// Array storing calculated normals
-	osg::Vec3Array* m_normalArray;
+	osg::ref_ptr<osg::Vec3Array> m_normalArray;
+
+	size_t m_size;
 };
 
 
