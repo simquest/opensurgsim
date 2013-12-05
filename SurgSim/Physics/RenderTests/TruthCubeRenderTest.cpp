@@ -59,7 +59,7 @@ struct TruthCubeRenderTests : public RenderTests
 	/// Parsing Truth Cube data from an external file
 	/// \param truthCube a container of cube data for all strains
 	/// \return True if the Truth Cube Data is successful loaded, otherwise false
-	bool ParseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
+	bool parseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
 	{
 		// Position of uncompressed data, 5% strain, 12.5% strain, 18.25% strain
 		Vector3d position0, position1, position2, position3;
