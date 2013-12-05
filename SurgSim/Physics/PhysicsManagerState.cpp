@@ -53,12 +53,14 @@ const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepr
 	return m_representations;
 }
 
-void PhysicsManagerState::setCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
+void PhysicsManagerState::setCollisionRepresentations(
+		const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
 {
 	m_collisionRepresentations = val;
 }
 
-const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& PhysicsManagerState::getCollisionRepresentations()
+const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
+PhysicsManagerState::getCollisionRepresentations()
 {
 	return m_collisionRepresentations;
 }
