@@ -32,16 +32,5 @@ Representation::~Representation()
 
 }
 
-void Representation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
-{
-	SURGSIM_FAILURE() << "Cannot set an initial pose on a collision representation.";
-}
-
-const SurgSim::Math::RigidTransform3d& Representation::getInitialPose() const
-{
-	SURGSIM_FAILURE() << "No initial pose on a collision representation.";
-	return SurgSim::Math::RigidTransform3d::Identity();
-}
-
 }; // namespace Collision
 }; // namespace SurgSim
