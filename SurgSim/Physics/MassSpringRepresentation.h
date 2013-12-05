@@ -159,6 +159,12 @@ public:
 	virtual void computeFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector** f,
 		SurgSim::Math::DiagonalMatrix** M, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K) override;
 
+	typedef Eigen::Matrix<double, 3,3, Eigen::DontAlign | Eigen::RowMajor> Matrix33d;
+
+	/// Retrieve the rigid body 3x3 compliance matrix
+	/// \return the 3x3 compliance matrix
+	Matrix33d getComplianceMatrix() const;
+
 protected:
 	/// Add the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
