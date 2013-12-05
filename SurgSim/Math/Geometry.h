@@ -1518,9 +1518,7 @@ void intersectionsSegmentBox(
 /// \note The [out] params are not modified if there is no intersection.
 /// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved
 /// by (nomal*depth*0.5), the triangle will no longer be intersecting.
-//template <class T, int MOpt> inline
-#define T double
-#define MOpt Eigen::DontAlign
+template <class T, int MOpt> inline
 bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
@@ -1794,8 +1792,6 @@ bool calculateContactTriangleTriangle(
 
 	return false;
 }
-#undef T
-#undef MOpt
 
 }; // namespace Math
 }; // namespace SurgSim
