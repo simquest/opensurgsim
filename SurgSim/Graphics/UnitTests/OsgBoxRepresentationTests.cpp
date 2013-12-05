@@ -16,12 +16,12 @@
 /// \file
 /// Tests for the OsgBoxRepresentation class.
 
-#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

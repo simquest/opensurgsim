@@ -18,10 +18,10 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Blocks/UnitTests/SpringTestUtils.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Physics/LinearSpring.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

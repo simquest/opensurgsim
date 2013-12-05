@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/TriangleMeshPlaneDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 
 using SurgSim::DataStructures::TriangleMesh;
 

@@ -25,7 +25,7 @@
 #include <boost/thread.hpp>
 
 
-#include <SurgSim/Framework/BasicThread.h>
+#include "SurgSim/Framework/BasicThread.h"
 #include "MockObjects.h"  //NOLINT
 
 namespace SurgSim

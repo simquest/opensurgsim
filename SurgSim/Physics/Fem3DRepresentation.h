@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/FemRepresentation.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {

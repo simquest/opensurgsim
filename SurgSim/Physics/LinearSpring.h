@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_LINEARSPRING_H
 #define SURGSIM_PHYSICS_LINEARSPRING_H
 
-#include <SurgSim/Physics/Spring.h>
+#include "SurgSim/Physics/Spring.h"
 
 namespace SurgSim
 {

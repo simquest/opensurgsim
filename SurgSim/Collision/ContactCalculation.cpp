@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/ContactCalculation.h>
+#include "SurgSim/Collision/ContactCalculation.h"
 
 namespace SurgSim
 {

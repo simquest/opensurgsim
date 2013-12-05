@@ -16,9 +16,9 @@
 /// \file
 /// Unit Tests for the OsgVectorFieldRepresentation class.
 
-#include <SurgSim/Graphics/VectorFieldRepresentation.h>
-#include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Graphics/VectorFieldRepresentation.h"
+#include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

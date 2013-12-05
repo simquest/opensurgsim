@@ -16,8 +16,8 @@
 /// \file
 /// Tests for the OsgTextureCubeMap class.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Graphics/OsgTextureCubeMap.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Graphics/OsgTextureCubeMap.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

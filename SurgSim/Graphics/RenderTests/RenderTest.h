@@ -19,13 +19,13 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
 namespace SurgSim
 {

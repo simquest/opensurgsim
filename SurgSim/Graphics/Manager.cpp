@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/Manager.h>
+#include "SurgSim/Graphics/Manager.h"
 
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Graphics/Camera.h>
-#include <SurgSim/Graphics/Group.h>
-#include <SurgSim/Graphics/View.h>
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/Group.h"
+#include "SurgSim/Graphics/View.h"
 
 using SurgSim::Graphics::Representation;
 using SurgSim::Graphics::Group;

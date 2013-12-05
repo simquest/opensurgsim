@@ -17,7 +17,7 @@
 #define SURGSIM_SERIALIZE_CONVERT_H
 
 #include <yaml-cpp/yaml.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
 #define OSS_SERIALIZE(T)\
 	virtual YAML::Node encode() override;\

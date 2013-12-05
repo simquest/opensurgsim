@@ -21,8 +21,8 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Math/OdeEquation.h>
-#include <SurgSim/Math/UnitTests/MockObject.h>
+#include "SurgSim/Math/OdeEquation.h"
+#include "SurgSim/Math/UnitTests/MockObject.h"
 
 using SurgSim::Math::MassPoint;
 using SurgSim::Math::MassPointState;

@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 namespace SurgSim
 {

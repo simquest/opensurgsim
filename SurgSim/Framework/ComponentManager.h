@@ -22,10 +22,10 @@
 
 #include <boost/thread/mutex.hpp>
 
-#include <SurgSim/Framework/BasicThread.h>
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/BasicThread.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Component.h"
 
 namespace SurgSim
 {
@@ -177,6 +177,6 @@ private:
 }; // namespace Framework
 }; // namespace SurgSim
 
-#include <SurgSim/Framework/ComponentManager-inl.h>
+#include "SurgSim/Framework/ComponentManager-inl.h"
 
 #endif // SURGSIM_FRAMEWORK_COMPONENTMANAGER_H

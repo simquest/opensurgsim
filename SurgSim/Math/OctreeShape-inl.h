@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_OCTREESHAPE_INL_H
 #define SURGSIM_MATH_OCTREESHAPE_INL_H
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

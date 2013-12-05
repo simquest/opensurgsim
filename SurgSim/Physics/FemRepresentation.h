@@ -18,11 +18,11 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/DeformableRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Physics/FemElement.h>
+#include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Physics/FemElement.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 using SurgSim::Math::Vector;
 
 namespace SurgSim
@@ -220,6 +220,6 @@ public:
 
 } // namespace SurgSim
 
-#include <SurgSim/Physics/FemRepresentation-inl.h>
+#include "SurgSim/Physics/FemRepresentation-inl.h"
 
 #endif // SURGSIM_PHYSICS_FEMREPRESENTATION_H

@@ -21,11 +21,11 @@
 #include <list>
 
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/DcdCollision.h>
-#include <SurgSim/Math/Shape.h>
-#include <SurgSim/Physics/Computation.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Math/Shape.h"
+#include "SurgSim/Physics/Computation.h"
+#include "SurgSim/Physics/Representation.h"
 
 using SurgSim::Collision::ContactCalculation;
 

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_GEOMETRY_H
 #define SURGSIM_MATH_GEOMETRY_H
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 

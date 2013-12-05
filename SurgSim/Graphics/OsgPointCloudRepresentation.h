@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGPOINTCLOUDREPRESENTATION_H
 
-#include <SurgSim/Graphics/PointCloudRepresentation.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/DataStructures/Vertices.h>
+#include "SurgSim/Graphics/PointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/DataStructures/Vertices.h"
 
 #include <osg/PrimitiveSet>
 #include <osg/Geometry>
@@ -101,6 +101,6 @@ private:
 }; // Graphics
 }; // SurgSim
 
-#include <SurgSim/Graphics/OsgPointCloudRepresentation-inl.h>
+#include "SurgSim/Graphics/OsgPointCloudRepresentation-inl.h"
 
 #endif

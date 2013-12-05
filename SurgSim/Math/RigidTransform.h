@@ -22,7 +22,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-#include <SurgSim/Math/Quaternion.h>
+#include "SurgSim/Math/Quaternion.h"
 
 namespace SurgSim
 {

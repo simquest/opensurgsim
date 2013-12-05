@@ -17,8 +17,8 @@
 #define SURGSIM_DATASTRUCTURES_NAMEDVARIANTDATA_H
 
 #include <boost/any.hpp>
-#include <SurgSim/DataStructures/NamedData.h>
-#include <SurgSim/DataStructures/NamedDataBuilder.h>
+#include "SurgSim/DataStructures/NamedData.h"
+#include "SurgSim/DataStructures/NamedDataBuilder.h"
 
 namespace SurgSim
 {
@@ -95,7 +95,7 @@ public:
 }; // namespace SurgSim
 
 
-#include <SurgSim/DataStructures/NamedVariantData-inl.h>
+#include "SurgSim/DataStructures/NamedVariantData-inl.h"
 
 
 #endif // SURGSIM_DATASTRUCTURES_NAMEDVARIANTDATA_H

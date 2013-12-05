@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/Representation.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {

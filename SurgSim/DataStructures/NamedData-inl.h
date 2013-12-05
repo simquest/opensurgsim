@@ -16,8 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_NAMEDDATA_INL_H
 #define SURGSIM_DATASTRUCTURES_NAMEDDATA_INL_H
 
-#include <SurgSim/DataStructures/NamedData.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/DataStructures/NamedData.h"
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

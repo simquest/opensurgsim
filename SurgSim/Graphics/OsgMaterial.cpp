@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgMaterial.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
 
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgUniformBase.h>
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgUniformBase.h"
 
 #include <algorithm>
 

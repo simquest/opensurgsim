@@ -16,12 +16,12 @@
 #ifndef SURGSIM_SERIALIZE_GRAPHICSCONVERT_H
 #define SURGSIM_SERIALIZE_GRAPHICSCONVERT_H
 
-#include <SurgSim/Serialize/Convert.h>
-#include <SurgSim/Serialize/FrameworkConvert.h>
-#include <SurgSim/Serialize/MathConvert.h>
+#include "SurgSim/Serialize/Convert.h"
+#include "SurgSim/Serialize/FrameworkConvert.h"
+#include "SurgSim/Serialize/MathConvert.h"
 
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Graphics/SphereRepresentation.h>
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/SphereRepresentation.h"
 
 namespace YAML
 {
