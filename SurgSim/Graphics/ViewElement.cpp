@@ -13,8 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/View.h>
-#include <SurgSim/Graphics/ViewElement.h>
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/ViewElement.h"
 
 using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;
@@ -46,4 +47,14 @@ bool ViewElement::doInitialize()
 bool ViewElement::doWakeUp()
 {
 	return true;
+}
+
+std::shared_ptr<SurgSim::Device::KeyboardDevice> SurgSim::Graphics::ViewElement::getKeyboardDevice()
+{
+	static auto keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
+	if (! keyboardDevice->isInitialized())
+	{
+		keyboardDevice->initialize();
+	}
+	return keyboardDevice;
 }

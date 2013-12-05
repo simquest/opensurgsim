@@ -16,10 +16,15 @@
 #ifndef SURGSIM_GRAPHICS_VIEWELEMENT_H
 #define SURGSIM_GRAPHICS_VIEWELEMENT_H
 
-#include <SurgSim/Framework/SceneElement.h>
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {
+
+namespace Device
+{
+class KeyboardDevice;
+}
 
 namespace Graphics
 {
@@ -48,6 +53,10 @@ public:
 	/// Returns the view component that provides the visualization of the graphics representations
 	/// \return A shared_ptr pointing to the View component
 	std::shared_ptr<View> getView() const;
+
+	/// Enables a keyboard device to be used.
+	/// \param val whether to enable the manipulator or not.
+	std::shared_ptr<SurgSim::Device::KeyboardDevice> getKeyboardDevice();
 
 protected:
 	/// Initializes the scene element

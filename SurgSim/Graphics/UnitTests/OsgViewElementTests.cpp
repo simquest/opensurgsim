@@ -56,5 +56,13 @@ TEST(OsgViewElementTests, ViewTest)
 	EXPECT_EQ(osgView, element->getView());
 }
 
-}  // namespace Graphics
-}  // namespace SurgSim
+TEST(OsgViewElementTests, enableKeyboardTest)
+{
+	std::shared_ptr<OsgViewElement> element = std::make_shared<OsgViewElement>("test name");
+
+	EXPECT_TRUE(element->enableKeyboardDevice(true));
+	EXPECT_TRUE(element->enableKeyboardDevice(false));
+}
+
+};  // namespace Graphics
+};  // namespace SurgSim

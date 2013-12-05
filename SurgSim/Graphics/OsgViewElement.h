@@ -16,13 +16,19 @@
 #ifndef SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 #define SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 
-#include <SurgSim/Graphics/ViewElement.h>
-#include <osg/ref_ptr>
+#include "SurgSim/Graphics/ViewElement.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
+
+#include <osg/ref_ptr>
 
 namespace SurgSim
 {
+
+namespace Device
+{
+class KeyboardDevice;
+}
 
 namespace Graphics
 {
@@ -62,10 +68,17 @@ public:
 	/// \param	lookat  	The location the camera looks at.
 	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
 
+	/// Turn on/off a keyboard device to be used.
+	/// \param val Indicate whether or not to use keyboard device
+	bool enableKeyboardDevice(bool val);
+
 private:
 	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
 	SurgSim::Math::Vector3d m_manipulatorPosition;
 	SurgSim::Math::Vector3d m_manipulatorLookat;
+
+	/// Indicate if a keyboard device is enabled
+	bool m_keyboardEnabled;
 };
 
 };  // namespace Graphics

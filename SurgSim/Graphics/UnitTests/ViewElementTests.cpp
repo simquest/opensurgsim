@@ -226,6 +226,14 @@ TEST(ViewElementTests, ViewTest)
 	EXPECT_EQ(mockView, element->getView());
 }
 
+TEST(ViewElementTests, GetDeviceTest)
+{
+	std::shared_ptr<ViewElement> element = std::make_shared<MockViewElement>("test name");
+
+	std::shared_ptr<SurgSim::Device::KeyboardDevice> keyboard = element->getKeyboardDevice();
+	EXPECT_TRUE(nullptr != keyboard);
+}
+
 };  // namespace Graphics
 
 };  // namespace SurgSim

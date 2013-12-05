@@ -13,11 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgConversions.h>
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
 
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgTrackballZoomManipulator.h>
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgConversions.h"
+
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
+
+#include <osgGA/GUIEventAdapter>
 
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
@@ -25,7 +30,8 @@ using SurgSim::Graphics::OsgViewElement;
 OsgViewElement::OsgViewElement(const std::string& name) :
 	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View")),
 	m_manipulatorPosition(SurgSim::Math::Vector3d(3.0,3.0,3.0)),
-	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0,0.0,0.0))
+	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0,0.0,0.0)),
+	m_keyboardEnabled(false)
 {
 }
 
@@ -38,7 +44,8 @@ bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
 	if (osgView && ViewElement::setView(view))
 	{
-		return true;
+		// After change 'view', need to enable keyboard device in the new 'view' if keyboard is enabled.
+		return enableKeyboardDevice(m_keyboardEnabled);
 	}
 	else
 	{
@@ -65,11 +72,36 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 		{
 			view->getOsgView()->setCameraManipulator(m_manipulator);
 
-			}
+		}
 		else
 		{
 			view->getOsgView()->setCameraManipulator(nullptr);
 		}
+	}
+}
+
+bool SurgSim::Graphics::OsgViewElement::enableKeyboardDevice(bool val)
+{
+	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
+	if (nullptr != view)
+	{
+		std::shared_ptr<SurgSim::Device::KeyboardDevice> keyboardDevice = getKeyboardDevice();
+		osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle = keyboardDevice->getKeyboardHandler();
+		if (val && ! m_keyboardEnabled)
+		{
+			view->getOsgView()->addEventHandler(keyboardHandle);
+			m_keyboardEnabled = true;
+		}
+		else if (! val && m_keyboardEnabled)
+		{
+			view->getOsgView()->removeEventHandler(keyboardHandle);
+			m_keyboardEnabled = false;
+		}
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
