@@ -22,8 +22,6 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
 
-#include <osgGA/GUIEventAdapter>
-
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
 

@@ -24,12 +24,6 @@
 
 namespace SurgSim
 {
-
-namespace Device
-{
-class KeyboardDevice;
-}
-
 namespace Graphics
 {
 
