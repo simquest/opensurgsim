@@ -227,6 +227,16 @@ TEST_F(ShapeTest, Octree)
 	}
 
 	{
+		OctreePath path;
+		EXPECT_NO_THROW(octree.getNode(path));
+		EXPECT_EQ(node, octree.getNode(path));
+
+		path.push_back(3);
+		path.push_back(1);
+		EXPECT_THROW(octree.getNode(path), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
 		OctreeShape<OctreeData> octree;
 		EXPECT_EQ(nullptr, octree.getRootNode());
 		octree.setRootNode(node);

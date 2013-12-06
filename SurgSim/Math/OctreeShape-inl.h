@@ -87,6 +87,7 @@ std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> OctreeShape<Data>::ge
 	for (auto index = path.cbegin(); index != path.cend(); ++index)
 	{
 		node = node->getChild(*index);
+		SURGSIM_ASSERT(node != nullptr) << "Octree path is invalid. Path is longer than octree is deep";
 	}
 	return node;
 }
