@@ -16,9 +16,11 @@
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 #include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
 
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/MouseHandler.h"
+
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgConversions.h"
-
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
 
@@ -41,13 +43,13 @@ OsgViewElement::~OsgViewElement()
 bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 {
 	// Disable KeyboardDevice of current view
-	bool result = enableKeyboardDevice(false);
+	bool result = enableKeyboardDevice(false) && enableMouseDevice(false);
 
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
 	if (osgView && ViewElement::setView(view) && result)
 	{
 		// After change 'view', need to enable keyboard device in the new 'view' if keyboard is enabled.
-		result = enableKeyboardDevice(m_keyboardEnabled);
+		result = enableKeyboardDevice(m_keyboardEnabled) && enableMouseDevice(m_mouseEnabled);
 	}
 	else
 	{
@@ -118,6 +120,42 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement:
 		keyboardDevice->initialize();
 	}
 	return keyboardDevice;
+}
+
+bool SurgSim::Graphics::OsgViewElement::enableMouseDevice(bool val)
+{
+	bool result = false;
+	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
+	if (nullptr != view)
+	{
+		std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
+		osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
+			std::dynamic_pointer_cast<SurgSim::Device::MouseDevice>(mouseDevice)->getMouseHandler();
+		if (val && ! m_mouseEnabled)
+		{
+			view->getOsgView()->addEventHandler(mouseHandler);
+			m_mouseEnabled = true;
+		}
+		else if (! val && m_mouseEnabled)
+		{
+			view->getOsgView()->removeEventHandler(mouseHandler);
+			m_mouseEnabled = false;
+		}
+		result = true;
+	}
+
+	return result;
+}
+
+
+std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement::getMouseDevice()
+{
+	static auto mouseDevice = std::make_shared<SurgSim::Device::MouseDevice>("Mouse");
+	if (! mouseDevice->isInitialized())
+	{
+		mouseDevice->initialize();
+	}
+	return mouseDevice;
 }
 
 

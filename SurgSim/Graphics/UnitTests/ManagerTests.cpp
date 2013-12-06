@@ -16,7 +16,8 @@
 /// \file
 /// Tests for the Graphics Manager class.
 
-#include "SurgSim/Devices/Keyboard/KeyBoardDevice.h"
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Component.h"
@@ -29,6 +30,7 @@
 #include <random>
 
 using SurgSim::Device::KeyboardDevice;
+using SurgSim::Device::MouseDevice;
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
@@ -72,6 +74,12 @@ public:
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override
 	{
 		static auto device = std::make_shared<KeyboardDevice>("TestKeyboardDevice");
+		return device;
+	}
+
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override
+	{
+		static auto device = std::make_shared<MouseDevice>("TestMouseDevice");
 		return device;
 	}
 

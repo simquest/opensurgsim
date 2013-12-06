@@ -146,6 +146,7 @@ SET(LIBS
 	SurgSimFramework
 	SurgSimInput
 	KeyboardDevice
+	MouseDevice
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 

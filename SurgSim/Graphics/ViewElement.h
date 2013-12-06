@@ -57,6 +57,9 @@ public:
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() = 0;
+	/// Return the keyboard to be used with this view.
+	/// \return A keyboard device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() = 0;
 
 protected:
 	/// Initializes the scene element

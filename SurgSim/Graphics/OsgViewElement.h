@@ -17,12 +17,15 @@
 #define SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 
 #include "SurgSim/Graphics/ViewElement.h"
-#include <osg/ref_ptr>
-
 #include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
+
+namespace Input
+{
+	class CommonDevice;
+}
 
 namespace Graphics
 {
@@ -65,10 +68,16 @@ public:
 	/// Return the keyboard to be used with this view.
 	/// \return A keyboard device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override;
-
-	/// Turn on/off a keyboard device to be used.
+	/// Turn on/off the keyboard device to be used.
 	/// \param val Indicate whether or not to use keyboard device
 	bool enableKeyboardDevice(bool val);
+
+	/// Return the mouse to be used with this view.
+	/// \return A mouse device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override;
+	/// Turn on/off the mouse device to be used.
+	/// \param val Indicate whether or not to use mouse device
+	bool enableMouseDevice(bool val);
 
 private:
 	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
@@ -77,6 +86,8 @@ private:
 
 	/// Indicate if a keyboard device is enabled
 	bool m_keyboardEnabled;
+	/// Indicate if a mouse device is enabled
+	bool m_mouseEnabled;
 };
 
 };  // namespace Graphics

@@ -19,6 +19,8 @@
 #include "SurgSim/Graphics/UnitTests/MockObjects.h"
 
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 
@@ -68,6 +70,12 @@ public:
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override
 	{
 		static auto device = std::make_shared<SurgSim::Device::KeyboardDevice>("TestKeyboardDevice");
+		return device;
+	}
+
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override
+	{
+		static auto device = std::make_shared<SurgSim::Device::MouseDevice>("TestMouseDevice");
 		return device;
 	}
 
