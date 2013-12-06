@@ -19,6 +19,7 @@
 #include <osg/NodeVisitor>
 #include <osg/Geode>
 #include <osg/Geometry>
+#include <osg/TriangleIndexFunctor>
 
 namespace SurgSim
 {
@@ -26,20 +27,21 @@ namespace Graphics
 {
 
 
-/// Triangle index functor which calculates normals for the vertices of a geometry
+/// Triangle index functor which calculates normals for the vertices of a geometry, use 
+/// createNormalGenerator to instantiate this
 class TriangleNormalGenerator
 {
 public:
-	/// Constructor
-	TriangleNormalGenerator();
 
 	/// Sets the arrays required to generate normals
+	/// \pre vertexArray and normalArray, need to have the same number of entries and not be nullptr
 	/// \param vertexArray Array containing vertex positions
 	/// \param normalArray Array to store calculated normals
 	void set(osg::Vec3Array* vertexArray,
 			 osg::Vec3Array* normalArray);
 
 	/// Normalizes the calculated normals, this needs to be called after the pass to normalize all the normals
+	/// Due to the osg way this object is called there is no real good way of having this called automatically
 	void normalize();
 
 	/// Resets all calculated normals to 0.
@@ -51,16 +53,23 @@ public:
 	/// \param vertexIndex3 Third triangle vertex index
 	void operator() (unsigned int vertexIndex1, unsigned int vertexIndex2, unsigned int vertexIndex3);
 
+protected:
+	/// Constructor
+	TriangleNormalGenerator();
 
 private:
+
 	/// Array containing vertex positions
 	osg::ref_ptr<osg::Vec3Array> m_vertexArray;
 
 	/// Array storing calculated normals
 	osg::ref_ptr<osg::Vec3Array> m_normalArray;
 
+	/// Size of vertex and normal array
 	size_t m_size;
 };
+
+osg::TriangleIndexFunctor<TriangleNormalGenerator> createNormalGenerator(osg::Vec3Array* vertexArray, osg::Vec3Array* normalArray);
 
 
 }; // Graphics

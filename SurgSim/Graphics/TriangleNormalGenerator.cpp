@@ -72,10 +72,6 @@ void TriangleNormalGenerator::operator() (unsigned int vertexIndex1,
 		return;
 	}
 
-	SURGSIM_ASSERT(vertexIndex1 < m_size && vertexIndex2 < m_size && vertexIndex3 < m_size) <<
-		"Mismatch between geomtry information that is being traversed and the one that is being held" <<
-		" by the TriangleNormalGenerator.";
-
 	const osg::Vec3& v1 = (*m_vertexArray)[vertexIndex1];
 	const osg::Vec3& v2 = (*m_vertexArray)[vertexIndex2];
 	const osg::Vec3& v3 = (*m_vertexArray)[vertexIndex3];
@@ -85,6 +81,13 @@ void TriangleNormalGenerator::operator() (unsigned int vertexIndex1,
 	(*m_normalArray)[vertexIndex1] += normal;
 	(*m_normalArray)[vertexIndex2] += normal;
 	(*m_normalArray)[vertexIndex3] += normal;
+}
+
+osg::TriangleIndexFunctor<TriangleNormalGenerator> createNormalGenerator(osg::Vec3Array* vertexArray, osg::Vec3Array* normalArray)
+{
+	osg::TriangleIndexFunctor<TriangleNormalGenerator> result;
+	result.set(vertexArray, normalArray);
+	return result;
 }
 
 }; // Graphics

@@ -167,8 +167,7 @@ void OsgMeshRepresentation::updateVertices(int updateOptions)
 void OsgMeshRepresentation::updateNormals()
 {
 	// Generate normals from geometry
-	osg::TriangleIndexFunctor<TriangleNormalGenerator> normalGenerator;
-	normalGenerator.set(m_vertices, m_normals);
+	auto normalGenerator = createNormalGenerator(m_vertices, m_normals);
 	m_geometry->accept(normalGenerator);
 	normalGenerator.normalize();
 }
