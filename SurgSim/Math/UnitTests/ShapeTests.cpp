@@ -227,7 +227,8 @@ TEST_F(ShapeTest, Octree)
 	}
 
 	{
-		OctreePath path;
+		OctreeShape<OctreeData> octree(node);
+		SurgSim::Math::OctreePath path;
 		EXPECT_NO_THROW(octree.getNode(path));
 		EXPECT_EQ(node, octree.getNode(path));
 
