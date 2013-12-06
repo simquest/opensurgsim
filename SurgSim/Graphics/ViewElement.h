@@ -21,7 +21,7 @@
 namespace SurgSim
 {
 
-namespace Input 
+namespace Input
 {
 class CommonDevice;
 }

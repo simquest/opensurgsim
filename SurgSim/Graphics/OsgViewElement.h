@@ -62,10 +62,21 @@ public:
 	/// \param	lookat  	The location the camera looks at.
 	void setManipulatorParameters(SurgSim::Math::Vector3d position, SurgSim::Math::Vector3d lookat);
 
+	/// Return the keyboard to be used with this view.
+	/// \return A keyboard device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override;
+
+	/// Turn on/off a keyboard device to be used.
+	/// \param val Indicate whether or not to use keyboard device
+	bool enableKeyboardDevice(bool val);
+
 private:
 	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
 	SurgSim::Math::Vector3d m_manipulatorPosition;
 	SurgSim::Math::Vector3d m_manipulatorLookat;
+
+	/// Indicate if a keyboard device is enabled
+	bool m_keyboardEnabled;
 };
 
 };  // namespace Graphics
