@@ -22,7 +22,7 @@
 #include <boost/chrono.hpp>
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/SharedInstance.h>
+#include "SurgSim/Framework/SharedInstance.h"
 
 using SurgSim::Framework::SharedInstance;
 

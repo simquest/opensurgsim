@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -53,6 +53,16 @@ void ShapeCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d
 }
 
 const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getPose() const
+{
+	return m_pose;
+}
+
+void ShapeCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_pose = pose;
+}
+
+const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getInitialPose() const
 {
 	return m_pose;
 }

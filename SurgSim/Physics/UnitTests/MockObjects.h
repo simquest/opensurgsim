@@ -16,13 +16,13 @@
 #ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/FemElement.h>
-#include <SurgSim/Physics/FemRepresentation.h>
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemRepresentation.h"
 
-#include <SurgSim/Math/OdeSolver.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/Matrix.h"
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeSolver;
 

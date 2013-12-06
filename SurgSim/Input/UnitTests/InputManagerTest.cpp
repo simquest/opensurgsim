@@ -23,16 +23,16 @@
 #include <string>
 #include <gtest/gtest.h>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Input/CommonDevice.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/Input/InputManager.h>
-#include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/Input/OutputComponent.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Input/CommonDevice.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Input/InputManager.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Matrix.h"
 
 #include "SurgSim/Input/UnitTests/TestDevice.h"
 

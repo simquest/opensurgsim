@@ -19,10 +19,10 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
-#include <SurgSim/Framework/ComponentManager.h>
-#include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/Input/OutputComponent.h>
-#include <SurgSim/Input/DeviceInterface.h>
+#include "SurgSim/Framework/ComponentManager.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
+#include "SurgSim/Input/DeviceInterface.h"
 
 #include <boost/thread/mutex.hpp>
 

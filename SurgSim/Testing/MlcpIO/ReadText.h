@@ -17,7 +17,7 @@
 #define SURGSIM_TESTING_MLCPIO_READTEXT_H
 
 #include <string>
-#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
+#include "SurgSim/Testing/MlcpIO/MlcpTestData.h"
 
 bool readMlcpTestDataAsText(const std::string& fileName, MlcpTestData* testData);
 

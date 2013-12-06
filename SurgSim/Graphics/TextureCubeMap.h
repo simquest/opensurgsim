@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_TEXTURECUBEMAP_H
 #define SURGSIM_GRAPHICS_TEXTURECUBEMAP_H
 
-#include <SurgSim/Graphics/Texture.h>
+#include "SurgSim/Graphics/Texture.h"
 
 namespace SurgSim
 {

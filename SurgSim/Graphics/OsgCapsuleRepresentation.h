@@ -16,10 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_OSGCAPSULEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGCAPSULEREPRESENTATION_H
 
-#include <SurgSim/Graphics/CapsuleRepresentation.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
+#include "SurgSim/Graphics/CapsuleRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
 
-#include <SurgSim/Framework/SharedInstance.h>
+#include "SurgSim/Framework/SharedInstance.h"
 
 #include <osg/PositionAttitudeTransform>
 

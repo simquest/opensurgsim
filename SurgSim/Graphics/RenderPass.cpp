@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/RenderPass.h>
+#include "SurgSim/Graphics/RenderPass.h"
 
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/View.h>
-#include <SurgSim/Graphics/Texture.h>
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/Texture.h"
 
 namespace SurgSim
 {

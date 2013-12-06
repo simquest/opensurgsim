@@ -22,11 +22,11 @@
 #ifndef SURGSIM_GRAPHICS_OSGRIGIDTRANSFORMCONVERSIONS_H
 #define SURGSIM_GRAPHICS_OSGRIGIDTRANSFORMCONVERSIONS_H
 
-#include <SurgSim/Graphics/OsgQuaternionConversions.h>
-#include <SurgSim/Graphics/OsgVectorConversions.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Graphics/OsgQuaternionConversions.h"
+#include "SurgSim/Graphics/OsgVectorConversions.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <osg/Quat>
 #include <osg/Vec2>

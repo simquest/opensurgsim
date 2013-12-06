@@ -13,17 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
 
 #include <algorithm>
 
 #include <boost/thread/locks.hpp>
 
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/OsgUnitBox.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgUnitBox.h"
 
 #include <osg/Geode>
 #include <osg/Switch>

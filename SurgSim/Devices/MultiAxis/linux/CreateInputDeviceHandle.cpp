@@ -15,7 +15,7 @@
 
 #include "SurgSim/Devices/MultiAxis/CreateInputDeviceHandle.h"
 
-#include <SurgSim/Devices/MultiAxis/linux/InputDeviceHandle.h>
+#include "SurgSim/Devices/MultiAxis/linux/InputDeviceHandle.h"
 
 
 namespace SurgSim

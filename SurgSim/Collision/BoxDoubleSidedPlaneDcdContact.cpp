@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h>
-#include <SurgSim/Collision/CollisionPair.h>
+#include "SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h"
+#include "SurgSim/Collision/CollisionPair.h"
 
-#include <SurgSim/Math/BoxShape.h>
-#include <SurgSim/Math/DoubleSidedPlaneShape.h>
-#include <SurgSim/Math/Geometry.h>
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/Geometry.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;

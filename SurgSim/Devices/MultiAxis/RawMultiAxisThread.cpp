@@ -15,7 +15,7 @@
 
 #include "SurgSim/Devices/MultiAxis/RawMultiAxisThread.h"
 
-#include <SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h>
+#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 
 namespace SurgSim
 {

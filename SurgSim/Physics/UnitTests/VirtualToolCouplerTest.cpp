@@ -15,16 +15,16 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
-#include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Physics/VirtualToolCoupler.h>
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Input::InputComponent;

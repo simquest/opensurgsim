@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Blocks/MassSpringNDRepresentationUtils.h>
+#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
 
-#include <SurgSim/Physics/LinearSpring.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 namespace SurgSim
 {

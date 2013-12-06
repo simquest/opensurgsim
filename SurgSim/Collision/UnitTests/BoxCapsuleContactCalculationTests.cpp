@@ -16,11 +16,11 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/Collision/BoxCapsuleDcdContact.h>
-#include <SurgSim/Collision/Representation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Collision/BoxCapsuleDcdContact.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;

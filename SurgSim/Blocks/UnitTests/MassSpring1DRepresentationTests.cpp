@@ -18,9 +18,9 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Blocks/MassSpring1DRepresentation.h>
-#include <SurgSim/Blocks/UnitTests/SpringTestUtils.h>
-#include <SurgSim/Physics/LinearSpring.h>
+#include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+#include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::LinearSpring;

@@ -16,8 +16,8 @@
 #ifndef SURGSIM_MATH_ODESOLVEREULEREXPLICITMODIFIED_H
 #define SURGSIM_MATH_ODESOLVEREULEREXPLICITMODIFIED_H
 
-#include <SurgSim/Math/OdeSolver.h>
-#include <SurgSim/Math/LinearSolveAndInverse.h>
+#include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/LinearSolveAndInverse.h"
 
 namespace SurgSim
 {
@@ -69,6 +69,6 @@ private:
 
 }; // namespace SurgSim
 
-#include <SurgSim/Math/OdeSolverEulerExplicitModified-inl.h>
+#include "SurgSim/Math/OdeSolverEulerExplicitModified-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVEREULEREXPLICITMODIFIED_H

@@ -16,9 +16,9 @@
 /// \file
 /// Tests for conversions to and from OSG quaternion types
 
-#include <SurgSim/Graphics/OsgQuaternionConversions.h>
+#include "SurgSim/Graphics/OsgQuaternionConversions.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

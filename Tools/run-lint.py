@@ -245,6 +245,16 @@ def check_tab_indentation(flags, file, lines):
                       'category': "opensurgsim/tab_indention",
                       'text': "the line does not correctly indent using tabs."})
 
+def check_oss_include(flags, file, lines):
+  for line_number, line in lines:
+    # Not a blank line
+    if len(line) > 0:
+      # Check that lines does not start with "#include <SurgSim"
+      if re.search(r'#include <SurgSim' , line) is not None:
+        emit_warning({'file': file, 'line': line_number,
+                      'category': "opensurgsim/oss_include",
+                      'text': "OSS header files should be included using #include \"\"."})
+
 def get_listed_files(flags, file, lines):
   flines = filter(lambda x: re.search(r'^\s.*\.(?:h|cpp)\s*(?:\)\s*)?$', x[1]),
                   lines)
@@ -362,6 +372,9 @@ if __name__ == '__main__':
   parser.add_argument('--ignore-tab-indentation',
                       action='store_false', dest='do_check_tab_indentation',
                       help='Do not check that lines are indented with tabs.')
+  parser.add_argument('--ignore-oss-include',
+                      action='store_false', dest='do_check_oss_include',
+                      help='Do not check that OSS related include use #include "".')
   parser.add_argument('--max-line-length', type=int, default=120,
                       help='Maximum allowed line length for C++ code.')
   parser.add_argument('--ignore-length',
@@ -461,6 +474,14 @@ if __name__ == '__main__':
         if not lines:
           continue
       if not check_tab_indentation(args, file, lines):
+        ok = False
+
+    if args.do_check_oss_include and re.search(r'(\.h|\.cpp$)', file):
+      if lines is None:
+        lines = slurp_numbered_lines(file)
+        if not lines:
+          continue
+      if not check_oss_include(args, file, lines):
         ok = False
 
   if args.do_check_file_lists and cmakelists_files is not None:

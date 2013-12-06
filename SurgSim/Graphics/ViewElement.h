@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_VIEWELEMENT_H
 #define SURGSIM_GRAPHICS_VIEWELEMENT_H
 
-#include <SurgSim/Framework/SceneElement.h>
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {

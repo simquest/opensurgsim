@@ -17,9 +17,9 @@
 #define SURGSIM_MATH_MLCPCONSTRAINTTYPENAME_H
 
 #include <string>
-#include <SurgSim/Math/MlcpConstraintType.h>
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {

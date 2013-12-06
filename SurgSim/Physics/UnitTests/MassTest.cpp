@@ -17,8 +17,8 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/Mass.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Physics/Mass.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;

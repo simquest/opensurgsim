@@ -19,8 +19,8 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Framework/BasicThread.h>
-#include <SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h>
+#include "SurgSim/Framework/BasicThread.h"
+#include "SurgSim/Devices/MultiAxis/RawMultiAxisScaffold.h"
 
 
 namespace SurgSim

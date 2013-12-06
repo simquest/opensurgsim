@@ -20,17 +20,17 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/FreeMotion.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector3d;

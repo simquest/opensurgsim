@@ -18,12 +18,12 @@
 
 #include <string>
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/MlcpSolution.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/MlcpSolution.h"
 
-#include <SurgSim/Framework/Representation.h>
+#include "SurgSim/Framework/Representation.h"
 
-#include <SurgSim/Collision/Location.h>
+#include "SurgSim/Collision/Location.h"
 
 namespace SurgSim
 {

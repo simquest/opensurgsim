@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_FEMREPRESENTATION_INL_H
 #define SURGSIM_PHYSICS_FEMREPRESENTATION_INL_H
 
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {

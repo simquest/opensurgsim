@@ -18,7 +18,7 @@
 
 #include <array>
 
-#include <SurgSim/Physics/FemElement.h>
+#include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
 {

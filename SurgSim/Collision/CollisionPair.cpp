@@ -15,10 +15,10 @@
 
 #include <numeric>
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/Representation.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

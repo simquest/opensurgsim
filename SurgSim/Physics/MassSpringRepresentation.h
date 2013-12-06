@@ -18,13 +18,13 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/DeformableRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Physics/Mass.h>
-#include <SurgSim/Physics/Spring.h>
+#include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Physics/Mass.h"
+#include "SurgSim/Physics/Spring.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {

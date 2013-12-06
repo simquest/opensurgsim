@@ -16,11 +16,11 @@
 #ifndef SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_INL_H
 #define SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_INL_H
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
-#include <SurgSim/Math/OdeSolverEulerExplicit.h>
-#include <SurgSim/Math/OdeSolverEulerExplicitModified.h>
-#include <SurgSim/Math/OdeSolverEulerImplicit.h>
+#include "SurgSim/Math/OdeSolverEulerExplicit.h"
+#include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
+#include "SurgSim/Math/OdeSolverEulerImplicit.h"
 
 namespace SurgSim
 {
