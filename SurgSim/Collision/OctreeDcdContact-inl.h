@@ -30,8 +30,8 @@ namespace SurgSim
 namespace Collision
 {
 
-template <class ContactCalculation, class OctreeNodeData>
-OctreeDcdContact<ContactCalculation, OctreeNodeData>::OctreeDcdContact()
+template <class T, class Data>
+OctreeDcdContact<T, Data>::OctreeDcdContact()
 {
 	SURGSIM_ASSERT(m_contactCalculator.getShapeTypes().first == SurgSim::Math::SHAPE_TYPE_BOX) <<
 		"OctreeDcdContact needs a contact calculator that works with Boxes";
@@ -39,23 +39,23 @@ OctreeDcdContact<ContactCalculation, OctreeNodeData>::OctreeDcdContact()
 	m_shapeTypes.first = SurgSim::Math::SHAPE_TYPE_OCTREE;
 }
 
-template <class ContactCalculation, class OctreeNodeData>
-std::pair<int, int> OctreeDcdContact<ContactCalculation, OctreeNodeData>::getShapeTypes()
+template <class T, class Data>
+std::pair<int, int> OctreeDcdContact<T, Data>::getShapeTypes()
 {
 	return m_shapeTypes;
 }
 
-template <class ContactCalculation, class OctreeNodeData>
-void OctreeDcdContact<ContactCalculation, OctreeNodeData>::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+template <class T, class Data>
+void OctreeDcdContact<T, Data>::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	typedef SurgSim::Math::OctreeShape<OctreeNodeData> OctreeShapeType;
+	typedef SurgSim::Math::OctreeShape<Data> OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> octree = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
 	calculateContactWithNode(octree->getRootNode(), pair, SurgSim::Math::OctreePath());
 }
 
-template <class ContactCalculation, class OctreeNodeData>
-void OctreeDcdContact<ContactCalculation, OctreeNodeData>::calculateContactWithNode(
-	std::shared_ptr<SurgSim::DataStructures::OctreeNode<OctreeNodeData>> node, std::shared_ptr<CollisionPair> pair,
+template <class T, class Data>
+void OctreeDcdContact<T, Data>::calculateContactWithNode(
+	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node, std::shared_ptr<CollisionPair> pair,
 	SurgSim::Math::OctreePath nodePath)
 {
 	if (! node->isActive())

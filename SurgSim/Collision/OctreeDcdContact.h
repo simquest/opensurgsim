@@ -29,9 +29,9 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between an Octree and other shapes
-/// \tparam	ContactCalculation The contact calculator to use on each octree node
-/// \tparam OctreeNodeData The data stored in each octree node
-template <class ContactCalculation, class OctreeNodeData>
+/// \tparam	T The contact calculator to use on each octree node
+/// \tparam Data The data stored in each octree node
+template <class T, class Data>
 class OctreeDcdContact : public ContactCalculation
 {
 public:
@@ -51,11 +51,11 @@ private:
 	/// Calculate the collision between a specific octree node and a shape
 	/// \param node the octree node to collide with
 	/// \param pair the collision pair that is under consideration
-	void calculateContactWithNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<OctreeNodeData>> node,
+	void calculateContactWithNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node,
 			std::shared_ptr<CollisionPair> pair, SurgSim::Math::OctreePath nodePath);
 
 	///The contact calculator to use on each octree node
-	ContactCalculation m_contactCalculator;
+	T m_contactCalculator;
 
 	/// The shape types that this contact caculation handles
 	std::pair<int, int> m_shapeTypes;
