@@ -14,8 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/CapsuleSphereDcdContact.h"
-
 #include "SurgSim/Collision/CollisionPair.h"
+
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -23,6 +23,7 @@
 
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {

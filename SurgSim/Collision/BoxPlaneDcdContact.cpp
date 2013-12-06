@@ -14,8 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/BoxPlaneDcdContact.h"
-
 #include "SurgSim/Collision/CollisionPair.h"
+
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/PlaneShape.h"
@@ -23,6 +23,7 @@
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::PlaneShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -54,16 +55,16 @@ void BoxPlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 	// Transform the plane normal to box co-ordinate system.
 	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
 														   representationPlane->getPose();
-	SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
-	SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-	SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
+	Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
+	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
 	// Loop through the box vertices (boxVertex) and check it it is below plane.
 	double d = 0.0;
-	SurgSim::Math::Vector3d boxVertex;
-	SurgSim::Math::Vector3d normal;
-	SurgSim::Math::Vector3d boxVertexGlobal;
+	Vector3d boxVertex;
+	Vector3d normal;
+	Vector3d boxVertexGlobal;
 	for (int i = 0; i < 8; ++i)
 	{
 		boxVertex = box->getVertex(i);

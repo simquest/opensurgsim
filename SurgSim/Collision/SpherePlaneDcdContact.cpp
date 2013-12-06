@@ -14,15 +14,16 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/SpherePlaneDcdContact.h"
-
 #include "SurgSim/Collision/CollisionPair.h"
+
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 
-using SurgSim::Math::SphereShape;
 using SurgSim::Math::PlaneShape;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {

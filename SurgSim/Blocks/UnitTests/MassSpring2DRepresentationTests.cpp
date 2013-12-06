@@ -163,7 +163,8 @@ TEST(MassSpring2DRepresentationTests, init2DTest)
 		for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
 		{
 			SurgSim::Math::Vector3d piExpected(rowExtremities[0] + col * delta);
-			Eigen::VectorBlock<Vector> pi = SurgSim::Math::getSubVector(m.getFinalState()->getPositions(), nodeId, 3);
+			SurgSim::Math::Vector& x = m.getFinalState()->getPositions();
+			Eigen::VectorBlock<SurgSim::Math::Vector> pi = SurgSim::Math::getSubVector(x, nodeId, 3);
 			EXPECT_TRUE(pi.isApprox(piExpected));
 			nodeId++;
 		}

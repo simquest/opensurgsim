@@ -29,6 +29,7 @@ using SurgSim::Physics::MassSpringRepresentation;
 using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 

@@ -31,7 +31,7 @@ namespace Physics
 template <class M, class D, class K, class S>
 DeformableRepresentation<M,D,K,S>::DeformableRepresentation(const std::string& name) :
 	Representation(name),
-	OdeEquation<DeformableRepresentationState, M, D, K, S>(),
+	SurgSim::Math::OdeEquation<DeformableRepresentationState, M, D, K, S>(),
 	m_numDofPerNode(0),
 	m_integrationScheme(SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER),
 	m_needToReloadOdeSolver(true)

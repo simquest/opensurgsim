@@ -19,6 +19,9 @@
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+using SurgSim::Math::Vector;
+using SurgSim::Math::DiagonalMatrix;
+using SurgSim::Math::Matrix;
 
 namespace SurgSim
 {

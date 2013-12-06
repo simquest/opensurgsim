@@ -44,11 +44,11 @@ namespace Physics
 {
 TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 {
-	Vector3d n(0.0, 1.0, 0.0);
+	SurgSim::Math::Vector3d n(0.0, 1.0, 0.0);
 	double d = 0.0;
 	double violation = -0.01;
 
-	Vector3d contactPosition = -n * (d - violation);
+	SurgSim::Math::Vector3d contactPosition = -n * (d - violation);
 	SurgSim::Math::RigidTransform3d poseFixed;
 	poseFixed.setIdentity();
 
