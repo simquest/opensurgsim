@@ -50,7 +50,7 @@ void OctreeDcdContact<T, Data>::doCalculateContact(std::shared_ptr<CollisionPair
 {
 	typedef SurgSim::Math::OctreeShape<Data> OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> octree = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
-	calculateContactWithNode(octree->getRootNode(), pair);
+	calculateContactWithNode(octree->getRootNode(), pair, std::make_shared<SurgSim::Math::OctreePath>());
 }
 
 template <class T, class Data>
