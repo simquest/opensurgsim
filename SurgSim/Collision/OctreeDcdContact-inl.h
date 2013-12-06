@@ -50,13 +50,13 @@ void OctreeDcdContact<T, Data>::doCalculateContact(std::shared_ptr<CollisionPair
 {
 	typedef SurgSim::Math::OctreeShape<Data> OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> octree = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
-	calculateContactWithNode(octree->getRootNode(), pair, SurgSim::Math::OctreePath());
+	calculateContactWithNode(octree->getRootNode(), pair);
 }
 
 template <class T, class Data>
 void OctreeDcdContact<T, Data>::calculateContactWithNode(
 	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node, std::shared_ptr<CollisionPair> pair,
-	SurgSim::Math::OctreePath nodePath)
+	std::shared_ptr<SurgSim::Math::OctreePath> nodePath)
 {
 	if (! node->isActive())
 		return;
@@ -78,9 +78,9 @@ void OctreeDcdContact<T, Data>::calculateContactWithNode(
 		{
 			for (size_t i = 0; i < node->getChildren().size(); i++)
 			{
-				SurgSim::Math::OctreePath childsPath = nodePath;
-				childsPath.push_back(i);
-				calculateContactWithNode(node->getChild(i), pair, childsPath);
+				nodePath->push_back(i);
+				calculateContactWithNode(node->getChild(i), pair, nodePath);
+				nodePath->pop_back();
 			}
 		}
 		else
@@ -88,7 +88,7 @@ void OctreeDcdContact<T, Data>::calculateContactWithNode(
 			const std::list<std::shared_ptr<Contact>>& newContacts = localPair->getContacts();
 			for(auto contact=newContacts.cbegin(); contact!=newContacts.cend(); ++contact)
 			{
-				(*contact)->penetrationPoints.first.octreeNodePath.setValue(nodePath);
+				(*contact)->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
 				pair->addContact(*contact);
 			}
 		}

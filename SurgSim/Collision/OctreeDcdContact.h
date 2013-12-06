@@ -51,8 +51,10 @@ private:
 	/// Calculate the collision between a specific octree node and a shape
 	/// \param node the octree node to collide with
 	/// \param pair the collision pair that is under consideration
+	/// \param nodePath the path of the current node
 	void calculateContactWithNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node,
-			std::shared_ptr<CollisionPair> pair, SurgSim::Math::OctreePath nodePath);
+			std::shared_ptr<CollisionPair> pair,
+			std::shared_ptr<SurgSim::Math::OctreePath> nodePath = std::make_shared<SurgSim::Math::OctreePath>());
 
 	///The contact calculator to use on each octree node
 	T m_contactCalculator;
