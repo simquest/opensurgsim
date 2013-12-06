@@ -21,14 +21,14 @@
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 #include <gtest/gtest.h>
-#include <SurgSim/Devices/Novint/Novint7DofDevice.h>
-//#include <SurgSim/Devices/Novint/NovintScaffold.h>  // only needed if calling setDefaultLogLevel()
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Framework/Clock.h>
+#include "SurgSim/Devices/Novint/Novint7DofDevice.h"
+//#include "SurgSim/Devices/Novint/NovintScaffold.h"  // only needed if calling setDefaultLogLevel()
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Framework/Clock.h"
 
 using SurgSim::Device::Novint7DofDevice;
 using SurgSim::Device::NovintScaffold;

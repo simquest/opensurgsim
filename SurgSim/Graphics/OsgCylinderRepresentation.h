@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGCYLINDERREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGCYLINDERREPRESENTATION_H
 
-#include <SurgSim/Graphics/CylinderRepresentation.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
+#include "SurgSim/Graphics/CylinderRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
 
 #include <osg/PositionAttitudeTransform>
 

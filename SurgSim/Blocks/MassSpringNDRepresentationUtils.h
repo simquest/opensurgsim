@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/LinearSpring.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 using SurgSim::Physics::LinearSpring;
 using SurgSim::Physics::DeformableRepresentationState;

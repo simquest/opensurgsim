@@ -21,8 +21,8 @@
 
 #include <vector>
 #include <Eigen/Core>
-#include <SurgSim/Math/MlcpProblem.h>
-#include <SurgSim/Math/MlcpConstraintType.h>
+#include "SurgSim/Math/MlcpProblem.h"
+#include "SurgSim/Math/MlcpConstraintType.h"
 
 
 struct MlcpTestData

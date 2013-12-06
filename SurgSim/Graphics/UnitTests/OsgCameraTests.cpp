@@ -16,15 +16,15 @@
 /// \file
 /// Tests for the OsgCamera class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
-#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgMatrixConversions.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Math/Quaternion.h>
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgMatrixConversions.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Math/Quaternion.h"
 
 #include <osg/Camera>
 #include <osg/ref_ptr>

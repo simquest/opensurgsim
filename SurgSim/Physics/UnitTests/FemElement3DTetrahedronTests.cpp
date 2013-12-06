@@ -18,10 +18,10 @@
 #include <memory>
 #include <array>
 
-#include <SurgSim/Physics/FemElement3DTetrahedron.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Physics::FemElement3DTetrahedron;
 using SurgSim::Physics::DeformableRepresentationState;

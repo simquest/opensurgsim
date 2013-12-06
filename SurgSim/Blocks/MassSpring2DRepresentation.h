@@ -19,8 +19,8 @@
 #include <array>
 #include <vector>
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 using SurgSim::Physics::DeformableRepresentationState;
 

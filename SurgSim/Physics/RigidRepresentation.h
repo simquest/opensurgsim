@@ -16,12 +16,12 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
-#include <SurgSim/Physics/RigidRepresentationBase.h>
-#include <SurgSim/Physics/RigidRepresentationState.h>
+#include "SurgSim/Physics/RigidRepresentationBase.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {

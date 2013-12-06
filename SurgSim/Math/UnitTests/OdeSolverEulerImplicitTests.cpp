@@ -21,8 +21,8 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Math/OdeSolverEulerImplicit.h>
-#include <SurgSim/Math/UnitTests/MockObject.h>
+#include "SurgSim/Math/OdeSolverEulerImplicit.h"
+#include "SurgSim/Math/UnitTests/MockObject.h"
 
 namespace SurgSim
 {

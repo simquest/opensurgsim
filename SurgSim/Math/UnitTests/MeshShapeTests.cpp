@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
-#include <SurgSim/Math/Shapes.h>
+#include "SurgSim/Math/Shapes.h"
 
 // CUBE
 //     3*----------*2

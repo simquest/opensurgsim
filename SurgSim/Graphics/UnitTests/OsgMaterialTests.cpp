@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the OsgMaterial class.
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgUniform.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 
 #include <gtest/gtest.h>
 

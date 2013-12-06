@@ -16,7 +16,7 @@
 /// \file
 /// Tests for the Group class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
 
 #include <gtest/gtest.h>
 

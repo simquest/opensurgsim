@@ -20,11 +20,11 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/ComponentManager.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/ComponentManager.h"
 
 
-#include <SurgSim/Framework/UnitTests/MockObjects.h>
+#include "SurgSim/Framework/UnitTests/MockObjects.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;

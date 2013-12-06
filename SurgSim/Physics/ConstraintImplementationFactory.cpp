@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/ConstraintImplementationFactory.h>
-#include <SurgSim/Physics/FixedRepresentationContact.h>
-#include <SurgSim/Physics/RigidRepresentationContact.h>
+#include "SurgSim/Physics/ConstraintImplementationFactory.h"
+#include "SurgSim/Physics/FixedRepresentationContact.h"
+#include "SurgSim/Physics/RigidRepresentationContact.h"
 
 namespace SurgSim
 {

@@ -16,8 +16,8 @@
 #include <memory>
 #include <GL/glut.h>
 
-#include <SurgSim/Input/DeviceInterface.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Framework/Assert.h"
 
 using SurgSim::Input::DeviceInterface;
 

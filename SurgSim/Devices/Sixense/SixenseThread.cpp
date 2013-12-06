@@ -15,7 +15,7 @@
 
 #include "SurgSim/Devices/Sixense/SixenseThread.h"
 
-#include <SurgSim/Devices/Sixense/SixenseScaffold.h>
+#include "SurgSim/Devices/Sixense/SixenseScaffold.h"
 
 namespace SurgSim
 {

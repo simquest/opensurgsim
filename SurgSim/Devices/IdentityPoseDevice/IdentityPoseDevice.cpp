@@ -15,12 +15,12 @@
 
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;

@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_VECTORFIELD_H
 #define SURGSIM_GRAPHICS_VECTORFIELD_H
 
-#include <SurgSim/DataStructures/OptionalValue.h>
-#include <SurgSim/DataStructures/Vertices.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/DataStructures/OptionalValue.h"
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

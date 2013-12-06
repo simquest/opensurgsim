@@ -13,15 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
-#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
-
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
-
 
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;
@@ -29,8 +25,7 @@ using SurgSim::Graphics::OsgViewElement;
 OsgViewElement::OsgViewElement(const std::string& name) :
 	SurgSim::Graphics::ViewElement(name, std::make_shared<OsgView>(name + " View")),
 	m_manipulatorPosition(SurgSim::Math::Vector3d(3.0,3.0,3.0)),
-	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0,0.0,0.0)),
-	m_keyboardEnabled(false)
+	m_manipulatorLookat(SurgSim::Math::Vector3d(0.0,0.0,0.0))
 {
 }
 
@@ -40,21 +35,15 @@ OsgViewElement::~OsgViewElement()
 
 bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 {
-	// Disable KeyboardDevice of current view
-	bool result = enableKeyboardDevice(false);
-
 	std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
-	if (osgView && ViewElement::setView(view) && result)
+	if (osgView && ViewElement::setView(view))
 	{
-		// After change 'view', need to enable keyboard device in the new 'view' if keyboard is enabled.
-		result = enableKeyboardDevice(m_keyboardEnabled);
+		return true;
 	}
 	else
 	{
-		result = false;
+		return false;
 	}
-
-	return result;
 }
 
 void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
@@ -76,50 +65,13 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 		{
 			view->getOsgView()->setCameraManipulator(m_manipulator);
 
-		}
+			}
 		else
 		{
 			view->getOsgView()->setCameraManipulator(nullptr);
 		}
 	}
 }
-
-bool SurgSim::Graphics::OsgViewElement::enableKeyboardDevice(bool val)
-{
-	bool result = false;
-	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
-	if (nullptr != view)
-	{
-		std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
-		osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
-					   std::dynamic_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
-		if (val && ! m_keyboardEnabled)
-		{
-			view->getOsgView()->addEventHandler(keyboardHandle);
-			m_keyboardEnabled = true;
-		}
-		else if (! val && m_keyboardEnabled)
-		{
-			view->getOsgView()->removeEventHandler(keyboardHandle);
-			m_keyboardEnabled = false;
-		}
-		result = true;
-	}
-	
-	return result;
-}
-
-
-std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement::getKeyboardDevice()
-{
-	static auto keyboardDevice = std::make_shared<SurgSim::Device::KeyboardDevice>("Keyboard");
-	if (! keyboardDevice->isInitialized())
-	{
-		keyboardDevice->initialize();
-	}
-	return keyboardDevice;
-}
-
 
 void SurgSim::Graphics::OsgViewElement::setManipulatorParameters(
 	SurgSim::Math::Vector3d position,

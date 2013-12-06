@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_VECTORFIELDREPRESENTATION_H
 
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Graphics/VectorField.h>
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/VectorField.h"
 
 namespace SurgSim
 {

@@ -15,23 +15,23 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Blocks/SphereElement.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgUniform.h>
+#include "SurgSim/Blocks/SphereElement.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;

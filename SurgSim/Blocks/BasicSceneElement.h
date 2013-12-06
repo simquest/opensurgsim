@@ -16,7 +16,7 @@
 #ifndef SURGSIM_BLOCKS_BASICSCENEELEMENT_H
 #define SURGSIM_BLOCKS_BASICSCENEELEMENT_H
 
-#include <SurgSim/Framework/SceneElement.h>
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {

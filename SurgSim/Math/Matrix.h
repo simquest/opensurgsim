@@ -21,7 +21,7 @@
 
 #include <vector>
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>

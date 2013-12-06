@@ -16,9 +16,9 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 
-#include <SurgSim/Physics/RigidRepresentationBaseState.h>
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;
 

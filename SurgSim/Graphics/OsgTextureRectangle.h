@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGTEXTURERECTANGLE_H
 #define SURGSIM_GRAPHICS_OSGTEXTURERECTANGLE_H
 
-#include <SurgSim/Graphics/OsgTexture.h>
-#include <SurgSim/Graphics/TextureRectangle.h>
+#include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/TextureRectangle.h"
 
 #include <osg/TextureRectangle>
 

@@ -16,19 +16,19 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationContact.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::SphereShape;
 

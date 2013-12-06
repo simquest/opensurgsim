@@ -18,10 +18,10 @@
 
 #include <array>
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Shape.h"
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
 namespace SurgSim
 {

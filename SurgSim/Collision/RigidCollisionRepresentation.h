@@ -18,10 +18,10 @@
 
 #include <memory>
 
-#include <SurgSim/Collision/Representation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {

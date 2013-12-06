@@ -16,15 +16,15 @@
 /// \file
 /// Tests for the TransferPoseBehavior class.
 
-#include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/TransferPoseBehavior.h>
-#include <SurgSim/Blocks/UnitTests/MockObjects.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Blocks/UnitTests/MockObjects.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

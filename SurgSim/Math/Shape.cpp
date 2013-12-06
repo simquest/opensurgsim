@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Math/Shape.h"
 
 /// Specialize of YAML::convert<> template RigidShape class.
 YAML::Node SurgSim::Math::Shape::encode()

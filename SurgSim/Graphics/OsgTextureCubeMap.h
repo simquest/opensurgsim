@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGTEXTURECUBEMAP_H
 #define SURGSIM_GRAPHICS_OSGTEXTURECUBEMAP_H
 
-#include <SurgSim/Graphics/OsgTexture.h>
+#include "SurgSim/Graphics/OsgTexture.h"
 
 #include <osg/TextureCubeMap>
 

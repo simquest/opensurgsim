@@ -21,8 +21,8 @@
 #ifndef SURGSIM_FRAMEWORK_ASSERT_H
 #define SURGSIM_FRAMEWORK_ASSERT_H
 
-#include <SurgSim/Framework/Logger.h>
-#include <SurgSim/Framework/AssertMessage.h>
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/AssertMessage.h"
 
 namespace SurgSim
 {

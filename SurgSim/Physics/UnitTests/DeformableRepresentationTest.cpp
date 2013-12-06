@@ -17,14 +17,14 @@
 
 #include <string>
 
-#include <SurgSim/Physics/DeformableRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/OdeSolver.h> // Need access to the enum IntegrationScheme
-#include <SurgSim/Math/OdeSolverEulerExplicit.h>
-#include <SurgSim/Math/OdeSolverEulerExplicitModified.h>
-#include <SurgSim/Math/OdeSolverEulerImplicit.h>
+#include "SurgSim/Physics/DeformableRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeSolver.h" // Need access to the enum IntegrationScheme
+#include "SurgSim/Math/OdeSolverEulerExplicit.h"
+#include "SurgSim/Math/OdeSolverEulerExplicitModified.h"
+#include "SurgSim/Math/OdeSolverEulerImplicit.h"
 
 using SurgSim::Physics::DeformableRepresentation;
 using SurgSim::Physics::DeformableRepresentationState;

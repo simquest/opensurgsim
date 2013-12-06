@@ -16,9 +16,9 @@
 #ifndef SURGSIM_BLOCKS_SPHEREELEMENT_H
 #define SURGSIM_BLOCKS_SPHEREELEMENT_H
 
-#include <SurgSim/Framework/SceneElement.h>
+#include "SurgSim/Framework/SceneElement.h"
 
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/RigidTransform.h"
 
 
 namespace SurgSim
