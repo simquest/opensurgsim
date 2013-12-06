@@ -84,18 +84,36 @@ std::shared_ptr<OctreeShape<OctreeData>> buildTestOctree()
 	const int numLevels = 4;
 	Eigen::AlignedBox<double, 3> boundingBox;
 	boundingBox.min() = Vector3d::Zero();
-	boundingBox.max() = Vector3d::Ones() * pow(2, numLevels);
+	boundingBox.max() = Vector3d::Ones() * pow(2.0, numLevels);
 	std::shared_ptr<OctreeNode<OctreeData> > rootNode = std::make_shared<OctreeNode<OctreeData> >(boundingBox);
 
-	rootNode->addData(Vector3d( 8.5,  8.5,  8.5), {"center"}, numLevels);
-	rootNode->addData(Vector3d( 0.5,  0.5,  0.5), {"corner0"}, numLevels);
-	rootNode->addData(Vector3d(15.5,  0.5,  0.5), {"corner1"}, numLevels);
-	rootNode->addData(Vector3d( 0.5, 15.5,  0.5), {"corner2"}, numLevels);
-	rootNode->addData(Vector3d(15.5, 15.5,  0.5), {"corner3"}, numLevels);
-	rootNode->addData(Vector3d( 0.5,  0.5, 15.5), {"corner4"}, numLevels);
-	rootNode->addData(Vector3d(15.5,  0.5, 15.5), {"corner5"}, numLevels);
-	rootNode->addData(Vector3d( 0.5, 15.5, 15.5), {"corner6"}, numLevels);
-	rootNode->addData(Vector3d(15.5, 15.5, 15.5), {"corner7"}, numLevels);
+	OctreeData data;
+	data.name = "center";
+	rootNode->addData(Vector3d( 8.5,  8.5,  8.5), data, numLevels);
+
+	data.name = "corner0";
+	rootNode->addData(Vector3d( 0.5,  0.5,  0.5), data, numLevels);
+
+	data.name = "corner1";
+	rootNode->addData(Vector3d(15.5,  0.5,  0.5), data, numLevels);
+
+	data.name = "corner2";
+	rootNode->addData(Vector3d( 0.5, 15.5,  0.5), data, numLevels);
+
+	data.name = "corner3";
+	rootNode->addData(Vector3d(15.5, 15.5,  0.5), data, numLevels);
+
+	data.name = "corner4";
+	rootNode->addData(Vector3d( 0.5,  0.5, 15.5), data, numLevels);
+
+	data.name = "corner5";
+	rootNode->addData(Vector3d(15.5,  0.5, 15.5), data, numLevels);
+
+	data.name = "corner6";
+	rootNode->addData(Vector3d( 0.5, 15.5, 15.5), data, numLevels);
+
+	data.name = "corner7";
+	rootNode->addData(Vector3d(15.5, 15.5, 15.5), data, numLevels);
 
 	return std::make_shared<OctreeShape<OctreeData>>(rootNode);
 }
