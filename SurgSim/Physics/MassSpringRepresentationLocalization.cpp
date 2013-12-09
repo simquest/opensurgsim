@@ -24,7 +24,8 @@ MassSpringRepresentationLocalization::MassSpringRepresentationLocalization()
 
 }
 
-MassSpringRepresentationLocalization::MassSpringRepresentationLocalization(std::shared_ptr<Representation> representation) :
+MassSpringRepresentationLocalization::MassSpringRepresentationLocalization(
+	std::shared_ptr<Representation> representation) :
 	Localization()
 {
 	setRepresentation(representation);

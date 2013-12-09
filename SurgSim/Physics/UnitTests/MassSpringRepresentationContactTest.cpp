@@ -59,8 +59,8 @@ TEST (MassSpringRepresentationContactTest, SetGet_BuildMlcp_Test)
 	unsigned int numNodesPerDim[1] = {2};
 	std::vector<unsigned int> boundaryConditions;
 	massSpring->init1D(
-		extremities, 
-		numNodesPerDim, 
+		extremities,
+		numNodesPerDim,
 		boundaryConditions,
 		0.1, // total mass (in Kg)
 		100.0, // Stiffness stretching
@@ -118,7 +118,7 @@ TEST (MassSpringRepresentationContactTest, SetGet_BuildMlcp_Test)
 
 	EXPECT_NEAR(d - (9.81 * dt * dt), mlcpPhysicsProblem.b[0], epsilon);
 
-	// Constraint U = nt.p + d >= 0, so 
+	// Constraint U = nt.p + d >= 0, so
 	// H = dU/dp
 	//   = dt.[nx  ny  nz]
 	EXPECT_NEAR(dt * n[0]   , mlcpPhysicsProblem.H(0, 0), epsilon);

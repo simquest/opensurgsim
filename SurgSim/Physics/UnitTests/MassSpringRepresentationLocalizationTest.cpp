@@ -40,8 +40,7 @@ TEST (MassSpringRepresentationLocalizationTest, ConstructorTest)
 
 	ASSERT_NO_THROW(
 	{
-		std::shared_ptr<MassSpringRepresentation> massSpring 
-			= std::make_shared<MassSpringRepresentation>("MassSpringRepresentation");
+		auto massSpring = std::make_shared<MassSpringRepresentation>("MassSpringRepresentation");
 		MassSpringRepresentationLocalization localization(massSpring);
 	});
 }
@@ -49,7 +48,7 @@ TEST (MassSpringRepresentationLocalizationTest, ConstructorTest)
 TEST (MassSpringRepresentationLocalizationTest, SetGetRepresentation)
 {
 	MassSpringRepresentationLocalization localization;
-	std::shared_ptr<MassSpringRepresentation> massSpring = std::make_shared<MassSpringRepresentation>("MassSpringRepresentation");
+	auto massSpring = std::make_shared<MassSpringRepresentation>("MassSpringRepresentation");
 
 	EXPECT_EQ(nullptr, localization.getRepresentation());
 
@@ -70,8 +69,8 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 	unsigned int numNodesPerDim[1] = {2};
 	std::vector<unsigned int> boundaryConditions;
 	massSpring->init1D(
-		extremities, 
-		numNodesPerDim, 
+		extremities,
+		numNodesPerDim,
 		boundaryConditions,
 		0.1, // total mass (in Kg)
 		100.0, // Stiffness stretching

@@ -53,7 +53,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 
 	unsigned int nodeId = std::static_pointer_cast<MassSpringRepresentationLocalization>(localization)->getLocalNode();
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
-	std::shared_ptr<MassSpringRepresentation> massSpring = std::static_pointer_cast<MassSpringRepresentation>(representation);
+	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(representation);
 
 	if (!massSpring->isActive())
 	{
@@ -95,7 +95,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	//
 	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
 	// => HCHt += H(CH't) + H'[C(H+H')t];
-	
+
 	// H'
 	SurgSim::Math::Vector3d localH = dt * scale * n;
 
@@ -112,7 +112,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	CHt.col(indexOfConstraint) += localCHt;
 
 	// HCHt += H'[C(H+H')t]
-	HCHt.row(indexOfConstraint) += localH.transpose() * CHt.middleRows(indexOfRepresentation + 3*nodeId, 3); 
+	HCHt.row(indexOfConstraint) += localH.transpose() * CHt.middleRows(indexOfRepresentation + 3*nodeId, 3);
 
 }
 
