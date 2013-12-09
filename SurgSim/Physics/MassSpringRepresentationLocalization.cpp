@@ -76,9 +76,12 @@ SurgSim::Math::Vector3d MassSpringRepresentationLocalization::doCalculatePositio
 
 bool MassSpringRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
+
+	std::shared_ptr<MassSpringRepresentation> massSpringRepresentation =
+		std::dynamic_pointer_cast<MassSpringRepresentation>(representation);
+
 	// Allows to reset the representation to nullptr ...
-	return (typeid(representation.get()) == typeid(MassSpringRepresentation)
-			|| representation == nullptr);
+	return (massSpringRepresentation != nullptr || representation == nullptr);
 }
 
 }; // Physics
