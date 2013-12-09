@@ -16,11 +16,11 @@
 /// \file
 /// Unit Tests for the OsgSceneryRepresentation class.
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
 
 #include <memory>
 

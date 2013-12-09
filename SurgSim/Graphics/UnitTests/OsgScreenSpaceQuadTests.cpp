@@ -16,16 +16,16 @@
 /// \file
 /// Tests for the OsgTexture class.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Graphics/OsgTexture.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgView.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgView.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;

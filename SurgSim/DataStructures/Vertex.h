@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_VERTEX_H
 #define SURGSIM_DATASTRUCTURES_VERTEX_H
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <memory>
 

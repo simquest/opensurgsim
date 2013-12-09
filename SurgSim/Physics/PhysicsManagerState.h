@@ -20,14 +20,14 @@
 #include <vector>
 #include <unordered_map>
 
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/MlcpMapping.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/MlcpPhysicsSolution.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/MlcpMapping.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/MlcpPhysicsSolution.h"
+#include "SurgSim/Physics/Representation.h"
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/Representation.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {

@@ -16,10 +16,10 @@
 #ifndef SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
 #define SURGSIM_MATH_MLCPGAUSSSEIDELSOLVER_H
 
-#include <SurgSim/Math/MlcpSolver.h>
+#include "SurgSim/Math/MlcpSolver.h"
 #include <Eigen/Core>
-#include <SurgSim/Math/MlcpProblem.h>
-#include <SurgSim/Math/MlcpSolution.h>
+#include "SurgSim/Math/MlcpProblem.h"
+#include "SurgSim/Math/MlcpSolution.h"
 
 namespace SurgSim
 {

@@ -16,14 +16,14 @@
 /// \file
 /// Tests for conversions to and from OSG rigid transform types
 
-#include <SurgSim/Graphics/OsgQuaternionConversions.h>
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/OsgVectorConversions.h>
+#include "SurgSim/Graphics/OsgQuaternionConversions.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgVectorConversions.h"
 
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

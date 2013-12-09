@@ -16,8 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_DATAGROUP_INL_H
 #define SURGSIM_DATASTRUCTURES_DATAGROUP_INL_H
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

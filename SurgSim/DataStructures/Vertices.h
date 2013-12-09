@@ -16,8 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_VERTICES_H
 #define SURGSIM_DATASTRUCTURES_VERTICES_H
 
-#include <SurgSim/DataStructures/Vertex.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Framework/Assert.h"
 
 #include <array>
 #include <typeinfo>

@@ -39,7 +39,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGMATRIXCONVERSIONS_H
 #define SURGSIM_GRAPHICS_OSGMATRIXCONVERSIONS_H
 
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Matrix.h"
 
 #include <osg/Matrixf>
 #include <osg/Matrixd>

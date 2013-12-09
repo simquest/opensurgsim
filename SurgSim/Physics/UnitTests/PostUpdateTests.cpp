@@ -20,11 +20,11 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/PostUpdate.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/PostUpdate.h"
+#include "SurgSim/Physics/Representation.h"
 
-#include <SurgSim/Physics/UnitTests/MockObjects.h>
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {

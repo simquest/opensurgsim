@@ -16,11 +16,11 @@
 /// \file
 /// Tests for the OsgView class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
-#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgView.h>
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgView.h"
 
 #include <gtest/gtest.h>
 

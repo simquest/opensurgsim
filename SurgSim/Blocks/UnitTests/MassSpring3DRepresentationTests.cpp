@@ -18,9 +18,9 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Blocks/MassSpring3DRepresentation.h>
-#include <SurgSim/Blocks/UnitTests/SpringTestUtils.h>
-#include <SurgSim/Physics/LinearSpring.h>
+#include "SurgSim/Blocks/MassSpring3DRepresentation.h"
+#include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::LinearSpring;
@@ -312,8 +312,8 @@ TEST(MassSpring3DRepresentationTests, init3DTest)
 			for (unsigned int col = 0; col < numNodesPerDim[0]; col++)
 			{
 				Vector3d xiExpected(rowExtremities[0] + col * delta);
-				Vector& x = m.getFinalState()->getPositions();
-				Eigen::VectorBlock<Vector> xi = SurgSim::Math::getSubVector(x, nodeId, 3);
+				SurgSim::Math::Vector& x = m.getFinalState()->getPositions();
+				Eigen::VectorBlock<SurgSim::Math::Vector> xi = SurgSim::Math::getSubVector(x, nodeId, 3);
 				EXPECT_TRUE(xi.isApprox(xiExpected));
 				nodeId++;
 			}

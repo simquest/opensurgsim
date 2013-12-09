@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/Computation.h>
-#include <SurgSim/Math/MlcpGaussSeidelSolver.h>
+#include "SurgSim/Physics/Computation.h"
+#include "SurgSim/Math/MlcpGaussSeidelSolver.h"
 
 namespace SurgSim
 {

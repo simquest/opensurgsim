@@ -19,11 +19,11 @@
 ///		 the simplest version of the abstract interface.
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Component.h"
 
-#include <SurgSim/Framework/UnitTests/MockObjects.h>
+#include "SurgSim/Framework/UnitTests/MockObjects.h"
 
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Scene;

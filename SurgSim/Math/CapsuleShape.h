@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_CAPSULESHAPE_H
 #define SURGSIM_MATH_CAPSULESHAPE_H
 
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {

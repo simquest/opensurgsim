@@ -103,7 +103,7 @@ namespace
 	{
 		std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
 		restState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
-		Vector& x = restState->getPositions();
+		SurgSim::Math::Vector& x = restState->getPositions();
 
 		// Sets the initial state (node positions and boundary conditions)
 		for (int nodeId = 0; nodeId < 8; nodeId++)

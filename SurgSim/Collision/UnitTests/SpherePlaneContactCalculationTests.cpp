@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/SpherePlaneDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/SpherePlaneDcdContact.h"
 
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::PlaneShape;

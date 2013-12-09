@@ -16,9 +16,9 @@
 #ifndef SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
 #define SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_INL_H
 
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/DataStructures/Vertices.h>
-#include <SurgSim/DataStructures/Vertex.h>
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/DataStructures/Vertex.h"
 
 namespace SurgSim
 {

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_SERIALIZE_SHAPESFACTORY_H
 #define SURGSIM_SERIALIZE_SHAPESFACTORY_H
 
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Math/Shape.h"
 #include <boost/function.hpp>
 #include <boost/functional/factory.hpp>
 
@@ -59,6 +59,6 @@ private:
 }
 }
 
-#include <SurgSim/Serialize/ShapesFactory-inl.h>
+#include "SurgSim/Serialize/ShapesFactory-inl.h"
 
 #endif // SURGSIM_SERIALIZE_SHAPESFACTORY_H

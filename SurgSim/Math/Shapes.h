@@ -17,13 +17,13 @@
 #define SURGSIM_MATH_SHAPES_H
 
 /// This file includes all the shapes
-#include <SurgSim/Math/BoxShape.h>
-#include <SurgSim/Math/CapsuleShape.h>
-#include <SurgSim/Math/CylinderShape.h>
-#include <SurgSim/Math/DoubleSidedPlaneShape.h>
-#include <SurgSim/Math/MeshShape.h>
-#include <SurgSim/Math/PlaneShape.h>
-#include <SurgSim/Math/OctreeShape.h>
-#include <SurgSim/Math/SphereShape.h>
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/CapsuleShape.h"
+#include "SurgSim/Math/CylinderShape.h"
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/PlaneShape.h"
+#include "SurgSim/Math/OctreeShape.h"
+#include "SurgSim/Math/SphereShape.h"
 
 #endif // SURGSIM_MATH_SHAPES_H

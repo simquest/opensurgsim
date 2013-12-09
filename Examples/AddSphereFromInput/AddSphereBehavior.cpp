@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <Examples/AddSphereFromInput/AddSphereBehavior.h>
+#include "Examples/AddSphereFromInput/AddSphereBehavior.h"
 
-#include <SurgSim/Blocks/SphereElement.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Framework/Scene.h>
+#include "SurgSim/Blocks/SphereElement.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Scene.h"
 
 #include <sstream>
 

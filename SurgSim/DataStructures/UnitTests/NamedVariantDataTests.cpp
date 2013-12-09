@@ -17,7 +17,7 @@
 /// Tests for the NamedVariantData class.
 
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 #include "SurgSim/DataStructures/NamedVariantData.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "gtest/gtest.h"
