@@ -107,7 +107,7 @@ struct TruthCubeRenderTests : public RenderTests
 		truthCube = std::make_shared<TruthCube>();
 
 		// Parsing TruthCube data
-		ParseTruthCubeData(truthCube);
+		parseTruthCubeData(truthCube);
 	};
 
 	void runTest(std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> representation)
