@@ -28,6 +28,10 @@ namespace Physics
 {
 
 /// MassSpring frictionless contact implementation.
+///
+/// MassSpringRepresentationContact implements the frictionless contact constraint for the MassSpringRepresentation,
+/// which prevents nodes from passing through a surface.  See MassSpringRepresentationContact::doBuild for more
+/// information.
 class MassSpringRepresentationContact : public ConstraintImplementation
 {
 public:
@@ -38,22 +42,22 @@ public:
 	virtual ~MassSpringRepresentationContact();
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
-	/// \return The MLCP constraint type corresponding to this constraint implementation
+	/// \return SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT
 	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override;
 
 	/// Gets the Type of representation that this implementation is concerned with
-	/// \return RepresentationType for this implementation
+	/// \return SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING
 	virtual RepresentationType getRepresentationType() const override;
 
 private:
-	/// Gets the number of degree of freedom for a frictionless contact.
-	/// \return 1 as a frictionless contact only has 1 equation of constraint (along the normal direction).
+	/// Gets the number of degrees of freedom for a frictionless contact.
+	/// \return 1, as a frictionless contact only has 1 equation of constraint (along the normal direction).
 	unsigned int doGetNumDof() const override;
 
-	/// Builds the subset of an Mlcp physics problem associated to this implementation.
+	/// Adds a mass-spring frictionless contact constraint to an MlcpPhysicsProblem.
 	/// \param dt The time step.
-	/// \param data The data associated to the constraint.
-	/// \param localization The localization for the representation.
+	/// \param data [ContactConstraintData] Plane defining the constraint.
+	/// \param localization [MassSpringRepresentationLocalization] Location and Representation to be constrained.
 	/// \param [in, out] mlcp The Mixed LCP physics problem to fill up.
 	/// \param indexOfRepresentation The index of the representation (associated to this implementation) in the mlcp.
 	/// \param indexOfConstraint The index of the constraint in the mlcp.

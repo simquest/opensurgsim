@@ -25,7 +25,16 @@ namespace SurgSim
 namespace Physics
 {
 
-/// This class implements the localization of a MassSpringRepresentation, as a local position
+/// Implementation of Localization for MassSpringRepresentation
+///
+/// MassSpringRepresentationLocalization is a helper class for filling out the MlcpPhysicsProblem when applying
+/// constraints to the motion of a MassSpringRepresentation.  For a concrete example, see
+/// MassSpringRepresentationContact::doBuild.
+///
+/// MassSpringRepresentationLocalization stores a pointer to a MassSpringRepresentation in an abstract Representation
+/// object.  It tracks the ID of a node contained within the associated MassSpringRepresentation, and it provides a
+/// helper function MassSpringRepresentationLocalization::calculatePosition to find the node's position in global
+/// coordinates.
 class MassSpringRepresentationLocalization: public Localization
 {
 public:
@@ -40,22 +49,23 @@ public:
 	virtual ~MassSpringRepresentationLocalization();
 
 	/// Sets the local node.
-	/// \param p The local node to set the localization at.
+	/// \param nodeID Node set for this localization.
 	void setLocalNode(size_t nodeID);
 
-	/// Gets the local position.
-	/// \return The local position set for this localization.
+	/// Gets the local node.
+	/// \return Node set for this localization.
 	const size_t& getLocalNode() const;
 
-	/// Query if 'representation' is valid representation.
-	/// \param	representation	The representation.
-	/// \return	true if valid representation, false if not.
+	/// Queries whether Representation can be assigned to this class.
+	/// \param representation Representation to check.
+	/// \return	true if Representation is valid.
 	virtual bool isValidRepresentation(std::shared_ptr<Representation> representation) override;
 
 private:
 	/// Calculates the global position of this localization.
-	/// \param time The time in [0..1] at which the position should be calculated.
-	/// \return The global position of the localization at the requested time.
+	/// \param time Interpolation parameter [0..1] for calcuting position between the previous time-step (0.0) and the
+	/// current time-step (1.0).
+	/// \return The global position of the localization at the requested interpolation.
 	/// \note time can useful when dealing with CCD.
 	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) override;
 
