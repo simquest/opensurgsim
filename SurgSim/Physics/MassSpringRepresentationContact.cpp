@@ -51,6 +51,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	MlcpPhysicsProblem::Matrix& HCHt = mlcp->A;
 	MlcpPhysicsProblem::Vector& b    = mlcp->b;
 
+	unsigned int nodeId = std::static_pointer_cast<MassSpringRepresentationLocalization>(localization)->getLocalNode();
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	std::shared_ptr<MassSpringRepresentation> massSpring = std::static_pointer_cast<MassSpringRepresentation>(representation);
 
@@ -85,27 +86,34 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	double violation = n.dot(globalPosition) + d;
 	b[indexOfConstraint] += violation * scale;
 
-	// Fill up H with just the non null values
-	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 0) += dt * scale * n;
+	// Fill matrices with just the non null values
+	// (H+H') = H+H'
+	// => H += H';
+	//
+	// C(H+H')t = CHt + CH't
+	// => CHt += CH't;
+	//
+	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
+	// => HCHt += H(CH't) + H'[C(H+H')t];
+	
+	// H'
+	SurgSim::Math::Vector3d localH = dt * scale * n;
 
-	// Fill up CH^t with just the non null values
-	for (unsigned int CHt_line = 0; CHt_line < massSpring->getNumDof(); CHt_line++)
-	{
-		CHt(indexOfRepresentation + CHt_line, indexOfConstraint) +=
-			C.block<1,3>(CHt_line, 0) * H.block<1,3>(indexOfConstraint, indexOfRepresentation).transpose();
-	}
+	// CH't
+	SurgSim::Math::Vector localCHt = C.middleCols(indexOfRepresentation + 3*nodeId, 3) * localH;
 
-	// Fill up HCHt (add 1 line and 1 column to it)
-	// NOTE: HCHt is symmetric => we compute the last line and reflect it on the last column
-	for (unsigned int col = 0; col < indexOfConstraint; col++)
-	{
-		HCHt(indexOfConstraint, col) +=
-			H.block<1, 3>(indexOfConstraint, indexOfRepresentation) * CHt.block<3, 1>(indexOfRepresentation, col);
-		HCHt(col, indexOfConstraint) = HCHt(indexOfConstraint, col);
-	}
-	HCHt(indexOfConstraint, indexOfConstraint) +=
-		H.block<1, 3>(indexOfConstraint, indexOfRepresentation) *
-		CHt.block<3, 1>(indexOfRepresentation, indexOfConstraint);
+	// HCHt += H(CH't)
+	HCHt.col(indexOfConstraint) += H * localCHt;
+
+	// H += H'
+	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 3*nodeId) += localH.transpose();
+
+	// CHt += CH't
+	CHt.col(indexOfConstraint) += localCHt;
+
+	// HCHt += H'[C(H+H')t]
+	HCHt.row(indexOfConstraint) += localH.transpose() * CHt.middleRows(indexOfRepresentation + 3*nodeId, 3); 
+
 }
 
 SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstraintType() const
