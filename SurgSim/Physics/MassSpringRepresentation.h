@@ -161,9 +161,9 @@ public:
 
 	typedef Eigen::Matrix<double, 3,3, Eigen::DontAlign | Eigen::RowMajor> Matrix33d;
 
-	/// Retrieve the rigid body 3x3 compliance matrix
-	/// \return the 3x3 compliance matrix
-	Matrix33d getComplianceMatrix() const;
+	/// Retrieve the compliance matrix
+	/// \return the (dof)x(dof) compliance matrix
+	SurgSim::Math::Matrix getComplianceMatrix() const;
 
 protected:
 	/// Add the Rayleigh damping forces

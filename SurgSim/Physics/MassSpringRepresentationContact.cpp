@@ -59,8 +59,8 @@ void MassSpringRepresentationContact::doBuild(double dt,
 		return;
 	}
 
-	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
-	const Eigen::Matrix<double, 3,3, Eigen::DontAlign | Eigen::RowMajor>& C = massSpring->getComplianceMatrix();
+	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
+	const SurgSim::Math::Matrix& C = massSpring->getComplianceMatrix();
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();

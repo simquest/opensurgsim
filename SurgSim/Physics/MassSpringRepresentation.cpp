@@ -365,7 +365,7 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	*K = &m_K;
 }
 
-MassSpringRepresentation::Matrix33d MassSpringRepresentation::getComplianceMatrix() const
+SurgSim::Math::Matrix MassSpringRepresentation::getComplianceMatrix() const
 {
 	return m_odeSolver->getCompliance();
 }
