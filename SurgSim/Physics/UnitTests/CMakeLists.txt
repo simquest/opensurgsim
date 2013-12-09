@@ -39,6 +39,7 @@ set(UNIT_TEST_SOURCES
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
 	MassSpringRepresentationContactTest.cpp
+	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	PhysicsManagerTests.cpp
