@@ -122,7 +122,7 @@ public:
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(const DeformableRepresentationState& state,
 		double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
+		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
 protected:
 	/// Computes the tetrahdron shape functions
