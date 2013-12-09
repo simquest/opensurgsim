@@ -36,7 +36,7 @@ MassSpringRepresentationLocalization::~MassSpringRepresentationLocalization()
 
 }
 
-void MassSpringRepresentationLocalization::setLocalNode(unsigned int nodeID)
+void MassSpringRepresentationLocalization::setLocalNode(size_t nodeID)
 {
 	m_nodeID = nodeID;
 }
