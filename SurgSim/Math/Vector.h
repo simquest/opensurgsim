@@ -161,6 +161,17 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 	}
 }
 
+/// Helper method to construct an orthonormal frame (i, j, k) given the 1st normalized vector i
+/// \tparam Vector The vector type
+/// \param i The 1st normalized vector of the frame (i, j, k)
+/// \param[out] j, k The orthonormal vectors j and k of the base (i, j, k)
+template <class Vector>
+void buildOrthonormalFrame(const Vector& i, Vector* j, Vector* k)
+{
+	*j = i.unitOrthogonal();
+	*k = i.cross(*j);
+}
+
 };  // namespace Math
 };  // namespace SurgSim
 

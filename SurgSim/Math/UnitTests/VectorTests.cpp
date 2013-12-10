@@ -1163,3 +1163,30 @@ TYPED_TEST(AllDynamicVectorTests, resize)
 	EXPECT_EQ(13, static_cast<int>(v.size()));
 	EXPECT_TRUE(v.isZero());
 }
+
+TYPED_TEST(Vector3Tests, buildOrthonormalFrame)
+{
+	typedef typename TestFixture::Vector3 Vector3;
+	typedef typename Vector3::Scalar T;
+
+	Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+	Vector3 j, k;
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	i.normalize();
+	ASSERT_NO_THROW(SurgSim::Math::buildOrthonormalFrame(i, &j, &k););
+	EXPECT_NEAR(i.dot(j), 0.0, precision);
+	EXPECT_NEAR(i.dot(k), 0.0, precision);
+	EXPECT_NEAR(j.dot(i), 0.0, precision);
+	EXPECT_NEAR(j.dot(k), 0.0, precision);
+	EXPECT_NEAR(k.dot(i), 0.0, precision);
+	EXPECT_NEAR(k.dot(j), 0.0, precision);
+
+	EXPECT_TRUE(i.cross(j).isApprox(k));
+	EXPECT_TRUE(j.cross(k).isApprox(i));
+	EXPECT_TRUE(k.cross(i).isApprox(j));
+
+	EXPECT_NEAR(i.norm(), 1.0, precision);
+	EXPECT_NEAR(j.norm(), 1.0, precision);
+	EXPECT_NEAR(k.norm(), 1.0, precision);
+}
