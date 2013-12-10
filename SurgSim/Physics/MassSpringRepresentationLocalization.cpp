@@ -64,10 +64,10 @@ SurgSim::Math::Vector3d MassSpringRepresentationLocalization::doCalculatePositio
 		return massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
 	}
 
-	const SurgSim::Math::Vector3d& currentPose  = massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
-	const SurgSim::Math::Vector3d& previousPose = massSpringRepresentation->getPreviousState()->getPosition(m_nodeID);
+	const SurgSim::Math::Vector3d& currentPoint  = massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
+	const SurgSim::Math::Vector3d& previousPoint = massSpringRepresentation->getPreviousState()->getPosition(m_nodeID);
 
-	return previousPose + time * (currentPose - previousPose);
+	return previousPoint + time * (currentPoint - previousPoint);
 }
 
 bool MassSpringRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
