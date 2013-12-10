@@ -232,7 +232,11 @@ TEST_F(ShapeTest, Octree)
 		EXPECT_NO_THROW(octree.getNode(path));
 		EXPECT_EQ(node, octree.getNode(path));
 
+		node->subdivide();
 		path.push_back(3);
+		EXPECT_NO_THROW(octree.getNode(path));
+		EXPECT_NE(nullptr, octree.getNode(path));
+
 		path.push_back(1);
 		EXPECT_THROW(octree.getNode(path), SurgSim::Framework::AssertionFailure);
 	}
