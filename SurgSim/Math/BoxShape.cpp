@@ -63,7 +63,7 @@ SurgSim::Math::Vector3d BoxShape::getCenter() const
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d BoxShape::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d BoxShape::getSecondMomentOfVolume() const
 {
 	const double volume = getVolume();
 

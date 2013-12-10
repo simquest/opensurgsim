@@ -145,6 +145,6 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 
 		EXPECT_NEAR(boxShape.getVolume(), boxMesh.getVolume(), 1e-8);
 		EXPECT_TRUE((boxShape.getCenter() - boxMesh.getCenter()).isZero());
-		EXPECT_TRUE(boxShape.getSecondMomentMatrix().isApprox(boxMesh.getSecondMomentMatrix(), 1e-8));
+		EXPECT_TRUE(boxShape.getSecondMomentOfVolume().isApprox(boxMesh.getSecondMomentOfVolume(), 1e-8));
 	}
 }

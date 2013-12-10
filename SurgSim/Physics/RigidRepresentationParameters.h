@@ -105,7 +105,7 @@ public:
 			// If a shape overwrite a mesh, the shape should be used !
 			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
 			m_massCenter   = m_shapeForMassInertia->getCenter();
-			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentMatrix();
+			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
 
 			m_isValid = checkValidity();
 		}
@@ -245,7 +245,7 @@ public:
 		{
 			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
 			m_massCenter   = m_shapeForMassInertia->getCenter();
-			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentMatrix();
+			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
 
 			m_isValid = checkValidity();
 		}

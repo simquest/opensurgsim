@@ -45,7 +45,7 @@ SurgSim::Math::Vector3d SphereShape::getCenter() const
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d SphereShape::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d SphereShape::getSecondMomentOfVolume() const
 {
 	const double volume = getVolume();
 

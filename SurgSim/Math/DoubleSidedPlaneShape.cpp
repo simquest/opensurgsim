@@ -39,7 +39,7 @@ SurgSim::Math::Vector3d DoubleSidedPlaneShape::getCenter() const
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d DoubleSidedPlaneShape::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d DoubleSidedPlaneShape::getSecondMomentOfVolume() const
 {
 	return Matrix33d::Zero();
 }

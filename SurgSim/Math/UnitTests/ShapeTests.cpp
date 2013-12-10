@@ -90,7 +90,7 @@ TEST_F(ShapeTest, Sphere)
 
 	double volume = s.getVolume();
 	Vector3d center = s.getCenter();
-	Matrix33d inertia = s.getSecondMomentMatrix() * m_rho;
+	Matrix33d inertia = s.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
@@ -120,7 +120,7 @@ TEST_F(ShapeTest, Box)
 
 	double volume = b.getVolume();
 	Vector3d center = b.getCenter();
-	Matrix33d inertia = b.getSecondMomentMatrix() * m_rho;
+	Matrix33d inertia = b.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
@@ -150,7 +150,7 @@ TEST_F(ShapeTest, Cylinder)
 
 	double volume = c.getVolume();
 	Vector3d center = c.getCenter();
-	Matrix33d inertia = c.getSecondMomentMatrix() * m_rho;
+	Matrix33d inertia = c.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
@@ -187,7 +187,7 @@ TEST_F(ShapeTest, Capsule)
 
 	double volume = c.getVolume();
 	Vector3d center = c.getCenter();
-	Matrix33d inertia = c.getSecondMomentMatrix() * m_rho;
+	Matrix33d inertia = c.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
 	EXPECT_TRUE(center.isZero());
@@ -226,7 +226,7 @@ TEST_F(ShapeTest, Octree)
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
 		EXPECT_THROW(octree.getVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_TRUE(octree.getCenter().isApprox(Vector3d::Zero(), epsilon));
-		EXPECT_THROW(octree.getSecondMomentMatrix(), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(octree.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 	}
 }

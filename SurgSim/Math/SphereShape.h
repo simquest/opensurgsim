@@ -47,10 +47,10 @@ public:
 	/// \return The center of the shape
 	virtual Vector3d getCenter() const override;
 
-	/// Get the second central moment of the shape, commonly used
+	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentMatrix() const override;
+	virtual Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Serialize declarations of the sphere
 	OSS_SERIALIZE(SurgSim::Math::SphereShape);

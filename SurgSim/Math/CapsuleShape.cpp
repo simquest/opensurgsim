@@ -65,7 +65,7 @@ SurgSim::Math::Vector3d CapsuleShape::bottomCentre() const
 	return Vector3d(0.0, -m_length / 2.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d CapsuleShape::getSecondMomentOfVolume() const
 {
 	const double &r = m_radius;
 	const double &l = m_length;

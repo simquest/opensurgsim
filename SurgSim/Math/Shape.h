@@ -69,10 +69,10 @@ public:
 	/// \return The center of the shape
 	virtual Vector3d getCenter() const = 0;
 
-	/// Get the second central moment of the shape, commonly used
+	/// Get the second central moment of the volume, commonly used
 	/// to calculate the moment of inertia matrix
 	/// \return The 3x3 symmetric second moment matrix
-	virtual Matrix33d getSecondMomentMatrix() const = 0;
+	virtual Matrix33d getSecondMomentOfVolume() const = 0;
 
 	/// Store data of RigidShape
 	virtual YAML::Node encode();

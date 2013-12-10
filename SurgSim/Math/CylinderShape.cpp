@@ -51,7 +51,7 @@ SurgSim::Math::Vector3d CylinderShape::getCenter() const
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d CylinderShape::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d CylinderShape::getSecondMomentOfVolume() const
 {
 	const double volume = getVolume();
 	const double coef    = 1.0 / 12.0 * volume;

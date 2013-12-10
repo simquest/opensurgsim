@@ -55,9 +55,9 @@ Vector3d OctreeShape<NodeData>::getCenter() const
 }
 
 template<class NodeData>
-Matrix33d OctreeShape<NodeData>::getSecondMomentMatrix() const
+Matrix33d OctreeShape<NodeData>::getSecondMomentOfVolume() const
 {
-	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentMatrix not implemented";
+	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentOfVolume not implemented";
 	return Matrix33d::Zero();
 }
 

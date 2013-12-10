@@ -57,7 +57,7 @@ SurgSim::Math::Vector3d MeshShape<VertexData, EdgeData, TriangleData>::getCenter
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-SurgSim::Math::Matrix33d MeshShape<VertexData, EdgeData, TriangleData>::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d MeshShape<VertexData, EdgeData, TriangleData>::getSecondMomentOfVolume() const
 {
 	Matrix33d secondMoment;
 	const Vector3d& r = getCenter();

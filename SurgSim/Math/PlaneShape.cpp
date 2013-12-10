@@ -39,7 +39,7 @@ SurgSim::Math::Vector3d PlaneShape::getCenter() const
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d PlaneShape::getSecondMomentMatrix() const
+SurgSim::Math::Matrix33d PlaneShape::getSecondMomentOfVolume() const
 {
 	return Matrix33d::Zero();
 }
