@@ -40,7 +40,7 @@ public:
 	OctreeDcdContact();
 
 	/// Function that returns the shapes between which this class performs collision detection.
-	/// \return int std::pair containing the shape types.
+	/// \return A pair of shape type ids
 	virtual std::pair<int, int> getShapeTypes() override;
 
 private:
@@ -56,7 +56,7 @@ private:
 			std::shared_ptr<CollisionPair> pair,
 			std::shared_ptr<SurgSim::Math::OctreePath> nodePath);
 
-	///The contact calculator to use on each octree node
+	/// The contact calculator to use on each octree node
 	T m_contactCalculator;
 
 	/// The shape types that this contact caculation handles

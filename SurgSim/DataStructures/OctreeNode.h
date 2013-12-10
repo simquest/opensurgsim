@@ -88,12 +88,14 @@ public:
 
 	/// Get a child of this node (non const version)
 	/// \param index the child index
-	/// \return octree node
+	/// \return the requested octree node
+	/// NOTE: an exception will be thrown if the index >= 8
 	std::shared_ptr<OctreeNode<Data> > getChild(size_t index);
 
 	/// Get a child of this node
 	/// \param index the child index
-	/// \return octree node
+	/// \return the requested octree node
+	/// NOTE: an exception will be thrown if the index >= 8
 	const std::shared_ptr<OctreeNode<Data> > getChild(size_t index) const;
 
 	/// Extra node data

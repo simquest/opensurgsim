@@ -59,7 +59,9 @@ void OctreeDcdContact<T, Data>::calculateContactWithNode(
 	std::shared_ptr<SurgSim::Math::OctreePath> nodePath)
 {
 	if (! node->isActive())
+	{
 		return;
+	}
 
 	SurgSim::Math::Vector3d boxSize = node->getBoundingBox().sizes();
 	std::shared_ptr<SurgSim::Math::Shape> boxShape =
@@ -86,7 +88,7 @@ void OctreeDcdContact<T, Data>::calculateContactWithNode(
 		else
 		{
 			const std::list<std::shared_ptr<Contact>>& newContacts = localPair->getContacts();
-			for(auto contact=newContacts.cbegin(); contact!=newContacts.cend(); ++contact)
+			for(auto contact = newContacts.cbegin(); contact != newContacts.cend(); ++contact)
 			{
 				(*contact)->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
 				pair->addContact(*contact);
