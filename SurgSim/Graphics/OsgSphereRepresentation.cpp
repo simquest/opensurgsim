@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/OsgUnitSphere.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgUnitSphere.h"
 
 #include <osg/Geode>
 #include <osg/Shape>

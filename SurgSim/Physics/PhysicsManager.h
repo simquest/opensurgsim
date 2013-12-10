@@ -19,9 +19,9 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Framework/ComponentManager.h>
-#include <SurgSim/Framework/Component.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/ComponentManager.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Log.h"
 
 
 namespace SurgSim

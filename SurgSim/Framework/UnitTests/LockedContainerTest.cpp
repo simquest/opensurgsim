@@ -17,7 +17,7 @@
 /// Tests for the LockedContainer class.
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/LockedContainer.h>
+#include "SurgSim/Framework/LockedContainer.h"
 
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>

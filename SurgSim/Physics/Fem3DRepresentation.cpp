@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
-#include <SurgSim/Physics/Fem3DRepresentation.h>
+#include "SurgSim/Physics/Fem3DRepresentation.h"
 
 namespace
 {
 void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
-										Vector* x, bool rotationOnly = false)
+										SurgSim::Math::Vector* x, bool rotationOnly = false)
 {
-	typedef Vector::Index IndexType;
+	typedef SurgSim::Math::Vector::Index IndexType;
 
 	IndexType numNodes = x->size() / 3;
 	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<

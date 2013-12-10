@@ -16,8 +16,8 @@
 /// \file
 /// Tests for conversions to and from OSG matrix types
 
-#include <SurgSim/Graphics/OsgMatrixConversions.h>
-#include <SurgSim/Graphics/OsgVectorConversions.h>
+#include "SurgSim/Graphics/OsgMatrixConversions.h"
+#include "SurgSim/Graphics/OsgVectorConversions.h"
 
 #include <gtest/gtest.h>
 

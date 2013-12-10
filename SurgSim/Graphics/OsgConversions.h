@@ -19,9 +19,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGCONVERSIONS_H
 #define SURGSIM_GRAPHICS_OSGCONVERSIONS_H
 
-#include <SurgSim/Graphics/OsgMatrixConversions.h>
-#include <SurgSim/Graphics/OsgQuaternionConversions.h>
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/OsgVectorConversions.h>
+#include "SurgSim/Graphics/OsgMatrixConversions.h"
+#include "SurgSim/Graphics/OsgQuaternionConversions.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgVectorConversions.h"
 
 #endif  // SURGSIM_GRAPHICS_OSGCONVERSIONS_H

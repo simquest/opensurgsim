@@ -16,11 +16,11 @@
 #ifndef SURGSIM_GRAPHICS_OSGSPHEREREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSPHEREREPRESENTATION_H
 
-#include <SurgSim/Graphics/SphereRepresentation.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
+#include "SurgSim/Graphics/SphereRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
 
-#include <SurgSim/Framework/SharedInstance.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/Switch>

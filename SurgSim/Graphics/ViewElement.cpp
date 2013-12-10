@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/View.h>
-#include <SurgSim/Graphics/ViewElement.h>
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/ViewElement.h"
 
 using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;

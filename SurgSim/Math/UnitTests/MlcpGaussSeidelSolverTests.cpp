@@ -23,11 +23,11 @@
 #include "gtest/gtest.h"
 #include <boost/chrono.hpp>
 
-#include <SurgSim/Math/Valid.h>
-#include <SurgSim/Math/MlcpGaussSeidelSolver.h>
-#include <SurgSim/Math/MlcpSolution.h>
-#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
-#include <SurgSim/Testing/MlcpIO/ReadText.h>
+#include "SurgSim/Math/Valid.h"
+#include "SurgSim/Math/MlcpGaussSeidelSolver.h"
+#include "SurgSim/Math/MlcpSolution.h"
+#include "SurgSim/Testing/MlcpIO/MlcpTestData.h"
+#include "SurgSim/Testing/MlcpIO/ReadText.h"
 
 using SurgSim::Math::isValid;
 using SurgSim::Math::MlcpGaussSeidelSolver;

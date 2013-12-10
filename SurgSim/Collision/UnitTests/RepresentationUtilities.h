@@ -18,10 +18,10 @@
 
 #include <memory>
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
 
-#include <SurgSim/Collision/Representation.h>
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {

@@ -94,6 +94,6 @@ private:
 }; // Framework
 }; // SurgSim
 
-#include <SurgSim/Framework/Accessible-inl.h>
+#include "SurgSim/Framework/Accessible-inl.h"
 
 #endif

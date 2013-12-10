@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H
 #define SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H
 
-#include <SurgSim/DataStructures/TriangleMesh.h>
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
 {
@@ -199,6 +199,6 @@ private:
 
 };  // namespace SurgSim
 
-#include <SurgSim/DataStructures/TetrahedronMesh-inl.h>
+#include "SurgSim/DataStructures/TetrahedronMesh-inl.h"
 
 #endif  // SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H

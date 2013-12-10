@@ -16,8 +16,8 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
 
-#include <SurgSim/DataStructures/Vertices.h>
-#include <SurgSim/DataStructures/MeshElement.h>
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/DataStructures/MeshElement.h"
 
 namespace SurgSim
 {
@@ -153,6 +153,6 @@ private:
 
 };  // namespace SurgSim
 
-#include <SurgSim/DataStructures/TriangleMesh-inl.h>
+#include "SurgSim/DataStructures/TriangleMesh-inl.h"
 
 #endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H

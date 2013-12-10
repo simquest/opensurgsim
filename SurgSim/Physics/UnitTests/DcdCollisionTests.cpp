@@ -20,15 +20,15 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Physics/DcdCollision.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
-#include <SurgSim/Math/DoubleSidedPlaneShape.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/SphereShape.h>
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/SphereShape.h"
 
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::RigidCollisionRepresentation;

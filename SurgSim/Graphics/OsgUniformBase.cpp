@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgUniformBase.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Graphics/OsgUniformBase.h"
+#include "SurgSim/Framework/Log.h"
 
 using SurgSim::Graphics::OsgUniformBase;
 

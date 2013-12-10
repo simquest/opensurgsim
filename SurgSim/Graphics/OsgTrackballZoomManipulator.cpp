@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgTrackballZoomManipulator.h>
+#include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
 #include <osgUtil/UpdateVisitor>
 
 /// Calculate the key code value of Ctrl-{character}, given the uppercase character.

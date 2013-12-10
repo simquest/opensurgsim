@@ -15,12 +15,12 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/DataStructures/OctreeNode.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Shapes.h>
+#include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Shapes.h"
 
 using SurgSim::DataStructures::OctreeNode;
 

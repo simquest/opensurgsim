@@ -16,16 +16,16 @@
 /// \file
 /// Tests for the OsgManager class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
-#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
-#include <SurgSim/Framework/Runtime.h>
+#include "SurgSim/Framework/Runtime.h"
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
 
 #include <gtest/gtest.h>
 

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Testing/MlcpIO/ReadText.h>
+#include "SurgSim/Testing/MlcpIO/ReadText.h"
 
 #include <string>
 #include <vector>
@@ -21,11 +21,11 @@
 
 #include <Eigen/Core>
 
-#include <SurgSim/Math/MlcpConstraintType.h>
-#include <SurgSim/Math/MlcpConstraintTypeName.h>
+#include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Math/MlcpConstraintTypeName.h"
 
-#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
-#include <SurgSim/Testing/MlcpIO/TextLabels.h>
+#include "SurgSim/Testing/MlcpIO/MlcpTestData.h"
+#include "SurgSim/Testing/MlcpIO/TextLabels.h"
 
 
 // input helpers

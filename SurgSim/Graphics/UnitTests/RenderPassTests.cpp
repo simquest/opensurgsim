@@ -15,12 +15,12 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Graphics/RenderPass.h>
+#include "SurgSim/Graphics/RenderPass.h"
 
-#include <SurgSim/Graphics/Group.h>
-#include <SurgSim/Graphics/Camera.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
+#include "SurgSim/Graphics/Group.h"
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 
 namespace SurgSim
 {

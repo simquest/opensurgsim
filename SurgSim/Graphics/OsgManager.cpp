@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgManager.h>
+#include "SurgSim/Graphics/OsgManager.h"
 
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgView.h>
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgView.h"
 
 #include <osgViewer/Scene>
 #include <osgDB/WriteFile>

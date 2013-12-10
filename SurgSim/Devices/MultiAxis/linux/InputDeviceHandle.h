@@ -21,7 +21,7 @@
 #include <array>
 #include <vector>
 
-#include <SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h>
+#include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
 
 
 namespace SurgSim

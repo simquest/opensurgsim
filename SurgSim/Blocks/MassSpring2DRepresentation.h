@@ -19,10 +19,8 @@
 #include <array>
 #include <vector>
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-
-using SurgSim::Physics::DeformableRepresentationState;
+#include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 namespace SurgSim
 {
@@ -69,19 +67,19 @@ private:
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 2 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init2DStretchingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init2DStretchingSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[2], double stiffness, double damping);
 	/// Helper method to initialize/add all bending springs on a 2D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 2 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init2DBendingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init2DBendingSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[2], double stiffness, double damping);
 	/// Helper method to initialize/add all face diagonal springs on a 2D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 2 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init2DFaceDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init2DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[2], double stiffness, double damping);
 };
 

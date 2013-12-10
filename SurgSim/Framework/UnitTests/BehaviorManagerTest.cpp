@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Framework/BehaviorManager.h>
+#include "SurgSim/Framework/BehaviorManager.h"
 
-#include <SurgSim/Framework/UnitTests/MockObjects.h>
+#include "SurgSim/Framework/UnitTests/MockObjects.h"
 #include "boost/thread/thread.hpp"
 
 using SurgSim::Framework::BehaviorManager;

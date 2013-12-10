@@ -13,12 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+using SurgSim::Math::Vector;
+using SurgSim::Math::DiagonalMatrix;
+using SurgSim::Math::Matrix;
 
 namespace SurgSim
 {

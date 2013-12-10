@@ -18,14 +18,14 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/LinearSpring.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-
-using SurgSim::Physics::LinearSpring;
-using SurgSim::Physics::DeformableRepresentationState;
-
 namespace SurgSim
 {
+
+namespace Physics
+{
+class LinearSpring;
+class DeformableRepresentationState;
+}
 
 namespace Blocks
 {
@@ -35,7 +35,8 @@ namespace Blocks
 /// \param nodeId0, nodeId1 Node ids of the 2 connected masses
 /// \param stiffness, damping The spring parameters
 /// \return The newly create spring
-std::shared_ptr<LinearSpring> createLinearSpring(const std::shared_ptr<DeformableRepresentationState> state,
+std::shared_ptr<SurgSim::Physics::LinearSpring> createLinearSpring(
+	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 	unsigned int nodeId0, unsigned int nodeId1,
 	double stiffness, double damping);
 

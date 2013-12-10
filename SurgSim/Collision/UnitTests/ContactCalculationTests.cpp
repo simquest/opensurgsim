@@ -15,18 +15,18 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Collision/ContactCalculation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Collision/SpherePlaneDcdContact.h>
+#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Collision/SpherePlaneDcdContact.h"
 
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/PlaneShape.h>
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/PlaneShape.h"
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;

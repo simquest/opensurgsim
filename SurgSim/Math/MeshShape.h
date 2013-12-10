@@ -21,10 +21,10 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include <SurgSim/Math/Shape.h>
-#include <SurgSim/DataStructures/TriangleMesh.h>
+#include "SurgSim/Math/Shape.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
 namespace SurgSim
 {
@@ -104,6 +104,6 @@ private:
 }; // Math
 }; // SurgSim
 
-#include <SurgSim/Math/MeshShape-inl.h>
+#include "SurgSim/Math/MeshShape-inl.h"
 
 #endif // SURGSIM_MATH_MESHSHAPE_H

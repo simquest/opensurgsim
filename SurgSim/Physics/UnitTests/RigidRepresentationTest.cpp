@@ -17,17 +17,17 @@
 
 #include <string>
 
-#include <SurgSim/Collision/Location.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/PlaneShape.h>
-#include <SurgSim/Math/Shape.h>
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/Localization.h>
+#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/PlaneShape.h"
+#include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Localization.h"
 
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;

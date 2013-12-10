@@ -16,8 +16,8 @@
 #ifndef SURGSIM_MATH_OCTREESHAPE_H
 #define SURGSIM_MATH_OCTREESHAPE_H
 
-#include <SurgSim/DataStructures/OctreeNode.h>
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
@@ -75,6 +75,6 @@ private:
 
 }; // SurgSim
 
-#include <SurgSim/Math/OctreeShape-inl.h>
+#include "SurgSim/Math/OctreeShape-inl.h"
 
 #endif // SURGSIM_MATH_OCTREESHAPE_H

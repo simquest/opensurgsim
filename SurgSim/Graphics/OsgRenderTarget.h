@@ -19,10 +19,10 @@
 #include <memory>
 #include <unordered_map>
 
-#include <SurgSim/Graphics/RenderTarget.h>
-#include <SurgSim/Graphics/OsgTexture.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
-#include <SurgSim/Graphics/OsgTextureRectangle.h>
+#include "SurgSim/Graphics/RenderTarget.h"
+#include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgTextureRectangle.h"
 
 #include <osg/FrameBufferObject>
 
@@ -141,6 +141,6 @@ typedef OsgRenderTarget<OsgTextureRectangle> OsgRenderTargetRectangle;
 }; // Graphics
 }; // SurgSim
 
-#include <SurgSim/Graphics/OsgRenderTarget-inl.h>
+#include "SurgSim/Graphics/OsgRenderTarget-inl.h"
 
 #endif

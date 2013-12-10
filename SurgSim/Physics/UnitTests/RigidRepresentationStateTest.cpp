@@ -16,11 +16,11 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/Physics/RigidRepresentationState.h>
+#include "SurgSim/Physics/RigidRepresentationState.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 TEST(RigidRepresentationStateTest, ConstructorTest)
 {
