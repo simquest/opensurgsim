@@ -206,7 +206,7 @@ int OsgMeshRepresentation::updateOsgArrays()
 
 	if (vertex.data.color.hasValue() && numVertices > m_colors->size())
 	{
-		if (m_colors->size() == 1)
+		if (m_colors->size() > 1)
 		{
 			m_colors->setDataVariance(getDataVariance(UPDATE_OPTION_COLORS));
 			m_geometry->setColorArray(m_colors, osg::Array::BIND_PER_VERTEX);
@@ -227,7 +227,7 @@ int OsgMeshRepresentation::updateOsgArrays()
 		result |= UPDATE_OPTION_TEXTURES;
 	}
 
-	if (m_mesh->getNumTriangles() > m_triangles->size())
+	if (m_mesh->getNumTriangles()*3 > m_triangles->size())
 	{
 		m_triangles->resize(m_mesh->getNumTriangles()*3);
 		m_triangles->setDataVariance(getDataVariance(UPDATE_OPTION_TRIANGLES));
