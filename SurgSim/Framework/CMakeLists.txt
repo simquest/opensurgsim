@@ -32,7 +32,6 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	BehaviorManager.cpp
 	Component.cpp
 	ComponentManager.cpp
-	CopyPropertiesBehavior.cpp
 	Logger.cpp
 	LoggerManager.cpp
 	LogMessageBase.cpp
@@ -41,6 +40,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Runtime.cpp
 	Scene.cpp
 	SceneElement.cpp
+	TransferPropertiesBehavior.cpp
 	Timer.cpp
 )
 
@@ -58,7 +58,6 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Component.h
 	ComponentManager.h
 	ComponentManager-inl.h
-	CopyPropertiesBehavior.h
 	LockedContainer.h
 	Log.h
 	Logger.h
@@ -75,6 +74,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	SceneElement-inl.h
 	SharedInstance.h
 	SharedInstance-inl.h
+	TransferPropertiesBehavior.h
 	Timer.h
 )
 

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/CopyPropertiesBehavior.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 
 #include <boost/thread/lock_guard.hpp>
 
@@ -22,19 +22,19 @@ namespace SurgSim
 namespace Framework
 {
 
-CopyPropertiesBehavior::CopyPropertiesBehavior(const std::string& name) :
-	m_targetManager(MANAGER_TYPE_BEHAVIOR),
-	SurgSim::Framework::Behavior(name)
+TransferPropertiesBehavior::TransferPropertiesBehavior(const std::string& name) :
+	SurgSim::Framework::Behavior(name),
+	m_targetManager(MANAGER_TYPE_BEHAVIOR)
 {
 
 }
 
-CopyPropertiesBehavior::~CopyPropertiesBehavior()
+TransferPropertiesBehavior::~TransferPropertiesBehavior()
 {
 
 }
 
-void CopyPropertiesBehavior::update(double dt)
+void TransferPropertiesBehavior::update(double dt)
 {
 	{
 		boost::lock_guard<boost::mutex>lock(m_incomingMutex);
@@ -53,7 +53,7 @@ void CopyPropertiesBehavior::update(double dt)
 	}
 }
 
-bool CopyPropertiesBehavior::connect(
+bool TransferPropertiesBehavior::connect(
 	std::shared_ptr<SurgSim::Framework::Accessible> source,
 	const std::string& sourcePropertyName,
 	std::shared_ptr<SurgSim::Framework::Accessible> target,				   
@@ -89,26 +89,26 @@ bool CopyPropertiesBehavior::connect(
 	return true;
 }
 
-bool CopyPropertiesBehavior::doInitialize()
+bool TransferPropertiesBehavior::doInitialize()
 {
 	return true;
 }
 
-bool CopyPropertiesBehavior::doWakeUp()
+bool TransferPropertiesBehavior::doWakeUp()
 {
 	// Do an update step to initialize all the values
 	update(0.0);
 	return true;
 }
 
-void CopyPropertiesBehavior::setTargetManagerType(int managerType)
+void TransferPropertiesBehavior::setTargetManagerType(int managerType)
 {
 	SURGSIM_ASSERT(managerType > 0 && managerType < MANAGER_TYPE_COUNT) << "Invalid manager type.";
 	SURGSIM_ASSERT(!isInitialized()) << "Cannot change the manager type after initialization.";
 	m_targetManager = managerType;
 }
 
-int CopyPropertiesBehavior::getTargetManagerType() const
+int TransferPropertiesBehavior::getTargetManagerType() const
 {
 	return m_targetManager;
 }

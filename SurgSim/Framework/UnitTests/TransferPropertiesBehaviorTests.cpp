@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Framework/CopyPropertiesBehavior.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 #include "SurgSim/Framework/Runtime.h"
 
 
@@ -42,17 +42,17 @@ namespace SurgSim
 namespace Framework
 {
 
-TEST(CopyPropertiesBehaviorTest, InitTest)
+TEST(TransferPropertiesBehaviorTest, InitTest)
 {
-	ASSERT_NO_THROW({CopyPropertiesBehavior b("TestName");});
+	ASSERT_NO_THROW({TransferPropertiesBehavior b("TestName");});
 }
 
-TEST(CopyPropertiesBehaviorTest, ValidConnections)
+TEST(TransferPropertiesBehaviorTest, ValidConnections)
 {
 	auto a = std::make_shared<A>();
 	auto b = std::make_shared<A>();
 
-	CopyPropertiesBehavior behavior("test");
+	TransferPropertiesBehavior behavior("test");
 
 	EXPECT_FALSE(behavior.connect(nullptr, "",a ,"a"));
 	EXPECT_FALSE(behavior.connect(a, "a", nullptr, ""));
@@ -65,10 +65,10 @@ TEST(CopyPropertiesBehaviorTest, ValidConnections)
 	EXPECT_TRUE(behavior.connect(a, "a", b, "b"));
 }
 
-TEST(CopyPropertiesBehaviorTest, ValidUpdates)
+TEST(TransferPropertiesBehaviorTest, ValidUpdates)
 {
 	auto runtime = std::make_shared<Runtime>();
-	auto behavior = std::make_shared<CopyPropertiesBehavior>("test");
+	auto behavior = std::make_shared<TransferPropertiesBehavior>("test");
 	auto a = std::make_shared<A>(1,2);
 	auto b = std::make_shared<A>(3,4);
 	auto c = std::make_shared<A>(5,6);

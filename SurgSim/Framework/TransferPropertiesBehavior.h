@@ -30,16 +30,16 @@ namespace Framework
 
 /// Behavior to copy properties between instances of Accessible
 /// \note HS-2013-dec-12 does not support removal of connections yes
-class CopyPropertiesBehavior : public SurgSim::Framework::Behavior
+class TransferPropertiesBehavior : public SurgSim::Framework::Behavior
 {
 public:
 
 	/// Constructor.
 	/// \param name The name of the behavior.
-	explicit CopyPropertiesBehavior(const std::string& name);
+	explicit TransferPropertiesBehavior(const std::string& name);
 	
 	/// Destructor.
-	virtual ~CopyPropertiesBehavior();
+	virtual ~TransferPropertiesBehavior();
 
 	/// Connect two properties of two instances of accessible, once connected the value of the property
 	/// will be copied from source to target at every update call.
