@@ -1164,7 +1164,7 @@ TYPED_TEST(AllDynamicVectorTests, resize)
 	EXPECT_TRUE(v.isZero());
 }
 
-TYPED_TEST(Vector3Tests, buildOrthonormalFrame)
+TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
 {
 	typedef typename TestFixture::Vector3 Vector3;
 	typedef typename Vector3::Scalar T;
@@ -1174,7 +1174,7 @@ TYPED_TEST(Vector3Tests, buildOrthonormalFrame)
 	T precision = Eigen::NumTraits<T>::dummy_precision();
 
 	i.normalize();
-	ASSERT_NO_THROW(SurgSim::Math::buildOrthonormalFrame(i, &j, &k););
+	ASSERT_NO_THROW(SurgSim::Math::buildOrthonormalBasis(i, &j, &k););
 	EXPECT_NEAR(i.dot(j), 0.0, precision);
 	EXPECT_NEAR(i.dot(k), 0.0, precision);
 	EXPECT_NEAR(j.dot(i), 0.0, precision);
