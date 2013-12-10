@@ -41,13 +41,13 @@ FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds,
 	setNumDofPerNode(3);
 
 	// Set the shape functions coefficients
-	// Ni(epsilon, neta, mu) = (1+-epsilon)(1+-neta)(1+-mu)/8
+	// Ni(epsilon, eta, mu) = (1+-epsilon)(1+-eta)(1+-mu)/8
 	std::array<double, 8> tmpEpsilon = {{-1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0, -1.0}};
-	std::array<double, 8> tmpNeta    = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
+	std::array<double, 8> tmpEta    = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
 	std::array<double, 8> tmpMu      = {{-1.0, -1.0, -1.0, -1.0, +1.0, +1.0, +1.0, +1.0}};
-	m_coefEpsilon = tmpEpsilon;
-	m_coefNeta    = tmpNeta;
-	m_coefMu      = tmpMu;
+	m_shapeFunctionsEpsilonSign = tmpEpsilon;
+	m_shapeFunctionsEtaSign     = tmpEta;
+	m_shapeFunctionsMuSign      = tmpMu;
 
 	// Store the 8 nodeIds in order
 	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
@@ -70,8 +70,8 @@ void FemElement3DCube::initialize(const DeformableRepresentationState& state)
 	FemElement::initialize(state);
 
 	// Pre-compute the mass and stiffness matrix
-	computeMass(state, &m_M);
-	computeStiffness(state, &m_strain, &m_stress, &m_K);
+	computeMass(state, &m_mass);
+	computeStiffness(state, &m_strain, &m_stress, &m_stiffness);
 }
 
 void FemElement3DCube::addForce(const DeformableRepresentationState& state,
@@ -90,7 +90,7 @@ void FemElement3DCube::addForce(const DeformableRepresentationState& state,
 void FemElement3DCube::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
 									   double scale)
 {
-	addForce(state, m_K, F, scale);
+	addForce(state, m_stiffness, F, scale);
 }
 
 void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
@@ -126,7 +126,7 @@ void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
 void FemElement3DCube::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
 									  double scale)
 {
-	addSubMatrix(m_M * scale, m_nodeIds, 3, M);
+	addSubMatrix(m_mass * scale, m_nodeIds, 3, M);
 }
 
 void FemElement3DCube::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D,
@@ -164,7 +164,7 @@ void FemElement3DCube::computeStiffness(const DeformableRepresentationState& sta
 	}
 }
 
-void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, double epsilon, double neta, double mu,
+void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, double epsilon, double eta, double mu,
 								 SurgSim::Math::Matrix33d *J,
 								 SurgSim::Math::Matrix33d *Jinv,
 								 double *detJ) const
@@ -182,15 +182,15 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 	// Zerout the matrix J
 	J->setZero();
 
-	// Compute J = d(x,y,z)/d(epsilon,neta,mu)
-	// Note that (x,y,z) = sum((xi,yi,zi).Ni(epsilon,neta,mu))
+	// Compute J = d(x,y,z)/d(epsilon,eta,mu)
+	// Note that (x,y,z) = sum((xi,yi,zi).Ni(epsilon,eta,mu))
 	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
 	{
 		for(size_t axis = 0; axis < 3; ++axis)
 		{
-			(*J)(0, axis) += p[nodeId][axis] * dNdepsilon(nodeId, epsilon, neta, mu);
-			(*J)(1, axis) += p[nodeId][axis] * dNdneta   (nodeId, epsilon, neta, mu);
-			(*J)(2, axis) += p[nodeId][axis] * dNdmu     (nodeId, epsilon, neta, mu);
+			(*J)(0, axis) += p[nodeId][axis] * dNdepsilon(nodeId, epsilon, eta, mu);
+			(*J)(1, axis) += p[nodeId][axis] * dNdeta    (nodeId, epsilon, eta, mu);
+			(*J)(2, axis) += p[nodeId][axis] * dNdmu     (nodeId, epsilon, eta, mu);
 		}
 	}
 
@@ -208,25 +208,26 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 	}
 }
 
-void FemElement3DCube::evaluateB(double epsilon, double neta, double mu, const SurgSim::Math::Matrix33d& Jinv,
-								 Eigen::Matrix<double, 6, 24, Eigen::DontAlign> *B) const
+void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, double mu,
+												  const SurgSim::Math::Matrix33d& Jinv,
+												  Eigen::Matrix<double, 6, 24, Eigen::DontAlign> *B) const
 {
-	SURGSIM_ASSERT(B) << "Trying to evalute B with a nullptr for matrix B";
+	SURGSIM_ASSERT(B) << "Trying to evalute the strain-displacmenet with a nullptr";
 
-	// Zerout B (strain-displacement matrix)
+	// Zerout the strain-displacement
 	B->setZero();
 
-	// Set non-zero entries of B
+	// Set non-zero entries of the strain-displacement
 	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
 	{
-		// Compute dNi/d(x,y,z) = dNi/d(epsilon,neta,mu) d(epsilon,neta,mu)/d(x,y,z)
-		//                      = J^{-1}.dNi/d(epsilon,neta,mu)
-		Vector3d dNidEpsilonNetaMu(
-			dNdepsilon(nodeId, epsilon, neta, mu),
-			dNdneta(nodeId, epsilon, neta, mu),
-			dNdmu(nodeId, epsilon, neta, mu)
+		// Compute dNi/d(x,y,z) = dNi/d(epsilon,eta,mu) d(epsilon,eta,mu)/d(x,y,z)
+		//                      = J^{-1}.dNi/d(epsilon,eta,mu)
+		Vector3d dNidEpsilonEtaMu(
+			dNdepsilon(nodeId, epsilon, eta, mu),
+			dNdeta(nodeId, epsilon, eta, mu),
+			dNdmu(nodeId, epsilon, eta, mu)
 		);
-		Vector3d dNidxyz = Jinv * dNidEpsilonNetaMu;
+		Vector3d dNidxyz = Jinv * dNidEpsilonEtaMu;
 
 		// B = (dNi/dx      0      0)
 		//     (     0 dNi/dy      0)
@@ -248,8 +249,8 @@ void FemElement3DCube::evaluateB(double epsilon, double neta, double mu, const S
 }
 
 void FemElement3DCube::addStrainStressStiffnessAtPoint(const DeformableRepresentationState& state,
-	double epsilon, double neta, double mu,
-	double weightEpsilon, double weightNeta, double weightMu,
+	double epsilon, double eta, double mu,
+	double weightEpsilon, double weightEta, double weightMu,
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
 	Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k)
@@ -260,29 +261,30 @@ void FemElement3DCube::addStrainStressStiffnessAtPoint(const DeformableRepresent
 	double detJ;
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign> B;
 
-	evaluateJ(state, epsilon, neta, mu, &J, &Jinv, &detJ);
+	evaluateJ(state, epsilon, eta, mu, &J, &Jinv, &detJ);
 
-	evaluateB(epsilon, neta, mu, Jinv, &B);
+	evaluateStrainDisplacement(epsilon, eta, mu, Jinv, &B);
 
 	{
 		// Compute the elasticity material matrix
 		// which is commonly based on the Lame coefficients (1st = lambda, 2nd = mu = shear modulus):
 		double lambda = m_E * m_nu / ((1.0 + m_nu) * (1.0 - 2.0 * m_nu));
 		double mu = m_E / (2.0 * (1 + m_nu));
-		m_Em.setZero();
-		m_Em(0, 0) = m_Em(1, 1) = m_Em(2, 2) = 2.0 * mu + lambda;
-		m_Em(0, 1) = m_Em(0, 2) = m_Em(1, 0) = m_Em(1, 2) = m_Em(2, 0) = m_Em(2, 1) = lambda;
-		m_Em(3, 3) = m_Em(4, 4) = m_Em(5, 5) = mu;
+		m_constitutiveMaterial.setZero();
+		m_constitutiveMaterial(0, 0) = m_constitutiveMaterial(1, 1) = m_constitutiveMaterial(2, 2) = 2.0 * mu + lambda;
+		m_constitutiveMaterial(0, 1) = m_constitutiveMaterial(0, 2) = m_constitutiveMaterial(1, 0) = lambda;
+		m_constitutiveMaterial(1, 2) = m_constitutiveMaterial(2, 0) = m_constitutiveMaterial(2, 1) = lambda;
+		m_constitutiveMaterial(3, 3) = m_constitutiveMaterial(4, 4) = m_constitutiveMaterial(5, 5) = mu;
 	}
 
-	*strain += B;
-	*stress += m_Em * B;
-	*k += (weightEpsilon * weightNeta * weightMu * detJ) * B.transpose() * m_Em * B;
+	*strain += (weightEpsilon * weightEta * weightMu * detJ) * B;
+	*stress += (weightEpsilon * weightEta * weightMu * detJ) * m_constitutiveMaterial * B;
+	*k += (weightEpsilon * weightEta * weightMu * detJ) * B.transpose() * m_constitutiveMaterial * B;
 }
 
 void FemElement3DCube::addMassMatrixAtPoint(const DeformableRepresentationState& state,
-	double epsilon, double neta, double mu,
-	double weightEpsilon, double weightNeta, double weightMu,
+	double epsilon, double eta, double mu,
+	double weightEpsilon, double weightEta, double weightMu,
 	Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m)
 {
 	using SurgSim::Framework::Logger;
@@ -291,24 +293,24 @@ void FemElement3DCube::addMassMatrixAtPoint(const DeformableRepresentationState&
 	double detJ;
 	SurgSim::Math::Matrix Ni(3, 24);
 
-	evaluateJ(state, epsilon, neta, mu, &J, &Jinv, &detJ);
+	evaluateJ(state, epsilon, eta, mu, &J, &Jinv, &detJ);
 
 	Ni.setZero();
 	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
 	{
-		double coef = N(nodeId, epsilon, neta, mu);
+		double coef = N(nodeId, epsilon, eta, mu);
 		Ni(0, getNumDofPerNode() * nodeId    ) += coef;
 		Ni(1, getNumDofPerNode() * nodeId + 1) += coef;
 		Ni(2, getNumDofPerNode() * nodeId + 2) += coef;
 	}
 
-	*m += (weightEpsilon * weightNeta * weightMu * detJ * m_rho) * Ni.transpose() * Ni;
+	*m += (weightEpsilon * weightEta * weightMu * detJ * m_rho) * Ni.transpose() * Ni;
 }
 
 void FemElement3DCube::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
 										   double scale)
 {
-	addSubMatrix(m_K * scale, getNodeIds(), 3, K);
+	addSubMatrix(m_stiffness * scale, getNodeIds(), 3, K);
 }
 
 void FemElement3DCube::addFMDK(const DeformableRepresentationState& state,
@@ -347,7 +349,7 @@ void FemElement3DCube::addMatVec(const DeformableRepresentationState& state,
 	// Adds the mass contribution
 	if (alphaM)
 	{
-		resLoc = alphaM * (m_M * xLoc);
+		resLoc = alphaM * (m_mass * xLoc);
 		addSubVector(resLoc, m_nodeIds, 3, F);
 	}
 
@@ -356,7 +358,7 @@ void FemElement3DCube::addMatVec(const DeformableRepresentationState& state,
 	// Adds the stiffness contribution
 	if (alphaK)
 	{
-		resLoc = alphaK * (m_K * xLoc);
+		resLoc = alphaK * (m_stiffness * xLoc);
 		addSubVector(resLoc, m_nodeIds, 3, F);
 	}
 }
@@ -369,7 +371,7 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 
 	// Compute the volume using a 2-points Gauss-Legendre quadrature
 	// V = \int_V dV
-	//   = sum_{i=0}^2 sum_{j=0}^2 sum_{k=0}^2 weightEpsilon_i weightNeta_j weightMu_k det(J(epsilon_i, neta_j, mu_k))
+	//   = sum_{i=0}^2 sum_{j=0}^2 sum_{k=0}^2 weightEpsilon_i weightEta_j weightMu_k det(J(epsilon_i, eta_j, mu_k))
 	for (int i = 0; i < 2; ++i)
 	{
 		double &epsilon = gaussQuadrature2Points[i].first;
@@ -377,8 +379,8 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 
 		for (int j = 0; j < 2; ++j)
 		{
-			double &neta= gaussQuadrature2Points[j].first;
-			double &weightNeta = gaussQuadrature2Points[j].second;
+			double &eta= gaussQuadrature2Points[j].first;
+			double &weightEta = gaussQuadrature2Points[j].second;
 
 			for (int k = 0; k < 2; ++k)
 			{
@@ -388,9 +390,9 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 				SurgSim::Math::Matrix33d J, Jinv;
 				double detJ;
 
-				evaluateJ(state, epsilon, neta, mu, &J, &Jinv, &detJ);
+				evaluateJ(state, epsilon, eta, mu, &J, &Jinv, &detJ);
 
-				v += weightEpsilon * weightNeta * weightMu * detJ;
+				v += weightEpsilon * weightEta * weightMu * detJ;
 			}
 		}
 	}
@@ -408,24 +410,36 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 	return v;
 }
 
-double FemElement3DCube::N(size_t i, double epsilon, double neta, double mu) const
+double FemElement3DCube::N(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 * (1 + epsilon * m_coefEpsilon[i]) * (1 + neta * m_coefNeta[i]) * (1 + mu * m_coefMu[i]);
+	return 1.0/8.0 *
+		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
+		(1 + eta * m_shapeFunctionsEtaSign[i]) *
+		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dNdepsilon(size_t i, double epsilon, double neta, double mu) const
+double FemElement3DCube::dNdepsilon(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 * m_coefEpsilon[i] * (1 + neta * m_coefNeta[i]) * (1 + mu * m_coefMu[i]);
+	return 1.0/8.0 *
+		m_shapeFunctionsEpsilonSign[i] *
+		(1 + eta * m_shapeFunctionsEtaSign[i]) *
+		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dNdneta(size_t i, double epsilon, double neta, double mu) const
+double FemElement3DCube::dNdeta(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 * (1 + epsilon * m_coefEpsilon[i]) * m_coefNeta[i] * (1 + mu * m_coefMu[i]);
+	return 1.0/8.0 *
+		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
+		m_shapeFunctionsEtaSign[i] *
+		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dNdmu(size_t i, double epsilon, double neta, double mu) const
+double FemElement3DCube::dNdmu(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 * (1 + epsilon * m_coefEpsilon[i]) * (1 + neta * m_coefNeta[i]) * m_coefMu[i];
+	return 1.0/8.0 *
+		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
+		(1 + eta * m_shapeFunctionsEtaSign[i]) *
+		m_shapeFunctionsMuSign[i];
 }
 
 } // namespace Physics

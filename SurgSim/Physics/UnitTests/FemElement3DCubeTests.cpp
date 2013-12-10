@@ -47,24 +47,24 @@ public:
 		return m_restVolume;
 	}
 
-	double evaluateN(int i, double epsilon, double neta, double mu) const
+	double evaluateN(int i, double epsilon, double eta, double mu) const
 	{
-		return N(i, epsilon, neta, mu);
+		return N(i, epsilon, eta, mu);
 	}
 
-	double evaluatedNidEpsilon(int i, double epsilon, double neta, double mu) const
+	double evaluatedNidEpsilon(int i, double epsilon, double eta, double mu) const
 	{
-		return dNdepsilon(i, epsilon, neta, mu);
+		return dNdepsilon(i, epsilon, eta, mu);
 	}
 
-	double evaluatedNidNeta(int i, double epsilon, double neta, double mu) const
+	double evaluatedNidEta(int i, double epsilon, double eta, double mu) const
 	{
-		return dNdneta(i, epsilon, neta, mu);
+		return dNdeta(i, epsilon, eta, mu);
 	}
 
-	double evaluatedNidMu(int i, double epsilon, double neta, double mu) const
+	double evaluatedNidMu(int i, double epsilon, double eta, double mu) const
 	{
-		return dNdmu(i, epsilon, neta, mu);
+		return dNdmu(i, epsilon, eta, mu);
 	}
 
 	const Eigen::Matrix<double, 24, 1, Eigen::DontAlign>& getInitialPosition() const
@@ -602,7 +602,7 @@ TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 	// We verify that relation by sampling the tetrahedron volume
 	for (double epsilon = -1.0; epsilon <= 1.0; epsilon+=0.1)
 	{
-		for (double neta = -1.0; neta <= 1.0; neta+=0.1)
+		for (double eta = -1.0; eta <= 1.0; eta+=0.1)
 		{
 			for (double mu = -1.0; mu <= 1.0; mu+=0.1)
 			{
@@ -610,15 +610,15 @@ TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 				double sum = 0.0;
 				for (int i = 0; i < 8; i++)
 				{
-					Ni_p[i] = cube.evaluateN(i, epsilon, neta, mu);
+					Ni_p[i] = cube.evaluateN(i, epsilon, eta, mu);
 					sum += Ni_p[i];
 				}
 				EXPECT_NEAR(sum, 1.0, 1e-10) <<
-					" for epsilon = " << epsilon << ", neta = " << neta << ", mu = " << mu << std::endl <<
-					" N0(epsilon,neta,mu) = " << Ni_p[0] << " N1(epsilon,neta,mu) = " << Ni_p[1] <<
-					" N2(epsilon,neta,mu) = " << Ni_p[2] << " N3(epsilon,neta,mu) = " << Ni_p[3] <<
-					" N4(epsilon,neta,mu) = " << Ni_p[4] << " N5(epsilon,neta,mu) = " << Ni_p[5] <<
-					" N6(epsilon,neta,mu) = " << Ni_p[6] << " N7(epsilon,neta,mu) = " << Ni_p[7];
+					" for epsilon = " << epsilon << ", eta = " << eta << ", mu = " << mu << std::endl <<
+					" N0(epsilon,eta,mu) = " << Ni_p[0] << " N1(epsilon,eta,mu) = " << Ni_p[1] <<
+					" N2(epsilon,eta,mu) = " << Ni_p[2] << " N3(epsilon,eta,mu) = " << Ni_p[3] <<
+					" N4(epsilon,eta,mu) = " << Ni_p[4] << " N5(epsilon,eta,mu) = " << Ni_p[5] <<
+					" N6(epsilon,eta,mu) = " << Ni_p[6] << " N7(epsilon,eta,mu) = " << Ni_p[7];
 			}
 		}
 	}
