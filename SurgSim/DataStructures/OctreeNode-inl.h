@@ -24,7 +24,7 @@ namespace DataStructures
 
 
 template<class Data>
-OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::BoundingBoxType& boundingBox) :
+OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::AxisAlignedBoundingBox& boundingBox) :
 	m_boundingBox(boundingBox),
 	m_isActive(false),
 	m_hasChildren(false)
@@ -37,7 +37,7 @@ OctreeNode<Data>::~OctreeNode()
 }
 
 template<class Data>
-const typename OctreeNode<Data>::BoundingBoxType& OctreeNode<Data>::getBoundingBox() const
+const typename OctreeNode<Data>::AxisAlignedBoundingBox& OctreeNode<Data>::getBoundingBox() const
 {
 	return m_boundingBox;
 }
@@ -62,7 +62,7 @@ void OctreeNode<Data>::subdivide()
 	if (! m_hasChildren)
 	{
 		Vector3d childsSize = (m_boundingBox.max() - m_boundingBox.min()) / 2.0;
-		BoundingBoxType childsBoundingBox;
+		AxisAlignedBoundingBox childsBoundingBox;
 		for (int i = 0; i < 8; i++)
 		{
 			// Use the index to pick one of the eight regions

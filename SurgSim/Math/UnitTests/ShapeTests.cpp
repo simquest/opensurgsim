@@ -218,7 +218,7 @@ struct OctreeData
 
 TEST_F(ShapeTest, Octree)
 {
-	OctreeNode<OctreeData>::BoundingBoxType boundingBox(Vector3d::Zero(), m_size);
+	OctreeNode<OctreeData>::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), m_size);
 	std::shared_ptr<OctreeNode<OctreeData> > node = std::make_shared<OctreeNode<OctreeData> >(boundingBox);
 
 	{
