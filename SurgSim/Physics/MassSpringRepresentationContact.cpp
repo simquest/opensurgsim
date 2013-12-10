@@ -55,7 +55,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(representation);
 
-	if (!massSpring->isActive())
+	if ( !massSpring->isActive())
 	{
 		return;
 	}
@@ -123,7 +123,7 @@ SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstr
 
 SurgSim::Physics::RepresentationType MassSpringRepresentationContact::getRepresentationType() const
 {
-	return 	REPRESENTATION_TYPE_MASSSPRING;
+	return REPRESENTATION_TYPE_MASSSPRING;
 }
 
 unsigned int MassSpringRepresentationContact::doGetNumDof() const
