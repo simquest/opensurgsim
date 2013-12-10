@@ -27,14 +27,15 @@ namespace Physics
 
 /// Implementation of Localization for MassSpringRepresentation
 ///
-/// MassSpringRepresentationLocalization is a helper class for filling out the MlcpPhysicsProblem when applying
-/// constraints to the motion of a MassSpringRepresentation.  For a concrete example, see
-/// MassSpringRepresentationContact::doBuild.
+/// MassSpringRepresentationLocalization tracks the global coordinates of a node contained in an associated
+/// MassSpringRepresentation.  It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
+/// MassSpringRepresentationContact::doBuild, which constrains the motion of MassSpringRepresentation at a frictionless
+/// contact.
 ///
 /// MassSpringRepresentationLocalization stores a pointer to a MassSpringRepresentation in an abstract Representation
 /// object.  It tracks the ID of a node contained within the associated MassSpringRepresentation, and it provides a
 /// helper function MassSpringRepresentationLocalization::calculatePosition to find the node's position in global
-/// coordinates.
+/// coordinates in the current state.
 class MassSpringRepresentationLocalization: public Localization
 {
 public:
@@ -63,10 +64,10 @@ public:
 
 private:
 	/// Calculates the global position of this localization.
-	/// \param time Interpolation parameter [0..1] for calcuting position between the previous time-step (0.0) and the
-	/// current time-step (1.0).
-	/// \return The global position of the localization at the requested interpolation.
-	/// \note time can useful when dealing with CCD.
+	/// \param time Interpolation parameter [0..1] for calcuting position between the previous state (0.0) and current
+	/// state (1.0).
+	/// \return The global position of the localization using an interpolation between the previous and current states.
+	/// \note The time parameter can useful when dealing with Continuous Collision Detection.
 	virtual SurgSim::Math::Vector3d doCalculatePosition(double time) override;
 
 	/// Node defining the localization.
