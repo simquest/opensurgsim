@@ -15,13 +15,13 @@
 
 #include "SurgSim/Graphics/RenderTests//RenderTest.h"
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Graphics/View.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Quaternion.h"

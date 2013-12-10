@@ -17,7 +17,7 @@
 #define SURGSIM_TESTING_TESTCUBE_H
 
 #include <vector>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;

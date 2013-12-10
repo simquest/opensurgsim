@@ -1,4 +1,4 @@
- // This file is a part of the OpenSurgSim project.
+// This file is a part of the OpenSurgSim project.
 // Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ namespace Graphics
 {
 
 
-/// Triangle index functor which calculates normals for the vertices of a geometry, use 
+/// Triangle index functor which calculates normals for the vertices of a geometry, use
 /// createNormalGenerator to instantiate this
 class TriangleNormalGenerator
 {
@@ -69,7 +69,9 @@ private:
 	size_t m_size;
 };
 
-osg::TriangleIndexFunctor<TriangleNormalGenerator> createNormalGenerator(osg::Vec3Array* vertexArray, osg::Vec3Array* normalArray);
+osg::TriangleIndexFunctor<TriangleNormalGenerator> createNormalGenerator(
+	osg::Vec3Array* vertexArray,
+	osg::Vec3Array* normalArray);
 
 
 }; // Graphics

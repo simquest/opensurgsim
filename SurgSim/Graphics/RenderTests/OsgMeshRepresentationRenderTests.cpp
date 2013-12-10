@@ -56,8 +56,8 @@ using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Testing::interpolate;
 using SurgSim::Testing::interpolatePose;
 
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Framework/Behavior.h>
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Behavior.h"
 #include <utility>
 
 namespace SurgSim

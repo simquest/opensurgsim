@@ -21,7 +21,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include <SurgSim/Framework/ApplicationData.h>
+#include "SurgSim/Framework/ApplicationData.h"
 
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
