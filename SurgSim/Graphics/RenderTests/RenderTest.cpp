@@ -17,6 +17,7 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Graphics/View.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
@@ -33,12 +34,15 @@ namespace SurgSim
 namespace Graphics
 {
 
+
 void RenderTest::SetUp()
 {
+	applicationData = std::make_shared<SurgSim::Framework::ApplicationData>("config.txt");
 	runtime = std::make_shared<SurgSim::Framework::Runtime>();
 	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
 	runtime->addManager(graphicsManager);
+	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
 	scene = std::make_shared<SurgSim::Framework::Scene>();
 	runtime->setScene(scene);
