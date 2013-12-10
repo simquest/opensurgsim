@@ -13,10 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/CopyPropertiesBehavior.h>
+#include "SurgSim/Framework/CopyPropertiesBehavior.h"
 
+#include <boost/thread/lock_guard.hpp>
 
-CopyPropertiesBehavior::CopyPropertiesBehavior(const std::string& name) : SurgSim::Framework::Behavior(name)
+namespace SurgSim
+{
+namespace Framework
+{
+
+CopyPropertiesBehavior::CopyPropertiesBehavior(const std::string& name) :
+	m_targetManager(MANAGER_TYPE_BEHAVIOR),
+	SurgSim::Framework::Behavior(name)
 {
 
 }
@@ -28,21 +36,28 @@ CopyPropertiesBehavior::~CopyPropertiesBehavior()
 
 void CopyPropertiesBehavior::update(double dt)
 {
-	for (auto it = std::begin(m_properties); it != std::end(m_properties); ++it)
 	{
-		auto source = it->first.second.lock();
-		auto target = it->second.second.lock();
-		if (source != nullptr && target !=nullptr)
+		boost::lock_guard<boost::mutex>lock(m_incomingMutex);
+		m_connections.insert(m_connections.end(), m_incomingConnections.begin(), m_incomingConnections.end());
+		m_incomingConnections.clear();
+	}
+
+	for (auto it = std::begin(m_connections); it != std::end(m_connections); ++it)
+	{
+		if (!it->first.second.expired() && !it->second.second.expired())
 		{
+			auto source = it->first.second.lock();
+			auto target = it->second.second.lock();
 			target->setValue(it->second.first,source->getValue(it->first.first));
 		}
 	}
 }
 
-bool CopyPropertiesBehavior::addConnection(const std::string& sourcePropertyName,
-										   std::shared_ptr<SurgSim::Framework::Accessible> source,
-										   const std::string& targetPropertyName,
-										   std::shared_ptr<SurgSim::Framework::Accessible> target)
+bool CopyPropertiesBehavior::connect(
+	std::shared_ptr<SurgSim::Framework::Accessible> source,
+	const std::string& sourcePropertyName,
+	std::shared_ptr<SurgSim::Framework::Accessible> target,				   
+	const std::string& targetPropertyName)
 {
 
 	// Early outs
@@ -56,16 +71,20 @@ bool CopyPropertiesBehavior::addConnection(const std::string& sourcePropertyName
 		return false;
 	}
 
-	// \note HS-2013-nov-26 should also check for existing properties and matching types here 
+	if (! source->isReadable(sourcePropertyName) || !target->isWriteable(targetPropertyName))
+	{
+		return false;
+	}
+
+	// \note HS-2013-nov-26 should also check for existing properties and matching types here
 
 	Property sourceProperty = std::make_pair(sourcePropertyName, source);
 	Property targetProperty = std::make_pair(targetPropertyName, target);
 
 	auto entry = std::make_pair(std::move(sourceProperty), std::move(targetProperty));
 
-	// Probably need to protect this, we might be manipulating in later on
-	// #threadsafety
-	m_properties.push_back(std::move(entry));
+	boost::lock_guard<boost::mutex>lock(m_incomingMutex);
+	m_incomingConnections.push_back(std::move(entry));
 
 	return true;
 }
@@ -82,3 +101,17 @@ bool CopyPropertiesBehavior::doWakeUp()
 	return true;
 }
 
+void CopyPropertiesBehavior::setTargetManagerType(int managerType)
+{
+	SURGSIM_ASSERT(managerType > 0 && managerType < MANAGER_TYPE_COUNT) << "Invalid manager type.";
+	SURGSIM_ASSERT(!isInitialized()) << "Cannot change the manager type after initialization.";
+	m_targetManager = managerType;
+}
+
+int CopyPropertiesBehavior::getTargetManagerType() const
+{
+	return m_targetManager;
+}
+
+}
+}
