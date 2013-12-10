@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	BehaviorManagerTest.cpp
 	ComponentManagerTests.cpp
 	ComponentTest.cpp
+	CopyPropertyBehaviorTests.cpp
 	LockedContainerTest.cpp
 	LoggerManagerTest.cpp
 	LoggerTest.cpp
