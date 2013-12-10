@@ -83,7 +83,9 @@ void TriangleNormalGenerator::operator() (unsigned int vertexIndex1,
 	(*m_normalArray)[vertexIndex3] += normal;
 }
 
-osg::TriangleIndexFunctor<TriangleNormalGenerator> createNormalGenerator(osg::Vec3Array* vertexArray, osg::Vec3Array* normalArray)
+osg::TriangleIndexFunctor<TriangleNormalGenerator> createNormalGenerator(
+	osg::Vec3Array* vertexArray
+	osg::Vec3Array* normalArray)
 {
 	osg::TriangleIndexFunctor<TriangleNormalGenerator> result;
 	result.set(vertexArray, normalArray);

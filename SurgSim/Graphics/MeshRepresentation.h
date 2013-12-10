@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_MESHREPRESENTATION_H
 #define SURGSIM_GRAPHICS_MESHREPRESENTATION_H
 
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Graphics/Mesh.h>
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/Mesh.h"
 
 namespace SurgSim
 {

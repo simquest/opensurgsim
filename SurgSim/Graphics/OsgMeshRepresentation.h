@@ -18,9 +18,9 @@
 
 #include <memory>
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/MeshRepresentation.h>
-#include <SurgSim/Graphics/Mesh.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/MeshRepresentation.h"
+#include "SurgSim/Graphics/Mesh.h"
 
 #include <osg/ref_ptr>
 #include <osg/Array>

@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgMeshRepresentation.h>
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
 
-#include <SurgSim/Graphics/OsgConversions.h>
-#include <SurgSim/Graphics/OsgTexture.h>
-#include <SurgSim/Graphics/Texture.h>
-#include <SurgSim/Graphics/TriangleNormalGenerator.h>
+#include "SurgSim/Graphics/OsgConversions.h"
+#include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/Texture.h"
+#include "SurgSim/Graphics/TriangleNormalGenerator.h"
 
 #include <osg/Array>
 #include <osg/Geode>

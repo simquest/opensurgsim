@@ -20,28 +20,28 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Graphics/OsgMeshRepresentation.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgAxesRepresentation.h>
-#include <SurgSim/Graphics/OsgUniform.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgAxesRepresentation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
 
-#include <SurgSim/DataStructures/Vertices.h>
-#include <SurgSim/Blocks/BasicSceneElement.h>
+#include "SurgSim/DataStructures/Vertices.h"
+#include "SurgSim/Blocks/BasicSceneElement.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Testing/MathUtilities.h"
 
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Testing/TestCube.h>
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Testing/TestCube.h"
 
 
 

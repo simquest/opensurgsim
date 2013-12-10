@@ -18,12 +18,12 @@
 
 #include <vector>
 
-#include <SurgSim/Graphics/OsgMeshRepresentation.h>
-#include <SurgSim/Graphics/Mesh.h>
-#include <SurgSim/Testing/TestCube.h>
-#include <SurgSim/Framework/Runtime.h>
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Testing/TestCube.h"
+#include "SurgSim/Framework/Runtime.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <osg/ref_ptr>
 #include <osg/Geometry>
