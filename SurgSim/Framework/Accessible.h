@@ -48,7 +48,6 @@ public:
 	/// 		if it was not found.
 	boost::any getValue(const std::string& name);
 
-
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
 	/// the type of the output parameter.
 	/// \tparam T	the type of the property, usually can be deduced automatically
@@ -62,6 +61,14 @@ public:
 	/// \param	name 	The name of the property.
 	/// \param	value	The value that it should be set to.
 	void setValue(const std::string& name, const boost::any& value);
+
+	/// Check whether a property is readable
+	/// \return true if the property exists and has a getter
+	bool isReadable(const std::string& name);
+
+	/// Check whether a property is writeable
+	/// \return true if the property exists and has a setter
+	bool isWriteable(const std::string& name);
 
 	/// Sets a getter for a given property.
 	/// \param	name	The name of the property.

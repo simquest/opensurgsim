@@ -30,6 +30,11 @@ public:
 						std::placeholders::_1)));
 
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, b, getB, setB);
+
+		// For testing readable and writeable
+		setGetter("readable", std::bind(&TestClass::getA, this));
+		setSetter("writeable", std::bind(&TestClass::setA, this, std::bind(SurgSim::Framework::convert<int>,
+			std::placeholders::_1)));
 	}
 	int a;
 	double b;
@@ -39,6 +44,7 @@ public:
 
 	double getB() { return b;}
 	void setB(double val) { b = val;}
+
 };
 
 namespace SurgSim
@@ -107,7 +113,23 @@ TEST(AccessibleTest, TemplateFunction)
 	double* noValue = nullptr;
 
 	EXPECT_FALSE(a.getValue("a", noValue));
+}
 
+TEST(AccessibleTest, CheckReadWriteable)
+{
+	TestClass a;
+
+	EXPECT_TRUE(a.isReadable("a"));
+	EXPECT_TRUE(a.isWriteable("a"));
+
+	EXPECT_TRUE(a.isReadable("readable"));
+	EXPECT_FALSE(a.isWriteable("readable"));
+
+	EXPECT_FALSE(a.isReadable("writeable"));
+	EXPECT_TRUE(a.isWriteable("writeable"));
+
+	EXPECT_FALSE(a.isWriteable("xxx"));
+	EXPECT_FALSE(a.isReadable("xxx"));
 }
 
 }; // namespace Framework
