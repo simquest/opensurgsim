@@ -63,11 +63,6 @@ SurgSim::Math::Vector3d MassSpringRepresentationLocalization::doCalculatePositio
 	{
 		return massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
 	}
-	else if (massSpringRepresentation->getCurrentState()->getPosition(m_nodeID).
-		isApprox(massSpringRepresentation->getPreviousState()->getPosition(m_nodeID)))
-	{
-		return massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
-	}
 
 	const SurgSim::Math::Vector3d& currentPose  = massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
 	const SurgSim::Math::Vector3d& previousPose = massSpringRepresentation->getPreviousState()->getPosition(m_nodeID);
