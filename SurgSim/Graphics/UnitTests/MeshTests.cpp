@@ -15,12 +15,12 @@
 
 #include <vector>
 #include <gtest/gtest.h>
-#include <SurgSim/Graphics/Mesh.h>
-#include <SurgSim/Testing/TestCube.h>
+#include "SurgSim/Graphics/Mesh.h"
+#include "SurgSim/Testing/TestCube.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;
