@@ -17,7 +17,7 @@
 #define SURGSIM_BLOCKS_TRANSFERINPUTPOSEBEHAVIOR_H
 
 #include <string>
-#include <SurgSim/Framework/Behavior.h>
+#include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {

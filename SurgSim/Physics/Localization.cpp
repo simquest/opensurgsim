@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/Representation.h"
 
 using SurgSim::Physics::Localization;
 using SurgSim::Physics::Representation;

@@ -16,8 +16,8 @@
 #ifndef SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 #define SURGSIM_COLLISION_SHAPECOLLISIONREPRESENTATION_H
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Math/Shape.h"
 
 
 namespace SurgSim
@@ -25,28 +25,51 @@ namespace SurgSim
 namespace Collision
 {
 
-/// Use a Shape as a CollisionRepresentation, any SurgSim::Physics::Representation can
+/// Use a Shape as a Collision Representation, any SurgSim::Physics::Representation can
 /// be used as a backing representation
-class ShapeCollisionRepresentation : public CollisionRepresentation
+class ShapeCollisionRepresentation : public Representation
 {
 public:
 	/// Constructor
 	ShapeCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Math::Shape> shape,
-		std::shared_ptr<SurgSim::Physics::Representation> representation);
+		const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Destructor
 	virtual ~ShapeCollisionRepresentation();
 
-	///@{
-	/// Implementations of virtual functions from CollisionRepresentation
+	/// Set the initial pose of the representation
+	/// \param pose The initial pose
+	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
+	/// Get the initial pose of the representation
+	/// \return The initial pose
+	virtual const SurgSim::Math::RigidTransform3d& getInitialPose() const override;
+
+	/// Set the pose of the representation
+	/// \param pose The pose to set the representation to
+	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) override;
+
+	/// Get the pose of the representation
+	/// \return The pose of this representation
+	virtual const SurgSim::Math::RigidTransform3d& getPose() const override;
+
+	/// Get the shape type id
+	/// \return The unique type of the shape, used to determine which calculation to use.
 	virtual int getShapeType() const override;
+
+	/// Get the shape
+	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
-	///@}
+
+	/// Gets physics representation.
+	/// \return	The physics representation.
+	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;
 
 private:
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
+	SurgSim::Math::RigidTransform3d m_pose;
 };
 
 

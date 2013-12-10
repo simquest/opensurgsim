@@ -16,10 +16,10 @@
 #ifndef SURGSIM_MATH_SHAPE_H
 #define SURGSIM_MATH_SHAPE_H
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
 namespace SurgSim
 {
@@ -36,13 +36,14 @@ typedef enum { SHAPE_DIRECTION_AXIS_X=0, SHAPE_DIRECTION_AXIS_Y=1, SHAPE_DIRECTI
 typedef enum
 {
 	SHAPE_TYPE_NONE = -1,
-	SHAPE_TYPE_PLANE,
-	SHAPE_TYPE_DOUBLESIDEDPLANE,
-	SHAPE_TYPE_SPHERE,
 	SHAPE_TYPE_BOX,
-	SHAPE_TYPE_CYLINDER,
 	SHAPE_TYPE_CAPSULE,
+	SHAPE_TYPE_CYLINDER,
+	SHAPE_TYPE_DOUBLESIDEDPLANE,
 	SHAPE_TYPE_MESH,
+	SHAPE_TYPE_OCTREE,
+	SHAPE_TYPE_PLANE,
+	SHAPE_TYPE_SPHERE,
 	SHAPE_TYPE_COUNT
 } ShapeType;
 

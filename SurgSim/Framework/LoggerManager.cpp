@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Logger.h>
-#include <SurgSim/Framework/LogOutput.h>
-#include <SurgSim/Framework/LoggerManager.h>
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/LogOutput.h"
+#include "SurgSim/Framework/LoggerManager.h"
 
 #include <iostream>
 

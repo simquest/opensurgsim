@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include <SurgSim/DataStructures/OptionalValue.h>
+#include "SurgSim/DataStructures/OptionalValue.h"
 
 namespace SurgSim
 {

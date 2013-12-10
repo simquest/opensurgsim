@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/DataStructures/IndexDirectory.h>
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/DataStructures/IndexDirectory.h"
 
 namespace SurgSim
 {
@@ -245,7 +245,7 @@ private:
 };  // namespace SurgSim
 
 
-#include <SurgSim/DataStructures/NamedData-inl.h>
+#include "SurgSim/DataStructures/NamedData-inl.h"
 
 
 #endif  // SURGSIM_DATASTRUCTURES_NAMEDDATA_H

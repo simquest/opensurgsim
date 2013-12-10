@@ -13,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/ContactConstraintGeneration.h>
+#include "SurgSim/Physics/ContactConstraintGeneration.h"
 
 #include <utility>
 #include <vector>
 
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 namespace SurgSim
 {
@@ -125,8 +125,8 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 }
 
 std::shared_ptr<Localization> ContactConstraintGeneration::makeLocalization(
-	const std::shared_ptr<CollisionRepresentation>& representation,
-	const Location& location)
+	const std::shared_ptr<SurgSim::Collision::Representation>& representation,
+	const SurgSim::Collision::Location& location)
 {
 	std::shared_ptr<Localization> result;
 	auto physicsRepresenation = representation->getPhysicsRepresentation();

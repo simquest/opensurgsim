@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/MlcpPhysicsSolution.h>
-#include <SurgSim/Physics/PushResults.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/MlcpPhysicsSolution.h"
+#include "SurgSim/Physics/PushResults.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {

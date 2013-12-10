@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/RigidRepresentationBase.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
+#include "SurgSim/Physics/RigidRepresentationBase.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 namespace SurgSim
 {
@@ -98,9 +98,23 @@ const SurgSim::Math::RigidTransform3d& RigidRepresentationBase::getPose() const
 	return m_finalState.getPose();
 }
 
-std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const Location& location)
+std::shared_ptr<Localization> RigidRepresentationBase::createLocalization(const SurgSim::Collision::Location& location)
 {
 	return std::move(createTypedLocalization<RigidRepresentationLocalization>(location));
+}
+
+void RigidRepresentationBase::setInitialParameters(const RigidRepresentationParameters& parameters)
+{
+	m_initialParameters = parameters;
+	m_currentParameters = parameters;
+
+	updateGlobalInertiaMatrices(m_currentState);
+}
+
+void RigidRepresentationBase::setCurrentParameters(const RigidRepresentationParameters& parameters)
+{
+	m_currentParameters = parameters;
+	updateGlobalInertiaMatrices(m_currentState);
 }
 
 const RigidRepresentationParameters& SurgSim::Physics::RigidRepresentationBase::getInitialParameters() const

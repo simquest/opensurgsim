@@ -16,14 +16,14 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
 using SurgSim::Physics::Constraint;
 using SurgSim::Physics::ConstraintData;
 using SurgSim::Physics::ContactConstraintData;
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 using SurgSim::Math::Vector3d;
 
 namespace

@@ -15,8 +15,8 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Physics/Computation.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Physics/Computation.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 
 namespace SurgSim

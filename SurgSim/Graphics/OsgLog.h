@@ -18,7 +18,7 @@
 
 #include <osg/Notify>
 
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {

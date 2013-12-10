@@ -19,10 +19,10 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/CommonDevice.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Input/CommonDevice.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {

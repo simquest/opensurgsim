@@ -17,13 +17,13 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-#include <SurgSim/Physics/BuildMlcp.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintImplementation.h>
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/BuildMlcp.h"
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {

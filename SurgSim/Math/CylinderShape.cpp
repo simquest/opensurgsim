@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Math/CylinderShape.h>
+#include "SurgSim/Math/CylinderShape.h"
 
 namespace SurgSim
 {

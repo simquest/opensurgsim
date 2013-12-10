@@ -18,17 +18,16 @@
 
 #include <utility>
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Physics/ContactConstraintGeneration.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Collision/DcdCollision.h>
-#include <SurgSim/Physics/Constraint.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/ContactConstraintGeneration.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Physics/Constraint.h"
 
 
-using SurgSim::Collision::CollisionRepresentation;
-using SurgSim::Collision::ShapeCollisionRepresentation;
+using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
 using SurgSim::Math::DoubleSidedPlaneShape;
@@ -43,15 +42,17 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 {
 	virtual void SetUp()
 	{
+		RigidRepresentationParameters params0;
+		params0.setShapeUsedForMassInertia(std::make_shared<SphereShape>(2.0));
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation 0");
-		sphere = std::make_shared<ShapeCollisionRepresentation>("Collision Representation 0",
-																	 std::make_shared<SphereShape>(2.0),
-																	 rigid0);
+		rigid0->setInitialParameters(params0);
+		sphere = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0", rigid0);
 
+		RigidRepresentationParameters params1;
+		params1.setShapeUsedForMassInertia(std::make_shared<DoubleSidedPlaneShape>());
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation 1");
-		plane = std::make_shared<ShapeCollisionRepresentation>("Collision Representation 1",
-																	 std::make_shared<DoubleSidedPlaneShape>(),
-																	 rigid1);
+		rigid1->setInitialParameters(params1);
+		plane = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1", rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
 	}
@@ -60,10 +61,10 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 	{
 	}
 
-	std::shared_ptr<CollisionRepresentation> sphere;
+	std::shared_ptr<SurgSim::Collision::Representation> sphere;
 	std::shared_ptr<RigidRepresentation> rigid0;
 
-	std::shared_ptr<CollisionRepresentation> plane;
+	std::shared_ptr<SurgSim::Collision::Representation> plane;
 	std::shared_ptr<RigidRepresentation> rigid1;
 
 

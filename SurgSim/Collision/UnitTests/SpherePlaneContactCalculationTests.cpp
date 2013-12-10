@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/SpherePlaneDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/SpherePlaneDcdContact.h"
 
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::PlaneShape;
@@ -34,10 +34,10 @@ void doSpherePlaneTest(std::shared_ptr<SphereShape> sphere,
 					   const double& expectedDepth = 0,
 					   const Vector3d& expectedNorm = Vector3d::Zero())
 {
-	std::shared_ptr<CollisionRepresentation> planeRep =
-		std::make_shared<MockCollisionRepresentation>("Plane Shape",plane,planeQuat,planeTrans);
-	std::shared_ptr<CollisionRepresentation> sphereRep =
-		std::make_shared<MockCollisionRepresentation>("Sphere Shape",sphere,sphereQuat,sphereTrans);
+	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
+			"Plane Shape", plane, SurgSim::Math::makeRigidTransform(planeQuat,planeTrans));
+	std::shared_ptr<Representation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
+			"Sphere Shape", sphere, SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	SpherePlaneDcdContact calcNormal;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphereRep, planeRep);

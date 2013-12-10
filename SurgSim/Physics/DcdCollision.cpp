@@ -13,16 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/ContactCalculation.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Physics/DcdCollision.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+
+using SurgSim::Collision::CollisionPair;
 
 namespace SurgSim
 {
@@ -78,7 +80,8 @@ void DcdCollision::populateCalculationTable()
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 {
-	std::vector<std::shared_ptr<CollisionRepresentation>> representations = state->getCollisionRepresentations();
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> representations =
+		state->getCollisionRepresentations();
 
 	if (representations.size() > 1)
 	{
@@ -100,7 +103,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 	}
 }
 
-void DcdCollision::setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact)
+void DcdCollision::setDcdContactInTable(std::shared_ptr<SurgSim::Collision::ContactCalculation> dcdContact)
 {
 	std::pair<int,int> shapeTypes = dcdContact->getShapeTypes();
 	m_contactCalculations[shapeTypes.first][shapeTypes.second] = dcdContact;

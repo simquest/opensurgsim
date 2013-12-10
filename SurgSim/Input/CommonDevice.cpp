@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Input/CommonDevice.h"
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>

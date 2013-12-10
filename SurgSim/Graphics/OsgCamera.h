@@ -18,9 +18,9 @@
 
 #include <unordered_map>
 
-#include <SurgSim/Graphics/Camera.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/Texture.h>
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/Texture.h"
 
 #include <osg/Camera>
 #include <osg/Switch>

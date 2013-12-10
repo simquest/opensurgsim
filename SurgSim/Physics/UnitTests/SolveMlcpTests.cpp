@@ -20,11 +20,11 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/SolveMlcp.h>
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/SolveMlcp.h"
 
-#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
-#include <SurgSim/Testing/MlcpIO/ReadText.h>
+#include "SurgSim/Testing/MlcpIO/MlcpTestData.h"
+#include "SurgSim/Testing/MlcpIO/ReadText.h"
 
 using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::SolveMlcp;

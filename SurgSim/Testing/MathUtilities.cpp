@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Testing/MathUtilities.h"
 
-#include <SurgSim/Math/Quaternion.h>
+#include "SurgSim/Math/Quaternion.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;

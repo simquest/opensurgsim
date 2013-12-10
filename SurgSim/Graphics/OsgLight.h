@@ -20,8 +20,8 @@
 #include <string>
 #include <unordered_map>
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/Light.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/Light.h"
 
 #include <osg/ref_ptr>
 

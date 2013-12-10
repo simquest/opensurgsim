@@ -15,12 +15,12 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/RigidRepresentationContact.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
-#include <SurgSim/Physics/ConstraintImplementation.h>
+#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
 namespace SurgSim
 {

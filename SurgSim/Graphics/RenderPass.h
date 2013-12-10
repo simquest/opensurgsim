@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Graphics/Camera.h>
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/Camera.h"
 
 namespace SurgSim
 {

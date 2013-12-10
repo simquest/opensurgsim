@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Math/MlcpConstraintType.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Math/MlcpConstraintType.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {

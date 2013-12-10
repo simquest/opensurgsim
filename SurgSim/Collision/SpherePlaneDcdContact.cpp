@@ -13,16 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/SpherePlaneDcdContact.h>
+#include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/CollisionPair.h"
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Math/PlaneShape.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/SphereShape.h>
+#include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/PlaneShape.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
 
-using SurgSim::Math::SphereShape;
 using SurgSim::Math::PlaneShape;
+using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -40,8 +41,8 @@ std::pair<int,int> SpherePlaneDcdContact::getShapeTypes()
 
 void SpherePlaneDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<CollisionRepresentation> representationSphere;
-	std::shared_ptr<CollisionRepresentation> representationPlane;
+	std::shared_ptr<Representation> representationSphere;
+	std::shared_ptr<Representation> representationPlane;
 
 	representationSphere = pair->getFirst();
 	representationPlane = pair->getSecond();

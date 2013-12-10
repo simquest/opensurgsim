@@ -28,9 +28,11 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
+	Fem3DRepresentationTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
 	FemRepresentationParametersTest.cpp
+	FemRepresentationTests.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp

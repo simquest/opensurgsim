@@ -40,6 +40,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Runtime.cpp
 	Scene.cpp
 	SceneElement.cpp
+	Timer.cpp
 )
 
 set(SURGSIM_FRAMEWORK_HEADERS
@@ -72,6 +73,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	SceneElement-inl.h
 	SharedInstance.h
 	SharedInstance-inl.h
+	Timer.h
 )
 
 surgsim_add_library(

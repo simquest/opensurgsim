@@ -14,9 +14,9 @@
 // limitations under the License.
 
 
-#include <SurgSim/Graphics/OsgCapsuleRepresentation.h>
-#include <SurgSim/Graphics/OsgUnitCylinder.h>
-#include <SurgSim/Graphics/OsgUnitSphere.h>
+#include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
+#include "SurgSim/Graphics/OsgUnitCylinder.h"
+#include "SurgSim/Graphics/OsgUnitSphere.h"
 
 using SurgSim::Graphics::OsgCapsuleRepresentation;
 using SurgSim::Graphics::OsgUnitCylinder;

@@ -16,10 +16,10 @@
 /// \file
 /// Render Tests for the OsgCylinderRepresentation class.
 
-#include <SurgSim/Graphics/OsgCylinderRepresentation.h>
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Graphics/OsgCylinderRepresentation.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Math::Vector2d;
 using SurgSim::Math::Vector3d;

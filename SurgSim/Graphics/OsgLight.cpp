@@ -15,15 +15,15 @@
 
 
 
-#include <SurgSim/Graphics/OsgLight.h>
+#include "SurgSim/Graphics/OsgLight.h"
 
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgConversions.h>
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgConversions.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 
 using SurgSim::Math::Vector3d;

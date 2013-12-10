@@ -15,14 +15,14 @@
 
 #include <string>
 
-#include <SurgSim/Blocks/SphereElement.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Blocks/TransferPoseBehavior.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
+#include "SurgSim/Blocks/SphereElement.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 
 
 using SurgSim::Blocks::SphereElement;

@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/Representation.h"
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Collision/Location.h>
+#include "SurgSim/Collision/Location.h"
 
-#include <SurgSim/Math/MlcpSolution.h>
+#include "SurgSim/Math/MlcpSolution.h"
 
 namespace SurgSim
 {
@@ -80,12 +80,12 @@ void Representation::afterUpdate(double dt)
 
 }
 
-std::shared_ptr<Localization> Representation::createLocalization(const Location& location)
+std::shared_ptr<Localization> Representation::createLocalization(const SurgSim::Collision::Location& location)
 {
 	return nullptr;
 }
 
-void Representation::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
+void Representation::applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block)
 {
 
 }

@@ -17,7 +17,7 @@
 /// Tests for SURGSIM_ASSERT() and SURGSIM_FAILURE().
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 
 class MockOutput : public SurgSim::Framework::LogOutput

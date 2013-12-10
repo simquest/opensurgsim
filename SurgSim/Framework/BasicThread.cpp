@@ -18,10 +18,10 @@
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
 #include <boost/ref.hpp>
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Framework/Clock.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Runtime.h>
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Clock.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 
 namespace SurgSim
 {

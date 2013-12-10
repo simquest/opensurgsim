@@ -16,7 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_OPTIONALVALUE_H
 #define SURGSIM_DATASTRUCTURES_OPTIONALVALUE_H
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

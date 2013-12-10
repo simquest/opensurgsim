@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Framework/ReuseFactory.h>
+#include "SurgSim/Framework/ReuseFactory.h"
 
 using SurgSim::Framework::ReuseFactory;
 

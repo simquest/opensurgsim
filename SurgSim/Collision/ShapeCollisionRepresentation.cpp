@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -25,9 +25,10 @@ namespace Collision
 ShapeCollisionRepresentation::ShapeCollisionRepresentation(
 		const std::string& name,
 		std::shared_ptr<SurgSim::Math::Shape> shape,
-		std::shared_ptr<SurgSim::Physics::Representation> representation) :
-	CollisionRepresentation(name,representation),
-	m_shape(shape)
+		const SurgSim::Math::RigidTransform3d& pose ) :
+	Representation(name),
+	m_shape(shape),
+	m_pose(pose)
 {
 }
 
@@ -44,6 +45,31 @@ int ShapeCollisionRepresentation::getShapeType() const
 const std::shared_ptr<SurgSim::Math::Shape> ShapeCollisionRepresentation::getShape() const
 {
 	return m_shape;
+}
+
+void ShapeCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_pose = pose;
+}
+
+const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getPose() const
+{
+	return m_pose;
+}
+
+void ShapeCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	m_pose = pose;
+}
+
+const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getInitialPose() const
+{
+	return m_pose;
+}
+
+std::shared_ptr<SurgSim::Physics::Representation> ShapeCollisionRepresentation::getPhysicsRepresentation()
+{
+	return nullptr;
 }
 
 

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/BoxSphereDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/BoxSphereDcdContact.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::SphereShape;
@@ -39,16 +39,10 @@ void doBoxSphereTest(std::shared_ptr<BoxShape> box,
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 	using SurgSim::Math::Geometry::ScalarEpsilon;
 
-	std::shared_ptr<CollisionRepresentation> boxRep = std::make_shared<MockCollisionRepresentation>(
-		"Collision Box 0",
-		box,
-		boxQuat,
-		boxTrans);
-	std::shared_ptr<CollisionRepresentation> sphereRep = std::make_shared<MockCollisionRepresentation>(
-		"Collision Sphere 0",
-		sphere,
-		sphereQuat,
-		sphereTrans);
+	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
+		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
+	std::shared_ptr<Representation> sphereRep = std::make_shared<ShapeCollisionRepresentation>(
+		"Collision Sphere 0", sphere, SurgSim::Math::makeRigidTransform(sphereQuat, sphereTrans));
 
 	// Perform collision detection.
 	BoxSphereDcdContact calcContact;

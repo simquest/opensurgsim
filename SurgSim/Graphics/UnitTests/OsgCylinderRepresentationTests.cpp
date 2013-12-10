@@ -16,11 +16,11 @@
 /// \file
 /// Tests for the OsgCylinderRepresentation class.
 
-#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgCylinderRepresentation.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgCylinderRepresentation.h"
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

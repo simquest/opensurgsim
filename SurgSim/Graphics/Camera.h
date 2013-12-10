@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_CAMERA_H
 #define SURGSIM_GRAPHICS_CAMERA_H
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
