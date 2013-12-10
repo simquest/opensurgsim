@@ -116,6 +116,10 @@ public:
 	/// \return The integration scheme currently in use
 	SurgSim::Math::IntegrationScheme getIntegrationScheme() const;
 
+	/// Gets the compliance matrix associated with motion
+	/// \return The compliance matrix
+	const SurgSim::Math::Matrix& getComplianceMatrix() const;
+
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
 	/// \note DeformableRepresentation::beforeUpdate takes care of the OdeSolver setup
