@@ -83,12 +83,12 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 	MassSpringRepresentationLocalization localization = MassSpringRepresentationLocalization(massSpring);
 
 	localization.setLocalNode(0);
-	ASSERT_EQ(0, localization.getLocalNode());
-	ASSERT_TRUE(localization.calculatePosition().isApprox(Vector3d(0,0,0), epsilon));
+	ASSERT_EQ(0u, localization.getLocalNode());
+	ASSERT_TRUE(localization.calculatePosition().isZero(epsilon));
 
 	localization.setLocalNode(1);
-	ASSERT_EQ(1, localization.getLocalNode());
-	ASSERT_TRUE(localization.calculatePosition().isApprox(Vector3d(1,0,0), epsilon));
+	ASSERT_EQ(1u, localization.getLocalNode());
+	ASSERT_TRUE(localization.calculatePosition().isApprox(Vector3d(1.0, 0.0, 0.0), epsilon));
 }
 
 };  //  namespace Physics
