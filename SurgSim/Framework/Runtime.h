@@ -63,6 +63,9 @@ public:
 	/// \param	scene	The scene.
 	void setScene(std::shared_ptr<Scene> scene);
 
+	/// \returns The current scene
+	std::shared_ptr<Scene> getScene() const;
+
 	/// Adds a scene element
 	/// \param	sceneElement	The scene element.
 	/// \return	true if it succeeds, false if it fails.
@@ -95,11 +98,11 @@ public:
 
 	/// Query if this object is running.
 	/// \return	true if running, false if not.
-	bool isRunning();
+	bool isRunning() const;
 
 	/// Query if this object is paused.
 	/// \return	true if paused, false if not.
-	bool isPaused();
+	bool isPaused() const;
 
 	/// Gets application data for the runtime.
 	/// \return	The application data.
