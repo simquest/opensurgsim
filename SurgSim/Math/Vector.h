@@ -24,6 +24,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Math
@@ -161,15 +163,29 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 	}
 }
 
-/// Helper method to construct an orthonormal basis (i, j, k) given the 1st normalized vector i
+/// Helper method to construct an orthonormal basis (i, j, k) given the 1st vector direction
 /// \tparam Vector The vector type
-/// \param i The 1st normalized vector of the basis (i, j, k)
+/// \param[in, out] i Should provide the 1st direction on input. The 1st vector of the basis (i, j, k) on output.
 /// \param[out] j, k The 2nd and 3rd orthonormal vectors of the basis (i, j, k)
+/// \return True if (i, j, k) has been built successfully, False if 'i' is a (or close to a) null vector
+/// \note If any of the parameter is nullptr, an exception will be raised
 template <class Vector>
-void buildOrthonormalBasis(const Vector& i, Vector* j, Vector* k)
+bool buildOrthonormalBasis(Vector* i, Vector* j, Vector* k)
 {
-	*j = i.unitOrthogonal();
-	*k = i.cross(*j);
+	SURGSIM_ASSERT(i != nullptr) << "Parameter [in, out] 'i' is a nullptr";
+	SURGSIM_ASSERT(j != nullptr) << "Parameter [out] 'j' is a nullptr";
+	SURGSIM_ASSERT(k != nullptr) << "Parameter [out] 'k' is a nullptr";
+	
+	if (i->isZero())
+	{
+		return false;
+	}
+
+	i->normalize();
+	*j = i->unitOrthogonal();
+	*k = i->cross(*j);
+
+	return true;
 }
 
 };  // namespace Math

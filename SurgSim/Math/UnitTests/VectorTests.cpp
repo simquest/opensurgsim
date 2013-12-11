@@ -1164,17 +1164,13 @@ TYPED_TEST(AllDynamicVectorTests, resize)
 	EXPECT_TRUE(v.isZero());
 }
 
-TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
+template <class Vector>
+void testOrthonormalBasis(const Vector& i, const Vector& j, const Vector& k)
 {
-	typedef typename TestFixture::Vector3 Vector3;
-	typedef typename Vector3::Scalar T;
+	typedef typename Vector::Scalar T;
 
-	Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
-	Vector3 j, k;
 	T precision = Eigen::NumTraits<T>::dummy_precision();
 
-	i.normalize();
-	ASSERT_NO_THROW(SurgSim::Math::buildOrthonormalBasis(i, &j, &k););
 	EXPECT_NEAR(i.dot(j), 0.0, precision);
 	EXPECT_NEAR(i.dot(k), 0.0, precision);
 	EXPECT_NEAR(j.dot(i), 0.0, precision);
@@ -1189,4 +1185,54 @@ TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
 	EXPECT_NEAR(i.norm(), 1.0, precision);
 	EXPECT_NEAR(j.norm(), 1.0, precision);
 	EXPECT_NEAR(k.norm(), 1.0, precision);
+}
+
+TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
+{
+	typedef typename TestFixture::Vector3 Vector3;
+	typedef typename Vector3::Scalar T;
+
+	Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+	Vector3 j, k;
+	Vector3 zero = Vector3::Zero();
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	// Assert if 1 parameter is nullptr
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(nullptr, &j, &k));
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(&i, nullptr, &k));
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(&i, &j, nullptr));
+	
+	// Assert if 2 parameters are nullptr
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(nullptr, nullptr, &k));
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(nullptr, &j, nullptr));
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(&i, nullptr, nullptr));
+
+	// Assert if 3 parameters are nullptr
+	ASSERT_ANY_THROW(SurgSim::Math::buildOrthonormalBasis<Vector3>(nullptr, nullptr, nullptr));
+
+	// Input parameter 'i' = (0, 0, 0)
+	ASSERT_NO_THROW(EXPECT_EQ(false, SurgSim::Math::buildOrthonormalBasis(&zero, &j, &k)));
+
+	// Input parameter 'i' = (0, 0, 0) + (epsilon, epsilon, epsilon)
+	Vector3 closeToZero = zero + Vector3::Constant(precision);
+	ASSERT_NO_THROW(EXPECT_EQ(false, SurgSim::Math::buildOrthonormalBasis(&closeToZero, &j, &k)));
+
+	// Input parameter 'i' is already normalized
+	{
+		Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+		Vector3 j, k;
+
+		i.normalize();
+		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
+		testOrthonormalBasis(i, j, k);
+	}
+
+	// Input parameter 'i' is not already normalized
+	{
+		Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+		Vector3 j, k;
+
+		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
+		testOrthonormalBasis(i, j, k);
+	}
 }
