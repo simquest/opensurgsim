@@ -36,7 +36,23 @@ namespace SurgSim
 namespace Physics
 {
 
-TEST (MassSpringRepresentationContactTest, SetGet_BuildMlcp_Test)
+TEST (MassSpringRepresentationContactTest, ConstructorTest)
+{
+	ASSERT_NO_THROW({ MassSpringRepresentationContact massSpring; });
+
+	ASSERT_NE(nullptr, std::make_shared<MassSpringRepresentationContact>());
+}
+
+TEST (MassSpringRepresentationContactTest, ConstraintConstantsTest)
+{
+	auto implementation = std::make_shared<MassSpringRepresentationContact>();
+
+	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
+	EXPECT_EQ(SurgSim::Physics::REPRESENTATION_TYPE_MASSSPRING, implementation->getRepresentationType());
+	EXPECT_EQ(1u, implementation->getNumDof());
+}
+
+TEST (MassSpringRepresentationContactTest, BuildMlcpTest)
 {
 	using SurgSim::Math::Vector3d;
 
@@ -50,8 +66,6 @@ TEST (MassSpringRepresentationContactTest, SetGet_BuildMlcp_Test)
 
 	// Define constraint (frictionless non-penetration)
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
-	EXPECT_EQ(SurgSim::Math::MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT, implementation->getMlcpConstraintType());
-	EXPECT_EQ(1u, implementation->getNumDof());
 
 	// Define physics representation of mass-spring using 1d helper function.
 	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
