@@ -54,114 +54,115 @@ using SurgSim::Physics::PhysicsManager;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 
-///\file Example of how to put together a very simple demo of Fem3D
+///\file Example of how to put together a very simple demo of Fem3D,
+/// using tetrahedron's elements and cube's elements
 
 namespace
 {
-	// Cube nodes
-	//       2*-----------*3
-	//       /           /|
-	//    6*-----------*7 |      ^ y
-	//     |           |  |      |
-	//     |  0        |  *1     *->x
-	//     |           | /      /
-	//    4*-----------*5       z
-	std::array<SurgSim::Math::Vector3d, 8> cubeNodes =
-	{{
-		Vector3d(-0.5,-0.5,-0.5), Vector3d( 0.5,-0.5,-0.5),
-		Vector3d(-0.5, 0.5,-0.5), Vector3d( 0.5, 0.5,-0.5),
-		Vector3d(-0.5,-0.5, 0.5), Vector3d( 0.5,-0.5, 0.5),
-		Vector3d(-0.5, 0.5, 0.5), Vector3d( 0.5, 0.5, 0.5)
-	}};
+// Cube nodes
+//       2*-----------*3
+//       /           /|
+//    6*-----------*7 |      ^ y
+//     |           |  |      |
+//     |  0        |  *1     *->x
+//     |           | /      /
+//    4*-----------*5       z
+std::array<SurgSim::Math::Vector3d, 8> cubeNodes =
+{{
+	Vector3d(-0.5,-0.5,-0.5), Vector3d( 0.5,-0.5,-0.5),
+	Vector3d(-0.5, 0.5,-0.5), Vector3d( 0.5, 0.5,-0.5),
+	Vector3d(-0.5,-0.5, 0.5), Vector3d( 0.5,-0.5, 0.5),
+	Vector3d(-0.5, 0.5, 0.5), Vector3d( 0.5, 0.5, 0.5)
+}};
 
-	// Cube decomposition into 5 tetrahedrons
-	// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
-	const unsigned int numTetrahedrons = 5;
-	std::array< std::array<unsigned int, 4>, numTetrahedrons> tetrahedrons =
-	{{
-		{{4, 7, 1, 2}}, // CCW (47)cross(41) . (42) > 0
-		{{4, 1, 7, 5}}, // CCW (41)cross(47) . (45) > 0
-		{{4, 2, 1, 0}}, // CCW (42)cross(41) . (40) > 0
-		{{4, 7, 2, 6}}, // CCW (47)cross(42) . (46) > 0
-		{{1, 2, 7, 3}}  // CCW (12)cross(17) . (13) > 0
-	}};
+// Cube decomposition into 5 tetrahedrons
+// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
+const unsigned int numTetrahedrons = 5;
+std::array< std::array<unsigned int, 4>, numTetrahedrons> tetrahedrons =
+{{
+	{{4, 7, 1, 2}}, // CCW (47)cross(41) . (42) > 0
+	{{4, 1, 7, 5}}, // CCW (41)cross(47) . (45) > 0
+	{{4, 2, 1, 0}}, // CCW (42)cross(41) . (40) > 0
+	{{4, 7, 2, 6}}, // CCW (47)cross(42) . (46) > 0
+	{{1, 2, 7, 3}}  // CCW (12)cross(17) . (13) > 0
+}};
 
-	const unsigned int numCubes = 1;
-	std::array< std::array<unsigned int, 8>, numCubes> cubes =
-	{{
-		{{7, 5, 4, 6, 3, 1, 0, 2}}
-	}};
+const unsigned int numCubes = 1;
+std::array< std::array<unsigned int, 8>, numCubes> cubes =
+{{
+	{{7, 5, 4, 6, 3, 1, 0, 2}}
+}};
 
-	// Boundary conditions (node indices)
-	const unsigned int numBoundaryConditionsNodeIdx = 4;
-	const std::array<unsigned int, numBoundaryConditionsNodeIdx> boundaryConditionsNodeIdx =
-	{{
-		0, 1, 2, 3
-	}};
+// Boundary conditions (node indices)
+const unsigned int numBoundaryConditionsNodeIdx = 4;
+const std::array<unsigned int, numBoundaryConditionsNodeIdx> boundaryConditionsNodeIdx =
+{{
+	0, 1, 2, 3
+}};
 
-	void loadFem3DRestState(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+void loadFem3DRestState(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+{
+	std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
+	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
+	SurgSim::Math::Vector& x = restState->getPositions();
+
+	// Sets the initial state (node positions and boundary conditions)
+	for (int nodeId = 0; nodeId < 8; nodeId++)
 	{
-		std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
-		restState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
-		SurgSim::Math::Vector& x = restState->getPositions();
-
-		// Sets the initial state (node positions and boundary conditions)
-		for (int nodeId = 0; nodeId < 8; nodeId++)
-		{
-			SurgSim::Math::getSubVector(x, nodeId, 3) =  cubeNodes[nodeId];
-		}
-		for (unsigned int boundaryConditionId = 0;
-			boundaryConditionId < numBoundaryConditionsNodeIdx;
-			boundaryConditionId++)
-		{
-			// The boundary conditions in the state are the dof indices to be fixed
-			restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 0);
-			restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 1);
-			restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 2);
-		}
-		physicsRepresentation->setInitialState(restState);
+		SurgSim::Math::getSubVector(x, nodeId, 3) =  cubeNodes[nodeId];
 	}
-
-	void setFemElementParameters(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+	for (unsigned int boundaryConditionId = 0;
+		boundaryConditionId < numBoundaryConditionsNodeIdx;
+		boundaryConditionId++)
 	{
-		// Adds all the cube FemElements
-		for (unsigned int elementId = 0; elementId < physicsRepresentation->getNumFemElements(); elementId++)
-		{
-			std::shared_ptr<FemElement> element = physicsRepresentation->getFemElement(elementId);
-			element->setMassDensity(8000.0);
-			element->setPoissonRatio(0.45);
-			element->setYoungModulus(1.0e6);
-		}
+		// The boundary conditions in the state are the dof indices to be fixed
+		restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 0);
+		restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 1);
+		restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 2);
 	}
+	physicsRepresentation->setInitialState(restState);
+}
 
-
-	void loadCubeModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+void setFemElementParameters(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+{
+	// Sets all the FemElement's parameters
+	for (unsigned int elementId = 0; elementId < physicsRepresentation->getNumFemElements(); elementId++)
 	{
-		loadFem3DRestState(physicsRepresentation);
-		auto restState = physicsRepresentation->getInitialState();
-
-		// Adds all the cube FemElements
-		for (unsigned int elementId = 0; elementId < numCubes; elementId++)
-		{
-			std::shared_ptr<FemElement3DCube> element = nullptr;
-			element = std::make_shared<FemElement3DCube>(cubes[elementId], *restState);
-			physicsRepresentation->addFemElement(element);
-		}
+		std::shared_ptr<FemElement> element = physicsRepresentation->getFemElement(elementId);
+		element->setMassDensity(8000.0);
+		element->setPoissonRatio(0.45);
+		element->setYoungModulus(1.0e6);
 	}
+}
 
-	void loadTetrahedronModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+
+void loadCubeModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+{
+	loadFem3DRestState(physicsRepresentation);
+	auto restState = physicsRepresentation->getInitialState();
+
+	// Adds all the cube FemElements
+	for (unsigned int elementId = 0; elementId < numCubes; elementId++)
 	{
-		loadFem3DRestState(physicsRepresentation);
-		auto restState = physicsRepresentation->getInitialState();
-
-		// Adds all the tetrahedrons FemElements
-		for (unsigned int elementId = 0; elementId < numTetrahedrons; elementId++)
-		{
-			std::shared_ptr<FemElement3DTetrahedron> element = nullptr;
-			element = std::make_shared<FemElement3DTetrahedron>(tetrahedrons[elementId], *restState);
-			physicsRepresentation->addFemElement(element);
-		}
+		std::shared_ptr<FemElement3DCube> element = nullptr;
+		element = std::make_shared<FemElement3DCube>(cubes[elementId], *restState);
+		physicsRepresentation->addFemElement(element);
 	}
+}
+
+void loadTetrahedronModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
+{
+	loadFem3DRestState(physicsRepresentation);
+	auto restState = physicsRepresentation->getInitialState();
+
+	// Adds all the tetrahedrons FemElements
+	for (unsigned int elementId = 0; elementId < numTetrahedrons; elementId++)
+	{
+		std::shared_ptr<FemElement3DTetrahedron> element = nullptr;
+		element = std::make_shared<FemElement3DTetrahedron>(tetrahedrons[elementId], *restState);
+		physicsRepresentation->addFemElement(element);
+	}
+}
 };
 
 std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,

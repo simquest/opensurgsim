@@ -41,7 +41,7 @@ FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds,
 	setNumDofPerNode(3);
 
 	// Set the shape functions coefficients
-	// Ni(epsilon, eta, mu) = (1+-epsilon)(1+-eta)(1+-mu)/8
+	// Ni(epsilon, eta, mu) = (1 + epsilon * sign(epsilon_i))(1 + eta * sign(eta_i))(1 + mu * sign(mu_i))/8
 	std::array<double, 8> tmpEpsilon = {{-1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0, -1.0}};
 	std::array<double, 8> tmpEta    = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
 	std::array<double, 8> tmpMu      = {{-1.0, -1.0, -1.0, -1.0, +1.0, +1.0, +1.0, +1.0}};
@@ -174,9 +174,9 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 	SURGSIM_ASSERT(J) << "Trying to evalute J with a nullptr for matrix J";
 
 	Vector3d p[8];
-	for (size_t nodeId = 0; nodeId < 8; nodeId++)
+	for (size_t index = 0; index < 8; index++)
 	{
-		p[nodeId] = state.getPosition(m_nodeIds[nodeId]);
+		p[index] = state.getPosition(m_nodeIds[index]);
 	}
 
 	// Zerout the matrix J
@@ -184,13 +184,13 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 
 	// Compute J = d(x,y,z)/d(epsilon,eta,mu)
 	// Note that (x,y,z) = sum((xi,yi,zi).Ni(epsilon,eta,mu))
-	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
+	for (size_t index = 0; index < 8; ++index)
 	{
 		for(size_t axis = 0; axis < 3; ++axis)
 		{
-			(*J)(0, axis) += p[nodeId][axis] * dNdepsilon(nodeId, epsilon, eta, mu);
-			(*J)(1, axis) += p[nodeId][axis] * dNdeta    (nodeId, epsilon, eta, mu);
-			(*J)(2, axis) += p[nodeId][axis] * dNdmu     (nodeId, epsilon, eta, mu);
+			(*J)(0, axis) += p[index][axis] * dNdepsilon(index, epsilon, eta, mu);
+			(*J)(1, axis) += p[index][axis] * dNdeta    (index, epsilon, eta, mu);
+			(*J)(2, axis) += p[index][axis] * dNdmu     (index, epsilon, eta, mu);
 		}
 	}
 
@@ -218,14 +218,14 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 	B->setZero();
 
 	// Set non-zero entries of the strain-displacement
-	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
+	for (size_t index = 0; index < 8; ++index)
 	{
 		// Compute dNi/d(x,y,z) = dNi/d(epsilon,eta,mu) d(epsilon,eta,mu)/d(x,y,z)
 		//                      = J^{-1}.dNi/d(epsilon,eta,mu)
 		Vector3d dNidEpsilonEtaMu(
-			dNdepsilon(nodeId, epsilon, eta, mu),
-			dNdeta(nodeId, epsilon, eta, mu),
-			dNdmu(nodeId, epsilon, eta, mu)
+			dNdepsilon(index, epsilon, eta, mu),
+			dNdeta(index, epsilon, eta, mu),
+			dNdmu(index, epsilon, eta, mu)
 		);
 		Vector3d dNidxyz = Jinv * dNidEpsilonEtaMu;
 
@@ -236,15 +236,15 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 		//     (     0 dNi/dz dNi/dy)
 		//     (dNi/dz      0 dNi/dx)
 		// c.f. http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch11.d/AFEM.Ch11.pdf
-		(*B)(0, getNumDofPerNode() * nodeId    ) = dNidxyz[0];
-		(*B)(1, getNumDofPerNode() * nodeId + 1) = dNidxyz[1];
-		(*B)(2, getNumDofPerNode() * nodeId + 2) = dNidxyz[2];
-		(*B)(3, getNumDofPerNode() * nodeId    ) = dNidxyz[1];
-		(*B)(3, getNumDofPerNode() * nodeId + 1) = dNidxyz[0];
-		(*B)(4, getNumDofPerNode() * nodeId + 1) = dNidxyz[2];
-		(*B)(4, getNumDofPerNode() * nodeId + 2) = dNidxyz[1];
-		(*B)(5, getNumDofPerNode() * nodeId    ) = dNidxyz[2];
-		(*B)(5, getNumDofPerNode() * nodeId + 2) = dNidxyz[0];
+		(*B)(0, getNumDofPerNode() * index    ) = dNidxyz[0];
+		(*B)(1, getNumDofPerNode() * index + 1) = dNidxyz[1];
+		(*B)(2, getNumDofPerNode() * index + 2) = dNidxyz[2];
+		(*B)(3, getNumDofPerNode() * index    ) = dNidxyz[1];
+		(*B)(3, getNumDofPerNode() * index + 1) = dNidxyz[0];
+		(*B)(4, getNumDofPerNode() * index + 1) = dNidxyz[2];
+		(*B)(4, getNumDofPerNode() * index + 2) = dNidxyz[1];
+		(*B)(5, getNumDofPerNode() * index    ) = dNidxyz[2];
+		(*B)(5, getNumDofPerNode() * index + 2) = dNidxyz[0];
 	}
 }
 
@@ -296,12 +296,12 @@ void FemElement3DCube::addMassMatrixAtPoint(const DeformableRepresentationState&
 	evaluateJ(state, epsilon, eta, mu, &J, &Jinv, &detJ);
 
 	Ni.setZero();
-	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
+	for (size_t index = 0; index < 8; ++index)
 	{
-		double coef = N(nodeId, epsilon, eta, mu);
-		Ni(0, getNumDofPerNode() * nodeId    ) += coef;
-		Ni(1, getNumDofPerNode() * nodeId + 1) += coef;
-		Ni(2, getNumDofPerNode() * nodeId + 2) += coef;
+		double coef = N(index, epsilon, eta, mu);
+		Ni(0, getNumDofPerNode() * index    ) += coef;
+		Ni(1, getNumDofPerNode() * index + 1) += coef;
+		Ni(2, getNumDofPerNode() * index + 2) += coef;
 	}
 
 	*m += (weightEpsilon * weightEta * weightMu * detJ * m_rho) * Ni.transpose() * Ni;
@@ -397,12 +397,12 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 		}
 	}
 
-	SURGSIM_ASSERT(v >= 0) << "FemElement3DCube illed defined, its volume is " << v << std::endl <<
+	SURGSIM_ASSERT(v >= 0) << "FemElement3DCube ill-defined, its volume is " << v << std::endl <<
 		"Please check the node ordering of your element formed by node ids" <<
 		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
 		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
 
-	SURGSIM_ASSERT(v > 1e-12) << "FemElement3DCube illed defined, its volume is " << v << std::endl <<
+	SURGSIM_ASSERT(v > 1e-12) << "FemElement3DCube ill-defined, its volume is " << v << std::endl <<
 		"Please check the node ordering of your element formed by node ids" <<
 		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
 		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
@@ -412,7 +412,7 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 
 double FemElement3DCube::N(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 *
+	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
 		(1 + eta * m_shapeFunctionsEtaSign[i]) *
 		(1 + mu * m_shapeFunctionsMuSign[i]);
@@ -420,7 +420,7 @@ double FemElement3DCube::N(size_t i, double epsilon, double eta, double mu) cons
 
 double FemElement3DCube::dNdepsilon(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 *
+	return 1.0 / 8.0 *
 		m_shapeFunctionsEpsilonSign[i] *
 		(1 + eta * m_shapeFunctionsEtaSign[i]) *
 		(1 + mu * m_shapeFunctionsMuSign[i]);
@@ -428,7 +428,7 @@ double FemElement3DCube::dNdepsilon(size_t i, double epsilon, double eta, double
 
 double FemElement3DCube::dNdeta(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 *
+	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
 		m_shapeFunctionsEtaSign[i] *
 		(1 + mu * m_shapeFunctionsMuSign[i]);
@@ -436,7 +436,7 @@ double FemElement3DCube::dNdeta(size_t i, double epsilon, double eta, double mu)
 
 double FemElement3DCube::dNdmu(size_t i, double epsilon, double eta, double mu) const
 {
-	return 1.0/8.0 *
+	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
 		(1 + eta * m_shapeFunctionsEtaSign[i]) *
 		m_shapeFunctionsMuSign[i];

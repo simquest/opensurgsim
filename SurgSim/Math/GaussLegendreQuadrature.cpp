@@ -29,32 +29,32 @@ std::array<std::pair<double, double>, 1> gaussQuadrature1Point =
 
 std::array<std::pair<double, double>, 2> gaussQuadrature2Points =
 {{
-	std::make_pair( 1.0/sqrt(3.0), 1.0),
-	std::make_pair(-1.0/sqrt(3.0), 1.0)
+	std::make_pair( 1.0 / sqrt(3.0), 1.0),
+	std::make_pair(-1.0 / sqrt(3.0), 1.0)
 }};
 
 std::array<std::pair<double, double>, 3> gaussQuadrature3Points =
 {{
-	std::make_pair(           0.0, 8.0/9.0),
-	std::make_pair( sqrt(3.0/5.0), 5.0/9.0),
-	std::make_pair(-sqrt(3.0/5.0), 5.0/9.0)
+	std::make_pair(             0.0, 8.0 / 9.0),
+	std::make_pair( sqrt(3.0 / 5.0), 5.0 / 9.0),
+	std::make_pair(-sqrt(3.0 / 5.0), 5.0 / 9.0)
 }};
 
 std::array<std::pair<double, double>, 4> gaussQuadrature4Points =
 {{
-	std::make_pair( sqrt((3.0 - 2.0*sqrt(6.0/5.0)) / 7.0), (18.0 + sqrt(30.0)) / 36.0),
-	std::make_pair(-sqrt((3.0 - 2.0*sqrt(6.0/5.0)) / 7.0), (18.0 + sqrt(30.0)) / 36.0),
-	std::make_pair( sqrt((3.0 + 2.0*sqrt(6.0/5.0)) / 7.0), (18.0 - sqrt(30.0)) / 36.0),
-	std::make_pair(-sqrt((3.0 + 2.0*sqrt(6.0/5.0)) / 7.0), (18.0 - sqrt(30.0)) / 36.0)
+	std::make_pair( sqrt((3.0 - 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 + sqrt(30.0)) / 36.0),
+	std::make_pair(-sqrt((3.0 - 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 + sqrt(30.0)) / 36.0),
+	std::make_pair( sqrt((3.0 + 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 - sqrt(30.0)) / 36.0),
+	std::make_pair(-sqrt((3.0 + 2.0 * sqrt(6.0 / 5.0)) / 7.0), (18.0 - sqrt(30.0)) / 36.0)
 }};
 
 std::array<std::pair<double, double>, 5> gaussQuadrature5Points =
 {{
 	std::make_pair( 0.0, 128.0 / 225.0),
-	std::make_pair( sqrt(5.0 - 2.0*sqrt(10.0/7.0)) / 3.0, (322.0 + 13.0 * sqrt(70.0)) / 900.0),
-	std::make_pair(-sqrt(5.0 - 2.0*sqrt(10.0/7.0)) / 3.0, (322.0 + 13.0 * sqrt(70.0)) / 900.0),
-	std::make_pair( sqrt(5.0 + 2.0*sqrt(10.0/7.0)) / 3.0, (322.0 - 13.0 * sqrt(70.0)) / 900.0),
-	std::make_pair(-sqrt(5.0 + 2.0*sqrt(10.0/7.0)) / 3.0, (322.0 - 13.0 * sqrt(70.0)) / 900.0)
+	std::make_pair( sqrt(5.0 - 2.0 * sqrt(10.0 / 7.0)) / 3.0, (322.0 + 13.0 * sqrt(70.0)) / 900.0),
+	std::make_pair(-sqrt(5.0 - 2.0 * sqrt(10.0 / 7.0)) / 3.0, (322.0 + 13.0 * sqrt(70.0)) / 900.0),
+	std::make_pair( sqrt(5.0 + 2.0 * sqrt(10.0 / 7.0)) / 3.0, (322.0 - 13.0 * sqrt(70.0)) / 900.0),
+	std::make_pair(-sqrt(5.0 + 2.0 * sqrt(10.0 / 7.0)) / 3.0, (322.0 - 13.0 * sqrt(70.0)) / 900.0)
 }};
 
 };  // namespace Math
