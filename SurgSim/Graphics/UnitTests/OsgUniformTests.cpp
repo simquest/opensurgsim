@@ -128,7 +128,8 @@ void testUniformFloat(FloatType min, FloatType max)
 
 	auto accessibleResult = testAccessible<FloatType>(value);
 	FloatType resultValue;
-	ASSERT_NO_THROW({resultValue = boost::any_cast<FloatType>(accessibleResult.second);});
+	ASSERT_NO_THROW({boost::any_cast<FloatType>(accessibleResult.second);});
+	resultValue = boost::any_cast<FloatType>(accessibleResult.second);
 	EXPECT_NEAR(value,resultValue, Eigen::NumTraits<FloatType>::dummy_precision());
 }
 
@@ -218,7 +219,8 @@ void testUniformEigen()
 
 	auto accessibleResult = testAccessible<Type>(value);
 	Type resultValue;
-	ASSERT_NO_THROW({resultValue = boost::any_cast<Type>(accessibleResult.second);});
+	ASSERT_NO_THROW({boost::any_cast<Type>(accessibleResult.second);});
+	resultValue = boost::any_cast<Type>(accessibleResult.second);
 	EXPECT_TRUE(value.isApprox(resultValue));
 }
 
