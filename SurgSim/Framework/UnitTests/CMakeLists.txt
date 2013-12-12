@@ -28,7 +28,6 @@ set(UNIT_TEST_SOURCES
 	BehaviorManagerTest.cpp
 	ComponentManagerTests.cpp
 	ComponentTest.cpp
-	TransferPropertiesBehaviorTests.cpp
 	LockedContainerTest.cpp
 	LoggerManagerTest.cpp
 	LoggerTest.cpp
@@ -38,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	SceneTest.cpp
 	SharedInstanceTest.cpp
 	TimerTest.cpp
+	TransferPropertiesBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
