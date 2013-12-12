@@ -18,7 +18,8 @@
 #include "SurgSim/Framework/Accessible.h"
 #include <functional>
 #include <boost/any.hpp>
-#include <SurgSim/Math/Matrix.h>
+
+#include "SurgSim/Math/Matrix.h"
 
 #include <memory>
 
@@ -34,10 +35,13 @@ public:
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, b, getB, setB);
 		SURGSIM_ADD_RW_PROPERTY(TestClass, std::shared_ptr<int>, c, getC, setC);
 
+		SURGSIM_ADD_RO_PROPERTY(TestClass, int, d, getD);
+
 		c = std::make_shared<int>(4);
 	}
 	int a;
 	double b;
+	int d;
 
 	std::shared_ptr<int> c;
 
@@ -49,6 +53,8 @@ public:
 
 	std::shared_ptr<int> getC() { return c; }
 	void setC(std::shared_ptr<int> val) { c = val; }
+
+	int getD() { return d; }
 };
 
 namespace SurgSim
@@ -87,7 +93,7 @@ TEST(AccessibleTests, TransferTest)
 	EXPECT_EQ(a.a, b.a);
 }
 
-TEST(AccessibleTests, MacroTest)
+TEST(AccessibleTests, ReadWriteMacroTest)
 {
 	TestClass a;
 	a.b = 100.0;
@@ -95,6 +101,16 @@ TEST(AccessibleTests, MacroTest)
 	EXPECT_EQ(a.b, boost::any_cast<double>(a.getValue("b")));
 	a.setValue("b",50.0);
 	EXPECT_EQ(50.0, a.b);
+}
+
+TEST(AccessibleTests, ReadOnlyMacroTest)
+{
+	TestClass a;
+	a.d = 200;
+
+	EXPECT_EQ(a.d, boost::any_cast<int>(a.getValue("d")));
+
+	EXPECT_ANY_THROW(a.setValue("d",100));
 }
 
 TEST(AccessibleTest, TemplateFunction)
