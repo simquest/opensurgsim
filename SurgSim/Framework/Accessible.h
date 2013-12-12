@@ -20,7 +20,8 @@
 #include <unordered_map>
 #include <functional>
 #include <boost/any.hpp>
-#include <SurgSim/Math/Matrix.h>
+
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -83,17 +84,17 @@ private:
 
 /// Wrap boost::any_cast to use in std::bind, for some reason it does not work by itself. This function will
 /// throw an exception if the cast does not work, this usually means that the types do not match up at all.
-/// \tparam T target type for conversion
-/// \return An object converted from boost::any to T
+/// \tparam T target type for conversion.
+/// \param val The value to be converted.
+/// \return An object converted from boost::any to T, will throw an exception if the conversion fails
 template <class T>
-T convert(boost::any val)
-{
-	return boost::any_cast<T>(val);
-}
+T convert(boost::any val);
 
-/// Specialization for convert to correctly cast Matrix44d to Matrix44d, will throw if the val is not castable to
-/// Matrix44d
-/// \return A matrix converted to Matrix44f
+/// Specialization for convert<T>() to correctly cast Matrix44d to Matrix44f, will throw if the val is not casteable to
+/// Matrix44[fd]. This is necessary as we need Matrix44f as outputs in some cases but all our Matrices are Matrix44d.
+/// This lets the user define a property that does a type conversion, without having to implement an accessor.
+/// \param val The value to be converted, should be a Matrix44[df].
+/// \return A matrix val converted to Matrix44f.
 template <>
 SurgSim::Math::Matrix44f convert(boost::any val);
 
@@ -108,7 +109,7 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 /// A macro to register a getter for a property that is read only
 #define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \
 	setGetter(#property, \
-	std::bind(&class::getter, this));
+	std::bind(&class::getter, this))
 
 
 }; // Framework
