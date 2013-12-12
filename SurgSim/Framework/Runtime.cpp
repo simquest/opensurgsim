@@ -195,9 +195,9 @@ bool Runtime::stop()
 	{
 		resume();
 	}
-	
+
 	m_isRunning = false;
-	
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
