@@ -164,13 +164,14 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 }
 
 /// Helper method to construct an orthonormal basis (i, j, k) given the 1st vector direction
-/// \tparam Vector The vector type
+/// \tparam T the numeric data type used for the vector argument. Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument. Can be deduced.
 /// \param[in, out] i Should provide the 1st direction on input. The 1st vector of the basis (i, j, k) on output.
 /// \param[out] j, k The 2nd and 3rd orthonormal vectors of the basis (i, j, k)
 /// \return True if (i, j, k) has been built successfully, False if 'i' is a (or close to a) null vector
-/// \note If any of the parameter is nullptr, an exception will be raised
-template <class Vector>
-bool buildOrthonormalBasis(Vector* i, Vector* j, Vector* k)
+/// \note If any of the parameter is a nullptr, an exception will be raised
+template <class T, int VOpt>
+bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i, Eigen::Matrix<T, 3, 1, VOpt>* j, Eigen::Matrix<T, 3, 1, VOpt>* k)
 {
 	SURGSIM_ASSERT(i != nullptr) << "Parameter [in, out] 'i' is a nullptr";
 	SURGSIM_ASSERT(j != nullptr) << "Parameter [out] 'j' is a nullptr";
