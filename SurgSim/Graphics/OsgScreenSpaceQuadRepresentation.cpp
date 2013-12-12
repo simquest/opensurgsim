@@ -38,13 +38,10 @@ namespace SurgSim
 namespace Graphics
 {
 
-OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
-	const std::string& name,
-	std::shared_ptr<View> view) :
+OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
-	ScreenSpaceQuadRepresentation(name,view),
-	m_view(view),
+	ScreenSpaceQuadRepresentation(name),
 	m_scale(1.0,1.0,1.0)
 {
 	m_switch = new osg::Switch;
@@ -52,8 +49,6 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 
 	m_transform = new osg::PositionAttitudeTransform();
 	m_transform->setName(name + " Transform");
-
-	m_view->getDimensions(&m_displayWidth, &m_displayHeight);
 
 	m_geode = new osg::Geode;
 
@@ -71,39 +66,20 @@ OsgScreenSpaceQuadRepresentation::OsgScreenSpaceQuadRepresentation(
 
 	m_geometry->addPrimitiveSet(new osg::DrawArrays(GL_QUADS,0,4));
 
-	//osg::StateSet* stateset = geom->getOrCreateStateSet();
-	//stateset->setMode(GL_BLEND,osg::StateAttribute::ON);
-
 	m_geode->addDrawable(m_geometry);
 
 	m_transform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	m_transform->setCullingActive(false);
 	m_transform->addChild(m_geode);
 
-	// Need to keep this around to modify the ortho projection when the view changes
-	m_projection = new osg::Projection;
-	m_projection->setMatrix(osg::Matrix::ortho2D(0,m_displayWidth,0,m_displayHeight));
-	m_projection->addChild(m_transform);
+	m_switch->addChild(m_transform);
 
-
-	m_switch->addChild(m_projection);
+	addGroupReference("ossHud");
 }
 
 OsgScreenSpaceQuadRepresentation::~OsgScreenSpaceQuadRepresentation()
 {
 
-}
-
-void OsgScreenSpaceQuadRepresentation::doUpdate(double dt)
-{
-	int width, height;
-	m_view->getDimensions(&width, &height);
-	if (width != m_displayWidth || height != m_displayHeight)
-	{
-		m_displayWidth = width;
-		m_displayHeight = height;
-		m_projection->setMatrix(osg::Matrix::ortho2D(0, m_displayWidth, 0, m_displayHeight));
-	}
 }
 
 void OsgScreenSpaceQuadRepresentation::setSize(double width, double height)
