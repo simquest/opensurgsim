@@ -26,7 +26,12 @@
 class TestClass : public SurgSim::Framework::Accessible
 {
 public:
-	TestClass() : privateProperty(100), sharedPtr(std::make_shared<int>(4))
+	TestClass() :
+		normal(100),
+		readWrite(100.0),
+		readOnly(100),
+		sharedPtr(std::make_shared<int>(4)),
+		privateProperty(100)
 	{
 		setGetter("normal", std::bind(&TestClass::getNormal, this));
 		setSetter("normal", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
