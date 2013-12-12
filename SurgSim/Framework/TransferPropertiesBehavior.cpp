@@ -37,7 +37,7 @@ TransferPropertiesBehavior::~TransferPropertiesBehavior()
 void TransferPropertiesBehavior::update(double dt)
 {
 	{
-		boost::lock_guard<boost::mutex>lock(m_incomingMutex);
+		boost::lock_guard<boost::mutex> lock(m_incomingMutex);
 		m_connections.insert(m_connections.end(), m_incomingConnections.begin(), m_incomingConnections.end());
 		m_incomingConnections.clear();
 	}
@@ -56,10 +56,10 @@ void TransferPropertiesBehavior::update(double dt)
 bool TransferPropertiesBehavior::connect(
 	std::shared_ptr<SurgSim::Framework::Accessible> sourceAccessible,
 	const std::string& sourcePropertyName,
-	std::shared_ptr<SurgSim::Framework::Accessible> targetAccessible,  
+	std::shared_ptr<SurgSim::Framework::Accessible> targetAccessible,
 	const std::string& targetPropertyName)
 {
-	SURGSIM_ASSERT(sourceAccessible != nullptr && targetAccessible != nullptr) << 
+	SURGSIM_ASSERT(sourceAccessible != nullptr && targetAccessible != nullptr) <<
 		"Accessibles cannot be nullptr";
 
 	Property source = {sourceAccessible, sourcePropertyName};
@@ -93,7 +93,7 @@ bool TransferPropertiesBehavior::connect(const Property& source, const Property&
 
 	auto entry = std::make_pair(source, target);
 
-	boost::lock_guard<boost::mutex>lock(m_incomingMutex);
+	boost::lock_guard<boost::mutex> lock(m_incomingMutex);
 	m_incomingConnections.push_back(std::move(entry));
 
 	return true;

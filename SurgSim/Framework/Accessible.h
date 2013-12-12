@@ -65,11 +65,11 @@ public:
 
 	/// Check whether a property is readable
 	/// \return true if the property exists and has a getter
-	bool isReadable(const std::string& name);
+	bool isReadable(const std::string& name) const;
 
 	/// Check whether a property is writeable
 	/// \return true if the property exists and has a setter
-	bool isWriteable(const std::string& name);
+	bool isWriteable(const std::string& name) const;
 
 	/// Sets a getter for a given property.
 	/// \param	name	The name of the property.

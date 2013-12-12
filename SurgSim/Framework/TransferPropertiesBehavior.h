@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_COPYPROPERTIESBEHAVIOR_H
-#define SURGSIM_FRAMEWORK_COPYPROPERTIESBEHAVIOR_H
+#ifndef SURGSIM_FRAMEWORK_TRANSFERPROPERTIESBEHAVIOR_H
+#define SURGSIM_FRAMEWORK_TRANSFERPROPERTIESBEHAVIOR_H
 
 #include <string>
 
@@ -37,7 +37,7 @@ public:
 	/// Constructor.
 	/// \param name The name of the behavior.
 	explicit TransferPropertiesBehavior(const std::string& name);
-	
+
 	/// Destructor.
 	virtual ~TransferPropertiesBehavior();
 
@@ -85,10 +85,8 @@ private:
 	virtual int getTargetManagerType() const;
 	///@}
 
-	///@{
-	/// Local typedefs 
+	/// Local typedefs
 	typedef std::pair<Property, Property> Connection;
-	///@}
 
 	/// List of connections in this object
 	std::vector<Connection> m_connections;
