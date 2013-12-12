@@ -18,7 +18,7 @@
 
 #include <string>
 #include <memory>
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 namespace SurgSim
 {

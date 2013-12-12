@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_GROUP_H
 #define SURGSIM_GRAPHICS_GROUP_H
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 #include <memory>
 #include <vector>

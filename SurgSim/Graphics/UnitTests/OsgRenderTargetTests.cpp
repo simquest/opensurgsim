@@ -15,8 +15,8 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Graphics/OsgCamera.h>
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 
 namespace SurgSim
 {

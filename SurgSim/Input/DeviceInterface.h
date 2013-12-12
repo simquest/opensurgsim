@@ -19,8 +19,8 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
 
 namespace SurgSim
 {

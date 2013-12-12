@@ -17,7 +17,7 @@
 /// Tests for the SURGSIM_LOG_*() macros and the related classes.
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
 #include <boost/filesystem.hpp>
 

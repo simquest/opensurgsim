@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
+#include "SurgSim/Collision/UnitTests/RepresentationUtilities.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 
-#include <SurgSim/Collision/Representation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
-#include <SurgSim/Math/Shapes.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;

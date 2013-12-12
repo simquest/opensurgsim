@@ -18,9 +18,9 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Blocks/MassSpring1DRepresentation.h>
-#include <SurgSim/Blocks/UnitTests/SpringTestUtils.h>
-#include <SurgSim/Physics/LinearSpring.h>
+#include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+#include "SurgSim/Blocks/UnitTests/SpringTestUtils.h"
+#include "SurgSim/Physics/LinearSpring.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Physics::LinearSpring;
@@ -83,7 +83,8 @@ TEST(MassSpring1DRepresentationTests, init1DTest)
 	for (unsigned int nodeId = 0; nodeId < numNodesPerDim[0]; nodeId++)
 	{
 		Vector3d piExpected = extremities[0] + delta * nodeId;
-		Eigen::VectorBlock<Vector> pi = SurgSim::Math::getSubVector(m.getFinalState()->getPositions(), nodeId, 3);
+		SurgSim::Math::Vector& x = m.getFinalState()->getPositions();
+		Eigen::VectorBlock<SurgSim::Math::Vector> pi = SurgSim::Math::getSubVector(x, nodeId, 3);
 		EXPECT_TRUE(pi.isApprox(piExpected));
 	}
 	EXPECT_EQ(boundaryConditions, m.getFinalState()->getBoundaryConditions());

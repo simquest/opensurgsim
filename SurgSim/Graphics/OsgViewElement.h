@@ -16,10 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 #define SURGSIM_GRAPHICS_OSGVIEWELEMENT_H
 
-#include <SurgSim/Graphics/ViewElement.h>
+#include "SurgSim/Graphics/ViewElement.h"
 #include <osg/ref_ptr>
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

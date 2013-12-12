@@ -19,8 +19,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Quaternion.h>
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Quaternion.h"
 #include "gtest/gtest.h"
 
 template <class T>

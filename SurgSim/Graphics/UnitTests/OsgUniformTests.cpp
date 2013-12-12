@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the OsgUniform class.
 
-#include <SurgSim/Graphics/OsgUniform.h>
+#include "SurgSim/Graphics/OsgUniform.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 

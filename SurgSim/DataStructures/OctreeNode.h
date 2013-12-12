@@ -20,7 +20,7 @@
 #include <memory>
 #include <Eigen/Geometry>
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 
 namespace SurgSim
@@ -115,6 +115,6 @@ private:
 };  // namespace DataStructures
 };  // namespace SurgSim
 
-#include <SurgSim/DataStructures/OctreeNode-inl.h>
+#include "SurgSim/DataStructures/OctreeNode-inl.h"
 
 #endif // SURGSIM_DATASTRUCTURES_OCTREENODE_H

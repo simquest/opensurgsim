@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/Log.h"
 
-#include <SurgSim/Physics/FemElement3DTetrahedron.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;

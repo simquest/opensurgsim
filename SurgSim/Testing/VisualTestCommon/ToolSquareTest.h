@@ -17,7 +17,7 @@
 #define SURGSIM_TESTING_VISUALTESTCOMMON_TOOLSQUARETEST_H
 
 #include <memory>
-#include <SurgSim/Input/DeviceInterface.h>
+#include "SurgSim/Input/DeviceInterface.h"
 
 void runToolSquareTest(std::shared_ptr<SurgSim::Input::DeviceInterface> toolDevice,
 					   std::shared_ptr<SurgSim::Input::DeviceInterface> squareDevice,

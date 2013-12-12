@@ -16,7 +16,7 @@
 #ifndef SURGSIM_BLOCKS_TRANSFERPOSEBEHAVIOR_H
 #define SURGSIM_BLOCKS_TRANSFERPOSEBEHAVIOR_H
 
-#include <SurgSim/Framework/Behavior.h>
+#include "SurgSim/Framework/Behavior.h"
 
 
 namespace SurgSim

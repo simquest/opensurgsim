@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgTextureRectangle.h>
+#include "SurgSim/Graphics/OsgTextureRectangle.h"
 
 using SurgSim::Graphics::OsgTextureRectangle;
 

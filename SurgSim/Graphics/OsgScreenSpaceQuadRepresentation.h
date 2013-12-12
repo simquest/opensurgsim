@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGSCREENSPACEQUADREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSCREENSPACEQUADREPRESENTATION_H
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Graphics/ScreenSpaceQuadRepresentation.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/ScreenSpaceQuadRepresentation.h"
 #include <osg/Vec3>
 
 #if defined(_MSC_VER)

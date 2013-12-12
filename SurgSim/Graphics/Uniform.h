@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_UNIFORM_H
 #define SURGSIM_GRAPHICS_UNIFORM_H
 
-#include <SurgSim/Graphics/UniformBase.h>
+#include "SurgSim/Graphics/UniformBase.h"
 
 #include <vector>
 

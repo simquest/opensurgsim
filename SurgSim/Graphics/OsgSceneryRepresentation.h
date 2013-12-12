@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGSCENERYREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSCENERYREPRESENTATION_H
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/SceneryRepresentation.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/SceneryRepresentation.h"
 
 #include <osg/Node>
 

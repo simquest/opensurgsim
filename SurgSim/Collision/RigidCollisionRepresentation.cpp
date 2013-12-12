@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 
 namespace SurgSim
 {
@@ -57,6 +57,18 @@ const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getPose() c
 void RigidCollisionRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	SURGSIM_FAILURE() << "Cannot set the pose on a RigidCollisionRepresentation.";
+}
+
+void RigidCollisionRepresentation::setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
+{
+	SURGSIM_FAILURE() << "Cannot set the intial pose on a RigidCollisionRepresentation.";
+}
+
+const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getInitialPose() const
+{
+	SURGSIM_ASSERT(!m_physicsRepresentation.expired()) <<
+		"PhysicsRepresentation went out of scope for Collision Representation " << getName();
+	return m_physicsRepresentation.lock()->getInitialPose();
 }
 
 std::shared_ptr<SurgSim::Physics::Representation> RigidCollisionRepresentation::getPhysicsRepresentation()

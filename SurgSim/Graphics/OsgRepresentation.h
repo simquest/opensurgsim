@@ -19,7 +19,7 @@
 #include <memory>
 #include <unordered_set>
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
 #include <osg/ref_ptr>
 

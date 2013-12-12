@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGUNIFORM_INL_H
 #define SURGSIM_GRAPHICS_OSGUNIFORM_INL_H
 
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Graphics/OsgConversions.h>
-#include <SurgSim/Graphics/OsgUniformTypes.h>
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Graphics/OsgConversions.h"
+#include "SurgSim/Graphics/OsgUniformTypes.h"
 
 namespace SurgSim
 {

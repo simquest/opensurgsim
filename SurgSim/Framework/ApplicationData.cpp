@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Log.h"
 
 #include <algorithm>
 #include <iostream>

@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Physics/DeformableRepresentationState.h>
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 using SurgSim::Physics::DeformableRepresentationState;
 

@@ -17,7 +17,7 @@
 #define SURGSIM_DEVICES_MULTIAXIS_BITSETBUFFER_H
 
 #include <string>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 
 namespace SurgSim

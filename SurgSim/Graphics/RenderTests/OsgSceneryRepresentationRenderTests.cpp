@@ -16,12 +16,12 @@
 /// \file
 /// Render Tests for OsgSceneryRepresentation class.
 
-#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Testing/MathUtilities.h"
 
 namespace SurgSim
 {

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASESTATE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASESTATE_H
 
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {

@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGVECTORFIELDREPRESENTATION_H
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/VectorFieldRepresentation.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/VectorFieldRepresentation.h"
 
 #include <osg/Array>
 #include <osg/Geometry>

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGVIEW_H
 #define SURGSIM_GRAPHICS_OSGVIEW_H
 
-#include <SurgSim/Graphics/View.h>
+#include "SurgSim/Graphics/View.h"
 
 #include <osgViewer/Viewer>
 

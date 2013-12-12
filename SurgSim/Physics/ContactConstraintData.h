@@ -16,9 +16,9 @@
 #ifndef SURGSIM_PHYSICS_CONTACTCONSTRAINTDATA_H
 #define SURGSIM_PHYSICS_CONTACTCONSTRAINTDATA_H
 
-#include <SurgSim/Physics/ConstraintData.h>
+#include "SurgSim/Physics/ConstraintData.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
