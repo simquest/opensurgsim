@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_ACCESSIBLE_H
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 #include <functional>
 #include <boost/any.hpp>
@@ -91,6 +92,12 @@ private:
 
 	std::unordered_map<std::string, GetterType > m_getters;
 	std::unordered_map<std::string, SetterType > m_setters;
+};
+
+struct Property
+{
+	std::weak_ptr<Accessible> accessible;
+	std::string name;
 };
 
 #define SURGSIM_ADD_RW_PROPERTY(class, type, property, getter, setter) \

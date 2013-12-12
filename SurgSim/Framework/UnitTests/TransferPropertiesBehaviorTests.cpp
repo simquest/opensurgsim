@@ -54,8 +54,8 @@ TEST(TransferPropertiesBehaviorTest, ValidConnections)
 
 	TransferPropertiesBehavior behavior("test");
 
-	EXPECT_FALSE(behavior.connect(nullptr, "",a ,"a"));
-	EXPECT_FALSE(behavior.connect(a, "a", nullptr, ""));
+	EXPECT_ANY_THROW(behavior.connect(nullptr, "", a ,"a"));
+	EXPECT_ANY_THROW(behavior.connect(a, "a", nullptr, ""));
 
 	EXPECT_FALSE(behavior.connect(a, "a", a, "a"));
 

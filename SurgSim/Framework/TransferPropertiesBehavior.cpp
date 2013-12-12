@@ -44,44 +44,54 @@ void TransferPropertiesBehavior::update(double dt)
 
 	for (auto it = std::begin(m_connections); it != std::end(m_connections); ++it)
 	{
-		if (!it->first.second.expired() && !it->second.second.expired())
+		if (!it->first.accessible.expired() && !it->second.accessible.expired())
 		{
-			auto source = it->first.second.lock();
-			auto target = it->second.second.lock();
-			target->setValue(it->second.first,source->getValue(it->first.first));
+			auto source = it->first.accessible.lock();
+			auto target = it->second.accessible.lock();
+			target->setValue(it->second.name,source->getValue(it->first.name));
 		}
 	}
 }
 
 bool TransferPropertiesBehavior::connect(
-	std::shared_ptr<SurgSim::Framework::Accessible> source,
+	std::shared_ptr<SurgSim::Framework::Accessible> sourceAccessible,
 	const std::string& sourcePropertyName,
-	std::shared_ptr<SurgSim::Framework::Accessible> target,				   
+	std::shared_ptr<SurgSim::Framework::Accessible> targetAccessible,  
 	const std::string& targetPropertyName)
 {
+	SURGSIM_ASSERT(sourceAccessible != nullptr && targetAccessible != nullptr) << 
+		"Accessibles cannot be nullptr";
 
+	Property source = {sourceAccessible, sourcePropertyName};
+	Property target = {targetAccessible, targetPropertyName};
+
+	return connect(source, target);
+}
+
+bool TransferPropertiesBehavior::connect(const Property& source, const Property& target)
+{
 	// Early outs
-	if (source == nullptr || target == nullptr)
+	if (source.accessible.expired() || target.accessible.expired())
 	{
 		return false;
 	}
 
-	if (source == target && sourcePropertyName == targetPropertyName)
+	auto sharedSource = source.accessible.lock();
+	auto sharedTarget = target.accessible.lock();
+
+	if (sharedSource == sharedTarget && source.name == target.name)
 	{
 		return false;
 	}
 
-	if (! source->isReadable(sourcePropertyName) || !target->isWriteable(targetPropertyName))
+	if (!sharedSource->isReadable(source.name) || !sharedTarget->isWriteable(target.name))
 	{
 		return false;
 	}
 
-	// \note HS-2013-nov-26 should also check for existing properties and matching types here
+	// \note HS-2013-nov-26 should also check matching types here
 
-	Property sourceProperty = std::make_pair(sourcePropertyName, source);
-	Property targetProperty = std::make_pair(targetPropertyName, target);
-
-	auto entry = std::make_pair(std::move(sourceProperty), std::move(targetProperty));
+	auto entry = std::make_pair(source, target);
 
 	boost::lock_guard<boost::mutex>lock(m_incomingMutex);
 	m_incomingConnections.push_back(std::move(entry));

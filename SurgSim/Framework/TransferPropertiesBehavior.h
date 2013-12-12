@@ -46,16 +46,26 @@ public:
 	/// \pre pointers cannot be nullptr, properties need to exist and the property
 	///      at the source needs to be readable and the property at the target needs
 	///      to be writeable
-	/// \param source Source Accessible instance.
+	/// \param sourceAccessible Source Accessible instance.
 	/// \param sourcePropertyName The name of the source property.
-	/// \param target Target Accessible instnace.
+	/// \param tagetAccessible Target Accessible instance.
 	/// \param targetPropertyName The name of the target property.
 	/// \return true if the connection was created
 	bool connect(
-		std::shared_ptr<SurgSim::Framework::Accessible> source,
+		std::shared_ptr<SurgSim::Framework::Accessible> sourceAccessible,
 		const std::string& sourcePropertyName,
-		std::shared_ptr<SurgSim::Framework::Accessible> taget,
+		std::shared_ptr<SurgSim::Framework::Accessible> tagetAccessible,
 		const std::string& targetPropertyName);
+
+	/// Connect two properties of two instances of accessible, once connected the value of the property
+	/// will be copied from source to target at every update call.
+	/// \pre pointers cannot be nullptr, properties need to exist and the property
+	///      at the source needs to be readable and the property at the target needs
+	///      to be writeable
+	/// \param source Source property.
+	/// \param target Target property.
+	/// \return true if the connection was created
+	bool connect(const Property& source, const Property& target);
 
 	/// Sets the type of manager that this behavior should use, this cannot be done after
 	/// initialization has occurred.
@@ -77,7 +87,6 @@ private:
 
 	///@{
 	/// Local typedefs 
-	typedef std::pair<std::string, std::weak_ptr<SurgSim::Framework::Accessible>> Property;
 	typedef std::pair<Property, Property> Connection;
 	///@}
 
