@@ -18,7 +18,7 @@
 
 #include <vector>
 #include <Eigen/Core>
-#include <SurgSim/Math/MlcpConstraintType.h>
+#include "SurgSim/Math/MlcpConstraintType.h"
 
 
 namespace SurgSim

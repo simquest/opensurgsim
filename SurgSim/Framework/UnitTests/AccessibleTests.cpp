@@ -15,7 +15,7 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/Accessible.h>
+#include "SurgSim/Framework/Accessible.h"
 #include <functional>
 #include <boost/any.hpp>
 #include <SurgSim/Math/Matrix.h>

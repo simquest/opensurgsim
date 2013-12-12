@@ -15,11 +15,11 @@
 
 
 
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgRigidTransformConversions.h>
-#include <SurgSim/Graphics/OsgUnitBox.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRigidTransformConversions.h"
+#include "SurgSim/Graphics/OsgUnitBox.h"
 
 #include <osg/Geode>
 #include <osg/Shape>

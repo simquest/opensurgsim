@@ -16,12 +16,12 @@
 /// \file
 /// Render Tests for the OsgViewElement class.
 
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 
 #include <gtest/gtest.h>
 

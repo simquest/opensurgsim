@@ -16,8 +16,8 @@
 /// \file
 /// Tests for the OsgTextureRectangle class.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Graphics/OsgTextureRectangle.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Graphics/OsgTextureRectangle.h"
 
 #include <boost/filesystem.hpp>
 

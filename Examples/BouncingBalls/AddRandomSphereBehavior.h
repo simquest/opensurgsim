@@ -18,7 +18,7 @@
 
 #include <random>
 
-#include <SurgSim/Framework/Behavior.h>
+#include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {

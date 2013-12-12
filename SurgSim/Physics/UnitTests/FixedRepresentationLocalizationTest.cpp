@@ -18,14 +18,14 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::RigidRepresentationLocalization;
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace
 {

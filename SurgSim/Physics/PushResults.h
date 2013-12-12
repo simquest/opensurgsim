@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_PUSHRESULTS_H
 #define SURGSIM_PHYSICS_PUSHRESULTS_H
 
-#include <SurgSim/Physics/Computation.h>
+#include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
 {

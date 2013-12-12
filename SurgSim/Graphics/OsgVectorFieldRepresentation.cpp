@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
+#include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
 
 #include <osg/Geode>
 #include <osg/PositionAttitudeTransform>
 #include <osg/PrimitiveSet>
 #include <osg/StateAttribute>
 
-#include <SurgSim/Graphics/OsgConversions.h>
+#include "SurgSim/Graphics/OsgConversions.h"
 
 namespace SurgSim
 {

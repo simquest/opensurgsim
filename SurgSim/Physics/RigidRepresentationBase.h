@@ -16,17 +16,15 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H
 
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Collision/Location.h>
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
+#include "SurgSim/Collision/Location.h"
 
-#include <SurgSim/Math/RigidTransform.h>
-
-using SurgSim::Collision::Location;
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -83,7 +81,7 @@ public:
 	/// \return The final pose (translation + rotation)
 	const SurgSim::Math::RigidTransform3d& getPose() const;
 
-	std::shared_ptr<Localization> createLocalization(const Location& location);
+	std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
 
 	/// Set the initial parameters of the rigid representation
 	/// \param parameters The initial parameters
@@ -120,7 +118,7 @@ protected:
 	/// \param	location	The location for the localization.
 	/// \return	The new Localization;
 	template <class T>
-	std::shared_ptr<T> createTypedLocalization(const Location& location);
+	std::shared_ptr<T> createTypedLocalization(const SurgSim::Collision::Location& location);
 
 private:
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) = 0;
@@ -130,6 +128,6 @@ private:
 
 }; // SurgSim
 
-#include <SurgSim/Physics/RigidRepresentationBase-inl.h>
+#include "SurgSim/Physics/RigidRepresentationBase-inl.h"
 
 #endif // SURGSIM_PHYSICS_RIGIDREPRESENTATIONBASE_H

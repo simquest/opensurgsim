@@ -19,9 +19,9 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Input/DeviceInterface.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {

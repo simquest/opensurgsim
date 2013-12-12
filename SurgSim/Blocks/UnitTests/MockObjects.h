@@ -16,7 +16,7 @@
 #ifndef SURGSIM_BLOCKS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_BLOCKS_UNITTESTS_MOCKOBJECTS_H
 
-#include <SurgSim/Framework/Representation.h>
+#include "SurgSim/Framework/Representation.h"
 
 /// Concrete Representation for testing
 class MockRepresentation : public SurgSim::Framework::Representation

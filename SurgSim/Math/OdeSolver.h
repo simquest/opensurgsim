@@ -16,10 +16,10 @@
 #ifndef SURGSIM_MATH_ODESOLVER_H
 #define SURGSIM_MATH_ODESOLVER_H
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
-#include <SurgSim/Math/OdeEquation.h>
+#include "SurgSim/Math/OdeEquation.h"
 
 namespace SurgSim
 {
@@ -109,6 +109,6 @@ protected:
 
 }; // namespace SurgSim
 
-#include <SurgSim/Math/OdeSolver-inl.h>
+#include "SurgSim/Math/OdeSolver-inl.h"
 
 #endif // SURGSIM_MATH_ODESOLVER_H

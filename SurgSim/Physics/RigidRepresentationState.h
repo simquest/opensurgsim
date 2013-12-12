@@ -16,11 +16,9 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONSTATE_H
 
-#include <SurgSim/Physics/RigidRepresentationBaseState.h>
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
-#include <SurgSim/Math/Vector.h>
-
-using SurgSim::Math::Vector3d;
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -78,38 +76,38 @@ public:
 
 	/// Get the linear velocity
 	/// \return the linear velocity
-	const Vector3d& getLinearVelocity() const
+	const SurgSim::Math::Vector3d& getLinearVelocity() const
 	{
 		return m_v;
 	}
 
 	/// Get the angular velocity
 	/// \return the angular velocity
-	const Vector3d& getAngularVelocity() const
+	const SurgSim::Math::Vector3d& getAngularVelocity() const
 	{
 		return m_w;
 	}
 
 	/// Set the linear velocity
 	/// \param v The linear velocity
-	void setLinearVelocity(const Vector3d &v)
+	void setLinearVelocity(const SurgSim::Math::Vector3d &v)
 	{
 		m_v = v;
 	}
 
 	/// Set the angular velocity
 	/// \param w The angular velocity
-	void setAngularVelocity(const Vector3d &w)
+	void setAngularVelocity(const SurgSim::Math::Vector3d &w)
 	{
 		m_w = w;
 	}
 
 private:
 	/// Linear velocity
-	Vector3d m_v;
+	SurgSim::Math::Vector3d m_v;
 
 	/// Angular velocity
-	Vector3d m_w;
+	SurgSim::Math::Vector3d m_w;
 };
 
 }; // Physics

@@ -19,13 +19,14 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/ApplicationData.h"
 
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
 namespace SurgSim
 {
@@ -59,6 +60,7 @@ public:
 	std::shared_ptr<OsgManager> graphicsManager;
 	std::shared_ptr<SurgSim::Framework::Scene> scene;
 	std::shared_ptr<OsgViewElement> viewElement;
+	std::shared_ptr<SurgSim::Framework::ApplicationData> applicationData;
 
 };
 

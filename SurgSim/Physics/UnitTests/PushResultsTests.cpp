@@ -19,8 +19,8 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Physics/UnitTests/CommonTests.h>
-#include <SurgSim/Physics/PushResults.h>
+#include "SurgSim/Physics/UnitTests/CommonTests.h"
+#include "SurgSim/Physics/PushResults.h"
 
 namespace SurgSim
 {

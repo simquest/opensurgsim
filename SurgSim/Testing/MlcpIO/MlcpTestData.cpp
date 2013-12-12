@@ -15,8 +15,8 @@
 
 #include <iomanip>
 
-#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
-#include <SurgSim/Testing/MlcpIO/ReadText.h>
+#include "SurgSim/Testing/MlcpIO/MlcpTestData.h"
+#include "SurgSim/Testing/MlcpIO/ReadText.h"
 
 std::shared_ptr<MlcpTestData> loadTestData(const std::string& fileName)
 {

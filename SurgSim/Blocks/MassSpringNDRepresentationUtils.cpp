@@ -13,7 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Blocks/MassSpringNDRepresentationUtils.h>
+#include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
+
+#include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 namespace SurgSim
 {
@@ -21,13 +24,15 @@ namespace SurgSim
 namespace Blocks
 {
 
-std::shared_ptr<LinearSpring> createLinearSpring(const std::shared_ptr<DeformableRepresentationState> state,
+std::shared_ptr<SurgSim::Physics::LinearSpring> createLinearSpring(
+	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 	unsigned int nodeId0, unsigned int nodeId1,
 	double stiffness, double damping)
 {
 	using SurgSim::Math::Vector3d;
 
-	std::shared_ptr<LinearSpring> spring = std::make_shared<LinearSpring>(nodeId0, nodeId1);
+	std::shared_ptr<SurgSim::Physics::LinearSpring> spring;
+	spring = std::make_shared<SurgSim::Physics::LinearSpring>(nodeId0, nodeId1);
 
 	const Vector3d& A = SurgSim::Math::getSubVector(state->getPositions(), nodeId0, 3);
 	const Vector3d& B = SurgSim::Math::getSubVector(state->getPositions(), nodeId1, 3);

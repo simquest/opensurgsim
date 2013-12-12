@@ -21,10 +21,10 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include <SurgSim/Math/Shape.h>
-#include <SurgSim/DataStructures/TriangleMesh.h>
+#include "SurgSim/Math/Shape.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
 namespace SurgSim
 {
@@ -54,18 +54,18 @@ public:
 	/// \return The triangle mesh associated to this MeshShape
 	const std::shared_ptr<TriMesh> getMesh() const;
 
-	/// Calculate the volume of the mesh
-	/// \return The volume of the mesh (in m-3)
-	virtual double calculateVolume() const override;
+	/// Get the volume of the shape
+	/// \return The volume of the shape (in m-3)
+	virtual double getVolume() const override;
 
-	/// Calculate the mass center of the mesh
-	/// \return The mass center of the mesh
-	virtual Vector3d calculateMassCenter() const override;
+	/// Get the volumetric center of the shape
+	/// \return The center of the shape
+	virtual Vector3d getCenter() const override;
 
-	/// Calculate the inertia of the mesh
-	/// \param rho The mass density (in Kg.m-3)
-	/// \return The 3x3 symmetric inertia matrix of the mesh
-	virtual Matrix33d calculateInertia(double rho) const override;
+	/// Get the second central moment of the volume, commonly used
+	/// to calculate the moment of inertia matrix
+	/// \return The 3x3 symmetric second moment matrix
+	virtual Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Get the complete name of the mesh
 	virtual std::string getClassName() override;
@@ -104,6 +104,6 @@ private:
 }; // Math
 }; // SurgSim
 
-#include <SurgSim/Math/MeshShape-inl.h>
+#include "SurgSim/Math/MeshShape-inl.h"
 
 #endif // SURGSIM_MATH_MESHSHAPE_H

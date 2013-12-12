@@ -17,11 +17,11 @@
 
 #include <string>
 
-#include <SurgSim/Physics/FemElement.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Physics/UnitTests/MockObjects.h>
+#include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 using SurgSim::Physics::FemElement;
 using SurgSim::Physics::DeformableRepresentationState;

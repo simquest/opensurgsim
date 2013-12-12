@@ -14,10 +14,10 @@
 // limitations under the License.
 
 
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/Representation.h>
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Representation.h"
 
-#include <SurgSim/Blocks/TransferPoseBehavior.h>
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
 
 namespace SurgSim
 {

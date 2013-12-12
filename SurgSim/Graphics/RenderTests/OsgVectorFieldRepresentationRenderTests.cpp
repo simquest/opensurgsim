@@ -15,15 +15,15 @@
 
 /// Render Tests for the OsgVectorFieldRepresentation class.
 
-#include <SurgSim/DataStructures/Vertex.h>
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Graphics/VectorField.h>
-#include <SurgSim/Graphics/VectorFieldRepresentation.h>
-#include <SurgSim/Graphics/OsgVectorFieldRepresentation.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Graphics/VectorField.h"
+#include "SurgSim/Graphics/VectorFieldRepresentation.h"
+#include "SurgSim/Graphics/OsgVectorFieldRepresentation.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::DataStructures::Vertex;
 using SurgSim::Graphics::OsgVectorFieldRepresentation;

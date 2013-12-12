@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_MANAGER_H
 #define SURGSIM_GRAPHICS_MANAGER_H
 
-#include <SurgSim/Framework/ComponentManager.h>
+#include "SurgSim/Framework/ComponentManager.h"
 
 #include <memory>
 #include <vector>

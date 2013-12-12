@@ -17,15 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Framework/Runtime.h> //< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
 
-#include <SurgSim/Physics/Fem3DRepresentation.h>
-#include <SurgSim/Physics/FemElement3DTetrahedron.h>
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector;
 using SurgSim::Math::getSubVector;

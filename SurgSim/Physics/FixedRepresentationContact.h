@@ -16,9 +16,9 @@
 #ifndef SURGSIM_PHYSICS_FIXEDREPRESENTATIONCONTACT_H
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATIONCONTACT_H
 
-#include <SurgSim/Physics/ConstraintImplementation.h>
+#include "SurgSim/Physics/ConstraintImplementation.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

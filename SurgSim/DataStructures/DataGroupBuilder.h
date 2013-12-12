@@ -16,9 +16,9 @@
 #ifndef SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
 #define SURGSIM_DATASTRUCTURES_DATAGROUPBUILDER_H
 
-#include <SurgSim/DataStructures/NamedDataBuilder.h>
-#include <SurgSim/DataStructures/NamedVariantData.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/DataStructures/NamedDataBuilder.h"
+#include "SurgSim/DataStructures/NamedVariantData.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 #include <Eigen/Core>
 
 namespace SurgSim

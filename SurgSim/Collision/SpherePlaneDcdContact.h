@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include <SurgSim/Collision/ContactCalculation.h>
+#include "SurgSim/Collision/ContactCalculation.h"
 
 namespace SurgSim
 {

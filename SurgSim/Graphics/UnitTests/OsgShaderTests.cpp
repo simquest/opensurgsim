@@ -16,8 +16,8 @@
 /// \file
 /// Tests for the OsgShader class.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Graphics/OsgShader.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Graphics/OsgShader.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>

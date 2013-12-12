@@ -16,8 +16,8 @@
 #ifndef EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H
 #define EXAMPLES_ADDSPHEREFROMINPUT_ADDSPHEREBEHAVIOR_H
 
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Input/InputComponent.h>
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Input/InputComponent.h"
 
 class AddSphereFromInputBehavior: public SurgSim::Framework::Behavior
 {

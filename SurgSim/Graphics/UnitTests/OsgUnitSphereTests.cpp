@@ -16,7 +16,7 @@
 /// \file
 /// Tests for the OsgUnitSphere class.
 
-#include <SurgSim/Graphics/OsgUnitSphere.h>
+#include "SurgSim/Graphics/OsgUnitSphere.h"
 
 #include <gtest/gtest.h>
 

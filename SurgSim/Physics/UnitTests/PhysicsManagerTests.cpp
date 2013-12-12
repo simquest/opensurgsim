@@ -24,11 +24,11 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;
