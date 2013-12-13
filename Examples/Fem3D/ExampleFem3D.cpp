@@ -59,6 +59,7 @@ using SurgSim::Math::Vector4f;
 
 namespace
 {
+
 // Cube nodes
 //       2*-----------*3
 //       /           /|
@@ -136,7 +137,6 @@ void setFemElementParameters(std::shared_ptr<Fem3DRepresentation> physicsReprese
 	}
 }
 
-
 void loadCubeModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
 {
 	loadFem3DRestState(physicsRepresentation);
@@ -164,7 +164,8 @@ void loadTetrahedronModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepre
 		physicsRepresentation->addFemElement(element);
 	}
 }
-};
+
+}; // namespace
 
 std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation,
@@ -270,9 +271,8 @@ int main(int argc, char* argv[])
 
 	std::cout << "Scene description:" << std::endl;
 	std::cout << "Columns:" << std::endl;
-	std::cout << "  The first 3 columns are testing different ODE solvers" << std::endl;
+	std::cout << "  The 3 columns are testing different ODE solvers" << std::endl;
 	std::cout << "    Explicit Euler | Modified Explicit Euler | Implicit Euler" << std::endl;
-	std::cout << "  The last column superposes all ODE solver results for comparison." << std::endl;
 	std::cout << "Rows:" << std::endl;
 	std::cout << "  The top row is simulating a cube with a single cube element." << std::endl;
 	std::cout << "  The bottom row is simulating a cube with 5 tetrahedron elements." << std::endl;
@@ -281,22 +281,19 @@ int main(int argc, char* argv[])
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
 
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-3.0, 1.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-2.5, 2.0, 0.0)));
 		scene->addSceneElement(createCubeFem3D("CubeElement Euler Explicit",
 			gfxPoses, Vector4d(1, 0, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 1.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 0.0, 2.0, 0.0)));
 		scene->addSceneElement(createCubeFem3D("CubeElement Modified Euler Explicit",
 			gfxPoses, Vector4d(0, 1, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 1.0, 1.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 2.5, 2.0, 0.0)));
 		scene->addSceneElement(createCubeFem3D("CubeElement Fem 3D Euler Implicit",
 			gfxPoses, Vector4d(0, 0, 1, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
@@ -306,22 +303,19 @@ int main(int argc, char* argv[])
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
 
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-3.0, -1.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -1.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-2.5, -1.0, 0.0)));
 		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Euler Explicit",
 			gfxPoses, Vector4d(1, 0, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, -1.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -1.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 0.0, -1.0, 0.0)));
 		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Modified Euler Explicit",
 			gfxPoses, Vector4d(0, 1, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 1.0, -1.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -1.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 2.5, -1.0, 0.0)));
 		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Fem 3D Euler Implicit",
 			gfxPoses, Vector4d(0, 0, 1, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
