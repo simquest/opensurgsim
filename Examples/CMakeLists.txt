@@ -16,6 +16,7 @@
 if(SURGSIM_DEVICES_BUILD)
 	add_subdirectory(AddSphereFromInput)
 	add_subdirectory(InputVtc)
+	add_subdirectory(TrackIR)
 endif(SURGSIM_DEVICES_BUILD)
 
 add_subdirectory(BouncingBalls)
