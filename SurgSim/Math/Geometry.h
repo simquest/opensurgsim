@@ -1480,7 +1480,7 @@ void intersectionsSegmentBox(
 	planeIntersectionAbscissas.col(0) = (box.min().array() - sv0.array());
 	planeIntersectionAbscissas.col(1) = (box.max().array() - sv0.array());
 
-	// While we could be dividing by zero here, INF values are 
+	// While we could be dividing by zero here, INF values are
 	// correctly handled by the rest of the function.
 	planeIntersectionAbscissas.colwise() /= v01;
 
@@ -1583,7 +1583,7 @@ bool calculateContactTriangleTriangle(
 			{
 				underPlaneB[A].push_back(i);
 			}
-			else 
+			else
 			{
 				abovePlaneBFlag[A].push_back(signedDFromPlaneB[A][i] > Geometry::DistanceEpsilon);
 				onOrAbovePlaneB[A].push_back(i);
@@ -1632,11 +1632,11 @@ bool calculateContactTriangleTriangle(
 		{
 			// Early rejection: If the possible penetration depth for this vertex is not greater than already
 			// calculated penetration depth for this triangle, there is no need to further evaluate.
-            if ((std::abs(signedDFromPlaneB[A][*edgeStartVertexId]) - penetrationDepth[A])
-                    < Geometry::DistanceEpsilon)
-            {
-                continue;
-            }
+			if ((std::abs(signedDFromPlaneB[A][*edgeStartVertexId]) - penetrationDepth[A])
+					< Geometry::DistanceEpsilon)
+			{
+				continue;
+			}
 
 			edgeStart = *v[A][*edgeStartVertexId];
 
@@ -1673,7 +1673,7 @@ bool calculateContactTriangleTriangle(
 				}
 				else if (underPlaneB[A].size() == 2 && contactFound[A])
 				{
-					processingEdgeBetweenTwoUnderPlaneBVertices = true;					
+					processingEdgeBetweenTwoUnderPlaneBVertices = true;				
 				}
 				else
 				{
@@ -1725,7 +1725,7 @@ bool calculateContactTriangleTriangle(
 								edgeIntersectionOnPlaneBParam[1] > -Geometry::DistanceEpsilon &&
 								edgeIntersectionOnPlaneBParam[1] < (T(1) + Geometry::DistanceEpsilon))
 							{
-								tempDepth = edgeIntersectionOnPlaneBParam[0] * 
+								tempDepth = edgeIntersectionOnPlaneBParam[0] *
 									std::abs(signedDFromPlaneB[A][*edgeStartVertexId]);
 
 								if (processingEdgeBetweenTwoUnderPlaneBVertices)
@@ -1749,7 +1749,7 @@ bool calculateContactTriangleTriangle(
 										penetrationPoint[A][A] = edgeStart + (edgeEnd - edgeStart) *
 																 (T(1) - edgeIntersectionOnPlaneBParam[0]);
 									}
-									
+
 									contactFound[A] = true;
 									break;
 								}
@@ -1766,12 +1766,12 @@ bool calculateContactTriangleTriangle(
 	if (contactFound[0] || contactFound[1])
 	{
 		bool useFirstTriangle = contactFound[0];
-		
+
 		if (contactFound[0] && contactFound[1])
 		{
 			useFirstTriangle = penetrationDepth[0] < penetrationDepth[1];
 		}
-		
+
 		if (useFirstTriangle)
 		{
 			*depth = penetrationDepth[0];
@@ -1786,7 +1786,7 @@ bool calculateContactTriangleTriangle(
 			*penetrationPoint0 = penetrationPoint[1][0];
 			*penetrationPoint1 = penetrationPoint[1][1];
 		}
-		
+
 		return true;
 	}
 

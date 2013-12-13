@@ -1558,5 +1558,5 @@ TEST_F(GeometryTest, calculateContactTriangleTriangle)
 }
 
 
-}; // namespace Math 
+}; // namespace Math
 }; // namespace SurgSim
