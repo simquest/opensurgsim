@@ -398,12 +398,12 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 	}
 
 	SURGSIM_ASSERT(v >= 0) << "FemElement3DCube ill-defined, its volume is " << v << std::endl <<
-		"Please check the node ordering of your element formed by node ids" <<
+		"Please check the node ordering of your element formed by node ids " <<
 		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
 		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
 
 	SURGSIM_ASSERT(v > 1e-12) << "FemElement3DCube ill-defined, its volume is " << v << std::endl <<
-		"Please check the node ordering of your element formed by node ids" <<
+		"Please check the node ordering of your element formed by node ids " <<
 		m_nodeIds[0]<<" "<<m_nodeIds[1]<<" "<<m_nodeIds[2]<<" "<<m_nodeIds[3]<<" "<<
 		m_nodeIds[4]<<" "<<m_nodeIds[5]<<" "<<m_nodeIds[6]<<" "<<m_nodeIds[7]<<std::endl;
 

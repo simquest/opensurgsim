@@ -38,7 +38,10 @@ public:
 	/// \param nodeIds An array of 8 nodes ids defining this cube element in a overall mesh
 	/// \param restState The rest state to initialize the cube with
 	/// \note The 8 nodes must be valid node ids in the rest state, if they aren't an ASSERT will be raised
-	/// \note The 8 nodes must defined a cube with positive volume, if they don't an ASSERT will be raised
+	/// \note The 8 nodes must define a cube with positive volume, if they don't an ASSERT will be raised
+	/// \note In order to do so (looking at the cube from the exterior, face normal 'n' pointing outward),
+	/// \note   the 1st  4 nodeIds (ABCD) should define any face CW            i.e. (AB^AC or AB^AD or AC^AD).n < 0
+	/// \note   the last 4 nodeIds (EFGH) should define the opposite face CCW  i.e. (EF^EG or EF^EH or EG^EH).n > 0
 	FemElement3DCube(std::array<unsigned int, 8> nodeIds, const DeformableRepresentationState& restState);
 
 	/// Initializes the element once everything has been set

@@ -90,7 +90,8 @@ std::array< std::array<unsigned int, 4>, numTetrahedrons> tetrahedrons =
 const unsigned int numCubes = 1;
 std::array< std::array<unsigned int, 8>, numCubes> cubes =
 {{
-	{{7, 5, 4, 6, 3, 1, 0, 2}}
+	// 1st face CW, 2nd face CCW (Faces being seen from outside)
+	{{0, 1, 3, 2, 4, 5, 7, 6}}
 }};
 
 // Boundary conditions (node indices)

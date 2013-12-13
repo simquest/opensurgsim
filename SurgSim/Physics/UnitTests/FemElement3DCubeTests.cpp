@@ -509,6 +509,100 @@ TEST_F(FemElement3DCubeTests, VolumeTest)
 	EXPECT_NEAR(cube.getVolume(m_restState), m_expectedVolume, 1e-10);
 }
 
+// This function tests all node permutations for both face definition (2 groups of 4 indices)
+// keeping their ordering intact (CW or CCW)
+void testNodeOrderingAllPermutations(const DeformableRepresentationState& m_restState,
+					  size_t id0, size_t id1, size_t id2, size_t id3, size_t id4, size_t id5, size_t id6, size_t id7,
+					  bool expectThrow)
+{
+	std::array<unsigned int, 4> face1 = {{id0, id1, id2, id3}};
+	std::array<unsigned int, 4> face2 = {{id4, id5, id6, id7}};
+
+	// Shuffle the faces to create all the possible permutations
+	for (size_t face1Permutation = 0; face1Permutation < 4; face1Permutation++)
+	{
+		for (size_t face2Permutation = 0; face2Permutation < 4; face2Permutation++)
+		{
+			std::array<unsigned int, 8> ids;
+			for (size_t index = 0; index < 4; index++)
+			{
+				ids[    index] = face1[(index + face1Permutation) % 4];
+				ids[4 + index] = face2[(index + face2Permutation) % 4];
+			}
+
+			// Test this permutation
+			if (expectThrow)
+			{
+				EXPECT_ANY_THROW({MockFemElement3DCube cube(ids, m_restState);});
+			}
+			else
+			{
+				EXPECT_NO_THROW({MockFemElement3DCube cube(ids, m_restState);});
+			}
+		}
+	}
+}
+
+TEST_F(FemElement3DCubeTests, NodeOrderingTest)
+{
+	// Any definition starting with a 1st face defined CW
+	// followed by the opposite face defined CCW is valid.
+
+	// Front face CW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 6, 7, 5, 4, 2, 3, 1, 0, false);
+	// Front face CW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 6, 7, 5, 4, 2, 0, 1, 3, true);
+	// Front face CCW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 6, 4, 5, 7, 2, 3, 1, 0, true);
+	// Front face CCW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 6, 4, 5, 7, 2, 0, 1, 3, true);
+
+	// Back face CW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 0, 1, 3, 2, 4, 5, 7, 6, false);
+	// Back face CW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 0, 1, 3, 2, 4, 6, 7, 5, true);
+	// Back face CCW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 0, 2, 3, 1, 4, 5, 7, 6, true);
+	// Back face CCW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 0, 2, 3, 1, 4, 6, 7, 5, true);
+
+	// Top face CW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 2, 3, 7, 6, 0, 1, 5, 4, false);
+	// Top face CW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 2, 3, 7, 6, 0, 4, 5, 1, true);
+	// Top face CCW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 2, 6, 7, 3, 0, 1, 5, 4, true);
+	// Top face CCW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 2, 6, 7, 3, 0, 4, 5, 1, true);
+
+	// Bottom face CW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 0, 4, 5, 1, 6, 7, 3, 2, false);
+	// Bottom face CW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 0, 4, 5, 1, 6, 2, 3, 7, true);
+	// Bottom face CCW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 0, 1, 5, 4, 6, 7, 3, 2, true);
+	// Bottom face CCW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 0, 1, 5, 4, 6, 2, 3, 7, true);
+
+	// Right face CW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 3, 1, 5, 7, 2, 0, 4, 6, false);
+	// Right face CW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 3, 1, 5, 7, 2, 6, 4, 0, true);
+	// Right face CCW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 3, 7, 5, 1, 2, 0, 4, 6, true);
+	// Right face CCW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 3, 7, 5, 1, 2, 6, 4, 0, true);
+
+	// Left face CW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 0, 2, 6, 4, 1, 3, 7, 5, false);
+	// Left face CW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 0, 2, 6, 4, 1, 5, 7, 3, true);
+	// Left face CCW, opposite face CCW
+	testNodeOrderingAllPermutations(m_restState, 0, 4, 6, 2, 1, 3, 7, 5, true);
+	// Left face CCW, opposite face CW
+	testNodeOrderingAllPermutations(m_restState, 0, 4, 6, 2, 1, 5, 7, 3, true);
+}
+
 TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;
