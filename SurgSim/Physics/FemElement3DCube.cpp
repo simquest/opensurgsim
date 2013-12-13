@@ -43,7 +43,7 @@ FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds,
 	// Set the shape functions coefficients
 	// Ni(epsilon, eta, mu) = (1 + epsilon * sign(epsilon_i))(1 + eta * sign(eta_i))(1 + mu * sign(mu_i))/8
 	std::array<double, 8> tmpEpsilon = {{-1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0, -1.0}};
-	std::array<double, 8> tmpEta    = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
+	std::array<double, 8> tmpEta     = {{-1.0, -1.0, +1.0, +1.0, -1.0, -1.0, +1.0, +1.0}};
 	std::array<double, 8> tmpMu      = {{-1.0, -1.0, -1.0, -1.0, +1.0, +1.0, +1.0, +1.0}};
 	m_shapeFunctionsEpsilonSign = tmpEpsilon;
 	m_shapeFunctionsEtaSign     = tmpEta;

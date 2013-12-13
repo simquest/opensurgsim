@@ -31,46 +31,46 @@ namespace Math
 /// 1-point Gauss-Legendre quadrature {<x_1, w_1>}
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
-/// \note \f$\int_{-1}^{+1} f(x) dx ~ \sum_{i=1}^n w_i f(x_i)\f$
+/// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
 /// \note n is the number of points used to discretized the integral
-/// \note x_i is the point to evaluate the function f with
-/// \note w_i is the weight to assign to the function evaluation at the given point x_i
+/// \note \f$x_i\f$ is the point to evaluate the function \f$f\f$ with
+/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<std::pair<double, double>, 1> gaussQuadrature1Point;
 
 /// 2-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>}
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
-/// \note \f$\int_{-1}^{+1} f(x) dx ~ \sum_{i=1}^n w_i f(x_i)\f$
+/// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
 /// \note n is the number of points used to discretized the integral
-/// \note x_i is the point to evaluate the function f with
-/// \note w_i is the weight to assign to the function evaluation at the given point x_i
+/// \note \f$x_i\f$ is the point to evaluate the function \f$f\f$ with
+/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<std::pair<double, double>, 2> gaussQuadrature2Points;
 
 /// 3-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>}
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
-/// \note \f$\int_{-1}^{+1} f(x) dx ~ \sum_{i=1}^n w_i f(x_i)\f$
+/// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
 /// \note n is the number of points used to discretized the integral
-/// \note x_i is the point to evaluate the function f with
-/// \note w_i is the weight to assign to the function evaluation at the given point x_i
+/// \note \f$x_i\f$ is the point to evaluate the function \f$f\f$ with
+/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<std::pair<double, double>, 3> gaussQuadrature3Points;
 
 /// 4-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, <x_4, w_4>}
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
-/// \note \f$\int_{-1}^{+1} f(x) dx ~ \sum_{i=1}^n w_i f(x_i)\f$
+/// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
 /// \note n is the number of points used to discretized the integral
-/// \note x_i is the point to evaluate the function f with
-/// \note w_i is the weight to assign to the function evaluation at the given point x_i
+/// \note \f$x_i\f$ is the point to evaluate the function \f$f\f$ with
+/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<std::pair<double, double>, 4> gaussQuadrature4Points;
 
 /// 5-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, <x_4, w_4>, <x_5, w_5>}
 /// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
 /// using some weights and specific points of evaluation of the function \f$f\f$:
-/// \note \f$\int_{-1}^{+1} f(x) dx ~ \sum_{i=1}^n w_i f(x_i)\f$
+/// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
 /// \note n is the number of points used to discretized the integral
-/// \note x_i is the point to evaluate the function f with
-/// \note w_i is the weight to assign to the function evaluation at the given point x_i
+/// \note \f$x_i\f$ is the point to evaluate the function \f$f\f$ with
+/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<std::pair<double, double>, 5> gaussQuadrature5Points;
 
 };  // namespace Math
