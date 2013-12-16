@@ -63,7 +63,49 @@ bool TrackIRDevice::finalize()
 
 bool TrackIRDevice::isInitialized() const
 {
-	return (m_scaffold != nullptr);
+	return (nullptr != m_scaffold);
+}
+
+
+void TrackIRDevice::setPositionScale(double scale)
+{
+	m_positionScale = scale;
+	if (m_scaffold)
+	{
+		m_scaffold->setPositionScale(this, m_positionScale);
+	}
+}
+
+
+double TrackIRDevice::getPositionScale() const
+{
+	return m_positionScale;
+}
+
+
+void TrackIRDevice::setOrientationScale(double scale)
+{
+	m_orientationScale = scale;
+	if (m_scaffold)
+	{
+		m_scaffold->setOrientationScale(this, m_orientationScale);
+	}
+}
+
+
+double TrackIRDevice::getOrientationScale() const
+{
+	return m_orientationScale;
+}
+
+double TrackIRDevice::defaultPositionScale()
+{
+	return 0.05;
+}
+
+double TrackIRDevice::defaultOrientationScale()
+{
+	return 0.05;
 }
 
 

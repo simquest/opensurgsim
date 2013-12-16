@@ -26,7 +26,7 @@ TrackIRThread::TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceD
 	m_scaffold(scaffold),
 	m_deviceData(deviceData)
 {
-	setRate(100.0);
+	setRate(120.0);
 }
 
 TrackIRThread::~TrackIRThread()
@@ -46,11 +46,6 @@ bool TrackIRThread::doStartUp()
 bool TrackIRThread::doUpdate(double dt)
 {
 	return m_scaffold->runInputFrame(m_deviceData);
-}
-
-void TrackIRThread::doBeforeStop()
-{
-	//m_scaffold->runAfterLastFrame(m_deviceData);
 }
 
 };  // namespace Device

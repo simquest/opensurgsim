@@ -56,15 +56,11 @@ public:
 	/// \param logLevel The log level.
 	static void setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel);
 
-//private:
+private:
 	/// Internal shared state data type.
 	struct StateData;
 	/// Internal per-device information.
 	struct DeviceData;
-	/// Wrapper for the callback.
-	class Callback;
-	/// Wrapper for the handle.
-	class Handle;
 
 	friend class TrackIRDevice;
 	friend class TrackIRThread;
@@ -76,7 +72,6 @@ public:
 	/// \param device The device object to be used, which should have a unique name.
 	/// \return True if the initialization succeeds, false if it fails.
 	bool registerDevice(TrackIRDevice* device);
-
 	/// Unregisters the specified device object.
 	/// The corresponding controller will become unused, and can be re-registered later.
 	///
@@ -84,15 +79,10 @@ public:
 	/// \return true on success, false on failure.
 	bool unregisterDevice(const TrackIRDevice* device);
 
-	/// Initializes a single device, creating the necessary HDAPI resources.
-	/// \param [in,out] info	The device data.
-	/// \return	true on success.
-	bool initializeDeviceState(DeviceData* info);
-
-	/// Finalizes a single device, destroying the necessary HDAPI resources.
-	/// \param [in,out] info	The device data.
-	/// \return	true on success.
-	bool finalizeDeviceState(DeviceData* info);
+	/// Sets the position scale for the device.
+	void setPositionScale(const TrackIRDevice* device, double scale);
+	/// Sets the orientation scale for the device.
+	void setOrientationScale(const TrackIRDevice* device, double scale);
 
 	/// Updates the device information for a single device.
 	/// \param info	The device data.
@@ -102,20 +92,14 @@ public:
 	/// Initializes the OptiTrack SDK.
 	/// \return true on success.
 	bool initializeSdk();
-
 	/// Finalizes (de-initializes) the OptiTrack SDK.
 	/// \return true on success.
 	bool finalizeSdk();
 
-	/// Destroys the haptic loop callback.
-	/// Should be called while NOT holding the internal device list mutex, to prevent deadlock.
-	/// \return true on success.
-	bool destroyHapticLoop();
-
 	/// Starts the camera, it will start to sending frames.
 	/// \return	true on success.
 	bool startCamera();
-	/// Stops the camera. 
+	/// Stops the camera.
 	/// \return	true on success.
 	bool stopCamera();
 
@@ -124,11 +108,6 @@ public:
 	/// \param info The internal device data.
 	/// \return true on success.
 	bool runInputFrame(DeviceData* info);
-	/// Executes the operations after the last input frame, as the device input loop thread is shutting down.
-	/// Should only be called from the context of the input loop thread.
-	/// \param info The internal device data.
-	/// \return true on success.
-	bool runAfterLastFrame(DeviceData* info);
 
 	/// Creates the input loop thread.
 	/// \return true on success.
@@ -136,11 +115,6 @@ public:
 	/// Destroys the input loop thread.
 	/// \return true on success.
 	bool destroyPerDeviceThread(DeviceData* data);
-
-	/// Check for OptiTrack HDAPI errors, display them, and signal fatal errors.
-	/// \param message An additional descriptive message.
-	/// \return true if there was a fatal error; false if everything is OK.
-	//bool checkForFatalError(const char* message);
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();

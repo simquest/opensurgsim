@@ -27,19 +27,29 @@ namespace Device
 {
 class TrackIRScaffold;
 
+/// A class implementing the communication with Natural Point TrackIR camera.
+///
+/// \par Application input provided by the device:
+///   | type       | name              |                                                                           |
+///   | ----       | ----              | ---                                                                       |
+///   | pose       | "pose"            | %Device pose (units are meters).                                          |
+///
+/// \par Application output used by the device: none.
+///
+/// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class TrackIRDevice : public SurgSim::Input::CommonDevice
 {
 public:
 	/// Constructor.
 	///
 	/// \param uniqueName A unique name for the device that will be used by the application.
-	TrackIRDevice(const std::string& uniqueName);
+	explicit TrackIRDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~TrackIRDevice();
 
 	///@{
-	/// Overridden from SurgSim::Input::CommonDevice	
+	/// Overridden from SurgSim::Input::CommonDevice
 	virtual bool initialize() override;
 	virtual bool finalize() override;
 	///@}
@@ -47,9 +57,33 @@ public:
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
 
-//private:
+	/// Sets the position scale for this device.
+	/// The position scale controls how much the pose changes for a given device translation.
+	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	void setPositionScale(double scale);
+	/// Gets the position scale for this device.
+	double getPositionScale() const;
+
+	/// Sets the orientation scale for this device.
+	/// The orientation scale controls how much the pose changes for a given device rotation.
+	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	void setOrientationScale(double scale);
+	/// Gets the orientation scale for this device.
+	double getOrientationScale() const;
+
+private:
 	friend class TrackIRScaffold;
-	
+
+	// Returns the default position scale
+	static double defaultPositionScale();
+	// Returns the default rotation scale
+	static double defaultOrientationScale();
+
+	/// Scale factor for the position axes; stored locally before the device is initialized.
+	double m_positionScale;
+	/// Scale factor for the orientation axes; stored locally before the device is initialized.
+	double m_orientationScale;
+
 	/// Communication with hardware is handled by scaffold.
 	std::shared_ptr<TrackIRScaffold> m_scaffold;
 };

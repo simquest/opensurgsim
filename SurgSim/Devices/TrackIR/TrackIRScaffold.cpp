@@ -17,14 +17,13 @@
 
 #include <vector>
 #include <list>
-#include <array>
 #include <memory>
 #include <algorithm>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <cameralibrary.h> 
+#include <cameralibrary.h>
 
 #include "SurgSim/Devices/TrackIR/TrackIRDevice.h"
 #include "SurgSim/Devices/TrackIR/TrackIRThread.h"
@@ -44,8 +43,6 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 
-using namespace CameraLibrary;
-
 namespace SurgSim
 {
 namespace Device
@@ -53,50 +50,45 @@ namespace Device
 
 struct TrackIRScaffold::DeviceData
 {
-	/// Initialize the data.
-	DeviceData(TrackIRDevice* device) :
+	/// Constructor
+	/// \param device Device to be handled by the scaffold
+	explicit DeviceData(TrackIRDevice* device) :
 		deviceObject(device),
 		thread(),
-		m_camera(CameraLibrary::CameraManager::X().GetCamera())
+		m_camera(CameraLibrary::CameraManager::X().GetCamera()),
+		vector(CameraLibrary::cModuleVector::Create()),
+		vectorProcessor(new CameraLibrary::cModuleVectorProcessing())
 	{
-		vec = CameraLibrary::cModuleVector::Create();
-		vecprocessor = new CameraLibrary::cModuleVectorProcessing();
 		m_camera->GetDistortionModel(lensDistortion);
 
 		//== Plug distortion into vector module ==--
-		vectorSettings = *vec->Settings();
-		vectorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
+		vectorSettings = *vector->Settings();
+		vectorSettings.Arrangement = CameraLibrary::cVectorSettings::TrackClipPro;
 		vectorSettings.Enabled     = true;
 
-		vectorProcessorSettings = *vecprocessor->Settings();
-		vectorProcessorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
-		vectorProcessorSettings.ShowPivotPoint = false;
+		vectorProcessorSettings = *vectorProcessor->Settings();
+		vectorProcessorSettings.Arrangement = CameraLibrary::cVectorSettings::TrackClipPro;
+		vectorProcessorSettings.ShowPivotPoint = true;
 		vectorProcessorSettings.ShowProcessed  = false;
-
-		vecprocessor->SetSettings(vectorProcessorSettings);
+		vectorProcessorSettings.ScaleTranslationX  = device->defaultPositionScale();
+		vectorProcessorSettings.ScaleTranslationY  = device->defaultPositionScale();
+		vectorProcessorSettings.ScaleTranslationZ  = device->defaultPositionScale();
+		vectorProcessorSettings.ScaleRotationPitch = device->defaultOrientationScale();
+		vectorProcessorSettings.ScaleRotationYaw   = device->defaultOrientationScale();
+		vectorProcessorSettings.ScaleRotationRoll  = device->defaultOrientationScale();
+		vectorProcessor->SetSettings(vectorProcessorSettings);
 
 		//== Plug in focal length in (mm) by converting it from pixels -> mm
-		vectorSettings.ImagerFocalLength =  (lensDistortion.HorizontalFocalLength/((float) m_camera->PhysicalPixelWidth())) * m_camera->ImagerWidth();
-
+		vectorSettings.ImagerFocalLength = (lensDistortion.HorizontalFocalLength /
+											(static_cast<float>(m_camera->PhysicalPixelWidth()))) *
+											m_camera->ImagerWidth();
 		vectorSettings.ImagerHeight = m_camera->ImagerHeight();
 		vectorSettings.ImagerWidth  = m_camera->ImagerWidth();
-
-		vectorSettings.PrincipalX   = m_camera->PhysicalPixelWidth()/2;
-		vectorSettings.PrincipalY   = m_camera->PhysicalPixelHeight()/2;
-
+		vectorSettings.PrincipalX   = m_camera->PhysicalPixelWidth() / 2.0;
+		vectorSettings.PrincipalY   = m_camera->PhysicalPixelHeight() / 2.0;
 		vectorSettings.PixelWidth   = m_camera->PhysicalPixelWidth();
 		vectorSettings.PixelHeight  = m_camera->PhysicalPixelHeight();
-
-		vec->SetSettings(vectorSettings);
-	}
-
-	// Initialize by moving the data from another object.
-	// Needed because Visual Studio 2010 doesn't support multi-argument emplace_back() for STL containers.
-	DeviceData(DeviceData&& other) :
-		deviceObject(std::move(other.deviceObject)),
-		thread(std::move(other.thread)),
-		m_camera(std::move(other.m_camera))
-	{
+		vector->SetSettings(vectorSettings);
 	}
 
 	~DeviceData()
@@ -104,14 +96,11 @@ struct TrackIRScaffold::DeviceData
 		m_camera->Release();
 	}
 
-
-	CameraLibrary::cModuleVector *vec;
-	CameraLibrary::cModuleVectorProcessing *vecprocessor;
 	Core::DistortionModel lensDistortion;
+	CameraLibrary::cModuleVector *vector;
+	CameraLibrary::cModuleVectorProcessing *vectorProcessor;
 	CameraLibrary::cVectorSettings vectorSettings;
 	CameraLibrary::cVectorProcessingSettings vectorProcessorSettings;
-
-
 
 	/// The corresponding device object.
 	TrackIRDevice* const deviceObject;
@@ -167,7 +156,6 @@ TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 
 TrackIRScaffold::~TrackIRScaffold()
 {
-	// The following block controls the duration of the mutex being locked.
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -268,6 +256,34 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 	return found;
 }
 
+void TrackIRScaffold::setPositionScale(const TrackIRDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->vectorProcessorSettings.ScaleTranslationX = scale;
+		(*matching)->vectorProcessorSettings.ScaleTranslationY = scale;
+		(*matching)->vectorProcessorSettings.ScaleTranslationZ = scale;
+	}
+}
+
+void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->vectorProcessorSettings.ScaleRotationPitch = scale;
+		(*matching)->vectorProcessorSettings.ScaleRotationYaw= scale;
+		(*matching)->vectorProcessorSettings.ScaleRotationRoll = scale;
+	}
+}
+
 bool TrackIRScaffold::runInputFrame(TrackIRScaffold::DeviceData* info)
 {
 	info->deviceObject->pullOutput();
@@ -285,12 +301,12 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
+
 	CameraLibrary::Frame *frame = info->m_camera->GetFrame();
-	
-	double X, Y, Z, yaw, pitch, roll;
-	if(frame) 
+	double X = 0.0, Y = 0.0, Z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
+	if(frame)
 	{
-		info->vec->BeginFrame();
+		info->vector->BeginFrame();
 		for(int i=0; i<frame->ObjectCount(); i++)
 		{
 			CameraLibrary::cObject *obj = frame->Object(i);
@@ -299,40 +315,25 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 			float y = obj->Y();
 
 			Core::Undistort2DPoint(info->lensDistortion,x,y);
-			info->vec->PushMarkerData(x, y, obj->Area(), obj->Width(), obj->Height());
+			info->vector->PushMarkerData(x, y, obj->Area(), obj->Width(), obj->Height());
 		}
-		info->vec->Calculate();
-		info->vecprocessor->PushData(info->vec);
-		if(info->vecprocessor->MarkerCount()>0)
+		info->vector->Calculate();
+		info->vectorProcessor->PushData(info->vector);
+		if(info->vectorProcessor->MarkerCount()>0)
 		{
-			info->vecprocessor->GetOrientation(yaw, pitch, roll);
-			info->vecprocessor->GetPosition(X, Y, Z);
-			/*for(int i=0; i<info->vecprocessor->MarkerCount(); i++)
-				for(int j=0; j<info->vecprocessor->MarkerCount(); j++)
-				{
-					if(i!=j)
-					{
-						float x,y,z;
-						info->vecprocessor->GetResult(i,x,y,z);
-						std::cerr <<"x="<<x<<", y="<<y<<", z="<<z<<std::endl;
-						info->vecprocessor->GetResult(j,x,y,z);
-					}
-				}*/
+			info->vectorProcessor->GetOrientation(yaw, pitch, roll); // In millimeters
+			info->vectorProcessor->GetPosition(X, Y, Z); // In millimeters
 		}
 		frame->Release();
 	}
 
-	//// Deal with dominance and scaling.
-	// It would be neat to put dominance into a filter, outside of the raw multi-axis device... but it has to
-	// happen before filtering, and putting dominance AND filtering (and integrator) into components is too much.
-	Vector3d position;
-	Vector3d rotation;
 
-	position = Vector3d(X, Y, Z);
-	rotation = Vector3d(yaw, pitch, roll);
+	// TrackIR camera is being set at the origin looking down the Z axis.
+	// So when the vector clip moves toward the camera, the positional Z value approaches zero.
+	Vector3d position(X, Y, Z);
+	Vector3d rotation(yaw, pitch, roll);
 
-
-	// Fix up the coordinate system (3DConnexion devices use +Z up coordinates, we want +Y up).
+	// Fix up the coordinate system if needed
 	/*position = info->coordinateSystemRotation * position;
 	rotation = info->coordinateSystemRotation * rotation;*/
 
@@ -388,11 +389,11 @@ bool TrackIRScaffold::createPerDeviceThread(DeviceData* data)
 {
 	SURGSIM_ASSERT(! data->thread);
 
-  	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, data));
-  	thread->start();
-  	data->thread = std::move(thread);
+	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, data));
+	thread->start();
+	data->thread = std::move(thread);
 
-  	return true;
+	return true;
 }
 
 bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* data)
@@ -408,7 +409,7 @@ bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* data)
 
 bool TrackIRScaffold::startCamera()
 {
-	CameraLibrary::CameraManager::X().GetCamera()->SetVideoType(CameraLibrary::SegmentMode);
+	CameraLibrary::CameraManager::X().GetCamera()->SetVideoType(CameraLibrary::BitPackedPrecisionMode);
 	CameraLibrary::CameraManager::X().GetCamera()->Start();
 	return CameraLibrary::CameraManager::X().GetCamera()->IsCameraRunning();
 }

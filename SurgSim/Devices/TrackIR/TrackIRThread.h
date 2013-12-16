@@ -33,8 +33,12 @@ namespace Device
 class TrackIRThread : public SurgSim::Framework::BasicThread
 {
 public:
+	/// Constructor
+	/// \param scaffold Corresponds to the TrackIRScaffold updated by this thread
+	/// \param deviceData Corresponds to the TrackIRScaffold::DeviceData updated by this thread
 	TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceData* deviceData);
 
+	/// Destructor
 	virtual ~TrackIRThread();
 
 protected:
@@ -43,7 +47,6 @@ protected:
 	virtual bool doInitialize() override;
 	virtual bool doStartUp() override;
 	virtual bool doUpdate(double dt) override;
-	virtual void doBeforeStop() override;
 	///@}
 
 private:
