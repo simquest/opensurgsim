@@ -29,12 +29,26 @@ template <class T>
 class OptionalValue
 {
 public:
+
+	/// Default Constructor, no value.
 	OptionalValue()  : m_hasValue(false)
 	{
 	}
 
+	/// Constructor that assigns a value.
+	/// \param value The value that should be used.
 	explicit OptionalValue(const T& value) : m_hasValue(true), m_value(value)
 	{
+	}
+
+	/// Copy constructor
+	/// \param other The value used for copying.
+	OptionalValue(const OptionalValue& other) : m_hasValue(other.m_hasValue)
+	{
+		if (m_hasValue)
+		{
+			m_value = other.m_value;
+		}
 	}
 
 	/// Query if this object has been assigned a value.
@@ -58,8 +72,43 @@ public:
 	/// \return	The assigned value if set, excepts if no value was set.
 	const T& getValue() const
 	{
-		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid TestableValue";
+		SURGSIM_ASSERT(m_hasValue) << "Tried to fetch a value from an invalid OptionalValue";
 		return m_value;
+	}
+
+	/// Equality operator.
+	/// \param	rhs	The right hand side.
+	/// \return	true if the parameters are considered equivalent.
+	bool operator==(const OptionalValue<T>& rhs) const
+	{
+		if (m_hasValue == true && rhs.m_hasValue == true)
+		{
+			return m_value == rhs.m_value;
+		}
+		else
+		{
+			return m_hasValue == rhs.m_hasValue;
+		}
+	}
+
+	/// Inequality operator
+	/// \param rhs the right hand side.
+	/// \return true if the parameters are not considered equivalent
+	bool operator!=(const OptionalValue<T>& rhs) const
+	{
+		return !(*this == rhs);
+	}
+
+	/// Assignment operator.
+	/// \param rhs The right hand side of the operator.
+	OptionalValue& operator=(const OptionalValue& rhs)
+	{
+		m_hasValue = rhs.m_hasValue;
+		if (m_hasValue)
+		{
+			m_value = rhs.m_value;
+		}
+		return *this;
 	}
 
 private:

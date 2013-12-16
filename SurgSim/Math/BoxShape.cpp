@@ -53,22 +53,22 @@ double BoxShape::getSizeZ() const
 	return m_size[2];
 }
 
-double BoxShape::calculateVolume() const
+double BoxShape::getVolume() const
 {
 	return m_size[0] * m_size[1] * m_size[2];
 }
 
-SurgSim::Math::Vector3d BoxShape::calculateMassCenter() const
+SurgSim::Math::Vector3d BoxShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d BoxShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d BoxShape::getSecondMomentOfVolume() const
 {
-	const double mass = calculateMass(rho);
+	const double volume = getVolume();
 
 	const Vector3d sizeSquared = m_size.array() * m_size.array();
-	const double coef = 1.0 / 12.0 * mass;
+	const double coef = 1.0 / 12.0 * volume;
 	Matrix33d inertia = Matrix33d::Zero();
 	inertia.diagonal() = coef * Vector3d(sizeSquared[1] + sizeSquared[2],
 										sizeSquared[0] + sizeSquared[2],

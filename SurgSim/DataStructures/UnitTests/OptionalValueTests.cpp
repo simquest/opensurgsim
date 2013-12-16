@@ -24,7 +24,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-TEST(TestableValueTests, InitTest)
+TEST(OptionalValueTests, InitTest)
 {
 	EXPECT_NO_THROW({OptionalValue<int> a;});
 	EXPECT_NO_THROW({OptionalValue<double> b(10.0);});
@@ -33,7 +33,7 @@ TEST(TestableValueTests, InitTest)
 	EXPECT_FALSE(a.hasValue());
 }
 
-TEST(TestableValueTests, AssertTest)
+TEST(OptionalValueTests, AssertTest)
 {
 	OptionalValue<std::shared_ptr<int>> a;
 
@@ -41,7 +41,7 @@ TEST(TestableValueTests, AssertTest)
 }
 
 
-TEST(TestableValueTests, SetValueTest)
+TEST(OptionalValueTests, SetValueTest)
 {
 	OptionalValue<double> a;
 	EXPECT_FALSE(a.hasValue());
@@ -53,6 +53,62 @@ TEST(TestableValueTests, SetValueTest)
 	a.invalidate();
 
 	EXPECT_FALSE(a.hasValue());
+}
+
+TEST(OptionalValueTests, ComparatorTest)
+{
+	OptionalValue<int> a;
+	OptionalValue<int> b;
+
+	EXPECT_TRUE(a == b);
+	EXPECT_FALSE(a != b);
+
+	a.setValue(10);
+	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a != b);
+
+	b.setValue(10);
+	EXPECT_TRUE(a == b);
+	EXPECT_FALSE(a != b);
+
+	b.setValue(20);
+	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a != b);
+
+	a.invalidate();
+	EXPECT_FALSE(a == b);
+	EXPECT_TRUE(a != b);
+}
+
+TEST(OptionalValueTests, CopyConstructorTest)
+{
+	OptionalValue<int> one;
+	OptionalValue<int> copyOfOne(one);
+
+	EXPECT_EQ(one, copyOfOne);
+
+	OptionalValue<int> two(10);
+	OptionalValue<int> copyOfTwo(two);
+
+	EXPECT_EQ(two, copyOfTwo);
+}
+
+TEST(OptionalValueTests, AssignmentOperatorTest)
+{
+	OptionalValue<int> one;
+	OptionalValue<int> two(10);
+	OptionalValue<int> target(100);
+
+	EXPECT_NE(one, target);
+	EXPECT_NE(two, target);
+
+	target = one;
+	EXPECT_EQ(one, target);
+	EXPECT_NE(two, target);
+
+	target = two;
+	EXPECT_NE(one, target);
+	EXPECT_EQ(two, target);
 }
 
 

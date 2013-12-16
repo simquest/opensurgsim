@@ -98,7 +98,6 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 {
 	for (int iterationID = 0; iterationID < m_numIterations; iterationID++)
 	{
-		double density = 1000.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
 		double lx = 10.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
 		double ly = 10.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
 		double lz = 10.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
@@ -144,16 +143,8 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 
 		SurgSim::Math::BoxShape boxShape(lx, ly, lz);
 
-		SurgSim::Math::Matrix33d expectedInertia;
-		SurgSim::Math::Vector3d expectedMassCenter;
-		double expectedMass;
-		expectedMass       = boxShape.calculateMass(density);
-		expectedInertia    = boxShape.calculateInertia(density);
-		expectedMassCenter = boxShape.calculateMassCenter();
-
-		EXPECT_NEAR(boxShape.calculateVolume(), boxMesh.calculateVolume(), 1e-8);
-		EXPECT_TRUE((expectedMassCenter - boxMesh.calculateMassCenter()).isZero());
-		EXPECT_NEAR(expectedMass, boxMesh.calculateMass(density), 1e-8);
-		EXPECT_TRUE(boxMesh.calculateInertia(density).isApprox(expectedInertia));
+		EXPECT_NEAR(boxShape.getVolume(), boxMesh.getVolume(), 1e-8);
+		EXPECT_TRUE((boxShape.getCenter() - boxMesh.getCenter()).isZero());
+		EXPECT_TRUE(boxShape.getSecondMomentOfVolume().isApprox(boxMesh.getSecondMomentOfVolume(), 1e-8));
 	}
 }
