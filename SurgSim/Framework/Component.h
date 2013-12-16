@@ -56,7 +56,7 @@ public:
 	/// Initialize this component.
 	/// \param runtime	The runtime which contains this component.
 	/// \return True if this component is initialized successfully; otherwise, false.
-	bool initialize(const std::shared_ptr<Runtime>& runtime);
+	bool initialize(const std::weak_ptr<Runtime>& runtime);
 
 	/// \return True if this component is awake; otherwise, false.
 	bool isAwake() const;
