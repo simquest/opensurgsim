@@ -213,5 +213,65 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpTest)
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
+TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
+{
+	auto implementation = std::make_shared<MassSpringRepresentationContact>();
+
+	MlcpPhysicsProblem mlcpPhysicsProblem;
+	initializeMlcp(&mlcpPhysicsProblem, 11, 2);
+
+	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
+	Eigen::Matrix<double, 1, 5> localH;
+	localH << 
+		0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
+	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
+
+	Eigen::Matrix<double, 5, 5> localC;
+	localC <<
+		-0.2294,  0.5160,  0.2520,  0.5941, -0.4854,
+		 0.1233, -0.4433,  0.3679,  0.9307,  0.2600,
+		 0.1988,  0.6637, -0.7591,  0.1475,  0.8517,
+		-0.5495, -0.4305,  0.3162, -0.7862,  0.7627,
+		-0.5754,  0.4108,  0.8445, -0.5565,  0.7150;
+	localC = localC * localC.transpose(); // force to be symmetric
+
+	Eigen::Matrix<double, 5, 1> localCHt = localC * localH.transpose();
+	mlcpPhysicsProblem.CHt.block<5, 1>(0, 0) = localCHt;
+
+	mlcpPhysicsProblem.A.block<1, 1>(0, 0) = localH * localCHt;
+
+	mlcpPhysicsProblem.b.block<1, 1>(0, 0)[0] = 0.6991;
+
+	// Place mass-spring at 5th dof and 1th constraint.
+	unsigned int indexOfRepresentation = 5;
+	unsigned int indexOfConstraint = 1;
+
+	setContactAtNode(1);
+
+	implementation->build(dt, m_constraintData, m_localization,
+		&mlcpPhysicsProblem, indexOfRepresentation, indexOfConstraint, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
+
+	// b -> E -> [#constraints, 1]
+	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
+
+	// H -> [#constraints, #dof]
+	EXPECT_NEAR(m_n[0], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 0), epsilon);
+	EXPECT_NEAR(m_n[1], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 1), epsilon);
+	EXPECT_NEAR(m_n[2], mlcpPhysicsProblem.H(indexOfConstraint, indexOfRepresentation + 3 * m_nodeId + 2), epsilon);
+
+	// C -> [#dof, #dof]
+	// CHt -> [#dof, #constraints]
+	EXPECT_NEAR(dt / m_massPerNode * m_n[0], 
+		mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 0, indexOfConstraint), epsilon);
+	EXPECT_NEAR(dt / m_massPerNode * m_n[1], 
+		mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 1, indexOfConstraint), epsilon);
+	EXPECT_NEAR(dt / m_massPerNode * m_n[2], 
+		mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 2, indexOfConstraint), epsilon);
+
+	// A -> HCHt -> [#constraints, #constraints]
+	double calculatedA = mlcpPhysicsProblem.A.block<1, 1>(indexOfConstraint, indexOfConstraint)[0];
+	EXPECT_NEAR(dt / m_massPerNode * (m_n[0] * m_n[0] + m_n[1] * m_n[1] + m_n[2] * m_n[2]), calculatedA, epsilon);
+}
+
 };  //  namespace Physics
 };  //  namespace SurgSim
