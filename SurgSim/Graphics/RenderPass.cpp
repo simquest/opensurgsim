@@ -51,11 +51,6 @@ bool RenderPass::doInitialize()
 	return true;
 }
 
-bool RenderPass::doWakeUp()
-{
-	return true;
-}
-
 std::shared_ptr<Camera> RenderPass::getCamera()
 {
 	return m_camera;

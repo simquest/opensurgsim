@@ -55,10 +55,6 @@ protected:
 	virtual bool doInitialize() override;
 
 private:
-	/// Wakes up the scene element
-	/// \return True if it succeeds, false if it fails
-	virtual bool doWakeUp() override;
-
 	/// View component that provides the visualization of the graphics representations
 	std::shared_ptr<View> m_view;
 };

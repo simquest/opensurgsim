@@ -35,7 +35,6 @@ public:
 	explicit MockSceneElement(const std::string& name = "MockSceneElement") :
 		SceneElement(name),
 		didInit(false),
-		didWakeUp(false),
 		didUpdate(false),
 		didLateUpdate(false),
 		didFixedUpdate(false)
@@ -43,7 +42,7 @@ public:
 		m_localRuntime = std::make_shared<SurgSim::Framework::Runtime>();
 		setRuntime(m_localRuntime);
 
-		m_localScene = std::make_shared<SurgSim::Framework::Scene>();
+		m_localScene = m_localRuntime->getScene();
 		setScene(m_localScene);
 	}
 
@@ -65,14 +64,8 @@ public:
 		didInit = true;
 		return didInit;
 	};
-	virtual bool doWakeUp()
-	{
-		didWakeUp = true;
-		return didWakeUp;
-	};
 
 	bool didInit;
-	bool didWakeUp;
 	bool didUpdate;
 	bool didLateUpdate;
 	bool didFixedUpdate;
@@ -175,7 +168,6 @@ public:
 	Behavior(name),
 		succeedWithInit(succeedInit),
 		succeedWithWakeUp(succeedWakeUp),
-		isInitialized(false),
 		updateCount(0)
 	{
 	}
@@ -185,7 +177,6 @@ public:
 
 	virtual bool doInitialize()
 	{
-		isInitialized = true;
 		return succeedWithInit;
 	}
 
@@ -201,7 +192,6 @@ public:
 
 	bool succeedWithInit;
 	bool succeedWithWakeUp;
-	bool isInitialized;
 	int updateCount;
 };
 

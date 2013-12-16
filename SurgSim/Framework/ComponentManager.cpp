@@ -174,17 +174,14 @@ void ComponentManager::addAndIntializeComponents(
 	for(auto it = beginIt; it != endIt; ++it)
 	{
 		std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(*it);
-		if (behavior != nullptr)
+		if (behavior != nullptr && behavior->getTargetManagerType() == getType())
 		{
-			if (behavior->getTargetManagerType() == getType())
+			if (tryAddComponent(*it, &m_behaviors) != nullptr)
 			{
-				if (tryAddComponent(*it, &m_behaviors) != nullptr && (*it)->initialize(std::move(getRuntime())))
-				{
-					actualAdditions->push_back(*it);
-				}
+				actualAdditions->push_back(*it);
 			}
 		}
-		else if (executeAdditions(*it) && (*it)->initialize(std::move(getRuntime())))
+		else if (executeAdditions(*it))
 		{
 			actualAdditions->push_back(*it);
 		}

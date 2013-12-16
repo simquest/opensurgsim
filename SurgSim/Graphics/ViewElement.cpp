@@ -43,7 +43,3 @@ bool ViewElement::doInitialize()
 	addComponent(m_view);
 	return true;
 }
-bool ViewElement::doWakeUp()
-{
-	return true;
-}

@@ -73,10 +73,6 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	bool initialize();
 
-	/// Executes the wake up operation.
-	/// \return	true if it succeeds, false if it fails.
-	bool wakeUp();
-
 	/// Return the name of this SceneElement
 	/// \return	The name.
 	std::string getName() const;
@@ -90,7 +86,7 @@ public:
 
 	/// Sets the Runtime.
 	/// \param runtime Pointer to the runtime.
-	void setRuntime(std::shared_ptr<Runtime> runtime);
+	void setRuntime(std::weak_ptr<Runtime> runtime);
 	/// Gets the runtime.
 	/// \return	The runtime.
 	std::shared_ptr<Runtime> getRuntime();
@@ -119,9 +115,6 @@ private:
 	/// Method to initialize this SceneElement. To be overridden by derived class(es).
 	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doInitialize() = 0;
-	/// Method to wake up this SceneElement. To be overridden by derived class(es).
-	/// \return True if initialization is successful; Otherwise, false.
-	virtual bool doWakeUp() = 0;
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;

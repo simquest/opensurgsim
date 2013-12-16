@@ -189,8 +189,7 @@ TEST(ViewElementTests, StartUpTest)
 	EXPECT_EQ(0, manager->getNumUpdates());
 	EXPECT_EQ(0.0, manager->getSumDt());
 
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
+	std::shared_ptr<Scene> scene = runtime->getScene();
 
 	/// Add a graphics component to the scene
 	std::shared_ptr<MockViewElement> viewElement = std::make_shared<MockViewElement>("test element");

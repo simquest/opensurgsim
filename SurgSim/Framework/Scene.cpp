@@ -27,16 +27,30 @@ namespace SurgSim
 namespace Framework
 {
 
-void SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> element)
+Scene::Scene(std::weak_ptr<Runtime> runtime) : 
+	m_runtime(runtime)
+{
+	SURGSIM_ASSERT(!m_runtime.expired()) << "Can't create scene with empty runtime.";
+}
+
+Scene::~Scene()
+{
+
+}
+
+void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 {
 	std::string name = element->getName();
 	element->setScene(getSharedPtr());
 
+	
+
 	m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
-	std::shared_ptr<Runtime> runtime = m_runtime.lock();
-	if (runtime != nullptr)
+	if (!m_runtime.expired())
 	{
-		std::shared_ptr<Runtime> runtime(m_runtime);
+		std::shared_ptr<Runtime> runtime = m_runtime.lock();
+		element->setRuntime(runtime);
+		element->initialize();
 		runtime->addSceneElement(element);
 	}
 }
@@ -50,11 +64,6 @@ std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) co
 		result = found->second;
 	}
 	return result;
-}
-
-void Scene::setRuntime(std::shared_ptr<Runtime> runtime)
-{
-	m_runtime = runtime;
 }
 
 std::shared_ptr<Runtime> Scene::getRuntime()

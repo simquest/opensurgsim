@@ -34,7 +34,6 @@ namespace Framework
 
 Runtime::Runtime() :
 	m_isRunning(false),
-	m_scene(new Scene()),
 	m_isPaused(false)
 {
 	initSearchPaths("");
@@ -42,7 +41,7 @@ Runtime::Runtime() :
 
 Runtime::Runtime(const std::string& configFilePath) :
 	m_isRunning(false),
-	m_scene(new Scene())
+	m_scene(nullptr)
 {
 	initSearchPaths(configFilePath);
 }
@@ -64,38 +63,26 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 	}
 }
 
-void SurgSim::Framework::Runtime::setScene(std::shared_ptr<Scene> scene)
+std::shared_ptr<Scene> Runtime::getScene()
 {
-	// Workers need to be initialized to do this
-	SURGSIM_ASSERT(! m_isRunning) << "Cannot set the scene in the runtime once it is running";
-	m_scene = scene;
-	scene->setRuntime(getSharedPtr());
+	if (m_scene == nullptr)
+	{
+		m_scene = std::make_shared<Scene>(getSharedPtr());
+	}
+	return m_scene;
 }
+
 
 bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 {
 	// If we add a single scene element before the simulation is running
-	// it will be handled by the scene initialization
-	if (! m_isRunning)
-	{
-		return false;
-	}
-
-	bool result = false;
-
-	result = sceneElement->initialize();
-
-	if (result)
+	// it will be handled by the scene initialization	
+	if (m_isRunning)
 	{
 		addComponents(sceneElement->getComponents());
 	}
 
-	if (result)
-	{
-		result = sceneElement->wakeUp();
-	}
-
-	return result;
+	return m_isRunning;
 }
 
 void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components)
@@ -142,6 +129,7 @@ bool Runtime::start(bool paused)
 	// Add all the scene Elements so they can be initialized during the startup process
 	preprocessSceneElements();
 
+	m_isRunning = true;
 	m_isPaused = paused;
 
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
@@ -168,14 +156,13 @@ bool Runtime::start(bool paused)
 	SURGSIM_LOG_INFO(logger) << "All component wakeUp() succeeded";
 
 	// Now wake up all the scene elements
-	auto sceneElements = m_scene->getSceneElements();
-	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
-	{
-		it->second->wakeUp();
-	}
+// 	auto sceneElements = m_scene->getSceneElements();
+// 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
+// 	{
+// 		it->second->wakeUp();
+// 	}
 	m_barrier->wait(true);
 
-	m_isRunning = true;
 	SURGSIM_LOG_INFO(logger) << "Scene is initialized. All managers updating";
 
 	return true;
@@ -236,10 +223,12 @@ void Runtime::preprocessSceneElements()
 {
 	// Collect all the Components
 	std::vector<std::shared_ptr<Component>> newComponents;
-	auto sceneElements = m_scene->getSceneElements();
+	auto sceneElements = getScene()->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
-		if (it->second->initialize())
+		// Initialize should have been called by now, if the component is not initialized this means
+		// initialization failed
+		if (it->second->isInitialized())
 		{
 			std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
 			newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());

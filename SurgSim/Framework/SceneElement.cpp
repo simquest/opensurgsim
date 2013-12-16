@@ -28,7 +28,7 @@ SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitiali
 }
 
 SceneElement::~SceneElement()
-{
+{  
 }
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
@@ -36,14 +36,16 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 	bool result= false;
 
 	SURGSIM_ASSERT(component != nullptr) << "Cannot add a nullptr as a component";
-
+	
 	if (m_components.find(component->getName()) == m_components.end())
 	{
 		component->setSceneElement(getSharedPtr());
 		component->setScene(m_scene);
-
-		m_components[component->getName()] = component;
 		result = true;
+		if (isInitialized())
+		{
+			result = component->initialize(getRuntime());
+		}
 	}
 	else
 	{
@@ -52,6 +54,12 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 				" already exists on SceneElement " << getName() <<
 				", did not add component";
 	}
+	
+	if (result)
+	{
+		m_components[component->getName()] = component;
+	}
+
 	return result;
 }
 
@@ -87,14 +95,20 @@ bool SceneElement::initialize()
 {
 	SURGSIM_ASSERT(! m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
 	m_isInitialized = doInitialize();
-	return m_isInitialized;
-}
 
-bool SceneElement::wakeUp()
-{
-	SURGSIM_ASSERT(! m_isAwake) << "Double wake up calls on SceneElement " << m_name;
-	m_isAwake = doWakeUp();
-	return m_isAwake;
+	if (m_isInitialized)
+	{
+		// initialize all components
+		std::shared_ptr<Runtime> runtime = getRuntime();
+		auto component = std::begin(m_components);
+		while (m_isInitialized && component != std::end(m_components))
+		{
+			m_isInitialized = component->second->initialize(runtime);
+			++component;
+		}
+	}
+
+	return m_isInitialized;
 }
 
 std::string SceneElement::getName() const
@@ -132,7 +146,7 @@ std::shared_ptr<Scene> SceneElement::getScene()
 	return m_scene.lock();
 }
 
-void SceneElement::setRuntime(std::shared_ptr<Runtime> runtime)
+void SceneElement::setRuntime(std::weak_ptr<Runtime> runtime)
 {
 	m_runtime = runtime;
 }

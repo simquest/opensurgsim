@@ -33,13 +33,9 @@ class Runtime;
 class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
-	Scene()
-	{
-	}
+	Scene(std::weak_ptr<Runtime> runtime);
 
-	~Scene()
-	{
-	}
+	~Scene();
 
 	/// Adds a scene element to member data 'm_element'.
 	/// \param	element	The element.
@@ -53,10 +49,6 @@ public:
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
 	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
-
-	/// Sets the runtime.
-	/// \param	runtime	The runtime for this scene.
-	void setRuntime(std::shared_ptr<Runtime> runtime);
 
 	/// Gets the runtime
 	/// \return runtime The runtime for this scene.

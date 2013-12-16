@@ -60,10 +60,6 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	virtual bool doInitialize() override;
 
-	/// Executes the wake up operation.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool doWakeUp() override;
-
 	/// Sets a view.
 	/// \note HS-2013-nov-11 this is currently necessary for the debug quads to work, this is only a workaround and
 	/// 	  should go away when we have a different way to get to the current view

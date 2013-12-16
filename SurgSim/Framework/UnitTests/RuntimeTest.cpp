@@ -26,14 +26,8 @@ using SurgSim::Framework::Logger;
 TEST(RuntimeTest, Constructor)
 {
 	EXPECT_NO_THROW({std::shared_ptr<Runtime> runtime(new Runtime());});
-
-}
-
-TEST(RuntimeTest, SetScene)
-{
 	std::shared_ptr<Runtime> runtime(new Runtime());
-	std::shared_ptr<Scene> scene(new Scene());
-	EXPECT_NO_THROW(runtime->setScene(scene));
+	EXPECT_NE(nullptr, runtime->getScene());
 }
 
 TEST(RuntimeTest, AddManager)
@@ -82,7 +76,7 @@ TEST(RuntimeTest, SceneInitialization)
 	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
 	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
 	runtime->addManager(manager);
-	std::shared_ptr<Scene> scene(new Scene());
+	std::shared_ptr<Scene> scene = runtime->getScene();
 
 	std::vector<std::shared_ptr<MockSceneElement>> elements;
 	std::vector<std::shared_ptr<MockComponent>> components;
@@ -101,8 +95,6 @@ TEST(RuntimeTest, SceneInitialization)
 	elements[1]->addComponent(components[2]);
 	elements[1]->addComponent(components[3]);
 
-	runtime->setScene(scene);
-
 	EXPECT_FALSE(manager->didInitialize);
 	EXPECT_FALSE(manager->didStartUp);
 	EXPECT_FALSE(manager->didBeforeStop);
@@ -117,13 +109,11 @@ TEST(RuntimeTest, SceneInitialization)
 	{
 		EXPECT_NE(nullptr, elements[i]->getRuntime());
 		EXPECT_TRUE(elements[i]->didInit);
-		EXPECT_TRUE(elements[i]->didWakeUp);
 	}
 
 	for (int i=0; i<4; i++)
 	{
 		EXPECT_TRUE(components[i]->didInit);
-		EXPECT_TRUE(components[i]->didWakeUp);
 	}
 
 	runtime->stop();
