@@ -35,15 +35,78 @@ namespace SurgSim
 {
 namespace Physics
 {
+using SurgSim::Math::Vector3d;
 
-TEST (MassSpringRepresentationContactTest, ConstructorTest)
+class MassSpringRepresentationContactTest : public ::testing::Test
+{
+public:
+	void SetUp() {
+		// Define plane with normal 'n' pointing against gravity.
+		m_n = Vector3d(0.8539, 0.6289, -0.9978);
+		m_n.normalize();
+
+		// Place spring at random location.
+		m_extremities[0] = Vector3d(0.8799, -0.0871, 0.7468);
+		m_extremities[1] = Vector3d(0.9040, -0.7074, 0.6783);
+
+		// Define physics representation of mass-spring using 1d helper function.
+		m_massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
+		unsigned int numNodesPerDim[1] = {2};
+		m_massPerNode = 0.137;
+		std::vector<unsigned int> boundaryConditions;
+		m_massSpring->init1D(
+			m_extremities,
+			numNodesPerDim,
+			boundaryConditions,
+			numNodesPerDim[0] * m_massPerNode, // total mass (in Kg)
+			100.0, // Stiffness stretching
+			0.0, // Damping stretching
+			10.0, // Stiffness bending
+			0.0); // Damping bending
+
+		// Update position in only 1 timestep
+		// Forward euler for velocity, backward euler for position
+		m_massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
+
+		m_massSpring->setIsActive(true);
+
+		// Update model by one timestep
+		m_massSpring->beforeUpdate(dt);
+		m_massSpring->update(dt);
+
+		// Create localization helper class
+		m_localization = std::make_shared<MassSpringRepresentationLocalization>(m_massSpring);
+	}
+
+	void setContactAtNode(size_t nodeId) 
+	{
+		m_nodeId = nodeId;
+		m_localization->setLocalNode(nodeId);
+
+		// Place plane at nodeId
+		double distance = -m_extremities[nodeId].dot(m_n);
+		m_constraintData.setPlaneEquation(m_n, distance);
+	}
+
+	Vector3d m_n;
+	ContactConstraintData m_constraintData;
+	size_t m_nodeId;
+
+	std::shared_ptr<SurgSim::Blocks::MassSpring1DRepresentation> m_massSpring;
+	double m_massPerNode;
+	std::array<Vector3d, 2> m_extremities;
+
+	std::shared_ptr<MassSpringRepresentationLocalization> m_localization;
+};
+
+TEST_F(MassSpringRepresentationContactTest, ConstructorTest)
 {
 	ASSERT_NO_THROW({ MassSpringRepresentationContact massSpring; });
 
 	ASSERT_NE(nullptr, std::make_shared<MassSpringRepresentationContact>());
 }
 
-TEST (MassSpringRepresentationContactTest, ConstraintConstantsTest)
+TEST_F(MassSpringRepresentationContactTest, ConstraintConstantsTest)
 {
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
 
@@ -52,69 +115,36 @@ TEST (MassSpringRepresentationContactTest, ConstraintConstantsTest)
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 
-TEST (MassSpringRepresentationContactTest, BuildMlcpTest)
+void initializeMlcp(MlcpPhysicsProblem *mlcpPhysicsProblem, size_t numDof, size_t numConstraints)
 {
-	using SurgSim::Math::Vector3d;
+	// Resize and zero all Eigen types
+	mlcpPhysicsProblem->A.resize(numConstraints, numConstraints);
+	mlcpPhysicsProblem->A.setZero();
+	mlcpPhysicsProblem->b.resize(numConstraints);
+	mlcpPhysicsProblem->b.setZero();
+	mlcpPhysicsProblem->mu.resize(numConstraints);
+	mlcpPhysicsProblem->mu.setZero();
+	mlcpPhysicsProblem->CHt.resize(numDof, numConstraints);
+	mlcpPhysicsProblem->CHt.setZero();
+	mlcpPhysicsProblem->H.resize(numConstraints, numDof);
+	mlcpPhysicsProblem->H.setZero();
+	// Empty all std::vector types
+	mlcpPhysicsProblem->constraintTypes.clear();
+}
 
-	// Define plane with normal 'n' at distance 'd' from origin.
-	Vector3d n(0.0, 1.0, 0.0);
-	double d = 0.0;
-
-	// Define constraint data
-	ContactConstraintData constraintData;
-	constraintData.setPlaneEquation(n, d);
-
+TEST_F(MassSpringRepresentationContactTest, BuildMlcpTest)
+{
 	// Define constraint (frictionless non-penetration)
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
 
-	// Define physics representation of mass-spring using 1d helper function.
-	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
-	std::array<Vector3d, 2> extremities = {{ Vector3d(0,0,0), Vector3d(1,0,0) }};
-	unsigned int numNodesPerDim[1] = {2};
-	std::vector<unsigned int> boundaryConditions;
-	massSpring->init1D(
-		extremities,
-		numNodesPerDim,
-		boundaryConditions,
-		0.1, // total mass (in Kg)
-		100.0, // Stiffness stretching
-		0.0, // Damping stretching
-		10.0, // Stiffness bending
-		0.0); // Damping bending
-
-	// Update position in only 1 timestep
-	// Forward euler for velocity, backward euler for position
-	massSpring->setIntegrationScheme(SurgSim::Math::IntegrationScheme::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER);
-	massSpring->setRayleighDampingMass(1e-1);
-	massSpring->setRayleighDampingStiffness(1e-2);
-
-	massSpring->setIsActive(true);
-
-	// Update model by one timestep
-	massSpring->beforeUpdate(dt);
-	massSpring->update(dt);
-
 	// Initialize MLCP
 	MlcpPhysicsProblem mlcpPhysicsProblem;
-	// Resize and zero all Eigen types
-	mlcpPhysicsProblem.A.resize(1u, 1u);
-	mlcpPhysicsProblem.A.setZero();
-	mlcpPhysicsProblem.b.resize(1u);
-	mlcpPhysicsProblem.b.setZero();
-	mlcpPhysicsProblem.mu.resize(1u);
-	mlcpPhysicsProblem.mu.setZero();
-	mlcpPhysicsProblem.CHt.resize(massSpring->getNumDof(), 1u);
-	mlcpPhysicsProblem.CHt.setZero();
-	mlcpPhysicsProblem.H.resize(1u, massSpring->getNumDof());
-	mlcpPhysicsProblem.H.setZero();
-	// Empty all std::vector types
-	mlcpPhysicsProblem.constraintTypes.clear();
+	initializeMlcp(&mlcpPhysicsProblem, m_massSpring->getNumDof(), 1);
 
 	// Build MLCP for 0th node
-	auto loc = std::make_shared<MassSpringRepresentationLocalization>(massSpring);
-	loc->setLocalNode(0);
+	setContactAtNode(0);
 
-	implementation->build(dt, constraintData, loc,
+	implementation->build(dt, m_constraintData, m_localization,
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// Expected results.
@@ -157,7 +187,7 @@ TEST (MassSpringRepresentationContactTest, BuildMlcpTest)
 
 	// ConstraintTypes should contain 0 entry as it is setup by the constraint and not the ConstraintImplementation
 	// This way, the constraint can verify that both ConstraintImplementation are the same type
-	ASSERT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
+	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
 }
 
 };  //  namespace Physics
