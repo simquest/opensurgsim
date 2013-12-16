@@ -98,7 +98,7 @@ struct TruthCubeRenderTests : public RenderTests
 				truthCube->cubeData3.push_back(position3);
 			}
 		}
-			return true;
+		return true;
 
 	};
 
