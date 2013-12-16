@@ -78,7 +78,7 @@ public:
 		m_localization = std::make_shared<MassSpringRepresentationLocalization>(m_massSpring);
 	}
 
-	void setContactAtNode(size_t nodeId) 
+	void setContactAtNode(size_t nodeId)
 	{
 		m_nodeId = nodeId;
 		m_localization->setLocalNode(nodeId);
@@ -222,7 +222,7 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::Matrix<double, 1, 5> localH;
-	localH << 
+	localH <<
 		0.9478,  -0.3807,  0.5536, -0.6944,  0.1815;
 	mlcpPhysicsProblem.H.block<1, 5>(0, 0) = localH;
 
@@ -261,11 +261,11 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 
 	// C -> [#dof, #dof]
 	// CHt -> [#dof, #constraints]
-	EXPECT_NEAR(dt / m_massPerNode * m_n[0], 
+	EXPECT_NEAR(dt / m_massPerNode * m_n[0],
 		mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 0, indexOfConstraint), epsilon);
-	EXPECT_NEAR(dt / m_massPerNode * m_n[1], 
+	EXPECT_NEAR(dt / m_massPerNode * m_n[1],
 		mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 1, indexOfConstraint), epsilon);
-	EXPECT_NEAR(dt / m_massPerNode * m_n[2], 
+	EXPECT_NEAR(dt / m_massPerNode * m_n[2],
 		mlcpPhysicsProblem.CHt(indexOfRepresentation + 3 * m_nodeId + 2, indexOfConstraint), epsilon);
 
 	// A -> HCHt -> [#constraints, #constraints]
