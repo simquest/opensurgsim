@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgConversions.h>
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgConversions.h"
 
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgTrackballZoomManipulator.h>
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgTrackballZoomManipulator.h"
 
 using SurgSim::Graphics::OsgView;
 using SurgSim::Graphics::OsgViewElement;

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/FemRepresentationParameters.h>
+#include "SurgSim/Physics/FemRepresentationParameters.h"
 
 namespace SurgSim
 {

@@ -16,8 +16,8 @@
 /// \file
 /// Tests for the View class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
-#include <SurgSim/Graphics/OsgCamera.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
+#include "SurgSim/Graphics/OsgCamera.h"
 
 #include <gtest/gtest.h>
 

@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_VIEW_H
 #define SURGSIM_GRAPHICS_VIEW_H
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <memory>
 

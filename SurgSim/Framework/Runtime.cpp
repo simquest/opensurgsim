@@ -17,14 +17,14 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/locks.hpp>
 
-#include <SurgSim/Framework/Runtime.h>
+#include "SurgSim/Framework/Runtime.h"
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/Barrier.h>
-#include <SurgSim/Framework/ComponentManager.h>
-#include <SurgSim/Framework/Component.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Scene.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Barrier.h"
+#include "SurgSim/Framework/ComponentManager.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Scene.h"
 
 namespace SurgSim
 {

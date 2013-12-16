@@ -17,16 +17,16 @@
 ///	Basic logic tests for OsgLight
 
 #include <gtest/gtest.h>
-#include <SurgSim/Graphics/Light.h>
-#include <SurgSim/Graphics/OsgLight.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgConversions.h>
+#include "SurgSim/Graphics/Light.h"
+#include "SurgSim/Graphics/OsgLight.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgConversions.h"
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;

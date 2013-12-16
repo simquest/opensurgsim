@@ -16,8 +16,8 @@
 #ifndef SURGSIM_COLLISION_LOCATION_H
 #define SURGSIM_COLLISION_LOCATION_H
 
-#include <SurgSim/DataStructures/OptionalValue.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/DataStructures/OptionalValue.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

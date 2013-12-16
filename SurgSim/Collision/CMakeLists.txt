@@ -15,6 +15,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(SURGSIM_COLLISION_SOURCES
@@ -24,9 +25,9 @@ set(SURGSIM_COLLISION_SOURCES
 	BoxSphereDcdContact.cpp
 	CapsuleSphereDcdContact.cpp
 	CollisionPair.cpp
-	CollisionRepresentation.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
+	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
@@ -41,11 +42,11 @@ set(SURGSIM_COLLISION_HEADERS
 	BoxSphereDcdContact.h
 	CapsuleSphereDcdContact.h
 	CollisionPair.h
-	CollisionRepresentation.h
 	ContactCalculation.h
 	DcdCollision.h
 	DefaultContactCalculation.h
 	Location.h
+	Representation.h
 	RigidCollisionRepresentation.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h

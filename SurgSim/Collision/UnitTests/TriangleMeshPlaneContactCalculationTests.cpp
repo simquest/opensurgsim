@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/TriangleMeshPlaneDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 
 using SurgSim::DataStructures::TriangleMesh;
 
@@ -119,16 +119,10 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape<VertexType
 					const int expectedNumberOfContacts,
 					const int* expectedMeshIndicesInContacts)
 {
-	std::shared_ptr<CollisionRepresentation> meshRep = std::make_shared<MockCollisionRepresentation>(
-		"Collision Mesh 0",
-		mesh,
-		meshQuat,
-		meshTrans);
-	std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<MockCollisionRepresentation>(
-		"Collision Plane 0",
-		plane,
-		planeQuat,
-		planeTrans);
+	std::shared_ptr<Representation> meshRep = std::make_shared<ShapeCollisionRepresentation>(
+		"Collision Mesh 0", mesh, SurgSim::Math::makeRigidTransform(meshQuat, meshTrans));
+	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
+		"Collision Plane 0", plane, SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
 
 	// First calculate the expected contact info.
 	std::list<std::shared_ptr<Contact>> expectedContacts;

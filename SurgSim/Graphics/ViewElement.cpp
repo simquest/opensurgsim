@@ -13,20 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/ViewElement.h>
-
-#include <SurgSim/Graphics/View.h>
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/ViewElement.h"
 
 using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;
 
-ViewElement::ViewElement(const std::string& name, std::shared_ptr<View> view) :
-SceneElement(name), m_view(view)
+ViewElement::ViewElement(const std::string& name, std::shared_ptr<View> view) : SceneElement(name), m_view(view)
 {
 }
+
 ViewElement::~ViewElement()
 {
-
 }
 
 bool ViewElement::setView(std::shared_ptr<View> view)
@@ -35,10 +33,14 @@ bool ViewElement::setView(std::shared_ptr<View> view)
 	return true;
 }
 
+std::shared_ptr<View> ViewElement::getView() const
+{
+	return m_view;
+}
+
 bool ViewElement::doInitialize()
 {
 	addComponent(m_view);
-
 	return true;
 }
 bool ViewElement::doWakeUp()

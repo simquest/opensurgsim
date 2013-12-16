@@ -16,12 +16,12 @@
 /// \file
 /// Render Tests for OsgSceneryRepresentation class.
 
-#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Testing/MathUtilities.h"
 
 namespace SurgSim
 {
@@ -60,13 +60,13 @@ TEST_F(OsgSceneryRepresentationRenderTests, RenderTest)
 	int numSteps = 100;
 
 	auto sceneryObject1 = std::make_shared<OsgSceneryRepresentation>("Torus1");
-	sceneryObject1->setFileName("OsgSceneryRepresentationTests/Torus.obj");
+	sceneryObject1->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
 	sceneryObject1->setInitialPose(SurgSim::Math::makeRigidTransform(
 									SurgSim::Math::Quaterniond::Identity(),	startPosition1));
 	viewElement->addComponent(sceneryObject1);
 
 	auto sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("Torus2");
-	sceneryObject2->setFileName("OsgSceneryRepresentationTests/Torus.osgb");
+	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
 	sceneryObject2->setInitialPose(SurgSim::Math::makeRigidTransform(
 									SurgSim::Math::Quaterniond::Identity(),	startPosition2));
 	viewElement->addComponent(sceneryObject2);

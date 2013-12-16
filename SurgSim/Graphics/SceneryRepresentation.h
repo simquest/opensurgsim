@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_SCENERYREPRESENTATION_H
 #define SURGSIM_GRAPHICS_SCENERYREPRESENTATION_H
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
 #include <string>
 
@@ -30,13 +30,23 @@ namespace Graphics
 class SceneryRepresentation : public virtual Representation
 {
 public:
+
+	/// Constructor.
+	/// \param	name	The name of the representation.
 	explicit SceneryRepresentation(const std::string& name): Representation(name)
 	{
 	}
+
+	/// Return file name of the object
+	/// \return File name of the object
+	virtual std::string getFileName() const = 0;
+
+	/// Set file name of the object to be loaded
+	/// \param	fileName Name of the file to be loaded
+	virtual void setFileName(const std::string& fileName) = 0;
 };
 
 };  // namespace Graphics
-
 };  // namespace SurgSim
 
 #endif  // SURGSIM_GRAPHICS_SCENERYREPRESENTATION_H

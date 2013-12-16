@@ -20,10 +20,10 @@
 
 #include <Eigen/Core>
 
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
 
 namespace SurgSim
 {

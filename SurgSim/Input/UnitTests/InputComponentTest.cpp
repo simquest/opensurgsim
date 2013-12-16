@@ -20,8 +20,8 @@
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
-#include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
 using SurgSim::Input::InputComponent;
 using SurgSim::DataStructures::DataGroup;

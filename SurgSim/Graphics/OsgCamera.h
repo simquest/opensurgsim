@@ -18,9 +18,9 @@
 
 #include <unordered_map>
 
-#include <SurgSim/Graphics/Camera.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/Texture.h>
+#include "SurgSim/Graphics/Camera.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/Texture.h"
 
 #include <osg/Camera>
 #include <osg/Switch>
@@ -102,7 +102,7 @@ public:
 	/// \return the OSG camera node
 	osg::ref_ptr<osg::Camera> getOsgCamera() const;
 
-	/// \return the OSG parent node for this object 
+	/// \return the OSG parent node for this object
 	osg::ref_ptr<osg::Node> getOsgNode() const;
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.

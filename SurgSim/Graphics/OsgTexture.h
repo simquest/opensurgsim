@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGTEXTURE_H
 #define SURGSIM_GRAPHICS_OSGTEXTURE_H
 
-#include <SurgSim/Graphics/Texture.h>
+#include "SurgSim/Graphics/Texture.h"
 
 #include <osg/Texture>
 

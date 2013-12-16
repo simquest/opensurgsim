@@ -16,15 +16,15 @@
 #ifndef SURGSIM_COLLISION_DCDCOLLISION_H
 #define SURGSIM_COLLISION_DCDCOLLISION_H
 
-#include <SurgSim/Collision/ContactCalculation.h>
-#include <SurgSim/Collision/DefaultContactCalculation.h>
-#include <SurgSim/Collision/SphereSphereDcdContact.h>
-#include <SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h>
-#include <SurgSim/Collision/SpherePlaneDcdContact.h>
-#include <SurgSim/Collision/BoxCapsuleDcdContact.h>
-#include <SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h>
-#include <SurgSim/Collision/BoxPlaneDcdContact.h>
-#include <SurgSim/Collision/BoxSphereDcdContact.h>
-#include <SurgSim/Collision/CapsuleSphereDcdContact.h>
+#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/DefaultContactCalculation.h"
+#include "SurgSim/Collision/SphereSphereDcdContact.h"
+#include "SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h"
+#include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/BoxCapsuleDcdContact.h"
+#include "SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h"
+#include "SurgSim/Collision/BoxPlaneDcdContact.h"
+#include "SurgSim/Collision/BoxSphereDcdContact.h"
+#include "SurgSim/Collision/CapsuleSphereDcdContact.h"
 
 #endif // SURGSIM_COLLISION_DCDCOLLISION_H

@@ -19,8 +19,8 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Framework/Logger.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {

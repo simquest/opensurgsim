@@ -118,6 +118,27 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, un
 	return vector.segment(blockSize * blockId, blockSize);
 }
 
+/// Helper method to get a sub-vector per block from a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param vector The vector (containing the blocks in a sparse manner)
+/// \param blockIds Vector of block indices (for accessing vector) corresponding to the blocks in vector
+/// \param blockSize The block size
+/// \param[out] subVector The sub-vector to store the requested blocks (blockIds) from vector into
+template <class Vector, class SubVector>
+void getSubVector(const Vector& vector, const std::vector<unsigned int> blockIds,
+	unsigned int blockSize, SubVector* subVector)
+{
+	const unsigned int numBlocks = blockIds.size();
+
+	for (unsigned int block = 0; block < numBlocks; block++)
+	{
+		unsigned int blockId = blockIds[block];
+
+		subVector->segment(blockSize * block, blockSize) = vector.segment(blockSize * blockId, blockSize);
+	}
+}
+
 /// Helper method to resize a vector (if necessary), and potentially zero it out
 /// \tparam Vector The vector type
 /// \param[in,out] v The vector to resize and potentially zero out

@@ -21,7 +21,7 @@
 #include <array>
 #include <vector>
 
-#include <SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h>
+#include "SurgSim/Devices/MultiAxis/SystemInputDeviceHandle.h"
 
 
 // The following structure is defined by the Windows HID API, but we don't want to include the whole thing here.

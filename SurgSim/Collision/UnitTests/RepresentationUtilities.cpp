@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
-#include <SurgSim/Collision/UnitTests/MockCollisionRepresentation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
+#include "SurgSim/Collision/UnitTests/RepresentationUtilities.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 
-#include <SurgSim/Math/Shapes.h>
+#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
@@ -30,65 +30,45 @@ namespace SurgSim
 namespace Collision
 {
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeSphereRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation,
+std::shared_ptr<SurgSim::Collision::Representation> makeSphereRepresentation(
 	const double& radius,
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
 
-	std::shared_ptr<Shape> sphere = std::make_shared<SurgSim::Math::SphereShape>(radius);
-	return 	std::make_shared<MockCollisionRepresentation>(
-		"TestSphereShapeCollisionRep",
-		sphere,
-		rotation,
-		position,
-		representation);
+	std::shared_ptr<SurgSim::Math::Shape> sphere = std::make_shared<SurgSim::Math::SphereShape>(radius);
+	return 	std::make_shared<ShapeCollisionRepresentation>(
+		"TestSphereShapeCollisionRep", sphere, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeDoubleSidedPlaneRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation,
+std::shared_ptr<SurgSim::Collision::Representation> makeDoubleSidedPlaneRepresentation(
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
-	std::shared_ptr<Shape> plane = std::make_shared<SurgSim::Math::DoubleSidedPlaneShape>();
-	return 	std::make_shared<MockCollisionRepresentation>(
-		"TestDoubleSidedPlaneCollisionRep",
-		plane,
-		rotation,
-		position,
-		representation);
+	std::shared_ptr<SurgSim::Math::Shape> plane = std::make_shared<SurgSim::Math::DoubleSidedPlaneShape>();
+	return 	std::make_shared<ShapeCollisionRepresentation>(
+		"TestDoubleSidedPlaneCollisionRep", plane, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makePlaneRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation,
+std::shared_ptr<SurgSim::Collision::Representation> makePlaneRepresentation(
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
-	std::shared_ptr<Shape> plane = std::make_shared<SurgSim::Math::PlaneShape>();
-	return  std::make_shared<MockCollisionRepresentation>(
-		"TestPlaneRepresentation",
-		plane,
-		rotation,
-		position,
-		representation);
+	std::shared_ptr<SurgSim::Math::Shape> plane = std::make_shared<SurgSim::Math::PlaneShape>();
+	return  std::make_shared<ShapeCollisionRepresentation>(
+		"TestPlaneRepresentation", plane, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
-std::shared_ptr<SurgSim::Collision::CollisionRepresentation> makeCapsuleRepresentation(
-	std::shared_ptr<SurgSim::Physics::Representation> representation,
+std::shared_ptr<SurgSim::Collision::Representation> makeCapsuleRepresentation(
 	const double& length,
 	const double& radius,
 	const Quaterniond& rotation,
 	const Vector3d& position)
 {
 
-	std::shared_ptr<Shape> capsule = std::make_shared<SurgSim::Math::CapsuleShape>(length, radius);
-	return 	std::make_shared<MockCollisionRepresentation>(
-		"TestCapsuleShapeCollisionRep",
-		capsule,
-		rotation,
-		position,
-		representation);
+	std::shared_ptr<SurgSim::Math::Shape> capsule = std::make_shared<SurgSim::Math::CapsuleShape>(length, radius);
+	return 	std::make_shared<ShapeCollisionRepresentation>(
+		"TestCapsuleShapeCollisionRep", capsule, SurgSim::Math::makeRigidTransform(rotation, position));
 }
 
 }; // Collision

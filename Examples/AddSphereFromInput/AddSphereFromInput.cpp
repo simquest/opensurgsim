@@ -16,35 +16,34 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include <Examples/AddSphereFromInput/AddSphereBehavior.h>
-#include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/TransferPoseBehavior.h>
-#include <SurgSim/Blocks/TransferInputPoseBehavior.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Devices/MultiAxis/MultiAxisDevice.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgPlaneRepresentation.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Input/InputManager.h>
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
-#include <SurgSim/Math/BoxShape.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
+#include "Examples/AddSphereFromInput/AddSphereBehavior.h"
+#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgPlaneRepresentation.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Input/InputManager.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
@@ -58,6 +57,7 @@ using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgUniform;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
@@ -80,8 +80,13 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 std::shared_ptr<SceneElement> createPlane(const std::string& name,
 										  const SurgSim::Math::RigidTransform3d& pose)
 {
+	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
+	RigidRepresentationParameters params;
+	params.setShapeUsedForMassInertia(planeShape);
+	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<OsgPlaneRepresentation> graphicsRepresentation =
@@ -104,16 +109,14 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
-
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
 	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>
-		("Plane Collision",planeShape, physicsRepresentation));
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Plane Collision", physicsRepresentation));
 	return planeElement;
 }
 

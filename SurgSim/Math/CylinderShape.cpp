@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Math/CylinderShape.h>
+#include "SurgSim/Math/CylinderShape.h"
 
 namespace SurgSim
 {
@@ -41,30 +41,52 @@ double CylinderShape::getRadius() const
 	return m_radius;
 }
 
-double CylinderShape::calculateVolume() const
+double CylinderShape::getVolume() const
 {
 	return M_PI * m_radius * m_radius * m_length;
 }
 
-SurgSim::Math::Vector3d CylinderShape::calculateMassCenter() const
+SurgSim::Math::Vector3d CylinderShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d CylinderShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d CylinderShape::getSecondMomentOfVolume() const
 {
-	const double mass = calculateMass(rho);
-	const double coef    = 1.0 / 12.0 * mass;
-	const double coefDir = 1.0 /  2.0 * mass;
+	const double volume = getVolume();
+	const double coef    = 1.0 / 12.0 * volume;
+	const double coefDir = 1.0 /  2.0 * volume;
 	const double squareL = m_length * m_length;
 	const double squareRadius = m_radius * m_radius;
 
-	Matrix33d inertia;
-	inertia.setZero();
-	inertia.diagonal().setConstant(coef * (3.0 * squareRadius + squareL));
-	inertia(1, 1) = coefDir * (squareRadius);
+	Matrix33d secondMoment;
+	secondMoment.setZero();
+	secondMoment.diagonal().setConstant(coef * (3.0 * squareRadius + squareL));
+	secondMoment(1, 1) = coefDir * (squareRadius);
 
-	return inertia;
+	return secondMoment;
+}
+
+YAML::Node SurgSim::Math::CylinderShape::encode()
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	node["Radius"] = getRadius();
+	node["Length"] = getLength();
+	return node;
+}
+
+bool SurgSim::Math::CylinderShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+
+	m_radius = node["Radius"].as<double>();
+	m_length = node["Length"].as<double>();
+	return true;
 }
 
 }; // namespace Math

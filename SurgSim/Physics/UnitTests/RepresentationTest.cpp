@@ -17,9 +17,9 @@
 
 #include <string>
 
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Physics::Representation;
 using SurgSim::Math::Quaterniond;

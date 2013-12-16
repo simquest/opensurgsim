@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include <SurgSim/Collision/CollisionPair.h>
+#include "SurgSim/Collision/CollisionPair.h"
 
 
 namespace SurgSim

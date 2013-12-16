@@ -16,7 +16,7 @@
 /// \file
 /// Tests for the OsgUniformTypes functions to make sure they return the correct enum values.
 
-#include <SurgSim/Graphics/OsgUniformTypes.h>
+#include "SurgSim/Graphics/OsgUniformTypes.h"
 
 #include <gtest/gtest.h>
 

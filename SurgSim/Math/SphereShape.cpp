@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Math/SphereShape.h>
+#include "SurgSim/Math/SphereShape.h"
 
 namespace SurgSim
 {
@@ -35,29 +35,49 @@ double SphereShape::getRadius() const
 	return m_radius;
 }
 
-double SphereShape::calculateVolume() const
+double SphereShape::getVolume() const
 {
 	return 4.0 / 3.0 * M_PI * m_radius * m_radius * m_radius;
 }
 
-SurgSim::Math::Vector3d SphereShape::calculateMassCenter() const
+SurgSim::Math::Vector3d SphereShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d SphereShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d SphereShape::getSecondMomentOfVolume() const
 {
-	const double mass = calculateMass(rho);
+	const double volume = getVolume();
 
-	double diagonalCoefficient = 2.0 / 5.0 * mass * m_radius * m_radius;
+	double diagonalCoefficient = 2.0 / 5.0 * volume * m_radius * m_radius;
 
-	Matrix33d inertia;
-	inertia.setZero();
-	inertia.diagonal().setConstant(diagonalCoefficient);
+	Matrix33d secondMoment;
+	secondMoment.setZero();
+	secondMoment.diagonal().setConstant(diagonalCoefficient);
 
-	return inertia;
+	return secondMoment;
 }
 
+YAML::Node SurgSim::Math::SphereShape::encode()
+
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	node["Radius"] = getRadius();
+	return node;
+}
+
+bool SurgSim::Math::SphereShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+
+	m_radius = node["Radius"].as<double>();
+	return true;
+}
 
 }; // namespace Math
 }; // namespace SurgSim

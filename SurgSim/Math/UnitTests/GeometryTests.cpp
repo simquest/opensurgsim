@@ -22,7 +22,7 @@
 #include <numeric>
 #include <cmath>
 
-#include <SurgSim/Math/Geometry.h>
+#include "SurgSim/Math/Geometry.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace SurgSim

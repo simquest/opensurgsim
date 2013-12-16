@@ -16,22 +16,22 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/FixedRepresentationContact.h>
-#include <SurgSim/Physics/FixedRepresentationLocalization.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationContact.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/FixedRepresentationContact.h"
+#include "SurgSim/Physics/FixedRepresentationLocalization.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace
 {
@@ -44,11 +44,11 @@ namespace Physics
 {
 TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 {
-	Vector3d n(0.0, 1.0, 0.0);
+	SurgSim::Math::Vector3d n(0.0, 1.0, 0.0);
 	double d = 0.0;
 	double violation = -0.01;
 
-	Vector3d contactPosition = -n * (d - violation);
+	SurgSim::Math::Vector3d contactPosition = -n * (d - violation);
 	SurgSim::Math::RigidTransform3d poseFixed;
 	poseFixed.setIdentity();
 

@@ -16,11 +16,11 @@
 #ifndef SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGBOXREPRESENTATION_H
 
-#include <SurgSim/Graphics/BoxRepresentation.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
+#include "SurgSim/Graphics/BoxRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
 
-#include <SurgSim/Framework/SharedInstance.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/Switch>

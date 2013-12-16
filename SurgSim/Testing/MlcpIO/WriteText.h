@@ -17,7 +17,7 @@
 #define SURGSIM_TESTING_MLCPIO_WRITETEXT_H
 
 #include <string>
-#include <SurgSim/Testing/MlcpIO/MlcpTestData.h>
+#include "SurgSim/Testing/MlcpIO/MlcpTestData.h"
 
 bool writeMlcpTestDataAsText(const std::string& fileName, const MlcpTestData& testData);
 

@@ -34,6 +34,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	NamedDataBuilder.h
 	NamedVariantData.h
 	NamedVariantData-inl.h
+	OctreeNode.h
+	OctreeNode-inl.h
 	OptionalValue.h
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h

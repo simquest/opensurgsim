@@ -16,7 +16,7 @@
 #ifndef SURGSIM_BLOCKS_BASICSCENEELEMENT_H
 #define SURGSIM_BLOCKS_BASICSCENEELEMENT_H
 
-#include <SurgSim/Framework/SceneElement.h>
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {
@@ -37,15 +37,14 @@ public:
 protected:
 	/// Initializes the scene element
 	/// \return	True if succeeds, false if fails
-	virtual bool doInitialize();
+	virtual bool doInitialize() override;
 	/// Wakes up the scene element
 	/// \pre	All scene elements are initialized
 	/// \return	True if succeeds, false if fails
-	virtual bool doWakeUp();
+	virtual bool doWakeUp() override;
 };
 
 };  // namespace Blocks
-
 };  // namespace SurgSim
 
 #endif  // SURGSIM_BLOCKS_BASICSCENEELEMENT_H

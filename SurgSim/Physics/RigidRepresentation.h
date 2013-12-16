@@ -16,12 +16,12 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATION_H
 
-#include <SurgSim/Physics/RigidRepresentationBase.h>
-#include <SurgSim/Physics/RigidRepresentationState.h>
+#include "SurgSim/Physics/RigidRepresentationBase.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -46,14 +46,6 @@ public:
 	/// Query the representation type
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
-
-	/// Set the initial parameters of the rigid representation
-	/// \param parameters The initial parameters
-	/// This will also set the current parameters to the initial parameters
-	void setInitialParameters(const RigidRepresentationParameters& parameters);
-	/// Set the current parameters of the rigid representation
-	/// \param parameters The current parameters
-	void setCurrentParameters(const RigidRepresentationParameters& parameters);
 
 	/// Set the current pose of the rigid representation
 	/// \param pose The current pose (translation + rotation)
@@ -92,7 +84,7 @@ public:
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block) override;
+	void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block) override;
 
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters();
@@ -123,6 +115,8 @@ protected:
 	Matrix66d m_externalDampingMatrix;
 
 private:
+	virtual bool doInitialize() override;
+
 	/// Compute compliance matrix (internal data structure)
 	/// \param dt The time step in use
 	void computeComplianceMatrix(double dt);

@@ -15,29 +15,29 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Log.h"
 
-#include <SurgSim/Graphics/Light.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgLight.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgView.h>
+#include "SurgSim/Graphics/Light.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgLight.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgView.h"
 
-#include <SurgSim/Blocks/BasicSceneElement.h>
+#include "SurgSim/Blocks/BasicSceneElement.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
@@ -112,7 +112,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 class SimpleBox : public SurgSim::Blocks::BasicSceneElement
 {
 public:
-	SimpleBox(const std::string& name) : BasicSceneElement(name)
+	explicit SimpleBox(const std::string& name) : BasicSceneElement(name)
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName()+" Graphics");
 		m_box->setInitialPose(RigidTransform3d::Identity());
