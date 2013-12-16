@@ -46,74 +46,46 @@ void MassSpringRepresentationContact::doBuild(double dt,
 			unsigned int indexOfConstraint,
 			ConstraintSideSign sign)
 {
-	MlcpPhysicsProblem::Matrix& H    = mlcp->H;
-	MlcpPhysicsProblem::Matrix& CHt  = mlcp->CHt;
-	MlcpPhysicsProblem::Matrix& HCHt = mlcp->A;
-	MlcpPhysicsProblem::Vector& b    = mlcp->b;
+	using SurgSim::Math::Vector3d;
 
-	unsigned int nodeId = std::static_pointer_cast<MassSpringRepresentationLocalization>(localization)->getLocalNode();
-	std::shared_ptr<Representation> representation = localization->getRepresentation();
-	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(representation);
+	auto massSpring = std::static_pointer_cast<MassSpringRepresentation>(localization->getRepresentation());
 
 	if ( !massSpring->isActive())
 	{
 		return;
 	}
 
+	unsigned int nodeId = std::static_pointer_cast<MassSpringRepresentationLocalization>(localization)->getLocalNode();
 	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
-	const SurgSim::Math::Matrix& C = massSpring->getComplianceMatrix();
-	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
-	const SurgSim::Math::Vector3d& n = contactData.getNormal();
+
+	auto& contactData = static_cast<const ContactConstraintData&>(data);
+	const Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();
 
 	// FRICTIONLESS CONTACT in a LCP
 	//   (n, d) defines the plane of contact
-	//   P(t) the point of contact (usually after free motion)
+	//   p(t) the point of contact (usually after free motion)
 	//
 	// The constraint equation for a plane is
-	//   n.P(t+dt) + d >= 0
-	// Using the Backward Euler numerical integration scheme
-	//   n.[ P(t) + dt.V(t+dt) ] + d >= 0
-	//   [n.dt].V(t+dt) + [n.P(t) + d] >= 0
-	// The solver requires an equation of the form
-	//   H.V(t+dt) + b >= 0
-	// Therefore
-	//   H = n.dt
-	//   b = n.P(t) + d             -> P(t) evaluated after free motion
+	// U(t) = n^t.p(t) + d >= 0
+	//
+	// dU/dt = H.dp/dt
+	// => H = n^t
 
-	// Fill up b with the constraint equation...
-	SurgSim::Math::Vector3d globalPosition = localization->calculatePosition();
+	// Update b with new violation U
+	Vector3d globalPosition = localization->calculatePosition();
 	double violation = n.dot(globalPosition) + d;
-	b[indexOfConstraint] += violation * scale;
 
-	// Fill matrices with just the non null values
-	// (H+H') = H+H'
-	// => H += H';
-	//
-	// C(H+H')t = CHt + CH't
-	// => CHt += CH't;
-	//
-	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
-	// => HCHt += H(CH't) + H'[C(H+H')t];
+	mlcp->b[indexOfConstraint] += violation * scale;
 
-	// H'
-	SurgSim::Math::Vector3d localH = dt * scale * n;
+	Eigen::SparseVector<double> newH;
+	newH.resize(massSpring->getNumDof());
+	newH.reserve(3);
+	newH.insert(3 * nodeId + 0) = n[0] * scale;
+	newH.insert(3 * nodeId + 1) = n[1] * scale;
+	newH.insert(3 * nodeId + 2) = n[2] * scale;
 
-	// CH't
-	SurgSim::Math::Vector localCHt = C.middleCols(indexOfRepresentation + 3*nodeId, 3) * localH;
-
-	// HCHt += H(CH't)
-	HCHt.col(indexOfConstraint) += H * localCHt;
-
-	// H += H'
-	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 3*nodeId) += localH.transpose();
-
-	// CHt += CH't
-	CHt.col(indexOfConstraint) += localCHt;
-
-	// HCHt += H'[C(H+H')t]
-	HCHt.row(indexOfConstraint) += localH.transpose() * CHt.middleRows(indexOfRepresentation + 3*nodeId, 3);
-
+	mlcp->updateConstraints(newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstraintType() const
@@ -130,8 +102,6 @@ unsigned int MassSpringRepresentationContact::doGetNumDof() const
 {
 	return 1;
 }
-
-
 
 }; // namespace Physics
 

@@ -148,42 +148,65 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpTest)
 		&mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE);
 
 	// Expected results.
-	// F = ma
-	// => mg = ma
-	// => dv/dt = -g
+	// At the initial time-step, the only force is gravity.
+	//
+	// F(0) = m * a(0)
+	// => a(0) = 1/m * F(0)
+	//         = (0, -g, 0)
 	//
 	// Modified Explicit Euler:
 	// v(1) = v(0) + dv/dt|(t=0)*dt
-	//      = -g*dt
+	//      = v(0) + a(0)*dt
+	//      = (0, -g*dt, 0)
 	//
-	// x(1) = x(0) + dx/dt|(t=1)*dt
-	//      = v(1)*dt
-	//      = -g*dt^2
+	// p(1) = p(0) + dp/dt|(t=1)*dt
+	//      = p(0) + v(1)*dt
+	//      = p(0) + (0, -g*dt^2, 0)
+	//
+	// The constraint violation is the position from the plane projected onto the constraint.  Note, we have defined the
+	// plane to intersect with p(0).  The constraint is
+	//      U(t) = n^t.(p(t) - p(0)) >= 0
+	//
+	// U(1) = n^t.(p(1) - p(0))
+	//      = (nx, ny, nz)^t.(0, -g*dt^2, 0)
+	//      = -g*dt^2*ny
+	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[0], epsilon);
 
-	EXPECT_NEAR(d - (9.81 * dt * dt), mlcpPhysicsProblem.b[0], epsilon);
+	// By definition, H = dU/dp.
+	//
+	// dU/dt = (dU/dp).(dp/dt)
+	//       = H.(dp/dt)
+	//
+	// dp = p(1) - p(0)
+	// => dp/dt = (p(1) - p(0)) / dt
+	//
+	// dU/dt = (U(1) - U(0)) / dt      [Note U(0) = 0]
+	//       = n^t.(p(1) - p(0)) / dt
+	//       = n^t.(dp/dt)
+	// => H = n^t
+	EXPECT_NEAR(m_n[0], mlcpPhysicsProblem.H(0, 0), epsilon);
+	EXPECT_NEAR(m_n[1], mlcpPhysicsProblem.H(0, 1), epsilon);
+	EXPECT_NEAR(m_n[2], mlcpPhysicsProblem.H(0, 2), epsilon);
 
-	// Constraint U = nt.p + d >= 0, so
-	// H = dU/dp
-	//   = dt.[nx  ny  nz]
-	EXPECT_NEAR(dt * n[0]   , mlcpPhysicsProblem.H(0, 0), epsilon);
-	EXPECT_NEAR(dt * n[1]   , mlcpPhysicsProblem.H(0, 1), epsilon);
-	EXPECT_NEAR(dt * n[2]   , mlcpPhysicsProblem.H(0, 2), epsilon);
+	// We define C as the matrix which transforms F -> v (which differs from treatments which define it as F -> p)
+	// v(1) = v(0) + a(0)*dt
+	//      = v(0) + 1/m*F(0)*dt
+	// => (v(1) - v(0)) = [dt/m] * F(0)
+	//
+	// Therefore C = dt/m
+	//
+	// We can directly calculate
+	// CHt = C * H^t
+	//     = (dt/m) * (nx, ny, nz)
+	EXPECT_NEAR(dt / m_massPerNode * m_n[0], mlcpPhysicsProblem.CHt(0, 0), epsilon);
+	EXPECT_NEAR(dt / m_massPerNode * m_n[1], mlcpPhysicsProblem.CHt(1, 0), epsilon);
+	EXPECT_NEAR(dt / m_massPerNode * m_n[2], mlcpPhysicsProblem.CHt(2, 0), epsilon);
 
-	// Test CHt
-	const Eigen::Matrix<double, 6, 6> &C = massSpring->getComplianceMatrix();
-	EXPECT_NEAR((C.block<1,3>(0, 0) * n * dt)[0], mlcpPhysicsProblem.CHt(0, 0), epsilon);
-	EXPECT_NEAR((C.block<1,3>(1, 0) * n * dt)[0], mlcpPhysicsProblem.CHt(1, 0), epsilon);
-	EXPECT_NEAR((C.block<1,3>(2, 0) * n * dt)[0], mlcpPhysicsProblem.CHt(2, 0), epsilon);
-	EXPECT_NEAR((C.block<1,3>(3, 0) * n * dt)[0], mlcpPhysicsProblem.CHt(3, 0), epsilon);
-	EXPECT_NEAR((C.block<1,3>(4, 0) * n * dt)[0], mlcpPhysicsProblem.CHt(4, 0), epsilon);
-	EXPECT_NEAR((C.block<1,3>(5, 0) * n * dt)[0], mlcpPhysicsProblem.CHt(5, 0), epsilon);
-
-	// Test HCHt
-	Eigen::Matrix<double, 1, 6> H;
-	H.block<1, 3>(0, 0) = dt * n;
-	H.block<1, 3>(0, 3) = Eigen::Matrix<double, 1, 3>::Zero();
-
-	EXPECT_TRUE((H * C * H.transpose()).isApprox(mlcpPhysicsProblem.A, epsilon));
+	// And finally,
+	// HCHt = [nx ny nz] * (dt/m) * (nx, ny, nz)
+	//      = (dt/m) * (nx*nx + ny*ny + nz*nz)
+	double calculatedA = mlcpPhysicsProblem.A.block<1, 1>(0, 0)[0]; // VS intellisense error workaround
+	EXPECT_NEAR(dt / m_massPerNode * (m_n[0] * m_n[0] + m_n[1] * m_n[1] + m_n[2] * m_n[2]), calculatedA, epsilon);
 
 	// ConstraintTypes should contain 0 entry as it is setup by the constraint and not the ConstraintImplementation
 	// This way, the constraint can verify that both ConstraintImplementation are the same type
