@@ -1540,8 +1540,8 @@ bool calculateContactTriangleTriangle(
 	// 1) Find signedDFromPlaneB([0],[1],[2]) by calculating (vA[0].nB + dB, vA[1].nB + dB, vA[2].nB + dB).
 	// 2) Depending on the sign of signedDFromPlaneB, the vertex can be classified as UnderPlaneB, OnPlaneB
 	//    or AbovePlaneB.
-	// 3) Every edge, from vertex UnderPlaneB to vertex OnPlaneB/AbovePlaneB, is checked against B, to
-	//    determine if there is any intersection.
+	// 3) Every edge, from vertex UnderPlaneB to vertex OnPlaneB/AbovePlaneB, is projected onto the PlaneB
+	//    and checked, to determine if there is any intersection with TriangleB.
 	// 4) In case of intersection, the minimum distance by which the point on the edge needs to be moved
 	//    along nB, to bring the edge above B is calculated. It is the penetration depth. And the
 	//    corresponding points are penetration points.
@@ -1615,13 +1615,12 @@ bool calculateContactTriangleTriangle(
 			(std::abs(signedDFromPlaneB[A][underPlaneB[A][0]]) - std::abs(signedDFromPlaneB[A][underPlaneB[A][1]]))
 				> Geometry::DistanceEpsilon)
 		{
-			// If there are 2 vertices under the planeB, we process the less deeper vertex first.
+			// If there are 2 vertices under the planeB, we process the vertex closer to PlaneB first.
 			std::swap(underPlaneB[A][0], underPlaneB[A][1]);
-			// After the swap, underPlaneB[A][0] is the less deep vertex.
-			// If underPlaneB[A][1] was processed first, and found to not have intersection with the
-			// triangle B, and then later underPlaneB[A][0] was found to have an intersection, then the
-			// edge (underPlaneB[A][0] to underPlaneB[A][1]) will go untested, even though it could
-			// potentially have a deeper penetration.
+			// The two underPlaneB[A] vertices must be ordered this way because the algorithm would fail
+			// to test the edge between these two underPlaneB[A] vertices if:
+			// a) the farther vertex from PlaneB was processed first and did not have an intersection, and
+			// b) the closer vertex to PlaneB was processed second and intersected.
 		}
 
 		// Now, the only edges of interest in A are the ones going from underPlaneB
