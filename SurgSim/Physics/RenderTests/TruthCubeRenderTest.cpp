@@ -81,6 +81,7 @@ struct TruthCubeRenderTests : public RenderTests
 		}
 
 		while (std::getline(datafile, lineId))
+		{
 			if (++index > numCommentLine)
 			{
 				std::stringstream strstream(lineId);
@@ -96,7 +97,7 @@ struct TruthCubeRenderTests : public RenderTests
 				truthCube->cubeData2.push_back(position2);
 				truthCube->cubeData3.push_back(position3);
 			}
-
+		}
 			return true;
 
 	};
