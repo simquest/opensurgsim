@@ -362,8 +362,8 @@ T distanceLineLine(
 /// \param s1v0, s1v1	Segment 1 Extremities.
 /// \param [out] pt0	Closest point on segment 0
 /// \param [out] pt1	Closest point on segment 1
-/// \param [out] s0t	s at the point of intersection in => s0v0 + s * (s0v1 - s0v0)
-/// \param [out] s1t	s at the point of intersection in => s1v0 + s * (s1v1 - s1v0)
+/// \param [out] s0t	Abscissa at the point of intersection on Segment 0 (s0v0 + t * (s0v1 - s0v0)).
+/// \param [out] s1t	Abscissa at the point of intersection on Segment 0 (s1v0 + t * (s1v1 - s1v0)).
 /// \return Distance between the segments, i.e. (pt0 - pt1).norm()
 template <class T, int MOpt>
 T distanceSegmentSegment(
