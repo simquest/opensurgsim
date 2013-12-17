@@ -122,7 +122,7 @@ TEST(OctreeContactCalculationTests, Capsule)
 {
 	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
 	std::shared_ptr<Shape> capsule = std::make_shared<CapsuleShape>(16.0, 1.0);
-	OctreeDcdContact<BoxCapsuleDcdContact, OctreeData> calculator;
+	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxCapsuleDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
@@ -196,7 +196,7 @@ TEST(OctreeContactCalculationTests, Plane)
 {
 	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
 	std::shared_ptr<Shape> plane = std::make_shared<PlaneShape>();
-	OctreeDcdContact<BoxPlaneDcdContact, OctreeData> calculator;
+	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxPlaneDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
@@ -264,7 +264,7 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 {
 	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
 	std::shared_ptr<Shape> plane = std::make_shared<DoubleSidedPlaneShape>();
-	OctreeDcdContact<BoxDoubleSidedPlaneDcdContact, OctreeData> calculator;
+	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxDoubleSidedPlaneDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
@@ -318,7 +318,7 @@ TEST(OctreeContactCalculationTests, Sphere)
 {
 	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
 	std::shared_ptr<Shape> sphere = std::make_shared<SphereShape>(9);
-	OctreeDcdContact<BoxSphereDcdContact, OctreeData> calculator;
+	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxSphereDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{

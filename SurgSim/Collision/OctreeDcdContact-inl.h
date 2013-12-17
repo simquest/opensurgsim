@@ -30,31 +30,32 @@ namespace SurgSim
 namespace Collision
 {
 
-template <class T, class Data>
-OctreeDcdContact<T, Data>::OctreeDcdContact()
+template <class Data>
+OctreeDcdContact<Data>::OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator) :
+	m_calculator(calculator)
 {
-	SURGSIM_ASSERT(m_contactCalculator.getShapeTypes().first == SurgSim::Math::SHAPE_TYPE_BOX) <<
+	SURGSIM_ASSERT(m_calculator->getShapeTypes().first == SurgSim::Math::SHAPE_TYPE_BOX) <<
 		"OctreeDcdContact needs a contact calculator that works with Boxes";
-	m_shapeTypes = m_contactCalculator.getShapeTypes();
+	m_shapeTypes = m_calculator->getShapeTypes();
 	m_shapeTypes.first = SurgSim::Math::SHAPE_TYPE_OCTREE;
 }
 
-template <class T, class Data>
-std::pair<int, int> OctreeDcdContact<T, Data>::getShapeTypes()
+template <class Data>
+std::pair<int, int> OctreeDcdContact<Data>::getShapeTypes()
 {
 	return m_shapeTypes;
 }
 
-template <class T, class Data>
-void OctreeDcdContact<T, Data>::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+template < class Data>
+void OctreeDcdContact<Data>::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
 	typedef SurgSim::Math::OctreeShape<Data> OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> octree = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
 	calculateContactWithNode(octree->getRootNode(), pair, std::make_shared<SurgSim::Math::OctreePath>());
 }
 
-template <class T, class Data>
-void OctreeDcdContact<T, Data>::calculateContactWithNode(
+template <class Data>
+void OctreeDcdContact<Data>::calculateContactWithNode(
 	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node, std::shared_ptr<CollisionPair> pair,
 	std::shared_ptr<SurgSim::Math::OctreePath> nodePath)
 {
@@ -73,7 +74,7 @@ void OctreeDcdContact<T, Data>::calculateContactWithNode(
 		std::make_shared<ShapeCollisionRepresentation>("Octree Node", boxShape, boxPose);
 
 	std::shared_ptr<CollisionPair> localPair = std::make_shared<CollisionPair>(box, pair->getSecond());
-	m_contactCalculator.calculateContact(localPair);
+	m_calculator->calculateContact(localPair);
 	if (localPair->hasContacts())
 	{
 		if (node->hasChildren())
