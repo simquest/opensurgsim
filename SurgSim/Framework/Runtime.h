@@ -59,6 +59,7 @@ public:
 	/// Add a worker thread, this should probably only be possible if the system is not running
 	void addManager(std::shared_ptr<ComponentManager> thread);
 
+	/// \return The scene to be used for this runtime. Use this for any kind of scene manipulation.
 	std::shared_ptr<Scene> getScene();
 
 	/// Adds a scene element

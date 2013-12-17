@@ -76,7 +76,7 @@ std::shared_ptr<Scene> Runtime::getScene()
 bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 {
 	// If we add a single scene element before the simulation is running
-	// it will be handled by the scene initialization	
+	// it will be handled by the scene initialization
 	if (m_isRunning)
 	{
 		addComponents(sceneElement->getComponents());

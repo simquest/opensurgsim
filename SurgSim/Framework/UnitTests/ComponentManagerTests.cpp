@@ -19,11 +19,9 @@
 ///		 the simplest version of the abstract interface.
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/ComponentManager.h"
-
 
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
 
@@ -210,7 +208,7 @@ TEST(ComponentManagerTests, AdditionDuringInitializationTest)
 	auto manager = std::make_shared<InitializationBugManager>();
 	auto runtime = std::make_shared<Runtime>();
 	auto scene = runtime->getScene();
-	
+
 	runtime->addManager(manager);
 	runtime->start();
 

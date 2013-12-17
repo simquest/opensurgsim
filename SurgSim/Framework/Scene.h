@@ -33,15 +33,18 @@ class Runtime;
 class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
-	Scene(std::weak_ptr<Runtime> runtime);
+
+	/// Constructor.
+	/// \param runtime The runtime to be used.
+	explicit Scene(std::weak_ptr<Runtime> runtime);
 
 	~Scene();
 
-	/// Adds a scene element to member data 'm_element'.
+	/// Adds a scene element to the Scene, the SceneElement will have its initialize() function called.
 	/// \param	element	The element.
 	void addSceneElement(std::shared_ptr<SceneElement> element);
 
-	/// Gets scene element with a given name
+	/// Gets scene element with a given name.
 	/// \param	name	The name.
 	/// \return	The scene element or nullptr if the element cannot be found.
 	std::shared_ptr<SceneElement> getSceneElement(const std::string& name) const;
@@ -50,7 +53,7 @@ public:
 	/// \return	The scene elements.
 	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
 
-	/// Gets the runtime
+	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();
 

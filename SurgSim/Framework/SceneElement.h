@@ -31,27 +31,32 @@ class Component;
 class Scene;
 class Runtime;
 
-/// SceneElement is the basic part of a scene, it is a container of components. SceneElements
-/// doInit() will be called on all SceneElements before they are integrated into the system,
-/// doWakeup() will be called after all doInit() have been completed and all the static information
-/// has been initialized
+/// SceneElement is the basic part of a scene, it is a container of components. When a
+/// SceneElement is added to a Scene, the Scene will call initialize on the SceneElement,
+/// which in turn will call initialize() on all its components.
+/// If a component is added to a SceneElement after the SceneEleent was initialized, the component will
+/// be initialized immediately.
+/// \note A SceneElement needs to be created as a shared_ptr.
 class SceneElement : public std::enable_shared_from_this<SceneElement>
 {
 public:
 	/// Constructor
 	/// \param name Name of this SceneElement
 	explicit SceneElement(const std::string& name);
+
 	/// Destructor
 	virtual ~SceneElement();
 
-	/// Adds a component
+	/// Adds a component, calls initialize() on the component, if SceneElement::isInitialized() is true
 	/// \param	component	The component.
 	/// \return	true if it succeeds, false if it fails.
 	bool addComponent(std::shared_ptr<Component> component);
+
 	/// Removes a given component.
 	/// \param	component	The component.
 	/// \return	true if it succeeds, false if it fails or the component cannot be found.
 	bool removeComponent(std::shared_ptr<Component> component);
+
 	/// Removes the component described by name.
 	/// \param	name	The name.
 	/// \return	true if it succeeds, false if it fails or the component cannot be found.
@@ -61,9 +66,11 @@ public:
 	/// \param	name	The name.
 	/// \return	The component or nullptr if the component cannot be found.
 	std::shared_ptr<Component> getComponent(const std::string& name) const;
+
 	/// Gets all the components of this SceneElement.
 	/// \return	The components.
 	std::vector<std::shared_ptr<Component> > getComponents() const;
+
 	/// Template version of getComponents method to get all the components with type T
 	/// \return The type T components
 	template <class T>
@@ -80,6 +87,7 @@ public:
 	/// Sets the Scene.
 	/// \param scene Pointer to the scene.
 	void setScene(std::weak_ptr<Scene> scene);
+
 	/// Gets the Scene.
 	/// \return The scene.
 	std::shared_ptr<Scene> getScene();
@@ -94,9 +102,6 @@ public:
 	/// Return if this SceneElement is initialized.
 	/// \return True if this SceneElement is initialized; Otherwise, false.
 	bool isInitialized() const;
-	/// Return if this SceneElement is awake.
-	/// \return True if this SceneElement is awake; Otherwise, false.
-	bool isAwake() const;
 
 	/// Gets a shared pointer to the runtime.
 	/// \return	The shared pointer.
@@ -118,8 +123,7 @@ private:
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;
-	/// Indicates if this SceneElement has been waken or not.
-	bool m_isAwake;
+
 };
 
 }; // namespace Framework

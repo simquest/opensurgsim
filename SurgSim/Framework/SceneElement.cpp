@@ -23,12 +23,14 @@ namespace SurgSim
 namespace Framework
 {
 
-SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false), m_isAwake(false)
+SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false)
 {
+
 }
 
 SceneElement::~SceneElement()
-{  
+{
+
 }
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
@@ -36,7 +38,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 	bool result= false;
 
 	SURGSIM_ASSERT(component != nullptr) << "Cannot add a nullptr as a component";
-	
+
 	if (m_components.find(component->getName()) == m_components.end())
 	{
 		component->setSceneElement(getSharedPtr());
@@ -54,7 +56,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 				" already exists on SceneElement " << getName() <<
 				", did not add component";
 	}
-	
+
 	if (result)
 	{
 		m_components[component->getName()] = component;
@@ -159,11 +161,6 @@ std::shared_ptr<Runtime> SceneElement::getRuntime()
 bool SceneElement::isInitialized() const
 {
 	return m_isInitialized;
-}
-
-bool SceneElement::isAwake() const
-{
-	return m_isAwake;
 }
 
 std::shared_ptr<SceneElement> SceneElement::getSharedPtr()

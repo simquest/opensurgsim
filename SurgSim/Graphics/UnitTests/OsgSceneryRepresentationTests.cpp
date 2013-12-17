@@ -48,7 +48,7 @@ public:
 		viewElement->addComponent(sceneryObject2);
 		scene->addSceneElement(viewElement);
 		runtime->addManager(manager);
-		
+
 	}
 
 	virtual void TearDown() override
