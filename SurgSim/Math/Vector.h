@@ -171,12 +171,14 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 /// \return True if (i, j, k) has been built successfully, False if 'i' is a (or close to a) null vector
 /// \note If any of the parameter is a nullptr, an exception will be raised
 template <class T, int VOpt>
-bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i, Eigen::Matrix<T, 3, 1, VOpt>* j, Eigen::Matrix<T, 3, 1, VOpt>* k)
+bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i,
+						   Eigen::Matrix<T, 3, 1, VOpt>* j,
+						   Eigen::Matrix<T, 3, 1, VOpt>* k)
 {
 	SURGSIM_ASSERT(i != nullptr) << "Parameter [in, out] 'i' is a nullptr";
 	SURGSIM_ASSERT(j != nullptr) << "Parameter [out] 'j' is a nullptr";
 	SURGSIM_ASSERT(k != nullptr) << "Parameter [out] 'k' is a nullptr";
-	
+
 	if (i->isZero())
 	{
 		return false;

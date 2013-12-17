@@ -1201,7 +1201,7 @@ TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
 	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, &j, &k)));
 	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, nullptr, &k)));
 	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, &j, nullptr)));
-	
+
 	// Assert if 2 parameters are nullptr
 	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, nullptr, &k)));
 	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, &j, nullptr)));
