@@ -44,8 +44,6 @@ public:
 		scene = runtime->getScene();
 		viewElement = std::make_shared<OsgViewElement>("view element");
 
-		viewElement->addComponent(sceneryObject);
-		viewElement->addComponent(sceneryObject2);
 		scene->addSceneElement(viewElement);
 		runtime->addManager(manager);
 
@@ -72,10 +70,10 @@ TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
 	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
-	ASSERT_NO_THROW(sceneryObject->initialize(runtime));
+	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject));
 
 	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
-	ASSERT_NO_THROW(sceneryObject2->initialize(runtime));
+	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
 

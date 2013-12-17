@@ -35,6 +35,8 @@ OsgSceneryRepresentation::OsgSceneryRepresentation(const std::string& name) :
 
 bool OsgSceneryRepresentation::doInitialize()
 {
+	// HS-2013-dec-17 This should probably use a return value of false rather than assertions
+	SURGSIM_ASSERT(m_fileName != "") << "Filename can't be empty.";
 	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
 
 	std::string objectPath = applicationData->findFile(m_fileName);
@@ -54,5 +56,6 @@ std::string SurgSim::Graphics::OsgSceneryRepresentation::getFileName() const
 
 void SurgSim::Graphics::OsgSceneryRepresentation::setFileName( const std::string& fileName )
 {
+	SURGSIM_ASSERT(! isInitialized()) << "Can't set the filename after the object has been initialized.";
 	m_fileName = fileName;
 }

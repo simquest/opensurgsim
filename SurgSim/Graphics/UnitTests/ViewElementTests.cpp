@@ -37,8 +37,7 @@ class MockViewElement : public ViewElement
 {
 public:
 	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
-		m_isInitialized(false),
-		m_isAwoken(false)
+		m_isInitialized(false)
 	{
 	}
 
@@ -69,11 +68,7 @@ public:
 	{
 		return m_isInitialized;
 	}
-	/// Gets whether the view element has been awoken
-	bool isAwoken() const
-	{
-		return m_isAwoken;
-	}
+
 private:
 	/// Initialize the view element
 	/// \post m_isInitialized is set to true
@@ -89,18 +84,9 @@ private:
 			return false;
 		}
 	}
-	/// Wake up the view element
-	/// \post m_isAwoken is set to true
-	virtual bool doWakeUp()
-	{
-		m_isAwoken = true;
-		return true;
-	}
 
 	/// Whether the view has been initialized
 	bool m_isInitialized;
-	/// Whether the view has been awoken
-	bool m_isAwoken;
 };
 
 /// View class for testing adding a non-MockView
@@ -203,7 +189,6 @@ TEST(ViewElementTests, StartUpTest)
 
 	/// Check that the view element was initialized and awoken
 	EXPECT_TRUE(viewElement->isInitialized());
-	EXPECT_TRUE(viewElement->isAwoken());
 	EXPECT_TRUE(viewElement->getMockView()->isInitialized());
 	EXPECT_TRUE(viewElement->getMockView()->isAwoken());
 }
