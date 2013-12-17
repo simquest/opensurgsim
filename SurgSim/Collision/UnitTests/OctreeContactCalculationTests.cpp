@@ -23,6 +23,7 @@
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::OctreeNode;
 using SurgSim::Math::CapsuleShape;
@@ -32,8 +33,10 @@ using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Math::OctreeShape;
 using SurgSim::Math::OctreePath;
 using SurgSim::Math::PlaneShape;
+using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -46,11 +49,11 @@ struct OctreeData
 };
 
 std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
-		const SurgSim::Math::Quaterniond& octreeQuat,
-		const SurgSim::Math::Vector3d& octreeTrans,
+		const Quaterniond& octreeQuat,
+		const Vector3d& octreeTrans,
 		std::shared_ptr<Shape> shape,
-		const SurgSim::Math::Quaterniond& shapeQuat,
-		const SurgSim::Math::Vector3d& shapeTrans,
+		const Quaterniond& shapeQuat,
+		const Vector3d& shapeTrans,
 		ContactCalculation& calculator)
 {
 	std::shared_ptr<Representation> octreeRep = std::make_shared<ShapeCollisionRepresentation>(

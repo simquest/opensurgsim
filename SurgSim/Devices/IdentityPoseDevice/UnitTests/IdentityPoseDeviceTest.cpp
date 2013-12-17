@@ -19,12 +19,12 @@
 #include <memory>
 #include <string>
 #include <gtest/gtest.h>
-#include <SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::DataGroup;

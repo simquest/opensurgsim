@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 #define SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Framework/Behavior.h>
+#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {

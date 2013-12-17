@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_GEOMETRY_H
 #define SURGSIM_MATH_GEOMETRY_H
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -362,6 +362,8 @@ T distanceLineLine(
 /// \param s1v0, s1v1	Segment 1 Extremities.
 /// \param [out] pt0	Closest point on segment 0
 /// \param [out] pt1	Closest point on segment 1
+/// \param [out] s0t	Abscissa at the point of intersection on Segment 0 (s0v0 + t * (s0v1 - s0v0)).
+/// \param [out] s1t	Abscissa at the point of intersection on Segment 0 (s1v0 + t * (s1v1 - s1v0)).
 /// \return Distance between the segments, i.e. (pt0 - pt1).norm()
 template <class T, int MOpt>
 T distanceSegmentSegment(
@@ -370,7 +372,9 @@ T distanceSegmentSegment(
 	const Eigen::Matrix<T, 3, 1, MOpt>& s1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& s1v1,
 	Eigen::Matrix<T, 3, 1, MOpt>* pt0,
-	Eigen::Matrix<T, 3, 1, MOpt>* pt1)
+	Eigen::Matrix<T, 3, 1, MOpt>* pt1,
+	T *s0t = nullptr,
+	T *s1t = nullptr)
 {
 	// Based on the outline of http://www.geometrictools.com/Distance.html, also refer to
 	// http://geomalgorithms.com/a07-_distance.html for a geometric interpretation
@@ -692,6 +696,11 @@ T distanceSegmentSegment(
 	}
 	*pt0 = s0v0 + s * (s0v01);
 	*pt1 = s1v0 + t * (s1v01);
+	if (s0t != nullptr && s1t != nullptr)
+	{
+		*s0t = s;
+		*s1t = t;
+	}
 	return ((*pt1)-(*pt0)).norm();
 }
 
@@ -1491,6 +1500,297 @@ void intersectionsSegmentBox(
 	}
 }
 
+
+/// Check for contact between two triangles.
+/// The collision volumes are considered to be the volume swept by the triangles
+/// along the negative triangle normal. If any edge of triangle0 pass through
+/// triangle1 or vice versa, the minimum displacement applied along the (chosen)
+/// triangle normal to remove the penetration, is the contact info.
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param [out] depth The depth of penetration.
+/// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
+/// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
+/// \param [out] normal The contact normal that points from triangle0 to triangle1.
+/// \return True, if intersection is detected. False, otherwise.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved
+/// by (nomal*depth*0.5), the triangle will no longer be intersecting.
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	T *depth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* normal)
+{
+	// - Let A and B be the two triangles.
+	// - Let vA([0],[1],[2]) and vB([0],[1],[2]) be vertices of A and B.
+	// - Let nA, nB be the normals of A and B respectively.
+	// - Let dA, dB be the distance of the planes of A and B from origin.
+
+	// Steps:
+	// 1) Find signedDFromPlaneB([0],[1],[2]) by calculating (vA[0].nB + dB, vA[1].nB + dB, vA[2].nB + dB).
+	// 2) Depending on the sign of signedDFromPlaneB, the vertex can be classified as UnderPlaneB, OnPlaneB
+	//    or AbovePlaneB.
+	// 3) Every edge, from vertex UnderPlaneB to vertex OnPlaneB/AbovePlaneB, is projected onto the PlaneB
+	//    and checked, to determine if there is any intersection with TriangleB.
+	// 4) In case of intersection, the minimum distance by which the point on the edge needs to be moved
+	//    along nB, to bring the edge above B is calculated. It is the penetration depth. And the
+	//    corresponding points are penetration points.
+	// 5) Do step 1 to 4 for the other triangle and find the penetration depth.
+	// 6) The contact having the lower of the two penetration depths is returned.
+
+	// For these variables, <var-name>[0] is the first triangle and <var-name>[1] is the second triangle.
+	const Eigen::Matrix<T, 3, 1, MOpt> *v[2][3] = {{&t0v0, &t0v1, &t0v2}, {&t1v0, &t1v1, &t1v2}};
+	Eigen::Matrix<T, 3, 1, MOpt> n[2];
+	T d[2];
+	T signedDFromPlaneB[2][3];
+	std::vector<unsigned int> underPlaneB[2];
+	std::vector<unsigned int> onOrAbovePlaneB[2];
+	std::vector<bool> abovePlaneBFlag[2];
+
+	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
+	{
+		// Calculate normal.
+		n[B] = (*v[B][1] - *v[B][0]).cross(*v[B][2] - *v[B][0]);
+
+		// Check for degenerate triangle.
+		if (n[B].isZero())
+		{
+			return false;
+		}
+
+		// Normalize the normal.
+		n[B].normalize();
+
+		// Calculate distance of plane of B from origin.
+		d[B] = -v[B][0]->dot(n[B]);
+
+		// Calculate signedDFromPlaneB and place the index into appropriate under/onOrAbove PlaneB list.
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			signedDFromPlaneB[A][i] = n[B].dot(*v[A][i]) + d[B];
+
+			if (signedDFromPlaneB[A][i] < -Geometry::DistanceEpsilon)
+			{
+				underPlaneB[A].push_back(i);
+			}
+			else
+			{
+				abovePlaneBFlag[A].push_back(signedDFromPlaneB[A][i] > Geometry::DistanceEpsilon);
+				onOrAbovePlaneB[A].push_back(i);
+			}
+		}
+
+		if (underPlaneB[A].size() == 0 || underPlaneB[A].size() == 3)
+		{
+			return false;
+		}
+	}
+
+	// Contact info.
+	bool contactFound[2] = {false, false};
+	T penetrationDepth[2] = {T(0), T(0)};
+	Eigen::Matrix<T, 3, 1, MOpt> penetrationPoint[2][2];
+
+	// Temporary variables used later on.
+	Eigen::Matrix<T, 3, 1, MOpt> edgeStart, edgeEnd;
+	Eigen::Matrix<T, 3, 1, MOpt> baryEdgeStart, baryEdgeEnd;
+	Eigen::Matrix<T, 3, 1, MOpt> edgeStartOnPlaneB;
+	Eigen::Matrix<T, 3, 1, MOpt> edgeIntersectionOnPlaneB;
+	T edgeIntersectionOnPlaneBParam[2] = {T(0), T(0)};
+	T tempDepth = T(0);
+
+	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
+	{
+		if (underPlaneB[A].size() == 2 &&
+			(std::abs(signedDFromPlaneB[A][underPlaneB[A][0]]) - std::abs(signedDFromPlaneB[A][underPlaneB[A][1]]))
+				> Geometry::DistanceEpsilon)
+		{
+			// If there are 2 vertices under the planeB, we process the vertex closer to PlaneB first.
+			std::swap(underPlaneB[A][0], underPlaneB[A][1]);
+			// The two underPlaneB[A] vertices must be ordered this way because the algorithm would fail
+			// to test the edge between these two underPlaneB[A] vertices if:
+			// a) the farther vertex from PlaneB was processed first and did not have an intersection, and
+			// b) the closer vertex to PlaneB was processed second and intersected.
+		}
+
+		// Now, the only edges of interest in A are the ones going from underPlaneB
+		// to either onOrAbovePlaneB or underPlaneB (only in a specific case).
+		for (auto edgeStartVertexId = underPlaneB[A].begin();
+			 edgeStartVertexId != underPlaneB[A].end();
+			 ++edgeStartVertexId)
+		{
+			// Early rejection: If the possible penetration depth for this vertex is not greater than already
+			// calculated penetration depth for this triangle, there is no need to further evaluate.
+			if ((std::abs(signedDFromPlaneB[A][*edgeStartVertexId]) - penetrationDepth[A])
+					< Geometry::DistanceEpsilon)
+			{
+				continue;
+			}
+
+			edgeStart = *v[A][*edgeStartVertexId];
+
+			auto edgeEndAbovePlaneBFlag = abovePlaneBFlag[A].begin();
+			for (auto edgeEndVertexId = onOrAbovePlaneB[A].begin();
+				 edgeEndVertexId != onOrAbovePlaneB[A].end();
+				 ++edgeEndVertexId, ++edgeEndAbovePlaneBFlag)
+			{
+				edgeEnd = *v[A][*edgeEndVertexId];
+
+				if (*edgeEndAbovePlaneBFlag)
+				{
+					// In the case of edgeEndAbovePlaneBFlag, the edge can be pruned,
+					// so that the "Above" vertex is trimmed to be "On" the plane of B.
+					edgeEnd = edgeStart + (edgeEnd - edgeStart) *
+										  ((-d[B] - edgeStart.dot(n[B])) / (edgeEnd - edgeStart).dot(n[B]));
+				}
+
+				// Find the barycentric coordinates of edgeEnd in B.
+				barycentricCoordinates(edgeEnd, *v[B][0], *v[B][1], *v[B][2], n[B], &baryEdgeEnd);
+
+				// This flag indicates three things.
+				// - There are two vertices underPlaneB.
+				// - The first (less deeper) vertex was processed and found to have yielded a contact.
+				// - The second (deeper) vertex, when projected onto the plane B, is outside the triangle B.
+				// This means that the edge between the two vertices is checked to see if it is in the
+				// collision volume of triangle B.
+				bool processingEdgeBetweenTwoUnderPlaneBVertices = false;
+
+				// Check if edgeEnd is inside B.
+				if (baryEdgeEnd[0] >= 0.0 && baryEdgeEnd[1] >= 0.0 && baryEdgeEnd[2] >= 0.0)
+				{
+					processingEdgeBetweenTwoUnderPlaneBVertices = false;
+				}
+				else if (underPlaneB[A].size() == 2 && contactFound[A])
+				{
+					processingEdgeBetweenTwoUnderPlaneBVertices = true;				
+				}
+				else
+				{
+					continue;
+				}
+
+				// Find the projection of edgeStart on plane B.
+				edgeStartOnPlaneB = edgeStart - n[B] * signedDFromPlaneB[A][*edgeStartVertexId];
+
+				// Find if edgeStartOnPlaneB is inside B.
+				barycentricCoordinates(edgeStartOnPlaneB, *v[B][0], *v[B][1], *v[B][2], n[B], &baryEdgeStart);
+
+				if (baryEdgeStart[0] >= 0.0 && baryEdgeStart[1] >= 0.0 && baryEdgeStart[2] >= 0.0)
+				{
+					// The fromOnOtherPlaneB is inside the other triangle.
+					penetrationDepth[A] = std::abs(signedDFromPlaneB[A][*edgeStartVertexId]);
+					penetrationPoint[A][A] = edgeStart;
+					penetrationPoint[A][B] = edgeStartOnPlaneB;
+					contactFound[A] = true;
+				}
+				else
+				{
+					if (processingEdgeBetweenTwoUnderPlaneBVertices)
+					{
+						// The "FirstVertex" projected on PlaneB.
+						edgeEnd = *v[A][underPlaneB[A][0]] - n[B] * signedDFromPlaneB[A][underPlaneB[A][0]];
+					}
+
+					// The points edgeStartOnPlaneB and edgeEnd are lying on plane B.
+					// The edgeStartOnPlaneB is outside triangle B.
+					// They possibly intersect the edge of B whose baryEdgeStart coords is < 0.
+					// Find the point of intersection.
+					for (unsigned int b = 0; b < 3; ++b)
+					{
+						if (baryEdgeStart[b] > T(0))
+						{
+							continue;
+						}
+
+						if (std::abs(distanceSegmentSegment(edgeEnd, edgeStartOnPlaneB, *v[B][(b+1)%3], *v[B][(b+2)%3],
+															&edgeIntersectionOnPlaneB,
+															&edgeIntersectionOnPlaneB,
+															&edgeIntersectionOnPlaneBParam[0],
+															&edgeIntersectionOnPlaneBParam[1]))
+																< Geometry::DistanceEpsilon)
+						{
+							if (edgeIntersectionOnPlaneBParam[0] > -Geometry::DistanceEpsilon &&
+								edgeIntersectionOnPlaneBParam[0] < (T(1) + Geometry::DistanceEpsilon) &&
+								edgeIntersectionOnPlaneBParam[1] > -Geometry::DistanceEpsilon &&
+								edgeIntersectionOnPlaneBParam[1] < (T(1) + Geometry::DistanceEpsilon))
+							{
+								tempDepth = edgeIntersectionOnPlaneBParam[0] *
+									std::abs(signedDFromPlaneB[A][*edgeStartVertexId]);
+
+								if (processingEdgeBetweenTwoUnderPlaneBVertices)
+								{
+									tempDepth += (T(1) - edgeIntersectionOnPlaneBParam[0]) *
+										std::abs(signedDFromPlaneB[A][underPlaneB[A][0]]);
+								}
+
+								if (tempDepth > penetrationDepth[A])
+								{
+									penetrationDepth[A] = tempDepth;
+									penetrationPoint[A][B] = edgeIntersectionOnPlaneB;
+
+									if (processingEdgeBetweenTwoUnderPlaneBVertices)
+									{
+										penetrationPoint[A][A] = edgeStart + (*v[A][underPlaneB[A][0]] - edgeStart) *
+																 (T(1) - edgeIntersectionOnPlaneBParam[0]);
+									}
+									else
+									{
+										penetrationPoint[A][A] = edgeStart + (edgeEnd - edgeStart) *
+																 (T(1) - edgeIntersectionOnPlaneBParam[0]);
+									}
+
+									contactFound[A] = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// We may have found the penetrationDepth along both triangle normals.
+	// Choose the one that is smaller.
+	if (contactFound[0] || contactFound[1])
+	{
+		bool useFirstTriangle = contactFound[0];
+
+		if (contactFound[0] && contactFound[1])
+		{
+			useFirstTriangle = penetrationDepth[0] < penetrationDepth[1];
+		}
+
+		if (useFirstTriangle)
+		{
+			*depth = penetrationDepth[0];
+			*normal = n[1];
+			*penetrationPoint0 = penetrationPoint[0][0];
+			*penetrationPoint1 = penetrationPoint[0][1];
+		}
+		else
+		{
+			*depth = penetrationDepth[1];
+			*normal = -n[0];
+			*penetrationPoint0 = penetrationPoint[1][0];
+			*penetrationPoint1 = penetrationPoint[1][1];
+		}
+
+		return true;
+	}
+
+	return false;
+}
 
 }; // namespace Math
 }; // namespace SurgSim

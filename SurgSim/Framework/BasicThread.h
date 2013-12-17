@@ -22,7 +22,7 @@
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 
-#include <SurgSim/Framework/Barrier.h>
+#include "SurgSim/Framework/Barrier.h"
 
 namespace SurgSim
 {

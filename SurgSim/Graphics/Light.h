@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_LIGHT_H
 #define SURGSIM_GRAPHICS_LIGHT_H
 
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

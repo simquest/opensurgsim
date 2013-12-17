@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include <SurgSim/Graphics/OsgLog.h>
-#include <SurgSim/Graphics/UnitTests/MockOsgObjects.h>
+#include "SurgSim/Graphics/OsgLog.h"
+#include "SurgSim/Graphics/UnitTests/MockOsgObjects.h"
 
 TEST(OsgLogTests, MessageTest)
 {

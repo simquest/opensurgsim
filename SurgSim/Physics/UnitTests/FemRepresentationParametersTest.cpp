@@ -17,7 +17,7 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/FemRepresentationParameters.h>
+#include "SurgSim/Physics/FemRepresentationParameters.h"
 
 namespace
 {

@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_AXESREPRESENTATION_H
 #define SURGSIM_GRAPHICS_AXESREPRESENTATION_H
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
 namespace SurgSim
 {

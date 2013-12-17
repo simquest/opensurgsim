@@ -70,7 +70,7 @@ private:
 };
 };
 
-#include <SurgSim/Collision/OctreeDcdContact-inl.h>
+#include "SurgSim/Collision/OctreeDcdContact-inl.h"
 
 
 #endif // SURGSIM_COLLISION_OCTREEDCDCONTACT_H

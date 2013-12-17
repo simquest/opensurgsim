@@ -19,10 +19,8 @@
 #include <array>
 #include <vector>
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
-#include <SurgSim/Physics/DeformableRepresentationState.h>
-
-using SurgSim::Physics::DeformableRepresentationState;
+#include "SurgSim/Physics/MassSpringRepresentation.h"
+#include "SurgSim/Physics/DeformableRepresentationState.h"
 
 namespace SurgSim
 {
@@ -74,25 +72,25 @@ private:
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DStretchingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init3DStretchingSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all bending springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DBendingSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init3DBendingSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all face diagonal springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DFaceDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init3DFaceDiagonalSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[3], double stiffness, double damping);
 	/// Helper method to initialize/add all volume diagonal springs on a 3D structure
 	/// \param state The state to initialize the springs with (rest lengths calculation)
 	/// \param numNodesPerDim The number of nodes on the 3 dimensions
 	/// \param stiffness, damping The spring parameters
-	void init3DVolumeDiagonalSprings(const std::shared_ptr<DeformableRepresentationState> state,
+	void init3DVolumeDiagonalSprings(const std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state,
 		unsigned int numNodesPerDim[3], double stiffness, double damping);
 };
 

@@ -22,8 +22,8 @@
 #include <Eigen/LU>
 #include <Eigen/Dense>
 
-#include <SurgSim/Math/Valid.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Math/Valid.h"
+#include "SurgSim/Framework/Assert.h"
 
 
 namespace SurgSim

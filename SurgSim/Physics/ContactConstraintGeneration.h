@@ -17,12 +17,12 @@
 #define SURGSIM_PHYSICS_CONTACTCONSTRAINTGENERATION_H
 
 #include  <memory>
-#include <SurgSim/Framework/SharedInstance.h>
-#include <SurgSim/Physics/Computation.h>
-#include <SurgSim/Physics/ConstraintImplementationFactory.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Collision/Location.h>
-#include <SurgSim/Collision/Representation.h>
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Physics/Computation.h"
+#include "SurgSim/Physics/ConstraintImplementationFactory.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Collision/Representation.h"
 
 
 namespace SurgSim

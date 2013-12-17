@@ -29,7 +29,7 @@
 #include <string>
 #include <stdexcept>
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

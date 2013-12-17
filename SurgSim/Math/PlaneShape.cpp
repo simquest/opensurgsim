@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Math/PlaneShape.h>
+#include "SurgSim/Math/PlaneShape.h"
 
 namespace SurgSim
 {
@@ -29,19 +29,19 @@ int PlaneShape::getType()
 	return SHAPE_TYPE_PLANE;
 }
 
-double PlaneShape::calculateVolume() const
+double PlaneShape::getVolume() const
 {
 	return 0.0;
 }
 
-SurgSim::Math::Vector3d PlaneShape::calculateMassCenter() const
+SurgSim::Math::Vector3d PlaneShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d PlaneShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d PlaneShape::getSecondMomentOfVolume() const
 {
-	return Matrix33d::Identity();
+	return Matrix33d::Zero();
 }
 
 double PlaneShape::getD() const

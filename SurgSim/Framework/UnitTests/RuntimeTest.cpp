@@ -14,9 +14,9 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
 #include "MockObjects.h"  //NOLINT
 
 using SurgSim::Framework::Runtime;

@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Framework/Runtime.h> //< Used to initialize the Component Fem3DRepresentation
+#include "SurgSim/Framework/Runtime.h" //< Used to initialize the Component Fem3DRepresentation
 
-#include <SurgSim/Physics/UnitTests/MockObjects.h>
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
@@ -154,32 +154,32 @@ TEST_F(FemRepresentationTests, InitializeTest)
 		std::make_shared<DeformableRepresentationState>();
 	initialState->setNumDof(fem.getNumDofPerNode(), 8);
 
-	std::shared_ptr<DeformableRepresentationState> state =
-		std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<SurgSim::Physics::DeformableRepresentationState> state =
+		std::make_shared<SurgSim::Physics::DeformableRepresentationState>();
 	state->setNumDof(fem.getNumDofPerNode(), 4);
 
 	// Initial state not setup yet for the fem + Initialize not called
-	ASSERT_ANY_THROW({Vector F = fem.computeF(*state);});
+	ASSERT_ANY_THROW({SurgSim::Math::Vector F = fem.computeF(*state);});
 
 	std::shared_ptr<MockFemElement> element = std::make_shared<MockFemElement>();
 	element->setMassDensity(m_rho);
 	element->setPoissonRatio(m_nu);
 	element->setYoungModulus(m_E);
 	fem.addFemElement(element);
-	ASSERT_ANY_THROW({Vector F = fem.computeF(*state);});
+	ASSERT_ANY_THROW({SurgSim::Math::Vector F = fem.computeF(*state);});
 
 	fem.setInitialState(initialState);
 	// Initial state setup (and we even have 1 FemElement) BUT Initialize not called yet
 	// Note as well that the number of nodes don't match between initialState and state
-	ASSERT_ANY_THROW({Vector F = fem.computeF(*state);});
+	ASSERT_ANY_THROW({SurgSim::Math::Vector F = fem.computeF(*state);});
 
 	fem.initialize(std::make_shared<Runtime>());
 	// Initial state setup (and we even have 1 FemElement) + Initialize called
 	// BUTE note as well that the number of nodes don't match between initialState and state
-	ASSERT_ANY_THROW({Vector F = fem.computeF(*state);});
+	ASSERT_ANY_THROW({SurgSim::Math::Vector F = fem.computeF(*state);});
 
 	// Initial state setup (and we even have 1 FemElement) + Initialize called
-	ASSERT_NO_THROW({Vector F = fem.computeF(*initialState);});
+	ASSERT_NO_THROW({SurgSim::Math::Vector F = fem.computeF(*initialState);});
 }
 
 } // namespace Physics

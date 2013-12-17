@@ -13,18 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/BoxCapsuleDcdContact.h>
-
 #include <Eigen/Core>
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Math/Geometry.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/BoxShape.h>
-#include <SurgSim/Math/CapsuleShape.h>
+#include "SurgSim/Collision/BoxCapsuleDcdContact.h"
+#include "SurgSim/Collision/CollisionPair.h"
+
+#include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/CapsuleShape.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::Vector3d;
 using SurgSim::Math::distancePointSegment;
 using SurgSim::Math::intersectionsSegmentBox;
 using SurgSim::Math::Geometry::DistanceEpsilon;

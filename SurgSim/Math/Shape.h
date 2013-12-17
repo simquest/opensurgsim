@@ -16,10 +16,10 @@
 #ifndef SURGSIM_MATH_SHAPE_H
 #define SURGSIM_MATH_SHAPE_H
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
 
-#include <SurgSim/Serialize/Convert.h>
+#include "SurgSim/Serialize/Convert.h"
 
 namespace SurgSim
 {
@@ -61,26 +61,18 @@ public:
 	/// \return the type of shape
 	virtual int getType() = 0;
 
-	/// Calculate the volume of the shape
+	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
-	virtual double calculateVolume() const = 0;
+	virtual double getVolume() const = 0;
 
-	/// Calculate the mass of the shape
-	/// \param rho The mass density (in Kg.m-3)
-	/// \return The mass of the shape
-	virtual double calculateMass(double rho) const
-	{
-		return calculateVolume() * rho;
-	}
+	/// Get the volumetric center of the shape
+	/// \return The center of the shape
+	virtual Vector3d getCenter() const = 0;
 
-	/// Calculate the mass center of the shape
-	/// \return The mass center of the shape
-	virtual Vector3d calculateMassCenter() const = 0;
-
-	/// Calculate the inertia of the shape
-	/// \param rho The mass density (in Kg.m-3)
-	/// \return The 3x3 symmetric inertia matrix of the shape
-	virtual Matrix33d calculateInertia(double rho) const = 0;
+	/// Get the second central moment of the volume, commonly used
+	/// to calculate the moment of inertia matrix
+	/// \return The 3x3 symmetric second moment matrix
+	virtual Matrix33d getSecondMomentOfVolume() const = 0;
 
 	/// Store data of RigidShape
 	virtual YAML::Node encode();

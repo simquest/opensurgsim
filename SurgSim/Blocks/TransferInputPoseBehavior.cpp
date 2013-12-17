@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Blocks/TransferInputPoseBehavior.h>
+#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Input/InputComponent.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::RigidTransform3d;
 

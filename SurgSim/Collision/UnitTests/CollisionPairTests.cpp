@@ -15,17 +15,17 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Collision/UnitTests/RepresentationUtilities.h>
+#include "SurgSim/Collision/UnitTests/RepresentationUtilities.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include <SurgSim/Physics/RigidRepresentationState.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Collision/Representation.h>
-#include <SurgSim/Collision/ContactCalculation.h>
-#include <SurgSim/Collision/CollisionPair.h>
+#include "SurgSim/Physics/RigidRepresentationState.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/CollisionPair.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;

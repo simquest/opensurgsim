@@ -18,11 +18,11 @@
 
 #include <string>
 
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
-#include <SurgSim/Framework/LockedContainer.h>
+#include "SurgSim/Framework/LockedContainer.h"
 
 
 /// A simple listener to calculate collision force against a square area for the example application.

@@ -16,24 +16,24 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h>
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/Fem3DRepresentation.h>
-#include <SurgSim/Physics/FemElement3DTetrahedron.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemElement3DTetrahedron.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
@@ -90,7 +90,7 @@ namespace
 	{
 		std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
 		restState->setNumDof((*physicsRepresentation)->getNumDofPerNode(), 8);
-		Vector& x = restState->getPositions();
+		SurgSim::Math::Vector& x = restState->getPositions();
 
 		// Sets the initial state (node positions and boundary conditions)
 		for (int nodeId = 0; nodeId < 8; nodeId++)

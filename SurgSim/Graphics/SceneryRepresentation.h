@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_SCENERYREPRESENTATION_H
 #define SURGSIM_GRAPHICS_SCENERYREPRESENTATION_H
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
 #include <string>
 

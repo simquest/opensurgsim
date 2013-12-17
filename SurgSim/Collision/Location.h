@@ -18,9 +18,9 @@
 
 #include <vector>
 
-#include <SurgSim/DataStructures/OptionalValue.h>
-#include <SurgSim/Math/OctreeShape.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/OctreeShape.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

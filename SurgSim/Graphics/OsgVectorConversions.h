@@ -19,7 +19,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGVECTORCONVERSIONS_H
 #define SURGSIM_GRAPHICS_OSGVECTORCONVERSIONS_H
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <osg/Vec2f>
 #include <osg/Vec2d>

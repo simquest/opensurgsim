@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_OCTREESHAPE_INL_H
 #define SURGSIM_MATH_OCTREESHAPE_INL_H
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
@@ -42,29 +42,22 @@ int OctreeShape<Data>::getType()
 }
 
 template<class Data>
-double OctreeShape<Data>::calculateVolume() const
+double OctreeShape<Data>::getVolume() const
 {
-	SURGSIM_FAILURE() << "OctreeShape::calculateVolume not implemented";
+	SURGSIM_FAILURE() << "OctreeShape::getVolume not implemented";
 	return 0.0;
 }
 
 template<class Data>
-double OctreeShape<Data>::calculateMass(double rho) const
-{
-	SURGSIM_FAILURE() << "OctreeShape::calculateMass not implemented";
-	return 0.0;
-}
-
-template<class Data>
-Vector3d OctreeShape<Data>::calculateMassCenter() const
+Vector3d OctreeShape<Data>::getCenter() const
 {
 	return Vector3d::Zero();
 }
 
 template<class Data>
-Matrix33d OctreeShape<Data>::calculateInertia(double rho) const
+Matrix33d OctreeShape<Data>::getSecondMomentOfVolume() const
 {
-	SURGSIM_FAILURE() << "OctreeShape::calculateInertia not implemented";
+	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentOfVolume not implemented";
 	return Matrix33d::Zero();
 }
 

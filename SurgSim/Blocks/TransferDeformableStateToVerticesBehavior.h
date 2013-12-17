@@ -16,7 +16,7 @@
 #ifndef SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_H
 #define SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_H
 
-#include <SurgSim/Framework/Behavior.h>
+#include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
 {
@@ -77,6 +77,6 @@ private:
 
 };  // namespace SurgSim
 
-#include <SurgSim/Blocks/TransferDeformableStateToVerticesBehavior-inl.h>
+#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior-inl.h"
 
 #endif  // SURGSIM_BLOCKS_TRANSFERDEFORMABLESTATETOVERTICESBEHAVIOR_H

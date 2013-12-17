@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGMANAGER_H
 #define SURGSIM_GRAPHICS_OSGMANAGER_H
 
-#include <SurgSim/Graphics/Manager.h>
+#include "SurgSim/Graphics/Manager.h"
 
 #include <memory>
 

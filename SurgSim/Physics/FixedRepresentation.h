@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATION_H
 
-#include <SurgSim/Physics/RigidRepresentationBase.h>
-#include <SurgSim/Physics/RigidRepresentationBaseState.h>
+#include "SurgSim/Physics/RigidRepresentationBase.h"
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 
 namespace SurgSim
 {
