@@ -37,7 +37,7 @@ public:
 
 	/// Constructor.
 	/// \param calculator The contact calculator to use on each octree node
-	OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator);
+	explicit OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator);
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return A pair of shape type ids
