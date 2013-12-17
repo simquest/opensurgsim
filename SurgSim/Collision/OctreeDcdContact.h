@@ -49,6 +49,10 @@ private:
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
 
 	/// Calculate the collision between a specific octree node and a shape
+	/// This function will check for contact between the node and shape. If
+	/// contact is found, this function will be called on each of the
+	/// node's children. Once a leaf node is reached, contacts are added to the
+	/// CollisionPair.
 	/// \param node the octree node to collide with
 	/// \param pair the collision pair that is under consideration
 	/// \param nodePath the path of the current node

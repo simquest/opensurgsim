@@ -81,8 +81,10 @@ bool nodeInContacts(const std::string& name, const std::list<std::shared_ptr<Con
 
 std::shared_ptr<OctreeShape<OctreeData>> buildTestOctree()
 {
-	const int numLevels = 4;
+	// To keep things simple, create an 4 level octree with leaf nodes of size 1x1x1.
+	// As a result, the root bounding box is 2^4 x 2^4 x 2^4, or 16x16x16
 	Eigen::AlignedBox<double, 3> boundingBox;
+	const int numLevels = 4;
 	boundingBox.min() = Vector3d::Zero();
 	boundingBox.max() = Vector3d::Ones() * pow(2.0, numLevels);
 	std::shared_ptr<OctreeNode<OctreeData> > rootNode = std::make_shared<OctreeNode<OctreeData> >(boundingBox);
