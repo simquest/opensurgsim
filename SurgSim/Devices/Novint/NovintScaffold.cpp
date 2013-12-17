@@ -87,11 +87,13 @@ public:
 
 		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
 		std::string hdalName = initializationName;
+		const char* hdalNameCharPointer = hdalName.c_str();
 		if (hdalName.length() == 0)
 		{
 			hdalName = "Default Falcon";
+			hdalNameCharPointer = nullptr; // This is how the HDAL API initializes default Falcon.
 		}
-		deviceHandle = hdlInitNamedDevice(hdalName.c_str());
+		deviceHandle = hdlInitNamedDevice(hdalNameCharPointer);
 
 		if (m_scaffold->checkForFatalError("Failed to initialize"))
 		{
