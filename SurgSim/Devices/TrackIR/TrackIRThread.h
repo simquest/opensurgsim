@@ -17,16 +17,15 @@
 #define SURGSIM_DEVICES_TRACKIR_TRACKIRTHREAD_H
 
 #include <memory>
-#include <string>
 
 #include "SurgSim/Framework/BasicThread.h"
-#include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
 
 namespace SurgSim
 {
 namespace Device
 {
+class TrackIRScaffold;
 
 /// A class implementing the thread context for sampling TrackIR devices.
 /// \sa SurgSim::Device::TrackIRScaffold
@@ -50,7 +49,9 @@ protected:
 	///@}
 
 private:
+	// Pointer to the scaffold which will be updated by this thread.
 	TrackIRScaffold* m_scaffold;
+	// Pointer to the DeviceData object which will be updated by the scaffold.
 	TrackIRScaffold::DeviceData* m_deviceData;
 };
 

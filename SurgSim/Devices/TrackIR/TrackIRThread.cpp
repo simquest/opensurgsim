@@ -26,7 +26,9 @@ TrackIRThread::TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceD
 	m_scaffold(scaffold),
 	m_deviceData(deviceData)
 {
-	setRate(120.0);
+	// TrackIR runs at 120FPS = 240Hz
+	// Set scaffold update rate to 60Hz/30FPS
+	setRate(60.0);
 }
 
 TrackIRThread::~TrackIRThread()
