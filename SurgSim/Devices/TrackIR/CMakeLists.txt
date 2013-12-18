@@ -43,8 +43,13 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
-	add_subdirectory(VisualTest)
+	if(GLUT_FOUND)
+		add_subdirectory(VisualTest)
+	endif(GLUT_FOUND)
 endif()
+
+# Natural Point Camera SDK needs this preprocessor definition to work properly
+add_definitions( -DCAMERALIBRARY_IMPORTS )
 
 # Put TrackIRDevice into folder "Devices"
 set_target_properties(TrackIRDevice PROPERTIES FOLDER "Devices")

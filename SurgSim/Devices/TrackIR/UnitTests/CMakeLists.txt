@@ -27,8 +27,15 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS TrackIRDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES} ${OPTITRACK_LIBRARY})
+set(LIBS ${LIBS}
+		 TrackIRDevice 
+		 SurgSimInput 
+		 SurgSimFramework 
+		 SurgSimDataStructures
+		 gtest 
+		 ${Boost_LIBRARIES} 
+		 ${OPTITRACK_LIBRARY}
+	)
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by
@@ -38,6 +45,15 @@ option(SURGSIM_TESTS_RUN_DEVICE_TRACKIR
 	OFF)
 surgsim_add_unit_tests(TrackIRDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_TRACKIR})
+	
+
+# Copy the device DLLs into the build directory
+surgsim_copy_to_target_directory_for_release(TrackIRDeviceTest
+	${OPTITRACK_SHARED_RELEASE}
+)
+surgsim_copy_to_target_directory_for_debug(TrackIRDeviceTest
+	${OPTITRACK_SHARED_DEBUG}
+)
 
 # Put TrackIRDeviceTest into folder "Devices"
 set_target_properties(TrackIRDeviceTest PROPERTIES FOLDER "Devices")

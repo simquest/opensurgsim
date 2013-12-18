@@ -28,8 +28,6 @@ set(EXAMPLE_HEADERS
 
 add_executable(TrackIRVisualTest
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
-#surgsim_show_ide_folders(
-#	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
 set(LIBS ${LIBS}
 		 TrackIRDevice
