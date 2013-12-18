@@ -161,6 +161,15 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 	}
 }
 
+template <typename T, int size, int TOpt>
+Eigen::Matrix<T, size, 1, TOpt> interpolate(
+	const Eigen::Matrix<T, size, 1, TOpt> &previous,
+	const Eigen::Matrix<T, size, 1, TOpt> &next,
+	T t)
+{
+	return previous + t * (next - previous);
+}
+
 };  // namespace Math
 };  // namespace SurgSim
 

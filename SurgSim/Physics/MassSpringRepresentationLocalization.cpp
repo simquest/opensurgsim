@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
@@ -67,7 +68,7 @@ SurgSim::Math::Vector3d MassSpringRepresentationLocalization::doCalculatePositio
 	const SurgSim::Math::Vector3d& currentPoint  = massSpringRepresentation->getCurrentState()->getPosition(m_nodeID);
 	const SurgSim::Math::Vector3d& previousPoint = massSpringRepresentation->getPreviousState()->getPosition(m_nodeID);
 
-	return previousPoint + time * (currentPoint - previousPoint);
+	return SurgSim::Math::interpolate(previousPoint, currentPoint, time);
 }
 
 bool MassSpringRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
