@@ -64,10 +64,12 @@ public:
 	void setValue(const std::string& name, const boost::any& value);
 
 	/// Check whether a property is readable
+	/// \param name Name of the property to be checked.
 	/// \return true if the property exists and has a getter
 	bool isReadable(const std::string& name) const;
 
 	/// Check whether a property is writeable
+	/// \param name Name of the property to be checked.
 	/// \return true if the property exists and has a setter
 	bool isWriteable(const std::string& name) const;
 
