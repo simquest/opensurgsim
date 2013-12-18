@@ -30,9 +30,9 @@ class TrackIRScaffold;
 /// A class implementing the communication with Natural Point TrackIR camera.
 ///
 /// \par Application input provided by the device:
-///   | type       | name              |                                                                           |
-///   | ----       | ----              | ---                                                                       |
-///   | pose       | "pose"            | %Device pose (units are meters).                                          |
+///   | type       | name              |                                        |
+///   | ----       | ----              | ---                                    |
+///   | pose       | "pose"            | %Device pose (units are meters).       |
 ///
 /// \par Application output used by the device: none.
 ///

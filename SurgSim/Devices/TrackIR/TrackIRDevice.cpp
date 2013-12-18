@@ -36,6 +36,7 @@ TrackIRDevice::~TrackIRDevice()
 	}
 }
 
+
 bool TrackIRDevice::initialize()
 {
 	SURGSIM_ASSERT(! isInitialized());
@@ -76,7 +77,6 @@ void TrackIRDevice::setPositionScale(double scale)
 	}
 }
 
-
 double TrackIRDevice::getPositionScale() const
 {
 	return m_positionScale;
@@ -92,22 +92,21 @@ void TrackIRDevice::setOrientationScale(double scale)
 	}
 }
 
-
 double TrackIRDevice::getOrientationScale() const
 {
 	return m_orientationScale;
 }
 
+
 double TrackIRDevice::defaultPositionScale()
 {
-	return 0.05;
+	return 0.02;
 }
 
 double TrackIRDevice::defaultOrientationScale()
 {
-	return 0.05;
+	return 0.02;
 }
-
 
 };  // namespace Device
 };  // namespace SurgSim
