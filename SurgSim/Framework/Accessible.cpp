@@ -59,5 +59,15 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 	setSetter(name, setter);
 }
 
+bool Accessible::isReadable(const std::string& name) const
+{
+	return (m_getters.cend() != m_getters.find(name));
+}
+
+bool Accessible::isWriteable(const std::string& name) const
+{
+	return (m_setters.cend() != m_setters.find(name));
+}
+
 }; // Framework
 }; // SurgSim

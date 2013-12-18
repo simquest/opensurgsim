@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_ACCESSIBLE_H
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 #include <functional>
 #include <boost/any.hpp>
@@ -48,7 +49,6 @@ public:
 	/// 		if it was not found.
 	boost::any getValue(const std::string& name);
 
-
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
 	/// the type of the output parameter.
 	/// \tparam T	the type of the property, usually can be deduced automatically
@@ -62,6 +62,16 @@ public:
 	/// \param	name 	The name of the property.
 	/// \param	value	The value that it should be set to.
 	void setValue(const std::string& name, const boost::any& value);
+
+	/// Check whether a property is readable
+	/// \param name Name of the property to be checked.
+	/// \return true if the property exists and has a getter
+	bool isReadable(const std::string& name) const;
+
+	/// Check whether a property is writeable
+	/// \param name Name of the property to be checked.
+	/// \return true if the property exists and has a setter
+	bool isWriteable(const std::string& name) const;
 
 	/// Sets a getter for a given property.
 	/// \param	name	The name of the property.
@@ -84,6 +94,12 @@ private:
 
 	std::unordered_map<std::string, GetterType > m_getters;
 	std::unordered_map<std::string, SetterType > m_setters;
+};
+
+struct Property
+{
+	std::weak_ptr<Accessible> accessible;
+	std::string name;
 };
 
 #define SURGSIM_ADD_RW_PROPERTY(class, type, property, getter, setter) \
