@@ -84,11 +84,6 @@ private:
 	/// Sets the orientation scale for the device.
 	void setOrientationScale(const TrackIRDevice* device, double scale);
 
-	/// Updates the device information for a single device.
-	/// \param info	The device data.
-	/// \return	true on success.
-	bool updateDevice(DeviceData* info);
-
 	/// Initializes the OptiTrack SDK.
 	/// \return true on success.
 	bool initializeSdk();
@@ -96,10 +91,10 @@ private:
 	/// \return true on success.
 	bool finalizeSdk();
 
-	/// Starts the camera, it will start to sending frames.
+	/// Start the camera, it will start to sending frames.
 	/// \return	true on success.
 	bool startCamera();
-	/// Stops the camera.
+	/// Stop the camera.
 	/// \return	true on success.
 	bool stopCamera();
 
@@ -109,10 +104,17 @@ private:
 	/// \return true on success.
 	bool runInputFrame(DeviceData* info);
 
-	/// Creates the input loop thread.
+	/// Updates the device information for a single device.
+	/// \param info	The device data.
+	/// \return	true on success.
+	bool updateDevice(DeviceData* info);
+
+	/// Creates a thread for the given DeviceData object
+	/// \param data A DeviceData object
 	/// \return true on success.
 	bool createPerDeviceThread(DeviceData* data);
-	/// Destroys the input loop thread.
+	/// Destroys the thread associated with the given DeviceData object
+	/// \param data A DeviceData object
 	/// \return true on success.
 	bool destroyPerDeviceThread(DeviceData* data);
 
@@ -121,11 +123,12 @@ private:
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
-	/// Internal scaffold state.
-	std::unique_ptr<StateData> m_state;
 
 	/// The default logging level.
 	static SurgSim::Framework::LogLevel m_defaultLogLevel;
+
+	/// Internal scaffold state.
+	std::unique_ptr<StateData> m_state;
 };
 
 };  // namespace Device
