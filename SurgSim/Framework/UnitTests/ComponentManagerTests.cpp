@@ -155,8 +155,8 @@ TEST(ComponentManagerTests, TypeTest)
 	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_NONE, manager.getType());
 }
 
-// Specific component manager to expose a bug where sceneelements added during initiialization of
-// the ComponentManagers are not initizialized themselves
+// Specific component manager to expose a bug where sceneelements added during initialization of
+// the ComponentManagers are not initialized themselves
 class InitializationBugManager : public ComponentManager
 {
 public:

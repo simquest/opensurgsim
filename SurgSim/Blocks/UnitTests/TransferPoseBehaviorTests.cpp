@@ -72,7 +72,6 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 
 	runtime->addManager(behaviorManager);
 
-	/// Create a scene and add the scene element to it
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(sceneElement);
 

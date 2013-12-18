@@ -69,8 +69,8 @@ bool Component::isAwake() const
 bool Component::wakeUp()
 {
 	SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
-	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialize failed on component " << getName();
 	SURGSIM_ASSERT(m_didInit) << "Component " << getName() << " was awoken without being initialized.";
+	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialize failed on component " << getName();
 
 	m_didWakeUp = true;
 	m_isAwake = doWakeUp();
