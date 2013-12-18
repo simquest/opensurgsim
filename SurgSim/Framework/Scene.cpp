@@ -48,8 +48,10 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 	{
 		std::shared_ptr<Runtime> runtime = m_runtime.lock();
 		element->setRuntime(runtime);
-		element->initialize();
-		runtime->addSceneElement(element);
+		if (element->initialize())
+		{
+			runtime->addSceneElement(element);
+		}
 	}
 }
 

@@ -75,8 +75,8 @@ std::shared_ptr<Scene> Runtime::getScene()
 
 bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 {
-	// If we add a single scene element before the simulation is running
-	// it will be handled by the scene initialization
+	// Before the runtime has been started, adding components will be handled via
+	// preprocessSceneElements()
 	if (m_isRunning)
 	{
 		addComponents(sceneElement->getComponents());
@@ -93,7 +93,15 @@ void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework
 	{
 		for (auto manager = std::begin(m_managers); manager != std::end(m_managers); ++manager)
 		{
-			(*manager)->enqueueAddComponent(*componentsIt);
+			if ((*componentsIt)->isInitialized())
+			{
+				(*manager)->enqueueAddComponent(*componentsIt);
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) <<
+					"Trying to add an uninitialized component.";
+			}
 		}
 	}
 }
@@ -126,7 +134,8 @@ bool Runtime::start(bool paused)
 {
 	auto logger = Logger::getDefaultLogger();
 
-	// Add all the scene Elements so they can be initialized during the startup process
+	// Gather all the Components from the currently known SceneElements to add them
+	// collectively.
 	preprocessSceneElements();
 
 	m_isRunning = true;
@@ -154,15 +163,6 @@ bool Runtime::start(bool paused)
 	// Wait for all the components to wakeUp()
 	m_barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All component wakeUp() succeeded";
-
-	// Now wake up all the scene elements
-// 	auto sceneElements = m_scene->getSceneElements();
-// 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
-// 	{
-// 		it->second->wakeUp();
-// 	}
-	m_barrier->wait(true);
-
 	SURGSIM_LOG_INFO(logger) << "Scene is initialized. All managers updating";
 
 	return true;
@@ -226,7 +226,7 @@ void Runtime::preprocessSceneElements()
 	auto sceneElements = getScene()->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
-		// Initialize should have been called by now, if the component is not initialized this means
+		// Initialize should have been called by now, if the SceneElement is not initialized this means
 		// initialization failed
 		if (it->second->isInitialized())
 		{

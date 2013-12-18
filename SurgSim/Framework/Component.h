@@ -55,9 +55,10 @@ public:
 	/// \return True if this component is initialized; otherwise, false.
 	bool isInitialized() const;
 
-	/// Initialize this component, this will at the time when the component is added to the scene,
-	/// this can be immediately if the underlying SceneElement is already in the scene, or later at
-	/// the time when the SceneElement is being added to the Scene.
+	/// Initialize this component, this needs to be called before wakeUp() can be called.O
+	/// This will be done automatically by the Scene hierarchy, either in SceneElement::addComponent(), if
+	/// SceneElement has already been added to the Scene, or through Scene::addSceneElement() on all Components
+	/// on the SceneElement.
 	/// \param runtime	The runtime which contains this component.
 	/// \return True if this component is initialized successfully; otherwise, false.
 	bool initialize(const std::weak_ptr<Runtime>& runtime);
