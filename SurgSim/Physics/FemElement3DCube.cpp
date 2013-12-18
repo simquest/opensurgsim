@@ -98,7 +98,7 @@ void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
-	// M = rho \int_{Volume} Ni^T.Ni dV
+	// M = rho * integration{over volume} {Ni^T.Ni} dV
 
 	// Zerout the mass matrix
 	M->setZero();
@@ -171,7 +171,7 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 {
 	using SurgSim::Framework::Logger;
 
-	SURGSIM_ASSERT(J) << "Trying to evalute J with a nullptr for matrix J";
+	SURGSIM_ASSERT(J != nullptr) << "Trying to evalute J with a nullptr for matrix J";
 
 	Vector3d p[8];
 	for (size_t index = 0; index < 8; index++)
@@ -183,7 +183,7 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 	J->setZero();
 
 	// Compute J = d(x,y,z)/d(epsilon,eta,mu)
-	// Note that (x,y,z) = sum((xi,yi,zi).Ni(epsilon,eta,mu))
+	// Note that (x,y,z) = for(i in {0..7}){ (x,y,z) += (xi,yi,zi).Ni(epsilon,eta,mu)}
 	for (size_t index = 0; index < 8; ++index)
 	{
 		for(size_t axis = 0; axis < 3; ++axis)
@@ -200,10 +200,10 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 		J->computeInverseAndDetWithCheck(*Jinv, *detJ, invertible);
 
 		SURGSIM_ASSERT(invertible) <<
-			"Found a non invertible matrix J\n"<<*J<<"\ndet(J)="<<*detJ<<
+			"Found a non invertible matrix J\n" << *J << "\ndet(J)=" << *detJ <<
 			") while computing FemElement3DCube stiffness matrix\n";
 		SURGSIM_LOG_IF(*detJ <= 1e-8 && *detJ >= -1e-8, Logger::getLogger("Physics"), WARNING) <<
-			"Found an invalid matrix J\n"<<*J<<"\ninvertible, but det(J)="<<*detJ<<
+			"Found an invalid matrix J\n" << *J << "\ninvertible, but det(J)=" << *detJ <<
 			") while computing FemElement3DCube stiffness matrix\n";
 	}
 }
@@ -212,7 +212,7 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 												  const SurgSim::Math::Matrix33d& Jinv,
 												  Eigen::Matrix<double, 6, 24, Eigen::DontAlign> *B) const
 {
-	SURGSIM_ASSERT(B) << "Trying to evalute the strain-displacmenet with a nullptr";
+	SURGSIM_ASSERT(B != nullptr) << "Trying to evalute the strain-displacmenet with a nullptr";
 
 	// Zerout the strain-displacement
 	B->setZero();
@@ -369,9 +369,11 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 
 	double v = 0.0;
 
-	// Compute the volume using a 2-points Gauss-Legendre quadrature
-	// V = \int_V dV
-	//   = sum_{i=0}^2 sum_{j=0}^2 sum_{k=0}^2 weightEpsilon_i weightEta_j weightMu_k det(J(epsilon_i, eta_j, mu_k))
+	// Compute the volume:
+	// V = integration{over volume} dV
+	// Using a 2-points Gauss-Legendre quadrature:
+	// V = for{i in {0..1}} for{j in {0..1}} for{k in {0..1}}
+	//        V += weightEpsilon[i] * weightEta[j] * weightMu[k] * det(J(epsilon[i], eta[j], mu[k]))
 	for (int i = 0; i < 2; ++i)
 	{
 		double &epsilon = gaussQuadrature2Points[i].first;

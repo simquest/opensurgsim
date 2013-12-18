@@ -31,6 +31,7 @@ using SurgSim::Physics::FemElement3DCube;
 
 namespace
 {
+/// Epsilon used in this unit test, resulting from a trial and error test.
 const double epsilon = 2.6e-9;
 };
 

@@ -135,6 +135,7 @@ public:
 		std::array<unsigned int, 4> tmp4 = {{1, 2, 7, 3}};  // CCW (12)cross(17) . (13) > 0
 		tetrahedrons[4] = tmp4;
 
+		// Cube decomposition into 1 single cube
 		// 1st face CW, 2nd face CCW (Faces being seen from outside)
 		std::array<unsigned int, 8> tmpCubeNodes = {{0, 1, 3, 2, 4, 5, 7, 6}};
 		cubes[0] = tmpCubeNodes;
@@ -191,7 +192,7 @@ public:
 
 std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation,
-	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
+	const SurgSim::Math::RigidTransform3d& gfxPose,
 	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
@@ -201,35 +202,32 @@ std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,
 	std::shared_ptr<SceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 
-	unsigned int gfxObjectId = 0;
-	for (auto gfxPose = std::begin(gfxPoses); gfxPose != std::end(gfxPoses); gfxPose++)
+	// Graphics setup
 	{
 		std::stringstream ss;
-		ss << name + " Graphics object " << gfxObjectId;
+		ss << name + " Graphics object ";
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
 			std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
-		graphicsRepresentation->setInitialPose(*gfxPose);
+		graphicsRepresentation->setInitialPose(gfxPose);
 		graphicsRepresentation->setColor(color);
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
 
 		femSceneElement->addComponent(graphicsRepresentation);
 		ss.clear();
-		ss << "Physics to Graphics ("<< gfxObjectId <<") deformable points";
+		ss << "Physics to Graphics deformable points";
 		femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
 			(ss.str(),
 			physicsRepresentation->getFinalState(),
 			graphicsRepresentation->getVertices()));
-
-		gfxObjectId++;
 	}
 
 	return femSceneElement;
 }
 
 std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
-	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
+	const SurgSim::Math::RigidTransform3d& gfxPose,
 	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation =
@@ -241,11 +239,11 @@ std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
 	cube.loadCubeModelFem3D(physicsRepresentation);
 	cube.setFemElementParameters(physicsRepresentation);
 
-	return initializeFem3D(name, physicsRepresentation, gfxPoses, color, integrationScheme);
+	return initializeFem3D(name, physicsRepresentation, gfxPose, color, integrationScheme);
 }
 
 std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
-	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
+	const SurgSim::Math::RigidTransform3d& gfxPose,
 	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<Fem3DRepresentation> physicsRepresentation =
@@ -257,7 +255,7 @@ std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 	cube.loadTetrahedronModelFem3D(physicsRepresentation);
 	cube.setFemElementParameters(physicsRepresentation);
 
-	return initializeFem3D(name, physicsRepresentation, gfxPoses, color, integrationScheme);
+	return initializeFem3D(name, physicsRepresentation, gfxPose, color, integrationScheme);
 }
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
@@ -301,45 +299,37 @@ int main(int argc, char* argv[])
 
 	// Cube with cube FemElement
 	{
-		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-2.5, 2.0, 0.0)));
 		scene->addSceneElement(createCubeFem3D("CubeElement Euler Explicit",
-			gfxPoses, Vector4d(1, 0, 0, 1),
+			makeRigidTransform(qIdentity, translate+Vector3d(-2.5, 2.0, 0.0)),
+			Vector4d(1, 0, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
-		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 0.0, 2.0, 0.0)));
 		scene->addSceneElement(createCubeFem3D("CubeElement Modified Euler Explicit",
-			gfxPoses, Vector4d(0, 1, 0, 1),
+			makeRigidTransform(qIdentity, translate+Vector3d( 0.0, 2.0, 0.0)),
+			Vector4d(0, 1, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
-		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 2.5, 2.0, 0.0)));
 		scene->addSceneElement(createCubeFem3D("CubeElement Fem 3D Euler Implicit",
-			gfxPoses, Vector4d(0, 0, 1, 1),
+			makeRigidTransform(qIdentity, translate+Vector3d( 2.5, 2.0, 0.0)),
+			Vector4d(0, 0, 1, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	// Cube with tetrahedron FemElement
 	{
-		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-2.5, -1.0, 0.0)));
 		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Euler Explicit",
-			gfxPoses, Vector4d(1, 0, 0, 1),
+			makeRigidTransform(qIdentity, translate+Vector3d(-2.5, -1.0, 0.0)),
+			Vector4d(1, 0, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
-		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 0.0, -1.0, 0.0)));
 		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Modified Euler Explicit",
-			gfxPoses, Vector4d(0, 1, 0, 1),
+			makeRigidTransform(qIdentity, translate+Vector3d( 0.0, -1.0, 0.0)),
+			Vector4d(0, 1, 0, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
-		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 2.5, -1.0, 0.0)));
 		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Fem 3D Euler Implicit",
-			gfxPoses, Vector4d(0, 0, 1, 1),
+			makeRigidTransform(qIdentity, translate+Vector3d( 2.5, -1.0, 0.0)),
+			Vector4d(0, 0, 1, 1),
 			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 

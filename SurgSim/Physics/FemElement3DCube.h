@@ -31,11 +31,16 @@ namespace Physics
 /// \note http://www.colorado.edu/engineering/CAS/courses.d/AFEM.d/AFEM.Ch11.d/AFEM.Ch11.pdf
 /// \note The mass property of the cube is derived from the kinetic energy computed on the cube's volume
 /// \note (c.f. internal documentation on cube mass matrix computation for details).
+/// \note Integral terms over the volume are evaluated using the Gauss-Legendre 2-points quadrature.
+/// \note http://en.wikipedia.org/wiki/Gaussian_quadrature
+/// \note Note that this technique is accurate for any polynomial evaluation up to degree 3.
+/// \note In our case, the shape functions \f$N_i\f$ are linear (of degree 1). So for exmaple,
+/// \note in the mass matrix we have integral terms like \f$\int_V N_i.N_j dV\f$, which are of degree 2.
 class FemElement3DCube : public FemElement
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 8 nodes ids defining this cube element in a overall mesh
+	/// \param nodeIds An array of 8 node ids defining this cube element in an overall mesh
 	/// \param restState The rest state to initialize the cube with
 	/// \note The 8 nodes must be valid node ids in the rest state, if they aren't an ASSERT will be raised
 	/// \note The 8 nodes must define a cube with positive volume, if they don't an ASSERT will be raised
@@ -46,7 +51,7 @@ public:
 
 	/// Initializes the element once everything has been set
 	/// \param state The state to initialize the FemElement with
-	/// \note We use the theory of linear elasticity, so this method pre-compute the stiffness and mass matrices
+	/// \note We use the theory of linear elasticity, so this method precomputes the stiffness and mass matrices
 	virtual void initialize(const DeformableRepresentationState& state) override;
 
 	/// Gets the element volume based on the input state
