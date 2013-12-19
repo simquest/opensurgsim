@@ -21,17 +21,16 @@
 #include <unordered_map>
 #include <functional>
 #include <boost/any.hpp>
+#include <yaml-cpp/yaml.h>
+
+#include "SurgSim/Math/Matrix.h"
+
+#include "SurgSim/Serialize/Convert.h"
 
 namespace SurgSim
 {
 namespace Framework
 {
-
-template <class T>
-T convert(boost::any val)
-{
-	return boost::any_cast<T>(val);
-}
 
 /// Mixin class for enabling a property system on OSS classes, the instance still needs to initialise properties in
 /// the constructor by using either addSetter, addGetter, addAccessors or the macro for each member variable
@@ -42,6 +41,9 @@ public:
 
 	typedef std::function<boost::any(void)> GetterType;
 	typedef std::function<void (boost::any)> SetterType;
+
+	typedef std::function<YAML::Node(void)> EncoderType;
+	typedef std::function<void(const YAML::Node*)> DecoderType;
 
 	/// Retrieves the value with the name by executing the getter if it is found.
 	/// \param	name	The name of the property.
@@ -89,11 +91,27 @@ public:
 	/// \param	setter	The setter.
 	void setAccessors(const std::string& name, GetterType getter, SetterType setter);
 
+	void setSerializable(const std::string& name, EncoderType encoder, DecoderType decoder);
+
+	YAML::Node encode();
+
+	void decode(const YAML::Node& node);
 
 private:
 
+	struct Functors
+	{
+		GetterType getter;
+		SetterType setter;
+		EncoderType encoder;
+		DecoderType decoder;
+	};
+
 	std::unordered_map<std::string, GetterType > m_getters;
 	std::unordered_map<std::string, SetterType > m_setters;
+
+	std::unordered_map<std::string, Functors> m_functors;
+
 };
 
 struct Property
@@ -102,10 +120,43 @@ struct Property
 	std::string name;
 };
 
+/// Wrap boost::any_cast to use in std::bind, for some reason it does not work by itself. This function will
+/// throw an exception if the cast does not work, this usually means that the types do not match up at all.
+/// \tparam T target type for conversion.
+/// \param val The value to be converted.
+/// \return An object converted from boost::any to T, will throw an exception if the conversion fails
+template <class T>
+T convert(boost::any val);
+
+/// Specialization for convert<T>() to correctly cast Matrix44d to Matrix44f, will throw if the val is not casteable to
+/// Matrix44[fd]. This is necessary as we need Matrix44f as outputs in some cases but all our Matrices are Matrix44d.
+/// This lets the user define a property that does a type conversion, without having to implement an accessor.
+/// \param val The value to be converted, should be a Matrix44[df].
+/// \return A matrix val converted to Matrix44f.
+template <>
+SurgSim::Math::Matrix44f convert(boost::any val);
+
+/// A macro to register getter and setter for a property that is readable and writeable,
+/// order of getter and setter agrees with 'RW'. Note that the property should not be quoted in the original
+/// macro call.
 #define SURGSIM_ADD_RW_PROPERTY(class, type, property, getter, setter) \
 	setAccessors(#property, \
 				std::bind(&class::getter, this),\
 				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)))
+
+#define SURGSIM_ADD_SERIALIZABLE_PROPERTY(class, type, property, getter, setter) \
+	setAccessors(#property, \
+				std::bind(&class::getter, this),\
+				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
+	setSerializable(#property,\
+				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
+				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
+ 
+/// A macro to register a getter for a property that is read only
+#define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \
+	setGetter(#property, \
+	std::bind(&class::getter, this))
+
 
 }; // Framework
 }; // SurgSim
