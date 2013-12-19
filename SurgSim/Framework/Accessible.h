@@ -107,9 +107,6 @@ private:
 		DecoderType decoder;
 	};
 
-	std::unordered_map<std::string, GetterType > m_getters;
-	std::unordered_map<std::string, SetterType > m_setters;
-
 	std::unordered_map<std::string, Functors> m_functors;
 
 };

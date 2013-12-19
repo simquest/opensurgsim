@@ -84,7 +84,7 @@ namespace SurgSim
 namespace Framework
 {
 
-TEST(AccessibleTests, GetterTest)
+TEST(AccessibleTest, GetterTest)
 {
 	TestClass t;
 	t.normal = 5;
@@ -94,7 +94,7 @@ TEST(AccessibleTests, GetterTest)
 	EXPECT_ANY_THROW(t.getValue("xxx"));
 }
 
-TEST(AccessibleTests, SetterTest)
+TEST(AccessibleTest, SetterTest)
 {
 	TestClass t;
 	t.normal = 0;
@@ -104,7 +104,7 @@ TEST(AccessibleTests, SetterTest)
 	EXPECT_ANY_THROW(t.setValue("xxxx",666.66));
 }
 
-TEST(AccessibleTests, TransferTest)
+TEST(AccessibleTest, TransferTest)
 {
 	TestClass a,b;
 	a.normal = 100;
@@ -115,7 +115,7 @@ TEST(AccessibleTests, TransferTest)
 	EXPECT_EQ(a.normal, b.normal);
 }
 
-TEST(AccessibleTests, ReadWriteMacroTest)
+TEST(AccessibleTest, ReadWriteMacroTest)
 {
 	TestClass a;
 	a.readWrite = 100.0;
@@ -125,7 +125,7 @@ TEST(AccessibleTests, ReadWriteMacroTest)
 	EXPECT_EQ(50.0, a.readWrite);
 }
 
-TEST(AccessibleTests, ReadOnlyMacroTest)
+TEST(AccessibleTest, ReadOnlyMacroTest)
 {
 	TestClass a;
 	a.readOnly = 200;
@@ -223,6 +223,7 @@ TEST(AccessibleTests, Serialize)
 	EXPECT_NO_THROW(a.decode(node));
 	EXPECT_EQ(50, a.serializableProperty);
 }
+
 
 }; // namespace Framework
 }; // namespace SurgSim

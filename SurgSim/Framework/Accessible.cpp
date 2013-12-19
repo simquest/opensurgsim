@@ -23,40 +23,46 @@ namespace Framework
 
 boost::any Framework::Accessible::getValue(const std::string& name)
 {
-	auto element = m_getters.find(name);
-	if (element != std::end(m_getters))
+	auto functors = m_functors.find(name);
+	if (functors != std::end(m_functors) && functors->second.getter != nullptr)
 	{
-		return element->second();
+		return functors->second.getter();
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "No property with name: " << name <<" found.";
+		SURGSIM_FAILURE() << "Can't get property: " << name << "." <<
+			((functors == std::end(m_functors)) ? "Property not found." : "No getter defined for property.");
 		return boost::any();
 	}
 }
 
 void Framework::Accessible::setValue(const std::string& name, const boost::any& value)
 {
-	auto element = m_setters.find(name);
-	if (element != std::end(m_setters))
+	auto functors = m_functors.find(name);
+	if (functors != std::end(m_functors) && functors->second.setter != nullptr)
 	{
-		element->second(value);
+		functors->second.setter(value);
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "Can't set property with name: " << name << ".";
+		SURGSIM_FAILURE() << "Can't set property: " << name << "." <<
+			((functors == std::end(m_functors)) ? "Property not found." : "No setter defined for property.");
 	}
 }
 
 
 void Accessible::setGetter(const std::string& name, GetterType func)
 {
-	m_getters[name] = func;
+	SURGSIM_ASSERT(func != nullptr) << "Getter functor can't be nullptr";
+
+	m_functors[name].getter = func;
 }
 
 void Accessible::setSetter(const std::string& name, SetterType func)
 {
-	m_setters[name] = func;
+	SURGSIM_ASSERT(func != nullptr) << "Getter functor can't be nullptr";
+
+	m_functors[name].setter = func;
 }
 
 void Accessible::setAccessors(const std::string& name, GetterType getter, SetterType setter)
@@ -67,12 +73,14 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 
 bool Accessible::isReadable(const std::string& name) const
 {
-	return (m_getters.cend() != m_getters.find(name));
+	auto functors = m_functors.find(name);
+	return (functors != m_functors.end() && functors->second.getter != nullptr);
 }
 
 bool Accessible::isWriteable(const std::string& name) const
 {
-	return (m_setters.cend() != m_setters.find(name));
+	auto functors = m_functors.find(name);
+	return (functors != m_functors.end() && functors->second.getter != nullptr);
 }
 
 void Accessible::setSerializable(const std::string& name, EncoderType encoder, DecoderType decoder)
