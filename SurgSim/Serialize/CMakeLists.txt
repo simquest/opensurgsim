@@ -32,6 +32,7 @@ set(SURGSIM_SERIALIZE_HEADERS
 	FrameworkConvert.h
 	GraphicsConvert.h
 	MathConvert.h
+	MathConvert-inl.h
 	ShapesFactory.h
 	ShapesFactory-inl.h
 )

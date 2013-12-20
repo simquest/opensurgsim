@@ -23,46 +23,16 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 
+#include <Eigen/Core>
+
 namespace YAML
 {
-	/// declaration of specialization convert<SurgSim::Math::Vector3d>
-	template <>
-	struct convert <SurgSim::Math::Vector3d>
-	{
-		static Node encode(const SurgSim::Math::Vector3d& rhs);
-		static bool decode(const Node &node, SurgSim::Math::Vector3d& rhs);
-	};
-
-	/// declaration of specialization convert<SurgSim::Math::Vector4d>
-	template <>
-	struct convert <SurgSim::Math::Vector4d>
-	{
-		static Node encode(const SurgSim::Math::Vector4d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Vector4d& rhs);
-	};
-
 	/// declaration of specialization convert<SurgSim::Math::Vector4d>
 	template <>
 	struct convert <SurgSim::Math::Quaterniond>
 	{
 		static Node encode(const SurgSim::Math::Quaterniond& rhs);
 		static bool decode(const Node& node, SurgSim::Math::Quaterniond& rhs);
-	};
-
-	/// declaration of specialization convert<SurgSim::Math::Matrix33d>
-	template <>
-	struct convert <SurgSim::Math::Matrix33d>
-	{
-		static Node encode(const SurgSim::Math::Matrix33d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Matrix33d& rhs);
-	};
-
-	/// declaration of specialization convert<SurgSim::Math::Matrix44d>
-	template <>
-	struct convert <SurgSim::Math::Matrix44d>
-	{
-		static Node encode(const SurgSim::Math::Matrix44d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Matrix44d& rhs);
 	};
 
 	/// declaration of specialization convert<SurgSim::Math::RigidTransform3d>
@@ -72,6 +42,30 @@ namespace YAML
 		static Node encode(const SurgSim::Math::RigidTransform3d& rhs);
 		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs);
 	};
+
+	template <class Type, int Rows, int Cols, int MOpt>
+	struct convert <typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
+	{
+		static Node convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
+			const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+		static bool convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
+			const Node& node,
+			typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+	};
+
+	/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
+	template <class Type, int Rows, int MOpt>
+	struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
+	{
+		static Node convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::encode(
+			const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
+		static bool convert<typename Eigen::Matrix<Type, Rows, 1, MOpt>>::decode(
+			const Node& node,
+			typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
+	};
+
+
+
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
@@ -90,8 +84,8 @@ namespace YAML
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
-
-
 };
+
+#include "SurgSim/Serialize/MathConvert-inl.h"
 
 #endif // SURGSIM_SERIALIZE_MATHCONVERT_H
