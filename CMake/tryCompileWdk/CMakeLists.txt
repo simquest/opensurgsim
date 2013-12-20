@@ -14,5 +14,10 @@
 # limitations under the License.
 
 project(tryCompileWdk)
-add_executable(tryCompileWdk main.cpp)
+set(TRYCOMPILEWDK_SOURCE
+	main.cpp
+)
+add_executable(tryCompileWdk
+	${TRYCOMPILEWDK_SOURCE}
+)
 target_link_libraries(tryCompileWdk hid setupapi)
