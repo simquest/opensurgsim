@@ -22,6 +22,13 @@ namespace SurgSim
 namespace DataStructures
 {
 
+template<class Data>
+OctreeNode<Data>::OctreeNode() :
+	m_isActive(false),
+	m_hasChildren(false)
+{
+}
+
 
 template<class Data>
 OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::AxisAlignedBoundingBox& boundingBox) :
@@ -136,6 +143,35 @@ template<class Data>
 const std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index) const
 {
 	return m_children[index];
+}
+
+template<class A>
+void copyOctreeNode(std::shared_ptr<OctreeNode<A>> from, std::shared_ptr<OctreeNode<A>> to)
+{
+	copyOctreeNode<A, A>(from, to);
+	// Also copy the data since the types are the same
+	to->data = from->data;
+}
+
+template<class A, class B>
+void copyOctreeNode(std::shared_ptr<OctreeNode<A>> from, std::shared_ptr<OctreeNode<B>> to)
+{
+	to->m_boundingBox = from->m_boundingBox;
+	to->m_hasChildren = from->m_hasChildren;
+	to->m_isActive = from->m_isActive;
+
+	for(int i = 0; i < from->m_children.size(); i++)
+	{
+		if (from->getChild(i) == nullptr)
+		{
+			to->m_children[i] = nullptr;
+		}
+		else
+		{
+			to->m_children[i] = std::make_shared<OctreeNode<B>>();
+			copyOctreeNode(from->m_children[i], to->m_children[i]);
+		}
+	}
 }
 
 };  // namespace DataStructures

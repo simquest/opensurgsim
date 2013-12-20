@@ -179,3 +179,73 @@ TEST(OctreeNodeTests, Data)
 	EXPECT_NEAR(expectedData.mockDouble, octree.data.mockDouble, epsilon);
 	EXPECT_EQ(expectedData.mockString, octree.data.mockString);
 }
+
+TEST(OctreeNodeTests, CopyOctreeNode)
+{
+	struct Data1
+	{
+		std::string name;
+	};
+	struct Data2
+	{
+		double value;
+	};
+
+	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), 2*Vector3d::Ones());
+	std::shared_ptr<OctreeNode<Data1>> octree1 = std::make_shared<OctreeNode<Data1>>(boundingBox);
+	Data1 dataRoot = {"root"};
+	octree1->addData(Vector3d(1.0, 1.0, 1.0), dataRoot, 1);
+	Data1 dataChild = {"child"};
+	octree1->addData(Vector3d(0.5, 0.5, 0.5), dataChild, 2);
+
+	{
+		SCOPED_TRACE("Copying with different Data Type");
+		std::shared_ptr<OctreeNode<Data2>> octree2 = std::make_shared<OctreeNode<Data2>>();
+		copyOctreeNode(octree1, octree2);
+		ASSERT_NE(nullptr, octree2);
+		EXPECT_TRUE(octree1->getBoundingBox().isApprox(octree2->getBoundingBox()));
+		EXPECT_EQ(octree1->hasChildren(), octree2->hasChildren());
+		EXPECT_EQ(octree1->isActive(), octree2->isActive());
+		for(size_t i = 0; i < 8; i++)
+		{
+			if (octree1->getChild(i) == nullptr)
+			{
+				EXPECT_EQ(nullptr, octree2->getChild(i));
+			}
+			else
+			{
+				ASSERT_NE(nullptr, octree2->getChild(i));
+				EXPECT_TRUE(octree1->getChild(i)->getBoundingBox().isApprox(octree2->getChild(i)->getBoundingBox()));
+				EXPECT_EQ(octree1->getChild(i)->hasChildren(), octree2->getChild(i)->hasChildren());
+				EXPECT_EQ(octree1->getChild(i)->isActive(), octree2->getChild(i)->isActive());
+			}
+		}
+	}
+
+	{
+		SCOPED_TRACE("Copying with same Data Type");
+		std::shared_ptr<OctreeNode<Data1>> octree2 = std::make_shared<OctreeNode<Data1>>();
+		copyOctreeNode(octree1, octree2);
+		ASSERT_NE(nullptr, octree2);
+		EXPECT_TRUE(octree1->getBoundingBox().isApprox(octree2->getBoundingBox()));
+		EXPECT_EQ(octree1->hasChildren(), octree2->hasChildren());
+		EXPECT_EQ(octree1->isActive(), octree2->isActive());
+		EXPECT_EQ(octree1->data.name, octree2->data.name);
+		for(size_t i = 0; i < 8; i++)
+		{
+			if (octree1->getChild(i) == nullptr)
+			{
+				EXPECT_EQ(nullptr, octree2->getChild(i));
+			}
+			else
+			{
+				ASSERT_NE(nullptr, octree2->getChild(i));
+				EXPECT_TRUE(octree1->getChild(i)->getBoundingBox().isApprox(octree2->getChild(i)->getBoundingBox()));
+				EXPECT_EQ(octree1->getChild(i)->hasChildren(), octree2->getChild(i)->hasChildren());
+				EXPECT_EQ(octree1->getChild(i)->isActive(), octree2->getChild(i)->isActive());
+				EXPECT_EQ(octree1->getChild(i)->data.name, octree2->getChild(i)->data.name);
+			}
+		}
+	}
+}
+
