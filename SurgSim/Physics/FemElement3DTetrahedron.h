@@ -125,6 +125,14 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
 
+	/// Computes a given barycentric coordinate in cartesian coordinates
+	/// \param state The state at which to transform coordinates
+	/// \param barycentricCoordinate The coordinates to transform
+	/// \return The resultant cartesian coordinates
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const DeformableRepresentationState& state, 
+		const SurgSim::Math::Vector &barycentricCoordinate) const override;
+
 protected:
 	/// Computes the tetrahdron shape functions
 	/// \param restState The deformable rest state to compute the shape function from
