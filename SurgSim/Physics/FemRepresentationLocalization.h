@@ -25,8 +25,11 @@ namespace Physics
 {
 
 struct FemRepresentationCoordinate {
-	SurgSim::Math::Vector barycentricCoordinate;
+	FemRepresentationCoordinate();
+	FemRepresentationCoordinate(unsigned int elementId, SurgSim::Math::Vector barycentricCoordinate);
+
 	unsigned int elementId;
+	SurgSim::Math::Vector barycentricCoordinate;
 };
 
 class FemRepresentationLocalization : public Localization
