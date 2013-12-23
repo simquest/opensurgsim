@@ -180,6 +180,24 @@ TEST(OctreeNodeTests, Data)
 	EXPECT_EQ(expectedData.mockString, octree.data.mockString);
 }
 
+TEST(OctreeNodeTests, OctreePath)
+{
+	AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
+	std::shared_ptr<OctreeNodeType> octree = std::make_shared<OctreeNodeType>(boundingBox);
+
+	SurgSim::DataStructures::OctreePath path;
+	EXPECT_NO_THROW(octree->getNode(path));
+	EXPECT_EQ(octree, octree->getNode(path));
+
+	octree->subdivide();
+	path.push_back(3);
+	EXPECT_NO_THROW(octree->getNode(path));
+	EXPECT_NE(nullptr, octree->getNode(path));
+
+	path.push_back(1);
+	EXPECT_THROW(octree->getNode(path), SurgSim::Framework::AssertionFailure);
+}
+
 TEST(OctreeNodeTests, CopyOctreeNode)
 {
 	struct Data1

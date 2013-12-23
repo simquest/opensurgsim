@@ -145,6 +145,19 @@ const std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index
 	return m_children[index];
 }
 
+template<class Data>
+std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& path)
+{
+	std::shared_ptr<OctreeNode<Data>> node = this->shared_from_this();
+	for (auto index = path.cbegin(); index != path.cend(); ++index)
+	{
+		node = node->getChild(*index);
+		SURGSIM_ASSERT(node != nullptr)
+			<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
+	}
+	return node;
+}
+
 template<class A>
 void copyOctreeNode(std::shared_ptr<OctreeNode<A>> from, std::shared_ptr<OctreeNode<A>> to)
 {

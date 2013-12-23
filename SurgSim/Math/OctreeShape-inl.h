@@ -74,19 +74,6 @@ void OctreeShape<Data>::setRootNode(std::shared_ptr<SurgSim::DataStructures::Oct
 }
 
 template<class Data>
-std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> OctreeShape<Data>::getNode(const OctreePath& path)
-{
-	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node = m_rootNode;
-	for (auto index = path.cbegin(); index != path.cend(); ++index)
-	{
-		node = node->getChild(*index);
-		SURGSIM_ASSERT(node != nullptr)
-			<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
-	}
-	return node;
-}
-
-template<class Data>
 std::string OctreeShape<Data>::getClassName()
 {
 	return std::string("SurgSim::Math::OctreeShape");

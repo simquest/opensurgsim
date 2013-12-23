@@ -27,11 +27,6 @@ namespace SurgSim
 namespace Math
 {
 
-/// Typedef of octree path
-/// The path is a vector of children indexes (each within 0 to 7) that lead to
-/// the specific node the front of the vector holds the index of the root's children.
-typedef std::vector<size_t> OctreePath;
-
 /// Octree Shape
 /// A defined by an octree data structure
 /// \tparam Data The data stored in each octree node
@@ -70,11 +65,6 @@ public:
 	/// Set the root node
 	/// \param node the octree root node of this shape
 	virtual void setRootNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node);
-
-	/// Get the node at the supplied path
-	/// \param path the path to the specific node
-	/// \return the requested octree node
-	virtual std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> getNode(const OctreePath& path);
 
 	/// Get the name of the class
 	/// \return the class name
