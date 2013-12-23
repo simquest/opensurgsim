@@ -117,7 +117,7 @@ SURGSIM_DOUBLE_SPECIALIZATION
 template <class Type, int QOpt>
 YAML::Node YAML::convert<Eigen::Quaternion<Type, QOpt>>::encode(const typename Eigen::Quaternion<Type, QOpt>& rhs)
 {
-	return Node(convert<Eigen::Matrix<Type,4,1,QOpt>>::encode(rhs.coeffs()));
+	return Node(convert<typename Eigen::Matrix<Type,4,1,QOpt>>::encode(rhs.coeffs()));
 }
 
 SURGSIM_DOUBLE_SPECIALIZATION
@@ -127,7 +127,7 @@ bool YAML::convert<Eigen::Quaternion<Type, QOpt>>::decode(const Node& node, type
 	bool result = false;
 	if (node.IsSequence() && node.size() == 4)
 	{
-		result = convert<Eigen::Matrix<Type,4,1,QOpt>>::decode(node, rhs.coeffs());
+		result = convert<typename Eigen::Matrix<Type,4,1,QOpt>>::decode(node, rhs.coeffs());
 	}
 	return result;
 }

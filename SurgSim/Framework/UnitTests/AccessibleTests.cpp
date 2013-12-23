@@ -261,22 +261,13 @@ TEST(AccessibleTests, MultipleValues)
 	EXPECT_EQ(test.b, "b");
 	EXPECT_EQ(test.c, "invalid");
 
-	
-	YAML::Node expected;
-	expected["a"] = "a";
-	expected["b"] = "b";
-	expected["c"] = "invalid";
-
 	YAML::Node encodedValues = test.encode();
 
-	std::ostringstream expectedString;
-	std::ostringstream encodedString;
-	expectedString << expected;
-	encodedString << encodedValues;
+	EXPECT_EQ("a", encodedValues["a"].as<std::string>());
+	EXPECT_EQ("b", encodedValues["b"].as<std::string>());
+	EXPECT_EQ("invalid", encodedValues["c"].as<std::string>());
 
-	EXPECT_EQ(expectedString.str(), encodedString.str()) << expectedString << ", " << encodedString;
 }
-
 
 }; // namespace Framework
 }; // namespace SurgSim

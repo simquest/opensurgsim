@@ -39,10 +39,10 @@ namespace YAML
 	/// Specialization of convert for fixed size Eigen::Matrix
 	SURGSIM_DOUBLE_SPECIALIZATION
 	template <typename Type, int Rows, int Cols, int MOpt>
-	struct convert<Eigen::Matrix<Type, Rows, Cols, MOpt>>
+	struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
 	{
-		static Node encode(const Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
-		static bool decode(const Node& node, Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+		static Node encode(const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
 	};
 
 	/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
@@ -51,7 +51,7 @@ namespace YAML
 	struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
 	{
 		static Node encode(const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
-		static bool decode(const Node& node, Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
 	};
 
 	/// Specialization of convert for Eigen::Quaternion
@@ -59,8 +59,8 @@ namespace YAML
 	template <class Type, int QOpt>
 	struct convert<typename Eigen::Quaternion<Type, QOpt>>
 	{
-		static Node encode(const Eigen::Quaternion<Type, QOpt>& rhs);
-		static bool decode(const Node& node, Eigen::Quaternion<Type, QOpt>& rhs);
+		static Node encode(const typename Eigen::Quaternion<Type, QOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs);
 	};
 
 	/// Specialization of convert for Eigen::RigidTransform
@@ -68,8 +68,8 @@ namespace YAML
 	template <class Type, int Dim, int TMode, int TOptions>
 	struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
 	{
-		static Node encode(const Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
-		static bool decode(const Node& node, Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+		static Node encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
 	};
 
 

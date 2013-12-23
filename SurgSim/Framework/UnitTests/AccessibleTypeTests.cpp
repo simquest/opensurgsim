@@ -101,7 +101,7 @@ public:
 	T getProperty() {return property;}
 };
 
-template <class T>
+template <typename T>
 std::pair<T, T> testProperty(T a, T b)
 {
 	Testable<T> test;
@@ -111,12 +111,12 @@ std::pair<T, T> testProperty(T a, T b)
 	test.setValue("property", b);
 	result.first = test.property;
 
-	bool success = test.getValue<T>("property", &result.second);
+	test.getValue("property", &result.second);
 
 	return result;
 }
 
-template <class T>
+template <typename T>
 std::pair<T, T> testEncodeDecode(T a, T b)
 {
 	Testable<T> test;
@@ -180,8 +180,14 @@ TYPED_TEST(QuaternionTest, Accessible)
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::Quaternion Quaternion;
 
-	Quaternion initialValue(1.0,2.0,3.0,4.0);
-	Quaternion newValue(5.0,6.0,7.0,8.0);
+	Quaternion initialValue(static_cast<Scalar>(1.0),
+							static_cast<Scalar>(2.0),
+							static_cast<Scalar>(3.0),
+							static_cast<Scalar>(4.0));
+	Quaternion newValue(static_cast<Scalar>(5.0),
+						static_cast<Scalar>(6.0),
+						static_cast<Scalar>(7.0),
+						static_cast<Scalar>(8.0));
 
 	initialValue.normalize();
 	newValue.normalize();
@@ -200,8 +206,8 @@ TYPED_TEST(RigidTransformTest, Accessible)
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::RigidTransform RigidTransform;
 
-	RigidTransform::MatrixType initialMatrix;
-	RigidTransform::MatrixType newMatrix;
+	typename RigidTransform::MatrixType initialMatrix;
+	typename RigidTransform::MatrixType newMatrix;
 
 	for (int i = 0; i < initialMatrix.size(); ++i)
 	{
