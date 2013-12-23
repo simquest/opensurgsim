@@ -29,15 +29,21 @@ namespace Math
 
 /// Octree Shape
 /// A defined by an octree data structure
-/// \tparam Data The data stored in each octree node
-template<class Data>
 class OctreeShape : public Shape
 {
 public:
+	struct EmptyData {};
+	typedef SurgSim::DataStructures::OctreeNode<EmptyData> NodeType;
 
 	/// Constructor
-	/// \param node octree root node
-	explicit OctreeShape(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node = nullptr);
+	OctreeShape();
+
+	/// Construct an OctreeShape by copying data from an OctreeNode
+	/// NOTE: The Data stored in the octree node will not be copied into the
+	/// OctreeShape.
+	/// \param node octree node data structure to build Octree Shape from
+	template<class Data>
+	static std::shared_ptr<OctreeShape> fromOctreeNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node);
 
 	/// Destructor
 	virtual ~OctreeShape();
@@ -60,11 +66,11 @@ public:
 
 	/// Get the root node
 	/// \return the octree root node of this shape
-	virtual std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> getRootNode();
+	virtual std::shared_ptr<NodeType> getRootNode();
 
 	/// Set the root node
 	/// \param node the octree root node of this shape
-	virtual void setRootNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node);
+	virtual void setRootNode(std::shared_ptr<NodeType> node);
 
 	/// Get the name of the class
 	/// \return the class name
@@ -72,9 +78,8 @@ public:
 
 private:
 	/// Root node of the octree datastructure
-	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> m_rootNode;
+	std::shared_ptr<NodeType> m_rootNode;
 };
-
 
 }; // Math
 
