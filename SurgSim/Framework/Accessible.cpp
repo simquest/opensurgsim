@@ -106,16 +106,27 @@ YAML::Node Accessible::encode()
 	return result;
 }
 
-void Accessible::decode(const YAML::Node& node)
+void  Accessible::decode(const YAML::Node& node)
 {
+	bool result = false;
+	SURGSIM_ASSERT(node.IsMap()) << "Node to decode accessible has to be map.";
 	for (auto functors = m_functors.cbegin(); functors != m_functors.cend(); ++functors)
 	{
 		auto decoder = functors->second.decoder;
 		if (decoder != nullptr)
 		{
-			// Still need to do error checking here !
 			YAML::Node temporary = node[functors->first];
-			decoder(&temporary);
+			if (!temporary.IsNull() && temporary.IsDefined())
+			{
+				try
+				{
+					decoder(&temporary);
+				}
+				catch (std::exception e)
+				{
+					SURGSIM_FAILURE() << e.what();
+				}
+			}
 		}
 	}
 }

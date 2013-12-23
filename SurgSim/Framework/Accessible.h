@@ -91,14 +91,27 @@ public:
 	/// \param	setter	The setter.
 	void setAccessors(const std::string& name, GetterType getter, SetterType setter);
 
+	/// Sets the functions used to convert data from and to a YAML::Node. Will throw and exception
+	/// if the data type that is passed to YAML cannot be converted into a YAML::Node
+	/// \param name The name of the property.
+	/// \param encoder The function to be used to put the property into the node.
+	/// \param decoder The function to be used to read the property from the node and set it
+	///                in the instance.
 	void setSerializable(const std::string& name, EncoderType encoder, DecoderType decoder);
 
+	/// Encode this Accessible to a YAML::Node
+	/// \return The encoded version of this instance.
 	YAML::Node encode();
 
+	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
+	/// be converted.
+	/// \param node The node that carries the data to be, properties with names that don't
+	///             match up with properties in the Accessible are ignored
 	void decode(const YAML::Node& node);
 
 private:
 
+	/// Private struct to keep the map under control
 	struct Functors
 	{
 		GetterType getter;
@@ -111,6 +124,7 @@ private:
 
 };
 
+/// Public struct to pair an accessible with its appropriate property
 struct Property
 {
 	std::weak_ptr<Accessible> accessible;

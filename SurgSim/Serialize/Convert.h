@@ -28,9 +28,9 @@
 ///       needs to be passed template parameters in a specialization, that extend the original template interface
 ///       gcc needs the template<> statement before the new template parameters, msvc does not like it at all.
 #ifdef _GNUC_
-#define SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION template<>
+#define SURGSIM_DOUBLE_SPECIALIZATION template<>
 #else
-#define SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
+#define SURGSIM_DOUBLE_SPECIALIZATION
 #endif
 
 

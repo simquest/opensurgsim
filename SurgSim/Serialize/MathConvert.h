@@ -37,7 +37,7 @@
 namespace YAML
 {
 	/// Specialization of convert for fixed size Eigen::Matrix
-	SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
+	SURGSIM_DOUBLE_SPECIALIZATION
 	template <typename Type, int Rows, int Cols, int MOpt>
 	struct convert<Eigen::Matrix<Type, Rows, Cols, MOpt>>
 	{
@@ -46,7 +46,7 @@ namespace YAML
 	};
 
 	/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
-	SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
+	SURGSIM_DOUBLE_SPECIALIZATION
 	template <class Type, int Rows, int MOpt>
 	struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
 	{
@@ -55,7 +55,7 @@ namespace YAML
 	};
 
 	/// Specialization of convert for Eigen::Quaternion
-	SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
+	SURGSIM_DOUBLE_SPECIALIZATION
 	template <class Type, int QOpt>
 	struct convert<typename Eigen::Quaternion<Type, QOpt>>
 	{
@@ -64,7 +64,7 @@ namespace YAML
 	};
 
 	/// Specialization of convert for Eigen::RigidTransform
-	SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
+	SURGSIM_DOUBLE_SPECIALIZATION
 	template <class Type, int Dim, int TMode, int TOptions>
 	struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
 	{

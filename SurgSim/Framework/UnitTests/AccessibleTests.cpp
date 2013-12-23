@@ -224,6 +224,59 @@ TEST(AccessibleTests, Serialize)
 	EXPECT_EQ(50, a.serializableProperty);
 }
 
+class MultipleValuesClass : public Accessible
+{
+public:
+	MultipleValuesClass() : a("invalid"), b("invalid"), c("invalid")
+	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultipleValuesClass, std::string, a, getA, setA);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultipleValuesClass, std::string, b, getB, setB);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultipleValuesClass, std::string, c, getC, setC);
+	}
+
+	std::string a;
+	std::string getA() const { return a; }
+	void setA(std::string val) { a = val; }
+	
+	std::string b;
+	std::string getB() const { return b; }
+	void setB(std::string val) { b = val; }
+	
+	std::string c;
+	std::string getC() const { return c; }
+	void setC(std::string val) { c = val; }
+};
+
+TEST(AccessibleTests, MultipleValues)
+{
+	YAML::Node newValues;
+	newValues["xxx"] = "invalid";
+	newValues["a"] = "a";
+	newValues["b"] = "b";
+
+	MultipleValuesClass test;
+	test.decode(newValues);
+
+	EXPECT_EQ(test.a, "a");
+	EXPECT_EQ(test.b, "b");
+	EXPECT_EQ(test.c, "invalid");
+
+	
+	YAML::Node expected;
+	expected["a"] = "a";
+	expected["b"] = "b";
+	expected["c"] = "invalid";
+
+	YAML::Node encodedValues = test.encode();
+
+	std::ostringstream expectedString;
+	std::ostringstream encodedString;
+	expectedString << expected;
+	encodedString << encodedValues;
+
+	EXPECT_EQ(expectedString.str(), encodedString.str()) << expectedString << ", " << encodedString;
+}
+
 
 }; // namespace Framework
 }; // namespace SurgSim
