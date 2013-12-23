@@ -12,7 +12,7 @@
 
 # Attempt to define OPTITRACK_INCLUDE_DIR if undefined
 find_path(OPTITRACK_INCLUDE_DIR
-	NAMES cameralibrary.h
+	NAMES cameralibrary.h linuxtrack.h
 	PATHS "$ENV{NP_CAMERASDK}"
 	PATH_SUFFIXES "include"
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
@@ -30,7 +30,9 @@ macro(optitrack_shared_from_link OUTPUT)
 			#string(REPLACE "/lib/" "/bin/" SHARED "${FILE}")
 			string(REPLACE ".lib" ".dll" SHARED "${FILE}")
 		else()
-			set(SHARED "${FILE}")
+			string(REPLACE "/lib/" "/bin/" SHARED "${FILE}")
+			string(REPLACE ".lib" ".so" SHARED "${FILE}")
+			#set(SHARED "${FILE}")
 		endif()
 		if(EXISTS "${SHARED}")
 			list(APPEND SHARED_LIST "${SHARED}")
@@ -44,28 +46,43 @@ macro(optitrack_shared_from_link OUTPUT)
 endmacro()
 
 macro(OptiTrack_find_library LIB_NAME)
-	find_library(OPTITRACK_LIBRARY_RELEASE
-		NAMES "${LIB_NAME}2010S"
-		HINTS ${OPTITRACK_ROOT_DIR}
-		PATH_SUFFIXES "lib"
-		NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
-	)
-	find_library(OPTITRACK_LIBRARY_DEBUG
-		NAMES "${LIB_NAME}2010D"
-		HINTS ${OPTITRACK_ROOT_DIR}
-		PATH_SUFFIXES "lib"
-		NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
-	)
-	if(OPTITRACK_LIBRARY_RELEASE AND
-			OPTITRACK_LIBRARY_DEBUG AND
-			NOT OPTITRACK_LIBRARY)
-		set(OPTITRACK_LIBRARY
-			optimized ${OPTITRACK_LIBRARY_RELEASE}
-			debug     ${OPTITRACK_LIBRARY_DEBUG}
-			CACHE STRING "The ${LIB_NAME} library from the OptiTrack SDK.")
-		mark_as_advanced(OPTITRACK_LIBRARY)
+	if(WIN32)
+		find_library(OPTITRACK_LIBRARY_RELEASE
+			NAMES "${LIB_NAME}2010S"
+			HINTS ${OPTITRACK_ROOT_DIR}
+			PATH_SUFFIXES "lib"
+			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
+		)
+		find_library(OPTITRACK_LIBRARY_DEBUG
+			NAMES "${LIB_NAME}2010D"
+			HINTS ${OPTITRACK_ROOT_DIR}
+			PATH_SUFFIXES "lib"
+			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
+		)
+	else()
+		find_library(OPTITRACK_LIBRARY_RELEASE
+			NAMES "${LIB_NAME}.a"
+			HINTS ${OPTITRACK_ROOT_DIR}
+			PATH_SUFFIXES "lib"
+			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
+		)
+		find_library(OPTITRACK_LIBRARY_DEBUG
+			NAMES "${LIB_NAME}.a"
+			HINTS ${OPTITRACK_ROOT_DIR}
+			PATH_SUFFIXES "lib"
+			NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
+		)
 	endif()
 	
+	if(OPTITRACK_LIBRARY_RELEASE AND
+	   OPTITRACK_LIBRARY_DEBUG AND
+	   NOT OPTITRACK_LIBRARY)
+			set(OPTITRACK_LIBRARY
+				optimized ${OPTITRACK_LIBRARY_RELEASE}
+				debug     ${OPTITRACK_LIBRARY_DEBUG}
+				CACHE STRING "The ${LIB_NAME} library from the OptiTrack SDK.")
+			mark_as_advanced(OPTITRACK_LIBRARY)
+	endif()
 	if(OPTITRACK_LIBRARY_RELEASE AND
 			NOT OPTITRACK_SHARED_RELEASE)
 		optitrack_shared_from_link(OPTITRACK_SHARED_RELEASE
@@ -77,7 +94,12 @@ macro(OptiTrack_find_library LIB_NAME)
 			"${OPTITRACK_LIBRARY_DEBUG}")
 	endif()
 endmacro()
-OptiTrack_find_library(cameralibrary)
+
+if(WIN32)
+	OptiTrack_find_library(cameralibrary)
+else()
+	OptiTrack_find_library(liblinuxtrack)
+endif()
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OPTITRACK

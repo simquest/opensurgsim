@@ -25,7 +25,6 @@ include_directories(
 
 set(TRACKIR_DEVICE_SOURCES
 	TrackIRDevice.cpp
-	TrackIRScaffold.cpp
 	TrackIRThread.cpp
 )
 
@@ -35,6 +34,20 @@ set(TRACKIR_DEVICE_HEADERS
 	TrackIRThread.h
 )
 
+set(TRACKIR_DEVICE_LINUX_SOURCES
+	linux/TrackIRScaffold.cpp
+)
+
+set(TRACKIR_DEVICE_WIN_SOURCES
+	win32/TrackIRScaffold.cpp
+)
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	list(APPEND TRACKIR_DEVICE_SOURCES ${TRACKIR_DEVICE_LINUX_SOURCES})
+else()
+	list(APPEND TRACKIR_DEVICE_SOURCES ${TRACKIR_DEVICE_WIN_SOURCES})
+endif()
+
 surgsim_add_library(
 	TrackIRDevice
 	"${TRACKIR_DEVICE_SOURCES}" "${TRACKIR_DEVICE_HEADERS}"
@@ -43,9 +56,6 @@ surgsim_add_library(
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
-	if(GLUT_FOUND)
-		add_subdirectory(VisualTest)
-	endif(GLUT_FOUND)
 endif()
 
 # Natural Point Camera SDK needs this preprocessor definition to work properly
