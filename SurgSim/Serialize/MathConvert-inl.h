@@ -42,7 +42,7 @@ bool YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::decode(const Node&
 		}
 		catch(YAML::RepresentationException)
 		{
-			rhs[i] = std::numeric_limits<SurgSim::Math::Vector4d::Scalar>::quiet_NaN();
+			rhs[i] = std::numeric_limits<Type>::quiet_NaN();
 
 			auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::Serialize::serializeLogger);
 			SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
@@ -94,10 +94,53 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 			}
 			catch(YAML::RepresentationException)
 			{
-				rhs.row(row)[col] = std::numeric_limits<SurgSim::Math::Vector4d::Scalar>::quiet_NaN();
+				rhs.row(row)[col] = std::numeric_limits<Type>::quiet_NaN();
 				auto logger = SurgSim::Framework::Logger::getLogger(SurgSim::Serialize::serializeLogger);
 				SURGSIM_LOG(logger, WARNING) << "Bad conversion: #NaN value";
 			}
+		}
+	}
+	return true;
+}
+
+template <class Type, int QOpt>
+YAML::Node YAML::convert<Eigen::Quaternion<Type, QOpt>>::encode(const typename Eigen::Quaternion<Type, QOpt>& rhs)
+{
+	return Node(convert<Eigen::Matrix<Type,4,1,QOpt>>::encode(rhs.coeffs()));
+}
+
+template <class Type, int QOpt>
+bool YAML::convert<Eigen::Quaternion<Type, QOpt>>::decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs)
+{
+	bool result = false;
+	if (node.IsSequence() && node.size() == 4)
+	{
+		result = convert<Eigen::Matrix<Type,4,1,QOpt>>::decode(node, rhs.coeffs());
+	}
+	return result;
+}
+
+template <class Type, int Dim, int TMode, int TOptions>
+YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
+{
+	typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::MatrixType MatrixType;
+	MatrixType temporary(rhs.matrix());
+	return Node(convert<MatrixType>::encode(temporary));
+}
+
+
+template <class Type, int Dim, int TMode, int TOptions>
+bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
+{
+	bool result = false;
+	if (node.IsSequence())
+	{
+		typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::MatrixType MatrixType;
+		MatrixType temporary;
+		if (convert<MatrixType>::decode(node, temporary))
+		{
+			rhs.matrix() = temporary;
+			result = true;
 		}
 	}
 	return true;

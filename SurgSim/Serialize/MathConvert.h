@@ -24,27 +24,21 @@
 #include "SurgSim/Math/RigidTransform.h"
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
+
+/// \file MathConvert.h
+/// This contains a series of functions to encode and decode Eigen data structures to
+/// and from YAML nodes. These conversion functions will extinguish Eigen options, these
+/// are not serialized, the output is determined by the type as it is declared in the
+/// appropriate conversion function, with Eigen::Transform, this could lead to problems
+/// If the mode that is used for reading is different than the mode that was used while
+/// writing.
 
 namespace YAML
 {
-	/// declaration of specialization convert<SurgSim::Math::Vector4d>
-	template <>
-	struct convert <SurgSim::Math::Quaterniond>
-	{
-		static Node encode(const SurgSim::Math::Quaterniond& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Quaterniond& rhs);
-	};
-
-	/// declaration of specialization convert<SurgSim::Math::RigidTransform3d>
-	template <>
-	struct convert <SurgSim::Math::RigidTransform3d>
-	{
-		static Node encode(const SurgSim::Math::RigidTransform3d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs);
-	};
-
+	/// Specialization of convert for fixed size Eigen::Matrix
 	template <class Type, int Rows, int Cols, int MOpt>
-	struct convert <typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
+	struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
 	{
 		static Node convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
 			const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
@@ -64,6 +58,21 @@ namespace YAML
 			typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
 	};
 
+	/// Specialization of convert for Eigen::Quaternion
+	template <class Type, int QOpt>
+	struct convert<typename Eigen::Quaternion<Type, QOpt>>
+	{
+		static Node encode(const typename Eigen::Quaternion<Type, QOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs);
+	};
+
+	/// Specialization of convert for Eigen::RigidTransform
+	template <class Type, int Dim, int TMode, int TOptions>
+	struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
+	{
+		static Node encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+	};
 
 
 

@@ -50,9 +50,36 @@ public:
 };
 
 typedef ::testing::Types<SurgSim::Math::Vector2d,
+						 SurgSim::Math::Vector2f,
 						 SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector4d> VectorTypes;
+						 SurgSim::Math::Vector3f,
+						 SurgSim::Math::Vector4d,
+						 SurgSim::Math::Vector4f> VectorTypes;
+
 TYPED_TEST_CASE(VectorTest, VectorTypes);
+
+template <class T>
+class QuaternionTest : public BaseTest<typename T::Scalar>
+{
+public:
+	typedef T Quaternion;
+};
+
+typedef ::testing::Types<SurgSim::Math::Quaterniond, SurgSim::Math::Quaternionf> QuaternionTypes;
+TYPED_TEST_CASE(QuaternionTest, QuaternionTypes);
+
+template <class T>
+class RigidTransformTest : public BaseTest<typename T::Scalar>
+{
+public:
+	typedef T RigidTransform;
+};
+typedef ::testing::Types<SurgSim::Math::RigidTransform2f,
+						 SurgSim::Math::RigidTransform2d,
+						 SurgSim::Math::RigidTransform3f,
+						 SurgSim::Math::RigidTransform3d> RigidTransformTypes;
+
+TYPED_TEST_CASE(RigidTransformTest, RigidTransformTypes);
 
 template <class T>
 class Testable : public Accessible
@@ -130,8 +157,8 @@ TYPED_TEST(VectorTest, Accessible)
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::Vector Vector;
 
-	TypeParam initialValue;
-	TypeParam newValue;
+	Vector initialValue;
+	Vector newValue;
 	
 	for (int i = 0; i < initialValue.size(); ++i)
 	{
@@ -144,6 +171,53 @@ TYPED_TEST(VectorTest, Accessible)
 	EXPECT_TRUE(newValue.isApprox(result.second));
 
 	result = testEncodeDecode<TypeParam>(initialValue, newValue);
+	EXPECT_TRUE(newValue.isApprox(result.first));
+	EXPECT_TRUE(newValue.isApprox(result.second));
+}
+
+TYPED_TEST(QuaternionTest, Accessible)
+{
+	typedef typename TestFixture::Scalar Scalar;
+	typedef typename TestFixture::Quaternion Quaternion;
+
+	Quaternion initialValue(1.0,2.0,3.0,4.0);
+	Quaternion newValue(5.0,6.0,7.0,8.0);
+
+	initialValue.normalize();
+	newValue.normalize();
+
+	std::pair<Quaternion, Quaternion> result = testProperty<TypeParam >(initialValue, newValue);
+	EXPECT_TRUE(newValue.isApprox(result.first));
+	EXPECT_TRUE(newValue.isApprox(result.second));
+
+	result = testEncodeDecode<Quaternion>(initialValue, newValue);
+	EXPECT_TRUE(newValue.isApprox(result.first));
+	EXPECT_TRUE(newValue.isApprox(result.second));
+}
+
+TYPED_TEST(RigidTransformTest, Accessible)
+{
+	typedef typename TestFixture::Scalar Scalar;
+	typedef typename TestFixture::RigidTransform RigidTransform;
+
+	RigidTransform::MatrixType initialMatrix;
+	RigidTransform::MatrixType newMatrix;
+	
+	for (int i = 0; i < initialMatrix.size(); ++i)
+	{
+		initialMatrix(i) = static_cast<Scalar>(i);
+		newMatrix(i) = static_cast<Scalar>(i*2);
+	}
+
+	RigidTransform initialValue(initialMatrix);
+	RigidTransform newValue(newMatrix);
+
+
+	std::pair<RigidTransform, RigidTransform> result = testProperty<RigidTransform >(initialValue, newValue);
+	EXPECT_TRUE(newValue.isApprox(result.first));
+	EXPECT_TRUE(newValue.isApprox(result.second));
+
+	result = testEncodeDecode<RigidTransform>(initialValue, newValue);
 	EXPECT_TRUE(newValue.isApprox(result.first));
 	EXPECT_TRUE(newValue.isApprox(result.second));
 }

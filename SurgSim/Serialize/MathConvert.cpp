@@ -18,47 +18,7 @@
 namespace YAML
 {
 
-	/// Specialize of YAML::convert<> template quanterniond class.
-	Node convert<SurgSim::Math::Quaterniond>::encode(const SurgSim::Math::Quaterniond& rhs)
-	{
-		Node node;
-		node = convert<SurgSim::Math::Vector4d>::encode(rhs.coeffs());
-		return node;
-	}
-
-	bool convert<SurgSim::Math::Quaterniond>::decode(const Node& node, SurgSim::Math::Quaterniond& rhs)
-	{
-		if (! node.IsSequence() || node.size() != 4)
-		{
-			return false;
-		}
-
-		SurgSim::Math::Vector4d coeffs;
-		convert<SurgSim::Math::Vector4d>::decode(node, rhs.coeffs());
-		return true;
-	}
-
 	/// Specialize of YAML::convert<> template RigidTransform class.
-	Node convert<SurgSim::Math::RigidTransform3d>::encode(const SurgSim::Math::RigidTransform3d& rhs)
-	{
-		Node node;
-		SurgSim::Math::Matrix44d transform = rhs.matrix();
-		node = convert<SurgSim::Math::Matrix44d>::encode(transform);
-		return node;
-	}
-
-	bool convert<SurgSim::Math::RigidTransform3d>::decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs)
-	{
-		if (! node.IsSequence())
-		{
-			return false;
-		}
-
-		SurgSim::Math::Matrix44d transform;
-		convert<SurgSim::Math::Matrix44d>::decode(node, transform);
-		rhs.matrix() = transform;
-		return true;
-	}
 
 	/// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs)
