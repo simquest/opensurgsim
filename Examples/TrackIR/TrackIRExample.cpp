@@ -16,11 +16,9 @@
 #include <memory>
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Blocks/TransferTrackIRPoseBehavior.h"
+#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 #include "SurgSim/Devices/TrackIR/TrackIRDevice.h"
 #include "SurgSim/Framework/BehaviorManager.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
@@ -40,9 +38,7 @@
 
 
 using SurgSim::Blocks::BasicSceneElement;
-using SurgSim::Blocks::TransferPoseBehavior;
-using SurgSim::Blocks::TransferTrackIRPoseBehavior;
-using SurgSim::Framework::Logger;
+using SurgSim::Blocks::TransferInputPoseBehavior;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgMaterial;
@@ -67,7 +63,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(
 
 	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input", "TrackIRDevice");
 	viewElement->addComponent(inputComponent);
-	viewElement->addComponent(std::make_shared<TransferTrackIRPoseBehavior>("TrackIR-Pose", inputComponent, camera));
+	viewElement->addComponent(std::make_shared<TransferInputPoseBehavior>("TrackIR-Pose", inputComponent, camera));
 
 	return viewElement;
 }

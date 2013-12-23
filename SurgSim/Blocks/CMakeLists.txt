@@ -29,7 +29,6 @@ set(SURGSIM_BLOCKS_SOURCES
 	SphereElement.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
-	TransferTrackIRPoseBehavior.cpp
 )
 
 set(SURGSIM_BLOCKS_HEADERS
@@ -43,7 +42,6 @@ set(SURGSIM_BLOCKS_HEADERS
 	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
 	TransferPoseBehavior.h
-	TransferTrackIRPoseBehavior.h
 )
 
 surgsim_add_library(
