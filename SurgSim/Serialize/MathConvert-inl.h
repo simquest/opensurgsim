@@ -16,7 +16,8 @@
 #ifndef SURGSIM_SERIALIZE_MATHCONVERT_INL_H
 #define SURGSIM_SERIALIZE_MATHCONVERT_INL_H
 
-template <class Type, int Rows, int MOpt>
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
+template <typename Type, int Rows, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::encode(
 	const typename Eigen::Matrix<Type,Rows,1,MOpt>& rhs)
 {
@@ -30,6 +31,7 @@ YAML::Node YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::encode(
 	return node;
 }
 
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int Rows, int MOpt>
 bool YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::decode(
 	const Node& node,
@@ -57,6 +59,7 @@ bool YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::decode(
 	return true;
 }
 
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int Rows, int Cols, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode(
 		const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs)
@@ -75,6 +78,7 @@ YAML::Node YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::encode
 	return node;
 }
 
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int Rows, int Cols, int MOpt>
 bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 		const YAML::Node& node,
@@ -109,12 +113,14 @@ bool YAML::convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>::decode(
 	return true;
 }
 
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int QOpt>
 YAML::Node YAML::convert<Eigen::Quaternion<Type, QOpt>>::encode(const typename Eigen::Quaternion<Type, QOpt>& rhs)
 {
 	return Node(convert<Eigen::Matrix<Type,4,1,QOpt>>::encode(rhs.coeffs()));
 }
 
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int QOpt>
 bool YAML::convert<Eigen::Quaternion<Type, QOpt>>::decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs)
 {
@@ -126,6 +132,7 @@ bool YAML::convert<Eigen::Quaternion<Type, QOpt>>::decode(const Node& node, type
 	return result;
 }
 
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int Dim, int TMode, int TOptions>
 YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
 	const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
@@ -135,7 +142,7 @@ YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
 	return Node(convert<MatrixType>::encode(temporary));
 }
 
-
+SURGSIM_EMPTY_TEMPLATE_SPECIALIZATION
 template <class Type, int Dim, int TMode, int TOptions>
 bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 	const Node& node,
@@ -152,7 +159,7 @@ bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 			result = true;
 		}
 	}
-	return true;
+	return result;
 }
 
 #endif

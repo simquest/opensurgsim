@@ -113,7 +113,9 @@ void Accessible::decode(const YAML::Node& node)
 		auto decoder = functors->second.decoder;
 		if (decoder != nullptr)
 		{
-			decoder(&node[functors->first]);
+			// Still need to do error checking here !
+			YAML::Node temporary = node[functors->first];
+			decoder(&temporary);
 		}
 	}
 }
