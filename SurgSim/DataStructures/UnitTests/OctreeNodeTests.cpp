@@ -249,3 +249,14 @@ TEST(OctreeNodeTests, CopyOctreeNode)
 	}
 }
 
+TEST(OctreeNodeTests, EmptyData)
+{
+	struct EmptyData {};
+
+	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones());
+
+	EXPECT_NO_THROW({OctreeNode<EmptyData> octree(boundingBox);});
+	EXPECT_NO_THROW(std::make_shared<OctreeNode<EmptyData>>(boundingBox));
+}
+
+
