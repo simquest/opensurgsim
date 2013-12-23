@@ -13,8 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_SERIALIZE_MATHCONVERT_INL_H
+#define SURGSIM_SERIALIZE_MATHCONVERT_INL_H
+
 template <class Type, int Rows, int MOpt>
-YAML::Node YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::encode(const typename Eigen::Matrix<Type,Rows,1,MOpt>& rhs)
+YAML::Node YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::encode(
+	const typename Eigen::Matrix<Type,Rows,1,MOpt>& rhs)
 {
 	Node node;
 	node.SetStyle(YAML::FlowStyle);
@@ -27,7 +31,9 @@ YAML::Node YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::encode(const
 }
 
 template <class Type, int Rows, int MOpt>
-bool YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::decode(const Node& node, typename Eigen::Matrix<Type,Rows,1,MOpt>& rhs)
+bool YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::decode(
+	const Node& node,
+	typename Eigen::Matrix<Type,Rows,1,MOpt>& rhs)
 {
 	if (! node.IsSequence() || node.size() != Rows)
 	{
@@ -121,7 +127,8 @@ bool YAML::convert<Eigen::Quaternion<Type, QOpt>>::decode(const Node& node, type
 }
 
 template <class Type, int Dim, int TMode, int TOptions>
-YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
+YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
+	const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
 {
 	typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::MatrixType MatrixType;
 	MatrixType temporary(rhs.matrix());
@@ -130,7 +137,9 @@ YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(c
 
 
 template <class Type, int Dim, int TMode, int TOptions>
-bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
+bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
+	const Node& node,
+	typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
 {
 	bool result = false;
 	if (node.IsSequence())
@@ -145,3 +154,5 @@ bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(const N
 	}
 	return true;
 }
+
+#endif

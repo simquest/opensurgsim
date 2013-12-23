@@ -148,7 +148,7 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 	setSerializable(#property,\
 				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
 				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
- 
+
 /// A macro to register a getter for a property that is read only
 #define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \
 	setGetter(#property, \

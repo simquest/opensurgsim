@@ -20,7 +20,7 @@
 
 
 // We need ALL of the math types
-using namespace SurgSim::Math;
+using namespace SurgSim::Math; //NOLINT
 
 namespace SurgSim
 {
@@ -39,7 +39,7 @@ class ScalarTest : public BaseTest<T>
 {
 };
 
-typedef ::testing::Types<int, long, size_t, double, float> ScalarTypes;
+typedef ::testing::Types<int, size_t, double, float> ScalarTypes;
 TYPED_TEST_CASE(ScalarTest, ScalarTypes);
 
 template <class T>
@@ -107,7 +107,7 @@ std::pair<T, T> testProperty(T a, T b)
 	Testable<T> test;
 	std::pair<T, T> result;
 	test.property = a;
-	
+
 	test.setValue("property", b);
 	result.first = test.property;
 
@@ -159,7 +159,7 @@ TYPED_TEST(VectorTest, Accessible)
 
 	Vector initialValue;
 	Vector newValue;
-	
+
 	for (int i = 0; i < initialValue.size(); ++i)
 	{
 		initialValue[i] = static_cast<Scalar>(i);
@@ -202,7 +202,7 @@ TYPED_TEST(RigidTransformTest, Accessible)
 
 	RigidTransform::MatrixType initialMatrix;
 	RigidTransform::MatrixType newMatrix;
-	
+
 	for (int i = 0; i < initialMatrix.size(); ++i)
 	{
 		initialMatrix(i) = static_cast<Scalar>(i);
@@ -212,7 +212,6 @@ TYPED_TEST(RigidTransformTest, Accessible)
 	RigidTransform initialValue(initialMatrix);
 	RigidTransform newValue(newMatrix);
 
-
 	std::pair<RigidTransform, RigidTransform> result = testProperty<RigidTransform >(initialValue, newValue);
 	EXPECT_TRUE(newValue.isApprox(result.first));
 	EXPECT_TRUE(newValue.isApprox(result.second));
@@ -221,9 +220,6 @@ TYPED_TEST(RigidTransformTest, Accessible)
 	EXPECT_TRUE(newValue.isApprox(result.first));
 	EXPECT_TRUE(newValue.isApprox(result.second));
 }
-
-
-
 
 }
 }
