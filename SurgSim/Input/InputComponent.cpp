@@ -43,6 +43,8 @@ public:
 	/// \param inputData The input data coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
 	{
+		SURGSIM_ASSERT(inputData.isValid())
+			<< "Cannot handle input with invalid data from device (" << device << ")";
 		m_lastInput.set(inputData);
 	}
 
