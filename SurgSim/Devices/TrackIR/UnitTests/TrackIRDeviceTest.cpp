@@ -153,34 +153,5 @@ TEST(TrackIRDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 50);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 100);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
-}
-
-TEST(TrackIRDeviceTest, OutputProducer)
-{
-	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-
-	std::shared_ptr<TestListener> producer = std::make_shared<TestListener>();
-	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
-
-	EXPECT_FALSE(device->removeOutputProducer(producer));
-	EXPECT_EQ(0, producer->m_numTimesRequestedOutput);
-
-	EXPECT_TRUE(device->setOutputProducer(producer));
-
-	// Sleep for one second, to see how many times the producer is invoked.
-	// (A TrackIR device is supposed to run at 120FPS = 240Hz.)
-	// (The thread to poll data out of TrackIR is running at 60Hz.)
-	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
-
-	EXPECT_TRUE(device->removeOutputProducer(producer));
-
-	// Removing the same input producer again should fail.
-	EXPECT_FALSE(device->removeOutputProducer(producer));
-
-	// Check the number of invocations.
-	EXPECT_GE(producer->m_numTimesRequestedOutput, 50);
-	EXPECT_LE(producer->m_numTimesRequestedOutput, 100);
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().isValid());
 }
