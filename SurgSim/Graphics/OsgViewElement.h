@@ -24,7 +24,7 @@ namespace SurgSim
 
 namespace Input
 {
-	class CommonDevice;
+class CommonDevice;
 }
 
 namespace Graphics
@@ -70,14 +70,14 @@ public:
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override;
 	/// Turn on/off the keyboard device to be used.
 	/// \param val Indicate whether or not to use keyboard device
-	bool enableKeyboardDevice(bool val);
+	virtual bool enableKeyboardDevice(bool val) override;
 
 	/// Return the mouse to be used with this view.
 	/// \return A mouse device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override;
 	/// Turn on/off the mouse device to be used.
 	/// \param val Indicate whether or not to use mouse device
-	bool enableMouseDevice(bool val);
+	virtual	bool enableMouseDevice(bool val) override;
 
 private:
 	osg::ref_ptr<OsgTrackballZoomManipulator> m_manipulator;
