@@ -121,9 +121,8 @@ bool InputManager::addOutputComponent(const std::shared_ptr<OutputComponent>& ou
 	{
 		if (! m_devices[output->getDeviceName()]->hasOutputProducer())
 		{
-			m_devices[output->getDeviceName()]->setOutputProducer(output);
-			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ <<
-				" Added component " << output->getName();
+			output->connectDevice(m_devices[output->getDeviceName()]);
+			SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Added component " << output->getName();
 			result = true;
 		}
 		else
@@ -152,7 +151,7 @@ bool InputManager::addDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> de
 	}
 	else
 	{
-		SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ << "Device already available in Input Manager";
+		SURGSIM_LOG_WARNING(m_logger) << __FUNCTION__ << " Device already available in Input Manager";
 	}
 	return result;
 }

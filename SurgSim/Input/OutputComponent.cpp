@@ -15,16 +15,60 @@
 
 #include "SurgSim/Input/OutputComponent.h"
 
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Input/DeviceInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Framework/LockedContainer.h"
+
 namespace SurgSim
 {
 namespace Input
 {
+/// An input consumer monitors device and signal state update
+class OutputProducer: public OutputProducerInterface
+{
+public:
+	/// Constructor
+	OutputProducer()
+	{
+	}
+	/// Destructor
+	virtual ~OutputProducer()
+	{
+	}
 
-OutputComponent::OutputComponent(const std::string& name, const std::string& deviceName,
-								 const SurgSim::DataStructures::DataGroup& outputData) :
+	/// Send the output to the device.
+	/// \param device The name of the device to receive the output.
+	/// \param outputData The output data going to the device.
+	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
+	{
+		bool result = false;
+		if (outputData != nullptr)
+		{
+			m_lastOutput.get(outputData);
+			SURGSIM_ASSERT((*outputData).isValid()) << "Attempting to output invalid data to device (" << device << ")";
+			result = true;
+		}
+		return result;
+	}
+
+	/// Set the output data information stored in this output producer
+	/// \param [out] dataGroup Used to accept the retrieved input data information
+	void setData(const SurgSim::DataStructures::DataGroup& dataGroup)
+	{
+		m_lastOutput.set(dataGroup);
+	}
+
+private:
+	/// Used to store output data information to be passed out to device
+	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastOutput;
+};
+
+OutputComponent::OutputComponent(const std::string& name, const std::string& deviceName) :
 	Component(name),
 	m_deviceName(deviceName),
-	m_outputData(outputData)
+	m_deviceConnected(false),
+	m_output(std::make_shared<OutputProducer>())
 {
 }
 
@@ -32,20 +76,15 @@ OutputComponent::~OutputComponent()
 {
 }
 
-bool OutputComponent::requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData)
+bool OutputComponent::isDeviceConnected()
 {
-	bool result = false;
-	if (outputData != nullptr)
-	{
-		*outputData = m_outputData;
-		result = true;
-	}
-	return result;
+	return m_deviceConnected;
 }
 
-SurgSim::DataStructures::DataGroup& OutputComponent::getOutputData()
+void OutputComponent::setData(const SurgSim::DataStructures::DataGroup& dataGroup)
 {
-	return m_outputData;
+	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to " << getName() << ". Unable to setData.";
+	m_output->setData(dataGroup);
 }
 
 bool OutputComponent::doInitialize()
@@ -61,6 +100,18 @@ bool OutputComponent::doWakeUp()
 std::string OutputComponent::getDeviceName() const
 {
 	return m_deviceName;
+}
+
+void OutputComponent::connectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
+{
+	device->setOutputProducer(m_output);
+	m_deviceConnected = true;
+}
+
+void OutputComponent::disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device)
+{
+	device->removeOutputProducer(m_output);
+	m_deviceConnected = false;
 }
 
 }; // namespace Input
