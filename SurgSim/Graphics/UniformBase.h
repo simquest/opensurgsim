@@ -17,7 +17,6 @@
 #define SURGSIM_GRAPHICS_UNIFORMBASE_H
 
 #include "SurgSim/Framework/Accessible.h"
-#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {
