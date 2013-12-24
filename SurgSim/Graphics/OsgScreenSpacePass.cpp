@@ -62,7 +62,7 @@ void OsgScreenSpacePass::updateViewport(int width, int height)
 {
 	if (m_camera != nullptr)
 	{
-		m_camera->setProjectionMatrixAsOrtho2D(0,width,0,height);
+		m_camera->setProjectionMatrixAsOrtho2D(0, width, 0, height);
 	}
 }
 

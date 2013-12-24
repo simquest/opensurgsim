@@ -32,26 +32,42 @@ namespace SurgSim
 namespace Graphics
 {
 
+/// Special RenderPass to draw items using a orthogonal projection, this is specific to the
+/// Osg implementation of the SurgSim rendering
 class OsgScreenSpacePass : public RenderPass
 {
 public:
+
+	/// Constructor.
+	/// \param name The name of the component
 	explicit OsgScreenSpacePass(const std::string& name);
 
+	/// Destructor
 	virtual ~OsgScreenSpacePass();
 
+	/// Set viewport dimensions
 	void setViewPort(int width, int height);
 
+	/// Initialize this Component
 	virtual bool doInitialize() override;
 
-	void updateViewport(int width, int height);
 
 private:
+	
+	/// Update the projection matrix
+	void updateViewport(int width, int height);
+
+	/// The osg camera reference
 	osg::ref_ptr<osg::Camera> m_camera;
+
+	/// The width of the viewport
 	int m_width;
+
+	/// The height of the viewport
 	int m_height;
 };
 
 }
 }
 
-#endif
+#endif // SURGSIM_GRAPHICS_OSGSCREENSPACEPASS_H

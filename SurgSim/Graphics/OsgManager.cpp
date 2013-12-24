@@ -198,7 +198,7 @@ bool OsgManager::doUpdate(double dt)
 		// \note HS-2013-dec-12 This will work as long as we deal with one view, when we move to stereoscopic
 		//	     we might have to revise things. Or just assume that most views have the same size
 		getViews()[0]->getDimensions(&width, &height);
-		m_hudElement->setViewPort(width,height);
+		m_hudElement->setViewPort(width, height);
 		return true;
 	}
 	else
@@ -216,6 +216,6 @@ void OsgManager::doBeforeStop()
 
 void SurgSim::Graphics::OsgManager::dumpDebugInfo() const
 {
-	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()),"default_camera.osgt" );
+	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()), "default_camera.osgt");
 }
 
