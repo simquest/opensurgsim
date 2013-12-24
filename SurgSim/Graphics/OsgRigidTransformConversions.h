@@ -32,9 +32,6 @@
 #include <osg/Vec2>
 #include <osg/Vec3>
 
-using SurgSim::Math::makeRigidTransform;
-
-
 namespace SurgSim
 {
 
@@ -57,7 +54,7 @@ inline std::pair<osg::Quat, osg::Vec3d> toOsg(const SurgSim::Math::RigidTransfor
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as floats
 inline SurgSim::Math::RigidTransform3f fromOsg(const osg::Quat& rotation, const osg::Vec3f& translation)
 {
-	return makeRigidTransform(fromOsg<float>(rotation), fromOsg(translation));
+	return SurgSim::Math::makeRigidTransform(fromOsg<float>(rotation), fromOsg(translation));
 }
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as floats
 inline SurgSim::Math::RigidTransform3f fromOsg(const std::pair<osg::Quat, osg::Vec3f>& transform)
@@ -67,7 +64,7 @@ inline SurgSim::Math::RigidTransform3f fromOsg(const std::pair<osg::Quat, osg::V
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as doubles
 inline SurgSim::Math::RigidTransform3d fromOsg(const osg::Quat& rotation, const osg::Vec3d& translation)
 {
-	return makeRigidTransform(fromOsg<double>(rotation), fromOsg(translation));
+	return SurgSim::Math::makeRigidTransform(fromOsg<double>(rotation), fromOsg(translation));
 }
 /// Convert from OSG to 3D rigid body (isometric) transform, represented as doubles
 inline SurgSim::Math::RigidTransform3d fromOsg(const std::pair<osg::Quat, osg::Vec3d>& transform)

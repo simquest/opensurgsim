@@ -41,6 +41,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	Scene.cpp
 	SceneElement.cpp
 	Timer.cpp
+	TransferPropertiesBehavior.cpp
 )
 
 set(SURGSIM_FRAMEWORK_HEADERS
@@ -74,6 +75,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	SharedInstance.h
 	SharedInstance-inl.h
 	Timer.h
+	TransferPropertiesBehavior.h
 )
 
 surgsim_add_library(

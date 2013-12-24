@@ -33,6 +33,8 @@
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
+
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;

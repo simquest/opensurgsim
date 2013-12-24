@@ -14,14 +14,15 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h"
-
 #include "SurgSim/Collision/CollisionPair.h"
+
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Geometry.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -54,9 +55,9 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 	// Transform the plane normal to box co-ordinate system.
 	SurgSim::Math::RigidTransform3d planeLocalToBoxLocal = representationBox->getPose().inverse() *
 														   representationPlane->getPose();
-	SurgSim::Math::Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
-	SurgSim::Math::Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
-	SurgSim::Math::Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
+	Vector3d planeNormal = planeLocalToBoxLocal.linear() * plane->getNormal();
+	Vector3d planeNormalScaled = plane->getNormal() * -plane->getD();
+	Vector3d planePoint = planeLocalToBoxLocal * planeNormalScaled;
 	double planeD = -planeNormal.dot(planePoint);
 
 	// Loop through the box vertices (boxVertex) and calculate "d = (planeNormal.dot(boxVertex) + planeD)".
@@ -70,7 +71,7 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 	double d[8] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	double maxD = -std::numeric_limits<double>::max();
 	double minD = std::numeric_limits<double>::max();
-	SurgSim::Math::Vector3d boxVertices[8];
+	Vector3d boxVertices[8];
 	for (int i = 0; i < 8; ++i)
 	{
 		boxVertices[i] = box->getVertex(i);
@@ -86,8 +87,8 @@ void BoxDoubleSidedPlaneDcdContact::doCalculateContact(std::shared_ptr<Collision
 		// - Vertex touching plane.
 		// - Vertex through plane.
 
-		SurgSim::Math::Vector3d normal;
-		SurgSim::Math::Vector3d boxVertexGlobal;
+		Vector3d normal;
+		Vector3d boxVertexGlobal;
 
 		enum BoxPlaneIntersectionType
 		{

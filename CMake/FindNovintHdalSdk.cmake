@@ -18,13 +18,16 @@ find_path(NOVINT_HDAL_SDK_INCLUDE_DIR
 	PATH_SUFFIXES "include"
 		# hack for getting the HDAL from the SimQuest-only SutureSim source tree
 		"SurgTool2003/DeviceDrivers/hdal/include"
+	DOC "Path in which the file hdl/hdl.h is located. File is part of HDAL SDK."
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 )
+
 # TODO(advornik): Shake down some usual suspects under Windows/Linux?
 find_path(NOVINT_HDAL_SDK_INCLUDE_DIR
 	NAMES hdl/hdl.h
 	PATH_SUFFIXES "include"
 )
+
 if(NOVINT_HDAL_SDK_INCLUDE_DIR)
 	get_filename_component(PARENT_DIR "${NOVINT_HDAL_SDK_INCLUDE_DIR}" PATH)
 	set(NOVINT_HDAL_SDK_ROOT_DIRS "${PARENT_DIR}")

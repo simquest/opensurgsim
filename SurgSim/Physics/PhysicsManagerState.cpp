@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/PhysicsManagerState.h"
-
 #include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/Representation.h"
+
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -54,7 +54,7 @@ const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepr
 }
 
 void PhysicsManagerState::setCollisionRepresentations(
-		const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
 {
 	m_collisionRepresentations = val;
 }

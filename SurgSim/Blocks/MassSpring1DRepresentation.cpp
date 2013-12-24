@@ -16,6 +16,9 @@
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/MassSpringNDRepresentationUtils.h"
 
+#include "SurgSim/Physics/LinearSpring.h"
+
+using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Mass;
 using SurgSim::Math::Vector3d;
 

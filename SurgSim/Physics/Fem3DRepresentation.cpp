@@ -20,9 +20,9 @@
 namespace
 {
 void transformVectorByBlockOf3(const SurgSim::Math::RigidTransform3d& transform,
-										Vector* x, bool rotationOnly = false)
+										SurgSim::Math::Vector* x, bool rotationOnly = false)
 {
-	typedef Vector::Index IndexType;
+	typedef SurgSim::Math::Vector::Index IndexType;
 
 	IndexType numNodes = x->size() / 3;
 	SURGSIM_ASSERT(numNodes * 3 == x->size()) <<

@@ -52,8 +52,10 @@ struct MeshElement
 	{
 	}
 
+	typedef std::array<unsigned int, N> IdType;
+
 	/// Element vertices.
-	std::array<unsigned int, N> verticesId;
+	IdType verticesId;
 	/// Extra element data.
 	Data data;
 
@@ -79,6 +81,7 @@ struct MeshElement
 template <unsigned int N>
 struct MeshElement<N, void>
 {
+
 	/// Constructor
 	/// \param	verticesId	IDs of the N element vertices
 	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
@@ -86,8 +89,10 @@ struct MeshElement<N, void>
 	{
 	}
 
+	typedef std::array<unsigned int, N> IdType;
+
 	/// Element vertices.
-	std::array<unsigned int, N> verticesId;
+	IdType verticesId;
 
 	/// Compare the element with another one (equality)
 	/// \param element The MeshElement to compare it to

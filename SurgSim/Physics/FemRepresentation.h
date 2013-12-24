@@ -23,7 +23,6 @@
 #include "SurgSim/Physics/FemElement.h"
 
 #include "SurgSim/Math/Vector.h"
-using SurgSim::Math::Vector;
 
 namespace SurgSim
 {
@@ -101,13 +100,13 @@ public:
 	/// Applies a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block) override;
+	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with
 	/// \return The vector containing f(x,v)
 	/// \note Returns a reference, its values will remain unchanged until the next call to computeF() or computeFMDK()
-	virtual Vector& computeF(const DeformableRepresentationState& state) override;
+	virtual SurgSim::Math::Vector& computeF(const DeformableRepresentationState& state) override;
 
 	/// Evaluation of the LHS matrix M(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the matrix M(x,v) with
@@ -136,7 +135,8 @@ public:
 	/// \param[out] K The matrix K = -df/dx(x,v)
 	/// \note Returns pointers, the internal data will remain unchanged until the next call to computeFMDK() or
 	/// \note computeF(), computeM(), computeD(), computeK()
-	virtual void computeFMDK(const DeformableRepresentationState& state, Vector** f, MT** M, DT** D, KT** K) override;
+	virtual void computeFMDK(const DeformableRepresentationState& state,
+		SurgSim::Math::Vector** f, MT** M, DT** D, KT** K) override;
 
 protected:
 	/// Adds the Rayleigh damping forces
@@ -155,7 +155,7 @@ protected:
 	/// \note    the mass      component will be computed FemElement by FemElement
 	/// \note If useGlobalDampingMatrix is False and useGlobalStiffnessMatrix is False
 	/// \note    the stiffness component will be computed FemElement by FemElement
-	void addRayleighDampingForce(Vector* f, const DeformableRepresentationState& state,
+	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
 		bool useGlobalDampingMatrix = false,
 		bool useGlobalMassMatrix = false, bool useGlobalStiffnessMatrix = false,
 		double scale = 1.0);
@@ -164,14 +164,14 @@ protected:
 	/// \param[in,out] f The force vector to cumulate the FemElements forces into
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the FemElements forces with
-	void addFemElementsForce(Vector* f, const DeformableRepresentationState& state, double scale = 1.0);
+	void addFemElementsForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state, double scale = 1.0);
 
 	/// Adds the gravity force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the gravity force into
 	/// \param state The state vector containing positions and velocities
 	/// \param scale A scaling factor to scale the gravity force with
 	/// \note This method does not do anything if gravity is disabled
-	void addGravityForce(Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
+	void addGravityForce(SurgSim::Math::Vector *f, const DeformableRepresentationState& state, double scale = 1.0);
 
 private:
 	/// Interface to be implemented by derived classes

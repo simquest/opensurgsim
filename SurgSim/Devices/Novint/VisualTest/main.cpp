@@ -27,7 +27,8 @@ using SurgSim::Device::IdentityPoseDevice;
 
 
 // Define the HDAL name of the device to use.
-static const char* const NOVINT_DEVICE_NAME = "FALCON_HTHR_R";
+static const char* const NOVINT_DEVICE_NAME = ""; // An empty name will instantiate the default falcon.
+//static const char* const NOVINT_DEVICE_NAME = "FALCON_HTHR_R";
 //static const char* const NOVINT_DEVICE_NAME = "FALCON_FRANKEN_L";
 //static const char* const NOVINT_DEVICE_NAME = "FALCON_BURRv3_1";
 //static const char* const NOVINT_DEVICE_NAME = "FALCON_BURRv3_2";

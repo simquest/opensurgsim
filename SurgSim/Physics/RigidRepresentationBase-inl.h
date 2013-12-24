@@ -23,7 +23,8 @@ namespace Physics
 {
 
 template <class T>
-std::shared_ptr<T> SurgSim::Physics::RigidRepresentationBase::createTypedLocalization(const Location& location)
+std::shared_ptr<T> SurgSim::Physics::RigidRepresentationBase::createTypedLocalization(
+	const SurgSim::Collision::Location& location)
 {
 	// Change when we deal with the meshes as shapes
 	std::shared_ptr<T> result = std::make_shared<T>();

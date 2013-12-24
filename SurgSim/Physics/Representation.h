@@ -20,11 +20,10 @@
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/MlcpSolution.h"
-#include "SurgSim/Framework/Representation.h"
-#include "SurgSim/Collision/Location.h"
 
-using SurgSim::Collision::Location;
-using SurgSim::Math::Vector;
+#include "SurgSim/Framework/Representation.h"
+
+#include "SurgSim/Collision/Location.h"
 
 namespace SurgSim
 {
@@ -108,12 +107,12 @@ public:
 	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt);
 
-	virtual std::shared_ptr<Localization> createLocalization(const Location& location);
+	virtual std::shared_ptr<Localization> createLocalization(const SurgSim::Collision::Location& location);
 
 	/// Apply a correction to the internal degrees of freedom
 	/// \param dt The time step
 	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block);
+	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block);
 
 protected:
 	/// Set the number of degrees of freedom
