@@ -43,6 +43,11 @@ public:
 		SURGSIM_ADD_RO_PROPERTY(TestClass, int, readOnly, getReadOnly);
 
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, privateProperty, getPrivateProperty, setPrivateProperty);
+
+		// For testing readable and writeable
+		setGetter("readable", std::bind(&TestClass::getNormal, this));
+		setSetter("writeable", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
+			std::placeholders::_1)));
 	}
 
 	int normal;
@@ -67,6 +72,7 @@ public:
 
 private:
 	double privateProperty;
+
 };
 
 namespace SurgSim
@@ -146,6 +152,23 @@ TEST(AccessibleTest, TemplateFunction)
 	EXPECT_FALSE(a.getValue("normal", noValue));
 }
 
+TEST(AccessibleTest, CheckReadWriteable)
+{
+	TestClass a;
+
+	EXPECT_TRUE(a.isReadable("normal"));
+	EXPECT_TRUE(a.isWriteable("normal"));
+
+	EXPECT_TRUE(a.isReadable("readable"));
+	EXPECT_FALSE(a.isWriteable("readable"));
+
+	EXPECT_FALSE(a.isReadable("writeable"));
+	EXPECT_TRUE(a.isWriteable("writeable"));
+
+	EXPECT_FALSE(a.isWriteable("xxx"));
+	EXPECT_FALSE(a.isReadable("xxx"));
+}
+
 TEST(AccessibleTest, Privates)
 {
 	TestClass a;
@@ -198,6 +221,7 @@ TEST(AccessibleTest, ConvertDoubleToFloat)
 	target = convert<SurgSim::Math::Matrix44f>(sourceFloat);
 	EXPECT_TRUE(target.isApprox(sourceFloat));
 }
+
 
 }; // namespace Framework
 }; // namespace SurgSim

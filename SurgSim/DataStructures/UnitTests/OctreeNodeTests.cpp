@@ -35,7 +35,7 @@ struct MockData
 };
 
 typedef OctreeNode<MockData> OctreeNodeType;
-typedef OctreeNode<MockData>::BoundingBoxType BoundingBoxType;
+typedef OctreeNode<MockData>::AxisAlignedBoundingBox AxisAlignedBoundingBox;
 
 namespace
 {
@@ -44,7 +44,7 @@ const double epsilon = 1e-14;
 
 TEST(OctreeNodeTests, CanConstruct)
 {
-	BoundingBoxType boundingBox(Vector3d::Zero(), Vector3d::Ones());
+	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones());
 
 	EXPECT_NO_THROW({OctreeNodeType octree(boundingBox);});
 	EXPECT_NO_THROW(std::make_shared<OctreeNodeType>(boundingBox));
@@ -52,7 +52,7 @@ TEST(OctreeNodeTests, CanConstruct)
 
 TEST(OctreeNodeTests, InitialValues)
 {
-	BoundingBoxType expectedBoundingBox(Vector3d::Zero(), Vector3d::Ones());
+	AxisAlignedBoundingBox expectedBoundingBox(Vector3d::Zero(), Vector3d::Ones());
 	OctreeNodeType octree(expectedBoundingBox);
 
 	EXPECT_FALSE(octree.isActive());
@@ -68,7 +68,7 @@ TEST(OctreeNodeTests, InitialValues)
 
 TEST(OctreeNodeTests, Subdivide)
 {
-	BoundingBoxType boundingBox(Vector3d::Zero(), Vector3d::Ones() * 16.0);
+	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * 16.0);
 	OctreeNodeType octree(boundingBox);
 
 	EXPECT_FALSE(octree.hasChildren());
@@ -85,15 +85,15 @@ TEST(OctreeNodeTests, Subdivide)
 		EXPECT_FALSE((*child)->hasChildren());
 	}
 
-	std::array<BoundingBoxType, 8> expectedBoxes = {
-		BoundingBoxType(Vector3d(0.0, 0.0, 0.0), Vector3d(8.0, 8.0, 8.0)),
-		BoundingBoxType(Vector3d(0.0, 0.0, 8.0), Vector3d(8.0, 8.0, 16.0)),
-		BoundingBoxType(Vector3d(0.0, 8.0, 0.0), Vector3d(8.0, 16.0, 8.0)),
-		BoundingBoxType(Vector3d(0.0, 8.0, 8.0), Vector3d(8.0, 16.0, 16.0)),
-		BoundingBoxType(Vector3d(8.0, 0.0, 0.0), Vector3d(16.0, 8.0, 8.0)),
-		BoundingBoxType(Vector3d(8.0, 0.0, 8.0), Vector3d(16.0, 8.0, 16.0)),
-		BoundingBoxType(Vector3d(8.0, 8.0, 0.0), Vector3d(16.0, 16.0, 8.0)),
-		BoundingBoxType(Vector3d(8.0, 8.0, 8.0), Vector3d(16.0, 16.0, 16.0))};
+	std::array<AxisAlignedBoundingBox, 8> expectedBoxes = {
+		AxisAlignedBoundingBox(Vector3d(0.0, 0.0, 0.0), Vector3d(8.0, 8.0, 8.0)),
+		AxisAlignedBoundingBox(Vector3d(0.0, 0.0, 8.0), Vector3d(8.0, 8.0, 16.0)),
+		AxisAlignedBoundingBox(Vector3d(0.0, 8.0, 0.0), Vector3d(8.0, 16.0, 8.0)),
+		AxisAlignedBoundingBox(Vector3d(0.0, 8.0, 8.0), Vector3d(8.0, 16.0, 16.0)),
+		AxisAlignedBoundingBox(Vector3d(8.0, 0.0, 0.0), Vector3d(16.0, 8.0, 8.0)),
+		AxisAlignedBoundingBox(Vector3d(8.0, 0.0, 8.0), Vector3d(16.0, 8.0, 16.0)),
+		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 0.0), Vector3d(16.0, 16.0, 8.0)),
+		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 8.0), Vector3d(16.0, 16.0, 16.0))};
 	for (auto expectedBox=expectedBoxes.cbegin(); expectedBox!=expectedBoxes.cend(); ++expectedBox)
 	{
 		bool boxFound = false;
@@ -133,7 +133,7 @@ int countOctreeLevels(std::shared_ptr<OctreeNodeType> node)
 
 TEST(OctreeNodeTests, AddNodes)
 {
-	BoundingBoxType boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
+	AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
 	std::shared_ptr<OctreeNodeType> octree = std::make_shared<OctreeNodeType>(boundingBox);
 
 	const int levels = 5;
@@ -163,7 +163,7 @@ TEST(OctreeNodeTests, AddNodes)
 
 TEST(OctreeNodeTests, Data)
 {
-	BoundingBoxType boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
+	AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * (-8.0), Vector3d::Ones() * 8.0);
 	OctreeNodeType octree(boundingBox);
 
 	const int levels = 1;
