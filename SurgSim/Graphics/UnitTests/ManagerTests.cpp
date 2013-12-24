@@ -16,111 +16,20 @@
 /// \file
 /// Tests for the Graphics Manager class.
 
-#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
-#include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Graphics/ViewElement.h"
+#include "SurgSim/Framework/ComponentManager.h"
 #include "SurgSim/Graphics/UnitTests/MockObjects.h"
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include <random>
 
-using SurgSim::Device::KeyboardDevice;
-using SurgSim::Device::MouseDevice;
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
-using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::ViewElement;
-
-/// View element for testing
-class MockViewElement : public ViewElement
-{
-public:
-	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
-		m_isInitialized(false),
-		m_isAwoken(false)
-	{
-	}
-
-	/// Sets the view component that provides the visualization of the graphics representations
-	/// Only allows MockView components, any other will not be set and it will return false.
-	/// \return	True if it succeeds, false if it fails
-	virtual bool setView(std::shared_ptr<View> view)
-	{
-		std::shared_ptr<MockView> mockView = std::dynamic_pointer_cast<MockView>(view);
-		if (mockView != nullptr)
-		{
-			return ViewElement::setView(mockView);
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/// Returns the View component as a MockView (only MockView is allowed by the overridden setView()).
-	std::shared_ptr<MockView> getMockView() const
-	{
-		return std::static_pointer_cast<MockView>(getView());
-	}
-
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() override
-	{
-		static auto device = std::make_shared<KeyboardDevice>("TestKeyboardDevice");
-		return device;
-	}
-
-	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override
-	{
-		static auto device = std::make_shared<MouseDevice>("TestMouseDevice");
-		return device;
-	}
-
-	/// Gets whether the view element has been initialized
-	bool isInitialized() const
-	{
-		return m_isInitialized;
-	}
-	/// Gets whether the view element has been awoken
-	bool isAwoken() const
-	{
-		return m_isAwoken;
-	}
-private:
-	/// Initialize the view element
-	/// \post m_isInitialized is set to true
-	virtual bool doInitialize()
-	{
-		if (ViewElement::doInitialize())
-		{
-			m_isInitialized = true;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	/// Wake up the view element
-	/// \post m_isAwoken is set to true
-	virtual bool doWakeUp()
-	{
-		m_isAwoken = true;
-		return true;
-	}
-
-	/// Whether the view has been initialized
-	bool m_isInitialized;
-	/// Whether the view has been awoken
-	bool m_isAwoken;
-};
 
 class GraphicsManagerTest : public ::testing::Test
 {
@@ -182,12 +91,6 @@ TEST_F(GraphicsManagerTest, StartUpTest)
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 	runtime->setScene(scene);
 
-	/// Add a graphics component to the scene
-	std::shared_ptr<MockView> view = std::make_shared<MockView>("test component");
-	std::shared_ptr<ViewElement> viewElement = std::make_shared<MockViewElement>("test element");
-	viewElement->setView(view);
-	scene->addSceneElement(viewElement);
-
 	/// Run the thread for a moment
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
@@ -197,11 +100,6 @@ TEST_F(GraphicsManagerTest, StartUpTest)
 	/// Check that the manager did update when the thread was running
 	EXPECT_GT(manager->getNumUpdates(), 0);
 	EXPECT_GT(manager->getSumDt(), 0.0);
-
-	EXPECT_TRUE(view->isInitialized());
-	EXPECT_TRUE(view->isAwoken());
-	EXPECT_GT(view->getNumUpdates(), 0);
-	EXPECT_EQ(manager->getNumUpdates(), view->getNumUpdates());
 }
 
 TEST_F(GraphicsManagerTest, AddRemoveTest)
