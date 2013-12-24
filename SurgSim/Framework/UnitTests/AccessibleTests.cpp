@@ -91,16 +91,16 @@ TEST(AccessibleTests, SetterTest)
 
 	t.setValue("normal", 4);
 	EXPECT_EQ(4, t.getNormal());
-	EXPECT_ANY_THROW(t.setValue("xxxx",666.66));
+	EXPECT_ANY_THROW(t.setValue("xxxx", 666.66));
 }
 
 TEST(AccessibleTests, TransferTest)
 {
-	TestClass a,b;
+	TestClass a, b;
 	a.normal = 100;
 	b.normal = 0;
 
-	b.setValue("normal",a.getValue("normal"));
+	b.setValue("normal", a.getValue("normal"));
 
 	EXPECT_EQ(a.normal, b.normal);
 }
@@ -111,7 +111,7 @@ TEST(AccessibleTests, ReadWriteMacroTest)
 	a.readWrite = 100.0;
 
 	EXPECT_EQ(a.readWrite, boost::any_cast<double>(a.getValue("readWrite")));
-	a.setValue("readWrite",50.0);
+	a.setValue("readWrite", 50.0);
 	EXPECT_EQ(50.0, a.readWrite);
 }
 
@@ -122,7 +122,7 @@ TEST(AccessibleTests, ReadOnlyMacroTest)
 
 	EXPECT_EQ(a.readOnly, boost::any_cast<int>(a.getValue("readOnly")));
 
-	EXPECT_ANY_THROW(a.setValue("readOnly",100));
+	EXPECT_ANY_THROW(a.setValue("readOnly", 100));
 }
 
 TEST(AccessibleTest, TemplateFunction)
@@ -163,11 +163,11 @@ TEST(AccessibleTest, SharedPointer)
 	std::shared_ptr<int> y;
 
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("sharedPtr"));
-	EXPECT_EQ(4,*y);
+	EXPECT_EQ(4, *y);
 
-	a.setValue("sharedPtr",x);
+	a.setValue("sharedPtr", x);
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("sharedPtr"));
-	EXPECT_EQ(5,*y);
+	EXPECT_EQ(5, *y);
 }
 
 TEST(AccessibleTest, ConvertDoubleToFloat)
