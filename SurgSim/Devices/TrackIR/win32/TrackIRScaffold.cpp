@@ -15,7 +15,6 @@
 
 #include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
-#include <vector>
 #include <list>
 #include <memory>
 #include <algorithm>
@@ -142,9 +141,10 @@ private:
 
 
 TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+	m_logger(logger),
+	m_state(new StateData)
 {
-	if (! m_logger)
+	if (!m_logger)
 	{
 		m_logger = SurgSim::Framework::Logger::getLogger("TrackIR device");
 		m_logger->setThreshold(m_defaultLogLevel);
@@ -158,7 +158,7 @@ TrackIRScaffold::~TrackIRScaffold()
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-		if (! m_state->activeDeviceList.empty())
+		if (!m_state->activeDeviceList.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "TrackIR: Destroying scaffold while devices are active!?!";
 			for (auto it = std::begin(m_state->activeDeviceList);  it != std::end(m_state->activeDeviceList);  ++it)
@@ -270,7 +270,7 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 		}
 	}
 
-	if (! found)
+	if (!found)
 	{
 		SURGSIM_LOG_WARNING(m_logger) << "TrackIR: Attempted to release a non-registered device.";
 	}
@@ -309,7 +309,7 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 
 bool TrackIRScaffold::runInputFrame(TrackIRScaffold::DeviceData* info)
 {
-	if (! updateDevice(info))
+	if (!updateDevice(info))
 	{
 		return false;
 	}
@@ -324,71 +324,79 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	CameraLibrary::Frame *frame = info->m_camera->GetFrame();
-	double X = 0.0, Y = 0.0, Z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
+	bool poseValid = false;
+	double x, y, z, pitch, yaw, roll;
 	if(frame)
 	{
 		info->vector->BeginFrame();
-		for(int i=0; i<frame->ObjectCount(); i++)
+		for(int i = 0; i < frame->ObjectCount(); ++i)
 		{
 			CameraLibrary::cObject *obj = frame->Object(i);
+			float xValue = obj->X();
+			float yValue = obj->Y();
 
-			float x = obj->X();
-			float y = obj->Y();
-
-			Core::Undistort2DPoint(info->lensDistortion,x,y);
-			info->vector->PushMarkerData(x, y, obj->Area(), obj->Width(), obj->Height());
+			Core::Undistort2DPoint(info->lensDistortion, xValue, yValue);
+			info->vector->PushMarkerData(xValue, yValue, obj->Area(), obj->Width(), obj->Height());
 		}
 		info->vector->Calculate();
 		info->vectorProcessor->PushData(info->vector);
 
 		// Vector Clip uses 3 markers to identify the pose, i.e. 6DOF
-		// If any marker is lost by the TrackIR camera, the pose will be reset to (0,0,0) with no rotation on any axis.
-		if(info->vectorProcessor->MarkerCount() > 2)
+		// Otherwise, the pose is considered as invalid.
+		if(info->vectorProcessor->MarkerCount() == 3)
 		{
 			info->vectorProcessor->GetOrientation(yaw, pitch, roll);
-			info->vectorProcessor->GetPosition(X, Y, Z);
+			info->vectorProcessor->GetPosition(x, y, z);
+			poseValid = true;
 		}
 		frame->Release();
 	}
 
-	// Assuming left hand coordinate with Y-axis points up.
-	// pitch: rotation around X-axis
-	// yaw: rotation around Y-axis
-	// roll: rotation around Z-axis
-	Vector3d position(X, Y, Z);
-	Vector3d rotation(pitch, yaw, roll); // In Degrees.
-
-	// Convert to a pose.
-	Matrix33d orientation;
-	double angle = rotation.norm();
-	if (angle < 1e-9)
+	if (true == poseValid)
 	{
-		orientation.setIdentity();
+		// Assuming left hand coordinate with Y-axis points up.
+		// pitch: rotation around X-axis
+		// yaw: rotation around Y-axis
+		// roll: rotation around Z-axis
+		Vector3d position(x, y, z);			 // In Millimeter
+		Vector3d rotation(pitch, yaw, roll); // In Degree.
+
+		// Convert to a pose.
+		Matrix33d orientation;
+		double angle = rotation.norm();
+		if (angle < 1e-9)
+		{
+			orientation.setIdentity();
+		}
+		else
+		{
+			orientation = SurgSim::Math::makeRotationMatrix(angle, Vector3d(rotation / angle));
+		}
+
+		RigidTransform3d pose;
+		pose.makeAffine();
+		pose.linear() = orientation;
+		pose.translation() = position;
+
+		inputData.poses().set("pose", pose);
 	}
-	else
+	else // If pose is invalid, data in 'inputData' will be set to 'invalid'.
 	{
-		orientation = SurgSim::Math::makeRotationMatrix(angle, Vector3d(rotation / angle));
+		inputData.poses().reset("pose");
 	}
-
-	RigidTransform3d pose;
-	pose.makeAffine();
-	pose.linear() = orientation;
-	pose.translation() = position;
-
-	inputData.poses().set("pose", pose);
 
 	return true;
 }
 
 bool TrackIRScaffold::initializeSdk()
 {
-	SURGSIM_ASSERT(! m_state->isApiInitialized);
+	SURGSIM_ASSERT(!m_state->isApiInitialized);
 	bool result = false;
 
 	bool isShutdown = CameraLibrary::CameraManager::X().AreCamerasShutdown();
 	bool initialized = CameraLibrary::CameraManager::X().AreCamerasInitialized();
 
-	if (! initialized || isShutdown)
+	if (!initialized || isShutdown)
 	{
 		CameraLibrary::CameraManager::X().WaitForInitialization();
 	}
@@ -409,7 +417,7 @@ bool TrackIRScaffold::finalizeSdk()
 	bool isShutdown = CameraLibrary::CameraManager::X().AreCamerasShutdown();
 	bool isInitialized = CameraLibrary::CameraManager::X().AreCamerasInitialized();
 
-	if (isInitialized || ! isShutdown)
+	if (isInitialized || !isShutdown)
 	{
 	  // Dec-17-2013-HW It's a bug in TrackIR CameraSDK that after calling CameraLibrary::CameraManager::X().Shutdown(),
 	  // calls to CameraLibrary::CameraManager::X().WaitForInitialization will thorw memory violation error.
@@ -420,22 +428,22 @@ bool TrackIRScaffold::finalizeSdk()
 	return true;
 }
 
-bool TrackIRScaffold::createPerDeviceThread(DeviceData* data)
+bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(! data->thread);
+	SURGSIM_ASSERT(!deviceData->thread);
 
-	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, data));
+	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, deviceData));
 	thread->start();
-	data->thread = std::move(thread);
+	deviceData->thread = std::move(thread);
 
 	return true;
 }
 
-bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* data)
+bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(data->thread);
+	SURGSIM_ASSERT(deviceData->thread);
 
-	std::unique_ptr<TrackIRThread> thread = std::move(data->thread);
+	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->thread);
 	thread->stop();
 	thread.reset();
 
@@ -452,7 +460,7 @@ bool TrackIRScaffold::startCamera()
 bool TrackIRScaffold::stopCamera()
 {
 	CameraLibrary::CameraManager::X().GetCamera()->Stop();
-	return ! CameraLibrary::CameraManager::X().GetCamera()->IsCameraRunning();
+	return !CameraLibrary::CameraManager::X().GetCamera()->IsCameraRunning();
 }
 
 SurgSim::DataStructures::DataGroup TrackIRScaffold::buildDeviceInputData()
