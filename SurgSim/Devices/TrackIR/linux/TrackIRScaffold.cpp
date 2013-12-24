@@ -268,18 +268,18 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
-	float X = 0.0, Y = 0.0, Z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
+	float x = 0.0, y = 0.0, z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
 	unsigned counter = 0; // Current camera frame number
 
 	// Assuming left hand coordinate with Y-axis points up.
 	// pitch: rotation around X-axis
 	// yaw: rotation around Y-axis
 	// roll: rotation around Z-axis (Min: -45; Max: +45)
-	ltr_get_pose(&yaw, &pitch, &roll, &X, &Y, &Z, &counter);
+	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter);
 	// Dec-22-2013-HW Currenty, the ouptut of Z-axis value from ltr_get_pose() is not consistent
 	// Contacted the developer, waiting for response.
 	// Thus, Z-axis value is set to 2.0 for temporary use.
-	Vector3d position(static_cast<double>(X), static_cast<double>(Y), 2.0); // In Millimeter
+	Vector3d position(static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)); // In Millimeter
 	Vector3d rotation(pitch, yaw, roll); // In Degrees
 
 	// Scale Position
