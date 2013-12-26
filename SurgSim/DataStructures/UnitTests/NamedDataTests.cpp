@@ -124,7 +124,7 @@ TEST(NamedDataTests, Empty)
 	EXPECT_FALSE(data.hasEntry("missing"));
 }
 
-/// Creating an unitialized data object.
+/// Creating an uninitialized data object.
 TEST(NamedDataTests, Uninitialized)
 {
 	NamedData<float> data;
