@@ -119,7 +119,7 @@ protected:
 	/// \param data	The input data to be set.
 	void setInputData(const SurgSim::DataStructures::DataGroup& data)
 	{
-		if (! m_initialInputData.isValid())
+		if (! m_initialInputData.isInitialized())
 		{
 			m_initialInputData = data;
 			m_initialInputData.resetAll();

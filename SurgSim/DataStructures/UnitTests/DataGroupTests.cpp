@@ -44,7 +44,7 @@ TEST(DataGroupTests, CanConstruct)
 	builder.addString("test");
 	builder.addCustom("test");
 	DataGroup data = builder.createData();
-	EXPECT_TRUE(data.isValid());
+	EXPECT_TRUE(data.isInitialized());
 	EXPECT_TRUE(data.poses().hasEntry("test"));
 	EXPECT_FALSE(data.poses().hasData("test"));
 	EXPECT_FALSE(data.strings().hasEntry("missing"));
@@ -53,7 +53,7 @@ TEST(DataGroupTests, CanConstruct)
 	DataGroupBuilder builder2;
 	builder2.addInteger("test");
 	DataGroup data2 = builder2.createData();
-	EXPECT_TRUE(data2.isValid());
+	EXPECT_TRUE(data2.isInitialized());
 	EXPECT_TRUE(data2.integers().hasEntry("test"));
 	EXPECT_FALSE(data2.integers().hasData("test"));
 	EXPECT_FALSE(data2.strings().hasEntry("missing"));
@@ -61,7 +61,7 @@ TEST(DataGroupTests, CanConstruct)
 
 	DataGroupBuilder builder3;
 	DataGroup data3 = builder3.createData();
-	EXPECT_TRUE(data3.isValid());  // A DataGroup created by an empty DataGroupBuilder is valid.
+	EXPECT_TRUE(data3.isInitialized());  // A DataGroup created by an empty DataGroupBuilder is initialized.
 }
 
 /// Creating a shared_ref to a named data object.
@@ -78,7 +78,7 @@ TEST(DataGroupTests, CanCreateShared)
 	builder.addCustom("test");
 	std::shared_ptr<DataGroup> data = builder.createSharedData();
 
-	EXPECT_TRUE(data->isValid());
+	EXPECT_TRUE(data->isInitialized());
 	EXPECT_TRUE(data->poses().hasEntry("test"));
 	EXPECT_FALSE(data->poses().hasData("test"));
 	EXPECT_FALSE(data->strings().hasEntry("missing"));
@@ -89,7 +89,7 @@ TEST(DataGroupTests, CanCreateShared)
 TEST(DataGroupTests, Uninitialized)
 {
 	DataGroup data;
-	EXPECT_FALSE(data.isValid());
+	EXPECT_FALSE(data.isInitialized());
 }
 
 /// Putting data into the container.
@@ -304,7 +304,7 @@ TEST(DataGroupTests, CopyConstruction)
 	const bool trueBool = true;
 	data.booleans().set("test2", trueBool);
 	DataGroup copied_data = data;
-	EXPECT_TRUE(copied_data.isValid());
+	EXPECT_TRUE(copied_data.isInitialized());
 	EXPECT_TRUE(copied_data.poses().hasEntry("test"));
 	EXPECT_FALSE(copied_data.poses().hasData("test"));
 	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
@@ -332,7 +332,7 @@ TEST(DataGroupTests, Assignment)
 	data.booleans().set("test2", trueBool);
 	DataGroup copied_data;
 	copied_data = data;
-	EXPECT_TRUE(copied_data.isValid());
+	EXPECT_TRUE(copied_data.isInitialized());
 	EXPECT_TRUE(copied_data.poses().hasEntry("test"));
 	EXPECT_FALSE(copied_data.poses().hasData("test"));
 	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
@@ -377,7 +377,7 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	
 	lockedDataGroup.set(data);
 	lockedDataGroup.get(&copied_data);
-	EXPECT_TRUE(copied_data.isValid());
+	EXPECT_TRUE(copied_data.isInitialized());
 	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
 	EXPECT_TRUE(copied_data.booleans().hasData("test"));
 	bool outBool, outCopiedBool;
@@ -392,7 +392,7 @@ TEST(DataGroupTests, PartialInitialization)
 	std::vector<std::string> names;
 	names.push_back("test");
 	DataGroup data;
-	EXPECT_FALSE(data.isValid());
+	EXPECT_FALSE(data.isInitialized());
 	data.booleans() = SurgSim::DataStructures::NamedData<DataGroup::BooleanType>(names);
-	EXPECT_THROW(data.isValid(), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(data.isInitialized(), SurgSim::Framework::AssertionFailure);
 }

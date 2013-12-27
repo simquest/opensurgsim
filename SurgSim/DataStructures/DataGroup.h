@@ -28,39 +28,35 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// A collection of value entries of different types that can be accessed by name or index.
+/// A collection of \ref NamedData objects.
 ///
-/// A DataGroup object contains a collection of values of one of several predefined types:
+/// A DataGroup object contains a NamedData for each of several predefined types:
 /// \li \em Poses contain the position and orientation of an object in space, represented as a 3D rigid-body
 /// 	 (isometric) transformation.
 /// \li \em Vectors contain a vector quantity that does not change when the coordinate system is translated,
 /// 	such as a force or an oriented distance.
+/// \li \em Matrices contain a matrix.
 /// \li \em Scalars contain a scalar value (i.e. anything that can be represented as a double).
 /// \li \em Integers contain an integer value.
 /// \li \em Booleans contain a Boolean logic value (true or false).
 /// \li \em Strings contain a text value.
+/// \li \em CustomData contain a custom data structure, \ref NamedVariantData.
 ///
-/// Each entry can be also be marked as not currently valid, i.e. missing.  Its entry still remains in the
-/// collection, but for the moment has no value associated with it.
-///
-/// Each entry of any particular value type in the collection can be accessed by using either its unique name (a
-/// std::string) or its unique index (a non-negative integer). Access by name is more convenient, but also less
-/// efficient.  The names and indices are unique within each type, but not necessarily across different types
+/// The entries (names and indices) are unique within each NamedData, but not necessarily across different types
 /// (i.e. there could be a scalar and a vector both named "friction", or a pose and a boolean both at index 1).
-/// However, it is recommended that you keep names separate between different types as well, to avoid confusion.
-///
-/// A DataGroup object constructed by the default constructor starts out empty, meaning it has not yet been
-/// associated with a set of names and indices.  A <i>non</i>-empty object contains a fixed set of value entries;
-/// entries <b>cannot be added or removed</b>, and names and indices of existing entries
-/// <b>cannot be changed</b>.  A non-empty object also cannot ever become empty again.  These properties ensure
-/// that a stable data layout is available to the code using this class so that it can, for example, record
-/// entry indices and use them to retrieve the same entries later on.  (Currently, no attempt is made to ensure
-/// type consistency, so attempting to read a pose entry using an index of a string may not result in an error.)
-///
-/// The set of names and indices within a DataGroup object object cannot be modified, but it can be initialized
-/// using the \ref DataGroupBuilder class.  After doing that, you can create other objects with the same layout
-/// by copy construction, or by assigning the initialized value to an empty (default-constructed) DataGroup
-/// object.
+/// It is recommended that you keep names separate between different types to avoid confusion.
+/// 
+/// A DataGroup object constructed by the default constructor starts out uninitialized, meaning its NamedData member
+/// objects have not been initialized. A DataGroup object can be initialized by initializing each and every of its
+/// NamedData, or by using the \ref DataGroupBuilder class.  Given an initialized DataGroup object, you can create other
+/// initialized objects with the same entries (in the NamedData) by copy construction, or by assigning the initialized
+/// object to an uninitialized (default-constructed) object.
+/// 
+/// Assignment to an initialized DataGroup object is only possible if the two objects use the same pointers to the
+/// directories in their respective NamedData, which happens when either of the two objects was copy-constructed from
+/// the other.
+/// 
+/// \sa SurgSim::DataStructures::NamedData, SurgSim::DataStructers::DataGroupBuilder
 class DataGroup
 {
 public:
@@ -120,15 +116,16 @@ public:
 	/// The same restrictions on object compatibility apply as in the case of the copy assignment
 	///	operator=(const DataGroup&).
 	///
-	/// \param [in,out] dataGroup The object to copy from, which will be left in an ununsable state.
+	/// \param [in,out] dataGroup The object to copy from, which will be left in an unusable state.
 	/// \return The object that was assigned into.
 	inline DataGroup& operator=(DataGroup&& dataGroup);
 
-	/// Check if the object is valid (non-empty), meaning it is associated with a set of names and indices.
-	/// If the object is empty, it can become valid on assignment from a valid object.
+	/// Check if the object has been initialized, which means each NamedData has been initialized (i.e., has a set of
+	/// entries). If the object has not been initialized, it can become initialized on assignment from an initialized
+	/// object.  Asserts on all of the NamedData having the same initialization state.
 	///
-	/// \return true if valid, false if empty.
-	inline bool isValid() const;
+	/// \return true if initialized.
+	inline bool isInitialized() const;
 
 	/// Return the pose data structure.
 	/// \return the mutable pose data.

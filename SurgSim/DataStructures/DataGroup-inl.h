@@ -42,8 +42,8 @@ inline DataGroup::DataGroup(const DataGroup& dataGroup) :
 
 inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 {
-	SURGSIM_ASSERT(dataGroup.isValid()) <<
-		"Can't use an invalid (empty) DataGroup on the right-hand side of an assignment!";
+	SURGSIM_ASSERT(dataGroup.isInitialized()) <<
+		"Cannot use an uninitialized DataGroup on the right-hand side of an assignment!";
 
 	m_poses = dataGroup.m_poses;
 	m_vectors = dataGroup.m_vectors;
@@ -54,14 +54,14 @@ inline DataGroup& DataGroup::operator=(const DataGroup& dataGroup)
 	m_strings = dataGroup.m_strings;
 	m_customData = dataGroup.m_customData;
 
-	SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
+	SURGSIM_ASSERT(isInitialized()) << "DataGroup is not initialized after assignment!";
 	return *this;
 }
 
 inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 {
-	SURGSIM_ASSERT(dataGroup.isValid()) <<
-		"Can't use an invalid (empty) DataGroup on the right-hand side of an assignment!";
+	SURGSIM_ASSERT(dataGroup.isInitialized()) <<
+		"Cannot use an uninitialized DataGroup on the right-hand side of an assignment!";
 
 	m_poses = std::move(dataGroup.m_poses);
 	m_vectors = std::move(dataGroup.m_vectors);
@@ -72,22 +72,21 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 	m_strings = std::move(dataGroup.m_strings);
 	m_customData = std::move(dataGroup.m_customData);
 
-	SURGSIM_ASSERT(isValid()) << "DataGroup isn't valid after assignment!";
+	SURGSIM_ASSERT(isInitialized()) << "DataGroup is not initialized after assignment!";
 	return *this;
 }
 
-inline bool DataGroup::isValid() const
+inline bool DataGroup::isInitialized() const
 {
-	bool valid = poses().isInitialized();
-	SURGSIM_ASSERT(poses().isInitialized() == valid &&
-				   vectors().isInitialized() == valid &&
-				   matrices().isInitialized() == valid &&
-				   scalars().isInitialized() == valid &&
-				   integers().isInitialized() == valid &&
-				   booleans().isInitialized() == valid &&
-				   strings().isInitialized() == valid &&
-				   customData().isInitialized() == valid) << "The object is only partially initialized!";
-	return valid;
+	bool initialized = poses().isInitialized();
+	SURGSIM_ASSERT(vectors().isInitialized() == initialized &&
+				   matrices().isInitialized() == initialized &&
+				   scalars().isInitialized() == initialized &&
+				   integers().isInitialized() == initialized &&
+				   booleans().isInitialized() == initialized &&
+				   strings().isInitialized() == initialized &&
+				   customData().isInitialized() == initialized) << "The DataGroup is only partially initialized!";
+	return initialized;
 }
 
 inline NamedData<DataGroup::PoseType>& DataGroup::poses()
