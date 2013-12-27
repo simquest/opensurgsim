@@ -24,12 +24,13 @@ namespace SurgSim
 {
 namespace Input
 {
-/// An input consumer monitors device and signal state update
+
+/// An output producer sends data to a device
 class OutputProducer: public OutputProducerInterface
 {
 public:
 	/// Constructor
-	OutputProducer()
+	OutputProducer() : haveData(false)
 	{
 	}
 	/// Destructor
@@ -40,13 +41,13 @@ public:
 	/// Send the output to the device.
 	/// \param device The name of the device to receive the output.
 	/// \param outputData The output data going to the device.
+	/// \return true if outputData was provided.
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
 	{
 		bool result = false;
-		if (outputData != nullptr)
+		if (haveData && (outputData != nullptr))
 		{
-			m_lastOutput.get(outputData);
-			SURGSIM_ASSERT((*outputData).isValid()) << "Attempting to output invalid data to device (" << device << ")";
+			m_lastOutput.get(outputData); // cannot get() unless the DataGroup in the LockedContainer is initialized.
 			result = true;
 		}
 		return result;
@@ -57,11 +58,16 @@ public:
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup)
 	{
 		m_lastOutput.set(dataGroup);
+		haveData = true;
 	}
 
 private:
-	/// Used to store output data information to be passed out to device
+	/// Used to store output data information to be passed out to device.  The DataGroup is default-constructed and 
+	/// becomes initialized the first time we call LockedContainer::set.
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastOutput;
+
+	/// Has setData been called since construction?
+	bool haveData;
 };
 
 OutputComponent::OutputComponent(const std::string& name, const std::string& deviceName) :

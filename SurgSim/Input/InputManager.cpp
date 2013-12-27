@@ -55,7 +55,6 @@ bool InputManager::doUpdate(double dt)
 
 bool InputManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
-
 	auto input = tryAddComponent(component, &m_inputs);
 	if (input != nullptr)
 	{
