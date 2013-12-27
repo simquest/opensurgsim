@@ -33,18 +33,18 @@ template <typename T>
 inline NamedData<T>::NamedData(std::shared_ptr<const IndexDirectory> directory) :
 	m_directory(directory)
 {
+	SURGSIM_ASSERT(isInitialized());
 	m_data.resize(m_directory->getNumEntries());
 	m_isDataValid.resize(m_directory->getNumEntries(), false);
-	SURGSIM_ASSERT(isInitialized());
 }
 
 template <typename T>
 inline NamedData<T>::NamedData(const std::vector<std::string>& names) :
 	m_directory(std::make_shared<const IndexDirectory>(names))
 {
+	SURGSIM_ASSERT(isInitialized());
 	m_data.resize(m_directory->getNumEntries());
 	m_isDataValid.resize(m_directory->getNumEntries(), false);
-	SURGSIM_ASSERT(isInitialized());
 }
 
 template <typename T>
