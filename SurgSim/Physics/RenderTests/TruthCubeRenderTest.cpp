@@ -67,7 +67,8 @@ struct TruthCubeRenderTests : public RenderTests
 		const int numCommentLine = 7;
 		std::string lineId;
 		char comma;
-		int i,j,k, index = 0;
+		int i,j,k;
+		int index = 0;
 
 		const SurgSim::Framework::ApplicationData data("config.txt");
 
