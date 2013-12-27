@@ -62,7 +62,7 @@ public:
 	}
 
 private:
-	/// Used to store output data information to be passed out to device.  The DataGroup is default-constructed and 
+	/// Used to store output data information to be passed out to device.  The DataGroup is default-constructed and
 	/// becomes initialized the first time we call LockedContainer::set.
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastOutput;
 
