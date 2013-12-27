@@ -22,6 +22,7 @@ include_directories(
 set(SURGSIM_GRAPHICS_SOURCES
 	Group.cpp
 	Manager.cpp
+	Mesh.cpp
 	OsgAxesRepresentation.cpp
 	OsgBoxRepresentation.cpp
 	OsgCamera.cpp
@@ -32,9 +33,11 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgLog.cpp
 	OsgManager.cpp
 	OsgMaterial.cpp
+	OsgMeshRepresentation.cpp
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
 	OsgSceneryRepresentation.cpp
+	OsgScreenSpacePass.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
@@ -47,10 +50,12 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgTrackballZoomManipulator.cpp
 	OsgUniformBase.cpp
 	OsgUnitAxes.cpp
+	OsgVectorFieldRepresentation.cpp
 	OsgView.cpp
 	OsgViewElement.cpp
 	RenderPass.cpp
 	Representation.cpp
+	TriangleNormalGenerator.cpp
 	ViewElement.cpp
 )
 
@@ -64,6 +69,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Light.h
 	Manager.h
 	Material.h
+	Mesh.h
+	MeshRepresentation.h
 	OsgAxesRepresentation.h
 	OsgBoxRepresentation.h
 	OsgCamera.h
@@ -76,6 +83,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgManager.h
 	OsgMaterial.h
 	OsgMatrixConversions.h
+	OsgMeshRepresentation.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
@@ -86,6 +94,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
 	OsgSceneryRepresentation.h
+	OsgScreenSpacePass.h
 	OsgScreenSpaceQuadRepresentation.h
 	OsgShader.h
 	OsgSphereRepresentation.h
@@ -107,6 +116,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgUnitCylinder.h
 	OsgUnitSphere.h
 	OsgVectorConversions.h
+	OsgVectorFieldRepresentation.h
 	OsgView.h
 	OsgViewElement.h
 	PlaneRepresentation.h
@@ -124,8 +134,11 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Texture3d.h
 	TextureCubeMap.h
 	TextureRectangle.h
+	TriangleNormalGenerator.h
 	Uniform.h
 	UniformBase.h
+	VectorField.h
+	VectorFieldRepresentation.h
 	View.h
 	ViewElement.h
 )

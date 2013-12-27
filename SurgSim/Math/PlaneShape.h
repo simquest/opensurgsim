@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_PLANESHAPE_H
 #define SURGSIM_MATH_PLANESHAPE_H
 
-#include <SurgSim/Math/Shape.h>
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
@@ -41,18 +41,18 @@ public:
 	/// \return the type of the shape
 	virtual int getType() override;
 
-	/// Calculate the volume of the plane
-	/// \return The volume of the plane, which is 0
-	virtual double calculateVolume() const override;
+	/// Get the volume of the shape
+	/// \return The volume of the shape (in m-3)
+	virtual double getVolume() const override;
 
-	/// Calculate the mass center of the plane
-	/// \return The mass center of the plane
-	virtual Vector3d calculateMassCenter() const override;
+	/// Get the volumetric center of the shape
+	/// \return The center of the shape
+	virtual Vector3d getCenter() const override;
 
-	/// Calculate the inertia of the box
-	/// \param rho The mass density (in Kg.m-3)
-	/// \return The 3x3 symmetric inertia matrix of the plane
-	virtual Matrix33d calculateInertia(double rho) const override;
+	/// Get the second central moment of the volume, commonly used
+	/// to calculate the moment of inertia matrix
+	/// \return The 3x3 symmetric second moment matrix
+	virtual Matrix33d getSecondMomentOfVolume() const override;
 
 	/// Gets the d of the plane equation.
 	/// \return	The value of d (always 0).
@@ -62,6 +62,8 @@ public:
 	/// \return	The value of the normal (always Y axis).
 	Vector3d getNormal() const;
 
+	/// Serialize declarations of the plane
+	OSS_SERIALIZE(SurgSim::Math::PlaneShape);
 };
 
 }; // Math

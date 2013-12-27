@@ -45,40 +45,40 @@ MeshShape<VertexData, EdgeData, TriangleData>::getMesh() const
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-double MeshShape<VertexData, EdgeData, TriangleData>::calculateVolume() const
+double MeshShape<VertexData, EdgeData, TriangleData>::getVolume() const
 {
 	return m_T0;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-SurgSim::Math::Vector3d MeshShape<VertexData, EdgeData, TriangleData>::calculateMassCenter() const
+SurgSim::Math::Vector3d MeshShape<VertexData, EdgeData, TriangleData>::getCenter() const
 {
 	return Vector3d(m_T1[0] / m_T0, m_T1[1] / m_T0, m_T1[2] / m_T0);
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-SurgSim::Math::Matrix33d MeshShape<VertexData, EdgeData, TriangleData>::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d MeshShape<VertexData, EdgeData, TriangleData>::getSecondMomentOfVolume() const
 {
-	Matrix33d inertia;
-	const Vector3d& r = calculateMassCenter();
-	const double mass = calculateMass(rho);
+	Matrix33d secondMoment;
+	const Vector3d& r = getCenter();
+	const double volume = getVolume();
 
-	inertia(0, 0) = rho * (m_T2[1] + m_T2[2]);
-	inertia(1, 1) = rho * (m_T2[2] + m_T2[0]);
-	inertia(2, 2) = rho * (m_T2[0] + m_T2[1]);
-	inertia(0, 1) = inertia(1, 0) = - rho * m_TP[0];
-	inertia(1, 2) = inertia(2, 1) = - rho * m_TP[1];
-	inertia(2, 0) = inertia(0, 2) = - rho * m_TP[2];
+	secondMoment(0, 0) = (m_T2[1] + m_T2[2]);
+	secondMoment(1, 1) = (m_T2[2] + m_T2[0]);
+	secondMoment(2, 2) = (m_T2[0] + m_T2[1]);
+	secondMoment(0, 1) = secondMoment(1, 0) = - m_TP[0];
+	secondMoment(1, 2) = secondMoment(2, 1) = - m_TP[1];
+	secondMoment(2, 0) = secondMoment(0, 2) = - m_TP[2];
 
-	// translate inertia tensor to center of mass
-	inertia(0, 0) -= mass * (r[1]*r[1] + r[0]*r[0]);
-	inertia(1, 1) -= mass * (r[2]*r[2] + r[0]*r[0]);
-	inertia(2, 2) -= mass * (r[0]*r[0] + r[1]*r[1]);
-	inertia(0, 1) = inertia(1, 0) += mass * r[0] * r[1];
-	inertia(1, 2) = inertia(2, 1) += mass * r[1] * r[2];
-	inertia(2, 0) = inertia(0, 2) += mass * r[2] * r[0];
+	// translate tensor to center
+	secondMoment(0, 0) -= volume * (r[1]*r[1] + r[0]*r[0]);
+	secondMoment(1, 1) -= volume * (r[2]*r[2] + r[0]*r[0]);
+	secondMoment(2, 2) -= volume * (r[0]*r[0] + r[1]*r[1]);
+	secondMoment(0, 1) = secondMoment(1, 0) += volume * r[0] * r[1];
+	secondMoment(1, 2) = secondMoment(2, 1) += volume * r[1] * r[2];
+	secondMoment(2, 0) = secondMoment(0, 2) += volume * r[2] * r[0];
 
-	return inertia;
+	return secondMoment;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
@@ -238,6 +238,13 @@ void MeshShape<VertexData, EdgeData, TriangleData>::computeVolumeIntegrals()
 	m_T2[0] /= 3; m_T2[1] /= 3; m_T2[2] /= 3;
 	m_TP[0] /= 2; m_TP[1] /= 2; m_TP[2] /= 2;
 }
+
+template <class VertexData, class EdgeData, class TriangleData>
+std::string MeshShape<VertexData, EdgeData, TriangleData>::getClassName()
+{
+	return std::string("SurgSim::Math::MeshShape<VertexData, EdgeData, TriangleData>");
+}
+
 
 }; // namespace Math
 }; // namespace SurgSim

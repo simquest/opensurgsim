@@ -16,7 +16,7 @@
 #ifndef SURGSIM_MATH_ODEEQUATION_INL_H
 #define SURGSIM_MATH_ODEEQUATION_INL_H
 
-#include <SurgSim/Math/OdeEquation.h>
+#include "SurgSim/Math/OdeEquation.h"
 
 namespace SurgSim
 {

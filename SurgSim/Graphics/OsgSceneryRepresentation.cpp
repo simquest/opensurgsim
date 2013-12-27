@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Graphics/OsgSceneryRepresentation.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 
 #include <osg/PositionAttitudeTransform>
 #include <osg/Switch>
@@ -37,7 +37,7 @@ bool OsgSceneryRepresentation::doInitialize()
 {
 	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
 
-	std::string objectPath = applicationData->findFile("Data/" + m_fileName);
+	std::string objectPath = applicationData->findFile(m_fileName);
 	SURGSIM_ASSERT(! objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
 
 	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);

@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGSCREENSPACEQUADREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSCREENSPACEQUADREPRESENTATION_H
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/Representation.h>
-#include <SurgSim/Graphics/ScreenSpaceQuadRepresentation.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Graphics/ScreenSpaceQuadRepresentation.h"
 #include <osg/Vec3>
 
 #if defined(_MSC_VER)
@@ -38,7 +38,6 @@ namespace SurgSim
 namespace Graphics
 {
 
-class View;
 class UniformBase;
 class Texture;
 class OsgTexture2d;
@@ -49,7 +48,7 @@ class OsgScreenSpaceQuadRepresentation : public OsgRepresentation, public Screen
 public:
 
 	/// Constructor
-	OsgScreenSpaceQuadRepresentation(const std::string& name, std::shared_ptr<View> view);
+	explicit OsgScreenSpaceQuadRepresentation(const std::string& name);
 	~OsgScreenSpaceQuadRepresentation();
 
 	/// Sets the location in screen space.
@@ -96,9 +95,6 @@ public:
 
 private:
 
-	/// The view that is being used
-	std::shared_ptr<View> m_view;
-
 	/// Local geode to contain geometry
 	osg::ref_ptr<osg::Geode> m_geode;
 
@@ -116,9 +112,6 @@ private:
 	int m_displayWidth;
 	int m_displayHeight;
 	///@}
-
-	/// Overridden from Representation, execute local updates
-	virtual void doUpdate(double dt) override;
 
 	/// Sets texture coordinates for the quad.
 	/// \param	left, bottom, right, top	The extents for the texture coordinates for the corners of the quad.

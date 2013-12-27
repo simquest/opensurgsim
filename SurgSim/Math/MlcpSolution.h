@@ -17,7 +17,7 @@
 #define SURGSIM_MATH_MLCPSOLUTION_H
 
 #include <Eigen/Core>
-#include <SurgSim/Math/MlcpConstraintType.h>
+#include "SurgSim/Math/MlcpConstraintType.h"
 
 namespace SurgSim
 {

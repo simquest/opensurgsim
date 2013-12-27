@@ -13,13 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgManager.h>
+#include "SurgSim/Graphics/OsgManager.h"
 
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgView.h>
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Runtime.h"
+
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgScreenSpacePass.h"
 
 #include <osgViewer/Scene>
 #include <osgDB/WriteFile>
@@ -84,9 +88,9 @@ bool OsgManager::addRepresentation(std::shared_ptr<SurgSim::Graphics::Representa
 			}
 			else
 			{
-				SURGSIM_LOG_WARNING(getLogger()) << "OsgManager::addRepresentation: " <<
+				SURGSIM_LOG_INFO(getLogger()) << "OsgManager::addRepresentation: " <<
 					"The component <" << representation->getName() << "> requested a group <" << *it << "> that could"<<
-					" not be found";
+					" not be found yet.";
 			}
 		}
 
@@ -161,6 +165,7 @@ bool OsgManager::removeView(std::shared_ptr<SurgSim::Graphics::View> view)
 
 bool OsgManager::doInitialize()
 {
+	m_hudElement = std::make_shared<OsgScreenSpacePass>("ossHud");
 	return true;
 }
 
@@ -172,11 +177,28 @@ bool OsgManager::doStartUp()
 bool OsgManager::doUpdate(double dt)
 {
 
+	// There is a bug in the scene initialisation where addSceneElement() will not be correctly executed if
+	// performed inside of doInitialize(), this needs to be fixed
+	// HS-2014-dec-12
+	// #workaround
+	if (!m_hudElement->isInitialized())
+	{
+		getRuntime()->getScene()->addSceneElement(m_hudElement);
+	}
+
 	m_defaultCamera->update(dt);
+
 
 	if (Manager::doUpdate(dt))
 	{
 		m_viewer->frame();
+		int width;
+		int height;
+
+		// \note HS-2013-dec-12 This will work as long as we deal with one view, when we move to stereoscopic
+		//	     we might have to revise things. Or just assume that most views have the same size
+		getViews()[0]->getDimensions(&width, &height);
+		m_hudElement->setViewPort(width, height);
 		return true;
 	}
 	else
@@ -194,6 +216,6 @@ void OsgManager::doBeforeStop()
 
 void SurgSim::Graphics::OsgManager::dumpDebugInfo() const
 {
-	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()),"default_camera.osgt" );
+	osgDB::writeNodeFile(*(m_defaultCamera->getOsgCamera()), "default_camera.osgt");
 }
 

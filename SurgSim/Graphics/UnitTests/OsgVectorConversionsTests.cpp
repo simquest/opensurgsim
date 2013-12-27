@@ -16,7 +16,7 @@
 /// \file
 /// Tests for conversions to and from OSG vector types
 
-#include <SurgSim/Graphics/OsgVectorConversions.h>
+#include "SurgSim/Graphics/OsgVectorConversions.h"
 
 #include <gtest/gtest.h>
 

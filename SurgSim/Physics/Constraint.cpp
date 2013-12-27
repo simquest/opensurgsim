@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/Localization.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/Localization.h"
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

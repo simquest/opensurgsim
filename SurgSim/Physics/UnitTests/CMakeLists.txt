@@ -28,9 +28,11 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
+	Fem3DRepresentationTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
 	FemRepresentationParametersTest.cpp
+	FemRepresentationTests.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
@@ -63,7 +65,9 @@ include_directories(
 
 set(LIBS
 	SurgSimPhysics
+	SurgSimMath
 	gtest
+	yaml-cpp
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

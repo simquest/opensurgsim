@@ -16,10 +16,10 @@
 /// \file
 /// Tests for the ViewElement class.
 
-#include <SurgSim/Graphics/UnitTests/MockObjects.h>
+#include "SurgSim/Graphics/UnitTests/MockObjects.h"
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
 
 #include <gtest/gtest.h>
 

@@ -16,16 +16,15 @@
 /// \file
 /// Tests for the OsgTexture class.
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Graphics/OsgTexture.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgView.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
@@ -48,11 +47,10 @@ namespace Graphics
 
 TEST(OsgScreenSpaceQuadRepresentationTests, SetTexture2d)
 {
-	std::shared_ptr<OsgView> view = std::make_shared<OsgView>("view");
 	std::shared_ptr<OsgTexture2d> texture = std::make_shared<OsgTexture2d>();
 	texture->setSize(256,256);
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad");
 
 	EXPECT_TRUE(quad->setTexture(texture));
 
@@ -80,11 +78,10 @@ TEST(OsgScreenSpaceQuadRepresentationTests, SetTexture2d)
 
 TEST(OsgScreenSpaceQuadRepresentationTests, SetTextureRectangle)
 {
-	std::shared_ptr<OsgView> view = std::make_shared<OsgView>("view");
 	std::shared_ptr<TextureRectangle> texture = std::make_shared<OsgTextureRectangle>();
 	texture->setSize(10,100);
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad");
 
 	EXPECT_TRUE(quad->setTexture(texture));
 
@@ -97,9 +94,8 @@ TEST(OsgScreenSpaceQuadRepresentationTests, SetTextureRectangle)
 
 TEST(OsgScreenSpaceQuadRepresentation, SetSize)
 {
-	std::shared_ptr<OsgView> view = std::make_shared<OsgView>("view");
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad");
 
 	double width = 100.0;
 	double height = 100.0;
@@ -122,9 +118,8 @@ TEST(OsgScreenSpaceQuadRepresentation, SetSize)
 
 TEST(OsgScreenSpaceQuadRepresentationTests, SetLocation)
 {
-	std::shared_ptr<OsgView> view = std::make_shared<OsgView>("view");
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad", view);
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("quad");
 
 	double x = 100.0;
 	double y = 100.0;

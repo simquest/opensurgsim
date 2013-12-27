@@ -18,12 +18,12 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Physics/RigidRepresentationBaseState.h>
+#include "SurgSim/Physics/RigidRepresentationBaseState.h"
 using SurgSim::Physics::RigidRepresentationBaseState;
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;

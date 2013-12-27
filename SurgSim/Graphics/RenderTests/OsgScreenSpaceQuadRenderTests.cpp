@@ -15,31 +15,31 @@
 
 
 #include <gtest/gtest.h>
-#include <SurgSim/Graphics/RenderTests/RenderTest.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/Material.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/OsgTexture.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
-#include <SurgSim/Graphics/OsgTextureRectangle.h>
-#include <SurgSim/Graphics/View.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/Material.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/OsgTexture.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgTextureRectangle.h"
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
 
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Testing/MathUtilities.h"
 
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
@@ -59,7 +59,7 @@ struct OsgScreenSpaceQuadRenderTests : public RenderTest
 TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 {
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad", viewElement->getView());
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad");
 
 	viewElement->addComponent(quad);
 
@@ -70,9 +70,10 @@ TEST_F(OsgScreenSpaceQuadRenderTests, InitTest)
 	quad->setSize(100,100);
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 
-	int width,height;
-	viewElement->getView()->getDimensions(&width, &height);
+	int width;
+	int height;
 
+	viewElement->getView()->getDimensions(&width, &height);
 
 	SurgSim::Math::Vector3d startPosition(0.0,0.0,0.0);
 	SurgSim::Math::Vector3d endPosition(width,height,0.0);
@@ -119,7 +120,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 
 
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad1 =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 1", viewElement->getView());
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 1");
 
 	quad1->setSize(256,256);
 	quad1->setInitialPose(SurgSim::Math::makeRigidTransform(
@@ -130,7 +131,7 @@ TEST_F(OsgScreenSpaceQuadRenderTests, TextureTest)
 
 
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad2 =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 2", viewElement->getView());
+		std::make_shared<OsgScreenSpaceQuadRepresentation>("Screen Quad 2");
 
 	int width, height;
 	rectTexture->getSize(&width, &height);
@@ -160,7 +161,6 @@ TEST_F(OsgScreenSpaceQuadRenderTests, RenderTextureTest)
 
 	int width, height;
 	viewElement->getView()->getDimensions(&width,&height);
-
 
 	std::shared_ptr<OsgRenderTarget2d> renderTargetOsg =
 		std::make_shared<OsgRenderTarget2d>(width,height, 1.0, 2, true);

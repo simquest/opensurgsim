@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/PhysicsManager.h>
+#include "SurgSim/Physics/PhysicsManager.h"
 
-#include <SurgSim/Framework/Component.h>
-#include <SurgSim/Physics/BuildMlcp.h>
-#include <SurgSim/Physics/ContactConstraintGeneration.h>
-#include <SurgSim/Physics/DcdCollision.h>
-#include <SurgSim/Physics/FreeMotion.h>
-#include <SurgSim/Physics/PhysicsManagerState.h>
-#include <SurgSim/Physics/PostUpdate.h>
-#include <SurgSim/Physics/PreUpdate.h>
-#include <SurgSim/Physics/PushResults.h>
-#include <SurgSim/Physics/Representation.h>
-#include <SurgSim/Physics/SolveMlcp.h>
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Physics/BuildMlcp.h"
+#include "SurgSim/Physics/ContactConstraintGeneration.h"
+#include "SurgSim/Physics/DcdCollision.h"
+#include "SurgSim/Physics/FreeMotion.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/PostUpdate.h"
+#include "SurgSim/Physics/PreUpdate.h"
+#include "SurgSim/Physics/PushResults.h"
+#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/SolveMlcp.h"
 
 #include <list>
 
@@ -66,7 +66,8 @@ bool PhysicsManager::doStartUp()
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
 	std::shared_ptr<Representation> representation = tryAddComponent(component, &m_representations);
-	std::shared_ptr<CollisionRepresentation> collisionRep= tryAddComponent(component, &m_collisionRepresentations);
+	std::shared_ptr<SurgSim::Collision::Representation> collisionRep =
+		tryAddComponent(component, &m_collisionRepresentations);
 	return representation != nullptr || collisionRep != nullptr;
 }
 

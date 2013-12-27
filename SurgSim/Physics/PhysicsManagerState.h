@@ -20,17 +20,14 @@
 #include <vector>
 #include <unordered_map>
 
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/MlcpMapping.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/MlcpPhysicsSolution.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/MlcpMapping.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/MlcpPhysicsSolution.h"
+#include "SurgSim/Physics/Representation.h"
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
-
-using SurgSim::Collision::CollisionPair;
-using SurgSim::Collision::CollisionRepresentation;
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {
@@ -58,18 +55,18 @@ public:
 	/// \return	The representations.
 	const std::vector<std::shared_ptr<Representation>>& getRepresentations();
 
-	void setCollisionRepresentations(const std::vector<std::shared_ptr<CollisionRepresentation>>& val);
+	void setCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val);
 
-	const std::vector<std::shared_ptr<CollisionRepresentation>>& getCollisionRepresentations();
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getCollisionRepresentations();
 
 	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
 	/// should only be from the list of representations that are in this state.
 	/// \param	val	The list of collision pairs.
-	void setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val);
+	void setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val);
 
 	/// Gets collision pairs.
 	/// \return	The collision pairs.
-	const std::vector<std::shared_ptr<CollisionPair>>& getCollisionPairs();
+	const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& getCollisionPairs();
 
 	/// Sets the group of constraints to a given value, the grouping indicates what type of constraint we are dealing
 	/// with.
@@ -109,10 +106,10 @@ private:
 	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
-	std::vector<std::shared_ptr<CollisionRepresentation>> m_collisionRepresentations;
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
 	/// The local list of collision pairs
-	std::vector<std::shared_ptr<CollisionPair>> m_collisionPairs;
+	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_collisionPairs;
 
 	/// The local map of constraints
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;

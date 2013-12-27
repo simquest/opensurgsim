@@ -13,12 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Framework/Assert.h"
 
-#include <SurgSim/Physics/MassSpringRepresentation.h>
+#include "SurgSim/Physics/MassSpringRepresentation.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+using SurgSim::Math::Vector;
+using SurgSim::Math::DiagonalMatrix;
+using SurgSim::Math::Matrix;
 
 namespace SurgSim
 {
@@ -34,7 +37,7 @@ MassSpringRepresentation::MassSpringRepresentation(const std::string& name) :
 
 	// Reminder: m_numDofPerNode is held by DeformableRepresentation
 	// but needs to be set by all concrete derived classes
-	this->m_numDofPerNode = 3;
+	m_numDofPerNode = 3;
 }
 
 MassSpringRepresentation::~MassSpringRepresentation()

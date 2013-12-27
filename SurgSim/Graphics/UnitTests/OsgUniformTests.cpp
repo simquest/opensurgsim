@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the OsgUniform class.
 
-#include <SurgSim/Graphics/OsgUniform.h>
+#include "SurgSim/Graphics/OsgUniform.h"
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 #include <gtest/gtest.h>
 
@@ -39,8 +39,8 @@ using SurgSim::Math::Matrix44d;
 
 namespace
 {
-	/// Random number generator, used to generate random values for the tests.
-	std::default_random_engine generator;
+/// Random number generator, used to generate random values for the tests.
+std::default_random_engine generator;
 }
 
 namespace SurgSim
@@ -56,7 +56,7 @@ template <class Type, class OsgType>
 std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 {
 	std::shared_ptr<OsgUniform<Type>> osgUniform =
-		std::make_shared<OsgUniform<Type>>("test name");
+									   std::make_shared<OsgUniform<Type>>("test name");
 	std::shared_ptr<OsgUniformBase> osgUniformBase = osgUniform;
 	std::shared_ptr<Uniform<Type>> uniform = osgUniform;
 	std::shared_ptr<UniformBase> uniformBase = osgUniform;
@@ -67,9 +67,19 @@ std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 
 	OsgType osgValue;
 	EXPECT_TRUE(osgUniformBase->getOsgUniform()->get(osgValue)) <<
-		"Failed to get osg::Uniform value. The Uniform type may be wrong!";
+			"Failed to get osg::Uniform value. The Uniform type may be wrong!";
 
 	return std::make_pair(uniform->get(), osgValue);
+}
+
+template <class Type>
+std::pair<Type, boost::any> testAccessible(const Type& value)
+{
+	auto osgUniform = std::make_shared<OsgUniform<Type>>("test name");
+
+	osgUniform->setValue("value", value);
+
+	return std::make_pair(osgUniform->get(), osgUniform->getValue("value"));
 }
 
 /// Constructs an OsgUniform that stores a vector of values, sets it to the given vector values, and returns the result
@@ -78,7 +88,7 @@ std::pair<Type, OsgType> testUniformConstruction(const Type& value)
 /// \tparam	OsgType	Type stored in the osg::Uniform
 template <class Type, class OsgType>
 std::pair<std::vector<Type>, std::vector<OsgType>> testUniformElementsConstruction(
-	const std::vector<Type>& value, unsigned int numElements)
+			const std::vector<Type>& value, unsigned int numElements)
 {
 	std::shared_ptr<OsgUniform<std::vector<Type>>> osgUniform =
 		std::make_shared<OsgUniform<std::vector<Type>>>("test name", numElements);
@@ -96,7 +106,7 @@ std::pair<std::vector<Type>, std::vector<OsgType>> testUniformElementsConstructi
 	{
 		OsgType element;
 		EXPECT_TRUE(osgUniformBase->getOsgUniform()->getElement(i, element)) <<
-			"Failed to get osg::Uniform element value. The Uniform type may be wrong!";
+				"Failed to get osg::Uniform element value. The Uniform type may be wrong!";
 		osgValue.push_back(element);
 	}
 
@@ -115,6 +125,12 @@ void testUniformFloat(FloatType min, FloatType max)
 	std::pair<FloatType, FloatType> result = testUniformConstruction<FloatType, FloatType>(value);
 	EXPECT_NEAR(value, result.first, Eigen::NumTraits<FloatType>::dummy_precision());
 	EXPECT_NEAR(value, result.second, Eigen::NumTraits<FloatType>::dummy_precision());
+
+	auto accessibleResult = testAccessible<FloatType>(value);
+	FloatType resultValue;
+	ASSERT_NO_THROW({boost::any_cast<FloatType>(accessibleResult.second);});
+	resultValue = boost::any_cast<FloatType>(accessibleResult.second);
+	EXPECT_NEAR(value, resultValue, Eigen::NumTraits<FloatType>::dummy_precision());
 }
 
 /// Tests OsgUniform with a vector of random floating point type values.
@@ -132,7 +148,7 @@ void testUniformElementsFloat(FloatType min, FloatType max, unsigned int numElem
 	}
 
 	std::pair<std::vector<FloatType>, std::vector<FloatType>> result =
-		testUniformElementsConstruction<FloatType, FloatType>(elements, numElements);
+				testUniformElementsConstruction<FloatType, FloatType>(elements, numElements);
 
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting float-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
@@ -156,6 +172,11 @@ void testUniformInt(IntType min, IntType max)
 	std::pair<IntType, IntType> result = testUniformConstruction<IntType, IntType>(value);
 	EXPECT_EQ(value, result.first);
 	EXPECT_EQ(value, result.second);
+
+	auto accessibleResult = testAccessible<IntType>(value);
+	IntType resultValue;
+	ASSERT_NO_THROW({resultValue = boost::any_cast<IntType>(accessibleResult.second);});
+	EXPECT_EQ(value, resultValue);
 }
 
 /// Tests OsgUniform with a vector of random integer type values.
@@ -173,7 +194,7 @@ void testUniformElementsInt(IntType min, IntType max, unsigned int numElements)
 	}
 
 	std::pair<std::vector<IntType>, std::vector<IntType>> result =
-		testUniformElementsConstruction<IntType, IntType>(elements, numElements);
+				testUniformElementsConstruction<IntType, IntType>(elements, numElements);
 
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting int-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
@@ -195,6 +216,12 @@ void testUniformEigen()
 	std::pair<Type, OsgType> result = testUniformConstruction<Type, OsgType>(value);
 	EXPECT_TRUE(result.first.isApprox(value));
 	EXPECT_TRUE(fromOsg(result.second).isApprox(value));
+
+	auto accessibleResult = testAccessible<Type>(value);
+	Type resultValue;
+	ASSERT_NO_THROW({boost::any_cast<Type>(accessibleResult.second);});
+	resultValue = boost::any_cast<Type>(accessibleResult.second);
+	EXPECT_TRUE(value.isApprox(resultValue));
 }
 
 /// Tests OsgUniform with a vector of random Eigen type values.
@@ -210,7 +237,7 @@ void testUniformElementsEigen(unsigned int numElements)
 	}
 
 	std::pair<std::vector<Type>, std::vector<OsgType>> result =
-		testUniformElementsConstruction<Type, OsgType>(elements, numElements);
+				testUniformElementsConstruction<Type, OsgType>(elements, numElements);
 
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting Eigen-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";
@@ -332,8 +359,8 @@ TEST(OsgUniformTests, BoolElementsTest)
 		elements.push_back(i % 2 == 0);
 	}
 
-	std::pair<std::vector<bool>, std::vector<bool>> result = testUniformElementsConstruction<bool, bool>(elements,
-		10);
+	std::pair<std::vector<bool>, std::vector<bool>> result =
+				testUniformElementsConstruction<bool, bool>(elements, 10);
 
 	EXPECT_EQ(elements.size(), result.first.size()) << "Number of resulting bool-type elements does not match input";
 	EXPECT_EQ(elements.size(), result.second.size()) << "Number of resulting OSG-type elements does not match input";

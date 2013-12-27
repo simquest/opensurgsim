@@ -18,9 +18,9 @@
 
 #include <boost/thread.hpp>
 
-#include <SurgSim/Input/InputConsumerInterface.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
 #include "SurgSim/Testing/VisualTestCommon/GlutRenderer.h"
 

@@ -20,14 +20,13 @@
 #include <vector>
 #include <list>
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/DcdCollision.h"
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/DcdCollision.h>
-#include <SurgSim/Math/Shape.h>
-#include <SurgSim/Physics/Computation.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Math/Shape.h"
 
-using SurgSim::Collision::ContactCalculation;
+#include "SurgSim/Physics/Computation.h"
+#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
@@ -71,12 +70,12 @@ private:
 	void updatePairs(std::shared_ptr<PhysicsManagerState> state);
 
 	/// Function to populate the m_contactCalculations table for each DcdContact class.
-	void setDcdContactInTable(std::shared_ptr<ContactCalculation> dcdContact);
+	void setDcdContactInTable(std::shared_ptr<SurgSim::Collision::ContactCalculation> dcdContact);
 
 	/// Table containing contact calculation, the indices indicate the type of
 	/// the first pair object and the second pair object in order
-	std::shared_ptr<ContactCalculation> m_contactCalculations[SurgSim::Math::SHAPE_TYPE_COUNT]
-															 [SurgSim::Math::SHAPE_TYPE_COUNT];
+	std::shared_ptr<SurgSim::Collision::ContactCalculation> m_contactCalculations[SurgSim::Math::SHAPE_TYPE_COUNT]
+																				 [SurgSim::Math::SHAPE_TYPE_COUNT];
 
 };
 

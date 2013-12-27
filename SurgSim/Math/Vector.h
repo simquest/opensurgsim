@@ -24,6 +24,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Math
@@ -118,6 +120,27 @@ Eigen::VectorBlock<Vector> getSubVector(Vector& vector, unsigned int blockId, un
 	return vector.segment(blockSize * blockId, blockSize);
 }
 
+/// Helper method to get a sub-vector per block from a vector, for the sake of clarity
+/// \tparam Vector The vector type
+/// \tparam SubVector The sub-vector type
+/// \param vector The vector (containing the blocks in a sparse manner)
+/// \param blockIds Vector of block indices (for accessing vector) corresponding to the blocks in vector
+/// \param blockSize The block size
+/// \param[out] subVector The sub-vector to store the requested blocks (blockIds) from vector into
+template <class Vector, class SubVector>
+void getSubVector(const Vector& vector, const std::vector<unsigned int> blockIds,
+	unsigned int blockSize, SubVector* subVector)
+{
+	const unsigned int numBlocks = blockIds.size();
+
+	for (unsigned int block = 0; block < numBlocks; block++)
+	{
+		unsigned int blockId = blockIds[block];
+
+		subVector->segment(blockSize * block, blockSize) = vector.segment(blockSize * blockId, blockSize);
+	}
+}
+
 /// Helper method to resize a vector (if necessary), and potentially zero it out
 /// \tparam Vector The vector type
 /// \param[in,out] v The vector to resize and potentially zero out
@@ -138,6 +161,34 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 	{
 		v->setZero();
 	}
+}
+
+/// Helper method to construct an orthonormal basis (i, j, k) given the 1st vector direction
+/// \tparam T the numeric data type used for the vector argument. Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument. Can be deduced.
+/// \param[in, out] i Should provide the 1st direction on input. The 1st vector of the basis (i, j, k) on output.
+/// \param[out] j, k The 2nd and 3rd orthonormal vectors of the basis (i, j, k)
+/// \return True if (i, j, k) has been built successfully, False if 'i' is a (or close to a) null vector
+/// \note If any of the parameter is a nullptr, an exception will be raised
+template <class T, int VOpt>
+bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i,
+						   Eigen::Matrix<T, 3, 1, VOpt>* j,
+						   Eigen::Matrix<T, 3, 1, VOpt>* k)
+{
+	SURGSIM_ASSERT(i != nullptr) << "Parameter [in, out] 'i' is a nullptr";
+	SURGSIM_ASSERT(j != nullptr) << "Parameter [out] 'j' is a nullptr";
+	SURGSIM_ASSERT(k != nullptr) << "Parameter [out] 'k' is a nullptr";
+
+	if (i->isZero())
+	{
+		return false;
+	}
+
+	i->normalize();
+	*j = i->unitOrthogonal();
+	*k = i->cross(*j);
+
+	return true;
 }
 
 };  // namespace Math

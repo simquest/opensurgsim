@@ -27,6 +27,7 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${YAML_CPP_SOURCE_DIR}/include"
 )
 
 set(EXAMPLE_SOURCES
@@ -45,6 +46,10 @@ SET(LIBS
 	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimGraphics
+	SurgSimCollision
+	SurgSimFramework
+	SurgSimMath
+	yaml-cpp
 )
 
 target_link_libraries(ExampleMassSprings ${LIBS}

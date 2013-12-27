@@ -24,7 +24,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGQUATERNIONCONVERSIONS_H
 #define SURGSIM_GRAPHICS_OSGQUATERNIONCONVERSIONS_H
 
-#include <SurgSim/Math/Quaternion.h>
+#include "SurgSim/Math/Quaternion.h"
 
 #include <osg/Quat>
 

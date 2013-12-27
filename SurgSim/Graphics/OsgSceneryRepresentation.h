@@ -16,8 +16,8 @@
 #ifndef SURGSIM_GRAPHICS_OSGSCENERYREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGSCENERYREPRESENTATION_H
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/SceneryRepresentation.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/SceneryRepresentation.h"
 
 #include <osg/Node>
 
@@ -43,10 +43,10 @@ public:
 
 	/// Return file name of the object
 	/// \return File name of the object
-	std::string getFileName() const;
+	std::string getFileName() const override;
 	/// Set file name of the object to be loaded
 	/// \param	fileName Name of the file to be loaded
-	void setFileName(const std::string& fileName);
+	void setFileName(const std::string& fileName) override;
 
 
 private:

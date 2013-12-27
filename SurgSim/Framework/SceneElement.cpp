@@ -13,15 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Component.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {
 namespace Framework
 {
+
+SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false), m_isAwake(false)
+{
+}
+
+SceneElement::~SceneElement()
+{
+}
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
 {
@@ -89,6 +97,11 @@ bool SceneElement::wakeUp()
 	return m_isAwake;
 }
 
+std::string SceneElement::getName() const
+{
+	return m_name;
+}
+
 std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 {
 	std::vector<std::shared_ptr<Component>> result(m_components.size());
@@ -108,9 +121,9 @@ void SceneElement::setScene(std::weak_ptr<Scene> scene)
 	auto endIt = std::end(m_components);
 
 	for ( ;  it != endIt;  ++it)
-		{
-			(it->second)->setScene(scene);
-		}
+	{
+		(it->second)->setScene(scene);
+	}
 
 }
 
@@ -129,6 +142,16 @@ std::shared_ptr<Runtime> SceneElement::getRuntime()
 	return m_runtime.lock();
 }
 
+bool SceneElement::isInitialized() const
+{
+	return m_isInitialized;
+}
+
+bool SceneElement::isAwake() const
+{
+	return m_isAwake;
+}
+
 std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
 {
 	std::shared_ptr<SceneElement> result;
@@ -142,6 +165,7 @@ std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
 	}
 	return result;
 }
+
 
 }; // namespace Framework
 }; // namespace SurgSim

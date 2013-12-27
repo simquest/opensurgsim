@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGUNIFORMBASE_H
 #define SURGSIM_GRAPHICS_OSGUNIFORMBASE_H
 
-#include <SurgSim/Graphics/Uniform.h>
+#include "SurgSim/Graphics/Uniform.h"
 
 #include <osg/StateSet>
 #include <osg/Uniform>

@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
-#include <SurgSim/Graphics/Material.h>
+#include "SurgSim/Graphics/Material.h"
 
 using SurgSim::Graphics::Material;
 using SurgSim::Graphics::Representation;

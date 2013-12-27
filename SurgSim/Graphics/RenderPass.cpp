@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/RenderPass.h>
+#include "SurgSim/Graphics/RenderPass.h"
 
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h>
-#include <SurgSim/Graphics/View.h>
-#include <SurgSim/Graphics/Texture.h>
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgScreenSpaceQuadRepresentation.h"
+#include "SurgSim/Graphics/View.h"
+#include "SurgSim/Graphics/Texture.h"
 
 namespace SurgSim
 {
@@ -64,16 +64,6 @@ std::shared_ptr<Camera> RenderPass::getCamera()
 std::shared_ptr<Group> RenderPass::getGroup()
 {
 	return m_group;
-}
-
-void RenderPass::setView(std::shared_ptr<View> view)
-{
-	m_view = view;
-}
-
-std::shared_ptr<View> RenderPass::getView()
-{
-	return m_view;
 }
 
 bool RenderPass::setRenderTarget(std::shared_ptr<RenderTarget> target)
@@ -154,7 +144,7 @@ void RenderPass::hideDepthTarget()
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderPass::buildDebugQuad(const std::string& name,
 		std::shared_ptr<Texture> texture)
 {
-	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name, m_view);
+	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	result->setTexture(texture);
 	addComponent(result);
 	return result;

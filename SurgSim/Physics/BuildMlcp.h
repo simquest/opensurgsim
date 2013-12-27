@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_BUILDMLCP_H
 #define SURGSIM_PHYSICS_BUILDMLCP_H
 
-#include <SurgSim/Physics/Computation.h>
+#include "SurgSim/Physics/Computation.h"
 
 namespace SurgSim
 {

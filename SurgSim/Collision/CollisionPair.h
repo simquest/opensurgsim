@@ -18,10 +18,10 @@
 
 #include <memory>
 #include <list>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Collision/Location.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Collision/Location.h"
 
 namespace SurgSim
 {
@@ -57,28 +57,28 @@ public:
 	CollisionPair();
 
 	/// Normal constructor
-	CollisionPair(const std::shared_ptr<CollisionRepresentation>& first,
-				  const std::shared_ptr<CollisionRepresentation>& second);
+	CollisionPair(const std::shared_ptr<Representation>& first,
+				  const std::shared_ptr<Representation>& second);
 
 	/// Destructor
 	~CollisionPair();
 
 	/// Sets the representations in this pair, representations cannot be the same instance and neither can be nullptr.
-	/// \param	first 	The first CollisionRepresentation.
-	/// \param	second	The second CollisionRepresentation.
-	void setRepresentations(const std::shared_ptr<CollisionRepresentation>& first,
-							const std::shared_ptr<CollisionRepresentation>& second);
+	/// \param	first 	The first Collision Representation.
+	/// \param	second	The second Collision Representation.
+	void setRepresentations(const std::shared_ptr<Representation>& first,
+							const std::shared_ptr<Representation>& second);
 
 	/// Function that returns the pair of representations of the objects that are colliding.
 	/// \return The pair of representations that are colliding.
-	const std::pair<std::shared_ptr<CollisionRepresentation>, std::shared_ptr<CollisionRepresentation>>&
+	const std::pair<std::shared_ptr<Representation>, std::shared_ptr<Representation>>&
 	getRepresentations() const;
 
 	/// \return The representation considered to be the first
-	std::shared_ptr<CollisionRepresentation> getFirst() const;
+	std::shared_ptr<Representation> getFirst() const;
 
 	/// \return The representation considered to be the second
-	std::shared_ptr<CollisionRepresentation> getSecond() const;
+	std::shared_ptr<Representation> getSecond() const;
 
 	/// \return true if there are any contacts assigned to the pair, false otherwise
 	bool hasContacts() const;
@@ -121,8 +121,8 @@ public:
 private:
 
 	/// Pair of objects that are colliding
-	std::pair<std::shared_ptr<CollisionRepresentation>,
-			  std::shared_ptr<CollisionRepresentation>> m_representations;
+	std::pair<std::shared_ptr<Representation>,
+			  std::shared_ptr<Representation>> m_representations;
 
 	/// List of current contacts
 	std::list<std::shared_ptr<Contact>> m_contacts;

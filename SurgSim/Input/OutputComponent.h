@@ -16,9 +16,9 @@
 #ifndef SURGSIM_INPUT_OUTPUTCOMPONENT_H
 #define SURGSIM_INPUT_OUTPUTCOMPONENT_H
 
-#include <SurgSim/Framework/Component.h>
-#include <SurgSim/Input/OutputProducerInterface.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {

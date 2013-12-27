@@ -18,10 +18,10 @@
 
 #include <Eigen/Core>
 
-#include <SurgSim/DataStructures/NamedData.h>
-#include <SurgSim/DataStructures/NamedVariantData.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/DataStructures/NamedData.h"
+#include "SurgSim/DataStructures/NamedVariantData.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

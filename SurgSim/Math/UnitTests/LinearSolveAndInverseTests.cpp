@@ -19,7 +19,7 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Math/LinearSolveAndInverse.h>
+#include "SurgSim/Math/LinearSolveAndInverse.h"
 
 namespace SurgSim
 {

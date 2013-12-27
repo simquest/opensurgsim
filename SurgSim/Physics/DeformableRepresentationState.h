@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {

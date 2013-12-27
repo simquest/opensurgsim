@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Framework/Assert.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/Assert.h"
 
 namespace SurgSim
 {

@@ -19,7 +19,7 @@
 #include <memory>
 #include <string>
 
-#include <SurgSim/Devices/Novint/NovintCommonDevice.h>
+#include "SurgSim/Devices/Novint/NovintCommonDevice.h"
 
 namespace SurgSim
 {

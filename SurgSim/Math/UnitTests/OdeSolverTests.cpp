@@ -21,8 +21,8 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/Math/OdeSolver.h>
-#include <SurgSim/Math/UnitTests/MockObject.h>
+#include "SurgSim/Math/OdeSolver.h"
+#include "SurgSim/Math/UnitTests/MockObject.h"
 
 namespace SurgSim
 {

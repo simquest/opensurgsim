@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_UNIFORM_H
 #define SURGSIM_GRAPHICS_UNIFORM_H
 
-#include <SurgSim/Graphics/UniformBase.h>
+#include "SurgSim/Graphics/UniformBase.h"
 
 #include <vector>
 
@@ -32,6 +32,11 @@ template <class T>
 class Uniform : public virtual UniformBase
 {
 public:
+
+	Uniform() {
+		SURGSIM_ADD_RW_PROPERTY(Uniform, T, value, get, set);
+	}
+
 	/// Sets the value of the uniform
 	virtual void set(const T& value) = 0;
 

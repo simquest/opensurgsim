@@ -17,13 +17,13 @@
 #include <sstream>
 #include <stdlib.h>
 
-#include <Examples/BouncingBalls/AddRandomSphereBehavior.h>
+#include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
 
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Blocks/SphereElement.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Blocks/SphereElement.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Blocks::SphereElement;
 using SurgSim::Framework::Behavior;

@@ -18,12 +18,12 @@
 
 #include <memory>
 
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/OsgTexture1d.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
-#include <SurgSim/Graphics/OsgTexture3d.h>
-#include <SurgSim/Graphics/OsgTextureRectangle.h>
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgTexture1d.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgTexture3d.h"
+#include "SurgSim/Graphics/OsgTextureRectangle.h"
 
 #include <osg/StateSet>
 

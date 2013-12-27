@@ -20,6 +20,7 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
+	AccessibleTests.cpp
 	ApplicationDataTest.cpp
 	AssertTest.cpp
 	BarrierTest.cpp
@@ -35,6 +36,8 @@ set(UNIT_TEST_SOURCES
 	SceneElementTest.cpp
 	SceneTest.cpp
 	SharedInstanceTest.cpp
+	TimerTest.cpp
+	TransferPropertiesBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 namespace SurgSim
 {

@@ -16,37 +16,36 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include <SurgSim/Blocks/BasicSceneElement.h>
-#include <SurgSim/Blocks/TransferPoseBehavior.h>
-#include <SurgSim/Collision/RigidCollisionRepresentation.h>
-#include <SurgSim/Collision/ShapeCollisionRepresentation.h>
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgPlaneRepresentation.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Math/DoubleSidedPlaneShape.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
+#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgPlaneRepresentation.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-#include <Examples/BouncingBalls/AddRandomSphereBehavior.h>
+#include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::AddRandomSphereBehavior;
@@ -62,6 +61,7 @@ using SurgSim::Graphics::OsgUniform;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::Vector4f;
+using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::Representation;
 using SurgSim::Physics::RigidRepresentation;
@@ -71,7 +71,6 @@ using SurgSim::Physics::PhysicsManager;
 /// \file
 ///      Example of how to put together a very simple demo of balls colliding with each other.
 ///	 	 Discrete Collision Detection (dcd) is used to detect collisions between spheres.
-
 
 /// Simple behavior to show that the spheres are moving while we don't have graphics.
 /// \note A Behavior is a type of Component that causes changes or actions.
@@ -84,7 +83,9 @@ public:
 
 	/// Perform per-period actions, i.e., what to do each "frame".
 	/// \note Behavior::update() is called by ComponentManager::processBehaviors(), which is called by
-	/// BehaviorManager::doUpdate(), which is called by BasicThread() inside a while(running) loop.
+	/// BehaviorManager::doUpdate() or Graphics::Manager::doUpdate() or PhysicsManager::doUpdate() depending on the
+	/// output of Behavior::getTargetManagerType().  Those manager's \c doUpdate() functions are called by
+	/// BasicThread() inside a \c while(running) loop.
 	/// Managers (e.g., ComponentManager) are threads and run their own update loops.
 	virtual void update(double dt)
 	{
@@ -92,6 +93,7 @@ public:
 		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
 								  m_representation->getPose().translation().transpose();
 	}
+
 protected:
 	/// Allocate the internal structures.
 	/// \return Success?
@@ -148,9 +150,14 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose)
 {
+	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+
 	// A FixedRepresentation has no motion or compliance. It does not change.
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + " Physics");
+	RigidRepresentationParameters params;
+	params.setShapeUsedForMassInertia(planeShape);
+	physicsRepresentation->setInitialParameters(params);
 
 	// A RigidTransform3d pose is the 6 degree-of-freedom (DOF) position and orientation.
 	physicsRepresentation->setInitialPose(pose);
@@ -182,8 +189,6 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	material->setShader(shader);
 	graphicsRepresentation->setMaterial(material);
 
-	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
-
 	// Here the SceneElement for the plane is created, to which the various Components that collectively define the
 	// plane are added.
 	std::shared_ptr<SceneElement> planeElement = std::make_shared<BasicSceneElement>(name);
@@ -196,13 +201,13 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	// practice to ensure that the physics and graphics poses are synced anyway.
 	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
 							   physicsRepresentation, graphicsRepresentation));
-	// ShapeCollisionRepresentation will use the provided Shape and physics to do collisions.  Collision detection
+	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>
-		("Plane Collision",planeShape, physicsRepresentation));
+	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Plane Collision", physicsRepresentation));
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
 	planeElement->addComponent(std::make_shared<AddRandomSphereBehavior>());
@@ -260,7 +265,7 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	std::shared_ptr<SceneElement> sphereElement = std::make_shared<BasicSceneElement>(name);
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
-	// By adding the PrintoutBehavior, this SceneElement will output its position each update.
+	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
 	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.

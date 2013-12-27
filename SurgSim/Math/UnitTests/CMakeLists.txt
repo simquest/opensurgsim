@@ -65,6 +65,7 @@ endif(SURGSIM_TESTS_BUILD_EIGEN)
 set(LIBS 
 	SurgSimMath
 	gtest
+	yaml-cpp
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
