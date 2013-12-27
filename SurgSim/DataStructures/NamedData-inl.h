@@ -35,7 +35,7 @@ inline NamedData<T>::NamedData(std::shared_ptr<const IndexDirectory> directory) 
 {
 	m_data.resize(m_directory->getNumEntries());
 	m_isDataValid.resize(m_directory->getNumEntries(), false);
-	SURGSIM_ASSERT(isValid());
+	SURGSIM_ASSERT(isInitialized());
 }
 
 template <typename T>
@@ -44,7 +44,7 @@ inline NamedData<T>::NamedData(const std::vector<std::string>& names) :
 {
 	m_data.resize(m_directory->getNumEntries());
 	m_isDataValid.resize(m_directory->getNumEntries(), false);
-	SURGSIM_ASSERT(isValid());
+	SURGSIM_ASSERT(isInitialized());
 }
 
 template <typename T>
@@ -53,16 +53,16 @@ inline NamedData<T>::NamedData(const NamedData& namedData) :
 	m_data(namedData.m_data),
 	m_isDataValid(namedData.m_isDataValid)
 {
-	SURGSIM_ASSERT(isValid());
+	SURGSIM_ASSERT(isInitialized());
 }
 
 template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 {
-	SURGSIM_ASSERT(namedData.isValid()) <<
-		"Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
+	SURGSIM_ASSERT(namedData.isInitialized()) <<
+		"Cannot use an uninitialized NamedData on the right-hand side of an assignment!";
 
-	if (! isValid())
+	if (! isInitialized())
 	{
 		m_directory = namedData.m_directory;
 	}
@@ -74,9 +74,9 @@ inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 	m_data = namedData.m_data;
 	m_isDataValid = namedData.m_isDataValid;
 
-	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
+	SURGSIM_ASSERT(isInitialized()) << "NamedData is not initialized after assignment!";
 	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isDataValid.size() == m_directory->size()) <<
-		"NamedData isn't correctly sized after assignment!";
+		"NamedData is not correctly sized after assignment!";
 
 	return *this;
 }
@@ -87,16 +87,16 @@ inline NamedData<T>::NamedData(NamedData&& namedData) :
 	m_data(std::move(namedData.m_data)),
 	m_isDataValid(std::move(namedData.m_isDataValid))
 {
-	SURGSIM_ASSERT(isValid());
+	SURGSIM_ASSERT(isInitialized());
 }
 
 template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 {
-	SURGSIM_ASSERT(namedData.isValid()) <<
-		"Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
+	SURGSIM_ASSERT(namedData.isInitialized()) <<
+		"Cannot use an uninitialized NamedData on the right-hand side of an assignment!";
 
-	if (! isValid())
+	if (! isInitialized())
 	{
 		m_directory = std::move(namedData.m_directory);
 	}
@@ -108,15 +108,15 @@ inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 	m_data = std::move(namedData.m_data);
 	m_isDataValid = std::move(namedData.m_isDataValid);
 
-	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
+	SURGSIM_ASSERT(isInitialized()) << "NamedData is not initialized after assignment!";
 	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isDataValid.size() == m_directory->size()) <<
-		"NamedData isn't correctly sized after assignment!";
+		"NamedData is not correctly sized after assignment!";
 
 	return *this;
 }
 
 template <typename T>
-inline bool NamedData<T>::isValid() const
+inline bool NamedData<T>::isInitialized() const
 {
 	return static_cast<bool>(m_directory);
 }
@@ -130,7 +130,7 @@ inline std::shared_ptr<const IndexDirectory> NamedData<T>::getDirectory() const
 template <typename T>
 inline int NamedData<T>::getIndex(const std::string& name) const
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return -1;
 	}
@@ -140,7 +140,7 @@ inline int NamedData<T>::getIndex(const std::string& name) const
 template <typename T>
 inline std::string NamedData<T>::getName(int index) const
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return "";
 	}
@@ -156,7 +156,7 @@ inline bool NamedData<T>::hasEntry(int index) const
 template <typename T>
 inline bool NamedData<T>::hasEntry(const std::string& name) const
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return false;
 	}
@@ -172,7 +172,7 @@ inline bool NamedData<T>::hasData(int index) const
 template <typename T>
 inline bool NamedData<T>::hasData(const std::string& name) const
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return false;
 	}
@@ -205,7 +205,7 @@ inline bool NamedData<T>::get(int index, T* value) const
 template <typename T>
 inline bool NamedData<T>::get(const std::string& name, T* value) const
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return false;
 	}
@@ -240,7 +240,7 @@ inline bool NamedData<T>::set(int index, const T& value)
 template <typename T>
 inline bool NamedData<T>::set(const std::string& name, const T& value)
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return false;
 	}
@@ -275,7 +275,7 @@ inline bool NamedData<T>::reset(int index)
 template <typename T>
 inline bool NamedData<T>::reset(const std::string& name)
 {
-	if (! isValid())
+	if (! isInitialized())
 	{
 		return false;
 	}

@@ -78,15 +78,15 @@ inline DataGroup& DataGroup::operator=(DataGroup&& dataGroup)
 
 inline bool DataGroup::isValid() const
 {
-	bool valid = poses().isValid();
-	SURGSIM_ASSERT(poses().isValid() == valid &&
-				   vectors().isValid() == valid &&
-				   matrices().isValid() == valid &&
-				   scalars().isValid() == valid &&
-				   integers().isValid() == valid &&
-				   booleans().isValid() == valid &&
-				   strings().isValid() == valid &&
-				   customData().isValid() == valid) << "The object is only partially initialized!";
+	bool valid = poses().isInitialized();
+	SURGSIM_ASSERT(poses().isInitialized() == valid &&
+				   vectors().isInitialized() == valid &&
+				   matrices().isInitialized() == valid &&
+				   scalars().isInitialized() == valid &&
+				   integers().isInitialized() == valid &&
+				   booleans().isInitialized() == valid &&
+				   strings().isInitialized() == valid &&
+				   customData().isInitialized() == valid) << "The object is only partially initialized!";
 	return valid;
 }
 
