@@ -36,7 +36,7 @@ namespace DataStructures
 ///
 /// A NamedData object constructed by the default constructor has no entries, meaning it has not been associated with a
 /// set of names and indices, and is called <b>un</b>initialized.
-/// 
+///
 /// An initialized object contains an immutable collection of entries.  For an initialized object: entries cannot be
 /// added or removed, and the entries' names and indices<b>cannot be changed</b>.  Further, an initialized object cannot
 /// become uninitialized. These properties ensure that a stable data layout is available to the code using this class so

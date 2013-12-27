@@ -45,17 +45,17 @@ namespace DataStructures
 /// The entries (names and indices) are unique within each NamedData, but not necessarily across different types
 /// (i.e. there could be a scalar and a vector both named "friction", or a pose and a boolean both at index 1).
 /// It is recommended that you keep names separate between different types to avoid confusion.
-/// 
+///
 /// A DataGroup object constructed by the default constructor starts out uninitialized, meaning its NamedData member
 /// objects have not been initialized. A DataGroup object can be initialized by initializing each and every of its
 /// NamedData, or by using the \ref DataGroupBuilder class.  Given an initialized DataGroup object, you can create other
 /// initialized objects with the same entries (in the NamedData) by copy construction, or by assigning the initialized
 /// object to an uninitialized (default-constructed) object.
-/// 
+///
 /// Assignment to an initialized DataGroup object is only possible if the two objects use the same pointers to the
 /// directories in their respective NamedData, which happens when either of the two objects was copy-constructed from
 /// the other.
-/// 
+///
 /// \sa SurgSim::DataStructures::NamedData, SurgSim::DataStructers::DataGroupBuilder
 class DataGroup
 {

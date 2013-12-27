@@ -371,10 +371,10 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> lockedDataGroup;
 	DataGroup copied_data;
 	// the DataGroup in the LockedContainer was default-constructed and so is not valid
-	// you cannot "get" an invalid DataGroup out of the LockedContainer...so don't put one in there to begin with or 
+	// you cannot "get" an invalid DataGroup out of the LockedContainer...so don't put one in there to begin with or
 	// the call to get will fail
 	EXPECT_THROW(lockedDataGroup.get(&copied_data), SurgSim::Framework::AssertionFailure);
-	
+
 	lockedDataGroup.set(data);
 	lockedDataGroup.get(&copied_data);
 	EXPECT_TRUE(copied_data.isInitialized());
