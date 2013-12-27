@@ -18,6 +18,7 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -384,4 +385,14 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	copied_data.booleans().get("test", &outCopiedBool);
 	EXPECT_EQ(outBool, outCopiedBool);
 	EXPECT_EQ(trueBool, outCopiedBool);
+}
+
+TEST(DataGroupTests, PartialInitialization)
+{
+	std::vector<std::string> names;
+	names.push_back("test");
+	DataGroup data;
+	EXPECT_FALSE(data.isValid());
+	data.booleans() = SurgSim::DataStructures::NamedData<DataGroup::BooleanType>(names);
+	EXPECT_THROW(data.isValid(), SurgSim::Framework::AssertionFailure);
 }
