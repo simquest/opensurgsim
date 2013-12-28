@@ -100,6 +100,9 @@ if(NOT WIN32)
 	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
 endif(NOT WIN32)
 
+# Also output the test results as an xml file for use with Jenkins
+# Build Server.
+set(SURGSIM_TEST_RUN_SUFFIX ${SURGSIM_TEST_RUN_SUFFIX} --gtest_output=xml)
 
 # Copy zero or more files to the location of a built target, after the
 # target is built successfully, but only if the condition (which
