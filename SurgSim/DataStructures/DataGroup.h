@@ -55,6 +55,11 @@ namespace DataStructures
 /// Assignment to an initialized DataGroup object is only possible if the two objects use the same pointers to the
 /// directories in their respective NamedData, which happens when either of the two objects was copy-constructed from
 /// the other.
+/// 
+/// Once a DataGroup is initialized, the "entries" (i.e., the strings and indices that are used to access the data)
+/// cannot be changed, added to, removed from, or made empty.  These properties ensure that a stable data layout is
+/// available to the code using this class.  For example, the calling code can cache the entries' indices and from then
+/// on use the faster index-based lookup instead of the slower string-based lookup.
 ///
 /// \sa SurgSim::DataStructures::NamedData, SurgSim::DataStructers::DataGroupBuilder
 class DataGroup
