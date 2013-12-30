@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_EXAMPLES_GRAPHICSSCENE_POSEINTERPOLATOR_H
-#define SURGSIM_EXAMPLES_GRAPHICSSCENE_POSEINTERPOLATOR_H
+#ifndef EXAMPLES_GRAPHICSSCENE_POSEINTERPOLATOR_H
+#define EXAMPLES_GRAPHICSSCENE_POSEINTERPOLATOR_H
 
 #include <memory>
 #include <string>
-#include <SurgSim/Framework/Behavior.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/DataStructures/OptionalValue.h>
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 
 namespace SurgSim
 {
@@ -48,33 +48,13 @@ public:
 
 	void update(double dt) override;
 
-	void setLoop(bool val)
-	{
-		m_loop = val;
-		if (m_loop)
-		{
-			m_pingpong = false;
-		}
-	}
+	void setLoop(bool val);
 
-	bool isLoop()
-	{
-		return m_loop;
-	}
+	bool isLoop();
 
-	void setPingPong(bool val)
-	{
-		m_pingpong = val;
-		if (m_pingpong)
-		{
-			m_loop = false;
-		}
-	}
+	void setPingPong(bool val);
 
-	bool isPingPong()
-	{
-		return m_pingpong;
-	}
+	bool isPingPong();
 
 private:
 	SurgSim::DataStructures::OptionalValue<SurgSim::Math::RigidTransform3d> m_optionalFrom;

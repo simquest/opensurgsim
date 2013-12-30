@@ -123,8 +123,6 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
-	// viewElement->enableManipulator(true);
-	// viewElement->setManipulatorParameters(SurgSim::Math::Vector3d(3.0,3.0,3.0), SurgSim::Math::Vector3d(0.0,0.0,0.0));
 
 	auto light = std::make_shared<SurgSim::Graphics::OsgLight>("Main Light");
 	light->setAmbientColor(Vector4d(0.5,0.5,0.5,1.0));
@@ -328,7 +326,8 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	material->addUniform(shadowMapTexture);
 
 	camera = graphicsManager->getDefaultCamera();
-	RigidTransform3d pose = makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
+	RigidTransform3d pose =
+		makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
 	camera->setPose(pose);
 	camera->setMaterial(material);
 
@@ -343,7 +342,7 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	interpolator->setPingPong(true);
 
 	viewElement->addComponent(interpolator);
-	
+
 	return scene;
 }
 

@@ -64,7 +64,7 @@ public:
 	MOCK_METHOD0(clearFragmentShader, void());
 
 	MOCK_CONST_METHOD0(isGlobalScope, bool());
-	MOCK_METHOD1(setGlobalScope, void(bool));
+	MOCK_METHOD1(setGlobalScope, void(bool)); //NOLINT
 };
 
 

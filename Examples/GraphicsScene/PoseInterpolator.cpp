@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <Examples/GraphicsScene/PoseInterpolator.h>
+#include "Examples/GraphicsScene/PoseInterpolator.h"
 
-#include <SurgSim/Framework/SceneElement.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Graphics/Representation.h"
 
 #include <memory>
 
@@ -91,4 +91,32 @@ void PoseInterpolator::update(double dt)
 			getSceneElement()->removeComponent(getName());
 		}
 	}
+}
+
+void PoseInterpolator::setLoop(bool val)
+{
+	m_loop = val;
+	if (m_loop)
+	{
+		m_pingpong = false;
+	}
+}
+
+bool PoseInterpolator::isLoop()
+{
+	return m_loop;
+}
+
+void PoseInterpolator::setPingPong(bool val)
+{
+	m_pingpong = val;
+	if (m_pingpong)
+	{
+		m_loop = false;
+	}
+}
+
+bool PoseInterpolator::isPingPong()
+{
+	return m_pingpong;
 }

@@ -55,7 +55,8 @@ public:
 	explicit Camera(const std::string& name) : Representation(name)
 	{
 		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, viewMatrix, getViewMatrix, setViewMatrix);
-		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, projectionMatrix, getProjectionMatrix, setProjectionMatrix);
+		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, projectionMatrix,
+			getProjectionMatrix, setProjectionMatrix);
 
 		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatViewMatrix, getViewMatrix);
 		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatProjectionMatrix, getProjectionMatrix);

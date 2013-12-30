@@ -123,9 +123,9 @@ inline Eigen::Matrix<T, 4, 4> makeViewMatrix(const Eigen::Matrix<T, 3, 1, VOpt>&
 
 	Eigen::Matrix<T, 4, 4> rotation;
 	rotation <<     side[0],      side[1],      side[2], 0.0,
-		        actualUp[0],  actualUp[1],  actualUp[2], 0.0, 
-		        -forward[0],  -forward[1],  -forward[2], 0.0,
-		                0.0,          0.0,          0.0, 1.0;  
+				actualUp[0],  actualUp[1],  actualUp[2], 0.0,
+				-forward[0],  -forward[1],  -forward[2], 0.0,
+						0.0,          0.0,          0.0, 1.0;
 
 	Eigen::Matrix<T, 4, 4> translation;
 	translation << 1.0, 0.0, 0.0, -eye.x(),
