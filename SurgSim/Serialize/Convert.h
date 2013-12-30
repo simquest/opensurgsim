@@ -24,6 +24,16 @@
 	virtual bool decode(const YAML::Node& node) override; \
 	virtual std::string getClassName() override {return std::string(#T);}\
 
+/// \note HS-2013-dec-23 The gcc and msvc compilers seem to have different requirements when a template class
+///       needs to be passed template parameters in a specialization, that extend the original template interface
+///       gcc needs the template<> statement before the new template parameters, msvc does not like it at all.
+#ifdef _GNUC_
+#define SURGSIM_DOUBLE_SPECIALIZATION template<>
+#else
+#define SURGSIM_DOUBLE_SPECIALIZATION
+#endif
+
+
 namespace SurgSim
 {
 namespace Serialize

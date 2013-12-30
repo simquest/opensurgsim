@@ -23,55 +23,56 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
+/// \file MathConvert.h
+/// This contains a series of functions to encode and decode Eigen data structures to
+/// and from YAML nodes. These conversion functions will extinguish Eigen options, these
+/// are not serialized, the output is determined by the type as it is declared in the
+/// appropriate conversion function, with Eigen::Transform, this could lead to problems
+/// If the mode that is used for reading is different than the mode that was used while
+/// writing.
+
 namespace YAML
 {
-	/// declaration of specialization convert<SurgSim::Math::Vector3d>
-	template <>
-	struct convert <SurgSim::Math::Vector3d>
+	/// Specialization of convert for fixed size Eigen::Matrix
+	SURGSIM_DOUBLE_SPECIALIZATION
+	template <typename Type, int Rows, int Cols, int MOpt>
+	struct convert<typename Eigen::Matrix<Type, Rows, Cols, MOpt>>
 	{
-		static Node encode(const SurgSim::Math::Vector3d& rhs);
-		static bool decode(const Node &node, SurgSim::Math::Vector3d& rhs);
+		static Node encode(const typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, Cols, MOpt>& rhs);
 	};
 
-	/// declaration of specialization convert<SurgSim::Math::Vector4d>
-	template <>
-	struct convert <SurgSim::Math::Vector4d>
+	/// Specialization for Eigen Row Vectors, which are the type that Vector2x, Vector3x use
+	SURGSIM_DOUBLE_SPECIALIZATION
+	template <class Type, int Rows, int MOpt>
+	struct convert <typename Eigen::Matrix<Type,Rows,1,MOpt>>
 	{
-		static Node encode(const SurgSim::Math::Vector4d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Vector4d& rhs);
+		static Node encode(const typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Matrix<Type, Rows, 1, MOpt>& rhs);
 	};
 
-	/// declaration of specialization convert<SurgSim::Math::Vector4d>
-	template <>
-	struct convert <SurgSim::Math::Quaterniond>
+	/// Specialization of convert for Eigen::Quaternion
+	SURGSIM_DOUBLE_SPECIALIZATION
+	template <class Type, int QOpt>
+	struct convert<typename Eigen::Quaternion<Type, QOpt>>
 	{
-		static Node encode(const SurgSim::Math::Quaterniond& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Quaterniond& rhs);
+		static Node encode(const typename Eigen::Quaternion<Type, QOpt>& rhs);
+		static bool decode(const Node& node, typename Eigen::Quaternion<Type, QOpt>& rhs);
 	};
 
-	/// declaration of specialization convert<SurgSim::Math::Matrix33d>
-	template <>
-	struct convert <SurgSim::Math::Matrix33d>
+	/// Specialization of convert for Eigen::RigidTransform
+	SURGSIM_DOUBLE_SPECIALIZATION
+	template <class Type, int Dim, int TMode, int TOptions>
+	struct convert<typename Eigen::Transform<Type, Dim, TMode, TOptions>>
 	{
-		static Node encode(const SurgSim::Math::Matrix33d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Matrix33d& rhs);
+		static Node encode(const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
+		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
 	};
 
-	/// declaration of specialization convert<SurgSim::Math::Matrix44d>
-	template <>
-	struct convert <SurgSim::Math::Matrix44d>
-	{
-		static Node encode(const SurgSim::Math::Matrix44d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::Matrix44d& rhs);
-	};
 
-	/// declaration of specialization convert<SurgSim::Math::RigidTransform3d>
-	template <>
-	struct convert <SurgSim::Math::RigidTransform3d>
-	{
-		static Node encode(const SurgSim::Math::RigidTransform3d& rhs);
-		static bool decode(const Node& node, SurgSim::Math::RigidTransform3d& rhs);
-	};
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
@@ -90,8 +91,8 @@ namespace YAML
 
 	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
-
-
 };
+
+#include "SurgSim/Serialize/MathConvert-inl.h"
 
 #endif // SURGSIM_SERIALIZE_MATHCONVERT_H

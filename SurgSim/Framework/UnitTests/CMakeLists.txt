@@ -17,10 +17,12 @@
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
 	AccessibleTests.cpp
+	AccessibleTypeTests.cpp
 	ApplicationDataTest.cpp
 	AssertTest.cpp
 	BarrierTest.cpp
@@ -52,6 +54,7 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 set(LIBS
 	SurgSimFramework
 	gtest
+	yaml-cpp
 )
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
