@@ -16,11 +16,11 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONCONTACT_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONCONTACT_H
 
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ConstraintImplementation.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/Localization.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/Localization.h"
 
 namespace SurgSim
 {

@@ -19,20 +19,20 @@
 #include <memory>
 #include <vector>
 
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Graphics/PointCloudRepresentation.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgPointCloudRepresentation.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/DataStructures/Vertices.h>
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/PointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/DataStructures/Vertices.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-#include <SurgSim/Testing/MathUtilities.h>
+#include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;

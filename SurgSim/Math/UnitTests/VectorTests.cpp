@@ -1115,6 +1115,41 @@ TYPED_TEST(AllDynamicVectorTests, getSubVector)
 	}
 }
 
+TYPED_TEST(AllDynamicVectorTests, getSubVectorBlocks)
+{
+	typedef typename TestFixture::Vector Vector;
+
+	Vector v, vInit, v2;
+	std::vector<unsigned int> nodeIds;
+	v.resize(18);   v.setRandom();   vInit = v;
+	v2.resize(9);  v2.setZero();
+	nodeIds.push_back(1);
+	nodeIds.push_back(3);
+	nodeIds.push_back(5);
+
+	EXPECT_EQ(18, v.size());
+	EXPECT_TRUE(v.isApprox(vInit));
+	EXPECT_EQ(9, v2.size());
+	EXPECT_TRUE(v2.isZero());
+	ASSERT_NO_THROW(SurgSim::Math::getSubVector(v, nodeIds, 3, &v2););
+	EXPECT_EQ(18, v.size());
+	EXPECT_TRUE(v.isApprox(vInit));
+	EXPECT_EQ(9, v2.size());
+	EXPECT_FALSE(v2.isZero());
+	for (int dofId = 0; dofId < 3; dofId++)
+	{
+		testScalar(v[3 + dofId], v2[dofId]);
+	}
+	for (int dofId = 3; dofId < 6; dofId++)
+	{
+		testScalar(v[9 + (dofId - 3)], v2[dofId]);
+	}
+	for (int dofId = 6; dofId < 9; dofId++)
+	{
+		testScalar(v[15 + (dofId - 6)], v2[dofId]);
+	}
+}
+
 TYPED_TEST(AllDynamicVectorTests, resize)
 {
 	typedef typename TestFixture::Vector Vector;
@@ -1127,4 +1162,78 @@ TYPED_TEST(AllDynamicVectorTests, resize)
 	ASSERT_NO_THROW(SurgSim::Math::resize(&v, 13, true););
 	EXPECT_EQ(13, static_cast<int>(v.size()));
 	EXPECT_TRUE(v.isZero());
+}
+
+template <class Vector>
+void testOrthonormalBasis(const Vector& i, const Vector& j, const Vector& k)
+{
+	typedef typename Vector::Scalar T;
+
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	EXPECT_NEAR(i.dot(j), 0.0, precision);
+	EXPECT_NEAR(i.dot(k), 0.0, precision);
+	EXPECT_NEAR(j.dot(i), 0.0, precision);
+	EXPECT_NEAR(j.dot(k), 0.0, precision);
+	EXPECT_NEAR(k.dot(i), 0.0, precision);
+	EXPECT_NEAR(k.dot(j), 0.0, precision);
+
+	EXPECT_TRUE(i.cross(j).isApprox(k));
+	EXPECT_TRUE(j.cross(k).isApprox(i));
+	EXPECT_TRUE(k.cross(i).isApprox(j));
+
+	EXPECT_NEAR(i.norm(), 1.0, precision);
+	EXPECT_NEAR(j.norm(), 1.0, precision);
+	EXPECT_NEAR(k.norm(), 1.0, precision);
+}
+
+TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
+{
+	typedef typename TestFixture::Vector3 Vector3;
+	typedef typename Vector3::Scalar T;
+	const int VOpt = Vector3::Options;
+
+	Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+	Vector3 j, k;
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	// Assert if 1 parameter is nullptr
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, &j, &k)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, nullptr, &k)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, &j, nullptr)));
+
+	// Assert if 2 parameters are nullptr
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, nullptr, &k)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, &j, nullptr)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, nullptr, nullptr)));
+
+	// Assert if 3 parameters are nullptr
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, nullptr, nullptr)));
+
+	// Input parameter 'i' = (0, 0, 0)
+	Vector3 zero = Vector3::Zero();
+	ASSERT_NO_THROW(EXPECT_EQ(false, SurgSim::Math::buildOrthonormalBasis(&zero, &j, &k)));
+
+	// Input parameter 'i' = (0, 0, 0) + (epsilon, epsilon, epsilon)
+	Vector3 closeToZero = Vector3::Constant(precision);
+	ASSERT_NO_THROW(EXPECT_EQ(false, SurgSim::Math::buildOrthonormalBasis(&closeToZero, &j, &k)));
+
+	// Input parameter 'i' is already normalized
+	{
+		Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+		Vector3 j, k;
+
+		i.normalize();
+		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
+		testOrthonormalBasis(i, j, k);
+	}
+
+	// Input parameter 'i' is not already normalized
+	{
+		Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+		Vector3 j, k;
+
+		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
+		testOrthonormalBasis(i, j, k);
+	}
 }

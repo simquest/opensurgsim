@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/Accessible.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -65,11 +65,24 @@ void Accessible::setAccessors(const std::string& name, GetterType getter, Setter
 	setSetter(name, setter);
 }
 
+bool Accessible::isReadable(const std::string& name) const
+{
+	return (m_getters.cend() != m_getters.find(name));
+}
+
+bool Accessible::isWriteable(const std::string& name) const
+{
+	return (m_setters.cend() != m_setters.find(name));
+}
+
 template<>
 SurgSim::Math::Matrix44f convert(boost::any val)
 {
+
 	SurgSim::Math::Matrix44f floatResult;
-	try 
+	// Use try in case this conversion was created using a Matrix44f, in which case the any_cast will
+	// still fail and throw an exception
+	try
 	{
 		SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
 		floatResult = result.cast<float>();

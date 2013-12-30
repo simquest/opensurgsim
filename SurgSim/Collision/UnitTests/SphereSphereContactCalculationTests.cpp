@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/SphereSphereDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/SphereSphereDcdContact.h"
 
 namespace SurgSim
 {
@@ -28,8 +28,8 @@ void doSphereSphereTest(double r0, Vector3d p0, double r1, Vector3d p1, bool has
 {
 	SphereSphereDcdContact calc;
 	std::shared_ptr<CollisionPair> pair =
-		std::make_shared<CollisionPair>(makeSphereRepresentation(nullptr, r0,Quaterniond::Identity(),p0),
-										makeSphereRepresentation(nullptr, r1,Quaterniond::Identity(),p1));
+		std::make_shared<CollisionPair>(makeSphereRepresentation(r0, Quaterniond::Identity(), p0),
+										makeSphereRepresentation(r1, Quaterniond::Identity(), p1));
 
 	calc.calculateContact(pair);
 	EXPECT_EQ(hasContacts, pair->hasContacts());

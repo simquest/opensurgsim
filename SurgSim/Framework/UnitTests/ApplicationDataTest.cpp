@@ -17,7 +17,7 @@
 #include <vector>
 #include <algorithm>
 
-#include <SurgSim/Framework/ApplicationData.h>
+#include "SurgSim/Framework/ApplicationData.h"
 
 #include <boost/filesystem.hpp>
 

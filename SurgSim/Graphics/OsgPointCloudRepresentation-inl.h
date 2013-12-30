@@ -20,7 +20,7 @@
 #include <osg/Point>
 #include <osg/StateAttribute>
 
-#include <SurgSim/Graphics/OsgConversions.h>
+#include "SurgSim/Graphics/OsgConversions.h"
 
 
 namespace SurgSim

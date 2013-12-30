@@ -25,6 +25,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	GroupTests.cpp
 	ManagerTests.cpp
+	MeshTests.cpp
 	OsgBoxRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp
@@ -35,6 +36,7 @@ set(UNIT_TEST_SOURCES
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
+	OsgMeshRepresentationTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp
@@ -57,6 +59,7 @@ set(UNIT_TEST_SOURCES
 	OsgUniformTypesTests.cpp
 	OsgUnitSphereTests.cpp
 	OsgVectorConversionsTests.cpp
+	OsgVectorFieldRepresentationTests.cpp
 	OsgViewElementTests.cpp
 	OsgViewTests.cpp
 	RenderPassTests.cpp
@@ -74,7 +77,8 @@ file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DEST
 
 
 set(LIBS 
-	SurgSimGraphics 
+	SurgSimGraphics
+	SurgSimTesting
 	gtest
 )
 

@@ -22,7 +22,6 @@ SurgSim::Framework::Representation::Representation(const std::string& m_name) : 
 
 SurgSim::Framework::Representation::~Representation()
 {
-
 }
 
 bool SurgSim::Framework::Representation::doInitialize()
@@ -34,5 +33,3 @@ bool SurgSim::Framework::Representation::doWakeUp()
 {
 	return true;
 }
-
-

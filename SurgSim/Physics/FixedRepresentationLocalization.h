@@ -16,11 +16,11 @@
 #ifndef SURGSIM_PHYSICS_FIXEDREPRESENTATIONLOCALIZATION_H
 #define SURGSIM_PHYSICS_FIXEDREPRESENTATIONLOCALIZATION_H
 
-#include <SurgSim/Physics/Localization.h>
-#include <SurgSim/Physics/FixedRepresentation.h>
+#include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {

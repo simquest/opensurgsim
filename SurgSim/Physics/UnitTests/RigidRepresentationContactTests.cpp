@@ -16,21 +16,22 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Physics/ConstraintData.h>
-#include <SurgSim/Physics/ContactConstraintData.h>
-#include <SurgSim/Physics/MlcpPhysicsProblem.h>
-#include <SurgSim/Physics/RigidRepresentation.h>
-#include <SurgSim/Physics/RigidRepresentationContact.h>
-#include <SurgSim/Physics/RigidRepresentationLocalization.h>
-#include <SurgSim/Physics/RigidRepresentationParameters.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintData.h"
+#include "SurgSim/Physics/ContactConstraintData.h"
+#include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/RigidRepresentationLocalization.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/SphereShape.h>
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace
 {
@@ -44,12 +45,12 @@ namespace Physics
 
 TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 {
-	SurgSim::Math::Vector3d n(0.0, 1.0, 0.0);
+	Vector3d n(0.0, 1.0, 0.0);
 	double d = 0.0;
 	double radius = 0.01;
 	double violation = -radius;
 
-	SurgSim::Math::Vector3d contactPosition = -n * (d - violation);
+	Vector3d contactPosition = -n * (d - violation);
 	SurgSim::Math::RigidTransform3d poseRigid;
 	poseRigid.setIdentity();
 
@@ -100,7 +101,7 @@ TEST (RigidRepresentationContactTests, SetGet_BuildMlcp_Test)
 
 	// Constraint H should be
 	// H = dt.[nx  ny  nz  nz.GPy-ny.GPz  nx.GPz-nz.GPx  ny.GPx-nx.GPy]
-	SurgSim::Math::Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));
+	Vector3d n_GP = n.cross(Vector3d(0.0, 0.0, 0.0));
 	EXPECT_NEAR(dt * n[0]   , mlcpPhysicsProblem.H(0, 0), epsilon);
 	EXPECT_NEAR(dt * n[1]   , mlcpPhysicsProblem.H(0, 1), epsilon);
 	EXPECT_NEAR(dt * n[2]   , mlcpPhysicsProblem.H(0, 2), epsilon);

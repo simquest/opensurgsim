@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGSHADER_H
 #define SURGSIM_GRAPHICS_OSGSHADER_H
 
-#include <SurgSim/Graphics/Shader.h>
+#include "SurgSim/Graphics/Shader.h"
 
 #include <osg/Program>
 #include <osg/StateSet>

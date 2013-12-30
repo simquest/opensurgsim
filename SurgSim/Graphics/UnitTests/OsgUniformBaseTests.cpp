@@ -16,7 +16,7 @@
 /// \file
 /// Tests for the OsgUniformBase class.
 
-#include <SurgSim/Graphics/OsgUniformBase.h>
+#include "SurgSim/Graphics/OsgUniformBase.h"
 
 #include <gtest/gtest.h>
 

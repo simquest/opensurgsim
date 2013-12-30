@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Physics/PhysicsManagerState.h>
+#include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/Representation.h"
 
-#include <SurgSim/Physics/Constraint.h>
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/CollisionRepresentation.h>
-#include <SurgSim/Physics/Representation.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 
 namespace SurgSim
 {
@@ -53,22 +53,24 @@ const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepr
 	return m_representations;
 }
 
-void PhysicsManagerState::setCollisionRepresentations(const std::vector<std::shared_ptr<CollisionRepresentation>>& val)
+void PhysicsManagerState::setCollisionRepresentations(
+	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val)
 {
 	m_collisionRepresentations = val;
 }
 
-const std::vector<std::shared_ptr<CollisionRepresentation>>& PhysicsManagerState::getCollisionRepresentations()
+const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
+PhysicsManagerState::getCollisionRepresentations()
 {
 	return m_collisionRepresentations;
 }
 
-void PhysicsManagerState::setCollisionPairs(std::vector<std::shared_ptr<CollisionPair>> val)
+void PhysicsManagerState::setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val)
 {
 	m_collisionPairs = val;
 }
 
-const std::vector<std::shared_ptr<CollisionPair>>& PhysicsManagerState::getCollisionPairs()
+const std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>>& PhysicsManagerState::getCollisionPairs()
 {
 	return m_collisionPairs;
 }

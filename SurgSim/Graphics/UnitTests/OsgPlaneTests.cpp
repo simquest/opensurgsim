@@ -16,7 +16,7 @@
 /// \file
 /// Tests for the OsgPlane class.
 
-#include <SurgSim/Graphics/OsgPlane.h>
+#include "SurgSim/Graphics/OsgPlane.h"
 
 #include <gtest/gtest.h>
 

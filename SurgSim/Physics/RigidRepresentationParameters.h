@@ -16,8 +16,8 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 
-#include <SurgSim/Math/Shapes.h>
-#include <SurgSim/Math/Valid.h>
+#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/Valid.h"
 
 namespace SurgSim
 {
@@ -103,9 +103,9 @@ public:
 		if (m_rho && m_shapeForMassInertia)
 		{
 			// If a shape overwrite a mesh, the shape should be used !
-			m_mass         = m_shapeForMassInertia->calculateMass(m_rho);
-			m_massCenter   = m_shapeForMassInertia->calculateMassCenter();
-			m_localInertia = m_shapeForMassInertia->calculateInertia(m_rho);
+			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
+			m_massCenter   = m_shapeForMassInertia->getCenter();
+			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
 
 			m_isValid = checkValidity();
 		}
@@ -243,9 +243,9 @@ public:
 
 		if (m_rho && m_shapeForMassInertia)
 		{
-			m_mass         = m_shapeForMassInertia->calculateMass(m_rho);
-			m_massCenter   = m_shapeForMassInertia->calculateMassCenter();
-			m_localInertia = m_shapeForMassInertia->calculateInertia(m_rho);
+			m_mass         = m_rho * m_shapeForMassInertia->getVolume();
+			m_massCenter   = m_shapeForMassInertia->getCenter();
+			m_localInertia = m_rho * m_shapeForMassInertia->getSecondMomentOfVolume();
 
 			m_isValid = checkValidity();
 		}

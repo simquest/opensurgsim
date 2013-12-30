@@ -15,42 +15,43 @@
 
 #include <memory>
 
-#include <SurgSim/Physics/PhysicsManager.h>
-#include <SurgSim/Framework/ApplicationData.h>
-#include <SurgSim/Framework/BehaviorManager.h>
-#include <SurgSim/Framework/Runtime.h>
-#include <SurgSim/Framework/Scene.h>
-#include <SurgSim/Framework/Log.h>
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/TransferPropertiesBehavior.h"
 
-#include <SurgSim/Graphics/Light.h>
-#include <SurgSim/Graphics/OsgBoxRepresentation.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
-#include <SurgSim/Graphics/OsgCamera.h>
-#include <SurgSim/Graphics/OsgGroup.h>
-#include <SurgSim/Graphics/OsgLight.h>
-#include <SurgSim/Graphics/OsgManager.h>
-#include <SurgSim/Graphics/OsgMaterial.h>
-#include <SurgSim/Graphics/OsgRenderTarget.h>
-#include <SurgSim/Graphics/OsgShader.h>
-#include <SurgSim/Graphics/OsgUniform.h>
-#include <SurgSim/Graphics/OsgTexture2d.h>
-#include <SurgSim/Graphics/OsgView.h>
-#include <SurgSim/Graphics/OsgViewElement.h>
-#include <SurgSim/Graphics/RenderPass.h>
+#include "SurgSim/Graphics/Light.h"
+#include "SurgSim/Graphics/OsgBoxRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
+#include "SurgSim/Graphics/OsgCamera.h"
+#include "SurgSim/Graphics/OsgGroup.h"
+#include "SurgSim/Graphics/OsgLight.h"
+#include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMaterial.h"
+#include "SurgSim/Graphics/OsgRenderTarget.h"
+#include "SurgSim/Graphics/OsgShader.h"
+#include "SurgSim/Graphics/OsgUniform.h"
+#include "SurgSim/Graphics/OsgTexture2d.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/RenderPass.h"
 
-#include <SurgSim/Blocks/BasicSceneElement.h>
+#include "SurgSim/Blocks/BasicSceneElement.h"
 
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Quaternion.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Math/Matrix.h>
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Math::Matrix44f;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
-
+using SurgSim::Math::makeRigidTransform;
 
 using SurgSim::Framework::Logger;
 
@@ -61,8 +62,7 @@ using SurgSim::Graphics::OsgTexture2d;
 #include <osg/Matrix>
 #include <osg/Camera>
 
-#include <Examples/GraphicsScene/PoseInterpolator.h>
-#include <Examples/GraphicsScene/CopyPropertiesBehavior.h>
+#include "Examples/GraphicsScene/PoseInterpolator.h"
 
 namespace
 {
@@ -277,49 +277,46 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 0, 0, 1024, 768);
 	scene->addSceneElement(viewElement);
 
-	auto copier =  std::make_shared<CopyPropertiesBehavior>("Copier");
+	auto copier =  std::make_shared<SurgSim::Framework::TransferPropertiesBehavior>("Copier");
 	viewElement->addComponent(copier);
 
 	auto pass1 = lightMapPass();
-	pass1->setView(viewElement->getView());
 	pass1->showColorTarget(0,0,256,256);
 
 	auto pass2 = shadowCastPass();
-	pass2->setView(viewElement->getView());
 	pass2->showColorTarget(1024-256,0,256,256);
 
 	auto light = viewElement->getComponents<SurgSim::Graphics::Light>()[0];
 	auto camera = pass1->getCamera();
 	// connect the light pose and the camera pose
-	copier->addConnection("pose", light, "pose", camera);
+	copier->connect(light, "pose", camera, "pose");
 	//copier->addConnection("pose", light, "pose", graphicsManager->getDefaultCamera());
 
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
 	// lightViewMatrix->setValue("value", pass1->getCamera()->getViewMatrix().cast<float>());
-	copier->addConnection("floatViewMatrix", pass1->getCamera(), "value", lightViewMatrix);
+	copier->connect(pass1->getCamera(), "floatViewMatrix", lightViewMatrix, "value");
 	pass2->getMaterial()->addUniform(lightViewMatrix);
 
 	auto lightProjectionMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightProjectionMatrix");
 	// lightProjectionMatrix->set(pass1->getCamera()->getProjectionMatrix().cast<float>());
-	copier->addConnection("floatProjectionMatrix", pass1->getCamera(), "value", lightProjectionMatrix);
+	copier->connect(pass1->getCamera(), "floatProjectionMatrix", lightProjectionMatrix, "value");
 	pass2->getMaterial()->addUniform(lightProjectionMatrix);
 
 	// Need to send the inverse view matrix of the main camera
 	// \note this should probably be a default camera uniform
 	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_inverseViewMatrix");
 	// inverseViewMatrix->set(pass2->getCamera()->getViewMatrix().inverse().cast<float>());
-	copier->addConnection("floatInverseViewMatrix", pass2->getCamera(), "value", inverseViewMatrix);
+	copier->connect(pass2->getCamera(), "floatInverseViewMatrix", inverseViewMatrix , "value");
 	pass2->getMaterial()->addUniform(inverseViewMatrix);
 
-	copier->addConnection("pose", graphicsManager->getDefaultCamera(), "pose", pass2->getCamera());
-	copier->addConnection("projectionMatrix", graphicsManager->getDefaultCamera(), "projectionMatrix", pass2->getCamera());
+	copier->connect(graphicsManager->getDefaultCamera(), "pose", pass2->getCamera(), "pose");
+	copier->connect(graphicsManager->getDefaultCamera(), "projectionMatrix", pass2->getCamera() , "projectionMatrix");
 
 
 	auto lightDepthTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_encodedLightDepthMap");
 	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass1->getRenderTarget()->getColorTarget(0)));
 	pass2->getMaterial()->addUniform(lightDepthTexture);
-
 
 	scene->addSceneElement(pass1);
 	scene->addSceneElement(pass2);

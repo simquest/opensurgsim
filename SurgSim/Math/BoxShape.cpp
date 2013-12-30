@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Math/BoxShape.h>
+#include "SurgSim/Math/BoxShape.h"
 
 namespace SurgSim
 {
@@ -53,22 +53,22 @@ double BoxShape::getSizeZ() const
 	return m_size[2];
 }
 
-double BoxShape::calculateVolume() const
+double BoxShape::getVolume() const
 {
 	return m_size[0] * m_size[1] * m_size[2];
 }
 
-SurgSim::Math::Vector3d BoxShape::calculateMassCenter() const
+SurgSim::Math::Vector3d BoxShape::getCenter() const
 {
 	return Vector3d(0.0, 0.0, 0.0);
 }
 
-SurgSim::Math::Matrix33d BoxShape::calculateInertia(double rho) const
+SurgSim::Math::Matrix33d BoxShape::getSecondMomentOfVolume() const
 {
-	const double mass = calculateMass(rho);
+	const double volume = getVolume();
 
 	const Vector3d sizeSquared = m_size.array() * m_size.array();
-	const double coef = 1.0 / 12.0 * mass;
+	const double coef = 1.0 / 12.0 * volume;
 	Matrix33d inertia = Matrix33d::Zero();
 	inertia.diagonal() = coef * Vector3d(sizeSquared[1] + sizeSquared[2],
 										sizeSquared[0] + sizeSquared[2],
@@ -101,6 +101,33 @@ void BoxShape::calculateVertices()
 		m_vertices[i] = m_size.array() * multiplier[i].array();
 	}
 }
+
+YAML::Node SurgSim::Math::BoxShape::encode()
+{
+	YAML::Node node;
+	node = SurgSim::Math::Shape::encode();
+	node["SizeX"] = getSizeX();
+	node["SizeY"] = getSizeY();
+	node["SizeZ"] = getSizeZ();
+
+	return node;
+}
+
+bool SurgSim::Math::BoxShape::decode(const YAML::Node& node)
+{
+	bool isSuccess = SurgSim::Math::Shape::decode(node);
+	if (! isSuccess)
+	{
+		return false;
+	}
+
+	m_size[0] = node["SizeX"].as<double>();
+	m_size[1] = node["SizeY"].as<double>();
+	m_size[2] = node["SizeZ"].as<double>();
+
+	return true;
+}
+
 
 }; // namespace Math
 }; // namespace SurgSim

@@ -19,5 +19,6 @@ if(SURGSIM_DEVICES_BUILD)
 endif(SURGSIM_DEVICES_BUILD)
 
 add_subdirectory(BouncingBalls)
+add_subdirectory(Fem3D)
 add_subdirectory(GraphicsScene)
 add_subdirectory(MassSprings)

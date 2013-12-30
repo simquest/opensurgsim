@@ -26,16 +26,16 @@
 
 #include <hdl/hdl.h>
 
-#include <SurgSim/Devices/Novint/NovintDevice.h>
-#include <SurgSim/Math/Vector.h>
-#include <SurgSim/Math/Matrix.h>
-#include <SurgSim/Math/RigidTransform.h>
-#include <SurgSim/Framework/Assert.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Clock.h>
-#include <SurgSim/Framework/SharedInstance.h>
-#include <SurgSim/DataStructures/DataGroup.h>
-#include <SurgSim/DataStructures/DataGroupBuilder.h>
+#include "SurgSim/Devices/Novint/NovintDevice.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Clock.h"
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix44d;
@@ -87,11 +87,13 @@ public:
 
 		HDLDeviceHandle deviceHandle = HDL_INVALID_HANDLE;
 		std::string hdalName = initializationName;
+		const char* hdalNameToPassSdk = hdalName.c_str();
 		if (hdalName.length() == 0)
 		{
 			hdalName = "Default Falcon";
+			hdalNameToPassSdk = nullptr; // This is how the HDAL API initializes default Falcon.
 		}
-		deviceHandle = hdlInitNamedDevice(hdalName.c_str());
+		deviceHandle = hdlInitNamedDevice(hdalNameToPassSdk);
 
 		if (m_scaffold->checkForFatalError("Failed to initialize"))
 		{

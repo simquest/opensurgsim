@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/ComponentManager.h>
-#include <SurgSim/Framework/Component.h>
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Runtime.h>
+#include "SurgSim/Framework/ComponentManager.h"
+#include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Runtime.h"
 
 #include <boost/thread/locks.hpp>
 

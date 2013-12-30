@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Graphics/OsgUnitAxes.h>
+#include "SurgSim/Graphics/OsgUnitAxes.h"
 
 namespace SurgSim
 {
@@ -52,6 +52,10 @@ OsgUnitAxes::OsgUnitAxes()
 
 	osg::StateSet* state = m_geode->getOrCreateStateSet();
 	state->setAttribute(new osg::LineWidth(2.0));
+
+	// These lines should never be lit, always render full color
+	state->setMode(GL_LIGHTING, osg::StateAttribute::OFF | osg::StateAttribute::PROTECTED);
+
 }
 
 OsgUnitAxes::~OsgUnitAxes()

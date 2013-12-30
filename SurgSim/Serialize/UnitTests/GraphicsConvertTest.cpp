@@ -15,9 +15,9 @@
 
 #include <fstream>
 #include <gtest/gtest.h>
-#include <SurgSim/Serialize/Convert.h>
-#include <SurgSim/Graphics/SphereRepresentation.h>
-#include <SurgSim/Graphics/OsgSphereRepresentation.h>
+#include "SurgSim/Serialize/GraphicsConvert.h"
+#include "SurgSim/Graphics/SphereRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 
 class GraphicsConvertTest : public ::testing::Test
 {

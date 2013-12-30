@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/CapsuleSphereDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/CapsuleSphereDcdContact.h"
 
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::SphereShape;
@@ -32,8 +32,8 @@ void doCapsuleSphereTest(double capsuleHeight, double capsuleRadius,
 						 const Vector3d& expectedNorm = Vector3d::Zero())
 {
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(
-		makeCapsuleRepresentation(nullptr, capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
-		makeSphereRepresentation(nullptr, sphereRadius, sphereQuat, spherePosition));
+		makeCapsuleRepresentation(capsuleHeight, capsuleRadius, capsuleQuat, capsulePosition),
+		makeSphereRepresentation(sphereRadius, sphereQuat, spherePosition));
 
 	CapsuleSphereDcdContact calc;
 	calc.calculateContact(pair);

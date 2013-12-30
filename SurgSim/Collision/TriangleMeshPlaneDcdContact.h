@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Collision/CollisionPair.h>
-#include <SurgSim/Collision/ContactCalculation.h>
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/ContactCalculation.h"
 
 namespace SurgSim
 {
@@ -49,7 +49,7 @@ private:
 };
 };
 
-#include <SurgSim/Collision/TriangleMeshPlaneDcdContact-inl.h>
+#include "SurgSim/Collision/TriangleMeshPlaneDcdContact-inl.h"
 
 
 #endif

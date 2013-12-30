@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_GROUP_H
 #define SURGSIM_GRAPHICS_GROUP_H
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 #include <memory>
 #include <vector>
@@ -69,21 +69,18 @@ public:
 	virtual bool remove(std::shared_ptr<Representation> representation);
 
 	/// Returns the representations in this group
-	const std::vector<std::shared_ptr<Representation>>& getMembers() const
-	{
-		return m_representations;
-	}
+	const std::vector<std::shared_ptr<Representation>>& getMembers() const;
 
 	/// Removes all representations
 	virtual void clear();
 
 private:
 	/// Initialize the component
-	/// \return	True if succeeded, false if failed
-	virtual bool doInitialize();
+	/// \return	True if initialization succeeded, false if failed
+	virtual bool doInitialize() override;
 	/// Wake up the component
-	/// \return	True if succeeded, false if failed
-	virtual bool doWakeUp();
+	/// \return	True if wake up succeeded, false if failed
+	virtual bool doWakeUp() override;
 
 	/// Representations in this group
 	std::vector<std::shared_ptr<Representation>> m_representations;

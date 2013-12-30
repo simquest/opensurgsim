@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_OSGMANAGER_H
 #define SURGSIM_GRAPHICS_OSGMANAGER_H
 
-#include <SurgSim/Graphics/Manager.h>
+#include "SurgSim/Graphics/Manager.h"
 
 #include <memory>
 
@@ -33,6 +33,7 @@ class Group;
 class View;
 class OsgCamera;
 class OsgGroup;
+class OsgScreenSpacePass;
 
 /// OSG-based implementation of graphics manager class.
 ///
@@ -141,6 +142,9 @@ private:
 	/// Default group to which all representations and groups are added
 	/// This group is initially assigned to the default camera.
 	std::shared_ptr<OsgGroup> m_defaultGroup;
+
+	/// Builtin RenderPass that can be used for HUD functionality, uses Group "ossHud"
+	std::shared_ptr<OsgScreenSpacePass> m_hudElement;
 };
 
 };  // namespace Graphics

@@ -18,8 +18,8 @@
 
 #include <memory>
 
-#include <SurgSim/Framework/Logger.h>
-#include <SurgSim/DataStructures/DataGroup.h>
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {

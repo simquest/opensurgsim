@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h>
-#include <SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h>
+#include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/Collision/BoxDoubleSidedPlaneDcdContact.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
@@ -34,16 +34,10 @@ void doBoxDoubleSidedPlaneTest(std::shared_ptr<BoxShape> box,
 							   const int* expectedBoxIndicesInContacts,
 							   const bool collisionNormalIsPlaneNormal)
 {
-	std::shared_ptr<CollisionRepresentation> boxRep = std::make_shared<MockCollisionRepresentation>(
-		"Collision Box 0",
-		box,
-		boxQuat,
-		boxTrans);
-	std::shared_ptr<CollisionRepresentation> planeRep = std::make_shared<MockCollisionRepresentation>(
-		"Collision Plane 0",
-		plane,
-		planeQuat,
-		planeTrans);
+	std::shared_ptr<Representation> boxRep = std::make_shared<ShapeCollisionRepresentation>(
+		"Collision Box 0", box, SurgSim::Math::makeRigidTransform(boxQuat, boxTrans));
+	std::shared_ptr<Representation> planeRep = std::make_shared<ShapeCollisionRepresentation>(
+		"Collision Plane 0", plane, SurgSim::Math::makeRigidTransform(planeQuat, planeTrans));
 
 	// First calculate the expected contact info.
 	std::list<std::shared_ptr<Contact>> expectedContacts;

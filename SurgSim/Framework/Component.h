@@ -19,8 +19,8 @@
 #include <string>
 #include <memory>
 
-#include <SurgSim/Framework/Log.h>
-#include <SurgSim/Framework/Accessible.h>
+#include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
 {

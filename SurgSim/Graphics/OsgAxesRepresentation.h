@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGAXESREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGAXESREPRESENTATION_H
 
-#include <SurgSim/Graphics/OsgRepresentation.h>
-#include <SurgSim/Graphics/AxesRepresentation.h>
-#include <SurgSim/Graphics/OsgUnitAxes.h>
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/AxesRepresentation.h"
+#include "SurgSim/Graphics/OsgUnitAxes.h"
 
 
 #if defined(_MSC_VER)

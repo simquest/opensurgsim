@@ -16,7 +16,7 @@
 #ifndef SURGSIM_GRAPHICS_SCREENSPACEQUADREPRESENTATION_H
 #define SURGSIM_GRAPHICS_SCREENSPACEQUADREPRESENTATION_H
 
-#include <SurgSim/Graphics/Representation.h>
+#include "SurgSim/Graphics/Representation.h"
 
 namespace SurgSim
 {
@@ -35,7 +35,7 @@ public:
 	/// Constructor.
 	/// \param	name	The name.
 	/// \param	view	The view that will contain this quad.
-	ScreenSpaceQuadRepresentation(const std::string name, std::shared_ptr<View> view) : Representation(name)
+	explicit ScreenSpaceQuadRepresentation(const std::string name) : Representation(name)
 	{
 
 	}
