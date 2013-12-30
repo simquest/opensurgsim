@@ -103,7 +103,7 @@ void RenderPass::setRenderOrder(SurgSim::Graphics::Camera::RenderOrder order, in
 
 void RenderPass::showColorTarget(int x, int y, int width, int height)
 {
-	if (m_debugColor == nullptr && m_renderTarget->getColorTargetCount() > 0 && m_view != nullptr)
+	if (m_debugColor == nullptr && m_renderTarget->getColorTargetCount() > 0)
 	{
 		auto texture = m_renderTarget->getColorTarget(0);
 		m_debugColor = buildDebugQuad("debug color", texture);
@@ -123,7 +123,7 @@ void RenderPass::hideColorTarget()
 
 void RenderPass::showDepthTarget(int x, int y, int width, int height)
 {
-	if (m_debugDepth == nullptr && m_renderTarget->doesUseDepthTarget() && m_view != nullptr)
+	if (m_debugDepth == nullptr && m_renderTarget->doesUseDepthTarget())
 	{
 		auto texture = m_renderTarget->getDepthTarget();
 		m_debugDepth = buildDebugQuad("debug depth", texture);

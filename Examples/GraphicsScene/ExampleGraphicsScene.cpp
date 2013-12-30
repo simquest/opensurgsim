@@ -312,7 +312,6 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	copier->connect(graphicsManager->getDefaultCamera(), "pose", pass2->getCamera(), "pose");
 	copier->connect(graphicsManager->getDefaultCamera(), "projectionMatrix", pass2->getCamera() , "projectionMatrix");
 
-
 	auto lightDepthTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_encodedLightDepthMap");
 	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass1->getRenderTarget()->getColorTarget(0)));
@@ -327,7 +326,6 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_shadowmap");
 	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass2->getRenderTarget()->getColorTarget(0)));
 	material->addUniform(shadowMapTexture);
-
 
 	camera = graphicsManager->getDefaultCamera();
 	RigidTransform3d pose = makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
