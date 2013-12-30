@@ -35,7 +35,7 @@ TEST(NamedVariantDataTests, CanConstruct)
 	EXPECT_EQ(1, data.getNumEntries());
 	EXPECT_EQ(1u, data.size());
 
-	EXPECT_TRUE(data.isInitialized());
+	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
 	EXPECT_FALSE(data.hasData(0));

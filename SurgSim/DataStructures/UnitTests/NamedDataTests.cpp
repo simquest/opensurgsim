@@ -34,7 +34,7 @@ TEST(NamedDataTests, CanConstruct)
 	EXPECT_EQ(1, data.getNumEntries());
 	EXPECT_EQ(1u, data.size());
 
-	EXPECT_TRUE(data.isInitialized());
+	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
 	EXPECT_FALSE(data.hasData(0));
@@ -61,7 +61,7 @@ TEST(NamedDataTests, CanCreateShared)
 	EXPECT_EQ(1, data->getNumEntries());
 	EXPECT_EQ(1u, data->size());
 
-	EXPECT_TRUE(data->isInitialized());
+	EXPECT_TRUE(data->isValid());
 	EXPECT_TRUE(data->hasEntry(0));
 	EXPECT_TRUE(data->hasEntry("test"));
 	EXPECT_FALSE(data->hasData(0));
@@ -88,7 +88,7 @@ TEST(NamedDataTests, CanConstructFromNames)
 	EXPECT_EQ(1, data.getNumEntries());
 	EXPECT_EQ(1u, data.size());
 
-	EXPECT_TRUE(data.isInitialized());
+	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.hasEntry(0));
 	EXPECT_TRUE(data.hasEntry("test"));
 	EXPECT_FALSE(data.hasData(0));
@@ -128,7 +128,7 @@ TEST(NamedDataTests, Empty)
 TEST(NamedDataTests, Uninitialized)
 {
 	NamedData<float> data;
-	EXPECT_FALSE(data.isInitialized());
+	EXPECT_FALSE(data.isValid());
 
 	EXPECT_EQ(0, data.getNumEntries());
 	EXPECT_EQ("", data.getName(0));

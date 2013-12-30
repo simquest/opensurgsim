@@ -35,11 +35,11 @@ namespace DataStructures
 /// name is more convenient, but less efficient.
 ///
 /// A NamedData object constructed by the default constructor has no entries, meaning it has not been associated with a
-/// set of names and indices, and is called <b>un</b>initialized.
+/// set of names and indices, and is called <i>invalid</i> or <i>empty</i>.
 ///
-/// An initialized object contains an immutable collection of entries.  For an initialized object: entries cannot be
-/// added or removed, and the entries' names and indices<b>cannot be changed</b>.  Further, an initialized object cannot
-/// become uninitialized. These properties ensure that a stable data layout is available to the code using this class so
+/// An <i>non</i>-empty object contains an immutable collection of entries.  For a non-empty object: entries cannot be
+/// added or removed, and the entries' names and indices <b>cannot be changed</b>.  Further, a non-empty object cannot
+/// become empty. These properties ensure that a stable data layout is available to the code using this class so
 /// that it can, for example, record entry indices and use them to retrieve the same entries later on.
 ///
 /// The data associated with an entry (e.g., the true or false associated with a particular name and index in a
@@ -47,8 +47,8 @@ namespace DataStructures
 /// collection, but has no associated data.
 ///
 /// The entries (i.e., names & indices) in a NamedData object can be set by passing a vector of names to the
-/// constructor, or by using the \ref NamedDataBuilder class.  Given one initialized object, other objects with the same
-/// entries can be created via copy construction or assignment of the initialized object to an uninitialized
+/// constructor, or by using the \ref NamedDataBuilder class.  Given one non-empty object, other objects with the same
+/// entries can be created via copy construction or assignment of the non-empty object to an empty
 /// (default-constructed) object.
 ///
 /// \tparam T the data type used for values contained in this collection.
@@ -122,7 +122,7 @@ public:
 	/// initialized object.
 	///
 	/// \return true if initialized.
-	inline bool isInitialized() const;
+	inline bool isValid() const;
 
 	/// Return the object's layout directory, which is its collection of names and indices.
 	/// In most cases, you should use direct assignment instead of doing things via the directory.
