@@ -355,10 +355,10 @@ TEST(DataGroupTests, Assignment)
 	// Having the same entries is not sufficient.
 	EXPECT_THROW(data = data3, SurgSim::Framework::AssertionFailure);
 
-	DataGroup data5(data); // data5 can assign to data because data5 was copy-constructed from data
-	data5.booleans().set("test2", !trueBool);
-	EXPECT_NO_THROW(data = data5);
-	EXPECT_NO_THROW(data5 = data);
+	DataGroup data4(data);
+	data4.booleans().set("test2", !trueBool);
+	EXPECT_NO_THROW(data = data4); // data4 can assign to data because data4 was copy-constructed from data
+	EXPECT_NO_THROW(data4 = data);
 }
 
 TEST(DataGroupTests, DataGroupInLockedContainer)
