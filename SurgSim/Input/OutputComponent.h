@@ -34,7 +34,7 @@ class DeviceInterface;
 class OutputProducer;
 
 /// OutputComponent is a Component that has an OutputProducer, a concrete instance of OutputProducerInterface, so that
-/// output devices can receive outputs through the normal component interface.
+/// output devices can receive data through the normal component interface to SceneElements.
 class OutputComponent : public SurgSim::Framework::Component
 {
 public:
@@ -78,7 +78,7 @@ private:
 	std::string m_deviceName;
 	/// Indicates if this output component is connected to a device
 	bool m_deviceConnected;
-	/// Output producer which sends information to hardware device
+	/// Output producer which sends data to hardware device
 	std::shared_ptr<OutputProducer> m_output;
 };
 

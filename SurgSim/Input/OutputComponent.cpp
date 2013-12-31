@@ -47,14 +47,14 @@ public:
 		bool result = false;
 		if (haveData && (outputData != nullptr))
 		{
-			m_lastOutput.get(outputData); // cannot get() unless the DataGroup in the LockedContainer is initialized.
+			m_lastOutput.get(outputData); // cannot get() until after the first call to setData
 			result = true;
 		}
 		return result;
 	}
 
 	/// Set the output data information stored in this output producer
-	/// \param [out] dataGroup Used to accept the retrieved input data information
+	/// \param dataGroup Data to be sent to the device
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup)
 	{
 		m_lastOutput.set(dataGroup);
@@ -62,8 +62,8 @@ public:
 	}
 
 private:
-	/// Used to store output data information to be passed out to device.  The DataGroup is default-constructed and
-	/// becomes initialized the first time we call LockedContainer::set.
+	/// Used to store output data information to be passed out to device.  The DataGroup in the LockedContainer is
+	/// default-constructed, so m_lastOutput.get will assert until after the first call to m_lastOutput.set in setData.
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastOutput;
 
 	/// Has setData been called since construction?
@@ -89,7 +89,6 @@ bool OutputComponent::isDeviceConnected()
 
 void OutputComponent::setData(const SurgSim::DataStructures::DataGroup& dataGroup)
 {
-	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to " << getName() << ". Unable to setData.";
 	m_output->setData(dataGroup);
 }
 
