@@ -19,6 +19,8 @@
 #include "SurgSim/Collision/BoxCapsuleDcdContact.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 

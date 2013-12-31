@@ -20,6 +20,7 @@
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
