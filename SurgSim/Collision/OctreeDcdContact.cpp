@@ -83,7 +83,7 @@ void OctreeDcdContact::calculateContactWithNode(
 		else
 		{
 			const std::list<std::shared_ptr<Contact>>& newContacts = localPair->getContacts();
-			for(auto contact = newContacts.cbegin(); contact != newContacts.cend(); ++contact)
+			for (auto contact = newContacts.cbegin(); contact != newContacts.cend(); ++contact)
 			{
 				(*contact)->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
 				pair->addContact(*contact);

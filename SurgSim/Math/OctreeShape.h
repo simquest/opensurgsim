@@ -44,7 +44,7 @@ public:
 	/// \tparam T octree node data structure to build Octree Shape from
 	/// \param node octree node data structure to build Octree Shape from
 	template<class T>
-	OctreeShape(const SurgSim::DataStructures::OctreeNode<T>& node);
+	explicit OctreeShape(const SurgSim::DataStructures::OctreeNode<T>& node);
 
 	/// Destructor
 	virtual ~OctreeShape();
