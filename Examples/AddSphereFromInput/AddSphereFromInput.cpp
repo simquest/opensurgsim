@@ -40,14 +40,12 @@
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
