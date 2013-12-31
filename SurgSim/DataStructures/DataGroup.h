@@ -42,21 +42,22 @@ namespace DataStructures
 /// \li \em Strings contain a text value.
 /// \li \em CustomData contain a custom data structure, \ref NamedVariantData.
 ///
-/// The entries (names and indices) are unique within each NamedData, but not necessarily across different types
+/// The entries (names and indices) are unique within each NamedData member, but not necessarily across different types
 /// (i.e. there could be a scalar and a vector both named "friction", or a pose and a boolean both at index 1).
 /// It is recommended that you keep names separate between different types to avoid confusion.
 ///
-/// A DataGroup object constructed by the default constructor starts out uninitialized, meaning its NamedData member
-/// objects have not been initialized. A DataGroup object can be initialized by initializing each and every of its
-/// NamedData, or by using the \ref DataGroupBuilder class.  Given an initialized DataGroup object, you can create other
-/// initialized objects with the same entries (in the NamedData) by copy construction, or by assigning the initialized
-/// object to an uninitialized (default-constructed) object.
+/// A DataGroup object constructed by the default constructor starts out empty, meaning its NamedData member
+/// objects are "invalid". An empty DataGroup object can be made non-empty by:
+/// \li using the \ref DataGroupBuilder class,
+/// \li copy construction,
+/// \li assigning from a non-empty DataGroup object, or
+/// \li assigning a "valid" NamedData object (of the correct template type) to each and every of the NamedData members.
 ///
-/// Assignment to an initialized DataGroup object is only possible if the two objects use the same pointers to the
-/// directories in their respective NamedData, which happens when either of the two objects was copy-constructed from
-/// the other.
-/// 
-/// Once a DataGroup is initialized, the "entries" (i.e., the strings and indices that are used to access the data)
+/// Assignment to a non-empty DataGroup object is only possible if either of the two objects in the assignment was made
+/// non-empty based on the other object (see the above list items about copy construction and assignment from a
+/// non-empty DataGroup object).
+///
+/// Once a DataGroup is non-empty, the "entries" (i.e., the strings and indices that are used to access the data)
 /// cannot be changed, added to, removed from, or made empty.  These properties ensure that a stable data layout is
 /// available to the code using this class.  For example, the calling code can cache the entries' indices and from then
 /// on use the faster index-based lookup instead of the slower string-based lookup.
@@ -124,13 +125,6 @@ public:
 	/// \param [in,out] dataGroup The object to copy from, which will be left in an unusable state.
 	/// \return The object that was assigned into.
 	inline DataGroup& operator=(DataGroup&& dataGroup);
-
-	/// Check if the object has been initialized, which means each NamedData has been initialized (i.e., has a set of
-	/// entries). If the object has not been initialized, it can become initialized on assignment from an initialized
-	/// object.  Asserts on all of the NamedData having the same initialization state.
-	///
-	/// \return true if initialized.
-	inline bool isInitialized() const;
 
 	/// Return the pose data structure.
 	/// \return the mutable pose data.

@@ -89,8 +89,6 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 		return false;
 	}
 
-	SURGSIM_ASSERT(m_initialInputData.isInitialized());
-
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	auto it = std::find(m_state->inputConsumerList.begin(), m_state->inputConsumerList.end(), inputConsumer);
 	if (it != m_state->inputConsumerList.end())
@@ -165,8 +163,6 @@ bool CommonDevice::hasOutputProducer()
 
 void CommonDevice::pushInput()
 {
-	SURGSIM_ASSERT(m_inputData.isInitialized());
-
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
 	{

@@ -44,7 +44,6 @@ TEST(DataGroupTests, CanConstruct)
 	builder.addString("test");
 	builder.addCustom("test");
 	DataGroup data = builder.createData();
-	EXPECT_TRUE(data.isInitialized());
 	EXPECT_TRUE(data.poses().hasEntry("test"));
 	EXPECT_FALSE(data.poses().hasData("test"));
 	EXPECT_FALSE(data.strings().hasEntry("missing"));
@@ -53,15 +52,14 @@ TEST(DataGroupTests, CanConstruct)
 	DataGroupBuilder builder2;
 	builder2.addInteger("test");
 	DataGroup data2 = builder2.createData();
-	EXPECT_TRUE(data2.isInitialized());
 	EXPECT_TRUE(data2.integers().hasEntry("test"));
 	EXPECT_FALSE(data2.integers().hasData("test"));
 	EXPECT_FALSE(data2.strings().hasEntry("missing"));
 	EXPECT_FALSE(data2.strings().hasData("missing"));
 
 	DataGroupBuilder builder3;
-	DataGroup data3 = builder3.createData();
-	EXPECT_TRUE(data3.isInitialized());  // A DataGroup created by an empty DataGroupBuilder is initialized.
+	DataGroup data3, data4 = builder3.createData();
+	EXPECT_NO_THROW(data3 = data4);  // A DataGroup created by an empty DataGroupBuilder is valid (aka non-empty).
 }
 
 /// Creating a shared_ref to a named data object.
@@ -78,18 +76,17 @@ TEST(DataGroupTests, CanCreateShared)
 	builder.addCustom("test");
 	std::shared_ptr<DataGroup> data = builder.createSharedData();
 
-	EXPECT_TRUE(data->isInitialized());
 	EXPECT_TRUE(data->poses().hasEntry("test"));
 	EXPECT_FALSE(data->poses().hasData("test"));
 	EXPECT_FALSE(data->strings().hasEntry("missing"));
 	EXPECT_FALSE(data->strings().hasData("missing"));
 }
 
-/// Creating an uninitialized data object.
+/// Creating an invalid (aka empty) data object.
 TEST(DataGroupTests, Uninitialized)
 {
-	DataGroup data;
-	EXPECT_FALSE(data.isInitialized());
+	DataGroup data, data2;
+	EXPECT_THROW(data = data2, SurgSim::Framework::AssertionFailure);
 }
 
 /// Putting data into the container.
@@ -304,7 +301,6 @@ TEST(DataGroupTests, CopyConstruction)
 	const bool trueBool = true;
 	data.booleans().set("test2", trueBool);
 	DataGroup copied_data = data;
-	EXPECT_TRUE(copied_data.isInitialized());
 	EXPECT_TRUE(copied_data.poses().hasEntry("test"));
 	EXPECT_FALSE(copied_data.poses().hasData("test"));
 	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
@@ -332,7 +328,6 @@ TEST(DataGroupTests, Assignment)
 	data.booleans().set("test2", trueBool);
 	DataGroup copied_data;
 	copied_data = data;
-	EXPECT_TRUE(copied_data.isInitialized());
 	EXPECT_TRUE(copied_data.poses().hasEntry("test"));
 	EXPECT_FALSE(copied_data.poses().hasData("test"));
 	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
@@ -370,14 +365,12 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	data.booleans().set("test", trueBool);
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> lockedDataGroup;
 	DataGroup copied_data;
-	// the DataGroup in the LockedContainer was default-constructed and so is not valid
-	// you cannot "get" an invalid DataGroup out of the LockedContainer...so don't put one in there to begin with or
-	// the call to get will fail
+	// the DataGroup in the LockedContainer was default-constructed and so is invalid (aka empty)
+	// you cannot "get" an invalid DataGroup out of the LockedContainer.  "set" must be called before "get".
 	EXPECT_THROW(lockedDataGroup.get(&copied_data), SurgSim::Framework::AssertionFailure);
 
 	lockedDataGroup.set(data);
 	lockedDataGroup.get(&copied_data);
-	EXPECT_TRUE(copied_data.isInitialized());
 	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
 	EXPECT_TRUE(copied_data.booleans().hasData("test"));
 	bool outBool, outCopiedBool;
@@ -385,14 +378,4 @@ TEST(DataGroupTests, DataGroupInLockedContainer)
 	copied_data.booleans().get("test", &outCopiedBool);
 	EXPECT_EQ(outBool, outCopiedBool);
 	EXPECT_EQ(trueBool, outCopiedBool);
-}
-
-TEST(DataGroupTests, PartialInitialization)
-{
-	std::vector<std::string> names;
-	names.push_back("test");
-	DataGroup data;
-	EXPECT_FALSE(data.isInitialized());
-	data.booleans() = SurgSim::DataStructures::NamedData<DataGroup::BooleanType>(names);
-	EXPECT_THROW(data.isInitialized(), SurgSim::Framework::AssertionFailure);
 }

@@ -48,12 +48,10 @@ public:
 
 	/// Initialize the input data information stored in this input consumer.
 	/// \param device The name of the device that is producing the input.
-	/// \param inputData Initial input data of the device.
+	/// \param initialData Initial input data of the device.
 	virtual void initializeInput(const std::string& device,
 		const SurgSim::DataStructures::DataGroup& initialData) override
 	{
-		SURGSIM_ASSERT(initialData.isInitialized())
-			<< "Cannot initialize input with uninitialized data from device (" << device << ")";
 		m_lastInput.set(initialData);
 	}
 
