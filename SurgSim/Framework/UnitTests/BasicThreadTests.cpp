@@ -231,7 +231,7 @@ TEST_F(BasicThreadDeathTest, DestructLiveThread)
 	ASSERT_DEATH_IF_SUPPORTED({
 		SurgSim::Framework::AssertMessage::setFailureBehaviorToDeath();
 		m.reset();
-	}, "Failure");
+	}, "");
 }
 
 }; // namespace Framework
