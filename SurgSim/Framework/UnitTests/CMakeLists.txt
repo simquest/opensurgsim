@@ -50,6 +50,7 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimFramework
+	gmock
 	gtest
 )
 
