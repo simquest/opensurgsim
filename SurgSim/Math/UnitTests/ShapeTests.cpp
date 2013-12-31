@@ -199,7 +199,7 @@ TEST_F(ShapeTest, Octree)
 
 	{
 		ASSERT_NO_THROW({OctreeShape octree;});
-		ASSERT_NO_THROW(OctreeShape::fromOctreeNode(node));
+		ASSERT_NO_THROW({OctreeShape octree(*node);});
 	}
 
 	{

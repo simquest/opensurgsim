@@ -198,7 +198,7 @@ TEST(OctreeNodeTests, OctreePath)
 	EXPECT_THROW(octree->getNode(path), SurgSim::Framework::AssertionFailure);
 }
 
-TEST(OctreeNodeTests, CopyOctreeNode)
+TEST(OctreeNodeTests, CopyConstructor)
 {
 	struct Data1
 	{
@@ -218,8 +218,7 @@ TEST(OctreeNodeTests, CopyOctreeNode)
 
 	{
 		SCOPED_TRACE("Copying with different Data Type");
-		std::shared_ptr<OctreeNode<Data2>> octree2 = std::make_shared<OctreeNode<Data2>>();
-		copyOctreeNode(octree1, octree2);
+		std::shared_ptr<OctreeNode<Data2>> octree2 = std::make_shared<OctreeNode<Data2>>(*octree1);
 		ASSERT_NE(nullptr, octree2);
 		EXPECT_TRUE(octree1->getBoundingBox().isApprox(octree2->getBoundingBox()));
 		EXPECT_EQ(octree1->hasChildren(), octree2->hasChildren());
@@ -242,8 +241,7 @@ TEST(OctreeNodeTests, CopyOctreeNode)
 
 	{
 		SCOPED_TRACE("Copying with same Data Type");
-		std::shared_ptr<OctreeNode<Data1>> octree2 = std::make_shared<OctreeNode<Data1>>();
-		copyOctreeNode(octree1, octree2);
+		std::shared_ptr<OctreeNode<Data1>> octree2 = std::make_shared<OctreeNode<Data1>>(*octree1);
 		ASSERT_NE(nullptr, octree2);
 		EXPECT_TRUE(octree1->getBoundingBox().isApprox(octree2->getBoundingBox()));
 		EXPECT_EQ(octree1->hasChildren(), octree2->hasChildren());

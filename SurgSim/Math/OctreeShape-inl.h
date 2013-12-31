@@ -22,15 +22,10 @@ namespace SurgSim
 namespace Math
 {
 
-template<class Data>
-std::shared_ptr<OctreeShape> OctreeShape::fromOctreeNode(
-		std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node)
+template<class T>
+OctreeShape::OctreeShape(const SurgSim::DataStructures::OctreeNode<T>& node) :
+	m_rootNode(std::make_shared<OctreeShape::NodeType>(node))
 {
-	std::shared_ptr<OctreeShape::NodeType> myNode = std::make_shared<OctreeShape::NodeType>();
-	SurgSim::DataStructures::copyOctreeNode(node, myNode);
-	std::shared_ptr<OctreeShape> shape = std::make_shared<OctreeShape>();
-	shape->setRootNode(myNode);
-	return shape;
 }
 
 }; // namespace Math

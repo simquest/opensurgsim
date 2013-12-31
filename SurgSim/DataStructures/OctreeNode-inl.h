@@ -39,6 +39,51 @@ OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::AxisAlignedBoundin
 }
 
 template<class Data>
+SurgSim::DataStructures::OctreeNode<Data>::OctreeNode(const OctreeNode& other)
+{
+	m_boundingBox = other.m_boundingBox;
+	m_hasChildren = other.m_hasChildren;
+	m_isActive = other.m_isActive;
+
+	// Also copy the data since they are the same type
+	data = other.data;
+
+	for(size_t i = 0; i < other.m_children.size(); i++)
+	{
+	   if (other.getChild(i) == nullptr)
+	   {
+		   m_children[i] = nullptr;
+	   }
+	   else
+	   {
+		   m_children[i] = std::make_shared<OctreeNode<Data>>(*other.m_children[i]);
+	   }
+	}
+}
+
+template <class Data>
+template <class T>
+SurgSim::DataStructures::OctreeNode<Data>::OctreeNode(const OctreeNode<T>& other)
+{
+	m_boundingBox = other.getBoundingBox();
+	m_hasChildren = other.hasChildren();
+	m_isActive = other.isActive();
+
+	for(size_t i = 0; i < m_children.size(); i++)
+	{
+		auto child = other.getChild(i);
+		if (child == nullptr)
+		{
+			m_children[i] = nullptr;
+		}
+		else
+		{
+			m_children[i] = std::make_shared<OctreeNode<Data>>(*child);
+		}
+	}
+}
+
+template<class Data>
 OctreeNode<Data>::~OctreeNode()
 {
 }
@@ -156,35 +201,6 @@ std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& pa
 			<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
 	}
 	return node;
-}
-
-template<class A>
-void copyOctreeNode(std::shared_ptr<OctreeNode<A>> from, std::shared_ptr<OctreeNode<A>> to)
-{
-	copyOctreeNode<A, A>(from, to);
-	// Also copy the data since the types are the same
-	to->data = from->data;
-}
-
-template<class A, class B>
-void copyOctreeNode(std::shared_ptr<OctreeNode<A>> from, std::shared_ptr<OctreeNode<B>> to)
-{
-	to->m_boundingBox = from->m_boundingBox;
-	to->m_hasChildren = from->m_hasChildren;
-	to->m_isActive = from->m_isActive;
-
-	for(int i = 0; i < from->m_children.size(); i++)
-	{
-		if (from->getChild(i) == nullptr)
-		{
-			to->m_children[i] = nullptr;
-		}
-		else
-		{
-			to->m_children[i] = std::make_shared<OctreeNode<B>>();
-			copyOctreeNode(from->m_children[i], to->m_children[i]);
-		}
-	}
 }
 
 };  // namespace DataStructures

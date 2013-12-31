@@ -41,9 +41,10 @@ public:
 	/// Construct an OctreeShape by copying data from an OctreeNode
 	/// NOTE: The Data stored in the octree node will not be copied into the
 	/// OctreeShape.
+	/// \tparam T octree node data structure to build Octree Shape from
 	/// \param node octree node data structure to build Octree Shape from
-	template<class Data>
-	static std::shared_ptr<OctreeShape> fromOctreeNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node);
+	template<class T>
+	OctreeShape(const SurgSim::DataStructures::OctreeNode<T>& node);
 
 	/// Destructor
 	virtual ~OctreeShape();

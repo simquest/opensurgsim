@@ -52,6 +52,17 @@ public:
 	/// Constructor
 	OctreeNode();
 
+	/// Copy constructor when the template data is the same type
+	/// \param other the octree to copy from
+	OctreeNode(const OctreeNode& other);
+
+	/// Copy constructor when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam T type of data stored in the other node
+	/// \param other the octree to copy from
+	template <class T>
+	OctreeNode(const OctreeNode<T>& other);
+
 	/// Constructor
 	/// \param  boundingBox The region contained by this octree node
 	explicit OctreeNode(const AxisAlignedBoundingBox& boundingBox);
@@ -114,12 +125,6 @@ public:
 	/// Extra node data
 	Data data;
 
-	template<class A>
-	friend void copyOctreeNode(std::shared_ptr<OctreeNode<A> > from, std::shared_ptr<OctreeNode<A> > to);
-
-	template<class A, class B>
-	friend void copyOctreeNode(std::shared_ptr<OctreeNode<A> > from, std::shared_ptr<OctreeNode<B> > to);
-
 protected:
 	/// Recursive function that does the adding of the data to the octree
 	/// \param position The position to add the data at
@@ -142,21 +147,6 @@ protected:
 	/// The children of this node
 	std::array<std::shared_ptr<OctreeNode<Data> >, 8> m_children;
 };
-
-/// Copy octree when the template data is the same type
-/// \tparam	A Type of extra data stored in each both octrees
-/// \param from the octree to copy from
-/// \param to the octree to copy to
-template<class A>
-void copyOctreeNode(std::shared_ptr<OctreeNode<A> > from, std::shared_ptr<OctreeNode<A> > to);
-
-/// Copy octree when the template data is a different type
-/// In this case, no data will be copied
-/// \tparam	A Type of extra data stored in each both octrees
-/// \param from the octree to copy from
-/// \param to the octree to copy to
-template<class A, class B>
-void copyOctreeNode(std::shared_ptr<OctreeNode<A> > from, std::shared_ptr<OctreeNode<B> > to);
 
 };  // namespace DataStructures
 };  // namespace SurgSim
