@@ -169,7 +169,7 @@ public:
 	/// \param barycentricCoordinate The coordinates to transform
 	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const DeformableRepresentationState& state, 
+		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const = 0;
 
 protected:

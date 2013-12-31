@@ -204,7 +204,7 @@ TEST_F(FemRepresentationLocalizationTest, CalculatePositionTest)
 
 	// Advanced tests
 	localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector4d(0.31, 0.03, 0.19, 0.47)));
-	//   0.31 * ( 0.0,  0.0,  0.0) => ( 0.0,  0.0,   0.0 )  
+	//   0.31 * ( 0.0,  0.0,  0.0) => ( 0.0,  0.0,   0.0 )
 	// + 0.03 * ( 0.0,  1.0, -1.0) => ( 0.0,  0.03, -0.03)
 	// + 0.19 * (-1.0,  1.0,  0.0) => (-0.19, 0.19,  0.0 )
 	// + 0.47 * ( 0.0,  1.0,  0.0) => ( 0.0,  0.47,  0.0 )

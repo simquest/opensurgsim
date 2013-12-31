@@ -29,7 +29,7 @@ FemRepresentationCoordinate::FemRepresentationCoordinate()
 
 }
 
-FemRepresentationCoordinate::FemRepresentationCoordinate(unsigned int elementId, 
+FemRepresentationCoordinate::FemRepresentationCoordinate(unsigned int elementId,
 														 SurgSim::Math::Vector barycentricCoordinate) :
 	elementId(elementId), barycentricCoordinate(barycentricCoordinate)
 {
@@ -82,9 +82,9 @@ SurgSim::Math::Vector3d FemRepresentationLocalization::doCalculatePosition(doubl
 		return femElement->computeCartesianCoordinate(*currentState, m_position.barycentricCoordinate);
 	}
 
-	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState, 
+	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState,
 		m_position.barycentricCoordinate);
-	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState, 
+	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState,
 		m_position.barycentricCoordinate);
 
 	return previousPosition + time * (currentPosition - previousPosition);

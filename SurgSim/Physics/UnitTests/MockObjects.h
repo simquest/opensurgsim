@@ -140,7 +140,7 @@ public:
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
 	{}
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
-		const DeformableRepresentationState& state, 
+		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector &barycentricCoordinate) const override
 	{ return SurgSim::Math::Vector3d::Zero(); }
 };
