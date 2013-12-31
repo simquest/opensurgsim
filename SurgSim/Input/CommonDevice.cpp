@@ -63,13 +63,6 @@ CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::Dat
 {
 }
 
-CommonDevice::CommonDevice(const std::string& name) :
-	m_name(name),
-	m_nameForCallback(name),
-	m_state(new State)
-{
-}
-
 CommonDevice::~CommonDevice()
 {
 }
