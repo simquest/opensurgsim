@@ -30,7 +30,7 @@ class OutputProducer: public OutputProducerInterface
 {
 public:
 	/// Constructor
-	OutputProducer() : haveData(false)
+	OutputProducer() : m_haveData(false)
 	{
 	}
 	/// Destructor
@@ -40,12 +40,12 @@ public:
 
 	/// Send the output to the device.
 	/// \param device The name of the device to receive the output.
-	/// \param outputData The output data going to the device.
+	/// \param [out] outputData The output data going to the device.
 	/// \return true if outputData was provided.
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override
 	{
 		bool result = false;
-		if (haveData && (outputData != nullptr))
+		if (m_haveData && (outputData != nullptr))
 		{
 			m_lastOutput.get(outputData); // cannot get() until after the first call to setData
 			result = true;
@@ -58,7 +58,7 @@ public:
 	void setData(const SurgSim::DataStructures::DataGroup& dataGroup)
 	{
 		m_lastOutput.set(dataGroup);
-		haveData = true;
+		m_haveData = true;
 	}
 
 private:
@@ -67,7 +67,7 @@ private:
 	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> m_lastOutput;
 
 	/// Has setData been called since construction?
-	bool haveData;
+	bool m_haveData;
 };
 
 OutputComponent::OutputComponent(const std::string& name, const std::string& deviceName) :
