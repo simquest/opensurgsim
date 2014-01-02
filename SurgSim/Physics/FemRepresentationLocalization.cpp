@@ -24,17 +24,6 @@ namespace SurgSim
 
 namespace Physics
 {
-FemRepresentationCoordinate::FemRepresentationCoordinate()
-{
-
-}
-
-FemRepresentationCoordinate::FemRepresentationCoordinate(unsigned int elementId,
-														 SurgSim::Math::Vector barycentricCoordinate) :
-	elementId(elementId), barycentricCoordinate(barycentricCoordinate)
-{
-
-}
 
 FemRepresentationLocalization::FemRepresentationLocalization()
 {

@@ -17,20 +17,13 @@
 #define SURGSIM_PHYSICS_FEMREPRESENTATIONLOCALIZATION_H
 
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim
 {
 
 namespace Physics
 {
-
-struct FemRepresentationCoordinate {
-	FemRepresentationCoordinate();
-	FemRepresentationCoordinate(unsigned int elementId, SurgSim::Math::Vector barycentricCoordinate);
-
-	unsigned int elementId;
-	SurgSim::Math::Vector barycentricCoordinate;
-};
 
 class FemRepresentationLocalization : public Localization
 {

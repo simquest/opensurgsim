@@ -32,6 +32,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationLocalization.cpp
+	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -71,6 +72,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemRepresentation.h
 	FemRepresentation-inl.h
 	FemRepresentationLocalization.h
+	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationContact.h
