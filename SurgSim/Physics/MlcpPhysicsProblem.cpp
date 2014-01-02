@@ -30,10 +30,6 @@ void MlcpPhysicsProblem::updateConstraints(
 {
 	using SurgSim::Math::Vector;
 
-	Matrix& m_H = H;
-	Matrix& m_CHt = CHt;
-	Matrix& m_HCHt = A;
-
 	// Update H, CHt, and HCHt with newH, denoted H'.
 	//
 	// Note that updates are linear for H and CHt, but not for HCHt:
@@ -47,10 +43,10 @@ void MlcpPhysicsProblem::updateConstraints(
 	// => HCHt += H(CH't) + H'[C(H+H')t];
 
 	Vector newCHt = subC * newH;
-	m_HCHt.col(colNewH) += m_H.middleCols(indexSubC, subC.rows()) * newCHt;
-	m_H.block(colNewH, indexSubC, 1, subC.rows()) += newH.transpose();
-	m_CHt.block(indexSubC, colNewH, subC.rows(), 1) += newCHt;
-	m_HCHt.row(colNewH) += newH.transpose() * m_CHt.middleRows(indexSubC, subC.rows());
+	A.col(colNewH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
+	H.block(colNewH, indexSubC, 1, subC.rows()) += newH.transpose();
+	CHt.block(indexSubC, colNewH, subC.rows(), 1) += newCHt;
+	A.row(colNewH) += newH.transpose() * CHt.middleRows(indexSubC, subC.rows());
 }
 
 }; // namespace Physics
