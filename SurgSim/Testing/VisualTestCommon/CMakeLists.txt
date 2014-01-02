@@ -46,3 +46,5 @@ add_library(VisualTestCommon
 	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})
 surgsim_show_ide_folders(
 	"${VISUAL_TEST_COMMON_SOURCES}" "${VISUAL_TEST_COMMON_HEADERS}")
+
+set_target_properties(VisualTestCommon PROPERTIES FOLDER "Devices")
