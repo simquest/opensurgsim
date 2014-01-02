@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_PHYSICS_FEMREPRESENTATIONLOCALIZATION_H
-#define SURGSIM_PHYSICS_FEMREPRESENTATIONLOCALIZATION_H
+#ifndef SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
+#define SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H
 
 #include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
@@ -25,18 +25,18 @@ namespace SurgSim
 namespace Physics
 {
 
-class FemRepresentationLocalization : public Localization
+class Fem3DRepresentationLocalization : public Localization
 {
 public:
 	/// Default constructor
-	FemRepresentationLocalization();
+	Fem3DRepresentationLocalization();
 
 	/// Constructor
 	/// \param representation The representation to assign to this localization.
-	explicit FemRepresentationLocalization(std::shared_ptr<Representation> representation);
+	explicit Fem3DRepresentationLocalization(std::shared_ptr<Representation> representation);
 
 	/// Destructor
-	virtual ~FemRepresentationLocalization();
+	virtual ~Fem3DRepresentationLocalization();
 
 	/// Sets the local position.
 	/// \param p The local position to set the localization at.
@@ -66,4 +66,4 @@ private:
 
 } // namespace SurgSim
 
-#endif // SURGSIM_PHYSICS_FEMREPRESENTATIONLOCALIZATION_H
+#endif // SURGSIM_PHYSICS_FEM3DREPRESENTATIONLOCALIZATION_H

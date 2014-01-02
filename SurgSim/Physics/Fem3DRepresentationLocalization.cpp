@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/FemRepresentationLocalization.h"
+#include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -25,33 +25,33 @@ namespace SurgSim
 namespace Physics
 {
 
-FemRepresentationLocalization::FemRepresentationLocalization()
+Fem3DRepresentationLocalization::Fem3DRepresentationLocalization()
 {
 
 }
 
-FemRepresentationLocalization::FemRepresentationLocalization(std::shared_ptr<Representation> representation) :
+Fem3DRepresentationLocalization::Fem3DRepresentationLocalization(std::shared_ptr<Representation> representation) :
 	Localization()
 {
 	setRepresentation(representation);
 }
 
-FemRepresentationLocalization::~FemRepresentationLocalization()
+Fem3DRepresentationLocalization::~Fem3DRepresentationLocalization()
 {
 
 }
 
-void FemRepresentationLocalization::setLocalPosition(const FemRepresentationCoordinate& p)
+void Fem3DRepresentationLocalization::setLocalPosition(const FemRepresentationCoordinate& p)
 {
 	m_position = p;
 }
 
-const FemRepresentationCoordinate& FemRepresentationLocalization::getLocalPosition() const
+const FemRepresentationCoordinate& Fem3DRepresentationLocalization::getLocalPosition() const
 {
 	return m_position;
 }
 
-SurgSim::Math::Vector3d FemRepresentationLocalization::doCalculatePosition(double time)
+SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(double time)
 {
 	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
 
@@ -79,7 +79,7 @@ SurgSim::Math::Vector3d FemRepresentationLocalization::doCalculatePosition(doubl
 	return previousPosition + time * (currentPosition - previousPosition);
 }
 
-bool FemRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
+bool Fem3DRepresentationLocalization::isValidRepresentation(std::shared_ptr<Representation> representation)
 {
 	auto femRepresentation = std::dynamic_pointer_cast<Fem3DRepresentation>(representation);
 

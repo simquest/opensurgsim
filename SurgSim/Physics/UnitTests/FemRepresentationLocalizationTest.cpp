@@ -20,9 +20,9 @@
 
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
-#include "SurgSim/Physics/FemRepresentationLocalization.h"
+#include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 using SurgSim::Physics::Fem3DRepresentation;
-using SurgSim::Physics::FemRepresentationLocalization;
+using SurgSim::Physics::Fem3DRepresentationLocalization;
 
 #include "SurgSim/Math/Vector.h"
 
@@ -48,7 +48,7 @@ void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes
 	fem->addFemElement(element);
 }
 
-class FemRepresentationLocalizationTest : public ::testing::Test
+class Fem3DRepresentationLocalizationTest : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -92,20 +92,20 @@ public:
 	std::shared_ptr<Fem3DRepresentation> m_fem;
 };
 
-TEST_F(FemRepresentationLocalizationTest, ConstructorTest)
+TEST_F(Fem3DRepresentationLocalizationTest, ConstructorTest)
 {
 	ASSERT_NO_THROW({
-		FemRepresentationLocalization localization;
+		Fem3DRepresentationLocalization localization;
 	});
 
 	ASSERT_NO_THROW({
-		FemRepresentationLocalization localization(m_fem);
+		Fem3DRepresentationLocalization localization(m_fem);
 	});
 }
 
-TEST_F(FemRepresentationLocalizationTest, SetGetRepresentation)
+TEST_F(Fem3DRepresentationLocalizationTest, SetGetRepresentation)
 {
-	FemRepresentationLocalization localization;
+	Fem3DRepresentationLocalization localization;
 
 	EXPECT_EQ(nullptr, localization.getRepresentation());
 
@@ -116,7 +116,7 @@ TEST_F(FemRepresentationLocalizationTest, SetGetRepresentation)
 	EXPECT_EQ(nullptr, localization.getRepresentation());
 }
 
-TEST_F(FemRepresentationLocalizationTest, FemRepresentationCoordinate)
+TEST_F(Fem3DRepresentationLocalizationTest, FemRepresentationCoordinate)
 {
 	using SurgSim::Math::Vector4d;
 
@@ -143,11 +143,11 @@ TEST_F(FemRepresentationLocalizationTest, FemRepresentationCoordinate)
 	}
 }
 
-TEST_F(FemRepresentationLocalizationTest, SetGetLocalization)
+TEST_F(Fem3DRepresentationLocalizationTest, SetGetLocalization)
 {
 	using SurgSim::Math::Vector4d;
 
-	auto localization = std::make_shared<FemRepresentationLocalization>(m_fem);
+	auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
 
 	localization->setLocalPosition(FemRepresentationCoordinate(6u, Vector4d(0.25, 0.55, 0.73, 0.11)));
 
@@ -155,13 +155,13 @@ TEST_F(FemRepresentationLocalizationTest, SetGetLocalization)
 	EXPECT_TRUE(Vector4d(0.25, 0.55, 0.73, 0.11).isApprox(localization->getLocalPosition().barycentricCoordinate));
 }
 
-TEST_F(FemRepresentationLocalizationTest, CalculatePositionTest)
+TEST_F(Fem3DRepresentationLocalizationTest, CalculatePositionTest)
 {
 	using SurgSim::Math::Vector;
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::Vector4d;
 
-	auto localization = std::make_shared<FemRepresentationLocalization>(m_fem);
+	auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
 
 	// Test tetrahedron 1: nodes 0, 1, 2, 3
 	localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector4d(1.0, 0.0, 0.0, 0.0)));
