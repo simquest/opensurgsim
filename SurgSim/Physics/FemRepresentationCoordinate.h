@@ -36,7 +36,7 @@ struct FemRepresentationCoordinate {
 
 	/// Numeric index of the FemElement contained in the FemRepresentation.
 	unsigned int elementId;
-	
+
 	/// Barycentric Coordinate representing position with respect to the nodes of the FemElement.
 	SurgSim::Math::Vector barycentricCoordinate;
 };
