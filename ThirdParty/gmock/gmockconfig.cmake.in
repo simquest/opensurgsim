@@ -1,0 +1,14 @@
+# - Config file for the gmock package
+# It defines the following variables
+#  GMOCK_INCLUDE_DIR - include directory
+#  GMOCK_LIBRARIES    - libraries to link against
+
+# Compute paths
+get_filename_component(GMOCK_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(GMOCK_INCLUDE_DIR "@CONFIG_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${GMOCK_CMAKE_DIR}/gmocktargets.cmake")
+
+# These are IMPORTED targets created by gmockargets.cmake
+set(GMOCK_LIBRARIES "@EXPORT_TARGETS@")
