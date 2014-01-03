@@ -32,11 +32,12 @@ set(UNIT_TEST_HEADERS
 	SpringTestUtils.h
 )
 
-set(LIBS 
+set(LIBS
 	SurgSimBlocks
-	gmock
+
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
+
 
 set_target_properties(SurgSimBlocksTest PROPERTIES FOLDER "Blocks") 

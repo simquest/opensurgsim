@@ -14,6 +14,7 @@
 # limitations under the License.
 
 include_directories(
+
 )
 
 set(UNIT_TEST_SOURCES
@@ -23,8 +24,8 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS 
-	IdentityPoseDevice 
+set(LIBS
+	IdentityPoseDevice
 )
 
 surgsim_add_unit_tests(IdentityPoseDeviceTest)

@@ -27,7 +27,7 @@ set(LIBS MouseDevice
 		 SurgSimFramework 
 		 SurgSimDataStructures
 		 ${OPENSCENEGRAPH_LIBRARIES}
-	)
+)
 
 surgsim_add_unit_tests(MouseDeviceTest)
 

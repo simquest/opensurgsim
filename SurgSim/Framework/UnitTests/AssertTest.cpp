@@ -73,9 +73,7 @@ typedef AssertTest AssertDeathTest;
 
 TEST_F(AssertTest, DefaultAssertLogger)
 {
-	std::cout << "=== You should see an assertion message to cout/cerr:" << std::endl;
 	EXPECT_THROW(SURGSIM_ASSERT(1 == 2) << "extra information would go here", SurgSim::Framework::AssertionFailure);
-	std::cout << "=== The test is now complete." << std::endl;
 }
 
 #undef SURGSIM_ASSERT_LOGGER   // override the default definition

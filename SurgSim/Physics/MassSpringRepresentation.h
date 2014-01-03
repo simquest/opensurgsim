@@ -189,6 +189,14 @@ protected:
 	void transformState(std::shared_ptr<DeformableRepresentationState> state,
 		const SurgSim::Math::RigidTransform3d& transform);
 
+	/// Determine whether the associated deformable state is valid
+	/// \param state The state to check
+	/// \result True if valid
+	bool isValidState(const DeformableRepresentationState &state) const;
+
+	/// Deactivate and reset state
+	void deactivateAndReset(void);
+
 private:
 	/// Masses
 	std::vector<std::shared_ptr<Mass>> m_masses;

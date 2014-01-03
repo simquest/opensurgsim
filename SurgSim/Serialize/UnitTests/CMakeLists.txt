@@ -31,11 +31,15 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimSerialize
+	SurgSimPhysics
+	SurgSimMath
+	SurgSimFramework
+	SurgSimGraphics
+	gmock
 	gtest
 	yaml-cpp
+	${Boost_LIBRARIES}
 )
-
-set(LIBS SurgSimSerialize SurgSimPhysics SurgSimMath SurgSimFramework SurgSimGraphics gtest yaml-cpp ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimSerializeTest)
 

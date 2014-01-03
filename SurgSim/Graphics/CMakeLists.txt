@@ -152,7 +152,11 @@ surgsim_add_library(
 )
 
 SET(LIBS
+	SurgSimDataStructures
 	SurgSimFramework
+	SurgSimInput
+	KeyboardDevice
+	MouseDevice
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 
@@ -164,5 +168,4 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(RenderTests)
 endif()
 
-# Put SurgSimGraphics into folder "Graphics"
 set_target_properties(SurgSimGraphics PROPERTIES FOLDER "Graphics")

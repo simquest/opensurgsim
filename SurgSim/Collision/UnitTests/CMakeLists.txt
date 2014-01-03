@@ -46,4 +46,5 @@ set(LIBS
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
 
+
 set_target_properties(SurgSimCollisionTest PROPERTIES FOLDER "Collision") 

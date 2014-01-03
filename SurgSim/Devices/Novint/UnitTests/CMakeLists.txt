@@ -29,7 +29,7 @@ set(UNIT_TEST_HEADERS
 )
 
 set(LIBS NovintDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
+	gmock gtest ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by
@@ -40,5 +40,4 @@ option(SURGSIM_TESTS_RUN_DEVICE_NOVINT
 surgsim_add_unit_tests(NovintDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_NOVINT})
 
-# Put NovintDeviceTest into folder "Devices"
 set_target_properties(NovintDeviceTest PROPERTIES FOLDER "Devices")
