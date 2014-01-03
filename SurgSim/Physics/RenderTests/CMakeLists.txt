@@ -38,6 +38,7 @@ configure_file(
 set(LIBS
 	SurgSimGraphics
 	SurgSimPhysics
+	gmock
 	gtest
 )
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
