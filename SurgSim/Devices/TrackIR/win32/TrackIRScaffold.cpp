@@ -200,7 +200,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 	}
 
 	// Only proceed when initializationSdk() is successful.
-	if (true == m_state->isApiInitialized)
+	if (m_state->isApiInitialized)
 	{
 		// Make sure the object is unique.
 		auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
@@ -212,26 +212,23 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		const std::string name = device->getName();
 		auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
 			[&name](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == name; });
-		if (sameName != m_state->activeDeviceList.end())
-		{
-			SURGSIM_LOG_CRITICAL(m_logger) << "TrackIR: Tried to register a device when the same name is" <<
-				" already present!";
-			result = false;
-		}
+		SURGSIM_ASSERT(sameName == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
+			" when the same name is already present!";
 	}
 
 	// Only proceed when no duplicate device and device name is found.
 	if (true == result)
 	{
-		CameraLibrary::CameraList camearList;
-		camearList.Refresh();
-		if (camearList.Count() > static_cast<int>(m_state->activeDeviceList.size()))
+		CameraLibrary::CameraList cameraList;
+		cameraList.Refresh();
+		if (cameraList.Count() > static_cast<int>(m_state->activeDeviceList.size()))
 		{
 			// Construct the object if one exists. Then start its thread, then move it to the list.
 			int cameraID = m_state->activeDeviceList.size();
 			std::unique_ptr<DeviceData> info(new DeviceData(device, cameraID));
 			createPerDeviceThread(info.get());
-			SURGSIM_ASSERT(info->thread);
+			SURGSIM_ASSERT(info->thread) << "Failed to create a per-device thread for TrackIR device: " << 
+				info->deviceObject->getName() << ", with ID number " << cameraID << ".";
 
 			m_state->activeDeviceList.emplace_back(std::move(info));
 
@@ -345,8 +342,8 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		// Otherwise, the pose is considered as invalid.
 		if(info->vectorProcessor->MarkerCount() == 3)
 		{
-			info->vectorProcessor->GetOrientation(yaw, pitch, roll);
-			info->vectorProcessor->GetPosition(x, y, z);
+			info->vectorProcessor->GetOrientation(yaw, pitch, roll); // Rotations are reported in degrees.
+			info->vectorProcessor->GetPosition(x, y, z); // Positions are reported in millimeters.
 			poseValid = true;
 		}
 		frame->Release();
@@ -358,8 +355,8 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		// pitch: rotation around X-axis
 		// yaw: rotation around Y-axis
 		// roll: rotation around Z-axis
-		Vector3d position(x, y, z);			 // In Millimeter
-		Vector3d rotation(pitch, yaw, roll); // In Degree.
+		Vector3d position(x, y, z);
+		Vector3d rotation(pitch, yaw, roll);
 
 		// Convert to a pose.
 		Matrix33d orientation;
@@ -393,15 +390,14 @@ bool TrackIRScaffold::initializeSdk()
 	SURGSIM_ASSERT(!m_state->isApiInitialized);
 	bool result = false;
 
-	bool isShutdown = CameraLibrary::CameraManager::X().AreCamerasShutdown();
 	bool initialized = CameraLibrary::CameraManager::X().AreCamerasInitialized();
 
-	if (!initialized || isShutdown)
+	if (!initialized)
 	{
 		CameraLibrary::CameraManager::X().WaitForInitialization();
 	}
 
-	if (nullptr != CameraLibrary::CameraManager::X().GetCamera())
+	if (CameraLibrary::CameraManager::X().GetCamera())
 	{
 		result = true;
 		m_state->isApiInitialized = true;
@@ -415,12 +411,11 @@ bool TrackIRScaffold::finalizeSdk()
 	SURGSIM_ASSERT(m_state->isApiInitialized);
 
 	bool isShutdown = CameraLibrary::CameraManager::X().AreCamerasShutdown();
-	bool isInitialized = CameraLibrary::CameraManager::X().AreCamerasInitialized();
 
-	if (isInitialized || !isShutdown)
+	if (!isShutdown)
 	{
 	  // Dec-17-2013-HW It's a bug in TrackIR CameraSDK that after calling CameraLibrary::CameraManager::X().Shutdown(),
-	  // calls to CameraLibrary::CameraManager::X().WaitForInitialization will thorw memory violation error.
+	  // calls to CameraLibrary::CameraManager::X().WaitForInitialization will throw memory violation error.
 		//CameraLibrary::CameraManager::X().Shutdown();
 	}
 
