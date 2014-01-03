@@ -227,7 +227,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 			int cameraID = m_state->activeDeviceList.size();
 			std::unique_ptr<DeviceData> info(new DeviceData(device, cameraID));
 			createPerDeviceThread(info.get());
-			SURGSIM_ASSERT(info->thread) << "Failed to create a per-device thread for TrackIR device: " << 
+			SURGSIM_ASSERT(info->thread) << "Failed to create a per-device thread for TrackIR device: " <<
 				info->deviceObject->getName() << ", with ID number " << cameraID << ".";
 
 			m_state->activeDeviceList.emplace_back(std::move(info));
@@ -299,7 +299,7 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->vectorProcessorSettings.ScaleRotationPitch = scale;
-		(*matching)->vectorProcessorSettings.ScaleRotationYaw= scale;
+		(*matching)->vectorProcessorSettings.ScaleRotationYaw = scale;
 		(*matching)->vectorProcessorSettings.ScaleRotationRoll = scale;
 	}
 }
@@ -323,7 +323,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	CameraLibrary::Frame *frame = info->m_camera->GetFrame();
 	bool poseValid = false;
 	double x, y, z, pitch, yaw, roll;
-	if(frame)
+	if (frame)
 	{
 		info->vector->BeginFrame();
 		for(int i = 0; i < frame->ObjectCount(); ++i)
@@ -355,7 +355,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		// pitch: rotation around X-axis
 		// yaw: rotation around Y-axis
 		// roll: rotation around Z-axis
-		Vector3d position(x, y, z);
+		Vector3d position(x / 1000.0, y / 1000.0, z / 1000.0); // Convert millimeter to meter
 		Vector3d rotation(pitch, yaw, roll);
 
 		// Convert to a pose.
@@ -377,7 +377,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 
 		inputData.poses().set("pose", pose);
 	}
-	else // If pose is invalid, data in 'inputData' will be set to 'invalid'.
+	else // If pose is invalid, NamedData 'pose' in DataGroup 'inputData' will be set to 'invalid'.
 	{
 		inputData.poses().reset("pose");
 	}

@@ -47,7 +47,6 @@ void TransferInputPoseBehavior::update(double dt)
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 	RigidTransform3d pose;
-	
 	if (dataGroup.poses().get(m_poseName, &pose))
 	{
 		m_to->setPose(pose);

@@ -100,12 +100,12 @@ double TrackIRDevice::getOrientationScale() const
 
 double TrackIRDevice::defaultPositionScale()
 {
-	return 0.01;
+	return 0.5;
 }
 
 double TrackIRDevice::defaultOrientationScale()
 {
-	return 0.01;
+	return 0.03;
 }
 
 };  // namespace Device
