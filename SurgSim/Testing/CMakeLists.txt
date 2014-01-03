@@ -15,8 +15,6 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(SURGSIM_TESTING_SOURCES

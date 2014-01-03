@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
-	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -59,18 +57,13 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
-include_directories(
-)
-
 set(LIBS
 	SurgSimPhysics
 	SurgSimMath
-	gmock
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)
 
-# Put SurgSimPhysicsTest into folder "Physics"
 set_target_properties(SurgSimPhysicsTest PROPERTIES FOLDER "Physics")

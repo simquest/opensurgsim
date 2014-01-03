@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
-	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -29,15 +27,10 @@ set(UNIT_TEST_HEADERS
 	TestDevice.h
 )
 
-include_directories(
-)
-
 set(LIBS 
 	SurgSimInput 
-	gmock 
 )
 
 surgsim_add_unit_tests(SurgSimInputTest)
 
-# Put SurgSimInputTest into folder "Input"
 set_target_properties(SurgSimInputTest PROPERTIES FOLDER "Input")

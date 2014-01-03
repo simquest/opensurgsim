@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-include_directories(
-	${GMOCK_INCLUDE_DIR}
+include_directories (
 )
 
 set(UNIT_TEST_SOURCES
@@ -44,17 +42,12 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
-include_directories(
-)
-
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimFramework
-	gmock
 )
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
 
-# Put SurgSimFrameworkTest into folder "Framework"
 set_target_properties(SurgSimFrameworkTest PROPERTIES FOLDER "Framework")

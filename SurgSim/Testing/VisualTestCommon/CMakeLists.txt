@@ -40,11 +40,17 @@ set(VISUAL_TEST_COMMON_HEADERS
 	ToolSquareTest.h
 )
 
+set(LIBS
+	glut
+)
+
+
 # The headers etc. for this do not need to be shipped, so do NOT use
 # surgsim_add_library here.
 add_library(VisualTestCommon
 	${VISUAL_TEST_COMMON_SOURCES} ${VISUAL_TEST_COMMON_HEADERS})
+
 surgsim_show_ide_folders(
 	"${VISUAL_TEST_COMMON_SOURCES}" "${VISUAL_TEST_COMMON_HEADERS}")
 
-set_target_properties(VisualTestCommon PROPERTIES FOLDER "Devices")
+set_target_properties(VisualTestCommon PROPERTIES FOLDER "Testing")
