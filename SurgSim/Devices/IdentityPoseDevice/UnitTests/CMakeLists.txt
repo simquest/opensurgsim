@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
-	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -27,10 +25,11 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS 
 	IdentityPoseDevice 
-	gtest 
 )
 
 surgsim_add_unit_tests(IdentityPoseDeviceTest)
 
-# Put IdentityPoseDeviceTest into folder "Devices"
 set_target_properties(IdentityPoseDeviceTest PROPERTIES FOLDER "Devices")
+=======
+set_target_properties(IdentityPoseDeviceTest PROPERTIES FOLDER "Devices")
+>>>>>>> d8d4521db6365d7704c71e1b08e3b6f5daac9366

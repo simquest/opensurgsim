@@ -13,10 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -30,7 +27,6 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS 
 	MultiAxisDevice
-	gtest
 )
 
 if(WDK_FOUND)
@@ -46,5 +42,4 @@ option(SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS
 surgsim_add_unit_tests(MultiAxisDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS})
 
-# Put MultiAxisDeviceTest into folder "Devices"
 set_target_properties(MultiAxisDeviceTest PROPERTIES FOLDER "Devices")

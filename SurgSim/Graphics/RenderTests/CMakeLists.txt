@@ -13,8 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${GMOCK_INCLUDE_DIR}
+include_directories (
 )
 
 set(UNIT_TEST_SOURCES
@@ -47,7 +46,6 @@ set(LIBS
 	SurgSimGraphics
 	SurgSimBlocks
 	SurgSimTesting
-	gmock
 )
 
 # Configure the path for the data files
@@ -65,5 +63,4 @@ option(SURGSIM_TESTS_RUN_GRAPHICS_RENDER
 surgsim_add_unit_tests(SurgSimGraphicsRenderTest
 	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
 
-# Put SurgSimGraphicsRenderTest into folder "Graphics"
 set_target_properties(SurgSimGraphicsRenderTest PROPERTIES FOLDER "Graphics")

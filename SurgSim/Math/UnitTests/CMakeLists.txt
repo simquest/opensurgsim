@@ -15,7 +15,6 @@
 
 
 include_directories(
-	${GMOCK_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -65,12 +64,10 @@ endif(SURGSIM_TESTS_BUILD_EIGEN)
 set(LIBS 
 	SurgSimMath
 	MlcpTestIO
-	gmock
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimMathTest)
 
-# Put SurgSimMathTest into folder "Math"
 set_target_properties(SurgSimMathTest PROPERTIES FOLDER "Math")
