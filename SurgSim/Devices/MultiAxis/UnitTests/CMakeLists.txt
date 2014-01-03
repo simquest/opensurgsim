@@ -28,8 +28,9 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS 
+set(LIBS
 	MultiAxisDevice
+	gmock
 	gtest
 )
 

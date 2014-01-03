@@ -33,9 +33,10 @@ set(UNIT_TEST_HEADERS
 include_directories(
 )
 
-set(LIBS 
-	SurgSimInput 
-	gtest 
+set(LIBS
+	SurgSimInput
+	gmock
+	gtest
 )
 
 surgsim_add_unit_tests(SurgSimInputTest)
