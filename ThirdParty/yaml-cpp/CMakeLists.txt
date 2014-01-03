@@ -274,12 +274,12 @@ install(
 )
 
 export(TARGETS yaml-cpp
-	FILE "${PROJECT_BINARY_DIR}/yaml-cpptargets.cmake")
+	FILE "${PROJECT_BINARY_DIR}/yaml-cpp-targets.cmake")
 export(PACKAGE yaml-cpp)
 
 set(CONFIG_INCLUDE_DIRS "${YAML_CPP_SOURCE_DIR}/include")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cppconfig.cmake.in
-	"${PROJECT_BINARY_DIR}/yaml-cppconfig.cmake" @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/yaml-cpp-config.cmake.in
+	"${PROJECT_BINARY_DIR}/yaml-cpp-config.cmake" @ONLY)
 
 if(UNIX)
 	set(PC_FILE ${CMAKE_BINARY_DIR}/yaml-cpp.pc)

@@ -8,7 +8,7 @@ get_filename_component(GMOCK_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 set(GMOCK_INCLUDE_DIR "@CONFIG_INCLUDE_DIRS@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("${GMOCK_CMAKE_DIR}/gmocktargets.cmake")
+include("${GMOCK_CMAKE_DIR}/gmock-targets.cmake")
 
-# These are IMPORTED targets created by gmockargets.cmake
+# These are IMPORTED targets created by gmock-targets.cmake
 set(GMOCK_LIBRARIES "@EXPORT_TARGETS@")

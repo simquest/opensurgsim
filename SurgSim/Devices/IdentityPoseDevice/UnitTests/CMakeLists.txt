@@ -15,8 +15,7 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
+	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES

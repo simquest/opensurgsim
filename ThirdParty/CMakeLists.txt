@@ -16,5 +16,5 @@ include(SurgSimBuildFlags)
 set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
 add_subdirectory(gmock)
 
-add_subdirectory(yaml-cpp)
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
+add_subdirectory(yaml-cpp)

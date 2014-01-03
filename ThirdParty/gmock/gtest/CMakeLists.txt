@@ -73,12 +73,12 @@ target_link_libraries(gtest_main gtest)
 
 # OpenSurgSim change to the original include file
 export(TARGETS gtest gtest_main
-	FILE "${PROJECT_BINARY_DIR}/gtesttargets.cmake")
+	FILE "${PROJECT_BINARY_DIR}/gtest-targets.cmake")
 export(PACKAGE gtest)
 
 set(CONFIG_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gtestconfig.cmake.in
-	"${PROJECT_BINARY_DIR}/gtestconfig.cmake" @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gtest-config.cmake.in
+	"${PROJECT_BINARY_DIR}/gtest-config.cmake" @ONLY)
 
 ########################################################################
 #

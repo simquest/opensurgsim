@@ -84,12 +84,12 @@ cxx_library(gmock_main
 
 # OpenSurgSim change to the original include file
 export(TARGETS gmock gmock_main
-	FILE "${PROJECT_BINARY_DIR}/gmocktargets.cmake")
+	FILE "${PROJECT_BINARY_DIR}/gmock-targets.cmake")
 export(PACKAGE gmock)
 
 set(CONFIG_INCLUDE_DIRS "${gmock_SOURCE_DIR}/include" "${gtest_SOURCE_DIR}/include")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gmockconfig.cmake.in
-	"${PROJECT_BINARY_DIR}/gmockconfig.cmake" @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gmock-config.cmake.in
+	"${PROJECT_BINARY_DIR}/gmock-config.cmake" @ONLY)
 
 ########################################################################
 #
