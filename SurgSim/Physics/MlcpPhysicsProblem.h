@@ -45,11 +45,16 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// vector of \f$c\f$ constraint forces to the \f$n\f$ displacements of each degree of freedom of the system.
 	Matrix CHt;
 
-	void updateConstraints(
-		const Eigen::SparseVector<double> &newH,
+	/// Applies a new constraint to a specific Representation
+	/// \param newSubH New constraint to be added to H
+	/// \param subC Compliance matrix associated with the Representation
+	/// \param indexSubC Index of the Representation's compliance matrix
+	/// \param indexNewSubH Index of the new constraint within H
+	void updateConstraint(
+		const Eigen::SparseVector<double> &newSubH,
 		const Eigen::MatrixXd &subC,
 		size_t indexSubC,
-		size_t colNewH);
+		size_t indexNewSubH);
 };
 
 };  // namespace Physics

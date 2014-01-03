@@ -22,15 +22,15 @@ namespace SurgSim
 namespace Physics
 {
 
-void MlcpPhysicsProblem::updateConstraints(
-	const Eigen::SparseVector<double> &newH,
+void MlcpPhysicsProblem::updateConstraint(
+	const Eigen::SparseVector<double> &newSubH,
 	const Eigen::MatrixXd &subC,
 	size_t indexSubC,
-	size_t colNewH)
+	size_t indexNewSubH)
 {
 	using SurgSim::Math::Vector;
 
-	// Update H, CHt, and HCHt with newH, denoted H'.
+	// Update H, CHt, and HCHt with newSubH, denoted H'.
 	//
 	// Note that updates are linear for H and CHt, but not for HCHt:
 	// (H+H') = H+H'
@@ -42,11 +42,11 @@ void MlcpPhysicsProblem::updateConstraints(
 	// (H+H')C(H+H')t = HCHt + HCH't + H'C(H+H')t
 	// => HCHt += H(CH't) + H'[C(H+H')t];
 
-	Vector newCHt = subC * newH;
-	A.col(colNewH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
-	H.block(colNewH, indexSubC, 1, subC.rows()) += newH.transpose();
-	CHt.block(indexSubC, colNewH, subC.rows(), 1) += newCHt;
-	A.row(colNewH) += newH.transpose() * CHt.middleRows(indexSubC, subC.rows());
+	Vector newCHt = subC * newSubH;
+	A.col(indexNewSubH) += H.middleCols(indexSubC, subC.rows()) * newCHt;
+	H.block(indexNewSubH, indexSubC, 1, subC.rows()) += newSubH.transpose();
+	CHt.block(indexSubC, indexNewSubH, subC.rows(), 1) += newCHt;
+	A.row(indexNewSubH) += newSubH.transpose() * CHt.middleRows(indexSubC, subC.rows());
 }
 
 }; // namespace Physics

@@ -84,7 +84,7 @@ void MassSpringRepresentationContact::doBuild(double dt,
 	m_newH.insert(3 * nodeId + 1) = n[1] * scale;
 	m_newH.insert(3 * nodeId + 2) = n[2] * scale;
 
-	mlcp->updateConstraints(m_newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstraintType() const

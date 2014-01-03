@@ -90,7 +90,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	m_newH.insert(4) = dt * scale * rotation[1];
 	m_newH.insert(5) = dt * scale * rotation[2];
 
-	mlcp->updateConstraints(m_newH, C, indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, C, indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintType() const
