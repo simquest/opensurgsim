@@ -13,28 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
-#define SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
-template <class T>
-bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
+namespace SurgSim
 {
-	auto element = m_getters.find(name);
-	if (value != nullptr && element != std::end(m_getters))
-	{
-		*value = boost::any_cast<T>(element->second());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+namespace Physics
+{
+
+void RenderTests::SetUp()
+{
+	runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+
+	runtime->addManager(graphicsManager);
+	scene = std::make_shared<SurgSim::Framework::Scene>();
+	runtime->setScene(scene);
+
+	viewElement = std::make_shared<SurgSim::Graphics::OsgViewElement>("Physics Render Scene");
+	scene->addSceneElement(viewElement);
 }
 
-template <class T>
-T SurgSim::Framework::convert(boost::any val)
+void RenderTests::TearDown()
 {
-	return boost::any_cast<T>(val);
+	runtime->stop();
 }
 
-#endif
+}; // namespace Physics
+}; // namespace SurgSim

@@ -44,7 +44,6 @@ static void solveAndCompareResult(const std::string& fileName,
 								  int gsMaxIterations = 100)
 {
 	SCOPED_TRACE("while running test " + fileName);
-	printf("-- TEST %s --\n", fileName.c_str());
 
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
 	ASSERT_TRUE(data != nullptr) << "Failed to load " << fileName;
@@ -64,14 +63,10 @@ static void solveAndCompareResult(const std::string& fileName,
 	MlcpGaussSeidelSolver mlcpSolver(gsSolverPrecision, gsContactTolerance,
 									 gsMaxIterations);
 
-	printf("  ### Gauss Seidel solver:\n");
 	solution.x.setZero();
 
 	// XXX set ratio to 1
-	bool res = mlcpSolver.solve(data->problem, &solution);
-
-	printf("\tsolver %s after %d iterations convergence=%d Signorini=%d\n", (res ? "succeeded" : "FAILED"),
-		   solution.numIterations, solution.validConvergence ? 1 : 0, solution.validSignorini ? 1 : 0);
+	mlcpSolver.solve(data->problem, &solution);
 
 	ASSERT_EQ(size, solution.x.rows());
 	ASSERT_EQ(size, data->expectedLambda.rows());
@@ -122,8 +117,6 @@ static void solveAndCompareResult(const std::string& fileName,
 //	int nbContactToSkip=0;
 //	int currentAtomicIndex = calculateConvergenceCriteria(lambda, nbContactToSkip, convergenceCriteria,
 //		validSignorini, 1.0);
-//	printf("\tStatus method final [convergence criteria=%g, Signorini=%d]\n",convergenceCriteria,validSignorini?1:0);
-	printf("############\n");
 }
 
 TEST(MlcpGaussSeidelSolverTests, SolveOriginal)
@@ -171,7 +164,6 @@ static double measureExecutionTimeUsec(const std::string& fileName,
 									   int gsMaxIterations = 20)
 {
 	SCOPED_TRACE("while running test " + fileName);
-	printf("-- TEST %s --\n", fileName.c_str());
 
 	const std::shared_ptr<MlcpTestData> data = loadTestData(fileName);
 	EXPECT_TRUE(data != nullptr) << "Failed to load " << fileName;

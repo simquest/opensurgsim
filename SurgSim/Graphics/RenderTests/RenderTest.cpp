@@ -66,7 +66,7 @@ std::shared_ptr<ScreenSpaceQuadRepresentation> RenderTest::makeQuad(
 	int y)
 {
 	std::shared_ptr<OsgScreenSpaceQuadRepresentation> quad =
-		std::make_shared<OsgScreenSpaceQuadRepresentation>(name, viewElement->getView());
+		std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	quad->setSize(width,height);
 	Quaterniond quat;
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(0.0,Vector3d::UnitY());

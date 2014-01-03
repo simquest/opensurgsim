@@ -50,6 +50,9 @@ find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
 
+if(WIN32)
+	set(GLUT_ROOT_PATH "$ENV{GLUT_ROOT_PATH}")
+endif(WIN32)
 find_package(GLUT)  # only needed for visual device tests
 find_package(GlutFromOsg)  # look for GLUT in the OSG tree if not found above
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")

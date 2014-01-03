@@ -64,12 +64,18 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 	}
 }
 
-void SurgSim::Framework::Runtime::setScene(std::shared_ptr<Scene> scene)
+void Runtime::setScene(std::shared_ptr<Scene> scene)
 {
 	// Workers need to be initialized to do this
-	SURGSIM_ASSERT(! m_isRunning) << "Cannot set the scene in the runtime once it is running";
+	SURGSIM_ASSERT(scene != nullptr) << "Cannot set the scene to nullptr.";
+	SURGSIM_ASSERT(! m_isRunning) << "Cannot set the scene in the runtime once it is running.";
 	m_scene = scene;
 	scene->setRuntime(getSharedPtr());
+}
+
+std::shared_ptr<Scene> Runtime::getScene() const
+{
+	return m_scene;
 }
 
 bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
@@ -140,6 +146,8 @@ bool Runtime::start(bool paused)
 	auto logger = Logger::getDefaultLogger();
 
 	// Add all the scene Elements so they can be initialized during the startup process
+	// HS-2013-dec-12 This construct cause a bug as this also gathers the elements to be processed
+	// any sceneelements added after this call and before initialization is finished will get lost
 	preprocessSceneElements();
 
 	m_isPaused = paused;
@@ -188,12 +196,13 @@ bool Runtime::stop()
 		resume();
 	}
 
+	m_isRunning = false;
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
 		(*it)->stop();
 	}
-
 	return true;
 }
 
@@ -227,7 +236,12 @@ void Runtime::step()
 	}
 }
 
-bool Runtime::isPaused()
+bool Runtime::isRunning() const
+{
+	return m_isRunning;
+}
+
+bool Runtime::isPaused() const
 {
 	return m_isPaused;
 }

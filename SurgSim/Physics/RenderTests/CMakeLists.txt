@@ -17,28 +17,32 @@
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
-	Novint7DofDeviceTest.cpp
-	NovintDeviceTest.cpp
-	NovintScaffoldTest.cpp
+	RenderTest.cpp
+	TruthCubeRenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	RenderTest.h
 )
 
-set(LIBS NovintDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gmock gtest ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+set(LIBS
+	SurgSimGraphics
+	SurgSimPhysics
+	gtest
+)
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_NOVINT
-	"Run the Novint tests as part of unit tests.  (Requires hardware and Novint HDAL SDK!)"
-	OFF)
-surgsim_add_unit_tests(NovintDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_NOVINT})
+surgsim_add_unit_tests(SurgSimPhysicsRenderTest)
 
-# Put NovintDeviceTest into folder "Devices"
-set_target_properties(NovintDeviceTest PROPERTIES FOLDER "Devices")
+# Put SurgSimPhysicsTest into folder "Physics"
+set_target_properties(SurgSimPhysicsRenderTest PROPERTIES FOLDER "Physics")

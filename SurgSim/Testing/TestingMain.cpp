@@ -13,28 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
-#define SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
+#include <gmock/gmock.h>
 
-template <class T>
-bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
+#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/LogOutput.h"
+
+int main(int argc, char** argv)
 {
-	auto element = m_getters.find(name);
-	if (value != nullptr && element != std::end(m_getters))
-	{
-		*value = boost::any_cast<T>(element->second());
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
+	//Disable logging during tests
+	std::shared_ptr<SurgSim::Framework::LoggerManager> loggerManager;
+	loggerManager = SurgSim::Framework::Logger::getLoggerManager();
+	loggerManager->setDefaultOutput(std::make_shared<SurgSim::Framework::NullOutput>());
 
-template <class T>
-T SurgSim::Framework::convert(boost::any val)
-{
-	return boost::any_cast<T>(val);
+	testing::InitGoogleMock(&argc, argv);
+	return RUN_ALL_TESTS();
 }
-
-#endif

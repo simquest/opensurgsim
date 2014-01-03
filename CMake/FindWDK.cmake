@@ -1,9 +1,9 @@
 # - Try to find the Windows Driver Kit (WDK, formerly WinDDK).
 #
 # Once done this will define
-#  WDK_FOUND - true if the system has GLUT
-#  WDK_INCLUDE_DIR - the GLUT include directory (not including the GL/)
-#  WDK_LIBRARIES - the GLUT libraries
+#  WDK_FOUND - true if the system has WDK
+#  WDK_INCLUDE_DIR - the WDK include directory or set to "." if no include directory is needed
+#  WDK_LIBRARIES - the WDK libraries
 
 # This file is a part of the OpenSurgSim project.
 # Copyright 2013, SimQuest Solutions Inc.
