@@ -80,7 +80,7 @@ public:
 	/// Constructor
 	/// \param	name	The printout behavior name
 	explicit PrintoutBehavior(const std::string& name = "PrintOutBehavior") :
-		Behavior("PrintoutBehavior") {}
+		Behavior(name) {}
 	~PrintoutBehavior() {}
 
 	/// Set representation for printout behavior

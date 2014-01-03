@@ -21,7 +21,9 @@ namespace Input
 {
 
 OutputComponent::OutputComponent(const std::string& name) :
-	Component(name)
+	Component(name),
+	m_deviceName(),
+	m_outputData()
 {
 }
 
