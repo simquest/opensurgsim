@@ -60,6 +60,9 @@ set(UNIT_TEST_HEADERS
 set(LIBS
 	SurgSimPhysics
 	SurgSimMath
+	SurgSimInput
+	MlcpTestIO
+	IdentityPoseDevice
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

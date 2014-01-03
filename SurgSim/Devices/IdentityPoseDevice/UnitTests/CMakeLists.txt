@@ -30,6 +30,3 @@ set(LIBS
 surgsim_add_unit_tests(IdentityPoseDeviceTest)
 
 set_target_properties(IdentityPoseDeviceTest PROPERTIES FOLDER "Devices")
-=======
-set_target_properties(IdentityPoseDeviceTest PROPERTIES FOLDER "Devices")
->>>>>>> d8d4521db6365d7704c71e1b08e3b6f5daac9366
