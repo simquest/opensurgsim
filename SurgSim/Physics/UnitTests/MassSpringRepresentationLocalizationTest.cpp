@@ -18,9 +18,13 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
+
 #include "SurgSim/Physics/MassSpringRepresentation.h"
 #include "SurgSim/Physics/MassSpringRepresentationLocalization.h"
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
+
+#include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Math/Vector.h"
 
@@ -89,6 +93,19 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 	localization.setLocalNode(1);
 	ASSERT_EQ(1u, localization.getLocalNode());
 	ASSERT_TRUE(localization.calculatePosition().isApprox(Vector3d(1.0, 0.0, 0.0), epsilon));
+}
+
+TEST (MassSpringRepresentationLocalizationTest, IsValidRepresentationTest)
+{
+	MassSpringRepresentationLocalization localization;
+
+	EXPECT_TRUE(localization.isValidRepresentation(nullptr));
+	EXPECT_TRUE(localization.isValidRepresentation(std::make_shared<MassSpringRepresentation>("massSpring")));
+	EXPECT_TRUE(localization.isValidRepresentation(
+		std::make_shared<MockDescendent<MassSpringRepresentation>>("descendent")));
+
+	EXPECT_FALSE(localization.isValidRepresentation(std::make_shared<MockRepresentation>()));
+	EXPECT_FALSE(localization.isValidRepresentation(std::make_shared<RigidRepresentation>("rigidRepresentation")));
 }
 
 };  //  namespace Physics
