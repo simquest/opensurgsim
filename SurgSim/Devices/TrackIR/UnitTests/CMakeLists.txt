@@ -32,6 +32,7 @@ set(LIBS ${LIBS}
 		 SurgSimInput 
 		 SurgSimFramework 
 		 SurgSimDataStructures
+		 gmock
 		 gtest 
 		 ${Boost_LIBRARIES} 
 		 ${OPTITRACK_LIBRARY}
@@ -45,7 +46,6 @@ option(SURGSIM_TESTS_RUN_DEVICE_TRACKIR
 	OFF)
 surgsim_add_unit_tests(TrackIRDeviceTest
 	RUN ${SURGSIM_TESTS_RUN_DEVICE_TRACKIR})
-	
 
 # Copy the device DLLs into the build directory
 surgsim_copy_to_target_directory_for_release(TrackIRDeviceTest

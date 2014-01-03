@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 link_directories(
 	${Boost_LIBRARY_DIRS}
 )
@@ -39,10 +38,17 @@ add_executable(TrackIRVisualTest
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
-set(LIBS TrackIRDevice VisualTestCommon
-	SurgSimInput SurgSimFramework SurgSimDataStructures
-	${OPENHAPTICS_LIBRARIES}
-	${Boost_LIBRARIES} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+set(LIBS IdentityPoseDevice
+		 TrackIRDevice  
+		 VisualTestCommon
+		 SurgSimDataStructures
+		 SurgSimFramework 
+		 SurgSimInput 
+		 ${Boost_LIBRARIES} 
+		 ${GLUT_LIBRARIES}
+		 ${OPENGL_LIBRARIES}
+		 ${OPENHAPTICS_LIBRARIES}
+		 ${OPTITRACK_LIBRARY})
 
 target_link_libraries(TrackIRVisualTest ${LIBS})
 
