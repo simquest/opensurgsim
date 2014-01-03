@@ -44,10 +44,6 @@ public:
 	/// \note Localization embbed the representation, so it is fully defined
 	explicit ConstraintImplementation();
 
-	/// Constructor
-	/// \param constrainedDof Number of dof that will be constrained.
-	explicit ConstraintImplementation(int constrainedDof);
-
 	/// Destructor
 	virtual ~ConstraintImplementation();
 

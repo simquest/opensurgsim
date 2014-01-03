@@ -28,8 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-MassSpringRepresentationContact::MassSpringRepresentationContact() :
-	ConstraintImplementation(3)
+MassSpringRepresentationContact::MassSpringRepresentationContact()
 {
 
 }
@@ -79,7 +78,10 @@ void MassSpringRepresentationContact::doBuild(double dt,
 
 	mlcp->b[indexOfConstraint] += violation * scale;
 
+	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(massSpring->getNumDof());
+	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
+	m_newH.reserve(3);
 	m_newH.insert(3 * nodeId + 0) = n[0] * scale;
 	m_newH.insert(3 * nodeId + 1) = n[1] * scale;
 	m_newH.insert(3 * nodeId + 2) = n[2] * scale;

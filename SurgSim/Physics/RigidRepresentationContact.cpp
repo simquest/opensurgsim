@@ -28,8 +28,7 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentationContact::RigidRepresentationContact() :
-	ConstraintImplementation(6)
+RigidRepresentationContact::RigidRepresentationContact()
 {
 
 }
@@ -82,6 +81,7 @@ void RigidRepresentationContact::doBuild(double dt,
 	mlcp->b[indexOfConstraint] += violation * scale;
 
 	m_newH.resize(rigid->getNumDof());
+	m_newH.reserve(6);
 	m_newH.insert(0) = dt * scale * n[0];
 	m_newH.insert(1) = dt * scale * n[1];
 	m_newH.insert(2) = dt * scale * n[2];
