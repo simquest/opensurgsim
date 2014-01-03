@@ -39,7 +39,7 @@ namespace SurgSim
 namespace Blocks
 {
 
-AddRandomSphereBehavior::AddRandomSphereBehavior():
+AddRandomSphereBehavior::AddRandomSphereBehavior(const std::string& name):
 	Behavior("DynamicallyAddSphereElement"), m_totalTime(0.0), m_numElements(0),
 	m_distribution_xz(0.0, 1.0), m_distribution_y(1.0, 2.0)
 {

@@ -60,7 +60,8 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		state.setPose(RigidTransform3d::Identity());
 		rigidBody->setInitialState(state);
 
-		input = std::make_shared<InputComponent>("Input", "Device");
+		input = std::make_shared<InputComponent>("Input");
+		input->setConnectedDeviceName("Device");
 		device = std::make_shared<IdentityPoseDevice>("Device");
 		input->connectDevice(device);
 

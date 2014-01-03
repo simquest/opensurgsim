@@ -130,8 +130,8 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
-		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
-
+		std::make_shared<SurgSim::Input::InputComponent>("input");
+	inputComponent->setConnectedDeviceName("MultiAxisDevice");
 	std::shared_ptr<SceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
 	boxElement->addComponent(graphicsRepresentation);
 	boxElement->addComponent(inputComponent);

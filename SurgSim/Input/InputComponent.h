@@ -41,10 +41,14 @@ class InputComponent : public SurgSim::Framework::Component
 public:
 	/// Constructor
 	/// \param name Name of this input component
-	/// \param deviceName Name of the device this input component connects
-	InputComponent(const std::string& name, const std::string& deviceName);
+	explicit InputComponent(const std::string& name);
+
 	/// Destructor
 	virtual ~InputComponent();
+
+	/// Set name of the device this input component connects to.
+	/// \param deviceName Name of the device this input component connects
+	void setConnectedDeviceName(const std::string& deviceName);
 
 	/// Is a device connected
 	/// \return true if a device has been connected.

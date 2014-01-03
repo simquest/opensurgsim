@@ -51,7 +51,7 @@ using SurgSim::DataStructures::DataGroupBuilder;
 class MockComponent : public SurgSim::Framework::Component
 {
 public:
-	MockComponent() : Component("MockComponent") {}
+	explicit MockComponent(const std::string& name = "MockComponent") : Component(name) {}
 	virtual ~MockComponent() {}
 
 protected:
@@ -110,7 +110,10 @@ std::shared_ptr<OutputComponent> createOutputComponent(const std::string& name, 
 	DataGroup data = builder.createData();
 	data.strings().set("data", "data");
 
-	return std::make_shared<OutputComponent>(name,deviceName,data);
+	auto outputComponent = std::make_shared<OutputComponent>(name);
+	outputComponent->setDeviceName(deviceName);
+	outputComponent->setOutputData(data);
+	return outputComponent;
 }
 
 
@@ -130,10 +133,15 @@ TEST_F(InputManagerTest, DeviceAddRemove)
 
 TEST_F(InputManagerTest, InputAddRemove)
 {
-	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
-	std::shared_ptr<InputComponent> listener2 = std::make_shared<InputComponent>("Component2","TestDevice1");
-	std::shared_ptr<InputComponent> listener3 = std::make_shared<InputComponent>("Component3","TestDevice2");
-	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component4","NonExistantDevice");
+	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1");
+	std::shared_ptr<InputComponent> listener2 = std::make_shared<InputComponent>("Component2");
+	std::shared_ptr<InputComponent> listener3 = std::make_shared<InputComponent>("Component3");
+	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component4");
+
+	listener1->setConnectedDeviceName("TestDevice1");
+	listener2->setConnectedDeviceName("TestDevice1");
+	listener3->setConnectedDeviceName("TestDevice2");
+	notvalid->setConnectedDeviceName("NonExistantDevice");
 
 	// Add various listeners to the input manager
 	EXPECT_TRUE(testDoAddComponent(listener1));
@@ -158,7 +166,8 @@ TEST_F(InputManagerTest, InputfromDevice)
 	std::string data;
 	SurgSim::DataStructures::DataGroup dataGroup;
 
-	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
+	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1");
+	listener1->setConnectedDeviceName("TestDevice1");
 
 	testDoAddComponent(listener1);
 
