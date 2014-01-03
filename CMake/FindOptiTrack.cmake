@@ -13,7 +13,7 @@
 # Attempt to define OPTITRACK_INCLUDE_DIR if undefined
 find_path(OPTITRACK_INCLUDE_DIR
 	NAMES cameralibrary.h linuxtrack.h
-	PATHS "$ENV{NP_CAMERASDK}" "/opt/linuxtrack/include"
+	PATHS "$ENV{NP_CAMERASDK}" "/opt/linuxtrack"
 	PATH_SUFFIXES "include"
 	NO_CMAKE_ENVIRONMENT_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH
 )
