@@ -16,9 +16,6 @@
 if(SURGSIM_DEVICES_BUILD)
 	add_subdirectory(AddSphereFromInput)
 	add_subdirectory(InputVtc)
-	if(OPTITRACK_FOUND)
-		add_subdirectory(TrackIR)
-	endif(OPTITRACK_FOUND)
 endif(SURGSIM_DEVICES_BUILD)
 
 add_subdirectory(BouncingBalls)
