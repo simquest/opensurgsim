@@ -100,6 +100,9 @@ if(NOT WIN32)
 	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
 endif(NOT WIN32)
 
+# Also output the test results as an xml file for use with Jenkins
+# Build Server.
+set(SURGSIM_TEST_RUN_SUFFIX ${SURGSIM_TEST_RUN_SUFFIX} --gtest_output=xml)
 
 # Copy zero or more files to the location of a built target, after the
 # target is built successfully, but only if the condition (which
@@ -192,7 +195,7 @@ macro(surgsim_unit_test_build_only TESTNAME)
 		#     So this option does not currently do anything useful...
 	else()
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} gmock_main ${LIBS})
+		target_link_libraries(${TESTNAME} SurgSimTesting ${LIBS})
 		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 		surgsim_copy_to_target_directory(${TESTNAME}
 			${UNIT_TEST_SHARED_LIBS})
