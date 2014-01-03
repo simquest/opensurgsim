@@ -23,7 +23,6 @@ include_directories(
 set(SURGSIM_SERIALIZE_SOURCES
 	FrameworkConvert.cpp
 	GraphicsConvert.cpp
-	MathConvert.cpp
 	ShapesFactory.cpp
 )
 
@@ -31,8 +30,6 @@ set(SURGSIM_SERIALIZE_HEADERS
 	Convert.h
 	FrameworkConvert.h
 	GraphicsConvert.h
-	MathConvert.h
-	MathConvert-inl.h
 	ShapesFactory.h
 	ShapesFactory-inl.h
 )
@@ -45,8 +42,7 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	SurgSimFramework
-	SurgSimGraphics
+
 )
 
 target_link_libraries(SurgSimSerialize ${LIBS}

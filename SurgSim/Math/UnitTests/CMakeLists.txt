@@ -15,8 +15,7 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
+	${GMOCK_INCLUDE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -24,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
 	MeshShapeTests.cpp
+	MathConvertTest.cpp
 	MlcpGaussSeidelSolverTests.cpp
 	OdeEquationTests.cpp
 	OdeSolverEulerExplicitModifiedTests.cpp
@@ -64,8 +64,8 @@ endif(SURGSIM_TESTS_BUILD_EIGEN)
 
 set(LIBS 
 	SurgSimMath
-	gtest
-	yaml-cpp
+	MlcpTestIO
+	gmock
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -22,7 +22,6 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	GraphicsConvertTest.cpp
-	MathConvertTest.cpp
 	ShapesConvertTest.cpp
 	ShapesFactoryTest.cpp
 )

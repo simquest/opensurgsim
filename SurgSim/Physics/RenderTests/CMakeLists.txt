@@ -15,9 +15,7 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
+	${GMOCK_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
@@ -38,7 +36,7 @@ configure_file(
 set(LIBS
 	SurgSimGraphics
 	SurgSimPhysics
-	gtest
+	gmock
 )
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 

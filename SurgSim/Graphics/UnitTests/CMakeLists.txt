@@ -14,11 +14,7 @@
 # limitations under the License.
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
+	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -78,7 +74,7 @@ file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DEST
 set(LIBS 
 	SurgSimGraphics
 	SurgSimTesting
-	gtest
+	gmock
 )
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)

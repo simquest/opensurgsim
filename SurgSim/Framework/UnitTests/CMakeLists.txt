@@ -15,9 +15,7 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -53,8 +51,7 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimFramework
-	gtest
-	yaml-cpp
+	gmock
 )
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)

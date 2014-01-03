@@ -19,9 +19,9 @@ link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 include_directories(
-	"${Boost_INCLUDE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${YAML_CPP_SOURCE_DIR}/include"
+	${Boost_INCLUDE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
@@ -88,7 +88,7 @@ surgsim_add_library(
 
 SET(LIBS
 	${Boost_LIBRARIES}
-	SurgSimSerialize
+	yaml-cpp
 )
 
 target_link_libraries(SurgSimFramework ${LIBS})

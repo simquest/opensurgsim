@@ -16,7 +16,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_MATH_SOURCES
@@ -25,6 +25,7 @@ set(SURGSIM_MATH_SOURCES
 	CylinderShape.cpp
 	DoubleSidedPlaneShape.cpp
 	LinearSolveAndInverse.cpp
+	MathConvert.cpp
 	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
 	PlaneShape.cpp
@@ -39,6 +40,8 @@ set(SURGSIM_MATH_HEADERS
 	DoubleSidedPlaneShape.h
 	Geometry.h
 	LinearSolveAndInverse.h
+	MathConvert.h
+	MathConvert-inl.h
 	Matrix.h
 	MeshShape.h
 	MeshShape-inl.h
@@ -81,7 +84,7 @@ surgsim_add_library(
 set(LIBS 
 	SurgSimFramework 
 	SurgSimTesting
-	MlcpTestIO
+	yaml-cpp
 )
 
 target_link_libraries(SurgSimMath ${LIBS}

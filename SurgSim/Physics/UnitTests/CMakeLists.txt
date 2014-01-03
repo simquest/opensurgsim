@@ -15,8 +15,7 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
+	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -66,8 +65,7 @@ include_directories(
 set(LIBS
 	SurgSimPhysics
 	SurgSimMath
-	gtest
-	yaml-cpp
+	gmock
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

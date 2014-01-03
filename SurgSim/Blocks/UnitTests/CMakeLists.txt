@@ -14,12 +14,7 @@
 # limitations under the License.
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${OSG_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
-	${OPENTHREADS_INCLUDE_DIR}
+	${GMOCK_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -40,7 +35,7 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS 
 	SurgSimBlocks
-	gtest
+	gmock
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)

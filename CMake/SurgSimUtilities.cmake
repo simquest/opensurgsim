@@ -281,7 +281,7 @@ macro(surgsim_add_unit_tests TESTNAME)
 endmacro()
 
 # Do all the work to add a library to the system
-# Works with the install system and detects wether the library is 
+# Works with the install system and detects whether the library is 
 # header only or has source files, for header only the headers are copied into
 # the appropriate directory. 
 # Note that when calling this the parameters  should be quoted to separate lists

@@ -17,9 +17,10 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <yaml-cpp/yaml.h>
-#include "SurgSim/Serialize/MathConvert.h"
-#include "SurgSim/Math/Valid.h"
 #include <limits>
+
+#include "SurgSim/Math/MathConvert.h"
+#include "SurgSim/Math/Valid.h"
 
 using SurgSim::Math::isValid;
 

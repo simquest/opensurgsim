@@ -16,7 +16,7 @@
 #ifndef SURGSIM_SERIALIZE_MATHCONVERT_H
 #define SURGSIM_SERIALIZE_MATHCONVERT_H
 
-#include "SurgSim/Serialize/Convert.h"
+#include "SurgSim/Framework/Convert.h"
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
@@ -93,6 +93,6 @@ namespace YAML
 	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
 };
 
-#include "SurgSim/Serialize/MathConvert-inl.h"
+#include "SurgSim/Math/MathConvert-inl.h"
 
 #endif // SURGSIM_SERIALIZE_MATHCONVERT_H

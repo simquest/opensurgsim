@@ -23,7 +23,7 @@
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Shape.h"
 
-#include "SurgSim/Serialize/Convert.h"
+#include "SurgSim/Framework/Convert.h"
 
 #include "SurgSim/Serialize/ShapesFactory.h"
 

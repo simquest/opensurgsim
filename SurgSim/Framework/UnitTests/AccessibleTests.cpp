@@ -21,7 +21,7 @@
 
 #include "SurgSim/Math/Matrix.h"
 
-#include "SurgSim/Serialize/Convert.h"
+#include "SurgSim/Framework/Convert.h"
 
 #include <memory>
 

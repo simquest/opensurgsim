@@ -15,7 +15,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_PHYSICS_SOURCES
@@ -108,8 +108,6 @@ surgsim_add_library(
 )
 
 SET(LIBS
-	MlcpTestIO
-	IdentityPoseDevice
 	SurgSimCollision
 )
 
