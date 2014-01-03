@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_MATHCONVERT_INL_H
-#define SURGSIM_SERIALIZE_MATHCONVERT_INL_H
+#ifndef SURGSIM_FRAMEWORK_MATHCONVERT_INL_H
+#define SURGSIM_FRAMEWORK_MATHCONVERT_INL_H
 
 SURGSIM_DOUBLE_SPECIALIZATION
 template <typename Type, int Rows, int MOpt>
@@ -162,4 +162,4 @@ bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 	return result;
 }
 
-#endif
+#endif // SURGSIM_FRAMEWORK_MATHCONVERT_INL_H

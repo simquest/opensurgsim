@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_MATHCONVERT_H
-#define SURGSIM_SERIALIZE_MATHCONVERT_H
+#ifndef SURGSIM_FRAMEWORK_MATHCONVERT_H
+#define SURGSIM_FRAMEWORK_MATHCONVERT_H
 
 #include "SurgSim/Framework/Convert.h"
 
@@ -95,4 +95,4 @@ namespace YAML
 
 #include "SurgSim/Math/MathConvert-inl.h"
 
-#endif // SURGSIM_SERIALIZE_MATHCONVERT_H
+#endif // SURGSIM_FRAMEWORK_MATHCONVERT_H

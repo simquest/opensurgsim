@@ -77,8 +77,6 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-find_package(yaml-cpp)
-
 if(SURGSIM_DEVICES_BUILD)
 	find_package(NovintHdalSdk)
 	find_package(OpenHaptics)
@@ -86,6 +84,8 @@ if(SURGSIM_DEVICES_BUILD)
 	find_package(WDK)
 endif(SURGSIM_DEVICES_BUILD)
 
+# This should have been built from the external ThirdParty directory
+find_package(yaml-cpp)
 find_package(gmock)
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")

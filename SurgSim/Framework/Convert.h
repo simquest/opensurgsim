@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_CONVERT_H
-#define SURGSIM_SERIALIZE_CONVERT_H
+#ifndef SURGSIM_FRAMEWORK_CONVERT_H
+#define SURGSIM_FRAMEWORK_CONVERT_H
 
 #include <yaml-cpp/yaml.h>
 #include "SurgSim/Framework/Log.h"
@@ -44,4 +44,4 @@ namespace Serialize
 };
 };
 
-#endif // SURGSIM_SERIALIZE_CONVERT_H
+#endif // SURGSIM_FRAMEWORK_CONVERT_H

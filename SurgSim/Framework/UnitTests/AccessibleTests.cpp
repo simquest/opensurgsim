@@ -237,11 +237,11 @@ public:
 	std::string a;
 	std::string getA() const { return a; }
 	void setA(std::string val) { a = val; }
-	
+
 	std::string b;
 	std::string getB() const { return b; }
 	void setB(std::string val) { b = val; }
-	
+
 	std::string c;
 	std::string getC() const { return c; }
 	void setC(std::string val) { c = val; }
