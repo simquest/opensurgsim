@@ -47,23 +47,11 @@ void TransferInputPoseBehavior::update(double dt)
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 	RigidTransform3d pose;
-	if (dataGroup.poses().hasData("pose"))
+	
+	if (dataGroup.poses().get(m_poseName, &pose))
 	{
-		dataGroup.poses().get(m_poseName, &pose);
 		m_to->setPose(pose);
 	}
-	else // If input pose is invalid, set the pose to (0, 0, 0) with no rotation at any axis.
-	{
-		Vector3d position(0.0, 0.0, 0.0);
-		Matrix33d orientation;
-		orientation.setIdentity();
-
-		pose.makeAffine();
-		pose.linear() = orientation;
-		pose.translation() = position;
-		m_to->setPose(pose);
-	}
-
 }
 
 bool TransferInputPoseBehavior::doInitialize()
