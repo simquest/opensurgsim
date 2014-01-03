@@ -50,16 +50,17 @@ bool OsgViewElement::setView(std::shared_ptr<SurgSim::Graphics::View> view)
 	}
 	else
 	{
-		// Disable KeyboardDevice of current view
-		result = enableKeyboardDevice(false);
-		result = enableMouseDevice(false) && result;
+		// Disable keyboard and mouse of current view
+		enableKeyboardDevice(false);
+		enableMouseDevice(false);
 
 		std::shared_ptr<OsgView> osgView = std::dynamic_pointer_cast<OsgView>(view);
-		if (osgView && ViewElement::setView(view) && result)
+		if (osgView && ViewElement::setView(view))
 		{
-			// After change 'view', need to enable keyboard/mouse in the new 'view' if they were enabled.
-			result = enableKeyboardDevice(m_keyboardEnabled);
-			result = enableMouseDevice(m_mouseEnabled) && result;
+			// Enable keyboard/mouse of the new view if they were enabled.
+			enableKeyboardDevice(m_keyboardEnabled);
+			enableMouseDevice(m_mouseEnabled);
+			result = true;
 		}
 		else
 		{
@@ -97,36 +98,31 @@ void SurgSim::Graphics::OsgViewElement::enableManipulator(bool val)
 	}
 }
 
-bool SurgSim::Graphics::OsgViewElement::enableKeyboardDevice(bool val)
+void SurgSim::Graphics::OsgViewElement::enableKeyboardDevice(bool val)
 {
-	bool result = false;
+	// Early return if device is already turned on/off.
 	if (val == m_keyboardEnabled)
 	{
-		result = true;
-	}
-	else // val != m_keyboardEnabled
-	{
-		std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
-		if (nullptr != view)
-		{
-			std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
-			osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
-					std::dynamic_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
-			if (val) // Turn on keyboard
-			{
-				view->getOsgView()->addEventHandler(keyboardHandle);
-				m_keyboardEnabled = true;
-			}
-			else // Turn off keyboard
-			{
-				view->getOsgView()->removeEventHandler(keyboardHandle);
-				m_keyboardEnabled = false;
-			}
-			result = true;
-		}
+		return;
 	}
 
-	return result;
+	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
+	if (view)
+	{
+		std::shared_ptr<SurgSim::Input::CommonDevice> keyboardDevice = getKeyboardDevice();
+		osg::ref_ptr<osgGA::GUIEventHandler> keyboardHandle =
+				std::static_pointer_cast<SurgSim::Device::KeyboardDevice>(keyboardDevice)->getKeyboardHandler();
+		if (val)
+		{
+			view->getOsgView()->addEventHandler(keyboardHandle);
+			m_keyboardEnabled = true;
+		}
+		else
+		{
+			view->getOsgView()->removeEventHandler(keyboardHandle);
+			m_keyboardEnabled = false;
+		}
+	}
 }
 
 
@@ -140,36 +136,31 @@ std::shared_ptr<SurgSim::Input::CommonDevice> SurgSim::Graphics::OsgViewElement:
 	return keyboardDevice;
 }
 
-bool SurgSim::Graphics::OsgViewElement::enableMouseDevice(bool val)
+void SurgSim::Graphics::OsgViewElement::enableMouseDevice(bool val)
 {
-	bool result = false;
+	// Early return if device is already turned on/off.
 	if (val == m_mouseEnabled)
 	{
-		result = true;
-	}
-	else // val != m_mouseEnabled
-	{
-		std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
-		if (nullptr != view)
-		{
-			std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
-			osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
-				std::dynamic_pointer_cast<SurgSim::Device::MouseDevice>(mouseDevice)->getMouseHandler();
-			if (val) // Turn on mouse device
-			{
-				view->getOsgView()->addEventHandler(mouseHandler);
-				m_mouseEnabled = true;
-			}
-			else // Turn off mouse device
-			{
-				view->getOsgView()->removeEventHandler(mouseHandler);
-				m_mouseEnabled = false;
-			}
-			result = true;
-		}
+		return;
 	}
 
-	return result;
+	std::shared_ptr<OsgView> view = std::dynamic_pointer_cast<OsgView>(getView());
+	if (view)
+	{
+		std::shared_ptr<SurgSim::Input::CommonDevice> mouseDevice = getMouseDevice();
+		osg::ref_ptr<osgGA::GUIEventHandler> mouseHandler =
+			std::static_pointer_cast<SurgSim::Device::MouseDevice>(mouseDevice)->getMouseHandler();
+		if (val)
+		{
+			view->getOsgView()->addEventHandler(mouseHandler);
+			m_mouseEnabled = true;
+		}
+		else
+		{
+			view->getOsgView()->removeEventHandler(mouseHandler);
+			m_mouseEnabled = false;
+		}
+	}
 }
 
 

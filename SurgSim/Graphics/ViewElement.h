@@ -59,14 +59,14 @@ public:
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() = 0;
 	/// Turn on/off the keyboard device to be used.
 	/// \param val Indicate whether or not to use keyboard device
-	virtual	bool enableKeyboardDevice(bool val) = 0;
+	virtual	void enableKeyboardDevice(bool val) = 0;
 
 	/// Return the mouse to be used with this view.
 	/// \return A mouse device
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() = 0;
 	/// Turn on/off the mouse device to be used.
 	/// \param val Indicate whether or not to use mouse device
-	virtual	bool enableMouseDevice(bool val) = 0;
+	virtual	void enableMouseDevice(bool val) = 0;
 
 protected:
 	/// Initializes the scene element
