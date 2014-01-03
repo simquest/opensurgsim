@@ -33,7 +33,7 @@ class TrackIRThread : public SurgSim::Framework::BasicThread
 {
 public:
 	/// Constructor
-	/// \param scaffold Corresponds to the TrackIRScaffold updated by this thread
+	/// \param scaffold The TrackIRScaffold updated by this thread
 	/// \param deviceData Corresponds to the TrackIRScaffold::DeviceData updated by this thread
 	TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceData* deviceData);
 

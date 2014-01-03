@@ -276,9 +276,8 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	// yaw: rotation around Y-axis
 	// roll: rotation around Z-axis (Min: -45; Max: +45)
 	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter);
-	// Dec-22-2013-HW Currenty, the ouptut of Z-axis value from ltr_get_pose() is not consistent
+	// Dec-22-2013-HW Currently, the output of Z-axis value from ltr_get_pose() is not consistent
 	// Contacted the developer, waiting for response.
-	// Thus, Z-axis value is set to 2.0 for temporary use.
 	Vector3d position(static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)); // In Millimeter
 	Vector3d rotation(pitch, yaw, roll); // In Degrees
 

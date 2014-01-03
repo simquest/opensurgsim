@@ -91,7 +91,7 @@ private:
 	/// \return true on success.
 	bool finalizeSdk();
 
-	/// Start the camera, it will start to sending frames.
+	/// Start the camera, it will start sending frames.
 	/// \return	true on success.
 	bool startCamera();
 	/// Stop the camera.
