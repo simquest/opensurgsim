@@ -41,7 +41,7 @@ class MassSpringRepresentationContactTest : public ::testing::Test
 {
 public:
 	void SetUp() {
-		// Define plane with normal 'n' pointing against gravity.
+		// Define plane with positive y component.
 		m_n = Vector3d(0.8539, 0.6289, -0.9978);
 		m_n.normalize();
 

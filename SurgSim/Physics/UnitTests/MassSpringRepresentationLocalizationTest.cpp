@@ -67,7 +67,7 @@ TEST (MassSpringRepresentationLocalizationTest, GetPositionTest)
 {
 	using SurgSim::Math::Vector3d;
 
-	// Create the rigid body
+	// Create the mass spring
 	auto massSpring = std::make_shared<SurgSim::Blocks::MassSpring1DRepresentation>("MassSpring");
 	std::array<Vector3d, 2> extremities = {{ Vector3d(0,0,0), Vector3d(1,0,0) }};
 	unsigned int numNodesPerDim[1] = {2};
