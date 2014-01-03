@@ -46,9 +46,9 @@ public:
 		return nullptr;
 	}
 
-	virtual	bool enableKeyboardDevice(bool val) override
+	virtual	void enableKeyboardDevice(bool val) override
 	{
-		return true;
+		return;
 	}
 
 	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() override
@@ -56,9 +56,9 @@ public:
 		return nullptr;
 	}
 
-	virtual	bool enableMouseDevice(bool val) override
+	virtual	void enableMouseDevice(bool val) override
 	{
-		return true;
+		return;
 	}
 
 };
