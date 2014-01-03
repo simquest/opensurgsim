@@ -28,7 +28,8 @@ namespace SurgSim
 namespace Physics
 {
 
-RigidRepresentationContact::RigidRepresentationContact()
+RigidRepresentationContact::RigidRepresentationContact() :
+	ConstraintImplementation(6)
 {
 
 }
@@ -80,19 +81,16 @@ void RigidRepresentationContact::doBuild(double dt,
 	double violation = n.dot(globalPosition) + d;
 	mlcp->b[indexOfConstraint] += violation * scale;
 
-	//Eigen::Matrix<double, 1, 6> H;
-	Eigen::SparseVector<double> newH;
-	newH.resize(rigid->getNumDof());
-	newH.reserve(rigid->getNumDof());
-	newH.insert(0) = dt * scale * n[0];
-	newH.insert(1) = dt * scale * n[1];
-	newH.insert(2) = dt * scale * n[2];
+	m_newH.resize(rigid->getNumDof());
+	m_newH.insert(0) = dt * scale * n[0];
+	m_newH.insert(1) = dt * scale * n[1];
+	m_newH.insert(2) = dt * scale * n[2];
 	Eigen::Vector3d rotation = GP.cross(n);
-	newH.insert(3) = dt * scale * rotation[0];
-	newH.insert(4) = dt * scale * rotation[1];
-	newH.insert(5) = dt * scale * rotation[2];
+	m_newH.insert(3) = dt * scale * rotation[0];
+	m_newH.insert(4) = dt * scale * rotation[1];
+	m_newH.insert(5) = dt * scale * rotation[2];
 
-	mlcp->updateConstraints(newH, C, indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraints(m_newH, C, indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintType() const

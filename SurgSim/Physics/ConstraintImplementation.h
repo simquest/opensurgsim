@@ -44,6 +44,10 @@ public:
 	/// \note Localization embbed the representation, so it is fully defined
 	explicit ConstraintImplementation();
 
+	/// Constructor
+	/// \param constrainedDof Number of dof that will be constrained.
+	explicit ConstraintImplementation(int constrainedDof);
+
 	/// Destructor
 	virtual ~ConstraintImplementation();
 
@@ -80,6 +84,10 @@ public:
 	{
 		doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
 	}
+
+protected:
+	/// Preallocated variable for derived implementations of doBuild.
+	Eigen::SparseVector<double> m_newH;
 
 private:
 

@@ -28,7 +28,8 @@ namespace SurgSim
 namespace Physics
 {
 
-MassSpringRepresentationContact::MassSpringRepresentationContact()
+MassSpringRepresentationContact::MassSpringRepresentationContact() :
+	ConstraintImplementation(3)
 {
 
 }
@@ -78,14 +79,12 @@ void MassSpringRepresentationContact::doBuild(double dt,
 
 	mlcp->b[indexOfConstraint] += violation * scale;
 
-	Eigen::SparseVector<double> newH;
-	newH.resize(massSpring->getNumDof());
-	newH.reserve(3);
-	newH.insert(3 * nodeId + 0) = n[0] * scale;
-	newH.insert(3 * nodeId + 1) = n[1] * scale;
-	newH.insert(3 * nodeId + 2) = n[2] * scale;
+	m_newH.resize(massSpring->getNumDof());
+	m_newH.insert(3 * nodeId + 0) = n[0] * scale;
+	m_newH.insert(3 * nodeId + 1) = n[1] * scale;
+	m_newH.insert(3 * nodeId + 2) = n[2] * scale;
 
-	mlcp->updateConstraints(newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraints(m_newH, massSpring->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType MassSpringRepresentationContact::getMlcpConstraintType() const

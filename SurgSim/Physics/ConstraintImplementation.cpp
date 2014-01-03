@@ -27,6 +27,11 @@ ConstraintImplementation::ConstraintImplementation()
 {
 }
 
+ConstraintImplementation::ConstraintImplementation(int constraintedDof)
+{
+	m_newH.reserve(constraintedDof);
+}
+
 ConstraintImplementation::~ConstraintImplementation()
 {
 }
