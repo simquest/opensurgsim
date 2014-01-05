@@ -159,7 +159,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input");
-	inputComponent->setConnectedDeviceName("MultiAxisDevice");
+	inputComponent->setDeviceName("MultiAxisDevice");
 	// The vtc parameters control the spring between the device and the simulated rigid body.
 	// To understand how they are used, let's have a look at the physics under the hood.
 	// For a given spring between points A and B, of stiffness k and damping c, we have the Newton's law:

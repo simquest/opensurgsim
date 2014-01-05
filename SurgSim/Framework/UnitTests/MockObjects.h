@@ -137,10 +137,10 @@ private:
 class MockComponent : public SurgSim::Framework::Component
 {
 public:
-	explicit MockComponent(const std::string& name) :
+	explicit MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
 		Component(name),
-		succeedWithInit(true),
-		succeedWithWakeUp(true),
+		succeedWithInit(succeedInit),
+		succeedWithWakeUp(succeedWakeUp),
 		didWakeUp(false),
 		didInit(false)
 	{
@@ -148,16 +148,6 @@ public:
 
 	virtual ~MockComponent()
 	{
-	}
-
-	void setSucceedInit(bool succeedInit)
-	{
-		succeedWithInit = succeedInit;
-	}
-
-	void setSucceedWakeUp(bool succeedWakeUp)
-	{
-		succeedWithWakeUp = succeedWakeUp;
 	}
 
 	virtual bool doInitialize()
@@ -181,26 +171,16 @@ public:
 class MockBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	MockBehavior(const std::string& name) :
+	MockBehavior(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
 	Behavior(name),
-		succeedWithInit(true),
-		succeedWithWakeUp(true),
+		succeedWithInit(succeedInit),
+		succeedWithWakeUp(succeedWakeUp),
 		isInitialized(false),
 		updateCount(0)
 	{
 	}
 	virtual ~MockBehavior()
 	{
-	}
-
-	void setSucceedInit(bool succeedInit)
-	{
-		succeedWithInit = succeedInit;
-	}
-
-	void setSucceedWakeUp(bool succeedWakeUp)
-	{
-		succeedWithWakeUp = succeedWakeUp;
 	}
 
 	virtual bool doInitialize()

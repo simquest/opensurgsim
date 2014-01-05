@@ -138,10 +138,10 @@ TEST_F(InputManagerTest, InputAddRemove)
 	std::shared_ptr<InputComponent> listener3 = std::make_shared<InputComponent>("Component3");
 	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component4");
 
-	listener1->setConnectedDeviceName("TestDevice1");
-	listener2->setConnectedDeviceName("TestDevice1");
-	listener3->setConnectedDeviceName("TestDevice2");
-	notvalid->setConnectedDeviceName("NonExistantDevice");
+	listener1->setDeviceName("TestDevice1");
+	listener2->setDeviceName("TestDevice1");
+	listener3->setDeviceName("TestDevice2");
+	notvalid->setDeviceName("NonExistantDevice");
 
 	// Add various listeners to the input manager
 	EXPECT_TRUE(testDoAddComponent(listener1));
@@ -167,7 +167,7 @@ TEST_F(InputManagerTest, InputfromDevice)
 	SurgSim::DataStructures::DataGroup dataGroup;
 
 	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1");
-	listener1->setConnectedDeviceName("TestDevice1");
+	listener1->setDeviceName("TestDevice1");
 
 	testDoAddComponent(listener1);
 

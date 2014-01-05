@@ -48,7 +48,7 @@ public:
 
 	/// Set name of the device this input component connects to.
 	/// \param deviceName Name of the device this input component connects
-	void setConnectedDeviceName(const std::string& deviceName);
+	void setDeviceName(const std::string& deviceName);
 
 	/// Is a device connected
 	/// \return true if a device has been connected.

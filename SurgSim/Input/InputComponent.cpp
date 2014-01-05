@@ -82,7 +82,7 @@ InputComponent::~InputComponent()
 {
 }
 
-void InputComponent::setConnectedDeviceName(const std::string& deviceName)
+void InputComponent::setDeviceName(const std::string& deviceName)
 {
 	m_deviceName = deviceName;
 }
