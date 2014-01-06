@@ -27,15 +27,27 @@ namespace SurgSim
 namespace Blocks
 {
 
-TransferInputPoseBehavior::TransferInputPoseBehavior(const std::string& name,
-													 std::shared_ptr<SurgSim::Input::InputComponent> from,
-													 std::shared_ptr<SurgSim::Framework::Representation> to,
-													 const std::string& poseName) :
+TransferInputPoseBehavior::TransferInputPoseBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_from(from),
-	m_to(to),
-	m_poseName(poseName)
+	m_from(),
+	m_to(),
+	m_poseName("pose")
 {
+}
+
+void TransferInputPoseBehavior::setPoseFrom(std::shared_ptr<SurgSim::Input::InputComponent> from)
+{
+	m_from = from;
+}
+
+void TransferInputPoseBehavior::setPoseTo(std::shared_ptr<SurgSim::Framework::Representation> to)
+{
+	m_to = to;
+}
+
+void TransferInputPoseBehavior::setPoseName(const std::string& poseName)
+{
+	m_poseName = poseName;
 }
 
 void TransferInputPoseBehavior::update(double dt)

@@ -20,12 +20,16 @@ namespace SurgSim
 namespace Collision
 {
 
-RigidCollisionRepresentation::RigidCollisionRepresentation(
-	const std::string& name,
-	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation):
+RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
 	Representation(name),
-	m_physicsRepresentation(representation)
+	m_physicsRepresentation()
 {
+}
+
+void RigidCollisionRepresentation::setRepresentation(
+	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation)
+{
+	m_physicsRepresentation = representation;
 }
 
 RigidCollisionRepresentation::~RigidCollisionRepresentation()

@@ -24,8 +24,11 @@ class AddSphereFromInputBehavior: public SurgSim::Framework::Behavior
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
+	explicit AddSphereFromInputBehavior(const std::string& name);
+
+	/// Set input component to get the pose
 	/// \param	from	Input component to get the pose
-	AddSphereFromInputBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from);
+	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> from);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.

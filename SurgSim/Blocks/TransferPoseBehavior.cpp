@@ -24,13 +24,21 @@ namespace SurgSim
 namespace Blocks
 {
 
-TransferPoseBehavior::TransferPoseBehavior(const std::string& name,
-										   std::shared_ptr<SurgSim::Framework::Representation> from,
-										   std::shared_ptr<SurgSim::Framework::Representation> to) :
+TransferPoseBehavior::TransferPoseBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_from(from),
-	m_to(to)
+	m_from(),
+	m_to()
 {
+}
+
+void TransferPoseBehavior::setPoseFrom(std::shared_ptr<SurgSim::Framework::Representation> from)
+{
+	m_from = from;
+}
+
+void TransferPoseBehavior::setPoseTo(std::shared_ptr<SurgSim::Framework::Representation> to)
+{
+	m_to = to;
 }
 
 void TransferPoseBehavior::update(double dt)

@@ -113,10 +113,15 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Plane Collision", physicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseFrom(physicsRepresentation);
+	transferPose->setPoseTo(graphicsRepresentation);
+	planeElement->addComponent(transferPose);
+
+	auto rigidCollision = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	rigidCollision->setRepresentation(physicsRepresentation);
+	planeElement->addComponent(rigidCollision);
+
 	return planeElement;
 }
 
@@ -136,10 +141,14 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(graphicsRepresentation);
 	boxElement->addComponent(inputComponent);
 
-	boxElement->addComponent(std::make_shared<TransferInputPoseBehavior>("Input to Graphics",
-		inputComponent, graphicsRepresentation));
+	auto transferPose = std::make_shared<TransferInputPoseBehavior>("Input to Graphics");
+	transferPose->setPoseFrom(inputComponent);
+	transferPose->setPoseTo(graphicsRepresentation);
+	boxElement->addComponent(transferPose);
 
-	boxElement->addComponent(std::make_shared<AddSphereFromInputBehavior>("SphereAdder", inputComponent));
+	auto addSphere = std::make_shared<AddSphereFromInputBehavior>("SphereAdder");
+	addSphere->setInputComponent(inputComponent);
+	boxElement->addComponent(addSphere);
 
 	return boxElement;
 }
