@@ -43,12 +43,25 @@ public:
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
+	/// Apply a correction to the internal degrees of freedom
+	/// \param dt The time step
+	/// \param block The block of a vector containing the correction to be applied to the dof
+	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block) override;
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override;
+
+	/// Determine whether the associated deformable state is valid
+	/// \param state The state to check
+	/// \result True if valid
+	bool isValidState(const DeformableRepresentationState &state) const;
+
+	/// Deactivate and reset state
+	void deactivateAndReset(void);
 };
 
 } // namespace Physics

@@ -16,6 +16,7 @@
 #include "SurgSim/Framework/Assert.h"
 
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Math/Valid.h"
 
 namespace
 {
@@ -68,12 +69,47 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
+void Fem3DRepresentation::applyDofCorrection(double dt,
+											 const Eigen::VectorBlock<SurgSim::Math::Vector>& block)
+{
+	if (!isActive())
+	{
+		return;
+	}
+
+	m_currentState->getPositions() += block * dt;
+	m_currentState->getVelocities() += block;
+
+	if (!isValidState(*m_currentState))
+	{
+		deactivateAndReset();
+	}
+}
+
 void Fem3DRepresentation::transformState(std::shared_ptr<DeformableRepresentationState> state,
 	const SurgSim::Math::RigidTransform3d& transform)
 {
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
+}
+
+bool Fem3DRepresentation::isValidState(const DeformableRepresentationState &state) const
+{
+	return SurgSim::Math::isValid(state.getPositions())
+		&& SurgSim::Math::isValid(state.getVelocities());
+}
+
+void Fem3DRepresentation::deactivateAndReset(void)
+{
+	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+		<< getName() << " deactivated and reset:" << std::endl
+		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl
+		<< "acceleration=(" << m_currentState->getAccelerations() << ")" << std::endl;
+
+	resetState();
+	setIsActive(false);
 }
 
 } // namespace Physics
