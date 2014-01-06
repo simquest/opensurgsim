@@ -88,16 +88,12 @@ TEST_F(ShapeTest, Sphere)
 		0.0, coef, 0.0,
 		0.0, 0.0, coef;
 
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = s.calculateVolume();
-	mass       = s.calculateMass(m_rho);
-	massCenter = s.calculateMassCenter();
-	inertia    = s.calculateInertia(m_rho);
+	double volume = s.getVolume();
+	Vector3d center = s.getCenter();
+	Matrix33d inertia = s.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
+	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
@@ -122,16 +118,12 @@ TEST_F(ShapeTest, Box)
 		0.0, coef*(x2 + z2), 0.0,
 		0.0, 0.0, coef*(x2 + y2);
 
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = b.calculateVolume();
-	mass       = b.calculateMass(m_rho);
-	massCenter = b.calculateMassCenter();
-	inertia    = b.calculateInertia(m_rho);
+	double volume = b.getVolume();
+	Vector3d center = b.getCenter();
+	Matrix33d inertia = b.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
+	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
@@ -156,16 +148,12 @@ TEST_F(ShapeTest, Cylinder)
 		0.0, coefDir, 0.0,
 		0.0, 0.0, coef;
 
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = c.calculateVolume();
-	mass       = c.calculateMass(m_rho);
-	massCenter = c.calculateMassCenter();
-	inertia    = c.calculateInertia(m_rho);
+	double volume = c.getVolume();
+	Vector3d center = c.getCenter();
+	Matrix33d inertia = c.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
+	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
@@ -187,7 +175,6 @@ TEST_F(ShapeTest, Capsule)
 	double volumeSphere = 4.0 / 3.0 * M_PI * r3;
 	double massSphere = m_rho * volumeSphere;
 	double expectedVolume = volumeCylinder + volumeSphere;
-	double expectedMass = massCylinder + massSphere;
 	double coefDir = 2.0 /  5.0 * massSphere * r2;
 	double coef    = coefDir;
 	coefDir += 1.0 / 2.0 * massCylinder * r2;
@@ -198,16 +185,12 @@ TEST_F(ShapeTest, Capsule)
 		0.0, coefDir, 0.0,
 		0.0, 0.0, coef;
 
-	double volume, mass;
-	Vector3d massCenter;
-	Matrix33d inertia;
-	volume     = c.calculateVolume();
-	mass       = c.calculateMass(m_rho);
-	massCenter = c.calculateMassCenter();
-	inertia    = c.calculateInertia(m_rho);
+	double volume = c.getVolume();
+	Vector3d center = c.getCenter();
+	Matrix33d inertia = c.getSecondMomentOfVolume() * m_rho;
 
 	EXPECT_NEAR(expectedVolume, volume, epsilon);
-	EXPECT_NEAR(expectedMass, mass, epsilon);
+	EXPECT_TRUE(center.isZero());
 	EXPECT_TRUE(expectedInertia.isApprox(inertia));
 }
 
@@ -218,12 +201,27 @@ struct OctreeData
 
 TEST_F(ShapeTest, Octree)
 {
-	OctreeNode<OctreeData>::BoundingBoxType boundingBox(Vector3d::Zero(), m_size);
+	OctreeNode<OctreeData>::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), m_size);
 	std::shared_ptr<OctreeNode<OctreeData> > node = std::make_shared<OctreeNode<OctreeData> >(boundingBox);
 
 	{
 		ASSERT_NO_THROW({OctreeShape<OctreeData> octree;});
 		ASSERT_NO_THROW({OctreeShape<OctreeData> octree(node);});
+	}
+
+	{
+		OctreeShape<OctreeData> octree(node);
+		SurgSim::Math::OctreePath path;
+		EXPECT_NO_THROW(octree.getNode(path));
+		EXPECT_EQ(node, octree.getNode(path));
+
+		node->subdivide();
+		path.push_back(3);
+		EXPECT_NO_THROW(octree.getNode(path));
+		EXPECT_NE(nullptr, octree.getNode(path));
+
+		path.push_back(1);
+		EXPECT_THROW(octree.getNode(path), SurgSim::Framework::AssertionFailure);
 	}
 
 	{
@@ -241,10 +239,9 @@ TEST_F(ShapeTest, Octree)
 	{
 		OctreeShape<OctreeData> octree(node);
 		EXPECT_EQ(SurgSim::Math::SHAPE_TYPE_OCTREE, octree.getType());
-		EXPECT_THROW(octree.calculateVolume(), SurgSim::Framework::AssertionFailure);
-		EXPECT_THROW(octree.calculateMass(m_rho), SurgSim::Framework::AssertionFailure);
-		EXPECT_TRUE(octree.calculateMassCenter().isApprox(Vector3d::Zero(), epsilon));
-		EXPECT_THROW(octree.calculateInertia(m_rho), SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(octree.getVolume(), SurgSim::Framework::AssertionFailure);
+		EXPECT_TRUE(octree.getCenter().isApprox(Vector3d::Zero(), epsilon));
+		EXPECT_THROW(octree.getSecondMomentOfVolume(), SurgSim::Framework::AssertionFailure);
 		EXPECT_EQ(octree.getClassName(), "SurgSim::Math::OctreeShape");
 	}
 }

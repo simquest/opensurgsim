@@ -24,6 +24,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	GroupTests.cpp
 	ManagerTests.cpp
+	MeshTests.cpp
 	OsgBoxRepresentationTests.cpp
 	OsgCameraTests.cpp
 	OsgCapsuleRepresentationTests.cpp
@@ -34,6 +35,7 @@ set(UNIT_TEST_SOURCES
 	OsgManagerTests.cpp
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
+	OsgMeshRepresentationTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp
@@ -73,8 +75,10 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 
-set(LIBS 
-	SurgSimGraphics 
+set(LIBS
+	SurgSimGraphics
+	SurgSimTesting
+	gmock
 	gtest
 )
 

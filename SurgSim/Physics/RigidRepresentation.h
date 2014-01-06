@@ -115,6 +115,8 @@ protected:
 	Matrix66d m_externalDampingMatrix;
 
 private:
+	virtual bool doInitialize() override;
+
 	/// Compute compliance matrix (internal data structure)
 	/// \param dt The time step in use
 	void computeComplianceMatrix(double dt);

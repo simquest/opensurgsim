@@ -31,4 +31,10 @@ bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
 	}
 }
 
+template <class T>
+T SurgSim::Framework::convert(boost::any val)
+{
+	return boost::any_cast<T>(val);
+}
+
 #endif

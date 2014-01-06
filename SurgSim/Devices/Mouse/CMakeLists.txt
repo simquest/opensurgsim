@@ -39,6 +39,17 @@ surgsim_add_library(
 	SurgSim/Devices/Mouse
 )
 
+SET(LIBS
+	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
+	KeyboardDevice
+	${OPENSCENEGRAPH_LIBRARIES}
+)
+
+target_link_libraries(MouseDevice ${LIBS}
+)
+
 if(SURGSIM_TESTS_BUILD)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)

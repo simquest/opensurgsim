@@ -34,6 +34,9 @@ TEST(RuntimeTest, SetScene)
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	std::shared_ptr<Scene> scene(new Scene());
 	EXPECT_NO_THROW(runtime->setScene(scene));
+	EXPECT_ANY_THROW(runtime->setScene(nullptr));
+
+	EXPECT_EQ(scene, runtime->getScene());
 }
 
 TEST(RuntimeTest, AddManager)
@@ -47,8 +50,11 @@ TEST(RuntimeTest, AddManager)
 
 	EXPECT_TRUE(manager->isInitialized());
 
+	EXPECT_TRUE(runtime->isRunning());
 
 	EXPECT_TRUE(runtime->stop());
+
+	EXPECT_FALSE(runtime->isRunning());
 
 	EXPECT_FALSE(manager->isRunning());
 }

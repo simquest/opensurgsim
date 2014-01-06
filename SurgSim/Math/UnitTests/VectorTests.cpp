@@ -976,6 +976,69 @@ TYPED_TEST(AllVectorTests, ArrayReadWrite)
 	}
 }
 
+TYPED_TEST(AllVectorTests, Interpolate)
+{
+	typedef typename TestFixture::Vector Vector;
+	typedef typename TestFixture::Scalar T;
+
+	T epsilon = static_cast<T>(1e-6);
+
+	T prevArray[5] = { 3.1f, 3.4f, 3.7f, 4.0f, 4.3f };
+	T nextArray[5] = { 7.2f, 0.6f, 4.8f, 5.1f, 8.9f };
+	T interpArray[5];
+
+	Vector prev(prevArray);
+	Vector next(nextArray);
+	Vector interp;
+
+	// 0.0
+	interpArray[0] = 3.1f * 1.0f + 7.2f * 0.0f;
+	interpArray[1] = 3.4f * 1.0f + 0.6f * 0.0f;
+	interpArray[2] = 3.7f * 1.0f + 4.8f * 0.0f;
+	interpArray[3] = 4.0f * 1.0f + 5.1f * 0.0f;
+	interpArray[4] = 4.3f * 1.0f + 8.9f * 0.0f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(prev));
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.0f)), epsilon));
+
+	// 1.0
+	interpArray[0] = 3.1f * 0.0f + 7.2f * 1.0f;
+	interpArray[1] = 3.4f * 0.0f + 0.6f * 1.0f;
+	interpArray[2] = 3.7f * 0.0f + 4.8f * 1.0f;
+	interpArray[3] = 4.0f * 0.0f + 5.1f * 1.0f;
+	interpArray[4] = 4.3f * 0.0f + 8.9f * 1.0f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(next));
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(1.0f)), epsilon));
+
+	// 0.5
+	interpArray[0] = 3.1f * 0.5f + 7.2f * 0.5f;
+	interpArray[1] = 3.4f * 0.5f + 0.6f * 0.5f;
+	interpArray[2] = 3.7f * 0.5f + 4.8f * 0.5f;
+	interpArray[3] = 4.0f * 0.5f + 5.1f * 0.5f;
+	interpArray[4] = 4.3f * 0.5f + 8.9f * 0.5f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.5f)), epsilon));
+
+	// 0.886
+	interpArray[0] = 3.1f * 0.114f + 7.2f * 0.886f;
+	interpArray[1] = 3.4f * 0.114f + 0.6f * 0.886f;
+	interpArray[2] = 3.7f * 0.114f + 4.8f * 0.886f;
+	interpArray[3] = 4.0f * 0.114f + 5.1f * 0.886f;
+	interpArray[4] = 4.3f * 0.114f + 8.9f * 0.886f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.886f)), epsilon));
+
+	// 0.623
+	interpArray[0] = 3.1f * 0.377f + 7.2f * 0.623f;
+	interpArray[1] = 3.4f * 0.377f + 0.6f * 0.623f;
+	interpArray[2] = 3.7f * 0.377f + 4.8f * 0.623f;
+	interpArray[3] = 4.0f * 0.377f + 5.1f * 0.623f;
+	interpArray[4] = 4.3f * 0.377f + 8.9f * 0.623f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.623f)), epsilon));
+}
+
 // TO DO:
 // testing numerical validity
 // testing for denormalized numbers
@@ -1162,4 +1225,78 @@ TYPED_TEST(AllDynamicVectorTests, resize)
 	ASSERT_NO_THROW(SurgSim::Math::resize(&v, 13, true););
 	EXPECT_EQ(13, static_cast<int>(v.size()));
 	EXPECT_TRUE(v.isZero());
+}
+
+template <class Vector>
+void testOrthonormalBasis(const Vector& i, const Vector& j, const Vector& k)
+{
+	typedef typename Vector::Scalar T;
+
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	EXPECT_NEAR(i.dot(j), 0.0, precision);
+	EXPECT_NEAR(i.dot(k), 0.0, precision);
+	EXPECT_NEAR(j.dot(i), 0.0, precision);
+	EXPECT_NEAR(j.dot(k), 0.0, precision);
+	EXPECT_NEAR(k.dot(i), 0.0, precision);
+	EXPECT_NEAR(k.dot(j), 0.0, precision);
+
+	EXPECT_TRUE(i.cross(j).isApprox(k));
+	EXPECT_TRUE(j.cross(k).isApprox(i));
+	EXPECT_TRUE(k.cross(i).isApprox(j));
+
+	EXPECT_NEAR(i.norm(), 1.0, precision);
+	EXPECT_NEAR(j.norm(), 1.0, precision);
+	EXPECT_NEAR(k.norm(), 1.0, precision);
+}
+
+TYPED_TEST(Vector3Tests, buildOrthonormalBasis)
+{
+	typedef typename TestFixture::Vector3 Vector3;
+	typedef typename Vector3::Scalar T;
+	const int VOpt = Vector3::Options;
+
+	Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+	Vector3 j, k;
+	T precision = Eigen::NumTraits<T>::dummy_precision();
+
+	// Assert if 1 parameter is nullptr
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, &j, &k)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, nullptr, &k)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, &j, nullptr)));
+
+	// Assert if 2 parameters are nullptr
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, nullptr, &k)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, &j, nullptr)));
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(&i, nullptr, nullptr)));
+
+	// Assert if 3 parameters are nullptr
+	ASSERT_ANY_THROW((SurgSim::Math::buildOrthonormalBasis<T, VOpt>(nullptr, nullptr, nullptr)));
+
+	// Input parameter 'i' = (0, 0, 0)
+	Vector3 zero = Vector3::Zero();
+	ASSERT_NO_THROW(EXPECT_EQ(false, SurgSim::Math::buildOrthonormalBasis(&zero, &j, &k)));
+
+	// Input parameter 'i' = (0, 0, 0) + (epsilon, epsilon, epsilon)
+	Vector3 closeToZero = Vector3::Constant(precision);
+	ASSERT_NO_THROW(EXPECT_EQ(false, SurgSim::Math::buildOrthonormalBasis(&closeToZero, &j, &k)));
+
+	// Input parameter 'i' is already normalized
+	{
+		Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+		Vector3 j, k;
+
+		i.normalize();
+		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
+		testOrthonormalBasis(i, j, k);
+	}
+
+	// Input parameter 'i' is not already normalized
+	{
+		Vector3 i(static_cast<T>(1.54), static_cast<T>(-4.25), static_cast<T>(0.983));
+		Vector3 j, k;
+
+		ASSERT_NO_THROW(EXPECT_EQ(true, SurgSim::Math::buildOrthonormalBasis(&i, &j, &k)));
+		testOrthonormalBasis(i, j, k);
+	}
 }

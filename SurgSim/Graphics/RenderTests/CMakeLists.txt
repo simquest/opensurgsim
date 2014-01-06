@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	OsgCapsuleRepresentationRenderTests.cpp
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
+	OsgMeshRepresentationRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
@@ -46,10 +47,22 @@ set(UNIT_TEST_HEADERS
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
-set(LIBS 
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+
+set(LIBS
+	SurgSimFramework
 	SurgSimGraphics
 	SurgSimTesting
+	SurgSimBlocks
+	gmock
 	gtest
+	${Boost_LIBRARIES}
+	${OPENSCENEGRAPH_LIBRARIES}
+	${OPENTHREADS_LIBRARY}
 )
 
 # The unit tests will be built whenever the library is built, but

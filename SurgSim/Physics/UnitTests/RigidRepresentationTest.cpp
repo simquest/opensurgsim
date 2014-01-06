@@ -17,14 +17,17 @@
 
 #include <string>
 
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/Localization.h"
 #include "SurgSim/Collision/Location.h"
-
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/PlaneShape.h"
+#include "SurgSim/Math/Shape.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/Localization.h"
 
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
@@ -387,6 +390,32 @@ TEST_F(RigidRepresentationTest, LocalizationCreation)
 	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(0.0)));
 	EXPECT_TRUE(globalPos.isApprox(localization->calculatePosition(1.0)));
 
+}
+
+TEST_F(RigidRepresentationTest, InvalidShapes)
+{
+	std::shared_ptr<SurgSim::Math::Shape> shapeWithNoVolume = std::make_shared<SurgSim::Math::PlaneShape>();
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+
+	{
+		RigidRepresentationParameters parameters;
+		parameters.setShapeUsedForMassInertia(shapeWithNoVolume);
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setCurrentParameters(parameters);
+
+		std::shared_ptr<SurgSim::Framework::Component> component = rigidBody;
+		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		RigidRepresentationParameters parameters;
+		parameters.setShapeUsedForMassInertia(shapeWithNoVolume);
+		std::shared_ptr<RigidRepresentation> rigidBody = std::make_shared<RigidRepresentation>("Rigid");
+		rigidBody->setInitialParameters(parameters);
+
+		std::shared_ptr<SurgSim::Framework::Component> component = rigidBody;
+		EXPECT_THROW(component->initialize(runtime), SurgSim::Framework::AssertionFailure);
+	}
 }
 
 }; // namespace Physics

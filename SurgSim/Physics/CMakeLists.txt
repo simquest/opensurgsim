@@ -38,6 +38,9 @@ set(SURGSIM_PHYSICS_SOURCES
 	LinearSpring.cpp
 	Localization.cpp
 	MassSpringRepresentation.cpp
+	MassSpringRepresentationContact.cpp
+	MassSpringRepresentationLocalization.cpp
+	MlcpPhysicsProblem.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
@@ -80,6 +83,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Mass.h
 	MassSpringRepresentation.h
+	MassSpringRepresentationContact.h
+	MassSpringRepresentationLocalization.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
@@ -120,6 +125,7 @@ target_link_libraries(SurgSimPhysics ${LIBS}
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+	add_subdirectory(RenderTests)
 endif()
 
 # Put SurgSimPhysics into folder "Physics"

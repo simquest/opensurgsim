@@ -39,6 +39,8 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
+	MassSpringRepresentationContactTest.cpp
+	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	PhysicsManagerTests.cpp
@@ -65,8 +67,10 @@ include_directories(
 )
 
 set(LIBS
+	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimMath
+	gmock
 	gtest
 	yaml-cpp
 )

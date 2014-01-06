@@ -17,14 +17,19 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${gmock_SOURCE_DIR}/include
+	${gmock_SOURCE_DIR}
 )
 
 set(SURGSIM_TESTING_SOURCES
+	TestingMain.cpp
 	MathUtilities.cpp
+	TestCube.cpp
 )
 
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
+	TestCube.h
 )
 
 surgsim_add_library(
