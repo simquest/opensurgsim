@@ -13,19 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-link_directories(
-	${Boost_LIBRARY_DIRS}
-)
-
-include_directories(
-	"${Boost_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${GLUT_INCLUDE_DIR}"
-	"${OPTITRACK_INCLUDE_DIR}"
-	"${SURGSIM_TOP_INCLUDE_DIR}"
-)
-
 set(EXAMPLE_SOURCES
 	main.cpp
 )
@@ -44,13 +31,18 @@ set(LIBS IdentityPoseDevice
 		 SurgSimDataStructures
 		 SurgSimFramework 
 		 SurgSimInput 
-		 ${Boost_LIBRARIES} 
 		 ${GLUT_LIBRARIES}
-		 ${OPENGL_LIBRARIES}
-		 ${OPENHAPTICS_LIBRARIES}
 		 ${OPTITRACK_LIBRARY})
 
 target_link_libraries(TrackIRVisualTest ${LIBS})
+
+# Copy the device DLLs into the build directory
+surgsim_copy_to_target_directory_for_release(TrackIRVisualTest
+	${OPTITRACK_SHARED_RELEASE}
+)
+surgsim_copy_to_target_directory_for_debug(TrackIRVisualTest
+	${OPTITRACK_SHARED_DEBUG}
+)
 
 # Put TrackIRVisualTest into folder "Devices"
 set_target_properties(TrackIRVisualTest PROPERTIES FOLDER "Devices")
