@@ -104,7 +104,7 @@ private:
 TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
 	m_logger(logger), m_state(new StateData)
 {
-	if (! m_logger)
+	if (!m_logger)
 	{
 		m_logger = SurgSim::Framework::Logger::getLogger("TrackIR device");
 		m_logger->setThreshold(m_defaultLogLevel);
@@ -115,6 +115,7 @@ TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 
 TrackIRScaffold::~TrackIRScaffold()
 {
+	// The following block controls the duration of the mutex being locked.
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -133,7 +134,10 @@ TrackIRScaffold::~TrackIRScaffold()
 
 		if (m_state->isApiInitialized)
 		{
-			finalizeSdk();
+			if (!finalizeSdk())
+			{
+				SURGSIM_LOG_SEVERE(m_logger) << "Finalizing TrackIR SDK failed.";
+			}
 		}
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "TrackIR: Shared scaffold destroyed.";
@@ -160,7 +164,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 	}
 
 	// Only proceed when initializationSdk() is successful.
-	if (true == m_state->isApiInitialized)
+	if (m_state->isApiInitialized)
 	{
 		// Make sure the object is unique.
 		auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
@@ -180,8 +184,8 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		}
 	}
 
-	// Only proceed when no duplicate device and device name is found.
-	if (true == result)
+	// Only proceed when no duplicate device or device name is found.
+	if (result)
 	{
 		std::unique_ptr<DeviceData> info(new DeviceData(device));
 		createPerDeviceThread(info.get());
@@ -254,7 +258,7 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 
 bool TrackIRScaffold::runInputFrame(TrackIRScaffold::DeviceData* info)
 {
-	if (! updateDevice(info))
+	if (!updateDevice(info))
 	{
 		return false;
 	}
@@ -275,10 +279,12 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	// pitch: rotation around X-axis
 	// yaw: rotation around Y-axis
 	// roll: rotation around Z-axis (Min: -45; Max: +45)
-	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter);
+	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter); // Positions are reported in millimeters.
 	// Dec-22-2013-HW Currently, the output of Z-axis value from ltr_get_pose() is not consistent
 	// Contacted the developer, waiting for response.
-	Vector3d position(static_cast<double>(x), static_cast<double>(y), static_cast<double>(z)); // In Millimeter
+	Vector3d position(static_cast<double>(x) / 1000.0,
+					  static_cast<double>(y) / 1000.0,
+					  static_cast<double>(z) / 1000.0); // Convert millimeter to meter
 	Vector3d rotation(pitch, yaw, roll); // In Degrees
 
 	// Scale Position
@@ -310,7 +316,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 
 bool TrackIRScaffold::initializeSdk()
 {
-	SURGSIM_ASSERT(! m_state->isApiInitialized);
+	SURGSIM_ASSERT(!m_state->isApiInitialized) << "TrackIR API already initialized.";
 	bool result = false;
 
 	//Initialize the tracking using Default profile
@@ -340,7 +346,7 @@ bool TrackIRScaffold::initializeSdk()
 
 bool TrackIRScaffold::finalizeSdk()
 {
-	SURGSIM_ASSERT(m_state->isApiInitialized);
+	SURGSIM_ASSERT(m_state->isApiInitialized) << "TrackIR API already finalized.";
 	bool result = false;
 
 	ltr_shutdown();
@@ -355,20 +361,20 @@ bool TrackIRScaffold::finalizeSdk()
 	return result;
 }
 
-bool TrackIRScaffold::createPerDeviceThread(DeviceData* data)
+bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(! data->thread);
+	SURGSIM_ASSERT(!deviceData->thread) << "Device " << deviceData->deviceObject->getName() << " already has a thread.";
 
-	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, data));
+	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, deviceData));
 	thread->start();
-	data->thread = std::move(thread);
+	deviceData->thread = std::move(thread);
 
 	return true;
 }
 
-bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* data)
+bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(data->thread);
+	SURGSIM_ASSERT(deviceData->thread)  << "No thread attached to device " << deviceData->deviceObject->getName();
 
 	std::unique_ptr<TrackIRThread> thread = std::move(data->thread);
 	thread->stop();

@@ -59,7 +59,7 @@ struct TrackIRScaffold::DeviceData
 		list.Refresh();
 		m_camera = CameraLibrary::CameraManager::X().GetCamera(list[cameraID].UID());
 
-		SURGSIM_ASSERT( m_camera != nullptr );
+		SURGSIM_ASSERT(m_camera != nullptr) << "Failed to obtain a camera from CameraLibrary.";
 		vectorProcessorSettings = *vectorProcessor->Settings();
 		vectorProcessorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
 		vectorProcessorSettings.ShowPivotPoint = false;
@@ -155,6 +155,7 @@ TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> log
 
 TrackIRScaffold::~TrackIRScaffold()
 {
+	// The following block controls the duration of the mutex being locked.
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
@@ -173,7 +174,10 @@ TrackIRScaffold::~TrackIRScaffold()
 
 		if (m_state->isApiInitialized)
 		{
-			finalizeSdk();
+			if (!finalizeSdk())
+			{
+				SURGSIM_LOG_SEVERE(m_logger) << "Finalizing TrackIR SDK failed.";
+			}
 		}
 	}
 	SURGSIM_LOG_DEBUG(m_logger) << "TrackIR: Shared scaffold destroyed.";
@@ -216,14 +220,14 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 			" when the same name is already present!";
 	}
 
-	// Only proceed when no duplicate device and device name is found.
-	if (true == result)
+	// Only proceed when no duplicate device or device name is found.
+	if (result)
 	{
 		CameraLibrary::CameraList cameraList;
 		cameraList.Refresh();
 		if (cameraList.Count() > static_cast<int>(m_state->activeDeviceList.size()))
 		{
-			// Construct the object if one exists. Then start its thread, then move it to the list.
+			// Construct the object if one exists. Start its thread, then move it to the list.
 			int cameraID = m_state->activeDeviceList.size();
 			std::unique_ptr<DeviceData> info(new DeviceData(device, cameraID));
 			createPerDeviceThread(info.get());
@@ -387,12 +391,10 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 
 bool TrackIRScaffold::initializeSdk()
 {
-	SURGSIM_ASSERT(!m_state->isApiInitialized);
+	SURGSIM_ASSERT(!m_state->isApiInitialized) << "TrackIR API already initialized.";
 	bool result = false;
 
-	bool initialized = CameraLibrary::CameraManager::X().AreCamerasInitialized();
-
-	if (!initialized)
+	if (!CameraLibrary::CameraManager::X().AreCamerasInitialized())
 	{
 		CameraLibrary::CameraManager::X().WaitForInitialization();
 	}
@@ -408,11 +410,9 @@ bool TrackIRScaffold::initializeSdk()
 
 bool TrackIRScaffold::finalizeSdk()
 {
-	SURGSIM_ASSERT(m_state->isApiInitialized);
+	SURGSIM_ASSERT(m_state->isApiInitialized) << "TrackIR API already finalized.";
 
-	bool isShutdown = CameraLibrary::CameraManager::X().AreCamerasShutdown();
-
-	if (!isShutdown)
+	if (!CameraLibrary::CameraManager::X().AreCamerasShutdown())
 	{
 	  // Dec-17-2013-HW It's a bug in TrackIR CameraSDK that after calling CameraLibrary::CameraManager::X().Shutdown(),
 	  // calls to CameraLibrary::CameraManager::X().WaitForInitialization will throw memory violation error.
@@ -425,7 +425,7 @@ bool TrackIRScaffold::finalizeSdk()
 
 bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(!deviceData->thread);
+	SURGSIM_ASSERT(!deviceData->thread) << "Device " << deviceData->deviceObject->getName() << " already has a thread.";
 
 	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, deviceData));
 	thread->start();
@@ -436,7 +436,7 @@ bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 
 bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(deviceData->thread);
+	SURGSIM_ASSERT(deviceData->thread) << "No thread attached to device " << deviceData->deviceObject->getName();
 
 	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->thread);
 	thread->stop();

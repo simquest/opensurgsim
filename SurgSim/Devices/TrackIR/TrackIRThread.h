@@ -33,6 +33,8 @@ class TrackIRThread : public SurgSim::Framework::BasicThread
 {
 public:
 	/// Constructor
+	/// TrackIR runs at 120FPS
+	/// Default update rate is set by BasicThraed constructor to 30Hz
 	/// \param scaffold The TrackIRScaffold updated by this thread
 	/// \param deviceData Corresponds to the TrackIRScaffold::DeviceData updated by this thread
 	TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceData* deviceData);
