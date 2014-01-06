@@ -55,7 +55,7 @@ public:
 	/// \return True if this component is initialized; otherwise, false.
 	bool isInitialized() const;
 
-	/// Initialize this component, this needs to be called before wakeUp() can be called.O
+	/// Initialize this component, this needs to be called before wakeUp() can be called.
 	/// This will be done automatically by the Scene hierarchy, either in SceneElement::addComponent(), if
 	/// SceneElement has already been added to the Scene, or through Scene::addSceneElement() on all Components
 	/// on the SceneElement.

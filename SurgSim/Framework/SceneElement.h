@@ -32,9 +32,9 @@ class Scene;
 class Runtime;
 
 /// SceneElement is the basic part of a scene, it is a container of components. When a
-/// SceneElement is added to a Scene, the Scene will call initialize on the SceneElement,
+/// SceneElement is added to a Scene, the Scene will call initialize() on the SceneElement,
 /// which in turn will call initialize() on all its components.
-/// If a component is added to a SceneElement after the SceneEleent was initialized, the component will
+/// If a component is added to a SceneElement after the SceneElement was initialized, the component will
 /// be initialized immediately.
 /// \note A SceneElement needs to be created as a shared_ptr.
 class SceneElement : public std::enable_shared_from_this<SceneElement>
