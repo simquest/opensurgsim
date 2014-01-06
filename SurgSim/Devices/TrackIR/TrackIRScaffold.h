@@ -19,13 +19,17 @@
 #include <memory>
 
 #include "SurgSim/Framework/Logger.h"
-#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class DataGroup;
+}
+
 namespace Device
 {
-
 class TrackIRDevice;
 
 /// A class that manages Natural Point TRACKIR devices.

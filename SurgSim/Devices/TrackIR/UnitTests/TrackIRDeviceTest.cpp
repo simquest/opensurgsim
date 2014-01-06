@@ -27,22 +27,18 @@
 #include "SurgSim/Devices/TrackIR/TrackIRDevice.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 
 using SurgSim::Device::TrackIRDevice;
-using SurgSim::Device::TrackIRScaffold;
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::Input::InputConsumerInterface;
-using SurgSim::Input::OutputProducerInterface;
 
 
-struct TestListener : public InputConsumerInterface, public OutputProducerInterface
+struct TestListener : public InputConsumerInterface
 {
 public:
 	TestListener() :
 		m_numTimesInitializedInput(0),
-		m_numTimesReceivedInput(0),
-		m_numTimesRequestedOutput(0)
+		m_numTimesReceivedInput(0)
 	{
 	}
 
@@ -55,49 +51,25 @@ public:
 		++m_numTimesReceivedInput;
 		m_lastReceivedInput = inputData;
 	}
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData)
-	{
-		++m_numTimesRequestedOutput;
-		return false;
-	}
 
 	int m_numTimesInitializedInput;
 	int m_numTimesReceivedInput;
-	int m_numTimesRequestedOutput;
 	DataGroup m_lastReceivedInput;
 };
 
 
-TEST(TrackIRDeviceTest, CreateUninitializedDevice)
-{
-	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-}
 
 TEST(TrackIRDeviceTest, CreateAndInitializeDevice)
 {
 	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
 	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
-	EXPECT_FALSE(device->isInitialized());
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-}
 
-TEST(TrackIRDeviceTest, CreateAndInitializeDefaultDevice)
-{
-	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_FALSE(device->isInitialized());
-	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-	EXPECT_TRUE(device->isInitialized());
-}
-
-TEST(TrackIRDeviceTest, Name)
-{
-	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
 	EXPECT_EQ("TrackIR", device->getName());
-	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
+
+	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
+
+	EXPECT_TRUE(device->isInitialized());
 	EXPECT_EQ("TrackIR", device->getName());
 }
 
@@ -119,7 +91,7 @@ TEST(TrackIRDeviceTest, CreateDevicesWithSameName)
 
 	std::shared_ptr<TrackIRDevice> device2 = std::make_shared<TrackIRDevice>("TrackIR");
 	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
-	ASSERT_FALSE(device2->initialize()) << "Initialization succeeded despite duplicate name.";
+	ASSERT_ANY_THROW(device2->initialize()) << "Initialization succeeded despite duplicate name.";
 }
 
 TEST(TrackIRDeviceTest, InputConsumer)
@@ -140,8 +112,8 @@ TEST(TrackIRDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->addInputConsumer(consumer));
 
 	// Sleep for one second, to see how many times the consumer is invoked.
-	// (A TrackIR device is supposed to run at 120FPS/240Hz.)
-	// (The thread to poll data out of TrackIR is running at 60Hz.)
+	// (A TrackIR device is supposed to run at 120FPS.)
+	// (The thread to poll data out of TrackIR is running at default 30Hz.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
@@ -150,8 +122,8 @@ TEST(TrackIRDeviceTest, InputConsumer)
 	EXPECT_FALSE(device->removeInputConsumer(consumer));
 
 	// Check the number of invocations.
-	EXPECT_GE(consumer->m_numTimesReceivedInput, 50);
-	EXPECT_LE(consumer->m_numTimesReceivedInput, 100);
+	EXPECT_GE(consumer->m_numTimesReceivedInput, 20);
+	EXPECT_LE(consumer->m_numTimesReceivedInput, 50);
 
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().isValid());
 }

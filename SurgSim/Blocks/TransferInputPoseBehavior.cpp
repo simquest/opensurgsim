@@ -16,15 +16,11 @@
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
 
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Matrix33d;
 
 namespace SurgSim
 {
