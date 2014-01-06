@@ -119,13 +119,15 @@ public:
 		return getLoggerManager()->getDefaultLogger();
 	}
 
+	/// Get the logger manager
+	/// \return Logger Manager that manages all loggers
+	static std::shared_ptr<LoggerManager> getLoggerManager();
+
 private:
 	/// Constructor.
 	/// \param name The name used for this logger.
 	/// \param output The LogOutput instance used to display or log the data.
 	Logger(const std::string& name, std::shared_ptr<LogOutput> output);
-
-	static std::shared_ptr<LoggerManager> getLoggerManager();
 
 	int m_threshold;
 	std::string m_name;

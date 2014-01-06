@@ -69,6 +69,7 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimMath
+	gmock
 	gtest
 	yaml-cpp
 )

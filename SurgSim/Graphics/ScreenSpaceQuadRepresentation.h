@@ -35,7 +35,7 @@ public:
 	/// Constructor.
 	/// \param	name	The name.
 	/// \param	view	The view that will contain this quad.
-	ScreenSpaceQuadRepresentation(const std::string name, std::shared_ptr<View> view) : Representation(name)
+	explicit ScreenSpaceQuadRepresentation(const std::string name) : Representation(name)
 	{
 
 	}

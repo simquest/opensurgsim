@@ -24,6 +24,8 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Math
@@ -170,6 +172,33 @@ Eigen::Matrix<T, size, 1, TOpt> interpolate(
 	return previous + t * (next - previous);
 }
 
+/// Helper method to construct an orthonormal basis (i, j, k) given the 1st vector direction
+/// \tparam T the numeric data type used for the vector argument. Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument. Can be deduced.
+/// \param[in, out] i Should provide the 1st direction on input. The 1st vector of the basis (i, j, k) on output.
+/// \param[out] j, k The 2nd and 3rd orthonormal vectors of the basis (i, j, k)
+/// \return True if (i, j, k) has been built successfully, False if 'i' is a (or close to a) null vector
+/// \note If any of the parameter is a nullptr, an exception will be raised
+template <class T, int VOpt>
+bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i,
+						   Eigen::Matrix<T, 3, 1, VOpt>* j,
+						   Eigen::Matrix<T, 3, 1, VOpt>* k)
+{
+	SURGSIM_ASSERT(i != nullptr) << "Parameter [in, out] 'i' is a nullptr";
+	SURGSIM_ASSERT(j != nullptr) << "Parameter [out] 'j' is a nullptr";
+	SURGSIM_ASSERT(k != nullptr) << "Parameter [out] 'k' is a nullptr";
+
+	if (i->isZero())
+	{
+		return false;
+	}
+
+	i->normalize();
+	*j = i->unitOrthogonal();
+	*k = i->cross(*j);
+
+	return true;
+}
 };  // namespace Math
 };  // namespace SurgSim
 

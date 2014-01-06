@@ -75,9 +75,10 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 
-set(LIBS 
+set(LIBS
 	SurgSimGraphics
 	SurgSimTesting
+	gmock
 	gtest
 )
 

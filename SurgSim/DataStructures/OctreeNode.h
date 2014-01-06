@@ -42,18 +42,18 @@ class OctreeNode
 {
 public:
 	/// Bounding box type for convenience
-	typedef Eigen::AlignedBox<double, 3> BoundingBoxType;
+	typedef Eigen::AlignedBox<double, 3> AxisAlignedBoundingBox;
 
 	/// Constructor
 	/// \param  boundingBox The region contained by this octree node
-	explicit OctreeNode(const BoundingBoxType& boundingBox);
+	explicit OctreeNode(const AxisAlignedBoundingBox& boundingBox);
 
 	/// Destructor
 	virtual ~OctreeNode();
 
 	/// Get the bounding box for this octree node
 	/// \return the bounding box
-	const BoundingBoxType& getBoundingBox() const;
+	const AxisAlignedBoundingBox& getBoundingBox() const;
 
 	/// Is this node active
 	/// \return true if there is any data inside this node, including data held
@@ -86,6 +86,18 @@ public:
 	/// \return vector of all eight children
 	const std::array<std::shared_ptr<OctreeNode<Data> >, 8>& getChildren() const;
 
+	/// Get a child of this node (non const version)
+	/// \param index the child index
+	/// \return the requested octree node
+	/// NOTE: an exception will be thrown if the index >= 8
+	std::shared_ptr<OctreeNode<Data> > getChild(size_t index);
+
+	/// Get a child of this node
+	/// \param index the child index
+	/// \return the requested octree node
+	/// NOTE: an exception will be thrown if the index >= 8
+	const std::shared_ptr<OctreeNode<Data> > getChild(size_t index) const;
+
 	/// Extra node data
 	Data data;
 
@@ -100,7 +112,7 @@ private:
 			const int currentLevel);
 
 	/// The bounding box of the current OctreeNode
-	BoundingBoxType m_boundingBox;
+	AxisAlignedBoundingBox m_boundingBox;
 
 	/// True if there is any data inside this node, including data held by children, children's children, etc.
 	bool m_isActive;

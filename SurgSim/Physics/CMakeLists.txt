@@ -123,6 +123,7 @@ target_link_libraries(SurgSimPhysics ${LIBS}
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+	add_subdirectory(RenderTests)
 endif()
 
 # Put SurgSimPhysics into folder "Physics"
