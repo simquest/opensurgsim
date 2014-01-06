@@ -167,9 +167,7 @@ public:
 		// Adds all the cube FemElements
 		for (unsigned int elementId = 0; elementId < numCubes; elementId++)
 		{
-			std::shared_ptr<FemElement3DCube> element = nullptr;
-			element = std::make_shared<FemElement3DCube>(cubes[elementId], *restState);
-			physicsRepresentation->addFemElement(element);
+			physicsRepresentation->addFemElement(std::make_shared<FemElement3DCube>(cubes[elementId], *restState));
 		}
 	}
 
@@ -203,25 +201,20 @@ std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,
 	femSceneElement->addComponent(physicsRepresentation);
 
 	// Graphics setup
-	{
-		std::stringstream ss;
-		ss << name + " Graphics object ";
-		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-			std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
+	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
+		std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
 
-		graphicsRepresentation->setInitialPose(gfxPose);
-		graphicsRepresentation->setColor(color);
-		graphicsRepresentation->setPointSize(3.0f);
-		graphicsRepresentation->setVisible(true);
+	graphicsRepresentation->setInitialPose(gfxPose);
+	graphicsRepresentation->setColor(color);
+	graphicsRepresentation->setPointSize(3.0f);
+	graphicsRepresentation->setVisible(true);
 
-		femSceneElement->addComponent(graphicsRepresentation);
-		ss.clear();
-		ss << "Physics to Graphics deformable points";
-		femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
-			(ss.str(),
-			physicsRepresentation->getFinalState(),
-			graphicsRepresentation->getVertices()));
-	}
+	femSceneElement->addComponent(graphicsRepresentation);
+	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+		"Physics to Graphics deformable points",
+		physicsRepresentation->getFinalState(),
+		graphicsRepresentation->getVertices())
+	);
 
 	return femSceneElement;
 }

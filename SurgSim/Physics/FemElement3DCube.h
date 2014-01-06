@@ -19,6 +19,7 @@
 #include <array>
 
 #include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Math/GaussLegendreQuadrature.h"
 
 namespace SurgSim
 {
@@ -78,7 +79,7 @@ public:
 	virtual void addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M,
 		double scale = 1.0) override;
 
-	/// Adds the element damping matrix D (= -df/dv) (comuted for a given state)
+	/// Adds the element damping matrix D (= -df/dv) (computed for a given state)
 	/// to a complete system damping matrix D (assembly)
 	/// \param state The state to compute the damping matrix with
 	/// \param[in,out] D The complete system damping matrix to add the element damping matrix into
@@ -131,6 +132,10 @@ public:
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
 protected:
+	/// Build the constitutive material 6x6 matrix
+	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix
+	void buildConstitutiveMaterialMatrix(Eigen::Matrix<double, 6, 6, Eigen::DontAlign>* constitutiveMatrix);
+
 	/// Computes the cube stiffness matrix along with the strain and stress matrices
 	/// \param state The deformable state to compute the stiffness matrix from
 	/// \param[out] strain, stress, k The strain, stress and stiffness matrices to store the result into
@@ -160,24 +165,24 @@ protected:
 	/// Helper method to evaluate strain-stress and stiffness integral terms with a discrete sum using
 	/// a Gauss quadrature rule
 	/// \param state The state to compute the evaluation with
-	/// \param epsilon, eta, mu The 3D parametric coordinates to evaluate the data at (within \f$[-1 +1]\f$)
-	/// \param weightEpsilon, weightEta, weightMu The weight to apply to this evaluation point in the Gauss quadrature
+	/// \param epsilon, eta, mu The Gauss quadrature points to evaluate the data at
 	/// \param[out] strain, stress, k The matrices in which to add the evaluations
 	void addStrainStressStiffnessAtPoint(const DeformableRepresentationState& state,
-		double epsilon, double eta, double mu,
-		double weightEpsilon, double weightEta, double weightMu,
+		const SurgSim::Math::gaussQuadraturePoint& epsilon,
+		const SurgSim::Math::gaussQuadraturePoint& eta,
+		const SurgSim::Math::gaussQuadraturePoint& mu,
 		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
 		Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
 		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k);
 
 	/// Helper method to evaluate mass integral terms with a discrete sum using a Gauss quadrature rule
 	/// \param state The state to compute the evaluation with
-	/// \param epsilon, eta, mu The 3D parametric coordinates to evaluate the data at (within \f$[-1 +1]\f$)
-	/// \param weightEpsilon, weightEta, weightMu The weight to apply to this evaluation point in the Gauss quadrature
+	/// \param epsilon, eta, mu The Gauss quadrature points to evaluate the data at
 	/// \param[out] m The matrix in which to add the evaluations
 	void addMassMatrixAtPoint(const DeformableRepresentationState& state,
-		double epsilon, double eta, double mu,
-		double weightEpsilon, double weightEta, double weightMu,
+		const SurgSim::Math::gaussQuadraturePoint& epsilon,
+		const SurgSim::Math::gaussQuadraturePoint& eta,
+		const SurgSim::Math::gaussQuadraturePoint& mu,
 		Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m);
 
 	/// Helper method to evaluate matrix J = d(x,y,z)/d(epsilon,eta,mu) at a given 3D parametric location
@@ -237,7 +242,7 @@ protected:
 	/// \note A check is performed on the nodeId i but not on the 3D parametric coordinates range
 	/// \sa m_shapeFunctionsEpsilonSign, m_shapeFunctionsEtaSign, m_shapeFunctionsMuSign
 	/// \sa dNdepsilon, dNdeta, dNdmu
-	double N(size_t i, double epsilon, double eta, double mu) const;
+	double shapeFunction(size_t i, double epsilon, double eta, double mu) const;
 
 	/// Shape functions derivative \f$dN_i/d\epsilon(\epsilon, \eta, \mu) = \pm(1\pm\eta)(1\pm\mu)/8\f$
 	/// \param i The node id (w.r.t. local element) to evaluate at
@@ -246,7 +251,7 @@ protected:
 	/// \note A check is performed on the nodeId i but not on the 3D parametric coordinates range
 	/// \sa N
 	/// \sa m_shapeFunctionsEpsilonSign, m_shapeFunctionsEtaSign, m_shapeFunctionsMuSign
-	double dNdepsilon(size_t i, double epsilon, double eta, double mu) const;
+	double dShapeFunctiondepsilon(size_t i, double epsilon, double eta, double mu) const;
 
 	/// Shape functions derivative \f$dN_i/d\eta(\epsilon, \eta, \mu) = \pm(1\pm\epsilon)(1\pm\mu)/8\f$
 	/// \param i The node id (w.r.t. local element) to evaluate at
@@ -255,7 +260,7 @@ protected:
 	/// \note A check is performed on the nodeId i but not on the 3D parametric coordinates range
 	/// \sa N
 	/// \sa m_shapeFunctionsEpsilonSign, m_shapeFunctionsEtaSign, m_shapeFunctionsMuSign
-	double dNdeta(size_t i, double epsilon, double eta, double mu) const;
+	double dShapeFunctiondeta(size_t i, double epsilon, double eta, double mu) const;
 
 	/// Shape functions derivative \f$dN_i/d\mu(\epsilon, \eta, \mu) = \pm(1\pm\epsilon)(1\pm\eta)/8\f$
 	/// \param i The node id (w.r.t. local element) to evaluate at
@@ -264,10 +269,10 @@ protected:
 	/// \note A check is performed on the nodeId i but not on the 3D parametric coordinates range
 	/// \sa N
 	/// \sa m_shapeFunctionsEpsilonSign, m_shapeFunctionsEtaSign, m_shapeFunctionsMuSign
-	double dNdmu(size_t i, double epsilon, double eta, double mu) const;
+	double dShapeFunctiondmu(size_t i, double epsilon, double eta, double mu) const;
 
 	/// The cube rest state (nodes ordered by m_nodeIds)
-	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> m_x0;
+	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> m_elementRestPosition;
 
 	/// Strain matrix (usually noted \f$\epsilon\f$)
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign> m_strain;

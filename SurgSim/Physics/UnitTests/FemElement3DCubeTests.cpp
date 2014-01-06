@@ -50,27 +50,27 @@ public:
 
 	double evaluateN(int i, double epsilon, double eta, double mu) const
 	{
-		return N(i, epsilon, eta, mu);
+		return shapeFunction(i, epsilon, eta, mu);
 	}
 
 	double evaluatedNidEpsilon(int i, double epsilon, double eta, double mu) const
 	{
-		return dNdepsilon(i, epsilon, eta, mu);
+		return dShapeFunctiondepsilon(i, epsilon, eta, mu);
 	}
 
 	double evaluatedNidEta(int i, double epsilon, double eta, double mu) const
 	{
-		return dNdeta(i, epsilon, eta, mu);
+		return dShapeFunctiondeta(i, epsilon, eta, mu);
 	}
 
 	double evaluatedNidMu(int i, double epsilon, double eta, double mu) const
 	{
-		return dNdmu(i, epsilon, eta, mu);
+		return dShapeFunctiondmu(i, epsilon, eta, mu);
 	}
 
 	const Eigen::Matrix<double, 24, 1, Eigen::DontAlign>& getInitialPosition() const
 	{
-		return m_x0;
+		return m_elementRestPosition;
 	}
 };
 
@@ -352,13 +352,8 @@ public:
 			}
 
 			// Use symmetry to complete the triangular inferior part of K
-			for (int row = 0; row < 24; ++row)
-			{
-				for (int col = row + 1; col < 24; ++col)
-				{
-					K(col, row) = K(row, col);
-				}
-			}
+			K.triangularView<Eigen::StrictlyLower>().setZero();
+			K += K.triangularView<Eigen::StrictlyUpper>().adjoint();
 		}
 		addSubMatrix(K, nodeIdsVectorForm, 3 , &m_expectedStiffnessMatrix);
 	}
@@ -446,11 +441,9 @@ public:
 		// Muller, Techner, Gross, CGI 2004
 		std::array<unsigned int, 8> tmpNodeIds = {{0, 1, 3, 2, 4, 5, 7, 6}};
 		m_nodeIds = tmpNodeIds;
-		std::vector<unsigned int> nodeIdsVectorForm; // Useful for assembly helper function
-		for (size_t i = 0; i < 8; ++i)
-		{
-			nodeIdsVectorForm.push_back(m_nodeIds[i]);
-		}
+
+		// Useful for assembly helper function
+		std::vector<unsigned int> nodeIdsVectorForm(tmpNodeIds.begin(), tmpNodeIds.end());
 
 		// Build the expected x0 vector
 		for (size_t i = 0; i < 8; i++)
@@ -621,8 +614,9 @@ TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 	Vector3d p[8];
 	for (size_t nodeId = 0; nodeId < 8; ++nodeId)
 	{
-		// either retrieving the points from expectedX0  with indices 0..7
-		// OR     retrieving the points from m_restState with indices m_nodeIds[0]..m_nodeIds[7]
+		// retrieving the points from expectedX0 with indices 0..7
+		// which is equivalent to
+		// retrieving the points from m_restState with indices m_nodeIds[0]..m_nodeIds[7]
 		p[nodeId] = getSubVector(m_expectedX0, nodeId, 3);
 	}
 	double Ni_p0[8], Ni_p1[8], Ni_p2[8], Ni_p3[8], Ni_p4[8], Ni_p5[8], Ni_p6[8], Ni_p7[8];

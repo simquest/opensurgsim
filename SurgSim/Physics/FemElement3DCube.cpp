@@ -15,8 +15,6 @@
 
 #include "SurgSim/Framework/Log.h"
 
-#include "SurgSim/Math/GaussLegendreQuadrature.h"
-
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement3DCube.h"
 
@@ -53,12 +51,12 @@ FemElement3DCube::FemElement3DCube(std::array<unsigned int, 8> nodeIds,
 	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
 	{
 		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < restState.getNumNodes()) <<
-			"Invalid nodeId " << *nodeId << " expected in range [0.."<< restState.getNumNodes()-1<<"]";
+			"Invalid nodeId " << *nodeId << " expected in range [0.." << restState.getNumNodes()-1 << "]";
 		m_nodeIds.push_back(*nodeId);
 	}
 
-	// Store the rest state for this cube in m_x0
-	getSubVector(restState.getPositions(), m_nodeIds, 3, &m_x0);
+	// Store the rest state for this cube in m_elementRestPosition
+	getSubVector(restState.getPositions(), m_nodeIds, 3, &m_elementRestPosition);
 
 	// Compute the cube rest volume
 	m_restVolume = getVolume(restState);
@@ -83,7 +81,7 @@ void FemElement3DCube::addForce(const DeformableRepresentationState& state,
 	// K.(x - x0) = Fext
 	// 0 = Fext + Fint     with Fint = -K.(x - x0)
 	getSubVector(state.getPositions(), m_nodeIds, 3, &x);
-	f = (- scale) * k * (x - m_x0);
+	f = (- scale) * k * (x - m_elementRestPosition);
 	addSubVector(f, m_nodeIds, 3, F);
 }
 
@@ -98,9 +96,16 @@ void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
-	// M = rho * integration{over volume} {Ni^T.Ni} dV
+	// From the internal documentation on cube mass matrix calculation, we have:
+	// M = rho * integration{over volume} {phi^T.phi} dV
+	// with phi = (N0  0  0 N1  0  0...)
+	//            ( 0 N0  0  0 N1  0...)
+	//            ( 0  0 N0  0  0 N1...)
+	// a 3x24 matrix filled with shape functions evaluation at a given point.
+	// Using the Gauss-Legendre quadrature to evaluate this integral, we have:
+	// M = sum{i=1..2} sum{j=1..2} sum{k=1..2}(w_i * w_j * _w_k * det(J) * rho * phi^T.phi)
 
-	// Zerout the mass matrix
+	// Zero out the mass matrix
 	M->setZero();
 
 	// Build up the mass matrix using a 2-points Gauss-Legendre quadrature
@@ -111,13 +116,7 @@ void FemElement3DCube::computeMass(const DeformableRepresentationState& state,
 			for (int k = 0; k < 2; ++k)
 			{
 				addMassMatrixAtPoint(state,
-					gaussQuadrature2Points[i].first,
-					gaussQuadrature2Points[j].first,
-					gaussQuadrature2Points[k].first,
-					gaussQuadrature2Points[i].second,
-					gaussQuadrature2Points[j].second,
-					gaussQuadrature2Points[k].second,
-					M);
+					gaussQuadrature2Points[i], gaussQuadrature2Points[j], gaussQuadrature2Points[k], M);
 			}
 		}
 	}
@@ -141,7 +140,7 @@ void FemElement3DCube::computeStiffness(const DeformableRepresentationState& sta
 {
 	using SurgSim::Math::gaussQuadrature2Points;
 
-	// Zerout the stiffness matrix
+	// Zero out the stiffness matrix
 	stiffness->setZero();
 
 	// Build up the stiffness matrix using a 2-points Gauss-Legendre quadrature
@@ -152,12 +151,7 @@ void FemElement3DCube::computeStiffness(const DeformableRepresentationState& sta
 			for (int k = 0; k < 2; ++k)
 			{
 				addStrainStressStiffnessAtPoint(state,
-					gaussQuadrature2Points[i].first,
-					gaussQuadrature2Points[j].first,
-					gaussQuadrature2Points[k].first,
-					gaussQuadrature2Points[i].second,
-					gaussQuadrature2Points[j].second,
-					gaussQuadrature2Points[k].second,
+					gaussQuadrature2Points[i], gaussQuadrature2Points[j], gaussQuadrature2Points[k],
 					strain, stress, stiffness);
 			}
 		}
@@ -171,7 +165,7 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 {
 	using SurgSim::Framework::Logger;
 
-	SURGSIM_ASSERT(J != nullptr) << "Trying to evalute J with a nullptr for matrix J";
+	SURGSIM_ASSERT(J != nullptr) << "Trying to evaluate J with a nullptr for matrix J";
 
 	Vector3d p[8];
 	for (size_t index = 0; index < 8; index++)
@@ -179,7 +173,7 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 		p[index] = state.getPosition(m_nodeIds[index]);
 	}
 
-	// Zerout the matrix J
+	// Zero out the matrix J
 	J->setZero();
 
 	// Compute J = d(x,y,z)/d(epsilon,eta,mu)
@@ -188,9 +182,9 @@ void FemElement3DCube::evaluateJ(const DeformableRepresentationState& state, dou
 	{
 		for(size_t axis = 0; axis < 3; ++axis)
 		{
-			(*J)(0, axis) += p[index][axis] * dNdepsilon(index, epsilon, eta, mu);
-			(*J)(1, axis) += p[index][axis] * dNdeta    (index, epsilon, eta, mu);
-			(*J)(2, axis) += p[index][axis] * dNdmu     (index, epsilon, eta, mu);
+			(*J)(0, axis) += p[index][axis] * dShapeFunctiondepsilon(index, epsilon, eta, mu);
+			(*J)(1, axis) += p[index][axis] * dShapeFunctiondeta    (index, epsilon, eta, mu);
+			(*J)(2, axis) += p[index][axis] * dShapeFunctiondmu     (index, epsilon, eta, mu);
 		}
 	}
 
@@ -212,9 +206,9 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 												  const SurgSim::Math::Matrix33d& Jinv,
 												  Eigen::Matrix<double, 6, 24, Eigen::DontAlign> *B) const
 {
-	SURGSIM_ASSERT(B != nullptr) << "Trying to evalute the strain-displacmenet with a nullptr";
+	SURGSIM_ASSERT(B != nullptr) << "Trying to evaluate the strain-displacmenet with a nullptr";
 
-	// Zerout the strain-displacement
+	// Zero out the strain-displacement
 	B->setZero();
 
 	// Set non-zero entries of the strain-displacement
@@ -223,9 +217,9 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 		// Compute dNi/d(x,y,z) = dNi/d(epsilon,eta,mu) d(epsilon,eta,mu)/d(x,y,z)
 		//                      = J^{-1}.dNi/d(epsilon,eta,mu)
 		Vector3d dNidEpsilonEtaMu(
-			dNdepsilon(index, epsilon, eta, mu),
-			dNdeta(index, epsilon, eta, mu),
-			dNdmu(index, epsilon, eta, mu)
+			dShapeFunctiondepsilon(index, epsilon, eta, mu),
+			dShapeFunctiondeta(index, epsilon, eta, mu),
+			dShapeFunctiondmu(index, epsilon, eta, mu)
 		);
 		Vector3d dNidxyz = Jinv * dNidEpsilonEtaMu;
 
@@ -248,63 +242,72 @@ void FemElement3DCube::evaluateStrainDisplacement(double epsilon, double eta, do
 	}
 }
 
+void FemElement3DCube::buildConstitutiveMaterialMatrix(
+	Eigen::Matrix<double, 6, 6, Eigen::DontAlign>* constitutiveMatrix)
+{
+	// Compute the elasticity material matrix
+	// which is commonly based on the Lame coefficients (1st = lambda, 2nd = mu = shear modulus):
+	double lambda = m_E * m_nu / ((1.0 + m_nu) * (1.0 - 2.0 * m_nu));
+	double mu = m_E / (2.0 * (1 + m_nu));
+	constitutiveMatrix->setZero();
+	(*constitutiveMatrix)(0, 0) = (*constitutiveMatrix)(1, 1) = (*constitutiveMatrix)(2, 2) = 2.0 * mu + lambda;
+	(*constitutiveMatrix)(0, 1) = (*constitutiveMatrix)(0, 2) = (*constitutiveMatrix)(1, 0) = lambda;
+	(*constitutiveMatrix)(1, 2) = (*constitutiveMatrix)(2, 0) = (*constitutiveMatrix)(2, 1) = lambda;
+	(*constitutiveMatrix)(3, 3) = (*constitutiveMatrix)(4, 4) = (*constitutiveMatrix)(5, 5) = mu;
+}
+
 void FemElement3DCube::addStrainStressStiffnessAtPoint(const DeformableRepresentationState& state,
-	double epsilon, double eta, double mu,
-	double weightEpsilon, double weightEta, double weightMu,
+	const SurgSim::Math::gaussQuadraturePoint& epsilon,
+	const SurgSim::Math::gaussQuadraturePoint& eta,
+	const SurgSim::Math::gaussQuadraturePoint& mu,
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* strain,
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign>* stress,
 	Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* k)
 {
-	using SurgSim::Framework::Logger;
-
 	SurgSim::Math::Matrix33d J, Jinv;
 	double detJ;
 	Eigen::Matrix<double, 6, 24, Eigen::DontAlign> B;
 
-	evaluateJ(state, epsilon, eta, mu, &J, &Jinv, &detJ);
+	evaluateJ(state, epsilon.point, eta.point, mu.point, &J, &Jinv, &detJ);
 
-	evaluateStrainDisplacement(epsilon, eta, mu, Jinv, &B);
+	evaluateStrainDisplacement(epsilon.point, eta.point, mu.point, Jinv, &B);
 
-	{
-		// Compute the elasticity material matrix
-		// which is commonly based on the Lame coefficients (1st = lambda, 2nd = mu = shear modulus):
-		double lambda = m_E * m_nu / ((1.0 + m_nu) * (1.0 - 2.0 * m_nu));
-		double mu = m_E / (2.0 * (1 + m_nu));
-		m_constitutiveMaterial.setZero();
-		m_constitutiveMaterial(0, 0) = m_constitutiveMaterial(1, 1) = m_constitutiveMaterial(2, 2) = 2.0 * mu + lambda;
-		m_constitutiveMaterial(0, 1) = m_constitutiveMaterial(0, 2) = m_constitutiveMaterial(1, 0) = lambda;
-		m_constitutiveMaterial(1, 2) = m_constitutiveMaterial(2, 0) = m_constitutiveMaterial(2, 1) = lambda;
-		m_constitutiveMaterial(3, 3) = m_constitutiveMaterial(4, 4) = m_constitutiveMaterial(5, 5) = mu;
-	}
+	buildConstitutiveMaterialMatrix(&m_constitutiveMaterial);
 
-	*strain += (weightEpsilon * weightEta * weightMu * detJ) * B;
-	*stress += (weightEpsilon * weightEta * weightMu * detJ) * m_constitutiveMaterial * B;
-	*k += (weightEpsilon * weightEta * weightMu * detJ) * B.transpose() * m_constitutiveMaterial * B;
+	*strain += (epsilon.weight * eta.weight * mu.weight * detJ) * B;
+	*stress += (epsilon.weight * eta.weight * mu.weight * detJ) * m_constitutiveMaterial * B;
+	*k += (epsilon.weight * eta.weight * mu.weight * detJ) * B.transpose() * m_constitutiveMaterial * B;
 }
 
 void FemElement3DCube::addMassMatrixAtPoint(const DeformableRepresentationState& state,
-	double epsilon, double eta, double mu,
-	double weightEpsilon, double weightEta, double weightMu,
+	const SurgSim::Math::gaussQuadraturePoint& epsilon,
+	const SurgSim::Math::gaussQuadraturePoint& eta,
+	const SurgSim::Math::gaussQuadraturePoint& mu,
 	Eigen::Matrix<double, 24, 24, Eigen::DontAlign>* m)
 {
-	using SurgSim::Framework::Logger;
-
+	// This helper method hels to compute:
+	// M = rho * integration{over volume} {phi^T.phi} dV
+	//   = sum{i=1..2} sum{j=1..2} sum{k=1..2} (w_i * w_j * w_k * det(J) * rho * phi^T.phi)
+	// with phi = (N0  0  0 N1  0  0...)   a 3x24 matrix filled with shape functions
+	//            ( 0 N0  0  0 N1  0...)   evaluation at a given point.
+	//            ( 0  0 N0  0  0 N1...)
+	// by computing the term inside the sums: (w_i * w_j * w_k * det(J) * rho * phi^T.phi)
 	SurgSim::Math::Matrix33d J, Jinv;
+	SurgSim::Math::Matrix phi(3, 24);
 	double detJ;
-	SurgSim::Math::Matrix Ni(3, 24);
 
-	evaluateJ(state, epsilon, eta, mu, &J, &Jinv, &detJ);
+	evaluateJ(state, epsilon.point, eta.point, mu.point, &J, &Jinv, &detJ);
 
-	Ni.setZero();
+	phi.setZero();
 	for (size_t index = 0; index < 8; ++index)
 	{
-		double coef = N(index, epsilon, eta, mu);
-		Ni(0, getNumDofPerNode() * index    ) += coef;
-		Ni(1, getNumDofPerNode() * index + 1) += coef;
-		Ni(2, getNumDofPerNode() * index + 2) += coef;
+		double weightPerIndex = shapeFunction(index, epsilon.point, eta.point, mu.point);
+		phi(0, getNumDofPerNode() * index    ) += weightPerIndex;
+		phi(1, getNumDofPerNode() * index + 1) += weightPerIndex;
+		phi(2, getNumDofPerNode() * index + 2) += weightPerIndex;
 	}
 
-	*m += (weightEpsilon * weightEta * weightMu * detJ * m_rho) * Ni.transpose() * Ni;
+	*m += (epsilon.weight * eta.weight * mu.weight * detJ * m_rho) * phi.transpose() * phi;
 }
 
 void FemElement3DCube::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K,
@@ -343,14 +346,14 @@ void FemElement3DCube::addMatVec(const DeformableRepresentationState& state,
 		return;
 	}
 
-	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> xLoc, resLoc;
-	getSubVector(x, m_nodeIds, 3, &xLoc);
+	Eigen::Matrix<double, 24, 1, Eigen::DontAlign> xElement, fElement;
+	getSubVector(x, m_nodeIds, 3, &xElement);
 
 	// Adds the mass contribution
 	if (alphaM)
 	{
-		resLoc = alphaM * (m_mass * xLoc);
-		addSubVector(resLoc, m_nodeIds, 3, F);
+		fElement = alphaM * (m_mass * xElement);
+		addSubVector(fElement, m_nodeIds, 3, F);
 	}
 
 	// Adds the damping contribution (No damping)
@@ -358,8 +361,8 @@ void FemElement3DCube::addMatVec(const DeformableRepresentationState& state,
 	// Adds the stiffness contribution
 	if (alphaK)
 	{
-		resLoc = alphaK * (m_stiffness * xLoc);
-		addSubVector(resLoc, m_nodeIds, 3, F);
+		fElement = alphaK * (m_stiffness * xElement);
+		addSubVector(fElement, m_nodeIds, 3, F);
 	}
 }
 
@@ -376,18 +379,18 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 	//        V += weightEpsilon[i] * weightEta[j] * weightMu[k] * det(J(epsilon[i], eta[j], mu[k]))
 	for (int i = 0; i < 2; ++i)
 	{
-		double &epsilon = gaussQuadrature2Points[i].first;
-		double &weightEpsilon = gaussQuadrature2Points[i].second;
+		const double &epsilon = gaussQuadrature2Points[i].point;
+		const double &weightEpsilon = gaussQuadrature2Points[i].weight;
 
 		for (int j = 0; j < 2; ++j)
 		{
-			double &eta= gaussQuadrature2Points[j].first;
-			double &weightEta = gaussQuadrature2Points[j].second;
+			const double &eta= gaussQuadrature2Points[j].point;
+			const double &weightEta = gaussQuadrature2Points[j].weight;
 
 			for (int k = 0; k < 2; ++k)
 			{
-				double &mu= gaussQuadrature2Points[k].first;
-				double &weightMu = gaussQuadrature2Points[k].second;
+				const double &mu= gaussQuadrature2Points[k].point;
+				const double &weightMu = gaussQuadrature2Points[k].weight;
 
 				SurgSim::Math::Matrix33d J, Jinv;
 				double detJ;
@@ -412,7 +415,7 @@ double FemElement3DCube::getVolume(const DeformableRepresentationState& state) c
 	return v;
 }
 
-double FemElement3DCube::N(size_t i, double epsilon, double eta, double mu) const
+double FemElement3DCube::shapeFunction(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
@@ -420,7 +423,7 @@ double FemElement3DCube::N(size_t i, double epsilon, double eta, double mu) cons
 		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dNdepsilon(size_t i, double epsilon, double eta, double mu) const
+double FemElement3DCube::dShapeFunctiondepsilon(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		m_shapeFunctionsEpsilonSign[i] *
@@ -428,7 +431,7 @@ double FemElement3DCube::dNdepsilon(size_t i, double epsilon, double eta, double
 		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dNdeta(size_t i, double epsilon, double eta, double mu) const
+double FemElement3DCube::dShapeFunctiondeta(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
@@ -436,7 +439,7 @@ double FemElement3DCube::dNdeta(size_t i, double epsilon, double eta, double mu)
 		(1 + mu * m_shapeFunctionsMuSign[i]);
 }
 
-double FemElement3DCube::dNdmu(size_t i, double epsilon, double eta, double mu) const
+double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta, double mu) const
 {
 	return 1.0 / 8.0 *
 		(1 + epsilon * m_shapeFunctionsEpsilonSign[i]) *
