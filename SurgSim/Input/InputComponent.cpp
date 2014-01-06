@@ -70,9 +70,9 @@ private:
 };
 
 
-InputComponent::InputComponent(const std::string& name, const std::string& deviceName) :
+InputComponent::InputComponent(const std::string& name) :
 	Component(name),
-	m_deviceName(deviceName),
+	m_deviceName(),
 	m_deviceConnected(false),
 	m_input(std::make_shared<InputConsumer>())
 {
@@ -80,6 +80,11 @@ InputComponent::InputComponent(const std::string& name, const std::string& devic
 
 InputComponent::~InputComponent()
 {
+}
+
+void InputComponent::setDeviceName(const std::string& deviceName)
+{
+	m_deviceName = deviceName;
 }
 
 bool InputComponent::isDeviceConnected()

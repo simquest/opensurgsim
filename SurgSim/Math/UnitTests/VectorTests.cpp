@@ -976,6 +976,69 @@ TYPED_TEST(AllVectorTests, ArrayReadWrite)
 	}
 }
 
+TYPED_TEST(AllVectorTests, Interpolate)
+{
+	typedef typename TestFixture::Vector Vector;
+	typedef typename TestFixture::Scalar T;
+
+	T epsilon = static_cast<T>(1e-6);
+
+	T prevArray[5] = { 3.1f, 3.4f, 3.7f, 4.0f, 4.3f };
+	T nextArray[5] = { 7.2f, 0.6f, 4.8f, 5.1f, 8.9f };
+	T interpArray[5];
+
+	Vector prev(prevArray);
+	Vector next(nextArray);
+	Vector interp;
+
+	// 0.0
+	interpArray[0] = 3.1f * 1.0f + 7.2f * 0.0f;
+	interpArray[1] = 3.4f * 1.0f + 0.6f * 0.0f;
+	interpArray[2] = 3.7f * 1.0f + 4.8f * 0.0f;
+	interpArray[3] = 4.0f * 1.0f + 5.1f * 0.0f;
+	interpArray[4] = 4.3f * 1.0f + 8.9f * 0.0f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(prev));
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.0f)), epsilon));
+
+	// 1.0
+	interpArray[0] = 3.1f * 0.0f + 7.2f * 1.0f;
+	interpArray[1] = 3.4f * 0.0f + 0.6f * 1.0f;
+	interpArray[2] = 3.7f * 0.0f + 4.8f * 1.0f;
+	interpArray[3] = 4.0f * 0.0f + 5.1f * 1.0f;
+	interpArray[4] = 4.3f * 0.0f + 8.9f * 1.0f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(next));
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(1.0f)), epsilon));
+
+	// 0.5
+	interpArray[0] = 3.1f * 0.5f + 7.2f * 0.5f;
+	interpArray[1] = 3.4f * 0.5f + 0.6f * 0.5f;
+	interpArray[2] = 3.7f * 0.5f + 4.8f * 0.5f;
+	interpArray[3] = 4.0f * 0.5f + 5.1f * 0.5f;
+	interpArray[4] = 4.3f * 0.5f + 8.9f * 0.5f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.5f)), epsilon));
+
+	// 0.886
+	interpArray[0] = 3.1f * 0.114f + 7.2f * 0.886f;
+	interpArray[1] = 3.4f * 0.114f + 0.6f * 0.886f;
+	interpArray[2] = 3.7f * 0.114f + 4.8f * 0.886f;
+	interpArray[3] = 4.0f * 0.114f + 5.1f * 0.886f;
+	interpArray[4] = 4.3f * 0.114f + 8.9f * 0.886f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.886f)), epsilon));
+
+	// 0.623
+	interpArray[0] = 3.1f * 0.377f + 7.2f * 0.623f;
+	interpArray[1] = 3.4f * 0.377f + 0.6f * 0.623f;
+	interpArray[2] = 3.7f * 0.377f + 4.8f * 0.623f;
+	interpArray[3] = 4.0f * 0.377f + 5.1f * 0.623f;
+	interpArray[4] = 4.3f * 0.377f + 8.9f * 0.623f;
+	interp = Vector(interpArray);
+	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.623f)), epsilon));
+}
+
 // TO DO:
 // testing numerical validity
 // testing for denormalized numbers

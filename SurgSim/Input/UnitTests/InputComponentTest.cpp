@@ -28,19 +28,21 @@ using SurgSim::DataStructures::DataGroup;
 
 TEST(InputComponentTest, CanConstruct)
 {
-	EXPECT_NO_THROW(InputComponent input("Input", "InputDevice"););
+	EXPECT_NO_THROW(InputComponent input("Input"); input.setDeviceName("InputDevice"));
 }
 
 TEST(InputComponentTest, Accessors)
 {
-	InputComponent input("Input", "InputDevice");
+	InputComponent input("Input");
+	input.setDeviceName("InputDevice");
 	EXPECT_EQ("Input", input.getName());
 	EXPECT_EQ("InputDevice", input.getDeviceName());
 }
 
 TEST(InputComponentTest, NotConnected)
 {
-	InputComponent input("Input", "InputDevice");
+	InputComponent input("Input");
+	input.setDeviceName("InputDevice");
 	DataGroup dataGroup;
 	EXPECT_THROW(input.getData(&dataGroup), SurgSim::Framework::AssertionFailure);
 	EXPECT_FALSE(input.isDeviceConnected());
