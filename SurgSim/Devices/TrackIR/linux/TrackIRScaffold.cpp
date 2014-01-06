@@ -376,7 +376,7 @@ bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
 	SURGSIM_ASSERT(deviceData->thread)  << "No thread attached to device " << deviceData->deviceObject->getName();
 
-	std::unique_ptr<TrackIRThread> thread = std::move(data->thread);
+	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->thread);
 	thread->stop();
 	thread.reset();
 
