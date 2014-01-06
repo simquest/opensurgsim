@@ -259,6 +259,7 @@ private:
 	virtual bool doUpdate(double dt)
 	{
 		++count;
+		processComponents();
 		return true;
 	};
 

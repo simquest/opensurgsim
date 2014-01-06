@@ -188,3 +188,43 @@ TEST(RuntimeTest, PauseResume)
 	runtime->stop();
 }
 
+TEST(RuntimeTest, AddComponentAddDuringRuntime)
+{
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>();
+	std::shared_ptr<MockManager> manager = std::make_shared<MockManager>();
+	runtime->addManager(manager);
+	std::shared_ptr<Scene> scene = runtime->getScene();
+
+	std::vector<std::shared_ptr<MockComponent>> components;
+
+	auto element = std::make_shared<MockSceneElement>("one");
+	components.push_back(std::make_shared<MockComponent>("one"));
+	components.push_back(std::make_shared<MockComponent>("two"));
+
+	scene->addSceneElement(element);
+
+	runtime->start(true);
+
+	EXPECT_TRUE(manager->didInitialize);
+	EXPECT_TRUE(manager->didStartUp);
+	EXPECT_FALSE(manager->didBeforeStop);
+
+	// Make sure we are out of initialization completely
+	runtime->step();
+
+	EXPECT_FALSE(components[0]->isInitialized());
+	EXPECT_FALSE(components[0]->isAwake());
+
+	EXPECT_TRUE(element->addComponent(components[0]));
+
+	EXPECT_TRUE(components[0]->isInitialized());
+	EXPECT_FALSE(components[0]->isAwake());
+
+	runtime->step();
+	runtime->step(); // Right now step is still non-blocking, make sure the thread has finished processing...
+
+	EXPECT_TRUE(components[0]->isInitialized());
+	EXPECT_TRUE(components[0]->isAwake());
+	
+	runtime->stop();
+}
