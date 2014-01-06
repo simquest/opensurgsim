@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
-	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();;
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box"));
 	scene->addSceneElement(createPlane("plane",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));

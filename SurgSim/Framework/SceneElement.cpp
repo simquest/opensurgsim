@@ -97,7 +97,7 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 
 bool SceneElement::initialize()
 {
-	SURGSIM_ASSERT(! m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
+	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
 	m_isInitialized = doInitialize();
 
 	if (m_isInitialized)
@@ -174,7 +174,7 @@ std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
 	}
 	catch (const std::exception&)
 	{
-		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr";
+		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr.";
 	}
 	return result;
 }

@@ -31,7 +31,8 @@ TEST(SceneTest, ConstructorTest)
 
 TEST(SceneTest, ElementManagement)
 {
-	std::shared_ptr<Scene> scene(new Scene(std::make_shared<Runtime>()));
+	auto runtime(std::make_shared<Runtime>());
+	std::shared_ptr<Scene> scene = runtime->getScene();
 	std::shared_ptr<MockSceneElement> element1(new MockSceneElement("one"));
 	std::shared_ptr<MockSceneElement> element2(new MockSceneElement("two"));
 
@@ -42,8 +43,8 @@ TEST(SceneTest, ElementManagement)
 	scene->addSceneElement(element2);
 	EXPECT_EQ(2u, scene->getSceneElements().size());
 
-	scene->addSceneElement(element1);
-	EXPECT_EQ(3u, scene->getSceneElements().size());
+	EXPECT_ANY_THROW(scene->addSceneElement(element1));
+	EXPECT_EQ(2u, scene->getSceneElements().size());
 
 	EXPECT_EQ(element1, scene->getSceneElement("one"));
 	EXPECT_EQ(element2, scene->getSceneElement("two"));
@@ -52,7 +53,8 @@ TEST(SceneTest, ElementManagement)
 
 TEST(SceneTest, AddAndTestScene)
 {
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>(std::make_shared<Runtime>());
+	auto runtime(std::make_shared<Runtime>());
+	std::shared_ptr<Scene> scene = runtime->getScene();
 	std::shared_ptr<MockSceneElement> element = std::make_shared<MockSceneElement>("element");
 	std::shared_ptr<MockComponent> component = std::make_shared<MockComponent>("component");
 
@@ -62,6 +64,30 @@ TEST(SceneTest, AddAndTestScene)
 	EXPECT_EQ(scene, component->getScene());
 	EXPECT_EQ(element, component->getSceneElement());
 	EXPECT_EQ(scene, element->getScene());
+}
+
+TEST(SceneTest, CheckForExpiredRuntime)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = std::make_shared<Scene>(runtime);
+
+	auto element0 = std::make_shared<MockSceneElement>("element0");
+	auto element1 = std::make_shared<MockSceneElement>("element1");
+
+	auto component0 = std::make_shared<MockComponent>("component0");
+	auto component1 = std::make_shared<MockComponent>("component1");
+
+	// This is the normal behavior
+	EXPECT_NO_THROW(scene->addSceneElement(element0));
+	EXPECT_NO_THROW(element0->addComponent(component0));
+
+	// invalidate runtime pointer, this will cause the weak_ptr inside of scene and sceneelement
+	// to expire
+	runtime.reset();
+
+	// We should not be able to do this with an expired runtime pointer 
+	EXPECT_THROW(scene->addSceneElement(element1), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(element0->addComponent(component1), SurgSim::Framework::AssertionFailure);
 }
 
 }

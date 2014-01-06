@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "SurgSim/Framework/SceneElement.h"
 
@@ -66,6 +67,9 @@ private:
 	std::weak_ptr<Runtime> m_runtime;
 
 	std::multimap<std::string, std::shared_ptr<SceneElement>> m_elements;
+
+	// Used in a const function, need to declare mutable
+	mutable boost::mutex m_sceneElementsMutex;
 };
 
 }; // namespace Framework

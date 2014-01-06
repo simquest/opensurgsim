@@ -20,6 +20,7 @@
 #include "SurgSim/Framework/Log.h"
 
 #include <utility>
+#include <boost/thread/locks.hpp>
 
 
 namespace SurgSim
@@ -43,22 +44,29 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 	std::string name = element->getName();
 	element->setScene(getSharedPtr());
 
-	m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
 	if (!m_runtime.expired())
 	{
 		std::shared_ptr<Runtime> runtime = m_runtime.lock();
 		element->setRuntime(runtime);
 		if (element->initialize())
 		{
+			boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
+			m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
 			runtime->addSceneElement(element);
 		}
 	}
+	else
+	{
+		SURGSIM_FAILURE() << "Runtime pointer is expired, cannot add SceneElement to Scene.";
+	}
+
 }
 
 std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) const
 {
+	std::shared_ptr<SceneElement> result;	
+	boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
 	auto found = m_elements.find(name);
-	std::shared_ptr<SceneElement> result;
 	if (found != m_elements.end())
 	{
 		result = found->second;
