@@ -14,8 +14,9 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/CapsuleSphereDcdContact.h"
-#include "SurgSim/Collision/CollisionPair.h"
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/RigidTransform.h"

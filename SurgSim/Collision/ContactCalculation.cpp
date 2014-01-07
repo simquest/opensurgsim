@@ -15,6 +15,9 @@
 
 #include "SurgSim/Collision/ContactCalculation.h"
 
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Math/Shape.h"
+
 namespace SurgSim
 {
 namespace Collision
