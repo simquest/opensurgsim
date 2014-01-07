@@ -57,7 +57,7 @@ private:
 	/// node's children. Once a leaf node is reached, contacts are added to the
 	/// CollisionPair.
 	/// \param node the octree node to collide with
-	/// \param pair the collision pair that is under consideration
+	/// \param [in/out] pair the collision pair that is under consideration
 	/// \param nodePath the path of the current node
 	void calculateContactWithNode(std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> node,
 			std::shared_ptr<CollisionPair> pair,
