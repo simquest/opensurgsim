@@ -32,7 +32,8 @@ void main(void)
 {
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
-	//compute light coord
-    lightCoord = oss_lightProjectionMatrix * oss_lightViewMatrix * oss_inverseViewMatrix * gl_ModelViewMatrix *  gl_Vertex;
+	// compute the coordinates of the incoming point in the space of the camera used
+	// to render the depth map
+	lightCoord = oss_lightProjectionMatrix * oss_lightViewMatrix * oss_inverseViewMatrix * gl_ModelViewMatrix *  gl_Vertex;
 } 
  

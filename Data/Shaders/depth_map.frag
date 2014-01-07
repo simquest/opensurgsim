@@ -14,8 +14,7 @@
 // limitations under the License.
 
 /// \file depth.frag
-/// Calculate the distance of fragments from a given origin (in most cases 
-/// a light source)
+/// Encode the z-depth of the fragment into rgba values
 
 vec4 encodeDepth(float depth)
 {

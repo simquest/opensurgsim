@@ -14,9 +14,7 @@
 // limitations under the License.
 
 /// \file depth.vert
-/// Vertex shader to produce simple depth map
-
-attribute vec4 osg_Vertex;
+/// Passthrough shader, transform the vertex into camera ModelView space
 
 void main(void) 
 {
