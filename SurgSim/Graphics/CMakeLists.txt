@@ -151,7 +151,11 @@ surgsim_add_library(
 )
 
 SET(LIBS
+	SurgSimDataStructures
 	SurgSimFramework
+	SurgSimInput
+	KeyboardDevice
+	MouseDevice
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 

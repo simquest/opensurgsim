@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,35 +17,33 @@
 include_directories(
 	${gtest_SOURCE_DIR}/include
 	${gtest_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
-	MultiAxisDeviceTest.cpp
-	RawMultiAxisDeviceTest.cpp
-	RawMultiAxisScaffoldTest.cpp
+	RenderTest.cpp
+	TruthCubeRenderTest.cpp
 )
 
 set(UNIT_TEST_HEADERS
+	RenderTest.h
 )
 
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
 set(LIBS
-	MultiAxisDevice
+	SurgSimGraphics
+	SurgSimPhysics
 	gmock
 	gtest
 )
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-if(WDK_FOUND)
-	list(APPEND LIBS ${WDK_LIBRARIES})
-endif()
+surgsim_add_unit_tests(SurgSimPhysicsRenderTest)
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS
-	"Run the MultiAxis device tests as part of unit tests.  (Requires a multi-axis controller device, e.g. Logitech's 3DConnexion SpaceNavigator.)"
-	OFF)
-surgsim_add_unit_tests(MultiAxisDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_MULTIAXIS})
-
-# Put MultiAxisDeviceTest into folder "Devices"
-set_target_properties(MultiAxisDeviceTest PROPERTIES FOLDER "Devices")
+# Put SurgSimPhysicsTest into folder "Physics"
+set_target_properties(SurgSimPhysicsRenderTest PROPERTIES FOLDER "Physics")

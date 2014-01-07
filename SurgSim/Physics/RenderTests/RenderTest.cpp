@@ -13,44 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Graphics/View.h"
-#include "SurgSim/Graphics/ViewElement.h"
+#include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 namespace SurgSim
 {
-namespace Graphics
+namespace Physics
 {
-using SurgSim::Graphics::View;
-using SurgSim::Graphics::ViewElement;
 
-ViewElement::ViewElement(const std::string& name, std::shared_ptr<View> view) : SceneElement(name), m_view(view)
+void RenderTests::SetUp()
 {
+	runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+
+	runtime->addManager(graphicsManager);
+	scene = std::make_shared<SurgSim::Framework::Scene>();
+	runtime->setScene(scene);
+
+	viewElement = std::make_shared<SurgSim::Graphics::OsgViewElement>("Physics Render Scene");
+	scene->addSceneElement(viewElement);
 }
 
-ViewElement::~ViewElement()
+void RenderTests::TearDown()
 {
+	runtime->stop();
 }
 
-bool ViewElement::setView(std::shared_ptr<View> view)
-{
-	m_view = view;
-	return true;
-}
-
-std::shared_ptr<View> ViewElement::getView() const
-{
-	return m_view;
-}
-
-bool ViewElement::doInitialize()
-{
-	addComponent(m_view);
-	return true;
-}
-bool ViewElement::doWakeUp()
-{
-	return true;
-}
-
-}; // End of namespace Graphics
-}; // End of namespace SurgSim
+}; // namespace Physics
+}; // namespace SurgSim

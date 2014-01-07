@@ -40,10 +40,13 @@ class OutputComponent : public SurgSim::Framework::Component
 public:
 	/// Constructor
 	/// \param name Name of this output component
-	/// \param deviceName Name of the device this output component connects
-	OutputComponent(const std::string& name, const std::string& deviceName);
+	OutputComponent(const std::string& name);
 	/// Destructor
 	virtual ~OutputComponent();
+
+	/// Set name of the device of output component.
+	/// param	deviceName	The name of the device that will receive the output data.
+	void setDeviceName(const std::string& deviceName);
 
 	/// Is a device connected
 	/// \return true if a device has been connected.

@@ -56,5 +56,5 @@ TEST(OsgViewElementTests, ViewTest)
 	EXPECT_EQ(osgView, element->getView());
 }
 
-}  // namespace Graphics
-}  // namespace SurgSim
+};  // namespace Graphics
+};  // namespace SurgSim

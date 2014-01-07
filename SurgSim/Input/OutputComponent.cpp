@@ -70,9 +70,9 @@ private:
 	bool m_haveData;
 };
 
-OutputComponent::OutputComponent(const std::string& name, const std::string& deviceName) :
+OutputComponent::OutputComponent(const std::string& name) :
 	Component(name),
-	m_deviceName(deviceName),
+	m_deviceName(),
 	m_deviceConnected(false),
 	m_output(std::make_shared<OutputProducer>())
 {
@@ -80,6 +80,11 @@ OutputComponent::OutputComponent(const std::string& name, const std::string& dev
 
 OutputComponent::~OutputComponent()
 {
+}
+
+void OutputComponent::setDeviceName(const std::string& deviceName)
+{
+	m_deviceName = deviceName;
 }
 
 bool OutputComponent::isDeviceConnected()
