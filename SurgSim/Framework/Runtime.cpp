@@ -273,17 +273,23 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData() const
 
 void Runtime::addComponent(const std::shared_ptr<Component>& component)
 {
-	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	if (m_isRunning)
 	{
-		(*it)->enqueueAddComponent(component);
+		for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+		{
+			(*it)->enqueueAddComponent(component);
+		}
 	}
 }
 
 void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 {
-	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	if (m_isRunning)
 	{
-		(*it)->enqueueRemoveComponent(component);
+		for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+		{
+			(*it)->enqueueRemoveComponent(component);
+		}
 	}
 }
 

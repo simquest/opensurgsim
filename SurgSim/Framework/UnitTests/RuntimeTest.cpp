@@ -202,6 +202,7 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 	components.push_back(std::make_shared<MockComponent>("two"));
 
 	scene->addSceneElement(element);
+	element->addComponent(components[0]);
 
 	runtime->start(true);
 
@@ -212,19 +213,19 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 	// Make sure we are out of initialization completely
 	runtime->step();
 
-	EXPECT_FALSE(components[0]->isInitialized());
-	EXPECT_FALSE(components[0]->isAwake());
+	EXPECT_FALSE(components[1]->isInitialized());
+	EXPECT_FALSE(components[1]->isAwake());
 
-	EXPECT_TRUE(element->addComponent(components[0]));
+	EXPECT_TRUE(element->addComponent(components[1]));
 
-	EXPECT_TRUE(components[0]->isInitialized());
-	EXPECT_FALSE(components[0]->isAwake());
+	EXPECT_TRUE(components[1]->isInitialized());
+	EXPECT_FALSE(components[1]->isAwake());
 
 	runtime->step();
 	runtime->step(); // Right now step is still non-blocking, make sure the thread has finished processing...
 
-	EXPECT_TRUE(components[0]->isInitialized());
-	EXPECT_TRUE(components[0]->isAwake());
+	EXPECT_TRUE(components[1]->isInitialized());
+	EXPECT_TRUE(components[1]->isAwake());
 	
 	runtime->stop();
 }
