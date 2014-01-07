@@ -146,13 +146,38 @@ TEST_F(Fem3DRepresentationLocalizationTest, FemRepresentationCoordinate)
 TEST_F(Fem3DRepresentationLocalizationTest, SetGetLocalization)
 {
 	using SurgSim::Math::Vector4d;
+	using SurgSim::Math::Vector3d;
 
-	auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
+	{
+		// Uninitialized Representation
+		auto localization = std::make_shared<Fem3DRepresentationLocalization>();
+		EXPECT_THROW(localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector4d(1.0, 0.0, 0.0, 0.0))),
+			SurgSim::Framework::AssertionFailure);
+	}
 
-	localization->setLocalPosition(FemRepresentationCoordinate(6u, Vector4d(0.25, 0.55, 0.73, 0.11)));
+	{
+		// Incorrectly formed natural coordinate
+		auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
+		EXPECT_THROW(localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector4d(0.25, 0.55, 0.73, 0.11))),
+			SurgSim::Framework::AssertionFailure);
 
-	EXPECT_EQ(6u, localization->getLocalPosition().elementId);
-	EXPECT_TRUE(Vector4d(0.25, 0.55, 0.73, 0.11).isApprox(localization->getLocalPosition().naturalCoordinate));
+		EXPECT_THROW(localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector3d(1.0, 0.0, 0.0))),
+			SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		// Out of bounds element Id
+		auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
+		EXPECT_THROW(localization->setLocalPosition(FemRepresentationCoordinate(6u, Vector4d(1.0, 0.0, 0.0, 0.0))),
+			SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		auto localization = std::make_shared<Fem3DRepresentationLocalization>(m_fem);
+		EXPECT_NO_THROW(localization->setLocalPosition(FemRepresentationCoordinate(1u, Vector4d(0.1, 0.1, 0.4, 0.4))));
+		EXPECT_EQ(1u, localization->getLocalPosition().elementId);
+		EXPECT_TRUE(Vector4d(0.1, 0.1, 0.4, 0.4).isApprox(localization->getLocalPosition().naturalCoordinate));
+	}
 }
 
 TEST_F(Fem3DRepresentationLocalizationTest, CalculatePositionTest)
@@ -226,19 +251,6 @@ TEST_F(Fem3DRepresentationLocalizationTest, CalculatePositionTest)
 	// + 0.07 * ( 1.0,  0.0, -1.0) => (0.07, 0.0,  -0.07)
 	//                              = (0.74, 0.82, -0.22)
 	EXPECT_TRUE(Vector3d(0.74, 0.82, -0.22).isApprox(localization->calculatePosition(), epsilon));
-
-	// Ill-formed testing
-	// Out of bounds elementId
-	localization->setLocalPosition(FemRepresentationCoordinate(5u, Vector4d(0.11, 0.15, 0.67, 0.07)));
-	EXPECT_THROW(localization->calculatePosition(), SurgSim::Framework::AssertionFailure);
-
-	// Non-barycentric coordinate
-	localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector4d(0.11, 0.15, 1.67, 0.07)));
-	EXPECT_THROW(localization->calculatePosition(), SurgSim::Framework::AssertionFailure);
-
-	// Incorrect barycentric coordinate size
-	localization->setLocalPosition(FemRepresentationCoordinate(0u, Vector3d(0.11, 0.15, 0.74)));
-	EXPECT_THROW(localization->calculatePosition(), SurgSim::Framework::AssertionFailure);
 }
 
 } // namespace SurgSim

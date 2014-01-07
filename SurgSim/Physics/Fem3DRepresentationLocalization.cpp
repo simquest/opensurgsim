@@ -43,6 +43,14 @@ Fem3DRepresentationLocalization::~Fem3DRepresentationLocalization()
 
 void Fem3DRepresentationLocalization::setLocalPosition(const FemRepresentationCoordinate& p)
 {
+	auto femRepresentation = std::static_pointer_cast<Fem3DRepresentation>(getRepresentation());
+
+	SURGSIM_ASSERT(femRepresentation != nullptr) << "FemRepresentation is null, it was probably not" <<
+		" initialized";
+
+	SURGSIM_ASSERT(femRepresentation->isValidCoordinate(p))
+		<< "FemRepresentationCoordinate is invalid for Representation " << getRepresentation()->getName();
+
 	m_position = p;
 }
 

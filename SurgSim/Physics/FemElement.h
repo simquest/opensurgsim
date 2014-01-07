@@ -164,6 +164,10 @@ public:
 	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
 
+	/// Determines whether a given natural coordinate is valid
+	/// \return True if valid
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const = 0;
+
 	/// Computes a given natural coordinate in cartesian coordinates
 	/// \param state The state at which to transform coordinates
 	/// \param naturalCoordinate The coordinates to transform

@@ -30,6 +30,8 @@ namespace SurgSim
 namespace Physics
 {
 
+struct FemRepresentationCoordinate;
+
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
 /// \note Therefore, it defines a dynamic system M.a=F(x,v)
@@ -64,6 +66,10 @@ public:
 	/// \note The FemElement is returned with read/write access
 	/// \note Out of range femElementId will raise an exception
 	std::shared_ptr<FemElement> getFemElement(unsigned int femElementId);
+
+	/// Determines whether the associated coordinate is valid
+	/// \return True if coordinate is valid
+	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
 
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)
