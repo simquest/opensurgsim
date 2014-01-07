@@ -62,7 +62,7 @@ using SurgSim::Graphics::OsgTexture2d;
 #include <osg/Matrix>
 #include <osg/Camera>
 
-#include "Examples/GraphicsScene/PoseInterpolator.h"
+#include "Surgsim/Blocks/PoseInterpolator.h"
 
 namespace
 {
@@ -133,7 +133,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	viewElement->addComponent(light);
 
 	// Move the light from left to right over along the scene
-	auto interpolator = std::make_shared<PoseInterpolator>("Interpolator");
+	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator");
 	RigidTransform3d from = makeRigidTransform(Vector3d(4.0, 3.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	RigidTransform3d to = makeRigidTransform(Vector3d(-4.0, 3.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	interpolator->setTarget(light);
@@ -331,8 +331,8 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	camera->setPose(pose);
 	camera->setMaterial(material);
 
-	// Move the light from left to right over along the scene
-	auto interpolator = std::make_shared<PoseInterpolator>("Interpolator_2");
+	// Move the camera from left to right over along the scene
+	auto interpolator = std::make_shared<SurgSim::Blocks::PoseInterpolator>("Interpolator_2");
 	RigidTransform3d from = makeRigidTransform(Vector3d(-4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	RigidTransform3d to = makeRigidTransform(Vector3d(4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	interpolator->setTarget(camera);

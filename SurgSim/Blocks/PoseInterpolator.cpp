@@ -13,15 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Examples/GraphicsScene/PoseInterpolator.h"
+#include "SurgSim/Blocks/PoseInterpolator.h"
 
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Graphics/Representation.h"
 
 #include <memory>
 
 using SurgSim::Math::RigidTransform3d;
+namespace SurgSim
+{
+namespace Blocks
+{
 
 PoseInterpolator::PoseInterpolator(const std::string& name) :
 	Behavior(name),
@@ -73,24 +76,25 @@ void PoseInterpolator::update(double dt)
 {
 	m_currentTime += dt;
 
-	m_target->setPose(SurgSim::Math::interpolate(m_from, m_to, m_currentTime/m_duration));
-
-	if (m_currentTime > m_duration)
+	if (m_currentTime >= m_duration)
 	{
 		if (isLoop())
 		{
-			m_currentTime = 0.0;
+			m_currentTime = m_currentTime - m_duration;
 		}
 		else if (isPingPong())
 		{
-			m_currentTime = 0.0;
+			m_currentTime = m_currentTime - m_duration;
 			std::swap(m_from, m_to);
 		}
 		else
 		{
+			m_currentTime = m_duration;
 			getSceneElement()->removeComponent(getName());
 		}
 	}
+
+	m_target->setPose(SurgSim::Math::interpolate(m_from, m_to, m_currentTime/m_duration));
 }
 
 void PoseInterpolator::setLoop(bool val)
@@ -120,3 +124,6 @@ bool PoseInterpolator::isPingPong()
 {
 	return m_pingpong;
 }
+
+}; // Blocks
+}; // Surgsim
