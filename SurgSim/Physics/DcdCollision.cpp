@@ -76,6 +76,16 @@ void DcdCollision::populateCalculationTable()
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::BoxSphereDcdContact>());
 	setDcdContactInTable(std::make_shared<SurgSim::Collision::CapsuleSphereDcdContact>());
+
+	// Add the Octree contact calculations using the box contact calculations
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
+				std::make_shared<SurgSim::Collision::BoxCapsuleDcdContact>()));
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
+				std::make_shared<SurgSim::Collision::BoxDoubleSidedPlaneDcdContact>()));
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
+				std::make_shared<SurgSim::Collision::BoxPlaneDcdContact>()));
+	setDcdContactInTable(std::make_shared<SurgSim::Collision::OctreeDcdContact>(
+				std::make_shared<SurgSim::Collision::BoxSphereDcdContact>()));
 }
 
 void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
