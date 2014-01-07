@@ -25,6 +25,16 @@ namespace SurgSim
 namespace Physics
 {
 
+/// Implementation of Localization for Fem3DRepresentation
+///
+/// Fem3DRepresentationLocalization tracks the global coordinates of an FemRepresentationCoordinate associated with an
+/// Fem3DRepresentation.  It is used, for example, as a helper class for filling out the MlcpPhysicsProblem in
+/// Fem3DRepresentationContact::doBuild, which constrains the motion of Fem3DRepresentation at a frictionless contact.
+///
+/// Fem3DRepresentationLocalization stores a pointer to a Fem3DRepresentation in an abstract Representation object.  It
+/// holds an FemRepresentationCoordinate, which contains a barycentric coordinate and the ID of an FemElement associated
+/// with an Fem3DRepresentation, and it provides a helper function Fem3DRepresentationLocalization::calculatePosition to
+/// find the FemRepresentationCoordinate in coordinates in the current DeformableRepresentationState.
 class Fem3DRepresentationLocalization : public Localization
 {
 public:
@@ -55,7 +65,7 @@ private:
 	/// Calculates the global position of this localization.
 	/// \param time The time in [0..1] at which the position should be calculated.
 	/// \return The global position of the localization at the requested time.
-	/// \note time can useful when dealing with CCD.
+	/// \note time can be useful when dealing with CCD.
 	SurgSim::Math::Vector3d doCalculatePosition(double time);
 
 	/// Barycentric position in local coordinates

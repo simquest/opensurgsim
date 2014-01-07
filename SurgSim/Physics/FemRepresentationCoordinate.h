@@ -24,6 +24,7 @@ namespace SurgSim
 namespace Physics
 {
 
+/// Structure which contains the elementId of an FemElement in an FemRepresentation and a coordinate in the FemElement.
 struct FemRepresentationCoordinate {
 	/// Default constructor with no initialization.
 	FemRepresentationCoordinate();
