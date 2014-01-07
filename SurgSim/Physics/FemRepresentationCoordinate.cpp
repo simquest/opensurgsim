@@ -27,8 +27,8 @@ FemRepresentationCoordinate::FemRepresentationCoordinate()
 }
 
 FemRepresentationCoordinate::FemRepresentationCoordinate(unsigned int elementId,
-														 SurgSim::Math::Vector barycentricCoordinate) :
-	elementId(elementId), barycentricCoordinate(barycentricCoordinate)
+														 SurgSim::Math::Vector naturalCoordinate) :
+	elementId(elementId), naturalCoordinate(naturalCoordinate)
 {
 
 }

@@ -64,17 +64,17 @@ SurgSim::Math::Vector3d Fem3DRepresentationLocalization::doCalculatePosition(dou
 
 	if (time == 0.0)
 	{
-		return femElement->computeCartesianCoordinate(*previousState, m_position.barycentricCoordinate);
+		return femElement->computeCartesianCoordinate(*previousState, m_position.naturalCoordinate);
 	}
 	else if (time == 1.0)
 	{
-		return femElement->computeCartesianCoordinate(*currentState, m_position.barycentricCoordinate);
+		return femElement->computeCartesianCoordinate(*currentState, m_position.naturalCoordinate);
 	}
 
 	const SurgSim::Math::Vector& currentPosition = femElement->computeCartesianCoordinate(*previousState,
-		m_position.barycentricCoordinate);
+		m_position.naturalCoordinate);
 	const SurgSim::Math::Vector& previousPosition = femElement->computeCartesianCoordinate(*currentState,
-		m_position.barycentricCoordinate);
+		m_position.naturalCoordinate);
 
 	return previousPosition + time * (currentPosition - previousPosition);
 }

@@ -397,13 +397,13 @@ void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentati
 
 SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
-	const SurgSim::Math::Vector &barycentricCoordinate) const
+	const SurgSim::Math::Vector &naturalCoordinate) const
 {
-	SURGSIM_ASSERT(std::abs(barycentricCoordinate.sum() - 1.0) < 1e-6)
-		<< "barycentricCoordinate must be normalized.";
+	SURGSIM_ASSERT(std::abs(naturalCoordinate.sum() - 1.0) < 1e-6)
+		<< "naturalCoordinate must be normalized.";
 
-	SURGSIM_ASSERT(barycentricCoordinate.size() == 4)
-		<< "barycentricCoordinate must be length 4.";
+	SURGSIM_ASSERT(naturalCoordinate.size() == 4)
+		<< "naturalCoordinate must be length 4.";
 
 	const Vector& x = state.getPositions();
 	auto p0 = getSubVector(x, m_nodeIds[0], 3);
@@ -414,10 +414,10 @@ SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 	SurgSim::Math::Vector3d result;
 	for (int i = 0; i < 3; i++)
 	{
-		result[i] = barycentricCoordinate(0) * p0(i)
-				  + barycentricCoordinate(1) * p1(i)
-				  + barycentricCoordinate(2) * p2(i)
-				  + barycentricCoordinate(3) * p3(i);
+		result[i] = naturalCoordinate(0) * p0(i)
+				  + naturalCoordinate(1) * p1(i)
+				  + naturalCoordinate(2) * p2(i)
+				  + naturalCoordinate(3) * p3(i);
 	}
 	return result;
 }

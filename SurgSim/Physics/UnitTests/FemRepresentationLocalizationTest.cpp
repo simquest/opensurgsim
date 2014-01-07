@@ -131,15 +131,15 @@ TEST_F(Fem3DRepresentationLocalizationTest, FemRepresentationCoordinate)
 	{
 		FemRepresentationCoordinate coord(6u, Vector4d(0.25, 0.55, 0.73, 0.11));
 		EXPECT_EQ(6u, coord.elementId);
-		EXPECT_TRUE(Vector4d(0.25, 0.55, 0.73, 0.11).isApprox(coord.barycentricCoordinate));
+		EXPECT_TRUE(Vector4d(0.25, 0.55, 0.73, 0.11).isApprox(coord.naturalCoordinate));
 	}
 
 	{
 		FemRepresentationCoordinate coord;
 		coord.elementId = 12u;
-		coord.barycentricCoordinate = Vector4d(0.33, 0.1, 0.05, 0.99);
+		coord.naturalCoordinate = Vector4d(0.33, 0.1, 0.05, 0.99);
 		EXPECT_EQ(12u, coord.elementId);
-		EXPECT_TRUE(Vector4d(0.33, 0.1, 0.05, 0.99).isApprox(coord.barycentricCoordinate));
+		EXPECT_TRUE(Vector4d(0.33, 0.1, 0.05, 0.99).isApprox(coord.naturalCoordinate));
 	}
 }
 
@@ -152,7 +152,7 @@ TEST_F(Fem3DRepresentationLocalizationTest, SetGetLocalization)
 	localization->setLocalPosition(FemRepresentationCoordinate(6u, Vector4d(0.25, 0.55, 0.73, 0.11)));
 
 	EXPECT_EQ(6u, localization->getLocalPosition().elementId);
-	EXPECT_TRUE(Vector4d(0.25, 0.55, 0.73, 0.11).isApprox(localization->getLocalPosition().barycentricCoordinate));
+	EXPECT_TRUE(Vector4d(0.25, 0.55, 0.73, 0.11).isApprox(localization->getLocalPosition().naturalCoordinate));
 }
 
 TEST_F(Fem3DRepresentationLocalizationTest, CalculatePositionTest)

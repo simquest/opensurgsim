@@ -164,13 +164,13 @@ public:
 	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) = 0;
 
-	/// Computes a given barycentric coordinate in cartesian coordinates
+	/// Computes a given natural coordinate in cartesian coordinates
 	/// \param state The state at which to transform coordinates
-	/// \param barycentricCoordinate The coordinates to transform
+	/// \param naturalCoordinate The coordinates to transform
 	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
-		const SurgSim::Math::Vector &barycentricCoordinate) const = 0;
+		const SurgSim::Math::Vector &naturalCoordinate) const = 0;
 
 protected:
 	/// Sets the number of degrees of freedom per node
