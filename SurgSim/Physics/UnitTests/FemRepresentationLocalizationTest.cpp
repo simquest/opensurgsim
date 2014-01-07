@@ -23,6 +23,7 @@
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 using SurgSim::Physics::Fem3DRepresentation;
 using SurgSim::Physics::Fem3DRepresentationLocalization;
+using SurgSim::Math::getSubVector;
 
 #include "SurgSim/Math/Vector.h"
 
@@ -59,12 +60,13 @@ public:
 		auto state = std::make_shared<DeformableRepresentationState>();
 		state->setNumDof(3, 6);
 
-		state->getPositions().segment<3>(0 * 3) = Vector3d( 0.0,  0.0,  0.0);
-		state->getPositions().segment<3>(1 * 3) = Vector3d( 0.0,  1.0, -1.0);
-		state->getPositions().segment<3>(2 * 3) = Vector3d(-1.0,  1.0,  0.0);
-		state->getPositions().segment<3>(3 * 3) = Vector3d( 0.0,  1.0,  0.0);
-		state->getPositions().segment<3>(4 * 3) = Vector3d( 1.0,  1.0,  0.0);
-		state->getPositions().segment<3>(5 * 3) = Vector3d( 1.0,  0.0, -1.0);
+		auto &x = state->getPositions();
+		getSubVector(x, 0, 3) = Vector3d( 0.0,  0.0,  0.0);
+		getSubVector(x, 1, 3) = Vector3d( 0.0,  1.0, -1.0);
+		getSubVector(x, 2, 3) = Vector3d(-1.0,  1.0,  0.0);
+		getSubVector(x, 3, 3) = Vector3d( 0.0,  1.0,  0.0);
+		getSubVector(x, 4, 3) = Vector3d( 1.0,  1.0,  0.0);
+		getSubVector(x, 5, 3) = Vector3d( 1.0,  0.0, -1.0);
 
 		{
 			std::array<unsigned int, 4> nodes = {0, 1, 2, 3};

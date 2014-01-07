@@ -411,20 +411,15 @@ SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 		<< "naturalCoordinate must be normalized and length 4.";
 
 	const Vector& x = state.getPositions();
-	auto p0 = getSubVector(x, m_nodeIds[0], 3);
-	auto p1 = getSubVector(x, m_nodeIds[1], 3);
-	auto p2 = getSubVector(x, m_nodeIds[2], 3);
-	auto p3 = getSubVector(x, m_nodeIds[3], 3);
+	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
+	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
+	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
+	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
 
-	SurgSim::Math::Vector3d result;
-	for (int i = 0; i < 3; i++)
-	{
-		result[i] = naturalCoordinate(0) * p0(i)
-				  + naturalCoordinate(1) * p1(i)
-				  + naturalCoordinate(2) * p2(i)
-				  + naturalCoordinate(3) * p3(i);
-	}
-	return result;
+	return naturalCoordinate(0) * p0
+		 + naturalCoordinate(1) * p1
+		 + naturalCoordinate(2) * p2
+		 + naturalCoordinate(3) * p3;
 }
 
 } // namespace Physics
