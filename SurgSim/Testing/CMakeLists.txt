@@ -15,10 +15,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${gmock_SOURCE_DIR}/include
-	${gmock_SOURCE_DIR}
+	${GMOCK_INCLUDE_DIR}
 )
 
 set(SURGSIM_TESTING_SOURCES
@@ -30,6 +27,10 @@ set(SURGSIM_TESTING_SOURCES
 set(SURGSIM_TESTING_HEADERS
 	MathUtilities.h
 	TestCube.h
+)
+
+set(LIBS
+	gmock
 )
 
 surgsim_add_library(
@@ -45,5 +46,5 @@ if(GLUT_FOUND)
 	add_subdirectory(VisualTestCommon)
 endif(GLUT_FOUND)
 
-# Put SurgSimTesting into folder "Testing"
+
 set_target_properties(SurgSimTesting PROPERTIES FOLDER "Testing")

@@ -17,6 +17,7 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
@@ -167,5 +168,4 @@ if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(RenderTests)
 endif()
 
-# Put SurgSimGraphics into folder "Graphics"
 set_target_properties(SurgSimGraphics PROPERTIES FOLDER "Graphics")

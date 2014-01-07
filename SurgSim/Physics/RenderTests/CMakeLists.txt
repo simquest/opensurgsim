@@ -15,9 +15,6 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
@@ -35,15 +32,15 @@ configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
+
 set(LIBS
 	SurgSimGraphics
 	SurgSimPhysics
-	gmock
-	gtest
 )
+
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-surgsim_add_unit_tests(SurgSimPhysicsRenderTest)
+surgsim_add_unit_tests(SurgSimPhysicsRenderTest
+	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
 
-# Put SurgSimPhysicsTest into folder "Physics"
 set_target_properties(SurgSimPhysicsRenderTest PROPERTIES FOLDER "Physics")

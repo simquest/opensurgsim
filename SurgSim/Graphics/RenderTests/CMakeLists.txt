@@ -13,12 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
+include_directories (
 )
 
 set(UNIT_TEST_SOURCES
@@ -47,22 +42,16 @@ set(UNIT_TEST_HEADERS
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
+set(LIBS
+	SurgSimGraphics
+	SurgSimBlocks
+	SurgSimTesting
+)
+
 # Configure the path for the data files
 configure_file(
 	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
-)
-
-set(LIBS
-	SurgSimFramework
-	SurgSimGraphics
-	SurgSimTesting
-	SurgSimBlocks
-	gmock
-	gtest
-	${Boost_LIBRARIES}
-	${OPENSCENEGRAPH_LIBRARIES}
-	${OPENTHREADS_LIBRARY}
 )
 
 # The unit tests will be built whenever the library is built, but
@@ -74,5 +63,4 @@ option(SURGSIM_TESTS_RUN_GRAPHICS_RENDER
 surgsim_add_unit_tests(SurgSimGraphicsRenderTest
 	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
 
-# Put SurgSimGraphicsRenderTest into folder "Graphics"
 set_target_properties(SurgSimGraphicsRenderTest PROPERTIES FOLDER "Graphics")

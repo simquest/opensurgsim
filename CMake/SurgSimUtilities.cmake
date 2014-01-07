@@ -188,14 +188,16 @@ endmacro()
 # You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
 #
 macro(surgsim_unit_test_build_only TESTNAME)
+	#Test framework include directory
+	include_directories(${GMOCK_INCLUDE_DIR})
 	if(SURGSIM_TESTS_ALL_IN_ONE)
 		add_library(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} ${LIBS})
+		target_link_libraries(${TESTNAME} gmock ${LIBS})
 		# NB: There's currently no way to pick up these libs and combine them.
 		#     So this option does not currently do anything useful...
 	else()
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} SurgSimTesting ${LIBS})
+		target_link_libraries(${TESTNAME} gmock SurgSimTesting ${LIBS})
 		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 		surgsim_copy_to_target_directory(${TESTNAME}
 			${UNIT_TEST_SHARED_LIBS})
@@ -284,7 +286,7 @@ macro(surgsim_add_unit_tests TESTNAME)
 endmacro()
 
 # Do all the work to add a library to the system
-# Works with the install system and detects wether the library is 
+# Works with the install system and detects whether the library is 
 # header only or has source files, for header only the headers are copied into
 # the appropriate directory. 
 # Note that when calling this the parameters  should be quoted to separate lists

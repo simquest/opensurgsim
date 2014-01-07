@@ -21,8 +21,11 @@
 #include <unordered_map>
 #include <functional>
 #include <boost/any.hpp>
+#include <yaml-cpp/yaml.h>
 
 #include "SurgSim/Math/Matrix.h"
+
+#include "SurgSim/Framework/Convert.h"
 
 namespace SurgSim
 {
@@ -38,6 +41,9 @@ public:
 
 	typedef std::function<boost::any(void)> GetterType;
 	typedef std::function<void (boost::any)> SetterType;
+
+	typedef std::function<YAML::Node(void)> EncoderType;
+	typedef std::function<void(const YAML::Node*)> DecoderType;
 
 	/// Retrieves the value with the name by executing the getter if it is found.
 	/// \param	name	The name of the property.
@@ -85,13 +91,40 @@ public:
 	/// \param	setter	The setter.
 	void setAccessors(const std::string& name, GetterType getter, SetterType setter);
 
+	/// Sets the functions used to convert data from and to a YAML::Node. Will throw and exception
+	/// if the data type that is passed to YAML cannot be converted into a YAML::Node
+	/// \param name The name of the property.
+	/// \param encoder The function to be used to put the property into the node.
+	/// \param decoder The function to be used to read the property from the node and set it
+	///                in the instance.
+	void setSerializable(const std::string& name, EncoderType encoder, DecoderType decoder);
+
+	/// Encode this Accessible to a YAML::Node
+	/// \return The encoded version of this instance.
+	YAML::Node encode();
+
+	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
+	/// be converted.
+	/// \param node The node that carries the data to be, properties with names that don't
+	///             match up with properties in the Accessible are ignored
+	void decode(const YAML::Node& node);
 
 private:
 
-	std::unordered_map<std::string, GetterType > m_getters;
-	std::unordered_map<std::string, SetterType > m_setters;
+	/// Private struct to keep the map under control
+	struct Functors
+	{
+		GetterType getter;
+		SetterType setter;
+		EncoderType encoder;
+		DecoderType decoder;
+	};
+
+	std::unordered_map<std::string, Functors> m_functors;
+
 };
 
+/// Public struct to pair an accessible with its appropriate property
 struct Property
 {
 	std::weak_ptr<Accessible> accessible;
@@ -121,6 +154,14 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 	setAccessors(#property, \
 				std::bind(&class::getter, this),\
 				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)))
+
+#define SURGSIM_ADD_SERIALIZABLE_PROPERTY(class, type, property, getter, setter) \
+	setAccessors(#property, \
+				std::bind(&class::getter, this),\
+				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)));\
+	setSerializable(#property,\
+				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
+				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
 
 /// A macro to register a getter for a property that is read only
 #define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \

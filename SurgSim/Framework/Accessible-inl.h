@@ -19,10 +19,10 @@
 template <class T>
 bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
 {
-	auto element = m_getters.find(name);
-	if (value != nullptr && element != std::end(m_getters))
+	auto functors = m_functors.find(name);
+	if (value != nullptr && functors != m_functors.end() && functors->second.getter != nullptr)
 	{
-		*value = boost::any_cast<T>(element->second());
+		*value = boost::any_cast<T>(functors->second.getter());
 		return true;
 	}
 	else

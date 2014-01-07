@@ -82,8 +82,14 @@ cxx_library(gmock_main
             src/gmock-all.cc
             src/gmock_main.cc)
 
-set_target_properties(gmock PROPERTIES FOLDER "ThirdParty")
-set_target_properties(gmock_main PROPERTIES FOLDER "ThirdParty") 
+# OpenSurgSim change to the original include file
+export(TARGETS gmock gmock_main
+	FILE "${PROJECT_BINARY_DIR}/gmock-targets.cmake")
+export(PACKAGE gmock)
+
+set(CONFIG_INCLUDE_DIRS "${gmock_SOURCE_DIR}/include" "${gtest_SOURCE_DIR}/include")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gmock-config.cmake.in
+	"${PROJECT_BINARY_DIR}/gmock-config.cmake" @ONLY)
 
 ########################################################################
 #

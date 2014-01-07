@@ -39,6 +39,7 @@ include_directories(${SURGSIM_TOP_INCLUDE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 set(SURGSIM_TOOLS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Tools")
 set(SURGSIM_THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty")
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
@@ -83,16 +84,9 @@ if(SURGSIM_DEVICES_BUILD)
 	find_package(WDK)
 endif(SURGSIM_DEVICES_BUILD)
 
-if(SURGSIM_TESTS_BUILD)
-	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
-	add_subdirectory(ThirdParty/gmock)
-endif()
-
-if(SURGSIM_YAMLCPP_BUILD)
-	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
-	add_subdirectory(ThirdParty/yaml-cpp)
-endif()
-
+# This should have been built from the external ThirdParty directory
+find_package(yaml-cpp)
+find_package(gmock)
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
 
