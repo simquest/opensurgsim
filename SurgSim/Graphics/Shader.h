@@ -101,8 +101,8 @@ public:
 
 	/// When this is set to true, shader set on other objects that could be considered of a lesser hierarchy
 	/// than this shader would be ignored. For example in a scene graph this shader would overidde other shaders that
-	/// have a node with this shader in of of their parent nodes.
-	/// \param	val	true to value.
+	/// have a node with this shader in of their parent nodes.
+	/// \param	val	If true the shader should override shaders in lower levels.
 	virtual void setGlobalScope(bool val) = 0;
 
 	/// Query if this shader is of global scope.

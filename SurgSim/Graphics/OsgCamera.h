@@ -148,7 +148,7 @@ private:
 	/// View matrix of the camera
 	SurgSim::Math::Matrix44d m_viewMatrix;
 
-	/// View matrix of the camera
+	/// Inverse view matrix of the camera
 	SurgSim::Math::Matrix44d m_inverseViewMatrix;
 
 	/// Projection matrix of the camera
