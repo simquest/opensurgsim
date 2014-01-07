@@ -21,7 +21,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemRepresentationCoordinate::FemRepresentationCoordinate()
+FemRepresentationCoordinate::FemRepresentationCoordinate() : elementId(), naturalCoordinate()
 {
 
 }
