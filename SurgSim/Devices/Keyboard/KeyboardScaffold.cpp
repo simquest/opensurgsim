@@ -93,10 +93,10 @@ bool KeyboardScaffold::unregisterDevice()
 bool KeyboardScaffold::updateDevice(int key, int modifierMask)
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
-	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
-
+	SurgSim::DataStructures::DataGroup inputData = m_device->deviceObject->getInputData();
 	inputData.integers().set("key", key);
 	inputData.integers().set("modifierMask", modifierMask);
+	m_device->deviceObject->setInputData(inputData);
 
 	m_device->deviceObject->pushInput();
 	return true;

@@ -485,7 +485,6 @@ bool PhantomScaffold::finalizeDeviceState(DeviceData* info)
 bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
 	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
@@ -521,11 +520,13 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 		pose.linear() = info->transformValue.block<3,3>(0,0);
 		pose.translation() = info->positionValue * 0.001;  // convert from millimeters to meters!
 
+		SurgSim::DataStructures::DataGroup inputData = info->deviceObject->getInputData();
 		inputData.poses().set("pose", pose);
 		inputData.booleans().set("button1", (info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
 		inputData.booleans().set("button2", (info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
 		inputData.booleans().set("button3", (info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
 		inputData.booleans().set("button4", (info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
+		info->deviceObject->setInputData(inputData);
 	}
 
 	return !fatalError;

@@ -590,7 +590,6 @@ bool NovintScaffold::finalizeDeviceState(DeviceData* info)
 bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
 	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
@@ -826,6 +825,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		pose.linear() = info->transformValue.block<3,3>(0,0);
 		pose.translation() = info->positionValue;
 
+		SurgSim::DataStructures::DataGroup inputData = info->deviceObject->getInputData();
 		inputData.poses().set("pose", pose);
 		inputData.booleans().set("button1", info->buttonStates[0]);
 		inputData.booleans().set("button2", info->buttonStates[1]);
@@ -834,6 +834,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		inputData.booleans().set("isHomed", info->isDeviceHomed);
 		inputData.booleans().set("isPositionHomed", info->isPositionHomed);
 		inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
+		info->deviceObject->setInputData(inputData);
 	}
 
 	return !fatalError;

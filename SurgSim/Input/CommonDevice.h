@@ -98,29 +98,38 @@ protected:
 	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
-	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function
-	/// may be called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
-	/// \return A const reference to the initial input data.
-	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
+	/// Getter for the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function may be
+	/// called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
+	/// \return A copy of the initial input data.
+	const SurgSim::DataStructures::DataGroup getInitialInputData() const
 	{
 		return m_initialInputData;
 	}
 
-	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is
-	/// typically called by friend scaffolds, to put the data that came from the device's SDK into the device's
-	/// member variable so it can be pushed to the device's input consumers.
-	/// \return A writable reference to the input data.
-	SurgSim::DataStructures::DataGroup& getInputData()
+	/// Getter for the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
+	/// called by friend scaffolds, to get a DataGroup they can copy, then modify and send to the device's input
+	/// consumers.
+	/// \return A copy of the input data.
+	const SurgSim::DataStructures::DataGroup getInputData() const
 	{
 		return m_inputData;
 	}
 
-	/// Provides access to the output data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is
-	/// typically called by friend scaffolds, to get the data that the output producer wants to send to the device (and
-	/// then send that data through the device's SDK). Note that a writable variant is not provided, an output producer
-	/// registered via \ref setOutputProducer will set the output data.
-	/// \return A const reference to the output data.
-	const SurgSim::DataStructures::DataGroup& getOutputData() const
+	/// Setter for the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
+	/// called by friend scaffolds, to put the data from the device's SDK into the device's member variable so it can be
+	/// pushed to the device's input consumers.
+	/// \return A copy of the input data.
+	void setInputData(const SurgSim::DataStructures::DataGroup& inputData)
+	{
+		m_inputData = inputData;
+	}
+
+	/// Getter for the output data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
+	/// called by friend scaffolds, to get the data that the output producer wants to send to the device (and then send
+	/// that data through the device's SDK). Note that a writable variant is not provided, an output producer registered
+	/// via \ref setOutputProducer will set the output data.
+	/// \return A copy of the output data.
+	const SurgSim::DataStructures::DataGroup getOutputData() const
 	{
 		return m_outputData;
 	}
