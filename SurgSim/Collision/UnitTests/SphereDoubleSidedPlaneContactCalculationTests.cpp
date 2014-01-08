@@ -15,6 +15,8 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h"
+#include "SurgSim/Math/PlaneShape.h"
+#include "SurgSim/Math/SphereShape.h"
 
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;

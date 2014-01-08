@@ -15,6 +15,7 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/DefaultContactCalculation.h"
+#include "SurgSim/Math/SphereShape.h"
 
 namespace SurgSim
 {

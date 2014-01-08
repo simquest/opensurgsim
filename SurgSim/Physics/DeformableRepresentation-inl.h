@@ -140,6 +140,15 @@ SurgSim::Math::IntegrationScheme DeformableRepresentation<M,D,K,S>::getIntegrati
 }
 
 template <class M, class D, class K, class S>
+const SurgSim::Math::Matrix& DeformableRepresentation<M,D,K,S>::getComplianceMatrix() const
+{
+	SURGSIM_ASSERT(m_odeSolver) <<
+		"Ode solver not initialized yet, call beforeUpdate(dt)";
+
+	return m_odeSolver->getCompliance();
+}
+
+template <class M, class D, class K, class S>
 void  DeformableRepresentation<M,D,K,S>::beforeUpdate(double dt)
 {
 	using SurgSim::Math::ExplicitEuler;

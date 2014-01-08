@@ -163,6 +163,24 @@ void resize(Vector *v, unsigned int size, bool zeroOut = false)
 	}
 }
 
+/// Interpolate (slerp) between 2 vectors
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam TOpt the option flags (alignment etc.) used for the Vector arguments.  Can be deduced.
+/// \param t0 The start transform (at time 0.0).
+/// \param t1 The end   transform (at time 1.0).
+/// \param t  The interpolation time requested. Within [0..1].
+/// \returns the transform resulting in the slerp interpolation at time t, between t0 and t1.
+/// \note t=0 => returns t0
+/// \note t=1 => returns t1
+template <typename T, int size, int TOpt>
+Eigen::Matrix<T, size, 1, TOpt> interpolate(
+	const Eigen::Matrix<T, size, 1, TOpt> &previous,
+	const Eigen::Matrix<T, size, 1, TOpt> &next,
+	T t)
+{
+	return previous + t * (next - previous);
+}
+
 /// Helper method to construct an orthonormal basis (i, j, k) given the 1st vector direction
 /// \tparam T the numeric data type used for the vector argument. Can usually be deduced.
 /// \tparam VOpt the option flags (alignment etc.) used for the vector argument. Can be deduced.
@@ -190,7 +208,6 @@ bool buildOrthonormalBasis(Eigen::Matrix<T, 3, 1, VOpt>* i,
 
 	return true;
 }
-
 };  // namespace Math
 };  // namespace SurgSim
 

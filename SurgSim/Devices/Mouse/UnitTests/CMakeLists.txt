@@ -24,13 +24,15 @@ set(UNIT_TEST_SOURCES
 	OsgMouseScaffoldTest.cpp
 )
 
-set(LIBS MouseDevice 
-		 SurgSimInput 
-		 SurgSimFramework 
-		 SurgSimDataStructures
-		 gtest 
-		 ${OPENSCENEGRAPH_LIBRARIES}
-	)
+set(LIBS
+	MouseDevice
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	gmock
+	gtest
+	${OPENSCENEGRAPH_LIBRARIES}
+)
 
 surgsim_add_unit_tests(MouseDeviceTest)
 
