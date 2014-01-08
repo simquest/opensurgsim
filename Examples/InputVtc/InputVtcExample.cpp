@@ -119,7 +119,8 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	planeElement->addComponent(transferPose);
-	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Plane Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 	planeElement->addComponent(collisionRepresentation);
 	return planeElement;
@@ -189,7 +190,8 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	boxElement->addComponent(transferPose);
-	auto collisionRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Box Collision Representation");
+	auto collisionRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Box Collision Representation");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 	boxElement->addComponent(collisionRepresentation);
 	return boxElement;
