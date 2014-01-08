@@ -118,14 +118,24 @@ protected:
 		return m_outputData;
 	}
 
+	/// Data used to initialize the input to an InputConsumerInterface when it is added to this device.
+	SurgSim::DataStructures::DataGroup m_initialInputData;
+
+	/// The data the device is providing to its input consumers.
+	SurgSim::DataStructures::DataGroup m_inputData;
+
+	/// The data the output producer (if any) is providing to the device.
+	SurgSim::DataStructures::DataGroup m_outputData;
+
 private:
 	struct State;
 
 	const std::string m_name;
+
+	/// The name used for the callbacks, defaults to the device name.
 	std::string m_nameForCallback;
-	SurgSim::DataStructures::DataGroup m_initialInputData;
-	SurgSim::DataStructures::DataGroup m_inputData;
-	SurgSim::DataStructures::DataGroup m_outputData;
+
+	/// Struct to hide some of the private member variables, PImpl (Pointer to Implementation).
 	std::unique_ptr<State> m_state;
 };
 

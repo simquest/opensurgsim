@@ -41,7 +41,7 @@ void TestDevice::pushInput()
 
 void TestDevice::pushInput(const std::string& data)
 {
-	getInputData().strings().set("helloWorld", data);
+	m_inputData.strings().set("helloWorld", data);
 	pushInput();
 }
 
