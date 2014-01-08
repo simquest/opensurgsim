@@ -19,15 +19,10 @@
 #include <memory>
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Math/OctreeShape.h"
 
 namespace SurgSim
 {
-
-namespace Math
-{
-class OctreeShape;
-};
-
 namespace Collision
 {
 
