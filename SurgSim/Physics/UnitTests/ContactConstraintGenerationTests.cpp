@@ -46,13 +46,15 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 		params0.setShapeUsedForMassInertia(std::make_shared<SphereShape>(2.0));
 		rigid0 = std::make_shared<RigidRepresentation>("Physics Representation 0");
 		rigid0->setInitialParameters(params0);
-		sphere = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0", rigid0);
+		sphere = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0");
+		std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere)->setRigidRepresentation(rigid0);
 
 		RigidRepresentationParameters params1;
 		params1.setShapeUsedForMassInertia(std::make_shared<DoubleSidedPlaneShape>());
 		rigid1 = std::make_shared<RigidRepresentation>("Physics Representation 1");
 		rigid1->setInitialParameters(params1);
-		plane = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1", rigid1);
+		plane = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1");
+		std::dynamic_pointer_cast<RigidCollisionRepresentation>(plane)->setRigidRepresentation(rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
 	}

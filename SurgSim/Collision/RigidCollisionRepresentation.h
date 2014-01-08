@@ -39,9 +39,9 @@ public:
 	/// \param	name	The name of rigid collision representation
 	explicit RigidCollisionRepresentation(const std::string& name);
 
-	/// Set physics representation
-	/// \param	representation	The physics representation
-	void setRepresentation(std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
+	/// Set rigid representation
+	/// \param	representation	The rigid representation
+	void setRigidRepresentation(std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
 
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();

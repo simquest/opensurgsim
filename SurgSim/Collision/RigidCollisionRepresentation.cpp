@@ -26,7 +26,7 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 {
 }
 
-void RigidCollisionRepresentation::setRepresentation(
+void RigidCollisionRepresentation::setRigidRepresentation(
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation)
 {
 	m_physicsRepresentation = representation;
