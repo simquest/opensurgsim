@@ -57,158 +57,74 @@ using SurgSim::Math::Vector4f;
 ///\file Example of how to put together a very simple demo of Fem3D,
 /// using tetrahedron's elements and cube's elements
 
-namespace
+std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
+	const SurgSim::Math::RigidTransform3d& pose, SurgSim::Math::Vector4d color,
+	SurgSim::Math::IntegrationScheme integrationScheme)
 {
-
-class Cube
-{
-private:
-	// Cube nodes
-	//       2*-----------*3
-	//       /           /|
-	//    6*-----------*7 |      ^ y
-	//     |           |  |      |
-	//     |  0        |  *1     *->x
-	//     |           | /      /
-	//    4*-----------*5       z
-	std::array<SurgSim::Math::Vector3d, 8> cubeNodes;
-
-	// Cube decomposition into 5 tetrahedrons
-	// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
-	static const unsigned int numTetrahedrons = 5;
-	std::array< std::array<unsigned int, 4>, numTetrahedrons> tetrahedrons;
-
-	// Cube decomposition into 1 cube
-	static const unsigned int numCubes = 1;
-	std::array< std::array<unsigned int, 8>, numCubes> cubes;
-
-	// Boundary conditions (node indices)
-	static const unsigned int numBoundaryConditionsNodeIdx = 4;
-	std::array<unsigned int, numBoundaryConditionsNodeIdx> boundaryConditionsNodeIdx;
-
-	void loadFem3DRestState(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
-	{
-		std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
-		restState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
-		SurgSim::Math::Vector& x = restState->getPositions();
-
-		// Sets the initial state (node positions and boundary conditions)
-		for (int nodeId = 0; nodeId < 8; nodeId++)
-		{
-			SurgSim::Math::getSubVector(x, nodeId, 3) =  cubeNodes[nodeId];
-		}
-		for (unsigned int boundaryConditionId = 0;
-			boundaryConditionId < numBoundaryConditionsNodeIdx;
-			boundaryConditionId++)
-		{
-			// The boundary conditions in the state are the dof indices to be fixed
-			restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 0);
-			restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 1);
-			restState->addBoundaryCondition(boundaryConditionsNodeIdx[boundaryConditionId] * 3 + 2);
-		}
-		physicsRepresentation->setInitialState(restState);
-	}
-
-public:
-
-	Cube()
-	{
-		cubeNodes[0] = Vector3d(-0.5, -0.5, -0.5);
-		cubeNodes[1] = Vector3d( 0.5, -0.5, -0.5);
-		cubeNodes[2] = Vector3d(-0.5,  0.5, -0.5);
-		cubeNodes[3] = Vector3d( 0.5,  0.5, -0.5);
-		cubeNodes[4] = Vector3d(-0.5, -0.5,  0.5);
-		cubeNodes[5] = Vector3d( 0.5, -0.5,  0.5);
-		cubeNodes[6] = Vector3d(-0.5,  0.5,  0.5);
-		cubeNodes[7] = Vector3d( 0.5,  0.5,  0.5);
-
-		// Cube decomposition into 5 tetrahedrons
-		// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
-		std::array<unsigned int, 4> tmp0 = {{4, 7, 1, 2}}; // CCW (47)cross(41) . (42) > 0
-		tetrahedrons[0] = tmp0;
-		std::array<unsigned int, 4> tmp1 = {{4, 1, 7, 5}}; // CCW (41)cross(47) . (45) > 0
-		tetrahedrons[1] = tmp1;
-		std::array<unsigned int, 4> tmp2 = {{4, 2, 1, 0}}; // CCW (42)cross(41) . (40) > 0
-		tetrahedrons[2] = tmp2;
-		std::array<unsigned int, 4> tmp3 = {{4, 7, 2, 6}}; // CCW (47)cross(42) . (46) > 0
-		tetrahedrons[3] = tmp3;
-		std::array<unsigned int, 4> tmp4 = {{1, 2, 7, 3}};  // CCW (12)cross(17) . (13) > 0
-		tetrahedrons[4] = tmp4;
-
-		// Cube decomposition into 1 single cube
-		// 1st face CW, 2nd face CCW (Faces being seen from outside)
-		std::array<unsigned int, 8> tmpCubeNodes = {{0, 1, 3, 2, 4, 5, 7, 6}};
-		cubes[0] = tmpCubeNodes;
-
-		// Boundary conditions (node indices)
-		boundaryConditionsNodeIdx[0] = 0;
-		boundaryConditionsNodeIdx[1] = 1;
-		boundaryConditionsNodeIdx[2] = 2;
-		boundaryConditionsNodeIdx[3] = 3;
-	}
-
-	void setFemElementParameters(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
-	{
-		// Sets all the FemElement's parameters
-		for (unsigned int elementId = 0; elementId < physicsRepresentation->getNumFemElements(); elementId++)
-		{
-			std::shared_ptr<FemElement> element = physicsRepresentation->getFemElement(elementId);
-			element->setMassDensity(8000.0);
-			element->setPoissonRatio(0.45);
-			element->setYoungModulus(1.0e6);
-		}
-	}
-
-	void loadCubeModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
-	{
-		loadFem3DRestState(physicsRepresentation);
-		auto restState = physicsRepresentation->getInitialState();
-
-		// Adds all the cube FemElements
-		for (unsigned int elementId = 0; elementId < numCubes; elementId++)
-		{
-			physicsRepresentation->addFemElement(std::make_shared<FemElement3DCube>(cubes[elementId], *restState));
-		}
-	}
-
-	void loadTetrahedronModelFem3D(std::shared_ptr<Fem3DRepresentation> physicsRepresentation)
-	{
-		loadFem3DRestState(physicsRepresentation);
-		auto restState = physicsRepresentation->getInitialState();
-
-		// Adds all the tetrahedrons FemElements
-		for (unsigned int elementId = 0; elementId < numTetrahedrons; elementId++)
-		{
-			std::shared_ptr<FemElement3DTetrahedron> element = nullptr;
-			element = std::make_shared<FemElement3DTetrahedron>(tetrahedrons[elementId], *restState);
-			physicsRepresentation->addFemElement(element);
-		}
-	}
-}; // class Cube
-
-}; // namespace
-
-std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,
-	std::shared_ptr<Fem3DRepresentation> physicsRepresentation,
-	const SurgSim::Math::RigidTransform3d& gfxPose,
-	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
-{
+	// Physics Representation
+	std::shared_ptr<Fem3DRepresentation> physicsRepresentation;
+	physicsRepresentation = std::make_shared<Fem3DRepresentation>(name + " Physics");
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	std::shared_ptr<SceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
-	femSceneElement->addComponent(physicsRepresentation);
+	std::array<Vector3d, 8> vertices = {
+		Vector3d(-0.5, -0.5, -0.5),
+		Vector3d( 0.5, -0.5, -0.5),
+		Vector3d(-0.5,  0.5, -0.5),
+		Vector3d( 0.5,  0.5, -0.5),
+		Vector3d(-0.5, -0.5,  0.5),
+		Vector3d( 0.5, -0.5,  0.5),
+		Vector3d(-0.5,  0.5,  0.5),
+		Vector3d( 0.5,  0.5,  0.5)};
 
-	// Graphics setup
-	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-		std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
+	// Cube decomposition into 5 tetrahedrons
+	// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
+	std::array< std::array<unsigned int, 4>, 5> tetrahedrons = {
+		4, 7, 1, 2, // CCW (47)cross(41) . (42) > 0
+		4, 1, 7, 5, // CCW (41)cross(47) . (45) > 0
+		4, 2, 1, 0, // CCW (42)cross(41) . (40) > 0
+		4, 7, 2, 6, // CCW (47)cross(42) . (46) > 0
+		1, 2, 7, 3 };  // CCW (12)cross(17) . (13) > 0
 
-	graphicsRepresentation->setInitialPose(gfxPose);
+	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
+
+	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
+
+	for (size_t i = 0; i != vertices.size(); i++)
+	{
+		initialState->getPositions().segment(i*3, 3) = vertices[i];
+	}
+
+	for (auto index = boundaryConditionsNodeIdx.cbegin(); index != boundaryConditionsNodeIdx.cend(); ++index)
+	{
+		initialState->addBoundaryCondition((*index) * 3 + 0);
+		initialState->addBoundaryCondition((*index) * 3 + 1);
+		initialState->addBoundaryCondition((*index) * 3 + 2);
+	}
+	physicsRepresentation->setInitialState(initialState);
+
+	for (auto tetrahedron = tetrahedrons.cbegin(); tetrahedron != tetrahedrons.cend(); ++tetrahedron)
+	{
+		std::shared_ptr<FemElement> element = std::make_shared<FemElement3DTetrahedron>(*tetrahedron, *initialState);
+		element->setMassDensity(8000.0);
+		element->setPoissonRatio(0.45);
+		element->setYoungModulus(1.0e6);
+		physicsRepresentation->addFemElement(element);
+	}
+
+	// Graphics Representation
+	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
+	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
+	graphicsRepresentation->setInitialPose(pose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
 	graphicsRepresentation->setVisible(true);
 
+	// Scene Element
+	std::shared_ptr<SceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
+	femSceneElement->addComponent(physicsRepresentation);
 	femSceneElement->addComponent(graphicsRepresentation);
 	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
 		"Physics to Graphics deformable points",
@@ -220,35 +136,69 @@ std::shared_ptr<SceneElement> initializeFem3D(const std::string& name,
 }
 
 std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
-	const SurgSim::Math::RigidTransform3d& gfxPose,
+	const SurgSim::Math::RigidTransform3d& pose,
 	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
-	std::shared_ptr<Fem3DRepresentation> physicsRepresentation =
-		std::make_shared<Fem3DRepresentation>(name + " Physics");
+	// Physics Representation
+	std::shared_ptr<Fem3DRepresentation> physicsRepresentation;
+	physicsRepresentation = std::make_shared<Fem3DRepresentation>(name + " Physics");
+	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->setRayleighDampingMass(5e-2);
+	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	// In this example, the physics representations are not transformed,
-	// only the graphics one will apply a transform
-	Cube cube;
-	cube.loadCubeModelFem3D(physicsRepresentation);
-	cube.setFemElementParameters(physicsRepresentation);
+	std::array<Vector3d, 8> vertices = {
+		Vector3d(-0.5, -0.5, -0.5),
+		Vector3d( 0.5, -0.5, -0.5),
+		Vector3d(-0.5,  0.5, -0.5),
+		Vector3d( 0.5,  0.5, -0.5),
+		Vector3d(-0.5, -0.5,  0.5),
+		Vector3d( 0.5, -0.5,  0.5),
+		Vector3d(-0.5,  0.5,  0.5),
+		Vector3d( 0.5,  0.5,  0.5)};
+	std::array<unsigned int, 8> cube = {{0, 1, 3, 2, 4, 5, 7, 6}};
+	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
-	return initializeFem3D(name, physicsRepresentation, gfxPose, color, integrationScheme);
-}
+	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	initialState->setNumDof(physicsRepresentation->getNumDofPerNode(), 8);
 
-std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
-	const SurgSim::Math::RigidTransform3d& gfxPose,
-	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
-{
-	std::shared_ptr<Fem3DRepresentation> physicsRepresentation =
-		std::make_shared<Fem3DRepresentation>(name + " Physics");
+	for (size_t i = 0; i != vertices.size(); i++)
+	{
+		initialState->getPositions().segment(i*3, 3) = vertices[i];
+	}
 
-	// In this example, the physics representations are not transformed,
-	// only the graphics one will apply a transform
-	Cube cube;
-	cube.loadTetrahedronModelFem3D(physicsRepresentation);
-	cube.setFemElementParameters(physicsRepresentation);
+	for (auto index = boundaryConditionsNodeIdx.cbegin(); index != boundaryConditionsNodeIdx.cend(); ++index)
+	{
+		initialState->addBoundaryCondition((*index) * 3 + 0);
+		initialState->addBoundaryCondition((*index) * 3 + 1);
+		initialState->addBoundaryCondition((*index) * 3 + 2);
+	}
+	physicsRepresentation->setInitialState(initialState);
 
-	return initializeFem3D(name, physicsRepresentation, gfxPose, color, integrationScheme);
+	std::shared_ptr<FemElement> element = std::make_shared<FemElement3DCube>(cube, *initialState);
+	element->setMassDensity(8000.0);
+	element->setPoissonRatio(0.45);
+	element->setYoungModulus(1.0e6);
+	physicsRepresentation->addFemElement(element);
+
+	// Graphics Representation
+	std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation;
+	graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(name + " Graphics object ");
+	graphicsRepresentation->setInitialPose(pose);
+	graphicsRepresentation->setColor(color);
+	graphicsRepresentation->setPointSize(3.0f);
+	graphicsRepresentation->setVisible(true);
+
+	// Scene Element
+	std::shared_ptr<SceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
+	femSceneElement->addComponent(physicsRepresentation);
+	femSceneElement->addComponent(graphicsRepresentation);
+	femSceneElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
+		"Physics to Graphics deformable points",
+		physicsRepresentation->getFinalState(),
+		graphicsRepresentation->getVertices())
+	);
+
+	return femSceneElement;
 }
 
 std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& name, int x, int y, int width, int height)
@@ -291,40 +241,36 @@ int main(int argc, char* argv[])
 	std::cout << "  The bottom row is simulating a cube with 5 tetrahedron elements." << std::endl;
 
 	// Cube with cube FemElement
-	{
-		scene->addSceneElement(createCubeFem3D("CubeElement Euler Explicit",
-			makeRigidTransform(qIdentity, translate+Vector3d(-2.5, 2.0, 0.0)),
-			Vector4d(1, 0, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+	scene->addSceneElement(createCubeFem3D("CubeElement Euler Explicit",
+		makeRigidTransform(qIdentity, translate+Vector3d(-2.5, 2.0, 0.0)),
+		Vector4d(1, 0, 0, 1),
+		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
-		scene->addSceneElement(createCubeFem3D("CubeElement Modified Euler Explicit",
-			makeRigidTransform(qIdentity, translate+Vector3d( 0.0, 2.0, 0.0)),
-			Vector4d(0, 1, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+	scene->addSceneElement(createCubeFem3D("CubeElement Modified Euler Explicit",
+		makeRigidTransform(qIdentity, translate+Vector3d( 0.0, 2.0, 0.0)),
+		Vector4d(0, 1, 0, 1),
+		SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
-		scene->addSceneElement(createCubeFem3D("CubeElement Fem 3D Euler Implicit",
-			makeRigidTransform(qIdentity, translate+Vector3d( 2.5, 2.0, 0.0)),
-			Vector4d(0, 0, 1, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
-	}
+	scene->addSceneElement(createCubeFem3D("CubeElement Fem 3D Euler Implicit",
+		makeRigidTransform(qIdentity, translate+Vector3d( 2.5, 2.0, 0.0)),
+		Vector4d(0, 0, 1, 1),
+		SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
 	// Cube with tetrahedron FemElement
-	{
-		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Euler Explicit",
-			makeRigidTransform(qIdentity, translate+Vector3d(-2.5, -1.0, 0.0)),
-			Vector4d(1, 0, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+	scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Euler Explicit",
+		makeRigidTransform(qIdentity, translate+Vector3d(-2.5, -1.0, 0.0)),
+		Vector4d(1, 0, 0, 1),
+		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
-		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Modified Euler Explicit",
-			makeRigidTransform(qIdentity, translate+Vector3d( 0.0, -1.0, 0.0)),
-			Vector4d(0, 1, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+	scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Modified Euler Explicit",
+		makeRigidTransform(qIdentity, translate+Vector3d( 0.0, -1.0, 0.0)),
+		Vector4d(0, 1, 0, 1),
+		SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
-		scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Fem 3D Euler Implicit",
-			makeRigidTransform(qIdentity, translate+Vector3d( 2.5, -1.0, 0.0)),
-			Vector4d(0, 0, 1, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
-	}
+	scene->addSceneElement(createTetrahedronFem3D("TetrahedronElement Fem 3D Euler Implicit",
+		makeRigidTransform(qIdentity, translate+Vector3d( 2.5, -1.0, 0.0)),
+		Vector4d(0, 0, 1, 1),
+		SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
