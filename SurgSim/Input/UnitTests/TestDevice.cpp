@@ -54,7 +54,7 @@ bool TestDevice::pullOutput()
 }
 
 // expose the getOutputData method to the world
-DataGroup& TestDevice::getOutputData()
+const DataGroup& TestDevice::getOutputData() const
 {
 	return CommonDevice::getOutputData();
 }

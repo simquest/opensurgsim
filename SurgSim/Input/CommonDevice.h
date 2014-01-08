@@ -101,7 +101,7 @@ protected:
 	/// Getter for the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function may be
 	/// called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
 	/// \return A reference to the initial input data.
-	SurgSim::DataStructures::DataGroup& getInitialInputData()
+	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
 	{
 		return m_initialInputData;
 	}
@@ -120,7 +120,7 @@ protected:
 	/// that data through the device's SDK). Note that a writable variant is not provided, an output producer registered
 	/// via \ref setOutputProducer will set the output data.
 	/// \return A reference to the output data.
-	SurgSim::DataStructures::DataGroup& getOutputData()
+	const SurgSim::DataStructures::DataGroup& getOutputData() const
 	{
 		return m_outputData;
 	}
