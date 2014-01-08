@@ -66,12 +66,28 @@ public:
 	/// \return	The name being used.
 	std::string getNameForCallback() const;
 
+	/// Connect this device to an InputConsumerInterface, which will receive the data that comes from this device.
+	/// \param inputConsumer The InputConsumerInterface to connect with.
+	/// \return true if successful
 	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
+
+	/// Disconnect this device from an InputConsumerInterface, which will no longer receive data from this device.
+	/// \param inputConsumer The InputConsumerInterface to disconnect from.
+	/// \return true if successful
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
+	/// Connect this device to an OutputProducerInterface, which will send data to this device.
+	/// \param outputProducer The OutputProducerInterface to connect with.
+	/// \return true if successful
 	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
+
+	/// Disconnect this device from an OutputProducerInterface, which will no longer send data to this device.
+	/// \param outputProducer The OutputProducerInterface to disconnect from.
+	/// \return true if successful
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
+	/// Getter for whether or not this device is connected with an OutputProducerInterface.
+	/// \return true if an OutputProducerInterface is connected.
 	virtual bool hasOutputProducer() override;
 
 protected:
@@ -82,36 +98,27 @@ protected:
 	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
-	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".
+	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function
+	/// may be called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
 	/// \return A const reference to the initial input data.
 	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
 	{
 		return m_initialInputData;
 	}
 
-	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".
-	/// \return A writable reference to the initial input data.
-	SurgSim::DataStructures::DataGroup& getInitialInputData()
-	{
-		return m_initialInputData;
-	}
-
-	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
-	/// \return A const reference to the input data.
-	const SurgSim::DataStructures::DataGroup& getInputData() const
-	{
-		return m_inputData;
-	}
-	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
+	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is
+	/// typically called by friend scaffolds, to put the data that came from the device's SDK into the device's
+	/// member variable so it can be pushed to the device's input consumers.
 	/// \return A writable reference to the input data.
 	SurgSim::DataStructures::DataGroup& getInputData()
 	{
 		return m_inputData;
 	}
 
-	/// Provides access to the output data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
-	/// Note that a writable variant is not provided, since derived classes will not need to write to the application
-	/// output data (an output producer registered via \ref setOutputProducer will be called to do that).
+	/// Provides access to the output data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is
+	/// typically called by friend scaffolds, to get the data that the output producer wants to send to the device (and
+	/// then send that data through the device's SDK). Note that a writable variant is not provided, an output producer
+	/// registered via \ref setOutputProducer will set the output data.
 	/// \return A const reference to the output data.
 	const SurgSim::DataStructures::DataGroup& getOutputData() const
 	{
