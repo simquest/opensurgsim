@@ -279,7 +279,7 @@ bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 	pose.translation() = position.cast<double>() * 0.001;  // convert from millimeters to meters!
 
 	// TODO(bert): this code should cache the access indices.
-	SurgSim::DataStructures::DataGroup inputData = info.deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = info.deviceObject->getInputData();
 	inputData.poses().set("pose", pose);
 	inputData.scalars().set("trigger", data.trigger);
 	inputData.scalars().set("joystickX", data.joystick_x);
@@ -292,7 +292,6 @@ bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 	inputData.booleans().set("button4", (data.buttons & SIXENSE_BUTTON_4) != 0);
 	inputData.booleans().set("buttonStart", (data.buttons & SIXENSE_BUTTON_START) != 0);
 	inputData.booleans().set("buttonJoystick", (data.buttons & SIXENSE_BUTTON_JOYSTICK) != 0);
-	info->deviceObject->setInputData(inputData);
 
 	return true;
 }

@@ -45,7 +45,7 @@ public:
 
 	virtual bool pullOutput();
 
-	const DataGroup getOutputData() const;
+	DataGroup& getOutputData();
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static DataGroup buildInputData();

@@ -93,7 +93,7 @@ bool OsgMouseScaffold::unregisterDevice()
 bool OsgMouseScaffold::updateDevice(int buttonMask, float x, float y, int scrollDeltaX, int scrollDeltaY)
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
-	SurgSim::DataStructures::DataGroup inputData = m_device->deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
 	inputData.booleans().set("button1", (buttonMask & osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) != 0);
 	inputData.booleans().set("button2", (buttonMask & osgGA::GUIEventAdapter::MIDDLE_MOUSE_BUTTON) != 0);
 	inputData.booleans().set("button3", (buttonMask & osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) != 0);
@@ -101,7 +101,6 @@ bool OsgMouseScaffold::updateDevice(int buttonMask, float x, float y, int scroll
 	inputData.scalars().set("y", static_cast<double>(y));
 	inputData.integers().set("scrollDeltaX", scrollDeltaX);
 	inputData.integers().set("scrollDeltaY", scrollDeltaY);
-	m_device->deviceObject->setInputData(inputData);
 
 	m_device->deviceObject->pushInput();
 	return true;

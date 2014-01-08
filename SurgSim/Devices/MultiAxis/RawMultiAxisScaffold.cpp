@@ -427,13 +427,12 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	pose.translation() = position;
 
 	// TODO(bert): this code should cache the access indices.
-	SurgSim::DataStructures::DataGroup inputData = info->deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set("pose", pose);
 	inputData.booleans().set("button1", info->buttonStates[0]);
 	inputData.booleans().set("button2", info->buttonStates[1]);
 	inputData.booleans().set("button3", info->buttonStates[2]);
 	inputData.booleans().set("button4", info->buttonStates[3]);
-	info->deviceObject->setInputData(inputData);
 
 	return true;
 }
