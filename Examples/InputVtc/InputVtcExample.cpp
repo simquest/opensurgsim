@@ -115,10 +115,13 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Plane Collision", physicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	planeElement->addComponent(transferPose);
+	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	planeElement->addComponent(collisionRepresentation);
 	return planeElement;
 }
 
@@ -182,12 +185,13 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(rawInputGraphicsRepresentation);
 	boxElement->addComponent(inputComponent);
 	boxElement->addComponent(inputCoupler);
-	boxElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics",
-								physicsRepresentation, graphicsRepresentation));
-	boxElement->addComponent(std::make_shared<TransferInputPoseBehavior>("Raw Input to Graphics",
-								inputComponent, rawInputGraphicsRepresentation));
-	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-								("Box Collision Representation", physicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	boxElement->addComponent(transferPose);
+	auto collisionRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Box Collision Representation");
+	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	boxElement->addComponent(collisionRepresentation);
 	return boxElement;
 }
 

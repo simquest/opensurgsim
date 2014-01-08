@@ -47,7 +47,9 @@ TEST(TransferPoseBehaviorTests, InitTest)
 	std::shared_ptr<MockRepresentation> from = std::make_shared<MockRepresentation>("from");
 	std::shared_ptr<MockRepresentation> to = std::make_shared<MockRepresentation>("to");
 
-	std::shared_ptr<Behavior> behavior = std::make_shared<TransferPoseBehavior>("test name", from, to);
+	std::shared_ptr<Behavior> behavior = std::make_shared<TransferPoseBehavior>("test name");
+	std::dynamic_pointer_cast<TransferPoseBehavior>(behavior)->setPoseSender(from);
+	std::dynamic_pointer_cast<TransferPoseBehavior>(behavior)->setPoseSender(to);
 
 	EXPECT_EQ("test name", behavior->getName());
 }
@@ -57,7 +59,9 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 	std::shared_ptr<MockRepresentation> from = std::make_shared<MockRepresentation>("from");
 	std::shared_ptr<MockRepresentation> to = std::make_shared<MockRepresentation>("to");
 
-	std::shared_ptr<Behavior> behavior = std::make_shared<TransferPoseBehavior>("behavior", from, to);
+	std::shared_ptr<Behavior> behavior = std::make_shared<TransferPoseBehavior>("behavior");
+	std::dynamic_pointer_cast<TransferPoseBehavior>(behavior)->setPoseSender(from);
+	std::dynamic_pointer_cast<TransferPoseBehavior>(behavior)->setPoseReceiver(to);
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 

@@ -208,15 +208,19 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	// uses a FixedRepresentation for physics.  Therefore, its physics pose will not change unless it is altered
 	// outside of the physics/collision calculations, making this Component unnecessary for this example.  It is good
 	// practice to ensure that the physics and graphics poses are synced anyway.
-	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-							   physicsRepresentation, graphicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose"));
+
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Plane Collision", physicsRepresentation));
+	auto rigidRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	rigidRepresentation->setRigidRepresentation(physicsRepresentation);
+	planeElement->addComponent(rigidRepresentation);
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
 	planeElement->addComponent(std::make_shared<AddRandomSphereBehavior>());
@@ -280,8 +284,10 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(printoutBehavior);
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
-	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	sphereElement->addComponent(transferPose);
 	return sphereElement;
 }
 

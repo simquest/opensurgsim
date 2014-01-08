@@ -29,20 +29,18 @@ namespace Blocks
 
 TransferInputPoseBehavior::TransferInputPoseBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_from(),
-	m_to(),
 	m_poseName("pose")
 {
 }
 
-void TransferInputPoseBehavior::setPoseFrom(std::shared_ptr<SurgSim::Input::InputComponent> from)
+void TransferInputPoseBehavior::setPoseSender(std::shared_ptr<SurgSim::Input::InputComponent> sender)
 {
-	m_from = from;
+	m_from = sender;
 }
 
-void TransferInputPoseBehavior::setPoseTo(std::shared_ptr<SurgSim::Framework::Representation> to)
+void TransferInputPoseBehavior::setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver)
 {
-	m_to = to;
+	m_to = receiver;
 }
 
 void TransferInputPoseBehavior::setPoseName(const std::string& poseName)

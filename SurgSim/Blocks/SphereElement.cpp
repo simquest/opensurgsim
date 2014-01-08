@@ -88,13 +88,13 @@ bool SphereElement::doInitialize()
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
 	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseFrom(physicsRepresentation);
-	transferPose->setPoseTo(graphicsRepresentation);
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
 	addComponent(transferPose);
 
 	auto rigidCollision = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		("Sphere Collision Representation");
-	rigidCollision->setRepresentation(physicsRepresentation);
+	rigidCollision->setRigidRepresentation(physicsRepresentation);
 	addComponent(rigidCollision);
 
 	return true;
