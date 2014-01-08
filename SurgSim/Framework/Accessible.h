@@ -101,7 +101,7 @@ public:
 
 	/// Encode this Accessible to a YAML::Node
 	/// \return The encoded version of this instance.
-	YAML::Node encode();
+	YAML::Node encode() const;
 
 	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
 	/// be converted.

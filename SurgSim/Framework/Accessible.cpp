@@ -92,7 +92,7 @@ void Accessible::setSerializable(const std::string& name, EncoderType encoder, D
 	m_functors[name].decoder = decoder;
 }
 
-YAML::Node Accessible::encode()
+YAML::Node Accessible::encode() const
 {
 	YAML::Node result;
 	for (auto functors = m_functors.cbegin(); functors != m_functors.cend(); ++functors)

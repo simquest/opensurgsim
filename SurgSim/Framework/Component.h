@@ -20,6 +20,8 @@
 #include <memory>
 
 #include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace SurgSim
 {
@@ -35,7 +37,7 @@ class Runtime;
 /// whether to handle a component of a given type or not. Components will get initialized by having
 /// doInit(), and doWakeUp() called in succession, all components together will have doInit() called before
 /// any component will recieve doWakeUp()
-class Component
+class Component : public Accessible
 {
 public:
 	/// Constructor
@@ -47,9 +49,13 @@ public:
 	/// Gets component name.
 	/// \return	Name of this component.
 	std::string getName() const;
+	
 	/// Sets the name of component.
 	/// \param	name	The name of this component.
 	void setName(const std::string& name);
+
+	/// Gets the id of the component
+	std::string getId() const;
 
 	/// \return True if this component is initialized; otherwise, false.
 	bool isInitialized() const;
@@ -85,6 +91,9 @@ public:
 private:
 	/// Name of this component
 	std::string m_name;
+
+	/// Id of this component
+	std::string m_id;
 
 	/// Runtime which contains this component
 	std::weak_ptr<Runtime> m_runtime;

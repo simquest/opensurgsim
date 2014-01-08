@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {
@@ -28,6 +29,7 @@ class Runtime;
 Component::Component(const std::string& name) :
 	m_name(name), m_didInit(false), m_didWakeUp(false), m_isInitialized(false), m_isAwake(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Framework::Component, std::string, name, getName, setName);
 }
 
 Component::~Component()
@@ -90,6 +92,7 @@ std::shared_ptr<Scene> Component::getScene()
 void Component::setSceneElement(std::weak_ptr<SceneElement> sceneElement)
 {
 	m_sceneElement = sceneElement;
+	m_id = (m_sceneElement.lock())->getName() + "/" + m_name;
 }
 
 std::shared_ptr<SceneElement> Component::getSceneElement()
@@ -100,6 +103,11 @@ std::shared_ptr<SceneElement> Component::getSceneElement()
 std::shared_ptr<Runtime> Component::getRuntime() const
 {
 	return m_runtime.lock();
+}
+
+std::string Component::getId() const
+{
+	return m_id;
 }
 
 }; // namespace Framework

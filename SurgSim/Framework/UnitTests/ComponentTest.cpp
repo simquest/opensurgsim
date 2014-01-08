@@ -24,6 +24,7 @@
 #include "SurgSim/Framework/Component.h"
 
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
+#include <mutex>
 
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Scene;
@@ -56,5 +57,102 @@ TEST(ComponentTests, SetAndGetSceneTest)
 
 	EXPECT_EQ(scene, mock1->getScene());
 
+}
+
+class TestComponent1 : public SurgSim::Framework::Component
+{
+public:
+	TestComponent1(const std::string& name) : Component(name)
+	{
+
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	std::string getClassName()
+	{
+		return "TestComponent1";
+	}
+};
+
+TEST(ComponentTests, ConvertFactoryTest)
+{
+	YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass<TestComponent1>("TestComponent1");
+
+	YAML::Node node;
+	node["name"] = "ComponentName";
+	node["className"] = "TestComponent1";
+
+	auto component = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+
+	auto testComponent = std::dynamic_pointer_cast<TestComponent1>(component);
+
+	EXPECT_NE(nullptr, testComponent);
+	EXPECT_EQ("ComponentName", testComponent->getName());
+	EXPECT_EQ("TestComponent1", testComponent->getClassName());
+}
+
+class TestComponent2 : public SurgSim::Framework::Component
+{
+public:
+	TestComponent2(const std::string& name) : Component(name)
+	{
+
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	std::string getClassName()
+	{
+		return Meta.ClassName;
+	}
+
+private:
+	class MetaData
+	{
+	public:
+		MetaData()
+		{
+			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass<TestComponent2>("TestComponent2");
+			ClassName = "TestComponent";
+		}
+
+		std::string ClassName;
+	};
+
+	static MetaData Meta;
+};
+
+TestComponent2::MetaData TestComponent2::Meta;
+
+TEST(ComponentTests, AutomaticRegistrationTest)
+{
+	YAML::Node node;
+	node["name"] = "ComponentName";
+	node["className"] = "TestComponent2";
+
+	auto component = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+
+	auto testComponent = std::dynamic_pointer_cast<TestComponent2>(component);
+
+	EXPECT_NE(nullptr, testComponent);
+	EXPECT_EQ("ComponentName", testComponent->getName());
+	EXPECT_EQ("TestComponent2", testComponent->getClassName());
 }
 
