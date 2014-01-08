@@ -20,18 +20,19 @@
 
 namespace YAML
 {
-
-	/// Specialize of YAML::convert<> template Component class.
 	Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(const SurgSim::Framework::Component& rhs)
 	{
-		return rhs.encode();
+
+		YAML::Node node(rhs.encode());
+		node["className"] = rhs.getClassName();
+		return node;
 	}
 
 	Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(const std::shared_ptr<SurgSim::Framework::Component> rhs)
 	{
 		Node result = rhs->encode();
 		result["id"] = rhs->getId();
-		//result["className"] = rhs->getClassName();
+		result["className"] = rhs->getClassName();
 		result["name"] = rhs->getName();
 		return result;
 	}

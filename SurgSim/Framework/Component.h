@@ -88,6 +88,12 @@ public:
 	/// \return The runtime which contains this component
 	std::shared_ptr<Runtime> getRuntime() const;
 
+	// Currently this has a default implementation to prevent all the builds from breaking
+	virtual std::string getClassName() const
+	{
+		return "Missing ClassName";
+	}
+
 private:
 	/// Name of this component
 	std::string m_name;
@@ -110,7 +116,7 @@ private:
 	/// Interface to be implemented by derived classes
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
-
+	void buildId();
 	/// Indicates if doInitialize() has been called
 	bool m_didInit;
 	/// Indicates if doWakeup() has been called

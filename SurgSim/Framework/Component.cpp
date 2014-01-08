@@ -92,7 +92,6 @@ std::shared_ptr<Scene> Component::getScene()
 void Component::setSceneElement(std::weak_ptr<SceneElement> sceneElement)
 {
 	m_sceneElement = sceneElement;
-	m_id = (m_sceneElement.lock())->getName() + "/" + m_name;
 }
 
 std::shared_ptr<SceneElement> Component::getSceneElement()

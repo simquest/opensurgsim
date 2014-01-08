@@ -30,6 +30,82 @@ using SurgSim::Framework::Component;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::Runtime;
 
+class TestComponent1 : public SurgSim::Framework::Component
+{
+public:
+	TestComponent1(const std::string& name) : Component(name)
+	{
+
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	std::string getClassName()
+	{
+		return "TestComponent1";
+	}
+};
+
+class TestComponent2 : public SurgSim::Framework::Component
+{
+public:
+	TestComponent2(const std::string& name) :
+		Component(name),
+		valueOne(999),
+		valueTwo(999)
+	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestComponent2, int, valueOne, getValueOne, setValueOne);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestComponent2, int, valueTwo, getValueTwo, setValueTwo);
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	int getValueOne() const { return valueOne; }
+	void setValueOne(int val) { valueOne = val; }
+	int getValueTwo() const { return valueTwo; }
+	void setValueTwo(int val) { valueTwo = val; }
+
+	std::string getClassName() const override
+	{
+		return "TestComponent2";
+	}
+
+private:
+	class MetaData
+	{
+	public:
+		MetaData()
+		{
+			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass<TestComponent2>("TestComponent2");
+		}
+
+
+	};
+
+	static MetaData Meta;
+
+	int valueOne;
+	int valueTwo;
+};
+
+TestComponent2::MetaData TestComponent2::Meta;
+
 TEST(ComponentTests, Constructor)
 {
 	ASSERT_NO_THROW({MockComponent component("Component");});
@@ -59,30 +135,6 @@ TEST(ComponentTests, SetAndGetSceneTest)
 
 }
 
-class TestComponent1 : public SurgSim::Framework::Component
-{
-public:
-	TestComponent1(const std::string& name) : Component(name)
-	{
-
-	}
-
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
-
-	std::string getClassName()
-	{
-		return "TestComponent1";
-	}
-};
-
 TEST(ComponentTests, ConvertFactoryTest)
 {
 	YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass<TestComponent1>("TestComponent1");
@@ -100,47 +152,6 @@ TEST(ComponentTests, ConvertFactoryTest)
 	EXPECT_EQ("ComponentName", testComponent->getName());
 	EXPECT_EQ("TestComponent1", testComponent->getClassName());
 }
-
-class TestComponent2 : public SurgSim::Framework::Component
-{
-public:
-	TestComponent2(const std::string& name) : Component(name)
-	{
-
-	}
-
-	virtual bool doInitialize()
-	{
-		return true;
-	}
-
-	virtual bool doWakeUp()
-	{
-		return true;
-	}
-
-	std::string getClassName()
-	{
-		return Meta.ClassName;
-	}
-
-private:
-	class MetaData
-	{
-	public:
-		MetaData()
-		{
-			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass<TestComponent2>("TestComponent2");
-			ClassName = "TestComponent2";
-		}
-
-		std::string ClassName;
-	};
-
-	static MetaData Meta;
-};
-
-TestComponent2::MetaData TestComponent2::Meta;
 
 TEST(ComponentTests, AutomaticRegistrationTest)
 {
@@ -181,3 +192,35 @@ TEST(ComponentTests, DecodeSharedReferences)
 	EXPECT_NE(component2, component1copy);
 }
 
+TEST(ComponentTests, EncodeComponent)
+{
+	auto component = std::make_shared<TestComponent2>("TestComponent");
+	component->setValueOne(1);
+	component->setValueTwo(2);
+
+	YAML::Node node = YAML::convert<std::shared_ptr<Component>>::encode(component);
+
+	EXPECT_EQ("TestComponent", (node["name"].IsDefined() ? node["name"].as<std::string>() : "undefined !"));
+	EXPECT_EQ("TestComponent2", (node["className"].IsDefined() ? node["className"].as<std::string>() : "undefined !"));
+	EXPECT_EQ(1, (node["valueOne"].IsDefined() ? node["valueOne"].as<int>() : 0xbad));
+	EXPECT_EQ(2, (node["valueTwo"].IsDefined() ? node["valueTwo"].as<int>() : 0xbad));
+}
+
+TEST(ComponentTests, DecodeComponent)
+{
+	YAML::Node node;
+	node["name"] = "TestComponentName";
+	node["className"] = "TestComponent2";
+	node["id"] = "TestId";
+	node["valueOne"] = 100;
+	node["valueTwo"] = 101;
+
+	auto component = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+
+	auto testComponent = std::dynamic_pointer_cast<TestComponent2>(component);
+
+	EXPECT_NE(nullptr, testComponent);
+	EXPECT_EQ("TestComponentName", testComponent->getName());
+	EXPECT_EQ(100, testComponent->getValueOne());
+	EXPECT_EQ(101, testComponent->getValueTwo());
+}
