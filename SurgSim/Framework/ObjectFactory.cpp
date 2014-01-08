@@ -13,23 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
-#define SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
+#include "SurgSim/Framework/ObjectFactory.h"
 
-#include "SurgSim/Serialize/Convert.h"
-
-#include "SurgSim/Framework/Component.h"
-
-namespace YAML
+namespace SurgSim
 {
-	/// Specialize of YAML::convert<> template Component class.
-	template <>
-	struct convert <SurgSim::Framework::Component>
-	{
-		static Node encode(const SurgSim::Framework::Component& rhs);
-		static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component> rhs);
-	};
+namespace Serialize
+{
+
 
 };
-
-#endif // SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
+};
