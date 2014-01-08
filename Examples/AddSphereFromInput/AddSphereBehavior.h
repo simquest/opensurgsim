@@ -27,8 +27,8 @@ public:
 	explicit AddSphereFromInputBehavior(const std::string& name);
 
 	/// Set input component to get the pose
-	/// \param	from	Input component to get the pose
-	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> from);
+	/// \param	sender	Input component to get the pose
+	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> sender);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
