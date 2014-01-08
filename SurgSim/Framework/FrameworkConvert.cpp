@@ -29,21 +29,39 @@ namespace YAML
 
 	Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(const std::shared_ptr<SurgSim::Framework::Component> rhs)
 	{
-		Node result;
+		Node result = rhs->encode();
 		result["id"] = rhs->getId();
+		//result["className"] = rhs->getClassName();
+		result["name"] = rhs->getName();
 		return result;
 	}
 
 	bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node& node,
 		std::shared_ptr<SurgSim::Framework::Component>& rhs)
 	{
-		if (! node.IsMap())
+		bool result = false;
+		if (node.IsMap() && node["id"].IsDefined() && node["className"].IsDefined() && node["name"].IsDefined())
 		{
-			return false;
-		}
-		rhs = getFactory().create(node["className"].as<std::string>(),node["name"].as<std::string>());
-		return true;
+			if (rhs == nullptr)
+			{
+				std::string id = node["id"].as<std::string>();
+				RegistryType& registry = getRegistry();
+				auto sharedComponent = registry.find(id);
+				if ( sharedComponent != registry.end())
+				{
+					rhs = sharedComponent->second;
+				}
+				else
+				{
 
+					rhs = getFactory().create(node["className"].as<std::string>(),node["name"].as<std::string>());
+					getRegistry()[id] = rhs;
+				}
+			}
+			rhs->decode(node);
+			result = true;
+		}
+		return result;
 	}
 
 	 convert<std::shared_ptr<SurgSim::Framework::Component>>::FactoryType& 
@@ -51,5 +69,12 @@ namespace YAML
 	{
 		static FactoryType factory;
 		return factory;
+	}
+
+	convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType& 
+		convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry()
+	{
+		static RegistryType registry;
+		return registry;
 	}
 }

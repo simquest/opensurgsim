@@ -90,6 +90,7 @@ TEST(ComponentTests, ConvertFactoryTest)
 	YAML::Node node;
 	node["name"] = "ComponentName";
 	node["className"] = "TestComponent1";
+	node["id"] = "ComponentId";
 
 	auto component = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
 
@@ -130,7 +131,7 @@ private:
 		MetaData()
 		{
 			YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass<TestComponent2>("TestComponent2");
-			ClassName = "TestComponent";
+			ClassName = "TestComponent2";
 		}
 
 		std::string ClassName;
@@ -146,6 +147,8 @@ TEST(ComponentTests, AutomaticRegistrationTest)
 	YAML::Node node;
 	node["name"] = "ComponentName";
 	node["className"] = "TestComponent2";
+	node["id"] = "FakeId";
+
 
 	auto component = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
 
@@ -154,5 +157,27 @@ TEST(ComponentTests, AutomaticRegistrationTest)
 	EXPECT_NE(nullptr, testComponent);
 	EXPECT_EQ("ComponentName", testComponent->getName());
 	EXPECT_EQ("TestComponent2", testComponent->getClassName());
+}
+
+TEST(ComponentTests, DecodeSharedReferences)
+{
+	YAML::Node node;
+	node["name"] = "OneComponentName";
+	node["className"] = "TestComponent2";
+	node["id"] = "OneComponentName";
+
+	auto component1 = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+	EXPECT_NE(nullptr, component1);
+
+	auto component1copy = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+	EXPECT_NE(nullptr, component1copy);
+	EXPECT_EQ(component1, component1copy);
+
+	node["id"] = "TwoComponentName";
+
+	auto component2 = node.as<std::shared_ptr<SurgSim::Framework::Component>>();
+	EXPECT_NE(nullptr, component2);
+	EXPECT_NE(component2, component1);
+	EXPECT_NE(component2, component1copy);
 }
 

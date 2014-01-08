@@ -45,8 +45,11 @@ struct convert<std::shared_ptr<SurgSim::Framework::Component> >
 private:
 
 	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType; 
+	typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Framework::Component>> RegistryType;
 
 	static FactoryType& getFactory();
+	static RegistryType& getRegistry(); 
+
 };
 
 };
