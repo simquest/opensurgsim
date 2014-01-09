@@ -144,7 +144,7 @@ private:
 
 void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 {
-	auto scene = std::make_shared<SurgSim::Framework::Scene>();
+	auto scene = runtime->getScene();
 	auto box = std::make_shared<SimpleBox>("Plane");
 	box->setSize(10,0.01,10);
 	box->setPose(RigidTransform3d::Identity());
@@ -156,7 +156,6 @@ void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 	scene->addSceneElement(box);
 
 	scene->addSceneElement(createView("View", 0, 0, 1023, 768));
-	runtime->setScene(scene);
 }
 
 

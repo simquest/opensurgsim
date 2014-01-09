@@ -312,7 +312,8 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 
 	// A Scene is a container for all of the SceneElements, which in turn contain their Components.
-	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
+	// Since the Scene contains all of the Elements, a Runtime therefore has access to all of the Components.
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
@@ -327,9 +328,7 @@ int main(int argc, char* argv[])
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
-	// Tell the Runtime which Scene to use. Since the Scene contains all of the Elements, a Runtime therefore has
-	// access to all of the Components.
-	runtime->setScene(scene);
+
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
 	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the

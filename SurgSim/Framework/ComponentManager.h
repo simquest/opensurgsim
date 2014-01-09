@@ -157,7 +157,7 @@ private:
 	/// \param	beginIt	The begin iterator.
 	/// \param	endIt  	The end iterator.
 	/// \param[out] actualAdditions	List of components actually added
-	void addAndIntializeComponents(
+	void addComponents(
 		const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 		const std::vector<std::shared_ptr<Component>>::const_iterator& endIt,
 		std::vector<std::shared_ptr<Component>>* actualAdditions);

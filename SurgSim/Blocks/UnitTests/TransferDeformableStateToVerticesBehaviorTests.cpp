@@ -114,8 +114,8 @@ void testUpdate()
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	runtime->addManager(behaviorManager);
 
-	/// Create a scene and add the scene element to it
-	std::shared_ptr<SurgSim::Framework::Scene> scene = std::make_shared<SurgSim::Framework::Scene>();
+	/// Fetch the scene from the runtime
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	/// Add the representations and behavior to a scene element
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
 	std::shared_ptr<TransferDeformableStateToVerticesBehavior<T>> m;
@@ -132,7 +132,6 @@ void testUpdate()
 	}
 	sceneElement->addComponent(m);
 	scene->addSceneElement(sceneElement);
-	runtime->setScene(scene);
 
 	EXPECT_FALSE(behaviorManager->isInitialized());
 	EXPECT_FALSE(behaviorManager->isRunning());
@@ -170,8 +169,8 @@ void testUpdate<void>()
 		std::make_shared<SurgSim::Framework::BehaviorManager>();
 	runtime->addManager(behaviorManager);
 
-	/// Create a scene and add the scene element to it
-	std::shared_ptr<SurgSim::Framework::Scene> scene = std::make_shared<SurgSim::Framework::Scene>();
+	/// Fetch the scene and add the scene element to it
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	/// Add the representations and behavior to a scene element
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("scene element");
 	std::shared_ptr<TransferDeformableStateToVerticesBehavior<void>> m;
@@ -188,7 +187,6 @@ void testUpdate<void>()
 	}
 	sceneElement->addComponent(m);
 	scene->addSceneElement(sceneElement);
-	runtime->setScene(scene);
 
 	EXPECT_FALSE(behaviorManager->isInitialized());
 	EXPECT_FALSE(behaviorManager->isRunning());

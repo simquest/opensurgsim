@@ -71,7 +71,7 @@ void ComponentManager::processComponents()
 
 	if (!inflightAdditions.empty())
 	{
-		addAndIntializeComponents(std::begin(inflightAdditions), std::end(inflightAdditions), &actualAdditions);
+		addComponents(std::begin(inflightAdditions), std::end(inflightAdditions), &actualAdditions);
 		wakeUpComponents(std::begin(actualAdditions), std::end(actualAdditions));
 	}
 
@@ -113,7 +113,7 @@ bool ComponentManager::executeInitialization()
 
 	if (! inflightAdditions.empty())
 	{
-		addAndIntializeComponents(std::begin(inflightAdditions), std::end(inflightAdditions), &actualAdditions);
+		addComponents(std::begin(inflightAdditions), std::end(inflightAdditions), &actualAdditions);
 	}
 
 	success = waitForBarrier(success);
@@ -131,9 +131,6 @@ bool ComponentManager::executeInitialization()
 	{
 		removeComponents(std::begin(inflightRemovals), std::end(inflightRemovals));
 	}
-
-	// Wait for SceneElement WakeUp, the last in the sequence
-	success = waitForBarrier(success);
 
 	success = waitForBarrier(success);
 
@@ -165,7 +162,7 @@ void ComponentManager::removeComponents(const std::vector<std::shared_ptr<Compon
 	}
 }
 
-void ComponentManager::addAndIntializeComponents(
+void ComponentManager::addComponents(
 	const std::vector<std::shared_ptr<Component>>::const_iterator& beginIt,
 	const std::vector<std::shared_ptr<Component>>::const_iterator& endIt,
 	std::vector<std::shared_ptr<Component>>* actualAdditions)
@@ -174,17 +171,14 @@ void ComponentManager::addAndIntializeComponents(
 	for(auto it = beginIt; it != endIt; ++it)
 	{
 		std::shared_ptr<Behavior> behavior = std::dynamic_pointer_cast<Behavior>(*it);
-		if (behavior != nullptr)
+		if (behavior != nullptr && behavior->getTargetManagerType() == getType())
 		{
-			if (behavior->getTargetManagerType() == getType())
+			if (tryAddComponent(*it, &m_behaviors) != nullptr)
 			{
-				if (tryAddComponent(*it, &m_behaviors) != nullptr && (*it)->initialize(std::move(getRuntime())))
-				{
-					actualAdditions->push_back(*it);
-				}
+				actualAdditions->push_back(*it);
 			}
 		}
-		else if (executeAdditions(*it) && (*it)->initialize(std::move(getRuntime())))
+		else if (executeAdditions(*it))
 		{
 			actualAdditions->push_back(*it);
 		}
