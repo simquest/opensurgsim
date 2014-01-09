@@ -41,30 +41,28 @@ Scene::~Scene()
 
 void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 {
+	SURGSIM_ASSERT(!m_runtime.expired()) << "Runtime pointer is expired, cannot add SceneElement to Scene.";
+
 	std::string name = element->getName();
 	element->setScene(getSharedPtr());
 
-	if (!m_runtime.expired())
+	std::shared_ptr<Runtime> runtime = m_runtime.lock();
+	element->setRuntime(runtime);
+
+	if (element->initialize())
 	{
-		std::shared_ptr<Runtime> runtime = m_runtime.lock();
-		element->setRuntime(runtime);
-		if (element->initialize())
 		{
 			boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
 			m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
-			runtime->addSceneElement(element);
 		}
-	}
-	else
-	{
-		SURGSIM_FAILURE() << "Runtime pointer is expired, cannot add SceneElement to Scene.";
+		runtime->addSceneElement(element);
 	}
 
 }
 
 std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) const
 {
-	std::shared_ptr<SceneElement> result;	
+	std::shared_ptr<SceneElement> result;
 	boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
 	auto found = m_elements.find(name);
 	if (found != m_elements.end())

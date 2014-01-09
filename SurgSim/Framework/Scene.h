@@ -39,6 +39,7 @@ public:
 	/// \param runtime The runtime to be used.
 	explicit Scene(std::weak_ptr<Runtime> runtime);
 
+	/// Destructor
 	~Scene();
 
 	/// Adds a scene element to the Scene, the SceneElement will have its initialize() function called.

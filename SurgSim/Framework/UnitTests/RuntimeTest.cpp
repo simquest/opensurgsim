@@ -226,6 +226,6 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 
 	EXPECT_TRUE(components[1]->isInitialized());
 	EXPECT_TRUE(components[1]->isAwake());
-	
+
 	runtime->stop();
 }

@@ -48,7 +48,7 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 		{
 			auto runtime = getRuntime();
 			result = component->initialize(runtime);
-			runtime->addComponent(component);	
+			runtime->addComponent(component);
 		}
 	}
 	else

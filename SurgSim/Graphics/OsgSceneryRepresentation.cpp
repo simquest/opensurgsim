@@ -40,7 +40,7 @@ bool OsgSceneryRepresentation::doInitialize()
 	std::shared_ptr<const SurgSim::Framework::ApplicationData> applicationData = getRuntime()->getApplicationData();
 
 	std::string objectPath = applicationData->findFile(m_fileName);
-	SURGSIM_ASSERT(! objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
+	SURGSIM_ASSERT(!objectPath.empty()) << "Could not find file " << m_fileName << std::endl;
 
 	m_sceneryRepresentation = osgDB::readNodeFile(objectPath);
 	SURGSIM_ASSERT(m_sceneryRepresentation.valid()) << "Could not load file " << objectPath << std::endl;
@@ -56,6 +56,6 @@ std::string SurgSim::Graphics::OsgSceneryRepresentation::getFileName() const
 
 void SurgSim::Graphics::OsgSceneryRepresentation::setFileName( const std::string& fileName )
 {
-	SURGSIM_ASSERT(! isInitialized()) << "Can't set the filename after the object has been initialized.";
+	SURGSIM_ASSERT(!isInitialized()) << "Can't set the filename after the object has been initialized.";
 	m_fileName = fileName;
 }

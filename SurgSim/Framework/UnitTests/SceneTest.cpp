@@ -85,7 +85,7 @@ TEST(SceneTest, CheckForExpiredRuntime)
 	// to expire
 	runtime.reset();
 
-	// We should not be able to do this with an expired runtime pointer 
+	// We should not be able to do this with an expired runtime pointer
 	EXPECT_THROW(scene->addSceneElement(element1), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(element0->addComponent(component1), SurgSim::Framework::AssertionFailure);
 }
