@@ -28,9 +28,6 @@ TEST(RuntimeTest, Constructor)
 	EXPECT_NO_THROW({std::shared_ptr<Runtime> runtime(new Runtime());});
 	std::shared_ptr<Runtime> runtime(new Runtime());
 	EXPECT_NE(nullptr, runtime->getScene());
-	EXPECT_ANY_THROW(runtime->setScene(nullptr));
-
-	EXPECT_EQ(scene, runtime->getScene());
 }
 
 TEST(RuntimeTest, AddManager)

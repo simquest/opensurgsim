@@ -22,6 +22,9 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 
+#include "SurgSim/Input/CommonDevice.h"
+
+
 #include <gtest/gtest.h>
 
 using SurgSim::Framework::Runtime;
@@ -57,6 +60,11 @@ public:
 		return nullptr;
 	}
 
+	virtual	void enableMouseDevice(bool val) override
+	{
+		return;
+	}
+
 private:
 	/// Initialize the view element
 	/// \post m_isInitialized is set to true
@@ -73,7 +81,6 @@ private:
 		}
 	}
 
-	virtual	void enableMouseDevice(bool val) override
 	/// Whether the view has been initialized
 	bool m_isInitialized;
 };
@@ -119,8 +126,8 @@ TEST(ViewElementTests, StartUpTest)
 
 	/// Check that the view element was initialized and awoken
 	EXPECT_TRUE(viewElement->isInitialized());
-	EXPECT_TRUE(viewElement->getMockView()->isInitialized());
-	EXPECT_TRUE(viewElement->getMockView()->isAwoken());
+	EXPECT_TRUE(viewElement->getView()->isInitialized());
+	EXPECT_TRUE(viewElement->getView()->isAwake());
 }
 
 TEST(ViewElementTests, ViewTest)
