@@ -55,7 +55,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4f;
 
 ///\file Example of how to put together a very simple demo of Fem3D,
-/// using tetrahedron's elements and cube's elements
+/// using tetrahedron's elements or cube's elements
 
 std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 	const SurgSim::Math::RigidTransform3d& pose, SurgSim::Math::Vector4d color,
