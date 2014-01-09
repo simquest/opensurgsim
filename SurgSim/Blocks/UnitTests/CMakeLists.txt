@@ -38,8 +38,9 @@ set(UNIT_TEST_HEADERS
 	SpringTestUtils.h
 )
 
-set(LIBS 
+set(LIBS
 	SurgSimBlocks
+	gmock
 	gtest
 )
 

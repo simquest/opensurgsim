@@ -136,6 +136,8 @@ bool Runtime::start(bool paused)
 
 	// Gather all the Components from the currently known SceneElements to add them
 	// collectively.
+	// HS-2013-dec-12 This construct cause a bug as this also gathers the elements to be processed
+	// any sceneelements added after this call and before initialization is finished will get lost
 	preprocessSceneElements();
 
 	m_isRunning = true;
@@ -175,12 +177,13 @@ bool Runtime::stop()
 		resume();
 	}
 
+	m_isRunning = false;
+
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
 		(*it)->stop();
 	}
-
 	return true;
 }
 
@@ -214,7 +217,12 @@ void Runtime::step()
 	}
 }
 
-bool Runtime::isPaused()
+bool Runtime::isRunning() const
+{
+	return m_isRunning;
+}
+
+bool Runtime::isPaused() const
 {
 	return m_isPaused;
 }

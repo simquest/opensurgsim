@@ -30,6 +30,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableRepresentationState.cpp
 	Fem3DRepresentation.cpp
 	FemElement.cpp
+	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
@@ -37,6 +38,9 @@ set(SURGSIM_PHYSICS_SOURCES
 	LinearSpring.cpp
 	Localization.cpp
 	MassSpringRepresentation.cpp
+	MassSpringRepresentationContact.cpp
+	MassSpringRepresentationLocalization.cpp
+	MlcpPhysicsProblem.cpp
 	PhysicsManager.cpp
 	PhysicsManagerState.cpp
 	PostUpdate.cpp
@@ -66,6 +70,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentationState.h
 	Fem3DRepresentation.h
 	FemElement.h
+	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h
 	FemRepresentation-inl.h
@@ -78,6 +83,8 @@ set(SURGSIM_PHYSICS_HEADERS
 	Localization.h
 	Mass.h
 	MassSpringRepresentation.h
+	MassSpringRepresentationContact.h
+	MassSpringRepresentationLocalization.h
 	MlcpMapping.h
 	MlcpPhysicsProblem.h
 	MlcpPhysicsSolution.h
@@ -118,6 +125,7 @@ target_link_libraries(SurgSimPhysics ${LIBS}
 
 if(SURGSIM_TESTS_BUILD)
 	add_subdirectory(UnitTests)
+	add_subdirectory(RenderTests)
 endif()
 
 # Put SurgSimPhysics into folder "Physics"

@@ -37,6 +37,7 @@ set(UNIT_TEST_SOURCES
 	SceneTest.cpp
 	SharedInstanceTest.cpp
 	TimerTest.cpp
+	TransferPropertiesBehaviorTests.cpp
 )
 
 set(UNIT_TEST_HEADERS
@@ -50,6 +51,7 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimFramework
+	gmock
 	gtest
 )
 

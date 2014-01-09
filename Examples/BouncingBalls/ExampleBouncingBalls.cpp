@@ -77,9 +77,18 @@ using SurgSim::Physics::PhysicsManager;
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
-		Behavior("PrintoutBehavior"), m_representation(representation) {}
+	/// Constructor
+	/// \param	name	The printout behavior name
+	explicit PrintoutBehavior(const std::string& name = "PrintOutBehavior") :
+		Behavior(name) {}
 	~PrintoutBehavior() {}
+
+	/// Set representation for printout behavior
+	/// \param	representation	The representation information
+	void setRepresentation(std::shared_ptr<RigidRepresentation> representation)
+	{
+		m_representation = representation;
+	}
 
 	/// Perform per-period actions, i.e., what to do each "frame".
 	/// \note Behavior::update() is called by ComponentManager::processBehaviors(), which is called by
@@ -266,7 +275,9 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
-	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
+	auto printoutBehavior = std::make_shared<PrintoutBehavior>();
+	printoutBehavior->setRepresentation(physicsRepresentation);
+	sphereElement->addComponent(printoutBehavior);
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
 	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",

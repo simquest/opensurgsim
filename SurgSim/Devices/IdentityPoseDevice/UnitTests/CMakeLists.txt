@@ -26,9 +26,10 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS 
-	IdentityPoseDevice 
-	gtest 
+set(LIBS
+	IdentityPoseDevice
+	gmock
+	gtest
 )
 
 surgsim_add_unit_tests(IdentityPoseDeviceTest)

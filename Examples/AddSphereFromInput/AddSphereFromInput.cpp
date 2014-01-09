@@ -17,6 +17,7 @@
 #include <boost/thread.hpp>
 
 #include "Examples/AddSphereFromInput/AddSphereBehavior.h"
+
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
@@ -37,13 +38,14 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Physics/PhysicsManager.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
@@ -130,8 +132,8 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
-		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
-
+		std::make_shared<SurgSim::Input::InputComponent>("input");
+	inputComponent->setDeviceName("MultiAxisDevice");
 	std::shared_ptr<SceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
 	boxElement->addComponent(graphicsRepresentation);
 	boxElement->addComponent(inputComponent);

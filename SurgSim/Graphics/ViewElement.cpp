@@ -16,6 +16,10 @@
 #include "SurgSim/Graphics/View.h"
 #include "SurgSim/Graphics/ViewElement.h"
 
+namespace SurgSim
+{
+namespace Graphics
+{
 using SurgSim::Graphics::View;
 using SurgSim::Graphics::ViewElement;
 
@@ -43,3 +47,6 @@ bool ViewElement::doInitialize()
 	addComponent(m_view);
 	return true;
 }
+
+}; // End of namespace Graphics
+}; // End of namespace SurgSim
