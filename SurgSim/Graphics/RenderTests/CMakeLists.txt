@@ -28,6 +28,7 @@ set(UNIT_TEST_SOURCES
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
 	OsgMeshRepresentationRenderTests.cpp
+	OsgOctreeRepresentationRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
