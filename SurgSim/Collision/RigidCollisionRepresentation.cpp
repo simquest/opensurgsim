@@ -21,8 +21,7 @@ namespace Collision
 {
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
-	Representation(name),
-	m_physicsRepresentation()
+	Representation(name)
 {
 }
 
