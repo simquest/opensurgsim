@@ -71,6 +71,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Material.h
 	Mesh.h
 	MeshRepresentation.h
+	OctreeRepresentation.h
 	OsgAxesRepresentation.h
 	OsgBoxRepresentation.h
 	OsgCamera.h
@@ -84,6 +85,8 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgMaterial.h
 	OsgMatrixConversions.h
 	OsgMeshRepresentation.h
+	OsgOctreeRepresentation.h
+	OsgOctreeRepresentation-inl.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h
