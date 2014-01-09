@@ -155,6 +155,7 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&class::getter, this),\
 				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)))
 
+/// Add a property that will also be serialized
 #define SURGSIM_ADD_SERIALIZABLE_PROPERTY(class, type, property, getter, setter) \
 	setAccessors(#property, \
 				std::bind(&class::getter, this),\

@@ -26,7 +26,10 @@ namespace SurgSim
 namespace Framework
 {
 
-/// A factory implementation for Objects
+/// An object factory, once class are registered with the factory the factory can
+/// be used to create instances of registered classes. All the classes registered
+/// need to have a default constructor.
+/// \tparam Base the base class for all classes that can be registered with the factory.
 template <typename Base>
 class ObjectFactory
 {
@@ -43,6 +46,11 @@ public:
 	/// \return a pointer to the object of derived rigid shape, or nullptr otherwise.
 	std::shared_ptr<Base> create(const std::string& className);
 
+	/// Check wether the class is registered in the factory.
+	/// \param className Name of the class to check.
+	/// \return true if the factory has a constructor for this class
+	bool isRegistered(const std::string& className) const;
+
 private:
 	/// A wrapper of function object
 	typedef boost::function<std::shared_ptr<Base>()> Constructor;
@@ -52,7 +60,11 @@ private:
 
 };
 
-/// A factory implementation for Objects
+/// An object factory, once class are registered with the factory the factory can
+/// be used to create instances of registered classes. All the classes registered
+/// need to have a one parameter constructor.
+/// \tparam Base The base class for all classes that can be registered with the factory.
+/// \tparam Parameter1 The class for the constructor parameter.
 template <typename Base, typename Parameter1>
 class ObjectFactory1
 {
@@ -66,8 +78,13 @@ public:
 
 	/// Create an instance of derived rigid shape based on the specific class name.
 	/// \param className The identifier name to be used.
-	/// \return a pointer to the object of derived rigid shape, or nullptr otherwise.
+	/// \return a pointer to the object of type Derived, asserts otherwise
 	std::shared_ptr<Base> create(const std::string& className, const Parameter1& val);
+
+	/// Check wether the class is registered in the factory.
+	/// \param className Name of the class to check.
+	/// \return true if the factory has a constructor for this class
+	bool isRegistered(const std::string& className) const;
 
 private:
 	/// A wrapper of function object
@@ -75,11 +92,10 @@ private:
 
 	/// Look up table for shapes factory.
 	std::map<std::string, Constructor> m_constructors;
-
 };
 
 };
-}; 
+};
 
 #include "SurgSim/Framework/ObjectFactory-inl.h"
 

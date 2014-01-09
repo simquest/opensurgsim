@@ -43,6 +43,15 @@ std::shared_ptr<Base> SurgSim::Framework::ObjectFactory<Base>::create(const std:
 	return (it->second)();
 };
 
+
+template <typename Base>
+bool SurgSim::Framework::ObjectFactory<Base>::isRegistered(const std::string& className) const
+{
+	auto it = m_constructors.find(className);
+	return (it != m_constructors.end());
+}
+
+
 template <typename Base, typename Parameter1>
 template <typename Derived>
 void SurgSim::Framework::ObjectFactory1<Base, Parameter1>::registerClass(const std::string& className)
@@ -68,5 +77,13 @@ std::shared_ptr<Base> SurgSim::Framework::ObjectFactory1<Base, Parameter1>::crea
 	}
 	return (it->second)(val);
 };
+
+template <typename Base, typename Parameter1>
+bool SurgSim::Framework::ObjectFactory1<Base, Parameter1>::isRegistered(const std::string& className) const
+{
+	auto it = m_constructors.find(className);
+	return (it != m_constructors.end());
+}
+
 
 #endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_INL_H

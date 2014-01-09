@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
-#define SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
+#ifndef SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_H
+#define SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_H
 
 #include <memory>
 
@@ -31,29 +31,48 @@ class Component;
 
 namespace YAML
 {
-/// Specialize of YAML::convert<> template Component class.
+/// Specialization of YAML::convert for std::shared_ptr<Component>
+/// This specialization, is slightly asymmetric, on encode it will only encode a components
+/// name, id and className. When decoding this conversion will check wether a component with
+/// the same id has already been encountered. If no a new instance will be created and stored
+/// in a local Registry. If yes, the entry from the registry will be returned, this makes sure
+/// that all references to the same id will use the correct, copy of the smart pointer.
+/// Additionally this class contains a class factory that can be used to generate the class from
+/// its name.
 template <>
 struct convert<std::shared_ptr<SurgSim::Framework::Component> >
 {
-	static Node encode(const SurgSim::Framework::Component& rhs);
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Component> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component>& rhs);
 
+	/// Register a class with the conversion class.
+	/// \tparam Base Type of the class that is being registered.
+	/// \param className name of the class that is being registered.
 	template <typename Base>
 	static void registerClass(const std::string& className);
 
 private:
 
-	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType; 
+	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType;
 	typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Framework::Component>> RegistryType;
 
+	/// \return The static class factory that is being used in the conversion
 	static FactoryType& getFactory();
-	static RegistryType& getRegistry(); 
 
+	/// \return The static registry for shared instances
+	static RegistryType& getRegistry();
+};
+
+/// Override of the convert structure for an Component, this will write out a full version
+/// of the component information, to decode a component use the other converter. 
+template<>
+struct convert<SurgSim::Framework::Component>
+{
+	static Node encode(const SurgSim::Framework::Component& rhs);
 };
 
 };
 
 #include "SurgSim/Framework/FrameworkConvert-inl.h"
 
-#endif // SURGSIM_SERIALIZE_FRAMEWORKCONVERT_H
+#endif // SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_H

@@ -20,17 +20,9 @@
 
 namespace YAML
 {
-	Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(const SurgSim::Framework::Component& rhs)
-	{
-
-		YAML::Node node(rhs.encode());
-		node["className"] = rhs.getClassName();
-		return node;
-	}
-
 	Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(const std::shared_ptr<SurgSim::Framework::Component> rhs)
 	{
-		Node result = rhs->encode();
+		Node result;
 		result["id"] = rhs->getId();
 		result["className"] = rhs->getClassName();
 		result["name"] = rhs->getName();
@@ -54,9 +46,18 @@ namespace YAML
 				}
 				else
 				{
+					std::string className = node["className"].as<std::string>();
+					FactoryType& factory = getFactory();
 
-					rhs = getFactory().create(node["className"].as<std::string>(),node["name"].as<std::string>());
-					getRegistry()[id] = rhs;
+					if (factory.isRegistered(className))
+					{
+						rhs = getFactory().create(node["className"].as<std::string>(),node["name"].as<std::string>());
+						getRegistry()[id] = rhs;
+					}
+					else
+					{
+						SURGSIM_FAILURE() << "Class " << className << " is not registered in the factory.";
+					}
 				}
 			}
 			rhs->decode(node);
@@ -65,17 +66,28 @@ namespace YAML
 		return result;
 	}
 
-	 convert<std::shared_ptr<SurgSim::Framework::Component>>::FactoryType& 
+	 convert<std::shared_ptr<SurgSim::Framework::Component>>::FactoryType&
 		  convert<std::shared_ptr<SurgSim::Framework::Component>>::getFactory()
 	{
 		static FactoryType factory;
 		return factory;
 	}
 
-	convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType& 
+	convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType&
 		convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry()
 	{
 		static RegistryType registry;
 		return registry;
 	}
+
+	Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Component& rhs)
+	{
+
+		YAML::Node node(rhs.encode());
+		node["id"] = rhs.getId();
+		node["className"] = rhs.getClassName();
+		node["name"] = rhs.getName();
+		return node;
+	}
+
 }

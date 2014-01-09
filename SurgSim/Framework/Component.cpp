@@ -106,7 +106,7 @@ std::shared_ptr<Runtime> Component::getRuntime() const
 
 std::string Component::getId() const
 {
-	return m_id;
+	return m_name;
 }
 
 }; // namespace Framework

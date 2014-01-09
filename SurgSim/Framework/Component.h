@@ -49,7 +49,7 @@ public:
 	/// Gets component name.
 	/// \return	Name of this component.
 	std::string getName() const;
-	
+
 	/// Sets the name of component.
 	/// \param	name	The name of this component.
 	void setName(const std::string& name);
@@ -126,6 +126,8 @@ private:
 	bool m_isInitialized;
 	/// Indicates if this component is awake
 	bool m_isAwake;
+
+
 };
 
 }; // namespace Framework
