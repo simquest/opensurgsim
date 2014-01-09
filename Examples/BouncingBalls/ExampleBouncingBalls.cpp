@@ -211,7 +211,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
-	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose"));
+	planeElement->addComponent(transferPose);
 
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
