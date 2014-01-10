@@ -89,7 +89,7 @@ std::shared_ptr<FemElement> FemRepresentation<MT, DT, KT, ST>::getFemElement(uns
 }
 
 template <class MT, class DT, class KT, class ST>
-bool FemRepresentation<MT, DT, KT, ST>::isValidCoordinate(const FemRepresentationCoordinate &coordinate) const
+bool FemRepresentation<MT, DT, KT, ST>::isValidCoordinate(const FemRepresentationCoordinate& coordinate) const
 {
 	return (coordinate.elementId < m_femElements.size())
 		&& m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.naturalCoordinate);

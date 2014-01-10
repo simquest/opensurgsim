@@ -38,7 +38,7 @@ namespace Physics
 {
 
 void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes,
-					 const DeformableRepresentationState &state, double massDensity = 1.0,
+					 const DeformableRepresentationState& state, double massDensity = 1.0,
 					 double poissonRatio = 0.1, double youngModulus = 1.0)
 {
 	auto element = std::make_shared<FemElement3DTetrahedron>(nodes, state);
@@ -60,7 +60,7 @@ public:
 		auto state = std::make_shared<DeformableRepresentationState>();
 		state->setNumDof(3, 6);
 
-		auto &x = state->getPositions();
+		auto& x = state->getPositions();
 		getSubVector(x, 0, 3) = Vector3d( 0.0,  0.0,  0.0);
 		getSubVector(x, 1, 3) = Vector3d( 0.0,  1.0, -1.0);
 		getSubVector(x, 2, 3) = Vector3d(-1.0,  1.0,  0.0);

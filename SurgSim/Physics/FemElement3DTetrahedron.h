@@ -127,7 +127,7 @@ public:
 
 	/// Determines whether a given natural coordinate is valid
 	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const override;
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 	/// Computes a given natural coordinate in cartesian coordinates
 	/// \param state The state at which to transform coordinates
@@ -135,7 +135,7 @@ public:
 	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
-		const SurgSim::Math::Vector &naturalCoordinate) const override;
+		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 protected:
 	/// Computes the tetrahdron shape functions

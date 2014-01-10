@@ -397,7 +397,7 @@ void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentati
 	}
 }
 
-bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const
+bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
 		&& (naturalCoordinate.size() == 4);
@@ -405,7 +405,7 @@ bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector &nat
 
 SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
-	const SurgSim::Math::Vector &naturalCoordinate) const
+	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
 		<< "naturalCoordinate must be normalized and length 4.";

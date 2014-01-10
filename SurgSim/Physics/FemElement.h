@@ -166,7 +166,7 @@ public:
 
 	/// Determines whether a given natural coordinate is valid
 	/// \return True if valid
-	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const = 0;
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const = 0;
 
 	/// Computes a given natural coordinate in cartesian coordinates
 	/// \param state The state at which to transform coordinates
