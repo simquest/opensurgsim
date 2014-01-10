@@ -42,6 +42,13 @@ public:
 
 };
 
+class NullOutput : public LogOutput
+{
+public:
+	virtual bool writeMessage(const std::string& message) {return true;};
+};
+
+
 /// Class to output logging information to a give file
 class FileOutput : public LogOutput
 {

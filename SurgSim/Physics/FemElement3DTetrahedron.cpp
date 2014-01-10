@@ -56,6 +56,8 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 
 	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
 	{
+		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < restState.getNumNodes()) <<
+			"Invalid nodeId " << *nodeId << " expected in range [0.."<< restState.getNumNodes()-1<<"]";
 		m_nodeIds.push_back(*nodeId);
 	}
 
@@ -74,7 +76,7 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 	SurgSim::Math::Vector3d AC = C - A;
 	SurgSim::Math::Vector3d AD = D - A;
 	SURGSIM_LOG_IF(AB.cross(AC).dot(AD) < 0, Logger::getDefaultLogger(), WARNING) <<
-		"Tetrahedron illed defined (ABC defined counter clock viewed from D) with node ids["<<
+		"Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids["<<
 		m_nodeIds[0]<<", "<<m_nodeIds[1]<<", "<<m_nodeIds[2]<<", "<<m_nodeIds[3]<<"]";
 }
 

@@ -46,11 +46,6 @@ void RigidRepresentationContact::doBuild(double dt,
 			unsigned int indexOfConstraint,
 			ConstraintSideSign sign)
 {
-	MlcpPhysicsProblem::Matrix& H    = mlcp->H;
-	MlcpPhysicsProblem::Matrix& CHt  = mlcp->CHt;
-	MlcpPhysicsProblem::Matrix& HCHt = mlcp->A;
-	MlcpPhysicsProblem::Vector& b    = mlcp->b;
-
 	std::shared_ptr<Representation> representation = localization->getRepresentation();
 	std::shared_ptr<RigidRepresentation> rigid = std::static_pointer_cast<RigidRepresentation>(representation);
 
@@ -83,30 +78,19 @@ void RigidRepresentationContact::doBuild(double dt,
 
 	// Fill up b with the constraint equation...
 	double violation = n.dot(globalPosition) + d;
-	b[indexOfConstraint] += violation * scale;
+	mlcp->b[indexOfConstraint] += violation * scale;
 
-	// Fill up H with just the non null values
-	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 0) += dt * scale * n;
-	H.block<1,3>(indexOfConstraint, indexOfRepresentation + 3) += dt * scale * GP.cross(n);
+	m_newH.resize(rigid->getNumDof());
+	m_newH.reserve(6);
+	m_newH.insert(0) = dt * scale * n[0];
+	m_newH.insert(1) = dt * scale * n[1];
+	m_newH.insert(2) = dt * scale * n[2];
+	Eigen::Vector3d rotation = GP.cross(n);
+	m_newH.insert(3) = dt * scale * rotation[0];
+	m_newH.insert(4) = dt * scale * rotation[1];
+	m_newH.insert(5) = dt * scale * rotation[2];
 
-	// Fill up CH^t with just the non null values
-	for (unsigned int CHt_line = 0; CHt_line < rigid->getNumDof(); CHt_line++)
-	{
-		CHt(indexOfRepresentation + CHt_line, indexOfConstraint) +=
-			C.block<1,6>(CHt_line, 0) * H.block<1,6>(indexOfConstraint, indexOfRepresentation).transpose();
-	}
-
-	// Fill up HCHt (add 1 line and 1 column to it)
-	// NOTE: HCHt is symmetric => we compute the last line and reflect it on the last column
-	for (unsigned int col = 0; col < indexOfConstraint; col++)
-	{
-		HCHt(indexOfConstraint, col) +=
-			H.block<1, 6>(indexOfConstraint, indexOfRepresentation) * CHt.block<6, 1>(indexOfRepresentation, col);
-		HCHt(col, indexOfConstraint) = HCHt(indexOfConstraint, col);
-	}
-	HCHt(indexOfConstraint, indexOfConstraint) +=
-		H.block<1, 6>(indexOfConstraint, indexOfRepresentation) *
-		CHt.block<6, 1>(indexOfRepresentation, indexOfConstraint);
+	mlcp->updateConstraint(m_newH, C, indexOfRepresentation, indexOfConstraint);
 }
 
 SurgSim::Math::MlcpConstraintType RigidRepresentationContact::getMlcpConstraintType() const
@@ -123,8 +107,6 @@ unsigned int RigidRepresentationContact::doGetNumDof() const
 {
 	return 1;
 }
-
-
 
 }; // namespace Physics
 

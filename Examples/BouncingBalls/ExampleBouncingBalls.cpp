@@ -77,9 +77,18 @@ using SurgSim::Physics::PhysicsManager;
 class PrintoutBehavior : public SurgSim::Framework::Behavior
 {
 public:
-	explicit PrintoutBehavior(std::shared_ptr<RigidRepresentation> representation) :
-		Behavior("PrintoutBehavior"), m_representation(representation) {}
+	/// Constructor
+	/// \param	name	The printout behavior name
+	explicit PrintoutBehavior(const std::string& name = "PrintOutBehavior") :
+		Behavior(name) {}
 	~PrintoutBehavior() {}
+
+	/// Set representation for printout behavior
+	/// \param	representation	The representation information
+	void setRepresentation(std::shared_ptr<RigidRepresentation> representation)
+	{
+		m_representation = representation;
+	}
 
 	/// Perform per-period actions, i.e., what to do each "frame".
 	/// \note Behavior::update() is called by ComponentManager::processBehaviors(), which is called by
@@ -266,7 +275,9 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(physicsRepresentation);
 	sphereElement->addComponent(graphicsRepresentation);
 	// By adding the PrintoutBehavior, the BehaviorManager will output this SceneElement's position each update.
-	sphereElement->addComponent(std::make_shared<PrintoutBehavior>(physicsRepresentation));
+	auto printoutBehavior = std::make_shared<PrintoutBehavior>();
+	printoutBehavior->setRepresentation(physicsRepresentation);
+	sphereElement->addComponent(printoutBehavior);
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
 	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
@@ -301,7 +312,8 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 
 	// A Scene is a container for all of the SceneElements, which in turn contain their Components.
-	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
+	// Since the Scene contains all of the Elements, a Runtime therefore has access to all of the Components.
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
@@ -316,9 +328,7 @@ int main(int argc, char* argv[])
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
-	// Tell the Runtime which Scene to use. Since the Scene contains all of the Elements, a Runtime therefore has
-	// access to all of the Components.
-	runtime->setScene(scene);
+
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
 	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the

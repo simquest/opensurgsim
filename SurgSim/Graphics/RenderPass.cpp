@@ -51,11 +51,6 @@ bool RenderPass::doInitialize()
 	return true;
 }
 
-bool RenderPass::doWakeUp()
-{
-	return true;
-}
-
 std::shared_ptr<Camera> RenderPass::getCamera()
 {
 	return m_camera;
@@ -64,16 +59,6 @@ std::shared_ptr<Camera> RenderPass::getCamera()
 std::shared_ptr<Group> RenderPass::getGroup()
 {
 	return m_group;
-}
-
-void RenderPass::setView(std::shared_ptr<View> view)
-{
-	m_view = view;
-}
-
-std::shared_ptr<View> RenderPass::getView()
-{
-	return m_view;
 }
 
 bool RenderPass::setRenderTarget(std::shared_ptr<RenderTarget> target)
@@ -154,7 +139,7 @@ void RenderPass::hideDepthTarget()
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderPass::buildDebugQuad(const std::string& name,
 		std::shared_ptr<Texture> texture)
 {
-	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name, m_view);
+	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	result->setTexture(texture);
 	addComponent(result);
 	return result;

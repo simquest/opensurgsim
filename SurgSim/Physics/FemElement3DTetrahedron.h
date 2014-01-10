@@ -125,7 +125,7 @@ public:
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(const DeformableRepresentationState& state,
 		double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
+		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check
@@ -152,7 +152,7 @@ protected:
 		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k);
 
 	/// Computes the tetrahedron mass matrix
-	/// \param state The deformable state to compute the stiffness matrix from
+	/// \param state The deformable state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
 	void computeMass(const DeformableRepresentationState& state,
 		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);

@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Accessible.h"
+#include "SurgSim/Math/Matrix.h"
 
 namespace SurgSim
 {
@@ -29,6 +30,7 @@ boost::any Framework::Accessible::getValue(const std::string& name)
 	}
 	else
 	{
+		SURGSIM_FAILURE() << "No property with name: " << name <<" found.";
 		return boost::any();
 	}
 }
@@ -39,6 +41,10 @@ void Framework::Accessible::setValue(const std::string& name, const boost::any& 
 	if (element != std::end(m_setters))
 	{
 		element->second(value);
+	}
+	else
+	{
+		SURGSIM_FAILURE() << "Can't set property with name: " << name << ".";
 	}
 }
 
@@ -68,6 +74,26 @@ bool Accessible::isWriteable(const std::string& name) const
 {
 	return (m_setters.cend() != m_setters.find(name));
 }
+
+template<>
+SurgSim::Math::Matrix44f convert(boost::any val)
+{
+
+	SurgSim::Math::Matrix44f floatResult;
+	// Use try in case this conversion was created using a Matrix44f, in which case the any_cast will
+	// still fail and throw an exception
+	try
+	{
+		SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
+		floatResult = result.cast<float>();
+	}
+	catch (boost::bad_any_cast &)
+	{
+		floatResult = boost::any_cast<SurgSim::Math::Matrix44f>(val);
+	}
+	return floatResult;
+}
+
 
 }; // Framework
 }; // SurgSim

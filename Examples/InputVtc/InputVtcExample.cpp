@@ -158,8 +158,8 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	rawInputGraphicsRepresentation->setMaterial(material);
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
-		std::make_shared<SurgSim::Input::InputComponent>("input", "MultiAxisDevice");
-
+		std::make_shared<SurgSim::Input::InputComponent>("input");
+	inputComponent->setDeviceName("MultiAxisDevice");
 	// The vtc parameters control the spring between the device and the simulated rigid body.
 	// To understand how they are used, let's have a look at the physics under the hood.
 	// For a given spring between points A and B, of stiffness k and damping c, we have the Newton's law:
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
-	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box"));
 	scene->addSceneElement(createPlane("plane",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
@@ -226,7 +226,6 @@ int main(int argc, char* argv[])
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
-	runtime->setScene(scene);
 	runtime->execute();
 
 	return 0;

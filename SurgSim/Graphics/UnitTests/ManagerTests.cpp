@@ -19,19 +19,17 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Graphics/ViewElement.h"
+#include "SurgSim/Framework/ComponentManager.h"
 #include "SurgSim/Graphics/UnitTests/MockObjects.h"
 
 #include <gtest/gtest.h>
 
 #include <algorithm>
-#include <random>
 
 using SurgSim::Framework::ComponentManager;
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
-using SurgSim::Framework::SceneElement;
 
 class GraphicsManagerTest : public ::testing::Test
 {
@@ -90,13 +88,7 @@ TEST_F(GraphicsManagerTest, StartUpTest)
 	EXPECT_EQ(0, manager->getNumUpdates());
 	EXPECT_EQ(0.0, manager->getSumDt());
 
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
-
-	/// Add a graphics component to the scene
-	std::shared_ptr<MockView> view = std::make_shared<MockView>("test component");
-	std::shared_ptr<ViewElement> viewElement = std::make_shared<ViewElement>("test element", view);
-	scene->addSceneElement(viewElement);
+	std::shared_ptr<Scene> scene = runtime->getScene();
 
 	/// Run the thread for a moment
 	runtime->start();
@@ -107,11 +99,6 @@ TEST_F(GraphicsManagerTest, StartUpTest)
 	/// Check that the manager did update when the thread was running
 	EXPECT_GT(manager->getNumUpdates(), 0);
 	EXPECT_GT(manager->getSumDt(), 0.0);
-
-	EXPECT_TRUE(view->isInitialized());
-	EXPECT_TRUE(view->isAwoken());
-	EXPECT_GT(view->getNumUpdates(), 0);
-	EXPECT_EQ(manager->getNumUpdates(), view->getNumUpdates());
 }
 
 TEST_F(GraphicsManagerTest, AddRemoveTest)

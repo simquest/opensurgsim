@@ -33,6 +33,11 @@ using SurgSim::Math::Vector;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 
+namespace
+{
+	const double epsilon = 1e-10;
+};
+
 class MockMassSpring : public MassSpringRepresentation
 {
 public:
@@ -476,4 +481,33 @@ TEST_F(MassSpringRepresentationTests, EnergyTest)
 			time += m_dt;
 		}
 	}
+}
+
+TEST_F(MassSpringRepresentationTests, ApplyDofCorrection)
+{
+	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_boundaryConditions, m_totalMass,
+		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
+		SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER);
+
+	SurgSim::Math::Vector dv;
+	dv.resize(m.getNumDof());
+	for (unsigned int i = 0; i < m.getNumDof(); i++)
+	{
+		dv(i) = static_cast<double>(i);
+	}
+
+	Eigen::VectorXd previousX = m.getCurrentState()->getPositions();
+	Eigen::VectorXd previousV = m.getCurrentState()->getVelocities();
+
+	m.applyDofCorrection(m_dt, dv.segment(0, m.getNumDof()));
+	Eigen::VectorXd nextX = m.getCurrentState()->getPositions();
+	Eigen::VectorXd nextV = m.getCurrentState()->getVelocities();
+
+	EXPECT_TRUE(nextX.isApprox(previousX + dv * m_dt, epsilon));
+	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
+
+	dv(0) = std::numeric_limits<double>::infinity();
+	EXPECT_TRUE(m.isActive());
+	m.applyDofCorrection(m_dt, dv.segment(0, m.getNumDof()));
+	EXPECT_FALSE(m.isActive());
 }

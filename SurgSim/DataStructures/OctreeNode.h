@@ -29,6 +29,11 @@ namespace SurgSim
 namespace DataStructures
 {
 
+/// Typedef of octree path
+/// The path is a vector of children indexes (each within 0 to 7) that lead to
+/// the specific node the front of the vector holds the index of the root's children.
+typedef std::vector<size_t> OctreePath;
+
 
 /// Octree data structure
 ///
@@ -38,11 +43,25 @@ namespace DataStructures
 ///
 /// \tparam	Data Type of extra data stored in each node
 template<class Data>
-class OctreeNode
+class OctreeNode : public std::enable_shared_from_this<OctreeNode<Data>>
 {
 public:
 	/// Bounding box type for convenience
 	typedef Eigen::AlignedBox<double, 3> AxisAlignedBoundingBox;
+
+	/// Constructor
+	OctreeNode();
+
+	/// Copy constructor when the template data is the same type
+	/// \param other the octree to copy from
+	OctreeNode(const OctreeNode& other);
+
+	/// Copy constructor when the template data is a different type
+	/// In this case, no data will be copied
+	/// \tparam T type of data stored in the other node
+	/// \param other the octree to copy from
+	template <class T>
+	OctreeNode(const OctreeNode<T>& other);
 
 	/// Constructor
 	/// \param  boundingBox The region contained by this octree node
@@ -98,10 +117,15 @@ public:
 	/// NOTE: an exception will be thrown if the index >= 8
 	const std::shared_ptr<OctreeNode<Data> > getChild(size_t index) const;
 
+	/// Get the node at the supplied path
+	/// \param path the path to the specific node
+	/// \return the requested octree node
+	virtual std::shared_ptr<OctreeNode<Data> > getNode(const OctreePath& path);
+
 	/// Extra node data
 	Data data;
 
-private:
+protected:
 	/// Recursive function that does the adding of the data to the octree
 	/// \param position The position to add the data at
 	/// \param nodeData The data to store in the node

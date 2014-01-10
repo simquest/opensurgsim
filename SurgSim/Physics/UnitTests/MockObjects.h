@@ -186,6 +186,14 @@ protected:
 	}
 };
 
+template <class Base>
+class MockDescendent : public Base
+{
+public:
+	MockDescendent() : Base() {}
+	explicit MockDescendent(const std::string &name) : Base(name) {}
+};
+
 }; // Physics
 }; // SurgSim
 
