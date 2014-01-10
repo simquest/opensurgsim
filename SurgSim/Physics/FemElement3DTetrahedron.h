@@ -128,6 +128,7 @@ public:
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
 
 	/// Determines whether a given natural coordinate is valid
+	/// \param naturalCoordinate Coordinate to check
 	/// \return True if valid
 	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
 

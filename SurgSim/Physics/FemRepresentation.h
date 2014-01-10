@@ -68,6 +68,7 @@ public:
 	std::shared_ptr<FemElement> getFemElement(unsigned int femElementId);
 
 	/// Determines whether the associated coordinate is valid
+	/// \param coordinate Coordinate to check
 	/// \return True if coordinate is valid
 	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
 
