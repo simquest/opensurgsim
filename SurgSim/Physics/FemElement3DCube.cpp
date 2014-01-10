@@ -447,6 +447,20 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 		m_shapeFunctionsMuSign[i];
 }
 
+bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	SURGSIM_FAILURE() << "FemElement3DCube::isValidCoordinate is not implemented.";
+	return false;
+}
+
+SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
+	const DeformableRepresentationState& state,
+	const SurgSim::Math::Vector &naturalCoordinate) const
+{
+	SURGSIM_FAILURE() << "FemElement3DCube::computeCartesianCoordinate is not implemented.";
+	return Vector3d(0.0, 0.0, 0.0);
+}
+
 } // namespace Physics
 
 } // namespace SurgSim
