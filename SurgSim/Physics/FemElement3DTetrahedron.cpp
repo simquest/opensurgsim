@@ -18,6 +18,8 @@
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 
+#include "SurgSim/Math/Geometry.h"
+
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::addSubVector;
@@ -395,6 +397,31 @@ void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentati
 		m_di[2] = -det(atilde, btilde, dtilde);
 		m_di[3] =  det(atilde, btilde, ctilde);
 	}
+}
+
+bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
+		&& (naturalCoordinate.size() == 4);
+}
+
+SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
+	const DeformableRepresentationState& state,
+	const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
+		<< "naturalCoordinate must be normalized and length 4.";
+
+	const Vector& x = state.getPositions();
+	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
+	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
+	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
+	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
+
+	return naturalCoordinate(0) * p0
+		 + naturalCoordinate(1) * p1
+		 + naturalCoordinate(2) * p2
+		 + naturalCoordinate(3) * p3;
 }
 
 } // namespace Physics

@@ -32,6 +32,7 @@ set(UNIT_TEST_SOURCES
 	FemElement3DCubeTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
+	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FemRepresentationTests.cpp
 	FixedRepresentationContactTests.cpp

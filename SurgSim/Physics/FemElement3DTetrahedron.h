@@ -18,6 +18,8 @@
 
 #include <array>
 
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
@@ -124,6 +126,19 @@ public:
 	virtual void addMatVec(const DeformableRepresentationState& state,
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
+
+	/// Determines whether a given natural coordinate is valid
+	/// \param naturalCoordinate Coordinate to check
+	/// \return True if valid
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
+
+	/// Computes a given natural coordinate in cartesian coordinates
+	/// \param state The state at which to transform coordinates
+	/// \param naturalCoordinate The coordinates to transform
+	/// \return The resultant cartesian coordinates
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 protected:
 	/// Computes the tetrahdron shape functions

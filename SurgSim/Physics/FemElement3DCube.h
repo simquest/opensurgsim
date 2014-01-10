@@ -131,6 +131,19 @@ public:
 		double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
 
+	/// Determines whether a given natural coordinate is valid
+	/// \param naturalCoordinate Coordinate to check
+	/// \return True if valid
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
+
+	/// Computes a given natural coordinate in cartesian coordinates
+	/// \param state The state at which to transform coordinates
+	/// \param naturalCoordinate The coordinates to transform
+	/// \return The resultant cartesian coordinates
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const override;
+
 protected:
 	/// Build the constitutive material 6x6 matrix
 	/// \param[out] constitutiveMatrix The 6x6 constitutive material matrix
