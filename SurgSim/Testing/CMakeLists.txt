@@ -22,9 +22,9 @@ include_directories(
 )
 
 set(SURGSIM_TESTING_SOURCES
-	TestingMain.cpp
 	MathUtilities.cpp
 	TestCube.cpp
+	TestingMain.cpp
 )
 
 set(SURGSIM_TESTING_HEADERS

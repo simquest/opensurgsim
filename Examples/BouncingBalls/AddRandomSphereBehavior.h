@@ -32,7 +32,7 @@ class AddRandomSphereBehavior: public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
-	/// \param	name	The name of add random sphere behavior 
+	/// \param	name	The name of add random sphere behavior.
 	explicit AddRandomSphereBehavior(const std::string& name = "AddRandomSphereBehavior");
 
 	/// Destructor
