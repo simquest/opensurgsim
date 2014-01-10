@@ -455,7 +455,7 @@ bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoo
 
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
-	const SurgSim::Math::Vector &naturalCoordinate) const
+	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_FAILURE() << "FemElement3DCube::computeCartesianCoordinate is not implemented.";
 	return Vector3d(0.0, 0.0, 0.0);

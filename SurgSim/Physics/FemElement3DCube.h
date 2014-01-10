@@ -142,7 +142,7 @@ public:
 	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
-		const SurgSim::Math::Vector &naturalCoordinate) const override;
+		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 protected:
 	/// Build the constitutive material 6x6 matrix

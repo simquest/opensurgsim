@@ -175,7 +175,7 @@ public:
 	/// \return The resultant cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
-		const SurgSim::Math::Vector &naturalCoordinate) const = 0;
+		const SurgSim::Math::Vector& naturalCoordinate) const = 0;
 
 protected:
 	/// Sets the number of degrees of freedom per node
