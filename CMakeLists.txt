@@ -85,8 +85,15 @@ if(SURGSIM_DEVICES_BUILD)
 endif(SURGSIM_DEVICES_BUILD)
 
 # This should have been built from the external ThirdParty directory
-find_package(yaml-cpp)
-find_package(gmock)
+find_package(yaml-cpp QUIET)
+find_package(gmock QUIET)
+
+if(NOT gmock_DIR OR NOT yaml-cpp_DIR)
+message(FATAL_ERROR "One of the libraries from the ThirdParty directory could not be "
+					"found, this usually means that you did not build the ThirdParty libraries "
+					"to remedy this you need to build the ThirdParty tree, by executing cmake "
+					"AND your usual build tools on it.")
+endif()
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
 
