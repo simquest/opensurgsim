@@ -14,10 +14,10 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
-#include "SurgSim/Physics/FemRepresentation.h"
-#include "SurgSim/Math/Vector.h"
 
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
 {

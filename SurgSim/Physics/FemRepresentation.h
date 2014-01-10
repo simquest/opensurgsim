@@ -19,8 +19,6 @@
 #include <memory>
 
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Physics/FemElement.h"
 
 #include "SurgSim/Math/Vector.h"
 
@@ -30,6 +28,8 @@ namespace SurgSim
 namespace Physics
 {
 
+class DeformableRepresentationState;
+class FemElement;
 struct FemRepresentationCoordinate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).

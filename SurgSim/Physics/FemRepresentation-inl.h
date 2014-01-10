@@ -18,6 +18,7 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim

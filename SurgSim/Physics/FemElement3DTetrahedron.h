@@ -18,6 +18,8 @@
 
 #include <array>
 
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
