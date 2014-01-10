@@ -22,9 +22,6 @@ set(UNIT_TEST_SOURCES
 	PhantomScaffoldTest.cpp
 )
 
-set(UNIT_TEST_HEADERS
-)
-
 set(LIBS
 	PhantomDevice
 	SurgSimInput

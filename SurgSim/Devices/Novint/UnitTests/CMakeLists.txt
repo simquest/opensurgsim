@@ -15,8 +15,6 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -25,11 +23,14 @@ set(UNIT_TEST_SOURCES
 	NovintScaffoldTest.cpp
 )
 
-set(UNIT_TEST_HEADERS
+set(LIBS
+	NovintDevice
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${NOVINT_HDAL_SDK_LIBRARIES}
 )
-
-set(LIBS NovintDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gmock gtest ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
 
 # The unit tests will be built whenever the library is built, but
 # running them at build time requires hardware and is disabled by
