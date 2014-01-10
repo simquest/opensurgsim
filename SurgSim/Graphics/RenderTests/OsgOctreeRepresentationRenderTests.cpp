@@ -27,7 +27,6 @@
 using SurgSim::Graphics::OsgOctreeRepresentation;
 using SurgSim::Graphics::OctreeRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector4d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
@@ -40,7 +39,7 @@ struct OsgOctreeRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
 };
 
-TEST_F(OsgOctreeRepresentationRenderTests, AddVectors)
+TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 {
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation<EmptyData>>("Octree Representation");
 
@@ -76,20 +75,15 @@ TEST_F(OsgOctreeRepresentationRenderTests, AddVectors)
 		auto self = octreeRepresentation->getOctree()->getChild(i);
 		for (int j = 0; j < 8; ++j)
 		{
-			auto selfBox = self->getChild(i)->getBoundingBox();
-			Vector3d childSize = (selfBox.max() - selfBox.min());
+			auto childBox = self->getChild(j)->getBoundingBox();
+			Vector3d childCenter = (childBox.max() + childBox.min()) / 2.0;
 
-			Vector3d selfCenter = (selfBox.max() + selfBox.min()) / 2.0;
-			auto targetBox = self->getChild(j)->getBoundingBox();
-			Vector3d targetCenter = (targetBox.max() + targetBox.min()) / 2.0;
-
-			int diff = (targetCenter - selfCenter).cwiseAbs().sum() / childSize[0];
-			if ( diff > 1)
+			if ( childCenter.cwiseAbs().sum()  <= 0.75)
 			{
-				octreeRepresentation->getOctree()->addData(targetCenter, emptyData, 3);
+				octreeRepresentation->getOctree()->addData(childCenter, emptyData, 3);
 				boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 			}
 		}
 	}
-	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+	boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 }

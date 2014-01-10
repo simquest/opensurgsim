@@ -61,7 +61,8 @@ private:
 	/// To draw the given Octree Node
 	/// \param octreeNode Octree node to be drawn
 	/// \return An osg::PositionAttitudeTransform containing the OSG representatoin of the Octree node
-	osg::ref_ptr<osg::PositionAttitudeTransform> draw(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octreeNode);
+	osg::ref_ptr<osg::PositionAttitudeTransform> draw
+		(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octreeNode);
 
 	/// The Octree represented by this representation
 	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> m_octree;
