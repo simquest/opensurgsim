@@ -76,10 +76,8 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 
 	runtime->addManager(behaviorManager);
 
-	/// Create a scene and add the scene element to it
-	std::shared_ptr<SurgSim::Framework::Scene> scene = std::make_shared<SurgSim::Framework::Scene>();
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(sceneElement);
-	runtime->setScene(scene);
 
 	/// Set the initial pose of the "from" representation
 	Quaterniond rotation = Quaterniond(SurgSim::Math::Vector4d::Random()).normalized();

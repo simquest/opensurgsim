@@ -41,14 +41,12 @@ public:
 		sceneryObject2 = std::make_shared<OsgSceneryRepresentation>("test2");
 		runtime = std::make_shared<SurgSim::Framework::Runtime>();
 		manager = std::make_shared<SurgSim::Graphics::OsgManager>();
-		scene = std::make_shared<SurgSim::Framework::Scene>();
+		scene = runtime->getScene();
 		viewElement = std::make_shared<OsgViewElement>("view element");
 
-		viewElement->addComponent(sceneryObject);
-		viewElement->addComponent(sceneryObject2);
 		scene->addSceneElement(viewElement);
 		runtime->addManager(manager);
-		runtime->setScene(scene);
+
 	}
 
 	virtual void TearDown() override
@@ -72,10 +70,10 @@ TEST_F(OsgSceneryRepresentationTest, FileNameTest)
 TEST_F(OsgSceneryRepresentationTest, InitTest)
 {
 	sceneryObject->setFileName("Data/OsgSceneryRepresentationTests/Torus.obj");
-	ASSERT_NO_THROW(sceneryObject->initialize(runtime));
+	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject));
 
 	sceneryObject2->setFileName("Data/OsgSceneryRepresentationTests/Torus.osgb");
-	ASSERT_NO_THROW(sceneryObject2->initialize(runtime));
+	EXPECT_NO_THROW(viewElement->addComponent(sceneryObject2));
 }
 
 

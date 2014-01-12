@@ -19,12 +19,14 @@
 #include <utility>
 
 #include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
-#include "SurgSim/Collision/DcdCollision.h"
-#include "SurgSim/Physics/Constraint.h"
 
 
 using SurgSim::Collision::RigidCollisionRepresentation;

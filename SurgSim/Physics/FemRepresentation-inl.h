@@ -18,6 +18,8 @@
 
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Physics/FemElement.h"
+#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
 namespace SurgSim
 {
@@ -85,6 +87,13 @@ std::shared_ptr<FemElement> FemRepresentation<MT, DT, KT, ST>::getFemElement(uns
 {
 	SURGSIM_ASSERT(femElementId < getNumFemElements()) << "Invalid femElement id";
 	return m_femElements[femElementId];
+}
+
+template <class MT, class DT, class KT, class ST>
+bool FemRepresentation<MT, DT, KT, ST>::isValidCoordinate(const FemRepresentationCoordinate& coordinate) const
+{
+	return (coordinate.elementId < m_femElements.size())
+		&& m_femElements[coordinate.elementId]->isValidCoordinate(coordinate.naturalCoordinate);
 }
 
 template <class MT, class DT, class KT, class ST>

@@ -32,7 +32,7 @@ set(LIBS KeyboardDevice
 		 SurgSimInput SurgSimTesting 
 		 ${OPENSCENEGRAPH_LIBRARIES}
 	)
-	
+
 target_link_libraries(KeyboardVisualTest ${LIBS})
 
 # Put KeyboardVisualTest into folder "Devices"

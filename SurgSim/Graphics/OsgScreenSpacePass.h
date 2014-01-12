@@ -53,7 +53,7 @@ public:
 
 
 private:
-	
+
 	/// Update the projection matrix
 	void updateViewport(int width, int height);
 
