@@ -42,12 +42,12 @@ public:
 	/// \param	name	Name of the behavior
 	explicit TransferInputPoseBehavior(const std::string& name);
 
-	/// Set representation to get the pose from.
-	/// \param	sender	Representation to get the pose
+	/// Set the InputComponent which sends the pose.
+	/// \param	sender	InputComponent which sends the pose.
 	void setPoseSender(std::shared_ptr<SurgSim::Input::InputComponent> sender);
 
-	/// Set representation to set the pose to.
-	/// \param	receiver	Representation to set the pose
+	/// Set the representation to receive the pose.
+	/// \param	receiver	Representation to receive the pose.
 	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
 
 	/// Set name of the pose.

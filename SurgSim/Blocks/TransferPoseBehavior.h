@@ -39,12 +39,12 @@ public:
 	/// \param	name	Name of the behavior
 	explicit TransferPoseBehavior(const std::string& name);
 
-	/// Set representation to set the pose from
-	/// \param	sender	Representation to get the pose
+	/// Set the representation which sends the pose.
+	/// \param	sender	Representation which sends the pose.
 	void setPoseSender(std::shared_ptr<SurgSim::Framework::Representation> sender);
 
-	/// Set representation to set the pose to
-	/// \param	receiver	Representation to set the pose
+	/// Set the representation to receive the pose.
+	/// \param	receiver	Representation to receive the pose.
 	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
 
 	/// Update the behavior
