@@ -1672,7 +1672,7 @@ bool calculateContactTriangleTriangle(
 				}
 				else if (underPlaneB[A].size() == 2 && contactFound[A])
 				{
-					processingEdgeBetweenTwoUnderPlaneBVertices = true;				
+					processingEdgeBetweenTwoUnderPlaneBVertices = true;
 				}
 				else
 				{
