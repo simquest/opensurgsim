@@ -109,5 +109,11 @@ std::string Component::getId() const
 	return m_name;
 }
 
+Component::FactoryType& Component::getFactory()
+{
+	static FactoryType factory;
+	return factory;
+}
+
 }; // namespace Framework
 }; // namespace SurgSim

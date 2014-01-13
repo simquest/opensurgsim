@@ -45,19 +45,9 @@ struct convert<std::shared_ptr<SurgSim::Framework::Component> >
 	static Node encode(const std::shared_ptr<SurgSim::Framework::Component> rhs);
 	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Component>& rhs);
 
-	/// Register a class with the conversion class.
-	/// \tparam Base Type of the class that is being registered.
-	/// \param className name of the class that is being registered.
-	template <typename Base>
-	static void registerClass(const std::string& className);
-
 private:
 
-	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType;
 	typedef std::unordered_map<std::string, std::shared_ptr<SurgSim::Framework::Component>> RegistryType;
-
-	/// \return The static class factory that is being used in the conversion
-	static FactoryType& getFactory();
 
 	/// \return The static registry for shared instances
 	static RegistryType& getRegistry();
@@ -72,7 +62,5 @@ struct convert<SurgSim::Framework::Component>
 };
 
 };
-
-#include "SurgSim/Framework/FrameworkConvert-inl.h"
 
 #endif // SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_H

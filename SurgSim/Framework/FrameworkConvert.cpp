@@ -47,11 +47,12 @@ namespace YAML
 				else
 				{
 					std::string className = node["className"].as<std::string>();
-					FactoryType& factory = getFactory();
+					SurgSim::Framework::Component::FactoryType& factory = 
+						SurgSim::Framework::Component::getFactory();
 
 					if (factory.isRegistered(className))
 					{
-						rhs = getFactory().create(node["className"].as<std::string>(),node["name"].as<std::string>());
+						rhs = factory.create(node["className"].as<std::string>(),node["name"].as<std::string>());
 						getRegistry()[id] = rhs;
 					}
 					else
@@ -64,13 +65,6 @@ namespace YAML
 			result = true;
 		}
 		return result;
-	}
-
-	 convert<std::shared_ptr<SurgSim::Framework::Component>>::FactoryType&
-		  convert<std::shared_ptr<SurgSim::Framework::Component>>::getFactory()
-	{
-		static FactoryType factory;
-		return factory;
 	}
 
 	convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType&

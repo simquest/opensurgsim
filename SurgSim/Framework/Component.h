@@ -22,6 +22,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -94,6 +95,11 @@ public:
 		return "Missing ClassName";
 	}
 
+	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType;
+
+	/// \return The static class factory that is being used in the conversion
+	static FactoryType& getFactory();
+
 private:
 	/// Name of this component
 	std::string m_name;
@@ -102,7 +108,7 @@ private:
 	std::string m_id;
 
 	/// Runtime which contains this component
-	std::weak_ptr<Runtime> m_runtime;
+ 	std::weak_ptr<Runtime> m_runtime;
 
 	/// Scene which contains this component
 	std::weak_ptr<Scene> m_scene;

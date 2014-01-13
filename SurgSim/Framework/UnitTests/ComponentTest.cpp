@@ -96,8 +96,7 @@ private:
 	public:
 		MetaData()
 		{
-			YAML::convert<std::shared_ptr<Component>>::
-				registerClass<TestComponent2>("TestComponent2");
+			Component::getFactory().registerClass<TestComponent2>("TestComponent2");
 		}
 	};
 
@@ -157,8 +156,7 @@ private:
 	public:
 		MetaData()
 		{
-			YAML::convert<std::shared_ptr<Component>>::
-				registerClass<TestComponent3>("TestComponent3");
+			Component::getFactory().registerClass<TestComponent3>("TestComponent3");
 		}
 	};
 
@@ -167,6 +165,7 @@ private:
 	std::shared_ptr<Component> m_componentOne;
 	std::shared_ptr<Component> m_componentTwo;
 };
+
 
 TestComponent3::MetaData TestComponent3::Meta;
 
@@ -201,7 +200,7 @@ TEST(ComponentTests, SetAndGetSceneTest)
 
 TEST(ComponentTests, ConvertFactoryTest)
 {
-	YAML::convert<std::shared_ptr<Component>>::registerClass<TestComponent1>("TestComponent1");
+	Component::getFactory().registerClass<TestComponent1>("TestComponent1");
 
 	YAML::Node node;
 	node["name"] = "ComponentName";
