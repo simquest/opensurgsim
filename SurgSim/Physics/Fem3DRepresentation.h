@@ -64,7 +64,7 @@ protected:
 	/// \result True if valid
 	bool isValidState(const DeformableRepresentationState &state) const;
 
-	/// Deactivate and reset state
+	/// Deactivate and call resetState
 	void deactivateAndReset(void);
 };
 
