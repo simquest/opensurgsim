@@ -281,7 +281,7 @@ TEST_F(Fem3DRepresentationTests, AfterUpdateTest)
 	EXPECT_TRUE(*m_fem->getCurrentState() == *m_fem->getFinalState());
 }
 
-TEST_F(Fem3DRepresentationTests, ApplyDofCorrectionTest)
+TEST_F(Fem3DRepresentationTests, ApplyCorrectionTest)
 {
 	double epsilon = 1e-12;
 	m_fem->setInitialState(m_initialState);
@@ -299,7 +299,7 @@ TEST_F(Fem3DRepresentationTests, ApplyDofCorrectionTest)
 	Eigen::VectorXd previousX = m_fem->getCurrentState()->getPositions();
 	Eigen::VectorXd previousV = m_fem->getCurrentState()->getVelocities();
 
-	m_fem->applyDofCorrection(m_dt, dv.segment(0, m_fem->getNumDof()));
+	m_fem->applyCorrection(m_dt, dv.segment(0, m_fem->getNumDof()));
 	Eigen::VectorXd nextX = m_fem->getCurrentState()->getPositions();
 	Eigen::VectorXd nextV = m_fem->getCurrentState()->getVelocities();
 
@@ -308,7 +308,7 @@ TEST_F(Fem3DRepresentationTests, ApplyDofCorrectionTest)
 
 	dv(0) = std::numeric_limits<double>::infinity();
 	EXPECT_TRUE(m_fem->isActive());
-	m_fem->applyDofCorrection(m_dt, dv.segment(0, m_fem->getNumDof()));
+	m_fem->applyCorrection(m_dt, dv.segment(0, m_fem->getNumDof()));
 	EXPECT_FALSE(m_fem->isActive());
 }
 

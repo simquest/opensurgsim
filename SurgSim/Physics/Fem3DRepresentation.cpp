@@ -69,16 +69,16 @@ RepresentationType Fem3DRepresentation::getType() const
 	return REPRESENTATION_TYPE_FEM3D;
 }
 
-void Fem3DRepresentation::applyDofCorrection(double dt,
-											 const Eigen::VectorBlock<SurgSim::Math::Vector>& block)
+void Fem3DRepresentation::applyCorrection(double dt,
+										  const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 	if (!isActive())
 	{
 		return;
 	}
 
-	m_currentState->getPositions() += block * dt;
-	m_currentState->getVelocities() += block;
+	m_currentState->getPositions() += deltaVelocity * dt;
+	m_currentState->getVelocities() += deltaVelocity;
 
 	if (!isValidState(*m_currentState))
 	{
