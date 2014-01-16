@@ -103,20 +103,6 @@ public:
 	std::shared_ptr<InputManager> inputManager;
 };
 
-std::shared_ptr<OutputComponent> createOutputComponent(const std::string& name, const std::string& deviceName)
-{
-	DataGroupBuilder builder;
-	builder.addString("data");
-	DataGroup data = builder.createData();
-	data.strings().set("data", "data");
-
-	auto outputComponent = std::make_shared<OutputComponent>(name);
-	outputComponent->setDeviceName(deviceName);
-	outputComponent->setOutputData(data);
-	return outputComponent;
-}
-
-
 TEST_F(InputManagerTest, DeviceAddRemove)
 {
 
@@ -187,14 +173,16 @@ TEST_F(InputManagerTest, InputfromDevice)
 
 TEST_F(InputManagerTest, OutputAddRemove)
 {
-	std::shared_ptr<OutputComponent> output1 = createOutputComponent("Component1", "TestDevice1");
-	std::shared_ptr<OutputComponent> output2 = createOutputComponent("Component2", "TestDevice1");
-	std::shared_ptr<OutputComponent> output3 = createOutputComponent("Component3", "TestDevice2");
-	std::shared_ptr<OutputComponent> invalid = createOutputComponent("Component4", "InvalidDevice");
-
+	std::shared_ptr<OutputComponent> output1 = std::make_shared<OutputComponent>("Component1");
+	std::shared_ptr<OutputComponent> output2 = std::make_shared<OutputComponent>("Component2");
+	std::shared_ptr<OutputComponent> output3 = std::make_shared<OutputComponent>("Component3");
+	std::shared_ptr<OutputComponent> invalid = std::make_shared<OutputComponent>("Component4");
+	output1->setDeviceName("TestDevice1");
+	output2->setDeviceName("TestDevice1");
+	output3->setDeviceName("TestDevice2");
+	invalid->setDeviceName("InvalidDevice");
 	EXPECT_TRUE(testDoAddComponent(output1));
-	EXPECT_FALSE(testDoAddComponent(output2));
-
+	EXPECT_FALSE(testDoAddComponent(output2)); // same device already attached to an OutputComponent
 	EXPECT_FALSE(testDoAddComponent(output2));
 	EXPECT_TRUE(testDoAddComponent(output3));
 	EXPECT_FALSE(testDoAddComponent(invalid));
@@ -204,11 +192,16 @@ TEST_F(InputManagerTest, OutputAddRemove)
 
 TEST_F(InputManagerTest, OutputPush)
 {
-	std::shared_ptr<OutputComponent> output = createOutputComponent("Component1", "TestDevice1");
+	std::shared_ptr<OutputComponent> output = std::make_shared<OutputComponent>("Component1");
+	output->setDeviceName("TestDevice1");
 	EXPECT_TRUE(testDoAddComponent(output));
-	output->getOutputData().strings().set("data","outputdata");
+	DataGroupBuilder builder;
+	builder.addString("data");
+	DataGroup data = builder.createData();
+	data.strings().set("data", "outputdata");
+	output->setData(data);
 	EXPECT_TRUE(testDevice1->pullOutput());
-	EXPECT_EQ("outputdata",testDevice1->lastPulledData);
+	EXPECT_EQ("outputdata", testDevice1->lastPulledData);
 }
 
 TEST_F(InputManagerTest, TypeTest)
