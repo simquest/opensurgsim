@@ -99,9 +99,10 @@ public:
 		clearFragmentShader();
 	}
 
-	/// When this is set to true, shader set on other objects that could be considered of a lesser hierarchy
-	/// than this shader would be ignored. For example in a scene graph this shader would overidde other shaders that
-	/// have a node with this shader in of their parent nodes.
+	/// When this is set to true, this shader should be used instead of other shaders that might apply, depending
+	/// on the hierarchy that is set out. E.g if this shader is on a camera, the shaders that occur in a group
+	/// attached to that camera will be overridden.
+	/// This will usually be used in conjunction with \sa RenderPass.
 	/// \param	val	If true the shader should override shaders in lower levels.
 	virtual void setGlobalScope(bool val) = 0;
 

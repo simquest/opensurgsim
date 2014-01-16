@@ -118,7 +118,10 @@ void RenderPass::showColorTarget(int x, int y, int width, int height)
 
 void RenderPass::hideColorTarget()
 {
-	m_debugColor->setVisible(false);
+	if(m_debugColor != nullptr)
+	{
+		m_debugColor->setVisible(false);
+	}
 }
 
 void RenderPass::showDepthTarget(int x, int y, int width, int height)
@@ -138,7 +141,10 @@ void RenderPass::showDepthTarget(int x, int y, int width, int height)
 
 void RenderPass::hideDepthTarget()
 {
-	m_debugDepth->setVisible(false);
+	if (m_debugDepth != nullptr)
+	{
+		m_debugDepth->setVisible(false);
+	}
 }
 
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderPass::buildDebugQuad(const std::string& name,

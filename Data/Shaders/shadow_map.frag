@@ -31,7 +31,7 @@ varying vec4 lightCoord;
 
 float decodeDepth(vec4 color)
 {
-	return dot(color, vec4(1.0, 1.0/255.0, 1.0/(255.0*255.0), 1.0/(255.0*255.0*255.0)));
+	return dot(color, vec4(1.0, 1.0/256.0, 1.0/(256.0*256.0), 1.0/(256.0*256.0*256.0)));
 }
 
 void main(void) 

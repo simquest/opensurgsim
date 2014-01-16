@@ -14,13 +14,14 @@
 // limitations under the License.
 
 /// \file depth.frag
-/// Encode the z-depth of the fragment into rgba values
+/// Encode the z-depth of the fragment into rgba values, see
+/// http://www.ozone3d.net/blogs/lab/20080604/glsl-float-to-rgba8-encoder/
 
 vec4 encodeDepth(float depth)
 {
-	vec4 encoded = vec4(1.0, 255.0, 255.0*255.0, 255.0*255.0*255.0) * depth;
+	vec4 encoded = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0) * depth;
 	encoded = fract(encoded);
-	encoded -= encoded.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
+	encoded -= encoded.yzww * vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);
 	return encoded;
 }
 

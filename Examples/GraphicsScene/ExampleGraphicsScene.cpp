@@ -64,6 +64,17 @@ using SurgSim::Graphics::OsgTexture2d;
 
 #include "Surgsim/Blocks/PoseInterpolator.h"
 
+/// \file
+/// This example creates a simple graphics scene and use the RenderPass object to show
+/// a simple shadowing algorithm. For the algorithm see http://en.wikipedia.org/wiki/Shadow_mapping
+/// There are two preprocessing passes that use specific shaders, plus a main pass that renders the
+/// objects using a shaders that can process the output from the preprocessing steps.
+/// Each shaders output becomes the input for the next shader, some parameters from other scene elements
+/// is passed into the shaders as uniforms.
+/// All of the information is kept up to date using a \sa TransferPropertiesBehavior
+/// Both the light and the main camera are being moved through a \sa PoseInterpolator to demonstrate
+/// dynamic changes and how to handle them in the rendering pipeline
+
 namespace
 {
 
@@ -137,9 +148,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	RigidTransform3d from = makeRigidTransform(Vector3d(4.0, 3.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	RigidTransform3d to = makeRigidTransform(Vector3d(-4.0, 3.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	interpolator->setTarget(light);
-	interpolator->setFrom(from);
+	interpolator->setStartingPose(from);
 	interpolator->setDuration(10.0);
-	interpolator->setTo(to);
+	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
 
 	viewElement->addComponent(interpolator);
@@ -147,7 +158,10 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
-std::shared_ptr<SurgSim::Graphics::RenderPass> lightMapPass()
+/// Create the pass that renders the scene from the view of the light source
+/// the identifier 'shadowing' is used in all graphic objects to mark them as used
+/// in this pass
+std::shared_ptr<SurgSim::Graphics::RenderPass> createLightMapPass()
 {
 	auto pass = std::make_shared<SurgSim::Graphics::RenderPass>("shadowing");
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
@@ -159,7 +173,10 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> lightMapPass()
 	return pass;
 }
 
-std::shared_ptr<SurgSim::Graphics::RenderPass> shadowCastPass()
+/// Create the pass that renders shadowed pixels into the scene,
+/// the identifier 'shadowed' can be used in all graphics objects to mark them
+/// as used in this pass
+std::shared_ptr<SurgSim::Graphics::RenderPass> createShadowMapPass()
 {
 	auto pass = std::make_shared<SurgSim::Graphics::RenderPass>("shadowed");
 	auto renderTarget = std::make_shared<SurgSim::Graphics::OsgRenderTarget2d>(1024, 1024, 1.0, 1, false);
@@ -170,6 +187,7 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> shadowCastPass()
 	return pass;
 }
 
+/// A simple box as a scenelement
 class SimpleBox : public SurgSim::Blocks::BasicSceneElement
 {
 public:
@@ -177,8 +195,14 @@ public:
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName()+" Graphics");
 		m_box->setInitialPose(RigidTransform3d::Identity());
+		
+		// The material that this object uses
 		m_box->setMaterial(materials["basicShadowed"]);
+
+		// Assign this to the pass for shadowing objects
 		m_box->addGroupReference("shadowing");
+
+		// Assign this to the pass for shadowed objects
 		m_box->addGroupReference("shadowed");
 	}
 
@@ -238,6 +262,7 @@ private:
 
 }
 
+// Create an array of spheres
 void addSpheres(std::shared_ptr<SurgSim::Framework::Scene> scene)
 {
 	double radius = 0.05;
@@ -275,56 +300,63 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	std::shared_ptr<SurgSim::Graphics::ViewElement> viewElement = createView("View", 0, 0, 1024, 768);
 	scene->addSceneElement(viewElement);
 
+	// This behavior is responsible to keep all values updated, in this example most targets
+	// will be uniforms that are used in shaders
 	auto copier =  std::make_shared<SurgSim::Framework::TransferPropertiesBehavior>("Copier");
 	viewElement->addComponent(copier);
 
-	auto pass1 = lightMapPass();
-	pass1->showColorTarget(0,0,256,256);
+	auto lightMapPass = createLightMapPass();
+	lightMapPass->showColorTarget(0,0,256,256);
 
-	auto pass2 = shadowCastPass();
-	pass2->showColorTarget(1024-256,0,256,256);
+	auto shadowMapPass = createShadowMapPass();
+	shadowMapPass->showColorTarget(1024-256,0,256,256);
 
 	auto light = viewElement->getComponents<SurgSim::Graphics::Light>()[0];
-	auto camera = pass1->getCamera();
-	// connect the light pose and the camera pose
+	auto camera = lightMapPass->getCamera();
+
+	// connect the light pose and the light map camera pose, so when the light moves,
+	// this camera will move as well
 	copier->connect(light, "pose", camera, "pose");
-	//copier->addConnection("pose", light, "pose", graphicsManager->getDefaultCamera());
 
+	// The following three uniforms in the shadowMapPass, are carry the information from the
+	// lightMapPass. They are used to project the incoming point into the space of the lightMap
+	// The view matrix of the camera used to render the light map
 	auto lightViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightViewMatrix");
-	// lightViewMatrix->setValue("value", pass1->getCamera()->getViewMatrix().cast<float>());
-	copier->connect(pass1->getCamera(), "floatViewMatrix", lightViewMatrix, "value");
-	pass2->getMaterial()->addUniform(lightViewMatrix);
+	shadowMapPass->getMaterial()->addUniform(lightViewMatrix);
+	copier->connect(lightMapPass->getCamera(), "floatViewMatrix", lightViewMatrix, "value");
 
+	// The projection matrix of the camera used to render the light map
 	auto lightProjectionMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_lightProjectionMatrix");
-	// lightProjectionMatrix->set(pass1->getCamera()->getProjectionMatrix().cast<float>());
-	copier->connect(pass1->getCamera(), "floatProjectionMatrix", lightProjectionMatrix, "value");
-	pass2->getMaterial()->addUniform(lightProjectionMatrix);
+	shadowMapPass->getMaterial()->addUniform(lightProjectionMatrix);
+	copier->connect(lightMapPass->getCamera(), "floatProjectionMatrix", lightProjectionMatrix, "value");
 
-	// Need to send the inverse view matrix of the main camera
-	// \note this should probably be a default camera uniform
+	// The inverse view matrix of the camera used to render the light map
 	auto inverseViewMatrix = std::make_shared<OsgUniform<Matrix44f>>("oss_inverseViewMatrix");
-	// inverseViewMatrix->set(pass2->getCamera()->getViewMatrix().inverse().cast<float>());
-	copier->connect(pass2->getCamera(), "floatInverseViewMatrix", inverseViewMatrix , "value");
-	pass2->getMaterial()->addUniform(inverseViewMatrix);
+	shadowMapPass->getMaterial()->addUniform(inverseViewMatrix);
+	copier->connect(shadowMapPass->getCamera(), "floatInverseViewMatrix", inverseViewMatrix , "value");
 
-	copier->connect(graphicsManager->getDefaultCamera(), "pose", pass2->getCamera(), "pose");
-	copier->connect(graphicsManager->getDefaultCamera(), "projectionMatrix", pass2->getCamera() , "projectionMatrix");
-
+	// Get the result of the lightMapPass and pass it on to the shadowMapPass
 	auto lightDepthTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_encodedLightDepthMap");
-	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass1->getRenderTarget()->getColorTarget(0)));
-	pass2->getMaterial()->addUniform(lightDepthTexture);
+	lightDepthTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(lightMapPass->getRenderTarget()->getColorTarget(0)));
+	shadowMapPass->getMaterial()->addUniform(lightDepthTexture);
 
-	scene->addSceneElement(pass1);
-	scene->addSceneElement(pass2);
+	// Make the camera in the shadowMapPass follow the main camera that is being used to render the
+	// whole scene
+	copier->connect(graphicsManager->getDefaultCamera(), "pose", shadowMapPass->getCamera(), "pose");
+	copier->connect(graphicsManager->getDefaultCamera(), "projectionMatrix", shadowMapPass->getCamera() , "projectionMatrix");
+
+	scene->addSceneElement(lightMapPass);
+	scene->addSceneElement(shadowMapPass);
 
 	// Put the result of the last pass into the main camera to make it accessible
 	auto material = std::make_shared<SurgSim::Graphics::OsgMaterial>();
 	auto shadowMapTexture =
 		std::make_shared<OsgTextureUniform<OsgTexture2d>>("oss_shadowmap");
-	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(pass2->getRenderTarget()->getColorTarget(0)));
+	shadowMapTexture->set(std::dynamic_pointer_cast<OsgTexture2d>(shadowMapPass->getRenderTarget()->getColorTarget(0)));
 	material->addUniform(shadowMapTexture);
 
+	// Set up the main camera
 	camera = graphicsManager->getDefaultCamera();
 	RigidTransform3d pose =
 		makeRigidTransform(Vector3d(-4.0, 3.0, 4.0), Vector3d(-0.0,0.0,-0.0), Vector3d(0.0,1.0,0.0));
@@ -336,9 +368,9 @@ std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::
 	RigidTransform3d from = makeRigidTransform(Vector3d(-4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	RigidTransform3d to = makeRigidTransform(Vector3d(4.0, 2.0, -4.0), Vector3d(0.0,0.0,0.0), Vector3d(0.0,1.0,0.0));
 	interpolator->setTarget(camera);
-	interpolator->setFrom(from);
+	interpolator->setStartingPose(from);
 	interpolator->setDuration(10.0);
-	interpolator->setTo(to);
+	interpolator->setEndingPose(to);
 	interpolator->setPingPong(true);
 
 	viewElement->addComponent(interpolator);
