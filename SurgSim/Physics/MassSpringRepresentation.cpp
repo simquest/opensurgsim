@@ -164,15 +164,15 @@ void MassSpringRepresentation::afterUpdate(double dt)
 	*m_finalState = *m_currentState;
 }
 
-void MassSpringRepresentation::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
+void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)
 {
 	if ( !isActive())
 	{
 		return;
 	}
 
-	m_currentState->getPositions() += block * dt;
-	m_currentState->getVelocities() += block;
+	m_currentState->getPositions() += deltaVelocity * dt;
+	m_currentState->getVelocities() += deltaVelocity;
 
 	if ( !isValidState(*m_currentState))
 	{
