@@ -46,11 +46,6 @@ public:
 	/// \param	element	The element.
 	void addSceneElement(std::shared_ptr<SceneElement> element);
 
-	/// Gets scene element with a given name.
-	/// \param	name	The name.
-	/// \return	The scene element or nullptr if the element cannot be found.
-	std::shared_ptr<SceneElement> getSceneElement(const std::string& name) const;
-
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
 	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;

@@ -60,18 +60,6 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 
 }
 
-std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) const
-{
-	std::shared_ptr<SceneElement> result;
-	boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
-	auto found = m_elements.find(name);
-	if (found != m_elements.end())
-	{
-		result = found->second;
-	}
-	return result;
-}
-
 std::shared_ptr<Runtime> Scene::getRuntime()
 {
 	return m_runtime.lock();
