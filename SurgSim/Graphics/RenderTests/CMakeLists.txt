@@ -65,14 +65,7 @@ set(LIBS
 	${OPENTHREADS_LIBRARY}
 )
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires a window system and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_GRAPHICS_RENDER
-	"Run the rendering tests as part of unit tests (Requires a running window system)"
-	OFF)
-surgsim_add_unit_tests(SurgSimGraphicsRenderTest
-	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
+surgsim_add_unit_tests(SurgSimGraphicsRenderTest)
 
 # Put SurgSimGraphicsRenderTest into folder "Graphics"
 set_target_properties(SurgSimGraphicsRenderTest PROPERTIES FOLDER "Graphics")

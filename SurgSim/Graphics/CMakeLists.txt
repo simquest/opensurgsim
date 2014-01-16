@@ -162,9 +162,12 @@ SET(LIBS
 target_link_libraries(SurgSimGraphics ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
-	add_subdirectory(RenderTests)
+  
+  if(BUILD_RENDER_TESTING)
+		add_subdirectory(RenderTests)
+	endif()
 endif()
 
 # Put SurgSimGraphics into folder "Graphics"

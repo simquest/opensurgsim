@@ -44,7 +44,7 @@ surgsim_add_library(
 	"${SIXENSE_DEVICE_SOURCES}" "${SIXENSE_DEVICE_HEADERS}"
 	SurgSim/Devices/Sixense
 )
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 
 	if(GLUT_FOUND)

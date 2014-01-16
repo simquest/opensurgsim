@@ -58,51 +58,9 @@ endfunction()
 
 # options related to unit tests
 #
-option(SURGSIM_TESTS_BUILD "Include the unit tests in the build" ON)
-option(SURGSIM_TESTS_RUN "Run the unit tests at the end of the build" ON)
-if(NOT WIN32)
-	option(SURGSIM_TESTS_RUN_WITH_VALGRIND
-		"Run the unit tests using Valgrind's memcheck tool." OFF)
-	option(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE
-		"When running the unit tests using Valgrind, add verbose info." OFF)
-	mark_as_advanced(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
-	option(SURGSIM_TESTS_RUN_WITH_VALGRIND_LEAK_CHECK
-		"When running the unit tests using Valgrind, also check for leaks." OFF)
-	mark_as_advanced(SURGSIM_TESTS_RUN_WITH_VALGRIND_LEAK_CHECK)
-endif(NOT WIN32)
-option(SURGSIM_TESTS_ALL_IN_ONE
-	"Build a single binary with all unit tests.  [Does not work yet!]" OFF)
-mark_as_advanced(SURGSIM_TESTS_ALL_IN_ONE)  # hide it as long as it's broken
-option(SURGSIM_EXAMPLES_BUILD "Include the examples in the build" ON)
 option(SURGSIM_YAMLCPP_BUILD "Include Yaml cpp in the build" ON)
 
 set(SURGSIM_COPY_WARNING_ONCE TRUE)
-set(SURGSIM_TEST_RUN_PREFIX)
-set(SURGSIM_TEST_RUN_SUFFIX)
-if(NOT WIN32)
-	if(SURGSIM_TESTS_RUN_WITH_VALGRIND)
-		set(SURGSIM_TEST_RUN_PREFIX valgrind --tool=memcheck --error-exitcode=1
-			--fullpath-after=
-			--suppressions=${SURGSIM_TOOLS_DIR}/memcheck.supp --gen-suppressions=all)
-		# The following assumes that the test is using Google Test.
-		# It's needed because by default tests use clone(), which doesn't
-		# play well with valgrind; fork() is supposed to work better.
-		set(SURGSIM_TEST_RUN_SUFFIX --gtest_death_test_use_fork)
-		if(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
-			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} -v)
-		endif(SURGSIM_TESTS_RUN_WITH_VALGRIND_VERBOSE)
-		if(SURGSIM_TESTS_RUN_WITH_VALGRIND_LEAK_CHECK)
-			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX}
-				--leak-check=full --show-reachable=yes)
-		else()
-			set(SURGSIM_TEST_RUN_PREFIX ${SURGSIM_TEST_RUN_PREFIX} --leak-check=no)
-		endif()
-	endif(SURGSIM_TESTS_RUN_WITH_VALGRIND)
-endif(NOT WIN32)
-
-# Also output the test results as an xml file for use with Jenkins
-# Build Server.
-set(SURGSIM_TEST_RUN_SUFFIX ${SURGSIM_TEST_RUN_SUFFIX} --gtest_output=xml)
 
 # Copy zero or more files to the location of a built target, after the
 # target is built successfully, but only if the condition (which
@@ -188,39 +146,26 @@ endmacro()
 # You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
 #
 macro(surgsim_unit_test_build_only TESTNAME)
-	if(SURGSIM_TESTS_ALL_IN_ONE)
-		add_library(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} ${LIBS})
-		# NB: There's currently no way to pick up these libs and combine them.
-		#     So this option does not currently do anything useful...
-	else()
-		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} SurgSimTesting ${LIBS})
-		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
-		surgsim_copy_to_target_directory(${TESTNAME}
-			${UNIT_TEST_SHARED_LIBS})
-		surgsim_copy_to_target_directory_for_release(${TESTNAME}
-			${UNIT_TEST_SHARED_RELEASE_LIBS})
-		surgsim_copy_to_target_directory_for_debug(${TESTNAME}
-			${UNIT_TEST_SHARED_DEBUG_LIBS})
-	endif()
+	add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
+	target_link_libraries(${TESTNAME} SurgSimTesting ${LIBS})
+	# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
+	surgsim_copy_to_target_directory(${TESTNAME}
+		${UNIT_TEST_SHARED_LIBS})
+	surgsim_copy_to_target_directory_for_release(${TESTNAME}
+		${UNIT_TEST_SHARED_RELEASE_LIBS})
+	surgsim_copy_to_target_directory_for_debug(${TESTNAME}
+		${UNIT_TEST_SHARED_DEBUG_LIBS})
 	surgsim_show_ide_folders("${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
 endmacro()
 
 # Run the unit test executable (unless disabled or built all-in-one).
 # Expects that the unit test build has already been set up via
 #   surgsim_unit_test_build_only(TESTNAME).
-# Uses the SURGSIM_TESTS_BUILD and SURGSIM_TESTS_ALL_IN_ONE options.
 #
 # You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
 #
 macro(surgsim_unit_test_run_only TESTNAME)
-	if(NOT SURGSIM_TESTS_ALL_IN_ONE)
-		add_custom_command(TARGET ${TESTNAME} POST_BUILD
-			COMMAND ${SURGSIM_TEST_RUN_PREFIX} $<TARGET_FILE:${TESTNAME}>
-				${SURGSIM_TEST_RUN_SUFFIX}
-			VERBATIM)
-	endif()
+	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME} "--gtest_output=xml")
 endmacro()
 
 # Build the unit test executable or library.
@@ -228,59 +173,10 @@ endmacro()
 #   tests even when enabled by the corresponding global options.  (If
 #   the options are off, they *do not* turn things back on!)
 # Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS and LIBS for this unit
-#   test, as well as the SURGSIM_TESTS_BUILD and ..._RUN options.
-#
-# Note the use of optional arguments:
-#   surgsim_add_unit_tests(<testname> [BUILD <boolean>] [RUN <boolean>])
-#
+#   test, as well as the BUILD_TESTING option.
 macro(surgsim_add_unit_tests TESTNAME)
-	set(SURGSIM_TESTS_building ${SURGSIM_TESTS_BUILD})
-	set(SURGSIM_TESTS_running ${SURGSIM_TESTS_RUN})
-
-	# First, parse the optional arguments
-	set(ARGS_TO_PROCESS ${ARGN})
-	while(1)
-		list(LENGTH ARGS_TO_PROCESS NUM_ARGS_TO_PROCESS)
-		if(NUM_ARGS_TO_PROCESS EQUAL 0)
-			break()   # we're done here
-		endif()
-		list(GET ARGS_TO_PROCESS 0 ARG_CURRENT)
-		#message("SSAUT: processing extra arg '${ARG_CURRENT}' ...")
-
-		if(ARG_CURRENT STREQUAL "BUILD")
-			if(NUM_ARGS_TO_PROCESS LESS 2)
-				message(SEND_ERROR
-					"surgsim_add_unit_tests(...BUILD <bool>...) is missing the argument!")
-				break()
-			endif(NUM_ARGS_TO_PROCESS LESS 2)
-			list(GET ARGS_TO_PROCESS 1 SURGSIM_TESTS_building)
-			#message("SSAUT: BUILDING set to ${SURGSIM_TESTS_building}")
-			list(REMOVE_AT ARGS_TO_PROCESS 0 1)
-
-		elseif(ARG_CURRENT STREQUAL "RUN")
-			if(NUM_ARGS_TO_PROCESS LESS 2)
-				message(SEND_ERROR
-					"surgsim_add_unit_tests(...RUN <bool>...) is missing the argument!")
-				break()
-			endif(NUM_ARGS_TO_PROCESS LESS 2)
-			list(GET ARGS_TO_PROCESS 1 SURGSIM_TESTS_running)
-			#message("SSAUT: RUNNING set to ${SURGSIM_TESTS_running}")
-			list(REMOVE_AT ARGS_TO_PROCESS 0 1)
-
-		else()
-			message(SEND_ERROR
-				"surgsim_add_unit_tests(... '${ARG_CURRENT}' ...): bad argument!")
-			break()
-		endif()
-	endwhile()
-
-	# OK, we're ready to set up building and running tests
-	if(SURGSIM_TESTS_building)
-		surgsim_unit_test_build_only("${TESTNAME}")
-		if(SURGSIM_TESTS_running)
-			surgsim_unit_test_run_only("${TESTNAME}")
-		endif()
-	endif()
+	surgsim_unit_test_build_only("${TESTNAME}")
+	surgsim_unit_test_run_only("${TESTNAME}")
 endmacro()
 
 # Do all the work to add a library to the system

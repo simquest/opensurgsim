@@ -46,7 +46,7 @@ surgsim_add_library(
 	"${NOVINT_DEVICE_SOURCES}" "${NOVINT_DEVICE_HEADERS}"
 	SurgSim/Devices/Novint
 )
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 

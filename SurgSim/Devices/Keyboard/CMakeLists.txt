@@ -39,7 +39,7 @@ surgsim_add_library(
 	SurgSim/Devices/Keyboard
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 	add_subdirectory(VisualTests)
