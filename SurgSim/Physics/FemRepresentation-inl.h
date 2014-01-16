@@ -186,8 +186,8 @@ void FemRepresentation<MT, DT, KT, ST>::afterUpdate(double dt)
 }
 
 template <class MT, class DT, class KT, class ST>
-void FemRepresentation<MT, DT, KT, ST>::applyDofCorrection(double dt,
-														   const Eigen::VectorBlock<SurgSim::Math::Vector>& block)
+void FemRepresentation<MT, DT, KT, ST>::applyCorrection(double dt,
+	const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity)
 {
 }
 
