@@ -40,7 +40,7 @@ class OutputComponent : public SurgSim::Framework::Component
 public:
 	/// Constructor
 	/// \param name Name of this output component
-	OutputComponent(const std::string& name);
+	explicit OutputComponent(const std::string& name);
 	/// Destructor
 	virtual ~OutputComponent();
 
