@@ -56,10 +56,9 @@ public:
 	bool isInitialized() const;
 
 	virtual void initializeInput(const std::string& device,
-		const SurgSim::DataStructures::DataGroup& newInputData) override;
+		const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	virtual void handleInput(const std::string& device,
-		const SurgSim::DataStructures::DataGroup& newInputData) override;
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
 	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
 
