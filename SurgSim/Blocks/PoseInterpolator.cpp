@@ -16,7 +16,7 @@
 #include "SurgSim/Blocks/PoseInterpolator.h"
 
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Framework/Representation.h"
 
 #include <memory>
 
@@ -28,32 +28,49 @@ namespace Blocks
 
 PoseInterpolator::PoseInterpolator(const std::string& name) :
 	Behavior(name),
-	m_optionalFrom(RigidTransform3d::Identity()),
-	m_to(RigidTransform3d::Identity()),
+	m_startingPose(RigidTransform3d::Identity()),
+	m_endingPose(RigidTransform3d::Identity()),
 	m_duration(1.0),
 	m_currentTime(0.0)
 {
 
 }
 
-void PoseInterpolator::setFrom(const SurgSim::Math::RigidTransform3d transform)
+void PoseInterpolator::setStartingPose(const SurgSim::Math::RigidTransform3d transform)
 {
-	m_optionalFrom.setValue(transform);
+	if (!isInitialized())
+	{
+		m_optionalStartPose.setValue(transform);
+	}
 }
 
-void PoseInterpolator::setTo(const SurgSim::Math::RigidTransform3d transform)
+void PoseInterpolator::setEndingPose(const SurgSim::Math::RigidTransform3d transform)
 {
-	m_to = transform;
+	if (!isInitialized())
+	{
+		m_endingPose = transform;
+	}
 }
 
-void PoseInterpolator::setTarget(std::shared_ptr<SurgSim::Graphics::Representation> target)
+void PoseInterpolator::setTarget(std::shared_ptr<SurgSim::Framework::Representation> target)
 {
-	m_target = target;
+	if (!isInitialized())
+	{
+		m_target = target;
+	}
 }
 
 void PoseInterpolator::setDuration(double t)
 {
-	m_duration = t;
+	if (!isInitialized())
+	{
+		m_duration = t;
+	}
+}
+
+double PoseInterpolator::getDuration() const
+{
+	return m_duration;
 }
 
 bool PoseInterpolator::doInitialize()
@@ -66,7 +83,7 @@ bool PoseInterpolator::doWakeUp()
 	bool result = false;
 	if (m_target != nullptr)
 	{
-		m_from = (m_optionalFrom.hasValue()) ? m_optionalFrom.getValue() : m_target->getPose();
+		m_startingPose = (m_optionalStartPose.hasValue()) ? m_optionalStartPose.getValue() : m_target->getInitialPose();
 		result = true;
 	}
 	return result;
@@ -85,7 +102,7 @@ void PoseInterpolator::update(double dt)
 		else if (isPingPong())
 		{
 			m_currentTime = m_currentTime - m_duration;
-			std::swap(m_from, m_to);
+			std::swap(m_endingPose, m_startingPose);
 		}
 		else
 		{
@@ -94,7 +111,7 @@ void PoseInterpolator::update(double dt)
 		}
 	}
 
-	m_target->setPose(SurgSim::Math::interpolate(m_from, m_to, m_currentTime/m_duration));
+	m_target->setPose(SurgSim::Math::interpolate(m_startingPose, m_endingPose, m_currentTime/m_duration));
 }
 
 void PoseInterpolator::setLoop(bool val)
@@ -106,7 +123,7 @@ void PoseInterpolator::setLoop(bool val)
 	}
 }
 
-bool PoseInterpolator::isLoop()
+bool PoseInterpolator::isLoop() const
 {
 	return m_loop;
 }
@@ -120,7 +137,7 @@ void PoseInterpolator::setPingPong(bool val)
 	}
 }
 
-bool PoseInterpolator::isPingPong()
+bool PoseInterpolator::isPingPong() const
 {
 	return m_pingpong;
 }

@@ -24,7 +24,7 @@
 
 namespace SurgSim
 {
-namespace Graphics
+namespace Framework
 {
 	class Representation;
 }
@@ -43,65 +43,60 @@ public:
 	/// Constructor
 	explicit PoseInterpolator(const std::string& name);
 
-	/// Set the starting pose. This is optional, if not set the targets pose
+	/// Set the starting pose. This is optional, if not set the target's pose
 	/// will be used as the from value.
 	/// \param transform The starting pose.
-	void setFrom(const SurgSim::Math::RigidTransform3d transform);
+	void setStartingPose(const SurgSim::Math::RigidTransform3d transform);
 
-	/// Set the target pose.
-	/// \param transform The target pose.
-	void setTo(const SurgSim::Math::RigidTransform3d transform);
+	/// Set the end pose.
+	/// \param transform The end pose.
+	void setEndingPose(const SurgSim::Math::RigidTransform3d transform);
 
 	/// Set the target of the interpolation, this is where the interpolated transform
-	/// will be applied to. 
+	/// will be applied to. If no starting pose is set, the pose of this representation will
+	/// be used as the starting pose
 	/// \param target The target that will use the interpolated pose.
-	void setTarget(std::shared_ptr<SurgSim::Graphics::Representation> target);
+	void setTarget(std::shared_ptr<SurgSim::Framework::Representation> target);
 
-	/// Set the duration of the for the interpolation.
+	/// Set the duration of the the interpolation.
 	/// \param t The duration in seconds.
 	void setDuration(double t);
 
 	/// Get the duration.
 	/// \return The duration in seconds.
-	double getDuration();
+	double getDuration() const;
 
 	/// Sets the interpolation to looping, pingpong and loop cannot be used together.
 	/// \param val If true the interpolation will loop.
 	void setLoop(bool val);
 
 	/// \return true If the interpolation is looping.
-	bool isLoop();
+	bool isLoop() const;
 
-	/// Sets the interpolation to ping pong back and forth between the from and to values.
+	/// Sets the interpolation to ping pong back and forth between the starting and ending poses.
 	/// pingpong and loop cannot be used together.
 	/// \param val If true the interpolation will ping pong.
 	void setPingPong(bool val);
 
 	/// \return true If the interpolation is doing ping pong.
-	bool isPingPong();
+	bool isPingPong() const;
 
-	/// Overridden from Representation
-	bool doWakeUp() override;
-
-	/// Overridden from Representation
-	bool doInitialize() override;
-
-	/// Overridden from Representation
-	void update(double dt) override;
+	/// Overridden from Behavior
+	virtual void update(double dt) override;
 
 private:
 
 	/// Optional value to take the from rigid transform
-	SurgSim::DataStructures::OptionalValue<SurgSim::Math::RigidTransform3d> m_optionalFrom;
+	SurgSim::DataStructures::OptionalValue<SurgSim::Math::RigidTransform3d> m_optionalStartPose;
 
 	/// Start of the interpolation
-	SurgSim::Math::RigidTransform3d m_from;
+	SurgSim::Math::RigidTransform3d m_endingPose;
 
 	/// Target of the interpolation
-	SurgSim::Math::RigidTransform3d m_to;
+	SurgSim::Math::RigidTransform3d m_startingPose;
 
 	/// Target for the interpolated RigidTransform 
-	std::shared_ptr<SurgSim::Graphics::Representation> m_target;
+	std::shared_ptr<SurgSim::Framework::Representation> m_target;
 
 	/// Duration of the interpolation
 	double m_duration;
@@ -114,6 +109,12 @@ private:
 
 	/// Whether to loop
 	bool m_loop;
+
+	/// Overridden from Component
+	virtual bool doWakeUp() override;
+
+	/// Overridden from Component
+	virtual bool doInitialize() override;
 };
 
 
