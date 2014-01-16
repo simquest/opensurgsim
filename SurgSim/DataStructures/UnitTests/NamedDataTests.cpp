@@ -16,6 +16,7 @@
 /// \file
 /// Tests for the NamedData<T> class.
 
+#include "SurgSim/DataStructures/IndexDirectory.h"
 #include "SurgSim/DataStructures/NamedData.h"
 #include "SurgSim/DataStructures/NamedDataBuilder.h"
 #include "gtest/gtest.h"
@@ -84,6 +85,33 @@ TEST(NamedDataTests, CanConstructFromNames)
 	std::vector<std::string> names;
 	names.push_back("test");
 	NamedData<float> data(names);
+
+	EXPECT_EQ(1, data.getNumEntries());
+	EXPECT_EQ(1u, data.size());
+
+	EXPECT_TRUE(data.isValid());
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("test"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("test"));
+	EXPECT_EQ(0, data.getIndex("test"));
+	EXPECT_EQ("test", data.getName(0));
+
+	EXPECT_FALSE(data.hasEntry(1));
+	EXPECT_FALSE(data.hasEntry("missing"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("missing"));
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_EQ("", data.getName(1));
+}
+
+/// Creating a named data object using an IndexDirectory, not from a builder.
+TEST(NamedDataTests, CanConstructFromIndexDirectory)
+{
+	NamedDataBuilder<float> builder;
+	builder.addEntry("test");
+	std::shared_ptr<const SurgSim::DataStructures::IndexDirectory> dir = builder.createData().getDirectory();
+	NamedData<float> data(dir);
 
 	EXPECT_EQ(1, data.getNumEntries());
 	EXPECT_EQ(1u, data.size());
