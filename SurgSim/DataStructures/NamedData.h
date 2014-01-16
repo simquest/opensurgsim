@@ -71,10 +71,6 @@ public:
 	/// \param names The names, which should be unique.
 	inline explicit NamedData(const std::vector<std::string>& names);
 
-	/// Construct an object as a copy of the data from another object.
-	/// \param namedData The object to copy from.
-	inline NamedData(const NamedData& namedData);
-
 	/// Copy the data from another object.
 	///
 	/// The object being assigned into must either be empty (not yet associated with a set of names and indices), or
