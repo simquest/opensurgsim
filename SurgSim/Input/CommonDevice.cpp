@@ -194,6 +194,21 @@ bool CommonDevice::pullOutput()
 	return false;
 }
 
+SurgSim::DataStructures::DataGroup& CommonDevice::getInitialInputData()
+{
+	return m_initialInputData;
+}
+
+SurgSim::DataStructures::DataGroup& CommonDevice::getInputData()
+{
+	return m_inputData;
+}
+
+const SurgSim::DataStructures::DataGroup& CommonDevice::getOutputData() const
+{
+	return m_outputData;
+}
+
 
 };  // namespace Input
 };  // namespace SurgSim

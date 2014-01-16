@@ -101,29 +101,20 @@ protected:
 	/// Getter for the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function may be
 	/// called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
 	/// \return A reference to the initial input data.
-	SurgSim::DataStructures::DataGroup& getInitialInputData()
-	{
-		return m_initialInputData;
-	}
+	SurgSim::DataStructures::DataGroup& getInitialInputData();
 
 	/// Getter for the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
 	/// called by friend scaffolds, to get a DataGroup they can modify then set back to the device to send to the
 	/// device's input consumers.
 	/// \return A reference to the input data.
-	SurgSim::DataStructures::DataGroup& getInputData()
-	{
-		return m_inputData;
-	}
+	SurgSim::DataStructures::DataGroup& getInputData();
 
 	/// Getter for the output data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
 	/// called by friend scaffolds, to get the data that the output producer wants to send to the device (and then send
 	/// that data through the device's SDK). Note that a writable variant is not provided, an output producer registered
 	/// via \ref setOutputProducer will set the output data.
 	/// \return A reference to the output data.
-	const SurgSim::DataStructures::DataGroup& getOutputData() const
-	{
-		return m_outputData;
-	}
+	const SurgSim::DataStructures::DataGroup& getOutputData() const;
 
 private:
 	struct State;
