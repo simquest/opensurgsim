@@ -88,8 +88,7 @@ TEST(OsgShaderRenderTests, SphereShaderTest)
 
 	runtime->addManager(manager);
 
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
+	std::shared_ptr<Scene> scene = runtime->getScene();
 
 	/// Add a graphics view element to the scene
 	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>("view element");

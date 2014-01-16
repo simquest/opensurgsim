@@ -58,8 +58,7 @@ struct OsgRepresentationRenderTests : public ::testing::Test
 
 		runtime->addManager(manager);
 
-		scene = std::make_shared<SurgSim::Framework::Scene>();
-		runtime->setScene(scene);
+		scene = runtime->getScene();
 
 		viewElement = std::make_shared<OsgViewElement>("view element");
 		scene->addSceneElement(viewElement);

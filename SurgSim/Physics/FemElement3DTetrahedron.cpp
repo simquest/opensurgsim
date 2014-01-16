@@ -18,6 +18,8 @@
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 
+#include "SurgSim/Math/Geometry.h"
+
 using SurgSim::Math::getSubVector;
 using SurgSim::Math::getSubMatrix;
 using SurgSim::Math::addSubVector;
@@ -54,6 +56,8 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 
 	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
 	{
+		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < restState.getNumNodes()) <<
+			"Invalid nodeId " << *nodeId << " expected in range [0.."<< restState.getNumNodes()-1<<"]";
 		m_nodeIds.push_back(*nodeId);
 	}
 
@@ -72,7 +76,7 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 	SurgSim::Math::Vector3d AC = C - A;
 	SurgSim::Math::Vector3d AD = D - A;
 	SURGSIM_LOG_IF(AB.cross(AC).dot(AD) < 0, Logger::getDefaultLogger(), WARNING) <<
-		"Tetrahedron illed defined (ABC defined counter clock viewed from D) with node ids["<<
+		"Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids["<<
 		m_nodeIds[0]<<", "<<m_nodeIds[1]<<", "<<m_nodeIds[2]<<", "<<m_nodeIds[3]<<"]";
 }
 
@@ -393,6 +397,31 @@ void FemElement3DTetrahedron::computeShapeFunctions(const DeformableRepresentati
 		m_di[2] = -det(atilde, btilde, dtilde);
 		m_di[3] =  det(atilde, btilde, ctilde);
 	}
+}
+
+bool FemElement3DTetrahedron::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
+		&& (naturalCoordinate.size() == 4);
+}
+
+SurgSim::Math::Vector FemElement3DTetrahedron::computeCartesianCoordinate(
+	const DeformableRepresentationState& state,
+	const SurgSim::Math::Vector& naturalCoordinate) const
+{
+	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
+		<< "naturalCoordinate must be normalized and length 4.";
+
+	const Vector& x = state.getPositions();
+	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
+	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
+	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
+	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
+
+	return naturalCoordinate(0) * p0
+		 + naturalCoordinate(1) * p1
+		 + naturalCoordinate(2) * p2
+		 + naturalCoordinate(3) * p3;
 }
 
 } // namespace Physics

@@ -14,12 +14,14 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/BoxSphereDcdContact.h"
-#include "SurgSim/Collision/CollisionPair.h"
 
+#include "SurgSim/Collision/CollisionPair.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::SphereShape;

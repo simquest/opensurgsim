@@ -27,10 +27,10 @@ set(KEYBOARD_DEVICE_SOURCES
 )
 
 set(KEYBOARD_DEVICE_HEADERS
-	KeyCode.h
 	KeyboardDevice.h
 	KeyboardHandler.h
 	KeyboardScaffold.h
+	KeyCode.h
 )
 
 surgsim_add_library(

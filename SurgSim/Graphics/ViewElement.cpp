@@ -47,10 +47,6 @@ bool ViewElement::doInitialize()
 	addComponent(m_view);
 	return true;
 }
-bool ViewElement::doWakeUp()
-{
-	return true;
-}
 
 }; // End of namespace Graphics
 }; // End of namespace SurgSim

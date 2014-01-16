@@ -19,8 +19,6 @@
 #include <memory>
 
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Physics/FemElement.h"
 
 #include "SurgSim/Math/Vector.h"
 
@@ -29,6 +27,10 @@ namespace SurgSim
 
 namespace Physics
 {
+
+class DeformableRepresentationState;
+class FemElement;
+struct FemRepresentationCoordinate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
@@ -64,6 +66,11 @@ public:
 	/// \note The FemElement is returned with read/write access
 	/// \note Out of range femElementId will raise an exception
 	std::shared_ptr<FemElement> getFemElement(unsigned int femElementId);
+
+	/// Determines whether the associated coordinate is valid
+	/// \param coordinate Coordinate to check
+	/// \return True if coordinate is valid
+	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
 
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)
