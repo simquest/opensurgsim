@@ -101,7 +101,7 @@ protected:
 	/// Getter for the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function may be
 	/// called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
 	/// \return A reference to the initial input data.
-	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
+	SurgSim::DataStructures::DataGroup& getInitialInputData()
 	{
 		return m_initialInputData;
 	}
@@ -125,6 +125,14 @@ protected:
 		return m_outputData;
 	}
 
+private:
+	struct State;
+
+	const std::string m_name;
+
+	/// The name used for the callbacks, defaults to the device name.
+	std::string m_nameForCallback;
+
 	/// Data used to initialize the input to an InputConsumerInterface when it is added to this device.
 	SurgSim::DataStructures::DataGroup m_initialInputData;
 
@@ -134,15 +142,17 @@ protected:
 	/// The data the output producer (if any) is providing to the device.
 	SurgSim::DataStructures::DataGroup m_outputData;
 
-private:
-	struct State;
-
-	const std::string m_name;
-
-	/// The name used for the callbacks, defaults to the device name.
-	std::string m_nameForCallback;
-
 	/// Struct to hide some of the private member variables, PImpl (Pointer to Implementation).
+	/// For CommonDevice, we are hiding:
+	/// - The list of input consumers,
+	/// - The output producer, if any, and
+	/// - The mutex that protects the consumers and the producer.
+	/// The PImpl idiom is being used so that subclasses of CommonDevice will never store device-specific datatypes in
+	/// member variables.  Instead they would store them in the PImpl object, so that the device-specific include
+	/// file(s) are only included by the subclass's .cpp file.  A benefit of this idiom is that any change to the
+	/// device's API/SDK will not force a recompile of any file including the subclass's .h file.  For historical
+	/// reasons we are not currently using the PImpl object to store all this class's private member variables, as is
+	/// commonly recommended.
 	std::unique_ptr<State> m_state;
 };
 

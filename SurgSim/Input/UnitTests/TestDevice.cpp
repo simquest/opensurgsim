@@ -41,7 +41,7 @@ void TestDevice::pushInput()
 
 void TestDevice::pushInput(const std::string& data)
 {
-	m_inputData.strings().set("helloWorld", data);
+	getInputData().strings().set("helloWorld", data);
 	pushInput();
 }
 
@@ -49,7 +49,7 @@ void TestDevice::pushInput(const std::string& data)
 bool TestDevice::pullOutput()
 {
 	bool result = CommonDevice::pullOutput();
-	m_outputData.strings().get("data",&lastPulledData);
+	getOutputData().strings().get("data", &lastPulledData);
 	return result;
 }
 

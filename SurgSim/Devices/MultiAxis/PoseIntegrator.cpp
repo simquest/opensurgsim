@@ -50,19 +50,22 @@ bool PoseIntegrator::isInitialized() const
 	return true;
 }
 
-void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
+void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& newInputData)
 {
-	m_initialInputData = inputData;
-	m_inputData = inputData;
+	SurgSim::DataStructures::DataGroup& initialInputData = getInitialInputData();
+	initialInputData = newInputData;
+	SurgSim::DataStructures::DataGroup& inputData = getInputData();
+	inputData = newInputData;
 }
 
-void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
+void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& newInputData)
 {
-	m_inputData = inputData;
+	SurgSim::DataStructures::DataGroup& inputData = getInputData();
+	inputData = newInputData;
 	SurgSim::Math::RigidTransform3d pose;
-	if (inputData.poses().get("pose", &pose))
+	if (newInputData.poses().get("pose", &pose))
 	{
-		m_inputData.poses().set("pose", integrate(pose));
+		inputData.poses().set("pose", integrate(pose));
 	}
 	pushInput();
 }
