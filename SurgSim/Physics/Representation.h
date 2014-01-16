@@ -115,7 +115,7 @@ public:
 	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
 	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
 	/// \param dt The time step
-	/// \param deltaVelocity The block of a vector containing the correction to be applied to the dof
+	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
 	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity);
 
 protected:
