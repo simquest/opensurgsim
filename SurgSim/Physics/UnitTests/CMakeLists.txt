@@ -29,8 +29,10 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	Fem3DRepresentationTests.cpp
+	FemElement3DCubeTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
+	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FemRepresentationTests.cpp
 	FixedRepresentationContactTests.cpp

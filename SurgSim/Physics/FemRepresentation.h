@@ -19,8 +19,6 @@
 #include <memory>
 
 #include "SurgSim/Physics/DeformableRepresentation.h"
-#include "SurgSim/Physics/DeformableRepresentationState.h"
-#include "SurgSim/Physics/FemElement.h"
 
 #include "SurgSim/Math/Vector.h"
 
@@ -29,6 +27,10 @@ namespace SurgSim
 
 namespace Physics
 {
+
+class DeformableRepresentationState;
+class FemElement;
+struct FemRepresentationCoordinate;
 
 /// Finite Element Model (a.k.a. fem) is a deformable model (a set of nodes connected by FemElement).
 /// \note A fem is a DeformableRepresentation (Physics::Representation and Math::OdeEquation)
@@ -65,6 +67,11 @@ public:
 	/// \note Out of range femElementId will raise an exception
 	std::shared_ptr<FemElement> getFemElement(unsigned int femElementId);
 
+	/// Determines whether the associated coordinate is valid
+	/// \param coordinate Coordinate to check
+	/// \return True if coordinate is valid
+	bool isValidCoordinate(const FemRepresentationCoordinate &coordinate) const;
+
 	/// Gets the total mass of the fem
 	/// \return The total mass of the fem (in Kg)
 	double getTotalMass() const;
@@ -97,10 +104,14 @@ public:
 	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt) override;
 
-	/// Applies a correction to the internal degrees of freedom
+	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
+	/// deltaVelocity.
+	///
+	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
+	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
 	/// \param dt The time step
-	/// \param block The block of a vector containing the correction to be applied to the dof
-	virtual void applyDofCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& block) override;
+	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
+	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
 
 	/// Evaluation of the RHS function f(x,v) for a given state
 	/// \param state (x, v) the current position and velocity to evaluate the function f(x,v) with

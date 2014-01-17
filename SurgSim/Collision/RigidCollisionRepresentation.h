@@ -36,9 +36,12 @@ class RigidCollisionRepresentation : public Representation
 public:
 
 	/// Constructor
-	RigidCollisionRepresentation(
-		const std::string& name,
-		std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
+	/// \param	name	The name of rigid collision representation
+	explicit RigidCollisionRepresentation(const std::string& name);
+
+	/// Set rigid representation
+	/// \param	representation	The rigid representation
+	void setRigidRepresentation(std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation);
 
 	/// Destructor
 	virtual ~RigidCollisionRepresentation();

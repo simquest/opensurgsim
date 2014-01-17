@@ -44,8 +44,7 @@ void RenderTest::SetUp()
 	runtime->addManager(graphicsManager);
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
-	scene = std::make_shared<SurgSim::Framework::Scene>();
-	runtime->setScene(scene);
+	scene = runtime->getScene();
 
 	viewElement = std::make_shared<OsgViewElement>("view element");
 	viewElement->getView()->setPosition(100,100);
