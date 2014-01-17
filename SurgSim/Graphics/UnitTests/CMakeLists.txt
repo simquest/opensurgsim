@@ -81,6 +81,7 @@ set(LIBS
 	SurgSimTesting
 	gmock
 	gtest
+	yaml-cpp
 )
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)

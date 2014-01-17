@@ -17,6 +17,7 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
+	${YAML_CPP_SOURCE_DIR}/include
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
@@ -34,6 +35,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgManager.cpp
 	OsgMaterial.cpp
 	OsgMeshRepresentation.cpp
+	OsgOctreeRepresentation.cpp
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
 	OsgSceneryRepresentation.cpp
@@ -86,7 +88,6 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgMatrixConversions.h
 	OsgMeshRepresentation.h
 	OsgOctreeRepresentation.h
-	OsgOctreeRepresentation-inl.h
 	OsgPlane.h
 	OsgPlaneRepresentation.h
 	OsgPointCloudRepresentation.h

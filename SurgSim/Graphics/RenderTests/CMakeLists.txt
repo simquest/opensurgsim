@@ -61,6 +61,7 @@ set(LIBS
 	SurgSimBlocks
 	gmock
 	gtest
+	yaml-cpp
 	${Boost_LIBRARIES}
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
