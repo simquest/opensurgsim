@@ -17,39 +17,42 @@
 
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
-#include "SurgSim/Graphics/OctreeRepresentation.h"
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/OctreeShape.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Testing/MathUtilities.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Graphics::OsgOctreeRepresentation;
-using SurgSim::Graphics::OctreeRepresentation;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
+using SurgSim::Math::OctreeShape;
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Testing::interpolate;
+using SurgSim::Math::Vector3d;
 
-struct EmptyData{}emptyData;
 
 struct OsgOctreeRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 {
 };
 
+// This visual test should draw a "+"-like shape in 3D space.
 TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 {
-	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation<EmptyData>>("Octree Representation");
+	SurgSim::Math::OctreeShape::EmptyData emptyData;
 
+	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d(0.2, 0.3, 0.4), Vector3d(1.2, 1.3, 1.4));
+	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
+	auto octreeShape = std::make_shared<OctreeShape>();
+	octreeShape->setRootNode(octreeNode);
+	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), emptyData, 1); //Make the OctreeNode visible
+
+	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
+	ASSERT_TRUE(nullptr == octreeRepresentation->getOctree());
 	octreeRepresentation->setInitialPose(makeRigidTransform(
-										 makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
-										 Vector3d(0.0, 0.0, -8.0)));
+										  makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
+										  Vector3d(0.0, 0.0, -8.0)));
 	viewElement->addComponent(octreeRepresentation);
-
-	octreeRepresentation->getOctree()->addData(Vector3d(0.0, 0.0, 0.0), emptyData, 1);
-
+	octreeRepresentation->setOctree(octreeShape);
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
@@ -70,6 +73,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 		octreeRepresentation->getOctree()->getChild(i)->subdivide();
 	}
 
+	Vector3d rootOctreeCenter = (boundingBox.max() + boundingBox.min()) / 2.0;
 	for (int i = 0; i < 8; ++i)
 	{
 		auto self = octreeRepresentation->getOctree()->getChild(i);
@@ -77,8 +81,9 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 		{
 			auto childBox = self->getChild(j)->getBoundingBox();
 			Vector3d childCenter = (childBox.max() + childBox.min()) / 2.0;
+			auto distance = childCenter - rootOctreeCenter;
 
-			if ( childCenter.cwiseAbs().sum()  <= 0.75)
+			if (distance.cwiseAbs().sum() <= 0.75)
 			{
 				octreeRepresentation->getOctree()->addData(childCenter, emptyData, 3);
 				boost::this_thread::sleep(boost::posix_time::milliseconds(500));

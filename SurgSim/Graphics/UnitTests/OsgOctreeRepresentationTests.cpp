@@ -16,27 +16,36 @@
 /// \file
 /// Unit Tests for the OsgOctreeRepresentation class.
 
-#include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
+#include "SurgSim/Math/OctreeShape.h"
 
 #include <gtest/gtest.h>
 
-using SurgSim::DataStructures::OctreeNode;
+using SurgSim::Framework::Runtime;
 using SurgSim::Graphics::OsgOctreeRepresentation;
+using SurgSim::Math::OctreeShape;
 using SurgSim::Math::Vector3d;
 
-struct EmptyData{}emptyData;
-
-TEST(OsgOctreeRepresentationTests, GetSetTest)
+TEST(OsgOctreeRepresentationTests, InitilizationTest)
 {
+	ASSERT_NO_THROW( {auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");} );
+};
 
-	Eigen::AlignedBox<double, 3> boundingBox;
-	boundingBox.min() = Vector3d::Zero();
-	boundingBox.max() = Vector3d::Ones() * pow(2.0, 2);
-	auto octree = std::make_shared<OctreeNode<EmptyData>>(boundingBox);
+TEST(OsgOctreeRepresentationTests, GetSetUpdateTest)
+{
+	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * pow(2.0, 2));
+	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
+	auto octreeShape = std::make_shared<OctreeShape>();
+	octreeShape->setRootNode(octreeNode);
 
-	auto octreeRepresentation =	std::make_shared<OsgOctreeRepresentation<EmptyData>>("Octree");
+	auto runtime = std::make_shared<Runtime>();
+	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
+	octreeRepresentation->setOctree(octreeShape);
+	EXPECT_TRUE(octreeNode == octreeRepresentation->getOctree());
 
-	octreeRepresentation->setOctree(octree);
-	EXPECT_TRUE(octree == octreeRepresentation->getOctree());
+	EXPECT_TRUE(octreeRepresentation->initialize(runtime));
+	EXPECT_TRUE(octreeRepresentation->wakeUp());
+
+	ASSERT_NO_THROW(octreeRepresentation->update(0.1));
 }
