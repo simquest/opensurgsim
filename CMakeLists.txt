@@ -51,6 +51,10 @@ find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
 
+set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
+find_package(GoogleMock)
+add_subdirectory(${GOOGLEMOCK_DIR} GoogleMock)
+
 if(WIN32)
 	set(GLUT_ROOT_PATH "$ENV{GLUT_ROOT_PATH}")
 endif(WIN32)
@@ -85,15 +89,7 @@ if(SURGSIM_DEVICES_BUILD)
 endif(SURGSIM_DEVICES_BUILD)
 
 # This should have been built from the external ThirdParty directory
-find_package(yaml-cpp QUIET)
-find_package(gmock QUIET)
-
-if(NOT gmock_DIR OR NOT yaml-cpp_DIR)
-message(FATAL_ERROR "One of the libraries from the ThirdParty directory could not be "
-					"found, this usually means that you did not build the ThirdParty libraries "
-					"to remedy this you need to build the ThirdParty tree, by executing cmake "
-					"AND your usual build tools on it.")
-endif()
+find_package(yaml-cpp)
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
 

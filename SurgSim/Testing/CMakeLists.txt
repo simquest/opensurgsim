@@ -29,10 +29,6 @@ set(SURGSIM_TESTING_HEADERS
 	TestCube.h
 )
 
-set(LIBS
-	gmock
-)
-
 surgsim_add_library(
 	SurgSimTesting
 	"${SURGSIM_TESTING_SOURCES}"

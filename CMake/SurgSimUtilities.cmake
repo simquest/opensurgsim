@@ -197,7 +197,7 @@ macro(surgsim_unit_test_build_only TESTNAME)
 		#     So this option does not currently do anything useful...
 	else()
 		add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
-		target_link_libraries(${TESTNAME} gmock SurgSimTesting ${LIBS})
+		target_link_libraries(${TESTNAME} SurgSimTesting gmock ${LIBS})
 		# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 		surgsim_copy_to_target_directory(${TESTNAME}
 			${UNIT_TEST_SHARED_LIBS})
