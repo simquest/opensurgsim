@@ -50,17 +50,6 @@ public:
 	/// 	using a DataGroupBuilder, to that device's supported values that it will push to the application.
 	CommonDevice(const std::string& name, SurgSim::DataStructures::DataGroup&& inputData);
 
-	/// Constructor.
-	///
-	/// Note that this form of the constructor does NOT initialize the initial input data from the device.
-	/// Therefore, the derived class MUST initialize it itself before any input consumers are added!
-	///
-	/// If you can use one of the other constructors, you should, but this one can be used when solving some
-	/// tricky situations with device filters.
-	///
-	/// \param name	The name associated with the input device.
-	explicit CommonDevice(const std::string& name);
-
 	/// Destructor.
 	virtual ~CommonDevice();
 
@@ -77,12 +66,28 @@ public:
 	/// \return	The name being used.
 	std::string getNameForCallback() const;
 
+	/// Connect this device to an InputConsumerInterface, which will receive the data that comes from this device.
+	/// \param inputConsumer The InputConsumerInterface to connect with.
+	/// \return true if successful
 	virtual bool addInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
+
+	/// Disconnect this device from an InputConsumerInterface, which will no longer receive data from this device.
+	/// \param inputConsumer The InputConsumerInterface to disconnect from.
+	/// \return true if successful
 	virtual bool removeInputConsumer(std::shared_ptr<InputConsumerInterface> inputConsumer) override;
 
+	/// Connect this device to an OutputProducerInterface, which will send data to this device.
+	/// \param outputProducer The OutputProducerInterface to connect with.
+	/// \return true if successful
 	virtual bool setOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
+
+	/// Disconnect this device from an OutputProducerInterface, which will no longer send data to this device.
+	/// \param outputProducer The OutputProducerInterface to disconnect from.
+	/// \return true if successful
 	virtual bool removeOutputProducer(std::shared_ptr<OutputProducerInterface> outputProducer) override;
 
+	/// Getter for whether or not this device is connected with an OutputProducerInterface.
+	/// \return true if an OutputProducerInterface is connected.
 	virtual bool hasOutputProducer() override;
 
 protected:
@@ -93,57 +98,52 @@ protected:
 	/// Pull application output from a producer.
 	virtual bool pullOutput();
 
-	/// Provides access to the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".
-	/// \return A const reference to the initial input data.
-	const SurgSim::DataStructures::DataGroup& getInitialInputData() const
-	{
-		return m_initialInputData;
-	}
+	/// Getter for the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function may be
+	/// called to provide initial data to input consumers (e.g., passed to the consumer's constructor).
+	/// \return A reference to the initial input data.
+	SurgSim::DataStructures::DataGroup& getInitialInputData();
 
-	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
-	/// \return A const reference to the input data.
-	const SurgSim::DataStructures::DataGroup& getInputData() const
-	{
-		return m_inputData;
-	}
-	/// Provides access to the input data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
-	/// \return A writable reference to the input data.
-	SurgSim::DataStructures::DataGroup& getInputData()
-	{
-		return m_inputData;
-	}
+	/// Getter for the input data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
+	/// called by friend scaffolds, to get a DataGroup they can modify then set back to the device to send to the
+	/// device's input consumers.
+	/// \return A reference to the input data.
+	SurgSim::DataStructures::DataGroup& getInputData();
 
-	/// Set the entire input data \ref SurgSim::DataStructures::DataGroup "DataGroup" from derived classes.
-	/// Also sets the initial input data \ref SurgSim::DataStructures::DataGroup "DataGroup" if it has not been set.
-	/// Otherwise equivalent to <code>getInputData() = data;</code> but has more readable syntax.
-	/// \param data	The input data to be set.
-	void setInputData(const SurgSim::DataStructures::DataGroup& data)
-	{
-		if (! m_initialInputData.isValid())
-		{
-			m_initialInputData = data;
-			m_initialInputData.resetAll();
-		}
-		m_inputData = data;
-	}
-
-	/// Provides access to the output data \ref SurgSim::DataStructures::DataGroup "DataGroup" for derived classes.
-	/// Note that a writable variant is not provided, since derived classes will not need to write to the application
-	/// output data (an output producer registered via \ref setOutputProducer will be called to do that).
-	/// \return A const reference to the output data.
-	const SurgSim::DataStructures::DataGroup& getOutputData() const
-	{
-		return m_outputData;
-	}
+	/// Getter for the output data \ref SurgSim::DataStructures::DataGroup "DataGroup".  This function is typically
+	/// called by friend scaffolds, to get the data that the output producer wants to send to the device (and then send
+	/// that data through the device's SDK). Note that a writable variant is not provided, an output producer registered
+	/// via \ref setOutputProducer will set the output data.
+	/// \return A reference to the output data.
+	const SurgSim::DataStructures::DataGroup& getOutputData() const;
 
 private:
 	struct State;
 
 	const std::string m_name;
+
+	/// The name used for the callbacks, defaults to the device name.
 	std::string m_nameForCallback;
+
+	/// Data used to initialize the input to an InputConsumerInterface when it is added to this device.
 	SurgSim::DataStructures::DataGroup m_initialInputData;
+
+	/// The data the device is providing to its input consumers.
 	SurgSim::DataStructures::DataGroup m_inputData;
+
+	/// The data the output producer (if any) is providing to the device.
 	SurgSim::DataStructures::DataGroup m_outputData;
+
+	/// Struct to hide some of the private member variables, PImpl (Pointer to Implementation).
+	/// For CommonDevice, we are hiding:
+	/// - The list of input consumers,
+	/// - The output producer, if any, and
+	/// - The mutex that protects the consumers and the producer.
+	/// The PImpl idiom is being used so that subclasses of CommonDevice will never store device-specific datatypes in
+	/// member variables.  Instead they would store them in the PImpl object, so that the device-specific include
+	/// file(s) are only included by the subclass's .cpp file.  A benefit of this idiom is that any change to the
+	/// device's API/SDK will not force a recompile of any file including the subclass's .h file.  For historical
+	/// reasons we are not currently using the PImpl object to store all this class's private member variables, as is
+	/// commonly recommended.
 	std::unique_ptr<State> m_state;
 };
 

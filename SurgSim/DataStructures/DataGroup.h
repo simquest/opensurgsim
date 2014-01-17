@@ -28,39 +28,41 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// A collection of value entries of different types that can be accessed by name or index.
+/// A collection of \ref NamedData objects.
 ///
-/// A DataGroup object contains a collection of values of one of several predefined types:
+/// A DataGroup object contains a NamedData for each of several predefined types:
 /// \li \em Poses contain the position and orientation of an object in space, represented as a 3D rigid-body
 /// 	 (isometric) transformation.
 /// \li \em Vectors contain a vector quantity that does not change when the coordinate system is translated,
 /// 	such as a force or an oriented distance.
+/// \li \em Matrices contain a matrix.
 /// \li \em Scalars contain a scalar value (i.e. anything that can be represented as a double).
 /// \li \em Integers contain an integer value.
 /// \li \em Booleans contain a Boolean logic value (true or false).
 /// \li \em Strings contain a text value.
+/// \li \em CustomData contain a custom data structure, \ref NamedVariantData.
 ///
-/// Each entry can be also be marked as not currently valid, i.e. missing.  Its entry still remains in the
-/// collection, but for the moment has no value associated with it.
-///
-/// Each entry of any particular value type in the collection can be accessed by using either its unique name (a
-/// std::string) or its unique index (a non-negative integer). Access by name is more convenient, but also less
-/// efficient.  The names and indices are unique within each type, but not necessarily across different types
+/// The entries (names and indices) are unique within each NamedData member, but not necessarily across different types
 /// (i.e. there could be a scalar and a vector both named "friction", or a pose and a boolean both at index 1).
-/// However, it is recommended that you keep names separate between different types as well, to avoid confusion.
+/// It is recommended that you keep names separate between different types to avoid confusion.
 ///
-/// A DataGroup object constructed by the default constructor starts out empty, meaning it has not yet been
-/// associated with a set of names and indices.  A <i>non</i>-empty object contains a fixed set of value entries;
-/// entries <b>cannot be added or removed</b>, and names and indices of existing entries
-/// <b>cannot be changed</b>.  A non-empty object also cannot ever become empty again.  These properties ensure
-/// that a stable data layout is available to the code using this class so that it can, for example, record
-/// entry indices and use them to retrieve the same entries later on.  (Currently, no attempt is made to ensure
-/// type consistency, so attempting to read a pose entry using an index of a string may not result in an error.)
+/// A DataGroup object constructed by the default constructor starts out empty, meaning its NamedData member
+/// objects are "invalid". An empty DataGroup object can be made non-empty by:
+/// \li using the \ref DataGroupBuilder class,
+/// \li copy construction,
+/// \li assigning from a non-empty DataGroup object, or
+/// \li assigning a "valid" NamedData object (of the correct template type) to each of the NamedData members.
 ///
-/// The set of names and indices within a DataGroup object object cannot be modified, but it can be initialized
-/// using the \ref DataGroupBuilder class.  After doing that, you can create other objects with the same layout
-/// by copy construction, or by assigning the initialized value to an empty (default-constructed) DataGroup
-/// object.
+/// Assignment to a non-empty DataGroup object is only possible if either of the two objects in the assignment was made
+/// non-empty based on the other object (see the above list items about copy construction and assignment from a
+/// non-empty DataGroup object).
+///
+/// Once a DataGroup is non-empty, the "entries" (i.e., the strings and indices that are used to access the data)
+/// cannot be changed, added to, removed from, or made empty.  These properties ensure that a stable data layout is
+/// available to the code using this class.  For example, the calling code can cache the entries' indices and from then
+/// on use the faster index-based lookup instead of the slower string-based lookup.
+///
+/// \sa SurgSim::DataStructures::NamedData, SurgSim::DataStructers::DataGroupBuilder
 class DataGroup
 {
 public:
@@ -120,15 +122,9 @@ public:
 	/// The same restrictions on object compatibility apply as in the case of the copy assignment
 	///	operator=(const DataGroup&).
 	///
-	/// \param [in,out] dataGroup The object to copy from, which will be left in an ununsable state.
+	/// \param [in,out] dataGroup The object to copy from, which will be left in an unusable state.
 	/// \return The object that was assigned into.
 	inline DataGroup& operator=(DataGroup&& dataGroup);
-
-	/// Check if the object is valid (non-empty), meaning it is associated with a set of names and indices.
-	/// If the object is empty, it can become valid on assignment from a valid object.
-	///
-	/// \return true if valid, false if empty.
-	inline bool isValid() const;
 
 	/// Return the pose data structure.
 	/// \return the mutable pose data.

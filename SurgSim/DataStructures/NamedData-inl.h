@@ -33,36 +33,27 @@ template <typename T>
 inline NamedData<T>::NamedData(std::shared_ptr<const IndexDirectory> directory) :
 	m_directory(directory)
 {
+	SURGSIM_ASSERT(isValid());
 	m_data.resize(m_directory->getNumEntries());
 	m_isDataValid.resize(m_directory->getNumEntries(), false);
-	SURGSIM_ASSERT(isValid());
 }
 
 template <typename T>
 inline NamedData<T>::NamedData(const std::vector<std::string>& names) :
 	m_directory(std::make_shared<const IndexDirectory>(names))
 {
+	SURGSIM_ASSERT(isValid());
 	m_data.resize(m_directory->getNumEntries());
 	m_isDataValid.resize(m_directory->getNumEntries(), false);
-	SURGSIM_ASSERT(isValid());
-}
-
-template <typename T>
-inline NamedData<T>::NamedData(const NamedData& namedData) :
-	m_directory(namedData.m_directory),
-	m_data(namedData.m_data),
-	m_isDataValid(namedData.m_isDataValid)
-{
-	SURGSIM_ASSERT(isValid());
 }
 
 template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 {
 	SURGSIM_ASSERT(namedData.isValid()) <<
-		"Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
+		"Cannot use an invalid (empty) NamedData on the right-hand side of an assignment!";
 
-	if (! isValid())
+	if (!isValid())
 	{
 		m_directory = namedData.m_directory;
 	}
@@ -74,9 +65,9 @@ inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 	m_data = namedData.m_data;
 	m_isDataValid = namedData.m_isDataValid;
 
-	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
+	SURGSIM_ASSERT(isValid()) << "NamedData is not valid after assignment!";
 	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isDataValid.size() == m_directory->size()) <<
-		"NamedData isn't correctly sized after assignment!";
+		"NamedData is not correctly sized after assignment!";
 
 	return *this;
 }
@@ -94,9 +85,9 @@ template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 {
 	SURGSIM_ASSERT(namedData.isValid()) <<
-		"Can't use an invalid (empty) NamedData on the right-hand side of an assignment!";
+		"Cannot use an invalid (empty) NamedData on the right-hand side of an assignment!";
 
-	if (! isValid())
+	if (!isValid())
 	{
 		m_directory = std::move(namedData.m_directory);
 	}
@@ -108,9 +99,9 @@ inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 	m_data = std::move(namedData.m_data);
 	m_isDataValid = std::move(namedData.m_isDataValid);
 
-	SURGSIM_ASSERT(isValid()) << "NamedData isn't valid after assignment!";
+	SURGSIM_ASSERT(isValid()) << "NamedData is not valid after assignment!";
 	SURGSIM_ASSERT(m_data.size() == m_directory->size() && m_isDataValid.size() == m_directory->size()) <<
-		"NamedData isn't correctly sized after assignment!";
+		"NamedData is not correctly sized after assignment!";
 
 	return *this;
 }
