@@ -16,9 +16,21 @@
 #ifndef SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H
 
-#include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/Graphics/OsgRepresentation.h"
+#include <memory>
+#include <string>
+
+#include <osg/ref_ptr>
+#include <osg/PositionAttitudeTransform>
+
 #include "SurgSim/Graphics/OctreeRepresentation.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Math/OctreeShape.h"
+
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4250)
+#endif
+
 
 namespace SurgSim
 {
@@ -27,14 +39,8 @@ namespace Graphics
 
 class OsgUnitBox;
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4250)
-#endif
-
 /// OSG octree representation, implements an OctreeRepresenation using OSG.
-template <class Data>
-class OsgOctreeRepresentation : public OctreeRepresentation<Data>, public OsgRepresentation
+class OsgOctreeRepresentation : public OctreeRepresentation, public OsgRepresentation
 {
 public:
 	/// Constructor
@@ -49,23 +55,21 @@ public:
 	virtual void doUpdate(double dt) override;
 
 	/// Get the Octree of this representation
-	/// \return	The octree used by this representation.
-	virtual std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> getOctree() const override;
+	/// \return    The octree used by this representation.
+	virtual std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> getOctree() const override;
 
 	/// Set the Octree of this representation
 	/// \param The Octree to be used in this representation.
-	virtual void setOctree(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octree) override;
+	virtual void setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape) override;
 
 private:
-
 	/// To draw the given Octree Node
 	/// \param octreeNode Octree node to be drawn
 	/// \return An osg::PositionAttitudeTransform containing the OSG representatoin of the Octree node
-	osg::ref_ptr<osg::PositionAttitudeTransform> draw
-		(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octreeNode);
+	osg::ref_ptr<osg::PositionAttitudeTransform> draw(std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode);
 
 	/// The Octree represented by this representation
-	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> m_octree;
+	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> m_octree;
 
 	/// Shared unit box, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;
@@ -73,13 +77,11 @@ private:
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
 };
 
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
-
 }; // Graphics
 }; // SurgSim
 
-#include "SurgSim/Graphics/OsgOctreeRepresentation-inl.h"
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #endif // SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H

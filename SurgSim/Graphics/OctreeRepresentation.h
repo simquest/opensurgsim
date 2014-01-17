@@ -16,7 +16,10 @@
 #ifndef SURGSIM_GRAPHICS_OCTREEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OCTREEREPRESENTATION_H
 
+#include <string>
+
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/OctreeShape.h"
 
 namespace SurgSim
 {
@@ -24,7 +27,6 @@ namespace Graphics
 {
 
 /// Graphic representation of an Octree
-template <class Data>
 class OctreeRepresentation : public virtual Representation
 {
 public:
@@ -40,12 +42,12 @@ public:
 	}
 
 	/// Get the Octree
-	/// \return	The octree.
-	virtual std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> getOctree() const = 0;
+	/// \return    The octree.
+	virtual std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> getOctree() const = 0;
 
 	/// Set the Octree
 	/// \param The Octree to be used in this representation.
-	virtual void setOctree(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octree) = 0;
+	virtual void setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape) = 0;
 };
 
 }; // Graphics

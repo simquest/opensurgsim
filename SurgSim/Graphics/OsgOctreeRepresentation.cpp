@@ -13,17 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_INL_H
-#define SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_INL_H
-
-#include <osg/PositionAttitudeTransform>
+#include "SurgSim/Graphics/OsgOctreeRepresentation.h"
 
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Graphics/OsgConversions.h"
 #include "SurgSim/Graphics/OsgUnitBox.h"
 #include "SurgSim/Math/Vector.h"
-
 
 namespace SurgSim
 {
@@ -32,36 +28,30 @@ namespace Graphics
 
 using SurgSim::Math::Vector3d;
 
-template<class Data>
-OsgOctreeRepresentation<Data>::OsgOctreeRepresentation(const std::string& name) :
+OsgOctreeRepresentation::OsgOctreeRepresentation(const std::string& name) :
 	Representation(name),
-	OctreeRepresentation<Data>(name),
+	OctreeRepresentation(name),
 	OsgRepresentation(name),
+	m_octree(nullptr),
 	m_sharedUnitBox(getSharedUnitBox())
 {
-	// Center the unit boundingBox at (0.0, 0.0, 0.0)
-	Eigen::AlignedBox<double, 3> boundingBox;
-	boundingBox.min() = Vector3d::Ones() * -0.5;
-	boundingBox.max() = Vector3d::Ones() * 0.5;
-	m_octree = std::make_shared<SurgSim::DataStructures::OctreeNode<Data>>(boundingBox);
-	m_transform->addChild(draw(m_octree));
 }
 
-template<class Data>
-OsgOctreeRepresentation<Data>::~OsgOctreeRepresentation()
+
+OsgOctreeRepresentation::~OsgOctreeRepresentation()
 {
 }
 
-template<class Data>
-void OsgOctreeRepresentation<Data>::doUpdate(double dt)
+
+void OsgOctreeRepresentation::doUpdate(double dt)
 {
+	SURGSIM_ASSERT(m_octree) << "OsgOctreeRepresentation::doUpdate(): No Octree attached.";
 	m_transform->removeChildren(0, m_transform->getNumChildren());
 	m_transform->addChild(draw(m_octree));
 }
 
-template<class Data>
-osg::ref_ptr<osg::PositionAttitudeTransform> OsgOctreeRepresentation<Data>::draw
-	(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octree)
+osg::ref_ptr<osg::PositionAttitudeTransform> OsgOctreeRepresentation::draw
+	(std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree)
 {
 	osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
 	if (octree->hasChildren())
@@ -88,23 +78,20 @@ osg::ref_ptr<osg::PositionAttitudeTransform> OsgOctreeRepresentation<Data>::draw
 	return osgTransform;
 }
 
-template<class Data>
-std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> OsgOctreeRepresentation<Data>::getOctree() const
+
+std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> OsgOctreeRepresentation::getOctree() const
 {
 	return m_octree;
 }
 
 
-template <class Data>
-void SurgSim::Graphics::OsgOctreeRepresentation<Data>::setOctree
-	(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> octree)
+void SurgSim::Graphics::OsgOctreeRepresentation::setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape)
 {
-	m_octree = octree;
+	m_octree = octreeShape->getRootNode();
 }
 
 
-template<class Data>
-std::shared_ptr<SurgSim::Graphics::OsgUnitBox> OsgOctreeRepresentation<Data>::getSharedUnitBox()
+std::shared_ptr<SurgSim::Graphics::OsgUnitBox> OsgOctreeRepresentation::getSharedUnitBox()
 {
 	static SurgSim::Framework::SharedInstance<OsgUnitBox> shared;
 	return shared.get();
@@ -112,5 +99,3 @@ std::shared_ptr<SurgSim::Graphics::OsgUnitBox> OsgOctreeRepresentation<Data>::ge
 
 }; // Graphics
 }; // SurgSim
-
-#endif //SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_INL_H
