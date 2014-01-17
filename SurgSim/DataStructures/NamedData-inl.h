@@ -53,7 +53,7 @@ inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 	SURGSIM_ASSERT(namedData.isValid()) <<
 		"Cannot use an invalid (empty) NamedData on the right-hand side of an assignment!";
 
-	if (! isValid())
+	if (!isValid())
 	{
 		m_directory = namedData.m_directory;
 	}
@@ -87,7 +87,7 @@ inline NamedData<T>& NamedData<T>::operator=(NamedData&& namedData)
 	SURGSIM_ASSERT(namedData.isValid()) <<
 		"Cannot use an invalid (empty) NamedData on the right-hand side of an assignment!";
 
-	if (! isValid())
+	if (!isValid())
 	{
 		m_directory = std::move(namedData.m_directory);
 	}
