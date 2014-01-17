@@ -60,10 +60,6 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	virtual bool doInitialize() override;
 
-	/// Executes the wake up operation.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool doWakeUp() override;
-
 	/// Sets render target for the camera, this abstracts the textures that are being used for rendering into.
 	/// \param	target	The rendertarget structure.
 	/// \return true if the target was successfully set

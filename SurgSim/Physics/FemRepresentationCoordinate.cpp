@@ -13,21 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Physics/FemRepresentationCoordinate.h"
 
-using SurgSim::Blocks::BasicSceneElement;
-
-BasicSceneElement::BasicSceneElement(const std::string& name) :
-	SurgSim::Framework::SceneElement(name)
+namespace SurgSim
 {
+
+namespace Physics
+{
+
+FemRepresentationCoordinate::FemRepresentationCoordinate() : elementId(0)
+{
+
 }
 
-BasicSceneElement::~BasicSceneElement()
+FemRepresentationCoordinate::FemRepresentationCoordinate(unsigned int elementId,
+														 SurgSim::Math::Vector naturalCoordinate) :
+	elementId(elementId), naturalCoordinate(naturalCoordinate)
 {
+
 }
 
-bool BasicSceneElement::doInitialize()
-{
-	return true;
-}
+} // namespace Physics
 
+} // namespace SurgSim

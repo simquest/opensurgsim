@@ -43,7 +43,12 @@ set(LIBS
 )
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-surgsim_add_unit_tests(SurgSimPhysicsRenderTest)
+option(SURGSIM_TESTS_RUN_PHYSICS_RENDER
+	"Run the rendering tests as part of unit tests (Requires a running window system)" 
+	OFF)
+
+surgsim_add_unit_tests(SurgSimPhysicsRenderTest
+	RUN ${SURGSIM_TESTS_RUN_PHYSICS_RENDER})
 
 # Put SurgSimPhysicsTest into folder "Physics"
 set_target_properties(SurgSimPhysicsRenderTest PROPERTIES FOLDER "Physics")

@@ -22,7 +22,7 @@
 #include <boost/chrono.hpp>
 #include <gtest/gtest.h>
 #include "SurgSim/Devices/Phantom/PhantomDevice.h"
-//#include "SurgSim/Devices/Phantom/PhantomScaffold.h"  // only needed if calling setDefaultLogLevel()
+#include "SurgSim/Devices/Phantom/PhantomScaffold.h"  // only needed if calling setDefaultLogLevel()
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
 #include "SurgSim/Input/OutputProducerInterface.h"

@@ -88,8 +88,7 @@ TEST_F(GraphicsManagerTest, StartUpTest)
 	EXPECT_EQ(0, manager->getNumUpdates());
 	EXPECT_EQ(0.0, manager->getSumDt());
 
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
+	std::shared_ptr<Scene> scene = runtime->getScene();
 
 	/// Run the thread for a moment
 	runtime->start();

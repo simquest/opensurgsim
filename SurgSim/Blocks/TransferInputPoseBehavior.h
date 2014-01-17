@@ -40,12 +40,19 @@ class TransferInputPoseBehavior : public SurgSim::Framework::Behavior
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	/// \param	from	Representation to get the pose
-	/// \param	to		Representation to set the pose
-	/// \param	poseName Name of the pose data in the input to transfer
-	TransferInputPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from,
-							  std::shared_ptr<SurgSim::Framework::Representation> to,
-							  const std::string& poseName = "pose");
+	explicit TransferInputPoseBehavior(const std::string& name);
+
+	/// Set the InputComponent which sends the pose.
+	/// \param	sender	InputComponent which sends the pose.
+	void setPoseSender(std::shared_ptr<SurgSim::Input::InputComponent> sender);
+
+	/// Set the representation to receive the pose.
+	/// \param	receiver	Representation to receive the pose.
+	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
+
+	/// Set name of the pose.
+	/// \param	poseName	The name of the pose.
+	void setPoseName(const std::string& poseName);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.

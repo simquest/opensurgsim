@@ -18,6 +18,8 @@
 
 #include <array>
 
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/FemElement.h"
 
 namespace SurgSim
@@ -123,7 +125,20 @@ public:
 	/// \note per node as getNumDofPerNode()
 	virtual void addMatVec(const DeformableRepresentationState& state,
 		double alphaM, double alphaD, double alphaK,
-		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F);
+		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
+
+	/// Determines whether a given natural coordinate is valid
+	/// \param naturalCoordinate Coordinate to check
+	/// \return True if valid
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
+
+	/// Computes a given natural coordinate in cartesian coordinates
+	/// \param state The state at which to transform coordinates
+	/// \param naturalCoordinate The coordinates to transform
+	/// \return The resultant cartesian coordinates
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector& naturalCoordinate) const override;
 
 protected:
 	/// Computes the tetrahdron shape functions
@@ -137,7 +152,7 @@ protected:
 		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* k);
 
 	/// Computes the tetrahedron mass matrix
-	/// \param state The deformable state to compute the stiffness matrix from
+	/// \param state The deformable state to compute the mass matrix from
 	/// \param[out] m The mass matrix to store the result into
 	void computeMass(const DeformableRepresentationState& state,
 		Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);

@@ -43,12 +43,29 @@ public:
 	/// \return the RepresentationType for this representation
 	virtual RepresentationType getType() const override;
 
+	/// Update the Representation's current position and velocity using a time interval, dt, and change in velocity,
+	/// deltaVelocity.
+	///
+	/// This function typically is called in the physics pipeline (PhysicsManager::doUpdate) after solving the equations
+	/// that enforce constraints when collisions occur.  Specifically it is called in the PushResults::doUpdate step.
+	/// \param dt The time step
+	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
+	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity) override;
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
 		const SurgSim::Math::RigidTransform3d& transform) override;
+
+	/// Determine whether the associated deformable state is valid
+	/// \param state The state to check
+	/// \result True if valid
+	bool isValidState(const DeformableRepresentationState &state) const;
+
+	/// Deactivate and call resetState
+	void deactivateAndReset(void);
 };
 
 } // namespace Physics

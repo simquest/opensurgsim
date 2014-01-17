@@ -24,6 +24,7 @@ set(SURGSIM_MATH_SOURCES
 	CapsuleShape.cpp
 	CylinderShape.cpp
 	DoubleSidedPlaneShape.cpp
+	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
 	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
@@ -38,6 +39,7 @@ set(SURGSIM_MATH_HEADERS
 	CapsuleShape.h
 	CylinderShape.h
 	DoubleSidedPlaneShape.h
+	GaussLegendreQuadrature.h
 	Geometry.h
 	LinearSolveAndInverse.h
 	Matrix.h
