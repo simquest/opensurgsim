@@ -51,7 +51,7 @@ namespace DataStructures
 /// \li using the \ref DataGroupBuilder class,
 /// \li copy construction,
 /// \li assigning from a non-empty DataGroup object, or
-/// \li assigning a "valid" NamedData object (of the correct template type) to each and every of the NamedData members.
+/// \li assigning a "valid" NamedData object (of the correct template type) to each of the NamedData members.
 ///
 /// Assignment to a non-empty DataGroup object is only possible if either of the two objects in the assignment was made
 /// non-empty based on the other object (see the above list items about copy construction and assignment from a

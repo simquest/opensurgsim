@@ -346,8 +346,12 @@ TEST(DataGroupTests, Assignment)
 	EXPECT_THROW(data = data2, SurgSim::Framework::AssertionFailure); // the right-hand DataGroup is not valid
 
 	DataGroup data3 = builder.createData();
-	// The left-hand DataGroup must be either empty or copy-constructed from the right-hand DataGroup.
-	// Having the same entries is not sufficient.
+	// Having the same entries is not sufficient for DataGroup assignment.
+	// There are three situations in which assignment will not assert:
+	// 1) the DataGroup being assigned to is "empty" (i.e., was default-constructed and has not yet been assigned to or
+	// otherwise altered),
+	// 2) one of the DataGroups was default-constructed and then the other DataGroup was assigned to it, or
+	// 3) one of the DataGroups was copy-constructed from the other.
 	EXPECT_THROW(data = data3, SurgSim::Framework::AssertionFailure);
 
 	DataGroup data4(data);
