@@ -29,9 +29,9 @@ namespace Device
 
 MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
 	m_name(uniqueName),
-	m_rawDevice(new RawMultiAxisDevice(uniqueName + "_RawBase")),
-	m_filter(new PoseIntegrator(uniqueName + "_Integrator"))
+	m_rawDevice(new RawMultiAxisDevice(uniqueName + "_RawBase"))
 {
+	m_filter = std::make_shared<PoseIntegrator>(uniqueName + "_Integrator", m_rawDevice->getInitialInputData());
 	m_filter->setNameForCallback(uniqueName);  // the filter should make callbacks as the entire device
 
 	m_rawDevice->addInputConsumer(m_filter);

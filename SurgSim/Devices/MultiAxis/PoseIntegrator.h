@@ -41,7 +41,8 @@ public:
 
 	/// Constructor.
 	/// \param name	Name of this device filter.
-	explicit PoseIntegrator(const std::string& name);
+	/// \param inputData An initial value for the application's input from the device (i.e., pose).
+	PoseIntegrator(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData);
 
 	/// Integrates the pose.
 	/// \param pose	The latest differential pose.

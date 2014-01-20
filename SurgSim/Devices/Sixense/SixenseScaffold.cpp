@@ -250,7 +250,6 @@ bool SixenseScaffold::runInputFrame()
 bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 {
 	//const SurgSim::DataStructures::DataGroup& outputData = info.deviceObject->getOutputData();
-	SurgSim::DataStructures::DataGroup& inputData = info.deviceObject->getInputData();
 
 	int status = sixenseSetActiveBase(info.deviceBaseIndex);
 	if (status != SIXENSE_SUCCESS)
@@ -280,6 +279,7 @@ bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 	pose.translation() = position.cast<double>() * 0.001;  // convert from millimeters to meters!
 
 	// TODO(bert): this code should cache the access indices.
+	SurgSim::DataStructures::DataGroup& inputData = info.deviceObject->getInputData();
 	inputData.poses().set("pose", pose);
 	inputData.scalars().set("trigger", data.trigger);
 	inputData.scalars().set("joystickX", data.joystick_x);
