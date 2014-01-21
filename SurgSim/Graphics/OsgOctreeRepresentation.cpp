@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <osg/PositionAttitudeTransform>
+
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
 
 #include "SurgSim/DataStructures/OctreeNode.h"
@@ -36,6 +38,7 @@ OsgOctreeRepresentation::OsgOctreeRepresentation(const std::string& name) :
 	m_sharedUnitBox(getSharedUnitBox()),
 	m_dummy(new osg::Node())
 {
+	m_transform->addChild(new osg::PositionAttitudeTransform());
 }
 
 
@@ -47,19 +50,35 @@ OsgOctreeRepresentation::~OsgOctreeRepresentation()
 void OsgOctreeRepresentation::doUpdate(double dt)
 {
 	SURGSIM_ASSERT(m_octree) << "OsgOctreeRepresentation::doUpdate(): No Octree attached.";
-	
-	draw(m_transform, m_octree->getBoundingBox().center(), m_octree, 0, 0, 0);
+
+	// Traverse the Octree and the corresponding OSG tree.
+	// A new node will be added to the OSG tree if it is not present.
+	// Draw the OSG node if the corresponding OctreeNode is active, i.e. leaf node with data.
+	draw(m_transform->getChild(0)->asGroup(), m_octree, 0, 0, 0);
 }
 
 void OsgOctreeRepresentation::draw
-	(osg::ref_ptr<osg::Group> thisTransform, SurgSim::Math::Vector3d parentCenter, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree, unsigned level, unsigned parentIndex, unsigned index)
+	(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree,
+	 unsigned level, unsigned parentIndex, unsigned index)
 {
+	// The IDs of children in a Octree are as follows (ID 1 is not shown):
+	/*
+				     _______ 
+				   /3  /  7/|
+				  /-------/ |
+				 /2__/_6_/| |
+				|   |   | |/|
+				|___|___|/|5|
+				|   |   | |/
+				|0__|__4|/
+	*/
+	// Get ID for this OctreeNode
 	int base = 0;
-	for (int n = (int)level - 1; n >= 0; --n)
+	for (int n = static_cast<int>(level) - 1; n >= 0; --n)
 	{
-		base += (int)pow(8.0, n);
+		base += static_cast<int>(pow(8.0, n));
 	}
-	unsigned nodeID = base + 8 * (parentIndex) + index;
+	unsigned nodeID = static_cast<unsigned>(base) + 8 * (parentIndex) + index;
 
 
 	if (m_nodeAdded[nodeID])
@@ -67,12 +86,16 @@ void OsgOctreeRepresentation::draw
 		auto transformNode = thisTransform->getChild(m_nodeIndex[nodeID])->asGroup();
 		if (octree->hasChildren())
 		{
+			// Scale and position is controlled by leaf node.
+			// If a node has child, its scale and position will be set to 1 and the origin, respectively.
 			transformNode->replaceChild(m_sharedUnitBox->getNode(), m_dummy);
+			transformNode->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3d(1.0, 1.0, 1.0));
+			transformNode->asTransform()->asPositionAttitudeTransform()->setPosition(osg::Vec3d(0.0, 0.0, 0.0));
 
 			auto octreeChildren = octree->getChildren();
 			for(int i = 0; i < 8; ++i)
 			{
-				draw(transformNode, octree->getBoundingBox().center(), octreeChildren[i], level + 1, index, i);
+				draw(transformNode, octreeChildren[i], level + 1, index, i);
 			}
 		}
 		else if (octree->isActive())
@@ -82,8 +105,21 @@ void OsgOctreeRepresentation::draw
 	}
 	else
 	{
-		addNode(thisTransform, octree, nodeID, parentCenter);
-		draw(thisTransform, parentCenter, octree, level, parentIndex, index);
+		osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
+		osgTransform->addChild(m_dummy);
+
+		Vector3d distance = octree->getBoundingBox().center();
+		osgTransform->setPosition(toOsg(distance));
+		Vector3d size = octree->getBoundingBox().sizes();
+		osgTransform->setScale(toOsg(size));
+
+		thisTransform->addChild(osgTransform);
+		// Hash this OctreeNode's location in the corresponding OSG node.
+		m_nodeIndex[nodeID] = thisTransform->getNumChildren() - 1;
+		m_nodeAdded[nodeID] = true;
+
+		// After add a OSG node for this OctreeNode, need to draw this node or its descendant.
+		draw(thisTransform, octree, level, parentIndex, index);
 	}
 }
 
@@ -97,31 +133,7 @@ std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> OsgOctreeRepresentation::g
 void SurgSim::Graphics::OsgOctreeRepresentation::setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape)
 {
 	m_octree = octreeShape->getRootNode();
-	addNode(m_transform, m_octree, 0, m_octree->getBoundingBox().center());
-}
-
-void SurgSim::Graphics::OsgOctreeRepresentation::addNode(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree, unsigned nodeID, Vector3d parentCenter)
-{
-	osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
-	if (octree->isActive())
-	{
-		osgTransform->addChild(m_sharedUnitBox->getNode());
-	}
-	else
-	{
-		osgTransform->addChild(m_dummy);
-	}
-
-	
-	Vector3d distance = octree->getBoundingBox().center() - parentCenter;
-	osgTransform->setPosition(toOsg(distance));
-	Vector3d size = octree->getBoundingBox().sizes();
-	osgTransform->setScale(toOsg(size));
-
-	thisTransform->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3d(1.0, 1.0, 1.0));
-	thisTransform->addChild(osgTransform);
-	m_nodeIndex[nodeID] = thisTransform->getNumChildren() - 1;
-	m_nodeAdded[nodeID] = true;
+	doUpdate(0.0);
 }
 
 

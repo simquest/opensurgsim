@@ -21,7 +21,7 @@
 #include <unordered_map>
 
 #include <osg/ref_ptr>
-#include <osg/PositionAttitudeTransform>
+#include <osg/Group>
 
 #include "SurgSim/Graphics/OctreeRepresentation.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
@@ -55,22 +55,23 @@ public:
 	/// \param	dt	The time step
 	virtual void doUpdate(double dt) override;
 
-	/// Get the Octree of this representation
-	/// \return    The octree used by this representation.
+	/// Get the Octree contained by this representation
+	/// \return	The octree contained by this representation.
 	virtual std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> getOctree() const override;
 
-	/// Set the Octree of this representation
-	/// \param The Octree to be used in this representation.
+	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
+	/// \param octreeShape The OctreeShape from which the octree is retrieved.
 	virtual void setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape) override;
 
 private:
-	/// To draw the given Octree Node
-	/// \param octreeNode Octree node to be drawn
-	/// \return An osg::PositionAttitudeTransform containing the OSG representatoin of the Octree node
-	void draw(osg::ref_ptr<osg::Group> thisTransform, SurgSim::Math::Vector3d parentCenter, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode, unsigned level, unsigned parentIndex, unsigned index);
-
-
-	void addNode(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode, unsigned key, SurgSim::Math::Vector3d parentCenter);
+	/// Draw the Octree associated with this OSG representation.
+	/// \param thisTranform The osg::PositionAttitudeTransform.
+	/// \param octreeNode The OctreeNode to be drawn.
+	/// \param level The level at which octreeNode is.
+	/// \param parentIndex The index of octreeNodes' parent.
+	/// \param index The index of octreeNode.
+	void draw(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode,
+			  unsigned level, unsigned parentIndex, unsigned index);
 
 	/// The Octree represented by this representation
 	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> m_octree;
@@ -80,13 +81,15 @@ private:
 	/// Returns the shared unit box
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
 
+	/// Dummy osg::Node used to subsititute the shared osg box when an OctreeNode is not active.
 	osg::ref_ptr<osg::Node> m_dummy;
 
-	/// Determine if an OctreeNode with given ID has been added to the scene graph.
+	/// A hash table recording if an OctreeNode (with an ID) has been added to the scene graph tree.
 	std::unordered_map<unsigned, bool> m_nodeAdded;
-	/// Determine the relative index of an OctreeNode in its parent's children list.
-	/// E.g. The 2nd child of an OctreeNode may be added to this OctreeNode's corresponding OSG node as its 5th child.
-	/// The difference here is that we have two trees: an Octree and a corresponding OSG tree.
+
+	/// Determine the index of an OctreeNode in the corresponding scene graph tree.
+	/// At a given level, the 2nd child of an OctreeNode may be added to the corresponding scene graph tree as its 5th
+	/// child.
 	std::unordered_map<unsigned, unsigned> m_nodeIndex;
 };
 
