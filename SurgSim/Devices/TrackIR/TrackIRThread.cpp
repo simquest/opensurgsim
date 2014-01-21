@@ -13,8 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 #include "SurgSim/Devices/TrackIR/TrackIRThread.h"
+
+#include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
 namespace SurgSim
 {

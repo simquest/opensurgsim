@@ -41,20 +41,21 @@ class TrackIRDevice : public SurgSim::Input::CommonDevice
 {
 public:
 	/// Constructor.
-	///
-	/// \param uniqueName A unique name for the device that will be used by the application.
+	/// \param uniqueName A unique name for the device.
 	explicit TrackIRDevice(const std::string& uniqueName);
 
 	/// Destructor.
 	virtual ~TrackIRDevice();
 
-	///@{
-	/// Overridden from SurgSim::Input::CommonDevice
+	/// Initialize this device, register it with the scaffold. 
+	/// \return True on success; false otherwise.
 	virtual bool initialize() override;
+	/// Finalize this device, unregister this device from the scaffold.
+	/// \return True on success; false otherwise.
 	virtual bool finalize() override;
-	///@}
 
 	/// Check whether this device is initialized.
+	/// \return True if this device is initialized; false otherwise.
 	bool isInitialized() const;
 
 	/// Sets the position scale for this device.

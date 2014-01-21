@@ -16,16 +16,13 @@
 #ifndef SURGSIM_DEVICES_TRACKIR_TRACKIRTHREAD_H
 #define SURGSIM_DEVICES_TRACKIR_TRACKIRTHREAD_H
 
-#include <memory>
-
 #include "SurgSim/Framework/BasicThread.h"
-
+#include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
 namespace SurgSim
 {
 namespace Device
 {
-class TrackIRScaffold;
 
 /// A class implementing the thread context for sampling TrackIR devices.
 /// \sa SurgSim::Device::TrackIRScaffold
@@ -33,7 +30,7 @@ class TrackIRThread : public SurgSim::Framework::BasicThread
 {
 public:
 	/// Constructor
-	/// TrackIR runs at 120FPS
+	/// TrackIR sample rate: 120FPS.
 	/// Default update rate is set by BasicThraed constructor to 30Hz
 	/// \param scaffold The TrackIRScaffold updated by this thread
 	/// \param deviceData Corresponds to the TrackIRScaffold::DeviceData updated by this thread
@@ -43,12 +40,16 @@ public:
 	virtual ~TrackIRThread();
 
 protected:
-	///@{
-	/// Overridden from SurgSim::Framework::BasicThread
+	/// Initialize this thread.
+	/// \return True on success, false otherwise.
 	virtual bool doInitialize() override;
+	/// Start up this thread.
+	/// \return True on success, false otherwise.
 	virtual bool doStartUp() override;
+	/// Update work of this thread.
+	/// \param dt The time step.
+	/// \return True on success, false otherwise.
 	virtual bool doUpdate(double dt) override;
-	///@}
 
 private:
 	// Pointer to the scaffold which will be updated by this thread.
