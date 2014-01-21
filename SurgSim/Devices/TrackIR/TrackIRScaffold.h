@@ -84,8 +84,12 @@ private:
 	bool unregisterDevice(const TrackIRDevice* device);
 
 	/// Sets the position scale for the device.
+	/// \param device The device whose position scale will be set.
+	/// \param scale Scale of the position.
 	void setPositionScale(const TrackIRDevice* device, double scale);
 	/// Sets the orientation scale for the device.
+	/// \param device The device whose orientation scale will be set.
+	/// \param scale Scale of the orientation.
 	void setOrientationScale(const TrackIRDevice* device, double scale);
 
 	/// Initializes the OptiTrack SDK.
@@ -95,12 +99,6 @@ private:
 	/// \return true on success.
 	bool finalizeSdk();
 
-	/// Start the camera, it will start sending frames.
-	/// \return	true on success.
-	bool startCamera();
-	/// Stop the camera.
-	/// \return	true on success.
-	bool stopCamera();
 
 	/// Executes the operations for a single input frame for a single device.
 	/// Should only be called from the context of the input loop thread.
