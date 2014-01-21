@@ -62,7 +62,7 @@ public:
 TEST(TrackIRDeviceTest, CreateAndInitializeDevice)
 {
 	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
 
 	EXPECT_FALSE(device->isInitialized());
 	EXPECT_EQ("TrackIR", device->getName());
@@ -73,57 +73,62 @@ TEST(TrackIRDeviceTest, CreateAndInitializeDevice)
 	EXPECT_EQ("TrackIR", device->getName());
 }
 
-TEST(TrackIRDeviceTest, CreateDeviceTwice)
+TEST(TrackIRDeviceTest, FinalizeDevice)
 {
 	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
+
 	ASSERT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
-	{
-		boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(100));
-	}
+	EXPECT_TRUE(device->isInitialized());
+	EXPECT_EQ("TrackIR", device->getName());
+
+	ASSERT_TRUE(device->finalize()) << "Finalization failed.";
+	EXPECT_FALSE(device->isInitialized());
+	EXPECT_EQ("TrackIR", device->getName());
 }
 
 TEST(TrackIRDeviceTest, CreateDevicesWithSameName)
 {
 	std::shared_ptr<TrackIRDevice> device1 = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device1 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(nullptr != device1) << "Device creation failed.";
 	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
 
 	std::shared_ptr<TrackIRDevice> device2 = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device2 != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(nullptr != device2) << "Device creation failed.";
 	ASSERT_ANY_THROW(device2->initialize()) << "Initialization succeeded despite duplicate name.";
+}
+
+TEST(TrackIRDeviceTest, RegisterMoreThanOneDevice)
+{
+	std::shared_ptr<TrackIRDevice> device1 = std::make_shared<TrackIRDevice>("TrackIR");
+	ASSERT_TRUE(nullptr != device1) << "Device creation failed.";
+	ASSERT_TRUE(device1->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
+
+	std::shared_ptr<TrackIRDevice> device2 = std::make_shared<TrackIRDevice>("TrackIR2");
+	ASSERT_TRUE(nullptr != device2) << "Device creation failed.";
+	ASSERT_ANY_THROW(device2->initialize()) << "Two TrackIR cameras are registered.";
 }
 
 TEST(TrackIRDeviceTest, InputConsumer)
 {
 	std::shared_ptr<TrackIRDevice> device = std::make_shared<TrackIRDevice>("TrackIR");
-	ASSERT_TRUE(device != nullptr) << "Device creation failed.";
+	ASSERT_TRUE(nullptr != device) << "Device creation failed.";
 	EXPECT_TRUE(device->initialize()) << "Initialization failed.  Is a TrackIR device plugged in?";
 
 	std::shared_ptr<TestListener> consumer = std::make_shared<TestListener>();
 	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
-
-	EXPECT_FALSE(device->removeInputConsumer(consumer));
-	EXPECT_EQ(0, consumer->m_numTimesReceivedInput);
-
 	EXPECT_TRUE(device->addInputConsumer(consumer));
 
-	// Adding the same input consumer again should fail.
-	EXPECT_FALSE(device->addInputConsumer(consumer));
-
 	// Sleep for one second, to see how many times the consumer is invoked.
-	// (A TrackIR device is supposed to run at 120FPS.)
+	// (TrackIR device sample rate is 120FPS.)
 	// (The thread to poll data out of TrackIR is running at default 30Hz.)
 	boost::this_thread::sleep_until(boost::chrono::steady_clock::now() + boost::chrono::milliseconds(1000));
 
 	EXPECT_TRUE(device->removeInputConsumer(consumer));
 
-	// Removing the same input consumer again should fail.
-	EXPECT_FALSE(device->removeInputConsumer(consumer));
-
 	// Check the number of invocations.
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 20);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 50);
-
+	
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().isValid());
 }
