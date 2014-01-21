@@ -72,6 +72,7 @@ public:
 	inline explicit NamedData(const std::vector<std::string>& names);
 
 	/// Construct an object as a copy of the data from another object.
+	/// This is used in the NamedVariantData copy constructor.
 	/// \param namedData The object to copy from.
 	inline NamedData(const NamedData& namedData);
 
