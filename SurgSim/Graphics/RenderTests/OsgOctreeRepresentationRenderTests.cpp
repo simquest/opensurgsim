@@ -40,7 +40,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 {
 	SurgSim::Math::OctreeShape::EmptyData emptyData;
 
-	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d(0.2, 0.3, 0.4), Vector3d(1.2, 1.3, 1.4));
+	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Ones() * -1.0, Vector3d::Zero() );
 	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
 	auto octreeShape = std::make_shared<OctreeShape>();
 	octreeShape->setRootNode(octreeNode);
@@ -62,8 +62,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	octreeRepresentation->getOctree()->subdivide();
 	for (int i = 0; i < 8; ++i)
 	{
-		auto boundingBox = octreeRepresentation->getOctree()->getChild(i)->getBoundingBox();
-		Vector3d center = (boundingBox.max() + boundingBox.min()) / 2.0;
+		Vector3d center = octreeRepresentation->getOctree()->getChild(i)->getBoundingBox().center();
 		octreeRepresentation->getOctree()->addData(center, emptyData, 2);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	}
@@ -73,14 +72,13 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 		octreeRepresentation->getOctree()->getChild(i)->subdivide();
 	}
 
-	Vector3d rootOctreeCenter = (boundingBox.max() + boundingBox.min()) / 2.0;
+	Vector3d rootOctreeCenter = boundingBox.center(); 
 	for (int i = 0; i < 8; ++i)
 	{
 		auto self = octreeRepresentation->getOctree()->getChild(i);
 		for (int j = 0; j < 8; ++j)
 		{
-			auto childBox = self->getChild(j)->getBoundingBox();
-			Vector3d childCenter = (childBox.max() + childBox.min()) / 2.0;
+			Vector3d childCenter = self->getChild(j)->getBoundingBox().center();
 			auto distance = childCenter - rootOctreeCenter;
 
 			if (distance.cwiseAbs().sum() <= 0.75)

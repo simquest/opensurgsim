@@ -47,12 +47,8 @@ OsgOctreeRepresentation::~OsgOctreeRepresentation()
 void OsgOctreeRepresentation::doUpdate(double dt)
 {
 	SURGSIM_ASSERT(m_octree) << "OsgOctreeRepresentation::doUpdate(): No Octree attached.";
-	//m_transform->removeChildren(0, m_transform->getNumChildren());
-	auto rootBox = m_octree->getBoundingBox();
-	Vector3d thisOctreeCenter = (rootBox.max() + rootBox.min()) / 2.0;
-
-	//m_transform->addChild(draw(m_octree));
-	draw(m_transform, thisOctreeCenter, m_octree, 0, 0, 0);
+	
+	draw(m_transform, m_octree->getBoundingBox().center(), m_octree, 0, 0, 0);
 }
 
 void OsgOctreeRepresentation::draw
@@ -68,9 +64,6 @@ void OsgOctreeRepresentation::draw
 
 	if (m_nodeAdded[nodeID])
 	{
-		auto thisBox = octree->getBoundingBox();
-		Vector3d thisOctreeCenter = (thisBox.max() + thisBox.min()) / 2.0;
-
 		auto transformNode = thisTransform->getChild(m_nodeIndex[nodeID])->asGroup();
 		if (octree->hasChildren())
 		{
@@ -79,7 +72,7 @@ void OsgOctreeRepresentation::draw
 			auto octreeChildren = octree->getChildren();
 			for(int i = 0; i < 8; ++i)
 			{
-				draw(transformNode, thisOctreeCenter, octreeChildren[i], level + 1, index, i);
+				draw(transformNode, octree->getBoundingBox().center(), octreeChildren[i], level + 1, index, i);
 			}
 		}
 		else if (octree->isActive())
@@ -104,10 +97,7 @@ std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> OsgOctreeRepresentation::g
 void SurgSim::Graphics::OsgOctreeRepresentation::setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape)
 {
 	m_octree = octreeShape->getRootNode();
-	auto rootBox = m_octree->getBoundingBox();
-	Vector3d thisOctreeCenter = (rootBox.max() + rootBox.min()) / 2.0;
-
-	addNode(m_transform, m_octree, 0, thisOctreeCenter);
+	addNode(m_transform, m_octree, 0, m_octree->getBoundingBox().center());
 }
 
 void SurgSim::Graphics::OsgOctreeRepresentation::addNode(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree, unsigned nodeID, Vector3d parentCenter)
@@ -122,15 +112,11 @@ void SurgSim::Graphics::OsgOctreeRepresentation::addNode(osg::ref_ptr<osg::Group
 		osgTransform->addChild(m_dummy);
 	}
 
-	auto boundingBox = octree->getBoundingBox();
-	// Translate the corresponding UnitBox of Octree node to its position
-	Vector3d center = (boundingBox.max() + boundingBox.min()) / 2.0;
-	Vector3d distance = center - parentCenter;
+	
+	Vector3d distance = octree->getBoundingBox().center() - parentCenter;
 	osgTransform->setPosition(toOsg(distance));
-
-	// Scale the UnitBox based on the size of Octree node
-	Vector3d octreeSize = boundingBox.max() - boundingBox.min();
-	osgTransform->setScale(toOsg(octreeSize));
+	Vector3d size = octree->getBoundingBox().sizes();
+	osgTransform->setScale(toOsg(size));
 
 	thisTransform->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3d(1.0, 1.0, 1.0));
 	thisTransform->addChild(osgTransform);
