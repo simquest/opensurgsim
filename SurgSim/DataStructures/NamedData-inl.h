@@ -48,6 +48,15 @@ inline NamedData<T>::NamedData(const std::vector<std::string>& names) :
 }
 
 template <typename T>
+inline NamedData<T>::NamedData(const NamedData& namedData) :
+	m_directory(namedData.m_directory),
+	m_data(namedData.m_data),
+	m_isDataValid(namedData.m_isDataValid)
+{
+	SURGSIM_ASSERT(isValid());
+}
+
+template <typename T>
 inline NamedData<T>& NamedData<T>::operator=(const NamedData& namedData)
 {
 	SURGSIM_ASSERT(namedData.isValid()) <<
