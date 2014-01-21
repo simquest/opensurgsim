@@ -15,13 +15,12 @@
 
 #include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
-#include <vector>
+#include <algorithm>
 #include <list>
 #include <memory>
-#include <algorithm>
 
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>
+#include <boost/thread/mutex.hpp>
 
 #include <linuxtrack.h>
 
@@ -32,14 +31,14 @@
 #include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::DataGroupBuilder;
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -51,17 +50,17 @@ struct TrackIRScaffold::DeviceData
 	/// Constructor
 	/// \param device Device to be wrapped
 	explicit DeviceData(TrackIRDevice* device) :
-		deviceObject(device),
-		thread(),
+		m_deviceObject(device),
+		m_thread(),
 		positionScale(TrackIRDevice::defaultPositionScale()),
 		orientationScale(TrackIRDevice::defaultOrientationScale())
 	{
 	}
 
 	/// The corresponding device object.
-	TrackIRDevice* const deviceObject;
+	SurgSim::Device::TrackIRDevice* const m_deviceObject;
 	/// Processing thread.
-	std::unique_ptr<TrackIRThread> thread;
+	std::unique_ptr<SurgSim::Device::TrackIRThread> m_thread;
 
 	/// Scale factor for the position axes; stored locally before the device is initialized.
 	double positionScale;
@@ -69,7 +68,7 @@ struct TrackIRScaffold::DeviceData
 	double orientationScale;
 
 	/// The mutex that protects the externally modifiable parameters.
-	boost::mutex parametersMutex;
+	boost::mutex m_parametersMutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -102,7 +101,8 @@ private:
 
 
 TrackIRScaffold::TrackIRScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) :
-	m_logger(logger), m_state(new StateData)
+	m_logger(logger),
+	m_state(new StateData)
 {
 	if (!m_logger)
 	{
@@ -119,12 +119,12 @@ TrackIRScaffold::~TrackIRScaffold()
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
-		if (! m_state->activeDeviceList.empty())
+		if (!m_state->activeDeviceList.empty())
 		{
 			SURGSIM_LOG_SEVERE(m_logger) << "TrackIR: Destroying scaffold while devices are active!?!";
 			for (auto it = std::begin(m_state->activeDeviceList);  it != std::end(m_state->activeDeviceList);  ++it)
 			{
-				if ((*it)->thread)
+				if ((*it)->m_thread)
 				{
 					destroyPerDeviceThread(it->get());
 				}
@@ -151,15 +151,14 @@ std::shared_ptr<SurgSim::Framework::Logger> TrackIRScaffold::getLogger() const
 
 bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 {
-	bool result = true;
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 
 	if (!m_state->isApiInitialized)
 	{
 		if (!initializeSdk())
 		{
-			SURGSIM_LOG_SEVERE(m_logger) << "Failed in TrackIRScaffold::registerDevice()";
-			result = false;
+			SURGSIM_LOG_SEVERE(m_logger) << "Failed to initialize TrackIR SDK in TrackIRScaffold::registerDevice(). "
+										 << "Continuing without the TrackIR device.";
 		}
 	}
 
@@ -168,39 +167,30 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 	{
 		// Make sure the object is unique.
 		auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
 		SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" which is already registered!";
 
 		// Make sure the name is unique.
 		const std::string name = device->getName();
 		auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-			[&name](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == name; });
-		if (sameName != m_state->activeDeviceList.end())
-		{
-			SURGSIM_LOG_CRITICAL(m_logger) << "TrackIR: Tried to register a device when the same name is" <<
-				" already present!";
-			result = false;
-		}
-	}
+			[&name](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject->getName() == name; });
+		SURGSIM_ASSERT(sameName == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
+			" when the same name is already present!";
 
-	// Only proceed when no duplicate device or device name is found.
-	if (result)
-	{
+		// This assertion overlaps with above two assertions somehow.
+		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already a TrackIR camera exists."
+			<< " TrackIRScaffold only supports one TrackIR camera right now."
+            << " Behaviors of multiple cameras are undefined.\n";
 		std::unique_ptr<DeviceData> info(new DeviceData(device));
 		createPerDeviceThread(info.get());
-		SURGSIM_ASSERT(info->thread);
+		SURGSIM_ASSERT(info->m_thread) << "Failed to create a per-device thread for TrackIR device: " <<
+				info->m_deviceObject->getName() << ", with ID number " << cameraID << ".";
 
 		m_state->activeDeviceList.emplace_back(std::move(info));
-
-		if (m_state->activeDeviceList.size() == 1)
-		{
-			startCamera();
-		}
-
 	}
 
-	return result;
+	return m_state->isApiInitialized;
 }
 
 
@@ -210,10 +200,11 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+
 		if (matching != m_state->activeDeviceList.end())
 		{
-			if ((*matching)->thread)
+			if ((*matching)->m_thread)
 			{
 				destroyPerDeviceThread(matching->get());
 			}
@@ -234,11 +225,11 @@ void TrackIRScaffold::setPositionScale(const TrackIRDevice* device, double scale
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
 
 	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
 		(*matching)->positionScale = scale;
 	}
 }
@@ -247,11 +238,11 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
 
 	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
 		(*matching)->orientationScale = scale;
 	}
 }
@@ -262,15 +253,15 @@ bool TrackIRScaffold::runInputFrame(TrackIRScaffold::DeviceData* info)
 	{
 		return false;
 	}
-	info->deviceObject->pushInput();
+	info->m_deviceObject->pushInput();
 	return true;
 }
 
 bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 {
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = info->m_deviceObject->getInputData();
 
-	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
+	boost::lock_guard<boost::mutex> lock(info->m_parametersMutex);
 
 	float x = 0.0, y = 0.0, z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
 	unsigned counter = 0; // Current camera frame number
@@ -317,7 +308,6 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 bool TrackIRScaffold::initializeSdk()
 {
 	SURGSIM_ASSERT(!m_state->isApiInitialized) << "TrackIR API already initialized.";
-	bool result = false;
 
 	//Initialize the tracking using Default profile
 	ltr_init(NULL);
@@ -334,64 +324,52 @@ bool TrackIRScaffold::initializeSdk()
 		}
 		else
 		{
-			result = true;
 			m_state->isApiInitialized = true;
 			break;
 		}
 		--timeout;
 	};
 
-	return result;
+	return m_state->isApiInitialized;
 }
 
 bool TrackIRScaffold::finalizeSdk()
 {
 	SURGSIM_ASSERT(m_state->isApiInitialized) << "TrackIR API already finalized.";
-	bool result = false;
 
 	ltr_shutdown();
-
 	ltr_state_type state;
 	state = ltr_get_tracking_state();
 	if (state == STOPPED)
 	{
 		m_state->isApiInitialized = false;
-		result = true;
 	}
-	return result;
+	return !m_state->isApiInitialized;
 }
 
 bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(!deviceData->thread) << "Device " << deviceData->deviceObject->getName() << " already has a thread.";
+	SURGSIM_ASSERT(!deviceData->m_thread) << "Device " << deviceData->m_deviceObject->getName()
+										  << " already has a thread.";
 
 	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, deviceData));
 	thread->start();
-	deviceData->thread = std::move(thread);
+	deviceData->m_thread = std::move(thread);
 
 	return true;
 }
 
 bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(deviceData->thread)  << "No thread attached to device " << deviceData->deviceObject->getName();
+	SURGSIM_ASSERT(deviceData->m_thread) << "No thread attached to device " << deviceData->m_deviceObject->getName();
 
-	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->thread);
+	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->m_thread);
 	thread->stop();
 	thread.reset();
 
 	return true;
 }
 
-bool TrackIRScaffold::startCamera()
-{
-	return true;
-}
-
-bool TrackIRScaffold::stopCamera()
-{
-	return true;
-}
 
 SurgSim::DataStructures::DataGroup TrackIRScaffold::buildDeviceInputData()
 {
