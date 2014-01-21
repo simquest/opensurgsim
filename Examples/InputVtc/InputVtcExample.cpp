@@ -190,6 +190,10 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	boxElement->addComponent(transferPose);
+	auto transferInputPose = std::make_shared<TransferInputPoseBehavior>("Input to RawGraphics");
+	transferInputPose->setPoseSender(inputComponent);
+	transferInputPose->setPoseReceiver(rawInputGraphicsRepresentation);
+	boxElement->addComponent(transferInputPose);
 	auto collisionRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		("Box Collision Representation");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
