@@ -83,9 +83,9 @@ static Vector3d calculateTriangleMeshVertex(const int i,
 		   trans;
 }
 
-void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape<void, void, void>> meshA,
+void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 									const RigidTransform3d& meshATransform,
-									std::shared_ptr<MeshShape<void, void, void>> meshB,
+									std::shared_ptr<MeshShape> meshB,
 									const RigidTransform3d& meshBTransform,
 									std::list<std::shared_ptr<Contact>> expectedContacts)
 {
@@ -158,10 +158,10 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape<void, void, void>> cubeMeshA =
-			std::make_shared<SurgSim::Math::MeshShape<void, void, void>>(mesh);
-	std::shared_ptr<SurgSim::Math::MeshShape<void, void, void>> cubeMeshB =
-			std::make_shared<SurgSim::Math::MeshShape<void, void, void>>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA =
+			std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB =
+			std::make_shared<SurgSim::Math::MeshShape>(mesh);
 
 	SurgSim::Math::RigidTransform3d cubeMeshATransform;
 	SurgSim::Math::RigidTransform3d cubeMeshBTransform;

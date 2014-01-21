@@ -64,6 +64,10 @@ public:
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
 	TriangleMesh();
 
+	// Copy constructor.
+	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
+	TriangleMesh(TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource> &mesh);
+
 	/// Destructor
 	virtual ~TriangleMesh();
 

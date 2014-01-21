@@ -34,6 +34,7 @@ set(SURGSIM_COLLISION_SOURCES
 	SphereDoubleSidedPlaneDcdContact.cpp
 	SpherePlaneDcdContact.cpp
 	SphereSphereDcdContact.cpp
+	TriangleMeshPlaneDcdContact.cpp
 	TriangleMeshTriangleMeshDcdContact.cpp
 )
 
@@ -56,7 +57,6 @@ set(SURGSIM_COLLISION_HEADERS
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h
 	TriangleMeshPlaneDcdContact.h
-	TriangleMeshPlaneDcdContact-inl.h
 	TriangleMeshTriangleMeshDcdContact.h
 )
 

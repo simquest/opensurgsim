@@ -45,22 +45,22 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 {
 	using SurgSim::Math::Geometry::DistanceEpsilon;
 	using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
-
+	
 	std::shared_ptr<Representation> representationMeshA;
 	std::shared_ptr<Representation> representationMeshB;
 
 	representationMeshA = pair->getFirst();
 	representationMeshB = pair->getSecond();
 
-	std::shared_ptr<MeshShape<void, void, void>> meshShapeA =
-		std::dynamic_pointer_cast<MeshShape<void, void, void>>(representationMeshA->getShape());
-	std::shared_ptr<MeshShape<void, void, void>> meshShapeB =
-		std::dynamic_pointer_cast<MeshShape<void, void, void>>(representationMeshB->getShape());
+	std::shared_ptr<MeshShape> meshShapeA =
+		std::static_pointer_cast<MeshShape>(representationMeshA->getShape());
+	std::shared_ptr<MeshShape> meshShapeB =
+		std::static_pointer_cast<MeshShape>(representationMeshB->getShape());
 
-	std::shared_ptr<TriangleMesh<void, void, void>> meshA =
-		std::dynamic_pointer_cast<TriangleMesh<void, void, void>>(meshShapeA->getMesh());
-	std::shared_ptr<TriangleMesh<void, void, void>> meshB =
-		std::dynamic_pointer_cast<TriangleMesh<void, void, void>>(meshShapeB->getMesh());
+	std::shared_ptr<MeshShape::TriMesh> meshA =
+		std::dynamic_pointer_cast<MeshShape::TriMesh>(meshShapeA->getMesh());
+	std::shared_ptr<MeshShape::TriMesh> meshB =
+		std::dynamic_pointer_cast<MeshShape::TriMesh>(meshShapeB->getMesh());
 
 	RigidTransform3d meshATransform = representationMeshA->getPose();
 	RigidTransform3d meshBTransform = representationMeshB->getPose();

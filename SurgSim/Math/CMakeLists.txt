@@ -26,6 +26,7 @@ set(SURGSIM_MATH_SOURCES
 	DoubleSidedPlaneShape.cpp
 	LinearSolveAndInverse.cpp
 	Matrix.cpp
+	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
 	OctreeShape.cpp
 	PlaneShape.cpp
@@ -42,7 +43,6 @@ set(SURGSIM_MATH_HEADERS
 	LinearSolveAndInverse.h
 	Matrix.h
 	MeshShape.h
-	MeshShape-inl.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
