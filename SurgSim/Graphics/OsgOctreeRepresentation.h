@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 
 #include <osg/ref_ptr>
 #include <osg/PositionAttitudeTransform>
@@ -66,7 +67,10 @@ private:
 	/// To draw the given Octree Node
 	/// \param octreeNode Octree node to be drawn
 	/// \return An osg::PositionAttitudeTransform containing the OSG representatoin of the Octree node
-	osg::ref_ptr<osg::PositionAttitudeTransform> draw(std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode);
+	void draw(osg::ref_ptr<osg::Group> thisTransform, SurgSim::Math::Vector3d parentCenter, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode, unsigned level, unsigned parentIndex, unsigned index);
+
+
+	void addNode(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode, unsigned key, SurgSim::Math::Vector3d parentCenter);
 
 	/// The Octree represented by this representation
 	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> m_octree;
@@ -75,6 +79,15 @@ private:
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;
 	/// Returns the shared unit box
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
+
+	osg::ref_ptr<osg::Node> m_dummy;
+
+	/// Determine if an OctreeNode with given ID has been added to the scene graph.
+	std::unordered_map<unsigned, bool> m_nodeAdded;
+	/// Determine the relative index of an OctreeNode in its parent's children list.
+	/// E.g. The 2nd child of an OctreeNode may be added to this OctreeNode's corresponding OSG node as its 5th child.
+	/// The difference here is that we have two trees: an Octree and a corresponding OSG tree.
+	std::unordered_map<unsigned, unsigned> m_nodeIndex;
 };
 
 }; // Graphics
