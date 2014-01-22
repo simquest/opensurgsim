@@ -449,17 +449,38 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 
 bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
-	SURGSIM_FAILURE() << "FemElement3DCube::isValidCoordinate is not implemented.";
-	return false;
+	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
+		&& (naturalCoordinate.size() == 8);
 }
 
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
-	SURGSIM_FAILURE() << "FemElement3DCube::computeCartesianCoordinate is not implemented.";
-	return Vector3d(0.0, 0.0, 0.0);
+	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
+		<< "naturalCoordinate must be normalized and length 8.";
+
+	const Vector& x = state.getPositions();
+	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
+	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
+	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
+	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
+	Vector3d p4 = getSubVector(x, m_nodeIds[4], 3);
+	Vector3d p5 = getSubVector(x, m_nodeIds[5], 3);
+	Vector3d p6 = getSubVector(x, m_nodeIds[6], 3);
+	Vector3d p7 = getSubVector(x, m_nodeIds[7], 3);
+
+
+	return naturalCoordinate(0) * p0
+		+ naturalCoordinate(1) * p1
+		+ naturalCoordinate(2) * p2
+		+ naturalCoordinate(3) * p3
+		+ naturalCoordinate(4) * p4
+		+ naturalCoordinate(5) * p5
+		+ naturalCoordinate(6) * p6
+		+ naturalCoordinate(7) * p7;
 }
+
 
 } // namespace Physics
 
