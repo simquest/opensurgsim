@@ -17,6 +17,7 @@
 #define SURGSIM_GRAPHICS_UNITTESTS_MOCKOSGOBJECTS_H
 
 #include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Framework/Runtime.h"
 
 #include <osg/Group>
 #include <osg/Notify>

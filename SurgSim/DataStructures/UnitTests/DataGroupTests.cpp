@@ -18,6 +18,8 @@
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/DataStructures/NamedData.h"
+#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -42,12 +44,22 @@ TEST(DataGroupTests, CanConstruct)
 	builder.addString("test");
 	builder.addCustom("test");
 	DataGroup data = builder.createData();
-
-	EXPECT_TRUE(data.isValid());
 	EXPECT_TRUE(data.poses().hasEntry("test"));
 	EXPECT_FALSE(data.poses().hasData("test"));
 	EXPECT_FALSE(data.strings().hasEntry("missing"));
 	EXPECT_FALSE(data.strings().hasData("missing"));
+
+	DataGroupBuilder builder2;
+	builder2.addInteger("test");
+	DataGroup data2 = builder2.createData();
+	EXPECT_TRUE(data2.integers().hasEntry("test"));
+	EXPECT_FALSE(data2.integers().hasData("test"));
+	EXPECT_FALSE(data2.strings().hasEntry("missing"));
+	EXPECT_FALSE(data2.strings().hasData("missing"));
+
+	DataGroupBuilder builder3;
+	DataGroup data3, data4 = builder3.createData();
+	EXPECT_NO_THROW(data3 = data4);  // A DataGroup created by an empty DataGroupBuilder is valid (aka non-empty).
 }
 
 /// Creating a shared_ref to a named data object.
@@ -64,18 +76,17 @@ TEST(DataGroupTests, CanCreateShared)
 	builder.addCustom("test");
 	std::shared_ptr<DataGroup> data = builder.createSharedData();
 
-	EXPECT_TRUE(data->isValid());
 	EXPECT_TRUE(data->poses().hasEntry("test"));
 	EXPECT_FALSE(data->poses().hasData("test"));
 	EXPECT_FALSE(data->strings().hasEntry("missing"));
 	EXPECT_FALSE(data->strings().hasData("missing"));
 }
 
-/// Creating an unitialized data object.
+/// Creating an invalid (aka empty) data object.
 TEST(DataGroupTests, Uninitialized)
 {
-	DataGroup data;
-	EXPECT_FALSE(data.isValid());
+	DataGroup data, data2;
+	EXPECT_THROW(data = data2, SurgSim::Framework::AssertionFailure);
 }
 
 /// Putting data into the container.
@@ -277,4 +288,98 @@ TEST(DataGroupTests, ResetOne)
 
 	EXPECT_TRUE(data.scalars().hasEntry("second"));
 	EXPECT_FALSE(data.scalars().hasData("second"));
+}
+
+/// Copy Constructing DataGroups
+TEST(DataGroupTests, CopyConstruction)
+{
+	DataGroupBuilder builder;
+	builder.addPose("test");
+	builder.addBoolean("test");
+	builder.addBoolean("test2");
+	DataGroup data = builder.createData();
+	const bool trueBool = true;
+	data.booleans().set("test2", trueBool);
+	DataGroup copied_data = data;
+	EXPECT_TRUE(copied_data.poses().hasEntry("test"));
+	EXPECT_FALSE(copied_data.poses().hasData("test"));
+	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
+	EXPECT_FALSE(copied_data.booleans().hasData("test"));
+	EXPECT_TRUE(copied_data.booleans().hasEntry("test2"));
+	EXPECT_TRUE(copied_data.booleans().hasData("test2"));
+	bool outBool, outCopiedBool;
+	data.booleans().get("test2", &outBool);
+	copied_data.booleans().get("test2", &outCopiedBool);
+	EXPECT_EQ(outBool, outCopiedBool);
+	EXPECT_EQ(trueBool, outCopiedBool);
+	EXPECT_FALSE(copied_data.strings().hasEntry("missing"));
+	EXPECT_FALSE(copied_data.strings().hasData("missing"));
+}
+
+/// Assigning DataGroups, testing DataGroup::operator=
+TEST(DataGroupTests, Assignment)
+{
+	DataGroupBuilder builder;
+	builder.addPose("test");
+	builder.addBoolean("test");
+	builder.addBoolean("test2");
+	DataGroup data = builder.createData();
+	const bool trueBool = true;
+	data.booleans().set("test2", trueBool);
+	DataGroup copied_data;
+	copied_data = data;
+	EXPECT_TRUE(copied_data.poses().hasEntry("test"));
+	EXPECT_FALSE(copied_data.poses().hasData("test"));
+	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
+	EXPECT_FALSE(copied_data.booleans().hasData("test"));
+	EXPECT_TRUE(copied_data.booleans().hasEntry("test2"));
+	EXPECT_TRUE(copied_data.booleans().hasData("test2"));
+	bool outBool, outCopiedBool;
+	data.booleans().get("test2", &outBool);
+	copied_data.booleans().get("test2", &outCopiedBool);
+	EXPECT_EQ(outBool, outCopiedBool);
+	EXPECT_EQ(trueBool, outCopiedBool);
+	EXPECT_FALSE(copied_data.strings().hasEntry("missing"));
+	EXPECT_FALSE(copied_data.strings().hasData("missing"));
+
+	DataGroup data2;
+	EXPECT_THROW(data = data2, SurgSim::Framework::AssertionFailure); // the right-hand DataGroup is not valid
+
+	DataGroup data3 = builder.createData();
+	// Having the same entries is not sufficient for DataGroup assignment.
+	// There are three situations in which assignment will not assert:
+	// 1) the DataGroup being assigned to is "empty" (i.e., was default-constructed and has not yet been assigned to or
+	// otherwise altered),
+	// 2) one of the DataGroups was default-constructed and then the other DataGroup was assigned to it, or
+	// 3) one of the DataGroups was copy-constructed from the other.
+	EXPECT_THROW(data = data3, SurgSim::Framework::AssertionFailure);
+
+	DataGroup data4(data);
+	data4.booleans().set("test2", !trueBool);
+	EXPECT_NO_THROW(data = data4); // data4 can assign to data because data4 was copy-constructed from data
+	EXPECT_NO_THROW(data4 = data);
+}
+
+TEST(DataGroupTests, DataGroupInLockedContainer)
+{
+	DataGroupBuilder builder;
+	builder.addBoolean("test");
+	DataGroup data = builder.createData();
+	const bool trueBool = true;
+	data.booleans().set("test", trueBool);
+	SurgSim::Framework::LockedContainer<SurgSim::DataStructures::DataGroup> lockedDataGroup;
+	DataGroup copied_data;
+	// the DataGroup in the LockedContainer was default-constructed and so is invalid (aka empty)
+	// you cannot "get" an invalid DataGroup out of the LockedContainer.  "set" must be called before "get".
+	EXPECT_THROW(lockedDataGroup.get(&copied_data), SurgSim::Framework::AssertionFailure);
+
+	lockedDataGroup.set(data);
+	lockedDataGroup.get(&copied_data);
+	EXPECT_TRUE(copied_data.booleans().hasEntry("test"));
+	EXPECT_TRUE(copied_data.booleans().hasData("test"));
+	bool outBool, outCopiedBool;
+	data.booleans().get("test", &outBool);
+	copied_data.booleans().get("test", &outCopiedBool);
+	EXPECT_EQ(outBool, outCopiedBool);
+	EXPECT_EQ(trueBool, outCopiedBool);
 }

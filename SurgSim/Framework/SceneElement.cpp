@@ -23,12 +23,14 @@ namespace SurgSim
 namespace Framework
 {
 
-SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false), m_isAwake(false)
+SceneElement::SceneElement(const std::string& name) : m_name(name), m_isInitialized(false)
 {
+
 }
 
 SceneElement::~SceneElement()
 {
+
 }
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
@@ -41,9 +43,13 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 	{
 		component->setSceneElement(getSharedPtr());
 		component->setScene(m_scene);
-
-		m_components[component->getName()] = component;
 		result = true;
+		if (isInitialized())
+		{
+			auto runtime = getRuntime();
+			result = component->initialize(runtime);
+			runtime->addComponent(component);
+		}
 	}
 	else
 	{
@@ -52,6 +58,12 @@ bool SceneElement::addComponent(std::shared_ptr<Component> component)
 				" already exists on SceneElement " << getName() <<
 				", did not add component";
 	}
+
+	if (result)
+	{
+		m_components[component->getName()] = component;
+	}
+
 	return result;
 }
 
@@ -85,16 +97,22 @@ std::shared_ptr<Component> SceneElement::getComponent(const std::string& name) c
 
 bool SceneElement::initialize()
 {
-	SURGSIM_ASSERT(! m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
+	SURGSIM_ASSERT(!m_isInitialized) << "Double initialization calls on SceneElement " << m_name;
 	m_isInitialized = doInitialize();
-	return m_isInitialized;
-}
 
-bool SceneElement::wakeUp()
-{
-	SURGSIM_ASSERT(! m_isAwake) << "Double wake up calls on SceneElement " << m_name;
-	m_isAwake = doWakeUp();
-	return m_isAwake;
+	if (m_isInitialized)
+	{
+		// initialize all components
+		std::shared_ptr<Runtime> runtime = getRuntime();
+		auto component = std::begin(m_components);
+		while (m_isInitialized && component != std::end(m_components))
+		{
+			m_isInitialized = component->second->initialize(runtime);
+			++component;
+		}
+	}
+
+	return m_isInitialized;
 }
 
 std::string SceneElement::getName() const
@@ -132,7 +150,7 @@ std::shared_ptr<Scene> SceneElement::getScene()
 	return m_scene.lock();
 }
 
-void SceneElement::setRuntime(std::shared_ptr<Runtime> runtime)
+void SceneElement::setRuntime(std::weak_ptr<Runtime> runtime)
 {
 	m_runtime = runtime;
 }
@@ -147,11 +165,6 @@ bool SceneElement::isInitialized() const
 	return m_isInitialized;
 }
 
-bool SceneElement::isAwake() const
-{
-	return m_isAwake;
-}
-
 std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
 {
 	std::shared_ptr<SceneElement> result;
@@ -161,7 +174,7 @@ std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
 	}
 	catch (const std::exception&)
 	{
-		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr";
+		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr.";
 	}
 	return result;
 }

@@ -19,6 +19,7 @@
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/OctreeDcdContact.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Shape.h"
@@ -26,12 +27,13 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::OctreeNode;
+using SurgSim::DataStructures::OctreePath;
+using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::Math::CapsuleShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 using SurgSim::Math::OctreeShape;
-using SurgSim::Math::OctreePath;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Shape;
@@ -68,7 +70,7 @@ std::list<std::shared_ptr<Contact>> doCollision(std::shared_ptr<Shape> octree,
 }
 
 bool nodeInContacts(const std::string& name, const std::list<std::shared_ptr<Contact>>& contacts,
-		std::shared_ptr<OctreeShape<OctreeData>> octree)
+		std::shared_ptr<OctreeNode<OctreeData>> octree)
 {
 	for(auto contact = contacts.cbegin(); contact != contacts.cend(); ++contact)
 	{
@@ -82,7 +84,7 @@ bool nodeInContacts(const std::string& name, const std::list<std::shared_ptr<Con
 	return false;
 }
 
-std::shared_ptr<OctreeShape<OctreeData>> buildTestOctree()
+std::shared_ptr<OctreeNode<OctreeData>> buildTestOctree()
 {
 	// To keep things simple, create an 4 level octree with leaf nodes of size 1x1x1.
 	// As a result, the root bounding box is 2^4 x 2^4 x 2^4, or 16x16x16
@@ -120,23 +122,24 @@ std::shared_ptr<OctreeShape<OctreeData>> buildTestOctree()
 	data.name = "corner7";
 	rootNode->addData(Vector3d(15.5, 15.5, 15.5), data, numLevels);
 
-	return std::make_shared<OctreeShape<OctreeData>>(rootNode);
+	return rootNode;
 }
 
 TEST(OctreeContactCalculationTests, Capsule)
 {
-	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
-	std::shared_ptr<Shape> capsule = std::make_shared<CapsuleShape>(16.0, 1.0);
-	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxCapsuleDcdContact>());
+	std::shared_ptr<OctreeNode<OctreeData>> octree = buildTestOctree();
+	std::shared_ptr<OctreeShape> octreeShape = std::make_shared<OctreeShape>(*octree);
+	std::shared_ptr<Shape> capsuleShape = std::make_shared<CapsuleShape>(16.0, 1.0);
+	OctreeDcdContact calculator(std::make_shared<BoxCapsuleDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
 		SCOPED_TRACE("No intersection, capsule outside octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(5.0, 0.0, 0.0),
-				capsule,
+				capsuleShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
@@ -146,10 +149,10 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("No intersection, capsule inside octree, but not contacting active nodes");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				capsule,
+				capsuleShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(5.0, 3.0, 0.0),
 				calculator);
@@ -159,10 +162,10 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("Intersection, capsule is in the center of the octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				capsule,
+				capsuleShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 8.0),
 				calculator);
@@ -172,10 +175,10 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("Intersection, capsule intersection 2 nodes");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				capsule,
+				capsuleShape,
 				makeRotationQuaternion(M_PI_2, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 0.0, 0.0),
 				calculator);
@@ -186,10 +189,10 @@ TEST(OctreeContactCalculationTests, Capsule)
 	{
 		SCOPED_TRACE("Intersection, octree rotated");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				capsule,
+				capsuleShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 12.0, 0.0),
 				calculator);
@@ -199,18 +202,19 @@ TEST(OctreeContactCalculationTests, Capsule)
 
 TEST(OctreeContactCalculationTests, Plane)
 {
-	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
-	std::shared_ptr<Shape> plane = std::make_shared<PlaneShape>();
-	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxPlaneDcdContact>());
+	std::shared_ptr<OctreeNode<OctreeData>> octree = buildTestOctree();
+	std::shared_ptr<OctreeShape> octreeShape = std::make_shared<OctreeShape>(*octree);
+	std::shared_ptr<Shape> planeShape = std::make_shared<PlaneShape>();
+	OctreeDcdContact calculator(std::make_shared<BoxPlaneDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
 		SCOPED_TRACE("No intersection, plane outside octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 5.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
@@ -220,10 +224,10 @@ TEST(OctreeContactCalculationTests, Plane)
 	{
 		SCOPED_TRACE("Intersection, plane inside octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 2.0, 0.0),
 				calculator);
@@ -236,10 +240,10 @@ TEST(OctreeContactCalculationTests, Plane)
 	{
 		SCOPED_TRACE("Intersection, rotated octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 2.0, 0.0),
 				calculator);
@@ -250,10 +254,10 @@ TEST(OctreeContactCalculationTests, Plane)
 	{
 		SCOPED_TRACE("Intersection, rotated plane");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 8.0, 0.0),
 				calculator);
@@ -267,18 +271,19 @@ TEST(OctreeContactCalculationTests, Plane)
 
 TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 {
-	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
-	std::shared_ptr<Shape> plane = std::make_shared<DoubleSidedPlaneShape>();
-	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxDoubleSidedPlaneDcdContact>());
+	std::shared_ptr<OctreeNode<OctreeData>> octree = buildTestOctree();
+	std::shared_ptr<OctreeShape> octreeShape = std::make_shared<OctreeShape>(*octree);
+	std::shared_ptr<Shape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
+	OctreeDcdContact calculator(std::make_shared<BoxDoubleSidedPlaneDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
 		SCOPED_TRACE("No intersection, plane outside octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 5.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
@@ -288,10 +293,10 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 	{
 		SCOPED_TRACE("Intersection, plane along bottom face");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
@@ -304,10 +309,10 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 	{
 		SCOPED_TRACE("Intersection, plane along diagnol");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				plane,
+				planeShape,
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
@@ -321,18 +326,19 @@ TEST(OctreeContactCalculationTests, DoubleSidedPlane)
 
 TEST(OctreeContactCalculationTests, Sphere)
 {
-	std::shared_ptr<OctreeShape<OctreeData>> octree = buildTestOctree();
-	std::shared_ptr<Shape> sphere = std::make_shared<SphereShape>(9);
-	OctreeDcdContact<OctreeData> calculator(std::make_shared<BoxSphereDcdContact>());
+	std::shared_ptr<OctreeNode<OctreeData>> octree = buildTestOctree();
+	std::shared_ptr<OctreeShape> octreeShape = std::make_shared<OctreeShape>(*octree);
+	std::shared_ptr<Shape> sphereShape = std::make_shared<SphereShape>(9);
+	OctreeDcdContact calculator(std::make_shared<BoxSphereDcdContact>());
 
 	std::list<std::shared_ptr<Contact>> contacts;
 	{
 		SCOPED_TRACE("No intersection, sphere outside octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 10.0, 0.0),
-				sphere,
+				sphereShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
 				calculator);
@@ -342,10 +348,10 @@ TEST(OctreeContactCalculationTests, Sphere)
 	{
 		SCOPED_TRACE("Intersection, sphere at center of octree");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				sphere,
+				sphereShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 8.0),
 				calculator);
@@ -355,10 +361,10 @@ TEST(OctreeContactCalculationTests, Sphere)
 	{
 		SCOPED_TRACE("Intersection, sphere center on box face");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 0.0),
-				sphere,
+				sphereShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 0.0),
 				calculator);
@@ -372,10 +378,10 @@ TEST(OctreeContactCalculationTests, Sphere)
 	{
 		SCOPED_TRACE("No intersection, sphere inside octree, but not contacting active nodes");
 		contacts = doCollision(
-				octree,
+				octreeShape,
 				makeRotationQuaternion(0.0, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(0.0, 0.0, 4.0),
-				sphere,
+				sphereShape,
 				makeRotationQuaternion(M_PI_4, Vector3d(0.0, 0.0, 1.0)),
 				Vector3d(8.0, 8.0, 0.0),
 				calculator);

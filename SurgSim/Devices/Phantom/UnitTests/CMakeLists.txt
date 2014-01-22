@@ -27,7 +27,7 @@ set(UNIT_TEST_SOURCES
 set(UNIT_TEST_HEADERS
 )
 
-set(LIBS PhantomDevice SurgSimInput SurgSimFramework SurgSimDataStructures
+set(LIBS PhantomDevice SurgSimFramework SurgSimInput SurgSimDataStructures
 	gmock gtest ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
 
 # The unit tests will be built whenever the library is built, but

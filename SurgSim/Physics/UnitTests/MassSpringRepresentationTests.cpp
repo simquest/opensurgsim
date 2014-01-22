@@ -483,7 +483,7 @@ TEST_F(MassSpringRepresentationTests, EnergyTest)
 	}
 }
 
-TEST_F(MassSpringRepresentationTests, ApplyDofCorrection)
+TEST_F(MassSpringRepresentationTests, ApplyCorrectionTest)
 {
 	MockMassSpring m("MassSpring", m_poseIdentity, m_numNodes, m_boundaryConditions, m_totalMass,
 		m_rayleighDampingMass, m_rayleighDampingStiffness, m_springStiffness, m_springDamping,
@@ -499,7 +499,7 @@ TEST_F(MassSpringRepresentationTests, ApplyDofCorrection)
 	Eigen::VectorXd previousX = m.getCurrentState()->getPositions();
 	Eigen::VectorXd previousV = m.getCurrentState()->getVelocities();
 
-	m.applyDofCorrection(m_dt, dv.segment(0, m.getNumDof()));
+	m.applyCorrection(m_dt, dv.segment(0, m.getNumDof()));
 	Eigen::VectorXd nextX = m.getCurrentState()->getPositions();
 	Eigen::VectorXd nextV = m.getCurrentState()->getVelocities();
 
@@ -508,6 +508,6 @@ TEST_F(MassSpringRepresentationTests, ApplyDofCorrection)
 
 	dv(0) = std::numeric_limits<double>::infinity();
 	EXPECT_TRUE(m.isActive());
-	m.applyDofCorrection(m_dt, dv.segment(0, m.getNumDof()));
+	m.applyCorrection(m_dt, dv.segment(0, m.getNumDof()));
 	EXPECT_FALSE(m.isActive());
 }

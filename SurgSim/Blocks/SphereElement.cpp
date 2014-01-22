@@ -16,24 +16,25 @@
 #include <string>
 
 #include "SurgSim/Blocks/SphereElement.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Physics/RigidRepresentation.h"
+#include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 
 using SurgSim::Blocks::SphereElement;
 using SurgSim::Blocks::TransferPoseBehavior;
-using SurgSim::Physics::RigidRepresentation;
-using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Collision::RigidCollisionRepresentation;
-using SurgSim::Math::SphereShape;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
+using SurgSim::Math::SphereShape;
+using SurgSim::Physics::RigidRepresentation;
+using SurgSim::Physics::RigidRepresentationParameters;
 
 SphereElement::SphereElement(const std::string& name, const SurgSim::Math::RigidTransform3d& pose):
 	SurgSim::Framework::SceneElement(name), m_name(name), m_pose(pose)
@@ -87,10 +88,15 @@ bool SphereElement::doInitialize()
 
 	addComponent(physicsRepresentation);
 	addComponent(graphicsRepresentation);
-	addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Sphere Collision Representation", physicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	addComponent(transferPose);
+
+	auto rigidCollision = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Sphere Collision Representation");
+	rigidCollision->setRigidRepresentation(physicsRepresentation);
+	addComponent(rigidCollision);
 
 	return true;
 }
