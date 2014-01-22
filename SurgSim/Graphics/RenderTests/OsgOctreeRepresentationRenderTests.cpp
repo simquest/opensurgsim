@@ -82,6 +82,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 			Vector3d childCenter = self->getChild(j)->getBoundingBox().center();
 			auto distance = childCenter - boundingBox.center();
 
+			// 0.75 here is somehow magic number, calculated based on the fact that the size of root OctreeNode is 1.0.
 			if (distance.cwiseAbs().sum() <= 0.75)
 			{
 				octreeRepresentation->getOctree()->addData(childCenter, emptyData, 3);
