@@ -238,7 +238,9 @@ struct NovintScaffold::DeviceData
 		torqueScale(Vector3d::Constant(1.0)),
 		positionValue(positionBuffer),
 		transformValue(transformBuffer),
-		forceValue(forceBuffer)
+		forceValue(forceBuffer),
+		positionScale(device->getPositionScale()),
+		orientationScale(device->getOrientationScale())
 	{
 		positionValue.setZero();   // also clears positionBuffer
 		transformValue.setIdentity();   // also sets transformBuffer
@@ -311,6 +313,11 @@ struct NovintScaffold::DeviceData
 
 	/// The force value to be written to the device, permanently connected to forceBuffer.
 	Eigen::Map<Vector3d> forceValue;
+
+	/// Scale factor for the position axes.
+	double positionScale;
+	/// Scale factor for the orientation axes.
+	double orientationScale;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -822,8 +829,8 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 
 	{
 		RigidTransform3d pose;
-		pose.linear() = info->transformValue.block<3,3>(0,0);
-		pose.translation() = info->positionValue;
+		pose.linear() = info->transformValue.block<3,3>(0,0) * info->orientationScale;
+		pose.translation() = info->positionValue * info->positionScale;
 
 		SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 		inputData.poses().set("pose", pose);
@@ -1097,6 +1104,31 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	builder.addBoolean("isOrientationHomed");
 	return builder.createData();
 }
+
+void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		//boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex); why is there no mutex?
+		(*matching)->positionScale = scale;
+	}
+}
+
+void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		//boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex); why is there no mutex?
+		(*matching)->orientationScale = scale;
+	}
+}
+
 
 std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 {
