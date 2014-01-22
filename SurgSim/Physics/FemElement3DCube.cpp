@@ -18,6 +18,8 @@
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement3DCube.h"
 
+#include "SurgSim/Math/Geometry.h"
+
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
