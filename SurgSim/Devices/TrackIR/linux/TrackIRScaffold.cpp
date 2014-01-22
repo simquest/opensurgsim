@@ -124,6 +124,7 @@ TrackIRScaffold::~TrackIRScaffold()
 			SURGSIM_LOG_SEVERE(m_logger) << "TrackIR: Destroying scaffold while devices are active!?!";
 			for (auto it = std::begin(m_state->activeDeviceList);  it != std::end(m_state->activeDeviceList);  ++it)
 			{
+				stopCamera((*it).get());
 				if ((*it)->m_thread)
 				{
 					destroyPerDeviceThread(it->get());
@@ -182,11 +183,13 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already a TrackIR camera exists."
 			<< " TrackIRScaffold only supports one TrackIR camera right now."
 			<< " Behaviors of multiple cameras are undefined.\n";
+
 		std::unique_ptr<DeviceData> info(new DeviceData(device));
 		createPerDeviceThread(info.get());
 		SURGSIM_ASSERT(info->m_thread) << "Failed to create a per-device thread for TrackIR device: " <<
-				info->m_deviceObject->getName() << ", with ID number " << cameraID << ".";
+				info->m_deviceObject->getName();
 
+		startCamera(info.get());
 		m_state->activeDeviceList.emplace_back(std::move(info));
 	}
 
@@ -204,6 +207,7 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 
 		if (matching != m_state->activeDeviceList.end())
 		{
+			stopCamera((*matching).get());
 			if ((*matching)->m_thread)
 			{
 				destroyPerDeviceThread(matching->get());
@@ -230,7 +234,7 @@ void TrackIRScaffold::setPositionScale(const TrackIRDevice* device, double scale
 	if (matching != m_state->activeDeviceList.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
-		(*matching)->positionScale = scale;
+		(*matching)->m_positionScale = scale;
 	}
 }
 
@@ -243,7 +247,7 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 	if (matching != m_state->activeDeviceList.end())
 	{
 		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
-		(*matching)->orientationScale = scale;
+		(*matching)->m_orientationScale = scale;
 	}
 }
 
@@ -279,9 +283,9 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	Vector3d rotation(pitch, yaw, roll); // In Degrees
 
 	// Scale Position
-	position *= info->positionScale;
+	position *= info->m_positionScale;
 	// Scale Orientation
-	rotation *= info->orientationScale;
+	rotation *= info->m_orientationScale;
 
 	// Convert to a pose.
 	Matrix33d orientation;
