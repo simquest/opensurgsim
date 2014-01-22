@@ -51,6 +51,33 @@ TEST(NamedDataTests, CanConstruct)
 	EXPECT_EQ("", data.getName(1));
 }
 
+/// Creating a named data object by copy construction.
+TEST(NamedDataTests, CanCopyConstruct)
+{
+	NamedDataBuilder<float> builder;
+	builder.addEntry("test");
+	NamedData<float> preData = builder.createData();
+	NamedData<float> data = preData;
+	EXPECT_EQ(1, data.getNumEntries());
+	EXPECT_EQ(1u, data.size());
+
+	EXPECT_TRUE(data.isValid());
+	EXPECT_TRUE(data.hasEntry(0));
+	EXPECT_TRUE(data.hasEntry("test"));
+	EXPECT_FALSE(data.hasData(0));
+	EXPECT_FALSE(data.hasData("test"));
+	EXPECT_EQ(0, data.getIndex("test"));
+	EXPECT_EQ("test", data.getName(0));
+
+	EXPECT_FALSE(data.hasEntry(1));
+	EXPECT_FALSE(data.hasEntry("missing"));
+	EXPECT_FALSE(data.hasData(1));
+	EXPECT_FALSE(data.hasData("missing"));
+	EXPECT_EQ(-1, data.getIndex("missing"));
+	EXPECT_EQ("", data.getName(1));
+
+}
+
 
 /// Creating a shared_ptr to a named data object.
 TEST(NamedDataTests, CanCreateShared)
