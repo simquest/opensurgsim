@@ -47,7 +47,7 @@ public:
 	/// Destructor.
 	virtual ~TrackIRDevice();
 
-	/// Initialize this device, register it with the scaffold. 
+	/// Initialize this device, register it with the scaffold.
 	/// \return True on success; false otherwise.
 	virtual bool initialize() override;
 	/// Finalize this device, unregister this device from the scaffold.

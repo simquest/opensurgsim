@@ -129,6 +129,6 @@ TEST(TrackIRDeviceTest, InputConsumer)
 	// Check the number of invocations.
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 20);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 50);
-	
+
 	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().isValid());
 }
