@@ -57,6 +57,7 @@ configure_file(
 set(LIBS
 	SurgSimFramework
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimTesting
 	SurgSimBlocks
 	gmock
