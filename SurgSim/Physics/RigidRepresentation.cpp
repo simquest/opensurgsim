@@ -165,13 +165,15 @@ void RigidRepresentation::update(double dt)
 	condition &= qNorm != 0.0;
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
-		" deactivated and reset because:" << std::endl << "m_G=(" <<
-		G[0] << "," << G[1] << "," << G[2] << ") " <<
-		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
-		"|q| before normalization=" << qNorm << " " <<
+	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated and reset because:" << std::endl <<
+		"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
+		"dG=(" << dG[0] << "," << dG[1] << "," << dG[2] << "), " <<
+		"w=(" << w[0] << "," << w[1] << "," << w[2] << "), " <<
+		"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
+		"|q| before normalization=" << qNorm << ", and " <<
 		"|q| after normalization="<< q.norm() << std::endl;
-	if (! condition)
+	if (!condition)
 	{
 		resetState();
 		setIsActive(false);
@@ -242,12 +244,12 @@ void RigidRepresentation::applyCorrection(
 	bool condition = SurgSim::Math::isValid(G);
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
-		" deactivated and reset because:" << std::endl << "m_G=(" <<
-		G[0] << "," << G[1] << "," << G[2] << ") " <<
-		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
-		"|q| after normalization="<< q.norm() << std::endl;
-	if (! condition)
+	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated and reset in applyCorrection because:" << std::endl <<
+		"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
+		"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
+		"and |q| after normalization=" << q.norm() << std::endl;
+	if (!condition)
 	{
 		resetState();
 		setIsActive(false);
