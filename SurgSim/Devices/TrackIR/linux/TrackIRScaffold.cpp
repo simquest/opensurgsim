@@ -52,8 +52,8 @@ struct TrackIRScaffold::DeviceData
 	explicit DeviceData(TrackIRDevice* device) :
 		m_deviceObject(device),
 		m_thread(),
-		positionScale(TrackIRDevice::defaultPositionScale()),
-		orientationScale(TrackIRDevice::defaultOrientationScale())
+		m_positionScale(TrackIRDevice::defaultPositionScale()),
+		m_orientationScale(TrackIRDevice::defaultOrientationScale())
 	{
 	}
 
@@ -63,9 +63,9 @@ struct TrackIRScaffold::DeviceData
 	std::unique_ptr<SurgSim::Device::TrackIRThread> m_thread;
 
 	/// Scale factor for the position axes; stored locally before the device is initialized.
-	double positionScale;
+	double m_positionScale;
 	/// Scale factor for the orientation axes; stored locally before the device is initialized.
-	double orientationScale;
+	double m_orientationScale;
 
 	/// The mutex that protects the externally modifiable parameters.
 	boost::mutex m_parametersMutex;
@@ -181,7 +181,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		// This assertion overlaps with above two assertions somehow.
 		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already a TrackIR camera exists."
 			<< " TrackIRScaffold only supports one TrackIR camera right now."
-            << " Behaviors of multiple cameras are undefined.\n";
+			<< " Behaviors of multiple cameras are undefined.\n";
 		std::unique_ptr<DeviceData> info(new DeviceData(device));
 		createPerDeviceThread(info.get());
 		SURGSIM_ASSERT(info->m_thread) << "Failed to create a per-device thread for TrackIR device: " <<
@@ -370,6 +370,15 @@ bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 	return true;
 }
 
+bool TrackIRScaffold::startCamera(DeviceData* info)
+{
+	return true;
+}
+
+bool TrackIRScaffold::stopCamera(DeviceData* info)
+{
+	return true;
+}
 
 SurgSim::DataStructures::DataGroup TrackIRScaffold::buildDeviceInputData()
 {

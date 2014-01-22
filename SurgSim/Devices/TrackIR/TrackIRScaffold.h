@@ -99,6 +99,14 @@ private:
 	/// \return true on success.
 	bool finalizeSdk();
 
+	/// Start the camera, it will start sending frames.
+	/// \param info DeviceData object which contains the camera to be started.
+	/// \return	true on success.
+	bool startCamera(DeviceData* info);
+	/// Stop the camera, it will stop sending frames.
+	/// \param info DeviceData object which contains the camera to be stopped.
+	/// \return	true on success.
+	bool stopCamera(DeviceData* info);
 
 	/// Executes the operations for a single input frame for a single device.
 	/// Should only be called from the context of the input loop thread.
