@@ -16,10 +16,10 @@
 /// Render Tests for the OsgOctreeRepresentation class.
 
 #include "SurgSim/DataStructures/OctreeNode.h"
-#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Graphics/OsgOctreeRepresentation.h"
-#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Math/OctreeShape.h"
+#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -44,7 +44,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
 	auto octreeShape = std::make_shared<OctreeShape>();
 	octreeShape->setRootNode(octreeNode);
-	octreeNode->addData(Vector3d(0.0, 0.0, 0.0), emptyData, 1); //Make the OctreeNode visible
+	octreeNode->addData(Vector3d(0.2, 0.3, 0.4), emptyData, 1); //Make the OctreeNode visible
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
 	ASSERT_TRUE(nullptr == octreeRepresentation->getOctree());
@@ -53,6 +53,7 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 										  Vector3d(0.0, 0.0, -8.0)));
 	viewElement->addComponent(octreeRepresentation);
 	octreeRepresentation->setOctree(octreeShape);
+
 	/// Run the thread
 	runtime->start();
 	EXPECT_TRUE(graphicsManager->isInitialized());
@@ -60,10 +61,10 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 
 	boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
 	octreeRepresentation->getOctree()->subdivide();
+
 	for (int i = 0; i < 8; ++i)
 	{
-		auto boundingBox = octreeRepresentation->getOctree()->getChild(i)->getBoundingBox();
-		Vector3d center = (boundingBox.max() + boundingBox.min()) / 2.0;
+		Vector3d center = octreeRepresentation->getOctree()->getChild(i)->getBoundingBox().center();
 		octreeRepresentation->getOctree()->addData(center, emptyData, 2);
 		boost::this_thread::sleep(boost::posix_time::milliseconds(500));
 	}
@@ -73,16 +74,15 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 		octreeRepresentation->getOctree()->getChild(i)->subdivide();
 	}
 
-	Vector3d rootOctreeCenter = (boundingBox.max() + boundingBox.min()) / 2.0;
 	for (int i = 0; i < 8; ++i)
 	{
 		auto self = octreeRepresentation->getOctree()->getChild(i);
 		for (int j = 0; j < 8; ++j)
 		{
-			auto childBox = self->getChild(j)->getBoundingBox();
-			Vector3d childCenter = (childBox.max() + childBox.min()) / 2.0;
-			auto distance = childCenter - rootOctreeCenter;
+			Vector3d childCenter = self->getChild(j)->getBoundingBox().center();
+			auto distance = childCenter - boundingBox.center();
 
+			// 0.75 here is somehow magic number, calculated based on the fact that the size of root OctreeNode is 1.0.
 			if (distance.cwiseAbs().sum() <= 0.75)
 			{
 				octreeRepresentation->getOctree()->addData(childCenter, emptyData, 3);
