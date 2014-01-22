@@ -54,72 +54,63 @@ void OsgOctreeRepresentation::doUpdate(double dt)
 	// Traverse the Octree and the corresponding OSG tree.
 	// A new node will be added to the OSG tree if it is not present.
 	// Draw the OSG node if the corresponding OctreeNode is active, i.e. leaf node with data.
-	draw(m_transform->getChild(0)->asGroup(), m_octree, 0, 0, 0);
+	draw(m_transform->getChild(0)->asGroup(), m_octree);
 }
 
+
+// An Octree(Node) is traversed in following order (the 2nd OctreeNode, i.e. OctreeNode with "1" is now shown): 
+/*
+			     _______ 
+			   /3  /  7/|
+			  /-------/ |
+			 /2__/_6_/| |
+			|   |   | |/|
+			|___|___|/|5|
+			|   |   | |/
+			|0__|__4|/
+*/
 void OsgOctreeRepresentation::draw
-	(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree,
-	 unsigned level, unsigned parentIndex, unsigned index)
+	(osg::ref_ptr<osg::Group> parentTransformNode, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree)
 {
-	// The IDs of children in a Octree are as follows (ID 1 is not shown):
-	/*
-				     _______ 
-				   /3  /  7/|
-				  /-------/ |
-				 /2__/_6_/| |
-				|   |   | |/|
-				|___|___|/|5|
-				|   |   | |/
-				|0__|__4|/
-	*/
-	// Get ID for this OctreeNode
-	int base = 0;
-	for (int n = static_cast<int>(level) - 1; n >= 0; --n)
-	{
-		base += static_cast<int>(pow(8.0, n));
-	}
-	unsigned nodeID = static_cast<unsigned>(base) + 8 * (parentIndex) + index;
+	const Vector3d key = octree->getBoundingBox().center();
+	auto result = find_if(m_nodeMap.cbegin(), m_nodeMap.cend(), 
+						  [&key](const std::pair<SurgSim::Math::Vector3d, unsigned>& item){ return item.first == key; }
+						 );
 
-
-	if (m_nodeAdded[nodeID])
+	if (m_nodeMap.cend() != result)
 	{
-		auto transformNode = thisTransform->getChild(m_nodeIndex[nodeID])->asGroup();
+		auto thisTransformNode = parentTransformNode->getChild(result->second)->asGroup();
 		if (octree->hasChildren())
 		{
 			// Scale and position is controlled by leaf node.
 			// If a node has child, its scale and position will be set to 1 and the origin, respectively.
-			transformNode->replaceChild(m_sharedUnitBox->getNode(), m_dummy);
-			transformNode->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3d(1.0, 1.0, 1.0));
-			transformNode->asTransform()->asPositionAttitudeTransform()->setPosition(osg::Vec3d(0.0, 0.0, 0.0));
+			thisTransformNode->replaceChild(m_sharedUnitBox->getNode(), m_dummy);
+			thisTransformNode->asTransform()->asPositionAttitudeTransform()->setScale(osg::Vec3d(1.0, 1.0, 1.0));
+			thisTransformNode->asTransform()->asPositionAttitudeTransform()->setPosition(osg::Vec3d(0.0, 0.0, 0.0));
 
 			auto octreeChildren = octree->getChildren();
 			for(int i = 0; i < 8; ++i)
 			{
-				draw(transformNode, octreeChildren[i], level + 1, index, i);
+				draw(thisTransformNode, octreeChildren[i]);
 			}
 		}
 		else if (octree->isActive())
 		{
-			transformNode->replaceChild(m_dummy, m_sharedUnitBox->getNode());
+			thisTransformNode->replaceChild(m_dummy, m_sharedUnitBox->getNode());
 		}
 	}
 	else
 	{
 		osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
 		osgTransform->addChild(m_dummy);
+		osgTransform->setPosition(toOsg(static_cast<Vector3d>(octree->getBoundingBox().center())));
+		osgTransform->setScale(toOsg(static_cast<Vector3d>(octree->getBoundingBox().sizes())));
 
-		Vector3d distance = octree->getBoundingBox().center();
-		osgTransform->setPosition(toOsg(distance));
-		Vector3d size = octree->getBoundingBox().sizes();
-		osgTransform->setScale(toOsg(size));
-
-		thisTransform->addChild(osgTransform);
-		// Hash this OctreeNode's location in the corresponding OSG node.
-		m_nodeIndex[nodeID] = thisTransform->getNumChildren() - 1;
-		m_nodeAdded[nodeID] = true;
+		parentTransformNode->addChild(osgTransform);
+		m_nodeMap.emplace_back(key, parentTransformNode->getNumChildren() - 1);
 
 		// After add a OSG node for this OctreeNode, need to draw this node or its descendant.
-		draw(thisTransform, octree, level, parentIndex, index);
+		draw(parentTransformNode, octree);
 	}
 }
 

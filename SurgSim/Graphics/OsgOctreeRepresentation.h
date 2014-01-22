@@ -16,9 +16,9 @@
 #ifndef SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H
 
+#include <deque>
 #include <memory>
 #include <string>
-#include <unordered_map>
 
 #include <osg/ref_ptr>
 #include <osg/Group>
@@ -67,11 +67,7 @@ private:
 	/// Draw the Octree associated with this OSG representation.
 	/// \param thisTranform The osg::PositionAttitudeTransform.
 	/// \param octreeNode The OctreeNode to be drawn.
-	/// \param level The level at which octreeNode is.
-	/// \param parentIndex The index of octreeNodes' parent.
-	/// \param index The index of octreeNode.
-	void draw(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode,
-			  unsigned level, unsigned parentIndex, unsigned index);
+	void draw(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode);
 
 	/// The Octree represented by this representation
 	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> m_octree;
@@ -84,13 +80,12 @@ private:
 	/// Dummy osg::Node used to subsititute the shared osg box when an OctreeNode is not active.
 	osg::ref_ptr<osg::Node> m_dummy;
 
-	/// A hash table recording if an OctreeNode (with an ID) has been added to the scene graph tree.
-	std::unordered_map<unsigned, bool> m_nodeAdded;
-
-	/// Determine the index of an OctreeNode in the corresponding scene graph tree.
-	/// At a given level, the 2nd child of an OctreeNode may be added to the corresponding scene graph tree as its 5th
-	/// child.
-	std::unordered_map<unsigned, unsigned> m_nodeIndex;
+	/// A hash table which gives the index of an OctreeNode in the corresponding scene graph tree (at the same level).
+	/// There are two trees: an Octree and a corresponding OSG tree. They have same levels, but at each level
+	/// the order of mapping might not be the same. For example, at a given level, the 2nd child of the OctreeNode may
+	/// be added to the corresponding scene graph tree as its 5th child.
+	/// The coordinate of the center of an OctreeNode is used as the hash key.
+	std::deque<std::pair<SurgSim::Math::Vector3d, unsigned>> m_nodeMap;
 };
 
 }; // Graphics
