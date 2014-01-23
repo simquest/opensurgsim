@@ -322,7 +322,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
-	if (! isActive() || ! m_currentParameters.isValid())
+	if (!isActive() || !m_currentParameters.isValid())
 	{
 		// do not setIsActive(false) due to invalid parameters because RigidRepresentationBase::setInitialParameters may
 		// not have been called before RigidRepresentationBase::setInitialState (which calls this function), in which
