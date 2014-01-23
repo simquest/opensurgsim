@@ -656,6 +656,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;  // 0 for 7DoF Falcon
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;   // +/-75deg
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch; // +/-50deg
+		info->jointAngles *= info->orientationScale;
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
 		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
@@ -829,7 +830,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 
 	{
 		RigidTransform3d pose;
-		pose.linear() = info->transformValue.block<3,3>(0,0) * info->orientationScale;
+		pose.linear() = info->transformValue.block<3,3>(0,0);
 		pose.translation() = info->positionValue * info->positionScale;
 
 		SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
