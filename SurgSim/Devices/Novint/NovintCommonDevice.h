@@ -61,6 +61,7 @@ public:
 	/// Sets the position scale for this device.
 	/// The position scale controls how much the pose changes for a given device translation.
 	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	/// \param scale The multiplicative factor to apply to the position.
 	void setPositionScale(double scale);
 	/// Gets the position scale for this device.
 	double getPositionScale() const;
@@ -68,6 +69,7 @@ public:
 	/// Sets the orientation scale for this device.
 	/// The orientation scale controls how much the pose changes for a given device rotation.
 	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	/// \param scale The multiplicative factor to apply to the rotation angles.
 	void setOrientationScale(double scale);
 	/// Gets the orientation scale for this device.
 	double getOrientationScale() const;
