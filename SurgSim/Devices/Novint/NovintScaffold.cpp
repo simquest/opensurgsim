@@ -654,10 +654,10 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
 		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
-		// The zero values are NOT the home orientation.  Shoot me now.
-		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;  // 0 for 7DoF Falcon
-		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;   // +/-75deg
-		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch; // +/-50deg
+		// The zero values are NOT the home orientation.
+		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
+		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
+		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
 		info->jointAngles *= info->orientationScale;
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
