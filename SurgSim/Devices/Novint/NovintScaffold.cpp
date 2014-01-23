@@ -318,6 +318,8 @@ struct NovintScaffold::DeviceData
 	double positionScale;
 	/// Scale factor for the orientation axes.
 	double orientationScale;
+	/// The mutex that protects the externally modifiable parameters.
+	boost::mutex parametersMutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -598,7 +600,7 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
-	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	// TODO(bert): this code should cache the access indices.
 	// TODO(bert): this needs to be split up into more methods.  It is WAAAAY too big.
@@ -1113,7 +1115,7 @@ void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double s
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 	if (matching != m_state->activeDeviceList.end())
 	{
-		//boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex); why is there no mutex?
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->positionScale = scale;
 	}
 }
@@ -1125,7 +1127,7 @@ void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, doubl
 		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 	if (matching != m_state->activeDeviceList.end())
 	{
-		//boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex); why is there no mutex?
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
 		(*matching)->orientationScale = scale;
 	}
 }
