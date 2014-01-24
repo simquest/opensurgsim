@@ -713,6 +713,66 @@ TEST_F(FemElement3DCubeTests, ShapeFunctionsTest)
 	}
 }
 
+TEST_F(FemElement3DCubeTests, IsValidCoordinateTest)
+{
+	MockFemElement3DCube cube(m_nodeIds, m_restState);
+
+	{
+		// Non-normalize node
+		SurgSim::Math::Vector nodePositions(8);
+		nodePositions <<  0.7, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
+
+		// Node with point which is outside of the cube
+		nodePositions <<  1.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
+
+		// Normal node
+		nodePositions <<  0.5, 0.25, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0;
+		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+
+	}
+
+	{
+		// Node with more than 8 coordinate points
+		SurgSim::Math::Vector nodePositions(9);
+		nodePositions <<  1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
+		EXPECT_FALSE(cube.isValidCoordinate(nodePositions));
+	}
+}
+
+TEST_F(FemElement3DCubeTests, ComputeCartesianCoordinate)
+{
+	MockFemElement3DCube cube(m_nodeIds, m_restState);
+
+	{
+		// Compute central point of the cube
+		SurgSim::Math::Vector nodePositions(8);
+		nodePositions << 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+		EXPECT_TRUE(SurgSim::Math::Vector3d(0.0, 0.0, 0.0).isApprox(
+					cube.computeCartesianCoordinate(m_restState, nodePositions), epsilon));
+	}
+
+	{
+		SurgSim::Math::Vector nodePositions(8);
+		nodePositions << 0.01, 0.07, 0.11, 0.05, 0.0, 0.23, 0.13, 0.4;
+		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
+		Vector3d a = cube.computeCartesianCoordinate(m_restState, nodePositions);
+		EXPECT_TRUE(SurgSim::Math::Vector3d(0.04, 0.19, 0.26).isApprox(
+					cube.computeCartesianCoordinate(m_restState, nodePositions), epsilon));
+		// 0.01 * (-0.5,-0.5,-0.5) => (-0.005, -0.005, -0.005)
+		// 0.07 * ( 0.5,-0.5,-0.5) => ( 0.035, -0.035, -0.035)
+		// 0.11 * ( 0.5, 0.5,-0.5) => ( 0.055,  0.055, -0.055)
+		// 0.05 * (-0.5, 0.5,-0.5) => (-0.025,  0.025, -0.025)
+		// 0.0  * (-0.5,-0.5, 0.5) => (-0.00,  -0.00,   0.00)
+		// 0.23 * ( 0.5,-0.5, 0.5) => ( 0.115, -0.115,  0.115)
+		// 0.13 * ( 0.5, 0.5, 0.5) => ( 0.065,  0.065,  0.065)
+		// 0.4  * (-0.5, 0.5, 0.5) => (-0.20,   0.20,   0.20)
+		//                          = ( 0.04,   0.19,   0.26)
+	}
+}
+
 TEST_F(FemElement3DCubeTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::getSubVector;
