@@ -451,8 +451,16 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 
 bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
+	// Check for valid range of localization points
+	bool validLocalRange = true;
+	for (int i = 0; i < naturalCoordinate.size(); i++)
+	{
+		validLocalRange = validLocalRange && (0 <= naturalCoordinate[i] && naturalCoordinate[i] <= 1);
+	}
+
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
-		&& (naturalCoordinate.size() == 8);
+		&& (naturalCoordinate.size() == 8)
+		&& (validLocalRange);
 }
 
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
@@ -462,25 +470,18 @@ SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
 		<< "naturalCoordinate must be normalized and length 8.";
 
+	std::array<Vector3d, 8> nodePositions;
+	Vector3d cartesianCoordinate(0.0, 0.0, 0.0);
+
 	const Vector& x = state.getPositions();
-	Vector3d p0 = getSubVector(x, m_nodeIds[0], 3);
-	Vector3d p1 = getSubVector(x, m_nodeIds[1], 3);
-	Vector3d p2 = getSubVector(x, m_nodeIds[2], 3);
-	Vector3d p3 = getSubVector(x, m_nodeIds[3], 3);
-	Vector3d p4 = getSubVector(x, m_nodeIds[4], 3);
-	Vector3d p5 = getSubVector(x, m_nodeIds[5], 3);
-	Vector3d p6 = getSubVector(x, m_nodeIds[6], 3);
-	Vector3d p7 = getSubVector(x, m_nodeIds[7], 3);
 
+	for (int i = 0; i < 8; i++)
+	{
+		nodePositions[i] = getSubVector(x, m_nodeIds[i], 3);
+		cartesianCoordinate += naturalCoordinate(i) * nodePositions[i];
+	}
 
-	return naturalCoordinate(0) * p0
-		+ naturalCoordinate(1) * p1
-		+ naturalCoordinate(2) * p2
-		+ naturalCoordinate(3) * p3
-		+ naturalCoordinate(4) * p4
-		+ naturalCoordinate(5) * p5
-		+ naturalCoordinate(6) * p6
-		+ naturalCoordinate(7) * p7;
+	return cartesianCoordinate;
 }
 
 
