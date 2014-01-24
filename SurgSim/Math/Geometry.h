@@ -1461,7 +1461,7 @@ void intersectionsSegmentBox(
 	const Eigen::AlignedBox<T, 3>& box,
 	std::vector<Eigen::Matrix<T, 3, 1, MOpt> >* intersections)
 {
-	Eigen::Array<double, 3, 1> v01 = sv1 - sv0;
+	Eigen::Array<T, 3, 1, MOpt> v01 = sv1 - sv0;
 	auto parralelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
 	if (parralelToPlane.any())
 	{
@@ -1476,7 +1476,7 @@ void intersectionsSegmentBox(
 	// Calculate the intesection of the segment with each of the 6 box planes.
 	// The intersection is calculated as the distance along the segment (abscissa)
 	// scaled from 0 to 1.
-	Eigen::Array<double, 3, 2> planeIntersectionAbscissas;
+	Eigen::Array<T, 3, 2, MOpt> planeIntersectionAbscissas;
 	planeIntersectionAbscissas.col(0) = (box.min().array() - sv0.array());
 	planeIntersectionAbscissas.col(1) = (box.max().array() - sv0.array());
 
@@ -1484,16 +1484,16 @@ void intersectionsSegmentBox(
 	// correctly handled by the rest of the function.
 	planeIntersectionAbscissas.colwise() /= v01;
 
-	double entranceAbscissa = planeIntersectionAbscissas.rowwise().minCoeff().maxCoeff();
-	double exitAbscissa = planeIntersectionAbscissas.rowwise().maxCoeff().minCoeff();
-	if (entranceAbscissa < exitAbscissa && exitAbscissa > 0.0)
+	T entranceAbscissa = planeIntersectionAbscissas.rowwise().minCoeff().maxCoeff();
+	T exitAbscissa = planeIntersectionAbscissas.rowwise().maxCoeff().minCoeff();
+	if (entranceAbscissa < exitAbscissa && exitAbscissa > T(0.0))
 	{
-		if (entranceAbscissa >= 0.0 && entranceAbscissa <= 1.0)
+		if (entranceAbscissa >= T(0.0) && entranceAbscissa <= T(1.0))
 		{
 			intersections->push_back(sv0 + v01.matrix() * entranceAbscissa);
 		}
 
-		if (exitAbscissa >= 0.0 && exitAbscissa <= 1.0)
+		if (exitAbscissa >= T(0.0) && exitAbscissa <= T(1.0))
 		{
 			intersections->push_back(sv0 + v01.matrix() * exitAbscissa);
 		}
