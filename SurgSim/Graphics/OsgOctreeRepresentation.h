@@ -16,7 +16,6 @@
 #ifndef SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H
 #define SURGSIM_GRAPHICS_OSGOCTREEREPRESENTATION_H
 
-#include <deque>
 #include <memory>
 #include <string>
 
@@ -41,6 +40,10 @@ namespace Graphics
 class OsgUnitBox;
 
 /// OSG octree representation, implements an OctreeRepresenation using OSG.
+/// Given a OctreeShape, this representation will copy the Octree instead of sharing the Octree (with the OctreeShape).
+/// Wake up call on this representation will fail if no octree is held.
+/// That is to say, setOctree() method MUST be called before WakeUp() to make this representation work properly.
+/// The OSG tree corresponds to the Octree will be built only once at wake up and can not be changed once awake.
 class OsgOctreeRepresentation : public OctreeRepresentation, public OsgRepresentation
 {
 public:
@@ -55,19 +58,24 @@ public:
 	/// \param	dt	The time step
 	virtual void doUpdate(double dt) override;
 
+	/// Wake up this representation, build the OSG corresponds to the Octree it holds.
+	/// \return True if OSG tree is built successfully.
+	virtual bool doWakeUp() override;
+
 	/// Get the Octree contained by this representation
 	/// \return	The octree contained by this representation.
 	virtual std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> getOctree() const override;
 
 	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
 	/// \param octreeShape The OctreeShape from which the octree is retrieved.
-	virtual void setOctree(std::shared_ptr<SurgSim::Math::OctreeShape> octreeShape) override;
+	virtual void setOctree(const std::shared_ptr<SurgSim::Math::OctreeShape>& octreeShape) override;
 
 private:
 	/// Draw the Octree associated with this OSG representation.
 	/// \param thisTranform The osg::PositionAttitudeTransform.
 	/// \param octreeNode The OctreeNode to be drawn.
-	void draw(osg::ref_ptr<osg::Group> thisTransform, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octreeNode);
+	void OsgOctreeRepresentation::buildOctree
+		(osg::ref_ptr<osg::Group> parentTransformNode, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree);
 
 	/// The Octree represented by this representation
 	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> m_octree;
@@ -76,16 +84,6 @@ private:
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;
 	/// Returns the shared unit box
 	static std::shared_ptr<OsgUnitBox> getSharedUnitBox();
-
-	/// Dummy osg::Node used to subsititute the shared osg box when an OctreeNode is not active.
-	osg::ref_ptr<osg::Node> m_dummy;
-
-	/// A hash table which gives the index of an OctreeNode in the corresponding scene graph tree (at the same level).
-	/// There are two trees: an Octree and a corresponding OSG tree. They have same levels, but at each level
-	/// the order of mapping might not be the same. For example, at a given level, the 2nd child of the OctreeNode may
-	/// be added to the corresponding scene graph tree as its 5th child.
-	/// The coordinate of the center of an OctreeNode is used as the hash key.
-	std::deque<std::pair<SurgSim::Math::Vector3d, unsigned>> m_nodeMap;
 };
 
 }; // Graphics
