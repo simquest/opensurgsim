@@ -43,7 +43,7 @@ namespace Device
 
 NovintCommonDevice::NovintCommonDevice(const std::string& uniqueName, const std::string& initializationName) :
 	SurgSim::Input::CommonDevice(uniqueName, NovintScaffold::buildDeviceInputData()),
-	m_initializationName(initializationName)
+	m_initializationName(initializationName), m_positionScale(1.0), m_orientationScale(1.0)
 {
 }
 
@@ -95,12 +95,38 @@ bool NovintCommonDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
+void NovintCommonDevice::setPositionScale(double scale)
+{
+	m_positionScale = scale;
+	if (m_scaffold)
+	{
+		m_scaffold->setPositionScale(this, m_positionScale);
+	}
+}
+
+double NovintCommonDevice::getPositionScale() const
+{
+	return m_positionScale;
+}
+
+void NovintCommonDevice::setOrientationScale(double scale)
+{
+	m_orientationScale = scale;
+	if (m_scaffold)
+	{
+		m_scaffold->setOrientationScale(this, m_orientationScale);
+	}
+}
+
+double NovintCommonDevice::getOrientationScale() const
+{
+	return m_orientationScale;
+}
 
 bool NovintCommonDevice::is7DofDevice() const
 {
 	return false;
 }
-
 
 };  // namespace Device
 };  // namespace SurgSim
