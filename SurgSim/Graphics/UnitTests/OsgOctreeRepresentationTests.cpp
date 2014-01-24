@@ -42,10 +42,15 @@ TEST(OsgOctreeRepresentationTests, GetSetUpdateTest)
 	auto runtime = std::make_shared<Runtime>();
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
 	octreeRepresentation->setOctree(octreeShape);
-	EXPECT_TRUE(octreeNode == octreeRepresentation->getOctree());
+
+	// OsgOctreeRepresentation owns a local copy of Octree, not shared with OctreeShape.
+	EXPECT_FALSE(octreeNode == octreeRepresentation->getOctree());
 
 	EXPECT_TRUE(octreeRepresentation->initialize(runtime));
 	EXPECT_TRUE(octreeRepresentation->wakeUp());
+
+	// Set the octree after wake up will cause a assertion failure.
+	ASSERT_ANY_THROW( { octreeRepresentation->setOctree(octreeShape); } );
 
 	ASSERT_NO_THROW(octreeRepresentation->update(0.1));
 }
