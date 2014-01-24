@@ -50,6 +50,7 @@ find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB o
 find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
+find_package(yaml-cpp)
 
 set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
 find_package(GoogleMock)
@@ -88,8 +89,6 @@ if(SURGSIM_DEVICES_BUILD)
 	find_package(WDK)
 endif(SURGSIM_DEVICES_BUILD)
 
-# This should have been built from the external ThirdParty directory
-find_package(yaml-cpp)
 
 SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
 
