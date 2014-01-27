@@ -82,31 +82,32 @@ void OsgOctreeRepresentation::buildOctree
 	(osg::ref_ptr<osg::Group> transformNode, std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree)
 {
 	SURGSIM_ASSERT(!isAwake()) << "OsgOctreeRepresentation::buildOctree() should be called before wake up.";
-	if (octree->isActive())
+	if (octree->hasChildren())
 	{
-		if (octree->hasChildren())
+		auto octreeChildren = octree->getChildren();
+		for(int i = 0; i < 8; ++i)
 		{
-			auto octreeChildren = octree->getChildren();
-			for(int i = 0; i < 8; ++i)
-			{
-				buildOctree(transformNode, octreeChildren[i]);
-			}
+			buildOctree(transformNode, octreeChildren[i]);
 		}
-		else
-		{
-			osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
-			osgTransform->addChild(m_sharedUnitBox->getNode());
-			osgTransform->setPosition(toOsg(static_cast<Vector3d>(octree->getBoundingBox().center())));
-			osgTransform->setScale(toOsg(static_cast<Vector3d>(octree->getBoundingBox().sizes())));
-			transformNode->addChild(osgTransform);
-		}
+	}
+	else
+	{
+		osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
+		osgTransform->addChild(m_sharedUnitBox->getNode());
+
+		int nodeMask = octree->isActive() ? 1 : 0;
+		osgTransform->setNodeMask(nodeMask);
+
+		osgTransform->setPosition(toOsg(static_cast<Vector3d>(octree->getBoundingBox().center())));
+		osgTransform->setScale(toOsg(static_cast<Vector3d>(octree->getBoundingBox().sizes())));
+		transformNode->addChild(osgTransform);
 	}
 }
 
-void OsgOctreeRepresentation::setOctree(const std::shared_ptr<SurgSim::Math::OctreeShape>& octreeShape)
+void OsgOctreeRepresentation::setOctree(const SurgSim::Math::OctreeShape& octreeShape)
 {
 	SURGSIM_ASSERT(!isAwake()) << "OsgOctreeRepresentation::setOctree() should be called before wake up.";
-	m_octree = std::make_shared<SurgSim::Math::OctreeShape::NodeType>(*(octreeShape)->getRootNode());
+	m_octree = std::make_shared<SurgSim::Math::OctreeShape::NodeType>(*(octreeShape.getRootNode()));
 }
 
 std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> OsgOctreeRepresentation::getOctree() const
