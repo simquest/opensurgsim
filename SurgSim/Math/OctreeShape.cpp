@@ -54,7 +54,12 @@ Matrix33d OctreeShape::getSecondMomentOfVolume() const
 	return Matrix33d::Zero();
 }
 
-std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode() const
+std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode()
+{
+	return m_rootNode;
+}
+
+const std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode() const
 {
 	return m_rootNode;
 }
