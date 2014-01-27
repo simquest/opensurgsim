@@ -12,7 +12,7 @@
 if(NOT GOOGLEMOCK_DIR)
 	find_path(GOOGLEMOCK_DIR
 		NAMES src/gmock.cc
-		PATHS "$ENV{GOOGLMOCK_DIR}" "/usr/src/gmock/"
+		PATHS "$ENV{GOOGLEMOCK_DIR}" "/usr/src/gmock/"
 	)
 endif(NOT GOOGLEMOCK_DIR)
 

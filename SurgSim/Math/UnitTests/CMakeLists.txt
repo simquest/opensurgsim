@@ -16,6 +16,7 @@
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
+	${gtest_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
