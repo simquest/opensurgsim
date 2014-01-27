@@ -452,11 +452,7 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	// Check for valid range of localization points
-	bool validLocalRange = true;
-	for (int i = 0; i < naturalCoordinate.size(); i++)
-	{
-		validLocalRange = validLocalRange && (0 <= naturalCoordinate[i] && naturalCoordinate[i] <= 1);
-	}
+	bool validLocalRange = (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
 
 	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
 		&& (naturalCoordinate.size() == 8)
@@ -468,17 +464,15 @@ SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
 	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
-		<< "naturalCoordinate must be normalized and length 8.";
+		<< "naturalCoordinate must be normalized and length 8 within [0 1].";
 
-	std::array<Vector3d, 8> nodePositions;
 	Vector3d cartesianCoordinate(0.0, 0.0, 0.0);
 
-	const Vector& x = state.getPositions();
+	const Vector& positions = state.getPositions();
 
 	for (int i = 0; i < 8; i++)
 	{
-		nodePositions[i] = getSubVector(x, m_nodeIds[i], 3);
-		cartesianCoordinate += naturalCoordinate(i) * nodePositions[i];
+		cartesianCoordinate += naturalCoordinate(i) * getSubVector(positions, m_nodeIds[i], 3);
 	}
 
 	return cartesianCoordinate;
