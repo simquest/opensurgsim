@@ -58,8 +58,8 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	boundingBox.max() = Vector3d::Ones() * 2.0;
 
 	auto octree1 = std::make_shared<OctreeShape::NodeType>(boundingBox);
-	auto octreeShape = std::make_shared<OctreeShape>();
-	octreeShape->setRootNode(octree1);
+	OctreeShape octreeShape;
+	octreeShape.setRootNode(octree1);
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
 	octreeRepresentation->setOctree(octreeShape);

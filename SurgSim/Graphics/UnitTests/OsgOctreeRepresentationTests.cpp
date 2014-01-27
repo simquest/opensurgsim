@@ -36,8 +36,8 @@ TEST(OsgOctreeRepresentationTests, GetSetUpdateTest)
 {
 	OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones() * pow(2.0, 2));
 	auto octreeNode = std::make_shared<OctreeShape::NodeType>(boundingBox);
-	auto octreeShape = std::make_shared<OctreeShape>();
-	octreeShape->setRootNode(octreeNode);
+	OctreeShape octreeShape;
+	octreeShape.setRootNode(octreeNode);
 
 	auto runtime = std::make_shared<Runtime>();
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Test Octree");
