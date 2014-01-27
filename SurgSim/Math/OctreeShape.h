@@ -67,7 +67,7 @@ public:
 
 	/// Get the root node
 	/// \return the octree root node of this shape
-	virtual std::shared_ptr<NodeType> getRootNode();
+	virtual std::shared_ptr<NodeType> getRootNode() const;
 
 	/// Set the root node
 	/// \param node the octree root node of this shape
