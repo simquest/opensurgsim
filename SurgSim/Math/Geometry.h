@@ -1462,18 +1462,18 @@ void intersectionsSegmentBox(
 	std::vector<Eigen::Matrix<T, 3, 1, MOpt> >* intersections)
 {
 	Eigen::Array<T, 3, 1, MOpt> v01 = sv1 - sv0;
-	auto parralelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
-	if (parralelToPlane.any())
+	auto parallelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
+	if (parallelToPlane.any())
 	{
 		Eigen::Array<bool, 3, 1, MOpt> beyondMinCorner = (sv0.array() < box.min().array());
 		Eigen::Array<bool, 3, 1, MOpt> beyondMaxCorner = (sv0.array() > box.max().array());
-		if ((parralelToPlane && (beyondMinCorner || beyondMaxCorner)).any())
+		if ((parallelToPlane && (beyondMinCorner || beyondMaxCorner)).any())
 		{
 			return;
 		}
 	}
 
-	// Calculate the intesection of the segment with each of the 6 box planes.
+	// Calculate the intersection of the segment with each of the 6 box planes.
 	// The intersection is calculated as the distance along the segment (abscissa)
 	// scaled from 0 to 1.
 	Eigen::Array<T, 3, 2, MOpt> planeIntersectionAbscissas;
