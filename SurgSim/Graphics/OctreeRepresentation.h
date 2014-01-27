@@ -47,7 +47,7 @@ public:
 
 	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
 	/// \param octreeShape The OctreeShape from which the octree is retrieved.
-	virtual void setOctree(const std::shared_ptr<SurgSim::Math::OctreeShape>& octreeShape) = 0;
+	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) = 0;
 };
 
 }; // Graphics
