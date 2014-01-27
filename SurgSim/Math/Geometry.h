@@ -1462,7 +1462,7 @@ void intersectionsSegmentBox(
 	std::vector<Eigen::Matrix<T, 3, 1, MOpt> >* intersections)
 {
 	Eigen::Array<T, 3, 1, MOpt> v01 = sv1 - sv0;
-	auto parallelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
+	Eigen::Array<bool, 3, 1, MOpt> parallelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
 	if (parallelToPlane.any())
 	{
 		Eigen::Array<bool, 3, 1, MOpt> beyondMinCorner = (sv0.array() < box.min().array());
