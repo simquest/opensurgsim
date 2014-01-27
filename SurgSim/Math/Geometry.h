@@ -1465,8 +1465,8 @@ void intersectionsSegmentBox(
 	auto parralelToPlane = (v01.cwiseAbs().array() < Geometry::DistanceEpsilon);
 	if (parralelToPlane.any())
 	{
-		auto beyondMinCorner = (sv0.array() < box.min().array());
-		auto beyondMaxCorner = (sv0.array() > box.max().array());
+		Eigen::Array<bool, 3, 1, MOpt> beyondMinCorner = (sv0.array() < box.min().array());
+		Eigen::Array<bool, 3, 1, MOpt> beyondMaxCorner = (sv0.array() > box.max().array());
 		if ((parralelToPlane && (beyondMinCorner || beyondMaxCorner)).any())
 		{
 			return;
