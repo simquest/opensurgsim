@@ -13,7 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+else(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	find_package(WDK REQUIRED)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})

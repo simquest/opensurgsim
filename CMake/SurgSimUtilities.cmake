@@ -138,16 +138,13 @@ macro(surgsim_copy_to_target_directory_for_release TARGET)
 		"${TARGET}" ${ARGN})
 endmacro()
 
-# Builds the unit test executable or library (unless disabled).
-# Does not try to run the test.
-# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS, UNIT_TEST_SHARED_LIBS,
-# UNIT_TEST_SHARED_RELEASE_LIBS and UNIT_TEST_SHARED_DEBUG_LIBS.
-#
-# You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
-#
-macro(surgsim_unit_test_build_only TESTNAME)
+# Build the unit test executable.
+# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS and LIBS for this unit test.
+macro(surgsim_add_unit_tests TESTNAME)
 	add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 	target_link_libraries(${TESTNAME} SurgSimTesting ${LIBS})
+	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME} "--gtest_output=xml")
+
 	# copy all ${UNIT_TEST_SHARED..._LIBS} to the test executable directory:
 	surgsim_copy_to_target_directory(${TESTNAME}
 		${UNIT_TEST_SHARED_LIBS})
@@ -156,27 +153,6 @@ macro(surgsim_unit_test_build_only TESTNAME)
 	surgsim_copy_to_target_directory_for_debug(${TESTNAME}
 		${UNIT_TEST_SHARED_DEBUG_LIBS})
 	surgsim_show_ide_folders("${UNIT_TEST_SOURCES}" "${UNIT_TEST_HEADERS}")
-endmacro()
-
-# Run the unit test executable (unless disabled or built all-in-one).
-# Expects that the unit test build has already been set up via
-#   surgsim_unit_test_build_only(TESTNAME).
-#
-# You probably want to use surgsim_add_unit_tests(TESTNAME) intead.
-#
-macro(surgsim_unit_test_run_only TESTNAME)
-	add_test(NAME ${TESTNAME} COMMAND ${TESTNAME} "--gtest_output=xml")
-endmacro()
-
-# Build the unit test executable or library.
-# The optional arguments can be used to turn off building and running
-#   tests even when enabled by the corresponding global options.  (If
-#   the options are off, they *do not* turn things back on!)
-# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS and LIBS for this unit
-#   test, as well as the BUILD_TESTING option.
-macro(surgsim_add_unit_tests TESTNAME)
-	surgsim_unit_test_build_only("${TESTNAME}")
-	surgsim_unit_test_run_only("${TESTNAME}")
 endmacro()
 
 # Do all the work to add a library to the system
@@ -286,7 +262,3 @@ macro(surgsim_cpplint_this_tree TARGET)
 	endif(SURGSIM_CPPLINT AND PYTHON_EXECUTABLE)
 endmacro()
 
-
-# options related to build input devices
-#
-option(SURGSIM_DEVICES_BUILD "Include input devices in the build" ON)

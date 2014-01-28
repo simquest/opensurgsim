@@ -30,14 +30,7 @@ set(UNIT_TEST_HEADERS
 set(LIBS PhantomDevice SurgSimFramework SurgSimInput SurgSimDataStructures
 	gmock gtest ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES})
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_PHANTOM
-	"Run the Phantom tests as part of unit tests.  (Requires hardware, OpenHaptics 3.0 and device license!)"
-	OFF)
-surgsim_add_unit_tests(PhantomDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_PHANTOM})
+surgsim_add_unit_tests(PhantomDeviceTest)
 
 # Put PhantomDeviceTest into folder "Devices"
 set_target_properties(PhantomDeviceTest PROPERTIES FOLDER "Devices")

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+find_package(OpenHaptics REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} SurgSimFramework SurgSimInput)

@@ -76,13 +76,6 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-if(SURGSIM_DEVICES_BUILD)
-	find_package(NovintHdalSdk)
-	find_package(OpenHaptics)
-	find_package(SixenseSdk)
-	find_package(WDK)
-endif(SURGSIM_DEVICES_BUILD)
-
 include(CTest)
 configure_file(CTestCustom.cmake.in CTestCustom.cmake)
 
