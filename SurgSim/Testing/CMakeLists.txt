@@ -16,6 +16,7 @@
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${gmock_SOURCE_DIR}/include
+	${gtest_SOURCE_DIR}/include
 )
 
 set(SURGSIM_TESTING_SOURCES
