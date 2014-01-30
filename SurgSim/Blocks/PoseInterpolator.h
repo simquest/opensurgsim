@@ -44,7 +44,7 @@ public:
 	explicit PoseInterpolator(const std::string& name);
 
 	/// Set the starting pose. This is optional, if not set the target's pose
-	/// will be used as the from value.
+	/// will be used as the starting pose.
 	/// \param transform The starting pose.
 	void setStartingPose(const SurgSim::Math::RigidTransform3d transform);
 
@@ -58,7 +58,7 @@ public:
 	/// \param target The target that will use the interpolated pose.
 	void setTarget(std::shared_ptr<SurgSim::Framework::Representation> target);
 
-	/// Set the duration of the the interpolation.
+	/// Set the duration of the interpolation.
 	/// \param t The duration in seconds.
 	void setDuration(double t);
 
