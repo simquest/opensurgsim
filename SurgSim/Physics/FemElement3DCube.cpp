@@ -18,6 +18,8 @@
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement3DCube.h"
 
+#include "SurgSim/Math/Geometry.h"
+
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
@@ -449,17 +451,33 @@ double FemElement3DCube::dShapeFunctiondmu(size_t i, double epsilon, double eta,
 
 bool FemElement3DCube::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
 {
-	SURGSIM_FAILURE() << "FemElement3DCube::isValidCoordinate is not implemented.";
-	return false;
+	// Check for valid range of localization points
+	bool validLocalRange = (0.0 <= naturalCoordinate.minCoeff() && naturalCoordinate.maxCoeff() <= 1.0);
+
+	return (std::abs(naturalCoordinate.sum() - 1.0) < SurgSim::Math::Geometry::ScalarEpsilon)
+		&& (naturalCoordinate.size() == 8)
+		&& (validLocalRange);
 }
 
 SurgSim::Math::Vector FemElement3DCube::computeCartesianCoordinate(
 	const DeformableRepresentationState& state,
 	const SurgSim::Math::Vector& naturalCoordinate) const
 {
-	SURGSIM_FAILURE() << "FemElement3DCube::computeCartesianCoordinate is not implemented.";
-	return Vector3d(0.0, 0.0, 0.0);
+	SURGSIM_ASSERT(isValidCoordinate(naturalCoordinate))
+		<< "naturalCoordinate must be normalized and length 8 within [0 1].";
+
+	Vector3d cartesianCoordinate(0.0, 0.0, 0.0);
+
+	const Vector& positions = state.getPositions();
+
+	for (int i = 0; i < 8; i++)
+	{
+		cartesianCoordinate += naturalCoordinate(i) * getSubVector(positions, m_nodeIds[i], 3);
+	}
+
+	return cartesianCoordinate;
 }
+
 
 } // namespace Physics
 
