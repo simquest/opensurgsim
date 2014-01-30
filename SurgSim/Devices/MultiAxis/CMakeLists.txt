@@ -18,9 +18,6 @@ else(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	find_package(WDK REQUIRED)
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
-
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -112,6 +109,10 @@ set(LIBS
 	SurgSimInput 
 	SurgSimFramework 
 )
+
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
 
 target_link_libraries(MultiAxisDevice ${LIBS}
 )

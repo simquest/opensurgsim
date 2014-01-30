@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(BUILD_DEVICE_MUTLTIAXIS)
+if(BUILD_DEVICE_MULTIAXIS)
 	add_subdirectory(AddSphereFromInput)
 	add_subdirectory(InputVtc)
-endif(BUILD_DEVICE_MUTLTIAXIS)
+endif(BUILD_DEVICE_MULTIAXIS)
 
 add_subdirectory(BouncingBalls)
 add_subdirectory(Fem3D)
