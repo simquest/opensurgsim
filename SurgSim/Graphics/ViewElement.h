@@ -21,6 +21,11 @@
 namespace SurgSim
 {
 
+namespace Input
+{
+class CommonDevice;
+}
+
 namespace Graphics
 {
 
@@ -49,16 +54,26 @@ public:
 	/// \return A shared_ptr pointing to the View component
 	std::shared_ptr<View> getView() const;
 
+	/// Return the keyboard to be used with this view.
+	/// \return A keyboard device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getKeyboardDevice() = 0;
+	/// Turn on/off the keyboard device to be used.
+	/// \param val Indicate whether or not to use keyboard device
+	virtual	void enableKeyboardDevice(bool val) = 0;
+
+	/// Return the mouse to be used with this view.
+	/// \return A mouse device
+	virtual std::shared_ptr<SurgSim::Input::CommonDevice> getMouseDevice() = 0;
+	/// Turn on/off the mouse device to be used.
+	/// \param val Indicate whether or not to use mouse device
+	virtual	void enableMouseDevice(bool val) = 0;
+
 protected:
 	/// Initializes the scene element
 	/// \return True if it succeeds, false if it fails
 	virtual bool doInitialize() override;
 
 private:
-	/// Wakes up the scene element
-	/// \return True if it succeeds, false if it fails
-	virtual bool doWakeUp() override;
-
 	/// View component that provides the visualization of the graphics representations
 	std::shared_ptr<View> m_view;
 };

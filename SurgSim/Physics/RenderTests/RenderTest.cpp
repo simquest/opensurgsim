@@ -26,8 +26,7 @@ void RenderTests::SetUp()
 	graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
 
 	runtime->addManager(graphicsManager);
-	scene = std::make_shared<SurgSim::Framework::Scene>();
-	runtime->setScene(scene);
+	scene = runtime->getScene();
 
 	viewElement = std::make_shared<SurgSim::Graphics::OsgViewElement>("Physics Render Scene");
 	scene->addSceneElement(viewElement);

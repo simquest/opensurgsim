@@ -51,7 +51,7 @@ using SurgSim::DataStructures::DataGroupBuilder;
 class MockComponent : public SurgSim::Framework::Component
 {
 public:
-	MockComponent() : Component("MockComponent") {}
+	explicit MockComponent(const std::string& name = "MockComponent") : Component(name) {}
 	virtual ~MockComponent() {}
 
 protected:
@@ -103,17 +103,6 @@ public:
 	std::shared_ptr<InputManager> inputManager;
 };
 
-std::shared_ptr<OutputComponent> createOutputComponent(const std::string& name, const std::string& deviceName)
-{
-	DataGroupBuilder builder;
-	builder.addString("data");
-	DataGroup data = builder.createData();
-	data.strings().set("data", "data");
-
-	return std::make_shared<OutputComponent>(name,deviceName,data);
-}
-
-
 TEST_F(InputManagerTest, DeviceAddRemove)
 {
 
@@ -130,10 +119,15 @@ TEST_F(InputManagerTest, DeviceAddRemove)
 
 TEST_F(InputManagerTest, InputAddRemove)
 {
-	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
-	std::shared_ptr<InputComponent> listener2 = std::make_shared<InputComponent>("Component2","TestDevice1");
-	std::shared_ptr<InputComponent> listener3 = std::make_shared<InputComponent>("Component3","TestDevice2");
-	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component4","NonExistantDevice");
+	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1");
+	std::shared_ptr<InputComponent> listener2 = std::make_shared<InputComponent>("Component2");
+	std::shared_ptr<InputComponent> listener3 = std::make_shared<InputComponent>("Component3");
+	std::shared_ptr<InputComponent> notvalid = std::make_shared<InputComponent>("Component4");
+
+	listener1->setDeviceName("TestDevice1");
+	listener2->setDeviceName("TestDevice1");
+	listener3->setDeviceName("TestDevice2");
+	notvalid->setDeviceName("NonExistantDevice");
 
 	// Add various listeners to the input manager
 	EXPECT_TRUE(testDoAddComponent(listener1));
@@ -158,7 +152,8 @@ TEST_F(InputManagerTest, InputfromDevice)
 	std::string data;
 	SurgSim::DataStructures::DataGroup dataGroup;
 
-	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1","TestDevice1");
+	std::shared_ptr<InputComponent> listener1 = std::make_shared<InputComponent>("Component1");
+	listener1->setDeviceName("TestDevice1");
 
 	testDoAddComponent(listener1);
 
@@ -178,14 +173,16 @@ TEST_F(InputManagerTest, InputfromDevice)
 
 TEST_F(InputManagerTest, OutputAddRemove)
 {
-	std::shared_ptr<OutputComponent> output1 = createOutputComponent("Component1", "TestDevice1");
-	std::shared_ptr<OutputComponent> output2 = createOutputComponent("Component2", "TestDevice1");
-	std::shared_ptr<OutputComponent> output3 = createOutputComponent("Component3", "TestDevice2");
-	std::shared_ptr<OutputComponent> invalid = createOutputComponent("Component4", "InvalidDevice");
-
+	std::shared_ptr<OutputComponent> output1 = std::make_shared<OutputComponent>("Component1");
+	std::shared_ptr<OutputComponent> output2 = std::make_shared<OutputComponent>("Component2");
+	std::shared_ptr<OutputComponent> output3 = std::make_shared<OutputComponent>("Component3");
+	std::shared_ptr<OutputComponent> invalid = std::make_shared<OutputComponent>("Component4");
+	output1->setDeviceName("TestDevice1");
+	output2->setDeviceName("TestDevice1");
+	output3->setDeviceName("TestDevice2");
+	invalid->setDeviceName("InvalidDevice");
 	EXPECT_TRUE(testDoAddComponent(output1));
-	EXPECT_FALSE(testDoAddComponent(output2));
-
+	EXPECT_FALSE(testDoAddComponent(output2)); // same device already attached to an OutputComponent
 	EXPECT_FALSE(testDoAddComponent(output2));
 	EXPECT_TRUE(testDoAddComponent(output3));
 	EXPECT_FALSE(testDoAddComponent(invalid));
@@ -195,11 +192,16 @@ TEST_F(InputManagerTest, OutputAddRemove)
 
 TEST_F(InputManagerTest, OutputPush)
 {
-	std::shared_ptr<OutputComponent> output = createOutputComponent("Component1", "TestDevice1");
+	std::shared_ptr<OutputComponent> output = std::make_shared<OutputComponent>("Component1");
+	output->setDeviceName("TestDevice1");
 	EXPECT_TRUE(testDoAddComponent(output));
-	output->getOutputData().strings().set("data","outputdata");
+	DataGroupBuilder builder;
+	builder.addString("data");
+	DataGroup data = builder.createData();
+	data.strings().set("data", "outputdata");
+	output->setData(data);
 	EXPECT_TRUE(testDevice1->pullOutput());
-	EXPECT_EQ("outputdata",testDevice1->lastPulledData);
+	EXPECT_EQ("outputdata", testDevice1->lastPulledData);
 }
 
 TEST_F(InputManagerTest, TypeTest)

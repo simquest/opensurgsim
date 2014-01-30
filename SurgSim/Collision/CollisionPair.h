@@ -18,15 +18,15 @@
 
 #include <memory>
 #include <list>
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
-#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/Location.h"
+#include "SurgSim/Math/Vector.h"
 
 namespace SurgSim
 {
 namespace Collision
 {
+
+class Representation;
 
 /// Contact data structure used when two representations touch each other
 /// The convention is that if body 1 is moved along the normal vector by

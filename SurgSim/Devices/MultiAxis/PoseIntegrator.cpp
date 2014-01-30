@@ -21,8 +21,8 @@ namespace SurgSim
 namespace Device
 {
 
-PoseIntegrator::PoseIntegrator(const std::string& name) :
-	CommonDevice(name),
+PoseIntegrator::PoseIntegrator(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
+	CommonDevice(name, inputData),
 	m_poseResult(PoseType::Identity())
 {
 }
@@ -52,13 +52,13 @@ bool PoseIntegrator::isInitialized() const
 
 void PoseIntegrator::initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	// The object was created with no initial input data, but now we can set the initial (and current) input data.
-	setInputData(inputData);
+	getInitialInputData() = inputData;
+	getInputData() = inputData;
 }
 
 void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData)
 {
-	setInputData(inputData);
+	getInputData() = inputData;
 	SurgSim::Math::RigidTransform3d pose;
 	if (inputData.poses().get("pose", &pose))
 	{

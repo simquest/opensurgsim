@@ -238,7 +238,9 @@ struct NovintScaffold::DeviceData
 		torqueScale(Vector3d::Constant(1.0)),
 		positionValue(positionBuffer),
 		transformValue(transformBuffer),
-		forceValue(forceBuffer)
+		forceValue(forceBuffer),
+		positionScale(device->getPositionScale()),
+		orientationScale(device->getOrientationScale())
 	{
 		positionValue.setZero();   // also clears positionBuffer
 		transformValue.setIdentity();   // also sets transformBuffer
@@ -311,6 +313,13 @@ struct NovintScaffold::DeviceData
 
 	/// The force value to be written to the device, permanently connected to forceBuffer.
 	Eigen::Map<Vector3d> forceValue;
+
+	/// Scale factor for the position axes.
+	double positionScale;
+	/// Scale factor for the orientation axes.
+	double orientationScale;
+	/// The mutex that protects the externally modifiable parameters.
+	boost::mutex parametersMutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -590,9 +599,8 @@ bool NovintScaffold::finalizeDeviceState(DeviceData* info)
 bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
-	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	// TODO(bert): this code should cache the access indices.
 	// TODO(bert): this needs to be split up into more methods.  It is WAAAAY too big.
@@ -646,10 +654,11 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
 		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
-		// The zero values are NOT the home orientation.  Shoot me now.
-		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;  // 0 for 7DoF Falcon
-		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;   // +/-75deg
-		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch; // +/-50deg
+		// The zero values are NOT the home orientation.
+		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
+		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
+		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
+		info->jointAngles *= info->orientationScale;
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
 		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
@@ -824,8 +833,9 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	{
 		RigidTransform3d pose;
 		pose.linear() = info->transformValue.block<3,3>(0,0);
-		pose.translation() = info->positionValue;
+		pose.translation() = info->positionValue * info->positionScale;
 
+		SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 		inputData.poses().set("pose", pose);
 		inputData.booleans().set("button1", info->buttonStates[0]);
 		inputData.booleans().set("button2", info->buttonStates[1]);
@@ -1097,6 +1107,31 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	builder.addBoolean("isOrientationHomed");
 	return builder.createData();
 }
+
+void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->positionScale = scale;
+	}
+}
+
+void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->orientationScale = scale;
+	}
+}
+
 
 std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 {

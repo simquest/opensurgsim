@@ -20,6 +20,7 @@
 #include <string>
 
 #include "SurgSim/Input/CommonDevice.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 
 namespace SurgSim
 {
@@ -107,6 +108,7 @@ private:
 	}
 
 
+	friend SurgSim::Device::MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName);
 	friend class RawMultiAxisScaffold;
 
 	std::shared_ptr<RawMultiAxisScaffold> m_scaffold;

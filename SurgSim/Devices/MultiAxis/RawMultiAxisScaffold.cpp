@@ -347,7 +347,6 @@ static int findDominantAxis(const std::array<int, 6>& axes)
 bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
@@ -428,6 +427,7 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 	pose.translation() = position;
 
 	// TODO(bert): this code should cache the access indices.
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set("pose", pose);
 	inputData.booleans().set("button1", info->buttonStates[0]);
 	inputData.booleans().set("button2", info->buttonStates[1]);

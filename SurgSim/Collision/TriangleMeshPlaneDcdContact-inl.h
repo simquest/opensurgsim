@@ -16,6 +16,8 @@
 #ifndef SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_INL_H
 #define SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_INL_H
 
+#include "SurgSim/Math/MeshShape.h"
+
 namespace SurgSim
 {
 namespace Collision

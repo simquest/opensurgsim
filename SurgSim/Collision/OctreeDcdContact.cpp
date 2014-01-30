@@ -13,14 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_OCTREEDCDCONTACT_INL_H
-#define SURGSIM_COLLISION_OCTREEDCDCONTACT_INL_H
+#include "SurgSim/Collision/OctreeDcdContact.h"
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/OctreeShape.h"
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -30,8 +28,7 @@ namespace SurgSim
 namespace Collision
 {
 
-template <class Data>
-OctreeDcdContact<Data>::OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator) :
+OctreeDcdContact::OctreeDcdContact(std::shared_ptr<ContactCalculation> calculator) :
 	m_calculator(calculator)
 {
 	SURGSIM_ASSERT(m_calculator->getShapeTypes().first == SurgSim::Math::SHAPE_TYPE_BOX) <<
@@ -40,24 +37,21 @@ OctreeDcdContact<Data>::OctreeDcdContact(std::shared_ptr<ContactCalculation> cal
 	m_shapeTypes.first = SurgSim::Math::SHAPE_TYPE_OCTREE;
 }
 
-template <class Data>
-std::pair<int, int> OctreeDcdContact<Data>::getShapeTypes()
+std::pair<int, int> OctreeDcdContact::getShapeTypes()
 {
 	return m_shapeTypes;
 }
 
-template < class Data>
-void OctreeDcdContact<Data>::doCalculateContact(std::shared_ptr<CollisionPair> pair)
+void OctreeDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	typedef SurgSim::Math::OctreeShape<Data> OctreeShapeType;
+	typedef SurgSim::Math::OctreeShape OctreeShapeType;
 	std::shared_ptr<OctreeShapeType> octree = std::static_pointer_cast<OctreeShapeType>(pair->getFirst()->getShape());
-	calculateContactWithNode(octree->getRootNode(), pair, std::make_shared<SurgSim::Math::OctreePath>());
+	calculateContactWithNode(octree->getRootNode(), pair, std::make_shared<SurgSim::DataStructures::OctreePath>());
 }
 
-template <class Data>
-void OctreeDcdContact<Data>::calculateContactWithNode(
-	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node, std::shared_ptr<CollisionPair> pair,
-	std::shared_ptr<SurgSim::Math::OctreePath> nodePath)
+void OctreeDcdContact::calculateContactWithNode(
+	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> node, std::shared_ptr<CollisionPair> pair,
+	std::shared_ptr<SurgSim::DataStructures::OctreePath> nodePath)
 {
 	if (! node->isActive())
 	{
@@ -89,7 +83,7 @@ void OctreeDcdContact<Data>::calculateContactWithNode(
 		else
 		{
 			const std::list<std::shared_ptr<Contact>>& newContacts = localPair->getContacts();
-			for(auto contact = newContacts.cbegin(); contact != newContacts.cend(); ++contact)
+			for (auto contact = newContacts.cbegin(); contact != newContacts.cend(); ++contact)
 			{
 				(*contact)->penetrationPoints.first.octreeNodePath.setValue(*nodePath);
 				pair->addContact(*contact);
@@ -101,4 +95,3 @@ void OctreeDcdContact<Data>::calculateContactWithNode(
 };
 };
 
-#endif

@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_MLCPPHYSICSPROBLEM_H
 
 #include "SurgSim/Math/MlcpProblem.h"
+#include <Eigen/SparseCore>
 
 namespace SurgSim
 {
@@ -43,6 +44,17 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// The matrix \f$\mathbf{C\;H^T}\f$, which is a matrix of size \f$n\times c\f$ that is used to convert the
 	/// vector of \f$c\f$ constraint forces to the \f$n\f$ displacements of each degree of freedom of the system.
 	Matrix CHt;
+
+	/// Applies a new constraint to a specific Representation
+	/// \param newSubH New constraint to be added to H
+	/// \param subC Compliance matrix associated with the Representation
+	/// \param indexSubC Index of the Representation's compliance matrix
+	/// \param indexNewSubH Index of the new constraint within H
+	void updateConstraint(
+		const Eigen::SparseVector<double> &newSubH,
+		const Eigen::MatrixXd &subC,
+		size_t indexSubC,
+		size_t indexNewSubH);
 };
 
 };  // namespace Physics

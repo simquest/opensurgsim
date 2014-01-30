@@ -19,6 +19,8 @@
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Valid.h"
+
 using SurgSim::Math::Vector;
 using SurgSim::Math::DiagonalMatrix;
 using SurgSim::Math::Matrix;
@@ -106,7 +108,6 @@ void MassSpringRepresentation::setRayleighDampingMass(double massCoef)
 	m_rayleighDamping.massCoefficient = massCoef;
 }
 
-
 RepresentationType MassSpringRepresentation::getType() const
 {
 	return REPRESENTATION_TYPE_MASSSPRING;
@@ -153,15 +154,29 @@ void MassSpringRepresentation::afterUpdate(double dt)
 		return;
 	}
 
+	if ( !isValidState(*m_currentState))
+	{
+		deactivateAndReset();
+		return;
+	}
+
 	// Back up the current state into the final state
 	*m_finalState = *m_currentState;
 }
 
-void MassSpringRepresentation::applyDofCorrection(double dt, const Eigen::VectorBlock<Vector>& block)
+void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlock<Vector>& deltaVelocity)
 {
-	if (! isActive())
+	if ( !isActive())
 	{
 		return;
+	}
+
+	m_currentState->getPositions() += deltaVelocity * dt;
+	m_currentState->getVelocities() += deltaVelocity;
+
+	if ( !isValidState(*m_currentState))
+	{
+		deactivateAndReset();
 	}
 }
 
@@ -477,6 +492,24 @@ void MassSpringRepresentation::transformState(std::shared_ptr<DeformableRepresen
 	transformVectorByBlockOf3(transform, &state->getPositions());
 	transformVectorByBlockOf3(transform, &state->getVelocities(), true);
 	transformVectorByBlockOf3(transform, &state->getAccelerations(), true);
+}
+
+bool MassSpringRepresentation::isValidState(const DeformableRepresentationState &state) const
+{
+	return SurgSim::Math::isValid(state.getPositions())
+		&& SurgSim::Math::isValid(state.getVelocities());
+}
+
+void MassSpringRepresentation::deactivateAndReset(void)
+{
+	SURGSIM_LOG(SurgSim::Framework::Logger::getDefaultLogger(), DEBUG)
+		<< getName() << " deactivated and reset:" << std::endl
+		<< "position=(" << m_currentState->getPositions() << ")" << std::endl
+		<< "velocity=(" << m_currentState->getVelocities() << ")" << std::endl
+		<< "acceleration=(" << m_currentState->getAccelerations() << ")" << std::endl;
+
+	resetState();
+	setIsActive(false);
 }
 
 } // namespace Physics

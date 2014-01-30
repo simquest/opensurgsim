@@ -183,7 +183,15 @@ private:
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
 
+	/// Sets the position scale for this device.
+	/// \param device A pointer to the device.
+	/// \param scale The multiplicative factor to apply to the position.
+	void setPositionScale(const NovintCommonDevice* device, double scale);
 
+	/// Sets the orientation scale for this device.
+	/// \param device A pointer to the device.
+	/// \param scale The multiplicative factor to apply to the rotation angles.
+	void setOrientationScale(const NovintCommonDevice* device, double scale);
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;

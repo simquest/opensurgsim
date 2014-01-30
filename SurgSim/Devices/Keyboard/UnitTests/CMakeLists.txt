@@ -25,7 +25,7 @@ set(UNIT_TEST_SOURCES
 )
 
 set(LIBS KeyboardDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
+	gmock gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
 
 surgsim_add_unit_tests(KeyboardDeviceTest)
 

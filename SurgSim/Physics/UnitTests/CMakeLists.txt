@@ -29,8 +29,10 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	Fem3DRepresentationTests.cpp
+	FemElement3DCubeTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
+	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FemRepresentationTests.cpp
 	FixedRepresentationContactTests.cpp
@@ -38,6 +40,8 @@ set(UNIT_TEST_SOURCES
 	FixedRepresentationTest.cpp
 	FreeMotionTests.cpp
 	LinearSpringTest.cpp
+	MassSpringRepresentationContactTest.cpp
+	MassSpringRepresentationLocalizationTest.cpp
 	MassSpringRepresentationTests.cpp
 	MassTest.cpp
 	PhysicsManagerTests.cpp
@@ -64,8 +68,10 @@ include_directories(
 )
 
 set(LIBS
+	SurgSimBlocks
 	SurgSimPhysics
 	SurgSimMath
+	gmock
 	gtest
 	yaml-cpp
 )

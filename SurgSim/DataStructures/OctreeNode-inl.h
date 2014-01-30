@@ -22,6 +22,13 @@ namespace SurgSim
 namespace DataStructures
 {
 
+template<class Data>
+OctreeNode<Data>::OctreeNode() :
+	m_isActive(false),
+	m_hasChildren(false)
+{
+}
+
 
 template<class Data>
 OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::AxisAlignedBoundingBox& boundingBox) :
@@ -29,6 +36,51 @@ OctreeNode<Data>::OctreeNode(const typename OctreeNode<Data>::AxisAlignedBoundin
 	m_isActive(false),
 	m_hasChildren(false)
 {
+}
+
+template<class Data>
+SurgSim::DataStructures::OctreeNode<Data>::OctreeNode(const OctreeNode& other)
+{
+	m_boundingBox = other.m_boundingBox;
+	m_hasChildren = other.m_hasChildren;
+	m_isActive = other.m_isActive;
+
+	// Also copy the data since they are the same type
+	data = other.data;
+
+	for(size_t i = 0; i < other.m_children.size(); i++)
+	{
+	   if (other.getChild(i) == nullptr)
+	   {
+		   m_children[i] = nullptr;
+	   }
+	   else
+	   {
+		   m_children[i] = std::make_shared<OctreeNode<Data>>(*other.m_children[i]);
+	   }
+	}
+}
+
+template <class Data>
+template <class T>
+SurgSim::DataStructures::OctreeNode<Data>::OctreeNode(const OctreeNode<T>& other)
+{
+	m_boundingBox = other.getBoundingBox();
+	m_hasChildren = other.hasChildren();
+	m_isActive = other.isActive();
+
+	for(size_t i = 0; i < m_children.size(); i++)
+	{
+		auto child = other.getChild(i);
+		if (child == nullptr)
+		{
+			m_children[i] = nullptr;
+		}
+		else
+		{
+			m_children[i] = std::make_shared<OctreeNode<Data>>(*child);
+		}
+	}
 }
 
 template<class Data>
@@ -136,6 +188,19 @@ template<class Data>
 const std::shared_ptr<OctreeNode<Data> > OctreeNode<Data>::getChild(size_t index) const
 {
 	return m_children[index];
+}
+
+template<class Data>
+std::shared_ptr<OctreeNode<Data>> OctreeNode<Data>::getNode(const OctreePath& path)
+{
+	std::shared_ptr<OctreeNode<Data>> node = this->shared_from_this();
+	for (auto index = path.cbegin(); index != path.cend(); ++index)
+	{
+		node = node->getChild(*index);
+		SURGSIM_ASSERT(node != nullptr)
+			<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
+	}
+	return node;
 }
 
 };  // namespace DataStructures
