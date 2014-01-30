@@ -139,7 +139,9 @@ macro(surgsim_copy_to_target_directory_for_release TARGET)
 endmacro()
 
 # Build the unit test executable.
-# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS and LIBS for this unit test.
+# Uses UNIT_TEST_SOURCES, UNIT_TEST_HEADERS, LIBS, UNIT_TEST_SHARED_LIBS,
+# UNIT_TEST_SHARED_RELEASE_LIBS and UNIT_TEST_SHARED_DEBUG_LIBS.
+#
 macro(surgsim_add_unit_tests TESTNAME)
 	add_executable(${TESTNAME} ${UNIT_TEST_SOURCES} ${UNIT_TEST_HEADERS})
 	target_link_libraries(${TESTNAME} SurgSimTesting ${LIBS})
