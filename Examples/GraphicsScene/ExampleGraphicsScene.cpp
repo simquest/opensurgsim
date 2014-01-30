@@ -282,7 +282,7 @@ void addSpheres(std::shared_ptr<SurgSim::Framework::Scene> scene)
 
 }
 
-std::shared_ptr<SurgSim::Framework::Scene> createScene(std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager)
+void createScene(std::shared_ptr<SurgSim::Framework::Runtime> runtime)
 {
 	auto scene = runtime->getScene();
 	auto box = std::make_shared<SimpleBox>("Plane");
@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(graphicsManager);
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
-	runtime->setScene(createScene(graphicsManager));
+	createScene(runtime);
 	runtime->execute();
 
 	return 0;
