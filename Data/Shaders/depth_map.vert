@@ -13,23 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Representation.h"
+/// \file depth.vert
+/// Passthrough shader, transform the vertex into camera ModelView space
 
-SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
+void main(void) 
 {
-	SURGSIM_ADD_RW_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, pose, getPose, setPose);
-}
-
-SurgSim::Framework::Representation::~Representation()
-{
-}
-
-bool SurgSim::Framework::Representation::doInitialize()
-{
-	return true;
-}
-
-bool SurgSim::Framework::Representation::doWakeUp()
-{
-	return true;
-}
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+} 
+ 

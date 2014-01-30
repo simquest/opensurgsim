@@ -567,6 +567,26 @@ TYPED_TEST(Matrix33Tests, ToAngleAxis)
 	EXPECT_NEAR(-angle, computeAngle(matrix), 1e-6) << "angle wasn't properly computed by computeAngle().";
 }
 
+TYPED_TEST(Matrix44Tests, MakeLookAt)
+{
+	typedef typename TestFixture::Matrix44 Matrix;
+	typedef typename TestFixture::Scalar T;
+
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
+	typedef Eigen::Matrix<T, 4, 1> Vector4;
+
+	Vector3 origin(0.0, 0.0, 0.0);
+	Vector3 eye(10.0, 10.0, 10.0);
+	Vector3 up(0.0, 1.0, 0.0);
+
+	Vector4 point4(10.0, 10.0, 10.0, 1.0);
+	Vector4 origin4(0.0, 0.0, 0.0, 1.0);
+
+	Matrix matrix = SurgSim::Math::makeViewMatrix(eye, origin, up);
+
+	EXPECT_TRUE(origin4.isApprox(matrix*point4)) << matrix * point4;
+}
+
 // ==================== ARITHMETIC ====================
 
 /// Negation (unary minus).

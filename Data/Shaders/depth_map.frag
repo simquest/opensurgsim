@@ -13,23 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Representation.h"
+/// \file depth.frag
+/// Encode the z-depth of the fragment into rgba values, see
+/// http://www.ozone3d.net/blogs/lab/20080604/glsl-float-to-rgba8-encoder/
 
-SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
+vec4 encodeDepth(float depth)
 {
-	SURGSIM_ADD_RW_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, pose, getPose, setPose);
+	vec4 encoded = vec4(1.0, 256.0, 256.0*256.0, 256.0*256.0*256.0) * depth;
+	encoded = fract(encoded);
+	encoded -= encoded.yzww * vec4(1.0/256.0, 1.0/256.0, 1.0/256.0, 0.0);
+	return encoded;
 }
 
-SurgSim::Framework::Representation::~Representation()
-{
-}
-
-bool SurgSim::Framework::Representation::doInitialize()
-{
-	return true;
-}
-
-bool SurgSim::Framework::Representation::doWakeUp()
-{
-	return true;
+void main(void) 
+{	
+	gl_FragColor.rgba = encodeDepth(gl_FragCoord.z);
 }
