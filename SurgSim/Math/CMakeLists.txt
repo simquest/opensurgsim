@@ -84,7 +84,7 @@ surgsim_add_library(
 set(LIBS 
 	SurgSimFramework 
 	SurgSimTesting
-	yaml-cpp
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(SurgSimMath ${LIBS}

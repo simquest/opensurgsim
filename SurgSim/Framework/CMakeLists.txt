@@ -89,7 +89,7 @@ surgsim_add_library(
 
 SET(LIBS
 	${Boost_LIBRARIES}
-	yaml-cpp
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(SurgSimFramework ${LIBS})

@@ -50,7 +50,7 @@ find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB o
 find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
-find_package(yaml-cpp 0.5.1.1 EXACT REQUIRED)
+find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
 
 set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
 find_package(GoogleMock)

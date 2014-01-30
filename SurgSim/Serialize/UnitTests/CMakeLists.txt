@@ -36,7 +36,7 @@ set(LIBS
 	SurgSimGraphics
 	gmock
 	gtest
-	yaml-cpp
+	${YAML_CPP_LIBRARIES}}
 	${Boost_LIBRARIES}
 )
 
