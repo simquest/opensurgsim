@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 project(OpenSurgSim)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -76,14 +76,12 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 	list(APPEND Boost_LIBRARIES rt)
 endif()
 
-if(SURGSIM_DEVICES_BUILD)
-	find_package(NovintHdalSdk)
-	find_package(OpenHaptics)
-	find_package(SixenseSdk)
-	find_package(WDK)
-endif(SURGSIM_DEVICES_BUILD)
+include(CTest)
+configure_file(CTestCustom.cmake.in CTestCustom.cmake)
 
-if(SURGSIM_TESTS_BUILD)
+option(BUILD_RENDER_TESTING "Build the render testing tree." OFF)
+
+if(BUILD_TESTING)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
 	add_subdirectory(ThirdParty/gmock)
 endif()
@@ -93,22 +91,19 @@ if(SURGSIM_YAMLCPP_BUILD)
 	add_subdirectory(ThirdParty/yaml-cpp)
 endif()
 
-
-SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
-
 add_subdirectory(SurgSim)
-add_subdirectory(Documentation)
 
-if(SURGSIM_EXAMPLES_BUILD)
+option(BUILD_EXAMPLES "Build the examples." ON)
+
+if(BUILD_EXAMPLES)
 	add_subdirectory(Examples)
 endif()
 
-export(TARGETS ${EXPORT_TARGETS}
-	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
+option(BUILD_DOCUMENTATION "Build the documentation using Doxygen." OFF)
 
-#Register where to find this build-tree. On windows this in the registry, on
-#unix this goes in ~/.cmake/packages/OpenSurgSim
-export(PACKAGE OpenSurgSim)
+if(BUILD_DOCUMENTATION)
+  add_subdirectory(Documentation)
+endif()
 
 #OpenSurgSimConfig For the Build Tree
 set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
@@ -129,9 +124,5 @@ install(FILES
 	"${PROJECT_BINARY_DIR}/OpenSurgSimConfigVersion.cmake"
 	DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
 install(EXPORT ${PROJECT_NAME}Targets DESTINATION ${INSTALL_CMAKE_DIR} COMPONENT dev)
-
-#install(EXPORT ${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
-
-#option(SURGSIM_EXAMPLES_BUILD "Build the example files" ON)
 
 surgsim_cpplint_this_tree(cpplint)

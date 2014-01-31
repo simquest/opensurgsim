@@ -91,7 +91,7 @@ target_link_libraries(SurgSimMath ${LIBS}
 )
 
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

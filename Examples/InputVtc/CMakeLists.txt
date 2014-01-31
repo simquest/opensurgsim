@@ -45,10 +45,6 @@ set(LIBS
 	yaml-cpp
 )
 
-if(WDK_FOUND)
-	list(APPEND LIBS ${WDK_LIBRARIES})
-endif()
-
 target_link_libraries(ExampleInputVtc ${LIBS}
 )
 

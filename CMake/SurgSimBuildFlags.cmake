@@ -24,7 +24,9 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
 endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 
 # We always want to use defines from <math.h>.
-add_definitions( -D_USE_MATH_DEFINES )
+if(MSVC)
+	add_definitions( -D_USE_MATH_DEFINES )
+endif()
 
 # Define our own debug symbol
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOSS_DEBUG")
@@ -84,16 +86,14 @@ if(MSVC)
 	endif(MSVC_VERSION EQUAL 1700)
 endif(MSVC)
 
-# Settings for clang/LLVM.  May currently be OS X-specific...
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-	set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-	set(CMAKE_CXX_FLAGS                "-Wall -std=c++11")
-	set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
-	set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+# Settings for LLVM Clang.
+if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+	if(APPLE)
+		set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+		set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+	endif()
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -stdlib=libc++")
 endif()
 
 # Windows-specific settings

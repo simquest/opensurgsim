@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2012-2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(BUILD_DEVICE_MULTIAXIS)
-	add_subdirectory(AddSphereFromInput)
-	add_subdirectory(InputVtc)
-endif(BUILD_DEVICE_MULTIAXIS)
+set(CTEST_PROJECT_NAME "OpenSurgSim")
+set(CTEST_NIGHTLY_START_TIME "00:00:00 EST")
 
-add_subdirectory(BouncingBalls)
-add_subdirectory(Fem3D)
-add_subdirectory(GraphicsScene)
-add_subdirectory(MassSprings)
+set(CTEST_DROP_METHOD "http")
+set(CTEST_DROP_SITE "open.cdash.org")
+set(CTEST_DROP_LOCATION "/submit.php?project=OpenSurgSim")
+set(CTEST_DROP_SITE_CDASH TRUE)
