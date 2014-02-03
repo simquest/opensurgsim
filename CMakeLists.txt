@@ -39,6 +39,7 @@ include_directories(${SURGSIM_TOP_INCLUDE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 set(SURGSIM_TOOLS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Tools")
 set(SURGSIM_THIRD_PARTY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty")
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SURGSIM_THIRD_PARTY_DIR})
 
 include(SurgSimBuildFlags)
 include(SurgSimUtilities)
@@ -49,6 +50,7 @@ find_package(OpenSceneGraph 3.2 COMPONENTS osg osgViewer osgText osgUtil osgDB o
 find_package(OpenThreads)
 find_package(OpenGL)
 find_package(Eigen3 3.2.0 REQUIRED)
+find_package(yaml-cpp 0.5.1.2 EXACT REQUIRED)
 
 if(WIN32)
 	set(GLUT_ROOT_PATH "$ENV{GLUT_ROOT_PATH}")
@@ -83,12 +85,8 @@ option(BUILD_RENDER_TESTING "Build the render testing tree." OFF)
 
 if(BUILD_TESTING)
 	set(gtest_force_shared_crt ON CACHE BOOL "Use shared CRT for Google Test [OpenSurgSim forces this to true!]" FORCE)
-	add_subdirectory(ThirdParty/gmock)
-endif()
-
-if(SURGSIM_YAMLCPP_BUILD)
-	set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "Disable testing and parse tools" FORCE)
-	add_subdirectory(ThirdParty/yaml-cpp)
+	find_package(GoogleMock)
+	add_subdirectory(${GOOGLEMOCK_DIR} GoogleMock)
 endif()
 
 add_subdirectory(SurgSim)

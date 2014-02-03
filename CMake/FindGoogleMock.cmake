@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2013, SimQuest Solutions Inc.
+# Copyright 2014, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,24 +14,21 @@
 # limitations under the License.
 
 
-include_directories(
-	${gtest_SOURCE_DIR}/include
-)
+# - Try to find the Google Mock Source directory
+#
+# Once done this will define
+#  GOOGLEMOCK_FOUND
+#  GOOGLEMOCK_DIR
+#
 
-set(UNIT_TEST_SOURCES
-	MultiAxisDeviceTest.cpp
-	RawMultiAxisDeviceTest.cpp
-	RawMultiAxisScaffoldTest.cpp
-)
+if(NOT GOOGLEMOCK_DIR)
+	find_path(GOOGLEMOCK_DIR
+		NAMES src/gmock.cc
+		PATHS "$ENV{GOOGLEMOCK_DIR}" "/usr/src/gmock/"
+	)
+endif(NOT GOOGLEMOCK_DIR)
 
-set(LIBS 
-	MultiAxisDevice
-)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(GoogleMock DEFAULT_MSG GOOGLEMOCK_DIR)
 
-if(WDK_FOUND)
-	list(APPEND LIBS ${WDK_LIBRARIES})
-endif()
-
-surgsim_add_unit_tests(MultiAxisDeviceTest)
-
-set_target_properties(MultiAxisDeviceTest PROPERTIES FOLDER "Devices")
+mark_as_advanced(GOOGLEMOCK_DIR)

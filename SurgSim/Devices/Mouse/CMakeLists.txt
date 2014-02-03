@@ -35,7 +35,8 @@ set(Mouse_DEVICE_HEADERS
 
 surgsim_add_library(
 	MouseDevice
-	"${Mouse_DEVICE_SOURCES}" "${Mouse_DEVICE_HEADERS}"
+	"${Mouse_DEVICE_SOURCES}"
+	"${Mouse_DEVICE_HEADERS}"
 	SurgSim/Devices/Mouse
 )
 
@@ -56,5 +57,4 @@ if(BUILD_TESTING)
 	add_subdirectory(VisualTests)
 endif()
 
-# Put MouseDevice into folder "Devices"
 set_target_properties(MouseDevice PROPERTIES FOLDER "Devices")

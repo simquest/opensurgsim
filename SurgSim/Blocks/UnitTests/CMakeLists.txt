@@ -13,13 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
+include_directories (
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${EIGEN3_INCLUDE_DIR}
-	${OSG_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
-	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -41,11 +36,10 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimBlocks
-	gmock
-	gtest
+
 )
 
 surgsim_add_unit_tests(SurgSimBlocksTest)
 
-# Put SurgSimBlocksTest into folder "Blocks"
+
 set_target_properties(SurgSimBlocksTest PROPERTIES FOLDER "Blocks") 

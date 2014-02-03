@@ -13,13 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
+include_directories (
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${gmock_SOURCE_DIR}/include
-	${EIGEN3_INCLUDE_DIR}
-	${OSG_INCLUDE_DIR}
-	${OPENTHREADS_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -76,14 +71,11 @@ file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Testing/OsgSceneryRepresentationTests DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Data)
 
 
-set(LIBS
+set(LIBS 
 	SurgSimGraphics
 	SurgSimTesting
-	gmock
-	gtest
 )
 
 surgsim_add_unit_tests(SurgSimGraphicsTest)
 
-# Put SurgSimGraphicsTest into folder "Graphics"
 set_target_properties(SurgSimGraphicsTest PROPERTIES FOLDER "Graphics")

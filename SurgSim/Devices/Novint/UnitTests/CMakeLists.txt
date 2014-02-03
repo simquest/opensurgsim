@@ -16,7 +16,6 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -25,13 +24,15 @@ set(UNIT_TEST_SOURCES
 	NovintScaffoldTest.cpp
 )
 
-set(UNIT_TEST_HEADERS
+set(LIBS
+	NovintDevice
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${NOVINT_HDAL_SDK_LIBRARIES}
 )
-
-set(LIBS NovintDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gmock gtest ${Boost_LIBRARIES} ${NOVINT_HDAL_SDK_LIBRARIES})
 
 surgsim_add_unit_tests(NovintDeviceTest)
 
-# Put NovintDeviceTest into folder "Devices"
 set_target_properties(NovintDeviceTest PROPERTIES FOLDER "Devices")

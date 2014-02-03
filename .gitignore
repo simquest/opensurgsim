@@ -83,9 +83,9 @@ My Amplifier XE Results*
 ##### specific files/paths to ignore #####
 
 ## build directories
-/build
-/build-*
-/build_*
+build/
+build-*/
+build_*/
 
 ## binaries
 # (only if building directly inside the tree)
