@@ -16,7 +16,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 )
 

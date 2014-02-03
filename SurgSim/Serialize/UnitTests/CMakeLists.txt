@@ -16,7 +16,7 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
