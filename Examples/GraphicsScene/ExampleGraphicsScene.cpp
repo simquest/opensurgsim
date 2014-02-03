@@ -62,7 +62,7 @@ using SurgSim::Graphics::OsgTexture2d;
 #include <osg/Matrix>
 #include <osg/Camera>
 
-#include "Surgsim/Blocks/PoseInterpolator.h"
+#include "SurgSim/Blocks/PoseInterpolator.h"
 
 /// \file
 /// This example creates a simple graphics scene and use the RenderPass object to show
@@ -272,7 +272,7 @@ void addSpheres(std::shared_ptr<SurgSim::Framework::Scene> scene)
 	{
 		for (int j=0; j<3; ++j)
 		{
-			auto sphere = std::make_shared<SimpleSphere>("Sphere_"+std::to_string(i*3+j));
+			auto sphere = std::make_shared<SimpleSphere>("Sphere_"+std::to_string(static_cast<long long>(i*3+j)));
 			sphere->setRadius(radius);
 			Vector3d position = origin + Vector3d(spacing.array() * Vector3d(i,1.0,j).array());
 			sphere->setPose(makeRigidTransform(Quaterniond::Identity(), position));
