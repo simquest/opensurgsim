@@ -509,8 +509,8 @@ void testNodeOrderingAllPermutations(const DeformableRepresentationState& m_rest
 					  size_t id0, size_t id1, size_t id2, size_t id3, size_t id4, size_t id5, size_t id6, size_t id7,
 					  bool expectThrow)
 {
-	std::array<unsigned int, 4> face1 = {{id0, id1, id2, id3}};
-	std::array<unsigned int, 4> face2 = {{id4, id5, id6, id7}};
+	std::array<size_t, 4> face1 = {{id0, id1, id2, id3}};
+	std::array<size_t, 4> face2 = {{id4, id5, id6, id7}};
 
 	// Shuffle the faces to create all the possible permutations
 	for (size_t face1Permutation = 0; face1Permutation < 4; face1Permutation++)
