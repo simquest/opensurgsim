@@ -14,7 +14,12 @@
 // limitations under the License.
 
 #include <memory>
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 
 #include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Framework/Assert.h"
