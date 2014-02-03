@@ -150,6 +150,7 @@ TEST(OsgCameraTests, PoseTest)
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getViewMatrix().isApprox(initialPose.matrix().inverse()));
+		EXPECT_TRUE(camera->getViewMatrix().inverse().isApprox(camera->getInverseViewMatrix()));
 		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(initialPose.matrix().inverse()));
 	}
 
@@ -161,6 +162,7 @@ TEST(OsgCameraTests, PoseTest)
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(currentPose));
 		EXPECT_TRUE(camera->getViewMatrix().isApprox(currentPose.matrix().inverse()));
+		EXPECT_TRUE(camera->getViewMatrix().inverse().isApprox(camera->getInverseViewMatrix()));
 		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(currentPose.matrix().inverse()));
 	}
 
@@ -172,6 +174,7 @@ TEST(OsgCameraTests, PoseTest)
 		EXPECT_TRUE(camera->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getPose().isApprox(initialPose));
 		EXPECT_TRUE(camera->getViewMatrix().isApprox(initialPose.matrix().inverse()));
+		EXPECT_TRUE(camera->getViewMatrix().inverse().isApprox(camera->getInverseViewMatrix()));
 		EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(initialPose.matrix().inverse()));
 	}
 }
@@ -191,6 +194,7 @@ TEST(OsgCameraTests, MatricesTest)
 	/// Set the matrices and make sure they were set correctly
 	camera->setViewMatrix(viewMatrix);
 	EXPECT_TRUE(camera->getViewMatrix().isApprox(viewMatrix));
+	EXPECT_TRUE(camera->getViewMatrix().inverse().isApprox(camera->getInverseViewMatrix()));
 	EXPECT_TRUE(camera->getPose().matrix().isApprox(viewMatrix.inverse()));
 	EXPECT_TRUE(fromOsg(osgCamera->getOsgCamera()->getViewMatrix()).isApprox(viewMatrix));
 

@@ -27,6 +27,7 @@ set(SURGSIM_COLLISION_SOURCES
 	CollisionPair.cpp
 	ContactCalculation.cpp
 	DefaultContactCalculation.cpp
+	OctreeDcdContact.cpp
 	Representation.cpp
 	RigidCollisionRepresentation.cpp
 	ShapeCollisionRepresentation.cpp
@@ -47,7 +48,6 @@ set(SURGSIM_COLLISION_HEADERS
 	DefaultContactCalculation.h
 	Location.h
 	OctreeDcdContact.h
-	OctreeDcdContact-inl.h
 	Representation.h
 	RigidCollisionRepresentation.h
 	ShapeCollisionRepresentation.h
@@ -74,7 +74,7 @@ SET(LIBS
 target_link_libraries(SurgSimCollision ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

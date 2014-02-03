@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <boost/thread/mutex.hpp>
 
 #include "SurgSim/Framework/SceneElement.h"
 
@@ -33,32 +34,23 @@ class Runtime;
 class Scene : public std::enable_shared_from_this<Scene>
 {
 public:
-	Scene()
-	{
-	}
 
-	~Scene()
-	{
-	}
+	/// Constructor.
+	/// \param runtime The runtime to be used.
+	explicit Scene(std::weak_ptr<Runtime> runtime);
 
-	/// Adds a scene element to member data 'm_element'.
+	/// Destructor
+	~Scene();
+
+	/// Adds a scene element to the Scene, the SceneElement will have its initialize() function called.
 	/// \param	element	The element.
 	void addSceneElement(std::shared_ptr<SceneElement> element);
-
-	/// Gets scene element with a given name
-	/// \param	name	The name.
-	/// \return	The scene element or nullptr if the element cannot be found.
-	std::shared_ptr<SceneElement> getSceneElement(const std::string& name) const;
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
 	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
 
-	/// Sets the runtime.
-	/// \param	runtime	The runtime for this scene.
-	void setRuntime(std::shared_ptr<Runtime> runtime);
-
-	/// Gets the runtime
+	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();
 
@@ -71,6 +63,9 @@ private:
 	std::weak_ptr<Runtime> m_runtime;
 
 	std::multimap<std::string, std::shared_ptr<SceneElement>> m_elements;
+
+	// Used in a const function, need to declare mutable
+	mutable boost::mutex m_sceneElementsMutex;
 };
 
 }; // namespace Framework

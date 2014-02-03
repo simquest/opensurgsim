@@ -48,7 +48,7 @@ set(LIBS
 target_link_libraries(SurgSimSerialize ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

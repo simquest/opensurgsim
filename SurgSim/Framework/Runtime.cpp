@@ -34,7 +34,6 @@ namespace Framework
 
 Runtime::Runtime() :
 	m_isRunning(false),
-	m_scene(new Scene()),
 	m_isPaused(false)
 {
 	initSearchPaths("");
@@ -42,7 +41,7 @@ Runtime::Runtime() :
 
 Runtime::Runtime(const std::string& configFilePath) :
 	m_isRunning(false),
-	m_scene(new Scene())
+	m_scene(nullptr)
 {
 	initSearchPaths(configFilePath);
 }
@@ -64,44 +63,26 @@ void Runtime::addManager(std::shared_ptr<ComponentManager> manager)
 	}
 }
 
-void Runtime::setScene(std::shared_ptr<Scene> scene)
+std::shared_ptr<Scene> Runtime::getScene()
 {
-	// Workers need to be initialized to do this
-	SURGSIM_ASSERT(scene != nullptr) << "Cannot set the scene to nullptr.";
-	SURGSIM_ASSERT(! m_isRunning) << "Cannot set the scene in the runtime once it is running.";
-	m_scene = scene;
-	scene->setRuntime(getSharedPtr());
-}
-
-std::shared_ptr<Scene> Runtime::getScene() const
-{
+	if (m_scene == nullptr)
+	{
+		m_scene = std::make_shared<Scene>(getSharedPtr());
+	}
 	return m_scene;
 }
 
+
 bool Runtime::addSceneElement(std::shared_ptr<SceneElement> sceneElement)
 {
-	// If we add a single scene element before the simulation is running
-	// it will be handled by the scene initialization
-	if (! m_isRunning)
-	{
-		return false;
-	}
-
-	bool result = false;
-
-	result = sceneElement->initialize();
-
-	if (result)
+	// Before the runtime has been started, adding components will be handled via
+	// preprocessSceneElements()
+	if (m_isRunning)
 	{
 		addComponents(sceneElement->getComponents());
 	}
 
-	if (result)
-	{
-		result = sceneElement->wakeUp();
-	}
-
-	return result;
+	return m_isRunning;
 }
 
 void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework::Component>>& components)
@@ -112,7 +93,15 @@ void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework
 	{
 		for (auto manager = std::begin(m_managers); manager != std::end(m_managers); ++manager)
 		{
-			(*manager)->enqueueAddComponent(*componentsIt);
+			if ((*componentsIt)->isInitialized())
+			{
+				(*manager)->enqueueAddComponent(*componentsIt);
+			}
+			else
+			{
+				SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) <<
+					"Trying to add an uninitialized component.";
+			}
 		}
 	}
 }
@@ -145,11 +134,13 @@ bool Runtime::start(bool paused)
 {
 	auto logger = Logger::getDefaultLogger();
 
-	// Add all the scene Elements so they can be initialized during the startup process
+	// Gather all the Components from the currently known SceneElements to add them
+	// collectively.
 	// HS-2013-dec-12 This construct cause a bug as this also gathers the elements to be processed
 	// any sceneelements added after this call and before initialization is finished will get lost
 	preprocessSceneElements();
 
+	m_isRunning = true;
 	m_isPaused = paused;
 
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
@@ -174,16 +165,6 @@ bool Runtime::start(bool paused)
 	// Wait for all the components to wakeUp()
 	m_barrier->wait(true);
 	SURGSIM_LOG_INFO(logger) << "All component wakeUp() succeeded";
-
-	// Now wake up all the scene elements
-	auto sceneElements = m_scene->getSceneElements();
-	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
-	{
-		it->second->wakeUp();
-	}
-	m_barrier->wait(true);
-
-	m_isRunning = true;
 	SURGSIM_LOG_INFO(logger) << "Scene is initialized. All managers updating";
 
 	return true;
@@ -250,10 +231,12 @@ void Runtime::preprocessSceneElements()
 {
 	// Collect all the Components
 	std::vector<std::shared_ptr<Component>> newComponents;
-	auto sceneElements = m_scene->getSceneElements();
+	auto sceneElements = getScene()->getSceneElements();
 	for (auto it = sceneElements.begin(); it != sceneElements.end(); ++it)
 	{
-		if (it->second->initialize())
+		// Initialize should have been called by now, if the SceneElement is not initialized this means
+		// initialization failed
+		if (it->second->isInitialized())
 		{
 			std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
 			newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());
@@ -298,17 +281,23 @@ std::shared_ptr<const ApplicationData> Runtime::getApplicationData() const
 
 void Runtime::addComponent(const std::shared_ptr<Component>& component)
 {
-	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	if (m_isRunning)
 	{
-		(*it)->enqueueAddComponent(component);
+		for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+		{
+			(*it)->enqueueAddComponent(component);
+		}
 	}
 }
 
 void Runtime::removeComponent(const std::shared_ptr<Component>& component)
 {
-	for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+	if (m_isRunning)
 	{
-		(*it)->enqueueRemoveComponent(component);
+		for (auto it = std::begin(m_managers); it != std::end(m_managers); ++it)
+		{
+			(*it)->enqueueRemoveComponent(component);
+		}
 	}
 }
 

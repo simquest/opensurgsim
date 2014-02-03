@@ -33,13 +33,6 @@ set(LIBS
 	${NOVINT_HDAL_SDK_LIBRARIES}
 )
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_NOVINT
-	"Run the Novint tests as part of unit tests.  (Requires hardware and Novint HDAL SDK!)"
-	OFF)
-surgsim_add_unit_tests(NovintDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_NOVINT})
+surgsim_add_unit_tests(NovintDeviceTest)
 
 set_target_properties(NovintDeviceTest PROPERTIES FOLDER "Devices")

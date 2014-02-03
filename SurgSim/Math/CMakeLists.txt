@@ -24,10 +24,12 @@ set(SURGSIM_MATH_SOURCES
 	CapsuleShape.cpp
 	CylinderShape.cpp
 	DoubleSidedPlaneShape.cpp
+	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
 	MathConvert.cpp
 	Matrix.cpp
 	MlcpGaussSeidelSolver.cpp
+	OctreeShape.cpp
 	PlaneShape.cpp
 	Shape.cpp
 	SphereShape.cpp
@@ -38,6 +40,7 @@ set(SURGSIM_MATH_HEADERS
 	CapsuleShape.h
 	CylinderShape.h
 	DoubleSidedPlaneShape.h
+	GaussLegendreQuadrature.h
 	Geometry.h
 	LinearSolveAndInverse.h
 	MathConvert.h
@@ -91,7 +94,7 @@ target_link_libraries(SurgSimMath ${LIBS}
 )
 
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

@@ -54,6 +54,15 @@ public:
 	/// \param	name	Name of the camera
 	explicit Camera(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, viewMatrix, getViewMatrix, setViewMatrix);
+		SURGSIM_ADD_RW_PROPERTY(Camera, SurgSim::Math::Matrix44d, projectionMatrix,
+			getProjectionMatrix, setProjectionMatrix);
+
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatViewMatrix, getViewMatrix);
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatProjectionMatrix, getProjectionMatrix);
+		SURGSIM_ADD_RO_PROPERTY(Camera, SurgSim::Math::Matrix44f, floatInverseViewMatrix, getInverseViewMatrix);
+
+
 	}
 
 	/// Sets the group of representations that will be seen by this camera.
@@ -82,6 +91,10 @@ public:
 	/// \return	View matrix
 	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const = 0;
 
+	/// Gets the inverse view matrix of the camera
+	/// \return	Inverse view matrix
+	virtual const SurgSim::Math::Matrix44d& getInverseViewMatrix() const = 0;
+
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
 	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix) = 0;
@@ -92,7 +105,6 @@ public:
 
 	/// Sets RenderTarget for the current camera, enables the camera to render to off-screen textures.
 	/// \param	renderTarget	The render target.
-	/// \return true if sucessful
 	virtual bool setRenderTarget(std::shared_ptr<RenderTarget> renderTarget) = 0;
 
 	/// Gets RenderTarget that is currently being used by the camera.

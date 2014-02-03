@@ -281,8 +281,35 @@ TEST_F(Fem3DRepresentationTests, AfterUpdateTest)
 	EXPECT_TRUE(*m_fem->getCurrentState() == *m_fem->getFinalState());
 }
 
-TEST_F(Fem3DRepresentationTests, ApplyDofCorrectionTest)
+TEST_F(Fem3DRepresentationTests, ApplyCorrectionTest)
 {
+	double epsilon = 1e-12;
+	m_fem->setInitialState(m_initialState);
+
+	SurgSim::Math::Vector dv;
+	dv.resize(m_fem->getNumDof());
+	for (unsigned int i = 0; i < m_fem->getNumDof(); i++)
+	{
+		dv(i) = static_cast<double>(i);
+	}
+
+	ASSERT_LE(3u, m_fem->getNumDof());
+	ASSERT_NEAR(2.0, dv(2), epsilon);
+
+	Eigen::VectorXd previousX = m_fem->getCurrentState()->getPositions();
+	Eigen::VectorXd previousV = m_fem->getCurrentState()->getVelocities();
+
+	m_fem->applyCorrection(m_dt, dv.segment(0, m_fem->getNumDof()));
+	Eigen::VectorXd nextX = m_fem->getCurrentState()->getPositions();
+	Eigen::VectorXd nextV = m_fem->getCurrentState()->getVelocities();
+
+	EXPECT_TRUE(nextX.isApprox(previousX + dv * m_dt, epsilon));
+	EXPECT_TRUE(nextV.isApprox(previousV + dv, epsilon));
+
+	dv(0) = std::numeric_limits<double>::infinity();
+	EXPECT_TRUE(m_fem->isActive());
+	m_fem->applyCorrection(m_dt, dv.segment(0, m_fem->getNumDof()));
+	EXPECT_FALSE(m_fem->isActive());
 }
 
 namespace

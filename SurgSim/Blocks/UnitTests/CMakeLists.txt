@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	MassSpring2DRepresentationTests.cpp
 	MassSpring3DRepresentationTests.cpp
 	MassSpringNDRepresentationUtilsTests.cpp
+	PoseInterpolatorTests.cpp
 	SpringTestUtils.cpp
 	TransferDeformableStateToVerticesBehaviorTests.cpp
 	TransferPoseBehaviorTests.cpp

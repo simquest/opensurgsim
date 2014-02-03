@@ -22,6 +22,9 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 
+#include "SurgSim/Input/CommonDevice.h"
+
+
 #include <gtest/gtest.h>
 
 using SurgSim::Framework::Runtime;
@@ -37,7 +40,8 @@ namespace Graphics
 class MockViewElement : public ViewElement
 {
 public:
-	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View"))
+	explicit MockViewElement(const std::string& name) : ViewElement(name, std::make_shared<MockView>(name + " View")),
+		m_isInitialized(false)
 	{
 	}
 
@@ -61,6 +65,37 @@ public:
 		return;
 	}
 
+private:
+	/// Initialize the view element
+	/// \post m_isInitialized is set to true
+	virtual bool doInitialize()
+	{
+		if (ViewElement::doInitialize())
+		{
+			m_isInitialized = true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/// Whether the view has been initialized
+	bool m_isInitialized;
+};
+
+/// View class for testing adding a non-MockView
+class NotMockView : public View
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the view
+	explicit NotMockView(const std::string& name) : View(name)
+	{
+		return;
+	}
+
 };
 
 TEST(ViewElementTests, InitTest)
@@ -77,8 +112,7 @@ TEST(ViewElementTests, StartUpTest)
 	EXPECT_EQ(0, manager->getNumUpdates());
 	EXPECT_EQ(0.0, manager->getSumDt());
 
-	auto scene = std::make_shared<Scene>();
-	runtime->setScene(scene);
+	std::shared_ptr<Scene> scene = runtime->getScene();
 
 	/// Add a graphics component to the scene
 	auto viewElement = std::make_shared<MockViewElement>("Testing MockViewElement");
@@ -92,7 +126,8 @@ TEST(ViewElementTests, StartUpTest)
 
 	/// Check that the view element was initialized and awoken
 	EXPECT_TRUE(viewElement->isInitialized());
-	EXPECT_TRUE(viewElement->isAwake());
+	EXPECT_TRUE(viewElement->getView()->isInitialized());
+	EXPECT_TRUE(viewElement->getView()->isAwake());
 }
 
 TEST(ViewElementTests, ViewTest)

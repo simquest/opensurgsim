@@ -27,10 +27,10 @@ set(KEYBOARD_DEVICE_SOURCES
 )
 
 set(KEYBOARD_DEVICE_HEADERS
-	KeyCode.h
 	KeyboardDevice.h
 	KeyboardHandler.h
 	KeyboardScaffold.h
+	KeyCode.h
 )
 
 surgsim_add_library(
@@ -39,7 +39,7 @@ surgsim_add_library(
 	SurgSim/Devices/Keyboard
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 	add_subdirectory(VisualTests)
