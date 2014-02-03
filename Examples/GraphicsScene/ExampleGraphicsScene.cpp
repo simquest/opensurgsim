@@ -62,7 +62,7 @@ using SurgSim::Graphics::OsgTexture2d;
 #include <osg/Matrix>
 #include <osg/Camera>
 
-#include "Surgsim/Blocks/PoseInterpolator.h"
+#include "SurgSim/Blocks/PoseInterpolator.h"
 
 /// \file
 /// This example creates a simple graphics scene and use the RenderPass object to show
