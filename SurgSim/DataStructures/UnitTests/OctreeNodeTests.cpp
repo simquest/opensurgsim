@@ -85,7 +85,7 @@ TEST(OctreeNodeTests, Subdivide)
 		EXPECT_FALSE((*child)->hasChildren());
 	}
 
-	std::array<AxisAlignedBoundingBox, 8> expectedBoxes = {
+	std::array<AxisAlignedBoundingBox, 8> expectedBoxes = {{
 		AxisAlignedBoundingBox(Vector3d(0.0, 0.0, 0.0), Vector3d(8.0, 8.0, 8.0)),
 		AxisAlignedBoundingBox(Vector3d(0.0, 0.0, 8.0), Vector3d(8.0, 8.0, 16.0)),
 		AxisAlignedBoundingBox(Vector3d(0.0, 8.0, 0.0), Vector3d(8.0, 16.0, 8.0)),
@@ -93,7 +93,7 @@ TEST(OctreeNodeTests, Subdivide)
 		AxisAlignedBoundingBox(Vector3d(8.0, 0.0, 0.0), Vector3d(16.0, 8.0, 8.0)),
 		AxisAlignedBoundingBox(Vector3d(8.0, 0.0, 8.0), Vector3d(16.0, 8.0, 16.0)),
 		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 0.0), Vector3d(16.0, 16.0, 8.0)),
-		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 8.0), Vector3d(16.0, 16.0, 16.0))};
+		AxisAlignedBoundingBox(Vector3d(8.0, 8.0, 8.0), Vector3d(16.0, 16.0, 16.0))}};
 	for (auto expectedBox=expectedBoxes.cbegin(); expectedBox!=expectedBoxes.cend(); ++expectedBox)
 	{
 		bool boxFound = false;
