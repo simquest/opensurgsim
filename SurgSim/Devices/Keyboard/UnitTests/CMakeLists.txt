@@ -16,7 +16,6 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -24,10 +23,15 @@ set(UNIT_TEST_SOURCES
 	KeyboardScaffoldTest.cpp
 )
 
-set(LIBS KeyboardDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gmock gtest ${Boost_LIBRARIES} ${OPENSCENEGRAPH_LIBRARIES})
+set(LIBS
+	KeyboardDevice
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${OPENSCENEGRAPH_LIBRARIES}
+)
 
 surgsim_add_unit_tests(KeyboardDeviceTest)
 
-# Put PhantomDeviceTest into folder "Devices"
 set_target_properties(KeyboardDeviceTest PROPERTIES FOLDER "Devices")

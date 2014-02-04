@@ -74,8 +74,13 @@ void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torqu
 
 void RigidRepresentation::beforeUpdate(double dt)
 {
-	if (! isActive() || ! m_currentParameters.isValid())
+	bool isParametersValid = m_currentParameters.isValid();
+	SURGSIM_LOG_IF(!isParametersValid,
+		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated in beforeUpdate because m_currentParameters is not valid." << std::endl;
+	if (!isActive() || !isParametersValid)
 	{
+		setIsActive(false);
 		return;
 	}
 
@@ -88,8 +93,13 @@ void RigidRepresentation::update(double dt)
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	if (! isActive() || ! m_currentParameters.isValid())
+	bool isParametersValid = m_currentParameters.isValid();
+	SURGSIM_LOG_IF(!isParametersValid,
+		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated in update because m_currentParameters is not valid." << std::endl;
+	if (!isActive() || !isParametersValid)
 	{
+		setIsActive(false);
 		return;
 	}
 
@@ -165,13 +175,15 @@ void RigidRepresentation::update(double dt)
 	condition &= qNorm != 0.0;
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
-		" deactivated and reset because:" << std::endl << "m_G=(" <<
-		G[0] << "," << G[1] << "," << G[2] << ") " <<
-		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
-		"|q| before normalization=" << qNorm << " " <<
+	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated and reset because:" << std::endl <<
+		"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
+		"dG=(" << dG[0] << "," << dG[1] << "," << dG[2] << "), " <<
+		"w=(" << w[0] << "," << w[1] << "," << w[2] << "), " <<
+		"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
+		"|q| before normalization=" << qNorm << ", and " <<
 		"|q| after normalization="<< q.norm() << std::endl;
-	if (! condition)
+	if (!condition)
 	{
 		resetState();
 		setIsActive(false);
@@ -183,8 +195,13 @@ void RigidRepresentation::update(double dt)
 
 void RigidRepresentation::afterUpdate(double dt)
 {
-	if (! isActive() || ! m_currentParameters.isValid())
+	bool isParametersValid = m_currentParameters.isValid();
+	SURGSIM_LOG_IF(!isParametersValid,
+		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated in afterUpdate because m_currentParameters is not valid." << std::endl;
+	if (!isActive() || !isParametersValid)
 	{
+		setIsActive(false);
 		return;
 	}
 
@@ -203,8 +220,13 @@ void RigidRepresentation::applyCorrection(
 	using SurgSim::Math::Matrix33d;
 	using SurgSim::Math::Quaterniond;
 
-	if (! isActive() || ! m_currentParameters.isValid())
+	bool isParametersValid = m_currentParameters.isValid();
+	SURGSIM_LOG_IF(!isParametersValid,
+		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated in applyCorrection because m_currentParameters is not valid." << std::endl;
+	if (!isActive() || !isParametersValid)
 	{
+		setIsActive(false);
 		return;
 	}
 
@@ -242,12 +264,12 @@ void RigidRepresentation::applyCorrection(
 	bool condition = SurgSim::Math::isValid(G);
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
-	SURGSIM_LOG_IF(! condition, SurgSim::Framework::Logger::getDefaultLogger(), DEBUG) << getName() <<
-		" deactivated and reset because:" << std::endl << "m_G=(" <<
-		G[0] << "," << G[1] << "," << G[2] << ") " <<
-		"m_q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << ") " <<
-		"|q| after normalization="<< q.norm() << std::endl;
-	if (! condition)
+	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated and reset in applyCorrection because:" << std::endl <<
+		"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
+		"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
+		"and |q| after normalization=" << q.norm() << std::endl;
+	if (!condition)
 	{
 		resetState();
 		setIsActive(false);
@@ -273,8 +295,13 @@ const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
 
 void RigidRepresentation::computeComplianceMatrix(double dt)
 {
-	if (! isActive() || ! m_currentParameters.isValid())
+	bool isParametersValid = m_currentParameters.isValid();
+	SURGSIM_LOG_IF(!isParametersValid,
+		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+		" deactivated in computComplianceMatrix because m_currentParameters is not valid." << std::endl;
+	if (!isActive() || !isParametersValid)
 	{
+		setIsActive(false);
 		return;
 	}
 
@@ -295,8 +322,11 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
 {
-	if (! isActive() || ! m_currentParameters.isValid())
+	if (!isActive() || !m_currentParameters.isValid())
 	{
+		// do not setIsActive(false) due to invalid parameters because RigidRepresentationBase::setInitialParameters may
+		// not have been called before RigidRepresentationBase::setInitialState (which calls this function), in which
+		// case the parameters are invalid but we should not deactivate the representation.
 		return;
 	}
 

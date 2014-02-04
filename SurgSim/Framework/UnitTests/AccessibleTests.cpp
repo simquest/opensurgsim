@@ -21,6 +21,8 @@
 
 #include "SurgSim/Math/Matrix.h"
 
+#include "SurgSim/Framework/Convert.h"
+
 #include <memory>
 
 class TestClass : public SurgSim::Framework::Accessible
@@ -44,10 +46,8 @@ public:
 
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, privateProperty, getPrivateProperty, setPrivateProperty);
 
-		// For testing readable and writeable
-		setGetter("readable", std::bind(&TestClass::getNormal, this));
-		setSetter("writeable", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
-			std::placeholders::_1)));
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestClass, float, serializableProperty,
+			getSerializableProperty, setSerializableProperty);
 	}
 
 	int normal;
@@ -55,6 +55,8 @@ public:
 	int readOnly;
 
 	std::shared_ptr<int> sharedPtr;
+
+	float serializableProperty;
 
 	int getNormal() { return normal; }
 	void setNormal(int val) { normal = val; }
@@ -70,9 +72,11 @@ public:
 	double getPrivateProperty() const { return privateProperty; }
 	void setPrivateProperty(double val) { privateProperty = val; }
 
+	float getSerializableProperty() const { return serializableProperty; }
+	void setSerializableProperty(float val) { serializableProperty = val; }
+
 private:
 	double privateProperty;
-
 };
 
 namespace SurgSim
@@ -80,7 +84,7 @@ namespace SurgSim
 namespace Framework
 {
 
-TEST(AccessibleTests, GetterTest)
+TEST(AccessibleTest, GetterTest)
 {
 	TestClass t;
 	t.normal = 5;
@@ -90,45 +94,45 @@ TEST(AccessibleTests, GetterTest)
 	EXPECT_ANY_THROW(t.getValue("xxx"));
 }
 
-TEST(AccessibleTests, SetterTest)
+TEST(AccessibleTest, SetterTest)
 {
 	TestClass t;
 	t.normal = 0;
 
 	t.setValue("normal", 4);
 	EXPECT_EQ(4, t.getNormal());
-	EXPECT_ANY_THROW(t.setValue("xxxx", 666.66));
+	EXPECT_ANY_THROW(t.setValue("xxxx",666.66));
 }
 
-TEST(AccessibleTests, TransferTest)
+TEST(AccessibleTest, TransferTest)
 {
-	TestClass a, b;
+	TestClass a,b;
 	a.normal = 100;
 	b.normal = 0;
 
-	b.setValue("normal", a.getValue("normal"));
+	b.setValue("normal",a.getValue("normal"));
 
 	EXPECT_EQ(a.normal, b.normal);
 }
 
-TEST(AccessibleTests, ReadWriteMacroTest)
+TEST(AccessibleTest, ReadWriteMacroTest)
 {
 	TestClass a;
 	a.readWrite = 100.0;
 
 	EXPECT_EQ(a.readWrite, boost::any_cast<double>(a.getValue("readWrite")));
-	a.setValue("readWrite", 50.0);
+	a.setValue("readWrite",50.0);
 	EXPECT_EQ(50.0, a.readWrite);
 }
 
-TEST(AccessibleTests, ReadOnlyMacroTest)
+TEST(AccessibleTest, ReadOnlyMacroTest)
 {
 	TestClass a;
 	a.readOnly = 200;
 
 	EXPECT_EQ(a.readOnly, boost::any_cast<int>(a.getValue("readOnly")));
 
-	EXPECT_ANY_THROW(a.setValue("readOnly", 100));
+	EXPECT_ANY_THROW(a.setValue("readOnly",100));
 }
 
 TEST(AccessibleTest, TemplateFunction)
@@ -152,23 +156,6 @@ TEST(AccessibleTest, TemplateFunction)
 	EXPECT_FALSE(a.getValue("normal", noValue));
 }
 
-TEST(AccessibleTest, CheckReadWriteable)
-{
-	TestClass a;
-
-	EXPECT_TRUE(a.isReadable("normal"));
-	EXPECT_TRUE(a.isWriteable("normal"));
-
-	EXPECT_TRUE(a.isReadable("readable"));
-	EXPECT_FALSE(a.isWriteable("readable"));
-
-	EXPECT_FALSE(a.isReadable("writeable"));
-	EXPECT_TRUE(a.isWriteable("writeable"));
-
-	EXPECT_FALSE(a.isWriteable("xxx"));
-	EXPECT_FALSE(a.isReadable("xxx"));
-}
-
 TEST(AccessibleTest, Privates)
 {
 	TestClass a;
@@ -186,11 +173,11 @@ TEST(AccessibleTest, SharedPointer)
 	std::shared_ptr<int> y;
 
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("sharedPtr"));
-	EXPECT_EQ(4, *y);
+	EXPECT_EQ(4,*y);
 
-	a.setValue("sharedPtr", x);
+	a.setValue("sharedPtr",x);
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("sharedPtr"));
-	EXPECT_EQ(5, *y);
+	EXPECT_EQ(5,*y);
 }
 
 TEST(AccessibleTest, ConvertDoubleToFloat)
@@ -222,6 +209,65 @@ TEST(AccessibleTest, ConvertDoubleToFloat)
 	EXPECT_TRUE(target.isApprox(sourceFloat));
 }
 
+TEST(AccessibleTests, Serialize)
+{
+	TestClass a;
+	a.serializableProperty = 100;
+
+	YAML::Node node = a.encode();
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(100, node["serializableProperty"].as<int>());
+
+	node["serializableProperty"] = 50;
+	EXPECT_NO_THROW(a.decode(node));
+	EXPECT_EQ(50, a.serializableProperty);
+}
+
+class MultipleValuesClass : public Accessible
+{
+public:
+	MultipleValuesClass() : a("invalid"), b("invalid"), c("invalid")
+	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultipleValuesClass, std::string, a, getA, setA);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultipleValuesClass, std::string, b, getB, setB);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(MultipleValuesClass, std::string, c, getC, setC);
+	}
+
+	std::string a;
+	std::string getA() const { return a; }
+	void setA(std::string val) { a = val; }
+
+	std::string b;
+	std::string getB() const { return b; }
+	void setB(std::string val) { b = val; }
+
+	std::string c;
+	std::string getC() const { return c; }
+	void setC(std::string val) { c = val; }
+};
+
+TEST(AccessibleTests, MultipleValues)
+{
+	YAML::Node newValues;
+	newValues["xxx"] = "invalid";
+	newValues["a"] = "a";
+	newValues["b"] = "b";
+
+	MultipleValuesClass test;
+	test.decode(newValues);
+
+	EXPECT_EQ(test.a, "a");
+	EXPECT_EQ(test.b, "b");
+	EXPECT_EQ(test.c, "invalid");
+
+	YAML::Node encodedValues = test.encode();
+
+	EXPECT_EQ("a", encodedValues["a"].as<std::string>());
+	EXPECT_EQ("b", encodedValues["b"].as<std::string>());
+	EXPECT_EQ("invalid", encodedValues["c"].as<std::string>());
+
+}
 
 }; // namespace Framework
 }; // namespace SurgSim

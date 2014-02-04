@@ -134,12 +134,15 @@ public:
 	/// Determines whether a given natural coordinate is valid
 	/// \param naturalCoordinate Coordinate to check
 	/// \return True if valid
+	/// \note The naturalCoordinate is a vector of 8 scalar values being the barycentric coordinate that are used
+	/// \note to represent localization. The range of naturalCoordinate is in [0, 1]. Otherwise, the corresponding
+	/// \note Cartesian point is outside the cube.
 	virtual bool isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const override;
 
-	/// Computes a given natural coordinate in cartesian coordinates
+	/// Computes a given natural coordinate in Cartesian coordinates
 	/// \param state The state at which to transform coordinates
 	/// \param naturalCoordinate The coordinates to transform
-	/// \return The resultant cartesian coordinates
+	/// \return The resultant Cartesian coordinates
 	virtual SurgSim::Math::Vector computeCartesianCoordinate(
 		const DeformableRepresentationState& state,
 		const SurgSim::Math::Vector& naturalCoordinate) const override;

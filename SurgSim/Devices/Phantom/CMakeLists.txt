@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+find_package(OpenHaptics REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES} ${OPENHAPTICS_LIBRARIES} SurgSimFramework SurgSimInput)
@@ -42,7 +43,7 @@ surgsim_add_library(
 	"${PHANTOM_DEVICE_SOURCES}" "${PHANTOM_DEVICE_HEADERS}"
 	SurgSim/Devices/Phantom
 )
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 

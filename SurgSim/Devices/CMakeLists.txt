@@ -15,25 +15,21 @@
 
 
 add_subdirectory(IdentityPoseDevice)
+add_subdirectory(Keyboard)
+add_subdirectory(Mouse)
 
-if(SURGSIM_DEVICES_BUILD)
-	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-		add_subdirectory(MultiAxis)
-	endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux" OR WDK_FOUND)
-	if(NOVINT_HDAL_SDK_FOUND)
-		add_subdirectory(Novint)
-	endif(NOVINT_HDAL_SDK_FOUND)
-	if(OPENHAPTICS_FOUND)
-		add_subdirectory(Phantom)
-	endif(OPENHAPTICS_FOUND)
-	if(SIXENSE_SDK_FOUND)
-		add_subdirectory(Sixense)
-	endif(SIXENSE_SDK_FOUND)
-	if(OPENSCENEGRAPH_FOUND)
-		add_subdirectory(Keyboard)
-		add_subdirectory(Mouse)
-	endif(OPENSCENEGRAPH_FOUND)
-	if(OPTITRACK_FOUND)
-		add_subdirectory(TrackIR)
-	endif(OPTITRACK_FOUND)
-endif(SURGSIM_DEVICES_BUILD)
+set(DEVICES
+	MultiAxis
+	Novint
+	Phantom
+	Sixense
+)
+
+foreach(DEVICE ${DEVICES})
+	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
+	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
+	if(BUILD_DEVICE_${DEVICE_UPPER_CASE})
+		add_subdirectory(${DEVICE})
+	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
+endforeach(DEVICE)
+

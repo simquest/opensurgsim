@@ -15,14 +15,14 @@
 
 
 include_directories(
-	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}
+	${gtest_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
 	GeometryTests.cpp
 	MakeRigidTransformTests.cpp
+	MathConvertTest.cpp
 	MeshShapeTests.cpp
 	MlcpGaussSeidelSolverTests.cpp
 	OdeEquationTests.cpp
@@ -49,10 +49,10 @@ set(UNIT_TEST_EIGEN_TYPE_SOURCES
 set(UNIT_TEST_EIGEN_TYPE_HEADERS
 )
 
-option(SURGSIM_TESTS_BUILD_EIGEN
+option(BUILD_TESTING_EIGEN
 	"Include basic tests for Eigen math class typedefs, which build very slowly."
 	OFF)
-if(SURGSIM_TESTS_BUILD_EIGEN)
+if(BUILD_TESTING_EIGEN)
 	set(UNIT_TEST_SOURCES ${UNIT_TEST_SOURCES} ${UNIT_TEST_EIGEN_TYPE_SOURCES})
 	set(UNIT_TEST_HEADERS ${UNIT_TEST_HEADERS} ${UNIT_TEST_EIGEN_TYPE_HEADERS})
 
@@ -60,18 +60,15 @@ if(SURGSIM_TESTS_BUILD_EIGEN)
 	if(MSVC AND CMAKE_CL_64)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 	endif(MSVC AND CMAKE_CL_64)
-endif(SURGSIM_TESTS_BUILD_EIGEN)
+endif(BUILD_TESTING_EIGEN)
 
 set(LIBS 
 	SurgSimMath
-	gmock
-	gtest
-	yaml-cpp
+	MlcpTestIO
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimMathTest)
 
-# Put SurgSimMathTest into folder "Math"
 set_target_properties(SurgSimMathTest PROPERTIES FOLDER "Math")
