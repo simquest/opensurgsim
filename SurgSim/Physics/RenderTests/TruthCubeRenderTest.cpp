@@ -115,12 +115,12 @@ struct TruthCubeRenderTests : public RenderTests
 	void runTest(std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> representation)
 	{
 		representation->setPointSize(4.0);
-		RigidTransform3d pose = makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero());
+		RigidTransform3d pose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0));
 		representation->setInitialPose(pose);
 
 		viewElement->addComponent(representation);
 		viewElement->enableManipulator(true);
-		viewElement->setManipulatorParameters(Vector3d(0.0, 140.0, 0.0), Vector3d::Zero());
+		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 2.0), Vector3d(0.0, 0.0, 0.0));
 
 		/// Run the thread
 		runtime->start();
@@ -142,7 +142,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Uncompressed)
 	/// Loading the Truth Cube uncompressed data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData0.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData0[i]));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData0[i]/100));
 	}
 
 	runTest(representation);
@@ -159,7 +159,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Compressed_5)
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData1.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData1[i]));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData1[i]/100));
 	}
 
 	runTest(representation);
@@ -176,7 +176,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Compressed_12_5)
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData2.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData2[i]));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData2[i]/100));
 	}
 
 	runTest(representation);
@@ -193,7 +193,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Compressed_18_25)
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData3.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData3[i]));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData3[i]/100));
 	}
 
 	runTest(representation);
