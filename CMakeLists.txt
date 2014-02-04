@@ -89,6 +89,8 @@ if(BUILD_TESTING)
 	add_subdirectory(${GOOGLEMOCK_DIR} GoogleMock)
 endif()
 
+SET(EXPORT_TARGETS CACHE INTERNAL "export targets")
+
 add_subdirectory(SurgSim)
 
 option(BUILD_EXAMPLES "Build the examples." ON)
@@ -102,6 +104,13 @@ option(BUILD_DOCUMENTATION "Build the documentation using Doxygen." OFF)
 if(BUILD_DOCUMENTATION)
   add_subdirectory(Documentation)
 endif()
+
+export(TARGETS ${EXPORT_TARGETS}
+	FILE "${PROJECT_BINARY_DIR}/OpenSurgSimTargets.cmake")
+
+#Register where to find this build-tree. On windows this in the registry, on
+#unix this goes in ~/.cmake/packages/OpenSurgSim
+export(PACKAGE OpenSurgSim)
 
 #OpenSurgSimConfig For the Build Tree
 set(CONFIG_INCLUDE_DIRS "${SURGSIM_TOP_INCLUDE_DIR}")
