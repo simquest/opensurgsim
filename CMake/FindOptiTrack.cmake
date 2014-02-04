@@ -27,25 +27,24 @@ macro(optitrack_shared_from_link OUTPUT)
 	set(SHARED_LIST)
 	foreach(FILE ${ARGN})
 		if(WIN32)
-			#string(REPLACE "/lib/" "/bin/" SHARED "${FILE}")
 			string(REPLACE ".lib" ".dll" SHARED "${FILE}")
 		else()
-			string(REPLACE "/lib/" "/bin/" SHARED "${FILE}")
-			string(REPLACE ".lib" ".so" SHARED "${FILE}")
-			#set(SHARED "${FILE}")
+			string(REPLACE ".a" ".so" SHARED "${FILE}")
 		endif()
+
 		if(EXISTS "${SHARED}")
 			list(APPEND SHARED_LIST "${SHARED}")
 		else()
 			message(SEND_ERROR "Could not find dynamic library for ${FILE}")
 		endif()
 	endforeach(FILE ${ARGN})
+ 
 	set(${OUTPUT} ${SHARED_LIST}
 		CACHE STRING "DLLs/SOs from the OptiTrack SDK.")
 	mark_as_advanced(${OUTPUT})
 endmacro()
 
-macro(OptiTrack_find_library LIB_NAME)
+macro(optiTrack_find_library LIB_NAME)
 	if(WIN32)
 		find_library(OPTITRACK_LIBRARY_RELEASE
 			NAMES "${LIB_NAME}2010S"
@@ -83,11 +82,13 @@ macro(OptiTrack_find_library LIB_NAME)
 				CACHE STRING "The ${LIB_NAME} library from the OptiTrack SDK.")
 			mark_as_advanced(OPTITRACK_LIBRARY)
 	endif()
+
 	if(OPTITRACK_LIBRARY_RELEASE AND
 			NOT OPTITRACK_SHARED_RELEASE)
 		optitrack_shared_from_link(OPTITRACK_SHARED_RELEASE
 			"${OPTITRACK_LIBRARY_RELEASE}")
 	endif()
+
 	if(OPTITRACK_LIBRARY_DEBUG AND
 			NOT OPTITRACK_SHARED_DEBUG)
 		optitrack_shared_from_link(OPTITRACK_SHARED_DEBUG
@@ -96,9 +97,9 @@ macro(OptiTrack_find_library LIB_NAME)
 endmacro()
 
 if(WIN32)
-	OptiTrack_find_library(cameralibrary)
+	optiTrack_find_library(cameralibrary)
 else()
-	OptiTrack_find_library(liblinuxtrack)
+	optiTrack_find_library(liblinuxtrack)
 endif()
 
 include(FindPackageHandleStandardArgs)

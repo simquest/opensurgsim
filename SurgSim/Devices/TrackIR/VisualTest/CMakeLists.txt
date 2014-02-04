@@ -32,6 +32,7 @@ set(LIBS IdentityPoseDevice
 		 SurgSimFramework 
 		 SurgSimInput 
 		 ${GLUT_LIBRARIES}
+		 ${OPENGL_LIBRARIES}
 		 ${OPTITRACK_LIBRARY})
 
 target_link_libraries(TrackIRVisualTest ${LIBS})

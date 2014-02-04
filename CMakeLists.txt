@@ -78,9 +78,9 @@ endif()
 
 if(SURGSIM_DEVICES_BUILD)
 	find_package(NovintHdalSdk)
-	find_package(SixenseSdk)
 	find_package(OpenHaptics)
 	find_package(OptiTrack)
+	find_package(SixenseSdk)
 	find_package(WDK)
 endif(SURGSIM_DEVICES_BUILD)
 
