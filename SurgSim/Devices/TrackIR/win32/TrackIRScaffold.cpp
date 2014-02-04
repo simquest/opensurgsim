@@ -36,6 +36,7 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -348,7 +349,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		// Otherwise, the pose is considered as invalid.
 		if(info->vectorProcessor->MarkerCount() == 3)
 		{
-			info->vectorProcessor->GetOrientation(yaw, pitch, roll); // Rotations are reported in degrees.
+			info->vectorProcessor->GetOrientation(yaw, pitch, roll); // Rotations are Euler Angles in degrees.
 			info->vectorProcessor->GetPosition(x, y, z); // Positions are reported in millimeters.
 			poseValid = true;
 		}
@@ -357,27 +358,21 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 
 	if (poseValid)
 	{
-		// Assuming left hand coordinate with Y-axis points up.
-		// pitch: rotation around X-axis
-		// yaw: rotation around Y-axis
-		// roll: rotation around Z-axis
+		// Assuming left-handed coordinate with X-axis points to the right, Y-axis points up and Z-axis points outwards.
 		Vector3d position(x / 1000.0, y / 1000.0, z / 1000.0); // Convert millimeter to meter
-		Vector3d rotation(pitch, yaw, roll);
-
-		// Convert to a pose.
-		Matrix33d orientation;
-		double angle = rotation.norm();
-		if (angle < 1e-9)
-		{
-			orientation.setIdentity();
-		}
-		else
-		{
-			orientation = SurgSim::Math::makeRotationMatrix(angle, Vector3d(rotation / angle));
-		}
+		
+		// roll: rotation around X-axis
+		// yaw: rotation around Y-axis
+		// pitch: rotation around Z-axis
+		// NB: angles reported by CameraSDK are Euler Angles in degrees, need to convert them into radians.
+		Matrix33d rotationX = makeRotationMatrix(roll  * M_PI / 180.0, Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationY = makeRotationMatrix(yaw   * M_PI / 180.0, Vector3d(Vector3d::UnitY()));
+		Matrix33d rotationZ = makeRotationMatrix(pitch * M_PI / 180.0, Vector3d(Vector3d::UnitZ()));
+		
+		// NB: the order of rotations is ZYX
+		Matrix33d orientation = rotationZ * rotationY * rotationX;
 
 		RigidTransform3d pose;
-		pose.makeAffine();
 		pose.linear() = orientation;
 		pose.translation() = position;
 
