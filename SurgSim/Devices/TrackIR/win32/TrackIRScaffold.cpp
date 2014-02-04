@@ -50,67 +50,67 @@ struct TrackIRScaffold::DeviceData
 	/// Constructor
 	/// \param device Device to be wrapped
 	explicit DeviceData(TrackIRDevice* device, int cameraID) :
-		m_deviceObject(device),
-		m_thread(),
-		m_vector(CameraLibrary::cModuleVector::Create()),
-		m_vectorProcessor(new CameraLibrary::cModuleVectorProcessing())
+		deviceObject(device),
+		thread(),
+		vector(CameraLibrary::cModuleVector::Create()),
+		vectorProcessor(new CameraLibrary::cModuleVectorProcessing())
 	{
 		CameraLibrary::CameraList list;
 		list.Refresh();
-		m_camera = CameraLibrary::CameraManager::X().GetCamera(list[cameraID].UID());
+		camera = CameraLibrary::CameraManager::X().GetCamera(list[cameraID].UID());
 
-		SURGSIM_ASSERT(m_camera != nullptr) << "Failed to obtain a camera from CameraLibrary.";
-		m_camera->SetVideoType(CameraLibrary::BitPackedPrecisionMode);
+		SURGSIM_ASSERT(nullptr != camera) << "Failed to obtain a camera from CameraLibrary.";
+		camera->SetVideoType(CameraLibrary::BitPackedPrecisionMode);
 
-		m_vectorProcessorSettings = *(m_vectorProcessor->Settings());
-		m_vectorProcessorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
-		m_vectorProcessorSettings.ShowPivotPoint = false;
-		m_vectorProcessorSettings.ShowProcessed  = false;
-		m_vectorProcessorSettings.ScaleTranslationX  = device->defaultPositionScale();
-		m_vectorProcessorSettings.ScaleTranslationY  = device->defaultPositionScale();
-		m_vectorProcessorSettings.ScaleTranslationZ  = device->defaultPositionScale();
-		m_vectorProcessorSettings.ScaleRotationPitch = device->defaultOrientationScale();
-		m_vectorProcessorSettings.ScaleRotationYaw   = device->defaultOrientationScale();
-		m_vectorProcessorSettings.ScaleRotationRoll  = device->defaultOrientationScale();
-		m_vectorProcessor->SetSettings(m_vectorProcessorSettings);
+		CameraLibrary::cVectorProcessingSettings vectorProcessorSettings;
+		vectorProcessorSettings = *(vectorProcessor->Settings());
+		vectorProcessorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
+		vectorProcessorSettings.ShowPivotPoint = false;
+		vectorProcessorSettings.ShowProcessed  = false;
+		vectorProcessorSettings.ScaleTranslationX  = device->defaultPositionScale();
+		vectorProcessorSettings.ScaleTranslationY  = device->defaultPositionScale();
+		vectorProcessorSettings.ScaleTranslationZ  = device->defaultPositionScale();
+		vectorProcessorSettings.ScaleRotationPitch = device->defaultOrientationScale();
+		vectorProcessorSettings.ScaleRotationYaw   = device->defaultOrientationScale();
+		vectorProcessorSettings.ScaleRotationRoll  = device->defaultOrientationScale();
+		vectorProcessor->SetSettings(vectorProcessorSettings);
 
 		//== Plug in focal length in (mm) by converting it from pixels -> mm
-		m_vectorSettings = *(m_vector->Settings());
-		m_vectorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
-		m_vectorSettings.Enabled     = true;
-		m_camera->GetDistortionModel(m_lensDistortion);
-		m_vectorSettings.ImagerFocalLength = m_lensDistortion.HorizontalFocalLength /
-										   static_cast<double>(m_camera->PhysicalPixelWidth()) *
-										   m_camera->ImagerWidth();
+		CameraLibrary::cVectorSettings vectorSettings;
+		vectorSettings = *(vector->Settings());
+		vectorSettings.Arrangement = CameraLibrary::cVectorSettings::VectorClip;
+		vectorSettings.Enabled     = true;
+		camera->GetDistortionModel(lensDistortion);
+		vectorSettings.ImagerFocalLength = lensDistortion.HorizontalFocalLength /
+										   static_cast<double>(camera->PhysicalPixelWidth()) *
+										   camera->ImagerWidth();
 
-		m_vectorSettings.ImagerHeight = m_camera->ImagerHeight();
-		m_vectorSettings.ImagerWidth  = m_camera->ImagerWidth();
-		m_vectorSettings.PrincipalX   = m_camera->PhysicalPixelWidth() / 2.0;
-		m_vectorSettings.PrincipalY   = m_camera->PhysicalPixelHeight() / 2.0;
-		m_vectorSettings.PixelWidth   = m_camera->PhysicalPixelWidth();
-		m_vectorSettings.PixelHeight  = m_camera->PhysicalPixelHeight();
-		m_vector->SetSettings(m_vectorSettings);
+		vectorSettings.ImagerHeight = camera->ImagerHeight();
+		vectorSettings.ImagerWidth  = camera->ImagerWidth();
+		vectorSettings.PrincipalX   = camera->PhysicalPixelWidth() / 2.0;
+		vectorSettings.PrincipalY   = camera->PhysicalPixelHeight() / 2.0;
+		vectorSettings.PixelWidth   = camera->PhysicalPixelWidth();
+		vectorSettings.PixelHeight  = camera->PhysicalPixelHeight();
+		vector->SetSettings(vectorSettings);
 	}
 
 	~DeviceData()
 	{
-		m_camera->Release();
+		camera->Release();
 	}
 
-	Core::DistortionModel m_lensDistortion;
-	CameraLibrary::Camera* m_camera;
-	CameraLibrary::cModuleVector* m_vector;
-	CameraLibrary::cModuleVectorProcessing* m_vectorProcessor;
-	CameraLibrary::cVectorProcessingSettings m_vectorProcessorSettings;
-	CameraLibrary::cVectorSettings m_vectorSettings;
-
+	Core::DistortionModel lensDistortion;
+	CameraLibrary::Camera* camera;
+	CameraLibrary::cModuleVector* vector;
+	CameraLibrary::cModuleVectorProcessing* vectorProcessor;
+	
 	/// The corresponding device object.
-	SurgSim::Device::TrackIRDevice* const m_deviceObject;
+	SurgSim::Device::TrackIRDevice* const deviceObject;
 	/// Processing thread.
-	std::unique_ptr<SurgSim::Device::TrackIRThread> m_thread;
+	std::unique_ptr<SurgSim::Device::TrackIRThread> thread;
 
 	/// The mutex that protects the externally modifiable parameters.
-	boost::mutex m_parametersMutex;
+	boost::mutex parametersMutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -167,7 +167,7 @@ TrackIRScaffold::~TrackIRScaffold()
 			for (auto it = std::begin(m_state->activeDeviceList);  it != std::end(m_state->activeDeviceList);  ++it)
 			{
 				stopCamera((*it).get());
-				if ((*it)->m_thread)
+				if ((*it)->thread)
 				{
 					destroyPerDeviceThread(it->get());
 				}
@@ -210,21 +210,21 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 	{
 		// Make sure the object is unique.
 		auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" which is already registered!";
 
 		// Make sure the name is unique.
 		const std::string name = device->getName();
 		auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-			[&name](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject->getName() == name; });
+			[&name](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == name; });
 		SURGSIM_ASSERT(sameName == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" when the same name is already present!";
 
-		// This assertion overlaps with above two assertions somehow.
-		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already a TrackIR camera exists."
-			<< " TrackIRScaffold only supports one TrackIR camera right now."
-			<< " Behaviors of multiple cameras are undefined.\n";
+		// The handling of multiple cameras could be done in different ways, each with trade-offs. 
+		// Instead of choosing an approach now, we assert on attempting to use more than one camera.
+		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already an active TrackIR camera."
+			<< " TrackIRScaffold only supports one TrackIR camera right now.";
 
 		CameraLibrary::CameraList cameraList;
 		cameraList.Refresh();
@@ -233,8 +233,8 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 			int cameraID = m_state->activeDeviceList.size();
 			std::unique_ptr<DeviceData> info(new DeviceData(device, cameraID));
 			createPerDeviceThread(info.get());
-			SURGSIM_ASSERT(info->m_thread) << "Failed to create a per-device thread for TrackIR device: " <<
-				info->m_deviceObject->getName() << ", with ID number " << cameraID << ".";
+			SURGSIM_ASSERT(info->thread) << "Failed to create a per-device thread for TrackIR device: " <<
+				info->deviceObject->getName() << ", with ID number " << cameraID << ".";
 
 			startCamera(info.get());
 			m_state->activeDeviceList.emplace_back(std::move(info));
@@ -256,12 +256,12 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
 		if (matching != m_state->activeDeviceList.end())
 		{
 			stopCamera((*matching).get());
-			if ((*matching)->m_thread)
+			if ((*matching)->thread)
 			{
 				destroyPerDeviceThread(matching->get());
 			}
@@ -282,14 +282,15 @@ void TrackIRScaffold::setPositionScale(const TrackIRDevice* device, double scale
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
 	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
-		(*matching)->m_vectorProcessorSettings.ScaleTranslationX = scale;
-		(*matching)->m_vectorProcessorSettings.ScaleTranslationY = scale;
-		(*matching)->m_vectorProcessorSettings.ScaleTranslationZ = scale;
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		CameraLibrary::cVectorProcessingSettings* vectorProcessorSettings = (*matching)->vectorProcessor->Settings();
+		vectorProcessorSettings->ScaleTranslationX = scale;
+		vectorProcessorSettings->ScaleTranslationY = scale;
+		vectorProcessorSettings->ScaleTranslationZ = scale;
 	}
 }
 
@@ -297,14 +298,15 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
 	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
-		(*matching)->m_vectorProcessorSettings.ScaleRotationPitch = scale;
-		(*matching)->m_vectorProcessorSettings.ScaleRotationYaw = scale;
-		(*matching)->m_vectorProcessorSettings.ScaleRotationRoll = scale;
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		CameraLibrary::cVectorProcessingSettings* vectorProcessorSettings = (*matching)->vectorProcessor->Settings();
+		vectorProcessorSettings->ScaleRotationPitch = scale;
+		vectorProcessorSettings->ScaleRotationYaw   = scale;
+		vectorProcessorSettings->ScaleRotationRoll  = scale;
 	}
 }
 
@@ -314,46 +316,46 @@ bool TrackIRScaffold::runInputFrame(TrackIRScaffold::DeviceData* info)
 	{
 		return false;
 	}
-	info->m_deviceObject->pushInput();
+	info->deviceObject->pushInput();
 	return true;
 }
 
 bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 {
-	SurgSim::DataStructures::DataGroup& inputData = info->m_deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
-	boost::lock_guard<boost::mutex> lock(info->m_parametersMutex);
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
-	CameraLibrary::Frame *frame = info->m_camera->GetFrame();
+	CameraLibrary::Frame *frame = info->camera->GetFrame();
 	bool poseValid = false;
 	double x, y, z, pitch, yaw, roll;
 	if (frame)
 	{
-		info->m_vector->BeginFrame();
+		info->vector->BeginFrame();
 		for(int i = 0; i < frame->ObjectCount(); ++i)
 		{
 			CameraLibrary::cObject *obj = frame->Object(i);
 			float xValue = obj->X();
 			float yValue = obj->Y();
 
-			Core::Undistort2DPoint(info->m_lensDistortion, xValue, yValue);
-			info->m_vector->PushMarkerData(xValue, yValue, obj->Area(), obj->Width(), obj->Height());
+			Core::Undistort2DPoint(info->lensDistortion, xValue, yValue);
+			info->vector->PushMarkerData(xValue, yValue, obj->Area(), obj->Width(), obj->Height());
 		}
-		info->m_vector->Calculate();
-		info->m_vectorProcessor->PushData(info->m_vector);
+		info->vector->Calculate();
+		info->vectorProcessor->PushData(info->vector);
 
 		// Vector Clip uses 3 markers to identify the pose, i.e. 6DOF
 		// Otherwise, the pose is considered as invalid.
-		if(info->m_vectorProcessor->MarkerCount() == 3)
+		if(info->vectorProcessor->MarkerCount() == 3)
 		{
-			info->m_vectorProcessor->GetOrientation(yaw, pitch, roll); // Rotations are reported in degrees.
-			info->m_vectorProcessor->GetPosition(x, y, z); // Positions are reported in millimeters.
+			info->vectorProcessor->GetOrientation(yaw, pitch, roll); // Rotations are reported in degrees.
+			info->vectorProcessor->GetPosition(x, y, z); // Positions are reported in millimeters.
 			poseValid = true;
 		}
 		frame->Release();
 	}
 
-	if (true == poseValid)
+	if (poseValid)
 	{
 		// Assuming left hand coordinate with Y-axis points up.
 		// pitch: rotation around X-axis
@@ -423,21 +425,20 @@ bool TrackIRScaffold::finalizeSdk()
 
 bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(!deviceData->m_thread) << "Device " << deviceData->m_deviceObject->getName()
-										  << " already has a thread.";
+	SURGSIM_ASSERT(!deviceData->thread) << "Device " << deviceData->deviceObject->getName() << " already has a thread.";
 
 	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, deviceData));
 	thread->start();
-	deviceData->m_thread = std::move(thread);
+	deviceData->thread = std::move(thread);
 
 	return true;
 }
 
 bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(deviceData->m_thread) << "No thread attached to device " << deviceData->m_deviceObject->getName();
+	SURGSIM_ASSERT(deviceData->thread) << "No thread attached to device " << deviceData->deviceObject->getName();
 
-	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->m_thread);
+	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->thread);
 	thread->stop();
 	thread.reset();
 
@@ -446,14 +447,14 @@ bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 
 bool TrackIRScaffold::startCamera(DeviceData* info)
 {
-	info->m_camera->Start();
-	return info->m_camera->IsCameraRunning();
+	info->camera->Start();
+	return info->camera->IsCameraRunning();
 }
 
 bool TrackIRScaffold::stopCamera(DeviceData* info)
 {
-	info->m_camera->Stop();
-	return !(info->m_camera->IsCameraRunning());
+	info->camera->Stop();
+	return !(info->camera->IsCameraRunning());
 }
 
 SurgSim::DataStructures::DataGroup TrackIRScaffold::buildDeviceInputData()

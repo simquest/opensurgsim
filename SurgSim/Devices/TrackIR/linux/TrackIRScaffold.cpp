@@ -50,25 +50,25 @@ struct TrackIRScaffold::DeviceData
 	/// Constructor
 	/// \param device Device to be wrapped
 	explicit DeviceData(TrackIRDevice* device) :
-		m_deviceObject(device),
-		m_thread(),
-		m_positionScale(TrackIRDevice::defaultPositionScale()),
-		m_orientationScale(TrackIRDevice::defaultOrientationScale())
+		deviceObject(device),
+		thread(),
+		positionScale(TrackIRDevice::defaultPositionScale()),
+		orientationScale(TrackIRDevice::defaultOrientationScale())
 	{
 	}
 
 	/// The corresponding device object.
-	SurgSim::Device::TrackIRDevice* const m_deviceObject;
+	SurgSim::Device::TrackIRDevice* const deviceObject;
 	/// Processing thread.
-	std::unique_ptr<SurgSim::Device::TrackIRThread> m_thread;
+	std::unique_ptr<SurgSim::Device::TrackIRThread> thread;
 
 	/// Scale factor for the position axes; stored locally before the device is initialized.
-	double m_positionScale;
+	double positionScale;
 	/// Scale factor for the orientation axes; stored locally before the device is initialized.
-	double m_orientationScale;
+	double orientationScale;
 
 	/// The mutex that protects the externally modifiable parameters.
-	boost::mutex m_parametersMutex;
+	boost::mutex parametersMutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -125,7 +125,7 @@ TrackIRScaffold::~TrackIRScaffold()
 			for (auto it = std::begin(m_state->activeDeviceList);  it != std::end(m_state->activeDeviceList);  ++it)
 			{
 				stopCamera((*it).get());
-				if ((*it)->m_thread)
+				if ((*it)->thread)
 				{
 					destroyPerDeviceThread(it->get());
 				}
@@ -168,26 +168,26 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 	{
 		// Make sure the object is unique.
 		auto sameObject = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 		SURGSIM_ASSERT(sameObject == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" which is already registered!";
 
 		// Make sure the name is unique.
 		const std::string name = device->getName();
 		auto sameName = std::find_if(m_state->activeDeviceList.cbegin(), m_state->activeDeviceList.cend(),
-			[&name](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject->getName() == name; });
+			[&name](const std::unique_ptr<DeviceData>& info) { return info->deviceObject->getName() == name; });
 		SURGSIM_ASSERT(sameName == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" when the same name is already present!";
 
-		// This assertion overlaps with above two assertions somehow.
-		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already a TrackIR camera exists."
-			<< " TrackIRScaffold only supports one TrackIR camera right now."
-			<< " Behaviors of multiple cameras are undefined.\n";
+		// The handling of multiple cameras could be done in different ways, each with trade-offs. 
+		// Instead of choosing an approach now, we assert on attempting to use more than one camera.
+		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already an active TrackIR camera."
+			<< " TrackIRScaffold only supports one TrackIR camera right now.";
 
 		std::unique_ptr<DeviceData> info(new DeviceData(device));
 		createPerDeviceThread(info.get());
-		SURGSIM_ASSERT(info->m_thread) << "Failed to create a per-device thread for TrackIR device: " <<
-				info->m_deviceObject->getName();
+		SURGSIM_ASSERT(info->thread) << "Failed to create a per-device thread for TrackIR device: " <<
+				info->deviceObject->getName();
 
 		startCamera(info.get());
 		m_state->activeDeviceList.emplace_back(std::move(info));
@@ -203,12 +203,12 @@ bool TrackIRScaffold::unregisterDevice(const TrackIRDevice* const device)
 	{
 		boost::lock_guard<boost::mutex> lock(m_state->mutex);
 		auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-			[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+			[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
 		if (matching != m_state->activeDeviceList.end())
 		{
 			stopCamera((*matching).get());
-			if ((*matching)->m_thread)
+			if ((*matching)->thread)
 			{
 				destroyPerDeviceThread(matching->get());
 			}
@@ -229,12 +229,12 @@ void TrackIRScaffold::setPositionScale(const TrackIRDevice* device, double scale
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
 	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
-		(*matching)->m_positionScale = scale;
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->positionScale = scale;
 	}
 }
 
@@ -242,12 +242,12 @@ void TrackIRScaffold::setOrientationScale(const TrackIRDevice* device, double sc
 {
 	boost::lock_guard<boost::mutex> lock(m_state->mutex);
 	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
-		[device](const std::unique_ptr<DeviceData>& info) { return info->m_deviceObject == device; });
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
 
 	if (matching != m_state->activeDeviceList.end())
 	{
-		boost::lock_guard<boost::mutex> lock((*matching)->m_parametersMutex);
-		(*matching)->m_orientationScale = scale;
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->orientationScale = scale;
 	}
 }
 
@@ -257,15 +257,15 @@ bool TrackIRScaffold::runInputFrame(TrackIRScaffold::DeviceData* info)
 	{
 		return false;
 	}
-	info->m_deviceObject->pushInput();
+	info->deviceObject->pushInput();
 	return true;
 }
 
 bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 {
-	SurgSim::DataStructures::DataGroup& inputData = info->m_deviceObject->getInputData();
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
-	boost::lock_guard<boost::mutex> lock(info->m_parametersMutex);
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	float x = 0.0, y = 0.0, z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
 	unsigned counter = 0; // Current camera frame number
@@ -283,9 +283,9 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	Vector3d rotation(pitch, yaw, roll); // In Degrees
 
 	// Scale Position
-	position *= info->m_positionScale;
+	position *= info->positionScale;
 	// Scale Orientation
-	rotation *= info->m_orientationScale;
+	rotation *= info->orientationScale;
 
 	// Convert to a pose.
 	Matrix33d orientation;
@@ -353,21 +353,20 @@ bool TrackIRScaffold::finalizeSdk()
 
 bool TrackIRScaffold::createPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(!deviceData->m_thread) << "Device " << deviceData->m_deviceObject->getName()
-										  << " already has a thread.";
+	SURGSIM_ASSERT(!deviceData->thread) << "Device " << deviceData->deviceObject->getName() << " already has a thread.";
 
 	std::unique_ptr<TrackIRThread> thread(new TrackIRThread(this, deviceData));
 	thread->start();
-	deviceData->m_thread = std::move(thread);
+	deviceData->thread = std::move(thread);
 
 	return true;
 }
 
 bool TrackIRScaffold::destroyPerDeviceThread(DeviceData* deviceData)
 {
-	SURGSIM_ASSERT(deviceData->m_thread) << "No thread attached to device " << deviceData->m_deviceObject->getName();
+	SURGSIM_ASSERT(deviceData->thread) << "No thread attached to device " << deviceData->deviceObject->getName();
 
-	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->m_thread);
+	std::unique_ptr<TrackIRThread> thread = std::move(deviceData->thread);
 	thread->stop();
 	thread.reset();
 
