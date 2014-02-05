@@ -104,7 +104,7 @@ struct TrackIRScaffold::DeviceData
 	CameraLibrary::Camera* camera;
 	CameraLibrary::cModuleVector* vector;
 	CameraLibrary::cModuleVectorProcessing* vectorProcessor;
-	
+
 	/// The corresponding device object.
 	SurgSim::Device::TrackIRDevice* const deviceObject;
 	/// Processing thread.
@@ -222,7 +222,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		SURGSIM_ASSERT(sameName == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" when the same name is already present!";
 
-		// The handling of multiple cameras could be done in different ways, each with trade-offs. 
+		// The handling of multiple cameras could be done in different ways, each with trade-offs.
 		// Instead of choosing an approach now, we assert on attempting to use more than one camera.
 		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already an active TrackIR camera."
 			<< " TrackIRScaffold only supports one TrackIR camera right now.";
@@ -350,7 +350,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		if(info->vectorProcessor->MarkerCount() == 3)
 		{
 			info->vectorProcessor->GetOrientation(yaw, pitch, roll); // Rotations are Euler Angles in degrees.
-			info->vectorProcessor->GetPosition(x, y, z); // Positions are reported in millimeters.
+			info->vectorProcessor->GetPosition(x, y, z);             // Positions are reported in millimeters.
 			poseValid = true;
 		}
 		frame->Release();
@@ -358,18 +358,14 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 
 	if (poseValid)
 	{
-		// Assuming left-handed coordinate with X-axis points to the right, Y-axis points up and Z-axis points outwards.
+		// Positions returned from CameraSDK are right-handed.
 		Vector3d position(x / 1000.0, y / 1000.0, z / 1000.0); // Convert millimeter to meter
-		
-		// roll: rotation around X-axis
-		// yaw: rotation around Y-axis
-		// pitch: rotation around Z-axis
-		// NB: angles reported by CameraSDK are Euler Angles in degrees, need to convert them into radians.
-		Matrix33d rotationX = makeRotationMatrix(roll  * M_PI / 180.0, Vector3d(Vector3d::UnitX()));
+
+		// Euler conventions returned from CameraSDK are: left-handed, axis order intrinsic ZYX, X=roll, Y=yaw, Z=pitch.
+		// OSS uses right-handed coordinate system.
+		Matrix33d rotationX = makeRotationMatrix(-roll * M_PI / 180.0, Vector3d(Vector3d::UnitX()));
 		Matrix33d rotationY = makeRotationMatrix(yaw   * M_PI / 180.0, Vector3d(Vector3d::UnitY()));
 		Matrix33d rotationZ = makeRotationMatrix(pitch * M_PI / 180.0, Vector3d(Vector3d::UnitZ()));
-		
-		// NB: the order of rotations is ZYX
 		Matrix33d orientation = rotationZ * rotationY * rotationX;
 
 		RigidTransform3d pose;

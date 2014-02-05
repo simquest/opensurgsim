@@ -179,7 +179,7 @@ bool TrackIRScaffold::registerDevice(TrackIRDevice* device)
 		SURGSIM_ASSERT(sameName == m_state->activeDeviceList.end()) << "TrackIR: Tried to register a device" <<
 			" when the same name is already present!";
 
-		// The handling of multiple cameras could be done in different ways, each with trade-offs. 
+		// The handling of multiple cameras could be done in different ways, each with trade-offs.
 		// Instead of choosing an approach now, we assert on attempting to use more than one camera.
 		SURGSIM_ASSERT(m_state->activeDeviceList.size() < 1) << "There is already an active TrackIR camera."
 			<< " TrackIRScaffold only supports one TrackIR camera right now.";
@@ -270,37 +270,29 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	float x = 0.0, y = 0.0, z = 0.0, yaw = 0.0, pitch = 0.0, roll = 0.0;
 	unsigned counter = 0; // Current camera frame number
 
-	// Assuming left hand coordinate with Y-axis points up.
-	// pitch: rotation around X-axis
-	// yaw: rotation around Y-axis
-	// roll: rotation around Z-axis (Min: -45; Max: +45)
-	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter); // Positions are reported in millimeters.
+	// roll:  rotation around X-axis
+	// yaw:   rotation around Y-axis
+	// pitch: rotation around Z-axis
+	// Positions are reported in millimeters.
+	// Angles are in radians.
+	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter);
 	// Dec-22-2013-HW Currently, the output of Z-axis value from ltr_get_pose() is not consistent
 	// Contacted the developer, waiting for response.
 	Vector3d position(static_cast<double>(x) / 1000.0,
-					  static_cast<double>(y) / 1000.0,
-					  static_cast<double>(z) / 1000.0); // Convert millimeter to meter
-	Vector3d rotation(pitch, yaw, roll); // In Degrees
-
+			  static_cast<double>(y) / 1000.0,
+			  static_cast<double>(z) / 1000.0); // Convert millimeter to meter
 	// Scale Position
 	position *= info->positionScale;
-	// Scale Orientation
-	rotation *= info->orientationScale;
 
-	// Convert to a pose.
-	Matrix33d orientation;
-	double angle = rotation.norm();
-	if (angle < 1e-9)
-	{
-		orientation.setIdentity();
-	}
-	else
-	{
-		orientation = SurgSim::Math::makeRotationMatrix(angle, Vector3d(rotation / angle));
-	}
+	Matrix33d rotationX = makeRotationMatrix(static_cast<double>(-roll), Vector3d(Vector3d::UnitX()));
+	Matrix33d rotationY = makeRotationMatrix(static_cast<double>(yaw),   Vector3d(Vector3d::UnitY()));
+	Matrix33d rotationZ = makeRotationMatrix(static_cast<double>(pitch), Vector3d(Vector3d::UnitZ()));
+	// Rotation order is extrinsic XYZ 
+	Matrix33d orientation = rotationZ * rotationY * rotationX;
+	// Scale Orientation
+	orientation *= info->orientationScale;
 
 	RigidTransform3d pose;
-	pose.makeAffine();
 	pose.linear() = orientation;
 	pose.translation() = position;
 
