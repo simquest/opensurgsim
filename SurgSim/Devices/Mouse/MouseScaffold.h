@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MOUSE_OSGMOUSESCAFFOLD_H
-#define SURGSIM_DEVICES_MOUSE_OSGMOUSESCAFFOLD_H
+#ifndef SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
+#define SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
 
 #include <memory>
 
@@ -25,29 +25,29 @@ namespace SurgSim
 
 namespace DataStructures
 {
-	class DataGroup;
+class DataGroup;
 }
 
 namespace Device
 {
 class MouseDevice;
-class MouseHandler;
+class OsgMouseHandler;
 
 /// A class that implements the behavior of MouseDevice objects.
 /// \sa SurgSim::Device::MouseDevice
-class OsgMouseScaffold
+class MouseScaffold
 {
 	friend class MouseDevice;
-	friend class MouseHandler;
 	friend class MouseDeviceTest;
+	friend class OsgMouseHandler;
 
 public:
 	/// Constructor.
 	/// \param logger (optional) The logger to be used by the scaffold object and the devices it manages.
 	/// If unspecified or empty, a console logger will be created and used.
-	explicit OsgMouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
+	explicit MouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger = nullptr);
 	/// Destructor
-	~OsgMouseScaffold();
+	~MouseScaffold();
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
@@ -56,7 +56,7 @@ public:
 	/// Gets or creates the scaffold shared by all MouseDevice instances.
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
 	/// \return the scaffold object.
-	static std::shared_ptr<OsgMouseScaffold> getOrCreateSharedInstance();
+	static std::shared_ptr<MouseScaffold> getOrCreateSharedInstance();
 
 	/// Sets the default log level.
 	/// Has no effect unless called before a scaffold is created (i.e. before the first device).
@@ -74,17 +74,21 @@ private:
 	bool registerDevice(MouseDevice* device);
 	/// Unregisters the specified device object.
 	/// The corresponding controller will become unused, and can be re-registered later.
-	/// \return true on success, false on failure.
+	/// \return True on success, false on failure.
 	bool unregisterDevice();
 
 	/// Updates the device information for a single device.
-	/// \param info	The device data.
-	/// \return	true on success.
+	/// \param buttons Buttons being pressed.
+	/// \param x X-Coordinate for the device.
+	/// \param y Y-Coordinate for the device.
+	/// \param scrollDeltaX Horizontal indicator for mouse wheel.
+	/// \param scrollDeltaY Vertical indicator for mouse wheel.
+	/// \return	True on success.
 	bool updateDevice(int buttons, float x, float y, int scrollDeltaX, int scrollDeltaY);
 
 	/// Get mouse handler
 	/// \return The mouse handler associated with this device
-	MouseHandler* getMouseHandler() const;
+	OsgMouseHandler* getMouseHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();
@@ -101,4 +105,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MOUSE_OSGMOUSESCAFFOLD_H
+#endif  // SURGSIM_DEVICES_MOUSE_MOUSESCAFFOLD_H
