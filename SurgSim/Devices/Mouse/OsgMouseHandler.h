@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DEVICES_MOUSE_MOUSEHANDLER_H
-#define SURGSIM_DEVICES_MOUSE_MOUSEHANDLER_H
+#ifndef SURGSIM_DEVICES_MOUSE_OSGMOUSEHANDLER_H
+#define SURGSIM_DEVICES_MOUSE_OSGMOUSEHANDLER_H
 
 #include <memory>
 
@@ -25,23 +25,23 @@ namespace SurgSim
 namespace Device
 {
 
-class OsgMouseScaffold;
+class MouseScaffold;
 
-class MouseHandler : public osgGA::GUIEventHandler
+class OsgMouseHandler : public osgGA::GUIEventHandler
 {
 public:
 	/// Constructor
-	MouseHandler();
+	OsgMouseHandler();
 
 	/// Method to handle GUI event
-	/// \param ea A osgGA::GUIEventAdapter
+	/// \param eventHandler A osgGA::GUIEventAdapter
 	/// \param _2 A dummy parameter (required by this virtual method)
 	/// \return True if the event has been handled by this method; Otherwise, false.
 	virtual bool handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter&) override;
 
 private:
 	/// A back pointer to the scaffold which owns this handle
-	std::weak_ptr<OsgMouseScaffold> m_mouseScaffold;
+	std::weak_ptr<MouseScaffold> m_mouseScaffold;
 
 	/// lastX is the X-coordinate of mouse's last location
 	/// lastY is the Y-coordinate of mouse's last location
@@ -56,4 +56,4 @@ private:
 };  // namespace Device
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DEVICES_MOUSE_MOUSEHANDLER_H
+#endif  // SURGSIM_DEVICES_MOUSE_OSGMOUSEHANDLER_H
