@@ -13,16 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
-#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
-#include "SurgSim/Devices/Keyboard/KeyCode.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
+#include <iostream>
+#include <map>
+#include <memory>
+#include <string>
 
 #include <osg/Camera>
 #include <osg/Geode>
 #include <osgText/Text>
 #include <osgViewer/Viewer>
+
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
+#include "SurgSim/Devices/Keyboard/OsgKeyboardHandler.h"
+#include "SurgSim/Devices/Keyboard/KeyCode.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+
+
 
 using SurgSim::DataStructures::DataGroup;
 
@@ -294,14 +301,14 @@ int main(int argc, char* argv[])
 
 	osg::ref_ptr<osgText::Text> text = new osgText::Text;
 	text->setText("Press any key in this window \n\nto verify keyboard driver \n\nworks correctly.");
-	text->setPosition(osg::Vec3(0,300,0.0f));
+	text->setPosition(osg::Vec3(0.0f, 300.0f, 0.0f));
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 	geode->addDrawable(text);
 
 	osg::ref_ptr<osg::Camera> camera = new osg::Camera;
 	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-	camera->setProjectionMatrixAsOrtho2D(0,600,0,400);
+	camera->setProjectionMatrixAsOrtho2D(0, 600 ,0, 400);
 	camera->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
 	camera->addChild(geode);
 
