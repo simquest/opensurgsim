@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Math/Vector.h"
-#include "SurgSim/Serialize/MathConvert.h"
+#include "SurgSim/Math/MathConvert.h"
 
 
 // We need ALL of the math types

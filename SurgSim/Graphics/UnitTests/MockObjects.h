@@ -453,6 +453,12 @@ public:
 		return std::vector<std::string>();
 	}
 
+	virtual const SurgSim::Math::Matrix44d& getInverseViewMatrix() const
+	{
+		static SurgSim::Math::Matrix44d identity = SurgSim::Math::Matrix44d::Identity();
+		return identity;
+	}
+
 private:
 	/// Number of times the camera has been updated
 	int m_numUpdates;

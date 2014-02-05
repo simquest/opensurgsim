@@ -32,6 +32,11 @@ template <class T>
 class Uniform : public virtual UniformBase
 {
 public:
+
+	Uniform() {
+		SURGSIM_ADD_RW_PROPERTY(Uniform, T, value, get, set);
+	}
+
 	/// Sets the value of the uniform
 	virtual void set(const T& value) = 0;
 

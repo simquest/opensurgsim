@@ -16,37 +16,60 @@
 #ifndef SURGSIM_INPUT_OUTPUTCOMPONENT_H
 #define SURGSIM_INPUT_OUTPUTCOMPONENT_H
 
+#include <string>
+#include <memory>
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
-#include "SurgSim/DataStructures/DataGroup.h"
 
 namespace SurgSim
 {
+
+namespace DataStructures
+{
+class DataGroup;
+}
+
 namespace Input
 {
+class DeviceInterface;
+class OutputProducer;
 
-class OutputComponent : public SurgSim::Framework::Component, public SurgSim::Input::OutputProducerInterface
+/// OutputComponent is a Component that has an OutputProducer, a concrete instance of OutputProducerInterface, so that
+/// output devices can receive data through the normal component interface to SceneElements.
+class OutputComponent : public SurgSim::Framework::Component
 {
 public:
-	OutputComponent(const std::string& name, const std::string& deviceName,
-					const SurgSim::DataStructures::DataGroup& outputData);
+	/// Constructor
+	/// \param name Name of this output component
+	explicit OutputComponent(const std::string& name);
+	/// Destructor
 	virtual ~OutputComponent();
 
-	/// Overridden callback from OutputProducerInterface, the device will call this to fetch the
-	/// data
-	/// \param	device			  	The name of the device to which we want to write the data.
-	/// \param [in,out]	outputData	If non-null, information pointer to the devices output data.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData);
+	/// Set name of the device of output component.
+	/// param	deviceName	The name of the device that will receive the output data.
+	void setDeviceName(const std::string& deviceName);
 
-	/// Reference to this components output data
-	/// \return	The output data.
-	SurgSim::DataStructures::DataGroup& getOutputData();
+	/// Is a device connected
+	/// \return true if a device has been connected.
+	bool isDeviceConnected();
 
-	/// Do Nothing, overridden from Component
+	/// Connect to a device
+	/// This call will be made by the InputManager, and should generally not be called directly.
+	/// \param device The device to connect to.
+	void connectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
+
+	/// Disconnect from a device
+	/// This call will be made by the InputManager, and should generally not be called directly.
+	/// \param device The device to disconnect from.
+	void disconnectDevice(std::shared_ptr<SurgSim::Input::DeviceInterface> device);
+
+	/// Sets the output data.
+	/// \para dataGroup The data to output.
+	void setData(const SurgSim::DataStructures::DataGroup& dataGroup);
+
+	/// Overridden from Component, do nothing
 	virtual bool doInitialize();
 
-	/// Do Nothing, overridden from Component
+	/// Overridden from Component, do nothing
 	virtual bool doWakeUp();
 
 	/// Gets device name.
@@ -54,8 +77,12 @@ public:
 	std::string getDeviceName() const;
 
 private:
+	/// Name of the device to which this output component connects
 	std::string m_deviceName;
-	SurgSim::DataStructures::DataGroup m_outputData;
+	/// Indicates if this output component is connected to a device
+	bool m_deviceConnected;
+	/// Output producer which sends data to hardware device
+	std::shared_ptr<OutputProducer> m_output;
 };
 
 }; // namespace Input

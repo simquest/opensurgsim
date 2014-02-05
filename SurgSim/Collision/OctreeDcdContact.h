@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "SurgSim/Collision/ContactCalculation.h"
-#include "SurgSim/DataStructures/OctreeNode.h"
+#include "SurgSim/Math/OctreeShape.h"
 
 namespace SurgSim
 {
@@ -29,8 +29,6 @@ namespace Collision
 class CollisionPair;
 
 /// Class to calculate intersections between an Octree and other shapes
-/// \tparam Data The data stored in each octree node
-template <class Data>
 class OctreeDcdContact : public ContactCalculation
 {
 public:
@@ -54,11 +52,11 @@ private:
 	/// node's children. Once a leaf node is reached, contacts are added to the
 	/// CollisionPair.
 	/// \param node the octree node to collide with
-	/// \param pair the collision pair that is under consideration
+	/// \param [in/out] pair the collision pair that is under consideration
 	/// \param nodePath the path of the current node
-	void calculateContactWithNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node,
+	void calculateContactWithNode(std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> node,
 			std::shared_ptr<CollisionPair> pair,
-			std::shared_ptr<SurgSim::Math::OctreePath> nodePath);
+			std::shared_ptr<SurgSim::DataStructures::OctreePath> nodePath);
 
 	/// The contact calculator to use on each octree node
 	const std::shared_ptr<ContactCalculation> m_calculator;
@@ -70,7 +68,6 @@ private:
 };
 };
 
-#include "SurgSim/Collision/OctreeDcdContact-inl.h"
 
 
 #endif // SURGSIM_COLLISION_OCTREEDCDCONTACT_H

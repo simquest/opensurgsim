@@ -50,7 +50,7 @@ TEST(ComponentTests, SetAndGetSceneTest)
 {
 	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component");
 
-	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+	std::shared_ptr<Scene> scene = std::make_shared<Scene>(std::make_shared<Runtime>());
 
 	mock1->setScene(scene);
 

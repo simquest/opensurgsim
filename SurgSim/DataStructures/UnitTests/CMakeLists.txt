@@ -13,10 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-include_directories(
+include_directories (
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -39,10 +37,8 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimDataStructures
-	gtest
 )
 
 surgsim_add_unit_tests(SurgSimDataStructuresTest)
 
-# Put SurgSimDataStructuresTest into folder "DataStructure"
 set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructure")

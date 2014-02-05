@@ -16,13 +16,11 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	GraphicsConvertTest.cpp
-	MathConvertTest.cpp
 	ShapesConvertTest.cpp
 	ShapesFactoryTest.cpp
 )
@@ -32,11 +30,15 @@ set(UNIT_TEST_HEADERS
 
 set(LIBS
 	SurgSimSerialize
+	SurgSimPhysics
+	SurgSimMath
+	SurgSimFramework
+	SurgSimGraphics
+	gmock
 	gtest
-	yaml-cpp
+	${YAML_CPP_LIBRARIES}}
+	${Boost_LIBRARIES}
 )
-
-set(LIBS SurgSimSerialize SurgSimPhysics SurgSimMath SurgSimFramework SurgSimGraphics gtest yaml-cpp ${Boost_LIBRARIES})
 
 surgsim_add_unit_tests(SurgSimSerializeTest)
 

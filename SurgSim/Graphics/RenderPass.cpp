@@ -51,11 +51,6 @@ bool RenderPass::doInitialize()
 	return true;
 }
 
-bool RenderPass::doWakeUp()
-{
-	return true;
-}
-
 std::shared_ptr<Camera> RenderPass::getCamera()
 {
 	return m_camera;
@@ -64,16 +59,6 @@ std::shared_ptr<Camera> RenderPass::getCamera()
 std::shared_ptr<Group> RenderPass::getGroup()
 {
 	return m_group;
-}
-
-void RenderPass::setView(std::shared_ptr<View> view)
-{
-	m_view = view;
-}
-
-std::shared_ptr<View> RenderPass::getView()
-{
-	return m_view;
 }
 
 bool RenderPass::setRenderTarget(std::shared_ptr<RenderTarget> target)
@@ -113,7 +98,7 @@ void RenderPass::setRenderOrder(SurgSim::Graphics::Camera::RenderOrder order, in
 
 void RenderPass::showColorTarget(int x, int y, int width, int height)
 {
-	if (m_debugColor == nullptr && m_renderTarget->getColorTargetCount() > 0 && m_view != nullptr)
+	if (m_debugColor == nullptr && m_renderTarget->getColorTargetCount() > 0)
 	{
 		auto texture = m_renderTarget->getColorTarget(0);
 		m_debugColor = buildDebugQuad("debug color", texture);
@@ -128,12 +113,15 @@ void RenderPass::showColorTarget(int x, int y, int width, int height)
 
 void RenderPass::hideColorTarget()
 {
-	m_debugColor->setVisible(false);
+	if(m_debugColor != nullptr)
+	{
+		m_debugColor->setVisible(false);
+	}
 }
 
 void RenderPass::showDepthTarget(int x, int y, int width, int height)
 {
-	if (m_debugDepth == nullptr && m_renderTarget->doesUseDepthTarget() && m_view != nullptr)
+	if (m_debugDepth == nullptr && m_renderTarget->doesUseDepthTarget())
 	{
 		auto texture = m_renderTarget->getDepthTarget();
 		m_debugDepth = buildDebugQuad("debug depth", texture);
@@ -148,13 +136,16 @@ void RenderPass::showDepthTarget(int x, int y, int width, int height)
 
 void RenderPass::hideDepthTarget()
 {
-	m_debugDepth->setVisible(false);
+	if (m_debugDepth != nullptr)
+	{
+		m_debugDepth->setVisible(false);
+	}
 }
 
 std::shared_ptr<ScreenSpaceQuadRepresentation> RenderPass::buildDebugQuad(const std::string& name,
 		std::shared_ptr<Texture> texture)
 {
-	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name, m_view);
+	auto result = std::make_shared<OsgScreenSpaceQuadRepresentation>(name);
 	result->setTexture(texture);
 	addComponent(result);
 	return result;

@@ -17,6 +17,7 @@ include_directories(
 	${EIGEN3_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_GRAPHICS_SOURCES
@@ -37,6 +38,7 @@ set(SURGSIM_GRAPHICS_SOURCES
 	OsgPlaneRepresentation.cpp
 	OsgRepresentation.cpp
 	OsgSceneryRepresentation.cpp
+	OsgScreenSpacePass.cpp
 	OsgScreenSpaceQuadRepresentation.cpp
 	OsgShader.cpp
 	OsgSphereRepresentation.cpp
@@ -93,6 +95,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	OsgRepresentation.h
 	OsgRigidTransformConversions.h
 	OsgSceneryRepresentation.h
+	OsgScreenSpacePass.h
 	OsgScreenSpaceQuadRepresentation.h
 	OsgShader.h
 	OsgSphereRepresentation.h
@@ -149,17 +152,23 @@ surgsim_add_library(
 )
 
 SET(LIBS
+	SurgSimDataStructures
 	SurgSimFramework
+	SurgSimInput
+	KeyboardDevice
+	MouseDevice
 	${OPENSCENEGRAPH_LIBRARIES}
 )
 
 target_link_libraries(SurgSimGraphics ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
-	add_subdirectory(RenderTests)
+  
+  if(BUILD_RENDER_TESTING)
+		add_subdirectory(RenderTests)
+	endif()
 endif()
 
-# Put SurgSimGraphics into folder "Graphics"
 set_target_properties(SurgSimGraphics PROPERTIES FOLDER "Graphics")

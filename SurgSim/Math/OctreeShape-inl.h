@@ -12,90 +12,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
 #ifndef SURGSIM_MATH_OCTREESHAPE_INL_H
 #define SURGSIM_MATH_OCTREESHAPE_INL_H
 
-#include "SurgSim/Framework/Assert.h"
-
 namespace SurgSim
 {
-
 namespace Math
 {
 
-template<class Data>
-OctreeShape<Data>::OctreeShape(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node) :
-	m_rootNode(node)
+template<class T>
+OctreeShape::OctreeShape(const SurgSim::DataStructures::OctreeNode<T>& node) :
+	m_rootNode(std::make_shared<OctreeShape::NodeType>(node))
 {
-}
-
-template<class Data>
-OctreeShape<Data>::~OctreeShape()
-{
-}
-
-template<class Data>
-int OctreeShape<Data>::getType()
-{
-	return SHAPE_TYPE_OCTREE;
-}
-
-template<class Data>
-double OctreeShape<Data>::getVolume() const
-{
-	SURGSIM_FAILURE() << "OctreeShape::getVolume not implemented";
-	return 0.0;
-}
-
-template<class Data>
-Vector3d OctreeShape<Data>::getCenter() const
-{
-	return Vector3d::Zero();
-}
-
-template<class Data>
-Matrix33d OctreeShape<Data>::getSecondMomentOfVolume() const
-{
-	SURGSIM_FAILURE() << "OctreeShape::getSecondMomentOfVolume not implemented";
-	return Matrix33d::Zero();
-}
-
-template<class Data>
-std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> OctreeShape<Data>::getRootNode()
-{
-	return m_rootNode;
-}
-
-template<class Data>
-void OctreeShape<Data>::setRootNode(std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node)
-{
-	m_rootNode = node;
-}
-
-template<class Data>
-std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> OctreeShape<Data>::getNode(const OctreePath& path)
-{
-	std::shared_ptr<SurgSim::DataStructures::OctreeNode<Data>> node = m_rootNode;
-	for (auto index = path.cbegin(); index != path.cend(); ++index)
-	{
-		node = node->getChild(*index);
-		SURGSIM_ASSERT(node != nullptr)
-			<< "Octree path is invalid. Path is longer than octree is deep in this given branch.";
-	}
-	return node;
-}
-
-template<class Data>
-std::string OctreeShape<Data>::getClassName()
-{
-	return std::string("SurgSim::Math::OctreeShape");
 }
 
 }; // namespace Math
-
 }; // namespace SurgSim
-
-
 
 #endif // SURGSIM_MATH_OCTREESHAPE_INL_H

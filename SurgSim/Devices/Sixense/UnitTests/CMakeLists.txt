@@ -16,7 +16,6 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -24,11 +23,15 @@ set(UNIT_TEST_SOURCES
 	SixenseScaffoldTest.cpp
 )
 
-set(UNIT_TEST_HEADERS
+set(LIBS 
+	SixenseDevice
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${SIXENSE_SDK_LIBRARIES}
 )
 
-set(LIBS SixenseDevice SurgSimInput SurgSimFramework SurgSimDataStructures
-	gtest ${Boost_LIBRARIES} ${SIXENSE_SDK_LIBRARIES})
 set(UNIT_TEST_SHARED_RELEASE_LIBS
 	${SIXENSE_SDK_sixense_SHARED_RELEASE}
 	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
@@ -39,14 +42,6 @@ set(UNIT_TEST_SHARED_DEBUG_LIBS
 	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires hardware and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_DEVICE_SIXENSE
-	"Run the Sixense tests as part of unit tests.  (Requires Razer Hydra hardware and drivers.)"
-	OFF)
-surgsim_add_unit_tests(SixenseDeviceTest
-	RUN ${SURGSIM_TESTS_RUN_DEVICE_SIXENSE})
+surgsim_add_unit_tests(SixenseDeviceTest)
 
-# Put SixenseDeviceTest into folder "Devices"
 set_target_properties(SixenseDeviceTest PROPERTIES FOLDER "Devices")

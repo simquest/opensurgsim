@@ -59,9 +59,11 @@ public:
 	/// Add a worker thread, this should probably only be possible if the system is not running
 	void addManager(std::shared_ptr<ComponentManager> thread);
 
-	/// Sets the scene currently only works before the runtime has started the threads
-	/// \param	scene	The scene.
-	void setScene(std::shared_ptr<Scene> scene);
+	/// \return The scene to be used for this runtime. Use this for any kind of scene manipulation.
+	std::shared_ptr<Scene> getScene();
+
+	/// \returns The current scene
+	std::shared_ptr<Scene> getScene() const;
 
 	/// Adds a scene element
 	/// \param	sceneElement	The scene element.
@@ -95,11 +97,11 @@ public:
 
 	/// Query if this object is running.
 	/// \return	true if running, false if not.
-	bool isRunning();
+	bool isRunning() const;
 
 	/// Query if this object is paused.
 	/// \return	true if paused, false if not.
-	bool isPaused();
+	bool isPaused() const;
 
 	/// Gets application data for the runtime.
 	/// \return	The application data.

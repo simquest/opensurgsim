@@ -81,6 +81,10 @@ public:
 		doBuild(dt, data, localization, mlcp, indexOfRepresentation, indexOfConstraint, sign);
 	}
 
+protected:
+	/// Preallocated variable for derived implementations of doBuild.
+	Eigen::SparseVector<double> m_newH;
+
 private:
 
 	/// Does get number of degree of freedom

@@ -133,7 +133,7 @@ TEST_F(FemRepresentationTests, AfterUpdateTest)
 	// Concrete derived classes will do this test
 }
 
-TEST_F(FemRepresentationTests, ApplyDofCorrectionTest)
+TEST_F(FemRepresentationTests, ApplyCorrectionTest)
 {
 	// Nothing to test, we need an actual FemElement doing something.
 	// Concrete derived classes will do this test

@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+else(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	find_package(WDK REQUIRED)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
@@ -24,18 +24,25 @@ include_directories(
 	"${EIGEN3_INCLUDE_DIR}"
 	"${Boost_INCLUDE_DIR}"
 )
+
 if(WDK_FOUND)
-	include_directories(
-		# This is a hack needed to get the Visual Studio includes into the
-		# include path ahead of the WDK ones, which is needed for the WDK
-		# 7.1.0 not to interfere with includes provided by Visual Studio.
-		# CMake will prefix this entry by the current path, but Visual
-		# Studio will split the path at the semicolon; the net effect is to
-		# add $(IncludePath) to the Visual Studio include directories.
-		".;$(IncludePath)"
-		# Now it's safe to add ${WDK_INCLUDE_DIR}.
-		"${WDK_INCLUDE_DIR}"
-	)
+	if(WDK_CAN_BUILD_DIRECTLY)
+		#message(STATUS "WDK does not need additional include paths; see the try_compile in FindWDK.cmake")
+	else(WDK_CAN_BUILD_DIRECTLY)
+		#message(STATUS "WDK was found, and needs the include directory '${WDK_INCLUDE_DIR}'.")
+		include_directories(
+				# This is a hack needed to get the Visual Studio includes into the
+				# include path ahead of the WDK ones, which is needed for the WDK
+				# 7.1.0 not to interfere with includes provided by Visual Studio.
+				# CMake will prefix this entry by the current path, but Visual
+				# Studio will split the path at the semicolon; the net effect is to
+				# add $(IncludePath) to the Visual Studio include directories.
+				# In cmake 2.8.11+, this hack generates a Policy CMP0021 warning due to relative path.
+				".;$(IncludePath)"
+				# Now it's safe to add ${WDK_INCLUDE_DIR}.
+				"${WDK_INCLUDE_DIR}"
+				)
+	endif(WDK_CAN_BUILD_DIRECTLY)
 endif(WDK_FOUND)
 
 set(MULTIAXIS_DEVICE_SOURCES
@@ -103,10 +110,14 @@ set(LIBS
 	SurgSimFramework 
 )
 
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
+
 target_link_libraries(MultiAxisDevice ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 
 	if(GLUT_FOUND)

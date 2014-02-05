@@ -139,6 +139,12 @@ public:
 	virtual void addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD, double alphaK,
 		const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override
 	{}
+	virtual bool isValidCoordinate(const SurgSim::Math::Vector &naturalCoordinate) const override
+	{ return true; }
+	virtual SurgSim::Math::Vector computeCartesianCoordinate(
+		const DeformableRepresentationState& state,
+		const SurgSim::Math::Vector &barycentricCoordinate) const override
+	{ return SurgSim::Math::Vector3d::Zero(); }
 };
 
 // Concrete class for testing
@@ -178,6 +184,14 @@ protected:
 		const SurgSim::Math::RigidTransform3d& transform) override
 	{
 	}
+};
+
+template <class Base>
+class MockDescendent : public Base
+{
+public:
+	MockDescendent() : Base() {}
+	explicit MockDescendent(const std::string &name) : Base(name) {}
 };
 
 }; // Physics

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+find_package(SixenseSdk REQUIRED)
 
 link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
@@ -44,7 +45,7 @@ surgsim_add_library(
 	"${SIXENSE_DEVICE_SOURCES}" "${SIXENSE_DEVICE_HEADERS}"
 	SurgSim/Devices/Sixense
 )
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 
 	if(GLUT_FOUND)

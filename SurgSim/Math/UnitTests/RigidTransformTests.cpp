@@ -135,3 +135,25 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 		}
 	}
 }
+
+TYPED_TEST(AllRigidTransformTests, MakeLookAt)
+{
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> Transform;
+
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
+	typedef Eigen::Matrix<T, 4, 1> Vector4;
+
+	Vector3 origin(0.0, 0.0, 0.0);
+	Vector3 eye(10.0, 10.0, 10.0);
+	Vector3 up(0.0, 1.0, 0.0);
+
+	Vector4 point4(10.0, 10.0, 10.0, 1.0);
+	Vector4 origin4(0.0, 0.0, 0.0, 1.0);
+
+	Transform transform = SurgSim::Math::makeRigidTransform(eye, origin, up);
+
+	EXPECT_TRUE(origin4.isApprox(transform*point4)) << transform * point4;
+}
+
+

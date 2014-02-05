@@ -15,6 +15,8 @@
 
 #include "SurgSim/Physics/FemElement.h"
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 
