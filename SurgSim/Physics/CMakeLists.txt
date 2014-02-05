@@ -32,6 +32,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
+	FemElement1DBeam.cpp
 	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationCoordinate.cpp
@@ -75,6 +76,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentation.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
+	FemElement1DBeam.h
 	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h
