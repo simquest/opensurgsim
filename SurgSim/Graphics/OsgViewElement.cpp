@@ -17,7 +17,7 @@
 #include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
 
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
-#include "SurgSim/Devices/Mouse/MouseHandler.h"
+#include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
 
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgConversions.h"
