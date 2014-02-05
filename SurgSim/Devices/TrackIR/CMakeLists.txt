@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+find_package(OptiTrack REQUIRED)
 
 include_directories(
 	"${CMAKE_CURRENT_SOURCE_DIR}"
@@ -53,7 +54,8 @@ surgsim_add_library(
 	"${TRACKIR_DEVICE_SOURCES}" "${TRACKIR_DEVICE_HEADERS}"
 	SurgSim/Devices/TrackIR
 )
-if(SURGSIM_TESTS_BUILD)
+
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 
