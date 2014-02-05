@@ -19,6 +19,7 @@ if(BUILD_DEVICE_MULTIAXIS)
 endif(BUILD_DEVICE_MULTIAXIS)
 
 add_subdirectory(BouncingBalls)
+add_subdirectory(Fem1D)
 add_subdirectory(Fem3D)
 add_subdirectory(GraphicsScene)
 add_subdirectory(MassSprings)
