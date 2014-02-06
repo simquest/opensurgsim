@@ -94,7 +94,7 @@ const SurgSim::Math::Vector& DeformableRepresentationState::getPositions() const
 
 const SurgSim::Math::Vector3d DeformableRepresentationState::getPosition(unsigned int nodeId) const
 {
-	return SurgSim::Math::getSubVector(m_x, nodeId, m_numDofPerNode).segment(0, 3);
+	return SurgSim::Math::getSubVector(m_x, nodeId, m_numDofPerNode);
 }
 
 SurgSim::Math::Vector& DeformableRepresentationState::getVelocities()
@@ -109,7 +109,7 @@ const SurgSim::Math::Vector& DeformableRepresentationState::getVelocities() cons
 
 const SurgSim::Math::Vector3d DeformableRepresentationState::getVelocity(unsigned int nodeId) const
 {
-	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode).segment(0, 3);
+	return SurgSim::Math::getSubVector(m_v, nodeId, m_numDofPerNode);
 }
 
 SurgSim::Math::Vector& DeformableRepresentationState::getAccelerations()

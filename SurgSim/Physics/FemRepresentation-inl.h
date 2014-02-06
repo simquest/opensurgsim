@@ -45,12 +45,6 @@ bool FemRepresentation<MT, DT, KT, ST>::doInitialize()
 {
 	SURGSIM_ASSERT(m_initialState != nullptr) << "You must set the initial state before calling Initialize";
 
-	// Initialize the FemElements
-	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
-	{
-		(*element)->initialize(*m_initialState);
-	}
-
 	// Allocate the vector m_massPerNode
 	if (m_massPerNode.size() == 0 || m_massPerNode.size() < m_initialState->getNumNodes())
 	{
@@ -65,6 +59,12 @@ bool FemRepresentation<MT, DT, KT, ST>::doInitialize()
 		{
 			m_massPerNode[*nodeId] += mass / (*element)->getNumNodes();
 		}
+	}
+
+	// Initialize the FemElements
+	for (auto element = std::begin(m_femElements); element != std::end(m_femElements); element++)
+	{
+		(*element)->initialize(*m_initialState);
 	}
 
 	return true;
