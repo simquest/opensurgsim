@@ -81,15 +81,6 @@ extern std::array<gaussQuadraturePoint, 4> gaussQuadrature4Points;
 /// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
 extern std::array<gaussQuadraturePoint, 5> gaussQuadrature5Points;
 
-/// 100-points Gauss-Legendre quadrature {<x_1, w_1>, <x_2, w_2>, <x_3, w_3>, ..., <x_100, w_100>}
-/// \note Gauss-Legendre quadrature numerically evaluates the integral of a function \f$f\f$ with a finite sum
-/// using some weights and specific points of evaluation of the function \f$f\f$:
-/// \note \f$\int_{-1}^{+1} f(x) dx = \sum_{i=1}^n w_i f(x_i)\f$
-/// \note n is the number of points used to discretized the integral
-/// \note \f$x_i\f$ is the point to evaluate the function \f$f\f$ with
-/// \note \f$w_i\f$ is the weight to assign to the function evaluation at the given point \f$x_i\f$
-extern std::array<gaussQuadraturePoint, 100> gaussQuadrature100Points;
-
 };  // namespace Math
 };  // namespace SurgSim
 
