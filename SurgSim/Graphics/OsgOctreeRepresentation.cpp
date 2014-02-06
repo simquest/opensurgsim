@@ -36,7 +36,6 @@ OsgOctreeRepresentation::OsgOctreeRepresentation(const std::string& name) :
 	Representation(name),
 	OctreeRepresentation(name),
 	OsgRepresentation(name),
-	m_octree(nullptr),
 	m_sharedUnitBox(getSharedUnitBox())
 {
 }
@@ -50,22 +49,6 @@ OsgOctreeRepresentation::~OsgOctreeRepresentation()
 void OsgOctreeRepresentation::doUpdate(double dt)
 {
 }
-
-
-bool OsgOctreeRepresentation::doWakeUp()
-{
-	if (!m_octree)
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "OsgOctreeRepresentation::doWakeUp(): No Octree held when waking up.";
-		return false;
-	}
-
-	buildOctree(m_transform, m_octree);
-	return true;
-}
-
-
 
 // An Octree(Node) is traversed in following order (the 2nd OctreeNode, i.e. OctreeNode with "1" is now shown):
 /*
@@ -95,7 +78,7 @@ void OsgOctreeRepresentation::buildOctree
 		osg::ref_ptr<osg::PositionAttitudeTransform> osgTransform = new osg::PositionAttitudeTransform();
 		osgTransform->addChild(m_sharedUnitBox->getNode());
 
-		int nodeMask = octree->isActive() ? 1 : 0;
+		int nodeMask = octree->isActive() ? 0xffffffff : 0;
 		osgTransform->setNodeMask(nodeMask);
 
 		osgTransform->setPosition(toOsg(static_cast<Vector3d>(octree->getBoundingBox().center())));
@@ -107,12 +90,8 @@ void OsgOctreeRepresentation::buildOctree
 void OsgOctreeRepresentation::setOctree(const SurgSim::Math::OctreeShape& octreeShape)
 {
 	SURGSIM_ASSERT(!isAwake()) << "OsgOctreeRepresentation::setOctree() should be called before wake up.";
-	m_octree = std::make_shared<SurgSim::Math::OctreeShape::NodeType>(*(octreeShape.getRootNode()));
-}
-
-std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> OsgOctreeRepresentation::getOctree() const
-{
-	return m_octree;
+	auto octree = std::make_shared<SurgSim::Math::OctreeShape::NodeType>(*(octreeShape.getRootNode()));
+	buildOctree(m_transform, octree);
 }
 
 std::shared_ptr<SurgSim::Graphics::OsgUnitBox> OsgOctreeRepresentation::getSharedUnitBox()

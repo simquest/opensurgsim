@@ -58,14 +58,6 @@ public:
 	/// \param	dt	The time step
 	virtual void doUpdate(double dt) override;
 
-	/// Wake up this representation, build the OSG corresponds to the Octree it holds.
-	/// \return True if OSG tree is built successfully.
-	virtual bool doWakeUp() override;
-
-	/// Get the Octree contained by this representation
-	/// \return	The octree contained by this representation.
-	virtual std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> getOctree() const override;
-
 	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
 	/// \param octreeShape The OctreeShape from which the octree is retrieved.
 	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) override;
@@ -77,9 +69,6 @@ private:
 	/// \param octreeNode The OctreeNode to be drawn.
 	void buildOctree(osg::ref_ptr<osg::Group> parentTransformNode,
 					 std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> octree);
-
-	/// The Octree represented by this representation
-	std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> m_octree;
 
 	/// Shared unit box, so that the geometry can be instanced rather than having multiple copies.
 	std::shared_ptr<OsgUnitBox> m_sharedUnitBox;

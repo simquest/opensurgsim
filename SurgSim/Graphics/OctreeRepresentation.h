@@ -41,10 +41,6 @@ public:
 	{
 	}
 
-	/// Get the Octree contained by this representation
-	/// \return	The octree contained by this representation.
-	virtual std::shared_ptr<SurgSim::Math::OctreeShape::NodeType> getOctree() const = 0;
-
 	/// Set the Octree of this representation. The Octree is retrieved from a Math::OctreeShape.
 	/// \param octreeShape The OctreeShape from which the octree is retrieved.
 	virtual void setOctree(const SurgSim::Math::OctreeShape& octreeShape) = 0;
