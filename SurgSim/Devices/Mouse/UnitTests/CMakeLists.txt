@@ -20,13 +20,13 @@ include_directories(
 
 set(UNIT_TEST_SOURCES
 	MouseDeviceTest.cpp
-	OsgMouseScaffoldTest.cpp
+	MouseScaffoldTest.cpp
 )
 
 set(LIBS MouseDevice 
-		 SurgSimInput 
-		 SurgSimFramework 
 		 SurgSimDataStructures
+		 SurgSimFramework 
+		 SurgSimInput 
 		 ${OPENSCENEGRAPH_LIBRARIES}
 )
 

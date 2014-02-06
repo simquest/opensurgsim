@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
+#include "SurgSim/Devices/Mouse/MouseScaffold.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
-#include "SurgSim/Devices/Mouse/MouseHandler.h"
+#include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 
@@ -30,20 +30,20 @@ namespace Device
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
 
-/// Struct to hold a MouseDevice object, a MouseHandler, and a mutex for data passing.
-struct OsgMouseScaffold::DeviceData
+/// Struct to hold a MouseDevice object, a OsgMouseHandler, and a mutex for data passing.
+struct MouseScaffold::DeviceData
 {
 	/// Constructor
 	/// \param device Device to be managed by this scaffold
 	explicit DeviceData(MouseDevice* device) : deviceObject(device)
 	{
-		mouseHandler = new MouseHandler();
+		mouseHandler = new OsgMouseHandler();
 	}
 
 	/// Device object managed by this scaffold.
 	MouseDevice* const deviceObject;
 	/// Mouse Handler to communicate with underneath API.
-	osg::ref_ptr<MouseHandler> mouseHandler;
+	osg::ref_ptr<OsgMouseHandler> mouseHandler;
 	/// The mutex that protects the externally modifiable parameters.
 	boost::mutex mutex;
 
@@ -53,7 +53,7 @@ private:
 	DeviceData& operator=(const DeviceData&) /*= delete*/;
 };
 
-OsgMouseScaffold::OsgMouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) : m_logger(logger)
+MouseScaffold::MouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) : m_logger(logger)
 {
 	if (nullptr == m_logger)
 	{
@@ -63,23 +63,23 @@ OsgMouseScaffold::OsgMouseScaffold(std::shared_ptr<SurgSim::Framework::Logger> l
 	SURGSIM_LOG_DEBUG(m_logger) << "Mouse: Shared scaffold created.";
 }
 
-OsgMouseScaffold::~OsgMouseScaffold()
+MouseScaffold::~MouseScaffold()
 {
 	unregisterDevice();
 }
 
-bool OsgMouseScaffold::registerDevice(MouseDevice* device)
+bool MouseScaffold::registerDevice(MouseDevice* device)
 {
 	m_device.reset(new DeviceData(device));
 	if (nullptr == m_device)
 	{
-		SURGSIM_LOG_CRITICAL(m_logger) << "OsgMouseScaffold::registerDevice(): failed to create a DeviceData";
+		SURGSIM_LOG_CRITICAL(m_logger) << "MouseScaffold::registerDevice(): failed to create a DeviceData";
 		return false;
 	}
 	return true;
 }
 
-bool OsgMouseScaffold::unregisterDevice()
+bool MouseScaffold::unregisterDevice()
 {
 	m_device.reset();
 	if (nullptr == m_device)
@@ -90,7 +90,7 @@ bool OsgMouseScaffold::unregisterDevice()
 	return false;
 }
 
-bool OsgMouseScaffold::updateDevice(int buttonMask, float x, float y, int scrollDeltaX, int scrollDeltaY)
+bool MouseScaffold::updateDevice(int buttonMask, float x, float y, int scrollDeltaX, int scrollDeltaY)
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
 	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
@@ -106,14 +106,14 @@ bool OsgMouseScaffold::updateDevice(int buttonMask, float x, float y, int scroll
 	return true;
 }
 
-MouseHandler* OsgMouseScaffold::getMouseHandler() const
+OsgMouseHandler* MouseScaffold::getMouseHandler() const
 {
 	return m_device->mouseHandler.get();
 }
 
 
 /// Builds the data layout for the application input (i.e. device output).
-SurgSim::DataStructures::DataGroup OsgMouseScaffold::buildDeviceInputData()
+SurgSim::DataStructures::DataGroup MouseScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addBoolean("button1");		// Indicates mouse left button
@@ -127,24 +127,24 @@ SurgSim::DataStructures::DataGroup OsgMouseScaffold::buildDeviceInputData()
 	return builder.createData();
 }
 
-std::shared_ptr<OsgMouseScaffold> OsgMouseScaffold::getOrCreateSharedInstance()
+std::shared_ptr<MouseScaffold> MouseScaffold::getOrCreateSharedInstance()
 {
-	static SurgSim::Framework::SharedInstance<OsgMouseScaffold> sharedInstance;
+	static SurgSim::Framework::SharedInstance<MouseScaffold> sharedInstance;
 	return sharedInstance.get();
 }
 
-void OsgMouseScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
+void MouseScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 {
 	m_defaultLogLevel = logLevel;
 }
 
-std::shared_ptr<SurgSim::Framework::Logger> OsgMouseScaffold::getLogger() const
+std::shared_ptr<SurgSim::Framework::Logger> MouseScaffold::getLogger() const
 {
 	return m_logger;
 }
 
 
-SurgSim::Framework::LogLevel OsgMouseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
+SurgSim::Framework::LogLevel MouseScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 };  // namespace Device
 };  // namespace SurgSim

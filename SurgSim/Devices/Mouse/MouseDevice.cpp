@@ -14,8 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
-#include "SurgSim/Devices/Mouse/MouseHandler.h"
-#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
+#include "SurgSim/Devices/Mouse/MouseScaffold.h"
+#include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
 #include "SurgSim/Framework/Log.h"
 
 namespace SurgSim
@@ -24,7 +24,7 @@ namespace Device
 {
 
 MouseDevice::MouseDevice(const std::string& deviceName) :
-	SurgSim::Input::CommonDevice(deviceName, OsgMouseScaffold::buildDeviceInputData())
+	SurgSim::Input::CommonDevice(deviceName, MouseScaffold::buildDeviceInputData())
 {
 }
 
@@ -38,9 +38,9 @@ MouseDevice::~MouseDevice()
 
 bool MouseDevice::initialize()
 {
-	SURGSIM_ASSERT(! isInitialized());
+	SURGSIM_ASSERT(!isInitialized());
 
-	m_scaffold = OsgMouseScaffold::getOrCreateSharedInstance();
+	m_scaffold = MouseScaffold::getOrCreateSharedInstance();
 	SURGSIM_ASSERT(m_scaffold);
 
 	m_scaffold->registerDevice(this);
@@ -62,7 +62,7 @@ bool MouseDevice::isInitialized() const
 	return (m_scaffold != nullptr);
 }
 
-MouseHandler* MouseDevice::getMouseHandler() const
+OsgMouseHandler* MouseDevice::getMouseHandler() const
 {
 	return m_scaffold->getMouseHandler();
 }

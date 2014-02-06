@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${OSG_INCLUDE_DIR}
-)
-
 set(UNIT_TEST_SOURCES
 	MouseVisualTests.cpp
 )
@@ -32,7 +28,7 @@ set(LIBS MouseDevice
 		 SurgSimInput 
 		 SurgSimTesting 
 		 ${OPENSCENEGRAPH_LIBRARIES}
-	)
+)
 
 target_link_libraries(MouseVisualTest ${LIBS})
 
