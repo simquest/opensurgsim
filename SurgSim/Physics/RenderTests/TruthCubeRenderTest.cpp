@@ -65,7 +65,7 @@ struct TruthCubeRenderTests : public RenderTests
 		Vector3d position0, position1, position2, position3;
 
 		// Conversion constant to convert from centimeter to meter. 
-		const unsigned int cm2m = 100;
+		const double cm2m = 100;
 
 		const int numCommentLine = 7;
 		std::string lineId;
