@@ -16,6 +16,8 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/SceneElement.h"
 
+#include <boost/uuid/random_generator.hpp>
+
 namespace SurgSim
 {
 namespace Framework
@@ -27,7 +29,12 @@ class Scene;
 class Runtime;
 
 Component::Component(const std::string& name) :
-	m_name(name), m_didInit(false), m_didWakeUp(false), m_isInitialized(false), m_isAwake(false)
+	m_name(name),
+	m_uuid(boost::uuids::random_generator()()),
+	m_didInit(false),
+	m_didWakeUp(false),
+	m_isInitialized(false),
+	m_isAwake(false)
 {
 	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Framework::Component, std::string, name, getName, setName);
 }
@@ -105,9 +112,9 @@ std::shared_ptr<Runtime> Component::getRuntime() const
 	return m_runtime.lock();
 }
 
-std::string Component::getId() const
+boost::uuids::uuid Component::getUuid() const
 {
-	return m_name;
+	return m_uuid;
 }
 
 Component::FactoryType& Component::getFactory()

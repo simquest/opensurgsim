@@ -205,7 +205,7 @@ TEST(ComponentTests, ConvertFactoryTest)
 	YAML::Node node;
 	node["name"] = "ComponentName";
 	node["className"] = "TestComponent1";
-	node["id"] = "ComponentId";
+	node["id"] = "ConvertFactoryTest_TestComponent1";
 
 	auto component = node.as<std::shared_ptr<Component>>();
 
@@ -216,10 +216,11 @@ TEST(ComponentTests, ConvertFactoryTest)
 	EXPECT_EQ("TestComponent1", testComponent->getClassName());
 
 	node["className"] = "Unknown";
+	node["id"] = "ConvertFactoryTest_TestComponent2";
 
 	// Should not be able to convert this class
 	// This currently does not work due to a bug with the id handling
-	// EXPECT_ANY_THROW({auto result = node.as<std::shared_ptr<Component>>();});
+	EXPECT_ANY_THROW({auto result = node.as<std::shared_ptr<Component>>();});
 }
 
 TEST(ComponentTests, AutomaticRegistrationTest)
@@ -227,7 +228,7 @@ TEST(ComponentTests, AutomaticRegistrationTest)
 	YAML::Node node;
 	node["name"] = "ComponentName";
 	node["className"] = "TestComponent2";
-	node["id"] = "FakeId";
+	node["id"] = "AutomaticRegistrationTest_ComponentName";
 
 
 	auto component = node.as<std::shared_ptr<Component>>();
@@ -244,7 +245,7 @@ TEST(ComponentTests, DecodeSharedReferences)
 	YAML::Node node;
 	node["name"] = "OneComponentName";
 	node["className"] = "TestComponent2";
-	node["id"] = "OneComponentName";
+	node["id"] = "DecodeSharedReferences_OneComponentName";
 
 	auto component1 = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component1);
@@ -253,7 +254,7 @@ TEST(ComponentTests, DecodeSharedReferences)
 	EXPECT_NE(nullptr, component1copy);
 	EXPECT_EQ(component1, component1copy);
 
-	node["id"] = "TwoComponentName";
+	node["id"] = "DecodeSharedReferences_TwoComponentName";
 
 	auto component2 = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component2);
@@ -280,7 +281,7 @@ TEST(ComponentTests, DecodeComponent)
 	YAML::Node node;
 	node["name"] = "TestComponentName";
 	node["className"] = "TestComponent2";
-	node["id"] = "TestId";
+	node["id"] = "DecodeComponent_TestComponentName";
 	node["valueOne"] = 100;
 	node["valueTwo"] = 101;
 

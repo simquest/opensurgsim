@@ -16,14 +16,14 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Component.h"
 
-
+#include <boost/uuid/uuid_io.hpp>
 
 namespace YAML
 {
 	Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(const std::shared_ptr<SurgSim::Framework::Component> rhs)
 	{
 		Node result;
-		result["id"] = rhs->getId();
+		result["id"] = to_string(rhs->getUuid());
 		result["className"] = rhs->getClassName();
 		result["name"] = rhs->getName();
 		return result;
@@ -42,6 +42,11 @@ namespace YAML
 				auto sharedComponent = registry.find(id);
 				if ( sharedComponent != registry.end())
 				{
+					SURGSIM_ASSERT(node["name"].as<std::string>() == sharedComponent->second->getName() && 
+								   node["className"].as<std::string>() == sharedComponent->second->getClassName()) <<
+								   "The current node: " << std::endl << node << "has the same id as an instance already " <<
+								   "registered, but the name and/or the className are different. This is likely a problem " <<
+								   "with a manually assigned id.";
 					rhs = sharedComponent->second;
 				}
 				else
@@ -76,9 +81,8 @@ namespace YAML
 
 	Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Component& rhs)
 	{
-
 		YAML::Node node(rhs.encode());
-		node["id"] = rhs.getId();
+		node["id"] = to_string(rhs.getUuid());
 		node["className"] = rhs.getClassName();
 		node["name"] = rhs.getName();
 		return node;

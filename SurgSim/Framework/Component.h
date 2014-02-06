@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <boost/uuid/uuid.hpp>
 
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/Log.h"
@@ -57,7 +58,7 @@ public:
 	void setName(const std::string& name);
 
 	/// Gets the id of the component
-	std::string getId() const;
+	boost::uuids::uuid getUuid() const;
 
 	/// \return True if this component is initialized; otherwise, false.
 	bool isInitialized() const;
@@ -114,7 +115,7 @@ private:
 	std::string m_name;
 
 	/// Id of this component
-	std::string m_id;
+	boost::uuids::uuid m_uuid;
 
 	/// Runtime which contains this component
  	std::weak_ptr<Runtime> m_runtime;
@@ -132,7 +133,8 @@ private:
 	/// Interface to be implemented by derived classes
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
-	void buildId();
+
+
 	/// Indicates if doInitialize() has been called
 	bool m_didInit;
 
