@@ -25,21 +25,21 @@ namespace SurgSim
 
 namespace DataStructures
 {
-	class DataGroup;
+class DataGroup;
 }
 
 namespace Device
 {
 class KeyboardDevice;
-class KeyboardHandler;
+class OsgKeyboardHandler;
 
 /// A class that implements the behavior of KeyboardDevice objects.
 /// \sa SurgSim::Device::KeyboardDevice
 class KeyboardScaffold
 {
 	friend class KeyboardDevice;
-	friend class KeyboardHandler;
 	friend class KeyboardDeviceTest;
+	friend class OsgKeyboardHandler;
 
 public:
 	/// Constructor.
@@ -74,17 +74,18 @@ private:
 	bool registerDevice(KeyboardDevice* device);
 	/// Unregisters the specified device object.
 	/// The corresponding controller will become unused, and can be re-registered later.
-	/// \return true on success, false on failure.
+	/// \return True on success, false on failure.
 	bool unregisterDevice();
 
 	/// Updates the device information for a single device.
-	/// \param info	The device data.
-	/// \return	true on success.
-	bool updateDevice(int key, int key_modifier);
+	/// \param key Unmodified OSG key code.
+	/// \param modifierMask Modifier mask.
+	/// \return	True on success.
+	bool updateDevice(int key, int modifierMask);
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	KeyboardHandler* getKeyboardHandler() const;
+	OsgKeyboardHandler* getKeyboardHandler() const;
 
 	/// Builds the data layout for the application input (i.e. device output).
 	static SurgSim::DataStructures::DataGroup buildDeviceInputData();

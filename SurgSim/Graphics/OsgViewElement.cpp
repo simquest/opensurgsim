@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
-#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
+#include "SurgSim/Devices/Keyboard/OsgKeyboardHandler.h"
 
 #include "SurgSim/Devices/Mouse/MouseDevice.h"
 #include "SurgSim/Devices/Mouse/MouseHandler.h"

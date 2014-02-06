@@ -26,7 +26,7 @@ namespace SurgSim
 namespace Device
 {
 class KeyboardScaffold;
-class KeyboardHandler;
+class OsgKeyboardHandler;
 
 /// A class implementing the communication with a keyboard
 ///
@@ -53,11 +53,11 @@ public:
 	/// Destructor
 	virtual ~KeyboardDevice();
 
-	/// Initialize corresponding KeyboardScaffold.
-	/// \return True if KeyboardScaffold is intialized successfully; Otherwise, false.
+	/// Initialize this device and register it with corresponding scaffold.
+	/// \return True on success; false otherwise.
 	virtual bool initialize() override;
-	/// "De"-initialize corresponding KeyboardScaffold.
-	/// \return True if KeyboardScaffold is 'de'-intialized successfully; Otherwise, false.
+	/// "De"-initialize this device and unregister from the scaffold.
+	/// \return True on success; false, otherwise.
 	virtual bool finalize() override;
 
 	/// Check if the scaffold of this device is initialized.
@@ -66,7 +66,7 @@ public:
 
 	/// Get keyboard handler
 	/// \return The keyboard handler associated with this device
-	KeyboardHandler* getKeyboardHandler() const;
+	OsgKeyboardHandler* getKeyboardHandler() const;
 
 private:
 	/// Communication with hardware is handled by scaffold.
