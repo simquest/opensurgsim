@@ -36,6 +36,7 @@
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
@@ -276,8 +277,6 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	// Positions are reported in millimeters.
 	// Angles are in radians.
 	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter);
-	// Dec-22-2013-HW Currently, the output of Z-axis value from ltr_get_pose() is not consistent
-	// Contacted the developer, waiting for response.
 	Vector3d position(static_cast<double>(x) / 1000.0,
 			  static_cast<double>(y) / 1000.0,
 			  static_cast<double>(z) / 1000.0); // Convert millimeter to meter
@@ -287,7 +286,7 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	Matrix33d rotationX = makeRotationMatrix(static_cast<double>(-roll), Vector3d(Vector3d::UnitX()));
 	Matrix33d rotationY = makeRotationMatrix(static_cast<double>(yaw),   Vector3d(Vector3d::UnitY()));
 	Matrix33d rotationZ = makeRotationMatrix(static_cast<double>(pitch), Vector3d(Vector3d::UnitZ()));
-	// Rotation order is extrinsic XYZ 
+	// Rotation order is extrinsic XYZ
 	Matrix33d orientation = rotationZ * rotationY * rotationX;
 	// Scale Orientation
 	orientation *= info->orientationScale;
