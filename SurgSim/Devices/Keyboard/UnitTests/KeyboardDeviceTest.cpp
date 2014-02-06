@@ -21,7 +21,6 @@
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
 #include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
 #include "SurgSim/Input/InputConsumerInterface.h"
-#include "SurgSim/Input/OutputProducerInterface.h"
 
 namespace SurgSim
 {
@@ -31,10 +30,9 @@ namespace Device
 using SurgSim::Device::KeyboardDevice;
 using SurgSim::DataStructures::DataGroup;
 
-struct TestListener : public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
+struct TestListener : public SurgSim::Input::InputConsumerInterface
 {
 	virtual void initializeInput(const std::string& device, const DataGroup& inputData) override {}
-	virtual bool requestOutput(const std::string& device, DataGroup* outputData) override {return true;}
 	virtual void handleInput(const std::string& device, const DataGroup& inputData) override
 	{
 		m_lastReceivedInput = inputData;

@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Tests for the KeyboardScaffold class and its device interactions.
+/// Tests for the OsgKeyboardScaffold class and its device interactions.
 
 #include <gtest/gtest.h>
 
