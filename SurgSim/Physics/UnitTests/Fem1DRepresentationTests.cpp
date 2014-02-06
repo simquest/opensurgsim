@@ -18,12 +18,14 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/Fem1DRepresentation.h"
 #include "SurgSim/Physics/FemElement1DBeam.h"
 
+using SurgSim::Math::Matrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 
@@ -38,6 +40,85 @@ namespace SurgSim
 namespace Physics
 {
 
+class Fem1DBuilder
+{
+public:
+	Fem1DBuilder()
+		: massDensity(0.0),
+		  youngModulus(0.0),
+		  poissonRatio(0.0),
+		  radius(0.0),
+		  shearingEnabled(true),
+		  initializeElements(false)
+	{
+	}
+
+	std::shared_ptr<Fem1DRepresentation> build(const std::string& name)
+	{
+		unsigned int& nodes = nodesPerDimension[0];
+		SURGSIM_ASSERT(nodes > 0) << "Number of nodes incorrect: " << nodes;
+
+		auto& fem = std::make_shared<Fem1DRepresentation>(name);
+		auto& state = std::make_shared<DeformableRepresentationState>();
+
+		state->setNumDof(fem->getNumDofPerNode(), nodes);
+
+		Vector3d delta = (extremities[1] - extremities[0]) / static_cast<double>(nodes - 1);
+
+		for (unsigned int nodeId = 0; nodeId < nodes; nodeId++)
+		{
+			state->getPositions().segment<3>(6 * nodeId) = extremities[0] + nodeId * delta;
+		}
+
+		for (unsigned int& boundaryCondition : boundaryConditions) // NOLINT
+		{
+			state->addBoundaryCondition(boundaryCondition);
+		}
+
+		std::array<unsigned int, 2> nodeEnds;
+
+		for (unsigned int nodeId = 0; nodeId < nodes - 1; nodeId++)
+		{
+			nodeEnds[0] = nodeId;
+			nodeEnds[1] = nodeId + 1;
+			auto element = std::make_shared<FemElement1DBeam>(nodeEnds, *state);
+			element->setMassDensity(massDensity);
+			element->setYoungModulus(youngModulus);
+			element->setPoissonRatio(poissonRatio);
+			element->setCrossSectionCircular(radius);
+			element->setShearingEnabled(shearingEnabled);
+			if (initializeElements)
+			{
+				element->initialize(*state);
+			}
+			fem->addFemElement(element);
+		}
+
+		fem->setInitialState(state);
+
+		return fem;
+	}
+
+	void addBoundaryCondition(int node, int dof)
+	{
+		for (int i = 0; i < dof; i++)
+		{
+			boundaryConditions.push_back(node * 6 + i);
+		}
+	}
+
+public:
+	std::array<Vector3d, 2> extremities;
+	std::vector<unsigned int> boundaryConditions;
+	std::array<unsigned int, 1> nodesPerDimension;
+	double massDensity;
+	double youngModulus;
+	double poissonRatio;
+	double radius;
+	bool shearingEnabled;
+	bool initializeElements;
+};
+	
 class Fem1DRepresentationTests : public ::testing::Test
 {
 public:
@@ -58,6 +139,8 @@ public:
 	Vector m_expectedTransformedPositions;
 	Vector m_expectedTransformedVelocities;
 	Vector m_expectedTransformedAccelerations;
+
+	Fem1DBuilder m_fem1DBuilder;
 
 protected:
 	virtual void SetUp() override
@@ -127,6 +210,16 @@ protected:
 
 		// Add element to fem
 		m_fem->addFemElement(element);
+
+		// Setup m_fem1DBuilder
+		m_fem1DBuilder.extremities[0] = Vector3d(0.0, 0.0, 0.0);
+		m_fem1DBuilder.extremities[1] = Vector3d(m_L, 0.0, 0.0);
+		m_fem1DBuilder.massDensity = m_rho;
+		m_fem1DBuilder.youngModulus = m_E;
+		m_fem1DBuilder.poissonRatio = m_nu;
+		m_fem1DBuilder.radius = m_radius;
+		m_fem1DBuilder.shearingEnabled = false;
+		m_fem1DBuilder.initializeElements = true;
 	}
 };
 
@@ -212,6 +305,157 @@ TEST_F(Fem1DRepresentationTests, ApplyDofCorrectionTest)
 TEST_F(Fem1DRepresentationTests, ComputesTest)
 {
 	// Not implemented
+}
+
+// Beam tests
+TEST_F(Fem1DRepresentationTests, CantileverEndLoadedTest)
+{
+	// Setup FEM
+	unsigned int nodesPerDim = 2;
+
+	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
+	m_fem1DBuilder.addBoundaryCondition(0, 6);
+	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("CantileverEndLoadedTest");
+	
+	// For last node, apply load to y-direction and calculate deflection
+	double load = 0.7;
+	unsigned int applyIndex = (nodesPerDim - 1) * 6 + 1;
+
+	Vector applyForce = Vector::Zero(nodesPerDim * 6);
+	applyForce[applyIndex] = load;
+	Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
+	Vector calculatedDeflection = stiffnessInverse * applyForce;
+
+	// Compare theoretical deflection with calculated deflection
+	unsigned int lookIndex = applyIndex;
+
+	double deflection = load * (m_L * m_L * m_L) / (3.0 * m_E * m_Iz);
+
+	EXPECT_NEAR(deflection, calculatedDeflection[lookIndex], 1e-8);
+}
+
+TEST_F(Fem1DRepresentationTests, CantileverPunctualLoadAnywhereTest)
+{
+	// Setup FEM
+	unsigned int nodesPerDim = 10;
+
+	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
+	m_fem1DBuilder.addBoundaryCondition(0, 6);
+	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("CantileverPunctualLoadAnywhereTest");
+
+	for (size_t applyNode = 1; applyNode < nodesPerDim; applyNode++)
+	{
+		// For each node, apply load to y-direction and calculate deflection
+		double load = 0.7;
+		unsigned int applyIndex = applyNode * 6 + 1;
+
+		Vector applyForce = Vector::Zero(nodesPerDim * 6);
+		applyForce[applyIndex] = load;
+		Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
+		Vector calculatedDeflection = stiffnessInverse * applyForce;
+
+		for (unsigned int lookNode = 0; lookNode < nodesPerDim; lookNode++)
+		{
+			// For each node, compare theoretical deflection with calculated deflection
+			unsigned int lookIndex = lookNode * 6 + 1;
+
+			double a = m_L * applyNode / (nodesPerDim - 1);
+			double x = m_L * lookNode / (nodesPerDim - 1);
+			double deflection = (x < a) ? load * x * x * (3 * a - x) / (6 * m_E * m_Iz)
+										: load * a * a * (3 * x - a) / (6 * m_E * m_Iz);
+
+			EXPECT_NEAR(deflection, calculatedDeflection[lookIndex], 1e-8);
+		}
+	}
+}
+
+TEST_F(Fem1DRepresentationTests, CantileverEndBentTest)
+{
+	// Setup FEM
+	unsigned int nodesPerDim = 5;
+
+	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
+	m_fem1DBuilder.addBoundaryCondition(0, 6);
+	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("CantileverEndBentTest");
+
+	// For last node, apply moment to z-rotational direction and calculate deflection
+	double moment = 0.7;
+	unsigned int applyIndex = (nodesPerDim - 1) * 6 + 5;
+
+	Vector applyForce = Vector::Zero(nodesPerDim * 6);
+	applyForce[applyIndex] = moment;
+	Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
+	Vector calculatedDeflection = stiffnessInverse * applyForce;
+
+	for (unsigned int lookNode = 0; lookNode < nodesPerDim; lookNode++)
+	{
+		// For each node, compare theoretical deflection with calculated deflection
+		unsigned int lookIndex = lookNode * 6 + 1;
+
+		double x = m_L * lookNode / (nodesPerDim - 1);
+		double deflection = moment * x * x / (2 * m_E * m_Iz);
+
+		EXPECT_NEAR(deflection, calculatedDeflection[lookIndex], 1e-8);
+	}
+}
+
+TEST_F(Fem1DRepresentationTests, EndSupportedBeamCenterLoadedTest)
+{
+	// Setup FEM
+	unsigned int nodesPerDim = 5;
+
+	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
+	m_fem1DBuilder.addBoundaryCondition(0, 3);
+	m_fem1DBuilder.addBoundaryCondition(nodesPerDim - 1, 3);
+	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("EndSupportedBeamCenterLoadedTest");
+
+	// For middle node, apply load to y-direction and calculate deflection
+	double load = 0.7;
+	unsigned int applyIndex = (nodesPerDim / 2) * 6 + 1;
+
+	Vector applyForce = Vector::Zero(nodesPerDim * 6);
+	applyForce[applyIndex] = load;
+	Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
+	Vector calculatedDeflection = stiffnessInverse * applyForce;
+
+	// Compare theoretical deflection with calculated deflection
+	unsigned int lookIndex = applyIndex;
+
+	double deflection = load * (m_L * m_L * m_L) / (48.0 * m_E * m_Iz);
+
+	EXPECT_NEAR(deflection, calculatedDeflection[lookIndex], 1e-8);
+}
+
+TEST_F(Fem1DRepresentationTests, EndSupportedBeamIntermediatelyLoadedTest)
+{
+	// Setup FEM
+	unsigned int nodesPerDim = 5;
+
+	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
+	m_fem1DBuilder.addBoundaryCondition(0, 3);
+	m_fem1DBuilder.addBoundaryCondition(nodesPerDim - 1, 3);
+	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("EndSupportedBeamIntermediatelyLoadedTest");
+
+	for (unsigned int node = 0; node < nodesPerDim; node++)
+	{
+		// For each node, apply load to y-direction and calculate deflection
+		double load = 0.7;
+		unsigned int applyIndex = node * 6 + 1;
+
+		Vector applyForce = Vector::Zero(nodesPerDim * 6);
+		applyForce[applyIndex] = load;
+		Matrix stiffnessInverse = fem->computeK(*fem->getInitialState()).inverse();
+		Vector calculatedDeflection = stiffnessInverse * applyForce;
+
+		// Compare theoretical deflection with calculated deflection
+		unsigned int lookIndex = applyIndex;
+
+		double a = static_cast<double>(node) / static_cast<double>(nodesPerDim - 1) * m_L;
+		double b = m_L - a;
+		double deflection = load * b * a / (6 * m_L * m_E * m_Iz) * (m_L * m_L - a * a - b * b);
+
+		EXPECT_NEAR(deflection, calculatedDeflection[lookIndex], 1e-8);
+	}
 }
 
 } // namespace Physics
