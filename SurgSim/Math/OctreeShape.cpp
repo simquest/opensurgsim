@@ -59,7 +59,7 @@ std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode()
 	return m_rootNode;
 }
 
-const std::shared_ptr<OctreeShape::NodeType> OctreeShape::getRootNode() const
+const std::shared_ptr<const OctreeShape::NodeType> OctreeShape::getRootNode() const
 {
 	return m_rootNode;
 }
