@@ -23,13 +23,11 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Testing/MathUtilities.h"
 
 using SurgSim::Graphics::OsgOctreeRepresentation;
 using SurgSim::Graphics::OctreeRepresentation;
 using SurgSim::Math::OctreeShape;
 using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationQuaternion;
 
@@ -57,36 +55,31 @@ TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 	boundingBox.min() = Vector3d::Ones() * -2.0;
 	boundingBox.max() = Vector3d::Ones() * 2.0;
 
-	auto octree1 = std::make_shared<OctreeShape::NodeType>(boundingBox);
+	std::array<Vector3d, 8> secondLevelPositions = {{ Vector3d(-1.0, -1.0, -1.0),
+													  Vector3d( 1.0, -1.0, -1.0),
+													  Vector3d(-1.0,  1.0, -1.0),
+													  Vector3d( 1.0,  1.0, -1.0),
+													  Vector3d(-1.0, -1.0,  1.0),
+													  Vector3d( 1.0, -1.0,  1.0),
+													  Vector3d(-1.0,  1.0,  1.0),
+													  Vector3d( 1.0,  1.0,  1.0)
+												   }};
+	auto octree = std::make_shared<OctreeShape::NodeType>(boundingBox);
+	octree->addData(secondLevelPositions[0], emptyData, 2);
+	octree->addData(secondLevelPositions[1], emptyData, 2);
+	octree->addData(secondLevelPositions[3], emptyData, 2);
+	octree->addData(secondLevelPositions[7], emptyData, 2);
+
 	OctreeShape octreeShape;
-	octreeShape.setRootNode(octree1);
+	octreeShape.setRootNode(octree);
 
 	auto octreeRepresentation = std::make_shared<OsgOctreeRepresentation>("Octree Representation");
-	octreeRepresentation->setOctree(octreeShape);
-
 	octreeRepresentation->setInitialPose(makeRigidTransform(
-										  makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
-										  Vector3d(0.0, 0.0, -20.0))
+											makeRotationQuaternion(M_PI_4, Vector3d(1.0, 1.0, 1.0)),
+											Vector3d(0.0, 0.0, -20.0))
 										);
 	viewElement->addComponent(octreeRepresentation);
-
-	auto octree2 = octreeRepresentation->getOctree();
-	// An OsgOctreeRepresentation holds a copy of the Octree.
-	EXPECT_NE(octree2, octree1);
-
-	std::array<Vector3d, 8> secondLevelPositions = {{
-			Vector3d(-1.0, -1.0, -1.0),
-			Vector3d( 1.0, -1.0, -1.0),
-			Vector3d(-1.0,  1.0, -1.0),
-			Vector3d( 1.0,  1.0, -1.0),
-			Vector3d(-1.0, -1.0,  1.0),
-			Vector3d( 1.0, -1.0,  1.0),
-			Vector3d(-1.0,  1.0,  1.0),
-			Vector3d( 1.0,  1.0,  1.0)}};
-	octree2->addData(secondLevelPositions[0], emptyData, 2);
-	octree2->addData(secondLevelPositions[1], emptyData, 2);
-	octree2->addData(secondLevelPositions[3], emptyData, 2);
-	octree2->addData(secondLevelPositions[7], emptyData, 2);
+	octreeRepresentation->setOctree(octreeShape);
 
 	/// Run the thread
 	runtime->start();
