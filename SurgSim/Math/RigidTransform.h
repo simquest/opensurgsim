@@ -80,6 +80,41 @@ inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransfo
 	return rigid;
 }
 
+/// Make a rigid transform from a eye point a center view point and an up direction, does not check whether up is
+/// colinear with eye-center
+/// The original formula can be found at
+/// http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
+/// \tparam	typename T	T the numeric data type used for arguments and the return value. Can usually be deduced.
+/// \tparam	int VOpt  	VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
+/// \param	eye   	The position of the object.
+/// \param	center	The point to which the object should point.
+/// \param	up	  	The up vector to be used for this calculation.
+/// \return	a RigidTransform that locates the object at position rotated into the direction of center.
+template <typename T, int VOpt>
+inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(
+	const Eigen::Matrix<T, 3, 1, VOpt>& position,
+	const Eigen::Matrix<T, 3, 1, VOpt>& center,
+	const Eigen::Matrix<T, 3, 1, VOpt>& up)
+{
+
+	Eigen::Transform<T, 3, Eigen::Isometry> rigid;
+	rigid.makeAffine();
+
+	Eigen::Matrix<T, 3, 1, VOpt> forward = (center - position).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> side = (forward.cross(up)).normalized();
+	Eigen::Matrix<T, 3, 1, VOpt> actualUp = side.cross(forward).normalized();
+
+	typename Eigen::Transform<T, 3, Eigen::Isometry>::LinearMatrixType rotation;
+	rotation << side[0], actualUp[0], -forward[0],
+				side[1], actualUp[1], -forward[1],
+				side[2], actualUp[2], -forward[2];
+
+	rigid.linear() = rotation;
+	rigid.translation() = position;
+
+	return rigid;
+}
+
 /// Interpolate (slerp) between 2 rigid transformations
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam TOpt the option flags (alignment etc.) used for the Transform arguments.  Can be deduced.

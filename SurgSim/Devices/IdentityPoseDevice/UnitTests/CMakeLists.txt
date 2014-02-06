@@ -13,15 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
 
+include_directories(
+	${gtest_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
 	IdentityPoseDeviceTest.cpp
-)
-
-set(UNIT_TEST_HEADERS
 )
 
 set(LIBS

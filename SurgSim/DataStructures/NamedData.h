@@ -28,26 +28,28 @@ namespace SurgSim
 namespace DataStructures
 {
 
-/// A collection of value entries that can be accessed by name or index.
+/// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.
 ///
-/// A NamedData object contains a collection of values of type \a T.  Each entry in the collection can be
-/// accessed by using either its unique name (a std::string) or its unique index (a non-negative integer).
-/// Access by name is more convenient, but also less efficient.
+/// A NamedData object consists of a collection of entries of type \a T.  The data value for each entry can be accessed
+/// by either the entry's unique name (a std::string) or the entry's unique index (a non-negative integer).  Access by
+/// name is more convenient, but less efficient.
 ///
-/// A NamedData object constructed by the default constructor starts out empty, meaning it has not yet been
-/// associated with a set of names and indices.  A <i>non</i>-empty object contains a fixed set of value entries;
-/// entries <b>cannot be added or removed</b>, and names and indices of existing entries
-/// <b>cannot be changed</b>.  A non-empty object also cannot ever become empty again.  These properties ensure
-/// that a stable data layout is available to the code using this class so that it can, for example, record
-/// entry indices and use them to retrieve the same entries later on.
+/// A NamedData object constructed by the default constructor has no entries, meaning it has not been associated with a
+/// set of names and indices, and is called <i>invalid</i> or <i>empty</i>.
 ///
-/// However, each entry can be marked as not valid right now, i.e. missing.  Its entry still remains in the
-/// collection, but for the moment has no value associated with it.
+/// An <i>non</i>-empty object contains an immutable collection of entries.  For a non-empty object: entries cannot be
+/// added or removed, and the entries' names and indices <b>cannot be changed</b>.  Further, a non-empty object cannot
+/// become empty. These properties ensure that a stable data layout is available to the code using this class so
+/// that it can, for example, record entry indices and use them to retrieve the same entries later on.
 ///
-/// The set of names and indices within a NamedData object object cannot be modified, but it can be initialized
-/// by passing in a vector of names to the constructor.  Alternately, you can initialize the data layout using
-/// the \ref NamedDataBuilder class.  After doing that, you can create other objects with the same layout by
-/// copy construction, or by assigning the initialized value to an empty (default-constructed) NamedData object.
+/// The data associated with an entry (e.g., the true or false associated with a particular name and index in a
+/// NamedData<bool>) can be changed, and each entry can be reset to a "missing" state.  A reset entry remains in the
+/// collection, but has no associated data.
+///
+/// The entries (i.e., names & indices) in a NamedData object can be set by passing a vector of names to the
+/// constructor, or by using the \ref NamedDataBuilder class.  Given one non-empty object, other objects with the same
+/// entries can be created via copy construction or assignment of the non-empty object to an empty
+/// (default-constructed) object.
 ///
 /// \tparam T the data type used for values contained in this collection.
 template <typename T>
@@ -70,6 +72,7 @@ public:
 	inline explicit NamedData(const std::vector<std::string>& names);
 
 	/// Construct an object as a copy of the data from another object.
+	/// This is used in the NamedVariantData copy constructor.
 	/// \param namedData The object to copy from.
 	inline NamedData(const NamedData& namedData);
 
@@ -115,10 +118,11 @@ public:
 	/// \return The object that was assigned into.
 	inline NamedData& operator=(NamedData&& namedData);
 
-	/// Check if the object is valid (non-empty), meaning it is associated with a set of names and indices.
-	/// If the object is empty, it can become valid on assignment from a valid object.
+	/// Check if the object has been initialized, which means it has a set of entries (i.e., names, indices, and the
+	/// map between them). If the object has not been initialized, it can become initialized on assignment from an
+	/// initialized object.
 	///
-	/// \return true if valid, false if empty.
+	/// \return true if initialized.
 	inline bool isValid() const;
 
 	/// Return the object's layout directory, which is its collection of names and indices.

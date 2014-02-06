@@ -25,9 +25,14 @@
 using SurgSim::Math::RigidTransform3d;
 
 AddSphereFromInputBehavior::AddSphereFromInputBehavior(
-	const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> from):
-	SurgSim::Framework::Behavior(name), m_from(from), m_numElements(0), m_buttonPreviouslyPressed(false)
+	const std::string& name):
+	SurgSim::Framework::Behavior(name), m_numElements(0), m_buttonPreviouslyPressed(false)
 {
+}
+
+void AddSphereFromInputBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> sender)
+{
+	m_from = sender;
 }
 
 void AddSphereFromInputBehavior::update(double dt)

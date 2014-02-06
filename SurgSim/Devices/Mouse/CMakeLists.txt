@@ -51,7 +51,7 @@ SET(LIBS
 target_link_libraries(MouseDevice ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 	add_subdirectory(VisualTests)

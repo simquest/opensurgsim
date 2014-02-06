@@ -14,16 +14,17 @@
 // limitations under the License.
 
 
-#include <gtest/gtest.h>
 #include "SurgSim/Framework/Accessible.h"
+
+#include <gtest/gtest.h>
+#include <memory>
 #include <functional>
 #include <boost/any.hpp>
 
 #include "SurgSim/Math/Matrix.h"
-
 #include "SurgSim/Framework/Convert.h"
 
-#include <memory>
+
 
 class TestClass : public SurgSim::Framework::Accessible
 {
@@ -142,14 +143,14 @@ TEST(AccessibleTest, TemplateFunction)
 	a.readWrite = 100.0;
 
 	// Parameter Deduction
-	int aDotA = 123;
-	double aDotB = 456;
-	EXPECT_TRUE(a.getValue("normal", &aDotA));
-	EXPECT_EQ(10, aDotA);
-	EXPECT_TRUE(a.getValue("readWrite", &aDotB));
-	EXPECT_EQ(100.0, aDotB);
+	int aDotNormal = 123;
+	double aDotReadWrite = 456;
+	EXPECT_TRUE(a.getValue("normal", &aDotNormal));
+	EXPECT_EQ(10, aDotNormal);
+	EXPECT_TRUE(a.getValue("readWrite", &aDotReadWrite));
+	EXPECT_EQ(100.0, aDotReadWrite);
 
-	EXPECT_FALSE(a.getValue("xxxx", &aDotA));
+	EXPECT_FALSE(a.getValue("xxxx", &aDotNormal));
 
 	double* noValue = nullptr;
 

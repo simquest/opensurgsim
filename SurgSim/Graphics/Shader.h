@@ -34,7 +34,7 @@ public:
 	virtual ~Shader() = 0;
 
 	/// Returns true if the vertex shader has been set, otherwise false.
-	virtual bool hasVertexShader() = 0;
+	virtual bool hasVertexShader() const = 0;
 
 	/// Removes the vertex shader, returning that portion of the shader program to fixed-function.
 	virtual void clearVertexShader() = 0;
@@ -98,6 +98,18 @@ public:
 		clearGeometryShader();
 		clearFragmentShader();
 	}
+
+	/// When this is set to true, this shader should be used instead of other shaders that might apply, depending
+	/// on the hierarchy that is set out. E.g if this shader is on a camera, the shaders that occur in a group
+	/// attached to that camera will be overridden.
+	/// This will usually be used in conjunction with \sa RenderPass.
+	/// \param	val	If true the shader should override shaders in lower levels.
+	virtual void setGlobalScope(bool val) = 0;
+
+	/// Query if this shader is of global scope.
+	/// \return	true if global scope, false if not.
+	virtual bool isGlobalScope() const = 0;
+
 };
 
 inline Shader::~Shader()

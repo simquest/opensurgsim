@@ -115,10 +115,14 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	planeElement->addComponent(physicsRepresentation);
 	planeElement->addComponent(graphicsRepresentation);
 
-	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Plane Collision", physicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	planeElement->addComponent(transferPose);
+	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Plane Collision");
+	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	planeElement->addComponent(collisionRepresentation);
 	return planeElement;
 }
 
@@ -182,12 +186,18 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	boxElement->addComponent(rawInputGraphicsRepresentation);
 	boxElement->addComponent(inputComponent);
 	boxElement->addComponent(inputCoupler);
-	boxElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics",
-								physicsRepresentation, graphicsRepresentation));
-	boxElement->addComponent(std::make_shared<TransferInputPoseBehavior>("Raw Input to Graphics",
-								inputComponent, rawInputGraphicsRepresentation));
-	boxElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-								("Box Collision Representation", physicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	boxElement->addComponent(transferPose);
+	auto transferInputPose = std::make_shared<TransferInputPoseBehavior>("Input to RawGraphics");
+	transferInputPose->setPoseSender(inputComponent);
+	transferInputPose->setPoseReceiver(rawInputGraphicsRepresentation);
+	boxElement->addComponent(transferInputPose);
+	auto collisionRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+		("Box Collision Representation");
+	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	boxElement->addComponent(collisionRepresentation);
 	return boxElement;
 }
 
@@ -217,7 +227,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 	runtime->addManager(inputManager);
 
-	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box"));
 	scene->addSceneElement(createPlane("plane",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
@@ -226,7 +236,6 @@ int main(int argc, char* argv[])
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
-	runtime->setScene(scene);
 	runtime->execute();
 
 	return 0;

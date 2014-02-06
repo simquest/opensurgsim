@@ -208,15 +208,19 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	// uses a FixedRepresentation for physics.  Therefore, its physics pose will not change unless it is altered
 	// outside of the physics/collision calculations, making this Component unnecessary for this example.  It is good
 	// practice to ensure that the physics and graphics poses are synced anyway.
-	planeElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-							   physicsRepresentation, graphicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	planeElement->addComponent(transferPose);
+
 	// RigidCollisionRepresentation will use provided physics representation to do collisions.  Collision detection
 	// occurs in SurgSim::Physics::DcdCollision::doUpdate(), which uses the Shape.  Then the physics representations
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
-	planeElement->addComponent(std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Plane Collision", physicsRepresentation));
+	auto rigidRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	rigidRepresentation->setRigidRepresentation(physicsRepresentation);
+	planeElement->addComponent(rigidRepresentation);
 
 	// This Behavior will add balls to the Scene at random locations every few seconds.
 	planeElement->addComponent(std::make_shared<AddRandomSphereBehavior>());
@@ -280,8 +284,10 @@ std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationD
 	sphereElement->addComponent(printoutBehavior);
 	// Each time the BehaviorManager updates the Behaviors, transfer the pose from the physics Representation to the
 	// graphics Representation.
-	sphereElement->addComponent(std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose",
-		physicsRepresentation, graphicsRepresentation));
+	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(graphicsRepresentation);
+	sphereElement->addComponent(transferPose);
 	return sphereElement;
 }
 
@@ -312,7 +318,8 @@ int main(int argc, char* argv[])
 	runtime->addManager(behaviorManager);
 
 	// A Scene is a container for all of the SceneElements, which in turn contain their Components.
-	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
+	// Since the Scene contains all of the Elements, a Runtime therefore has access to all of the Components.
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	scene->addSceneElement(createEarth(data, "earth1",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
@@ -327,9 +334,7 @@ int main(int argc, char* argv[])
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
 
-	// Tell the Runtime which Scene to use. Since the Scene contains all of the Elements, a Runtime therefore has
-	// access to all of the Components.
-	runtime->setScene(scene);
+
 
 	// Run the simulation, starting with initialize/startup of Managers and Components. For each Component of each
 	// Element (Runtime::preprocessSceneElements) the Runtime tries to give access to the Component to each of the

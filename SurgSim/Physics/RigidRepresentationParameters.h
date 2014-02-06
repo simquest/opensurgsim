@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 #define SURGSIM_PHYSICS_RIGIDREPRESENTATIONPARAMETERS_H
 
-#include "SurgSim/Math/Shapes.h"
+#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Valid.h"
 
 namespace SurgSim

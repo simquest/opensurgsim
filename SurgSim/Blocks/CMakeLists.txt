@@ -26,6 +26,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpring2DRepresentation.cpp
 	MassSpring3DRepresentation.cpp
 	MassSpringNDRepresentationUtils.cpp
+	PoseInterpolator.cpp
 	SphereElement.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
@@ -38,6 +39,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
 	SphereElement.h
+	PoseInterpolator.h
 	TransferDeformableStateToVerticesBehavior.h
 	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
@@ -60,7 +62,7 @@ SET(LIBS
 target_link_libraries(SurgSimBlocks ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

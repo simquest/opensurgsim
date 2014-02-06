@@ -14,6 +14,7 @@
 # limitations under the License.
 
 include_directories (
+	${gtest_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
@@ -54,13 +55,18 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-# The unit tests will be built whenever the library is built, but
-# running them at build time requires a window system and is disabled by
-# default.
-option(SURGSIM_TESTS_RUN_GRAPHICS_RENDER
-	"Run the rendering tests as part of unit tests (Requires a running window system)"
-	OFF)
-surgsim_add_unit_tests(SurgSimGraphicsRenderTest
-	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
+set(LIBS
+	SurgSimFramework
+	SurgSimGraphics
+	SurgSimTesting
+	SurgSimBlocks
+	gmock
+	gtest
+	${Boost_LIBRARIES}
+	${OPENSCENEGRAPH_LIBRARIES}
+	${OPENTHREADS_LIBRARY}
+)
+
+surgsim_add_unit_tests(SurgSimGraphicsRenderTest)
 
 set_target_properties(SurgSimGraphicsRenderTest PROPERTIES FOLDER "Graphics")

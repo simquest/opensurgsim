@@ -15,6 +15,7 @@
 
 
 include_directories(
+	${gtest_SOURCE_DIR}/include
 	${OSG_INCLUDE_DIR}
 	${OPENTHREADS_INCLUDE_DIR}
 )
@@ -40,7 +41,6 @@ set(LIBS
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-surgsim_add_unit_tests(SurgSimPhysicsRenderTest
-	RUN ${SURGSIM_TESTS_RUN_GRAPHICS_RENDER})
+surgsim_add_unit_tests(SurgSimPhysicsRenderTest)
 
 set_target_properties(SurgSimPhysicsRenderTest PROPERTIES FOLDER "Physics")

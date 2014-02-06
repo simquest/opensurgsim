@@ -95,12 +95,12 @@ surgsim_add_library(
 
 SET(LIBS
 	${Boost_LIBRARIES}
-	yaml-cpp
+	${YAML_CPP_LIBRARIES}
 )
 
 target_link_libraries(SurgSimFramework ${LIBS})
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

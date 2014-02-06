@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-
-link_directories(${Boost_LIBRARY_DIRS})
-set(LIBS ${LIBS} ${Boost_LIBRARIES})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+else(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	find_package(WDK REQUIRED)
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 include_directories(
 	"${SURGSIM_TOP_INCLUDE_DIR}"
@@ -110,10 +110,14 @@ set(LIBS
 	SurgSimFramework 
 )
 
+if(WDK_FOUND)
+	list(APPEND LIBS ${WDK_LIBRARIES})
+endif()
+
 target_link_libraries(MultiAxisDevice ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 
 	if(GLUT_FOUND)

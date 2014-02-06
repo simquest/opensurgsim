@@ -14,6 +14,7 @@
 # limitations under the License.
 
 include_directories(
+	${gtest_SOURCE_DIR}/include
 )
 
 set(UNIT_TEST_SOURCES
@@ -26,8 +27,10 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	Fem3DRepresentationTests.cpp
+	FemElement3DCubeTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
+	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FemRepresentationTests.cpp
 	FixedRepresentationContactTests.cpp

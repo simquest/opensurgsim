@@ -51,11 +51,10 @@ bool Component::isInitialized() const
 	return m_isInitialized;
 }
 
-bool Component::initialize(const std::shared_ptr<Runtime>& runtime)
+bool Component::initialize(const std::weak_ptr<Runtime>& runtime)
 {
-	SURGSIM_ASSERT(! m_didInit) << "Double initialization called on component " << getName();
-
-	SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be nullptr";
+	SURGSIM_ASSERT(!m_didInit) << "Double initialization called in component " << getName();
+	SURGSIM_ASSERT(!runtime.expired()) << "Runtime cannot be expired at initialization in component " << getName();
 	m_runtime = runtime;
 
 	m_didInit = true;
@@ -71,7 +70,9 @@ bool Component::isAwake() const
 
 bool Component::wakeUp()
 {
-	SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
+	SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component." << getName();
+	SURGSIM_ASSERT(m_didInit) << "Component " << getName() << " was awoken without being initialized.";
+	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialization failed on component." << getName();
 
 	m_didWakeUp = true;
 	m_isAwake = doWakeUp();

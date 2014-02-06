@@ -20,6 +20,7 @@
 #include "SurgSim/Framework/Log.h"
 
 #include <utility>
+#include <boost/thread/locks.hpp>
 
 
 namespace SurgSim
@@ -27,34 +28,36 @@ namespace SurgSim
 namespace Framework
 {
 
-void SurgSim::Framework::Scene::addSceneElement(std::shared_ptr<SceneElement> element)
+Scene::Scene(std::weak_ptr<Runtime> runtime) :
+	m_runtime(runtime)
 {
+	SURGSIM_ASSERT(!m_runtime.expired()) << "Can't create scene with empty runtime.";
+}
+
+Scene::~Scene()
+{
+
+}
+
+void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
+{
+	SURGSIM_ASSERT(!m_runtime.expired()) << "Runtime pointer is expired, cannot add SceneElement to Scene.";
+
 	std::string name = element->getName();
 	element->setScene(getSharedPtr());
 
-	m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
 	std::shared_ptr<Runtime> runtime = m_runtime.lock();
-	if (runtime != nullptr)
+	element->setRuntime(runtime);
+
+	if (element->initialize())
 	{
-		std::shared_ptr<Runtime> runtime(m_runtime);
+		{
+			boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
+			m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
+		}
 		runtime->addSceneElement(element);
 	}
-}
 
-std::shared_ptr<SceneElement> Scene::getSceneElement(const std::string& name) const
-{
-	auto found = m_elements.find(name);
-	std::shared_ptr<SceneElement> result;
-	if (found != m_elements.end())
-	{
-		result = found->second;
-	}
-	return result;
-}
-
-void Scene::setRuntime(std::shared_ptr<Runtime> runtime)
-{
-	m_runtime = runtime;
 }
 
 std::shared_ptr<Runtime> Scene::getRuntime()

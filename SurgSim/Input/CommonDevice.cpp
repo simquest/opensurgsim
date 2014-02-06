@@ -63,13 +63,6 @@ CommonDevice::CommonDevice(const std::string& name, SurgSim::DataStructures::Dat
 {
 }
 
-CommonDevice::CommonDevice(const std::string& name) :
-	m_name(name),
-	m_nameForCallback(name),
-	m_state(new State)
-{
-}
-
 CommonDevice::~CommonDevice()
 {
 }
@@ -95,8 +88,6 @@ bool CommonDevice::addInputConsumer(std::shared_ptr<InputConsumerInterface> inpu
 	{
 		return false;
 	}
-
-	SURGSIM_ASSERT(m_initialInputData.isValid());
 
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	auto it = std::find(m_state->inputConsumerList.begin(), m_state->inputConsumerList.end(), inputConsumer);
@@ -172,8 +163,6 @@ bool CommonDevice::hasOutputProducer()
 
 void CommonDevice::pushInput()
 {
-	SURGSIM_ASSERT(m_inputData.isValid());
-
 	boost::lock_guard<boost::mutex> lock(m_state->consumerProducerMutex);
 	for (auto it = m_state->inputConsumerList.begin();  it != m_state->inputConsumerList.end();  ++it)
 	{
@@ -203,6 +192,21 @@ bool CommonDevice::pullOutput()
 	m_outputData.resetAll();
 
 	return false;
+}
+
+SurgSim::DataStructures::DataGroup& CommonDevice::getInitialInputData()
+{
+	return m_initialInputData;
+}
+
+SurgSim::DataStructures::DataGroup& CommonDevice::getInputData()
+{
+	return m_inputData;
+}
+
+const SurgSim::DataStructures::DataGroup& CommonDevice::getOutputData() const
+{
+	return m_outputData;
 }
 
 

@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(graphicsManager);
 	runtime->addManager(behaviorManager);
 
-	std::shared_ptr<SurgSim::Framework::Scene> scene(new SurgSim::Framework::Scene());
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
 	SurgSim::Math::Vector3d translate(0,0,-3);
@@ -359,8 +359,6 @@ int main(int argc, char* argv[])
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.5, 5.0)));
-
-	runtime->setScene(scene);
 
 	runtime->execute();
 
