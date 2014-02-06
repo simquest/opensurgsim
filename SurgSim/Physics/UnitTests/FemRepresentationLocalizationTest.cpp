@@ -71,17 +71,17 @@ public:
 
 		// Define Tetrahedrons
 		{
-			std::array<unsigned int, 4> nodes = {0, 1, 2, 3};
+			std::array<unsigned int, 4> nodes = {{0, 1, 2, 3}};
 			addTetraheadron(m_fem.get(), nodes, *state);
 		}
 
 		{
-			std::array<unsigned int, 4> nodes = {0, 1, 3, 4};
+			std::array<unsigned int, 4> nodes = {{0, 1, 3, 4}};
 			addTetraheadron(m_fem.get(), nodes, *state);
 		}
 
 		{
-			std::array<unsigned int, 4> nodes = {0, 1, 4, 5};
+			std::array<unsigned int, 4> nodes = {{0, 1, 4, 5}};
 			addTetraheadron(m_fem.get(), nodes, *state);
 		}
 
