@@ -56,6 +56,59 @@ public:
 	}
 };
 
+void computeShapeFunction(double xi, double eta, double zeta, double L, Eigen::Ref<Eigen::Matrix<double, 3, 12>> N)
+{
+	// Shape function for beam from "Theory of Matrix Structural Analysis", Przemieniecki.  Eqns 11.30.
+	// Note xi = x/l, eta = y/l, zeta = z/l
+
+	double xi2 = xi * xi;
+	double xi3 = xi2 * xi;
+
+	// Node 1
+	N(0, 0) = 1.0 - xi;
+	N(0, 1) = 6.0 * (xi - xi2) * eta;
+	N(0, 2) = 6.0 * (xi - xi2) * zeta;
+	N(0, 3) = 0.0;
+	N(0, 4) = (1.0 - 4.0 * xi + 3.0 * xi2) * L * zeta;
+	N(0, 5) = (-1.0 + 4.0 * xi - 3.0 * xi2) * L * eta;
+
+	N(1, 0) = 0.0;
+	N(1, 1) = 1.0 - 3.0 * xi2 + 2.0 * xi3;
+	N(1, 2) = 0.0;
+	N(1, 3) = -(1.0 - xi) * L * zeta;
+	N(1, 4) = 0.0;
+	N(1, 5) = (xi - 2.0 * xi2 + xi3) * L;
+
+	N(2, 0) = 0.0;
+	N(2, 1) = 0.0;
+	N(2, 2) = 1.0 - 3.0 * xi2 + 2.0 * xi3;
+	N(2, 3) = -(1.0 - xi) * L * eta;
+	N(2, 4) = (-xi + 2.0 * xi2 - xi3) * L;
+	N(2, 5) = 0.0;
+
+	// Node 2
+	N(0, 6 + 0) = xi;
+	N(0, 6 + 1) = 6.0 * (-xi + xi2) * eta;
+	N(0, 6 + 2) = 6.0 * (-xi + xi2) * zeta;
+	N(0, 6 + 3) = 0.0;
+	N(0, 6 + 4) = (-2.0 * xi + 3.0 * xi2) * L * zeta;
+	N(0, 6 + 5) = (2.0 * xi - 3.0 * xi2) * L * eta;
+
+	N(1, 6 + 0) = 0.0;
+	N(1, 6 + 1) = 3.0 * xi2 - 2.0 * xi3;
+	N(1, 6 + 2) = 0.0;
+	N(1, 6 + 3) = -L * xi * zeta;
+	N(1, 6 + 4) = 0.0;
+	N(1, 6 + 5) = (-xi2 + xi3) * L;
+
+	N(2, 6 + 0) = 0.0;
+	N(2, 6 + 1) = 0.0;
+	N(2, 6 + 2) = 3.0 * xi2 - 2.0 * xi3;
+	N(2, 6 + 3) = -L * xi * eta;
+	N(2, 6 + 4) = (xi2 - xi3) * L;
+	N(2, 6 + 5) = 0.0;
+}
+
 class FemElement1DBeamTests : public ::testing::Test
 {
 public:
@@ -157,6 +210,83 @@ public:
 			0.0, -11.0 * L / 210.0 - Iz / (10.0 * A * L), 0.0, 0.0, 0.0,  L2 / 105.0 + 2 * Iz / (15.0 * A);
 
 		untransformedMass *= m_rho * m_expectedVolume;
+
+		mass.setZero();
+		placeIntoAssembly(untransformedMass, mass);
+	}
+
+	void getExpectedMassMatrix2(Eigen::Ref<SurgSim::Math::Matrix> mass)
+	{
+		// Kinetic Energy = K = \int_V 1/2 rho v^2 dV, with rho the density and v the velocity of a volume particle
+		// The shape function N transforms local coordinates into global coordinates, x = N q,
+		//      N = (N_1^x     0     0 N_2^x     0     0)
+		//          (    0 N_1^y     0     0 N_2^y     0)
+		//          (    0     0 N_1^z     0     0 N_2^z)
+		//
+		// Using Lagrange's equation, we find
+		// d\dt (dK/d\dot{q}_i) = d\dt( 1/2.rho \int_V d/d\dot(q}_i ( \dot{q}^T.N^T.N.\dot{q} ) dV )
+		//                      [Note d/dx(ax \cdot ax) = 2 (a \cdot ax)]
+		//                      = rho d\dt( \int_V N^T.N.\dot{q} dV )
+		//                      = rho d\dt( \int_V N^T.N dV \dot{q})
+		//                      = rho \int_V N^T.N dV \ddot{q}
+		//
+		// Therefore the mass 'M' is
+		//    M = rho \int_V N^T(x,y,z).N(x,y,z) dV
+		//      = rho \int_V f(x,y,z) dV
+		//
+		// Integrate over the cylindrical volume of the beam
+		//    M = rho \int_0^L dx \int_{-R}^R dy \int_{-\sqrt{R^2-y^2}}^{\sqrt{R^2-y^2}} dz [f(x,y,z)]
+		//
+		// Let
+		//    x = l \xi
+		//    y = l \eta
+		//    z = l \zeta
+		// Then
+		//    \int_0^L dx
+		//      => \int_0^1 l d\xi
+		//    \int_{-R}^R dy
+		//      => \int_{-R/l}^{R/l} l d\eta
+		//    \int_{-\sqrt{R^2-y^2}}^{\sqrt{R^2-y^2}} dz
+		//      => \int_{-\sqrt{(R/l)^2-\eta^2}}^{\sqrt{(R/l)^2-\eta^2}} l d\zeta
+		//
+		// We know 'f' in transformed coordinates, so we can directly calculate
+		//    M = \rho l^3 ...
+		//           \int_0^1 d\xi ...
+		//           \int_{-R/l}^{R/l} d\eta ...
+		//           \int_{-\sqrt{(R/l)^2-\eta^2}}^{\sqrt{(R/l)^2-\eta^2}} d\zeta ...
+		//           [f(\xi, \eta, \zeta)]
+
+		using std::pow;
+		using std::sqrt;
+
+		Eigen::Matrix<double, 3, 12> N;
+		Eigen::Matrix<double, 12, 12> untransformedMass = Eigen::Matrix<double, 12, 12>::Zero();
+
+		for (int i = 0; i < 4; i++)
+		{
+			double xi = 0.5 * SurgSim::Math::gaussQuadrature4Points[i].point + 0.5;
+			double hXi = 0.5 * SurgSim::Math::gaussQuadrature4Points[i].weight;
+
+			for (int j = 0; j < 100; j++)
+			{
+				double eta = m_radius / m_L * SurgSim::Math::gaussQuadrature100Points[j].point;
+				double hEta = m_radius / m_L * SurgSim::Math::gaussQuadrature100Points[j].weight;
+
+				for (int k = 0; k < 2; k++)
+				{
+					double zeta = sqrt(pow(m_radius / m_L, 2.0) - pow(eta, 2.0))
+								  * SurgSim::Math::gaussQuadrature2Points[k].point;
+					double hZeta = sqrt(pow(m_radius / m_L, 2.0) - pow(eta, 2.0))
+								   * SurgSim::Math::gaussQuadrature2Points[k].weight;
+
+					computeShapeFunction(xi, eta, zeta, m_L, N);
+
+					untransformedMass += N.transpose() * N * hZeta * hEta * hXi;
+				}
+			}
+		}
+
+		untransformedMass *= m_rho * pow(m_L, 3.0);
 
 		mass.setZero();
 		placeIntoAssembly(untransformedMass, mass);
@@ -388,10 +518,12 @@ TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 	Matrix stiffnessMatrix = Matrix::Zero(6 * m_numberNodes, 6 * m_numberNodes);
 
 	Matrix expectedMass(6 * m_numberNodes, 6 * m_numberNodes);
+	Matrix expectedMass2(6 * m_numberNodes, 6 * m_numberNodes);
 	Matrix expectedDamping = Matrix(dampingMatrix);
 	Matrix expectedStiffness(6 * m_numberNodes, 6 * m_numberNodes);
 
 	getExpectedMassMatrix(expectedMass);
+	getExpectedMassMatrix2(expectedMass2);
 	getExpectedStiffnessMatrix(expectedStiffness);
 
 	// No force should be produced when in rest state (x = x0) => F = K.(x-x0) = 0
@@ -400,6 +532,7 @@ TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 
 	beam->addMass(m_restState, &massMatrix);
 	EXPECT_TRUE(massMatrix.isApprox(expectedMass));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6));
 
 	beam->addDamping(m_restState, &dampingMatrix);
 	EXPECT_TRUE(dampingMatrix.isApprox(expectedDamping));
@@ -415,6 +548,7 @@ TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 	beam->addFMDK(m_restState, &forceVector, &massMatrix, &dampingMatrix, &stiffnessMatrix);
 	EXPECT_TRUE(forceVector.isZero());
 	EXPECT_TRUE(massMatrix.isApprox(expectedMass));
+	EXPECT_TRUE(massMatrix.isApprox(expectedMass2, 1e-6));
 	EXPECT_TRUE(dampingMatrix.isApprox(expectedDamping));
 	EXPECT_TRUE(stiffnessMatrix.isApprox(expectedStiffness));
 
@@ -424,6 +558,7 @@ TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 	for (int rowId = 0; rowId < 6 * m_numberNodes; rowId++)
 	{
 		EXPECT_NEAR(expectedMass.row(rowId).sum(), forceVector[rowId], epsilon);
+		EXPECT_NEAR(expectedMass2.row(rowId).sum(), forceVector[rowId], 1e-6);
 	}
 	// Test addMatVec API with Damping component only
 	forceVector.setZero();
@@ -448,5 +583,10 @@ TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 							  + 2.0 * expectedDamping.row(rowId).sum()
 							  + 3.0 * expectedStiffness.row(rowId).sum();
 		EXPECT_NEAR(expectedCoef, forceVector[rowId], epsilon);
+
+		expectedCoef = 1.0 * expectedMass2.row(rowId).sum()
+					   + 2.0 * expectedDamping.row(rowId).sum()
+					   + 3.0 * expectedStiffness.row(rowId).sum();
+		EXPECT_NEAR(expectedCoef, forceVector[rowId], 1e-6);
 	}
 }
