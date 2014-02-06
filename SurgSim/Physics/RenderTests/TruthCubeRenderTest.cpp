@@ -39,9 +39,6 @@ namespace Physics
 
 typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
 
-// Conversion constant to convert from centimeter to meter. 
-const unsigned int cm2m = 100;
-
 struct TruthCube
 {
 	// Data positions of uncompressed data
@@ -60,12 +57,15 @@ struct TruthCube
 struct TruthCubeRenderTests : public RenderTests
 {
 	/// Parsing Truth Cube data from an external file
-	/// \param truthCube a container of cube data for all strains in centimeter unit. 
+	/// \param truthCube a container of cube data for all strains in meter unit. 
 	/// \return True if the Truth Cube Data is successful loaded, otherwise false
 	bool parseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
 	{
 		// Position of uncompressed data, 5% strain, 12.5% strain, 18.25% strain
 		Vector3d position0, position1, position2, position3;
+
+		// Conversion constant to convert from centimeter to meter. 
+		const unsigned int cm2m = 100;
 
 		const int numCommentLine = 7;
 		std::string lineId;
@@ -96,10 +96,10 @@ struct TruthCubeRenderTests : public RenderTests
 					>> position3.x() >> comma >> position3.y() >> comma >> position3.z();
 
 				// Store proper strains for each cubeData
-				truthCube->cubeData0.push_back(position0);
-				truthCube->cubeData1.push_back(position1);
-				truthCube->cubeData2.push_back(position2);
-				truthCube->cubeData3.push_back(position3);
+				truthCube->cubeData0.push_back(position0 / cm2m);
+				truthCube->cubeData1.push_back(position1 / cm2m);
+				truthCube->cubeData2.push_back(position2 / cm2m);
+				truthCube->cubeData3.push_back(position3 / cm2m);
 			}
 		}
 		return true;
@@ -145,7 +145,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Uncompressed)
 	/// Loading the Truth Cube uncompressed data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData0.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData0[i] / cm2m));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData0[i]));
 	}
 
 	runTest(representation);
@@ -162,7 +162,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Compressed_5)
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData1.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData1[i] / cm2m));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData1[i]));
 	}
 
 	runTest(representation);
@@ -179,7 +179,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Compressed_12_5)
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData2.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData2[i] / cm2m));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData2[i]));
 	}
 
 	runTest(representation);
@@ -196,7 +196,7 @@ TEST_F(TruthCubeRenderTests, LoadTruthCubeData_Compressed_18_25)
 	/// Loading the Truth Cube data into point cloud
 	for (size_t i = 0; i < truthCube->cubeData3.size(); ++i)
 	{
-		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData3[i] / cm2m));
+		pointCloud->addVertex(CloudMesh::VertexType(truthCube->cubeData3[i]));
 	}
 
 	runTest(representation);
