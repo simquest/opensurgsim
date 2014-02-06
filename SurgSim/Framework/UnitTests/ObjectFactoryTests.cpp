@@ -79,7 +79,7 @@ namespace SurgSim
 namespace Framework
 {
 
-TEST(ObjectFactoryTest, Single)
+TEST(ObjectFactoryTests, Single)
 {
 	ObjectFactory<TestClass> factory;
 
