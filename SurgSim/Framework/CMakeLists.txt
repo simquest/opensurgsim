@@ -68,6 +68,8 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessage.h
 	LogMessageBase.h
 	LogOutput.h
+	ObjectFactory.h
+	ObjectFactory-inl.h
 	Representation.h
 	ReuseFactory.h
 	Runtime.h
