@@ -28,9 +28,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableRepresentationState.cpp
+	Fem1DRepresentation.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
+	FemElement1DBeam.cpp
 	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationCoordinate.cpp
@@ -70,9 +72,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentation.h
 	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
+	Fem1DRepresentation.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
+	FemElement1DBeam.h
 	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h
