@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Keyboard/KeyCode.h"
-#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
-#include "SurgSim/Devices/Keyboard/KeyboardScaffold.h"
+#ifndef SURGSIM_DEVICES_KEYBOARD_OSGKEYBOARDHANDLER_H
+#define SURGSIM_DEVICES_KEYBOARD_OSGKEYBOARDHANDLER_H
 
 #include <memory>
 
@@ -26,28 +25,26 @@ namespace SurgSim
 namespace Device
 {
 
-KeyboardHandler::KeyboardHandler() : m_keyboardScaffold(KeyboardScaffold::getOrCreateSharedInstance())
-{
-}
+class KeyboardScaffold;
 
-bool KeyboardHandler::handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&)
+class OsgKeyboardHandler : public osgGA::GUIEventHandler
 {
-	switch(ea.getEventType())
-	{
-	case(osgGA::GUIEventAdapter::KEYDOWN) :
-	{// Note that we are setting the modifier mask here instead of the modifier itself
-		m_keyboardScaffold.lock()->updateDevice(ea.getUnmodifiedKey(), ea.getModKeyMask());
-		return true;
-	}
-	case(osgGA::GUIEventAdapter::KEYUP) :
-	{
-		m_keyboardScaffold.lock()->updateDevice(KeyCode::NONE, ModKeyMask::MODKEY_NONE);
-		return true;
-	}
-	default:
-		return false;
-	}
-}
+public:
+	/// Constructor
+	OsgKeyboardHandler();
+
+	/// Method to handle GUI event
+	/// \param ea A osgGA::GUIEventAdapter
+	/// \param _2 A dummy parameter (required by this virtual method)
+	/// \return True if the event has been handled by this method; Otherwise, false.
+	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter&) override;
+
+private:
+	/// A back pointer to the scaffold which owns this handle
+	std::weak_ptr<KeyboardScaffold> m_keyboardScaffold;
+};
 
 };  // namespace Device
 };  // namespace SurgSim
+
+#endif  // SURGSIM_DEVICES_KEYBOARD_OSGKEYBOARDHANDLER_H

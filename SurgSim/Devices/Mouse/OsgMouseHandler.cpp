@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Mouse/MouseHandler.h"
-#include "SurgSim/Devices/Mouse/OsgMouseScaffold.h"
+#include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
+#include "SurgSim/Devices/Mouse/MouseScaffold.h"
 
 namespace SurgSim
 {
 namespace Device
 {
 
-MouseHandler::MouseHandler() : m_mouseScaffold(OsgMouseScaffold::getOrCreateSharedInstance()),
+OsgMouseHandler::OsgMouseHandler() : m_mouseScaffold(MouseScaffold::getOrCreateSharedInstance()),
 							   m_lastX(0.0), m_lastY(0.0), m_lastButtonMask(0), m_lastScrollX(0), m_lastScrollY(0)
 {
 }
 
-bool MouseHandler::handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter&)
+bool OsgMouseHandler::handle(const osgGA::GUIEventAdapter& eventHandler, osgGA::GUIActionAdapter&)
 {
 	int scrollX = 0, scrollY = 0;
 	if (eventHandler.getEventType() == osgGA::GUIEventAdapter::EventType::SCROLL)
