@@ -118,4 +118,4 @@ private:
 	static bool _surgsim_registered_##DerivedClass = BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass);
 
 
-#endif // SURGSIM_SERIALIZE_SHAPESFACTORY_H
+#endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

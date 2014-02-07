@@ -54,7 +54,7 @@ private:
 };
 
 /// Override of the convert structure for an Component, this will write out a full version
-/// of the component information, to decode a component use the other converter. 
+/// of the component information, to decode a component use the other converter.
 template<>
 struct convert<SurgSim::Framework::Component>
 {

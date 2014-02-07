@@ -13,9 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_INL_H
+#define SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_INL_H
+
 SURGSIM_DOUBLE_SPECIALIZATION
 template<typename Base>
 static void YAML::convert<std::shared_ptr<SurgSim::Framework::Component>>::registerClass(const std::string& className)
 {
 	getFactory().registerClass<Base>(className);
 }
+
+#endif // SURGSIM_FRAMEWORK_FRAMEWORKCONVERTINL_H

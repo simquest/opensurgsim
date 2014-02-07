@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Framework/UnitTests/MockObjects.h>
+#include "SurgSim/Framework/UnitTests/MockObjects.h"
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, MockComponent)
 
@@ -24,8 +24,10 @@ MockComponent::MockComponent(const std::string& name, bool succeedInit /*= true*
 	didWakeUp(false),
 	didInit(false)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MockComponent, bool, SucceedWithInit, getSucceedWithInit, setSucceedWithInit);
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(MockComponent, bool, SucceedWithWakeUp, getSucceedWithWakeUp, setSucceedWithWakeUp);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+		MockComponent, bool, SucceedWithInit, getSucceedWithInit, setSucceedWithInit);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+		MockComponent, bool, SucceedWithWakeUp, getSucceedWithWakeUp, setSucceedWithWakeUp);
 }
 
 MockComponent::~MockComponent()

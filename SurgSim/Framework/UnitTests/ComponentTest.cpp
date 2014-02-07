@@ -345,12 +345,14 @@ TEST(ComponentTests, MockComponent)
 	/// SerializationMockComponent does not have an explicit definition anywhere in the code
 	/// there is not SerializationMockComponent, but this should still suceed, this test protects
 	/// against linker optimization
-	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create("SerializationMockComponent", "othercomponent");
+	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create(
+		"SerializationMockComponent",
+		"othercomponent");
 
 	ASSERT_NE(nullptr, nonDefinedComponent) << "It looks like SerializationMockComponent was lost during linkage.";
 
 	YAML::Node node = YAML::convert<Component>::encode(*nonDefinedComponent);
-	
+
 	std::cout << node;
 
 	auto roundtripComponent = node.as<std::shared_ptr<Component>>();

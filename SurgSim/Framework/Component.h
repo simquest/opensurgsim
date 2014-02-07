@@ -24,7 +24,6 @@
 
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
@@ -120,7 +119,7 @@ private:
 	boost::uuids::uuid m_uuid;
 
 	/// Runtime which contains this component
- 	std::weak_ptr<Runtime> m_runtime;
+	std::weak_ptr<Runtime> m_runtime;
 
 	/// Scene which contains this component
 	std::weak_ptr<Scene> m_scene;

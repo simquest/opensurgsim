@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_FRAMEWORK_UNITTESTS_SERIALIZATIOMOCKCOMPONENT_H
-#define SURGSIM_FRAMEWORK_UNITTESTS_SERIALIZATIOMOCKCOMPONENT_H
+#ifndef SURGSIM_FRAMEWORK_UNITTESTS_SERIALIZATIONMOCKCOMPONENT_H
+#define SURGSIM_FRAMEWORK_UNITTESTS_SERIALIZATIONMOCKCOMPONENT_H
 
-#include <SurgSim/Framework/Component.h>
+#include "SurgSim/Framework/Component.h"
 
 /// This class is for testing the linker and checking if the definition stays in the
 /// executable even if there is not direct reference to it, DO NOT define a member
