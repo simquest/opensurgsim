@@ -30,6 +30,7 @@ set(UNIT_TEST_SOURCES
 	LockedContainerTest.cpp
 	LoggerManagerTest.cpp
 	LoggerTest.cpp
+	ObjectFactoryTests.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
 	SceneElementTest.cpp

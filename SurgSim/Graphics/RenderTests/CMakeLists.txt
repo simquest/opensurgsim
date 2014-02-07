@@ -24,6 +24,7 @@ set(UNIT_TEST_SOURCES
 	OsgCylinderRepresentationRenderTests.cpp
 	OsgManagerRenderTests.cpp
 	OsgMeshRepresentationRenderTests.cpp
+	OsgOctreeRepresentationRenderTests.cpp
 	OsgPlaneRepresentationRenderTests.cpp
 	OsgPointCloudRepresentationRenderTests.cpp
 	OsgRepresentationRenderTests.cpp
@@ -58,10 +59,12 @@ configure_file(
 set(LIBS
 	SurgSimFramework
 	SurgSimGraphics
+	SurgSimMath
 	SurgSimTesting
 	SurgSimBlocks
 	gmock
 	gtest
+	yaml-cpp
 	${Boost_LIBRARIES}
 	${OPENSCENEGRAPH_LIBRARIES}
 	${OPENTHREADS_LIBRARY}
