@@ -38,7 +38,6 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	LoggerManager.cpp
 	LogMessageBase.cpp
 	LogOutput.cpp
-	ObjectFactory.cpp
 	Representation.cpp
 	Runtime.cpp
 	Scene.cpp

@@ -43,7 +43,7 @@ public:
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
 	template <typename Derived>
-	void registerClass(const std::string& className);
+	bool registerClass(const std::string& className);
 
 	/// Create an instance of a class based on the specific class name.
 	/// \param className The class name that was used to register the class.
@@ -85,7 +85,7 @@ public:
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
 	template <typename Derived>
-	void registerClass(const std::string& className);
+	bool registerClass(const std::string& className);
 
 	/// Create an instance of a class based on the specific class name.
 	/// \param className The class name.
@@ -113,5 +113,9 @@ private:
 };
 
 #include "SurgSim/Framework/ObjectFactory-inl.h"
+
+#define SURGSIM_REGISTER(BaseClass, DerivedClass) \
+	static bool _surgsim_registered_##DerivedClass = BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass);
+
 
 #endif // SURGSIM_SERIALIZE_SHAPESFACTORY_H

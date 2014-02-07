@@ -25,6 +25,8 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
+#include "SurgSim/Framework/UnitTests/SerializationMockComponent.h"
+
 #include <mutex>
 
 using SurgSim::Framework::Component;
@@ -91,22 +93,11 @@ public:
 
 
 private:
-	class MetaData
-	{
-	public:
-		MetaData()
-		{
-			Component::getFactory().registerClass<TestComponent2>("TestComponent2");
-		}
-	};
-
-	static MetaData Meta;
-
 	int valueOne;
 	int valueTwo;
 };
 
-TestComponent2::MetaData TestComponent2::Meta;
+
 
 /// Testcomponent with references to other components
 class TestComponent3 : public Component
@@ -151,23 +142,15 @@ public:
 	}
 
 private:
-	class MetaData
-	{
-	public:
-		MetaData()
-		{
-			Component::getFactory().registerClass<TestComponent3>("TestComponent3");
-		}
-	};
-
-	static MetaData Meta;
 
 	std::shared_ptr<Component> m_componentOne;
 	std::shared_ptr<Component> m_componentTwo;
 };
 
-
-TestComponent3::MetaData TestComponent3::Meta;
+namespace {
+	SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2);
+	SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3);
+}
 
 TEST(ComponentTests, Constructor)
 {
@@ -351,4 +334,19 @@ TEST(ComponentTests, ComponentReferences)
 
 	EXPECT_EQ(componentTwo->getValueTwo(),
 			  boost::any_cast<int>(resultContainer->getComponentTwo()->getValue("valueTwo")));
+}
+
+TEST(ComponentTests, MockComponent)
+{
+	auto component = SurgSim::Framework::Component::getFactory().create("MockComponent","testcomponent");
+
+	ASSERT_NE(nullptr, component);
+
+	/// SerializationMockComponent does not have an explicit definition anywhere in the code
+	/// there is not SerializationMockComponent, but this should still suceed, this test protects
+	/// against linker optimization
+	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create("SerializationMockComponent", "othercomponent");
+
+	ASSERT_NE(nullptr, nonDefinedComponent) << "It looks like SerializationMockComponent was lost during linkage.";
+
 }

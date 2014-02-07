@@ -21,13 +21,16 @@
 
 template <class Base>
 template <class Derived>
-void SurgSim::Framework::ObjectFactory<Base>::registerClass(const std::string& className)
+bool SurgSim::Framework::ObjectFactory<Base>::registerClass(const std::string& className)
 {
 	boost::mutex::scoped_lock lock(m_mutex);
+	bool result = false;
 	if (m_constructors.find(className) == m_constructors.end())
 	{
 		m_constructors[className] = boost::factory<std::shared_ptr<Derived>>();
+		result = true;
 	};
+	return false;
 };
 
 template <class Base>
@@ -55,13 +58,16 @@ bool SurgSim::Framework::ObjectFactory<Base>::isRegistered(const std::string& cl
 
 template <typename Base, typename Parameter1>
 template <typename Derived>
-void SurgSim::Framework::ObjectFactory1<Base, Parameter1>::registerClass(const std::string& className)
+bool SurgSim::Framework::ObjectFactory1<Base, Parameter1>::registerClass(const std::string& className)
 {
 	boost::mutex::scoped_lock lock(m_mutex);
+	bool result = false;
 	if (m_constructors.find(className) == m_constructors.end())
 	{
 		m_constructors[className] = boost::factory<std::shared_ptr<Derived>>();
+		result = true;
 	};
+	return result;
 };
 
 template <typename Base, typename Parameter1>

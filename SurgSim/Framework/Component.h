@@ -16,8 +16,10 @@
 #ifndef SURGSIM_FRAMEWORK_COMPONENT_H
 #define SURGSIM_FRAMEWORK_COMPONENT_H
 
+
 #include <string>
 #include <memory>
+
 #include <boost/uuid/uuid.hpp>
 
 #include "SurgSim/Framework/Accessible.h"
