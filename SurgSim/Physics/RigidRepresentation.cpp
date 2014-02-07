@@ -13,16 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/Logger.h"
 
 #include "SurgSim/Physics/RigidRepresentation.h"
 
+#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Collision/Location.h"
+#include "SurgSim/Physics/RigidRepresentationState.h"
 
 using SurgSim::Collision::Location;
 
@@ -315,7 +316,7 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 	m_C.setZero();
 
 	//Invert systemMatrix
-	//We can use this shortcut because we know the linear and angular terms are independant
+	//We can use this shortcut because we know the linear and angular terms are independent
 	m_C.block<3,3>(0,0) = systemMatrix.block<3,3>(0,0).inverse();
 	m_C.block<3,3>(3,3) = systemMatrix.block<3,3>(3,3).inverse();
 }
