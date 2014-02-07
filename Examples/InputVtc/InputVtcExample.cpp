@@ -34,6 +34,7 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
