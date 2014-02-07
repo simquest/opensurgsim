@@ -28,6 +28,8 @@ public:
 
 	virtual ~SerializationMockComponent();
 
+	SURGSIM_CLASSNAME(SerializationMockComponent);
+
 	virtual bool doInitialize();
 	virtual bool doWakeUp();
 

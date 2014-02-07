@@ -349,4 +349,14 @@ TEST(ComponentTests, MockComponent)
 
 	ASSERT_NE(nullptr, nonDefinedComponent) << "It looks like SerializationMockComponent was lost during linkage.";
 
+	YAML::Node node = YAML::convert<Component>::encode(*nonDefinedComponent);
+	
+	std::cout << node;
+
+	auto roundtripComponent = node.as<std::shared_ptr<Component>>();
+
+	ASSERT_NE(nullptr, roundtripComponent);
+
+	EXPECT_EQ("SerializationMockComponent", roundtripComponent->getClassName());
+	EXPECT_EQ("othercomponent", roundtripComponent->getName());
 }
