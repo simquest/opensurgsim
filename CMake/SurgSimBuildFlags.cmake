@@ -69,7 +69,8 @@ if(MSVC)
 
 	# default VC++ compilation flags
 	add_definitions( -D_CRT_SECURE_NO_WARNINGS )
-
+	add_definitions( -D_SCL_SECURE_NO_WARNINGS )
+	
 	# Set the iterator debug level consistently for Debug builds.
 	# [Note that you can't add_definitions() conditionally for debug only,
 	#  because for VS add_definitions() affects ALL build types in the project.
