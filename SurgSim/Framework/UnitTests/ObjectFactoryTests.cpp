@@ -40,8 +40,6 @@ public:
 
 	std::string stringValue;
 	std::string className;
-
-
 };
 
 class TestClassA : public TestClass
@@ -81,7 +79,7 @@ namespace SurgSim
 namespace Framework
 {
 
-TEST(ObjectFactoryTest, Single)
+TEST(ObjectFactoryTests, Single)
 {
 	ObjectFactory<TestClass> factory;
 

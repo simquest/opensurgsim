@@ -108,7 +108,6 @@ YAML::Node Accessible::encode() const
 
 void  Accessible::decode(const YAML::Node& node)
 {
-	bool result = false;
 	SURGSIM_ASSERT(node.IsMap()) << "Node to decode accessible has to be map.";
 	for (auto functors = m_functors.cbegin(); functors != m_functors.cend(); ++functors)
 	{
