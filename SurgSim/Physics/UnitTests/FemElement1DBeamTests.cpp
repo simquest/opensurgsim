@@ -109,6 +109,96 @@ void computeShapeFunction(double xi, double eta, double zeta, double L, Eigen::R
 	N(2, 6 + 5) = 0.0;
 }
 
+void computeB(double xi, double k, double L, double A, double Iy, double Iz, double E, double nu,
+			  Eigen::Ref<Eigen::Matrix<double, 12, 6>> B)
+{
+	// Formula for B derives from
+	// Yunhua Luo's "An Efficient 3D Timoshenko Beam Element with Consistent Shape Functions"
+	// Adv. Theor. Appl. Mech., Vol. 1, 2008, no. 3, 95-106
+	//
+	// According to equation 8, let
+	//     sigma = [epsilon] = [u'         ]
+	//     	       [kappa_y]   [-theta'	   ]
+	//     	       [kappa_z]   [psi'       ]
+	//     	       [gamma_y]   [v' - theta ]
+	//     	       [gamma_z]   [w' + psi   ]
+	//     	       [kappa_x]   [phi'       ]
+	//
+	// Using eqns 19 and 20, we can write
+	//     sigma = B[x] (p_1 p_2)
+	// where B[x] is a 6-by-12 matrix that interpolates barycentric coordinates as curvatures at point x.
+	//
+	// Note that Przemieniecki, which we use for our calculations, transposes phi and theta relative to Luo. Note also
+	// that there appears to be sign issues in Luo's paper, which we identify and fix in the following comments.
+
+	double xi2 = xi * xi;
+
+	double G = E / (2.0 * (1.0 + nu));
+
+	double ay = 12.0 * E * Iy / k / G / A / L / L;
+	double by = 1.0 / (1.0 - ay);
+	double az = 12.0 * E * Iz / k / G / A / L / L;
+	double bz = 1.0 / (1.0 - az);
+
+	// Node 1 contributions
+	// N_1'
+	B(0, 0) = -1.0;
+
+	// -G_v1'
+	B(1, 2) = -6.0 * by / L * (2.0 * xi - 1.0);
+	// H_v1' - G_v1
+	B(1, 4) = by * (6.0 * xi2 - 6.0 * xi + ay) - 6.0 * by / L * (xi2 - xi);
+
+	// G_w1'
+	B(2, 1) = 6.0 * bz / L * (2.0 * xi - 1.0);
+	// H_w1' + G_w1 => H_w1' - G_w1
+	B(2, 3) = bz * (6.0 * xi2 - 6.0 * xi + az) - 6.0 * bz / L * (xi2 - xi);
+
+	// N_1'
+	B(3, 5) = -1.0;
+
+	// -G_{/theta 1}'
+	B(5, 2) = -by * (6.0 * xi + ay - 4.0);
+	// H_{/theta 1}' - G_{/theta 1}
+	B(5, 4) = L * by * (3.0 * xi2 + 2.0 * (0.5 * ay - 2.0) * xi + 1.0 - 0.5 * ay)
+					- by * (3.0 * xi2 + (ay - 4.0) * xi + 1.0 - ay);
+
+	// G_{/psi 1}' => -G_{/psi 1}'
+	B(4, 1) = -bz * (6.0 * xi + az - 4.0);
+	// H_{/psi 1}' + G_{/psi 1} => -H_{/psi 1}' + G_{/psi 1}
+	B(4, 3) = -L * bz * (3.0 * xi2 + 2.0 * (0.5 * az - 2.0) * xi + 1.0 - 0.5 * az)
+					+ bz * (3.0 * xi2 + (az - 4.0) * xi + 1 - az);
+
+	// Node 2 contributions
+	// N_2'
+	B(6, 0) = 1.0;
+
+	// -G_v2'
+	B(7, 2) = -6.0 * by / L * (-2.0 * xi + 1.0);
+	// H_v2' - G_v2
+	B(7, 4) = by * (-6.0 * xi2 + 6.0 * xi - ay) - 6.0 * by / L * (-xi2 + xi);
+
+	// G_w2'
+	B(8, 1) = 6.0 * bz / L * (-2.0 * xi + 1.0);
+	// H_w2' + G_w2 => H_w2' - G_w2
+	B(8, 3) = bz * (-6.0 * xi2 + 6.0 * xi - az) - 6.0 * bz / L * (-xi2 + xi);
+
+	// N_2'
+	B(9, 5) = 1.0;
+
+	// -G_{/theta 2}'
+	B(11, 2) = -by * (6.0 * xi - ay - 2.0);
+	// H_{/theta 2}' - G_{/theta 2}
+	B(11, 4) = L * by * (3.0 * xi2 - 2.0 * (0.5 * ay + 1.0) * xi + 0.5 * ay)
+					- by * (3.0 * xi2 - (ay + 2.0) * xi);
+
+	// G_{/psi 2}' => -G_{/psi 2}'
+	B(10, 1) = -bz * (6.0 * xi - az - 2.0);
+	// H_{/psi 2}' + G_{/psi 2} => -H_{/psi 2}' + G_{/psi 2}
+	B(10, 3) = -L * bz * (3.0 * xi2 - 2.0 * (0.5 * az + 1.0) * xi + 0.5 * az)
+					+ bz * (3.0 * xi2 - (az + 2.0) * xi);
+}
+
 class FemElement1DBeamTests : public ::testing::Test
 {
 public:
@@ -117,7 +207,7 @@ public:
 	std::array<unsigned int, 2> m_nodeIds;
 	DeformableRepresentationState m_restState;
 	double m_expectedVolume;
-	double m_rho, m_E, m_nu, m_L;
+	double m_rho, m_E, m_nu, m_L, m_A, m_Iy, m_Iz;
 	double m_radius;
 	Quaterniond m_orientation;
 
@@ -130,7 +220,10 @@ public:
 		m_nu = 0.45;
 		m_radius = 0.01;
 		m_L = 1.0;
-		m_expectedVolume = m_L * (M_PI * m_radius * m_radius);
+		m_A = M_PI * m_radius * m_radius;
+		m_expectedVolume = m_L * m_A;
+		m_Iy = M_PI_4 * m_radius * m_radius * m_radius * m_radius;
+		m_Iz = m_Iy;
 
 		// Beam is made of node 3 and 1 in a bigger system containing m_numberNodes nodes (at least 4)
 		m_nodeIds[0] = 3;
@@ -365,6 +458,71 @@ public:
 		placeIntoAssembly(untransformedStiffness, stiffness);
 	}
 
+	void getExpectedStiffnessMatrix2(Eigen::Ref<SurgSim::Math::Matrix> stiffness)
+	{
+		// The following discussion refers to
+		// Yunhua Luo's "An Efficient 3D Timoshenko Beam Element with Consistent Shape Functions"
+		// Adv. Theor. Appl. Mech., Vol. 1, 2008, no. 3, 95-106
+		//
+		// The strain for a 1D beam is given by eqn 8,
+		//     sigma = (epsilon, kappa_y, kappa_z, gamma_y, gamma_z, kappa_x)
+		//
+		// The strains are curvatures in a solid, and locations within the solid are derived
+		// through the shape function.  The shape function is given by eqns 19 and 20, and
+		// it depends on the beams's endpoints (p_1, p_2).  Let
+		//     sigma = B[x] * (p_1 p_2)
+		//
+		// The strain displacement equation is given by eqn 12,
+		//     epsilon = D sigma
+		// where D is block diagonal matrix given by eqn 12 as well.
+		//
+		// Energy is force times displacement, so
+		//     E = 1/2 \int_V \epsilon^T sigma dV
+		//       = 1/2 \int_V (p_1 p_2)^T B^T D B (p_1 p_2) dV
+		//
+		// Force is the derivative of energy with respect to distance
+		//     F = -dE/d(p_1 p_2)
+		//       = -\int_V B^T D B (p_1 p_2) dV
+		//
+		// Stiffness is the derivative of force with respect to distance
+		//     K = -dF/d(p_1 p_2)
+		//       = \int_V B^T D B dV
+		//
+		// Note this produces _different_ results from the Euler-Bernoulli beam derived by Przemieniecki, so it is
+		// actually not suitable for this test.
+
+		Eigen::Matrix<double, 12, 6> B;
+		Eigen::DiagonalMatrix<double, 6> D;
+
+		double G = m_E / (2.0 * (1.0 + m_nu));
+		double k = 1.0;
+
+		double Iz = M_PI_4 * std::pow(m_radius, 4.0);
+		double Iy = M_PI_4 * std::pow(m_radius, 4.0);
+
+		D.diagonal() << m_E * m_A, m_E * Iy, m_E * Iz, k * G * m_A, k * G * m_A, k * G * (Iy + Iz);
+
+		Eigen::Matrix<double, 12, 12, Eigen::DontAlign> untransformedStiffness;
+
+		B.setZero();
+		untransformedStiffness.setZero();
+
+		for (int i = 0; i < 3; i++)
+		{
+			double xi = 0.5 * SurgSim::Math::gaussQuadrature3Points[i].point + 0.5;
+			double hXi = 0.5 * SurgSim::Math::gaussQuadrature3Points[i].weight;
+
+			computeB(xi, k, m_L, m_A, m_Iy, m_Iz, m_E, m_nu, B);
+
+			untransformedStiffness += B * D * B.transpose() * hXi;
+		}
+
+		untransformedStiffness *= m_L;
+
+		stiffness.setZero();
+		placeIntoAssembly(untransformedStiffness, stiffness);
+	}
+
 	void placeIntoAssembly(const Eigen::Ref<SurgSim::Math::Matrix>& in, Eigen::Ref<SurgSim::Math::Matrix> out)
 	{
 		std::vector<unsigned int> nodeIdsVectorForm(m_nodeIds.begin(), m_nodeIds.end());
@@ -589,4 +747,14 @@ TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 					   + 3.0 * expectedStiffness.row(rowId).sum();
 		EXPECT_NEAR(expectedCoef, forceVector[rowId], 1e-6);
 	}
+}
+
+TEST_F(FemElement1DBeamTests, EulerBernoulliVersusTimoshenkoTest)
+{
+	Matrix timoshenkoStiffness(6 * m_numberNodes, 6 * m_numberNodes);
+	Matrix eulerBernoulliStiffness(6 * m_numberNodes, 6 * m_numberNodes);
+	getExpectedStiffnessMatrix(eulerBernoulliStiffness);
+	getExpectedStiffnessMatrix2(timoshenkoStiffness);
+
+	EXPECT_FALSE(eulerBernoulliStiffness.isApprox(timoshenkoStiffness));
 }
