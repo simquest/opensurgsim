@@ -255,6 +255,29 @@ public:
 		}
 	}
 
+	/// Get beads of the truth cube
+	/// Note: the beads are actually all the internal nodes of the cube
+	/// \return coordinate of beads
+	std::vector<std::vector<std::vector<Vector3d>>> getBeads()
+	{
+		std::vector<std::vector<std::vector<Vector3d>>> beads;
+
+		beads.resize(m_numNodesPerAxis - 2);
+		for (int i = 0; i < m_numNodesPerAxis - 2; i++)
+		{
+			beads[i].resize(m_numNodesPerAxis - 2);
+			for (int j = 0; j < m_numNodesPerAxis - 2; j++)
+			{
+				beads[i][j].resize(m_numNodesPerAxis - 2);
+				for (int k = 0; k < m_numNodesPerAxis - 2; k++)
+				{
+						beads[i][j][k] = m_nodes[i + 1][j + 1][k + 1];
+				}
+			}
+		}
+		return beads;
+	}
+
 private:
 	typedef std::array<SurgSim::Math::Vector3d, 8> CubeNodesType;
 
