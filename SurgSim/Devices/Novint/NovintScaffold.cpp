@@ -724,15 +724,15 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::Math::Vector3d force, torque;
-	if (outputData.vectors().get("force", &force))
-	{
-		info->forceValue = force;
-	}
-	if (outputData.vectors().get("torque", &torque))
-	{
-		info->torqueValue = torque;
-	}
+	SurgSim::Math::Vector3d force;
+	force.setZero();
+	outputData.vectors().get("force", &force);
+	info->forceValue = force;
+
+	SurgSim::Math::Vector3d torque;
+	torque.setZero();
+	outputData.vectors().get("torque", &torque);
+	info->torqueValue = torque;
 
 	// Set the force command (in newtons).
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
