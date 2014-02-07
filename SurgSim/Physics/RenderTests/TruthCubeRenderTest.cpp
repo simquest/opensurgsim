@@ -65,7 +65,7 @@ struct TruthCubeRenderTests : public RenderTests
 		Vector3d position0, position1, position2, position3;
 
 		// Conversion constant to convert from centimeter to meter. 
-		const double cm2m = 100.0;
+		const double cm2m = 1000.0;
 
 		const int numCommentLine = 7;
 		std::string lineId;
@@ -123,7 +123,7 @@ struct TruthCubeRenderTests : public RenderTests
 
 		viewElement->addComponent(representation);
 		viewElement->enableManipulator(true);
-		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 2.0), Vector3d::Zero());
+		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero());
 
 		/// Run the thread
 		runtime->start();
