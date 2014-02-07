@@ -596,38 +596,13 @@ bool NovintScaffold::finalizeDeviceState(DeviceData* info)
 }
 
 
-bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
+bool NovintScaffold::updateDevice(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
 	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	// TODO(bert): this code should cache the access indices.
-	// TODO(bert): this needs to be split up into more methods.  It is WAAAAY too big.
-
-	SurgSim::Math::Vector3d force;
-	if (outputData.vectors().get("force", &force))
-	{
-		info->forceValue = force;
-	}
-	else
-	{
-		info->forceValue.setZero();
-	}
-
-	SurgSim::Math::Vector3d torque;
-	if (outputData.vectors().get("torque", &torque))
-	{
-		info->torqueValue = torque;
-	}
-	else
-	{
-		info->torqueValue.setZero();
-	}
-
-	bool desiredGravityCompensation = false;
-	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
-
 
 	hdlMakeCurrent(info->deviceHandle.get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
@@ -658,19 +633,50 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
 		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
 		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
-		info->jointAngles *= info->orientationScale;
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
-		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
-		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
+			Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
+			Vector3d(Vector3d::UnitY()));
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
+			Vector3d(Vector3d::UnitZ()));
 		Matrix33d orientation = rotationY * rotationZ * rotationX;
 		// Put the result into the orientation transform matrix:
 		info->transformValue.block<3, 3>(0, 0) = orientation;
 	}
 
-	// Check the device's homing state.
+	checkDeviceHoming(info);
 
+	RigidTransform3d pose;
+	pose.linear() = info->transformValue.block<3,3>(0,0);
+	pose.translation() = info->positionValue * info->positionScale;
+
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	inputData.poses().set("pose", pose);
+	inputData.booleans().set("button1", info->buttonStates[0]);
+	inputData.booleans().set("button2", info->buttonStates[1]);
+	inputData.booleans().set("button3", info->buttonStates[2]);
+	inputData.booleans().set("button4", info->buttonStates[3]);
+	inputData.booleans().set("isHomed", info->isDeviceHomed);
+	inputData.booleans().set("isPositionHomed", info->isPositionHomed);
+	inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
+
+	bool desiredGravityCompensation = false;
+	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
+	if (shouldSetGravityCompensation)
+	{
+		setGravityCompensation(info, desiredGravityCompensation);
+	}
+
+	info->forceValue.setZero();
+	info->torqueValue.setZero();
+	fatalError = fatalError || !updateForcesAndTorques(info); // short-circuit only updates forces if no fatal error
+	return !fatalError;
+}
+
+void NovintScaffold::checkDeviceHoming(DeviceData* info)
+{
 	unsigned int deviceStateBitmask = hdlGetState();
 	info->isPositionHomed = ((deviceStateBitmask & HDAL_NOT_CALIBRATED) == 0);
 
@@ -713,20 +719,33 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	{
 		info->transformValue.setIdentity();
 	}
+}
 
-	// Set the force command (in newtons) and gravity compensation.
+bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
+{
+	const SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	RigidTransform3d pose;
+	SURGSIM_ASSERT(inputData.poses().get("pose", &pose)) << "In NovintScaffold.  We just set the pose, but cannot" <<
+		"'get' it." << std::endl;
+	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
+	SurgSim::Math::Vector3d force;
+	SurgSim::Math::Vector3d torque;
+	if (outputData.vectors().get("force", &force))
+	{
+		info->forceValue = force;
+	}
+	if (outputData.vectors().get("torque", &torque))
+	{
+		info->torqueValue = torque;
+	}
 
+	// Set the force command (in newtons).
 	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
+	bool fatalError = false;
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 	//hdlGripSetAttributesd(HDL_GRIP_TORQUE, 3, info->torqueBuffer);  // 2nd arg is size
 
-	if (shouldSetGravityCompensation)
-	{
-		setGravityCompensation(info, desiredGravityCompensation);
-	}
-
 	// Set the torque command if applicable (and convert newton-meters to command counts).
-
 	if (info->isDevice7Dof)
 	{
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
@@ -828,24 +847,6 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, deviceTorques);
 		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
-
-
-	{
-		RigidTransform3d pose;
-		pose.linear() = info->transformValue.block<3,3>(0,0);
-		pose.translation() = info->positionValue * info->positionScale;
-
-		SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-		inputData.poses().set("pose", pose);
-		inputData.booleans().set("button1", info->buttonStates[0]);
-		inputData.booleans().set("button2", info->buttonStates[1]);
-		inputData.booleans().set("button3", info->buttonStates[2]);
-		inputData.booleans().set("button4", info->buttonStates[3]);
-		inputData.booleans().set("isHomed", info->isDeviceHomed);
-		inputData.booleans().set("isPositionHomed", info->isPositionHomed);
-		inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
-	}
-
 	return !fatalError;
 }
 
