@@ -99,6 +99,63 @@ public:
 		return m_displacement.size();
 	}
 
+	/// Sets state for the truth cube representation
+	/// \param state	The deformable state. 
+	void setDeformableState(std::shared_ptr<DeformableRepresentationState> state)
+	{
+		int nodeId = 0;
+		for (int k = 0; k < m_numNodesPerAxis; k++)
+		{
+			for (int j = 0; j < m_numNodesPerAxis; j++)
+			{
+				for (int i = 0; i < m_numNodesPerAxis; i++)
+				{
+					state->getPositions()[nodeId * 3 + 0] = m_nodes[i][j][k][0];
+					state->getPositions()[nodeId * 3 + 1] = m_nodes[i][j][k][1];
+					state->getPositions()[nodeId * 3 + 2] = m_nodes[i][j][k][2];
+					nodeId++;
+				}
+			}
+		}
+	}
+
+	/// Sets the boundary condition for the truth cube
+	/// \param displacement	The displacement of the boundary conditions
+	void setBoundaryCondition(double displacement)
+	{
+		int nodeId = 0;
+		for (int k = 0; k < m_numNodesPerAxis; k++)
+		{
+			for (int j = 0; j < m_numNodesPerAxis; j++)
+			{
+				for (int i = 0; i < m_numNodesPerAxis; i++)
+				{
+
+					// Boundary conditions at bottom layer
+					if (j == 0)
+					{
+						m_boundary[nodeId * 3 + 0] = true;
+						m_boundary[nodeId * 3 + 1] = true;
+						m_boundary[nodeId * 3 + 2] = true;
+					}
+
+					if (j == m_numNodesPerAxis-1)
+					{
+						// Apply displacement value
+						m_displacement[nodeId * 3 + 1] = displacement;
+
+					}
+					nodeId++;
+				}
+			}
+		}
+	}
+
+	std::vector<bool> getBoundaryConditions()
+	{
+		return m_boundary;
+	}
+
 	/// Creates the subdivision truth cube nodes
 	void createTruthCubeMesh()
 	{
