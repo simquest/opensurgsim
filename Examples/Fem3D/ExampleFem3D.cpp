@@ -68,7 +68,7 @@ std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	std::array<Vector3d, 8> vertices = {
+	std::array<Vector3d, 8> vertices = {{
 		Vector3d(-0.5, -0.5, -0.5),
 		Vector3d( 0.5, -0.5, -0.5),
 		Vector3d(-0.5,  0.5, -0.5),
@@ -76,16 +76,16 @@ std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 		Vector3d(-0.5, -0.5,  0.5),
 		Vector3d( 0.5, -0.5,  0.5),
 		Vector3d(-0.5,  0.5,  0.5),
-		Vector3d( 0.5,  0.5,  0.5)};
+		Vector3d( 0.5,  0.5,  0.5)}};
 
 	// Cube decomposition into 5 tetrahedrons
 	// https://www.math.ucdavis.edu/~deloera/CURRENT_INTERESTS/cube.html
-	std::array< std::array<unsigned int, 4>, 5> tetrahedrons = {
-		4, 7, 1, 2, // CCW (47)cross(41) . (42) > 0
-		4, 1, 7, 5, // CCW (41)cross(47) . (45) > 0
-		4, 2, 1, 0, // CCW (42)cross(41) . (40) > 0
-		4, 7, 2, 6, // CCW (47)cross(42) . (46) > 0
-		1, 2, 7, 3 };  // CCW (12)cross(17) . (13) > 0
+	std::array< std::array<unsigned int, 4>, 5> tetrahedrons = {{
+		{{4, 7, 1, 2}}, // CCW (47)cross(41) . (42) > 0
+		{{4, 1, 7, 5}}, // CCW (41)cross(47) . (45) > 0
+		{{4, 2, 1, 0}}, // CCW (42)cross(41) . (40) > 0
+		{{4, 7, 2, 6}}, // CCW (47)cross(42) . (46) > 0
+		{{1, 2, 7, 3}}}};  // CCW (12)cross(17) . (13) > 0
 
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 
@@ -146,7 +146,7 @@ std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	std::array<Vector3d, 8> vertices = {
+	std::array<Vector3d, 8> vertices = {{
 		Vector3d(-0.5, -0.5, -0.5),
 		Vector3d( 0.5, -0.5, -0.5),
 		Vector3d(-0.5,  0.5, -0.5),
@@ -154,7 +154,7 @@ std::shared_ptr<SceneElement> createCubeFem3D(const std::string& name,
 		Vector3d(-0.5, -0.5,  0.5),
 		Vector3d( 0.5, -0.5,  0.5),
 		Vector3d(-0.5,  0.5,  0.5),
-		Vector3d( 0.5,  0.5,  0.5)};
+		Vector3d( 0.5,  0.5,  0.5)}};
 	std::array<unsigned int, 8> cube = {{0, 1, 3, 2, 4, 5, 7, 6}};
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 

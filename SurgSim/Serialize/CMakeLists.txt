@@ -16,14 +16,13 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 	${OSG_INCLUDE_DIR}
 )
 
 set(SURGSIM_SERIALIZE_SOURCES
 	FrameworkConvert.cpp
 	GraphicsConvert.cpp
-	MathConvert.cpp
 	ShapesFactory.cpp
 )
 
@@ -31,7 +30,6 @@ set(SURGSIM_SERIALIZE_HEADERS
 	Convert.h
 	FrameworkConvert.h
 	GraphicsConvert.h
-	MathConvert.h
 	ShapesFactory.h
 	ShapesFactory-inl.h
 )
@@ -44,14 +42,13 @@ surgsim_add_library(
 )
 
 set(LIBS 
-	SurgSimFramework
-	SurgSimGraphics
+
 )
 
 target_link_libraries(SurgSimSerialize ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

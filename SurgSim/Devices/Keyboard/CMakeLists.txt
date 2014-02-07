@@ -22,15 +22,15 @@ include_directories(
 
 set(KEYBOARD_DEVICE_SOURCES
 	KeyboardDevice.cpp
-	KeyboardHandler.cpp
 	KeyboardScaffold.cpp
+	OsgKeyboardHandler.cpp
 )
 
 set(KEYBOARD_DEVICE_HEADERS
 	KeyboardDevice.h
-	KeyboardHandler.h
 	KeyboardScaffold.h
 	KeyCode.h
+	OsgKeyboardHandler.h
 )
 
 surgsim_add_library(
@@ -39,7 +39,15 @@ surgsim_add_library(
 	SurgSim/Devices/Keyboard
 )
 
-if(SURGSIM_TESTS_BUILD)
+set(LIBS ${LIBS} 
+		 SurgSimInput
+		 ${Boost_LIBRARIES}
+)
+
+target_link_libraries(KeyboardDevice ${LIBS}
+)
+
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 	add_subdirectory(VisualTests)

@@ -18,7 +18,12 @@
 
 #include <vector>
 #include <memory>
+
+#ifdef __APPLE__
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
+#endif
 
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/RigidTransform.h"

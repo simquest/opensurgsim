@@ -19,8 +19,9 @@ link_directories(${Boost_LIBRARY_DIRS})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 
 include_directories(
-	"${Boost_INCLUDE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
+	${Boost_INCLUDE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_FRAMEWORK_SOURCES
@@ -58,6 +59,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Component.h
 	ComponentManager.h
 	ComponentManager-inl.h
+	Convert.h
 	LockedContainer.h
 	Log.h
 	Logger.h
@@ -66,6 +68,8 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessage.h
 	LogMessageBase.h
 	LogOutput.h
+	ObjectFactory.h
+	ObjectFactory-inl.h
 	Representation.h
 	ReuseFactory.h
 	Runtime.h
@@ -87,12 +91,12 @@ surgsim_add_library(
 
 SET(LIBS
 	${Boost_LIBRARIES}
+	${YAML_CPP_LIBRARIES}
 )
 
-target_link_libraries(SurgSimFramework ${LIBS}
-)
+target_link_libraries(SurgSimFramework ${LIBS})
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

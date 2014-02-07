@@ -16,13 +16,11 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	GraphicsConvertTest.cpp
-	MathConvertTest.cpp
 	ShapesConvertTest.cpp
 	ShapesFactoryTest.cpp
 )
@@ -38,7 +36,7 @@ set(LIBS
 	SurgSimGraphics
 	gmock
 	gtest
-	yaml-cpp
+	${YAML_CPP_LIBRARIES}}
 	${Boost_LIBRARIES}
 )
 

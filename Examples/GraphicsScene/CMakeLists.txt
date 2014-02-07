@@ -27,6 +27,7 @@ include_directories(
 	"${Boost_INCLUDE_DIR}"
 	"${OSG_INCLUDE_DIR}"
 	"${OPENTHREADS_INCLUDE_DIR}"
+	"${YAML_CPP_INCLUDE_DIR}"
 )
 
 set(EXAMPLE_SOURCES
@@ -52,8 +53,7 @@ SET(LIBS
 	SurgSimGraphics
 )
 
-target_link_libraries(ExampleGraphicsScene ${LIBS}
-)
+target_link_libraries(ExampleGraphicsScene ${LIBS})
 
 # Put ExampleGraphicsScene into folder "Examples"
 set_target_properties(ExampleGraphicsScene PROPERTIES FOLDER "Examples") 

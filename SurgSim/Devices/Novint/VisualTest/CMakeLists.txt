@@ -59,3 +59,6 @@ surgsim_show_ide_folders(
 
 # Put Novint7DofVisualTest into folder "Devices"
 set_target_properties(Novint7DofVisualTest PROPERTIES FOLDER "Devices")
+
+# Put NovintVisualTest into folder "Devices"
+set_target_properties(NovintVisualTest PROPERTIES FOLDER "Devices")

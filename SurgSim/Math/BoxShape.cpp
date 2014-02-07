@@ -88,14 +88,14 @@ const std::array<Vector3d, 8>& BoxShape::getVertices() const
 
 void BoxShape::calculateVertices()
 {
-	static const std::array<Vector3d, 8> multiplier = {Vector3d(-0.5, -0.5, -0.5),
+	static const std::array<Vector3d, 8> multiplier = {{Vector3d(-0.5, -0.5, -0.5),
 													   Vector3d(-0.5, -0.5,  0.5),
 													   Vector3d(-0.5,  0.5,  0.5),
 													   Vector3d(-0.5,  0.5, -0.5),
 													   Vector3d( 0.5, -0.5, -0.5),
 													   Vector3d( 0.5, -0.5,  0.5),
 													   Vector3d( 0.5,  0.5,  0.5),
-													   Vector3d( 0.5,  0.5, -0.5)};
+													   Vector3d( 0.5,  0.5, -0.5)}};
 	for(int i = 0; i < 8; ++i)
 	{
 		m_vertices[i] = m_size.array() * multiplier[i].array();

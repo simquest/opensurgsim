@@ -26,19 +26,13 @@ find_program(DOXYGEN_DOT_EXECUTABLE
 	PATHS "$ENV{DOXYGEN_DOT_PATH}" "${DOXYGEN_DOT_PATH}"
 	DOC "Graphviz Dot tool for using Doxygen")
 
-find_package(Doxygen)
+find_package(Doxygen REQUIRED)
 
 if(EXISTS "${SURGSIM_THIRD_PARTY_DIR}/mathjax")
 	set(MATHJAX_LOCAL "${SURGSIM_THIRD_PARTY_DIR}/mathjax")
 else()
 	set(MATHJAX_LOCAL "")
 endif()
-
-option(SURGSIM_DOCUMENTATION
-	"Generate HTML documentation using Doxygen" ${DOXYGEN_FOUND})
-
-option(SURGSIM_DOCUMENTATION_AUTOBUILD
-	"(Re)generate HTML documentation during build, and do it every time." OFF)
 
 set(SURGSIM_DOCUMENTATION_EXCLUDE_LIST
 	*/UnitTests/*
@@ -54,70 +48,56 @@ set(PROJECT_LOGO "${CMAKE_CURRENT_SOURCE_DIR}/OpenSurgSim-dox.png")
 set(HTML_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/header.html")
 set(HTML_FOOTER "${CMAKE_CURRENT_SOURCE_DIR}/footer.html")
 
+# Set DOT_PATH to DOXYGEN_DOT_EXECUTABLE, or empty if not found.
+# Eliminates whining from Doxygen.
+if(DOXYGEN_DOT_FOUND)
+	set(DOT_PATH "${DOXYGEN_DOT_EXECUTABLE}")
+else(DOXYGEN_DOT_FOUND)
+	set(DOT_PATH "")
+endif(DOXYGEN_DOT_FOUND)
 
-if(SURGSIM_DOCUMENTATION)
-	if (NOT DOXYGEN_FOUND)
-		message(FATAL_ERROR
-			"Doxygen is needed to generate the documentation, but was not found.")
+# Tie the documentation build to the project build.
+set(DOCUMENTATION_TARGET_FLAGS ALL)
 
-	else(NOT DOXYGEN_FOUND)
-		# Set DOT_PATH to DOXYGEN_DOT_EXECUTABLE, or empty if not found.
-		# Eliminates whining from Doxygen.
-		if(DOXYGEN_DOT_FOUND)
-			set(DOT_PATH "${DOXYGEN_DOT_EXECUTABLE}")
-		else(DOXYGEN_DOT_FOUND)
-			set(DOT_PATH "")
-		endif(DOXYGEN_DOT_FOUND)
+# Control the output format so warnings pop up in the Visual Studio list
+if(MSVC)
+	set(WARN_FORMAT "\"$file($line): warning DOC1: $text\"")
+else(MSVC)
+	set(WARN_FORMAT "\"$file:$line: $text\"")
+endif(MSVC)
 
-		# Control whether the "documentation" target needs to be built
-		# separately or whether it will be tied into the project build.
-		if(SURGSIM_DOCUMENTATION_AUTOBUILD)
-			set(DOCUMENTATION_TARGET_FLAGS ALL)
-		else(SURGSIM_DOCUMENTATION_AUTOBUILD)
-			set(DOCUMENTATION_TARGET_FLAGS )
-		endif(SURGSIM_DOCUMENTATION_AUTOBUILD)
+if(SURGSIM_DOCUMENTATION_MATHJAX_LOCAL STREQUAL "")
+	# Use MathJax directly from the web
+	set(MATHJAX_RELPATH http://www.mathjax.org/mathjax)
+else()
+	# Copy MathJax directly into the generated documentation
+	if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/html/mathjax")
+		message("Copying local MathJax (please be patient)...")
+		file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/")
+		file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/mathjax/")
+		file(COPY "${SURGSIM_THIRD_PARTY_DIR}/mathjax/."
+			DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/html/")
+		message("...done!")
+	endif()
+	set(MATHJAX_RELPATH ./mathjax)
+endif()
 
-		# Control the output format so warnings pop up in the Visual Studio list
-		if(MSVC)
-			set(WARN_FORMAT "\"$file($line): warning DOC1: $text\"")
-		else(MSVC)
-			set(WARN_FORMAT "\"$file:$line: $text\"")
-		endif(MSVC)
+# Generate Doxyfile from Doxyfile.in, with @VARIABLE@ substitution.
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+	${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 
-		if(SURGSIM_DOCUMENTATION_MATHJAX_LOCAL STREQUAL "")
-			# Use MathJax directly from the web
-			set(MATHJAX_RELPATH http://www.mathjax.org/mathjax)
-		else()
-			# Copy MathJax directly into the generated documentation
-			if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/html/mathjax")
-				message("Copying local MathJax (please be patient)...")
-				file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/")
-				file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/html/mathjax/")
-				file(COPY "${SURGSIM_THIRD_PARTY_DIR}/mathjax/."
-					DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/html/")
-				message("...done!")
-			endif()
-			set(MATHJAX_RELPATH ./mathjax)
-		endif()
+add_custom_target(documentation ${DOCUMENTATION_TARGET_FLAGS}
+	${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+	SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	COMMENT "Generating HTML documentation" VERBATIM)
+# Put the Doxyfile.in at the top of the VS project, not "Header Files":
+source_group("" FILES "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in")
 
-		# Generate Doxyfile from Doxyfile.in, with @VARIABLE@ substitution.
-		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-			${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-
-		add_custom_target(documentation ${DOCUMENTATION_TARGET_FLAGS}
-			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-			SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-			COMMENT "Generating HTML documentation" VERBATIM)
-		# Put the Doxyfile.in at the top of the VS project, not "Header Files":
-		source_group("" FILES "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in")
-
-		if(UNIX)
-			install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
-				DESTINATION share/doc/${CMAKE_PROJECT_NAME}) 
-		else(UNIX)
-			install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
-				DESTINATION documentation) 
-		endif(UNIX)
-	endif(NOT DOXYGEN_FOUND)
-endif(SURGSIM_DOCUMENTATION)
+if(UNIX)
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
+		DESTINATION share/doc/${CMAKE_PROJECT_NAME}) 
+else(UNIX)
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
+		DESTINATION documentation) 
+endif(UNIX)
