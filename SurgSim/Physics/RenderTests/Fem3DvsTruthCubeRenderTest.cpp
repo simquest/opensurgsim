@@ -235,6 +235,26 @@ public:
 		}
 	}
 
+	/// Update dof based on correction values after compressing the cube
+	/// \params offset The correction values.
+	void ApplyDofCorrection(const SurgSim::Math::Vector& offset)
+	{
+		int nodeId = 0;
+		for (int k = 0; k < m_numNodesPerAxis; k++)
+		{
+			for (int j = 0; j < m_numNodesPerAxis; j++)
+			{
+				for (int i = 0; i < m_numNodesPerAxis; i++)
+				{
+					m_nodes[i][j][k].x() += (offset)[nodeId+0];
+					m_nodes[i][j][k].y() += (offset)[nodeId+1];
+					m_nodes[i][j][k].z() += (offset)[nodeId+2];
+					nodeId += 3;
+				}
+			}
+		}
+	}
+
 private:
 	typedef std::array<SurgSim::Math::Vector3d, 8> CubeNodesType;
 
