@@ -723,13 +723,8 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 
 bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 {
-	const SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	RigidTransform3d pose;
-	SURGSIM_ASSERT(inputData.poses().get("pose", &pose)) << "In NovintScaffold.  We just set the pose, but cannot" <<
-		"'get' it." << std::endl;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::Math::Vector3d force;
-	SurgSim::Math::Vector3d torque;
+	SurgSim::Math::Vector3d force, torque;
 	if (outputData.vectors().get("force", &force))
 	{
 		info->forceValue = force;
