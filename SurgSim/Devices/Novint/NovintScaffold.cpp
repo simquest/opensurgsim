@@ -671,7 +671,10 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 
 	info->forceValue.setZero();
 	info->torqueValue.setZero();
-	fatalError = fatalError || !updateForcesAndTorques(info); // short-circuit only updates forces if no fatal error
+	if (info->isDeviceHomed)
+	{
+		fatalError = fatalError || !updateForcesAndTorques(info); // short-circuit only updates forces if no fatal error
+	}
 	return !fatalError;
 }
 
@@ -724,12 +727,13 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::Math::Vector3d force;
+	
+	Vector3d force;
 	force.setZero();
 	outputData.vectors().get("force", &force);
 	info->forceValue = force;
 
-	SurgSim::Math::Vector3d torque;
+	Vector3d torque;
 	torque.setZero();
 	outputData.vectors().get("torque", &torque);
 	info->torqueValue = torque;
