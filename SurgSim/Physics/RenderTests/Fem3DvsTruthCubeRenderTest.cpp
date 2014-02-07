@@ -85,6 +85,20 @@ public:
 		return m_numNodesPerAxis;
 	}
 
+	/// Gets displacement values
+	/// \return The vector of displacement
+	std::vector<double> getDisplacements()
+	{
+		return m_displacement;
+	}
+
+	/// Get number of displacement 
+	/// \return the size of displacement vector
+	int getNumofDisplacements()
+	{
+		return m_displacement.size();
+	}
+
 	/// Creates the subdivision truth cube nodes
 	void createTruthCubeMesh()
 	{
