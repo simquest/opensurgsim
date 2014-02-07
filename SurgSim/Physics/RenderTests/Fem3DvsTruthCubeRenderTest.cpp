@@ -295,6 +295,91 @@ private:
 	std::vector<std::vector<std::vector<Vector3d>>> m_nodes;
 };
 
+struct TruthCube
+{
+	// Data positions of uncompressed data
+	std::vector<Vector3d> cubeData0;
+
+	// Data positions of 5% strain
+	std::vector<Vector3d> cubeData1;
+
+	// Data positions of  12.5% strain
+	std::vector<Vector3d> cubeData2;
+
+	// Data positions of  18.25% strain
+	std::vector<Vector3d> cubeData3;
+};
+
+/// Parsing Truth Cube data from an external file
+/// \param truthCube a container of cube data for all strains
+/// \return True if the Truth Cube Data is successful loaded, otherwise false
+bool parseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
+{
+	// Position of uncompressed data, 5% strain, 12.5% strain, 18.25% strain
+	std::array<Vector3d, 4> position;// position0, position1, position2, position3;
+
+	const int numCommentLine = 7;
+	std::string lineId;
+	char comma;
+	int i,j,k;
+	int index = 0;
+
+	// Conversion constant from millimeter to meter
+	const double cm2m = 1000.0;
+
+	const SurgSim::Framework::ApplicationData data("config.txt");
+
+	std::string filename = data.findFile("uniaxial_positions.csv");
+
+	std::ifstream datafile(filename);
+
+	if (! datafile.good())
+	{
+		return false;
+	}
+
+	while (std::getline(datafile, lineId))
+	{
+		if (++index > numCommentLine)
+		{
+			std::stringstream strstream(lineId);
+			strstream >> i >> comma >> j >> comma >> k >> comma
+				>> position[0].x() >> comma >> position[0].y() >> comma >> position[0].z() >> comma
+				>> position[1].x() >> comma >> position[1].y() >> comma >> position[1].z() >> comma
+				>> position[2].x() >> comma >> position[2].y() >> comma >> position[2].z() >> comma
+				>> position[3].x() >> comma >> position[3].y() >> comma >> position[3].z();
+
+			// Re-scale, rotate and translate data of the truth cube
+			// so that it would be ready to use in the simulation.
+			for (unsigned int i = 0; i < position.size(); i++)
+			{
+				// Rescale into meter unit;
+				position[i] /= cm2m;
+
+				// Rotate CCW PI/2 around X-axis to correct the orientation.
+				auto temp = position[i].y();
+				position[i].y() = -1* position[i].z();
+				position[i].z() = -1* temp;
+
+				// Translate 20mm down on Y-Axis
+				position[i].y()  -= 0.017;
+
+				// Translate 10mm down on Z-Axis
+				position[i].z()  += 0.013;
+
+			}
+
+			// Store proper strains for each cubeData
+			truthCube->cubeData0.push_back(position[0]);
+			truthCube->cubeData1.push_back(position[1]);
+			truthCube->cubeData2.push_back(position[2]);
+			truthCube->cubeData3.push_back(position[3]);
+		}
+	}
+	return true;
+
+};
+
 }; // namespace Physics
 }; // namespace SurgSim
 
