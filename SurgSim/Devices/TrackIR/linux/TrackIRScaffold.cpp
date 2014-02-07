@@ -278,18 +278,16 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	// Angles are in radians.
 	ltr_get_pose(&yaw, &pitch, &roll, &x, &y, &z, &counter);
 	Vector3d position(static_cast<double>(x) / 1000.0,
-			  static_cast<double>(y) / 1000.0,
-			  static_cast<double>(z) / 1000.0); // Convert millimeter to meter
+					  static_cast<double>(y) / 1000.0,
+					  static_cast<double>(z) / 1000.0); // Convert millimeter to meter
 	// Scale Position
 	position *= info->positionScale;
 
-	Matrix33d rotationX = makeRotationMatrix(static_cast<double>(-roll), Vector3d(Vector3d::UnitX()));
-	Matrix33d rotationY = makeRotationMatrix(static_cast<double>(yaw),   Vector3d(Vector3d::UnitY()));
-	Matrix33d rotationZ = makeRotationMatrix(static_cast<double>(pitch), Vector3d(Vector3d::UnitZ()));
+	Matrix33d rotationX = makeRotationMatrix(info->orientationScale * static_cast<double>(-roll), Vector3d(1.0, 0.0, 0.0));
+	Matrix33d rotationY = makeRotationMatrix(info->orientationScale * static_cast<double>(yaw),   Vector3d(0.0, 1.0, 0.0));
+	Matrix33d rotationZ = makeRotationMatrix(info->orientationScale * static_cast<double>(pitch), Vector3d(0.0, 0.0, 1.0));
 	// Rotation order is intrinsic/local XYZ
 	Matrix33d orientation = rotationX * rotationY * rotationZ;
-	// Scale Orientation
-	orientation *= info->orientationScale;
 
 	RigidTransform3d pose;
 	pose.linear() = orientation;
