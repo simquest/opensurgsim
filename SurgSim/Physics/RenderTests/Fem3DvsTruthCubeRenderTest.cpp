@@ -1,4 +1,4 @@
-	// This file is a part of the OpenSurgSim project.
+// This file is a part of the OpenSurgSim project.
 // Copyright 2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,6 @@
 // limitations under the License.
 
 #include <math.h>
-#include <iostream>
-#include <fstream>
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
 #include "SurgSim/Framework/ApplicationData.h"
@@ -37,6 +35,7 @@
 #include "SurgSim/Math/Quaternion.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
@@ -50,6 +49,8 @@ namespace SurgSim
 {
 namespace Physics
 {
+
+typedef SurgSim::DataStructures::Vertices<void> CloudMesh;
 
 /// Truth cube implementation by Fem3DRepresentation
 class TruthCubeRepresentation : public Fem3DRepresentation
@@ -166,8 +167,6 @@ public:
 		return m_boundary;
 	}
 
-
-
 	/// Creates the subdivision truth cube nodes
 	void createTruthCubeMesh()
 	{
@@ -196,7 +195,6 @@ public:
 					extremitiesYi[index] = extremitiesY0[index] * (1.0 - j/(m_numNodesPerAxis - 1.0)) +
 						extremitiesY1[index] * j / (m_numNodesPerAxis - 1.0);
 				}
-				
 				m_nodes[i][j].resize(m_numNodesPerAxis);
 				for (int k=0; k < m_numNodesPerAxis; k++)
 				{
@@ -239,7 +237,6 @@ public:
 					femElement->setPoissonRatio(0.499);
 					femElement->setYoungModulus(15.3e5);
 					femElement->initialize(*state);
-					
 					this->addFemElement(femElement);
 
 				}
@@ -351,6 +348,9 @@ struct TruthCube
 	std::vector<Vector3d> cubeData3;
 };
 
+/// Storage for experimental truth cube data.
+std::shared_ptr<TruthCube> truthCube;
+
 /// Parsing Truth Cube data from an external file
 /// \param truthCube a container of cube data for all strains
 /// \return True if the Truth Cube Data is successful loaded, otherwise false
@@ -443,7 +443,7 @@ SurgSim::Math::Matrix computeH(int row, int col, std::shared_ptr<TruthCubeRepres
 			}
 		}
 		// update for next column index
-		indexCol = j;
+		indexCol = j+1;
 	}
 
 	return H;
@@ -492,9 +492,10 @@ SurgSim::Math::Matrix computeA(int numConstraints, int numDof,
 
 	//Copy H^T into A
 	A.block(0, numDof, numDof, numConstraints) = H.transpose();
-	
+
 	return A;
 }
+
 
 /// Using static solver to find the displacement of truth cube
 /// \param truthcubeRepresentation	The Fem3D representation of truth cube
@@ -545,7 +546,7 @@ SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> trut
 	SurgSim::Math::Vector b(numDof+numConstraints);
 	b.setZero();
 	b.segment(numDof, numConstraints) = E;
-	
+
 	// Create vector X
 	SurgSim::Math::Vector X(numDof+numConstraints);
 	X.setZero();
@@ -555,7 +556,7 @@ SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> trut
 
 	// Compute vector U
 	SurgSim::Math::Vector U = X.segment(0, numDof);
-	
+
 	return U;
 }
 
@@ -570,7 +571,8 @@ void doSimulation(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentati
 
 	// Create initial state
 	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
-	initialState->setNumDof(truthCubeRepresentation->getNumDofPerNode(), truthCubeRepresentation->getNumDof());
+	initialState->setNumDof(truthCubeRepresentation->getNumDofPerNode(), 
+		pow(truthCubeRepresentation->getNumNodesPerAxis(), 3));
 	truthCubeRepresentation->setDeformableState(initialState);
 	truthCubeRepresentation->setInitialState(initialState);
 
@@ -651,7 +653,7 @@ struct Fem3DVSTruthCubeRenderTests : public RenderTests
 		/// Run the thread
 		runtime->start();
 
-		boost::this_thread::sleep(boost::posix_time::milliseconds(6000));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(60000));
 	}
 };
 
