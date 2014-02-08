@@ -587,6 +587,172 @@ void doSimulation(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentati
 	truthCubeRepresentation->applyDofCorrection(offset);
 }
 
+/// Copy simulation beads data into point cloud
+/// \param truthCubePrepresentation	The representation of truth cube
+/// \param representation	The representation of point cloud
+void copySimulationBeadsIntoPointCloud(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation,
+							 std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> representation)
+{
+	std::vector<std::vector<std::vector<Vector3d>>> beads = truthCubeRepresentation->getBeads();
+	auto pointCloud = representation->getVertices();
+
+	// Add deform to pointCloud
+	for (unsigned int i = 0; i < beads.size(); i++)
+	{
+		for (unsigned int j = 0; j < beads[i].size(); j++)
+		{
+			for (unsigned int k = 0; k < beads[i][j].size(); k++)
+			{
+				pointCloud->addVertex(CloudMesh::VertexType(beads[i][j][k]));
+			}
+		}
+	}
+}
+
+// Copy experimental beads data into point cloud
+/// \param truthCube	The experimental data for the truth cube
+/// \param representation	The representation of point cloud
+void copyExperimentalBeadsIntoPointCloud(std::vector<SurgSim::Math::Vector3d>& truthCube,
+							 std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> representation)
+{
+	auto pointCloudCompressed = representation->getVertices();
+
+	/// Loading the Truth Cube data into point cloud
+	for (size_t i = 0; i < truthCube.size(); ++i)
+	{
+		pointCloudCompressed->addVertex(CloudMesh::VertexType(truthCube[i]));
+	}
+
+}
+
+struct Fem3DVSTruthCubeRenderTests : public RenderTests
+{
+
+	void runTest(std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> expectData,
+		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> actualData)
+	{
+		/// Setup for expect data points
+		expectData->setPointSize(4.0);
+		RigidTransform3d expectPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0));
+		expectData->setInitialPose(expectPose);
+		expectData->setColor(Vector4d(1.0, 0.0, 0.0, 0.0));
+
+		/// Setup for actual data points
+		actualData->setPointSize(4.0);
+		RigidTransform3d actualPose = makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero());
+		actualData->setInitialPose(actualPose);
+		actualData->setColor(Vector4d(0.0, 1.0, 0.0, 0.0));
+
+		viewElement->addComponent(expectData);
+		viewElement->addComponent(actualData);
+		viewElement->enableManipulator(true);
+		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero());
+
+		/// Run the thread
+		runtime->start();
+
+		boost::this_thread::sleep(boost::posix_time::milliseconds(6000));
+	}
+};
+
+/// Simulate truth cube with 4mm of displacement.
+TEST_F(Fem3DVSTruthCubeRenderTests, CompressedCubeTest1)
+{
+	/// Displacement for this setup
+	double displacement = -0.004;
+
+	std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation = 
+		std::make_shared<TruthCubeRepresentation> ("TruthCube");
+
+	// Run simulation with specific displacement
+	doSimulation(truthCubeRepresentation, displacement);
+
+	auto actualpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>
+		("CompressedTruthCube");
+
+	copySimulationBeadsIntoPointCloud(truthCubeRepresentation, actualpoints);
+
+	// Initialize truthCube variable
+	truthCube = std::make_shared<TruthCube>();
+
+	// Parsing TruthCube data
+	parseTruthCubeData(truthCube);
+
+	auto expectedpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>
+		("ExperimentalTruthCube");
+
+	copyExperimentalBeadsIntoPointCloud(truthCube->cubeData1, expectedpoints);
+
+	/// Run the thread
+	runTest(expectedpoints, actualpoints);
+
+}
+
+/// Simulate truth cube with 10mm of displacement.
+TEST_F(Fem3DVSTruthCubeRenderTests, CompressedCubeTest2)
+{
+
+	/// Displacement for this setup
+	double displacement = -0.010;
+
+	std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation = 
+		std::make_shared<TruthCubeRepresentation> ("TruthCube");
+
+	// Run simulation with specific displacement
+	doSimulation(truthCubeRepresentation, displacement);
+
+	auto actualpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>
+		("CompressedTruthCube");
+
+	copySimulationBeadsIntoPointCloud(truthCubeRepresentation, actualpoints);
+
+	// Initialize truthCube variable
+	truthCube = std::make_shared<TruthCube>();
+
+	// Parsing TruthCube data
+	parseTruthCubeData(truthCube);
+
+	auto expectedpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>
+		("ExperimentalTruthCube");
+
+	copyExperimentalBeadsIntoPointCloud(truthCube->cubeData2, expectedpoints);
+
+	/// Run the thread
+	runTest(expectedpoints, actualpoints);
+}
+
+/// Simulate truth cube with 14.6mm of displacement.
+TEST_F(Fem3DVSTruthCubeRenderTests, CompressedCubeTest3)
+{
+	/// Displacement for this setup
+	double displacement = -0.0146;
+
+	std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation = 
+		std::make_shared<TruthCubeRepresentation> ("TruthCube");
+
+	// Run simulation with specific displacement
+	doSimulation(truthCubeRepresentation, displacement);
+
+	auto actualpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>
+		("CompressedTruthCube");
+
+	copySimulationBeadsIntoPointCloud(truthCubeRepresentation, actualpoints);
+
+	// Initialize truthCube variable
+	truthCube = std::make_shared<TruthCube>();
+
+	// Parsing TruthCube data
+	parseTruthCubeData(truthCube);
+
+	auto expectedpoints = std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>
+		("ExperimentalTruthCube");
+
+	copyExperimentalBeadsIntoPointCloud(truthCube->cubeData3, expectedpoints);
+
+	/// Run the thread
+	runTest(expectedpoints, actualpoints);
+}
+
 }; // namespace Physics
 }; // namespace SurgSim
 
