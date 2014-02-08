@@ -57,12 +57,14 @@ class TruthCubeRepresentation : public Fem3DRepresentation
 public:
 	/// Constructor
 	/// \param name	The name of the truth cube representation.
-	/// \param size	The original length of the truth cube in mm.
+	/// \param size	The original length of the truth cube in m.
 	/// \param level	The subdivision level.
-	explicit TruthCubeRepresentation(const std::string& name, double size, unsigned int level) :
+	explicit TruthCubeRepresentation(const std::string& name, double size = 0.08, unsigned int level = 3) :
 		m_name(name),
 		m_size(size),
 		m_levelSubdivision(level),
+		m_numBoundayConditions(0),
+		m_numDisplacements(0),
 		Fem3DRepresentation(name)
 	{
 		const int dofPerNode = 3;
@@ -86,17 +88,24 @@ public:
 	}
 
 	/// Gets displacement values
-	/// \return The vector of displacement
+	/// \return The vector of displacement.
 	std::vector<double> getDisplacements()
 	{
 		return m_displacement;
 	}
 
 	/// Get number of displacement 
-	/// \return the size of displacement vector
+	/// \return the number of displacements have been set.
 	int getNumofDisplacements()
 	{
-		return m_displacement.size();
+		return m_numDisplacements;
+	}
+
+	/// Get number of boundary conditions
+	/// \return the number of boundary conditions
+	int getNumofBoundaryConsitions()
+	{
+		return m_numBoundayConditions;
 	}
 
 	/// Sets state for the truth cube representation
@@ -130,20 +139,21 @@ public:
 			{
 				for (int i = 0; i < m_numNodesPerAxis; i++)
 				{
-
-					// Boundary conditions at bottom layer
+					// At bottom layer nodes
 					if (j == 0)
 					{
+						// Add boundary condition
 						m_boundary[nodeId * 3 + 0] = true;
 						m_boundary[nodeId * 3 + 1] = true;
 						m_boundary[nodeId * 3 + 2] = true;
+						m_numBoundayConditions += 3;
 					}
-
+					// At top layer nodes
 					if (j == m_numNodesPerAxis-1)
 					{
 						// Apply displacement value
 						m_displacement[nodeId * 3 + 1] = displacement;
-
+						m_numDisplacements++;
 					}
 					nodeId++;
 				}
@@ -155,6 +165,8 @@ public:
 	{
 		return m_boundary;
 	}
+
+
 
 	/// Creates the subdivision truth cube nodes
 	void createTruthCubeMesh()
@@ -237,7 +249,7 @@ public:
 
 	/// Update dof based on correction values after compressing the cube
 	/// \params offset The correction values.
-	void ApplyDofCorrection(const SurgSim::Math::Vector& offset)
+	void applyDofCorrection(const SurgSim::Math::Vector& offset)
 	{
 		int nodeId = 0;
 		for (int k = 0; k < m_numNodesPerAxis; k++)
@@ -304,6 +316,12 @@ private:
 
 	// Number of point per dimensions for each subdivision level
 	int m_numNodesPerAxis; 
+
+	// Number of boundary conditions
+	int m_numBoundayConditions;
+
+	// Number of displacements
+	int m_numDisplacements;
 
 	// Displacement
 	std::vector<double> m_displacement;
@@ -389,7 +407,6 @@ bool parseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
 
 				// Translate 10mm down on Z-Axis
 				position[i].z()  += 0.013;
-
 			}
 
 			// Store proper strains for each cubeData
