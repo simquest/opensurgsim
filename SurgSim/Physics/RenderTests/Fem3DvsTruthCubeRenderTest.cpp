@@ -420,6 +420,173 @@ bool parseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
 
 };
 
+/// Compute matrix H in staticSolver()
+/// \param row	The number of row of H
+/// \param col	The number of column of H.
+/// \param truthcubeRepresentation	The Fem3D representation of the truth cube
+/// \return the computed matrix H
+SurgSim::Math::Matrix computeH(int row, int col, std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation)
+{
+	int j;
+	int indexCol = 0;
+	SurgSim::Math::Matrix H(row, col);
+	H.setZero();
+	for (int i = 0; i < row; i++)
+	{ 
+		for (j = indexCol; j < col; j++)
+		{
+			if (truthCubeRepresentation->getDisplacements()[j] != 0 ||
+				truthCubeRepresentation->getBoundaryConditions()[j])
+			{
+				H(i, j) = 1.0;
+				break;
+			}
+		}
+		// update for next column index
+		indexCol = j;
+	}
+
+	return H;
+}
+
+/// Compute vector E in staticSolver()
+/// \param col	The number of col of E
+/// \param truthcubeRepresentation	The Fem3D representation of the truth cube
+/// \return the computed vector E
+SurgSim::Math::Vector computeE(int col, std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation)
+{
+	SurgSim::Math::Vector E(col);
+	E.setZero();
+	std::vector<double> displacements = truthCubeRepresentation->getDisplacements();
+	std::vector<bool> bc = truthCubeRepresentation->getBoundaryConditions();
+
+	// Copy boundary conditions and displacement into E
+	int displacementId = 0;
+	for (unsigned int i = 0; i < truthCubeRepresentation->getNumDof(); i++)
+	{
+		if (displacements[i] || bc[i])
+		{
+			E(displacementId) = displacements[i];
+			displacementId++;
+		}
+	}
+
+	return E;
+}
+
+/// Compute extend matrix A in staticSolver()
+/// \param numConstraints	The number of constraints of system
+/// \param numDof	The number of dof of the truth cube
+/// \return the extended matrix A
+SurgSim::Math::Matrix computeA(int numConstraints, int numDof, 
+							 SurgSim::Math::Matrix K, SurgSim::Math::Matrix H)
+{
+	SurgSim::Math::Matrix A(numDof+numConstraints, numDof+numConstraints);
+	A.setZero();
+
+	// Copy K into A
+	A.block(0,0, numDof, numDof) = K;
+
+	// Copy H into A
+	A.block(numDof,0, numConstraints, numDof) = H;
+
+	//Copy H^T into A
+	A.block(0, numDof, numDof, numConstraints) = H.transpose();
+	
+	return A;
+}
+
+/// Using static solver to find the displacement of truth cube
+/// \param truthcubeRepresentation	The Fem3D representation of truth cube
+/// \return the list of displacements for each dofId
+SurgSim::Math::Vector staticSolver(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation)
+{
+	// Apply Lagrange multiplier method.
+	// The static system with constraints is defined:
+	// (K H^T).(U      ) = (F)
+	// (H   0) (-lambda)   (E)
+	// 
+	// Extended matrix A = (K H^T)
+	//                     (H   0)
+	// Unknown vector  X = (      U)
+	//                     (-lambda)
+	// RHS             B = (F)
+	//                     (E)
+	// where:
+	//		 - K is the stiffness matrix of size (numDof x numDof)
+	//		 - H is constraint matrix of size (numConstraint x numDof)
+	//		 - F is the initial force, F = 0
+	//		 - E is displacements vector for each constraint in H
+	//		 - U and lambda are the unknown variables.
+
+	// numConstraints = number of boundary conditions  + number of displacements
+	int numConstraints = truthCubeRepresentation->getNumofBoundaryConsitions() +
+						truthCubeRepresentation->getNumofDisplacements();
+
+	int numDof = truthCubeRepresentation->getNumDof();
+
+	// Compute matrix H
+	SurgSim::Math::Matrix H = computeH(numConstraints, numDof, truthCubeRepresentation);
+
+	// Compute stiffness matrix K
+	std::shared_ptr<DeformableRepresentationState> initialState = truthCubeRepresentation->getInitialState();
+	SurgSim::Math::Matrix K = truthCubeRepresentation->computeK(*initialState);
+
+	// Compute extended matrix A
+	SurgSim::Math::Matrix A = computeA(numConstraints, numDof, K, H);
+
+	// Compute the inverse of matrix A
+	SurgSim::Math::Matrix Ainv = A.inverse();
+
+	// Compute vector E
+	SurgSim::Math::Vector E = computeE(numConstraints, truthCubeRepresentation);
+
+	// Compute vector B
+	SurgSim::Math::Vector b(numDof+numConstraints);
+	b.setZero();
+	b.segment(numDof, numConstraints) = E;
+	
+	// Create vector X
+	SurgSim::Math::Vector X(numDof+numConstraints);
+	X.setZero();
+
+	// Compute the unknown variable X
+	X = Ainv*b;
+
+	// Compute vector U
+	SurgSim::Math::Vector U = X.segment(0, numDof);
+	
+	return U;
+}
+
+/// Apply the compression with different strains on the truth cube
+/// \param truthcubecRepresentation 	The representation of truth cube 
+/// \param displacement The displacement
+void doSimulation(std::shared_ptr<TruthCubeRepresentation> truthCubeRepresentation,
+				  double displacement)
+{
+	// Create subdivision cubes mesh
+	truthCubeRepresentation->createTruthCubeMesh();
+
+	// Create initial state
+	std::shared_ptr<DeformableRepresentationState> initialState = std::make_shared<DeformableRepresentationState>();
+	initialState->setNumDof(truthCubeRepresentation->getNumDofPerNode(), truthCubeRepresentation->getNumDof());
+	truthCubeRepresentation->setDeformableState(initialState);
+	truthCubeRepresentation->setInitialState(initialState);
+
+	// Create Fem3d cubes from the subdivision cubes
+	truthCubeRepresentation->addFemCubes(initialState);
+
+	// Setup boundary conditions and displacement
+	truthCubeRepresentation->setBoundaryCondition(displacement);
+
+	// Call staticSolver to find the offset values
+	SurgSim::Math::Vector offset = staticSolver(truthCubeRepresentation);
+
+	// Update the correction
+	truthCubeRepresentation->applyDofCorrection(offset);
+}
+
 }; // namespace Physics
 }; // namespace SurgSim
 
