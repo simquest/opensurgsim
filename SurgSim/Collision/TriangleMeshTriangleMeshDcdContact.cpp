@@ -70,6 +70,18 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	RigidTransform3d meshBCoordinatesFromMeshACoordinates = meshBCoordinatesFromGlobalCoordinates
 															* globalCoordinatesFromMeshACoordinates;
 
+	// Precalculate mesh B normals
+	std::vector<Vector3d> collectionNormalB;
+	collectionNormalB.reserve(meshB->getNumTriangles());
+	for (unsigned int i = 0; i < meshB->getNumTriangles(); ++i)
+	{
+		const Vector3d &triangleB0 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
+		const Vector3d &triangleB1 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
+		const Vector3d &triangleB2 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
+
+		collectionNormalB.emplace_back((triangleB1 - triangleB0).cross(triangleB2 - triangleB0));
+	}
+
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointA, penetrationPointB;
@@ -92,16 +104,16 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 
 		for (unsigned int j = 0; j < meshB->getNumTriangles(); ++j)
 		{
-			// The triangleB vertices.
-			const Vector3d &triangleB0 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
-			const Vector3d &triangleB1 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
-			const Vector3d &triangleB2 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
-
-			const Vector3d normalB = (triangleB1 - triangleB0).cross(triangleB2 - triangleB0);
+			const Vector3d &normalB = collectionNormalB[i];
 			if (normalB.isZero())
 			{
 				continue;
 			}
+
+			// The triangleB vertices.
+			const Vector3d &triangleB0 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
+			const Vector3d &triangleB1 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
+			const Vector3d &triangleB2 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
 
 			// Check if the triangles intersect.
 			if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0, triangleA1, triangleA2,
