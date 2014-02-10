@@ -20,7 +20,6 @@
 #include "SurgSim/Framework/LogOutput.h"
 
 #include <string>
-#include <sstream>
 #include <memory>
 
 namespace SurgSim
