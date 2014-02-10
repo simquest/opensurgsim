@@ -62,11 +62,13 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	std::shared_ptr<MeshShape::TriMesh> meshB =
 		std::dynamic_pointer_cast<MeshShape::TriMesh>(meshShapeB->getMesh());
 
-	RigidTransform3d meshATransform = representationMeshA->getPose();
-	RigidTransform3d meshBTransform = representationMeshB->getPose();
+	RigidTransform3d globalCoordinatesFromMeshACoordinates = representationMeshA->getPose();
+	RigidTransform3d globalCoordinatesFromMeshBCoordinates = representationMeshB->getPose();
 
-	RigidTransform3d meshATransformInverse = meshATransform.inverse();
-	RigidTransform3d meshBTransformInverse = meshBTransform.inverse();
+	RigidTransform3d meshBCoordinatesFromGlobalCoordinates = globalCoordinatesFromMeshBCoordinates.inverse();
+
+	RigidTransform3d meshBCoordinatesFromMeshACoordinates = meshBCoordinatesFromGlobalCoordinates
+															* globalCoordinatesFromMeshACoordinates;
 
 	double depth = 0.0;
 	Vector3d normal;
@@ -75,9 +77,12 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	for (unsigned int i = 0; i < meshA->getNumTriangles(); ++i)
 	{
 		// The triangleA vertices.
-		const Vector3d &triangleA0 = meshATransform * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[0]);
-		const Vector3d &triangleA1 = meshATransform * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[1]);
-		const Vector3d &triangleA2 = meshATransform * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[2]);
+		const Vector3d &triangleA0 = meshBCoordinatesFromMeshACoordinates
+									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[0]);
+		const Vector3d &triangleA1 = meshBCoordinatesFromMeshACoordinates
+									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[1]);
+		const Vector3d &triangleA2 = meshBCoordinatesFromMeshACoordinates
+									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[2]);
 
 		const Vector3d normalA = (triangleA1 - triangleA0).cross(triangleA2 - triangleA0);
 		if (normalA.isZero())
@@ -88,9 +93,9 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 		for (unsigned int j = 0; j < meshB->getNumTriangles(); ++j)
 		{
 			// The triangleB vertices.
-			const Vector3d &triangleB0 = meshBTransform * meshA->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
-			const Vector3d &triangleB1 = meshBTransform * meshA->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
-			const Vector3d &triangleB2 = meshBTransform * meshA->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
+			const Vector3d &triangleB0 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
+			const Vector3d &triangleB1 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
+			const Vector3d &triangleB2 = meshA->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
 
 			const Vector3d normalB = (triangleB1 - triangleB0).cross(triangleB2 - triangleB0);
 			if (normalB.isZero())
@@ -107,10 +112,13 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 			{
 				// Create the contact.
 				std::pair<Location,Location> penetrationPoints;
-				penetrationPoints.first.globalPosition.setValue(penetrationPointA);
-				penetrationPoints.second.globalPosition.setValue(penetrationPointB);
+				penetrationPoints.first.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
+																* penetrationPointA);
+				penetrationPoints.second.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
+																 * penetrationPointB);
 
-				pair->addContact(std::abs(depth), normal, penetrationPoints);
+				pair->addContact(std::abs(depth), globalCoordinatesFromMeshBCoordinates.linear() * normal,
+								 penetrationPoints);
 			}
 		}
 	}
