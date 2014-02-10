@@ -34,6 +34,7 @@ add_executable(StaplingDemo
 )
 
 set(LIBS ${LIBS}
+		 MultiAxisDevice
 		 SurgSimBlocks
 		 SurgSimFramework
 		 SurgSimGraphics
