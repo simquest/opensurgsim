@@ -96,9 +96,10 @@ TEST(PoseInterpolatorTests, StartAndEndPose)
 
 	EXPECT_TRUE(startPose.isApprox(representation->getPose()));
 	interpolator->update(0.5);
-	
+
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.5);
-	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl << representation->getPose().matrix();
+	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
+																			<< representation->getPose().matrix();
 }
 
 TEST(PoseInterpolatorTests, UseOptionalStartPose)
@@ -119,7 +120,8 @@ TEST(PoseInterpolatorTests, UseOptionalStartPose)
 	interpolator->update(0.5);
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.5);
-	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl << representation->getPose().matrix();
+	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
+																			<< representation->getPose().matrix();
 }
 
 TEST(PoseInterpolatorTests, UseLoop)
@@ -131,7 +133,7 @@ TEST(PoseInterpolatorTests, UseLoop)
 	interpolator->setStartingPose(startPose);
 	interpolator->setEndingPose(endPose);
 	interpolator->setTarget(representation);
-	
+
 	interpolator->setPingPong(true);
 	interpolator->setLoop(true);
 
@@ -147,11 +149,13 @@ TEST(PoseInterpolatorTests, UseLoop)
 	interpolator->update(0.25);
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.25);
-	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl << representation->getPose().matrix();
+	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
+																			<< representation->getPose().matrix();
 
 	// We advance by 1.0, this should wrap around to 0.25 again and the poses should be the same
 	interpolator->update(1.0);
-	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl << representation->getPose().matrix();
+	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
+																			<< representation->getPose().matrix();
 
 }
 
@@ -180,12 +184,14 @@ TEST(PoseInterpolatorTests, UsePingPong)
 	interpolator->update(0.25);
 
 	RigidTransform3d pose = interpolate(startPose, endPose, 0.25);
-	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl << representation->getPose().matrix();
+	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
+																			<< representation->getPose().matrix();
 
 	// We advance by 1.0, this should wrap around to 0.25 and the poses should be flipped
 	pose = interpolate(endPose, startPose, 0.25);
 	interpolator->update(1.0);
-	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl << representation->getPose().matrix();
+	EXPECT_TRUE(pose.matrix().isApprox(representation->getPose().matrix())) << pose.matrix() << std::endl
+																			<< representation->getPose().matrix();
 
 }
 

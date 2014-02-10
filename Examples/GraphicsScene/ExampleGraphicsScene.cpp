@@ -195,7 +195,7 @@ public:
 	{
 		m_box = std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>(getName()+" Graphics");
 		m_box->setInitialPose(RigidTransform3d::Identity());
-		
+
 		// The material that this object uses
 		m_box->setMaterial(materials["basicShadowed"]);
 
