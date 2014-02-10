@@ -16,10 +16,14 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-
-#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
@@ -28,14 +32,22 @@
 /// Create a SceneElement with stapler data load from obj file
 std::shared_ptr<SurgSim::Framework::SceneElement> loadStapler(const std::string& fileName)
 {
-	std::shared_ptr<SurgSim::Framework::SceneElement> element =
-		std::make_shared<SurgSim::Blocks::BasicSceneElement>("Stapler");
-
 	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> stapler =
 		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Stapler");
-
 	stapler->setFileName(fileName);
+
+	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input");
+	inputComponent->setDeviceName("MultiAxisDevice");
+
+	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>("Input to scenery object");
+	transferInputPose->setPoseSender(inputComponent);
+	transferInputPose->setPoseReceiver(stapler);
+
+	std::shared_ptr<SurgSim::Framework::SceneElement> element =
+		std::make_shared<SurgSim::Blocks::BasicSceneElement>("SceneElement");
+	element->addComponent(inputComponent);
 	element->addComponent(stapler);
+	element->addComponent(transferInputPose);
 
 	return element;
 }
@@ -67,18 +79,25 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView()
 int main(int argc, char* argv[])
 {
 	// Create managers
+	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
 	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	auto inputManager = std::make_shared<SurgSim::Input::InputManager>();
+
+	auto toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
+	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
+		"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
+	inputManager->addDevice(toolDevice);
+
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	runtime->addManager(behaviorManager);
+	runtime->addManager(graphicsManager);
+	runtime->addManager(inputManager);
 
 	// Scene will contain all SceneElements in this stapler demo.
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-
-	// Load scenery objects into Scene.
 	scene->addSceneElement(loadStapler("stapler_collision.obj"));
 	scene->addSceneElement(loadArm("forearm.osgb"));
 	scene->addSceneElement(createView());
-
-	runtime->addManager(graphicsManager);
 
 	runtime->execute();
 
