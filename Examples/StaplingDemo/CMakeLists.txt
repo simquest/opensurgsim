@@ -13,6 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(
+	${SURGSIM_TOP_INCLUDE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${Boost_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
+)
+
 set(STAPLINGDEMO_SOURCES
 	main.cpp
 )
@@ -24,7 +33,9 @@ add_executable(StaplingDemo
 	${STAPLINGDEMO_SOURCES} ${STAPLINGDEMO_HEADERS})
 	
 
-set(LIBS
+set(LIBS ${LIBS}
+		 SurgSimFramework
+		 SurgSimGraphics
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
