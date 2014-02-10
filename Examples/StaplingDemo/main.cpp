@@ -19,12 +19,69 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/ApplicationData.h"
 
+#include <SurgSim/Blocks/BasicSceneElement.h>
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 
+/// Create a SceneElement with stapler data load from obj file
+std::shared_ptr<SurgSim::Framework::SceneElement> createStapler()
+{
+	std::shared_ptr<SurgSim::Framework::SceneElement> element;
+	element = std::make_shared<SurgSim::Blocks::BasicSceneElement>("Stapler");
+
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> stapler;
+	stapler = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Stapler");
+	stapler->setFileName("Data/stapler_collision.obj");
+
+	element->addComponent(stapler);
+	
+	return element;
+}
+
+/// Create a SceneElement with arm data load from obj file
+std::shared_ptr<SurgSim::Framework::SceneElement> createArm()
+{
+	std::shared_ptr<SurgSim::Framework::SceneElement> element;
+	element = std::make_shared<SurgSim::Blocks::BasicSceneElement>("Arm");
+
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> arm;
+	arm = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Arm");
+	arm->setFileName("Data/arm_collision.obj");
+
+	element->addComponent(arm);
+
+	return element;
+}
+
+std::shared_ptr<SurgSim::Graphics::ViewElement> createView()
+{
+	std::shared_ptr<SurgSim::Graphics::OsgViewElement> view;
+	view = std::make_shared<SurgSim::Graphics::OsgViewElement>("StaplingDemoView");
+	view->enableManipulator(true);
+	view->setManipulatorParameters(SurgSim::Math::Vector3d(0.0, 0.5, 1.0), SurgSim::Math::Vector3d(0.0, 0.5, 0.5));
+	return view;
+}
+
 int main(int argc, char* argv[])
 {
+	// Create managers
+	std::shared_ptr<SurgSim::Graphics::Manager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+
+	// Scene will contain all SceneElements in this stapler demo.
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene(); 
+
+	// Load scenery objects into Scene.
+	scene->addSceneElement(createStapler());
+	scene->addSceneElement(createArm());
+
+	scene->addSceneElement(createView());
+
+	runtime->addManager(graphicsManager);
+
+	runtime->execute();
+
 	return 0;
 }
