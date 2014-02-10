@@ -34,7 +34,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> loadStapler(const std::string&
 	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> stapler =
 		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Stapler");
 
-	stapler->setFileName("Data/" + fileName);
+	stapler->setFileName(fileName);
 	element->addComponent(stapler);
 	
 	return element;
@@ -49,7 +49,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> loadArm(const std::string& fil
 	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> arm =
 		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Arm");
 
-	arm->setFileName("Data/" + fileName);
+	arm->setFileName(fileName);
 	element->addComponent(arm);
 
 	return element;
@@ -60,7 +60,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView()
 	auto view = std::make_shared<SurgSim::Graphics::OsgViewElement>("StaplingDemoView");
 
 	view->enableManipulator(true);
-	view->setManipulatorParameters(SurgSim::Math::Vector3d(0.0, 0.5, 2.0), SurgSim::Math::Vector3d(0.0, 0.0, 0.0));
+	view->setManipulatorParameters(SurgSim::Math::Vector3d(0.0, 0.5, 0.5), SurgSim::Math::Vector3d::Zero());
 	return view;
 }
 
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 {
 	// Create managers
 	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
 	// Scene will contain all SceneElements in this stapler demo.
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene(); 
