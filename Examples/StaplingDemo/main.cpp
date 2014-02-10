@@ -19,11 +19,11 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 
-#include <SurgSim/Blocks/BasicSceneElement.h>
-#include "SurgSim/Graphics/OsgView.h"
-#include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgView.h"
+#include "SurgSim/Graphics/OsgViewElement.h"
 
 /// Create a SceneElement with stapler data load from obj file
 std::shared_ptr<SurgSim::Framework::SceneElement> loadStapler(const std::string& fileName)
@@ -36,7 +36,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> loadStapler(const std::string&
 
 	stapler->setFileName(fileName);
 	element->addComponent(stapler);
-	
+
 	return element;
 }
 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
 	// Scene will contain all SceneElements in this stapler demo.
-	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene(); 
+	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	// Load scenery objects into Scene.
 	scene->addSceneElement(loadStapler("stapler_collision.obj"));
