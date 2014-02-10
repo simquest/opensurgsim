@@ -13,13 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(BUILD_DEVICE_MULTIAXIS)
-	add_subdirectory(AddSphereFromInput)
-	add_subdirectory(InputVtc)
-endif(BUILD_DEVICE_MULTIAXIS)
+set(STAPLINGDEMO_SOURCES
+	main.cpp
+)
 
-add_subdirectory(BouncingBalls)
-add_subdirectory(Fem3D)
-add_subdirectory(GraphicsScene)
-add_subdirectory(MassSprings)
-add_subdirectory(StaplingDemo)
+set(STAPLINGDEMO_HEADERS
+)
+
+add_executable(StaplingDemo
+	${STAPLINGDEMO_SOURCES} ${STAPLINGDEMO_HEADERS})
+
+set(LIBS
+)
+
+target_link_libraries(StaplingDemo ${LIBS})
+
+# Put ExampleInputVtc into folder "Examples"
+set_target_properties(StaplingDemo PROPERTIES FOLDER "Examples") 
