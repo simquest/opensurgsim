@@ -148,12 +148,21 @@ TYPED_TEST(AllRigidTransformTests, MakeLookAt)
 	Vector3 eye(10.0, 10.0, 10.0);
 	Vector3 up(0.0, 1.0, 0.0);
 
-	Vector4 point4(10.0, 10.0, 10.0, 1.0);
-	Vector4 origin4(0.0, 0.0, 0.0, 1.0);
+	Vector4 center4(0.0, 0.0, 0.0, 1.0);
+
+	// This follows the OpenGl convention for the camera view matrix transform, any axis would do see
+	// the documentation for makeRigidTransform and gluLookAt()
+	Vector4 direction4(0.0, 0.0, -1.0, 1.0);
+	Vector4 eye4(10.0, 10.0, 10.0, 1.0);
 
 	Transform transform = SurgSim::Math::makeRigidTransform(eye, origin, up);
 
-	EXPECT_TRUE(origin4.isApprox(transform*point4)) << transform * point4;
+	EXPECT_TRUE(eye4.isApprox(transform*center4));
+	
+	Vector4 transformed = transform*direction4;
+
+	Vector3 direction3(transformed[0], transformed[1], transformed[2]);
+	EXPECT_TRUE(eye.normalized().isApprox(direction3.normalized()));
 }
 
 
