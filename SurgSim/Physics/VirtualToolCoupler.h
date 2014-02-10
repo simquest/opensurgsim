@@ -43,14 +43,14 @@ class VirtualToolCoupler : public SurgSim::Framework::Behavior
 public:
 	/// Constructor
 	/// \param name Name of the behavior
-	VirtualToolCoupler(const std::string& name);
+	explicit VirtualToolCoupler(const std::string& name);
 
 	~VirtualToolCoupler();
-	
+
 	/// Set the Input Component
 	/// \param input Input Component to get the pose from
 	void setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input);
-	
+
 	/// Set the Output Component (if any)
 	/// \param output Output Component to send forces and torques
 	void setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output);
@@ -58,7 +58,7 @@ public:
 	/// Set the Physics Representation which follows the input
 	/// \param rigid Rigid Representation that provides state and receives external forces and torques
 	void setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid);
-	
+
 	/// Set the name of the pose entry in the input DataGroup
 	/// \param    poseName Name of the pose data in the input to transfer
 	void setPoseName(const std::string& poseName = "pose");
