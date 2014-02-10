@@ -17,7 +17,6 @@
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/ApplicationData.h"
 
 #include <SurgSim/Blocks/BasicSceneElement.h>
 #include "SurgSim/Graphics/OsgView.h"
@@ -33,7 +32,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createStapler()
 
 	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> stapler;
 	stapler = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Stapler");
-	stapler->setFileName("Data/stapler_collision.obj");
+	stapler->setFileName("stapler_collision.obj");
 
 	element->addComponent(stapler);
 	
@@ -48,7 +47,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createArm()
 
 	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> arm;
 	arm = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Arm");
-	arm->setFileName("Data/arm_collision.obj");
+	arm->setFileName("arm_collision.obj");
 
 	element->addComponent(arm);
 
@@ -68,7 +67,7 @@ int main(int argc, char* argv[])
 {
 	// Create managers
 	std::shared_ptr<SurgSim::Graphics::Manager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 
 	// Scene will contain all SceneElements in this stapler demo.
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene(); 
