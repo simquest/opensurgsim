@@ -49,5 +49,5 @@ configure_file(
 
 target_link_libraries(StaplingDemo ${LIBS})
 
-# Put ExampleInputVtc into folder "Examples"
+# Put StaplingDemo into folder "Examples"
 set_target_properties(StaplingDemo PROPERTIES FOLDER "Examples") 
