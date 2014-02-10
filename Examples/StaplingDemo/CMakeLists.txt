@@ -41,6 +41,12 @@ set(LIBS ${LIBS}
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
+)
+
 target_link_libraries(StaplingDemo ${LIBS})
 
 # Put ExampleInputVtc into folder "Examples"
