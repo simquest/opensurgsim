@@ -13,6 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_directories(
+	${SURGSIM_TOP_INCLUDE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${Boost_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
+)
+
 set(STAPLINGDEMO_SOURCES
 	main.cpp
 )
@@ -21,12 +30,24 @@ set(STAPLINGDEMO_HEADERS
 )
 
 add_executable(StaplingDemo
-	${STAPLINGDEMO_SOURCES} ${STAPLINGDEMO_HEADERS})
+	${STAPLINGDEMO_SOURCES} ${STAPLINGDEMO_HEADERS}
+)
 
-set(LIBS
+set(LIBS ${LIBS}
+		 SurgSimBlocks
+		 SurgSimFramework
+		 SurgSimGraphics
+)
+
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Configure the path for the data files
+configure_file(
+	"${CMAKE_CURRENT_SOURCE_DIR}/config.txt.in"
+	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
 target_link_libraries(StaplingDemo ${LIBS})
 
-# Put ExampleInputVtc into folder "Examples"
+# Put StaplingDemo into folder "Examples"
 set_target_properties(StaplingDemo PROPERTIES FOLDER "Examples") 
