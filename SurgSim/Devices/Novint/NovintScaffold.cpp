@@ -648,20 +648,6 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 
 	checkDeviceHoming(info);
 
-	RigidTransform3d pose;
-	pose.linear() = info->transformValue.block<3,3>(0,0);
-	pose.translation() = info->positionValue * info->positionScale;
-
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set("pose", pose);
-	inputData.booleans().set("button1", info->buttonStates[0]);
-	inputData.booleans().set("button2", info->buttonStates[1]);
-	inputData.booleans().set("button3", info->buttonStates[2]);
-	inputData.booleans().set("button4", info->buttonStates[3]);
-	inputData.booleans().set("isHomed", info->isDeviceHomed);
-	inputData.booleans().set("isPositionHomed", info->isPositionHomed);
-	inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
-
 	bool desiredGravityCompensation = false;
 	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
 	if (shouldSetGravityCompensation)
@@ -675,6 +661,9 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	{
 		fatalError = fatalError || !updateForcesAndTorques(info); // short-circuit only updates forces if no fatal error
 	}
+
+	setInputData(info);
+
 	return !fatalError;
 }
 
@@ -847,6 +836,24 @@ bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
 	return !fatalError;
+}
+
+
+void NovintScaffold::setInputData(DeviceData* info)
+{
+	RigidTransform3d pose;
+	pose.linear() = info->transformValue.block<3,3>(0,0);
+	pose.translation() = info->positionValue * info->positionScale;
+
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	inputData.poses().set("pose", pose);
+	inputData.booleans().set("button1", info->buttonStates[0]);
+	inputData.booleans().set("button2", info->buttonStates[1]);
+	inputData.booleans().set("button3", info->buttonStates[2]);
+	inputData.booleans().set("button4", info->buttonStates[3]);
+	inputData.booleans().set("isHomed", info->isDeviceHomed);
+	inputData.booleans().set("isPositionHomed", info->isPositionHomed);
+	inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
 }
 
 

@@ -105,6 +105,22 @@ private:
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
 
+	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
+	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's
+	/// parameter mutex should be locked before this function is called.
+	/// \param info The device data.
+	void checkDeviceHoming(DeviceData* info);
+
+	/// Calculates forces and torques, and sends them to the HDAL.  The DeviceData's parameter mutex should be locked
+	/// before this function is called.
+	/// \param info The device data.
+	/// \return false if a fatal error occurs
+	bool calculateForceAndTorque(DeviceData* info);
+
+	/// Sets the input DataGroup, which will be pushed to the InputComponent
+	/// \param info The device data
+	void setInputData(DeviceData* info);
+
 	/// Initializes the HDAL SDK.
 	/// \return true on success.
 	bool initializeSdk();
@@ -189,18 +205,6 @@ private:
 	/// \param device A pointer to the device.
 	/// \param scale The multiplicative factor to apply to the rotation angles.
 	void setOrientationScale(const NovintCommonDevice* device, double scale);
-
-	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
-	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's
-	/// parameter mutex should be locked before this function is called.
-	/// \param info The device data.
-	void checkDeviceHoming(DeviceData* info);
-
-	/// Calculates forces and torques, and sends them to the HDAL.  The DeviceData's parameter mutex should be locked
-	/// before this function is called.
-	/// \param info The device data.
-	/// \return false if a fatal error occurs.
-	bool updateForcesAndTorques(DeviceData* info);
 
 	/// Logger used by the scaffold and all devices.
 	std::shared_ptr<SurgSim::Framework::Logger> m_logger;
