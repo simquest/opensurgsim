@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_GRAPHICSSCENE_POSEINTERPOLATOR_H
-#define EXAMPLES_GRAPHICSSCENE_POSEINTERPOLATOR_H
+#ifndef SURGSIM_BLOCKS_POSEINTERPOLATOR_H
+#define SURGSIM_BLOCKS_POSEINTERPOLATOR_H
 
 #include <memory>
 #include <string>
@@ -95,7 +95,7 @@ private:
 	/// Target of the interpolation
 	SurgSim::Math::RigidTransform3d m_startingPose;
 
-	/// Target for the interpolated RigidTransform 
+	/// Target for the interpolated RigidTransform
 	std::shared_ptr<SurgSim::Framework::Representation> m_target;
 
 	/// Duration of the interpolation
