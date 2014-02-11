@@ -21,6 +21,8 @@ include_directories(
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
+	plyfile.c
+	PlyReader.cpp
 )
 
 set(SURGSIM_DATA_STRUCTURES_HEADERS
@@ -37,6 +39,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	OctreeNode.h
 	OctreeNode-inl.h
 	OptionalValue.h
+	ply.h
+	PlyReader.h
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h
 	TriangleMesh.h
@@ -65,5 +69,4 @@ if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 
-# Put SurgSimDataStructures into folder "DataStructure"
-set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructure")
+set_target_properties(SurgSimDataStructures PROPERTIES FOLDER "DataStructures")

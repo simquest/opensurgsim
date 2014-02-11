@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	NamedVariantDataTests.cpp
 	OctreeNodeTests.cpp
 	OptionalValueTests.cpp
+	PlyReaderTests.cpp
 	TetrahedronMeshTest.cpp
 	TriangleMeshTest.cpp
 )
@@ -35,10 +36,12 @@ set(UNIT_TEST_HEADERS
 	MockObjects.h
 )
 
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 set(LIBS
 	SurgSimDataStructures
 )
 
 surgsim_add_unit_tests(SurgSimDataStructuresTest)
 
-set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructure")
+set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructures")
