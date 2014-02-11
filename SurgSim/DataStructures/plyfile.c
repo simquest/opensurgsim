@@ -194,9 +194,7 @@ PlyFile *ply_open_for_writing(
   float *version
 )
 {
-  int i;
   PlyFile *plyfile;
-  PlyElement *elem;
   char *name;
   FILE *fp;
 
@@ -398,9 +396,7 @@ void ply_element_count(
   int nelems
 )
 {
-  int i;
   PlyElement *elem;
-  PlyProperty *prop;
 
   /* look for appropriate element */
   elem = find_element (plyfile, elem_name);
@@ -520,7 +516,7 @@ Entry:
 
 void ply_put_element(PlyFile *plyfile, void *elem_ptr)
 {
-  int i,j,k;
+  int j,k;
   FILE *fp = plyfile->fp;
   PlyElement *elem;
   PlyProperty *prop;
@@ -740,7 +736,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
         plyfile->file_type = PLY_BINARY_LE;
       else
         return (NULL);
-      plyfile->version = atof (words[2]);
+      plyfile->version = (float)atof (words[2]);
       found_format = 1;
     }
     else if (equal_strings (words[0], "element"))
@@ -1218,7 +1214,6 @@ PlyOtherElems *ply_get_other_element (
   PlyElement *elem;
   PlyOtherElems *other_elems;
   OtherElem *other;
-  int num_elems;
 
   /* look for appropriate element */
   elem = find_element (plyfile, elem_name);
@@ -1400,7 +1395,6 @@ Compare two strings.  Returns 1 if they are the same, 0 if not.
 
 int equal_strings(const char *s1,const char *s2)
 {
-  int i;
 
   while (*s1 && *s2)
     if (*s1++ != *s2++)
@@ -1473,7 +1467,7 @@ Entry:
 
 void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
 {
-  int i,j,k;
+  int j,k;
   PlyElement *elem;
   PlyProperty *prop;
   char **words;
@@ -1595,7 +1589,7 @@ Entry:
 
 void binary_get_element(PlyFile *plyfile, char *elem_ptr)
 {
-  int i,j,k;
+  int j,k;
   PlyElement *elem;
   PlyProperty *prop;
   FILE *fp = plyfile->fp;
@@ -1739,7 +1733,6 @@ Exit:
 char **get_words(FILE *fp, int *nwords, char **orig_line)
 {
 #define BIG_STRING 4096
-  int i,j;
   static char str[BIG_STRING];
   static char str_copy[BIG_STRING];
   char **words;
@@ -1927,7 +1920,7 @@ void write_binary_item(
       fwrite (&uint_val, 4, 1, fp);
       break;
     case PLY_FLOAT:
-      float_val = double_val;
+      float_val = (float)double_val;
       fwrite (&float_val, 4, 1, fp);
       break;
     case PLY_DOUBLE:
@@ -2110,13 +2103,13 @@ void get_stored_item(
       break;
     case PLY_FLOAT:
       *double_val = *((float *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = (int)(*double_val);
+      *uint_val = (unsigned int)*double_val;
       break;
     case PLY_DOUBLE:
       *double_val = *((double *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+      *int_val = (int)(*double_val);
+      *uint_val = (unsigned int)(*double_val);
       break;
     default:
       fprintf (stderr, "get_stored_item: bad type = %d\n", type);
@@ -2192,14 +2185,14 @@ void get_binary_item(
     case PLY_FLOAT:
       fread (ptr, 4, 1, fp);
       *double_val = *((float *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+	  *int_val = (int)(*double_val);
+	  *uint_val = (unsigned int)(*double_val);
       break;
     case PLY_DOUBLE:
       fread (ptr, 8, 1, fp);
       *double_val = *((double *) ptr);
-      *int_val = *double_val;
-      *uint_val = *double_val;
+	  *int_val = (int)(*double_val);
+	  *uint_val = (unsigned int)(*double_val);
       break;
     default:
       fprintf (stderr, "get_binary_item: bad type = %d\n", type);
@@ -2317,7 +2310,7 @@ void store_item (
       break;
     case PLY_FLOAT:
       pfloat = (float *) item;
-      *pfloat = double_val;
+      *pfloat = (float)double_val;
       break;
     case PLY_DOUBLE:
       pdouble = (double *) item;
@@ -2396,8 +2389,6 @@ Entry:
 
 void add_property (PlyFile *plyfile, char **words, int nwords)
 {
-  int prop_type;
-  int count_type;
   PlyProperty *prop;
   PlyElement *elem;
 
