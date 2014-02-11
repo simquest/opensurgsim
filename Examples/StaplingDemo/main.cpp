@@ -31,10 +31,10 @@
 std::shared_ptr<SurgSim::Framework::SceneElement> loadSceneryObject(const std::string& name,
 																	const std::string& fileName)
 {
-	auto sceneryRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>("Stapler");
+	auto sceneryRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "Element");
 	sceneryRepresentation->setFileName(fileName);
 
-	auto sceneElement =	std::make_shared<SurgSim::Blocks::BasicSceneElement>(name);
+	auto sceneElement = std::make_shared<SurgSim::Blocks::BasicSceneElement>(name);
 	sceneElement->addComponent(sceneryRepresentation);
 
 	return sceneElement;
