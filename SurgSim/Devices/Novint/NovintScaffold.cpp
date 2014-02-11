@@ -38,6 +38,7 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::makeRotationMatrix;
@@ -239,6 +240,7 @@ struct NovintScaffold::DeviceData
 		positionValue(positionBuffer),
 		transformValue(transformBuffer),
 		forceValue(forceBuffer),
+		torqueValue(torqueBuffer),
 		positionScale(device->getPositionScale()),
 		orientationScale(device->getOrientationScale())
 	{
@@ -248,7 +250,7 @@ struct NovintScaffold::DeviceData
 		buttonStates.fill(false);
 
 		forceValue.setZero();   // also clears forceBuffer
-		torqueValue.setZero();
+		torqueValue.setZero();  // also clears torqueBuffer
 	}
 
 
@@ -303,8 +305,8 @@ struct NovintScaffold::DeviceData
 
 	/// The raw force to be written to the device.
 	double forceBuffer[3];
-	/// The torque value to be written to the device after conversion.
-	Vector3d torqueValue;
+	/// Torque command counts for each motor axis (including the jaw).
+	double torqueBuffer[4];
 
 	/// The position value from the device, permanently connected to positionBuffer.
 	Eigen::Map<Vector3d> positionValue;
@@ -313,6 +315,8 @@ struct NovintScaffold::DeviceData
 
 	/// The force value to be written to the device, permanently connected to forceBuffer.
 	Eigen::Map<Vector3d> forceValue;
+	/// The torque value to be written to the device, permanently connected to torqueBuffer.
+	Eigen::Map<Vector4d> torqueValue;
 
 	/// Scale factor for the position axes.
 	double positionScale;
@@ -619,7 +623,6 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
 
 	// Get the additional 7DoF data if available.
-
 	if (info->isDevice7Dof)
 	{
 		// We compute the device orientation from the joint angles, for two reasons.  The first that it lets us
@@ -659,8 +662,18 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	info->torqueValue.setZero();
 	if (info->isDeviceHomed)
 	{
-		fatalError = fatalError || !updateForcesAndTorques(info); // short-circuit only updates forces if no fatal error
+		calculateForceAndTorque(info);
 	}
+
+	// Set the force command (in newtons).
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
+
+	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
+	// anywhere at the moment.
+	// The 2nd arg to this call is the count; we're setting 4 doubles.
+	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torqueBuffer);
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 
 	setInputData(info);
 
@@ -713,7 +726,7 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 	}
 }
 
-bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
+void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 	
@@ -722,16 +735,9 @@ bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 	outputData.vectors().get("force", &force);
 	info->forceValue = force;
 
-	Vector3d torque;
-	torque.setZero();
-	outputData.vectors().get("torque", &torque);
-	info->torqueValue = torque;
-
-	// Set the force command (in newtons).
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
-	bool fatalError = false;
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
-	//hdlGripSetAttributesd(HDL_GRIP_TORQUE, 3, info->torqueBuffer);  // 2nd arg is size
+	Vector3d torqueInNewtonMeters;
+	torqueInNewtonMeters.setZero();
+	outputData.vectors().get("torque", &torqueInNewtonMeters);
 
 	// Set the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
@@ -800,10 +806,9 @@ bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
 			double ratio = 0;
 			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
-			// We just use linear drop-off.
 			decompositionMatrix.row(1) *= ratio;
 		}
-		Vector3d axisTorqueVector = decompositionMatrix * info->torqueValue;
+		Vector3d axisTorqueVector = decompositionMatrix * torqueInNewtonMeters;
 
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
@@ -815,27 +820,19 @@ bool NovintScaffold::updateForcesAndTorques(DeviceData* info)
 		// pitch axis: torque = 47.96 mNm when command = 2000
 		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
 
-		double deviceTorques[4];
-		deviceTorques[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+		info->torqueValue[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
 			axisTorqueMin, axisTorqueMax);
-		deviceTorques[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
+		info->torqueValue[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 			axisTorqueMin, axisTorqueMax);
-		deviceTorques[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+		info->torqueValue[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
 			axisTorqueMin, axisTorqueMax);
-		deviceTorques[3] = 0;
+		info->torqueValue[3] = 0;
 
 		if (info->isDeviceRollAxisReversed)  // commence swearing.
 		{
-			deviceTorques[0] = -deviceTorques[0];
+			info->torqueValue[0] = -info->torqueValue[0];
 		}
-
-		// Set the torque vector (from the first 3 elements of the argument array).  Also set the jaw squeeze torque
-		// (as 4th element of the array)-- though this is not used anywhere at the moment.
-		// The 2nd arg to this call is the count; we're setting 4 doubles.
-		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, deviceTorques);
-		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
-	return !fatalError;
 }
 
 

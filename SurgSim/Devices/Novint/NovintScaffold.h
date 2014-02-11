@@ -114,8 +114,7 @@ private:
 	/// Calculates forces and torques, and sends them to the HDAL.  The DeviceData's parameter mutex should be locked
 	/// before this function is called.
 	/// \param info The device data.
-	/// \return false if a fatal error occurs
-	bool calculateForceAndTorque(DeviceData* info);
+	void calculateForceAndTorque(DeviceData* info);
 
 	/// Sets the input DataGroup, which will be pushed to the InputComponent
 	/// \param info The device data
