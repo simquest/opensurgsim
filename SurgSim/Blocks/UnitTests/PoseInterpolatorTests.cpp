@@ -32,16 +32,15 @@ using SurgSim::Math::interpolate;
 
 namespace
 {
-	RigidTransform3d startPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0,2.0,3.0));
-	RigidTransform3d endPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0,2.0,1.0));
+	RigidTransform3d startPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(1.0, 2.0, 3.0));
+	RigidTransform3d endPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(3.0, 2.0, 1.0));
 }
 
 class PoseTestRepresentation : public SurgSim::Framework::Representation
 {
 public:
-	PoseTestRepresentation(const std::string& name) : Representation(name)
+	explicit PoseTestRepresentation(const std::string& name) : Representation(name)
 	{
-
 	}
 
 	virtual void setInitialPose(const SurgSim::Math::RigidTransform3d& pose)
@@ -67,8 +66,6 @@ public:
 private:
 	RigidTransform3d m_pose;
 };
-
-
 
 namespace SurgSim
 {
@@ -195,6 +192,5 @@ TEST(PoseInterpolatorTests, UsePingPong)
 
 }
 
-}
-}
-
+};
+};
