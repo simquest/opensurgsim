@@ -17,19 +17,19 @@
 
 #include "SurgSim/Blocks/StapleElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/CylinderShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-
 using SurgSim::Blocks::StapleElement;
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Math::CylinderShape;
-using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name):
-	SurgSim::Framework::SceneElement(name), m_name(name)
+	SurgSim::Framework::SceneElement(name),
+	m_name(name)
 {
 	m_pose.setIdentity();
 }
@@ -46,38 +46,30 @@ void StapleElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
 
 bool StapleElement::doInitialize()
 {
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(m_name + " Physics");
-
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel
 	params.setLinearDamping(2.0);
 
 	// Shape of a cylinder is used to model the staple with length: 4.8mm and radius: 1.8mm
-	std::shared_ptr<CylinderShape> shape = std::make_shared<CylinderShape>(0.0048, 0.0018);
+	auto shape = std::make_shared<CylinderShape>(0.0048, 0.0018);
 	params.setShapeUsedForMassInertia(shape);
 
+	auto physicsRepresentation = std::make_shared<SurgSim::Physics::RigidRepresentation>(m_name + " Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(m_pose);
 
 	// Graphics Representation: Load staple object from external file. 
-	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> graphicsRepresentation =
-		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
-
+	auto graphicsRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
 	graphicsRepresentation->setFileName("staple_collision.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
 
-	addComponent(physicsRepresentation);
-	addComponent(graphicsRepresentation);
 	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
+
+	addComponent(physicsRepresentation);
+	addComponent(graphicsRepresentation);
 	addComponent(transferPose);
 
-	return true;
-}
-
-bool StapleElement::doWakeUp()
-{
 	return true;
 }

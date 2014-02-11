@@ -16,10 +16,8 @@
 #ifndef SURGSIM_BLOCKS_STAPLEELEMENT_H
 #define SURGSIM_BLOCKS_STAPLEELEMENT_H
 
-#include "SurgSim/Math/RigidTransform.h"
-
 #include "SurgSim/Framework/SceneElement.h"
-#include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Math/RigidTransform.h"
 
 
 namespace SurgSim
@@ -34,7 +32,7 @@ public:
 	/// Constructor
 	/// \param name Name of the staple element.
 	explicit StapleElement(const std::string& name);
-	
+
 	/// Set initial pose of the staple
 	/// \param pose	The initial pose to set. 
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
@@ -42,17 +40,15 @@ public:
 	/// Destructor
 	~StapleElement();
 
-
 protected:
 	/// Initialize the behavior
 	virtual bool doInitialize();
 
-	/// Wakeup the behavior
-	virtual bool doWakeUp();
-
-
 private:
+	/// Name of this scene element
 	std::string m_name;
+
+	/// The pose of this scene element
 	SurgSim::Math::RigidTransform3d m_pose;
 
 };
