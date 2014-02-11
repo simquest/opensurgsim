@@ -26,7 +26,7 @@ namespace SurgSim
 
 namespace Collision
 {
-	class ContactCalculation;
+class ContactCalculation;
 }
 
 namespace Physics
