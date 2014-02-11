@@ -24,10 +24,13 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
+#include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+
+#include "Examples/StaplingDemo/AddStapleBehavior.h"
 
 /// Create a SceneElement with stapler data load from obj file
 std::shared_ptr<SurgSim::Framework::SceneElement> loadStapler(const std::string& fileName)
@@ -48,6 +51,10 @@ std::shared_ptr<SurgSim::Framework::SceneElement> loadStapler(const std::string&
 	element->addComponent(inputComponent);
 	element->addComponent(stapler);
 	element->addComponent(transferInputPose);
+
+	auto addStaple = std::make_shared<AddStapleFromInputBehavior>("Staple");
+	addStaple->setInputComponent(inputComponent);
+	element->addComponent(addStaple);
 
 	return element;
 }
@@ -81,6 +88,7 @@ int main(int argc, char* argv[])
 	// Create managers
 	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
 	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	auto physicsManager = std::make_shared<SurgSim::Physics::PhysicsManager>();
 	auto inputManager = std::make_shared<SurgSim::Input::InputManager>();
 
 	auto toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
@@ -89,6 +97,8 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(toolDevice);
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+
+	runtime->addManager(physicsManager);
 	runtime->addManager(behaviorManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(inputManager);
