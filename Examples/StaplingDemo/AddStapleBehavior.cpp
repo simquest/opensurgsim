@@ -13,20 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <sstream>
+
 #include "Examples/StaplingDemo/AddStapleBehavior.h"
 
 #include "SurgSim/Blocks/StapleElement.h"
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Input/InputComponent.h"
 
-#include <sstream>
+namespace SurgSim
+{
 
-using SurgSim::Math::RigidTransform3d;
+namespace Blocks
+{
 
-AddStapleFromInputBehavior::AddStapleFromInputBehavior(
-	const std::string& name):
-SurgSim::Framework::Behavior(name), m_numElements(0), m_buttonPreviouslyPressed(false)
+AddStapleFromInputBehavior::AddStapleFromInputBehavior(const std::string& name):
+	SurgSim::Framework::Behavior(name),
+	m_numElements(0),
+	m_buttonPreviouslyPressed(false)
 {
 }
 
@@ -41,25 +47,23 @@ void AddStapleFromInputBehavior::update(double dt)
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 
-	RigidTransform3d pose;
+	SurgSim::Math::RigidTransform3d pose;
 	dataGroup.poses().get("pose", &pose);
 
 	// Add staple to the scene from input
 	bool button1 = false;
 	dataGroup.booleans().get("button1", &button1);
 
-	if (button1 && ! m_buttonPreviouslyPressed)
+	if (button1 && !m_buttonPreviouslyPressed)
 	{
 		std::stringstream elementCount;
-		elementCount << ++ m_numElements;
+		elementCount << ++m_numElements;
 
 		std::string name = "stapleId_" + elementCount.str();
 
-		// Create a staple element and add its into scene.
-		std::shared_ptr<SurgSim::Framework::SceneElement> m_element =
-			std::make_shared<SurgSim::Blocks::StapleElement>(name);
-
-		std::static_pointer_cast<SurgSim::Blocks::StapleElement>(m_element)->setPose(pose);
+		// Create a staple element and add it into scene.
+		auto m_element = std::make_shared<SurgSim::Blocks::StapleElement>(name);
+		m_element->setPose(pose);
 
 		getScene()->addSceneElement(m_element);
 	}
@@ -80,3 +84,6 @@ bool AddStapleFromInputBehavior::doWakeUp()
 {
 	return true;
 }
+
+}; // End of namespace Blocks
+}; // End of namespace SurgSim

@@ -17,7 +17,17 @@
 #define EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
 
 #include "SurgSim/Framework/Behavior.h"
-#include "SurgSim/Input/InputComponent.h"
+
+namespace SurgSim
+{
+
+namespace Input
+{
+class InputComponent;
+}
+
+namespace Blocks
+{
 
 class AddStapleFromInputBehavior: public SurgSim::Framework::Behavior
 {
@@ -26,8 +36,8 @@ public:
 	/// \param	name	Name of the behavior
 	explicit AddStapleFromInputBehavior(const std::string& name);
 
-	/// Set input component to get the pose
-	/// \param	sender	Input component to get the pose
+	/// Set the input component from which to get the pose
+	/// \param	sender	The input component which sends the pose.
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> sender);
 
 	/// Update the behavior
@@ -35,23 +45,32 @@ public:
 	virtual void update(double dt) override;
 
 	/// Return the type of manager that should be responsible for this behavior
+	/// \return An integer indicating which manger should be responsible for this behavior.
 	virtual int getTargetManagerType() const override;
 
 protected:
-	/// Initialize the behavior
+	/// Initialize this behavior
+	/// \return True on success, otherwise false.
+	/// Note: In current implementation, this method always returns "true".
 	virtual bool doInitialize() override;
-	/// Wakeup the behavior
+
+	/// Wakeup this behavior
+	/// \return True on success, otherwise false.
+	/// Note: In current implementation, this method always returns "true".
 	virtual bool doWakeUp() override;
 
 private:
-	/// Input component to get the pose
+	/// Input component from which to get the pose
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 
-	/// The number of staple added
+	/// The number of staples added
 	int m_numElements;
 
-	/// Used to record if button was previously pressed
+	/// Used to record if a button was previously pressed
 	bool m_buttonPreviouslyPressed;
 };
+
+}; // End of namespace Blocks
+}; // End of namespace SurgSim
 
 #endif  // EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
