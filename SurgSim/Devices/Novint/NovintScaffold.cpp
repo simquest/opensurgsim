@@ -1144,6 +1144,11 @@ void NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 	m_defaultLogLevel = logLevel;
 }
 
+std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const
+{
+	return m_logger;
+}
+
 SurgSim::Framework::LogLevel NovintScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 
 

@@ -50,10 +50,7 @@ public:
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
