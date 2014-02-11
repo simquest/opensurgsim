@@ -20,15 +20,12 @@
 #include <vector>
 
 #include "SurgSim/Framework/ComponentManager.h"
-#include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/Log.h"
 
 
 namespace SurgSim
 {
 namespace Framework
 {
-	class Logger;
 	class Component;
 }
 
