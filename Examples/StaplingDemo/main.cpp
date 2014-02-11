@@ -17,8 +17,13 @@
 #include <string>
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferInputPoseBehavior.h"
+#include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
@@ -31,10 +36,11 @@
 std::shared_ptr<SurgSim::Framework::SceneElement> createSceneryObject(const std::string& name,
 																	  const std::string& fileName)
 {
-	auto sceneryRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "Element");
+	auto sceneryRepresentation =
+		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "SceneryRepresentatiion");
 	sceneryRepresentation->setFileName(fileName);
 
-	auto sceneElement = std::make_shared<SurgSim::Blocks::BasicSceneElement>(name);
+	auto sceneElement = std::make_shared<SurgSim::Blocks::BasicSceneElement>(name + "SceneElement");
 	sceneElement->addComponent(sceneryRepresentation);
 
 	return sceneElement;
@@ -52,15 +58,44 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView()
 
 int main(int argc, char* argv[])
 {
+	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
 	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	auto inputManager = std::make_shared<SurgSim::Input::InputManager>();
+
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	runtime->addManager(behaviorManager);
+	runtime->addManager(graphicsManager);
+	runtime->addManager(inputManager);
+
+	auto toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
+	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
+		"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
+	inputManager->addDevice(toolDevice);
+
+	std::shared_ptr<SurgSim::Framework::SceneElement> staplerSceneElement =
+		createSceneryObject("stapler", "Geometry/stapler_collision.obj");
+
+	// In order to connect the stapler scenery representation to an input device, after create a SceneElement for it,
+	// we need to retrieve the stapler scenery representation from the SceneElement.
+	std::shared_ptr<SurgSim::Framework::Component> staplerComponent =
+		staplerSceneElement->getComponent("staplerSceneryRepresentatiion");
+	auto staplerSceneryRepresentation = std::static_pointer_cast<SurgSim::Framework::Representation>(staplerComponent);
+
+	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input");
+	inputComponent->setDeviceName("MultiAxisDevice");
+
+	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>("Input to graghicalStapler");
+	transferInputPose->setPoseSender(inputComponent);
+	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
+
+	staplerSceneElement->addComponent(inputComponent);
+	staplerSceneElement->addComponent(transferInputPose);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-	scene->addSceneElement(createSceneryObject("stapler", "Geometry/stapler_collision.obj"));
 	scene->addSceneElement(createSceneryObject("arm", "Geometry/forearm.osgb"));
 	scene->addSceneElement(createView());
+	scene->addSceneElement(staplerSceneElement);
 
-	runtime->addManager(graphicsManager);
 	runtime->execute();
 
 	return 0;
