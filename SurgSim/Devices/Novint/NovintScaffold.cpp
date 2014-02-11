@@ -729,7 +729,7 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	
+
 	Vector3d force;
 	force.setZero();
 	outputData.vectors().get("force", &force);
