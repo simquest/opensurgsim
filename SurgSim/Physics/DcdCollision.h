@@ -17,21 +17,21 @@
 #define SURGSIM_PHYSICS_DCDCOLLISION_H
 
 #include <memory>
-#include <vector>
-#include <list>
-
-#include "SurgSim/Collision/CollisionPair.h"
-#include "SurgSim/Collision/DcdCollision.h"
 
 #include "SurgSim/Math/Shape.h"
-
 #include "SurgSim/Physics/Computation.h"
-#include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
 {
+
+namespace Collision
+{
+	class ContactCalculation;
+}
+
 namespace Physics
 {
+	class PhysicsManagerState;
 
 /// Computation to determine the contacts between a list of CollisionPairs.
 /// This Computation class takes a list of representations, it will generate a list of collision pairs
