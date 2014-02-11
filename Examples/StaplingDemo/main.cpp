@@ -28,6 +28,8 @@
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "Examples/StaplingDemo/AddStapleBehavior.h"
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
@@ -60,12 +62,14 @@ int main(int argc, char* argv[])
 {
 	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
 	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	auto inputManager = std::make_shared<SurgSim::Input::InputManager>();
+	auto inputManager    = std::make_shared<SurgSim::Input::InputManager>();
+	auto physicsManager  = std::make_shared<SurgSim::Physics::PhysicsManager>();
 
 	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(inputManager);
+	runtime->addManager(physicsManager);
 
 	auto toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
 	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
@@ -88,8 +92,12 @@ int main(int argc, char* argv[])
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 
+	auto addStapleBehavior = std::make_shared<SurgSim::Blocks::AddStapleFromInputBehavior>("Staple");
+	addStapleBehavior->setInputComponent(inputComponent);
+
 	staplerSceneElement->addComponent(inputComponent);
 	staplerSceneElement->addComponent(transferInputPose);
+	staplerSceneElement->addComponent(addStapleBehavior);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createSceneryObject("arm", "Geometry/forearm.osgb"));
