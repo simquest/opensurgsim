@@ -31,7 +31,7 @@ class ContactCalculation;
 
 namespace Physics
 {
-	class PhysicsManagerState;
+class PhysicsManagerState;
 
 /// Computation to determine the contacts between a list of CollisionPairs.
 /// This Computation class takes a list of representations, it will generate a list of collision pairs
