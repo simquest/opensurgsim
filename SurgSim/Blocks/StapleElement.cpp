@@ -22,18 +22,21 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
-using SurgSim::Blocks::StapleElement;
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Math::CylinderShape;
 using SurgSim::Physics::RigidRepresentationParameters;
+
+namespace SurgSim
+{
+
+namespace Blocks
+{
 
 StapleElement::StapleElement(const std::string& name):
 	SurgSim::Framework::SceneElement(name),
 	m_name(name)
 {
-	m_pose.setIdentity();
 }
-
 
 StapleElement::~StapleElement()
 {
@@ -44,21 +47,24 @@ void StapleElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
 	m_pose = pose;
 }
 
+/*
+In this implementation, physics representation of a surgical staple is simulated by using a cylinder shape.
+Graphical representation of the surgical staple is loaded from a .obj file.
+*/
 bool StapleElement::doInitialize()
 {
+	// Shape of a cylinder is used to model the staple with length: 4.8mm and radius: 1.8mm
+	// Feb-11-2014-HW: Need reference for the dimension of a surgical staple.
+	auto shape = std::make_shared<CylinderShape>(0.0048, 0.0018);
+
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel
-	params.setLinearDamping(2.0);
-
-	// Shape of a cylinder is used to model the staple with length: 4.8mm and radius: 1.8mm
-	auto shape = std::make_shared<CylinderShape>(0.0048, 0.0018);
 	params.setShapeUsedForMassInertia(shape);
 
 	auto physicsRepresentation = std::make_shared<SurgSim::Physics::RigidRepresentation>(m_name + " Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(m_pose);
 
-	// Graphics Representation: Load staple object from external file. 
 	auto graphicsRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
 	graphicsRepresentation->setFileName("staple_collision.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
@@ -73,3 +79,6 @@ bool StapleElement::doInitialize()
 
 	return true;
 }
+
+}; // End of namespace Blocks
+}; // End of namespace SurgSim

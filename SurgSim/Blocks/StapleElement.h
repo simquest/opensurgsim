@@ -19,7 +19,6 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-
 namespace SurgSim
 {
 
@@ -34,14 +33,15 @@ public:
 	explicit StapleElement(const std::string& name);
 
 	/// Set initial pose of the staple
-	/// \param pose	The initial pose to set. 
+	/// \param pose	The initial pose to set.
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
 	/// Destructor
 	~StapleElement();
 
 protected:
-	/// Initialize the behavior
+	/// Initialize this scene element
+	/// \return True on success, otherwise false.
 	virtual bool doInitialize();
 
 private:
@@ -50,11 +50,9 @@ private:
 
 	/// The pose of this scene element
 	SurgSim::Math::RigidTransform3d m_pose;
-
 };
 
-
-};
-};
+}; // End of namespace Blocks
+}; // End of namespace SurgSim
 
 #endif //SURGSIM_BLOCKS_STAPLEELEMENT_H
