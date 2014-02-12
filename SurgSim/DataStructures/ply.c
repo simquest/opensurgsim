@@ -700,7 +700,6 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
   PlyFile *plyfile;
   int nwords;
   char **words;
-  int found_format = 0;
   char **elist;
   PlyElement *elem;
   char *orig_line;
@@ -724,7 +723,10 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
 
   words = get_words (plyfile->fp, &nwords, &orig_line);
   if (!words || !equal_strings (words[0], "ply"))
-    return (NULL);
+  {
+	  if (words) free(words);
+	  return (NULL);
+  }
 
   while (words) {
 
@@ -740,9 +742,12 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
       else if (equal_strings (words[1], "binary_little_endian"))
         plyfile->file_type = PLY_BINARY_LE;
       else
-        return (NULL);
+	  {
+		  free(words);
+		  return (NULL);
+	  }
+
       plyfile->version = (float)atof (words[2]);
-      found_format = 1;
     }
     else if (equal_strings (words[0], "element"))
       add_element (plyfile, words, nwords);
@@ -753,8 +758,10 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
     else if (equal_strings (words[0], "obj_info"))
       add_obj_info (plyfile, orig_line);
     else if (equal_strings (words[0], "end_header"))
-      break;
-
+	{
+		free(words);
+		break;
+	}
     /* free up words space */
     free (words);
 
@@ -811,19 +818,10 @@ PlyFile *ply_open_for_reading(
 {
   FILE *fp;
   PlyFile *plyfile;
-  char *name;
-
-  /* tack on the extension .ply, if necessary */
-
-  name = (char *) myalloc (sizeof (char) * (strlen (filename) + 5));
-  strcpy (name, filename);
-  if (strlen (name) < 4 ||
-      strcmp (name + strlen (name) - 4, ".ply") != 0)
-      strcat (name, ".ply");
 
   /* open the file for reading */
 
-  fp = fopen (name, "r");
+  fp = fopen (filename, "r");
   if (fp == NULL)
     return (NULL);
 
@@ -837,7 +835,6 @@ PlyFile *ply_open_for_reading(
   *version = plyfile->version;
 
   /* return a pointer to the file's information */
-
   return (plyfile);
 }
 
@@ -1366,10 +1363,64 @@ Entry:
 
 void ply_close(PlyFile *plyfile)
 {
-  fclose (plyfile->fp);
+	int i;
+	int j;
+	PlyElement* elem;
 
-  /* free up memory associated with the PLY file */
-  free (plyfile);
+	fclose (plyfile->fp);
+	for (i=0; i<plyfile->nelems; i++)
+	{
+		elem = plyfile->elems[i];
+		free(elem->name);
+		for (j=0; j<elem->nprops; j++)
+		{
+			free((elem->props[j]->name));
+			free (elem->props[j]);
+		}
+		free (elem->props);
+		free (elem->store_prop);
+		free (elem);
+	}
+	free(plyfile->elems);
+
+	for (i=0; i<plyfile->num_comments; i++)
+	{
+		free (plyfile->comments[i]);
+	}
+	free (plyfile->comments);
+
+	for (i=0; i<plyfile->num_obj_info; i++)
+	{
+		free (plyfile->obj_info[i]);
+	}
+	free (plyfile->obj_info);
+
+	if (plyfile->other_elems != NULL)
+	{
+		for (i=0; i<plyfile->other_elems->num_elems; ++i)
+		{
+			OtherElem* other = &(plyfile->other_elems->other_list[i]);
+			free(other->elem_name);
+			for (j=0; j<other->elem_count; ++j)
+			{
+				free(other->other_data[j]);
+			}
+			free(other->other_data);
+			free(other->other_props->name);
+			for (j=0; j<other->other_props->nprops; ++j)
+			{
+				free(other->other_props->props[j]->name);
+				free(other->other_props->props[j]);
+			}
+			free(other->other_props->props);
+			free(other->other_props);
+		}
+		free(plyfile->other_elems->other_list);
+		free(plyfile->other_elems);
+	}
+
+	free (plyfile);
+
 }
 
 
@@ -1497,16 +1548,18 @@ void ascii_get_element(PlyFile *plyfile, char *elem_ptr)
 
   /* do we need to setup for other_props? */
 
-  if (elem->other_offset != NO_OTHER_PROPS) {
-    char **ptr;
-    other_flag = 1;
-    /* make room for other_props */
-    other_data = (char *) myalloc (elem->other_size);
-    /* store pointer in user's structure to the other_props */
-    ptr = (char **) (elem_ptr + elem->other_offset);
-    *ptr = other_data;
-  }
-  else
+// NOTE HS-2014-02-12 This leaks, it is easier to disable the 'other' functionality than to
+// fix the leak, vtk solves this by allocating on an internal heap rather than the global heap
+//   if (elem->other_offset != NO_OTHER_PROPS) {
+//     char **ptr;
+//     other_flag = 1;
+//     /* make room for other_props */
+//     other_data = (char *) myalloc (elem->other_size);
+//     /* store pointer in user's structure to the other_props */
+//     ptr = (char **) (elem_ptr + elem->other_offset);
+//     *ptr = other_data;
+//   }
+//   else
     other_flag = 0;
 
   /* read in the element */
@@ -1746,7 +1799,6 @@ char **get_words(FILE *fp, int *nwords, char **orig_line)
   char *ptr,*ptr2;
   char *result;
 
-  words = (char **) myalloc (sizeof (char *) * max_words);
 
   /* read in a line */
   result = fgets (str, BIG_STRING, fp);
@@ -1755,6 +1807,8 @@ char **get_words(FILE *fp, int *nwords, char **orig_line)
     *orig_line = NULL;
     return (NULL);
   }
+
+  words = (char **) myalloc (sizeof (char *) * max_words);
 
   /* convert line-feed and tabs into spaces */
   /* (this guarentees that there will be a space before the */
@@ -2513,4 +2567,3 @@ char *my_alloc(int size, int lnum, char *fname)
 #if defined(_MSC_VER)
 #pragma warning(pop)
 #endif
-
