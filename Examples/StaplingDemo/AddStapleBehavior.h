@@ -26,9 +26,6 @@ namespace Input
 class InputComponent;
 }
 
-namespace Blocks
-{
-
 class AddStapleFromInputBehavior: public SurgSim::Framework::Behavior
 {
 public:
@@ -70,7 +67,6 @@ private:
 	bool m_buttonPreviouslyPressed;
 };
 
-}; // End of namespace Blocks
 }; // End of namespace SurgSim
 
 #endif  // EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H

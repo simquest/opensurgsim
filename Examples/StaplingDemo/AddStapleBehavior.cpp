@@ -26,9 +26,6 @@
 namespace SurgSim
 {
 
-namespace Blocks
-{
-
 AddStapleFromInputBehavior::AddStapleFromInputBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_numElements(0),
@@ -85,5 +82,4 @@ bool AddStapleFromInputBehavior::doWakeUp()
 	return true;
 }
 
-}; // End of namespace Blocks
 }; // End of namespace SurgSim
