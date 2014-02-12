@@ -30,12 +30,12 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh()
 template <class VertexData, class EdgeData, class TriangleData>
 template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
 TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
-	TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource> &mesh)
+	const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
 {
 	for (unsigned int iVertex = 0; iVertex < mesh.getNumVertices(); ++iVertex)
 	{
-		VertexType vertexData(mesh.getVertexPosition(iVertex));
-		addVertex(vertexData);
+		typename Vertices<VertexData>::VertexType vertexData(mesh.getVertexPosition(iVertex));
+		Vertices<VertexData>::addVertex(vertexData);
 	}
 	for (unsigned int iEdge = 0; iEdge < mesh.getNumEdges(); ++iEdge)
 	{

@@ -24,14 +24,14 @@ namespace SurgSim
 namespace Collision
 {
 
-/* CUBE
-3*----------*2
-/          /|
-7*----------* |
-|         6| |
-| *0       | *1
-|          |/
-4*----------*5
+/*	CUBE
+	  3*----------*2
+	  /          /|
+	7*----------* |
+	 |         6| |
+	 | *0       | *1
+	 |          |/
+	4*----------*5
 */
 static const int cubeNumPoints = 8;
 static const SurgSim::Math::Vector3d cubePoints[8] =
@@ -66,23 +66,6 @@ static const int cubeTrianglesCCW[12][3] =
 	{0, 4, 7}, {0, 7, 3}  // Left   (-1  0  0) [0473]
 };
 
-class EmptyData
-{
-public:
-	bool operator ==(const EmptyData& e) const
-	{
-		return true;
-	}
-};
-
-static Vector3d calculateTriangleMeshVertex(const int i,
-											const Quaterniond& quat,
-											const Vector3d& trans)
-{
-	return (quat * Vector3d(cubePoints[i][0], cubePoints[i][1], cubePoints[i][2])) +
-		   trans;
-}
-
 void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 									const RigidTransform3d& meshATransform,
 									std::shared_ptr<MeshShape> meshB,
@@ -103,19 +86,11 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshARep, meshBRep);
 	calcContact.calculateContact(pair);
 
-	if (expectedContacts.size() != 0)
-	{
-		EXPECT_TRUE(pair->hasContacts());
-
-		if (pair->hasContacts())
-		{
-			contactsInfoEqualityTest(expectedContacts, pair->getContacts());
-		}
-	}
+	contactsInfoEqualityTest(expectedContacts, pair->getContacts());
 }
 
 
-TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
+TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRotationQuaternion;
@@ -179,11 +154,13 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 								 Quaterniond::Identity(),
 								 Vector3d(0.0, (cubeSize + epsilonTrans), 0.0));
 		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.234, Vector3d(1.2, 3.4, 5.6)),
+							  makeRotationQuaternion(1.234, Vector3d(1.2, 3.4, 5.6).normalized()),
 							  Vector3d(34.4, 567.6, 234.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
+
 		std::list<std::shared_ptr<Contact>> expectedContacts;
+
 		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
 	}
 
@@ -196,11 +173,13 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 								 Quaterniond::Identity(),
 								 Vector3d(0.0, -(cubeSize + epsilonTrans), 0.0));
 		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.4, Vector3d(10.2, 34.4, 15.6)),
+							  makeRotationQuaternion(1.4, Vector3d(10.2, 34.4, 15.6).normalized()),
 							  Vector3d(3.4, 6.6, 2.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
+
 		std::list<std::shared_ptr<Contact>> expectedContacts;
+
 		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
 	}
 
@@ -213,11 +192,13 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 								 Quaterniond::Identity(),
 								 Vector3d(-(cubeSize + epsilonTrans), 0.0, 0.0));
 		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.4, Vector3d(1.2, 3.4, 5.6)),
+							  makeRotationQuaternion(1.4, Vector3d(1.2, 3.4, 5.6).normalized()),
 							  Vector3d(340.4, 567.6, 234.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
+
 		std::list<std::shared_ptr<Contact>> expectedContacts;
+
 		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
 	}
 
@@ -230,11 +211,13 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 								 Quaterniond::Identity(),
 								 Vector3d((cubeSize + epsilonTrans), 0.0, 0.0));
 		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.2, Vector3d(11.2, 13.4, 15.6)),
+							  makeRotationQuaternion(1.2, Vector3d(11.2, 13.4, 15.6).normalized()),
 							  Vector3d(3.4, 5.6, 2.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
+
 		std::list<std::shared_ptr<Contact>> expectedContacts;
+
 		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
 	}
 
@@ -247,11 +230,13 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 								 Quaterniond::Identity(),
 								 Vector3d(0.0, 0.0, (cubeSize + epsilonTrans)));
 		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(2.234, Vector3d(10.2, 30.4, 50.6)),
+							  makeRotationQuaternion(2.234, Vector3d(10.2, 30.4, 50.6).normalized()),
 							  Vector3d(84.4, 56.6, 24.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
+
 		std::list<std::shared_ptr<Contact>> expectedContacts;
+
 		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
 	}
 
@@ -264,278 +249,13 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, UnitTests)
 								 Quaterniond::Identity(),
 								 Vector3d(0.0, 0.0, -(cubeSize + epsilonTrans)));
 		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.24, Vector3d(9.2, 7.4, 5.6)),
+							  makeRotationQuaternion(1.24, Vector3d(9.2, 7.4, 5.6).normalized()),
 							  Vector3d(39.4, 67.6, 34.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
+
 		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
 
-	epsilonTrans = -1e-10;
-	double expectedDepth = 1.0;
-	std::pair<Location, Location> penetrationPoint;
-	penetrationPoint.first.globalPosition.setValue(Vector3d::Zero());
-	penetrationPoint.second.globalPosition.setValue(Vector3d::Zero());
-
-	{
-		SCOPED_TRACE("Just touching, boxB above boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, (cubeSize + epsilonTrans), 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(2.4, Vector3d(-1.2, 3.4, 5.6)),
-							  Vector3d(34.4, -67.6, 34.5));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * -Vector3d::UnitY(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Just touching, boxB below boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, -(cubeSize + epsilonTrans), 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(-1.234, Vector3d(1.2, -3.4, -5.6)),
-							  Vector3d(-34.4, -67.6, 34.5));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * Vector3d::UnitY(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Just touching, boxB to the left of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(-(cubeSize + epsilonTrans), 0.0, 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(0.973, Vector3d(2.5, 3.5, 8.2)),
-							  Vector3d(23.98, 95.37, 68.93));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * Vector3d::UnitX(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Just touching, boxB to the right of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d((cubeSize + epsilonTrans), 0.0, 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(3.272, Vector3d(7.06, 2.74, 8.36)),
-							  Vector3d(4.38, 8.36, 6.87));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * -Vector3d::UnitX(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Just touching, boxB in front of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, 0.0, (cubeSize + epsilonTrans)));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(-0.538, Vector3d(94.3, 65.3, -92.4)),
-							  Vector3d(-84.24, 39.38, 85.63));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * -Vector3d::UnitZ(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Just touching, boxB behind boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, 0.0, -(cubeSize + epsilonTrans)));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(0.463, Vector3d(54.3, 5.23, 83.2)),
-							  Vector3d(-84.35, 73.65, 32.47));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * Vector3d::UnitZ(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	epsilonTrans = 0.0;
-	expectedDepth = 1.0;
-
-	{
-		SCOPED_TRACE("Vertex into face, boxB above boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 makeRotationQuaternion(M_PI_4 * 1.00012, Vector3d(1.0, 0.0, 0.0)) *
-								 makeRotationQuaternion(M_PI_4 * 1.00034, Vector3d(0.0, 1.0, 0.0)),
-								 Vector3d(0.0, (cubeSize + epsilonTrans), 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(6.372, Vector3d(-1.2, 3.4, 5.6)),
-							  Vector3d(74.4, 67.6, 64.5));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * -Vector3d::UnitY(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Vertex into face, boxB below boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 makeRotationQuaternion(M_PI_4 * 1.0001, Vector3d(1.0, 0.0, 0.0)) *
-								 makeRotationQuaternion(M_PI_4 * 1.0003, Vector3d(0.0, 1.0, 0.0)),
-								 Vector3d(0.0, -(cubeSize + epsilonTrans), 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(0.34, Vector3d(31.2, 43.4, 25.6)),
-							  Vector3d(4.4, 7.6, 2.5));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * Vector3d::UnitY(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Vertex into face, boxB to the left of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 makeRotationQuaternion(M_PI_4 * 1.0002, Vector3d(0.0, 0.0, 1.0)) *
-								 makeRotationQuaternion(M_PI_4 * 1.0002, Vector3d(0.0, 1.0, 0.0)),
-								 Vector3d(-(cubeSize + epsilonTrans), 0.0, 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(-1.234, Vector3d(-1.2, -3.4, -5.6)),
-							  Vector3d(-34.4, -567.6, -234.5));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * Vector3d::UnitX(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Vertex into face, boxB to the right of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 makeRotationQuaternion(M_PI_4 * 1.00025, Vector3d(0.0, 0.0, 1.0)) *
-								 makeRotationQuaternion(M_PI_4 * 1.00014, Vector3d(0.0, 1.0, 0.0)),
-								 Vector3d((cubeSize + epsilonTrans), 0.0, 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(0.34, Vector3d(1.2, -3.4, 5.6)),
-							  Vector3d(-7.3, -2.5, -1.7));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * -Vector3d::UnitX(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Vertex into face, boxB in front of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 makeRotationQuaternion(M_PI_4 * 1.00009, Vector3d(1.0, 0.0, 0.0)) *
-								 makeRotationQuaternion(M_PI_4 * 1.00011, Vector3d(0.0, 1.0, 0.0)),
-								 Vector3d(0.0, 0.0, (cubeSize + epsilonTrans)));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(-0.736, Vector3d(0.7357, 0.7257, 0.3642)),
-							  Vector3d(0.2846, 0.9774, 0.2974));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * -Vector3d::UnitZ(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
-	}
-
-	{
-		SCOPED_TRACE("Vertex into face, boxB behind boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 makeRotationQuaternion(M_PI_4 * 1.00011, Vector3d(1.0, 0.0, 0.0)) *
-								 makeRotationQuaternion(M_PI_4 * 1.00033, Vector3d(0.0, 1.0, 0.0)),
-								 Vector3d(0.0, 0.0, -(cubeSize + epsilonTrans)));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(0.864, Vector3d(18.66, 28.64, 75.28)),
-							  Vector3d(64.39, 85.27, 74.36));
-		cubeMeshATransform = globalTransform * cubeMeshATransform;
-		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
-		std::shared_ptr<Contact> expectedContact = std::make_shared<Contact>(expectedDepth,
-												   Vector3d::Zero(),
-												   globalTransform.rotation() * Vector3d::UnitZ(),
-												   penetrationPoint);
-		std::list<std::shared_ptr<Contact>> expectedContacts;
 		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
 	}
 }

@@ -65,7 +65,7 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 
 	// Now loop through all the vertices on the Mesh and check if it below the plane
 	unsigned int totalMeshVertices = mesh->getMesh()->getNumVertices();
-	
+
 	double d;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d meshVertex;

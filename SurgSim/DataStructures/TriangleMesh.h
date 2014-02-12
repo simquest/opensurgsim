@@ -66,7 +66,7 @@ public:
 
 	// Copy constructor.
 	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	TriangleMesh(TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource> &mesh);
+	TriangleMesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
 
 	/// Destructor
 	virtual ~TriangleMesh();

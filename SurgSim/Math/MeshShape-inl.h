@@ -27,7 +27,7 @@ MeshShape::MeshShape(
 	const std::shared_ptr<SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>> mesh)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "MeshShape cannot be initialized with a null TriangleMesh";
-	m_mesh = std::make_shared<TriMesh>(*mesh.get());
+	m_mesh = std::make_shared<TriMesh>(*mesh);
 	computeVolumeIntegrals();
 }
 

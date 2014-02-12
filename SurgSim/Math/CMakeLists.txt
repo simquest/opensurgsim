@@ -43,6 +43,7 @@ set(SURGSIM_MATH_HEADERS
 	LinearSolveAndInverse.h
 	Matrix.h
 	MeshShape.h
+	MeshShape-inl.h
 	MlcpConstraintType.h
 	MlcpConstraintTypeName.h
 	MlcpGaussSeidelSolver.h
