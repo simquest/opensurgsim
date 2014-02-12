@@ -62,19 +62,28 @@ PlyReader::PlyReader(std::string filename) :
 		&m_data->elementNames,
 		&m_data->file_type,
 		&m_data->version);
-
+	
 }
 
 PlyReader::~PlyReader()
 {
 	if (isValid())
 	{
+		for (int i=0;i<m_data->elementCount;++i)
+		{
+			free(m_data->elementNames[i]);
+		}
+		free(m_data->elementNames);
+
 		ply_close(m_data->plyFile);
 		m_data->plyFile = nullptr;
+
+
+
 	}
 }
 
-bool PlyReader::isValid()
+bool PlyReader::isValid() const
 {
 	return m_data->plyFile != nullptr;
 }
@@ -84,9 +93,11 @@ bool PlyReader::requestElement(std::string elementName,
 							   std::function<void (const std::string&)> processElementCallback,
 							   std::function<void (const std::string&)> endElementCallback)
 {
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+
 	bool result = false;
 
-	if (hasElement(elementName))
+	if (hasElement(elementName) && m_requestedElements.find(elementName) == m_requestedElements.end())
 	{
 		ElementInfo info;
 		info.name = elementName;
@@ -101,35 +112,48 @@ bool PlyReader::requestElement(std::string elementName,
 	return result;
 }
 
-bool PlyReader::requestProperty(std::string elementName, std::string propertyName, int targetType, int dataOffset)
+bool PlyReader::requestProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset)
 {
-	return requestProperty(elementName, propertyName, targetType, dataOffset, 0, 0);
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+
+	return requestProperty(elementName, propertyName, dataType, dataOffset, 0, 0);
 }
 
 bool PlyReader::requestProperty(std::string elementName,
 								std::string propertyName,
-								int targetType, int dataOffset,
+								int dataType, int dataOffset,
 								int countType, int countOffset)
 {
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
 	SURGSIM_ASSERT(m_requestedElements.find(elementName) != m_requestedElements.end()) <<
 		"Cannot request Properties before the element has been added.";
-	SURGSIM_ASSERT(targetType < TYPE_COUNT && targetType > 0) << "Invalid type used.";
+	SURGSIM_ASSERT(dataType < TYPE_COUNT && dataType > 0) << "Invalid type used.";
 
 	bool result = false;
 
 	bool scalar = isScalar(elementName, propertyName);
 	bool wantScalar = (countType == 0);
 
+
 	if (hasProperty(elementName, propertyName) && (scalar == wantScalar))
 	{
-		PropertyInfo info;
-		info.propertyName = propertyName;
-		info.targetType = m_data->types[targetType];
-		info.dataOffset = dataOffset;
-		info.countType = m_data->types[countType];
-		info.countOffset = countOffset;
-		m_requestedElements[elementName].requestedProperties.push_back(info);
-		result = true;
+		auto itBegin = std::begin(m_requestedElements[elementName].requestedProperties);
+		auto itEnd = std::end(m_requestedElements[elementName].requestedProperties);
+
+		bool doAdd = std::find_if(itBegin, itEnd, 
+			[propertyName](PropertyInfo p){return p.propertyName == propertyName;}) == itEnd;
+		
+		if (doAdd)
+		{
+			PropertyInfo info;
+			info.propertyName = propertyName;
+			info.targetType = m_data->types[dataType];
+			info.dataOffset = dataOffset;
+			info.countType = m_data->types[countType];
+			info.countOffset = countOffset;
+			m_requestedElements[elementName].requestedProperties.push_back(info);
+			result = true;
+		}
 	}
 
 	return result;
@@ -137,6 +161,8 @@ bool PlyReader::requestProperty(std::string elementName,
 
 bool PlyReader::setDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
 {
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+
 	bool result = false;
 	if (delegate != nullptr)
 	{
@@ -162,7 +188,8 @@ void PlyReader::parseFile()
 		int propertyCount;
 
 		// Not freeing the return value might be a leak here ...
-		ply_get_element_description(m_data->plyFile, currentElementName, &numberOfElements, &propertyCount);
+		PlyProperty** properties = 
+			ply_get_element_description(m_data->plyFile, currentElementName, &numberOfElements, &propertyCount);
 
 		// Check if the user wanted this element, if yes process
 		if (m_requestedElements.find(currentElementName) != m_requestedElements.end())
@@ -213,19 +240,30 @@ void PlyReader::parseFile()
 			// Inefficient way to skip an element, but there does not seem to be an
 			// easy way to ignore an element
 			PlyOtherElems* other = ply_get_other_element(m_data->plyFile, currentElementName, numberOfElements);
-			free(other->other_list);
-			free(other);
+
 		}
+
+		// Free the data allocated in the ply_get_element_description call
+		for (int i = 0; i < propertyCount; ++i)
+		{
+			free(properties[i]->name);
+			free(properties[i]);
+		}
+		free(properties);
 	}
 }
 
-bool PlyReader::hasElement(std::string elemenetName) const
+bool PlyReader::hasElement(std::string elementName) const
 {
-	return find_element(m_data->plyFile, elemenetName.c_str()) != nullptr;
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+
+	return find_element(m_data->plyFile, elementName.c_str()) != nullptr;
 }
 
 bool PlyReader::hasProperty(std::string elementName, std::string propertyName) const
 {
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+
 	bool result = false;
 	PlyElement* element = find_element(m_data->plyFile, elementName.c_str());
 	if (element != nullptr)
@@ -238,6 +276,8 @@ bool PlyReader::hasProperty(std::string elementName, std::string propertyName) c
 
 bool PlyReader::isScalar(std::string elementName, std::string propertyName) const
 {
+	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+
 	bool result = false;
 	PlyElement* element = find_element(m_data->plyFile, elementName.c_str());
 	if (element != nullptr)

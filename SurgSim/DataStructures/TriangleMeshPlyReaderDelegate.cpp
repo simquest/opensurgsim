@@ -30,6 +30,7 @@ TriangleMeshPlyReaderDelegate::TriangleMeshPlyReaderDelegate() :
 TriangleMeshPlyReaderDelegate::TriangleMeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh) :
 	m_mesh(mesh)
 {
+	SURGSIM_ASSERT(mesh != nullptr) << "The mesh cannot be null.";
 	mesh->clear();
 }
 
@@ -79,10 +80,9 @@ std::shared_ptr<TriangleMesh<void, void, void>> TriangleMeshPlyReaderDelegate::g
 
 
 
-void* TriangleMeshPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertices)
+void* TriangleMeshPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
 {
 	vertexData.overrun = 0l;
-	m_vertexPositions.reserve(vertices);
 	return &vertexData;
 }
 
@@ -99,7 +99,7 @@ void TriangleMeshPlyReaderDelegate::endVertices(const std::string& elementName)
 		"has become corrupted.";
 }
 
-void* TriangleMeshPlyReaderDelegate::beginFaces(const std::string& elementName, size_t faces)
+void* TriangleMeshPlyReaderDelegate::beginFaces(const std::string& elementName, size_t faceCount)
 {
 	faceData.overrun = 0;
 	return &faceData;

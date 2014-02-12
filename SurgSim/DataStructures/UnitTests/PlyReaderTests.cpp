@@ -164,7 +164,16 @@ TEST(PlyReaderTests, ScalarReadTest)
 		std::bind(&TestData::beginVertices, &testData, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
 		std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
+
+	/// Should not be able to register the element twice
+	EXPECT_FALSE(reader.requestElement("vertex",
+		std::bind(&TestData::beginVertices, &testData, std::placeholders::_1, std::placeholders::_2),
+		std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
+		std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
+
 	EXPECT_TRUE(reader.requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+	EXPECT_FALSE(reader.requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+
 	EXPECT_TRUE(reader.requestProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, y)));
 	EXPECT_TRUE(reader.requestProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
 
@@ -246,7 +255,6 @@ TEST(PlyReaderTests, TriangleMeshDelegateTest)
 
 	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
 	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
-
 }
 
 
