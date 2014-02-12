@@ -38,6 +38,11 @@ WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
 #include <string.h>
 #include "SurgSim/DataStructures/ply.h"
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4996)
+#endif
+
 char *type_names[] = {
 "invalid",
 "char", "short", "int",
@@ -108,8 +113,8 @@ void get_binary_item(FILE *, int, int *, unsigned int *, double *);
 void ascii_get_element(PlyFile *, char *);
 void binary_get_element(PlyFile *, char *);
 
-/* memory allocation */
-char *my_alloc(int, int, char *);
+// /* memory allocation */
+// static char *my_alloc(int, int, char *);
 
 
 /*************/
@@ -162,7 +167,7 @@ PlyFile *ply_write(
   for (i = 0; i < nelems; i++) {
     elem = (PlyElement *) myalloc (sizeof (PlyElement));
     plyfile->elems[i] = elem;
-    elem->name = _strdup (elem_names[i]);
+    elem->name = strdup (elem_names[i]);
     elem->num = 0;
     elem->nprops = 0;
   }
@@ -637,7 +642,7 @@ void ply_put_comment(PlyFile *plyfile, char *comment)
                          sizeof (char *) * (plyfile->num_comments + 1));
 
   /* add comment to list */
-  plyfile->comments[plyfile->num_comments] = _strdup (comment);
+  plyfile->comments[plyfile->num_comments] = strdup (comment);
   plyfile->num_comments++;
 }
 
@@ -661,7 +666,7 @@ void ply_put_obj_info(PlyFile *plyfile, char *obj_info)
                          sizeof (char *) * (plyfile->num_obj_info + 1));
 
   /* add info to list */
-  plyfile->obj_info[plyfile->num_obj_info] = _strdup (obj_info);
+  plyfile->obj_info[plyfile->num_obj_info] = strdup (obj_info);
   plyfile->num_obj_info++;
 }
 
@@ -771,7 +776,7 @@ PlyFile *ply_read(FILE *fp, int *nelems, char ***elem_names)
 
   elist = (char **) myalloc (sizeof (char *) * plyfile->nelems);
   for (i = 0; i < plyfile->nelems; i++)
-    elist[i] = _strdup (plyfile->elems[i]->name);
+    elist[i] = strdup (plyfile->elems[i]->name);
 
   *elem_names = elist;
   *nelems = plyfile->nelems;
@@ -1146,7 +1151,7 @@ PlyOtherProp *ply_get_other_properties(
 
   /* create structure for describing other_props */
   other = (PlyOtherProp *) myalloc (sizeof (PlyOtherProp));
-  other->name = _strdup (elem_name);
+  other->name = strdup (elem_name);
 #if 0
   if (elem->other_offset == NO_OTHER_PROPS) {
     other->size = 0;
@@ -1245,7 +1250,7 @@ PlyOtherElems *ply_get_other_element (
   other->elem_count = elem_count;
 
   /* save name of element */
-  other->elem_name = _strdup (elem_name);
+  other->elem_name = strdup (elem_name);
 
   /* create a list to hold all the current elements */
   other->other_data = (OtherData **)
@@ -2338,7 +2343,7 @@ void add_element (PlyFile *plyfile, char **words, int nwords)
 
   /* create the new element */
   elem = (PlyElement *) myalloc (sizeof (PlyElement));
-  elem->name = _strdup (words[1]);
+  elem->name = strdup (words[1]);
   elem->num = atoi (words[2]);
   elem->nprops = 0;
 
@@ -2399,12 +2404,12 @@ void add_property (PlyFile *plyfile, char **words, int nwords)
   if (equal_strings (words[1], "list")) {       /* is a list */
     prop->count_external = get_prop_type (words[2]);
     prop->external_type = get_prop_type (words[3]);
-    prop->name = _strdup (words[4]);
+    prop->name = strdup (words[4]);
     prop->is_list = 1;
   }
   else {                                        /* not a list */
     prop->external_type = get_prop_type (words[1]);
-    prop->name = _strdup (words[2]);
+    prop->name = strdup (words[2]);
     prop->is_list = 0;
   }
 
@@ -2471,7 +2476,7 @@ Copy a property.
 
 void copy_property(PlyProperty *dest, PlyProperty *src)
 {
-  dest->name = _strdup (src->name);
+  dest->name = strdup (src->name);
   dest->external_type = src->external_type;
   dest->internal_type = src->internal_type;
   dest->offset = src->offset;
@@ -2492,7 +2497,7 @@ Entry:
   fname - file name from which memory was requested
 ******************************************************************************/
 
-static char *my_alloc(int size, int lnum, char *fname)
+char *my_alloc(int size, int lnum, char *fname)
 {
   char *ptr;
 
@@ -2504,4 +2509,8 @@ static char *my_alloc(int size, int lnum, char *fname)
 
   return (ptr);
 }
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
