@@ -14,6 +14,8 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/Representation.h"
+
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
@@ -30,6 +32,21 @@ Representation::Representation(const std::string& name) :
 Representation::~Representation()
 {
 
+}
+
+const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& Representation::getContacts() const
+{
+	return m_contacts;
+}
+
+bool Representation::didCollide() const
+{
+	return m_contacts.empty();
+}
+
+void Representation::reset()
+{
+	m_contacts.clear();
 }
 
 }; // namespace Collision

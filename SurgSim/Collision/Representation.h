@@ -16,11 +16,10 @@
 #ifndef SURGSIM_COLLISION_REPRESENTATION_H
 #define SURGSIM_COLLISION_REPRESENTATION_H
 
+#include <deque>
 #include <memory>
 
 #include "SurgSim/Framework/Representation.h"
-
-#include "SurgSim/Math/RigidTransform.h"
 
 namespace SurgSim
 {
@@ -37,6 +36,7 @@ class Representation;
 
 namespace Collision
 {
+struct Contact;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
@@ -44,12 +44,11 @@ namespace Collision
 class Representation : public SurgSim::Framework::Representation
 {
 public:
-
-	///@{
-	/// Constructors
+	/// Constructor
+	/// \param name Name of this collision representation
 	explicit Representation(const std::string& name);
-	///@}
 
+	/// Destructor
 	virtual ~Representation();
 
 	/// Get the shape type id
@@ -64,6 +63,20 @@ public:
 	/// \return	The physics representation.
 	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
 
+	/// Get a list of SurgSim::Collision::Contact if there is a collision.
+	/// \return A std::deque containing contact informatoin.
+	const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& getContacts() const;
+
+	/// Check if this collision representation has collisions.
+	/// \return True if there is a collision; otherwise false.
+	bool didCollide() const;
+
+	/// Empty the contact list.
+	void reset();
+
+protected:
+	/// A list (implemented as std::deque) of contact information if there is any collision.
+	std::deque<std::shared_ptr<SurgSim::Collision::Contact>> m_contacts;
 };
 
 
