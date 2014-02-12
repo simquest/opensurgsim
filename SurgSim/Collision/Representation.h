@@ -69,7 +69,7 @@ public:
 
 	/// Check if this collision representation has collisions.
 	/// \return True if there is a collision; otherwise false.
-	bool didCollide() const;
+	bool hasContacts() const;
 
 	/// Empty the contact list.
 	void reset();

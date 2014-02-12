@@ -39,9 +39,9 @@ const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& Representation::
 	return m_contacts;
 }
 
-bool Representation::didCollide() const
+bool Representation::hasContacts() const
 {
-	return m_contacts.empty();
+	return !m_contacts.empty();
 }
 
 void Representation::reset()
