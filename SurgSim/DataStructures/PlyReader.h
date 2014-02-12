@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURE_PLYREADER_H
-#define SURGSIM_DATASTRUCTURE_PLYREADER_H
+#ifndef SURGSIM_DATASTRUCTURES_PLYREADER_H
+#define SURGSIM_DATASTRUCTURES_PLYREADER_H
 
 #include <string>
 #include <vector>
 
-#include <SurgSim/DataStructures/TriangleMesh.h>
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
 struct PlyFile;
 
@@ -27,8 +27,21 @@ namespace SurgSim
 {
 namespace DataStructures
 {
+class PlyReader;
 
-class PlyReader 
+class PlyReaderDelegate
+{
+public:
+	virtual ~PlyReaderDelegate()
+	{
+	}
+
+	virtual bool registerDelegate(PlyReader* reader) = 0;
+
+	virtual bool fileIsAcceptable(const PlyReader& reader) = 0;
+};
+
+class PlyReader
 {
 public:
 
@@ -47,26 +60,33 @@ public:
 	};
 
 	explicit PlyReader(std::string filename);
-	
+
 	virtual ~PlyReader();
 
 	bool isValid();
 
-	bool requestElement(std::string elementName, 
-		std::function<void* (const std::string&, size_t)> startElementCallback,
-		std::function<void (const std::string&)> processElementCallback,
-		std::function<void (const std::string&)> endElementCallback);
+	bool requestElement(std::string elementName,
+						std::function<void* (const std::string&, size_t)> startElementCallback,
+						std::function<void (const std::string&)> processElementCallback,
+						std::function<void (const std::string&)> endElementCallback);
 
 	bool requestProperty(std::string elementName, std::string propertyName, int targetType, int dataOffset);
-	bool requestProperty(std::string elementName, std::string propertyName, int targetType, int dataOffset, int countType, int countOffset);
 
-	bool hasElement(std::string elemenetName);
+	bool requestProperty(std::string elementName,
+						 std::string propertyName,
+						 int targetType, int dataOffset,
+						 int countType, int countOffset);
 
-	bool hasProperty(std::string elementName, std::string propertyName);
+	bool hasElement(std::string elemenetName) const;
 
-	bool isScalar(std::string elementName, std::string propertyName);
+	bool hasProperty(std::string elementName, std::string propertyName) const;
+
+	bool isScalar(std::string elementName, std::string propertyName) const;
+
+	bool setDelegate(std::shared_ptr<PlyReaderDelegate> delegate);
 
 	void parseFile();
+
 private:
 	std::string m_filename;
 
@@ -92,8 +112,12 @@ private:
 
 	struct Data;
 	std::unique_ptr<Data> m_data;
+
+	std::shared_ptr<PlyReaderDelegate> m_delegate;
 };
 
+
+std::shared_ptr<TriangleMesh<void, void, void>> readTriangleMesh(std::string fileName);
 
 }
 }

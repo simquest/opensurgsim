@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <SurgSim/Datastructures/PlyReader.h>
-#include <SurgSim/DataStructures/ply.h>
+#include <algorithm>
 
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/Datastructures/PlyReader.h"
+#include "SurgSim/DataStructures/ply.h"
+
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;
-
-
 
 namespace SurgSim
 {
@@ -106,12 +106,15 @@ bool PlyReader::requestProperty(std::string elementName, std::string propertyNam
 	return requestProperty(elementName, propertyName, targetType, dataOffset, 0, 0);
 }
 
-bool PlyReader::requestProperty(std::string elementName, std::string propertyName, int targetType, int dataOffset, int countType, int countOffset)
+bool PlyReader::requestProperty(std::string elementName,
+								std::string propertyName,
+								int targetType, int dataOffset,
+								int countType, int countOffset)
 {
 	SURGSIM_ASSERT(m_requestedElements.find(elementName) != m_requestedElements.end()) <<
 		"Cannot request Properties before the element has been added.";
 	SURGSIM_ASSERT(targetType < TYPE_COUNT && targetType > 0) << "Invalid type used.";
-	
+
 	bool result = false;
 
 	bool scalar = isScalar(elementName, propertyName);
@@ -132,6 +135,20 @@ bool PlyReader::requestProperty(std::string elementName, std::string propertyNam
 	return result;
 }
 
+bool PlyReader::setDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
+{
+	bool result = false;
+	if (delegate != nullptr)
+	{
+		if (delegate->fileIsAcceptable(*this))
+		{
+			result = delegate->registerDelegate(this);
+		}
+	}
+	return result;
+
+}
+
 void PlyReader::parseFile()
 {
 	SURGSIM_ASSERT(isValid()) << "Cannot parse invalid file.";
@@ -140,11 +157,11 @@ void PlyReader::parseFile()
 	for (int elementIndex = 0; elementIndex < m_data->elementCount; ++elementIndex)
 	{
 		currentElementName = m_data->elementNames[elementIndex];
-		
+
 		int numberOfElements;
 		int propertyCount;
 
-		// Not freeing the return value might be a leak here ... 
+		// Not freeing the return value might be a leak here ...
 		ply_get_element_description(m_data->plyFile, currentElementName, &numberOfElements, &propertyCount);
 
 		// Check if the user wanted this element, if yes process
@@ -155,9 +172,9 @@ void PlyReader::parseFile()
 			// Build the propertyinfo structure
 			for (size_t propertyIndex = 0; propertyIndex < elementInfo.requestedProperties.size(); ++propertyIndex)
 			{
-				PropertyInfo propertyInfo = elementInfo.requestedProperties[propertyIndex]; 
+				PropertyInfo propertyInfo = elementInfo.requestedProperties[propertyIndex];
 				PlyProperty requestedProperty = {nullptr, 0, 0, 0, 0, 0, 0, 0};
-				
+
 				// Create temp char*
 				std::vector<char> writable(propertyInfo.propertyName.size() + 1);
 				std::copy(propertyInfo.propertyName.begin(), propertyInfo.propertyName.end(), writable.begin());
@@ -170,7 +187,7 @@ void PlyReader::parseFile()
 				{
 					requestedProperty.is_list = 1;
 				}
-				
+
 				// Tell ply that we want this property to be read and put into the readbuffer
 				ply_get_property(m_data->plyFile, currentElementName, &requestedProperty);
 			}
@@ -202,12 +219,12 @@ void PlyReader::parseFile()
 	}
 }
 
-bool PlyReader::hasElement(std::string elementName)
+bool PlyReader::hasElement(std::string elemenetName) const
 {
-	return find_element(m_data->plyFile, elementName.c_str()) != nullptr;
+	return find_element(m_data->plyFile, elemenetName.c_str()) != nullptr;
 }
 
-bool PlyReader::hasProperty(std::string elementName, std::string propertyName)
+bool PlyReader::hasProperty(std::string elementName, std::string propertyName) const
 {
 	bool result = false;
 	PlyElement* element = find_element(m_data->plyFile, elementName.c_str());
@@ -219,7 +236,7 @@ bool PlyReader::hasProperty(std::string elementName, std::string propertyName)
 	return result;
 }
 
-bool PlyReader::isScalar(std::string elementName, std::string propertyName)
+bool PlyReader::isScalar(std::string elementName, std::string propertyName) const
 {
 	bool result = false;
 	PlyElement* element = find_element(m_data->plyFile, elementName.c_str());
@@ -234,7 +251,6 @@ bool PlyReader::isScalar(std::string elementName, std::string propertyName)
 	}
 	return result;
 }
-
 
 }
 }

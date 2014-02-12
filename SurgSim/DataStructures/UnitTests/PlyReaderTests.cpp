@@ -15,11 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include <SurgSim/DataStructures/PlyReader.h>
-#include <SurgSim/Framework/ApplicationData.h>
-#include "boost/filesystem/operations.hpp"
-
-#include <SurgSim/Math/Vector.h>
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -131,7 +130,7 @@ public:
 		double x;
 		double y;
 		double z;
-		long overrun;
+		int64_t overrun;
 	};
 
 	struct FaceData
@@ -139,7 +138,7 @@ public:
 		unsigned int faceCount;
 		unsigned int* faces;
 		int extra;
-		long overrun;
+		int64_t overrun;
 	};
 
 	VertexData vertexData;
@@ -165,7 +164,7 @@ TEST(PlyReaderTests, ScalarReadTest)
 		std::bind(&TestData::beginVertices, &testData, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
 		std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
- 	EXPECT_TRUE(reader.requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+	EXPECT_TRUE(reader.requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
 	EXPECT_TRUE(reader.requestProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, y)));
 	EXPECT_TRUE(reader.requestProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
 
@@ -193,9 +192,9 @@ TEST(PlyReaderTests, ListReadTest)
 	EXPECT_TRUE(reader.requestElement("face",
 		std::bind(&TestData::beginFaces, &testData, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TestData::newFace, &testData, std::placeholders::_1),nullptr));
-	EXPECT_TRUE(reader.requestProperty("face", "vertex_indices", 
+	EXPECT_TRUE(reader.requestProperty("face", "vertex_indices",
 										PlyReader::TYPE_UNSIGNED_INT,
-										offsetof(TestData::FaceData, faces),							   
+										offsetof(TestData::FaceData, faces),
 										PlyReader::TYPE_UNSIGNED_INT,
 										offsetof(TestData::FaceData, faceCount)));
 	EXPECT_TRUE(reader.requestProperty("face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
@@ -221,6 +220,33 @@ TEST(PlyReaderTests, ListReadTest)
 			++expected;
 		}
 	}
+}
+
+TEST(PlyReaderTests, TriangleMeshDelegateTest)
+{
+	PlyReader reader(findFile("Cube.ply"));
+	auto delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+
+	EXPECT_TRUE(reader.setDelegate(delegate));
+	EXPECT_NO_THROW(reader.parseFile());
+
+	auto mesh = delegate->getMesh();
+	EXPECT_EQ(26, mesh->getNumVertices());
+	EXPECT_EQ(12, mesh->getNumTriangles());
+
+	// The first and last vertices from the file
+	Vector3d vertex0(1.0, 1.0, -1.0);
+	Vector3d vertex25(-1.0, -1.0, 1.0);
+
+	EXPECT_TRUE(vertex0.isApprox(mesh->getVertex(0).position));
+	EXPECT_TRUE(vertex25.isApprox(mesh->getVertex(25).position));
+
+	std::array<unsigned int, 3> triangle0 = {0, 1, 2};
+	std::array<unsigned int, 3> triangle11 = {10, 25, 11};
+
+	EXPECT_EQ(triangle0, mesh->getTriangle(0).verticesId);
+	EXPECT_EQ(triangle11, mesh->getTriangle(11).verticesId);
+
 }
 
 
