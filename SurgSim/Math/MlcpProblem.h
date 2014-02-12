@@ -28,22 +28,22 @@ namespace Math
 
 /// A description of an MLCP (mixed linear complementarity problem, or mixed LCP) system to be solved.
 ///
-/// A traditional (not mixed!) LCP problem is expressed as \f$\mathbf{A}x + b = c\f$, where \f$x\f$ and \f$c\f$
-/// are subject
-/// to inequality conditions \f$x_i \ge 0\f$, \f$c_i \ge 0\f$, and \f$x \perp c\f$ (i.e. \f$x \cdot c = 0\f$).
+/// A traditional (not mixed!) LCP problem is expressed as \f$\mathbf{A}x + b = c\f$, where \f$x\f$ is the vector of 
+/// variables of interest to be determined, \f$c\f$ is the vector of slack variables (transforming a system of
+/// inequalities into a system of equalities), and \f$x\f$ and \f$c\f$ are subject to the inequality conditions
+/// \f$x_i \ge 0\f$, \f$c_i \ge 0\f$, and \f$x \perp c\f$ (i.e. \f$x \cdot c = 0\f$).
 /// Thus for each row \f$i\f$, either
 /// * \f$(\mathbf{A}x+b)_i = \mathbf{A}_{i,*}\cdot x+b_i \ge 0\f$ <b>and</b> \f$x_i = 0\f$
-///   (the constraint is non-binding, and therefore there is no force); or
+///   (the constraint is non-binding, so the variable of interest enforcing the constraint is zero);
+///   or
 /// * \f$(\mathbf{A}x+b)_i = \mathbf{A}_{i,*}\cdot x+b_i = 0\f$ <b>and</b> \f$x_i \ge 0\f$
-///   (the constraint is binding, and therefore there is a positive force to enforce the constraint)
+///   (the constraint is binding, so the variable of interest is nonzero to enforce the constraint).
 ///
 /// Solving the problem produces the vector \f$x\f$, from which \f$c\f$ can also be computed if needed.
 ///
 /// A mixed LCP problem is defined in the same way, except that for a certain subset of indices, the conditions are
-/// restricted further to require \f$c_i\f$ to be zero, \f$\mathbf{A}_{i,*}\cdot x+b_i = 0\f$,
-/// which results in a non-zero force,
-/// \f$x_i \ge 0\f$.  These are referred to as <i>bilateral</i> constraints, as opposed to the <i>unilateral</i>
-/// constraints that behave as they do in the LCP problem.
+/// restricted further to require \f$c_i\f$ to be zero, \f$\mathbf{A}_{i,*}\cdot x+b_i = 0\f$.  These are referred to as
+/// <i>bilateral</i> constraints, as opposed to the <i>unilateral</i> constraints in the LCP problem.
 ///
 /// Friction is integrated directly into the problem, using the general approach described e.g. in:<br/>
 /// Duriez, Christian; Dubois, F.; Kheddar, A.; Andriot, C., "Realistic haptic rendering of interacting
