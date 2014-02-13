@@ -18,9 +18,6 @@
 
 #include "SurgSim/Framework/Behavior.h"
 
-namespace SurgSim
-{
-
 namespace Input
 {
 class InputComponent;
@@ -66,7 +63,5 @@ private:
 	/// Used to record if a button was previously pressed
 	bool m_buttonPreviouslyPressed;
 };
-
-}; // End of namespace SurgSim
 
 #endif  // EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H

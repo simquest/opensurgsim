@@ -23,9 +23,6 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Input/InputComponent.h"
 
-namespace SurgSim
-{
-
 AddStapleFromInputBehavior::AddStapleFromInputBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_numElements(0),
@@ -81,5 +78,3 @@ bool AddStapleFromInputBehavior::doWakeUp()
 {
 	return true;
 }
-
-}; // End of namespace SurgSim
