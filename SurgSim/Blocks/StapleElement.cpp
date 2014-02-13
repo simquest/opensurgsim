@@ -54,8 +54,10 @@ Graphical representation of the surgical staple is loaded from a .obj file.
 bool StapleElement::doInitialize()
 {
 	// Shape of a cylinder is used to model the staple with length: 4.8mm and radius: 1.8mm
-	// Feb-11-2014-HW: Need reference for the dimension of a surgical staple.
-	auto shape = std::make_shared<CylinderShape>(0.0048, 0.0018);
+	// The surgical staple dimensions is pulled from:
+	// http://surgical.covidien.com/products/stapling/skin-staplers
+	// for model: MultiFire Premium Single Use Skin Stapler.
+	auto shape = std::make_shared<CylinderShape>(0.0048, 0.0017);
 
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel
@@ -66,7 +68,7 @@ bool StapleElement::doInitialize()
 	physicsRepresentation->setInitialPose(m_pose);
 
 	auto graphicsRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
-	graphicsRepresentation->setFileName("staple_collision.obj");
+	graphicsRepresentation->setFileName("Geometry/staple_collision.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
 
 	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
