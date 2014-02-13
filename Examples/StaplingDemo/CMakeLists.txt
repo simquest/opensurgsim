@@ -24,11 +24,13 @@ include_directories(
 
 set(STAPLINGDEMO_SOURCES
 	AddStapleBehavior.cpp
+	StapleElement.cpp
 	main.cpp
 )
 
 set(STAPLINGDEMO_HEADERS
 	AddStapleBehavior.h
+	StapleElement.h
 )
 
 add_executable(StaplingDemo

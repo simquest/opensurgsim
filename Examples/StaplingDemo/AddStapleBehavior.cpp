@@ -16,8 +16,8 @@
 #include <sstream>
 
 #include "Examples/StaplingDemo/AddStapleBehavior.h"
+#include "Examples/StaplingDemo/StapleElement.h"
 
-#include "SurgSim/Blocks/StapleElement.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
@@ -56,7 +56,7 @@ void AddStapleFromInputBehavior::update(double dt)
 		std::string name = "stapleId_" + elementCount.str();
 
 		// Create a staple element and add it into scene.
-		auto m_element = std::make_shared<SurgSim::Blocks::StapleElement>(name);
+		auto m_element = std::make_shared<StapleElement>(name);
 		m_element->setPose(pose);
 
 		getScene()->addSceneElement(m_element);

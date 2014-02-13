@@ -15,7 +15,8 @@
 
 #include <string>
 
-#include "SurgSim/Blocks/StapleElement.h"
+#include "Examples/StaplingDemo/StapleElement.h"
+
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/CylinderShape.h"
@@ -25,12 +26,6 @@
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Math::CylinderShape;
 using SurgSim::Physics::RigidRepresentationParameters;
-
-namespace SurgSim
-{
-
-namespace Blocks
-{
 
 StapleElement::StapleElement(const std::string& name):
 	SurgSim::Framework::SceneElement(name),
@@ -81,6 +76,3 @@ bool StapleElement::doInitialize()
 
 	return true;
 }
-
-}; // End of namespace Blocks
-}; // End of namespace SurgSim

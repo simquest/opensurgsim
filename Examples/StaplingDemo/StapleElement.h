@@ -19,12 +19,6 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-namespace SurgSim
-{
-
-namespace Blocks
-{
-
 class StapleElement : public SurgSim::Framework::SceneElement
 {
 public:
@@ -51,8 +45,5 @@ private:
 	/// The pose of this scene element
 	SurgSim::Math::RigidTransform3d m_pose;
 };
-
-}; // End of namespace Blocks
-}; // End of namespace SurgSim
 
 #endif //SURGSIM_BLOCKS_STAPLEELEMENT_H
