@@ -28,6 +28,7 @@ set(SURGSIM_BLOCKS_SOURCES
 	MassSpringNDRepresentationUtils.cpp
 	PoseInterpolator.cpp
 	SphereElement.cpp
+	StapleElement.cpp
 	TransferInputPoseBehavior.cpp
 	TransferPoseBehavior.cpp
 )
@@ -39,6 +40,7 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
 	SphereElement.h
+	StapleElement.h
 	PoseInterpolator.h
 	TransferDeformableStateToVerticesBehavior.h
 	TransferDeformableStateToVerticesBehavior-inl.h
