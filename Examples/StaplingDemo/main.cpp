@@ -37,7 +37,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createSceneryObject(const std:
 																	  const std::string& fileName)
 {
 	auto sceneryRepresentation =
-		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "SceneryRepresentatiion");
+		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "SceneryRepresentation");
 	sceneryRepresentation->setFileName(fileName);
 
 	auto sceneElement = std::make_shared<SurgSim::Blocks::BasicSceneElement>(name + "SceneElement");
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
 	auto toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
 	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
-		"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
+		"Could not initialize device " << toolDevice->getName() << " for the tool.\n";
 	inputManager->addDevice(toolDevice);
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> staplerSceneElement =
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 	// In order to connect the stapler scenery representation to an input device, after create a SceneElement for it,
 	// we need to retrieve the stapler scenery representation from the SceneElement.
 	std::shared_ptr<SurgSim::Framework::Component> staplerComponent =
-		staplerSceneElement->getComponent("staplerSceneryRepresentatiion");
+		staplerSceneElement->getComponent("staplerSceneryRepresentation");
 	auto staplerSceneryRepresentation = std::static_pointer_cast<SurgSim::Framework::Representation>(staplerComponent);
 
 	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input");
