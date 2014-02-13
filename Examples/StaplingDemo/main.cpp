@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 
-	auto addStapleBehavior = std::make_shared<SurgSim::Blocks::AddStapleFromInputBehavior>("Staple");
+	auto addStapleBehavior = std::make_shared<AddStapleFromInputBehavior>("Staple");
 	addStapleBehavior->setInputComponent(inputComponent);
 
 	staplerSceneElement->addComponent(inputComponent);

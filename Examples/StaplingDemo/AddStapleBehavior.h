@@ -18,9 +18,14 @@
 
 #include "SurgSim/Framework/Behavior.h"
 
+namespace SurgSim
+{
+
 namespace Input
 {
 class InputComponent;
+}
+
 }
 
 class AddStapleFromInputBehavior: public SurgSim::Framework::Behavior
