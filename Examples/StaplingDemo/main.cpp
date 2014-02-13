@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(toolDevice);
 
 	std::shared_ptr<SurgSim::Framework::SceneElement> staplerSceneElement =
-		createSceneryObject("stapler", "Geometry/stapler_collision.obj");
+		createSceneryObject("stapler", "Geometry/stapler.obj");
 
 	// In order to connect the stapler scenery representation to an input device, after create a SceneElement for it,
 	// we need to retrieve the stapler scenery representation from the SceneElement.

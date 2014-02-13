@@ -68,7 +68,7 @@ bool StapleElement::doInitialize()
 	physicsRepresentation->setInitialPose(m_pose);
 
 	auto graphicsRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
-	graphicsRepresentation->setFileName("Geometry/staple_collision.obj");
+	graphicsRepresentation->setFileName("Geometry/staple.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
 
 	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
