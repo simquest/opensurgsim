@@ -17,8 +17,9 @@
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHPLYREADERDELEGATE_H
 
 #include <array>
+#include <memory>
 
-#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
@@ -46,10 +47,12 @@ public:
 	std::shared_ptr<TriangleMesh<void, void, void>> getMesh();
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
+	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
 	virtual bool registerDelegate(PlyReader* reader) override;
 
 	/// Check whether this file is acceptable to the delegate, overridden from \sa PlyReaderDelegate.
+	/// \param reader The reader that should be used.
 	/// \return true if it succeeds, false otherwise.
 	virtual bool fileIsAcceptable(const PlyReader& reader) override;
 
@@ -69,7 +72,7 @@ public:
 
 	/// Callback function, begin the processing of faces.
 	/// \param elementName Name of the element.
-	/// \param vertexCount Number of faces.
+	/// \param faceCount Number of faces.
 	/// \return memory for face data to the reader.
 	void* beginFaces(const std::string& elementName, size_t faceCount);
 
@@ -83,8 +86,6 @@ public:
 
 
 private:
-	bool m_isAcceptable;
-
 	/// Internal structure, the receiver for data from the "vertex" element
 	struct VertexData
 	{
@@ -92,7 +93,7 @@ private:
 		double y;
 		double z;
 		int64_t overrun; ///< Used to check for buffer overruns
-	} vertexData;
+	} m_vertexData;
 
 	/// Internal structure, the received for data from the "face" element
 	struct FaceData
@@ -100,7 +101,7 @@ private:
 		unsigned int edgeCount;
 		unsigned int* indices;
 		int64_t overrun; ///< Used to check for buffer overruns
-	} faceData;
+	} m_faceData;
 
 	/// The mesh that will be created
 	std::shared_ptr<MeshType> m_mesh;

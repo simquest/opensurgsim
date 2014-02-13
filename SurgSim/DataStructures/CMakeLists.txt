@@ -42,6 +42,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	OptionalValue.h
 	ply.h
 	PlyReader.h
+	PlyReaderDelegate.h
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h
 	TriangleMesh.h

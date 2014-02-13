@@ -171,11 +171,11 @@ TEST(PlyReaderTests, ScalarReadTest)
 		std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
 		std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
 
-	EXPECT_TRUE(reader.requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
-	EXPECT_FALSE(reader.requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+	EXPECT_TRUE(reader.requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+	EXPECT_FALSE(reader.requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
 
-	EXPECT_TRUE(reader.requestProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, y)));
-	EXPECT_TRUE(reader.requestProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
+	EXPECT_TRUE(reader.requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, y)));
+	EXPECT_TRUE(reader.requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.vertexData.overrun);
@@ -185,7 +185,7 @@ TEST(PlyReaderTests, ScalarReadTest)
 	EXPECT_EQ(4u, testData.vertices.size());
 	for (size_t i = 0; i < testData.vertices.size(); ++i)
 	{
-		double sign = (i%2 == 0) ? 1 : -1;
+		double sign = (i % 2 == 0) ? 1 : -1;
 		Vector3d expected(static_cast<double>(sign * (i + 1)),
 						  static_cast<double>(sign * (i + 2)),
 						  static_cast<double>(sign * (i + 3)));
@@ -200,13 +200,14 @@ TEST(PlyReaderTests, ListReadTest)
 	PlyReader reader(findFile("Testdata.ply"));
 	EXPECT_TRUE(reader.requestElement("face",
 		std::bind(&TestData::beginFaces, &testData, std::placeholders::_1, std::placeholders::_2),
-		std::bind(&TestData::newFace, &testData, std::placeholders::_1),nullptr));
-	EXPECT_TRUE(reader.requestProperty("face", "vertex_indices",
+		std::bind(&TestData::newFace, &testData, std::placeholders::_1),
+		nullptr));
+	EXPECT_TRUE(reader.requestListProperty("face", "vertex_indices",
 										PlyReader::TYPE_UNSIGNED_INT,
 										offsetof(TestData::FaceData, faces),
 										PlyReader::TYPE_UNSIGNED_INT,
 										offsetof(TestData::FaceData, faceCount)));
-	EXPECT_TRUE(reader.requestProperty("face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
+	EXPECT_TRUE(reader.requestScalarProperty("face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.faceData.overrun);
@@ -221,7 +222,7 @@ TEST(PlyReaderTests, ListReadTest)
 	{
 		std::vector<unsigned int> face = testData.faces[i];
 		EXPECT_EQ(i+1, face.size());
-		EXPECT_EQ( -static_cast<int>(i), testData.extras[i]);
+		EXPECT_EQ(-static_cast<int>(i), testData.extras[i]);
 
 		for (size_t j = 0; j < face.size(); ++j)
 		{
@@ -240,8 +241,8 @@ TEST(PlyReaderTests, TriangleMeshDelegateTest)
 	EXPECT_NO_THROW(reader.parseFile());
 
 	auto mesh = delegate->getMesh();
-	EXPECT_EQ(26, mesh->getNumVertices());
-	EXPECT_EQ(12, mesh->getNumTriangles());
+	EXPECT_EQ(26u, mesh->getNumVertices());
+	EXPECT_EQ(12u, mesh->getNumTriangles());
 
 	// The first and last vertices from the file
 	Vector3d vertex0(1.0, 1.0, -1.0);

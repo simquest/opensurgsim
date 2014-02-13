@@ -17,11 +17,10 @@
 #define SURGSIM_DATASTRUCTURES_PLYREADER_H
 
 #include <string>
+#include <functional>
 #include <vector>
-
-#include "SurgSim/DataStructures/TriangleMesh.h"
-
-struct PlyFile;
+#include <memory>
+#include <unordered_map>
 
 namespace SurgSim
 {
@@ -46,7 +45,7 @@ class PlyReaderDelegate;
 ///   property float y           { y coordinate is also a vertex property }
 ///   property float z           { z coordinate, too }
 ///   element face 6             { there are 6 "face" elements in the file }
-///   property list uchar int vertex_index { "vertex_indices" is a list of ints }
+///   property list uchar int vertex_indices { "vertex_indices" is a list of ints }
 ///   end_header                 { delimits the end of the header }
 /// 
 /// As you can see there are elements with properties, there can be multiple elements and multiple
@@ -137,25 +136,24 @@ public:
 						std::function<void (const std::string&)> endElementCallback);
 
 	/// Request a scalar property for parsing. 
-	/// Use this for when you want the information from a scalar property from the .ply file. In general
-	/// you will supply a data structure that the reader uses for storing the data, here you register the
-	/// type that you want for storing the data and the offset in the data structure where the information
-	/// should be stored.
-	/// \note If the offset is wrong or the data type provided and the actual data type in your structure
-	/// 	  does not match there could be a buffer overrun, use this with caution
+	/// Use this for when you want the information from a scalar property from the .ply file. With this call
+	/// you register the type that you want for storing the data and the offset in the data structure where the information
+	/// should be stored. The data actually comes from the startElementCallback that was supplied in the previous call
+	/// \warning If the offset is wrong or the data type provided and the actual data type in your structure
+	///          does not match there could be a buffer overrun, use this with caution
 	/// \param elementName  Name of the element that contains this property.
 	/// \param propertyName Name of the property that you want stored.
 	/// \param dataType	The type of the data that should be stored.
 	/// \param dataOffset The offset of the data in your data structure where the data should be stored.
 	/// \return true if the property exists and has not been registered yet and is a scalar property,
 	/// 		otherwise false.
-	bool requestProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset);
+	bool requestScalarProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset);
 
 	/// Request a list property for parsing. 
 	/// Use this for when you want the information from a list property from the .ply file. The item in your
 	/// data structure should be a pointer of the type of data that you want, the reader will allocate the needed
 	/// space and deposit all the items in the list in this space.
-	/// \note If the offset is wrong or the data type provided and the actual data type in your structure
+	/// \warning If the offset is wrong or the data type provided and the actual data type in your structure
 	/// 	  does not match there could be a buffer overrun, use this with caution. Also note that
 	/// 	  you will need to call free() on the pointer that is return from the parser, otherwise
 	/// 	  there will be a leak.
@@ -167,7 +165,7 @@ public:
 	/// \param countOffset The offset for storing the count.
 	///
 	/// \return true if it succeeds, false if it fails.
-	bool requestProperty(std::string elementName,
+	bool requestListProperty(std::string elementName,
 						 std::string propertyName,
 						 int dataType, int dataOffset,
 						 int countType, int countOffset);
@@ -198,6 +196,22 @@ public:
 	void parseFile();
 
 private:
+	
+	/// Generic Internal function to handle list and scalar properties, see requestScalarProperty() and 
+	/// requestListProperty() for full documentation.
+	/// \param elementName  Name of the element that contains this property.
+	/// \param propertyName Name of the property that you want stored.
+	/// \param dataType	The type of the data that should be stored.
+	/// \param dataOffset The offset of the data in your data structure where the data should be stored.
+	/// \param countType The type of the number of element that should be stored.
+	/// \param countOffset The offset for storing the count.
+	///
+	/// \return true if it succeeds, false if it fails.
+	bool requestProperty(std::string elementName,
+		std::string propertyName,
+		int dataType, int dataOffset,
+		int countType, int countOffset);
+
 	/// The name of the .ply file
 	std::string m_filename;
 
@@ -233,29 +247,7 @@ private:
 	std::shared_ptr<PlyReaderDelegate> m_delegate;
 };
 
-/// PlyReaderDelegate abstract class.
-/// The purpose of this class is to customize the parsing and contain the callback functions that
-/// are being used in the parsing process.
-class PlyReaderDelegate
-{
-public:
 
-	/// Virtual destructor.
-	virtual ~PlyReaderDelegate()
-	{
-	}
-
-	/// Registers the delegate with the reader.
-	/// \param [out] reader The reader that should be used by the delegate.
-	/// \return true usually if the reader is valid and fileIsAcceptable() is true.
-	virtual bool registerDelegate(PlyReader* reader) = 0;
-
-	/// Check whether the file in the reader can be used with this delegate,
-	/// this gives the delegate a chance to make sure that all the elements and 
-	/// properties that are required are available in the file encapsulated by
-	/// the reader
-	virtual bool fileIsAcceptable(const PlyReader& reader) = 0;
-};
 
 }
 }

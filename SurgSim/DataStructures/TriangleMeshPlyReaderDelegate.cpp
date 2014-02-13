@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 
 namespace SurgSim
 {
@@ -41,16 +42,16 @@ bool TriangleMeshPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(&TriangleMeshPlyReaderDelegate::beginVertices, this, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TriangleMeshPlyReaderDelegate::processVertex, this, std::placeholders::_1),
 		std::bind(&TriangleMeshPlyReaderDelegate::endVertices, this, std::placeholders::_1));
-	reader->requestProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(VertexData, x));
-	reader->requestProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(VertexData, y));
-	reader->requestProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
+	reader->requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(VertexData, x));
+	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(VertexData, y));
+	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(VertexData, z));
 
 	// Face Processing
 	reader->requestElement("face",
 		std::bind(&TriangleMeshPlyReaderDelegate::beginFaces, this, std::placeholders::_1, std::placeholders::_2),
 		std::bind(&TriangleMeshPlyReaderDelegate::processFace, this, std::placeholders::_1),
 		std::bind(&TriangleMeshPlyReaderDelegate::endFaces, this, std::placeholders::_1));
-	reader->requestProperty("face", "vertex_indices",
+	reader->requestListProperty("face", "vertex_indices",
 		PlyReader::TYPE_UNSIGNED_INT,
 		offsetof(FaceData, indices),
 		PlyReader::TYPE_UNSIGNED_INT,
@@ -82,41 +83,41 @@ std::shared_ptr<TriangleMesh<void, void, void>> TriangleMeshPlyReaderDelegate::g
 
 void* TriangleMeshPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
 {
-	vertexData.overrun = 0l;
-	return &vertexData;
+	m_vertexData.overrun = 0l;
+	return &m_vertexData;
 }
 
 void TriangleMeshPlyReaderDelegate::processVertex(const std::string& elementName)
 {
-	MeshType::VertexType vertex(SurgSim::Math::Vector3d(vertexData.x, vertexData.y, vertexData.z));
+	MeshType::VertexType vertex(SurgSim::Math::Vector3d(m_vertexData.x, m_vertexData.y, m_vertexData.z));
 	m_mesh->addVertex(vertex);
 }
 
 void TriangleMeshPlyReaderDelegate::endVertices(const std::string& elementName)
 {
-	SURGSIM_ASSERT(vertexData.overrun == 0) << 
+	SURGSIM_ASSERT(m_vertexData.overrun == 0) << 
 		"There was an overrun while reading the vertex structures, it is likely that data " <<
 		"has become corrupted.";
 }
 
 void* TriangleMeshPlyReaderDelegate::beginFaces(const std::string& elementName, size_t faceCount)
 {
-	faceData.overrun = 0;
-	return &faceData;
+	m_faceData.overrun = 0;
+	return &m_faceData;
 }
 
 void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 {
-	SURGSIM_ASSERT(faceData.edgeCount == 3) << "Can only process triangle meshes.";
-	std::copy(faceData.indices, faceData.indices+3, m_indices.begin());
+	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
+	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
 	TriangleMesh<void, void, void>::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
-	free(faceData.indices);
+	free(m_faceData.indices);
 }
 
 void TriangleMeshPlyReaderDelegate::endFaces(const std::string& elementName)
 {
-	SURGSIM_ASSERT(faceData.overrun == 0) << 
+	SURGSIM_ASSERT(m_faceData.overrun == 0) << 
 		"There was an overrun while reading the face structures, it is likely that data " <<
 		"has become corrupted.";
 }

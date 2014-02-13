@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "SurgSim/Datastructures/PlyReader.h"
+#include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/ply.h"
 
 #include "SurgSim/Math/Vector.h"
@@ -31,7 +32,8 @@ namespace DataStructures
 struct PlyReader::Data
 {
 	Data() :
-		plyFile(nullptr)
+		plyFile(nullptr),
+		elementNames(nullptr)
 	{
 		types[TYPE_INVALID] = PLY_START_TYPE;
 		types[TYPE_CHAR] = PLY_CHAR;
@@ -69,7 +71,7 @@ PlyReader::~PlyReader()
 {
 	if (isValid())
 	{
-		for (int i=0;i<m_data->elementCount;++i)
+		for (int i=0; i<m_data->elementCount; ++i)
 		{
 			free(m_data->elementNames[i]);
 		}
@@ -77,9 +79,6 @@ PlyReader::~PlyReader()
 
 		ply_close(m_data->plyFile);
 		m_data->plyFile = nullptr;
-
-
-
 	}
 }
 
@@ -112,11 +111,21 @@ bool PlyReader::requestElement(std::string elementName,
 	return result;
 }
 
-bool PlyReader::requestProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset)
+bool PlyReader::requestScalarProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset)
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
-
+	SURGSIM_ASSERT(isScalar(elementName, propertyName)) << "Trying to access a list property as a scalar." <<
+		"Element: " << elementName << " Property: " << propertyName;
 	return requestProperty(elementName, propertyName, dataType, dataOffset, 0, 0);
+}
+
+bool PlyReader::requestListProperty(std::string elementName,
+									std::string propertyName,
+									int dataType, int dataOffset,
+									int countType, int countOffset)
+{
+	SURGSIM_ASSERT(! isScalar(elementName, propertyName)) << "Trying to access a scalar property as a list." <<
+		"Element: " << elementName << " Property: " << propertyName;
+	return requestProperty(elementName, propertyName, dataType, dataOffset, countType, countOffset);
 }
 
 bool PlyReader::requestProperty(std::string elementName,
@@ -133,7 +142,6 @@ bool PlyReader::requestProperty(std::string elementName,
 
 	bool scalar = isScalar(elementName, propertyName);
 	bool wantScalar = (countType == 0);
-
 
 	if (hasProperty(elementName, propertyName) && (scalar == wantScalar))
 	{
@@ -187,19 +195,19 @@ void PlyReader::parseFile()
 		int numberOfElements;
 		int propertyCount;
 
-		// Not freeing the return value might be a leak here ...
+		// Free this after we are done with it
 		PlyProperty** properties = 
 			ply_get_element_description(m_data->plyFile, currentElementName, &numberOfElements, &propertyCount);
 
 		// Check if the user wanted this element, if yes process
 		if (m_requestedElements.find(currentElementName) != m_requestedElements.end())
 		{
-			ElementInfo elementInfo = m_requestedElements[currentElementName];
+			ElementInfo& elementInfo = m_requestedElements[currentElementName];
 
 			// Build the propertyinfo structure
 			for (size_t propertyIndex = 0; propertyIndex < elementInfo.requestedProperties.size(); ++propertyIndex)
 			{
-				PropertyInfo propertyInfo = elementInfo.requestedProperties[propertyIndex];
+				PropertyInfo& propertyInfo = elementInfo.requestedProperties[propertyIndex];
 				PlyProperty requestedProperty = {nullptr, 0, 0, 0, 0, 0, 0, 0};
 
 				// Create temp char*
@@ -210,10 +218,7 @@ void PlyReader::parseFile()
 				requestedProperty.offset = propertyInfo.dataOffset;
 				requestedProperty.count_internal = propertyInfo.countType;
 				requestedProperty.count_offset = propertyInfo.countOffset;
-				if (propertyInfo.countType != 0)
-				{
-					requestedProperty.is_list = 1;
-				}
+				requestedProperty.is_list = (propertyInfo.countType != 0) ? PLY_LIST : PLY_SCALAR;
 
 				// Tell ply that we want this property to be read and put into the readbuffer
 				ply_get_property(m_data->plyFile, currentElementName, &requestedProperty);
@@ -286,7 +291,7 @@ bool PlyReader::isScalar(std::string elementName, std::string propertyName) cons
 		PlyProperty* property = find_property(element, propertyName.c_str(), &index);
 		if (property != nullptr)
 		{
-			result = (property->is_list != 1);
+			result = (property->is_list == PLY_SCALAR);
 		}
 	}
 	return result;
