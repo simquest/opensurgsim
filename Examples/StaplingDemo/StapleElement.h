@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_STAPLEELEMENT_H
-#define SURGSIM_BLOCKS_STAPLEELEMENT_H
+#ifndef EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
+#define EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
 
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -46,4 +46,4 @@ private:
 	SurgSim::Math::RigidTransform3d m_pose;
 };
 
-#endif //SURGSIM_BLOCKS_STAPLEELEMENT_H
+#endif //EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H

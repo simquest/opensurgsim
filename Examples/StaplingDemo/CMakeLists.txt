@@ -24,8 +24,8 @@ include_directories(
 
 set(STAPLINGDEMO_SOURCES
 	AddStapleBehavior.cpp
-	StapleElement.cpp
 	main.cpp
+	StapleElement.cpp
 )
 
 set(STAPLINGDEMO_HEADERS
