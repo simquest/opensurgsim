@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/SceneElement.h"
 
 #include <boost/uuid/random_generator.hpp>
 
@@ -121,6 +120,12 @@ Component::FactoryType& Component::getFactory()
 {
 	static FactoryType factory;
 	return factory;
+}
+
+std::string Component::getClassName() const
+{
+	SURGSIM_FAILURE() << "Missing implementation of getClassName() for base class";
+	return "SurgSim::Framework::Component";
 }
 
 }; // namespace Framework

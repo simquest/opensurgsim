@@ -21,7 +21,7 @@
 #include <boost/function.hpp>
 #include <boost/functional/factory.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+
 
 namespace SurgSim
 {
@@ -42,6 +42,7 @@ public:
 	/// Register a class with the factory.
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
+	/// \return true if the class was added, false if it alread existed in the registry.
 	template <typename Derived>
 	bool registerClass(const std::string& className);
 
@@ -53,7 +54,7 @@ public:
 
 	/// Check whether the class is registered in the factory.
 	/// \param className Name of the class to check.
-	/// \return true if the factory has a constructor for this class
+	/// \return true if the factory has a constructor for this class.
 	bool isRegistered(const std::string& className) const;
 
 private:
@@ -64,7 +65,7 @@ private:
 	std::map<std::string, Constructor> m_constructors;
 
 	/// Threadsafety for registration
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 
 };
 
@@ -84,6 +85,7 @@ public:
 	/// Register a class with the factory.
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
+	/// \return true if the class was added, false if it alread existed in the registry.
 	template <typename Derived>
 	bool registerClass(const std::string& className);
 
@@ -106,7 +108,7 @@ private:
 	std::map<std::string, Constructor> m_constructors;
 
 	/// Threadsafety for registration
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 };
 
 };

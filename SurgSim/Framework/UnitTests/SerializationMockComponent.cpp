@@ -21,8 +21,8 @@ namespace {
 
 SerializationMockComponent::SerializationMockComponent(
 	const std::string& name,
-	bool succeedInit /*= true*/,
-	bool succeedWakeUp /*= true*/) :
+	bool succeedInit,
+	bool succeedWakeUp) :
 	Component(name),
 	succeedWithInit(succeedInit),
 	succeedWithWakeUp(succeedWakeUp),

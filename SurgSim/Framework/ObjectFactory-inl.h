@@ -30,14 +30,14 @@ bool SurgSim::Framework::ObjectFactory<Base>::registerClass(const std::string& c
 		m_constructors[className] = boost::factory<std::shared_ptr<Derived>>();
 		result = true;
 	};
-	return false;
+	return result;
 };
 
 template <class Base>
 std::shared_ptr<Base> SurgSim::Framework::ObjectFactory<Base>::create(const std::string& className)
 {
+	boost::mutex::scoped_lock lock(m_mutex);
 	auto it = m_constructors.find(className);
-
 	if (it == m_constructors.end())
 	{
 		SURGSIM_FAILURE() << "ObjectFactory does not know about class called " << className;
@@ -51,6 +51,7 @@ std::shared_ptr<Base> SurgSim::Framework::ObjectFactory<Base>::create(const std:
 template <typename Base>
 bool SurgSim::Framework::ObjectFactory<Base>::isRegistered(const std::string& className) const
 {
+	boost::mutex::scoped_lock lock(m_mutex);
 	auto it = m_constructors.find(className);
 	return (it != m_constructors.end());
 }
@@ -75,6 +76,7 @@ std::shared_ptr<Base> SurgSim::Framework::ObjectFactory1<Base, Parameter1>::crea
 	const std::string& className,
 	const Parameter1& val)
 {
+	boost::mutex::scoped_lock lock(m_mutex);
 	auto it = m_constructors.find(className);
 
 	if (it == m_constructors.end())
@@ -89,6 +91,7 @@ std::shared_ptr<Base> SurgSim::Framework::ObjectFactory1<Base, Parameter1>::crea
 template <typename Base, typename Parameter1>
 bool SurgSim::Framework::ObjectFactory1<Base, Parameter1>::isRegistered(const std::string& className) const
 {
+	boost::mutex::scoped_lock lock(m_mutex);
 	auto it = m_constructors.find(className);
 	return (it != m_constructors.end());
 }

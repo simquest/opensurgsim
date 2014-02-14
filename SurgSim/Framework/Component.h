@@ -24,7 +24,6 @@
 
 #include "SurgSim/Framework/Accessible.h"
 #include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
@@ -89,26 +88,27 @@ public:
 	std::shared_ptr<Scene> getScene();
 
 	/// Sets the scene element.
-	/// \param sceneElement The scene element for this component
+	/// \param sceneElement The scene element for this component.
 	void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
 
 	/// Gets the scene element.
-	/// \return The scene element for this component
+	/// \return The scene element for this component.
 	std::shared_ptr<SceneElement> getSceneElement();
 
-	/// Get the runtime which contains this component
-	/// \return The runtime which contains this component
+	/// Get the runtime which contains this component.
+	/// \return The runtime which contains this component.
 	std::shared_ptr<Runtime> getRuntime() const;
 
-	// Currently this has a default implementation to prevent all the builds from breaking
-	virtual std::string getClassName() const
-	{
-		return "Missing ClassName";
-	}
+	/// The class name for this class, this being the baseclass it should
+	/// return SurgSim::Framework::Component but this would make missing implmenentations
+	/// of this hard to catch, there for this calls SURGSIM_FAILURE.
+	/// \note Use the SURGSIM_CLASSNAME macro in derived classes.
+	/// \return The fully namespace qualified name of this class.
+	virtual std::string getClassName() const;
 
 	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType;
 
-	/// \return The static class factory that is being used in the conversion
+	/// \return The static class factory that is being used in the conversion.
 	static FactoryType& getFactory();
 
 private:

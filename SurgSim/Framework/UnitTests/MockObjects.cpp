@@ -17,7 +17,7 @@
 
 SURGSIM_REGISTER(SurgSim::Framework::Component, MockComponent)
 
-MockComponent::MockComponent(const std::string& name, bool succeedInit /*= true*/, bool succeedWakeUp /*= true*/) :
+MockComponent::MockComponent(const std::string& name, bool succeedInit, bool succeedWakeUp) :
 	Component(name),
 	succeedWithInit(succeedInit),
 	succeedWithWakeUp(succeedWakeUp),

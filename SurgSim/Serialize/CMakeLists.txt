@@ -21,14 +21,11 @@ include_directories(
 )
 
 set(SURGSIM_SERIALIZE_SOURCES
-	FrameworkConvert.cpp
 	GraphicsConvert.cpp
 	ShapesFactory.cpp
 )
 
 set(SURGSIM_SERIALIZE_HEADERS
-	Convert.h
-	FrameworkConvert.h
 	GraphicsConvert.h
 	ShapesFactory.h
 	ShapesFactory-inl.h

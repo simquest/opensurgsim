@@ -17,9 +17,8 @@
 #define SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_H
 
 #include <memory>
-
-#include "SurgSim/Framework/Convert.h"
-#include "SurgSim/Framework/ObjectFactory.h"
+#include <unordered_map>
+#include <yaml-cpp/yaml.h>
 
 namespace SurgSim
 {
@@ -31,9 +30,11 @@ class Component;
 
 namespace YAML
 {
-/// Specialization of YAML::convert for std::shared_ptr<Component>
+/// Specialization of YAML::convert for std::shared_ptr<Component>, use this for to read in a component
+/// written by the convert<SurgSim::Framework::Component> converter, or a reference to a
+/// component written by this converter.
 /// This specialization, is slightly asymmetric, on encode it will only encode a components
-/// name, id and className. When decoding this conversion will check wether a component with
+/// name, id and className. When decoding this conversion will check whether a component with
 /// the same id has already been encountered. If no a new instance will be created and stored
 /// in a local Registry. If yes, the entry from the registry will be returned, this makes sure
 /// that all references to the same id will use the correct, copy of the smart pointer.
@@ -53,8 +54,9 @@ private:
 	static RegistryType& getRegistry();
 };
 
-/// Override of the convert structure for an Component, this will write out a full version
-/// of the component information, to decode a component use the other converter.
+/// Override of the convert structure for an Component, use this form to write out a full version
+/// of the component information, to decode a component use the other converter. This converter
+/// intentionally does not have a decode function.
 template<>
 struct convert<SurgSim::Framework::Component>
 {
