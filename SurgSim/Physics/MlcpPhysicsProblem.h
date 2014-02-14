@@ -44,7 +44,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 {
 	/// The matrix \f$\mathbf{H}\f$, which is a matrix of size \f$c\times n\f$ that converts from
 	/// the \f$n\f$ degrees of freedom in the system (i.e., the sum of all the DOF over all the representations in the
-	/// scene), to the 
+	/// scene), to the
 	/// \f$c\f$ degrees of freedom summed over all the constraints being applied to the system.
 	/// It is used to convert the vector of \f$n\f$ displacements of each degree of freedom of the system to the vector
 	/// of \f$c\f$ displacements of each degree of freedom of the constraints.
