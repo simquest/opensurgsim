@@ -34,9 +34,15 @@ Representation::~Representation()
 
 }
 
-const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& Representation::getContacts() const
+const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& 
+	Representation::getContacts(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation)
 {
-	return m_contacts;
+	return m_contacts[collisionRepresentation->getName()];
+}
+
+const std::deque<std::weak_ptr<SurgSim::Collision::Representation>>& Representation::getColliders()
+{
+	return m_colliders;
 }
 
 bool Representation::hasContacts() const

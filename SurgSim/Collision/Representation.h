@@ -18,6 +18,7 @@
 
 #include <deque>
 #include <memory>
+#include <unordered_map>
 
 #include "SurgSim/Framework/Representation.h"
 
@@ -63,9 +64,14 @@ public:
 	/// \return	The physics representation.
 	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
 
-	/// Get a list of SurgSim::Collision::Contact if there is a collision.
+	/// Given a collision representation, return the contact information between it and this collision representation,
+	/// if any.
 	/// \return A std::deque containing contact informatoin.
-	const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& getContacts() const;
+	const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& 
+		getContacts(std::shared_ptr<SurgSim::Collision::Representation>);
+
+	/// Get the collision representations which are colliding with this collision representation.
+	const std::deque<std::weak_ptr<SurgSim::Collision::Representation>>& getColliders();
 
 	/// Check if this collision representation has collisions.
 	/// \return True if there is a collision; otherwise false.
@@ -75,8 +81,10 @@ public:
 	void reset();
 
 protected:
-	/// A list (implemented as std::deque) of contact information if there is any collision.
-	std::deque<std::shared_ptr<SurgSim::Collision::Contact>> m_contacts;
+	/// A list (implemented as std::deque) of SurgSim::Collision::Representations colliding with this.
+	std::deque<std::weak_ptr<SurgSim::Collision::Representation>> m_colliders;
+	/// Contacts associated with each collision.
+	std::unordered_map<std::string, std::deque<std::shared_ptr<SurgSim::Collision::Contact>>> m_contacts;
 };
 
 
