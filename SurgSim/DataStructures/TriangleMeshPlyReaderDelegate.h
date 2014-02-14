@@ -40,7 +40,7 @@ public:
 
 	/// Constructor.
 	/// \param mesh The mesh to be used, it will be cleared by the constructor.
-	TriangleMeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
+	explicit TriangleMeshPlyReaderDelegate(std::shared_ptr<MeshType> mesh);
 
 	/// Gets the mesh.
 	/// \return The mesh.

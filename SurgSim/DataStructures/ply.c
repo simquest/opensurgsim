@@ -830,9 +830,11 @@ PlyFile *ply_open_for_reading(
   plyfile = ply_read (fp, nelems, elem_names);
 
   /* determine the file type and version */
-
-  *file_type = plyfile->file_type;
-  *version = plyfile->version;
+  if (plyfile != NULL)
+  {
+	  *file_type = plyfile->file_type;
+	  *version = plyfile->version;
+  }
 
   /* return a pointer to the file's information */
   return (plyfile);

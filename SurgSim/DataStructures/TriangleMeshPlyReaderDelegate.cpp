@@ -95,7 +95,7 @@ void TriangleMeshPlyReaderDelegate::processVertex(const std::string& elementName
 
 void TriangleMeshPlyReaderDelegate::endVertices(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_vertexData.overrun == 0) << 
+	SURGSIM_ASSERT(m_vertexData.overrun == 0) <<
 		"There was an overrun while reading the vertex structures, it is likely that data " <<
 		"has become corrupted.";
 }
@@ -112,12 +112,11 @@ void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
 	TriangleMesh<void, void, void>::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
-	free(m_faceData.indices);
 }
 
 void TriangleMeshPlyReaderDelegate::endFaces(const std::string& elementName)
 {
-	SURGSIM_ASSERT(m_faceData.overrun == 0) << 
+	SURGSIM_ASSERT(m_faceData.overrun == 0) <<
 		"There was an overrun while reading the face structures, it is likely that data " <<
 		"has become corrupted.";
 }

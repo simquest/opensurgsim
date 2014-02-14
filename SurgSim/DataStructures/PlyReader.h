@@ -30,7 +30,8 @@ namespace DataStructures
 class PlyReaderDelegate;
 
 /// Wrapper for the C .ply file parser
-/// This class wraps the main functionality for the original C .ply file parser at http://paulbourke.net/dataformats/ply/
+/// This class wraps the main functionality for the original C .ply file parser at
+/// http://paulbourke.net/dataformats/ply/
 /// it enables customization of the parsing process either through a delegate class or through executing
 /// the requestElement and requestProperty functions.
 /// The file needs to be a valid .ply file, either ascii or binary, for the reader to be a valid reader.
@@ -47,35 +48,35 @@ class PlyReaderDelegate;
 ///   element face 6             { there are 6 "face" elements in the file }
 ///   property list uchar int vertex_indices { "vertex_indices" is a list of ints }
 ///   end_header                 { delimits the end of the header }
-/// 
+///
 /// As you can see there are elements with properties, there can be multiple elements and multiple
 /// properties per element. An element can have scalar and/or list properties.
 /// To work correctly users will have to preallocate the memory that will be used by the parser
 /// to deposit the information from the file, and set offsets to the correct value to match
 /// the expected locations in the preallocated receiving memory.
-/// 
+///
 /// ## Initialisation
 /// The constructor for the PlyReader accepts the file name of the file, it will make sure
 /// the the file exists and is actually a .ply file, after the constructor has executed
 /// isValid() should be true. At this time all the information in the header is available and
 /// users of the reader can tell the reader which elements and which properties are of interest
 /// using the requestElement() and requestProperty() functions.
-/// 
+///
 /// ## The three types of callback functions
 /// Parsing is accomplished via a set of callback functions. There are three kinds of callback
 /// function each with a different responsibility.
 /// - The BeginElement callback is called whenever the section for an element is encountered in
 /// 	the file, it will pass the name of the element and the number of elements that will be read
 /// 	it should return a pointer to the preallocated memory that will be used for reading.
-/// 
+///
 /// - The ProcessElement callback is called whenever a new element has been read from the file,
 /// 	the read values can be copied from the preallocated memory that was sent to the parser in the
 /// 	previous callback. If list data was requested, the memory for the list data needs to be freed
 /// 	at this time.
-/// 
+///
 /// - The EndElement callback is called whenever processing of the element is concluded, this
 /// 	gives users a chance to finalize processing on their side.
-/// 
+///
 /// ## The delegate
 /// The PlyReaderDelegate interface should be used to create classes that encapsulate the needed
 /// callbacks and their processing.
@@ -135,10 +136,11 @@ public:
 						std::function<void (const std::string&)> processElementCallback,
 						std::function<void (const std::string&)> endElementCallback);
 
-	/// Request a scalar property for parsing. 
+	/// Request a scalar property for parsing.
 	/// Use this for when you want the information from a scalar property from the .ply file. With this call
-	/// you register the type that you want for storing the data and the offset in the data structure where the information
-	/// should be stored. The data actually comes from the startElementCallback that was supplied in the previous call
+	/// you register the type that you want for storing the data and the offset in the data structure where the
+	/// information should be stored. The data actually comes from the startElementCallback that was supplied
+	/// in the previous call
 	/// \warning If the offset is wrong or the data type provided and the actual data type in your structure
 	///          does not match there could be a buffer overrun, use this with caution
 	/// \param elementName  Name of the element that contains this property.
@@ -149,14 +151,12 @@ public:
 	/// 		otherwise false.
 	bool requestScalarProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset);
 
-	/// Request a list property for parsing. 
+	/// Request a list property for parsing.
 	/// Use this for when you want the information from a list property from the .ply file. The item in your
 	/// data structure should be a pointer of the type of data that you want, the reader will allocate the needed
 	/// space and deposit all the items in the list in this space.
 	/// \warning If the offset is wrong or the data type provided and the actual data type in your structure
-	/// 	  does not match there could be a buffer overrun, use this with caution. Also note that
-	/// 	  you will need to call free() on the pointer that is return from the parser, otherwise
-	/// 	  there will be a leak.
+	/// 	  does not match there could be a buffer overrun, use this with caution.
 	/// \param elementName  Name of the element that contains this property.
 	/// \param propertyName Name of the property that you want stored.
 	/// \param dataType	The type of the data that should be stored.
@@ -175,7 +175,7 @@ public:
 	/// \return true if yes, false otherwise.
 	bool hasElement(std::string elementName) const;
 
-	/// Query if 'elementName' has the given property. 
+	/// Query if 'elementName' has the given property.
 	/// \param elementName  Name of the element.
 	/// \param propertyName Name of the property.
 	/// \return true if the element exists and has the property, false otherwise.
@@ -196,8 +196,8 @@ public:
 	void parseFile();
 
 private:
-	
-	/// Generic Internal function to handle list and scalar properties, see requestScalarProperty() and 
+
+	/// Generic Internal function to handle list and scalar properties, see requestScalarProperty() and
 	/// requestListProperty() for full documentation.
 	/// \param elementName  Name of the element that contains this property.
 	/// \param propertyName Name of the property that you want stored.
@@ -215,11 +215,11 @@ private:
 	/// The name of the .ply file
 	std::string m_filename;
 
-	/// Information about the property on the .ply file. 
+	/// Information about the property on the .ply file.
 	struct PropertyInfo
 	{
- 		std::string propertyName; ///< Name of the property.
-		int targetType; ///< Type of the receiving data.
+		std::string propertyName; ///< Name of the property.
+		int dataType; ///< Type of the receiving data.
 		int dataOffset; ///< Location for the receiving data.
 		int countType; ///< For lists, type of the receiving data for the count of listelements.
 		int countOffset; ///< For lists, location of the receiving data for the count.
@@ -242,7 +242,7 @@ private:
 	struct Data;
 	std::unique_ptr<Data> m_data;
 	///@}
- 
+
 	/// The delegate.
 	std::shared_ptr<PlyReaderDelegate> m_delegate;
 };

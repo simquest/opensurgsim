@@ -64,7 +64,6 @@ PlyReader::PlyReader(std::string filename) :
 		&m_data->elementNames,
 		&m_data->file_type,
 		&m_data->version);
-	
 }
 
 PlyReader::~PlyReader()
@@ -148,14 +147,14 @@ bool PlyReader::requestProperty(std::string elementName,
 		auto itBegin = std::begin(m_requestedElements[elementName].requestedProperties);
 		auto itEnd = std::end(m_requestedElements[elementName].requestedProperties);
 
-		bool doAdd = std::find_if(itBegin, itEnd, 
+		bool doAdd = std::find_if(itBegin, itEnd,
 			[propertyName](PropertyInfo p){return p.propertyName == propertyName;}) == itEnd;
-		
+
 		if (doAdd)
 		{
 			PropertyInfo info;
 			info.propertyName = propertyName;
-			info.targetType = m_data->types[dataType];
+			info.dataType = m_data->types[dataType];
 			info.dataOffset = dataOffset;
 			info.countType = m_data->types[countType];
 			info.countOffset = countOffset;
@@ -196,9 +195,10 @@ void PlyReader::parseFile()
 		int propertyCount;
 
 		// Free this after we are done with it
-		PlyProperty** properties = 
+		PlyProperty** properties =
 			ply_get_element_description(m_data->plyFile, currentElementName, &numberOfElements, &propertyCount);
 
+		std::vector<int> listOffsets;
 		// Check if the user wanted this element, if yes process
 		if (m_requestedElements.find(currentElementName) != m_requestedElements.end())
 		{
@@ -214,11 +214,16 @@ void PlyReader::parseFile()
 				std::vector<char> writable(propertyInfo.propertyName.size() + 1);
 				std::copy(propertyInfo.propertyName.begin(), propertyInfo.propertyName.end(), writable.begin());
 				requestedProperty.name = &writable[0];
-				requestedProperty.internal_type = propertyInfo.targetType;
+				requestedProperty.internal_type = propertyInfo.dataType;
 				requestedProperty.offset = propertyInfo.dataOffset;
 				requestedProperty.count_internal = propertyInfo.countType;
 				requestedProperty.count_offset = propertyInfo.countOffset;
 				requestedProperty.is_list = (propertyInfo.countType != 0) ? PLY_LIST : PLY_SCALAR;
+
+				if (requestedProperty.is_list == PLY_LIST)
+				{
+					listOffsets.push_back(propertyInfo.dataOffset);
+				}
 
 				// Tell ply that we want this property to be read and put into the readbuffer
 				ply_get_property(m_data->plyFile, currentElementName, &requestedProperty);
@@ -233,6 +238,17 @@ void PlyReader::parseFile()
 				{
 					elementInfo.processElementCallback(currentElementName);
 				}
+
+				// Free the lists that where allocated by plyreader
+				// This gains access to the buffer, where ply.c put the address of
+				// the memory that was allocated to carry the information for the list property
+				// it does that for all properties that where marked as lists
+				for (size_t i = 0; i<listOffsets.size(); ++i)
+				{
+					void** item = (void **)((char *)readBuffer + listOffsets[i]); // NOLINT
+					free(item[0]);
+				}
+
 			}
 
 			if (elementInfo.endElementCallback != nullptr)

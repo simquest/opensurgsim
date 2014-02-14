@@ -121,7 +121,6 @@ public:
 		}
 		faces.push_back(face);
 		extras.push_back(faceData.extra);
-		free(faceData.faces);
 	}
 
 
@@ -171,11 +170,15 @@ TEST(PlyReaderTests, ScalarReadTest)
 		std::bind(&TestData::newVertex, &testData, std::placeholders::_1),
 		std::bind(&TestData::endVertices, &testData, std::placeholders::_1)));
 
-	EXPECT_TRUE(reader.requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
-	EXPECT_FALSE(reader.requestScalarProperty("vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+	EXPECT_TRUE(reader.requestScalarProperty(
+		"vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
+	EXPECT_FALSE(reader.requestScalarProperty(
+		"vertex", "x", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, x)));
 
-	EXPECT_TRUE(reader.requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, y)));
-	EXPECT_TRUE(reader.requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
+	EXPECT_TRUE(reader.requestScalarProperty(
+		"vertex", "y", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, y)));
+	EXPECT_TRUE(reader.requestScalarProperty(
+		"vertex", "z", PlyReader::TYPE_DOUBLE, offsetof(TestData::VertexData, z)));
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.vertexData.overrun);
@@ -207,7 +210,8 @@ TEST(PlyReaderTests, ListReadTest)
 										offsetof(TestData::FaceData, faces),
 										PlyReader::TYPE_UNSIGNED_INT,
 										offsetof(TestData::FaceData, faceCount)));
-	EXPECT_TRUE(reader.requestScalarProperty("face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
+	EXPECT_TRUE(reader.requestScalarProperty(
+		"face", "extra", PlyReader::TYPE_INT, offsetof(TestData::FaceData, extra)));
 
 	ASSERT_NO_THROW(reader.parseFile());
 	EXPECT_EQ(0L, testData.faceData.overrun);

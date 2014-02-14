@@ -43,7 +43,7 @@ public:
 	virtual bool registerDelegate(PlyReader* reader) = 0;
 
 	/// Check whether the file in the reader can be used with this delegate,
-	/// this gives the delegate a chance to make sure that all the elements and 
+	/// this gives the delegate a chance to make sure that all the elements and
 	/// properties that are required are available in the file encapsulated by
 	/// the reader
 	virtual bool fileIsAcceptable(const PlyReader& reader) = 0;
