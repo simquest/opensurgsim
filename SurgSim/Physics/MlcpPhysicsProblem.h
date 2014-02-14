@@ -31,14 +31,25 @@ namespace Physics
 /// matrices \ref H and \ref CHt that are necessary to physically interpret the solution.
 ///
 /// Note that the matrix \f$\mathbf{A}\f$ used in the MlcpProblem is computed in the physical problem as
-/// \f$\mathbf{H\;C\;H^T}\f$.
+/// \f$\mathbf{H\;C\;H^T}\f$, where \f$\mathbf{C}\f$ is the compliance matrix.  For contact constraints, \f$b\f$ is
+/// the initial signed displacements between the colliding representations, \f$b_i \lt 0\f$ when the representations
+/// interpenetrate, \f$x\f$ is the forces to apply at each contact to prevent penetration, and \f$c\f$ is the signed
+/// displacements after the forces are applied.
+/// \note The solution to the MLCP will only address the constraints that were provided, and application of \f$x\f$ to
+/// the representations in the scene may cause new collisions for constraints that were not originally incorporated in
+/// the MLCP.
 ///
 /// \sa SurgSim::Math::MlcpProblem
 struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 {
-	/// The matrix \f$\mathbf{H}\f$, which is a constraints matrix of size\f$c\times n\f$ that is used to describe
-	/// the correspondence between the \f$c\f$ constraints being applied to the system, and the \f$n\f$ total
-	/// system degrees of freedom.
+	/// The matrix \f$\mathbf{H}\f$, which is a matrix of size \f$c\times n\f$ that converts from
+	/// the \f$n\f$ degrees of freedom in the system (i.e., the sum of all the DOF over all the representations in the
+	/// scene), to the 
+	/// \f$c\f$ degrees of freedom summed over all the constraints being applied to the system.
+	/// It is used to convert the vector of \f$n\f$ displacements of each degree of freedom of the system to the vector
+	/// of \f$c\f$ displacements of each degree of freedom of the constraints.
+	/// Given a set of constraints \f$\mathbf{G}(t, \mathbf{x})\f$, then
+	/// \f$\mathbf{H} = \frac{d \mathbf{G}}{d \mathbf{x}}\f$ (i.e., the constraints' tangential space).
 	Matrix H;
 
 	/// The matrix \f$\mathbf{C\;H^T}\f$, which is a matrix of size \f$n\times c\f$ that is used to convert the
