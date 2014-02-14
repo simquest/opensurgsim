@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "Examples/StaplingDemo/StapleElement.h"
+#include "Examples/ExampleStapling/StapleElement.h"
 
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"

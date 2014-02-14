@@ -15,8 +15,8 @@
 
 #include <sstream>
 
-#include "Examples/StaplingDemo/AddStapleBehavior.h"
-#include "Examples/StaplingDemo/StapleElement.h"
+#include "Examples/ExampleStapling/AddStapleBehavior.h"
+#include "Examples/ExampleStapling/StapleElement.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"

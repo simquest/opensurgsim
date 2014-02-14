@@ -29,7 +29,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Physics/PhysicsManager.h"
-#include "Examples/StaplingDemo/AddStapleBehavior.h"
+#include "Examples/ExampleStapling/AddStapleBehavior.h"
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
