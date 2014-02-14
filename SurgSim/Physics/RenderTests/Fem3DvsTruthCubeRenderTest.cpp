@@ -33,6 +33,8 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/RenderTests/RenderTest.h"
 
+#include "SurgSim/Framework/Logger.h"
+
 using SurgSim::DataStructures::Vertices;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgAxesRepresentation;
@@ -43,6 +45,8 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
 using SurgSim::Physics::PhysicsManager;
+
+using SurgSim::Framework::Logger;
 
 namespace SurgSim
 {
@@ -85,6 +89,7 @@ bool parseTruthCubeData(std::shared_ptr<TruthCubeData> truthCubeData)
 
 	if (! datafile.good())
 	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Could not get uniaxial_positions.csv data file";
 		return false;
 	}
 
