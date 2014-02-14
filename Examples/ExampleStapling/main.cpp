@@ -38,7 +38,7 @@
 std::shared_ptr<SurgSim::Framework::SceneElement> createSceneryObject(const std::string& name,
 																	  const std::string& fileName)
 {
-	auto sceneryRepresentation =
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> sceneryRepresentation =
 		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "SceneryRepresentation");
 	sceneryRepresentation->setFileName(fileName);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input");
 	inputComponent->setDeviceName("MultiAxisDevice");
 
-	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>("Input to graghicalStapler");
+	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>("Input to graphicalStapler");
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 

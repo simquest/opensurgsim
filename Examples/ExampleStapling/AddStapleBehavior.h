@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
-#define EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+#define EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
 
 #include <memory>
 #include <string>
@@ -72,4 +72,4 @@ private:
 	bool m_buttonPreviouslyPressed;
 };
 
-#endif  // EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
+#endif  // EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H

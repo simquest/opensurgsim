@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
-#define EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_STAPLEELEMENT_H
+#define EXAMPLES_EXAMPLESTAPLING_STAPLEELEMENT_H
 
 #include <string>
 
@@ -48,4 +48,4 @@ private:
 	SurgSim::Math::RigidTransform3d m_pose;
 };
 
-#endif //EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
+#endif //EXAMPLES_EXAMPLESTAPLING_STAPLEELEMENT_H
