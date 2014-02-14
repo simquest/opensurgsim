@@ -30,9 +30,9 @@ AddStapleFromInputBehavior::AddStapleFromInputBehavior(const std::string& name):
 {
 }
 
-void AddStapleFromInputBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> sender)
+void AddStapleFromInputBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
 {
-	m_from = sender;
+	m_from = inputComponent;
 }
 
 void AddStapleFromInputBehavior::update(double dt)
@@ -71,6 +71,7 @@ int AddStapleFromInputBehavior::getTargetManagerType() const
 
 bool AddStapleFromInputBehavior::doInitialize()
 {
+	SURGSIM_ASSERT(m_from) << "Could not get inputComponent from device.";
 	return true;
 }
 
