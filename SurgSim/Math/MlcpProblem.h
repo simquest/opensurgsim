@@ -28,7 +28,7 @@ namespace Math
 
 /// A description of an MLCP (mixed linear complementarity problem, or mixed LCP) system to be solved.
 ///
-/// A traditional (not mixed!) LCP problem is expressed as \f$\mathbf{A}x + b = c\f$, where \f$x\f$ is the vector of 
+/// A traditional (not mixed!) LCP problem is expressed as \f$\mathbf{A}x + b = c\f$, where \f$x\f$ is the vector of
 /// variables of interest to be determined, \f$c\f$ is the vector of slack variables (transforming a system of
 /// inequalities into a system of equalities), and \f$x\f$ and \f$c\f$ are subject to the inequality conditions
 /// \f$x_i \ge 0\f$, \f$c_i \ge 0\f$, and \f$x \perp c\f$ (i.e., \f$x \cdot c = 0\f$).
