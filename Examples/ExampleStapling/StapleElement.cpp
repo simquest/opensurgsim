@@ -13,9 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string>
-
-#include "Examples/StaplingDemo/StapleElement.h"
+#include "Examples/ExampleStapling/StapleElement.h"
 
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
@@ -62,7 +60,8 @@ bool StapleElement::doInitialize()
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(m_pose);
 
-	auto graphicsRepresentation = std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> graphicsRepresentation =
+		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
 

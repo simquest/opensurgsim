@@ -13,8 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
-#define EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+#define EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+
+#include <memory>
+#include <string>
 
 #include "SurgSim/Framework/Behavior.h"
 
@@ -36,8 +39,8 @@ public:
 	explicit AddStapleFromInputBehavior(const std::string& name);
 
 	/// Set the input component from which to get the pose
-	/// \param	sender	The input component which sends the pose.
-	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> sender);
+	/// \param	inputComponent	The input component which sends the pose.
+	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -50,12 +53,12 @@ public:
 protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
-	/// Note: In current implementation, this method always returns "true".
+	/// \note: In current implementation, this method always returns "true".
 	virtual bool doInitialize() override;
 
 	/// Wakeup this behavior
 	/// \return True on success, otherwise false.
-	/// Note: In current implementation, this method always returns "true".
+	/// \note: In current implementation, this method always returns "true".
 	virtual bool doWakeUp() override;
 
 private:
@@ -69,4 +72,4 @@ private:
 	bool m_buttonPreviouslyPressed;
 };
 
-#endif  // EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
+#endif  // EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H

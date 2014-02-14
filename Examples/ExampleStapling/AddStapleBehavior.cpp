@@ -15,8 +15,8 @@
 
 #include <sstream>
 
-#include "Examples/StaplingDemo/AddStapleBehavior.h"
-#include "Examples/StaplingDemo/StapleElement.h"
+#include "Examples/ExampleStapling/AddStapleBehavior.h"
+#include "Examples/ExampleStapling/StapleElement.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
@@ -30,9 +30,9 @@ AddStapleFromInputBehavior::AddStapleFromInputBehavior(const std::string& name):
 {
 }
 
-void AddStapleFromInputBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> sender)
+void AddStapleFromInputBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
 {
-	m_from = sender;
+	m_from = inputComponent;
 }
 
 void AddStapleFromInputBehavior::update(double dt)
@@ -71,6 +71,7 @@ int AddStapleFromInputBehavior::getTargetManagerType() const
 
 bool AddStapleFromInputBehavior::doInitialize()
 {
+	SURGSIM_ASSERT(m_from) << "Could not get inputComponent from device.";
 	return true;
 }
 

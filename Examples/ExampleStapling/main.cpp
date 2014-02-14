@@ -29,7 +29,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Physics/PhysicsManager.h"
-#include "Examples/StaplingDemo/AddStapleBehavior.h"
+#include "Examples/ExampleStapling/AddStapleBehavior.h"
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
@@ -38,7 +38,7 @@
 std::shared_ptr<SurgSim::Framework::SceneElement> createSceneryObject(const std::string& name,
 																	  const std::string& fileName)
 {
-	auto sceneryRepresentation =
+	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> sceneryRepresentation =
 		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "SceneryRepresentation");
 	sceneryRepresentation->setFileName(fileName);
 
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("input");
 	inputComponent->setDeviceName("MultiAxisDevice");
 
-	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>("Input to graghicalStapler");
+	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>("Input to graphicalStapler");
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 

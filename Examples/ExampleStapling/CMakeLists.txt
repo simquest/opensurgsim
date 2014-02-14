@@ -22,19 +22,19 @@ include_directories(
 	${YAML_CPP_INCLUDE_DIR}
 )
 
-set(STAPLINGDEMO_SOURCES
+set(EXAMPLESTAPLING_SOURCES
 	AddStapleBehavior.cpp
 	main.cpp
 	StapleElement.cpp
 )
 
-set(STAPLINGDEMO_HEADERS
+set(EXAMPLESTAPLING_HEADERS
 	AddStapleBehavior.h
 	StapleElement.h
 )
 
-add_executable(StaplingDemo
-	${STAPLINGDEMO_SOURCES} ${STAPLINGDEMO_HEADERS}
+add_executable(ExampleStapling
+	${EXAMPLESTAPLING_SOURCES} ${EXAMPLESTAPLING_HEADERS}
 )
 
 set(LIBS ${LIBS}
@@ -52,7 +52,7 @@ configure_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/config.txt"
 )
 
-target_link_libraries(StaplingDemo ${LIBS})
+target_link_libraries(ExampleStapling ${LIBS})
 
-# Put StaplingDemo into folder "Examples"
-set_target_properties(StaplingDemo PROPERTIES FOLDER "Examples") 
+# Put ExampleStapling into folder "Examples"
+set_target_properties(ExampleStapling PROPERTIES FOLDER "Examples") 
