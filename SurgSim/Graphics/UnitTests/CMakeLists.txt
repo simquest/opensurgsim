@@ -33,6 +33,7 @@ set(UNIT_TEST_SOURCES
 	OsgMaterialTests.cpp
 	OsgMatrixConversionsTests.cpp
 	OsgMeshRepresentationTests.cpp
+	OsgOctreeRepresentationTests.cpp
 	OsgPlaneRepresentationTests.cpp
 	OsgPlaneTests.cpp
 	OsgQuaternionConversionsTests.cpp

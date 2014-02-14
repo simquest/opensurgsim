@@ -38,8 +38,8 @@ set(SURGSIM_BLOCKS_HEADERS
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h
 	MassSpringNDRepresentationUtils.h
-	SphereElement.h
 	PoseInterpolator.h
+	SphereElement.h
 	TransferDeformableStateToVerticesBehavior.h
 	TransferDeformableStateToVerticesBehavior-inl.h
 	TransferInputPoseBehavior.h
