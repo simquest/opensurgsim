@@ -27,7 +27,6 @@ set(SURGSIM_SERIALIZE_SOURCES
 )
 
 set(SURGSIM_SERIALIZE_HEADERS
-	Convert.h
 	FrameworkConvert.h
 	GraphicsConvert.h
 	ShapesFactory.h

@@ -158,7 +158,7 @@ TYPED_TEST(AllRigidTransformTests, MakeLookAt)
 	Transform transform = SurgSim::Math::makeRigidTransform(eye, origin, up);
 
 	EXPECT_TRUE(eye4.isApprox(transform*center4));
-	
+
 	Vector4 transformed = transform*direction4;
 
 	Vector3 direction3(transformed[0], transformed[1], transformed[2]);

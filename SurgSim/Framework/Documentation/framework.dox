@@ -1,0 +1,11 @@
+/*!
+
+\page Framework The OSS Framework
+
+\addtogroup Framework
+
+The 'Framework' namespace contains classes that are the basis of the OSS simulation framework. Most of the classes here are not used by themselves but are extended by the other libraries in OSS. 
+
+\subpage Serialization
+
+*/
