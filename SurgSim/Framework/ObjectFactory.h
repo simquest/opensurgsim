@@ -114,4 +114,4 @@ private:
 
 #include "SurgSim/Framework/ObjectFactory-inl.h"
 
-#endif // SURGSIM_SERIALIZE_SHAPESFACTORY_H
+#endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

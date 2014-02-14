@@ -100,6 +100,8 @@ if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 
+add_subdirectory(Documentation)
+
 
 # Put SurgSimFramework into folder "Framework"
 set_target_properties(SurgSimFramework PROPERTIES FOLDER "Framework")
