@@ -16,6 +16,8 @@
 #ifndef EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
 #define EXAMPLES_STAPLINGDEMO_STAPLEELEMENT_H
 
+#include <string>
+
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 

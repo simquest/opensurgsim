@@ -16,6 +16,9 @@
 #ifndef EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
 #define EXAMPLES_STAPLINGDEMO_ADDSTAPLEBEHAVIOR_H
 
+#include <memory>
+#include <string>
+
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
