@@ -1,0 +1,83 @@
+/*!
+
+\page Serialization Serialization
+
+Loading and storing of instances from the OpenSurgSim framework utilizes the facilities provided by YAML-cpp, the duck typing and introspection capabilities provided by SurgSim::Framework::Accessible and when necessary a generic class registration and factory mechanism provided by SurgSim::Framework::ObjectFactory. Together these classes enable a serialization solution that can load and store instances of classes without the need of knowing the structure.
+
+By using YAML::Node, we can represent data in a form that can be written to file and read from a file in the YAML format. By converting instances to and from YAML::Node we can enable the loading and storing of instances to disk. Depending on the requirements more or less work needs to be done to enable the conversions. We will describe the various steps in order of increasing complexity. 
+
+## Conventions
+
+For consistency we will agree on naming properties in CamelCase beginning with a capital letter, this concurs with the naming portion of the getter and setter. E.g. if a component has a public getter and setter getFileName() and setFileName() the property should be named 'FileName'. We reserve the names "ClassName", "Name" and "Uuid" for use in component serialization.
+
+## POD
+
+SurgSim and YAML-cpp already include conversions from and to YAML::node for all the POD types that should be needed, int, float, double, std::map, std::vector, ... are handle, likewise with the main Eigen classes Matrix and Vector. These can all be used with YAML::Node as such.
+
+	YAML::Node node;
+	node["value"] = 1;	
+	int a = node["value"].as<int>();
+	
+For more complex data types the conversion can be implemented as member functions, for consistency purposes the following signatures should be used:
+
+	YAML::node Class::encode();
+	void Class::decode(const YAML::Node& node);
+
+If an addition to the member class is not possible or the conversion using 'node.as<>()' is wished, it will be necessary to specialize the YAML::convert structure for the required class type that needs to be converted.
+
+	template <>
+	YAML::convert<Class>(...)
+	
+After implementing either of these it should be possible to create a node structure from the class under development, and to fill the members of the class with values from the node.
+
+When restoring the class these approaches work best if the class that is being handled implements a default constructor, when it does the data in the given node does not have to be inspected or extracted before class creation. And a class can be filled with data as such.
+
+	Class a;
+	a.decode(dataNode);
+	
+When the constructor needs more data things like the following might become necessary possibly making the process more brittle
+
+	int val = node["val"].as<int>();
+	Class a(val);
+	a.decode(dataNode);
+	
+## Accessible
+
+An easy way to enable serialization for a class is to derive from SurgSim::Framework::Accessible, and to declare all the classes' properties that need to be serialized through the `SURGSIM_SERIALIZABLE_PROPERTY` macro. This macro does two things, it declares a read/write property on the instance, but it also declares a conversion from and to YAML::Node for this property. `Accessible` implements `encode()` and `decode()` in a way so that all the properties that were declared serializable can be serialized to and from the YAML::Node.
+
+## ObjectFactory
+
+The above approaches work well when the type of the data that is being serialized is known, e.g. a list of objects of the same type, or the specific member variables of a class. An additional facility needs to be utilized when the objects that are being dealt with are of heterogeneous types, i.e. list of objects with same base type but different subtypes. In this case a factory class needs to be filled and utilized. The main purpose of the factory is to create an instance of a class from the name of the class. `SurgSim::Framework::ObjectFactory` is one kind of factory class. For it to work correctly classes need to be registered with `ObjectFactory` through the `register<Class>()` template call. After register has been executed, you can create an instance of a class by calling `create("ClassName")` on the factory. Just by convention each class should indicate its name by using the 'ClassName' property or `getClassName()` member function.
+
+### Registration
+
+For classes with limited subclasses it is usually pretty easy to execute all the calls to `register()` in one place, but sometimes this is not feasible and a more distributed approach is necessary. For Example when the classes are spread out over multiple libraries it can be hard to create an exhaustive list. In this case on can register the class through static initialisation using a macro. The following code used in the `.cpp` file can register a subclass in the superclasses factory if the superclass contains a factory.
+
+	namespace
+	{
+		 SURGSIM_REGISTER(BaseClass, DerivedClass)
+	}
+
+with `Baseclass` being the fully qualified name of the base class e.g. `SurgSim::Framework::Component` and `Derived` the name of the derived class without name space e.g. `OsgBoxRepresentation`.
+
+### Loading
+
+The key to restore the correct class under differing incoming classes is to implement the YAML conversion specialized to the base class pointer, when the decode function is called, the decode code can determine at runtime what instance needs to be created and call the appropriate factory function. After the correct instance has been created, a class member `decode()` function can be used to fill the appropriate member variables.
+
+## Instances vs. References 
+
+When there is a need to load and store references to objects, when objects are being shared amongst other objects the serialization can be specialized to object instances and object pointers to indicate whether a reference to an object as opposed to the actual object data should be written.
+
+	template<>
+	YAML::convert<Class> ...
+	
+	template<>
+	YAMLL::convert<std::shared_ptr<Class>>
+
+In the calling code the determination needs to be made whether the reference is serialized or the actual instance. Only the instance serialization should write out the data, the reference serializations should write out, a unique identifier for the instance and class information, if needed. When reading the unique identifier can be used to return a pointer to the shared instance in all places where the object is being used. When the actual data is found the normal `decode()` can be used to restore the member data.
+
+## Component Loading and Storing
+
+All of the above mechanisms are in place for loading and storing components. The component class implements a factory, it utilizes the split convert object to serialize shared component references from the inside of a component. The data for a component can be written out when the owning `SceneElement` writes its component. Additionally there is a registry data structure for components in the inside of the convert object that can be used to restore shared instances to components.
+	
+*/
