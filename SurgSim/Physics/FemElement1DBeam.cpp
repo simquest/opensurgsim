@@ -77,6 +77,14 @@ void FemElement1DBeam::setShearingEnabled(bool enabled)
 	m_haveShear = enabled;
 }
 
+double FemElement1DBeam::getVolume(const DeformableRepresentationState& state) const
+{
+	const Vector3d A = state.getPosition(m_nodeIds[0]);
+	const Vector3d B = state.getPosition(m_nodeIds[1]);
+
+	return m_A * (B - A).norm();
+}
+
 void FemElement1DBeam::initialize(const DeformableRepresentationState& state)
 {
 	// Test the validity of the physical parameters
@@ -113,6 +121,66 @@ void FemElement1DBeam::addForce(const DeformableRepresentationState& state, Surg
 	getSubVector(state.getPositions(), m_nodeIds, 6, &x);
 	f = (-scale) * m_K * (x - m_x0);
 	addSubVector(f, m_nodeIds, 6, F);
+}
+
+void FemElement1DBeam::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M, double scale)
+{
+	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
+}
+
+void FemElement1DBeam::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D, double scale)
+{
+}
+
+void FemElement1DBeam::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K, double scale)
+{
+	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
+}
+
+void FemElement1DBeam::addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
+{
+	// Assemble the mass matrix
+	addMass(state, M);
+
+	// No damping matrix as we are using linear elasticity (not visco-elasticity)
+
+	// Assemble the stiffness matrix
+	addStiffness(state, K);
+
+	// Assemble the force vector
+	addForce(state, F);
+}
+
+void FemElement1DBeam::addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD,
+								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+{
+	using SurgSim::Math::addSubVector;
+	using SurgSim::Math::getSubVector;
+
+	if (alphaM == 0.0 && alphaK == 0.0)
+	{
+		return;
+	}
+
+	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> extractedX, extractedResult;
+	getSubVector(x, m_nodeIds, 6, &extractedX);
+
+	// Adds the mass contribution
+	if (alphaM != 0.0)
+	{
+		extractedResult = alphaM * (m_M * extractedX);
+		addSubVector(extractedResult, m_nodeIds, 6, F);
+	}
+
+	// Adds the damping contribution (No damping)
+
+	// Adds the stiffness contribution
+	if (alphaK != 0.0)
+	{
+		extractedResult = alphaK * (m_K * extractedX);
+		addSubVector(extractedResult, m_nodeIds, 6, F);
+	}
 }
 
 void FemElement1DBeam::computeMass(const DeformableRepresentationState& state,
@@ -182,15 +250,6 @@ void FemElement1DBeam::computeMass(const DeformableRepresentationState& state,
 
 	// Transformation Local -> Global
 	m_M = m_R0.transpose() * m_MLocal * m_R0;
-}
-
-void FemElement1DBeam::addMass(const DeformableRepresentationState& state, SurgSim::Math::Matrix* M, double scale)
-{
-	addSubMatrix(m_M * scale, m_nodeIds, 6, M);
-}
-
-void FemElement1DBeam::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D, double scale)
-{
 }
 
 void FemElement1DBeam::computeStiffness(const DeformableRepresentationState& state,
@@ -299,65 +358,6 @@ void FemElement1DBeam::computeInitialRotation(const DeformableRepresentationStat
 	setSubMatrix(rotation3x3, 1, 1, 3, 3, &m_R0);
 	setSubMatrix(rotation3x3, 2, 2, 3, 3, &m_R0);
 	setSubMatrix(rotation3x3, 3, 3, 3, 3, &m_R0);
-}
-
-void FemElement1DBeam::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K, double scale)
-{
-	addSubMatrix(m_K * scale, getNodeIds(), 6, K);
-}
-
-void FemElement1DBeam::addFMDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
-							   SurgSim::Math::Matrix* M, SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
-{
-	// Assemble the mass matrix
-	addMass(state, M);
-
-	// No damping matrix as we are using linear elasticity (not visco-elasticity)
-
-	// Assemble the stiffness matrix
-	addStiffness(state, K);
-
-	// Assemble the force vector
-	addForce(state, F);
-}
-
-void FemElement1DBeam::addMatVec(const DeformableRepresentationState& state, double alphaM, double alphaD,
-								 double alphaK, const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
-{
-	using SurgSim::Math::addSubVector;
-	using SurgSim::Math::getSubVector;
-
-	if (alphaM == 0.0 && alphaK == 0.0)
-	{
-		return;
-	}
-
-	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> extractedX, extractedResult;
-	getSubVector(x, m_nodeIds, 6, &extractedX);
-
-	// Adds the mass contribution
-	if (alphaM)
-	{
-		extractedResult = alphaM * (m_M * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
-	}
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK)
-	{
-		extractedResult = alphaK * (m_K * extractedX);
-		addSubVector(extractedResult, m_nodeIds, 6, F);
-	}
-}
-
-double FemElement1DBeam::getVolume(const DeformableRepresentationState& state) const
-{
-	const Vector3d A = state.getPosition(m_nodeIds[0]);
-	const Vector3d B = state.getPosition(m_nodeIds[1]);
-
-	return m_A * (B - A).norm();
 }
 
 bool FemElement1DBeam::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
