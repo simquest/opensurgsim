@@ -52,14 +52,6 @@ FemElement1DBeam::FemElement1DBeam(std::array<unsigned int, 2> nodeIds, const De
 	setNumDofPerNode(6);
 
 	m_nodeIds.assign(nodeIds.cbegin(), nodeIds.cend());
-
-	// Store the rest state for this beam in m_x0
-	getSubVector(restState.getPositions(), m_nodeIds, 6, &m_x0);
-
-	m_restLength = (m_x0.segment<3>(6) - m_x0.segment<3>(0)).norm();
-	SURGSIM_ASSERT(m_restLength > 0) << "FemElement1DBeam rest length is zero (degenerate beam)";
-
-	computeInitialRotation(restState);
 }
 
 void FemElement1DBeam::setRadius(double radius)
@@ -97,6 +89,14 @@ void FemElement1DBeam::initialize(const DeformableRepresentationState& state)
 	m_Iz = M_PI * (m_radius * m_radius * m_radius * m_radius) / 4.0;
 	m_Iy = m_Iz;
 	m_J = m_Iz + m_Iy;
+
+	// Store the rest state for this beam in m_x0
+	getSubVector(state.getPositions(), m_nodeIds, 6, &m_x0);
+
+	m_restLength = (m_x0.segment<3>(6) - m_x0.segment<3>(0)).norm();
+	SURGSIM_ASSERT(m_restLength > 0) << "FemElement1DBeam rest length is zero (degenerate beam)";
+
+	computeInitialRotation(state);
 
 	// Pre-compute the mass and stiffness matrix
 	computeMass(state, &m_M);
