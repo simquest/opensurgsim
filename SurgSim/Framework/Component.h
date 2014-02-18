@@ -99,9 +99,9 @@ public:
 	/// \return The runtime which contains this component.
 	std::shared_ptr<Runtime> getRuntime() const;
 
-	/// The class name for this class, this being the baseclass it should
-	/// return SurgSim::Framework::Component but this would make missing implmenentations
-	/// of this hard to catch, there for this calls SURGSIM_FAILURE.
+	/// The class name for this class, this being the base class it should
+	/// return SurgSim::Framework::Component but this would make missing implemenentations
+	/// of this hard to catch, therefore this calls SURGSIM_FAILURE.
 	/// \note Use the SURGSIM_CLASSNAME macro in derived classes.
 	/// \return The fully namespace qualified name of this class.
 	virtual std::string getClassName() const;

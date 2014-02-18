@@ -42,7 +42,7 @@ public:
 	/// Register a class with the factory.
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
-	/// \return true if the class was added, false if it alread existed in the registry.
+	/// \return true if the class was added, false if it already existed in the registry.
 	template <typename Derived>
 	bool registerClass(const std::string& className);
 
@@ -85,7 +85,7 @@ public:
 	/// Register a class with the factory.
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
-	/// \return true if the class was added, false if it alread existed in the registry.
+	/// \return true if the class was added, false if it already existed in the registry.
 	template <typename Derived>
 	bool registerClass(const std::string& className);
 

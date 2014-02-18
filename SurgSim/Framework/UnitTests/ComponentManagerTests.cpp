@@ -25,15 +25,8 @@
 
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
 
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;
-
-
-
-
 
 namespace SurgSim
 {
