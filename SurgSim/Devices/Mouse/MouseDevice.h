@@ -26,8 +26,8 @@ namespace SurgSim
 namespace Device
 {
 
-class OsgMouseScaffold;
-class MouseHandler;
+class MouseScaffold;
+class OsgMouseHandler;
 
 /// A class implementing the communication with a mouse
 ///
@@ -50,7 +50,7 @@ class MouseHandler;
 /// \sa SurgSim::Input::CommonDevice, SurgSim::Input::DeviceInterface
 class MouseDevice : public SurgSim::Input::CommonDevice
 {
-	friend class OsgMouseScaffold;
+	friend class MouseScaffold;
 	friend class MouseDeviceTest;
 
 public:
@@ -73,11 +73,11 @@ public:
 
 	/// Get mouse handler
 	/// \return The mouse handler associated with this device
-	MouseHandler* getMouseHandler() const;
+	OsgMouseHandler* getMouseHandler() const;
 
 private:
 	/// Communication with hardware is handled by scaffold.
-	std::shared_ptr<OsgMouseScaffold> m_scaffold;
+	std::shared_ptr<MouseScaffold> m_scaffold;
 };
 
 };  // namespace Device

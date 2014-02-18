@@ -31,7 +31,6 @@ namespace SurgSim
 namespace Physics
 {
 
-class RigidRepresentationState;
 
 /// The RigidRepresentationBase class defines the base class for
 /// all rigid motion based representations (fixed, rigid body, rigid body + vtc,...)

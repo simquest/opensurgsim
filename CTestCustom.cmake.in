@@ -30,6 +30,8 @@ set(CTEST_CUSTOM_WARNING_MATCH
 
 set(CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "osgUtil::GLObjectsVisitor::apply"
+  "osgUtil::StateToCompile::apply"
 )
 
 set(CTEST_CUSTOM_TESTS_IGNORE

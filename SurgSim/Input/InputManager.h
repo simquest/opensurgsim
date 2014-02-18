@@ -16,21 +16,20 @@
 #ifndef SURGSIM_INPUT_INPUTMANAGER_H
 #define SURGSIM_INPUT_INPUTMANAGER_H
 
-#include <vector>
-#include <unordered_map>
-#include <memory>
-#include "SurgSim/Framework/ComponentManager.h"
-#include "SurgSim/Input/InputComponent.h"
-#include "SurgSim/Input/OutputComponent.h"
-#include "SurgSim/Input/DeviceInterface.h"
-
 #include <boost/thread/mutex.hpp>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
+#include "SurgSim/Framework/ComponentManager.h"
 
 namespace SurgSim
 {
 namespace Input
 {
+class DeviceInterface;
+class InputComponent;
+class OutputComponent;
 
 /// Manager to handle InputComponent and OutputComponent, SceneElement can add these to
 /// get input from devices, or even write output to devices. The devices have to be added

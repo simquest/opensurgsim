@@ -22,21 +22,29 @@ include_directories(
 
 set(KEYBOARD_DEVICE_SOURCES
 	KeyboardDevice.cpp
-	KeyboardHandler.cpp
 	KeyboardScaffold.cpp
+	OsgKeyboardHandler.cpp
 )
 
 set(KEYBOARD_DEVICE_HEADERS
 	KeyboardDevice.h
-	KeyboardHandler.h
 	KeyboardScaffold.h
 	KeyCode.h
+	OsgKeyboardHandler.h
 )
 
 surgsim_add_library(
 	KeyboardDevice
 	"${KEYBOARD_DEVICE_SOURCES}" "${KEYBOARD_DEVICE_HEADERS}"
 	SurgSim/Devices/Keyboard
+)
+
+set(LIBS ${LIBS} 
+		 SurgSimInput
+		 ${Boost_LIBRARIES}
+)
+
+target_link_libraries(KeyboardDevice ${LIBS}
 )
 
 if(BUILD_TESTING)

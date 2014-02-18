@@ -16,7 +16,9 @@
 #include "SurgSim/Input/InputManager.h"
 
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Input/DeviceInterface.h"
 #include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/OutputComponent.h"
 
 namespace SurgSim
 {

@@ -57,12 +57,15 @@ struct TruthCube
 struct TruthCubeRenderTests : public RenderTests
 {
 	/// Parsing Truth Cube data from an external file
-	/// \param truthCube a container of cube data for all strains
+	/// \param truthCube a container of cube data for all strains in meter unit.
 	/// \return True if the Truth Cube Data is successful loaded, otherwise false
 	bool parseTruthCubeData(std::shared_ptr<TruthCube> truthCube)
 	{
 		// Position of uncompressed data, 5% strain, 12.5% strain, 18.25% strain
 		Vector3d position0, position1, position2, position3;
+
+		// Conversion constant to convert from centimeter to meter.
+		const double cm2m = 1000.0;
 
 		const int numCommentLine = 7;
 		std::string lineId;
@@ -93,10 +96,10 @@ struct TruthCubeRenderTests : public RenderTests
 					>> position3.x() >> comma >> position3.y() >> comma >> position3.z();
 
 				// Store proper strains for each cubeData
-				truthCube->cubeData0.push_back(position0);
-				truthCube->cubeData1.push_back(position1);
-				truthCube->cubeData2.push_back(position2);
-				truthCube->cubeData3.push_back(position3);
+				truthCube->cubeData0.push_back(position0 / cm2m);
+				truthCube->cubeData1.push_back(position1 / cm2m);
+				truthCube->cubeData2.push_back(position2 / cm2m);
+				truthCube->cubeData3.push_back(position3 / cm2m);
 			}
 		}
 		return true;
@@ -120,7 +123,7 @@ struct TruthCubeRenderTests : public RenderTests
 
 		viewElement->addComponent(representation);
 		viewElement->enableManipulator(true);
-		viewElement->setManipulatorParameters(Vector3d(0.0, 140.0, 0.0), Vector3d::Zero());
+		viewElement->setManipulatorParameters(Vector3d(0.0, 0.0, 0.2), Vector3d::Zero());
 
 		/// Run the thread
 		runtime->start();

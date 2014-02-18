@@ -15,8 +15,6 @@
 
 #include "SurgSim/Framework/Logger.h"
 
-#include <iostream>
-
 
 namespace SurgSim
 {
