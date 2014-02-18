@@ -62,7 +62,7 @@ FemElement1DBeam::FemElement1DBeam(std::array<unsigned int, 2> nodeIds, const De
 	computeInitialRotation(restState);
 }
 
-void FemElement1DBeam::setCrossSectionCircular(double radius)
+void FemElement1DBeam::setRadius(double radius)
 {
 	SURGSIM_ASSERT(radius != 0.0) << "The beam radius cannot be set to 0";
 	SURGSIM_ASSERT(radius > 0.0) << "The beam radius cannot be negative (trying to set it to " << radius << ")";
@@ -70,7 +70,7 @@ void FemElement1DBeam::setCrossSectionCircular(double radius)
 	m_radius = radius;
 }
 
-double FemElement1DBeam::getCrossSectionCircular() const
+double FemElement1DBeam::getRadius() const
 {
 	return m_radius;
 }

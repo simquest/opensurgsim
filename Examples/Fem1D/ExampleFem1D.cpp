@@ -80,7 +80,7 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	{
 		std::array<unsigned int, 2> beamNodeIds = {{beamId, beamId + 1}};
 		std::shared_ptr<FemElement1DBeam> beam = std::make_shared<FemElement1DBeam>(beamNodeIds, *restState);
-		beam->setCrossSectionCircular(0.10);
+		beam->setRadius(0.10);
 		beam->setMassDensity(3000.0);
 		beam->setPoissonRatio(0.45);
 		beam->setYoungModulus(1e6);

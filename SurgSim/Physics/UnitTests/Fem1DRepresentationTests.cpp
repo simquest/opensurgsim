@@ -85,7 +85,7 @@ public:
 			element->setMassDensity(massDensity);
 			element->setYoungModulus(youngModulus);
 			element->setPoissonRatio(poissonRatio);
-			element->setCrossSectionCircular(radius);
+			element->setRadius(radius);
 			element->setShearingEnabled(shearingEnabled);
 			if (initializeElements)
 			{
@@ -206,7 +206,7 @@ protected:
 		element->setMassDensity(m_rho);
 		element->setYoungModulus(m_E);
 		element->setPoissonRatio(m_nu);
-		element->setCrossSectionCircular(m_radius);
+		element->setRadius(m_radius);
 
 		// Add element to fem
 		m_fem->addFemElement(element);

@@ -31,6 +31,7 @@ namespace Physics
 /// The inertia property (mass) and the stiffness matrices are derived from "Theory of Matrix Structural Analysis" from
 /// J.S. Przemieniecki.  The deformation is based on linear elasticity theory and not on visco-elasticity theory;
 /// therefore, the element does not have any damping components.
+/// \note The element is considered to have a circular cross section.
 class FemElement1DBeam : public FemElement
 {
 public:
@@ -41,12 +42,12 @@ public:
 	FemElement1DBeam(std::array<unsigned int, 2> nodeIds, const DeformableRepresentationState& restState);
 
 	/// Sets the beam's circular cross-section radius
-	/// \param radius The radius of the beam (considered circular)
-	void setCrossSectionCircular(double radius);
+	/// \param radius The radius of the beam
+	void setRadius(double radius);
 
 	/// Gets the beam's circular cross-section radius
-	/// \return The radius of the beam (considered circular)
-	double getCrossSectionCircular() const;
+	/// \return The radius of the beam
+	double getRadius() const;
 
 	/// Initializes the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with

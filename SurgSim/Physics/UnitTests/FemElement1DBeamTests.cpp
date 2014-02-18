@@ -379,7 +379,7 @@ public:
 	std::shared_ptr<MockFemElement1D> getBeam()
 	{
 		auto beam = std::make_shared<MockFemElement1D>(m_nodeIds, m_restState);
-		beam->setCrossSectionCircular(m_radius);
+		beam->setRadius(m_radius);
 		beam->setMassDensity(m_rho);
 		beam->setPoissonRatio(m_nu);
 		beam->setYoungModulus(m_E);
@@ -418,19 +418,19 @@ TEST_F(FemElement1DBeamTests, setGetRadiusTest)
 	FemElement1DBeam beam(m_nodeIds, m_restState);
 
 	// Default radius = 0
-	EXPECT_DOUBLE_EQ(0.0, beam.getCrossSectionCircular());
+	EXPECT_DOUBLE_EQ(0.0, beam.getRadius());
 	// Set to a valid radius
-	beam.setCrossSectionCircular(1.54);
-	EXPECT_DOUBLE_EQ(1.54, beam.getCrossSectionCircular());
+	beam.setRadius(1.54);
+	EXPECT_DOUBLE_EQ(1.54, beam.getRadius());
 	// Set to an invalid radius
-	EXPECT_ANY_THROW(beam.setCrossSectionCircular(0.0));
-	EXPECT_ANY_THROW(beam.setCrossSectionCircular(-9.4));
+	EXPECT_ANY_THROW(beam.setRadius(0.0));
+	EXPECT_ANY_THROW(beam.setRadius(-9.4));
 }
 
 TEST_F(FemElement1DBeamTests, MaterialParameterTest)
 {
 	FemElement1DBeam beam(m_nodeIds, m_restState);
-	beam.setCrossSectionCircular(m_radius);
+	beam.setRadius(m_radius);
 
 	// Test the various mode of failure related to the physical parameters
 	// This has been already tested in FemElementTests, but this is to make sure this method is called properly
