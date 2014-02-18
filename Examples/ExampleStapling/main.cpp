@@ -29,7 +29,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Physics/PhysicsManager.h"
-#include "Examples/ExampleStapling/AddStapleBehavior.h"
+#include "Examples/ExampleStapling/StaplerBehavior.h"
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 
-	auto addStapleBehavior = std::make_shared<AddStapleFromInputBehavior>("Staple");
+	auto addStapleBehavior = std::make_shared<StaplerBehavior>("Staple");
 	addStapleBehavior->setInputComponent(inputComponent);
 
 	staplerSceneElement->addComponent(inputComponent);

@@ -15,27 +15,27 @@
 
 #include <sstream>
 
-#include "Examples/ExampleStapling/AddStapleBehavior.h"
 #include "Examples/ExampleStapling/StapleElement.h"
+#include "Examples/ExampleStapling/StaplerBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Input/InputComponent.h"
 
-AddStapleFromInputBehavior::AddStapleFromInputBehavior(const std::string& name):
+StaplerBehavior::StaplerBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_numElements(0),
 	m_buttonPreviouslyPressed(false)
 {
 }
 
-void AddStapleFromInputBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
+void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
 {
 	m_from = inputComponent;
 }
 
-void AddStapleFromInputBehavior::update(double dt)
+void StaplerBehavior::update(double dt)
 {
 	// Get the pose information from input device
 	SurgSim::DataStructures::DataGroup dataGroup;
@@ -64,18 +64,18 @@ void AddStapleFromInputBehavior::update(double dt)
 	m_buttonPreviouslyPressed = button1;
 }
 
-int AddStapleFromInputBehavior::getTargetManagerType() const
+int StaplerBehavior::getTargetManagerType() const
 {
 	return SurgSim::Framework::MANAGER_TYPE_INPUT;
 }
 
-bool AddStapleFromInputBehavior::doInitialize()
+bool StaplerBehavior::doInitialize()
 {
 	SURGSIM_ASSERT(m_from) << "Could not get inputComponent from device.";
 	return true;
 }
 
-bool AddStapleFromInputBehavior::doWakeUp()
+bool StaplerBehavior::doWakeUp()
 {
 	return true;
 }

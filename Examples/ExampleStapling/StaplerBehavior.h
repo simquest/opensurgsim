@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
-#define EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
+#define EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 
 #include <memory>
 #include <string>
@@ -31,12 +31,12 @@ class InputComponent;
 
 }
 
-class AddStapleFromInputBehavior: public SurgSim::Framework::Behavior
+class StaplerBehavior: public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit AddStapleFromInputBehavior(const std::string& name);
+	explicit StaplerBehavior(const std::string& name);
 
 	/// Set the input component from which to get the pose
 	/// \param	inputComponent	The input component which sends the pose.
@@ -72,4 +72,4 @@ private:
 	bool m_buttonPreviouslyPressed;
 };
 
-#endif  // EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+#endif  // EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H

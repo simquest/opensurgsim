@@ -23,19 +23,22 @@ include_directories(
 )
 
 set(EXAMPLESTAPLING_SOURCES
-	AddStapleBehavior.cpp
 	main.cpp
 	StapleElement.cpp
+	StaplerBehavior.cpp
 )
 
 set(EXAMPLESTAPLING_HEADERS
-	AddStapleBehavior.h
 	StapleElement.h
+	StaplerBehavior.h
 )
 
 add_executable(ExampleStapling
 	${EXAMPLESTAPLING_SOURCES} ${EXAMPLESTAPLING_HEADERS}
 )
+
+surgsim_show_ide_folders(
+	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
 set(LIBS ${LIBS}
 		 MultiAxisDevice
