@@ -28,6 +28,7 @@
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
+#include "SurgSim/Graphics/PointCloudRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Vector.h"
@@ -54,7 +55,7 @@ namespace
 
 void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, unsigned int numNodes)
 {
-	auto restState = std::make_shared<DeformableRepresentationState>();
+	std::shared_ptr<DeformableRepresentationState> restState = std::make_shared<DeformableRepresentationState>();
 	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)
@@ -78,7 +79,7 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 	for (unsigned int beamId = 0; beamId < numNodes - 1; beamId++)
 	{
 		std::array<unsigned int, 2> beamNodeIds = {{beamId, beamId + 1}};
-		auto beam = std::make_shared<FemElement1DBeam>(beamNodeIds, *restState);
+		std::shared_ptr<FemElement1DBeam> beam = std::make_shared<FemElement1DBeam>(beamNodeIds, *restState);
 		beam->setCrossSectionCircular(0.10);
 		beam->setMassDensity(3000.0);
 		beam->setPoissonRatio(0.45);
@@ -91,7 +92,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 {
 	using SurgSim::Graphics::OsgViewElement;
 
-	auto viewElement = std::make_shared<OsgViewElement>(name);
+	std::shared_ptr<OsgViewElement> viewElement = std::make_shared<OsgViewElement>(name);
 	viewElement->getView()->setPosition(x, y);
 	viewElement->getView()->setDimensions(width, height);
 
@@ -103,7 +104,8 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 										  SurgSim::Math::Vector4d color,
 										  SurgSim::Math::IntegrationScheme integrationScheme)
 {
-	auto physicsRepresentation = std::make_shared<Fem1DRepresentation>(name + " Physics");
+	std::shared_ptr<Fem1DRepresentation> physicsRepresentation
+		= std::make_shared<Fem1DRepresentation>(name + " Physics");
 
 	// In this example, the physics representations are not transformed, only the graphics will be transformed
 	loadModelFem1D(physicsRepresentation, 10);
@@ -112,17 +114,19 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 	physicsRepresentation->setRayleighDampingMass(5e-2);
 	physicsRepresentation->setRayleighDampingStiffness(5e-3);
 
-	auto femSceneElement = std::make_shared<BasicSceneElement>(name);
+	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 
 	unsigned int gfxObjectId = 0;
-	for (const SurgSim::Math::RigidTransform3d& gfxPose : gfxPoses)
+	for (std::vector<SurgSim::Math::RigidTransform3d>::const_iterator gfxPose = gfxPoses.begin();
+		 gfxPose != gfxPoses.end(); ++gfxPose)
 	{
 		std::stringstream ss;
 		ss << name + " Graphics object " << gfxObjectId;
 
-		auto graphicsRepresentation = std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
-		graphicsRepresentation->setInitialPose(gfxPose);
+		std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
+			= std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
+		graphicsRepresentation->setInitialPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
 		graphicsRepresentation->setPointSize(3.0f);
 		graphicsRepresentation->setVisible(true);
@@ -151,10 +155,11 @@ int main(int argc, char* argv[])
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::Vector4d;
 
-	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	auto physicsManager = std::make_shared<PhysicsManager>();
-	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>();
+	std::shared_ptr<SurgSim::Graphics::OsgManager> graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
+	std::shared_ptr<PhysicsManager> physicsManager = std::make_shared<PhysicsManager>();
+	std::shared_ptr<SurgSim::Framework::BehaviorManager> behaviorManager
+		= std::make_shared<SurgSim::Framework::BehaviorManager>();
+	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
 
 	runtime->addManager(physicsManager);
 	runtime->addManager(graphicsManager);
