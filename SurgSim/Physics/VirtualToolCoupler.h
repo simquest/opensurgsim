@@ -92,13 +92,16 @@ public:
 	void setOutputTorqueScaling(double torqueScaling);
 
 protected:
-	/// Initialize the behavior
+	/// Initialize the behavior.  Does nothing.
+	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize();
 
-	/// Wakeup the behavior
+	/// Wakeup the behavior.  Does nothing.
+	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp();
 
-	/// Put this behavior in physics, so everything updates once per physics loop
+	/// Put this behavior in physics, so everything updates once per physics loop.
+	/// \return int corresponding to enum in Behavior.h.
 	virtual int getTargetManagerType() const;
 
 private:
