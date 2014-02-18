@@ -15,20 +15,29 @@
 
 #include "SurgSim/Framework/Component.h"
 
+#include <boost/uuid/random_generator.hpp>
+
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Framework
 {
 
 // Forward References
-class SceneElement;
-class Scene;
 class Runtime;
+class Scene;
+class SceneElement;
 
 Component::Component(const std::string& name) :
-	m_name(name), m_didInit(false), m_didWakeUp(false), m_isInitialized(false), m_isAwake(false)
+	m_name(name),
+	m_uuid(boost::uuids::random_generator()()),
+	m_didInit(false),
+	m_didWakeUp(false),
+	m_isInitialized(false),
+	m_isAwake(false)
 {
-	SURGSIM_ADD_RW_PROPERTY(Component, std::string, name, getName, setName);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Framework::Component, std::string, name, getName, setName);
 }
 
 Component::~Component()
@@ -102,6 +111,23 @@ std::shared_ptr<SceneElement> Component::getSceneElement()
 std::shared_ptr<Runtime> Component::getRuntime() const
 {
 	return m_runtime.lock();
+}
+
+boost::uuids::uuid Component::getUuid() const
+{
+	return m_uuid;
+}
+
+Component::FactoryType& Component::getFactory()
+{
+	static FactoryType factory;
+	return factory;
+}
+
+std::string Component::getClassName() const
+{
+	SURGSIM_FAILURE() << "Missing implementation of getClassName() for base class";
+	return "SurgSim::Framework::Component";
 }
 
 }; // namespace Framework

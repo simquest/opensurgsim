@@ -13,35 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories (
-	${gtest_SOURCE_DIR}/include
+set(SURGSIM_FRAMEWORK_DOCUMENTATION
+	framework.dox
+	serialization.dox
 )
 
-set(UNIT_TEST_SOURCES
-	DataGroupTests.cpp
-	IndexDirectoryTests.cpp
-	MeshElementTest.cpp
-	MeshTest.cpp
-	MeshVertexTest.cpp
-	NamedDataTests.cpp
-	NamedVariantDataTests.cpp
-	OctreeNodeTests.cpp
-	OptionalValueTests.cpp
-	PlyReaderTests.cpp
-	TetrahedronMeshTest.cpp
-	TriangleMeshTest.cpp
-)
-
-set(UNIT_TEST_HEADERS
-	MockObjects.h
-)
-
-file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-set(LIBS
-	SurgSimDataStructures
-)
-
-surgsim_add_unit_tests(SurgSimDataStructuresTest)
-
-set_target_properties(SurgSimDataStructuresTest PROPERTIES FOLDER "DataStructures")
+add_custom_target(SurgSimFrameworkDocumentation SOURCES ${SURGSIM_FRAMEWORK_DOCUMENTATION})
+set_target_properties(SurgSimFrameworkDocumentation PROPERTIES FOLDER "Framework")

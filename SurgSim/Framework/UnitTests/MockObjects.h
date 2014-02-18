@@ -130,30 +130,18 @@ private:
 class MockComponent : public SurgSim::Framework::Component
 {
 public:
-	explicit MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true) :
-		Component(name),
-		succeedWithInit(succeedInit),
-		succeedWithWakeUp(succeedWakeUp),
-		didWakeUp(false),
-		didInit(false)
-	{
-	}
+	explicit MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true);
 
-	virtual ~MockComponent()
-	{
-	}
+	virtual ~MockComponent();
 
-	virtual bool doInitialize()
-	{
-		didInit = true;
-		return succeedWithInit;
-	}
+	virtual bool doInitialize();
+	virtual bool doWakeUp();
 
-	virtual bool doWakeUp()
-	{
-		didWakeUp = true;
-		return succeedWithWakeUp;
-	}
+	bool getSucceedWithInit() const;
+	void setSucceedWithInit(bool val);
+
+	bool getSucceedWithWakeUp() const;
+	void setSucceedWithWakeUp(bool val);
 
 	bool succeedWithInit;
 	bool succeedWithWakeUp;

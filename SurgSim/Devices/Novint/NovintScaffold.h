@@ -50,10 +50,7 @@ public:
 
 	/// Gets the logger used by this object and the devices it manages.
 	/// \return The logger.
-	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const
-	{
-		return m_logger;
-	}
+	std::shared_ptr<SurgSim::Framework::Logger> getLogger() const;
 
 	/// Gets or creates the scaffold shared by all NovintDevice and Novint7DofDevice instances.
 	/// The scaffold is managed using a SingleInstance object, so it will be destroyed when all devices are released.
@@ -69,7 +66,7 @@ private:
 
 	/// Internal shared state data type.
 	struct StateData;
-	/// Interal per-device information.
+	/// Internal per-device information.
 	struct DeviceData;
 	/// Wrapper for the haptic loop callback.
 	class Callback;
@@ -107,6 +104,21 @@ private:
 	/// \param info	The device data.
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
+
+	/// Checks whether a device has been homed.  If the position and/or orientation have not been homed, zeros the
+	/// respective Values.  Call this before setting the data to send to the Input Component.  The DeviceData's
+	/// parameter mutex should be locked before this function is called.
+	/// \param info The device data.
+	void checkDeviceHoming(DeviceData* info);
+
+	/// Calculates forces and torques, and sends them to the HDAL.  The DeviceData's parameter mutex should be locked
+	/// before this function is called.
+	/// \param info The device data.
+	void calculateForceAndTorque(DeviceData* info);
+
+	/// Sets the input DataGroup, which will be pushed to the InputComponent
+	/// \param info The device data
+	void setInputData(DeviceData* info);
 
 	/// Initializes the HDAL SDK.
 	/// \return true on success.

@@ -45,7 +45,7 @@ public:
 class NullOutput : public LogOutput
 {
 public:
-	virtual bool writeMessage(const std::string& message) { return true; }
+	virtual bool writeMessage(const std::string& message) {return true;}
 };
 
 

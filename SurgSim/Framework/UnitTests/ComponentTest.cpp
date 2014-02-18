@@ -19,15 +19,140 @@
 ///		 the simplest version of the abstract interface.
 
 #include <gtest/gtest.h>
+
+#include <boost/uuid/uuid_io.hpp>
+
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
+#include "SurgSim/Framework/UnitTests/SerializationMockComponent.h"
+
 
 using SurgSim::Framework::Component;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::Runtime;
+
+/// Simple component class, no additional features
+class TestComponent1 : public Component
+{
+public:
+	explicit TestComponent1(const std::string& name) : Component(name)
+	{
+
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	std::string getClassName() const override
+	{
+		return "TestComponent1";
+	}
+};
+
+/// TestComponent with properties, automatic registration in the factory
+class TestComponent2 : public Component
+{
+public:
+	explicit TestComponent2(const std::string& name) :
+		Component(name),
+		valueOne(999),
+		valueTwo(888)
+	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestComponent2, int, ValueOne, getValueOne, setValueOne);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestComponent2, int, ValueTwo, getValueTwo, setValueTwo);
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	int getValueOne() const { return valueOne; }
+	void setValueOne(int val) { valueOne = val; }
+	int getValueTwo() const { return valueTwo; }
+	void setValueTwo(int val) { valueTwo = val; }
+
+	std::string getClassName() const override
+	{
+		return "TestComponent2";
+	}
+
+
+private:
+	int valueOne;
+	int valueTwo;
+};
+
+
+
+/// Testcomponent with references to other components
+class TestComponent3 : public Component
+{
+public:
+	explicit TestComponent3(const std::string& name) :
+		Component(name)
+	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+			TestComponent3,
+			std::shared_ptr<Component>,
+			ComponentOne,
+			getComponentOne,
+			setComponentOne);
+
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(
+			TestComponent3,
+			std::shared_ptr<Component>,
+			ComponentTwo,
+			getComponentTwo,
+			setComponentTwo);
+	}
+
+	virtual bool doInitialize()
+	{
+		return true;
+	}
+
+	virtual bool doWakeUp()
+	{
+		return true;
+	}
+
+	std::shared_ptr<Component> getComponentOne() const { return m_componentOne; }
+	void setComponentOne(std::shared_ptr<Component> val) { m_componentOne = val; }
+	std::shared_ptr<Component> getComponentTwo() const { return m_componentTwo; }
+	void setComponentTwo(std::shared_ptr<Component> val) { m_componentTwo = val; }
+
+	std::string getClassName() const override
+	{
+		return "TestComponent3";
+	}
+
+private:
+
+	std::shared_ptr<Component> m_componentOne;
+	std::shared_ptr<Component> m_componentTwo;
+};
+
+namespace {
+	SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent2);
+	SURGSIM_REGISTER(SurgSim::Framework::Component, TestComponent3);
+}
 
 TEST(ComponentTests, Constructor)
 {
@@ -58,3 +183,195 @@ TEST(ComponentTests, SetAndGetSceneTest)
 
 }
 
+TEST(ComponentTests, PointerEncode)
+{
+	auto component = std::make_shared<TestComponent1>("TestComponent");
+	YAML::Node node = YAML::convert<std::shared_ptr<Component>>::encode(component);
+
+	EXPECT_FALSE(node.IsNull());
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(3u, node.size());
+
+	EXPECT_EQ("TestComponent1", node["ClassName"].as<std::string>());
+	EXPECT_EQ("TestComponent", node["Name"].as<std::string>());
+	EXPECT_EQ(to_string(component->getUuid()), node["Id"].as<std::string>());
+
+}
+
+TEST(ComponentTests, ConvertFactoryTest)
+{
+	Component::getFactory().registerClass<TestComponent1>("TestComponent1");
+
+	YAML::Node node;
+	node["Name"] = "ComponentName";
+	node["ClassName"] = "TestComponent1";
+	node["Id"] = "ConvertFactoryTest_TestComponent1";
+
+	auto component = node.as<std::shared_ptr<Component>>();
+
+	auto testComponent = std::dynamic_pointer_cast<TestComponent1>(component);
+
+	EXPECT_NE(nullptr, testComponent);
+	EXPECT_EQ("ComponentName", testComponent->getName());
+	EXPECT_EQ("TestComponent1", testComponent->getClassName());
+
+	node["ClassName"] = "Unknown";
+	node["Id"] = "ConvertFactoryTest_TestComponent2";
+
+	// Should not be able to convert this class
+	// This currently does not work due to a bug with the id handling
+	EXPECT_ANY_THROW({auto result = node.as<std::shared_ptr<Component>>();});
+}
+
+TEST(ComponentTests, MacroRegistrationTest)
+{
+	YAML::Node node;
+	node["Name"] = "ComponentName";
+	node["ClassName"] = "TestComponent2";
+	node["Id"] = "AutomaticRegistrationTest_ComponentName";
+
+
+	auto component = node.as<std::shared_ptr<Component>>();
+
+	auto testComponent = std::dynamic_pointer_cast<TestComponent2>(component);
+
+	EXPECT_NE(nullptr, testComponent);
+	EXPECT_EQ("ComponentName", testComponent->getName());
+	EXPECT_EQ("TestComponent2", testComponent->getClassName());
+}
+
+TEST(ComponentTests, DecodeSharedReferences)
+{
+	YAML::Node node;
+	node["Name"] = "OneComponentName";
+	node["ClassName"] = "TestComponent2";
+	node["Id"] = "DecodeSharedReferences_OneComponentName";
+
+	auto component1 = node.as<std::shared_ptr<Component>>();
+	EXPECT_NE(nullptr, component1);
+
+	auto component1copy = node.as<std::shared_ptr<Component>>();
+	EXPECT_NE(nullptr, component1copy);
+	EXPECT_EQ(component1, component1copy);
+
+	node["Id"] = "DecodeSharedReferences_TwoComponentName";
+
+	auto component2 = node.as<std::shared_ptr<Component>>();
+	EXPECT_NE(nullptr, component2);
+	EXPECT_NE(component2, component1);
+	EXPECT_NE(component2, component1copy);
+}
+
+TEST(ComponentTests, EncodeComponent)
+{
+	auto component = std::make_shared<TestComponent2>("TestComponent");
+	component->setValueOne(1);
+	component->setValueTwo(2);
+
+	YAML::Node node = YAML::convert<Component>::encode(*component);
+
+	EXPECT_EQ("TestComponent", (node["Name"].IsDefined() ? node["Name"].as<std::string>() : "undefined !"));
+	EXPECT_EQ("TestComponent2", (node["ClassName"].IsDefined() ? node["ClassName"].as<std::string>() : "undefined !"));
+	EXPECT_EQ(1, (node["ValueOne"].IsDefined() ? node["ValueOne"].as<int>() : 0xbad));
+	EXPECT_EQ(2, (node["ValueTwo"].IsDefined() ? node["ValueTwo"].as<int>() : 0xbad));
+}
+
+TEST(ComponentTests, DecodeComponent)
+{
+	YAML::Node node;
+	node["Name"] = "TestComponentName";
+	node["ClassName"] = "TestComponent2";
+	node["Id"] = "DecodeComponent_TestComponentName";
+	node["ValueOne"] = 100;
+	node["ValueTwo"] = 101;
+
+	auto component = node.as<std::shared_ptr<Component>>();
+
+	auto testComponent = std::dynamic_pointer_cast<TestComponent2>(component);
+
+	EXPECT_NE(nullptr, testComponent);
+	EXPECT_EQ("TestComponentName", testComponent->getName());
+	EXPECT_EQ(100, testComponent->getValueOne());
+	EXPECT_EQ(101, testComponent->getValueTwo());
+}
+
+TEST(ComponentTests, ComponentReferences)
+{
+	auto containerComponent = std::make_shared<TestComponent3>("Root");
+	auto componentOne = std::make_shared<TestComponent2>("Component1");
+	auto componentTwo = std::make_shared<TestComponent2>("Component2");
+
+	componentOne->setValueOne(100);
+	componentOne->setValueTwo(101);
+
+	componentTwo->setValueOne(200);
+	componentTwo->setValueTwo(201);
+
+	containerComponent->setComponentOne(componentOne);
+	containerComponent->setComponentTwo(componentTwo);
+
+	// Push the components onto the node, note that one component is serialized before the container
+	// and the other after the container, this is intentional to test referencing
+	YAML::Node node;
+
+	// because yaml internally does not know about our conversions we have to make them explicit
+	node.push_back(YAML::convert<Component>::encode(*componentOne));
+	node.push_back(YAML::convert<Component>::encode(*containerComponent));
+	node.push_back(YAML::convert<Component>::encode(*componentTwo));
+
+	// Convert from node to shared component
+	auto resultOne =
+		std::dynamic_pointer_cast<TestComponent2>(node[0].as<std::shared_ptr<Component>>());
+	auto resultContainer =
+		std::dynamic_pointer_cast<TestComponent3>(node[1].as<std::shared_ptr<Component>>());
+	auto resultTwo =
+		std::dynamic_pointer_cast<TestComponent2>(node[2].as<std::shared_ptr<Component>>());
+
+	// All of the components should have been de-serialized
+	ASSERT_NE(nullptr, resultContainer);
+	ASSERT_NE(nullptr, resultOne);
+	ASSERT_NE(nullptr, resultTwo);
+
+	// The references should have been resolved correctly
+	EXPECT_EQ(resultContainer->getComponentOne(), resultOne);
+	EXPECT_EQ(resultContainer->getComponentTwo(), resultTwo);
+
+
+	// All components should have the correct values ...
+	EXPECT_EQ(componentOne->getValueOne(),
+			  boost::any_cast<int>(resultContainer->getComponentOne()->getValue("ValueOne")));
+
+	EXPECT_EQ(componentOne->getValueTwo(),
+			  boost::any_cast<int>(resultContainer->getComponentOne()->getValue("ValueTwo")));
+
+	EXPECT_EQ(componentTwo->getValueOne(),
+			  boost::any_cast<int>(resultContainer->getComponentTwo()->getValue("ValueOne")));
+
+	EXPECT_EQ(componentTwo->getValueTwo(),
+			  boost::any_cast<int>(resultContainer->getComponentTwo()->getValue("ValueTwo")));
+}
+
+TEST(ComponentTests, MockComponent)
+{
+	auto component = SurgSim::Framework::Component::getFactory().create("MockComponent","testcomponent");
+
+	ASSERT_NE(nullptr, component);
+
+	/// SerializationMockComponent does not have an explicit definition anywhere in the code
+	/// there is not SerializationMockComponent, but this should still suceed, this test protects
+	/// against linker optimization
+	auto nonDefinedComponent = SurgSim::Framework::Component::getFactory().create(
+		"SerializationMockComponent",
+		"othercomponent");
+
+	ASSERT_NE(nullptr, nonDefinedComponent) << "It looks like SerializationMockComponent was lost during linkage.";
+
+	YAML::Node node = YAML::convert<Component>::encode(*nonDefinedComponent);
+
+	auto roundtripComponent = node.as<std::shared_ptr<Component>>();
+
+	ASSERT_NE(nullptr, roundtripComponent);
+
+	EXPECT_EQ("SerializationMockComponent", roundtripComponent->getClassName());
+	EXPECT_EQ("othercomponent", roundtripComponent->getName());
+}
