@@ -21,7 +21,7 @@
 #include <boost/function.hpp>
 #include <boost/functional/factory.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/thread/locks.hpp>
+
 
 namespace SurgSim
 {
@@ -42,8 +42,9 @@ public:
 	/// Register a class with the factory.
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
+	/// \return true if the class was added, false if it already existed in the registry.
 	template <typename Derived>
-	void registerClass(const std::string& className);
+	bool registerClass(const std::string& className);
 
 	/// Create an instance of a class based on the specific class name.
 	/// \param className The class name that was used to register the class.
@@ -53,7 +54,7 @@ public:
 
 	/// Check whether the class is registered in the factory.
 	/// \param className Name of the class to check.
-	/// \return true if the factory has a constructor for this class
+	/// \return true if the factory has a constructor for this class.
 	bool isRegistered(const std::string& className) const;
 
 private:
@@ -64,7 +65,7 @@ private:
 	std::map<std::string, Constructor> m_constructors;
 
 	/// Threadsafety for registration
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 
 };
 
@@ -84,8 +85,9 @@ public:
 	/// Register a class with the factory.
 	/// \tparam T The specific type of the class to be registered.
 	/// \param className The name of this class.
+	/// \return true if the class was added, false if it already existed in the registry.
 	template <typename Derived>
-	void registerClass(const std::string& className);
+	bool registerClass(const std::string& className);
 
 	/// Create an instance of a class based on the specific class name.
 	/// \param className The class name.
@@ -106,12 +108,16 @@ private:
 	std::map<std::string, Constructor> m_constructors;
 
 	/// Threadsafety for registration
-	boost::mutex m_mutex;
+	mutable boost::mutex m_mutex;
 };
 
 };
 };
 
 #include "SurgSim/Framework/ObjectFactory-inl.h"
+
+#define SURGSIM_REGISTER(BaseClass, DerivedClass) \
+	static bool _surgsim_registered_##DerivedClass = BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass);
+
 
 #endif // SURGSIM_FRAMEWORK_OBJECTFACTORY_H

@@ -30,11 +30,13 @@ set(UNIT_TEST_SOURCES
 	LockedContainerTest.cpp
 	LoggerManagerTest.cpp
 	LoggerTest.cpp
+	MockObjects.cpp
 	ObjectFactoryTests.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
+	SerializationMockComponent.cpp
 	SharedInstanceTest.cpp
 	TimerTest.cpp
 	TransferPropertiesBehaviorTests.cpp
@@ -42,6 +44,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
+	SerializationMockComponent.h
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

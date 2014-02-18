@@ -101,7 +101,7 @@ public:
 
 	/// Encode this Accessible to a YAML::Node
 	/// \return The encoded version of this instance.
-	YAML::Node encode();
+	YAML::Node encode() const;
 
 	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
 	/// be converted.
@@ -171,7 +171,8 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
 
 
-
+#define SURGSIM_CLASSNAME(ClassName) \
+	virtual std::string getClassName() const {return #ClassName;}
 
 }; // Framework
 }; // SurgSim

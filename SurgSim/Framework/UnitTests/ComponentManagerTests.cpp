@@ -28,10 +28,6 @@
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;
 
-
-
-
-
 namespace SurgSim
 {
 namespace Framework
