@@ -40,18 +40,31 @@ const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>&
 	return m_contacts[collisionRepresentation->getName()];
 }
 
-const std::deque<std::weak_ptr<SurgSim::Collision::Representation>>& Representation::getColliders()
+const std::deque<std::shared_ptr<SurgSim::Collision::Representation>>& Representation::getColliders()
 {
 	return m_colliders;
 }
 
-bool Representation::hasContacts() const
+void Representation::addCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
+								  std::shared_ptr<SurgSim::Collision::Contact> contact)
 {
-	return !m_contacts.empty();
+	auto result = std::find(std::begin(m_colliders), std::end(m_colliders), collisionRepresentation);
+	if(result != std::end(m_colliders))
+	{
+		m_colliders.push_back(collisionRepresentation);
+	}
+
+	m_contacts[collisionRepresentation->getName()].push_back(contact);
 }
 
-void Representation::reset()
+bool Representation::hasContacts() const
 {
+	return !m_colliders.empty() && !m_contacts.empty();
+}
+
+void Representation::clearCollisions()
+{
+	m_colliders.clear();
 	m_contacts.clear();
 }
 

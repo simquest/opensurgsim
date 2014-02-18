@@ -71,18 +71,25 @@ public:
 		getContacts(std::shared_ptr<SurgSim::Collision::Representation>);
 
 	/// Get the collision representations which are colliding with this collision representation.
-	const std::deque<std::weak_ptr<SurgSim::Collision::Representation>>& getColliders();
+	const std::deque<std::shared_ptr<SurgSim::Collision::Representation>>& getColliders();
+
+	/// Add the collision information to this collision representation
+	/// \param collisionRepresentation The collision representation with which this representation is colliding
+	/// \param contact The contact point.
+	void addCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
+					  std::shared_ptr<SurgSim::Collision::Contact> contact);
 
 	/// Check if this collision representation has collisions.
 	/// \return True if there is a collision; otherwise false.
 	bool hasContacts() const;
 
 	/// Empty the contact list.
-	void reset();
+	void clearCollisions();
 
 protected:
 	/// A list (implemented as std::deque) of SurgSim::Collision::Representations colliding with this.
-	std::deque<std::weak_ptr<SurgSim::Collision::Representation>> m_colliders;
+	std::deque<std::shared_ptr<SurgSim::Collision::Representation>> m_colliders;
+
 	/// Contacts associated with each collision.
 	std::unordered_map<std::string, std::deque<std::shared_ptr<SurgSim::Collision::Contact>>> m_contacts;
 };
