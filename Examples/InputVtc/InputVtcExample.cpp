@@ -131,8 +131,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 }
 
 
-std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& toolDeviceName,
-										bool deviceHasOutput)
+std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& toolDeviceName)
 {
 	// ***Physics Components***
 	RigidRepresentationParameters params;
@@ -191,11 +190,8 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	inputComponent->setDeviceName(toolDeviceName);
 
 	std::shared_ptr<SurgSim::Input::OutputComponent> outputComponent = nullptr;
-	if (deviceHasOutput)
-	{
-		outputComponent = std::make_shared<SurgSim::Input::OutputComponent>("output component");
-		outputComponent->setDeviceName(toolDeviceName);
-	}
+	outputComponent = std::make_shared<SurgSim::Input::OutputComponent>("output component");
+	outputComponent->setDeviceName(toolDeviceName);
 
 	std::shared_ptr<TransferInputPoseBehavior> transferInputPose =
 		std::make_shared<TransferInputPoseBehavior>("Input to RawInputGraphics");
@@ -242,10 +238,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	boxElement->addComponent(rawInputGraphicsRepresentation);
 	boxElement->addComponent(transferPose);
 	boxElement->addComponent(inputComponent);
-	if (outputComponent)
-	{
-		boxElement->addComponent(outputComponent);
-	}
+	boxElement->addComponent(outputComponent);
 	boxElement->addComponent(transferInputPose);
 	boxElement->addComponent(inputCoupler);
 
@@ -262,8 +255,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
 
 	DeviceFactory deviceFactory;
-	bool deviceHasOutput = false;
-	inputManager->addDevice(deviceFactory.getDevice(toolDeviceName, &deviceHasOutput));
+	inputManager->addDevice(deviceFactory.getDevice(toolDeviceName));
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);
@@ -272,7 +264,7 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
-	scene->addSceneElement(createBox("box", toolDeviceName, deviceHasOutput));
+	scene->addSceneElement(createBox("box", toolDeviceName));
 	scene->addSceneElement(createPlane("plane",
 		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));

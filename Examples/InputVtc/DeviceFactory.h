@@ -34,14 +34,12 @@ public:
 	/// This class will try to create a NovintDevice.  If the NovintDevice library is not available, or the device does
 	/// not initialize, the class tries to use a MultiAxisDevice.  If that fails, it uses an IdentityPoseDevice.
 	/// \param name The name passed to the device.
-	/// \param[out] gotAnOutput true if the return value is an output device, so it should be sent forces/torques.
 	/// \return A shared pointer to an instance of a subclass of DeviceInterface.
-	std::shared_ptr<SurgSim::Input::DeviceInterface> getDevice(const std::string& name, bool* gotAnOutput);
+	std::shared_ptr<SurgSim::Input::DeviceInterface> getDevice(const std::string& name);
 
 private:
 	/// The device instance (which should finalize itself upon destruction).
 	std::shared_ptr<SurgSim::Input::DeviceInterface> m_device;
-	bool m_deviceIsAnOutput;
 };
 
 

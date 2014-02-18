@@ -29,24 +29,21 @@
 using SurgSim::Framework::Logger;
 
 
-DeviceFactory::DeviceFactory() : m_device(nullptr), m_deviceIsAnOutput(false)
+DeviceFactory::DeviceFactory() : m_device(nullptr)
 {
 }
 DeviceFactory::~DeviceFactory()
 {
 }
 
-std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const std::string& name, bool* gotAnOutput)
+std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const std::string& name)
 {
 	if (m_device != nullptr)
 	{
-		*gotAnOutput = m_deviceIsAnOutput;
 		return m_device;
 	}
 
 	std::shared_ptr<Logger> logger = Logger::getDefaultLogger();
-	m_deviceIsAnOutput = false;
-	*gotAnOutput = m_deviceIsAnOutput;
 
 	// First check for a Falcon.  Did we build NovintDevice, and will the device initialize?
 #ifdef NOVINT_LIBRARY_AVAILABLE
@@ -58,8 +55,6 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 	if (novintDevice->initialize())
 	{
 		m_device = novintDevice;
-		m_deviceIsAnOutput = true;
-		*gotAnOutput = m_deviceIsAnOutput;
 		return m_device;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the NovintDevice.";
