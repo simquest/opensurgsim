@@ -38,7 +38,7 @@ DeviceFactory::~DeviceFactory()
 
 std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const std::string& name, bool* gotAnOutput)
 {
-	if (m_device)
+	if (m_device != nullptr)
 	{
 		*gotAnOutput = m_deviceIsAnOutput;
 		return m_device;
