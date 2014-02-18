@@ -98,10 +98,12 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 		--firstEnd;
 		for (auto first = std::begin(representations); first != firstEnd; ++first)
 		{
+			(*first)->clearCollisions();
 			auto second = first;
 			++second;
 			for (; second != std::end(representations); ++second)
 			{
+				(*second)->clearCollisions();
 				std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>();
 				pair->setRepresentations(*first,*second);
 				pairs.push_back(pair);
