@@ -49,7 +49,7 @@ void Representation::addCollision(std::shared_ptr<SurgSim::Collision::Representa
 								  std::shared_ptr<SurgSim::Collision::Contact> contact)
 {
 	auto result = std::find(std::begin(m_colliders), std::end(m_colliders), collisionRepresentation);
-	// Check if the collisionRepresentation object has not been added into m_colliders list before. 
+	// Check if the collisionRepresentation object has not been added into m_colliders list before.
 	if(result == std::end(m_colliders))
 	{
 		m_colliders.push_back(collisionRepresentation);
