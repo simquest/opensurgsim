@@ -165,19 +165,6 @@ protected:
 	/// \param[out] m The mass matrix to store the result into
 	void computeMass(const DeformableRepresentationState& state, Eigen::Matrix<double, 12, 12, Eigen::DontAlign>* m);
 
-	/// Adds the element's force (computed for a given state) into a complete system force vector F (assembly)
-	///
-	/// This method relies on a given stiffness matrix and does not evaluate it from the state.
-	/// \param state The state to compute the force with
-	/// \param k The given element stiffness matrix
-	/// \param[in,out] F The complete system force vector to add the element force into
-	/// \param scale A factor to scale the added force with
-	/// \note The element force is of size (getNumDofPerNode() x getNumNodes()).
-	/// \note This method supposes that the incoming state contains information with the same number of dof per node as
-	/// getNumDofPerNode().
-	void addForce(const DeformableRepresentationState& state, const Eigen::Matrix<double, 12, 12>& k,
-				  SurgSim::Math::Vector* F, double scale = 1.0);
-
 	/// The element's rest state
 	Eigen::Matrix<double, 12, 1, Eigen::DontAlign> m_x0;
 

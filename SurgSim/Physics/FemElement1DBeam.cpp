@@ -103,8 +103,7 @@ void FemElement1DBeam::initialize(const DeformableRepresentationState& state)
 	computeStiffness(state, &m_K);
 }
 
-void FemElement1DBeam::addForce(const DeformableRepresentationState& state, const Eigen::Matrix<double, 12, 12>& k,
-								SurgSim::Math::Vector* F, double scale)
+void FemElement1DBeam::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
 {
 	Eigen::Matrix<double, 12, 1> x, f;
 
@@ -112,13 +111,8 @@ void FemElement1DBeam::addForce(const DeformableRepresentationState& state, cons
 	// K.(x - x0) = F_ext
 	// 0 = F_ext + F_int, with F_int = -K.(x - x0)
 	getSubVector(state.getPositions(), m_nodeIds, 6, &x);
-	f = (-scale) * k * (x - m_x0);
+	f = (-scale) * m_K * (x - m_x0);
 	addSubVector(f, m_nodeIds, 6, F);
-}
-
-void FemElement1DBeam::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
-{
-	addForce(state, m_K, F, scale);
 }
 
 void FemElement1DBeam::computeMass(const DeformableRepresentationState& state,
