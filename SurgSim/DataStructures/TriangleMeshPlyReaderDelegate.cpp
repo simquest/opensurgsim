@@ -102,7 +102,7 @@ void TriangleMeshPlyReaderDelegate::endVertices(const std::string& elementName)
 
 void* TriangleMeshPlyReaderDelegate::beginFaces(const std::string& elementName, size_t faceCount)
 {
-	m_faceData.overrun = 0;
+	m_faceData.overrun = 0l;
 	return &m_faceData;
 }
 

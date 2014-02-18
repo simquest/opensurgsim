@@ -15,7 +15,7 @@
 
 #include <algorithm>
 
-#include "SurgSim/Datastructures/PlyReader.h"
+#include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/ply.h"
 
@@ -70,7 +70,7 @@ PlyReader::~PlyReader()
 {
 	if (isValid())
 	{
-		for (int i=0; i<m_data->elementCount; ++i)
+		for (int i=0; i < m_data->elementCount; ++i)
 		{
 			free(m_data->elementNames[i]);
 		}
@@ -112,8 +112,6 @@ bool PlyReader::requestElement(std::string elementName,
 
 bool PlyReader::requestScalarProperty(std::string elementName, std::string propertyName, int dataType, int dataOffset)
 {
-	SURGSIM_ASSERT(isScalar(elementName, propertyName)) << "Trying to access a list property as a scalar." <<
-		"Element: " << elementName << " Property: " << propertyName;
 	return requestProperty(elementName, propertyName, dataType, dataOffset, 0, 0);
 }
 
@@ -122,8 +120,6 @@ bool PlyReader::requestListProperty(std::string elementName,
 									int dataType, int dataOffset,
 									int countType, int countOffset)
 {
-	SURGSIM_ASSERT(! isScalar(elementName, propertyName)) << "Trying to access a scalar property as a list." <<
-		"Element: " << elementName << " Property: " << propertyName;
 	return requestProperty(elementName, propertyName, dataType, dataOffset, countType, countOffset);
 }
 
@@ -133,14 +129,29 @@ bool PlyReader::requestProperty(std::string elementName,
 								int countType, int countOffset)
 {
 	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
-	SURGSIM_ASSERT(m_requestedElements.find(elementName) != m_requestedElements.end()) <<
-		"Cannot request Properties before the element has been added.";
-	SURGSIM_ASSERT(dataType < TYPE_COUNT && dataType > 0) << "Invalid type used.";
+
+	SURGSIM_ASSERT(hasElement(elementName)) <<
+		"The element <" << elementName << "> has not been requested yet, you cannot access properties for it";
+	SURGSIM_ASSERT(hasProperty(elementName, propertyName)) <<
+		"The requested property <" << propertyName << "> cannot be found in element <" << elementName << ">.";
+
+
 
 	bool result = false;
 
 	bool scalar = isScalar(elementName, propertyName);
+
 	bool wantScalar = (countType == 0);
+	if (wantScalar && !scalar)
+	{
+		SURGSIM_FAILURE() << "Trying to access a list property as a scalar." <<
+			"for element <" << elementName << "> and property <" << propertyName << ">.";
+	}
+	else if (!wantScalar && scalar)
+	{
+		SURGSIM_FAILURE() << "Trying to access a scalar property as a list." <<
+			"for element <" << elementName << "> and property <" << propertyName << ">.";
+	}
 
 	if (hasProperty(elementName, propertyName) && (scalar == wantScalar))
 	{
@@ -260,6 +271,8 @@ void PlyReader::parseFile()
 		{
 			// Inefficient way to skip an element, but there does not seem to be an
 			// easy way to ignore an element
+			// The data for other is stored internally in the plyFile data structure
+			// and should not be freed
 			PlyOtherElems* other = ply_get_other_element(m_data->plyFile, currentElementName, numberOfElements);
 
 		}
