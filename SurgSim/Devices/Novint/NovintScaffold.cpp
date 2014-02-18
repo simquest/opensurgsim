@@ -29,6 +29,7 @@
 #include "SurgSim/Devices/Novint/NovintDevice.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
@@ -43,6 +44,7 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Quaterniond;
 
 using SurgSim::Framework::Clock;
 
@@ -54,6 +56,17 @@ namespace SurgSim
 {
 namespace Device
 {
+
+
+	Vector3d computeRotationVector(const Matrix33d& t1, const Matrix33d& t2)
+	{
+		Quaterniond q1(t1);
+		Quaterniond q2(t2);
+		double angle;
+		Vector3d axis;
+		SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
+		return angle*axis;
+	}
 
 
 class NovintScaffold::Handle
@@ -730,18 +743,48 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
-	Vector3d force;
-	force.setZero();
-	outputData.vectors().get("force", &force);
-	info->forceValue = force;
+	Vector3d nominalForce = Vector3d::Zero();
+	outputData.vectors().get("force", &nominalForce);
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType forcePositionJacobian = Matrix33d::Zero();
+	outputData.matrices().get("forcePositionJacobian", &forcePositionJacobian);
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType forceLinearVelocityJacobian = Matrix33d::Zero();
+	outputData.matrices().get("forceLinearVelocityJacobian", &forceLinearVelocityJacobian);
 
-	Vector3d torqueInNewtonMeters;
-	torqueInNewtonMeters.setZero();
-	outputData.vectors().get("torque", &torqueInNewtonMeters);
+	Vector3d position = info->positionValue * info->positionScale;
+	Vector3d velocity = Vector3d::Zero();
 
-	// Set the torque command if applicable (and convert newton-meters to command counts).
+	Vector3d positionForNominalForce = position;
+	outputData.vectors().get("inputPosition", &positionForNominalForce);
+	Vector3d velocityForNominalForce = velocity;
+	outputData.vectors().get("inputLinearVelocity", &velocityForNominalForce);
+	// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData
+
+	info->forceValue = nominalForce +
+		forcePositionJacobian * (position - positionForNominalForce) +
+		forceLinearVelocityJacobian * (velocity - velocityForNominalForce);
+
+	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
 	{
+		Vector3d nominalTorque = Vector3d::Zero();
+		outputData.vectors().get("torque", &nominalTorque);
+		SurgSim::DataStructures::DataGroup::DynamicMatrixType torqueAngleJacobian = Matrix33d::Zero();
+		outputData.matrices().get("torqueAngleJacobian", &torqueAngleJacobian);
+		SurgSim::DataStructures::DataGroup::DynamicMatrixType torqueAngularVelocityJacobian = Matrix33d::Zero();
+		outputData.matrices().get("torqueAngularVelocityJacobian", &torqueAngularVelocityJacobian);
+
+		Matrix33d orientation = info->transformValue.block<3,3>(0,0);
+		Vector3d angularVelocity = Vector3d::Zero();
+
+		SurgSim::DataStructures::DataGroup::DynamicMatrixType orientationForNominalTorque = orientation;
+		outputData.matrices().get("inputOrientation", &orientationForNominalTorque);
+		Vector3d angularVelocityForNominalTorque = angularVelocity;
+		outputData.vectors().get("inputAngularVelocity", &angularVelocityForNominalTorque);
+
+		Vector3d totalTorque = nominalTorque +
+			torqueAngleJacobian * computeRotationVector(orientation, orientationForNominalTorque) +
+			torqueAngularVelocityJacobian * (angularVelocity - angularVelocityForNominalTorque);
+
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
 		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
@@ -808,7 +851,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
 			decompositionMatrix.row(1) *= ratio;
 		}
-		Vector3d axisTorqueVector = decompositionMatrix * torqueInNewtonMeters;
+		Vector3d axisTorqueVector = decompositionMatrix * totalTorque;
 
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
