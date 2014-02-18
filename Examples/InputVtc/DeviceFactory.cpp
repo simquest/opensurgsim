@@ -54,7 +54,6 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 	std::shared_ptr<SurgSim::Device::NovintDevice> novintDevice =
 		std::make_shared<SurgSim::Device::NovintDevice>(name, "");
 	novintDevice->setPositionScale(novintDevice->getPositionScale() * 10.0);
-	novintDevice->setOrientationScale(novintDevice->getOrientationScale() * 0.0);
 
 	if (novintDevice->initialize())
 	{
