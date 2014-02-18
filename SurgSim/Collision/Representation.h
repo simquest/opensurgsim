@@ -67,7 +67,7 @@ public:
 	/// Given a collision representation, return the contact information between it and this collision representation,
 	/// if any.
 	/// \return A std::deque containing contact informatoin.
-	const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>& 
+	const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>&
 		getContacts(std::shared_ptr<SurgSim::Collision::Representation>);
 
 	/// Get the collision representations which are colliding with this collision representation.

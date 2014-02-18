@@ -29,7 +29,7 @@ public:
 	MOCK_METHOD0(getInitialPose, const SurgSim::Math::RigidTransform3d& ());
 	MOCK_METHOD0(setPose, void());
 	MOCK_METHOD0(getPose, const SurgSim::Math::RigidTransform3d& ());
-	
+
 	MOCK_METHOD0(getShapeType, int());
 	MOCK_METHOD0(getShape, const std::shared_ptr<SurgSim::Math::Shape>());
 	MOCK_METHOD0(getPhysicsRepresentation, std::shared_ptr<SurgSim::Physics::Representation>());
@@ -44,4 +44,4 @@ TEST(CollisionRepresentationTest, Calls) {
 	//Painter painter(&turtle);                   // #4
 
 	//EXPECT_TRUE(painter.DrawCircle(0, 0, 10));
-}    
+}

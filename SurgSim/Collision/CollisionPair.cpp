@@ -81,17 +81,17 @@ void CollisionPair::addContact(const double& depth,
 							   const SurgSim::Math::Vector3d& normal,
 							   const std::pair<Location, Location>& penetrationPoints)
 {
-	std::shared_ptr<SurgSim::Collision::Contact> contact = 
+	std::shared_ptr<SurgSim::Collision::Contact> contact =
 		std::make_shared<Contact>(depth, contactPoint, normal, penetrationPoints);
-	addContact(contact);	
+	addContact(contact);
 }
 
 void CollisionPair::addContact(const double& depth,
 							   const SurgSim::Math::Vector3d& normal,
 							   const std::pair<Location, Location>& penetrationPoints)
 {
-	std::shared_ptr<SurgSim::Collision::Contact> contact = 
-		std::make_shared<Contact>(depth, SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints); 
+	std::shared_ptr<SurgSim::Collision::Contact> contact =
+		std::make_shared<Contact>(depth, SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints);
 	addContact(contact);
 }
 
