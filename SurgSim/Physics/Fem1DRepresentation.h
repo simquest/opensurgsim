@@ -17,6 +17,7 @@
 #define SURGSIM_PHYSICS_FEM1DREPRESENTATION_H
 
 #include <memory>
+#include <string>
 
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Physics/FemRepresentation.h"

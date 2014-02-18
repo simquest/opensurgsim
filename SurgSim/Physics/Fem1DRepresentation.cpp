@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Physics/Fem1DRepresentation.h"
-
 #include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Physics/Fem1DRepresentation.h"
 
 namespace
 {

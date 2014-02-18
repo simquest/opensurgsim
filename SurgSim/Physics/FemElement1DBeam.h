@@ -56,6 +56,7 @@ public:
 
 	/// Gets the element's volume based on the input state
 	/// \param state The deformable state to compute the volume with
+	/// \return The element's volume
 	virtual double getVolume(const DeformableRepresentationState& state) const override;
 
 	/// Gets whether shearing is enabled for the element
@@ -64,7 +65,7 @@ public:
 
 	/// Enables or disables shearing for the element
 	///
-	/// Shearing can only be meaningfully enabled or disabled before the element has had ::initialize called.
+	/// Shearing can only be meaningfully enabled or disabled before the element has had initialize called.
 	/// \param enabled Boolean determining whether shearing is enabled
 	void setShearingEnabled(bool enabled);
 

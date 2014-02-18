@@ -135,7 +135,7 @@ public:
 		// Beam is made of node 3 and 1 in a bigger system containing m_numberNodes nodes (at least 4)
 		m_nodeIds[0] = 3;
 		m_nodeIds[1] = 1;
-		
+
 		m_restState.setNumDof(6, m_numberNodes);
 
 		m_orientation.coeffs().setRandom();
@@ -392,13 +392,6 @@ TEST_F(FemElement1DBeamTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
 		{ MockFemElement1D beam(m_nodeIds, m_restState); });
-	ASSERT_NO_THROW(
-		{
-			MockFemElement1D* beam = new MockFemElement1D(m_nodeIds, m_restState);
-			delete beam;
-		});
-	ASSERT_NO_THROW(
-		{ std::shared_ptr<MockFemElement1D> beam = std::make_shared<MockFemElement1D>(m_nodeIds, m_restState); });
 }
 
 TEST_F(FemElement1DBeamTests, NodeIdsTest)

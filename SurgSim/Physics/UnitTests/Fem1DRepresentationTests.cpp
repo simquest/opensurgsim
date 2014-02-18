@@ -70,9 +70,10 @@ public:
 			state->getPositions().segment<3>(6 * nodeId) = extremities[0] + nodeId * delta;
 		}
 
-		for (unsigned int& boundaryCondition : boundaryConditions) // NOLINT
+		for (auto boundaryCondition = std::begin(boundaryConditions); boundaryCondition != std::end(boundaryConditions);
+			 ++boundaryCondition)
 		{
-			state->addBoundaryCondition(boundaryCondition);
+			state->addBoundaryCondition(*boundaryCondition);
 		}
 
 		std::array<unsigned int, 2> nodeEnds;
@@ -118,7 +119,7 @@ public:
 	bool shearingEnabled;
 	bool initializeElements;
 };
-	
+
 class Fem1DRepresentationTests : public ::testing::Test
 {
 public:
@@ -227,13 +228,6 @@ TEST_F(Fem1DRepresentationTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
 		{ Fem1DRepresentation("name"); });
-	ASSERT_NO_THROW(
-		{
-			Fem1DRepresentation* fem = new Fem1DRepresentation("name");
-			delete fem;
-		});
-	ASSERT_NO_THROW(
-		{ std::shared_ptr<Fem1DRepresentation> fem = std::make_shared<Fem1DRepresentation>("name"); });
 }
 
 TEST_F(Fem1DRepresentationTests, GetTypeTest)
@@ -297,16 +291,6 @@ TEST_F(Fem1DRepresentationTests, AfterUpdateTest)
 	EXPECT_TRUE(*m_fem->getCurrentState() == *m_fem->getFinalState());
 }
 
-TEST_F(Fem1DRepresentationTests, ApplyDofCorrectionTest)
-{
-	// Not implemented
-}
-
-TEST_F(Fem1DRepresentationTests, ComputesTest)
-{
-	// Not implemented
-}
-
 // Beam tests
 TEST_F(Fem1DRepresentationTests, CantileverEndLoadedTest)
 {
@@ -316,7 +300,7 @@ TEST_F(Fem1DRepresentationTests, CantileverEndLoadedTest)
 	m_fem1DBuilder.nodesPerDimension[0] = nodesPerDim;
 	m_fem1DBuilder.addBoundaryCondition(0, 6);
 	std::shared_ptr<Fem1DRepresentation> fem = m_fem1DBuilder.build("CantileverEndLoadedTest");
-	
+
 	// For last node, apply load to y-direction and calculate deflection
 	double load = 0.7;
 	unsigned int applyIndex = (nodesPerDim - 1) * 6 + 1;
