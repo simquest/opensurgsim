@@ -43,7 +43,7 @@ Vector3d computeRotationVector(const RigidTransform3d& t1, const RigidTransform3
 	double angle;
 	Vector3d axis;
 	SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-	return angle*axis;
+	return angle * axis;
 }
 
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
@@ -121,10 +121,10 @@ void VirtualToolCoupler::update(double dt)
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
-		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3,
-			linearDampingMatrix = m_linearDamping * identity3x3,
-			angularStiffnessMatrix = m_angularStiffness * identity3x3,
-			angularDampingMatrix = m_angularDamping * identity3x3;
+		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
+		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
+		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
+		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
 		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
 		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
 
