@@ -77,24 +77,29 @@ bool CollisionPair::hasContacts() const
 }
 
 void CollisionPair::addContact(const double& depth,
-					   const SurgSim::Math::Vector3d& contactPoint,
-					   const SurgSim::Math::Vector3d& normal,
-					   const std::pair<Location, Location>& penetrationPoints)
+							   const SurgSim::Math::Vector3d& contactPoint,
+							   const SurgSim::Math::Vector3d& normal,
+							   const std::pair<Location, Location>& penetrationPoints)
 {
-	m_contacts.push_back(std::make_shared<Contact>(depth,contactPoint,normal,penetrationPoints));
+	std::shared_ptr<SurgSim::Collision::Contact> contact = 
+		std::make_shared<Contact>(depth, contactPoint, normal, penetrationPoints);
+	addContact(contact);	
 }
 
 void CollisionPair::addContact(const double& depth,
-					   const SurgSim::Math::Vector3d& normal,
-					   const std::pair<Location, Location>& penetrationPoints)
+							   const SurgSim::Math::Vector3d& normal,
+							   const std::pair<Location, Location>& penetrationPoints)
 {
-	m_contacts.push_back(
-		std::make_shared<Contact>(depth,SurgSim::Math::Vector3d(0.0,0.0,0.0),normal, penetrationPoints));
+	std::shared_ptr<SurgSim::Collision::Contact> contact = 
+		std::make_shared<Contact>(depth, SurgSim::Math::Vector3d::Zero(), normal, penetrationPoints); 
+	addContact(contact);
 }
 
 void CollisionPair::addContact(const std::shared_ptr<Contact>& contact)
 {
 	m_contacts.push_back(contact);
+	m_representations.first->addCollision(m_representations.second, contact);
+	m_representations.second->addCollision(m_representations.first, contact);
 }
 
 const std::list<std::shared_ptr<Contact>>& CollisionPair::getContacts() const
