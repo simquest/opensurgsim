@@ -105,6 +105,14 @@ private:
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
 
+	/// Calculates forces and torques, and sends them to the device library.
+	/// \param info The device data.
+	void calculateForceAndTorque(DeviceData* info);
+
+	/// Sets the input DataGroup, which will be pushed to the InputComponent
+	/// \param info The device data
+	void setInputData(DeviceData* info);
+
 	/// Initializes the OpenHaptics SDK.
 	/// \return true on success.
 	bool initializeSdk();

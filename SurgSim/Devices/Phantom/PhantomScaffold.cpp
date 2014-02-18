@@ -217,10 +217,12 @@ struct PhantomScaffold::DeviceData
 		initializationName(apiName),
 		deviceObject(device),
 		positionValue(positionBuffer),
+		linearVelocityValue(linearVelocityBuffer),
 		transformValue(transformBuffer),
 		forceValue(forceBuffer)
 	{
 		positionValue.setZero();   // also clears positionBuffer
+		linearVelocityValue.setZero();   // also clears linearVelocityBuffer
 		transformValue.setIdentity();   // also sets transformBuffer
 		buttonsBuffer = 0;
 
@@ -237,6 +239,8 @@ struct PhantomScaffold::DeviceData
 
 	/// The raw position read from the device.
 	double positionBuffer[3];
+	/// The raw velocity read from the device.
+	double velocityBuffer[3];
 	/// The raw pose transform read from the device.
 	double transformBuffer[16];
 	/// The raw button state read from the device.
@@ -247,6 +251,8 @@ struct PhantomScaffold::DeviceData
 
 	/// The position value from the device, permanently connected to positionBuffer.
 	Eigen::Map<Vector3d> positionValue;
+	/// The velocity value from the device, permanently connected to linearVelocityBuffer.
+	Eigen::Map<Vector3d> linearVelocityValue;
 	/// The pose transform value from the device, permanently connected to transformBuffer.
 	Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::ColMajor>> transformValue;
 
@@ -488,47 +494,66 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 
 	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
-	// TODO(bert): this code should cache the access indices.
-
-	SurgSim::Math::Vector3d force;
-	if (outputData.vectors().get("force", &force))
-	{
-		info->forceValue = force;
-	}
-	else
-	{
-		info->forceValue.setZero();
-	}
-
 	hdBeginFrame(info->deviceHandle.get());
 
 	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
 	hdGetDoublev(HD_CURRENT_POSITION, info->positionBuffer);
+	hdGetDoublev(HD_CURRENT_VELOCITY, info->velocityBuffer);
 	hdGetDoublev(HD_CURRENT_TRANSFORM, info->transformBuffer);
 	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsBuffer));
 
+	calculateForceAndTorque(info);
+
 	// Set the force command (in newtons).
 	hdSetDoublev(HD_CURRENT_FORCE, info->forceBuffer);
-	//hdSetDoublev(HD_CURRENT_TORQUE, info->torqueBuffer);
 
 	hdEndFrame(info->deviceHandle.get());
 
+	setInputData(info);
+
 	bool fatalError = checkForFatalError("Error in device update");
 
-	{
-		RigidTransform3d pose;
-		pose.linear() = info->transformValue.block<3,3>(0,0);
-		pose.translation() = info->positionValue * 0.001;  // convert from millimeters to meters!
-
-		SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-		inputData.poses().set("pose", pose);
-		inputData.booleans().set("button1", (info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
-		inputData.booleans().set("button2", (info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
-		inputData.booleans().set("button3", (info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
-		inputData.booleans().set("button4", (info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
-	}
-
 	return !fatalError;
+}
+
+
+void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
+{
+	Vector3d nominalForce = Vector3d::Zero();
+	outputData.vectors().get("force", &nominalForce);
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType forcePositionJacobian = Matrix33d::Zero();
+	outputData.matrices().get("forcePositionJacobian", &forcePositionJacobian);
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType forceLinearVelocityJacobian = Matrix33d::Zero();
+	outputData.matrices().get("forceLinearVelocityJacobian", &forceLinearVelocityJacobian);
+
+	Vector3d position = info->positionValue * info->positionScale;
+	Vector3d linearVelocity = info->linearVelocityValue * info->positionScale;
+
+	Vector3d positionForNominalForce = position;
+	outputData.vectors().get("inputPosition", &positionForNominalForce);
+	Vector3d linearVelocityForNominalForce = velocity;
+	outputData.vectors().get("inputLinearVelocity", &linearVelocityForNominalForce);
+
+	info->forceValue = nominalForce +
+		forcePositionJacobian * (position - positionForNominalForce) +
+		forceLinearVelocityJacobian * (linearVelocity - linearVelocityForNominalForce);
+}
+
+
+void PhantomScaffold::setInputData(DeviceData* info)
+{
+	RigidTransform3d pose;
+	pose.linear() = info->transformValue.block<3,3>(0,0);
+	pose.translation() = info->positionValue * 0.001;  // convert from millimeters to meters!
+
+	// TODO(bert): this code should cache the access indices.
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	inputData.poses().set("pose", pose);
+	inputData.vectors().set("linearVelocity", info->linearVelocityValue);
+	inputData.booleans().set("button1", (info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
+	inputData.booleans().set("button2", (info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
+	inputData.booleans().set("button3", (info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
+	inputData.booleans().set("button4", (info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
 }
 
 
@@ -659,6 +684,7 @@ SurgSim::DataStructures::DataGroup PhantomScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
 	builder.addPose("pose");
+	builder.addVector("linearVelocity");
 	builder.addBoolean("button1");
 	builder.addBoolean("button2");
 	builder.addBoolean("button3");
