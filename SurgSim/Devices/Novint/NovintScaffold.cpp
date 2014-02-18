@@ -250,20 +250,15 @@ struct NovintScaffold::DeviceData
 		eulerAngleOffsetPitch(0.0),
 		forwardPointingPoseThreshold(0.9),
 		torqueScale(Vector3d::Constant(1.0)),
-		positionValue(positionBuffer),
-		transformValue(transformBuffer),
-		forceValue(forceBuffer),
-		torqueValue(torqueBuffer),
 		positionScale(device->getPositionScale()),
-		orientationScale(device->getOrientationScale())
+		orientationScale(device->getOrientationScale()),
+		positionValue(Vector3d::Zero()),
+		jointAngles(Vector3d::Zero()),
+		forceValue(Vector3d::Zero()),
+		torqueValue(Vector4d::Zero())
 	{
-		positionValue.setZero();   // also clears positionBuffer
-		transformValue.setIdentity();   // also sets transformBuffer
-		jointAngles.setZero();
+		transformValue.setIdentity();
 		buttonStates.fill(false);
-
-		forceValue.setZero();   // also clears forceBuffer
-		torqueValue.setZero();  // also clears torqueBuffer
 	}
 
 
@@ -284,10 +279,6 @@ struct NovintScaffold::DeviceData
 	/// Time of the initialization of the handle.
 	Clock::time_point initializationTime;
 
-	/// The raw position read from the device.
-	double positionBuffer[3];
-	/// The raw pose transform read from the device.
-	double transformBuffer[16];
 	/// The joint angles for the device orientation.
 	Vector3d jointAngles;
 	/// The button state read from the device.
@@ -316,20 +307,15 @@ struct NovintScaffold::DeviceData
 	/// The scaling factors for the torque axes.
 	Vector3d torqueScale;
 
-	/// The raw force to be written to the device.
-	double forceBuffer[3];
-	/// Torque command counts for each motor axis (including the jaw).
-	double torqueBuffer[4];
+	/// The position value from the device.
+	Vector3d positionValue;
+	/// The pose transform value from the device.
+	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transformValue;
 
-	/// The position value from the device, permanently connected to positionBuffer.
-	Eigen::Map<Vector3d> positionValue;
-	/// The pose transform value from the device, permanently connected to transformBuffer.
-	Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::ColMajor>> transformValue;
-
-	/// The force value to be written to the device, permanently connected to forceBuffer.
-	Eigen::Map<Vector3d> forceValue;
-	/// The torque value to be written to the device, permanently connected to torqueBuffer.
-	Eigen::Map<Vector4d> torqueValue;
+	/// The force value to be written to the device.
+	Vector3d forceValue;
+	/// The torque value to be written to the device.
+	Vector4d torqueValue;
 
 	/// Scale factor for the position axes.
 	double positionScale;
@@ -626,9 +612,9 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 
 	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
 
-	hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->positionBuffer);
+	hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->positionValue.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributev(HDL_GRIP_POSITION)");
-	hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, info->transformBuffer);
+	hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, info->transformValue.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ORIENTATION)");
 
 	info->buttonStates.fill(false);
@@ -679,13 +665,13 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	}
 
 	// Set the force command (in newtons).
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceValue.data());  // 2nd arg is index; output force is always "vector #0"
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
 	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
 	// anywhere at the moment.
 	// The 2nd arg to this call is the count; we're setting 4 doubles.
-	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torqueBuffer);
+	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torqueValue.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 
 	setInputData(info);
