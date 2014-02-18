@@ -133,7 +133,7 @@ void VirtualToolCoupler::update(double dt)
 			m_outputData.vectors().set("force", -force * m_outputForceScaling);
 			m_outputData.matrices().set("forcePositionJacobian", -linearStiffnessMatrix * m_outputForceScaling);
 			m_outputData.vectors().set("inputPosition", inputPose.translation());
-			m_outputData.matrices().set("forceVelocityJacobian", -linearDampingMatrix * m_outputForceScaling);
+			m_outputData.matrices().set("forceLinearVelocityJacobian", -linearDampingMatrix * m_outputForceScaling);
 			m_outputData.vectors().set("inputLinearVelocity", inputLinearVelocity);
 			m_outputData.vectors().set("torque", -force * m_outputForceScaling);
 			m_outputData.matrices().set("torqueAngleJacobian", -angularStiffnessMatrix * m_outputForceScaling);
