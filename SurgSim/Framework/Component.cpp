@@ -17,15 +17,17 @@
 
 #include <boost/uuid/random_generator.hpp>
 
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Framework
 {
 
 // Forward References
-class SceneElement;
-class Scene;
 class Runtime;
+class Scene;
+class SceneElement;
 
 Component::Component(const std::string& name) :
 	m_name(name),
