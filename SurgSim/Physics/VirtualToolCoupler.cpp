@@ -128,7 +128,7 @@ void VirtualToolCoupler::update(double dt)
 		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
 		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
 
-		if (m_output)
+		if (m_output != nullptr)
 		{
 			m_outputData.vectors().set("force", -force * m_outputForceScaling);
 			m_outputData.matrices().set("forcePositionJacobian", -linearStiffnessMatrix * m_outputForceScaling);
