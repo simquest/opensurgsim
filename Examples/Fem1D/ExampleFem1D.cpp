@@ -52,34 +52,30 @@ using SurgSim::Physics::PhysicsManager;
 namespace
 {
 
-// Boundary conditions (node indices)
-const unsigned int numBoundaryConditionsNodeIds = 2;
-const std::array<unsigned int, numBoundaryConditionsNodeIds> boundaryConditionsNodeIds = {{0, 9}};
-
-void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation)
+void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, unsigned int numNodes)
 {
 	auto restState = std::make_shared<DeformableRepresentationState>();
-	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), 10);
+	restState->setNumDof(physicsRepresentation->getNumDofPerNode(), numNodes);
 
 	// Sets the initial state (node positions and boundary conditions)
 	SurgSim::Math::Vector& x = restState->getPositions();
-	for (int nodeId = 0; nodeId < 10; nodeId++)
+	for (unsigned int nodeId = 0; nodeId < numNodes; nodeId++)
 	{
-		SurgSim::Math::getSubVector(x, nodeId, physicsRepresentation->getNumDofPerNode()).segment(0, 3)
-			= Vector3d(static_cast<double>(nodeId) / 10.0, 0.0, 0.0);
+		SurgSim::Math::getSubVector(x, nodeId, physicsRepresentation->getNumDofPerNode()).segment<3>(0)
+			= Vector3d(static_cast<double>(nodeId) / static_cast<double>(numNodes), 0.0, 0.0);
 	}
 
-	for (const unsigned int& boundaryConditionNode : boundaryConditionsNodeIds) // NOLINT
-	{
-		restState->addBoundaryCondition(boundaryConditionNode * physicsRepresentation->getNumDofPerNode() + 0);
-		restState->addBoundaryCondition(boundaryConditionNode * physicsRepresentation->getNumDofPerNode() + 1);
-		restState->addBoundaryCondition(boundaryConditionNode * physicsRepresentation->getNumDofPerNode() + 2);
-	}
+	restState->addBoundaryCondition(0 + 0);
+	restState->addBoundaryCondition(0 + 1);
+	restState->addBoundaryCondition(0 + 2);
+	restState->addBoundaryCondition((numNodes - 1) * physicsRepresentation->getNumDofPerNode() + 0);
+	restState->addBoundaryCondition((numNodes - 1) * physicsRepresentation->getNumDofPerNode() + 1);
+	restState->addBoundaryCondition((numNodes - 1) * physicsRepresentation->getNumDofPerNode() + 2);
 
 	physicsRepresentation->setInitialState(restState);
 
 	// Adds all the FemElements
-	for (unsigned int beamId = 0; beamId < 9; beamId++)
+	for (unsigned int beamId = 0; beamId < numNodes - 1; beamId++)
 	{
 		std::array<unsigned int, 2> beamNodeIds = {{beamId, beamId + 1}};
 		auto beam = std::make_shared<FemElement1DBeam>(beamNodeIds, *restState);
@@ -110,7 +106,7 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 	auto physicsRepresentation = std::make_shared<Fem1DRepresentation>(name + " Physics");
 
 	// In this example, the physics representations are not transformed, only the graphics will be transformed
-	loadModelFem1D(physicsRepresentation);
+	loadModelFem1D(physicsRepresentation, 10);
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(5e-2);
