@@ -99,6 +99,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 	return viewElement;
 }
 
+// Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
+// by loadModelFem1D.  The gfxPoses parameter can be used to create multiple identical fems with different intial
+// locations.
 std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 										  const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
 										  SurgSim::Math::Vector4d color,
@@ -118,11 +121,12 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 	femSceneElement->addComponent(physicsRepresentation);
 
 	unsigned int gfxObjectId = 0;
+	std::stringstream ss;
 	for (std::vector<SurgSim::Math::RigidTransform3d>::const_iterator gfxPose = gfxPoses.begin();
 		 gfxPose != gfxPoses.end(); ++gfxPose)
 	{
-		std::stringstream ss;
-		ss << name + " Graphics object " << gfxObjectId;
+		ss.clear();
+		ss << name << " Graphics object " << gfxObjectId;
 
 		std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
 			= std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
@@ -168,31 +172,27 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Graphics::OsgCamera> camera = graphicsManager->getDefaultCamera();
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
-	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
+	const SurgSim::Math::Quaterniond quaternionIdentity = SurgSim::Math::Quaterniond::Identity();
 	SurgSim::Math::Vector3d translate(0, 0, -3);
-	SurgSim::Math::IntegrationScheme integrationScheme = SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER;
-	{
-		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
 
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, 0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d( 3.0, 0.5, 0.0)));
-		scene->addSceneElement(createFem1D("Euler Explicit", gfxPoses, Vector4d(1, 0, 0, 1), integrationScheme));
+	std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
+	gfxPoses.push_back(makeRigidTransform(quaternionIdentity, translate + Vector3d(-3.5, 0.5, 0.0)));
+	scene->addSceneElement(
+		createFem1D("Euler Explicit", gfxPoses, Vector4d(1, 0, 0, 1), SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
-		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, 0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d( 3.0, 0.5, 0.0)));
-		scene->addSceneElement(
-			createFem1D("Modified Euler Explicit", gfxPoses, Vector4d(0, 1, 0, 1), integrationScheme));
+	gfxPoses.clear();
+	gfxPoses.push_back(makeRigidTransform(quaternionIdentity, translate + Vector3d(-0.5, 0.5, 0.0)));
+	scene->addSceneElement(createFem1D("Modified Euler Explicit", gfxPoses, Vector4d(0, 1, 0, 1),
+									   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
-		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d( 1.0, 0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d( 3.0, 0.5, 0.0)));
-		scene->addSceneElement(createFem1D("Euler Implicit", gfxPoses, Vector4d(0, 0, 1, 1), integrationScheme));
-	}
+	gfxPoses.clear();
+	gfxPoses.push_back(makeRigidTransform(quaternionIdentity, translate + Vector3d(2.5, 0.5, 0.0)));
+	scene->addSceneElement(
+		createFem1D("Euler Implicit", gfxPoses, Vector4d(0, 0, 1, 1), SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
-	camera->setInitialPose(SurgSim::Math::makeRigidTransform(qIdentity, Vector3d(0.0, 0.5, 5.0)));
+	camera->setInitialPose(SurgSim::Math::makeRigidTransform(quaternionIdentity, Vector3d(0.0, 0.5, 5.0)));
 
 	runtime->execute();
 
