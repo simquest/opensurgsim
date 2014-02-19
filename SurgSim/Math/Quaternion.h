@@ -114,6 +114,45 @@ inline T computeAngle(const Eigen::Quaternion<T, QOpt>& quaternion)
 	}
 }
 
+/// Get the vector corresponding to the rotation between matrices.
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam MOpt the option flags (alignment etc.) used for the matrix arguments.  Can be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument.  Can be deduced.
+/// \param end the rotation matrix after the rotation.
+/// \param start the rotation matrix before the rotation.
+/// \param[out] rotationVector a vector describing the rotation.
+template <typename T, int MOpt, int VOpt>
+void computeRotationVector(const Eigen::Matrix<T, 3, 3, MOpt>& end, const Eigen::Matrix<T, 3, 3, MOpt>& start,
+						   Eigen::Matrix<T, 3, 1, VOpt>* rotationVector)
+{
+	Eigen::Quaternion<T, Eigen::DontAlign> q1(end);
+	Eigen::Quaternion<T, Eigen::DontAlign> q2(start);
+	double angle;
+	Eigen::Matrix<T, 3, 1, VOpt> axis;
+	computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
+	*rotationVector = angle*axis;
+}
+
+/// Get the vector corresponding to the rotation between transforms.
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam TOpt the option flags (alignment etc.) used for the transform arguments.  Can be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument.  Can be deduced.
+/// \param end the transform after the rotation.
+/// \param start the transform before the rotation.
+/// \param[out] rotationVector a vector describing the rotation.
+template <typename T, int TOpt, int VOpt>
+void computeRotationVector(const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& end,
+						   const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& start,
+						   Eigen::Matrix<T, 3, 1, VOpt>* rotationVector)
+{
+	Eigen::Quaternion<T, Eigen::DontAlign> q1(end.linear());
+	Eigen::Quaternion<T, Eigen::DontAlign> q2(start.linear());
+	double angle;
+	Eigen::Matrix<T, 3, 1, VOpt> axis;
+	computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
+	*rotationVector = angle*axis;
+}
+
 /// Interpolate (slerp) between 2 quaternions
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam QOpt the option flags (alignment etc.) used for the quaternion arguments.  Can be deduced.

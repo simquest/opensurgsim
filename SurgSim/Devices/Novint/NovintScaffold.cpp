@@ -44,7 +44,6 @@ using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Quaterniond;
 
 using SurgSim::Framework::Clock;
 
@@ -56,18 +55,6 @@ namespace SurgSim
 {
 namespace Device
 {
-
-
-	Vector3d computeRotationVector(const Matrix33d& t1, const Matrix33d& t2)
-	{
-		Quaterniond q1(t1);
-		Quaterniond q2(t2);
-		double angle;
-		Vector3d axis;
-		SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-		return angle*axis;
-	}
-
 
 class NovintScaffold::Handle
 {
@@ -767,8 +754,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		Vector3d angularVelocityForNominalTorque = angularVelocity;
 		outputData.vectors().get("inputAngularVelocity", &angularVelocityForNominalTorque);
 
+		Vector3d rotationVector;
+		SurgSim::Math::computeRotationVector(orientation, static_cast<Matrix33d>(orientationForNominalTorque),
+			&rotationVector);
 		Vector3d totalTorque = nominalTorque +
-			torqueAngleJacobian * computeRotationVector(orientation, orientationForNominalTorque) +
+			torqueAngleJacobian * rotationVector +
 			torqueAngularVelocityJacobian * (angularVelocity - angularVelocityForNominalTorque);
 
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR

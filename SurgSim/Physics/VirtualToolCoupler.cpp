@@ -27,22 +27,11 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::RigidTransform3d;
-using SurgSim::Math::Quaterniond;
 
 
 namespace SurgSim{
 
 namespace Physics{
-
-Vector3d computeRotationVector(const RigidTransform3d& t1, const RigidTransform3d& t2)
-{
-	Quaterniond q1(t1.linear());
-	Quaterniond q2(t2.linear());
-	double angle;
-	Vector3d axis;
-	SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-	return angle*axis;
-}
 
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
 						 std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid,
@@ -71,7 +60,9 @@ void VirtualToolCoupler::update(double dt)
 
 	RigidTransform3d previousInputPose = m_previousState.getPose();
 	Vector3d inputLinearVelocity = (inputPose.translation() - previousInputPose.translation()) / dt;
-	Vector3d inputAngularVelocity = computeRotationVector(inputPose, previousInputPose) / dt;
+	Vector3d rotationFromPreviousToCurrentInput;
+	SurgSim::Math::computeRotationVector(inputPose, previousInputPose, &rotationFromPreviousToCurrentInput);
+	Vector3d inputAngularVelocity = rotationFromPreviousToCurrentInput / dt;
 
 	RigidRepresentationState objectState(m_rigid->getCurrentState());
 	RigidTransform3d objectPose(objectState.getPose());
@@ -82,8 +73,10 @@ void VirtualToolCoupler::update(double dt)
 	force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
 	force += m_linearDamping * (inputLinearVelocity - objectLinearVelocity);
 
+	Vector3d rotationFromObjectToInput;
+	SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationFromObjectToInput);
 	Vector3d torque;
-	torque = m_angularStiffness * computeRotationVector(inputPose, objectPose);
+	torque = m_angularStiffness * rotationFromObjectToInput;
 	torque += m_angularDamping * (inputAngularVelocity - objectAnglularVelocity);
 
 	const Matrix33d identity3x3 = Matrix33d::Identity();
