@@ -58,8 +58,8 @@ public:
 		unsigned int& nodes = nodesPerDimension[0];
 		SURGSIM_ASSERT(nodes > 0) << "Number of nodes incorrect: " << nodes;
 
-		auto& fem = std::make_shared<Fem1DRepresentation>(name);
-		auto& state = std::make_shared<DeformableRepresentationState>();
+		auto fem = std::make_shared<Fem1DRepresentation>(name);
+		auto state = std::make_shared<DeformableRepresentationState>();
 
 		state->setNumDof(fem->getNumDofPerNode(), nodes);
 
