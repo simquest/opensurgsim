@@ -32,39 +32,44 @@ Representation::~Representation()
 
 }
 
-const std::deque<std::shared_ptr<SurgSim::Collision::Contact>>&
-	Representation::getContacts(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation)
+std::list<std::shared_ptr<SurgSim::Collision::Contact>>
+	Representation::getCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const
 {
-	return m_contacts[collisionRepresentation->getName()];
+	auto result = std::find_if(std::begin(m_collisions), std::end(m_collisions),
+		[collisionRepresentation](std::pair<std::shared_ptr<SurgSim::Collision::Representation>,
+											std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collision)
+		{ return collision.first == collisionRepresentation;});
+
+	if(std::end(m_collisions) == result)
+	{
+		return std::list<std::shared_ptr<SurgSim::Collision::Contact>>();
+	}
+	else
+	{
+		return (*result).second;
+	}
 }
 
-const std::deque<std::shared_ptr<SurgSim::Collision::Representation>>& Representation::getColliders()
+std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+				   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> Representation::getCollisions() const
 {
-	return m_colliders;
+	return m_collisions;
 }
 
 void Representation::addCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
 								  std::shared_ptr<SurgSim::Collision::Contact> contact)
 {
-	auto result = std::find(std::begin(m_colliders), std::end(m_colliders), collisionRepresentation);
-	// Check if the collisionRepresentation object has not been added into m_colliders list before.
-	if(result == std::end(m_colliders))
-	{
-		m_colliders.push_back(collisionRepresentation);
-	}
-
-	m_contacts[collisionRepresentation->getName()].push_back(contact);
+	m_collisions[collisionRepresentation].push_back(contact);
 }
 
-bool Representation::hasContacts() const
+bool Representation::hasCollision() const
 {
-	return !m_colliders.empty() && !m_contacts.empty();
+	return !m_collisions.empty();
 }
 
-void Representation::clearCollisions()
+void Representation::clearCollision()
 {
-	m_colliders.clear();
-	m_contacts.clear();
+	m_collisions.clear();
 }
 
 }; // namespace Collision
