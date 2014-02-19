@@ -27,7 +27,7 @@ namespace Collision
 
 class CollisionPair;
 
-/// Class to calculate intersections between a box and a sphere
+/// Class to calculate intersections between a triangle mesh and a triangle mesh
 class TriangleMeshTriangleMeshDcdContact : public ContactCalculation
 {
 public:
@@ -36,16 +36,15 @@ public:
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
-	virtual std::pair<int,int> getShapeTypes() override;
+	virtual std::pair<int, int> getShapeTypes() override;
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
 	/// \param    pair    The symmetric pair that is under consideration.
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
-
 };
 
 }; // namespace Collision
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_COLLISION_TRIANGLEMESHTRIANGLEMESHDCDCONTACT_H

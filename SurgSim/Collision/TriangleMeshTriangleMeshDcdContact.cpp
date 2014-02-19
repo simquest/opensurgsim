@@ -43,24 +43,14 @@ std::pair<int,int> TriangleMeshTriangleMeshDcdContact::getShapeTypes()
 
 void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair)
 {
-	using SurgSim::Math::Geometry::DistanceEpsilon;
-	using SurgSim::Math::Geometry::SquaredDistanceEpsilon;
+	std::shared_ptr<Representation> representationMeshA = pair->getFirst();
+	std::shared_ptr<Representation> representationMeshB = pair->getSecond();
 
-	std::shared_ptr<Representation> representationMeshA;
-	std::shared_ptr<Representation> representationMeshB;
+	std::shared_ptr<MeshShape> meshShapeA = std::static_pointer_cast<MeshShape>(representationMeshA->getShape());
+	std::shared_ptr<MeshShape> meshShapeB = std::static_pointer_cast<MeshShape>(representationMeshB->getShape());
 
-	representationMeshA = pair->getFirst();
-	representationMeshB = pair->getSecond();
-
-	std::shared_ptr<MeshShape> meshShapeA =
-		std::static_pointer_cast<MeshShape>(representationMeshA->getShape());
-	std::shared_ptr<MeshShape> meshShapeB =
-		std::static_pointer_cast<MeshShape>(representationMeshB->getShape());
-
-	std::shared_ptr<MeshShape::TriMesh> meshA =
-		std::dynamic_pointer_cast<MeshShape::TriMesh>(meshShapeA->getMesh());
-	std::shared_ptr<MeshShape::TriMesh> meshB =
-		std::dynamic_pointer_cast<MeshShape::TriMesh>(meshShapeB->getMesh());
+	std::shared_ptr<MeshShape::TriMesh> meshA = meshShapeA->getMesh();
+	std::shared_ptr<MeshShape::TriMesh> meshB = meshShapeB->getMesh();
 
 	RigidTransform3d globalCoordinatesFromMeshACoordinates = representationMeshA->getPose();
 	RigidTransform3d globalCoordinatesFromMeshBCoordinates = representationMeshB->getPose();
@@ -125,7 +115,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 																&normal))
 			{
 				// Create the contact.
-				std::pair<Location,Location> penetrationPoints;
+				std::pair<Location, Location> penetrationPoints;
 				penetrationPoints.first.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates
 																* penetrationPointA);
 				penetrationPoints.second.globalPosition.setValue(globalCoordinatesFromMeshBCoordinates

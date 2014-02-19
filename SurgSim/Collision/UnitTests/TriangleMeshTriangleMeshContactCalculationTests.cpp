@@ -36,15 +36,14 @@ namespace Collision
 static const int cubeNumPoints = 8;
 static const SurgSim::Math::Vector3d cubePoints[8] =
 {
-	SurgSim::Math::Vector3d(-1.0/2.0, -1.0/2.0, -1.0/2.0),
-	SurgSim::Math::Vector3d(1.0/2.0, -1.0/2.0, -1.0/2.0),
-	SurgSim::Math::Vector3d(1.0/2.0,  1.0/2.0, -1.0/2.0),
-	SurgSim::Math::Vector3d(-1.0/2.0,  1.0/2.0, -1.0/2.0),
-
-	SurgSim::Math::Vector3d(-1.0/2.0, -1.0/2.0,  1.0/2.0),
-	SurgSim::Math::Vector3d(1.0/2.0, -1.0/2.0,  1.0/2.0),
-	SurgSim::Math::Vector3d(1.0/2.0,  1.0/2.0,  1.0/2.0),
-	SurgSim::Math::Vector3d(-1.0/2.0,  1.0/2.0,  1.0/2.0)
+	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d( 1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d( 1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	SurgSim::Math::Vector3d( 1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	SurgSim::Math::Vector3d( 1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
+	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
 };
 
 static const int cubeNumEdges = 12;
@@ -70,7 +69,7 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 									const RigidTransform3d& meshATransform,
 									std::shared_ptr<MeshShape> meshB,
 									const RigidTransform3d& meshBTransform,
-									std::list<std::shared_ptr<Contact>> expectedContacts)
+									const std::list<std::shared_ptr<Contact>> expectedContacts)
 {
 	std::shared_ptr<Representation> meshARep = std::make_shared<ShapeCollisionRepresentation>(
 												   "Collision Mesh 0",
@@ -89,15 +88,14 @@ void doTriangleMeshTriangleMeshTest(std::shared_ptr<MeshShape> meshA,
 	contactsInfoEqualityTest(expectedContacts, pair->getContacts());
 }
 
-
 TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 {
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRotationQuaternion;
 
-	typedef SurgSim::DataStructures::TriangleMesh<void,void,void> TriangleMesh;
-	typedef SurgSim::DataStructures::MeshElement<2,void> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3,void> TriangleElement;
+	typedef SurgSim::DataStructures::TriangleMesh<void, void, void> TriangleMesh;
+	typedef SurgSim::DataStructures::MeshElement<2, void> EdgeElement;
+	typedef SurgSim::DataStructures::MeshElement<3, void> TriangleElement;
 
 	// Create a Mesh Cube
 	std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
@@ -112,7 +110,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 	for (int i = 0; i < cubeNumEdges; i++)
 	{
-		std::array<unsigned int,2> edgePoints;
+		std::array<unsigned int, 2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
@@ -123,7 +121,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 	for (int i = 0; i < cubeNumTriangles; i++)
 	{
-		std::array<unsigned int,3> trianglePoints;
+		std::array<unsigned int, 3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
@@ -133,130 +131,87 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA =
-			std::make_shared<SurgSim::Math::MeshShape>(mesh);
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB =
-			std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB = std::make_shared<SurgSim::Math::MeshShape>(mesh);
 
 	SurgSim::Math::RigidTransform3d cubeMeshATransform;
 	SurgSim::Math::RigidTransform3d cubeMeshBTransform;
 	SurgSim::Math::RigidTransform3d globalTransform;
+	const std::list<std::shared_ptr<Contact>> emptyContacts;
 
 	double cubeSize = 1.0;
 	double epsilonTrans = 0.001;
 
 	{
 		SCOPED_TRACE("No intersection, boxB above boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, (cubeSize + epsilonTrans), 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.234, Vector3d(1.2, 3.4, 5.6).normalized()),
-							  Vector3d(34.4, 567.6, 234.5));
+		cubeMeshATransform.setIdentity();
+		cubeMeshBTransform = Eigen::Translation<double, 3>(0.0, cubeSize + epsilonTrans, 0.0);
+		globalTransform = makeRigidTransform(makeRotationQuaternion(1.234, Vector3d(1.2, 3.4, 5.6).normalized()),
+											 Vector3d(34.4, 567.6, 234.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
+		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
 		SCOPED_TRACE("No intersection, boxB below boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, -(cubeSize + epsilonTrans), 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.4, Vector3d(10.2, 34.4, 15.6).normalized()),
-							  Vector3d(3.4, 6.6, 2.5));
+		cubeMeshATransform.setIdentity();
+		cubeMeshBTransform = Eigen::Translation<double, 3>(0.0, -(cubeSize + epsilonTrans), 0.0);
+		globalTransform = makeRigidTransform(makeRotationQuaternion(1.4, Vector3d(10.2, 34.4, 15.6).normalized()),
+											 Vector3d(3.4, 6.6, 2.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
+		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
 		SCOPED_TRACE("No intersection, boxB to the left of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(-(cubeSize + epsilonTrans), 0.0, 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.4, Vector3d(1.2, 3.4, 5.6).normalized()),
-							  Vector3d(340.4, 567.6, 234.5));
+		cubeMeshATransform.setIdentity();
+		cubeMeshBTransform = Eigen::Translation<double, 3>(-(cubeSize + epsilonTrans), 0.0, 0.0);
+		globalTransform = makeRigidTransform(makeRotationQuaternion(1.4, Vector3d(1.2, 3.4, 5.6).normalized()),
+											 Vector3d(340.4, 567.6, 234.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
+		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
 		SCOPED_TRACE("No intersection, boxB to the right of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d((cubeSize + epsilonTrans), 0.0, 0.0));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.2, Vector3d(11.2, 13.4, 15.6).normalized()),
-							  Vector3d(3.4, 5.6, 2.5));
+		cubeMeshATransform.setIdentity();
+		cubeMeshBTransform = Eigen::Translation<double, 3>((cubeSize + epsilonTrans), 0.0, 0.0);
+		globalTransform = makeRigidTransform(makeRotationQuaternion(1.2, Vector3d(11.2, 13.4, 15.6).normalized()),
+											 Vector3d(3.4, 5.6, 2.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
+		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
 		SCOPED_TRACE("No intersection, boxB in front of boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, 0.0, (cubeSize + epsilonTrans)));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(2.234, Vector3d(10.2, 30.4, 50.6).normalized()),
-							  Vector3d(84.4, 56.6, 24.5));
+		cubeMeshATransform.setIdentity();
+		cubeMeshBTransform = Eigen::Translation<double, 3>(0.0, 0.0, (cubeSize + epsilonTrans));
+		globalTransform = makeRigidTransform(makeRotationQuaternion(2.234, Vector3d(10.2, 30.4, 50.6).normalized()),
+											 Vector3d(84.4, 56.6, 24.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
+		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 
 	{
 		SCOPED_TRACE("No intersection, boxB behind boxA");
-		cubeMeshATransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0,0.0,0.0));
-		cubeMeshBTransform = makeRigidTransform(
-								 Quaterniond::Identity(),
-								 Vector3d(0.0, 0.0, -(cubeSize + epsilonTrans)));
-		globalTransform = makeRigidTransform(
-							  makeRotationQuaternion(1.24, Vector3d(9.2, 7.4, 5.6).normalized()),
-							  Vector3d(39.4, 67.6, 34.5));
+		cubeMeshATransform.setIdentity();
+		cubeMeshBTransform = Eigen::Translation<double, 3>(0.0, 0.0, -(cubeSize + epsilonTrans));
+		globalTransform = makeRigidTransform(makeRotationQuaternion(1.24, Vector3d(9.2, 7.4, 5.6).normalized()),
+											 Vector3d(39.4, 67.6, 34.5));
 		cubeMeshATransform = globalTransform * cubeMeshATransform;
 		cubeMeshBTransform = globalTransform * cubeMeshBTransform;
 
-		std::list<std::shared_ptr<Contact>> expectedContacts;
-
-		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, expectedContacts);
+		doTriangleMeshTriangleMeshTest(cubeMeshA, cubeMeshATransform, cubeMeshB, cubeMeshBTransform, emptyContacts);
 	}
 }
 

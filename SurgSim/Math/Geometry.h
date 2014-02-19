@@ -16,9 +16,11 @@
 #ifndef SURGSIM_MATH_GEOMETRY_H
 #define SURGSIM_MATH_GEOMETRY_H
 
-#include "SurgSim/Math/Vector.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Vector.h"
 
 /// \file Geometry.h a collection of functions that calculation geometric properties of various basic geometric shapes.
 /// 	  Point, LineSegment, Plane, Triangle. All functions are templated for the accuracy of the calculation
@@ -1501,25 +1503,26 @@ void intersectionsSegmentBox(
 }
 
 
-/// Check for contact between two triangles.
-/// The collision volumes are considered to be the volume swept by the triangles
-/// along the negative triangle normal. If any edge of triangle0 pass through
-/// triangle1 or vice versa, the minimum displacement applied along the (chosen)
-/// triangle normal to remove the penetration, is the contact info.
+/// Calculates the intersection between two triangles
+///
+/// If any edge of triangle 't0' passes through triangle 't1' (or vice versa), then the minimum displacement needed to
+/// remove the penetration is calculated and returned by parameter.  The displacement is parallel to a triangle's
+/// normal.
+///
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
 /// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
-/// \param t0n Normal of the first triangle.
-/// \param t1n Normal of the second triangle.
+/// \param t0n Unit length normal of the first triangle.
+/// \param t1n Unit length normal of the second triangle.
 /// \param [out] depth The depth of penetration.
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
 /// \param [out] normal The contact normal that points from triangle0 to triangle1.
-/// \return True, if intersection is detected. False, otherwise.
+/// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
-/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved
-/// by (nomal*depth*0.5), the triangle will no longer be intersecting.
+/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
+/// triangles will no longer be intersecting.
 template <class T, int MOpt> inline
 bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
@@ -1790,11 +1793,12 @@ bool calculateContactTriangleTriangle(
 	return false;
 }
 
-/// Check for contact between two triangles.
-/// The collision volumes are considered to be the volume swept by the triangles
-/// along the negative triangle normal. If any edge of triangle0 pass through
-/// triangle1 or vice versa, the minimum displacement applied along the (chosen)
-/// triangle normal to remove the penetration, is the contact info.
+/// Calculates the intersection between two triangles
+///
+/// If any edge of triangle 't0' passes through triangle 't1' (or vice versa), then the minimum displacement needed to
+/// remove the penetration is calculated and returned by parameter.  The displacement is parallel to a triangle's
+/// normal.
+///
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
@@ -1803,10 +1807,10 @@ bool calculateContactTriangleTriangle(
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
 /// \param [out] normal The contact normal that points from triangle0 to triangle1.
-/// \return True, if intersection is detected. False, otherwise.
+/// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
-/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved
-/// by (nomal*depth*0.5), the triangle will no longer be intersecting.
+/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
+/// triangles will no longer be intersecting.
 template <class T, int MOpt> inline
 bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
@@ -1824,6 +1828,8 @@ bool calculateContactTriangleTriangle(
 	Eigen::Matrix<T, 3, 1, MOpt> t1n = (t1v1 - t1v0).cross(t1v2 - t1v0);
 	if (t0n.isZero() || t1n.isZero())
 	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Degenerate triangle(s) passed to calculateContactTriangleTriangle.";
 		return false;
 	}
 	t0n.normalize();
