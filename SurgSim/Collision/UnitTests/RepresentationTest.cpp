@@ -17,22 +17,24 @@
 #include <gtest/gtest.h>
 
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/Collision/SpherePlaneDcdContact.h"
-#include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::Collision::Contact;
+using SurgSim::Collision::Location;
 using SurgSim::Collision::ShapeCollisionRepresentation;
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Quaterniond;
-using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
+using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::SphereShape;
+using SurgSim::Math::Vector3d;
 
 namespace
 {
@@ -96,6 +98,24 @@ TEST_F(RepresentationTest, ShapeTest)
 
 	EXPECT_EQ(plane, planeRep->getShape());
 	EXPECT_EQ(sphere, sphereRep->getShape());
+}
+
+TEST_F(RepresentationTest, GetPhysicsRepresentationTest)
+{
+	EXPECT_EQ(nullptr, sphereRep->getPhysicsRepresentation());
+}
+
+TEST_F(RepresentationTest, AddAndClearCollisionTest)
+{
+	EXPECT_FALSE(sphereRep->hasContacts());
+
+	std::shared_ptr<Contact> dummyContact =
+		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
+	EXPECT_NO_THROW(sphereRep->addCollision(planeRep, dummyContact));
+
+	EXPECT_TRUE(sphereRep->hasContacts());
+	sphereRep->clearCollisions();
+	EXPECT_FALSE(sphereRep->hasContacts());
 }
 
 TEST_F(RepresentationTest, EmptyCollisionTest)

@@ -14,8 +14,6 @@
 // limitations under the License.
 
 #include "SurgSim/Collision/Representation.h"
-
-#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Physics/Representation.h"
 
 namespace SurgSim
