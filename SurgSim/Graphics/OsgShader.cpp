@@ -18,22 +18,30 @@
 using SurgSim::Graphics::OsgShader;
 
 OsgShader::OsgShader() : SurgSim::Graphics::Shader(),
-	m_program(new osg::Program())
+	m_program(new osg::Program()),
+	m_globalScope(false)
 {
 
 }
 
 void OsgShader::addToStateSet(osg::StateSet* stateSet)
 {
-	stateSet->setAttributeAndModes(m_program, osg::StateAttribute::ON);
+	if (stateSet != nullptr)
+	{
+		int attribute = osg::StateAttribute::ON | ((m_globalScope) ? osg::StateAttribute::OVERRIDE : 0);
+		stateSet->setAttributeAndModes(m_program, attribute);
+	}
 }
 
 void OsgShader::removeFromStateSet(osg::StateSet* stateSet)
 {
-	stateSet->removeAttribute(m_program);
+	if (stateSet != nullptr)
+	{
+		stateSet->removeAttribute(m_program);
+	}
 }
 
-bool OsgShader:: hasVertexShader()
+bool OsgShader:: hasVertexShader() const
 {
 	return m_vertexShader.valid();
 }
@@ -175,4 +183,24 @@ bool OsgShader::getFragmentShaderSource(std::string* source) const
 		*source = "";
 		return false;
 	}
+}
+
+osg::ref_ptr<osg::Program> SurgSim::Graphics::OsgShader::getOsgProgram() const
+{
+	return m_program;
+}
+
+void SurgSim::Graphics::OsgShader::setGlobalScope(bool val)
+{
+	m_globalScope = val;
+	osg::StateAttribute::ParentList parents = m_program->getParents();
+	for (auto it = std::begin(parents); it != std::end(parents); ++it)
+	{
+		addToStateSet(*it);
+	}
+}
+
+bool SurgSim::Graphics::OsgShader::isGlobalScope() const
+{
+	return m_globalScope;
 }

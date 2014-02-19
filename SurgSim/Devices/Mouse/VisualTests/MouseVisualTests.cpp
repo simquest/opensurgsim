@@ -13,15 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Devices/Mouse/MouseDevice.h"
-#include "SurgSim/Devices/Mouse/MouseHandler.h"
-#include "SurgSim/Input/InputConsumerInterface.h"
+#include <iostream>
+#include <map>
+#include <memory>
+#include <string>
 
 #include <osg/Camera>
 #include <osg/Geode>
 #include <osgText/Text>
 #include <osgViewer/Viewer>
+
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Devices/Mouse/MouseDevice.h"
+#include "SurgSim/Devices/Mouse/OsgMouseHandler.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+
+
 
 using SurgSim::DataStructures::DataGroup;
 
@@ -65,7 +72,7 @@ int main(int argc, char* argv[])
 
 	osg::ref_ptr<osgText::Text> text = new osgText::Text;
 	text->setText("Move/click/drag mouse in\n\nthis window to verify that\n\nmouse driver works correctly.");
-	text->setPosition(osg::Vec3(0, 300, 0.0f));
+	text->setPosition(osg::Vec3(0.0f, 300.0f, 0.0f));
 
 	osg::ref_ptr<osg::Geode> geode = new osg::Geode;
 	geode->addDrawable(text);

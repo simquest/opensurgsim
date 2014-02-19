@@ -60,10 +60,6 @@ public:
 	/// \return	true if it succeeds, false if it fails.
 	virtual bool doInitialize() override;
 
-	/// Executes the wake up operation.
-	/// \return	true if it succeeds, false if it fails.
-	virtual bool doWakeUp() override;
-
 	/// Sets render target for the camera, this abstracts the textures that are being used for rendering into.
 	/// \param	target	The rendertarget structure.
 	/// \return true if the target was successfully set
@@ -118,7 +114,6 @@ private:
 	std::shared_ptr<Group> m_group;					///< The groupd used for the pass
 	std::shared_ptr<RenderTarget> m_renderTarget;	///< The camera's rendertarget
 	std::shared_ptr<Material> m_material;			///< The material, attached to the camera
-	std::shared_ptr<View> m_view;					///< The view, used for the debug quads
 
 	int m_renderOrder;	///< The renderorder that is being used for this pass
 

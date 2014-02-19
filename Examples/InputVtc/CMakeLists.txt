@@ -18,13 +18,13 @@ link_directories(
 )
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${OSG_INCLUDE_DIR}"
-	"${OPENTHREADS_INCLUDE_DIR}"
-	"${YAML_CPP_SOURCE_DIR}/include"
+	${SURGSIM_TOP_INCLUDE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${Boost_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(INPUTVTCEXAMPLE_SOURCES
@@ -42,15 +42,9 @@ set(LIBS
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimMath
-	yaml-cpp
 )
 
-if(WDK_FOUND)
-	list(APPEND LIBS ${WDK_LIBRARIES})
-endif()
-
-target_link_libraries(ExampleInputVtc ${LIBS}
-)
+target_link_libraries(ExampleInputVtc ${LIBS})
 
 # Put ExampleInputVtc into folder "Examples"
 set_target_properties(ExampleInputVtc PROPERTIES FOLDER "Examples") 

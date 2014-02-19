@@ -13,10 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-include_directories(
+include_directories (
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
@@ -43,18 +41,12 @@ set(UNIT_TEST_HEADERS
 	RepresentationUtilities.h
 )
 
-include_directories(
-)
-
 set(LIBS
 	SurgSimCollision
 	SurgSimMath
-	gmock
-	gtest
-	yaml-cpp
 )
 
 surgsim_add_unit_tests(SurgSimCollisionTest)
 
-# Put SurgSimCollisionTest into folder "Collision"
+
 set_target_properties(SurgSimCollisionTest PROPERTIES FOLDER "Collision") 

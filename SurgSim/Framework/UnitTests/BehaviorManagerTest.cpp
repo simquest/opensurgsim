@@ -31,7 +31,7 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 	std::shared_ptr<BehaviorManager> behaviorManager(new BehaviorManager());
 
 	runtime->addManager(behaviorManager);
-	std::shared_ptr<Scene> scene(new Scene());
+	auto scene = runtime->getScene();
 	std::shared_ptr<SceneElement> element(new MockSceneElement());
 	std::shared_ptr<MockBehavior> behavior(new MockBehavior("MockBehavior"));
 	std::shared_ptr<MockComponent> component(new MockComponent("Test Component"));
@@ -40,16 +40,16 @@ TEST(BehaviorManagerTest, BehaviorInitTest)
 	element->addComponent(behavior);
 	element->addComponent(component);
 	scene->addSceneElement(element);
-	runtime->setScene(scene);
+	EXPECT_TRUE(element->isInitialized());
+	EXPECT_TRUE(behavior->isInitialized());
+	EXPECT_TRUE(component->isInitialized());
 
 	runtime->start();
 	EXPECT_TRUE(behaviorManager->isInitialized());
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 	runtime->stop();
 
-	EXPECT_TRUE(behavior->isInitialized);
 	EXPECT_TRUE(behavior->isAwake());
-	EXPECT_FALSE(component->isInitialized());
 	EXPECT_FALSE(component->isAwake());
 	EXPECT_GT(behavior->updateCount, 0);
 

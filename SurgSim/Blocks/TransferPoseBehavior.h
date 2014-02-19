@@ -37,10 +37,15 @@ class TransferPoseBehavior : public SurgSim::Framework::Behavior
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	/// \param	from	Representation to get the pose
-	/// \param	to	Representation to set the pose
-	TransferPoseBehavior(const std::string& name, std::shared_ptr<SurgSim::Framework::Representation> from,
-						 std::shared_ptr<SurgSim::Framework::Representation> to);
+	explicit TransferPoseBehavior(const std::string& name);
+
+	/// Set the representation which sends the pose.
+	/// \param	sender	Representation which sends the pose.
+	void setPoseSender(std::shared_ptr<SurgSim::Framework::Representation> sender);
+
+	/// Set the representation to receive the pose.
+	/// \param	receiver	Representation to receive the pose.
+	void setPoseReceiver(std::shared_ptr<SurgSim::Framework::Representation> receiver);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.

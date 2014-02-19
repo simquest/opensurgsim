@@ -67,10 +67,11 @@ TEST(DcdCollisionTest, RigidRigidCollisionTest)
 	std::shared_ptr<RigidRepresentation> sphere2 = createSphere("Sphere2", Vector3d(0.0,0.0,0.5));
 
 	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
-		std::make_shared<RigidCollisionRepresentation>("Sphere1 Collision", sphere1);
+		std::make_shared<RigidCollisionRepresentation>("Sphere1 Collision");
+	std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere1Collision)->setRigidRepresentation(sphere1);
 	std::shared_ptr<SurgSim::Collision::Representation> sphere2Collision =
-		std::make_shared<RigidCollisionRepresentation>("Sphere2 Collision", sphere2);
-
+		std::make_shared<RigidCollisionRepresentation>("Sphere2 Collision");
+	std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere2Collision)->setRigidRepresentation(sphere2);
 	std::vector<std::shared_ptr<Representation>> representations;
 	representations.push_back(sphere1);
 	representations.push_back(sphere2);
@@ -95,7 +96,8 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 	std::shared_ptr<RigidRepresentation> sphere1 = createSphere("Sphere1", Vector3d(0.0,0.0,0.0));
 
 	std::shared_ptr<SurgSim::Collision::Representation> sphere1Collision =
-		std::make_shared<RigidCollisionRepresentation>("Sphere Collision", sphere1);
+		std::make_shared<RigidCollisionRepresentation>("Sphere Collision");
+	std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere1Collision)->setRigidRepresentation(sphere1);
 
 	RigidRepresentationParameters params;
 	std::shared_ptr<Shape> shape = std::make_shared<DoubleSidedPlaneShape>();
@@ -103,7 +105,8 @@ TEST(DcdCollisionTest, FixedRigidCollisionTest)
 	std::shared_ptr<FixedRepresentation> fixed = std::make_shared<FixedRepresentation>("Fixed");
 	fixed->setInitialParameters(params);
 	std::shared_ptr<SurgSim::Collision::Representation> fixedCollision =
-		std::make_shared<RigidCollisionRepresentation>("Plane Collision", fixed);
+		std::make_shared<RigidCollisionRepresentation>("Plane Collision");
+	std::dynamic_pointer_cast<RigidCollisionRepresentation>(fixedCollision)->setRigidRepresentation(fixed);
 
 	std::vector<std::shared_ptr<Representation>> representations;
 	representations.push_back(sphere1);

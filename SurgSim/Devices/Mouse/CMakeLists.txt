@@ -13,44 +13,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${OPENSCENEGRAPH_INCLUDE_DIR}"
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 )
 
 set(Mouse_DEVICE_SOURCES
 	MouseDevice.cpp
-	MouseHandler.cpp
-	OsgMouseScaffold.cpp
+	MouseScaffold.cpp
+	OsgMouseHandler.cpp
 )
 
 set(Mouse_DEVICE_HEADERS
 	MouseDevice.h
-	MouseHandler.h
-	OsgMouseScaffold.h
+	MouseScaffold.h
+	OsgMouseHandler.h
 )
 
 surgsim_add_library(
 	MouseDevice
-	"${Mouse_DEVICE_SOURCES}" "${Mouse_DEVICE_HEADERS}"
+	"${Mouse_DEVICE_SOURCES}"
+	"${Mouse_DEVICE_HEADERS}"
 	SurgSim/Devices/Mouse
 )
 
-SET(LIBS
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimInput
-	KeyboardDevice
-	${OPENSCENEGRAPH_LIBRARIES}
+set(LIBS ${LIBS}
+		 SurgSimInput
 )
 
 target_link_libraries(MouseDevice ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	# The unit tests will be built whenever the library is built.
 	add_subdirectory(UnitTests)
 	add_subdirectory(VisualTests)

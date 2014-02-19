@@ -16,6 +16,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_INPUT_SOURCES
@@ -50,7 +51,7 @@ set(LIBS
 target_link_libraries(SurgSimInput ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

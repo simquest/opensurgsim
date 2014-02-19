@@ -15,7 +15,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_COLLISION_SOURCES
@@ -76,7 +76,7 @@ SET(LIBS
 target_link_libraries(SurgSimCollision ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

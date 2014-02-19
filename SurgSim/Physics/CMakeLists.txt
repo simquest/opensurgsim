@@ -15,7 +15,7 @@
 
 include_directories(
 	${EIGEN3_INCLUDE_DIR}
-	${YAML_CPP_SOURCE_DIR}/include
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(SURGSIM_PHYSICS_SOURCES
@@ -29,8 +29,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	DcdCollision.cpp
 	DeformableRepresentationState.cpp
 	Fem3DRepresentation.cpp
+	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
+	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
+	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
@@ -68,10 +71,13 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
 	Fem3DRepresentation.h
+	Fem3DRepresentationLocalization.h
 	FemElement.h
+	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h
 	FemRepresentation-inl.h
+	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
 	FixedRepresentationContact.h
@@ -113,17 +119,18 @@ surgsim_add_library(
 )
 
 SET(LIBS
-	MlcpTestIO
-	IdentityPoseDevice
 	SurgSimCollision
 )
 
 target_link_libraries(SurgSimPhysics ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
-	add_subdirectory(RenderTests)
+
+  if(BUILD_RENDER_TESTING)
+		add_subdirectory(RenderTests)
+	endif()
 endif()
 
 # Put SurgSimPhysics into folder "Physics"

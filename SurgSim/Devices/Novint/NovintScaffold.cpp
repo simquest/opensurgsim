@@ -38,6 +38,7 @@
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::makeRotationMatrix;
@@ -238,7 +239,10 @@ struct NovintScaffold::DeviceData
 		torqueScale(Vector3d::Constant(1.0)),
 		positionValue(positionBuffer),
 		transformValue(transformBuffer),
-		forceValue(forceBuffer)
+		forceValue(forceBuffer),
+		torqueValue(torqueBuffer),
+		positionScale(device->getPositionScale()),
+		orientationScale(device->getOrientationScale())
 	{
 		positionValue.setZero();   // also clears positionBuffer
 		transformValue.setIdentity();   // also sets transformBuffer
@@ -246,7 +250,7 @@ struct NovintScaffold::DeviceData
 		buttonStates.fill(false);
 
 		forceValue.setZero();   // also clears forceBuffer
-		torqueValue.setZero();
+		torqueValue.setZero();  // also clears torqueBuffer
 	}
 
 
@@ -301,8 +305,8 @@ struct NovintScaffold::DeviceData
 
 	/// The raw force to be written to the device.
 	double forceBuffer[3];
-	/// The torque value to be written to the device after conversion.
-	Vector3d torqueValue;
+	/// Torque command counts for each motor axis (including the jaw).
+	double torqueBuffer[4];
 
 	/// The position value from the device, permanently connected to positionBuffer.
 	Eigen::Map<Vector3d> positionValue;
@@ -311,6 +315,15 @@ struct NovintScaffold::DeviceData
 
 	/// The force value to be written to the device, permanently connected to forceBuffer.
 	Eigen::Map<Vector3d> forceValue;
+	/// The torque value to be written to the device, permanently connected to torqueBuffer.
+	Eigen::Map<Vector4d> torqueValue;
+
+	/// Scale factor for the position axes.
+	double positionScale;
+	/// Scale factor for the orientation axes.
+	double orientationScale;
+	/// The mutex that protects the externally modifiable parameters.
+	boost::mutex parametersMutex;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -587,39 +600,13 @@ bool NovintScaffold::finalizeDeviceState(DeviceData* info)
 }
 
 
-bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
+bool NovintScaffold::updateDevice(DeviceData* info)
 {
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 
-	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
+	boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	// TODO(bert): this code should cache the access indices.
-	// TODO(bert): this needs to be split up into more methods.  It is WAAAAY too big.
-
-	SurgSim::Math::Vector3d force;
-	if (outputData.vectors().get("force", &force))
-	{
-		info->forceValue = force;
-	}
-	else
-	{
-		info->forceValue.setZero();
-	}
-
-	SurgSim::Math::Vector3d torque;
-	if (outputData.vectors().get("torque", &torque))
-	{
-		info->torqueValue = torque;
-	}
-	else
-	{
-		info->torqueValue.setZero();
-	}
-
-	bool desiredGravityCompensation = false;
-	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
-
 
 	hdlMakeCurrent(info->deviceHandle.get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
@@ -636,7 +623,6 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
 
 	// Get the additional 7DoF data if available.
-
 	if (info->isDevice7Dof)
 	{
 		// We compute the device orientation from the joint angles, for two reasons.  The first that it lets us
@@ -646,22 +632,56 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		hdlGripGetAttributesd(HDL_GRIP_ANGLE, 4, angles);
 		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ANGLE)");
 
-		// The zero values are NOT the home orientation.  Shoot me now.
-		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;  // 0 for 7DoF Falcon
-		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;   // +/-75deg
-		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch; // +/-50deg
+		// The zero values are NOT the home orientation.
+		info->jointAngles[0] = angles[0] + info->eulerAngleOffsetRoll;
+		info->jointAngles[1] = angles[1] + info->eulerAngleOffsetYaw;
+		info->jointAngles[2] = angles[2] + info->eulerAngleOffsetPitch;
 
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
-		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0], Vector3d(Vector3d::UnitX()));
-		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1], Vector3d(Vector3d::UnitY()));
-		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2], Vector3d(Vector3d::UnitZ()));
+		Matrix33d rotationX = makeRotationMatrix(info->jointAngles[0] * info->orientationScale,
+			Vector3d(Vector3d::UnitX()));
+		Matrix33d rotationY = makeRotationMatrix(info->jointAngles[1] * info->orientationScale,
+			Vector3d(Vector3d::UnitY()));
+		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
+			Vector3d(Vector3d::UnitZ()));
 		Matrix33d orientation = rotationY * rotationZ * rotationX;
 		// Put the result into the orientation transform matrix:
 		info->transformValue.block<3, 3>(0, 0) = orientation;
 	}
 
-	// Check the device's homing state.
+	checkDeviceHoming(info);
 
+	bool desiredGravityCompensation = false;
+	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
+	if (shouldSetGravityCompensation)
+	{
+		setGravityCompensation(info, desiredGravityCompensation);
+	}
+
+	info->forceValue.setZero();
+	info->torqueValue.setZero();
+	if (info->isDeviceHomed)
+	{
+		calculateForceAndTorque(info);
+	}
+
+	// Set the force command (in newtons).
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
+
+	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
+	// anywhere at the moment.
+	// The 2nd arg to this call is the count; we're setting 4 doubles.
+	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torqueBuffer);
+	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
+
+	setInputData(info);
+
+	return !fatalError;
+}
+
+void NovintScaffold::checkDeviceHoming(DeviceData* info)
+{
 	unsigned int deviceStateBitmask = hdlGetState();
 	info->isPositionHomed = ((deviceStateBitmask & HDAL_NOT_CALIBRATED) == 0);
 
@@ -704,20 +724,22 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 	{
 		info->transformValue.setIdentity();
 	}
+}
 
-	// Set the force command (in newtons) and gravity compensation.
+void NovintScaffold::calculateForceAndTorque(DeviceData* info)
+{
+	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
-	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
-	//hdlGripSetAttributesd(HDL_GRIP_TORQUE, 3, info->torqueBuffer);  // 2nd arg is size
+	Vector3d force;
+	force.setZero();
+	outputData.vectors().get("force", &force);
+	info->forceValue = force;
 
-	if (shouldSetGravityCompensation)
-	{
-		setGravityCompensation(info, desiredGravityCompensation);
-	}
+	Vector3d torqueInNewtonMeters;
+	torqueInNewtonMeters.setZero();
+	outputData.vectors().get("torque", &torqueInNewtonMeters);
 
 	// Set the torque command if applicable (and convert newton-meters to command counts).
-
 	if (info->isDevice7Dof)
 	{
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
@@ -784,10 +806,9 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 			//double ratio = (basisDeterminant / smallBasisDeterminantThreshold);
 			double ratio = 0;
 			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
-			// We just use linear drop-off.
 			decompositionMatrix.row(1) *= ratio;
 		}
-		Vector3d axisTorqueVector = decompositionMatrix * info->torqueValue;
+		Vector3d axisTorqueVector = decompositionMatrix * torqueInNewtonMeters;
 
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
@@ -799,44 +820,37 @@ bool NovintScaffold::updateDevice(NovintScaffold::DeviceData* info)
 		// pitch axis: torque = 47.96 mNm when command = 2000
 		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
 
-		double deviceTorques[4];
-		deviceTorques[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+		info->torqueValue[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
 			axisTorqueMin, axisTorqueMax);
-		deviceTorques[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
+		info->torqueValue[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 			axisTorqueMin, axisTorqueMax);
-		deviceTorques[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+		info->torqueValue[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
 			axisTorqueMin, axisTorqueMax);
-		deviceTorques[3] = 0;
+		info->torqueValue[3] = 0;
 
 		if (info->isDeviceRollAxisReversed)  // commence swearing.
 		{
-			deviceTorques[0] = -deviceTorques[0];
+			info->torqueValue[0] = -info->torqueValue[0];
 		}
-
-		// Set the torque vector (from the first 3 elements of the argument array).  Also set the jaw squeeze torque
-		// (as 4th element of the array)-- though this is not used anywhere at the moment.
-		// The 2nd arg to this call is the count; we're setting 4 doubles.
-		hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, deviceTorques);
-		fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 	}
+}
 
 
-	{
-		RigidTransform3d pose;
-		pose.linear() = info->transformValue.block<3,3>(0,0);
-		pose.translation() = info->positionValue;
+void NovintScaffold::setInputData(DeviceData* info)
+{
+	RigidTransform3d pose;
+	pose.linear() = info->transformValue.block<3,3>(0,0);
+	pose.translation() = info->positionValue * info->positionScale;
 
-		inputData.poses().set("pose", pose);
-		inputData.booleans().set("button1", info->buttonStates[0]);
-		inputData.booleans().set("button2", info->buttonStates[1]);
-		inputData.booleans().set("button3", info->buttonStates[2]);
-		inputData.booleans().set("button4", info->buttonStates[3]);
-		inputData.booleans().set("isHomed", info->isDeviceHomed);
-		inputData.booleans().set("isPositionHomed", info->isPositionHomed);
-		inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
-	}
-
-	return !fatalError;
+	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
+	inputData.poses().set("pose", pose);
+	inputData.booleans().set("button1", info->buttonStates[0]);
+	inputData.booleans().set("button2", info->buttonStates[1]);
+	inputData.booleans().set("button3", info->buttonStates[2]);
+	inputData.booleans().set("button4", info->buttonStates[3]);
+	inputData.booleans().set("isHomed", info->isDeviceHomed);
+	inputData.booleans().set("isPositionHomed", info->isPositionHomed);
+	inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
 }
 
 
@@ -1098,6 +1112,31 @@ SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 	return builder.createData();
 }
 
+void NovintScaffold::setPositionScale(const NovintCommonDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->positionScale = scale;
+	}
+}
+
+void NovintScaffold::setOrientationScale(const NovintCommonDevice* device, double scale)
+{
+	boost::lock_guard<boost::mutex> lock(m_state->mutex);
+	auto matching = std::find_if(m_state->activeDeviceList.begin(), m_state->activeDeviceList.end(),
+		[device](const std::unique_ptr<DeviceData>& info) { return info->deviceObject == device; });
+	if (matching != m_state->activeDeviceList.end())
+	{
+		boost::lock_guard<boost::mutex> lock((*matching)->parametersMutex);
+		(*matching)->orientationScale = scale;
+	}
+}
+
+
 std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 {
 	static SurgSim::Framework::SharedInstance<NovintScaffold> sharedInstance;
@@ -1107,6 +1146,11 @@ std::shared_ptr<NovintScaffold> NovintScaffold::getOrCreateSharedInstance()
 void NovintScaffold::setDefaultLogLevel(SurgSim::Framework::LogLevel logLevel)
 {
 	m_defaultLogLevel = logLevel;
+}
+
+std::shared_ptr<SurgSim::Framework::Logger> NovintScaffold::getLogger() const
+{
+	return m_logger;
 }
 
 SurgSim::Framework::LogLevel NovintScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;

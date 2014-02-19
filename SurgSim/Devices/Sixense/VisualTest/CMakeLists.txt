@@ -35,24 +35,35 @@ set(EXAMPLE_HEADERS
 
 add_executable(SixenseVisualTest
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
-target_link_libraries(SixenseVisualTest
-	${LIBS} SixenseDevice IdentityPoseDevice VisualTestCommon
-	SurgSimInput SurgSimFramework SurgSimDataStructures
-	${Boost_LIBRARIES} ${SIXENSE_SDK_LIBRARIES}
-	${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+
+target_link_libraries(
+	SixenseVisualTest
+	${LIBS}
+	SixenseDevice
+	IdentityPoseDevice
+	VisualTestCommon
+	SurgSimInput
+	SurgSimFramework
+	SurgSimDataStructures
+	${Boost_LIBRARIES}
+	${SIXENSE_SDK_LIBRARIES}
+	${GLUT_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
 
 # Copy the device DLLs into the build directory
 surgsim_copy_to_target_directory_for_release(SixenseVisualTest
 	${SIXENSE_SDK_sixense_SHARED_RELEASE}
 	${SIXENSE_SDK_sixense_utils_SHARED_RELEASE}
 )
+
 surgsim_copy_to_target_directory_for_debug(SixenseVisualTest
 	${SIXENSE_SDK_sixense_SHARED_DEBUG}
 	${SIXENSE_SDK_sixense_utils_SHARED_DEBUG}
 	${SIXENSE_SDK_DeviceDLL_SHARED_DEBUG}  # crazy debug-only dependency
 )
 
-# Put SixenseVisualTest into folder "Devices"
 set_target_properties(SixenseVisualTest PROPERTIES FOLDER "Devices")

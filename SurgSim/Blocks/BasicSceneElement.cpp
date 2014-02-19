@@ -31,7 +31,3 @@ bool BasicSceneElement::doInitialize()
 	return true;
 }
 
-bool BasicSceneElement::doWakeUp()
-{
-	return true;
-}

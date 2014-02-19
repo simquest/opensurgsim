@@ -24,7 +24,7 @@
 #include "SurgSim/Math/Shape.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 
-#include "SurgSim/Serialize/Convert.h"
+#include "SurgSim/Framework/Convert.h"
 
 namespace SurgSim
 {

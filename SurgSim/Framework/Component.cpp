@@ -15,19 +15,29 @@
 
 #include "SurgSim/Framework/Component.h"
 
+#include <boost/uuid/random_generator.hpp>
+
+#include "SurgSim/Framework/Assert.h"
+
 namespace SurgSim
 {
 namespace Framework
 {
 
 // Forward References
-class SceneElement;
-class Scene;
 class Runtime;
+class Scene;
+class SceneElement;
 
 Component::Component(const std::string& name) :
-	m_name(name), m_didInit(false), m_didWakeUp(false), m_isInitialized(false), m_isAwake(false)
+	m_name(name),
+	m_uuid(boost::uuids::random_generator()()),
+	m_didInit(false),
+	m_didWakeUp(false),
+	m_isInitialized(false),
+	m_isAwake(false)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Framework::Component, std::string, name, getName, setName);
 }
 
 Component::~Component()
@@ -49,11 +59,10 @@ bool Component::isInitialized() const
 	return m_isInitialized;
 }
 
-bool Component::initialize(const std::shared_ptr<Runtime>& runtime)
+bool Component::initialize(const std::weak_ptr<Runtime>& runtime)
 {
-	SURGSIM_ASSERT(! m_didInit) << "Double initialization called on component " << getName();
-
-	SURGSIM_ASSERT(runtime != nullptr) << "Runtime cannot be nullptr";
+	SURGSIM_ASSERT(!m_didInit) << "Double initialization called in component " << getName();
+	SURGSIM_ASSERT(!runtime.expired()) << "Runtime cannot be expired at initialization in component " << getName();
 	m_runtime = runtime;
 
 	m_didInit = true;
@@ -69,7 +78,9 @@ bool Component::isAwake() const
 
 bool Component::wakeUp()
 {
-	SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component " << getName();
+	SURGSIM_ASSERT(! m_didWakeUp) << "Double wakeup called on component." << getName();
+	SURGSIM_ASSERT(m_didInit) << "Component " << getName() << " was awoken without being initialized.";
+	SURGSIM_ASSERT(m_isInitialized) << "Wakeup called even though initialization failed on component." << getName();
 
 	m_didWakeUp = true;
 	m_isAwake = doWakeUp();
@@ -100,6 +111,23 @@ std::shared_ptr<SceneElement> Component::getSceneElement()
 std::shared_ptr<Runtime> Component::getRuntime() const
 {
 	return m_runtime.lock();
+}
+
+boost::uuids::uuid Component::getUuid() const
+{
+	return m_uuid;
+}
+
+Component::FactoryType& Component::getFactory()
+{
+	static FactoryType factory;
+	return factory;
+}
+
+std::string Component::getClassName() const
+{
+	SURGSIM_FAILURE() << "Missing implementation of getClassName() for base class";
+	return "SurgSim::Framework::Component";
 }
 
 }; // namespace Framework

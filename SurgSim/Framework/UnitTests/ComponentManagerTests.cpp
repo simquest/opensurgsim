@@ -23,12 +23,15 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/ComponentManager.h"
 
-
 #include "SurgSim/Framework/UnitTests/MockObjects.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Component;
 
+namespace SurgSim
+{
+namespace Framework
+{
 TEST(ComponentManagerTests, TestInternalAddRemove)
 {
 	std::shared_ptr<Component> mock1 = std::make_shared<MockComponent>("Component1");
@@ -146,4 +149,69 @@ TEST(ComponentManagerTests, TypeTest)
 {
 	MockManager manager;
 	EXPECT_EQ(SurgSim::Framework::MANAGER_TYPE_NONE, manager.getType());
+}
+
+// Specific component manager to expose a bug where sceneelements added during initialization of
+// the ComponentManagers are not initialized themselves
+class InitializationBugManager : public ComponentManager
+{
+public:
+
+	InitializationBugManager()
+	{
+		m_sceneElementInitialize = std::make_shared<MockSceneElement>("Initialize");
+		auto mockComponent = std::make_shared<MockComponent>("Component");
+		m_sceneElementInitialize->addComponent(mockComponent);
+
+		m_sceneElementStartup = std::make_shared<MockSceneElement>("Startup");
+		mockComponent = std::make_shared<MockComponent>("Component");
+		m_sceneElementStartup->addComponent(mockComponent);
+	}
+
+	virtual int getType() const
+	{
+		return MANAGER_TYPE_NONE;
+	}
+
+	virtual bool executeAdditions(const std::shared_ptr<Component>& component)
+	{
+		return true;
+	}
+
+	virtual bool executeRemovals(const std::shared_ptr<Component>& component)
+	{
+		return true;
+	}
+
+	virtual bool doInitialize()
+	{
+		getRuntime()->getScene()->addSceneElement(m_sceneElementInitialize);
+		return true;
+	}
+
+	virtual bool doStartUp()
+	{
+		getRuntime()->getScene()->addSceneElement(m_sceneElementStartup);
+		return true;
+	}
+
+	std::shared_ptr<MockSceneElement> m_sceneElementInitialize;
+	std::shared_ptr<MockSceneElement> m_sceneElementStartup;
+};
+
+TEST(ComponentManagerTests, AdditionDuringInitializationTest)
+{
+	auto manager = std::make_shared<InitializationBugManager>();
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = runtime->getScene();
+
+	runtime->addManager(manager);
+	runtime->start();
+
+	EXPECT_TRUE(manager->m_sceneElementInitialize->isInitialized());
+
+	EXPECT_TRUE(manager->m_sceneElementStartup->isInitialized());
+}
+
+}
 }

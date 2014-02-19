@@ -18,7 +18,7 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Keyboard/KeyboardDevice.h"
-#include "SurgSim/Devices/Keyboard/KeyboardHandler.h"
+#include "SurgSim/Devices/Keyboard/OsgKeyboardHandler.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
 
@@ -37,13 +37,13 @@ struct KeyboardScaffold::DeviceData
 	/// \param device Device to be managed by this scaffold
 	explicit DeviceData(KeyboardDevice* device) : deviceObject(device)
 	{
-		keyboardHandler = new KeyboardHandler();
+		keyboardHandler = new OsgKeyboardHandler();
 	}
 
 	/// Device object managed by this scaffold.
 	KeyboardDevice* const deviceObject;
 	/// Keyboard Handler to communicate with underneath API.
-	osg::ref_ptr<KeyboardHandler> keyboardHandler;
+	osg::ref_ptr<OsgKeyboardHandler> keyboardHandler;
 	/// The mutex that protects the externally modifiable parameters.
 	boost::mutex mutex;
 
@@ -55,7 +55,7 @@ private:
 
 KeyboardScaffold::KeyboardScaffold(std::shared_ptr<SurgSim::Framework::Logger> logger) : m_logger(logger)
 {
-	if (! m_logger)
+	if (!m_logger)
 	{
 		m_logger = SurgSim::Framework::Logger::getLogger("Keyboard device");
 		m_logger->setThreshold(m_defaultLogLevel);
@@ -94,7 +94,6 @@ bool KeyboardScaffold::updateDevice(int key, int modifierMask)
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
 	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
-
 	inputData.integers().set("key", key);
 	inputData.integers().set("modifierMask", modifierMask);
 
@@ -102,7 +101,7 @@ bool KeyboardScaffold::updateDevice(int key, int modifierMask)
 	return true;
 }
 
-KeyboardHandler* KeyboardScaffold::getKeyboardHandler() const
+OsgKeyboardHandler* KeyboardScaffold::getKeyboardHandler() const
 {
 	return m_device->keyboardHandler.get();
 }
@@ -132,7 +131,6 @@ std::shared_ptr<SurgSim::Framework::Logger> KeyboardScaffold::getLogger() const
 {
 	return m_logger;
 }
-
 
 SurgSim::Framework::LogLevel KeyboardScaffold::m_defaultLogLevel = SurgSim::Framework::LOG_LEVEL_INFO;
 

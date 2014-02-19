@@ -58,6 +58,22 @@ public:
 	/// Check whether this device is initialized.
 	bool isInitialized() const;
 
+	/// Sets the position scale for this device.
+	/// The position scale controls how much the pose changes for a given device translation.
+	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	/// \param scale The multiplicative factor to apply to the position.
+	void setPositionScale(double scale);
+	/// Gets the position scale for this device.
+	double getPositionScale() const;
+
+	/// Sets the orientation scale for this device.
+	/// The orientation scale controls how much the pose changes for a given device rotation.
+	/// The default value for a raw device tries to correspond to the actual physical motion of the device.
+	/// \param scale The multiplicative factor to apply to the rotation angles.
+	void setOrientationScale(double scale);
+	/// Gets the orientation scale for this device.
+	double getOrientationScale() const;
+
 private:
 	friend class NovintScaffold;
 
@@ -65,9 +81,14 @@ private:
 	/// \return	true if 7 degree of freedom device, false if not.
 	virtual bool is7DofDevice() const;
 
-
+	/// The scaffold handles all the communication with the SDK.
 	std::shared_ptr<NovintScaffold> m_scaffold;
 	std::string m_initializationName;
+
+	/// Scale factor for the position axes; stored locally before the device is initialized.
+	double m_positionScale;
+	/// Scale factor for the orientation axes; stored locally before the device is initialized.
+	double m_orientationScale;
 };
 
 };  // namespace Device

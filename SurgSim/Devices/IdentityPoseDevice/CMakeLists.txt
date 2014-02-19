@@ -47,7 +47,7 @@ set(LIBS
 target_link_libraries(IdentityPoseDevice ${LIBS}
 )
 
-if(SURGSIM_TESTS_BUILD)
+if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 endif()
 

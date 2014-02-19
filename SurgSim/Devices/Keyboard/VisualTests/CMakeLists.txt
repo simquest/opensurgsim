@@ -13,10 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_directories(
-	${OSG_INCLUDE_DIR}
-)
-
 set(UNIT_TEST_SOURCES
 	KeyboardVisualTests.cpp
 )
@@ -29,10 +25,11 @@ add_executable(KeyboardVisualTest
 
 set(LIBS KeyboardDevice
 		 SurgSimDataStructures 
-		 SurgSimInput SurgSimTesting 
+		 SurgSimInput 
+		 SurgSimTesting 
 		 ${OPENSCENEGRAPH_LIBRARIES}
-	)
-	
+)
+
 target_link_libraries(KeyboardVisualTest ${LIBS})
 
 # Put KeyboardVisualTest into folder "Devices"

@@ -13,14 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-include_directories(
+include_directories (
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	AccessibleTests.cpp
+	AccessibleTypeTests.cpp
 	ApplicationDataTest.cpp
 	AssertTest.cpp
 	BarrierTest.cpp
@@ -31,10 +30,13 @@ set(UNIT_TEST_SOURCES
 	LockedContainerTest.cpp
 	LoggerManagerTest.cpp
 	LoggerTest.cpp
+	MockObjects.cpp
+	ObjectFactoryTests.cpp
 	ReuseFactoryTest.cpp
 	RuntimeTest.cpp
 	SceneElementTest.cpp
 	SceneTest.cpp
+	SerializationMockComponent.cpp
 	SharedInstanceTest.cpp
 	TimerTest.cpp
 	TransferPropertiesBehaviorTests.cpp
@@ -42,20 +44,15 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	MockObjects.h
-)
-
-include_directories(
+	SerializationMockComponent.h
 )
 
 file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(LIBS
 	SurgSimFramework
-	gmock
-	gtest
 )
 
 surgsim_add_unit_tests(SurgSimFrameworkTest)
 
-# Put SurgSimFrameworkTest into folder "Framework"
 set_target_properties(SurgSimFrameworkTest PROPERTIES FOLDER "Framework")

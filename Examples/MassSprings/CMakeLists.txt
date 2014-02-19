@@ -21,13 +21,13 @@ link_directories(
 )
 
 include_directories(
-	"${SURGSIM_TOP_INCLUDE_DIR}"
-	"${CMAKE_CURRENT_SOURCE_DIR}"
-	"${EIGEN3_INCLUDE_DIR}"
-	"${Boost_INCLUDE_DIR}"
-	"${OSG_INCLUDE_DIR}"
-	"${OPENTHREADS_INCLUDE_DIR}"
-	"${YAML_CPP_SOURCE_DIR}/include"
+	${SURGSIM_TOP_INCLUDE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}
+	${EIGEN3_INCLUDE_DIR}
+	${Boost_INCLUDE_DIR}
+	${OSG_INCLUDE_DIR}
+	${OPENTHREADS_INCLUDE_DIR}
+	${YAML_CPP_INCLUDE_DIR}
 )
 
 set(EXAMPLE_SOURCES
@@ -39,6 +39,7 @@ set(EXAMPLE_HEADERS
 
 add_executable(ExampleMassSprings
 	${EXAMPLE_SOURCES} ${EXAMPLE_HEADERS})
+
 surgsim_show_ide_folders(
 	"${EXAMPLE_SOURCES}" "${EXAMPLE_HEADERS}")
 
@@ -49,11 +50,9 @@ SET(LIBS
 	SurgSimCollision
 	SurgSimFramework
 	SurgSimMath
-	yaml-cpp
 )
 
-target_link_libraries(ExampleMassSprings ${LIBS}
-)
+target_link_libraries(ExampleMassSprings ${LIBS})
 
 # Put ExampleMassSprings into folder "Examples"
 set_target_properties(ExampleMassSprings PROPERTIES FOLDER "Examples") 

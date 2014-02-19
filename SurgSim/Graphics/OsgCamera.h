@@ -87,6 +87,10 @@ public:
 	/// \return	View matrix
 	virtual const SurgSim::Math::Matrix44d& getViewMatrix() const;
 
+	/// Gets the inverse view matrix of the camera
+	/// \return	Inverse view matrix
+	virtual const SurgSim::Math::Matrix44d& getInverseViewMatrix() const;
+
 	/// Sets the projection matrix of the camera
 	/// \param	matrix	Projection matrix
 	virtual void setProjectionMatrix(const SurgSim::Math::Matrix44d& matrix);
@@ -143,6 +147,10 @@ private:
 	SurgSim::Math::RigidTransform3d m_pose;
 	/// View matrix of the camera
 	SurgSim::Math::Matrix44d m_viewMatrix;
+
+	/// Inverse view matrix of the camera
+	SurgSim::Math::Matrix44d m_inverseViewMatrix;
+
 	/// Projection matrix of the camera
 	SurgSim::Math::Matrix44d m_projectionMatrix;
 

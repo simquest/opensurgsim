@@ -16,25 +16,20 @@
 
 include_directories(
 	${gtest_SOURCE_DIR}/include
-	${gtest_SOURCE_DIR}
 )
 
 set(UNIT_TEST_SOURCES
 	MouseDeviceTest.cpp
-	OsgMouseScaffoldTest.cpp
+	MouseScaffoldTest.cpp
 )
 
-set(LIBS
-	MouseDevice
-	SurgSimInput
-	SurgSimFramework
-	SurgSimDataStructures
-	gmock
-	gtest
-	${OPENSCENEGRAPH_LIBRARIES}
+set(LIBS MouseDevice 
+		 SurgSimDataStructures
+		 SurgSimFramework 
+		 SurgSimInput 
+		 ${OPENSCENEGRAPH_LIBRARIES}
 )
 
 surgsim_add_unit_tests(MouseDeviceTest)
 
-# Put MouseDeviceTest into folder "Devices"
 set_target_properties(MouseDeviceTest PROPERTIES FOLDER "Devices")
