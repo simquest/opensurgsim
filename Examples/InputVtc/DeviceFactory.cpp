@@ -15,7 +15,6 @@
 
 #include "Examples/InputVtc/DeviceFactory.h"
 
-#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Framework/Log.h"
 
 #ifdef MULTIAXISDEVICE_LIBRARY_AVAILABLE
@@ -76,10 +75,6 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the MultiAxisDevice.";
 #endif // MULTIAXISDEVICE_LIBRARY_AVAILABLE
 
-	// If all else fails, use an IdentityPoseDevice.
-	SURGSIM_LOG_INFO(logger) << "DeviceFactory is going to use an IdentityPoseDevice.";
-	m_device = std::make_shared<SurgSim::Device::IdentityPoseDevice>(name);
-	SURGSIM_ASSERT(m_device->initialize()) << "Could not initialize an IdentityPoseDevice." <<
-		" DeviceFactory was unable to create any device.";
-	return m_device;
+	// failed to instantiate a device
+	return nullptr;
 }

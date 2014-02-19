@@ -255,7 +255,9 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Input::InputManager> inputManager = std::make_shared<SurgSim::Input::InputManager>();
 
 	DeviceFactory deviceFactory;
-	inputManager->addDevice(deviceFactory.getDevice(toolDeviceName));
+	std::shared_ptr<SurgSim::Input::DeviceInterface> device = deviceFactory.getDevice(toolDeviceName);
+	SURGSIM_ASSERT(device != nullptr) << "Unable to get a device, is one connected?";
+	inputManager->addDevice(device);
 
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime(new SurgSim::Framework::Runtime());
 	runtime->addManager(physicsManager);

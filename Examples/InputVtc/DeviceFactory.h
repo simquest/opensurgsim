@@ -16,6 +16,9 @@
 #ifndef EXAMPLES_INPUTVTC_DEVICEFACTORY_H
 #define EXAMPLES_INPUTVTC_DEVICEFACTORY_H
 
+#include <memory>
+#include <string>
+
 #include "SurgSim/Input/DeviceInterface.h"
 
 /// A class that creates an instance of a suitable subclass of DeviceInterface.
@@ -32,9 +35,9 @@ public:
 
 	/// Creates a device.
 	/// This class will try to create a NovintDevice.  If the NovintDevice library is not available, or the device does
-	/// not initialize, the class tries to use a MultiAxisDevice.  If that fails, it uses an IdentityPoseDevice.
+	/// not initialize, this class tries to create a MultiAxisDevice.
 	/// \param name The name passed to the device.
-	/// \return A shared pointer to an instance of a subclass of DeviceInterface.
+	/// \return A shared pointer to an instance of a subclass of DeviceInterface, or nullptr on failure.
 	std::shared_ptr<SurgSim::Input::DeviceInterface> getDevice(const std::string& name);
 
 private:
