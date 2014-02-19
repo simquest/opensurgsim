@@ -39,10 +39,6 @@ public:
 	/// \param name The name passed to the device.
 	/// \return A shared pointer to an instance of a subclass of DeviceInterface, or nullptr on failure.
 	std::shared_ptr<SurgSim::Input::DeviceInterface> getDevice(const std::string& name);
-
-private:
-	/// The device instance (which should finalize itself upon destruction).
-	std::shared_ptr<SurgSim::Input::DeviceInterface> m_device;
 };
 
 

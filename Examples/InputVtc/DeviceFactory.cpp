@@ -28,7 +28,7 @@
 using SurgSim::Framework::Logger;
 
 
-DeviceFactory::DeviceFactory() : m_device(nullptr)
+DeviceFactory::DeviceFactory()
 {
 }
 DeviceFactory::~DeviceFactory()
@@ -37,11 +37,6 @@ DeviceFactory::~DeviceFactory()
 
 std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const std::string& name)
 {
-	if (m_device != nullptr)
-	{
-		return m_device;
-	}
-
 	std::shared_ptr<Logger> logger = Logger::getDefaultLogger();
 
 	// First check for a Falcon.  Did we build NovintDevice, and will the device initialize?
@@ -53,8 +48,7 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 
 	if (novintDevice->initialize())
 	{
-		m_device = novintDevice;
-		return m_device;
+		return novintDevice;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the NovintDevice.";
 #endif // NOVINT_LIBRARY_AVAILABLE
@@ -69,8 +63,7 @@ std::shared_ptr<SurgSim::Input::DeviceInterface> DeviceFactory::getDevice(const 
 
 	if (multiAxisDevice->initialize())
 	{
-		m_device = multiAxisDevice;
-		return m_device;
+		return multiAxisDevice;
 	}
 	SURGSIM_LOG_WARNING(logger) << "Could not initialize the MultiAxisDevice.";
 #endif // MULTIAXISDEVICE_LIBRARY_AVAILABLE
