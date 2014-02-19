@@ -13,12 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_H
-#define SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_H
+#ifndef SURGSIM_COLLISION_TRIANGLEMESHTRIANGLEMESHDCDCONTACT_H
+#define SURGSIM_COLLISION_TRIANGLEMESHTRIANGLEMESHDCDCONTACT_H
 
 #include <memory>
 
-#include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
 
 namespace SurgSim
@@ -26,13 +25,14 @@ namespace SurgSim
 namespace Collision
 {
 
-/// Class to calculate intersections between a triangle mesh and a plane
-class TriangleMeshPlaneDcdContact : public ContactCalculation
+class CollisionPair;
+
+/// Class to calculate intersections between a triangle mesh and a triangle mesh
+class TriangleMeshTriangleMeshDcdContact : public ContactCalculation
 {
 public:
-
-	/// Constructor
-	TriangleMeshPlaneDcdContact();
+	/// Constructor.
+	TriangleMeshTriangleMeshDcdContact();
 
 	/// Function that returns the shapes between which this class performs collision detection.
 	/// \return int std::pair containing the shape types.
@@ -40,13 +40,11 @@ public:
 
 private:
 	/// Calculate the actual contact between two shapes of the given CollisionPair.
-	/// \param pair The symmetric pair that is under consideration.
+	/// \param    pair    The symmetric pair that is under consideration.
 	virtual void doCalculateContact(std::shared_ptr<CollisionPair> pair) override;
-
 };
 
-};
-};
+}; // namespace Collision
+}; // namespace SurgSim
 
-
-#endif
+#endif // SURGSIM_COLLISION_TRIANGLEMESHTRIANGLEMESHDCDCONTACT_H

@@ -13,37 +13,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_INL_H
-#define SURGSIM_COLLISION_TRIANGLEMESHPLANEDCDCONTACT_INL_H
-
+#include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
+#include "SurgSim/Collision/Representation.h"
+#include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/DataStructures/TriangleMesh.h"
+
+using SurgSim::Math::MeshShape;
+using SurgSim::Math::PlaneShape;
+using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
 namespace Collision
 {
 
-template <class VertexType, class EdgeType, class TriangleType>
-TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::TriangleMeshPlaneDcdContact()
+TriangleMeshPlaneDcdContact::TriangleMeshPlaneDcdContact()
 {
 }
 
-template <class VertexType, class EdgeType, class TriangleType>
-std::pair<int, int> TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::getShapeTypes()
+std::pair<int, int> TriangleMeshPlaneDcdContact::getShapeTypes()
 {
 	return std::pair<int, int> (SurgSim::Math::SHAPE_TYPE_MESH, SurgSim::Math::SHAPE_TYPE_PLANE);
 }
 
-template <class VertexType, class EdgeType, class TriangleType>
-void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculateContact
+void TriangleMeshPlaneDcdContact::doCalculateContact
 	(std::shared_ptr<CollisionPair> pair)
 {
-	std::shared_ptr<Representation> representationTriangleMesh(pair->getFirst());
-	std::shared_ptr<Representation> representationPlane(pair->getSecond());
+	std::shared_ptr<Representation> representationTriangleMesh;
+	std::shared_ptr<Representation> representationPlane;
 
-	std::shared_ptr<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>> mesh
-		(std::static_pointer_cast<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>>
-		(representationTriangleMesh->getShape()));
+	representationTriangleMesh = pair->getFirst();
+	representationPlane = pair->getSecond();
+
+	std::shared_ptr<MeshShape> mesh =
+		std::static_pointer_cast<MeshShape>(representationTriangleMesh->getShape());
 
 	std::shared_ptr<PlaneShape> plane(std::static_pointer_cast<PlaneShape>(representationPlane->getShape()));
 
@@ -56,15 +64,14 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 	double planeD = -planeNormal.dot(planePoint);
 
 	// Now loop through all the vertices on the Mesh and check if it below the plane
-	unsigned int totalMeshVertices = mesh->getMesh()->getNumVertices();
-	const std::vector<SurgSim::DataStructures::Vertex<VertexType>> Vertices = mesh->getMesh()->getVertices();
+	size_t totalMeshVertices = mesh->getMesh()->getNumVertices();
 
 	double d;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d meshVertex;
 	SurgSim::Math::Vector3d meshVertexGlobal;
 
-	for (unsigned int i = 0; i < totalMeshVertices; ++i)
+	for (size_t i = 0; i < totalMeshVertices; ++i)
 	{
 		meshVertex = mesh->getMesh()->getVertex(i).position;
 		d = planeNormal.dot(meshVertex) + planeD;
@@ -78,12 +85,9 @@ void TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType>::doCalculat
 			penetrationPoints.second.globalPosition.setValue(meshVertexGlobal - normal * d);
 
 			pair->addContact(d, normal, penetrationPoints);
-
 		}
 	}
 }
 
 }; // Physics
 }; // SurgSim
-
-#endif
