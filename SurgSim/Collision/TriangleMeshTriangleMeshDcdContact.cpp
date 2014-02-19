@@ -80,6 +80,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 		const Vector3d &triangleB2 = meshB->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
 
 		collectionNormalB.emplace_back((triangleB1 - triangleB0).cross(triangleB2 - triangleB0));
+		collectionNormalB.back().normalize();
 	}
 
 	double depth = 0.0;
@@ -96,7 +97,8 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 		const Vector3d &triangleA2 = meshBCoordinatesFromMeshACoordinates
 									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[2]);
 
-		const Vector3d normalA = (triangleA1 - triangleA0).cross(triangleA2 - triangleA0);
+		Vector3d normalA = (triangleA1 - triangleA0).cross(triangleA2 - triangleA0);
+		normalA.normalize();
 		if (normalA.isZero())
 		{
 			continue;
