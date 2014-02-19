@@ -151,6 +151,11 @@ private:
 
 	/// Triangles
 	std::vector<TriangleType> m_triangles;
+
+public:
+	// Dependent name resolution for inherited functions and typenames from templates
+	using typename Vertices<VertexData>::VertexType;
+	using Vertices<VertexData>::addVertex;
 };
 
 };  // namespace DataStructures

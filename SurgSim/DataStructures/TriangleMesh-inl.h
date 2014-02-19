@@ -34,8 +34,8 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
 {
 	for (size_t iVertex = 0; iVertex < mesh.getNumVertices(); ++iVertex)
 	{
-		typename Vertices<VertexData>::VertexType vertexData(mesh.getVertexPosition(iVertex));
-		Vertices<VertexData>::addVertex(vertexData);
+		VertexType vertexData(mesh.getVertexPosition(iVertex));
+		addVertex(vertexData);
 	}
 	for (size_t iEdge = 0; iEdge < mesh.getNumEdges(); ++iEdge)
 	{
