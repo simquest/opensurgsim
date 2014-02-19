@@ -794,9 +794,9 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// is basically unnecessary, but...
 		Vector3d fakeAxisX  = jointAxisY.cross(jointAxisZ).normalized();
 		Matrix33d fakeBasisMatrix;
-		basisMatrix.col(0) = fakeAxisX;
-		basisMatrix.col(1) = jointAxisY;
-		basisMatrix.col(2) = jointAxisZ;
+		fakeBasisMatrix.col(0) = fakeAxisX;
+		fakeBasisMatrix.col(1) = jointAxisY;
+		fakeBasisMatrix.col(2) = jointAxisZ;
 
 		const double mediumBasisDeterminantThreshold = 0.6;
 		const double smallBasisDeterminantThreshold = 0.4;
