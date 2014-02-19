@@ -32,17 +32,17 @@ template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource
 TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
 	const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
 {
-	for (unsigned int iVertex = 0; iVertex < mesh.getNumVertices(); ++iVertex)
+	for (size_t iVertex = 0; iVertex < mesh.getNumVertices(); ++iVertex)
 	{
 		typename Vertices<VertexData>::VertexType vertexData(mesh.getVertexPosition(iVertex));
 		Vertices<VertexData>::addVertex(vertexData);
 	}
-	for (unsigned int iEdge = 0; iEdge < mesh.getNumEdges(); ++iEdge)
+	for (size_t iEdge = 0; iEdge < mesh.getNumEdges(); ++iEdge)
 	{
 		EdgeType edgeData((mesh.getEdge(iEdge)).verticesId, EdgeData());
 		addEdge(edgeData);
 	}
-	for (unsigned int iTriangle = 0; iTriangle < mesh.getNumTriangles(); ++iTriangle)
+	for (size_t iTriangle = 0; iTriangle < mesh.getNumTriangles(); ++iTriangle)
 	{
 		TriangleType triangleData((mesh.getTriangle(iTriangle)).verticesId, TriangleData());
 		addTriangle(triangleData);

@@ -170,13 +170,12 @@ void MeshShape::computeFaceIntegrals(const MeshShape::TriMesh::TriangleType& fac
 void MeshShape::computeVolumeIntegrals()
 {
 	double nx, ny, nz;
-	unsigned int i;
 
 	m_T0 = m_T1[0] = m_T1[1] = m_T1[2]
 		= m_T2[0] = m_T2[1] = m_T2[2]
 		= m_TP[0] = m_TP[1] = m_TP[2] = 0.0;
 
-	for (i = 0; i < m_mesh->getNumTriangles(); i++)
+	for (size_t i = 0; i < m_mesh->getNumTriangles(); i++)
 	{
 		const TriMesh::TriangleType* f = &m_mesh->getTriangle(i);
 

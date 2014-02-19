@@ -64,14 +64,14 @@ void TriangleMeshPlaneDcdContact::doCalculateContact
 	double planeD = -planeNormal.dot(planePoint);
 
 	// Now loop through all the vertices on the Mesh and check if it below the plane
-	unsigned int totalMeshVertices = mesh->getMesh()->getNumVertices();
+	size_t totalMeshVertices = mesh->getMesh()->getNumVertices();
 
 	double d;
 	SurgSim::Math::Vector3d normal;
 	SurgSim::Math::Vector3d meshVertex;
 	SurgSim::Math::Vector3d meshVertexGlobal;
 
-	for (unsigned int i = 0; i < totalMeshVertices; ++i)
+	for (size_t i = 0; i < totalMeshVertices; ++i)
 	{
 		meshVertex = mesh->getMesh()->getVertex(i).position;
 		d = planeNormal.dot(meshVertex) + planeD;

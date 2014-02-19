@@ -73,7 +73,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	// Precalculate mesh B normals
 	std::vector<Vector3d> collectionNormalB;
 	collectionNormalB.reserve(meshB->getNumTriangles());
-	for (unsigned int i = 0; i < meshB->getNumTriangles(); ++i)
+	for (size_t i = 0; i < meshB->getNumTriangles(); ++i)
 	{
 		const Vector3d &triangleB0 = meshB->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
 		const Vector3d &triangleB1 = meshB->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
@@ -86,7 +86,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	Vector3d normal;
 	Vector3d penetrationPointA, penetrationPointB;
 
-	for (unsigned int i = 0; i < meshA->getNumTriangles(); ++i)
+	for (size_t i = 0; i < meshA->getNumTriangles(); ++i)
 	{
 		// The triangleA vertices.
 		const Vector3d &triangleA0 = meshBCoordinatesFromMeshACoordinates
@@ -102,7 +102,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 			continue;
 		}
 
-		for (unsigned int j = 0; j < meshB->getNumTriangles(); ++j)
+		for (size_t j = 0; j < meshB->getNumTriangles(); ++j)
 		{
 			const Vector3d &normalB = collectionNormalB[j];
 			if (normalB.isZero())
