@@ -14,11 +14,9 @@
 // limitations under the License.
 
 #include <memory>
-#include <boost/thread.hpp>
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
-#include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -38,11 +36,9 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
-using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector4f;
 using SurgSim::Physics::DeformableRepresentationState;
 using SurgSim::Physics::Fem1DRepresentation;
 using SurgSim::Physics::FemElement1DBeam;
@@ -66,6 +62,7 @@ void loadModelFem1D(std::shared_ptr<Fem1DRepresentation> physicsRepresentation, 
 			= Vector3d(static_cast<double>(nodeId) / static_cast<double>(numNodes), 0.0, 0.0);
 	}
 
+	// Fix the start and end nodes
 	restState->addBoundaryCondition(0 + 0);
 	restState->addBoundaryCondition(0 + 1);
 	restState->addBoundaryCondition(0 + 2);
@@ -100,15 +97,14 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 }
 
 // Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
-// by loadModelFem1D.  The gfxPoses parameter can be used to create multiple identical fems with different intial
-// locations.
+// by loadModelFem1D.
 std::shared_ptr<SceneElement> createFem1D(const std::string& name,
-										  const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-										  SurgSim::Math::Vector4d color,
+										  const SurgSim::Math::RigidTransform3d& gfxPose,
+										  const SurgSim::Math::Vector4d& color,
 										  SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<Fem1DRepresentation> physicsRepresentation
-		= std::make_shared<Fem1DRepresentation>(name + " Physics");
+		= std::make_shared<Fem1DRepresentation>("Physics Representation: " + name);
 
 	// In this example, the physics representations are not transformed, only the graphics will be transformed
 	loadModelFem1D(physicsRepresentation, 10);
@@ -120,33 +116,19 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 	std::shared_ptr<BasicSceneElement> femSceneElement = std::make_shared<BasicSceneElement>(name);
 	femSceneElement->addComponent(physicsRepresentation);
 
-	unsigned int gfxObjectId = 0;
-	std::stringstream ss;
-	for (std::vector<SurgSim::Math::RigidTransform3d>::const_iterator gfxPose = gfxPoses.begin();
-		 gfxPose != gfxPoses.end(); ++gfxPose)
-	{
-		ss.clear();
-		ss << name << " Graphics object " << gfxObjectId;
+	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
+		= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
+	graphicsRepresentation->setInitialPose(gfxPose);
+	graphicsRepresentation->setColor(color);
+	graphicsRepresentation->setPointSize(3.0f);
+	graphicsRepresentation->setVisible(true);
 
-		std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
-			= std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
-		graphicsRepresentation->setInitialPose(*gfxPose);
-		graphicsRepresentation->setColor(color);
-		graphicsRepresentation->setPointSize(3.0f);
-		graphicsRepresentation->setVisible(true);
+	femSceneElement->addComponent(graphicsRepresentation);
 
-		femSceneElement->addComponent(graphicsRepresentation);
-
-		ss.clear();
-		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
-
-		femSceneElement->addComponent(
-			std::make_shared<TransferDeformableStateToVerticesBehavior<void>>(
-				ss.str(), physicsRepresentation->getFinalState(), graphicsRepresentation->getVertices())
-			);
-
-		gfxObjectId++;
-	}
+	femSceneElement->addComponent(
+		std::make_shared<TransferDeformableStateToVerticesBehavior<void>>("Transfer from Physics to Graphics: " + name,
+																		  physicsRepresentation->getFinalState(),
+																		  graphicsRepresentation->getVertices()));
 
 	return femSceneElement;
 }
@@ -173,22 +155,24 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	const SurgSim::Math::Quaterniond quaternionIdentity = SurgSim::Math::Quaterniond::Identity();
-	SurgSim::Math::Vector3d translate(0, 0, -3);
 
-	std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-	gfxPoses.push_back(makeRigidTransform(quaternionIdentity, translate + Vector3d(-3.5, 0.5, 0.0)));
 	scene->addSceneElement(
-		createFem1D("Euler Explicit", gfxPoses, Vector4d(1, 0, 0, 1), SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+		createFem1D("Euler Explicit",                                                  // name
+					makeRigidTransform(quaternionIdentity, Vector3d(-3.5, 0.5, -3.0)), // graphics pose (rot., trans.)
+					Vector4d(1, 0, 0, 1),                                              // color (r, g, b, a)
+					SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));                 // technique to update object
 
-	gfxPoses.clear();
-	gfxPoses.push_back(makeRigidTransform(quaternionIdentity, translate + Vector3d(-0.5, 0.5, 0.0)));
-	scene->addSceneElement(createFem1D("Modified Euler Explicit", gfxPoses, Vector4d(0, 1, 0, 1),
-									   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
-
-	gfxPoses.clear();
-	gfxPoses.push_back(makeRigidTransform(quaternionIdentity, translate + Vector3d(2.5, 0.5, 0.0)));
 	scene->addSceneElement(
-		createFem1D("Euler Implicit", gfxPoses, Vector4d(0, 0, 1, 1), SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+		createFem1D("Modified Euler Explicit",
+					makeRigidTransform(quaternionIdentity, Vector3d(-0.5, 0.5, -3.0)),
+					Vector4d(0, 1, 0, 1),
+					SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+
+	scene->addSceneElement(
+		createFem1D("Euler Implicit",
+					makeRigidTransform(quaternionIdentity, Vector3d(2.5, 0.5, -3.0)),
+					Vector4d(0, 0, 1, 1),
+					SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));
 
