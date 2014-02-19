@@ -216,17 +216,12 @@ struct PhantomScaffold::DeviceData
 	DeviceData(const std::string& apiName, PhantomDevice* device) :
 		initializationName(apiName),
 		deviceObject(device),
-		positionValue(positionBuffer),
-		linearVelocityValue(linearVelocityBuffer),
-		transformValue(transformBuffer),
-		forceValue(forceBuffer)
+		positionValue(Vector3d::Zero()),
+		linearVelocityValue(Vector3d::Zero()),
+		forceValue(Vector3d::Zero()),
+		buttonsBuffer(0)
 	{
-		positionValue.setZero();   // also clears positionBuffer
-		linearVelocityValue.setZero();   // also clears linearVelocityBuffer
-		transformValue.setIdentity();   // also sets transformBuffer
-		buttonsBuffer = 0;
-
-		forceValue.setZero();   // also clears forceBuffer
+		transformValue.setIdentity();
 	}
 
 	/// The OpenHaptics device name.
@@ -237,27 +232,18 @@ struct PhantomScaffold::DeviceData
 	/// The device handle wrapper.
 	PhantomScaffold::Handle deviceHandle;
 
-	/// The raw position read from the device.
-	double positionBuffer[3];
-	/// The raw velocity read from the device.
-	double velocityBuffer[3];
-	/// The raw pose transform read from the device.
-	double transformBuffer[16];
 	/// The raw button state read from the device.
 	int buttonsBuffer;
 
-	/// The raw force to be written to the device.
-	double forceBuffer[3];
+	/// The position value from the device.
+	Vector3d positionValue;
+	/// The velocity value from the device.
+	Vector3d linearVelocityValue;
+	/// The pose transform value from the device.
+	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transformValue;
 
-	/// The position value from the device, permanently connected to positionBuffer.
-	Eigen::Map<Vector3d> positionValue;
-	/// The velocity value from the device, permanently connected to linearVelocityBuffer.
-	Eigen::Map<Vector3d> linearVelocityValue;
-	/// The pose transform value from the device, permanently connected to transformBuffer.
-	Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::ColMajor>> transformValue;
-
-	/// The force value to be written to the device, permanently connected to positionBuffer.
-	Eigen::Map<Vector3d> forceValue;
+	/// The force value to be written to the device.
+	Vector3d forceValue;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -497,15 +483,15 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 	hdBeginFrame(info->deviceHandle.get());
 
 	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
-	hdGetDoublev(HD_CURRENT_POSITION, info->positionBuffer);
-	hdGetDoublev(HD_CURRENT_VELOCITY, info->velocityBuffer);
-	hdGetDoublev(HD_CURRENT_TRANSFORM, info->transformBuffer);
-	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsBuffer));
+	hdGetDoublev(HD_CURRENT_POSITION, info->positionValue.data());
+	hdGetDoublev(HD_CURRENT_VELOCITY, info->velocityValue.data());
+	hdGetDoublev(HD_CURRENT_TRANSFORM, info->transformValue.data());
+	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsValue.data()));
 
 	calculateForceAndTorque(info);
 
 	// Set the force command (in newtons).
-	hdSetDoublev(HD_CURRENT_FORCE, info->forceBuffer);
+	hdSetDoublev(HD_CURRENT_FORCE, info->forceValue.data());
 
 	hdEndFrame(info->deviceHandle.get());
 
