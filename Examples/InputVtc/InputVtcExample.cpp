@@ -44,7 +44,7 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::BasicSceneElement;
@@ -120,7 +120,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	planeElement->addComponent(transferPose);
-	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+	auto collisionRepresentation =  std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 		("Plane Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 	planeElement->addComponent(collisionRepresentation);
@@ -195,7 +195,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(rawInputGraphicsRepresentation);
 	boxElement->addComponent(transferInputPose);
-	auto collisionRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+	auto collisionRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 		("Box Collision Representation");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 	boxElement->addComponent(collisionRepresentation);

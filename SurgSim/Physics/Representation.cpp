@@ -100,5 +100,15 @@ const SurgSim::Math::Vector3d& Representation::getGravity() const
 	return m_gravity;
 }
 
+std::shared_ptr<SurgSim::Collision::Representation> Representation::getCollisionRepresentation() const
+{
+	return m_collisionRepresentation;
+}
+
+void Representation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> val)
+{
+	m_collisionRepresentation = val;
+}
+
 }; // Physics
 }; // SurgSim

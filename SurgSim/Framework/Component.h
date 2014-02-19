@@ -40,7 +40,7 @@ class Runtime;
 /// whether to handle a component of a given type or not. Components will get initialized by having
 /// doInit(), and doWakeUp() called in succession, all components together will have doInit() called before
 /// any component will recieve doWakeUp()
-class Component : public Accessible
+class Component : public Accessible, public std::enable_shared_from_this<Component>
 {
 public:
 	/// Constructor
@@ -110,6 +110,10 @@ public:
 
 	/// \return The static class factory that is being used in the conversion.
 	static FactoryType& getFactory();
+
+	/// Gets a shared pointer to this component.
+	/// \return	The shared pointer.
+	std::shared_ptr<Component> getSharedPtr();
 
 private:
 	/// Name of this component

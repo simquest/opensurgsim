@@ -59,6 +59,9 @@ public:
 
 	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getCollisionRepresentations();
 
+	const std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+							 std::shared_ptr<SurgSim::Physics::Representation>>& getCollisionToPhysicsMap() const;
+
 	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
 	/// should only be from the list of representations that are in this state.
 	/// \param	val	The list of collision pairs.
@@ -107,6 +110,9 @@ private:
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
+
+	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+					   std::shared_ptr<SurgSim::Physics::Representation>> m_collisionsToPhysicsMap;
 
 	/// The local list of collision pairs
 	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_collisionPairs;

@@ -128,5 +128,19 @@ std::string Component::getClassName() const
 	return "SurgSim::Framework::Component";
 }
 
+std::shared_ptr<Component> Component::getSharedPtr()
+{
+	std::shared_ptr<Component> result;
+	try
+	{
+		result = shared_from_this();
+	}
+	catch (const std::exception&)
+	{
+		SURGSIM_FAILURE() << "Component was not created as a shared_ptr.";
+	}
+	return result;
+}
+
 }; // namespace Framework
 }; // namespace SurgSim

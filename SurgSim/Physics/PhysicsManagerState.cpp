@@ -41,16 +41,31 @@ void PhysicsManagerState::setRepresentations(const std::vector<std::shared_ptr<R
 
 	int index = 0;
 	m_representationsIndexMapping.clear();
-	for (auto it = val.begin(); it != val.end(); it++)
+	m_collisionsToPhysicsMap.clear();
+	for (auto it = m_representations.begin(); it != m_representations.end(); it++)
 	{
 		m_representationsIndexMapping.setValue((*it).get(), index);
 		index += (*it)->getNumDof();
+
+		auto collision = (*it)->getCollisionRepresentation();
+		if (collision != nullptr)
+		{
+			m_collisionsToPhysicsMap[collision] = (*it);
+		}
 	}
 }
 
 const std::vector<std::shared_ptr<Representation>>& PhysicsManagerState::getRepresentations()
 {
 	return m_representations;
+}
+
+const std::unordered_map<
+	std::shared_ptr<SurgSim::Collision::Representation>,
+	std::shared_ptr<SurgSim::Physics::Representation>>&
+	PhysicsManagerState::getCollisionToPhysicsMap() const
+{
+	return m_collisionsToPhysicsMap;
 }
 
 void PhysicsManagerState::setCollisionRepresentations(

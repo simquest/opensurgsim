@@ -67,12 +67,5 @@ const SurgSim::Math::RigidTransform3d& ShapeCollisionRepresentation::getInitialP
 	return m_pose;
 }
 
-std::shared_ptr<SurgSim::Physics::Representation> ShapeCollisionRepresentation::getPhysicsRepresentation()
-{
-	return nullptr;
-}
-
-
-
 }; // namespace Collision
 }; // namespace SurgSim

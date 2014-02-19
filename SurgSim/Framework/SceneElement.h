@@ -103,7 +103,7 @@ public:
 	/// \return True if this SceneElement is initialized; Otherwise, false.
 	bool isInitialized() const;
 
-	/// Gets a shared pointer to the runtime.
+	/// Gets a shared pointer to this SceneElement.
 	/// \return	The shared pointer.
 	std::shared_ptr<SceneElement> getSharedPtr();
 
