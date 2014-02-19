@@ -24,16 +24,14 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/SphereShape.h"
-#include "SurgSim/Math/Shape.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Collision::ShapeCollisionRepresentation;
-using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::PlaneShape;
-using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
 
 namespace
@@ -76,7 +74,7 @@ struct RepresentationTest : public ::testing::Test
 TEST_F(RepresentationTest, InitTest)
 {
 	EXPECT_NO_THROW(
-		{ShapeCollisionRepresentation("Temp", plane, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));}
+		{ShapeCollisionRepresentation("Plane", plane, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));}
 	);
 }
 
