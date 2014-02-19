@@ -82,7 +82,7 @@ public:
 		{
 			nodeEnds[0] = nodeId;
 			nodeEnds[1] = nodeId + 1;
-			auto element = std::make_shared<FemElement1DBeam>(nodeEnds, *state);
+			auto element = std::make_shared<FemElement1DBeam>(nodeEnds);
 			element->setMassDensity(massDensity);
 			element->setYoungModulus(youngModulus);
 			element->setPoissonRatio(poissonRatio);
@@ -203,7 +203,7 @@ protected:
 
 		// Create FemElement1DBeam
 		std::array<unsigned int, 2> nodeIds = {0, 1};
-		auto element = std::make_shared<FemElement1DBeam>(nodeIds, *m_initialState);
+		auto element = std::make_shared<FemElement1DBeam>(nodeIds);
 		element->setMassDensity(m_rho);
 		element->setYoungModulus(m_E);
 		element->setPoissonRatio(m_nu);

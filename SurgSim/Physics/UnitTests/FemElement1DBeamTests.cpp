@@ -40,8 +40,8 @@ const double epsilon = 1e-9;
 class MockFemElement1D : public FemElement1DBeam
 {
 public:
-	MockFemElement1D(std::array<unsigned int, 2> nodeIds, const DeformableRepresentationState& restState)
-		: FemElement1DBeam(nodeIds, restState)
+	MockFemElement1D(std::array<unsigned int, 2> nodeIds)
+		: FemElement1DBeam(nodeIds)
 	{
 	}
 
@@ -378,7 +378,7 @@ public:
 
 	std::shared_ptr<MockFemElement1D> getBeam()
 	{
-		auto beam = std::make_shared<MockFemElement1D>(m_nodeIds, m_restState);
+		auto beam = std::make_shared<MockFemElement1D>(m_nodeIds);
 		beam->setRadius(m_radius);
 		beam->setMassDensity(m_rho);
 		beam->setPoissonRatio(m_nu);
@@ -391,12 +391,12 @@ public:
 TEST_F(FemElement1DBeamTests, ConstructorTest)
 {
 	ASSERT_NO_THROW(
-		{ MockFemElement1D beam(m_nodeIds, m_restState); });
+		{ MockFemElement1D beam(m_nodeIds); });
 }
 
 TEST_F(FemElement1DBeamTests, NodeIdsTest)
 {
-	FemElement1DBeam beam(m_nodeIds, m_restState);
+	FemElement1DBeam beam(m_nodeIds);
 	EXPECT_EQ(2u, beam.getNumNodes());
 	EXPECT_EQ(2u, beam.getNodeIds().size());
 	for (int i = 0; i < 2; i++)
@@ -408,7 +408,7 @@ TEST_F(FemElement1DBeamTests, NodeIdsTest)
 
 TEST_F(FemElement1DBeamTests, setGetRadiusTest)
 {
-	FemElement1DBeam beam(m_nodeIds, m_restState);
+	FemElement1DBeam beam(m_nodeIds);
 
 	// Default radius = 0
 	EXPECT_DOUBLE_EQ(0.0, beam.getRadius());
@@ -422,7 +422,7 @@ TEST_F(FemElement1DBeamTests, setGetRadiusTest)
 
 TEST_F(FemElement1DBeamTests, MaterialParameterTest)
 {
-	FemElement1DBeam beam(m_nodeIds, m_restState);
+	FemElement1DBeam beam(m_nodeIds);
 	beam.setRadius(m_radius);
 
 	// Test the various mode of failure related to the physical parameters

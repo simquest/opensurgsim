@@ -36,10 +36,9 @@ class FemElement1DBeam : public FemElement
 {
 public:
 	/// Constructor
-	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element in a mesh provided by the restState's
-	/// DeformableRepresentationState::getPositions
-	/// \param restState The rest state to initialize the element with
-	FemElement1DBeam(std::array<unsigned int, 2> nodeIds, const DeformableRepresentationState& restState);
+	/// \param nodeIds An array of 2 node ids (A, B) defining this beam element with respect to a
+	/// DeformableRepresentaitonState which is passed to the initialize method.
+	FemElement1DBeam(std::array<unsigned int, 2> nodeIds);
 
 	/// Sets the beam's circular cross-section radius
 	/// \param radius The radius of the beam

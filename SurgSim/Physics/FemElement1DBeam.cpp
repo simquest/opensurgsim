@@ -32,7 +32,7 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement1DBeam::FemElement1DBeam(std::array<unsigned int, 2> nodeIds, const DeformableRepresentationState& restState)
+FemElement1DBeam::FemElement1DBeam(std::array<unsigned int, 2> nodeIds)
 	: m_G(0.0),
 	  m_restLength(0.0),
 	  m_radius(0.0),
