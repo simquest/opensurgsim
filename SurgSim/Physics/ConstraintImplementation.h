@@ -42,7 +42,7 @@ class ConstraintImplementation
 public:
 	/// Constructor
 	/// \note Localization embbed the representation, so it is fully defined
-	explicit ConstraintImplementation();
+	ConstraintImplementation();
 
 	/// Destructor
 	virtual ~ConstraintImplementation();
