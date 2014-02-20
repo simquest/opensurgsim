@@ -16,7 +16,7 @@
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
 
@@ -53,8 +53,10 @@ void TransferInputPoseBehavior::update(double dt)
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_from->getData(&dataGroup);
 	RigidTransform3d pose;
-	dataGroup.poses().get(m_poseName, &pose);
-	m_to->setPose(pose);
+	if (dataGroup.poses().get(m_poseName, &pose))
+	{
+		m_to->setPose(pose);
+	}
 }
 
 bool TransferInputPoseBehavior::doInitialize()
