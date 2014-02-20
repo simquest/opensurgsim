@@ -50,10 +50,8 @@ struct RepresentationTest : public ::testing::Test
 	{
 		plane = std::make_shared<PlaneShape>();
 		sphere = std::make_shared<SphereShape>(1.0);
-		planeRep = std::make_shared<ShapeCollisionRepresentation>("Plane Shape", plane,
-														makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));
-		sphereRep = std::make_shared<ShapeCollisionRepresentation>("Sphere Shape", sphere,
-														makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));
+		planeRep = std::make_shared<ShapeCollisionRepresentation>("PlaneShape", plane, RigidTransform3d::Identity());
+		sphereRep = std::make_shared<ShapeCollisionRepresentation>("SphereShape", sphere, RigidTransform3d::Identity());
 	}
 
 	virtual void TearDown()
@@ -69,7 +67,7 @@ struct RepresentationTest : public ::testing::Test
 TEST_F(RepresentationTest, InitTest)
 {
 	EXPECT_NO_THROW(
-		{ShapeCollisionRepresentation("Plane", plane, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero()));}
+		{ShapeCollisionRepresentation("Plane", plane, RigidTransform3d::Identity());}
 	);
 }
 
@@ -107,6 +105,9 @@ TEST_F(RepresentationTest, EmptyCollisionTest)
 	EXPECT_EQ(0u, planeCollisions.size());
 	EXPECT_EQ(0u, sphereCollisions.size());
 
+	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
+	EXPECT_FALSE(sphereRep->isCollidingWith(planeRep));
+
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts = sphereRep->getCollision(planeRep);
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts = planeRep->getCollision(sphereRep);
 	EXPECT_EQ(0u, sphereCollisionContacts.size());
@@ -116,21 +117,40 @@ TEST_F(RepresentationTest, EmptyCollisionTest)
 TEST_F(RepresentationTest, CollisionTest)
 {
 	EXPECT_FALSE(sphereRep->hasCollision());
+	EXPECT_FALSE(planeRep->hasCollision());
 
 	std::shared_ptr<Contact> dummyContact =
 		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
 	EXPECT_NO_THROW(sphereRep->addCollision(planeRep, dummyContact));
 
 	EXPECT_TRUE(sphereRep->hasCollision());
+	EXPECT_TRUE(sphereRep->isCollidingWith(planeRep));
+	// Collision is only added to 'sphereRep', thus the following check should return 'false'.
+	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
+
+	EXPECT_NO_THROW(planeRep->addCollision(sphereRep, dummyContact));
+	EXPECT_TRUE(planeRep->hasCollision());
+	EXPECT_TRUE(planeRep->isCollidingWith(sphereRep));
 
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>  sphereCollisions = sphereRep->getCollisions();
 	EXPECT_EQ(1u, sphereCollisions.size());
 	EXPECT_NE(std::end(sphereCollisions), sphereCollisions.find(planeRep));
 
+	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>  planeCollisions = planeRep->getCollisions();
+	EXPECT_EQ(1u, planeCollisions.size());
+	EXPECT_NE(std::end(planeCollisions), planeCollisions.find(sphereRep));
+
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts = sphereRep->getCollision(planeRep);
 	EXPECT_EQ(1u, sphereCollisionContacts.size());
 	EXPECT_EQ(dummyContact, sphereCollisionContacts.front());
+
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts = planeRep->getCollision(sphereRep);
+	EXPECT_EQ(1u, planeCollisionContacts.size());
+	EXPECT_EQ(dummyContact, planeCollisionContacts.front());
+
+	EXPECT_EQ(planeCollisionContacts.front(), sphereCollisionContacts.front());
 
 	sphereRep->clearCollision();
 	EXPECT_FALSE(sphereRep->hasCollision());
