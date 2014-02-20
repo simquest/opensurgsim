@@ -35,14 +35,12 @@ Representation::~Representation()
 std::list<std::shared_ptr<SurgSim::Collision::Contact>>
 	Representation::getCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const
 {
-	auto result = std::find_if(std::begin(m_collisions), std::end(m_collisions),
-		[collisionRepresentation](std::pair<std::shared_ptr<SurgSim::Collision::Representation>,
-											std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collision)
-		{ return collision.first == collisionRepresentation;});
+	auto result = m_collisions.find(collisionRepresentation);
 
 	if(std::end(m_collisions) == result)
 	{
-		return std::list<std::shared_ptr<SurgSim::Collision::Contact>>();
+		static std::list<std::shared_ptr<SurgSim::Collision::Contact>> emptyList;
+		return emptyList;
 	}
 	else
 	{
@@ -60,6 +58,12 @@ void Representation::addCollision(std::shared_ptr<SurgSim::Collision::Representa
 								  std::shared_ptr<SurgSim::Collision::Contact> contact)
 {
 	m_collisions[collisionRepresentation].push_back(contact);
+}
+
+bool Representation::isCollidingWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const
+{
+	auto result = m_collisions.find(collisionRepresentation);
+	return (std::end(m_collisions) == result) ? false : true;
 }
 
 bool Representation::hasCollision() const

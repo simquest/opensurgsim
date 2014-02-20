@@ -81,6 +81,11 @@ public:
 	void addCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
 					  std::shared_ptr<SurgSim::Collision::Contact> contact);
 
+	/// Check if this collision representation is colliding with the given collision representation
+	/// \param collisionRepresentation The collision representation to be check
+	/// \return True if there is collision; otherwise, false.
+	bool isCollidingWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const;
+
 	/// Check if this collision representation has collisions.
 	/// \return True if there is a collision; otherwise false.
 	bool hasCollision() const;
