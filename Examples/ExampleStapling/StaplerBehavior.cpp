@@ -18,6 +18,7 @@
 #include "Examples/ExampleStapling/StapleElement.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/Scene.h"
@@ -70,8 +71,16 @@ void StaplerBehavior::update(double dt)
 	}
 	m_buttonPreviouslyPressed = button1;
 
-	//if(m_staplerRepresentation->hasCollision())
-	//	printoutCollisionInfo();
+	// Printout message when detecting collision
+	auto collisionRepresentation = std::dynamic_pointer_cast<SurgSim::Collision::Representation>(m_staplerRepresentation);
+	if(collisionRepresentation->hasCollision())
+	{
+		auto collisionsMap = collisionRepresentation->getCollisions();
+		for (auto i = collisionsMap.begin(); i != collisionsMap.end(); ++i)
+		{
+			std::cout << "Stapler has collision with " << (i->first)->getName() << std::endl;
+		}
+	}
 }
 
 int StaplerBehavior::getTargetManagerType() const
