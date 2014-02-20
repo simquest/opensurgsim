@@ -19,6 +19,7 @@
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Input/InputComponent.h"
@@ -33,6 +34,12 @@ StaplerBehavior::StaplerBehavior(const std::string& name):
 void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
 {
 	m_from = inputComponent;
+}
+
+void StaplerBehavior::setStaplerRepresentation(
+	 std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation)
+{
+	m_staplerRepresentation = staplerRepresentation;
 }
 
 void StaplerBehavior::update(double dt)
@@ -62,6 +69,9 @@ void StaplerBehavior::update(double dt)
 		getScene()->addSceneElement(m_element);
 	}
 	m_buttonPreviouslyPressed = button1;
+
+	//if(m_staplerRepresentation->hasCollision())
+	//	printoutCollisionInfo();
 }
 
 int StaplerBehavior::getTargetManagerType() const

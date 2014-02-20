@@ -24,6 +24,11 @@
 namespace SurgSim
 {
 
+namespace Framework
+{
+class Representation;
+}
+
 namespace Input
 {
 class InputComponent;
@@ -31,6 +36,9 @@ class InputComponent;
 
 }
 
+/// This behavior is used to add staples.
+/// The stapler is controlled by an input device and when
+/// the user pushes a button on the device, a stapler will be deployed from the stapler.
 class StaplerBehavior: public SurgSim::Framework::Behavior
 {
 public:
@@ -41,6 +49,10 @@ public:
 	/// Set the input component from which to get the pose
 	/// \param	inputComponent	The input component which sends the pose.
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
+
+	/// Set the stapler representation
+	/// \param	staplerRepresentation The representation of a stapler
+	void setStaplerRepresentation(std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -64,6 +76,9 @@ protected:
 private:
 	/// Input component from which to get the pose
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
+
+	/// A stapler representation
+	std::shared_ptr<SurgSim::Framework::Representation> m_staplerRepresentation;
 
 	/// The number of staples added
 	int m_numElements;
