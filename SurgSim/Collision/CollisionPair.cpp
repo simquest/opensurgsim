@@ -50,8 +50,6 @@ void CollisionPair::setRepresentations(const std::shared_ptr<Representation>& fi
 
 	// Invalidate the current contacts
 	clearContacts();
-	first->clearCollision();
-	second->clearCollision();
 	m_representations.first = first;
 	m_representations.second = second;
 	m_isSwapped = false;
