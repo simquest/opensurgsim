@@ -32,5 +32,49 @@ Representation::~Representation()
 
 }
 
+std::list<std::shared_ptr<SurgSim::Collision::Contact>>
+	Representation::getCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const
+{
+	auto result = m_collisions.find(collisionRepresentation);
+
+	if(std::end(m_collisions) == result)
+	{
+		static std::list<std::shared_ptr<SurgSim::Collision::Contact>> emptyList;
+		return emptyList;
+	}
+	else
+	{
+		return (*result).second;
+	}
+}
+
+std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+				   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> Representation::getCollisions() const
+{
+	return m_collisions;
+}
+
+void Representation::addCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
+								  std::shared_ptr<SurgSim::Collision::Contact> contact)
+{
+	m_collisions[collisionRepresentation].push_back(contact);
+}
+
+bool Representation::isCollidingWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const
+{
+	auto result = m_collisions.find(collisionRepresentation);
+	return (std::end(m_collisions) == result) ? false : true;
+}
+
+bool Representation::hasCollision() const
+{
+	return !m_collisions.empty();
+}
+
+void Representation::clearCollision()
+{
+	m_collisions.clear();
+}
+
 }; // namespace Collision
 }; // namespace SurgSim
