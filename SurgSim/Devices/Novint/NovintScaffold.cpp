@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Novint/NovintScaffold.h"
-
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -26,22 +24,24 @@
 
 #include <hdl/hdl.h>
 
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
-#include "SurgSim/Math/Vector.h"
+#include "SurgSim/Devices/Novint/NovintScaffold.h"
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Clock.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Clock.h"
-#include "SurgSim/Framework/SharedInstance.h"
-#include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/DataStructures/DataGroupBuilder.h"
+#include "SurgSim/Math/Vector.h"
+
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Vector4d;
-using SurgSim::Math::Matrix44d;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix44d;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::RigidTransform3d;
 
