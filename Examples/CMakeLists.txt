@@ -15,9 +15,12 @@
 
 if(BUILD_DEVICE_MULTIAXIS)
 	add_subdirectory(AddSphereFromInput)
-	add_subdirectory(InputVtc)
 	add_subdirectory(ExampleStapling)
 endif(BUILD_DEVICE_MULTIAXIS)
+
+if(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
+	add_subdirectory(InputVtc)
+endif(BUILD_DEVICE_MULTIAXIS OR BUILD_DEVICE_NOVINT)
 
 add_subdirectory(BouncingBalls)
 add_subdirectory(Fem3D)
