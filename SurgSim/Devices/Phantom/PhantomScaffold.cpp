@@ -476,17 +476,15 @@ bool PhantomScaffold::finalizeDeviceState(DeviceData* info)
 
 bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 {
-	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
-
 	//boost::lock_guard<boost::mutex> lock(info->parametersMutex);
 
 	hdBeginFrame(info->deviceHandle.get());
 
 	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
 	hdGetDoublev(HD_CURRENT_POSITION, info->positionValue.data());
-	hdGetDoublev(HD_CURRENT_VELOCITY, info->velocityValue.data());
+	hdGetDoublev(HD_CURRENT_VELOCITY, info->linearVelocityValue.data());
 	hdGetDoublev(HD_CURRENT_TRANSFORM, info->transformValue.data());
-	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsValue.data()));
+	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsBuffer));
 
 	calculateForceAndTorque(info);
 
@@ -505,6 +503,8 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 
 void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 {
+	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
+
 	Vector3d nominalForce = Vector3d::Zero();
 	outputData.vectors().get("force", &nominalForce);
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType forcePositionJacobian = Matrix33d::Zero();
@@ -512,12 +512,12 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType forceLinearVelocityJacobian = Matrix33d::Zero();
 	outputData.matrices().get("forceLinearVelocityJacobian", &forceLinearVelocityJacobian);
 
-	Vector3d position = info->positionValue * info->positionScale;
-	Vector3d linearVelocity = info->linearVelocityValue * info->positionScale;
+	Vector3d position = info->positionValue;
+	Vector3d linearVelocity = info->linearVelocityValue;
 
 	Vector3d positionForNominalForce = position;
 	outputData.vectors().get("inputPosition", &positionForNominalForce);
-	Vector3d linearVelocityForNominalForce = velocity;
+	Vector3d linearVelocityForNominalForce = linearVelocity;
 	outputData.vectors().get("inputLinearVelocity", &linearVelocityForNominalForce);
 
 	info->forceValue = nominalForce +
