@@ -1,4 +1,5 @@
-/*
+/* Copyright (c) 1994 The Board of Trustees of The Leland Stanford
+Junior University.  All rights reserved. 
 
 Header for PLY polygon files.
 
@@ -140,7 +141,7 @@ extern PlyFile *ply_open_for_writing(const char *, int, char **, int, float *);
 extern void ply_describe_element(PlyFile *, char *, int, int, PlyProperty *);
 extern void ply_describe_property(PlyFile *, char *, PlyProperty *);
 extern void ply_element_count(PlyFile *, char *, int);
-extern void ply_header_complete(PlyFile *);
+extern void ply_header_complete(PlyFile * plyfile);
 extern void ply_put_element_setup(PlyFile *, char *);
 extern void ply_put_element(PlyFile *, void *);
 extern void ply_put_comment(PlyFile *, char *);
@@ -154,12 +155,12 @@ extern PlyOtherProp *ply_get_other_properties(PlyFile *, char *, int);
 extern void ply_get_element(PlyFile *, void *);
 extern char **ply_get_comments(PlyFile *, int *);
 extern char **ply_get_obj_info(PlyFile *, int *);
-extern void ply_close(PlyFile *);
+extern void ply_close(PlyFile * plyfile);
 extern void ply_get_info(PlyFile *, float *, int *);
 extern PlyOtherElems *ply_get_other_element (PlyFile *, char *, int);
 extern void ply_describe_other_elements ( PlyFile *, PlyOtherElems *);
-extern void ply_put_other_elements (PlyFile *);
-extern void ply_free_other_elements (PlyOtherElems *);
+extern void ply_put_other_elements (PlyFile *plyfile);
+extern void ply_free_other_elements (PlyOtherElems *elements);
 
 extern int equal_strings(const char *,const char *);
 

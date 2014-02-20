@@ -29,7 +29,12 @@ LogMessageBase::LogMessageBase(Logger* logger, int level)
 	static std::string levelNames[5] = {"DEBUG   ", "INFO    ", "WARNING ", "SEVERE  ","CRITICAL"};
 	std::time_t timeStamp;
 	std::time(&timeStamp);
-	::tm* tm = std::localtime(&timeStamp);
+	::tm tm;
+#ifdef _MSC_VER
+	localtime_s(&tm, &timeStamp);
+#else
+	localtime_r(&timeStamp, &tm);
+#endif
 	std::string levelName("NONE    ");
 	if (level >= 0 && level <= LOG_LEVEL_CRITICAL)
 	{
@@ -37,11 +42,11 @@ LogMessageBase::LogMessageBase(Logger* logger, int level)
 	}
 	char fillChar = m_stream.fill();
 	m_stream << std::setfill('0') <<
-		std::setw(2) << 1+tm->tm_mon << "." <<
-		std::setw(2) << tm->tm_mday << ' ' <<
-		std::setw(2) << tm->tm_hour << ':' <<
-		std::setw(2) << tm->tm_min << ':' <<
-		std::setw(2) << tm->tm_sec << ' ' <<
+		std::setw(2) << 1+tm.tm_mon << "." <<
+		std::setw(2) << tm.tm_mday << ' ' <<
+		std::setw(2) << tm.tm_hour << ':' <<
+		std::setw(2) << tm.tm_min << ':' <<
+		std::setw(2) << tm.tm_sec << ' ' <<
 		std::setfill(fillChar) <<
 		m_logger->getName() << " " <<
 		levelName << " ";

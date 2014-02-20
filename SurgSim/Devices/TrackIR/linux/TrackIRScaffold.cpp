@@ -283,9 +283,12 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 	// Scale Position
 	position *= info->positionScale;
 
-	Matrix33d rotationX = makeRotationMatrix(info->orientationScale * static_cast<double>(-roll), Vector3d(Vector3d::UnitX()));
-	Matrix33d rotationY = makeRotationMatrix(info->orientationScale * static_cast<double>(yaw),   Vector3d(Vector3d::UnitY()));
-	Matrix33d rotationZ = makeRotationMatrix(info->orientationScale * static_cast<double>(pitch), Vector3d(Vector3d::UnitZ()));
+	Matrix33d rotationX = makeRotationMatrix(
+		info->orientationScale * static_cast<double>(-roll), Vector3d(Vector3d::UnitX()));
+	Matrix33d rotationY = makeRotationMatrix(
+		info->orientationScale * static_cast<double>(yaw),   Vector3d(Vector3d::UnitY()));
+	Matrix33d rotationZ = makeRotationMatrix(
+		info->orientationScale * static_cast<double>(pitch), Vector3d(Vector3d::UnitZ()));
 	// Rotation order is intrinsic/local XYZ
 	Matrix33d orientation = rotationX * rotationY * rotationZ;
 
