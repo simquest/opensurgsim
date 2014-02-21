@@ -23,7 +23,6 @@
 #include <boost/uuid/uuid.hpp>
 
 #include "SurgSim/Framework/Accessible.h"
-#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
@@ -32,9 +31,9 @@ namespace Framework
 {
 
 // Forward References
+class Runtime;
 class Scene;
 class SceneElement;
-class Runtime;
 
 /// Component is the main interface class to pass information to the system managers each will decide
 /// whether to handle a component of a given type or not. Components will get initialized by having

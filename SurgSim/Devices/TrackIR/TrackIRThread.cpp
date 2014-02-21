@@ -12,27 +12,41 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
-#define SURGSIM_MATH_MESHSHAPE_INL_H
+#include "SurgSim/Devices/TrackIR/TrackIRThread.h"
+
+#include "SurgSim/Devices/TrackIR/TrackIRScaffold.h"
 
 namespace SurgSim
 {
-namespace Math
+namespace Device
 {
 
-template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(
-	const std::shared_ptr<SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>> mesh)
+TrackIRThread::TrackIRThread(TrackIRScaffold* scaffold, TrackIRScaffold::DeviceData* deviceData) :
+	BasicThread("TrackIR thread"),
+	m_scaffold(scaffold),
+	m_deviceData(deviceData)
 {
-	SURGSIM_ASSERT(mesh != nullptr) << "MeshShape cannot be initialized with a null TriangleMesh";
-	m_mesh = std::make_shared<TriMesh>(*mesh);
-	computeVolumeIntegrals();
 }
 
+TrackIRThread::~TrackIRThread()
+{
+}
 
-}; // namespace Math
-}; // namespace SurgSim
+bool TrackIRThread::doInitialize()
+{
+	return true;
+}
 
-#endif
+bool TrackIRThread::doStartUp()
+{
+	return true;
+}
+
+bool TrackIRThread::doUpdate(double dt)
+{
+	return m_scaffold->runInputFrame(m_deviceData);
+}
+
+};  // namespace Device
+};  // namespace SurgSim
