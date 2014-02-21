@@ -51,6 +51,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	PreUpdate.cpp
 	PushResults.cpp
 	Representation.cpp
+	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidRepresentationContact.cpp
@@ -102,6 +103,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	PreUpdate.h
 	PushResults.h
 	Representation.h
+	RigidCollisionRepresentation.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
@@ -126,16 +128,14 @@ SET(LIBS
 	SurgSimCollision
 )
 
-target_link_libraries(SurgSimPhysics ${LIBS}
-)
+target_link_libraries(SurgSimPhysics ${LIBS})
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 
-  if(BUILD_RENDER_TESTING)
+	if(BUILD_RENDER_TESTING)
 		add_subdirectory(RenderTests)
 	endif()
 endif()
 
-# Put SurgSimPhysics into folder "Physics"
 set_target_properties(SurgSimPhysics PROPERTIES FOLDER "Physics")

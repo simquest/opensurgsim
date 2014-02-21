@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
 	${gtest_SOURCE_DIR}/include
 )
@@ -25,9 +24,9 @@ set(UNIT_TEST_SOURCES
 
 set(LIBS
 	KeyboardDevice
-	SurgSimInput
-	SurgSimFramework
 	SurgSimDataStructures
+	SurgSimFramework
+	SurgSimInput
 	${Boost_LIBRARIES}
 	${OPENSCENEGRAPH_LIBRARIES}
 )

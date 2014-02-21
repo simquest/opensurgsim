@@ -19,9 +19,9 @@
 #include <string>
 #include <memory>
 
-#include "SurgSim/Physics/UnitTests/CommonTests.h"
 #include "SurgSim/Physics/BuildMlcp.h"
-
+#include "SurgSim/Physics/UnitTests/CommonTests.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 
 namespace SurgSim
 {
@@ -196,6 +196,75 @@ TEST_F(BuildMlcpTests, OneRepresentationOneConstraintTest)
 	EXPECT_TRUE(mlcpProblem.isConsistent());
 
 	EXPECT_EQ(1, mlcpSolution.x.rows());
+	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
+}
+
+TEST_F(BuildMlcpTests, TwoRepresentationsOneConstraintSize3Test)
+{
+	// Prep the list of representations: use only 1 rigid representation + 1 fixed
+	m_usedRepresentations.push_back(m_allRepresentations[0]);
+	m_usedRepresentations.push_back(m_fixedWorldRepresentation);
+	// Set the representation list in the Physics Manager State
+	m_physicsManagerState->setRepresentations(m_usedRepresentations);
+
+	// Prep the list of constraints: use only 1 constraint
+	{
+		std::shared_ptr<Localization> rigidLocalization;
+		{
+			std::shared_ptr<RigidRepresentationLocalization> rigidLocalizationTyped;
+			rigidLocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+			rigidLocalizationTyped->setRepresentation(m_usedRepresentations[0]);
+			rigidLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
+			rigidLocalization = rigidLocalizationTyped;
+		}
+		std::shared_ptr<MockRigidConstraintBilateral3D> rigidSideContact;
+		rigidSideContact = std::make_shared<MockRigidConstraintBilateral3D>();
+
+		std::shared_ptr<Localization> fixedLocalization;
+		{
+			std::shared_ptr<FixedRepresentationLocalization> fixedLocalizationTyped;
+			fixedLocalizationTyped = std::make_shared<FixedRepresentationLocalization>();
+			fixedLocalizationTyped->setRepresentation(m_fixedWorldRepresentation);
+			fixedLocalizationTyped->setLocalPosition(SurgSim::Math::Vector3d::Zero());
+			fixedLocalization = fixedLocalizationTyped;
+		}
+		std::shared_ptr<MockFixedConstraintBilateral3D> fixedSideContact;
+		fixedSideContact = std::make_shared<MockFixedConstraintBilateral3D>();
+
+		// Define the constraint specific data
+		std::shared_ptr<ConstraintData> data = std::make_shared<ConstraintData>();
+
+		// Set up the constraint
+		std::shared_ptr<Constraint> constraint = std::make_shared<Constraint>(
+			data, rigidSideContact, rigidLocalization, fixedSideContact, fixedLocalization);
+
+		// Register the constraint in the list of used constraints for this test
+		m_usedConstraints.push_back(constraint);
+	}
+
+	// Set the constraint list in the Physics Manager State
+	m_physicsManagerState->setConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT, m_usedConstraints);
+
+	// Run the BuildMlcp computation...
+	m_buildMlcpComputation->update(dt, m_physicsManagerState);
+	MlcpPhysicsProblem& mlcpProblem = m_physicsManagerState->getMlcpProblem();
+	MlcpPhysicsSolution& mlcpSolution = m_physicsManagerState->getMlcpSolution();
+
+	// Test that the Mlcp is as expected
+	EXPECT_EQ(3, mlcpProblem.getSize());
+	EXPECT_EQ(3, mlcpProblem.A.rows());
+	EXPECT_EQ(3, mlcpProblem.A.cols());
+	EXPECT_EQ(3, mlcpProblem.b.rows());
+	EXPECT_EQ(6, mlcpProblem.CHt.rows());
+	EXPECT_EQ(3, mlcpProblem.CHt.cols());
+	EXPECT_EQ(3, mlcpProblem.H.rows());
+	EXPECT_EQ(6, mlcpProblem.H.cols());
+	EXPECT_EQ(1, mlcpProblem.mu.rows());
+	EXPECT_EQ(1u, mlcpProblem.constraintTypes.size());
+	EXPECT_EQ(SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT, mlcpProblem.constraintTypes[0]);
+	EXPECT_TRUE(mlcpProblem.isConsistent());
+
+	EXPECT_EQ(3, mlcpSolution.x.rows());
 	EXPECT_EQ(6, mlcpSolution.dofCorrection.rows());
 }
 

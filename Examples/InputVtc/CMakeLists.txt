@@ -28,21 +28,33 @@ include_directories(
 )
 
 set(INPUTVTCEXAMPLE_SOURCES
+	DeviceFactory.cpp
 	InputVtcExample.cpp
 )
 
 set(INPUTVTCEXAMPLE_HEADERS
+	DeviceFactory.h
 )
 
 add_executable(ExampleInputVtc
 	${INPUTVTCEXAMPLE_SOURCES} ${INPUTVTCEXAMPLE_HEADERS})
 
 set(LIBS 
-	MultiAxisDevice
+	IdentityPoseDevice
 	SurgSimBlocks
 	SurgSimGraphics
 	SurgSimMath
 )
+
+if(BUILD_DEVICE_MULTIAXIS)
+	list(APPEND LIBS MultiAxisDevice)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMULTIAXISDEVICE_LIBRARY_AVAILABLE")
+endif(BUILD_DEVICE_MULTIAXIS)
+
+if(BUILD_DEVICE_NOVINT)
+	list(APPEND LIBS NovintDevice)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOVINT_LIBRARY_AVAILABLE")
+endif(BUILD_DEVICE_NOVINT)
 
 target_link_libraries(ExampleInputVtc ${LIBS})
 

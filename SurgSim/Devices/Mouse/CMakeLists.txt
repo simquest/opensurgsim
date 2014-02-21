@@ -13,24 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
 	"${CMAKE_CURRENT_SOURCE_DIR}"
 	"${EIGEN3_INCLUDE_DIR}"
 	"${OPENSCENEGRAPH_INCLUDE_DIR}"
-	"${SURGSIM_TOP_INCLUDE_DIR}"
 )
 
 set(Mouse_DEVICE_SOURCES
 	MouseDevice.cpp
-	MouseHandler.cpp
-	OsgMouseScaffold.cpp
+	MouseScaffold.cpp
+	OsgMouseHandler.cpp
 )
 
 set(Mouse_DEVICE_HEADERS
 	MouseDevice.h
-	MouseHandler.h
-	OsgMouseScaffold.h
+	MouseScaffold.h
+	OsgMouseHandler.h
 )
 
 surgsim_add_library(
@@ -40,12 +39,8 @@ surgsim_add_library(
 	SurgSim/Devices/Mouse
 )
 
-SET(LIBS
-	SurgSimDataStructures
-	SurgSimFramework
-	SurgSimInput
-	KeyboardDevice
-	${OPENSCENEGRAPH_LIBRARIES}
+set(LIBS ${LIBS}
+		 SurgSimInput
 )
 
 target_link_libraries(MouseDevice ${LIBS}
@@ -57,4 +52,5 @@ if(BUILD_TESTING)
 	add_subdirectory(VisualTests)
 endif()
 
+# Put MouseDevice into folder "Devices"
 set_target_properties(MouseDevice PROPERTIES FOLDER "Devices")

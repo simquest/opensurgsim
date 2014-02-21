@@ -21,7 +21,6 @@
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Log.h"
@@ -45,6 +44,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Blocks::BasicSceneElement;
@@ -120,7 +120,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	planeElement->addComponent(transferPose);
 
-	auto rigidCollision = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	auto rigidCollision = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	rigidCollision->setRigidRepresentation(physicsRepresentation);
 	planeElement->addComponent(rigidCollision);
 

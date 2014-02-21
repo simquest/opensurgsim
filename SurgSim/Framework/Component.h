@@ -16,11 +16,14 @@
 #ifndef SURGSIM_FRAMEWORK_COMPONENT_H
 #define SURGSIM_FRAMEWORK_COMPONENT_H
 
+
 #include <string>
 #include <memory>
 
+#include <boost/uuid/uuid.hpp>
+
 #include "SurgSim/Framework/Accessible.h"
-#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/ObjectFactory.h"
 
 namespace SurgSim
 {
@@ -28,15 +31,15 @@ namespace Framework
 {
 
 // Forward References
+class Runtime;
 class Scene;
 class SceneElement;
-class Runtime;
 
 /// Component is the main interface class to pass information to the system managers each will decide
 /// whether to handle a component of a given type or not. Components will get initialized by having
 /// doInit(), and doWakeUp() called in succession, all components together will have doInit() called before
 /// any component will recieve doWakeUp()
-class Component : public Accessible
+class Component : public Accessible, public std::enable_shared_from_this<Component>
 {
 public:
 	/// Constructor
@@ -52,6 +55,9 @@ public:
 	/// Sets the name of component.
 	/// \param	name	The name of this component.
 	void setName(const std::string& name);
+
+	/// Gets the id of the component
+	boost::uuids::uuid getUuid() const;
 
 	/// \return True if this component is initialized; otherwise, false.
 	bool isInitialized() const;
@@ -81,20 +87,39 @@ public:
 	std::shared_ptr<Scene> getScene();
 
 	/// Sets the scene element.
-	/// \param sceneElement The scene element for this component
+	/// \param sceneElement The scene element for this component.
 	void setSceneElement(std::weak_ptr<SceneElement> sceneElement);
 
 	/// Gets the scene element.
-	/// \return The scene element for this component
+	/// \return The scene element for this component.
 	std::shared_ptr<SceneElement> getSceneElement();
 
-	/// Get the runtime which contains this component
-	/// \return The runtime which contains this component
+	/// Get the runtime which contains this component.
+	/// \return The runtime which contains this component.
 	std::shared_ptr<Runtime> getRuntime() const;
+
+	/// The class name for this class, this being the base class it should
+	/// return SurgSim::Framework::Component but this would make missing implemenentations
+	/// of this hard to catch, therefore this calls SURGSIM_FAILURE.
+	/// \note Use the SURGSIM_CLASSNAME macro in derived classes.
+	/// \return The fully namespace qualified name of this class.
+	virtual std::string getClassName() const;
+
+	typedef SurgSim::Framework::ObjectFactory1<SurgSim::Framework::Component, std::string> FactoryType;
+
+	/// \return The static class factory that is being used in the conversion.
+	static FactoryType& getFactory();
+
+	/// Gets a shared pointer to this component.
+	/// \return	The shared pointer.
+	std::shared_ptr<Component> getSharedPtr();
 
 private:
 	/// Name of this component
 	std::string m_name;
+
+	/// Id of this component
+	boost::uuids::uuid m_uuid;
 
 	/// Runtime which contains this component
 	std::weak_ptr<Runtime> m_runtime;
@@ -113,6 +138,7 @@ private:
 	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp() = 0;
 
+
 	/// Indicates if doInitialize() has been called
 	bool m_didInit;
 
@@ -124,6 +150,8 @@ private:
 
 	/// Indicates if this component is awake
 	bool m_isAwake;
+
+
 };
 
 }; // namespace Framework

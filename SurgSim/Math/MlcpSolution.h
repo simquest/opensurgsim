@@ -26,7 +26,7 @@ namespace Math
 
 /// The description of a solution to a \ref MlcpProblem "mixed linear complementarity problem".
 ///
-/// The solution consists of the vector \f$x\f$ and various diagnostic parameers.
+/// The solution consists of the vector \f$x\f$ and various diagnostic parameters.
 /// If \f$c = \mathbf{A}x + b\f$ is also needed, it can be computed by the caller.
 ///
 /// \sa SurgSim::Physics::MlcpPhysicsSolution, MlcpProblem, MlcpSolver
@@ -37,7 +37,7 @@ struct MlcpSolution
 	/// Vector \f$x\f$ specifying a solution to the specified mixed LCP problem.
 	Vector x;
 
-	/// The number of informations performed.
+	/// The number of iterations performed.
 	int numIterations;
 	/// True if the final value of the convergence criteria is valid.
 	bool validConvergence;

@@ -21,15 +21,13 @@
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/DcdCollision.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/Constraint.h"
 #include "SurgSim/Physics/ContactConstraintGeneration.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
-
-using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Collision::CollisionPair;
 using SurgSim::Collision::ContactCalculation;
 using SurgSim::Math::DoubleSidedPlaneShape;
@@ -50,6 +48,8 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 		rigid0->setInitialParameters(params0);
 		sphere = std::make_shared<RigidCollisionRepresentation>("Collision Representation 0");
 		std::dynamic_pointer_cast<RigidCollisionRepresentation>(sphere)->setRigidRepresentation(rigid0);
+		rigid0->setCollisionRepresentation(sphere);
+		representations.push_back(rigid0);
 
 		RigidRepresentationParameters params1;
 		params1.setShapeUsedForMassInertia(std::make_shared<DoubleSidedPlaneShape>());
@@ -57,8 +57,11 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 		rigid1->setInitialParameters(params1);
 		plane = std::make_shared<RigidCollisionRepresentation>("Collision Representation 1");
 		std::dynamic_pointer_cast<RigidCollisionRepresentation>(plane)->setRigidRepresentation(rigid1);
+		rigid1->setCollisionRepresentation(plane);
+		representations.push_back(rigid1);
 
 		state = std::make_shared<PhysicsManagerState>();
+		state->setRepresentations(representations);
 	}
 
 	virtual void TearDown()
@@ -73,6 +76,7 @@ struct ContactConstraintGenerationTests: public ::testing::Test
 
 
 	std::shared_ptr<PhysicsManagerState> state;
+	std::vector<std::shared_ptr<SurgSim::Physics::Representation>> representations;
 
 	std::vector<std::shared_ptr<CollisionPair>> pairs;
 };

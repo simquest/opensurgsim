@@ -28,6 +28,28 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh()
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
+template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
+TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
+	const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
+{
+	for (size_t iVertex = 0; iVertex < mesh.getNumVertices(); ++iVertex)
+	{
+		VertexType vertexData(mesh.getVertexPosition(iVertex));
+		addVertex(vertexData);
+	}
+	for (size_t iEdge = 0; iEdge < mesh.getNumEdges(); ++iEdge)
+	{
+		EdgeType edgeData((mesh.getEdge(iEdge)).verticesId, EdgeData());
+		addEdge(edgeData);
+	}
+	for (size_t iTriangle = 0; iTriangle < mesh.getNumTriangles(); ++iTriangle)
+	{
+		TriangleType triangleData((mesh.getTriangle(iTriangle)).verticesId, TriangleData());
+		addTriangle(triangleData);
+	}
+}
+
+template <class VertexData, class EdgeData, class TriangleData>
 TriangleMesh<VertexData, EdgeData, TriangleData>::~TriangleMesh()
 {
 }

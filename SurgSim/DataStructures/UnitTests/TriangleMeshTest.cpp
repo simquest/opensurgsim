@@ -497,3 +497,49 @@ TEST_F(TriangleMeshTest, ComparisonTest)
 	EXPECT_FALSE(mesh == meshWithDifferentTriangles);
 	EXPECT_TRUE(mesh != meshWithDifferentTriangles);
 }
+
+class EmptyData
+{
+public:
+	bool operator==(const EmptyData &data) const
+	{
+		return true;
+	}
+};
+
+TEST_F(TriangleMeshTest, CopyConstructorTest)
+{
+	MockTriangleMesh mesh;
+
+	/// Create mesh using test data
+	for (unsigned int i = 0; i < testPositions.size(); ++i)
+	{
+		EXPECT_EQ(i, mesh.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
+		EXPECT_EQ(i + 1, mesh.getNumVertices());
+	}
+	for (unsigned int i = 0; i < testEdgeVertices.size(); ++i)
+	{
+		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
+		EXPECT_EQ(i + 1, mesh.getNumEdges());
+	}
+	for (unsigned int i = 0; i < testTriangleVertices.size(); ++i)
+	{
+		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
+		EXPECT_EQ(i + 1, mesh.getNumTriangles());
+	}
+
+	TriangleMesh<EmptyData, EmptyData, EmptyData> mesh2(mesh);
+
+	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
+	{
+		EXPECT_EQ(mesh.getVertexPosition(i), mesh2.getVertexPosition(i));
+	}
+	for (unsigned int i = 0; i < mesh.getNumEdges(); ++i)
+	{
+		EXPECT_EQ(mesh.getEdge(i).verticesId, mesh2.getEdge(i).verticesId);
+	}
+	for (unsigned int i = 0; i < mesh.getNumTriangles(); ++i)
+	{
+		EXPECT_EQ(mesh.getTriangle(i).verticesId, mesh2.getTriangle(i).verticesId);
+	}
+}

@@ -60,7 +60,7 @@ void Accessible::setGetter(const std::string& name, GetterType func)
 
 void Accessible::setSetter(const std::string& name, SetterType func)
 {
-	SURGSIM_ASSERT(func != nullptr) << "Getter functor can't be nullptr";
+	SURGSIM_ASSERT(func != nullptr) << "Setter functor can't be nullptr";
 
 	m_functors[name].setter = func;
 }
@@ -80,7 +80,7 @@ bool Accessible::isReadable(const std::string& name) const
 bool Accessible::isWriteable(const std::string& name) const
 {
 	auto functors = m_functors.find(name);
-	return (functors != m_functors.end() && functors->second.getter != nullptr);
+	return (functors != m_functors.end() && functors->second.setter != nullptr);
 }
 
 void Accessible::setSerializable(const std::string& name, EncoderType encoder, DecoderType decoder)
@@ -92,7 +92,7 @@ void Accessible::setSerializable(const std::string& name, EncoderType encoder, D
 	m_functors[name].decoder = decoder;
 }
 
-YAML::Node Accessible::encode()
+YAML::Node Accessible::encode() const
 {
 	YAML::Node result;
 	for (auto functors = m_functors.cbegin(); functors != m_functors.cend(); ++functors)
@@ -108,7 +108,6 @@ YAML::Node Accessible::encode()
 
 void  Accessible::decode(const YAML::Node& node)
 {
-	bool result = false;
 	SURGSIM_ASSERT(node.IsMap()) << "Node to decode accessible has to be map.";
 	for (auto functors = m_functors.cbegin(); functors != m_functors.cend(); ++functors)
 	{

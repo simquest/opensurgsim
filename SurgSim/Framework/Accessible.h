@@ -32,7 +32,7 @@ namespace SurgSim
 namespace Framework
 {
 
-/// Mixin class for enabling a property system on OSS classes, the instance still needs to initialise properties in
+/// Mixin class for enabling a property system on OSS classes, the instance still needs to initialize properties in
 /// the constructor by using either addSetter, addGetter, addAccessors or the macro for each member variable
 /// that should be made accessible.
 class Accessible
@@ -101,7 +101,7 @@ public:
 
 	/// Encode this Accessible to a YAML::Node
 	/// \return The encoded version of this instance.
-	YAML::Node encode();
+	YAML::Node encode() const;
 
 	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
 	/// be converted.
@@ -155,6 +155,13 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&class::getter, this),\
 				std::bind(&class::setter, this, std::bind(SurgSim::Framework::convert<type>,std::placeholders::_1)))
 
+/// A macro to register a getter for a property that is read only
+#define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \
+	setGetter(#property, \
+	std::bind(&class::getter, this))
+
+/// A macro to register a serializable property, this needs to support reading, writing and all the
+/// conversions to and from YAML::Node
 #define SURGSIM_ADD_SERIALIZABLE_PROPERTY(class, type, property, getter, setter) \
 	setAccessors(#property, \
 				std::bind(&class::getter, this),\
@@ -163,11 +170,9 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
 				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
 
-/// A macro to register a getter for a property that is read only
-#define SURGSIM_ADD_RO_PROPERTY(class, type, property, getter) \
-	setGetter(#property, \
-	std::bind(&class::getter, this))
 
+#define SURGSIM_CLASSNAME(ClassName) \
+	virtual std::string getClassName() const {return #ClassName;}
 
 }; // Framework
 }; // SurgSim

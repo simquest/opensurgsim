@@ -28,10 +28,10 @@ std::array<gaussQuadraturePoint, 1> gaussQuadrature1Point =
 }};
 
 std::array<gaussQuadraturePoint, 2> gaussQuadrature2Points =
-{
+{{
 	gaussQuadraturePoint( 1.0 / sqrt(3.0), 1.0),
 	gaussQuadraturePoint(-1.0 / sqrt(3.0), 1.0)
-};
+}};
 
 std::array<gaussQuadraturePoint, 3> gaussQuadrature3Points =
 {{

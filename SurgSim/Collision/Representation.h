@@ -59,11 +59,6 @@ public:
 	/// Get the shape
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
-
-	/// Gets physics representation.
-	/// \return	The physics representation.
-	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
-
 };
 
 

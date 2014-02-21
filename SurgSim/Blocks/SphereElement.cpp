@@ -17,22 +17,22 @@
 
 #include "SurgSim/Blocks/SphereElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgShader.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 
 using SurgSim::Blocks::SphereElement;
 using SurgSim::Blocks::TransferPoseBehavior;
-using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Graphics::OsgMaterial;
 using SurgSim::Graphics::OsgShader;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Math::SphereShape;
+using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
@@ -93,7 +93,7 @@ bool SphereElement::doInitialize()
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	addComponent(transferPose);
 
-	auto rigidCollision = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+	auto rigidCollision = std::make_shared<RigidCollisionRepresentation>
 		("Sphere Collision Representation");
 	rigidCollision->setRigidRepresentation(physicsRepresentation);
 	addComponent(rigidCollision);

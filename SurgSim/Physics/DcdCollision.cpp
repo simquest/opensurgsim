@@ -13,16 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <vector>
+
 #include "SurgSim/Physics/DcdCollision.h"
-#include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
-#include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/ContactCalculation.h"
+#include "SurgSim/Collision/DcdCollision.h"
+#include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
-
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/Vector.h"
 
 using SurgSim::Collision::CollisionPair;
 

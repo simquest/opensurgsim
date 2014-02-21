@@ -16,13 +16,14 @@
 #ifndef SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 #define SURGSIM_PHYSICS_UNITTESTS_MOCKOBJECTS_H
 
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/OdeSolver.h"
 #include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/ConstraintImplementation.h"
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
+#include "SurgSim/Physics/Representation.h"
 
-#include "SurgSim/Math/OdeSolver.h"
-#include "SurgSim/Math/Matrix.h"
 using SurgSim::Math::Matrix;
 using SurgSim::Math::OdeSolver;
 
@@ -184,6 +185,70 @@ protected:
 		const SurgSim::Math::RigidTransform3d& transform) override
 	{
 	}
+};
+
+class MockFixedConstraintBilateral3D : public ConstraintImplementation
+{
+public:
+	MockFixedConstraintBilateral3D() : ConstraintImplementation(){}
+	virtual ~MockFixedConstraintBilateral3D(){}
+
+	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override
+	{
+		return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	}
+
+	virtual RepresentationType getRepresentationType() const override
+	{
+		return REPRESENTATION_TYPE_FIXED;
+	}
+
+private:
+	virtual unsigned int doGetNumDof() const override
+	{
+		return 3;
+	}
+
+	virtual void doBuild(double dt,
+				const ConstraintData& data,
+				const std::shared_ptr<Localization>& localization,
+				MlcpPhysicsProblem* mlcp,
+				unsigned int indexOfRepresentation,
+				unsigned int indexOfConstraint,
+				ConstraintSideSign sign) override
+	{}
+};
+
+class MockRigidConstraintBilateral3D : public ConstraintImplementation
+{
+public:
+	MockRigidConstraintBilateral3D() : ConstraintImplementation(){}
+	virtual ~MockRigidConstraintBilateral3D(){}
+
+	virtual SurgSim::Math::MlcpConstraintType getMlcpConstraintType() const override
+	{
+		return SurgSim::Math::MLCP_BILATERAL_3D_CONSTRAINT;
+	}
+
+	virtual RepresentationType getRepresentationType() const override
+	{
+		return REPRESENTATION_TYPE_RIGID;
+	}
+
+private:
+	virtual unsigned int doGetNumDof() const override
+	{
+		return 3;
+	}
+
+	virtual void doBuild(double dt,
+				const ConstraintData& data,
+				const std::shared_ptr<Localization>& localization,
+				MlcpPhysicsProblem* mlcp,
+				unsigned int indexOfRepresentation,
+				unsigned int indexOfConstraint,
+				ConstraintSideSign sign) override
+	{}
 };
 
 template <class Base>
