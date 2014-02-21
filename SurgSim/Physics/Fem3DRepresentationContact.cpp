@@ -44,19 +44,21 @@ void Fem3DRepresentationContact::doBuild(double dt,
 {
 	using SurgSim::Math::Vector3d;
 
-	std::shared_ptr<Fem3DRepresentation> fem3d = std::static_pointer_cast<Fem3DRepresentation>(localization->getRepresentation());
+	auto fem3d = std::static_pointer_cast<Fem3DRepresentation>(localization->getRepresentation());
 
 	if (!fem3d->isActive())
 	{
 		return;
 	}
 
-	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE ? 1.0 : -1.0);
+	const double scale = (sign == CONSTRAINT_POSITIVE_SIDE) ? 1.0 : -1.0;
+
 	const ContactConstraintData& contactData = static_cast<const ContactConstraintData&>(data);
 	const SurgSim::Math::Vector3d& n = contactData.getNormal();
 	const double d = contactData.getDistance();
 
-	const FemRepresentationCoordinate &coord = std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
+	const FemRepresentationCoordinate& coord
+		= std::static_pointer_cast<Fem3DRepresentationLocalization>(localization)->getLocalPosition();
 
 	// FRICTIONLESS CONTACT in a LCP
 	//   (n, d) defines the plane of contact
@@ -90,6 +92,7 @@ void Fem3DRepresentationContact::doBuild(double dt,
 		}
 	}
 	m_newH.reserve(3 * numNodeToConstrain);
+
 	for (size_t index = 0; index < numNodes; index++)
 	{
 		if (coord.naturalCoordinate[index] != 0.0)

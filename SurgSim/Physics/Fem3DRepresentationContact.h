@@ -18,8 +18,6 @@
 
 #include "SurgSim/Physics/ConstraintImplementation.h"
 
-#include "SurgSim/Math/Vector.h"
-
 namespace SurgSim
 {
 
@@ -35,7 +33,6 @@ public:
 
 	/// Destructor
 	virtual ~Fem3DRepresentationContact();
-
 
 	/// Gets the Mixed Linear Complementarity Problem constraint type for this ConstraintImplementation
 	/// \return The MLCP constraint type corresponding to this constraint implementation
