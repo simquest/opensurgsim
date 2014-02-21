@@ -16,7 +16,9 @@
 #ifndef SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 #define SURGSIM_PHYSICS_VIRTUALTOOLCOUPLER_H
 
-#include "SurgSim/Physics/RigidRepresentationState.h"
+#include <memory>
+
+#include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
@@ -25,6 +27,7 @@ namespace SurgSim
 namespace Input
 {
 	class InputComponent;
+	class OutputComponent;
 }
 
 namespace Physics
@@ -32,54 +35,80 @@ namespace Physics
 
 class RigidRepresentation;
 
-/// The VirtualToolCoupler couples a rigid object to an input through a spring.
+/// The VirtualToolCoupler couples a rigid object to an input/output device through a spring and damper.  If the device
+/// will output forces and/or torques, we pass it a force (and/or torque) as well as the derivatives (Jacobians) of
+/// the force with respect to position and velocity, so that the device can recalculate its forces at its update rate.
 class VirtualToolCoupler : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
-	/// \param    name     Name of the behavior
-	/// \param    input    Input Component to get the pose from
-	/// \param    rigid    Rigid Representation to control
-	/// \param    poseName Name of the pose data in the input to transfer
-	VirtualToolCoupler(const std::string& name, std::shared_ptr<SurgSim::Input::InputComponent> input,
-			std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid, const std::string& poseName = "pose");
+	/// \param name Name of the behavior
+	explicit VirtualToolCoupler(const std::string& name);
 
 	~VirtualToolCoupler();
+
+	/// Set the Input Component
+	/// \param input Input Component to get the pose from
+	void setInput(const std::shared_ptr<SurgSim::Input::InputComponent> input);
+
+	/// Set the Output Component (if any)
+	/// \param output Output Component to send forces and torques
+	void setOutput(const std::shared_ptr<SurgSim::Input::OutputComponent> output);
+
+	/// Set the Physics Representation which follows the input
+	/// \param rigid Rigid Representation that provides state and receives external forces and torques
+	void setRepresentation(const std::shared_ptr<SurgSim::Physics::RigidRepresentation> rigid);
+
+	/// Set the name of the pose entry in the input DataGroup
+	/// \param    poseName Name of the pose data in the input to transfer
+	void setPoseName(const std::string& poseName = "pose");
 
 	/// Update the behavior
 	/// \param dt    The length of time (seconds) between update calls.
 	virtual void update(double dt);
 
-	/// Set vtc linear stiffness
+	/// Set linear stiffness connecting the input device and the physics representation
 	/// \param linearStiffness The stiffness of the vtc in linear mode (in N·m-1)
 	void setLinearStiffness(double linearStiffness);
 
-	/// Set vtc linear damping
+	/// Set linear damping connecting the input device and the physics representation
 	/// \param linearDamping The damping of the vtc in linear mode (in N·s·m-1 or Kg·s-1)
 	void setLinearDamping(double linearDamping);
 
-	/// Set vtc angular stiffness
+	/// Set angular stiffness connecting the input device and the physics representation
 	/// \param angularStiffness The stiffness of the vtc in angular mode (in N·m rad-1)
 	void setAngularStiffness(double angularStiffness);
 
-	/// Set vtc angular damping
+	/// Set angular damping connecting the input device and the physics representation
 	/// \param angularDamping The damping of the vtc in angular mode (in N·m·s·rad-1)
 	void setAngularDamping(double angularDamping);
 
+	/// Set the scaling term for the force sent to the output component.
+	/// \param forceScaling The factor to multiply the forces.
+	void setOutputForceScaling(double forceScaling);
+
+	/// Set the scaling term for the torque sent to the output component.
+	/// \param torqueScaling The factor to multiply the torque.
+	void setOutputTorqueScaling(double torqueScaling);
+
 protected:
-	/// Initialize the behavior
+	/// Initialize the behavior.  Does nothing.
+	/// \return True if component is initialized successfully; otherwise, false.
 	virtual bool doInitialize();
 
-	/// Wakeup the behavior
+	/// Wakeup the behavior.  Does nothing.
+	/// \return True if component is woken up successfully; otherwise, false.
 	virtual bool doWakeUp();
 
+	/// Put this behavior in physics, so everything updates once per physics loop.
+	/// \return int corresponding to enum in Behavior.h.
 	virtual int getTargetManagerType() const;
 
 private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_input;
+	std::shared_ptr<SurgSim::Input::OutputComponent> m_output;
 	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_rigid;
 	std::string m_poseName;
-	RigidRepresentationState m_previousState;
 
 	/// Vtc stiffness parameter in linear mode (in N·m-1)
 	double m_linearStiffness;
@@ -92,6 +121,15 @@ private:
 
 	/// Vtc damping parameter in angular mode (in N·m·s·rad-1)
 	double m_angularDamping;
+
+	/// Scaling factor for the forces sent to the OutputComponent
+	double m_outputForceScaling;
+
+	/// Scaling factor for the torques sent to the OutputComponent
+	double m_outputTorqueScaling;
+
+	/// The DataGroup to output
+	SurgSim::DataStructures::DataGroup m_outputData;
 };
 
 }; // Physics

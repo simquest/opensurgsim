@@ -16,9 +16,11 @@
 #ifndef SURGSIM_MATH_GEOMETRY_H
 #define SURGSIM_MATH_GEOMETRY_H
 
-#include "SurgSim/Math/Vector.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Math/Vector.h"
 
 /// \file Geometry.h a collection of functions that calculation geometric properties of various basic geometric shapes.
 /// 	  Point, LineSegment, Plane, Triangle. All functions are templated for the accuracy of the calculation
@@ -1501,23 +1503,26 @@ void intersectionsSegmentBox(
 }
 
 
-/// Check for contact between two triangles.
-/// The collision volumes are considered to be the volume swept by the triangles
-/// along the negative triangle normal. If any edge of triangle0 pass through
-/// triangle1 or vice versa, the minimum displacement applied along the (chosen)
-/// triangle normal to remove the penetration, is the contact info.
+/// Calculates the intersection between two triangles
+///
+/// If any edge of triangle 't0' passes through triangle 't1' (or vice versa), then the minimum displacement needed to
+/// remove the penetration is calculated and returned by parameter.  The displacement is parallel to a triangle's
+/// normal.
+///
 /// \tparam T		Accuracy of the calculation, can usually be inferred.
 /// \tparam MOpt	Eigen Matrix options, can usually be inferred.
 /// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
 /// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param t0n Unit length normal of the first triangle.
+/// \param t1n Unit length normal of the second triangle.
 /// \param [out] depth The depth of penetration.
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
 /// \param [out] normal The contact normal that points from triangle0 to triangle1.
-/// \return True, if intersection is detected. False, otherwise.
+/// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
-/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved
-/// by (nomal*depth*0.5), the triangle will no longer be intersecting.
+/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
+/// triangles will no longer be intersecting.
 template <class T, int MOpt> inline
 bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
@@ -1526,6 +1531,8 @@ bool calculateContactTriangleTriangle(
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
 	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0n,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1n,
 	T *depth,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
 	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
@@ -1550,7 +1557,7 @@ bool calculateContactTriangleTriangle(
 
 	// For these variables, <var-name>[0] is the first triangle and <var-name>[1] is the second triangle.
 	const Eigen::Matrix<T, 3, 1, MOpt> *v[2][3] = {{&t0v0, &t0v1, &t0v2}, {&t1v0, &t1v1, &t1v2}};
-	Eigen::Matrix<T, 3, 1, MOpt> n[2];
+	const Eigen::Matrix<T, 3, 1, MOpt> *n[2] = {&t0n, &t1n};
 	T d[2];
 	T signedDFromPlaneB[2][3];
 	std::vector<unsigned int> underPlaneB[2];
@@ -1559,25 +1566,19 @@ bool calculateContactTriangleTriangle(
 
 	for (unsigned int A = 0, B = 1; A < 2; ++A, --B)
 	{
-		// Calculate normal.
-		n[B] = (*v[B][1] - *v[B][0]).cross(*v[B][2] - *v[B][0]);
-
 		// Check for degenerate triangle.
-		if (n[B].isZero())
+		if (n[B]->isZero())
 		{
 			return false;
 		}
 
-		// Normalize the normal.
-		n[B].normalize();
-
 		// Calculate distance of plane of B from origin.
-		d[B] = -v[B][0]->dot(n[B]);
+		d[B] = -v[B][0]->dot(*n[B]);
 
 		// Calculate signedDFromPlaneB and place the index into appropriate under/onOrAbove PlaneB list.
 		for (unsigned int i = 0; i < 3; ++i)
 		{
-			signedDFromPlaneB[A][i] = n[B].dot(*v[A][i]) + d[B];
+			signedDFromPlaneB[A][i] = n[B]->dot(*v[A][i]) + d[B];
 
 			if (signedDFromPlaneB[A][i] < -Geometry::DistanceEpsilon)
 			{
@@ -1651,11 +1652,11 @@ bool calculateContactTriangleTriangle(
 					// In the case of edgeEndAbovePlaneBFlag, the edge can be pruned,
 					// so that the "Above" vertex is trimmed to be "On" the plane of B.
 					edgeEnd = edgeStart + (edgeEnd - edgeStart) *
-										  ((-d[B] - edgeStart.dot(n[B])) / (edgeEnd - edgeStart).dot(n[B]));
+										  ((-d[B] - edgeStart.dot(*n[B])) / (edgeEnd - edgeStart).dot(*n[B]));
 				}
 
 				// Find the barycentric coordinates of edgeEnd in B.
-				barycentricCoordinates(edgeEnd, *v[B][0], *v[B][1], *v[B][2], n[B], &baryEdgeEnd);
+				barycentricCoordinates(edgeEnd, *v[B][0], *v[B][1], *v[B][2], *n[B], &baryEdgeEnd);
 
 				// This flag indicates three things.
 				// - There are two vertices underPlaneB.
@@ -1680,10 +1681,10 @@ bool calculateContactTriangleTriangle(
 				}
 
 				// Find the projection of edgeStart on plane B.
-				edgeStartOnPlaneB = edgeStart - n[B] * signedDFromPlaneB[A][*edgeStartVertexId];
+				edgeStartOnPlaneB = edgeStart - *n[B] * signedDFromPlaneB[A][*edgeStartVertexId];
 
 				// Find if edgeStartOnPlaneB is inside B.
-				barycentricCoordinates(edgeStartOnPlaneB, *v[B][0], *v[B][1], *v[B][2], n[B], &baryEdgeStart);
+				barycentricCoordinates(edgeStartOnPlaneB, *v[B][0], *v[B][1], *v[B][2], *n[B], &baryEdgeStart);
 
 				if (baryEdgeStart[0] >= 0.0 && baryEdgeStart[1] >= 0.0 && baryEdgeStart[2] >= 0.0)
 				{
@@ -1698,7 +1699,7 @@ bool calculateContactTriangleTriangle(
 					if (processingEdgeBetweenTwoUnderPlaneBVertices)
 					{
 						// The "FirstVertex" projected on PlaneB.
-						edgeEnd = *v[A][underPlaneB[A][0]] - n[B] * signedDFromPlaneB[A][underPlaneB[A][0]];
+						edgeEnd = *v[A][underPlaneB[A][0]] - *n[B] * signedDFromPlaneB[A][underPlaneB[A][0]];
 					}
 
 					// The points edgeStartOnPlaneB and edgeEnd are lying on plane B.
@@ -1774,14 +1775,14 @@ bool calculateContactTriangleTriangle(
 		if (useFirstTriangle)
 		{
 			*depth = penetrationDepth[0];
-			*normal = n[1];
+			*normal = *n[1];
 			*penetrationPoint0 = penetrationPoint[0][0];
 			*penetrationPoint1 = penetrationPoint[0][1];
 		}
 		else
 		{
 			*depth = penetrationDepth[1];
-			*normal = -n[0];
+			*normal = -*n[0];
 			*penetrationPoint0 = penetrationPoint[1][0];
 			*penetrationPoint1 = penetrationPoint[1][1];
 		}
@@ -1791,6 +1792,52 @@ bool calculateContactTriangleTriangle(
 
 	return false;
 }
+
+/// Calculates the intersection between two triangles
+///
+/// If any edge of triangle 't0' passes through triangle 't1' (or vice versa), then the minimum displacement needed to
+/// remove the penetration is calculated and returned by parameter.  The displacement is parallel to a triangle's
+/// normal.
+///
+/// \tparam T		Accuracy of the calculation, can usually be inferred.
+/// \tparam MOpt	Eigen Matrix options, can usually be inferred.
+/// \param t0v0,t0v1,t0v2 Vertices of the first triangle.
+/// \param t1v0,t1v1,t1v2 Vertices of the second triangle.
+/// \param [out] depth The depth of penetration.
+/// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
+/// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
+/// \param [out] normal The contact normal that points from triangle0 to triangle1.
+/// \return True, if intersection is detected.
+/// \note The [out] params are not modified if there is no intersection.
+/// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
+/// triangles will no longer be intersecting.
+template <class T, int MOpt> inline
+bool calculateContactTriangleTriangle(
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t0v2,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v0,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v1,
+	const Eigen::Matrix<T, 3, 1, MOpt>& t1v2,
+	T *depth,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint0,
+	Eigen::Matrix<T, 3, 1, MOpt>* penetrationPoint1,
+	Eigen::Matrix<T, 3, 1, MOpt>* normal)
+{
+	Eigen::Matrix<T, 3, 1, MOpt> t0n = (t0v1 - t0v0).cross(t0v2 - t0v0);
+	Eigen::Matrix<T, 3, 1, MOpt> t1n = (t1v1 - t1v0).cross(t1v2 - t1v0);
+	if (t0n.isZero() || t1n.isZero())
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Degenerate triangle(s) passed to calculateContactTriangleTriangle.";
+		return false;
+	}
+	t0n.normalize();
+	t1n.normalize();
+	return calculateContactTriangleTriangle(t0v0, t0v1, t0v2, t1v0, t1v1, t1v2, t0n, t1n, depth, penetrationPoint0,
+											penetrationPoint1, normal);
+}
+
 
 }; // namespace Math
 }; // namespace SurgSim

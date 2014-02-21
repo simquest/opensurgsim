@@ -41,7 +41,9 @@ struct Contact;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
-/// is a nullptr or a has gone out of scope ASSERT's will be triggered
+/// is a nullptr or a has gone out of scope ASSERT's will be triggered.
+/// Collision with other representations will be updated by CollisionPair::addContact() and
+/// be cleared every time DcdCollision::updatePair() makes a new CollisionPair.
 class Representation : public SurgSim::Framework::Representation
 {
 public:
@@ -60,40 +62,38 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
-	/// Gets physics representation.
-	/// \return	The physics representation.
-	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
+	/// A map between collision representations and contacts.
+	/// For each collision representation, it gives the list of contacts registered against this instance.
+	/// \return A map with collision representations as keys and lists of contacts as the associated value.
+	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> getCollisions() const;
 
-	/// Return a list of contacts between the given collision representation and this collision representation.
+	/// Return the list of contacts between the given collision representation and this collision representation.
 	/// \param collisionRepresentation The collision representation with which this collision representation collides.
 	/// \return A list of contact points.
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>>
-		getCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const;
+		getCollisionsWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const;
 
-	/// Return the list of colliding collision representations and a list of contacts associated with each collision.
-	/// \return A map of collisions. Each collision is associated with a list of contact points.
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-					   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> getCollisions() const;
-
-	/// Add a colliding collision representation and the colliding point.
+	/// Add a contact against a given collision representation.
 	/// \param collisionRepresentation The collision representation to which this collision representation collides.
-	/// \param contact The colliding point and other colliding information.
-	void addCollision(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
-					  std::shared_ptr<SurgSim::Collision::Contact> contact);
+	/// \param contact The contact information.
+	void addCollisionWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
+						  std::shared_ptr<SurgSim::Collision::Contact> contact);
 
-	/// Check if this collision representation is colliding with the given collision representation
-	/// \param collisionRepresentation The collision representation to be check
-	/// \return True if there is collision; otherwise, false.
+	/// Check if this collision representation is colliding with the given collision representation.
+	/// \param collisionRepresentation The collision representation to be checked against.
+	/// \return True if the two representations are colliding; otherwise, false.
 	bool isCollidingWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const;
 
 	/// Check if this collision representation has collisions.
 	/// \return True if there is a collision; otherwise false.
 	bool hasCollision() const;
 
-	/// Empty the collision list.
-	void clearCollision();
+	/// Clear all the collisions.
+	void clearCollisions();
 
 protected:
+	/// A map which associates a list of contacts with each collision representation.
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 					   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> m_collisions;
 };

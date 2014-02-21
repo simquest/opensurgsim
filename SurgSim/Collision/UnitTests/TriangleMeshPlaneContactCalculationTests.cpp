@@ -109,8 +109,7 @@ void generateTriangleMeshPlaneContact(std::list<std::shared_ptr<Contact>>* expec
 	}
 }
 
-template <class VertexType, class EdgeType, class TriangleType>
-void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape<VertexType, EdgeType, TriangleType>> mesh,
+void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 					const Quaterniond& meshQuat,
 					const Vector3d& meshTrans,
 					std::shared_ptr<PlaneShape> plane,
@@ -134,7 +133,7 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape<VertexType
 	}
 
 	// Perform collision detection.
-	TriangleMeshPlaneDcdContact<VertexType, EdgeType, TriangleType> calcContact;
+	TriangleMeshPlaneDcdContact calcContact;
 	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(meshRep, planeRep);
 	calcContact.calculateContact(pair);
 
@@ -186,8 +185,8 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData>> cubeMesh =
-		std::make_shared<SurgSim::Math::MeshShape<EmptyData, EmptyData, EmptyData>>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMesh =
+		std::make_shared<SurgSim::Math::MeshShape>(mesh);
 
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	SurgSim::Math::Quaterniond meshQuat;
@@ -209,7 +208,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = Vector3d(0.0, -(cubeSize / 2 + epsilonTrans), 0.0);
 		int expectedNumberOfContacts = 0;
 		int expectedBoxIndicesInContacts[] = {0};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -221,7 +220,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = Vector3d(0.0,0.0,0.0);
 		int expectedNumberOfContacts = 4;
 		int expectedBoxIndicesInContacts[] = {0, 1, 4, 5};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -233,7 +232,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = Vector3d(0.0,(cubeSize / 2 + epsilonTrans),0.0);
 		int expectedNumberOfContacts = 8;
 		int expectedBoxIndicesInContacts[] = {0, 1, 2, 3, 4, 5, 6, 7};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -246,7 +245,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = Vector3d(-1,-1,0.0) * (cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 2;
 		int expectedBoxIndicesInContacts[] = {0, 4};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -260,7 +259,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = planNormal * (cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 6;
 		int expectedBoxIndicesInContacts[] = {0, 4, 1, 3, 7, 5};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -275,7 +274,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {4};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -289,7 +288,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {7};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -303,7 +302,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {0};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -317,7 +316,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {3};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -331,7 +330,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {5};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -345,7 +344,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {6};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -359,7 +358,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {1};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -373,7 +372,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = -1 * planNormal * (sqrt(3.0) * cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {2};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 
@@ -388,7 +387,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		planeTrans = Vector3d(-1,-1,0.0) * (cubeSize / 2 - epsilonTrans);
 		int expectedNumberOfContacts = 2;
 		int expectedBoxIndicesInContacts[] = {0, 4};
-		doTriangleMeshPlaneTest<EmptyData, EmptyData, EmptyData> (cubeMesh, meshQuat, meshTrans,
+		doTriangleMeshPlaneTest(cubeMesh, meshQuat, meshTrans,
 				plane, planeQuat, planeTrans, expectedNumberOfContacts, expectedBoxIndicesInContacts);
 	}
 }

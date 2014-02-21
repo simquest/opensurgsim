@@ -30,7 +30,7 @@ namespace Framework
 
 BasicThread::BasicThread(const std::string& name) :
 	m_name(name),
-	m_period(1.0/30),
+	m_period(1.0 / 30),
 	m_isInitialized(false),
 	m_isRunning(false),
 	m_stopExecution(false),
@@ -97,14 +97,17 @@ boost::thread& BasicThread::getThread()
 void BasicThread::operator()()
 {
 	bool success = executeInitialization();
-	if (! success) return;
+	if (! success)
+	{
+		return;
+	}
 
 	boost::chrono::duration<double> frameTime(0.0);
 	boost::chrono::duration<double> sleepTime(0.0);
 	Clock::time_point start;
 
 	m_isRunning = true;
-	while (m_isRunning && !m_stopExecution )
+	while (m_isRunning && !m_stopExecution)
 	{
 		if (! m_isSynchronous)
 		{
@@ -120,7 +123,10 @@ void BasicThread::operator()()
 		}
 		else
 		{
-			// if waitForBarrier is false this means it is time to come out of sync mode and stop running
+			// HS-2014-feb-21 This is not thread safe, if setSynchronous(false) is called while the thread is in the
+			// _not_ in the wait state, the thread will exit without having issued a wait, this will cause the
+			// all the threads that are waiting to indefinitely wait as there is one less thread on the barrier
+			// #threadsafety
 			bool success = waitForBarrier(true);
 			if (success)
 			{
@@ -149,7 +155,7 @@ void BasicThread::stop()
 		if (! m_thisThread.joinable())
 		{
 			SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
-				" is detached, cannot wait for it to stop.";
+					" is detached, cannot wait for it to stop.";
 		}
 		else
 		{
@@ -159,7 +165,7 @@ void BasicThread::stop()
 	else
 	{
 		SURGSIM_LOG_INFO(Logger::getDefaultLogger()) << "Thread " << getName() <<
-			" is in synchronouse mode, stop with a barrier->wait(false).";
+				" is in synchronouse mode, stop with a barrier->wait(false).";
 	}
 }
 
@@ -207,7 +213,7 @@ bool BasicThread::waitForBarrier(bool success)
 
 bool BasicThread::setSynchronous(bool val)
 {
-	if(m_startupBarrier!=nullptr)
+	if (m_startupBarrier != nullptr)
 	{
 		m_isSynchronous = val;
 	}

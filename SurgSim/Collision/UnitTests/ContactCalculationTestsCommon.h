@@ -29,6 +29,7 @@
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/PlaneShape.h"
 #include "SurgSim/Math/DoubleSidedPlaneShape.h"
+#include "SurgSim/Math/MeshShape.h"
 
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/Collision/ContactCalculation.h"
@@ -44,6 +45,7 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::BoxShape;
 using SurgSim::Math::PlaneShape;
 using SurgSim::Math::DoubleSidedPlaneShape;
+using SurgSim::Math::MeshShape;
 
 namespace SurgSim
 {

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_COLLISION_RIGIDCOLLISIONREPRESENTATION_H
-#define SURGSIM_COLLISION_RIGIDCOLLISIONREPRESENTATION_H
+#ifndef SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H
+#define SURGSIM_PHYSICS_RIGIDCOLLISIONREPRESENTATION_H
 
 #include <memory>
 
@@ -25,13 +25,13 @@
 
 namespace SurgSim
 {
-namespace Collision
+namespace Physics
 {
 
 /// Collision Representation class that wraps a RigidRepresentation, this can be used to strictly tie the
 /// Collision Representation to the Rigid, so even if the shape of the rigid changes, the collision representation
 /// will use the appropriate shape.
-class RigidCollisionRepresentation : public Representation
+class RigidCollisionRepresentation : public SurgSim::Collision::Representation
 {
 public:
 
@@ -72,7 +72,7 @@ public:
 
 	/// Gets physics representation.
 	/// \return	The physics representation.
-	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;
+	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> getRigidRepresentation();
 
 private:
 	std::weak_ptr<SurgSim::Physics::RigidRepresentationBase> m_physicsRepresentation;

@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 
 namespace SurgSim
 {
-namespace Collision
+namespace Physics
 {
 
 RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& name):
@@ -25,15 +25,23 @@ RigidCollisionRepresentation::RigidCollisionRepresentation(const std::string& na
 {
 }
 
+RigidCollisionRepresentation::~RigidCollisionRepresentation()
+{
+
+}
+
 void RigidCollisionRepresentation::setRigidRepresentation(
 	std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> representation)
 {
 	m_physicsRepresentation = representation;
+	std::shared_ptr<RigidCollisionRepresentation> shared = std::static_pointer_cast<RigidCollisionRepresentation>(
+		getSharedPtr());
+	representation->setCollisionRepresentation(shared);
 }
 
-RigidCollisionRepresentation::~RigidCollisionRepresentation()
+std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> RigidCollisionRepresentation::getRigidRepresentation()
 {
-
+	return m_physicsRepresentation.lock();
 }
 
 int RigidCollisionRepresentation::getShapeType() const
@@ -74,10 +82,6 @@ const SurgSim::Math::RigidTransform3d& RigidCollisionRepresentation::getInitialP
 	return m_physicsRepresentation.lock()->getInitialPose();
 }
 
-std::shared_ptr<SurgSim::Physics::Representation> RigidCollisionRepresentation::getPhysicsRepresentation()
-{
-	return m_physicsRepresentation.lock();
-}
 
 }; // namespace Collision
 }; // namespace SurgSim
