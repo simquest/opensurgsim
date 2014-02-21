@@ -98,9 +98,9 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 {
 	for (int iterationID = 0; iterationID < m_numIterations; iterationID++)
 	{
-		double lx = 10.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
-		double ly = 10.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
-		double lz = 10.0 * static_cast<double>(rand())/static_cast<double>(RAND_MAX) + 1.0;
+		double lx = 10.0 * (1.0/static_cast<double>(iterationID+1));
+		double ly = 10.0 * (2.0/static_cast<double>(iterationID+1));
+		double lz = 10.0 * (static_cast<double>(iterationID+1)/3.0);
 
 		// Cube
 		std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
