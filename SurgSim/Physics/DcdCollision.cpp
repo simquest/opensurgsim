@@ -95,7 +95,7 @@ void DcdCollision::updatePairs(std::shared_ptr<PhysicsManagerState> state)
 	{
 		for(auto it = std::begin(representations); it != std::end(representations); ++it)
 		{
-			(*it)->clearCollision();
+			(*it)->clearCollisions();
 		}
 
 		std::vector<std::shared_ptr<CollisionPair>> pairs;

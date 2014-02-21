@@ -77,7 +77,7 @@ TEST_F(RepresentationTest, PoseTest)
 	planeRep->setInitialPose(initialPose);
 	EXPECT_TRUE(initialPose.isApprox(planeRep->getPose(), epsilon));
 
-	RigidTransform3d pose =	makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 2.0, 0.0));
+	RigidTransform3d pose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 2.0, 0.0));
 	sphereRep->setPose(pose);
 	EXPECT_TRUE(pose.isApprox(sphereRep->getPose(), epsilon));
 }
@@ -108,8 +108,10 @@ TEST_F(RepresentationTest, EmptyCollisionTest)
 	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
 	EXPECT_FALSE(sphereRep->isCollidingWith(planeRep));
 
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts = sphereRep->getCollision(planeRep);
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts = planeRep->getCollision(sphereRep);
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts =
+		sphereRep->getCollisionsWith(planeRep);
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts =
+		planeRep->getCollisionsWith(sphereRep);
 	EXPECT_EQ(0u, sphereCollisionContacts.size());
 	EXPECT_EQ(0u, planeCollisionContacts.size());
 }
@@ -121,14 +123,14 @@ TEST_F(RepresentationTest, CollisionTest)
 
 	std::shared_ptr<Contact> dummyContact =
 		std::make_shared<Contact>(0.0, Vector3d::Zero(), Vector3d::Zero(), std::make_pair(Location(), Location()));
-	EXPECT_NO_THROW(sphereRep->addCollision(planeRep, dummyContact));
+	EXPECT_NO_THROW(sphereRep->addCollisionWith(planeRep, dummyContact));
 
 	EXPECT_TRUE(sphereRep->hasCollision());
 	EXPECT_TRUE(sphereRep->isCollidingWith(planeRep));
 	// Collision is only added to 'sphereRep', thus the following check should return 'false'.
 	EXPECT_FALSE(planeRep->isCollidingWith(sphereRep));
 
-	EXPECT_NO_THROW(planeRep->addCollision(sphereRep, dummyContact));
+	EXPECT_NO_THROW(planeRep->addCollisionWith(sphereRep, dummyContact));
 	EXPECT_TRUE(planeRep->hasCollision());
 	EXPECT_TRUE(planeRep->isCollidingWith(sphereRep));
 
@@ -142,17 +144,19 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_EQ(1u, planeCollisions.size());
 	EXPECT_NE(std::end(planeCollisions), planeCollisions.find(sphereRep));
 
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts = sphereRep->getCollision(planeRep);
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> sphereCollisionContacts =
+		sphereRep->getCollisionsWith(planeRep);
 	EXPECT_EQ(1u, sphereCollisionContacts.size());
 	EXPECT_EQ(dummyContact, sphereCollisionContacts.front());
 
-	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts = planeRep->getCollision(sphereRep);
+	std::list<std::shared_ptr<SurgSim::Collision::Contact>> planeCollisionContacts =
+		planeRep->getCollisionsWith(sphereRep);
 	EXPECT_EQ(1u, planeCollisionContacts.size());
 	EXPECT_EQ(dummyContact, planeCollisionContacts.front());
 
 	EXPECT_EQ(planeCollisionContacts.front(), sphereCollisionContacts.front());
 
-	sphereRep->clearCollision();
+	sphereRep->clearCollisions();
 	EXPECT_FALSE(sphereRep->hasCollision());
 }
 
