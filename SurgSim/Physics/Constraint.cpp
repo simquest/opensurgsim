@@ -125,9 +125,8 @@ void Constraint::setInformation(
 		"Implementations have incompatible implementations first( " << implementation0->getMlcpConstraintType() <<
 		" != " << implementation1->getMlcpConstraintType() << " )";
 	SURGSIM_ASSERT(implementation0->getNumDof() == implementation1->getNumDof()) <<
-		"Both sides of the constraint should have the same number of Dof ("<< m_implementations.first->getNumDof() <<
-		" != " << m_implementations.second->getNumDof() <<")";
-
+		"Both sides of the constraint should have the same number of Dof ("<< implementation0->getNumDof() <<
+		" != " << implementation1->getNumDof() <<")";
 
 	m_data = data;
 	m_implementations = std::make_pair(implementation0, implementation1);
