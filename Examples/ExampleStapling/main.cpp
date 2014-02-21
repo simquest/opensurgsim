@@ -19,7 +19,9 @@
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -32,15 +34,16 @@
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
-#include "SurgSim/Physics/PhysicsManager.h"
-#include "Examples/ExampleStapling/AddStapleBehavior.h"
 
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
+#include "SurgSim/Physics/PhysicsManager.h"
+#include "SurgSim/Physics/VirtualToolCoupler.h"
+
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/RigidTransform.h"
+
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
@@ -84,17 +87,6 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createStapler(const std::strin
 		staplerSceneElement->getComponent("staplerSceneryRepresentation");
 	auto staplerSceneryRepresentation = std::static_pointer_cast<SurgSim::Framework::Representation>(staplerComponent);
 
-	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
-	inputComponent->setDeviceName("MultiAxisDevice");
-
-	auto transferInputPose = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>(name + "Input to graphicalStapler");
-	transferInputPose->setPoseSender(inputComponent);
-	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
-
-	auto addStapleBehavior = std::make_shared<AddStapleFromInputBehavior>(name + "AddStaplerBehavior");
-	addStapleBehavior->setInputComponent(inputComponent);
-
-
 	// Stapler Physics
 	auto shape = std::make_shared<SurgSim::Math::CapsuleShape>(0.172, 0.028);
 
@@ -108,35 +100,54 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createStapler(const std::strin
 
 	// Stapler collisionRep
 	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
-		("Collision");
+		(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
 	// Debug only
-	// Add the capsule representation
+	// Add the capsule rigid representation
 	std::shared_ptr<SurgSim::Graphics::CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<SurgSim::Graphics::OsgCapsuleRepresentation>("capsule representation");
 	capsuleRepresentation->setHeight(0.172);
 	capsuleRepresentation->setRadius(0.028);
 	capsuleRepresentation->setInitialPose(pose);
 
-	auto transferInputPose0 = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>(name + "Input to Physics");
-	transferInputPose0->setPoseSender(inputComponent);
-	transferInputPose0->setPoseReceiver(physicsRepresentation);
+	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
+	inputComponent->setDeviceName("MultiAxisDevice");
 
-	auto transferInputPose1 = std::make_shared<SurgSim::Blocks::TransferPoseBehavior>(name + "Input");
-	transferInputPose1->setPoseSender(physicsRepresentation);
-	transferInputPose1->setPoseReceiver(capsuleRepresentation);
+	// Behaviors
 
-	staplerSceneElement->addComponent(inputComponent);
-	staplerSceneElement->addComponent(transferInputPose);
-	staplerSceneElement->addComponent(addStapleBehavior);
+	// Add VTC
+	std::shared_ptr<SurgSim::Physics::VirtualToolCoupler> inputVTC =
+		std::make_shared<SurgSim::Physics::VirtualToolCoupler>("VTC", inputComponent, physicsRepresentation);
+	inputVTC->setAngularDamping(params.getMass() * 10e-2);
+	inputVTC->setAngularStiffness(params.getMass() * 50);
+	inputVTC->setLinearDamping(params.getMass() * 10);
+	inputVTC->setLinearStiffness(params.getMass() * 200);
+
+	// Add stapler behavior
+	auto addStaplerBehavior = std::make_shared<StaplerBehavior>(name + "StaplerBehavior");
+	addStaplerBehavior->setInputComponent(inputComponent);
+	addStaplerBehavior->setStaplerRepresentation(collisionRepresentation);
+
+	// Transfer physicsRepresentation to sceneryRepresentation raw
+	auto transferInputPosePS = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>(name + "Input to Physics");
+	transferInputPosePS->setPoseSender(inputComponent);
+	transferInputPosePS->setPoseReceiver(staplerSceneryRepresentation);
+
+	// Transfer physics to rigidRepresentation shape
+	auto transferInputPosePR = std::make_shared<SurgSim::Blocks::TransferPoseBehavior>(name + "Graphic to RigidRep");
+	transferInputPosePR->setPoseSender(physicsRepresentation);
+	transferInputPosePR->setPoseReceiver(capsuleRepresentation);
+
 	staplerSceneElement->addComponent(physicsRepresentation);
 	staplerSceneElement->addComponent(collisionRepresentation);
-	
-	staplerSceneElement->addComponent(transferInputPose1);
-
 	staplerSceneElement->addComponent(capsuleRepresentation);
-		staplerSceneElement->addComponent(transferInputPose0);
+
+	staplerSceneElement->addComponent(inputComponent);
+	staplerSceneElement->addComponent(addStaplerBehavior);
+	staplerSceneElement->addComponent(inputVTC);
+	staplerSceneElement->addComponent(transferInputPosePR);
+	staplerSceneElement->addComponent(transferInputPosePS);
 
 	return staplerSceneElement;
 }
@@ -172,7 +183,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createArm(const std::string&na
 	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
 		(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
-	
+
 	armSceneElement->addComponent(physicsRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 
@@ -201,11 +212,11 @@ int main(int argc, char* argv[])
 
 	// create staplerSceneElement
 	std::shared_ptr<SurgSim::Framework::SceneElement> staplerSceneElement = createStapler("stapler", SurgSim::Math::
-			makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, 0.5, 0.0)));
+			makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, 0.0, 0.0)));
 
 	// create armSceneElement
 	std::shared_ptr<SurgSim::Framework::SceneElement> armSceneElement = createArm("arm", SurgSim::Math::
-		makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, 0.0, 0.0)));
+		makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, -0.5, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(staplerSceneElement);

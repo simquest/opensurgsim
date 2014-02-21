@@ -72,7 +72,8 @@ void StaplerBehavior::update(double dt)
 	m_buttonPreviouslyPressed = button1;
 
 	// Printout message when detecting collision
-	auto collisionRepresentation = std::dynamic_pointer_cast<SurgSim::Collision::Representation>(m_staplerRepresentation);
+	auto collisionRepresentation = std::dynamic_pointer_cast
+		<SurgSim::Collision::Representation>(m_staplerRepresentation);
 	if(collisionRepresentation->hasCollision())
 	{
 		auto collisionsMap = collisionRepresentation->getCollisions();
