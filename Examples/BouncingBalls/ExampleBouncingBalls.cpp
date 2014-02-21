@@ -18,7 +18,6 @@
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -42,6 +41,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
@@ -218,7 +218,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 	// (of the colliding pair) are used to generate constraints that the solver uses to calculate forces that will
 	// un-collide the pair.  The entire process of collision detection, constraint generation, and solving is handled in
 	// SurgSim::PhysicsManager::doUpdate().
-	auto rigidRepresentation = std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	auto rigidRepresentation = std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	rigidRepresentation->setRigidRepresentation(physicsRepresentation);
 	planeElement->addComponent(rigidRepresentation);
 

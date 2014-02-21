@@ -29,7 +29,6 @@ set(SURGSIM_COLLISION_SOURCES
 	DefaultContactCalculation.cpp
 	OctreeDcdContact.cpp
 	Representation.cpp
-	RigidCollisionRepresentation.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
 	SpherePlaneDcdContact.cpp
@@ -51,7 +50,6 @@ set(SURGSIM_COLLISION_HEADERS
 	Location.h
 	OctreeDcdContact.h
 	Representation.h
-	RigidCollisionRepresentation.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h

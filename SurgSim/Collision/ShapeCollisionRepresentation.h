@@ -63,10 +63,6 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const override;
 
-	/// Gets physics representation.
-	/// \return	The physics representation.
-	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() override;
-
 private:
 	std::shared_ptr<SurgSim::Math::Shape> m_shape;
 	SurgSim::Math::RigidTransform3d m_pose;

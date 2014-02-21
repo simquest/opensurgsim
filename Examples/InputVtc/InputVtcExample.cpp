@@ -45,7 +45,7 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 #include "Examples/InputVtc/DeviceFactory.h"
@@ -123,8 +123,8 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 	planeElement->addComponent(transferPose);
-	std::shared_ptr<SurgSim::Collision::RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Plane Collision");
+	auto collisionRepresentation =
+		std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Plane Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 	planeElement->addComponent(collisionRepresentation);
 	return planeElement;
@@ -133,7 +133,7 @@ std::shared_ptr<SceneElement> createPlane(const std::string& name,
 
 std::shared_ptr<SceneElement> createBox(const std::string& name, const std::string& toolDeviceName)
 {
-	// ***Physics Components***
+	// Physics Components
 	RigidRepresentationParameters params;
 	// The VTC needs a mass for the calculations in Physics, but ideally it would track the input perfectly if no
 	// collisions occurred.  (Since the VTC follows the input device, it may appear to have mass based on the force
@@ -153,11 +153,11 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
 
-	std::shared_ptr<SurgSim::Collision::RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>("Box Collision Representation");
+	auto collisionRepresentation =
+		std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>("Box Collision Representation");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	// ***Graphics Components***
+	// Graphics Components
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
 	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
@@ -184,7 +184,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 
-	// ***Input Components***
+	// Input Components
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input component");
 	inputComponent->setDeviceName(toolDeviceName);
@@ -230,7 +230,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	inputCoupler->setAngularDamping(params.getMass() * 10);
 	inputCoupler->setOutputForceScaling(1.0);
 
-	// ***The SceneElement***
+	// The SceneElement
 	std::shared_ptr<BasicSceneElement> boxElement = std::make_shared<BasicSceneElement>(name);
 	boxElement->addComponent(physicsRepresentation);
 	boxElement->addComponent(collisionRepresentation);
@@ -268,7 +268,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box", toolDeviceName));
 	scene->addSceneElement(createPlane("plane",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
+									   SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(

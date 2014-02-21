@@ -47,17 +47,26 @@ public:
 	PhysicsManagerState();
 	~PhysicsManagerState();
 
-	/// Sets the representations for the state, these are the basis for all the computations.
+	/// Sets the physics representations for the state, these are the basis for all the computations.
 	/// \param	val The list of representations.
 	void setRepresentations(const std::vector<std::shared_ptr<Representation>>& val);
 
-	/// Gets the representations.
-	/// \return	The representations.
+	/// Gets the physics representations.
+	/// \return	The physics representations that are known to the state.
 	const std::vector<std::shared_ptr<Representation>>& getRepresentations();
 
+	/// Sets the collision representations for the state.
+	/// \param val collection of all collision representations.
 	void setCollisionRepresentations(const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& val);
 
+	/// Gets the collision representations.
+	/// \return The collision representations that are known to the state.
 	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getCollisionRepresentations();
+
+	/// \return A map that associates collision representations with physicsre presentations where
+	///         map[physicsRep->getCollisionRepresentation] = physicsRep
+	const std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+		  std::shared_ptr<SurgSim::Physics::Representation>>& getCollisionToPhysicsMap() const;
 
 	/// Sets collision pairs that should be considered, while this is not being verified the collision pairs
 	/// should only be from the list of representations that are in this state.
@@ -106,12 +115,17 @@ private:
 	/// The local list of representations
 	std::vector<std::shared_ptr<Representation>> m_representations;
 
+	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
-	/// The local list of collision pairs
+	/// Mapping of collision representations to their respective physics representation.
+	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+		std::shared_ptr<SurgSim::Physics::Representation>> m_collisionsToPhysicsMap;
+
+	/// The local list of collision pairs.
 	std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> m_collisionPairs;
 
-	/// The local map of constraints
+	/// The local map of constraints.
 	std::unordered_map<int, std::vector<std::shared_ptr<Constraint>>> m_constraints;
 
 	/// Representation mapping

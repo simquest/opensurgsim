@@ -22,7 +22,7 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Physics/DcdCollision.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 
@@ -31,7 +31,6 @@
 #include "SurgSim/Math/SphereShape.h"
 
 using SurgSim::Collision::CollisionPair;
-using SurgSim::Collision::RigidCollisionRepresentation;
 using SurgSim::Math::DoubleSidedPlaneShape;
 using SurgSim::Math::Shape;
 using SurgSim::Math::SphereShape;
@@ -39,6 +38,7 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Physics::FixedRepresentation;
 using SurgSim::Physics::PhysicsManagerState;
 using SurgSim::Physics::Representation;
+using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
