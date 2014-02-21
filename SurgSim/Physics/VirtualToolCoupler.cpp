@@ -36,16 +36,6 @@ namespace SurgSim
 namespace Physics
 {
 
-Vector3d computeRotationVector(const RigidTransform3d& t1, const RigidTransform3d& t2)
-{
-	Quaterniond q1(t1.linear());
-	Quaterniond q2(t2.linear());
-	double angle;
-	Vector3d axis;
-	SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-	return angle * axis;
-}
-
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
 	m_poseName("pose"),
@@ -116,8 +106,10 @@ void VirtualToolCoupler::update(double dt)
 
 		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
-
-		Vector3d torque = m_angularStiffness * computeRotationVector(inputPose, objectPose);
+		
+		Vector3d rotationVector;
+		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
+		Vector3d torque = m_angularStiffness * rotationVector;
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
