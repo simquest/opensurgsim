@@ -63,7 +63,7 @@ void Representation::addCollisionWith(std::shared_ptr<SurgSim::Collision::Repres
 bool Representation::isCollidingWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const
 {
 	auto result = m_collisions.find(collisionRepresentation);
-	return (std::end(m_collisions) == result) ? false : true;
+	return std::end(m_collisions) != result;
 }
 
 bool Representation::hasCollision() const

@@ -140,7 +140,7 @@ TEST_F(RepresentationTest, CollisionTest)
 	EXPECT_NE(std::end(sphereCollisions), sphereCollisions.find(planeRep));
 
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>>>  planeCollisions = planeRep->getCollisions();
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> planeCollisions = planeRep->getCollisions();
 	EXPECT_EQ(1u, planeCollisions.size());
 	EXPECT_NE(std::end(planeCollisions), planeCollisions.find(sphereRep));
 
