@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(
 		createFem1D("Euler Explicit",                                                  // name
-					makeRigidTransform(quaternionIdentity, Vector3d(-3.5, 0.5, -3.0)), // graphics pose (rot., trans.)
+					makeRigidTransform(quaternionIdentity, Vector3d(-3.0, 0.5, -3.0)), // graphics pose (rot., trans.)
 					Vector4d(1, 0, 0, 1),                                              // color (r, g, b, a)
 					SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));                 // technique to update object
 
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 
 	scene->addSceneElement(
 		createFem1D("Euler Implicit",
-					makeRigidTransform(quaternionIdentity, Vector3d(2.5, 0.5, -3.0)),
+					makeRigidTransform(quaternionIdentity, Vector3d(2.0, 0.5, -3.0)),
 					Vector4d(0, 0, 1, 1),
 					SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 
