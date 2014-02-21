@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/Math/Matrix.h"
@@ -87,7 +87,6 @@ void VirtualToolCoupler::setPoseName(const std::string& poseName)
 void VirtualToolCoupler::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup inputData;
-	SURGSIM_ASSERT(m_input) << "VirtualToolCoupler named " << getName() << " does not have an Input Component.";
 	m_input->getData(&inputData);
 	RigidTransform3d inputPose;
 	if (inputData.poses().get(m_poseName, &inputPose))
@@ -100,7 +99,6 @@ void VirtualToolCoupler::update(double dt)
 		inputAngularVelocity.setZero();
 		inputData.vectors().get("angularVelocity", &inputAngularVelocity);
 
-		SURGSIM_ASSERT(m_rigid) << "VirtualToolCoupler named " << getName() << " does not have a Representation.";
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 
@@ -144,6 +142,18 @@ bool VirtualToolCoupler::doInitialize()
 
 bool VirtualToolCoupler::doWakeUp()
 {
+	if (m_input == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
+			getName() << " does not have an Input Component.";
+		return false;
+	}
+	if (m_rigid == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
+			getName() << " does not have a Representation.";
+		return false;
+	}
 	return true;
 }
 
