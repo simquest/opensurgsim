@@ -39,6 +39,7 @@
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 
 #include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/CapsuleShape.h"
@@ -175,7 +176,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createArm(const std::string&na
 	params.setDensity(1062); // Average human body density
 	params.setShapeUsedForMassInertia(shape);
 
-	auto physicsRepresentation = std::make_shared<SurgSim::Physics::RigidRepresentation>(name + "Physics");
+	auto physicsRepresentation = std::make_shared<SurgSim::Physics::FixedRepresentation>(name + "Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
@@ -184,10 +185,16 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createArm(const std::string&na
 		(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
+	// Behavior
+	auto transferPose = std::make_shared<SurgSim::Blocks::TransferPoseBehavior>("Physics to Graphics Pose");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(boxRepresentation);
+
 	armSceneElement->addComponent(physicsRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 
 	armSceneElement->addComponent(boxRepresentation);
+	armSceneElement->addComponent(transferPose);
 
 	return armSceneElement;
 }
@@ -216,11 +223,12 @@ int main(int argc, char* argv[])
 
 	// create armSceneElement
 	std::shared_ptr<SurgSim::Framework::SceneElement> armSceneElement = createArm("arm", SurgSim::Math::
-		makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, -0.5, 0.0)));
+		makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, -0.2, 0.0)));
 
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(staplerSceneElement);
 	scene->addSceneElement(armSceneElement);
+
 	scene->addSceneElement(createView());
 
 	runtime->execute();
