@@ -41,7 +41,9 @@ struct Contact;
 
 /// Wrapper class to use for the collision operation, handles its enclosed shaped
 /// and a possible local to global coordinate system transform, if the physics representation
-/// is a nullptr or a has gone out of scope ASSERT's will be triggered
+/// is a nullptr or a has gone out of scope ASSERT's will be triggered.
+/// Collision with other representations will be updated by CollisionPair::addContact() and
+/// be cleared every time DcdCollision::updatePair() makes a new CollisionPair.
 class Representation : public SurgSim::Framework::Representation
 {
 public:
@@ -64,7 +66,8 @@ public:
 	/// \return	The physics representation.
 	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
 
-	/// Return the list of colliding representations and a list of contacts associated with each collision.
+	/// A map between collision representations and contacts.
+	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		std::list<std::shared_ptr<SurgSim::Collision::Contact>>> getCollisions() const;
@@ -94,7 +97,7 @@ public:
 	void clearCollisions();
 
 protected:
-	/// A map which associates a list of contacts with each collision.
+	/// A map which associates a list of contacts with each collision representation.
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 					   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> m_collisions;
 };
