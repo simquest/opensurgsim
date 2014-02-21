@@ -205,6 +205,9 @@ void Runtime::resume()
 		{
 			(*it)->setSynchronous(false);
 		}
+		// HS-2014-feb-21 if there are threads that are not waiting this will hang, this can happen if the above call
+		// to setSynchronous was made while the thread was executing code rather than waiting.
+		// #threadsafety
 		m_barrier->wait(true);
 	}
 }

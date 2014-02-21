@@ -230,5 +230,7 @@ TEST(RuntimeTest, AddComponentAddDuringRuntime)
 	EXPECT_TRUE(components[1]->isInitialized());
 	EXPECT_TRUE(components[1]->isAwake());
 
+	boost::this_thread::sleep(boost::posix_time::milliseconds(150));
+
 	runtime->stop();
 }

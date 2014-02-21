@@ -64,7 +64,7 @@ public:
 	/// sequence in step.
 	/// \param isSynchronous when true the thread will wait on the barrier after each call to update(dt), this
 	/// 					 means that only one step will be performed at a time
-	void start(std::shared_ptr<Barrier> startupBarrier=nullptr, bool isSynchronous = false);
+	void start(std::shared_ptr<Barrier> startupBarrier = nullptr, bool isSynchronous = false);
 
 	/// Stopping the execution, blocks until the running thread has actually stopped,
 	/// \note When the thread is in synchronous mode, it needs to be stopped with a call to
@@ -91,7 +91,10 @@ public:
 
 	/// Set the update rate of the thread
 	/// \param val	rate in hertz (updates per second) of the thread
-	void setRate(double val) {m_period = boost::chrono::duration<double>(1.0/val);}
+	void setRate(double val)
+	{
+		m_period = boost::chrono::duration<double>(1.0 / val);
+	}
 
 	/// Sets the thread to synchronized execution in concert with the startup
 	/// barrier, the startup barrier has to exist for this call to succeed.
