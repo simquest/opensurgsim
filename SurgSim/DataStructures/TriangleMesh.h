@@ -64,6 +64,10 @@ public:
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
 	TriangleMesh();
 
+	// Copy constructor.
+	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
+	TriangleMesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
+
 	/// Destructor
 	virtual ~TriangleMesh();
 
@@ -147,6 +151,11 @@ private:
 
 	/// Triangles
 	std::vector<TriangleType> m_triangles;
+
+public:
+	// Dependent name resolution for inherited functions and typenames from templates
+	using typename Vertices<VertexData>::VertexType;
+	using Vertices<VertexData>::addVertex;
 };
 
 };  // namespace DataStructures

@@ -27,6 +27,12 @@
 
 namespace SurgSim
 {
+
+namespace Collision
+{
+class Representation;
+}
+
 namespace Physics
 {
 
@@ -39,6 +45,7 @@ enum RepresentationType
 	REPRESENTATION_TYPE_RIGID,
 	REPRESENTATION_TYPE_VTC_RIGID,
 	REPRESENTATION_TYPE_MASSSPRING,
+	REPRESENTATION_TYPE_FEM1D,
 	REPRESENTATION_TYPE_FEM3D,
 	REPRESENTATION_TYPE_COUNT
 };
@@ -118,6 +125,14 @@ public:
 	/// \param deltaVelocity The block of a vector containing the correction to be applied to the velocity
 	virtual void applyCorrection(double dt, const Eigen::VectorBlock<SurgSim::Math::Vector>& deltaVelocity);
 
+	/// \return the collision representation for this physics representation.
+	std::shared_ptr<SurgSim::Collision::Representation> getCollisionRepresentation() const;
+
+	/// Set the collision representation for this physics representation, when the collision object
+	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
+	/// \param representation The appropriate collision representation for this object.
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
+
 protected:
 	/// Set the number of degrees of freedom
 	/// \param numDof The number of degrees of freedom
@@ -147,6 +162,8 @@ private:
 
 	/// Is this representation active or not ?
 	bool m_isActive;
+
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 };
 
 };  // namespace Physics

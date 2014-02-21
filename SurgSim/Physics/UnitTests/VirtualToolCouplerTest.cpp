@@ -66,7 +66,9 @@ struct VirtualToolCouplerTest : public ::testing::Test
 		device = std::make_shared<IdentityPoseDevice>("Device");
 		input->connectDevice(device);
 
-		virtualToolCoupler = std::make_shared<VirtualToolCoupler>("Virtual Tool Coupler", input, rigidBody);
+		virtualToolCoupler = std::make_shared<VirtualToolCoupler>("Virtual Tool Coupler");
+		virtualToolCoupler->setInput(input);
+		virtualToolCoupler->setRepresentation(rigidBody);
 		const double mass = parameters.getMass();
 		virtualToolCoupler->setAngularDamping(mass * 1.0 );
 		virtualToolCoupler->setAngularStiffness(mass * 200);

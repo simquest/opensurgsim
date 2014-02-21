@@ -637,17 +637,16 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 
 	checkDeviceHoming(info);
 
-	bool desiredGravityCompensation = false;
-	bool shouldSetGravityCompensation = outputData.booleans().get("gravityCompensation", &desiredGravityCompensation);
-	if (shouldSetGravityCompensation)
-	{
-		setGravityCompensation(info, desiredGravityCompensation);
-	}
-
 	info->forceValue.setZero();
 	info->torqueValue.setZero();
 	if (info->isDeviceHomed)
 	{
+		bool desiredGravityCompensation = false;
+		if (outputData.booleans().get("gravityCompensation", &desiredGravityCompensation))
+		{
+			setGravityCompensation(info, desiredGravityCompensation);
+		}
+
 		calculateForceAndTorque(info);
 	}
 

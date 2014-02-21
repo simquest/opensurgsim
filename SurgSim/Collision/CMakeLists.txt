@@ -29,11 +29,12 @@ set(SURGSIM_COLLISION_SOURCES
 	DefaultContactCalculation.cpp
 	OctreeDcdContact.cpp
 	Representation.cpp
-	RigidCollisionRepresentation.cpp
 	ShapeCollisionRepresentation.cpp
 	SphereDoubleSidedPlaneDcdContact.cpp
 	SpherePlaneDcdContact.cpp
 	SphereSphereDcdContact.cpp
+	TriangleMeshPlaneDcdContact.cpp
+	TriangleMeshTriangleMeshDcdContact.cpp
 )
 
 set(SURGSIM_COLLISION_HEADERS
@@ -49,13 +50,12 @@ set(SURGSIM_COLLISION_HEADERS
 	Location.h
 	OctreeDcdContact.h
 	Representation.h
-	RigidCollisionRepresentation.h
 	ShapeCollisionRepresentation.h
 	SphereDoubleSidedPlaneDcdContact.h
 	SpherePlaneDcdContact.h
 	SphereSphereDcdContact.h
 	TriangleMeshPlaneDcdContact.h
-	TriangleMeshPlaneDcdContact-inl.h
+	TriangleMeshTriangleMeshDcdContact.h
 )
 
 surgsim_add_library(

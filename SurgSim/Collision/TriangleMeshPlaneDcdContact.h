@@ -26,8 +26,7 @@ namespace SurgSim
 namespace Collision
 {
 
-/// Class to calculate intersections between a triangle mesh and a plan
-template <class VertexType, class EdgeType, class TriangleType>
+/// Class to calculate intersections between a triangle mesh and a plane
 class TriangleMeshPlaneDcdContact : public ContactCalculation
 {
 public:
@@ -48,8 +47,6 @@ private:
 
 };
 };
-
-#include "SurgSim/Collision/TriangleMeshPlaneDcdContact-inl.h"
 
 
 #endif
