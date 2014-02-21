@@ -85,6 +85,8 @@ public:
 	void pause();
 
 	/// Resume from pause, causes all managers to resume normal processing
+	/// \warning This function is not thread safe, if stop is called when there are threads that are not waiting,
+	///          this call will hang indefinitely.
 	void resume();
 
 	/// Make all managers execute 1 update loop, afterwards they will wait for another step() call or resume()
@@ -92,6 +94,8 @@ public:
 
 	/// Stops the simulation.
 	/// The call will wait for all the threads to finish, except for any threads that have been detached.
+	/// \warning This function is not thread safe, if stop is called when there are threads that are not waiting,
+	///          this call will hang indefinitely.
 	/// \return	true if it succeeds, false if it fails.
 	bool stop();
 
