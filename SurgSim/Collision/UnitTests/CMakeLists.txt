@@ -35,6 +35,7 @@ set(UNIT_TEST_SOURCES
 	SpherePlaneContactCalculationTests.cpp
 	SphereSphereContactCalculationTests.cpp
 	TriangleMeshPlaneContactCalculationTests.cpp
+	TriangleMeshTriangleMeshContactCalculationTests.cpp
 )
 
 set(UNIT_TEST_HEADERS

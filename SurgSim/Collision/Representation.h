@@ -62,10 +62,6 @@ public:
 	/// \return The actual shape used for collision.
 	virtual const std::shared_ptr<SurgSim::Math::Shape> getShape() const = 0;
 
-	/// Gets physics representation.
-	/// \return	The physics representation.
-	virtual std::shared_ptr<SurgSim::Physics::Representation> getPhysicsRepresentation() = 0;
-
 	/// A map between collision representations and contacts.
 	/// For each collision representation, it gives the list of contacts registered against this instance.
 	/// \return A map with collision representations as keys and lists of contacts as the associated value.

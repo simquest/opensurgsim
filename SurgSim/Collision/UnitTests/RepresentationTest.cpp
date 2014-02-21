@@ -91,11 +91,6 @@ TEST_F(RepresentationTest, ShapeTest)
 	EXPECT_EQ(sphere, sphereRep->getShape());
 }
 
-TEST_F(RepresentationTest, GetPhysicsRepresentationTest)
-{
-	EXPECT_EQ(nullptr, sphereRep->getPhysicsRepresentation());
-}
-
 TEST_F(RepresentationTest, EmptyCollisionTest)
 {
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,

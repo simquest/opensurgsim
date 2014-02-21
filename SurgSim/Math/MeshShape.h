@@ -36,16 +36,27 @@ namespace Math
 /// Various physical properties are computed from the triangle mesh using
 /// work by Brian Mirtich.
 /// http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html
-template <class VertexData, class EdgeData, class TriangleData>
 class MeshShape : public Shape
 {
+public:
+	// EmptyData class used for the TriangleMesh.
+	class EmptyData
+	{
+	public:
+		bool operator==(const EmptyData& vertex) const
+		{
+			return true;
+		}
+	};
 	/// Type TriMesh for convenience
-	typedef SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData> TriMesh;
+	typedef SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, EmptyData> TriMesh;
 
 public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
-	explicit MeshShape(const std::shared_ptr<TriMesh> mesh);
+	template <class VertexData, class EdgeData, class TriangleData>
+	explicit MeshShape(
+		const std::shared_ptr<SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>> mesh);
 
 	/// \return the type of the shape
 	virtual int getType() override;
@@ -74,11 +85,11 @@ private:
 
 	/// Compute various integrations over projection of face
 	/// \param face A triangle
-	void computeProjectionIntegrals(const typename TriMesh::TriangleType& face);
+	void computeProjectionIntegrals(const TriMesh::TriangleType& face);
 
 	/// Compute various integrations on a face
 	/// \param face A triangle
-	void computeFaceIntegrals(const typename TriMesh::TriangleType& face);
+	void computeFaceIntegrals(const TriMesh::TriangleType& face);
 
 	/// Compute various volume integrals over the triangle mesh
 	void computeVolumeIntegrals();
@@ -103,6 +114,7 @@ private:
 
 }; // Math
 }; // SurgSim
+
 
 #include "SurgSim/Math/MeshShape-inl.h"
 

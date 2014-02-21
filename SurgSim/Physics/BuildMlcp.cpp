@@ -85,7 +85,7 @@ std::shared_ptr<PhysicsManagerState>
 	// Resize the Mlcp solution
 	result->getMlcpSolution().dofCorrection.resize(numDof);
 	result->getMlcpSolution().dofCorrection.setZero();
-	result->getMlcpSolution().x.resize(numConstraint);
+	result->getMlcpSolution().x.resize(numAtomicConstraint);
 	result->getMlcpSolution().x.setZero();
 
 	// Fill up the Mlcp problem

@@ -28,6 +28,7 @@ set(SURGSIM_MATH_SOURCES
 	LinearSolveAndInverse.cpp
 	MathConvert.cpp
 	Matrix.cpp
+	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
 	OctreeShape.cpp
 	PlaneShape.cpp

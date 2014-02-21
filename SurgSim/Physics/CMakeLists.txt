@@ -28,9 +28,11 @@ set(SURGSIM_PHYSICS_SOURCES
 	ContactConstraintGeneration.cpp
 	DcdCollision.cpp
 	DeformableRepresentationState.cpp
+	Fem1DRepresentation.cpp
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
+	FemElement1DBeam.cpp
 	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationCoordinate.cpp
@@ -49,6 +51,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	PreUpdate.cpp
 	PushResults.cpp
 	Representation.cpp
+	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
 	RigidRepresentationContact.cpp
@@ -70,9 +73,11 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentation.h
 	DeformableRepresentation-inl.h
 	DeformableRepresentationState.h
+	Fem1DRepresentation.h
 	Fem3DRepresentation.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
+	FemElement1DBeam.h
 	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h
@@ -98,6 +103,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	PreUpdate.h
 	PushResults.h
 	Representation.h
+	RigidCollisionRepresentation.h
 	RigidRepresentation.h
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
@@ -122,16 +128,14 @@ SET(LIBS
 	SurgSimCollision
 )
 
-target_link_libraries(SurgSimPhysics ${LIBS}
-)
+target_link_libraries(SurgSimPhysics ${LIBS})
 
 if(BUILD_TESTING)
 	add_subdirectory(UnitTests)
 
-  if(BUILD_RENDER_TESTING)
+	if(BUILD_RENDER_TESTING)
 		add_subdirectory(RenderTests)
 	endif()
 endif()
 
-# Put SurgSimPhysics into folder "Physics"
 set_target_properties(SurgSimPhysics PROPERTIES FOLDER "Physics")

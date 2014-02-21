@@ -23,6 +23,7 @@ set(DEVICES
 	Novint
 	Phantom
 	Sixense
+	TrackIR
 )
 
 foreach(DEVICE ${DEVICES})
