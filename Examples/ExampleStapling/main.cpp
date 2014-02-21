@@ -19,7 +19,6 @@
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
-#include "SurgSim/Collision/RigidCollisionRepresentation.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -35,6 +34,7 @@
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
@@ -100,7 +100,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createStapler(const std::strin
 	physicsRepresentation->setInitialPose(pose);
 
 	// Stapler collisionRep
-	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+	auto collisionRepresentation =  std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 		(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
@@ -181,7 +181,7 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createArm(const std::string&na
 	physicsRepresentation->setInitialPose(pose);
 
 	// Arm collisionRep
-	auto collisionRepresentation =  std::make_shared<SurgSim::Collision::RigidCollisionRepresentation>
+	auto collisionRepresentation =  std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
 		(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
