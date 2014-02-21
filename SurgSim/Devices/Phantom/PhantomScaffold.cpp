@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Devices/Phantom/PhantomScaffold.h"
 
 #include <vector>
 #include <memory>
@@ -23,23 +22,23 @@
 
 #include <HD/hd.h>
 
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Phantom/PhantomDevice.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Devices/Phantom/PhantomScaffold.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
-#include "SurgSim/DataStructures/DataGroup.h"
-#include "SurgSim/DataStructures/DataGroupBuilder.h"
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Matrix44d;
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::RigidTransform3d;
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix44d;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
 
 namespace SurgSim
@@ -216,12 +215,12 @@ struct PhantomScaffold::DeviceData
 	DeviceData(const std::string& apiName, PhantomDevice* device) :
 		initializationName(apiName),
 		deviceObject(device),
-		positionValue(Vector3d::Zero()),
-		linearVelocityValue(Vector3d::Zero()),
-		forceValue(Vector3d::Zero()),
+		position(Vector3d::Zero()),
+		linearVelocity(Vector3d::Zero()),
+		scaledPose(RigidTransform3d::Identity()),
+		force(Vector3d::Zero()),
 		buttonsBuffer(0)
 	{
-		transformValue.setIdentity();
 	}
 
 	/// The OpenHaptics device name.
@@ -236,14 +235,14 @@ struct PhantomScaffold::DeviceData
 	int buttonsBuffer;
 
 	/// The position value from the device.
-	Vector3d positionValue;
-	/// The velocity value from the device.
-	Vector3d linearVelocityValue;
-	/// The pose transform value from the device.
-	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transformValue;
+	Vector3d position;
+	/// The linear velocity value from the device.
+	Vector3d linearVelocity;
+	/// The pose value from the device, after scaling.
+	RigidTransform3d scaledPose;
 
 	/// The force value to be written to the device.
-	Vector3d forceValue;
+	Vector3d force;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -481,15 +480,22 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 	hdBeginFrame(info->deviceHandle.get());
 
 	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
-	hdGetDoublev(HD_CURRENT_POSITION, info->positionValue.data());
-	hdGetDoublev(HD_CURRENT_VELOCITY, info->linearVelocityValue.data());
-	hdGetDoublev(HD_CURRENT_TRANSFORM, info->transformValue.data());
+	hdGetDoublev(HD_CURRENT_POSITION, info->position.data());
+	info->scaledPose.translation() = info->position * 0.001;  // convert from millimeters to meters!
+
+	hdGetDoublev(HD_CURRENT_VELOCITY, info->linearVelocity.data());
+	//TODO(ryanbeasley): convert HD_CURRENT_ANGULAR_VELOCITY to a rotation vector and store in info->angularVelocity.
+
+	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;
+	hdGetDoublev(HD_CURRENT_TRANSFORM, transform.data());
+	info->scaledPose.linear() = transform.block<3,3>(0, 0); // store orientation in a RigidTransform3d
+	
 	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsBuffer));
 
 	calculateForceAndTorque(info);
 
 	// Set the force command (in newtons).
-	hdSetDoublev(HD_CURRENT_FORCE, info->forceValue.data());
+	hdSetDoublev(HD_CURRENT_FORCE, info->force.data());
 
 	hdEndFrame(info->deviceHandle.get());
 
@@ -503,39 +509,63 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 
 void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 {
+	typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
 	Vector3d nominalForce = Vector3d::Zero();
 	outputData.vectors().get("force", &nominalForce);
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType forcePositionJacobian = Matrix33d::Zero();
-	outputData.matrices().get("forcePositionJacobian", &forcePositionJacobian);
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType forceLinearVelocityJacobian = Matrix33d::Zero();
-	outputData.matrices().get("forceLinearVelocityJacobian", &forceLinearVelocityJacobian);
+	Vector3d nominalTorque = Vector3d::Zero();
+	Vector6d nominalForceAndTorque = Vector6d::Zero();
+	SurgSim::Math::setSubVector(nominalForce, 0, 3, &nominalForceAndTorque);
 
-	Vector3d position = info->positionValue;
-	Vector3d linearVelocity = info->linearVelocityValue;
+	Vector6d forceAndTorqueFromDeltaPosition = Vector6d::Zero();
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromPosition;
+	if (outputData.matrices().get("jacobianFromPosition", &jacobianFromPosition))
+	{
+		RigidTransform3d poseForNominal = info->scaledPose;
+		outputData.poses().get("inputPose", &poseForNominal);
 
-	Vector3d positionForNominalForce = position;
-	outputData.vectors().get("inputPosition", &positionForNominalForce);
-	Vector3d linearVelocityForNominalForce = linearVelocity;
-	outputData.vectors().get("inputLinearVelocity", &linearVelocityForNominalForce);
+		Vector3d rotationVector = Vector3d::Zero();
+		SurgSim::Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
 
-	info->forceValue = nominalForce +
-		forcePositionJacobian * (position - positionForNominalForce) +
-		forceLinearVelocityJacobian * (linearVelocity - linearVelocityForNominalForce);
+		Vector6d deltaPosition;
+		SurgSim::Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3, &deltaPosition);
+		SurgSim::Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
+
+		forceAndTorqueFromDeltaPosition = jacobianFromPosition * deltaPosition;
+	}
+
+	Vector6d forceAndTorqueFromDeltaVelocity = Vector6d::Zero();
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromVelocity;
+	if (outputData.matrices().get("jacobianFromVelocity", &jacobianFromVelocity))
+	{
+		Vector3d angularVelocity = Vector3d::Zero();
+
+		Vector3d linearVelocityForNominal = info->linearVelocity;
+		outputData.vectors().get("inputLinearVelocity", &linearVelocityForNominal);
+		Vector3d angularVelocityForNominal = angularVelocity;
+		outputData.vectors().get("inputAngularVelocity", &angularVelocityForNominal);
+
+		Vector6d deltaVelocity;
+		SurgSim::Math::setSubVector(info->linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
+		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
+
+		forceAndTorqueFromDeltaVelocity = jacobianFromVelocity * deltaVelocity;
+	}
+
+	Vector6d forceAndTorque = nominalForceAndTorque + forceAndTorqueFromDeltaPosition +
+		forceAndTorqueFromDeltaVelocity;
+
+	info->force = SurgSim::Math::getSubVector(forceAndTorque, 0, 3);
 }
 
 
 void PhantomScaffold::setInputData(DeviceData* info)
 {
-	RigidTransform3d pose;
-	pose.linear() = info->transformValue.block<3,3>(0,0);
-	pose.translation() = info->positionValue * 0.001;  // convert from millimeters to meters!
-
 	// TODO(bert): this code should cache the access indices.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set("pose", pose);
-	inputData.vectors().set("linearVelocity", info->linearVelocityValue);
+	inputData.poses().set("pose", info->scaledPose);
+	inputData.vectors().set("linearVelocity", info->linearVelocity);
 	inputData.booleans().set("button1", (info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
 	inputData.booleans().set("button2", (info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
 	inputData.booleans().set("button3", (info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);

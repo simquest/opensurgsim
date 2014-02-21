@@ -26,6 +26,7 @@
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
 
@@ -48,14 +49,11 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector("force");
-	builder.addMatrix("forcePositionJacobian");
-	builder.addVector("inputPosition");
-	builder.addMatrix("forceLinearVelocityJacobian");
-	builder.addVector("inputLinearVelocity");
 	builder.addVector("torque");
-	builder.addMatrix("torqueAngleJacobian");
-	builder.addMatrix("inputOrientation");
-	builder.addMatrix("torqueAngularVelocityJacobian");
+	builder.addMatrix("jacobianFromPosition");
+	builder.addPose("inputPose");
+	builder.addMatrix("jacobianFromVelocity");
+	builder.addVector("inputLinearVelocity");
 	builder.addVector("inputAngularVelocity");
 	m_outputData = builder.createData();
 }
@@ -121,15 +119,25 @@ void VirtualToolCoupler::update(double dt)
 		if (m_output != nullptr)
 		{
 			m_outputData.vectors().set("force", -force * m_outputForceScaling);
-			m_outputData.matrices().set("forcePositionJacobian", -linearStiffnessMatrix * m_outputForceScaling);
-			m_outputData.vectors().set("inputPosition", inputPose.translation());
-			m_outputData.matrices().set("forceLinearVelocityJacobian", -linearDampingMatrix * m_outputForceScaling);
+			m_outputData.vectors().set("torque", -torque * m_outputTorqueScaling);
+
+			Matrix66d jacobianFromPosition = Matrix66d::Zero();
+			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
+			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &jacobianFromPosition);
+			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
+			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &jacobianFromPosition);
+			m_outputData.matrices().set("jacobianFromPosition", jacobianFromPosition);
+			m_outputData.poses().set("inputPose", inputPose);
+
+			Matrix66d jacobianFromVelocity = Matrix66d::Zero();
+			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
+			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &jacobianFromVelocity);
+			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
+			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &jacobianFromVelocity);
+			m_outputData.matrices().set("jacobianFromVelocity", jacobianFromVelocity);
 			m_outputData.vectors().set("inputLinearVelocity", inputLinearVelocity);
-			m_outputData.vectors().set("torque", -force * m_outputForceScaling);
-			m_outputData.matrices().set("torqueAngleJacobian", -angularStiffnessMatrix * m_outputForceScaling);
-			m_outputData.matrices().set("inputOrientation", inputPose.linear());
-			m_outputData.matrices().set("torqueAngularVelocityJacobian", -angularDampingMatrix * m_outputForceScaling);
 			m_outputData.vectors().set("inputAngularVelocity", inputAngularVelocity);
+
 			m_output->setData(m_outputData);
 		}
 	}
