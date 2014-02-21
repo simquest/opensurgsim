@@ -115,11 +115,14 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createStapler(const std::strin
 	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
 	inputComponent->setDeviceName("MultiAxisDevice");
 
+
 	// Behaviors
 
 	// Add VTC
 	std::shared_ptr<SurgSim::Physics::VirtualToolCoupler> inputVTC =
-		std::make_shared<SurgSim::Physics::VirtualToolCoupler>("VTC", inputComponent, physicsRepresentation);
+		std::make_shared<SurgSim::Physics::VirtualToolCoupler>("VTC");
+	inputVTC->setInput(inputComponent);
+	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->setAngularDamping(params.getMass() * 10e-2);
 	inputVTC->setAngularStiffness(params.getMass() * 50);
 	inputVTC->setLinearDamping(params.getMass() * 10);
