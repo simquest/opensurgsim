@@ -24,179 +24,193 @@
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Input/InputComponent.h"
-#include "SurgSim/Input/InputManager.h"
-
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
-
+#include "SurgSim/Input/InputComponent.h"
+#include "SurgSim/Input/InputManager.h"
+#include "SurgSim/Math/BoxShape.h"
+#include "SurgSim/Math/CapsuleShape.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
-#include "SurgSim/Physics/FixedRepresentation.h"
 
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/CapsuleShape.h"
-#include "SurgSim/Math/RigidTransform.h"
+using SurgSim::Blocks::TransferInputPoseBehavior;
+using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Blocks::BasicSceneElement;
+using SurgSim::Framework::BehaviorManager;
+using SurgSim::Framework::Scene;
+using SurgSim::Framework::SceneElement;
+using SurgSim::Framework::Runtime;
+using SurgSim::Device::MultiAxisDevice;
+using SurgSim::Graphics::BoxRepresentation;
+using SurgSim::Graphics::CapsuleRepresentation;
+using SurgSim::Graphics::OsgBoxRepresentation;
+using SurgSim::Graphics::OsgCapsuleRepresentation;
+using SurgSim::Graphics::OsgManager;
+using SurgSim::Graphics::OsgSceneryRepresentation;
+using SurgSim::Graphics::OsgViewElement;
+using SurgSim::Graphics::SceneryRepresentation;
+using SurgSim::Graphics::ViewElement;
+using SurgSim::Math::BoxShape;
+using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Input::DeviceInterface;
+using SurgSim::Input::InputComponent;
+using SurgSim::Input::InputManager;
+using SurgSim::Physics::FixedRepresentation;
+using SurgSim::Physics::PhysicsManager;
+using SurgSim::Physics::RigidRepresentationParameters;
+using SurgSim::Physics::RigidCollisionRepresentation;
+using SurgSim::Physics::RigidRepresentation;
+using SurgSim::Physics::VirtualToolCoupler;
 
-
-/// Load scenery object from file
+/// Load scenery object from file.
 /// \param name Name of this scenery representation.
 /// \param fileName Name of the file from which the scenery representation is loaded.
+/// \param pose The pose of the loaded scenery representation.
 /// \return A SceneElement containing the scenery representation.
-std::shared_ptr<SurgSim::Framework::SceneElement> createSceneryObject(const std::string& name,
-																	  const std::string& fileName,
-																	  const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createSceneryObject(const std::string& name,
+												  const std::string& fileName,
+												  const RigidTransform3d& pose)
 {
-	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> sceneryRepresentation =
-		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(name + "SceneryRepresentation");
+	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
+		std::make_shared<OsgSceneryRepresentation>(name + "SceneryRepresentation");
 	sceneryRepresentation->setFileName(fileName);
 	sceneryRepresentation->setInitialPose(pose);
 
-	auto sceneElement = std::make_shared<SurgSim::Blocks::BasicSceneElement>(name + "SceneElement");
+	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
 	sceneElement->addComponent(sceneryRepresentation);
 
 	return sceneElement;
 }
 
-std::shared_ptr<SurgSim::Graphics::ViewElement> createView()
+std::shared_ptr<ViewElement> createView()
 {
-	auto view = std::make_shared<SurgSim::Graphics::OsgViewElement>("StaplingDemoView");
+	std::shared_ptr<OsgViewElement> view = std::make_shared<OsgViewElement>("StaplingDemoView");
 
 	view->enableManipulator(true);
-	view->setManipulatorParameters(SurgSim::Math::Vector3d(0.0, 0.5, 0.5), SurgSim::Math::Vector3d::Zero());
+	view->setManipulatorParameters(Vector3d(0.0, 0.5, 0.5), Vector3d::Zero());
 
 	return view;
 }
 
-std::shared_ptr<SurgSim::Framework::SceneElement> createStapler(const std::string&name,
-																const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createStapler(const std::string& name)
 {
-	// add graphic representation for staplerSceneElement
-	std::shared_ptr<SurgSim::Framework::SceneElement> staplerSceneElement =
-		createSceneryObject(name, "Geometry/stapler.obj", pose);
+	std::shared_ptr<SceneryRepresentation> staplerSceneryRepresentation =
+		std::make_shared<OsgSceneryRepresentation>(name + "SceneryRepresentation");
+	staplerSceneryRepresentation->setFileName("Geometry/stapler.obj");
 
-	// In order to connect the stapler scenery representation to an input device, after create a SceneElement for it,
-	// we need to retrieve the stapler scenery representation from the SceneElement.
-	std::shared_ptr<SurgSim::Framework::Component> staplerComponent =
-		staplerSceneElement->getComponent("staplerSceneryRepresentation");
-	auto staplerSceneryRepresentation = std::static_pointer_cast<SurgSim::Framework::Representation>(staplerComponent);
+	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the stapler.
+	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.172, 0.028); // Unit: meter
 
-	// Stapler Physics
-	auto shape = std::make_shared<SurgSim::Math::CapsuleShape>(0.172, 0.028);
+	RigidRepresentationParameters params;
+	params.setDensity(8050); // Stainless steel (in Kg.m-3)
+	params.setShapeUsedForMassInertia(capsuleShape);
 
-	SurgSim::Physics::RigidRepresentationParameters params;
-	params.setDensity(8050); // Stainless steel
-	params.setShapeUsedForMassInertia(shape);
-
-	auto physicsRepresentation = std::make_shared<SurgSim::Physics::RigidRepresentation>(name + "Physics");
+	std::shared_ptr<RigidRepresentation> physicsRepresentation =
+		std::make_shared<RigidRepresentation>(name + "Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
 
-	// Stapler collisionRep
-	auto collisionRepresentation =  std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-		(name + "Collision");
+	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
+		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	// Debug only
-	// Add the capsule rigid representation
-	std::shared_ptr<SurgSim::Graphics::CapsuleRepresentation> capsuleRepresentation =
-		std::make_shared<SurgSim::Graphics::OsgCapsuleRepresentation>("capsule representation");
-	capsuleRepresentation->setHeight(0.172);
-	capsuleRepresentation->setRadius(0.028);
-	capsuleRepresentation->setInitialPose(pose);
+	// Visualization of the collision representation.
+	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
+		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
+	capsuleRepresentation->setHeight(0.172); // Unit: meter
+	capsuleRepresentation->setRadius(0.028); // Unit: meter
 
-	auto inputComponent = std::make_shared<SurgSim::Input::InputComponent>("InputComponent");
+	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName("MultiAxisDevice");
 
-
-	// Behaviors
-
-	// Add VTC
-	std::shared_ptr<SurgSim::Physics::VirtualToolCoupler> inputVTC =
-		std::make_shared<SurgSim::Physics::VirtualToolCoupler>("VTC");
+	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
 	inputVTC->setAngularDamping(params.getMass() * 10e-2);
-	inputVTC->setAngularStiffness(params.getMass() * 50);
-	inputVTC->setLinearDamping(params.getMass() * 10);
-	inputVTC->setLinearStiffness(params.getMass() * 200);
+	inputVTC->setAngularStiffness(params.getMass() * 50.0);
+	inputVTC->setLinearDamping(params.getMass() * 10.0);
+	inputVTC->setLinearStiffness(params.getMass() * 200.0);
 
-	// Add stapler behavior
-	auto addStaplerBehavior = std::make_shared<StaplerBehavior>(name + "StaplerBehavior");
-	addStaplerBehavior->setInputComponent(inputComponent);
-	addStaplerBehavior->setStaplerRepresentation(collisionRepresentation);
+	// A stapler behavior controls the release of stale when a button is pushed on the device.
+	// Also, it is aware of collisions of the stapler.
+	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>(name + "StaplerBehavior");
+	staplerBehavior->setInputComponent(inputComponent);
+	staplerBehavior->setStaplerRepresentation(collisionRepresentation);
 
 	// Transfer physicsRepresentation to sceneryRepresentation raw
-	auto transferInputPosePS = std::make_shared<SurgSim::Blocks::TransferInputPoseBehavior>(name + "Input to Physics");
-	transferInputPosePS->setPoseSender(inputComponent);
-	transferInputPosePS->setPoseReceiver(staplerSceneryRepresentation);
+	std::shared_ptr<TransferInputPoseBehavior> transferInputPose =
+		std::make_shared<TransferInputPoseBehavior>(name + "Input to Graphics");
+	transferInputPose->setPoseSender(inputComponent);
+	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 
-	// Transfer physics to rigidRepresentation shape
-	auto transferInputPosePR = std::make_shared<SurgSim::Blocks::TransferPoseBehavior>(name + "Graphic to RigidRep");
-	transferInputPosePR->setPoseSender(physicsRepresentation);
-	transferInputPosePR->setPoseReceiver(capsuleRepresentation);
+	// Transfer physics to rigidRepresentation capsuleShape
+	std::shared_ptr<TransferPoseBehavior> transferPose =
+		std::make_shared<TransferPoseBehavior>(name + "Physics to Graphics");
+	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseReceiver(capsuleRepresentation);
 
+	std::shared_ptr<SceneElement> staplerSceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
 	staplerSceneElement->addComponent(physicsRepresentation);
 	staplerSceneElement->addComponent(collisionRepresentation);
 	staplerSceneElement->addComponent(capsuleRepresentation);
-
+	staplerSceneElement->addComponent(staplerSceneryRepresentation);
 	staplerSceneElement->addComponent(inputComponent);
-	staplerSceneElement->addComponent(addStaplerBehavior);
 	staplerSceneElement->addComponent(inputVTC);
-	staplerSceneElement->addComponent(transferInputPosePR);
-	staplerSceneElement->addComponent(transferInputPosePS);
+	staplerSceneElement->addComponent(staplerBehavior);
+	staplerSceneElement->addComponent(transferInputPose);
+	staplerSceneElement->addComponent(transferPose);
 
 	return staplerSceneElement;
 }
 
-std::shared_ptr<SurgSim::Framework::SceneElement> createArm(const std::string&name,
-															const SurgSim::Math::RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createArm(const std::string& name, const RigidTransform3d& pose)
 {
-	// add graphic representation for armSceneElement
-	std::shared_ptr<SurgSim::Framework::SceneElement> armSceneElement =
-		createSceneryObject(name, "Geometry/forearm.osgb", pose);
+	// Load graphic representation for armSceneElement
+	std::shared_ptr<SceneElement> armSceneElement = createSceneryObject(name, "Geometry/forearm.osgb", pose);
 
-	// Debug only
-	// Add the capsule representation
-	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> boxRepresentation =
-		std::make_shared<SurgSim::Graphics::OsgBoxRepresentation>("capsule representation");
-	boxRepresentation->setSizeX(0.635);
-	boxRepresentation->setSizeY(0.05);
-	boxRepresentation->setSizeZ(0.05);
+	std::shared_ptr<BoxRepresentation> boxRepresentation =
+		std::make_shared<OsgBoxRepresentation>("capsule representation");
+	boxRepresentation->setSize(0.635, 0.05, 0.05); // Unit: meter
 	boxRepresentation->setInitialPose(pose);
 
-	// Arm Physics
-	auto shape = std::make_shared<SurgSim::Math::BoxShape>(0.635, 0.05, 0.05);
+	// Since there is no collision mesh loader yet, use a box shape as the collision representation of the arm.
+	std::shared_ptr<BoxShape> boxShape = std::make_shared<BoxShape>(boxRepresentation->getSizeX(),
+																	boxRepresentation->getSizeY(),
+																	boxRepresentation->getSizeZ());
 
-	SurgSim::Physics::RigidRepresentationParameters params;
-	params.setDensity(1062); // Average human body density
-	params.setShapeUsedForMassInertia(shape);
+	RigidRepresentationParameters params;
+	params.setDensity(1062); // Average human body density  (in Kg.m-3)
+	params.setShapeUsedForMassInertia(boxShape);
 
-	auto physicsRepresentation = std::make_shared<SurgSim::Physics::FixedRepresentation>(name + "Physics");
+	std::shared_ptr<FixedRepresentation> physicsRepresentation =
+		std::make_shared<FixedRepresentation>(name + "Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
-	// Arm collisionRep
-	auto collisionRepresentation =  std::make_shared<SurgSim::Physics::RigidCollisionRepresentation>
-		(name + "Collision");
+	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
+		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	// Behavior
-	auto transferPose = std::make_shared<SurgSim::Blocks::TransferPoseBehavior>("Physics to Graphics Pose");
+	std::shared_ptr<TransferPoseBehavior> transferPose =
+		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(boxRepresentation);
 
+	armSceneElement->addComponent(boxRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
-
-	armSceneElement->addComponent(boxRepresentation);
 	armSceneElement->addComponent(transferPose);
 
 	return armSceneElement;
@@ -204,35 +218,30 @@ std::shared_ptr<SurgSim::Framework::SceneElement> createArm(const std::string&na
 
 int main(int argc, char* argv[])
 {
-	auto behaviorManager = std::make_shared<SurgSim::Framework::BehaviorManager>();
-	auto graphicsManager = std::make_shared<SurgSim::Graphics::OsgManager>();
-	auto inputManager    = std::make_shared<SurgSim::Input::InputManager>();
-	auto physicsManager  = std::make_shared<SurgSim::Physics::PhysicsManager>();
+	std::shared_ptr<BehaviorManager> behaviorManager = std::make_shared<BehaviorManager>();
+	std::shared_ptr<OsgManager> graphicsManager = std::make_shared<OsgManager>();
+	std::shared_ptr<InputManager> inputManager    = std::make_shared<InputManager>();
+	std::shared_ptr<PhysicsManager>  physicsManager  = std::make_shared<PhysicsManager>();
 
-	auto runtime = std::make_shared<SurgSim::Framework::Runtime>("config.txt");
+	std::shared_ptr<Runtime> runtime = std::make_shared<Runtime>("config.txt");
 	runtime->addManager(behaviorManager);
 	runtime->addManager(graphicsManager);
 	runtime->addManager(inputManager);
 	runtime->addManager(physicsManager);
 
-	auto toolDevice = std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
-	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
-		"Could not initialize device " << toolDevice->getName() << " for the tool.\n";
-	inputManager->addDevice(toolDevice);
+	std::shared_ptr<DeviceInterface> device = std::make_shared<MultiAxisDevice>("MultiAxisDevice");
+	SURGSIM_ASSERT(device->initialize() == true) <<
+		"Could not initialize device " << device->getName() << " for the tool.\n";
+	inputManager->addDevice(device);
 
-	// create staplerSceneElement
-	std::shared_ptr<SurgSim::Framework::SceneElement> staplerSceneElement = createStapler("stapler", SurgSim::Math::
-			makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, 0.0, 0.0)));
+	std::shared_ptr<SceneElement> staplerSceneElement = createStapler("stapler");
+	std::shared_ptr<SceneElement> armSceneElement = createArm("arm",
+		makeRigidTransform(Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, -0.2, 0.0)));
 
-	// create armSceneElement
-	std::shared_ptr<SurgSim::Framework::SceneElement> armSceneElement = createArm("arm", SurgSim::Math::
-		makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, -0.2, 0.0)));
-
-	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
+	std::shared_ptr<Scene> scene = runtime->getScene();
+	scene->addSceneElement(createView());
 	scene->addSceneElement(staplerSceneElement);
 	scene->addSceneElement(armSceneElement);
-
-	scene->addSceneElement(createView());
 
 	runtime->execute();
 

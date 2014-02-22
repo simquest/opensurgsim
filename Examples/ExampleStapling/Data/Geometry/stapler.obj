@@ -1,6 +1,6 @@
 # Blender v2.69 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib untitled.mtl
+mtllib stapler.mtl
 o stapler_handle
 v 0.053356 -0.007044 0.095488
 v 0.072241 -0.007044 0.067669
