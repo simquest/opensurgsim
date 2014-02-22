@@ -654,7 +654,7 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	}
 
 	// Set the force command (in newtons).
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data());  // 2nd arg is index; output force is always "vector #0"
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
 	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used

@@ -489,7 +489,7 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;
 	hdGetDoublev(HD_CURRENT_TRANSFORM, transform.data());
 	info->scaledPose.linear() = transform.block<3,3>(0, 0); // store orientation in a RigidTransform3d
-	
+
 	hdGetIntegerv(HD_CURRENT_BUTTONS, &(info->buttonsBuffer));
 
 	calculateForceAndTorque(info);
@@ -529,7 +529,8 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 		SurgSim::Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
 
 		Vector6d deltaPosition;
-		SurgSim::Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3, &deltaPosition);
+		SurgSim::Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3,
+			&deltaPosition);
 		SurgSim::Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
 
 		forceAndTorqueFromDeltaPosition = jacobianFromPosition * deltaPosition;

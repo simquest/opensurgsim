@@ -102,7 +102,7 @@ void VirtualToolCoupler::update(double dt)
 
 		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
-		
+
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
 		Vector3d torque = m_angularStiffness * rotationVector;
