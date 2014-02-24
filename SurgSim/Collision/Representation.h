@@ -95,7 +95,7 @@ public:
 
 protected:
 	/// A map which associates a list of contacts with each collision representation.
-	SurgSim::Framework::LockedContainer<std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>, 
+	SurgSim::Framework::LockedContainer<std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 														   std::list<std::shared_ptr<SurgSim::Collision::Contact>>>>
 														   m_collisions;
 };
