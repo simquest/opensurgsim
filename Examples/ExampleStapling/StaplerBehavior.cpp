@@ -21,7 +21,6 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Input/InputComponent.h"
 
 StaplerBehavior::StaplerBehavior(const std::string& name):
@@ -69,8 +68,7 @@ void StaplerBehavior::update(double dt)
 	}
 	m_buttonPreviouslyPressed = button1;
 
-	// Printout message when detecting collision.
-	// #Thread-safety HW-Feb-23-2014 Race condition between PhysicsManager (writer) and BehaviorManager (reader).
+	// Printout collision information if there is any.
 	if (m_staplerRepresentation->hasCollision())
 	{
 		std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
@@ -90,7 +88,7 @@ int StaplerBehavior::getTargetManagerType() const
 
 bool StaplerBehavior::doInitialize()
 {
-	SURGSIM_ASSERT(m_from) << "Could not get inputComponent from device.";
+	SURGSIM_ASSERT(m_from) << "StaplerBehavior: no InputComponent held.";
 	return true;
 }
 

@@ -107,17 +107,11 @@ std::shared_ptr<ViewElement> createView()
 
 std::shared_ptr<SceneElement> createStapler(const std::string& name)
 {
-	std::shared_ptr<SceneryRepresentation> staplerSceneryRepresentation =
-		std::make_shared<OsgSceneryRepresentation>(name + "SceneryRepresentation");
-	staplerSceneryRepresentation->setFileName("Geometry/stapler.obj");
-
 	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the stapler.
-	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.172, 0.028); // Unit: meter
-
+	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.1, 0.02); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(capsuleShape);
-
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(name + "Physics");
 	physicsRepresentation->setInitialParameters(params);
@@ -125,12 +119,6 @@ std::shared_ptr<SceneElement> createStapler(const std::string& name)
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
-
-	// Visualization of the collision representation.
-	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
-		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
-	capsuleRepresentation->setHeight(capsuleShape->getLength());
-	capsuleRepresentation->setRadius(capsuleShape->getRadius());
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName("MultiAxisDevice");
@@ -149,22 +137,30 @@ std::shared_ptr<SceneElement> createStapler(const std::string& name)
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setStaplerRepresentation(collisionRepresentation);
 
-	// Transfer physicsRepresentation to sceneryRepresentation raw
+	std::shared_ptr<SceneryRepresentation> staplerSceneryRepresentation =
+		std::make_shared<OsgSceneryRepresentation>(name + "SceneryRepresentation");
+	staplerSceneryRepresentation->setFileName("Geometry/stapler.obj");
+	// Connect inputComponent to graphical representation.
 	std::shared_ptr<TransferInputPoseBehavior> transferInputPose =
 		std::make_shared<TransferInputPoseBehavior>(name + "Input to Graphics");
 	transferInputPose->setPoseSender(inputComponent);
 	transferInputPose->setPoseReceiver(staplerSceneryRepresentation);
 
-	// Transfer physics to rigidRepresentation capsuleShape
+	// Visualization of the collision representation.
+	std::shared_ptr<CapsuleRepresentation> osgCapsuleRepresentation =
+		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
+	osgCapsuleRepresentation->setHeight(capsuleShape->getLength());
+	osgCapsuleRepresentation->setRadius(capsuleShape->getRadius());
+	// Connect physical representation to graphical representation.
 	std::shared_ptr<TransferPoseBehavior> transferPose =
 		std::make_shared<TransferPoseBehavior>(name + "Physics to Graphics");
 	transferPose->setPoseSender(physicsRepresentation);
-	transferPose->setPoseReceiver(capsuleRepresentation);
+	transferPose->setPoseReceiver(osgCapsuleRepresentation);
 
 	std::shared_ptr<SceneElement> staplerSceneElement = std::make_shared<BasicSceneElement>(name + "SceneElement");
 	staplerSceneElement->addComponent(physicsRepresentation);
 	staplerSceneElement->addComponent(collisionRepresentation);
-	staplerSceneElement->addComponent(capsuleRepresentation);
+	staplerSceneElement->addComponent(osgCapsuleRepresentation);
 	staplerSceneElement->addComponent(staplerSceneryRepresentation);
 	staplerSceneElement->addComponent(inputComponent);
 	staplerSceneElement->addComponent(inputVTC);
