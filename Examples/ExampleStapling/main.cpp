@@ -129,8 +129,8 @@ std::shared_ptr<SceneElement> createStapler(const std::string& name)
 	// Visualization of the collision representation.
 	std::shared_ptr<CapsuleRepresentation> capsuleRepresentation =
 		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
-	capsuleRepresentation->setHeight(0.172); // Unit: meter
-	capsuleRepresentation->setRadius(0.028); // Unit: meter
+	capsuleRepresentation->setHeight(capsuleShape->getLength());
+	capsuleRepresentation->setRadius(capsuleShape->getRadius());
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
 	inputComponent->setDeviceName("MultiAxisDevice");
