@@ -20,6 +20,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include "SurgSim/Framework/LockedContainer.h"
 #include "SurgSim/Framework/Representation.h"
 
 namespace SurgSim
@@ -72,18 +73,18 @@ public:
 	/// \param collisionRepresentation The collision representation with which this collision representation collides.
 	/// \return A list of contact points.
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>>
-		getCollisionsWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const;
+		getCollisionsWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const;
 
 	/// Add a contact against a given collision representation.
 	/// \param collisionRepresentation The collision representation to which this collision representation collides.
 	/// \param contact The contact information.
-	void addCollisionWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation,
-						  std::shared_ptr<SurgSim::Collision::Contact> contact);
+	void addCollisionWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
+						  const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
 	/// Check if this collision representation is colliding with the given collision representation.
 	/// \param collisionRepresentation The collision representation to be checked against.
 	/// \return True if the two representations are colliding; otherwise, false.
-	bool isCollidingWith(std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation) const;
+	bool isCollidingWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const;
 
 	/// Check if this collision representation has collisions.
 	/// \return True if there is a collision; otherwise false.
@@ -94,8 +95,9 @@ public:
 
 protected:
 	/// A map which associates a list of contacts with each collision representation.
-	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-					   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> m_collisions;
+	SurgSim::Framework::LockedContainer<std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+														   std::list<std::shared_ptr<SurgSim::Collision::Contact>>>>
+														   m_collisions;
 };
 
 
