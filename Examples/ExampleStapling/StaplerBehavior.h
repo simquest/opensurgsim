@@ -24,7 +24,7 @@
 namespace SurgSim
 {
 
-namespace Framework
+namespace Collision
 {
 class Representation;
 }
@@ -52,7 +52,7 @@ public:
 
 	/// Set the stapler representation
 	/// \param	staplerRepresentation The representation of a stapler
-	void setStaplerRepresentation(std::shared_ptr<SurgSim::Framework::Representation> staplerRepresentation);
+	void setStaplerRepresentation(std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -78,7 +78,7 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 
 	/// A stapler representation
-	std::shared_ptr<SurgSim::Framework::Representation> m_staplerRepresentation;
+	std::shared_ptr<SurgSim::Collision::Representation> m_staplerRepresentation;
 
 	/// The number of staples added
 	int m_numElements;
