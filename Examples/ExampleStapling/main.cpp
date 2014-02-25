@@ -171,15 +171,18 @@ std::shared_ptr<SceneElement> createStapler(const std::string& name)
 	return staplerSceneElement;
 }
 
-std::shared_ptr<SceneElement> createArm(const std::string& name, const RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createArm(const std::string& name, const Vector3d& trans)
 {
 	// Load graphic representation for armSceneElement
+	auto pose = makeRigidTransform(Quaterniond::Identity(), trans);
 	std::shared_ptr<SceneElement> armSceneElement = createSceneryObject(name, "Geometry/forearm.osgb", pose);
 
 	std::shared_ptr<BoxRepresentation> boxRepresentation =
-		std::make_shared<OsgBoxRepresentation>("capsule representation");
-	boxRepresentation->setSize(0.635, 0.05, 0.05); // Unit: meter
-	boxRepresentation->setInitialPose(pose);
+		std::make_shared<OsgBoxRepresentation>("box representation");
+	auto boxQuat =  SurgSim::Math::makeRotationQuaternion(-M_PI / 4, SurgSim::Math::Vector3d(0.0, 1.0, 0.0));
+	auto poseRepresentation = makeRigidTransform(boxQuat, trans);
+	boxRepresentation->setSize(0.335, 0.05, 0.05); // Unit: meter
+	boxRepresentation->setInitialPose(poseRepresentation);
 
 	// Since there is no collision mesh loader yet, use a box shape as the collision representation of the arm.
 	std::shared_ptr<BoxShape> boxShape = std::make_shared<BoxShape>(boxRepresentation->getSizeX(),
@@ -193,7 +196,7 @@ std::shared_ptr<SceneElement> createArm(const std::string& name, const RigidTran
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(name + "Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
+	physicsRepresentation->setInitialPose(poseRepresentation);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(name + "Collision");
@@ -231,8 +234,8 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(device);
 
 	std::shared_ptr<SceneElement> staplerSceneElement = createStapler("stapler");
-	std::shared_ptr<SceneElement> armSceneElement = createArm("arm",
-		makeRigidTransform(Quaterniond::Identity(), SurgSim::Math::Vector3d(0.0, -0.2, 0.0)));
+	auto armTrans = Vector3d(0.0, -0.2, 0.0);
+	std::shared_ptr<SceneElement> armSceneElement = createArm("arm", armTrans);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
