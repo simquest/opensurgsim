@@ -16,6 +16,7 @@
 #ifndef EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 #define EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 
+#include <list>
 #include <memory>
 #include <string>
 
@@ -23,6 +24,11 @@
 
 namespace SurgSim
 {
+
+namespace Graphics
+{
+class SceneryRepresentation;
+}
 
 namespace Collision
 {
@@ -50,9 +56,14 @@ public:
 	/// \param	inputComponent	The input component which sends the pose.
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
 
-	/// Set the stapler representation
+	/// Set the collision representation of the stapler
 	/// \param	staplerRepresentation The representation of a stapler
-	void setStaplerRepresentation(std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation);
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation);
+
+	/// Set the graphics representations of the stapler
+	/// \param	graphicsRepresentations The graphics representations of a stapler
+	void setGraphicsRepresentations(
+		std::list<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> graphicsRepresentations);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -74,11 +85,14 @@ protected:
 	virtual bool doWakeUp() override;
 
 private:
-	/// Input component from which to get the pose
+	/// Input component from which to get the pose.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 
-	/// A stapler representation
+	/// The collision representation of a stapler.
 	std::shared_ptr<SurgSim::Collision::Representation> m_staplerRepresentation;
+
+	/// A list of graphics representations of a stapler.
+	std::list<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> m_graphicsRepresentations;
 
 	/// The number of staples added
 	int m_numElements;
