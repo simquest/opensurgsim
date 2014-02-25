@@ -40,15 +40,14 @@ class FemElement3DTetrahedron : public FemElement
 public:
 	/// Constructor
 	/// \param nodeIds An array of 4 node (A, B, C, D) ids defining this tetrahedron element in a overall mesh
-	/// \param restState The rest state to initialize the Tetrahedron with
-	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
-	/// \note This is required from the signed volume calculation method getVolume()
-	/// \note A warning will be logged in if this condition is not met, but the simulation will keep running
-	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds, const DeformableRepresentationState& restState);
+	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds);
 
 	/// Initialize the FemElement once everything has been set
 	/// \param state The state to initialize the FemElement with
 	/// \note We use the theory of linear elasticity, so this method pre-compute the stiffness and mass matrices
+	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
+	/// \note This is required from the signed volume calculation method getVolume()
+	/// \note A warning will be logged in if this condition is not met, but the simulation will keep running
 	virtual void initialize(const DeformableRepresentationState& state) override;
 
 	/// Get the element volume based on the input state

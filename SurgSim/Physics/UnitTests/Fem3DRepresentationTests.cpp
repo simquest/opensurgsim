@@ -130,7 +130,7 @@ protected:
 		getSubVector(m_expectedTransformedAccelerations, 3, 3) = m_initialPose.linear() * getSubVector(a, 3, 3);
 
 		std::shared_ptr<FemElement3DTetrahedron> element;
-		element = std::make_shared<FemElement3DTetrahedron>(m_femElementNodeIdx, *m_initialState);
+		element = std::make_shared<FemElement3DTetrahedron>(m_femElementNodeIdx);
 		element->setMassDensity(m_rho);
 		element->setYoungModulus(m_E);
 		element->setPoissonRatio(m_nu);
