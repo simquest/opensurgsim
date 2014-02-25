@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	Fem1DRepresentationTests.cpp
+	Fem3DRepresentationReaderTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElement1DBeamTests.cpp
 	FemElement3DCubeTests.cpp
@@ -74,6 +75,7 @@ set(LIBS
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/SurgSim/Math/UnitTests/MlcpTestData DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY Data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 surgsim_add_unit_tests(SurgSimPhysicsTest)
 
