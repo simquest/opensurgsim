@@ -107,7 +107,7 @@ std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 
 	for (auto tetrahedron = tetrahedrons.cbegin(); tetrahedron != tetrahedrons.cend(); ++tetrahedron)
 	{
-		std::shared_ptr<FemElement> element = std::make_shared<FemElement3DTetrahedron>(*tetrahedron, *initialState);
+		std::shared_ptr<FemElement> element = std::make_shared<FemElement3DTetrahedron>(*tetrahedron);
 		element->setMassDensity(8000.0);
 		element->setPoissonRatio(0.45);
 		element->setYoungModulus(1.0e6);
