@@ -174,13 +174,13 @@ std::shared_ptr<SceneElement> createStapler(const std::string& name)
 std::shared_ptr<SceneElement> createArm(const std::string& name, const Vector3d& trans)
 {
 	// Load graphic representation for armSceneElement
-	auto pose = makeRigidTransform(Quaterniond::Identity(), trans);
+	SurgSim::Math::RigidTransform3d pose = makeRigidTransform(Quaterniond::Identity(), trans);
 	std::shared_ptr<SceneElement> armSceneElement = createSceneryObject(name, "Geometry/forearm.osgb", pose);
 
 	std::shared_ptr<BoxRepresentation> boxRepresentation =
 		std::make_shared<OsgBoxRepresentation>("box representation");
-	auto boxQuat =  SurgSim::Math::makeRotationQuaternion(-M_PI / 4, SurgSim::Math::Vector3d(0.0, 1.0, 0.0));
-	auto poseRepresentation = makeRigidTransform(boxQuat, trans);
+	SurgSim::Math::Quaterniond boxQuat =  SurgSim::Math::makeRotationQuaternion(-M_PI / 4, SurgSim::Math::Vector3d(0.0, 1.0, 0.0));
+	SurgSim::Math::RigidTransform3d poseRepresentation = makeRigidTransform(boxQuat, trans);
 	boxRepresentation->setSize(0.335, 0.05, 0.05); // Unit: meter
 	boxRepresentation->setInitialPose(poseRepresentation);
 
@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(device);
 
 	std::shared_ptr<SceneElement> staplerSceneElement = createStapler("stapler");
-	auto armTrans = Vector3d(0.0, -0.2, 0.0);
+	SurgSim::Math::Vector3d armTrans = Vector3d(0.0, -0.2, 0.0);
 	std::shared_ptr<SceneElement> armSceneElement = createArm("arm", armTrans);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
