@@ -27,7 +27,7 @@ namespace Physics
 {
 
 Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate()
-	: m_fem(nullptr), m_state(nullptr), vertexIterator(nullptr)
+	: vertexIterator(nullptr), m_fem(nullptr), m_state(nullptr)
 {
 
 }
