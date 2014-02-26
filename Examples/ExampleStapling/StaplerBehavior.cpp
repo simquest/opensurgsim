@@ -21,6 +21,7 @@
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/SceneryRepresentation.h"
 #include "SurgSim/Input/InputComponent.h"
 
 StaplerBehavior::StaplerBehavior(const std::string& name):
@@ -35,10 +36,16 @@ void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputCom
 	m_from = inputComponent;
 }
 
-void StaplerBehavior::setStaplerRepresentation(
+void StaplerBehavior::setCollisionRepresentation(
 	 std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation)
 {
 	m_staplerRepresentation = staplerRepresentation;
+}
+
+void StaplerBehavior::setGraphicsRepresentations(
+	std::list<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> graphicsRepresentations)
+{
+	m_graphicsRepresentations = graphicsRepresentations;
 }
 
 void StaplerBehavior::update(double dt)
@@ -47,26 +54,32 @@ void StaplerBehavior::update(double dt)
 	m_from->getData(&dataGroup);
 
 	SurgSim::Math::RigidTransform3d pose;
-	dataGroup.poses().get("pose", &pose);
-
-	// Add staple to the scene from input
-	bool button1 = false;
-	dataGroup.booleans().get("button1", &button1);
-
-	if (button1 && !m_buttonPreviouslyPressed)
+	if (dataGroup.poses().get("pose", &pose))
 	{
-		std::stringstream elementCount;
-		elementCount << ++m_numElements;
+		for (auto it = std::begin(m_graphicsRepresentations); it != std::end(m_graphicsRepresentations); ++it)
+		{
+			(*it)->setPose(pose);
+		}
 
-		std::string name = "stapleId_" + elementCount.str();
+		// Add staple to the scene from input
+		bool button1 = false;
+		dataGroup.booleans().get("button1", &button1);
 
-		// Create a staple element and add it into scene.
-		auto m_element = std::make_shared<StapleElement>(name);
-		m_element->setPose(pose);
+		if (button1 && !m_buttonPreviouslyPressed)
+		{
+			std::stringstream elementCount;
+			elementCount << ++m_numElements;
 
-		getScene()->addSceneElement(m_element);
+			std::string name = "stapleId_" + elementCount.str();
+
+			// Create a staple element and add it into scene.
+			auto m_element = std::make_shared<StapleElement>(name);
+			m_element->setPose(pose);
+
+			getScene()->addSceneElement(m_element);
+		}
+		m_buttonPreviouslyPressed = button1;
 	}
-	m_buttonPreviouslyPressed = button1;
 
 	// Printout collision information if there is any.
 	if (m_staplerRepresentation->hasCollision())
