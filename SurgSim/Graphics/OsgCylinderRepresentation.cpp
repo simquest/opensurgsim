@@ -29,6 +29,11 @@
 using SurgSim::Graphics::OsgCylinderRepresentation;
 using SurgSim::Graphics::OsgUnitCylinder;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCylinderRepresentation);
+}
+
 OsgCylinderRepresentation::OsgCylinderRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),

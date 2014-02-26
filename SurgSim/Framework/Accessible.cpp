@@ -45,8 +45,8 @@ void Framework::Accessible::setValue(const std::string& name, const boost::any& 
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "Can't set property: " << name << "." <<
-						  ((functors == std::end(m_functors)) ? "Property not found." : "No setter defined for property.");
+		SURGSIM_FAILURE() << "Can't set property: " << name << "." << ((functors == std::end(m_functors)) ?
+						  "Property not found." : "No setter defined for property.");
 	}
 }
 

@@ -179,12 +179,12 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 			box1Size.x() = (1 - t) * startSizeX1 + t * endSizeX1;
 			box1Size.y() = (1 - t) * startSizeY1 + t * endSizeY1;
 			box1Size.z() = (1 - t) * startSizeZ1 + t * endSizeZ1;
-			boxRepresentation1->setSizeXYZ(box1Size);
+			boxRepresentation1->setSize(box1Size);
 
 			box2Size.x() = (1 - t) * startSizeX2 + t * endSizeX2;
 			box2Size.y() = (1 - t) * startSizeY2 + t * endSizeY2;
 			box2Size.z() = (1 - t) * startSizeZ2 + t * endSizeZ2;
-			boxRepresentation2->setSizeXYZ(box2Size);
+			boxRepresentation2->setSize(box2Size);
 		}
 		boxSetterType = (boxSetterType + 1) % BoxSetterTypeCount;
 		/// The total number of steps should complete in 1 second

@@ -142,8 +142,8 @@ bool OsgRepresentation::addGroupReference(const std::string& name)
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-			"Representation::requestGroup() was called while the component was already awake for component " <<
-			getName() << " this has no effect and should be avoided.";
+				"Representation::requestGroup() was called while the component was already awake for component " <<
+				getName() << " this has no effect and should be avoided.";
 	}
 	return result;
 
@@ -153,7 +153,7 @@ void OsgRepresentation::addGroupReferences(const std::vector<std::string>& group
 {
 	if (! isAwake())
 	{
-		for (auto it = groups.cbegin(); it!= groups.cend(); ++it)
+		for (auto it = groups.cbegin(); it != groups.cend(); ++it)
 		{
 			addGroupReference(*it);
 		}
@@ -161,8 +161,27 @@ void OsgRepresentation::addGroupReferences(const std::vector<std::string>& group
 	else
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
-			"Representation::requestGroups() was called while the component was already awake for component " <<
-			getName() << " this has no effect and should be avoided.";
+				"Representation::addGroupReferences() was called while the component " <<
+				"was already awake for component " << getName() << " this has no effect and should be avoided.";
+	}
+
+}
+
+void OsgRepresentation::setGroupReferences(const std::vector<std::string>& groups)
+{
+	if (! isAwake())
+	{
+		m_groups.clear();
+		for (auto it = groups.cbegin(); it != groups.cend(); ++it)
+		{
+			addGroupReference(*it);
+		}
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getLogger("Graphics")) <<
+				"Representation::setGroupReferences() was called while the component " <<
+				"was already awake for component " << getName() << " this has no effect and should be avoided.";
 	}
 }
 

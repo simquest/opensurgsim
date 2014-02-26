@@ -169,8 +169,8 @@ int main(int argc, char* argv[])
 		std::make_shared<SurgSim::Device::MultiAxisDevice>("MultiAxisDevice");
 	toolDevice->setPositionScale(toolDevice->getPositionScale() * 10.0);
 	toolDevice->setOrientationScale(toolDevice->getOrientationScale() * 3.0);
-	SURGSIM_ASSERT( toolDevice->initialize() == true ) <<
-		"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
+	SURGSIM_ASSERT(toolDevice->initialize() == true) <<
+			"Could not initialize device '%s' for the tool.\n", toolDevice->getName().c_str();
 
 	inputManager->addDevice(toolDevice);
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////

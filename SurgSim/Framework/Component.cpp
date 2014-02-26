@@ -37,7 +37,6 @@ Component::Component(const std::string& name) :
 	m_isInitialized(false),
 	m_isAwake(false)
 {
-	SURGSIM_ADD_SERIALIZABLE_PROPERTY(SurgSim::Framework::Component, std::string, name, getName, setName);
 }
 
 Component::~Component()

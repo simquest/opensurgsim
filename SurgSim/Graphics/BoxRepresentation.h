@@ -17,6 +17,7 @@
 #define SURGSIM_GRAPHICS_BOXREPRESENTATION_H
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/MathConvert.h"
 
 namespace SurgSim
 {
@@ -34,6 +35,10 @@ public:
 	/// \post	The box size is (1.0,1.0,1.0).
 	explicit BoxRepresentation(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxRepresentation, SurgSim::Math::Vector3d, Size, getSize, setSize);
+		SURGSIM_ADD_RW_PROPERTY(BoxRepresentation, double, SizeX, getSizeX, setSizeX);
+		SURGSIM_ADD_RW_PROPERTY(BoxRepresentation, double, SizeY, getSizeY, setSizeY);
+		SURGSIM_ADD_RW_PROPERTY(BoxRepresentation, double, SizeZ, getSizeZ, setSizeZ);
 	}
 
 	/// Sets the size along X-axis of the box

@@ -34,11 +34,12 @@ public:
 		readWrite(100.0),
 		readOnly(100),
 		sharedPtr(std::make_shared<int>(4)),
-		privateProperty(100)
+		privateProperty(100),
+		overloadedValue(200.0)
 	{
 		setGetter("normal", std::bind(&TestClass::getNormal, this));
 		setSetter("normal", std::bind(&TestClass::setNormal, this, std::bind(SurgSim::Framework::convert<int>,
-						std::placeholders::_1)));
+									  std::placeholders::_1)));
 
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, readWrite, getReadWrite, setReadWrite);
 		SURGSIM_ADD_RW_PROPERTY(TestClass, std::shared_ptr<int>, sharedPtr, getSharedPtr, setSharedPtr);
@@ -59,23 +60,69 @@ public:
 
 	float serializableProperty;
 
-	int getNormal() { return normal; }
-	void setNormal(int val) { normal = val; }
+	double overloadedValue;
 
-	double getReadWrite() { return readWrite; }
-	void setReadWrite(double val) { readWrite = val; }
+	int getNormal()
+	{
+		return normal;
+	}
+	void setNormal(int val)
+	{
+		normal = val;
+	}
 
-	std::shared_ptr<int> getSharedPtr() { return sharedPtr; }
-	void setSharedPtr(std::shared_ptr<int> val) { sharedPtr = val; }
+	double getReadWrite()
+	{
+		return readWrite;
+	}
+	void setReadWrite(double val)
+	{
+		readWrite = val;
+	}
 
-	int getReadOnly() { return readOnly; }
+	std::shared_ptr<int> getSharedPtr()
+	{
+		return sharedPtr;
+	}
+	void setSharedPtr(std::shared_ptr<int> val)
+	{
+		sharedPtr = val;
+	}
 
-	double getPrivateProperty() const { return privateProperty; }
-	void setPrivateProperty(double val) { privateProperty = val; }
+	int getReadOnly()
+	{
+		return readOnly;
+	}
 
-	float getSerializableProperty() const { return serializableProperty; }
-	void setSerializableProperty(float val) { serializableProperty = val; }
+	double getPrivateProperty() const
+	{
+		return privateProperty;
+	}
+	void setPrivateProperty(double val)
+	{
+		privateProperty = val;
+	}
 
+	float getSerializableProperty() const
+	{
+		return serializableProperty;
+	}
+	void setSerializableProperty(float val)
+	{
+		serializableProperty = val;
+	}
+
+	void getOverloadedFunction(double* x) const {}
+	double getOverloadedFunction() const
+	{
+		return overloadedValue;
+	}
+
+	void setOverloadedFunction(double x, double y) {}
+	void setOverloadedFunction(const double& x)
+	{
+		overloadedValue = x;
+	}
 private:
 	double privateProperty;
 };
@@ -90,9 +137,24 @@ TEST(AccessibleTest, GetterTest)
 	TestClass t;
 	t.normal = 5;
 
-	EXPECT_EQ(5, boost::any_cast<int>(t.getValue("normal")));
+	int receiver = -1;
 
+	EXPECT_EQ(5, boost::any_cast<int>(t.getValue("normal")));
+	EXPECT_EQ(5, t.getValue<int>("normal"));
+	EXPECT_TRUE(t.getValue<int>("normal", &receiver));
+	EXPECT_EQ(5, receiver);
+
+	/// Response to fetching value that does not exist
 	EXPECT_ANY_THROW(t.getValue("xxx"));
+	EXPECT_ANY_THROW(t.getValue<int>("xxx"));
+	receiver = -1;
+	EXPECT_FALSE(t.getValue<int>("xxx", &receiver));
+	EXPECT_EQ(-1, receiver);
+
+	/// Response to trying to fetch an type that can't be converted
+	EXPECT_ANY_THROW(t.getValue<TestClass>("normal"));
+	EXPECT_FALSE(t.getValue<TestClass>("normal", &t));
+
 }
 
 TEST(AccessibleTest, SetterTest)
@@ -102,16 +164,16 @@ TEST(AccessibleTest, SetterTest)
 
 	t.setValue("normal", 4);
 	EXPECT_EQ(4, t.getNormal());
-	EXPECT_ANY_THROW(t.setValue("xxxx",666.66));
+	EXPECT_ANY_THROW(t.setValue("xxxx", 666.66));
 }
 
 TEST(AccessibleTest, TransferTest)
 {
-	TestClass a,b;
+	TestClass a, b;
 	a.normal = 100;
 	b.normal = 0;
 
-	b.setValue("normal",a.getValue("normal"));
+	b.setValue("normal", a.getValue("normal"));
 
 	EXPECT_EQ(a.normal, b.normal);
 }
@@ -122,7 +184,7 @@ TEST(AccessibleTest, ReadWriteMacroTest)
 	a.readWrite = 100.0;
 
 	EXPECT_EQ(a.readWrite, boost::any_cast<double>(a.getValue("readWrite")));
-	a.setValue("readWrite",50.0);
+	a.setValue("readWrite", 50.0);
 	EXPECT_EQ(50.0, a.readWrite);
 }
 
@@ -133,7 +195,7 @@ TEST(AccessibleTest, ReadOnlyMacroTest)
 
 	EXPECT_EQ(a.readOnly, boost::any_cast<int>(a.getValue("readOnly")));
 
-	EXPECT_ANY_THROW(a.setValue("readOnly",100));
+	EXPECT_ANY_THROW(a.setValue("readOnly", 100));
 }
 
 TEST(AccessibleTest, TemplateFunction)
@@ -174,11 +236,11 @@ TEST(AccessibleTest, SharedPointer)
 	std::shared_ptr<int> y;
 
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("sharedPtr"));
-	EXPECT_EQ(4,*y);
+	EXPECT_EQ(4, *y);
 
-	a.setValue("sharedPtr",x);
+	a.setValue("sharedPtr", x);
 	y = boost::any_cast<std::shared_ptr<int>>(a.getValue("sharedPtr"));
-	EXPECT_EQ(5,*y);
+	EXPECT_EQ(5, *y);
 }
 
 TEST(AccessibleTest, ConvertDoubleToFloat)
@@ -186,17 +248,17 @@ TEST(AccessibleTest, ConvertDoubleToFloat)
 	// Values don't matter only care for them to be filled
 	SurgSim::Math::Matrix44d sourceDouble;
 	sourceDouble <<
-		1.0/2.0, 1.0/3.0, 1.0/4.0, 1.0/5.0,
-		1.0/6.0, 1.0/7.0, 1.0/8.0, 1.0/9.0,
-		1.0/10.0, 1.0/11.0, 1.0/12.0, 1.0/13.0,
-		1.0/14.0, 1.0/15.0, 1.0/16.0, 1.0/17.0;
+				 1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0,
+					 1.0 / 6.0, 1.0 / 7.0, 1.0 / 8.0, 1.0 / 9.0,
+					 1.0 / 10.0, 1.0 / 11.0, 1.0 / 12.0, 1.0 / 13.0,
+					 1.0 / 14.0, 1.0 / 15.0, 1.0 / 16.0, 1.0 / 17.0;
 
 	SurgSim::Math::Matrix44f sourceFloat;
 	sourceFloat <<
-		1.0f/2.0f, 1.0f/3.0f, 1.0f/4.0f, 1.0f/5.0f,
-		1.0f/6.0f, 1.0f/7.0f, 1.0f/8.0f, 1.0f/9.0f,
-		1.0f/10.0f, 1.0f/11.0f, 1.0f/12.0f, 1.0f/13.0f,
-		1.0f/14.0f, 1.0f/15.0f, 1.0f/16.0f, 1.0f/17.0f;
+				1.0f / 2.0f, 1.0f / 3.0f, 1.0f / 4.0f, 1.0f / 5.0f,
+					 1.0f / 6.0f, 1.0f / 7.0f, 1.0f / 8.0f, 1.0f / 9.0f,
+					 1.0f / 10.0f, 1.0f / 11.0f, 1.0f / 12.0f, 1.0f / 13.0f,
+					 1.0f / 14.0f, 1.0f / 15.0f, 1.0f / 16.0f, 1.0f / 17.0f;
 
 	SurgSim::Math::Matrix44f target;
 
@@ -236,16 +298,34 @@ public:
 	}
 
 	std::string a;
-	std::string getA() const { return a; }
-	void setA(std::string val) { a = val; }
+	std::string getA() const
+	{
+		return a;
+	}
+	void setA(std::string val)
+	{
+		a = val;
+	}
 
 	std::string b;
-	std::string getB() const { return b; }
-	void setB(std::string val) { b = val; }
+	std::string getB() const
+	{
+		return b;
+	}
+	void setB(std::string val)
+	{
+		b = val;
+	}
 
 	std::string c;
-	std::string getC() const { return c; }
-	void setC(std::string val) { c = val; }
+	std::string getC() const
+	{
+		return c;
+	}
+	void setC(std::string val)
+	{
+		c = val;
+	}
 };
 
 TEST(AccessibleTests, MultipleValues)
@@ -269,6 +349,8 @@ TEST(AccessibleTests, MultipleValues)
 	EXPECT_EQ("invalid", encodedValues["c"].as<std::string>());
 
 }
+
+
 
 }; // namespace Framework
 }; // namespace SurgSim

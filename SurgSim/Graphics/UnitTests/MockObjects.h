@@ -212,6 +212,10 @@ public:
 	{
 	}
 
+	virtual void setGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
 	virtual std::vector<std::string> getGroupReferences() override
 	{
 		return std::vector<std::string>();
@@ -445,6 +449,10 @@ public:
 	}
 
 	virtual void addGroupReferences(const std::vector<std::string>& groups) override
+	{
+	}
+
+	virtual void setGroupReferences(const std::vector<std::string>& groups) override
 	{
 	}
 

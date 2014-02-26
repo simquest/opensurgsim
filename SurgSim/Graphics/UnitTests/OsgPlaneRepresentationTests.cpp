@@ -22,6 +22,7 @@
 #include "SurgSim/Graphics/OsgPlaneRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 #include <gtest/gtest.h>
 
@@ -44,10 +45,28 @@ namespace Graphics
 TEST(OsgPlaneRepresentationTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
-		std::make_shared<OsgPlaneRepresentation>("test name");});
+						 std::make_shared<OsgPlaneRepresentation>("test name");
+					});
 
 	std::shared_ptr<Representation> representation = std::make_shared<OsgPlaneRepresentation>("test name");
 	EXPECT_EQ("test name", representation->getName());
+}
+
+TEST(OsgPlaneRepresentationTests, AccessibleTest)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+									"SurgSim::Graphics::OsgPlaneRepresentation",
+									"capsule"));
+
+	EXPECT_EQ("SurgSim::Graphics::OsgPlaneRepresentation", component->getClassName());
+
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decoded = std::dynamic_pointer_cast<SurgSim::Graphics::OsgPlaneRepresentation>(
+					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+
+	EXPECT_NE(nullptr, decoded);
 }
 
 TEST(OsgPlaneRepresentationTests, OsgNodeTest)
@@ -147,7 +166,7 @@ TEST(OsgPlaneRepresentationTests, MaterialTest)
 		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_EQ(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should be the material's state set!";
+				"State set should be the material's state set!";
 	}
 
 	{
@@ -159,7 +178,7 @@ TEST(OsgPlaneRepresentationTests, MaterialTest)
 		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should have been cleared!";
+				"State set should have been cleared!";
 	}
 }
 
