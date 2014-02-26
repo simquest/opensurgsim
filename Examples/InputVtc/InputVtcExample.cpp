@@ -160,11 +160,11 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	// Graphics Components
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
-	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+	graphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> rawInputGraphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-RawInput-Graphics");
-	rawInputGraphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+	rawInputGraphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 	shader->setVertexShaderSource(

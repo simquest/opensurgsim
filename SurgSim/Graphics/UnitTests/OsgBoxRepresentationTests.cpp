@@ -108,7 +108,7 @@ TEST(OsgBoxRepresentationTests, SizeTest)
 	double randomSizeY = distribution(generator);
 	double randomSizeZ = distribution(generator);
 
-	boxRepresentation->setSize(randomSizeX, randomSizeY, randomSizeZ);
+	boxRepresentation->setSizeXYZ(randomSizeX, randomSizeY, randomSizeZ);
 	EXPECT_EQ(randomSizeX, boxRepresentation->getSizeX());
 	EXPECT_EQ(randomSizeY, boxRepresentation->getSizeY());
 	EXPECT_EQ(randomSizeZ, boxRepresentation->getSizeZ());

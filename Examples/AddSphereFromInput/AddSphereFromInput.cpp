@@ -134,7 +134,7 @@ std::shared_ptr<SceneElement> createBox(const std::string& name)
 
 	std::shared_ptr<OsgBoxRepresentation> graphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
-	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+	graphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
 	std::shared_ptr<SurgSim::Input::InputComponent> inputComponent =
 		std::make_shared<SurgSim::Input::InputComponent>("input");
