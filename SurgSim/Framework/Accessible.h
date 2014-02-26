@@ -45,20 +45,30 @@ public:
 	typedef std::function<YAML::Node(void)> EncoderType;
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
-	/// Retrieves the value with the name by executing the getter if it is found.
+	/// Retrieves the value with the name by executing the getter if it is found, throws if the property
+	/// cannot be found.
 	/// \param	name	The name of the property.
-	/// \return	The value of the property if the getter was found, a default constructed boost::any
-	/// 		if it was not found.
-	boost::any getValue(const std::string& name);
+	/// \return	The value of the property if the getter was found
+	boost::any getValue(const std::string& name) const;
+
+	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
+	/// it to the given type. Throws if the conversion fails or the property cannot be found.
+	/// \tparam T The requested type for the property.
+	/// \param	name	The name of the property.
+	/// \return	The value of the property if the getter was found
+	template <class T>
+	T getValue(const std::string& name) const;
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
-	/// the type of the output parameter.
+	/// the type of the output parameter. This does not throw.
 	/// \tparam T	the type of the property, usually can be deduced automatically
 	/// \param	name	The name of the property.
 	/// \param [out]	value	If non-null, will receive the value of the given property.
 	/// \return	true if value != nullptr and the getter can be found.
 	template <class T>
-	bool getValue(const std::string& name, T* value);
+	bool getValue(const std::string& name, T* value) const;
+
+
 
 	/// Sets a value of a property that has setter.
 	/// \param	name 	The name of the property.
