@@ -40,6 +40,10 @@ class FemElement3DTetrahedron : public FemElement
 public:
 	/// Constructor
 	/// \param nodeIds An array of 4 node (A, B, C, D) ids defining this tetrahedron element in a overall mesh
+	/// \note It is required that the triangle ABC is CCW looking from D (i.e. dot(cross(AB, AC), AD) > 0)
+	/// \note This is required from the signed volume calculation method getVolume()
+	/// \note A warning will be logged when the initialize funciton is called if this condition is not met, but the
+	/// simulation will keep running
 	FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds);
 
 	/// Initialize the FemElement once everything has been set
