@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Devices/Phantom/PhantomScaffold.h"
 
 #include <vector>
 #include <memory>
@@ -25,7 +26,6 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Phantom/PhantomDevice.h"
-#include "SurgSim/Devices/Phantom/PhantomScaffold.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/SharedInstance.h"
@@ -519,12 +519,15 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 	typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
+	// Get the nominal force and torque, if provided.
 	Vector3d nominalForce = Vector3d::Zero();
 	outputData.vectors().get("force", &nominalForce);
 	Vector3d nominalTorque = Vector3d::Zero();
 	Vector6d nominalForceAndTorque = Vector6d::Zero();
 	SurgSim::Math::setSubVector(nominalForce, 0, 3, &nominalForceAndTorque);
 
+	// If the jacobianFromPosition was provided, multiply with the change in position since the output data was set,
+	// to get a delta force & torque.  This way a linearized output force & torque is calculated at haptic update rates.
 	Vector6d forceAndTorqueFromDeltaPosition = Vector6d::Zero();
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromPosition;
 	if (outputData.matrices().get("jacobianFromPosition", &jacobianFromPosition))
@@ -543,6 +546,7 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 		forceAndTorqueFromDeltaPosition = jacobianFromPosition * deltaPosition;
 	}
 
+	// If the jacobianFromVelocity was provided, calculate a delta force & torque based on the change in velocity.
 	Vector6d forceAndTorqueFromDeltaVelocity = Vector6d::Zero();
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromVelocity;
 	if (outputData.matrices().get("jacobianFromVelocity", &jacobianFromVelocity))

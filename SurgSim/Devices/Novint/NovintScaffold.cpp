@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+#include "SurgSim/Devices/Novint/NovintScaffold.h"
+
 #include <vector>
 #include <memory>
 #include <algorithm>
@@ -27,7 +30,6 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Devices/Novint/NovintDevice.h"
-#include "SurgSim/Devices/Novint/NovintScaffold.h"
 #include "SurgSim/Framework/Assert.h"
 #include "SurgSim/Framework/Clock.h"
 #include "SurgSim/Framework/Log.h"
@@ -722,10 +724,13 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
+	// Set the DeviceData's force to the nominal force, if provided.
 	Vector3d nominalForce = Vector3d::Zero();
 	outputData.vectors().get("force", &nominalForce);
 	info->force = nominalForce;
 
+	// If the jacobianFromPosition was provided, multiply with the change in position since the output data was set,
+	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
 	Vector6d deltaPosition;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromPosition;
 	bool haveJacobianFromPosition = outputData.matrices().get("jacobianFromPosition", &jacobianFromPosition);
@@ -744,6 +749,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		info->force += jacobianFromPosition.block<3,6>(0, 0) * deltaPosition;
 	}
 
+	// If the jacobianFromVelocity was provided, calculate a delta force based on the change in velocity.
 	Vector6d deltaVelocity;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromVelocity;
 	bool haveJacobianFromVelocity = outputData.matrices().get("jacobianFromVelocity", &jacobianFromVelocity);
