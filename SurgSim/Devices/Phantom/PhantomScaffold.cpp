@@ -219,6 +219,7 @@ struct PhantomScaffold::DeviceData
 		linearVelocity(Vector3d::Zero()),
 		scaledPose(RigidTransform3d::Identity()),
 		force(Vector3d::Zero()),
+		torque(Vector3d::Zero()),
 		buttonsBuffer(0)
 	{
 	}
@@ -243,6 +244,9 @@ struct PhantomScaffold::DeviceData
 
 	/// The force value to be written to the device.
 	Vector3d force;
+
+	/// The torque value to be written to the device.
+	Vector3d torque;
 
 private:
 	// Prevent copy construction and copy assignment.  (VS2012 does not support "= delete" yet.)
@@ -497,6 +501,9 @@ bool PhantomScaffold::updateDevice(PhantomScaffold::DeviceData* info)
 	// Set the force command (in newtons).
 	hdSetDoublev(HD_CURRENT_FORCE, info->force.data());
 
+	// Set the torque command.
+	hdSetDoublev(HD_CURRENT_GIMBAL_TORQUE, info->torque.data());
+
 	hdEndFrame(info->deviceHandle.get());
 
 	setInputData(info);
@@ -558,6 +565,7 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 		forceAndTorqueFromDeltaVelocity;
 
 	info->force = SurgSim::Math::getSubVector(forceAndTorque, 0, 3);
+	info->torque = SurgSim::Math::getSubVector(forceAndTorque, 1, 3);
 }
 
 
