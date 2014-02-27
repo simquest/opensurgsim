@@ -25,9 +25,9 @@
 
 namespace osg
 {
-	class Switch;
-	class Node;
-	class PositionAttitudeTransform;
+class Switch;
+class Node;
+class PositionAttitudeTransform;
 }
 
 namespace SurgSim
@@ -103,6 +103,10 @@ public:
 	/// Adds a list of group references.
 	/// \param	groups	The references.
 	virtual void addGroupReferences(const std::vector<std::string>& groups) override;
+
+	/// Sets the list of group references. Clearing all the old references
+	/// \param groups The references.
+	virtual void setGroupReferences(const std::vector<std::string>& groups) override;
 
 	/// Gets group references.
 	/// \return	The group references.

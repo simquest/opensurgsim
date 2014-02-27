@@ -164,17 +164,17 @@ TEST(OsgBoxRepresentationRenderTests, MovingBoxesTest)
 			boxRepresentation2->setSizeY((1 - t) * startSizeY2 + t * endSizeY2);
 			boxRepresentation2->setSizeZ((1 - t) * startSizeZ2 + t * endSizeZ2);
 		}
-		else if(boxSetterType == static_cast<int>(BoxSetterTypeTogether))
+		else if (boxSetterType == static_cast<int>(BoxSetterTypeTogether))
 		{
-			boxRepresentation1->setSize((1 - t) * startSizeX1 + t * endSizeX1,
-										(1 - t) * startSizeY1 + t * endSizeY1,
-										(1 - t) * startSizeZ1 + t * endSizeZ1);
+			boxRepresentation1->setSizeXYZ((1 - t) * startSizeX1 + t * endSizeX1,
+										   (1 - t) * startSizeY1 + t * endSizeY1,
+										   (1 - t) * startSizeZ1 + t * endSizeZ1);
 
-			boxRepresentation2->setSize((1 - t) * startSizeX2 + t * endSizeX2,
-										(1 - t) * startSizeY2 + t * endSizeY2,
-										(1 - t) * startSizeZ2 + t * endSizeZ2);
+			boxRepresentation2->setSizeXYZ((1 - t) * startSizeX2 + t * endSizeX2,
+										   (1 - t) * startSizeY2 + t * endSizeY2,
+										   (1 - t) * startSizeZ2 + t * endSizeZ2);
 		}
-		else if(boxSetterType == static_cast<int>(BoxSetterTypeVector3d))
+		else if (boxSetterType == static_cast<int>(BoxSetterTypeVector3d))
 		{
 			box1Size.x() = (1 - t) * startSizeX1 + t * endSizeX1;
 			box1Size.y() = (1 - t) * startSizeY1 + t * endSizeY1;

@@ -129,14 +129,14 @@ TEST_F(OsgRepresentationRenderTests, RepresentationTest)
 	runtime->start();
 	EXPECT_TRUE(manager->isInitialized());
 
-	boxRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), boxPosition ));
-	capsuleRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition ));
-	cylinderRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), cylinderPosition ));
-	sphereRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), spherePosition ));
-	axesRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0,0.0,-0.2)));
+	boxRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), boxPosition));
+	capsuleRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), capsulePosition));
+	cylinderRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), cylinderPosition));
+	sphereRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), spherePosition));
+	axesRepresentation->setPose(makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, -0.2)));
 
 	/// Set the size of box
-	boxRepresentation->setSize(boxSize.x(), boxSize.y(), boxSize.z());
+	boxRepresentation->setSizeXYZ(boxSize.x(), boxSize.y(), boxSize.z());
 	/// Set the size of capsule
 	/// Capsule should use Y-axis as its axis
 	capsuleRepresentation->setSize(capsuleSize.x(), capsuleSize.y());

@@ -34,6 +34,8 @@ public:
 	/// \post	The capsule radius is 1.0.
 	explicit CapsuleRepresentation(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleRepresentation, double, Radius, getRadius, setRadius);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(CapsuleRepresentation, double, Height, getHeight, setHeight);
 	}
 
 	/// Sets the radius of the capsule

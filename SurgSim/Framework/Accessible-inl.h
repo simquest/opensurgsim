@@ -17,18 +17,38 @@
 #define SURGSIM_FRAMEWORK_ACCESSIBLE_INL_H
 
 template <class T>
-bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value)
+bool SurgSim::Framework::Accessible::getValue(const std::string& name, T* value) const
 {
+	bool result = false;
 	auto functors = m_functors.find(name);
 	if (value != nullptr && functors != m_functors.end() && functors->second.getter != nullptr)
 	{
-		*value = boost::any_cast<T>(functors->second.getter());
-		return true;
+		try
+		{
+			*value = boost::any_cast<T>(functors->second.getter());
+			result = true;
+		}
+		catch (boost::bad_any_cast exception)
+		{
+
+		}
 	}
-	else
+	return result;
+}
+
+template <class T>
+T SurgSim::Framework::Accessible::getValue(const std::string& name) const
+{
+	T result;
+	try
 	{
-		return false;
+		result = boost::any_cast<T>(getValue(name));
 	}
+	catch (boost::bad_any_cast exception)
+	{
+		SURGSIM_FAILURE() << "Failure to cast to the given type. <" << exception.what() << ">";
+	}
+	return result;
 }
 
 template <class T>

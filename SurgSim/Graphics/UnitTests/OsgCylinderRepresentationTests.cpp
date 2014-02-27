@@ -21,6 +21,7 @@
 #include "SurgSim/Graphics/OsgMaterial.h"
 #include "SurgSim/Graphics/OsgCylinderRepresentation.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 #include <gtest/gtest.h>
 
@@ -30,7 +31,7 @@ using SurgSim::Math::Vector2d;
 
 namespace
 {
-	const double epsilon = 1e-10;
+const double epsilon = 1e-10;
 };
 
 namespace SurgSim
@@ -38,6 +39,31 @@ namespace SurgSim
 
 namespace Graphics
 {
+
+TEST(OsgCylinderRepresentationTests, AccessibleTest)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+									"SurgSim::Graphics::OsgCylinderRepresentation",
+									"sphere"));
+
+	EXPECT_EQ("SurgSim::Graphics::OsgCylinderRepresentation", component->getClassName());
+
+	double radius = 4.321;
+	double height = 1.234;
+
+	component->setValue("Height", height);
+	component->setValue("Radius", radius);
+
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decoded = std::dynamic_pointer_cast<SurgSim::Graphics::OsgCylinderRepresentation>(
+					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+
+	EXPECT_NE(nullptr, decoded);
+	EXPECT_DOUBLE_EQ(radius, decoded->getValue<double>("Radius"));
+	EXPECT_DOUBLE_EQ(height, decoded->getValue<double>("Height"));
+}
 
 TEST(OsgCylinderRepresentationTests, RadiusTest)
 {

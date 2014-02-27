@@ -76,6 +76,10 @@ public:
 	/// \param	groups	The references.
 	virtual void addGroupReferences(const std::vector<std::string>& groups) = 0;
 
+	/// Sets the list of group references. Clearing all the old references
+	/// \param groups The references.
+	virtual void setGroupReferences(const std::vector<std::string>& groups) = 0;
+
 	/// Gets group references.
 	/// \return	The group references.
 	virtual std::vector<std::string> getGroupReferences() = 0;
