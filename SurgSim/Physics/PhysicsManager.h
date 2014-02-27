@@ -63,8 +63,9 @@ public:
 
 	friend class PhysicsManagerTest;
 
-	/// Get the last state of the previous PhysicsManager update.
-	/// \param [out] s pointer to the state.
+	/// Get the last PhysicsManagerState from the previous PhysicsManager update.
+	/// \param [out] s pointer to an allocated PhysicsManagerState object.
+	/// \warning The state contains many pointers.  The objects pointed to are not thread-safe.
 	void getFinalState(SurgSim::Physics::PhysicsManagerState *s) const;
 
 protected:
@@ -102,6 +103,7 @@ private:
 	std::unique_ptr<PostUpdate> m_postUpdateStep;
 	///@}
 
+	/// A thread-safe copy of the last PhysicsManagerState in the previous update.
 	SurgSim::Framework::LockedContainer<SurgSim::Physics::PhysicsManagerState> m_finalState;
 };
 

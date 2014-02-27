@@ -105,7 +105,7 @@ bool PhysicsManager::doUpdate(double dt)
 	stateList.push_back(m_pushResultsStep->update(dt, stateList.back()));
 	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
 
-	m_finalState.set(*(stateList.back().get()));
+	m_finalState.set(*(stateList.back()));
 
 	return true;
 }
