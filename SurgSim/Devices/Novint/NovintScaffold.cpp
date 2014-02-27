@@ -604,11 +604,6 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->position.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributev(HDL_GRIP_POSITION)");
 
-	Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;
-	hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, transform.data());
-	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ORIENTATION)");
-	info->orientationTransform.linear() = transform.block<3,3>(0, 0); // store orientation in a RigidTransform3d
-
 	info->buttonStates.fill(false);
 	hdlGripGetAttributesb(HDL_GRIP_BUTTON, info->buttonStates.size(), info->buttonStates.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesb(HDL_GRIP_BUTTON)");
@@ -638,6 +633,13 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 		Matrix33d orientation = rotationY * rotationZ * rotationX;
 		// Put the result into the orientation transform
 		info->orientationTransform.linear() = orientation;
+	}
+	else
+	{
+		Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;
+		hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, transform.data());
+		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ORIENTATION)");
+		info->orientationTransform.linear() = transform.block<3,3>(0, 0); // store orientation in a RigidTransform3d
 	}
 
 	checkDeviceHoming(info);
