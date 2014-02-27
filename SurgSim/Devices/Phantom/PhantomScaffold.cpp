@@ -526,11 +526,11 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 	Vector6d nominalForceAndTorque = Vector6d::Zero();
 	SurgSim::Math::setSubVector(nominalForce, 0, 3, &nominalForceAndTorque);
 
-	// If the jacobianFromPosition was provided, multiply with the change in position since the output data was set,
+	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force & torque.  This way a linearized output force & torque is calculated at haptic update rates.
 	Vector6d forceAndTorqueFromDeltaPosition = Vector6d::Zero();
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromPosition;
-	if (outputData.matrices().get("jacobianFromPosition", &jacobianFromPosition))
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
+	if (outputData.matrices().get("springJacobian", &springJacobian))
 	{
 		RigidTransform3d poseForNominal = info->scaledPose;
 		outputData.poses().get("inputPose", &poseForNominal);
@@ -543,13 +543,13 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 			&deltaPosition);
 		SurgSim::Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
 
-		forceAndTorqueFromDeltaPosition = jacobianFromPosition * deltaPosition;
+		forceAndTorqueFromDeltaPosition = springJacobian * deltaPosition;
 	}
 
-	// If the jacobianFromVelocity was provided, calculate a delta force & torque based on the change in velocity.
+	// If the damperJacobian was provided, calculate a delta force & torque based on the change in velocity.
 	Vector6d forceAndTorqueFromDeltaVelocity = Vector6d::Zero();
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromVelocity;
-	if (outputData.matrices().get("jacobianFromVelocity", &jacobianFromVelocity))
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
+	if (outputData.matrices().get("damperJacobian", &damperJacobian))
 	{
 		Vector3d angularVelocity = Vector3d::Zero();
 
@@ -562,7 +562,7 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 		SurgSim::Math::setSubVector(info->linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
 		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
 
-		forceAndTorqueFromDeltaVelocity = jacobianFromVelocity * deltaVelocity;
+		forceAndTorqueFromDeltaVelocity = damperJacobian * deltaVelocity;
 	}
 
 	Vector6d forceAndTorque = nominalForceAndTorque + forceAndTorqueFromDeltaPosition +

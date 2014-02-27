@@ -107,7 +107,7 @@ private:
 
 	/// Calculates forces and torques and sends them to the device library.  The force to output is
 	/// composed of a vector named "force" in the output data, plus contributions from two optional Jacobians.
-	/// If the matrix "jacobianFromPosition" is provided in the output data, a spring force & torque are generated from
+	/// If the matrix "springJacobian" is provided in the output data, a spring force & torque are generated from
 	/// its product with the difference between the current pose and the pose in the output data named "inputPose".
 	/// A damping force & torque are generated similarly.  The intention is for a Behavior to calculate a nominal
 	/// force & torque as well as the desired linearized changes to the force & torque based on changes to the input's

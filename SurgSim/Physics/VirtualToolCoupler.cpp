@@ -50,9 +50,9 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector("force");
 	builder.addVector("torque");
-	builder.addMatrix("jacobianFromPosition");
+	builder.addMatrix("springJacobian");
 	builder.addPose("inputPose");
-	builder.addMatrix("jacobianFromVelocity");
+	builder.addMatrix("damperJacobian");
 	builder.addVector("inputLinearVelocity");
 	builder.addVector("inputAngularVelocity");
 	m_outputData = builder.createData();
@@ -125,19 +125,19 @@ void VirtualToolCoupler::update(double dt)
 
 			m_outputData.poses().set("inputPose", inputPose);
 
-			Matrix66d jacobianFromPosition = Matrix66d::Zero();
+			Matrix66d springJacobian = Matrix66d::Zero();
 			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
-			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &jacobianFromPosition);
+			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &springJacobian);
 			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
-			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &jacobianFromPosition);
-			m_outputData.matrices().set("jacobianFromPosition", jacobianFromPosition);
+			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &springJacobian);
+			m_outputData.matrices().set("springJacobian", springJacobian);
 
-			Matrix66d jacobianFromVelocity = Matrix66d::Zero();
+			Matrix66d damperJacobian = Matrix66d::Zero();
 			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
-			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &jacobianFromVelocity);
+			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &damperJacobian);
 			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
-			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &jacobianFromVelocity);
-			m_outputData.matrices().set("jacobianFromVelocity", jacobianFromVelocity);
+			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &damperJacobian);
+			m_outputData.matrices().set("damperJacobian", damperJacobian);
 
 			m_output->setData(m_outputData);
 		}

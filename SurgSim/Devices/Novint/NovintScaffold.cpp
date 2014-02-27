@@ -731,12 +731,12 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	outputData.vectors().get("force", &nominalForce);
 	info->force = nominalForce;
 
-	// If the jacobianFromPosition was provided, multiply with the change in position since the output data was set,
+	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
 	Vector6d deltaPosition;
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromPosition;
-	bool haveJacobianFromPosition = outputData.matrices().get("jacobianFromPosition", &jacobianFromPosition);
-	if (haveJacobianFromPosition)
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
+	bool havespringJacobian = outputData.matrices().get("springJacobian", &springJacobian);
+	if (havespringJacobian)
 	{
 		RigidTransform3d poseForNominal = info->scaledPose;
 		outputData.poses().get("inputPose", &poseForNominal);
@@ -748,14 +748,14 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 			&deltaPosition);
 		SurgSim::Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
 
-		info->force += jacobianFromPosition.block<3,6>(0, 0) * deltaPosition;
+		info->force += springJacobian.block<3,6>(0, 0) * deltaPosition;
 	}
 
-	// If the jacobianFromVelocity was provided, calculate a delta force based on the change in velocity.
+	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
 	Vector6d deltaVelocity;
-	SurgSim::DataStructures::DataGroup::DynamicMatrixType jacobianFromVelocity;
-	bool haveJacobianFromVelocity = outputData.matrices().get("jacobianFromVelocity", &jacobianFromVelocity);
-	if (haveJacobianFromVelocity)
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
+	bool havedamperJacobian = outputData.matrices().get("damperJacobian", &damperJacobian);
+	if (havedamperJacobian)
 	{
 		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
 		Vector3d linearVelocity = Vector3d::Zero();
@@ -769,7 +769,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		SurgSim::Math::setSubVector(linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
 		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
 
-		info->force += jacobianFromVelocity.block<3,6>(0, 0) * deltaVelocity;
+		info->force += damperJacobian.block<3,6>(0, 0) * deltaVelocity;
 	}
 
 	// Calculate the torque command if applicable (and convert newton-meters to command counts).
@@ -779,14 +779,14 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		outputData.vectors().get("torque", &nominalTorque);
 		Vector3d torque = nominalTorque;
 
-		if (haveJacobianFromPosition)
+		if (havespringJacobian)
 		{
-			torque += jacobianFromPosition.block<3,6>(3, 0) * deltaPosition;
+			torque += springJacobian.block<3,6>(3, 0) * deltaPosition;
 		}
 
-		if (haveJacobianFromVelocity)
+		if (havedamperJacobian)
 		{
-			torque += jacobianFromVelocity.block<3,6>(3, 0) * deltaVelocity;
+			torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
 		}
 
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
