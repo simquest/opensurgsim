@@ -134,7 +134,7 @@ void OsgRepresentation::doUpdate(double dt)
 bool OsgRepresentation::addGroupReference(const std::string& name)
 {
 	bool result = false;
-	if (! isAwake())
+	if (!isAwake())
 	{
 		auto insertion = m_groups.insert(name);
 		result = insertion.second;

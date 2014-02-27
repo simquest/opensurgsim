@@ -191,7 +191,6 @@ TEST(OsgBoxRepresentationTests, PoseTest)
 	}
 
 	YAML::Node node = representation->encode();
-	std::cout << node;
 }
 
 TEST(OsgBoxRepresentationTests, MaterialTest)
