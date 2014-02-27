@@ -70,11 +70,14 @@ public:
 		return m_x0;
 	}
 
-	void setupInitialParams(const DeformableRepresentationState &state)
+	void setupInitialParams(const DeformableRepresentationState &state,
+							double massDensity,
+							double poissonRatio,
+							double youngModulus)
 	{
-		setMassDensity(0.25);
-		setPoissonRatio(0.25);
-		setYoungModulus(0.25);
+		setMassDensity(massDensity);
+		setPoissonRatio(poissonRatio);
+		setYoungModulus(youngModulus);
 		initialize(state);
 	}
 };
@@ -246,7 +249,7 @@ TEST_F(FemElement3DTetrahedronTests, NodeIdsTest)
 TEST_F(FemElement3DTetrahedronTests, VolumeTest)
 {
 	MockFemElement3DTet tet(m_nodeIds);
-	tet.setupInitialParams(m_restState);
+	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
 	EXPECT_NEAR(tet.getRestVolume(), m_expectedVolume, 1e-10);
 	EXPECT_NEAR(tet.getVolume(m_restState), m_expectedVolume, 1e-10);
@@ -257,7 +260,7 @@ TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)
 	using SurgSim::Math::getSubVector;
 
 	MockFemElement3DTet tet(m_nodeIds);
-	tet.setupInitialParams(m_restState);
+	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
 	EXPECT_TRUE(tet.getInitialPosition().isApprox(m_expectedX0)) <<
 		"x0 = " << tet.getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
