@@ -62,6 +62,11 @@ bool PhysicsManager::doStartUp()
 	return true;
 }
 
+void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState *s) const
+{
+	m_finalState.get(s);
+}
+
 
 bool PhysicsManager::executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component)
 {
@@ -99,6 +104,8 @@ bool PhysicsManager::doUpdate(double dt)
 	stateList.push_back(m_solveMlcpStep->update(dt, stateList.back()));
 	stateList.push_back(m_pushResultsStep->update(dt, stateList.back()));
 	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
+
+	m_finalState.set(*(stateList.back().get()));
 
 	return true;
 }

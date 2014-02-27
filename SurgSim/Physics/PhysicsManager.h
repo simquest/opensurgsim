@@ -20,6 +20,8 @@
 #include <vector>
 
 #include "SurgSim/Framework/ComponentManager.h"
+#include "SurgSim/Framework/LockedContainer.h"
+#include "SurgSim/Physics/PhysicsManagerState.h"
 
 
 namespace SurgSim
@@ -61,6 +63,10 @@ public:
 
 	friend class PhysicsManagerTest;
 
+	/// Get the last state of the previous PhysicsManager update.
+	/// \param [out] s pointer to the state.
+	void getFinalState(SurgSim::Physics::PhysicsManagerState *s) const;
+
 protected:
 
 	///@{
@@ -96,6 +102,7 @@ private:
 	std::unique_ptr<PostUpdate> m_postUpdateStep;
 	///@}
 
+	SurgSim::Framework::LockedContainer<SurgSim::Physics::PhysicsManagerState> m_finalState;
 };
 
 }; // namespace Physics
