@@ -131,7 +131,7 @@ void computeRotationVector(const Eigen::Transform<T, 3, Eigen::Isometry, TOpt>& 
 	double angle;
 	Eigen::Matrix<T, 3, 1, VOpt> axis;
 	computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-	*rotationVector = angle*axis;
+	*rotationVector = angle * axis;
 }
 
 /// Interpolate (slerp) between 2 quaternions
