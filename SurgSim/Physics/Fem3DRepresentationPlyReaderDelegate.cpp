@@ -27,7 +27,7 @@ namespace Physics
 {
 
 Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate()
-	: vertexIterator(nullptr), m_fem(nullptr), m_state(nullptr)
+	: vertexIterator(nullptr), m_fem(nullptr), m_state(nullptr), m_hasBoundaryConditions(false)
 {
 
 }
@@ -46,7 +46,7 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("tetrahedron", "vertex_index_2");
 	result = result && reader.hasProperty("tetrahedron", "vertex_index_3");
 
-	result = result && reader.hasProperty("boundary_condition", "vertex_index");
+	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
 	return result;
 }
@@ -83,15 +83,18 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		"tetrahedron", "vertex_index_3", PlyReader::TYPE_UNSIGNED_INT, 3 * sizeof(m_tetrahedronData[0]));
 
 	// Boundary Condition Processing
-	reader->requestElement(
-		"boundary_condition",
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions,
-				  this,
-				  std::placeholders::_1,
-				  std::placeholders::_2),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions, this, std::placeholders::_1));
-	reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
+	if (m_hasBoundaryConditions)
+	{
+		reader->requestElement(
+			"boundary_condition",
+			std::bind(&Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions,
+					  this,
+					  std::placeholders::_1,
+					  std::placeholders::_2),
+			std::bind(&Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
+			std::bind(&Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions, this, std::placeholders::_1));
+		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
+	}
 
 	reader->setStartParseFileCallback(std::bind(&Fem3DRepresentationPlyReaderDelegate::startParseFile, this));
 	reader->setEndParseFileCallback(std::bind(&Fem3DRepresentationPlyReaderDelegate::endParseFile, this));

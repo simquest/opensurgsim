@@ -118,6 +118,9 @@ private:
 
 	/// The state that will be created by loading
 	std::shared_ptr<DeformableRepresentationState> m_state;
+
+	/// Flag indicating whether the associated file has boundary conditions
+	bool m_hasBoundaryConditions;
 };
 
 } // namespace Physics
