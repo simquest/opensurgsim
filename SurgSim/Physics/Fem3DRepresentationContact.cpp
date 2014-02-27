@@ -71,8 +71,10 @@ void Fem3DRepresentationContact::doBuild(double dt,
 	// n^t.[p(free)+u] + d >= 0
 	// n^t.p(free) + n^t.u + d >= 0
 	// n^t.u + (n^t.p(free) + d) >= 0
+	//
+	// For implicit integration, u = dt.v(t+dt)
 
-	// Update b with new violation U
+	// Update b with new violation
 	Vector3d globalPosition = localization->calculatePosition();
 	double violation = n.dot(globalPosition) + d;
 
@@ -98,9 +100,9 @@ void Fem3DRepresentationContact::doBuild(double dt,
 		if (coord.naturalCoordinate[index] != 0.0)
 		{
 			unsigned int nodeIndex = femElement->getNodeId(index);
-			m_newH.insert(3 * nodeIndex + 0) = coord.naturalCoordinate[index] * n[0] * scale;
-			m_newH.insert(3 * nodeIndex + 1) = coord.naturalCoordinate[index] * n[1] * scale;
-			m_newH.insert(3 * nodeIndex + 2) = coord.naturalCoordinate[index] * n[2] * scale;
+			m_newH.insert(3 * nodeIndex + 0) = coord.naturalCoordinate[index] * n[0] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 1) = coord.naturalCoordinate[index] * n[1] * scale * dt;
+			m_newH.insert(3 * nodeIndex + 2) = coord.naturalCoordinate[index] * n[2] * scale * dt;
 		}
 	}
 

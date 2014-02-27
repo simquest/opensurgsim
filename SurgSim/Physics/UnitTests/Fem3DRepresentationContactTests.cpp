@@ -230,7 +230,7 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpTest)
 	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[0], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
-	SurgSim::Math::setSubVector(m_n, 0, 3, &H);
+	SurgSim::Math::setSubVector(dt * m_n, 0, 3, &H);
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -264,10 +264,10 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpCoordinateTest)
 	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[0], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
-	SurgSim::Math::setSubVector(0.25 * m_n, 0, 3, &H);
-	SurgSim::Math::setSubVector(0.33 * m_n, 1, 3, &H);
-	SurgSim::Math::setSubVector(0.28 * m_n, 3, 3, &H);
-	SurgSim::Math::setSubVector(0.14 * m_n, 4, 3, &H);
+	SurgSim::Math::setSubVector(0.25 * dt * m_n, 0, 3, &H);
+	SurgSim::Math::setSubVector(0.33 * dt * m_n, 1, 3, &H);
+	SurgSim::Math::setSubVector(0.28 * dt * m_n, 3, 3, &H);
+	SurgSim::Math::setSubVector(0.14 * dt * m_n, 4, 3, &H);
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -327,10 +327,10 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	EXPECT_NEAR(-9.81 * dt * dt * m_n[1], mlcpPhysicsProblem.b[indexOfConstraint], epsilon);
 
 	Eigen::Matrix<double, 1, 18> H = Eigen::Matrix<double, 1, 18>::Zero();
-	SurgSim::Math::setSubVector(0.25 * m_n, 0, 3, &H);
-	SurgSim::Math::setSubVector(0.33 * m_n, 1, 3, &H);
-	SurgSim::Math::setSubVector(0.28 * m_n, 3, 3, &H);
-	SurgSim::Math::setSubVector(0.14 * m_n, 4, 3, &H);
+	SurgSim::Math::setSubVector(0.25 * dt * m_n, 0, 3, &H);
+	SurgSim::Math::setSubVector(0.33 * dt * m_n, 1, 3, &H);
+	SurgSim::Math::setSubVector(0.28 * dt * m_n, 3, 3, &H);
+	SurgSim::Math::setSubVector(0.14 * dt * m_n, 4, 3, &H);
 
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H.block(indexOfConstraint, indexOfRepresentation, 1, 18), epsilon);
 
