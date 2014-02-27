@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 #include "SurgSim/Devices/Novint/NovintScaffold.h"
 
 #include <vector>
@@ -26,35 +27,34 @@
 
 #include <hdl/hdl.h>
 
-#include "SurgSim/Devices/Novint/NovintDevice.h"
-#include "SurgSim/Math/Vector.h"
-#include "SurgSim/Math/Matrix.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Framework/Assert.h"
-#include "SurgSim/Framework/Log.h"
-#include "SurgSim/Framework/Clock.h"
-#include "SurgSim/Framework/SharedInstance.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-
-using SurgSim::Math::Vector3d;
-using SurgSim::Math::Vector4d;
-using SurgSim::Math::Matrix44d;
-using SurgSim::Math::Matrix33d;
-using SurgSim::Math::makeRotationMatrix;
-using SurgSim::Math::RigidTransform3d;
-
-using SurgSim::Framework::Clock;
+#include "SurgSim/Devices/Novint/NovintDevice.h"
+#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/Clock.h"
+#include "SurgSim/Framework/Log.h"
+#include "SurgSim/Framework/SharedInstance.h"
+#include "SurgSim/Math/Matrix.h"
+#include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
+using SurgSim::Framework::Clock;
+using SurgSim::Math::makeRotationMatrix;
+using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix44d;
+using SurgSim::Math::Matrix66d;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::Vector4d;
 
 
 namespace SurgSim
 {
 namespace Device
 {
-
 
 class NovintScaffold::Handle
 {
@@ -237,20 +237,16 @@ struct NovintScaffold::DeviceData
 		eulerAngleOffsetPitch(0.0),
 		forwardPointingPoseThreshold(0.9),
 		torqueScale(Vector3d::Constant(1.0)),
-		positionValue(positionBuffer),
-		transformValue(transformBuffer),
-		forceValue(forceBuffer),
-		torqueValue(torqueBuffer),
 		positionScale(device->getPositionScale()),
-		orientationScale(device->getOrientationScale())
+		orientationScale(device->getOrientationScale()),
+		position(Vector3d::Zero()),
+		jointAngles(Vector3d::Zero()),
+		force(Vector3d::Zero()),
+		torque(Vector4d::Zero()),
+		orientationTransform(RigidTransform3d::Identity()),
+		scaledPose(RigidTransform3d::Identity())
 	{
-		positionValue.setZero();   // also clears positionBuffer
-		transformValue.setIdentity();   // also sets transformBuffer
-		jointAngles.setZero();
 		buttonStates.fill(false);
-
-		forceValue.setZero();   // also clears forceBuffer
-		torqueValue.setZero();  // also clears torqueBuffer
 	}
 
 
@@ -271,10 +267,6 @@ struct NovintScaffold::DeviceData
 	/// Time of the initialization of the handle.
 	Clock::time_point initializationTime;
 
-	/// The raw position read from the device.
-	double positionBuffer[3];
-	/// The raw pose transform read from the device.
-	double transformBuffer[16];
 	/// The joint angles for the device orientation.
 	Vector3d jointAngles;
 	/// The button state read from the device.
@@ -303,20 +295,17 @@ struct NovintScaffold::DeviceData
 	/// The scaling factors for the torque axes.
 	Vector3d torqueScale;
 
-	/// The raw force to be written to the device.
-	double forceBuffer[3];
-	/// Torque command counts for each motor axis (including the jaw).
-	double torqueBuffer[4];
+	/// The position value from the device.
+	Vector3d position;
+	/// The orientation value from the device.
+	RigidTransform3d orientationTransform;
+	/// The pose value from the device, after scaling.
+	RigidTransform3d scaledPose;
 
-	/// The position value from the device, permanently connected to positionBuffer.
-	Eigen::Map<Vector3d> positionValue;
-	/// The pose transform value from the device, permanently connected to transformBuffer.
-	Eigen::Map<Eigen::Matrix<double, 4, 4, Eigen::ColMajor>> transformValue;
-
-	/// The force value to be written to the device, permanently connected to forceBuffer.
-	Eigen::Map<Vector3d> forceValue;
-	/// The torque value to be written to the device, permanently connected to torqueBuffer.
-	Eigen::Map<Vector4d> torqueValue;
+	/// The force value to be written to the device.
+	Vector3d force;
+	/// The torque value to be written to the device.
+	Vector4d torque;
 
 	/// Scale factor for the position axes.
 	double positionScale;
@@ -611,12 +600,9 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	hdlMakeCurrent(info->deviceHandle.get());	// This device is now "current", and all hdlXxx calls apply to it.
 	bool fatalError = checkForFatalError(false, "hdlMakeCurrent()");
 
-	// Receive the current device position (in millimeters!), pose transform, and button state bitmap.
-
-	hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->positionBuffer);
+	// Receive the current device position (in meters), orientation transform, and button state bitmap.
+	hdlGripGetAttributev(HDL_GRIP_POSITION, 0, info->position.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributev(HDL_GRIP_POSITION)");
-	hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, info->transformBuffer);
-	fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ORIENTATION)");
 
 	info->buttonStates.fill(false);
 	hdlGripGetAttributesb(HDL_GRIP_BUTTON, info->buttonStates.size(), info->buttonStates.data());
@@ -645,14 +631,21 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 		Matrix33d rotationZ = makeRotationMatrix(info->jointAngles[2] * info->orientationScale,
 			Vector3d(Vector3d::UnitZ()));
 		Matrix33d orientation = rotationY * rotationZ * rotationX;
-		// Put the result into the orientation transform matrix:
-		info->transformValue.block<3, 3>(0, 0) = orientation;
+		// Put the result into the orientation transform
+		info->orientationTransform.linear() = orientation;
+	}
+	else
+	{
+		Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;
+		hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, transform.data());
+		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ORIENTATION)");
+		info->orientationTransform.linear() = transform.block<3,3>(0, 0); // store orientation in a RigidTransform3d
 	}
 
 	checkDeviceHoming(info);
 
-	info->forceValue.setZero();
-	info->torqueValue.setZero();
+	info->force.setZero();
+	info->torque.setZero();
 	if (info->isDeviceHomed)
 	{
 		bool desiredGravityCompensation = false;
@@ -665,13 +658,13 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 	}
 
 	// Set the force command (in newtons).
-	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->forceBuffer);  // 2nd arg is index; output force is always "vector #0"
+	hdlGripSetAttributev(HDL_GRIP_FORCE, 0, info->force.data()); // 2nd arg is index; output force is always "vector #0"
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributev(HDL_GRIP_FORCE)");
 
 	// Set the torque vector.  Also set the jaw squeeze torque (as 4th element of the array)-- though this is not used
 	// anywhere at the moment.
 	// The 2nd arg to this call is the count; we're setting 4 doubles.
-	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torqueBuffer);
+	hdlGripSetAttributesd(HDL_GRIP_TORQUE, 4, info->torque.data());
 	fatalError = checkForFatalError(fatalError, "hdlGripSetAttributesd(HDL_GRIP_TORQUE)");
 
 	setInputData(info);
@@ -706,7 +699,7 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 		// Wait until the tool is pointed forwards (i.e. perpendicular to the Falcon centerline) before proclaiming the
 		// whole device homed.
 		Vector3d forwardDirection = Vector3d::UnitX();
-		double forwardMetric = forwardDirection.dot(info->transformValue.block<3, 3>(0, 0) * forwardDirection);
+		double forwardMetric = forwardDirection.dot(info->orientationTransform.linear() * forwardDirection);
 
 		if (forwardMetric >= info->forwardPointingPoseThreshold)
 		{
@@ -717,30 +710,85 @@ void NovintScaffold::checkDeviceHoming(DeviceData* info)
 
 	if (! info->isPositionHomed)
 	{
-		info->positionValue.setZero();
+		info->position.setZero();
 	}
 	if (! info->isOrientationHomed)
 	{
-		info->transformValue.setIdentity();
+		info->orientationTransform.setIdentity();
 	}
+
+	info->scaledPose.translation() = info->position * info->positionScale;
+	info->scaledPose.linear() = info->orientationTransform.linear();
 }
 
 void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 {
+	typedef Eigen::Matrix<double, 6, 1, Eigen::DontAlign> Vector6d;
 	const SurgSim::DataStructures::DataGroup& outputData = info->deviceObject->getOutputData();
 
-	Vector3d force;
-	force.setZero();
-	outputData.vectors().get("force", &force);
-	info->forceValue = force;
+	// Set the DeviceData's force to the nominal force, if provided.
+	Vector3d nominalForce = Vector3d::Zero();
+	outputData.vectors().get("force", &nominalForce);
+	info->force = nominalForce;
 
-	Vector3d torqueInNewtonMeters;
-	torqueInNewtonMeters.setZero();
-	outputData.vectors().get("torque", &torqueInNewtonMeters);
+	// If the springJacobian was provided, multiply with the change in position since the output data was set,
+	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
+	Vector6d deltaPosition;
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
+	bool havespringJacobian = outputData.matrices().get("springJacobian", &springJacobian);
+	if (havespringJacobian)
+	{
+		RigidTransform3d poseForNominal = info->scaledPose;
+		outputData.poses().get("inputPose", &poseForNominal);
 
-	// Set the torque command if applicable (and convert newton-meters to command counts).
+		Vector3d rotationVector = Vector3d::Zero();
+		SurgSim::Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
+
+		SurgSim::Math::setSubVector(info->scaledPose.translation() - poseForNominal.translation(), 0, 3,
+			&deltaPosition);
+		SurgSim::Math::setSubVector(rotationVector, 1, 3, &deltaPosition);
+
+		info->force += springJacobian.block<3,6>(0, 0) * deltaPosition;
+	}
+
+	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
+	Vector6d deltaVelocity;
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
+	bool havedamperJacobian = outputData.matrices().get("damperJacobian", &damperJacobian);
+	if (havedamperJacobian)
+	{
+		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
+		Vector3d linearVelocity = Vector3d::Zero();
+		Vector3d angularVelocity = Vector3d::Zero();
+
+		Vector3d linearVelocityForNominal = linearVelocity;
+		outputData.vectors().get("inputLinearVelocity", &linearVelocityForNominal);
+		Vector3d angularVelocityForNominal = angularVelocity;
+		outputData.vectors().get("inputAngularVelocity", &angularVelocityForNominal);
+
+		SurgSim::Math::setSubVector(linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
+		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
+
+		info->force += damperJacobian.block<3,6>(0, 0) * deltaVelocity;
+	}
+
+	// Calculate the torque command if applicable (and convert newton-meters to command counts).
 	if (info->isDevice7Dof)
 	{
+		Vector3d nominalTorque = Vector3d::Zero();
+		outputData.vectors().get("torque", &nominalTorque);
+		Vector3d torque = nominalTorque;
+
+		if (havespringJacobian)
+		{
+			torque += springJacobian.block<3,6>(3, 0) * deltaPosition;
+		}
+
+		if (havedamperJacobian)
+		{
+			torque += damperJacobian.block<3,6>(3, 0) * deltaVelocity;
+		}
+
 		// We have the torque vector in newton-meters.  Sadly, what we need is the torque command counts FOR EACH MOTOR
 		// AXIS, not for each Cartesian axis. Which means we need to go back to calculations with joint angles.
 		// For the Falcon 7DoF grip, the axes are perpendicular and the joint angles are Euler angles:
@@ -764,9 +812,9 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// is basically unnecessary, but...
 		Vector3d fakeAxisX  = jointAxisY.cross(jointAxisZ).normalized();
 		Matrix33d fakeBasisMatrix;
-		basisMatrix.col(0) = fakeAxisX;
-		basisMatrix.col(1) = jointAxisY;
-		basisMatrix.col(2) = jointAxisZ;
+		fakeBasisMatrix.col(0) = fakeAxisX;
+		fakeBasisMatrix.col(1) = jointAxisY;
+		fakeBasisMatrix.col(2) = jointAxisZ;
 
 		const double mediumBasisDeterminantThreshold = 0.6;
 		const double smallBasisDeterminantThreshold = 0.4;
@@ -807,7 +855,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 			// The computed ratio has to be 0 <= ratio < 1.  We just use linear drop-off.
 			decompositionMatrix.row(1) *= ratio;
 		}
-		Vector3d axisTorqueVector = decompositionMatrix * torqueInNewtonMeters;
+		Vector3d axisTorqueVector = decompositionMatrix * torque;
 
 		// Unit conversion factors for the Falcon 7DoF.  THIS SHOULD BE PARAMETRIZED!
 		const double axisTorqueMin = -2000;
@@ -819,17 +867,17 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		// pitch axis: torque = 47.96 mNm when command = 2000
 		const double pitchTorqueScale = axisTorqueMax / 47.96e-3;
 
-		info->torqueValue[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
+		info->torque[0] = clampToRange(rollTorqueScale  * info->torqueScale.x() * axisTorqueVector.x(),
 			axisTorqueMin, axisTorqueMax);
-		info->torqueValue[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
+		info->torque[1] = clampToRange(yawTorqueScale   * info->torqueScale.y() * axisTorqueVector.y(),
 			axisTorqueMin, axisTorqueMax);
-		info->torqueValue[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
+		info->torque[2] = clampToRange(pitchTorqueScale * info->torqueScale.z() * axisTorqueVector.z(),
 			axisTorqueMin, axisTorqueMax);
-		info->torqueValue[3] = 0;
+		info->torque[3] = 0;
 
 		if (info->isDeviceRollAxisReversed)  // commence swearing.
 		{
-			info->torqueValue[0] = -info->torqueValue[0];
+			info->torque[0] = -info->torque[0];
 		}
 	}
 }
@@ -837,12 +885,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 
 void NovintScaffold::setInputData(DeviceData* info)
 {
-	RigidTransform3d pose;
-	pose.linear() = info->transformValue.block<3,3>(0,0);
-	pose.translation() = info->positionValue * info->positionScale;
-
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set("pose", pose);
+	inputData.poses().set("pose", info->scaledPose);
 	inputData.booleans().set("button1", info->buttonStates[0]);
 	inputData.booleans().set("button2", info->buttonStates[1]);
 	inputData.booleans().set("button3", info->buttonStates[2]);

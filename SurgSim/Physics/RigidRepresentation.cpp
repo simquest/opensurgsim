@@ -26,6 +26,7 @@
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 using SurgSim::Collision::Location;
+using SurgSim::Math::Matrix66d;
 
 namespace SurgSim
 {

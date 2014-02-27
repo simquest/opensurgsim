@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include <memory>
-#include <boost/thread.hpp>
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"

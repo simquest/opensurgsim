@@ -93,11 +93,9 @@ public:
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters();
 
-	typedef Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> Matrix66d;
-
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
-	const Matrix66d& getComplianceMatrix() const;
+	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
 
 protected:
 	/// Inertia matrices in global coordinates
@@ -111,12 +109,12 @@ protected:
 	SurgSim::Math::Vector3d m_torque;
 
 	/// Compliance matrix (size of the number of Dof = 6)
-	Matrix66d m_C;
+	SurgSim::Math::Matrix66d m_C;
 
 	SurgSim::Math::Vector3d m_externalForce;
 	SurgSim::Math::Vector3d m_externalTorque;
-	Matrix66d m_externalStiffnessMatrix;
-	Matrix66d m_externalDampingMatrix;
+	SurgSim::Math::Matrix66d m_externalStiffnessMatrix;
+	SurgSim::Math::Matrix66d m_externalDampingMatrix;
 
 private:
 	virtual bool doInitialize() override;

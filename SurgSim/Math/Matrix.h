@@ -56,6 +56,10 @@ typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign | Eigen::RowMajor>  Matrix3
 /// This type (and any structs that contain it) can be safely allocated via new.
 typedef Eigen::Matrix<double, 4, 4, Eigen::DontAlign | Eigen::RowMajor>  Matrix44d;
 
+/// A 6x6 matrix of doubles.
+/// This type (and any structs that contain it) can be safely allocated via new.
+typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign | Eigen::RowMajor> Matrix66d;
+
 /// A dynamic size diagonal matrix
 typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> DiagonalMatrix;
 
