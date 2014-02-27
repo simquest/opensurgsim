@@ -93,6 +93,9 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 		std::bind(&Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions, this, std::placeholders::_1));
 	reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 
+	reader->setStartParseFileCallback(std::bind(&Fem3DRepresentationPlyReaderDelegate::startParseFile, this));
+	reader->setEndParseFileCallback(std::bind(&Fem3DRepresentationPlyReaderDelegate::endParseFile, this));
+
 	return true;
 }
 
@@ -101,11 +104,19 @@ std::shared_ptr<Fem3DRepresentation> Fem3DRepresentationPlyReaderDelegate::getFe
 	return m_fem;
 }
 
-void* Fem3DRepresentationPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
+void Fem3DRepresentationPlyReaderDelegate::startParseFile()
 {
 	m_fem = std::make_shared<Fem3DRepresentation>("Ply loaded Fem3d");
 	m_state = std::make_shared<DeformableRepresentationState>();
+}
 
+void Fem3DRepresentationPlyReaderDelegate::endParseFile()
+{
+	m_fem->setInitialState(m_state);
+}
+
+void* Fem3DRepresentationPlyReaderDelegate::beginVertices(const std::string& elementName, size_t vertexCount)
+{
 	m_state->setNumDof(3, vertexCount);
 	vertexIterator = m_state->getPositions().data();
 
@@ -149,8 +160,6 @@ void Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition(const std::s
 
 void Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions(const std::string& elementName)
 {
-	// We must defer setting state to the very last moment
-	m_fem->setInitialState(m_state);
 }
 
 } // namespace SurgSim

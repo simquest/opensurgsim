@@ -52,6 +52,12 @@ public:
 	/// \return true if it succeeds, false otherwise.
 	virtual bool fileIsAcceptable(const SurgSim::DataStructures::PlyReader& reader) override;
 
+	/// Callback for beginning of PlyReader::parseFile.
+	void startParseFile();
+
+	/// Callback for end of PlyReader::parseFile.
+	void endParseFile();
+
 	/// Callback function, begin the processing of vertices.
 	/// \param elementName Name of the element.
 	/// \param vertexCount Number of vertices.

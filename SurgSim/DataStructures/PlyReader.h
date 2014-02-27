@@ -195,6 +195,12 @@ public:
 	/// Parse the file.
 	void parseFile();
 
+	/// Register callback to be called at the begining of parseFile.
+	void setStartParseFileCallback(std::function<void (void)> startParseFileCallback);
+
+	/// Register callback to be called at the end of parseFile.
+	void setEndParseFileCallback(std::function<void (void)> endParseFileCallback);
+
 private:
 
 	/// Generic Internal function to handle list and scalar properties, see requestScalarProperty() and
@@ -245,6 +251,12 @@ private:
 
 	/// The delegate.
 	std::shared_ptr<PlyReaderDelegate> m_delegate;
+
+	/// Callback to be executed at the start of 'parseFile'.
+	std::function<void(void)> m_startParseFileCallback;
+
+	/// Callback to be executed at the end of 'parseFile'.
+	std::function<void(void)> m_endParseFileCallback;
 };
 
 
