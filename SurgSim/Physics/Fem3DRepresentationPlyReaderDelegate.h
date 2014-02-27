@@ -37,7 +37,8 @@ public:
 	/// Default constructor
 	Fem3DRepresentationPlyReaderDelegate();
 
-	/// Gets the fem.
+	/// Gets a shared pointer to the fem.  This class maintains its copy of the pointer until the next time
+	/// PlyReader::parseFile is called on the registered PlyReader.
 	/// \return The stored fem.
 	std::shared_ptr<Fem3DRepresentation> getFem();
 
