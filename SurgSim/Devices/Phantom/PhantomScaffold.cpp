@@ -242,10 +242,10 @@ struct PhantomScaffold::DeviceData
 	/// The pose value from the device, after scaling.
 	RigidTransform3d scaledPose;
 
-	/// The force value to be written to the device.
+	/// The force value to be written to the device, in Newtons.
 	Vector3d force;
 
-	/// The torque value to be written to the device.
+	/// The torque value to be written to the device, in milliNewton-meters.
 	Vector3d torque;
 
 private:
@@ -569,7 +569,8 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 		forceAndTorqueFromDeltaVelocity;
 
 	info->force = SurgSim::Math::getSubVector(forceAndTorque, 0, 3);
-	info->torque = SurgSim::Math::getSubVector(forceAndTorque, 1, 3);
+	// convert the torque from Newton-meters to milliNewton-meters as expected by the hardware library.
+	info->torque = SurgSim::Math::getSubVector(forceAndTorque, 1, 3) * 1000.0;
 }
 
 
