@@ -5,11 +5,8 @@ element vertex 26
 property double x
 property double y
 property double z
-element tetrahedron 12
-property uint vertex_index_0
-property uint vertex_index_1
-property uint vertex_index_2
-property uint vertex_index_3
+element polyhedron 12
+property list uint uint vertex_indices
 element boundary_condition 8
 property uint vertex_index
 end_header
@@ -39,18 +36,18 @@ end_header
 -1.000000 -1.000000 1.000000 
 -1.000000 1.000000 -1.000000 
 -1.000000 -1.000000 1.000000 
-0 1 2 3
-3 4 5 6
-6 7 8 9
-9 10 11 12
-12 13 14 15
-15 16 17 18
-18 0 2 4
-19 20 21 5
-16 22 17 6
-4 23 5 7
-24 12 14 8
-10 25 11 9
+4 0 1 2 3
+4 3 4 5 6
+4 6 7 8 9
+4 9 10 11 12
+4 12 13 14 15
+4 15 16 17 18
+4 18 0 2 4
+4 19 20 21 5
+4 16 22 17 6
+4 4 23 5 7
+4 24 12 14 8
+4 10 25 11 9
 8
 5
 3

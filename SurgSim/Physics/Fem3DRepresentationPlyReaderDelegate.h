@@ -29,7 +29,7 @@ namespace Physics
 class DeformableRepresentationState;
 class Fem3DRepresentation;
 
-/// Implementation of PlyReaderDelegate for simple tetrahedral meshes
+/// Implementation of PlyReaderDelegate for polyhedral Fem3DRepresentation
 class Fem3DRepresentationPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
@@ -71,19 +71,19 @@ public:
 	/// \param elementName Name of the element.
 	void endVertices(const std::string& elementName);
 
-	/// Callback function, begin the processing of tetrahedrons.
+	/// Callback function, begin the processing of polyhedrons.
 	/// \param elementName Name of the element.
-	/// \param tetrahedronCount Number of tetrahedrons.
-	/// \return memory for tetrahedron data to the reader.
-	void* beginTetrahedrons(const std::string& elementName, size_t tetrahedronCount);
+	/// \param polyhedronCount Number of polyhedrons.
+	/// \return memory for polyhedron data to the reader.
+	void* beginPolyhedrons(const std::string& elementName, size_t polyhedronCount);
 
-	/// Callback function to process one tetrahedron.
+	/// Callback function to process one polyhedron.
 	/// \param elementName Name of the element.
-	void processTetrahedron(const std::string& elementName);
+	void processPolyhedron(const std::string& elementName);
 
-	/// Callback function to finalize processing of tetrahedrons.
+	/// Callback function to finalize processing of polyhedrons.
 	/// \param elementName Name of the element.
-	void endTetrahedrons(const std::string& elementName);
+	void endPolyhedrons(const std::string& elementName);
 
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
@@ -106,8 +106,14 @@ private:
 	/// Internal iterator to save the "vertex" element
 	double *vertexIterator;
 
-	/// Internal data to receive the "tetrahedron" element
-	std::array<unsigned int, 4> m_tetrahedronData;
+	/// Internal data to receive the "polyhedron" element
+	struct PolyhedronData
+	{
+		PolyhedronData();
+
+		unsigned int* indicies;
+		unsigned int vertexCount;
+	} m_polyhedronData;
 
 	/// Internal data to receive the "boundary_condition" element
 	unsigned int m_boundaryConditionData;

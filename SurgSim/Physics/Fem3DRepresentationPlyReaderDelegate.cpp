@@ -29,7 +29,10 @@ namespace Physics
 Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate()
 	: vertexIterator(nullptr), m_hasBoundaryConditions(false)
 {
+}
 
+Fem3DRepresentationPlyReaderDelegate::PolyhedronData::PolyhedronData() : indicies(nullptr), vertexCount(0)
+{
 }
 
 bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
@@ -41,10 +44,8 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("vertex", "y");
 	result = result && reader.hasProperty("vertex", "z");
 
-	result = result && reader.hasProperty("tetrahedron", "vertex_index_0");
-	result = result && reader.hasProperty("tetrahedron", "vertex_index_1");
-	result = result && reader.hasProperty("tetrahedron", "vertex_index_2");
-	result = result && reader.hasProperty("tetrahedron", "vertex_index_3");
+	result = result && reader.hasProperty("polyhedron", "vertex_indices");
+	result = result && !reader.isScalar("polyhedron", "vertex_indices");
 
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
@@ -64,23 +65,21 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	reader->requestScalarProperty("vertex", "y", PlyReader::TYPE_DOUBLE, 1 * sizeof(m_vertexData[0]));
 	reader->requestScalarProperty("vertex", "z", PlyReader::TYPE_DOUBLE, 2 * sizeof(m_vertexData[0]));
 
-	// Tetrahedron Processing
+	// Polyhedron Processing
 	reader->requestElement(
-		"tetrahedron",
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginTetrahedrons,
+		"polyhedron",
+		std::bind(&Fem3DRepresentationPlyReaderDelegate::beginPolyhedrons,
 				  this,
 				  std::placeholders::_1,
 				  std::placeholders::_2),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::processTetrahedron, this, std::placeholders::_1),
-		std::bind(&Fem3DRepresentationPlyReaderDelegate::endTetrahedrons, this, std::placeholders::_1));
-	reader->requestScalarProperty(
-		"tetrahedron", "vertex_index_0", PlyReader::TYPE_UNSIGNED_INT, 0 * sizeof(m_tetrahedronData[0]));
-	reader->requestScalarProperty(
-		"tetrahedron", "vertex_index_1", PlyReader::TYPE_UNSIGNED_INT, 1 * sizeof(m_tetrahedronData[0]));
-	reader->requestScalarProperty(
-		"tetrahedron", "vertex_index_2", PlyReader::TYPE_UNSIGNED_INT, 2 * sizeof(m_tetrahedronData[0]));
-	reader->requestScalarProperty(
-		"tetrahedron", "vertex_index_3", PlyReader::TYPE_UNSIGNED_INT, 3 * sizeof(m_tetrahedronData[0]));
+		std::bind(&Fem3DRepresentationPlyReaderDelegate::processPolyhedron, this, std::placeholders::_1),
+		std::bind(&Fem3DRepresentationPlyReaderDelegate::endPolyhedrons, this, std::placeholders::_1));
+	reader->requestListProperty("polyhedron",
+								"vertex_indices",
+								PlyReader::TYPE_UNSIGNED_INT,
+								offsetof(PolyhedronData, indicies),
+								PlyReader::TYPE_UNSIGNED_INT,
+								offsetof(PolyhedronData, vertexCount));
 
 	// Boundary Condition Processing
 	if (m_hasBoundaryConditions)
@@ -137,18 +136,24 @@ void Fem3DRepresentationPlyReaderDelegate::endVertices(const std::string& elemen
 	vertexIterator = nullptr;
 }
 
-void* Fem3DRepresentationPlyReaderDelegate::beginTetrahedrons(const std::string& elementName, size_t faceCount)
+void* Fem3DRepresentationPlyReaderDelegate::beginPolyhedrons(const std::string& elementName, size_t polyhedronCount)
 {
-	return m_tetrahedronData.data();
+	return &m_polyhedronData;
 }
 
-void Fem3DRepresentationPlyReaderDelegate::processTetrahedron(const std::string& elementName)
+void Fem3DRepresentationPlyReaderDelegate::processPolyhedron(const std::string& elementName)
 {
-	m_fem->addFemElement(std::make_shared<FemElement3DTetrahedron>(m_tetrahedronData, *m_state));
+	SURGSIM_ASSERT(m_polyhedronData.vertexCount == 4) << "Cannot process polyhedron with "
+													  << m_polyhedronData.vertexCount << " vertices.";
+
+	std::array<unsigned int, 4> polyhedronVertices;
+	std::copy(m_polyhedronData.indicies, m_polyhedronData.indicies + 4, polyhedronVertices.begin());
+	m_fem->addFemElement(std::make_shared<FemElement3DTetrahedron>(polyhedronVertices, *m_state));
 }
 
-void Fem3DRepresentationPlyReaderDelegate::endTetrahedrons(const std::string& elementName)
+void Fem3DRepresentationPlyReaderDelegate::endPolyhedrons(const std::string& elementName)
 {
+	m_polyhedronData.indicies = nullptr;
 }
 
 void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
