@@ -42,7 +42,7 @@ void addTetraheadron(Fem3DRepresentation *fem, std::array<unsigned int, 4> nodes
 	const DeformableRepresentationState& state, double massDensity = 1.0,
 	double poissonRatio = 0.1, double youngModulus = 1.0)
 {
-	auto element = std::make_shared<FemElement3DTetrahedron>(nodes, state);
+	auto element = std::make_shared<FemElement3DTetrahedron>(nodes);
 	element->setMassDensity(massDensity);
 	element->setPoissonRatio(poissonRatio);
 	element->setYoungModulus(youngModulus);
