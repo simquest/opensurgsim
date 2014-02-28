@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
-#include "SurgSim/Framework/Assert.h"
+#include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/OutputComponent.h"
 #include "SurgSim/Math/Matrix.h"
@@ -26,6 +26,7 @@
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Quaterniond;
 
@@ -35,16 +36,6 @@ namespace SurgSim
 
 namespace Physics
 {
-
-Vector3d computeRotationVector(const RigidTransform3d& t1, const RigidTransform3d& t2)
-{
-	Quaterniond q1(t1.linear());
-	Quaterniond q2(t2.linear());
-	double angle;
-	Vector3d axis;
-	SurgSim::Math::computeAngleAndAxis((q1 * q2.inverse()).normalized(), &angle, &axis);
-	return angle * axis;
-}
 
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
@@ -58,14 +49,11 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
 	builder.addVector("force");
-	builder.addMatrix("forcePositionJacobian");
-	builder.addVector("inputPosition");
-	builder.addMatrix("forceLinearVelocityJacobian");
-	builder.addVector("inputLinearVelocity");
 	builder.addVector("torque");
-	builder.addMatrix("torqueAngleJacobian");
-	builder.addMatrix("inputOrientation");
-	builder.addMatrix("torqueAngularVelocityJacobian");
+	builder.addMatrix("springJacobian");
+	builder.addPose("inputPose");
+	builder.addMatrix("damperJacobian");
+	builder.addVector("inputLinearVelocity");
 	builder.addVector("inputAngularVelocity");
 	m_outputData = builder.createData();
 }
@@ -97,7 +85,6 @@ void VirtualToolCoupler::setPoseName(const std::string& poseName)
 void VirtualToolCoupler::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup inputData;
-	SURGSIM_ASSERT(m_input) << "VirtualToolCoupler named " << getName() << " does not have an Input Component.";
 	m_input->getData(&inputData);
 	RigidTransform3d inputPose;
 	if (inputData.poses().get(m_poseName, &inputPose))
@@ -110,14 +97,15 @@ void VirtualToolCoupler::update(double dt)
 		inputAngularVelocity.setZero();
 		inputData.vectors().get("angularVelocity", &inputAngularVelocity);
 
-		SURGSIM_ASSERT(m_rigid) << "VirtualToolCoupler named " << getName() << " does not have a Representation.";
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 
 		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
 		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
 
-		Vector3d torque = m_angularStiffness * computeRotationVector(inputPose, objectPose);
+		Vector3d rotationVector;
+		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
+		Vector3d torque = m_angularStiffness * rotationVector;
 		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
@@ -131,15 +119,26 @@ void VirtualToolCoupler::update(double dt)
 		if (m_output != nullptr)
 		{
 			m_outputData.vectors().set("force", -force * m_outputForceScaling);
-			m_outputData.matrices().set("forcePositionJacobian", -linearStiffnessMatrix * m_outputForceScaling);
-			m_outputData.vectors().set("inputPosition", inputPose.translation());
-			m_outputData.matrices().set("forceLinearVelocityJacobian", -linearDampingMatrix * m_outputForceScaling);
+			m_outputData.vectors().set("torque", -torque * m_outputTorqueScaling);
 			m_outputData.vectors().set("inputLinearVelocity", inputLinearVelocity);
-			m_outputData.vectors().set("torque", -force * m_outputForceScaling);
-			m_outputData.matrices().set("torqueAngleJacobian", -angularStiffnessMatrix * m_outputForceScaling);
-			m_outputData.matrices().set("inputOrientation", inputPose.linear());
-			m_outputData.matrices().set("torqueAngularVelocityJacobian", -angularDampingMatrix * m_outputForceScaling);
 			m_outputData.vectors().set("inputAngularVelocity", inputAngularVelocity);
+
+			m_outputData.poses().set("inputPose", inputPose);
+
+			Matrix66d springJacobian = Matrix66d::Zero();
+			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
+			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &springJacobian);
+			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
+			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &springJacobian);
+			m_outputData.matrices().set("springJacobian", springJacobian);
+
+			Matrix66d damperJacobian = Matrix66d::Zero();
+			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
+			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &damperJacobian);
+			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
+			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &damperJacobian);
+			m_outputData.matrices().set("damperJacobian", damperJacobian);
+
 			m_output->setData(m_outputData);
 		}
 	}
@@ -152,6 +151,18 @@ bool VirtualToolCoupler::doInitialize()
 
 bool VirtualToolCoupler::doWakeUp()
 {
+	if (m_input == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
+			getName() << " does not have an Input Component.";
+		return false;
+	}
+	if (m_rigid == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "VirtualToolCoupler named " <<
+			getName() << " does not have a Representation.";
+		return false;
+	}
 	return true;
 }
 

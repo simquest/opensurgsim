@@ -47,6 +47,8 @@ public:
 	/// \param	name	Name of the representation
 	explicit OsgPlaneRepresentation(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgPlaneRepresentation);
+
 private:
 
 	/// Shared plane, so that the geometry can be instanced rather than having multiple copies.

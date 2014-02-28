@@ -16,6 +16,7 @@
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
+#include "SurgSim/Physics/Fem3DRepresentationContact.h"
 
 namespace SurgSim
 {
@@ -26,6 +27,7 @@ ConstraintImplementationFactory::ConstraintImplementationFactory()
 {
 	addImplementation(std::make_shared<FixedRepresentationContact>());
 	addImplementation(std::make_shared<RigidRepresentationContact>());
+	addImplementation(std::make_shared<Fem3DRepresentationContact>());
 }
 
 ConstraintImplementationFactory::~ConstraintImplementationFactory()

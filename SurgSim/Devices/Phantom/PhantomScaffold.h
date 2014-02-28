@@ -105,6 +105,21 @@ private:
 	/// \return	true on success.
 	bool updateDevice(DeviceData* info);
 
+	/// Calculates forces and torques and sends them to the device library.  The force to output is
+	/// composed of a vector named "force" in the output data, plus contributions from two optional Jacobians.
+	/// If the matrix "springJacobian" is provided in the output data, a spring force & torque are generated from
+	/// its product with the difference between the current pose and the pose in the output data named "inputPose".
+	/// A damping force & torque are generated similarly.  The intention is for a Behavior to calculate a nominal
+	/// force & torque as well as the desired linearized changes to the force & torque based on changes to the input's
+	/// pose & velocities.  Then the linearized deltas to the output force & torque can be calculated at the haptic
+	/// update rates, thereby smoothing the output response to motion.
+	/// \param info The device data.
+	void calculateForceAndTorque(DeviceData* info);
+
+	/// Sets the input DataGroup, which will be pushed to the InputComponent
+	/// \param info The device data
+	void setInputData(DeviceData* info);
+
 	/// Initializes the OpenHaptics SDK.
 	/// \return true on success.
 	bool initializeSdk();
