@@ -53,6 +53,14 @@ public:
 	/// physics simulation).
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
 
+	/// Set the current linear velocity of the rigid representation
+	/// \param linearVelocity The linear velocity
+	void setLinearVelocity(const SurgSim::Math::Vector3d& linearVelocity);
+
+	/// Set the current angular velocity of the rigid representation
+	/// \param angularVelocity The angular velocity
+	void setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity);
+
 	/// Set the external force being applied to the rigid representation
 	/// Note this force will be zeroed every update of the rigid representation
 	/// \param force The external force
@@ -93,11 +101,9 @@ public:
 	/// Reset the rigid representation parameters to the initial parameters
 	void resetParameters();
 
-	typedef Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor> Matrix66d;
-
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
-	const Matrix66d& getComplianceMatrix() const;
+	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
 
 protected:
 	/// Inertia matrices in global coordinates
@@ -111,12 +117,12 @@ protected:
 	SurgSim::Math::Vector3d m_torque;
 
 	/// Compliance matrix (size of the number of Dof = 6)
-	Matrix66d m_C;
+	SurgSim::Math::Matrix66d m_C;
 
 	SurgSim::Math::Vector3d m_externalForce;
 	SurgSim::Math::Vector3d m_externalTorque;
-	Matrix66d m_externalStiffnessMatrix;
-	Matrix66d m_externalDampingMatrix;
+	SurgSim::Math::Matrix66d m_externalStiffnessMatrix;
+	SurgSim::Math::Matrix66d m_externalDampingMatrix;
 
 private:
 	virtual bool doInitialize() override;

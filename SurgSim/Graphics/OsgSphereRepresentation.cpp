@@ -26,6 +26,11 @@
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgUnitSphere;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgSphereRepresentation);
+}
+
 OsgSphereRepresentation::OsgSphereRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
@@ -44,7 +49,7 @@ double OsgSphereRepresentation::getRadius() const
 {
 	SURGSIM_ASSERT(m_transform->getScale().x() == m_transform->getScale().y() &&
 				   m_transform->getScale().x() == m_transform->getScale().z()) <<
-		"Sphere should be scaled equally in all directions!";
+						   "Sphere should be scaled equally in all directions!";
 	return m_transform->getScale().x();
 }
 

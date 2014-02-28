@@ -45,6 +45,8 @@ public:
 	/// \param	name	Name of the representation
 	explicit OsgCapsuleRepresentation(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCapsuleRepresentation);
+
 	/// Sets the radius of the capsule
 	/// \param radius Radius of the capsule
 	virtual void setRadius(double radius) override;

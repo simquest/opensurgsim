@@ -21,7 +21,7 @@ namespace SurgSim
 namespace Framework
 {
 
-boost::any Framework::Accessible::getValue(const std::string& name)
+boost::any Framework::Accessible::getValue(const std::string& name) const
 {
 	auto functors = m_functors.find(name);
 	if (functors != std::end(m_functors) && functors->second.getter != nullptr)
@@ -30,8 +30,8 @@ boost::any Framework::Accessible::getValue(const std::string& name)
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "Can't get property: " << name << "." <<
-			((functors == std::end(m_functors)) ? "Property not found." : "No getter defined for property.");
+		SURGSIM_FAILURE() << "Can't get property: " << name << "." << ((functors == std::end(m_functors)) ?
+						  "Property not found." : "No getter defined for property.");
 		return boost::any();
 	}
 }
@@ -45,8 +45,8 @@ void Framework::Accessible::setValue(const std::string& name, const boost::any& 
 	}
 	else
 	{
-		SURGSIM_FAILURE() << "Can't set property: " << name << "." <<
-			((functors == std::end(m_functors)) ? "Property not found." : "No setter defined for property.");
+		SURGSIM_FAILURE() << "Can't set property: " << name << "." << ((functors == std::end(m_functors)) ?
+						  "Property not found." : "No setter defined for property.");
 	}
 }
 
@@ -142,7 +142,7 @@ SurgSim::Math::Matrix44f convert(boost::any val)
 		SurgSim::Math::Matrix44d result = boost::any_cast<SurgSim::Math::Matrix44d>(val);
 		floatResult = result.cast<float>();
 	}
-	catch (boost::bad_any_cast &)
+	catch (boost::bad_any_cast&)
 	{
 		floatResult = boost::any_cast<SurgSim::Math::Matrix44f>(val);
 	}

@@ -22,6 +22,11 @@ using SurgSim::Graphics::OsgCapsuleRepresentation;
 using SurgSim::Graphics::OsgUnitCylinder;
 using SurgSim::Graphics::OsgUnitSphere;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgCapsuleRepresentation);
+}
+
 OsgCapsuleRepresentation::OsgCapsuleRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),
@@ -63,8 +68,8 @@ void OsgCapsuleRepresentation::setHeight(double height)
 {
 	m_scale.y() = height;
 	m_patCylinder->setScale(osg::Vec3d(m_scale.x(), m_scale.x(), height));
-	m_patSphere1->setPosition(osg::Vec3d(0.0, height/2, 0.0));
-	m_patSphere2->setPosition(osg::Vec3d(0.0, -height/2, 0.0));
+	m_patSphere1->setPosition(osg::Vec3d(0.0, height / 2, 0.0));
+	m_patSphere2->setPosition(osg::Vec3d(0.0, -height / 2, 0.0));
 }
 double OsgCapsuleRepresentation::getHeight() const
 {
@@ -80,8 +85,8 @@ void OsgCapsuleRepresentation::setSize(double radius, double height)
 	m_patSphere1->setScale(osg::Vec3d(radius, radius, radius));
 	m_patSphere2->setScale(osg::Vec3d(radius, radius, radius));
 
-	m_patSphere1->setPosition(osg::Vec3d(0.0, height/2, 0.0));
-	m_patSphere2->setPosition(osg::Vec3d(0.0, -height/2, 0.0));
+	m_patSphere1->setPosition(osg::Vec3d(0.0, height / 2, 0.0));
+	m_patSphere2->setPosition(osg::Vec3d(0.0, -height / 2, 0.0));
 }
 void OsgCapsuleRepresentation::getSize(double* radius, double* height)
 {
@@ -97,8 +102,8 @@ void OsgCapsuleRepresentation::setSize(SurgSim::Math::Vector2d size)
 	m_patSphere1->setScale(osg::Vec3d(size.x(), size.x(), size.x()));
 	m_patSphere2->setScale(osg::Vec3d(size.x(), size.x(), size.x()));
 
-	m_patSphere1->setPosition(osg::Vec3d(0.0, size.y()/2, 0.0));
-	m_patSphere2->setPosition(osg::Vec3d(0.0, -size.y()/2, 0.0));
+	m_patSphere1->setPosition(osg::Vec3d(0.0, size.y() / 2, 0.0));
+	m_patSphere2->setPosition(osg::Vec3d(0.0, -size.y() / 2, 0.0));
 }
 SurgSim::Math::Vector2d OsgCapsuleRepresentation::getSize() const
 {

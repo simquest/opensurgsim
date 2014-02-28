@@ -22,6 +22,7 @@
 #include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 #include <gtest/gtest.h>
 
@@ -41,10 +42,32 @@ namespace Graphics
 TEST(OsgBoxRepresentationTests, InitTest)
 {
 	ASSERT_NO_THROW({std::shared_ptr<Representation> representation =
-		std::make_shared<OsgBoxRepresentation>("test name");});
+						 std::make_shared<OsgBoxRepresentation>("test name");
+					});
 
 	std::shared_ptr<Representation> representation = std::make_shared<OsgBoxRepresentation>("test name");
 	EXPECT_EQ("test name", representation->getName());
+}
+
+TEST(OsgBoxRepresentationTests, AccessibleTest)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+									"SurgSim::Graphics::OsgBoxRepresentation",
+									"box"));
+
+	EXPECT_EQ("SurgSim::Graphics::OsgBoxRepresentation", component->getClassName());
+
+	SurgSim::Math::Vector3d size(1.0, 2.0, 3.0);
+
+	component->setValue("Size", size);
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decoded = std::dynamic_pointer_cast<SurgSim::Graphics::OsgBoxRepresentation>(
+					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+
+	EXPECT_NE(nullptr, decoded);
+	EXPECT_TRUE(size.isApprox(decoded->getValue<SurgSim::Math::Vector3d>("Size")));
 }
 
 TEST(OsgBoxRepresentationTests, VisibilityTest)
@@ -108,7 +131,7 @@ TEST(OsgBoxRepresentationTests, SizeTest)
 	double randomSizeY = distribution(generator);
 	double randomSizeZ = distribution(generator);
 
-	boxRepresentation->setSize(randomSizeX, randomSizeY, randomSizeZ);
+	boxRepresentation->setSizeXYZ(randomSizeX, randomSizeY, randomSizeZ);
 	EXPECT_EQ(randomSizeX, boxRepresentation->getSizeX());
 	EXPECT_EQ(randomSizeY, boxRepresentation->getSizeY());
 	EXPECT_EQ(randomSizeZ, boxRepresentation->getSizeZ());
@@ -166,6 +189,8 @@ TEST(OsgBoxRepresentationTests, PoseTest)
 		EXPECT_TRUE(representation->getInitialPose().isApprox(initialPose));
 		EXPECT_TRUE(representation->getPose().isApprox(initialPose));
 	}
+
+	YAML::Node node = representation->encode();
 }
 
 TEST(OsgBoxRepresentationTests, MaterialTest)
@@ -184,7 +209,7 @@ TEST(OsgBoxRepresentationTests, MaterialTest)
 		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_EQ(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should be the material's state set!";
+				"State set should be the material's state set!";
 	}
 
 	{
@@ -196,7 +221,7 @@ TEST(OsgBoxRepresentationTests, MaterialTest)
 		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should have been cleared!";
+				"State set should have been cleared!";
 	}
 }
 

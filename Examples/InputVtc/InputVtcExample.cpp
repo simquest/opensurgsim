@@ -14,7 +14,6 @@
 // limitations under the License.
 
 #include <memory>
-#include <boost/thread.hpp>
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
@@ -160,11 +159,11 @@ std::shared_ptr<SceneElement> createBox(const std::string& name, const std::stri
 	// Graphics Components
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> graphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-Graphics");
-	graphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+	graphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 
 	std::shared_ptr<SurgSim::Graphics::BoxRepresentation> rawInputGraphicsRepresentation =
 		std::make_shared<OsgBoxRepresentation>(name + "-RawInput-Graphics");
-	rawInputGraphicsRepresentation->setSize(box->getSizeX(), box->getSizeY(), box->getSizeZ());
+	rawInputGraphicsRepresentation->setSizeXYZ(box->getSizeX(), box->getSizeY(), box->getSizeZ());
 	std::shared_ptr<OsgMaterial> material = std::make_shared<OsgMaterial>();
 	std::shared_ptr<OsgShader> shader = std::make_shared<OsgShader>();
 	shader->setVertexShaderSource(
@@ -268,7 +267,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box", toolDeviceName));
 	scene->addSceneElement(createPlane("plane",
-									   SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
+				SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(
