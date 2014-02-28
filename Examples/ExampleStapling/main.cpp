@@ -100,7 +100,8 @@ std::shared_ptr<ViewElement> createView()
 
 std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, const std::string& deviceName)
 {
-	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler's tip.
+	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler at
+	// the tip of the stapler.
 	std::shared_ptr<SphereShape> sphereShape = std::make_shared<SphereShape>(0.02); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
@@ -169,44 +170,41 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 }
 std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidTransform3d& pose)
 {
+	// Load graphic representation for armSceneElement
+	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
+		createSceneryObject(armName, "Geometry/forearm.osgb");
+	sceneryRepresentation->setInitialPose(pose);
+
 	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the arm.
 	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.335, 0.03); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
 	params.setShapeUsedForMassInertia(capsuleShape);
 
+	Matrix33d rotationX = makeRotationMatrix(M_PI_2, Vector3d(1.0, 0.0, 0.0));
+	Matrix33d rotationY = makeRotationMatrix(M_PI_4, Vector3d(0.0, 1.0, 0.0));
+	RigidTransform3d alignedPose = makeRigidTransform(pose.linear() * rotationY * rotationX, pose.translation());
+
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(armName + "Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(pose);
+	physicsRepresentation->setInitialPose(alignedPose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
 	std::shared_ptr<CapsuleRepresentation> graphicalCollisionRepresentation =
-		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
+		std::make_shared<OsgCapsuleRepresentation>("CapsuleGraphicalRepresentationOfCollision");
 	graphicalCollisionRepresentation->setHeight(capsuleShape->getLength()); // Unit: meter
 	graphicalCollisionRepresentation->setRadius(capsuleShape->getRadius()); // Unit: meter
-	graphicalCollisionRepresentation->setInitialPose(pose);
-
-	std::shared_ptr<TransferPoseBehavior> transferPhysicsPoseToGraphics =
-		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPhysicsPoseToGraphics->setPoseSender(physicsRepresentation);
-	transferPhysicsPoseToGraphics->setPoseReceiver(graphicalCollisionRepresentation);
-
-	// Load graphic representation for armSceneElement
-	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
-		createSceneryObject(armName, "Geometry/forearm.osgb");
-	Matrix33d rotationMatrix = makeRotationMatrix(M_PI_4, Vector3d(0.0, 1.0, 0.0));
-	sceneryRepresentation->setInitialPose(makeRigidTransform(rotationMatrix, pose.translation()));
+	graphicalCollisionRepresentation->setInitialPose(alignedPose);
 
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>("ArmSceneElement");
 	armSceneElement->addComponent(sceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 	armSceneElement->addComponent(graphicalCollisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
-	armSceneElement->addComponent(transferPhysicsPoseToGraphics);
 
 	return armSceneElement;
 }
@@ -233,9 +231,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
-
-	Matrix33d rotationMatrix = makeRotationMatrix(M_PI_2, Vector3d(0.0, 0.0, 1.0));
-	scene->addSceneElement(createArm("arm", makeRigidTransform(rotationMatrix, Vector3d(0.0, -0.2, 0.0))));
+	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0))));
 	scene->addSceneElement(createStapler("stapler", deviceName));
 
 	runtime->execute();
