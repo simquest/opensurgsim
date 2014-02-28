@@ -300,7 +300,7 @@ void PlyReader::parseFile()
 		}
 		free(properties);
 	}
-	
+
 	if (m_endParseFileCallback != nullptr)
 	{
 		m_endParseFileCallback();

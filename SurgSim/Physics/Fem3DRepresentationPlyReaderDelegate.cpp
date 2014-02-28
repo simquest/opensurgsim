@@ -27,7 +27,7 @@ namespace Physics
 {
 
 Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate()
-	: vertexIterator(nullptr), m_fem(nullptr), m_state(nullptr), m_hasBoundaryConditions(false)
+	: vertexIterator(nullptr), m_hasBoundaryConditions(false)
 {
 
 }
@@ -151,7 +151,8 @@ void Fem3DRepresentationPlyReaderDelegate::endTetrahedrons(const std::string& el
 {
 }
 
-void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName, size_t faceCount)
+void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
+																	size_t boundaryConditionCount)
 {
 	return &m_boundaryConditionData;
 }

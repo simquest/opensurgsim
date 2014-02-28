@@ -17,7 +17,6 @@
 #define SURGSIM_PHYSICS_FEM3DREPRESENTATIONPLYREADERDELEGATE_H
 
 #include <array>
-#include <vector>
 #include <memory>
 
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
