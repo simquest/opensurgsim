@@ -24,16 +24,16 @@
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/OsgBoxRepresentation.h"
 #include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
+#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Math/BoxShape.h"
 #include "SurgSim/Math/CapsuleShape.h"
+#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -49,18 +49,18 @@ using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::BoxRepresentation;
 using SurgSim::Graphics::CapsuleRepresentation;
 using SurgSim::Graphics::SceneryRepresentation;
+using SurgSim::Graphics::SphereRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Graphics::OsgBoxRepresentation;
 using SurgSim::Graphics::OsgCapsuleRepresentation;
+using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Math::BoxShape;
 using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::SphereShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
@@ -100,15 +100,16 @@ std::shared_ptr<ViewElement> createView()
 
 std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, const std::string& deviceName)
 {
-	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the stapler.
-	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.1, 0.02); // Unit: meter
+	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler's tip.
+	std::shared_ptr<SphereShape> sphereShape = std::make_shared<SphereShape>(0.02); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
-	params.setShapeUsedForMassInertia(capsuleShape);
+	params.setShapeUsedForMassInertia(sphereShape);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(staplerName + "Physics");
 	physicsRepresentation->setInitialParameters(params);
+	physicsRepresentation->setIsGravityEnabled(false);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(staplerName + "Collision");
@@ -123,7 +124,7 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 	inputVTC->setAngularDamping(params.getMass() * 10e-2);
 	inputVTC->setAngularStiffness(params.getMass() * 50.0);
 	inputVTC->setLinearDamping(params.getMass() * 10.0);
-	inputVTC->setLinearStiffness(params.getMass() * 200.0);
+	inputVTC->setLinearStiffness(params.getMass() * 800.0);
 
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
@@ -139,10 +140,9 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 	staplerBehavior->setGraphicsRepresentations(sceneryRepresentations);
 
 	// Visualization of the collision representation.
-	std::shared_ptr<CapsuleRepresentation> graphicalCollisionRepresentation =
-		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
-	graphicalCollisionRepresentation->setHeight(capsuleShape->getLength());
-	graphicalCollisionRepresentation->setRadius(capsuleShape->getRadius());
+	std::shared_ptr<SphereRepresentation> graphicalCollisionRepresentation =
+		std::make_shared<OsgSphereRepresentation>("sphere representation");
+	graphicalCollisionRepresentation->setRadius(sphereShape->getRadius());
 
 	// Connect physical representation to graphical representation.
 	std::shared_ptr<TransferPoseBehavior> transferPhysicsPoseToGraphics =
@@ -169,11 +169,11 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 }
 std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidTransform3d& pose)
 {
-	// Since there is no collision mesh loader yet, use a box shape as the collision representation of the arm.
-	std::shared_ptr<BoxShape> boxShape = std::make_shared<BoxShape>(0.335, 0.03, 0.05); // Unit: meter
+	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the arm.
+	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.335, 0.03); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
-	params.setShapeUsedForMassInertia(boxShape);
+	params.setShapeUsedForMassInertia(capsuleShape);
 
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(armName + "Physics");
@@ -184,9 +184,10 @@ std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidT
 		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	std::shared_ptr<BoxRepresentation> graphicalCollisionRepresentation =
-		std::make_shared<OsgBoxRepresentation>("box representation");
-	graphicalCollisionRepresentation->setSize(boxShape->getSize()); // Unit: meter
+	std::shared_ptr<CapsuleRepresentation> graphicalCollisionRepresentation =
+		std::make_shared<OsgCapsuleRepresentation>("capsule representation");
+	graphicalCollisionRepresentation->setHeight(capsuleShape->getLength()); // Unit: meter
+	graphicalCollisionRepresentation->setRadius(capsuleShape->getRadius()); // Unit: meter
 	graphicalCollisionRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<TransferPoseBehavior> transferPhysicsPoseToGraphics =
@@ -232,7 +233,9 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
-	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0))));
+
+	Matrix33d rotationMatrix = makeRotationMatrix(M_PI_2, Vector3d(0.0, 0.0, 1.0));
+	scene->addSceneElement(createArm("arm", makeRigidTransform(rotationMatrix, Vector3d(0.0, -0.2, 0.0))));
 	scene->addSceneElement(createStapler("stapler", deviceName));
 
 	runtime->execute();
