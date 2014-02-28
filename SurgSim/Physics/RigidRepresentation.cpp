@@ -17,7 +17,7 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Collision/Location.h"
-#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -56,6 +56,8 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 
 void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
+	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), SEVERE) <<
+		"RigidRepresentation::setPose does nothing.";
 }
 
 void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
@@ -348,6 +350,16 @@ bool RigidRepresentation::doInitialize()
 		"Cannot use a shape with zero volume for RigidRepresentations";
 
 	return true;
+}
+
+void RigidRepresentation::setLinearVelocity(const SurgSim::Math::Vector3d& linearVelocity)
+{
+	m_currentState.setLinearVelocity(linearVelocity);
+}
+
+void RigidRepresentation::setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity)
+{
+	m_currentState.setAngularVelocity(angularVelocity);
 }
 
 }; /// Physics
