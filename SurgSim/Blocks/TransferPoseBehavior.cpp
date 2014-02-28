@@ -51,22 +51,27 @@ bool TransferPoseBehavior::doInitialize()
 
 bool TransferPoseBehavior::doWakeUp()
 {
+	bool result = true;
 	if (m_to == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "TransferPoseBehavior named '" +
 			getName() + "' must have a receiver to do anything.";
-		return false;
+		result = false;
 	}
 
 	if (m_from == nullptr)
 	{
 		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "TransferPoseBehavior named '" +
 			getName() + "' must have a sender to do anything.";
-		return false;
+		result = false;
 	}
 	
-	m_to->setInitialPose(m_from->getInitialPose());
-	return true;
+	if (result)
+	{
+		m_to->setInitialPose(m_from->getInitialPose());
+	}
+
+	return result;
 }
 
 }; //namespace Blocks
