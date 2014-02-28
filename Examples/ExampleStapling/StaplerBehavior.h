@@ -16,7 +16,6 @@
 #ifndef EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 #define EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 
-#include <list>
 #include <memory>
 #include <string>
 
@@ -60,11 +59,6 @@ public:
 	/// \param	staplerRepresentation The representation of a stapler
 	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation);
 
-	/// Set the graphics representations of the stapler
-	/// \param	graphicsRepresentations The graphics representations of a stapler
-	void setGraphicsRepresentations(
-		std::list<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> graphicsRepresentations);
-
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
 	virtual void update(double dt) override;
@@ -89,10 +83,7 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
 
 	/// The collision representation of a stapler.
-	std::shared_ptr<SurgSim::Collision::Representation> m_staplerRepresentation;
-
-	/// A list of graphics representations of a stapler.
-	std::list<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> m_graphicsRepresentations;
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
 	/// The number of staples added
 	int m_numElements;

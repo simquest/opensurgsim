@@ -17,7 +17,6 @@
 
 #include "Examples/ExampleStapling/StapleElement.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
-
 #include "SurgSim/Collision/Representation.h"
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Framework/Scene.h"
@@ -39,13 +38,7 @@ void StaplerBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputCom
 void StaplerBehavior::setCollisionRepresentation(
 	 std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation)
 {
-	m_staplerRepresentation = staplerRepresentation;
-}
-
-void StaplerBehavior::setGraphicsRepresentations(
-	std::list<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> graphicsRepresentations)
-{
-	m_graphicsRepresentations = graphicsRepresentations;
+	m_collisionRepresentation = staplerRepresentation;
 }
 
 void StaplerBehavior::update(double dt)
@@ -56,11 +49,6 @@ void StaplerBehavior::update(double dt)
 	SurgSim::Math::RigidTransform3d pose;
 	if (dataGroup.poses().get("pose", &pose))
 	{
-		for (auto it = std::begin(m_graphicsRepresentations); it != std::end(m_graphicsRepresentations); ++it)
-		{
-			(*it)->setPose(pose);
-		}
-
 		// Add staple to the scene from input
 		bool button1 = false;
 		dataGroup.booleans().get("button1", &button1);
@@ -82,11 +70,11 @@ void StaplerBehavior::update(double dt)
 	}
 
 	// Printout collision information if there is any.
-	if (m_staplerRepresentation->hasCollision())
+	if (m_collisionRepresentation->hasCollision())
 	{
 		std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 			std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisionsMap =
-			m_staplerRepresentation->getCollisions();
+			m_collisionRepresentation->getCollisions();
 		for (auto i = std::begin(collisionsMap); i != std::end(collisionsMap); ++i)
 		{
 			std::cout << "Stapler has collision with " << (*i).first->getName() << std::endl;
