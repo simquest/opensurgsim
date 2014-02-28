@@ -30,6 +30,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableRepresentationState.cpp
 	Fem1DRepresentation.cpp
 	Fem3DRepresentation.cpp
+	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
 	FemElement.cpp
 	FemElement1DBeam.cpp
@@ -75,6 +76,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentationState.h
 	Fem1DRepresentation.h
 	Fem3DRepresentation.h
+	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	FemElement.h
 	FemElement1DBeam.h

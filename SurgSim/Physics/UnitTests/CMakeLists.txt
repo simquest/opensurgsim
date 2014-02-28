@@ -27,6 +27,7 @@ set(UNIT_TEST_SOURCES
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
 	Fem1DRepresentationTests.cpp
+	Fem3DRepresentationContactTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElement1DBeamTests.cpp
 	FemElement3DCubeTests.cpp
