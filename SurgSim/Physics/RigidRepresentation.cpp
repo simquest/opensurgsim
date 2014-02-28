@@ -242,7 +242,7 @@ void RigidRepresentation::applyCorrection(
 
 	const Vector3d& delta_dG = deltaVelocity.segment(0,3);
 	const Vector3d& delta_w  = deltaVelocity.segment(3,3);
-	Quaterniond delta_dq = Quaterniond(delta_w[0],delta_w[1],delta_w[2],0.0) * q;
+	Quaterniond delta_dq = Quaterniond(0.0, delta_w[0], delta_w[1], delta_w[2]) * q;
 	delta_dq.coeffs() *= 0.5;
 
 	dG += delta_dG;
