@@ -127,43 +127,34 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 	inputVTC->setLinearDamping(params.getMass() * 10.0);
 	inputVTC->setLinearStiffness(params.getMass() * 800.0);
 
+	// A stapler behavior controls the release of stale when a button is pushed on the device.
+	// Also, it is aware of collisions of the stapler.
+	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>(staplerName + "Behavior");
+	staplerBehavior->setInputComponent(inputComponent);
+	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
+
+	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
+	sceneElement->addComponent(physicsRepresentation);
+	sceneElement->addComponent(collisionRepresentation);
+	sceneElement->addComponent(inputComponent);
+	sceneElement->addComponent(inputVTC);
+	sceneElement->addComponent(staplerBehavior);
+
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
 	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Handle",    "Geometry/stapler_handle.obj"));
 	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Indicator", "Geometry/stapler_indicator.obj"));
 	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Markings",  "Geometry/stapler_markings.obj"));
 	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Trigger",   "Geometry/stapler_trigger.obj"));
-	// A stapler behavior controls the release of stale when a button is pushed on the device.
-	// Also, it is aware of collisions of the stapler.
-	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>(staplerName + "Behavior");
-	staplerBehavior->setInputComponent(inputComponent);
-	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
-	staplerBehavior->setGraphicsRepresentations(sceneryRepresentations);
-
-	// Visualization of the collision representation.
-	std::shared_ptr<SphereRepresentation> graphicalCollisionRepresentation =
-		std::make_shared<OsgSphereRepresentation>("sphere representation");
-	graphicalCollisionRepresentation->setRadius(sphereShape->getRadius());
-
-	// Connect physical representation to graphical representation.
-	std::shared_ptr<TransferPoseBehavior> transferPhysicsPoseToGraphics =
-		std::make_shared<TransferPoseBehavior>(staplerName + "Physics to Graphics");
-	transferPhysicsPoseToGraphics->setPoseSender(physicsRepresentation);
-	transferPhysicsPoseToGraphics->setPoseReceiver(graphicalCollisionRepresentation);
-
-	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
-	sceneElement->addComponent(physicsRepresentation);
-	sceneElement->addComponent(collisionRepresentation);
-	sceneElement->addComponent(graphicalCollisionRepresentation);
-	sceneElement->addComponent(inputComponent);
-	sceneElement->addComponent(inputVTC);
-	sceneElement->addComponent(staplerBehavior);
-	sceneElement->addComponent(transferPhysicsPoseToGraphics);
-
-	// Add all stapler graphical parts into SceneElement.
 	for (auto it = std::begin(sceneryRepresentations); it != std::end(sceneryRepresentations); ++it)
 	{
+		std::shared_ptr<TransferPoseBehavior> transferPhysicsPoseToGraphics =
+			std::make_shared<TransferPoseBehavior>("Physics to Graphics" + (*it)->getName());
+		transferPhysicsPoseToGraphics->setPoseSender(physicsRepresentation);
+		transferPhysicsPoseToGraphics->setPoseReceiver(*it);
+
 		sceneElement->addComponent(*it);
+		sceneElement->addComponent(transferPhysicsPoseToGraphics);
 	}
 
 	return sceneElement;
