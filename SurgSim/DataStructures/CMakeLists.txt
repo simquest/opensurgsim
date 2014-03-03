@@ -30,6 +30,7 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	DataGroup.h
 	DataGroup-inl.h
 	DataGroupBuilder.h
+	EmptyData.h
 	IndexDirectory.h
 	MeshElement.h
 	NamedData.h

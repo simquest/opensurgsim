@@ -22,9 +22,13 @@
 #define SURGSIM_MATH_MESHSHAPE_H
 
 #include "SurgSim/Math/Shape.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 
 #include "SurgSim/Framework/Convert.h"
+
+
+using SurgSim::DataStructures::EmptyData;
 
 namespace SurgSim
 {
@@ -39,15 +43,7 @@ namespace Math
 class MeshShape : public Shape
 {
 public:
-	// EmptyData class used for the TriangleMesh.
-	class EmptyData
-	{
-	public:
-		bool operator==(const EmptyData& vertex) const
-		{
-			return true;
-		}
-	};
+
 	/// Type TriMesh for convenience
 	typedef SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, EmptyData> TriMesh;
 
