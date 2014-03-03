@@ -19,6 +19,7 @@
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -44,6 +45,7 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
@@ -215,9 +217,15 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 	runtime->addManager(physicsManager);
 
-	std::shared_ptr<DeviceInterface> device = std::make_shared<MultiAxisDevice>(deviceName);
-	SURGSIM_ASSERT(device->initialize() == true) <<
-		"Could not initialize device " << device->getName() << " for the tool.\n";
+	std::shared_ptr<DeviceInterface> device;
+	device = std::make_shared<MultiAxisDevice>(deviceName);
+	if (!device->initialize())
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Could not initialize device " << device->getName() << " for the tool.";
+
+		device = std::make_shared<IdentityPoseDevice>(deviceName);
+	}
 	inputManager->addDevice(device);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
