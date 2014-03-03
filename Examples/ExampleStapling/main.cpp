@@ -18,15 +18,24 @@
 #include <string>
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/DataStructures/MeshElement.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
@@ -36,6 +45,8 @@
 #include "SurgSim/Math/CapsuleShape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -78,6 +89,141 @@ using SurgSim::Physics::RigidRepresentationParameters;
 using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
+
+static std::string findFile(std::string fileName)
+{
+	// Helper function for locating files in the correct folder.
+	std::vector<std::string> paths;
+	paths.push_back("Data/Geometry");
+	SurgSim::Framework::ApplicationData data(paths);
+
+	return data.findFile(fileName);
+}
+
+static std::shared_ptr<SurgSim::Graphics::Mesh> graphicsMeshFromTriMesh(
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh<void, void, void>> mesh)
+{
+	std::shared_ptr<SurgSim::Graphics::Mesh> result = std::make_shared<SurgSim::Graphics::Mesh>();
+
+	// Graphics::Mesh requires specific parameters for initialization
+	std::vector<SurgSim::Math::Vector4d> emptyColors;
+	std::vector<SurgSim::Math::Vector2d> emptyTextures;
+	std::vector<SurgSim::Math::Vector3d> vertices;
+	std::vector<unsigned int> triangles;
+
+	typedef std::vector<SurgSim::DataStructures::Vertex<void>>::iterator VertexIterator;
+	for (VertexIterator it = std::begin(mesh->getVertices()); it != std::end(mesh->getVertices()); ++it)
+	{
+		vertices.emplace_back(it->position);
+	}
+
+	typedef std::vector<SurgSim::DataStructures::MeshElement<3u, void>>::iterator TriangleIterator;
+	for (TriangleIterator it = std::begin(mesh->getTriangles()); it != std::end(mesh->getTriangles()); ++it)
+	{
+		triangles.push_back(it->verticesId[0]);
+		triangles.push_back(it->verticesId[1]);
+		triangles.push_back(it->verticesId[2]);
+	}
+
+	result->initialize(vertices, emptyColors, emptyTextures, triangles);
+
+	return result;
+}
+
+static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
+{
+	std::string fileFullName = findFile(fileName);
+
+	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
+	SurgSim::DataStructures::PlyReader reader(fileFullName);
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate> triangleMeshDelegate
+		= std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
+
+	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileFullName << " is malformed.";
+	reader.parseFile();
+
+	// graphicsMeshFromTriMesh transforms mesh types
+	return graphicsMeshFromTriMesh(triangleMeshDelegate->getMesh());
+}
+
+static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
+	const std::string& fileName,
+	SurgSim::Math::IntegrationScheme integrationScheme,
+	double massDensity,
+	double poissonRatio,
+	double youngModulus)
+{
+	std::string fileFullName = findFile(fileName);
+
+	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
+	SurgSim::DataStructures::PlyReader reader(fileFullName);
+	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
+		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
+
+	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileFullName << " is malformed.";
+	reader.parseFile();
+
+	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
+
+	// The FEM requires the implicit euler integration scheme to avoid "blowing up"
+	fem->setIntegrationScheme(integrationScheme);
+
+	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
+	for (size_t i = 0; i < fem->getNumFemElements(); i++)
+	{
+		fem->getFemElement(i)->setMassDensity(massDensity);
+		fem->getFemElement(i)->setPoissonRatio(poissonRatio);
+		fem->getFemElement(i)->setYoungModulus(youngModulus);
+	}
+
+	return fem;
+}
+
+static std::shared_ptr<SurgSim::Framework::SceneElement> createFemWound(const std::string& name, bool displayPointCloud)
+{
+	// Create a SceneElement that bundles the pieces associated with the finite element model
+	std::shared_ptr<SurgSim::Framework::SceneElement> woundSceneElement
+		= std::make_shared<SurgSim::Blocks::BasicSceneElement>(name);
+
+	// Load the tetrahedral mesh and initialize the finite element model
+	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
+		= loadFem("DeformableArmWound.ply", SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, 1000.0, 0.45, 500000.0);
+	woundSceneElement->addComponent(physicsRepresentation);
+
+	// Create a triangle mesh for visualizing the surface of the finite element model
+	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
+		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
+	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh("DeformableArmWoundSurfaceFromInitialMesh.ply");
+	woundSceneElement->addComponent(graphicsTriangleMeshRepresentation);
+
+	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
+	woundSceneElement->addComponent(
+		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+			name + " physics to triangle mesh",
+			physicsRepresentation->getFinalState(),
+			graphicsTriangleMeshRepresentation->getMesh()));
+
+	if (displayPointCloud)
+	{
+		// Create a point-cloud for visualizing the nodes of the finite element model
+		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> graphicsPointCloudRepresentation
+			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>(name + " point cloud");
+		graphicsPointCloudRepresentation->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
+		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
+		graphicsPointCloudRepresentation->setPointSize(3.0f);
+		graphicsPointCloudRepresentation->setVisible(true);
+		woundSceneElement->addComponent(graphicsPointCloudRepresentation);
+
+		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
+		woundSceneElement->addComponent(
+			std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<void>>(
+				name + " physics to point cloud",
+				physicsRepresentation->getFinalState(),
+				graphicsPointCloudRepresentation->getVertices()));
+	}
+
+	return woundSceneElement;
+}
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
@@ -230,8 +376,9 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
-	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0))));
+	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
 	scene->addSceneElement(createStapler("stapler", deviceName));
+	scene->addSceneElement(createFemWound("wound", true));
 
 	runtime->execute();
 
