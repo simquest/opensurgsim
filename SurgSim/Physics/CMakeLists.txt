@@ -32,6 +32,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DRepresentation.cpp
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
+	Fem3DRepresentationPlyReaderDelegate.cpp
 	FemElement.cpp
 	FemElement1DBeam.cpp
 	FemElement3DCube.cpp
@@ -78,6 +79,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentation.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
+	Fem3DRepresentationPlyReaderDelegate.h
 	FemElement.h
 	FemElement1DBeam.h
 	FemElement3DCube.h

@@ -123,6 +123,16 @@ bool PlyReader::requestListProperty(std::string elementName,
 	return requestProperty(elementName, propertyName, dataType, dataOffset, countType, countOffset);
 }
 
+void PlyReader::setStartParseFileCallback(std::function<void (void)> startParseFileCallback)
+{
+	m_startParseFileCallback = startParseFileCallback;
+}
+
+void PlyReader::setEndParseFileCallback(std::function<void (void)> endParseFileCallback)
+{
+	m_endParseFileCallback = endParseFileCallback;
+}
+
 bool PlyReader::requestProperty(std::string elementName,
 								std::string propertyName,
 								int dataType, int dataOffset,
@@ -196,6 +206,11 @@ bool PlyReader::setDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
 void PlyReader::parseFile()
 {
 	SURGSIM_ASSERT(isValid()) << "Cannot parse invalid file.";
+
+	if (m_startParseFileCallback != nullptr)
+	{
+		m_startParseFileCallback();
+	}
 
 	char* currentElementName;
 	for (int elementIndex = 0; elementIndex < m_data->elementCount; ++elementIndex)
@@ -284,6 +299,11 @@ void PlyReader::parseFile()
 			free(properties[i]);
 		}
 		free(properties);
+	}
+
+	if (m_endParseFileCallback != nullptr)
+	{
+		m_endParseFileCallback();
 	}
 }
 
