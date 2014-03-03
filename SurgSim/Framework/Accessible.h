@@ -46,21 +46,31 @@ public:
 	typedef std::function<void(const YAML::Node*)> DecoderType;
 
 	/// Retrieves the value with the name by executing the getter if it is found.
+	/// \throws SurgSim::Framework::AssertionFailure if the property cannot be found
 	/// \param	name	The name of the property.
-	/// \return	The value of the property if the getter was found, a default constructed boost::any
-	/// 		if it was not found.
-	boost::any getValue(const std::string& name);
+	/// \return	The value of the property if the getter was found
+	boost::any getValue(const std::string& name) const;
+
+	/// Retrieves the value with the name by executing the getter if it is found and tries to convert
+	/// it to the given type.
+	/// \throws SurgSim::Framework::AssertionFailure If the conversion fails or the property cannot be found.
+	/// \tparam T The requested type for the property.
+	/// \param	name	The name of the property.
+	/// \return	The value of the property if the getter was found
+	template <class T>
+	T getValue(const std::string& name) const;
 
 	/// Retrieves the value with the name by executing the getter if it is found, and converts it to
-	/// the type of the output parameter.
+	/// the type of the output parameter. This does not throw.
 	/// \tparam T	the type of the property, usually can be deduced automatically
 	/// \param	name	The name of the property.
 	/// \param [out]	value	If non-null, will receive the value of the given property.
 	/// \return	true if value != nullptr and the getter can be found.
 	template <class T>
-	bool getValue(const std::string& name, T* value);
+	bool getValue(const std::string& name, T* value) const;
 
 	/// Sets a value of a property that has setter.
+	/// \throws SurgSim::Framework::AssertionFailure If the property cannot be found.
 	/// \param	name 	The name of the property.
 	/// \param	value	The value that it should be set to.
 	void setValue(const std::string& name, const boost::any& value);
@@ -70,22 +80,25 @@ public:
 	/// \return true if the property exists and has a getter
 	bool isReadable(const std::string& name) const;
 
-	/// Check whether a property is writeable
+	/// Check whether a property is writable
 	/// \param name Name of the property to be checked.
 	/// \return true if the property exists and has a setter
 	bool isWriteable(const std::string& name) const;
 
 	/// Sets a getter for a given property.
+	/// \throws SurgSim::Framework::AssertionFailure if func is a nullptr.
 	/// \param	name	The name of the property.
 	/// \param	func	The getter function.
 	void setGetter(const std::string& name, GetterType func);
 
 	/// Sets a setter for a given property.
+	/// \throws SurgSim::Framework::AssertionFailure if func is a nullptr.
 	/// \param	name	The name of the property.
 	/// \param	func	The setter function.
 	void setSetter(const std::string& name, SetterType func);
 
 	/// Sets the accessors getter and setter in one function.
+	/// \throws SurgSim::Framework::AssertionFailure if either getter or setter is a nullptr.
 	/// \param	name  	The name of the property.
 	/// \param	getter	The getter.
 	/// \param	setter	The setter.
@@ -105,6 +118,7 @@ public:
 
 	/// Decode this Accessible from a YAML::Node, will throw an exception if the data type cannot
 	/// be converted.
+	/// \throws SurgSim::Framework::AssertionFailure if node is not of YAML::NodeType::Map.
 	/// \param node The node that carries the data to be, properties with names that don't
 	///             match up with properties in the Accessible are ignored
 	void decode(const YAML::Node& node);

@@ -132,17 +132,17 @@ TEST_F(OsgCameraRenderTests, PassTest)
 	viewElement->addComponent(quad);
 
 	Quaterniond quat = Quaterniond::Identity();
-	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0,0.0,-0.2));
+	RigidTransform3d startPose = SurgSim::Math::makeRigidTransform(quat,Vector3d(0.0, 0.0, -0.2));
 	quat = SurgSim::Math::makeRotationQuaternion<double,Eigen::DontAlign>(M_PI,Vector3d::UnitY());
-	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0,0.0,-0.2));
+	RigidTransform3d endPose = SurgSim::Math::makeRigidTransform(quat, Vector3d(0.0, 0.0, -0.2));
 
 	auto boxRepresentation1 = std::make_shared<OsgBoxRepresentation>("Box Representation");
-	boxRepresentation1->setSize(0.05,0.05,0.05);
+	boxRepresentation1->setSizeXYZ(0.05, 0.05, 0.05);
 	boxRepresentation1->setPose(startPose);
 	renderPass->getGroup()->add(boxRepresentation1);
 
 	auto boxRepresentation = std::make_shared<OsgBoxRepresentation>("Box Representation");
-	boxRepresentation->setSize(0.05,0.05,0.05);
+	boxRepresentation->setSizeXYZ(0.05, 0.05, 0.05);
 	boxRepresentation->setMaterial(material1);
 	viewElement->addComponent(boxRepresentation);
 

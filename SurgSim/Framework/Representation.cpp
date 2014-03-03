@@ -14,10 +14,13 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/Representation.h"
+#include "SurgSim/Math/MathConvert.h"
 
 SurgSim::Framework::Representation::Representation(const std::string& m_name) : Component(m_name)
 {
-	SURGSIM_ADD_RW_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, pose, getPose, setPose);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d, Pose, getPose, setPose);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, SurgSim::Math::RigidTransform3d,
+									  InitialPose, getInitialPose, setInitialPose);
 }
 
 SurgSim::Framework::Representation::~Representation()

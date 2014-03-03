@@ -17,7 +17,7 @@
 #include "SurgSim/Physics/RigidRepresentation.h"
 
 #include "SurgSim/Collision/Location.h"
-#include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -26,6 +26,7 @@
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 using SurgSim::Collision::Location;
+using SurgSim::Math::Matrix66d;
 
 namespace SurgSim
 {
@@ -55,6 +56,8 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 
 void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
+	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), SEVERE) <<
+		"RigidRepresentation::setPose does nothing.";
 }
 
 void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
@@ -239,7 +242,7 @@ void RigidRepresentation::applyCorrection(
 
 	const Vector3d& delta_dG = deltaVelocity.segment(0,3);
 	const Vector3d& delta_w  = deltaVelocity.segment(3,3);
-	Quaterniond delta_dq = Quaterniond(delta_w[0],delta_w[1],delta_w[2],0.0) * q;
+	Quaterniond delta_dq = Quaterniond(0.0, delta_w[0], delta_w[1], delta_w[2]) * q;
 	delta_dq.coeffs() *= 0.5;
 
 	dG += delta_dG;
@@ -347,6 +350,16 @@ bool RigidRepresentation::doInitialize()
 		"Cannot use a shape with zero volume for RigidRepresentations";
 
 	return true;
+}
+
+void RigidRepresentation::setLinearVelocity(const SurgSim::Math::Vector3d& linearVelocity)
+{
+	m_currentState.setLinearVelocity(linearVelocity);
+}
+
+void RigidRepresentation::setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity)
+{
+	m_currentState.setAngularVelocity(angularVelocity);
 }
 
 }; /// Physics

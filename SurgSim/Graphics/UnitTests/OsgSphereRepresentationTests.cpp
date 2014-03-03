@@ -22,6 +22,7 @@
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 #include <gtest/gtest.h>
 
@@ -47,6 +48,27 @@ TEST(OsgSphereRepresentationTests, InitTest)
 
 	std::shared_ptr<Representation> representation = std::make_shared<OsgSphereRepresentation>("test name");
 	EXPECT_EQ("test name", representation->getName());
+}
+
+TEST(OsgSphereRepresentationTests, AccessibleTest)
+{
+	std::shared_ptr<SurgSim::Framework::Component> component;
+	ASSERT_NO_THROW(component = SurgSim::Framework::Component::getFactory().create(
+									"SurgSim::Graphics::OsgSphereRepresentation",
+									"sphere"));
+
+	EXPECT_EQ("SurgSim::Graphics::OsgSphereRepresentation", component->getClassName());
+
+	double radius = 4.321;
+
+	component->setValue("Radius", radius);
+	YAML::Node node(YAML::convert<SurgSim::Framework::Component>::encode(*component));
+
+	auto decoded = std::dynamic_pointer_cast<SurgSim::Graphics::OsgSphereRepresentation>(
+					   node.as<std::shared_ptr<SurgSim::Framework::Component>>());
+
+	EXPECT_NE(nullptr, decoded);
+	EXPECT_DOUBLE_EQ(radius, decoded->getValue<double>("Radius"));
 }
 
 TEST(OsgSphereRepresentationTests, OsgNodeTest)
@@ -159,7 +181,7 @@ TEST(OsgSphereRepresentationTests, MaterialTest)
 		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_EQ(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should be the material's state set!";
+				"State set should be the material's state set!";
 	}
 
 	{
@@ -171,7 +193,7 @@ TEST(OsgSphereRepresentationTests, MaterialTest)
 		ASSERT_NE(nullptr, switchNode) << "Could not get OSG switch node!";
 		ASSERT_EQ(1u, switchNode->getNumChildren()) << "OSG switch node should have 1 child, the transform node!";
 		EXPECT_NE(osgMaterial->getOsgStateSet(), switchNode->getChild(0)->getStateSet()) <<
-			"State set should have been cleared!";
+				"State set should have been cleared!";
 	}
 }
 

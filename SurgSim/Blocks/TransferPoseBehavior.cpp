@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Blocks/TransferPoseBehavior.h"
 
 #include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
-
-#include "SurgSim/Blocks/TransferPoseBehavior.h"
 
 namespace SurgSim
 {
@@ -51,8 +51,27 @@ bool TransferPoseBehavior::doInitialize()
 
 bool TransferPoseBehavior::doWakeUp()
 {
-	m_to->setInitialPose(m_from->getInitialPose());
-	return true;
+	bool result = true;
+	if (m_to == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "TransferPoseBehavior named '" +
+			getName() + "' must have a receiver to do anything.";
+		result = false;
+	}
+
+	if (m_from == nullptr)
+	{
+		SURGSIM_LOG_SEVERE(SurgSim::Framework::Logger::getDefaultLogger()) << "TransferPoseBehavior named '" +
+			getName() + "' must have a sender to do anything.";
+		result = false;
+	}
+	
+	if (result)
+	{
+		m_to->setInitialPose(m_from->getInitialPose());
+	}
+
+	return result;
 }
 
 }; //namespace Blocks

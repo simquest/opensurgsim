@@ -214,7 +214,7 @@ public:
 
 	void setSize(double width, double height, double length)
 	{
-		m_box->setSize(width, height, length);
+		m_box->setSizeXYZ(width, height, length);
 	}
 
 	void setPose(const RigidTransform3d& pose)

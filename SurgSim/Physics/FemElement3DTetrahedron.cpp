@@ -47,25 +47,29 @@ namespace SurgSim
 namespace Physics
 {
 
-FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds,
-												 const DeformableRepresentationState& restState)
+FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nodeIds)
 {
-	using SurgSim::Framework::Logger;
-
 	setNumDofPerNode(3); // 3 dof per node (x, y, z)
 
-	for (auto nodeId = nodeIds.cbegin(); nodeId != nodeIds.cend(); nodeId++)
+	m_nodeIds.assign(std::begin(nodeIds), std::end(nodeIds));
+}
+
+void FemElement3DTetrahedron::initialize(const DeformableRepresentationState& state)
+{
+	// Test the validity of the physical parameters
+	FemElement::initialize(state);
+
+	for (auto nodeId = m_nodeIds.cbegin(); nodeId != m_nodeIds.cend(); nodeId++)
 	{
-		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < restState.getNumNodes()) <<
-			"Invalid nodeId " << *nodeId << " expected in range [0.."<< restState.getNumNodes()-1<<"]";
-		m_nodeIds.push_back(*nodeId);
+		SURGSIM_ASSERT(*nodeId >= 0 && *nodeId < state.getNumNodes())
+			<< "Invalid nodeId " << *nodeId << " expected in range [0.." << state.getNumNodes() - 1 << "]";
 	}
 
 	// Compute the fem tetrahedron shape functions Ni(x,y,z) = 1/6V ( ai + x.bi + y.ci + z.di )
-	computeShapeFunctions(restState);
+	computeShapeFunctions(state);
 
 	// Store the rest state for this tetrahedron in m_x0
-	getSubVector(restState.getPositions(), m_nodeIds, 3, &m_x0);
+	getSubVector(state.getPositions(), m_nodeIds, 3, &m_x0);
 
 	// Verify the Counter clock-wise condition
 	auto A = getSubVector(m_x0, 0, 3);
@@ -75,15 +79,9 @@ FemElement3DTetrahedron::FemElement3DTetrahedron(std::array<unsigned int, 4> nod
 	SurgSim::Math::Vector3d AB = B - A;
 	SurgSim::Math::Vector3d AC = C - A;
 	SurgSim::Math::Vector3d AD = D - A;
-	SURGSIM_LOG_IF(AB.cross(AC).dot(AD) < 0, Logger::getDefaultLogger(), WARNING) <<
-		"Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids["<<
-		m_nodeIds[0]<<", "<<m_nodeIds[1]<<", "<<m_nodeIds[2]<<", "<<m_nodeIds[3]<<"]";
-}
-
-void FemElement3DTetrahedron::initialize(const DeformableRepresentationState& state)
-{
-	// Test the validity of the physical parameters
-	FemElement::initialize(state);
+	SURGSIM_LOG_IF(AB.cross(AC).dot(AD) < 0, SurgSim::Framework::Logger::getDefaultLogger(), WARNING)
+		<< "Tetrahedron ill-defined (ABC defined counter clock viewed from D) with node ids[" << m_nodeIds[0] << ", "
+		<< m_nodeIds[1] << ", " << m_nodeIds[2] << ", " << m_nodeIds[3] << "]";
 
 	// Pre-compute the mass and stiffness matrix
 	computeMass(state, &m_M);

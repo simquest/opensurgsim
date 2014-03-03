@@ -17,6 +17,7 @@
 #define SURGSIM_GRAPHICS_BOXREPRESENTATION_H
 
 #include "SurgSim/Graphics/Representation.h"
+#include "SurgSim/Math/MathConvert.h"
 
 namespace SurgSim
 {
@@ -34,6 +35,10 @@ public:
 	/// \post	The box size is (1.0,1.0,1.0).
 	explicit BoxRepresentation(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(BoxRepresentation, SurgSim::Math::Vector3d, Size, getSize, setSize);
+		SURGSIM_ADD_RW_PROPERTY(BoxRepresentation, double, SizeX, getSizeX, setSizeX);
+		SURGSIM_ADD_RW_PROPERTY(BoxRepresentation, double, SizeY, getSizeY, setSizeY);
+		SURGSIM_ADD_RW_PROPERTY(BoxRepresentation, double, SizeZ, getSizeZ, setSizeZ);
 	}
 
 	/// Sets the size along X-axis of the box
@@ -61,16 +66,16 @@ public:
 	/// \param sizeX Size along X-axis of the box
 	/// \param sizeY Size along Y-axis of the box
 	/// \param sizeZ Size along Z-axis of the box
-	virtual void setSize(double sizeX, double sizeY, double sizeZ) = 0;
+	virtual void setSizeXYZ(double sizeX, double sizeY, double sizeZ) = 0;
 	/// Gets the size of the box
 	/// \param sizeX Reference to store the size along X-axis of the box
 	/// \param sizeY Reference to store the size along Y-axis of the box
 	/// \param sizeZ Reference to store the size along Z-axis of the box
-	virtual void getSize(double* sizeX, double* sizeY, double* sizeZ) = 0;
+	virtual void getSizeXYZ(double* sizeX, double* sizeY, double* sizeZ) const = 0;
 
 	/// Sets the size of the box
 	/// \param size Size of the box
-	virtual void setSize(SurgSim::Math::Vector3d size) = 0;
+	virtual void setSize(const SurgSim::Math::Vector3d& size) = 0;
 	/// Returns the radius of the sphere
 	/// \return Size of the box
 	virtual SurgSim::Math::Vector3d getSize() const = 0;

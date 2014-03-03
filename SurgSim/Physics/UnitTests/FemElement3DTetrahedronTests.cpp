@@ -48,8 +48,7 @@ const double epsilon = 1e-9;
 class MockFemElement3DTet : public FemElement3DTetrahedron
 {
 public:
-	MockFemElement3DTet(std::array<unsigned int, 4> nodeIds, const DeformableRepresentationState& restState) :
-		FemElement3DTetrahedron(nodeIds, restState)
+	MockFemElement3DTet(std::array<unsigned int, 4> nodeIds) : FemElement3DTetrahedron(nodeIds)
 	{
 	}
 
@@ -69,6 +68,17 @@ public:
 	const Eigen::Matrix<double, 12, 1, Eigen::DontAlign>& getInitialPosition() const
 	{
 		return m_x0;
+	}
+
+	void setupInitialParams(const DeformableRepresentationState &state,
+							double massDensity,
+							double poissonRatio,
+							double youngModulus)
+	{
+		setMassDensity(massDensity);
+		setPoissonRatio(poissonRatio);
+		setYoungModulus(youngModulus);
+		initialize(state);
 	}
 };
 
@@ -218,15 +228,15 @@ extern void testSize(const Matrix& m, int expectedRows, int expectedCols);
 
 TEST_F(FemElement3DTetrahedronTests, ConstructorTest)
 {
-	ASSERT_NO_THROW({MockFemElement3DTet tet(m_nodeIds, m_restState);});
-	ASSERT_NO_THROW({MockFemElement3DTet* tet = new MockFemElement3DTet(m_nodeIds, m_restState); delete tet;});
+	ASSERT_NO_THROW({MockFemElement3DTet tet(m_nodeIds);});
+	ASSERT_NO_THROW({MockFemElement3DTet* tet = new MockFemElement3DTet(m_nodeIds); delete tet;});
 	ASSERT_NO_THROW({std::shared_ptr<MockFemElement3DTet> tet =
-		std::make_shared<MockFemElement3DTet>(m_nodeIds, m_restState);});
+		std::make_shared<MockFemElement3DTet>(m_nodeIds);});
 }
 
 TEST_F(FemElement3DTetrahedronTests, NodeIdsTest)
 {
-	FemElement3DTetrahedron tet(m_nodeIds, m_restState);
+	FemElement3DTetrahedron tet(m_nodeIds);
 	EXPECT_EQ(4u, tet.getNumNodes());
 	EXPECT_EQ(4u, tet.getNodeIds().size());
 	for (int i = 0; i < 4; i++)
@@ -238,7 +248,9 @@ TEST_F(FemElement3DTetrahedronTests, NodeIdsTest)
 
 TEST_F(FemElement3DTetrahedronTests, VolumeTest)
 {
-	MockFemElement3DTet tet(m_nodeIds, m_restState);
+	MockFemElement3DTet tet(m_nodeIds);
+	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
+
 	EXPECT_NEAR(tet.getRestVolume(), m_expectedVolume, 1e-10);
 	EXPECT_NEAR(tet.getVolume(m_restState), m_expectedVolume, 1e-10);
 }
@@ -247,7 +259,8 @@ TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFemElement3DTet tet(m_nodeIds, m_restState);
+	MockFemElement3DTet tet(m_nodeIds);
+	tet.setupInitialParams(m_restState, m_rho, m_nu, m_E);
 
 	EXPECT_TRUE(tet.getInitialPosition().isApprox(m_expectedX0)) <<
 		"x0 = " << tet.getInitialPosition().transpose() << std::endl << "x0 expected = " << m_expectedX0.transpose();
@@ -327,7 +340,7 @@ TEST_F(FemElement3DTetrahedronTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::getSubVector;
 
-	MockFemElement3DTet tet(m_nodeIds, m_restState);
+	MockFemElement3DTet tet(m_nodeIds);
 
 	// Test the various mode of failure related to the physical parameters
 	// This has been already tested in FemElementTests, but this is to make sure this method is called properly

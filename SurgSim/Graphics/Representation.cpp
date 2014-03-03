@@ -22,5 +22,8 @@ using SurgSim::Graphics::Representation;
 
 Representation::Representation(const std::string& name) : SurgSim::Framework::Representation(name)
 {
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, bool, Visible, isVisible, setVisible);
+	SURGSIM_ADD_SERIALIZABLE_PROPERTY(Representation, std::vector<std::string>,
+									  GroupReferences, getGroupReferences, addGroupReferences);
 }
 

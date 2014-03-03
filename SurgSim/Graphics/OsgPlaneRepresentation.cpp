@@ -26,6 +26,11 @@
 using SurgSim::Graphics::OsgPlaneRepresentation;
 using SurgSim::Graphics::OsgPlane;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, SurgSim::Graphics::OsgPlaneRepresentation);
+}
+
 OsgPlaneRepresentation::OsgPlaneRepresentation(const std::string& name) :
 	Representation(name),
 	OsgRepresentation(name),

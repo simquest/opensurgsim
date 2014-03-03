@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
-#define EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
+#define EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 
 #include <memory>
 #include <string>
@@ -24,6 +24,16 @@
 namespace SurgSim
 {
 
+namespace Graphics
+{
+class SceneryRepresentation;
+}
+
+namespace Collision
+{
+class Representation;
+}
+
 namespace Input
 {
 class InputComponent;
@@ -31,16 +41,23 @@ class InputComponent;
 
 }
 
-class AddStapleFromInputBehavior: public SurgSim::Framework::Behavior
+/// This behavior is used to add staples.
+/// The stapler is controlled by an input device and when
+/// the user pushes a button on the device, a stapler will be deployed from the stapler.
+class StaplerBehavior: public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit AddStapleFromInputBehavior(const std::string& name);
+	explicit StaplerBehavior(const std::string& name);
 
 	/// Set the input component from which to get the pose
 	/// \param	inputComponent	The input component which sends the pose.
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
+
+	/// Set the collision representation of the stapler
+	/// \param	staplerRepresentation The representation of a stapler
+	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> staplerRepresentation);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -62,8 +79,11 @@ protected:
 	virtual bool doWakeUp() override;
 
 private:
-	/// Input component from which to get the pose
+	/// Input component from which to get the pose.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_from;
+
+	/// The collision representation of a stapler.
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 
 	/// The number of staples added
 	int m_numElements;
@@ -72,4 +92,4 @@ private:
 	bool m_buttonPreviouslyPressed;
 };
 
-#endif  // EXAMPLES_EXAMPLESTAPLING_ADDSTAPLEBEHAVIOR_H
+#endif  // EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H

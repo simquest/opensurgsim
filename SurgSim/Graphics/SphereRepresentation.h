@@ -34,6 +34,7 @@ public:
 	/// \post	The sphere radius is 1.0.
 	explicit SphereRepresentation(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(SphereRepresentation, double, Radius, getRadius, setRadius);
 	}
 
 	/// Sets the radius of the sphere

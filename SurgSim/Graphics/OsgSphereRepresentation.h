@@ -46,6 +46,8 @@ public:
 	/// \param	name	Name of the representation
 	explicit OsgSphereRepresentation(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgSphereRepresentation);
+
 	/// Sets the radius of the sphere
 	/// \param	radius	Radius of the sphere
 	virtual void setRadius(double radius);

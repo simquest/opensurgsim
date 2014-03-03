@@ -42,6 +42,8 @@ public:
 	/// \param	name	Name of the representation
 	explicit OsgCylinderRepresentation(const std::string& name);
 
+	SURGSIM_CLASSNAME(SurgSim::Graphics::OsgCylinderRepresentation);
+
 	/// Sets the radius of the cylinder
 	/// \param	radius	Radius along X-axis and Z-axis of the cylinder
 	virtual void setRadius(double radius) override;

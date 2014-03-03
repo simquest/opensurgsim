@@ -35,6 +35,8 @@ public:
 	/// \post	The cylinder radius is 1.0.
 	explicit CylinderRepresentation(const std::string& name) : Representation(name)
 	{
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderRepresentation, double, Radius, getRadius, setRadius);
+		SURGSIM_ADD_SERIALIZABLE_PROPERTY(CylinderRepresentation, double, Height, getHeight, setHeight);
 	}
 
 	/// Sets the radius of the cylinder
