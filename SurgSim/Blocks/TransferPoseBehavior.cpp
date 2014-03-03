@@ -65,7 +65,7 @@ bool TransferPoseBehavior::doWakeUp()
 			getName() + "' must have a sender to do anything.";
 		result = false;
 	}
-	
+
 	if (result)
 	{
 		m_to->setInitialPose(m_from->getInitialPose());
