@@ -15,6 +15,9 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
+#include "SurgSim/DataStructures/EmptyData.h"
+
+using SurgSim::DataStructures::EmptyData;
 
 using SurgSim::DataStructures::TriangleMesh;
 
@@ -65,15 +68,6 @@ static const int cubeTrianglesCCW[12][3] =
 	{0, 3, 2}, {0, 2, 1}, // Back   ( 0  0 -1) [0321]
 	{1, 2, 6}, {1, 6, 5}, // Right  ( 1  0  0) [1265]
 	{0, 4, 7}, {0, 7, 3}  // Left   (-1  0  0) [0473]
-};
-
-class EmptyData
-{
-public:
-	bool operator ==(const EmptyData& e) const
-	{
-		return true;
-	}
 };
 
 Vector3d calculateTriangleMeshVertex(const int i,
