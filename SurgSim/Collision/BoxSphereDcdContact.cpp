@@ -72,8 +72,8 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	closestPoint.z() = std::min(boxSize.z(), closestPoint.z());
 	closestPoint.z() = std::max(-boxSize.z(), closestPoint.z());
 
-	// Distance between the closestPoint and boxLocalSphereCenter.
-	Vector3d normal = boxLocalSphereCenter - closestPoint;
+	// Distance between the closestPoint and boxLocalSphereCenter.  Normal points into first representation.
+	Vector3d normal = closestPoint - boxLocalSphereCenter;
 	double distanceSquared = normal.squaredNorm();
 	if (distanceSquared - (sphere->getRadius() * sphere->getRadius()) > SquaredDistanceEpsilon)
 	{
@@ -120,7 +120,7 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	// Create the contact.
 	std::pair<Location,Location> penetrationPoints;
 	penetrationPoints.first.globalPosition.setValue(representationBox->getPose() * closestPoint);
-	penetrationPoints.second.globalPosition.setValue(sphereCenter - (normal * sphere->getRadius()));
+	penetrationPoints.second.globalPosition.setValue(sphereCenter + (normal * sphere->getRadius()));
 
 	pair->addContact(std::abs(distance - sphere->getRadius()), normal, penetrationPoints);
 }
