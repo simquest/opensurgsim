@@ -66,6 +66,19 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 		const Eigen::MatrixXd &subC,
 		size_t indexSubC,
 		size_t indexNewSubH);
+
+	/// Resize an MlcpPhysicsProblem and set to zero.
+	/// \param numDof the total degrees of freedom.
+	/// \param numConstraintDof the total constrained degrees of freedom.
+	/// \param numConstraints the number of constraints.
+	void setZero(int numDof, int numConstraintDof, int numConstraints);
+
+	/// Initialize an MlcpPhysicsProblem with zero values.
+	/// \param numDof the total degrees of freedom for the MlcpPhysicsProblem to be constructed.
+	/// \param numConstraintDof the total constrained degrees of freedom for the MlcpPhysicsProblem to be constructed.
+	/// \param numConstraints the number of constraints for the MlcpPhysicsProblem to be constructed.
+	/// \return An MlcpPhysicsProblem appropriately sized and initialized to zero.
+	static MlcpPhysicsProblem Zero(int numDof, int numConstraintDof, int numConstraints);
 };
 
 };  // namespace Physics

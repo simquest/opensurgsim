@@ -142,18 +142,6 @@ TEST_F(Fem3DRepresentationContactTests, ConstraintConstantsTest)
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 
-static void initializeMlcp(MlcpPhysicsProblem *mlcpPhysicsProblem, size_t numDof, size_t numConstraints)
-{
-	// Resize and zero all Eigen types
-	mlcpPhysicsProblem->A = SurgSim::Math::Matrix::Zero(numConstraints, numConstraints);
-	mlcpPhysicsProblem->b = SurgSim::Math::Vector::Zero(numConstraints);
-	mlcpPhysicsProblem->mu = SurgSim::Math::Vector::Zero(numConstraints);
-	mlcpPhysicsProblem->CHt = SurgSim::Math::Matrix::Zero(numDof, numConstraints);
-	mlcpPhysicsProblem->H = SurgSim::Math::Matrix::Zero(numConstraints, numDof);
-	// Empty all std::vector types
-	mlcpPhysicsProblem->constraintTypes.clear();
-}
-
 TEST_F(Fem3DRepresentationContactTests, BuildMlcpTest)
 {
 	// This test verifies the build mlcp function works for a simple case.
@@ -161,8 +149,7 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpTest)
 	auto implementation = std::make_shared<Fem3DRepresentationContact>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem;
-	initializeMlcp(&mlcpPhysicsProblem, m_fem->getNumDof(), 1);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
 
 	// Apply constraint purely to the first node of the 0th tetrahedron.
 	FemRepresentationCoordinate coord(0, Vector4d(1.0, 0.0, 0.0, 0.0));
@@ -195,8 +182,7 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpCoordinateTest)
 	auto implementation = std::make_shared<Fem3DRepresentationContact>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem;
-	initializeMlcp(&mlcpPhysicsProblem, m_fem->getNumDof(), 1);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof(), 1, 1);
 
 	// Apply constraint to all nodes of an fem.
 	FemRepresentationCoordinate coord(1, Vector4d(0.25, 0.33, 0.28, 0.14));
@@ -232,8 +218,7 @@ TEST_F(Fem3DRepresentationContactTests, BuildMlcpIndiciesTest)
 	auto implementation = std::make_shared<Fem3DRepresentationContact>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem;
-	initializeMlcp(&mlcpPhysicsProblem, m_fem->getNumDof() + 5, 2);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_fem->getNumDof() + 5, 2, 1);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::Matrix<double, 1, 5> localH;
