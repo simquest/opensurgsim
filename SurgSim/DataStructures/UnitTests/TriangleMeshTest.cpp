@@ -18,12 +18,14 @@
 
 #include "gtest/gtest.h"
 
-#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/Vertex.h"
 
 #include <random>
 
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMesh;
 using SurgSim::Math::Vector3d;
 
@@ -163,7 +165,7 @@ TEST_F(TriangleMeshTest, InitTest)
 	typedef TriangleMesh<void, MockEdgeData, void> TriangleMeshNoVertexOrTriangleData;
 	typedef TriangleMesh<void, void, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
 
-	typedef TriangleMesh<void, void, void> TriangleMeshNoData;
+	typedef TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMeshNoData;
 
 	ASSERT_NO_THROW({TriangleMeshNoVertexData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoEdgeData mesh;});
@@ -497,15 +499,6 @@ TEST_F(TriangleMeshTest, ComparisonTest)
 	EXPECT_FALSE(mesh == meshWithDifferentTriangles);
 	EXPECT_TRUE(mesh != meshWithDifferentTriangles);
 }
-
-class EmptyData
-{
-public:
-	bool operator==(const EmptyData &data) const
-	{
-		return true;
-	}
-};
 
 TEST_F(TriangleMeshTest, CopyConstructorTest)
 {

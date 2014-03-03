@@ -15,8 +15,10 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMesh;
 
 namespace SurgSim
@@ -93,9 +95,9 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRotationQuaternion;
 
-	typedef SurgSim::DataStructures::TriangleMesh<void, void, void> TriangleMesh;
-	typedef SurgSim::DataStructures::MeshElement<2, void> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, void> TriangleElement;
+	typedef SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMesh;
+	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
+	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
 
 	// Create a Mesh Cube
 	std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
@@ -110,23 +112,25 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 	for (int i = 0; i < cubeNumEdges; i++)
 	{
+		EmptyData emptyData;
 		std::array<unsigned int, 2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
 		}
-		EdgeElement edgeElement(edgePoints);
+		EdgeElement edgeElement(edgePoints, emptyData);
 		TriangleMesh::EdgeType e(edgeElement);
 		mesh->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; i++)
 	{
+		EmptyData emptyData;
 		std::array<unsigned int, 3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
-		TriangleElement triangleElement(trianglePoints);
+		TriangleElement triangleElement(trianglePoints, emptyData);
 		TriangleMesh::TriangleType t(triangleElement);
 		mesh->addTriangle(t);
 	}

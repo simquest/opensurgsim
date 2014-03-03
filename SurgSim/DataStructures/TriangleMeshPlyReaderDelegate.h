@@ -33,7 +33,7 @@ class TriangleMeshPlyReaderDelegate : public PlyReaderDelegate
 public:
 
 	/// The Mesh Type
-	typedef TriangleMesh<void, void, void> MeshType;
+	typedef TriangleMesh<EmptyData, EmptyData, EmptyData> MeshType;
 
 	/// Default constructor.
 	TriangleMeshPlyReaderDelegate();
@@ -44,7 +44,7 @@ public:
 
 	/// Gets the mesh.
 	/// \return The mesh.
-	std::shared_ptr<TriangleMesh<void, void, void>> getMesh();
+	std::shared_ptr<TriangleMesh<EmptyData, EmptyData, EmptyData>> getMesh();
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
