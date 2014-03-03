@@ -18,8 +18,11 @@
 
 #include <vector>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Math/Shape.h"
+
+using SurgSim::DataStructures::EmptyData;
 
 namespace SurgSim
 {
@@ -32,7 +35,6 @@ namespace Math
 class OctreeShape : public Shape
 {
 public:
-	struct EmptyData {};
 	typedef SurgSim::DataStructures::OctreeNode<EmptyData> NodeType;
 
 	/// Constructor
