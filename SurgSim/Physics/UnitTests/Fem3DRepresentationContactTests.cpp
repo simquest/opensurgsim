@@ -14,8 +14,6 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <memory>
-#include <tuple>
 
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Math/Vector.h"
@@ -25,6 +23,7 @@
 #include "SurgSim/Physics/Fem3DRepresentationLocalization.h"
 #include "SurgSim/Physics/FemElement3DTetrahedron.h"
 #include "SurgSim/Physics/MlcpPhysicsProblem.h"
+#include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Framework::Runtime;
 using SurgSim::Physics::ContactConstraintData;
@@ -43,61 +42,6 @@ namespace
 	const double epsilon = 1e-10;
 	const double dt = 1e-3;
 };
-
-::testing::AssertionResult AssertMatricesEqual(const char *expected_expr,
-											   const char *actual_expr,
-											   const char *abs_err_expr,
-											   const Eigen::MatrixXd &expected,
-											   const Eigen::MatrixXd &actual,
-											   double abs_err)
-{
-	if ((expected.rows() != actual.rows()) || (expected.cols() != actual.cols()))
-	{
-		return ::testing::AssertionFailure()
-			<< "Sizes do not match." << std::endl
-			<< "Actual: [" << actual.rows() << ", " << actual.cols() << "]" << std::endl
-			<< "Expected: [" << expected.rows() << ", " << expected.cols() << "]" << std::endl;
-	}
-
-	if (!expected.isApprox(actual, abs_err))
-	{
-		::testing::AssertionResult result = ::testing::AssertionFailure()
-			<< "Matrices are not within epsilon of each other." << std::endl
-			<< "Difference: " << (actual - expected).norm() << std::endl
-			<< "Epsilon: " << abs_err << std::endl;
-
-		if (expected.cols() == 1 || expected.rows() == 1)
-		{
-			typedef std::tuple<int, double, double> DifferenceTuple;
-			std::vector<DifferenceTuple> differences;
-			for (int index = 0; index < expected.size(); ++index)
-			{
-				if (std::abs(expected(index) - actual(index)) > abs_err)
-				{
-					differences.emplace_back(index, expected(index), actual(index));
-				}
-			}
-
-			result << "Total differing values: " << differences.size() << std::endl;
-
-			for (std::vector<DifferenceTuple>::iterator it = std::begin(differences); it != std::end(differences); ++it)
-			{
-				result
-					<< "[Index, Expected, Actual]: "
-					<< std::get<0>(*it) << ", " << std::get<1>(*it)  << ", " << std::get<2>(*it)  << std::endl;
-			}
-		}
-
-		return result;
-	}
-
-	return ::testing::AssertionSuccess();
-}
-
-#define EXPECT_NEAR_EIGEN(expected, actual, abs_err) \
-	EXPECT_PRED_FORMAT3(AssertMatricesEqual, (expected), (actual), (abs_err))
-#define ASSERT_NEAR_EIGEN(expected, actual, abs_err) \
-	ASSERT_PRED_FORMAT3(AssertMatricesEqual, (expected), (actual), (abs_err))
 
 static void addTetraheadron(Fem3DRepresentation *fem,
 							unsigned int node0,

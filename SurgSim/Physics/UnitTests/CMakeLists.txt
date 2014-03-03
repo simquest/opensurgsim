@@ -26,6 +26,7 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
+	EigenGtestAsserts.cpp
 	Fem1DRepresentationTests.cpp
 	Fem3DRepresentationContactTests.cpp
 	Fem3DRepresentationReaderTests.cpp
@@ -63,6 +64,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
+	EigenGtestAsserts.h
 	MockObjects.h
 )
 
