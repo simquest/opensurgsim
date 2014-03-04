@@ -30,6 +30,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	DeformableRepresentationState.cpp
 	Fem1DRepresentation.cpp
 	Fem3DRepresentation.cpp
+	Fem3DRepresentationBilateral3D.cpp
 	Fem3DRepresentationContact.cpp
 	Fem3DRepresentationLocalization.cpp
 	Fem3DRepresentationPlyReaderDelegate.cpp
@@ -39,6 +40,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	FemElement3DTetrahedron.cpp
 	FemRepresentationCoordinate.cpp
 	FemRepresentationParameters.cpp
+	FixedRepresentationBilateral3D.cpp
 	FixedRepresentationContact.cpp
 	FreeMotion.cpp
 	LinearSpring.cpp
@@ -56,6 +58,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidCollisionRepresentation.cpp
 	RigidRepresentation.cpp
 	RigidRepresentationBase.cpp
+	RigidRepresentationBilateral3D.cpp
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	SolveMlcp.cpp
@@ -77,6 +80,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	DeformableRepresentationState.h
 	Fem1DRepresentation.h
 	Fem3DRepresentation.h
+	Fem3DRepresentationBilateral3D.h
 	Fem3DRepresentationContact.h
 	Fem3DRepresentationLocalization.h
 	Fem3DRepresentationPlyReaderDelegate.h
@@ -89,6 +93,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	FemRepresentationCoordinate.h
 	FemRepresentationParameters.h
 	FixedRepresentation.h
+	FixedRepresentationBilateral3D.h
 	FixedRepresentationContact.h
 	FixedRepresentationLocalization.h
 	FreeMotion.h
@@ -112,6 +117,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationBase.h
 	RigidRepresentationBase-inl.h
 	RigidRepresentationBaseState.h
+	RigidRepresentationBilateral3D.h
 	RigidRepresentationContact.h
 	RigidRepresentationLocalization.h
 	RigidRepresentationParameters.h
