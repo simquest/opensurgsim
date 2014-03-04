@@ -132,6 +132,8 @@ class MockComponent : public SurgSim::Framework::Component
 public:
 	explicit MockComponent(const std::string& name, bool succeedInit = true, bool succeedWakeUp = true);
 
+	SURGSIM_CLASSNAME(MockComponent);
+
 	virtual ~MockComponent();
 
 	virtual bool doInitialize();
