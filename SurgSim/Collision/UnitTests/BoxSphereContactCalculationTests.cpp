@@ -102,7 +102,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.5, // depth
-						boxQuat * Vector3d(0.0,1.0,0.0), // normal
+						boxQuat * Vector3d(0.0,-1.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.0,0.5,0.0) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,-1.0,0.0) + sphereTrans); // sphere penetration point
 	}
@@ -122,7 +122,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.3, // depth
-						boxQuat * Vector3d(0.0,-1.0,0.0), // normal
+						boxQuat * Vector3d(0.0,1.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.3345,-0.5,0.1234) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,1.0,0.0) + sphereTrans); // sphere penetration point
 	}
@@ -141,7 +141,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.2676, // depth
-						boxQuat * Vector3d(1.0,0.0,0.0), // normal
+						boxQuat * Vector3d(-1.0,0.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.5,-0.2354,0.412) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(-1.0,0.0,0.0) + sphereTrans); // sphere penetration point
 	}
@@ -160,7 +160,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.3777, // depth
-						boxQuat * Vector3d(-1.0,0.0,0.0), // normal
+						boxQuat * Vector3d(1.0,0.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(-0.5,0.2354,-0.412) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(1.0,0.0,0.0) + sphereTrans); // sphere penetration point
 	}
@@ -179,7 +179,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.6014, // depth
-						boxQuat * Vector3d(0.0,0.0,-1.0), // normal
+						boxQuat * Vector3d(0.0,0.0,1.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.1564,-0.2987,-0.5) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,0.0,1.0) + sphereTrans); // sphere penetration point
 	}
@@ -198,7 +198,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.7014, // depth
-						boxQuat * Vector3d(0.0,0.0,1.0), // normal
+						boxQuat * Vector3d(0.0,0.0,-1.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(-0.2564,-0.4987,0.5) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,0.0,-1.0) + sphereTrans); // sphere penetration point
 	}
