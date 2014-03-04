@@ -90,7 +90,7 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 
 	if (it != m_loggers.end() && (it->second != nullptr))
 	{
-		result = (it->second);
+		result = it->second;
 	}
 	else
 	{

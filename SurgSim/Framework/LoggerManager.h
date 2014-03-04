@@ -70,7 +70,7 @@ public:
 	int getThreshold() const;
 
 private:
-	/// Keep track of all the loggers that must be hold somewhere else.
+	/// Keep track of all the loggers
 	std::unordered_map<std::string, std::shared_ptr<Logger>> m_loggers;
 
 	/// Use for default output of the logger
