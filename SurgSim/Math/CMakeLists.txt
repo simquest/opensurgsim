@@ -26,7 +26,6 @@ set(SURGSIM_MATH_SOURCES
 	DoubleSidedPlaneShape.cpp
 	GaussLegendreQuadrature.cpp
 	LinearSolveAndInverse.cpp
-	MathConvert.cpp
 	Matrix.cpp
 	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp

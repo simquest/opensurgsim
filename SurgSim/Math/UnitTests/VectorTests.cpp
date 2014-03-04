@@ -21,6 +21,7 @@
 
 #include <math.h>
 #include "SurgSim/Math/Vector.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "gtest/gtest.h"
 
 // Define test fixture class templates.
@@ -360,6 +361,29 @@ TYPED_TEST(AllVectorTests, SetFromArray)
 		EXPECT_NEAR(0.1 + i*1.1, vector[i], 1e-6) << i << " wasn't properly initialized.";
 	}
 }
+
+// Test conversion to and from yaml node
+TYPED_TEST(AllVectorTests, YamlConvert)
+{
+	typedef typename TestFixture::Vector Vector;
+	typedef typename TestFixture::Scalar T;
+
+	T testData[5] = { 3.1f, 3.4f, 3.7f, 4.0f, 4.3f };
+	Vector original(testData);
+
+	YAML::Node node;
+
+	ASSERT_NO_THROW(node = original);
+
+	EXPECT_TRUE(node.IsSequence());
+	EXPECT_EQ(original.size(), node.size());
+
+	Vector expected;
+
+	ASSERT_NO_THROW(expected = node.as<Vector>());
+	EXPECT_TRUE(original.isApprox(expected));
+}
+
 
 /// Test assignment.
 TYPED_TEST(AllVectorTests, Assign)
@@ -1038,6 +1062,7 @@ TYPED_TEST(AllVectorTests, Interpolate)
 	interp = Vector(interpArray);
 	EXPECT_TRUE(interp.isApprox(SurgSim::Math::interpolate(prev, next, static_cast<T>(0.623f)), epsilon));
 }
+
 
 // TO DO:
 // testing numerical validity

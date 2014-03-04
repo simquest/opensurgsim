@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "gtest/gtest.h"
 
 // Define test fixture class templates.
@@ -172,6 +173,31 @@ TYPED_TEST(QuaternionTests, SetToZero)
 	EXPECT_NEAR(0.0, quaternion.y(), 1e-6) << "Y wasn't properly initialized.";
 	EXPECT_NEAR(0.0, quaternion.z(), 1e-6) << "Z wasn't properly initialized.";
 }
+
+// Test conversion to and from yaml node
+TYPED_TEST(QuaternionTests, YamlConvert)
+{
+	typedef typename TestFixture::Quaternion Quaternion;
+	typedef typename TestFixture::Scalar T;
+
+	// There is no Quaternion::setZero(), but you can do this:
+	const T inputArray[5]  = { 0.1f, 1.2f, 2.3f, 3.4f, 4.5f };
+	Quaternion quaternion(inputArray);
+
+	YAML::Node node;
+
+	ASSERT_NO_THROW(node = quaternion);
+
+	EXPECT_TRUE(node.IsSequence());
+	EXPECT_EQ(4u, node.size());
+
+	Quaternion expected;
+
+	ASSERT_NO_THROW(expected = node.as<Quaternion>());
+	EXPECT_TRUE(quaternion.isApprox(expected));
+}
+
+
 
 // ==================== REPRESENTATION CONVERSIONS ====================
 

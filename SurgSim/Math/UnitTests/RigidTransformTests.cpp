@@ -21,6 +21,7 @@
 #include <Eigen/Geometry>
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "gtest/gtest.h"
 
 template <class T>
@@ -165,4 +166,36 @@ TYPED_TEST(AllRigidTransformTests, MakeLookAt)
 	EXPECT_TRUE(eye.normalized().isApprox(direction3.normalized()));
 }
 
+// Test conversion to and from yaml node
+TYPED_TEST(AllRigidTransformTests, YamlConvert)
+{
+	using SurgSim::Math::makeRigidTransform;
 
+	typedef typename TestFixture::Scalar T;
+	typedef Eigen::Quaternion<T> Quaternion;
+	typedef Eigen::Transform<T, 3, Eigen::Isometry> Transform;
+	typedef Eigen::Matrix<T, 3, 1> Vector3;
+
+	const T inputValues[4] = {1.1f, 2.2f, 3.3f, 4.4f};
+
+	Quaternion quaternion(inputValues);
+	quaternion.normalize();
+
+	Vector3 translation(inputValues);
+
+	Transform transform = makeRigidTransform(quaternion, translation);
+
+	YAML::Node node;
+
+	ASSERT_NO_THROW(node = transform);
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ(2, node.size());
+
+	Transform expected;
+
+	std::cout << node;
+
+	ASSERT_NO_THROW(expected = node.as<Transform>());
+	EXPECT_TRUE(transform.isApprox(expected));
+}

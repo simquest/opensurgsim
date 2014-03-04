@@ -16,6 +16,12 @@
 #ifndef SURGSIM_MATH_MATHCONVERT_INL_H
 #define SURGSIM_MATH_MATHCONVERT_INL_H
 
+namespace
+{
+	const std::string RotationPropertyName = "quaternion";
+	const std::string TranslationPropertyName = "translation";
+}
+
 SURGSIM_DOUBLE_SPECIALIZATION
 template <typename Type, int Rows, int MOpt>
 YAML::Node YAML::convert<typename Eigen::Matrix<Type,Rows,1,MOpt>>::encode(
@@ -138,8 +144,13 @@ YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
 	const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
 {
 	typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::MatrixType MatrixType;
-	MatrixType temporary(rhs.matrix());
-	return Node(convert<MatrixType>::encode(temporary));
+	Eigen::Quaternion<Type, TOptions> quaternion(rhs.linear());
+	Eigen::Matrix<Type, Dim, 1, TOptions> translation(rhs.translation());
+
+	Node node;
+	node[RotationPropertyName] = quaternion;
+	node[TranslationPropertyName] = translation;
+	return node;
 }
 
 SURGSIM_DOUBLE_SPECIALIZATION
@@ -149,15 +160,26 @@ bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 	typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
 {
 	bool result = false;
-	if (node.IsSequence())
+
+
+	if (node.IsMap())
 	{
 		typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::MatrixType MatrixType;
-		MatrixType temporary;
-		if (convert<MatrixType>::decode(node, temporary))
+		Eigen::Quaternion<Type, TOptions> rotation(Eigen::Quaternion<Type, TOptions>::Identity());
+		Eigen::Matrix<Type, Dim, 1, TOptions> translation(Eigen::Matrix<Type, Dim, 1, TOptions>::Zero());
+		if (node[RotationPropertyName].IsDefined())
 		{
-			rhs.matrix() = temporary;
+			rotation = node[RotationPropertyName].as<Eigen::Quaternion<Type, TOptions>>();
 			result = true;
 		}
+		if (node[TranslationPropertyName].IsDefined())
+		{
+			translation = node[TranslationPropertyName].as<Eigen::Matrix<Type, Dim, 1, TOptions>>();
+			result = true;
+		}
+		rhs.makeAffine();
+		rhs.linear() = rotation.matrix();
+		rhs.translation() = translation;
 	}
 	return result;
 }
