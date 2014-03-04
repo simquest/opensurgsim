@@ -192,7 +192,7 @@ void resizeMatrix(Matrix* A, unsigned int numRow, unsigned int numCol, bool zero
 	{
 		return;
 	}
-	if (A->rows() != static_cast<int>(numRow) && A->cols() != static_cast<int>(numCol))
+	if (A->rows() != static_cast<int>(numRow) || A->cols() != static_cast<int>(numCol))
 	{
 		A->resize(static_cast<int>(numRow), static_cast<int>(numCol));
 	}

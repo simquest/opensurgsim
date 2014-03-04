@@ -1164,6 +1164,17 @@ TYPED_TEST(AllDynamicMatrixTests, resizeMatrix)
 	EXPECT_EQ(13, static_cast<int>(m.cols()));
 	EXPECT_TRUE(m.isZero());
 
+	ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 12, 13, true););
+	EXPECT_EQ(12, static_cast<int>(m.rows()));
+	EXPECT_EQ(13, static_cast<int>(m.cols()));
+	EXPECT_TRUE(m.isZero());
+
+	ASSERT_NO_THROW(SurgSim::Math::resizeMatrix(&m, 12, 14, true););
+	EXPECT_EQ(12, static_cast<int>(m.rows()));
+	EXPECT_EQ(14, static_cast<int>(m.cols()));
+	EXPECT_TRUE(m.isZero());
+
+
 	{
 		SCOPED_TRACE("DiagonalMatrix");
 

@@ -30,7 +30,7 @@ void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsign
 	{
 		return;
 	}
-	if (A->rows() != static_cast<int>(numRow) && A->cols() != static_cast<int>(numCol))
+	if (A->rows() != static_cast<int>(numRow) || A->cols() != static_cast<int>(numCol))
 	{
 		A->resize(static_cast<int>(numCol));
 	}
