@@ -229,12 +229,18 @@ TEST_F(TetrahedronMeshTest, InitTest)
 	ASSERT_NO_THROW({TetrahedronMeshNoTetrahedronData mesh;});
 
 	/// Two void entries
-	typedef TetrahedronMesh<EmptyData, EmptyData, MockTriangleData, MockTetrahedronData> TetrahedronMeshNoVertexOrEdgeData;
-	typedef TetrahedronMesh<EmptyData, MockEdgeData, EmptyData, MockTetrahedronData> TetrahedronMeshNoVertexOrTriangleData;
-	typedef TetrahedronMesh<EmptyData, MockEdgeData, MockTriangleData, EmptyData> TetrahedronMeshNoVertexOrTetrahedronData;
-	typedef TetrahedronMesh<MockVertexData, EmptyData, EmptyData, MockTetrahedronData> TetrahedronMeshNoEdgeOrTriangleData;
-	typedef TetrahedronMesh<MockVertexData, EmptyData, MockTriangleData, EmptyData> TetrahedronMeshNoEdgeOrTetrahedronData;
-	typedef TetrahedronMesh<MockVertexData, MockEdgeData, EmptyData, EmptyData> TetrahedronMeshNoTriangleOrTetrahedronData;
+	typedef TetrahedronMesh<EmptyData, EmptyData, MockTriangleData, MockTetrahedronData>
+		TetrahedronMeshNoVertexOrEdgeData;
+	typedef TetrahedronMesh<EmptyData, MockEdgeData, EmptyData, MockTetrahedronData>
+		TetrahedronMeshNoVertexOrTriangleData;
+	typedef TetrahedronMesh<EmptyData, MockEdgeData, MockTriangleData, EmptyData>
+		TetrahedronMeshNoVertexOrTetrahedronData;
+	typedef TetrahedronMesh<MockVertexData, EmptyData, EmptyData, MockTetrahedronData>
+		TetrahedronMeshNoEdgeOrTriangleData;
+	typedef TetrahedronMesh<MockVertexData, EmptyData, MockTriangleData, EmptyData>
+		TetrahedronMeshNoEdgeOrTetrahedronData;
+	typedef TetrahedronMesh<MockVertexData, MockEdgeData, EmptyData, EmptyData>
+		TetrahedronMeshNoTriangleOrTetrahedronData;
 	ASSERT_NO_THROW({TetrahedronMeshNoVertexOrEdgeData mesh;});
 	ASSERT_NO_THROW({TetrahedronMeshNoVertexOrTriangleData mesh;});
 	ASSERT_NO_THROW({TetrahedronMeshNoVertexOrTetrahedronData mesh;});
