@@ -186,7 +186,7 @@ Eigen::Block<Matrix> getSubMatrix(Matrix& matrix, unsigned int blockIdRow, unsig
 /// \param zeroOut True if the vector v should be filled up with 0, False if not
 /// \note This template method is useful to account for different matrix class having different API
 template <class Matrix>
-void resize(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = false)
+void resizeMatrix(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = false)
 {
 	if (A == nullptr)
 	{
@@ -203,7 +203,7 @@ void resize(Matrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut = 
 }
 
 template <>
-void resize<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut);
+void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut);
 
 };  // namespace Math
 };  // namespace SurgSim

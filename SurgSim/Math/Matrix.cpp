@@ -23,7 +23,7 @@ namespace Math
 {
 
 template <>
-void resize<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut)
+void resizeMatrix<DiagonalMatrix>(DiagonalMatrix* A, unsigned int numRow, unsigned int numCol, bool zeroOut)
 {
 	SURGSIM_ASSERT(numRow == numCol) << "Trying to create a diagonal matrix non-square";
 	if (A == nullptr)

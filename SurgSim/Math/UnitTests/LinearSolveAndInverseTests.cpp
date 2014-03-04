@@ -57,12 +57,12 @@ public:
 
 	LinearSolveAndInverseMatrixTests()
 	{
-		resize(&matrix, size, size, false);
+		resizeMatrix(&matrix, size, size, false);
 		matrix = gMatrix;
 		expectedInverse = matrix.inverse();
-		resize(&b, size);
+		resizeVector(&b, size);
 		b = gVector;
-		resize(&x, size);
+		resizeVector(&x, size);
 		expectedX = expectedInverse * b;
 	}
 	Matrix matrix;
@@ -81,13 +81,13 @@ public:
 
 	LinearSolveAndInverseDiagonalMatrixTests()
 	{
-		resize(&matrix, size, size, false);
+		resizeMatrix(&matrix, size, size, false);
 		matrix.diagonal() = gMatrix.diagonal();
 		denseMatrix = matrix;
 		expectedInverse = denseMatrix.inverse();
-		resize(&b, size);
+		resizeVector(&b, size);
 		b = gVector;
-		resize(&x, size);
+		resizeVector(&x, size);
 		expectedX = expectedInverse * b;
 	}
 	DiagonalMatrix matrix;
@@ -126,9 +126,9 @@ public:
 		matrix.setFromTriplets(coefficients.begin(), coefficients.end());
 		denseMatrix = matrix;
 		expectedInverse = denseMatrix.inverse();
-		resize(&b, size);
+		resizeVector(&b, size);
 		b = gVector;
-		resize(&x, size);
+		resizeVector(&x, size);
 		expectedX = expectedInverse * b;
 	}
 	Eigen::SparseMatrix<double,Eigen::ColMajor> matrix;
