@@ -157,13 +157,13 @@ TEST_F(TriangleMeshTest, InitTest)
 	ASSERT_NO_THROW({MockTriangleMesh mesh;});
 
 	/// Make sure we can create triangle meshes with each possible combination of void data.
-	typedef TriangleMesh<void, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
-	typedef TriangleMesh<MockVertexData, void, MockTriangleData> TriangleMeshNoEdgeData;
-	typedef TriangleMesh<MockVertexData, MockEdgeData, void> TriangleMeshNoTriangleData;
+	typedef TriangleMesh<EmptyData, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
+	typedef TriangleMesh<MockVertexData, EmptyData, MockTriangleData> TriangleMeshNoEdgeData;
+	typedef TriangleMesh<MockVertexData, MockEdgeData, EmptyData> TriangleMeshNoTriangleData;
 
-	typedef TriangleMesh<MockVertexData, void, void> TriangleMeshNoEdgeOrTriangleData;
-	typedef TriangleMesh<void, MockEdgeData, void> TriangleMeshNoVertexOrTriangleData;
-	typedef TriangleMesh<void, void, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
+	typedef TriangleMesh<MockVertexData, EmptyData, EmptyData> TriangleMeshNoEdgeOrTriangleData;
+	typedef TriangleMesh<EmptyData, MockEdgeData, EmptyData> TriangleMeshNoVertexOrTriangleData;
+	typedef TriangleMesh<EmptyData, EmptyData, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
 
 	typedef TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMeshNoData;
 
