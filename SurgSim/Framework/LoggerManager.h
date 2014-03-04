@@ -70,8 +70,8 @@ public:
 	int getThreshold() const;
 
 private:
-	/// Keep track of all the loggers
-	std::unordered_map<std::string, std::weak_ptr<Logger>> m_loggers;
+	/// Keep track of all the loggers that must be hold somewhere else.
+	std::unordered_map<std::string, std::shared_ptr<Logger>> m_loggers;
 
 	/// Use for default output of the logger
 	std::shared_ptr<LogOutput> m_defaultOutput;

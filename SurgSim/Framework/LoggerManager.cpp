@@ -67,9 +67,9 @@ void LoggerManager::setThreshold(const std::string& path, int threshold)
 	{
 		if (boost::istarts_with(it->first, path))
 		{
-			if (! (it->second).expired())
+			if (it->second !=  nullptr)
 			{
-				(it->second).lock()->setThreshold(threshold);
+				it->second->setThreshold(threshold);
 			}
 		}
 	}
@@ -88,9 +88,9 @@ std::shared_ptr<Logger> LoggerManager::getLogger(const std::string& name)
 	auto it = m_loggers.find(name);
 	std::shared_ptr<Logger> result;
 
-	if (it != m_loggers.end() && (! (it->second).expired()))
+	if (it != m_loggers.end() && (it->second != nullptr))
 	{
-		result = (it->second).lock();
+		result = (it->second);
 	}
 	else
 	{
