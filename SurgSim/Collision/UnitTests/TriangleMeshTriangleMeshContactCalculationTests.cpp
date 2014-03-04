@@ -17,9 +17,11 @@
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -36,16 +38,16 @@ namespace Collision
 	4*----------*5
 */
 static const int cubeNumPoints = 8;
-static const SurgSim::Math::Vector3d cubePoints[8] =
+static const Vector3d cubePoints[8] =
 {
-	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
+	Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d( 1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d( 1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d( 1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d( 1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
 };
 
 static const int cubeNumEdges = 12;
@@ -101,16 +103,16 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 
 	// Create a Mesh Cube
 	std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
-	for (int i = 0; i < cubeNumPoints; i++)
+	for (int i = 0; i < cubeNumPoints; ++i)
 	{
-		SurgSim::Math::Vector3d p;
+		Vector3d p;
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
 		TriangleMesh::VertexType v(p);
 		mesh->addVertex(v);
 	}
-	for (int i = 0; i < cubeNumEdges; i++)
+	for (int i = 0; i < cubeNumEdges; ++i)
 	{
 		EmptyData emptyData;
 		std::array<unsigned int, 2> edgePoints;
@@ -122,7 +124,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		TriangleMesh::EdgeType e(edgeElement);
 		mesh->addEdge(e);
 	}
-	for (int i = 0; i < cubeNumTriangles; i++)
+	for (int i = 0; i < cubeNumTriangles; ++i)
 	{
 		EmptyData emptyData;
 		std::array<unsigned int, 3> trianglePoints;
