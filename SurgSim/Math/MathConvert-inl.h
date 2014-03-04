@@ -164,7 +164,6 @@ bool YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::decode(
 
 	if (node.IsMap())
 	{
-		typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::MatrixType MatrixType;
 		Eigen::Quaternion<Type, TOptions> rotation(Eigen::Quaternion<Type, TOptions>::Identity());
 		Eigen::Matrix<Type, Dim, 1, TOptions> translation(Eigen::Matrix<Type, Dim, 1, TOptions>::Zero());
 		if (node[RotationPropertyName].IsDefined())
