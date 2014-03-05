@@ -1,0 +1,17 @@
+/*!
+
+\page Conversion File Format Conversion
+
+In OpenSurgSim(OSS), we load graphical meshes from obj(3D model format) files and meshes for physics and collision from ply(Polygon File Format) files. ply files are converted from obj files using Blender software. obj files can be either created by Blender or obtained somewhere else.
+
+## Note
+
+1. A obj file can contain geometry information for multiple objects
+2. A ply file can contain geometry information for exactly one object
+3. Blender use mouse right click to 'select' instead of left click. 
+
+## Steps
+After imported an obj file in Blender, to export objects as ply files, one must first right click, i.e. select, the object to be exported. Then the option under 'File->Export->Stanford(.ply)' will become available. In one obj file, there might be multiple objects. To convert them to ply files, the user must do the previous steps for each object.
+
+	
+*/
