@@ -105,6 +105,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 						boxQuat * Vector3d(0.0,-1.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.0,0.5,0.0) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,-1.0,0.0) + sphereTrans); // sphere penetration point
+	}
 
 	{
 		SCOPED_TRACE("Sphere center inside box, intersection on top face");
@@ -143,6 +144,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 						boxQuat * Vector3d(0.0,1.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.3345,-0.5,0.1234) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,1.0,0.0) + sphereTrans); // sphere penetration point
+	}
 
 	{
 		SCOPED_TRACE("Sphere center inside box, intersection on bottom face");
@@ -181,6 +183,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 						boxQuat * Vector3d(-1.0,0.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.5,-0.2354,0.412) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(-1.0,0.0,0.0) + sphereTrans); // sphere penetration point
+	}
 
 	{
 		SCOPED_TRACE("Sphere center inside box, intersection on right face");
@@ -218,6 +221,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 						boxQuat * Vector3d(1.0,0.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(-0.5,0.2354,-0.412) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(1.0,0.0,0.0) + sphereTrans); // sphere penetration point
+	}
 
 	{
 		SCOPED_TRACE("Sphere center inside box, intersection on left face");
@@ -255,6 +259,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 						boxQuat * Vector3d(0.0,0.0,1.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.1564,-0.2987,-0.5) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,0.0,1.0) + sphereTrans); // sphere penetration point
+	}
 
 	{
 		SCOPED_TRACE("Sphere center inside box, intersection on front face");
@@ -292,6 +297,7 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 						boxQuat * Vector3d(0.0,0.0,-1.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(-0.2564,-0.4987,0.5) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,0.0,-1.0) + sphereTrans); // sphere penetration point
+	}
 
 	{
 		SCOPED_TRACE("Sphere center inside box, intersection on back face");
