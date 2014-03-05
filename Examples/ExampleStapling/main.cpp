@@ -19,6 +19,8 @@
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -33,7 +35,7 @@
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/CapsuleShape.h"
-#include "SurgSim/Math/SphereShape.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -44,6 +46,8 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::DataStructures::PlyReader;
+using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
@@ -60,7 +64,7 @@ using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::CapsuleShape;
-using SurgSim::Math::SphereShape;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
@@ -100,12 +104,16 @@ std::shared_ptr<ViewElement> createView()
 
 std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, const std::string& deviceName)
 {
-	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler at
-	// the tip of the stapler.
-	std::shared_ptr<SphereShape> sphereShape = std::make_shared<SphereShape>(0.02); // Unit: meter
+	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+	PlyReader reader("Data/Collision/stapler_collision.ply");
+	reader.setDelegate(delegate);
+	reader.parseFile();
+
+	// Stapler collision mesh
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(delegate->getMesh()); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
-	params.setShapeUsedForMassInertia(sphereShape);
+	params.setShapeUsedForMassInertia(meshShape);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(staplerName + "Physics");
