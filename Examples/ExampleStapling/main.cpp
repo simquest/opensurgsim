@@ -19,12 +19,13 @@
 
 #include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
-#include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgSphereRepresentation.h"
@@ -32,7 +33,7 @@
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Math/CapsuleShape.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
@@ -44,22 +45,22 @@
 
 using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::DataStructures::PlyReader;
+using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::CapsuleRepresentation;
 using SurgSim::Graphics::SceneryRepresentation;
 using SurgSim::Graphics::SphereRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Graphics::OsgCapsuleRepresentation;
 using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
@@ -159,18 +160,24 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 
 	return sceneElement;
 }
+
 std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidTransform3d& pose)
 {
+	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+	PlyReader reader("Data/Collision/arm_collision.ply");
+	reader.setDelegate(delegate);
+	reader.parseFile();
+
 	// Load graphic representation for armSceneElement
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
 		createSceneryObject(armName, "Geometry/forearm.osgb");
 	sceneryRepresentation->setInitialPose(pose);
 
-	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the arm.
-	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.335, 0.03); // Unit: meter
+	// MeshShape collision representation of the arm.
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(delegate->getMesh()); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
-	params.setShapeUsedForMassInertia(capsuleShape);
+	params.setShapeUsedForMassInertia(meshShape);
 
 	Matrix33d rotationX = makeRotationMatrix(M_PI_2, Vector3d(1.0, 0.0, 0.0));
 	Matrix33d rotationY = makeRotationMatrix(M_PI_4, Vector3d(0.0, 1.0, 0.0));
@@ -185,16 +192,9 @@ std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidT
 		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	std::shared_ptr<CapsuleRepresentation> graphicalCollisionRepresentation =
-		std::make_shared<OsgCapsuleRepresentation>("CapsuleGraphicalRepresentationOfCollision");
-	graphicalCollisionRepresentation->setHeight(capsuleShape->getLength()); // Unit: meter
-	graphicalCollisionRepresentation->setRadius(capsuleShape->getRadius()); // Unit: meter
-	graphicalCollisionRepresentation->setInitialPose(alignedPose);
-
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>("ArmSceneElement");
 	armSceneElement->addComponent(sceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
-	armSceneElement->addComponent(graphicalCollisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
 
 	return armSceneElement;
