@@ -16,9 +16,9 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Log.h"
@@ -47,9 +47,9 @@
 
 #include "Examples/BouncingBalls/AddRandomSphereBehavior.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::AddRandomSphereBehavior;
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgMaterial;
@@ -100,7 +100,7 @@ public:
 	{
 		// SURGSIM_LOG_DEBUG is a macro to ensure only messages of a certain threshold are output.
 		SURGSIM_LOG_DEBUG(m_logger) << m_representation->getName() << ": " <<
-								  m_representation->getPose().translation().transpose();
+									m_representation->getPose().translation().transpose();
 	}
 
 protected:
@@ -157,7 +157,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 
 /// Creates a planar SceneElement with graphics, physics, and collision.
 std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-	const SurgSim::Math::RigidTransform3d& pose)
+		const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
@@ -233,7 +233,7 @@ std::shared_ptr<SceneElement> createPlane(const SurgSim::Framework::ApplicationD
 /// \note This SceneElement does not have a collision Component.
 /// \note Alternatively, a SurgSim::Blocks::SphereElement could be constructed and then its member variables altered.
 std::shared_ptr<SceneElement> createEarth(const SurgSim::Framework::ApplicationData& data, const std::string& name,
-	const SurgSim::Math::RigidTransform3d& pose)
+		const SurgSim::Math::RigidTransform3d& pose)
 {
 	// A RigidRepresentation is for a non-deformable 6 degree-of-freedom (DOF) object with compliance and inertia.
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
@@ -322,10 +322,10 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	scene->addSceneElement(createEarth(data, "earth1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,3.0,0.0))));
+			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 3.0, 0.0))));
 
 	scene->addSceneElement(createPlane(data, "plane1",
-		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0,0.0,0.0))));
+			SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
 
 	// Creates a ViewElement and adds it to the Scene.  A ViewElement is required for graphical display.
 	scene->addSceneElement(createView("view1", 30, 30, 963, 707));

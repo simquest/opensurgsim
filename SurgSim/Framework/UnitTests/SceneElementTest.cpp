@@ -170,3 +170,4 @@ TEST(SceneElementTest, DoubleInitTest)
 
 	ASSERT_ANY_THROW(element->initialize());
 }
+

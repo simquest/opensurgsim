@@ -13,9 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 
-using SurgSim::Blocks::BasicSceneElement;
+namespace SurgSim
+{
+namespace Framework
+{
 
 BasicSceneElement::BasicSceneElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name)
@@ -29,5 +32,8 @@ BasicSceneElement::~BasicSceneElement()
 bool BasicSceneElement::doInitialize()
 {
 	return true;
+}
+
+}
 }
 

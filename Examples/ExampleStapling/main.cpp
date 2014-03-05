@@ -17,10 +17,10 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -42,9 +42,9 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Device::MultiAxisDevice;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<DeviceInterface> device = std::make_shared<MultiAxisDevice>(deviceName);
 	SURGSIM_ASSERT(device->initialize() == true) <<
-		"Could not initialize device " << device->getName() << " for the tool.\n";
+			"Could not initialize device " << device->getName() << " for the tool.\n";
 	inputManager->addDevice(device);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();

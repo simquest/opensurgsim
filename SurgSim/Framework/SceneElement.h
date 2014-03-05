@@ -22,6 +22,11 @@
 #include <unordered_map>
 #include <vector>
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 namespace Framework
@@ -40,12 +45,15 @@ class Runtime;
 class SceneElement : public std::enable_shared_from_this<SceneElement>
 {
 public:
+
 	/// Constructor
 	/// \param name Name of this SceneElement
 	explicit SceneElement(const std::string& name);
 
 	/// Destructor
 	virtual ~SceneElement();
+
+	virtual std::string getClassName() const;
 
 	/// Adds a component, calls initialize() on the component, if SceneElement::isInitialized() is true
 	/// \param	component	The component.
@@ -107,19 +115,28 @@ public:
 	/// \return	The shared pointer.
 	std::shared_ptr<SceneElement> getSharedPtr();
 
+	virtual YAML::Node encode() const;
+
+	virtual bool decode(const YAML::Node& node);
+
 private:
 	/// Name of this SceneElement
 	std::string m_name;
+
 	/// A collection of Components
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;
+
 	/// A (weak) back pointer to the Scene containing this SceneElement
 	std::weak_ptr<Scene> m_scene;
+
 	/// A (weak) back pointer to the Runtime containing this SceneElement
 	std::weak_ptr<Runtime> m_runtime;
 
 	/// Method to initialize this SceneElement. To be overridden by derived class(es).
 	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doInitialize() = 0;
+
+	void setName(const std::string& name);
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;

@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_BASICSCENEELEMENT_H
-#define SURGSIM_BLOCKS_BASICSCENEELEMENT_H
+#ifndef SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H
+#define SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H
 
 #include "SurgSim/Framework/SceneElement.h"
 
 namespace SurgSim
 {
 
-namespace Blocks
+namespace Framework
 {
 
 /// Simple concrete implementation of a scene element that does not have any higher logic
@@ -44,4 +44,4 @@ protected:
 };  // namespace Blocks
 };  // namespace SurgSim
 
-#endif  // SURGSIM_BLOCKS_BASICSCENEELEMENT_H
+#endif  // SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H

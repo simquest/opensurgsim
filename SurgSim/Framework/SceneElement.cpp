@@ -18,6 +18,10 @@
 #include "SurgSim/Framework/Component.h"
 #include "SurgSim/Framework/Log.h"
 
+#include "SurgSim/Framework/FrameworkConvert.h"
+
+#include <yaml-cpp/yaml.h>
+
 namespace SurgSim
 {
 namespace Framework
@@ -35,7 +39,7 @@ SceneElement::~SceneElement()
 
 bool SceneElement::addComponent(std::shared_ptr<Component> component)
 {
-	bool result= false;
+	bool result = false;
 
 	SURGSIM_ASSERT(component != nullptr) << "Cannot add a nullptr as a component";
 
@@ -124,7 +128,7 @@ std::vector<std::shared_ptr<Component>> SceneElement::getComponents() const
 {
 	std::vector<std::shared_ptr<Component>> result(m_components.size());
 	auto componentIt = m_components.begin();
-	for (int i=0; componentIt != m_components.end(); ++componentIt, ++i)
+	for (int i = 0; componentIt != m_components.end(); ++componentIt, ++i)
 	{
 		result[i] = componentIt->second;
 	}
@@ -138,7 +142,7 @@ void SceneElement::setScene(std::weak_ptr<Scene> scene)
 	auto it = std::begin(m_components);
 	auto endIt = std::end(m_components);
 
-	for ( ;  it != endIt;  ++it)
+	for (;  it != endIt;  ++it)
 	{
 		(it->second)->setScene(scene);
 	}
@@ -177,6 +181,51 @@ std::shared_ptr<SceneElement> SceneElement::getSharedPtr()
 		SURGSIM_FAILURE() << "SceneElement was not created as a shared_ptr.";
 	}
 	return result;
+}
+
+void SceneElement::setName(const std::string& name)
+{
+	m_name = name;
+}
+
+YAML::Node SceneElement::encode() const
+{
+	YAML::Node data(YAML::NodeType::Map);
+	data["Name"] = getName();
+
+	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
+	{
+		data["Components"].push_back(*component);
+	}
+	YAML::Node node(YAML::NodeType::Map);
+	node[getClassName()] = data;
+	return node;
+}
+
+bool SceneElement::decode(const YAML::Node& node)
+{
+	SURGSIM_ASSERT(! isInitialized()) << "Should not call decode on a SceneElement that has already been initialized.";
+	bool result = false;
+	if (!node.IsMap())
+	{
+		std::string className = node.begin()->first.as<std::string>();
+
+		SURGSIM_ASSERT(className == getClassName()) << "Wrong type for this node, wanted <" << className << ">" <<
+				"but this is a <" << getClassName() << ">.";
+
+		node["Name"].as<std::string>(m_name);
+		for (auto nodeIt = node["Components"].begin(); nodeIt != node["Components"].end(); ++nodeIt)
+		{
+			addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+		}
+	}
+	return true;
+}
+
+std::string SceneElement::getClassName() const
+{
+	SURGSIM_FAILURE() << "SceneElement is abstract, this should not be called.";
+	return "SurgSim::Framework::SceneElement";
 }
 
 

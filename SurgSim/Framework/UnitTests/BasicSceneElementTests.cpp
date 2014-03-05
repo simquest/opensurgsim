@@ -16,9 +16,10 @@
 /// \file
 /// Tests for the BasicSceneElement class.
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Blocks/UnitTests/MockObjects.h"
 #include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Math/Quaternion.h"
@@ -38,20 +39,20 @@ using SurgSim::Math::makeRigidTransform;
 namespace SurgSim
 {
 
-namespace Blocks
+namespace Framework
 {
 
-TEST(BasicSceneElementTests, InitTest)
+TEST(BasicSceneElementTestss, InitTest)
 {
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("test name");
 
 	EXPECT_EQ("test name", sceneElement->getName());
 }
 
-TEST(BasicSceneElementTest, InitComponentTest)
+TEST(BasicSceneElementTests, InitComponentTest)
 {
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement = std::make_shared<BasicSceneElement>(
-		"SceneElement");
+				"SceneElement");
 
 	/// Scene element needs a runtime to initialize
 	std::shared_ptr<SurgSim::Framework::Runtime> runtime = std::make_shared<SurgSim::Framework::Runtime>();
@@ -68,6 +69,30 @@ TEST(BasicSceneElementTest, InitComponentTest)
 	EXPECT_FALSE(representation2->didInit());
 	EXPECT_FALSE(representation2->didWakeUp());
 
+}
+
+TEST(BasicSceneElementTests, YamlTest)
+{
+	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>("SceneElement");
+
+	auto representation1 = std::make_shared<MockRepresentation>("TestRepresentation1");
+	auto representation2 = std::make_shared<MockRepresentation>("TestRepresentation2");
+
+	sceneElement->addComponent(representation1);
+	sceneElement->addComponent(representation2);
+
+	YAML::Node node;
+
+	ASSERT_NO_THROW(node = sceneElement);
+
+	EXPECT_TRUE(node.IsMap());
+	EXPECT_EQ("SurgSim::Framework::BasicsSceneElement", node.begin()->first.as<std::string>());
+
+	std::shared_ptr<SceneElement> result;
+
+	ASSERT_NO_THROW(result = node.as<std::shared_ptr<SceneElement>>());
+	EXPECT_EQ("SceneElement", result->getName());
+	EXPECT_EQ(2u, result->getComponents().size());
 }
 
 };  // namespace Blocks

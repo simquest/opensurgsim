@@ -16,9 +16,9 @@
 /// \file
 /// Tests for the TransferPoseBehavior class.
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Blocks/UnitTests/MockObjects.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -30,6 +30,7 @@
 
 #include <random>
 
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Behavior;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::RigidTransform3d;
@@ -91,7 +92,7 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 
 	/// Check that initial pose propagates correctly
 	EXPECT_TRUE(pose.matrix().isApprox(to->getPose().matrix())) <<
-		"The behavior should copy the initial pose on update!";
+			"The behavior should copy the initial pose on update!";
 
 	/// Change the pose and check that it propagates correctly
 	rotation = Quaterniond(SurgSim::Math::Vector4d::Random()).normalized();
@@ -102,7 +103,7 @@ TEST(TransferPoseBehaviorTests, UpdateTest)
 	boost::this_thread::sleep(boost::posix_time::milliseconds(100));
 
 	EXPECT_TRUE(pose.matrix().isApprox(to->getPose().matrix())) <<
-		"The behavior should copy the new pose on update!";
+			"The behavior should copy the new pose on update!";
 
 	runtime->stop();
 }

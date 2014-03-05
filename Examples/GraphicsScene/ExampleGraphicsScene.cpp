@@ -18,10 +18,11 @@
 #include <osg/Matrix>
 #include <osg/Camera>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/PoseInterpolator.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -188,7 +189,7 @@ std::shared_ptr<SurgSim::Graphics::RenderPass> createShadowMapPass()
 }
 
 /// A simple box as a scenelement
-class SimpleBox : public SurgSim::Blocks::BasicSceneElement
+class SimpleBox : public SurgSim::Framework::BasicSceneElement
 {
 public:
 	explicit SimpleBox(const std::string& name) : BasicSceneElement(name)
@@ -227,7 +228,7 @@ private:
 };
 
 
-class SimpleSphere : public SurgSim::Blocks::BasicSceneElement
+class SimpleSphere : public SurgSim::Framework::BasicSceneElement
 {
 public:
 	explicit SimpleSphere(const std::string& name) : BasicSceneElement(name)
@@ -410,7 +411,20 @@ int main(int argc, char* argv[])
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
 	createScene(runtime, graphicsManager);
+	YAML::Node root(YAML::NodeType::Map);
+	YAML::Node sceneElementNode(YAML::NodeType::Sequence);
+	auto sceneElements = runtime->getScene()->getSceneElements();
+	for (auto it = std::begin(sceneElements); it != std::end(sceneElements); ++it)
+	{
+		sceneElementNode.push_back(it->second);
+	}
+	root["Scene"] = sceneElementNode;
+
+	std::ofstream out("test.yaml", std::ios::out);
+	out << root;
+	out.close();
 	runtime->execute();
+
 
 	return 0;
 }

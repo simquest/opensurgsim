@@ -22,7 +22,6 @@
 #include <utility>
 #include <boost/thread/locks.hpp>
 
-
 namespace SurgSim
 {
 namespace Framework
@@ -65,7 +64,7 @@ std::shared_ptr<Runtime> Scene::getRuntime()
 	return m_runtime.lock();
 }
 
-const std::multimap<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
+const std::unordered_map<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
 {
 	return m_elements;
 }

@@ -48,7 +48,7 @@ public:
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
-	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
+	const std::unordered_map<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
 
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
@@ -62,7 +62,7 @@ private:
 
 	std::weak_ptr<Runtime> m_runtime;
 
-	std::multimap<std::string, std::shared_ptr<SceneElement>> m_elements;
+	std::unordered_map<std::string, std::shared_ptr<SceneElement>> m_elements;
 
 	// Used in a const function, need to declare mutable
 	mutable boost::mutex m_sceneElementsMutex;
