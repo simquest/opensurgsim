@@ -28,7 +28,6 @@
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputComponent.h"
@@ -53,9 +52,7 @@ using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::SceneryRepresentation;
-using SurgSim::Graphics::SphereRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
@@ -80,8 +77,8 @@ using SurgSim::Physics::VirtualToolCoupler;
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
-/// \param fileName Name of the file from which the scenery representation is loaded.
-/// \return A SceneElement containing the scenery representation.
+/// \param fileName Name of the file from which the scenery representation will be loaded.
+/// \return A scenery representation.
 std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
 {
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
