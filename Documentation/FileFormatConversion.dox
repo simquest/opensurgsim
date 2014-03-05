@@ -11,7 +11,7 @@ In OpenSurgSim(OSS), we load graphical meshes from obj(3D model format) files an
 3. Blender use mouse right click to 'select' instead of left click. 
 
 ## Steps
-After imported an obj file in Blender, to export objects as ply files, one must first right click, i.e. select, the object to be exported. Then the option under 'File->Export->Stanford(.ply)' will become available. In one obj file, there might be multiple objects. To convert them to ply files, the user must do the previous steps for each object.
+Load the obj file to be converted by selecting 'File->Import->Wavefront(.obj). After imported the obj file in Blender, to export objects as ply files, one must first right click, i.e. select, the object to be exported. Then the option in menu 'File->Export->Stanford(.ply)' will become available. In one obj file, there might be multiple objects. To convert them to ply files, the user must do the previous steps for each object.
 
 	
 */
