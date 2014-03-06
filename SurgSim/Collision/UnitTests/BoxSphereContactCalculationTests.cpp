@@ -102,9 +102,28 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.5, // depth
-						boxQuat * Vector3d(0.0,1.0,0.0), // normal
+						boxQuat * Vector3d(0.0,-1.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.0,0.5,0.0) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,-1.0,0.0) + sphereTrans); // sphere penetration point
+	}
+
+	{
+		SCOPED_TRACE("Sphere center inside box, intersection on top face");
+		boxQuat.setIdentity();
+		boxTrans = Vector3d(0.0,0.0,0.0);
+		sphereQuat.setIdentity();
+		sphereTrans = Vector3d(0.0,0.05,0.0);
+		globalQuat = SurgSim::Math::makeRotationQuaternion(0.35465, Vector3d(0.3454, 0.78567, 0.234346).normalized());
+		globalTrans = Vector3d(24.6,-32.67,87.53);
+		boxQuat = globalQuat * boxQuat;
+		boxTrans = globalQuat * boxTrans + globalTrans;
+		sphereQuat = globalQuat * sphereQuat;
+		sphereTrans = globalQuat * sphereTrans + globalTrans;
+		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
+			1.45, // depth
+			boxQuat * Vector3d(0.0,-1.0,0.0), // normal points into first representation of CollisionPair
+			boxQuat * Vector3d(0.0,0.5,0.0) + boxTrans, // box penetration point
+			sphereQuat * Vector3d(0.0,-1.0,0.0) + sphereTrans); // sphere penetration point
 	}
 
 	{
@@ -122,9 +141,29 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.3, // depth
-						boxQuat * Vector3d(0.0,-1.0,0.0), // normal
+						boxQuat * Vector3d(0.0,1.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.3345,-0.5,0.1234) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,1.0,0.0) + sphereTrans); // sphere penetration point
+	}
+
+	{
+		SCOPED_TRACE("Sphere center inside box, intersection on bottom face");
+		boxQuat.setIdentity();
+		boxTrans = Vector3d(0.0,0.0,0.0);
+		sphereQuat.setIdentity();
+		sphereTrans = Vector3d(0.3345,-0.4,0.1234);
+		globalQuat = SurgSim::Math::makeRotationQuaternion(-0.35465,
+			Vector3d(18.3454, -27.78567, 23.234346).normalized());
+		globalTrans = Vector3d(234.6,326.67,987.53);
+		boxQuat = globalQuat * boxQuat;
+		boxTrans = globalQuat * boxTrans + globalTrans;
+		sphereQuat = globalQuat * sphereQuat;
+		sphereTrans = globalQuat * sphereTrans + globalTrans;
+		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
+			1.1, // depth
+			boxQuat * Vector3d(0.0,1.0,0.0), // normal points into first representation of CollisionPair
+			boxQuat * Vector3d(0.3345,-0.5,0.1234) + boxTrans, // box penetration point
+			sphereQuat * Vector3d(0.0,1.0,0.0) + sphereTrans); // sphere penetration point
 	}
 
 	{
@@ -141,9 +180,28 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.2676, // depth
-						boxQuat * Vector3d(1.0,0.0,0.0), // normal
+						boxQuat * Vector3d(-1.0,0.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.5,-0.2354,0.412) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(-1.0,0.0,0.0) + sphereTrans); // sphere penetration point
+	}
+
+	{
+		SCOPED_TRACE("Sphere center inside box, intersection on right face");
+		boxQuat.setIdentity();
+		boxTrans = Vector3d(23.545,3.4321,5.3421);
+		sphereQuat.setIdentity();
+		sphereTrans = boxTrans + Vector3d(0.45,-0.2354,0.412);
+		globalQuat = SurgSim::Math::makeRotationQuaternion(1.285, Vector3d(23.446, 13.786, 32.254).normalized());
+		globalTrans = Vector3d(-249.6,532.67,977.53);
+		boxQuat = globalQuat * boxQuat;
+		boxTrans = globalQuat * boxTrans + globalTrans;
+		sphereQuat = globalQuat * sphereQuat;
+		sphereTrans = globalQuat * sphereTrans + globalTrans;
+		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
+			1.05, // depth
+			boxQuat * Vector3d(-1.0,0.0,0.0), // normal points into first representation of CollisionPair
+			boxQuat * Vector3d(0.5,-0.2354,0.412) + boxTrans, // box penetration point
+			sphereQuat * Vector3d(-1.0,0.0,0.0) + sphereTrans); // sphere penetration point
 	}
 
 	{
@@ -160,9 +218,28 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.3777, // depth
-						boxQuat * Vector3d(-1.0,0.0,0.0), // normal
+						boxQuat * Vector3d(1.0,0.0,0.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(-0.5,0.2354,-0.412) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(1.0,0.0,0.0) + sphereTrans); // sphere penetration point
+	}
+
+	{
+		SCOPED_TRACE("Sphere center inside box, intersection on left face");
+		boxQuat.setIdentity();
+		boxTrans = Vector3d(876.324,6754.23,7343.76);
+		sphereQuat.setIdentity();
+		sphereTrans = boxTrans + Vector3d(-0.3,0.2354,-0.012);
+		globalQuat = SurgSim::Math::makeRotationQuaternion(0.276, Vector3d(0.945, 1.532, 0.896).normalized());
+		globalTrans = Vector3d(-24.6,32.67,97.53);
+		boxQuat = globalQuat * boxQuat;
+		boxTrans = globalQuat * boxTrans + globalTrans;
+		sphereQuat = globalQuat * sphereQuat;
+		sphereTrans = globalQuat * sphereTrans + globalTrans;
+		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
+			1.2, // depth
+			boxQuat * Vector3d(1.0,0.0,0.0), // normal points into first representation of CollisionPair
+			boxQuat * Vector3d(-0.5,0.2354,-0.012) + boxTrans, // box penetration point
+			sphereQuat * Vector3d(1.0,0.0,0.0) + sphereTrans); // sphere penetration point
 	}
 
 	{
@@ -179,9 +256,28 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.6014, // depth
-						boxQuat * Vector3d(0.0,0.0,-1.0), // normal
+						boxQuat * Vector3d(0.0,0.0,1.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(0.1564,-0.2987,-0.5) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,0.0,1.0) + sphereTrans); // sphere penetration point
+	}
+
+	{
+		SCOPED_TRACE("Sphere center inside box, intersection on front face");
+		boxQuat.setIdentity();
+		boxTrans = Vector3d(0.3252,-0.64564,0.12345);
+		sphereQuat.setIdentity();
+		sphereTrans = boxTrans + Vector3d(0.1564,-0.2987,-0.3986);
+		globalQuat = SurgSim::Math::makeRotationQuaternion(-1.32, Vector3d(235.67, 215.567, 146.345).normalized());
+		globalTrans = Vector3d(224.6,132.67,27.53);
+		boxQuat = globalQuat * boxQuat;
+		boxTrans = globalQuat * boxTrans + globalTrans;
+		sphereQuat = globalQuat * sphereQuat;
+		sphereTrans = globalQuat * sphereTrans + globalTrans;
+		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
+			1.1014, // depth
+			boxQuat * Vector3d(0.0,0.0,1.0), // normal points into first representation of CollisionPair
+			boxQuat * Vector3d(0.1564,-0.2987,-0.5) + boxTrans, // box penetration point
+			sphereQuat * Vector3d(0.0,0.0,1.0) + sphereTrans); // sphere penetration point
 	}
 
 	{
@@ -198,9 +294,28 @@ TEST(BoxSphereContactCalculationTests, UnitTests)
 		sphereTrans = globalQuat * sphereTrans + globalTrans;
 		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
 						0.7014, // depth
-						boxQuat * Vector3d(0.0,0.0,1.0), // normal
+						boxQuat * Vector3d(0.0,0.0,-1.0), // normal points into first representation of CollisionPair
 						boxQuat * Vector3d(-0.2564,-0.4987,0.5) + boxTrans, // box penetration point
 						sphereQuat * Vector3d(0.0,0.0,-1.0) + sphereTrans); // sphere penetration point
+	}
+
+	{
+		SCOPED_TRACE("Sphere center inside box, intersection on back face");
+		boxQuat.setIdentity();
+		boxTrans = Vector3d(24.345,-865.325,46.345);
+		sphereQuat.setIdentity();
+		sphereTrans = boxTrans + Vector3d(-0.2564,-0.3987,0.48);
+		globalQuat = SurgSim::Math::makeRotationQuaternion(1.2, Vector3d(25.67, -25.567, 16.345).normalized());
+		globalTrans = Vector3d(24.6,3243.67,9762.53);
+		boxQuat = globalQuat * boxQuat;
+		boxTrans = globalQuat * boxTrans + globalTrans;
+		sphereQuat = globalQuat * sphereQuat;
+		sphereTrans = globalQuat * sphereTrans + globalTrans;
+		doBoxSphereTest(box, boxQuat, boxTrans, sphere, sphereQuat, sphereTrans, true,
+			1.02, // depth
+			boxQuat * Vector3d(0.0,0.0,-1.0), // normal points into first representation of CollisionPair
+			boxQuat * Vector3d(-0.2564,-0.3987,0.5) + boxTrans, // box penetration point
+			sphereQuat * Vector3d(0.0,0.0,-1.0) + sphereTrans); // sphere penetration point
 	}
 }
 
