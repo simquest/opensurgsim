@@ -101,35 +101,32 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 		std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
-			EmptyData emptyData;
 			SurgSim::Math::Vector3d p;
 			p[0] = cubePoints[i][0] * lx;
 			p[1] = cubePoints[i][1] * ly;
 			p[2] = cubePoints[i][2] * lz;
-			TriangleMesh::VertexType v(p, emptyData);
+			TriangleMesh::VertexType v(p);
 			mesh->addVertex(v);
 		}
 		for (int i = 0; i < cubeNumEdges; i++)
 		{
-			EmptyData emptyData;
 			std::array<unsigned int,2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
 			}
-			EdgeElement edgeElement(edgePoints, emptyData);
+			EdgeElement edgeElement(edgePoints);
 			TriangleMesh::EdgeType e(edgeElement);
 			mesh->addEdge(e);
 		}
 		for (int i = 0; i < cubeNumTriangles; i++)
 		{
-			EmptyData emptyData;
 			std::array<unsigned int,3> trianglePoints;
 			for (int j = 0; j < 3; j++)
 			{
 				trianglePoints[j] = cubeTrianglesCCW[i][j];
 			}
-			TriangleElement triangleElement(trianglePoints, emptyData);
+			TriangleElement triangleElement(trianglePoints);
 			TriangleMesh::TriangleType t(triangleElement);
 			mesh->addTriangle(t);
 		}

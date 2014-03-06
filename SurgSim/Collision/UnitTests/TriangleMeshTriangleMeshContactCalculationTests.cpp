@@ -114,25 +114,23 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 	for (int i = 0; i < cubeNumEdges; ++i)
 	{
-		EmptyData emptyData;
 		std::array<unsigned int, 2> edgePoints;
 		for (int j = 0; j < 2; j++)
 		{
 			edgePoints[j] = cubeEdges[i][j];
 		}
-		EdgeElement edgeElement(edgePoints, emptyData);
+		EdgeElement edgeElement(edgePoints);
 		TriangleMesh::EdgeType e(edgeElement);
 		mesh->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; ++i)
 	{
-		EmptyData emptyData;
 		std::array<unsigned int, 3> trianglePoints;
 		for (int j = 0; j < 3; j++)
 		{
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
-		TriangleElement triangleElement(trianglePoints, emptyData);
+		TriangleElement triangleElement(trianglePoints);
 		TriangleMesh::TriangleType t(triangleElement);
 		mesh->addTriangle(t);
 	}

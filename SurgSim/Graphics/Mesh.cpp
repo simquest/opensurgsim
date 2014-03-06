@@ -70,8 +70,7 @@ void Mesh::initialize(
 
 		if (valid)
 		{
-			EmptyData emptyData;
-			Mesh::TriangleType triangle(ids, emptyData);
+			Mesh::TriangleType triangle(ids);
 			addTriangle(triangle);
 		}
 		else

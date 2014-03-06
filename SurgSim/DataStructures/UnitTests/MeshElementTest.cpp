@@ -46,8 +46,7 @@ TEST(MeshElementTest, InitTest)
 	ASSERT_NO_THROW({MockTriangle triangle(triangleVertices, triangleData);});
 
 	std::array<unsigned int, 4> tetrahedronVertices = {{0, 1, 2, 3}};
-	EmptyData emptyData;
-	ASSERT_NO_THROW({MockTetrahedron triangle(tetrahedronVertices, emptyData);});
+	ASSERT_NO_THROW({MockTetrahedron triangle(tetrahedronVertices);});
 }
 
 TEST(MeshElementTest, EdgeTest)
@@ -128,20 +127,19 @@ TEST(MeshElementTest, TriangleTest)
 TEST(MeshElementTest, TetrahedronTest)
 {
 	std::array<unsigned int, 4> tetrahedronVertices = {{5, 2, 10, 6}};
-	EmptyData emptyData;
-	MockTetrahedron tetrahedron(tetrahedronVertices, emptyData);
+	MockTetrahedron tetrahedron(tetrahedronVertices);
 
 	EXPECT_EQ(tetrahedronVertices, tetrahedron.verticesId);
 
 	/// Check comparisons
 
-	MockTetrahedron sameTetrahedron(tetrahedronVertices, emptyData);
+	MockTetrahedron sameTetrahedron(tetrahedronVertices);
 	EXPECT_TRUE(tetrahedron == sameTetrahedron);
 	EXPECT_FALSE(tetrahedron != sameTetrahedron);
 
 	std::array<unsigned int, 4> differentTetrahedronVertices = {{10, 5, 7, 3}};
 
-	MockTetrahedron tetrahedronWithDifferentVertices(differentTetrahedronVertices, emptyData);
+	MockTetrahedron tetrahedronWithDifferentVertices(differentTetrahedronVertices);
 	EXPECT_FALSE(tetrahedron == tetrahedronWithDifferentVertices);
 	EXPECT_TRUE(tetrahedron != tetrahedronWithDifferentVertices);
 }
