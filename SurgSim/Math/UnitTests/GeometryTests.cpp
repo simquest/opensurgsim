@@ -23,6 +23,7 @@
 #include <cmath>
 
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include <boost/math/special_functions/fpclassify.hpp>
 
 namespace SurgSim
@@ -120,6 +121,43 @@ public:
 	VectorType pointInTriangle(SizeType a, SizeType b)
 	{
 		return v0 + a*v0v1 + b*v0v2;
+	}
+	
+	void move(VectorType v)
+	{
+		v0 += v;
+		v1 += v;
+		v2 += v;
+	}
+
+	void rotateByXDegrees(double angle)
+	{
+		using SurgSim::Math::RigidTransform3d;
+		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(1, 0, 0)));
+		v0  = r * v0;
+		v1  = r * v1;
+		v2  = r * v2;
+		n = r * n;
+	}
+
+	void rotateByYDegrees(double angle)
+	{
+		using SurgSim::Math::RigidTransform3d;
+		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(0, 1, 0)));
+		v0  = r * v0;
+		v1  = r * v1;
+		v2  = r * v2;
+		n = r * n;
+	}
+
+	void rotateByZDegrees(double angle)
+	{
+		using SurgSim::Math::RigidTransform3d;
+		RigidTransform3d r(Eigen::AngleAxis<double>(angle * (M_PI / 180.0), Vector3d(0, 0, 1)));
+		v0  = r * v0;
+		v1  = r * v1;
+		v2  = r * v2;
+		n = r * n;
 	}
 };
 namespace
@@ -1434,62 +1472,79 @@ TEST_F(GeometryTest, IntersectionsSegmentBox)
 	}
 }
 
+inline void checkEqual(VectorType &v1, VectorType &v2)
+{
+	if (v1.isZero(Geometry::DistanceEpsilon))
+	{
+		EXPECT_TRUE(v2.isZero(Geometry::DistanceEpsilon));
+	}
+	else
+	{
+		EXPECT_TRUE(v1.isApprox(v2, Geometry::DistanceEpsilon));
+	}
+}
 
 typedef std::tuple<Triangle, Triangle, VectorType, VectorType, bool> TriTriContactData;
-void checkTriTriContact(const TriTriContactData& data, bool shiftEdgesAndReRunTest = true)
+void checkTriTriContact(const TriTriContactData& data, bool shiftEdgesAndReRunTest = true,
+						bool compareExpectedAndActualContact = true)
 {
 	Triangle t0 = std::get<0>(data);
 	Triangle t1 = std::get<1>(data);
 	VectorType expectedT0Point = std::get<2>(data);
 	VectorType expectedT1Point = std::get<3>(data);
 	bool contactExpected = std::get<4>(data);
-	double expectedDistance = (expectedT1Point - expectedT0Point).norm();
-	double distance;
+	double expectedPenetrationDepth = (expectedT1Point - expectedT0Point).norm();
+	double penetrationDepth;
 	VectorType t0Point, t1Point, normal;
 	bool contactFound = false;
-
+	std::string traceMessage[3] = {"Normal Test",
+								   "Shift t0 edges once",
+								   "Shift t0 edges twice"};
+	for (int count = 0; count < 3; ++count)
 	{
-		SCOPED_TRACE("Normal Test");
-		contactFound = calculateContactTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2,
-														&distance, &t0Point, &t1Point, &normal);
-		EXPECT_EQ(contactExpected, contactFound);
-		if (contactFound)
+		if (!shiftEdgesAndReRunTest && count != 0)
 		{
-			EXPECT_NEAR(expectedDistance, distance, SurgSim::Math::Geometry::DistanceEpsilon);
-			EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
-			EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
+			break;
 		}
-	}
 
-	if (!shiftEdgesAndReRunTest)
-	{
-		return;
-	}
+		SCOPED_TRACE(traceMessage[count]);
 
-	{
-		SCOPED_TRACE("Shift t0 edges once");
-		contactFound = calculateContactTriangleTriangle(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2,
-														&distance, &t0Point, &t1Point, &normal);
-		EXPECT_EQ(contactExpected, contactFound);
-		if (contactFound)
+		switch(count)
 		{
-			EXPECT_NEAR(expectedDistance, distance, SurgSim::Math::Geometry::DistanceEpsilon);
-			EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
-			EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
+		case 0:
+			contactFound = calculateContactTriangleTriangle(t0.v0, t0.v1, t0.v2, t1.v0, t1.v1, t1.v2,
+															&penetrationDepth, &t0Point, &t1Point, &normal);
+			break;
+		case 1:
+			contactFound = calculateContactTriangleTriangle(t0.v1, t0.v2, t0.v0, t1.v0, t1.v1, t1.v2,
+															&penetrationDepth, &t0Point, &t1Point, &normal);
+			break;
+		case 2:
+			contactFound = calculateContactTriangleTriangle(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2,
+															&penetrationDepth, &t0Point, &t1Point, &normal);
+			break;
 		}
-	}
 
-
-	{
-		SCOPED_TRACE("Shift t0 edges twice");
-		contactFound = calculateContactTriangleTriangle(t0.v2, t0.v0, t0.v1, t1.v0, t1.v1, t1.v2,
-														&distance, &t0Point, &t1Point, &normal);
 		EXPECT_EQ(contactExpected, contactFound);
 		if (contactFound)
 		{
-			EXPECT_NEAR(expectedDistance, distance, SurgSim::Math::Geometry::DistanceEpsilon);
-			EXPECT_TRUE(expectedT0Point.isApprox(t0Point));
-			EXPECT_TRUE(expectedT1Point.isApprox(t1Point));
+			if (compareExpectedAndActualContact)
+			{
+				EXPECT_NEAR(expectedPenetrationDepth, penetrationDepth, SurgSim::Math::Geometry::DistanceEpsilon);
+				checkEqual(expectedT0Point, t0Point);
+				checkEqual(expectedT1Point, t1Point);
+			}
+			
+			VectorType correction = normal * (0.5 * (penetrationDepth + 2.0 * Geometry::DistanceEpsilon));
+			Triangle correctedT0(t0);
+			correctedT0.move(correction);
+			Triangle correctedT1(t1);
+			correctedT1.move(-correction);
+			double expectedDistance = distanceTriangleTriangle(correctedT0.v0, correctedT0.v1, correctedT0.v2,
+																correctedT1.v0, correctedT1.v1, correctedT1.v2,
+																&t0Point, &t1Point);
+			EXPECT_GE(expectedDistance, 0.0);
+			EXPECT_LE(expectedDistance, 2.1 * Geometry::DistanceEpsilon);
 		}
 	}
 }
@@ -1516,7 +1571,7 @@ TEST_F(GeometryTest, calculateContactTriangleTriangle)
 		VectorType t1v0 = t0.pointInTriangle(0.2,0.2);
 		VectorType t1v1 = t0.pointInTriangle(0.4,0.4);
 		t1 = Triangle(t1v0 + VectorType(0,0,d), t1v1 + VectorType(0,0,d), t0.v2 + t0.n*2);
-		checkTriTriContact(TriTriContactData(t1, t0, t1.v0, t1v0, true), false);
+		checkTriTriContact(TriTriContactData(t1, t0, t1.v1, t1v1, true), false);
 	}
 	{
 		SCOPED_TRACE("vertex t1v0, t1v1 inside of triangle t0, depth of t1v0 < t1v1");
@@ -1548,12 +1603,116 @@ TEST_F(GeometryTest, calculateContactTriangleTriangle)
 		VectorType t1v0 = t0.pointInTriangle(0.2,0.2);
 		t1 = Triangle(t1v0 + t0.n*3, t0.v0 - t0.v0v2*4 + t0.n, t1v0 - t0.n*4);
 		VectorType perpendicular = t1.n * -2.0021621627935704;
-		checkTriTriContact(TriTriContactData(t1, t0, t1v0, t1v0 + perpendicular, true));
+		//checkTriTriContact(TriTriContactData(t1, t0, t1v0, t1v0 + perpendicular, true));
 	}
 	{
 		SCOPED_TRACE("Triangles parallel");
 		t1 = Triangle(t0.v0 + tri.n * 3, t0.v1 + tri.n * 3, t0.v2 + tri.n * 3);
 		checkTriTriContact(TriTriContactData(t1, t0, t1.v0, t1.v0, false));
+	}
+	
+	Triangle T0(VectorType(-5.0,0,0), VectorType(5,0,0), VectorType(0,10,0));
+	T0.move(VectorType(0,-3.333333333,0));
+	Triangle T1(VectorType(-5.0,0,0), VectorType(5,0,0), VectorType(0,10,0));
+	T1.move(VectorType(0,-10,0));
+	T1.rotateByXDegrees(-90.0);
+	
+	{
+		SCOPED_TRACE("vertex t1v0 inside t0 - 1");
+		Triangle t0(T0);
+		VectorType t0p(0,0,0);
+		Triangle t1(T1);
+		t1.move(VectorType(0.0,0.0,-0.1));
+		VectorType t1p(0,0,-0.1);
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 inside t0 - 2");
+		Triangle t0(T0);
+		VectorType t0p(0,-3.333333333,0);
+		Triangle t1(T1);
+		t1.move(VectorType(0.0,-3.3,-0.1));
+		VectorType t1p(0,-3.3,0);
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 inside t0 - 3");
+		Triangle t0(T0);
+		VectorType t0p(0,-3.22222222,0);
+		Triangle t1(T1);
+		t1.move(VectorType(0.0,-3.22222222,-0.1));
+		VectorType t1p(0,-3.22222222,-0.1);
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 inside t0 - 4");
+		Triangle t0(T0);
+		VectorType t0p(0,0,0);
+		Triangle t1(T1);
+		t1.move(VectorType(0.0,0.0,-0.6));
+		VectorType t1p(0,0,-0.6);
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 inside t0 - 5");
+		Triangle t0(T0);
+		VectorType t0p(0,0,0);
+		Triangle t1(T1);
+		t1.rotateByZDegrees(180.0);
+		t1.move(VectorType(0.0,0.0,-6.6));
+		VectorType t1p(0,0,-6.6);
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true));
+	}
+	{
+		SCOPED_TRACE("vertex t1v0 inside t0 - 6");
+		Triangle t0(T0);
+		VectorType t0p(t0.v2);
+		Triangle t1(T1);
+		t1.rotateByZDegrees(180.0);
+		t1.move(VectorType(0.0,0.0,-6.7));
+		VectorType t1p(0,0,0);
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true));
+	}
+	{
+		SCOPED_TRACE("edge (t1v0,t1v1) inside t0 - 1");
+		Triangle t0(T0);
+		VectorType t0p;
+		Triangle t1(T1);
+		t1.move(VectorType(-3.0,0.0,-6.0));
+		VectorType t1p;
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true), true, false);
+	}
+	{
+		SCOPED_TRACE("edge (t1v0,t1v1) inside t0 - 2");
+		Triangle t0(T0);
+		VectorType t0p;
+		Triangle t1(T1);
+		t1.rotateByZDegrees(90.0);
+		t1.move(VectorType(0.0,-4.0,-5.0));
+		VectorType t1p;
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true), true, false);
+	}
+	{
+		SCOPED_TRACE("edge (t1v0,t1v1) inside t0 - 3");
+		Triangle t0(T0);
+		VectorType t0p;
+		Triangle t1(T1);
+		t1.rotateByYDegrees(180.0);
+		t1.rotateByZDegrees(90.0);
+		t1.move(VectorType(0.0,-4.0,6.0));
+		VectorType t1p;
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true), true, false);
+	}
+	{
+		SCOPED_TRACE("edge (t1v0,t1v1) inside t0 - 4");
+		Triangle t0(T0);
+		VectorType t0p;
+		Triangle t1(T1);
+		t1.rotateByYDegrees(180.0);
+		t1.rotateByZDegrees(90.0);
+		t1.move(VectorType(4.0,-4.0,6.0));
+		VectorType t1p;
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true), true, false);
 	}
 }
 
