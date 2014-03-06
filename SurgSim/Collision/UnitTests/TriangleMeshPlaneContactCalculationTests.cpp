@@ -293,7 +293,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		meshTrans = Vector3d::Zero();
 		mRotation = Eigen::AngleAxisd(M_PI_4, Vector3d(1.0, 0.0, -1.0).normalized());
 		planeQuat = Quaterniond(mRotation);
-		planNormal = mRotation * Vector3d(0.0, 1.0, 0.0);
+		planNormal = mRotation * Vector3d::UnitY();
 		planeTrans = -1.0 * planNormal * (sqrt(3.0) * cubeSize / 2.0 - epsilonTrans);
 		int expectedNumberOfContacts = 1;
 		int expectedBoxIndicesInContacts[] = {0};
@@ -373,7 +373,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("intersection, 01 contacts, plane & cube -0.8*M_PI*rotate(Z, -M_PI/4)");
-		globalQuat = SurgSim::Math::makeRotationQuaternion(-1.318, Vector3d::UnitZ().normalized());
+		globalQuat = SurgSim::Math::makeRotationQuaternion<double, Vector3d::Options>(-1.318, Vector3d::UnitZ().normalized());
 		meshQuat = globalQuat * Quaterniond::Identity();
 		meshTrans = Vector3d::Zero();
 		planeQuat = globalQuat * Quaterniond(Eigen::AngleAxisd(-M_PI_4, Vector3d::UnitZ()));

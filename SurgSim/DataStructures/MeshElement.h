@@ -55,7 +55,7 @@ struct MeshElement
 	/// Constructor with empty data member
 	/// \param	verticesId IDs of the N element vertices
 	MeshElement(const std::array<unsigned int, N>& verticesId) : 
-		verticesId(verticesId)
+		verticesId(verticesId),
 		data()
 	{
 	}
