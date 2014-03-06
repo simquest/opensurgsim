@@ -28,7 +28,7 @@ namespace SurgSim
 namespace DataStructures
 {
 
-TEST(MeshTest, NormalTest)
+TEST(TriangleMeshTest, NormalTest)
 {
 	typedef SurgSim::DataStructures::TriangleMeshBase<void, void, void> TriangleMeshBase;
 	typedef SurgSim::DataStructures::MeshElement<2, void> EdgeElement;
