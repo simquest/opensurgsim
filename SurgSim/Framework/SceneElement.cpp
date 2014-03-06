@@ -188,14 +188,21 @@ void SceneElement::setName(const std::string& name)
 	m_name = name;
 }
 
-YAML::Node SceneElement::encode() const
+YAML::Node SceneElement::encode(bool standalone) const
 {
 	YAML::Node data(YAML::NodeType::Map);
 	data["Name"] = getName();
 
 	for (auto component = std::begin(m_components); component != std::end(m_components); ++component)
 	{
-		data["Components"].push_back(*component);
+		if (standalone)
+		{
+			data["Components"].push_back(*component->second);
+		}
+		else
+		{
+			data["Components"].push_back(component->second);
+		}
 	}
 	YAML::Node node(YAML::NodeType::Map);
 	node[getClassName()] = data;
@@ -206,25 +213,31 @@ bool SceneElement::decode(const YAML::Node& node)
 {
 	SURGSIM_ASSERT(! isInitialized()) << "Should not call decode on a SceneElement that has already been initialized.";
 	bool result = false;
-	if (!node.IsMap())
+	if (node.IsMap())
 	{
 		std::string className = node.begin()->first.as<std::string>();
 
 		SURGSIM_ASSERT(className == getClassName()) << "Wrong type for this node, wanted <" << className << ">" <<
 				"but this is a <" << getClassName() << ">.";
 
-		node["Name"].as<std::string>(m_name);
-		for (auto nodeIt = node["Components"].begin(); nodeIt != node["Components"].end(); ++nodeIt)
+		YAML::Node data = node[getClassName()];
+
+		m_name = data["Name"].as<std::string>();
+		if (data["Components"].IsSequence())
 		{
-			addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+			for (auto nodeIt = data["Components"].begin(); nodeIt != data["Components"].end(); ++nodeIt)
+			{
+				addComponent(nodeIt->as<std::shared_ptr<SurgSim::Framework::Component>>());
+			}
+			result = true;
 		}
 	}
-	return true;
+	return result;
 }
 
 std::string SceneElement::getClassName() const
 {
-	SURGSIM_FAILURE() << "SceneElement is abstract, this should not be called.";
+	// SURGSIM_FAILURE() << "SceneElement is abstract, this should not be called.";
 	return "SurgSim::Framework::SceneElement";
 }
 

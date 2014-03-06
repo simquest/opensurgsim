@@ -17,6 +17,7 @@
 #define SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H
 
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Macros.h"
 
 namespace SurgSim
 {
@@ -33,6 +34,8 @@ public:
 	explicit BasicSceneElement(const std::string& name);
 	/// Destructor
 	virtual ~BasicSceneElement();
+
+	SURGSIM_CLASSNAME(SurgSim::Framework::BasicSceneElement);
 
 protected:
 	/// Initializes the scene element

@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SceneElement.h"
@@ -20,7 +21,11 @@
 #include "SurgSim/Framework/Log.h"
 
 #include <utility>
+#include <set>
+#include <vector>
 #include <boost/thread/locks.hpp>
+
+#include <yaml-cpp/yaml.h>
 
 namespace SurgSim
 {
@@ -64,7 +69,7 @@ std::shared_ptr<Runtime> Scene::getRuntime()
 	return m_runtime.lock();
 }
 
-const std::unordered_map<std::string,std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
+const std::unordered_map<std::string, std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
 {
 	return m_elements;
 }
@@ -83,6 +88,59 @@ std::shared_ptr<Scene> Scene::getSharedPtr()
 	return result;
 }
 
+YAML::Node Scene::encode() const
+{
+	YAML::Node result(YAML::NodeType::Map);
+	YAML::Node data(YAML::NodeType::Map);
+
+
+	// Pre-encode all the components so the scene elements only see references to those components.
+	std::set<std::shared_ptr<SurgSim::Framework::Component>> componentSet;
+	std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>> sceneElements;
+	for (auto sceneElement = m_elements.begin(); sceneElement != m_elements.end(); ++sceneElement)
+	{
+		sceneElements.push_back(sceneElement->second);
+		auto components = sceneElement->second->getComponents();
+		componentSet.insert(components.begin(), components.end());
+	}
+
+	std::for_each(componentSet.begin(), componentSet.end(),
+				  [&data](std::shared_ptr<Component> component)
+	{
+		data["Components"].push_back(*component);
+	});
+
+	data["SceneElements"] = sceneElements;
+	result["SurgSim::Framework::Scene"] = data;
+	return result;
+}
+
+bool Scene::decode(const YAML::Node& node)
+{
+	bool result = false;
+	if (node.IsMap())
+	{
+		YAML::Node data = node["SurgSim::Framework::Scene"];
+		// Prime the cache in the reader, this should have created all the components
+		if (data["Components"].IsDefined())
+		{
+			data["Components"].as<std::vector<std::shared_ptr<Component>>>();
+		}
+
+		if (data["SceneElements"].IsDefined())
+		{
+			auto sceneElements = data["SceneElements"].as<std::vector<std::shared_ptr<SceneElement>>>();
+
+			std::for_each(sceneElements.begin(), sceneElements.end(),
+						  [&](std::shared_ptr<SceneElement> element)
+			{
+				addSceneElement(element);
+			});
+		}
+		result = true;
+	}
+	return result;
+}
 }; // namespace Framework
 }; // namespace SurgSim
 

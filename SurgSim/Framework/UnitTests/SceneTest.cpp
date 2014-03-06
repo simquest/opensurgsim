@@ -18,6 +18,7 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/FrameworkConvert.h"
 
 namespace SurgSim
 {
@@ -84,6 +85,25 @@ TEST(SceneTest, CheckForExpiredRuntime)
 	// We should not be able to do this with an expired runtime pointer
 	EXPECT_THROW(scene->addSceneElement(element1), SurgSim::Framework::AssertionFailure);
 	EXPECT_THROW(element0->addComponent(component1), SurgSim::Framework::AssertionFailure);
+}
+
+TEST(SceneTest, YamlTest)
+{
+	auto runtime = std::make_shared<Runtime>();
+	auto scene = std::make_shared<Scene>(runtime);
+
+	auto element0 = std::make_shared<MockSceneElement>("element0");
+	auto element1 = std::make_shared<MockSceneElement>("element1");
+
+	auto component0 = std::make_shared<MockComponent>("component0");
+	auto component1 = std::make_shared<MockComponent>("component1");
+
+	element0->addComponent(component0);
+	element1->addComponent(component1);
+
+	YAML::Node node;
+	EXPECT_NO_THROW(node = scene) << "Failed to serialize Scene.";
+
 }
 
 }

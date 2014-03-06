@@ -36,6 +36,11 @@ using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeRigidTransform;
 
+namespace
+{
+SURGSIM_REGISTER(SurgSim::Framework::Component, MockRepresentation)
+}
+
 namespace SurgSim
 {
 
@@ -83,14 +88,14 @@ TEST(BasicSceneElementTests, YamlTest)
 
 	YAML::Node node;
 
-	ASSERT_NO_THROW(node = sceneElement);
+	ASSERT_NO_THROW(node = sceneElement) << "Failed to serialize SceneElement";
 
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ("SurgSim::Framework::BasicsSceneElement", node.begin()->first.as<std::string>());
+	EXPECT_EQ("SurgSim::Framework::BasicSceneElement", node.begin()->first.as<std::string>());
 
 	std::shared_ptr<SceneElement> result;
 
-	ASSERT_NO_THROW(result = node.as<std::shared_ptr<SceneElement>>());
+	ASSERT_NO_THROW(result = node.as<std::shared_ptr<SceneElement>>()) << "Failed to restore SceneElement.";
 	EXPECT_EQ("SceneElement", result->getName());
 	EXPECT_EQ(2u, result->getComponents().size());
 }

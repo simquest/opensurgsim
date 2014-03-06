@@ -411,18 +411,14 @@ int main(int argc, char* argv[])
 	runtime->addManager(std::make_shared<SurgSim::Framework::BehaviorManager>());
 
 	createScene(runtime, graphicsManager);
-	YAML::Node root(YAML::NodeType::Map);
-	YAML::Node sceneElementNode(YAML::NodeType::Sequence);
-	auto sceneElements = runtime->getScene()->getSceneElements();
-	for (auto it = std::begin(sceneElements); it != std::end(sceneElements); ++it)
-	{
-		sceneElementNode.push_back(it->second);
-	}
-	root["Scene"] = sceneElementNode;
 
-	std::ofstream out("test.yaml", std::ios::out);
+	YAML::Node root;
+	root["Scene"] = runtime->getScene();
+
+	std::ofstream out("scene.yaml", std::ios::out);
 	out << root;
 	out.close();
+
 	runtime->execute();
 
 

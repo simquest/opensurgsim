@@ -23,6 +23,11 @@
 
 #include "SurgSim/Framework/SceneElement.h"
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 namespace Framework
@@ -48,11 +53,20 @@ public:
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
-	const std::unordered_map<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
+	const std::unordered_map<std::string, std::shared_ptr<SceneElement>>& getSceneElements() const;
 
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();
+
+	/// Convert to a YAML::Node
+	/// \return A node with all the public data of this instance
+	YAML::Node encode() const;
+
+	/// Pull data from a YAML::Node.
+	/// \param node the node to decode.
+	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
+	bool decode(const YAML::Node& node);
 
 private:
 

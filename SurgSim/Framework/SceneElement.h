@@ -115,8 +115,17 @@ public:
 	/// \return	The shared pointer.
 	std::shared_ptr<SceneElement> getSharedPtr();
 
-	virtual YAML::Node encode() const;
 
+	/// Convert to a YAML::Node
+	/// \param standalone when true, all the components will be represented as full component, when false
+	///                   they will be represented as references
+	/// \return A node with all the public data of this instance
+	virtual YAML::Node encode(bool standalone) const;
+
+	/// Pull data from a YAML::Node.
+	/// \throws SurgSim::Framework::AssertionFailure if the SceneElement is already initialized
+	/// \param node the node to decode.
+	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
 	virtual bool decode(const YAML::Node& node);
 
 private:
