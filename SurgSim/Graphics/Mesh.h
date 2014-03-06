@@ -23,7 +23,6 @@
 #include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Math/Vector.h"
 
-using SurgSim::DataStructures::EmptyData;
 
 namespace SurgSim
 {
@@ -53,7 +52,8 @@ struct VertexData {
 	}
 };
 
-class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, EmptyData, EmptyData>
+class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, SurgSim::DataStructures::EmptyData,
+					SurgSim::DataStructures::EmptyData>
 {
 public:
 	/// Utility function to initialize a mesh with plain data,

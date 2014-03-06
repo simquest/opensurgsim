@@ -19,6 +19,7 @@
 
 #include "gtest/gtest.h"
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Vector.h"

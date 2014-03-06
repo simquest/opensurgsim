@@ -19,6 +19,7 @@
 #include <array>
 #include <memory>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 

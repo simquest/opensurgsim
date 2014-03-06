@@ -28,7 +28,6 @@
 #include "SurgSim/Framework/Convert.h"
 
 
-using SurgSim::DataStructures::EmptyData;
 
 namespace SurgSim
 {
@@ -45,7 +44,8 @@ class MeshShape : public Shape
 public:
 
 	/// Type TriMesh for convenience
-	typedef SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, EmptyData> TriMesh;
+	typedef SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
+			SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData> TriMesh;
 
 public:
 	/// Constructor
