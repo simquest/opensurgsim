@@ -1630,7 +1630,7 @@ bool calculateContactTriangleTriangle(
 			 ++edgeStartVertexId)
 		{
 			vUnder[iUnder] = *v[A][*edgeStartVertexId];
-			
+
 			// This vertex is at the depth.
 			dFromPlaneB[iUnder] = std::abs(signedDFromPlaneB[A][*edgeStartVertexId]);
 
@@ -1638,7 +1638,8 @@ bool calculateContactTriangleTriangle(
 			vUnderOnPlaneB[iUnder] = vUnder[iUnder] - *n[B] * signedDFromPlaneB[A][*edgeStartVertexId];
 
 			// Find the barycentric coordinates of vUnderOnPlaneB[iUnder] w.r.t. B.
-			barycentricCoordinates(vUnderOnPlaneB[iUnder], *v[B][0], *v[B][1], *v[B][2], *n[B], &vUnderOnPlaneBBary[iUnder]);
+			barycentricCoordinates(vUnderOnPlaneB[iUnder], *v[B][0], *v[B][1], *v[B][2], *n[B],
+								   &vUnderOnPlaneBBary[iUnder]);
 
 			// Find if vUnderOnPlaneB[iUnder] is inside B.
 			vUnderInsideB[iUnder] = vUnderOnPlaneBBary[iUnder][0] >= -Geometry::DistanceEpsilon &&
@@ -1668,7 +1669,7 @@ bool calculateContactTriangleTriangle(
 
 				// Find the barycentric coordinates of vOn[iOn] w.r.t. B.
 				barycentricCoordinates(vOn[iOn], *v[B][0], *v[B][1], *v[B][2], *n[B], &vOnBary[iOn]);
-				
+
 				// Find if vOn[iOn] is inside B.
 				vOnInsideB[iOn] = vOnBary[iOn][0] >= -Geometry::DistanceEpsilon &&
 								  vOnBary[iOn][1] >= -Geometry::DistanceEpsilon &&
@@ -1721,7 +1722,7 @@ bool calculateContactTriangleTriangle(
 		{
 			continue;
 		}
-		
+
 		if (!vOnInsideB[0])
 		{
 			vOn[0] = prunePoint[0];
@@ -1741,7 +1742,8 @@ bool calculateContactTriangleTriangle(
 			for (unsigned int b = 0; b < 3; ++b)
 			{
 				T s[2] = {T(-1), T(-1)};
-				if (std::abs(distanceSegmentSegment(vUnderOnPlaneB[0], vUnderOnPlaneB[1], *v[B][(b+1)%3], *v[B][(b+2)%3],
+				if (std::abs(distanceSegmentSegment(vUnderOnPlaneB[0], vUnderOnPlaneB[1],
+													*v[B][(b+1)%3], *v[B][(b+2)%3],
 													&segmentSegmentIntersection[0], &segmentSegmentIntersection[1],
 													&s[0], &s[1]))
 														< Geometry::DistanceEpsilon)
@@ -1829,7 +1831,8 @@ bool calculateContactTriangleTriangle(
 					dpi2 = (dpi2 + 1) % 2;
 					penetrationPoint[A][A] += vUnder[0] + pruneParam[dpi2] * (vUnder[1] - vUnder[0]);
 					penetrationPoint[A][A] *= 0.5;
-					penetrationPoint[A][B] += vUnderOnPlaneB[0] + pruneParam[dpi2] * (vUnderOnPlaneB[1] - vUnderOnPlaneB[0]);
+					penetrationPoint[A][B] += vUnderOnPlaneB[0] +
+											  pruneParam[dpi2] * (vUnderOnPlaneB[1] - vUnderOnPlaneB[0]);
 					penetrationPoint[A][B] *= 0.5;
 				}
 				contactCaclulated[A] = true;
@@ -1838,13 +1841,15 @@ bool calculateContactTriangleTriangle(
 			else
 			{
 				penetrationDepth[A] = depth[dpi];
-				penetrationPoint[A][A] = vOn[dpi] + parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
+				penetrationPoint[A][A] = vOn[dpi] +
+										 parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
 				penetrationPoint[A][B] = vUnderOnPlaneB[vOnToUnderId[dpi]];
 				if (depth[0] > depth[1] - Geometry::DistanceEpsilon && depth[0] < depth[1] + Geometry::DistanceEpsilon)
 				{
 					// Same depth.
 					dpi = (dpi + 1) % 2;
-					penetrationPoint[A][A] += vOn[dpi] + parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
+					penetrationPoint[A][A] += vOn[dpi] + parametricPointOnProjectedEdge[dpi] *
+														 (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
 					penetrationPoint[A][A] *= 0.5;
 					penetrationPoint[A][B] += vUnderOnPlaneB[vOnToUnderId[dpi]];
 					penetrationPoint[A][B] *= 0.5;
@@ -1855,7 +1860,8 @@ bool calculateContactTriangleTriangle(
 		else
 		{
 			penetrationDepth[A] = depth[dpi];
-			penetrationPoint[A][A] = vOn[dpi] + parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
+			penetrationPoint[A][A] = vOn[dpi] +
+									 parametricPointOnProjectedEdge[dpi] * (vUnder[vOnToUnderId[dpi]] - vOn[dpi]);
 			penetrationPoint[A][B] = vUnderOnPlaneB[vOnToUnderId[dpi]];
 			contactCaclulated[A] = true;
 		}

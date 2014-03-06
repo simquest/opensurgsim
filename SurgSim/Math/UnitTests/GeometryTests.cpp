@@ -122,7 +122,7 @@ public:
 	{
 		return v0 + a*v0v1 + b*v0v2;
 	}
-	
+
 	void move(VectorType v)
 	{
 		v0 += v;
@@ -1534,7 +1534,7 @@ void checkTriTriContact(const TriTriContactData& data, bool shiftEdgesAndReRunTe
 				checkEqual(expectedT0Point, t0Point);
 				checkEqual(expectedT1Point, t1Point);
 			}
-			
+
 			VectorType correction = normal * (0.5 * (penetrationDepth + 2.0 * Geometry::DistanceEpsilon));
 			Triangle correctedT0(t0);
 			correctedT0.move(correction);
@@ -1610,13 +1610,13 @@ TEST_F(GeometryTest, calculateContactTriangleTriangle)
 		t1 = Triangle(t0.v0 + tri.n * 3, t0.v1 + tri.n * 3, t0.v2 + tri.n * 3);
 		checkTriTriContact(TriTriContactData(t1, t0, t1.v0, t1.v0, false));
 	}
-	
+
 	Triangle T0(VectorType(-5.0,0,0), VectorType(5,0,0), VectorType(0,10,0));
 	T0.move(VectorType(0,-3.333333333,0));
 	Triangle T1(VectorType(-5.0,0,0), VectorType(5,0,0), VectorType(0,10,0));
 	T1.move(VectorType(0,-10,0));
 	T1.rotateByXDegrees(-90.0);
-	
+
 	{
 		SCOPED_TRACE("vertex t1v0 inside t0 - 1");
 		Triangle t0(T0);
