@@ -24,6 +24,10 @@ namespace DataStructures
 class EmptyData
 {
 public:
+
+	/// Comparison operator
+	/// \param data The data to compare it to.
+	/// \return true for all cases. 
 	bool operator==(const EmptyData& data) const
 	{
 		return true;
