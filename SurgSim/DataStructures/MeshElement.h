@@ -18,6 +18,7 @@
 
 #include <array>
 #include <memory>
+#include "SurgSim/DataStructures/EmptyData.h"
 
 namespace SurgSim
 {
@@ -50,6 +51,15 @@ struct MeshElement
 		verticesId(verticesId),
 		data(data)
 	{
+	}
+
+	/// Constructor with empty data member
+	/// \param	verticesId IDs of the N element vertices
+	MeshElement(const std::array<unsigned int, N>& verticesId) : 
+		verticesId(verticesId)
+	{
+		SurgSim::DataStructures::EmptyData emptyData;
+		data = emptyData;
 	}
 
 	typedef std::array<unsigned int, N> IdType;
