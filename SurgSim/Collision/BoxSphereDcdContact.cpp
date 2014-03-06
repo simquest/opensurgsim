@@ -72,7 +72,7 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	closestPoint.z() = std::min(boxSize.z(), closestPoint.z());
 	closestPoint.z() = std::max(-boxSize.z(), closestPoint.z());
 
-	// Distance between the closestPoint and boxLocalSphereCenter.  Normal points into first representation.
+	// Distance between the closestPoint and boxLocalSphereCenter.  Normal points into first representation, the box.
 	Vector3d normal = closestPoint - boxLocalSphereCenter;
 	double distanceSquared = normal.squaredNorm();
 	if (distanceSquared - (sphere->getRadius() * sphere->getRadius()) > SquaredDistanceEpsilon)
@@ -88,7 +88,7 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	{
 		// Sphere center is inside the box.
 		// In this case closestPoint is equal to boxLocalSphereCenter.
-		// Find which face of the box which is closest to the closestPoint.
+		// Find which face of the box is closest to the closestPoint.
 		// abs(boxSize.x - closestPoint.x) and abs(-boxSize.x - closestPoint.x) are the distances between the
 		// closestPoint and the two faces (along x-axis) of the box.
 		// But since the abs(closestPoint.x) will always <= boxSize.x (because the point is inside box),
@@ -101,13 +101,13 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 		int minimumDistanceId = SurgSim::Math::indexOfMinimum(distancesFromFaces[0], distancesFromFaces[1],
 															  distancesFromFaces[2]);
 		// The mininumDistanceId is the index of the non-zero component of the normal of the closest face.
-		// The normal points to the first representation, the box.  So the sign (or direction) of that entry is +1
+		// The normal points toward the first representation, the box.  So the sign (or direction) of that entry is +1
 		// if the closestPoint component is negative and vice versa.
 		double direction = closestPoint[minimumDistanceId] > -DistanceEpsilon ? -1.0 : 1.0;
 		normal.setZero();
 		normal[minimumDistanceId] = direction;
 		// The closestPoint should be on the closest box face, so the negative of the normal direction.
-		closestPoint[minimumDistanceId] = -boxSize[minimumDistanceId] * direction;
+		closestPoint[minimumDistanceId] = boxSize[minimumDistanceId] * (-direction);
 		distance = -std::abs(distancesFromFaces[minimumDistanceId]);
 	}
 	else
