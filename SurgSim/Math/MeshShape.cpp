@@ -15,7 +15,6 @@
 //
 
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/DataStructures/EmptyData.h"
 
 namespace SurgSim
 {
