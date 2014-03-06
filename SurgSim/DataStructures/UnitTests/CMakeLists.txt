@@ -30,7 +30,7 @@ set(UNIT_TEST_SOURCES
 	PlyReaderTests.cpp
 	TetrahedronMeshTest.cpp
 	TriangleMeshBaseTest.cpp
-
+	TriangleMeshTest.cpp
 )
 
 set(UNIT_TEST_HEADERS

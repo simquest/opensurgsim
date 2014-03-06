@@ -21,6 +21,7 @@ include_directories(
 set(SURGSIM_DATA_STRUCTURES_SOURCES
 	DataGroupBuilder.cpp
 	IndexDirectory.cpp
+	TriangleMesh.cpp
 	ply.c
 	PlyReader.cpp
 	TriangleMeshPlyReaderDelegate.cpp
@@ -45,6 +46,8 @@ set(SURGSIM_DATA_STRUCTURES_HEADERS
 	PlyReaderDelegate.h
 	TetrahedronMesh.h
 	TetrahedronMesh-inl.h
+	TriangleMesh.h
+	TriangleMesh-inl.h
 	TriangleMeshBase.h
 	TriangleMeshBase-inl.h
 	TriangleMeshPlyReaderDelegate.h

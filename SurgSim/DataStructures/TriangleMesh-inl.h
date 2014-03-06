@@ -14,25 +14,24 @@
 // limitations under the License.
 //
 
-#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
-#define SURGSIM_MATH_MESHSHAPE_INL_H
+#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
+#define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
 
 namespace SurgSim
 {
-namespace Math
+namespace DataStructures
 {
 
-template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(
-	const std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>> mesh)
+template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
+TriangleMesh::TriangleMesh(
+	const std::shared_ptr<TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>> mesh) :
+	TriangleMeshBase<EmptyData, EmptyData, TriangleData>(*mesh)
 {
-	SURGSIM_ASSERT(mesh != nullptr) << "MeshShape cannot be initialized with a null TriangleMesh";
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
-	computeVolumeIntegrals();
+	calculateNormals();
 }
 
 
-}; // namespace Math
-}; // namespace SurgSim
+}; // DataStructures
+}; // SurgSim
 
-#endif
+#endif // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
