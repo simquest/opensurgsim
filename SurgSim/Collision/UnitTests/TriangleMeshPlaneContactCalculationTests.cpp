@@ -373,7 +373,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 
 	{
 		SCOPED_TRACE("intersection, 01 contacts, plane & cube -0.8*M_PI*rotate(Z, -M_PI/4)");
-		globalQuat = SurgSim::Math::makeRotationQuaternion<double, Vector3d::Options>(-1.318, Vector3d::UnitZ().normalized());
+		globalQuat = SurgSim::Math::makeRotationQuaternion<double, Vector3d::Options>(-1.318, Vector3d::UnitZ());
 		meshQuat = globalQuat * Quaterniond::Identity();
 		meshTrans = Vector3d::Zero();
 		planeQuat = globalQuat * Quaterniond(Eigen::AngleAxisd(-M_PI_4, Vector3d::UnitZ()));
