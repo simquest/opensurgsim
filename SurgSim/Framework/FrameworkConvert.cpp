@@ -16,19 +16,18 @@
 #include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Component.h"
 
-#include <vector>
-
 #include <boost/uuid/uuid_io.hpp>
 
-namespace {
-	const std::string NamePropertyName = "Name";
-	const std::string IdPropertyName = "Id";
+namespace
+{
+const std::string NamePropertyName = "Name";
+const std::string IdPropertyName = "Id";
 }
 
 namespace YAML
 {
 Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
-	const std::shared_ptr<SurgSim::Framework::Component> rhs)
+			const std::shared_ptr<SurgSim::Framework::Component> rhs)
 {
 	Node data;
 	data[IdPropertyName] = to_string(rhs->getUuid());
@@ -40,7 +39,7 @@ Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
 }
 
 bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node& node,
-	std::shared_ptr<SurgSim::Framework::Component>& rhs)
+		std::shared_ptr<SurgSim::Framework::Component>& rhs)
 {
 	bool result = false;
 
@@ -61,7 +60,7 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node&
 			std::string id = data[IdPropertyName].as<std::string>();
 			RegistryType& registry = getRegistry();
 			auto sharedComponent = registry.find(id);
-			if ( sharedComponent != registry.end())
+			if (sharedComponent != registry.end())
 			{
 				SURGSIM_ASSERT(data[NamePropertyName].as<std::string>() == sharedComponent->second->getName() &&
 						className == sharedComponent->second->getClassName()) <<
@@ -93,7 +92,7 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node&
 }
 
 convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType&
-	convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry()
+		convert<std::shared_ptr<SurgSim::Framework::Component>>::getRegistry()
 {
 	static RegistryType registry;
 	return registry;
@@ -101,11 +100,13 @@ convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType&
 
 Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Component& rhs)
 {
-	YAML::Node result(YAML::NodeType::Map);
 	YAML::Node data(rhs.encode());
 	data[IdPropertyName] = to_string(rhs.getUuid());
 	data[NamePropertyName] = rhs.getName();
+
+	YAML::Node result;
 	result[rhs.getClassName()] = data;
+
 	return result;
 }
 
