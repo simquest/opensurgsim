@@ -24,7 +24,7 @@ namespace Math
 
 template <class VertexData, class EdgeData, class TriangleData>
 MeshShape::MeshShape(
-	const std::shared_ptr<SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>> mesh)
+	const std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>> mesh)
 {
 	SURGSIM_ASSERT(mesh != nullptr) << "MeshShape cannot be initialized with a null TriangleMesh";
 	m_mesh = std::make_shared<TriMesh>(*mesh);

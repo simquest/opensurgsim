@@ -20,10 +20,10 @@
 #include "SurgSim/Math/Geometry.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 
 using SurgSim::Math::MeshShape;
-using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 

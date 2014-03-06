@@ -75,7 +75,7 @@ public:
 class CubeMeshTest : public ::testing::Test
 {
 public:
-	typedef SurgSim::DataStructures::TriangleMesh<EmptyData,EmptyData,EmptyData> TriangleMesh;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData,EmptyData,EmptyData> TriangleMesh;
 	typedef SurgSim::DataStructures::MeshElement<2,EmptyData> EdgeElement;
 	typedef SurgSim::DataStructures::MeshElement<3,EmptyData> TriangleElement;
 

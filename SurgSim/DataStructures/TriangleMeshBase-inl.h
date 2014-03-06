@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
-#define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
+#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H
+#define SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H
 
 namespace SurgSim
 {
@@ -23,14 +23,14 @@ namespace DataStructures
 {
 
 template <class VertexData, class EdgeData, class TriangleData>
-TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh()
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleMeshBase()
 {
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
 template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
-	const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleMeshBase(
+	const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
 {
 	for (size_t iVertex = 0; iVertex < mesh.getNumVertices(); ++iVertex)
 	{
@@ -50,97 +50,97 @@ TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleMesh(
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-TriangleMesh<VertexData, EdgeData, TriangleData>::~TriangleMesh()
+TriangleMeshBase<VertexData, EdgeData, TriangleData>::~TriangleMeshBase()
 {
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMesh<VertexData, EdgeData, TriangleData>::addEdge(const EdgeType& edge)
+unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::addEdge(const EdgeType& edge)
 {
 	m_edges.push_back(edge);
 	return m_edges.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMesh<VertexData, EdgeData, TriangleData>::addTriangle(const TriangleType& triangle)
+unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::addTriangle(const TriangleType& triangle)
 {
 	m_triangles.push_back(triangle);
 	return m_triangles.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMesh<VertexData, EdgeData, TriangleData>::getNumEdges() const
+unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumEdges() const
 {
 	return m_edges.size();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMesh<VertexData, EdgeData, TriangleData>::getNumTriangles() const
+unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumTriangles() const
 {
 	return m_triangles.size();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-const std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType>&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getEdges() const
+const std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType>&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdges() const
 {
 	return m_edges;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType>&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getEdges()
+std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType>&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdges()
 {
 	return m_edges;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-const std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType>&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangles() const
+const std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType>&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangles() const
 {
 	return m_triangles;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-std::vector<typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType>&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangles()
+std::vector<typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType>&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangles()
 {
 	return m_triangles;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-const typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id) const
+const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id) const
 {
 	return m_edges[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id)
+typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getEdge(unsigned int id)
 {
 	return m_edges[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-const typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id) const
+const typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id) const
 {
 	return m_triangles[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType&
-	TriangleMesh<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id)
+typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType&
+	TriangleMeshBase<VertexData, EdgeData, TriangleData>::getTriangle(unsigned int id)
 {
 	return m_triangles[id];
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-bool TriangleMesh<VertexData, EdgeData, TriangleData>::isValid() const
+bool TriangleMeshBase<VertexData, EdgeData, TriangleData>::isValid() const
 {
-	typedef typename TriangleMesh<VertexData, EdgeData, TriangleData>::EdgeType EdgeType;
-	typedef typename TriangleMesh<VertexData, EdgeData, TriangleData>::TriangleType TriangleType;
+	typedef typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType EdgeType;
+	typedef typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType TriangleType;
 
 	unsigned int numVertices = Vertices<VertexData>::getNumVertices();
 
@@ -173,27 +173,27 @@ bool TriangleMesh<VertexData, EdgeData, TriangleData>::isValid() const
 
 
 template <class VertexData, class EdgeData, class TriangleData>
-void TriangleMesh<VertexData, EdgeData, TriangleData>::doClearEdges()
+void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClearEdges()
 {
 	m_edges.clear();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-void TriangleMesh<VertexData, EdgeData, TriangleData>::doClearTriangles()
+void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClearTriangles()
 {
 	m_triangles.clear();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-bool TriangleMesh<VertexData, EdgeData, TriangleData>::isEqual(const Vertices<VertexData>& mesh) const
+bool TriangleMeshBase<VertexData, EdgeData, TriangleData>::isEqual(const Vertices<VertexData>& mesh) const
 {
-	const TriangleMesh& triangleMesh = static_cast<const TriangleMesh&>(mesh);
+	const TriangleMeshBase& triangleMesh = static_cast<const TriangleMeshBase&>(mesh);
 	return Vertices<VertexData>::isEqual(triangleMesh) && m_edges == triangleMesh.getEdges() &&
 		m_triangles == triangleMesh.getTriangles();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
+void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClear()
 {
 	doClearTriangles();
 	doClearEdges();
@@ -204,4 +204,4 @@ void TriangleMesh<VertexData, EdgeData, TriangleData>::doClear()
 
 };  // namespace SurgSim
 
-#endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
+#endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H

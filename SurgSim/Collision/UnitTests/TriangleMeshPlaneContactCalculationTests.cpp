@@ -16,7 +16,7 @@
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 
-using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::DataStructures::TriangleMeshBase;
 
 namespace SurgSim
 {
@@ -144,12 +144,12 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 
 TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 {
-	typedef SurgSim::DataStructures::TriangleMesh<EmptyData,EmptyData,EmptyData> TriangleMesh;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData,EmptyData,EmptyData> TriangleMeshBase;
 	typedef SurgSim::DataStructures::MeshElement<2,EmptyData> EdgeElement;
 	typedef SurgSim::DataStructures::MeshElement<3,EmptyData> TriangleElement;
 
 	// Create a Mesh Cube
-	std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
+	std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
 	for (int i = 0; i < cubeNumPoints; i++)
 	{
 		EmptyData emptyData;
@@ -157,7 +157,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
-		TriangleMesh::VertexType v(p, emptyData);
+		TriangleMeshBase::VertexType v(p, emptyData);
 		mesh->addVertex(v);
 	}
 	for (int i = 0; i < cubeNumEdges; i++)
@@ -169,7 +169,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 			edgePoints[j] = cubeEdges[i][j];
 		}
 		EdgeElement edgeElement(edgePoints, emptyData);
-		TriangleMesh::EdgeType e(edgeElement);
+		TriangleMeshBase::EdgeType e(edgeElement);
 		mesh->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; i++)
@@ -181,7 +181,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
 		TriangleElement triangleElement(trianglePoints, emptyData);
-		TriangleMesh::TriangleType t(triangleElement);
+		TriangleMeshBase::TriangleType t(triangleElement);
 		mesh->addTriangle(t);
 	}
 

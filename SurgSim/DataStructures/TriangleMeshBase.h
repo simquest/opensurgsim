@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
-#define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
+#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H
+#define SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H
 
 #include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/MeshElement.h"
@@ -27,8 +27,8 @@ namespace DataStructures
 
 /// Basic class for storing Triangle Meshes, handling basic vertex, edge, and triangle functionality.
 ///
-/// TriangleMesh is to be used purely as a data structure and not provide implementation of algorithms.
-/// For example, a physics 2D FEM is not a subclass of TriangleMesh, but may use a TriangleMesh for storing the
+/// TriangleMeshBase is to be used purely as a data structure and not provide implementation of algorithms.
+/// For example, a physics 2D FEM is not a subclass of TriangleMeshBase, but may use a TriangleMeshBase for storing the
 /// structure of the FEM.
 ///
 /// It is recommended that subclasses with a specific purpose (such as for use in collision detection) provide
@@ -36,7 +36,7 @@ namespace DataStructures
 /// createVertex(position, other data...), createEdge(vertices, other data...),
 /// and createTriangle(vertices, other data...) simplify the creation of vertices and elements and the data required.
 /// These methods would use the addVertex(), addEdge(), and addTriangle() methods to add the created vertices and
-/// elements to the TriangleMesh.
+/// elements to the TriangleMeshBase.
 ///
 /// Overriding isEqual(const Mesh&) is necessary to do more than just basic list comparison of the
 /// vertices, edges, and triangles, which is dependent on order in the list.
@@ -53,7 +53,7 @@ namespace DataStructures
 /// \sa Vertex
 /// \sa MeshElement
 template <class VertexData, class EdgeData, class TriangleData>
-class TriangleMesh : public Vertices<VertexData>
+class TriangleMeshBase : public Vertices<VertexData>
 {
 public:
 	/// Edge type for convenience  (Ids of the 2 vertices)
@@ -62,14 +62,14 @@ public:
 	typedef MeshElement<3, TriangleData> TriangleType;
 
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
-	TriangleMesh();
+	TriangleMeshBase();
 
 	// Copy constructor.
 	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	TriangleMesh(const TriangleMesh<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
+	TriangleMeshBase(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
 
 	/// Destructor
-	virtual ~TriangleMesh();
+	virtual ~TriangleMeshBase();
 
 	/// Adds an edge to the mesh.
 	/// No checking on the edge's vertices is performed.
@@ -124,8 +124,8 @@ public:
 	/// Returns the specified triangle.
 	TriangleType& getTriangle(unsigned int id);
 
-	/// Test if the TriangleMesh is valid (valid vertex Ids used in all MeshElements)
-	/// \return True if the TriangleMesh is valid, False otherwise (the topology is then broken)
+	/// Test if the TriangleMeshBase is valid (valid vertex Ids used in all MeshElements)
+	/// \return True if the TriangleMeshBase is valid, False otherwise (the topology is then broken)
 	bool isValid() const;
 
 protected:
@@ -136,7 +136,7 @@ protected:
 	virtual void doClearTriangles();
 
 	/// Internal comparison of meshes of the same type: returns true if equal, false if not equal.
-	/// Override this method to provide custom comparison. Basic TriangleMesh implementation compares vertices,
+	/// Override this method to provide custom comparison. Basic TriangleMeshBase implementation compares vertices,
 	/// edges and triangles: the order of vertices, edges, and triangles must also match to be considered equal.
 	/// \param	mesh	Mesh must be of the same type as that which it is compared against
 	/// \return True if the vertices are equals, False otherwise
@@ -162,6 +162,6 @@ public:
 
 };  // namespace SurgSim
 
-#include "SurgSim/DataStructures/TriangleMesh-inl.h"
+#include "SurgSim/DataStructures/TriangleMeshBase-inl.h"
 
-#endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
+#endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H

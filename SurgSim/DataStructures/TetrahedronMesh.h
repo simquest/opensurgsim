@@ -16,8 +16,6 @@
 #ifndef SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H
 #define SURGSIM_DATASTRUCTURES_TETRAHEDRONMESH_H
 
-#include "SurgSim/DataStructures/TriangleMesh.h"
-
 namespace SurgSim
 {
 

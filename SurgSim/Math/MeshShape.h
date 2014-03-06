@@ -21,10 +21,9 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include "SurgSim/Math/Shape.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
-
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/Convert.h"
+#include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
 {
@@ -49,14 +48,14 @@ public:
 		}
 	};
 	/// Type TriMesh for convenience
-	typedef SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, EmptyData> TriMesh;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriMesh;
 
 public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
 	template <class VertexData, class EdgeData, class TriangleData>
 	explicit MeshShape(
-		const std::shared_ptr<SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>> mesh);
+		const std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>> mesh);
 
 	/// \return the type of the shape
 	virtual int getType() override;

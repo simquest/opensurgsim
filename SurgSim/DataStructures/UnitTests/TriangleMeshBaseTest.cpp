@@ -24,10 +24,10 @@
 
 #include <random>
 
-using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::Math::Vector3d;
 
-class TriangleMeshTest : public ::testing::Test
+class TriangleMeshBaseTest : public ::testing::Test
 {
 public:
 	void SetUp()
@@ -150,20 +150,20 @@ public:
 };
 
 
-TEST_F(TriangleMeshTest, InitTest)
+TEST_F(TriangleMeshBaseTest, InitTest)
 {
-	ASSERT_NO_THROW({MockTriangleMesh mesh;});
+	ASSERT_NO_THROW({MockTriangleMeshBase mesh;});
 
 	/// Make sure we can create triangle meshes with each possible combination of void data.
-	typedef TriangleMesh<void, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
-	typedef TriangleMesh<MockVertexData, void, MockTriangleData> TriangleMeshNoEdgeData;
-	typedef TriangleMesh<MockVertexData, MockEdgeData, void> TriangleMeshNoTriangleData;
+	typedef TriangleMeshBase<void, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
+	typedef TriangleMeshBase<MockVertexData, void, MockTriangleData> TriangleMeshNoEdgeData;
+	typedef TriangleMeshBase<MockVertexData, MockEdgeData, void> TriangleMeshNoTriangleData;
 
-	typedef TriangleMesh<MockVertexData, void, void> TriangleMeshNoEdgeOrTriangleData;
-	typedef TriangleMesh<void, MockEdgeData, void> TriangleMeshNoVertexOrTriangleData;
-	typedef TriangleMesh<void, void, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
+	typedef TriangleMeshBase<MockVertexData, void, void> TriangleMeshNoEdgeOrTriangleData;
+	typedef TriangleMeshBase<void, MockEdgeData, void> TriangleMeshNoVertexOrTriangleData;
+	typedef TriangleMeshBase<void, void, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
 
-	typedef TriangleMesh<void, void, void> TriangleMeshNoData;
+	typedef TriangleMeshBase<void, void, void> TriangleMeshNoData;
 
 	ASSERT_NO_THROW({TriangleMeshNoVertexData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoEdgeData mesh;});
@@ -176,9 +176,9 @@ TEST_F(TriangleMeshTest, InitTest)
 	ASSERT_NO_THROW({TriangleMeshNoData mesh;});
 }
 
-TEST_F(TriangleMeshTest, CreateVerticesTest)
+TEST_F(TriangleMeshBaseTest, CreateVerticesTest)
 {
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 
 	EXPECT_EQ(0u, mesh.getNumVertices());
 	EXPECT_EQ(0u, mesh.getVertices().size());
@@ -189,7 +189,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
 		EXPECT_EQ(i + 1, mesh.getNumVertices());
 
-		const std::vector<MockTriangleMesh::VertexType>& vertices = mesh.getVertices();
+		const std::vector<MockTriangleMeshBase::VertexType>& vertices = mesh.getVertices();
 		EXPECT_EQ(i + 1, vertices.size());
 
 		/// Make sure each vertex is set properly
@@ -209,7 +209,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createEdge(testEdgeVertices[i]));
 		EXPECT_EQ(i + 1, mesh.getNumEdges());
 
-		const std::vector<MockTriangleMesh::EdgeType>& edges = mesh.getEdges();
+		const std::vector<MockTriangleMeshBase::EdgeType>& edges = mesh.getEdges();
 		EXPECT_EQ(i + 1, edges.size());
 
 		/// Make sure each vertex is set properly
@@ -228,7 +228,7 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 		EXPECT_EQ(i, mesh.createTriangle(testTriangleVertices[i], testTriangleEdges[i]));
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 
-		const std::vector<MockTriangleMesh::TriangleType>& triangles = mesh.getTriangles();
+		const std::vector<MockTriangleMeshBase::TriangleType>& triangles = mesh.getTriangles();
 		EXPECT_EQ(i + 1, triangles.size());
 
 		/// Make sure each vertex is set properly
@@ -243,9 +243,9 @@ TEST_F(TriangleMeshTest, CreateVerticesTest)
 	}
 }
 
-TEST_F(TriangleMeshTest, isValidTest)
+TEST_F(TriangleMeshBaseTest, isValidTest)
 {
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 
 	EXPECT_TRUE(mesh.isValid());
 
@@ -274,9 +274,9 @@ TEST_F(TriangleMeshTest, isValidTest)
 	EXPECT_TRUE(mesh.isValid());
 }
 
-TEST_F(TriangleMeshTest, SetVertexPositionsTest)
+TEST_F(TriangleMeshBaseTest, SetVertexPositionsTest)
 {
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 
 	/// Create vertices with test normals, but all positions at (0,0,0)
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
@@ -338,9 +338,9 @@ TEST_F(TriangleMeshTest, SetVertexPositionsTest)
 	EXPECT_ANY_THROW(mesh.setVertexPositions(testPositions));
 }
 
-TEST_F(TriangleMeshTest, ClearTest)
+TEST_F(TriangleMeshBaseTest, ClearTest)
 {
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 
 	EXPECT_EQ(0, mesh.getNumUpdates());
 
@@ -392,9 +392,9 @@ TEST_F(TriangleMeshTest, ClearTest)
 	EXPECT_EQ(0u, mesh.getTriangles().size());
 }
 
-TEST_F(TriangleMeshTest, UpdateTest)
+TEST_F(TriangleMeshBaseTest, UpdateTest)
 {
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 
 	EXPECT_EQ(0, mesh.getNumUpdates());
 
@@ -405,10 +405,10 @@ TEST_F(TriangleMeshTest, UpdateTest)
 	}
 }
 
-TEST_F(TriangleMeshTest, ComparisonTest)
+TEST_F(TriangleMeshBaseTest, ComparisonTest)
 {
 	/// Create mesh using test data
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, mesh.createVertex(testPositions[i], testNormals[i]));
@@ -423,7 +423,7 @@ TEST_F(TriangleMeshTest, ComparisonTest)
 	}
 
 	/// Create same mesh again
-	MockTriangleMesh sameMesh;
+	MockTriangleMeshBase sameMesh;
 
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
 	{
@@ -439,7 +439,7 @@ TEST_F(TriangleMeshTest, ComparisonTest)
 	}
 
 	/// Create mesh with test data, but each vertex has position and normal of (0,0,0) to make them different
-	MockTriangleMesh meshWithDifferentVertices;
+	MockTriangleMeshBase meshWithDifferentVertices;
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentVertices.createVertex(Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 0.0)));
@@ -454,7 +454,7 @@ TEST_F(TriangleMeshTest, ComparisonTest)
 	}
 
 	/// Create mesh with test data, but reverse each edge's vertex order to make them different
-	MockTriangleMesh meshWithDifferentEdges;
+	MockTriangleMeshBase meshWithDifferentEdges;
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentEdges.createVertex(testPositions[i], testNormals[i]));
@@ -470,7 +470,7 @@ TEST_F(TriangleMeshTest, ComparisonTest)
 	}
 
 	/// Create mesh with test data, but only create half of the triangles to make the list different.
-	MockTriangleMesh meshWithDifferentTriangles;
+	MockTriangleMeshBase meshWithDifferentTriangles;
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
 	{
 		EXPECT_EQ(i, meshWithDifferentTriangles.createVertex(testPositions[i], testNormals[i]));
@@ -507,9 +507,9 @@ public:
 	}
 };
 
-TEST_F(TriangleMeshTest, CopyConstructorTest)
+TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 {
-	MockTriangleMesh mesh;
+	MockTriangleMeshBase mesh;
 
 	/// Create mesh using test data
 	for (unsigned int i = 0; i < testPositions.size(); ++i)
@@ -528,7 +528,7 @@ TEST_F(TriangleMeshTest, CopyConstructorTest)
 		EXPECT_EQ(i + 1, mesh.getNumTriangles());
 	}
 
-	TriangleMesh<EmptyData, EmptyData, EmptyData> mesh2(mesh);
+	TriangleMeshBase<EmptyData, EmptyData, EmptyData> mesh2(mesh);
 
 	for (unsigned int i = 0; i < mesh.getNumVertices(); ++i)
 	{
