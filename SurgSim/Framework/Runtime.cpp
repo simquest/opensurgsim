@@ -100,7 +100,7 @@ void Runtime::addComponents(const std::vector<std::shared_ptr<SurgSim::Framework
 			else
 			{
 				SURGSIM_LOG_WARNING(Logger::getLogger("Runtime")) <<
-					"Trying to add an uninitialized component.";
+						"Trying to add an uninitialized component.";
 			}
 		}
 	}
@@ -118,7 +118,7 @@ bool Runtime::execute()
 			boost::this_thread::sleep(boost::posix_time::milliseconds(2000));
 			for (it = m_managers.cbegin(); it != m_managers.cend(); ++it)
 			{
-				if (! (*it)->isRunning())
+				if (!(*it)->isRunning())
 				{
 					doExit = true;
 					break;
@@ -144,7 +144,7 @@ bool Runtime::start(bool paused)
 	m_isPaused = paused;
 
 	std::vector<std::shared_ptr<ComponentManager>>::iterator it;
-	m_barrier.reset(new Barrier(m_managers.size()+1));
+	m_barrier.reset(new Barrier(m_managers.size() + 1));
 	for (it = m_managers.begin(); it != m_managers.end(); ++it)
 	{
 		(*it)->start(m_barrier, m_isPaused);
@@ -239,9 +239,9 @@ void Runtime::preprocessSceneElements()
 	{
 		// Initialize should have been called by now, if the SceneElement is not initialized this means
 		// initialization failed
-		if (it->second->isInitialized())
+		if ((*it)->isInitialized())
 		{
-			std::vector<std::shared_ptr<Component>> elementComponents =  it->second->getComponents();
+			std::vector<std::shared_ptr<Component>> elementComponents = (*it)->getComponents();
 			newComponents.insert(newComponents.end(), elementComponents.begin(), elementComponents.end());
 		}
 	}

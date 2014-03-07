@@ -211,14 +211,14 @@ YAML::Node SceneElement::encode(bool standalone) const
 
 bool SceneElement::decode(const YAML::Node& node)
 {
-	SURGSIM_ASSERT(! isInitialized()) << "Should not call decode on a SceneElement that has already been initialized.";
+	SURGSIM_ASSERT(!isInitialized()) << "Should not call decode on a SceneElement that has already been initialized.";
 	bool result = false;
 	if (node.IsMap())
 	{
 		std::string className = node.begin()->first.as<std::string>();
 
-		SURGSIM_ASSERT(className == getClassName()) << "Wrong type for this node, wanted <" << className << ">" <<
-				"but this is a <" << getClassName() << ">.";
+		SURGSIM_ASSERT(className == getClassName()) << "Type in node does not match class, wanted <" <<
+				className << ">" << " but this is a <" << getClassName() << ">.";
 
 		YAML::Node data = node[getClassName()];
 

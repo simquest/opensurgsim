@@ -87,9 +87,9 @@ std::shared_ptr<SceneElement> createTetrahedronFem3D(const std::string& name,
 			{{4, 1, 7, 5}}, // CCW (41)cross(47) . (45) > 0
 			{{4, 2, 1, 0}}, // CCW (42)cross(41) . (40) > 0
 			{{4, 7, 2, 6}}, // CCW (47)cross(42) . (46) > 0
-			{{1, 2, 7, 3}}
+			{{1, 2, 7, 3}}  // CCW (12)cross(17) . (13) > 0
 		}
-	};  // CCW (12)cross(17) . (13) > 0
+	};
 
 	std::array<unsigned int, 4> boundaryConditionsNodeIdx = {{0, 1, 2, 3}};
 

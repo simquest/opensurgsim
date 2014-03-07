@@ -13,8 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Scene.h"
+
+#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Framework/Component.h"
@@ -57,7 +58,7 @@ void Scene::addSceneElement(std::shared_ptr<SceneElement> element)
 	{
 		{
 			boost::lock_guard<boost::mutex> lock(m_sceneElementsMutex);
-			m_elements.insert(std::pair<std::string, std::shared_ptr<SceneElement>>(name, element));
+			m_elements.push_back(element);
 		}
 		runtime->addSceneElement(element);
 	}
@@ -69,7 +70,7 @@ std::shared_ptr<Runtime> Scene::getRuntime()
 	return m_runtime.lock();
 }
 
-const std::unordered_map<std::string, std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
+const std::vector <std::shared_ptr<SceneElement>>& Scene::getSceneElements() const
 {
 	return m_elements;
 }
@@ -94,13 +95,13 @@ YAML::Node Scene::encode() const
 	YAML::Node data(YAML::NodeType::Map);
 
 
-	// Pre-encode all the components so the scene elements only see references to those components.
+	// Pre-encode all the components so that the scene elements only see references to those components.
 	std::set<std::shared_ptr<SurgSim::Framework::Component>> componentSet;
 	std::vector<std::shared_ptr<SurgSim::Framework::SceneElement>> sceneElements;
 	for (auto sceneElement = m_elements.begin(); sceneElement != m_elements.end(); ++sceneElement)
 	{
-		sceneElements.push_back(sceneElement->second);
-		auto components = sceneElement->second->getComponents();
+		sceneElements.push_back(*sceneElement);
+		auto components = (*sceneElement)->getComponents();
 		componentSet.insert(components.begin(), components.end());
 	}
 

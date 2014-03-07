@@ -13,12 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/FrameworkConvert.h"
+
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Component.h"
-#include "SurgSim/Framework/FrameworkConvert.h"
 #include "SurgSim/Framework/Scene.h"
-
-#include <vector>
 
 #include <boost/uuid/uuid_io.hpp>
 

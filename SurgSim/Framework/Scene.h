@@ -16,7 +16,7 @@
 #ifndef SURGSIM_FRAMEWORK_SCENE_H
 #define SURGSIM_FRAMEWORK_SCENE_H
 
-#include <map>
+#include <vector>
 #include <memory>
 #include <string>
 #include <boost/thread/mutex.hpp>
@@ -53,7 +53,7 @@ public:
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
-	const std::unordered_map<std::string, std::shared_ptr<SceneElement>>& getSceneElements() const;
+	const std::vector<std::shared_ptr<SceneElement>>& getSceneElements() const;
 
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
@@ -76,7 +76,7 @@ private:
 
 	std::weak_ptr<Runtime> m_runtime;
 
-	std::unordered_map<std::string, std::shared_ptr<SceneElement>> m_elements;
+	std::vector<std::shared_ptr<SceneElement>> m_elements;
 
 	// Used in a const function, need to declare mutable
 	mutable boost::mutex m_sceneElementsMutex;

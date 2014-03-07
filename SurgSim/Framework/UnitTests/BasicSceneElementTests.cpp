@@ -47,7 +47,7 @@ namespace SurgSim
 namespace Framework
 {
 
-TEST(BasicSceneElementTestss, InitTest)
+TEST(BasicSceneElementTests, InitTest)
 {
 	std::shared_ptr<BasicSceneElement> sceneElement = std::make_shared<BasicSceneElement>("test name");
 

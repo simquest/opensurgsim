@@ -44,7 +44,7 @@ protected:
 
 };
 
-};  // namespace Blocks
+};  // namespace Framework
 };  // namespace SurgSim
 
 #endif  // SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H

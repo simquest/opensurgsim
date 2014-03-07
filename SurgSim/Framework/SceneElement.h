@@ -53,6 +53,7 @@ public:
 	/// Destructor
 	virtual ~SceneElement();
 
+	/// \return the class name for this class
 	virtual std::string getClassName() const;
 
 	/// Adds a component, calls initialize() on the component, if SceneElement::isInitialized() is true
@@ -145,6 +146,8 @@ private:
 	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doInitialize() = 0;
 
+	/// Sets the name of this SceneElement.
+	/// \param name The new name.
 	void setName(const std::string& name);
 
 	/// Indicates if this SceneElement has been initialized or not.
