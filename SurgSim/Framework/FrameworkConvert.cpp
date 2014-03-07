@@ -23,7 +23,6 @@
 
 namespace
 {
-const std::string ClassNamePropertyName = "ClassName";
 const std::string NamePropertyName = "Name";
 const std::string IdPropertyName = "Id";
 }
@@ -33,10 +32,12 @@ namespace YAML
 Node convert<std::shared_ptr<SurgSim::Framework::Component>>::encode(
 			const std::shared_ptr<SurgSim::Framework::Component> rhs)
 {
+	Node data;
+	data[IdPropertyName] = to_string(rhs->getUuid());
+	data[NamePropertyName] = rhs->getName();
 	Node result;
-	result[IdPropertyName] = to_string(rhs->getUuid());
-	result[ClassNamePropertyName] = rhs->getClassName();
-	result[NamePropertyName] = rhs->getName();
+	result[rhs->getClassName()] = data;
+
 	return result;
 }
 
@@ -44,36 +45,41 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node&
 		std::shared_ptr<SurgSim::Framework::Component>& rhs)
 {
 	bool result = false;
-	if (node.IsMap() &&
-		node[IdPropertyName].IsDefined() &&
-		node[ClassNamePropertyName].IsDefined() &&
-		node[NamePropertyName].IsDefined())
+
+	if (!node.IsMap())
+	{
+		return false;
+	}
+
+	Node data = node.begin()->second;
+	std::string className = node.begin()->first.as<std::string>();
+
+	if (data.IsMap() &&
+		data[IdPropertyName].IsDefined() &&
+		data[NamePropertyName].IsDefined())
 	{
 		if (rhs == nullptr)
 		{
-			std::string id = node[IdPropertyName].as<std::string>();
+			std::string id = data[IdPropertyName].as<std::string>();
 			RegistryType& registry = getRegistry();
 			auto sharedComponent = registry.find(id);
 			if (sharedComponent != registry.end())
 			{
-				SURGSIM_ASSERT(node[NamePropertyName].as<std::string>() == sharedComponent->second->getName() &&
-					node[ClassNamePropertyName].as<std::string>() == sharedComponent->second->getClassName()) <<
-							"The current node: " << std::endl << node << "has the same id as an instance " <<
-							"already registered, but the name and/or the className are different. This is " <<
-							"likely a problem with a manually assigned id.";
+				SURGSIM_ASSERT(data[NamePropertyName].as<std::string>() == sharedComponent->second->getName() &&
+						className == sharedComponent->second->getClassName()) <<
+						"The current node: " << std::endl << node << "has the same id as an instance " <<
+						"already registered, but the name and/or the className are different. This is " <<
+						"likely a problem with a manually assigned id.";
 				rhs = sharedComponent->second;
 			}
 			else
 			{
-				std::string className = node[ClassNamePropertyName].as<std::string>();
 				SurgSim::Framework::Component::FactoryType& factory =
 					SurgSim::Framework::Component::getFactory();
 
 				if (factory.isRegistered(className))
 				{
-					rhs = factory.create(
-							  node[ClassNamePropertyName].as<std::string>(),
-							  node[NamePropertyName].as<std::string>());
+					rhs = factory.create(className, data[NamePropertyName].as<std::string>());
 					getRegistry()[id] = rhs;
 				}
 				else
@@ -82,7 +88,7 @@ bool convert<std::shared_ptr<SurgSim::Framework::Component>>::decode(const Node&
 				}
 			}
 		}
-		rhs->decode(node);
+		rhs->decode(data);
 		result = true;
 	}
 	return result;
@@ -97,11 +103,14 @@ convert<std::shared_ptr<SurgSim::Framework::Component>>::RegistryType&
 
 Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Component& rhs)
 {
-	YAML::Node node(rhs.encode());
-	node[IdPropertyName] = to_string(rhs.getUuid());
-	node[ClassNamePropertyName] = rhs.getClassName();
-	node[NamePropertyName] = rhs.getName();
-	return node;
+	YAML::Node data(rhs.encode());
+	data[IdPropertyName] = to_string(rhs.getUuid());
+	data[NamePropertyName] = rhs.getName();
+
+	YAML::Node result;
+	result[rhs.getClassName()] = data;
+
+	return result;
 }
 
 
