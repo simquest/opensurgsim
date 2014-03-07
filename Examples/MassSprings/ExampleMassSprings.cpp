@@ -16,11 +16,11 @@
 #include <memory>
 #include <boost/thread.hpp>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/MassSpring1DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring2DRepresentation.h"
 #include "SurgSim/Blocks/MassSpring3DRepresentation.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -36,11 +36,11 @@
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/RigidTransform.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::MassSpring1DRepresentation;
 using SurgSim::Blocks::MassSpring2DRepresentation;
 using SurgSim::Blocks::MassSpring3DRepresentation;
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
@@ -63,8 +63,8 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 }
 
 std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
-	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
+		const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
+		SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<MassSpring1DRepresentation> physicsRepresentation =
 		std::make_shared<MassSpring1DRepresentation>(name + " Physics");
@@ -76,16 +76,16 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 	boundaryConditions.push_back(0);
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
-	std::array<SurgSim::Math::Vector3d, 2> extremities = {{ Vector3d(0,0,0), Vector3d(1,0,0) }};
+	std::array<SurgSim::Math::Vector3d, 2> extremities = {{ Vector3d(0, 0, 0), Vector3d(1, 0, 0) }};
 	unsigned int numNodesPerDim[1] = {6};
 	physicsRepresentation->init1D(extremities,
-		numNodesPerDim,
-		boundaryConditions,
-		0.1, // total mass (in Kg)
-		100.0, // Stiffness stretching
-		0.0, // Damping stretching
-		10.0, // Stiffness bending
-		0.0); // Damping bending
+								  numNodesPerDim,
+								  boundaryConditions,
+								  0.1, // total mass (in Kg)
+								  100.0, // Stiffness stretching
+								  0.0, // Damping stretching
+								  10.0, // Stiffness bending
+								  0.0); // Damping bending
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-1);
@@ -100,7 +100,7 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 		std::stringstream ss;
 		ss << name + " Graphics object " << gfxObjectId;
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-			std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
+					std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
 		graphicsRepresentation->setInitialPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
@@ -109,11 +109,11 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 
 		massSpringElement->addComponent(graphicsRepresentation);
 		ss.clear();
-		ss << "Physics to Graphics ("<< gfxObjectId <<") deformable points";
+		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
 		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
-			(ss.str(),
-			physicsRepresentation->getFinalState(),
-			graphicsRepresentation->getVertices()));
+										(ss.str(),
+										 physicsRepresentation->getFinalState(),
+										 graphicsRepresentation->getVertices()));
 
 		gfxObjectId++;
 	}
@@ -123,8 +123,8 @@ std::shared_ptr<SceneElement> createMassSpring1D(const std::string& name,
 }
 
 std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
-	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
+		const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
+		SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<MassSpring2DRepresentation> physicsRepresentation =
 		std::make_shared<MassSpring2DRepresentation>(name + " Physics");
@@ -137,21 +137,23 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
 	std::array<std::array<SurgSim::Math::Vector3d, 2>, 2> extremities =
-	{{
-		{{ Vector3d(0,0,0), Vector3d(1,0,0) }},
-		{{ Vector3d(0,-1,0), Vector3d(1,-1,0) }}
-	}};
+	{
+		{
+			{{ Vector3d(0, 0, 0), Vector3d(1, 0, 0) }},
+			{{ Vector3d(0, -1, 0), Vector3d(1, -1, 0) }}
+		}
+	};
 	unsigned int numNodesPerDim[2] = {3, 3};
 	physicsRepresentation->init2D(extremities,
-		numNodesPerDim,
-		boundaryConditions,
-		0.1, // total mass (in Kg)
-		100.0, // Stiffness stretching
-		0.0, // Damping stretching
-		10.0, // Stiffness bending
-		0.0, // Damping bending
-		10.0, // Stiffness face diagonal
-		0.0); // Damping face diagonal
+								  numNodesPerDim,
+								  boundaryConditions,
+								  0.1, // total mass (in Kg)
+								  100.0, // Stiffness stretching
+								  0.0, // Damping stretching
+								  10.0, // Stiffness bending
+								  0.0, // Damping bending
+								  10.0, // Stiffness face diagonal
+								  0.0); // Damping face diagonal
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-1);
@@ -166,7 +168,7 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 		std::stringstream ss;
 		ss << name + " Graphics object " << gfxObjectId;
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-			std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
+					std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
 		graphicsRepresentation->setInitialPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
@@ -175,11 +177,11 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 
 		massSpringElement->addComponent(graphicsRepresentation);
 		ss.clear();
-		ss << "Physics to Graphics ("<< gfxObjectId <<") deformable points";
+		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
 		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
-			(ss.str(),
-			physicsRepresentation->getFinalState(),
-			graphicsRepresentation->getVertices()));
+										(ss.str(),
+										 physicsRepresentation->getFinalState(),
+										 graphicsRepresentation->getVertices()));
 
 		gfxObjectId++;
 	}
@@ -188,8 +190,8 @@ std::shared_ptr<SceneElement> createMassSpring2D(const std::string& name,
 }
 
 std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
-	const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
-	SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
+		const std::vector<SurgSim::Math::RigidTransform3d> gfxPoses,
+		SurgSim::Math::Vector4d color, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<MassSpring3DRepresentation> physicsRepresentation =
 		std::make_shared<MassSpring3DRepresentation>(name + " Physics");
@@ -202,32 +204,36 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 	boundaryConditions.push_back(1);
 	boundaryConditions.push_back(2);
 	std::array<std::array<std::array<SurgSim::Math::Vector3d, 2>, 2>, 2> extremities =
-	{{
-		{{
-			{{ Vector3d(0,0,0), Vector3d(1,0,0) }}
+	{
+		{
+			{{
+					{{ Vector3d(0, 0, 0), Vector3d(1, 0, 0) }}
+					,
+					{{ Vector3d(0, -1, 0), Vector3d(1, -1, 0) }}
+				}
+			}
 			,
-			{{ Vector3d(0,-1,0), Vector3d(1,-1,0) }}
-		}}
-		,
-		{{
-			{{ Vector3d(0,0,-1), Vector3d(1,0,-1) }}
-			,
-			{{ Vector3d(0,-1,-1), Vector3d(1,-1,-1) }}
-		}},
-	}};
+			{{
+					{{ Vector3d(0, 0, -1), Vector3d(1, 0, -1) }}
+					,
+					{{ Vector3d(0, -1, -1), Vector3d(1, -1, -1) }}
+				}
+			},
+		}
+	};
 	unsigned int numNodesPerDim[3] = {3, 3, 3};
 	physicsRepresentation->init3D(extremities,
-		numNodesPerDim,
-		boundaryConditions,
-		0.1, // total mass (in Kg)
-		100.0, // Stiffness stretching
-		0.0, // Damping stretching
-		10.0, // Stiffness bending
-		0.0,  // Damping bending
-		10.0, // Stiffness face diagonal
-		0.0, // Damping face diagonal
-		10.0, // Stiffness volume diagonal
-		0.0); // Damping volume diagonal
+								  numNodesPerDim,
+								  boundaryConditions,
+								  0.1, // total mass (in Kg)
+								  100.0, // Stiffness stretching
+								  0.0, // Damping stretching
+								  10.0, // Stiffness bending
+								  0.0,  // Damping bending
+								  10.0, // Stiffness face diagonal
+								  0.0, // Damping face diagonal
+								  10.0, // Stiffness volume diagonal
+								  0.0); // Damping volume diagonal
 
 	physicsRepresentation->setIntegrationScheme(integrationScheme);
 	physicsRepresentation->setRayleighDampingMass(1e-1);
@@ -242,7 +248,7 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 		std::stringstream ss;
 		ss << name + " Graphics object " << gfxObjectId;
 		std::shared_ptr<OsgPointCloudRepresentation<void>> graphicsRepresentation =
-			std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
+					std::make_shared<OsgPointCloudRepresentation<void>>(ss.str());
 
 		graphicsRepresentation->setInitialPose(*gfxPose);
 		graphicsRepresentation->setColor(color);
@@ -251,11 +257,11 @@ std::shared_ptr<SceneElement> createMassSpring3D(const std::string& name,
 
 		massSpringElement->addComponent(graphicsRepresentation);
 		ss.clear();
-		ss << "Physics to Graphics ("<< gfxObjectId <<") deformable points";
+		ss << "Physics to Graphics (" << gfxObjectId << ") deformable points";
 		massSpringElement->addComponent(std::make_shared<TransferDeformableStateToVerticesBehavior<void>>
-			(ss.str(),
-			physicsRepresentation->getFinalState(),
-			graphicsRepresentation->getVertices()));
+										(ss.str(),
+										 physicsRepresentation->getFinalState(),
+										 graphicsRepresentation->getVertices()));
 
 		gfxObjectId++;
 	}
@@ -281,78 +287,78 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 
 	SurgSim::Math::Quaterniond qIdentity = SurgSim::Math::Quaterniond::Identity();
-	SurgSim::Math::Vector3d translate(0,0,-3);
+	SurgSim::Math::Vector3d translate(0, 0, -3);
 
 	// MassSpring1D
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-3.0, 3.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Explicit",
-			gfxPoses, Vector4d(1, 0, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   gfxPoses, Vector4d(1, 0, 0, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 3.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Modified Euler Explicit",
-			gfxPoses, Vector4d(0, 1, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   gfxPoses, Vector4d(0, 1, 0, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(1.0, 3.0, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(3.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(1.0, 3.0, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 3.0, 0.0)));
 		scene->addSceneElement(createMassSpring1D("MassSpring 1D Euler Implicit",
-			gfxPoses, Vector4d(0, 0, 1, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   gfxPoses, Vector4d(0, 0, 1, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	// MassSpring2D
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-3.0, 1.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Explicit",
-			gfxPoses, Vector4d(1, 0, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   gfxPoses, Vector4d(1, 0, 0, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, 1.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Modified Euler Explicit",
-			gfxPoses, Vector4d(0, 1, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   gfxPoses, Vector4d(0, 1, 0, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 1.0, 1.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(1.0, 1.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, 1.5, 0.0)));
 		scene->addSceneElement(createMassSpring2D("MassSpring 2D Euler Implicit",
-			gfxPoses, Vector4d(0, 0, 1, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   gfxPoses, Vector4d(0, 0, 1, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	// MassSpring3D
 	{
 		std::vector<SurgSim::Math::RigidTransform3d> gfxPoses;
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-3.0, -0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Explicit",
-			gfxPoses, Vector4d(1, 0, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
+							   gfxPoses, Vector4d(1, 0, 0, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d(-1.0, -0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(-1.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Modified Euler Explicit",
-			gfxPoses, Vector4d(0, 1, 0, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
+							   gfxPoses, Vector4d(0, 1, 0, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_MODIFIED_EXPLICIT_EULER));
 
 		gfxPoses.clear();
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 1.0, -0.5, 0.0)));
-		gfxPoses.push_back(makeRigidTransform(qIdentity, translate+Vector3d( 3.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(1.0, -0.5, 0.0)));
+		gfxPoses.push_back(makeRigidTransform(qIdentity, translate + Vector3d(3.0, -0.5, 0.0)));
 		scene->addSceneElement(createMassSpring3D("MassSpring 3D Euler Implicit",
-			gfxPoses, Vector4d(0, 0, 1, 1),
-			SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
+							   gfxPoses, Vector4d(0, 0, 1, 1),
+							   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER));
 	}
 
 	scene->addSceneElement(createView("view1", 0, 0, 1023, 768));

@@ -147,7 +147,7 @@ void getSubVector(const Vector& vector, const std::vector<unsigned int> blockIds
 /// \param size The size to resize the vector v to
 /// \param zeroOut True if the vector v should be filled up with 0 after having been resized, False if not
 template <class Vector>
-void resize(Vector *v, unsigned int size, bool zeroOut = false)
+void resizeVector(Vector *v, unsigned int size, bool zeroOut = false)
 {
 	if (v == nullptr)
 	{

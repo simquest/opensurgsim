@@ -184,10 +184,6 @@ SurgSim::Math::Matrix44f convert(boost::any val);
 				std::bind(&YAML::convert<type>::encode, std::bind(&class::getter, this)),\
 				std::bind(&class::setter, this, std::bind(&YAML::Node::as<type>,std::placeholders::_1)))
 
-
-#define SURGSIM_CLASSNAME(ClassName) \
-	virtual std::string getClassName() const {return #ClassName;}
-
 }; // Framework
 }; // SurgSim
 

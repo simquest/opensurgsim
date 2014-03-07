@@ -1238,16 +1238,16 @@ TYPED_TEST(AllDynamicVectorTests, getSubVectorBlocks)
 	}
 }
 
-TYPED_TEST(AllDynamicVectorTests, resize)
+TYPED_TEST(AllDynamicVectorTests, resizeVector)
 {
 	typedef typename TestFixture::Vector Vector;
 
 	Vector v;
 
-	ASSERT_NO_THROW(SurgSim::Math::resize(&v, 10, false););
+	ASSERT_NO_THROW(SurgSim::Math::resizeVector(&v, 10, false););
 	EXPECT_EQ(10, static_cast<int>(v.size()));
 
-	ASSERT_NO_THROW(SurgSim::Math::resize(&v, 13, true););
+	ASSERT_NO_THROW(SurgSim::Math::resizeVector(&v, 13, true););
 	EXPECT_EQ(13, static_cast<int>(v.size()));
 	EXPECT_TRUE(v.isZero());
 }
