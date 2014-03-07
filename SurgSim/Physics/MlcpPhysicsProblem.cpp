@@ -23,6 +23,11 @@ namespace SurgSim
 namespace Physics
 {
 
+MlcpPhysicsProblem::~MlcpPhysicsProblem()
+{
+}
+
+
 void MlcpPhysicsProblem::updateConstraint(
 	const Eigen::SparseVector<double> &newSubH,
 	const Eigen::MatrixXd &subC,
@@ -52,18 +57,12 @@ void MlcpPhysicsProblem::updateConstraint(
 
 void MlcpPhysicsProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
 {
-	A.resize(numConstraintDof, numConstraintDof);
-	A.setZero();
-	b.resize(numConstraintDof);
-	b.setZero();
+	MlcpProblem::setZero(numDof, numConstraintDof, numConstraints);
+
 	H.resize(numConstraintDof, numDof);
 	H.setZero();
 	CHt.resize(numDof, numConstraintDof);
 	CHt.setZero();
-	mu.resize(numConstraints);
-	mu.setZero();
-
-	constraintTypes.clear();
 }
 
 MlcpPhysicsProblem MlcpPhysicsProblem::Zero(int numDof, int numConstraintDof, int numConstraints)

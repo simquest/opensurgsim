@@ -42,6 +42,9 @@ namespace Physics
 /// \sa SurgSim::Math::MlcpProblem
 struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 {
+	/// Destructor
+	virtual ~MlcpPhysicsProblem() override;
+
 	/// The matrix \f$\mathbf{H}\f$, which is a matrix of size \f$c\times n\f$ that converts from
 	/// the \f$n\f$ degrees of freedom in the system (i.e., the sum of all the DOF over all the representations in the
 	/// scene), to the
@@ -71,7 +74,7 @@ struct MlcpPhysicsProblem : public SurgSim::Math::MlcpProblem
 	/// \param numDof the total degrees of freedom.
 	/// \param numConstraintDof the total constrained degrees of freedom.
 	/// \param numConstraints the number of constraints.
-	void setZero(int numDof, int numConstraintDof, int numConstraints);
+	virtual void setZero(int numDof, int numConstraintDof, int numConstraints) override;
 
 	/// Initialize an MlcpPhysicsProblem with zero values.
 	/// \param numDof the total degrees of freedom for the MlcpPhysicsProblem to be constructed.
