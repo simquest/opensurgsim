@@ -50,8 +50,8 @@ const Matrix& OdeSolver<State, MT, DT, KT, ST>::getCompliance() const
 template <class State, class MT, class DT, class KT, class ST>
 void OdeSolver<State, MT, DT, KT, ST>::allocate(unsigned int size)
 {
-	resize(&m_systemMatrix, size, size);
-	resize(&m_compliance, size, size);
+	resizeMatrix(&m_systemMatrix, size, size);
+	resizeMatrix(&m_compliance, size, size);
 }
 
 }; // namespace Math

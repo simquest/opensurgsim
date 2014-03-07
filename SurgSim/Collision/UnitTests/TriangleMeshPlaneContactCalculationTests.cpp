@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::DataStructures::EmptyData;
-using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Quaterniond;
 using SurgSim::Math::Vector3d;
@@ -143,19 +143,19 @@ void doTriangleMeshPlaneTest(std::shared_ptr<SurgSim::Math::MeshShape> mesh,
 
 TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 {
-	typedef SurgSim::DataStructures::TriangleMesh<EmptyData, EmptyData, EmptyData> TriangleMesh;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
 	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
 	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
 
 	// Create a Mesh Cube
-	std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
+	std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
 	for (int i = 0; i < cubeNumPoints; ++i)
 	{
 		Vector3d p;
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
-		TriangleMesh::VertexType v(p);
+		TriangleMeshBase::VertexType v(p);
 		mesh->addVertex(v);
 	}
 	for (int i = 0; i < cubeNumEdges; ++i)
@@ -166,7 +166,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 			edgePoints[j] = cubeEdges[i][j];
 		}
 		EdgeElement edgeElement(edgePoints);
-		TriangleMesh::EdgeType e(edgeElement);
+		TriangleMeshBase::EdgeType e(edgeElement);
 		mesh->addEdge(e);
 	}
 	for (int i = 0; i < cubeNumTriangles; ++i)
@@ -177,11 +177,11 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
 		TriangleElement triangleElement(trianglePoints);
-		TriangleMesh::TriangleType t(triangleElement);
+		TriangleMeshBase::TriangleType t(triangleElement);
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMesh = std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMesh = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
 
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	Quaterniond meshQuat;

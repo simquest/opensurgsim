@@ -77,7 +77,7 @@ bool TriangleMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	return result;
 }
 
-std::shared_ptr<TriangleMesh<EmptyData, EmptyData, EmptyData>> TriangleMeshPlyReaderDelegate::getMesh()
+std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> TriangleMeshPlyReaderDelegate::getMesh()
 {
 	return m_mesh;
 }
@@ -113,7 +113,7 @@ void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
 	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
-	TriangleMesh<EmptyData, EmptyData, EmptyData>::TriangleType triangle(m_indices);
+	TriangleMeshBase<EmptyData, EmptyData, EmptyData>::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
 }
 

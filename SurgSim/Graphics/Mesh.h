@@ -52,7 +52,7 @@ struct VertexData {
 	}
 };
 
-class Mesh : public SurgSim::DataStructures::TriangleMesh<VertexData, SurgSim::DataStructures::EmptyData,
+class Mesh : public SurgSim::DataStructures::TriangleMeshBase<VertexData, SurgSim::DataStructures::EmptyData,
 					SurgSim::DataStructures::EmptyData>
 {
 public:

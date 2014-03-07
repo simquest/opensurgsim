@@ -190,11 +190,14 @@ TEST(ComponentTests, PointerEncode)
 
 	EXPECT_FALSE(node.IsNull());
 	EXPECT_TRUE(node.IsMap());
-	EXPECT_EQ(3u, node.size());
+	EXPECT_EQ(1u, node.size());
+	std::string className = node.begin()->first.as<std::string>();
+	YAML::Node data = node[className];
 
-	EXPECT_EQ("TestComponent1", node["ClassName"].as<std::string>());
-	EXPECT_EQ("TestComponent", node["Name"].as<std::string>());
-	EXPECT_EQ(to_string(component->getUuid()), node["Id"].as<std::string>());
+	EXPECT_EQ(2u, data.size());
+	EXPECT_EQ("TestComponent1", className);
+	EXPECT_EQ("TestComponent", data["Name"].as<std::string>());
+	EXPECT_EQ(to_string(component->getUuid()), data["Id"].as<std::string>());
 
 }
 
@@ -203,9 +206,8 @@ TEST(ComponentTests, ConvertFactoryTest)
 	Component::getFactory().registerClass<TestComponent1>("TestComponent1");
 
 	YAML::Node node;
-	node["Name"] = "ComponentName";
-	node["ClassName"] = "TestComponent1";
-	node["Id"] = "ConvertFactoryTest_TestComponent1";
+	node["TestComponent1"]["Name"] = "ComponentName";
+	node["TestComponent1"]["Id"] = "ConvertFactoryTest_TestComponent1";
 
 	auto component = node.as<std::shared_ptr<Component>>();
 
@@ -215,20 +217,19 @@ TEST(ComponentTests, ConvertFactoryTest)
 	EXPECT_EQ("ComponentName", testComponent->getName());
 	EXPECT_EQ("TestComponent1", testComponent->getClassName());
 
-	node["ClassName"] = "Unknown";
-	node["Id"] = "ConvertFactoryTest_TestComponent2";
+	YAML::Node invalidNode;
+	node["Invalid"]["Name"] = "Other";
+	node["Invalid"]["Id"] = "ConvertFactoryTest_TestComponent2";
 
 	// Should not be able to convert this class
-	// This currently does not work due to a bug with the id handling
-	EXPECT_ANY_THROW({auto result = node.as<std::shared_ptr<Component>>();});
+	EXPECT_ANY_THROW({auto result = invalidNode.as<std::shared_ptr<Component>>();});
 }
 
 TEST(ComponentTests, MacroRegistrationTest)
 {
 	YAML::Node node;
-	node["Name"] = "ComponentName";
-	node["ClassName"] = "TestComponent2";
-	node["Id"] = "AutomaticRegistrationTest_ComponentName";
+	node["TestComponent2"]["Name"] = "ComponentName";
+	node["TestComponent2"]["Id"] = "AutomaticRegistrationTest_ComponentName";
 
 
 	auto component = node.as<std::shared_ptr<Component>>();
@@ -243,9 +244,8 @@ TEST(ComponentTests, MacroRegistrationTest)
 TEST(ComponentTests, DecodeSharedReferences)
 {
 	YAML::Node node;
-	node["Name"] = "OneComponentName";
-	node["ClassName"] = "TestComponent2";
-	node["Id"] = "DecodeSharedReferences_OneComponentName";
+	node["TestComponent2"]["Name"] = "OneComponentName";
+	node["TestComponent2"]["Id"] = "DecodeSharedReferences_OneComponentName";
 
 	auto component1 = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component1);
@@ -254,7 +254,7 @@ TEST(ComponentTests, DecodeSharedReferences)
 	EXPECT_NE(nullptr, component1copy);
 	EXPECT_EQ(component1, component1copy);
 
-	node["Id"] = "DecodeSharedReferences_TwoComponentName";
+	node["TestComponent2"]["Id"] = "DecodeSharedReferences_TwoComponentName";
 
 	auto component2 = node.as<std::shared_ptr<Component>>();
 	EXPECT_NE(nullptr, component2);
@@ -269,21 +269,22 @@ TEST(ComponentTests, EncodeComponent)
 	component->setValueTwo(2);
 
 	YAML::Node node = YAML::convert<Component>::encode(*component);
+	std::string className = node.begin()->first.as<std::string>();
+	YAML::Node data = node[className];
 
-	EXPECT_EQ("TestComponent", (node["Name"].IsDefined() ? node["Name"].as<std::string>() : "undefined !"));
-	EXPECT_EQ("TestComponent2", (node["ClassName"].IsDefined() ? node["ClassName"].as<std::string>() : "undefined !"));
-	EXPECT_EQ(1, (node["ValueOne"].IsDefined() ? node["ValueOne"].as<int>() : 0xbad));
-	EXPECT_EQ(2, (node["ValueTwo"].IsDefined() ? node["ValueTwo"].as<int>() : 0xbad));
+	EXPECT_EQ("TestComponent", (data["Name"].IsDefined() ? data["Name"].as<std::string>() : "undefined !"));
+	EXPECT_EQ("TestComponent2", className);
+	EXPECT_EQ(1, (data["ValueOne"].IsDefined() ? data["ValueOne"].as<int>() : 0xbad));
+	EXPECT_EQ(2, (data["ValueTwo"].IsDefined() ? data["ValueTwo"].as<int>() : 0xbad));
 }
 
 TEST(ComponentTests, DecodeComponent)
 {
 	YAML::Node node;
-	node["Name"] = "TestComponentName";
-	node["ClassName"] = "TestComponent2";
-	node["Id"] = "DecodeComponent_TestComponentName";
-	node["ValueOne"] = 100;
-	node["ValueTwo"] = 101;
+	node["TestComponent2"]["Name"] = "TestComponentName";
+	node["TestComponent2"]["Id"] = "DecodeComponent_TestComponentName";
+	node["TestComponent2"]["ValueOne"] = 100;
+	node["TestComponent2"]["ValueTwo"] = 101;
 
 	auto component = node.as<std::shared_ptr<Component>>();
 

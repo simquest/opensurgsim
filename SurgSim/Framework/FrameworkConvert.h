@@ -25,6 +25,7 @@ namespace SurgSim
 namespace Framework
 {
 class Component;
+class SceneElement;
 }
 }
 

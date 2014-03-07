@@ -21,11 +21,11 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
-#include "SurgSim/Math/Shape.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
-
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/Convert.h"
+#include "SurgSim/Math/Shape.h"
 
 
 
@@ -42,24 +42,17 @@ namespace Math
 class MeshShape : public Shape
 {
 public:
-
-	/// Type TriMesh for convenience
-	typedef SurgSim::DataStructures::TriangleMesh<SurgSim::DataStructures::EmptyData,
-			SurgSim::DataStructures::EmptyData, SurgSim::DataStructures::EmptyData> TriMesh;
-
-public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
 	template <class VertexData, class EdgeData, class TriangleData>
-	explicit MeshShape(
-		const std::shared_ptr<SurgSim::DataStructures::TriangleMesh<VertexData, EdgeData, TriangleData>> mesh);
+	explicit MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh);
 
 	/// \return the type of the shape
 	virtual int getType() override;
 
 	/// Get mesh
-	/// \return The triangle mesh associated to this MeshShape
-	const std::shared_ptr<TriMesh> getMesh() const;
+	/// \return The collision mesh associated to this MeshShape
+	const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
@@ -81,11 +74,11 @@ private:
 
 	/// Compute various integrations over projection of face
 	/// \param face A triangle
-	void computeProjectionIntegrals(const TriMesh::TriangleType& face);
+	void computeProjectionIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face);
 
 	/// Compute various integrations on a face
 	/// \param face A triangle
-	void computeFaceIntegrals(const TriMesh::TriangleType& face);
+	void computeFaceIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face);
 
 	/// Compute various volume integrals over the triangle mesh
 	void computeVolumeIntegrals();
@@ -104,8 +97,8 @@ private:
 	/// volume integrals (Data structure from Brian Mirtich)
 	double m_T0, m_T1[3], m_T2[3], m_TP[3];
 
-	/// Triangle mesh associated to this MeshShape
-	std::shared_ptr<TriMesh> m_mesh;
+	/// Collision mesh associated to this MeshShape
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
 };
 
 }; // Math
