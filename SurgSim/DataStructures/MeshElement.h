@@ -52,11 +52,10 @@ struct MeshElement
 	{
 	}
 
-	/// Constructor with empty data member
+	/// Constructor where the Data is constructed by its default constructor.
 	/// \param	verticesId IDs of the N element vertices
-	MeshElement(const std::array<unsigned int, N>& verticesId) : 
-		verticesId(verticesId),
-		data()
+	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
+		verticesId(verticesId)
 	{
 	}
 
