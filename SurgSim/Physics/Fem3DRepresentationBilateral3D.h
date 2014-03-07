@@ -25,11 +25,13 @@ namespace Physics
 {
 
 /// Fem3DRepresentation bilateral 3d constraint implementation.
+///
+/// The family of bilateral3D constraints enforce point-contact between two Representations.
 class Fem3DRepresentationBilateral3D : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	explicit Fem3DRepresentationBilateral3D();
+	Fem3DRepresentationBilateral3D();
 
 	/// Destructor
 	virtual ~Fem3DRepresentationBilateral3D();

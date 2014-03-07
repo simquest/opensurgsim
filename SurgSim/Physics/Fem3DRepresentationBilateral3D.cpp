@@ -20,22 +20,6 @@
 
 using SurgSim::Math::Vector3d;
 
-static size_t countNonZero(Eigen::VectorXd vector)
-{
-	size_t count = 0;
-	size_t size = vector.size();
-
-	for (size_t i = 0; i < size; i++)
-	{
-		if (vector[i] != 0.0)
-		{
-			count++;
-		}
-	}
-
-	return count;
-}
-
 namespace SurgSim
 {
 
@@ -72,15 +56,30 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 
 	Vector3d globalPosition = localization->calculatePosition();
 
-	// Bilateral3d in a LCP
-	//   P(t+dt) = other side of the constraint...
-	//   P(free motion) + dt.v(t+dt) = other side of the constraint...
-	//   p(free) is the point of contact after free motion
-	//   u is the displacement needed to verify the constraint
-	// note that u = sum ui * baryCoord[i]
+	// Fixed point constraint in MCLP
+	//   p(t) is defined as the point before motion
+	//   s is defined as position to be constrained to
+	//   u is defined as the displacement needed to enforce the constraint
 	//
-	// The constraint equation is
-	// P(free motion) + dt.v = ... (Using Backward Euler integration scheme: x(t+dt)-x(t) = dt.v(t+dt))
+	// The equation is
+	//   u + (p(t) - s) = 0
+	//
+	// Using backward-euler integration,
+	//   u = dt.v(t + dt)
+	//
+	// The constraint (p(t) - s) exists in 3-space, but we must modify the velocity of coordinates in (n * 3) space. The
+	// transform from (n * 3) velocity space -> 3 translational space is denoted by H, which we construct here.
+	//
+	// The constructing principal of FEM is that nodes must be placed close enough such that the value of a function
+	// within an FEM can be linearly interpolated by the values at the nodes of the FEM.  The interpolation weights are
+	// given by barycentric coordinates which linearly transform the nodes from (n * 3) -> 3 space (and vice versa):
+	//    sum(n_i * b_i) = n_1 * b_1 + n_2 * b_i ... n_n * b_n
+	// where v_i are in 3 space.
+	//
+	// So the transform from node-velocity to constraint space is
+	//    dt * sum(v_i * b_i)
+	//
+	// See RigidRepresentationBilateral3D for more implementation details.
 
 	// Update b with new violation: P(free motion)
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
@@ -88,7 +87,7 @@ void Fem3DRepresentationBilateral3D::doBuild(double dt,
 	// m_newH is a SparseVector, so resizing is cheap.  The object's memory also gets cleared.
 	m_newH.resize(fem3d->getNumDof());
 	// m_newH is a member variable, so 'reserve' only needs to allocate memory on the first run.
-	size_t numNodeToConstrain = countNonZero(coord.naturalCoordinate);
+	size_t numNodeToConstrain = (coord.naturalCoordinate.array() != 0.0).count();
 	m_newH.reserve(3 * numNodeToConstrain);
 
 	std::shared_ptr<FemElement> femElement = fem3d->getFemElement(coord.elementId);

@@ -25,11 +25,13 @@ namespace Physics
 {
 
 /// FixedRepresentation bilateral 3d constraint implementation.
+///
+/// The family of bilateral3D constraints enforce point-contact between two Representations.
 class FixedRepresentationBilateral3D : public ConstraintImplementation
 {
 public:
 	/// Constructor
-	explicit FixedRepresentationBilateral3D();
+	FixedRepresentationBilateral3D();
 
 	/// Destructor
 	virtual ~FixedRepresentationBilateral3D();
