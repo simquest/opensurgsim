@@ -24,22 +24,23 @@ namespace SurgSim
 namespace DataStructures
 {
 
-struct TriangleData {
+/// Store normal for each triangle in a triangle mesh.
+struct NormalData {
 
 	SurgSim::Math::Vector3d normal;
 
 	/// Equality operator.
-	/// \param	rhs	The right hand side.
+	/// \param	rhs	The right hand side NormalData.
 	/// \return	true if the parameters are considered equivalent.
-	bool operator==(const SurgSim::DataStructures::TriangleData& rhs) const
+	bool operator==(const SurgSim::DataStructures::NormalData& rhs) const
 	{
 		return normal == rhs.normal;
 	}
 
 	/// Inequality operator.
-	/// \param	rhs	The right hand side.
+	/// \param	rhs	The right hand side NormalData.
 	/// \return	true if the parameters are not considered equivalent.
-	bool operator!=(const SurgSim::DataStructures::TriangleData& rhs) const
+	bool operator!=(const SurgSim::DataStructures::NormalData& rhs) const
 	{
 		return !((*this) == rhs);
 	}
@@ -55,23 +56,31 @@ public:
 	}
 };
 
-class TriangleMesh: public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, TriangleData>
+/// A TriangleMesh stores normal information for the triangles.
+class TriangleMesh: public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
 {
 public:
-	// Constructor
+	/// Constructor
+	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
+	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
+	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
+	/// \param mesh The mesh to be copied from. Vertex, edge and triangle data will be emptied.
+	/// \sa TriangleMeshBase
 	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	TriangleMesh(const std::shared_ptr<TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>> mesh);
+	explicit TriangleMesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
 
-	// Get normal for triangle
-	// \param triangleId The triangle to get normal
+	/// Get normal for triangle.
+	/// \param triangleId The triangle to get normal.
+	/// \return The normal for the triangle with given ID.
 	SurgSim::Math::Vector3d getNormal(int triangleId);
 
-	// Calculate normals for all triangles
+	/// Calculate normals for all triangles.
+	/// \note Normals will be normalized.
 	void calculateNormals();
 };
 
-}; // DataStructures
-}; // SurgSim
+}; // namespace DataStructures
+}; // namespace SurgSim
 
 #include "SurgSim/DataStructures/TriangleMesh-inl.h"
 

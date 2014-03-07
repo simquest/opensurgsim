@@ -37,11 +37,9 @@ void TriangleMesh::calculateNormals()
 		SurgSim::Math::Vector3d normal = (vertex1 - vertex0).cross(vertex2 - vertex0);
 		normal.normalize();
 
-		TriangleData data;
-		data.normal = normal;
-		getTriangle(i).data = data;
+		getTriangle(i).data.normal = normal;
 	}
 }
 
-}; // DataStructures
-}; // SurgSim
+}; // namespace DataStructures
+}; // namespace SurgSim

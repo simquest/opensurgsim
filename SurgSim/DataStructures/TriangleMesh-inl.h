@@ -23,15 +23,13 @@ namespace DataStructures
 {
 
 template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-TriangleMesh::TriangleMesh(
-	const std::shared_ptr<TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>> mesh) :
-	TriangleMeshBase<EmptyData, EmptyData, TriangleData>(*mesh)
+TriangleMesh::TriangleMesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh) :
+	TriangleMeshBase<EmptyData, EmptyData, NormalData>(mesh)
 {
 	calculateNormals();
 }
 
-
-}; // DataStructures
-}; // SurgSim
+}; // namespace DataStructures
+}; // namespace SurgSim
 
 #endif // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
