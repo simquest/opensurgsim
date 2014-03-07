@@ -18,7 +18,6 @@
 
 namespace SurgSim
 {
-
 namespace DataStructures
 {
 
@@ -55,27 +54,27 @@ TriangleMeshBase<VertexData, EdgeData, TriangleData>::~TriangleMeshBase()
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::addEdge(const EdgeType& edge)
+size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::addEdge(const EdgeType& edge)
 {
 	m_edges.push_back(edge);
 	return m_edges.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::addTriangle(const TriangleType& triangle)
+size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::addTriangle(const TriangleType& triangle)
 {
 	m_triangles.push_back(triangle);
 	return m_triangles.size() - 1;
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumEdges() const
+size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumEdges() const
 {
 	return m_edges.size();
 }
 
 template <class VertexData, class EdgeData, class TriangleData>
-unsigned int TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumTriangles() const
+size_t TriangleMeshBase<VertexData, EdgeData, TriangleData>::getNumTriangles() const
 {
 	return m_triangles.size();
 }
@@ -142,10 +141,10 @@ bool TriangleMeshBase<VertexData, EdgeData, TriangleData>::isValid() const
 	typedef typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::EdgeType EdgeType;
 	typedef typename TriangleMeshBase<VertexData, EdgeData, TriangleData>::TriangleType TriangleType;
 
-	unsigned int numVertices = Vertices<VertexData>::getNumVertices();
+	size_t numVertices = Vertices<VertexData>::getNumVertices();
 
 	// Test edges validity
-	for (typename std::vector<EdgeType>::const_iterator it = m_edges.begin(); it != m_edges.end(); it++)
+	for (typename std::vector<EdgeType>::const_iterator it = m_edges.begin(); it != m_edges.end(); ++it)
 	{
 		for (int vertexId = 0; vertexId < 2; vertexId++)
 		{
@@ -157,7 +156,7 @@ bool TriangleMeshBase<VertexData, EdgeData, TriangleData>::isValid() const
 	}
 
 	// Test triangles validity
-	for (typename std::vector<TriangleType>::const_iterator it = m_triangles.begin(); it != m_triangles.end(); it++)
+	for (typename std::vector<TriangleType>::const_iterator it = m_triangles.begin(); it != m_triangles.end(); ++it)
 	{
 		for (int vertexId = 0; vertexId < 3; vertexId++)
 		{
@@ -201,7 +200,6 @@ void TriangleMeshBase<VertexData, EdgeData, TriangleData>::doClear()
 }
 
 };  // namespace DataStructures
-
 };  // namespace SurgSim
 
 #endif  // SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_INL_H

@@ -16,12 +16,11 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESHBASE_H
 
-#include "SurgSim/DataStructures/Vertices.h"
 #include "SurgSim/DataStructures/MeshElement.h"
+#include "SurgSim/DataStructures/Vertices.h"
 
 namespace SurgSim
 {
-
 namespace DataStructures
 {
 
@@ -64,9 +63,14 @@ public:
 	/// Constructor. The mesh is initially empty (no vertices, no edges, no triangles).
 	TriangleMeshBase();
 
-	// Copy constructor.
+	/// Copy constructor.
+	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
+	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
+	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
+	/// \param mesh The mesh to be copied from. Vertex, edge and triangle data will be emptied.
+	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
 	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-	TriangleMeshBase(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
+	explicit TriangleMeshBase(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
 
 	/// Destructor
 	virtual ~TriangleMeshBase();
@@ -78,7 +82,7 @@ public:
 	/// on the vertices and other parameters.
 	/// \param	edge	Edge to add to the mesh
 	/// \return	Unique ID of the new edge.
-	unsigned int addEdge(const EdgeType& edge);
+	size_t addEdge(const EdgeType& edge);
 
 	/// Adds a triangle to the mesh.
 	/// \param	triangle	Triangle to add to the mesh
@@ -86,15 +90,15 @@ public:
 	/// createTriangle(vertices, other data...) method which performs any checking desired and sets up the triangle data
 	/// based on the vertices and other parameters.
 	/// \return	Unique ID of the new triangle.
-	unsigned int addTriangle(const TriangleType& triangle);
+	size_t addTriangle(const TriangleType& triangle);
 
 	/// Get the number of edges
 	/// Returns the number of edges in this mesh.
-	unsigned int getNumEdges() const;
+	size_t getNumEdges() const;
 
 	/// Get the number of triangles
 	/// Returns the number of triangles in this mesh.
-	unsigned int getNumTriangles() const;
+	size_t getNumTriangles() const;
 
 	/// Retrieve all edges
 	/// Returns a vector containing the position of each edge.
