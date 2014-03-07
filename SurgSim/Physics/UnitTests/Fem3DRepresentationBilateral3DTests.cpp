@@ -113,6 +113,40 @@ TEST(Fem3DRepresentationBilateral3DTests, Constants)
 	EXPECT_EQ(3u, constraint.getNumDof());
 }
 
+TEST(Fem3DRepresentationBilateral3DTests, BuildMlcpBasic)
+{
+	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
+	// CHt and HCHt can be correctly built given H, so it does not neccessarily construct the physical parameters
+	// neccessary to supply a realistic C.  It only checks H and b.
+	Fem3DRepresentationBilateral3D constraint;
+
+	Vector3d actual;
+
+	// Setup parameters for Fem3DRepresentationBilateral3D::build
+	auto localization = std::make_shared<Fem3DRepresentationLocalization>(getTestingFem3d("representation"));
+	localization->setLocalPosition(FemRepresentationCoordinate(2u, Vector4d(0.0, 0.0, 1.0, 0.0)));
+
+	actual = localization->calculatePosition();
+
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(18, 3, 1);
+
+	ConstraintData emptyConstraint;
+
+	ASSERT_NO_THROW(constraint.build(
+		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
+
+	// Compare results
+	Eigen::Matrix<double, 3, 1> violation = actual;
+	EXPECT_NEAR_EIGEN(violation, mlcpPhysicsProblem.b, epsilon);
+
+	Eigen::Matrix<double, 3, 18> H = Eigen::Matrix<double, 3, 18>::Zero();
+	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
+	SurgSim::Math::setSubMatrix(1.0 * dt * identity, 0, 4, 3, 3, &H);
+	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
+
+	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
+}
+
 TEST(Fem3DRepresentationBilateral3DTests, BuildMlcp)
 {
 	// Whitebox test which validates ConstraintImplementation::build's output parameter, MlcpPhysicsProblem.  It assumes
