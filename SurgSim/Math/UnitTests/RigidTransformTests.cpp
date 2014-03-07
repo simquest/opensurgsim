@@ -39,7 +39,7 @@ class RigidTransform3Tests : public RigidTransformTestBase<T>
 };
 
 typedef ::testing::Types<SurgSim::Math::RigidTransform3d,
-						 SurgSim::Math::RigidTransform3f> RigidTransform3Variants;
+		SurgSim::Math::RigidTransform3f> RigidTransform3Variants;
 TYPED_TEST_CASE(RigidTransform3Tests, RigidTransform3Variants);
 
 
@@ -49,9 +49,9 @@ class AllRigidTransformTests : public RigidTransformTestBase<T>
 };
 
 typedef ::testing::Types<SurgSim::Math::RigidTransform2d,
-						 SurgSim::Math::RigidTransform2f,
-						 SurgSim::Math::RigidTransform3d,
-						 SurgSim::Math::RigidTransform3f> AllRigidTransformVariants;
+		SurgSim::Math::RigidTransform2f,
+		SurgSim::Math::RigidTransform3d,
+		SurgSim::Math::RigidTransform3f> AllRigidTransformVariants;
 TYPED_TEST_CASE(AllRigidTransformTests, AllRigidTransformVariants);
 
 
@@ -73,8 +73,8 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 
 	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
 	{
-		Quaternion q0(Eigen::Matrix<T,4,1>::Random());
-		Quaternion q1(Eigen::Matrix<T,4,1>::Random());
+		Quaternion q0(Eigen::Matrix<T, 4, 1>::Random());
+		Quaternion q1(Eigen::Matrix<T, 4, 1>::Random());
 		q0.normalize();
 		q1.normalize();
 
@@ -111,8 +111,8 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 			// the tests to these possibilities as well:
 			// (-q0 + q1) / 2 normalized
 			// (-q0 - q1) / 2 normalized
-			Quaternion qHalf0(( q0.coeffs() + q1.coeffs()) * 0.5);
-			Quaternion qHalf1(( q0.coeffs() - q1.coeffs()) * 0.5);
+			Quaternion qHalf0((q0.coeffs() + q1.coeffs()) * 0.5);
+			Quaternion qHalf1((q0.coeffs() - q1.coeffs()) * 0.5);
 			Quaternion qHalf2((-q0.coeffs() + q1.coeffs()) * 0.5);
 			Quaternion qHalf3((-q0.coeffs() - q1.coeffs()) * 0.5);
 			qHalf0.normalize();
@@ -126,7 +126,7 @@ TYPED_TEST(AllRigidTransformTests, Interpolation)
 			Transform transformHalf2 = makeRigidTransform(qHalf2, tHalf);
 			Transform transformHalf3 = makeRigidTransform(qHalf3, tHalf);
 			EXPECT_TRUE(transform.isApprox(transformHalf0) || transform.isApprox(transformHalf1) ||
-				transform.isApprox(transformHalf2) || transform.isApprox(transformHalf3));
+						transform.isApprox(transformHalf2) || transform.isApprox(transformHalf3));
 		}
 
 		{
@@ -158,9 +158,9 @@ TYPED_TEST(AllRigidTransformTests, MakeLookAt)
 
 	Transform transform = SurgSim::Math::makeRigidTransform(eye, origin, up);
 
-	EXPECT_TRUE(eye4.isApprox(transform*center4));
+	EXPECT_TRUE(eye4.isApprox(transform * center4));
 
-	Vector4 transformed = transform*direction4;
+	Vector4 transformed = transform * direction4;
 
 	Vector3 direction3(transformed[0], transformed[1], transformed[2]);
 	EXPECT_TRUE(eye.normalized().isApprox(direction3.normalized()));
@@ -193,8 +193,6 @@ TYPED_TEST(AllRigidTransformTests, YamlConvert)
 	EXPECT_EQ(2, node.size());
 
 	Transform expected;
-
-	std::cout << node;
 
 	ASSERT_NO_THROW(expected = node.as<Transform>());
 	EXPECT_TRUE(transform.isApprox(expected));
