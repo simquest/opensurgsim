@@ -14,7 +14,10 @@
 // limitations under the License.
 
 #include "SurgSim/Framework/FrameworkConvert.h"
+
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Component.h"
+#include "SurgSim/Framework/Scene.h"
 
 #include <boost/uuid/uuid_io.hpp>
 
@@ -107,6 +110,51 @@ Node convert<SurgSim::Framework::Component>::encode(const SurgSim::Framework::Co
 	YAML::Node result;
 	result[rhs.getClassName()] = data;
 
+	return result;
+}
+
+
+Node convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::encode(
+			const std::shared_ptr<SurgSim::Framework::SceneElement> rhs)
+{
+	SURGSIM_ASSERT(rhs != nullptr) << "Trying to encode nullptr SceneElement";
+	return rhs->encode(false);
+}
+
+bool convert<std::shared_ptr<SurgSim::Framework::SceneElement>>::decode(
+			const Node& node,
+			std::shared_ptr<SurgSim::Framework::SceneElement>& rhs)
+{
+	if (rhs == nullptr)
+	{
+		// For now only deal with BasicSceneElement classes
+		rhs = std::make_shared<SurgSim::Framework::BasicSceneElement>("");
+	}
+	return rhs->decode(node);
+}
+
+Node convert<SurgSim::Framework::SceneElement>::encode(
+	const SurgSim::Framework::SceneElement& rhs)
+{
+	return rhs.encode(true);
+}
+
+Node convert<std::shared_ptr<SurgSim::Framework::Scene>>::encode(
+			const std::shared_ptr<SurgSim::Framework::Scene> rhs)
+{
+	SURGSIM_ASSERT(rhs != nullptr) << "Trying to encode nullptr Scene";
+	return rhs->encode();
+}
+
+bool convert<std::shared_ptr<SurgSim::Framework::Scene>>::decode(
+			const Node& node,
+			std::shared_ptr<SurgSim::Framework::Scene>& rhs)
+{
+	bool result = false;
+	if (rhs != nullptr)
+	{
+		result = rhs->decode(node);
+	}
 	return result;
 }
 

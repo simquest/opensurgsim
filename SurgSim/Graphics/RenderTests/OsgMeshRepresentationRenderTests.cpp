@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
@@ -32,7 +33,6 @@
 #include "SurgSim/Graphics/OsgUniform.h"
 
 #include "SurgSim/DataStructures/Vertices.h"
-#include "SurgSim/Blocks/BasicSceneElement.h"
 
 #include "SurgSim/Math/Quaternion.h"
 #include "SurgSim/Math/Vector.h"
@@ -87,8 +87,8 @@ protected:
 
 TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 {
-	std::shared_ptr<SurgSim::Blocks::BasicSceneElement> element =
-		std::make_shared<SurgSim::Blocks::BasicSceneElement>("Scene");
+	std::shared_ptr<SurgSim::Framework::BasicSceneElement> element =
+		std::make_shared<SurgSim::Framework::BasicSceneElement>("Scene");
 	scene->addSceneElement(element);
 
 	SurgSim::Testing::Cube::makeCube(&cubeVertices, &cubeColors, &cubeTextures, &cubeTriangles);
@@ -122,25 +122,25 @@ TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 	{
 	public:
 		std::pair<RigidTransform3d, RigidTransform3d> transform;
-		std::pair<double,double> scale;
+		std::pair<double, double> scale;
 	};
 
 	std::vector<InterpolationData> interpolators;
 	InterpolationData interpolator;
 
 	interpolator.transform.first =
-		makeRigidTransform(makeRotationQuaternion(0.0,Vector3d(1.0, 1.0, 1.0)), Vector3d(-0.1, 0.0, -0.2));
+		makeRigidTransform(makeRotationQuaternion(0.0, Vector3d(1.0, 1.0, 1.0)), Vector3d(-0.1, 0.0, -0.2));
 	interpolator.scale.first = 0.001;
 	interpolator.transform.second =
-		makeRigidTransform(makeRotationQuaternion(M_PI_2,Vector3d(1.0, -1.0, 1.0)), Vector3d(0.1, 0.0, -0.2));
+		makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d(1.0, -1.0, 1.0)), Vector3d(0.1, 0.0, -0.2));
 	interpolator.scale.second = 0.03;
 	interpolators.push_back(interpolator);
 
 	interpolator.transform.first =
-		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0, -1.0, 0.0)), Vector3d(0.0, -0.1, -0.2));
+		makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(-1.0, -1.0, 0.0)), Vector3d(0.0, -0.1, -0.2));
 	interpolator.scale.first = 0.001;
 	interpolator.transform.second =
-		makeRigidTransform(makeRotationQuaternion(-M_PI_2,Vector3d(-1.0, 1.0 ,0.0)), Vector3d(0.0, 0.1, -0.2));
+		makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d(-1.0, 1.0 , 0.0)), Vector3d(0.0, 0.1, -0.2));
 	interpolator.scale.second = 0.03;
 	interpolators.push_back(interpolator);
 
@@ -173,7 +173,7 @@ TEST_F(OsgMeshRepresentationRenderTests, StaticRotateDynamicScale)
 			{
 				newVertices[index] =  transform * (cubeVertices[index] * scale);
 			}
-			meshes[j]->setVertexPositions(newVertices,true);
+			meshes[j]->setVertexPositions(newVertices, true);
 		}
 
 		if (i == 500)

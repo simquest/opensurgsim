@@ -15,8 +15,8 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -34,8 +34,8 @@
 #include "SurgSim/Physics/FemElement1DBeam.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgPointCloudRepresentation;
 using SurgSim::Math::Vector3d;
@@ -99,9 +99,9 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 // Generates a 1d fem comprised of adjacent elements along a straight line.  The number of fem elements is determined
 // by loadModelFem1D.
 std::shared_ptr<SceneElement> createFem1D(const std::string& name,
-										  const SurgSim::Math::RigidTransform3d& gfxPose,
-										  const SurgSim::Math::Vector4d& color,
-										  SurgSim::Math::IntegrationScheme integrationScheme)
+		const SurgSim::Math::RigidTransform3d& gfxPose,
+		const SurgSim::Math::Vector4d& color,
+		SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	std::shared_ptr<Fem1DRepresentation> physicsRepresentation
 		= std::make_shared<Fem1DRepresentation>("Physics Representation: " + name);
@@ -117,7 +117,7 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 	femSceneElement->addComponent(physicsRepresentation);
 
 	std::shared_ptr<SurgSim::Graphics::PointCloudRepresentation<void>> graphicsRepresentation
-		= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
+			= std::make_shared<OsgPointCloudRepresentation<void>>("Graphics Representation: " + name);
 	graphicsRepresentation->setInitialPose(gfxPose);
 	graphicsRepresentation->setColor(color);
 	graphicsRepresentation->setPointSize(3.0f);
@@ -127,8 +127,8 @@ std::shared_ptr<SceneElement> createFem1D(const std::string& name,
 
 	femSceneElement->addComponent(
 		std::make_shared<TransferDeformableStateToVerticesBehavior<void>>("Transfer from Physics to Graphics: " + name,
-																		  physicsRepresentation->getFinalState(),
-																		  graphicsRepresentation->getVertices()));
+				physicsRepresentation->getFinalState(),
+				graphicsRepresentation->getVertices()));
 
 	return femSceneElement;
 }
