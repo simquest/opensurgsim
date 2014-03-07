@@ -80,7 +80,10 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 
 	Eigen::Matrix<double, 3, 6> H = Eigen::Matrix<double, 3, 6>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::setSubMatrix(dt * identity, 0, 0, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(dt * identity,
+		0, 0, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(Eigen::DiagonalMatrix<double, 3, 3>(dt * actual),
+		0, 1, 3, 3, &H);
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
 	EXPECT_EQ(0u, mlcpPhysicsProblem.constraintTypes.size());
@@ -118,8 +121,14 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	Eigen::Matrix<double, 3, 12> H = Eigen::Matrix<double, 3, 12>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
-	SurgSim::Math::setSubMatrix(dt * identity, 0, 0, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(-dt * identity, 0, 2, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(dt * identity,
+		0, 0, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(Eigen::DiagonalMatrix<double, 3, 3>(dt * actual),
+		0, 1, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(-dt * identity,
+		0, 2, 3, 3, &H);
+	SurgSim::Math::setSubMatrix(Eigen::DiagonalMatrix<double, 3, 3>(-dt * desired),
+		0, 3, 3, 3, &H);
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 }
 

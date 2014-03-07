@@ -55,28 +55,45 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	Vector3d globalPosition = localization->calculatePosition();
 
 	// Fixed point constraint in MCLP
-	//   p(t) is defined as the point after motion
-	//   f is defined as position to be constrained to
+	//   p(t) is defined as the point before motion
+	//   s is defined as position to be constrained to [see note 1]
 	//   u is defined as the displacement needed to enforce the constraint
 	// The equation is
-	//   u + (p(t) - f) = 0
+	//   u + (p(t) - s) = 0
 	//
-	// For implicit integration, u = dt.I.v(t+dt)
+	// Using backward-euler integration,
+	//   u = dt.v(t + dt)
 	//
-	// Note that in the physics pipeline, the constraint consits of two implementations and two localizations.  The
+	// In rigid body dynamics, the screw vectors are represented as (x, y, z, wx, wy, wz), where the GP = (x, y, z)
+	// represents the vector from the origin to the center of mass, and w = (wx, wy, wz) represents angular rotation
+	// about the center of mass.  The twist vector in cartesian space is--
+	//
+	//   dt.v(t+dt) = dt.dGP(t+dt) + dt.GP^w(t+dt)
+	//
+	// The update pipeline uses a modified technique of matrix multiplication for rigid bodies.  It takes the cross
+	// product with suppiled constraint components rather than the matrix product, so we must provide the appropriately
+	// scaled position vector to the angular velocity component.
+	//
+	// We construct H to transform v(t + dt) into constrained space.  From the previous equation and comments, this
+	// implies that we must multiply the translational velocity by dt and cross-multiply the angular velocity with
+	// dt * GP.
+	//
+	// [note 1]: In the physics pipeline, the constraint consits of two implementations and two localizations.  The
 	// implementation is processed once for each localization, with the first being processed with scale = 1 and the
-	// second with scale = -1.  This effectively takes the _difference_ of two constraints.  Therefore we can
-	// effectively calculate the bilateral constraint using _only_ the position information of the localization.
+	// second with scale = -1.  When applied together in the Mlcp, this effectively takes the difference of the two
+	// constraints.  Therefore we can effectively calculate the bilateral constraint using only the position information
+	// of the localization.
 
 	// Fill up b with the constraint violation
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
 	m_newH.resize(rigid->getNumDof());
-	m_newH.reserve(3);
+	m_newH.reserve(2);
 	for (size_t index = 0; index < 3; index++)
 	{
 		m_newH.setZero();
 		m_newH.insert(index) = dt * scale;
+		m_newH.insert(index + 3) = dt * scale * globalPosition[index];
 		mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + index);
 	}
 }
