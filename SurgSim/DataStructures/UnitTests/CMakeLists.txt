@@ -29,6 +29,7 @@ set(UNIT_TEST_SOURCES
 	OptionalValueTests.cpp
 	PlyReaderTests.cpp
 	TetrahedronMeshTest.cpp
+	TriangleMeshBaseTest.cpp
 	TriangleMeshTest.cpp
 )
 
