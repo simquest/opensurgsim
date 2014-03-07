@@ -199,7 +199,7 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 {
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
 
-	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(11, 2, 1);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(11, 2, 2);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::Matrix<double, 1, 5> localH;
