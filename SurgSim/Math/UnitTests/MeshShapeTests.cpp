@@ -139,7 +139,7 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 			mesh->addTriangle(t);
 		}
 
-		SurgSim::Math::MeshShape boxMesh(mesh);
+		SurgSim::Math::MeshShape boxMesh(*mesh);
 
 		SurgSim::Math::BoxShape boxShape(lx, ly, lz);
 

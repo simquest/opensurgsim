@@ -131,8 +131,8 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(mesh);
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB = std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
 
 	SurgSim::Math::RigidTransform3d cubeMeshATransform;
 	SurgSim::Math::RigidTransform3d cubeMeshBTransform;

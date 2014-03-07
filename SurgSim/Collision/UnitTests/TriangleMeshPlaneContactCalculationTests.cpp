@@ -185,8 +185,7 @@ TEST(TriangleMeshPlaneContactCalculationTests, UnitTests)
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMesh =
-		std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMesh = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
 
 	std::shared_ptr<PlaneShape> plane = std::make_shared<PlaneShape>();
 	SurgSim::Math::Quaterniond meshQuat;

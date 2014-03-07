@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <gtest/gtest.h>
 
 #include "SurgSim/DataStructures/TriangleMesh.h"
@@ -69,20 +68,20 @@ TEST(TriangleMeshTest, NormalTest)
 	TriangleMeshBase::TriangleType t(triangleElement);
 	mesh->addTriangle(t);
 
-	std::shared_ptr<TriangleMesh> collisionMesh = std::make_shared<TriangleMesh>(mesh);
+	std::shared_ptr<TriangleMesh> meshWithNormal = std::make_shared<TriangleMesh>(*mesh);
 
 	Vector3d expectedZNormal(0.0, 0.0, 1.0);
-	EXPECT_EQ(expectedZNormal, collisionMesh->getNormal(0));
+	EXPECT_EQ(expectedZNormal, meshWithNormal->getNormal(0));
 
 	// Update new vertex location of v2 to v3
 	Vector3d v3(-1.0, -1.0, 1.0);
-	SurgSim::DataStructures::Vertex<SurgSim::DataStructures::EmptyData>& v2p = collisionMesh->getVertex(2);
+	SurgSim::DataStructures::Vertex<SurgSim::DataStructures::EmptyData>& v2p = meshWithNormal->getVertex(2);
 	v2p = v3;
 
-	// Recompute normals for CollisionMesh
-	collisionMesh->calculateNormals();
+	// Recompute normals for meshWithNormal
+	meshWithNormal->calculateNormals();
 	Vector3d expectedXNormal(0.0, -1.0, 0.0);
-	EXPECT_EQ(expectedXNormal, collisionMesh->getNormal(0));
+	EXPECT_EQ(expectedXNormal, meshWithNormal->getNormal(0));
 }
 
 };
