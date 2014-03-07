@@ -42,8 +42,7 @@ public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
 	template <class VertexData, class EdgeData, class TriangleData>
-	explicit MeshShape(
-		const std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>> mesh);
+	explicit MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh);
 
 	/// \return the type of the shape
 	virtual int getType() override;
