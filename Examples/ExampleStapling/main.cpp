@@ -218,7 +218,9 @@ std::shared_ptr<ViewElement> createView()
 	return view;
 }
 
-std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, const std::string& deviceName)
+std::shared_ptr<SceneElement> createStapler(const std::string& staplerName,
+											const std::string& deviceName,
+											SurgSim::Math::RigidTransform3d pose)
 {
 	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler at
 	// the tip of the stapler.
@@ -231,6 +233,7 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 		std::make_shared<RigidRepresentation>(staplerName + "Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
+	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(staplerName + "Collision");
@@ -349,7 +352,8 @@ int main(int argc, char* argv[])
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
 	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
-	scene->addSceneElement(createStapler("stapler", deviceName));
+	scene->addSceneElement(
+		createStapler("stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
 	scene->addSceneElement(createFemWound("wound", true));
 
 	runtime->execute();
