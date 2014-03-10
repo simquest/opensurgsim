@@ -52,6 +52,13 @@ struct MeshElement
 	{
 	}
 
+	/// Constructor where the Data is constructed by its default constructor.
+	/// \param	verticesId IDs of the N element vertices
+	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
+		verticesId(verticesId)
+	{
+	}
+
 	typedef std::array<unsigned int, N> IdType;
 
 	/// Element vertices.
@@ -71,41 +78,6 @@ struct MeshElement
 	/// \param element The MeshElement to compare it to
 	/// \return False if the two MeshElements are equals, True otherwise
 	bool operator!=(const MeshElement<N, Data>& element) const
-	{
-		return ! ((*this) == element);
-	}
-};
-
-/// Specialization of MeshElement with no data.
-/// \sa MeshElement
-template <unsigned int N>
-struct MeshElement<N, void>
-{
-
-	/// Constructor
-	/// \param	verticesId	IDs of the N element vertices
-	explicit MeshElement(const std::array<unsigned int, N>& verticesId) :
-		verticesId(verticesId)
-	{
-	}
-
-	typedef std::array<unsigned int, N> IdType;
-
-	/// Element vertices.
-	IdType verticesId;
-
-	/// Compare the element with another one (equality)
-	/// \param element The MeshElement to compare it to
-	/// \return True if the two MeshElements are equals, False otherwise
-	bool operator==(const MeshElement<N, void>& element) const
-	{
-		return verticesId == element.verticesId;
-	}
-
-	/// Compare the element with another one (inequality)
-	/// \param element The MeshElement to compare it to
-	/// \return False if the two MeshElements are equals, True otherwise
-	bool operator!=(const MeshElement<N, void>& element) const
 	{
 		return ! ((*this) == element);
 	}

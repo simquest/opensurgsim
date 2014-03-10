@@ -15,6 +15,7 @@
 
 /// Render Tests for the OsgOctreeRepresentation class.
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Graphics/RenderTests/RenderTest.h"
 #include "SurgSim/Graphics/OctreeRepresentation.h"
@@ -49,7 +50,7 @@ struct OsgOctreeRepresentationRenderTests : public SurgSim::Graphics::RenderTest
 */
 TEST_F(OsgOctreeRepresentationRenderTests, OctreeSubdivide)
 {
-	SurgSim::Math::OctreeShape::EmptyData emptyData;
+	SurgSim::DataStructures::EmptyData emptyData;
 
 	SurgSim::Math::OctreeShape::NodeType::AxisAlignedBoundingBox boundingBox;
 	boundingBox.min() = Vector3d::Ones() * -2.0;

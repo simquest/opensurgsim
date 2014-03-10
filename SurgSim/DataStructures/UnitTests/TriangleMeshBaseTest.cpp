@@ -18,12 +18,14 @@
 
 #include "gtest/gtest.h"
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 
 #include <random>
 
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::Math::Vector3d;
 
@@ -154,16 +156,16 @@ TEST_F(TriangleMeshBaseTest, InitTest)
 {
 	ASSERT_NO_THROW({MockTriangleMeshBase mesh;});
 
-	/// Make sure we can create triangle meshes with each possible combination of void data.
-	typedef TriangleMeshBase<void, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
-	typedef TriangleMeshBase<MockVertexData, void, MockTriangleData> TriangleMeshNoEdgeData;
-	typedef TriangleMeshBase<MockVertexData, MockEdgeData, void> TriangleMeshNoTriangleData;
+	/// Make sure we can create triangle meshes with each possible combination of EmptyData data.
+	typedef TriangleMeshBase<EmptyData, MockEdgeData, MockTriangleData> TriangleMeshNoVertexData;
+	typedef TriangleMeshBase<MockVertexData, EmptyData, MockTriangleData> TriangleMeshNoEdgeData;
+	typedef TriangleMeshBase<MockVertexData, MockEdgeData, EmptyData> TriangleMeshNoTriangleData;
 
-	typedef TriangleMeshBase<MockVertexData, void, void> TriangleMeshNoEdgeOrTriangleData;
-	typedef TriangleMeshBase<void, MockEdgeData, void> TriangleMeshNoVertexOrTriangleData;
-	typedef TriangleMeshBase<void, void, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
+	typedef TriangleMeshBase<MockVertexData, EmptyData, EmptyData> TriangleMeshNoEdgeOrTriangleData;
+	typedef TriangleMeshBase<EmptyData, MockEdgeData, EmptyData> TriangleMeshNoVertexOrTriangleData;
+	typedef TriangleMeshBase<EmptyData, EmptyData, MockTriangleData> TriangleMeshNoVertexOrEdgeData;
 
-	typedef TriangleMeshBase<void, void, void> TriangleMeshNoData;
+	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshNoData;
 
 	ASSERT_NO_THROW({TriangleMeshNoVertexData mesh;});
 	ASSERT_NO_THROW({TriangleMeshNoEdgeData mesh;});
@@ -498,14 +500,6 @@ TEST_F(TriangleMeshBaseTest, ComparisonTest)
 	EXPECT_TRUE(mesh != meshWithDifferentTriangles);
 }
 
-class EmptyData
-{
-public:
-	bool operator==(const EmptyData &data) const
-	{
-		return true;
-	}
-};
 
 TEST_F(TriangleMeshBaseTest, CopyConstructorTest)
 {
