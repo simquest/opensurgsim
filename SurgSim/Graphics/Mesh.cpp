@@ -24,6 +24,10 @@ namespace SurgSim
 namespace Graphics
 {
 
+Mesh::Mesh()
+{
+}
+
 void Mesh::initialize(
 	const std::vector<SurgSim::Math::Vector3d>& vertices,
 	const std::vector<SurgSim::Math::Vector4d>& colors,
