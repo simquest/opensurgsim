@@ -308,16 +308,9 @@ std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidT
 		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	std::shared_ptr<CapsuleRepresentation> graphicalCollisionRepresentation =
-		std::make_shared<OsgCapsuleRepresentation>("CapsuleGraphicalRepresentationOfCollision");
-	graphicalCollisionRepresentation->setHeight(capsuleShape->getLength()); // Unit: meter
-	graphicalCollisionRepresentation->setRadius(capsuleShape->getRadius()); // Unit: meter
-	graphicalCollisionRepresentation->setInitialPose(alignedPose);
-
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>("ArmSceneElement");
 	armSceneElement->addComponent(sceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
-	armSceneElement->addComponent(graphicalCollisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
 
 	return armSceneElement;
