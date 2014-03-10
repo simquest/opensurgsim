@@ -102,35 +102,6 @@ static std::string findFile(std::string fileName)
 	return data.findFile(fileName);
 }
 
-static std::shared_ptr<SurgSim::Graphics::Mesh> graphicsMeshFromTriMesh(
-	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> mesh)
-{
-	std::shared_ptr<SurgSim::Graphics::Mesh> result = std::make_shared<SurgSim::Graphics::Mesh>();
-
-	// Graphics::Mesh requires specific parameters for initialization
-	std::vector<SurgSim::Math::Vector4d> emptyColors;
-	std::vector<SurgSim::Math::Vector2d> emptyTextures;
-	std::vector<SurgSim::Math::Vector3d> vertices;
-	std::vector<unsigned int> triangles;
-
-	typedef std::vector<SurgSim::DataStructures::Vertex<EmptyData>>::iterator VertexIterator;
-	for (VertexIterator it = std::begin(mesh->getVertices()); it != std::end(mesh->getVertices()); ++it)
-	{
-		vertices.emplace_back(it->position);
-	}
-
-	typedef std::vector<SurgSim::DataStructures::MeshElement<3u, EmptyData>>::iterator TriangleIterator;
-	for (TriangleIterator it = std::begin(mesh->getTriangles()); it != std::end(mesh->getTriangles()); ++it)
-	{
-		triangles.push_back(it->verticesId[0]);
-		triangles.push_back(it->verticesId[1]);
-		triangles.push_back(it->verticesId[2]);
-	}
-
-	result->initialize(vertices, emptyColors, emptyTextures, triangles);
-
-	return result;
-}
 
 static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
 {
@@ -144,8 +115,7 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& file
 	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileFullName << " is malformed.";
 	reader.parseFile();
 
-	// graphicsMeshFromTriMesh transforms mesh types
-	return graphicsMeshFromTriMesh(triangleMeshDelegate->getMesh());
+	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
 }
 
 static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
