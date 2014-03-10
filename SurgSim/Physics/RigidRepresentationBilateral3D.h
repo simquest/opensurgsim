@@ -26,7 +26,7 @@ namespace Physics
 
 /// RigidRepresentation bilateral 3d constraint implementation.
 ///
-/// The family of bilateral3D constraints enforce point-contact between two Representations.
+/// The family of bilateral3D constraints enforce equality between two points.
 class RigidRepresentationBilateral3D : public ConstraintImplementation
 {
 public:
