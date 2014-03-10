@@ -340,14 +340,17 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(
 		createStapler("stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
 
+	// Load the FEM
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
+	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
+	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
 	scene->addSceneElement(
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
 							  1000.0,										   // Mass Density
 							  0.45,											   // Poisson Ratio
-							  500000.0,										   // Young Modulus
+							  75e3,											   // Young Modulus
 							  true));										   // Display point cloud
 
 	runtime->execute();
