@@ -159,13 +159,13 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemWound(const st
 
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
-		= loadFem("DeformableArmWound.ply", SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, 1000.0, 0.45, 500000.0);
+		= loadFem("wound_deformable.ply", SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, 1000.0, 0.45, 500000.0);
 	woundSceneElement->addComponent(physicsRepresentation);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh("DeformableArmWoundSurfaceFromInitialMesh.ply");
+	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh("wound_deformable.ply");
 	woundSceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
