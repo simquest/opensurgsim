@@ -17,9 +17,9 @@
 #include <memory>
 #include <string>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
@@ -28,6 +28,7 @@
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
@@ -54,10 +55,11 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::Device::MultiAxisDevice;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
@@ -101,7 +103,7 @@ static std::string findFile(std::string fileName)
 }
 
 static std::shared_ptr<SurgSim::Graphics::Mesh> graphicsMeshFromTriMesh(
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh<void, void, void>> mesh)
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> mesh)
 {
 	std::shared_ptr<SurgSim::Graphics::Mesh> result = std::make_shared<SurgSim::Graphics::Mesh>();
 
@@ -111,13 +113,13 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> graphicsMeshFromTriMesh(
 	std::vector<SurgSim::Math::Vector3d> vertices;
 	std::vector<unsigned int> triangles;
 
-	typedef std::vector<SurgSim::DataStructures::Vertex<void>>::iterator VertexIterator;
+	typedef std::vector<SurgSim::DataStructures::Vertex<EmptyData>>::iterator VertexIterator;
 	for (VertexIterator it = std::begin(mesh->getVertices()); it != std::end(mesh->getVertices()); ++it)
 	{
 		vertices.emplace_back(it->position);
 	}
 
-	typedef std::vector<SurgSim::DataStructures::MeshElement<3u, void>>::iterator TriangleIterator;
+	typedef std::vector<SurgSim::DataStructures::MeshElement<3u, EmptyData>>::iterator TriangleIterator;
 	for (TriangleIterator it = std::begin(mesh->getTriangles()); it != std::end(mesh->getTriangles()); ++it)
 	{
 		triangles.push_back(it->verticesId[0]);
@@ -183,7 +185,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemWound(const st
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SurgSim::Framework::SceneElement> woundSceneElement
-		= std::make_shared<SurgSim::Blocks::BasicSceneElement>(name);
+		= std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
 
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation

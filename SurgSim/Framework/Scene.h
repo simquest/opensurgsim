@@ -16,12 +16,17 @@
 #ifndef SURGSIM_FRAMEWORK_SCENE_H
 #define SURGSIM_FRAMEWORK_SCENE_H
 
-#include <map>
+#include <vector>
 #include <memory>
 #include <string>
 #include <boost/thread/mutex.hpp>
 
 #include "SurgSim/Framework/SceneElement.h"
+
+namespace YAML
+{
+class Node;
+}
 
 namespace SurgSim
 {
@@ -48,11 +53,20 @@ public:
 
 	/// Gets all the scene elements in the scene.
 	/// \return	The scene elements.
-	const std::multimap<std::string,std::shared_ptr<SceneElement>>& getSceneElements() const;
+	const std::vector<std::shared_ptr<SceneElement>>& getSceneElements() const;
 
 	/// Gets the runtime.
 	/// \return runtime The runtime for this scene.
 	std::shared_ptr<Runtime> getRuntime();
+
+	/// Convert to a YAML::Node
+	/// \return A node with all the public data of this instance
+	YAML::Node encode() const;
+
+	/// Pull data from a YAML::Node.
+	/// \param node the node to decode.
+	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
+	bool decode(const YAML::Node& node);
 
 private:
 
@@ -62,7 +76,7 @@ private:
 
 	std::weak_ptr<Runtime> m_runtime;
 
-	std::multimap<std::string, std::shared_ptr<SceneElement>> m_elements;
+	std::vector<std::shared_ptr<SceneElement>> m_elements;
 
 	// Used in a const function, need to declare mutable
 	mutable boost::mutex m_sceneElementsMutex;

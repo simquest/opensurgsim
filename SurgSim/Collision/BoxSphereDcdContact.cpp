@@ -72,8 +72,8 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	closestPoint.z() = std::min(boxSize.z(), closestPoint.z());
 	closestPoint.z() = std::max(-boxSize.z(), closestPoint.z());
 
-	// Distance between the closestPoint and boxLocalSphereCenter.
-	Vector3d normal = boxLocalSphereCenter - closestPoint;
+	// Distance between the closestPoint and boxLocalSphereCenter.  Normal points into first representation, the box.
+	Vector3d normal = closestPoint - boxLocalSphereCenter;
 	double distanceSquared = normal.squaredNorm();
 	if (distanceSquared - (sphere->getRadius() * sphere->getRadius()) > SquaredDistanceEpsilon)
 	{
@@ -88,23 +88,26 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	{
 		// Sphere center is inside the box.
 		// In this case closestPoint is equal to boxLocalSphereCenter.
-		// Find which face of the box which is closest to the closestPoint.
+		// Find which face of the box is closest to the closestPoint.
 		// abs(boxSize.x - closestPoint.x) and abs(-boxSize.x - closestPoint.x) are the distances between the
 		// closestPoint and the two faces (along x-axis) of the box.
 		// But since the abs(closestPoint.x) will always <= boxSize.x (because the point is inside box),
-		// (boxSize.x() - abs(closestPoint.x())) gives the distance of the face from the closestPoint in x-axis.
-		// This value is calculated for all the axes. The axis with the minimum value is assumed to contain the
+		// (boxSize.x() - abs(closestPoint.x())) gives the distance from the closestPoint to whichever x-axis face is
+		// closest. This value is calculated for all the axes. The axis with the minimum value contains the
 		// colliding face.
 		double distancesFromFaces[3] = {boxSize.x() - std::abs(closestPoint.x()),
 										boxSize.y() - std::abs(closestPoint.y()),
 										boxSize.z() - std::abs(closestPoint.z())};
 		int minimumDistanceId = SurgSim::Math::indexOfMinimum(distancesFromFaces[0], distancesFromFaces[1],
 															  distancesFromFaces[2]);
-		// The mininumDistanceId gives the normal of the closet face.
-		double direction = closestPoint[minimumDistanceId] > -DistanceEpsilon ? 1.0 : -1.0;
+		// The mininumDistanceId is the index of the non-zero component of the normal of the closest face.
+		// The normal points toward the first representation, the box.  So the sign (or direction) of that entry is +1
+		// if the closestPoint component is negative and vice versa.
+		double direction = closestPoint[minimumDistanceId] > -DistanceEpsilon ? -1.0 : 1.0;
 		normal.setZero();
 		normal[minimumDistanceId] = direction;
-		closestPoint[minimumDistanceId] = boxSize[minimumDistanceId] * direction;
+		// The closestPoint should be on the closest box face, so the negative of the normal direction.
+		closestPoint[minimumDistanceId] = boxSize[minimumDistanceId] * (-direction);
 		distance = -std::abs(distancesFromFaces[minimumDistanceId]);
 	}
 	else
@@ -120,7 +123,7 @@ void BoxSphereDcdContact::doCalculateContact(std::shared_ptr<CollisionPair> pair
 	// Create the contact.
 	std::pair<Location,Location> penetrationPoints;
 	penetrationPoints.first.globalPosition.setValue(representationBox->getPose() * closestPoint);
-	penetrationPoints.second.globalPosition.setValue(sphereCenter - (normal * sphere->getRadius()));
+	penetrationPoints.second.globalPosition.setValue(sphereCenter + (normal * sphere->getRadius()));
 
 	pair->addContact(std::abs(distance - sphere->getRadius()), normal, penetrationPoints);
 }

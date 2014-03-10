@@ -183,7 +183,7 @@ void MassSpringRepresentation::applyCorrection(double dt, const Eigen::VectorBlo
 Vector& MassSpringRepresentation::computeF(const DeformableRepresentationState& state)
 {
 	// Make sure the force vector has been properly allocated and zeroed out
-	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
+	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
 
 	addGravityForce(&m_f, state);
 	addRayleighDampingForce(&m_f, state);
@@ -207,7 +207,7 @@ const DiagonalMatrix& MassSpringRepresentation::computeM(const DeformableReprese
 
 	// Make sure the mass matrix has been properly allocated
 	// It does not need to be zeroed out, as it will be directly set
-	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
+	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), false);
 
 	DiagonalMatrix::DiagonalVectorType& diagonal = m_M.diagonal();
 
@@ -237,7 +237,7 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 	const double& rayMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
 
 	// D += rayMass.M
 	if (rayMass != 0.0)
@@ -283,7 +283,7 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resizeMatrix(&m_K, state.getNumDof(), state.getNumDof(), true);
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
@@ -310,17 +310,17 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	using SurgSim::Math::addSubMatrix;
 
 	// Make sure the force vector has been properly allocated and zeroed out
-	SurgSim::Math::resize(&m_f, state.getNumDof(), true);
+	SurgSim::Math::resizeVector(&m_f, state.getNumDof(), true);
 
 	// Make sure the mass matrix has been properly allocated
 	// It does not need to be zeroed out, as it will be directly set
-	SurgSim::Math::resize(&m_M, state.getNumDof(), state.getNumDof(), false);
+	SurgSim::Math::resizeMatrix(&m_M, state.getNumDof(), state.getNumDof(), false);
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&m_D, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
 
 	// Make sure the stiffness matrix has been properly allocated and zeroed out
-	SurgSim::Math::resize(&m_K, state.getNumDof(), state.getNumDof(), true);
+	SurgSim::Math::resizeMatrix(&m_K, state.getNumDof(), state.getNumDof(), true);
 
 	// Computes the mass matrix m_M
 	computeM(state);
