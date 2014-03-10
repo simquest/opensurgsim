@@ -69,16 +69,20 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	// about the center of mass.  The twist vector in cartesian space is--
 	//
 	//   dt.v(t+dt) = dt.dGP(t+dt) + dt.GP^w(t+dt)
+	//              = dt.dGP(t+dt) + dt.|1   1   1   |
+	//                                  |GPx GPy GPz |
+	//                                  |wx  wy  wz  |
+	//              = dt.dGP(t+dt) + dt.[ GPy.wz - GPz.wy]
+	//                                  [-GPx.wz + GPz.wx]
+	//                                  [ GPx.wy - GPy.wx]
+	//              = dt.dGP(t+dt) + dt.[ 0   -GPz  GPy].w
+	//                                  [ GPz  0   -GPx]
+	//                                  [-GPy  GPx  0  ]
 	//
-	// The update pipeline uses a modified technique of matrix multiplication for rigid bodies.  It takes the cross
-	// product with suppiled constraint components rather than the matrix product, so we must provide the appropriately
-	// scaled position vector to the angular velocity component.
+	// We construct H to transform v(t + dt) into constrained space.  Therefore we multiply the translational velocity
+	// by dt, and we must multiply the angular velocity with the skew-symmetric matrix of GP times dt.
 	//
-	// We construct H to transform v(t + dt) into constrained space.  From the previous equation and comments, this
-	// implies that we must multiply the translational velocity by dt and cross-multiply the angular velocity with
-	// dt * GP.
-	//
-	// [note 1]: In the physics pipeline, the constraint consits of two implementations and two localizations.  The
+	// [note 1]: In the physics pipeline, the constraint consists of two implementations and two localizations.  The
 	// implementation is processed once for each localization, with the first being processed with scale = 1 and the
 	// second with scale = -1.  When applied together in the Mlcp, this effectively takes the difference of the two
 	// constraints.  Therefore we can effectively calculate the bilateral constraint using only the position information
@@ -88,14 +92,24 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
 	m_newH.resize(rigid->getNumDof());
-	m_newH.reserve(2);
-	for (size_t index = 0; index < 3; index++)
-	{
-		m_newH.setZero();
-		m_newH.insert(index) = dt * scale;
-		m_newH.insert(index + 3) = dt * scale * globalPosition[index];
-		mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + index);
-	}
+	m_newH.reserve(3);
+
+	m_newH.insert(0) = dt * scale;
+	m_newH.insert(3 + 1) = -dt * scale * globalPosition.z();
+	m_newH.insert(3 + 2) = dt * scale * globalPosition.y();
+	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 0);
+
+	m_newH.setZero();
+	m_newH.insert(1) = dt * scale;
+	m_newH.insert(3 + 0) = dt * scale * globalPosition.z();
+	m_newH.insert(3 + 2) = -dt * scale * globalPosition.x();
+	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 1);
+
+	m_newH.setZero();
+	m_newH.insert(2) = dt * scale;
+	m_newH.insert(3 + 0) = -dt * scale * globalPosition.y();
+	m_newH.insert(3 + 1) = dt * scale * globalPosition.x();
+	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 2);
 }
 
 SurgSim::Math::MlcpConstraintType RigidRepresentationBilateral3D::getMlcpConstraintType() const
