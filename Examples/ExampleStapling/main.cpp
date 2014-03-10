@@ -92,27 +92,14 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
-static std::string findFile(std::string fileName)
-{
-	// Helper function for locating files in the correct folder.
-	std::vector<std::string> paths;
-	paths.push_back("Data/Geometry");
-	SurgSim::Framework::ApplicationData data(paths);
-
-	return data.findFile(fileName);
-}
-
-
 static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
 {
-	std::string fileFullName = findFile(fileName);
-
 	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
-	SurgSim::DataStructures::PlyReader reader(fileFullName);
+	SurgSim::DataStructures::PlyReader reader(fileName);
 	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate> triangleMeshDelegate
 		= std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
 
-	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileFullName << " is malformed.";
+	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
 	reader.parseFile();
 
 	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
@@ -125,14 +112,12 @@ static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
 	double poissonRatio,
 	double youngModulus)
 {
-	std::string fileFullName = findFile(fileName);
-
 	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
-	SurgSim::DataStructures::PlyReader reader(fileFullName);
+	SurgSim::DataStructures::PlyReader reader(fileName);
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
 		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
 
-	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileFullName << " is malformed.";
+	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileName << " is malformed.";
 	reader.parseFile();
 
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
@@ -151,25 +136,32 @@ static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
 	return fem;
 }
 
-static std::shared_ptr<SurgSim::Framework::SceneElement> createFemWound(const std::string& name, bool displayPointCloud)
+static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
+	const std::string& name,
+	const std::string& filename,
+	SurgSim::Math::IntegrationScheme integrationScheme,
+	double massDensity,
+	double poissonRatio,
+	double youngModulus,
+	bool displayPointCloud)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
-	std::shared_ptr<SurgSim::Framework::SceneElement> woundSceneElement
+	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
 		= std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
 
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
-		= loadFem("wound_deformable.ply", SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, 1000.0, 0.45, 500000.0);
-	woundSceneElement->addComponent(physicsRepresentation);
+		= loadFem(filename, integrationScheme, massDensity, poissonRatio, youngModulus);
+	sceneElement->addComponent(physicsRepresentation);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh("wound_deformable.ply");
-	woundSceneElement->addComponent(graphicsTriangleMeshRepresentation);
+	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh(filename);
+	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
-	woundSceneElement->addComponent(
+	sceneElement->addComponent(
 		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
 			name + " physics to triangle mesh",
 			physicsRepresentation->getFinalState(),
@@ -184,17 +176,17 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemWound(const st
 		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 		graphicsPointCloudRepresentation->setPointSize(3.0f);
 		graphicsPointCloudRepresentation->setVisible(true);
-		woundSceneElement->addComponent(graphicsPointCloudRepresentation);
+		sceneElement->addComponent(graphicsPointCloudRepresentation);
 
 		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
-		woundSceneElement->addComponent(
+		sceneElement->addComponent(
 			std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<void>>(
 				name + " physics to point cloud",
 				physicsRepresentation->getFinalState(),
 				graphicsPointCloudRepresentation->getVertices()));
 	}
 
-	return woundSceneElement;
+	return sceneElement;
 }
 
 /// Load scenery object from file
@@ -347,7 +339,16 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
 	scene->addSceneElement(
 		createStapler("stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
-	scene->addSceneElement(createFemWound("wound", true));
+
+	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
+	scene->addSceneElement(
+		createFemSceneElement("wound",
+							  woundFilename,
+							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
+							  1000.0,										   // Mass Density
+							  0.45,											   // Poisson Ratio
+							  500000.0,										   // Young Modulus
+							  true));										   // Display point cloud
 
 	runtime->execute();
 
