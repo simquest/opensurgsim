@@ -105,7 +105,7 @@ std::shared_ptr<ViewElement> createView()
 std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, const std::string& deviceName)
 {
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader("Data/Collision/stapler_collision.ply");
+	PlyReader reader("Data/Geometry/stapler_collision.ply");
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
@@ -130,8 +130,8 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
-	inputVTC->setAngularDamping(params.getMass() * 25);
-	inputVTC->setAngularStiffness(params.getMass() * 400.0);
+	inputVTC->setAngularDamping(params.getMass() * 25e-2);
+	inputVTC->setAngularStiffness(params.getMass() * 10.0);
 	inputVTC->setLinearDamping(params.getMass() * 25);
 	inputVTC->setLinearStiffness(params.getMass() * 800.0);
 
