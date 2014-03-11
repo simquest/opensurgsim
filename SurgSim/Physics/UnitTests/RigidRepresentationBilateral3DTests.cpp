@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/MlcpConstraintType.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Physics/ConstraintData.h"
@@ -27,31 +28,13 @@
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
 using SurgSim::Math::Vector3d;
+using SurgSim::Math::makeSkewSymmetricMatrix;
 
 namespace
 {
 const double epsilon = 1e-10;
 const double dt = 1e-3;
 };
-
-static Eigen::Matrix<double, 3, 3, Vector3d::Options> SkewSymmetricMatrix(const Vector3d &vector)
-{
-	Eigen::Matrix<double, 3, 3> result;
-
-	result(0, 0) = 0.0;
-	result(0, 1) = -vector(2);
-	result(0, 2) = vector(1);
-
-	result(1, 0) = vector(2);
-	result(1, 1) = 0.0;
-	result(1, 2) = -vector(0);
-
-	result(2, 0) = -vector(1);
-	result(2, 1) = vector(0);
-	result(2, 2) = 0.0;
-
-	return result;
-}
 
 namespace SurgSim
 {
@@ -102,7 +85,7 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
 	SurgSim::Math::setSubMatrix(dt * identity,
 		0, 0, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(SkewSymmetricMatrix(dt * actual),
+	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((dt * actual).eval()),
 		0, 1, 3, 3, &H);
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -143,11 +126,11 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
 	SurgSim::Math::setSubMatrix(dt * identity,
 		0, 0, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(SkewSymmetricMatrix(dt * actual),
+	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((dt * actual).eval()),
 		0, 1, 3, 3, &H);
 	SurgSim::Math::setSubMatrix(-dt * identity,
 		0, 2, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(SkewSymmetricMatrix(-dt * desired),
+	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((-dt * desired).eval()),
 		0, 3, 3, 3, &H);
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 }
