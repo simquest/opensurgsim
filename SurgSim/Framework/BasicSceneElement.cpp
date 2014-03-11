@@ -12,24 +12,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
-#define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
+#include "SurgSim/Framework/BasicSceneElement.h"
 
 namespace SurgSim
 {
-namespace DataStructures
+namespace Framework
 {
 
-template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-TriangleMesh::TriangleMesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh) :
-	TriangleMeshBase<EmptyData, EmptyData, NormalData>(mesh)
+BasicSceneElement::BasicSceneElement(const std::string& name) :
+	SurgSim::Framework::SceneElement(name)
 {
-	calculateNormals();
 }
 
-}; // namespace DataStructures
-}; // namespace SurgSim
+BasicSceneElement::~BasicSceneElement()
+{
+}
 
-#endif // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
+bool BasicSceneElement::doInitialize()
+{
+	return true;
+}
+
+}
+}
+

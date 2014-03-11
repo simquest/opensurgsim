@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include "SurgSim/Math/Quaternion.h"
+#include "SurgSim/Math/MathConvert.h"
 #include "gtest/gtest.h"
 
 // Define test fixture class templates.
@@ -35,7 +36,7 @@ public:
 
 // This used to contain aligned (via Eigen::AutoAlign) quaternion type aliases, but we got rid of those.
 typedef ::testing::Types<SurgSim::Math::Quaterniond,
-						 SurgSim::Math::Quaternionf> QuaternionVariants;
+		SurgSim::Math::Quaternionf> QuaternionVariants;
 TYPED_TEST_CASE(QuaternionTests, QuaternionVariants);
 
 
@@ -46,7 +47,7 @@ class UnalignedQuaternionTests : public QuaternionTests<T>
 };
 
 typedef ::testing::Types<SurgSim::Math::Quaterniond,
-						 SurgSim::Math::Quaternionf> UnalignedQuaternionVariants;
+		SurgSim::Math::Quaternionf> UnalignedQuaternionVariants;
 TYPED_TEST_CASE(UnalignedQuaternionTests, UnalignedQuaternionVariants);
 
 
@@ -104,12 +105,8 @@ TYPED_TEST(QuaternionTests, InitializeFromArray)
 	typedef typename TestFixture::Quaternion Quaternion;
 	typedef typename TestFixture::Scalar T;
 
-	// This array has more elements than we will need.
-	// The element type must match the quaternion!
-	const T inputArray[5]  = { 0.1f, 1.2f, 2.3f, 3.4f, 4.5f };
+	Quaternion quaternion(T(3.4), T(0.1), T(1.2), T(2.3));
 
-	// Note: this initializes the quaternion from the array in the **XYZW** order (not WXYZ!)
-	Quaternion quaternion(inputArray);
 	EXPECT_NEAR(0.1, quaternion.x(), 1e-6) << "X wasn't properly initialized.";
 	EXPECT_NEAR(1.2, quaternion.y(), 1e-6) << "Y wasn't properly initialized.";
 	EXPECT_NEAR(2.3, quaternion.z(), 1e-6) << "Z wasn't properly initialized.";
@@ -173,6 +170,29 @@ TYPED_TEST(QuaternionTests, SetToZero)
 	EXPECT_NEAR(0.0, quaternion.z(), 1e-6) << "Z wasn't properly initialized.";
 }
 
+// Test conversion to and from yaml node
+TYPED_TEST(QuaternionTests, YamlConvert)
+{
+	typedef typename TestFixture::Quaternion Quaternion;
+	typedef typename TestFixture::Scalar T;
+
+	Quaternion quaternion(T(0.1), T(1.2), T(2.3), T(3.4));
+
+	YAML::Node node;
+
+	ASSERT_NO_THROW(node = quaternion);
+
+	EXPECT_TRUE(node.IsSequence());
+	EXPECT_EQ(4u, node.size());
+
+	Quaternion expected;
+
+	ASSERT_NO_THROW(expected = node.as<Quaternion>());
+	EXPECT_TRUE(quaternion.isApprox(expected));
+}
+
+
+
 // ==================== REPRESENTATION CONVERSIONS ====================
 
 /// Test setting quaternions from an angle/axis rotation.
@@ -189,20 +209,20 @@ TYPED_TEST(QuaternionTests, FromAngleAxis)
 	using SurgSim::Math::makeRotationQuaternion;
 
 	Quaternion quaternion = makeRotationQuaternion(angle, axis);
-	EXPECT_NEAR(std::cos(angle/2.0f),            quaternion.w(), 1e-6) << "W wasn't properly initialized.";
-	EXPECT_NEAR(axis.x() * std::sin(angle/2.0f), quaternion.x(), 1e-6) << "X wasn't properly initialized.";
-	EXPECT_NEAR(axis.y() * std::sin(angle/2.0f), quaternion.y(), 1e-6) << "X wasn't properly initialized.";
-	EXPECT_NEAR(axis.z() * std::sin(angle/2.0f), quaternion.z(), 1e-6) << "X wasn't properly initialized.";
+	EXPECT_NEAR(std::cos(angle / 2.0f),            quaternion.w(), 1e-6) << "W wasn't properly initialized.";
+	EXPECT_NEAR(axis.x() * std::sin(angle / 2.0f), quaternion.x(), 1e-6) << "X wasn't properly initialized.";
+	EXPECT_NEAR(axis.y() * std::sin(angle / 2.0f), quaternion.y(), 1e-6) << "X wasn't properly initialized.";
+	EXPECT_NEAR(axis.z() * std::sin(angle / 2.0f), quaternion.z(), 1e-6) << "X wasn't properly initialized.";
 }
 
 template<class T>
 void testAngleAxis(const Eigen::Quaternion<T>& q, const Eigen::AngleAxis<T>& expectedAA,
-	bool expectNegatedQuatOppositeAxis = false)
+				   bool expectNegatedQuatOppositeAxis = false)
 {
 	using SurgSim::Math::computeAngleAndAxis;
 	using SurgSim::Math::computeAngle;
 
-	Eigen::Matrix<T,3,1> axis, axisNeg;
+	Eigen::Matrix<T, 3, 1> axis, axisNeg;
 	T angle, angleNeg;
 
 	computeAngleAndAxis(q, &angle, &axis);
@@ -254,7 +274,7 @@ TYPED_TEST(QuaternionTests, ToAngleAxis)
 		SCOPED_TRACE("Angle = 0");
 		Quaternion quaternion = makeRotationQuaternion(angle, axis); // q=(1 0 0 0)
 		expectedAA.angle() = angle;
-		expectedAA.axis() = Vector3(1,0,0);
+		expectedAA.axis() = Vector3(1, 0, 0);
 
 		testAngleAxis<T>(quaternion, expectedAA);
 	}
@@ -381,15 +401,15 @@ TYPED_TEST(QuaternionTests, FromMatrix)
 
 	Matrix33 matrix;
 	matrix <<
-		cosAngle, -sinAngle, 0,
-		sinAngle, cosAngle, 0,
-		0, 0, 1;
+		   cosAngle, -sinAngle, 0,
+					 sinAngle, cosAngle, 0,
+					 0, 0, 1;
 
 	Quaternion quaternion(matrix);
-	EXPECT_NEAR(std::cos(angle/2), quaternion.w(), 1e-6) << "W wasn't properly computed.";
+	EXPECT_NEAR(std::cos(angle / 2), quaternion.w(), 1e-6) << "W wasn't properly computed.";
 	EXPECT_NEAR(0,                 quaternion.x(), 1e-6) << "X wasn't properly computed.";
 	EXPECT_NEAR(0,                 quaternion.y(), 1e-6) << "Y wasn't properly computed.";
-	EXPECT_NEAR(std::sin(angle/2), quaternion.z(), 1e-6) << "Z wasn't properly computed.";
+	EXPECT_NEAR(std::sin(angle / 2), quaternion.z(), 1e-6) << "Z wasn't properly computed.";
 }
 
 
@@ -402,22 +422,22 @@ TYPED_TEST(QuaternionTests, ToMatrix)
 	typedef Eigen::Matrix<T, 3, 3> Matrix33;
 
 	T angle = 0.1f;
-	Quaternion quaternion(std::cos(angle/2), 0, 0, std::sin(angle/2));
+	Quaternion quaternion(std::cos(angle / 2), 0, 0, std::sin(angle / 2));
 
 	Matrix33 expectedMatrix;
 	T sinAngle = std::sin(angle);
 	T cosAngle = std::cos(angle);
 	expectedMatrix <<
-		cosAngle, -sinAngle, 0,
-		sinAngle, cosAngle, 0,
-		0, 0, 1;
+				   cosAngle, -sinAngle, 0,
+							 sinAngle, cosAngle, 0,
+							 0, 0, 1;
 
 	Matrix33 matrix1 = quaternion.matrix();
 	EXPECT_NEAR(0, (matrix1 - expectedMatrix).norm(), 9e-6) << "The rotation matrix wasn't properly computed" <<
-															   " by matrix().";
+			" by matrix().";
 	Matrix33 matrix2 = quaternion.toRotationMatrix();
 	EXPECT_NEAR(0, (matrix2 - expectedMatrix).norm(), 9e-6) << "The rotation matrix wasn't properly computed" <<
-															   " by toRotationMatrix().";
+			" by toRotationMatrix().";
 }
 
 // ==================== ARITHMETIC ====================
@@ -581,7 +601,7 @@ TYPED_TEST(QuaternionTests, Negate)
 	// Test that 2 quaternions are opposite if they are not equal but give the same rotation
 	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
 	{
-		Quaternion q(Eigen::Matrix<T,4,1>::Random());
+		Quaternion q(Eigen::Matrix<T, 4, 1>::Random());
 		q.normalize();
 		Quaternion qNeg = negate(q);
 		EXPECT_FALSE(q.isApprox(qNeg));
@@ -605,8 +625,8 @@ TYPED_TEST(QuaternionTests, SlerpInterpolation)
 	for (unsigned int numLoop = 0; numLoop < 100; numLoop++)
 	{
 		Quaternion q;
-		Quaternion q0(Eigen::Matrix<T,4,1>::Random());
-		Quaternion q1(Eigen::Matrix<T,4,1>::Random());
+		Quaternion q0(Eigen::Matrix<T, 4, 1>::Random());
+		Quaternion q1(Eigen::Matrix<T, 4, 1>::Random());
 		q0.normalize();
 		q1.normalize();
 
@@ -630,8 +650,8 @@ TYPED_TEST(QuaternionTests, SlerpInterpolation)
 		// the tests to these possibilities as well:
 		// (-q0 + q1) / 2 normalized
 		// (-q0 - q1) / 2 normalized
-		Quaternion qHalf0(( q0.coeffs() + q1.coeffs()) * 0.5);
-		Quaternion qHalf1(( q0.coeffs() - q1.coeffs()) * 0.5);
+		Quaternion qHalf0((q0.coeffs() + q1.coeffs()) * 0.5);
+		Quaternion qHalf1((q0.coeffs() - q1.coeffs()) * 0.5);
 		Quaternion qHalf2((-q0.coeffs() + q1.coeffs()) * 0.5);
 		Quaternion qHalf3((-q0.coeffs() - q1.coeffs()) * 0.5);
 		qHalf0.normalize();
@@ -639,7 +659,7 @@ TYPED_TEST(QuaternionTests, SlerpInterpolation)
 		qHalf2.normalize();
 		qHalf3.normalize();
 		EXPECT_TRUE(q.isApprox(qHalf0) || q.isApprox(qHalf1) ||
-			q.isApprox(qHalf2) || q.isApprox(qHalf3));
+					q.isApprox(qHalf2) || q.isApprox(qHalf3));
 
 		q = SurgSim::Math::interpolate(q0, q1, static_cast<T>(0.874));
 		EXPECT_FALSE(q.isApprox(q0) || q.isApprox(negate(q0)));

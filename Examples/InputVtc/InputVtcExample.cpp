@@ -15,10 +15,10 @@
 
 #include <memory>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Runtime.h"
@@ -49,9 +49,9 @@
 
 #include "Examples/InputVtc/DeviceFactory.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::Blocks::TransferInputPoseBehavior;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::SceneElement;
 using SurgSim::Graphics::OsgBoxRepresentation;
@@ -82,7 +82,7 @@ std::shared_ptr<SurgSim::Graphics::ViewElement> createView(const std::string& na
 }
 
 std::shared_ptr<SceneElement> createPlane(const std::string& name,
-										  const SurgSim::Math::RigidTransform3d& pose)
+		const SurgSim::Math::RigidTransform3d& pose)
 {
 	std::shared_ptr<DoubleSidedPlaneShape> planeShape = std::make_shared<DoubleSidedPlaneShape>();
 
@@ -267,7 +267,7 @@ int main(int argc, char* argv[])
 	std::shared_ptr<SurgSim::Framework::Scene> scene = runtime->getScene();
 	scene->addSceneElement(createBox("box", toolDeviceName));
 	scene->addSceneElement(createPlane("plane",
-				SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
+		SurgSim::Math::makeRigidTransform(SurgSim::Math::Quaterniond::Identity(), Vector3d(0.0, -1.0, 0.0))));
 	scene->addSceneElement(createView("view", 0, 0, 1023, 768));
 
 	graphicsManager->getDefaultCamera()->setInitialPose(

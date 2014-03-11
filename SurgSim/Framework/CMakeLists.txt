@@ -29,6 +29,7 @@ set(SURGSIM_FRAMEWORK_SOURCES
 	ApplicationData.cpp
 	AssertMessage.cpp
 	Barrier.cpp
+	BasicSceneElement.cpp
 	BasicThread.cpp
 	BehaviorManager.cpp
 	Component.cpp
@@ -53,6 +54,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	Assert.h
 	AssertMessage.h
 	Barrier.h
+	BasicSceneElement.h
 	BasicThread.h
 	Behavior.h
 	BehaviorManager.h
@@ -70,6 +72,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	LogMessage.h
 	LogMessageBase.h
 	LogOutput.h
+	Macros.h
 	ObjectFactory.h
 	ObjectFactory-inl.h
 	Representation.h

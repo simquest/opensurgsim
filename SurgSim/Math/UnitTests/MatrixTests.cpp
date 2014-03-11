@@ -18,7 +18,8 @@
 /// straight from Eigen.
 
 #include <math.h>
-#include "SurgSim/Math/Matrix.h"
+
+#include "SurgSim/Math/MathConvert.h"
 #include <Eigen/Geometry>  // SurgSim/Math/Matrix.h by itself does not provide cross()
 #include "gtest/gtest.h"
 
@@ -426,6 +427,36 @@ TYPED_TEST(AllMatrixTests, InitializeFromArray)
 				row << "," << col << " wasn't properly initialized.";
 		}
 	}
+}
+
+// Test conversion to and from yaml node
+TYPED_TEST(AllMatrixTests, YamlConvert)
+{
+	typedef typename TestFixture::Matrix Matrix;
+	typedef typename TestFixture::Scalar T;
+	const int SIZE = Matrix::RowsAtCompileTime;
+
+	// This array has more elements than we will need.
+	// The element type must match the matrix!
+	const T inputArray[18]  =
+	{
+		0.01f,  1.02f,  2.03f,  3.04f,  4.05f,  5.06f,  6.07f,  7.08f,  8.09f,
+		9.10f, 10.11f, 11.12f, 12.13f, 13.14f, 14.15f, 15.16f, 16.17f, 17.18f
+	};
+
+	Matrix matrix(inputArray);
+
+	YAML::Node node;
+
+	ASSERT_NO_THROW(node = matrix);
+
+	EXPECT_TRUE(node.IsSequence());
+	EXPECT_EQ(matrix.rows(), node.size());
+
+	Matrix expected;
+
+	ASSERT_NO_THROW(expected = node.as<Matrix>());
+	EXPECT_TRUE(matrix.isApprox(expected));
 }
 
 /// Test assignment.

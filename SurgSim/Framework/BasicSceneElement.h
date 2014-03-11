@@ -13,15 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_BLOCKS_BASICSCENEELEMENT_H
-#define SURGSIM_BLOCKS_BASICSCENEELEMENT_H
+#ifndef SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H
+#define SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H
 
 #include "SurgSim/Framework/SceneElement.h"
+#include "SurgSim/Framework/Macros.h"
 
 namespace SurgSim
 {
 
-namespace Blocks
+namespace Framework
 {
 
 /// Simple concrete implementation of a scene element that does not have any higher logic
@@ -34,6 +35,8 @@ public:
 	/// Destructor
 	virtual ~BasicSceneElement();
 
+	SURGSIM_CLASSNAME(SurgSim::Framework::BasicSceneElement);
+
 protected:
 	/// Initializes the scene element
 	/// \return	True if succeeds, false if fails
@@ -41,7 +44,7 @@ protected:
 
 };
 
-};  // namespace Blocks
+};  // namespace Framework
 };  // namespace SurgSim
 
-#endif  // SURGSIM_BLOCKS_BASICSCENEELEMENT_H
+#endif  // SURGSIM_FRAMEWORK_BASICSCENEELEMENT_H

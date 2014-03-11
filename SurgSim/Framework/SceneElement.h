@@ -22,6 +22,11 @@
 #include <unordered_map>
 #include <vector>
 
+namespace YAML
+{
+class Node;
+}
+
 namespace SurgSim
 {
 namespace Framework
@@ -40,12 +45,16 @@ class Runtime;
 class SceneElement : public std::enable_shared_from_this<SceneElement>
 {
 public:
+
 	/// Constructor
 	/// \param name Name of this SceneElement
 	explicit SceneElement(const std::string& name);
 
 	/// Destructor
 	virtual ~SceneElement();
+
+	/// \return the class name for this class
+	virtual std::string getClassName() const;
 
 	/// Adds a component, calls initialize() on the component, if SceneElement::isInitialized() is true
 	/// \param	component	The component.
@@ -107,19 +116,39 @@ public:
 	/// \return	The shared pointer.
 	std::shared_ptr<SceneElement> getSharedPtr();
 
+
+	/// Convert to a YAML::Node
+	/// \param standalone when true, all the components will be represented as full component, when false
+	///                   they will be represented as references
+	/// \return A node with all the public data of this instance
+	virtual YAML::Node encode(bool standalone) const;
+
+	/// Pull data from a YAML::Node.
+	/// \throws SurgSim::Framework::AssertionFailure if the SceneElement is already initialized
+	/// \param node the node to decode.
+	/// \return true if the decoding succeeded and the node was formatted correctly, false otherwise
+	virtual bool decode(const YAML::Node& node);
+
 private:
 	/// Name of this SceneElement
 	std::string m_name;
+
 	/// A collection of Components
 	std::unordered_map<std::string, std::shared_ptr<Component>> m_components;
+
 	/// A (weak) back pointer to the Scene containing this SceneElement
 	std::weak_ptr<Scene> m_scene;
+
 	/// A (weak) back pointer to the Runtime containing this SceneElement
 	std::weak_ptr<Runtime> m_runtime;
 
 	/// Method to initialize this SceneElement. To be overridden by derived class(es).
 	/// \return True if initialization is successful; Otherwise, false.
 	virtual bool doInitialize() = 0;
+
+	/// Sets the name of this SceneElement.
+	/// \param name The new name.
+	void setName(const std::string& name);
 
 	/// Indicates if this SceneElement has been initialized or not.
 	bool m_isInitialized;

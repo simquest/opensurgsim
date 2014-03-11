@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCES
 	ApplicationDataTest.cpp
 	AssertTest.cpp
 	BarrierTest.cpp
+	BasicSceneElementTests.cpp
 	BasicThreadTests.cpp
 	BehaviorManagerTest.cpp
 	ComponentManagerTests.cpp

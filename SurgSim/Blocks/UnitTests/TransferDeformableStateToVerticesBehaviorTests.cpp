@@ -18,17 +18,17 @@
 
 #include <gtest/gtest.h>
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
+#include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Matrix.h"
 
-using SurgSim::Blocks::BasicSceneElement;
 using SurgSim::Blocks::TransferDeformableStateToVerticesBehavior;
 using SurgSim::DataStructures::Vertices;
+using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Physics::DeformableRepresentationState;
 
 namespace
@@ -47,7 +47,7 @@ public:
 
 	bool operator !=(const ExtraData& e) const
 	{
-		return ! ((*this) == e);
+		return !((*this) == e);
 	}
 };
 };
@@ -68,9 +68,11 @@ void testConstructor()
 
 	ASSERT_NO_THROW({TransferDeformableStateToVerticesBehavior<T> m("name", state, vertices);});
 	ASSERT_NO_THROW({TransferDeformableStateToVerticesBehavior<T>* m = \
-		new TransferDeformableStateToVerticesBehavior<T>("name", state, vertices); delete m;});
+					 new TransferDeformableStateToVerticesBehavior<T>("name", state, vertices); delete m;
+					});
 	ASSERT_NO_THROW({std::shared_ptr<TransferDeformableStateToVerticesBehavior<T>> m = \
-		std::make_shared<TransferDeformableStateToVerticesBehavior<T>>("name", state, vertices);});
+					 std::make_shared<TransferDeformableStateToVerticesBehavior<T>>("name", state, vertices);
+					});
 }
 
 TEST(TransferDeformableStateToVerticesBehaviorTests, ConstructorTest)

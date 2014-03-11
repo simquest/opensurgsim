@@ -125,7 +125,8 @@ Component::FactoryType& Component::getFactory()
 
 std::string Component::getClassName() const
 {
-	SURGSIM_FAILURE() << "Missing implementation of getClassName() for base class";
+	SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "getClassName() called on Component base class, this is wrong" <<
+			" in almost all cases, this means there is a class that does not have getClassName() defined.";
 	return "SurgSim::Framework::Component";
 }
 
