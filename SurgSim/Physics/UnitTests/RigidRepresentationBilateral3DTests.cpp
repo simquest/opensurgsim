@@ -68,10 +68,10 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 	Vector3d constraintPoint = Vector3d(8.0, 6.4, 3.5);
 
 	// Setup parameters for RigidRepresentationBilateral3D::build
-	auto localization
-		= std::make_shared<RigidRepresentationLocalization>(std::make_shared<RigidRepresentation>("representation"));
-	localization->setLocalPosition(constraintPoint);
-	localization->getRepresentation()->setPose(makeRigidTranslation(centerOfMass));
+	auto representation = std::make_shared<RigidRepresentation>("representation");
+	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
+	localization->setLocalPosition(constraintPoint - centerOfMass);
+	representation->setInitialPose(makeRigidTranslation(centerOfMass));
 
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(6, 3, 1);
 
@@ -113,16 +113,16 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 
 	ConstraintData emptyConstraint;
 
-	auto localization
-		= std::make_shared<RigidRepresentationLocalization>(std::make_shared<RigidRepresentation>("representation"));
+	auto representation = std::make_shared<RigidRepresentation>("representation");
+	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
 
-	localization->setLocalPosition(constraintPointLhs);
-	localization->getRepresentation()->setPose(makeRigidTranslation(centerOfMassLhs));
+	localization->setLocalPosition(constraintPointLhs - centerOfMassLhs);
+	representation->setInitialPose(makeRigidTranslation(centerOfMassLhs));
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
-	localization->setLocalPosition(constraintPointRhs);
-	localization->getRepresentation()->setPose(makeRigidTranslation(centerOfMassRhs));
+	localization->setLocalPosition(constraintPointRhs - centerOfMassRhs);
+	representation->setInitialPose(makeRigidTranslation(centerOfMassRhs));
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 6, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
 
