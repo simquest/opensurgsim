@@ -165,13 +165,14 @@ void resizeVector(Vector *v, unsigned int size, bool zeroOut = false)
 
 /// Interpolate (slerp) between 2 vectors
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam size the size of the vectors.  Can be deduced.
 /// \tparam TOpt the option flags (alignment etc.) used for the Vector arguments.  Can be deduced.
-/// \param t0 The start transform (at time 0.0).
-/// \param t1 The end   transform (at time 1.0).
-/// \param t  The interpolation time requested. Within [0..1].
-/// \returns the transform resulting in the slerp interpolation at time t, between t0 and t1.
-/// \note t=0 => returns t0
-/// \note t=1 => returns t1
+/// \param previous The starting vector (at time 0.0).
+/// \param next The ending vector (at time 1.0).
+/// \param t  The interpolation time requested. Within [0..1], although note bounds are not checked.
+/// \returns the transform resulting in the slerp interpolation at time t.
+/// \note t=0 => returns vector 'previous'
+/// \note t=1 => returns vector 'next'
 template <typename T, int size, int TOpt>
 Eigen::Matrix<T, size, 1, TOpt> interpolate(
 	const Eigen::Matrix<T, size, 1, TOpt> &previous,
