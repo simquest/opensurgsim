@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Definitions of 2x2 and 3x3 rigid-body (isometric) transforms.
+/// Definitions of 2x2 and 3x3 rigid (isometric) transforms.
 
 #ifndef SURGSIM_MATH_RIGIDTRANSFORM_H
 #define SURGSIM_MATH_RIGIDTRANSFORM_H
@@ -29,24 +29,24 @@ namespace SurgSim
 namespace Math
 {
 
-/// A 2D rigid body (isometric) transform, represented as floats.
+/// A 2D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<float,  2, Eigen::Isometry, Eigen::DontAlign>  RigidTransform2f;
 
-/// A 3D rigid body (isometric) transform, represented as floats.
+/// A 3D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<float,  3, Eigen::Isometry, Eigen::DontAlign>  RigidTransform3f;
 
-/// A 2D rigid body (isometric) transform, represented as doubles.
+/// A 2D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<double, 2, Eigen::Isometry, Eigen::DontAlign>  RigidTransform2d;
 
-/// A 3D rigid body (isometric) transform, represented as doubles.
+/// A 3D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<double, 3, Eigen::Isometry, Eigen::DontAlign>  RigidTransform3d;
 
 
-/// Create a rigid-body transform using the specified rotation matrix and translation.
+/// Create a rigid transform using the specified rotation matrix and translation.
 /// \tparam M the type used to describe the rotation matrix.  Can usually be deduced.
 /// \tparam V the type used to describe the translation vector.  Can usually be deduced.
 /// \param rotation the rotation matrix.
@@ -63,7 +63,7 @@ inline Eigen::Transform<typename M::Scalar, M::RowsAtCompileTime, Eigen::Isometr
 	return rigid;
 }
 
-/// Create a rigid-body transform using the specified rotation quaternion and translation.
+/// Create a rigid transform using the specified rotation quaternion and translation.
 /// \tparam Q the type used to describe the rotation quaternion.  Can usually be deduced.
 /// \tparam V the type used to describe the translation vector.  Can usually be deduced.
 /// \param rotation the rotation quaternion.
@@ -115,7 +115,7 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(
 	return rigid;
 }
 
-/// Create a rigid-body transform using the identity rotation and the specified translation.
+/// Create a rigid transform using the identity rotation and the specified translation.
 /// \tparam V the type used to describe the translation vector.  Can usually be deduced.
 /// \param translation the translation vector.
 /// \returns the transform with the identity rotation and the specified translation.
