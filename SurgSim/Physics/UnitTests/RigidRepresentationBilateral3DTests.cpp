@@ -29,6 +29,7 @@
 
 using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeSkewSymmetricMatrix;
+using SurgSim::Math::makeRigidTranslation;
 
 namespace
 {
@@ -63,12 +64,14 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 	// neccessary to supply a realistic C.  It only checks H and b.
 	RigidRepresentationBilateral3D constraint;
 
-	Vector3d actual = Vector3d(8.0, 6.4, 3.5);
+	Vector3d centerOfMass = Vector3d(3.0, 2.42, 9.54);
+	Vector3d constraintPoint = Vector3d(8.0, 6.4, 3.5);
 
 	// Setup parameters for RigidRepresentationBilateral3D::build
 	auto localization
 		= std::make_shared<RigidRepresentationLocalization>(std::make_shared<RigidRepresentation>("representation"));
-	localization->setLocalPosition(actual);
+	localization->setLocalPosition(constraintPoint);
+	localization->getRepresentation()->setPose(makeRigidTranslation(centerOfMass));
 
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(6, 3, 1);
 
@@ -78,14 +81,14 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
 	// Compare results
-	Eigen::Matrix<double, 3, 1> violation = actual;
+	Eigen::Matrix<double, 3, 1> violation = constraintPoint;
 	EXPECT_NEAR_EIGEN(violation, mlcpPhysicsProblem.b, epsilon);
 
 	Eigen::Matrix<double, 3, 6> H = Eigen::Matrix<double, 3, 6>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
 	SurgSim::Math::setSubMatrix(dt * identity,
 		0, 0, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((dt * actual).eval()),
+	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((dt * (constraintPoint - centerOfMass)).eval()),
 		0, 1, 3, 3, &H);
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 
@@ -99,8 +102,11 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 	// neccessary to supply a realistic C.  It only checks H and b.
 	RigidRepresentationBilateral3D constraint;
 
-	Vector3d actual = Vector3d(8.0, 6.4, 3.5);
-	Vector3d desired = Vector3d(3.0, 7.7, 0.0);
+	Vector3d centerOfMassLhs = Vector3d(3.0, 2.42, 9.54);
+	Vector3d centerOfMassRhs = Vector3d(1.0, 24.52, 8.00);
+
+	Vector3d constraintPointLhs = Vector3d(8.0, 6.4, 3.5);
+	Vector3d constraintPointRhs = Vector3d(3.0, 7.7, 0.0);
 
 	// Setup parameters for RigidRepresentationBilateral3D::build
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(12, 3, 1);
@@ -110,27 +116,29 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 	auto localization
 		= std::make_shared<RigidRepresentationLocalization>(std::make_shared<RigidRepresentation>("representation"));
 
-	localization->setLocalPosition(actual);
+	localization->setLocalPosition(constraintPointLhs);
+	localization->getRepresentation()->setPose(makeRigidTranslation(centerOfMassLhs));
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
-	localization->setLocalPosition(desired);
+	localization->setLocalPosition(constraintPointRhs);
+	localization->getRepresentation()->setPose(makeRigidTranslation(centerOfMassRhs));
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 6, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
 
 	// Compare results
-	Eigen::Matrix<double, 3, 1> violation = actual - desired;
+	Eigen::Matrix<double, 3, 1> violation = constraintPointLhs - constraintPointRhs;
 	EXPECT_NEAR_EIGEN(violation, mlcpPhysicsProblem.b, epsilon);
 
 	Eigen::Matrix<double, 3, 12> H = Eigen::Matrix<double, 3, 12>::Zero();
 	Eigen::Matrix<double, 3, 3> identity = Eigen::Matrix<double, 3, 3>::Identity();
 	SurgSim::Math::setSubMatrix(dt * identity,
 		0, 0, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((dt * actual).eval()),
+	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((dt * (constraintPointLhs - centerOfMassLhs)).eval()),
 		0, 1, 3, 3, &H);
 	SurgSim::Math::setSubMatrix(-dt * identity,
 		0, 2, 3, 3, &H);
-	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((-dt * desired).eval()),
+	SurgSim::Math::setSubMatrix(makeSkewSymmetricMatrix((-dt * (constraintPointRhs - centerOfMassRhs)).eval()),
 		0, 3, 3, 3, &H);
 	EXPECT_NEAR_EIGEN(H, mlcpPhysicsProblem.H, epsilon);
 }

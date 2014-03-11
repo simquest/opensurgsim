@@ -68,16 +68,18 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	// represents the vector from the origin to the center of mass, and w = (wx, wy, wz) represents angular rotation
 	// about the center of mass.  The twist vector in cartesian space is--
 	//
-	//   dt.v(t+dt) = dt.dGP(t+dt) + dt.GP^w(t+dt)
-	//              = dt.dGP(t+dt) + dt.|1   1   1   |
-	//                                  |GPx GPy GPz |
-	//                                  |wx  wy  wz  |
-	//              = dt.dGP(t+dt) + dt.[ GPy.wz - GPz.wy]
-	//                                  [-GPx.wz + GPz.wx]
-	//                                  [ GPx.wy - GPy.wx]
-	//              = dt.dGP(t+dt) + dt.[ 0   -GPz  GPy].w
-	//                                  [ GPz  0   -GPx]
-	//                                  [-GPy  GPx  0  ]
+	//   dt.v(t+dt) = dt.dG(t+dt) + dt.GP^w(t+dt), where G is the position of the center of mass,
+	//                                             dG is the velocity of the center of mass,
+	//                                             and GP is the vector from the center of mass to the point of interest
+	//              = dt.dG(t+dt) + dt.|i   j   k  |
+	//                                 |GPx GPy GPz|, where i, j, k are unit vectors for the x, y, and z directions
+	//                                 |wx  wy  wz |
+	//              = dt.dG(t+dt) + dt.[ GPy.wz - GPz.wy]
+	//                                 [-GPx.wz + GPz.wx]
+	//                                 [ GPx.wy - GPy.wx]
+	//              = dt.dP(t+dt) + dt.[ 0   -GPz  GPy].w
+	//                                 [ GPz  0   -GPx]
+	//                                 [-GPy  GPx  0  ]
 	//
 	// We construct H to transform v(t + dt) into constrained space.  Therefore we multiply the translational velocity
 	// by dt, and we must multiply the angular velocity with the skew-symmetric matrix of GP times dt.
@@ -91,24 +93,26 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	// Fill up b with the constraint violation
 	mlcp->b.segment<3>(indexOfConstraint) += globalPosition * scale;
 
+	// Fill up H with the transform from rigid body velocity -> constraint space
+	Vector3d GP = globalPosition - rigid->getPose().translation();
 	m_newH.resize(rigid->getNumDof());
 	m_newH.reserve(3);
 
 	m_newH.insert(0) = dt * scale;
-	m_newH.insert(3 + 1) = -dt * scale * globalPosition.z();
-	m_newH.insert(3 + 2) = dt * scale * globalPosition.y();
+	m_newH.insert(3 + 1) = -dt * scale * GP.z();
+	m_newH.insert(3 + 2) = dt * scale * GP.y();
 	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 0);
 
 	m_newH.setZero();
 	m_newH.insert(1) = dt * scale;
-	m_newH.insert(3 + 0) = dt * scale * globalPosition.z();
-	m_newH.insert(3 + 2) = -dt * scale * globalPosition.x();
+	m_newH.insert(3 + 0) = dt * scale * GP.z();
+	m_newH.insert(3 + 2) = -dt * scale * GP.x();
 	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 1);
 
 	m_newH.setZero();
 	m_newH.insert(2) = dt * scale;
-	m_newH.insert(3 + 0) = -dt * scale * globalPosition.y();
-	m_newH.insert(3 + 1) = dt * scale * globalPosition.x();
+	m_newH.insert(3 + 0) = -dt * scale * GP.y();
+	m_newH.insert(3 + 1) = dt * scale * GP.x();
 	mlcp->updateConstraint(m_newH, rigid->getComplianceMatrix(), indexOfRepresentation, indexOfConstraint + 2);
 }
 
