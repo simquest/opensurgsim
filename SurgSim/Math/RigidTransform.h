@@ -86,7 +86,7 @@ inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransfo
 /// http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
 /// \tparam	typename T	T the numeric data type used for arguments and the return value. Can usually be deduced.
 /// \tparam	int VOpt  	VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
-/// \param	eye   	The position of the object.
+/// \param	position   	The position of the object.
 /// \param	center	The point to which the object should point.
 /// \param	up	  	The up vector to be used for this calculation.
 /// \return	a RigidTransform that locates the object at position rotated into the direction of center.
