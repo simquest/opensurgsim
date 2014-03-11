@@ -115,6 +115,22 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(
 	return rigid;
 }
 
+/// Create a rigid-body transform using the identity rotation and the specified translation.
+/// \tparam V the type used to describe the translation vector.  Can usually be deduced.
+/// \param translation the translation vector.
+/// \returns the transform with the identity rotation and the specified translation.
+template <typename V>
+inline Eigen::Transform<typename V::Scalar, V::SizeAtCompileTime, Eigen::Isometry> makeRigidTranslation(
+	const Eigen::MatrixBase<V>& translation)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(Eigen::MatrixBase<V>);
+	Eigen::Transform<typename V::Scalar, V::SizeAtCompileTime, Eigen::Isometry> rigid;
+	rigid.makeAffine();
+	rigid.linear().setIdentity();
+	rigid.translation() = translation;
+	return rigid;
+}
+
 /// Interpolate (slerp) between 2 rigid transformations
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam TOpt the option flags (alignment etc.) used for the Transform arguments.  Can be deduced.
