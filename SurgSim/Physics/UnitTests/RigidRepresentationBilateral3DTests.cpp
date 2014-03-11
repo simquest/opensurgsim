@@ -27,9 +27,11 @@
 #include "SurgSim/Physics/RigidRepresentationLocalization.h"
 #include "SurgSim/Physics/UnitTests/EigenGtestAsserts.h"
 
-using SurgSim::Math::Vector3d;
 using SurgSim::Math::makeSkewSymmetricMatrix;
-using SurgSim::Math::makeRigidTranslation;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::Quaterniond;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Math::Vector3d;
 
 namespace
 {
@@ -65,13 +67,16 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcp)
 	RigidRepresentationBilateral3D constraint;
 
 	Vector3d centerOfMass = Vector3d(3.0, 2.42, 9.54);
+	Quaterniond objectRotation = Quaterniond(0.1, 0.35, 4.2, 5.0).normalized();
+
+	RigidTransform3d objectPose = makeRigidTransform(objectRotation, centerOfMass);
 	Vector3d constraintPoint = Vector3d(8.0, 6.4, 3.5);
 
 	// Setup parameters for RigidRepresentationBilateral3D::build
 	auto representation = std::make_shared<RigidRepresentation>("representation");
 	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
-	localization->setLocalPosition(constraintPoint - centerOfMass);
-	representation->setInitialPose(makeRigidTranslation(centerOfMass));
+	localization->setLocalPosition(objectPose.inverse() * constraintPoint);
+	representation->setInitialPose(objectPose);
 
 	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(6, 3, 1);
 
@@ -105,6 +110,12 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 	Vector3d centerOfMassLhs = Vector3d(3.0, 2.42, 9.54);
 	Vector3d centerOfMassRhs = Vector3d(1.0, 24.52, 8.00);
 
+	Quaterniond objectRotationLhs = Quaterniond(0.1, 0.35, 4.2, 5.0).normalized();
+	Quaterniond objectRotationRhs = Quaterniond(1.43, 6.21, 7.11, 0.55).normalized();
+
+	RigidTransform3d objectPoseLhs = makeRigidTransform(objectRotationLhs, centerOfMassLhs);
+	RigidTransform3d objectPoseRhs = makeRigidTransform(objectRotationRhs, centerOfMassRhs);
+
 	Vector3d constraintPointLhs = Vector3d(8.0, 6.4, 3.5);
 	Vector3d constraintPointRhs = Vector3d(3.0, 7.7, 0.0);
 
@@ -116,13 +127,13 @@ TEST(RigidRepresentationBilateral3DTests, BuildMlcpTwoStep)
 	auto representation = std::make_shared<RigidRepresentation>("representation");
 	auto localization = std::make_shared<RigidRepresentationLocalization>(representation);
 
-	localization->setLocalPosition(constraintPointLhs - centerOfMassLhs);
-	representation->setInitialPose(makeRigidTranslation(centerOfMassLhs));
+	localization->setLocalPosition(objectPoseLhs.inverse() * constraintPointLhs);
+	representation->setInitialPose(objectPoseLhs);
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 0, 0, SurgSim::Physics::CONSTRAINT_POSITIVE_SIDE));
 
-	localization->setLocalPosition(constraintPointRhs - centerOfMassRhs);
-	representation->setInitialPose(makeRigidTranslation(centerOfMassRhs));
+	localization->setLocalPosition(objectPoseRhs.inverse() * constraintPointRhs);
+	representation->setInitialPose(objectPoseRhs);
 	ASSERT_NO_THROW(constraint.build(
 		dt, emptyConstraint, localization, &mlcpPhysicsProblem, 6, 0, SurgSim::Physics::CONSTRAINT_NEGATIVE_SIDE));
 
