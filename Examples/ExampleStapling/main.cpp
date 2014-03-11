@@ -165,7 +165,7 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidTransform3d& pose)
 {
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader("Data/Collision/arm_collision.ply");
+	PlyReader reader("Data/Geometry/arm_collision.ply");
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
