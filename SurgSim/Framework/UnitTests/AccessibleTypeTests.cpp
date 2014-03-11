@@ -209,18 +209,30 @@ TYPED_TEST(RigidTransformTest, Accessible)
 {
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::RigidTransform RigidTransform;
+	typedef Eigen::Quaternion<Scalar> Quaternion;
+	typedef Eigen::Matrix<Scalar, 3, 1, Eigen::DontAlign>  Vector3;
 
 	typename RigidTransform::MatrixType initialMatrix;
 	typename RigidTransform::MatrixType newMatrix;
 
-	for (int i = 0; i < initialMatrix.size(); ++i)
+	RigidTransform initialValue;
 	{
-		initialMatrix(i) = static_cast<Scalar>(i);
-		newMatrix(i) = static_cast<Scalar>(i * 2);
+		Quaternion quaternion(1.0, 2.0, 3.0, 4.0);
+		quaternion.normalize();
+		Vector3 translation(1.0, 2.0, 3.0);
+
+		initialValue = SurgSim::Math::makeRigidTransform(quaternion, translation);
 	}
 
-	RigidTransform initialValue(initialMatrix);
-	RigidTransform newValue(newMatrix);
+	RigidTransform newValue;
+	{
+		Quaternion quaternion(4.0, 3.0, 2.0, 1.0);
+		quaternion.normalize();
+		Vector3 translation(3.0, 2.0, 1.0);
+
+		newValue = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	}
+
 
 	std::pair<RigidTransform, RigidTransform> result = testProperty<RigidTransform >(initialValue, newValue);
 	EXPECT_TRUE(newValue.isApprox(result.first));
