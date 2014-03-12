@@ -17,9 +17,13 @@
 
 #include <gtest/gtest.h>
 
+#include "SurgSim/DataStructures/EmptyData.h"
+
 #include "SurgSim/Math/Vector.h"
 
 #include "SurgSim/Math/Shapes.h"
+
+using SurgSim::DataStructures::EmptyData;
 
 // CUBE
 //     3*----------*2
@@ -63,19 +67,10 @@ static const int cubeTrianglesCCW[12][3] =
 	{0, 4, 7}, {0, 7, 3}  // Left   (-1  0  0) [0473]
 };
 
-class EmptyData
-{
-public:
-	bool operator ==(const EmptyData& e) const
-	{
-		return true;
-	}
-};
-
 class CubeMeshTest : public ::testing::Test
 {
 public:
-	typedef SurgSim::DataStructures::TriangleMesh<EmptyData,EmptyData,EmptyData> TriangleMesh;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData,EmptyData,EmptyData> TriangleMeshBase;
 	typedef SurgSim::DataStructures::MeshElement<2,EmptyData> EdgeElement;
 	typedef SurgSim::DataStructures::MeshElement<3,EmptyData> TriangleElement;
 
@@ -103,43 +98,40 @@ TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
 		double lz = 10.0 * (static_cast<double>(iterationID+1)/3.0);
 
 		// Cube
-		std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
+		std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
 		for (int i = 0; i < cubeNumPoints; i++)
 		{
-			EmptyData emptyData;
 			SurgSim::Math::Vector3d p;
 			p[0] = cubePoints[i][0] * lx;
 			p[1] = cubePoints[i][1] * ly;
 			p[2] = cubePoints[i][2] * lz;
-			TriangleMesh::VertexType v(p, emptyData);
+			TriangleMeshBase::VertexType v(p);
 			mesh->addVertex(v);
 		}
 		for (int i = 0; i < cubeNumEdges; i++)
 		{
-			EmptyData emptyData;
 			std::array<unsigned int,2> edgePoints;
 			for (int j = 0; j < 2; j++)
 			{
 				edgePoints[j] = cubeEdges[i][j];
 			}
-			EdgeElement edgeElement(edgePoints, emptyData);
-			TriangleMesh::EdgeType e(edgeElement);
+			EdgeElement edgeElement(edgePoints);
+			TriangleMeshBase::EdgeType e(edgeElement);
 			mesh->addEdge(e);
 		}
 		for (int i = 0; i < cubeNumTriangles; i++)
 		{
-			EmptyData emptyData;
 			std::array<unsigned int,3> trianglePoints;
 			for (int j = 0; j < 3; j++)
 			{
 				trianglePoints[j] = cubeTrianglesCCW[i][j];
 			}
-			TriangleElement triangleElement(trianglePoints, emptyData);
-			TriangleMesh::TriangleType t(triangleElement);
+			TriangleElement triangleElement(trianglePoints);
+			TriangleMeshBase::TriangleType t(triangleElement);
 			mesh->addTriangle(t);
 		}
 
-		SurgSim::Math::MeshShape boxMesh(mesh);
+		SurgSim::Math::MeshShape boxMesh(*mesh);
 
 		SurgSim::Math::BoxShape boxShape(lx, ly, lz);
 

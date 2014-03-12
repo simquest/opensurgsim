@@ -15,9 +15,13 @@
 
 #include "SurgSim/Collision/UnitTests/ContactCalculationTestsCommon.h"
 #include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Math/Vector.h"
 
-using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::DataStructures::EmptyData;
+using SurgSim::DataStructures::TriangleMeshBase;
+using SurgSim::Math::Vector3d;
 
 namespace SurgSim
 {
@@ -34,16 +38,16 @@ namespace Collision
 	4*----------*5
 */
 static const int cubeNumPoints = 8;
-static const SurgSim::Math::Vector3d cubePoints[8] =
+static const Vector3d cubePoints[8] =
 {
-	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d( 1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
-	SurgSim::Math::Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
+	Vector3d(-1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d( 1.0 / 2.0, -1.0 / 2.0, -1.0 / 2.0),
+	Vector3d( 1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(-1.0 / 2.0,  1.0 / 2.0, -1.0 / 2.0),
+	Vector3d(-1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d( 1.0 / 2.0, -1.0 / 2.0,  1.0 / 2.0),
+	Vector3d( 1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0),
+	Vector3d(-1.0 / 2.0,  1.0 / 2.0,  1.0 / 2.0)
 };
 
 static const int cubeNumEdges = 12;
@@ -93,22 +97,22 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	using SurgSim::Math::makeRigidTransform;
 	using SurgSim::Math::makeRotationQuaternion;
 
-	typedef SurgSim::DataStructures::TriangleMesh<void, void, void> TriangleMesh;
-	typedef SurgSim::DataStructures::MeshElement<2, void> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, void> TriangleElement;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
+	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
+	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
 
 	// Create a Mesh Cube
-	std::shared_ptr<TriangleMesh> mesh = std::make_shared<TriangleMesh>();
-	for (int i = 0; i < cubeNumPoints; i++)
+	std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
+	for (int i = 0; i < cubeNumPoints; ++i)
 	{
-		SurgSim::Math::Vector3d p;
+		Vector3d p;
 		p[0] = cubePoints[i][0];
 		p[1] = cubePoints[i][1];
 		p[2] = cubePoints[i][2];
-		TriangleMesh::VertexType v(p);
+		TriangleMeshBase::VertexType v(p);
 		mesh->addVertex(v);
 	}
-	for (int i = 0; i < cubeNumEdges; i++)
+	for (int i = 0; i < cubeNumEdges; ++i)
 	{
 		std::array<unsigned int, 2> edgePoints;
 		for (int j = 0; j < 2; j++)
@@ -116,10 +120,10 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			edgePoints[j] = cubeEdges[i][j];
 		}
 		EdgeElement edgeElement(edgePoints);
-		TriangleMesh::EdgeType e(edgeElement);
+		TriangleMeshBase::EdgeType e(edgeElement);
 		mesh->addEdge(e);
 	}
-	for (int i = 0; i < cubeNumTriangles; i++)
+	for (int i = 0; i < cubeNumTriangles; ++i)
 	{
 		std::array<unsigned int, 3> trianglePoints;
 		for (int j = 0; j < 3; j++)
@@ -127,12 +131,12 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 			trianglePoints[j] = cubeTrianglesCCW[i][j];
 		}
 		TriangleElement triangleElement(trianglePoints);
-		TriangleMesh::TriangleType t(triangleElement);
+		TriangleMeshBase::TriangleType t(triangleElement);
 		mesh->addTriangle(t);
 	}
 
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(mesh);
-	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB = std::make_shared<SurgSim::Math::MeshShape>(mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshA = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
+	std::shared_ptr<SurgSim::Math::MeshShape> cubeMeshB = std::make_shared<SurgSim::Math::MeshShape>(*mesh);
 
 	SurgSim::Math::RigidTransform3d cubeMeshATransform;
 	SurgSim::Math::RigidTransform3d cubeMeshBTransform;

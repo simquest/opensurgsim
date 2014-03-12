@@ -16,6 +16,8 @@
 #ifndef SURGSIM_FRAMEWORK_OBJECTFACTORY_H
 #define SURGSIM_FRAMEWORK_OBJECTFACTORY_H
 
+#include "SurgSim/Framework/Macros.h"
+
 #include <string>
 #include <map>
 #include <boost/function.hpp>
@@ -116,27 +118,13 @@ private:
 
 #include "SurgSim/Framework/ObjectFactory-inl.h"
 
-/// GCC macro to write out an _Pragma statement inside a macro, disabled for other platforms
-#ifdef __GNUC__
-#define SURGSIM_DO_PRAGMA(x) _Pragma (#x)
-#else
-#define SURGSIM_DO_PRAGMA(x)
-#endif
-
-///@{
-/// Set of macros to create a unique name with a common basename
-#define CONCATENATE_DETAIL(x, y) x##y
-#define CONCATENATE(x, y) CONCATENATE_DETAIL(x, y)
-#define MAKE_UNIQUE(x) CONCATENATE(x, __COUNTER__)
-///@}
-
 /// Register a class with a factory that is in a base class, DerivedClass has to be of type BaseClass
-/// The assignment is used to enable the execution of registerClass during static intialisation time.
+/// The assignment is used to enable the execution of registerClass during static initialization time.
 /// The variable will never be used, so the GCC warning is disabled
 #define SURGSIM_REGISTER(BaseClass, DerivedClass) \
 	SURGSIM_DO_PRAGMA (GCC diagnostic push); \
 	SURGSIM_DO_PRAGMA (GCC diagnostic ignored "-Wunused-variable"); \
-	static bool MAKE_UNIQUE(registered) = \
+	static bool SURGSIM_MAKE_UNIQUE(registered) = \
 		BaseClass::getFactory().registerClass<DerivedClass>(#DerivedClass); \
 	SURGSIM_DO_PRAGMA (GCC diagnostic pop)
 

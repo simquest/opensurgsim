@@ -26,8 +26,7 @@ int MeshShape::getType()
 	return SHAPE_TYPE_MESH;
 }
 
-const std::shared_ptr<typename MeshShape::TriMesh>
-MeshShape::getMesh() const
+const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh() const
 {
 	return m_mesh;
 }
@@ -66,7 +65,7 @@ SurgSim::Math::Matrix33d MeshShape::getSecondMomentOfVolume() const
 	return secondMoment;
 }
 
-void MeshShape::computeProjectionIntegrals(const MeshShape::TriMesh::TriangleType& face)
+void MeshShape::computeProjectionIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face)
 {
 	double a0, a1, da;
 	double b0, b1, db;
@@ -123,7 +122,7 @@ void MeshShape::computeProjectionIntegrals(const MeshShape::TriMesh::TriangleTyp
 	m_Pabb /= -60.0;
 }
 
-void MeshShape::computeFaceIntegrals(const MeshShape::TriMesh::TriangleType& face)
+void MeshShape::computeFaceIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face)
 {
 	double k1, k2, k3, k4;
 
@@ -177,7 +176,7 @@ void MeshShape::computeVolumeIntegrals()
 
 	for (size_t i = 0; i < m_mesh->getNumTriangles(); i++)
 	{
-		const TriMesh::TriangleType* f = &m_mesh->getTriangle(i);
+		const SurgSim::DataStructures::TriangleMesh::TriangleType* f = &m_mesh->getTriangle(i);
 
 		const Vector3d& ptA = m_mesh->getVertexPosition(f->verticesId[0]);
 		const Vector3d& ptB = m_mesh->getVertexPosition(f->verticesId[1]);

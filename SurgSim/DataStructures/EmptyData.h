@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2012-2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "SurgSim/Blocks/BasicSceneElement.h"
+#ifndef SURGSIM_DATASTRUCTURES_EMPTYDATA_H
+#define SURGSIM_DATASTRUCTURES_EMPTYDATA_H
 
-using SurgSim::Blocks::BasicSceneElement;
-
-BasicSceneElement::BasicSceneElement(const std::string& name) :
-	SurgSim::Framework::SceneElement(name)
+namespace SurgSim
 {
-}
-
-BasicSceneElement::~BasicSceneElement()
+namespace DataStructures
 {
-}
-
-bool BasicSceneElement::doInitialize()
+/// EmptyData class
+class EmptyData
 {
-	return true;
-}
+public:
 
+	/// Comparison operator
+	/// \param data The data to compare it to.
+	/// \return true for all cases.
+	bool operator==(const EmptyData& data) const
+	{
+		return true;
+	}
+};
+
+}
+}
+#endif //SURGSIM_DATASTRUCTURES_EMPTYDATA_H

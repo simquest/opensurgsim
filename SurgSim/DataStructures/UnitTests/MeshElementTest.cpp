@@ -19,10 +19,12 @@
 
 #include "gtest/gtest.h"
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::Math::Vector3d;
 
 /// Edge element with ID data.
@@ -30,7 +32,7 @@ typedef SurgSim::DataStructures::MeshElement<2, MockEdgeData> MockEdge;
 /// Triangle element with ID and edge ID data.
 typedef SurgSim::DataStructures::MeshElement<3, MockTriangleData> MockTriangle;
 /// Tetrahedron element with no data
-typedef SurgSim::DataStructures::MeshElement<4, void> MockTetrahedron;
+typedef SurgSim::DataStructures::MeshElement<4, EmptyData> MockTetrahedron;
 
 TEST(MeshElementTest, InitTest)
 {

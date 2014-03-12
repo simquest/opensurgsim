@@ -16,10 +16,12 @@
 /// \file
 /// Tests for LoggerManager class.
 
-#include <gtest/gtest.h>
 #include "SurgSim/Framework/Log.h"
 
 #include <string>
+#include <memory>
+
+#include <gtest/gtest.h>
 
 using SurgSim::Framework::Logger;
 using SurgSim::Framework::LoggerManager;
@@ -131,4 +133,8 @@ TEST(LoggerManagerTest, Threshold)
 	/// even the logger's name match the pattern
 	auto logger5 = loggerManager->getLogger("logger5");
 	EXPECT_NE(SurgSim::Framework::LOG_LEVEL_WARNING, logger5->getThreshold());
+
+	/// Logger manager should own the logger.
+	loggerManager->getLogger("xxx")->setThreshold(SurgSim::Framework::LOG_LEVEL_DEBUG);
+	EXPECT_EQ(SurgSim::Framework::LOG_LEVEL_DEBUG, loggerManager->getLogger("xxx")->getThreshold());
 }

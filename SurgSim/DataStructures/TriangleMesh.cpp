@@ -12,24 +12,34 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
-#define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H
+#include "SurgSim/DataStructures/TriangleMesh.h"
 
 namespace SurgSim
 {
 namespace DataStructures
 {
 
-template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
-TriangleMesh::TriangleMesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh) :
-	TriangleMeshBase<EmptyData, EmptyData, NormalData>(mesh)
+SurgSim::Math::Vector3d TriangleMesh::getNormal(int triangleId)
 {
-	calculateNormals();
+	return getTriangle(triangleId).data.normal;
+}
+
+void TriangleMesh::calculateNormals()
+{
+	for (size_t i = 0; i < getNumTriangles(); ++i)
+	{
+		const SurgSim::Math::Vector3d& vertex0 = getVertexPosition(getTriangle(i).verticesId[0]);
+		const SurgSim::Math::Vector3d& vertex1 = getVertexPosition(getTriangle(i).verticesId[1]);
+		const SurgSim::Math::Vector3d& vertex2 = getVertexPosition(getTriangle(i).verticesId[2]);
+
+		// Calculate normal vector
+		SurgSim::Math::Vector3d normal = (vertex1 - vertex0).cross(vertex2 - vertex0);
+		normal.normalize();
+
+		getTriangle(i).data.normal = normal;
+	}
 }
 
 }; // namespace DataStructures
 }; // namespace SurgSim
-
-#endif // SURGSIM_DATASTRUCTURES_TRIANGLEMESH_INL_H

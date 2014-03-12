@@ -21,9 +21,11 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/OctreeNode.h"
 #include "SurgSim/Math/Vector.h"
 
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::OctreeNode;
 using SurgSim::Math::Vector3d;
 
@@ -267,8 +269,6 @@ TEST(OctreeNodeTests, CopyConstructor)
 
 TEST(OctreeNodeTests, EmptyData)
 {
-	struct EmptyData {};
-
 	AxisAlignedBoundingBox boundingBox(Vector3d::Zero(), Vector3d::Ones());
 
 	EXPECT_NO_THROW({OctreeNode<EmptyData> octree(boundingBox);});

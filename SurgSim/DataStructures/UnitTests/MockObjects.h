@@ -17,7 +17,7 @@
 #define SURGSIM_DATASTRUCTURES_UNITTESTS_MOCKOBJECTS_H
 
 #include "SurgSim/DataStructures/Vertices.h"
-#include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TetrahedronMesh.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -294,23 +294,25 @@ private:
 };
 
 /// Triangle Mesh for testing using MockVertexData, MockEdgeData, and MockTriangleData
-class MockTriangleMesh : public SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>
+class MockTriangleMeshBase : public SurgSim::DataStructures::TriangleMeshBase<MockVertexData,
+																		  MockEdgeData,
+																		  MockTriangleData>
 {
 public:
 	/// Vertex type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::VertexType VertexType;
+	typedef TriangleMeshBase<MockVertexData, MockEdgeData, MockTriangleData>::VertexType VertexType;
 	/// Edge type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::EdgeType EdgeType;
+	typedef TriangleMeshBase<MockVertexData, MockEdgeData, MockTriangleData>::EdgeType EdgeType;
 	/// Triangle type for convenience
-	typedef TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>::TriangleType TriangleType;
+	typedef TriangleMeshBase<MockVertexData, MockEdgeData, MockTriangleData>::TriangleType TriangleType;
 
 	/// Constructor. Start out with no vertices and 0 updates
-	MockTriangleMesh() :SurgSim::DataStructures::TriangleMesh<MockVertexData, MockEdgeData, MockTriangleData>(),
+	MockTriangleMeshBase() :SurgSim::DataStructures::TriangleMeshBase<MockVertexData, MockEdgeData, MockTriangleData>(),
 		m_numUpdates(0)
 	{
 	}
 	/// Destructor
-	virtual ~MockTriangleMesh()
+	virtual ~MockTriangleMeshBase()
 	{
 	}
 

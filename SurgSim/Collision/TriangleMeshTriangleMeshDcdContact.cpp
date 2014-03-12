@@ -17,13 +17,15 @@
 
 #include "SurgSim/Collision/CollisionPair.h"
 #include "SurgSim/Collision/Representation.h"
-#include "SurgSim/Math/Geometry.h"
-#include "SurgSim/Math/RigidTransform.h"
-#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
+#include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/MeshShape.h"
+#include "SurgSim/Math/RigidTransform.h"
 
-using SurgSim::Math::MeshShape;
 using SurgSim::DataStructures::TriangleMesh;
+using SurgSim::DataStructures::TriangleMeshBase;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
@@ -46,66 +48,53 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	std::shared_ptr<Representation> representationMeshA = pair->getFirst();
 	std::shared_ptr<Representation> representationMeshB = pair->getSecond();
 
-	std::shared_ptr<MeshShape> meshShapeA = std::static_pointer_cast<MeshShape>(representationMeshA->getShape());
-	std::shared_ptr<MeshShape> meshShapeB = std::static_pointer_cast<MeshShape>(representationMeshB->getShape());
-
-	std::shared_ptr<MeshShape::TriMesh> meshA = meshShapeA->getMesh();
-	std::shared_ptr<MeshShape::TriMesh> meshB = meshShapeB->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshA =
+		std::static_pointer_cast<MeshShape>(representationMeshA->getShape())->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshB =
+		std::static_pointer_cast<MeshShape>(representationMeshB->getShape())->getMesh();
 
 	RigidTransform3d globalCoordinatesFromMeshACoordinates = representationMeshA->getPose();
 	RigidTransform3d globalCoordinatesFromMeshBCoordinates = representationMeshB->getPose();
 
 	RigidTransform3d meshBCoordinatesFromGlobalCoordinates = globalCoordinatesFromMeshBCoordinates.inverse();
-
 	RigidTransform3d meshBCoordinatesFromMeshACoordinates = meshBCoordinatesFromGlobalCoordinates
 															* globalCoordinatesFromMeshACoordinates;
-
-	// Precalculate mesh B normals
-	std::vector<Vector3d> collectionNormalB;
-	collectionNormalB.reserve(meshB->getNumTriangles());
-	for (size_t i = 0; i < meshB->getNumTriangles(); ++i)
-	{
-		const Vector3d &triangleB0 = meshB->getVertexPosition(meshB->getTriangle(i).verticesId[0]);
-		const Vector3d &triangleB1 = meshB->getVertexPosition(meshB->getTriangle(i).verticesId[1]);
-		const Vector3d &triangleB2 = meshB->getVertexPosition(meshB->getTriangle(i).verticesId[2]);
-
-		collectionNormalB.emplace_back((triangleB1 - triangleB0).cross(triangleB2 - triangleB0));
-		collectionNormalB.back().normalize();
-	}
 
 	double depth = 0.0;
 	Vector3d normal;
 	Vector3d penetrationPointA, penetrationPointB;
 
-	for (size_t i = 0; i < meshA->getNumTriangles(); ++i)
+	for (size_t i = 0; i < collisionMeshA->getNumTriangles(); ++i)
 	{
 		// The triangleA vertices.
-		const Vector3d &triangleA0 = meshBCoordinatesFromMeshACoordinates
-									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[0]);
-		const Vector3d &triangleA1 = meshBCoordinatesFromMeshACoordinates
-									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[1]);
-		const Vector3d &triangleA2 = meshBCoordinatesFromMeshACoordinates
-									 * meshA->getVertexPosition(meshA->getTriangle(i).verticesId[2]);
+		const Vector3d& triangleA0 = meshBCoordinatesFromMeshACoordinates
+									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[0]);
+		const Vector3d& triangleA1 = meshBCoordinatesFromMeshACoordinates
+									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[1]);
+		const Vector3d& triangleA2 = meshBCoordinatesFromMeshACoordinates
+									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[2]);
 
-		Vector3d normalA = (triangleA1 - triangleA0).cross(triangleA2 - triangleA0);
-		normalA.normalize();
+		const Vector3d& normalA = collisionMeshA->getNormal(i);
 		if (normalA.isZero())
 		{
 			continue;
 		}
 
-		for (size_t j = 0; j < meshB->getNumTriangles(); ++j)
+		for (size_t j = 0; j < collisionMeshB->getNumTriangles(); ++j)
 		{
-			const Vector3d &normalB = collectionNormalB[j];
+			const Vector3d& normalB = collisionMeshB->getNormal(j);
 			if (normalB.isZero())
 			{
 				continue;
 			}
 
 			// The triangleB vertices.
-			const Vector3d &triangleB0 = meshB->getVertexPosition(meshB->getTriangle(j).verticesId[0]);
-			const Vector3d &triangleB1 = meshB->getVertexPosition(meshB->getTriangle(j).verticesId[1]);
-			const Vector3d &triangleB2 = meshB->getVertexPosition(meshB->getTriangle(j).verticesId[2]);
+			const Vector3d& triangleB0 =
+				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[0]);
+			const Vector3d& triangleB1 =
+				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[1]);
+			const Vector3d& triangleB2 =
+				collisionMeshB->getVertexPosition(collisionMeshB->getTriangle(j).verticesId[2]);
 
 			// Check if the triangles intersect.
 			if (SurgSim::Math::calculateContactTriangleTriangle(triangleA0, triangleA1, triangleA2,

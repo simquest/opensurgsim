@@ -72,25 +72,6 @@ namespace YAML
 		static bool decode(const Node& node, typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs);
 	};
 
-
-
-	// Overload << for YAML::Emitter to support SurgSim::Math::Vector3d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector3d& rhs);
-
-	// Overload << for YAML::Emitter to support SurgSim::Math::Vector4d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Vector4d& rhs);
-
-	// Overload << for YAML::Emitter to support SurgSim::Math::Quaterniond type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Quaterniond& rhs);
-
-	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix33d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix33d& rhs);
-
-	// Overload << for YAML::Emitter to support SurgSim::Math::Matrix44d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::Matrix44d& rhs);
-
-	// Overload << for YAML::Emitter to support SurgSim::Math::RigidTransform3d type
-	Emitter& operator << (Emitter& out, const SurgSim::Math::RigidTransform3d& rhs);
 };
 
 #include "SurgSim/Math/MathConvert-inl.h"

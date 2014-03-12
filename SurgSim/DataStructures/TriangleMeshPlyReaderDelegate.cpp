@@ -13,8 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/DataStructures/PlyReader.h"
+
+using SurgSim::DataStructures::EmptyData;
 
 namespace SurgSim
 {
@@ -74,7 +77,7 @@ bool TriangleMeshPlyReaderDelegate::fileIsAcceptable(const PlyReader& reader)
 	return result;
 }
 
-std::shared_ptr<TriangleMesh<void, void, void>> TriangleMeshPlyReaderDelegate::getMesh()
+std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> TriangleMeshPlyReaderDelegate::getMesh()
 {
 	return m_mesh;
 }
@@ -110,7 +113,7 @@ void TriangleMeshPlyReaderDelegate::processFace(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_faceData.edgeCount == 3) << "Can only process triangle meshes.";
 	std::copy(m_faceData.indices, m_faceData.indices + 3, m_indices.begin());
-	TriangleMesh<void, void, void>::TriangleType triangle(m_indices);
+	TriangleMeshBase<EmptyData, EmptyData, EmptyData>::TriangleType triangle(m_indices);
 	m_mesh->addTriangle(triangle);
 }
 
