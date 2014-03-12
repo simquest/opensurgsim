@@ -26,9 +26,8 @@ template <class VertexData, class EdgeData, class TriangleData>
 MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh)
 {
 	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
-	computeVolumeIntegrals();
+	compute();
 }
-
 
 }; // namespace Math
 }; // namespace SurgSim
