@@ -271,7 +271,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 	using SurgSim::Math::RigidTransform3d;
 
 	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
-	
+
 	{
 		auto baseTriangles = std::make_shared<TriangleMesh>();
 		static const int numTriangles = 100;
