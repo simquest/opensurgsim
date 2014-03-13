@@ -41,6 +41,7 @@ surgsim_show_ide_folders(
 	"${EXAMPLESTAPLING_SOURCES}" "${EXAMPLESTAPLING_HEADERS}")
 
 set(LIBS ${LIBS}
+		 IdentityPoseDevice
 		 MultiAxisDevice
 		 SurgSimBlocks
 		 SurgSimFramework

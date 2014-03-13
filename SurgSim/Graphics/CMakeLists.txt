@@ -72,6 +72,7 @@ set(SURGSIM_GRAPHICS_HEADERS
 	Manager.h
 	Material.h
 	Mesh.h
+	Mesh-inl.h
 	MeshRepresentation.h
 	OctreeRepresentation.h
 	OsgAxesRepresentation.h
