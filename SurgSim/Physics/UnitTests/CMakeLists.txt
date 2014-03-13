@@ -26,7 +26,9 @@ set(UNIT_TEST_SOURCES
 	DcdCollisionTests.cpp
 	DeformableRepresentationStateTest.cpp
 	DeformableRepresentationTest.cpp
+	EigenGtestAsserts.cpp
 	Fem1DRepresentationTests.cpp
+	Fem3DRepresentationBilateral3DTests.cpp
 	Fem3DRepresentationContactTests.cpp
 	Fem3DRepresentationReaderTests.cpp
 	Fem3DRepresentationTests.cpp
@@ -37,6 +39,7 @@ set(UNIT_TEST_SOURCES
 	FemRepresentationLocalizationTest.cpp
 	FemRepresentationParametersTest.cpp
 	FemRepresentationTests.cpp
+	FixedRepresentationBilateral3DTests.cpp
 	FixedRepresentationContactTests.cpp
 	FixedRepresentationLocalizationTest.cpp
 	FixedRepresentationTest.cpp
@@ -52,6 +55,7 @@ set(UNIT_TEST_SOURCES
 	PushResultsTests.cpp
 	RepresentationTest.cpp
 	RigidRepresentationBaseStateTest.cpp
+	RigidRepresentationBilateral3DTests.cpp
 	RigidRepresentationContactTests.cpp
 	RigidRepresentationLocalizationTest.cpp
 	RigidRepresentationParametersTest.cpp
@@ -63,6 +67,7 @@ set(UNIT_TEST_SOURCES
 
 set(UNIT_TEST_HEADERS
 	CommonTests.h
+	EigenGtestAsserts.h
 	MockObjects.h
 )
 

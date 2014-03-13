@@ -115,31 +115,13 @@ TEST_F(MassSpringRepresentationContactTest, ConstraintConstantsTest)
 	EXPECT_EQ(1u, implementation->getNumDof());
 }
 
-void initializeMlcp(MlcpPhysicsProblem *mlcpPhysicsProblem, size_t numDof, size_t numConstraints)
-{
-	// Resize and zero all Eigen types
-	mlcpPhysicsProblem->A.resize(numConstraints, numConstraints);
-	mlcpPhysicsProblem->A.setZero();
-	mlcpPhysicsProblem->b.resize(numConstraints);
-	mlcpPhysicsProblem->b.setZero();
-	mlcpPhysicsProblem->mu.resize(numConstraints);
-	mlcpPhysicsProblem->mu.setZero();
-	mlcpPhysicsProblem->CHt.resize(numDof, numConstraints);
-	mlcpPhysicsProblem->CHt.setZero();
-	mlcpPhysicsProblem->H.resize(numConstraints, numDof);
-	mlcpPhysicsProblem->H.setZero();
-	// Empty all std::vector types
-	mlcpPhysicsProblem->constraintTypes.clear();
-}
-
 TEST_F(MassSpringRepresentationContactTest, BuildMlcpTest)
 {
 	// Define constraint (frictionless non-penetration)
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
 
 	// Initialize MLCP
-	MlcpPhysicsProblem mlcpPhysicsProblem;
-	initializeMlcp(&mlcpPhysicsProblem, m_massSpring->getNumDof(), 1);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(m_massSpring->getNumDof(), 1, 1);
 
 	// Build MLCP for 0th node
 	setContactAtNode(0);
@@ -217,8 +199,7 @@ TEST_F(MassSpringRepresentationContactTest, BuildMlcpIndiciesTest)
 {
 	auto implementation = std::make_shared<MassSpringRepresentationContact>();
 
-	MlcpPhysicsProblem mlcpPhysicsProblem;
-	initializeMlcp(&mlcpPhysicsProblem, 11, 2);
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(11, 2, 2);
 
 	// Suppose 5 dof and 1 constraint are defined elsewhere.  Then H, CHt, HCHt, and b are prebuilt.
 	Eigen::Matrix<double, 1, 5> localH;
