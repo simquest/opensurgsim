@@ -29,6 +29,7 @@ set(SURGSIM_MATH_SOURCES
 	Matrix.cpp
 	MeshShape.cpp
 	MlcpGaussSeidelSolver.cpp
+	MlcpProblem.cpp
 	OctreeShape.cpp
 	PlaneShape.cpp
 	Shape.cpp

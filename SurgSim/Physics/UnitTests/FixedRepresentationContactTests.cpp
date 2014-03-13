@@ -67,20 +67,7 @@ TEST (FixedRepresentationContactTests, SetGet_BuildMlcp_Test)
 	ContactConstraintData constraintData;
 	constraintData.setPlaneEquation(n, d);
 
-	MlcpPhysicsProblem mlcpPhysicsProblem;
-	// Resize and zero all Eigen types
-	mlcpPhysicsProblem.A.resize(1u, 1u);
-	mlcpPhysicsProblem.A.setZero();
-	mlcpPhysicsProblem.b.resize(1u);
-	mlcpPhysicsProblem.b.setZero();
-	mlcpPhysicsProblem.mu.resize(1u);
-	mlcpPhysicsProblem.mu.setZero();
-	mlcpPhysicsProblem.CHt.resize(fixed->getNumDof(), 1u);
-	mlcpPhysicsProblem.CHt.setZero();
-	mlcpPhysicsProblem.H.resize(1u, fixed->getNumDof());
-	mlcpPhysicsProblem.H.setZero();
-	// Empty all std::vector types
-	mlcpPhysicsProblem.constraintTypes.clear();
+	MlcpPhysicsProblem mlcpPhysicsProblem = MlcpPhysicsProblem::Zero(fixed->getNumDof(), 1, 1);
 
 	// Fill up the Mlcp
 	double dt = 1e-3;

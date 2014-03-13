@@ -78,6 +78,32 @@ inline Eigen::Matrix<T, 3, 3> makeRotationMatrix(const T& angle, const Eigen::Ma
 	return Eigen::AngleAxis<T>(angle, axis).toRotationMatrix();
 }
 
+/// Create a skew-symmetric matrix corresponding to the specified vector.  Skew-symmetric matrices are particularly
+/// useful for representing a portion of the vector cross-product.
+/// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
+/// \tparam VOpt the option flags (alignment etc.) used for the vector argument.  Can be deduced.
+/// \param vector the vector to be transformed.
+/// \returns the skew-symmetric matrix corresponding with the vector argument.
+template <typename T, int VOpt>
+inline Eigen::Matrix<T, 3, 3> makeSkewSymmetricMatrix(const Eigen::Matrix<T, 3, 1, VOpt>& vector)
+{
+	Eigen::Matrix<T, 3, 3> result;
+
+	result(0, 0) = 0.0;
+	result(0, 1) = -vector(2);
+	result(0, 2) = vector(1);
+
+	result(1, 0) = vector(2);
+	result(1, 1) = 0.0;
+	result(1, 2) = -vector(0);
+
+	result(2, 0) = -vector(1);
+	result(2, 1) = vector(0);
+	result(2, 2) = 0.0;
+
+	return result;
+}
+
 /// Get the angle (in radians) and axis corresponding to a rotation matrix.
 /// \tparam T the numeric data type used for arguments and the return value.  Can usually be deduced.
 /// \tparam MOpt the option flags (alignment etc.) used for the rotation matrix argument.  Can be deduced.
