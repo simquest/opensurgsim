@@ -74,35 +74,27 @@ void MeshShape::computeVolumeIntegrals()
 		const Vector3d& p1 = m_mesh->getVertexPosition(m_mesh->getTriangle(t).verticesId[1]);
 		const Vector3d& p2 = m_mesh->getVertexPosition(m_mesh->getTriangle(t).verticesId[2]);
 
-		double x0 = p0.x(), y0 = p0.y(), z0 = p0.z();
-		double x1 = p1.x(), y1 = p1.y(), z1 = p1.z();
-		double x2 = p2.x(), y2 = p2.y(), z2 = p2.z();
-
 		// get edges and cross product of edges
-		double a1 = x1 - x0, b1 = y1 - y0, c1 = z1 - z0;
-		double a2 = x2 - x0, b2 = y2 - y0, c2 = z2 - z0;
-		double d0 = b1 * c2 - b2 * c1;
-		double d1 = a2 * c1 - a1 * c2;
-		double d2 = a1 * b2 - a2 * b1;
+		Vector3d d = (p1 - p0).cross(p2 - p0);
 
 		// compute integral terms
 		double f1x, f1y, f1z, f2x, f2y, f2z, f3x, f3y, f3z;
 		double g0x, g0y, g0z, g1x, g1y, g1z, g2x, g2y, g2z;
-		computeIntegralTerms(x0, x1, x2, &f1x, &f2x, &f3x, &g0x, &g1x, &g2x);
-		computeIntegralTerms(y0, y1, y2, &f1y, &f2y, &f3y, &g0y, &g1y, &g2y);
-		computeIntegralTerms(z0, z1, z2, &f1z, &f2z, &f3z, &g0z, &g1z, &g2z);
+		computeIntegralTerms(p0.x(), p1.x(), p2.x(), &f1x, &f2x, &f3x, &g0x, &g1x, &g2x);
+		computeIntegralTerms(p0.y(), p1.y(), p2.y(), &f1y, &f2y, &f3y, &g0y, &g1y, &g2y);
+		computeIntegralTerms(p0.z(), p1.z(), p2.z(), &f1z, &f2z, &f3z, &g0z, &g1z, &g2z);
 
 		// update integrals
-		intg[0] += d0 * f1x;
-		intg[1] += d0 * f2x;
-		intg[2] += d1 * f2y;
-		intg[3] += d2 * f2z;
-		intg[4] += d0 * f3x;
-		intg[5] += d1 * f3y;
-		intg[6] += d2 * f3z;
-		intg[7] += d0 * (y0 * g0x + y1 * g1x + y2 * g2x);
-		intg[8] += d1 * (z0 * g0y + z1 * g1y + z2 * g2y);
-		intg[9] += d2 * (x0 * g0z + x1 * g1z + x2 * g2z);
+		intg[0] += d[0] * f1x;
+		intg[1] += d[0] * f2x;
+		intg[2] += d[1] * f2y;
+		intg[3] += d[2] * f2z;
+		intg[4] += d[0] * f3x;
+		intg[5] += d[1] * f3y;
+		intg[6] += d[2] * f3z;
+		intg[7] += d[0] * (p0.y() * g0x + p1.y() * g1x + p2.y() * g2x);
+		intg[8] += d[1] * (p0.z() * g0y + p1.z() * g1y + p2.z() * g2y);
+		intg[9] += d[2] * (p0.x() * g0z + p1.x() * g1z + p2.x() * g2z);
 	}
 	for (int i = 0; i < 10; i++)
 	{
@@ -115,9 +107,7 @@ void MeshShape::computeVolumeIntegrals()
 	SURGSIM_ASSERT(m_volume > 0.0) << "A MeshShape cannot have a negative or null volume, we found V = " << m_volume;
 
 	// center of mass
-	m_center.x() = intg[1] / m_volume;
-	m_center.y() = intg[2] / m_volume;
-	m_center.z() = intg[3] / m_volume;
+	m_center = Vector3d(intg[1], intg[2], intg[3]) / m_volume;
 
 	// inertia tensor relative to center of mass
 	const Vector3d& C = m_center; // To improve readability
