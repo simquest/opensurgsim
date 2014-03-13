@@ -122,7 +122,7 @@ static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
 
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
 
-	// The FEM requires the implicit euler integration scheme to avoid "blowing up"
+	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
 	fem->setIntegrationScheme(integrationScheme);
 
 	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
@@ -170,8 +170,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	if (displayPointCloud)
 	{
 		// Create a point-cloud for visualizing the nodes of the finite element model
-		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<void>> graphicsPointCloudRepresentation
-			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<void>>(name + " point cloud");
+		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> graphicsPointCloudRepresentation
+			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
 		graphicsPointCloudRepresentation->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
 		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 		graphicsPointCloudRepresentation->setPointSize(3.0f);
@@ -180,7 +180,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
 		sceneElement->addComponent(
-			std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<void>>(
+			std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<EmptyData>>(
 				name + " physics to point cloud",
 				physicsRepresentation->getFinalState(),
 				graphicsPointCloudRepresentation->getVertices()));
@@ -210,9 +210,9 @@ std::shared_ptr<ViewElement> createView()
 	return view;
 }
 
-std::shared_ptr<SceneElement> createStapler(const std::string& staplerName,
-											const std::string& deviceName,
-											SurgSim::Math::RigidTransform3d pose)
+std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
+														const std::string& deviceName,
+														SurgSim::Math::RigidTransform3d pose)
 {
 	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler at
 	// the tip of the stapler.
@@ -274,7 +274,7 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName,
 
 	return sceneElement;
 }
-std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, const RigidTransform3d& pose)
 {
 	// Load graphic representation for armSceneElement
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
@@ -336,9 +336,10 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
-	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.0, 0.0))));
 	scene->addSceneElement(
-		createStapler("stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
+		createArmSceneElement("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero())));
+	scene->addSceneElement(createStaplerSceneElement(
+		"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
 
 	// Load the FEM
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
