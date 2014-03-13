@@ -61,12 +61,12 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	// The equation is
 	//   u + (p(t) - s) = 0
 	//
-	// Using backward-euler integration,
+	// Using backward-Euler integration,
 	//   u = dt.v(t + dt)
 	//
-	// In rigid body dynamics, the screw vectors are represented as (x, y, z, wx, wy, wz), where the GP = (x, y, z)
+	// In rigid body dynamics, the screw vectors are represented as (x, y, z, wx, wy, wz), where the G = (x, y, z)
 	// represents the vector from the origin to the center of mass, and w = (wx, wy, wz) represents angular rotation
-	// about the center of mass.  The twist vector in cartesian space is--
+	// about the center of mass.  The twist vector in Cartesian space is--
 	//
 	//   dt.v(t+dt) = dt.dG(t+dt) + dt.GP^w(t+dt), where G is the position of the center of mass,
 	//                                             dG is the velocity of the center of mass,
@@ -77,7 +77,7 @@ void RigidRepresentationBilateral3D::doBuild(double dt,
 	//              = dt.dG(t+dt) + dt.[ GPy.wz - GPz.wy]
 	//                                 [-GPx.wz + GPz.wx]
 	//                                 [ GPx.wy - GPy.wx]
-	//              = dt.dP(t+dt) + dt.[ 0   -GPz  GPy].w
+	//              = dt.dG(t+dt) + dt.[ 0   -GPz  GPy].w
 	//                                 [ GPz  0   -GPx]
 	//                                 [-GPy  GPx  0  ]
 	//

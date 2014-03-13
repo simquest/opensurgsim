@@ -46,7 +46,7 @@ public:
 
 private:
 	/// Gets the number of degree of freedom.
-	/// \return 1 as a frictionless contact is formed of 1 equation of constraint (along the normal direction).
+	/// \return 3 A bilateral 3d constraint enforces equality in the x, y, and z dimensions between 2 points.
 	unsigned int doGetNumDof() const override;
 
 	/// Builds the subset of an Mlcp physics problem associated to this implementation.
