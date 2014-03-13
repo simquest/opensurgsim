@@ -1602,8 +1602,9 @@ TEST_F(GeometryTest, calculateContactTriangleTriangle)
 		SCOPED_TRACE("edge t1v0v1 through triangle t0");
 		VectorType t1v0 = t0.pointInTriangle(0.2,0.2);
 		t1 = Triangle(t1v0 + t0.n*3, t0.v0 - t0.v0v2*4 + t0.n, t1v0 - t0.n*4);
-		VectorType perpendicular = t1.n * -2.0021621627935704;
-		//checkTriTriContact(TriTriContactData(t1, t0, t1v0, t1v0 + perpendicular, true));
+		VectorType t0p;
+		VectorType t1p;
+		checkTriTriContact(TriTriContactData(t0, t1, t0p, t1p, true), true, false);
 	}
 	{
 		SCOPED_TRACE("Triangles parallel");

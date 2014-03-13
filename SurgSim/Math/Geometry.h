@@ -1737,8 +1737,8 @@ bool calculateContactTriangleTriangle(
 		{
 			// Check if the edge vUnderOnPlaneB[0]->vUnderOnPlaneB[1] intersects with B.
 			// If so, prune the edge vUnderOnPlaneB[0]->vUnderOnPlaneB[1] to be within B.
-			pruneParam[0] = T(2.0);
-			pruneParam[1] = T(-2.0);
+			pruneParam[0] = T(vUnderInsideB[0] ? 0.0 : 2.0);
+			pruneParam[1] = T(vUnderInsideB[1] ? 1.0: -2.0);
 			for (unsigned int b = 0; b < 3; ++b)
 			{
 				T s[2] = {T(-1), T(-1)};
