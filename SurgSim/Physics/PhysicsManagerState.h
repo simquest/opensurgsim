@@ -86,15 +86,23 @@ public:
 	/// Gets constraint group.
 	/// \param	type	The type.
 	/// \return	The constraint group.
-	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(int type);
+	const std::vector<std::shared_ptr<Constraint>>& getConstraintGroup(int type) const;
 
 	/// Gets the Mlcp problem
 	/// \return	The Mlcp problem for this physics manager state (read/write access).
 	MlcpPhysicsProblem& getMlcpProblem();
 
+	/// Gets the Mlcp problem
+	/// \return	The Mlcp problem for this physics manager state (const).
+	const MlcpPhysicsProblem& getMlcpProblem() const;
+
 	/// Gets the Mlcp solution
 	/// \return	The Mlcp solution for this physics manager state (read/write access).
 	MlcpPhysicsSolution& getMlcpSolution();
+
+	/// Gets the Mlcp solution
+	/// \return	The Mlcp solution for this physics manager state (const).
+	const MlcpPhysicsSolution& getMlcpSolution() const;
 
 	/// Gets the representations mapping
 	/// \return	The representations mapping (mapping between the representation and the mlcp)
