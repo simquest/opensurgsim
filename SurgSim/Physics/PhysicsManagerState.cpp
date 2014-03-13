@@ -111,9 +111,14 @@ void PhysicsManagerState::setConstraintGroup(
 	}
 }
 
-const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstraintGroup(int type)
+const std::vector<std::shared_ptr<Constraint>>& PhysicsManagerState::getConstraintGroup(int type) const
 {
-	return m_constraints[type];
+	if (m_constraints.count(type) > 0)
+	{
+		return m_constraints.at(type);
+	}
+	static std::vector<std::shared_ptr<Constraint>> emptyVector;
+	return emptyVector;
 }
 
 MlcpPhysicsProblem& PhysicsManagerState::getMlcpProblem()
@@ -121,7 +126,17 @@ MlcpPhysicsProblem& PhysicsManagerState::getMlcpProblem()
 	return m_mlcpPhysicsProblem;
 }
 
+const MlcpPhysicsProblem& PhysicsManagerState::getMlcpProblem() const
+{
+	return m_mlcpPhysicsProblem;
+}
+
 MlcpPhysicsSolution& PhysicsManagerState::getMlcpSolution()
+{
+	return m_mlcpPhysicsSolution;
+}
+
+const MlcpPhysicsSolution& PhysicsManagerState::getMlcpSolution() const
 {
 	return m_mlcpPhysicsSolution;
 }

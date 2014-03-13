@@ -19,6 +19,8 @@
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/ply.h"
 
+#include "SurgSim/Framework/Log.h"
+
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Math::Vector3d;
@@ -64,6 +66,9 @@ PlyReader::PlyReader(std::string filename) :
 		&m_data->elementNames,
 		&m_data->file_type,
 		&m_data->version);
+
+	SURGSIM_LOG_IF(!isValid(), SurgSim::Framework::Logger::getLogger("InputOutput"), WARNING) <<
+		"'" << m_filename << "' is an invalid .ply file";
 }
 
 PlyReader::~PlyReader()
@@ -91,7 +96,7 @@ bool PlyReader::requestElement(std::string elementName,
 							   std::function<void (const std::string&)> processElementCallback,
 							   std::function<void (const std::string&)> endElementCallback)
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	bool result = false;
 
@@ -138,7 +143,7 @@ bool PlyReader::requestProperty(std::string elementName,
 								int dataType, int dataOffset,
 								int countType, int countOffset)
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	SURGSIM_ASSERT(hasElement(elementName)) <<
 		"The element <" << elementName << "> has not been requested yet, you cannot access properties for it";
@@ -189,7 +194,7 @@ bool PlyReader::requestProperty(std::string elementName,
 
 bool PlyReader::setDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	bool result = false;
 	if (delegate != nullptr)
@@ -205,7 +210,7 @@ bool PlyReader::setDelegate(std::shared_ptr<PlyReaderDelegate> delegate)
 
 void PlyReader::parseFile()
 {
-	SURGSIM_ASSERT(isValid()) << "Cannot parse invalid file.";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	if (m_startParseFileCallback != nullptr)
 	{
@@ -309,14 +314,14 @@ void PlyReader::parseFile()
 
 bool PlyReader::hasElement(std::string elementName) const
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	return find_element(m_data->plyFile, elementName.c_str()) != nullptr;
 }
 
 bool PlyReader::hasProperty(std::string elementName, std::string propertyName) const
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	bool result = false;
 	PlyElement* element = find_element(m_data->plyFile, elementName.c_str());
@@ -330,7 +335,7 @@ bool PlyReader::hasProperty(std::string elementName, std::string propertyName) c
 
 bool PlyReader::isScalar(std::string elementName, std::string propertyName) const
 {
-	SURGSIM_ASSERT(isValid()) << "Invalid .ply file encountered";
+	SURGSIM_ASSERT(isValid()) << "'" << m_filename << "' is an invalid .ply file";
 
 	bool result = false;
 	PlyElement* element = find_element(m_data->plyFile, elementName.c_str());
@@ -346,6 +351,6 @@ bool PlyReader::isScalar(std::string elementName, std::string propertyName) cons
 	return result;
 }
 
-}
-}
+} // namespace DataStructures
+} // namespace SurgSim
 

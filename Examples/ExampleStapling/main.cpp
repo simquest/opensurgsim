@@ -33,17 +33,15 @@
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
 #include "SurgSim/Graphics/Mesh.h"
-#include "SurgSim/Graphics/OsgCapsuleRepresentation.h"
 #include "SurgSim/Graphics/OsgManager.h"
 #include "SurgSim/Graphics/OsgMeshRepresentation.h"
 #include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-#include "SurgSim/Graphics/OsgSphereRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
-#include "SurgSim/Math/CapsuleShape.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
@@ -58,23 +56,21 @@
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
+using SurgSim::DataStructures::PlyReader;
+using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
-using SurgSim::Graphics::CapsuleRepresentation;
 using SurgSim::Graphics::SceneryRepresentation;
-using SurgSim::Graphics::SphereRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Graphics::OsgCapsuleRepresentation;
-using SurgSim::Graphics::OsgSphereRepresentation;
 using SurgSim::Graphics::OsgManager;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
-using SurgSim::Math::CapsuleShape;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::SphereShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
@@ -191,8 +187,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
-/// \param fileName Name of the file from which the scenery representation is loaded.
-/// \return A SceneElement containing the scenery representation.
+/// \param fileName Name of the file from which the scenery representation will be loaded.
+/// \return A scenery representation.
 std::shared_ptr<SceneryRepresentation> createSceneryObject(const std::string& name, const std::string& fileName)
 {
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation = std::make_shared<OsgSceneryRepresentation>(name);
@@ -276,16 +272,21 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 }
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, const RigidTransform3d& pose)
 {
+	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+	PlyReader reader("Data/Collision/arm_collision.ply");
+	reader.setDelegate(delegate);
+	reader.parseFile();
+
 	// Load graphic representation for armSceneElement
 	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
 		createSceneryObject(armName, "Geometry/forearm.osgb");
 	sceneryRepresentation->setInitialPose(pose);
 
-	// Since there is no collision mesh loader yet, use a capsule shape as the collision representation of the arm.
-	std::shared_ptr<CapsuleShape> capsuleShape = std::make_shared<CapsuleShape>(0.335, 0.03); // Unit: meter
+	// MeshShape collision representation of the arm.
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
-	params.setShapeUsedForMassInertia(capsuleShape);
+	params.setShapeUsedForMassInertia(meshShape);
 
 	Matrix33d rotationX = makeRotationMatrix(M_PI_2, Vector3d(1.0, 0.0, 0.0));
 	Matrix33d rotationY = makeRotationMatrix(M_PI_4, Vector3d(0.0, 1.0, 0.0));
