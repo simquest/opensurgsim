@@ -33,9 +33,6 @@ const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh(
 
 double MeshShape::getVolume() const
 {
-	// Test that the volume is valid
-	SURGSIM_ASSERT(m_volume > 0.0) <<
-		"A MeshShape cannot have a negative or null volume, we found V = " << m_volume;
 	return m_volume;
 }
 
@@ -46,11 +43,6 @@ SurgSim::Math::Vector3d MeshShape::getCenter() const
 
 SurgSim::Math::Matrix33d MeshShape::getSecondMomentOfVolume() const
 {
-	// Test that the second moment of volume is valid
-	// The diagonal element should be all positive
-	SURGSIM_ASSERT(m_secondMomentOfVolume.diagonal().minCoeff() > 0.0) <<
-		"A MeshShape cannot have a second moment of volume (used to compute the inertia matrix)" <<
-		" with negative or null diagonal elements, we found" << std::endl << m_secondMomentOfVolume;
 	return m_secondMomentOfVolume;
 }
 
@@ -68,10 +60,10 @@ void MeshShape::computeIntegralTerms(const double w0, const double w1, const dou
 	*g2 = (*f2) + w2 * ((*f1) + w2);
 }
 
-void MeshShape::compute()
+void MeshShape::computeVolumeIntegrals()
 {
-	const double mult[10] = {1.0/6.0, 1.0/24.0, 1.0/24.0, 1.0/24.0, 1.0/60.0, 1.0/60.0, 1.0/60.0,
-		1.0/120.0, 1.0/120.0, 1.0/120.0};
+	const double mult[10] = {1.0 / 6.0, 1.0 / 24.0, 1.0 / 24.0, 1.0 / 24.0, 1.0 / 60.0, 1.0 / 60.0, 1.0 / 60.0,
+		1.0 / 120.0, 1.0 / 120.0, 1.0 / 120.0};
 	// intg order: 1, x, y, z, x^2, y^2, z^2, xy, yz, zx
 	double intg[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
@@ -87,8 +79,11 @@ void MeshShape::compute()
 		double x2 = p2.x(), y2 = p2.y(), z2 = p2.z();
 
 		// get edges and cross product of edges
-		double a1 = x1 - x0, b1 = y1 - y0, c1 = z1 - z0, a2 = x2 - x0, b2 = y2 - y0, c2 = z2 - z0;
-		double d0 = b1 * c2 - b2 * c1, d1 = a2 * c1 - a1 * c2, d2 = a1 * b2 - a2 * b1;
+		double a1 = x1 - x0, b1 = y1 - y0, c1 = z1 - z0;
+		double a2 = x2 - x0, b2 = y2 - y0, c2 = z2 - z0;
+		double d0 = b1 * c2 - b2 * c1;
+		double d1 = a2 * c1 - a1 * c2;
+		double d2 = a1 * b2 - a2 * b1;
 
 		// compute integral terms
 		double f1x, f1y, f1z, f2x, f2y, f2z, f3x, f3y, f3z;
@@ -116,6 +111,8 @@ void MeshShape::compute()
 
 	// volume
 	m_volume = intg[0];
+	// Test the volume validity
+	SURGSIM_ASSERT(m_volume > 0.0) << "A MeshShape cannot have a negative or null volume, we found V = " << m_volume;
 
 	// center of mass
 	m_center.x() = intg[1] / m_volume;
@@ -123,12 +120,18 @@ void MeshShape::compute()
 	m_center.z() = intg[3] / m_volume;
 
 	// inertia tensor relative to center of mass
-	m_secondMomentOfVolume(0, 0) = intg[5] + intg[6] - m_volume * (m_center.y() * m_center.y() + m_center.z() * m_center.z());
-	m_secondMomentOfVolume(1, 1) = intg[4] + intg[6] - m_volume * (m_center.z() * m_center.z() + m_center.x() * m_center.x());
-	m_secondMomentOfVolume(2, 2) = intg[4] + intg[5] - m_volume * (m_center.x() * m_center.x() + m_center.y() * m_center.y());
-	m_secondMomentOfVolume(0, 1) = m_secondMomentOfVolume(1, 0) = -(intg[7] - m_volume * m_center.x() * m_center.y());
-	m_secondMomentOfVolume(1, 2) = m_secondMomentOfVolume(2, 1) = -(intg[8] - m_volume * m_center.y() * m_center.z());
-	m_secondMomentOfVolume(0, 2) = m_secondMomentOfVolume(2, 0) = -(intg[9] - m_volume * m_center.z() * m_center.x());
+	const Vector3d& C = m_center; // To improve readability
+	m_secondMomentOfVolume(0, 0) = intg[5] + intg[6] - m_volume * (C.y() * C.y() + C.z() * C.z());
+	m_secondMomentOfVolume(1, 1) = intg[4] + intg[6] - m_volume * (C.z() * C.z() + C.x() * C.x());
+	m_secondMomentOfVolume(2, 2) = intg[4] + intg[5] - m_volume * (C.x() * C.x() + C.y() * C.y());
+	m_secondMomentOfVolume(0, 1) = m_secondMomentOfVolume(1, 0) = -(intg[7] - m_volume * C.x() * C.y());
+	m_secondMomentOfVolume(1, 2) = m_secondMomentOfVolume(2, 1) = -(intg[8] - m_volume * C.y() * C.z());
+	m_secondMomentOfVolume(0, 2) = m_secondMomentOfVolume(2, 0) = -(intg[9] - m_volume * C.z() * C.x());
+	// Test the second moment of volume validity
+	// The diagonal element should all be positive
+	SURGSIM_ASSERT(m_secondMomentOfVolume.diagonal().minCoeff() > 0.0) <<
+		"A MeshShape cannot have a second moment of volume (used to compute the inertia matrix)" <<
+		" with negative or null diagonal elements, we found" << std::endl << m_secondMomentOfVolume;
 }
 
 std::string MeshShape::getClassName()
