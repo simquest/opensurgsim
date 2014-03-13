@@ -67,7 +67,7 @@ static const int cubeTrianglesCCW[12][3] =
 	{0, 4, 7}, {0, 7, 3}  // Left   (-1  0  0) [0473]
 };
 
-class CubeMeshTest : public ::testing::Test
+class MeshShapeTest : public ::testing::Test
 {
 public:
 	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData,EmptyData,EmptyData> TriangleMeshBase;
@@ -89,7 +89,54 @@ public:
 	int m_numIterations;
 };
 
-TEST_F(CubeMeshTest, MeshCubeVSBoxTest)
+TEST_F(MeshShapeTest, InvalidMeshCubeTest)
+{
+	// Cube
+	std::shared_ptr<TriangleMeshBase> invalidTriMesh = std::make_shared<TriangleMeshBase>();
+	for (int i = 0; i < cubeNumPoints; i++)
+	{
+		SurgSim::Math::Vector3d p;
+		p[0] = cubePoints[i][0];
+		p[1] = cubePoints[i][1];
+		p[2] = cubePoints[i][2];
+		TriangleMeshBase::VertexType v(p);
+		invalidTriMesh->addVertex(v);
+	}
+	for (int i = 0; i < cubeNumEdges; i++)
+	{
+		std::array<unsigned int,2> edgePoints;
+		for (int j = 0; j < 2; j++)
+		{
+			edgePoints[j] = cubeEdges[i][j];
+		}
+		EdgeElement edgeElement(edgePoints);
+		TriangleMeshBase::EdgeType e(edgeElement);
+		invalidTriMesh->addEdge(e);
+	}
+	for (int i = 0; i < cubeNumTriangles; i++)
+	{
+		std::array<unsigned int,3> trianglePoints;
+		for (int j = 0; j < 3; j++)
+		{
+			// Add an offset of 3 to the indices (=> some of them will be invalid)
+			trianglePoints[j] = cubeTrianglesCCW[i][j] + 3;
+		}
+		TriangleElement triangleElement(trianglePoints);
+		TriangleMeshBase::TriangleType t(triangleElement);
+		invalidTriMesh->addTriangle(t);
+	}
+
+	EXPECT_ANY_THROW({SurgSim::Math::MeshShape invalidMeshShape(*invalidTriMesh);});
+}
+
+TEST_F(MeshShapeTest, EmptyMeshTest)
+{
+	std::shared_ptr<TriangleMeshBase> emptyMesh = std::make_shared<TriangleMeshBase>();
+
+	EXPECT_ANY_THROW({SurgSim::Math::MeshShape meshShape(*emptyMesh);});
+}
+
+TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
 {
 	for (int iterationID = 0; iterationID < m_numIterations; iterationID++)
 	{
