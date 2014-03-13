@@ -126,14 +126,14 @@ TEST_F(MeshShapeTest, InvalidMeshCubeTest)
 		invalidTriMesh->addTriangle(t);
 	}
 
-	EXPECT_ANY_THROW({SurgSim::Math::MeshShape invalidMeshShape(*invalidTriMesh);});
+	EXPECT_THROW(SurgSim::Math::MeshShape invalidMeshShape(*invalidTriMesh), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(MeshShapeTest, EmptyMeshTest)
 {
 	std::shared_ptr<TriangleMeshBase> emptyMesh = std::make_shared<TriangleMeshBase>();
 
-	EXPECT_ANY_THROW({SurgSim::Math::MeshShape meshShape(*emptyMesh);});
+	EXPECT_THROW(SurgSim::Math::MeshShape meshShape(*emptyMesh), SurgSim::Framework::AssertionFailure);
 }
 
 TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
