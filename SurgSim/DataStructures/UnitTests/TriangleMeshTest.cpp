@@ -1,5 +1,5 @@
 // This file is a part of the OpenSurgSim project.
-// Copyright 2013, SimQuest Solutions Inc.
+// Copyright 2012-2013, SimQuest Solutions Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,14 @@
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Vector.h"
 
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/MeshElement.h"
+#include "SurgSim/DataStructures/UnitTests/MockObjects.h"
+#include "SurgSim/DataStructures/Vertex.h"
+
+#include <random>
+
+using SurgSim::DataStructures::EmptyData;
 using SurgSim::DataStructures::TriangleMesh;
 using SurgSim::Math::Vector3d;
 
@@ -29,9 +37,9 @@ namespace DataStructures
 
 TEST(TriangleMeshTest, NormalTest)
 {
-	typedef SurgSim::DataStructures::TriangleMeshBase<void, void, void> TriangleMeshBase;
-	typedef SurgSim::DataStructures::MeshElement<2, void> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3, void> TriangleElement;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
+	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
+	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
 
 	std::shared_ptr<TriangleMeshBase> mesh = std::make_shared<TriangleMeshBase>();
 

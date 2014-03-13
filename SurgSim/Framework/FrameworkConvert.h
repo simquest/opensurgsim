@@ -26,6 +26,7 @@ namespace Framework
 {
 class Component;
 class SceneElement;
+class Scene;
 }
 }
 
@@ -63,6 +64,28 @@ struct convert<SurgSim::Framework::Component>
 {
 	static Node encode(const SurgSim::Framework::Component& rhs);
 };
+
+
+template<>
+struct convert<std::shared_ptr<SurgSim::Framework::SceneElement>>
+{
+	static Node encode(const std::shared_ptr<SurgSim::Framework::SceneElement> rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::SceneElement>& rhs);
+};
+
+template<>
+struct convert<SurgSim::Framework::SceneElement>
+{
+	static Node encode(const SurgSim::Framework::SceneElement& rhs);
+};
+
+template<>
+struct convert<std::shared_ptr<SurgSim::Framework::Scene>>
+{
+	static Node encode(const std::shared_ptr<SurgSim::Framework::Scene> rhs);
+	static bool decode(const Node& node, std::shared_ptr<SurgSim::Framework::Scene>& rhs);
+};
+
 
 };
 

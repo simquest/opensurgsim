@@ -13,13 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Framework/Log.h"
+
+using SurgSim::DataStructures::EmptyData;
 
 namespace SurgSim
 {
 namespace Graphics
 {
+
+Mesh::Mesh()
+{
+}
 
 void Mesh::initialize(
 	const std::vector<SurgSim::Math::Vector3d>& vertices,

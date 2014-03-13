@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
 #define SURGSIM_DATASTRUCTURES_TRIANGLEMESH_H
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Math/Vector.h"
 
@@ -46,15 +47,6 @@ struct NormalData {
 	}
 };
 
-// EmptyData class used for the TriangleMesh.
-class EmptyData
-{
-public:
-	bool operator==(const EmptyData& vertex) const
-	{
-		return true;
-	}
-};
 
 /// A TriangleMesh stores normal information for the triangles.
 class TriangleMesh: public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>

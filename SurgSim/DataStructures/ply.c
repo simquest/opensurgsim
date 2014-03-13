@@ -1240,7 +1240,7 @@ PlyOtherElems *ply_get_other_element (
   else {
     other_elems = plyfile->other_elems;
     other_elems->other_list = (OtherElem *) realloc (other_elems->other_list,
-                              sizeof (OtherElem) * other_elems->num_elems + 1);
+                              sizeof (OtherElem) * (other_elems->num_elems + 1));
     other = &(other_elems->other_list[other_elems->num_elems]);
     other_elems->num_elems++;
   }

@@ -49,7 +49,7 @@ public:
 		SURGSIM_ADD_RW_PROPERTY(TestClass, double, privateProperty, getPrivateProperty, setPrivateProperty);
 
 		SURGSIM_ADD_SERIALIZABLE_PROPERTY(TestClass, float, serializableProperty,
-			getSerializableProperty, setSerializableProperty);
+										  getSerializableProperty, setSerializableProperty);
 	}
 
 	int normal;

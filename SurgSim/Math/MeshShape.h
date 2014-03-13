@@ -21,10 +21,13 @@
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/Framework/Convert.h"
 #include "SurgSim/Math/Shape.h"
+
+
 
 namespace SurgSim
 {

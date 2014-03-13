@@ -297,7 +297,7 @@ struct NovintScaffold::DeviceData
 
 	/// The position value from the device.
 	Vector3d position;
-	/// The orientation value from the device.
+	/// The orientation value from the device.  If the device is not 7Dof the orientation is always Identity.
 	RigidTransform3d orientationTransform;
 	/// The pose value from the device, after scaling.
 	RigidTransform3d scaledPose;
@@ -633,13 +633,6 @@ bool NovintScaffold::updateDevice(DeviceData* info)
 		Matrix33d orientation = rotationY * rotationZ * rotationX;
 		// Put the result into the orientation transform
 		info->orientationTransform.linear() = orientation;
-	}
-	else
-	{
-		Eigen::Matrix<double, 4, 4, Eigen::ColMajor> transform;
-		hdlGripGetAttributesd(HDL_GRIP_ORIENTATION, 16, transform.data());
-		fatalError = checkForFatalError(fatalError, "hdlGripGetAttributesd(HDL_GRIP_ORIENTATION)");
-		info->orientationTransform.linear() = transform.block<3,3>(0, 0); // store orientation in a RigidTransform3d
 	}
 
 	checkDeviceHoming(info);

@@ -19,6 +19,7 @@
 #include <array>
 #include <memory>
 
+#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/PlyReaderDelegate.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
 
@@ -33,7 +34,7 @@ class TriangleMeshPlyReaderDelegate : public PlyReaderDelegate
 public:
 
 	/// The Mesh Type
-	typedef TriangleMeshBase<void, void, void> MeshType;
+	typedef TriangleMeshBase<EmptyData, EmptyData, EmptyData> MeshType;
 
 	/// Default constructor.
 	TriangleMeshPlyReaderDelegate();
@@ -44,7 +45,7 @@ public:
 
 	/// Gets the mesh.
 	/// \return The mesh.
-	std::shared_ptr<TriangleMeshBase<void, void, void>> getMesh();
+	std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> getMesh();
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
