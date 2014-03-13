@@ -33,188 +33,103 @@ const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh(
 
 double MeshShape::getVolume() const
 {
-	return m_T0;
+	return m_volume;
 }
 
 SurgSim::Math::Vector3d MeshShape::getCenter() const
 {
-	return Vector3d(m_T1[0] / m_T0, m_T1[1] / m_T0, m_T1[2] / m_T0);
+	return m_center;
 }
 
 SurgSim::Math::Matrix33d MeshShape::getSecondMomentOfVolume() const
 {
-	Matrix33d secondMoment;
-	const Vector3d& r = getCenter();
-	const double volume = getVolume();
-
-	secondMoment(0, 0) = (m_T2[1] + m_T2[2]);
-	secondMoment(1, 1) = (m_T2[2] + m_T2[0]);
-	secondMoment(2, 2) = (m_T2[0] + m_T2[1]);
-	secondMoment(0, 1) = secondMoment(1, 0) = - m_TP[0];
-	secondMoment(1, 2) = secondMoment(2, 1) = - m_TP[1];
-	secondMoment(2, 0) = secondMoment(0, 2) = - m_TP[2];
-
-	// translate tensor to center
-	secondMoment(0, 0) -= volume * (r[1]*r[1] + r[0]*r[0]);
-	secondMoment(1, 1) -= volume * (r[2]*r[2] + r[0]*r[0]);
-	secondMoment(2, 2) -= volume * (r[0]*r[0] + r[1]*r[1]);
-	secondMoment(0, 1) = secondMoment(1, 0) += volume * r[0] * r[1];
-	secondMoment(1, 2) = secondMoment(2, 1) += volume * r[1] * r[2];
-	secondMoment(2, 0) = secondMoment(0, 2) += volume * r[2] * r[0];
-
-	return secondMoment;
+	return m_secondMomentOfVolume;
 }
 
-void MeshShape::computeProjectionIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face)
+namespace
 {
-	double a0, a1, da;
-	double b0, b1, db;
-	double a0_2, a0_3, a0_4, b0_2, b0_3, b0_4;
-	double a1_2, a1_3, b1_2, b1_3;
-	double C1, Ca, Caa, Caaa, Cb, Cbb, Cbbb;
-	double Cab, Kab, Caab, Kaab, Cabb, Kabb;
-	int i;
-
-	m_P1 = m_Pa = m_Pb = m_Paa = m_Pab = m_Pbb = m_Paaa = m_Paab = m_Pabb = m_Pbbb = 0.0;
-
-	for (i = 0; i < 3; i++)
-	{
-		a0 = m_mesh->getVertexPosition(face.verticesId[i])[m_alpha];
-		b0 = m_mesh->getVertexPosition(face.verticesId[i])[m_beta];
-		a1 = m_mesh->getVertexPosition(face.verticesId[(i+1) % 3])[m_alpha];
-		b1 = m_mesh->getVertexPosition(face.verticesId[(i+1) % 3])[m_beta];
-		da = a1 - a0;
-		db = b1 - b0;
-		a0_2 = a0 * a0; a0_3 = a0_2 * a0; a0_4 = a0_3 * a0;
-		b0_2 = b0 * b0; b0_3 = b0_2 * b0; b0_4 = b0_3 * b0;
-		a1_2 = a1 * a1; a1_3 = a1_2 * a1;
-		b1_2 = b1 * b1; b1_3 = b1_2 * b1;
-
-		C1 = a1 + a0;
-		Ca = a1*C1 + a0_2; Caa = a1*Ca + a0_3; Caaa = a1*Caa + a0_4;
-		Cb = b1*(b1 + b0) + b0_2; Cbb = b1*Cb + b0_3; Cbbb = b1*Cbb + b0_4;
-		Cab = 3*a1_2 + 2*a1*a0 + a0_2; Kab = a1_2 + 2*a1*a0 + 3*a0_2;
-		Caab = a0*Cab + 4*a1_3; Kaab = a1*Kab + 4*a0_3;
-		Cabb = 4*b1_3 + 3*b1_2*b0 + 2*b1*b0_2 + b0_3;
-		Kabb = b1_3 + 2*b1_2*b0 + 3*b1*b0_2 + 4*b0_3;
-
-		m_P1 += db*C1;
-		m_Pa += db*Ca;
-		m_Paa += db*Caa;
-		m_Paaa += db*Caaa;
-		m_Pb += da*Cb;
-		m_Pbb += da*Cbb;
-		m_Pbbb += da*Cbbb;
-		m_Pab += db*(b1*Cab + b0*Kab);
-		m_Paab += db*(b1*Caab + b0*Kaab);
-		m_Pabb += da*(a1*Cabb + a0*Kabb);
-	}
-
-	m_P1 /= 2.0;
-	m_Pa /= 6.0;
-	m_Paa /= 12.0;
-	m_Paaa /= 20.0;
-	m_Pb /= -6.0;
-	m_Pbb /= -12.0;
-	m_Pbbb /= -20.0;
-	m_Pab /= 24.0;
-	m_Paab /= 60.0;
-	m_Pabb /= -60.0;
-}
-
-void MeshShape::computeFaceIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face)
+/// Compute various integral terms
+/// \note Please refer to http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
+/// \note for details about parameters
+void computeIntegralTerms(const double w0, const double w1, const double w2,
+									 double* f1, double* f2, double* f3, double* g0, double* g1, double* g2)
 {
-	double k1, k2, k3, k4;
-
-	computeProjectionIntegrals(face);
-
-	const Vector3d& ptA = m_mesh->getVertexPosition(face.verticesId[0]);
-	const Vector3d& ptB = m_mesh->getVertexPosition(face.verticesId[1]);
-	const Vector3d& ptC = m_mesh->getVertexPosition(face.verticesId[2]);
-	Vector3d n = (ptB - ptA).cross(ptC - ptA);
-	n.normalize();
-	double w = -ptA.dot(n);
-
-	const double alpha_squared = n[m_alpha] * n[m_alpha];
-	const double alpha_cubed = alpha_squared * n[m_alpha];
-	const double beta_squared = n[m_beta] * n[m_beta];
-	const double beta_cubed = beta_squared * n[m_beta];
-
-	k1 = 1 / n[m_gamma]; k2 = k1 * k1; k3 = k2 * k1; k4 = k3 * k1;
-
-	m_Fa = k1 * m_Pa;
-	m_Fb = k1 * m_Pb;
-	m_Fc = -k2 * (n[m_alpha]*m_Pa + n[m_beta]*m_Pb + w*m_P1);
-
-	m_Faa = k1 * m_Paa;
-	m_Fbb = k1 * m_Pbb;
-	m_Fcc = k3 * (alpha_squared*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
-				  + beta_squared*m_Pbb + w*(2*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
-
-	m_Faaa = k1 * m_Paaa;
-	m_Fbbb = k1 * m_Pbbb;
-	m_Fccc = -k4 * (alpha_cubed*m_Paaa + 3*alpha_squared*n[m_beta]*m_Paab
-					+ 3*n[m_alpha]*beta_squared*m_Pabb + beta_cubed*m_Pbbb
-					+ 3*w*(alpha_squared*m_Paa + 2*n[m_alpha]*n[m_beta]*m_Pab
-						   + beta_squared*m_Pbb)
-					+ w*w*(3*(n[m_alpha]*m_Pa + n[m_beta]*m_Pb) + w*m_P1));
-
-	m_Faab = k1 * m_Paab;
-	m_Fbbc = -k2 * (n[m_alpha]*m_Pabb + n[m_beta]*m_Pbbb + w*m_Pbb);
-	m_Fcca = k3 * (alpha_squared*m_Paaa + 2*n[m_alpha]*n[m_beta]*m_Paab
-				   + beta_squared*m_Pabb
-				   + w*(2*(n[m_alpha]*m_Paa + n[m_beta]*m_Pab) + w*m_Pa));
+	double temp0 = w0 + w1;
+	double temp1 = w0 * w0;
+	double temp2 = temp1 + w1 * temp0;
+	*f1 = temp0 + w2;
+	*f2 = temp2 + w2 * (*f1);
+	*f3 = w0 * temp1 + w1 * temp2 + w2 * (*f2);
+	*g0 = (*f2) + w0 * ((*f1) + w0);
+	*g1 = (*f2) + w1 * ((*f1) + w1);
+	*g2 = (*f2) + w2 * ((*f1) + w2);
 }
+};
 
 void MeshShape::computeVolumeIntegrals()
 {
-	double nx, ny, nz;
+	Eigen::VectorXd multiplier(10);
+	multiplier << 1.0 / 6.0, 1.0 / 24.0, 1.0 / 24.0, 1.0 / 24.0, 1.0 / 60.0, 1.0 / 60.0, 1.0 / 60.0,
+		1.0 / 120.0, 1.0 / 120.0, 1.0 / 120.0;
 
-	m_T0 = m_T1[0] = m_T1[1] = m_T1[2]
-		= m_T2[0] = m_T2[1] = m_T2[2]
-		= m_TP[0] = m_TP[1] = m_TP[2] = 0.0;
+	Eigen::VectorXd integral(10); // integral order: 1, x, y, z, x^2, y^2, z^2, xy, yz, zx
+	integral.setZero();
 
-	for (size_t i = 0; i < m_mesh->getNumTriangles(); i++)
+	for (size_t t = 0; t < m_mesh->getNumTriangles(); t++)
 	{
-		const SurgSim::DataStructures::TriangleMesh::TriangleType* f = &m_mesh->getTriangle(i);
+		// get vertices of triangle t
+		const Vector3d& v0 = m_mesh->getVertexPosition(m_mesh->getTriangle(t).verticesId[0]);
+		const Vector3d& v1 = m_mesh->getVertexPosition(m_mesh->getTriangle(t).verticesId[1]);
+		const Vector3d& v2 = m_mesh->getVertexPosition(m_mesh->getTriangle(t).verticesId[2]);
 
-		const Vector3d& ptA = m_mesh->getVertexPosition(f->verticesId[0]);
-		const Vector3d& ptB = m_mesh->getVertexPosition(f->verticesId[1]);
-		const Vector3d& ptC = m_mesh->getVertexPosition(f->verticesId[2]);
-		Vector3d n = (ptB - ptA).cross(ptC - ptA);
-		n.normalize();
-		nx = fabs(n[0]);
-		ny = fabs(n[1]);
-		nz = fabs(n[2]);
-		if (nx > ny && nx > nz)
-		{
-			m_gamma = 0;
-		}
-		else
-		{
-			m_gamma = (ny > nz) ? 1 : 2;
-		}
-		m_alpha = (m_gamma + 1) % 3;
-		m_beta = (m_alpha + 1) % 3;
+		// get edges and cross product of edges
+		Vector3d normal = (v1 - v0).cross(v2 - v0);
 
-		computeFaceIntegrals(*f);
+		// compute integral terms
+		double f1x, f1y, f1z, f2x, f2y, f2z, f3x, f3y, f3z;
+		double g0x, g0y, g0z, g1x, g1y, g1z, g2x, g2y, g2z;
+		computeIntegralTerms(v0.x(), v1.x(), v2.x(), &f1x, &f2x, &f3x, &g0x, &g1x, &g2x);
+		computeIntegralTerms(v0.y(), v1.y(), v2.y(), &f1y, &f2y, &f3y, &g0y, &g1y, &g2y);
+		computeIntegralTerms(v0.z(), v1.z(), v2.z(), &f1z, &f2z, &f3z, &g0z, &g1z, &g2z);
 
-		m_T0 += n[0] * ((m_alpha == 0) ? m_Fa : ((m_beta == 0) ? m_Fb : m_Fc));
-
-		m_T1[m_alpha] += n[m_alpha] * m_Faa;
-		m_T1[m_beta] += n[m_beta] * m_Fbb;
-		m_T1[m_gamma] += n[m_gamma] * m_Fcc;
-		m_T2[m_alpha] += n[m_alpha] * m_Faaa;
-		m_T2[m_beta] += n[m_beta] * m_Fbbb;
-		m_T2[m_gamma] += n[m_gamma] * m_Fccc;
-		m_TP[m_alpha] += n[m_alpha] * m_Faab;
-		m_TP[m_beta] += n[m_beta] * m_Fbbc;
-		m_TP[m_gamma] += n[m_gamma] * m_Fcca;
+		// update integrals
+		integral[0] += normal[0] * f1x;
+		integral[1] += normal[0] * f2x;
+		integral[2] += normal[1] * f2y;
+		integral[3] += normal[2] * f2z;
+		integral[4] += normal[0] * f3x;
+		integral[5] += normal[1] * f3y;
+		integral[6] += normal[2] * f3z;
+		integral[7] += normal[0] * (v0.y() * g0x + v1.y() * g1x + v2.y() * g2x);
+		integral[8] += normal[1] * (v0.z() * g0y + v1.z() * g1y + v2.z() * g2y);
+		integral[9] += normal[2] * (v0.x() * g0z + v1.x() * g1z + v2.x() * g2z);
 	}
+	integral = integral.cwiseProduct(multiplier);
 
-	m_T1[0] /= 2; m_T1[1] /= 2; m_T1[2] /= 2;
-	m_T2[0] /= 3; m_T2[1] /= 3; m_T2[2] /= 3;
-	m_TP[0] /= 2; m_TP[1] /= 2; m_TP[2] /= 2;
+	// volume
+	m_volume = integral[0];
+	// Test the volume validity
+	SURGSIM_ASSERT(m_volume > 0.0) << "A MeshShape cannot have a negative or null volume, we found V = " << m_volume;
+
+	// center of mass
+	m_center = integral.segment(1, 3) / m_volume;
+
+	// inertia tensor relative to center of mass
+	Vector3d centerSquared = m_center.cwiseProduct(m_center);
+	m_secondMomentOfVolume(0, 0) = integral[5] + integral[6] - m_volume * (centerSquared.y() + centerSquared.z());
+	m_secondMomentOfVolume(1, 1) = integral[4] + integral[6] - m_volume * (centerSquared.z() + centerSquared.x());
+	m_secondMomentOfVolume(2, 2) = integral[4] + integral[5] - m_volume * (centerSquared.x() + centerSquared.y());
+	m_secondMomentOfVolume(0, 1) = -(integral[7] - m_volume * m_center.x() * m_center.y());
+	m_secondMomentOfVolume(1, 0) = m_secondMomentOfVolume(0, 1);
+	m_secondMomentOfVolume(1, 2) = -(integral[8] - m_volume * m_center.y() * m_center.z());
+	m_secondMomentOfVolume(2, 1) = m_secondMomentOfVolume(1, 2);
+	m_secondMomentOfVolume(0, 2) = -(integral[9] - m_volume * m_center.z() * m_center.x());
+	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
+	// Test the second moment of volume validity
+	// The diagonal element should all be positive
+	SURGSIM_ASSERT(m_secondMomentOfVolume.diagonal().minCoeff() > 0.0) <<
+		"A MeshShape cannot have a second moment of volume (used to compute the inertia matrix)" <<
+		" with negative or null diagonal elements, we found" << std::endl << m_secondMomentOfVolume;
 }
 
 std::string MeshShape::getClassName()

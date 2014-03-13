@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Parts of the code in this file are based on research and
-// public-domain code by Brian Mirtich.
-// (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
-
+// This code is based on David Eberly's paper:
+// http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
+// which is improving Brian Mirtich previous work (http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html)
+// by making the assumption that the polyhedral mesh is composed of triangles.
 
 #ifndef SURGSIM_MATH_MESHSHAPE_H
 #define SURGSIM_MATH_MESHSHAPE_H
@@ -27,8 +27,6 @@
 #include "SurgSim/Framework/Convert.h"
 #include "SurgSim/Math/Shape.h"
 
-
-
 namespace SurgSim
 {
 
@@ -36,14 +34,15 @@ namespace Math
 {
 
 /// Mesh shape: shape made of a triangle mesh
-/// Various physical properties are computed from the triangle mesh using
-/// work by Brian Mirtich.
-/// http://www.cs.berkeley.edu/~jfc/mirtich/massProps.html
+/// Various geometrical properties are computed from the triangle mesh using
+/// David Eberly's work:
+/// http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
 class MeshShape : public Shape
 {
 public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
+	/// \exception Raise an exception if the mesh is invalid or empty
 	template <class VertexData, class EdgeData, class TriangleData>
 	explicit MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh);
 
@@ -72,30 +71,20 @@ public:
 
 private:
 
-	/// Compute various integrations over projection of face
-	/// \param face A triangle
-	void computeProjectionIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face);
-
-	/// Compute various integrations on a face
-	/// \param face A triangle
-	void computeFaceIntegrals(const SurgSim::DataStructures::TriangleMesh::TriangleType& face);
-
-	/// Compute various volume integrals over the triangle mesh
+	/// Compute useful volume integrals based on the triangle mesh, which
+	/// are used to get the volume , center and second moment of volume.
+	/// \exception Raise an exception if the volume is negative or null
+	/// \exception or if the second moment of volume is invalid (contains negative diagonal element)
 	void computeVolumeIntegrals();
 
-	/// Data structure from Brian Mirtich
-	int m_alpha;
-	int m_beta;
-	int m_gamma;
+	/// Center (considering a uniform distribution in the mesh volume)
+	SurgSim::Math::Vector3d m_center;
 
-	//// projection integrals (Data structure from Brian Mirtich)
-	double m_P1, m_Pa, m_Pb, m_Paa, m_Pab, m_Pbb, m_Paaa, m_Paab, m_Pabb, m_Pbbb;
+	/// Volume (in m^-3)
+	double m_volume;
 
-	/// face integrals (Data structure from Brian Mirtich)
-	double m_Fa, m_Fb, m_Fc, m_Faa, m_Fbb, m_Fcc, m_Faaa, m_Fbbb, m_Fccc, m_Faab, m_Fbbc, m_Fcca;
-
-	/// volume integrals (Data structure from Brian Mirtich)
-	double m_T0, m_T1[3], m_T2[3], m_TP[3];
+	/// Second moment of volume
+	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
 	/// Collision mesh associated to this MeshShape
 	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
