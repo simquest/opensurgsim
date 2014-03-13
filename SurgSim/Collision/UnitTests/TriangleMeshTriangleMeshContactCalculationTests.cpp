@@ -219,46 +219,48 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 }
 
-void addNewTriangle(std::shared_ptr<SurgSim::Math::MeshShape::TriMesh> mesh, SurgSim::Math::Vector3d point0,
-					SurgSim::Math::Vector3d point1, SurgSim::Math::Vector3d point2)
+
+void addNewTriangle(std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> mesh,
+					SurgSim::Math::Vector3d point0, SurgSim::Math::Vector3d point1, SurgSim::Math::Vector3d point2)
 {
-	using SurgSim::Math::MeshShape;
-	static const MeshShape::EmptyData emptyData;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
+
+	static const EmptyData emptyData;
 
 	// Add vertices
-	MeshShape::TriMesh::VertexType vertexMesh(Vector3d::Zero(), emptyData);
+	TriangleMesh::VertexType vertexMesh(Vector3d::Zero(), emptyData);
 
-	vertexMesh = MeshShape::TriMesh::VertexType(point0, emptyData);
+	vertexMesh = TriangleMesh::VertexType(point0, emptyData);
 	unsigned int index0 = mesh->addVertex(vertexMesh);
 
-	vertexMesh = MeshShape::TriMesh::VertexType(point1, emptyData);
+	vertexMesh = TriangleMesh::VertexType(point1, emptyData);
 	unsigned int index1 = mesh->addVertex(vertexMesh);
 
-	vertexMesh = MeshShape::TriMesh::VertexType(point2, emptyData);
+	vertexMesh = TriangleMesh::VertexType(point2, emptyData);
 	unsigned int index2 = mesh->addVertex(vertexMesh);
 
 	// Add edges
 	std::array<unsigned int, 2> edge;
-	MeshShape::TriMesh::EdgeType meshEdge(edge, emptyData);
+	TriangleMesh::EdgeType meshEdge(edge, emptyData);
 
 	edge[0] = index0;
 	edge[1] = index1;
-	meshEdge = MeshShape::TriMesh::EdgeType(edge, emptyData);
+	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
 	mesh->addEdge(meshEdge);
 
 	edge[0] = index1;
 	edge[1] = index2;
-	meshEdge = MeshShape::TriMesh::EdgeType(edge, emptyData);
+	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
 	mesh->addEdge(meshEdge);
 
 	edge[0] = index2;
 	edge[1] = index0;
-	meshEdge = MeshShape::TriMesh::EdgeType(edge, emptyData);
+	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
 	mesh->addEdge(meshEdge);
 
 	// Add triangle
 	std::array<unsigned int, 3> triangle = {index0, index1, index2};
-	MeshShape::TriMesh::TriangleType meshTriangle(triangle, emptyData);
+	TriangleMesh::TriangleType meshTriangle(triangle, emptyData);
 	mesh->addTriangle(meshTriangle);
 }
 
@@ -268,8 +270,10 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 	using SurgSim::Math::Vector3d;
 	using SurgSim::Math::RigidTransform3d;
 
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
+	
 	{
-		auto baseTriangles = std::make_shared<MeshShape::TriMesh>();
+		auto baseTriangles = std::make_shared<TriangleMesh>();
 		static const int numTriangles = 100;
 
 		std::list<std::shared_ptr<Contact>> expectedContacts;
@@ -305,12 +309,12 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 				expectedContacts.push_back(contact);
 			}
 		}
-		auto baseMesh = std::make_shared<MeshShape>(baseTriangles);
+		auto baseMesh = std::make_shared<MeshShape>(*baseTriangles);
 
-		auto intersectingTriangle = std::make_shared<MeshShape::TriMesh>();
+		auto intersectingTriangle = std::make_shared<TriangleMesh>();
 		addNewTriangle(intersectingTriangle, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 1.0),
 					   Vector3d(1.0, 0.0, 0.5));
-		auto triangleMesh = std::make_shared<MeshShape>(intersectingTriangle);
+		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
 
 		// Looking in -y, triangle A points in +y, +z is left, +x is down
 		//                     |-------| => k
