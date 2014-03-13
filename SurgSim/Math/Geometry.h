@@ -1518,7 +1518,7 @@ void intersectionsSegmentBox(
 /// \param [out] depth The depth of penetration.
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
-/// \param [out] normal The contact normal that points from triangle0 to triangle1.
+/// \param [out] normal The contact normal that points from triangle1 to triangle0.
 /// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
 /// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
@@ -1912,7 +1912,7 @@ bool calculateContactTriangleTriangle(
 /// \param [out] depth The depth of penetration.
 /// \param [out] penetrationPoint0 The contact point on triangle0 (t0v0,t0v1,t0v2).
 /// \param [out] penetrationPoint1 The contact point on triangle1 (t1v0,t1v1,t1v2).
-/// \param [out] normal The contact normal that points from triangle0 to triangle1.
+/// \param [out] normal The contact normal that points from triangle1 to triangle0.
 /// \return True, if intersection is detected.
 /// \note The [out] params are not modified if there is no intersection.
 /// \note If penetrationPoint0 is moved by -(nomal*depth*0.5) and penetrationPoint1 is moved by (nomal*depth*0.5), the
