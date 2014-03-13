@@ -171,7 +171,7 @@ std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidT
 	sceneryRepresentation->setInitialPose(pose);
 
 	// MeshShape collision representation of the arm.
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(delegate->getMesh()); // Unit: meter
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
