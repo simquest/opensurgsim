@@ -42,7 +42,7 @@ class MeshShape : public Shape
 public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
-	/// \exception Raise an exception if the mesh is invalid or empty
+	/// \exception Raise an exception if the mesh is invalid
 	template <class VertexData, class EdgeData, class TriangleData>
 	explicit MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh);
 
@@ -73,8 +73,6 @@ private:
 
 	/// Compute useful volume integrals based on the triangle mesh, which
 	/// are used to get the volume , center and second moment of volume.
-	/// \exception Raise an exception if the volume is negative or null
-	/// \exception or if the second moment of volume is invalid (contains negative diagonal element)
 	void computeVolumeIntegrals();
 
 	/// Center (considering a uniform distribution in the mesh volume)

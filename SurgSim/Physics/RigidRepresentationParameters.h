@@ -272,8 +272,8 @@ private:
 	bool checkValidity() const
 	{
 		using SurgSim::Math::isValid;
-		if (isValid(m_localInertia) && ! m_localInertia.isZero() &&
-			isValid(m_mass) && m_mass != 0.0)
+		if (isValid(m_localInertia) && ! m_localInertia.isZero() && m_localInertia.diagonal().minCoeff() > 0.0 &&
+			isValid(m_mass) && m_mass > 0.0)
 		{
 			return true;
 		}

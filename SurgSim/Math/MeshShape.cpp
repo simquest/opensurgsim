@@ -108,13 +108,18 @@ void MeshShape::computeVolumeIntegrals()
 
 	// volume
 	m_volume = integral[0];
-	// Test the volume validity
-	SURGSIM_ASSERT(m_volume > 0.0) << "A MeshShape cannot have a negative or null volume, we found V = " << m_volume;
 
 	// center of mass
-	m_center = integral.segment(1, 3) / m_volume;
+	if (m_volume != 0.0)
+	{
+		m_center = integral.segment(1, 3) / m_volume;
+	}
+	else
+	{
+		m_center.setZero();
+	}
 
-	// inertia tensor relative to center of mass
+	// second moment of volume relative to center
 	Vector3d centerSquared = m_center.cwiseProduct(m_center);
 	m_secondMomentOfVolume(0, 0) = integral[5] + integral[6] - m_volume * (centerSquared.y() + centerSquared.z());
 	m_secondMomentOfVolume(1, 1) = integral[4] + integral[6] - m_volume * (centerSquared.z() + centerSquared.x());
@@ -125,11 +130,6 @@ void MeshShape::computeVolumeIntegrals()
 	m_secondMomentOfVolume(2, 1) = m_secondMomentOfVolume(1, 2);
 	m_secondMomentOfVolume(0, 2) = -(integral[9] - m_volume * m_center.z() * m_center.x());
 	m_secondMomentOfVolume(2, 0) = m_secondMomentOfVolume(0, 2);
-	// Test the second moment of volume validity
-	// The diagonal element should all be positive
-	SURGSIM_ASSERT(m_secondMomentOfVolume.diagonal().minCoeff() > 0.0) <<
-		"A MeshShape cannot have a second moment of volume (used to compute the inertia matrix)" <<
-		" with negative or null diagonal elements, we found" << std::endl << m_secondMomentOfVolume;
 }
 
 std::string MeshShape::getClassName()
