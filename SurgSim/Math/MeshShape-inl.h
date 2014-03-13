@@ -25,10 +25,13 @@ namespace Math
 template <class VertexData, class EdgeData, class TriangleData>
 MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh)
 {
+	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
+
 	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
+
+	// If the mesh is empty, the following method will raise an exception because it will find a null volume
 	computeVolumeIntegrals();
 }
-
 
 }; // namespace Math
 }; // namespace SurgSim
