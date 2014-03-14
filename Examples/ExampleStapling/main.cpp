@@ -267,6 +267,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 		transferPhysicsPoseToGraphics->setPoseSender(physicsRepresentation);
 		transferPhysicsPoseToGraphics->setPoseReceiver(*it);
 
+		(*it)->setInitialPose(pose);
 		sceneElement->addComponent(*it);
 		sceneElement->addComponent(transferPhysicsPoseToGraphics);
 	}
@@ -291,14 +292,10 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	Matrix33d rotationX = makeRotationMatrix(M_PI_2, Vector3d(1.0, 0.0, 0.0));
-	Matrix33d rotationY = makeRotationMatrix(M_PI_4, Vector3d(0.0, 1.0, 0.0));
-	RigidTransform3d alignedPose = makeRigidTransform(pose.linear() * rotationY * rotationX, pose.translation());
-
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(armName + "Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(alignedPose);
+	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
