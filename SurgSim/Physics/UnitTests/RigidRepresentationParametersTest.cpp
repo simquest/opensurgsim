@@ -44,7 +44,7 @@ public:
 		m_id33.setIdentity();
 		m_zero33.setZero();
 		m_invalidInertia.setRandom();
-		m_invalidInertia = m_invalidInertia + m_invalidInertia.transpose(); // make symmetric
+		m_invalidInertia = m_invalidInertia + m_invalidInertia.transpose().eval(); // make symmetric
 		m_invalidInertia(0, 0) = -12.3; // Negative value on hte diagonal (invalid)
 		m_sphere = std::make_shared<SphereShape>(m_radius);
 	}
