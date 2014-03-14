@@ -42,7 +42,6 @@
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/Math/SphereShape.h"
 #include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
@@ -71,7 +70,7 @@ using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::MeshShape;
-using SurgSim::Math::SphereShape;
+using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
@@ -210,12 +209,16 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 														const std::string& deviceName,
 														SurgSim::Math::RigidTransform3d pose)
 {
-	// Since there is no collision mesh loader yet, use a sphere shape as the collision representation of the stapler at
-	// the tip of the stapler.
-	std::shared_ptr<SphereShape> sphereShape = std::make_shared<SphereShape>(0.02); // Unit: meter
+	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+	PlyReader reader("Data/Geometry/stapler_collision.ply");
+	reader.setDelegate(delegate);
+	reader.parseFile();
+
+	// Stapler collision mesh
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
-	params.setShapeUsedForMassInertia(sphereShape);
+	params.setShapeUsedForMassInertia(meshShape);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation =
 		std::make_shared<RigidRepresentation>(staplerName + "Physics");
@@ -233,9 +236,9 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
-	inputVTC->setAngularDamping(params.getMass() * 10e-2);
-	inputVTC->setAngularStiffness(params.getMass() * 50.0);
-	inputVTC->setLinearDamping(params.getMass() * 10.0);
+	inputVTC->setAngularDamping(params.getMass() * 25e-2);
+	inputVTC->setAngularStiffness(params.getMass() * 10.0);
+	inputVTC->setLinearDamping(params.getMass() * 25);
 	inputVTC->setLinearStiffness(params.getMass() * 800.0);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
@@ -264,6 +267,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 		transferPhysicsPoseToGraphics->setPoseSender(physicsRepresentation);
 		transferPhysicsPoseToGraphics->setPoseReceiver(*it);
 
+		(*it)->setInitialPose(pose);
 		sceneElement->addComponent(*it);
 		sceneElement->addComponent(transferPhysicsPoseToGraphics);
 	}
@@ -273,7 +277,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, const RigidTransform3d& pose)
 {
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader("Data/Collision/arm_collision.ply");
+	PlyReader reader("Data/Geometry/arm_collision.ply");
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
@@ -283,19 +287,15 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	sceneryRepresentation->setInitialPose(pose);
 
 	// MeshShape collision representation of the arm.
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(1062); // Average human body density  (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	Matrix33d rotationX = makeRotationMatrix(M_PI_2, Vector3d(1.0, 0.0, 0.0));
-	Matrix33d rotationY = makeRotationMatrix(M_PI_4, Vector3d(0.0, 1.0, 0.0));
-	RigidTransform3d alignedPose = makeRigidTransform(pose.linear() * rotationY * rotationX, pose.translation());
-
 	std::shared_ptr<FixedRepresentation> physicsRepresentation =
 		std::make_shared<FixedRepresentation>(armName + "Physics");
 	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(alignedPose);
+	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
