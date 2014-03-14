@@ -34,6 +34,7 @@ set(SURGSIM_MATH_SOURCES
 	PlaneShape.cpp
 	Shape.cpp
 	SphereShape.cpp
+	SurfaceMeshShape.cpp
 )
 
 set(SURGSIM_MATH_HEADERS
@@ -73,6 +74,8 @@ set(SURGSIM_MATH_HEADERS
 	Shape.h
 	Shapes.h
 	SphereShape.h
+	SurfaceMeshShape.h
+	SurfaceMeshShape-inl.h
 	Valid.h
 	Valid-inl.h
 	Vector.h

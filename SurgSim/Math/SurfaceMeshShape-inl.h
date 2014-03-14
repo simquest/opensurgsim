@@ -12,19 +12,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 
-#ifndef SURGSIM_MATH_SHAPES_H
-#define SURGSIM_MATH_SHAPES_H
+#ifndef SURGSIM_MATH_SURFACEMESHSHAPE_INL_H
+#define SURGSIM_MATH_SURFACEMESHSHAPE_INL_H
 
-/// This file includes all the shapes
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/CapsuleShape.h"
-#include "SurgSim/Math/CylinderShape.h"
-#include "SurgSim/Math/DoubleSidedPlaneShape.h"
-#include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/Math/PlaneShape.h"
-#include "SurgSim/Math/OctreeShape.h"
-#include "SurgSim/Math/SphereShape.h"
-#include "SurgSim/Math/SurfaceMeshShape.h"
+namespace SurgSim
+{
+namespace Math
+{
 
-#endif // SURGSIM_MATH_SHAPES_H
+template <class VertexData, class EdgeData, class TriangleData>
+SurfaceMeshShape::SurfaceMeshShape(
+	const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh,
+	double thickness) : m_thickness(thickness)
+{
+	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
+
+	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
+
+	computeVolumeIntegrals();
+}
+
+}; // namespace Math
+}; // namespace SurgSim
+
+#endif // SURGSIM_MATH_SURFACEMESHSHAPE_INL_H
