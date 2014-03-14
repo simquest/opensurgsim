@@ -27,5 +27,7 @@
 #include "SurgSim/Collision/SphereSphereDcdContact.h"
 #include "SurgSim/Collision/SphereDoubleSidedPlaneDcdContact.h"
 #include "SurgSim/Collision/SpherePlaneDcdContact.h"
+#include "SurgSim/Collision/TriangleMeshPlaneDcdContact.h"
+#include "SurgSim/Collision/TriangleMeshTriangleMeshDcdContact.h"
 
 #endif // SURGSIM_COLLISION_DCDCOLLISION_H

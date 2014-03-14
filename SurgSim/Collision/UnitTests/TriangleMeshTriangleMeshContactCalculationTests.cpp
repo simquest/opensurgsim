@@ -219,5 +219,143 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, NonintersectionTest)
 	}
 }
 
+
+void addNewTriangle(std::shared_ptr<SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData>> mesh,
+					SurgSim::Math::Vector3d point0, SurgSim::Math::Vector3d point1, SurgSim::Math::Vector3d point2)
+{
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
+
+	static const EmptyData emptyData;
+
+	// Add vertices
+	TriangleMesh::VertexType vertexMesh(Vector3d::Zero(), emptyData);
+
+	vertexMesh = TriangleMesh::VertexType(point0, emptyData);
+	unsigned int index0 = mesh->addVertex(vertexMesh);
+
+	vertexMesh = TriangleMesh::VertexType(point1, emptyData);
+	unsigned int index1 = mesh->addVertex(vertexMesh);
+
+	vertexMesh = TriangleMesh::VertexType(point2, emptyData);
+	unsigned int index2 = mesh->addVertex(vertexMesh);
+
+	// Add edges
+	std::array<unsigned int, 2> edge;
+	TriangleMesh::EdgeType meshEdge(edge, emptyData);
+
+	edge[0] = index0;
+	edge[1] = index1;
+	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
+	mesh->addEdge(meshEdge);
+
+	edge[0] = index1;
+	edge[1] = index2;
+	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
+	mesh->addEdge(meshEdge);
+
+	edge[0] = index2;
+	edge[1] = index0;
+	meshEdge = TriangleMesh::EdgeType(edge, emptyData);
+	mesh->addEdge(meshEdge);
+
+	// Add triangle
+	std::array<unsigned int, 3> triangle = {index0, index1, index2};
+	TriangleMesh::TriangleType meshTriangle(triangle, emptyData);
+	mesh->addTriangle(meshTriangle);
+}
+
+TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
+{
+	using SurgSim::Math::MeshShape;
+	using SurgSim::Math::Vector3d;
+	using SurgSim::Math::RigidTransform3d;
+
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
+
+	{
+		auto baseTriangles = std::make_shared<TriangleMesh>();
+		static const int numTriangles = 100;
+
+		std::list<std::shared_ptr<Contact>> expectedContacts;
+		double expectedDepth;
+		std::pair<Location, Location> expectedPenetrationPoints;
+		Vector3d expectedPoint0, expectedPoint1;
+		Vector3d expectedNormal, expectedContact;
+		for (int i = 0; i < numTriangles; i++)
+		{
+			addNewTriangle(baseTriangles, Vector3d(0.5, 0.5, static_cast<double>(i) / numTriangles),
+			Vector3d(-0.5, 0.5, static_cast<double>(i) / numTriangles),
+			Vector3d(0.0, -0.5, static_cast<double>(i) / numTriangles));
+			expectedDepth = static_cast<double>(i) / numTriangles;
+			if (expectedDepth > 0.5)
+			{
+				expectedDepth = 0.5;
+				expectedNormal = Vector3d(0,1,0);
+				expectedPoint0 = Vector3d(0,-0.5,static_cast<double>(i) / numTriangles);
+				expectedPoint1 = Vector3d(0,0,static_cast<double>(i) / numTriangles);
+			}
+			else
+			{
+				expectedNormal = Vector3d(0,0,-1);
+				expectedPoint0 = Vector3d(0,0,static_cast<double>(i) / numTriangles);
+				expectedPoint1 = Vector3d(0,0,0);
+			}
+			if (expectedDepth > 0.0)
+			{
+				expectedPenetrationPoints.first.globalPosition.setValue(expectedPoint0);
+				expectedPenetrationPoints.second.globalPosition.setValue(expectedPoint1);
+				auto contact = std::make_shared<Contact>(expectedDepth, expectedContact, expectedNormal,
+														 expectedPenetrationPoints);
+				expectedContacts.push_back(contact);
+			}
+		}
+		auto baseMesh = std::make_shared<MeshShape>(*baseTriangles);
+
+		auto intersectingTriangle = std::make_shared<TriangleMesh>();
+		addNewTriangle(intersectingTriangle, Vector3d(0.0, 0.0, 0.0), Vector3d(0.0, 0.0, 1.0),
+					   Vector3d(1.0, 0.0, 0.5));
+		auto triangleMesh = std::make_shared<MeshShape>(*intersectingTriangle);
+
+		// Looking in -y, triangle A points in +y, +z is left, +x is down
+		//                     |-------| => k
+		//     * * * * * * * * * * * * *  -----
+		//       *             *     *      |
+		//         *           *   *        |   => 2*k on right, 2*(1-k) on left
+		//           *         * *          |
+		//             *       *          -----
+		//               *   *
+		//                 *
+		//
+		// Looking in -z, triangle B points in +z, +y is up, +x is right
+		//    (1) When triangle A sticks sufficiently out of triangle B
+		//        i.e. k >= 1/8 && k <= 7/8
+		//
+		//                 *             -----
+		//               *   *             |   => 1/2
+		//             *       *           |
+		//           *     * * * *       -----
+		//         *               *       |   => 1/2
+		//       *                   *     |
+		//     * * * * * * * * * * * * * -----
+		//                 |-----| => 1/4
+		//
+		//    (2) When triangle A only partially sticks out of triangle B
+		//        i.e. k > 7/8 || k < 1/8
+		//                 *             -----
+		//               *   *             |   => 1/2
+		//             *       *           |
+		//           *     *     *       -----
+		//         *               *       |   => 1/2
+		//       *                   *     |
+		//     * * * * * * * * * * * * * -----
+		//                 |--| => 2k
+		//
+
+		doTriangleMeshTriangleMeshTest(baseMesh, RigidTransform3d::Identity(), triangleMesh,
+									   RigidTransform3d::Identity(), expectedContacts);
+	}
+}
+
+
 }; // namespace Collision
 }; // namespace Surgsim
