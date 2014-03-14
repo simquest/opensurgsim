@@ -29,7 +29,6 @@ MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData,
 
 	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
 
-	// If the mesh is empty, the following method will raise an exception because it will find a null volume
 	computeVolumeIntegrals();
 }
 

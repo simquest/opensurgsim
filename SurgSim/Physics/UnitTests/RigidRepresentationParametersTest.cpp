@@ -43,6 +43,9 @@ public:
 		m_inertia << coef, 0.0, 0.0, 0.0, coef, 0.0, 0.0, 0.0, coef;
 		m_id33.setIdentity();
 		m_zero33.setZero();
+		m_invalidInertia.setRandom();
+		m_invalidInertia = m_invalidInertia + m_invalidInertia.transpose().eval(); // make symmetric
+		m_invalidInertia(0, 0) = -12.3; // Negative value on hte diagonal (invalid)
 		m_sphere = std::make_shared<SphereShape>(m_radius);
 	}
 
@@ -67,6 +70,9 @@ public:
 
 	// Zero matrix 3x3 (for convenience)
 	SurgSim::Math::Matrix33d m_zero33;
+
+	// Invalid inertia matrix
+	SurgSim::Math::Matrix33d m_invalidInertia;
 
 	// SphereShape
 	std::shared_ptr<SphereShape> m_sphere;
@@ -203,6 +209,11 @@ TEST_F(RigidRepresentationParametersTest, ValidityCheckTest)
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
 
 	// Mass invalid (0), inertia valid
+	rigidRepresentationParam->setMass(-10.0);
+	rigidRepresentationParam->setLocalInertia(m_inertia);
+	EXPECT_FALSE(rigidRepresentationParam->isValid());
+
+	// Mass invalid (0), inertia valid
 	rigidRepresentationParam->setMass(0.0);
 	rigidRepresentationParam->setLocalInertia(m_inertia);
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
@@ -210,6 +221,11 @@ TEST_F(RigidRepresentationParametersTest, ValidityCheckTest)
 	// Mass valid, inertia invalid (0)
 	rigidRepresentationParam->setMass(m_mass);
 	rigidRepresentationParam->setLocalInertia(m_zero33);
+	EXPECT_FALSE(rigidRepresentationParam->isValid());
+
+	// Mass valid, inertia invalid (negative value on the diagonal)
+	rigidRepresentationParam->setMass(m_mass);
+	rigidRepresentationParam->setLocalInertia(m_invalidInertia);
 	EXPECT_FALSE(rigidRepresentationParam->isValid());
 
 	// Mass valid, inertia valid
