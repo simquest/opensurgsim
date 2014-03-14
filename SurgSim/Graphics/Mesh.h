@@ -56,6 +56,18 @@ class Mesh : public SurgSim::DataStructures::TriangleMeshBase<VertexData, SurgSi
 					SurgSim::DataStructures::EmptyData>
 {
 public:
+	/// Default constructor
+	Mesh();
+
+	/// Copy constructor
+	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
+	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
+	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
+	/// \param mesh The mesh to be copied from. Vertex, edge and triangle data will be emptied.
+	/// \note: Data of the input mesh, i.e. VertexDataSource, EdgeDataSource and TrianleDataSource will not be copied.
+	template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
+	explicit Mesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh);
+
 	/// Utility function to initialize a mesh with plain data,
 	/// \param	vertices 	An array of vertex coordinates.
 	/// \param	colors   	The colors, the number of colors can be 0 or
@@ -71,9 +83,9 @@ public:
 		const std::vector<unsigned int>& triangles);
 };
 
-
-
 }; // Graphics
 }; // SurgSim
+
+#include "SurgSim/Graphics/Mesh-inl.h"
 
 #endif

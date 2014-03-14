@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /// \file
-/// Definitions of 2x2 and 3x3 rigid-body (isometric) transforms.
+/// Definitions of 2x2 and 3x3 rigid (isometric) transforms.
 
 #ifndef SURGSIM_MATH_RIGIDTRANSFORM_H
 #define SURGSIM_MATH_RIGIDTRANSFORM_H
@@ -29,24 +29,24 @@ namespace SurgSim
 namespace Math
 {
 
-/// A 2D rigid body (isometric) transform, represented as floats.
+/// A 2D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<float,  2, Eigen::Isometry, Eigen::DontAlign>  RigidTransform2f;
 
-/// A 3D rigid body (isometric) transform, represented as floats.
+/// A 3D rigid (isometric) transform, represented as floats.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<float,  3, Eigen::Isometry, Eigen::DontAlign>  RigidTransform3f;
 
-/// A 2D rigid body (isometric) transform, represented as doubles.
+/// A 2D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<double, 2, Eigen::Isometry, Eigen::DontAlign>  RigidTransform2d;
 
-/// A 3D rigid body (isometric) transform, represented as doubles.
+/// A 3D rigid (isometric) transform, represented as doubles.
 /// This type (and any struct that contain it) can be safely allocated via new.
 typedef Eigen::Transform<double, 3, Eigen::Isometry, Eigen::DontAlign>  RigidTransform3d;
 
 
-/// Create a rigid-body transform using the specified rotation matrix and translation.
+/// Create a rigid transform using the specified rotation matrix and translation.
 /// \tparam M the type used to describe the rotation matrix.  Can usually be deduced.
 /// \tparam V the type used to describe the translation vector.  Can usually be deduced.
 /// \param rotation the rotation matrix.
@@ -63,7 +63,7 @@ inline Eigen::Transform<typename M::Scalar, M::RowsAtCompileTime, Eigen::Isometr
 	return rigid;
 }
 
-/// Create a rigid-body transform using the specified rotation quaternion and translation.
+/// Create a rigid transform using the specified rotation quaternion and translation.
 /// \tparam Q the type used to describe the rotation quaternion.  Can usually be deduced.
 /// \tparam V the type used to describe the translation vector.  Can usually be deduced.
 /// \param rotation the rotation quaternion.
@@ -86,7 +86,7 @@ inline Eigen::Transform<typename Q::Scalar, 3, Eigen::Isometry> makeRigidTransfo
 /// http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
 /// \tparam	typename T	T the numeric data type used for arguments and the return value. Can usually be deduced.
 /// \tparam	int VOpt  	VOpt the option flags (alignment etc.) used for the axis vector argument.  Can be deduced.
-/// \param	eye   	The position of the object.
+/// \param	position   	The position of the object.
 /// \param	center	The point to which the object should point.
 /// \param	up	  	The up vector to be used for this calculation.
 /// \return	a RigidTransform that locates the object at position rotated into the direction of center.
@@ -112,6 +112,22 @@ inline Eigen::Transform<T, 3, Eigen::Isometry> makeRigidTransform(
 	rigid.linear() = rotation;
 	rigid.translation() = position;
 
+	return rigid;
+}
+
+/// Create a rigid transform using the identity rotation and the specified translation.
+/// \tparam V the type used to describe the translation vector.  Can usually be deduced.
+/// \param translation the translation vector.
+/// \returns the transform with the identity rotation and the specified translation.
+template <typename V>
+inline Eigen::Transform<typename V::Scalar, V::SizeAtCompileTime, Eigen::Isometry> makeRigidTranslation(
+	const Eigen::MatrixBase<V>& translation)
+{
+	EIGEN_STATIC_ASSERT_VECTOR_ONLY(Eigen::MatrixBase<V>);
+	Eigen::Transform<typename V::Scalar, V::SizeAtCompileTime, Eigen::Isometry> rigid;
+	rigid.makeAffine();
+	rigid.linear().setIdentity();
+	rigid.translation() = translation;
 	return rigid;
 }
 

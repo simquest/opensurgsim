@@ -17,16 +17,25 @@
 #include <memory>
 #include <string>
 
+#include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/DataStructures/EmptyData.h"
+#include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/DataStructures/Vertex.h"
+#include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
 #include "SurgSim/Framework/Runtime.h"
 #include "SurgSim/Framework/Scene.h"
+#include "SurgSim/Graphics/Mesh.h"
 #include "SurgSim/Graphics/OsgManager.h"
+#include "SurgSim/Graphics/OsgMeshRepresentation.h"
+#include "SurgSim/Graphics/OsgPointCloudRepresentation.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Graphics/OsgView.h"
 #include "SurgSim/Graphics/OsgViewElement.h"
@@ -34,6 +43,8 @@
 #include "SurgSim/Input/InputManager.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Physics/Fem3DRepresentation.h"
+#include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
@@ -42,6 +53,8 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::DataStructures::EmptyData;
+using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
@@ -74,6 +87,103 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
+static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
+{
+	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	std::shared_ptr<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate> triangleMeshDelegate
+		= std::make_shared<SurgSim::DataStructures::TriangleMeshPlyReaderDelegate>();
+
+	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
+	reader.parseFile();
+
+	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
+}
+
+static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
+	const std::string& fileName,
+	SurgSim::Math::IntegrationScheme integrationScheme,
+	double massDensity,
+	double poissonRatio,
+	double youngModulus)
+{
+	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
+	SurgSim::DataStructures::PlyReader reader(fileName);
+	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
+		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
+
+	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileName << " is malformed.";
+	reader.parseFile();
+
+	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
+
+	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
+	fem->setIntegrationScheme(integrationScheme);
+
+	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
+	for (size_t i = 0; i < fem->getNumFemElements(); i++)
+	{
+		fem->getFemElement(i)->setMassDensity(massDensity);
+		fem->getFemElement(i)->setPoissonRatio(poissonRatio);
+		fem->getFemElement(i)->setYoungModulus(youngModulus);
+	}
+
+	return fem;
+}
+
+static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
+	const std::string& name,
+	const std::string& filename,
+	SurgSim::Math::IntegrationScheme integrationScheme,
+	double massDensity,
+	double poissonRatio,
+	double youngModulus,
+	bool displayPointCloud)
+{
+	// Create a SceneElement that bundles the pieces associated with the finite element model
+	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
+		= std::make_shared<SurgSim::Framework::BasicSceneElement>(name);
+
+	// Load the tetrahedral mesh and initialize the finite element model
+	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
+		= loadFem(filename, integrationScheme, massDensity, poissonRatio, youngModulus);
+	sceneElement->addComponent(physicsRepresentation);
+
+	// Create a triangle mesh for visualizing the surface of the finite element model
+	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
+		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
+	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh(filename);
+	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
+
+	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
+	sceneElement->addComponent(
+		std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<SurgSim::Graphics::VertexData>>(
+			name + " physics to triangle mesh",
+			physicsRepresentation->getFinalState(),
+			graphicsTriangleMeshRepresentation->getMesh()));
+
+	if (displayPointCloud)
+	{
+		// Create a point-cloud for visualizing the nodes of the finite element model
+		std::shared_ptr<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>> graphicsPointCloudRepresentation
+			= std::make_shared<SurgSim::Graphics::OsgPointCloudRepresentation<EmptyData>>(name + " point cloud");
+		graphicsPointCloudRepresentation->setInitialPose(SurgSim::Math::RigidTransform3d::Identity());
+		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
+		graphicsPointCloudRepresentation->setPointSize(3.0f);
+		graphicsPointCloudRepresentation->setVisible(true);
+		sceneElement->addComponent(graphicsPointCloudRepresentation);
+
+		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
+		sceneElement->addComponent(
+			std::make_shared<SurgSim::Blocks::TransferDeformableStateToVerticesBehavior<EmptyData>>(
+				name + " physics to point cloud",
+				physicsRepresentation->getFinalState(),
+				graphicsPointCloudRepresentation->getVertices()));
+	}
+
+	return sceneElement;
+}
+
 /// Load scenery object from file
 /// \param name Name of this scenery representation.
 /// \param fileName Name of the file from which the scenery representation will be loaded.
@@ -95,7 +205,9 @@ std::shared_ptr<ViewElement> createView()
 	return view;
 }
 
-std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, const std::string& deviceName)
+std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
+														const std::string& deviceName,
+														SurgSim::Math::RigidTransform3d pose)
 {
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
 	PlyReader reader("Data/Geometry/stapler_collision.ply");
@@ -112,6 +224,7 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 		std::make_shared<RigidRepresentation>(staplerName + "Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
+	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
 		std::make_shared<RigidCollisionRepresentation>(staplerName + "Collision");
@@ -160,8 +273,7 @@ std::shared_ptr<SceneElement> createStapler(const std::string& staplerName, cons
 
 	return sceneElement;
 }
-
-std::shared_ptr<SceneElement> createArm(const std::string& armName, const RigidTransform3d& pose)
+std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, const RigidTransform3d& pose)
 {
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
 	PlyReader reader("Data/Geometry/arm_collision.ply");
@@ -215,15 +327,36 @@ int main(int argc, char* argv[])
 	runtime->addManager(inputManager);
 	runtime->addManager(physicsManager);
 
-	std::shared_ptr<DeviceInterface> device = std::make_shared<MultiAxisDevice>(deviceName);
-	SURGSIM_ASSERT(device->initialize() == true) <<
-			"Could not initialize device " << device->getName() << " for the tool.\n";
+	std::shared_ptr<DeviceInterface> device;
+	device = std::make_shared<MultiAxisDevice>(deviceName);
+	if (!device->initialize())
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+			<< "Could not initialize device " << device->getName() << " for the tool.";
+
+		device = std::make_shared<IdentityPoseDevice>(deviceName);
+	}
 	inputManager->addDevice(device);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
 	scene->addSceneElement(createView());
-	scene->addSceneElement(createArm("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0))));
-	scene->addSceneElement(createStapler("stapler", deviceName));
+	scene->addSceneElement(
+		createArmSceneElement("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero())));
+	scene->addSceneElement(createStaplerSceneElement(
+		"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
+
+	// Load the FEM
+	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
+	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
+	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
+	scene->addSceneElement(
+		createFemSceneElement("wound",
+							  woundFilename,
+							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
+							  1000.0,										   // Mass Density
+							  0.45,											   // Poisson Ratio
+							  75e3,											   // Young Modulus
+							  true));										   // Display point cloud
 
 	runtime->execute();
 

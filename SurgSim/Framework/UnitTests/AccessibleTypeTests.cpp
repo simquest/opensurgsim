@@ -50,11 +50,11 @@ public:
 };
 
 typedef ::testing::Types<SurgSim::Math::Vector2d,
-						 SurgSim::Math::Vector2f,
-						 SurgSim::Math::Vector3d,
-						 SurgSim::Math::Vector3f,
-						 SurgSim::Math::Vector4d,
-						 SurgSim::Math::Vector4f> VectorTypes;
+		SurgSim::Math::Vector2f,
+		SurgSim::Math::Vector3d,
+		SurgSim::Math::Vector3f,
+		SurgSim::Math::Vector4d,
+		SurgSim::Math::Vector4f> VectorTypes;
 
 TYPED_TEST_CASE(VectorTest, VectorTypes);
 
@@ -74,10 +74,7 @@ class RigidTransformTest : public BaseTest<typename T::Scalar>
 public:
 	typedef T RigidTransform;
 };
-typedef ::testing::Types<SurgSim::Math::RigidTransform2f,
-						 SurgSim::Math::RigidTransform2d,
-						 SurgSim::Math::RigidTransform3f,
-						 SurgSim::Math::RigidTransform3d> RigidTransformTypes;
+typedef ::testing::Types <SurgSim::Math::RigidTransform3f, SurgSim::Math::RigidTransform3d> RigidTransformTypes;
 
 TYPED_TEST_CASE(RigidTransformTest, RigidTransformTypes);
 
@@ -88,17 +85,24 @@ public:
 	Testable()
 	{
 		setAccessors("property",
-			std::bind(&Testable::getProperty, this),
-			std::bind(&Testable::setProperty, this, std::bind(SurgSim::Framework::convert<T>,std::placeholders::_1)));
+					 std::bind(&Testable::getProperty, this),
+					 std::bind(&Testable::setProperty, this,
+							   std::bind(SurgSim::Framework::convert<T>, std::placeholders::_1)));
 		setSerializable("property",
-			std::bind(&YAML::convert<T>::encode, std::bind(&Testable::getProperty, this)),
-			std::bind(&Testable::setProperty, this, std::bind(&YAML::Node::as<T>,std::placeholders::_1)));
+						std::bind(&YAML::convert<T>::encode, std::bind(&Testable::getProperty, this)),
+						std::bind(&Testable::setProperty, this, std::bind(&YAML::Node::as<T>, std::placeholders::_1)));
 	}
 
 	T property;
 
-	void setProperty(T value) {property = value;}
-	T getProperty() {return property;}
+	void setProperty(T value)
+	{
+		property = value;
+	}
+	T getProperty()
+	{
+		return property;
+	}
 };
 
 template <typename T>
@@ -142,7 +146,7 @@ TYPED_TEST(ScalarTest, Accessible)
 	Scalar initialValue = static_cast<Scalar>(1);
 	Scalar newValue = static_cast<Scalar>(2);
 
-	std::pair<Scalar,Scalar> result = testProperty(initialValue, newValue);
+	std::pair<Scalar, Scalar> result = testProperty(initialValue, newValue);
 	EXPECT_NEAR(newValue, result.first, 1e-6);
 	EXPECT_NEAR(newValue, result.second, 1e-6);
 
@@ -163,7 +167,7 @@ TYPED_TEST(VectorTest, Accessible)
 	for (int i = 0; i < initialValue.size(); ++i)
 	{
 		initialValue[i] = static_cast<Scalar>(i);
-		newValue[i] = static_cast<Scalar>(i*2);
+		newValue[i] = static_cast<Scalar>(i * 2);
 	}
 
 	std::pair<Vector, Vector> result = testProperty<TypeParam >(initialValue, newValue);
@@ -205,18 +209,30 @@ TYPED_TEST(RigidTransformTest, Accessible)
 {
 	typedef typename TestFixture::Scalar Scalar;
 	typedef typename TestFixture::RigidTransform RigidTransform;
+	typedef Eigen::Quaternion<Scalar> Quaternion;
+	typedef Eigen::Matrix<Scalar, 3, 1, Eigen::DontAlign>  Vector3;
 
 	typename RigidTransform::MatrixType initialMatrix;
 	typename RigidTransform::MatrixType newMatrix;
 
-	for (int i = 0; i < initialMatrix.size(); ++i)
+	RigidTransform initialValue;
 	{
-		initialMatrix(i) = static_cast<Scalar>(i);
-		newMatrix(i) = static_cast<Scalar>(i*2);
+		Quaternion quaternion(1.0, 2.0, 3.0, 4.0);
+		quaternion.normalize();
+		Vector3 translation(1.0, 2.0, 3.0);
+
+		initialValue = SurgSim::Math::makeRigidTransform(quaternion, translation);
 	}
 
-	RigidTransform initialValue(initialMatrix);
-	RigidTransform newValue(newMatrix);
+	RigidTransform newValue;
+	{
+		Quaternion quaternion(4.0, 3.0, 2.0, 1.0);
+		quaternion.normalize();
+		Vector3 translation(3.0, 2.0, 1.0);
+
+		newValue = SurgSim::Math::makeRigidTransform(quaternion, translation);
+	}
+
 
 	std::pair<RigidTransform, RigidTransform> result = testProperty<RigidTransform >(initialValue, newValue);
 	EXPECT_TRUE(newValue.isApprox(result.first));

@@ -12,28 +12,38 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
-#define SURGSIM_MATH_MESHSHAPE_INL_H
+#include "SurgSim/Math/MlcpProblem.h"
 
 namespace SurgSim
 {
 namespace Math
 {
 
-template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh)
+MlcpProblem::~MlcpProblem()
 {
-	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
-
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
-
-	// If the mesh is empty, the following method will raise an exception because it will find a null volume
-	computeVolumeIntegrals();
 }
 
-}; // namespace Math
-}; // namespace SurgSim
+void MlcpProblem::setZero(int numDof, int numConstraintDof, int numConstraints)
+{
+	A.resize(numConstraintDof, numConstraintDof);
+	A.setZero();
+	b.resize(numConstraintDof);
+	b.setZero();
+	mu.resize(numConstraints);
+	mu.setZero();
 
-#endif
+	constraintTypes.clear();
+}
+
+MlcpProblem MlcpProblem::Zero(int numDof, int numConstraintDof, int numConstraints)
+{
+	MlcpProblem result;
+	result.setZero(numDof, numConstraintDof, numConstraints);
+
+	return result;
+
+}
+
+} // namespace SurgSim
+} // namespace Math

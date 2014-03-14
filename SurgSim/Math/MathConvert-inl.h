@@ -143,7 +143,9 @@ template <class Type, int Dim, int TMode, int TOptions>
 YAML::Node YAML::convert<Eigen::Transform<Type, Dim, TMode, TOptions>>::encode(
 			const typename Eigen::Transform<Type, Dim, TMode, TOptions>& rhs)
 {
-	Eigen::Quaternion<Type, TOptions> quaternion(rhs.linear());
+	typedef typename Eigen::Transform<Type, Dim, TMode, TOptions>::LinearMatrixType LinearMatrixType;
+	LinearMatrixType linear(rhs.linear());
+	Eigen::Quaternion<Type, TOptions> quaternion(linear);
 	Eigen::Matrix<Type, Dim, 1, TOptions> translation(rhs.translation());
 
 	Node node;

@@ -12,28 +12,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
-#define SURGSIM_MATH_MESHSHAPE_INL_H
+#ifndef SURGSIM_GRAPHICS_MESH_INL_H
+#define SURGSIM_GRAPHICS_MESH_INL_H
 
 namespace SurgSim
 {
-namespace Math
+
+namespace Graphics
 {
 
-template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh)
+template <class VertexDataSource, class EdgeDataSource, class TriangleDataSource>
+Mesh::Mesh(const TriangleMeshBase<VertexDataSource, EdgeDataSource, TriangleDataSource>& mesh)
+	: SurgSim::DataStructures::TriangleMeshBase<VertexData,
+												SurgSim::DataStructures::EmptyData,
+												SurgSim::DataStructures::EmptyData>(mesh)
 {
-	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
-
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
-
-	// If the mesh is empty, the following method will raise an exception because it will find a null volume
-	computeVolumeIntegrals();
 }
 
-}; // namespace Math
-}; // namespace SurgSim
+}; // Graphics
+}; // SurgSim
 
-#endif
+#endif // SURGSIM_GRAPHICS_MESH_INL_H

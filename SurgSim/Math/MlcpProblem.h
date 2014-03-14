@@ -56,6 +56,9 @@ namespace Math
 // TODO(advornik): Get rid of the constraint types and encode necessary info in other ways.
 struct MlcpProblem
 {
+	/// Destructor
+	virtual ~MlcpProblem();
+
 	typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::DontAlign> Matrix;
 	typedef Eigen::Matrix<double, Eigen::Dynamic, 1, Eigen::DontAlign> Vector;
 
@@ -94,6 +97,19 @@ struct MlcpProblem
 		return ((b.rows() >= 0) && (b.cols() == 1) && (A.rows() == b.rows()) && (A.cols() == A.rows()) &&
 				(numConstraintTypes <= b.rows()) && (mu.size() == numConstraintTypes));
 	}
+
+	/// Resize an MlcpProblem and set to zero.
+	/// \param numDof the total degrees of freedom.
+	/// \param numConstraintDof the total constrained degrees of freedom.
+	/// \param numConstraints the number of constraints.
+	virtual void setZero(int numDof, int numConstraintDof, int numConstraints);
+
+	/// Initialize an MlcpProblem with zero values.
+	/// \param numDof the total degrees of freedom for the MlcpProblem to be constructed.
+	/// \param numConstraintDof the total constrained degrees of freedom for the MlcpProblem to be constructed.
+	/// \param numConstraints the number of constraints for the MlcpProblem to be constructed.
+	/// \return An MlcpProblem appropriately sized and initialized to zero.
+	static MlcpProblem Zero(int numDof, int numConstraintDof, int numConstraints);
 };
 
 };  // namespace Math
