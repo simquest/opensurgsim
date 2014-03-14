@@ -133,7 +133,12 @@ TEST_F(MeshShapeTest, EmptyMeshTest)
 {
 	std::shared_ptr<TriangleMeshBase> emptyMesh = std::make_shared<TriangleMeshBase>();
 
-	EXPECT_THROW(SurgSim::Math::MeshShape meshShape(*emptyMesh), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(SurgSim::Math::MeshShape meshShape(*emptyMesh));
+
+	SurgSim::Math::MeshShape meshShape(*emptyMesh);
+	EXPECT_NEAR(0.0, meshShape.getVolume(), 1e-8);
+	EXPECT_TRUE(meshShape.getCenter().isZero());
+	EXPECT_TRUE(meshShape.getSecondMomentOfVolume().isZero());
 }
 
 TEST_F(MeshShapeTest, MeshCubeVSBoxTest)
