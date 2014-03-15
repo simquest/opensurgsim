@@ -100,7 +100,6 @@ TEST(PhysicsManagerStateTest, SetGetCollisionRepresentations)
 	std::shared_ptr<SurgSim::Collision::Representation> collision1 =
 		std::make_shared<RigidCollisionRepresentation>("collision1");
 
-	std::make_shared<RigidCollisionRepresentation>("Sphere1 Collision");
 	expectedRepresentations.push_back(collision1);
 	physicsState->setCollisionRepresentations(expectedRepresentations);
 	actualRepresentations = physicsState->getCollisionRepresentations();
@@ -149,16 +148,16 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	// We need a populated constraint to check the constraintsIndexMapping.
 	// Create first side of a constraint.
 	auto rigid1 = std::make_shared<RigidRepresentation>("rigid1");
-	std::shared_ptr<RigidRepresentationLocalization> rigid1LocalizationTyped;
-	rigid1LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+	std::shared_ptr<RigidRepresentationLocalization> rigid1LocalizationTyped =
+		std::make_shared<RigidRepresentationLocalization>();
 	rigid1LocalizationTyped->setRepresentation(rigid1);
 	std::shared_ptr<Localization> rigid1Localization = rigid1LocalizationTyped;
 	auto rigid1Contact = std::make_shared<RigidRepresentationContact>();
 
 	// Create second side of a constraint.
 	auto rigid2 = std::make_shared<RigidRepresentation>("rigid2");
-	std::shared_ptr<RigidRepresentationLocalization> rigid2LocalizationTyped;
-	rigid2LocalizationTyped = std::make_shared<RigidRepresentationLocalization>();
+	std::shared_ptr<RigidRepresentationLocalization> rigid2LocalizationTyped =
+		std::make_shared<RigidRepresentationLocalization>();
 	rigid2LocalizationTyped->setRepresentation(rigid2);
 	std::shared_ptr<Localization> rigid2Localization = rigid2LocalizationTyped;
 	auto rigid2Contact = std::make_shared<RigidRepresentationContact>();
