@@ -200,6 +200,50 @@ TEST_F(FemElement2DTriangleTests, VolumeTest)
 	EXPECT_NEAR(element->getVolume(m_restState), m_expectedVolume, 1e-10);
 }
 
+TEST_F(FemElement2DTriangleTests, CoordinateTests)
+{
+	FemElement2DTriangle element(m_nodeIds);
+
+	Vector validNaturalCoordinate(3);
+	Vector invalidNaturalCoordinateSumNot1(3);
+	Vector invalidNaturalCoordinateNegativeValue(3);
+	Vector invalidNaturalCoordinateBiggerThan1Value(3);
+	Vector invalidNaturalCoordinateSize2(2), invalidNaturalCoordinateSize4(4);
+
+	validNaturalCoordinate << 0.4, 0.5, 0.1;
+	invalidNaturalCoordinateSumNot1 << 0.4, 0.5, 0.3;
+	invalidNaturalCoordinateNegativeValue << 0.7, 0.7, -0.4;
+	invalidNaturalCoordinateBiggerThan1Value << 1.4, 0.6, -1.0;
+	invalidNaturalCoordinateSize2 << 0.4, 0.6;
+	invalidNaturalCoordinateSize4 << 0.2, 0.2, 0.2, 0.4;
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateBiggerThan1Value));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize2));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize4));
+
+	Vector naturalCoordinateA(3), naturalCoordinateB(3), naturalCoordinateC(3), naturalCoordinateMiddle(3);
+	Vector3d ptA, ptB, ptC, ptMiddle;
+	naturalCoordinateA << 1.0, 0.0, 0.0;
+	naturalCoordinateB << 0.0, 1.0, 0.0;
+	naturalCoordinateC << 0.0, 0.0, 1.0;
+	naturalCoordinateMiddle << 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0;
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateBiggerThan1Value), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateNegativeValue), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize2), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize4), SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSumNot1), SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(ptA = element.computeCartesianCoordinate(m_restState, naturalCoordinateA));
+	EXPECT_NO_THROW(ptB = element.computeCartesianCoordinate(m_restState, naturalCoordinateB));
+	EXPECT_NO_THROW(ptC = element.computeCartesianCoordinate(m_restState, naturalCoordinateC));
+	EXPECT_NO_THROW(ptMiddle = element.computeCartesianCoordinate(m_restState, naturalCoordinateMiddle));
+	EXPECT_TRUE(ptA.isApprox(m_expectedRotation._transformVector(Vector3d(0.0, 0.0, 0.0))));
+	EXPECT_TRUE(ptB.isApprox(m_expectedRotation._transformVector(Vector3d(1.0, 0.0, 0.0))));
+	EXPECT_TRUE(ptC.isApprox(m_expectedRotation._transformVector(Vector3d(0.0, 1.0, 0.0))));
+	EXPECT_TRUE(ptMiddle.isApprox(m_expectedRotation._transformVector(Vector3d(1.0 / 3.0, 1.0 / 3.0, 0.0))));
+}
+
 TEST_F(FemElement2DTriangleTests, RestAreaTest)
 {
 	std::shared_ptr<MockFemElement2D> element = getElement();
