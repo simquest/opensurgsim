@@ -263,6 +263,12 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
 
+	std::shared_ptr<TransferPoseBehavior> physicsPoseToGraphics =
+		std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
+	physicsPoseToGraphics->setPoseSender(physicsRepresentation);
+	physicsPoseToGraphics->setPoseReceiver(osgMeshRepresentation);
+	sceneElement->addComponent(physicsPoseToGraphics);
+
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
 	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Handle",    "Geometry/stapler_handle.obj"));
