@@ -16,13 +16,21 @@
 #include "Examples/ExampleStapling/StapleElement.h"
 
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
-#include "SurgSim/Math/CylinderShape.h"
+#include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
 using SurgSim::Blocks::TransferPoseBehavior;
-using SurgSim::Math::CylinderShape;
+using SurgSim::DataStructures::PlyReader;
+using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
+using SurgSim::Graphics::SceneryRepresentation;
+using SurgSim::Graphics::OsgSceneryRepresentation;
+using SurgSim::Math::MeshShape;
+using SurgSim::Math::RigidTransform3d;
+using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name):
@@ -35,37 +43,36 @@ StapleElement::~StapleElement()
 {
 }
 
-void StapleElement::setPose(const SurgSim::Math::RigidTransform3d& pose)
+void StapleElement::setPose(const RigidTransform3d& pose)
 {
 	m_pose = pose;
 }
 
-/*
-In this implementation, physics representation of a surgical staple is simulated by using a cylinder shape.
-Graphical representation of the surgical staple is loaded from a .obj file.
-*/
 bool StapleElement::doInitialize()
 {
-	// Shape of a cylinder is used to model the staple with length: 4.8mm and radius: 1.8mm
-	// The surgical staple dimensions is pulled from:
-	// http://surgical.covidien.com/products/stapling/skin-staplers
-	// for model: MultiFire Premium Single Use Skin Stapler.
-	auto shape = std::make_shared<CylinderShape>(0.0048, 0.0017);
+	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
+	PlyReader reader("Data/Geometry/staple_collision.ply");
+	reader.setDelegate(delegate);
+	reader.parseFile();
 
+	// Stapler collision mesh
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
-	params.setDensity(8050); // Stainless steel
-	params.setShapeUsedForMassInertia(shape);
+	params.setDensity(8050); // Stainless steel (in Kg.m-3)
+	params.setShapeUsedForMassInertia(meshShape);
 
-	auto physicsRepresentation = std::make_shared<SurgSim::Physics::RigidRepresentation>(m_name + " Physics");
+	std::shared_ptr<RigidRepresentation> physicsRepresentation =
+		std::make_shared<RigidRepresentation>(m_name + " Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(m_pose);
 
-	std::shared_ptr<SurgSim::Graphics::SceneryRepresentation> graphicsRepresentation =
-		std::make_shared<SurgSim::Graphics::OsgSceneryRepresentation>(m_name + "Graphics");
+	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
+		std::make_shared<OsgSceneryRepresentation>(m_name + "Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
 
-	auto transferPose = std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
+	std::shared_ptr<TransferPoseBehavior> transferPose =
+		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
 	transferPose->setPoseSender(physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 
