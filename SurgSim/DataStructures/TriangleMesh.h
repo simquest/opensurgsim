@@ -64,7 +64,7 @@ public:
 	/// Get normal for triangle.
 	/// \param triangleId The triangle to get normal.
 	/// \return The normal for the triangle with given ID.
-	SurgSim::Math::Vector3d getNormal(int triangleId);
+	SurgSim::Math::Vector3d getNormal(int triangleId) const;
 
 	/// Calculate normals for all triangles.
 	/// \note Normals will be normalized.
