@@ -62,6 +62,10 @@ public:
 	/// \param inputData The application input state coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
 
+	/// Set the initial input data group.
+	/// \param device The name of the device that is producing the input.  This should only be used to identify
+	/// 	the device (e.g. if the consumer is listening to several devices at once).
+	/// \param inputData The application input state coming from the device.
 	virtual void initializeInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) = 0;
 };
 
