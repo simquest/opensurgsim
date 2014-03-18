@@ -16,10 +16,8 @@
 #ifndef SURGSIM_MATH_SURFACEMESHSHAPE_H
 #define SURGSIM_MATH_SURFACEMESHSHAPE_H
 
-#include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/TriangleMesh.h"
 #include "SurgSim/DataStructures/TriangleMeshBase.h"
-#include "SurgSim/Framework/Convert.h"
 #include "SurgSim/Math/Shape.h"
 
 namespace SurgSim
@@ -28,23 +26,32 @@ namespace SurgSim
 namespace Math
 {
 
+/// SurfaceMeshShape defines a shape based on a mesh, like MeshShape.
+/// But, unlike MeshShape, the mesh does not need to be watertight to produce valid volume, center and second moment of
+/// volume. In the MeshShape case, these quantities are based on the notion of volume and are therefore undefined
+/// if no volume if properly defined. In the SurfaceMeshShape case, these quantities are based on the mesh as a surface
+/// mesh, with a thickness (which should be very small compared to the mesh size, i.e. 1e-3 in practice). If the mesh
+/// is not closed or has holes, the class will still produce valid geometric properties.
+/// \note If not used in physics, there is no differences between using a SurfaceMeshShape or a MeshShape.
+/// \sa MeshShape
 class SurfaceMeshShape : public Shape
 {
 public:
 	/// Constructor
 	/// \param mesh The triangle mesh to build the shape from
+	/// \param thickness The thickness associated to this surface mesh
 	/// \exception Raise an exception if the mesh is invalid
 	template <class VertexData, class EdgeData, class TriangleData>
-	explicit SurfaceMeshShape(
+	SurfaceMeshShape(
 		const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh,
-		double thikcness = 1e-2);
+		double thickness = 1e-2);
 
 	/// \return the type of the shape
 	virtual int getType() override;
 
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
-	const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
+	std::shared_ptr<const SurgSim::DataStructures::TriangleMesh> getMesh() const;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
@@ -78,7 +85,9 @@ private:
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
 	/// Collision mesh associated to this MeshShape
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
+	/// \note 'const' as volume, center and second moment of volume are computed with the mesh in the constructor,
+	/// \note so the mesh should not change once initialization has been done.
+	std::shared_ptr<const SurgSim::DataStructures::TriangleMesh> m_mesh;
 
 	/// Surface mesh thickness
 	double m_thickness;

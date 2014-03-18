@@ -29,9 +29,9 @@ using SurgSim::Math::Vector3d;
 class SurfaceMeshShapeTest : public ::testing::Test
 {
 public:
-	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData,EmptyData,EmptyData> TriangleMeshBase;
-	typedef SurgSim::DataStructures::MeshElement<2,EmptyData> EdgeElement;
-	typedef SurgSim::DataStructures::MeshElement<3,EmptyData> TriangleElement;
+	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMeshBase;
+	typedef SurgSim::DataStructures::MeshElement<2, EmptyData> EdgeElement;
+	typedef SurgSim::DataStructures::MeshElement<3, EmptyData> TriangleElement;
 
 	void SetUp()
 	{
@@ -81,6 +81,16 @@ public:
 		return disk;
 	}
 };
+
+TEST_F(SurfaceMeshShapeTest, EmptyMeshTest)
+{
+	TriangleMeshBase emptyMesh;
+	std::shared_ptr<SurfaceMeshShape> diskShape = std::make_shared<SurfaceMeshShape>(emptyMesh, m_thickness);
+
+	EXPECT_NEAR(0.0, diskShape->getVolume(), 1e-9);
+	EXPECT_TRUE(diskShape->getCenter().isZero());
+	EXPECT_TRUE(diskShape->getSecondMomentOfVolume().isZero());
+}
 
 TEST_F(SurfaceMeshShapeTest, DiskShapeTest)
 {

@@ -16,6 +16,11 @@
 
 #include "SurgSim/Math/SurfaceMeshShape.h"
 
+namespace
+{
+const double epsilon = 1e-10;
+};
+
 namespace SurgSim
 {
 namespace Math
@@ -26,7 +31,7 @@ int SurfaceMeshShape::getType()
 	return SHAPE_TYPE_SURFACEMESH;
 }
 
-const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh() const
+std::shared_ptr<const SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh() const
 {
 	return m_mesh;
 }
@@ -96,7 +101,11 @@ void SurfaceMeshShape::computeVolumeIntegrals()
 	double area = integral[0];
 
 	// Center of mass
-	m_center = integral.segment(1, 3) / area;
+	m_center = integral.segment(1, 3);
+	if (area > epsilon)
+	{
+		m_center /= area;
+	}
 
 	// second moment of volume relative to center
 	Vector3d centerSquared = m_center.cwiseProduct(m_center);

@@ -27,7 +27,7 @@ MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData,
 {
 	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
 
-	m_mesh = std::make_shared<SurgSim::DataStructures::TriangleMesh>(mesh);
+	m_mesh = std::make_shared<const SurgSim::DataStructures::TriangleMesh>(mesh);
 
 	computeVolumeIntegrals();
 }
