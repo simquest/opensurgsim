@@ -16,6 +16,7 @@
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -66,7 +67,20 @@ bool TransferInputPoseBehavior::doInitialize()
 
 bool TransferInputPoseBehavior::doWakeUp()
 {
-	return true;
+	bool result = true;
+	if (m_from == nullptr)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No pose sender set for TransferInputPoseBehavior named '" << getName() << "', so it cannot wake up.";
+		result = false;
+	}
+	if (m_to == nullptr)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No pose receiver set for TransferInputPoseBehavior named '" << getName() << "', so it cannot wake up.";
+		result = false;
+	}
+	return result;
 }
 
 }; //namespace Blocks
