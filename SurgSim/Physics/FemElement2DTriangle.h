@@ -28,12 +28,30 @@ namespace Physics
 
 /// 2D FemElement based on a triangle with a constant thickness
 ///
-/// XXX TO DO
-/// XXX Reference Batoz for deformation
-/// XXX Reference Prezienski for mass
+/// The triangle is modelled as a shell (6DOF) which is decomposed into a membrane (in-plane 2DOF (X,Y)) and
+/// a plate (bending/twisting 3DOF (Z, ThetaX,ThetaY)). The thin-plate assumption does not consider the drilling
+/// dof (ThetaZ). The system includes the DOF for completeness but does not assign any mass or stiffness to it.
+///
+/// The membrane (in-plane) equations (mass and stiffness) are following
+/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki.
+///
+/// The thin-plate (bending) equations (mass and stiffness) are following
+/// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
+/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
+/// \note The plate mass matrix is not detailed in the above paper, but the analytical equations
+/// \note have been derived from it.
+///
 /// \note The element is considered to have a constant thickness.
 class FemElement2DTriangle : public FemElement
 {
+	typedef Eigen::Matrix<double, 3, 3, Eigen::DontAlign> Matrix33Type;
+
+	typedef Eigen::Matrix<double, 3, 6, Eigen::DontAlign> Matrix36Type;
+	typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix66Type;
+
+	typedef Eigen::Matrix<double, 3, 9, Eigen::DontAlign> Matrix39Type;
+	typedef Eigen::Matrix<double, 9, 9, Eigen::DontAlign> Matrix99Type;
+
 public:
 	/// Constructor
 	/// \param nodeIds An array of 3 node ids (A, B, C) defining this triangle element with respect to a
@@ -170,14 +188,69 @@ protected:
 	/// Stiffness matrix (in local coordinate frame)
 	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_KLocal;
 
-	/// Physical shear modulus G = E/( 2(1+mu) )
-	double m_G;
-
-	// The triangle rest area
+	/// The triangle rest area
 	double m_restArea;
 
-	/// thickness of the element
+	/// Thickness of the element
 	double m_thickness;
+
+	/// Compute the various shape functions (membrane and plate deformations) parameters
+	/// \param restState the rest state to compute the shape functions paramters from
+	void computeShapeFunctionsParameters(const DeformableRepresentationState& restState);
+
+	/// Membrane (in-plane) deformation. DOF simulated: (x, y)
+	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
+	std::array<double, 3> m_membraneShapeFunctionConstantParameter; //< Shape functions fi(x, y) = ai + bi.x + ci.y
+	std::array<double, 3> m_membraneShapeFunctionXCoefficient;      //< Shape functions fi(x, y) = ai + bi.x + ci.y
+	std::array<double, 3> m_membraneShapeFunctionYCoefficient;      //< Shape functions fi(x, y) = ai + bi.x + ci.y
+	Matrix36Type m_membraneStrainDisplacement; //< Strain-displacement matrix containing (dfi/dx=bi , dfi/dy=ci)
+	Matrix33Type m_membraneEm; //< Membrane elasticity material matrix
+	Matrix66Type m_membraneKLocal; //< Membrane local stiffness matrix
+
+	/// Thin-plate (bending/twisting) specific data structure
+	/// DOF simulated: (z, thetaX, thetaY)
+	/// "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
+	/// Numerical Methods in Engineering, vol 15, 1771-1812 (1980)
+	/// Indices are as follow:
+	/// 0 1 2 denotes triangle's points ABC:
+	/// 4 (mid-edge 12) 5 (mid-edge 20) 6 (mid-edge 01) denotes mid-edge points
+	/// Data structures having only mid-edge information are 0 based (0->4 (mid-egde 12) ; 1->5 ; 2->6)
+	SurgSim::Math::Vector3d m_xij;     //< xi - xj
+	SurgSim::Math::Vector3d m_yij;     //< yi - yj
+	SurgSim::Math::Vector3d m_lij_sqr; //< xij^2 + yij^2
+	SurgSim::Math::Vector3d m_ak;      //< -xij/li^2
+	SurgSim::Math::Vector3d m_bk;      //< 3/4 xij yij/lij2
+	SurgSim::Math::Vector3d m_ck;      //< (1/4 xij^2 - 1/2 yij^2)/lij^2
+	SurgSim::Math::Vector3d m_dk;      //< -yij/lij^2
+	SurgSim::Math::Vector3d m_ek;      //< (1/4 yij^2 - 1/2 xij^2)/lij^2
+	//...and more variables for the derivatives
+	SurgSim::Math::Vector3d m_Pk;      //< -6xij/lij^2    = 6 m_ak
+	SurgSim::Math::Vector3d m_qk;      //< 3xijyij/lij^2  = 4 m_bk
+	SurgSim::Math::Vector3d m_tk;      //< -6yij/lij^2    = 6 m_dk
+	SurgSim::Math::Vector3d m_rk;      //< 3yij^2/lij^2
+	std::array<Matrix39Type, 3> m_plateStrainDisplacementAtGaussPoints; //< Strain-displacement at given Gauss points
+	Matrix33Type m_plateEm; //< Membrane elasticity material matrix
+	Matrix99Type m_plateKLocal; //< Membrane local stiffness matrix
+	/// Batoz derivative dHx/dxi
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHx/dxi evaluated at (xi, neta)
+	std::array<double, 9> Batoz_dHx_dxi(double xi, double neta) const;
+	/// Batoz derivative dHx/dneta
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHx/dneta evaluated at (xi, neta)
+	std::array<double, 9> Batoz_dHx_dneta(double xi, double neta) const;
+	/// Batoz derivative dHy/dxi
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHy/dxi evaluated at (xi, neta)
+	std::array<double, 9> Batoz_dHy_dxi(double xi, double neta) const;
+	/// Batoz derivative dHy/dneta
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The vector dHy/dneta evaluated at (xi, neta)
+	std::array<double, 9> Batoz_dHy_dneta(double xi, double neta) const;
+	/// Batoz strain displacement matrix evaluated at a given point
+	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
+	/// \return The 3x9 strain displacement matrix evaluated at (xi, neta)
+	Matrix39Type BatozStrainDisplacement(double xi, double neta) const;
 };
 
 } // namespace Physics
