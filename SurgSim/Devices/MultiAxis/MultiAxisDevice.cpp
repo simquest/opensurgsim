@@ -135,6 +135,16 @@ bool MultiAxisDevice::isUsingAxisDominance() const
 	return m_rawDevice->isUsingAxisDominance();
 }
 
+double MultiAxisDevice::defaultPositionScale()
+{
+	return 0.00001;
+}
+
+double MultiAxisDevice::defaultOrientationScale()
+{
+	return 0.0001;
+}
+
 
 };  // namespace Device
 };  // namespace SurgSim
