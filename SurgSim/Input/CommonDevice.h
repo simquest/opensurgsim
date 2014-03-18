@@ -34,6 +34,10 @@ namespace Input
 class CommonDevice : public DeviceInterface
 {
 public:
+	/// Constructor.  Sets the input data to an empty DataGroup.
+	/// \param name The name associated with the input device.
+	explicit CommonDevice(const std::string& name);
+
 	/// Constructor.
 	///
 	/// \param name The name associated with the input device.

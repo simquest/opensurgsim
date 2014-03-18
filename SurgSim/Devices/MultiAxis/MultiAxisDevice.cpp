@@ -28,6 +28,7 @@ namespace Device
 
 
 MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
+	CommonDevice(uniqueName),
 	m_name(uniqueName),
 	m_rawDevice(new RawMultiAxisDevice(uniqueName + "_RawBase"))
 {
