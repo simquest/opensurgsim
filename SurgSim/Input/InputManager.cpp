@@ -109,7 +109,7 @@ bool InputManager::addInputComponent(const std::shared_ptr<InputComponent>& inpu
 	}
 	else
 	{
-		SURGSIM_LOG_INFO(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
+		SURGSIM_LOG_CRITICAL(m_logger) << __FUNCTION__ << " Could not find Device with name " <<
 								   input->getDeviceName() << " when adding component " << input->getName();
 	}
 	return result;
