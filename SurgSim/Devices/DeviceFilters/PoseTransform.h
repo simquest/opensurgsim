@@ -1,0 +1,116 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef SURGSIM_DEVICES_DEVICEFILTERS_POSETRANSFORM_H
+#define SURGSIM_DEVICES_DEVICEFILTERS_POSETRANSFORM_H
+
+#include <memory>
+#include <string>
+
+#include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Input/CommonDevice.h"
+#include "SurgSim/Input/InputConsumerInterface.h"
+#include "SurgSim/Input/OutputProducerInterface.h"
+#include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Vector.h"
+
+namespace SurgSim
+{
+
+namespace Device
+{
+/// A device filter that transforms the pose.  It can scale the translation, and/or apply a constant transform.
+/// Any other data in the DataGroup is passed through.  The filter can be added as an input consumer to an
+/// input device, and/or as an output producer to an output device.  If it is used for both input and output, the data
+/// are kept separate, but the same transform & scaling is applied to both the input data and the output data.
+/// \sa	SurgSim::Input::CommonDevice
+/// \sa	SurgSim::Input::InputConsumerInterface
+/// \sa	SurgSim::Input::OutputProducerInterface
+class PoseTransform : public SurgSim::Input::CommonDevice,
+	public SurgSim::Input::InputConsumerInterface, public SurgSim::Input::OutputProducerInterface
+{
+public:
+	/// Constructor.
+	/// \param name	Name of this device filter.
+	explicit PoseTransform(const std::string& name);
+
+	/// Destructor.
+	virtual ~PoseTransform();
+
+	/// Fully initialize the device.
+	/// When the manager object creates the device, the internal state of the device usually isn't fully
+	/// initialized yet.  This method performs any needed initialization.
+	/// \return True on success.
+	virtual bool initialize() override;
+
+	/// Set the initial input data.  Used when transforming the pose coming from an input device.
+	/// \param device The name of the device that is producing the input.  This should only be used to identify
+	/// 	the device (e.g. if the consumer is listening to several devices at once).
+	/// \param inputData The application input state coming from the device.
+	virtual void initializeInput(const std::string& device,
+		const SurgSim::DataStructures::DataGroup& inputData) override;
+
+	/// Notifies the consumer that the application input coming from the device has been updated.
+	/// Used when transforming the pose coming from an input device.
+	/// \param device The name of the device that is producing the input.  This should only be used to identify
+	/// 	the device (e.g. if the consumer is listening to several devices at once).
+	/// \param inputData The application input state coming from the device.
+	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
+
+	/// Asks the producer to provide output state to the device.  Used when transforming the pose sent to an output
+	/// device.  Note that devices may never call this method, e.g. because the device doesn't actually have any
+	/// output capability.
+	/// \param device The name of the device that is requesting the output.  This should only be used to identify
+	/// 	the device (e.g. if the producer is listening to several devices at once).
+	/// \param [out] outputData The data being sent to the device.
+	/// \return True if the producer has provided output data.  A producer that returns false should leave outputData
+	///		unmodified.
+	virtual bool requestOutput(const std::string& device, SurgSim::DataStructures::DataGroup* outputData) override;
+
+	/// Set the translation scale factor so that each direction has the same scale.
+	/// \param translationScale The scalar scaling factor.
+	/// \warning This setter is not thread-safe, so it is recommended that the scaling only be set before this filter
+	///		wakes up.
+	void setTranslationScale(double translationScale);
+
+	/// Set the constant transform.  The transform is pre-applied to the input or output pose.
+	/// \param transform The transform.
+	/// \warning This setter is not thread-safe, so it is recommended that the transform only be set before this
+	///		filter wakes up.
+	void setTransform(const SurgSim::Math::RigidTransform3d& transform);
+
+private:
+	/// Finalize (de-initialize) the device.
+	/// \return True on success.
+	virtual bool finalize() override;
+
+	/// Filter the data.
+	/// \param dataToFilter The data that will be filtered.
+	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
+	///		Will contain the filtered data.
+	void PoseTransform::filter(const SurgSim::DataStructures::DataGroup& dataToFilter,
+		SurgSim::DataStructures::DataGroup* result);
+
+	/// The constant pre-transform.
+	SurgSim::Math::RigidTransform3d m_transform;
+
+	/// The scaling factor applied to each direction of the translation.
+	double m_translationScale;
+};
+
+};  // namespace Device
+};  // namespace SurgSim
+
+#endif  // SURGSIM_DEVICES_DEVICEFILTERS_POSETRANSFORM_H

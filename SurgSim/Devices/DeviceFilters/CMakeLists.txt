@@ -1,5 +1,5 @@
 # This file is a part of the OpenSurgSim project.
-# Copyright 2012-2013, SimQuest Solutions Inc.
+# Copyright 2013, SimQuest Solutions Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,24 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_subdirectory(DeviceFilters)
-add_subdirectory(IdentityPoseDevice)
-add_subdirectory(Keyboard)
-add_subdirectory(Mouse)
+link_directories(${Boost_LIBRARY_DIRS})
+set(LIBS ${LIBS} ${Boost_LIBRARIES} SurgSimFramework SurgSimInput)
 
-set(DEVICES
-	MultiAxis
-	Novint
-	Phantom
-	Sixense
-	TrackIR
+include_directories(
+	"${SURGSIM_TOP_INCLUDE_DIR}"
+	"${CMAKE_CURRENT_SOURCE_DIR}"
+	"${EIGEN3_INCLUDE_DIR}"
+	"${Boost_INCLUDE_DIR}"
 )
 
-foreach(DEVICE ${DEVICES})
-	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
-	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
-	if(BUILD_DEVICE_${DEVICE_UPPER_CASE})
-		add_subdirectory(${DEVICE})
-	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
-endforeach(DEVICE)
+set(DEVICE_FILTERS_SOURCES
+	PoseTransform.cpp
+)
 
+set(DEVICE_FILTERS_HEADERS
+	PoseTransform.h
+)
+
+surgsim_add_library(
+	SurgSimDeviceFilters
+	"${DEVICE_FILTERS_SOURCES}" "${DEVICE_FILTERS_HEADERS}"
+	SurgSim/Devices/DeviceFilters
+)
+
+set_target_properties(SurgSimDeviceFilters PROPERTIES FOLDER "Devices")
