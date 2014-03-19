@@ -123,6 +123,7 @@ public:
 TEST(PoseTransformDeviceFilterTest, AsInputConsumer)
 {
 	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
+	ASSERT_TRUE(poseTransformer->initialize());
 	auto device = std::make_shared<TestInputOutputDevice>("InputDevice");
 	auto inputConsumer = std::make_shared<TestInputConsumerInterface>();
 
@@ -190,6 +191,7 @@ TEST(PoseTransformDeviceFilterTest, AsInputConsumer)
 TEST(PoseTransformDeviceFilterTest, AsOutputProducer)
 {
 	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
+	ASSERT_TRUE(poseTransformer->initialize());
 	auto device = std::make_shared<TestInputOutputDevice>("OutputDevice");
 	auto outputProducer = std::make_shared<TestOutputProducerInterface>();
 
@@ -257,6 +259,7 @@ TEST(PoseTransformDeviceFilterTest, AsOutputProducer)
 TEST(PoseTransformDeviceFilterTest, BothInputAndOutput)
 {
 	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
+	ASSERT_TRUE(poseTransformer->initialize());
 	auto device = std::make_shared<TestInputOutputDevice>("InputDevice"); // two separate devices could be used
 	auto inputConsumer = std::make_shared<TestInputConsumerInterface>();
 	auto outputProducer = std::make_shared<TestOutputProducerInterface>();
