@@ -39,6 +39,12 @@ namespace Math
 /// Various geometrical properties (volume based) are computed from the triangle mesh using
 /// David Eberly's work:
 /// http://www.geometrictools.com/Documentation/PolyhedralMassProperties.pdf
+///
+/// \note The internal mesh should not be modified, otherwise the geometric properties will be invalid.
+/// \note Practical use cases:
+/// \note * Fixed/Rigid object, the mesh will not change anyway.
+/// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
+///
 /// \sa SurfaceMeshShape
 class MeshShape : public Shape
 {
@@ -54,7 +60,7 @@ public:
 
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
-	std::shared_ptr<const SurgSim::DataStructures::TriangleMesh> getMesh() const;
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
@@ -88,9 +94,7 @@ private:
 	SurgSim::Math::Matrix33d m_secondMomentOfVolume;
 
 	/// Collision mesh associated to this MeshShape
-	/// \note 'const' as volume, center and second moment of volume are computed with the mesh in the constructor,
-	/// \note so the mesh should not change once initialization has been done.
-	std::shared_ptr<const SurgSim::DataStructures::TriangleMesh> m_mesh;
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> m_mesh;
 };
 
 }; // Math
