@@ -120,7 +120,7 @@ public:
 	DataGroup m_data;
 };
 
-TEST(PoseTransformDeviceFilterTest, AsInputConsumer)
+TEST(PoseTransformDeviceFilterTest, OnlyInput)
 {
 	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
 	ASSERT_TRUE(poseTransformer->initialize());
@@ -134,7 +134,7 @@ TEST(PoseTransformDeviceFilterTest, AsInputConsumer)
 	DataGroup data = builder.createData();
 	RigidTransform3d initialPose;
 	initialPose.matrix() << 0.529453820664377, 0.830923707192042, 0.171010071662834, 2.0,
-		-0.785101696592397, 0.403558881227842, 0.469846310392954, 3.0, 
+		-0.785101696592397, 0.403558881227842, 0.469846310392954, 3.0,
 		0.32139380484327, -0.383022221559489, 0.866025403784439, 4.0,
 		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 20/30/40 degrees
 
@@ -188,79 +188,11 @@ TEST(PoseTransformDeviceFilterTest, AsInputConsumer)
 	EXPECT_TRUE(anotherPoseAfterTransform.isApprox(anotherInitialPose, errorEpsilon));
 }
 
-TEST(PoseTransformDeviceFilterTest, AsOutputProducer)
+TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
 {
 	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
 	ASSERT_TRUE(poseTransformer->initialize());
-	auto device = std::make_shared<TestInputOutputDevice>("OutputDevice");
-	auto outputProducer = std::make_shared<TestOutputProducerInterface>();
-
-	DataGroupBuilder builder;
-	builder.addPose("pose");
-	builder.addPose("anotherPose");
-
-	DataGroup data = builder.createData();
-	RigidTransform3d initialPose;
-	initialPose.matrix() << -0.014297271682553, 0.696079050903939, 0.717822779601698, -179.3,
-		-0.956807691132494, -0.218000810711764, 0.192340034102939, 223.92354,
-		0.290369816289747, -0.684068418670008, 0.669130606358858, 8.7,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 75/48/23 degrees
-
-	RigidTransform3d anotherInitialPose;
-	anotherInitialPose.matrix() << -0.534717382486846, 0.445878658326802, -0.717822779601697, 0.7,
-		-0.463195024434534, -0.865133331123227, -0.192340034102939, -33.3,
-		-0.7067727288213, 0.229644380354319, 0.669130606358858, 2.1,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 75/-48/72 degrees
-
-	data.poses().set("pose", initialPose);
-	data.poses().set("anotherPose", anotherInitialPose);
-
-	// Normally the data would be set by a behavior.
-	outputProducer->m_data = data;
-
-	// The OutputProducer sends data out to the filter, which sends data out to the device.
-	poseTransformer->setOutputProducer(outputProducer);
-	device->setOutputProducer(poseTransformer);
-
-	device->doPullOutput(); // Normally the scaffold would pull the data;
-
-	RigidTransform3d actualPose;
-	ASSERT_TRUE(device->doGetOutputData().poses().get("pose", &actualPose));
-	// The PoseTransform should be using identity transform and scaling if they have not been set.
-	EXPECT_TRUE(actualPose.isApprox(initialPose, errorEpsilon));
-
-	RigidTransform3d transform;
-	transform.matrix() << 0.76461304237996, 0.265602364171189, 0.587215701058083, -0.95,
-		0.3146967650075, 0.64126665474163, -0.699816421363698, -1.1,
-		-0.562434744229297, 0.719883644530944, 0.4067366430758, 4.2,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, -40/-66/38 degrees
-
-	poseTransformer->setTransform(transform);
-	poseTransformer->setTranslationScale(-31.18);
-
-	device->doPullOutput(); // Normally the scaffold would pull the data;
-
-	// The "pose" data should have its translation scaled and be pre-transformed.
-	RigidTransform3d actualPoseAfterTransform;
-	ASSERT_TRUE(device->doGetOutputData().poses().get("pose", &actualPoseAfterTransform));
-	RigidTransform3d expectedPose;
-	expectedPose.matrix() << -0.094552549982206385, 0.072633874091332429, 0.99286662529583847, 2259.965438390881,
-		-0.82127373817845517, 0.55797948761443317, -0.11903082953554855, -2529.2107740265933,
-		-0.56264488113751565, -0.82666995332842363, 0.0068939099016622207, -8276.648397154011,
-		0.0, 0.0, 0.0, 1.0; // Calculated via numpy.
-	EXPECT_TRUE(actualPoseAfterTransform.isApprox(expectedPose, errorEpsilon));
-
-	// PoseTransform should pass through all other data unchanged.
-	RigidTransform3d anotherPoseAfterTransform;
-	ASSERT_TRUE(outputProducer->m_data.poses().get("anotherPose", &anotherPoseAfterTransform));
-	EXPECT_TRUE(anotherPoseAfterTransform.isApprox(anotherInitialPose, errorEpsilon));
-}
-
-TEST(PoseTransformDeviceFilterTest, BothInputAndOutput)
-{
-	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
-	ASSERT_TRUE(poseTransformer->initialize());
-	auto device = std::make_shared<TestInputOutputDevice>("InputDevice"); // two separate devices could be used
+	auto device = std::make_shared<TestInputOutputDevice>("InputDevice");
 	auto inputConsumer = std::make_shared<TestInputConsumerInterface>();
 	auto outputProducer = std::make_shared<TestOutputProducerInterface>();
 
@@ -284,6 +216,7 @@ TEST(PoseTransformDeviceFilterTest, BothInputAndOutput)
 
 	DataGroupBuilder outputBuilder;
 	outputBuilder.addPose("pose");
+	outputBuilder.addPose("inputPose");
 	outputBuilder.addVector("outVector");
 
 	DataGroup outputData = outputBuilder.createData();
@@ -327,4 +260,40 @@ TEST(PoseTransformDeviceFilterTest, BothInputAndOutput)
 	Vector3d actualOutputVector;
 	ASSERT_TRUE(device->doGetOutputData().vectors().get("outVector", &actualOutputVector));
 	EXPECT_TRUE(actualOutputVector.isApprox(initialOutputVector, errorEpsilon));
+
+	// Check the round-trip.
+	RigidTransform3d transform = RigidTransform3d::Identity();
+	transform.matrix() << 0.76461304237996, 0.265602364171189, 0.587215701058083, -0.95,
+		0.3146967650075, 0.64126665474163, -0.699816421363698, -1.1,
+		-0.562434744229297, 0.719883644530944, 0.4067366430758, 4.2,
+		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, -40/-66/38 degrees
+	poseTransformer->setTransform(transform);
+	poseTransformer->setTranslationScale(-31.18);
+
+	RigidTransform3d newPose;
+	newPose.matrix() << -0.014297271682553, 0.696079050903939, 0.717822779601698, -179.3,
+		-0.956807691132494, -0.218000810711764, 0.192340034102939, 223.92354,
+		0.290369816289747, -0.684068418670008, 0.669130606358858, 8.7,
+		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 75/48/23 degrees
+
+	inputData.poses().set("pose", newPose);
+	device->doGetInputData() = inputData;
+	device->doPushInput();
+
+	RigidTransform3d expectedPose;
+	expectedPose.matrix() << -0.094552549982206385, 0.072633874091332429, 0.99286662529583847, 2259.965438390881,
+		-0.82127373817845517, 0.55797948761443317, -0.11903082953554855, -2529.2107740265933,
+		-0.56264488113751565, -0.82666995332842363, 0.0068939099016622207, -8276.648397154011,
+		0.0, 0.0, 0.0, 1.0; // Calculated via numpy.
+
+	ASSERT_TRUE(inputConsumer->m_data.poses().get("pose", &actualInputPose));
+	EXPECT_TRUE(actualInputPose.isApprox(expectedPose, errorEpsilon));
+
+	// Now back through the output path, ready for the haptic device force calculations.
+	outputData.poses().set("inputPose", actualInputPose);
+	outputProducer->m_data = outputData;
+	device->doPullOutput();
+	RigidTransform3d newActualInputPose;
+	ASSERT_TRUE(device->doGetOutputData().poses().get("inputPose", &newActualInputPose));
+	EXPECT_TRUE(newActualInputPose.isApprox(newPose, errorEpsilon));
 }

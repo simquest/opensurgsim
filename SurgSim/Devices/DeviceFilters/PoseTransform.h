@@ -31,10 +31,12 @@ namespace SurgSim
 
 namespace Device
 {
-/// A device filter that transforms the pose.  It can scale the translation, and/or apply a constant transform.
-/// Any other data in the DataGroup is passed through.  The filter can be added as an input consumer to an
-/// input device, and/or as an output producer to an output device.  If it is used for both input and output, the data
-/// are kept separate, but the same transform & scaling is applied to both the input data and the output data.
+/// A device filter that transforms the input pose.  It can scale the translation, and/or apply a constant transform.
+/// Any other data in the DataGroup is passed through.  For an input/output device (e.g., a haptic device), the filter
+/// should be added as one of the device's input consumers and set as the device's output producer.  For a purely input
+/// device, the filter can just be added as an input consumer.  If it is used for both input and output, the input data
+/// is filtered using the offset(s) and scaling, and the output data is un-filtered so the device does not need to know
+/// about the filtering.
 /// \sa	SurgSim::Input::CommonDevice
 /// \sa	SurgSim::Input::InputConsumerInterface
 /// \sa	SurgSim::Input::OutputProducerInterface
@@ -69,9 +71,9 @@ public:
 	/// \param inputData The application input state coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	/// Asks the producer to provide output state to the device.  Used when transforming the pose sent to an output
-	/// device.  Note that devices may never call this method, e.g. because the device doesn't actually have any
-	/// output capability.
+	/// Asks the producer to provide output state to the device.  Passes through all data, modifying the data entries
+	/// used by haptic devices.  Note that devices may never call this method, e.g. because the device doesn't actually
+	/// have any output capability.
 	/// \param device The name of the device that is requesting the output.  This should only be used to identify
 	/// 	the device (e.g. if the producer is listening to several devices at once).
 	/// \param [out] outputData The data being sent to the device.
@@ -85,8 +87,8 @@ public:
 	///		wakes up.
 	void setTranslationScale(double translationScale);
 
-	/// Set the constant transform.  The transform is pre-applied to the input or output pose.
-	/// \param transform The transform.
+	/// Set the constant transform.  The transform is pre-applied to the input pose.
+	/// \param transform The transform, which must be invertible.
 	/// \warning This setter is not thread-safe, so it is recommended that the transform only be set before this
 	///		filter wakes up.
 	void setTransform(const SurgSim::Math::RigidTransform3d& transform);
@@ -96,15 +98,28 @@ private:
 	/// \return True on success.
 	virtual bool finalize() override;
 
-	/// Filter the data.
+	/// Filter the input data.
 	/// \param dataToFilter The data that will be filtered.
 	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
 	///		Will contain the filtered data.
-	void PoseTransform::filter(const SurgSim::DataStructures::DataGroup& dataToFilter,
+	void inputFilter(const SurgSim::DataStructures::DataGroup& dataToFilter,
+		SurgSim::DataStructures::DataGroup* result);
+
+	/// Filter the output data.
+	/// If this device filter offsets/scales input data from a haptic device, then when output data (forces, torques,
+	/// Jacobians) are created for output to that device, this function incorporates the transform/scaling to correct
+	/// the displayed outputs.
+	/// \param dataToFilter The data that will be filtered.
+	/// \param [in,out] result A pointer to a DataGroup object that must be assignable to by the dataToFilter object.
+	///		Will contain the filtered data.
+	void outputFilter(const SurgSim::DataStructures::DataGroup& dataToFilter,
 		SurgSim::DataStructures::DataGroup* result);
 
 	/// The constant pre-transform.
 	SurgSim::Math::RigidTransform3d m_transform;
+
+	/// The inverse of the pre-transform.
+	SurgSim::Math::RigidTransform3d m_transformInverse;
 
 	/// The scaling factor applied to each direction of the translation.
 	double m_translationScale;
