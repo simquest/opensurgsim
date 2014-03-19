@@ -22,6 +22,7 @@
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
+#include "SurgSim/DataStructures/TriangleMeshBase.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
@@ -56,6 +57,7 @@ using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
+using SurgSim::DataStructures::TriangleMeshBase;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
 using SurgSim::Framework::ApplicationData;
@@ -73,7 +75,6 @@ using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Math::MeshShape;
-using SurgSim::Math::MeshShape;
 using SurgSim::Math::makeRigidTransform;
 using SurgSim::Math::makeRotationMatrix;
 using SurgSim::Math::Matrix33d;
@@ -90,7 +91,7 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::VirtualToolCoupler;
 
-static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& fileName)
+static std::shared_ptr<TriangleMeshBase<EmptyData, EmptyData, EmptyData>> loadMesh(const std::string& fileName)
 {
 	// The PlyReader and TriangleMeshPlyReaderDelegate work together to load triangle meshes.
 	SurgSim::DataStructures::PlyReader reader(fileName);
@@ -100,7 +101,7 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& file
 	SURGSIM_ASSERT(reader.setDelegate(triangleMeshDelegate)) << "The input file " << fileName << " is malformed.";
 	reader.parseFile();
 
-	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
+	return triangleMeshDelegate->getMesh();
 }
 
 static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
@@ -157,7 +158,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
-	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh(filename);
+	*graphicsTriangleMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*loadMesh(filename));
 	graphicsTriangleMeshRepresentation->setInitialPose(pose);
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
