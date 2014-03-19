@@ -48,10 +48,10 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 	std::shared_ptr<Representation> representationMeshA = pair->getFirst();
 	std::shared_ptr<Representation> representationMeshB = pair->getSecond();
 
-	std::shared_ptr<const TriangleMesh> collisionMeshA =
-		std::static_pointer_cast<const MeshShape>(representationMeshA->getShape())->getMesh();
-	std::shared_ptr<const TriangleMesh> collisionMeshB =
-		std::static_pointer_cast<const MeshShape>(representationMeshB->getShape())->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshA =
+		std::static_pointer_cast<MeshShape>(representationMeshA->getShape())->getMesh();
+	std::shared_ptr<TriangleMesh> collisionMeshB =
+		std::static_pointer_cast<MeshShape>(representationMeshB->getShape())->getMesh();
 
 	RigidTransform3d globalCoordinatesFromMeshACoordinates = representationMeshA->getPose();
 	RigidTransform3d globalCoordinatesFromMeshBCoordinates = representationMeshB->getPose();
