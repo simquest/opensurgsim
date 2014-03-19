@@ -17,8 +17,11 @@
 #include <memory>
 #include <string>
 
+#include <boost/exception/to_string.hpp>
+
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Collision/ShapeCollisionRepresentation.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
@@ -54,6 +57,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Collision::ShapeCollisionRepresentation;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
@@ -287,6 +291,32 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		recievesPhysicsPose.push_back(*it);
 		sceneElement->addComponent(*it);
+	}
+
+	std::vector<std::shared_ptr<MeshShape>> virtualTeethShapes;
+	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_1.ply")));
+	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_2.ply")));
+
+	int i = 0;
+	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it)
+	{
+		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
+			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
+				"VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
+
+		sceneElement->addComponent(virtualToothCollision);
+		recievesPhysicsPose.push_back(virtualToothCollision);
+
+		std::shared_ptr<OsgMeshRepresentation> virtualToothMesh
+			= std::make_shared<OsgMeshRepresentation>("virtualToothMesh" + boost::to_string(i));
+		*virtualToothMesh->getMesh() = SurgSim::Graphics::Mesh(*(*it)->getMesh());
+		virtualToothMesh->setInitialPose(pose);
+		virtualToothMesh->setDrawAsWireFrame(true);
+
+		sceneElement->addComponent(virtualToothMesh);
+		recievesPhysicsPose.push_back(virtualToothMesh);
+
+		i++;
 	}
 
 	for (auto it = recievesPhysicsPose.begin(); it != recievesPhysicsPose.end(); ++it)
