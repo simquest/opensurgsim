@@ -216,6 +216,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 														const std::string& deviceName,
 														const SurgSim::Math::RigidTransform3d& pose)
 {
+	std::vector<std::shared_ptr<SurgSim::Framework::Representation>> recievesPhysicsPose;
+
 	std::vector<std::string> paths;
 	paths.push_back("Data/Geometry");
 	ApplicationData data(paths);
@@ -230,6 +232,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
 	osgMeshRepresentation->setInitialPose(pose);
 	osgMeshRepresentation->setDrawAsWireFrame(true);
+	recievesPhysicsPose.push_back(osgMeshRepresentation);
 
 	// Stapler collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
@@ -271,11 +274,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
 
-	std::shared_ptr<TransferPoseBehavior> physicsPoseToGraphics =
-		std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
-	physicsPoseToGraphics->setPoseSender(physicsRepresentation);
-	physicsPoseToGraphics->setPoseReceiver(osgMeshRepresentation);
-	sceneElement->addComponent(physicsPoseToGraphics);
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
 	sceneryRepresentations.push_back(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
@@ -284,13 +282,18 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneryRepresentations.push_back(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
 	for (auto it = std::begin(sceneryRepresentations); it != std::end(sceneryRepresentations); ++it)
 	{
-		std::shared_ptr<TransferPoseBehavior> transferPose =
-			std::make_shared<TransferPoseBehavior>("Physics to Graphics" + (*it)->getName());
+		(*it)->setInitialPose(pose);
+
+		recievesPhysicsPose.push_back(*it);
+		sceneElement->addComponent(*it);
+	}
+
+	for (auto it = recievesPhysicsPose.begin(); it != recievesPhysicsPose.end(); ++it)
+	{
+		std::shared_ptr<TransferPoseBehavior> transferPose
+			= std::make_shared<TransferPoseBehavior>("Physics to " + (*it)->getName());
 		transferPose->setPoseSender(physicsRepresentation);
 		transferPose->setPoseReceiver(*it);
-
-		(*it)->setInitialPose(pose);
-		sceneElement->addComponent(*it);
 		sceneElement->addComponent(transferPose);
 	}
 
