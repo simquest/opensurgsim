@@ -98,8 +98,11 @@ TEST(LinearSpringTests, computeMethods)
 	setSubVector(Vector3d(2.3, 4.1, 1.2), 1, 3, &state.getPositions());
 	setSubVector(expectedF3D, 0, 3, &expectedF);
 	setSubVector(-expectedF3D, 1, 3, &expectedF);
-	const Vector& f = ls.computeForce(state);
-	EXPECT_TRUE(f.isApprox(expectedF));
+	Vector f(6);
+	f.setZero();
+	ls.addForce(state, &f);
+	EXPECT_TRUE(f.isApprox(expectedF)) << " F = " << f.transpose() << std::endl <<
+		"expectedF = " << expectedF.transpose() << std::endl;
 
 	// Calculate stiffness matrix
 	double expectedStiffnessMatrixContent[] = {
@@ -114,20 +117,31 @@ TEST(LinearSpringTests, computeMethods)
 	setSubMatrix(-expectedStiffness33, 0, 1, 3, 3, &expectedK);
 	setSubMatrix(-expectedStiffness33, 1, 0, 3, 3, &expectedK);
 	setSubMatrix( expectedStiffness33, 1, 1, 3, 3, &expectedK);
-	const Matrix& K = ls.computeStiffness(state);
-	EXPECT_TRUE(K.isApprox(expectedK));
+	Matrix K(6, 6);
+	K.setZero();
+	ls.addStiffness(state, &K);
+	EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
+		"expectedK = " << std::endl << expectedK << std::endl;
 
 	// Calculate damping matrix
-	const Matrix& D = ls.computeDamping(state);
-	EXPECT_TRUE(D.isZero());
+	Matrix D(6, 6);
+	D.setZero();
+	ls.addDamping(state, &D);
+	EXPECT_TRUE(D.isZero()) << " D = " << std::endl << D << std::endl;
 
 	// Compute all together
 	{
-		Vector *f;
-		Matrix *K, *D;
-		ls.computeFDK(state, &f, &D, &K);
-		EXPECT_TRUE(f->isApprox(expectedF));
-		EXPECT_TRUE(K->isApprox(expectedK));
-		EXPECT_TRUE(D->isZero());
+		SCOPED_TRACE("Testing addFDK method call");
+		Vector f(6);
+		Matrix K(6, 6), D(6, 6);
+		f.setZero();
+		K.setZero();
+		D.setZero();
+		ls.addFDK(state, &f, &D, &K);
+		EXPECT_TRUE(f.isApprox(expectedF)) << " F = " << f.transpose() << std::endl <<
+			"expectedF = " << expectedF.transpose() << std::endl;
+		EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
+			"expectedK = " << std::endl << expectedK << std::endl;
+		EXPECT_TRUE(D.isZero()) << " D = " << std::endl << D << std::endl;
 	}
 }

@@ -16,6 +16,13 @@
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
+using SurgSim::Math::Matrix33d;
+using SurgSim::Math::Vector;
+using SurgSim::Math::Vector3d;
+using SurgSim::Math::addSubMatrix;
+using SurgSim::Math::addSubVector;
+using SurgSim::Math::getSubVector;
+
 namespace SurgSim
 {
 
@@ -27,15 +34,6 @@ LinearSpring::LinearSpring(unsigned int nodeId0, unsigned int nodeId1) :
 {
 	m_nodeIds.push_back(nodeId0);
 	m_nodeIds.push_back(nodeId1);
-
-	m_f.resize(6);
-	m_f.setZero();
-
-	m_K.resize(6, 6);
-	m_K.setZero();
-
-	m_D.resize(6, 6);
-	m_D.setZero();
 }
 
 void LinearSpring::setStiffness(double stiffness)
@@ -68,83 +66,101 @@ double LinearSpring::getRestLength() const
 	return m_restLength;
 }
 
-const SurgSim::Math::Vector& LinearSpring::computeForce(const DeformableRepresentationState& state)
+void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
 {
-	using SurgSim::Math::Vector3d;
-	using SurgSim::Math::getSubVector;
-	using SurgSim::Math::setSubVector;
-
-	const SurgSim::Math::Vector& x = state.getPositions();
-	const SurgSim::Math::Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
-	const SurgSim::Math::Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
+	const Vector& x = state.getPositions();
+	const Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
+	const Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
 
 	Vector3d f = x1 - x0;
 	double m_l = f.norm();
-	f *= (m_l - m_restLength)/m_l * m_stiffness;
+	f *= scale * (m_l - m_restLength)/m_l * m_stiffness;
 
-	SurgSim::Math::setSubVector( f, 0, 3, &m_f);
-	SurgSim::Math::setSubVector(-f, 1, 3, &m_f);
-
-	return m_f;
+	// Assembly stage in F
+	addSubVector( f, m_nodeIds[0], 3, F);
+	addSubVector(-f, m_nodeIds[1], 3, F);
 }
 
-const SurgSim::Math::Matrix& LinearSpring::computeStiffness(const DeformableRepresentationState& state)
+void LinearSpring::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D, double scale)
 {
-	using SurgSim::Math::getSubVector;
-	using SurgSim::Math::setSubMatrix;
+}
 
-	const SurgSim::Math::Vector& x = state.getPositions();
-	const SurgSim::Math::Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
-	const SurgSim::Math::Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
-	SurgSim::Math::Vector3d u = x1 - x0;
+void LinearSpring::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K, double scale)
+{
+	const Vector& x = state.getPositions();
+	const Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
+	const Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
+	Vector3d u = x1 - x0;
 	double m_l = u.norm();
 	double lRatio = (m_l - m_restLength) / m_l;
 	u /= m_l;
 
-	SurgSim::Math::Matrix33d K00 = SurgSim::Math::Matrix33d::Identity() * (m_stiffness * lRatio);
+	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
 	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
-	setSubMatrix( K00, 0, 0, 3, 3, &m_K);
-	setSubMatrix(-K00, 0, 1, 3, 3, &m_K);
-	setSubMatrix(-K00, 1, 0, 3, 3, &m_K);
-	setSubMatrix( K00, 1, 1, 3, 3, &m_K);
+	K00 *= scale;
 
-	return m_K;
+	// Assembly stage in K
+	addSubMatrix( K00, m_nodeIds[0], m_nodeIds[0], 3, 3, K);
+	addSubMatrix(-K00, m_nodeIds[0], m_nodeIds[1], 3, 3, K);
+	addSubMatrix(-K00, m_nodeIds[1], m_nodeIds[0], 3, 3, K);
+	addSubMatrix( K00, m_nodeIds[1], m_nodeIds[1], 3, 3, K);
 }
 
-const SurgSim::Math::Matrix& LinearSpring::computeDamping(const DeformableRepresentationState& state)
+void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::Math::Vector* F,
+							   SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
-	return m_D;
-}
-
-void LinearSpring::computeFDK(const DeformableRepresentationState& state,
-	SurgSim::Math::Vector** f, SurgSim::Math::Matrix** D, SurgSim::Math::Matrix** K)
-{
-	using SurgSim::Math::getSubVector;
-	using SurgSim::Math::setSubVector;
-	using SurgSim::Math::setSubMatrix;
-
-	const SurgSim::Math::Vector& x = state.getPositions();
-	const SurgSim::Math::Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
-	const SurgSim::Math::Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
-	SurgSim::Math::Vector3d u = x1 - x0;
+	const Vector& x = state.getPositions();
+	const Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
+	const Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
+	Vector3d u = x1 - x0;
 	double m_l = u.norm();
 	double lRatio = (m_l - m_restLength) / m_l;
 	u /= m_l;
 
-	SurgSim::Math::Matrix33d K00 = SurgSim::Math::Matrix33d::Identity() * (m_stiffness * lRatio);
+	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
 	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
-	setSubMatrix( K00, 0, 0, 3, 3, &m_K);
-	setSubMatrix(-K00, 0, 1, 3, 3, &m_K);
-	setSubMatrix(-K00, 1, 0, 3, 3, &m_K);
-	setSubMatrix( K00, 1, 1, 3, 3, &m_K);
-	*K = &m_K;
+	addSubMatrix( K00, m_nodeIds[0], m_nodeIds[0], 3, 3, K);
+	addSubMatrix(-K00, m_nodeIds[0], m_nodeIds[1], 3, 3, K);
+	addSubMatrix(-K00, m_nodeIds[1], m_nodeIds[0], 3, 3, K);
+	addSubMatrix( K00, m_nodeIds[1], m_nodeIds[1], 3, 3, K);
 
 	u *= (m_l - m_restLength) * m_stiffness;
-	setSubVector( u, 0, 3, &m_f);
-	setSubVector(-u, 1, 3, &m_f);
-	*f = &m_f;
+	addSubVector( u, m_nodeIds[0], 3, F);
+	addSubVector(-u, m_nodeIds[1], 3, F);
+}
 
-	*D = &m_D;
+void LinearSpring::addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
+							 const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+{
+	// Considering that we do not have damping yet, only the stiffness part will contribute
+	if (alphaK == 0.0)
+	{
+		return;
+	}
+
+	Eigen::Matrix<double, 6, 1, Eigen::DontAlign> x6D;
+	getSubVector(x, m_nodeIds, 3, &x6D);
+
+	// Adds the damping contribution (No damping)
+
+	// Adds the stiffness contribution
+	if (alphaK != 0.0)
+	{
+		const Vector& xState = state.getPositions();
+		const Vector& x0 = getSubVector(xState, m_nodeIds[0], 3);
+		const Vector& x1 = getSubVector(xState, m_nodeIds[1], 3);
+		Vector3d u = x1 - x0;
+		double m_l = u.norm();
+		double lRatio = (m_l - m_restLength) / m_l;
+		u /= m_l;
+
+		Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
+		K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
+
+		Vector3d force = alphaK * (K00 * (x6D.segment(0, 3) - x6D.segment(3, 3)));
+		addSubVector( force, m_nodeIds[0], 3, F);
+		addSubVector(-force, m_nodeIds[1], 3, F);
+	}
 }
 
 bool LinearSpring::operator ==(const Spring& spring) const
