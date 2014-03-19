@@ -36,5 +36,9 @@ surgsim_add_library(
 	"${DEVICE_FILTERS_SOURCES}" "${DEVICE_FILTERS_HEADERS}"
 	SurgSim/Devices/DeviceFilters
 )
+if(BUILD_TESTING)
+	# The unit tests will be built whenever the library is built.
+	add_subdirectory(UnitTests)
+endif()
 
 set_target_properties(SurgSimDeviceFilters PROPERTIES FOLDER "Devices")
