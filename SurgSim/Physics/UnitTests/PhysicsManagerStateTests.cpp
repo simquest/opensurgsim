@@ -80,6 +80,7 @@ TEST(PhysicsManagerStateTest, SetGetRigidRepresentations)
 	// check the representationsIndexMapping
 	actualRepresentationsIndexMapping = physicsState->getRepresentationsMapping();
 	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid1AsRepresentation.get()));
+	EXPECT_EQ(6, rigid1AsRepresentation->getNumDof()); // make sure the rigid representation is 6 DOF
 	expectedMapValue += 6; // the number of DOF for a rigid representation
 	std::shared_ptr<Representation> rigid2AsRepresentation = rigid2;
 	EXPECT_EQ(expectedMapValue, actualRepresentationsIndexMapping.getValue(rigid2AsRepresentation.get()));
@@ -192,7 +193,6 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	int expectedMapValue = 0;
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint1.get()));
 	expectedMapValue += 1; // The number of DOF for a MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT.
-	std::shared_ptr<Representation> rigid2AsRepresentation = rigid2;
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint2.get()));
 }
 
