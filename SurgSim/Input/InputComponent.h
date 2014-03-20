@@ -66,6 +66,7 @@ public:
 
 	/// Gets the input data.
 	/// \param [out] dataGroup The location to write the data.  The pointer must be non-null.
+	/// \exception Asserts if the InputComponent is not connected to a device.
 	void getData(SurgSim::DataStructures::DataGroup* dataGroup);
 
 	/// Overridden from Component, do nothing
