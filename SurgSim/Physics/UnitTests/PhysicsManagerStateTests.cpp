@@ -192,6 +192,7 @@ TEST(PhysicsManagerStateTest, SetGetConstraintGroup)
 	MlcpMapping<Constraint> actualConstraintsIndexMapping = physicsState->getConstraintsMapping();
 	int expectedMapValue = 0;
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint1.get()));
+	EXPECT_EQ(1, constraint1->getNumDof()); // Make sure the unilateral 3d frictionless constraint is 1 DOF.
 	expectedMapValue += 1; // The number of DOF for a MLCP_UNILATERAL_3D_FRICTIONLESS_CONSTRAINT.
 	EXPECT_EQ(expectedMapValue, actualConstraintsIndexMapping.getValue(constraint2.get()));
 }
