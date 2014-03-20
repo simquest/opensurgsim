@@ -31,7 +31,7 @@ int SurfaceMeshShape::getType()
 	return SHAPE_TYPE_SURFACEMESH;
 }
 
-std::shared_ptr<SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh() const
+std::shared_ptr<SurgSim::DataStructures::TriangleMesh> SurfaceMeshShape::getMesh()
 {
 	return m_mesh;
 }
