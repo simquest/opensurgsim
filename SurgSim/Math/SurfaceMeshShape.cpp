@@ -53,19 +53,40 @@ SurgSim::Math::Matrix33d SurfaceMeshShape::getSecondMomentOfVolume() const
 
 void SurfaceMeshShape::computeVolumeIntegrals()
 {
-	// Considering a surface mesh with thickness, the goal is to evaluate integral terms of the form:
-	// integral(over volume) x.y dV =
-	// integral(over area) x.y dS * thickness
-	// [sum(over all triangles) integral(over triangle) x.y dS] * thickness
+	// Considering a surface mesh with thickness, the goal is to compute the following properties:
+	// 1) volume = integral(over volume) dx dy dz
+	// 2) center = integral(over volume) (x y z)^T dx dy dz / volume
+	// 3) the inertia matrix without the mass density:
+	// I = (Ixx Ixy Ixz) = integral(over volume) (y^2+z^2    -xy      -xz  ) dx dy dz
+	//     (Iyx Iyy Iyz)                         (  -yx    x^2+z^2    -yz  )
+	//     (Izx Izy Izz)                         (  -zx      -zy    x^2+y^2)
+	// Each term of the matrix I can be evaluated independently and each monome can also be evaluated
+	// independently and summed up after: integral(V) y^2+z^2 dV = integral(V) y^2 dV + integral(V) z^2 dV
 	//
-	// Change the integration variables to a parametrization of a triangle ABC:
-	//   P = A + a.u + b.v
-	//   with u=AB  v=AC  0<=a<=1 0<=b<=1-a
-	//   dS = |dP/db x dP/da|.db.da = |vxu|.db.da = |uxv|.db.da
+	// Therefore, we simply need to compute 10 different volume integral:
+	// {1, x, y, z, x^2, y^2, z^2, xy, yz, zx}
 	//
-	// => integral(over triangle) x.y dS = integral(from 0 to 1) integral(from 0 to 1-a) x.y db.da |uxv|
+	// Example for the monome 'xy':
+	// = integral(over volume) x.y dx dy dz = integral(over volume) x.y dV
+	// = integral(over area) x.y dS * thickness
+	// = [sum(over all triangles) integral(over triangle) x.y dS] * thickness
 	//
-	// The various integral terms can be found using any formal integration tool.
+	// Change the integration variables from cartesian coordinates to a parametrization of the
+	// triangle ABC = {P | P = A + a.u + b.v}
+	//   with
+	//  { u=AB       the 1st triangle edge supporting the parametrization
+	//  { v=AC       the 2nd triangle edge supporting the parametrization
+	//  { 0<=a<=1    the triangle 1st coordinate in the new coordinate system (parametrized)
+	//  { 0<=b<=1-a  the triangle 2nd coordinate in the new coordinate system (parametrized)
+	//  => dS = |dP/db x dP/da|.db.da = |vxu|.db.da = |uxv|.db.da
+	//  => x  = Px
+	//  => y  = Py
+	//
+	// integral(over volume) x.y dx dy dz =
+	// [sum(over all triangles) integral(over triangle) x.y dS] * thickness =
+	// [sum(over all triangles) integral(from 0 to 1) integral(from 0 to 1-a) Px.Py db.da |uxv|] * thickness
+	//
+	// From here, the various integral terms can be found related to A, u and v using any formal integration tool.
 
 	// Order: 1, x, y, z, x^2, y^2, z^2, xy, yz, zx
 	Eigen::VectorXd integral(10);
