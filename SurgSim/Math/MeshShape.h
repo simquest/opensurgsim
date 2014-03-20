@@ -60,7 +60,7 @@ public:
 
 	/// Get mesh
 	/// \return The collision mesh associated to this MeshShape
-	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh() const;
+	std::shared_ptr<SurgSim::DataStructures::TriangleMesh> getMesh();
 
 	/// Get the volume of the shape
 	/// \return The volume of the shape (in m-3)
