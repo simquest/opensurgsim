@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 
-#ifndef SURGSIM_MATH_MESHSHAPE_INL_H
-#define SURGSIM_MATH_MESHSHAPE_INL_H
+#ifndef SURGSIM_MATH_SURFACEMESHSHAPE_INL_H
+#define SURGSIM_MATH_SURFACEMESHSHAPE_INL_H
 
 namespace SurgSim
 {
@@ -23,7 +23,9 @@ namespace Math
 {
 
 template <class VertexData, class EdgeData, class TriangleData>
-MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh)
+SurfaceMeshShape::SurfaceMeshShape(
+	const SurgSim::DataStructures::TriangleMeshBase<VertexData, EdgeData, TriangleData>& mesh,
+	double thickness) : m_thickness(thickness)
 {
 	SURGSIM_ASSERT(mesh.isValid()) << "Invalid mesh";
 
@@ -36,4 +38,4 @@ MeshShape::MeshShape(const SurgSim::DataStructures::TriangleMeshBase<VertexData,
 }; // namespace Math
 }; // namespace SurgSim
 
-#endif
+#endif // SURGSIM_MATH_SURFACEMESHSHAPE_INL_H
