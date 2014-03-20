@@ -69,12 +69,18 @@ double LinearSpring::getRestLength() const
 void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim::Math::Vector* F, double scale)
 {
 	const Vector& x = state.getPositions();
+	const Vector& v = state.getVelocities();
 	const Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
 	const Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
+	const Vector& v0 = getSubVector(v, m_nodeIds[0], 3);
+	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 
-	Vector3d f = x1 - x0;
-	double m_l = f.norm();
-	f *= scale * (m_l - m_restLength)/m_l * m_stiffness;
+	Vector3d u = x1 - x0;
+	double m_l = u.norm();
+	u /= m_l;
+	double elongationPosition = m_l - m_restLength;
+	double elongationVelocity = (v1 - v0).dot(u);
+	Vector3d f = scale * (m_stiffness* elongationPosition + m_damping * elongationVelocity) * u;
 
 	// Assembly stage in F
 	addSubVector( f, m_nodeIds[0], 3, F);
@@ -83,20 +89,35 @@ void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim:
 
 void LinearSpring::addDamping(const DeformableRepresentationState& state, SurgSim::Math::Matrix* D, double scale)
 {
+	const Vector& x = state.getPositions();
+	Vector3d u = getSubVector(x, m_nodeIds[1], 3) - getSubVector(x, m_nodeIds[0], 3);
+	u.normalize();
+	Matrix33d D00 = scale * m_damping * (u * u.transpose());
+
+	// Assembly stage in D
+	addSubMatrix( D00, m_nodeIds[0], m_nodeIds[0], 3, 3, D);
+	addSubMatrix(-D00, m_nodeIds[0], m_nodeIds[1], 3, 3, D);
+	addSubMatrix(-D00, m_nodeIds[1], m_nodeIds[0], 3, 3, D);
+	addSubMatrix( D00, m_nodeIds[1], m_nodeIds[1], 3, 3, D);
 }
 
 void LinearSpring::addStiffness(const DeformableRepresentationState& state, SurgSim::Math::Matrix* K, double scale)
 {
 	const Vector& x = state.getPositions();
+	const Vector& v = state.getVelocities();
 	const Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
 	const Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
+	const Vector& v0 = getSubVector(v, m_nodeIds[0], 3);
+	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
 	double m_l = u.norm();
-	double lRatio = (m_l - m_restLength) / m_l;
 	u /= m_l;
+	double lRatio = (m_l - m_restLength) / m_l;
+	double vRatio = (v1 -v0).dot(u) / m_l;
 
-	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
-	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
+	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio + m_damping * vRatio);
+	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0) + 2.0 * m_damping * vRatio);
+	K00 += m_damping * (u * (v1 -v0).transpose()) / m_l;
 	K00 *= scale;
 
 	// Assembly stage in K
@@ -110,21 +131,34 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 							   SurgSim::Math::Matrix* D, SurgSim::Math::Matrix* K)
 {
 	const Vector& x = state.getPositions();
+	const Vector& v = state.getVelocities();
 	const Vector& x0 = getSubVector(x, m_nodeIds[0], 3);
 	const Vector& x1 = getSubVector(x, m_nodeIds[1], 3);
+	const Vector& v0 = getSubVector(v, m_nodeIds[0], 3);
+	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
 	double m_l = u.norm();
-	double lRatio = (m_l - m_restLength) / m_l;
 	u /= m_l;
+	double elongationPosition = m_l - m_restLength;
+	double elongationVelocity = (v1 - v0).dot(u);
+	double lRatio = elongationPosition / m_l;
+	double vRatio = (v1 -v0).dot(u) / m_l;
 
-	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
-	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
+	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio + m_damping * vRatio);
+	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0) + 2.0 * m_damping * vRatio);
+	K00 += m_damping * (u * (v1 -v0).transpose()) / m_l;
 	addSubMatrix( K00, m_nodeIds[0], m_nodeIds[0], 3, 3, K);
 	addSubMatrix(-K00, m_nodeIds[0], m_nodeIds[1], 3, 3, K);
 	addSubMatrix(-K00, m_nodeIds[1], m_nodeIds[0], 3, 3, K);
 	addSubMatrix( K00, m_nodeIds[1], m_nodeIds[1], 3, 3, K);
 
-	u *= (m_l - m_restLength) * m_stiffness;
+	Matrix33d D00 = m_damping * (u * u.transpose());
+	addSubMatrix( D00, m_nodeIds[0], m_nodeIds[0], 3, 3, D);
+	addSubMatrix(-D00, m_nodeIds[0], m_nodeIds[1], 3, 3, D);
+	addSubMatrix(-D00, m_nodeIds[1], m_nodeIds[0], 3, 3, D);
+	addSubMatrix( D00, m_nodeIds[1], m_nodeIds[1], 3, 3, D);
+
+	u *= (m_stiffness* elongationPosition + m_damping * elongationVelocity);
 	addSubVector( u, m_nodeIds[0], 3, F);
 	addSubVector(-u, m_nodeIds[1], 3, F);
 }
