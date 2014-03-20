@@ -36,13 +36,16 @@ namespace Math
 ///
 /// \note If not used in physics, there is no differences between using a SurfaceMeshShape or a MeshShape.
 ///
-/// \note The internal mesh should not be modified, otherwise the geometric properties will be invalid.
+/// \note Any change on the mesh will invalidate the geometric properties.
 /// \note Practical use cases:
 /// \note * Fixed/Rigid object, the mesh will not change anyway.
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
 ///
 /// \note The thickness should be multiple order of magnitude smaller than the other 2 dimensions of the mesh.
 /// \note It should also not be smaller than 1e-5 to avoid formal and numerical issues when getting close to 0.
+///
+/// \note SurfaceMeshShape does not have any collision algorithm associated with it in SurgSim::Collision and
+/// \note SurgSim::Physics::DcdCollision so far.
 ///
 /// \sa MeshShape
 class SurfaceMeshShape : public Shape
