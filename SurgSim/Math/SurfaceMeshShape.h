@@ -29,9 +29,10 @@ namespace Math
 /// SurfaceMeshShape defines a shape based on a mesh, like MeshShape.
 /// But, unlike MeshShape, the mesh does not need to be watertight to produce valid volume, center and second moment of
 /// volume. In the MeshShape case, these quantities are based on the notion of volume and are therefore undefined
-/// if no volume if properly defined. In the SurfaceMeshShape case, these quantities are based on the mesh as a surface
-/// mesh, with a thickness (which should be very small compared to the mesh size, i.e. 1e-3 in practice). If the mesh
-/// is not closed or has holes, the class will still produce valid geometric properties.
+/// if no volume if properly defined. In the SurfaceMeshShape case, these quantities are based on a surface
+/// mesh, with a thickness (which is considered constant over the surface and should be multiple orders of magnitude
+/// smaller than the two other dimesions, i.e. 1e-3 in practice). If the mesh is not closed or has holes, the class
+/// will still produce valid geometric properties.
 ///
 /// \note If not used in physics, there is no differences between using a SurfaceMeshShape or a MeshShape.
 ///
@@ -39,6 +40,9 @@ namespace Math
 /// \note Practical use cases:
 /// \note * Fixed/Rigid object, the mesh will not change anyway.
 /// \note * Deformable  object, the mesh will be updated, but the geometric properties will not be used.
+///
+/// \note The thickness should be multiple order of magnitude smaller than the other 2 dimensions of the mesh.
+/// \note It should also not be smaller than 1e-5 to avoid formal and numerical issues when getting close to 0.
 ///
 /// \sa MeshShape
 class SurfaceMeshShape : public Shape
