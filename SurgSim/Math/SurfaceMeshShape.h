@@ -85,7 +85,7 @@ private:
 	/// Center (considering a uniform distribution in the mesh volume)
 	SurgSim::Math::Vector3d m_center;
 
-	/// Volume (in m^-3)
+	/// Volume (in m-3)
 	double m_volume;
 
 	/// Second moment of volume
