@@ -93,6 +93,8 @@ bool InputComponent::isDeviceConnected()
 
 void InputComponent::getData(SurgSim::DataStructures::DataGroup* dataGroup)
 {
+	SURGSIM_ASSERT(m_deviceConnected) << "No device connected to InputComponent named '" << getName() <<
+		"'. Unable to getData.";
 	m_input->getData(dataGroup);
 }
 
@@ -103,13 +105,7 @@ bool InputComponent::doInitialize()
 
 bool InputComponent::doWakeUp()
 {
-	bool result = true;
-	if (!m_deviceConnected)
-	{
-		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No device connected to " << getName() << "...failed to wake up.";
-	}
-	return result;
+	return true;
 }
 
 std::string InputComponent::getDeviceName() const
