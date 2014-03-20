@@ -62,25 +62,25 @@ void TransferInputPoseBehavior::update(double dt)
 
 bool TransferInputPoseBehavior::doInitialize()
 {
-	return true;
-}
-
-bool TransferInputPoseBehavior::doWakeUp()
-{
 	bool result = true;
 	if (m_from == nullptr)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No pose sender set for TransferInputPoseBehavior named '" << getName() << "', so it cannot wake up.";
+			"No pose sender set for TransferInputPoseBehavior named '" << getName() << "', so it cannot initialize.";
 		result = false;
 	}
 	if (m_to == nullptr)
 	{
 		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
-			"No pose receiver set for TransferInputPoseBehavior named '" << getName() << "', so it cannot wake up.";
+			"No pose receiver set for TransferInputPoseBehavior named '" << getName() << "', so it cannot initialize.";
 		result = false;
 	}
 	return result;
+}
+
+bool TransferInputPoseBehavior::doWakeUp()
+{
+	return true;
 }
 
 }; //namespace Blocks
