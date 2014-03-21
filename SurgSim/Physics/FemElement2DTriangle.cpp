@@ -27,6 +27,12 @@ using SurgSim::Math::setSubMatrix;
 using SurgSim::Math::Vector;
 using SurgSim::Math::Vector3d;
 
+namespace
+{
+const double epsilon = 1e-8;
+const double epsilonArea = 1e-10;
+};
+
 namespace SurgSim
 {
 
@@ -70,8 +76,8 @@ void FemElement2DTriangle::initialize(const DeformableRepresentationState& state
 	// Test the validity of the physical parameters
 	FemElement::initialize(state);
 
-	SURGSIM_ASSERT(m_thickness > 0) << "FemElement2DTriangle thickness should be positive and non-zero.  Did you call "
-									"setThickness(thickness) ?";
+	SURGSIM_ASSERT(m_thickness > 0.0) << "FemElement2DTriangle thickness should be positive and non-zero. " <<
+		"Did you call setThickness(thickness) ?";
 
 	// Store the rest state for this beam in m_x0
 	getSubVector(state.getPositions(), m_nodeIds, 6, &m_x0);
@@ -180,7 +186,7 @@ void FemElement2DTriangle::computeMass(const DeformableRepresentationState& stat
 		m_MLocal.block(i * 6, i * 6, 3, 3).setConstant(mass / 12.0);
 		m_MLocal.block(i * 6, i * 6, 3, 3).diagonal().setConstant(mass / 6.0);
 
-		// Plate inertia matrix developped from Batoz paper
+		// Plate inertia matrix developed from Batoz paper
 		// Interpolation of the rotational displacement over the triangle w.r.t. DOF:
 		// Uthetax(xi,neta) = z.Hx^T. U
 		// Uthetay(xi,neta) = z.Hy^T. U
@@ -418,7 +424,7 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	double y2 = c2D[1];
 
 	// Note that by construction, we should have x0=y0=0 and y1=0
-	SURGSIM_ASSERT(std::abs(x0) < 1e-10 && std::abs(y0) < 1e-10 && std::abs(y1) < 1e-10) <<
+	SURGSIM_ASSERT(std::abs(x0) < epsilon && std::abs(y0) < epsilon && std::abs(y1) < epsilon) <<
 		"Membrane local transform problem. We should have x0=y0=y1=0, but we have x0=" << x0 <<
 		" y0=" << y0 << " y1=" << y1;
 	x0=y0=y1=0.0; // Force it to exactly 0 for numerical purpose
