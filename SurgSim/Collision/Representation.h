@@ -73,7 +73,7 @@ public:
 	/// \param collisionRepresentation The collision representation with which this collision representation collides.
 	/// \return A list of contact points.
 	std::list<std::shared_ptr<SurgSim::Collision::Contact>>
-		getCollisionsWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const;
+			getCollisionsWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation) const;
 
 	/// Add a contact against a given collision representation.
 	/// \param collisionRepresentation The collision representation to which this collision representation collides.
@@ -93,11 +93,15 @@ public:
 	/// Clear all the collisions.
 	void clearCollisions();
 
+	/// Update the representation, implement for your subclass, default do nothing
+	/// \param dt the time passed from the last update;
+	virtual void update(const double& dt);
+
 protected:
 	/// A map which associates a list of contacts with each collision representation.
 	SurgSim::Framework::LockedContainer<std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-														   std::list<std::shared_ptr<SurgSim::Collision::Contact>>>>
-														   m_collisions;
+			std::list<std::shared_ptr<SurgSim::Collision::Contact>>>>
+			m_collisions;
 };
 
 

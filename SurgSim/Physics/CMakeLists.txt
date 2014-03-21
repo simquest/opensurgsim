@@ -62,6 +62,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	RigidRepresentationContact.cpp
 	RigidRepresentationLocalization.cpp
 	SolveMlcp.cpp
+	UpdateCollisionRepresentations.cpp
 	VirtualToolCoupler.cpp
 )
 
@@ -124,6 +125,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	RigidRepresentationState.h
 	SolveMlcp.h
 	Spring.h
+	UpdateCollisionRepresentations.h
 	VirtualToolCoupler.h
 )
 

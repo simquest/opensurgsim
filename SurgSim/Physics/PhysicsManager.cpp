@@ -26,6 +26,7 @@
 #include "SurgSim/Physics/PushResults.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/SolveMlcp.h"
+#include "SurgSim/Physics/UpdateCollisionRepresentations.h"
 
 #include <list>
 
@@ -35,7 +36,7 @@ namespace Physics
 {
 
 PhysicsManager::PhysicsManager() :
-  ComponentManager("Physics Manager")
+	ComponentManager("Physics Manager")
 {
 	setRate(1000.0);
 }
@@ -62,7 +63,7 @@ bool PhysicsManager::doStartUp()
 	return true;
 }
 
-void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState *s) const
+void PhysicsManager::getFinalState(SurgSim::Physics::PhysicsManagerState* s) const
 {
 	m_finalState.get(s);
 }
@@ -98,11 +99,13 @@ bool PhysicsManager::doUpdate(double dt)
 
 	stateList.push_back(m_preUpdateStep->update(dt, stateList.back()));
 	stateList.push_back(m_freeMotionStep->update(dt, stateList.back()));
+	stateList.push_back(m_updateCollisionRepresentationsStep->update(dt, stateList.back()));
 	stateList.push_back(m_dcdCollisionStep->update(dt, stateList.back()));
 	stateList.push_back(m_constraintGenerationStep->update(dt, stateList.back()));
 	stateList.push_back(m_buildMlcpStep->update(dt, stateList.back()));
 	stateList.push_back(m_solveMlcpStep->update(dt, stateList.back()));
 	stateList.push_back(m_pushResultsStep->update(dt, stateList.back()));
+	stateList.push_back(m_updateCollisionRepresentationsStep->update(dt, stateList.back()));
 	stateList.push_back(m_postUpdateStep->update(dt, stateList.back()));
 
 	m_finalState.set(*(stateList.back()));
@@ -120,6 +123,7 @@ void PhysicsManager::initializeComputations(bool copyState)
 	m_solveMlcpStep.reset(new SolveMlcp(copyState));
 	m_pushResultsStep.reset(new PushResults(copyState));
 	m_postUpdateStep.reset(new PostUpdate(copyState));
+	m_updateCollisionRepresentationsStep.reset(new UpdateCollisionRepresentations(copyState));
 }
 
 
