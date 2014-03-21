@@ -61,10 +61,10 @@ void StaplerBehavior::update(double dt)
 			std::string name = "stapleId_" + elementCount.str();
 
 			// Create a staple element and add it into scene.
-			auto m_element = std::make_shared<StapleElement>(name);
-			m_element->setPose(pose);
+			std::shared_ptr<StapleElement> element = std::make_shared<StapleElement>(name);
+			element->setPose(pose);
 
-			getScene()->addSceneElement(m_element);
+			getScene()->addSceneElement(element);
 		}
 		m_buttonPreviouslyPressed = button1;
 	}
