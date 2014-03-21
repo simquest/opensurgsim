@@ -16,6 +16,7 @@
 #ifndef SURGSIM_DEVICES_DEVICEFILTERS_POSETRANSFORM_H
 #define SURGSIM_DEVICES_DEVICEFILTERS_POSETRANSFORM_H
 
+#include <boost/thread/mutex.hpp>
 #include <memory>
 #include <string>
 
@@ -92,14 +93,14 @@ public:
 
 	/// Set the translation scale factor so that each direction has the same scale.
 	/// \param translationScale The scalar scaling factor.
-	/// \warning This setter is not thread-safe, so it is recommended that the scaling only be set before this filter
-	///		wakes up.
+	/// \warning This setter is thread-safe, but after calling this function the output filter will use the new
+	///		transform even if the following output data is based off input data that used the old transform.
 	void setTranslationScale(double translationScale);
 
 	/// Set the constant transform.  The transform is pre-applied to the input pose.
 	/// \param transform The transform, which must be invertible.
-	/// \warning This setter is not thread-safe, so it is recommended that the transform only be set before this
-	///		filter wakes up.
+	/// \warning This setter is thread-safe, but after calling this function the output filter will use the new
+	///		transform even if the following output data is based off input data that used the old transform.
 	void setTransform(const SurgSim::Math::RigidTransform3d& transform);
 
 private:
@@ -123,6 +124,9 @@ private:
 	///		Will contain the filtered data.
 	void outputFilter(const SurgSim::DataStructures::DataGroup& dataToFilter,
 		SurgSim::DataStructures::DataGroup* result);
+
+	/// The mutex that protects the transform and scaling factor.
+	boost::mutex m_mutex;
 
 	/// The constant pre-transform.
 	SurgSim::Math::RigidTransform3d m_transform;

@@ -42,7 +42,7 @@ const double errorEpsilon = 1e-9;
 class TestInputOutputDevice : public CommonDevice
 {
 public:
-	TestInputOutputDevice(const std::string& name) :
+	explicit TestInputOutputDevice(const std::string& name) :
 		CommonDevice(name)
 	{
 	}
@@ -266,7 +266,7 @@ TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
 	RigidTransform3d actualOutputPose;
 	ASSERT_TRUE(device->doGetOutputData().poses().get("pose", &actualOutputPose));
 	EXPECT_TRUE(actualOutputPose.isApprox(initialOutputPose, errorEpsilon));
-	
+
 	Vector3d actualOutputVector;
 	ASSERT_TRUE(device->doGetOutputData().vectors().get("outVector", &actualOutputVector));
 	EXPECT_TRUE(actualOutputVector.isApprox(initialOutputVector, errorEpsilon));

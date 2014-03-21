@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/thread/locks.hpp>
+
 #include "SurgSim/Devices/DeviceFilters/PoseTransform.h"
 
 #include "SurgSim/Math/Matrix.h"
@@ -99,6 +101,8 @@ bool PoseTransform::requestOutput(const std::string& device, DataGroup* outputDa
 
 void PoseTransform::inputFilter(const DataGroup& dataToFilter, DataGroup* result)
 {
+	boost::lock_guard<boost::mutex> lock(m_mutex); // Prevent the transform or scaling from being set simultaneously.
+
 	*result = dataToFilter;  // Pass on all the data entries.
 
 	if (m_poseIndex >= 0)
@@ -136,7 +140,10 @@ void PoseTransform::inputFilter(const DataGroup& dataToFilter, DataGroup* result
 
 void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* result)
 {
+	boost::lock_guard<boost::mutex> lock(m_mutex); // Prevent the transform or scaling from being set simultaneously.
+
 	*result = dataToFilter;  // Pass on all the data entries.
+
 	// Since the haptic devices will compare the data in the output DataGroup to a raw input pose, the filter must
 	// perform the reverse transform and scaling to data used by the haptic devices.
 
@@ -235,11 +242,13 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 
 void PoseTransform::setTranslationScale(double translationScale)
 {
+	boost::lock_guard<boost::mutex> lock(m_mutex);
 	m_translationScale = translationScale;
 }
 
 void PoseTransform::setTransform(const RigidTransform3d& transform)
 {
+	boost::lock_guard<boost::mutex> lock(m_mutex);
 	m_transform = transform;
 	m_transformInverse = m_transform.inverse();
 }
