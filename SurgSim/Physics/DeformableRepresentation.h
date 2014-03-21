@@ -21,7 +21,7 @@
 
 #include <memory>
 
-#include "SurgSim/Physics/Representation.h"
+#include "SurgSim/Physics/DeformableRepresentationBase.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 
 #include "SurgSim/Math/OdeEquation.h"
@@ -45,7 +45,7 @@ namespace Physics
 /// \note   m_numDofPerNode and call Representation::setNumDof()
 template <class MType, class DType, class KType, class SType>
 class DeformableRepresentation :
-	public Representation,
+	public DeformableRepresentationBase,
 	public SurgSim::Math::OdeEquation<DeformableRepresentationState, MType, DType, KType, SType>
 {
 public:
@@ -90,19 +90,19 @@ public:
 	/// \note   so after this call, do not expect 'initialState' to be unchanged.
 	/// \note All internal states are initialized with the transformed initialState to make the simulation ready.
 	/// \note This method also sets the number of dof for this Representation
-	void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState);
+	virtual void setInitialState(std::shared_ptr<DeformableRepresentationState> initialState) override;
 
-	/// Get the current state (in the global frame)
+	/// Get the current state (in the global frame), this is for use inside the physics calculation only
 	/// \return The current state of this deformable representation
-	const std::shared_ptr<DeformableRepresentationState> getCurrentState() const;
+	virtual const std::shared_ptr<DeformableRepresentationState> getCurrentState() const override;
 
-	/// Get the previous state (in the global frame)
+	/// Get the previous state (in the global frame), this is for use inside the physics calculation only
 	/// \return The previous state of this deformable representation
-	const std::shared_ptr<DeformableRepresentationState> getPreviousState() const;
+	virtual const std::shared_ptr<DeformableRepresentationState> getPreviousState() const override;
 
-	/// Get the final state (in the global frame)
+	/// Get the final state (in the global frame), this is for use inside the physics calculation only
 	/// \return The final state of this deformable representation
-	const std::shared_ptr<DeformableRepresentationState> getFinalState() const;
+	virtual const std::shared_ptr<DeformableRepresentationState> getFinalState() const override;
 
 	/// Gets the number of degrees of freedom per node
 	/// \return The number of degrees of freedom per node for this Deformable Representation
@@ -126,17 +126,25 @@ public:
 	/// \note All derived classes overriding this method should call DeformableRepresentation::beforeUpdate(dt)
 	virtual void beforeUpdate(double dt) override;
 
+	virtual void setCollisionRepresentation(
+		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
+
 protected:
 	/// Transform a state using a given transformation
 	/// \param[in,out] state The state to be transformed
 	/// \param transform The transformation to apply
 	virtual void transformState(std::shared_ptr<DeformableRepresentationState> state,
-		const SurgSim::Math::RigidTransform3d& transform) = 0;
+								const SurgSim::Math::RigidTransform3d& transform) = 0;
 
-	/// Previous, current and new states (internal use)
-	/// \note New state is a temporary variable to store the newly computed state
-	/// \note The initial state is held by the OdeEquation
-	std::shared_ptr<DeformableRepresentationState> m_previousState, m_currentState, m_newState;
+	/// The previous state inside the calculation loop, this has no meaning outside of the loop
+	std::shared_ptr<DeformableRepresentationState> m_previousState;
+
+	/// The currently calculated state inside the physics loop, after the whole calculation is done this will
+	/// become m_finalState
+	std::shared_ptr<DeformableRepresentationState> m_currentState;
+
+	/// New state is a temporary variable to store the newly computed state
+	std::shared_ptr<DeformableRepresentationState> m_newState;
 
 	/// Last valid state (a.k.a final state)
 	/// \note Backup of the current state for thread-safety access while the current state is being recomputed.
@@ -151,13 +159,13 @@ protected:
 	/// Force applied on the deformable representation
 	SurgSim::Math::Vector m_f;
 
-	/// Mass matrix (templatized type for performance reason)
+	/// Mass matrix (templated type for performance reason)
 	MType m_M;
 
-	/// Damping matrix (templatized type for performance reason)
+	/// Damping matrix (templated type for performance reason)
 	DType m_D;
 
-	/// Stiffness matrix (templatized type for performance reason)
+	/// Stiffness matrix (templated type for performance reason)
 	KType m_K;
 
 	/// Number of degrees of freedom per node (varies per deformable model)
@@ -192,3 +200,6 @@ public:
 #include "SurgSim/Physics/DeformableRepresentation-inl.h"
 
 #endif // SURGSIM_PHYSICS_DEFORMABLEREPRESENTATION_H
+
+
+

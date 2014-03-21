@@ -23,6 +23,7 @@
 #include "SurgSim/Math/Vector.h"
 #include "SurgSim/Math/Valid.h"
 #include "SurgSim/Physics/Localization.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationState.h"
 
 using SurgSim::Collision::Location;
@@ -57,31 +58,31 @@ SurgSim::Physics::RepresentationType RigidRepresentation::getType() const
 void RigidRepresentation::setPose(const SurgSim::Math::RigidTransform3d& pose)
 {
 	SURGSIM_LOG_ONCE(SurgSim::Framework::Logger::getDefaultLogger(), SEVERE) <<
-		"RigidRepresentation::setPose does nothing.";
+			"RigidRepresentation::setPose does nothing.";
 }
 
 void RigidRepresentation::addExternalForce(const SurgSim::Math::Vector3d& force, const SurgSim::Math::Matrix33d& K,
-										   const SurgSim::Math::Matrix33d& D)
+		const SurgSim::Math::Matrix33d& D)
 {
 	m_externalForce = force;
-	m_externalStiffnessMatrix.block<3,3>(0,0) = K;
-	m_externalDampingMatrix.block<3,3>(0,0) = D;
+	m_externalStiffnessMatrix.block<3, 3>(0, 0) = K;
+	m_externalDampingMatrix.block<3, 3>(0, 0) = D;
 }
 
 void RigidRepresentation::addExternalTorque(const SurgSim::Math::Vector3d& torque, const SurgSim::Math::Matrix33d& K,
-											const SurgSim::Math::Matrix33d& D)
+		const SurgSim::Math::Matrix33d& D)
 {
 	m_externalTorque = torque;
-	m_externalStiffnessMatrix.block<3,3>(3,3) = K;
-	m_externalDampingMatrix.block<3,3>(3,3) = D;
+	m_externalStiffnessMatrix.block<3, 3>(3, 3) = K;
+	m_externalDampingMatrix.block<3, 3>(3, 3) = D;
 }
 
 void RigidRepresentation::beforeUpdate(double dt)
 {
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
-		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated in beforeUpdate because m_currentParameters is not valid." << std::endl;
+				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+						   " deactivated in beforeUpdate because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
 		setIsActive(false);
@@ -99,8 +100,8 @@ void RigidRepresentation::update(double dt)
 
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
-		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated in update because m_currentParameters is not valid." << std::endl;
+				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+						   " deactivated in update because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
 		setIsActive(false);
@@ -147,8 +148,8 @@ void RigidRepresentation::update(double dt)
 	{
 		// { Id33.m.(1/dt + alphaLinear ).v(t+dt) = Id33.m.v(t)/dt + f
 		// { I     .(1/dt + alphaAngular).w(t+dt) = I.w(t)/dt + t - w(t)^(I.w(t))
-		dG = (1.0 / p.getMass())* m_force  / (1.0/dt + p.getLinearDamping());
-		w  = m_invGlobalInertia * m_torque / (1.0/dt + p.getAngularDamping());
+		dG = (1.0 / p.getMass()) * m_force  / (1.0 / dt + p.getLinearDamping());
+		w  = m_invGlobalInertia * m_torque / (1.0 / dt + p.getAngularDamping());
 		// Compute the quaternion velocity as well: dq = 1/2.(0 w).q
 		dq = Quaterniond(0.0, w[0], w[1], w[2]) * q;
 		dq.coeffs() *= 0.5;
@@ -180,13 +181,13 @@ void RigidRepresentation::update(double dt)
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
 	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated and reset because:" << std::endl <<
-		"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
-		"dG=(" << dG[0] << "," << dG[1] << "," << dG[2] << "), " <<
-		"w=(" << w[0] << "," << w[1] << "," << w[2] << "), " <<
-		"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
-		"|q| before normalization=" << qNorm << ", and " <<
-		"|q| after normalization="<< q.norm() << std::endl;
+			" deactivated and reset because:" << std::endl <<
+			"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
+			"dG=(" << dG[0] << "," << dG[1] << "," << dG[2] << "), " <<
+			"w=(" << w[0] << "," << w[1] << "," << w[2] << "), " <<
+			"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
+			"|q| before normalization=" << qNorm << ", and " <<
+			"|q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
 		resetState();
@@ -201,8 +202,8 @@ void RigidRepresentation::afterUpdate(double dt)
 {
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
-		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated in afterUpdate because m_currentParameters is not valid." << std::endl;
+				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+						   " deactivated in afterUpdate because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
 		setIsActive(false);
@@ -226,8 +227,8 @@ void RigidRepresentation::applyCorrection(
 
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
-		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated in applyCorrection because m_currentParameters is not valid." << std::endl;
+				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+						   " deactivated in applyCorrection because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
 		setIsActive(false);
@@ -240,8 +241,8 @@ void RigidRepresentation::applyCorrection(
 	Quaterniond       q = Quaterniond(R);
 	Vector3d          w = m_currentState.getAngularVelocity();
 
-	const Vector3d& delta_dG = deltaVelocity.segment(0,3);
-	const Vector3d& delta_w  = deltaVelocity.segment(3,3);
+	const Vector3d& delta_dG = deltaVelocity.segment(0, 3);
+	const Vector3d& delta_w  = deltaVelocity.segment(3, 3);
 	Quaterniond delta_dq = Quaterniond(0.0, delta_w[0], delta_w[1], delta_w[2]) * q;
 	delta_dq.coeffs() *= 0.5;
 
@@ -269,10 +270,10 @@ void RigidRepresentation::applyCorrection(
 	condition &= SurgSim::Math::isValid(q);
 	condition &= fabs(1.0 - q.norm()) < 1e-3;
 	SURGSIM_LOG_IF(!condition, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated and reset in applyCorrection because:" << std::endl <<
-		"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
-		"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
-		"and |q| after normalization=" << q.norm() << std::endl;
+			" deactivated and reset in applyCorrection because:" << std::endl <<
+			"G=(" << G[0] << "," << G[1] << "," << G[2] << "), " <<
+			"q=(" << q.x() << "," << q.y() << "," << q.z() << "," << q.w() << "), " <<
+			"and |q| after normalization=" << q.norm() << std::endl;
 	if (!condition)
 	{
 		resetState();
@@ -291,8 +292,8 @@ void SurgSim::Physics::RigidRepresentation::resetParameters()
 	updateGlobalInertiaMatrices(m_currentState);
 }
 
-const Eigen::Matrix<double, 6,6, Eigen::DontAlign | Eigen::RowMajor>&
-	SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
+const Eigen::Matrix < double, 6, 6, Eigen::DontAlign | Eigen::RowMajor > &
+SurgSim::Physics::RigidRepresentation::getComplianceMatrix() const
 {
 	return m_C;
 }
@@ -301,8 +302,8 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 {
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
-		SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-		" deactivated in computComplianceMatrix because m_currentParameters is not valid." << std::endl;
+				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
+						   " deactivated in computComplianceMatrix because m_currentParameters is not valid." << std::endl;
 	if (!isActive() || !isParametersValid)
 	{
 		setIsActive(false);
@@ -312,16 +313,16 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 	Matrix66d systemMatrix;
 	RigidRepresentationParameters& parameters = m_currentParameters;
 	const SurgSim::Math::Matrix33d identity3x3 = SurgSim::Math::Matrix33d::Identity();
-	systemMatrix.block<3,3>(0,0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
-	systemMatrix.block<3,3>(3,3) = m_globalInertia / dt + parameters.getAngularDamping() * identity3x3;
+	systemMatrix.block<3, 3>(0, 0) = identity3x3 * (parameters.getMass() / dt + parameters.getLinearDamping());
+	systemMatrix.block<3, 3>(3, 3) = m_globalInertia / dt + parameters.getAngularDamping() * identity3x3;
 	systemMatrix += m_externalDampingMatrix + m_externalStiffnessMatrix * dt;
 
 	m_C.setZero();
 
 	//Invert systemMatrix
 	//We can use this shortcut because we know the linear and angular terms are independent
-	m_C.block<3,3>(0,0) = systemMatrix.block<3,3>(0,0).inverse();
-	m_C.block<3,3>(3,3) = systemMatrix.block<3,3>(3,3).inverse();
+	m_C.block<3, 3>(0, 0) = systemMatrix.block<3, 3>(0, 0).inverse();
+	m_C.block<3, 3>(3, 3) = systemMatrix.block<3, 3>(3, 3).inverse();
 }
 
 void RigidRepresentation::updateGlobalInertiaMatrices(const RigidRepresentationState& state)
@@ -343,11 +344,11 @@ bool RigidRepresentation::doInitialize()
 {
 	double shapeVolume = getCurrentParameters().getShapeUsedForMassInertia()->getVolume();
 	SURGSIM_ASSERT(shapeVolume > SurgSim::Math::Geometry::ScalarEpsilon) <<
-		"Cannot use a shape with zero volume for RigidRepresentations";
+			"Cannot use a shape with zero volume for RigidRepresentations";
 
 	shapeVolume = getInitialParameters().getShapeUsedForMassInertia()->getVolume();
 	SURGSIM_ASSERT(shapeVolume > SurgSim::Math::Geometry::ScalarEpsilon) <<
-		"Cannot use a shape with zero volume for RigidRepresentations";
+			"Cannot use a shape with zero volume for RigidRepresentations";
 
 	return true;
 }
@@ -360,6 +361,29 @@ void RigidRepresentation::setLinearVelocity(const SurgSim::Math::Vector3d& linea
 void RigidRepresentation::setAngularVelocity(const SurgSim::Math::Vector3d& angularVelocity)
 {
 	m_currentState.setAngularVelocity(angularVelocity);
+}
+
+void RigidRepresentation::setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation)
+{
+	if (m_collisionRepresentation != representation)
+	{
+		// If we have an old collision representation clear the dependency
+		if (m_collisionRepresentation != nullptr)
+		{
+			auto oldCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(m_collisionRepresentation);
+			oldCollisionRep->setRigidRepresentation(nullptr);
+		}
+
+		Representation::setCollisionRepresentation(representation);
+
+		// If its a RigidCollisionRepresentation connect with this representation
+		auto newCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(representation);
+		if (newCollisionRep != nullptr)
+		{
+			newCollisionRep->setRigidRepresentation(std::static_pointer_cast<RigidRepresentation>(getSharedPtr()));
+		}
+	}
+
 }
 
 }; /// Physics

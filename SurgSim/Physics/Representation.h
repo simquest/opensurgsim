@@ -103,6 +103,7 @@ public:
 	virtual void setPose(const SurgSim::Math::RigidTransform3d& pose) = 0;
 
 	/// Preprocessing done before the update call
+	/// This needs to be called from the outside usually from a Computation
 	/// \param dt The time step (in seconds)
 	virtual void beforeUpdate(double dt);
 
@@ -111,6 +112,7 @@ public:
 	virtual void update(double dt);
 
 	/// Postprocessing done after the update call
+	/// This needs to be called from the outside usually from a Computation
 	/// \param dt The time step (in seconds)
 	virtual void afterUpdate(double dt);
 
@@ -131,7 +133,7 @@ public:
 	/// Set the collision representation for this physics representation, when the collision object
 	/// is involved in a collision, the collision should be resolved inside the dynamics calculation.
 	/// \param representation The appropriate collision representation for this object.
-	void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
+	virtual void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
 
 protected:
 	/// Set the number of degrees of freedom
@@ -144,12 +146,15 @@ protected:
 	/// \return The gravity vector
 	const SurgSim::Math::Vector3d& getGravity() const;
 
+	/// This entities collision representation, these are usually very specific to the physics representation
+	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
+
 private:
 	/// NO copy constructor
 	Representation(const Representation& a);
 
 	/// NO assignement operator
-	Representation& operator =(const Representation &a);
+	Representation& operator =(const Representation& a);
 
 	/// Gravity vector
 	const SurgSim::Math::Vector3d m_gravity;
@@ -163,7 +168,6 @@ private:
 	/// Is this representation active or not ?
 	bool m_isActive;
 
-	std::shared_ptr<SurgSim::Collision::Representation> m_collisionRepresentation;
 };
 
 };  // namespace Physics

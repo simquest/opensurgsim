@@ -76,8 +76,8 @@ public:
 	/// \param K The angular stiffness matrix associated with the torque (jacobian of the torque w.r.t position)
 	/// \param D The angular damping matrix associated with the torque (jacobian of the torque w.r.t velocity)
 	void addExternalTorque(const SurgSim::Math::Vector3d& torque,
-						  const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
-						  const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
+						   const SurgSim::Math::Matrix33d& K = SurgSim::Math::Matrix33d::Zero(),
+						   const SurgSim::Math::Matrix33d& D = SurgSim::Math::Matrix33d::Zero());
 
 	/// Preprocessing done before the update call
 	/// \param dt The time step (in seconds)
@@ -104,6 +104,10 @@ public:
 	/// Retrieve the rigid body 6x6 compliance matrix
 	/// \return the 6x6 compliance matrix
 	const SurgSim::Math::Matrix66d& getComplianceMatrix() const;
+
+	/// Overridden from SurgSim::Physics::Reprensentation
+	/// Specializes for discarding anything besides a rigid collision representation
+	virtual void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
 
 protected:
 	/// Inertia matrices in global coordinates
@@ -134,6 +138,8 @@ private:
 	/// Update global inertia matrices (internal data structure)
 	/// \param state The state of the rigid representation to use for the update
 	virtual void updateGlobalInertiaMatrices(const RigidRepresentationState& state) override;
+
+
 };
 
 }; // Physics
