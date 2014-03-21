@@ -29,6 +29,11 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::Matrix;
 using SurgSim::Math::Matrix33d;
 
+namespace
+{
+const double epsilon = 1e-10;
+};
+
 TEST(LinearSpringTests, Constructor)
 {
 	ASSERT_NO_THROW({LinearSpring ls(0, 1);});
@@ -143,5 +148,68 @@ TEST(LinearSpringTests, computeMethods)
 		EXPECT_TRUE(K.isApprox(expectedK)) << " K = " << std::endl << K << std::endl <<
 			"expectedK = " << std::endl << expectedK << std::endl;
 		EXPECT_TRUE(D.isZero()) << " D = " << std::endl << D << std::endl;
+	}
+
+	// Test addMatVec method
+	Vector ones(6), oneToSix(6);
+	ones.setOnes();
+	oneToSix.setLinSpaced(1.0, 6.0);
+
+	f.setZero();
+	ls.addMatVec(state, 1.0, 0.0, ones, &f);
+	{
+		SCOPED_TRACE("addMatVec(..., dampingFactor=1, stiffnessFactor=0, (1 1 1 1 1 1),...)");
+		EXPECT_TRUE(f.isZero()) << "f = " << f.transpose();
+	}
+	f.setZero();
+	ls.addMatVec(state, 1.0, 0.0, oneToSix, &f);
+	{
+		SCOPED_TRACE("addMatVec(..., dampingFactor=1, stiffnessFactor=0, (1 2 3 4 5 6),...)");
+		EXPECT_TRUE(f.isZero()) << "f = " << f.transpose();
+	}
+	f.setZero();
+	ls.addMatVec(state, 0.0, 1.0, ones, &f);
+	{
+		SCOPED_TRACE("addMatVec(..., dampingFactor=0, stiffnessFactor=1, (1 1 1 1 1 1),...)");
+		for (size_t row = 0; row < 6; ++row)
+		{
+			EXPECT_NEAR(expectedK.row(row).sum(), f[row], epsilon) <<
+				"f[" << row << "] = " << f[row] <<
+				" expectedValue = " << expectedK.row(row).sum();
+		}
+	}
+	f.setZero();
+	ls.addMatVec(state, 0.0, 1.0, oneToSix, &f);
+	{
+		SCOPED_TRACE("addMatVec(..., dampingFactor=0, stiffnessFactor=1, (1 2 3 4 5 6),...)");
+		for (size_t row = 0; row < 6; ++row)
+		{
+			EXPECT_NEAR(expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
+				"f[" << row << "] = " << f[row] <<
+				" expectedValue = " << expectedK.row(row).dot(oneToSix);
+		}
+	}
+
+	f.setZero();
+	ls.addMatVec(state, 1.4, 4.1, ones, &f);
+	{
+		SCOPED_TRACE("addMatVec(..., dampingFactor=1.4, stiffnessFactor=4.1, (1 1 1 1 1 1),...)");
+		for (size_t row = 0; row < 6; ++row)
+		{
+			EXPECT_NEAR(4.1 * expectedK.row(row).sum(), f[row], epsilon) <<
+				"f[" << row << "] = " << f[row] <<
+				" expectedValue = " << 4.1 * expectedK.row(row).sum();
+		}
+	}
+	f.setZero();
+	ls.addMatVec(state, 1.4, 4.1, oneToSix, &f);
+	{
+		SCOPED_TRACE("addMatVec(..., dampingFactor=1.4, stiffnessFactor=4.1, (1 2 3 4 5 6),...)");
+		for (size_t row = 0; row < 6; ++row)
+		{
+			EXPECT_NEAR(4.1 * expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
+				"f[" << row << "] = " << f[row] <<
+				" expectedValue = " << 4.1 * expectedK.row(row).dot(oneToSix);
+		}
 	}
 }
