@@ -26,8 +26,8 @@ namespace SurgSim
 namespace Physics
 {
 
-Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate()
-	: vertexIterator(nullptr), m_hasBoundaryConditions(false)
+Fem3DRepresentationPlyReaderDelegate::Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem)
+	: vertexIterator(nullptr), m_fem(fem), m_hasBoundaryConditions(false)
 {
 }
 
@@ -108,7 +108,7 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 					  std::placeholders::_1,
 					  std::placeholders::_2),
 			std::bind(&Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition, this, std::placeholders::_1),
-			std::bind(&Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions, this, std::placeholders::_1));
+			nullptr);
 		reader->requestScalarProperty("boundary_condition", "vertex_index", PlyReader::TYPE_UNSIGNED_INT, 0);
 	}
 
@@ -118,14 +118,14 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 	return true;
 }
 
-std::shared_ptr<Fem3DRepresentation> Fem3DRepresentationPlyReaderDelegate::getFem()
-{
-	return m_fem;
-}
-
 void Fem3DRepresentationPlyReaderDelegate::startParseFile()
 {
-	m_fem = std::make_shared<Fem3DRepresentation>("Ply loaded Fem3d");
+	SURGSIM_ASSERT(m_fem != nullptr) << "The Representation cannot be nullptr.";
+	SURGSIM_ASSERT(m_fem->getNumFemElements() == 0)
+		<< "The Representation cannot be initialized with elements.";
+	SURGSIM_ASSERT(m_fem->getInitialState() == nullptr)
+		<< "The Representation's initial state must be uninitialized.";
+
 	m_state = std::make_shared<DeformableRepresentationState>();
 }
 
@@ -194,10 +194,6 @@ void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::s
 void Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
 	m_state->addBoundaryCondition(m_boundaryConditionData);
-}
-
-void Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions(const std::string& elementName)
-{
 }
 
 } // namespace SurgSim

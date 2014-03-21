@@ -24,15 +24,13 @@
 using SurgSim::Math::Vector3d;
 using SurgSim::DataStructures::PlyReader;
 
-namespace {
-	std::string findFile(std::string filename)
-	{
-		std::vector<std::string> paths;
-		paths.push_back("Data/PlyReaderTests");
-		SurgSim::Framework::ApplicationData data(paths);
+static std::string findFile(std::string filename)
+{
+	std::vector<std::string> paths;
+	paths.push_back("Data/PlyReaderTests");
+	SurgSim::Framework::ApplicationData data(paths);
 
-		return data.findFile(filename);
-	}
+	return data.findFile(filename);
 }
 
 namespace SurgSim
@@ -42,13 +40,13 @@ namespace Physics
 
 TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 {
+	auto fem = std::make_shared<Fem3DRepresentation>("Representation");
+
 	PlyReader reader(findFile("Tetrahedron.ply"));
-	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>();
+	auto delegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(fem);
 
 	ASSERT_TRUE(reader.setDelegate(delegate));
 	ASSERT_NO_THROW(reader.parseFile());
-
-	auto fem = delegate->getFem();
 
 	// Vertices
 	ASSERT_EQ(3u, fem->getNumDofPerNode());

@@ -101,25 +101,6 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& file
 	return std::make_shared<SurgSim::Graphics::Mesh>(*triangleMeshDelegate->getMesh());
 }
 
-static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
-	const std::string& fileName, SurgSim::Math::IntegrationScheme integrationScheme)
-{
-	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
-		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
-
-	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
-
-	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
-	fem->setIntegrationScheme(integrationScheme);
-
-	return fem;
-}
-
 static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
@@ -132,7 +113,10 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
-		= loadFem(filename, integrationScheme);
+		= std::make_shared<SurgSim::Physics::Fem3DRepresentation>(name + " physics");
+	physicsRepresentation->setFilename(filename);
+	physicsRepresentation->setIntegrationScheme(integrationScheme);
+	physicsRepresentation->loadFile();
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model

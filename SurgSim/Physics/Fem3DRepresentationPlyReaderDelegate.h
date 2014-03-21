@@ -33,13 +33,9 @@ class Fem3DRepresentation;
 class Fem3DRepresentationPlyReaderDelegate : public SurgSim::DataStructures::PlyReaderDelegate
 {
 public:
-	/// Default constructor
-	Fem3DRepresentationPlyReaderDelegate();
-
-	/// Gets a shared pointer to the fem.  This class maintains its copy of the pointer until the next time
-	/// PlyReader::parseFile is called on the registered PlyReader.
-	/// \return The stored fem.
-	std::shared_ptr<Fem3DRepresentation> getFem();
+	/// Constructor
+	/// \param fem The object that is updated when PlyReader::parseFile is called.
+	explicit Fem3DRepresentationPlyReaderDelegate(std::shared_ptr<Fem3DRepresentation> fem);
 
 	/// Registers the delegate with the reader, overridden from \sa PlyReaderDelegate.
 	/// \param reader The reader that should be used.
@@ -100,10 +96,6 @@ public:
 	/// Callback function to process one boundary condition.
 	/// \param elementName Name of the element.
 	void processBoundaryCondition(const std::string& elementName);
-
-	/// Callback function to finalize processing of boundary conditions.
-	/// \param elementName Name of the element.
-	void endBoundaryConditions(const std::string& elementName);
 
 private:
 	/// Internal data to receive the "vertex" element
