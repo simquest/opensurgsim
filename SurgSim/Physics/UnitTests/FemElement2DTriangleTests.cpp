@@ -102,9 +102,9 @@ public:
 	/// \note fi(x,y) = ai + x.bi + y.ci
 	void getMembraneShapeFunction(int i, double *ai, double *bi, double *ci) const
 	{
-		*ai = m_membraneShapeFunctionConstantParameter[i];
-		*bi = m_membraneShapeFunctionXCoefficient[i];
-		*ci = m_membraneShapeFunctionYCoefficient[i];
+		*ai = m_membraneShapeFunctionsParameters(i, 0);
+		*bi = m_membraneShapeFunctionsParameters(i, 1);
+		*ci = m_membraneShapeFunctionsParameters(i, 2);
 	}
 
 	// The Thin-Plate shape functions (Batoz shape functions)

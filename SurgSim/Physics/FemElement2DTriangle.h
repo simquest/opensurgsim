@@ -200,9 +200,8 @@ protected:
 
 	/// Membrane (in-plane) deformation. DOF simulated: (x, y)
 	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
-	std::array<double, 3> m_membraneShapeFunctionConstantParameter; //< Shape functions fi(x, y) = ai + bi.x + ci.y
-	std::array<double, 3> m_membraneShapeFunctionXCoefficient;      //< Shape functions fi(x, y) = ai + bi.x + ci.y
-	std::array<double, 3> m_membraneShapeFunctionYCoefficient;      //< Shape functions fi(x, y) = ai + bi.x + ci.y
+	/// Shape functions fi(x, y) = ai + bi.x + ci.y
+	SurgSim::Math::Matrix33d m_membraneShapeFunctionsParameters; //< Stores (ai, bi, ci) on each row
 	Matrix36Type m_membraneStrainDisplacement; //< Strain-displacement matrix containing (dfi/dx=bi , dfi/dy=ci)
 	Matrix33Type m_membraneEm; //< Membrane elasticity material matrix
 	Matrix66Type m_membraneKLocal; //< Membrane local stiffness matrix

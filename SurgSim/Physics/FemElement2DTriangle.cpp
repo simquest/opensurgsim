@@ -263,14 +263,14 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 		// The strain is E=(Exx , Eyy , Exy)
 		// Exx = dux/dx = df0/dx.u0x + df1/dx.u1x + df2/dx.u2x
 		//                dfi/dx = bi = m_membraneShapeFunctionXCoefficient
-		m_membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionXCoefficient[i];
+		m_membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionsParameters(i, 1);
 		// Eyy = duy/dy = df0/dy.u0y + df1/dy.u1y + df2/dy.u2y
 		//                dfi/dy = ci = m_membraneShapeFunctionYCoefficient
-		m_membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionYCoefficient[i];
+		m_membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 2);
 		// Exy = dux/dy + duy/dx =
 		// (df0/dy.u0x + df0/dx.u0y) + (df1/dy.u1x + df1/dx.u1y) + (df2/dy.u2x + df2/dx.u2y)
-		m_membraneStrainDisplacement(2, 2 * i) = m_membraneShapeFunctionYCoefficient[i];
-		m_membraneStrainDisplacement(2, 2 * i + 1) = m_membraneShapeFunctionXCoefficient[i];
+		m_membraneStrainDisplacement(2, 2 * i) = m_membraneShapeFunctionsParameters(i, 2);
+		m_membraneStrainDisplacement(2, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 1);
 	}
 	// Membrane material stiffness coming from Hooke Law (isotropic material)
 	m_membraneEm.setZero();
@@ -445,28 +445,35 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 		", A=(" << a.transpose() << "), B=(" << b.transpose() << "), C=(" << c.transpose() << ")";
 
 	// Membrane shape functions
+	// Notation: yij = yi - yj (reminder Przemieniecki use  1-based indexing, while we use 0-based)
+	// Notation: xij = xi - xj (reminder Przemieniecki use  1-based indexing, while we use 0-based)
+	//
+	// Shape functions fi(x, y) = ai + bi.x + ci.y
 	// Identifying coefficient for f1:
-	// (a1)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(1)   1/2A (x1y2-x2y1)        ( x1y2-x2y1)
-	// (b1) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) = 1/2A y12         = 1/2A (-y21      )
-	// (c1)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x21                ( x21      )
+	// (a0)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(1)   1/2A (x1y2-x2y1)        ( x1y2-x2y1)
+	// (b0) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) = 1/2A y12         = 1/2A (-y21      )
+	// (c0)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x21                ( x21      )
 	// Similarly for f2:
-	// (a2)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)   1/2A (x2y0-x0y2)        (-x0y2-x2y0)
-	// (b2) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(1) = 1/2A y20         = 1/2A ( y20      )
-	// (c2)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x02                (-x20      )
+	// (a1)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)   1/2A (x2y0-x0y2)        (-x0y2-x2y0)
+	// (b1) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(1) = 1/2A y20         = 1/2A ( y20      )
+	// (c1)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x02                (-x20      )
 	// Similarly for f3:
-	// (a3)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)    1/2A (x0y1-x1y0)        ( x0y1-x1y0)
-	// (b3) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) =  1/2A y01         = 1/2A (-y10      )
-	// (c3)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(1)    1/2A x10                ( x10      )
+	// (a2)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)    1/2A (x0y1-x1y0)        ( x0y1-x1y0)
+	// (b2) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) =  1/2A y01         = 1/2A (-y10      )
+	// (c2)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(1)    1/2A x10                ( x10      )
 	double inv_2A = 1.0 / (2.0 * m_restArea);
-	m_membraneShapeFunctionConstantParameter[0] = inv_2A * x1 * y2;   // Because y1 = 0
-	m_membraneShapeFunctionConstantParameter[1] = 0.0;                // Because x0 = 0 and y0 = 0
-	m_membraneShapeFunctionConstantParameter[2] = 0.0;                // Because x0 = 0 and y0 = 0
-	m_membraneShapeFunctionXCoefficient[0] =-inv_2A * y2;             // Because y1 = 0
-	m_membraneShapeFunctionXCoefficient[1] = inv_2A * y2;             // Because y0 = 0
-	m_membraneShapeFunctionXCoefficient[2] = 0.0;                     // Because y0 = 0 and y1 = 0
-	m_membraneShapeFunctionYCoefficient[0] = inv_2A * x2 - x1;
-	m_membraneShapeFunctionYCoefficient[1] =-inv_2A * x2;             // Because x0 = 0
-	m_membraneShapeFunctionYCoefficient[2] = inv_2A * x1;             // Because x0 = 0
+	// f0(x, y) = a0 + b0.x + c0.y, store a0 b0 c0
+	m_membraneShapeFunctionsParameters(0, 0) = inv_2A * x1 * y2;   // Because y1 = 0
+	m_membraneShapeFunctionsParameters(0, 1) =-inv_2A * y2;        // Because y1 = 0
+	m_membraneShapeFunctionsParameters(0, 2) = inv_2A * x2 - x1;
+	// f1(x, y) = a1 + b1.x + c1.y, store a1 b1 c1
+	m_membraneShapeFunctionsParameters(1, 0) = 0.0;                // Because x0 = 0 and y0 = 0
+	m_membraneShapeFunctionsParameters(1, 1) = inv_2A * y2;        // Because y0 = 0
+	m_membraneShapeFunctionsParameters(1, 2) =-inv_2A * x2;        // Because x0 = 0
+	// f2(x, y) = a2 + b2.x + c2.y, store a2 b2 c2
+	m_membraneShapeFunctionsParameters(2, 0) = 0.0;                // Because x0 = 0 and y0 = 0
+	m_membraneShapeFunctionsParameters(2, 1) = 0.0;                // Because y0 = 0 and y1 = 0
+	m_membraneShapeFunctionsParameters(2, 2) = inv_2A * x1;        // Because x0 = 0
 
 	// Thin-Plate Batoz specific data
 	m_xij[0] = x1 - x2; // xij[0] = x1 - x2
