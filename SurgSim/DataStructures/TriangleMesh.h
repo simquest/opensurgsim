@@ -26,7 +26,8 @@ namespace DataStructures
 {
 
 /// Store normal for each triangle in a triangle mesh.
-struct NormalData {
+struct NormalData
+{
 
 	SurgSim::Math::Vector3d normal;
 
@@ -52,7 +53,11 @@ struct NormalData {
 class TriangleMesh: public SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, NormalData>
 {
 public:
+
 	/// Constructor
+	TriangleMesh();
+
+	/// Templated copy constructor this lets us convert one mesh class into another mesh class
 	/// \tparam	VertexDataSource	Type of extra data stored in each vertex
 	/// \tparam	EdgeDataSource	Type of extra data stored in each edge
 	/// \tparam	TriangleDataSource	Type of extra data stored in each triangle
