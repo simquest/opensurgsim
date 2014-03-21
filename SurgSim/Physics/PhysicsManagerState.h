@@ -39,7 +39,7 @@ class ConstraintComponent;
 enum ConstraintGroupType
 {
 	CONSTRAINT_GROUP_TYPE_CONTACT = 0,
-	CONSTRAINT_GROUP_TYPE_FROM_CONSTRAINT_COMPONENT,
+	CONSTRAINT_GROUP_TYPE_SCENE,
 	CONSTRAINT_GROUP_TYPE_COUNT
 };
 
@@ -139,7 +139,7 @@ private:
 	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
 
-	/// List of the constraint components between representations
+	/// List of the constraint components
 	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
 
 	/// Mapping of collision representations to their respective physics representation.

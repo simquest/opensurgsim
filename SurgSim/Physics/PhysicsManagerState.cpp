@@ -91,7 +91,7 @@ void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_
 	{
 		constraints.push_back((*it)->getConstraint());
 	}
-	setConstraintGroup(CONSTRAINT_GROUP_TYPE_FROM_CONSTRAINT_COMPONENT, constraints);
+	setConstraintGroup(CONSTRAINT_GROUP_TYPE_SCENE, constraints);
 }
 
 const std::vector<std::shared_ptr<ConstraintComponent>>& PhysicsManagerState::getConstraintComponents()

@@ -189,40 +189,21 @@ TEST_F (ConstraintTests, TestConstructor)
 	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();
 
 	{
-		SCOPED_TRACE("Combinatorial nullptr test");
+		SCOPED_TRACE("nullptr test");
 		ASSERT_NO_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
 
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, nullptr, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, nullptr, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, nullptr, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, nullptr, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, fixedLoc, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, fixedLoc, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, fixedLoc, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, fixedLoc, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, nullptr, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, nullptr, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, nullptr, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, nullptr, nullptr, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, fixedLoc, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, fixedLoc, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, fixedLoc, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, fixedLoc, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, nullptr, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, nullptr, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, nullptr, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, fixedImp, nullptr, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, fixedLoc, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, fixedLoc, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, fixedLoc, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, fixedLoc, nullptr, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, nullptr, rigidImp, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, nullptr, rigidImp, nullptr);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, nullptr, nullptr, rigidLoc);});
-		EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, nullptr, nullptr, nullptr);});
+		EXPECT_THROW(
+			{ Constraint c(nullptr, nullptr, nullptr, nullptr, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, nullptr, nullptr, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, nullptr); },
+			SurgSim::Framework::AssertionFailure);
 	}
 
 	{
@@ -230,30 +211,42 @@ TEST_F (ConstraintTests, TestConstructor)
 
 		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
 		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
 
 		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
 		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		fixedLoc->setRepresentation(fixedRep);
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
 
 		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
 		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		rigidLoc->setRepresentation(rigidRep);
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
 
 		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
 		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		fixedLoc->setRepresentation(fixedRep);
 		rigidLoc->setRepresentation(rigidRep);
-		EXPECT_NO_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
 	}
 
 	{
 		SCOPED_TRACE("Representation mismatch between Implementation and Localization");
 
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, rigidLoc, rigidImp, fixedLoc);});
-		EXPECT_ANY_THROW({Constraint c(m_constraintData, rigidImp, fixedLoc, fixedImp, rigidLoc);});
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, rigidLoc, rigidImp, fixedLoc); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, rigidImp, fixedLoc, fixedImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
 	}
 
 	// Need more checks for the other error conditions
