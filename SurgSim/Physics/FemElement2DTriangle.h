@@ -234,23 +234,23 @@ protected:
 	/// Batoz derivative dHx/dxi
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The vector dHx/dxi evaluated at (xi, neta)
-	std::array<double, 9> Batoz_dHx_dxi(double xi, double neta) const;
+	std::array<double, 9> batozDhxDxi(double xi, double neta) const;
 	/// Batoz derivative dHx/dneta
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The vector dHx/dneta evaluated at (xi, neta)
-	std::array<double, 9> Batoz_dHx_dneta(double xi, double neta) const;
+	std::array<double, 9> batozDhxDneta(double xi, double neta) const;
 	/// Batoz derivative dHy/dxi
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The vector dHy/dxi evaluated at (xi, neta)
-	std::array<double, 9> Batoz_dHy_dxi(double xi, double neta) const;
+	std::array<double, 9> batozDhyDxi(double xi, double neta) const;
 	/// Batoz derivative dHy/dneta
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The vector dHy/dneta evaluated at (xi, neta)
-	std::array<double, 9> Batoz_dHy_dneta(double xi, double neta) const;
+	std::array<double, 9> batozDhyDneta(double xi, double neta) const;
 	/// Batoz strain displacement matrix evaluated at a given point
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The 3x9 strain displacement matrix evaluated at (xi, neta)
-	Matrix39Type BatozStrainDisplacement(double xi, double neta) const;
+	Matrix39Type batozStrainDisplacement(double xi, double neta) const;
 };
 
 } // namespace Physics

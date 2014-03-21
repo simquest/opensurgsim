@@ -280,9 +280,9 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 
 	// Thin-plate part from "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
 	// Thin-Plate strain-displacement matrices using a 3 point Gauss quadrature located at the middle of the edges
-	m_plateStrainDisplacementAtGaussPoints[0] = BatozStrainDisplacement(0.0 , 0.5);
-	m_plateStrainDisplacementAtGaussPoints[1] = BatozStrainDisplacement(0.5 , 0.0);
-	m_plateStrainDisplacementAtGaussPoints[2] = BatozStrainDisplacement(0.5 , 0.5);
+	m_plateStrainDisplacementAtGaussPoints[0] = batozStrainDisplacement(0.0 , 0.5);
+	m_plateStrainDisplacementAtGaussPoints[1] = batozStrainDisplacement(0.5 , 0.0);
+	m_plateStrainDisplacementAtGaussPoints[2] = batozStrainDisplacement(0.5 , 0.5);
 	// Thin-plate material stiffness coming from Hooke Law (isotropic material)
 	m_plateEm = m_membraneEm;
 	m_plateEm *= m_thickness * m_thickness * m_thickness / 12.0;
@@ -487,7 +487,7 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	}
 }
 
-std::array<double, 9> FemElement2DTriangle::Batoz_dHx_dxi(double xi, double neta) const
+std::array<double, 9> FemElement2DTriangle::batozDhxDxi(double xi, double neta) const
 {
 	std::array<double, 9> res;
 
@@ -508,7 +508,7 @@ std::array<double, 9> FemElement2DTriangle::Batoz_dHx_dxi(double xi, double neta
 	return res;
 }
 
-std::array<double, 9> FemElement2DTriangle::Batoz_dHx_dneta(double xi, double neta) const
+std::array<double, 9> FemElement2DTriangle::batozDhxDneta(double xi, double neta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * neta;
@@ -528,7 +528,7 @@ std::array<double, 9> FemElement2DTriangle::Batoz_dHx_dneta(double xi, double ne
 	return res;
 }
 
-std::array<double, 9> FemElement2DTriangle::Batoz_dHy_dxi(double xi, double neta) const
+std::array<double, 9> FemElement2DTriangle::batozDhyDxi(double xi, double neta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * xi;
@@ -548,7 +548,7 @@ std::array<double, 9> FemElement2DTriangle::Batoz_dHy_dxi(double xi, double neta
 	return res;
 }
 
-std::array<double, 9> FemElement2DTriangle::Batoz_dHy_dneta(double xi, double neta) const
+std::array<double, 9> FemElement2DTriangle::batozDhyDneta(double xi, double neta) const
 {
 	std::array<double, 9> res;
 	double a = 1.0 - 2.0 * neta;
@@ -568,16 +568,16 @@ std::array<double, 9> FemElement2DTriangle::Batoz_dHy_dneta(double xi, double ne
 	return res;
 }
 
-FemElement2DTriangle::Matrix39Type FemElement2DTriangle::BatozStrainDisplacement(double xi, double neta)const
+FemElement2DTriangle::Matrix39Type FemElement2DTriangle::batozStrainDisplacement(double xi, double neta)const
 {
 	Matrix39Type res;
 	std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 	double coefficient = 1.0 / (2.0 * m_restArea);
 
-	dHx_dxi   = Batoz_dHx_dxi(xi, neta);
-	dHx_dneta = Batoz_dHx_dneta(xi, neta);
-	dHy_dxi   = Batoz_dHy_dxi(xi, neta);
-	dHy_dneta = Batoz_dHy_dneta(xi, neta);
+	dHx_dxi   = batozDhxDxi(xi, neta);
+	dHx_dneta = batozDhxDneta(xi, neta);
+	dHy_dxi   = batozDhyDxi(xi, neta);
+	dHy_dneta = batozDhyDneta(xi, neta);
 
 	for(size_t i = 0; i < 9; ++i)
 	{

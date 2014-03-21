@@ -109,218 +109,218 @@ public:
 
 	// The Thin-Plate shape functions (Batoz shape functions)
 	// N1(xi, neta) = 2(1-xi-neta)(0.5-xi-neta)
-	double Batoz_N1(double xi, double neta) const { return 2.0 * (1.0 - xi - neta) * (0.5 - xi - neta); }
+	double batozN1(double xi, double neta) const { return 2.0 * (1.0 - xi - neta) * (0.5 - xi - neta); }
 	// N2(xi, neta) = xi(2 xi-1)
-	double Batoz_N2(double xi, double neta) const { return xi * (2.0 * xi - 1.0);                       }
+	double batozN2(double xi, double neta) const { return xi * (2.0 * xi - 1.0);                       }
 	// N3(xi, neta) = neta(2 neta-1)
-	double Batoz_N3(double xi, double neta) const { return neta * (2.0 * neta - 1.0);                   }
+	double batozN3(double xi, double neta) const { return neta * (2.0 * neta - 1.0);                   }
 	// N4(xi, neta) = 4 xi neta
-	double Batoz_N4(double xi, double neta) const { return 4.0 * xi * neta;                             }
+	double batozN4(double xi, double neta) const { return 4.0 * xi * neta;                             }
 	// N5(xi, neta) = 4 neta(1-xi-neta)
-	double Batoz_N5(double xi, double neta) const { return 4.0 * neta * (1.0 - xi - neta);              }
+	double batozN5(double xi, double neta) const { return 4.0 * neta * (1.0 - xi - neta);              }
 	// N6(xi, neta) = 4 xi(1-xi-neta)
-	double Batoz_N6(double xi, double neta) const { return 4.0 * xi * (1.0 - xi - neta);                }
+	double batozN6(double xi, double neta) const { return 4.0 * xi * (1.0 - xi - neta);                }
 
 	// dN1/dxi(xi, neta) = 2[(-0.5+xi+neta) + (-1+xi+neta)] = 2(-3/2+2(xi+neta)) = 4(xi+neta) - 3
-	double Batoz_dN1_dxi(double xi, double neta) const { return 4.0 * (xi + neta) - 3.0;       }
+	double batozDN1Dxi(double xi, double neta) const { return 4.0 * (xi + neta) - 3.0;       }
 	// dN2/dxi(xi, neta) = (2xi-1) + 2xi = 4xi-1
-	double Batoz_dN2_dxi(double xi, double neta) const { return 4.0 * xi - 1.0;                }
+	double batozDN2Dxi(double xi, double neta) const { return 4.0 * xi - 1.0;                }
 	// dN3/dxi(xi, neta) = 0
-	double Batoz_dN3_dxi(double xi, double neta) const { return 0.0;                           }
+	double batozDN3Dxi(double xi, double neta) const { return 0.0;                           }
 	// dN4/dxi(xi, neta) = 4 neta
-	double Batoz_dN4_dxi(double xi, double neta) const { return 4.0 * neta;                    }
+	double batozDN4Dxi(double xi, double neta) const { return 4.0 * neta;                    }
 	// dN5/dxi(xi,neta) = -4 neta
-	double Batoz_dN5_dxi(double xi, double neta) const { return -4.0 * neta;                   }
+	double batozDN5Dxi(double xi, double neta) const { return -4.0 * neta;                   }
 	// dN6/dxi(xi,neta) = 4(1-xi-neta) -4xi = 4(1-2xi-neta)
-	double Batoz_dN6_dxi(double xi, double neta) const { return 4.0 * (1.0 - 2.0 * xi - neta); }
+	double batozDN6Dxi(double xi, double neta) const { return 4.0 * (1.0 - 2.0 * xi - neta); }
 
 	// dN1/dneta(xi, neta) = 2[(-0.5+xi+neta) + (-1+xi+neta)] = 2(-3/2 + 2xi + 2neta) = 4(xi+neta) - 3
-	double Batoz_dN1_dneta(double xi, double neta) const { return 4.0 * (xi + neta) - 3.0;       }
+	double batozDN1Dneta(double xi, double neta) const { return 4.0 * (xi + neta) - 3.0;       }
 	// dN2/dneta(xi, neta) = 0
-	double Batoz_dN2_dneta(double xi, double neta) const { return 0.0;                           }
+	double batozDN2Dneta(double xi, double neta) const { return 0.0;                           }
 	// dN3/dneta(xi, neta) = 2neta-1 + 2neta = 4neta-1
-	double Batoz_dN3_dneta(double xi, double neta) const { return 4.0 * neta - 1.0;              }
+	double batozDN3Dneta(double xi, double neta) const { return 4.0 * neta - 1.0;              }
 	// dN4/dneta(xi, neta) = 4xi
-	double Batoz_dN4_dneta(double xi, double neta) const { return 4.0 * xi;                      }
+	double batozDN4Dneta(double xi, double neta) const { return 4.0 * xi;                      }
 	// dN5/dneta(xi, neta) = 4[(1-xi-neta) - neta] = 4(1-xi-2neta)
-	double Batoz_dN5_dneta(double xi, double neta) const { return 4.0 * (1.0 - xi - 2.0 * neta); }
+	double batozDN5Dneta(double xi, double neta) const { return 4.0 * (1.0 - xi - 2.0 * neta); }
 	// dN6/dneta(xi, neta) = -4xi
-	double Batoz_dN6_dneta(double xi, double neta) const { return -4.0 * xi;                     }
+	double batozDN6Dneta(double xi, double neta) const { return -4.0 * xi;                     }
 
-	std::array<double, 9> Batoz_Hx(double xi, double neta)
+	std::array<double, 9> batozHx(double xi, double neta)
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6N6-a5N5)
-		res[0] = 1.5 * (m_ak[2] * Batoz_N6(xi, neta) - m_ak[1] * Batoz_N5(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * batozN6(xi, neta) - m_ak[1] * batozN5(xi, neta));
 		// b5N5+b6N6
-		res[1] = m_bk[1] * Batoz_N5(xi, neta) + m_bk[2] * Batoz_N6(xi, neta);
+		res[1] = m_bk[1] * batozN5(xi, neta) + m_bk[2] * batozN6(xi, neta);
 		// N1 - c5N5 - c6N6
-		res[2] = Batoz_N1(xi, neta) - m_ck[1] * Batoz_N5(xi, neta) - m_ck[2] * Batoz_N6(xi, neta);
+		res[2] = batozN1(xi, neta) - m_ck[1] * batozN5(xi, neta) - m_ck[2] * batozN6(xi, neta);
 
 		// 1.5 (a4N4-a6N6)
-		res[3] = 1.5 * (m_ak[0] * Batoz_N4(xi, neta) - m_ak[2] * Batoz_N6(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * batozN4(xi, neta) - m_ak[2] * batozN6(xi, neta));
 		// b6N6+b4N4
-		res[4] = m_bk[2] * Batoz_N6(xi, neta) + m_bk[0] * Batoz_N4(xi, neta);
+		res[4] = m_bk[2] * batozN6(xi, neta) + m_bk[0] * batozN4(xi, neta);
 		// N2 - c6N6 - c4N4
-		res[5] = Batoz_N2(xi, neta) - m_ck[2] * Batoz_N6(xi, neta) - m_ck[0] * Batoz_N4(xi, neta);
+		res[5] = batozN2(xi, neta) - m_ck[2] * batozN6(xi, neta) - m_ck[0] * batozN4(xi, neta);
 
 		// 1.5 (a5N5-a4N4)
-		res[6] = 1.5 * (m_ak[1] * Batoz_N5(xi, neta) - m_ak[0] * Batoz_N4(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * batozN5(xi, neta) - m_ak[0] * batozN4(xi, neta));
 		// b4N4+b5N5
-		res[7] = m_bk[0] * Batoz_N4(xi, neta) + m_bk[1] * Batoz_N5(xi, neta);
+		res[7] = m_bk[0] * batozN4(xi, neta) + m_bk[1] * batozN5(xi, neta);
 		// N3 - c4N4 - c5N5
-		res[8] = Batoz_N3(xi, neta) - m_ck[0] * Batoz_N4(xi, neta) - m_ck[1] * Batoz_N5(xi, neta);
+		res[8] = batozN3(xi, neta) - m_ck[0] * batozN4(xi, neta) - m_ck[1] * batozN5(xi, neta);
 
 		return res;
 	}
-	std::array<double, 9> Batoz_dHx_dxiAlternative(double xi, double neta)
+	std::array<double, 9> batozDhxDxiAlternative(double xi, double neta)
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6dN6-a5dN5)
-		res[0] = 1.5 * (m_ak[2] * Batoz_dN6_dxi(xi, neta) - m_ak[1] * Batoz_dN5_dxi(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * batozDN6Dxi(xi, neta) - m_ak[1] * batozDN5Dxi(xi, neta));
 		// b5dN5+b6dN6
-		res[1] = m_bk[1] * Batoz_dN5_dxi(xi, neta) + m_bk[2] * Batoz_dN6_dxi(xi, neta);
+		res[1] = m_bk[1] * batozDN5Dxi(xi, neta) + m_bk[2] * batozDN6Dxi(xi, neta);
 		// dN1 - c5dN5 - c6dN6
-		res[2] = Batoz_dN1_dxi(xi, neta) - m_ck[1] * Batoz_dN5_dxi(xi, neta) - m_ck[2] * Batoz_dN6_dxi(xi, neta);
+		res[2] = batozDN1Dxi(xi, neta) - m_ck[1] * batozDN5Dxi(xi, neta) - m_ck[2] * batozDN6Dxi(xi, neta);
 
 		// 1.5 (a4dN4-a6dN6)
-		res[3] = 1.5 * (m_ak[0] * Batoz_dN4_dxi(xi, neta) - m_ak[2] * Batoz_dN6_dxi(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * batozDN4Dxi(xi, neta) - m_ak[2] * batozDN6Dxi(xi, neta));
 		// b6dN6+b4dN4
-		res[4] = m_bk[2] * Batoz_dN6_dxi(xi, neta) + m_bk[0] * Batoz_dN4_dxi(xi, neta);
+		res[4] = m_bk[2] * batozDN6Dxi(xi, neta) + m_bk[0] * batozDN4Dxi(xi, neta);
 		// dN2 - c6dN6 - c4dN4
-		res[5] = Batoz_dN2_dxi(xi, neta) - m_ck[2] * Batoz_dN6_dxi(xi, neta) - m_ck[0] * Batoz_dN4_dxi(xi, neta);
+		res[5] = batozDN2Dxi(xi, neta) - m_ck[2] * batozDN6Dxi(xi, neta) - m_ck[0] * batozDN4Dxi(xi, neta);
 
 		// 1.5 (a5dN5-a4dN4)
-		res[6] = 1.5 * (m_ak[1] * Batoz_dN5_dxi(xi, neta) - m_ak[0] * Batoz_dN4_dxi(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * batozDN5Dxi(xi, neta) - m_ak[0] * batozDN4Dxi(xi, neta));
 		// b4dN4+b5dN5
-		res[7] = m_bk[0] * Batoz_dN4_dxi(xi, neta) + m_bk[1] * Batoz_dN5_dxi(xi, neta);
+		res[7] = m_bk[0] * batozDN4Dxi(xi, neta) + m_bk[1] * batozDN5Dxi(xi, neta);
 		// dN3 - c4dN4 - c5dN5
-		res[8] = Batoz_dN3_dxi(xi, neta) - m_ck[0] * Batoz_dN4_dxi(xi, neta) - m_ck[1] * Batoz_dN5_dxi(xi, neta);
+		res[8] = batozDN3Dxi(xi, neta) - m_ck[0] * batozDN4Dxi(xi, neta) - m_ck[1] * batozDN5Dxi(xi, neta);
 
 		return res;
 	}
-	std::array<double, 9> Batoz_dHx_dnetaAlternative(double xi, double neta)
+	std::array<double, 9> batozDhxDnetaAlternative(double xi, double neta)
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (a6dN6-a5dN5)
-		res[0] = 1.5 * (m_ak[2] * Batoz_dN6_dneta(xi, neta) - m_ak[1] * Batoz_dN5_dneta(xi, neta));
+		res[0] = 1.5 * (m_ak[2] * batozDN6Dneta(xi, neta) - m_ak[1] * batozDN5Dneta(xi, neta));
 		// b5dN5+b6dN6
-		res[1] = m_bk[1] * Batoz_dN5_dneta(xi, neta) + m_bk[2] * Batoz_dN6_dneta(xi, neta);
+		res[1] = m_bk[1] * batozDN5Dneta(xi, neta) + m_bk[2] * batozDN6Dneta(xi, neta);
 		// dN1 - c5dN5 - c6dN6
-		res[2] = Batoz_dN1_dneta(xi, neta) - m_ck[1] * Batoz_dN5_dneta(xi, neta) - m_ck[2] * Batoz_dN6_dneta(xi, neta);
+		res[2] = batozDN1Dneta(xi, neta) - m_ck[1] * batozDN5Dneta(xi, neta) - m_ck[2] * batozDN6Dneta(xi, neta);
 
 		// 1.5 (a4dN4-a6dN6)
-		res[3] = 1.5 * (m_ak[0] * Batoz_dN4_dneta(xi, neta) - m_ak[2] * Batoz_dN6_dneta(xi, neta));
+		res[3] = 1.5 * (m_ak[0] * batozDN4Dneta(xi, neta) - m_ak[2] * batozDN6Dneta(xi, neta));
 		// b6dN6+b4dN4
-		res[4] = m_bk[2] * Batoz_dN6_dneta(xi, neta) + m_bk[0] * Batoz_dN4_dneta(xi, neta);
+		res[4] = m_bk[2] * batozDN6Dneta(xi, neta) + m_bk[0] * batozDN4Dneta(xi, neta);
 		// dN2 - c6dN6 - c4dN4
-		res[5] = Batoz_dN2_dneta(xi, neta) - m_ck[2] * Batoz_dN6_dneta(xi, neta) - m_ck[0] * Batoz_dN4_dneta(xi, neta);
+		res[5] = batozDN2Dneta(xi, neta) - m_ck[2] * batozDN6Dneta(xi, neta) - m_ck[0] * batozDN4Dneta(xi, neta);
 
 		// 1.5 (a5dN5-a4dN4)
-		res[6] = 1.5 * (m_ak[1] * Batoz_dN5_dneta(xi, neta) - m_ak[0] * Batoz_dN4_dneta(xi, neta));
+		res[6] = 1.5 * (m_ak[1] * batozDN5Dneta(xi, neta) - m_ak[0] * batozDN4Dneta(xi, neta));
 		// b4dN4+b5dN5
-		res[7] = m_bk[0] * Batoz_dN4_dneta(xi, neta) + m_bk[1] * Batoz_dN5_dneta(xi, neta);
+		res[7] = m_bk[0] * batozDN4Dneta(xi, neta) + m_bk[1] * batozDN5Dneta(xi, neta);
 		// dN3 - c4dN4 - c5dN5
-		res[8] = Batoz_dN3_dneta(xi, neta) - m_ck[0] * Batoz_dN4_dneta(xi, neta) - m_ck[1] * Batoz_dN5_dneta(xi, neta);
+		res[8] = batozDN3Dneta(xi, neta) - m_ck[0] * batozDN4Dneta(xi, neta) - m_ck[1] * batozDN5Dneta(xi, neta);
 
 		return res;
 	}
 
-	std::array<double, 9> Batoz_Hy(double xi, double neta)
+	std::array<double, 9> batozHy(double xi, double neta)
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6N6-d5N5)
-		res[0] = 1.5 * (m_dk[2] * Batoz_N6(xi, neta) - m_dk[1] * Batoz_N5(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * batozN6(xi, neta) - m_dk[1] * batozN5(xi, neta));
 		// -N1 + e5N5 + e6N6
-		res[1] = -Batoz_N1(xi, neta) + m_ek[1] * Batoz_N5(xi, neta) + m_ek[2] * Batoz_N6(xi, neta);
+		res[1] = -batozN1(xi, neta) + m_ek[1] * batozN5(xi, neta) + m_ek[2] * batozN6(xi, neta);
 		// -b5N5-b6N6
-		res[2] = -m_bk[1] * Batoz_N5(xi, neta) - m_bk[2] * Batoz_N6(xi, neta);
+		res[2] = -m_bk[1] * batozN5(xi, neta) - m_bk[2] * batozN6(xi, neta);
 
 		// 1.5 (d4N4-d6N6)
-		res[3] = 1.5 * (m_dk[0] * Batoz_N4(xi, neta) - m_dk[2] * Batoz_N6(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * batozN4(xi, neta) - m_dk[2] * batozN6(xi, neta));
 		// -N2 + e6N6 + e4N4
-		res[4] = -Batoz_N2(xi, neta) + m_ek[2] * Batoz_N6(xi, neta) + m_ek[0] * Batoz_N4(xi, neta);
+		res[4] = -batozN2(xi, neta) + m_ek[2] * batozN6(xi, neta) + m_ek[0] * batozN4(xi, neta);
 		// -b6N6-b4N4
-		res[5] = -m_bk[2] * Batoz_N6(xi, neta) - m_bk[0] * Batoz_N4(xi, neta);
+		res[5] = -m_bk[2] * batozN6(xi, neta) - m_bk[0] * batozN4(xi, neta);
 
 		// 1.5 (d5N5-d4N4)
-		res[6] = 1.5 * (m_dk[1] * Batoz_N5(xi, neta) - m_dk[0] * Batoz_N4(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * batozN5(xi, neta) - m_dk[0] * batozN4(xi, neta));
 		// -N3 + e4N4 + e5N5
-		res[7] = -Batoz_N3(xi, neta) + m_ek[0] * Batoz_N4(xi, neta) + m_ek[1] * Batoz_N5(xi, neta);
+		res[7] = -batozN3(xi, neta) + m_ek[0] * batozN4(xi, neta) + m_ek[1] * batozN5(xi, neta);
 		// -b4N4-b5N5
-		res[8] = -m_bk[0] * Batoz_N4(xi, neta) - m_bk[1] * Batoz_N5(xi, neta);
+		res[8] = -m_bk[0] * batozN4(xi, neta) - m_bk[1] * batozN5(xi, neta);
 
 		return res;
 	}
-	std::array<double, 9> Batoz_dHy_dxiAlternative(double xi, double neta)
+	std::array<double, 9> batozDhyDxiAlternative(double xi, double neta)
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6dN6-d5dN5)
-		res[0] = 1.5 * (m_dk[2] * Batoz_dN6_dxi(xi, neta) - m_dk[1] * Batoz_dN5_dxi(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * batozDN6Dxi(xi, neta) - m_dk[1] * batozDN5Dxi(xi, neta));
 		// -dN1 + e5dN5 + e6dN6
-		res[1] = -Batoz_dN1_dxi(xi, neta) + m_ek[1] * Batoz_dN5_dxi(xi, neta) + m_ek[2] * Batoz_dN6_dxi(xi, neta);
+		res[1] = -batozDN1Dxi(xi, neta) + m_ek[1] * batozDN5Dxi(xi, neta) + m_ek[2] * batozDN6Dxi(xi, neta);
 		// -b5dN5-b6dN6
-		res[2] = -m_bk[1] * Batoz_dN5_dxi(xi, neta) - m_bk[2] * Batoz_dN6_dxi(xi, neta);
+		res[2] = -m_bk[1] * batozDN5Dxi(xi, neta) - m_bk[2] * batozDN6Dxi(xi, neta);
 
 		// 1.5 (d4dN4-d6dN6)
-		res[3] = 1.5 * (m_dk[0] * Batoz_dN4_dxi(xi, neta) - m_dk[2] * Batoz_dN6_dxi(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * batozDN4Dxi(xi, neta) - m_dk[2] * batozDN6Dxi(xi, neta));
 		// -dN2 + e6dN6 + e4dN4
-		res[4] = -Batoz_dN2_dxi(xi, neta) + m_ek[2] * Batoz_dN6_dxi(xi, neta) + m_ek[0] * Batoz_dN4_dxi(xi, neta);
+		res[4] = -batozDN2Dxi(xi, neta) + m_ek[2] * batozDN6Dxi(xi, neta) + m_ek[0] * batozDN4Dxi(xi, neta);
 		// -b6dN6-b4dN4
-		res[5] = -m_bk[2] * Batoz_dN6_dxi(xi, neta) - m_bk[0] * Batoz_dN4_dxi(xi, neta);
+		res[5] = -m_bk[2] * batozDN6Dxi(xi, neta) - m_bk[0] * batozDN4Dxi(xi, neta);
 
 		// 1.5 (d5dN5-d4dN4)
-		res[6] = 1.5 * (m_dk[1] * Batoz_dN5_dxi(xi, neta) - m_dk[0] * Batoz_dN4_dxi(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * batozDN5Dxi(xi, neta) - m_dk[0] * batozDN4Dxi(xi, neta));
 		// -dN3 + e4dN4 + e5dN5
-		res[7] = -Batoz_dN3_dxi(xi, neta) + m_ek[0] * Batoz_dN4_dxi(xi, neta) + m_ek[1] * Batoz_dN5_dxi(xi, neta);
+		res[7] = -batozDN3Dxi(xi, neta) + m_ek[0] * batozDN4Dxi(xi, neta) + m_ek[1] * batozDN5Dxi(xi, neta);
 		// -b4dN4-b5dN5
-		res[8] = -m_bk[0] * Batoz_dN4_dxi(xi, neta) - m_bk[1] * Batoz_dN5_dxi(xi, neta);
+		res[8] = -m_bk[0] * batozDN4Dxi(xi, neta) - m_bk[1] * batozDN5Dxi(xi, neta);
 
 		return res;
 	}
-	std::array<double, 9> Batoz_dHy_dnetaAlternative(double xi, double neta)
+	std::array<double, 9> batozDhyDnetaAlternative(double xi, double neta)
 	{
 		std::array<double, 9> res;
 
 		// 1.5 (d6dN6-d5dN5)
-		res[0] = 1.5 * (m_dk[2] * Batoz_dN6_dneta(xi, neta) - m_dk[1] * Batoz_dN5_dneta(xi, neta));
+		res[0] = 1.5 * (m_dk[2] * batozDN6Dneta(xi, neta) - m_dk[1] * batozDN5Dneta(xi, neta));
 		// -dN1 + e5dN5 + e6dN6
-		res[1] = -Batoz_dN1_dneta(xi, neta) + m_ek[1] * Batoz_dN5_dneta(xi, neta) + m_ek[2] * Batoz_dN6_dneta(xi, neta);
+		res[1] = -batozDN1Dneta(xi, neta) + m_ek[1] * batozDN5Dneta(xi, neta) + m_ek[2] * batozDN6Dneta(xi, neta);
 		// -b5dN5-b6dN6
-		res[2] = -m_bk[1] * Batoz_dN5_dneta(xi, neta) - m_bk[2] * Batoz_dN6_dneta(xi, neta);
+		res[2] = -m_bk[1] * batozDN5Dneta(xi, neta) - m_bk[2] * batozDN6Dneta(xi, neta);
 
 		// 1.5 (d4dN4-d6dN6)
-		res[3] = 1.5 * (m_dk[0] * Batoz_dN4_dneta(xi, neta) - m_dk[2] * Batoz_dN6_dneta(xi, neta));
+		res[3] = 1.5 * (m_dk[0] * batozDN4Dneta(xi, neta) - m_dk[2] * batozDN6Dneta(xi, neta));
 		// -dN2 + e6dN6 + e4dN4
-		res[4] = -Batoz_dN2_dneta(xi, neta) + m_ek[2] * Batoz_dN6_dneta(xi, neta) + m_ek[0] * Batoz_dN4_dneta(xi, neta);
+		res[4] = -batozDN2Dneta(xi, neta) + m_ek[2] * batozDN6Dneta(xi, neta) + m_ek[0] * batozDN4Dneta(xi, neta);
 		// -b6dN6-b4dN4
-		res[5] = -m_bk[2] * Batoz_dN6_dneta(xi, neta) - m_bk[0] * Batoz_dN4_dneta(xi, neta);
+		res[5] = -m_bk[2] * batozDN6Dneta(xi, neta) - m_bk[0] * batozDN4Dneta(xi, neta);
 
 		// -dN3 + e4dN4 + e5dN5
-		res[6] = 1.5 * (m_dk[1] * Batoz_dN5_dneta(xi, neta) - m_dk[0] * Batoz_dN4_dneta(xi, neta));
+		res[6] = 1.5 * (m_dk[1] * batozDN5Dneta(xi, neta) - m_dk[0] * batozDN4Dneta(xi, neta));
 		// -dN3 + e4dN4 + e5dN5
-		res[7] = -Batoz_dN3_dneta(xi, neta) + m_ek[0] * Batoz_dN4_dneta(xi, neta) + m_ek[1] * Batoz_dN5_dneta(xi, neta);
+		res[7] = -batozDN3Dneta(xi, neta) + m_ek[0] * batozDN4Dneta(xi, neta) + m_ek[1] * batozDN5Dneta(xi, neta);
 		// -b4dN4-b5dN5
-		res[8] = -m_bk[0] * Batoz_dN4_dneta(xi, neta) - m_bk[1] * Batoz_dN5_dneta(xi, neta);
+		res[8] = -m_bk[0] * batozDN4Dneta(xi, neta) - m_bk[1] * batozDN5Dneta(xi, neta);
 
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> BatozStrainDisplacementAlternativeDerivative(double xi, double neta)
+	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> batozStrainDisplacementAlternativeDerivative(double xi, double neta)
 	{
 		Eigen::Matrix<double, 3, 9, Eigen::DontAlign> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
-		dHx_dxi   = Batoz_dHx_dxiAlternative(xi, neta);
-		dHx_dneta = Batoz_dHx_dnetaAlternative(xi, neta);
-		dHy_dxi   = Batoz_dHy_dxiAlternative(xi, neta);
-		dHy_dneta = Batoz_dHy_dnetaAlternative(xi, neta);
+		dHx_dxi   = batozDhxDxiAlternative(xi, neta);
+		dHx_dneta = batozDhxDnetaAlternative(xi, neta);
+		dHy_dxi   = batozDhyDxiAlternative(xi, neta);
+		dHy_dneta = batozDhyDnetaAlternative(xi, neta);
 
 		for(size_t i = 0; i < 9; ++i)
 		{
@@ -336,7 +336,7 @@ public:
 		return res;
 	}
 
-	std::array<double, 9> Batoz_fx(double xi, double neta,
+	std::array<double, 9> batozFx(double xi, double neta,
 		double (MockFemElement2D::*f1)(double,double) const,
 		double (MockFemElement2D::*f2)(double,double) const,
 		double (MockFemElement2D::*f3)(double,double) const,
@@ -370,7 +370,7 @@ public:
 		return res;
 	}
 
-	std::array<double, 9> Batoz_fy(double xi, double neta,
+	std::array<double, 9> batozFy(double xi, double neta,
 		double (MockFemElement2D::*f1)(double,double) const,
 		double (MockFemElement2D::*f2)(double,double) const,
 		double (MockFemElement2D::*f3)(double,double) const,
@@ -404,24 +404,24 @@ public:
 		return res;
 	}
 
-	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> BatozStrainDisplacementNumericalDerivation(double xi, double neta)
+	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> batozStrainDisplacementNumericalDerivation(double xi, double neta)
 	{
 		Eigen::Matrix<double, 3, 9, Eigen::DontAlign> res;
 		std::array<double, 9> dHx_dxi, dHx_dneta, dHy_dxi, dHy_dneta;
 		double coefficient = 1.0 / (2.0 * m_restArea);
 
-		dHx_dxi = Batoz_fx(xi, neta, &MockFemElement2D::Batoz_dN1_dxi , &MockFemElement2D::Batoz_dN2_dxi ,
-			&MockFemElement2D::Batoz_dN3_dxi , &MockFemElement2D::Batoz_dN4_dxi , &MockFemElement2D::Batoz_dN5_dxi ,
-			&MockFemElement2D::Batoz_dN6_dxi);//Batoz_dHx_dxi  (xi, neta, dHx_dxi  );
-		dHx_dneta = Batoz_fx(xi, neta, &MockFemElement2D::Batoz_dN1_dneta, &MockFemElement2D::Batoz_dN2_dneta,
-			&MockFemElement2D::Batoz_dN3_dneta, &MockFemElement2D::Batoz_dN4_dneta, &MockFemElement2D::Batoz_dN5_dneta,
-			&MockFemElement2D::Batoz_dN6_dneta);//Batoz_dHx_dneta(xi, neta, dHx_dneta);
-		dHy_dxi = Batoz_fy(xi, neta, &MockFemElement2D::Batoz_dN1_dxi, &MockFemElement2D::Batoz_dN2_dxi ,
-			&MockFemElement2D::Batoz_dN3_dxi, &MockFemElement2D::Batoz_dN4_dxi, &MockFemElement2D::Batoz_dN5_dxi,
-			&MockFemElement2D::Batoz_dN6_dxi);//Batoz_dHy_dxi  (xi, neta, dHy_dxi  );
-		dHy_dneta = Batoz_fy(xi, neta, &MockFemElement2D::Batoz_dN1_dneta, &MockFemElement2D::Batoz_dN2_dneta,
-			&MockFemElement2D::Batoz_dN3_dneta, &MockFemElement2D::Batoz_dN4_dneta, &MockFemElement2D::Batoz_dN5_dneta,
-			&MockFemElement2D::Batoz_dN6_dneta);//Batoz_dHy_dneta(xi, neta, dHy_dneta);
+		dHx_dxi = batozFx(xi, neta, &MockFemElement2D::batozDN1Dxi , &MockFemElement2D::batozDN2Dxi ,
+			&MockFemElement2D::batozDN3Dxi , &MockFemElement2D::batozDN4Dxi , &MockFemElement2D::batozDN5Dxi ,
+			&MockFemElement2D::batozDN6Dxi);
+		dHx_dneta = batozFx(xi, neta, &MockFemElement2D::batozDN1Dneta, &MockFemElement2D::batozDN2Dneta,
+			&MockFemElement2D::batozDN3Dneta, &MockFemElement2D::batozDN4Dneta, &MockFemElement2D::batozDN5Dneta,
+			&MockFemElement2D::batozDN6Dneta);
+		dHy_dxi = batozFy(xi, neta, &MockFemElement2D::batozDN1Dxi, &MockFemElement2D::batozDN2Dxi ,
+			&MockFemElement2D::batozDN3Dxi, &MockFemElement2D::batozDN4Dxi, &MockFemElement2D::batozDN5Dxi,
+			&MockFemElement2D::batozDN6Dxi);
+		dHy_dneta = batozFy(xi, neta, &MockFemElement2D::batozDN1Dneta, &MockFemElement2D::batozDN2Dneta,
+			&MockFemElement2D::batozDN3Dneta, &MockFemElement2D::batozDN4Dneta, &MockFemElement2D::batozDN5Dneta,
+			&MockFemElement2D::batozDN6Dneta);
 
 		for(size_t i = 0; i < 9; ++i)
 		{
@@ -593,9 +593,9 @@ public:
 		std::shared_ptr<MockFemElement2D> element = getElement();
 
 		// Thin-plate theory (Batoz)
-		Matrix39Type B0 = element->BatozStrainDisplacementNumericalDerivation(0.5, 0.0);
-		Matrix39Type B1 = element->BatozStrainDisplacementNumericalDerivation(0.0, 0.5);
-		Matrix39Type B2 = element->BatozStrainDisplacementNumericalDerivation(0.5, 0.5);
+		Matrix39Type B0 = element->batozStrainDisplacementNumericalDerivation(0.5, 0.0);
+		Matrix39Type B1 = element->batozStrainDisplacementNumericalDerivation(0.0, 0.5);
+		Matrix39Type B2 = element->batozStrainDisplacementNumericalDerivation(0.5, 0.5);
 		Matrix33d Eplate;
 		Eplate << 1.0, m_nu, 0.0, m_nu, 1.0, 0.0, 0.0, 0.0, (1.0 - m_nu) / 2.0;
 		Eplate *= m_E * m_thickness * m_thickness * m_thickness / (12.0 * (1.0 - m_nu * m_nu));
@@ -778,13 +778,13 @@ TEST_F(FemElement2DTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 	std::shared_ptr<MockFemElement2D> element = getElement();
 
 	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected1[3];
-	strainDisplacementExpected1[0] = element->BatozStrainDisplacementAlternativeDerivative(0.0, 0.5);
-	strainDisplacementExpected1[1] = element->BatozStrainDisplacementAlternativeDerivative(0.5, 0.0);
-	strainDisplacementExpected1[2] = element->BatozStrainDisplacementAlternativeDerivative(0.5, 0.5);
+	strainDisplacementExpected1[0] = element->batozStrainDisplacementAlternativeDerivative(0.0, 0.5);
+	strainDisplacementExpected1[1] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.0);
+	strainDisplacementExpected1[2] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.5);
 	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected2[3];
-	strainDisplacementExpected2[0] = element->BatozStrainDisplacementNumericalDerivation(0.0, 0.5);
-	strainDisplacementExpected2[1] = element->BatozStrainDisplacementNumericalDerivation(0.5, 0.0);
-	strainDisplacementExpected2[2] = element->BatozStrainDisplacementNumericalDerivation(0.5, 0.5);
+	strainDisplacementExpected2[0] = element->batozStrainDisplacementNumericalDerivation(0.0, 0.5);
+	strainDisplacementExpected2[1] = element->batozStrainDisplacementNumericalDerivation(0.5, 0.0);
+	strainDisplacementExpected2[2] = element->batozStrainDisplacementNumericalDerivation(0.5, 0.5);
 
 	// Validate the alternative technique against the numerical evaluation
 	EXPECT_TRUE(strainDisplacementExpected1[0].isApprox(strainDisplacementExpected2[0])) <<
@@ -906,70 +906,70 @@ TEST_F(FemElement2DTriangleTests, PlateShapeFunctionsTest)
 	std::shared_ptr<MockFemElement2D> tri = getElement();
 
 	// Shape function N1 weigth point 0 (parametric coordinate 0 0)
-	EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N1(0.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N1(1.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N1(0.0, 1.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N1(0.5, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N1(0.0, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N1(0.5, 0.0));
+	EXPECT_DOUBLE_EQ(1.0, tri->batozN1(0.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN1(1.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN1(0.0, 1.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN1(0.5, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN1(0.0, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN1(0.5, 0.0));
 
 	// Shape function N2 weigth point 1 (parametric coordinate 1 0)
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N2(0.0, 0.0));
-	EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N2(1.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N2(0.0, 1.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N2(0.5, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N2(0.0, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N2(0.5, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN2(0.0, 0.0));
+	EXPECT_DOUBLE_EQ(1.0, tri->batozN2(1.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN2(0.0, 1.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN2(0.5, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN2(0.0, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN2(0.5, 0.0));
 
 	// Shape function N3 weigth point 2 (parametric coordinate 0 1)
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N3(0.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N3(1.0, 0.0));
-	EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N3(0.0, 1.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N3(0.5, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N3(0.0, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N3(0.5, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN3(0.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN3(1.0, 0.0));
+	EXPECT_DOUBLE_EQ(1.0, tri->batozN3(0.0, 1.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN3(0.5, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN3(0.0, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN3(0.5, 0.0));
 
 	// Shape function N4 weigth point 4 (mid-point 12) (parametric coordinate 0.5 0.5)
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N4(0.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N4(1.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N4(0.0, 1.0));
-	EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N4(0.5, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N4(0.0, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N4(0.5, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN4(0.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN4(1.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN4(0.0, 1.0));
+	EXPECT_DOUBLE_EQ(1.0, tri->batozN4(0.5, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN4(0.0, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN4(0.5, 0.0));
 
 	// Shape function N5 weigth point 5 (mid-point 20) (parametric coordinate 0.0 0.5)
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N5(0.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N5(1.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N5(0.0, 1.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N5(0.5, 0.5));
-	EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N5(0.0, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N5(0.5, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN5(0.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN5(1.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN5(0.0, 1.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN5(0.5, 0.5));
+	EXPECT_DOUBLE_EQ(1.0, tri->batozN5(0.0, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN5(0.5, 0.0));
 
 	// Shape function N6 weigth point 6 (mid-point 01) (parametric coordinate 0.5 0.0)
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N6(0.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N6(1.0, 0.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N6(0.0, 1.0));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N6(0.5, 0.5));
-	EXPECT_DOUBLE_EQ(0.0, tri->Batoz_N6(0.0, 0.5));
-	EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N6(0.5, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN6(0.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN6(1.0, 0.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN6(0.0, 1.0));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN6(0.5, 0.5));
+	EXPECT_DOUBLE_EQ(0.0, tri->batozN6(0.0, 0.5));
+	EXPECT_DOUBLE_EQ(1.0, tri->batozN6(0.5, 0.0));
 
 	// We should have the relation sum(Ni(xi, neta) = 1) for all points in the triangle
 	for (double xi = 0.0; xi <= 1.0; xi += 0.1)
 	{
 		for (double neta = 0.0; xi + neta <= 1.0; neta += 0.1)
 		{
-			EXPECT_DOUBLE_EQ(1.0, tri->Batoz_N1(xi, neta) + tri->Batoz_N2(xi, neta) + tri->Batoz_N3(xi, neta) + \
-				tri->Batoz_N4(xi, neta) + tri->Batoz_N5(xi, neta) + tri->Batoz_N6(xi, neta)) <<
+			EXPECT_DOUBLE_EQ(1.0, tri->batozN1(xi, neta) + tri->batozN2(xi, neta) + tri->batozN3(xi, neta) + \
+				tri->batozN4(xi, neta) + tri->batozN5(xi, neta) + tri->batozN6(xi, neta)) <<
 				"For (xi = " << xi << ", neta = " << neta << "), " << std::endl <<
-				" N1 = " << tri->Batoz_N1(xi, neta) << std::endl <<
-				" N2 = " << tri->Batoz_N2(xi, neta) << std::endl <<
-				" N3 = " << tri->Batoz_N3(xi, neta) << std::endl <<
-				" N4 = " << tri->Batoz_N4(xi, neta) << std::endl <<
-				" N5 = " << tri->Batoz_N5(xi, neta) << std::endl <<
-				" N6 = " << tri->Batoz_N6(xi, neta) << std::endl <<
+				" N1 = " << tri->batozN1(xi, neta) << std::endl <<
+				" N2 = " << tri->batozN2(xi, neta) << std::endl <<
+				" N3 = " << tri->batozN3(xi, neta) << std::endl <<
+				" N4 = " << tri->batozN4(xi, neta) << std::endl <<
+				" N5 = " << tri->batozN5(xi, neta) << std::endl <<
+				" N6 = " << tri->batozN6(xi, neta) << std::endl <<
 				" N1+N2+N3+N4+N5+N6 = " <<
-				tri->Batoz_N1(xi, neta) + tri->Batoz_N2(xi, neta) + tri->Batoz_N3(xi, neta) +
-				tri->Batoz_N4(xi, neta) + tri->Batoz_N5(xi, neta) + tri->Batoz_N6(xi, neta);
+				tri->batozN1(xi, neta) + tri->batozN2(xi, neta) + tri->batozN3(xi, neta) +
+				tri->batozN4(xi, neta) + tri->batozN5(xi, neta) + tri->batozN6(xi, neta);
 		}
 	}
 }
