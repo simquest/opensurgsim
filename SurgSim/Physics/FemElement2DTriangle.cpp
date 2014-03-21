@@ -405,29 +405,31 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	SurgSim::Math::Vector2d b2D = m_R0.block(0, 0, 3, 3).inverse().block(0, 0, 2, 3) * (b - a);
 	SurgSim::Math::Vector2d c2D = m_R0.block(0, 0, 3, 3).inverse().block(0, 0, 2, 3) * (c - a);
 
-	double x1 = a2D[0];
-	double y1 = a2D[1];
-	double x2 = b2D[0];
-	double y2 = b2D[1];
-	double x3 = c2D[0];
-	double y3 = c2D[1];
+	// To avoid confusion, we base all our notation on a 0-based indexing
+	// Note that Batoz paper has a 0-based indexing as well, but Przemieniecki has a 1-base indexing
+	double x0 = a2D[0];
+	double y0 = a2D[1];
+	double x1 = b2D[0];
+	double y1 = b2D[1];
+	double x2 = c2D[0];
+	double y2 = c2D[1];
 
-	// Note that by construction, we should have x1=y1=0 and y2=0
-	SURGSIM_ASSERT(std::abs(x1) < 1e-10 && std::abs(y1) < 1e-10 && std::abs(y2) < 1e-10) <<
-		"Membrane local transform problem. We should have x1=y1=y2=0, but we have x1=" << x1 <<
-		" y1=" << y1 << " y2=" << y2;
-	x1=y1=y2=0.0; // Force it to exactly 0 for numerical purpose
+	// Note that by construction, we should have x0=y0=0 and y1=0
+	SURGSIM_ASSERT(std::abs(x0) < 1e-10 && std::abs(y0) < 1e-10 && std::abs(y1) < 1e-10) <<
+		"Membrane local transform problem. We should have x0=y0=y1=0, but we have x0=" << x0 <<
+		" y0=" << y0 << " y1=" << y1;
+	x0=y0=y1=0.0; // Force it to exactly 0 for numerical purpose
 
-	// Also note that x2>0 and y3>0 by construction
-	SURGSIM_ASSERT(x2 >= 0 && y3 >= 0) <<
-		"Membrane local transform problem. We should have x2>=0 and y3>=0, but we have x2=" << x2 <<
-		" y3=" << y3;
+	// Also note that x1>=0 and y2>=0 by construction
+	SURGSIM_ASSERT(x1 >= 0 && y2 >= 0) <<
+		"Membrane local transform problem. We should have x1>=0 and y2>=0, but we have x1=" << x1 <<
+		" y2=" << y2;
 
-	// Note: 2Area(ABC) = 2A = (x1y2 + x2y3 + x3y1 - x1y3 - x2y1 - x3y2) =
-	//                   (x2-x3)(y2-y1) - (x2-x1)(y2-y3) = x23y21 - x21y23
-	// In the local frame, we have x1=y1=y2=0
-	// 2A = x2y3  (with x2>=0 and y3>=0)
-	m_restArea = x2 * y3 / 2.0;
+	// Note: 2Area(ABC) = 2A = (x0y1 + x1y2 + x2y0 - x0y2 - x1y0 - x2y1) =
+	//                   (x1-x2)(y1-y0) - (x1-x0)(y1-y2) = x12y10 - x10y12
+	// In the local frame, we have x0=y0=y1=0
+	// 2A = x1y2  (with x1>=0 and y2>=0)
+	m_restArea = x1 * y2 / 2.0;
 	SURGSIM_ASSERT(m_restArea != 0.0) << "Triangle with null area, A=(" << a.transpose() <<
 		"), B=(" << b.transpose() << "), C=(" << c.transpose() << ")";
 	SURGSIM_ASSERT(m_restArea > 0.0) << "Triangle with negtive area, Area = " << m_restArea <<
@@ -435,57 +437,50 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 
 	// Membrane shape functions
 	// Identifying coefficient for f1:
-	// (a1)     1  (  x2y3-x3y2 -(x1y3-x3y1)   x1y2-x2y1 )(1)   1/2A (x2y3-x3y2)        ( x2y3-x3y2)
-	// (b1) = ---- (  y2-y3     -(y1-y3)       y1-y2     )(0) = 1/2A y23         = 1/2A (-y32      )
-	// (c1)    2A  (-(x2-x3)      x1-x3      -(x1-x2)    )(0)   1/2A x32                ( x32      )
+	// (a1)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(1)   1/2A (x1y2-x2y1)        ( x1y2-x2y1)
+	// (b1) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) = 1/2A y12         = 1/2A (-y21      )
+	// (c1)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x21                ( x21      )
 	// Similarly for f2:
-	// (a2)     1  (  x2y3-x3y2 -(x1y3-x3y1)   x1y2-x2y1 )(0)   1/2A (x3y1-x1y3)        (-x1y3-x3y1)
-	// (b2) = ---- (  y2-y3     -(y1-y3)       y1-y2     )(1) = 1/2A y31         = 1/2A ( y31      )
-	// (c2)    2A  (-(x2-x3)      x1-x3      -(x1-x2)    )(0)   1/2A x13                (-x31      )
+	// (a2)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)   1/2A (x2y0-x0y2)        (-x0y2-x2y0)
+	// (b2) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(1) = 1/2A y20         = 1/2A ( y20      )
+	// (c2)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(0)   1/2A x02                (-x20      )
 	// Similarly for f3:
-	// (a3)     1  (  x2y3-x3y2 -(x1y3-x3y1)   x1y2-x2y1 )(0)    1/2A (x1y2-x2y1)        ( x1y2-x2y1)
-	// (b3) = ---- (  y2-y3     -(y1-y3)       y1-y2     )(0) =  1/2A y12         = 1/2A (-y21      )
-	// (c3)    2A  (-(x2-x3)      x1-x3      -(x1-x2)    )(1)    1/2A x21                ( x21      )
+	// (a3)     1  (  x1y2-x2y1 -(x0y2-x2y0)   x0y1-x1y0 )(0)    1/2A (x0y1-x1y0)        ( x0y1-x1y0)
+	// (b3) = ---- (  y1-y2     -(y0-y2)       y0-y1     )(0) =  1/2A y01         = 1/2A (-y10      )
+	// (c3)    2A  (-(x1-x2)      x0-x2      -(x0-x1)    )(1)    1/2A x10                ( x10      )
 	double inv_2A = 1.0 / (2.0 * m_restArea);
-	m_membraneShapeFunctionConstantParameter[0] = inv_2A * (x2 * y3 - x3 * y2);
-	m_membraneShapeFunctionConstantParameter[1] =-inv_2A * (x1 * y3 - x3 * y1);
-	m_membraneShapeFunctionConstantParameter[2] = inv_2A * (x1 * y2 - x2 * y1);
-	m_membraneShapeFunctionXCoefficient[0] =-inv_2A * (y3 - y2);
-	m_membraneShapeFunctionXCoefficient[1] = inv_2A * (y3 - y1);
-	m_membraneShapeFunctionXCoefficient[2] =-inv_2A * (y2 - y1);
-	m_membraneShapeFunctionYCoefficient[0] = inv_2A * (x3 - x2);
-	m_membraneShapeFunctionYCoefficient[1] =-inv_2A * (x3 - x1);
-	m_membraneShapeFunctionYCoefficient[2] = inv_2A * (x2 - x1);
+	m_membraneShapeFunctionConstantParameter[0] = inv_2A * x1 * y2;   // Because y1 = 0
+	m_membraneShapeFunctionConstantParameter[1] = 0.0;                // Because x0 = 0 and y0 = 0
+	m_membraneShapeFunctionConstantParameter[2] = 0.0;                // Because x0 = 0 and y0 = 0
+	m_membraneShapeFunctionXCoefficient[0] =-inv_2A * y2;             // Because y1 = 0
+	m_membraneShapeFunctionXCoefficient[1] = inv_2A * y2;             // Because y0 = 0
+	m_membraneShapeFunctionXCoefficient[2] = 0.0;                     // Because y0 = 0 and y1 = 0
+	m_membraneShapeFunctionYCoefficient[0] = inv_2A * x2 - x1;
+	m_membraneShapeFunctionYCoefficient[1] =-inv_2A * x2;             // Because x0 = 0
+	m_membraneShapeFunctionYCoefficient[2] = inv_2A * x1;             // Because x0 = 0
 
 	// Thin-Plate Batoz specific data
-	double x[3] = { 0.0,  x2, x3};
-	double y[3] = { 0.0, 0.0, y3};
-	for(size_t i = 0; i < 3; ++i)
+	m_xij[0] = x1 - x2; // xij[0] = x1 - x2
+	m_xij[1] = x2;      // xij[1] = x2 - x0    but x0=0
+	m_xij[2] = -x1;     // xij[2] = x0 - x1    but x0=0
+	m_yij[0] = -y2;     // yij[0] = y1 - y2    but y1=0
+	m_yij[1] = y2;      // yij[1] = y2 - y0    but y0=0
+	m_yij[2] = 0.0;     // yij[2] = y0 - y1    but y0=y1=0
+	for(size_t k = 0; k < 3; ++k)
 	{
-		m_xij[0] = (x[1]-x[2]); // xij = xi - xj (i=1 j=2)
-		m_xij[1] = (x[2]-x[0]); // xij = xi - xj (i=2 j=0)
-		m_xij[2] = (x[0]-x[1]); // xij = xi - xj (i=0 j=1)
-
-		m_yij[0] = (y[1]-y[2]); // yij = yi - yj (i=1 j=2)
-		m_yij[1] = (y[2]-y[0]); // yij = yi - yj (i=2 j=0)
-		m_yij[2] = (y[0]-y[1]); // yij = yi - yj (i=0 j=1)
-
-		for(size_t k = 0; k < 3; ++k)
-		{
-			m_lij_sqr[k] = m_xij[k] * m_xij[k] + m_yij[k] * m_yij[k];  // lij_sqr = xij^2 + yij^2
-			m_ak[k]  = -m_xij[k] / m_lij_sqr[k];                       // ak      = -xij/li^2
-			m_bk[k]  = 0.75 * m_xij[k] * m_yij[k] / m_lij_sqr[k];      // bk      = 3/4 xij yij/lij^2
-			m_ck[k]  = (0.25 * m_xij[k] * m_xij[k] - 0.5 * m_yij[k] * m_yij[k]) / m_lij_sqr[k];
-																	   // ck      = (1/4 xij^2 - 1/2 yij^2)/lij^2
-			m_dk[k]  = -m_yij[k] / m_lij_sqr[k];                       // dk      = -yij/lij^2
-			m_ek[k]  = (0.25 * m_yij[k] * m_yij[k] - 0.5 * m_xij[k] * m_xij[k]) / m_lij_sqr[k];
-																	   // ek      = (1/4 yij^2 - 1/2 xij^2)/lij^2
-			//// ... and some more for the derivatives...
-			m_Pk[k]  = 6.0 * m_ak[k];                                  // Pk      = -6xij/lij^2    = 6ak
-			m_qk[k]  = 4.0 * m_bk[k];                                  // qk      = 3xijyij/lij^2  = 4bk
-			m_tk[k]  = 6.0 * m_dk[k];                                  // tk      = -6yij/lij^2    = 6dk
-			m_rk[k]  = 3.0 * m_yij[k] * m_yij[k] / m_lij_sqr[k];       // rk      = 3yij^2/lij^2
-		}
+		m_lij_sqr[k] = m_xij[k] * m_xij[k] + m_yij[k] * m_yij[k];  // lij_sqr = xij^2 + yij^2
+		m_ak[k]  = -m_xij[k] / m_lij_sqr[k];                       // ak      = -xij/li^2
+		m_bk[k]  = 0.75 * m_xij[k] * m_yij[k] / m_lij_sqr[k];      // bk      = 3/4 xij yij/lij^2
+		m_ck[k]  = (0.25 * m_xij[k] * m_xij[k] - 0.5 * m_yij[k] * m_yij[k]) / m_lij_sqr[k];
+																	// ck      = (1/4 xij^2 - 1/2 yij^2)/lij^2
+		m_dk[k]  = -m_yij[k] / m_lij_sqr[k];                       // dk      = -yij/lij^2
+		m_ek[k]  = (0.25 * m_yij[k] * m_yij[k] - 0.5 * m_xij[k] * m_xij[k]) / m_lij_sqr[k];
+																	// ek      = (1/4 yij^2 - 1/2 xij^2)/lij^2
+		//// ... and some more for the derivatives...
+		m_Pk[k]  = 6.0 * m_ak[k];                                  // Pk      = -6xij/lij^2    = 6ak
+		m_qk[k]  = 4.0 * m_bk[k];                                  // qk      = 3xijyij/lij^2  = 4bk
+		m_tk[k]  = 6.0 * m_dk[k];                                  // tk      = -6yij/lij^2    = 6dk
+		m_rk[k]  = 3.0 * m_yij[k] * m_yij[k] / m_lij_sqr[k];       // rk      = 3yij^2/lij^2
 	}
 }
 
