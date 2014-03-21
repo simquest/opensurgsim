@@ -137,15 +137,11 @@ void LinearSpring::addMatVec(const DeformableRepresentationState& state, double 
 	{
 		return;
 	}
-
-	Eigen::Matrix<double, 6, 1, Eigen::DontAlign> x6D;
-	getSubVector(x, m_nodeIds, 3, &x6D);
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK != 0.0)
+	else
 	{
+		Eigen::Matrix<double, 6, 1, Eigen::DontAlign> x6D;
+		getSubVector(x, m_nodeIds, 3, &x6D);
+
 		const Vector& xState = state.getPositions();
 		const Vector& x0 = getSubVector(xState, m_nodeIds[0], 3);
 		const Vector& x1 = getSubVector(xState, m_nodeIds[1], 3);
