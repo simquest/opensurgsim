@@ -1,6 +1,0 @@
-newmtl material_1
-       Ka 0 0 0 1
-       Kd 0.8 0.8 0.8 1
-       Ks 0.1 0.1 0.1 1
-       map_Kd forearm.png
-
