@@ -159,7 +159,7 @@ public:
 protected:
 	/// Computes the triangle element's initial rotation
 	/// \param state The deformable state to compute the rotation from
-	/// \note This method stores the result in m_R0
+	/// \note This method stores the result in m_initialRotation
 	void computeInitialRotation(const DeformableRepresentationState& state);
 
 	/// Computes the triangle's stiffness matrix
@@ -177,7 +177,7 @@ protected:
 	Eigen::Matrix<double, 18, 1, Eigen::DontAlign> m_x0;
 
 	/// Initial rotation matrix for the element
-	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_R0;
+	SurgSim::Math::Matrix33d m_initialRotation;
 
 	/// Mass matrix (in global coordinate frame)
 	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_M;

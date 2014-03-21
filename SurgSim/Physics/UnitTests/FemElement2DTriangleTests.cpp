@@ -51,9 +51,25 @@ public:
 		return m_plateStrainDisplacementAtGaussPoints[i];
 	}
 
-	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getInitialRotation() const
+	const Matrix33d& getInitialRotation() const
 	{
-		return m_R0;
+		return m_initialRotation;
+	}
+
+	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getInitialRotationTimes6()
+	{
+		const Matrix33d& R0 = getInitialRotation();
+
+		m_initialRotationTimes6.setZero();
+
+		SurgSim::Math::setSubMatrix(R0, 0, 0, 3, 3, &m_initialRotationTimes6);
+		SurgSim::Math::setSubMatrix(R0, 1, 1, 3, 3, &m_initialRotationTimes6);
+		SurgSim::Math::setSubMatrix(R0, 2, 2, 3, 3, &m_initialRotationTimes6);
+		SurgSim::Math::setSubMatrix(R0, 3, 3, 3, 3, &m_initialRotationTimes6);
+		SurgSim::Math::setSubMatrix(R0, 4, 4, 3, 3, &m_initialRotationTimes6);
+		SurgSim::Math::setSubMatrix(R0, 5, 5, 3, 3, &m_initialRotationTimes6);
+
+		return m_initialRotationTimes6;
 	}
 
 	const Eigen::Matrix<double, 6, 6, Eigen::DontAlign>& getMembraneLocalStiffnessMatrix() const
@@ -437,6 +453,8 @@ public:
 		return res;
 	}
 
+private:
+	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> m_initialRotationTimes6;
 };
 
 class FemElement2DTriangleTests : public ::testing::Test
@@ -763,14 +781,14 @@ TEST_F(FemElement2DTriangleTests, InitialRotationTest)
 	mask.block<3, 3>(9, 9).setZero();
 	mask.block<3, 3>(12, 12).setZero();
 	mask.block<3, 3>(15, 15).setZero();
-	EXPECT_TRUE(element->getInitialRotation().cwiseProduct(mask).isZero());
+	EXPECT_TRUE(element->getInitialRotationTimes6().cwiseProduct(mask).isZero());
 
-	EXPECT_TRUE(element->getInitialRotation().block(0, 0, 3, 3).isApprox(m_expectedRotation.matrix()));
-	EXPECT_TRUE(element->getInitialRotation().block(3, 3, 3, 3).isApprox(m_expectedRotation.matrix()));
-	EXPECT_TRUE(element->getInitialRotation().block(6, 6, 3, 3).isApprox(m_expectedRotation.matrix()));
-	EXPECT_TRUE(element->getInitialRotation().block(9, 9, 3, 3).isApprox(m_expectedRotation.matrix()));
-	EXPECT_TRUE(element->getInitialRotation().block(12, 12, 3, 3).isApprox(m_expectedRotation.matrix()));
-	EXPECT_TRUE(element->getInitialRotation().block(15, 15, 3, 3).isApprox(m_expectedRotation.matrix()));
+	EXPECT_TRUE(element->getInitialRotationTimes6().block(0, 0, 3, 3).isApprox(m_expectedRotation.matrix()));
+	EXPECT_TRUE(element->getInitialRotationTimes6().block(3, 3, 3, 3).isApprox(m_expectedRotation.matrix()));
+	EXPECT_TRUE(element->getInitialRotationTimes6().block(6, 6, 3, 3).isApprox(m_expectedRotation.matrix()));
+	EXPECT_TRUE(element->getInitialRotationTimes6().block(9, 9, 3, 3).isApprox(m_expectedRotation.matrix()));
+	EXPECT_TRUE(element->getInitialRotationTimes6().block(12, 12, 3, 3).isApprox(m_expectedRotation.matrix()));
+	EXPECT_TRUE(element->getInitialRotationTimes6().block(15, 15, 3, 3).isApprox(m_expectedRotation.matrix()));
 }
 
 TEST_F(FemElement2DTriangleTests, StrainDisplacementPlateAtGaussPointTest)
@@ -1006,7 +1024,7 @@ TEST_F(FemElement2DTriangleTests, StiffnessMatrixTest)
 		"KLocal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
 		"KLocal expected = " << std::endl << expectedLocalStiffness << std::endl;
 
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotation();
+	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalStiffnessMatrix().isApprox(R0.transpose() * expectedLocalStiffness * R0)) <<
 		"R0 = " << std::endl << R0 << std::endl <<
 		"KGlobal = " << std::endl << tri->getLocalStiffnessMatrix() << std::endl <<
@@ -1031,7 +1049,7 @@ TEST_F(FemElement2DTriangleTests, MassMatrixTest)
 	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expectedMassMatrix;
 	getExpectedLocalMassMatrix(expectedMassMatrix);
 	EXPECT_TRUE(tri->getLocalMassMatrix().isApprox(expectedMassMatrix));
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotation();
+	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
 	EXPECT_TRUE(tri->getGlobalMassMatrix().isApprox(R0.transpose() * expectedMassMatrix * R0));
 }
 
@@ -1052,7 +1070,7 @@ TEST_F(FemElement2DTriangleTests, ForceAndMatricesAPITest)
 	SurgSim::Math::Matrix expectedStiffnessMatrix(numDof, numDof);
 
 	// Assemble manually the expectedStiffnessMatrix
-	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotation();
+	Eigen::Matrix<double, 18 ,18, Eigen::DontAlign> R0 = tri->getInitialRotationTimes6();
 	Eigen::Matrix<double, 18, 18, Eigen::DontAlign> expected18x18StiffnessMatrix;
 	getExpectedLocalStiffnessMatrix(expected18x18StiffnessMatrix);
 	expectedStiffnessMatrix.setZero();

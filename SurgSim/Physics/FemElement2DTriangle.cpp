@@ -82,7 +82,7 @@ void FemElement2DTriangle::initialize(const DeformableRepresentationState& state
 	// Store the rest state for this beam in m_x0
 	getSubVector(state.getPositions(), m_nodeIds, 6, &m_x0);
 
-	// Store the rest rotation 3x3 6 times along the diagonal of m_R0
+	// Store the rest rotation in m_initialRotation
 	computeInitialRotation(state);
 
 	// computeShapeFunctionsParameters needs the initial rotation and
@@ -245,7 +245,15 @@ void FemElement2DTriangle::computeMass(const DeformableRepresentationState& stat
 	}
 
 	// Transformation Local -> Global
-	m_M = m_R0.transpose() * m_MLocal * m_R0;
+	// m_MLocal has only 3x3 block element on the diagonal, we can transform each block independently
+	m_M.setZero();
+	const SurgSim::Math::Matrix33d& rotation = m_initialRotation;
+	const SurgSim::Math::Matrix33d rotationTranspose = m_initialRotation.transpose();
+	for (size_t rowId = 0; rowId < 6; ++rowId)
+	{
+		auto MLocal3x3block = getSubMatrix(m_MLocal, rowId, rowId, 3, 3);
+		setSubMatrix(rotationTranspose * MLocal3x3block * rotation, rowId, rowId, 3, 3, &m_M);
+	}
 }
 
 void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState& state,
@@ -325,7 +333,17 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 	}
 
 	// Transformation Local -> Global
-	m_K = m_R0.transpose() * m_KLocal * m_R0;
+	m_K.setZero();
+	const SurgSim::Math::Matrix33d& rotation = m_initialRotation;
+	const SurgSim::Math::Matrix33d rotationTranspose = m_initialRotation.transpose();
+	for (size_t rowId = 0; rowId < 6; ++rowId)
+	{
+		for (size_t colId = 0; colId < 6; ++colId)
+		{
+			auto KLocal3x3block = getSubMatrix(m_KLocal, rowId, colId, 3, 3);
+			setSubMatrix(rotationTranspose * KLocal3x3block * rotation, rowId, colId, 3, 3, &m_K);
+		}
+	}
 }
 
 void FemElement2DTriangle::computeInitialRotation(const DeformableRepresentationState& state)
@@ -354,20 +372,10 @@ void FemElement2DTriangle::computeInitialRotation(const DeformableRepresentation
 	j = k.cross(i);
 	j.normalize();
 
-	// Set up a temporary 3x3 initial rotation matrix
-	SurgSim::Math::Matrix33d rotation3x3;
-	rotation3x3.col(0) = i;
-	rotation3x3.col(1) = j;
-	rotation3x3.col(2) = k;
-
-	// Set up the 18x18 initial rotation matrix
-	m_R0.setZero();
-	setSubMatrix(rotation3x3, 0, 0, 3, 3, &m_R0);
-	setSubMatrix(rotation3x3, 1, 1, 3, 3, &m_R0);
-	setSubMatrix(rotation3x3, 2, 2, 3, 3, &m_R0);
-	setSubMatrix(rotation3x3, 3, 3, 3, 3, &m_R0);
-	setSubMatrix(rotation3x3, 4, 4, 3, 3, &m_R0);
-	setSubMatrix(rotation3x3, 5, 5, 3, 3, &m_R0);
+	// Initialize the initial rotation matrix
+	m_initialRotation.col(0) = i;
+	m_initialRotation.col(1) = j;
+	m_initialRotation.col(2) = k;
 }
 
 bool FemElement2DTriangle::isValidCoordinate(const SurgSim::Math::Vector& naturalCoordinate) const
@@ -408,8 +416,7 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	const SurgSim::Math::Vector3d c = restState.getPosition(m_nodeIds[2]);
 
 	// Transforms the 3 triangle points in 2D triangle cartesian coordinates
-	SurgSim::Math::Matrix33d R0 = m_R0.block(0, 0, 3, 3);
-	SurgSim::Math::RigidTransform3d inverseTransform = SurgSim::Math::makeRigidTransform(R0, a).inverse();
+	SurgSim::Math::RigidTransform3d inverseTransform = SurgSim::Math::makeRigidTransform(m_initialRotation, a).inverse();
 	SurgSim::Math::Vector2d a2D = (inverseTransform * a).segment(0, 2);
 	SurgSim::Math::Vector2d b2D = (inverseTransform * b).segment(0, 2);
 	SurgSim::Math::Vector2d c2D = (inverseTransform * c).segment(0, 2);
