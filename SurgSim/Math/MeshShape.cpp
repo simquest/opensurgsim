@@ -26,7 +26,7 @@ int MeshShape::getType()
 	return SHAPE_TYPE_MESH;
 }
 
-const std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh() const
+std::shared_ptr<SurgSim::DataStructures::TriangleMesh> MeshShape::getMesh()
 {
 	return m_mesh;
 }
