@@ -83,14 +83,22 @@ PhysicsManagerState::getCollisionRepresentations()
 
 void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
 {
+	if (m_constraintComponents == val)
+	{
+		return;
+	}
 	m_constraintComponents = val;
 
-	std::vector<std::shared_ptr<Constraint>> constraints;
+	std::vector<std::shared_ptr<Constraint>>& constraints = m_constraints[CONSTRAINT_GROUP_TYPE_SCENE];
+
 	constraints.reserve(m_constraintComponents.size());
+	constraints.clear();
 	for (auto it = m_constraintComponents.cbegin(); it != m_constraintComponents.cend(); ++it)
 	{
 		constraints.push_back((*it)->getConstraint());
 	}
+	constraints.shrink_to_fit();
+
 	setConstraintGroup(CONSTRAINT_GROUP_TYPE_SCENE, constraints);
 }
 
