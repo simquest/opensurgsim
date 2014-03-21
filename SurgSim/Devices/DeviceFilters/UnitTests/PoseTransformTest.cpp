@@ -215,8 +215,15 @@ TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
 	device->doGetInitialInputData() = inputData;
 
 	DataGroupBuilder outputBuilder;
-	outputBuilder.addPose("pose");
+	outputBuilder.addVector("force");
+	outputBuilder.addVector("torque");
+	outputBuilder.addMatrix("springJacobian");
 	outputBuilder.addPose("inputPose");
+	outputBuilder.addMatrix("damperJacobian");
+	outputBuilder.addVector("linearVelocity");
+	outputBuilder.addVector("angularVelocity");
+	// A couple of data that should not be altered by the filter.
+	outputBuilder.addPose("pose");
 	outputBuilder.addVector("outVector");
 
 	DataGroup outputData = outputBuilder.createData();
@@ -225,11 +232,11 @@ TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
 								0.0, 1.0, 0.0, 6.0,
 								1.0, 0.0, 0.0, 7.0,
 								0.0, 0.0, 0.0, 1.0; // 90 degree rotation about y-axis
+	outputData.poses().set("pose", initialOutputPose);
 
 	Vector3d initialOutputVector = Vector3d::UnitZ();
-
-	outputData.poses().set("pose", initialOutputPose);
 	outputData.vectors().set("outVector", initialOutputVector);
+
 	// Normally the data would be set by a behavior.
 	outputProducer->m_data = outputData;
 
@@ -250,6 +257,8 @@ TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
 	RigidTransform3d actualInputPose;
 	ASSERT_TRUE(inputConsumer->m_data.poses().get("pose", &actualInputPose));
 	EXPECT_TRUE(actualInputPose.isApprox(initialInputPose, errorEpsilon));
+
+	// Data that we do not expect to be filtered should be passed through unchanged.
 	Vector3d actualInputVector;
 	ASSERT_TRUE(inputConsumer->m_data.vectors().get("inVector", &actualInputVector));
 	EXPECT_TRUE(actualInputVector.isApprox(initialInputVector, errorEpsilon));
@@ -257,11 +266,13 @@ TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
 	RigidTransform3d actualOutputPose;
 	ASSERT_TRUE(device->doGetOutputData().poses().get("pose", &actualOutputPose));
 	EXPECT_TRUE(actualOutputPose.isApprox(initialOutputPose, errorEpsilon));
+	
 	Vector3d actualOutputVector;
 	ASSERT_TRUE(device->doGetOutputData().vectors().get("outVector", &actualOutputVector));
 	EXPECT_TRUE(actualOutputVector.isApprox(initialOutputVector, errorEpsilon));
 
-	// Check the round-trip.
+
+	// Check the round-trip on the pose->inputPose.
 	RigidTransform3d transform = RigidTransform3d::Identity();
 	transform.matrix() << 0.76461304237996, 0.265602364171189, 0.587215701058083, -0.95,
 		0.3146967650075, 0.64126665474163, -0.699816421363698, -1.1,

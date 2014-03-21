@@ -132,6 +132,23 @@ private:
 
 	/// The scaling factor applied to each direction of the translation.
 	double m_translationScale;
+
+	///@{
+	/// The indices into the DataGroups.
+	int m_poseIndex;
+	int m_linearVelocityIndex;
+	int m_angularVelocityIndex;
+	int m_forceIndex;
+	int m_torqueIndex;
+	int m_springJacobianIndex;
+	int m_inputPoseIndex;
+	int m_damperJacobianIndex;
+	int m_inputLinearVelocityIndex;
+	int m_inputAngularVelocityIndex;
+	///@}
+
+	/// True if the output DataGroup indices have been cached.
+	bool m_cachedOutputIndices;
 };
 
 };  // namespace Device
