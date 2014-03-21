@@ -85,6 +85,12 @@ public:
 	/// \param elementName Name of the element.
 	void endPolyhedrons(const std::string& elementName);
 
+	/// Callback function, begin the processing of materials.
+	/// \param elementName Name of the element.
+	/// \param materialCount Number of materials.
+	/// \return memory for material data to the reader.
+	void* beginMaterials(const std::string& elementName, size_t materialCount);
+
 	/// Callback function, begin the processing of boundary conditions.
 	/// \param elementName Name of the element.
 	/// \param boundaryConditionCount Number of boundary conditions.
@@ -117,6 +123,14 @@ private:
 
 	/// Internal data to receive the "boundary_condition" element
 	unsigned int m_boundaryConditionData;
+
+	/// Internal data to receive the "material" data
+	struct MaterialData
+	{
+		double massDensity;
+		double poissonRatio;
+		double youngModulus;
+	} m_materialData;
 
 	/// The fem that will be created by loading
 	std::shared_ptr<Fem3DRepresentation> m_fem;

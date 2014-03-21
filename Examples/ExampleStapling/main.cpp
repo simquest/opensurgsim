@@ -102,11 +102,7 @@ static std::shared_ptr<SurgSim::Graphics::Mesh> loadMesh(const std::string& file
 }
 
 static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
-	const std::string& fileName,
-	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus)
+	const std::string& fileName, SurgSim::Math::IntegrationScheme integrationScheme)
 {
 	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
 	SurgSim::DataStructures::PlyReader reader(fileName);
@@ -121,14 +117,6 @@ static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
 	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
 	fem->setIntegrationScheme(integrationScheme);
 
-	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
-	for (size_t i = 0; i < fem->getNumFemElements(); i++)
-	{
-		fem->getFemElement(i)->setMassDensity(massDensity);
-		fem->getFemElement(i)->setPoissonRatio(poissonRatio);
-		fem->getFemElement(i)->setYoungModulus(youngModulus);
-	}
-
 	return fem;
 }
 
@@ -136,9 +124,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	const std::string& name,
 	const std::string& filename,
 	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus,
 	bool displayPointCloud)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
@@ -147,7 +132,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
-		= loadFem(filename, integrationScheme, massDensity, poissonRatio, youngModulus);
+		= loadFem(filename, integrationScheme);
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
@@ -350,9 +335,6 @@ int main(int argc, char* argv[])
 		createFemSceneElement("wound",
 							  woundFilename,
 							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
-							  1000.0,										   // Mass Density
-							  0.45,											   // Poisson Ratio
-							  75e3,											   // Young Modulus
 							  true));										   // Display point cloud
 
 	runtime->execute();

@@ -47,6 +47,10 @@ bool Fem3DRepresentationPlyReaderDelegate::fileIsAcceptable(const PlyReader& rea
 	result = result && reader.hasProperty("polyhedron", "vertex_indices");
 	result = result && !reader.isScalar("polyhedron", "vertex_indices");
 
+	result = result && reader.hasProperty("material", "mass_density");
+	result = result && reader.hasProperty("material", "poisson_ratio");
+	result = result && reader.hasProperty("material", "young_modulus");
+
 	m_hasBoundaryConditions = reader.hasProperty("boundary_condition", "vertex_index");
 
 	return result;
@@ -81,6 +85,19 @@ bool Fem3DRepresentationPlyReaderDelegate::registerDelegate(PlyReader* reader)
 								PlyReader::TYPE_UNSIGNED_INT,
 								offsetof(PolyhedronData, vertexCount));
 
+	reader->requestElement(
+		"material",
+		std::bind(
+			&Fem3DRepresentationPlyReaderDelegate::beginMaterials, this, std::placeholders::_1, std::placeholders::_2),
+		nullptr,
+		nullptr);
+	reader->requestScalarProperty(
+		"material", "mass_density", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, massDensity));
+	reader->requestScalarProperty(
+		"material", "poisson_ratio", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, poissonRatio));
+	reader->requestScalarProperty(
+		"material", "young_modulus", PlyReader::TYPE_DOUBLE, offsetof(MaterialData, youngModulus));
+
 	// Boundary Condition Processing
 	if (m_hasBoundaryConditions)
 	{
@@ -114,6 +131,13 @@ void Fem3DRepresentationPlyReaderDelegate::startParseFile()
 
 void Fem3DRepresentationPlyReaderDelegate::endParseFile()
 {
+	for (size_t i = 0; i < m_fem->getNumFemElements(); i++)
+	{
+		m_fem->getFemElement(i)->setMassDensity(m_materialData.massDensity);
+		m_fem->getFemElement(i)->setPoissonRatio(m_materialData.poissonRatio);
+		m_fem->getFemElement(i)->setYoungModulus(m_materialData.youngModulus);
+	}
+
 	m_fem->setInitialState(m_state);
 }
 
@@ -154,6 +178,11 @@ void Fem3DRepresentationPlyReaderDelegate::processPolyhedron(const std::string& 
 void Fem3DRepresentationPlyReaderDelegate::endPolyhedrons(const std::string& elementName)
 {
 	m_polyhedronData.indicies = nullptr;
+}
+
+void* Fem3DRepresentationPlyReaderDelegate::beginMaterials(const std::string& elementName, size_t materialCount)
+{
+	return &m_materialData;
 }
 
 void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,

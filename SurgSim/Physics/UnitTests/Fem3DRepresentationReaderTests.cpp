@@ -75,10 +75,21 @@ TEST(Fem3DRepresentationReaderTests, TetrahedronMeshDelegateTest)
 	ASSERT_EQ(8u, fem->getInitialState()->getNumBoundaryConditions());
 
 	unsigned int boundaryCondition0 = 8;
-	unsigned int boundaryConditoin7 = 11;
+	unsigned int boundaryCondition7 = 11;
 
 	EXPECT_EQ(boundaryCondition0, fem->getInitialState()->getBoundaryConditions().at(0));
-	EXPECT_EQ(boundaryConditoin7, fem->getInitialState()->getBoundaryConditions().at(7));
+	EXPECT_EQ(boundaryCondition7, fem->getInitialState()->getBoundaryConditions().at(7));
+
+	// Material
+	auto fem2 = fem->getFemElement(2);
+	EXPECT_EQ(0.1432, fem2->getMassDensity());
+	EXPECT_EQ(0.224, fem2->getPoissonRatio());
+	EXPECT_EQ(0.472, fem2->getYoungModulus());
+
+	auto fem8 = fem->getFemElement(8);
+	EXPECT_EQ(0.1432, fem2->getMassDensity());
+	EXPECT_EQ(0.224, fem2->getPoissonRatio());
+	EXPECT_EQ(0.472, fem2->getYoungModulus());
 }
 
 }
