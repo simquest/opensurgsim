@@ -46,11 +46,6 @@ public:
 	{
 	}
 
-	const Eigen::Matrix<double, 3, 9, Eigen::DontAlign> getStrainDisplacementPlateAtGaussPoint(size_t i) const
-	{
-		return m_plateStrainDisplacementAtGaussPoints[i];
-	}
-
 	const Matrix33d& getInitialRotation() const
 	{
 		return m_initialRotation;
@@ -72,14 +67,9 @@ public:
 		return m_initialRotationTimes6;
 	}
 
-	const Eigen::Matrix<double, 6, 6, Eigen::DontAlign>& getMembraneLocalStiffnessMatrix() const
+	const Eigen::Matrix<double, 3, 9, Eigen::DontAlign> getBatozStrainDisplacement(double xi, double neta) const
 	{
-		return m_membraneKLocal;
-	}
-
-	const Eigen::Matrix<double, 9, 9, Eigen::DontAlign>& getPlateLocalStiffnessMatrix() const
-	{
-		return m_plateKLocal;
+		return batozStrainDisplacement(xi, neta);
 	}
 
 	const Eigen::Matrix<double, 18, 18, Eigen::DontAlign>& getLocalStiffnessMatrix() const
@@ -795,6 +785,11 @@ TEST_F(FemElement2DTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 {
 	std::shared_ptr<MockFemElement2D> element = getElement();
 
+	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacement[3];
+	strainDisplacement[0] = element->getBatozStrainDisplacement(0.0, 0.5);
+	strainDisplacement[1] = element->getBatozStrainDisplacement(0.5, 0.0);
+	strainDisplacement[2] = element->getBatozStrainDisplacement(0.5, 0.5);
+
 	Eigen::Matrix<double, 3, 9, Eigen::DontAlign> strainDisplacementExpected1[3];
 	strainDisplacementExpected1[0] = element->batozStrainDisplacementAlternativeDerivative(0.0, 0.5);
 	strainDisplacementExpected1[1] = element->batozStrainDisplacementAlternativeDerivative(0.5, 0.0);
@@ -816,25 +811,25 @@ TEST_F(FemElement2DTriangleTests, StrainDisplacementPlateAtGaussPointTest)
 		strainDisplacementExpected2[2] << std::endl;
 
 	// Validate the FemElement2DTriangle internal calculation against both technique
-	EXPECT_TRUE(element->getStrainDisplacementPlateAtGaussPoint(0).isApprox(strainDisplacementExpected1[0])) <<
-		element->getStrainDisplacementPlateAtGaussPoint(0) << std::endl <<
+	EXPECT_TRUE(strainDisplacement[0].isApprox(strainDisplacementExpected1[0])) <<
+		strainDisplacement[0] << std::endl <<
 		strainDisplacementExpected1[0] << std::endl;
-	EXPECT_TRUE(element->getStrainDisplacementPlateAtGaussPoint(0).isApprox(strainDisplacementExpected2[0])) <<
-		element->getStrainDisplacementPlateAtGaussPoint(0) << std::endl <<
+	EXPECT_TRUE(strainDisplacement[0].isApprox(strainDisplacementExpected2[0])) <<
+		strainDisplacement[0] << std::endl <<
 		strainDisplacementExpected2[0] << std::endl;
 
-	EXPECT_TRUE(element->getStrainDisplacementPlateAtGaussPoint(1).isApprox(strainDisplacementExpected1[1])) <<
-		element->getStrainDisplacementPlateAtGaussPoint(1) << std::endl <<
+	EXPECT_TRUE(strainDisplacement[1].isApprox(strainDisplacementExpected1[1])) <<
+		strainDisplacement[1] << std::endl <<
 		strainDisplacementExpected1[1] << std::endl;
-	EXPECT_TRUE(element->getStrainDisplacementPlateAtGaussPoint(1).isApprox(strainDisplacementExpected2[1])) <<
-		element->getStrainDisplacementPlateAtGaussPoint(1) << std::endl <<
+	EXPECT_TRUE(strainDisplacement[1].isApprox(strainDisplacementExpected2[1])) <<
+		strainDisplacement[1] << std::endl <<
 		strainDisplacementExpected2[1] << std::endl;
 
-	EXPECT_TRUE(element->getStrainDisplacementPlateAtGaussPoint(2).isApprox(strainDisplacementExpected1[2])) <<
-		element->getStrainDisplacementPlateAtGaussPoint(2) << std::endl <<
+	EXPECT_TRUE(strainDisplacement[2].isApprox(strainDisplacementExpected1[2])) <<
+		strainDisplacement[2] << std::endl <<
 		strainDisplacementExpected1[2] << std::endl;
-	EXPECT_TRUE(element->getStrainDisplacementPlateAtGaussPoint(2).isApprox(strainDisplacementExpected2[2])) <<
-		element->getStrainDisplacementPlateAtGaussPoint(2) << std::endl <<
+	EXPECT_TRUE(strainDisplacement[2].isApprox(strainDisplacementExpected2[2])) <<
+		strainDisplacement[2] << std::endl <<
 		strainDisplacementExpected2[2] << std::endl;
 }
 
@@ -990,28 +985,6 @@ TEST_F(FemElement2DTriangleTests, PlateShapeFunctionsTest)
 				tri->batozN4(xi, neta) + tri->batozN5(xi, neta) + tri->batozN6(xi, neta);
 		}
 	}
-}
-
-TEST_F(FemElement2DTriangleTests, MembraneLocalStiffnessMatrixTest)
-{
-	std::shared_ptr<MockFemElement2D> tri = getElement();
-
-	auto membraneStiffness = tri->getMembraneLocalStiffnessMatrix();
-	auto expectedMembraneStiffness = getMembraneLocalStiffnessMatrix();
-	EXPECT_TRUE(membraneStiffness.isApprox(expectedMembraneStiffness)) <<
-		"Kmembrane = " << std::endl << membraneStiffness << std::endl <<
-		"Kmembrane expected = " << std::endl << expectedMembraneStiffness << std::endl;
-}
-
-TEST_F(FemElement2DTriangleTests, ThinPlateLocalStiffnessMatrixTest)
-{
-	std::shared_ptr<MockFemElement2D> tri = getElement();
-
-	auto plateStiffness = tri->getPlateLocalStiffnessMatrix();
-	auto expectedPlateStiffness = getPlateLocalStiffnessMatrix();
-	EXPECT_TRUE(plateStiffness.isApprox(expectedPlateStiffness)) <<
-		"Kplate = " << std::endl << plateStiffness << std::endl <<
-		"Kplate expected = " << std::endl << expectedPlateStiffness << std::endl;
 }
 
 TEST_F(FemElement2DTriangleTests, StiffnessMatrixTest)

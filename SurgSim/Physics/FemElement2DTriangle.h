@@ -202,9 +202,6 @@ protected:
 	/// "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	/// Shape functions fi(x, y) = ai + bi.x + ci.y
 	SurgSim::Math::Matrix33d m_membraneShapeFunctionsParameters; //< Stores (ai, bi, ci) on each row
-	Matrix36Type m_membraneStrainDisplacement; //< Strain-displacement matrix containing (dfi/dx=bi , dfi/dy=ci)
-	Matrix33Type m_membraneEm; //< Membrane elasticity material matrix
-	Matrix66Type m_membraneKLocal; //< Membrane local stiffness matrix
 
 	/// Thin-plate (bending/twisting) specific data structure
 	/// DOF simulated: (z, thetaX, thetaY)
@@ -227,9 +224,6 @@ protected:
 	SurgSim::Math::Vector3d m_qk;      //< 3xijyij/lij^2  = 4 m_bk
 	SurgSim::Math::Vector3d m_tk;      //< -6yij/lij^2    = 6 m_dk
 	SurgSim::Math::Vector3d m_rk;      //< 3yij^2/lij^2
-	std::array<Matrix39Type, 3> m_plateStrainDisplacementAtGaussPoints; //< Strain-displacement at given Gauss points
-	Matrix33Type m_plateEm; //< Membrane elasticity material matrix
-	Matrix99Type m_plateKLocal; //< Membrane local stiffness matrix
 	/// Batoz derivative dHx/dxi
 	/// \param xi, neta The parametric coordinate (in [0 1] and xi+neta<1.0)
 	/// \return The vector dHx/dxi evaluated at (xi, neta)

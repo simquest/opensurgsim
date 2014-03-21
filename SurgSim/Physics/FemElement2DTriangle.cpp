@@ -263,7 +263,8 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 
 	// Membrane part from "Theory of Matrix Structural Analysis" from J.S. Przemieniecki
 	// Compute the membrane local strain-displacement matrix
-	m_membraneStrainDisplacement.setZero();
+	Matrix36Type membraneStrainDisplacement;
+	membraneStrainDisplacement.setZero();
 	for(size_t i = 0; i < 3; ++i)
 	{
 		// Noting f(x,y) the membrane shape function, the displacement is:
@@ -271,35 +272,37 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 		// The strain is E=(Exx , Eyy , Exy)
 		// Exx = dux/dx = df0/dx.u0x + df1/dx.u1x + df2/dx.u2x
 		//                dfi/dx = bi = m_membraneShapeFunctionXCoefficient
-		m_membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionsParameters(i, 1);
+		membraneStrainDisplacement(0, 2 * i) = m_membraneShapeFunctionsParameters(i, 1);
 		// Eyy = duy/dy = df0/dy.u0y + df1/dy.u1y + df2/dy.u2y
 		//                dfi/dy = ci = m_membraneShapeFunctionYCoefficient
-		m_membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 2);
+		membraneStrainDisplacement(1, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 2);
 		// Exy = dux/dy + duy/dx =
 		// (df0/dy.u0x + df0/dx.u0y) + (df1/dy.u1x + df1/dx.u1y) + (df2/dy.u2x + df2/dx.u2y)
-		m_membraneStrainDisplacement(2, 2 * i) = m_membraneShapeFunctionsParameters(i, 2);
-		m_membraneStrainDisplacement(2, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 1);
+		membraneStrainDisplacement(2, 2 * i) = m_membraneShapeFunctionsParameters(i, 2);
+		membraneStrainDisplacement(2, 2 * i + 1) = m_membraneShapeFunctionsParameters(i, 1);
 	}
 	// Membrane material stiffness coming from Hooke Law (isotropic material)
-	m_membraneEm.setZero();
-	m_membraneEm(0, 0) = 1.0;
-	m_membraneEm(1, 1) = 1.0;
-	m_membraneEm(2, 2) = 0.5 * (1.0 - m_nu);
-	m_membraneEm(0, 1) = m_nu;
-	m_membraneEm(1, 0) = m_nu;
-	m_membraneEm *= m_E / (1.0 - m_nu * m_nu);
+	Matrix33Type membraneElasticMaterial;
+	membraneElasticMaterial.setZero();
+	membraneElasticMaterial(0, 0) = 1.0;
+	membraneElasticMaterial(1, 1) = 1.0;
+	membraneElasticMaterial(2, 2) = 0.5 * (1.0 - m_nu);
+	membraneElasticMaterial(0, 1) = m_nu;
+	membraneElasticMaterial(1, 0) = m_nu;
+	membraneElasticMaterial*= m_E / (1.0 - m_nu * m_nu);
 	// Membrane local stiffness matrix = integral(strain:stress)
-	m_membraneKLocal = m_membraneStrainDisplacement.transpose() * m_membraneEm * m_membraneStrainDisplacement;
-	m_membraneKLocal *= m_thickness * m_restArea;
+	Matrix66Type membraneKLocal =
+		membraneStrainDisplacement.transpose() * membraneElasticMaterial * membraneStrainDisplacement;
+	membraneKLocal *= m_thickness * m_restArea;
 
 	// Thin-plate part from "A Study Of Three-Node Triangular Plate Bending Elements", Jean-Louis Batoz
 	// Thin-Plate strain-displacement matrices using a 3 point Gauss quadrature located at the middle of the edges
-	m_plateStrainDisplacementAtGaussPoints[0] = batozStrainDisplacement(0.0 , 0.5);
-	m_plateStrainDisplacementAtGaussPoints[1] = batozStrainDisplacement(0.5 , 0.0);
-	m_plateStrainDisplacementAtGaussPoints[2] = batozStrainDisplacement(0.5 , 0.5);
+	Matrix39Type plateStrainDisplacementGaussPoint0 = batozStrainDisplacement(0.0 , 0.5);
+	Matrix39Type plateStrainDisplacementGaussPoint1 = batozStrainDisplacement(0.5 , 0.0);
+	Matrix39Type plateStrainDisplacementGaussPoint2 = batozStrainDisplacement(0.5 , 0.5);
 	// Thin-plate material stiffness coming from Hooke Law (isotropic material)
-	m_plateEm = m_membraneEm;
-	m_plateEm *= m_thickness * m_thickness * m_thickness / 12.0;
+	Matrix33Type plateElasticMaterial = membraneElasticMaterial;
+	plateElasticMaterial *= m_thickness * m_thickness * m_thickness / 12.0;
 	// Thin-plate local stiffness matrix = integral(strain:stress) using a 3 points integration
 	// rule over the parametrized triangle (exact integration because only quadratic terms)
 	// integral(over parametric triangle) Bt.Em.B = sum(gauss point (xi,neta)) wi Bt(xi,neta).Em.B(xi,neta)
@@ -308,13 +311,13 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 	// + Area(parametric triangle)/3.0 * Bt(0.0, 0.5).Em.B(0.0, 0.5)
 	// + Area(parametric triangle)/3.0 * Bt(0.5, 0.5).Em.B(0.5, 0.5)
 	double areaParametricTriangle = 1.0 / 2.0;
-	m_plateKLocal = (areaParametricTriangle / 3.0) *
-		m_plateStrainDisplacementAtGaussPoints[0].transpose() * m_plateEm * m_plateStrainDisplacementAtGaussPoints[0];
-	m_plateKLocal += (areaParametricTriangle / 3.0) *
-		m_plateStrainDisplacementAtGaussPoints[1].transpose() * m_plateEm * m_plateStrainDisplacementAtGaussPoints[1];
-	m_plateKLocal += (areaParametricTriangle / 3.0) *
-		m_plateStrainDisplacementAtGaussPoints[2].transpose() * m_plateEm * m_plateStrainDisplacementAtGaussPoints[2];
-	m_plateKLocal *= 2.0 * m_restArea; // Factor due to switch from cartesian coordinates to parametric coordinates
+	Matrix99Type plateKLocal = (areaParametricTriangle / 3.0) *
+		plateStrainDisplacementGaussPoint0.transpose() * plateElasticMaterial * plateStrainDisplacementGaussPoint0;
+	plateKLocal += (areaParametricTriangle / 3.0) *
+		plateStrainDisplacementGaussPoint1.transpose() * plateElasticMaterial * plateStrainDisplacementGaussPoint1;
+	plateKLocal += (areaParametricTriangle / 3.0) *
+		plateStrainDisplacementGaussPoint2.transpose() * plateElasticMaterial * plateStrainDisplacementGaussPoint2;
+	plateKLocal *= 2.0 * m_restArea; // Factor due to switch from cartesian coordinates to parametric coordinates
 
 	// Assemble shell stiffness as combination of membrane (Ux Uy) and plate stiffnesses (Uz ThetaX ThetaY)
 	// In the Kirchhof theory of Thin-Plate, the drilling dof (ThetaZ) is not considered.
@@ -325,10 +328,10 @@ void FemElement2DTriangle::computeStiffness(const DeformableRepresentationState&
 		for(size_t column = 0; column < 3; ++column)
 		{
 			// Membrane part
-			m_KLocal.block(6 * row, 6 * column, 2, 2) = m_membraneKLocal.block(2 * row , 2 * column, 2, 2);
+			m_KLocal.block(6 * row, 6 * column, 2, 2) = membraneKLocal.block(2 * row , 2 * column, 2, 2);
 
 			// Thin-plate part
-			m_KLocal.block(6 * row + 2, 6 * column + 2, 3, 3) = m_plateKLocal.block(3 * row, 3 * column, 3, 3);
+			m_KLocal.block(6 * row + 2, 6 * column + 2, 3, 3) = plateKLocal.block(3 * row, 3 * column, 3, 3);
 		}
 	}
 
