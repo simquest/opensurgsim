@@ -15,6 +15,7 @@
 
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Math/Geometry.h"
+#include "SurgSim/Math/RigidTransform.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/FemElement2DTriangle.h"
 
@@ -401,9 +402,11 @@ void FemElement2DTriangle::computeShapeFunctionsParameters(const DeformableRepre
 	const SurgSim::Math::Vector3d c = restState.getPosition(m_nodeIds[2]);
 
 	// Transforms the 3 triangle points in 2D triangle cartesian coordinates
-	SurgSim::Math::Vector2d a2D = m_R0.block(0, 0, 3, 3).inverse().block(0, 0, 2, 3) * (a - a);
-	SurgSim::Math::Vector2d b2D = m_R0.block(0, 0, 3, 3).inverse().block(0, 0, 2, 3) * (b - a);
-	SurgSim::Math::Vector2d c2D = m_R0.block(0, 0, 3, 3).inverse().block(0, 0, 2, 3) * (c - a);
+	SurgSim::Math::Matrix33d R0 = m_R0.block(0, 0, 3, 3);
+	SurgSim::Math::RigidTransform3d inverseTransform = SurgSim::Math::makeRigidTransform(R0, a).inverse();
+	SurgSim::Math::Vector2d a2D = (inverseTransform * a).segment(0, 2);
+	SurgSim::Math::Vector2d b2D = (inverseTransform * b).segment(0, 2);
+	SurgSim::Math::Vector2d c2D = (inverseTransform * c).segment(0, 2);
 
 	// To avoid confusion, we base all our notation on a 0-based indexing
 	// Note that Batoz paper has a 0-based indexing as well, but Przemieniecki has a 1-base indexing
