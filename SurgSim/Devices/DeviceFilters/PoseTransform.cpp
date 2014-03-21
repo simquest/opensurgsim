@@ -75,8 +75,7 @@ void PoseTransform::inputFilter(const DataGroup& dataToFilter, DataGroup* result
 {
 	*result = dataToFilter;  // Pass on all the data entries.
 
-	// If there is a pose, offset and scale it.
-	RigidTransform3d pose;
+	RigidTransform3d pose; // If there is a pose, scale the translation, then transform the result.
 	if (dataToFilter.poses().get("pose", &pose))
 	{
 		pose.translation() *= m_translationScale;
@@ -84,12 +83,19 @@ void PoseTransform::inputFilter(const DataGroup& dataToFilter, DataGroup* result
 		result->poses().set("pose", pose);
 	}
 
-	// If there is a linear velocity, scale it to match the scaled translation.
-	Vector3d linearVelocity;
+	Vector3d linearVelocity; // If there is a linear velocity, scale then rotate it.
 	if (dataToFilter.vectors().get("linearVelocity", &linearVelocity))
 	{
 		linearVelocity *= m_translationScale;
+		linearVelocity = m_transform.linear() * linearVelocity;
 		result->vectors().set("linearVelocity", linearVelocity);
+	}
+
+	Vector3d angularVelocity; // If there is an angular velocity, rotate it.
+	if (dataToFilter.vectors().get("angularVelocity", &angularVelocity))
+	{
+		angularVelocity = m_transform.linear() * angularVelocity;
+		result->vectors().set("angularVelocity", angularVelocity);
 	}
 }
 
@@ -98,8 +104,8 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 	*result = dataToFilter;  // Pass on all the data entries.
 
 	// Since the haptic devices will compare the data in the output DataGroup to a raw input pose, the filter must
-	// reverse any transformation it did to any data the haptic devices use.
-	SurgSim::Math::RigidTransform3d inputPose;
+	// perform the reverse transform and scaling to data used by the haptic devices.
+	RigidTransform3d inputPose;
 	if (dataToFilter.poses().get("inputPose", &inputPose))
 	{
 		inputPose = m_transformInverse * inputPose;
@@ -110,9 +116,57 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 	Vector3d inputLinearVelocity;
 	if (dataToFilter.vectors().get("inputLinearVelocity", &inputLinearVelocity))
 	{
+		inputLinearVelocity = m_transformInverse.linear() * inputLinearVelocity;
 		inputLinearVelocity /= m_translationScale;
 		result->vectors().set("linearVelocity", inputLinearVelocity);
 	}
+
+	// The force and torque must be similarly transformed into device space.  In order to reliably display the desired
+	// forces as calculated by the simulation, the nominal forces and torques are not scaled by the translation scaling.
+	// The benefit is that increasing the translation scaling does not result in larger penetrations for the
+	// same force, but the downside is that as the translation scaling increases it becomes more likely that the haptic
+	// feedback loop at a surface will become "active" (smaller motions penetrating another object are sufficient to
+	// create forces ejecting the device's collision representation).  Therefore, a device that is having its
+	// translation scaled may required a force scaling filter to reduce the forces.
+	Vector3d force;
+	if (dataToFilter.vectors().get("force", &force))
+	{
+		force = m_transformInverse.linear() * force;
+		result->vectors().set("force", force);
+	}
+
+	Vector3d torque;
+	if (dataToFilter.vectors().get("torque", &torque))
+	{
+		torque = m_transformInverse.linear() * torque;
+		result->vectors().set("torque", torque);
+	}
+
+	// The Jacobians must be transformed into device space.  The Jacobians are scaled based on the translation scaling,
+	// so that the forces displayed by the device will be correct for the scene-space motions, not for the device-space
+	// motions.
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
+	if (dataToFilter.matrices().get("springJacobian", &springJacobian))
+	{
+		springJacobian.block<3,3>(0, 0).applyOnTheLeft(m_transformInverse.linear());
+		springJacobian.block<3,3>(3, 0).applyOnTheLeft(m_transformInverse.linear());
+		springJacobian.block<3,3>(0, 3).applyOnTheLeft(m_transformInverse.linear());
+		springJacobian.block<3,3>(3, 3).applyOnTheLeft(m_transformInverse.linear());
+		springJacobian.block<6,3>(0, 0) *= m_translationScale;
+		result->matrices().set("springJacobian", springJacobian);
+	}
+
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
+	if (dataToFilter.matrices().get("damperJacobian", &damperJacobian))
+	{
+		damperJacobian.block<3,3>(0, 0).applyOnTheLeft(m_transformInverse.linear());
+		damperJacobian.block<3,3>(3, 0).applyOnTheLeft(m_transformInverse.linear());
+		damperJacobian.block<3,3>(0, 3).applyOnTheLeft(m_transformInverse.linear());
+		damperJacobian.block<3,3>(3, 3).applyOnTheLeft(m_transformInverse.linear());
+		damperJacobian.block<6,3>(0, 0) *= m_translationScale;
+		result->matrices().set("damperJacobian", damperJacobian);
+	}
+
 }
 
 void PoseTransform::setTranslationScale(double translationScale)

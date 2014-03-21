@@ -37,6 +37,15 @@ namespace Device
 /// device, the filter can just be added as an input consumer.  If it is used for both input and output, the input data
 /// is filtered using the offset(s) and scaling, and the output data is un-filtered so the device does not need to know
 /// about the filtering.
+/// For haptic devices, so that changing the translation scaling does not alter the relationship between displayed
+/// forces and collision penetrations, the output filter does not scale the nominal forces and torques, and it does
+/// scale the Jacobians.  Thereby the displayed forces and torques are appropriate for the scene (not the device-space
+/// motions).  In other words, a 1 m motion by the device's scene representation generates forces according to that 1 m
+/// motion, instead of the original device motion before scaling.  This means the device displays forces and torques
+/// that are "true" to the scene, with the consequence that increasing the translation scaling can negatively impact the
+/// haptic stability.  As the scaling increases, the same motion would cause larger forces, until at great enough
+/// scaling the system becomes unstable (either when colliding with another scene element, or just due to over-damping).
+/// Consider chaining this device filter with a force scaling device filter to improve system stability.
 /// \sa	SurgSim::Input::CommonDevice
 /// \sa	SurgSim::Input::InputConsumerInterface
 /// \sa	SurgSim::Input::OutputProducerInterface
