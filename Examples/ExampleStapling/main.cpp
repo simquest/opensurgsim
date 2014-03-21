@@ -225,17 +225,17 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
-    std::shared_ptr<OsgMeshRepresentation> osgMeshRepresentation =
-        std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
-    *osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
-    osgMeshRepresentation->setInitialPose(pose);
-    osgMeshRepresentation->setDrawAsWireFrame(true);
+	std::shared_ptr<OsgMeshRepresentation> osgMeshRepresentation =
+		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
+	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
+	osgMeshRepresentation->setInitialPose(pose);
+	osgMeshRepresentation->setDrawAsWireFrame(true);
 
-    // Stapler collision mesh
-    std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
-    RigidRepresentationParameters params;
-    params.setDensity(8050); // Stainless steel (in Kg.m-3)
-    params.setShapeUsedForMassInertia(meshShape);
+	// Stapler collision mesh
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
+	RigidRepresentationParameters params;
+	params.setDensity(8050); // Stainless steel (in Kg.m-3)
+	params.setShapeUsedForMassInertia(meshShape);
 
 	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
@@ -272,10 +272,10 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(staplerBehavior);
 
 	std::shared_ptr<TransferPoseBehavior> physicsPoseToGraphics =
-        std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
-    physicsPoseToGraphics->setPoseSender(physicsRepresentation);
-    physicsPoseToGraphics->setPoseReceiver(osgMeshRepresentation);
-    sceneElement->addComponent(physicsPoseToGraphics);
+		std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
+	physicsPoseToGraphics->setPoseSender(physicsRepresentation);
+	physicsPoseToGraphics->setPoseReceiver(osgMeshRepresentation);
+	sceneElement->addComponent(physicsPoseToGraphics);
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
 	sceneryRepresentations.push_back(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
@@ -307,12 +307,12 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	PlyReader reader(data.findFile("arm_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
-	
+
 	std::shared_ptr<OsgMeshRepresentation> osgMeshRepresentation =
-        std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
-    *osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
-    osgMeshRepresentation->setInitialPose(pose);
-    osgMeshRepresentation->setDrawAsWireFrame(true);
+		std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
+	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
+	osgMeshRepresentation->setInitialPose(pose);
+	osgMeshRepresentation->setDrawAsWireFrame(true);
 
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
@@ -382,15 +382,15 @@ int main(int argc, char* argv[])
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
-	//scene->addSceneElement(
-	//	createFemSceneElement("wound",
-	//						  woundFilename,
-	//						  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
-	//						  1000.0,										   // Mass Density
-	//						  0.45,											   // Poisson Ratio
-	//						  75e3,											   // Young Modulus
-	//						  true,											   // Display point cloud
-	//						  armPose));									   // Pose of wound on arm
+	scene->addSceneElement(
+		createFemSceneElement("wound",
+							  woundFilename,
+							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
+							  1000.0,										   // Mass Density
+							  0.45,											   // Poisson Ratio
+							  75e3,											   // Young Modulus
+							  true,											   // Display point cloud
+							  armPose));									   // Pose of wound on arm
 	runtime->execute();
 
 	return 0;
