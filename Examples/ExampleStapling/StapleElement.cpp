@@ -20,7 +20,7 @@
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
-#include "Surgsim/Physics/RigidCollisionRepresentation.h"
+#include "SurgSim/Physics/RigidCollisionRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentation.h"
 #include "SurgSim/Physics/RigidRepresentationParameters.h"
 
