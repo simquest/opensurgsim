@@ -18,6 +18,7 @@
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/DataStructures/PlyReader.h"
 #include "SurgSim/DataStructures/TriangleMeshPlyReaderDelegate.h"
+#include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Graphics/OsgSceneryRepresentation.h"
 #include "SurgSim/Math/MeshShape.h"
 #include "SurgSim/Physics/RigidCollisionRepresentation.h"
@@ -27,6 +28,7 @@
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
+using SurgSim::Framework::ApplicationData;
 using SurgSim::Graphics::SceneryRepresentation;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Math::MeshShape;
@@ -35,7 +37,7 @@ using SurgSim::Physics::RigidCollisionRepresentation;
 using SurgSim::Physics::RigidRepresentation;
 using SurgSim::Physics::RigidRepresentationParameters;
 
-StapleElement::StapleElement(const std::string& name):
+StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name),
 	m_name(name)
 {
@@ -52,8 +54,12 @@ void StapleElement::setPose(const RigidTransform3d& pose)
 
 bool StapleElement::doInitialize()
 {
+	std::vector<std::string> paths;
+	paths.push_back("Data/Geometry");
+	ApplicationData data(paths);
+
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader("Data/Geometry/staple_collision.ply");
+	PlyReader reader(data.findFile("staple_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
@@ -63,17 +69,16 @@ bool StapleElement::doInitialize()
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(m_name + " Physics");
+	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(m_name + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
-		std::make_shared<OsgSceneryRepresentation>(m_name + "Graphics");
+		std::make_shared<OsgSceneryRepresentation>("Graphics");
 	graphicsRepresentation->setFileName("Geometry/staple.obj");
 	graphicsRepresentation->setInitialPose(m_pose);
 
