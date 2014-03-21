@@ -58,6 +58,7 @@ using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
 using SurgSim::DataStructures::TriangleMeshPlyReaderDelegate;
 using SurgSim::Device::MultiAxisDevice;
+using SurgSim::Framework::ApplicationData;
 using SurgSim::Framework::BasicSceneElement;
 using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
@@ -138,7 +139,8 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	double massDensity,
 	double poissonRatio,
 	double youngModulus,
-	bool displayPointCloud)
+	bool displayPointCloud,
+	const SurgSim::Math::RigidTransform3d& pose)
 {
 	// Create a SceneElement that bundles the pieces associated with the finite element model
 	std::shared_ptr<SurgSim::Framework::SceneElement> sceneElement
@@ -147,12 +149,14 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	// Load the tetrahedral mesh and initialize the finite element model
 	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> physicsRepresentation
 		= loadFem(filename, integrationScheme, massDensity, poissonRatio, youngModulus);
+	physicsRepresentation->setInitialPose(pose);
 	sceneElement->addComponent(physicsRepresentation);
 
 	// Create a triangle mesh for visualizing the surface of the finite element model
 	std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation> graphicsTriangleMeshRepresentation
 		= std::make_shared<SurgSim::Graphics::OsgMeshRepresentation>(name + " triangle mesh");
 	*graphicsTriangleMeshRepresentation->getMesh() = *loadMesh(filename);
+	graphicsTriangleMeshRepresentation->setInitialPose(pose);
 	sceneElement->addComponent(graphicsTriangleMeshRepresentation);
 
 	// Create a behavior which transfers the position of the vertices in the FEM to locations in the triangle mesh
@@ -171,6 +175,7 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 		graphicsPointCloudRepresentation->setColor(SurgSim::Math::Vector4d(1.0, 1.0, 1.0, 1.0));
 		graphicsPointCloudRepresentation->setPointSize(3.0f);
 		graphicsPointCloudRepresentation->setVisible(true);
+		graphicsPointCloudRepresentation->setInitialPose(pose);
 		sceneElement->addComponent(graphicsPointCloudRepresentation);
 
 		// Create a behavior which transfers the position of the vertices in the FEM to locations in the point cloud
@@ -207,27 +212,30 @@ std::shared_ptr<ViewElement> createView()
 
 std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& staplerName,
 														const std::string& deviceName,
-														SurgSim::Math::RigidTransform3d pose)
+														const SurgSim::Math::RigidTransform3d& pose)
 {
+	std::vector<std::string> paths;
+	paths.push_back("Data/Geometry");
+	ApplicationData data(paths);
+
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader("Data/Geometry/stapler_collision.ply");
+	PlyReader reader(data.findFile("stapler_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
 	// Stapler collision mesh
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	std::shared_ptr<RigidRepresentation> physicsRepresentation =
-		std::make_shared<RigidRepresentation>(staplerName + "Physics");
+	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setIsGravityEnabled(false);
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(staplerName + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
 	std::shared_ptr<InputComponent> inputComponent = std::make_shared<InputComponent>("InputComponent");
@@ -243,7 +251,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.
-	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>(staplerName + "Behavior");
+	std::shared_ptr<StaplerBehavior> staplerBehavior = std::make_shared<StaplerBehavior>("Behavior");
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
 
@@ -256,53 +264,60 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
-	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Handle",    "Geometry/stapler_handle.obj"));
-	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Indicator", "Geometry/stapler_indicator.obj"));
-	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Markings",  "Geometry/stapler_markings.obj"));
-	sceneryRepresentations.push_back(createSceneryObject(staplerName + "Trigger",   "Geometry/stapler_trigger.obj"));
+	sceneryRepresentations.push_back(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
+	sceneryRepresentations.push_back(createSceneryObject("Indicator", "Geometry/stapler_indicator.obj"));
+	sceneryRepresentations.push_back(createSceneryObject("Markings",  "Geometry/stapler_markings.obj"));
+	sceneryRepresentations.push_back(createSceneryObject("Trigger",   "Geometry/stapler_trigger.obj"));
 	for (auto it = std::begin(sceneryRepresentations); it != std::end(sceneryRepresentations); ++it)
 	{
-		std::shared_ptr<TransferPoseBehavior> transferPhysicsPoseToGraphics =
+		std::shared_ptr<TransferPoseBehavior> transferPose =
 			std::make_shared<TransferPoseBehavior>("Physics to Graphics" + (*it)->getName());
-		transferPhysicsPoseToGraphics->setPoseSender(physicsRepresentation);
-		transferPhysicsPoseToGraphics->setPoseReceiver(*it);
+		transferPose->setPoseSender(physicsRepresentation);
+		transferPose->setPoseReceiver(*it);
 
 		(*it)->setInitialPose(pose);
 		sceneElement->addComponent(*it);
-		sceneElement->addComponent(transferPhysicsPoseToGraphics);
+		sceneElement->addComponent(transferPose);
 	}
 
 	return sceneElement;
 }
 std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, const RigidTransform3d& pose)
 {
+	std::vector<std::string> paths;
+	paths.push_back("Data/Geometry");
+	ApplicationData data(paths);
+
+	// File "arm_collision.ply" contains collision mesh for upper arm and forearm.
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
-	PlyReader reader("Data/Geometry/arm_collision.ply");
+	PlyReader reader(data.findFile("arm_collision.ply"));
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
-	// Load graphic representation for armSceneElement
-	std::shared_ptr<SceneryRepresentation> sceneryRepresentation =
-		createSceneryObject(armName, "Geometry/forearm.osgb");
-	sceneryRepresentation->setInitialPose(pose);
+	// Graphic representation for arm
+	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
+		createSceneryObject("forearm", "Geometry/forearm.osgb");
+	forearmSceneryRepresentation->setInitialPose(pose);
+	std::shared_ptr<SceneryRepresentation> upperarmSceneryRepresentation =
+		createSceneryObject("upperarm", "Geometry/upperarm.osgb");
+	upperarmSceneryRepresentation->setInitialPose(pose);
 
 	// MeshShape collision representation of the arm.
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
-	params.setDensity(1062); // Average human body density  (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	std::shared_ptr<FixedRepresentation> physicsRepresentation =
-		std::make_shared<FixedRepresentation>(armName + "Physics");
+	std::shared_ptr<FixedRepresentation> physicsRepresentation = std::make_shared<FixedRepresentation>("Physics");
 	physicsRepresentation->setInitialParameters(params);
 	physicsRepresentation->setInitialPose(pose);
 
 	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>(armName + "Collision");
+		std::make_shared<RigidCollisionRepresentation>("Collision");
 	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
 
-	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>("ArmSceneElement");
-	armSceneElement->addComponent(sceneryRepresentation);
+	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName + "SceneElement");
+	armSceneElement->addComponent(forearmSceneryRepresentation);
+	armSceneElement->addComponent(upperarmSceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
 
@@ -336,11 +351,11 @@ int main(int argc, char* argv[])
 	inputManager->addDevice(device);
 
 	std::shared_ptr<Scene> scene = runtime->getScene();
+	RigidTransform3d armPose = makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, -0.2, 0.0));
 	scene->addSceneElement(createView());
-	scene->addSceneElement(
-		createArmSceneElement("arm", makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero())));
+	scene->addSceneElement(createArmSceneElement("arm", armPose));
 	scene->addSceneElement(createStaplerSceneElement(
-		"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d(0.0, 0.2, 0.0))));
+		"stapler", deviceName, makeRigidTransform(Quaterniond::Identity(), Vector3d::Zero())));
 
 	// Load the FEM
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
@@ -353,8 +368,8 @@ int main(int argc, char* argv[])
 							  1000.0,										   // Mass Density
 							  0.45,											   // Poisson Ratio
 							  75e3,											   // Young Modulus
-							  true));										   // Display point cloud
-
+							  true,											   // Display point cloud
+							  armPose));									   // Pose of wound on arm
 	runtime->execute();
 
 	return 0;
