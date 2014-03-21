@@ -495,6 +495,49 @@ TEST_F(FemElement1DBeamTests, InitialRotationTest)
 	EXPECT_TRUE(i_3.isApprox(expected_i));
 }
 
+TEST_F(FemElement1DBeamTests, CoordinateTests)
+{
+	FemElement1DBeam element(m_nodeIds);
+
+	Vector validNaturalCoordinate(2);
+	Vector invalidNaturalCoordinateSumNot1(2);
+	Vector invalidNaturalCoordinateNegativeValue(2);
+	Vector invalidNaturalCoordinateSize1(1), invalidNaturalCoordinateSize3(3);
+	Vector3d expectedA(0.1, 1.2, 2.3);
+	Vector3d expectedB = expectedA + m_orientation._transformVector(Vector3d(m_L, 0.0, 0.0));
+
+	validNaturalCoordinate << 0.4, 0.6;
+	invalidNaturalCoordinateSumNot1 << 0.5, 0.6;
+	invalidNaturalCoordinateNegativeValue << 1.4, -0.4;
+	invalidNaturalCoordinateSize1 << 1.0;
+	invalidNaturalCoordinateSize3 << 0.2, 0.2, 0.6;
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize1));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize3));
+
+	Vector naturalCoordinateA(2), naturalCoordinateB(2), naturalCoordinateMiddle(2);
+	Vector ptA, ptB, ptMiddle;
+	naturalCoordinateA << 1.0, 0.0;
+	naturalCoordinateB << 0.0, 1.0;
+	naturalCoordinateMiddle << 1.0 / 2.0, 1.0 / 2.0;
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateNegativeValue), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize1), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize3), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSumNot1), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(ptA = element.computeCartesianCoordinate(m_restState, naturalCoordinateA));
+	EXPECT_NO_THROW(ptB = element.computeCartesianCoordinate(m_restState, naturalCoordinateB));
+	EXPECT_NO_THROW(ptMiddle = element.computeCartesianCoordinate(m_restState, naturalCoordinateMiddle));
+	EXPECT_TRUE(ptA.isApprox(expectedA));
+	EXPECT_TRUE(ptB.isApprox(expectedB));
+	EXPECT_TRUE(ptMiddle.isApprox((expectedA + expectedB) * 0.5));
+}
+
 TEST_F(FemElement1DBeamTests, ForceAndMatricesTest)
 {
 	using SurgSim::Math::Matrix;
