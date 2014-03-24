@@ -20,6 +20,7 @@ include_directories(
 set(UNIT_TEST_SOURCES
 	BuildMlcpTests.cpp
 	ComputationTests.cpp
+	ConstraintComponentTests.cpp
 	ConstraintTests.cpp
 	ContactConstraintDataTests.cpp
 	ContactConstraintGenerationTests.cpp
