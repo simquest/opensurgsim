@@ -34,14 +34,15 @@ PoseTransform::PoseTransform(const std::string& name) :
 	m_transformInverse(RigidTransform3d::Identity()),
 	m_translationScale(1.0),
 	m_poseIndex(-1),
-	m_inputPoseIndex(-1),
 	m_linearVelocityIndex(-1),
 	m_angularVelocityIndex(-1),
-	m_inputLinearVelocityIndex(-1),
 	m_forceIndex(-1),
 	m_torqueIndex(-1),
 	m_springJacobianIndex(-1),
+	m_inputPoseIndex(-1),
 	m_damperJacobianIndex(-1),
+	m_inputLinearVelocityIndex(-1),
+	m_inputAngularVelocityIndex(-1),
 	m_cachedOutputIndices(false)
 {
 }
