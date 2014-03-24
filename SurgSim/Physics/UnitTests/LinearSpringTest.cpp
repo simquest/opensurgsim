@@ -32,7 +32,7 @@ using SurgSim::Math::Matrix33d;
 namespace
 {
 const double epsilon = 1e-10;
-const double epsilonNumericalEvaluation = 1e-10;
+const double epsilonNumericalEvaluation = 1e-8;
 
 Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KFormal(const Vector3d p0, const Vector3d p1,
 			   const Vector3d v0, const Vector3d v1,
@@ -103,7 +103,6 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KNumerical(const Vector3d p0, cons
 			   double l0, double stiffness, double damping)
 {
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> dfdx;
-	double epsilon = 1e-8;
 
 	for (size_t row = 0; row < 6; row++)
 	{
@@ -133,7 +132,6 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> DNumerical(const Vector3d p0, cons
 			   double l0, double stiffness, double damping)
 {
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> dfdv;
-	double epsilon = 1e-8;
 
 	for (size_t row = 0; row < 6; row++)
 	{
@@ -304,13 +302,23 @@ TEST(LinearSpringTests, computeMethods)
 	ls.addMatVec(state, 1.0, 0.0, ones, &f);
 	{
 		SCOPED_TRACE("addMatVec(..., dampingFactor=1, stiffnessFactor=0, (1 1 1 1 1 1),...)");
-		EXPECT_TRUE(f.isZero()) << "f = " << f.transpose();
+		for (size_t row = 0; row < 6; ++row)
+		{
+			EXPECT_NEAR(expectedD.row(row).sum(), f[row], epsilon) <<
+				"f[" << row << "] = " << f[row] <<
+				" expectedValue = " << expectedD.row(row).sum();
+		}
 	}
 	f.setZero();
 	ls.addMatVec(state, 1.0, 0.0, oneToSix, &f);
 	{
 		SCOPED_TRACE("addMatVec(..., dampingFactor=1, stiffnessFactor=0, (1 2 3 4 5 6),...)");
-		EXPECT_TRUE(f.isZero()) << "f = " << f.transpose();
+		for (size_t row = 0; row < 6; ++row)
+		{
+			EXPECT_NEAR(expectedD.row(row).dot(oneToSix), f[row], epsilon) <<
+				"f[" << row << "] = " << f[row] <<
+				" expectedValue = " << expectedD.row(row).dot(oneToSix);
+		}
 	}
 	f.setZero();
 	ls.addMatVec(state, 0.0, 1.0, ones, &f);
@@ -341,9 +349,9 @@ TEST(LinearSpringTests, computeMethods)
 		SCOPED_TRACE("addMatVec(..., dampingFactor=1.4, stiffnessFactor=4.1, (1 1 1 1 1 1),...)");
 		for (size_t row = 0; row < 6; ++row)
 		{
-			EXPECT_NEAR(4.1 * expectedK.row(row).sum(), f[row], epsilon) <<
+			EXPECT_NEAR(1.4 * expectedD.row(row).sum() + 4.1 * expectedK.row(row).sum(), f[row], epsilon) <<
 				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << 4.1 * expectedK.row(row).sum();
+				" expectedValue = " << 1.4 * expectedD.row(row).sum() + 4.1 * expectedK.row(row).sum();
 		}
 	}
 	f.setZero();
@@ -352,9 +360,10 @@ TEST(LinearSpringTests, computeMethods)
 		SCOPED_TRACE("addMatVec(..., dampingFactor=1.4, stiffnessFactor=4.1, (1 2 3 4 5 6),...)");
 		for (size_t row = 0; row < 6; ++row)
 		{
-			EXPECT_NEAR(4.1 * expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
+			EXPECT_NEAR(\
+				1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix), f[row], epsilon) <<
 				"f[" << row << "] = " << f[row] <<
-				" expectedValue = " << 4.1 * expectedK.row(row).dot(oneToSix);
+				" expectedValue = " << 1.4 * expectedD.row(row).dot(oneToSix) + 4.1 * expectedK.row(row).dot(oneToSix);
 		}
 	}
 }

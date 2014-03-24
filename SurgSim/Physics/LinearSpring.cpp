@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/LinearSpring.h"
 
@@ -22,6 +23,11 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
+
+namespace
+{
+const double epsilonZero = 1e-8;
+};
 
 namespace SurgSim
 {
@@ -76,9 +82,15 @@ void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim:
 	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 
 	Vector3d u = x1 - x0;
-	double m_l = u.norm();
-	u /= m_l;
-	double elongationPosition = m_l - m_restLength;
+	double length = u.norm();
+	if (length < epsilonZero)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+		return;
+	}
+	u /= length;
+	double elongationPosition = length - m_restLength;
 	double elongationVelocity = (v1 - v0).dot(u);
 	Vector3d f = scale * (m_stiffness* elongationPosition + m_damping * elongationVelocity) * u;
 
@@ -91,7 +103,14 @@ void LinearSpring::addDamping(const DeformableRepresentationState& state, SurgSi
 {
 	const Vector& x = state.getPositions();
 	Vector3d u = getSubVector(x, m_nodeIds[1], 3) - getSubVector(x, m_nodeIds[0], 3);
-	u.normalize();
+	double length = u.norm();
+	if (length < epsilonZero)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+		return;
+	}
+	u /= length;
 	Matrix33d D00 = scale * m_damping * (u * u.transpose());
 
 	// Assembly stage in D
@@ -110,14 +129,20 @@ void LinearSpring::addStiffness(const DeformableRepresentationState& state, Surg
 	const Vector& v0 = getSubVector(v, m_nodeIds[0], 3);
 	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
-	double m_l = u.norm();
-	u /= m_l;
-	double lRatio = (m_l - m_restLength) / m_l;
-	double vRatio = (v1 -v0).dot(u) / m_l;
+	double length = u.norm();
+	if (length < epsilonZero)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+		return;
+	}
+	u /= length;
+	double lRatio = (length - m_restLength) / length;
+	double vRatio = (v1 -v0).dot(u) / length;
 
 	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio + m_damping * vRatio);
 	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0) + 2.0 * m_damping * vRatio);
-	K00 += m_damping * (u * (v1 -v0).transpose()) / m_l;
+	K00 += m_damping * (u * (v1 -v0).transpose()) / length;
 	K00 *= scale;
 
 	// Assembly stage in K
@@ -137,16 +162,22 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 	const Vector& v0 = getSubVector(v, m_nodeIds[0], 3);
 	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
-	double m_l = u.norm();
-	u /= m_l;
-	double elongationPosition = m_l - m_restLength;
+	double length = u.norm();
+	if (length < epsilonZero)
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+		return;
+	}
+	u /= length;
+	double elongationPosition = length - m_restLength;
 	double elongationVelocity = (v1 - v0).dot(u);
-	double lRatio = elongationPosition / m_l;
-	double vRatio = (v1 -v0).dot(u) / m_l;
+	double lRatio = elongationPosition / length;
+	double vRatio = (v1 -v0).dot(u) / length;
 
 	Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio + m_damping * vRatio);
 	K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0) + 2.0 * m_damping * vRatio);
-	K00 += m_damping * (u * (v1 -v0).transpose()) / m_l;
+	K00 += m_damping * (u * (v1 -v0).transpose()) / length;
 	addSubMatrix( K00, m_nodeIds[0], m_nodeIds[0], 3, 3, K);
 	addSubMatrix(-K00, m_nodeIds[0], m_nodeIds[1], 3, 3, K);
 	addSubMatrix(-K00, m_nodeIds[1], m_nodeIds[0], 3, 3, K);
@@ -166,26 +197,53 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 void LinearSpring::addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
 							 const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F)
 {
-	// Considering that we do not have damping yet, only the stiffness part will contribute
-	if (alphaK == 0.0)
+	// Premature return if both factors are zero
+	if (alphaK == 0.0 && alphaD == 0.0)
 	{
 		return;
 	}
-	else
+
+	// Shared data: the 6D vector to multiply the 6x6 matrix with
+	Eigen::Matrix<double, 6, 1, Eigen::DontAlign> vector6D;
+	getSubVector(vector, m_nodeIds, 3, &vector6D);
+
+	// Shared data: spring direction and length
+	const Vector& xState = state.getPositions();
+	const Vector& x0 = getSubVector(xState, m_nodeIds[0], 3);
+	const Vector& x1 = getSubVector(xState, m_nodeIds[1], 3);
+	Vector3d u = x1 - x0;
+	double length = u.norm();
+	if (length < epsilonZero)
 	{
-		Eigen::Matrix<double, 6, 1, Eigen::DontAlign> vector6D;
-		getSubVector(vector, m_nodeIds, 3, &vector6D);
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
+		return;
+	}
+	u /= length;
 
-		const Vector& xState = state.getPositions();
-		const Vector& x0 = getSubVector(xState, m_nodeIds[0], 3);
-		const Vector& x1 = getSubVector(xState, m_nodeIds[1], 3);
-		Vector3d u = x1 - x0;
-		double m_l = u.norm();
-		double lRatio = (m_l - m_restLength) / m_l;
-		u /= m_l;
+	if (alphaD != 0.0)
+	{
+		Matrix33d D00 = m_damping * (u * u.transpose());
 
-		Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
-		K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
+		Vector3d force = alphaD * (D00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
+		addSubVector( force, m_nodeIds[0], 3, F);
+		addSubVector(-force, m_nodeIds[1], 3, F);
+	}
+
+	if (alphaK != 0.0)
+	{
+		const Vector& v = state.getVelocities();
+		const Vector& v0 = getSubVector(v, m_nodeIds[0], 3);
+		const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
+
+		double elongationPosition = length - m_restLength;
+		double elongationVelocity = (v1 - v0).dot(u);
+		double lRatio = elongationPosition / length;
+		double vRatio = elongationVelocity / length;
+
+		Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio + m_damping * vRatio);
+		K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0) + 2.0 * m_damping * vRatio);
+		K00 += m_damping * (u * (v1 - v0).transpose()) / length;
 
 		Vector3d force = alphaK * (K00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
 		addSubVector( force, m_nodeIds[0], 3, F);
