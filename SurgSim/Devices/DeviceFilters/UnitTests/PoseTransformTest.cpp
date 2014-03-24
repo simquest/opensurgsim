@@ -41,7 +41,7 @@ using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-const double errorEpsilon = 1e-7;
+const double ERROR_EPSILON = 1e-7;
 
 /// Exposes protected members of CommonDevice.
 class MockPoseTransform : public PoseTransform
@@ -94,21 +94,21 @@ void TestInputDataGroup(const DataGroup& actualData, const DataGroup& expectedDa
 	ASSERT_TRUE(actualData.poses().get(SurgSim::DataStructures::Names::POSE, &actualPose));
 	RigidTransform3d expectedPose;
 	ASSERT_TRUE(expectedData.poses().get(SurgSim::DataStructures::Names::POSE, &expectedPose));
-	EXPECT_TRUE(actualPose.isApprox(expectedPose, errorEpsilon));
+	EXPECT_TRUE(actualPose.isApprox(expectedPose, ERROR_EPSILON));
 
 	Vector3d actualLinearVelocity;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &actualLinearVelocity));
 	Vector3d expectedLinearVelocity;
 	ASSERT_TRUE(expectedData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY,
 		&expectedLinearVelocity));
-	EXPECT_TRUE(actualLinearVelocity.isApprox(expectedLinearVelocity, errorEpsilon));
+	EXPECT_TRUE(actualLinearVelocity.isApprox(expectedLinearVelocity, ERROR_EPSILON));
 
 	Vector3d actualAngularVelocity;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &actualAngularVelocity));
 	Vector3d expectedAngularVelocity;
 	ASSERT_TRUE(expectedData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY,
 		&expectedAngularVelocity));
-	EXPECT_TRUE(actualAngularVelocity.isApprox(expectedAngularVelocity, errorEpsilon));
+	EXPECT_TRUE(actualAngularVelocity.isApprox(expectedAngularVelocity, ERROR_EPSILON));
 
 	bool actualBoolean;
 	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
@@ -269,13 +269,13 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 	Vector3d actualForce;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::FORCE, &actualForce));
 	Vector3d expectedForce(10.0, 8.0, -6.0);
-	EXPECT_TRUE(actualForce.isApprox(expectedForce, errorEpsilon));
+	EXPECT_TRUE(actualForce.isApprox(expectedForce, ERROR_EPSILON));
 
 	// The torque should be anti-rotated.
 	Vector3d actualtorque;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &actualtorque));
 	Vector3d expectedtorque(-2.0, -4.0, 8.0);
-	EXPECT_TRUE(actualtorque.isApprox(expectedtorque, errorEpsilon));
+	EXPECT_TRUE(actualtorque.isApprox(expectedtorque, ERROR_EPSILON));
 
 	// The springJacobian should have each 3x3 block anti-rotated, and the first three columns un-scaled.
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualSpringJacobian;
@@ -287,7 +287,7 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 		52.0, 56.0, 60.0, 32.0, 34.0, 36.0,
 		-28.0, -32.0, -36.0, -20.0, -22.0, -24.0,
 		-4.0, -8.0, -12.0, -8.0, -10.0, -12.0;
-	EXPECT_TRUE(actualSpringJacobian.isApprox(expectedSpringJacobian, errorEpsilon));
+	EXPECT_TRUE(actualSpringJacobian.isApprox(expectedSpringJacobian, ERROR_EPSILON));
 
 	// The inputPose should be anti-transformed, and have its translation un-scaled.
 	RigidTransform3d actualInputPose;
@@ -295,7 +295,7 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 	RigidTransform3d expectedInputPose = makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d::UnitY().eval()) *
 		makeRotationQuaternion(M_PI_2, Vector3d::UnitX().eval()),
 		Vector3d(3.0, -3.5, -4.0));
-	EXPECT_TRUE(actualInputPose.isApprox(expectedInputPose, errorEpsilon));
+	EXPECT_TRUE(actualInputPose.isApprox(expectedInputPose, ERROR_EPSILON));
 
 	// The damperJacobian should have each 3x3 block anti-rotated, and the first three columns un-scaled.
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualDamperJacobian;
@@ -307,21 +307,21 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 		108.0, 116.0, 124.0, 66.0, 70.0, 74.0,
 		-60.0, -68.0, -76.0, -42.0, -46.0, -50.0,
 		-12.0, -20.0, -28.0, -18.0, -22.0, -26.0;
-	EXPECT_TRUE(actualDamperJacobian.isApprox(expectedDamperJacobian, errorEpsilon));
+	EXPECT_TRUE(actualDamperJacobian.isApprox(expectedDamperJacobian, ERROR_EPSILON));
 
 	// The inputLinearVelocity should be anti-rotated and un-scaled.
 	Vector3d actualInputLinearVelocity;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY,
 		&actualInputLinearVelocity));
 	Vector3d expectedInputLinearVelocity(-7.0, 3.0, 5.0);
-	EXPECT_TRUE(actualInputLinearVelocity.isApprox(expectedInputLinearVelocity, errorEpsilon));
+	EXPECT_TRUE(actualInputLinearVelocity.isApprox(expectedInputLinearVelocity, ERROR_EPSILON));
 
 	// The inputAngularVelocity should be anti-rotated.
 	Vector3d actualInputAngularVelocity;
 	ASSERT_TRUE(actualData.vectors().get(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY,
 		&actualInputAngularVelocity));
 	Vector3d expectedInputAngularVelocity(-10.0, 9.0, 8.0);
-	EXPECT_TRUE(actualInputAngularVelocity.isApprox(expectedInputAngularVelocity, errorEpsilon));
+	EXPECT_TRUE(actualInputAngularVelocity.isApprox(expectedInputAngularVelocity, ERROR_EPSILON));
 
 	// Other data should pass through unchanged.
 	bool actualBoolean;
