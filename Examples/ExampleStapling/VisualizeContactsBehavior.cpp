@@ -37,6 +37,10 @@ VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 	SurgSim::Framework::Behavior(name),
 	m_vectorFiled(std::make_shared<OsgVectorFieldRepresentation>("VisualizeContacts"))
 {
+	// Note: Since usually the penetration depth of a collision is so small (at the magnitude of mm),
+	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
+	// Thus, we manually enlarge the vector field by 200 times.
+	m_vectorFiled->setScale(200);
 }
 
 void VisualizeContactsBehavior::setCollisionRepresentation(
@@ -75,12 +79,8 @@ void VisualizeContactsBehavior::update(double dt)
 			{
 				VectorFieldData vectorData1;
 				VectorFieldData vectorData2;
-				// Note: Since usually the 'depth' of penetration is so small (at the magnitude of mm),
-				// the length of vector will be too small to be seen on the screen.
-				// We multiply the length of vector by 200 to make it 'visible'.
-				// The number '200' serves as a magic number here.
-				vectorData1.direction = -(*iter)->normal * (*iter)->depth * 200;
-				vectorData2.direction =  (*iter)->normal * (*iter)->depth * 200;
+				vectorData1.direction = -(*iter)->normal * (*iter)->depth;
+				vectorData2.direction =  (*iter)->normal * (*iter)->depth;
 
 				Vertex<VectorFieldData> vertex1 =
 					Vertex<VectorFieldData>((*iter)->penetrationPoints.first.globalPosition.getValue(), vectorData1);
