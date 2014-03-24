@@ -21,6 +21,14 @@
 #include "SurgSim/Framework/SceneElement.h"
 #include "SurgSim/Math/RigidTransform.h"
 
+namespace SurgSim
+{
+namespace Physics
+{
+class RigidRepresentation;
+}
+}
+
 class StapleElement : public SurgSim::Framework::SceneElement
 {
 public:
@@ -31,6 +39,14 @@ public:
 	/// Set initial pose of the staple
 	/// \param pose	The initial pose to set.
 	void setPose(const SurgSim::Math::RigidTransform3d& pose);
+
+	/// Return the staple physics representation.
+	/// \return The shared poiter to the physics representation.
+	const std::shared_ptr<SurgSim::Physics::RigidRepresentation> getPhysicsRepresentation();
+
+	/// Specify if the collision representation should be created or not.
+	/// \param flag Flag to specify if the collision representation should be created or not.
+	void setHasCollisionRepresentation(bool flag);
 
 	/// Destructor
 	~StapleElement();
@@ -46,6 +62,12 @@ private:
 
 	/// The pose of this scene element
 	SurgSim::Math::RigidTransform3d m_pose;
+
+	/// The shared pointer to the physics representation.
+	std::shared_ptr<SurgSim::Physics::RigidRepresentation> m_physicsRepresentation;
+
+	/// Flag to specify if the stapleElement needs to be created with a collision representation.
+	bool m_hasCollisionRepresentation;
 };
 
 #endif //EXAMPLES_EXAMPLESTAPLING_STAPLEELEMENT_H

@@ -39,7 +39,9 @@ using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name),
-	m_name(name)
+	m_name(name),
+	m_physicsRepresentation(nullptr),
+	m_hasCollisionRepresentation(true)
 {
 }
 
@@ -50,6 +52,16 @@ StapleElement::~StapleElement()
 void StapleElement::setPose(const RigidTransform3d& pose)
 {
 	m_pose = pose;
+}
+
+const std::shared_ptr<SurgSim::Physics::RigidRepresentation> StapleElement::getPhysicsRepresentation()
+{
+	return m_physicsRepresentation;
+}
+
+void StapleElement::setHasCollisionRepresentation(bool flag)
+{
+	m_hasCollisionRepresentation = flag;
 }
 
 bool StapleElement::doInitialize()
@@ -69,13 +81,9 @@ bool StapleElement::doInitialize()
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
 
-	std::shared_ptr<RigidRepresentation> physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
-	physicsRepresentation->setInitialParameters(params);
-	physicsRepresentation->setInitialPose(m_pose);
-
-	std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
-		std::make_shared<RigidCollisionRepresentation>("Collision");
-	collisionRepresentation->setRigidRepresentation(physicsRepresentation);
+	m_physicsRepresentation = std::make_shared<RigidRepresentation>("Physics");
+	m_physicsRepresentation->setInitialParameters(params);
+	m_physicsRepresentation->setInitialPose(m_pose);
 
 	std::shared_ptr<SceneryRepresentation> graphicsRepresentation =
 		std::make_shared<OsgSceneryRepresentation>("Graphics");
@@ -84,11 +92,18 @@ bool StapleElement::doInitialize()
 
 	std::shared_ptr<TransferPoseBehavior> transferPose =
 		std::make_shared<TransferPoseBehavior>("Physics to Graphics Pose");
-	transferPose->setPoseSender(physicsRepresentation);
+	transferPose->setPoseSender(m_physicsRepresentation);
 	transferPose->setPoseReceiver(graphicsRepresentation);
 
-	addComponent(physicsRepresentation);
-	addComponent(collisionRepresentation);
+	addComponent(m_physicsRepresentation);
+	if (m_hasCollisionRepresentation)
+	{
+		std::shared_ptr<RigidCollisionRepresentation> collisionRepresentation =
+			std::make_shared<RigidCollisionRepresentation>("Collision");
+		collisionRepresentation->setRigidRepresentation(m_physicsRepresentation);
+
+		addComponent(collisionRepresentation);
+	}
 	addComponent(graphicsRepresentation);
 	addComponent(transferPose);
 
