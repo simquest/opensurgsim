@@ -28,7 +28,6 @@ namespace Device
 
 
 MultiAxisDevice::MultiAxisDevice(const std::string& uniqueName) :
-	CommonDevice(uniqueName),
 	m_name(uniqueName),
 	m_rawDevice(new RawMultiAxisDevice(uniqueName + "_RawBase"))
 {
@@ -137,12 +136,12 @@ bool MultiAxisDevice::isUsingAxisDominance() const
 
 double MultiAxisDevice::defaultPositionScale()
 {
-	return 0.00001;
+	return 0.00001; // The default position scale, in meters per tick.
 }
 
 double MultiAxisDevice::defaultOrientationScale()
 {
-	return 0.0001;
+	return 0.0001; // The default rotation scale, in radians per tick.
 }
 
 

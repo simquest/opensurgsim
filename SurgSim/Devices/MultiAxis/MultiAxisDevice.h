@@ -51,8 +51,8 @@ class PoseIntegrator;
 ///   | ----       | ----              | ---                                                                       |
 ///   | bool       | "led1"            | If the device has at least one LED light, controls the first one.         |
 ///
-/// \sa RawMultiAxisDevice
-class MultiAxisDevice : public SurgSim::Input::CommonDevice
+/// \sa RawMultiAxisDevice, SurgSim::Input::DeviceInterface
+class MultiAxisDevice : public SurgSim::Input::DeviceInterface
 {
 public:
 	/// Constructor.
