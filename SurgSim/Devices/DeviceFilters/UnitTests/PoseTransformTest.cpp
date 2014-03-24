@@ -135,8 +135,8 @@ TEST(PoseTransformDeviceFilterTest, InputDataFilter)
 	data.vectors().set(SurgSim::DataStructures::DataNames::linearVelocity, Vector3d(5.0, 6.0, 7.0));
 	data.vectors().set(SurgSim::DataStructures::DataNames::angularVelocity, Vector3d(8.0, 9.0, 10.0));
 	data.booleans().set("extraData", true);
-	
-	// Normally the input device's initial input data would be set by the constructor or scaffold, then 
+
+	// Normally the input device's initial input data would be set by the constructor or scaffold, then
 	// initializeInput would be called in addInputConsumer.
 	poseTransformer->initializeInput("device", data);
 
@@ -164,7 +164,7 @@ TEST(PoseTransformDeviceFilterTest, InputDataFilter)
 
 	// Normally the input device would PushInput, which would call the filter's handleInput.
 	poseTransformer->handleInput("device", data);
-	
+
 	DataGroup expectedData = builder.createData();
 
 	// The "pose" data should have its translation scaled and be pre-transformed.

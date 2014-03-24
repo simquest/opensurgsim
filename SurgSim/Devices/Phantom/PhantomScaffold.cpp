@@ -580,10 +580,14 @@ void PhantomScaffold::setInputData(DeviceData* info)
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
 	inputData.poses().set(SurgSim::DataStructures::DataNames::pose, info->scaledPose);
 	inputData.vectors().set(SurgSim::DataStructures::DataNames::linearVelocity, info->linearVelocity);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button1, (info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button2, (info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button3, (info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button4, (info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::DataNames::button1,
+		(info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::DataNames::button2,
+		(info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::DataNames::button3,
+		(info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::DataNames::button4,
+		(info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
 }
 
 
