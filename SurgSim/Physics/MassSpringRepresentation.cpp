@@ -138,6 +138,11 @@ void MassSpringRepresentation::update(double dt)
 		return;
 	}
 
+	SURGSIM_ASSERT(m_odeSolver != nullptr) <<
+		"Ode solver has not been set yet. Did you call beforeUpdate() ?";
+	SURGSIM_ASSERT(m_initialState != nullptr) <<
+		"Initial state has not been set yet. Did you call setInitialState() ?";
+
 	// Solve the ode
 	m_odeSolver->solve(dt, *m_currentState, m_newState.get());
 
@@ -233,36 +238,36 @@ const Matrix& MassSpringRepresentation::computeD(const DeformableRepresentationS
 	using SurgSim::Math::setSubVector;
 	using SurgSim::Math::addSubMatrix;
 
-	const double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
-	const double& rayMass = m_rayleighDamping.massCoefficient;
+	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
+	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
 
-	// D += rayMass.M
-	if (rayMass != 0.0)
+	// D += rayleighMass.M
+	if (rayleighMass != 0.0)
 	{
 		for (unsigned int massId = 0; massId < getNumMasses(); massId++)
 		{
-			double coef = rayMass * getMass(massId)->getMass();
+			double coef = rayleighMass * getMass(massId)->getMass();
 			Matrix::DiagonalReturnType Ddiagonal = m_D.diagonal();
 			setSubVector(Vector3d::Ones() * coef, massId, 3, &Ddiagonal);
 		}
 	}
 
-	// D += rayStiff.K
-	if (rayStiff != 0.0)
+	// D += rayleighStiffness.K
+	if (rayleighStiffness != 0.0)
 	{
 		for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 		{
-			addSubMatrix(rayStiff * (*spring)->computeStiffness(state), (*spring)->getNodeIds(), 3, &m_D);
+			(*spring)->addStiffness(state, &m_D, rayleighStiffness);
 		}
 	}
 
 	// D += Springs damping matrix
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
-		addSubMatrix((*spring)->computeDamping(state), (*spring)->getNodeIds(), 3, &m_D);
+		(*spring)->addDamping(state, &m_D);
 	}
 
 	// Apply boundary conditions globally
@@ -287,7 +292,7 @@ const Matrix& MassSpringRepresentation::computeK(const DeformableRepresentationS
 
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
-		addSubMatrix((*spring)->computeStiffness(state), (*spring)->getNodeIds(), 3, &m_K);
+		(*spring)->addStiffness(state, &m_K);
 	}
 
 	// Apply boundary conditions globally
@@ -330,14 +335,7 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	// Add the springs force to m_f
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
-		Vector* f;
-		Matrix* D;
-		Matrix* K;
-		(*spring)->computeFDK(state, &f, &D, &K);
-
-		addSubMatrix(*K, (*spring)->getNodeIds(), 3, &m_K);
-		addSubMatrix(*D, (*spring)->getNodeIds(), 3, &m_D);
-		addSubVector(*f, (*spring)->getNodeIds(), 3, &m_f);
+		(*spring)->addFDK(state, &m_f, &m_D, &m_K);
 	}
 
 	// Add the Rayleigh damping matrix
@@ -353,8 +351,8 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 	// Add the gravity to m_f
 	addGravityForce(&m_f, state);
 
-	// Add the Rayleigh damping force to m_f
-	addRayleighDampingForce(&m_f, state, false);
+	// Add the Rayleigh damping force to m_f (using the damping matrix)
+	addRayleighDampingForce(&m_f, state, true);
 
 	// Apply boundary conditions globally
 	for (auto boundaryCondition = std::begin(state.getBoundaryConditions());
@@ -381,59 +379,57 @@ void MassSpringRepresentation::computeFMDK(const DeformableRepresentationState& 
 }
 
 void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const DeformableRepresentationState& state,
-	bool useGlobalStiffnessMatrix, double scale)
+	bool useGlobalDampingMatrix, bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	using SurgSim::Math::getSubVector;
 	using SurgSim::Math::addSubVector;
 	using SurgSim::Math::getSubMatrix;
 
 	// Temporary variables for convenience
-	double& rayMass = m_rayleighDamping.massCoefficient;
-	double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
+	double& rayleighMass = m_rayleighDamping.massCoefficient;
+	double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const Vector& v = state.getVelocities();
 
-	// Rayleigh damping mass: F = - rayMass.M.v(t)
-	// M is diagonal, so this calculation can be done node per node
-	if (rayMass != 0.0)
+	// If we have the damping matrix build (D = rayleighMass.M + rayleighStiffness.K), F = -D.v(t)
+	if (useGlobalDampingMatrix && (rayleighStiffness != 0.0 || rayleighMass != 0.0))
 	{
-		for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
-		{
-			double mass = getMass(nodeID)->getMass();
-			SurgSim::Math::Vector3d f = - scale * rayMass * mass * getSubVector(v, nodeID, 3);
-			addSubVector(f, nodeID, 3, force);
-		}
+		*force -= scale * (m_D * v);
 	}
-
-	// Rayleigh damping stiffness: F = - rayStiff.K.v(t)
-	// K is not diagonal and links all dof of the N connected nodes
-	if (rayStiff != 0.0)
+	else // Otherwise we unroll the calculation separately on the mass and stiffness components
 	{
-		if (useGlobalStiffnessMatrix)
+		// Rayleigh damping mass: F = - rayleighMass.M.v(t)
+		if (rayleighMass != 0.0)
 		{
-			*force -= scale * rayStiff * (m_K * v);
-		}
-		else
-		{
-			// Loop through each spring to compute its contribution
-			for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
+			// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
+			if (useGlobalMassMatrix)
 			{
-				const Matrix& springK = (*spring)->computeStiffness(state);
-				const unsigned int springNumNodes = (*spring)->getNumNodes();
-
-				// This spring contribution is F = - rayStiff.springK.v (with v a subset of the global velocity vector)
-				// We do this matrix-vector product node by node
-				for (unsigned int springNodeIdRow = 0; springNodeIdRow < springNumNodes; springNodeIdRow++)
+				// M is diagonal, take advantage of it...
+				*force -= (scale * rayleighMass) * (m_M.diagonal().cwiseProduct(v));
+			}
+			else
+			{
+				for (unsigned int nodeID = 0; nodeID < getNumMasses(); nodeID++)
 				{
-					unsigned int nodeIdRow = (*spring)->getNodeId(springNodeIdRow);
+					double mass = getMass(nodeID)->getMass();
+					SurgSim::Math::Vector3d f = - scale * rayleighMass * mass * getSubVector(v, nodeID, 3);
+					addSubVector(f, nodeID, 3, force);
+				}
+			}
+		}
 
-					for (unsigned int springNodeIdCol = 0; springNodeIdCol < springNumNodes; springNodeIdCol++)
-					{
-						unsigned int nodeIdCol = (*spring)->getNodeId(springNodeIdCol);
-
-						auto springKij = getSubMatrix(springK, springNodeIdRow, springNodeIdCol, 3, 3);
-						auto vj        = getSubVector(v, nodeIdCol, 3);
-						addSubVector(- scale * rayStiff * (springKij * vj), nodeIdRow, 3, force);
-					}
+		// Rayleigh damping stiffness: F = - rayleighStiffness.K.v(t)
+		if (rayleighStiffness != 0.0)
+		{
+			if (useGlobalStiffnessMatrix)
+			{
+				*force -= scale * rayleighStiffness * (m_K * v);
+			}
+			else
+			{
+				// Otherwise, we loop through each fem element to compute its contribution
+				for (auto spring = std::begin(m_springs); spring != std::end(m_springs); ++spring)
+				{
+					(*spring)->addMatVec(state, 0.0, - scale * rayleighStiffness, v, force);
 				}
 			}
 		}
@@ -442,11 +438,9 @@ void MassSpringRepresentation::addRayleighDampingForce(Vector* force, const Defo
 
 void MassSpringRepresentation::addSpringsForce(Vector *force, const DeformableRepresentationState& state, double scale)
 {
-	using SurgSim::Math::addSubVector;
-
 	for (auto spring = std::begin(m_springs); spring != std::end(m_springs); spring++)
 	{
-		addSubVector((*spring)->computeForce(state), (*spring)->getNodeIds(), 3, force);
+		(*spring)->addForce(state, force, scale);
 	}
 }
 
