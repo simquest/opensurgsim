@@ -27,6 +27,7 @@
 #include "SurgSim/Input/OutputProducerInterface.h"
 #include "SurgSim/Math/Matrix.h"
 #include "SurgSim/Math/RigidTransform.h"
+#include "SurgSim/Math/Quaternion.h"
 
 using SurgSim::DataStructures::DataGroup;
 using SurgSim::DataStructures::DataGroupBuilder;
@@ -34,32 +35,25 @@ using SurgSim::Device::PoseTransform;
 using SurgSim::Input::CommonDevice;
 using SurgSim::Input::InputConsumerInterface;
 using SurgSim::Input::OutputProducerInterface;
+using SurgSim::Math::makeRigidTransform;
+using SurgSim::Math::makeRotationQuaternion;
+using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
-const double errorEpsilon = 1e-9;
+const double errorEpsilon = 1e-7;
 
-class TestInputOutputDevice : public CommonDevice
+/// Exposes protected members of CommonDevice.
+class MockPoseTransform : public PoseTransform
 {
 public:
-	explicit TestInputOutputDevice(const std::string& name) :
-		CommonDevice(name)
+	explicit MockPoseTransform(const std::string& name) : PoseTransform(name)
 	{
 	}
 
-	void doPushInput()
+	virtual void doPushInput()
 	{
 		pushInput();
-	}
-
-	void doPullOutput()
-	{
-		pullOutput();
-	}
-
-	const SurgSim::DataStructures::DataGroup& doGetOutputData() const
-	{
-		return getOutputData();
 	}
 
 	SurgSim::DataStructures::DataGroup& doGetInitialInputData()
@@ -72,36 +66,10 @@ public:
 		return getInputData();
 	}
 
-	virtual bool initialize()
+	const SurgSim::DataStructures::DataGroup& doGetOutputData() const
 	{
-		return true;
+		return getOutputData();
 	}
-
-	virtual bool finalize()
-	{
-		return true;
-	}
-};
-
-class TestInputConsumerInterface : public InputConsumerInterface
-{
-public:
-	TestInputConsumerInterface()
-	{
-	}
-
-	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override
-	{
-		m_data = inputData;
-	}
-
-	virtual void initializeInput(const std::string& device,
-		const SurgSim::DataStructures::DataGroup& inputData) override
-	{
-		handleInput(device, inputData);
-	}
-
-	DataGroup m_data;
 };
 
 class TestOutputProducerInterface : public OutputProducerInterface
@@ -120,191 +88,240 @@ public:
 	DataGroup m_data;
 };
 
-TEST(PoseTransformDeviceFilterTest, OnlyInput)
+void TestInputDataGroup(const DataGroup& actualData, const DataGroup& expectedData)
 {
-	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
+	RigidTransform3d actualPose;
+	ASSERT_TRUE(actualData.poses().get("pose", &actualPose));
+	RigidTransform3d expectedPose;
+	ASSERT_TRUE(expectedData.poses().get("pose", &expectedPose));
+	EXPECT_TRUE(actualPose.isApprox(expectedPose, errorEpsilon));
+
+	Vector3d actualLinearVelocity;
+	ASSERT_TRUE(actualData.vectors().get("linearVelocity", &actualLinearVelocity));
+	Vector3d expectedLinearVelocity;
+	ASSERT_TRUE(expectedData.vectors().get("linearVelocity", &expectedLinearVelocity));
+	EXPECT_TRUE(actualLinearVelocity.isApprox(expectedLinearVelocity, errorEpsilon));
+
+	Vector3d actualAngularVelocity;
+	ASSERT_TRUE(actualData.vectors().get("angularVelocity", &actualAngularVelocity));
+	Vector3d expectedAngularVelocity;
+	ASSERT_TRUE(expectedData.vectors().get("angularVelocity", &expectedAngularVelocity));
+	EXPECT_TRUE(actualAngularVelocity.isApprox(expectedAngularVelocity, errorEpsilon));
+
+	bool actualBoolean;
+	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
+	bool expectedBoolean;
+	ASSERT_TRUE(expectedData.booleans().get("extraData", &expectedBoolean));
+	EXPECT_EQ(expectedBoolean, actualBoolean);
+}
+
+TEST(PoseTransformDeviceFilterTest, InputDataFilter)
+{
+	auto poseTransformer = std::make_shared<MockPoseTransform>("PoseTransformFilter");
 	ASSERT_TRUE(poseTransformer->initialize());
-	auto device = std::make_shared<TestInputOutputDevice>("InputDevice");
-	auto inputConsumer = std::make_shared<TestInputConsumerInterface>();
 
 	DataGroupBuilder builder;
 	builder.addPose("pose");
-	builder.addPose("anotherPose");
+	builder.addVector("linearVelocity");
+	builder.addVector("angularVelocity");
+	builder.addBoolean("extraData");
 
 	DataGroup data = builder.createData();
-	RigidTransform3d initialPose;
-	initialPose.matrix() << 0.529453820664377, 0.830923707192042, 0.171010071662834, 2.0,
-		-0.785101696592397, 0.403558881227842, 0.469846310392954, 3.0,
-		0.32139380484327, -0.383022221559489, 0.866025403784439, 4.0,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 20/30/40 degrees
+	RigidTransform3d pose = makeRigidTransform(makeRotationQuaternion(1.5, Vector3d(1.2, 5.6, 0.7).normalized()),
+		Vector3d(2.0, 3.0, 4.0));
+	data.poses().set("pose", pose);
+	data.vectors().set("linearVelocity", Vector3d(5.0, 6.0, 7.0));
+	data.vectors().set("angularVelocity", Vector3d(8.0, 9.0, 10.0));
+	data.booleans().set("extraData", true);
+	
+	// Normally the input device's initial input data would be set by the constructor or scaffold, then 
+	// initializeInput would be called in addInputConsumer.
+	poseTransformer->initializeInput("device", data);
 
-	RigidTransform3d anotherInitialPose;
-	anotherInitialPose.matrix() << 0.657741706348699, 0.748222844697849, -0.086824088833465, -3.5,
-		-0.681235546590068, 0.54171630256426, -0.492403876506104, -8.0,
-		-0.321393804843269, 0.383022221559489, 0.866025403784439, 7.0,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 10/-30/40 degrees
+	// After initialization, before the first handleInput, the initial and current input data should be the same.
+	// There is no DataGroup::operator==, so we just test both DataGroups.
+	{
+		SCOPED_TRACE("Testing Initial Input Data, no transform or scaling.");
+		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
+		// The PoseTransform should be using identity transform and scaling if they have not been set.
+		TestInputDataGroup(actualInitialInputData, data);
+	}
+	{
+		SCOPED_TRACE("Testing Input Data, no transform or scaling.");
+		// Normally the InputComponent (or another device filter) would have its handleInput called with the
+		// PoseTransform's input data.
+		DataGroup actualInputData = poseTransformer->doGetInputData();
+		TestInputDataGroup(actualInputData, data);
+	}
 
-	data.poses().set("pose", initialPose);
-	data.poses().set("anotherPose", anotherInitialPose);
-
-	// Normally the initial input data would be set by the constructor or scaffold.
-	device->doGetInitialInputData() = data;
-
-	// The device's input data is consumed by the filter, and the filter's input data is consumed by the InputConsumer.
-	// InitializeInput is called in addInputConsumer, passing the initial input down the chain.
-	device->addInputConsumer(poseTransformer);
-	poseTransformer->addInputConsumer(inputConsumer);
-
-	RigidTransform3d actualPose;
-	ASSERT_TRUE(inputConsumer->m_data.poses().get("pose", &actualPose));
-	// The PoseTransform should be using identity transform and scaling if they have not been set.
-	EXPECT_TRUE(actualPose.isApprox(initialPose, errorEpsilon));
-
-	RigidTransform3d transform;
-	transform.matrix() << 0.10130572780775, -0.941511110779744, -0.321393804843269, 18.3,
-		0.824533332339233, -0.10130572780775, 0.556670399226419, -12.6,
-		-0.556670399226419, -0.32139380484327, 0.766044443118978, 1.0,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, -30/40/-60 degrees
-
+	// Now test setting transform and scaling.
+	RigidTransform3d transform = makeRigidTransform(makeRotationQuaternion(0.9, Vector3d(10.8, -7.6, 5.4)).normalized(),
+		Vector3d(18.3, -12.6, 1.0));
 	poseTransformer->setTransform(transform);
 	poseTransformer->setTranslationScale(3.7);
 
-	device->doGetInputData() = data; // Normally the scaffold would set and push the input data.
-	device->doPushInput();
+	// Normally the input device would PushInput, which would call the filter's handleInput.
+	poseTransformer->handleInput("device", data);
+	
+	DataGroup expectedData = builder.createData();
 
 	// The "pose" data should have its translation scaled and be pre-transformed.
-	RigidTransform3d actualPoseAfterTransform;
-	ASSERT_TRUE(inputConsumer->m_data.poses().get("pose", &actualPoseAfterTransform));
-	RigidTransform3d expectedPose;
-	expectedPose.matrix() << 0.68952469728513432, -0.17267687049352703, -0.70337642143478485, 3.8422607444418091,
-		0.69499803949953043, 0.43102433404654489, 0.57549608908448779, 0.61577498919529994,
-		0.20379748998859773, -0.88566400054213212, 0.41721200991588686, 4.6506255701250767,
-		0.0, 0.0, 0.0, 1.0; // Calculated via numpy.
-	EXPECT_TRUE(actualPoseAfterTransform.isApprox(expectedPose, errorEpsilon));
+	RigidTransform3d expectedPose = makeRigidTransform(makeRotationQuaternion(2.4972022984476547,
+		Vector3d(0.29211414245268102, -0.31582037986877071, 0.90273297017372756)),
+		Vector3d(15.6146599514, -31.1502325138, -5.75927677405));
 
-	// PoseTransform should pass through all other data unchanged.
-	RigidTransform3d anotherPoseAfterTransform;
-	ASSERT_TRUE(inputConsumer->m_data.poses().get("anotherPose", &anotherPoseAfterTransform));
-	EXPECT_TRUE(anotherPoseAfterTransform.isApprox(anotherInitialPose, errorEpsilon));
+	expectedData.poses().set("pose", expectedPose);
+
+	// The linearVelocity should be scaled and rotated.
+	Vector3d expectedLinearVelocity(-6.28155746782, -37.3676130859, -8.37278496308);
+	expectedData.vectors().set("linearVelocity", expectedLinearVelocity);
+
+	// The angularVelocity should be rotated.
+	Vector3d expectedAngularVelocity(-2.66966888839, -15.1851334211, -2.69899814922);
+	expectedData.vectors().set("angularVelocity", expectedAngularVelocity);
+
+	expectedData.booleans().set("extraData", true);
+
+	{
+		SCOPED_TRACE("Testing Input Data, with transform or scaling.");
+		DataGroup actualTransformedInputData = poseTransformer->doGetInputData();
+		TestInputDataGroup(actualTransformedInputData, expectedData);
+	}
+
+	// handleInput should not change the initial input data.
+	{
+		SCOPED_TRACE("Testing Initial Input Data, after handleInput, expecting no transform or scaling.");
+		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
+		TestInputDataGroup(actualInitialInputData, data);
+	}
+
+	// A new initializeInput should run the new initial input data through the filter with the new parameters.
+	poseTransformer->initializeInput("device", data);
+	{
+		SCOPED_TRACE("Testing Initial Input Data, with transform or scaling.");
+		DataGroup actualInitialInputData = poseTransformer->doGetInitialInputData();
+		TestInputDataGroup(actualInitialInputData, expectedData);
+	}
 }
 
-TEST(PoseTransformDeviceFilterTest, InputAndOutputDataPaths)
+TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 {
-	auto poseTransformer = std::make_shared<PoseTransform>("PoseTransformFilter");
+	auto poseTransformer = std::make_shared<MockPoseTransform>("PoseTransformFilter");
 	ASSERT_TRUE(poseTransformer->initialize());
-	auto device = std::make_shared<TestInputOutputDevice>("InputDevice");
-	auto inputConsumer = std::make_shared<TestInputConsumerInterface>();
-	auto outputProducer = std::make_shared<TestOutputProducerInterface>();
 
-	DataGroupBuilder inputBuilder;
-	inputBuilder.addPose("pose");
-	inputBuilder.addVector("inVector");
+	DataGroupBuilder builder;
+	builder.addVector("force");
+	builder.addVector("torque");
+	builder.addMatrix("springJacobian");
+	builder.addPose("inputPose");
+	builder.addMatrix("damperJacobian");
+	builder.addVector("inputLinearVelocity");
+	builder.addVector("inputAngularVelocity");
+	builder.addBoolean("extraData");
 
-	DataGroup inputData = inputBuilder.createData();
-	RigidTransform3d initialInputPose;
-	initialInputPose.matrix() << 1.0, 0.0, 0.0, 2.0,
-							0.0, 0.0, 1.0, 3.0,
-							0.0, -1.0, 0.0, 4.0,
-							0.0, 0.0, 0.0, 1.0; // 90 degree rotation about x-axis
+	DataGroup data = builder.createData();
+	data.vectors().set("force", Vector3d(-6.0, 8.0, -10.0));
+	data.vectors().set("torque", Vector3d(8.0, -4.0, 2.0));
 
-	Vector3d initialInputVector = Vector3d::UnitY();
+	Matrix66d springJacobian;
+	springJacobian << 2.0, 4.0, 6.0, 8.0, 10.0, 12.0,
+		14.0, 16.0, 18.0, 20.0, 22.0, 24.0,
+		26.0, 28.0, 30.0, 32.0, 34.0, 36.0,
+		-2.0, -4.0, -6.0, -8.0, -10.0, -12.0,
+		-14.0, -16.0, -18.0, -20.0, -22.0, -24.0,
+		-26.0, -28.0, -30.0, -32.0, -34.0, -36.0;
+	data.matrices().set("springJacobian", springJacobian);
 
-	inputData.poses().set("pose", initialInputPose);
-	inputData.vectors().set("inVector", initialInputVector);
-	// Normally the initial input data would be set by the constructor or scaffold.
-	device->doGetInitialInputData() = inputData;
+	RigidTransform3d inputPose = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d::UnitX().eval()),
+		Vector3d(3., 5., 7.));
+	data.poses().set("inputPose", inputPose);
 
-	DataGroupBuilder outputBuilder;
-	outputBuilder.addVector("force");
-	outputBuilder.addVector("torque");
-	outputBuilder.addMatrix("springJacobian");
-	outputBuilder.addPose("inputPose");
-	outputBuilder.addMatrix("damperJacobian");
-	outputBuilder.addVector("linearVelocity");
-	outputBuilder.addVector("angularVelocity");
-	// A couple of data that should not be altered by the filter.
-	outputBuilder.addPose("pose");
-	outputBuilder.addVector("outVector");
+	Matrix66d damperJacobian;
+	damperJacobian << 6.0, 10.0, 14.0, 18.0, 22.0, 26.0,
+		30.0, 34.0, 38.0, 42.0, 46.0, 50.0,
+		54.0, 58.0, 62.0, 66.0, 70.0, 74.0,
+		-6.0, -10.0, -14.0, -18.0, -22.0, -26.0,
+		-30.0, -34.0, -38.0, -42.0, -46.0, -50.0,
+		-54.0, -58.0, -62.0, -66.0, -70.0, -74.0;
+	data.matrices().set("damperJacobian", damperJacobian);
 
-	DataGroup outputData = outputBuilder.createData();
-	RigidTransform3d initialOutputPose;
-	initialOutputPose.matrix() << 0.0, 0.0, -1.0, 5.0,
-								0.0, 1.0, 0.0, 6.0,
-								1.0, 0.0, 0.0, 7.0,
-								0.0, 0.0, 0.0, 1.0; // 90 degree rotation about y-axis
-	outputData.poses().set("pose", initialOutputPose);
+	data.vectors().set("inputLinearVelocity", Vector3d(10.0, 6.0, 14.0));
+	data.vectors().set("inputAngularVelocity", Vector3d(8.0, 9.0, 10.0));
+	data.booleans().set("extraData", true);
 
-	Vector3d initialOutputVector = Vector3d::UnitZ();
-	outputData.vectors().set("outVector", initialOutputVector);
+	// Normally the data would be set by a behavior, then the output device scaffold would call requestOutput on the
+	// filter, which would call requestOutput on the OutputComponent.
+	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
+	testOutputProducer->m_data = data;
+	poseTransformer->setOutputProducer(testOutputProducer);
 
-	// Normally the data would be set by a behavior.
-	outputProducer->m_data = outputData;
-
-	// The device's input data is consumed by the filter, and the filter's input data is consumed by the InputConsumer.
-	// InitializeInput is called in addInputConsumer, passing the initial input down the chain.
-	device->addInputConsumer(poseTransformer);
-	poseTransformer->addInputConsumer(inputConsumer);
-
-	// The OutputProducer sends data out to the filter, which sends data out to the device.
-	poseTransformer->setOutputProducer(outputProducer);
-	device->setOutputProducer(poseTransformer);
-
-	// The PoseTransform should keep the input data and output data separate.
-	device->doPullOutput();
-	device->doGetInputData() = inputData; // Normally the scaffold would set and push the input data.
-	device->doPushInput();
-
-	RigidTransform3d actualInputPose;
-	ASSERT_TRUE(inputConsumer->m_data.poses().get("pose", &actualInputPose));
-	EXPECT_TRUE(actualInputPose.isApprox(initialInputPose, errorEpsilon));
-
-	// Data that we do not expect to be filtered should be passed through unchanged.
-	Vector3d actualInputVector;
-	ASSERT_TRUE(inputConsumer->m_data.vectors().get("inVector", &actualInputVector));
-	EXPECT_TRUE(actualInputVector.isApprox(initialInputVector, errorEpsilon));
-
-	RigidTransform3d actualOutputPose;
-	ASSERT_TRUE(device->doGetOutputData().poses().get("pose", &actualOutputPose));
-	EXPECT_TRUE(actualOutputPose.isApprox(initialOutputPose, errorEpsilon));
-
-	Vector3d actualOutputVector;
-	ASSERT_TRUE(device->doGetOutputData().vectors().get("outVector", &actualOutputVector));
-	EXPECT_TRUE(actualOutputVector.isApprox(initialOutputVector, errorEpsilon));
-
-
-	// Check the round-trip on the pose->inputPose.
-	RigidTransform3d transform = RigidTransform3d::Identity();
-	transform.matrix() << 0.76461304237996, 0.265602364171189, 0.587215701058083, -0.95,
-		0.3146967650075, 0.64126665474163, -0.699816421363698, -1.1,
-		-0.562434744229297, 0.719883644530944, 0.4067366430758, 4.2,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, -40/-66/38 degrees
+	RigidTransform3d transform = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d::UnitY().eval()),
+		Vector3d(11., 12., 13.));
 	poseTransformer->setTransform(transform);
-	poseTransformer->setTranslationScale(-31.18);
+	poseTransformer->setTranslationScale(2.0);
 
-	RigidTransform3d newPose;
-	newPose.matrix() << -0.014297271682553, 0.696079050903939, 0.717822779601698, -179.3,
-		-0.956807691132494, -0.218000810711764, 0.192340034102939, 223.92354,
-		0.290369816289747, -0.684068418670008, 0.669130606358858, 8.7,
-		0.0, 0.0, 0.0, 1.0; // Euler z-x-z, 75/48/23 degrees
+	DataGroup actualData;
+	poseTransformer->requestOutput("device", &actualData);
 
-	inputData.poses().set("pose", newPose);
-	device->doGetInputData() = inputData;
-	device->doPushInput();
+	// The force should be anti-rotated.
+	Vector3d actualForce;
+	ASSERT_TRUE(actualData.vectors().get("force", &actualForce));
+	Vector3d expectedForce(10.0, 8.0, -6.0);
+	EXPECT_TRUE(actualForce.isApprox(expectedForce, errorEpsilon));
 
-	RigidTransform3d expectedPose;
-	expectedPose.matrix() << -0.094552549982206385, 0.072633874091332429, 0.99286662529583847, 2259.965438390881,
-		-0.82127373817845517, 0.55797948761443317, -0.11903082953554855, -2529.2107740265933,
-		-0.56264488113751565, -0.82666995332842363, 0.0068939099016622207, -8276.648397154011,
-		0.0, 0.0, 0.0, 1.0; // Calculated via numpy.
+	// The torque should be anti-rotated.
+	Vector3d actualtorque;
+	ASSERT_TRUE(actualData.vectors().get("torque", &actualtorque));
+	Vector3d expectedtorque(-2.0, -4.0, 8.0);
+	EXPECT_TRUE(actualtorque.isApprox(expectedtorque, errorEpsilon));
 
-	ASSERT_TRUE(inputConsumer->m_data.poses().get("pose", &actualInputPose));
-	EXPECT_TRUE(actualInputPose.isApprox(expectedPose, errorEpsilon));
+	// The springJacobian should have each 3x3 block anti-rotated, and the first three columns un-scaled.
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualSpringJacobian;
+	ASSERT_TRUE(actualData.matrices().get("springJacobian", &actualSpringJacobian));
+	Matrix66d expectedSpringJacobian;
+	expectedSpringJacobian << -52.0, -56.0, -60.0, -32.0, -34.0, -36.0,
+		28.0, 32.0, 36.0, 20.0, 22.0, 24.0,
+		4.0, 8.0, 12.0, 8.0, 10.0, 12.0,
+		52.0, 56.0, 60.0, 32.0, 34.0, 36.0,
+		-28.0, -32.0, -36.0, -20.0, -22.0, -24.0,
+		-4.0, -8.0, -12.0, -8.0, -10.0, -12.0;
+	EXPECT_TRUE(actualSpringJacobian.isApprox(expectedSpringJacobian, errorEpsilon));
 
-	// Now back through the output path, ready for the haptic device force calculations.
-	outputData.poses().set("inputPose", actualInputPose);
-	outputProducer->m_data = outputData;
-	device->doPullOutput();
-	RigidTransform3d newActualInputPose;
-	ASSERT_TRUE(device->doGetOutputData().poses().get("inputPose", &newActualInputPose));
-	EXPECT_TRUE(newActualInputPose.isApprox(newPose, errorEpsilon));
+	// The inputPose should be anti-transformed, and have its translation un-scaled.
+	RigidTransform3d actualInputPose;
+	ASSERT_TRUE(actualData.poses().get("inputPose", &actualInputPose));
+	RigidTransform3d expectedInputPose = makeRigidTransform(makeRotationQuaternion(-M_PI_2, Vector3d::UnitY().eval()) *
+		makeRotationQuaternion(M_PI_2, Vector3d::UnitX().eval()),
+		Vector3d(3.0, -3.5, -4.0));
+	EXPECT_TRUE(actualInputPose.isApprox(expectedInputPose, errorEpsilon));
+
+	// The damperJacobian should have each 3x3 block anti-rotated, and the first three columns un-scaled.
+	SurgSim::DataStructures::DataGroup::DynamicMatrixType actualDamperJacobian;
+	ASSERT_TRUE(actualData.matrices().get("damperJacobian", &actualDamperJacobian));
+	Matrix66d expectedDamperJacobian;
+	expectedDamperJacobian << -108.0, -116.0, -124.0, -66.0, -70.0, -74.0,
+		60.0, 68.0, 76.0, 42.0, 46.0, 50.0,
+		12.0, 20.0, 28.0, 18.0, 22.0, 26.0,
+		108.0, 116.0, 124.0, 66.0, 70.0, 74.0,
+		-60.0, -68.0, -76.0, -42.0, -46.0, -50.0,
+		-12.0, -20.0, -28.0, -18.0, -22.0, -26.0;
+	EXPECT_TRUE(actualDamperJacobian.isApprox(expectedDamperJacobian, errorEpsilon));
+
+	// The inputLinearVelocity should be anti-rotated and un-scaled.
+	Vector3d actualInputLinearVelocity;
+	ASSERT_TRUE(actualData.vectors().get("inputLinearVelocity", &actualInputLinearVelocity));
+	Vector3d expectedInputLinearVelocity(-7.0, 3.0, 5.0);
+	EXPECT_TRUE(actualInputLinearVelocity.isApprox(expectedInputLinearVelocity, errorEpsilon));
+
+	// The inputAngularVelocity should be anti-rotated.
+	Vector3d actualInputAngularVelocity;
+	ASSERT_TRUE(actualData.vectors().get("inputAngularVelocity", &actualInputAngularVelocity));
+	Vector3d expectedInputAngularVelocity(-10.0, 9.0, 8.0);
+	EXPECT_TRUE(actualInputAngularVelocity.isApprox(expectedInputAngularVelocity, errorEpsilon));
+
+	// Other data should pass through unchanged.
+	bool actualBoolean;
+	ASSERT_TRUE(actualData.booleans().get("extraData", &actualBoolean));
+	bool expectedBoolean = true;
+	EXPECT_EQ(expectedBoolean, actualBoolean);
 }
