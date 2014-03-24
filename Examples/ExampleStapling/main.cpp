@@ -27,6 +27,7 @@
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
+#include "Examples/ExampleStapling/VisualizeContactsBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -263,6 +264,10 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
 
+	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
+		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
+	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
+
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
 	sceneElement->addComponent(physicsRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
@@ -270,6 +275,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(inputComponent);
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
+	sceneElement->addComponent(visualizeContactsBehavior);
 
 	std::shared_ptr<TransferPoseBehavior> physicsPoseToGraphics =
 		std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
