@@ -121,9 +121,15 @@ bool Fem3DRepresentation::loadFile()
 	SurgSim::DataStructures::PlyReader reader(m_filename);
 	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
+	if (!reader.isValid())
+	{
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " could not be found.";
+		return false;
+	}
+
 	if (!reader.setDelegate(readerDelegate))
 	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is malformed.";
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File " << m_filename << " is not acceptable PLY.";
 		return false;
 	}
 

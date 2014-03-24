@@ -378,8 +378,8 @@ TEST_F(Fem3DRepresentationTests, SetFilenameTest)
 		SCOPED_TRACE("Calling setFileName with bad name");
 		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
 
-		ASSERT_NO_THROW(fem->setFilename("Non existant fake name"));
-		ASSERT_FALSE(fem->loadFile());
+		ASSERT_NO_THROW(fem->setFilename("Non existent fake name"));
+		EXPECT_FALSE(fem->loadFile());
 	}
 
 }
