@@ -167,12 +167,22 @@ protected:
 	/// Add the Rayleigh damping forces
 	/// \param[in,out] f The force vector to cumulate the Rayleigh damping force into
 	/// \param state The state vector containing positions and velocities
-	/// \param useGlobalStiffnessMatrix True is the global stiffness matrix should be used, False otherwise
+	/// \param useGlobalDampingMatrix True indicates that the global stiffness matrix D should be used (F = -D.v)
+	/// \param useGlobalMassMatrix, useGlobalStiffnessMatrix True indicates that the global mass and stiffness matrices
+	///        should be used (F = -c.M.v - d.K.v)
 	/// \param scale A scaling factor to apply on the damping force
-	/// \note M.a + D.v + K.x = F          with D = c.M + d.K (Rayleigh damping definition)
-	/// \note M.a + K.x = F - (c.M.v + d.K.v)
+	/// \note Damping matrix D = c.M + d.K (Rayleigh damping definition)
+	/// \note F = - D.v
+	/// \note F = - (c.M.v + d.K.v)
+	/// \note If useGlobalDampingMatrix is True, D will be used
+	/// \note Otherwise, if {useGlobalMassMatrix | useGlobalStiffnessMatrix} is True, {M | K} will be used instead.
+	/// \note If useGlobalDampingMatrix is False and useGlobalMassMatrix      is False
+	/// \note    the mass      component will be computed FemElement by FemElement
+	/// \note If useGlobalDampingMatrix is False and useGlobalStiffnessMatrix is False
+	/// \note    the stiffness component will be computed FemElement by FemElement
 	void addRayleighDampingForce(SurgSim::Math::Vector* f, const DeformableRepresentationState& state,
-		bool useGlobalStiffnessMatrix = false, double scale = 1.0);
+		bool useGlobalDampingMatrix = false, bool useGlobalStiffnessMatrix = false, bool useGlobalMassMatrix = false,
+		double scale = 1.0);
 
 	/// Add the springs force to f (given a state)
 	/// \param[in,out] f The force vector to cumulate the spring forces into
