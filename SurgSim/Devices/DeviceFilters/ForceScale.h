@@ -65,9 +65,9 @@ public:
 	/// \param inputData The application input state coming from the device.
 	virtual void handleInput(const std::string& device, const SurgSim::DataStructures::DataGroup& inputData) override;
 
-	/// Asks the producer to provide output state to the device.  Passes through all data, modifying certain data entries
-	/// used by haptic devices to calculate force and torque.  Note that devices may never call this method, e.g.,
-	/// because the device doesn't actually have any output capability.
+	/// Asks the producer to provide output state to the device.  Passes through all data, modifying certain data
+	/// entries used by haptic devices to calculate force and torque.  Note that devices may never call this method,
+	/// e.g., because the device doesn't actually have any output capability.
 	/// \param device The name of the device that is requesting the output.  This should only be used to identify
 	/// 	the device (e.g. if the producer is listening to several devices at once).
 	/// \param [out] outputData The data being sent to the device.

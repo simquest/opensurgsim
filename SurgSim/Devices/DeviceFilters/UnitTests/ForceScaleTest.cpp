@@ -142,7 +142,7 @@ TEST(ForceScaleDeviceFilterTest, OutputDataFilter)
 	// filter, which would call requestOutput on the OutputComponent.
 	auto testOutputProducer = std::make_shared<TestOutputProducerInterface>();
 	testOutputProducer->m_data = data;
-	
+
 	// The OutputProducer sends data out to the filter, which sends data out to the device.
 	forceScaler->setForceScale(10.0);
 	forceScaler->setTorqueScale(0.1);
