@@ -521,7 +521,7 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 
 	// Get the nominal force and torque, if provided.
 	Vector3d nominalForce = Vector3d::Zero();
-	outputData.vectors().get(SurgSim::DataStructures::DataNames::force, &nominalForce);
+	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &nominalForce);
 	Vector3d nominalTorque = Vector3d::Zero();
 	Vector6d nominalForceAndTorque = Vector6d::Zero();
 	SurgSim::Math::setSubVector(nominalForce, 0, 3, &nominalForceAndTorque);
@@ -530,10 +530,10 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 	// to get a delta force & torque.  This way a linearized output force & torque is calculated at haptic update rates.
 	Vector6d forceAndTorqueFromDeltaPosition = Vector6d::Zero();
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
-	if (outputData.matrices().get(SurgSim::DataStructures::DataNames::springJacobian, &springJacobian))
+	if (outputData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &springJacobian))
 	{
 		RigidTransform3d poseForNominal = info->scaledPose;
-		outputData.poses().get(SurgSim::DataStructures::DataNames::inputPose, &poseForNominal);
+		outputData.poses().get(SurgSim::DataStructures::Names::INPUT_POSE, &poseForNominal);
 
 		Vector3d rotationVector = Vector3d::Zero();
 		SurgSim::Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
@@ -549,14 +549,14 @@ void PhantomScaffold::calculateForceAndTorque(PhantomScaffold::DeviceData* info)
 	// If the damperJacobian was provided, calculate a delta force & torque based on the change in velocity.
 	Vector6d forceAndTorqueFromDeltaVelocity = Vector6d::Zero();
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
-	if (outputData.matrices().get(SurgSim::DataStructures::DataNames::damperJacobian, &damperJacobian))
+	if (outputData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian))
 	{
 		Vector3d angularVelocity = Vector3d::Zero();
 
 		Vector3d linearVelocityForNominal = info->linearVelocity;
-		outputData.vectors().get(SurgSim::DataStructures::DataNames::inputLinearVelocity, &linearVelocityForNominal);
+		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, &linearVelocityForNominal);
 		Vector3d angularVelocityForNominal = angularVelocity;
-		outputData.vectors().get(SurgSim::DataStructures::DataNames::inputAngularVelocity, &angularVelocityForNominal);
+		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, &angularVelocityForNominal);
 
 		Vector6d deltaVelocity;
 		SurgSim::Math::setSubVector(info->linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
@@ -578,15 +578,15 @@ void PhantomScaffold::setInputData(DeviceData* info)
 {
 	// TODO(bert): this code should cache the access indices.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set(SurgSim::DataStructures::DataNames::pose, info->scaledPose);
-	inputData.vectors().set(SurgSim::DataStructures::DataNames::linearVelocity, info->linearVelocity);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button1,
+	inputData.poses().set(SurgSim::DataStructures::Names::POSE, info->scaledPose);
+	inputData.vectors().set(SurgSim::DataStructures::Names::LINEAR_VELOCITY, info->linearVelocity);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1,
 		(info->buttonsBuffer & HD_DEVICE_BUTTON_1) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button2,
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2,
 		(info->buttonsBuffer & HD_DEVICE_BUTTON_2) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button3,
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3,
 		(info->buttonsBuffer & HD_DEVICE_BUTTON_3) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button4,
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_4,
 		(info->buttonsBuffer & HD_DEVICE_BUTTON_4) != 0);
 }
 
@@ -717,12 +717,12 @@ bool PhantomScaffold::checkForFatalError(const char* message)
 SurgSim::DataStructures::DataGroup PhantomScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addPose(SurgSim::DataStructures::DataNames::pose);
-	builder.addVector(SurgSim::DataStructures::DataNames::linearVelocity);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button1);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button2);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button3);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button4);
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addVector(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_4);
 	return builder.createData();
 }
 

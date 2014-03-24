@@ -39,7 +39,7 @@ namespace Physics
 
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_poseName(SurgSim::DataStructures::DataNames::pose),
+	m_poseName(SurgSim::DataStructures::Names::POSE),
 	m_linearStiffness(0.0),
 	m_linearDamping(0.0),
 	m_angularStiffness(0.0),
@@ -48,13 +48,13 @@ VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	m_outputTorqueScaling(1.0)
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addVector(SurgSim::DataStructures::DataNames::force);
-	builder.addVector(SurgSim::DataStructures::DataNames::torque);
-	builder.addMatrix(SurgSim::DataStructures::DataNames::springJacobian);
-	builder.addPose(SurgSim::DataStructures::DataNames::inputPose);
-	builder.addMatrix(SurgSim::DataStructures::DataNames::damperJacobian);
-	builder.addVector(SurgSim::DataStructures::DataNames::inputLinearVelocity);
-	builder.addVector(SurgSim::DataStructures::DataNames::inputAngularVelocity);
+	builder.addVector(SurgSim::DataStructures::Names::FORCE);
+	builder.addVector(SurgSim::DataStructures::Names::TORQUE);
+	builder.addMatrix(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+	builder.addPose(SurgSim::DataStructures::Names::INPUT_POSE);
+	builder.addMatrix(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
+	builder.addVector(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
 	m_outputData = builder.createData();
 }
 
@@ -93,9 +93,9 @@ void VirtualToolCoupler::update(double dt)
 		// RigidRepresentation's state to the input state.
 		Vector3d inputLinearVelocity, inputAngularVelocity;
 		inputLinearVelocity.setZero();
-		inputData.vectors().get(SurgSim::DataStructures::DataNames::linearVelocity, &inputLinearVelocity);
+		inputData.vectors().get(SurgSim::DataStructures::Names::LINEAR_VELOCITY, &inputLinearVelocity);
 		inputAngularVelocity.setZero();
-		inputData.vectors().get(SurgSim::DataStructures::DataNames::angularVelocity, &inputAngularVelocity);
+		inputData.vectors().get(SurgSim::DataStructures::Names::ANGULAR_VELOCITY, &inputAngularVelocity);
 
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
@@ -118,26 +118,26 @@ void VirtualToolCoupler::update(double dt)
 
 		if (m_output != nullptr)
 		{
-			m_outputData.vectors().set(SurgSim::DataStructures::DataNames::force, -force * m_outputForceScaling);
-			m_outputData.vectors().set(SurgSim::DataStructures::DataNames::torque, -torque * m_outputTorqueScaling);
-			m_outputData.vectors().set(SurgSim::DataStructures::DataNames::inputLinearVelocity, inputLinearVelocity);
-			m_outputData.vectors().set(SurgSim::DataStructures::DataNames::inputAngularVelocity, inputAngularVelocity);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::FORCE, -force * m_outputForceScaling);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::TORQUE, -torque * m_outputTorqueScaling);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, inputLinearVelocity);
+			m_outputData.vectors().set(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, inputAngularVelocity);
 
-			m_outputData.poses().set(SurgSim::DataStructures::DataNames::inputPose, inputPose);
+			m_outputData.poses().set(SurgSim::DataStructures::Names::INPUT_POSE, inputPose);
 
 			Matrix66d springJacobian = Matrix66d::Zero();
 			Matrix33d outputLinearStiffnessMatrix = -linearStiffnessMatrix * m_outputForceScaling;
 			SurgSim::Math::setSubMatrix(outputLinearStiffnessMatrix, 0, 0, 3, 3, &springJacobian);
 			Matrix33d outputAngularStiffnessMatrix = -angularStiffnessMatrix * m_outputTorqueScaling;
 			SurgSim::Math::setSubMatrix(outputAngularStiffnessMatrix, 1, 1, 3, 3, &springJacobian);
-			m_outputData.matrices().set(SurgSim::DataStructures::DataNames::springJacobian, springJacobian);
+			m_outputData.matrices().set(SurgSim::DataStructures::Names::SPRING_JACOBIAN, springJacobian);
 
 			Matrix66d damperJacobian = Matrix66d::Zero();
 			Matrix33d outputLinearDampingMatrix = -linearDampingMatrix * m_outputForceScaling;
 			SurgSim::Math::setSubMatrix(outputLinearDampingMatrix, 0, 0, 3, 3, &damperJacobian);
 			Matrix33d outputAngularDampingMatrix = -angularDampingMatrix * m_outputTorqueScaling;
 			SurgSim::Math::setSubMatrix(outputAngularDampingMatrix, 1, 1, 3, 3, &damperJacobian);
-			m_outputData.matrices().set(SurgSim::DataStructures::DataNames::damperJacobian, damperJacobian);
+			m_outputData.matrices().set(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, damperJacobian);
 
 			m_output->setData(m_outputData);
 		}

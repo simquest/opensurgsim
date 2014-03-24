@@ -721,7 +721,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 
 	// Set the DeviceData's force to the nominal force, if provided.
 	Vector3d nominalForce = Vector3d::Zero();
-	outputData.vectors().get(SurgSim::DataStructures::DataNames::force, &nominalForce);
+	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &nominalForce);
 	info->force = nominalForce;
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
@@ -729,11 +729,11 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	Vector6d deltaPosition;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
 	bool havespringJacobian =
-		outputData.matrices().get(SurgSim::DataStructures::DataNames::springJacobian, &springJacobian);
+		outputData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &springJacobian);
 	if (havespringJacobian)
 	{
 		RigidTransform3d poseForNominal = info->scaledPose;
-		outputData.poses().get(SurgSim::DataStructures::DataNames::inputPose, &poseForNominal);
+		outputData.poses().get(SurgSim::DataStructures::Names::INPUT_POSE, &poseForNominal);
 
 		Vector3d rotationVector = Vector3d::Zero();
 		SurgSim::Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
@@ -749,7 +749,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	Vector6d deltaVelocity;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
 	bool havedamperJacobian =
-		outputData.matrices().get(SurgSim::DataStructures::DataNames::damperJacobian, &damperJacobian);
+		outputData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
 	if (havedamperJacobian)
 	{
 		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
@@ -757,9 +757,9 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		Vector3d angularVelocity = Vector3d::Zero();
 
 		Vector3d linearVelocityForNominal = linearVelocity;
-		outputData.vectors().get(SurgSim::DataStructures::DataNames::inputLinearVelocity, &linearVelocityForNominal);
+		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, &linearVelocityForNominal);
 		Vector3d angularVelocityForNominal = angularVelocity;
-		outputData.vectors().get(SurgSim::DataStructures::DataNames::inputAngularVelocity, &angularVelocityForNominal);
+		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, &angularVelocityForNominal);
 
 		SurgSim::Math::setSubVector(linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
 		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
@@ -771,7 +771,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	if (info->isDevice7Dof)
 	{
 		Vector3d nominalTorque = Vector3d::Zero();
-		outputData.vectors().get(SurgSim::DataStructures::DataNames::torque, &nominalTorque);
+		outputData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &nominalTorque);
 		Vector3d torque = nominalTorque;
 
 		if (havespringJacobian)
@@ -881,14 +881,14 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 void NovintScaffold::setInputData(DeviceData* info)
 {
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set(SurgSim::DataStructures::DataNames::pose, info->scaledPose);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button1, info->buttonStates[0]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button2, info->buttonStates[1]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button3, info->buttonStates[2]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button4, info->buttonStates[3]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::isHomed, info->isDeviceHomed);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::isPositionHomed, info->isPositionHomed);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::isOrientationHomed, info->isOrientationHomed);
+	inputData.poses().set(SurgSim::DataStructures::Names::POSE, info->scaledPose);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1, info->buttonStates[0]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2, info->buttonStates[1]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3, info->buttonStates[2]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_4, info->buttonStates[3]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::IS_HOMED, info->isDeviceHomed);
+	inputData.booleans().set(SurgSim::DataStructures::Names::IS_POSITION_HOMED, info->isPositionHomed);
+	inputData.booleans().set(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED, info->isOrientationHomed);
 }
 
 
@@ -1139,14 +1139,14 @@ bool NovintScaffold::checkForFatalError(const char* message)
 SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addPose(SurgSim::DataStructures::DataNames::pose);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button1);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button2);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button3);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button4);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::isHomed);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::isPositionHomed);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::isOrientationHomed);
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_4);
+	builder.addBoolean(SurgSim::DataStructures::Names::IS_HOMED);
+	builder.addBoolean(SurgSim::DataStructures::Names::IS_POSITION_HOMED);
+	builder.addBoolean(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED);
 	return builder.createData();
 }
 

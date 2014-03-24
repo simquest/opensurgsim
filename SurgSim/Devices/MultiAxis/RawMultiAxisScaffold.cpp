@@ -428,11 +428,11 @@ bool RawMultiAxisScaffold::updateDevice(RawMultiAxisScaffold::DeviceData* info)
 
 	// TODO(bert): this code should cache the access indices.
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set(SurgSim::DataStructures::DataNames::pose, pose);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button1, info->buttonStates[0]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button2, info->buttonStates[1]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button3, info->buttonStates[2]);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button4, info->buttonStates[3]);
+	inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1, info->buttonStates[0]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2, info->buttonStates[1]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3, info->buttonStates[2]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_4, info->buttonStates[3]);
 
 	return true;
 }
@@ -596,11 +596,11 @@ bool RawMultiAxisScaffold::destroyPerDeviceThread(DeviceData* data)
 SurgSim::DataStructures::DataGroup RawMultiAxisScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addPose(SurgSim::DataStructures::DataNames::pose);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button1);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button2);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button3);
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button4);
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_4);
 	return builder.createData();
 }
 

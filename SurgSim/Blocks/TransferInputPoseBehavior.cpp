@@ -29,7 +29,7 @@ namespace Blocks
 
 TransferInputPoseBehavior::TransferInputPoseBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
-	m_poseName(SurgSim::DataStructures::DataNames::pose)
+	m_poseName(SurgSim::DataStructures::Names::POSE)
 {
 }
 

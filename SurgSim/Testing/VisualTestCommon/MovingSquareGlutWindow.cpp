@@ -75,27 +75,27 @@ void MovingSquareGlutWindow::updateTool(const DataGroup& inputData)
 {
 	RigidTransform3d devicePose;
 	bool button1, button2, button3, button4, isHomed;
-	if (! inputData.poses().get(SurgSim::DataStructures::DataNames::pose, &devicePose))
+	if (! inputData.poses().get(SurgSim::DataStructures::Names::POSE, &devicePose))
 	{
 		return;  // not much we can do without a pose...
 	}
-	if (! inputData.booleans().get(SurgSim::DataStructures::DataNames::button1, &button1))
+	if (! inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_1, &button1))
 	{
 		button1 = false;
 	}
-	if (! inputData.booleans().get(SurgSim::DataStructures::DataNames::button2, &button2))
+	if (! inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_2, &button2))
 	{
 		button2 = false;
 	}
-	if (! inputData.booleans().get(SurgSim::DataStructures::DataNames::button3, &button3))
+	if (! inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_3, &button3))
 	{
 		button3 = false;
 	}
-	if (! inputData.booleans().get(SurgSim::DataStructures::DataNames::button4, &button4))
+	if (! inputData.booleans().get(SurgSim::DataStructures::Names::BUTTON_4, &button4))
 	{
 		button4 = false;
 	}
-	if (! inputData.booleans().get(SurgSim::DataStructures::DataNames::isHomed, &isHomed))
+	if (! inputData.booleans().get(SurgSim::DataStructures::Names::IS_HOMED, &isHomed))
 	{
 		isHomed = true;  // if device has no homing indication, never show as un-homed
 	}
@@ -136,7 +136,7 @@ void MovingSquareGlutWindow::updateTool(const DataGroup& inputData)
 void MovingSquareGlutWindow::updateSquare(const DataGroup& inputData)
 {
 	RigidTransform3d devicePose;
-	if (! inputData.poses().get(SurgSim::DataStructures::DataNames::pose, &devicePose))
+	if (! inputData.poses().get(SurgSim::DataStructures::Names::POSE, &devicePose))
 	{
 		return;
 	}

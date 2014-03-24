@@ -63,9 +63,9 @@ bool PoseTransform::finalize()
 
 void PoseTransform::initializeInput(const std::string& device, const DataGroup& inputData)
 {
-	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::DataNames::pose);
-	m_linearVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::DataNames::linearVelocity);
-	m_angularVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::DataNames::angularVelocity);
+	m_poseIndex = inputData.poses().getIndex(SurgSim::DataStructures::Names::POSE);
+	m_linearVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::LINEAR_VELOCITY);
+	m_angularVelocityIndex = inputData.vectors().getIndex(SurgSim::DataStructures::Names::ANGULAR_VELOCITY);
 
 	inputFilter(inputData, &getInitialInputData());
 	getInputData() = getInitialInputData();
@@ -85,17 +85,17 @@ bool PoseTransform::requestOutput(const std::string& device, DataGroup* outputDa
 		if (!m_cachedOutputIndices)
 		{
 			const DataGroup& initialOutputData = getOutputData();
-			m_forceIndex = initialOutputData.vectors().getIndex(SurgSim::DataStructures::DataNames::force);
-			m_torqueIndex = initialOutputData.vectors().getIndex(SurgSim::DataStructures::DataNames::torque);
+			m_forceIndex = initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::FORCE);
+			m_torqueIndex = initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::TORQUE);
 			m_springJacobianIndex =
-				initialOutputData.matrices().getIndex(SurgSim::DataStructures::DataNames::springJacobian);
-			m_inputPoseIndex = initialOutputData.poses().getIndex(SurgSim::DataStructures::DataNames::inputPose);
+				initialOutputData.matrices().getIndex(SurgSim::DataStructures::Names::SPRING_JACOBIAN);
+			m_inputPoseIndex = initialOutputData.poses().getIndex(SurgSim::DataStructures::Names::INPUT_POSE);
 			m_damperJacobianIndex =
-				initialOutputData.matrices().getIndex(SurgSim::DataStructures::DataNames::damperJacobian);
+				initialOutputData.matrices().getIndex(SurgSim::DataStructures::Names::DAMPER_JACOBIAN);
 			m_inputLinearVelocityIndex =
-				initialOutputData.vectors().getIndex(SurgSim::DataStructures::DataNames::inputLinearVelocity);
+				initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY);
 			m_inputAngularVelocityIndex =
-				initialOutputData.vectors().getIndex(SurgSim::DataStructures::DataNames::inputAngularVelocity);
+				initialOutputData.vectors().getIndex(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY);
 			m_cachedOutputIndices = true;
 		}
 		outputFilter(getOutputData(), outputData);

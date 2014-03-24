@@ -94,11 +94,11 @@ bool MouseScaffold::updateDevice(int buttonMask, float x, float y, int scrollDel
 {
 	boost::lock_guard<boost::mutex> lock(m_device->mutex);
 	SurgSim::DataStructures::DataGroup& inputData = m_device->deviceObject->getInputData();
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button1,
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1,
 		(buttonMask & osgGA::GUIEventAdapter::LEFT_MOUSE_BUTTON) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button2,
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2,
 		(buttonMask & osgGA::GUIEventAdapter::MIDDLE_MOUSE_BUTTON) != 0);
-	inputData.booleans().set(SurgSim::DataStructures::DataNames::button3,
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3,
 		(buttonMask & osgGA::GUIEventAdapter::RIGHT_MOUSE_BUTTON) != 0);
 	inputData.scalars().set("x", static_cast<double>(x));
 	inputData.scalars().set("y", static_cast<double>(y));
@@ -119,9 +119,9 @@ OsgMouseHandler* MouseScaffold::getMouseHandler() const
 SurgSim::DataStructures::DataGroup MouseScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button1);	// Indicates mouse left button
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button2); 	// Indicates mouse middle button (i.e. wheel)
-	builder.addBoolean(SurgSim::DataStructures::DataNames::button3);	// Indicates mouse right button
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);	// Indicates mouse left button
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2); 	// Indicates mouse middle button (i.e. wheel)
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);	// Indicates mouse right button
 	builder.addScalar("x");				// Indicates mouse's X-coordinate in the current window, left bottom = (0, 0)
 	builder.addScalar("y");				// Indicates mouse's Y-coordinate in the current window, left bottom = (0, 0)
 	builder.addInteger("scrollDeltaX"); // Indicates mouse wheel vertical movement

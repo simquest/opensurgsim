@@ -60,9 +60,9 @@ void PoseIntegrator::handleInput(const std::string& device, const SurgSim::DataS
 {
 	getInputData() = inputData;
 	SurgSim::Math::RigidTransform3d pose;
-	if (inputData.poses().get(SurgSim::DataStructures::DataNames::pose, &pose))
+	if (inputData.poses().get(SurgSim::DataStructures::Names::POSE, &pose))
 	{
-		getInputData().poses().set(SurgSim::DataStructures::DataNames::pose, integrate(pose));
+		getInputData().poses().set(SurgSim::DataStructures::Names::POSE, integrate(pose));
 	}
 	pushInput();
 }
