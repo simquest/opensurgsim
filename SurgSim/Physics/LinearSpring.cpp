@@ -164,22 +164,18 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 }
 
 void LinearSpring::addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
-							 const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F)
+							 const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F)
 {
 	// Considering that we do not have damping yet, only the stiffness part will contribute
 	if (alphaK == 0.0)
 	{
 		return;
 	}
-
-	Eigen::Matrix<double, 6, 1, Eigen::DontAlign> x6D;
-	getSubVector(x, m_nodeIds, 3, &x6D);
-
-	// Adds the damping contribution (No damping)
-
-	// Adds the stiffness contribution
-	if (alphaK != 0.0)
+	else
 	{
+		Eigen::Matrix<double, 6, 1, Eigen::DontAlign> vector6D;
+		getSubVector(vector, m_nodeIds, 3, &vector6D);
+
 		const Vector& xState = state.getPositions();
 		const Vector& x0 = getSubVector(xState, m_nodeIds[0], 3);
 		const Vector& x1 = getSubVector(xState, m_nodeIds[1], 3);
@@ -191,7 +187,7 @@ void LinearSpring::addMatVec(const DeformableRepresentationState& state, double 
 		Matrix33d K00 = Matrix33d::Identity() * (m_stiffness * lRatio);
 		K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0));
 
-		Vector3d force = alphaK * (K00 * (x6D.segment(0, 3) - x6D.segment(3, 3)));
+		Vector3d force = alphaK * (K00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
 		addSubVector( force, m_nodeIds[0], 3, F);
 		addSubVector(-force, m_nodeIds[1], 3, F);
 	}

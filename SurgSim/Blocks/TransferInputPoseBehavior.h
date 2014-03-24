@@ -59,7 +59,7 @@ public:
 	virtual void update(double dt);
 
 protected:
-	/// Initialize the behavior
+	/// Initialize the behavior.  Checks for sender and receiver.
 	virtual bool doInitialize();
 
 	/// Wakeup the behavior

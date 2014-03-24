@@ -93,10 +93,10 @@ public:
 	/// \param state The state to compute everything with
 	/// \param alphaD The scaling factor for the damping contribution
 	/// \param alphaK The scaling factor for the stiffness contribution
-	/// \param x A complete system vector to use as the vector in the matrix-vector multiplication
+	/// \param vector A complete system vector to use as the vector in the matrix-vector multiplication
 	/// \param[in,out] F The complete system force vector to add the element matrix-vector contribution into
 	virtual void addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
-						   const SurgSim::Math::Vector& x, SurgSim::Math::Vector* F) override;
+						   const SurgSim::Math::Vector& vector, SurgSim::Math::Vector* F) override;
 
 	/// Comparison operator (equality)
 	/// \param spring Spring to compare it to

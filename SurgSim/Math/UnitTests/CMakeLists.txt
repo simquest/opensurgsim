@@ -30,6 +30,7 @@ set(UNIT_TEST_SOURCES
 	OdeSolverEulerImplicitTests.cpp
 	OdeSolverTests.cpp
 	ShapeTests.cpp
+	SurfaceMeshShapeTests.cpp
 	ValidTests.cpp
 )
 

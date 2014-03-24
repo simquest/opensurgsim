@@ -758,7 +758,6 @@ TEST_F(FemElement3DCubeTests, ComputeCartesianCoordinate)
 		SurgSim::Math::Vector nodePositions(8);
 		nodePositions << 0.01, 0.07, 0.11, 0.05, 0.0, 0.23, 0.13, 0.4;
 		EXPECT_TRUE(cube.isValidCoordinate(nodePositions));
-		Vector3d a = cube.computeCartesianCoordinate(m_restState, nodePositions);
 		EXPECT_TRUE(SurgSim::Math::Vector3d(0.04, 0.19, 0.26).isApprox(
 					cube.computeCartesianCoordinate(m_restState, nodePositions), epsilon));
 		// 0.01 * (-0.5,-0.5,-0.5) => (-0.005, -0.005, -0.005)
