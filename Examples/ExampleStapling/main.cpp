@@ -64,9 +64,11 @@ using SurgSim::Framework::BehaviorManager;
 using SurgSim::Framework::Runtime;
 using SurgSim::Framework::Scene;
 using SurgSim::Framework::SceneElement;
+using SurgSim::Graphics::Mesh;
 using SurgSim::Graphics::SceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
 using SurgSim::Graphics::OsgManager;
+using SurgSim::Graphics::OsgMeshRepresentation;
 using SurgSim::Graphics::OsgViewElement;
 using SurgSim::Graphics::OsgSceneryRepresentation;
 using SurgSim::Graphics::ViewElement;
@@ -223,8 +225,14 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
+	std::shared_ptr<OsgMeshRepresentation> osgMeshRepresentation =
+		std::make_shared<OsgMeshRepresentation>("StaplerOsgMesh");
+	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
+	osgMeshRepresentation->setInitialPose(pose);
+	osgMeshRepresentation->setDrawAsWireFrame(true);
+
 	// Stapler collision mesh
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
@@ -258,10 +266,16 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
 	sceneElement->addComponent(physicsRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
+	sceneElement->addComponent(osgMeshRepresentation);
 	sceneElement->addComponent(inputComponent);
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
 
+	std::shared_ptr<TransferPoseBehavior> physicsPoseToGraphics =
+		std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
+	physicsPoseToGraphics->setPoseSender(physicsRepresentation);
+	physicsPoseToGraphics->setPoseReceiver(osgMeshRepresentation);
+	sceneElement->addComponent(physicsPoseToGraphics);
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
 	sceneryRepresentations.push_back(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
@@ -294,6 +308,12 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	reader.setDelegate(delegate);
 	reader.parseFile();
 
+	std::shared_ptr<OsgMeshRepresentation> osgMeshRepresentation =
+		std::make_shared<OsgMeshRepresentation>("ArmOsgMesh");
+	*osgMeshRepresentation->getMesh() = SurgSim::Graphics::Mesh(*delegate->getMesh());
+	osgMeshRepresentation->setInitialPose(pose);
+	osgMeshRepresentation->setDrawAsWireFrame(true);
+
 	// Graphic representation for arm
 	std::shared_ptr<SceneryRepresentation> forearmSceneryRepresentation =
 		createSceneryObject("forearm", "Geometry/forearm.osgb");
@@ -317,6 +337,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 
 	std::shared_ptr<SceneElement> armSceneElement = std::make_shared<BasicSceneElement>(armName + "SceneElement");
 	armSceneElement->addComponent(forearmSceneryRepresentation);
+	armSceneElement->addComponent(osgMeshRepresentation);
 	armSceneElement->addComponent(upperarmSceneryRepresentation);
 	armSceneElement->addComponent(collisionRepresentation);
 	armSceneElement->addComponent(physicsRepresentation);
