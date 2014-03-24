@@ -16,7 +16,7 @@
 #ifndef SURGSIM_PHYSICS_DEFORMABLECOLLISIONREPRESENTATION_H
 #define SURGSIM_PHYSICS_DEFORMABLECOLLISIONREPRESENTATION_H
 
-#include <SurgSim/Collision/Representation.h>
+#include "SurgSim/Collision/Representation.h"
 
 #include <string>
 #include <memory>

@@ -303,7 +303,8 @@ void RigidRepresentation::computeComplianceMatrix(double dt)
 	bool isParametersValid = m_currentParameters.isValid();
 	SURGSIM_LOG_IF(!isParametersValid,
 				   SurgSim::Framework::Logger::getDefaultLogger(), WARNING) << getName() <<
-						   " deactivated in computComplianceMatrix because m_currentParameters is not valid." << std::endl;
+						   " deactivated in computComplianceMatrix because m_currentParameters is not valid." <<
+						   std::endl;
 	if (!isActive() || !isParametersValid)
 	{
 		setIsActive(false);

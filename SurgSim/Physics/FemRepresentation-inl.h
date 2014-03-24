@@ -139,10 +139,10 @@ void FemRepresentation<MT, DT, KT, ST>::beforeUpdate(double dt)
 		return;
 	}
 
-	SURGSIM_ASSERT(getNumFemElements()) <<
-										"No fem element specified yet, call addFemElement() prior to running the simulation";
-	SURGSIM_ASSERT(getNumDof()) <<
-								"State has not been initialized yet, call setInitialState() prior to running the simulation";
+	SURGSIM_ASSERT(getNumFemElements())
+			<< "No fem element specified yet, call addFemElement() prior to running the simulation";
+	SURGSIM_ASSERT(getNumDof())
+			<<	"State has not been initialized yet, call setInitialState() prior to running the simulation";
 
 	// Call the DeformableRepresentation implementation to take care of the OdeSolver setup
 	DeformableRepresentation<MT, DT, KT, ST>::beforeUpdate(dt);

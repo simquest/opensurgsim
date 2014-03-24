@@ -46,7 +46,7 @@ template <class SourceType, class TargetType>
 class MeshToMeshTransfer : public SurgSim::Framework::Behavior
 {
 public:
-	MeshToMeshTransfer(const std::string& name) : Behavior(name)
+	explicit MeshToMeshTransfer(const std::string& name) : Behavior(name)
 	{
 
 	}

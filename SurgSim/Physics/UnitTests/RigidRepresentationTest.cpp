@@ -262,7 +262,8 @@ TEST_F(RigidRepresentationTest, PreviousStateDifferentFromCurrentTest)
 }
 
 void disableWhenDivergeTest(std::shared_ptr<RigidRepresentation> rigidBody,
-							const RigidRepresentationParameters& param, const RigidRepresentationState& state, double dt)
+							const RigidRepresentationParameters& param,
+							const RigidRepresentationState& state, double dt)
 {
 	// Setup phase
 	rigidBody->setIsActive(true);

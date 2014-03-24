@@ -190,8 +190,8 @@ void  DeformableRepresentation<M, D, K, S>::beforeUpdate(double dt)
 						  <ImplicitEuler<DeformableRepresentationState, M, D, K, S>>(this);
 			break;
 		default:
-			SURGSIM_ASSERT(m_odeSolver) <<
-										"Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
+			SURGSIM_ASSERT(m_odeSolver)
+					<< "Ode solver (integration scheme) not initialized yet, call setIntegrationScheme()";
 			break;
 		}
 
@@ -219,7 +219,8 @@ setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> r
 		auto newCollisionRep = std::dynamic_pointer_cast<DeformableCollisionRepresentation>(representation);
 		if (newCollisionRep != nullptr)
 		{
-			newCollisionRep->setDeformableRepresentation(std::static_pointer_cast<DeformableRepresentation>(getSharedPtr()));
+			newCollisionRep->setDeformableRepresentation(
+				std::static_pointer_cast<DeformableRepresentation>(getSharedPtr()));
 		}
 	}
 }

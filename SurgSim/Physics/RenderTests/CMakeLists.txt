@@ -21,8 +21,8 @@ include_directories(
 )
 
 set(UNIT_TEST_SOURCES
-	Fem3DvsTruthCubeRenderTest.cpp
 	Fem3DMeshRenderTest.cpp
+	Fem3DvsTruthCubeRenderTest.cpp
 	RenderTest.cpp
 )
 

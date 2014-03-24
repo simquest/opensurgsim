@@ -27,7 +27,7 @@ class UpdateCollisionRepresentations : public Computation
 {
 public:
 	/// Constructor
-	UpdateCollisionRepresentations(bool doCopyState);
+	explicit UpdateCollisionRepresentations(bool doCopyState);
 
 	/// Destructor
 	virtual ~UpdateCollisionRepresentations();
