@@ -217,8 +217,8 @@ TEST(NovintDeviceTest, InputConsumer)
 	EXPECT_GE(consumer->m_numTimesReceivedInput, 10*700);
 	EXPECT_LE(consumer->m_numTimesReceivedInput, 10*1300);
 
-	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData("pose"));
-	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData("button1"));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.poses().hasData(SurgSim::DataStructures::DataNames::pose));
+	EXPECT_TRUE(consumer->m_lastReceivedInput.booleans().hasData(SurgSim::DataStructures::DataNames::button1));
 }
 
 TEST(NovintDeviceTest, OutputProducer)

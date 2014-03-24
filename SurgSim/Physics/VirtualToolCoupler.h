@@ -61,7 +61,7 @@ public:
 
 	/// Set the name of the pose entry in the input DataGroup
 	/// \param    poseName Name of the pose data in the input to transfer
-	void setPoseName(const std::string& poseName = "pose");
+	void setPoseName(const std::string& poseName = SurgSim::DataStructures::DataNames::pose);
 
 	/// Update the behavior
 	/// \param dt    The length of time (seconds) between update calls.

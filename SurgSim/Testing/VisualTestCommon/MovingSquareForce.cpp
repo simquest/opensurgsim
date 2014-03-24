@@ -50,12 +50,12 @@ MovingSquareForce::MovingSquareForce(const std::string& toolDeviceName, const st
 	m_tipPoint(0, 0, 0)
 {
 	DataGroupBuilder builder;
-	builder.addVector("force");
-	builder.addVector("torque");
+	builder.addVector(SurgSim::DataStructures::DataNames::force);
+	builder.addVector(SurgSim::DataStructures::DataNames::torque);
 	m_outputData = std::move(builder.createData());
 
-	m_outputData.vectors().set("force", Vector3d(0, 0, 0));
-	m_outputData.vectors().set("torque", Vector3d(0, 0, 0));
+	m_outputData.vectors().set(SurgSim::DataStructures::DataNames::force, Vector3d(0, 0, 0));
+	m_outputData.vectors().set(SurgSim::DataStructures::DataNames::torque, Vector3d(0, 0, 0));
 }
 
 void MovingSquareForce::initializeInput(const std::string& device, const DataGroup& inputData)
@@ -83,22 +83,22 @@ void MovingSquareForce::updateTool(const DataGroup& inputData)
 	m_outputData.resetAll();
 
 	RigidTransform3d devicePose;
-	if (! inputData.poses().get("pose", &devicePose))
+	if (! inputData.poses().get(SurgSim::DataStructures::DataNames::pose, &devicePose))
 	{
-		m_outputData.vectors().set("force", Vector3d(0, 0, 0));
-		m_outputData.vectors().set("torque", Vector3d(0, 0, 0));
+		m_outputData.vectors().set(SurgSim::DataStructures::DataNames::force, Vector3d(0, 0, 0));
+		m_outputData.vectors().set(SurgSim::DataStructures::DataNames::torque, Vector3d(0, 0, 0));
 		return;
 	}
 
 	Vector3d tipPosition = devicePose * m_tipPoint;
-	m_outputData.vectors().set("force", computeForce(tipPosition));
-	m_outputData.vectors().set("torque", Vector3d(0, 0, 0));
+	m_outputData.vectors().set(SurgSim::DataStructures::DataNames::force, computeForce(tipPosition));
+	m_outputData.vectors().set(SurgSim::DataStructures::DataNames::torque, Vector3d(0, 0, 0));
 }
 
 void MovingSquareForce::updateSquare(const DataGroup& inputData)
 {
 	RigidTransform3d devicePose;
-	if (! inputData.poses().get("pose", &devicePose))
+	if (! inputData.poses().get(SurgSim::DataStructures::DataNames::pose, &devicePose))
 	{
 		return;
 	}

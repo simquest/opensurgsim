@@ -28,6 +28,30 @@ namespace SurgSim
 namespace DataStructures
 {
 
+/// Common strings for NamedData.
+
+namespace DataNames
+{
+static const char* const pose = "pose";
+static const char* const linearVelocity = "linearVelocity";
+static const char* const angularVelocity = "angularVelocity";
+static const char* const force = "force";
+static const char* const torque = "torque";
+static const char* const springJacobian = "springJacobian";
+static const char* const inputPose = "inputPose";
+static const char* const damperJacobian = "damperJacobian";
+static const char* const inputLinearVelocity = "inputLinearVelocity";
+static const char* const inputAngularVelocity = "inputAngularVelocity";
+static const char* const button0 = "button0";
+static const char* const button1 = "button1";
+static const char* const button2 = "button2";
+static const char* const button3 = "button3";
+static const char* const button4 = "button4";
+static const char* const isHomed = "isHomed";
+static const char* const isPositionHomed = "isPositionHomed";
+static const char* const isOrientationHomed = "isOrientationHomed";
+};
+
 /// A templated dictionary in which data can be accessed by name or index, with immutable names & indices.
 ///
 /// A NamedData object consists of a collection of entries of type \a T.  The data value for each entry can be accessed
@@ -245,7 +269,7 @@ private:
 };
 
 
-};  // namespace Input
+};  // namespace DataStructures
 };  // namespace SurgSim
 
 
