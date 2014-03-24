@@ -1,0 +1,80 @@
+// This file is a part of the OpenSurgSim project.
+// Copyright 2013, SimQuest Solutions Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
+#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
+
+#include "SurgSim/Framework/Behavior.h"
+#include "SurgSim/Graphics/OsgRepresentation.h"
+
+namespace SurgSim
+{
+
+namespace Device
+{
+enum KeyCode;
+}
+
+namespace Input
+{
+class InputComponent;
+}
+
+}
+
+/// This behavior is used to turn on and off registered graphical representation(s)
+/// when registered key(s) is pressed.
+class KeyboardBehavior : public SurgSim::Framework::Behavior
+{
+public:
+	/// Constructor
+	/// \param	name	Name of the behavior
+	explicit KeyboardBehavior(const std::string& name);
+
+	/// Set the input component from which to get the pose.
+	/// \param	inputComponent	The input component which sends the pose.
+	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
+
+	/// Register key and graphical representation pair with this behavior.
+	/// \param key The register key to turn on/off the graphical representation
+	/// \param graphics The graphics representation
+	void registerKey(SurgSim::Device::KeyCode key,
+					 const std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>& graphics);
+
+	/// Update the behavior
+	/// \param dt	The length of time (seconds) between update calls.
+	virtual void update(double dt) override;
+
+protected:
+	/// Initialize this behavior
+	/// \return True on success, otherwise false.
+	/// \note: In current implementation, this method always returns "true".
+	virtual bool doInitialize() override;
+
+	/// Wakeup this behavior
+	/// \return True on success, otherwise false.
+	/// \note: In current implementation, this method always returns "true".
+	virtual bool doWakeUp() override;
+
+private:
+	/// Input component from which to get the pose.
+	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
+
+	/// A mapping between key and the graphical representation it controls.
+	std::unordered_map<SurgSim::Device::KeyCode,
+					   std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
+};
+
+#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H

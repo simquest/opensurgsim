@@ -23,12 +23,14 @@ include_directories(
 )
 
 set(EXAMPLESTAPLING_SOURCES
+	KeyboardBehavior.cpp
 	main.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
 )
 
 set(EXAMPLESTAPLING_HEADERS
+	KeyboardBehavior.h
 	StapleElement.h
 	StaplerBehavior.h
 )
