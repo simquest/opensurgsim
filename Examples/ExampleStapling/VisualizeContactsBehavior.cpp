@@ -40,7 +40,7 @@ VisualizeContactsBehavior::VisualizeContactsBehavior(const std::string& name):
 }
 
 void VisualizeContactsBehavior::setCollisionRepresentation(
-	std::shared_ptr<SurgSim::Collision::Representation> collisionRepresentation)
+	std::shared_ptr<Representation> collisionRepresentation)
 {
 	m_collisionRepresentation = collisionRepresentation;
 }
@@ -49,8 +49,8 @@ void VisualizeContactsBehavior::update(double dt)
 {
 	if (m_collisionRepresentation->hasCollision())
 	{
-		std::unordered_map<std::shared_ptr<Representation>, std::list<std::shared_ptr<Contact>>> collisions =
-																			 m_collisionRepresentation->getCollisions();
+		std::unordered_map<std::shared_ptr<Representation>,
+						   std::list<std::shared_ptr<Contact>>> collisions = m_collisionRepresentation->getCollisions();
 
 		unsigned int totalContacts = 0;
 		std::for_each(std::begin(collisions), std::end(collisions),
@@ -75,8 +75,12 @@ void VisualizeContactsBehavior::update(double dt)
 			{
 				VectorFieldData vectorData1;
 				VectorFieldData vectorData2;
-				vectorData1.direction = -(*iter)->normal * (*iter)->depth * 10;
-				vectorData2.direction =  (*iter)->normal * (*iter)->depth * 10;
+				// Note: Since usually the 'depth' of penetration is so small (at the magnitude of mm),
+				// the length of vector will be too small to be seen on the screen.
+				// We multiply the length of vector by 200 to make it 'visible'.
+				// The number '200' serves as a magic number here.
+				vectorData1.direction = -(*iter)->normal * (*iter)->depth * 200;
+				vectorData2.direction =  (*iter)->normal * (*iter)->depth * 200;
 
 				Vertex<VectorFieldData> vertex1 =
 					Vertex<VectorFieldData>((*iter)->penetrationPoints.first.globalPosition.getValue(), vectorData1);
