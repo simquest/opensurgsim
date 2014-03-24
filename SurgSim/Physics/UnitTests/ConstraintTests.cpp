@@ -233,9 +233,8 @@ TEST_F (ConstraintTests, TestConstructor)
 		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
 		fixedLoc->setRepresentation(fixedRep);
 		rigidLoc->setRepresentation(rigidRep);
-		EXPECT_THROW(
-			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
-			SurgSim::Framework::AssertionFailure);
+		EXPECT_NO_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); });
 	}
 
 	{
