@@ -67,7 +67,7 @@ void PoseTransform::initializeInput(const std::string& device, const DataGroup& 
 	m_linearVelocityIndex = inputData.vectors().getIndex("linearVelocity");
 	m_angularVelocityIndex = inputData.vectors().getIndex("angularVelocity");
 
-	getInitialInputData() = inputData;
+	inputFilter(inputData, &getInitialInputData());
 	getInputData() = getInitialInputData();
 }
 
@@ -228,7 +228,7 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 			}
 		}
 
-		if (m_angularVelocityIndex >= 0)
+		if (m_inputAngularVelocityIndex >= 0)
 		{
 			Vector3d inputAngularVelocity;
 			if (dataToFilter.vectors().get(m_inputAngularVelocityIndex, &inputAngularVelocity))
