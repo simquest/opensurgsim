@@ -51,11 +51,6 @@ public:
 	{
 	}
 
-	virtual void doPushInput()
-	{
-		pushInput();
-	}
-
 	SurgSim::DataStructures::DataGroup& doGetInitialInputData()
 	{
 		return getInitialInputData();
@@ -64,11 +59,6 @@ public:
 	SurgSim::DataStructures::DataGroup& doGetInputData()
 	{
 		return getInputData();
-	}
-
-	const SurgSim::DataStructures::DataGroup& doGetOutputData() const
-	{
-		return getOutputData();
 	}
 };
 
