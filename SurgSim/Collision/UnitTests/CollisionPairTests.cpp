@@ -58,6 +58,8 @@ TEST(CollisionPairTests, InitTest)
 	EXPECT_FALSE(pair.isSwapped());
 
 	std::pair<Location,Location> penetrationPoints;
+	penetrationPoints.first.globalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
+	penetrationPoints.second.globalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
 }
@@ -77,6 +79,8 @@ TEST(CollisionPairTests, SwapTest)
 	EXPECT_FALSE(pair.isSwapped());
 
 	std::pair<Location,Location> penetrationPoints;
+	penetrationPoints.first.globalPosition.setValue(Vector3d(0.1, 0.2, 0.3));
+	penetrationPoints.second.globalPosition.setValue(Vector3d(0.4, 0.5, 0.6));
 
 	pair.addContact(1.0, Vector3d(1.0,0.0,0.0),penetrationPoints);
 	EXPECT_TRUE(pair.hasContacts());
