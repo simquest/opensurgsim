@@ -239,27 +239,27 @@ const MT& FemRepresentation<MT, DT, KT, ST>::computeM(const DeformableRepresenta
 template <class MT, class DT, class KT, class ST>
 const DT& FemRepresentation<MT, DT, KT, ST>::computeD(const DeformableRepresentationState& state)
 {
-	const double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
-	const double& rayMass = m_rayleighDamping.massCoefficient;
+	const double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
+	const double& rayleighMass = m_rayleighDamping.massCoefficient;
 
 	// Make sure the damping matrix has been properly allocated and zeroed out
 	SurgSim::Math::resizeMatrix(&m_D, state.getNumDof(), state.getNumDof(), true);
 
-	// D += rayMass.M
-	if (rayMass != 0.0)
+	// D += rayleighMass.M
+	if (rayleighMass != 0.0)
 	{
 		for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 		{
-			(*femElement)->addMass(state, &m_D, rayMass);
+			(*femElement)->addMass(state, &m_D, rayleighMass);
 		}
 	}
 
-	// D += rayStiff.K
-	if (rayStiff != 0.0)
+	// D += rayleighStiffness.K
+	if (rayleighStiffness != 0.0)
 	{
 		for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 		{
-			(*femElement)->addStiffness(state, &m_D, rayStiff);
+			(*femElement)->addStiffness(state, &m_D, rayleighStiffness);
 		}
 	}
 
@@ -376,49 +376,49 @@ void FemRepresentation<MT, DT, KT, ST>::addRayleighDampingForce(
 	bool useGlobalDampingMatrix, bool useGlobalStiffnessMatrix, bool useGlobalMassMatrix, double scale)
 {
 	// Temporary variables for convenience
-	double& rayMass = m_rayleighDamping.massCoefficient;
-	double& rayStiff = m_rayleighDamping.stiffnessCoefficient;
+	double& rayleighMass = m_rayleighDamping.massCoefficient;
+	double& rayleighStiffness = m_rayleighDamping.stiffnessCoefficient;
 	const SurgSim::Math::Vector& v = state.getVelocities();
 
-	// If we have the damping matrix build (D = rayMass.M + rayStiff.K), F = -D.v(t)
-	if (useGlobalDampingMatrix && rayStiff != 0.0 && rayMass != 0.0)
+	// If we have the damping matrix build (D = rayleighMass.M + rayleighStiffness.K), F = -D.v(t)
+	if (useGlobalDampingMatrix && (rayleighStiffness != 0.0 || rayleighMass != 0.0))
 	{
 		*force -= scale * (m_D * v);
 	}
 	else // Otherwise we unroll the calculation separately on the mass and stiffness components
 	{
-		// Rayleigh damping mass: F = -rayMass.M.v(t)
-		if (rayMass != 0.0)
+		// Rayleigh damping mass: F = -rayleighMass.M.v(t)
+		if (rayleighMass != 0.0)
 		{
-			// If we have the mass matrix, we can compute directly F = -rayMass.M.v(t)
+			// If we have the mass matrix, we can compute directly F = -rayleighMass.M.v(t)
 			if (useGlobalMassMatrix)
 			{
-				*force -= (scale * rayMass) * (m_M * v);
+				*force -= (scale * rayleighMass) * (m_M * v);
 			}
 			else
 			{
 				// Otherwise, we loop through each fem element to compute its contribution
 				for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 				{
-					(*femElement)->addMatVec(state, - scale * rayMass, 0.0, 0.0, v, force);
+					(*femElement)->addMatVec(state, - scale * rayleighMass, 0.0, 0.0, v, force);
 				}
 			}
 		}
 
-		// Rayleigh damping stiffness: F = - rayStiff.K.v(t)
+		// Rayleigh damping stiffness: F = - rayleighStiffness.K.v(t)
 		// K is not diagonal and links all dof of the N connected nodes
-		if (rayStiff != 0.0)
+		if (rayleighStiffness != 0.0)
 		{
 			if (useGlobalStiffnessMatrix)
 			{
-				*force -= scale * rayStiff * (m_K * v);
+				*force -= scale * rayleighStiffness * (m_K * v);
 			}
 			else
 			{
 				// Otherwise, we loop through each fem element to compute its contribution
 				for (auto femElement = std::begin(m_femElements); femElement != std::end(m_femElements); femElement++)
 				{
-					(*femElement)->addMatVec(state, 0.0, 0.0, - scale * rayStiff, v, force);
+					(*femElement)->addMatVec(state, 0.0, 0.0, - scale * rayleighStiffness, v, force);
 				}
 			}
 		}
