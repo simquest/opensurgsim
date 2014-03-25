@@ -39,7 +39,6 @@ using SurgSim::Physics::RigidRepresentationParameters;
 
 StapleElement::StapleElement(const std::string& name) :
 	SurgSim::Framework::SceneElement(name),
-	m_name(name),
 	m_physicsRepresentation(nullptr),
 	m_hasCollisionRepresentation(true)
 {

@@ -57,9 +57,6 @@ protected:
 	virtual bool doInitialize() override;
 
 private:
-	/// Name of this scene element
-	std::string m_name;
-
 	/// The pose of this scene element
 	SurgSim::Math::RigidTransform3d m_pose;
 

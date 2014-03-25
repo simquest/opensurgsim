@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <sstream>
+#include <boost/exception/to_string.hpp>
 
 #include "Examples/ExampleStapling/StapleElement.h"
 #include "Examples/ExampleStapling/StaplerBehavior.h"
@@ -69,10 +69,7 @@ void StaplerBehavior::update(double dt)
 	}
 
 	// Create the staple (not added to the scene right now).
-	std::stringstream elementCount;
-	elementCount << ++m_numElements;
-
-	std::string stapleName = "stapleId_" + elementCount.str();
+	std::string stapleName = "stapleId_" + boost::to_string(m_numElements++);
 	auto staple = std::make_shared<StapleElement>(stapleName);
 	staple->setPose(m_collisionRepresentation->getPose());
 
@@ -181,11 +178,9 @@ void StaplerBehavior::update(double dt)
 				std::make_shared<RigidRepresentationBilateral3D>(),
 				otherLocalization);
 
-		std::stringstream toothIdString;
-		toothIdString << toothId;
 		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
 			std::make_shared<SurgSim::Physics::ConstraintComponent>(
-				stapleName + "_bilateral_constraint_" + toothIdString.str());
+				stapleName + "_bilateral_constraint_" + boost::to_string(toothId++));
 
 		constraintComponent->setConstraint(constraint);
 		staple->addComponent(constraintComponent);
