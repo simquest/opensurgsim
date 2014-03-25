@@ -142,14 +142,6 @@ void StaplerBehavior::update(double dt)
 			continue;
 		}
 
-		// Create the staple with no collision representation.
-		if (!stapleElementCreated)
-		{
-			staple->setHasCollisionRepresentation(false);
-			getScene()->addSceneElement(staple);
-			stapleElementCreated = true;
-		}
-
 		// Get the physics representation of the mostCollidedObject.
 		// Done by dynamic type casting.
 		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> rigidCollisionRepresentation = 
@@ -166,6 +158,14 @@ void StaplerBehavior::update(double dt)
 		if (physicsRepresentation == nullptr)
 		{
 			continue;
+		}
+
+		// Create the staple with no collision representation.
+		if (!stapleElementCreated)
+		{
+			staple->setHasCollisionRepresentation(false);
+			getScene()->addSceneElement(staple);
+			stapleElementCreated = true;
 		}
 
 		// Create a bilateral constraint between the physicsRepresentation and staple.
