@@ -51,6 +51,48 @@ void StaplerBehavior::setCollisionRepresentation(
 	m_collisionRepresentation = staplerRepresentation;
 }
 
+static std::shared_ptr<SurgSim::Collision::Representation> findMostCollidedRepresentation(
+	const std::shared_ptr<SurgSim::Collision::Representation>& object)
+{
+	typedef std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+							   std::list<std::shared_ptr<SurgSim::Collision::Contact>>> MapType;
+
+	MapType collisionsMap = object->getCollisions();
+
+	if (collisionsMap.empty())
+	{
+		return nullptr;
+	}
+
+	auto result = std::max_element(collisionsMap.begin(),
+								   collisionsMap.end(),
+								   [](const MapType::value_type& lhs, const MapType::value_type& rhs)
+								   { return lhs.second.size() < rhs.second.size(); });
+
+	return (*result).first;
+}
+
+static std::shared_ptr<SurgSim::Collision::Contact> findDeepestContact(
+	const std::shared_ptr<SurgSim::Collision::Representation>& object,
+	const std::shared_ptr<SurgSim::Collision::Representation>& intersectingObject)
+{
+	const std::list<std::shared_ptr<SurgSim::Collision::Contact>>& contacts
+		= object->getCollisions().at(intersectingObject);
+
+	if (contacts.empty())
+	{
+		return nullptr;
+	}
+
+	auto result = std::max_element(contacts.begin(),
+								   contacts.end(),
+								   [](const std::shared_ptr<SurgSim::Collision::Contact>& lhs,
+									  const std::shared_ptr<SurgSim::Collision::Contact>& rhs)
+								   { return lhs->depth < rhs->depth; });
+
+	return *result;
+}
+
 void StaplerBehavior::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup dataGroup;
@@ -81,51 +123,20 @@ void StaplerBehavior::update(double dt)
 	bool stapleElementCreated = false;
 	for (; virtualStaple != virtualStaples.end(); ++virtualStaple)
 	{
-		// Check if this newly created staple needs to be constrained to any object in the scene.
-		// Check if the vitual staple on the stapler is in contact with anything.
-		if (!(*virtualStaple)->hasCollision())
-		{
-			continue;
-		}
 		// The virtual staple could be in contact with any number of objects in the scene.
 		// Find the object it has most collision pairs with.
-		std::shared_ptr<SurgSim::Collision::Representation> mostCollidedObject = nullptr;
-		std::list<std::shared_ptr<SurgSim::Collision::Contact>> *mostCollidedObjectCollisionPairs = 0;
-		size_t maximumCollisionPairsCount = 0;
-
-		std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-			std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisionsMap =
-			(*virtualStaple)->getCollisions();
-		for (auto i = std::begin(collisionsMap); i != std::end(collisionsMap); ++i)
-		{
-			if ((*i).second.size() > maximumCollisionPairsCount)
-			{
-				maximumCollisionPairsCount = (*i).second.size();
-				mostCollidedObject = (*i).first;
-				mostCollidedObjectCollisionPairs = &((*i).second);
-			}
-		}
+		std::shared_ptr<SurgSim::Collision::Representation> mostCollidedObject
+			= findMostCollidedRepresentation(*virtualStaple);
 
 		if (mostCollidedObject == nullptr)
 		{
 			continue;
 		}
 
-		// This object, mostCollidedObject, now needs to be 
-		// Iterate through the list of collision pairs to find a point of constraint.
-		double maximumDepth = std::numeric_limits<double>::min();
-		std::shared_ptr<SurgSim::Collision::Contact> chosenContact = nullptr;
-		for (auto contact = (*mostCollidedObjectCollisionPairs).begin();
-				contact != (*mostCollidedObjectCollisionPairs).end(); ++contact)
-		{
-			if ((*contact)->depth > maximumDepth)
-			{
-				maximumDepth = (*contact)->depth;
-				chosenContact = (*contact);
-			}
-		}
+		// Iterate through the list of collision pairs to find a point of constraint with the deepest contact.
+		std::shared_ptr<SurgSim::Collision::Contact> chosenContact
+			= findDeepestContact(*virtualStaple, mostCollidedObject);
 
-		// Create a constraint at the chosenContact.
 		if (chosenContact == nullptr)
 		{
 			continue;
