@@ -74,7 +74,7 @@ void TriangleMeshTriangleMeshDcdContact::doCalculateContact(std::shared_ptr<Coll
 		const Vector3d& triangleA2 = meshBCoordinatesFromMeshACoordinates
 									 * collisionMeshA->getVertexPosition(collisionMeshA->getTriangle(i).verticesId[2]);
 
-		const Vector3d& normalA = collisionMeshA->getNormal(i);
+		const Vector3d& normalA = meshBCoordinatesFromMeshACoordinates.linear() * collisionMeshA->getNormal(i);
 		if (normalA.isZero())
 		{
 			continue;
