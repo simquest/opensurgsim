@@ -35,7 +35,7 @@ class InputComponent;
 }
 
 /// This behavior is used to turn on and off registered graphical representation(s)
-/// when registered key(s) is pressed.
+/// when the corresponding registered key is pressed.
 class KeyboardBehavior : public SurgSim::Framework::Behavior
 {
 public:
@@ -43,15 +43,15 @@ public:
 	/// \param	name	Name of the behavior
 	explicit KeyboardBehavior(const std::string& name);
 
-	/// Set the input component from which to get the pose.
-	/// \param	inputComponent	The input component which sends the pose.
+	/// Set the input component from which pressed keys come.
+	/// \param	inputComponent	The input component which contains the pressed key(s).
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
 
-	/// Register key and graphical representation pair with this behavior.
-	/// \param key The register key to turn on/off the graphical representation
-	/// \param graphics The graphics representation
-	void registerKey(SurgSim::Device::KeyCode key,
-					 const std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>& graphics);
+	/// Register key and graphical representation(s) pair with this behavior.
+	/// \param key The key used to turn on and off graphical representation(s).
+	/// \param graphics The graphics representation(s) controlled by the key.
+	template<class T>
+	void registerKey(SurgSim::Device::KeyCode key, const std::vector<std::shared_ptr<T>>& graphics);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -69,12 +69,17 @@ protected:
 	virtual bool doWakeUp() override;
 
 private:
-	/// Input component from which to get the pose.
+	/// Input component from which pressed keys come.
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
 
-	/// A mapping between key and the graphical representation it controls.
+	/// A mapping between key and the graphical representation(s) it controls.
 	std::unordered_map<SurgSim::Device::KeyCode,
 					   std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
+
+	/// Total time from the last key pressed
+	double m_totalTime;
 };
+
+#include "Examples/ExampleStapling/KeyboardBehavior-inl.h"
 
 #endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H

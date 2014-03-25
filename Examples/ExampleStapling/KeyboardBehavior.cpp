@@ -14,8 +14,6 @@
 
 #include "Examples/ExampleStapling/KeyboardBehavior.h"
 
-#include <algorithm>
-
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Logger.h"
@@ -217,28 +215,15 @@ namespace{
 	std::unordered_map<int, SurgSim::Device::KeyCode> keyMap = createKeyMap();
 }
 
-KeyboardBehavior::KeyboardBehavior(const std::string& name) : SurgSim::Framework::Behavior(name)
+KeyboardBehavior::KeyboardBehavior(const std::string& name) :
+	SurgSim::Framework::Behavior(name),
+	m_totalTime(0.0)
 {
 }
 
 void KeyboardBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
 {
 	m_inputComponent = inputComponent;
-}
-
-void KeyboardBehavior::registerKey(SurgSim::Device::KeyCode key,
-								   const std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>& graphics)
-{
-	auto result = m_keyRegister.find(key);
-	if (result != m_keyRegister.end() && result->second != graphics)
-	{
-		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
-			<< "Key " << key << " has been registered.";
-	}
-	else
-	{
-		m_keyRegister[key] = graphics;
-	}
 }
 
 // Note: This behavior is currently updated by BehaviorManager which runs at 30Hz.
@@ -250,17 +235,17 @@ void KeyboardBehavior::update(double dt)
 	m_inputComponent->getData(&dataGroup);
 
 	int key;
+	m_totalTime += dt;
 	if(dataGroup.integers().get("key", &key))
 	{
-		auto result = m_keyRegister.find(keyMap[key]);
-		if (result != m_keyRegister.end())
+		auto match = m_keyRegister.find(keyMap[key]);
+		if (match != m_keyRegister.end() && m_totalTime > 0.3)
 		{
-			std::for_each(std::begin(result->second), std::end(result->second),
-						  [](std::shared_ptr<SurgSim::Graphics::Representation>& item)
-							{
-								item->setVisible(!item->isVisible());
-							}
-						 );
+			for(auto it = std::begin(match->second); it != std::end(match->second); ++it)
+			{
+				(*it)->setVisible(!(*it)->isVisible());
+			};
+			m_totalTime = 0;
 		}
 	}
 }

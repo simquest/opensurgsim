@@ -405,44 +405,20 @@ int main(int argc, char* argv[])
 	std::shared_ptr<KeyboardBehavior> keyboardBehavior = std::make_shared<KeyboardBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
-	std::vector<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> staplerScenery =
+	std::vector<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> staperScenery =
 		staplerSceneElement->getComponents<SurgSim::Graphics::SceneryRepresentation>();
-	std::vector<std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation>> staplerMesh =
-		staplerSceneElement->getComponents<SurgSim::Graphics::OsgMeshRepresentation>();
-
 	std::vector<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> armScenery =
 		armSceneElement->getComponents<SurgSim::Graphics::SceneryRepresentation>();
+
+	std::vector<std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation>> staperMesh =
+		staplerSceneElement->getComponents<SurgSim::Graphics::OsgMeshRepresentation>();
 	std::vector<std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation>> armMesh =
 		armSceneElement->getComponents<SurgSim::Graphics::OsgMeshRepresentation>();
 
-	std::vector<std::shared_ptr<SurgSim::Graphics::Representation>> cargo;
-	cargo.resize(staplerScenery.size());
-	for (size_t i = 0; i < cargo.size(); ++i)
-	{
-		cargo[i] = staplerScenery[i];
-	}
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, cargo);
-
-	cargo.resize(staplerMesh.size());
-	for (size_t i = 0; i < cargo.size(); ++i)
-	{
-		cargo[i] = staplerMesh[i];
-	}
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, cargo);
-
-	cargo.resize(armScenery.size());
-	for (size_t i = 0; i < cargo.size(); ++i)
-	{
-		cargo[i] = armScenery[i];
-	}
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, cargo);
-
-	cargo.resize(armMesh.size());
-	for (size_t i = 0; i < cargo.size(); ++i)
-	{
-		cargo[i] = armMesh[i];
-	}
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, cargo);
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staperScenery);
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, armScenery);
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, staperMesh);
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, armMesh);
 
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>("SceneElement");
 	sceneElement->addComponent(keyboardComponent);

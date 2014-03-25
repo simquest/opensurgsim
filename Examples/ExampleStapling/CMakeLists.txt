@@ -31,6 +31,7 @@ set(EXAMPLESTAPLING_SOURCES
 
 set(EXAMPLESTAPLING_HEADERS
 	KeyboardBehavior.h
+	KeyboardBehavior-inl.h
 	StapleElement.h
 	StaplerBehavior.h
 )
