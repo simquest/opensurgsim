@@ -115,40 +115,41 @@ void StaplerBehavior::update(double dt)
 	auto staple = std::make_shared<StapleElement>(stapleName);
 	staple->setPose(m_collisionRepresentation->getPose());
 
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> virtualStaples;
-	virtualStaples.push_back(m_collisionRepresentation);
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> virtualTeeth;
+	virtualTeeth.push_back(m_collisionRepresentation);
 
 	int toothId = 0;
-	auto virtualStaple = virtualStaples.begin();
-	bool stapleElementCreated = false;
-	for (; virtualStaple != virtualStaples.end(); ++virtualStaple)
+	bool stapleAdded = false;
+	for (auto virtualTooth = virtualTeeth.begin(); virtualTooth != virtualTeeth.end(); ++virtualTooth)
 	{
-		// The virtual staple could be in contact with any number of objects in the scene.
+		// The virtual tooth could be in contact with any number of objects in the scene.
 		// Find the object it has most collision pairs with.
-		std::shared_ptr<SurgSim::Collision::Representation> mostCollidedObject
-			= findMostCollidedRepresentation(*virtualStaple);
+		std::shared_ptr<SurgSim::Collision::Representation> targetRepresentation
+			= findMostCollidedRepresentation(*virtualTooth);
 
-		if (mostCollidedObject == nullptr)
+		if (targetRepresentation == nullptr)
 		{
 			continue;
 		}
 
 		// Iterate through the list of collision pairs to find a point of constraint with the deepest contact.
-		std::shared_ptr<SurgSim::Collision::Contact> chosenContact
-			= findDeepestContact(*virtualStaple, mostCollidedObject);
+		std::shared_ptr<SurgSim::Collision::Contact> targetContact
+			= findDeepestContact(*virtualTooth, targetRepresentation);
 
-		if (chosenContact == nullptr)
+		if (targetContact == nullptr)
 		{
 			continue;
 		}
 
-		// Get the physics representation of the mostCollidedObject.
+		// Get the physics representation of the targetRepresentation.
 		// Done by dynamic type casting.
 		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> rigidCollisionRepresentation = 
-			std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(mostCollidedObject);
+			std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(targetRepresentation);
 
 		if (rigidCollisionRepresentation == nullptr)
 		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Failed to attach staple.  Collision only supported with RigidCollisionRepresentation.";
 			continue;
 		}
 
@@ -157,27 +158,27 @@ void StaplerBehavior::update(double dt)
 
 		if (physicsRepresentation == nullptr)
 		{
+			SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
+				<< "Failed to attach staple.  RigidCollisionRepresentation not attached to RigidRepresentationBase.";
 			continue;
 		}
 
 		// Create the staple with no collision representation.
-		if (!stapleElementCreated)
+		if (!stapleAdded)
 		{
 			staple->setHasCollisionRepresentation(false);
 			getScene()->addSceneElement(staple);
-			stapleElementCreated = true;
+			stapleAdded = true;
 		}
 
 		// Create a bilateral constraint between the physicsRepresentation and staple.
 		// First find the points where the constraint is going to be applied.
-		std::shared_ptr<Localization> stapleLocalization;
-		std::shared_ptr<Localization> otherLocalization;
-
-		stapleLocalization =
-			staple->getPhysicsRepresentation()->createLocalization(chosenContact->penetrationPoints.first);
+		std::shared_ptr<Localization> stapleLocalization
+			= staple->getPhysicsRepresentation()->createLocalization(targetContact->penetrationPoints.first);
 		stapleLocalization->setRepresentation(staple->getPhysicsRepresentation());
 
-		otherLocalization = physicsRepresentation->createLocalization(chosenContact->penetrationPoints.second);
+		std::shared_ptr<Localization> otherLocalization
+			= physicsRepresentation->createLocalization(targetContact->penetrationPoints.second);
 		otherLocalization->setRepresentation(physicsRepresentation);
 
 		// Create the Constraint.
@@ -197,7 +198,7 @@ void StaplerBehavior::update(double dt)
 		staple->addComponent(constraintComponent);
 	}
 
-	if (!stapleElementCreated)
+	if (!stapleAdded)
 	{
 		// Create the staple element.
 		getScene()->addSceneElement(staple);
