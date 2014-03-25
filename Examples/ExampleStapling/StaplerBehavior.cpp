@@ -59,139 +59,143 @@ void StaplerBehavior::update(double dt)
 	// Check if the stapler is being pressed.
 	bool button1 = false;
 	dataGroup.booleans().get("button1", &button1);
-	if (button1 && m_buttonPreviouslyPressed)
+
+	bool processButtonPush = button1 && m_buttonPreviouslyPressed;
+	m_buttonPreviouslyPressed = button1;
+
+	if (!processButtonPush)
 	{
-		// Create the staple (not added to the scene right now).
-		std::stringstream elementCount;
-		elementCount << ++m_numElements;
-		
-		std::string stapleName = "stapleId_" + elementCount.str();
-		auto staple = std::make_shared<StapleElement>(stapleName);
-		staple->setPose(m_collisionRepresentation->getPose());
-
-		std::vector<std::shared_ptr<SurgSim::Collision::Representation>> virtualStaples;
-		virtualStaples.push_back(m_collisionRepresentation);
-
-		int toothId = 0;
-		auto virtualStaple = virtualStaples.begin();
-		bool stapleElementCreated = false;
-		for (; virtualStaple != virtualStaples.end(); ++virtualStaple)
-		{
-			// Check if this newly created staple needs to be constrained to any object in the scene.
-			// Check if the vitual staple on the stapler is in contact with anything.
-			if (!(*virtualStaple)->hasCollision())
-			{
-				continue;
-			}
-			// The virtual staple could be in contact with any number of objects in the scene.
-			// Find the object it has most collision pairs with.
-			std::shared_ptr<SurgSim::Collision::Representation> mostCollidedObject = nullptr;
-			std::list<std::shared_ptr<SurgSim::Collision::Contact>> *mostCollidedObjectCollisionPairs = 0;
-			size_t maximumCollisionPairsCount = 0;
-
-			std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
-				std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisionsMap =
-				(*virtualStaple)->getCollisions();
-			for (auto i = std::begin(collisionsMap); i != std::end(collisionsMap); ++i)
-			{
-				if ((*i).second.size() > maximumCollisionPairsCount)
-				{
-					maximumCollisionPairsCount = (*i).second.size();
-					mostCollidedObject = (*i).first;
-					mostCollidedObjectCollisionPairs = &((*i).second);
-				}
-			}
-
-			if (mostCollidedObject == nullptr)
-			{
-				continue;
-			}
-
-			// This object, mostCollidedObject, now needs to be 
-			// Iterate through the list of collision pairs to find a point of constraint.
-			double maximumDepth = std::numeric_limits<double>::min();
-			std::shared_ptr<SurgSim::Collision::Contact> chosenContact = nullptr;
-			for (auto contact = (*mostCollidedObjectCollisionPairs).begin();
-					contact != (*mostCollidedObjectCollisionPairs).end(); ++contact)
-			{
-				if ((*contact)->depth > maximumDepth)
-				{
-					maximumDepth = (*contact)->depth;
-					chosenContact = (*contact);
-				}
-			}
-
-			// Create a constraint at the chosenContact.
-			if (chosenContact == nullptr)
-			{
-				continue;
-			}
-
-			// Create the staple with no collision representation.
-			if (!stapleElementCreated)
-			{
-				staple->setHasCollisionRepresentation(false);
-				getScene()->addSceneElement(staple);
-				stapleElementCreated = true;
-			}
-
-			// Get the physics representation of the mostCollidedObject.
-			// Done by dynamic type casting.
-			std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> rigidCollisionRepresentation = 
-				std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(mostCollidedObject);
-
-			if (rigidCollisionRepresentation == nullptr)
-			{
-				continue;
-			}
-
-			std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> physicsRepresentation =
-				rigidCollisionRepresentation->getRigidRepresentation();
-
-			if (physicsRepresentation == nullptr)
-			{
-				continue;
-			}
-			
-			// Create a bilateral constraint between the physicsRepresentation and staple.
-			// First find the points where the constraint is going to be applied.
-			std::shared_ptr<Localization> stapleLocalization;
-			std::shared_ptr<Localization> otherLocalization;
-
-			stapleLocalization =
-				staple->getPhysicsRepresentation()->createLocalization(chosenContact->penetrationPoints.first);
-			stapleLocalization->setRepresentation(staple->getPhysicsRepresentation());
-
-			otherLocalization = physicsRepresentation->createLocalization(chosenContact->penetrationPoints.second);
-			otherLocalization->setRepresentation(physicsRepresentation);
-
-			// Create the Constraint.
-			std::shared_ptr<SurgSim::Physics::Constraint> constraint =
-				std::make_shared<SurgSim::Physics::Constraint>(
-					std::make_shared<SurgSim::Physics::ConstraintData>(),
-					std::make_shared<RigidRepresentationBilateral3D>(),
-					stapleLocalization,
-					std::make_shared<RigidRepresentationBilateral3D>(),
-					otherLocalization);
-
-			std::stringstream toothIdString;
-			toothIdString << toothId;
-			std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
-				std::make_shared<SurgSim::Physics::ConstraintComponent>(
-					stapleName + "_bilateral_constraint_" + toothIdString.str());
-
-			constraintComponent->setConstraint(constraint);
-			staple->addComponent(constraintComponent);
-		}
-
-		if (!stapleElementCreated)
-		{
-			// Create the staple element.
-			getScene()->addSceneElement(staple);
-		}
+		return;
 	}
 
-	m_buttonPreviouslyPressed = button1;
+	// Create the staple (not added to the scene right now).
+	std::stringstream elementCount;
+	elementCount << ++m_numElements;
+
+	std::string stapleName = "stapleId_" + elementCount.str();
+	auto staple = std::make_shared<StapleElement>(stapleName);
+	staple->setPose(m_collisionRepresentation->getPose());
+
+	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> virtualStaples;
+	virtualStaples.push_back(m_collisionRepresentation);
+
+	int toothId = 0;
+	auto virtualStaple = virtualStaples.begin();
+	bool stapleElementCreated = false;
+	for (; virtualStaple != virtualStaples.end(); ++virtualStaple)
+	{
+		// Check if this newly created staple needs to be constrained to any object in the scene.
+		// Check if the vitual staple on the stapler is in contact with anything.
+		if (!(*virtualStaple)->hasCollision())
+		{
+			continue;
+		}
+		// The virtual staple could be in contact with any number of objects in the scene.
+		// Find the object it has most collision pairs with.
+		std::shared_ptr<SurgSim::Collision::Representation> mostCollidedObject = nullptr;
+		std::list<std::shared_ptr<SurgSim::Collision::Contact>> *mostCollidedObjectCollisionPairs = 0;
+		size_t maximumCollisionPairsCount = 0;
+
+		std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
+			std::list<std::shared_ptr<SurgSim::Collision::Contact>>> collisionsMap =
+			(*virtualStaple)->getCollisions();
+		for (auto i = std::begin(collisionsMap); i != std::end(collisionsMap); ++i)
+		{
+			if ((*i).second.size() > maximumCollisionPairsCount)
+			{
+				maximumCollisionPairsCount = (*i).second.size();
+				mostCollidedObject = (*i).first;
+				mostCollidedObjectCollisionPairs = &((*i).second);
+			}
+		}
+
+		if (mostCollidedObject == nullptr)
+		{
+			continue;
+		}
+
+		// This object, mostCollidedObject, now needs to be 
+		// Iterate through the list of collision pairs to find a point of constraint.
+		double maximumDepth = std::numeric_limits<double>::min();
+		std::shared_ptr<SurgSim::Collision::Contact> chosenContact = nullptr;
+		for (auto contact = (*mostCollidedObjectCollisionPairs).begin();
+				contact != (*mostCollidedObjectCollisionPairs).end(); ++contact)
+		{
+			if ((*contact)->depth > maximumDepth)
+			{
+				maximumDepth = (*contact)->depth;
+				chosenContact = (*contact);
+			}
+		}
+
+		// Create a constraint at the chosenContact.
+		if (chosenContact == nullptr)
+		{
+			continue;
+		}
+
+		// Create the staple with no collision representation.
+		if (!stapleElementCreated)
+		{
+			staple->setHasCollisionRepresentation(false);
+			getScene()->addSceneElement(staple);
+			stapleElementCreated = true;
+		}
+
+		// Get the physics representation of the mostCollidedObject.
+		// Done by dynamic type casting.
+		std::shared_ptr<SurgSim::Physics::RigidCollisionRepresentation> rigidCollisionRepresentation = 
+			std::dynamic_pointer_cast<SurgSim::Physics::RigidCollisionRepresentation>(mostCollidedObject);
+
+		if (rigidCollisionRepresentation == nullptr)
+		{
+			continue;
+		}
+
+		std::shared_ptr<SurgSim::Physics::RigidRepresentationBase> physicsRepresentation =
+			rigidCollisionRepresentation->getRigidRepresentation();
+
+		if (physicsRepresentation == nullptr)
+		{
+			continue;
+		}
+
+		// Create a bilateral constraint between the physicsRepresentation and staple.
+		// First find the points where the constraint is going to be applied.
+		std::shared_ptr<Localization> stapleLocalization;
+		std::shared_ptr<Localization> otherLocalization;
+
+		stapleLocalization =
+			staple->getPhysicsRepresentation()->createLocalization(chosenContact->penetrationPoints.first);
+		stapleLocalization->setRepresentation(staple->getPhysicsRepresentation());
+
+		otherLocalization = physicsRepresentation->createLocalization(chosenContact->penetrationPoints.second);
+		otherLocalization->setRepresentation(physicsRepresentation);
+
+		// Create the Constraint.
+		std::shared_ptr<SurgSim::Physics::Constraint> constraint =
+			std::make_shared<SurgSim::Physics::Constraint>(
+				std::make_shared<SurgSim::Physics::ConstraintData>(),
+				std::make_shared<RigidRepresentationBilateral3D>(),
+				stapleLocalization,
+				std::make_shared<RigidRepresentationBilateral3D>(),
+				otherLocalization);
+
+		std::stringstream toothIdString;
+		toothIdString << toothId;
+		std::shared_ptr<SurgSim::Physics::ConstraintComponent> constraintComponent =
+			std::make_shared<SurgSim::Physics::ConstraintComponent>(
+				stapleName + "_bilateral_constraint_" + toothIdString.str());
+
+		constraintComponent->setConstraint(constraint);
+		staple->addComponent(constraintComponent);
+	}
+
+	if (!stapleElementCreated)
+	{
+		// Create the staple element.
+		getScene()->addSceneElement(staple);
+	}
 }
 
 int StaplerBehavior::getTargetManagerType() const
