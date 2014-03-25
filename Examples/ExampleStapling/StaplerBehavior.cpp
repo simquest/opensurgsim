@@ -51,6 +51,13 @@ void StaplerBehavior::setCollisionRepresentation(
 	m_collisionRepresentation = staplerRepresentation;
 }
 
+void StaplerBehavior::setVirtualStaple(std::shared_ptr<SurgSim::Collision::Representation> virtualTooth1,
+									   std::shared_ptr<SurgSim::Collision::Representation> virtualTooth2)
+{
+	m_virtualTeeth[0] = virtualTooth1;
+	m_virtualTeeth[1] = virtualTooth2;
+}
+
 static std::shared_ptr<SurgSim::Collision::Representation> findMostCollidedRepresentation(
 	const std::shared_ptr<SurgSim::Collision::Representation>& object)
 {
@@ -115,13 +122,15 @@ void StaplerBehavior::update(double dt)
 	auto staple = std::make_shared<StapleElement>(stapleName);
 	staple->setPose(m_collisionRepresentation->getPose());
 
-	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> virtualTeeth;
-	virtualTeeth.push_back(m_collisionRepresentation);
-
 	int toothId = 0;
 	bool stapleAdded = false;
-	for (auto virtualTooth = virtualTeeth.begin(); virtualTooth != virtualTeeth.end(); ++virtualTooth)
+	for (auto virtualTooth = m_virtualTeeth.begin(); virtualTooth != m_virtualTeeth.end(); ++virtualTooth)
 	{
+		if (*virtualTooth == nullptr)
+		{
+			continue;
+		}
+
 		// The virtual tooth could be in contact with any number of objects in the scene.
 		// Find the object it has most collision pairs with.
 		std::shared_ptr<SurgSim::Collision::Representation> targetRepresentation

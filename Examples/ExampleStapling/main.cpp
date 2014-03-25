@@ -298,12 +298,14 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	virtualTeethShapes.push_back(std::make_shared<MeshShape>(*loadMesh("Data/Geometry/virtual_staple_2.ply")));
 
 	int i = 0;
+	std::array<std::shared_ptr<ShapeCollisionRepresentation>, 2> virtualTeeth;
 	for (auto it = virtualTeethShapes.begin(); it != virtualTeethShapes.end(); ++it)
 	{
 		std::shared_ptr<ShapeCollisionRepresentation> virtualToothCollision
 			= std::make_shared<SurgSim::Collision::ShapeCollisionRepresentation>(
 				"VirtualToothCollision" + boost::to_string(i), *it, RigidTransform3d::Identity());
 
+		virtualTeeth[i] = virtualToothCollision;
 		sceneElement->addComponent(virtualToothCollision);
 		recievesPhysicsPose.push_back(virtualToothCollision);
 
@@ -318,6 +320,8 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 
 		i++;
 	}
+
+	staplerBehavior->setVirtualStaple(virtualTeeth[0], virtualTeeth[1]);
 
 	for (auto it = recievesPhysicsPose.begin(); it != recievesPhysicsPose.end(); ++it)
 	{

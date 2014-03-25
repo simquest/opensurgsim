@@ -16,6 +16,7 @@
 #ifndef EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 #define EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
 
+#include <array>
 #include <memory>
 #include <string>
 
@@ -67,6 +68,12 @@ public:
 	/// \return An integer indicating which manger should be responsible for this behavior.
 	virtual int getTargetManagerType() const override;
 
+	/// Sets the virtual teeth for the virtual staple
+	/// \param virtualTooth1 collision representation for the virtual staple tooth
+	/// \param virtualTooth2 collision representation for the virtual staple tooth
+	void setVirtualStaple(std::shared_ptr<SurgSim::Collision::Representation> virtualTooth1,
+						  std::shared_ptr<SurgSim::Collision::Representation> virtualTooth2);
+
 protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
@@ -90,6 +97,9 @@ private:
 
 	/// Used to record if a button was previously pressed
 	bool m_buttonPreviouslyPressed;
+
+	/// Contains the teeth for detecting collisions
+	std::array<std::shared_ptr<SurgSim::Collision::Representation>, 2> m_virtualTeeth;
 };
 
 #endif  // EXAMPLES_EXAMPLESTAPLING_STAPLERBEHAVIOR_H
