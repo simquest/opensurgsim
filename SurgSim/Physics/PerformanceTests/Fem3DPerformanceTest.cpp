@@ -35,37 +35,6 @@ static const double dt = 0.001;
 static const int frameCount = 100;
 }
 
-static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
-	const std::string& fileName,
-	SurgSim::Math::IntegrationScheme integrationScheme,
-	double massDensity,
-	double poissonRatio,
-	double youngModulus)
-{
-	// The PlyReader and Fem3DRepresentationPlyReaderDelegate work together to load 3d fems.
-	SurgSim::DataStructures::PlyReader reader(fileName);
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate> fem3dDelegate
-		= std::make_shared<SurgSim::Physics::Fem3DRepresentationPlyReaderDelegate>();
-
-	SURGSIM_ASSERT(reader.setDelegate(fem3dDelegate)) << "The input file " << fileName << " is malformed.";
-	reader.parseFile();
-
-	std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> fem = fem3dDelegate->getFem();
-
-	// The FEM requires the implicit Euler integration scheme to avoid "blowing up"
-	fem->setIntegrationScheme(integrationScheme);
-
-	// Physical parameters must be set for the finite elements in order to be valid for the simulation.
-	for (size_t i = 0; i < fem->getNumFemElements(); i++)
-	{
-		fem->getFemElement(i)->setMassDensity(massDensity);
-		fem->getFemElement(i)->setPoissonRatio(poissonRatio);
-		fem->getFemElement(i)->setYoungModulus(youngModulus);
-	}
-
-	return fem;
-}
-
 namespace SurgSim
 {
 namespace Physics
@@ -247,11 +216,9 @@ protected:
 
 TEST_F(Fem3DPerformanceTest, WoundTest)
 {
-	auto fem = loadFem("Data/Fem3DPerformanceTest/wound_deformable.ply",
-					   SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER,
-					   1000.0,
-					   0.45,
-					   75e3);
+	auto fem = std::make_shared<SurgSim::Physics::Fem3DRepresentation>("wound");
+	fem->setFilename("Data/Fem3DPerformanceTest/wound_deformable.ply");
+	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
 	performTimingTest();
