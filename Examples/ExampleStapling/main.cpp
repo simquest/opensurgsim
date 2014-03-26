@@ -252,10 +252,6 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<VirtualToolCoupler> inputVTC = std::make_shared<VirtualToolCoupler>("VTC");
 	inputVTC->setInput(inputComponent);
 	inputVTC->setRepresentation(physicsRepresentation);
-	inputVTC->setAngularDamping(params.getMass() * 25e-2);
-	inputVTC->setAngularStiffness(params.getMass() * 10.0);
-	inputVTC->setLinearDamping(params.getMass() * 25);
-	inputVTC->setLinearStiffness(params.getMass() * 800.0);
 
 	// A stapler behavior controls the release of stale when a button is pushed on the device.
 	// Also, it is aware of collisions of the stapler.

@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/DataStructures/OptionalValue.h"
 #include "SurgSim/Framework/Behavior.h"
 
 namespace SurgSim
@@ -111,16 +112,16 @@ private:
 	std::string m_poseName;
 
 	/// Vtc stiffness parameter in linear mode (in N·m-1)
-	double m_linearStiffness;
+	SurgSim::DataStructures::OptionalValue<double> m_linearStiffness;
 
 	/// Vtc damping parameter in linear mode (in N·s·m-1 or Kg·s-1)
-	double m_linearDamping;
+	SurgSim::DataStructures::OptionalValue<double> m_linearDamping;
 
 	/// Vtc stiffness parameter in angular mode (in N·m rad-1)
-	double m_angularStiffness;
+	SurgSim::DataStructures::OptionalValue<double> m_angularStiffness;
 
 	/// Vtc damping parameter in angular mode (in N·m·s·rad-1)
-	double m_angularDamping;
+	SurgSim::DataStructures::OptionalValue<double> m_angularDamping;
 
 	/// Scaling factor for the forces sent to the OutputComponent
 	double m_outputForceScaling;

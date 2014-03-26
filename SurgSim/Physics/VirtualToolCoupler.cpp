@@ -40,10 +40,6 @@ namespace Physics
 VirtualToolCoupler::VirtualToolCoupler(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
 	m_poseName("pose"),
-	m_linearStiffness(0.0),
-	m_linearDamping(0.0),
-	m_angularStiffness(0.0),
-	m_angularDamping(0.0),
 	m_outputForceScaling(1.0),
 	m_outputTorqueScaling(1.0)
 {
@@ -100,19 +96,19 @@ void VirtualToolCoupler::update(double dt)
 		RigidRepresentationState objectState(m_rigid->getCurrentState());
 		RigidTransform3d objectPose(objectState.getPose());
 
-		Vector3d force = m_linearStiffness * (inputPose.translation() - objectPose.translation());
-		force += m_linearDamping * (inputLinearVelocity - objectState.getLinearVelocity());
+		Vector3d force = m_linearStiffness.getValue() * (inputPose.translation() - objectPose.translation());
+		force += m_linearDamping.getValue() * (inputLinearVelocity - objectState.getLinearVelocity());
 
 		Vector3d rotationVector;
 		SurgSim::Math::computeRotationVector(inputPose, objectPose, &rotationVector);
-		Vector3d torque = m_angularStiffness * rotationVector;
-		torque += m_angularDamping * (inputAngularVelocity - objectState.getAngularVelocity());
+		Vector3d torque = m_angularStiffness.getValue() * rotationVector;
+		torque += m_angularDamping.getValue() * (inputAngularVelocity - objectState.getAngularVelocity());
 
 		const Matrix33d identity3x3 = Matrix33d::Identity();
-		const Matrix33d linearStiffnessMatrix = m_linearStiffness * identity3x3;
-		const Matrix33d linearDampingMatrix = m_linearDamping * identity3x3;
-		const Matrix33d angularStiffnessMatrix = m_angularStiffness * identity3x3;
-		const Matrix33d angularDampingMatrix = m_angularDamping * identity3x3;
+		const Matrix33d linearStiffnessMatrix = m_linearStiffness.getValue() * identity3x3;
+		const Matrix33d linearDampingMatrix = m_linearDamping.getValue() * identity3x3;
+		const Matrix33d angularStiffnessMatrix = m_angularStiffness.getValue() * identity3x3;
+		const Matrix33d angularDampingMatrix = m_angularDamping.getValue() * identity3x3;
 		m_rigid->addExternalForce(force, linearStiffnessMatrix, linearDampingMatrix);
 		m_rigid->addExternalTorque(torque, angularStiffnessMatrix, angularDampingMatrix);
 
@@ -163,6 +159,27 @@ bool VirtualToolCoupler::doWakeUp()
 			getName() << " does not have a Representation.";
 		return false;
 	}
+
+	//Provide sensible defaults based on the rigid representation
+	double mass = m_rigid->getInitialParameters().getMass();
+	const Matrix33d& inertia = m_rigid->getInitialParameters().getLocalInertia();
+	if (! m_linearStiffness.hasValue())
+	{
+		m_linearStiffness.setValue(mass * 1000.0);
+	}
+	if (! m_linearDamping.hasValue())
+	{
+		m_linearDamping.setValue(mass * 25.0);
+	}
+	if (! m_angularStiffness.hasValue())
+	{
+		m_angularStiffness.setValue(inertia.trace() * 250.0);
+	}
+	if (! m_angularDamping.hasValue())
+	{
+		m_angularDamping.setValue(inertia.trace() * 10.0);
+	}
+
 	return true;
 }
 
@@ -173,22 +190,22 @@ int VirtualToolCoupler::getTargetManagerType() const
 
 void VirtualToolCoupler::setLinearStiffness(double linearStiffness)
 {
-	m_linearStiffness = linearStiffness;
+	m_linearStiffness.setValue(linearStiffness);
 }
 
 void VirtualToolCoupler::setLinearDamping(double linearDamping)
 {
-	m_linearDamping = linearDamping;
+	m_linearDamping.setValue(linearDamping);
 }
 
 void VirtualToolCoupler::setAngularStiffness(double angularStiffness)
 {
-	m_angularStiffness = angularStiffness;
+	m_angularStiffness.setValue(angularStiffness);
 }
 
 void VirtualToolCoupler::setAngularDamping(double angularDamping)
 {
-	m_angularDamping = angularDamping;
+	m_angularDamping.setValue(angularDamping);
 }
 
 void VirtualToolCoupler::setOutputForceScaling(double forceScaling)
