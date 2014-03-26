@@ -141,5 +141,27 @@ TEST_F(ContactConstraintGenerationTests, CountTest)
 	ASSERT_EQ(3u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
 }
+
+TEST_F(ContactConstraintGenerationTests, InactivePhysics)
+{
+	rigid0->setIsActive(false);
+
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
+	// Test case setup, create a pair with a contact and set up the physics state with it
+	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+
+	contactCalculation.calculateContact(pair);
+	ASSERT_TRUE(pair->hasContacts());
+
+	pairs.push_back(pair);
+
+	state->setCollisionPairs(pairs);
+
+	ContactConstraintGeneration generator;
+	generator.update(0.1,state);
+
+	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+}
+
 }; // namespace Physics
 }; // namespace SurgSim
