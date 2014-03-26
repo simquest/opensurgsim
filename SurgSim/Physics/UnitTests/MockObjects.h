@@ -24,7 +24,6 @@
 #include "SurgSim/Physics/FemElement.h"
 #include "SurgSim/Physics/FemRepresentation.h"
 #include "SurgSim/Physics/Localization.h"
-#include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/Representation.h"
 
 using SurgSim::Math::Matrix;
@@ -323,35 +322,6 @@ inline std::shared_ptr<Constraint> makeMockConstraint(std::shared_ptr<MockRepres
 										std::make_shared<MockConstraintImplementation>(),
 										std::make_shared<MockLocalization>(secondRepresentation));
 }
-
-class MockPhysicsManager : public SurgSim::Physics::PhysicsManager
-{
-public:
-	virtual bool executeAdditions(const std::shared_ptr<SurgSim::Framework::Component>& component) override
-	{
-		return SurgSim::Physics::PhysicsManager::executeAdditions(component);
-	}
-
-	virtual bool executeRemovals(const std::shared_ptr<SurgSim::Framework::Component>& component) override
-	{
-		return SurgSim::Physics::PhysicsManager::executeRemovals(component);
-	}
-
-	virtual bool doInitialize() override
-	{
-		return SurgSim::Physics::PhysicsManager::doInitialize();
-	}
-
-	virtual bool doStartUp() override
-	{
-		return SurgSim::Physics::PhysicsManager::doStartUp();
-	}
-
-	virtual bool doUpdate(double dt)
-	{
-		return SurgSim::Physics::PhysicsManager::doUpdate(dt);
-	}
-};
 
 }; // Physics
 }; // SurgSim

@@ -25,7 +25,7 @@
 #include "SurgSim/Physics/Fem3DRepresentation.h"
 #include "SurgSim/Physics/Fem3DRepresentationPlyReaderDelegate.h"
 #include "SurgSim/Physics/FemElement3DCube.h"
-#include "SurgSim/Physics/UnitTests/MockObjects.h"
+#include "SurgSim/Testing/PhysicsManager.h"
 
 using SurgSim::Math::Vector3d;
 
@@ -212,7 +212,7 @@ class Fem3DPerformanceTest : public ::testing::Test
 public:
 	virtual void SetUp()
 	{
-		m_physicsManager = std::make_shared<MockPhysicsManager>();
+		m_physicsManager = std::make_shared<SurgSim::Testing::PhysicsManager>();
 
 		m_physicsManager->doInitialize();
 		m_physicsManager->doStartUp();
@@ -242,7 +242,7 @@ public:
 	}
 
 protected:
-	std::shared_ptr<MockPhysicsManager> m_physicsManager;
+	std::shared_ptr<SurgSim::Testing::PhysicsManager> m_physicsManager;
 };
 
 TEST_F(Fem3DPerformanceTest, WoundTest)
