@@ -390,15 +390,15 @@ int main(int argc, char* argv[])
 	std::string woundFilename = runtime->getApplicationData()->findFile("Geometry/wound_deformable.ply");
 	// Mechanical properties are based on Liang and Boppart, "Biomechanical Properties of In Vivo Human Skin From
 	// Dynamic Optical Coherence Elastography", IEEE Transactions on Biomedical Engineering, Vol 57, No 4.
-	//scene->addSceneElement(
-	//	createFemSceneElement("wound",
-	//						  woundFilename,
-	//						  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
-	//						  1000.0,										   // Mass Density
-	//						  0.45,											   // Poisson Ratio
-	//						  75e3,											   // Young Modulus
-	//						  true,											   // Display point cloud
-	//						  armPose));									   // Pose of wound on arm
+	std::shared_ptr<SceneElement> woundSceneElement =
+		createFemSceneElement("wound",
+							  woundFilename,
+							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
+							  1000.0,										   // Mass Density
+							  0.45,											   // Poisson Ratio
+							  75e3,											   // Young Modulus
+							  true,											   // Display point cloud
+							  armPose);									   // Pose of wound on arm
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
@@ -428,6 +428,7 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(view);
 	scene->addSceneElement(armSceneElement);
 	scene->addSceneElement(staplerSceneElement);
+	scene->addSceneElement(woundSceneElement);
 	scene->addSceneElement(sceneElement);
 
 	runtime->execute();
