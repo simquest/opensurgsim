@@ -79,7 +79,7 @@ public:
 	/// Constructor
 	/// \param name	The name of the truth cube representation.
 	/// \param corners The 8 corners of the truth cube
-	TruthCubeRepresentation(const std::string& name, int nodesPerAxis)
+	TruthCubeRepresentation(const std::string& name, unsigned int nodesPerAxis)
 		: Fem3DRepresentation(name), m_numNodesPerAxis(nodesPerAxis)
 	{
 		// Compute the center point of the cube
@@ -103,14 +103,13 @@ public:
 		fillUpDeformableState(initialState);
 		setInitialState(initialState);
 		addFemCubes(initialState);
-		defineBoundaryCondition(0.0);
 	}
 
 protected:
 	/// Convert an node index from a 3d indexing to a 1d indexing
 	/// \param i, j, k Indices along the X, Y and Z axis
 	/// \return Unique index of the corresponding point (to access a linear array for example)
-	size_t get1DIndexFrom3D(size_t i, size_t j, size_t k)
+	unsigned int get1DIndexFrom3D(unsigned int i, unsigned int j, unsigned int k)
 	{
 		return m_numNodesPerAxis * m_numNodesPerAxis * i + m_numNodesPerAxis * j + k;
 	}
@@ -123,7 +122,7 @@ protected:
 		state->setNumDof(getNumDofPerNode(), m_numNodesPerAxis * m_numNodesPerAxis * m_numNodesPerAxis);
 		SurgSim::Math::Vector& nodePositions = state->getPositions();
 
-		for (int i = 0; i < m_numNodesPerAxis; i++)
+		for (unsigned int i = 0; i < m_numNodesPerAxis; i++)
 		{
 			// For a given index i, we intersect the cube with a (Y Z) plane, which defines a square on a (Y Z) plane
 			Vector3d extremitiesX0[4] = {m_cubeNodes[0], m_cubeNodes[2], m_cubeNodes[4], m_cubeNodes[6]};
@@ -138,7 +137,7 @@ protected:
 					extremitiesX1[index] *        coefI;
 			}
 
-			for (int j = 0; j < m_numNodesPerAxis; j++)
+			for (unsigned int j = 0; j < m_numNodesPerAxis; j++)
 			{
 				// For a given index j, we intersect the square with a (X Z) plane, which defines a line along (Z)
 				Vector3d extremitiesY0[2] = {extremitiesXi[0], extremitiesXi[2]};
@@ -153,7 +152,7 @@ protected:
 						extremitiesY1[index] *        coefJ;
 				}
 
-				for (int k = 0; k < m_numNodesPerAxis; k++)
+				for (unsigned int k = 0; k < m_numNodesPerAxis; k++)
 				{
 					// For a given index k, we intersect the line with a (X Y) plane, which defines a 3d point
 					double coefK = static_cast<double>(k) / (static_cast<double>(m_numNodesPerAxis) - 1.0);
@@ -164,48 +163,17 @@ protected:
 		}
 	}
 
-	/// Defines the boundary conditions for the truth cube
-	/// \param displacementForTopLayer	The displacement of the boundary conditions for the top layer
-	/// \note The bottom layer is completely fixed (all nodes, all dof)
-	/// \note The top layer is completely fixed and compressed along Y
-	void defineBoundaryCondition(double displacementForTopLayer)
-	{
-		for (int i = 0; i < m_numNodesPerAxis; i++)
-		{
-			for (int k = 0; k < m_numNodesPerAxis; k++)
-			{
-				// Add boundary condition for bottom layer (j = 0)
-				int nodeId = get1DIndexFrom3D(i, 0, k);
-				m_boundaryConditions.push_back(nodeId * 3 + 0);
-				m_boundaryConditions.push_back(nodeId * 3 + 1);
-				m_boundaryConditions.push_back(nodeId * 3 + 2);
-				m_boundaryConditionsDisplacement.push_back(0.0);
-				m_boundaryConditionsDisplacement.push_back(0.0);
-				m_boundaryConditionsDisplacement.push_back(0.0);
-
-				// Add boundary condition for top layer (j = m_numNodesPerAxis - 1)
-				nodeId = get1DIndexFrom3D(i, m_numNodesPerAxis - 1, k);
-				m_boundaryConditions.push_back(nodeId * 3 + 0);
-				m_boundaryConditions.push_back(nodeId * 3 + 1);
-				m_boundaryConditions.push_back(nodeId * 3 + 2);
-				m_boundaryConditionsDisplacement.push_back(0.0);
-				m_boundaryConditionsDisplacement.push_back(displacementForTopLayer);
-				m_boundaryConditionsDisplacement.push_back(0.0);
-			}
-		}
-	}
-
 	/// Adds the Fem3D elements of small cubes
 	/// \param state	The deformable state for initialization.
 	void addFemCubes(std::shared_ptr<DeformableRepresentationState> state)
 	{
-		for (int i = 0; i < m_numNodesPerAxis - 1; i++)
+		for (unsigned int i = 0; i < m_numNodesPerAxis - 1; i++)
 		{
-			for (int j = 0; j < m_numNodesPerAxis - 1; j++)
+			for (unsigned int j = 0; j < m_numNodesPerAxis - 1; j++)
 			{
-				for (int k = 0; k < m_numNodesPerAxis - 1; k++)
+				for (unsigned int k = 0; k < m_numNodesPerAxis - 1; k++)
 				{
-					std::array<int, 8> cubeNodeIds;
+					std::array<unsigned int, 8> cubeNodeIds;
 					cubeNodeIds[0] = get1DIndexFrom3D(i  , j  , k  );
 					cubeNodeIds[1] = get1DIndexFrom3D(i+1, j  , k  );
 					cubeNodeIds[2] = get1DIndexFrom3D(i  , j+1, k  );
@@ -233,13 +201,7 @@ protected:
 
 private:
 	// Number of point per dimensions
-	int m_numNodesPerAxis;
-
-	/// Boundary condition (list of degrees of freedom to be fixed)
-	std::vector<size_t> m_boundaryConditions;
-
-	/// Boundary condition displacement (displacement to apply for each boundary condition)
-	std::vector<double> m_boundaryConditionsDisplacement;
+	unsigned int m_numNodesPerAxis;
 
 	// Nodes of the original truth cube
 	std::array<SurgSim::Math::Vector3d, 8> m_cubeNodes;
