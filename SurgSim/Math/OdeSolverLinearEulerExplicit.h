@@ -24,6 +24,9 @@ namespace SurgSim
 namespace Math
 {
 
+/// Linear Version of the Euler Explicit ode solver
+/// This solver assumes that the system is linear, ie that that Mass,
+/// Damping, and Stiffness matrices do not change.
 template <class State, class MT, class DT, class KT, class ST>
 class LinearExplicitEuler : public ExplicitEuler<State, MT, DT, KT, ST>
 {
