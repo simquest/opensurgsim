@@ -75,9 +75,6 @@ private:
 	/// A mapping between key and the graphical representation(s) it controls.
 	std::unordered_map<SurgSim::Device::KeyCode,
 					   std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
-
-	/// Total time from the last key pressed
-	double m_totalTime;
 };
 
 #include "Examples/ExampleStapling/KeyboardBehavior-inl.h"

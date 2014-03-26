@@ -216,8 +216,8 @@ namespace{
 }
 
 KeyboardBehavior::KeyboardBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name),
-	m_totalTime(0.0)
+	SurgSim::Framework::Behavior(name)
+	//m_totalTime(0.0)
 {
 }
 
@@ -231,22 +231,22 @@ void KeyboardBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputCo
 // set to visible/invisible even with one key press.
 void KeyboardBehavior::update(double dt)
 {
+	static bool keyPressed = false;
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
 
 	int key;
-	m_totalTime += dt;
 	if(dataGroup.integers().get("key", &key))
 	{
 		auto match = m_keyRegister.find(keyMap[key]);
-		if (match != m_keyRegister.end() && m_totalTime > 0.3)
+		if (match != m_keyRegister.end() && !keyPressed)
 		{
 			for(auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
 				(*it)->setVisible(!(*it)->isVisible());
 			};
-			m_totalTime = 0;
 		}
+		keyPressed = (SurgSim::Device::KeyCode::NONE == key) ? false : true;
 	}
 }
 
