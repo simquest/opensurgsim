@@ -32,9 +32,7 @@ using SurgSim::Math::Vector3d;
 namespace
 {
 static const double dt = 0.001;
-static const double timeoutHz = 20;
 static const int frameCount = 100;
-static const double timeoutDuration = static_cast<double>(frameCount) / timeoutHz;
 }
 
 static std::shared_ptr<SurgSim::Physics::Fem3DRepresentation> loadFem(
@@ -232,13 +230,8 @@ public:
 			timer.beginFrame();
 			m_physicsManager->doUpdate(dt);
 			timer.endFrame();
-
-			RecordProperty("FrameRate", boost::to_string(timer.getAverageFrameRate()));
-			if (timer.getCumulativeTime() > timeoutDuration)
-			{
-				return;
-			}
 		}
+		RecordProperty("FrameRate", boost::to_string(timer.getAverageFrameRate()));
 	}
 
 protected:
