@@ -16,16 +16,12 @@
 #ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
 #define EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
 
+#include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 
 namespace SurgSim
 {
-
-namespace Device
-{
-enum KeyCode;
-}
 
 namespace Input
 {
@@ -73,8 +69,7 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
 
 	/// A mapping between key and the graphical representation(s) it controls.
-	std::unordered_map<SurgSim::Device::KeyCode,
-					   std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
+	std::unordered_map<int, std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
 };
 
 #include "Examples/ExampleStapling/KeyboardBehavior-inl.h"

@@ -19,7 +19,7 @@
 template<class T>
 void KeyboardBehavior::registerKey(SurgSim::Device::KeyCode key, const std::vector<std::shared_ptr<T>>& graphics)
 {
-	auto match = m_keyRegister.find(key);
+	auto match = m_keyRegister.find(static_cast<int>(key));
 	if (match != m_keyRegister.end())
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger())
@@ -27,10 +27,11 @@ void KeyboardBehavior::registerKey(SurgSim::Device::KeyCode key, const std::vect
 	}
 	else
 	{
-		m_keyRegister[key].reserve(graphics.size());
+		m_keyRegister[static_cast<int>(key)].reserve(graphics.size());
 		for (auto it = std::begin(graphics); it != std::end(graphics); ++it)
 		{
-			m_keyRegister[key].push_back(std::static_pointer_cast<SurgSim::Graphics::Representation>(*it));
+			m_keyRegister[static_cast<int>(key)].push_back(
+				std::static_pointer_cast<SurgSim::Graphics::Representation>(*it));
 		}
 	}
 }
