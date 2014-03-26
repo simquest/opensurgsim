@@ -73,20 +73,20 @@ namespace SurgSim
 namespace Physics
 {
 
-class TruthCubeRepresentation : public Fem3DRepresentation
+class DivisbleCubeRepresentation : public Fem3DRepresentation
 {
 public:
 	/// Constructor
 	/// \param name	The name of the truth cube representation.
 	/// \param corners The 8 corners of the truth cube
-	TruthCubeRepresentation(const std::string& name, unsigned int nodesPerAxis)
+	DivisbleCubeRepresentation(const std::string& name, unsigned int nodesPerAxis)
 		: Fem3DRepresentation(name), m_numNodesPerAxis(nodesPerAxis)
 	{
 		// Compute the center point of the cube
 		SurgSim::Math::Vector3d center = SurgSim::Math::Vector3d::Zero();
 
 		// Compute the cube's corners for the Fem3d simulation
-		double halfLength = 0.04;
+		double halfLength = static_cast<double>(nodesPerAxis);
 		Vector3d X = Vector3d::UnitX();
 		Vector3d Y = Vector3d::UnitY();
 		Vector3d Z = Vector3d::UnitZ();
@@ -260,7 +260,7 @@ TEST_F(Fem3DPerformanceTest, WoundTest)
 TEST_F(Fem3DPerformanceTest, Cube2Test)
 {
 	static const int numCubes = 2;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -270,7 +270,7 @@ TEST_F(Fem3DPerformanceTest, Cube2Test)
 TEST_F(Fem3DPerformanceTest, Cube3Test)
 {
 	static const int numCubes = 3;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -280,7 +280,7 @@ TEST_F(Fem3DPerformanceTest, Cube3Test)
 TEST_F(Fem3DPerformanceTest, Cube4Test)
 {
 	static const int numCubes = 4;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -290,7 +290,7 @@ TEST_F(Fem3DPerformanceTest, Cube4Test)
 TEST_F(Fem3DPerformanceTest, Cube5Test)
 {
 	static const int numCubes = 5;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -300,7 +300,7 @@ TEST_F(Fem3DPerformanceTest, Cube5Test)
 TEST_F(Fem3DPerformanceTest, Cube6Test)
 {
 	static const int numCubes = 6;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -310,7 +310,7 @@ TEST_F(Fem3DPerformanceTest, Cube6Test)
 TEST_F(Fem3DPerformanceTest, Cube7Test)
 {
 	static const int numCubes = 7;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -320,7 +320,7 @@ TEST_F(Fem3DPerformanceTest, Cube7Test)
 TEST_F(Fem3DPerformanceTest, Cube8Test)
 {
 	static const int numCubes = 8;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
@@ -330,7 +330,7 @@ TEST_F(Fem3DPerformanceTest, Cube8Test)
 TEST_F(Fem3DPerformanceTest, Cube9Test)
 {
 	static const int numCubes = 9;
-	auto fem = std::make_shared<TruthCubeRepresentation>("truthCube", numCubes);
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
 	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
 
 	initializeRepresentation(fem);
