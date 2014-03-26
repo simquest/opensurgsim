@@ -337,5 +337,35 @@ TEST_F(Fem3DPerformanceTest, Cube9Test)
 	performTimingTest();
 }
 
+TEST_F(Fem3DPerformanceTest, Cube10Test)
+{
+	static const int numCubes = 10;
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
+	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+
+	initializeRepresentation(fem);
+	performTimingTest();
+}
+
+TEST_F(Fem3DPerformanceTest, Cube11Test)
+{
+	static const int numCubes = 11;
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
+	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+
+	initializeRepresentation(fem);
+	performTimingTest();
+}
+
+TEST_F(Fem3DPerformanceTest, Cube12Test)
+{
+	static const int numCubes = 12;
+	auto fem = std::make_shared<DivisbleCubeRepresentation>("cube", numCubes);
+	fem->setIntegrationScheme(SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER);
+
+	initializeRepresentation(fem);
+	performTimingTest();
+}
+
 } // namespace Physics
 } // namespace SurgSim
