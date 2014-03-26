@@ -31,7 +31,7 @@ namespace SurgSim
 namespace Math
 {
 
-template<T>
+template<class T>
 void doConstructorTest()
 {
 	MassPoint m;
@@ -53,7 +53,7 @@ TEST(OdeSolverEulerExplicitModified, ConstructorTest)
 	}
 }
 
-template<T>
+template<class T>
 void doSolveTest()
 {
 	{
@@ -84,11 +84,11 @@ void doSolveTest()
 TEST(OdeSolverEulerExplicitModified, SolveTest)
 {
 	{
-		SCOPED_TRACE("EulerExplicitModified with DenseMatrix");
+		SCOPED_TRACE("EulerExplicitModified");
 		doSolveTest<ModifiedExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
 	}
 	{
-		SCOPED_TRACE("LinearEulerExplicitModified with DenseMatrix");
+		SCOPED_TRACE("LinearEulerExplicitModified");
 		doSolveTest<LinearModifiedExplicitEuler<MassPointState, Matrix, Matrix, Matrix, Matrix>>();
 	}
 }
