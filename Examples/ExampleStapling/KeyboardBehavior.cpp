@@ -217,7 +217,6 @@ namespace{
 
 KeyboardBehavior::KeyboardBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
-	//m_totalTime(0.0)
 {
 }
 
