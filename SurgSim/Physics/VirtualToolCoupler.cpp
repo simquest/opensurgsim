@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <Eigen/Eigenvalues> 
+
 #include "SurgSim/DataStructures/DataGroupBuilder.h"
 #include "SurgSim/Framework/LogMacros.h"
 #include "SurgSim/Input/InputComponent.h"
@@ -161,23 +163,41 @@ bool VirtualToolCoupler::doWakeUp()
 	}
 
 	//Provide sensible defaults based on the rigid representation
+	double dampingRatio = 1.0;
+
 	double mass = m_rigid->getInitialParameters().getMass();
-	const Matrix33d& inertia = m_rigid->getInitialParameters().getLocalInertia();
-	if (! m_linearStiffness.hasValue())
-	{
-		m_linearStiffness.setValue(mass * 1000.0);
-	}
 	if (! m_linearDamping.hasValue())
 	{
-		m_linearDamping.setValue(mass * 25.0);
+		if (! m_linearStiffness.hasValue())
+		{
+			m_linearStiffness.setValue(mass * 2000.0);
+		}
+		m_linearDamping.setValue(2.0 * dampingRatio * sqrt(mass * m_linearStiffness.getValue()));
 	}
-	if (! m_angularStiffness.hasValue())
+	else
 	{
-		m_angularStiffness.setValue(inertia.trace() * 250.0);
+		if (! m_linearStiffness.hasValue())
+		{
+			m_linearStiffness.setValue(pow(m_linearDamping.getValue() / dampingRatio, 2) / (4.0 * mass));
+		}
 	}
+
+	const Matrix33d& inertia = m_rigid->getInitialParameters().getLocalInertia();
+	double maxInertia = inertia.eigenvalues().real().maxCoeff();
 	if (! m_angularDamping.hasValue())
 	{
-		m_angularDamping.setValue(inertia.trace() * 10.0);
+		if (! m_angularStiffness.hasValue())
+		{
+			m_angularStiffness.setValue(maxInertia * 1000.0);
+		}
+		m_angularDamping.setValue(2.0 * dampingRatio * sqrt(maxInertia * m_angularStiffness.getValue()));
+	}
+	else
+	{
+		if (! m_angularStiffness.hasValue())
+		{
+			m_angularStiffness.setValue(pow(m_angularDamping.getValue() / dampingRatio, 2) / (4.0 * maxInertia));
+		}
 	}
 
 	return true;
