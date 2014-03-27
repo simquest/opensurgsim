@@ -205,11 +205,12 @@ setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> r
 {
 	if (m_collisionRepresentation != representation)
 	{
-		// If we have an old collision representation clear the dependency
-		if (m_collisionRepresentation != nullptr)
+		// If we have an old collision representation clear the dependency if it was a deformable collision
+		// representation
+		auto oldCollisionRep =
+			std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
 		{
-			auto oldCollisionRep =
-				std::dynamic_pointer_cast<DeformableCollisionRepresentation>(m_collisionRepresentation);
 			oldCollisionRep->setDeformableRepresentation(nullptr);
 		}
 

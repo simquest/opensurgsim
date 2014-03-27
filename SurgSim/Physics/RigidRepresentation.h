@@ -107,7 +107,8 @@ public:
 
 	/// Overridden from SurgSim::Physics::Reprensentation
 	/// Specializes for discarding anything besides a rigid collision representation
-	virtual void setCollisionRepresentation(std::shared_ptr<SurgSim::Collision::Representation> representation);
+	virtual void setCollisionRepresentation(
+		std::shared_ptr<SurgSim::Collision::Representation> representation) override;
 
 protected:
 	/// Inertia matrices in global coordinates

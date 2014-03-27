@@ -179,7 +179,6 @@ static std::shared_ptr<SurgSim::Framework::SceneElement> createFemSceneElement(
 	auto collision = std::make_shared<SurgSim::Physics::DeformableCollisionRepresentation>("collision");
 	collision->setMesh(std::make_shared<SurgSim::DataStructures::TriangleMesh>(*loadMesh(filename)));
 	sceneElement->addComponent(collision);
-	collision->setDeformable(fem);
 	fem->setCollisionRepresentation(collision);
 
 	// The mesh for visualizing the collision mesh

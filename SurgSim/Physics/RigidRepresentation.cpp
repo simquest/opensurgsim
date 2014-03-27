@@ -369,9 +369,9 @@ void RigidRepresentation::setCollisionRepresentation(std::shared_ptr<SurgSim::Co
 	if (m_collisionRepresentation != representation)
 	{
 		// If we have an old collision representation clear the dependency
-		if (m_collisionRepresentation != nullptr)
+		auto oldCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(m_collisionRepresentation);
+		if (oldCollisionRep != nullptr)
 		{
-			auto oldCollisionRep = std::dynamic_pointer_cast<RigidCollisionRepresentation>(m_collisionRepresentation);
 			oldCollisionRep->setRigidRepresentation(nullptr);
 		}
 

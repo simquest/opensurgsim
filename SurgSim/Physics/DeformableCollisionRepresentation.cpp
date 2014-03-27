@@ -60,26 +60,16 @@ std::shared_ptr<SurgSim::DataStructures::TriangleMesh> DeformableCollisionRepres
 void DeformableCollisionRepresentation::update(const double& dt)
 {
 	SURGSIM_ASSERT(!m_deformable.expired()) << "Deformable has expired, cannot update the mesh.";
-
 	auto state = m_deformable.lock()->getCurrentState();
 
 	const size_t numNodes = state->getNumNodes();
 
-	// If initialization is requested and no vertices have been allocated we will do it here
-	if (m_mesh->getNumVertices() == 0 && numNodes != 0)
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == numNodes) << "The number of nodes in the deformable does not match " <<
+			"the number of vertices in the mesh.";
+
+	for (size_t nodeId = 0; nodeId < numNodes; ++nodeId)
 	{
-		for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
-		{
-			SurgSim::DataStructures::TriangleMesh::VertexType v(state->getPosition(nodeId));
-			m_mesh->addVertex(v);
-		}
-	}
-	else if (m_mesh->getNumVertices() == numNodes)
-	{
-		for (size_t nodeId = 0; nodeId < numNodes; nodeId++)
-		{
-			m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
-		}
+		m_mesh->setVertexPosition(nodeId, state->getPosition(nodeId));
 	}
 }
 
@@ -87,6 +77,12 @@ bool DeformableCollisionRepresentation::doInitialize()
 {
 	SURGSIM_ASSERT(m_mesh != nullptr) << "Mesh was not set.";
 	SURGSIM_ASSERT(!m_deformable.expired()) << "Can't startup without a deformable.";
+
+	auto state = m_deformable.lock()->getCurrentState();
+	SURGSIM_ASSERT(m_mesh->getNumVertices() == state->getNumNodes()) <<
+			"The number of nodes in the deformable does not match " <<
+			"the number of vertices in the mesh.";
+
 	update(0.0);
 	return true;
 }

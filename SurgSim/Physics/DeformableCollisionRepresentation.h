@@ -62,14 +62,14 @@ public:
 	/// Overridden from Collision::Representation
 	const std::shared_ptr<SurgSim::Math::Shape> getShape() const;
 
-	///
+	/// Set the mesh to be used in this collision representation
 	void setMesh(std::shared_ptr<SurgSim::DataStructures::TriangleMesh> mesh);
 
-	/// Sets the deformable to which this collision representation is connected, this will call
-	/// setCollisionRepresentation in the deformable
+	/// Sets the deformable to which this collision representation is connected
 	/// \param representation The deformable that will be used to update the contained mesh
 	void setDeformableRepresentation(std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> representation);
 
+	/// \return The deformable that is used to update the contained mesh
 	const std::shared_ptr<SurgSim::Physics::DeformableRepresentationBase> getDeformable() const;
 
 	/// Overridden from Collision::Representation
