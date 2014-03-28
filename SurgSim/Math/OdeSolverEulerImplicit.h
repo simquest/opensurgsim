@@ -53,10 +53,6 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit ImplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
 
-	/// Solves the equation
-	/// \param dt The time step
-	/// \param currentState State at time t
-	/// \param[out] newState State at time t+dt
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 
 private:

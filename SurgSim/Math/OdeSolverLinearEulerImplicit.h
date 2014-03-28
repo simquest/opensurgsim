@@ -35,17 +35,13 @@ public:
 	/// \param equation The ode equation to be solved
 	explicit LinearImplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
 
-	/// Solves the equation
-	/// \param dt The time step
-	/// \param currentState State at time t
-	/// \param[out] newState State at time t+dt
 	virtual void solve(double dt, const State& currentState, State* newState) override;
 
 private:
 	/// The constant stiffness matrix
 	KT m_constantK;
 
-	/// Has the solver been at least once to initialize itself
+	/// Has the solver been initialized
 	bool m_initialized;
 
 public:
