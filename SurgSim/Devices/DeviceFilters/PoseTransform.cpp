@@ -182,25 +182,29 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 	}
 
 	// The Jacobians must be transformed into device space.  The Jacobians are scaled based on the translation scaling,
-	// so that the forces displayed by the device will be correct for the scene-space motions, not for the device-space
-	// motions.
+	// so that the forces and torques displayed by the device will be correct for the scene-space motions, not for the
+	// device-space motions.  Let R be the linear rotation portion of our transform, s be the translation scaling
+	// factor, and J be the 3x3 upper-left corner of the spring Jacobian.  Then:
+	// delta-translation-in-scene = s * R * delta-translation-in-device
+	// delta-force-in-scene = J * delta-translation-in-scene
+	// So to transform J into the device space, we left-multiply by R^-1, and right-multiply by R.
+	// Then, because we want the forces to be scaled as in scene-space, we scale J by s.  The bottom-left 3x3 block
+	// in springJacobian (or damperJacobian) also transforms from delta-translation and is treated the same, while the
+	// two 3x3 blocks on the right half (of springJacobian or damperJacobian) will be multiplied by the delta-rotation
+	// (not delta-translation) and so should not be scaled.
 	if (m_springJacobianIndex >= 0)
 	{
 		SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
 		if (dataToFilter.matrices().get(m_springJacobianIndex, &springJacobian))
 		{
 			springJacobian.block<3,3>(0, 0).applyOnTheLeft(m_transformInverse.linear());
+			springJacobian.block<3,3>(0, 0).applyOnTheRight(m_transform.linear());
 			springJacobian.block<3,3>(3, 0).applyOnTheLeft(m_transformInverse.linear());
+			springJacobian.block<3,3>(3, 0).applyOnTheRight(m_transform.linear());
 			springJacobian.block<3,3>(0, 3).applyOnTheLeft(m_transformInverse.linear());
+			springJacobian.block<3,3>(0, 3).applyOnTheRight(m_transform.linear());
 			springJacobian.block<3,3>(3, 3).applyOnTheLeft(m_transformInverse.linear());
-			// The Jacobian is calculated by Behaviors to provide Scene-relative forces and torques given
-			// Scene-relative delta-translation (linear and angular).  Since the device Scaffold will be doing
-			// the calculation, and it does not know about the Scene-relative values, we must scale the Jacobian
-			// here to get the correct forces and torques.  In other words, we transform the Jacobian so that
-			// its input space is the values provided by the device, while its output space remains the
-			// Scene-relative forces and torques.  Alternately, we could provide the scaling factor to the
-			// device Scaffold, which would multiply it with the linear translation to get the Scene-relative
-			// linear translation, and would then multiply that by the un-scaled Jacobian.
+			springJacobian.block<3,3>(3, 3).applyOnTheRight(m_transform.linear());
 			springJacobian.block<6,3>(0, 0) *= m_translationScale;
 			result->matrices().set(m_springJacobianIndex, springJacobian);
 		}
@@ -224,17 +228,13 @@ void PoseTransform::outputFilter(const DataGroup& dataToFilter, DataGroup* resul
 		if (dataToFilter.matrices().get(m_damperJacobianIndex, &damperJacobian))
 		{
 			damperJacobian.block<3,3>(0, 0).applyOnTheLeft(m_transformInverse.linear());
+			damperJacobian.block<3,3>(0, 0).applyOnTheRight(m_transform.linear());
 			damperJacobian.block<3,3>(3, 0).applyOnTheLeft(m_transformInverse.linear());
+			damperJacobian.block<3,3>(3, 0).applyOnTheRight(m_transform.linear());
 			damperJacobian.block<3,3>(0, 3).applyOnTheLeft(m_transformInverse.linear());
+			damperJacobian.block<3,3>(0, 3).applyOnTheRight(m_transform.linear());
 			damperJacobian.block<3,3>(3, 3).applyOnTheLeft(m_transformInverse.linear());
-			// The Jacobian is calculated by Behaviors to provide Scene-relative forces and torques given
-			// Scene-relative delta-translation (linear and angular).  Since the device Scaffold will be doing
-			// the calculation, and it does not know about the Scene-relative values, we must scale the Jacobian
-			// here to get the correct forces and torques.  In other words, we transform the Jacobian so that
-			// its input space is the values provided by the device, while its output space remains the
-			// Scene-relative forces and torques.  Alternately, we could provide the scaling factor to the
-			// device Scaffold, which would multiply it with the linear translation to get the Scene-relative
-			// linear translation, and would then multiply that by the un-scaled Jacobian.
+			damperJacobian.block<3,3>(3, 3).applyOnTheRight(m_transform.linear());
 			damperJacobian.block<6,3>(0, 0) *= m_translationScale;
 			result->matrices().set(m_damperJacobianIndex, damperJacobian);
 		}
