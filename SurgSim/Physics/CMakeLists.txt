@@ -37,6 +37,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	Fem3DRepresentationPlyReaderDelegate.cpp
 	FemElement.cpp
 	FemElement1DBeam.cpp
+	FemElement2DTriangle.cpp
 	FemElement3DCube.cpp
 	FemElement3DTetrahedron.cpp
 	FemRepresentationCoordinate.cpp
@@ -88,6 +89,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	Fem3DRepresentationPlyReaderDelegate.h
 	FemElement.h
 	FemElement1DBeam.h
+	FemElement2DTriangle.h
 	FemElement3DCube.h
 	FemElement3DTetrahedron.h
 	FemRepresentation.h

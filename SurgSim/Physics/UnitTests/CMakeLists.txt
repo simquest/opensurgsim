@@ -34,6 +34,7 @@ set(UNIT_TEST_SOURCES
 	Fem3DRepresentationReaderTests.cpp
 	Fem3DRepresentationTests.cpp
 	FemElement1DBeamTests.cpp
+	FemElement2DTriangleTests.cpp
 	FemElement3DCubeTests.cpp
 	FemElement3DTetrahedronTests.cpp
 	FemElementTests.cpp
