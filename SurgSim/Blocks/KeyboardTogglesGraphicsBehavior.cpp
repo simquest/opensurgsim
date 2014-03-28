@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
-
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Logger.h"
@@ -24,7 +23,6 @@ namespace SurgSim
 {
 namespace Blocks
 {
-
 
 KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name),
@@ -40,12 +38,18 @@ void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim:
 void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
 												  std::shared_ptr<SurgSim::Framework::Component> component)
 {
-	m_register[static_cast<int>(key)].push_back(component);
+	auto graphicsRepresentation = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(component);
+	if (graphicsRepresentation != nullptr)
+	{
+		m_register[static_cast<int>(key)].push_back(graphicsRepresentation);
+	}
+	else
+	{
+		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"Can not register component " << component->getName() << ".\n";
+	}
 }
 
-// Note: This behavior is currently updated by BehaviorManager which runs at 30Hz.
-// Since the speed (30Hz) is fast compared with the speed one key is pressed, the graphical representations will be
-// set to visible/invisible even with one key press.
 void KeyboardTogglesGraphicsBehavior::update(double dt)
 {
 	SurgSim::DataStructures::DataGroup dataGroup;
@@ -59,11 +63,7 @@ void KeyboardTogglesGraphicsBehavior::update(double dt)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
-				auto settable = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(*it);
-				if (settable != nullptr)
-				{
-					settable->setVisible(!settable->isVisible());
-				}
+				(*it)->setVisible(!(*it)->isVisible());
 			};
 		}
 		m_keyPressed = (SurgSim::Device::KeyCode::NONE != key);

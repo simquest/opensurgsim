@@ -20,7 +20,7 @@
 
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
-#include "SurgSim/Graphics/OsgRepresentation.h"
+#include "SurgSim/Graphics/Representation.h"
 
 namespace SurgSim
 {
@@ -51,11 +51,11 @@ public:
 	/// \param	inputComponent	The input component which contains the pressed key(s).
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
 
-	/// Register key with a component in this behavior.
-	/// \param key The key used to control the component.
+	/// Register a key with a component in this behavior.
+	/// \param key A key used to control the component.
 	/// \param component The component being controlled by the key.
-	/// \note A key can be registered several times.
-	void registerKey(SurgSim::Device::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> graphics);
+	/// \note A key can be registered several times, so does a component.
+	void registerKey(SurgSim::Device::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> component);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -64,12 +64,12 @@ public:
 protected:
 	/// Initialize this behavior
 	/// \return True on success, otherwise false.
-	/// \note: In current implementation, this method always returns "true".
+	/// \note In current implementation, this method always returns "true".
 	virtual bool doInitialize() override;
 
 	/// Wakeup this behavior
 	/// \return True on success, otherwise false.
-	/// \note: In current implementation, this method always returns "true".
+	/// \note In current implementation, this method always returns "true".
 	virtual bool doWakeUp() override;
 
 private:
@@ -77,8 +77,9 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
 
 	/// A mapping between key and the graphical representation(s) it controls.
-	std::unordered_map<int, std::list<std::shared_ptr<SurgSim::Framework::Component>>> m_register;
+	std::unordered_map<int, std::list<std::shared_ptr<SurgSim::Graphics::Representation>>> m_register;
 
+	/// Record if any key has been pressed.
 	bool m_keyPressed;
 };
 
