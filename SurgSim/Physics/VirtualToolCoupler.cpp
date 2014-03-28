@@ -170,7 +170,7 @@ bool VirtualToolCoupler::doWakeUp()
 	{
 		if (! m_linearStiffness.hasValue())
 		{
-			m_linearStiffness.setValue(mass * 2000.0);
+			m_linearStiffness.setValue(mass * 800.0);
 		}
 		m_linearDamping.setValue(2.0 * dampingRatio * sqrt(mass * m_linearStiffness.getValue()));
 	}
