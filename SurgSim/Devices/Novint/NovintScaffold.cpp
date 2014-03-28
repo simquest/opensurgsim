@@ -721,18 +721,19 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 
 	// Set the DeviceData's force to the nominal force, if provided.
 	Vector3d nominalForce = Vector3d::Zero();
-	outputData.vectors().get("force", &nominalForce);
+	outputData.vectors().get(SurgSim::DataStructures::Names::FORCE, &nominalForce);
 	info->force = nominalForce;
 
 	// If the springJacobian was provided, multiply with the change in position since the output data was set,
 	// to get a delta force.  This way a linearized output force is calculated at haptic update rates.
 	Vector6d deltaPosition;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType springJacobian;
-	bool havespringJacobian = outputData.matrices().get("springJacobian", &springJacobian);
+	bool havespringJacobian =
+		outputData.matrices().get(SurgSim::DataStructures::Names::SPRING_JACOBIAN, &springJacobian);
 	if (havespringJacobian)
 	{
 		RigidTransform3d poseForNominal = info->scaledPose;
-		outputData.poses().get("inputPose", &poseForNominal);
+		outputData.poses().get(SurgSim::DataStructures::Names::INPUT_POSE, &poseForNominal);
 
 		Vector3d rotationVector = Vector3d::Zero();
 		SurgSim::Math::computeRotationVector(info->scaledPose, poseForNominal, &rotationVector);
@@ -747,7 +748,8 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	// If the damperJacobian was provided, calculate a delta force based on the change in velocity.
 	Vector6d deltaVelocity;
 	SurgSim::DataStructures::DataGroup::DynamicMatrixType damperJacobian;
-	bool havedamperJacobian = outputData.matrices().get("damperJacobian", &damperJacobian);
+	bool havedamperJacobian =
+		outputData.matrices().get(SurgSim::DataStructures::Names::DAMPER_JACOBIAN, &damperJacobian);
 	if (havedamperJacobian)
 	{
 		// TODO(ryanbeasley): consider adding a velocity filter setting to NovintDevice/DeviceData.
@@ -755,9 +757,9 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 		Vector3d angularVelocity = Vector3d::Zero();
 
 		Vector3d linearVelocityForNominal = linearVelocity;
-		outputData.vectors().get("inputLinearVelocity", &linearVelocityForNominal);
+		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_LINEAR_VELOCITY, &linearVelocityForNominal);
 		Vector3d angularVelocityForNominal = angularVelocity;
-		outputData.vectors().get("inputAngularVelocity", &angularVelocityForNominal);
+		outputData.vectors().get(SurgSim::DataStructures::Names::INPUT_ANGULAR_VELOCITY, &angularVelocityForNominal);
 
 		SurgSim::Math::setSubVector(linearVelocity - linearVelocityForNominal, 0, 3, &deltaVelocity);
 		SurgSim::Math::setSubVector(angularVelocity - angularVelocityForNominal, 1, 3, &deltaVelocity);
@@ -769,7 +771,7 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 	if (info->isDevice7Dof)
 	{
 		Vector3d nominalTorque = Vector3d::Zero();
-		outputData.vectors().get("torque", &nominalTorque);
+		outputData.vectors().get(SurgSim::DataStructures::Names::TORQUE, &nominalTorque);
 		Vector3d torque = nominalTorque;
 
 		if (havespringJacobian)
@@ -879,14 +881,14 @@ void NovintScaffold::calculateForceAndTorque(DeviceData* info)
 void NovintScaffold::setInputData(DeviceData* info)
 {
 	SurgSim::DataStructures::DataGroup& inputData = info->deviceObject->getInputData();
-	inputData.poses().set("pose", info->scaledPose);
-	inputData.booleans().set("button1", info->buttonStates[0]);
-	inputData.booleans().set("button2", info->buttonStates[1]);
-	inputData.booleans().set("button3", info->buttonStates[2]);
-	inputData.booleans().set("button4", info->buttonStates[3]);
-	inputData.booleans().set("isHomed", info->isDeviceHomed);
-	inputData.booleans().set("isPositionHomed", info->isPositionHomed);
-	inputData.booleans().set("isOrientationHomed", info->isOrientationHomed);
+	inputData.poses().set(SurgSim::DataStructures::Names::POSE, info->scaledPose);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1, info->buttonStates[0]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2, info->buttonStates[1]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3, info->buttonStates[2]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_4, info->buttonStates[3]);
+	inputData.booleans().set(SurgSim::DataStructures::Names::IS_HOMED, info->isDeviceHomed);
+	inputData.booleans().set(SurgSim::DataStructures::Names::IS_POSITION_HOMED, info->isPositionHomed);
+	inputData.booleans().set(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED, info->isOrientationHomed);
 }
 
 
@@ -1137,14 +1139,14 @@ bool NovintScaffold::checkForFatalError(const char* message)
 SurgSim::DataStructures::DataGroup NovintScaffold::buildDeviceInputData()
 {
 	DataGroupBuilder builder;
-	builder.addPose("pose");
-	builder.addBoolean("button1");
-	builder.addBoolean("button2");
-	builder.addBoolean("button3");
-	builder.addBoolean("button4");
-	builder.addBoolean("isHomed");
-	builder.addBoolean("isPositionHomed");
-	builder.addBoolean("isOrientationHomed");
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_4);
+	builder.addBoolean(SurgSim::DataStructures::Names::IS_HOMED);
+	builder.addBoolean(SurgSim::DataStructures::Names::IS_POSITION_HOMED);
+	builder.addBoolean(SurgSim::DataStructures::Names::IS_ORIENTATION_HOMED);
 	return builder.createData();
 }
 

@@ -78,6 +78,9 @@ public:
 	/// Add a contact against a given collision representation.
 	/// \param collisionRepresentation The collision representation to which this collision representation collides.
 	/// \param contact The contact information.
+	/// \note The Contact object added to the map follows the convention of pointing the contact normal toward
+	/// this representation. And the first penetration point is on this representation and the second is on
+	/// collisionRepresentation.
 	void addCollisionWith(const std::shared_ptr<SurgSim::Collision::Representation>& collisionRepresentation,
 						  const std::shared_ptr<SurgSim::Collision::Contact>& contact);
 
@@ -95,6 +98,8 @@ public:
 
 protected:
 	/// A map which associates a list of contacts with each collision representation.
+	/// Every contact added to this map follows the convention of pointing the contact normal toward this
+	/// representation. And the first penetration point is on this representation.
 	SurgSim::Framework::LockedContainer<std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 														   std::list<std::shared_ptr<SurgSim::Collision::Contact>>>>
 														   m_collisions;

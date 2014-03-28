@@ -43,11 +43,11 @@ void AddSphereFromInputBehavior::update(double dt)
 	m_from->getData(&dataGroup);
 
 	RigidTransform3d pose;
-	dataGroup.poses().get("pose", &pose);
+	dataGroup.poses().get(SurgSim::DataStructures::Names::POSE, &pose);
 
 	// Add sphere to the scene from input
 	bool button1 = false;
-	dataGroup.booleans().get("button1", &button1);
+	dataGroup.booleans().get(SurgSim::DataStructures::Names::BUTTON_1, &button1);
 
 	if (button1 && ! m_buttonPreviouslyPressed)
 	{

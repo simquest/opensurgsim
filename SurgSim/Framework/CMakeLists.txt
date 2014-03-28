@@ -64,6 +64,7 @@ set(SURGSIM_FRAMEWORK_HEADERS
 	ComponentManager-inl.h
 	Convert.h
 	FrameworkConvert.h
+	FrameworkConvert-inl.h
 	LockedContainer.h
 	Log.h
 	Logger.h

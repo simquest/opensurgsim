@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
 
+
 namespace SurgSim
 {
 namespace Framework
@@ -32,6 +33,24 @@ class Scene;
 
 namespace YAML
 {
+
+/// Specializatio of YAML::convert for std::shared_ptr, this is used to redirect the serialization of a derived class
+/// to the specialization of the serialization for a base class, for example all subclasses of Component can use the
+/// Component serialization specialization, currently each redirection has to be implemented separately, there is
+/// probably a way to do this automatically.
+/// \tparam T class that should be converted from a shared ptr
+template <class T>
+struct convert<std::shared_ptr<T>>
+{
+	static YAML::Node encode(
+		const typename std::enable_if <std::is_base_of <SurgSim::Framework::Component, T>::value,
+		std::shared_ptr<T> >::type  rhs);
+	static bool decode(
+		const Node& node,
+		typename std::enable_if <std::is_base_of<SurgSim::Framework::Component, T>::value,
+		std::shared_ptr<T> >::type& rhs);
+};
+
 /// Specialization of YAML::convert for std::shared_ptr<Component>, use this for to read in a component
 /// written by the convert<SurgSim::Framework::Component> converter, or a reference to a
 /// component written by this converter.
@@ -56,6 +75,9 @@ private:
 	static RegistryType& getRegistry();
 };
 
+
+
+
 /// Override of the convert structure for an Component, use this form to write out a full version
 /// of the component information, to decode a component use the other converter. This converter
 /// intentionally does not have a decode function.
@@ -64,7 +86,6 @@ struct convert<SurgSim::Framework::Component>
 {
 	static Node encode(const SurgSim::Framework::Component& rhs);
 };
-
 
 template<>
 struct convert<std::shared_ptr<SurgSim::Framework::SceneElement>>
@@ -87,6 +108,10 @@ struct convert<std::shared_ptr<SurgSim::Framework::Scene>>
 };
 
 
+
+
 };
+
+#include "SurgSim/Framework/FrameworkConvert-inl.h"
 
 #endif // SURGSIM_FRAMEWORK_FRAMEWORKCONVERT_H

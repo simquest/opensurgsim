@@ -144,7 +144,7 @@ void* Fem3DRepresentationPlyReaderDelegate::beginPolyhedrons(const std::string& 
 void Fem3DRepresentationPlyReaderDelegate::processPolyhedron(const std::string& elementName)
 {
 	SURGSIM_ASSERT(m_polyhedronData.vertexCount == 4) << "Cannot process polyhedron with "
-													  << m_polyhedronData.vertexCount << " vertices.";
+			<< m_polyhedronData.vertexCount << " vertices.";
 
 	std::array<unsigned int, 4> polyhedronVertices;
 	std::copy(m_polyhedronData.indicies, m_polyhedronData.indicies + 4, polyhedronVertices.begin());
@@ -157,14 +157,16 @@ void Fem3DRepresentationPlyReaderDelegate::endPolyhedrons(const std::string& ele
 }
 
 void* Fem3DRepresentationPlyReaderDelegate::beginBoundaryConditions(const std::string& elementName,
-																	size_t boundaryConditionCount)
+		size_t boundaryConditionCount)
 {
 	return &m_boundaryConditionData;
 }
 
 void Fem3DRepresentationPlyReaderDelegate::processBoundaryCondition(const std::string& elementName)
 {
-	m_state->addBoundaryCondition(m_boundaryConditionData);
+	m_state->addBoundaryCondition(3 * m_boundaryConditionData);
+	m_state->addBoundaryCondition(3 * m_boundaryConditionData + 1);
+	m_state->addBoundaryCondition(3 * m_boundaryConditionData + 2);
 }
 
 void Fem3DRepresentationPlyReaderDelegate::endBoundaryConditions(const std::string& elementName)
