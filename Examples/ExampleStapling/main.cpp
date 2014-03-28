@@ -18,8 +18,8 @@
 #include <string>
 
 #include "Examples/ExampleStapling/StaplerBehavior.h"
-#include "Examples/ExampleStapling/KeyboardBehavior.h"
 
+#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
@@ -56,6 +56,7 @@
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
+using SurgSim::Blocks::KeyboardTogglesGraphicsBehavior;
 using SurgSim::Blocks::TransferPoseBehavior;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
@@ -402,23 +403,18 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<InputComponent> keyboardComponent = std::make_shared<InputComponent>("KeyboardInputComponent");
 	keyboardComponent->setDeviceName("Keyboard"); // Name of device is case sensitive.
-	std::shared_ptr<KeyboardBehavior> keyboardBehavior = std::make_shared<KeyboardBehavior>("KeyboardBehavior");
+	std::shared_ptr<KeyboardTogglesGraphicsBehavior> keyboardBehavior =
+		std::make_shared<KeyboardTogglesGraphicsBehavior>("KeyboardBehavior");
 	keyboardBehavior->setInputComponent(keyboardComponent);
 
-	std::vector<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> staperScenery =
-		staplerSceneElement->getComponents<SurgSim::Graphics::SceneryRepresentation>();
-	std::vector<std::shared_ptr<SurgSim::Graphics::SceneryRepresentation>> armScenery =
-		armSceneElement->getComponents<SurgSim::Graphics::SceneryRepresentation>();
-
-	std::vector<std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation>> staperMesh =
-		staplerSceneElement->getComponents<SurgSim::Graphics::OsgMeshRepresentation>();
-	std::vector<std::shared_ptr<SurgSim::Graphics::OsgMeshRepresentation>> armMesh =
-		armSceneElement->getComponents<SurgSim::Graphics::OsgMeshRepresentation>();
-
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staperScenery);
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, armScenery);
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, staperMesh);
-	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, armMesh);
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Handle"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Indicator"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Markings"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_A, staplerSceneElement->getComponent("Trigger"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_B, staplerSceneElement->getComponent("StaplerOsgMesh"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, armSceneElement->getComponent("forearm"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_C, armSceneElement->getComponent("upperarm"));
+	keyboardBehavior->registerKey(SurgSim::Device::KeyCode::KEY_D, armSceneElement->getComponent("ArmOsgMesh"));
 
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>("SceneElement");
 	sceneElement->addComponent(keyboardComponent);
