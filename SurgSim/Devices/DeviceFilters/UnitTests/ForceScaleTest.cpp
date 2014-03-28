@@ -36,7 +36,10 @@ using SurgSim::Input::OutputProducerInterface;
 using SurgSim::Math::Matrix66d;
 using SurgSim::Math::Vector3d;
 
+namespace
+{
 const double ERROR_EPSILON = 1e-7;
+}
 
 /// Exposes protected members of CommonDevice.
 class MockForceScale : public ForceScale
