@@ -40,22 +40,22 @@ void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim:
 // set to visible/invisible even with one key press.
 void KeyboardTogglesGraphicsBehavior::update(double dt)
 {
-	static bool keyPressed = false;
+	bool keyPressed = false;
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
 
 	int key;
-	if(dataGroup.integers().get("key", &key))
+	if (dataGroup.integers().get("key", &key))
 	{
 		auto match = m_keyRegister.find(key);
 		if (match != m_keyRegister.end() && !keyPressed)
 		{
-			for(auto it = std::begin(match->second); it != std::end(match->second); ++it)
+			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
 				(*it)->setVisible(!(*it)->isVisible());
 			};
 		}
-		keyPressed = (SurgSim::Device::KeyCode::NONE == key) ? false : true;
+		keyPressed = (SurgSim::Device::KeyCode::NONE != key);
 	}
 }
 
