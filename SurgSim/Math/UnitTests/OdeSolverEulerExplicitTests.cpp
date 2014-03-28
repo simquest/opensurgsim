@@ -35,10 +35,7 @@ template<class T>
 void doConstructorTest()
 {
 	MassPoint m;
-
 	ASSERT_NO_THROW({T solver(&m);});
-	ASSERT_NO_THROW({T* solver = new T(&m); delete solver;});
-	ASSERT_NO_THROW({std::shared_ptr<T> solver = std::make_shared<T>(&m);});
 }
 
 TEST(OdeSolverEulerExplicit, ConstructorTest)
