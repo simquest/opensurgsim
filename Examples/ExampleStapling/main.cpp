@@ -17,8 +17,11 @@
 #include <memory>
 #include <string>
 
+#include "Examples/ExampleStapling/StaplerBehavior.h"
+
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
@@ -26,8 +29,6 @@
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
-#include "Examples/ExampleStapling/StaplerBehavior.h"
-#include "Examples/ExampleStapling/VisualizeContactsBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -54,6 +55,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
@@ -267,6 +269,10 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
 		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
 	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
+	// Note: Since usually the penetration depth of a collision is so small (at the magnitude of mm),
+	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
+	// Thus, we enlarge the vector field by 200 times.
+	visualizeContactsBehavior->setVectorFieldScale(200);
 
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
 	sceneElement->addComponent(physicsRepresentation);
