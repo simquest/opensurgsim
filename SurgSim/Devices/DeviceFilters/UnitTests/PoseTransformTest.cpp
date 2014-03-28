@@ -41,7 +41,10 @@ using SurgSim::Math::Matrix66d;
 using SurgSim::Math::RigidTransform3d;
 using SurgSim::Math::Vector3d;
 
+namespace
+{
 const double ERROR_EPSILON = 1e-7;
+}
 
 /// Exposes protected members of CommonDevice.
 class MockPoseTransform : public PoseTransform
@@ -248,7 +251,7 @@ TEST(PoseTransformDeviceFilterTest, OutputDataFilter)
 	poseTransformer->setOutputProducer(testOutputProducer);
 
 	RigidTransform3d transform = makeRigidTransform(makeRotationQuaternion(M_PI_2, Vector3d::UnitY().eval()),
-		Vector3d(11., 12., 13.));
+		Vector3d(11.0, 12.0, 13.0));
 	poseTransformer->setTransform(transform);
 	poseTransformer->setTranslationScale(2.0);
 
