@@ -62,8 +62,8 @@ void VisualizeContactsBehavior::update(double dt)
 		}
 
 		std::shared_ptr<VectorField> vectorField = m_vectorField->getVectorField();
-		vectorField->getVertices().reserve(2 * totalContacts);
 		vectorField->clear();
+		vectorField->getVertices().reserve(2 * totalContacts);
 
 		for (auto it = std::begin(collisions); it != std::end(collisions); ++it)
 		{
