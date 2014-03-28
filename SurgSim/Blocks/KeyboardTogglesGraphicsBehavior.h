@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
-#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
+#ifndef SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
+#define SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
 
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -28,7 +28,8 @@ namespace Input
 class InputComponent;
 }
 
-}
+namespace Blocks
+{
 
 /// This behavior is used to turn on and off registered graphical representation(s)
 /// when the corresponding registered key is pressed.
@@ -72,6 +73,11 @@ private:
 	std::unordered_map<int, std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
 };
 
-#include "Examples/ExampleStapling/KeyboardTogglesGraphicsBehavior-inl.h"
+}; // namespace Blocks
 
-#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
+}; // namespace SurgSim
+
+
+#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior-inl.h"
+
+#endif //SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H

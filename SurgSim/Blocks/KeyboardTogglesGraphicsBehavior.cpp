@@ -12,12 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "Examples/ExampleStapling/KeyboardTogglesGraphicsBehavior.h"
+#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Input/InputComponent.h"
+
+namespace SurgSim
+{
+namespace Blocks
+{
+
 
 KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
@@ -62,3 +68,7 @@ bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 {
 	return true;
 }
+
+}; // namespace Blocks
+
+}; // namespace SurgSim

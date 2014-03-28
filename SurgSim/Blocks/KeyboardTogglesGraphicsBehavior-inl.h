@@ -13,8 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
-#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
+#ifndef SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
+#define SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
+
+namespace SurgSim
+{
+
+namespace Blocks
+{
+
 
 template<class T>
 void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key, const std::vector<std::shared_ptr<T>>& graphics)
@@ -36,4 +43,8 @@ void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key, 
 	}
 }
 
-#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
+}; // namespace Blocks
+
+}; // namespace SurgSim
+
+#endif //SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
