@@ -13,24 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-add_subdirectory(DeviceFilters)
-add_subdirectory(IdentityPoseDevice)
-add_subdirectory(Keyboard)
-add_subdirectory(Mouse)
-
-set(DEVICES
-	MultiAxis
-	Novint
-	Phantom
-	Sixense
-	TrackIR
+include_directories(
+	${gtest_SOURCE_DIR}/include
 )
 
-foreach(DEVICE ${DEVICES})
-	string(TOUPPER ${DEVICE} DEVICE_UPPER_CASE)
-	option(BUILD_DEVICE_${DEVICE_UPPER_CASE} "Build ${DEVICE} device." OFF)
-	if(BUILD_DEVICE_${DEVICE_UPPER_CASE})
-		add_subdirectory(${DEVICE})
-	endif(BUILD_DEVICE_${DEVICE_UPPER_CASE})
-endforeach(DEVICE)
+set(UNIT_TEST_SOURCES
+	PoseTransformTest.cpp
+)
 
+set(LIBS
+	IdentityPoseDevice
+	SurgSimDeviceFilters
+)
+
+surgsim_add_unit_tests(SurgSimDeviceFiltersTest)
+
+set_target_properties(SurgSimDeviceFiltersTest PROPERTIES FOLDER "Devices")
