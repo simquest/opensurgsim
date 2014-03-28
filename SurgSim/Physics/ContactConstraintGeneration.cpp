@@ -84,7 +84,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 					continue;
 				}
 
-				if (! (foundFirst->second->isActive() && foundSecond->second->isActive()))
+				if (!(foundFirst->second->isActive() && foundSecond->second->isActive()))
 				{
 					SURGSIM_LOG_DEBUG(m_logger) << __FUNCTION__ << " Not creating a constraint. " <<
 						foundFirst->second->getName() << " and/or " << foundSecond->second->getName() <<
@@ -92,7 +92,7 @@ std::shared_ptr<PhysicsManagerState> ContactConstraintGeneration::doUpdate(
 					continue;
 				}
 
-				localizations.first = makeLocalization(foundFirst->second,(*contactsIt)->penetrationPoints.first);
+				localizations.first = makeLocalization(foundFirst->second, (*contactsIt)->penetrationPoints.first);
 				localizations.second = makeLocalization(foundSecond->second,(*contactsIt)->penetrationPoints.second);
 				if (localizations.first != nullptr && localizations.second != nullptr)
 				{
