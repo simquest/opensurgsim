@@ -224,13 +224,20 @@ public:
 
 	void performTimingTest()
 	{
+		SurgSim::Framework::Timer totalTime;
+		totalTime.beginFrame();
+
 		SurgSim::Framework::Timer timer;
+		timer.setMaxNumberOfFrames(frameCount);
 		for (int i = 0; i < frameCount; i++)
 		{
 			timer.beginFrame();
 			m_physicsManager->doUpdate(dt);
 			timer.endFrame();
 		}
+
+		totalTime.endFrame();
+		RecordProperty("Duration", boost::to_string(totalTime.getCumulativeTime()));
 		RecordProperty("FrameRate", boost::to_string(timer.getAverageFrameRate()));
 	}
 
