@@ -16,12 +16,19 @@
 #ifndef SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
 #define SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
 
+#include <list>
+
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
 #include "SurgSim/Graphics/OsgRepresentation.h"
 
 namespace SurgSim
 {
+
+namespace Framework
+{
+class Component;
+}
 
 namespace Input
 {
@@ -44,11 +51,11 @@ public:
 	/// \param	inputComponent	The input component which contains the pressed key(s).
 	void setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent);
 
-	/// Register key and graphical representation(s) pair with this behavior.
-	/// \param key The key used to turn on and off graphical representation(s).
-	/// \param graphics The graphics representation(s) controlled by the key.
-	template<class T>
-	void registerKey(SurgSim::Device::KeyCode key, const std::vector<std::shared_ptr<T>>& graphics);
+	/// Register key with a component in this behavior.
+	/// \param key The key used to control the component.
+	/// \param component The component being controlled by the key.
+	/// \note A key can be registered several times.
+	void registerKey(SurgSim::Device::KeyCode key, std::shared_ptr<SurgSim::Framework::Component> graphics);
 
 	/// Update the behavior
 	/// \param dt	The length of time (seconds) between update calls.
@@ -70,14 +77,14 @@ private:
 	std::shared_ptr<SurgSim::Input::InputComponent> m_inputComponent;
 
 	/// A mapping between key and the graphical representation(s) it controls.
-	std::unordered_map<int, std::vector<std::shared_ptr<SurgSim::Graphics::Representation>>> m_keyRegister;
+	std::unordered_map<int, std::list<std::shared_ptr<SurgSim::Framework::Component>>> m_register;
+
+	bool m_keyPressed;
 };
 
 }; // namespace Blocks
 
 }; // namespace SurgSim
 
-
-#include "SurgSim/Blocks/KeyboardTogglesGraphicsBehavior-inl.h"
 
 #endif //SURGSIM_BLOCKS_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H

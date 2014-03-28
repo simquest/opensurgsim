@@ -34,7 +34,6 @@ set(SURGSIM_BLOCKS_SOURCES
 
 set(SURGSIM_BLOCKS_HEADERS
 	KeyboardTogglesGraphicsBehavior.h
-	KeyboardTogglesGraphicsBehavior-inl.h
 	MassSpring1DRepresentation.h
 	MassSpring2DRepresentation.h
 	MassSpring3DRepresentation.h

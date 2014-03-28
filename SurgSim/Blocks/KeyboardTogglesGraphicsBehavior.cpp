@@ -17,6 +17,7 @@
 #include "SurgSim/DataStructures/DataGroup.h"
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Logger.h"
+#include "SurgSim/Graphics/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 
 namespace SurgSim
@@ -26,7 +27,8 @@ namespace Blocks
 
 
 KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
-	SurgSim::Framework::Behavior(name)
+	SurgSim::Framework::Behavior(name),
+	m_keyPressed(false)
 {
 }
 
@@ -35,27 +37,36 @@ void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim:
 	m_inputComponent = inputComponent;
 }
 
+void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key,
+												  std::shared_ptr<SurgSim::Framework::Component> component)
+{
+	m_register[static_cast<int>(key)].push_back(component);
+}
+
 // Note: This behavior is currently updated by BehaviorManager which runs at 30Hz.
 // Since the speed (30Hz) is fast compared with the speed one key is pressed, the graphical representations will be
 // set to visible/invisible even with one key press.
 void KeyboardTogglesGraphicsBehavior::update(double dt)
 {
-	bool keyPressed = false;
 	SurgSim::DataStructures::DataGroup dataGroup;
 	m_inputComponent->getData(&dataGroup);
 
 	int key;
 	if (dataGroup.integers().get("key", &key))
 	{
-		auto match = m_keyRegister.find(key);
-		if (match != m_keyRegister.end() && !keyPressed)
+		auto match = m_register.find(key);
+		if (match != m_register.end() && !m_keyPressed)
 		{
 			for (auto it = std::begin(match->second); it != std::end(match->second); ++it)
 			{
-				(*it)->setVisible(!(*it)->isVisible());
+				auto settable = std::dynamic_pointer_cast<SurgSim::Graphics::Representation>(*it);
+				if (settable != nullptr)
+				{
+					settable->setVisible(!settable->isVisible());
+				}
 			};
 		}
-		keyPressed = (SurgSim::Device::KeyCode::NONE != key);
+		m_keyPressed = (SurgSim::Device::KeyCode::NONE != key);
 	}
 }
 
