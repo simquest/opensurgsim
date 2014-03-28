@@ -16,6 +16,7 @@
 #include "SurgSim/Framework/Log.h"
 #include "SurgSim/Physics/DeformableRepresentationState.h"
 #include "SurgSim/Physics/LinearSpring.h"
+#include "SurgSim/Math/Geometry.h"
 
 using SurgSim::Math::Matrix33d;
 using SurgSim::Math::Vector;
@@ -23,11 +24,6 @@ using SurgSim::Math::Vector3d;
 using SurgSim::Math::addSubMatrix;
 using SurgSim::Math::addSubVector;
 using SurgSim::Math::getSubVector;
-
-namespace
-{
-const double epsilonZero = 1e-8;
-};
 
 namespace SurgSim
 {
@@ -83,7 +79,7 @@ void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim:
 
 	Vector3d u = x1 - x0;
 	double length = u.norm();
-	if (length < epsilonZero)
+	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
@@ -92,7 +88,7 @@ void LinearSpring::addForce(const DeformableRepresentationState& state, SurgSim:
 	u /= length;
 	double elongationPosition = length - m_restLength;
 	double elongationVelocity = (v1 - v0).dot(u);
-	Vector3d f = scale * (m_stiffness* elongationPosition + m_damping * elongationVelocity) * u;
+	const Vector3d f = scale * (m_stiffness* elongationPosition + m_damping * elongationVelocity) * u;
 
 	// Assembly stage in F
 	addSubVector( f, m_nodeIds[0], 3, F);
@@ -104,7 +100,7 @@ void LinearSpring::addDamping(const DeformableRepresentationState& state, SurgSi
 	const Vector& x = state.getPositions();
 	Vector3d u = getSubVector(x, m_nodeIds[1], 3) - getSubVector(x, m_nodeIds[0], 3);
 	double length = u.norm();
-	if (length < epsilonZero)
+	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
@@ -130,7 +126,7 @@ void LinearSpring::addStiffness(const DeformableRepresentationState& state, Surg
 	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
 	double length = u.norm();
-	if (length < epsilonZero)
+	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
@@ -163,7 +159,7 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 	const Vector& v1 = getSubVector(v, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
 	double length = u.norm();
-	if (length < epsilonZero)
+	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
@@ -189,9 +185,9 @@ void LinearSpring::addFDK(const DeformableRepresentationState& state, SurgSim::M
 	addSubMatrix(-D00, m_nodeIds[1], m_nodeIds[0], 3, 3, D);
 	addSubMatrix( D00, m_nodeIds[1], m_nodeIds[1], 3, 3, D);
 
-	u *= (m_stiffness* elongationPosition + m_damping * elongationVelocity);
-	addSubVector( u, m_nodeIds[0], 3, F);
-	addSubVector(-u, m_nodeIds[1], 3, F);
+	const Vector3d f = u * (m_stiffness* elongationPosition + m_damping * elongationVelocity);
+	addSubVector( f, m_nodeIds[0], 3, F);
+	addSubVector(-f, m_nodeIds[1], 3, F);
 }
 
 void LinearSpring::addMatVec(const DeformableRepresentationState& state, double alphaD, double alphaK,
@@ -213,7 +209,7 @@ void LinearSpring::addMatVec(const DeformableRepresentationState& state, double 
 	const Vector& x1 = getSubVector(xState, m_nodeIds[1], 3);
 	Vector3d u = x1 - x0;
 	double length = u.norm();
-	if (length < epsilonZero)
+	if (length < SurgSim::Math::Geometry::DistanceEpsilon)
 	{
 		SURGSIM_LOG_WARNING(SurgSim::Framework::Logger::getDefaultLogger()) <<
 			"Spring (initial length = " << m_restLength << ") became degenerated with 0 length => no force generated";
@@ -225,7 +221,7 @@ void LinearSpring::addMatVec(const DeformableRepresentationState& state, double 
 	{
 		Matrix33d D00 = m_damping * (u * u.transpose());
 
-		Vector3d force = alphaD * (D00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
+		const Vector3d force = alphaD * (D00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
 		addSubVector( force, m_nodeIds[0], 3, F);
 		addSubVector(-force, m_nodeIds[1], 3, F);
 	}
@@ -245,7 +241,7 @@ void LinearSpring::addMatVec(const DeformableRepresentationState& state, double 
 		K00 -= (u * u.transpose()) * (m_stiffness * (lRatio - 1.0) + 2.0 * m_damping * vRatio);
 		K00 += m_damping * (u * (v1 - v0).transpose()) / length;
 
-		Vector3d force = alphaK * (K00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
+		const Vector3d force = alphaK * (K00 * (vector6D.segment(0, 3) - vector6D.segment(3, 3)));
 		addSubVector( force, m_nodeIds[0], 3, F);
 		addSubVector(-force, m_nodeIds[1], 3, F);
 	}
