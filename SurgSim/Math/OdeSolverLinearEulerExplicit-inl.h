@@ -25,10 +25,10 @@ namespace Math
 template <class State, class MT, class DT, class KT, class ST>
 LinearExplicitEuler<State, MT, DT, KT, ST>::LinearExplicitEuler(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	ExplicitEuler<State, MT, DT, KT, ST>(equation)
+	ExplicitEuler<State, MT, DT, KT, ST>(equation),
+	m_initialized(false)
 {
 	this->m_name = "Linear Explicit Euler";
-	this->m_initialized = false;
 }
 
 template <class State, class MT, class DT, class KT, class ST>
@@ -42,7 +42,7 @@ void LinearExplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const State& c
 	else
 	{
 		const Vector& f = this->m_equation.computeF(currentState);
-		Vector deltaV = this->m_compliance * (f);
+		Vector deltaV = this->m_compliance * f;
 
 		newState->getPositions()  = currentState.getPositions()  + dt * currentState.getVelocities();
 		newState->getVelocities() = currentState.getVelocities() + deltaV;

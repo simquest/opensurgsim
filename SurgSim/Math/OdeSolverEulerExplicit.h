@@ -51,13 +51,13 @@ class ExplicitEuler : public OdeSolver<State, MT, DT, KT, ST>
 public:
 	/// Constructor
 	/// \param equation The ode equation to be solved
-	ExplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
+	explicit ExplicitEuler(OdeEquation<State, MT, DT, KT, ST>* equation);
 
 	/// Solves the equation
 	/// \param dt The time step
 	/// \param currentState State at time t
 	/// \param[out] newState State at time t+dt
-	void solve(double dt, const State& currentState, State* newState) override;
+	virtual void solve(double dt, const State& currentState, State* newState) override;
 
 private:
 	/// Helper class to solve and inverse a system of linear equations

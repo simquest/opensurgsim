@@ -25,10 +25,10 @@ namespace Math
 template <class State, class MT, class DT, class KT, class ST>
 LinearModifiedExplicitEuler<State, MT, DT, KT, ST>::LinearModifiedExplicitEuler(
 	OdeEquation<State, MT, DT, KT, ST>* equation) :
-	ModifiedExplicitEuler<State, MT, DT, KT, ST>(equation)
+	ModifiedExplicitEuler<State, MT, DT, KT, ST>(equation),
+	m_initialized(false)
 {
 	this->m_name = "Linear Explicit Euler Modified";
-	this->m_initialized = false;
 }
 
 template <class State, class MT, class DT, class KT, class ST>
