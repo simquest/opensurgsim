@@ -33,10 +33,11 @@ namespace
 {
 const double epsilon = 1e-10;
 const double epsilonNumericalEvaluation = 1e-8;
+const double epsilonTestAgainstNumericalApproximation = 1e-7;
 
 Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KFormal(const Vector3d p0, const Vector3d p1,
-			   const Vector3d v0, const Vector3d v1,
-			   double l0, double stiffness, double damping)
+													  const Vector3d v0, const Vector3d v1,
+													  double l0, double stiffness, double damping)
 {
 	Vector3d u = p1 - p0;
 	double m_l = u.norm();
@@ -90,11 +91,11 @@ double f(int axis, const Vector3d p0, const Vector3d p1,
 	double elongationVelocity = (v1 - v0).dot(u);
 	if (axis <=2)
 	{
-		return (stiffness* elongationPosition + damping * elongationVelocity) * u[axis];
+		return (stiffness * elongationPosition + damping * elongationVelocity) * u[axis];
 	}
 	else
 	{
-		return -(stiffness* elongationPosition + damping * elongationVelocity) * u[axis - 3];
+		return -(stiffness * elongationPosition + damping * elongationVelocity) * u[axis - 3];
 	}
 }
 
@@ -110,17 +111,17 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> KNumerical(const Vector3d p0, cons
 		{
 			// dfrow/dxcol
 			// (1) f(x+delta) = f(x) + df/dx.delta + o(delta^2)
-			// (2) f(x) = f(x-delta) + df/dx.delta + o(delta^2)
-			// (1) + (2) f(x+delta) + f(x) = f(x) + f(x-delta) + 2df/dx.delta
+			// (2) f(x-delta) = f(x) - df/dx.delta + o(delta^2)
+			// (1) - (2) f(x+delta) - f(x-delta) = 2df/dx.delta
 			// df/dx = (f(x+delta) - f(x-delta)) / 2delta
 			Eigen::Matrix<double, 6 ,1> delta6D;
 			delta6D.setZero();
 			delta6D[col] = epsilonNumericalEvaluation;
 			double f_plus_delta = f(row, p0 + delta6D.segment(0, 3), p1 + delta6D.segment(3, 3), v0, v1,
 				l0, stiffness, damping);
-			double f_moins_delta = f(row, p0 - delta6D.segment(0, 3), p1 - delta6D.segment(3, 3), v0, v1,
+			double f_minus_delta = f(row, p0 - delta6D.segment(0, 3), p1 - delta6D.segment(3, 3), v0, v1,
 				l0, stiffness, damping);
-			dfdx(row, col) = (f_plus_delta - f_moins_delta) / (2.0 * epsilonNumericalEvaluation);
+			dfdx(row, col) = (f_plus_delta - f_minus_delta) / (2.0 * epsilonNumericalEvaluation);
 		}
 	}
 
@@ -139,8 +140,8 @@ Eigen::Matrix<double, 6, 6, Eigen::DontAlign> DNumerical(const Vector3d p0, cons
 		{
 			// dfrow/dxcol
 			// (1) f(x+delta) = f(x) + df/dx.delta + o(delta^2)
-			// (2) f(x) = f(x-delta) + df/dx.delta + o(delta^2)
-			// (1) + (2) f(x+delta) + f(x) = f(x) + f(x-delta) + 2df/dx.delta
+			// (2) f(x-delta) = f(x) - df/dx.delta + o(delta^2)
+			// (1) - (2) f(x+delta) - f(x-delta) = 2df/dx.delta
 			// df/dx = (f(x+delta) - f(x-delta)) / 2delta
 			Eigen::Matrix<double, 6 ,1> delta6D;
 			delta6D.setZero();
@@ -239,12 +240,10 @@ TEST(LinearSpringTests, computeMethods)
 		"expectedF = " << expectedF.transpose() << std::endl;
 
 	// Calculate stiffness matrix
-	double expectedStiffnessMatrixContent[] = {
-		0.224919570941728960, 0.064210544149390564, 0.0011847965179350647,
+	Matrix33d expectedStiffness33;
+	expectedStiffness33 << 0.224919570941728960, 0.064210544149390564, 0.0011847965179350647,
 		0.047808674990512064, 0.312562344690556770, 0.0021120285754494608,
-		0.013992782924052311, 0.033501153469247251, 0.1987182250423049600
-	};
-	Matrix33d expectedStiffness33(expectedStiffnessMatrixContent);
+		0.013992782924052311, 0.033501153469247251, 0.1987182250423049600;
 	Matrix expectedK;
 	expectedK.resize(6u, 6u);
 	setSubMatrix( expectedStiffness33, 0, 0, 3, 3, &expectedK);
@@ -258,12 +257,10 @@ TEST(LinearSpringTests, computeMethods)
 		"expectedK = " << std::endl << expectedK << std::endl;
 
 	// Calculate damping matrix
-	double expectedDampingMatrixContent[] = {
-		0.101125743415463040, 0.180267629566694950, 0.052761257434154628,
+	Matrix33d expectedDamping33;
+	expectedDamping33 << 0.101125743415463040, 0.180267629566694950, 0.052761257434154628,
 		0.180267629566694950, 0.321346644010195360, 0.094052676295666937,
-		0.052761257434154628, 0.094052676295666937, 0.027527612574341543
-	};
-	Matrix33d expectedDamping33(expectedDampingMatrixContent);
+		0.052761257434154628, 0.094052676295666937, 0.027527612574341543;
 	Matrix expectedD;
 	expectedD.resize(6u, 6u);
 	setSubMatrix( expectedDamping33, 0, 0, 3, 3, &expectedD);
@@ -393,11 +390,11 @@ TEST(LinearSpringTests, addStiffnessNumericalTest)
 
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
-	EXPECT_TRUE(Kformal.isApprox(Knumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(Kformal.isApprox(Knumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Kformal = " << std::endl << Kformal << std::endl <<
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
 		"Kformal - Knumeric= " << std::endl << Kformal - Knumeric << std::endl;
-	EXPECT_TRUE(K.isApprox(Knumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(K.isApprox(Kformal)) << std::endl <<
 		"K = " << std::endl << K << std::endl <<
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
 		"K - Knumeric= " << std::endl << K - Knumeric << std::endl;
@@ -428,11 +425,11 @@ TEST(LinearSpringTests, addDampingNumericalTest)
 
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
-	EXPECT_TRUE(Dformal.isApprox(Dnumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(Dformal.isApprox(Dnumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Dformal = " << std::endl << Dformal << std::endl <<
 		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
 		"Dformal - Dnumeric= " << std::endl << Dformal - Dnumeric << std::endl;
-	EXPECT_TRUE(D.isApprox(Dnumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(D.isApprox(Dformal)) << std::endl <<
 		"D = " << std::endl << D << std::endl <<
 		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
 		"D - Dnumeric= " << std::endl << D - Dnumeric << std::endl;
@@ -467,22 +464,22 @@ TEST(LinearSpringTests, addFDKNumericalTest)
 
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Knumeric = KNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Kformal = KFormal(x0, x1, v0, v1, restLength, stiffness, damping);
-	EXPECT_TRUE(Kformal.isApprox(Knumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(Kformal.isApprox(Knumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Kformal = " << std::endl << Kformal << std::endl <<
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
 		"Kformal - Knumeric= " << std::endl << Kformal - Knumeric << std::endl;
-	EXPECT_TRUE(K.isApprox(Knumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(K.isApprox(Kformal)) << std::endl <<
 		"K = " << std::endl << K << std::endl <<
 		"Knumeric = " << std::endl << Knumeric << std::endl <<
 		"K - Knumeric= " << std::endl << K - Knumeric << std::endl;
 
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dnumeric = DNumerical(x0, x1, v0, v1, restLength, stiffness, damping);
 	Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Dformal = DFormal(x0, x1, v0, v1, restLength, stiffness, damping);
-	EXPECT_TRUE(Dformal.isApprox(Dnumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(Dformal.isApprox(Dnumeric, epsilonTestAgainstNumericalApproximation)) << std::endl <<
 		"Dformal = " << std::endl << Dformal << std::endl <<
 		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
 		"Dformal - Dnumeric= " << std::endl << Dformal - Dnumeric << std::endl;
-	EXPECT_TRUE(D.isApprox(Dnumeric, 1e-7)) << std::endl <<
+	EXPECT_TRUE(D.isApprox(Dformal)) << std::endl <<
 		"D = " << std::endl << D << std::endl <<
 		"Dnumeric = " << std::endl << Dnumeric << std::endl <<
 		"D - Dnumeric= " << std::endl << D - Dnumeric << std::endl;
