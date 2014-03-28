@@ -382,6 +382,45 @@ TEST_F(Fem3DRepresentationTests, SetFilenameTest)
 		EXPECT_FALSE(fem->loadFile());
 	}
 
+	{
+		SCOPED_TRACE("Loading file with no filename");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		EXPECT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading twice");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+		ASSERT_TRUE(fem->loadFile());
+		ASSERT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading with non-shared ptr");
+		auto fem = Fem3DRepresentation("fem3d");
+
+		ASSERT_NO_THROW(fem.setFilename("Data/PlyReaderTests/Tetrahedron.ply"));
+		EXPECT_THROW(fem.loadFile(), SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Loading file with incorrect PLY format");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/WrongPlyTetrahedron.ply"));
+		EXPECT_FALSE(fem->loadFile());
+	}
+
+	{
+		SCOPED_TRACE("Loading file with incorrect data");
+		auto fem = std::make_shared<Fem3DRepresentation>("fem3d");
+
+		ASSERT_NO_THROW(fem->setFilename("Data/PlyReaderTests/WrongDataTetrahedron.ply"));
+		EXPECT_THROW(fem->loadFile(), SurgSim::Framework::AssertionFailure);
+	}
 }
 
 } // namespace Physics
