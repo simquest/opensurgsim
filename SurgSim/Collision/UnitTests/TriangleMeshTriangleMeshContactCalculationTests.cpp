@@ -274,7 +274,7 @@ TEST(TriangleMeshTriangleMeshContactCalculationTests, IntersectionTest)
 	pose = SurgSim::Math::makeRigidTransform(
 			SurgSim::Math::makeRotationQuaternion(0.3468, Vector3d(0.2577, 0.8245, 1.0532).normalized()),
 			Vector3d(120.34, 567.23, -832.84));
-	
+
 	typedef SurgSim::DataStructures::TriangleMeshBase<EmptyData, EmptyData, EmptyData> TriangleMesh;
 
 	{
