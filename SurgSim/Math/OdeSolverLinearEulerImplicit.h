@@ -47,6 +47,12 @@ private:
 
 	/// Has the solver been at least once to initialize itself
 	bool m_initialized;
+
+public:
+	// Variables used from OdeSolver 
+	using OdeSolver<State, MT, DT, KT, ST>::m_name;
+	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
+	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
 };
 
 }; // namespace Math

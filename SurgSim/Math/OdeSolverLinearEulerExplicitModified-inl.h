@@ -28,7 +28,7 @@ LinearModifiedExplicitEuler<State, MT, DT, KT, ST>::LinearModifiedExplicitEuler(
 	ModifiedExplicitEuler<State, MT, DT, KT, ST>(equation),
 	m_initialized(false)
 {
-	this->m_name = "Linear Explicit Euler Modified";
+	m_name = "Linear Explicit Euler Modified";
 }
 
 template <class State, class MT, class DT, class KT, class ST>
@@ -41,8 +41,8 @@ void LinearModifiedExplicitEuler<State, MT, DT, KT, ST>::solve(double dt, const 
 	}
 	else
 	{
-		const Vector& f = this->m_equation.computeF(currentState);
-		Vector deltaV = this->m_compliance * (f);
+		const Vector& f = m_equation.computeF(currentState);
+		Vector deltaV = m_compliance * (f);
 
 		newState->getVelocities() = currentState.getVelocities() + deltaV;
 		newState->getPositions()  = currentState.getPositions()  + dt * newState->getVelocities();

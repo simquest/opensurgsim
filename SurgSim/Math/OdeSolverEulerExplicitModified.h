@@ -63,6 +63,13 @@ private:
 
 	/// Temporary matrix to modify the mass matrix into the system matrix while keeping the proper type
 	MT m_MsystemMatrix;
+
+public:
+	// Variables used from OdeSolver
+	using OdeSolver<State, MT, DT, KT, ST>::m_name;
+	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
+	using OdeSolver<State, MT, DT, KT, ST>::m_systemMatrix;
+	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
 };
 
 }; // namespace Math

@@ -63,6 +63,13 @@ private:
 	/// Helper variable to solve and inverse a system of linear equations
 	/// Optimized for the system matrix type
 	SolveAndInverse<ST> m_solveAndInverse;
+
+public:
+	// Variables used from OdeSolver
+	using OdeSolver<State, MT, DT, KT, ST>::m_name;
+	using OdeSolver<State, MT, DT, KT, ST>::m_equation;
+	using OdeSolver<State, MT, DT, KT, ST>::m_systemMatrix;
+	using OdeSolver<State, MT, DT, KT, ST>::m_compliance;
 };
 
 }; // namespace Math
