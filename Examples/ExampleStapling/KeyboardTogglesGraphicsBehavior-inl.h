@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_INL_H
-#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_INL_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
+#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H
 
 template<class T>
-void KeyboardBehavior::registerKey(SurgSim::Device::KeyCode key, const std::vector<std::shared_ptr<T>>& graphics)
+void KeyboardTogglesGraphicsBehavior::registerKey(SurgSim::Device::KeyCode key, const std::vector<std::shared_ptr<T>>& graphics)
 {
 	auto match = m_keyRegister.find(static_cast<int>(key));
 	if (match != m_keyRegister.end())
@@ -36,4 +36,4 @@ void KeyboardBehavior::registerKey(SurgSim::Device::KeyCode key, const std::vect
 	}
 }
 
-#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_INL_H
+#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_INL_H

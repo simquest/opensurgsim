@@ -23,15 +23,15 @@ include_directories(
 )
 
 set(EXAMPLESTAPLING_SOURCES
-	KeyboardBehavior.cpp
+	KeyboardTogglesGraphicsBehavior.cpp
 	main.cpp
 	StapleElement.cpp
 	StaplerBehavior.cpp
 )
 
 set(EXAMPLESTAPLING_HEADERS
-	KeyboardBehavior.h
-	KeyboardBehavior-inl.h
+	KeyboardTogglesGraphicsBehavior.h
+	KeyboardTogglesGraphicsBehavior-inl.h
 	StapleElement.h
 	StaplerBehavior.h
 )

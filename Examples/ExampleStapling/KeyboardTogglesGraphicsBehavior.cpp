@@ -19,12 +19,12 @@
 #include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Input/InputComponent.h"
 
-KeyboardBehavior::KeyboardBehavior(const std::string& name) :
+KeyboardTogglesGraphicsBehavior::KeyboardTogglesGraphicsBehavior(const std::string& name) :
 	SurgSim::Framework::Behavior(name)
 {
 }
 
-void KeyboardBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
+void KeyboardTogglesGraphicsBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputComponent> inputComponent)
 {
 	m_inputComponent = inputComponent;
 }
@@ -32,7 +32,7 @@ void KeyboardBehavior::setInputComponent(std::shared_ptr<SurgSim::Input::InputCo
 // Note: This behavior is currently updated by BehaviorManager which runs at 30Hz.
 // Since the speed (30Hz) is fast compared with the speed one key is pressed, the graphical representations will be
 // set to visible/invisible even with one key press.
-void KeyboardBehavior::update(double dt)
+void KeyboardTogglesGraphicsBehavior::update(double dt)
 {
 	static bool keyPressed = false;
 	SurgSim::DataStructures::DataGroup dataGroup;
@@ -53,12 +53,12 @@ void KeyboardBehavior::update(double dt)
 	}
 }
 
-bool KeyboardBehavior::doInitialize()
+bool KeyboardTogglesGraphicsBehavior::doInitialize()
 {
 	return true;
 }
 
-bool KeyboardBehavior::doWakeUp()
+bool KeyboardTogglesGraphicsBehavior::doWakeUp()
 {
 	return true;
 }

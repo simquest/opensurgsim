@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
-#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
+#ifndef EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
+#define EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
 
 #include "SurgSim/Devices/Keyboard/KeyCode.h"
 #include "SurgSim/Framework/Behavior.h"
@@ -32,12 +32,12 @@ class InputComponent;
 
 /// This behavior is used to turn on and off registered graphical representation(s)
 /// when the corresponding registered key is pressed.
-class KeyboardBehavior : public SurgSim::Framework::Behavior
+class KeyboardTogglesGraphicsBehavior : public SurgSim::Framework::Behavior
 {
 public:
 	/// Constructor
 	/// \param	name	Name of the behavior
-	explicit KeyboardBehavior(const std::string& name);
+	explicit KeyboardTogglesGraphicsBehavior(const std::string& name);
 
 	/// Set the input component from which pressed keys come.
 	/// \param	inputComponent	The input component which contains the pressed key(s).
@@ -74,4 +74,4 @@ private:
 
 #include "Examples/ExampleStapling/KeyboardBehavior-inl.h"
 
-#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDBEHAVIOR_H
+#endif //EXAMPLES_EXAMPLESTAPLING_KEYBOARDTOGGLESGRAPHICSBEHAVIOR_H
