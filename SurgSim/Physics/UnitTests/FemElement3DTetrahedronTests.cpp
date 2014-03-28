@@ -255,6 +255,63 @@ TEST_F(FemElement3DTetrahedronTests, VolumeTest)
 	EXPECT_NEAR(tet.getVolume(m_restState), m_expectedVolume, 1e-10);
 }
 
+TEST_F(FemElement3DTetrahedronTests, CoordinateTests)
+{
+	FemElement3DTetrahedron element(m_nodeIds);
+	Vector3d expectedA(0.1, 1.2, 2.3);
+	Vector3d expectedB(1.1, 1.2, 2.3);
+	Vector3d expectedC(0.1, 2.2, 2.3);
+	Vector3d expectedD(0.1, 1.2, 3.3);
+
+	Vector validNaturalCoordinate(4);
+	Vector invalidNaturalCoordinateSumNot1(4);
+	Vector invalidNaturalCoordinateNegativeValue(4);
+	Vector invalidNaturalCoordinateBiggerThan1Value(4);
+	Vector invalidNaturalCoordinateSize3(3), invalidNaturalCoordinateSize5(5);
+
+	validNaturalCoordinate << 0.4, 0.3, 0.2, 0.1;
+	invalidNaturalCoordinateSumNot1 << 0.1, 0.1, 0.1, 0.1;
+	invalidNaturalCoordinateNegativeValue << 0.7, 0.7, -0.5, 0.1;
+	invalidNaturalCoordinateBiggerThan1Value << 1.4, 0.6, -1.2, 0.2;
+	invalidNaturalCoordinateSize3 << 0.4, 0.4, 0.2;
+	invalidNaturalCoordinateSize5 << 0.2, 0.2, 0.2, 0.2, 0.2;
+	EXPECT_TRUE(element.isValidCoordinate(validNaturalCoordinate));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSumNot1));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateNegativeValue));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateBiggerThan1Value));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize3));
+	EXPECT_FALSE(element.isValidCoordinate(invalidNaturalCoordinateSize5));
+
+	Vector naturalCoordinateA(4), naturalCoordinateB(4), naturalCoordinateC(4), naturalCoordinateD(4);
+	Vector naturalCoordinateMiddle(4);
+	Vector ptA, ptB, ptC, ptD, ptMiddle;
+	naturalCoordinateA << 1.0, 0.0, 0.0, 0.0;
+	naturalCoordinateB << 0.0, 1.0, 0.0, 0.0;
+	naturalCoordinateC << 0.0, 0.0, 1.0, 0.0;
+	naturalCoordinateD << 0.0, 0.0, 0.0, 1.0;
+	naturalCoordinateMiddle << 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0, 1 / 4.0;
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateBiggerThan1Value), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateNegativeValue), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize3), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSize5), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_THROW(ptA = element.computeCartesianCoordinate(m_restState, invalidNaturalCoordinateSumNot1), \
+		SurgSim::Framework::AssertionFailure);
+	EXPECT_NO_THROW(ptA = element.computeCartesianCoordinate(m_restState, naturalCoordinateA));
+	EXPECT_NO_THROW(ptB = element.computeCartesianCoordinate(m_restState, naturalCoordinateB));
+	EXPECT_NO_THROW(ptC = element.computeCartesianCoordinate(m_restState, naturalCoordinateC));
+	EXPECT_NO_THROW(ptD = element.computeCartesianCoordinate(m_restState, naturalCoordinateD));
+	EXPECT_NO_THROW(ptMiddle = element.computeCartesianCoordinate(m_restState, naturalCoordinateMiddle));
+	EXPECT_TRUE(ptA.isApprox(expectedA));
+	EXPECT_TRUE(ptB.isApprox(expectedB));
+	EXPECT_TRUE(ptC.isApprox(expectedC));
+	EXPECT_TRUE(ptD.isApprox(expectedD));
+	EXPECT_TRUE(ptMiddle.isApprox((expectedA + expectedB + expectedC + expectedD) / 4.0));
+}
+
 TEST_F(FemElement3DTetrahedronTests, ShapeFunctionsTest)
 {
 	using SurgSim::Math::getSubVector;

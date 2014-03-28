@@ -176,17 +176,77 @@ protected:
 
 TEST_F (ConstraintTests, TestConstructor)
 {
+	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
+	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
+
 	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
 	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+
+	fixedLoc->setRepresentation(fixedRep);
+	rigidLoc->setRepresentation(rigidRep);
 
 	std::shared_ptr<ConstraintImplementation> fixedImp = std::make_shared<FixedRepresentationContact>();
 	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();
 
-	EXPECT_ANY_THROW({Constraint c(nullptr, nullptr, nullptr, nullptr, nullptr);});
-	EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, nullptr, nullptr, nullptr);});
-	EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, nullptr);});
-	EXPECT_ANY_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, nullptr);});
-	ASSERT_NO_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+	{
+		SCOPED_TRACE("nullptr test");
+		ASSERT_NO_THROW({Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc);});
+
+		EXPECT_THROW(
+			{ Constraint c(nullptr, nullptr, nullptr, nullptr, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, nullptr, nullptr, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, nullptr, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, nullptr); },
+			SurgSim::Framework::AssertionFailure);
+	}
+
+	{
+		SCOPED_TRACE("Localization nullptr test");
+
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
+
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+		fixedLoc->setRepresentation(fixedRep);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
+
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+		rigidLoc->setRepresentation(rigidRep);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
+
+		fixedLoc = std::make_shared<FixedRepresentationLocalization>();
+		rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+		fixedLoc->setRepresentation(fixedRep);
+		rigidLoc->setRepresentation(rigidRep);
+		EXPECT_NO_THROW(
+			{ Constraint c(m_constraintData, fixedImp, fixedLoc, rigidImp, rigidLoc); });
+	}
+
+	{
+		SCOPED_TRACE("Representation mismatch between Implementation and Localization");
+
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, fixedImp, rigidLoc, rigidImp, fixedLoc); },
+			SurgSim::Framework::AssertionFailure);
+		EXPECT_THROW(
+			{ Constraint c(m_constraintData, rigidImp, fixedLoc, fixedImp, rigidLoc); },
+			SurgSim::Framework::AssertionFailure);
+	}
 
 	// Need more checks for the other error conditions
 
@@ -201,9 +261,14 @@ TEST_F (ConstraintTests, TestConstructor)
 
 TEST_F (ConstraintTests, TestGetNumDof)
 {
+	auto fixedRep = std::make_shared<FixedRepresentation>("fixed");
+	auto rigidRep = std::make_shared<RigidRepresentation>("rigid");
 
 	std::shared_ptr<Localization> fixedLoc = std::make_shared<FixedRepresentationLocalization>();
 	std::shared_ptr<Localization> rigidLoc = std::make_shared<RigidRepresentationLocalization>();
+
+	fixedLoc->setRepresentation(fixedRep);
+	rigidLoc->setRepresentation(rigidRep);
 
 	std::shared_ptr<ConstraintImplementation> fixedImp = std::make_shared<FixedRepresentationContact>();
 	std::shared_ptr<ConstraintImplementation> rigidImp = std::make_shared<RigidRepresentationContact>();

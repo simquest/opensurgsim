@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "SurgSim/Framework/Logger.h"
 #include "SurgSim/Physics/ConstraintImplementationFactory.h"
 #include "SurgSim/Physics/FixedRepresentationContact.h"
 #include "SurgSim/Physics/RigidRepresentationContact.h"
@@ -43,7 +44,12 @@ std::shared_ptr<ConstraintImplementation> ConstraintImplementationFactory::getIm
 	SURGSIM_ASSERT(constraintType >= 0 && constraintType < SurgSim::Math::MLCP_NUM_CONSTRAINT_TYPES) <<
 		"Invalid constraint type " << constraintType;
 
-	return m_implementations[representationType][constraintType];
+	auto implementation = m_implementations[representationType][constraintType];
+	SURGSIM_LOG_IF(implementation == nullptr, SurgSim::Framework::Logger::getDefaultLogger(), WARNING) <<
+		"No constraint implementation for representation type (" << representationType <<
+		") and constraint type (" << constraintType << ")";
+
+	return implementation;
 }
 
 void ConstraintImplementationFactory::addImplementation(std::shared_ptr<ConstraintImplementation> implementation)

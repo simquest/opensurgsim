@@ -95,7 +95,7 @@ TEST_F(ContactConstraintGenerationTests, BasicTest)
 	state->setCollisionPairs(pairs);
 
 	ContactConstraintGeneration generator;
-	generator.update(0.1,state);
+	generator.update(0.1, state);
 
 	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
@@ -135,11 +135,42 @@ TEST_F(ContactConstraintGenerationTests, CountTest)
 
 	state->setCollisionPairs(pairs);
 	ContactConstraintGeneration generator;
-	generator.update(0.1,state);
+	generator.update(0.1, state);
 
 	// 3 Contacts should generate 3 constraints
 	ASSERT_EQ(3u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
 
 }
+
+TEST_F(ContactConstraintGenerationTests, InactivePhysics)
+{
+	std::shared_ptr<CollisionPair> pair = std::make_shared<CollisionPair>(sphere, plane);
+	SurgSim::Collision::SphereDoubleSidedPlaneDcdContact contactCalculation;
+	contactCalculation.calculateContact(pair);
+	pairs.push_back(pair);
+	state->setCollisionPairs(pairs);
+	ContactConstraintGeneration generator;
+
+	rigid0->setIsActive(false);
+	rigid1->setIsActive(true);
+	generator.update(0.1, state);
+	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+
+	rigid0->setIsActive(true);
+	rigid1->setIsActive(false);
+	generator.update(0.1, state);
+	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+
+	rigid0->setIsActive(false);
+	rigid1->setIsActive(false);
+	generator.update(0.1, state);
+	ASSERT_EQ(0u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+
+	rigid0->setIsActive(true);
+	rigid1->setIsActive(true);
+	generator.update(0.1, state);
+	ASSERT_EQ(1u, state->getConstraintGroup(CONSTRAINT_GROUP_TYPE_CONTACT).size());
+}
+
 }; // namespace Physics
 }; // namespace SurgSim

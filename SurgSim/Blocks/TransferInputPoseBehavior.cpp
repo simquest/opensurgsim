@@ -16,6 +16,7 @@
 #include "SurgSim/Blocks/TransferInputPoseBehavior.h"
 
 #include "SurgSim/DataStructures/DataGroup.h"
+#include "SurgSim/Framework/Log.h"
 #include "SurgSim/Framework/Representation.h"
 #include "SurgSim/Input/InputComponent.h"
 #include "SurgSim/Math/RigidTransform.h"
@@ -61,7 +62,20 @@ void TransferInputPoseBehavior::update(double dt)
 
 bool TransferInputPoseBehavior::doInitialize()
 {
-	return true;
+	bool result = true;
+	if (m_from == nullptr)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No pose sender set for TransferInputPoseBehavior named '" << getName() << "', so it cannot initialize.";
+		result = false;
+	}
+	if (m_to == nullptr)
+	{
+		SURGSIM_LOG_CRITICAL(SurgSim::Framework::Logger::getDefaultLogger()) <<
+			"No pose receiver set for TransferInputPoseBehavior named '" << getName() << "', so it cannot initialize.";
+		result = false;
+	}
+	return result;
 }
 
 bool TransferInputPoseBehavior::doWakeUp()

@@ -13,18 +13,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SURGSIM_MATH_SHAPES_H
-#define SURGSIM_MATH_SHAPES_H
+#include "SurgSim/Physics/ConstraintComponent.h"
 
-/// This file includes all the shapes
-#include "SurgSim/Math/BoxShape.h"
-#include "SurgSim/Math/CapsuleShape.h"
-#include "SurgSim/Math/CylinderShape.h"
-#include "SurgSim/Math/DoubleSidedPlaneShape.h"
-#include "SurgSim/Math/MeshShape.h"
-#include "SurgSim/Math/PlaneShape.h"
-#include "SurgSim/Math/OctreeShape.h"
-#include "SurgSim/Math/SphereShape.h"
-#include "SurgSim/Math/SurfaceMeshShape.h"
+namespace SurgSim
+{
+namespace Physics
+{
 
-#endif // SURGSIM_MATH_SHAPES_H
+ConstraintComponent::ConstraintComponent(const std::string& name) : Component(name)
+{
+}
+
+ConstraintComponent::~ConstraintComponent()
+{
+}
+
+void ConstraintComponent::setConstraint(std::shared_ptr<Constraint> constraint)
+{
+	m_constraint = constraint;
+}
+
+std::shared_ptr<Constraint> ConstraintComponent::getConstraint() const
+{
+	return m_constraint;
+}
+
+bool ConstraintComponent::doInitialize()
+{
+	return m_constraint != nullptr;
+};
+
+bool ConstraintComponent::doWakeUp()
+{
+	return true;
+}
+
+}; // namespace Physics
+}; // namespace SurgSim
