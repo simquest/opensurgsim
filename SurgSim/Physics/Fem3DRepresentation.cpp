@@ -95,7 +95,7 @@ void Fem3DRepresentation::setFilename(const std::string& filename)
 {
 	m_filename = filename;
 
-	m_doLoadFile = (m_filename.size() != 0);
+	m_doLoadFile = !m_filename.empty();
 }
 
 const std::string& Fem3DRepresentation::getFilename() const
@@ -105,20 +105,20 @@ const std::string& Fem3DRepresentation::getFilename() const
 
 bool Fem3DRepresentation::loadFile()
 {
-	if (!m_doLoadFile)
+	if (m_filename.empty())
 	{
 		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Filename not set.";
 		return false;
 	}
 
-	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
-	if (thisAsSharedPtr == nullptr)
+	if (!m_doLoadFile)
 	{
-		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "Object must be created as a shared_ptr.";
+		SURGSIM_LOG_WARNING(Logger::getDefaultLogger()) << "File already loaded.";
 		return false;
 	}
 
 	SurgSim::DataStructures::PlyReader reader(m_filename);
+	auto thisAsSharedPtr = std::static_pointer_cast<Fem3DRepresentation>(getSharedPtr());
 	auto readerDelegate = std::make_shared<Fem3DRepresentationPlyReaderDelegate>(thisAsSharedPtr);
 
 	if (!reader.isValid())
