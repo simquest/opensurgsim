@@ -22,6 +22,7 @@ set(SURGSIM_PHYSICS_SOURCES
 	BuildMlcp.cpp
 	Computation.cpp
 	Constraint.cpp
+	ConstraintComponent.cpp
 	ConstraintData.cpp
 	ConstraintImplementation.cpp
 	ConstraintImplementationFactory.cpp
@@ -69,6 +70,7 @@ set(SURGSIM_PHYSICS_HEADERS
 	BuildMlcp.h
 	Computation.h
 	Constraint.h
+	ConstraintComponent.h
 	ConstraintData.h
 	ConstraintImplementation.h
 	ConstraintImplementationFactory.h

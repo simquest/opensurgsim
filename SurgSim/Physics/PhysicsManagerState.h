@@ -34,9 +34,12 @@ namespace SurgSim
 namespace Physics
 {
 
+class ConstraintComponent;
+
 enum ConstraintGroupType
 {
 	CONSTRAINT_GROUP_TYPE_CONTACT = 0,
+	CONSTRAINT_GROUP_TYPE_SCENE,
 	CONSTRAINT_GROUP_TYPE_COUNT
 };
 
@@ -45,6 +48,8 @@ class PhysicsManagerState
 public:
 	/// Constructor
 	PhysicsManagerState();
+
+	/// Destructor
 	~PhysicsManagerState();
 
 	/// Sets the physics representations for the state, these are the basis for all the computations.
@@ -63,7 +68,15 @@ public:
 	/// \return The collision representations that are known to the state.
 	const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>& getCollisionRepresentations();
 
-	/// \return A map that associates collision representations with physicsre presentations where
+	/// Sets the list of constraint components
+	/// \param val collection of all constraint components
+	void setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val);
+
+	/// Gets the constraint components
+	/// \return The constraint components known to the state
+	const std::vector<std::shared_ptr<ConstraintComponent>>& getConstraintComponents();
+
+	/// \return A map that associates collision representations with physics representations where
 	///         map[physicsRep->getCollisionRepresentation] = physicsRep
 	const std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,
 		  std::shared_ptr<SurgSim::Physics::Representation>>& getCollisionToPhysicsMap() const;
@@ -125,6 +138,9 @@ private:
 
 	/// List of all the collision representations know to the state
 	std::vector<std::shared_ptr<SurgSim::Collision::Representation>> m_collisionRepresentations;
+
+	/// List of the constraint components
+	std::vector<std::shared_ptr<ConstraintComponent>> m_constraintComponents;
 
 	/// Mapping of collision representations to their respective physics representation.
 	std::unordered_map<std::shared_ptr<SurgSim::Collision::Representation>,

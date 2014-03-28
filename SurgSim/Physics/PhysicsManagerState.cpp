@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include "SurgSim/Physics/Constraint.h"
+#include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/PhysicsManagerState.h"
 #include "SurgSim/Physics/Representation.h"
 
@@ -78,6 +79,31 @@ const std::vector<std::shared_ptr<SurgSim::Collision::Representation>>&
 PhysicsManagerState::getCollisionRepresentations()
 {
 	return m_collisionRepresentations;
+}
+
+void PhysicsManagerState::setConstraintComponents(const std::vector<std::shared_ptr<ConstraintComponent>>& val)
+{
+	if (m_constraintComponents == val)
+	{
+		return;
+	}
+	m_constraintComponents = val;
+
+	std::vector<std::shared_ptr<Constraint>>& constraints = m_constraints[CONSTRAINT_GROUP_TYPE_SCENE];
+
+	constraints.reserve(m_constraintComponents.size());
+	constraints.clear();
+	for (auto it = m_constraintComponents.cbegin(); it != m_constraintComponents.cend(); ++it)
+	{
+		constraints.push_back((*it)->getConstraint());
+	}
+
+	setConstraintGroup(CONSTRAINT_GROUP_TYPE_SCENE, constraints);
+}
+
+const std::vector<std::shared_ptr<ConstraintComponent>>& PhysicsManagerState::getConstraintComponents()
+{
+	return m_constraintComponents;
 }
 
 void PhysicsManagerState::setCollisionPairs(std::vector<std::shared_ptr<SurgSim::Collision::CollisionPair>> val)

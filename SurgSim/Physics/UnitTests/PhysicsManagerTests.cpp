@@ -25,9 +25,11 @@
 #include <memory>
 
 #include "SurgSim/Framework/Runtime.h"
+#include "SurgSim/Physics/ConstraintComponent.h"
 #include "SurgSim/Physics/PhysicsManager.h"
 #include "SurgSim/Physics/Representation.h"
 #include "SurgSim/Physics/FixedRepresentation.h"
+#include "SurgSim/Physics/UnitTests/MockObjects.h"
 #include "SurgSim/Math/Vector.h"
 
 using SurgSim::Framework::Runtime;
@@ -83,7 +85,7 @@ TEST_F(PhysicsManagerTest, InitTest)
 	EXPECT_NO_THROW(runtime->stop());
 }
 
-TEST_F(PhysicsManagerTest, AddRemoveComponent)
+TEST_F(PhysicsManagerTest, AddRemoveRepresentation)
 {
 	std::shared_ptr<FixedRepresentation> representation1 = std::make_shared<FixedRepresentation>("Rep1");
 	std::shared_ptr<FixedRepresentation> representation2 = std::make_shared<FixedRepresentation>("Rep2");
@@ -95,6 +97,25 @@ TEST_F(PhysicsManagerTest, AddRemoveComponent)
 	EXPECT_TRUE(testDoRemoveComponent(representation1));
 	EXPECT_FALSE(testDoRemoveComponent(representation1));
 	EXPECT_TRUE(testDoRemoveComponent(representation2));
+}
+
+TEST_F(PhysicsManagerTest, AddRemoveConstraintComponent)
+{
+	auto constraintComponent1 = std::make_shared<ConstraintComponent>("component1");
+	auto constraintComponent2 = std::make_shared<ConstraintComponent>("component2");
+
+	constraintComponent1->setConstraint(
+		makeMockConstraint(std::make_shared<MockRepresentation>(), std::make_shared<MockRepresentation>()));
+	constraintComponent2->setConstraint(
+		makeMockConstraint(std::make_shared<MockRepresentation>(), std::make_shared<MockRepresentation>()));
+
+	EXPECT_TRUE(testDoAddComponent(constraintComponent1));
+	EXPECT_TRUE(testDoAddComponent(constraintComponent2));
+	EXPECT_FALSE(testDoAddComponent(constraintComponent1));
+
+	EXPECT_TRUE(testDoRemoveComponent(constraintComponent1));
+	EXPECT_FALSE(testDoRemoveComponent(constraintComponent1));
+	EXPECT_TRUE(testDoRemoveComponent(constraintComponent2));
 }
 
 }; // namespace Physics
