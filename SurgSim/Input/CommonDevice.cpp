@@ -45,6 +45,15 @@ struct CommonDevice::State
 
 
 
+CommonDevice::CommonDevice(const std::string& name) :
+	m_name(name),
+	m_nameForCallback(name),
+	m_initialInputData(SurgSim::DataStructures::DataGroup()),
+	m_inputData(SurgSim::DataStructures::DataGroup()),
+	m_state(new State)
+{
+}
+
 CommonDevice::CommonDevice(const std::string& name, const SurgSim::DataStructures::DataGroup& inputData) :
 	m_name(name),
 	m_nameForCallback(name),

@@ -280,16 +280,16 @@ bool SixenseScaffold::updateDevice(const SixenseScaffold::DeviceData& info)
 
 	// TODO(bert): this code should cache the access indices.
 	SurgSim::DataStructures::DataGroup& inputData = info.deviceObject->getInputData();
-	inputData.poses().set("pose", pose);
+	inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);
 	inputData.scalars().set("trigger", data.trigger);
 	inputData.scalars().set("joystickX", data.joystick_x);
 	inputData.scalars().set("joystickY", data.joystick_y);
 	inputData.booleans().set("buttonTrigger", (data.trigger > 0));
 	inputData.booleans().set("buttonBumper", (data.buttons & SIXENSE_BUTTON_BUMPER) != 0);
-	inputData.booleans().set("button1", (data.buttons & SIXENSE_BUTTON_1) != 0);
-	inputData.booleans().set("button2", (data.buttons & SIXENSE_BUTTON_2) != 0);
-	inputData.booleans().set("button3", (data.buttons & SIXENSE_BUTTON_3) != 0);
-	inputData.booleans().set("button4", (data.buttons & SIXENSE_BUTTON_4) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_1, (data.buttons & SIXENSE_BUTTON_1) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_2, (data.buttons & SIXENSE_BUTTON_2) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_3, (data.buttons & SIXENSE_BUTTON_3) != 0);
+	inputData.booleans().set(SurgSim::DataStructures::Names::BUTTON_4, (data.buttons & SIXENSE_BUTTON_4) != 0);
 	inputData.booleans().set("buttonStart", (data.buttons & SIXENSE_BUTTON_START) != 0);
 	inputData.booleans().set("buttonJoystick", (data.buttons & SIXENSE_BUTTON_JOYSTICK) != 0);
 
@@ -456,16 +456,16 @@ bool SixenseScaffold::destroyThread()
 SurgSim::DataStructures::DataGroup SixenseScaffold::buildDeviceInputData()
 {
 	SurgSim::DataStructures::DataGroupBuilder builder;
-	builder.addPose("pose");
+	builder.addPose(SurgSim::DataStructures::Names::POSE);
 	builder.addScalar("trigger");
 	builder.addScalar("joystickX");
 	builder.addScalar("joystickY");
 	builder.addBoolean("buttonTrigger");
 	builder.addBoolean("buttonBumper");
-	builder.addBoolean("button1");
-	builder.addBoolean("button2");
-	builder.addBoolean("button3");
-	builder.addBoolean("button4");
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_1);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_2);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_3);
+	builder.addBoolean(SurgSim::DataStructures::Names::BUTTON_4);
 	builder.addBoolean("buttonStart");
 	builder.addBoolean("buttonJoystick");
 	return builder.createData();

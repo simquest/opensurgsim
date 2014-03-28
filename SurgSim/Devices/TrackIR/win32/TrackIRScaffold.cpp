@@ -372,11 +372,11 @@ bool TrackIRScaffold::updateDevice(TrackIRScaffold::DeviceData* info)
 		pose.linear() = orientation;
 		pose.translation() = position;
 
-		inputData.poses().set("pose", pose);
+		inputData.poses().set(SurgSim::DataStructures::Names::POSE, pose);
 	}
 	else // Invalid pose. inputData.poses().hasData("pose") will be set to 'false'.
 	{
-		inputData.poses().reset("pose");
+		inputData.poses().reset(SurgSim::DataStructures::Names::POSE);
 	}
 
 	return true;

@@ -17,8 +17,11 @@
 #include <memory>
 #include <string>
 
+#include "Examples/ExampleStapling/StaplerBehavior.h"
+
 #include "SurgSim/Blocks/TransferDeformableStateToVerticesBehavior.h"
 #include "SurgSim/Blocks/TransferPoseBehavior.h"
+#include "SurgSim/Blocks/VisualizeContactsBehavior.h"
 #include "SurgSim/DataStructures/EmptyData.h"
 #include "SurgSim/DataStructures/MeshElement.h"
 #include "SurgSim/DataStructures/PlyReader.h"
@@ -26,7 +29,6 @@
 #include "SurgSim/DataStructures/Vertex.h"
 #include "SurgSim/Devices/IdentityPoseDevice/IdentityPoseDevice.h"
 #include "SurgSim/Devices/MultiAxis/MultiAxisDevice.h"
-#include "Examples/ExampleStapling/StaplerBehavior.h"
 #include "SurgSim/Framework/ApplicationData.h"
 #include "SurgSim/Framework/BasicSceneElement.h"
 #include "SurgSim/Framework/BehaviorManager.h"
@@ -53,6 +55,7 @@
 #include "SurgSim/Physics/VirtualToolCoupler.h"
 
 using SurgSim::Blocks::TransferPoseBehavior;
+using SurgSim::Blocks::VisualizeContactsBehavior;
 using SurgSim::DataStructures::EmptyData;
 using SurgSim::Device::IdentityPoseDevice;
 using SurgSim::DataStructures::PlyReader;
@@ -232,7 +235,7 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	osgMeshRepresentation->setDrawAsWireFrame(true);
 
 	// Stapler collision mesh
-	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh()); // Unit: meter
+	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
 	params.setDensity(8050); // Stainless steel (in Kg.m-3)
 	params.setShapeUsedForMassInertia(meshShape);
@@ -263,6 +266,14 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	staplerBehavior->setInputComponent(inputComponent);
 	staplerBehavior->setCollisionRepresentation(collisionRepresentation);
 
+	std::shared_ptr<VisualizeContactsBehavior> visualizeContactsBehavior =
+		std::make_shared<VisualizeContactsBehavior>("VisualizeContactsBehavior");
+	visualizeContactsBehavior->setCollisionRepresentation(collisionRepresentation);
+	// Note: Since usually the penetration depth of a collision is so small (at the magnitude of mm),
+	// if we use the depth as the length of vector, the vector field will be too small to be seen on the screen.
+	// Thus, we enlarge the vector field by 200 times.
+	visualizeContactsBehavior->setVectorFieldScale(200);
+
 	std::shared_ptr<SceneElement> sceneElement = std::make_shared<BasicSceneElement>(staplerName + "SceneElement");
 	sceneElement->addComponent(physicsRepresentation);
 	sceneElement->addComponent(collisionRepresentation);
@@ -270,12 +281,14 @@ std::shared_ptr<SceneElement> createStaplerSceneElement(const std::string& stapl
 	sceneElement->addComponent(inputComponent);
 	sceneElement->addComponent(inputVTC);
 	sceneElement->addComponent(staplerBehavior);
+	sceneElement->addComponent(visualizeContactsBehavior);
 
 	std::shared_ptr<TransferPoseBehavior> physicsPoseToGraphics =
 		std::make_shared<TransferPoseBehavior>("Physics to Graphics" + osgMeshRepresentation->getName());
 	physicsPoseToGraphics->setPoseSender(physicsRepresentation);
 	physicsPoseToGraphics->setPoseReceiver(osgMeshRepresentation);
 	sceneElement->addComponent(physicsPoseToGraphics);
+
 	// Load the graphical parts of a stapler.
 	std::list<std::shared_ptr<SceneryRepresentation>> sceneryRepresentations;
 	sceneryRepresentations.push_back(createSceneryObject("Handle",    "Geometry/stapler_handle.obj"));
@@ -302,7 +315,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 	paths.push_back("Data/Geometry");
 	ApplicationData data(paths);
 
-	// File "arm_collision.ply" contains collision mesh for upper arm and forearm.
+	// File "arm_collision.ply" contains collision meshes for both upper arm and forearm.
 	std::shared_ptr<TriangleMeshPlyReaderDelegate> delegate = std::make_shared<TriangleMeshPlyReaderDelegate>();
 	PlyReader reader(data.findFile("arm_collision.ply"));
 	reader.setDelegate(delegate);
@@ -322,7 +335,7 @@ std::shared_ptr<SceneElement> createArmSceneElement(const std::string& armName, 
 		createSceneryObject("upperarm", "Geometry/upperarm.osgb");
 	upperarmSceneryRepresentation->setInitialPose(pose);
 
-	// MeshShape collision representation of the arm.
+	// Arm collision mesh
 	std::shared_ptr<MeshShape> meshShape = std::make_shared<MeshShape>(*delegate->getMesh());
 	RigidRepresentationParameters params;
 	params.setShapeUsedForMassInertia(meshShape);
@@ -385,7 +398,7 @@ int main(int argc, char* argv[])
 	scene->addSceneElement(
 		createFemSceneElement("wound",
 							  woundFilename,
-							  SurgSim::Math::INTEGRATIONSCHEME_IMPLICIT_EULER, // Physics loop update technique
+							  SurgSim::Math::INTEGRATIONSCHEME_LINEAR_IMPLICIT_EULER,
 							  1000.0,										   // Mass Density
 							  0.45,											   // Poisson Ratio
 							  75e3,											   // Young Modulus
